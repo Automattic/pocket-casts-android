@@ -1337,6 +1337,7 @@ class MainActivity :
                     closeToRoot()
                 }
                 is DownloadsDeepLink -> {
+                    closePlayer()
                     closeToRoot()
                     addFragment(ProfileEpisodeListFragment.newInstance(ProfileEpisodeListFragment.Mode.Downloaded))
                 }
@@ -1370,6 +1371,7 @@ class MainActivity :
                 }
 
                 is ShowPodcastDeepLink -> {
+                    closePlayer()
                     openPodcastPage(deepLink.podcastUuid, deepLink.sourceView)
                 }
 
@@ -1385,9 +1387,11 @@ class MainActivity :
                     )
                 }
                 is ShowPodcastsDeepLink -> {
+                    closePlayer()
                     openTab(VR.id.navigation_podcasts)
                 }
                 is ShowDiscoverDeepLink -> {
+                    closePlayer()
                     openTab(VR.id.navigation_discover)
                 }
                 is ShowUpNextModalDeepLink -> {
@@ -1403,6 +1407,7 @@ class MainActivity :
                             withContext(Dispatchers.Main) {
                                 settings.setSelectedFilter(it.uuid)
                                 // HACK: Go diving to find if a filter fragment
+                                closePlayer()
                                 openTab(VR.id.navigation_filters)
                                 val filtersFragment = supportFragmentManager.fragments.find { it is FiltersFragment } as? FiltersFragment
                                 filtersFragment?.openPlaylist(it)
@@ -1439,11 +1444,13 @@ class MainActivity :
                     openCloudFiles()
                 }
                 is UpsellDeepLink -> {
+                    closePlayer()
                     openOnboardingFlow(OnboardingFlow.Upsell(OnboardingUpgradeSource.DEEP_LINK))
                 }
                 is SmartFoldersDeepLink -> {
                     if (supportFragmentManager.findFragmentByTag("suggested_folders") == null) {
-                        SuggestedFoldersFragment.newInstance(SuggestedFoldersFragment.Source.DEEPLINK).showNow(supportFragmentManager, "suggested_folders")
+                        closePlayer()
+                        SuggestedFoldersFragment.newInstance(SuggestedFoldersFragment.Source.DEEPLINK).show(supportFragmentManager, "suggested_folders")
                     }
                     openTab(VR.id.navigation_podcasts)
                 }
@@ -1457,6 +1464,7 @@ class MainActivity :
                     openSharingUrl(deepLink)
                 }
                 is OpmlImportDeepLink -> {
+                    closePlayer()
                     OpmlImportTask.run(deepLink.uri, this)
                 }
                 is ImportDeepLink -> {
@@ -1495,9 +1503,11 @@ class MainActivity :
                     openOnboardingFlow(onboardingFlow)
                 }
                 is ThemesDeepLink -> {
+                    closePlayer()
                     addFragment(AppearanceSettingsFragment.newInstance())
                 }
                 is DeveloperOptionsDeeplink -> {
+                    closePlayer()
                     addFragment(DeveloperFragment())
                 }
                 null -> {
@@ -1511,6 +1521,7 @@ class MainActivity :
     }
 
     private fun openDiscoverListDeeplink(listId: String) {
+        closePlayer()
         openTab(VR.id.navigation_discover)
         lifecycleScope.launch {
             val discoverList = discoverDeepLinkManager.getDiscoverList(listId, resources) ?: return@launch
