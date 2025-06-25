@@ -31,7 +31,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.MaterialTheme
-import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -41,11 +40,10 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.scale
-import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.content.res.ResourcesCompat
 import androidx.core.net.toUri
 import androidx.fragment.app.Fragment
@@ -60,7 +58,6 @@ import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.compose.AppTheme
 import au.com.shiftyjelly.pocketcasts.compose.LocalPodcastColors
-import au.com.shiftyjelly.pocketcasts.compose.PlayerColors
 import au.com.shiftyjelly.pocketcasts.compose.PodcastColors
 import au.com.shiftyjelly.pocketcasts.compose.ad.AdBanner
 import au.com.shiftyjelly.pocketcasts.compose.ad.BlazeAd
@@ -68,16 +65,16 @@ import au.com.shiftyjelly.pocketcasts.compose.ad.rememberAdColors
 import au.com.shiftyjelly.pocketcasts.compose.components.AnimatedNonNullVisibility
 import au.com.shiftyjelly.pocketcasts.compose.extensions.setContentWithViewCompositionStrategy
 import au.com.shiftyjelly.pocketcasts.compose.theme
-import au.com.shiftyjelly.pocketcasts.models.to.Chapters
 import au.com.shiftyjelly.pocketcasts.models.to.Transcript
 import au.com.shiftyjelly.pocketcasts.player.databinding.AdapterPlayerHeaderBinding
 import au.com.shiftyjelly.pocketcasts.player.view.bookmark.BookmarkActivity
 import au.com.shiftyjelly.pocketcasts.player.view.bookmark.BookmarkActivityContract
+import au.com.shiftyjelly.pocketcasts.player.view.nowplaying.ArtworkImageState
+import au.com.shiftyjelly.pocketcasts.player.view.nowplaying.ArtworkOrVideo
+import au.com.shiftyjelly.pocketcasts.player.view.nowplaying.ArtworkOrVideoState
+import au.com.shiftyjelly.pocketcasts.player.view.nowplaying.EpisodeTitles
 import au.com.shiftyjelly.pocketcasts.player.view.nowplaying.PlayerControls
-import au.com.shiftyjelly.pocketcasts.player.view.nowplaying.PlayerHeadingSection
-import au.com.shiftyjelly.pocketcasts.player.view.nowplaying.PlayerVisuals
-import au.com.shiftyjelly.pocketcasts.player.view.nowplaying.PlayerVisualsState
-import au.com.shiftyjelly.pocketcasts.player.view.nowplaying.VisualContentState
+import au.com.shiftyjelly.pocketcasts.player.view.nowplaying.PlayerSeekBar
 import au.com.shiftyjelly.pocketcasts.player.view.shelf.PlayerShelf
 import au.com.shiftyjelly.pocketcasts.player.view.video.VideoActivity
 import au.com.shiftyjelly.pocketcasts.player.viewmodel.PlayerViewModel
@@ -86,6 +83,7 @@ import au.com.shiftyjelly.pocketcasts.player.viewmodel.ShelfSharedViewModel.Navi
 import au.com.shiftyjelly.pocketcasts.player.viewmodel.ShelfSharedViewModel.SnackbarMessage
 import au.com.shiftyjelly.pocketcasts.reimagine.ShareDialogFragment
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
+import au.com.shiftyjelly.pocketcasts.repositories.playback.Player
 import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingFlow
 import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingLauncher
 import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingUpgradeSource
@@ -107,9 +105,9 @@ import dagger.hilt.android.AndroidEntryPoint
 import dagger.hilt.android.lifecycle.withCreationCallback
 import javax.inject.Inject
 import kotlin.math.abs
-import kotlin.time.Duration
 import kotlin.time.Duration.Companion.milliseconds
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
@@ -162,10 +160,9 @@ class PlayerHeaderFragment : BaseFragment(), PlayerClickListener {
         requireNotNull(binding).composeContent.setContentWithViewCompositionStrategy {
             val headerData by remember { playerHeaderFlow() }.collectAsState(PlayerViewModel.PlayerHeader())
             val podcastColors by remember { podcastColorsFlow() }.collectAsState(PodcastColors.ForUserEpisode)
-            val ads by viewModel.activeAds.collectAsState()
-            val visualsState by remember { playerVisualsStateFlow() }.collectAsState(PlayerVisualsState.Empty)
-            val player by viewModel.playerFlow.collectAsState()
+            val artworkOrVideoState by remember { playerVisualsStateFlow() }.collectAsState(ArtworkOrVideoState.NoContent)
             val transcriptUiState by transcriptViewModel.uiState.collectAsState()
+            val ads by viewModel.activeAds.collectAsState()
 
             val isTranscriptOpen by shelfSharedViewModel.isTranscriptOpen.collectAsState()
             val showTranscriptTransition = updateTransition(isTranscriptOpen)
@@ -261,9 +258,8 @@ class PlayerHeaderFragment : BaseFragment(), PlayerClickListener {
                                             onOptionsClick = { openAdReportSheet(ad, podcastColors) },
                                         )
                                     }
-                                    PlayerVisuals(
-                                        state = visualsState,
-                                        player = player,
+                                    ArtworkOrVideo(
+                                        state = artworkOrVideoState,
                                         onChapterUrlClick = viewModel::onChapterUrlClick,
                                         configureVideoView = { videoView ->
                                             videoView.setOnClickListener { onFullScreenVideoClick() }
@@ -272,7 +268,7 @@ class PlayerHeaderFragment : BaseFragment(), PlayerClickListener {
                                 }
                             }
                             if (!isTranscriptOpen) {
-                                PlayerHeadingSection(
+                                EpisodeTitles(
                                     playerColors = playerColors,
                                     playerViewModel = viewModel,
                                     modifier = Modifier.alpha(playerElementsAlpha),
@@ -307,6 +303,8 @@ class PlayerHeaderFragment : BaseFragment(), PlayerClickListener {
                                         playerColors = playerColors,
                                         playerViewModel = viewModel,
                                         modifier = Modifier
+                                            .fillMaxWidth()
+                                            .padding(start = 8.dp, end = 8.dp, bottom = dimensionResource(R.dimen.large_play_button_margin_bottom))
                                             .scale(playbackButtonsScale)
                                             .offset { controlsOffset },
                                     )
@@ -648,10 +646,11 @@ class PlayerHeaderFragment : BaseFragment(), PlayerClickListener {
         }
     }
 
-    private fun playerVisualsStateFlow(): Flow<PlayerVisualsState> {
-        return viewModel.listDataLive.asFlow()
+    private fun playerVisualsStateFlow(): Flow<ArtworkOrVideoState> {
+        val listDataFlow = viewModel.listDataLive
+            .asFlow()
             .distinctUntilChanged(::isListDataEquivalentForVisuals)
-            .map(::createPlayerVisualState)
+        return combine(listDataFlow, viewModel.playerFlow, ::createPlayerVisualState)
     }
 
     private fun isListDataEquivalentForVisuals(old: PlayerViewModel.ListData, new: PlayerViewModel.ListData): Boolean {
@@ -661,68 +660,32 @@ class PlayerHeaderFragment : BaseFragment(), PlayerClickListener {
             old.podcastHeader.isPrepared == new.podcastHeader.isPrepared
     }
 
-    private fun createPlayerVisualState(listData: PlayerViewModel.ListData): PlayerVisualsState {
+    private fun createPlayerVisualState(
+        listData: PlayerViewModel.ListData,
+        player: Player?,
+    ): ArtworkOrVideoState {
         val header = listData.podcastHeader
-        val contentState = when {
-            header.isVideo -> VisualContentState.DisplayVideo(
+        return when {
+            header.isVideo -> ArtworkOrVideoState.Video(
+                player = player,
                 chapterUrl = header.chapter?.url,
             )
 
-            header.episode == null -> VisualContentState.NoContent
-            else -> VisualContentState.DisplayArtwork(
-                episode = header.episode,
-                chapterArtworkPath = header.chapter?.imagePath,
-                chapterUrl = header.chapter?.url,
-                canDisplayEpisodeArtwork = header.useEpisodeArtwork,
-            )
+            header.episode != null -> {
+                val chapterPath = header.chapter?.imagePath
+                ArtworkOrVideoState.Artwork(
+                    artworkImageState = when {
+                        chapterPath != null -> ArtworkImageState.Chapter(chapterPath)
+                        header.useEpisodeArtwork -> ArtworkImageState.Episode(header.episode)
+                        else -> ArtworkImageState.Podcast(header.episode)
+                    },
+                    chapterUrl = header.chapter?.url,
+                )
+            }
+
+            else -> ArtworkOrVideoState.NoContent
         }
-        return PlayerVisualsState(contentState, header.isPrepared)
     }
-}
-
-@Composable
-private fun PlayerSeekBar(
-    playbackPosition: Duration,
-    playbackDuration: Duration,
-    adjustPlaybackDuration: Boolean,
-    playbackSpeed: Double,
-    chapters: Chapters,
-    isBuffering: Boolean,
-    bufferedUpTo: Duration,
-    playerColors: PlayerColors,
-    modifier: Modifier = Modifier,
-    onSeekToPosition: (Duration, onSeekComplete: () -> Unit) -> Unit,
-) {
-    val theme = MaterialTheme.theme.type
-
-    AndroidView(
-        factory = { context ->
-            PlayerSeekBar(context).apply {
-                changeListener = object : PlayerSeekBar.OnUserSeekListener {
-                    override fun onSeekPositionChangeStop(progress: Duration, seekComplete: () -> Unit) {
-                        onSeekToPosition(progress, seekComplete)
-                    }
-
-                    override fun onSeekPositionChanging(progress: Duration) = Unit
-
-                    override fun onSeekPositionChangeStart() = Unit
-                }
-            }
-        },
-        update = { seekBar ->
-            seekBar.apply {
-                setCurrentTime(playbackPosition)
-                setDuration(playbackDuration)
-                setAdjustDuration(adjustPlaybackDuration)
-                setPlaybackSpeed(playbackSpeed)
-                setChapters(chapters)
-                this.isBuffering = isBuffering
-                bufferedUpToInSecs = bufferedUpTo.inWholeSeconds.toInt()
-                setTintColor(playerColors.highlight01.toArgb(), theme)
-            }
-        },
-        modifier = modifier.fillMaxWidth(),
-    )
 }
 
 private val adEnterTransition = fadeIn(spring(stiffness = Spring.StiffnessVeryLow)) + expandVertically(spring(stiffness = Spring.StiffnessMediumLow))
