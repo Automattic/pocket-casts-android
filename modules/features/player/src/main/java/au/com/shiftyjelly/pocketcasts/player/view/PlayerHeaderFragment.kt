@@ -3,9 +3,7 @@ package au.com.shiftyjelly.pocketcasts.player.view
 import android.content.ActivityNotFoundException
 import android.content.Intent
 import android.os.Bundle
-import android.view.GestureDetector
 import android.view.LayoutInflater
-import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
 import androidx.activity.result.ActivityResultLauncher
@@ -21,6 +19,8 @@ import androidx.compose.animation.fadeOut
 import androidx.compose.animation.shrinkVertically
 import androidx.compose.animation.slideInVertically
 import androidx.compose.foundation.background
+import androidx.compose.foundation.gestures.FlingBehavior
+import androidx.compose.foundation.gestures.ScrollScope
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -31,6 +31,8 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
@@ -44,6 +46,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.scale
+import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.layout.SubcomposeLayout
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.dimensionResource
@@ -70,11 +73,11 @@ import au.com.shiftyjelly.pocketcasts.compose.ad.AdBanner
 import au.com.shiftyjelly.pocketcasts.compose.ad.BlazeAd
 import au.com.shiftyjelly.pocketcasts.compose.ad.rememberAdColors
 import au.com.shiftyjelly.pocketcasts.compose.components.AnimatedNonNullVisibility
-import au.com.shiftyjelly.pocketcasts.compose.extensions.setContentWithViewCompositionStrategy
+import au.com.shiftyjelly.pocketcasts.compose.components.rememberNestedScrollLockableInteropConnection
+import au.com.shiftyjelly.pocketcasts.compose.extensions.contentWithoutConsumedInsets
 import au.com.shiftyjelly.pocketcasts.compose.theme
 import au.com.shiftyjelly.pocketcasts.models.to.Transcript
 import au.com.shiftyjelly.pocketcasts.player.R
-import au.com.shiftyjelly.pocketcasts.player.databinding.AdapterPlayerHeaderBinding
 import au.com.shiftyjelly.pocketcasts.player.view.bookmark.BookmarkActivity
 import au.com.shiftyjelly.pocketcasts.player.view.bookmark.BookmarkActivityContract
 import au.com.shiftyjelly.pocketcasts.player.view.nowplaying.ArtworkImageState
@@ -112,7 +115,6 @@ import com.google.android.material.snackbar.Snackbar
 import dagger.hilt.android.AndroidEntryPoint
 import dagger.hilt.android.lifecycle.withCreationCallback
 import javax.inject.Inject
-import kotlin.math.abs
 import kotlin.time.Duration.Companion.milliseconds
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
@@ -125,8 +127,6 @@ import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 import au.com.shiftyjelly.pocketcasts.transcripts.UiState as TranscriptsUiState
 import au.com.shiftyjelly.pocketcasts.ui.R as UR
-
-private const val UP_NEXT_FLING_VELOCITY_THRESHOLD = 1000.0f
 
 @AndroidEntryPoint
 class PlayerHeaderFragment : BaseFragment(), PlayerClickListener {
@@ -146,85 +146,96 @@ class PlayerHeaderFragment : BaseFragment(), PlayerClickListener {
             }
         },
     )
-    private var binding: AdapterPlayerHeaderBinding? = null
     private val sourceView = SourceView.PLAYER
 
     private val activityLauncher: ActivityResultLauncher<Intent> = registerForActivityResult(BookmarkActivityContract()) { result ->
         showViewBookmarksSnackbar(result)
     }
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        binding = AdapterPlayerHeaderBinding.inflate(inflater, container, false)
-        return binding?.root
+    private val ShowUpNextFlingBehavior = object : FlingBehavior {
+        override suspend fun ScrollScope.performFling(initialVelocity: Float): Float {
+            if (isPlayerExpanded() && isUpNextCollapsed() && initialVelocity > 2000f) {
+                (parentFragment as PlayerContainerFragment).openUpNext()
+            }
+            return 0f
+        }
+
+        private fun isPlayerExpanded(): Boolean {
+            val playerSheetState = (requireActivity() as FragmentHostListener).getPlayerBottomSheetState()
+            return playerSheetState == BottomSheetBehavior.STATE_EXPANDED
+        }
+
+        private fun isUpNextCollapsed(): Boolean {
+            val upNextSheetState = (requireParentFragment() as PlayerContainerFragment).upNextBottomSheetBehavior.state
+            return upNextSheetState in listOf(BottomSheetBehavior.STATE_COLLAPSED, BottomSheetBehavior.STATE_HIDDEN)
+        }
     }
 
-    override fun onDestroyView() {
-        super.onDestroyView()
-        binding = null
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?,
+    ) = contentWithoutConsumedInsets {
+        val podcastColors by remember { podcastColorsFlow() }.collectAsState(PodcastColors.ForUserEpisode)
+
+        val headerData by remember { playerHeaderFlow() }.collectAsState(PlayerViewModel.PlayerHeader())
+        val artworkOrVideoState by remember { playerVisualsStateFlow() }.collectAsState(ArtworkOrVideoState.NoContent)
+        val ads by viewModel.activeAds.collectAsState()
+
+        val isTranscriptOpen by shelfSharedViewModel.isTranscriptOpen.collectAsState()
+        val transcriptUiState by transcriptViewModel.uiState.collectAsState()
+
+        val transitionData = updateTranscriptTransitionData(
+            isTranscriptOpen = isTranscriptOpen,
+            showTranscriptPaywall = transcriptUiState.isPaywallVisible,
+        )
+
+        AppTheme(theme.activeTheme) {
+            CompositionLocalProvider(LocalPodcastColors provides podcastColors) {
+                val playerColors = MaterialTheme.theme.rememberPlayerColorsOrDefault()
+                Box(
+                    contentAlignment = Alignment.TopCenter,
+                    modifier = Modifier
+                        .background(playerColors.background01)
+                        .fillMaxSize()
+                        .nestedScroll(rememberNestedScrollLockableInteropConnection().apply { isEnabled = !isTranscriptOpen }),
+                ) {
+                    TranscriptContent(
+                        state = transcriptUiState,
+                        isVisible = transitionData.isTranscriptOpen,
+                        modifier = Modifier
+                            .fillMaxWidth(fraction = ResourcesCompat.getFloat(resources, UR.dimen.player_max_content_width_fraction))
+                            .fillMaxHeight()
+                            .padding(start = 16.dp, end = 16.dp, bottom = 16.dp),
+                    )
+                    VerticalPlayerContent(
+                        ad = ads.firstOrNull(),
+                        artworkOrVideoState = artworkOrVideoState,
+                        headerData = headerData,
+                        playerColors = playerColors,
+                        transitionData = transitionData,
+                        modifier = Modifier
+                            .fillMaxWidth(fraction = ResourcesCompat.getFloat(resources, UR.dimen.player_max_content_width_fraction))
+                            .fillMaxHeight()
+                            .padding(16.dp),
+                    )
+                }
+            }
+        }
+
+        LoadTranscriptEffect(
+            isTranscriptOpen = transitionData.isTranscriptOpen,
+            playerEpisodeUuid = headerData.episodeUuid,
+            transcriptEpisodeUuid = transcriptUiState.transcriptEpisodeUuid,
+        )
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
-        requireNotNull(binding).composeContent.setContentWithViewCompositionStrategy {
-            val podcastColors by remember { podcastColorsFlow() }.collectAsState(PodcastColors.ForUserEpisode)
-
-            val headerData by remember { playerHeaderFlow() }.collectAsState(PlayerViewModel.PlayerHeader())
-            val artworkOrVideoState by remember { playerVisualsStateFlow() }.collectAsState(ArtworkOrVideoState.NoContent)
-            val ads by viewModel.activeAds.collectAsState()
-
-            val isTranscriptOpen by shelfSharedViewModel.isTranscriptOpen.collectAsState()
-            val transcriptUiState by transcriptViewModel.uiState.collectAsState()
-
-            val transitionData = updateTranscriptTransitionData(
-                isTranscriptOpen = isTranscriptOpen,
-                showTranscriptPaywall = transcriptUiState.isPaywallVisible,
-            )
-
-            AppTheme(theme.activeTheme) {
-                CompositionLocalProvider(LocalPodcastColors provides podcastColors) {
-                    val playerColors = MaterialTheme.theme.rememberPlayerColorsOrDefault()
-                    Box(
-                        contentAlignment = Alignment.TopCenter,
-                        modifier = Modifier
-                            .background(playerColors.background01)
-                            .fillMaxSize(),
-                    ) {
-                        TranscriptContent(
-                            state = transcriptUiState,
-                            isVisible = transitionData.isTranscriptOpen,
-                            modifier = Modifier
-                                .fillMaxWidth(fraction = ResourcesCompat.getFloat(resources, UR.dimen.player_max_content_width_fraction))
-                                .fillMaxHeight()
-                                .padding(start = 16.dp, end = 16.dp, bottom = 16.dp),
-                        )
-                        VerticalPlayerContent(
-                            ad = ads.firstOrNull(),
-                            artworkOrVideoState = artworkOrVideoState,
-                            headerData = headerData,
-                            playerColors = playerColors,
-                            transitionData = transitionData,
-                            modifier = Modifier
-                                .fillMaxWidth(fraction = ResourcesCompat.getFloat(resources, UR.dimen.player_max_content_width_fraction))
-                                .fillMaxHeight()
-                                .padding(16.dp),
-                        )
-                    }
-                }
-            }
-
-            LoadTranscriptEffect(
-                isTranscriptOpen = transitionData.isTranscriptOpen,
-                playerEpisodeUuid = headerData.episodeUuid,
-                transcriptEpisodeUuid = transcriptUiState.transcriptEpisodeUuid,
-            )
-        }
-
         observeNavigationState()
         observeShelfItemNavigationState()
         observeTranscriptPageTransition()
         observeSnackbarMessages()
-        setupUpNextDrag()
     }
 
     private fun observeNavigationState() {
@@ -362,7 +373,6 @@ class PlayerHeaderFragment : BaseFragment(), PlayerClickListener {
                     if (!wasTranscriptOpen && isTranscriptOpen) {
                         val containerFragment = parentFragment as? PlayerContainerFragment
                         containerFragment?.updateTabsVisibility(false)
-                        binding?.root?.setScrollingEnabled(false)
                     } else if (wasTranscriptOpen && !isTranscriptOpen) {
                         val event = if (uiState.isPaywallVisible) {
                             AnalyticsEvent.TRANSCRIPT_GENERATED_PAYWALL_DISMISSED
@@ -372,7 +382,6 @@ class PlayerHeaderFragment : BaseFragment(), PlayerClickListener {
                         transcriptViewModel.track(event)
                         val containerFragment = parentFragment as? PlayerContainerFragment
                         containerFragment?.updateTabsVisibility(true)
-                        binding?.root?.setScrollingEnabled(true)
                     }
                     wasTranscriptOpen = isTranscriptOpen
                 }
@@ -402,40 +411,6 @@ class PlayerHeaderFragment : BaseFragment(), PlayerClickListener {
                     }
                     showSnackBar(text = getString(text))
                 }
-            }
-        }
-    }
-
-    private fun setupUpNextDrag() {
-        val flingGestureDetector = GestureDetector(
-            requireContext(),
-            object : GestureDetector.SimpleOnGestureListener() {
-                override fun onFling(e1: MotionEvent?, e2: MotionEvent, velocityX: Float, velocityY: Float): Boolean {
-                    val containerFragment = parentFragment as? PlayerContainerFragment ?: return false
-                    val upNextBottomSheetBehavior = containerFragment.upNextBottomSheetBehavior
-
-                    return if (velocityY < 0 && abs(velocityY) >= UP_NEXT_FLING_VELOCITY_THRESHOLD && upNextBottomSheetBehavior.state == BottomSheetBehavior.STATE_COLLAPSED) {
-                        containerFragment.openUpNext()
-                        true
-                    } else {
-                        false
-                    }
-                }
-            },
-        )
-        @Suppress("ClickableViewAccessibility")
-        binding?.root?.setOnTouchListener { _, event ->
-            // This check is a workaround for a behavior between velocityY detected by flingGestureDetector and dragging player bottom sheet.
-            // When only the player is expanded and we fling down the velocityY should be positive indicating that direction.
-            // However, regardless of flinging up or down the velocityY is always negative because the player's view drags along
-            // with a finger and thus velocity computation "gets confused" because MotionEvent positions are relative to the view.
-            //
-            // Because the fling motion is detected only after we release the finger it means that the player bottom sheet
-            // is no longer in an expanded state but in a dragging or a collapsing state.
-            if ((activity as? FragmentHostListener)?.getPlayerBottomSheetState() == BottomSheetBehavior.STATE_EXPANDED) {
-                flingGestureDetector.onTouchEvent(event)
-            } else {
-                false
             }
         }
     }
@@ -540,9 +515,9 @@ class PlayerHeaderFragment : BaseFragment(), PlayerClickListener {
 
     private fun isListDataEquivalentForVisuals(old: PlayerViewModel.ListData, new: PlayerViewModel.ListData): Boolean {
         return old.podcastHeader.episode?.uuid == new.podcastHeader.episode?.uuid &&
-            old.podcastHeader.useEpisodeArtwork == new.podcastHeader.useEpisodeArtwork &&
-            old.podcastHeader.chapter?.index == new.podcastHeader.chapter?.index &&
-            old.podcastHeader.isPrepared == new.podcastHeader.isPrepared
+                old.podcastHeader.useEpisodeArtwork == new.podcastHeader.useEpisodeArtwork &&
+                old.podcastHeader.chapter?.index == new.podcastHeader.chapter?.index &&
+                old.podcastHeader.isPrepared == new.podcastHeader.isPrepared
     }
 
     private fun createPlayerVisualState(
@@ -581,8 +556,18 @@ class PlayerHeaderFragment : BaseFragment(), PlayerClickListener {
         transitionData: TranscriptTransitionData,
         modifier: Modifier = Modifier,
     ) {
+        val scrollState = rememberScrollState()
+
         Column(
-            modifier = modifier,
+            modifier = modifier
+                // Do not apply scroll modifiers when transcripts are open so toolbar click events are not consumed.
+                .then(
+                    if (transitionData.isTranscriptOpen) {
+                        Modifier
+                    } else {
+                        Modifier.verticalScroll(scrollState, flingBehavior = ShowUpNextFlingBehavior)
+                    },
+                ),
         ) {
             AdAndArtwork(
                 ad = ad,
