@@ -10,6 +10,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalInspectionMode
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import au.com.shiftyjelly.pocketcasts.models.entity.BaseEpisode
 import au.com.shiftyjelly.pocketcasts.repositories.images.PocketCastsImageRequestFactory
@@ -20,6 +21,7 @@ import coil.compose.rememberAsyncImagePainter
 internal fun ArtworkImage(
     state: ArtworkImageState,
     modifier: Modifier = Modifier,
+    cornerRadius: Dp = 16.dp,
 ) {
     val context = LocalContext.current
     val isPreview = LocalInspectionMode.current
@@ -47,7 +49,7 @@ internal fun ArtworkImage(
         contentDescription = null,
         modifier = modifier
             .aspectRatio(1f)
-            .clip(RoundedCornerShape(16.dp)),
+            .clip(RoundedCornerShape(cornerRadius)),
     )
 }
 
