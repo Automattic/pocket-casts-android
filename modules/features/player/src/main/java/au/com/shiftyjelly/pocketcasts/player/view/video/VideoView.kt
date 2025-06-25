@@ -1,3 +1,5 @@
+@file:Suppress("OPT_IN_USAGE")
+
 package au.com.shiftyjelly.pocketcasts.player.view.video
 
 import android.content.Context
@@ -26,6 +28,12 @@ class VideoView @JvmOverloads constructor(
     private val binding = VideoViewBinding.inflate(LayoutInflater.from(context), this, true).apply {
         aspectRatioLayout.setAspectRatio(1.78f)
         surfaceView.holder.addCallback(this@VideoView)
+    }
+
+    fun addOnAspectRatioListener(listener: (Float) -> Unit) {
+        binding.aspectRatioLayout.setAspectRatioListener { targetAspectRatio, _, _ ->
+            listener(targetAspectRatio)
+        }
     }
 
     override fun setVisibility(visibility: Int) {

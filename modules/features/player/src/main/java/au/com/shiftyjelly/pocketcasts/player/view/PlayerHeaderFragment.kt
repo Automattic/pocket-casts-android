@@ -21,9 +21,11 @@ import androidx.compose.animation.slideInVertically
 import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.FlingBehavior
 import androidx.compose.foundation.gestures.ScrollScope
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
@@ -31,9 +33,16 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.sizeIn
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.MaterialTheme
+import androidx.compose.material3.windowsizeclass.ExperimentalMaterial3WindowSizeClassApi
+import androidx.compose.material3.windowsizeclass.WindowHeightSizeClass
+import androidx.compose.material3.windowsizeclass.WindowWidthSizeClass
+import androidx.compose.material3.windowsizeclass.calculateWindowSizeClass
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
@@ -48,12 +57,14 @@ import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.layout.SubcomposeLayout
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.platform.LocalWindowInfo
 import androidx.compose.ui.res.dimensionResource
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
-import androidx.core.content.res.ResourcesCompat
 import androidx.core.net.toUri
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
@@ -80,12 +91,14 @@ import au.com.shiftyjelly.pocketcasts.models.to.Transcript
 import au.com.shiftyjelly.pocketcasts.player.R
 import au.com.shiftyjelly.pocketcasts.player.view.bookmark.BookmarkActivity
 import au.com.shiftyjelly.pocketcasts.player.view.bookmark.BookmarkActivityContract
+import au.com.shiftyjelly.pocketcasts.player.view.nowplaying.ArtworkImage
 import au.com.shiftyjelly.pocketcasts.player.view.nowplaying.ArtworkImageState
 import au.com.shiftyjelly.pocketcasts.player.view.nowplaying.ArtworkOrVideo
 import au.com.shiftyjelly.pocketcasts.player.view.nowplaying.ArtworkOrVideoState
 import au.com.shiftyjelly.pocketcasts.player.view.nowplaying.EpisodeTitles
 import au.com.shiftyjelly.pocketcasts.player.view.nowplaying.PlayerControls
 import au.com.shiftyjelly.pocketcasts.player.view.nowplaying.PlayerSeekBar
+import au.com.shiftyjelly.pocketcasts.player.view.nowplaying.VideoBox
 import au.com.shiftyjelly.pocketcasts.player.view.shelf.PlayerShelf
 import au.com.shiftyjelly.pocketcasts.player.view.video.VideoActivity
 import au.com.shiftyjelly.pocketcasts.player.viewmodel.PlayerViewModel
@@ -100,6 +113,7 @@ import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingLauncher
 import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingUpgradeSource
 import au.com.shiftyjelly.pocketcasts.transcripts.TranscriptViewModel
 import au.com.shiftyjelly.pocketcasts.transcripts.ui.TranscriptPage
+import au.com.shiftyjelly.pocketcasts.ui.extensions.inPortrait
 import au.com.shiftyjelly.pocketcasts.ui.helper.FragmentHostListener
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.ui.theme.ThemeColor
@@ -126,8 +140,8 @@ import timber.log.Timber
 import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 import au.com.shiftyjelly.pocketcasts.transcripts.UiState as TranscriptsUiState
-import au.com.shiftyjelly.pocketcasts.ui.R as UR
 
+@OptIn(ExperimentalMaterial3WindowSizeClassApi::class)
 @AndroidEntryPoint
 class PlayerHeaderFragment : BaseFragment(), PlayerClickListener {
     @Inject
@@ -176,8 +190,12 @@ class PlayerHeaderFragment : BaseFragment(), PlayerClickListener {
         container: ViewGroup?,
         savedInstanceState: Bundle?,
     ) = contentWithoutConsumedInsets {
-        val podcastColors by remember { podcastColorsFlow() }.collectAsState(PodcastColors.ForUserEpisode)
+        val windowSize = calculateWindowSizeClass(requireActivity())
+        val isPortraitConfiguration = LocalConfiguration.current.inPortrait()
+        val isPortraitPlayer = isPortraitConfiguration || windowSize.heightSizeClass >= WindowHeightSizeClass.Medium
+        val maxWidthFraction = if (isPortraitConfiguration && windowSize.widthSizeClass >= WindowWidthSizeClass.Medium) 0.8f else 1f
 
+        val podcastColors by remember { podcastColorsFlow() }.collectAsState(PodcastColors.ForUserEpisode)
         val headerData by remember { playerHeaderFlow() }.collectAsState(PlayerViewModel.PlayerHeader())
         val artworkOrVideoState by remember { playerVisualsStateFlow() }.collectAsState(ArtworkOrVideoState.NoContent)
         val ads by viewModel.activeAds.collectAsState()
@@ -187,7 +205,7 @@ class PlayerHeaderFragment : BaseFragment(), PlayerClickListener {
 
         val transitionData = updateTranscriptTransitionData(
             isTranscriptOpen = isTranscriptOpen,
-            showTranscriptPaywall = transcriptUiState.isPaywallVisible,
+            isTranscriptPaywallOpen = transcriptUiState.isPaywallVisible,
         )
 
         AppTheme(theme.activeTheme) {
@@ -203,21 +221,23 @@ class PlayerHeaderFragment : BaseFragment(), PlayerClickListener {
                     TranscriptContent(
                         state = transcriptUiState,
                         isVisible = transitionData.isTranscriptOpen,
+                        isPortraitPlayer = isPortraitPlayer,
                         modifier = Modifier
-                            .fillMaxWidth(fraction = ResourcesCompat.getFloat(resources, UR.dimen.player_max_content_width_fraction))
+                            .fillMaxWidth(fraction = maxWidthFraction)
                             .fillMaxHeight()
                             .padding(start = 16.dp, end = 16.dp, bottom = 16.dp),
                     )
-                    VerticalPlayerContent(
+                    PlayerContent(
                         ad = ads.firstOrNull(),
                         artworkOrVideoState = artworkOrVideoState,
                         headerData = headerData,
                         playerColors = playerColors,
                         transitionData = transitionData,
+                        isPortraitPlayer = isPortraitPlayer,
                         modifier = Modifier
-                            .fillMaxWidth(fraction = ResourcesCompat.getFloat(resources, UR.dimen.player_max_content_width_fraction))
+                            .fillMaxWidth(fraction = maxWidthFraction)
                             .fillMaxHeight()
-                            .padding(16.dp),
+                            .padding(start = 16.dp, end = 16.dp, top = 16.dp, bottom = if (isPortraitPlayer) 32.dp else 0.dp),
                     )
                 }
             }
@@ -515,9 +535,9 @@ class PlayerHeaderFragment : BaseFragment(), PlayerClickListener {
 
     private fun isListDataEquivalentForVisuals(old: PlayerViewModel.ListData, new: PlayerViewModel.ListData): Boolean {
         return old.podcastHeader.episode?.uuid == new.podcastHeader.episode?.uuid &&
-                old.podcastHeader.useEpisodeArtwork == new.podcastHeader.useEpisodeArtwork &&
-                old.podcastHeader.chapter?.index == new.podcastHeader.chapter?.index &&
-                old.podcastHeader.isPrepared == new.podcastHeader.isPrepared
+            old.podcastHeader.useEpisodeArtwork == new.podcastHeader.useEpisodeArtwork &&
+            old.podcastHeader.chapter?.index == new.podcastHeader.chapter?.index &&
+            old.podcastHeader.isPrepared == new.podcastHeader.isPrepared
     }
 
     private fun createPlayerVisualState(
@@ -544,6 +564,37 @@ class PlayerHeaderFragment : BaseFragment(), PlayerClickListener {
             }
 
             else -> ArtworkOrVideoState.NoContent
+        }
+    }
+
+    @Composable
+    private fun PlayerContent(
+        ad: BlazeAd?,
+        artworkOrVideoState: ArtworkOrVideoState,
+        headerData: PlayerViewModel.PlayerHeader,
+        playerColors: PlayerColors,
+        transitionData: TranscriptTransitionData,
+        isPortraitPlayer: Boolean,
+        modifier: Modifier = Modifier,
+    ) {
+        if (isPortraitPlayer) {
+            VerticalPlayerContent(
+                ad = ad,
+                artworkOrVideoState = artworkOrVideoState,
+                headerData = headerData,
+                playerColors = playerColors,
+                transitionData = transitionData,
+                modifier = modifier,
+            )
+        } else {
+            HorizontalPlayerContent(
+                ad = ad,
+                artworkOrVideoState = artworkOrVideoState,
+                headerData = headerData,
+                playerColors = playerColors,
+                transitionData = transitionData,
+                modifier = modifier,
+            )
         }
     }
 
@@ -600,20 +651,11 @@ class PlayerHeaderFragment : BaseFragment(), PlayerClickListener {
                         modifier = Modifier.height(8.dp),
                     )
                     PlayerSeekBar(
-                        playbackPosition = headerData.positionMs.milliseconds,
-                        playbackDuration = headerData.durationMs.milliseconds,
-                        adjustPlaybackDuration = headerData.adjustRemainingTimeDuration,
-                        playbackSpeed = headerData.playbackEffects.playbackSpeed,
-                        chapters = headerData.chapters,
-                        isBuffering = headerData.isBuffering,
-                        bufferedUpTo = headerData.bufferedUpToMs.milliseconds,
+                        headerData = headerData,
                         playerColors = playerColors,
-                        onSeekToPosition = { progress, onSeekComplete ->
-                            val progressMs = progress.inWholeMilliseconds.toInt()
-                            viewModel.seekToMs(progressMs, onSeekComplete)
-                            playbackManager.trackPlaybackSeek(progressMs, SourceView.PLAYER)
-                        },
-                        modifier = Modifier.offset { transitionData.seekBarOffset },
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .offset { transitionData.seekBarOffset },
                     )
                     Spacer(
                         modifier = Modifier.height(16.dp),
@@ -647,9 +689,182 @@ class PlayerHeaderFragment : BaseFragment(), PlayerClickListener {
     }
 
     @Composable
+    private fun HorizontalPlayerContent(
+        ad: BlazeAd?,
+        artworkOrVideoState: ArtworkOrVideoState,
+        headerData: PlayerViewModel.PlayerHeader,
+        playerColors: PlayerColors,
+        transitionData: TranscriptTransitionData,
+        modifier: Modifier = Modifier,
+    ) {
+        AnimatedVisibility(
+            visible = !transitionData.isTranscriptOpen,
+            enter = shelfEnterTransition,
+            exit = shelfExitTransition,
+            modifier = modifier,
+        ) {
+            if (ad == null) {
+                HorizontalPlayerContentWithoutAd(
+                    artworkOrVideoState = artworkOrVideoState,
+                    headerData = headerData,
+                    playerColors = playerColors,
+                )
+            } else {
+                HorizontalPlayerContentWithAd(
+                    ad = ad,
+                    artworkOrVideoState = artworkOrVideoState,
+                    headerData = headerData,
+                    playerColors = playerColors,
+                )
+            }
+        }
+    }
+
+    @Composable
+    private fun HorizontalPlayerContentWithAd(
+        ad: BlazeAd,
+        artworkOrVideoState: ArtworkOrVideoState,
+        headerData: PlayerViewModel.PlayerHeader,
+        playerColors: PlayerColors,
+        modifier: Modifier = Modifier,
+    ) {
+        Row(
+            horizontalArrangement = Arrangement.spacedBy(32.dp),
+            modifier = modifier.fillMaxSize(),
+        ) {
+            Column(
+                horizontalAlignment = Alignment.CenterHorizontally,
+                modifier = Modifier
+                    .weight(1f)
+                    .fillMaxHeight()
+                    .verticalScroll(rememberScrollState(), flingBehavior = ShowUpNextFlingBehavior),
+            ) {
+                AdAndArtworkHorizontal(
+                    artworkOrVideoState = artworkOrVideoState,
+                    playerColors = playerColors,
+                    modifier = modifier.fillMaxWidth(),
+                )
+                Spacer(
+                    modifier = Modifier.height(16.dp),
+                )
+                PlayerSeekBar(
+                    headerData = headerData,
+                    playerColors = playerColors,
+                    modifier = Modifier.fillMaxWidth(),
+                )
+                Spacer(
+                    modifier = Modifier.height(12.dp),
+                )
+                PlayerControls(
+                    playerColors = playerColors,
+                    playerViewModel = viewModel,
+                )
+                Spacer(
+                    modifier = Modifier.height(16.dp),
+                )
+                PlayerShelf(
+                    playerColors = playerColors,
+                    shelfSharedViewModel = shelfSharedViewModel,
+                    playerViewModel = viewModel,
+                    modifier = Modifier.fillMaxWidth(),
+                )
+            }
+
+            Column(
+                verticalArrangement = Arrangement.Center,
+                horizontalAlignment = Alignment.CenterHorizontally,
+                modifier = Modifier
+                    .weight(1f)
+                    .fillMaxHeight()
+                    .verticalScroll(rememberScrollState(), flingBehavior = ShowUpNextFlingBehavior),
+            ) {
+                Spacer(
+                    modifier = Modifier.weight(1f),
+                )
+                AdBanner(
+                    ad = ad,
+                    colors = rememberAdColors().bannerAd,
+                    onAdClick = { openAd(ad) },
+                    onOptionsClick = { openAdReportSheet(ad, playerColors.podcastColors) },
+                )
+                Spacer(
+                    modifier = Modifier.weight(3f),
+                )
+            }
+        }
+    }
+
+    @Composable
+    private fun HorizontalPlayerContentWithoutAd(
+        artworkOrVideoState: ArtworkOrVideoState,
+        headerData: PlayerViewModel.PlayerHeader,
+        playerColors: PlayerColors,
+        modifier: Modifier = Modifier,
+    ) {
+        Column(
+            modifier = modifier
+                .fillMaxSize()
+                .verticalScroll(rememberScrollState(), flingBehavior = ShowUpNextFlingBehavior),
+        ) {
+            Row {
+                val windowWithPx = LocalWindowInfo.current.containerSize.width
+                val windowWidthDp = LocalDensity.current.run { windowWithPx.toDp() }
+                val maxSize = when (artworkOrVideoState) {
+                    is ArtworkOrVideoState.Video -> if (windowWidthDp >= 720.dp) 360.dp else 280.dp
+                    is ArtworkOrVideoState.Artwork, is ArtworkOrVideoState.NoContent -> 200.dp
+                }
+                ArtworkOrVideo(
+                    state = artworkOrVideoState,
+                    onChapterUrlClick = {},
+                    configureVideoView = { videoView ->
+                        videoView.setOnClickListener { onFullScreenVideoClick() }
+                    },
+                    modifier = Modifier.sizeIn(maxWidth = maxSize, maxHeight = maxSize),
+                )
+                Spacer(
+                    modifier = Modifier.width(32.dp),
+                )
+                Column(
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                ) {
+                    EpisodeTitles(
+                        playerColors = playerColors,
+                        playerViewModel = viewModel,
+                    )
+                    Spacer(
+                        modifier = Modifier.height(16.dp),
+                    )
+                    PlayerSeekBar(
+                        headerData = headerData,
+                        playerColors = playerColors,
+                        modifier = Modifier.fillMaxWidth(),
+                    )
+                    Spacer(
+                        modifier = Modifier.height(12.dp),
+                    )
+                    PlayerControls(
+                        playerColors = playerColors,
+                        playerViewModel = viewModel,
+                    )
+                }
+            }
+            Spacer(
+                modifier = Modifier.height(16.dp),
+            )
+            PlayerShelf(
+                playerColors = playerColors,
+                shelfSharedViewModel = shelfSharedViewModel,
+                playerViewModel = viewModel,
+                modifier = Modifier.fillMaxWidth(),
+            )
+        }
+    }
+
+    @Composable
     private fun TranscriptContent(
         state: TranscriptsUiState,
         isVisible: Boolean,
+        isPortraitPlayer: Boolean,
         modifier: Modifier = Modifier,
     ) {
         AnimatedVisibility(
@@ -662,7 +877,7 @@ class PlayerHeaderFragment : BaseFragment(), PlayerClickListener {
                 uiState = state,
                 toolbarPadding = PaddingValues(horizontal = 16.dp),
                 paywallPadding = PaddingValues(start = 16.dp, end = 16.dp, bottom = 16.dp),
-                transcriptPadding = PaddingValues(start = 16.dp, end = 16.dp, bottom = 96.dp),
+                transcriptPadding = PaddingValues(start = 16.dp, end = 16.dp, bottom = if (isPortraitPlayer) 96.dp else 16.dp),
                 onClickClose = {
                     transcriptViewModel.hideSearch()
                     shelfSharedViewModel.closeTranscript()
@@ -756,9 +971,93 @@ class PlayerHeaderFragment : BaseFragment(), PlayerClickListener {
     }
 
     @Composable
+    private fun AdAndArtworkHorizontal(
+        artworkOrVideoState: ArtworkOrVideoState,
+        playerColors: PlayerColors,
+        modifier: Modifier,
+    ) {
+        when (artworkOrVideoState) {
+            is ArtworkOrVideoState.Artwork -> {
+                Row(
+                    modifier = modifier,
+                ) {
+                    ArtworkImage(
+                        state = artworkOrVideoState.artworkImageState,
+                        cornerRadius = 8.dp,
+                        modifier = Modifier.size(64.dp),
+                    )
+                    Spacer(
+                        modifier = Modifier.width(16.dp),
+                    )
+                    EpisodeTitles(
+                        playerColors = playerColors,
+                        playerViewModel = viewModel,
+                        textAlign = TextAlign.Start,
+                    )
+                }
+            }
+
+            is ArtworkOrVideoState.Video -> {
+                Column(
+                    modifier = modifier,
+                ) {
+                    VideoBox(
+                        player = artworkOrVideoState.player,
+                        configureVideoView = { videoView ->
+                            videoView.setOnClickListener { onFullScreenVideoClick() }
+                        },
+                        modifier = Modifier.fillMaxWidth(),
+                    )
+                    Spacer(
+                        modifier = Modifier.height(16.dp),
+                    )
+                    EpisodeTitles(
+                        playerColors = playerColors,
+                        playerViewModel = viewModel,
+                        modifier = Modifier.fillMaxWidth(),
+                    )
+                }
+            }
+
+            is ArtworkOrVideoState.NoContent -> {
+                EpisodeTitles(
+                    playerColors = playerColors,
+                    playerViewModel = viewModel,
+                    textAlign = TextAlign.Start,
+                    modifier = modifier,
+                )
+            }
+        }
+    }
+
+    @Composable
+    private fun PlayerSeekBar(
+        headerData: PlayerViewModel.PlayerHeader,
+        playerColors: PlayerColors,
+        modifier: Modifier = Modifier,
+    ) {
+        PlayerSeekBar(
+            playbackPosition = headerData.positionMs.milliseconds,
+            playbackDuration = headerData.durationMs.milliseconds,
+            adjustPlaybackDuration = headerData.adjustRemainingTimeDuration,
+            playbackSpeed = headerData.playbackEffects.playbackSpeed,
+            chapters = headerData.chapters,
+            isBuffering = headerData.isBuffering,
+            bufferedUpTo = headerData.bufferedUpToMs.milliseconds,
+            playerColors = playerColors,
+            onSeekToPosition = { progress, onSeekComplete ->
+                val progressMs = progress.inWholeMilliseconds.toInt()
+                viewModel.seekToMs(progressMs, onSeekComplete)
+                playbackManager.trackPlaybackSeek(progressMs, SourceView.PLAYER)
+            },
+            modifier = modifier,
+        )
+    }
+
+    @Composable
     private fun updateTranscriptTransitionData(
         isTranscriptOpen: Boolean,
-        showTranscriptPaywall: Boolean,
+        isTranscriptPaywallOpen: Boolean,
     ): TranscriptTransitionData {
         val controlsOffsetValue = LocalDensity.current.run { 64.dp.roundToPx() }
 
@@ -773,7 +1072,7 @@ class PlayerHeaderFragment : BaseFragment(), PlayerClickListener {
         val seekbarOffset = transition.animateIntOffset { showTranscript ->
             if (showTranscript) IntOffset(x = 0, y = controlsOffsetValue) else IntOffset.Zero
         }
-        val showPlayerControls = rememberUpdatedState(if (transcriptOpenState.value) !showTranscriptPaywall else true)
+        val showPlayerControls = rememberUpdatedState(if (transcriptOpenState.value) !isTranscriptPaywallOpen else true)
 
         return remember(transition, transcriptOpenState, showPlayerControls) {
             TranscriptTransitionData(

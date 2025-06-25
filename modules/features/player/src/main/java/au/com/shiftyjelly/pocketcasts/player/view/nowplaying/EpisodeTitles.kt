@@ -19,6 +19,7 @@ import androidx.compose.material.IconButton
 import androidx.compose.material.LocalRippleConfiguration
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.RippleConfiguration
+import androidx.compose.material.RippleDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.getValue
@@ -63,6 +64,7 @@ fun EpisodeTitles(
     playerColors: PlayerColors,
     playerViewModel: PlayerViewModel,
     modifier: Modifier = Modifier,
+    textAlign: TextAlign = TextAlign.Center,
 ) {
     val state by remember {
         playerViewModel.listDataLive.map {
@@ -89,6 +91,7 @@ fun EpisodeTitles(
         onNextChapterClick = { playerViewModel.onNextChapterClick() },
         onChapterTitleClick = { playerViewModel.onChapterTitleClick(it) },
         onPodcastTitleClick = { playerViewModel.onPodcastTitleClick(state.episodeUuid, state.podcastUuid) },
+        textAlign = textAlign,
         modifier = modifier,
     )
 }
@@ -102,10 +105,11 @@ private fun Content(
     onChapterTitleClick: (Chapter) -> Unit,
     onPodcastTitleClick: () -> Unit,
     modifier: Modifier = Modifier,
+    textAlign: TextAlign = TextAlign.Center,
     playerColors: PlayerColors = MaterialTheme.theme.rememberPlayerColorsOrDefault(),
 ) {
     CompositionLocalProvider(
-        LocalRippleConfiguration provides RippleConfiguration(color = playerColors.contrast01),
+        LocalRippleConfiguration provides RippleConfiguration(Color.White, RippleDefaults.rippleAlpha(Color.White, true)),
     ) {
         Row(
             modifier = modifier,
@@ -114,7 +118,6 @@ private fun Content(
                 ChapterPreviousButton(
                     enabled = !state.isFirstChapter,
                     alpha = if (state.isFirstChapter) 0.5f else 1f,
-                    iconTint = playerColors.contrast01,
                     onClick = onPreviousChapterClick,
                 )
             }
@@ -129,7 +132,7 @@ private fun Content(
                 TextH30(
                     text = state.title,
                     color = playerColors.contrast01,
-                    textAlign = TextAlign.Center,
+                    textAlign = textAlign,
                     maxLines = 2,
                     modifier = Modifier
                         .fillMaxWidth()
@@ -150,8 +153,8 @@ private fun Content(
 
                         TextH50(
                             text = state.podcastTitle,
-                            color = playerColors.contrast02,
-                            textAlign = TextAlign.Center,
+                            color = MaterialTheme.theme.colors.playerContrast02,
+                            textAlign = textAlign,
                             maxLines = 1,
                             modifier = Modifier
                                 .fillMaxWidth()
@@ -171,8 +174,8 @@ private fun Content(
 
                         TextH70(
                             text = chapterSummary,
-                            color = playerColors.contrast02,
-                            textAlign = TextAlign.Center,
+                            color = Color.White.copy(alpha = 0.7f),
+                            textAlign = textAlign,
                             maxLines = 1,
                             modifier = Modifier
                                 .fillMaxWidth()
@@ -194,8 +197,6 @@ private fun Content(
                         enabled = !state.isLastChapter,
                         alpha = if (state.isLastChapter) 0.5f else 1f,
                         progress = state.chapterProgress,
-                        iconTint = playerColors.contrast01,
-                        progressTint = playerColors.contrast04,
                         onClick = onNextChapterClick,
                     )
 
@@ -203,7 +204,7 @@ private fun Content(
 
                     TextH70(
                         text = state.chapterTimeRemaining,
-                        color = playerColors.contrast02,
+                        color = Color.White,
                         modifier = Modifier
                             .semantics { this.contentDescription = timeRemainingContentDescription }
                             .alpha(0.4f),
@@ -218,7 +219,6 @@ private fun Content(
 private fun ChapterPreviousButton(
     enabled: Boolean,
     alpha: Float,
-    iconTint: Color,
     onClick: () -> Unit,
 ) {
     IconButton(
@@ -231,8 +231,8 @@ private fun ChapterPreviousButton(
             modifier = Modifier.clip(CircleShape),
         ) {
             Icon(
-                painter = painterResource(R.drawable.ic_chapter_skipbackwards),
-                tint = iconTint,
+                painterResource(R.drawable.ic_chapter_skipbackwards),
+                tint = Color.White,
                 contentDescription = stringResource(LR.string.player_action_previous_chapter),
             )
         }
@@ -244,8 +244,6 @@ private fun ChapterNextButtonWithChapterProgressCircle(
     enabled: Boolean,
     progress: Float,
     alpha: Float,
-    iconTint: Color,
-    progressTint: Color,
     onClick: () -> Unit,
 ) {
     val contentDescription = stringResource(LR.string.player_action_next_chapter)
@@ -257,14 +255,13 @@ private fun ChapterNextButtonWithChapterProgressCircle(
             .semantics { this.contentDescription = contentDescription },
     ) {
         Icon(
-            painter = painterResource(R.drawable.ic_chapter_skipforward),
-            tint = iconTint,
+            painterResource(R.drawable.ic_chapter_skipforward),
+            tint = Color.White,
             contentDescription = null,
         )
 
         ChapterProgressCircle(
             progress = progress,
-            tint = progressTint,
         )
     }
 }
@@ -272,7 +269,6 @@ private fun ChapterNextButtonWithChapterProgressCircle(
 @Composable
 private fun ChapterProgressCircle(
     progress: Float,
-    tint: Color,
     modifier: Modifier = Modifier,
 ) {
     Canvas(
@@ -280,7 +276,7 @@ private fun ChapterProgressCircle(
     ) {
         val degrees = 360f * (1f - progress)
         drawArc(
-            color = tint,
+            color = Color.White.copy(alpha = 0.4f),
             startAngle = -90f,
             sweepAngle = -degrees,
             useCenter = false,
