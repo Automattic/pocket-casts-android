@@ -22,6 +22,8 @@
         ([#4132](https://github.com/Automattic/pocket-casts-android/pull/4132))
     *   Fix downloading episodes after backup and restore
         ([#4130](https://github.com/Automattic/pocket-casts-android/pull/4130))
+    *   Add `@Transaction` to podcast queries that might result in large amount of data
+        ([#4151](https://github.com/Automattic/pocket-casts-android/pull/4151))
 
 7.91
 -----
