@@ -30,6 +30,7 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import au.com.shiftyjelly.pocketcasts.compose.AppThemeWithBackground
+import au.com.shiftyjelly.pocketcasts.compose.bars.ThemedTopAppBar
 import au.com.shiftyjelly.pocketcasts.compose.components.FormField
 import au.com.shiftyjelly.pocketcasts.compose.components.HorizontalDivider
 import au.com.shiftyjelly.pocketcasts.compose.components.SettingRadioDialogRow
@@ -42,6 +43,7 @@ import kotlin.time.Duration.Companion.seconds
 
 @Composable
 internal fun NotificationsTestingPage(
+    onBack: () -> Unit,
     modifier: Modifier = Modifier,
     viewModel: NotificationsTestingViewModel = hiltViewModel(),
 ) {
@@ -56,6 +58,7 @@ internal fun NotificationsTestingPage(
         onResetDatabase = viewModel::clearNotificationsTable,
         onCancelNotifications = viewModel::cancelAllNotifications,
         onScheduleCategory = viewModel::scheduleCategory,
+        onBack = onBack,
     )
 }
 
@@ -66,24 +69,33 @@ private fun NotificationsTestingContent(
     onResetDatabase: () -> Unit,
     onCancelNotifications: () -> Unit,
     onScheduleCategory: (NotificationsTestingViewModel.NotificationCategorySchedule) -> Unit,
+    onBack: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    Column(modifier = modifier.verticalScroll(rememberScrollState())) {
-        UniqueNotificationSchedulerContent(
-            notificationTypes = state.uniqueNotifications,
-            onButtonClick = onScheduleNotification,
+    Column(modifier = modifier) {
+        ThemedTopAppBar(
+            title = "Notification Testing",
+            bottomShadow = true,
+            onNavigationClick = onBack,
         )
 
-        Spacer(modifier = Modifier.height(8.dp))
-        HorizontalDivider()
-        Spacer(modifier = Modifier.height(8.dp))
+        Column(modifier = Modifier.verticalScroll(rememberScrollState())) {
+            UniqueNotificationSchedulerContent(
+                notificationTypes = state.uniqueNotifications,
+                onButtonClick = onScheduleNotification,
+            )
 
-        SettingNotifications(
-            onResetDatabase = onResetDatabase,
-            onCancelNotifications = onCancelNotifications,
-            categories = state.notificationCategories,
-            scheduleCategory = onScheduleCategory,
-        )
+            Spacer(modifier = Modifier.height(8.dp))
+            HorizontalDivider()
+            Spacer(modifier = Modifier.height(8.dp))
+
+            SettingNotifications(
+                onResetDatabase = onResetDatabase,
+                onCancelNotifications = onCancelNotifications,
+                categories = state.notificationCategories,
+                scheduleCategory = onScheduleCategory,
+            )
+        }
     }
 }
 
@@ -145,7 +157,7 @@ private fun SettingNotifications(
             savedOption = selectedCategory,
             optionToLocalisedString = { it.toString() },
             onSave = { selectedCategory = it },
-            indent = false
+            indent = false,
         )
         Row(
             modifier = Modifier
@@ -219,7 +231,7 @@ private fun UniqueNotificationSchedulerContent(
             savedOption = selectedType,
             optionToLocalisedString = { it.toString() },
             onSave = { selectedType = it },
-            indent = false
+            indent = false,
         )
         Row(
             modifier = Modifier
@@ -273,6 +285,7 @@ private fun PreviewNotificationTestingScreen(
             onResetDatabase = {},
             onCancelNotifications = {},
             onScheduleCategory = {},
+            onBack = {},
         )
     }
 }

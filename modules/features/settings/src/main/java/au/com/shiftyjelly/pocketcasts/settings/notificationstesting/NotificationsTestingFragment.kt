@@ -12,7 +12,12 @@ import dagger.hilt.android.AndroidEntryPoint
 class NotificationsTestingFragment : BaseFragment() {
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?) = contentWithoutConsumedInsets {
         AppTheme(theme.activeTheme) {
-            NotificationsTestingPage()
+            NotificationsTestingPage(
+                onBack = {
+                    @Suppress("DEPRECATION")
+                    activity?.onBackPressed()
+                },
+            )
         }
     }
 }
