@@ -23,7 +23,6 @@ import dagger.hilt.android.qualifiers.ApplicationContext
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 import kotlin.time.Duration
-import kotlin.time.Duration.Companion.milliseconds
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -111,24 +110,27 @@ internal class NotificationsTestingViewModel @Inject constructor(
                 NotificationCategoryType.DAILY_REMINDERS -> {
                     notificationScheduler.setupOnboardingNotifications {
                         val indexOfType = OnboardingNotificationType.values.indexOf(it)
-                        ((1 + indexOfType) * schedule.consecutiveDelaySeconds * 1000L).milliseconds
+                        schedule.consecutiveDelay * (1 + indexOfType)
                     }
                     notificationScheduler.setupReEngagementNotification {
                         val indexOfType = ReEngagementNotificationType.values.indexOf(it)
-                        ((1 + indexOfType) * schedule.consecutiveDelaySeconds * 1000L).milliseconds
+                        schedule.consecutiveDelay * (1 + indexOfType)
                     }
                 }
+
                 NotificationCategoryType.TRENDING_AND_RECOMMENDATIONS -> notificationScheduler.setupTrendingAndRecommendationsNotifications {
                     val indexOfType = TrendingAndRecommendationsNotificationType.values.indexOf(it)
-                    ((1 + indexOfType) * schedule.consecutiveDelaySeconds * 1000L).milliseconds
+                    schedule.consecutiveDelay * (1 + indexOfType)
                 }
+
                 NotificationCategoryType.NEW_FEATURES_AND_TIPS -> notificationScheduler.setupNewFeaturesAndTipsNotifications {
                     val indexOfType = NewFeaturesAndTipsNotificationType.values.indexOf(it)
-                    ((1 + indexOfType) * schedule.consecutiveDelaySeconds * 1000L).milliseconds
+                    schedule.consecutiveDelay * (1 + indexOfType)
                 }
+
                 NotificationCategoryType.POCKET_CASTS_OFFERS -> notificationScheduler.setupOffersNotifications {
                     val indexOfType = OffersNotificationType.values.indexOf(it)
-                    ((1 + indexOfType) * schedule.consecutiveDelaySeconds * 1000L).milliseconds
+                    schedule.consecutiveDelay * (1 + indexOfType)
                 }
             }
         }
@@ -151,7 +153,7 @@ internal class NotificationsTestingViewModel @Inject constructor(
 
     data class NotificationCategorySchedule(
         val category: NotificationCategoryType,
-        val consecutiveDelaySeconds: Int,
+        val consecutiveDelay: Duration,
     )
 
     enum class NotificationType {
