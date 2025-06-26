@@ -21,7 +21,6 @@ import androidx.compose.animation.fadeOut
 import androidx.compose.animation.shrinkVertically
 import androidx.compose.animation.slideInVertically
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -45,8 +44,10 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.scale
+import androidx.compose.ui.layout.SubcomposeLayout
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.dimensionResource
+import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.core.content.res.ResourcesCompat
@@ -583,39 +584,16 @@ class PlayerHeaderFragment : BaseFragment(), PlayerClickListener {
         Column(
             modifier = modifier,
         ) {
-            Column(
-                verticalArrangement = Arrangement.Center,
-                horizontalAlignment = Alignment.CenterHorizontally,
+            AdAndArtwork(
+                ad = ad,
+                artworkOrVideoState = artworkOrVideoState,
+                isTranscriptOpen = transitionData.isTranscriptOpen,
+                playerColors = playerColors,
                 modifier = Modifier
                     .weight(1f)
                     .fillMaxWidth()
                     .alpha(transitionData.nonTranscriptElementsAlpha),
-            ) {
-                if (!transitionData.isTranscriptOpen) {
-                    AnimatedNonNullVisibility(
-                        item = ad,
-                        enter = adEnterTransition,
-                        exit = adExitTransition,
-                    ) { ad ->
-                        AdBanner(
-                            ad = ad,
-                            colors = rememberAdColors().bannerAd,
-                            onAdClick = { openAd(ad) },
-                            onOptionsClick = { openAdReportSheet(ad, playerColors.podcastColors) },
-                        )
-                    }
-                    Spacer(
-                        modifier = Modifier.height(16.dp),
-                    )
-                    ArtworkOrVideo(
-                        state = artworkOrVideoState,
-                        onChapterUrlClick = viewModel::onChapterUrlClick,
-                        configureVideoView = { videoView ->
-                            videoView.setOnClickListener { onFullScreenVideoClick() }
-                        },
-                    )
-                }
-            }
+            )
             if (!transitionData.isTranscriptOpen) {
                 Spacer(
                     modifier = Modifier.height(8.dp),
@@ -726,6 +704,69 @@ class PlayerHeaderFragment : BaseFragment(), PlayerClickListener {
                     transcriptViewModel.track(AnalyticsEvent.TRANSCRIPT_GENERATED_PAYWALL_SHOWN)
                 },
             )
+        }
+    }
+
+    @Composable
+    private fun AdAndArtwork(
+        ad: BlazeAd?,
+        artworkOrVideoState: ArtworkOrVideoState,
+        isTranscriptOpen: Boolean,
+        playerColors: PlayerColors,
+        modifier: Modifier = Modifier,
+    ) {
+        SubcomposeLayout(modifier = modifier) { constraints ->
+            val adPlaceable = if (!isTranscriptOpen) {
+                subcompose("ad") {
+                    AnimatedNonNullVisibility(
+                        item = ad,
+                        enter = adEnterTransition,
+                        exit = adExitTransition,
+                    ) { ad ->
+                        AdBanner(
+                            ad = ad,
+                            colors = rememberAdColors().bannerAd,
+                            onAdClick = { openAd(ad) },
+                            onOptionsClick = { openAdReportSheet(ad, playerColors.podcastColors) },
+                        )
+                    }
+                }.getOrNull(0)?.measure(constraints.copyMaxDimensions())
+            } else {
+                null
+            }
+
+            val spacingDp = 16.dp
+            val spacingPx = spacingDp.roundToPx()
+            val availableHeightPx = constraints.maxHeight - (adPlaceable?.height ?: 0) - spacingPx
+            val artworkPlaceable = if (!isTranscriptOpen && availableHeightPx > 64.dp.roundToPx()) {
+                val availableHeightDp = availableHeightPx.toDp()
+                val artworkConstraints = Constraints(maxHeight = availableHeightPx, maxWidth = constraints.maxWidth)
+                subcompose("artworkOrVideo") {
+                    ArtworkOrVideo(
+                        state = artworkOrVideoState,
+                        artworkCornerRadius = if (availableHeightDp > 120.dp) 16.dp else 8.dp,
+                        onChapterUrlClick = viewModel::onChapterUrlClick,
+                        configureVideoView = { videoView ->
+                            videoView.setOnClickListener { onFullScreenVideoClick() }
+                        },
+                        modifier = Modifier.padding(top = spacingDp),
+                    )
+                }[0].measure(artworkConstraints)
+            } else {
+                null
+            }
+
+            layout(constraints.maxWidth, constraints.maxHeight) {
+                val placeablesHeight = (adPlaceable?.height ?: 0) + (artworkPlaceable?.height ?: 0)
+                val yOffset = (constraints.maxHeight - placeablesHeight) / 2
+
+                adPlaceable?.let { placeable ->
+                    placeable.place((constraints.maxWidth - adPlaceable.width) / 2, yOffset)
+                }
+                artworkPlaceable?.let { placeable ->
+                    placeable.place((constraints.maxWidth - placeable.width) / 2, yOffset + (adPlaceable?.height ?: 0))
+                }
+            }
         }
     }
 

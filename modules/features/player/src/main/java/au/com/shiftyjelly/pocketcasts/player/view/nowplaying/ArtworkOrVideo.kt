@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import au.com.shiftyjelly.pocketcasts.player.view.video.VideoView
 import au.com.shiftyjelly.pocketcasts.repositories.playback.Player
@@ -16,6 +17,7 @@ internal fun ArtworkOrVideo(
     onChapterUrlClick: (HttpUrl) -> Unit,
     configureVideoView: (VideoView) -> Unit,
     modifier: Modifier = Modifier,
+    artworkCornerRadius: Dp = 16.dp,
 ) {
     Box(
         modifier = modifier,
@@ -24,6 +26,7 @@ internal fun ArtworkOrVideo(
             is ArtworkOrVideoState.Artwork -> {
                 ArtworkImage(
                     state = state.artworkImageState,
+                    cornerRadius = artworkCornerRadius,
                 )
             }
 
