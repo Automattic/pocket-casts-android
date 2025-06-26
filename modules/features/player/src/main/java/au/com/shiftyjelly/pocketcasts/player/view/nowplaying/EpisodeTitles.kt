@@ -19,6 +19,7 @@ import androidx.compose.material.IconButton
 import androidx.compose.material.LocalRippleConfiguration
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.RippleConfiguration
+import androidx.compose.material.RippleDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.getValue
@@ -63,6 +64,7 @@ fun EpisodeTitles(
     playerColors: PlayerColors,
     playerViewModel: PlayerViewModel,
     modifier: Modifier = Modifier,
+    textAlign: TextAlign = TextAlign.Center,
 ) {
     val state by remember {
         playerViewModel.listDataLive.map {
@@ -89,6 +91,7 @@ fun EpisodeTitles(
         onNextChapterClick = { playerViewModel.onNextChapterClick() },
         onChapterTitleClick = { playerViewModel.onChapterTitleClick(it) },
         onPodcastTitleClick = { playerViewModel.onPodcastTitleClick(state.episodeUuid, state.podcastUuid) },
+        textAlign = textAlign,
         modifier = modifier,
     )
 }
@@ -102,6 +105,7 @@ private fun Content(
     onChapterTitleClick: (Chapter) -> Unit,
     onPodcastTitleClick: () -> Unit,
     modifier: Modifier = Modifier,
+    textAlign: TextAlign = TextAlign.Center,
     playerColors: PlayerColors = MaterialTheme.theme.rememberPlayerColorsOrDefault(),
 ) {
     CompositionLocalProvider(
@@ -129,7 +133,7 @@ private fun Content(
                 TextH30(
                     text = state.title,
                     color = playerColors.contrast01,
-                    textAlign = TextAlign.Center,
+                    textAlign = textAlign,
                     maxLines = 2,
                     modifier = Modifier
                         .fillMaxWidth()
@@ -151,7 +155,7 @@ private fun Content(
                         TextH50(
                             text = state.podcastTitle,
                             color = playerColors.contrast02,
-                            textAlign = TextAlign.Center,
+                            textAlign = textAlign,
                             maxLines = 1,
                             modifier = Modifier
                                 .fillMaxWidth()
@@ -172,7 +176,7 @@ private fun Content(
                         TextH70(
                             text = chapterSummary,
                             color = playerColors.contrast02,
-                            textAlign = TextAlign.Center,
+                            textAlign = textAlign,
                             maxLines = 1,
                             modifier = Modifier
                                 .fillMaxWidth()

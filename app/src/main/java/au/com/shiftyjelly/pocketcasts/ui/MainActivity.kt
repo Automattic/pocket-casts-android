@@ -4,7 +4,6 @@ import android.Manifest
 import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.Intent
-import android.content.pm.ActivityInfo
 import android.content.pm.PackageManager
 import android.content.res.Configuration
 import android.net.Uri
@@ -409,7 +408,6 @@ class MainActivity :
         WindowCompat.setDecorFitsSystemWindows(window, false)
         super.onCreate(savedInstanceState)
         theme.setupThemeForConfig(this, resources.configuration)
-        requestPortraitOrientation()
         enableEdgeToEdge(navigationBarStyle = theme.getNavigationBarStyle(this))
         bottomSheetTag = savedInstanceState?.getString(SAVEDSTATE_BOTTOM_SHEET_TAG)
 
@@ -1798,12 +1796,5 @@ class MainActivity :
         openTab(VR.id.navigation_profile)
         addFragment(SettingsFragment())
         addFragment(ExportSettingsFragment())
-    }
-
-    @SuppressLint("SourceLockedOrientationActivity")
-    private fun requestPortraitOrientation() {
-        if (resources.getBoolean(R.bool.force_portrait_orientation)) {
-            setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_SENSOR_PORTRAIT)
-        }
     }
 }
