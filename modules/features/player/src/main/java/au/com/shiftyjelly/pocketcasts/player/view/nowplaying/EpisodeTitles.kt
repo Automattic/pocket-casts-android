@@ -109,7 +109,7 @@ private fun Content(
     playerColors: PlayerColors = MaterialTheme.theme.rememberPlayerColorsOrDefault(),
 ) {
     CompositionLocalProvider(
-        LocalRippleConfiguration provides RippleConfiguration(Color.White, RippleDefaults.rippleAlpha(Color.White, true)),
+        LocalRippleConfiguration provides RippleConfiguration(color = playerColors.contrast01),
     ) {
         Row(
             modifier = modifier,
