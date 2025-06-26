@@ -158,7 +158,7 @@ private fun SettingNotifications(
         val notificationSchedule = if (selectedDelay > 0 && selectedCategory != null) {
             NotificationsTestingViewModel.NotificationCategorySchedule(
                 category = selectedCategory!!,
-                consecutiveDelaySeconds = selectedDelay,
+                consecutiveDelay = selectedDelay.seconds,
             )
         } else {
             null
