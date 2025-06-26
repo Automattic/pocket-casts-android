@@ -118,6 +118,7 @@ private fun Content(
                 ChapterPreviousButton(
                     enabled = !state.isFirstChapter,
                     alpha = if (state.isFirstChapter) 0.5f else 1f,
+                    iconTint = playerColors.contrast01,
                     onClick = onPreviousChapterClick,
                 )
             }
@@ -153,7 +154,7 @@ private fun Content(
 
                         TextH50(
                             text = state.podcastTitle,
-                            color = MaterialTheme.theme.colors.playerContrast02,
+                            color = playerColors.contrast02,
                             textAlign = textAlign,
                             maxLines = 1,
                             modifier = Modifier
@@ -174,7 +175,7 @@ private fun Content(
 
                         TextH70(
                             text = chapterSummary,
-                            color = Color.White.copy(alpha = 0.7f),
+                            color = playerColors.contrast02,
                             textAlign = textAlign,
                             maxLines = 1,
                             modifier = Modifier
@@ -197,6 +198,8 @@ private fun Content(
                         enabled = !state.isLastChapter,
                         alpha = if (state.isLastChapter) 0.5f else 1f,
                         progress = state.chapterProgress,
+                        iconTint = playerColors.contrast01,
+                        progressTint = playerColors.contrast04,
                         onClick = onNextChapterClick,
                     )
 
@@ -204,7 +207,7 @@ private fun Content(
 
                     TextH70(
                         text = state.chapterTimeRemaining,
-                        color = Color.White,
+                        color = playerColors.contrast02,
                         modifier = Modifier
                             .semantics { this.contentDescription = timeRemainingContentDescription }
                             .alpha(0.4f),
@@ -219,6 +222,7 @@ private fun Content(
 private fun ChapterPreviousButton(
     enabled: Boolean,
     alpha: Float,
+    iconTint: Color,
     onClick: () -> Unit,
 ) {
     IconButton(
@@ -231,8 +235,8 @@ private fun ChapterPreviousButton(
             modifier = Modifier.clip(CircleShape),
         ) {
             Icon(
-                painterResource(R.drawable.ic_chapter_skipbackwards),
-                tint = Color.White,
+                painter = painterResource(R.drawable.ic_chapter_skipbackwards),
+                tint = iconTint,
                 contentDescription = stringResource(LR.string.player_action_previous_chapter),
             )
         }
@@ -244,6 +248,8 @@ private fun ChapterNextButtonWithChapterProgressCircle(
     enabled: Boolean,
     progress: Float,
     alpha: Float,
+    iconTint: Color,
+    progressTint: Color,
     onClick: () -> Unit,
 ) {
     val contentDescription = stringResource(LR.string.player_action_next_chapter)
@@ -255,13 +261,14 @@ private fun ChapterNextButtonWithChapterProgressCircle(
             .semantics { this.contentDescription = contentDescription },
     ) {
         Icon(
-            painterResource(R.drawable.ic_chapter_skipforward),
-            tint = Color.White,
+            painter = painterResource(R.drawable.ic_chapter_skipforward),
+            tint = iconTint,
             contentDescription = null,
         )
 
         ChapterProgressCircle(
             progress = progress,
+            tint = progressTint,
         )
     }
 }
@@ -269,6 +276,7 @@ private fun ChapterNextButtonWithChapterProgressCircle(
 @Composable
 private fun ChapterProgressCircle(
     progress: Float,
+    tint: Color,
     modifier: Modifier = Modifier,
 ) {
     Canvas(
@@ -276,7 +284,7 @@ private fun ChapterProgressCircle(
     ) {
         val degrees = 360f * (1f - progress)
         drawArc(
-            color = Color.White.copy(alpha = 0.4f),
+            color = tint,
             startAngle = -90f,
             sweepAngle = -degrees,
             useCenter = false,
