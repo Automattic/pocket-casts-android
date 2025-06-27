@@ -34,6 +34,8 @@
         ([#4130](https://github.com/Automattic/pocket-casts-android/pull/4130))
     *   Add `@Transaction` to podcast queries that might result in large amount of data
         ([#4151](https://github.com/Automattic/pocket-casts-android/pull/4151))
+    *   Fix issue with notification prompt showing too often
+        ([#4162](https://github.com/Automattic/pocket-casts-android/pull/4162))
 
 7.91
 -----
