@@ -67,13 +67,16 @@ class PodcastsViewModel @AssistedInject constructor(
         .map { it.isNotEmpty() }
         .stateIn(viewModelScope, SharingStarted.Eagerly, initialValue = false)
 
-    private val _notificationsState = MutableStateFlow(
+    private val notificationsPermissionState = MutableStateFlow(notificationHelper.hasNotificationsPermission())
+    val notificationPromptState = combine(
+        notificationsPermissionState,
+        settings.notificationsPromptAcknowledged.flow,
+    ) { hasPermission, hasShownPermissionBefore ->
         NotificationsPermissionState(
-            hasPermission = notificationHelper.hasNotificationsPermission(),
-            hasShownPromptBefore = settings.notificationsPromptAcknowledged.value,
-        ),
-    )
-    val notificationPromptState = _notificationsState.asStateFlow()
+            hasPermission = hasPermission,
+            hasShownPromptBefore = hasShownPermissionBefore,
+        )
+    }
 
     val activeAds = if (folderUuid == null) {
         combine(
@@ -274,10 +277,7 @@ class PodcastsViewModel @AssistedInject constructor(
     }
 
     fun updateNotificationsPermissionState() {
-        _notificationsState.value = NotificationsPermissionState(
-            hasPermission = notificationHelper.hasNotificationsPermission(),
-            hasShownPromptBefore = settings.notificationsPromptAcknowledged.value,
-        )
+        notificationsPermissionState.value = notificationHelper.hasNotificationsPermission()
     }
 
     private suspend fun saveSortOrder() {

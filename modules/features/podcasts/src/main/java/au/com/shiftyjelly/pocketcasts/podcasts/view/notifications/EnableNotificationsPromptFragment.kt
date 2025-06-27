@@ -54,12 +54,13 @@ internal class EnableNotificationsPromptFragment : BaseDialogFragment() {
             analyticsTracker.track(AnalyticsEvent.NOTIFICATIONS_OPT_IN_ALLOWED)
         } else {
             analyticsTracker.track(AnalyticsEvent.NOTIFICATIONS_OPT_IN_DENIED)
+            handleDismissedByUser()
         }
-
+        isFinalizingActionUsed = true
         dismiss()
     }
 
-    private var wasDismissedViaCloseButton = false
+    private var isFinalizingActionUsed = false
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -84,10 +85,7 @@ internal class EnableNotificationsPromptFragment : BaseDialogFragment() {
                 EnableNotificationsPromptScreen(
                     modifier = Modifier
                         .fillMaxSize()
-                        .padding(
-                            vertical = 16.dp,
-                            horizontal = 16.dp,
-                        )
+                        .padding(16.dp)
                         .windowInsetsPadding(WindowInsets.safeDrawing.only(WindowInsetsSides.Horizontal)),
                     onCtaClicked = {
                         analyticsTracker.track(AnalyticsEvent.NOTIFICATIONS_PERMISSIONS_ALLOW_TAPPED)
@@ -101,7 +99,8 @@ internal class EnableNotificationsPromptFragment : BaseDialogFragment() {
                         }
                     },
                     onDismissClicked = {
-                        wasDismissedViaCloseButton = true
+                        isFinalizingActionUsed = true
+                        handleDismissedByUser()
                         dismiss()
                     },
                 )
@@ -111,9 +110,13 @@ internal class EnableNotificationsPromptFragment : BaseDialogFragment() {
 
     override fun onDismiss(dialog: DialogInterface) {
         super.onDismiss(dialog)
-        if (wasDismissedViaCloseButton) {
-            settings.notificationsPromptAcknowledged.set(value = true, updateModifiedAt = true)
-            analyticsTracker.track(AnalyticsEvent.NOTIFICATIONS_PERMISSIONS_DISMISSED)
+        if (!requireActivity().isChangingConfigurations && !isFinalizingActionUsed) {
+            handleDismissedByUser()
         }
+    }
+
+    private fun handleDismissedByUser() {
+        settings.notificationsPromptAcknowledged.set(value = true, updateModifiedAt = true)
+        analyticsTracker.track(AnalyticsEvent.NOTIFICATIONS_PERMISSIONS_DISMISSED)
     }
 }
