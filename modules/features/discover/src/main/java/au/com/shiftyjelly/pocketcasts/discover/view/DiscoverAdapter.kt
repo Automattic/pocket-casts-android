@@ -1032,10 +1032,13 @@ internal class DiscoverAdapter(
 
                             holder.binding.lblTitle.text = it.subtitle?.tryToLocalise(resources)
 
-                            val collectionHeader =
-                                it.collectionImageUrl?.let { imageUrl -> CollectionHeader(imageUrl, it.title, it.description) }
+                            val description = it.shortDescription ?: it.description ?: ""
+                            val collectionImageUrl = it.collectionRectangleImageUrl ?: it.collectionImageUrl
+                            val collectionHeader = collectionImageUrl?.let { imageUrl ->
+                                CollectionHeader(imageUrl, it.title, description)
+                            }
 
-                            val collectionPodcasts: List<CollectionPodcast> = podcasts.map { CollectionPodcast(it) }
+                            val collectionPodcasts: List<CollectionPodcast> = podcasts.map { podcast -> CollectionPodcast(podcast) }
 
                             holder.adapter.submitPodcastList(collectionPodcasts, collectionHeader) { onRestoreInstanceState(holder) }
                         },

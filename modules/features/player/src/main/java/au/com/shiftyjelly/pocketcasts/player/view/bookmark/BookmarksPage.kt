@@ -80,7 +80,6 @@ fun BookmarksPage(
 
     Content(
         state = state,
-        sourceView = sourceView,
         colors = bookmarkColors,
         bottomInset = bottomInset,
         onRowLongPressed = onRowLongPressed,
@@ -130,7 +129,6 @@ fun BookmarksPage(
 @Composable
 private fun Content(
     state: UiState,
-    sourceView: SourceView,
     colors: BookmarkColors,
     bottomInset: Dp,
     onRowLongPressed: (Bookmark) -> Unit,
@@ -147,8 +145,7 @@ private fun Content(
         contentAlignment = Alignment.Center,
         modifier = Modifier
             .fillMaxSize()
-            .background(color = playerColors?.background01 ?: MaterialTheme.theme.colors.primaryUi01)
-            .padding(bottom = if (sourceView == SourceView.PROFILE) 0.dp else 28.dp),
+            .background(color = playerColors?.background01 ?: MaterialTheme.theme.colors.primaryUi01),
     ) {
         when (state) {
             is UiState.Loading -> LoadingView()
@@ -311,7 +308,6 @@ private fun BookmarksPreview(
                 onRowClick = {},
                 sourceView = SourceView.PLAYER,
             ),
-            sourceView = SourceView.PLAYER,
             bottomInset = 0.dp,
             colors = rememberBookmarkColors(),
             onPlayClick = {},

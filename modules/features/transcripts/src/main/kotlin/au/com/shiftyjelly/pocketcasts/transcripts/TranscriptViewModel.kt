@@ -17,8 +17,10 @@ import au.com.shiftyjelly.pocketcasts.repositories.user.UserManager
 import au.com.shiftyjelly.pocketcasts.utils.search.SearchCoordinates
 import au.com.shiftyjelly.pocketcasts.utils.search.SearchMatches
 import au.com.shiftyjelly.pocketcasts.utils.search.kmpSearch
+import dagger.assisted.Assisted
+import dagger.assisted.AssistedFactory
+import dagger.assisted.AssistedInject
 import dagger.hilt.android.lifecycle.HiltViewModel
-import javax.inject.Inject
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.cancelAndJoin
@@ -29,8 +31,9 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.reactive.asFlow
 
-@HiltViewModel
-class TranscriptViewModel @Inject constructor(
+@HiltViewModel(assistedFactory = TranscriptViewModel.Factory::class)
+class TranscriptViewModel @AssistedInject constructor(
+    @Assisted private val source: Source,
     private val transcriptManager: TranscriptManager,
     private val episodeManager: EpisodeManager,
     private val userManager: UserManager,
@@ -195,6 +198,7 @@ class TranscriptViewModel @Inject constructor(
             event,
             buildMap {
                 putAll(additionalProperties)
+                put("source", source.analyticsValue)
                 episodeUuid?.let { uuid -> put("episode_uuid", uuid) }
                 podcastUuid?.let { uuid -> put("podcast_uuid", uuid) }
             },
@@ -206,6 +210,22 @@ class TranscriptViewModel @Inject constructor(
             this.episodeUuid = episodeUuid
             this.podcastUuid = episodeManager.findByUuid(episodeUuid)?.podcastUuid
         }
+    }
+
+    enum class Source(
+        val analyticsValue: String,
+    ) {
+        Episode(
+            analyticsValue = "episode",
+        ),
+        Player(
+            analyticsValue = "player",
+        ),
+    }
+
+    @AssistedFactory
+    interface Factory {
+        fun create(source: Source): TranscriptViewModel
     }
 }
 

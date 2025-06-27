@@ -4,7 +4,6 @@ import android.Manifest
 import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.Intent
-import android.content.pm.ActivityInfo
 import android.content.pm.PackageManager
 import android.content.res.Configuration
 import android.net.Uri
@@ -62,6 +61,7 @@ import au.com.shiftyjelly.pocketcasts.deeplink.CreateAccountDeepLink
 import au.com.shiftyjelly.pocketcasts.deeplink.DeepLink.Companion.EXTRA_PAGE
 import au.com.shiftyjelly.pocketcasts.deeplink.DeepLinkFactory
 import au.com.shiftyjelly.pocketcasts.deeplink.DeleteBookmarkDeepLink
+import au.com.shiftyjelly.pocketcasts.deeplink.DeveloperOptionsDeeplink
 import au.com.shiftyjelly.pocketcasts.deeplink.DownloadsDeepLink
 import au.com.shiftyjelly.pocketcasts.deeplink.ImportDeepLink
 import au.com.shiftyjelly.pocketcasts.deeplink.NativeShareDeepLink
@@ -156,6 +156,7 @@ import au.com.shiftyjelly.pocketcasts.servers.model.NetworkLoadableList.Companio
 import au.com.shiftyjelly.pocketcasts.settings.AppearanceSettingsFragment
 import au.com.shiftyjelly.pocketcasts.settings.ExportSettingsFragment
 import au.com.shiftyjelly.pocketcasts.settings.SettingsFragment
+import au.com.shiftyjelly.pocketcasts.settings.developer.DeveloperFragment
 import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingFlow
 import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingLauncher
 import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingUpgradeSource
@@ -407,7 +408,6 @@ class MainActivity :
         WindowCompat.setDecorFitsSystemWindows(window, false)
         super.onCreate(savedInstanceState)
         theme.setupThemeForConfig(this, resources.configuration)
-        requestPortraitOrientation()
         enableEdgeToEdge(navigationBarStyle = theme.getNavigationBarStyle(this))
         bottomSheetTag = savedInstanceState?.getString(SAVEDSTATE_BOTTOM_SHEET_TAG)
 
@@ -1335,6 +1335,7 @@ class MainActivity :
                     closeToRoot()
                 }
                 is DownloadsDeepLink -> {
+                    closePlayer()
                     closeToRoot()
                     addFragment(ProfileEpisodeListFragment.newInstance(ProfileEpisodeListFragment.Mode.Downloaded))
                 }
@@ -1368,6 +1369,7 @@ class MainActivity :
                 }
 
                 is ShowPodcastDeepLink -> {
+                    closePlayer()
                     openPodcastPage(deepLink.podcastUuid, deepLink.sourceView)
                 }
 
@@ -1383,9 +1385,11 @@ class MainActivity :
                     )
                 }
                 is ShowPodcastsDeepLink -> {
+                    closePlayer()
                     openTab(VR.id.navigation_podcasts)
                 }
                 is ShowDiscoverDeepLink -> {
+                    closePlayer()
                     openTab(VR.id.navigation_discover)
                 }
                 is ShowUpNextModalDeepLink -> {
@@ -1401,6 +1405,7 @@ class MainActivity :
                             withContext(Dispatchers.Main) {
                                 settings.setSelectedFilter(it.uuid)
                                 // HACK: Go diving to find if a filter fragment
+                                closePlayer()
                                 openTab(VR.id.navigation_filters)
                                 val filtersFragment = supportFragmentManager.fragments.find { it is FiltersFragment } as? FiltersFragment
                                 filtersFragment?.openPlaylist(it)
@@ -1437,11 +1442,13 @@ class MainActivity :
                     openCloudFiles()
                 }
                 is UpsellDeepLink -> {
+                    closePlayer()
                     openOnboardingFlow(OnboardingFlow.Upsell(OnboardingUpgradeSource.DEEP_LINK))
                 }
                 is SmartFoldersDeepLink -> {
                     if (supportFragmentManager.findFragmentByTag("suggested_folders") == null) {
-                        SuggestedFoldersFragment.newInstance(SuggestedFoldersFragment.Source.DEEPLINK).showNow(supportFragmentManager, "suggested_folders")
+                        closePlayer()
+                        SuggestedFoldersFragment.newInstance(SuggestedFoldersFragment.Source.DEEPLINK).show(supportFragmentManager, "suggested_folders")
                     }
                     openTab(VR.id.navigation_podcasts)
                 }
@@ -1455,6 +1462,7 @@ class MainActivity :
                     openSharingUrl(deepLink)
                 }
                 is OpmlImportDeepLink -> {
+                    closePlayer()
                     OpmlImportTask.run(deepLink.uri, this)
                 }
                 is ImportDeepLink -> {
@@ -1493,7 +1501,12 @@ class MainActivity :
                     openOnboardingFlow(onboardingFlow)
                 }
                 is ThemesDeepLink -> {
+                    closePlayer()
                     addFragment(AppearanceSettingsFragment.newInstance())
+                }
+                is DeveloperOptionsDeeplink -> {
+                    closePlayer()
+                    addFragment(DeveloperFragment())
                 }
                 null -> {
                     LogBuffer.i("DeepLink", "Did not find any matching deep link for: $intent")
@@ -1506,6 +1519,7 @@ class MainActivity :
     }
 
     private fun openDiscoverListDeeplink(listId: String) {
+        closePlayer()
         openTab(VR.id.navigation_discover)
         lifecycleScope.launch {
             val discoverList = discoverDeepLinkManager.getDiscoverList(listId, resources) ?: return@launch
@@ -1782,12 +1796,5 @@ class MainActivity :
         openTab(VR.id.navigation_profile)
         addFragment(SettingsFragment())
         addFragment(ExportSettingsFragment())
-    }
-
-    @SuppressLint("SourceLockedOrientationActivity")
-    private fun requestPortraitOrientation() {
-        if (resources.getBoolean(R.bool.force_portrait_orientation)) {
-            setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_SENSOR_PORTRAIT)
-        }
     }
 }

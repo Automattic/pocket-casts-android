@@ -1,6 +1,16 @@
 7.93
 -----
-
+*   New Features
+    *   Display transcripts in the episode details UI
+        ([#4143](https://github.com/Automattic/pocket-casts-android/pull/4143))
+*   Updates
+    *   New design for the Guest List and Network Highlight sections in Discover
+        ([#4153](https://github.com/Automattic/pocket-casts-android/pull/4153))
+    *   Bring bang landscape UI
+        ([#4156](https://github.com/Automattic/pocket-casts-android/pull/4156))
+*   Bug Fixes
+    *   Collapse player when opening a notification
+        ([#4150](https://github.com/Automattic/pocket-casts-android/pull/4150))
 
 7.92
 -----

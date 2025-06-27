@@ -34,6 +34,7 @@ dependencies {
     api(libs.rx2.relay)
 
     api(projects.modules.features.player)
+    api(projects.modules.features.transcripts)
     api(projects.modules.services.analytics)
     api(projects.modules.services.compose)
     api(projects.modules.services.localization)
@@ -74,6 +75,7 @@ dependencies {
     implementation(projects.modules.features.reimagine)
     implementation(projects.modules.features.search)
     implementation(projects.modules.features.settings)
+    implementation(projects.modules.services.compose)
     implementation(projects.modules.services.images)
 
     testImplementation(libs.coroutines.test)

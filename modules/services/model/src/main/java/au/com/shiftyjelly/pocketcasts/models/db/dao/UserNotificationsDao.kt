@@ -21,4 +21,7 @@ abstract class UserNotificationsDao {
 
     @Update
     abstract suspend fun update(userNotifications: UserNotifications)
+
+    @Query("DELETE FROM user_notifications")
+    abstract suspend fun deleteAll()
 }

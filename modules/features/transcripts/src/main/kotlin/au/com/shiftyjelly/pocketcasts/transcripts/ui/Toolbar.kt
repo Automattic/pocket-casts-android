@@ -69,7 +69,7 @@ import au.com.shiftyjelly.pocketcasts.utils.search.SearchMatches
 import au.com.shiftyjelly.pocketcasts.compose.components.SearchBar as BaseSearchBar
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
-internal data class ToolbarColors(
+data class ToolbarColors(
     val button: Color,
     val buttonBackground: Color,
     val searchBarBackground: Color,
@@ -119,6 +119,7 @@ internal fun Toolbar(
     modifier: Modifier = Modifier,
     colors: ToolbarColors = ToolbarColors.default(MaterialTheme.theme.colors),
     hideSearchBar: Boolean = false,
+    trailingContent: (@Composable (ToolbarColors) -> Unit)? = null,
 ) {
     val focusRequester = remember { FocusRequester() }
     val showSearchTransition = updateTransition(searchState.isSearchOpen)
@@ -150,10 +151,15 @@ internal fun Toolbar(
                         enter = SearchButtonEnterTransition,
                         exit = SearchButtonExitTransition,
                     ) {
-                        ShowSearchButton(
-                            colors = colors,
-                            onClick = onShowSearchBar,
-                        )
+                        Row(
+                            horizontalArrangement = Arrangement.spacedBy(8.dp),
+                        ) {
+                            trailingContent?.invoke(colors)
+                            ShowSearchButton(
+                                colors = colors,
+                                onClick = onShowSearchBar,
+                            )
+                        }
                     }
                     showSearchTransition.AnimatedVisibility(
                         visible = { it },
@@ -424,7 +430,7 @@ private fun ToolbarPreview(
                 modifier = Modifier.fillMaxWidth(),
             )
             Toolbar(
-                initialSearchState = SearchState.Empty.copy(isSearchOpen = true),
+                initialSearchState = SearchState.Empty.copy(isSearchOpen = false),
                 modifier = Modifier.fillMaxWidth(),
             )
             Toolbar(
@@ -459,7 +465,7 @@ private fun ToolbarPlayerPreview(
                     modifier = Modifier.fillMaxWidth(),
                 )
                 Toolbar(
-                    initialSearchState = SearchState.Empty.copy(isSearchOpen = true),
+                    initialSearchState = SearchState.Empty.copy(isSearchOpen = false),
                     colors = transcriptTheme.toolbarColors,
                     modifier = Modifier.fillMaxWidth(),
                 )

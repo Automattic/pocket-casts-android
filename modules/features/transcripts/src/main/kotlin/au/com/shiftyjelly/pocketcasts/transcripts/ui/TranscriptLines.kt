@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
@@ -100,7 +101,9 @@ internal fun TranscriptLines(
                             entry = entry,
                             searchState = searchState,
                             theme = theme,
-                            modifier = Modifier.padding(entry.padding()),
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(entry.padding()),
                         )
                     }
                 }
@@ -200,13 +203,13 @@ private fun isValidHighlightRange(start: Int, end: Int, maxLength: Int): Boolean
 
 private val SimpleTextStyle = TextStyle(
     fontSize = 16.sp,
-    lineHeight = 24.sp,
+    lineHeight = 16.sp * 1.5f,
     fontWeight = FontWeight.Medium,
     fontFamily = TranscriptTheme.RobotoSerifFontFamily,
 )
 private val SpeakerTextStyle = SimpleTextStyle.copy(
     fontSize = 12.sp,
-    lineHeight = 18.sp,
+    lineHeight = 12.sp * 1.5f,
 )
 
 private val SimplePadding = PaddingValues(bottom = 16.dp)
