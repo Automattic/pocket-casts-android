@@ -56,7 +56,6 @@ import au.com.shiftyjelly.pocketcasts.discover.util.ScrollingLinearLayoutManager
 import au.com.shiftyjelly.pocketcasts.discover.view.CollectionListRowAdapter.CollectionItem.CollectionHeader
 import au.com.shiftyjelly.pocketcasts.discover.view.CollectionListRowAdapter.CollectionItem.CollectionPodcast
 import au.com.shiftyjelly.pocketcasts.discover.view.CollectionListRowAdapter.Companion.HEADER_OFFSET
-import au.com.shiftyjelly.pocketcasts.discover.view.CollectionListRowAdapter.HeaderViewHolder
 import au.com.shiftyjelly.pocketcasts.discover.view.CollectionListRowAdapter.PodcastsViewHolder.Companion.NUMBER_OF_ROWS_PER_PAGE
 import au.com.shiftyjelly.pocketcasts.discover.view.DiscoverFragment.Companion.EPISODE_UUID_KEY
 import au.com.shiftyjelly.pocketcasts.discover.view.DiscoverFragment.Companion.LIST_ID_KEY
@@ -578,8 +577,6 @@ internal class DiscoverAdapter(
                     if (newState == RecyclerView.SCROLL_STATE_IDLE) {
                         val position = linearLayoutManager.getCurrentPosition()
 
-                        updateHeader(recyclerView, position)
-
                         // Adds extra right padding starting from page 1 to preview the next page, except for the first page
                         if (position == 0) {
                             recyclerView.setPadding(8.dpToPx(itemView.context), 0, 0, 0)
@@ -607,14 +604,6 @@ internal class DiscoverAdapter(
                             recyclerView.setPadding(8.dpToPx(itemView.context), 0, 0, 0)
                         }
                     }
-                }
-
-                private fun updateHeader(
-                    recyclerView: RecyclerView,
-                    position: Int,
-                ) {
-                    val headerViewHolder = recyclerView.findViewHolderForAdapterPosition(0) as? HeaderViewHolder
-                    headerViewHolder?.updateVisibility(position != 1)
                 }
 
                 private fun trackPageChangedEvent(position: Int) {

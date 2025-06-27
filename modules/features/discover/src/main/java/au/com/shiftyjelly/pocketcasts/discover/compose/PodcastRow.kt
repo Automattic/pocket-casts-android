@@ -90,7 +90,7 @@ internal fun PodcastRowPlaceholder(
     modifier: Modifier = Modifier,
 ) {
     PodcastRow(
-        podcast = DiscoverPodcastPreview,
+        podcast = DiscoverPodcastPlaceholder,
         onClickSubscribe = {},
         modifier = modifier,
     )
@@ -174,6 +174,17 @@ private fun SubscribeInteractionBox(
 
 private val IconSize = 24.dp
 private val TouchTargetSize = 48.dp
+internal val DiscoverPodcastPlaceholder = DiscoverPodcast(
+    uuid = "",
+    title = "",
+    author = "",
+    description = "",
+    url = "",
+    category = "",
+    language = "",
+    mediaType = "",
+    isSubscribed = false,
+)
 internal val DiscoverPodcastPreview = DiscoverPodcast(
     uuid = "uuid",
     title = "Title",
