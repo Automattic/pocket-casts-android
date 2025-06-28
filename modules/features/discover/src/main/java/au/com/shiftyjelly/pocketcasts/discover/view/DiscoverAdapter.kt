@@ -851,8 +851,8 @@ internal class DiscoverAdapter(
                             CategoriesStateInput(
                                 source = row.source,
                                 popularIds = row.mostPopularCategoriesId.orEmpty(),
-                                sponsoredIds = row.sponsoredCategoryIds.orEmpty()
-                            )
+                                sponsoredIds = row.sponsoredCategoryIds.orEmpty(),
+                            ),
                         ),
                         onNext = { state ->
                             adapter.submitList(state.allCategories.sortedBy { it.totalVisits }) {
@@ -868,8 +868,8 @@ internal class DiscoverAdapter(
                             CategoriesStateInput(
                                 source = row.source,
                                 popularIds = row.mostPopularCategoriesId.orEmpty(),
-                                sponsoredIds = row.sponsoredCategoryIds.orEmpty()
-                            )
+                                sponsoredIds = row.sponsoredCategoryIds.orEmpty(),
+                            ),
                         ),
                         onNext = { state ->
                             holder.submitState(state)

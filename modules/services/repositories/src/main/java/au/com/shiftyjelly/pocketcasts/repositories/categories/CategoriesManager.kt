@@ -47,18 +47,18 @@ class CategoriesManager @Inject constructor(
                 .sortedByDescending { it.totalVisits }
             val groupedBySponsoredWithVisits = categoriesWithVisits.groupBy { rowInfo.sponsoredCategoryIds.contains(it.id) }
             val featuredCategories = buildList {
-                        addAll(groupedBySponsoredWithVisits[true] ?: emptyList())
-                        addAll(groupedBySponsoredWithVisits[false] ?: emptyList())
+                addAll(groupedBySponsoredWithVisits[true] ?: emptyList())
+                addAll(groupedBySponsoredWithVisits[false] ?: emptyList())
 
-                        if (size < 6) {
-                            val popularFillers = categories
-                                .filter { !contains(it) }
-                                .filter { it.id in rowInfo.popularCategoryIds }
-                                .sortedBy { rowInfo.popularCategoryIds.indexOf(it.id) }
-                                .take(6 - size)
-                            addAll(popularFillers)
-                        }
-                    }.take(6)
+                if (size < 6) {
+                    val popularFillers = categories
+                        .filter { !contains(it) }
+                        .filter { it.id in rowInfo.popularCategoryIds }
+                        .sortedBy { rowInfo.popularCategoryIds.indexOf(it.id) }
+                        .take(6 - size)
+                    addAll(popularFillers)
+                }
+            }.take(6)
             State.Idle(
                 featuredCategories = featuredCategories
                     .ifEmpty { categories },
@@ -82,7 +82,7 @@ class CategoriesManager @Inject constructor(
                     val userVisits = userCategoryVisitsDao.getCategoryVisitsOrdered()
                     discoverCategories.value = listRepository.getCategoriesList(url).map { category ->
                         category.copy(
-                            totalVisits = userVisits.find { it.categoryId == category.id }?.totalVisits ?: 0
+                            totalVisits = userVisits.find { it.categoryId == category.id }?.totalVisits ?: 0,
                         )
                     }
                     lastUpdate = TimeSource.Monotonic.markNow()
@@ -96,7 +96,7 @@ class CategoriesManager @Inject constructor(
     fun setRowInfo(popularCategoryIds: List<Int>, sponsoredCategoryIds: List<Int>) {
         discoverRowInfo.value = DiscoverRowInfo(
             popularCategoryIds = popularCategoryIds,
-            sponsoredCategoryIds = sponsoredCategoryIds
+            sponsoredCategoryIds = sponsoredCategoryIds,
         )
     }
 

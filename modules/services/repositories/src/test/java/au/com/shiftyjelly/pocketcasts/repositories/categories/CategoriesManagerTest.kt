@@ -30,7 +30,7 @@ internal class CategoriesManagerTest {
         val categoriesManager = CategoriesManager(listRepository, userCategoryVisitsDao, CoroutineScope(Dispatchers.Default))
         categoriesManager.loadCategories("whatever")
         val popularCategoryIds = (0 until 6).toList()
-        categoriesManager.setRowInfo(popularCategoryIds = popularCategoryIds, sponsoredCategoryIds = listOf(4,5,6,7))
+        categoriesManager.setRowInfo(popularCategoryIds = popularCategoryIds, sponsoredCategoryIds = listOf(4, 5, 6, 7))
 
         categoriesManager.state.test {
             skipItems(1)
@@ -49,13 +49,13 @@ internal class CategoriesManagerTest {
                 UserCategoryVisits(categoryId = 5, totalVisits = 3),
                 UserCategoryVisits(categoryId = 8, totalVisits = 4),
                 UserCategoryVisits(categoryId = 9, totalVisits = 11),
-            )
+            ),
         )
 
         val categoriesManager = CategoriesManager(listRepository, userCategoryVisitsDao, CoroutineScope(Dispatchers.Default))
         categoriesManager.loadCategories("whatever")
         val popularCategoryIds = (0 until 6).toList()
-        categoriesManager.setRowInfo(popularCategoryIds = popularCategoryIds, sponsoredCategoryIds = listOf(4,5,6,7))
+        categoriesManager.setRowInfo(popularCategoryIds = popularCategoryIds, sponsoredCategoryIds = listOf(4, 5, 6, 7))
 
         categoriesManager.state.test {
             skipItems(1)
@@ -76,13 +76,13 @@ internal class CategoriesManagerTest {
                 UserCategoryVisits(categoryId = 5, totalVisits = 3),
                 UserCategoryVisits(categoryId = 8, totalVisits = 4),
                 UserCategoryVisits(categoryId = 9, totalVisits = 11),
-            )
+            ),
         )
 
         val categoriesManager = CategoriesManager(listRepository, userCategoryVisitsDao, CoroutineScope(Dispatchers.Default))
         categoriesManager.loadCategories("whatever")
         val popularCategoryIds = (0 until 6).toList()
-        categoriesManager.setRowInfo(popularCategoryIds = popularCategoryIds, sponsoredCategoryIds = listOf(4,5,6,7))
+        categoriesManager.setRowInfo(popularCategoryIds = popularCategoryIds, sponsoredCategoryIds = listOf(4, 5, 6, 7))
 
         categoriesManager.state.test {
             skipItems(1)

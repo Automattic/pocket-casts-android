@@ -109,7 +109,7 @@ data class DiscoverRow(
             sponsoredPodcasts = sponsoredPodcasts,
             mostPopularCategoriesId = mostPopularCategoriesId,
             authenticated = authenticated,
-            sponsoredCategoryIds = sponsoredCategoryIds
+            sponsoredCategoryIds = sponsoredCategoryIds,
         )
     }
 }
@@ -262,7 +262,7 @@ data class DiscoverCategory(
     @field:Json(name = "icon") val icon: String,
     @field:Json(name = "source") override val source: String,
     override val curated: Boolean = false,
-    val totalVisits: Int = 0
+    val totalVisits: Int = 0,
 ) : NetworkLoadableList {
     override val title: String
         get() = name
