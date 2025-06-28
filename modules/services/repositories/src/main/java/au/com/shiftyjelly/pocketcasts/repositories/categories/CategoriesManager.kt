@@ -65,7 +65,12 @@ class CategoriesManager @Inject constructor(
         if (discoverCategories.value.isEmpty() || areCategoriesStale()) {
             scope.launch {
                 try {
-                    discoverCategories.value = listRepository.getCategoriesList(url)
+                    val userVisits = userCategoryVisitsDao.getCategoryVisitsOrdered()
+                    discoverCategories.value = listRepository.getCategoriesList(url).map { category ->
+                        category.copy(
+                            totalVisits = userVisits.find { it.categoryId == category.id }?.totalVisits ?: 0
+                        )
+                    }
                     lastUpdate = TimeSource.Monotonic.markNow()
                 } catch (e: Throwable) {
                     Timber.e(e, "Failed to fetch categories under $url")
@@ -80,6 +85,9 @@ class CategoriesManager @Inject constructor(
 
     fun selectCategory(id: Int) {
         selectedId.value = id
+        scope.launch {
+            userCategoryVisitsDao.incrementVisits(id)
+        }
     }
 
     fun dismissSelectedCategory() {
