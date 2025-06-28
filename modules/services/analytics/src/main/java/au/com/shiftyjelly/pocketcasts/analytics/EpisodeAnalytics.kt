@@ -96,6 +96,7 @@ class EpisodeAnalytics @Inject constructor(
 
     private object AnalyticsProp {
         private const val source = "source"
+        private const val podcast_uuid = "podcast_uuid"
         private const val episode_uuid = "episode_uuid"
         private const val count = "count"
         private const val to_top = "to_top"
@@ -107,6 +108,7 @@ class EpisodeAnalytics @Inject constructor(
             mapOf(
                 source to eventSource.analyticsValue,
                 to_top to toTop,
+                podcast_uuid to episode.podcastOrSubstituteUuid,
                 episode_uuid to episode.uuid,
             )
 
