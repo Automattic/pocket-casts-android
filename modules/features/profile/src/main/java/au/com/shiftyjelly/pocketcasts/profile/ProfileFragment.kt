@@ -21,6 +21,7 @@ import au.com.shiftyjelly.pocketcasts.profile.cloud.CloudFilesFragment
 import au.com.shiftyjelly.pocketcasts.referrals.ReferralsGuestPassFragment
 import au.com.shiftyjelly.pocketcasts.referrals.ReferralsGuestPassFragment.ReferralsPageType
 import au.com.shiftyjelly.pocketcasts.referrals.ReferralsViewModel
+import au.com.shiftyjelly.pocketcasts.settings.HackWeekEoYFragment
 import au.com.shiftyjelly.pocketcasts.settings.HelpFragment
 import au.com.shiftyjelly.pocketcasts.settings.SettingsFragment
 import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingFlow
@@ -160,6 +161,7 @@ class ProfileFragment : BaseFragment(), TopScrollable {
             ProfileSection.Bookmarks -> BookmarksContainerFragment.newInstance(sourceView = SourceView.PROFILE)
             ProfileSection.ListeningHistory -> ProfileEpisodeListFragment.newInstance(ProfileEpisodeListFragment.Mode.History)
             ProfileSection.Help -> HelpFragment()
+            ProfileSection.Hack -> HackWeekEoYFragment()
         }
         fragmentHostListener.addFragment(fragment)
     }
