@@ -15,6 +15,8 @@ import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.R
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.SuggestedFoldersManager
 import au.com.shiftyjelly.pocketcasts.repositories.user.UserManager
+import au.com.shiftyjelly.pocketcasts.utils.AppPlatform
+import au.com.shiftyjelly.pocketcasts.utils.Util
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import dagger.assisted.Assisted
@@ -35,6 +37,8 @@ class NotificationWorker @AssistedInject constructor(
     private val userManager: UserManager,
 ) : CoroutineWorker(context, params) {
     override suspend fun doWork(): Result {
+        if (Util.getAppPlatform(applicationContext) != AppPlatform.Phone) return Result.failure()
+
         val subcategory = inputData.getString(SUBCATEGORY) ?: return Result.failure()
 
         val type = NotificationType.fromSubCategory(subcategory) ?: return Result.failure()
