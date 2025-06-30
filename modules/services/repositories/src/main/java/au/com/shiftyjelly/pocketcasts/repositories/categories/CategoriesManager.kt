@@ -50,18 +50,19 @@ class CategoriesManager @Inject constructor(
                 addAll(groupedBySponsoredWithVisits[true] ?: emptyList())
                 addAll(groupedBySponsoredWithVisits[false] ?: emptyList())
 
-                if (size < 6) {
+                if (size < FEATURED_CATEGORY_COUNT) {
                     val popularFillers = categories
                         .filter { !contains(it) }
                         .filter { it.id in rowInfo.popularCategoryIds }
                         .sortedBy { rowInfo.popularCategoryIds.indexOf(it.id) }
-                        .take(6 - size)
+                        .take(FEATURED_CATEGORY_COUNT - size)
                     addAll(popularFillers)
                 }
-            }.take(6)
+            }.ifEmpty {
+                categories
+            }.take(FEATURED_CATEGORY_COUNT)
             State.Idle(
-                featuredCategories = featuredCategories
-                    .ifEmpty { categories },
+                featuredCategories = featuredCategories,
                 allCategories = categories,
                 areAllCategoriesShown = areAllShown,
             )
@@ -145,5 +146,9 @@ class CategoriesManager @Inject constructor(
                 areAllCategoriesShown = false,
             )
         }
+    }
+
+    private companion object {
+        const val FEATURED_CATEGORY_COUNT = 6
     }
 }

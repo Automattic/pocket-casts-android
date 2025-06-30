@@ -91,4 +91,23 @@ internal class CategoriesManagerTest {
             assertEquals(listOf(5, 4, 9, 1, 8, 2), (state as CategoriesManager.State.Idle).featuredCategories.map { it.id })
         }
     }
+
+    @Test
+    fun `GIVEN no visited categories and no populars WHEN categories evaluated THEN categories are ordered as expected`() = runBlocking {
+        whenever(listRepository.getCategoriesList(any())).thenReturn(testCategories)
+        whenever(userCategoryVisitsDao.getCategoryVisitsOrdered()).thenReturn(
+            emptyList(),
+        )
+
+        val categoriesManager = CategoriesManager(listRepository, userCategoryVisitsDao, CoroutineScope(Dispatchers.Default))
+        categoriesManager.loadCategories("whatever")
+        categoriesManager.setRowInfo(popularCategoryIds = emptyList(), sponsoredCategoryIds = listOf(4, 5, 6, 7))
+
+        categoriesManager.state.test {
+            skipItems(1)
+            val state = awaitItem()
+            assert(state is CategoriesManager.State.Idle)
+            assertEquals((0..5).toList(), (state as CategoriesManager.State.Idle).featuredCategories.map { it.id })
+        }
+    }
 }
