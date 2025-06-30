@@ -13,6 +13,8 @@
         ([#4150](https://github.com/Automattic/pocket-casts-android/pull/4150))
     *   Fix episodes not being removed from the downloads list
         ([#4167](https://github.com/Automattic/pocket-casts-android/pull/4167))
+    *   Fix revamped notifications showing up on wear and automotive
+        ([#4177](https://github.com/Automattic/pocket-casts-android/pull/4177))
 
 7.92
 -----
