@@ -203,8 +203,8 @@ class DiscoverFragment :
                 theme = theme,
                 loadPodcastList = { source, authenticated -> viewModel.loadPodcastList(source, authenticated) },
                 loadCarouselSponsoredPodcastList = viewModel::loadCarouselSponsoredPodcasts,
-                categoriesState = { url, popularIds ->
-                    categoriesManager.setMostPopularCategories(popularIds)
+                categoriesState = { (url, popularIds, sponsoredIds) ->
+                    categoriesManager.setRowInfo(popularCategoryIds = popularIds, sponsoredCategoryIds = sponsoredIds)
                     categoriesManager.loadCategories(url)
                     categoriesManager.state.asFlowable()
                 },

@@ -170,7 +170,7 @@ private fun CategoriesManager.State.toPills() = when (this) {
 }
 
 private fun CategoriesManager.State.Idle.toPills(): List<CategoryPill> {
-    val categories = mostPopularCategories.map { category -> CategoryPill.Category(category, isSelected = false) }
+    val categories = featuredCategories.map { category -> CategoryPill.Category(category, isSelected = false) }
     return if (categories.isNotEmpty()) {
         buildList {
             if (areAllCategoriesShown) {

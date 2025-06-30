@@ -49,6 +49,7 @@ import au.com.shiftyjelly.pocketcasts.models.db.dao.TranscriptDao
 import au.com.shiftyjelly.pocketcasts.models.db.dao.UpNextChangeDao
 import au.com.shiftyjelly.pocketcasts.models.db.dao.UpNextDao
 import au.com.shiftyjelly.pocketcasts.models.db.dao.UpNextHistoryDao
+import au.com.shiftyjelly.pocketcasts.models.db.dao.UserCategoryVisitsDao
 import au.com.shiftyjelly.pocketcasts.models.db.dao.UserEpisodeDao
 import au.com.shiftyjelly.pocketcasts.models.db.dao.UserNotificationsDao
 import au.com.shiftyjelly.pocketcasts.models.entity.AnonymousBumpStat
@@ -67,6 +68,7 @@ import au.com.shiftyjelly.pocketcasts.models.entity.Transcript
 import au.com.shiftyjelly.pocketcasts.models.entity.UpNextChange
 import au.com.shiftyjelly.pocketcasts.models.entity.UpNextEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.UpNextHistory
+import au.com.shiftyjelly.pocketcasts.models.entity.UserCategoryVisits
 import au.com.shiftyjelly.pocketcasts.models.entity.UserEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.UserNotifications
 import au.com.shiftyjelly.pocketcasts.models.entity.UserPodcastRating
@@ -97,8 +99,9 @@ import au.com.shiftyjelly.pocketcasts.localization.R as LR
         UserPodcastRating::class,
         UpNextHistory::class,
         UserNotifications::class,
+        UserCategoryVisits::class,
     ],
-    version = 115,
+    version = 116,
     exportSchema = true,
     autoMigrations = [
         AutoMigration(from = 81, to = 82, spec = AppDatabase.Companion.DeleteSilenceRemovedMigration::class),
@@ -146,6 +149,7 @@ abstract class AppDatabase : RoomDatabase() {
     abstract fun endOfYearDao(): EndOfYearDao
     abstract fun upNextHistoryDao(): UpNextHistoryDao
     abstract fun userNotificationsDao(): UserNotificationsDao
+    abstract fun userCategoryVisitsDao(): UserCategoryVisitsDao
 
     fun databaseFiles() =
         openHelper.readableDatabase.path?.let {
@@ -1020,6 +1024,25 @@ abstract class AppDatabase : RoomDatabase() {
             }
         }
 
+        val MIGRATION_115_116 = addMigration(115, 116) { database ->
+            with(database) {
+                beginTransaction()
+                try {
+                    execSQL(
+                        """
+                        CREATE TABLE IF NOT EXISTS user_category_visits (
+                            category_id INTEGER NOT NULL PRIMARY KEY,
+                            total_visits INTEGER NOT NULL DEFAULT 0
+                        )
+                        """.trimIndent(),
+                    )
+                    setTransactionSuccessful()
+                } finally {
+                    endTransaction()
+                }
+            }
+        }
+
         fun addMigrations(databaseBuilder: Builder<AppDatabase>, context: Context) {
             databaseBuilder.addMigrations(
                 addMigration(1, 2) { },
@@ -1425,6 +1448,7 @@ abstract class AppDatabase : RoomDatabase() {
                 MIGRATION_112_113,
                 MIGRATION_113_114,
                 MIGRATION_114_115,
+                MIGRATION_115_116,
             )
         }
 

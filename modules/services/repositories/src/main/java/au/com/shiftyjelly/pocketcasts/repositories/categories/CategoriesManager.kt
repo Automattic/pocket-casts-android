@@ -1,10 +1,9 @@
 package au.com.shiftyjelly.pocketcasts.repositories.categories
 
-import android.content.Context
+import au.com.shiftyjelly.pocketcasts.models.db.dao.UserCategoryVisitsDao
 import au.com.shiftyjelly.pocketcasts.repositories.di.ApplicationScope
 import au.com.shiftyjelly.pocketcasts.repositories.lists.ListRepository
 import au.com.shiftyjelly.pocketcasts.servers.model.DiscoverCategory
-import dagger.hilt.android.qualifiers.ApplicationContext
 import javax.inject.Inject
 import javax.inject.Singleton
 import kotlin.time.Duration
@@ -23,11 +22,11 @@ import timber.log.Timber
 @Singleton
 class CategoriesManager @Inject constructor(
     private val listRepository: ListRepository,
+    private val userCategoryVisitsDao: UserCategoryVisitsDao,
     @ApplicationScope private val scope: CoroutineScope,
-    @ApplicationContext private val context: Context,
 ) {
     private val discoverCategories = MutableStateFlow<List<DiscoverCategory>>(emptyList())
-    private val mostPopularIds = MutableStateFlow<List<Int>>(emptyList())
+    private val discoverRowInfo = MutableStateFlow(DiscoverRowInfo())
     private val selectedId = MutableStateFlow<Int?>(null)
     private val areAllCategoriesShown = MutableStateFlow(false)
 
@@ -35,19 +34,35 @@ class CategoriesManager @Inject constructor(
 
     val state = combine(
         discoverCategories,
-        mostPopularIds,
+        discoverRowInfo,
         selectedId,
         areAllCategoriesShown,
-    ) { categories, popularIds, selectedId, areAllShown ->
+    ) { categories, rowInfo, selectedId, areAllShown ->
         val selectedCategory = categories.find { it.id == selectedId }
         if (selectedCategory != null) {
             State.Selected(selectedCategory, categories, areAllShown)
         } else {
+            val categoriesWithVisits = categories
+                .filter { it.totalVisits > 0 }
+                .sortedByDescending { it.totalVisits }
+            val groupedBySponsoredWithVisits = categoriesWithVisits.groupBy { rowInfo.sponsoredCategoryIds.contains(it.id) }
+            val featuredCategories = buildList {
+                addAll(groupedBySponsoredWithVisits[true] ?: emptyList())
+                addAll(groupedBySponsoredWithVisits[false] ?: emptyList())
+
+                if (size < FEATURED_CATEGORY_COUNT) {
+                    val popularFillers = categories
+                        .filter { !contains(it) }
+                        .filter { it.id in rowInfo.popularCategoryIds }
+                        .sortedBy { rowInfo.popularCategoryIds.indexOf(it.id) }
+                        .take(FEATURED_CATEGORY_COUNT - size)
+                    addAll(popularFillers)
+                }
+            }.ifEmpty {
+                categories
+            }.take(FEATURED_CATEGORY_COUNT)
             State.Idle(
-                mostPopularCategories = categories
-                    .filter { it.id in popularIds }
-                    .sortedBy { popularIds.indexOf(it.id) }
-                    .ifEmpty { categories },
+                featuredCategories = featuredCategories,
                 allCategories = categories,
                 areAllCategoriesShown = areAllShown,
             )
@@ -65,7 +80,12 @@ class CategoriesManager @Inject constructor(
         if (discoverCategories.value.isEmpty() || areCategoriesStale()) {
             scope.launch {
                 try {
-                    discoverCategories.value = listRepository.getCategoriesList(url)
+                    val userVisits = userCategoryVisitsDao.getCategoryVisitsOrdered()
+                    discoverCategories.value = listRepository.getCategoriesList(url).map { category ->
+                        category.copy(
+                            totalVisits = userVisits.find { it.categoryId == category.id }?.totalVisits ?: 0,
+                        )
+                    }
                     lastUpdate = TimeSource.Monotonic.markNow()
                 } catch (e: Throwable) {
                     Timber.e(e, "Failed to fetch categories under $url")
@@ -74,12 +94,18 @@ class CategoriesManager @Inject constructor(
         }
     }
 
-    fun setMostPopularCategories(ids: List<Int>) {
-        mostPopularIds.value = ids
+    fun setRowInfo(popularCategoryIds: List<Int>, sponsoredCategoryIds: List<Int>) {
+        discoverRowInfo.value = DiscoverRowInfo(
+            popularCategoryIds = popularCategoryIds,
+            sponsoredCategoryIds = sponsoredCategoryIds,
+        )
     }
 
     fun selectCategory(id: Int) {
         selectedId.value = id
+        scope.launch {
+            userCategoryVisitsDao.incrementVisits(id)
+        }
     }
 
     fun dismissSelectedCategory() {
@@ -92,12 +118,17 @@ class CategoriesManager @Inject constructor(
 
     private fun areCategoriesStale() = (lastUpdate?.elapsedNow() ?: Duration.INFINITE) > 1.days
 
+    private data class DiscoverRowInfo(
+        val popularCategoryIds: List<Int> = emptyList(),
+        val sponsoredCategoryIds: List<Int> = emptyList(),
+    )
+
     sealed interface State {
         val allCategories: List<DiscoverCategory>
         val areAllCategoriesShown: Boolean
 
         data class Idle(
-            val mostPopularCategories: List<DiscoverCategory>,
+            val featuredCategories: List<DiscoverCategory>,
             override val allCategories: List<DiscoverCategory>,
             override val areAllCategoriesShown: Boolean,
         ) : State
@@ -111,9 +142,13 @@ class CategoriesManager @Inject constructor(
         companion object {
             val Empty: State = Idle(
                 allCategories = emptyList(),
-                mostPopularCategories = emptyList(),
+                featuredCategories = emptyList(),
                 areAllCategoriesShown = false,
             )
         }
+    }
+
+    private companion object {
+        const val FEATURED_CATEGORY_COUNT = 6
     }
 }

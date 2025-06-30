@@ -139,7 +139,7 @@ internal class DiscoverAdapter(
     val theme: Theme,
     loadPodcastList: (String, Boolean?) -> Flowable<PodcastList>,
     val loadCarouselSponsoredPodcastList: (List<SponsoredPodcast>) -> Flowable<List<CarouselSponsoredPodcast>>,
-    private val categoriesState: (String, List<Int>) -> Flowable<CategoriesManager.State>,
+    private val categoriesState: (CategoriesStateInput) -> Flowable<CategoriesManager.State>,
     private val analyticsTracker: AnalyticsTracker,
 ) : ListAdapter<Any, RecyclerView.ViewHolder>(DiscoverRowDiffCallback()) {
     interface Listener {
@@ -155,6 +155,12 @@ internal class DiscoverAdapter(
         fun onDismissSelectedCategory(category: DiscoverCategory)
         fun onShowAllCategories()
     }
+
+    data class CategoriesStateInput(
+        val source: String,
+        val popularIds: List<Int>,
+        val sponsoredIds: List<Int>,
+    )
 
     val loadPodcastList = { source: String, authenticated: Boolean? ->
         loadPodcastList(source, authenticated).distinctUntilChanged()
@@ -841,9 +847,15 @@ internal class DiscoverAdapter(
                     val adapter = CategoriesListRowAdapter(listener::onPodcastListClicked)
                     holder.recyclerView?.adapter = adapter
                     holder.loadFlowable(
-                        categoriesState(row.source, row.mostPopularCategoriesId.orEmpty()),
+                        categoriesState(
+                            CategoriesStateInput(
+                                source = row.source,
+                                popularIds = row.mostPopularCategoriesId.orEmpty(),
+                                sponsoredIds = row.sponsoredCategoryIds.orEmpty(),
+                            ),
+                        ),
                         onNext = { state ->
-                            adapter.submitList(state.allCategories.sortedBy { it.name.tryToLocalise(resources) }) {
+                            adapter.submitList(state.allCategories.sortedBy { it.totalVisits }) {
                                 onRestoreInstanceState(holder)
                             }
                         },
@@ -852,7 +864,13 @@ internal class DiscoverAdapter(
 
                 is CategoryPillsViewHolder -> {
                     holder.loadFlowable(
-                        categoriesState(row.source, row.mostPopularCategoriesId.orEmpty()),
+                        categoriesState(
+                            CategoriesStateInput(
+                                source = row.source,
+                                popularIds = row.mostPopularCategoriesId.orEmpty(),
+                                sponsoredIds = row.sponsoredCategoryIds.orEmpty(),
+                            ),
+                        ),
                         onNext = { state ->
                             holder.submitState(state)
                         },

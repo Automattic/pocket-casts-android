@@ -72,6 +72,7 @@ data class DiscoverRow(
     @field:Json(name = "authenticated") override val authenticated: Boolean? = false,
     @field:Json(name = "sponsored_podcasts") val sponsoredPodcasts: List<SponsoredPodcast> = emptyList(),
     @field:Json(name = "popular") val mostPopularCategoriesId: List<Int>?,
+    @field:Json(name = "sponsored_ids") val sponsoredCategoryIds: List<Int>?,
 ) : NetworkLoadableList {
 
     override fun transformWithReplacements(replacements: Map<String, String>, resources: Resources): DiscoverRow {
@@ -108,6 +109,7 @@ data class DiscoverRow(
             sponsoredPodcasts = sponsoredPodcasts,
             mostPopularCategoriesId = mostPopularCategoriesId,
             authenticated = authenticated,
+            sponsoredCategoryIds = sponsoredCategoryIds,
         )
     }
 }
@@ -260,6 +262,7 @@ data class DiscoverCategory(
     @field:Json(name = "icon") val icon: String,
     @field:Json(name = "source") override val source: String,
     override val curated: Boolean = false,
+    val totalVisits: Int = 0,
 ) : NetworkLoadableList {
     override val title: String
         get() = name
