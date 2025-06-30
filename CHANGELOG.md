@@ -6,11 +6,13 @@
 *   Updates
     *   New design for the Guest List and Network Highlight sections in Discover
         ([#4153](https://github.com/Automattic/pocket-casts-android/pull/4153))
-    *   Bring bang landscape UI
+    *   Bring back landscape UI
         ([#4156](https://github.com/Automattic/pocket-casts-android/pull/4156))
 *   Bug Fixes
     *   Collapse player when opening a notification
         ([#4150](https://github.com/Automattic/pocket-casts-android/pull/4150))
+    *   Fix episodes not being removed from the downloads list
+        ([#4167](https://github.com/Automattic/pocket-casts-android/pull/4167))
 
 7.92
 -----

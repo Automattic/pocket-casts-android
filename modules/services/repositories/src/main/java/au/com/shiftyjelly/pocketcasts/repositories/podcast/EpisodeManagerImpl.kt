@@ -554,6 +554,7 @@ class EpisodeManagerImpl @Inject constructor(
         cleanUpDownloadFiles(episode)
 
         if (updateDatabase) {
+            updateDownloadTaskId(episode, null)
             updateEpisodeStatus(episode, EpisodeStatusEnum.NOT_DOWNLOADED)
             if (disableAutoDownload) {
                 updateAutoDownloadStatus(episode, PodcastEpisode.AUTO_DOWNLOAD_STATUS_IGNORE)
