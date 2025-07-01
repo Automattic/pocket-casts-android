@@ -12,6 +12,8 @@ import au.com.shiftyjelly.pocketcasts.repositories.notification.NotificationWork
 import au.com.shiftyjelly.pocketcasts.repositories.notification.ReEngagementNotificationType.Companion.SUBCATEGORY_REENGAGE_CATCH_UP_OFFLINE
 import au.com.shiftyjelly.pocketcasts.repositories.notification.ReEngagementNotificationType.Companion.SUBCATEGORY_REENGAGE_WE_MISS_YOU
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
+import au.com.shiftyjelly.pocketcasts.utils.AppPlatform
+import au.com.shiftyjelly.pocketcasts.utils.Util
 import dagger.hilt.android.qualifiers.ApplicationContext
 import jakarta.inject.Inject
 import java.util.concurrent.TimeUnit
@@ -32,6 +34,8 @@ class NotificationSchedulerImpl @Inject constructor(
     }
 
     override fun setupOnboardingNotifications(delayProvider: ((OnboardingNotificationType) -> Duration)?) {
+        if (!isRunningOnPhone) return
+
         listOf(
             OnboardingNotificationType.Sync,
             OnboardingNotificationType.Import,
@@ -58,6 +62,8 @@ class NotificationSchedulerImpl @Inject constructor(
     }
 
     override suspend fun setupReEngagementNotification(delayProvider: ((ReEngagementNotificationType) -> Duration)?) {
+        if (!isRunningOnPhone) return
+
         val initialDelay = delayProvider?.invoke(ReEngagementNotificationType.WeMissYou)?.inWholeMilliseconds ?: delayCalculator.calculateDelayForReEngagementCheck()
 
         val downloadedEpisodes = episodeManager.downloadedEpisodesThatHaveNotBeenPlayedCount()
@@ -83,6 +89,8 @@ class NotificationSchedulerImpl @Inject constructor(
     }
 
     override suspend fun setupTrendingAndRecommendationsNotifications(delayProvider: ((TrendingAndRecommendationsNotificationType) -> Duration)?) {
+        if (!isRunningOnPhone) return
+
         TrendingAndRecommendationsNotificationType.values.forEachIndexed { index, notification ->
             val initialDelay = delayProvider?.invoke(notification)?.inWholeMilliseconds ?: delayCalculator.calculateDelayForRecommendations(index)
             val workData = workDataOf(
@@ -105,6 +113,8 @@ class NotificationSchedulerImpl @Inject constructor(
     }
 
     override suspend fun setupNewFeaturesAndTipsNotifications(delayProvider: ((NewFeaturesAndTipsNotificationType) -> Duration)?) {
+        if (!isRunningOnPhone) return
+
         // this should be later updated to fire the desired feature for the given release
         val workData = workDataOf(
             SUBCATEGORY to NewFeaturesAndTipsNotificationType.SmartFolders.subcategory,
@@ -123,6 +133,8 @@ class NotificationSchedulerImpl @Inject constructor(
     }
 
     override suspend fun setupOffersNotifications(delayProvider: ((OffersNotificationType) -> Duration)?) {
+        if (!isRunningOnPhone) return
+
         val workData = workDataOf(
             SUBCATEGORY to OffersNotificationType.UpgradeNow.subcategory,
         )
@@ -170,4 +182,6 @@ class NotificationSchedulerImpl @Inject constructor(
             }
         }
     }
+
+    private val isRunningOnPhone = Util.getAppPlatform(context) == AppPlatform.Phone
 }
