@@ -1,0 +1,113 @@
+package au.com.shiftyjelly.pocketcasts.repositories.categories
+
+import app.cash.turbine.test
+import au.com.shiftyjelly.pocketcasts.models.db.dao.UserCategoryVisitsDao
+import au.com.shiftyjelly.pocketcasts.models.entity.UserCategoryVisits
+import au.com.shiftyjelly.pocketcasts.repositories.lists.ListRepository
+import au.com.shiftyjelly.pocketcasts.servers.model.DiscoverCategory
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.runBlocking
+import org.junit.Assert.assertEquals
+import org.junit.Test
+import org.mockito.kotlin.any
+import org.mockito.kotlin.mock
+import org.mockito.kotlin.whenever
+
+internal class CategoriesManagerTest {
+    private val listRepository = mock<ListRepository>()
+    private val userCategoryVisitsDao = mock<UserCategoryVisitsDao>()
+
+    companion object {
+        val testCategories = List(10) { DiscoverCategory(id = it, name = "name$it", icon = "", source = "") }
+    }
+
+    @Test
+    fun `GIVEN no visits WHEN categories evaluated THEN popular categories are returned`() = runBlocking {
+        whenever(listRepository.getCategoriesList(any())).thenReturn(testCategories)
+        whenever(userCategoryVisitsDao.getCategoryVisitsOrdered()).thenReturn(emptyList())
+
+        val categoriesManager = CategoriesManager(listRepository, userCategoryVisitsDao, CoroutineScope(Dispatchers.Default))
+        categoriesManager.loadCategories("whatever")
+        val popularCategoryIds = (0 until 6).toList()
+        categoriesManager.setRowInfo(popularCategoryIds = popularCategoryIds, sponsoredCategoryIds = listOf(4, 5, 6, 7))
+
+        categoriesManager.state.test {
+            skipItems(1)
+            val state = awaitItem()
+            assert(state is CategoriesManager.State.Idle)
+            assertEquals(testCategories.filter { popularCategoryIds.contains(it.id) }, (state as CategoriesManager.State.Idle).featuredCategories)
+        }
+    }
+
+    @Test
+    fun `GIVEN less than 6 visited categories WHEN categories evaluated THEN visited categories are ordered as expected`() = runBlocking {
+        whenever(listRepository.getCategoriesList(any())).thenReturn(testCategories)
+        whenever(userCategoryVisitsDao.getCategoryVisitsOrdered()).thenReturn(
+            listOf(
+                UserCategoryVisits(categoryId = 4, totalVisits = 1),
+                UserCategoryVisits(categoryId = 5, totalVisits = 3),
+                UserCategoryVisits(categoryId = 8, totalVisits = 4),
+                UserCategoryVisits(categoryId = 9, totalVisits = 11),
+            ),
+        )
+
+        val categoriesManager = CategoriesManager(listRepository, userCategoryVisitsDao, CoroutineScope(Dispatchers.Default))
+        categoriesManager.loadCategories("whatever")
+        val popularCategoryIds = (0 until 6).toList()
+        categoriesManager.setRowInfo(popularCategoryIds = popularCategoryIds, sponsoredCategoryIds = listOf(4, 5, 6, 7))
+
+        categoriesManager.state.test {
+            skipItems(1)
+            val state = awaitItem()
+            assert(state is CategoriesManager.State.Idle)
+            assertEquals(listOf(5, 4, 9, 8, 0, 1), (state as CategoriesManager.State.Idle).featuredCategories.map { it.id })
+        }
+    }
+
+    @Test
+    fun `GIVEN more than 6 visited categories WHEN categories evaluated THEN visited categories are ordered as expected`() = runBlocking {
+        whenever(listRepository.getCategoriesList(any())).thenReturn(testCategories)
+        whenever(userCategoryVisitsDao.getCategoryVisitsOrdered()).thenReturn(
+            listOf(
+                UserCategoryVisits(categoryId = 1, totalVisits = 8),
+                UserCategoryVisits(categoryId = 2, totalVisits = 3),
+                UserCategoryVisits(categoryId = 4, totalVisits = 1),
+                UserCategoryVisits(categoryId = 5, totalVisits = 3),
+                UserCategoryVisits(categoryId = 8, totalVisits = 4),
+                UserCategoryVisits(categoryId = 9, totalVisits = 11),
+            ),
+        )
+
+        val categoriesManager = CategoriesManager(listRepository, userCategoryVisitsDao, CoroutineScope(Dispatchers.Default))
+        categoriesManager.loadCategories("whatever")
+        val popularCategoryIds = (0 until 6).toList()
+        categoriesManager.setRowInfo(popularCategoryIds = popularCategoryIds, sponsoredCategoryIds = listOf(4, 5, 6, 7))
+
+        categoriesManager.state.test {
+            skipItems(1)
+            val state = awaitItem()
+            assert(state is CategoriesManager.State.Idle)
+            assertEquals(listOf(5, 4, 9, 1, 8, 2), (state as CategoriesManager.State.Idle).featuredCategories.map { it.id })
+        }
+    }
+
+    @Test
+    fun `GIVEN no visited categories and no populars WHEN categories evaluated THEN categories are ordered as expected`() = runBlocking {
+        whenever(listRepository.getCategoriesList(any())).thenReturn(testCategories)
+        whenever(userCategoryVisitsDao.getCategoryVisitsOrdered()).thenReturn(
+            emptyList(),
+        )
+
+        val categoriesManager = CategoriesManager(listRepository, userCategoryVisitsDao, CoroutineScope(Dispatchers.Default))
+        categoriesManager.loadCategories("whatever")
+        categoriesManager.setRowInfo(popularCategoryIds = emptyList(), sponsoredCategoryIds = listOf(4, 5, 6, 7))
+
+        categoriesManager.state.test {
+            skipItems(1)
+            val state = awaitItem()
+            assert(state is CategoriesManager.State.Idle)
+            assertEquals((0..5).toList(), (state as CategoriesManager.State.Idle).featuredCategories.map { it.id })
+        }
+    }
+}
