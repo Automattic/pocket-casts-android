@@ -3,6 +3,8 @@
 *   New Features
     *   Display transcripts in the episode details UI
         ([#4143](https://github.com/Automattic/pocket-casts-android/pull/4143))
+    *   Smart Categories - featured categories are now ordered by visits on the Discover tab
+        ([#4186](https://github.com/Automattic/pocket-casts-android/pull/4186))
 *   Updates
     *   New design for the Guest List and Network Highlight sections in Discover
         ([#4153](https://github.com/Automattic/pocket-casts-android/pull/4153))
