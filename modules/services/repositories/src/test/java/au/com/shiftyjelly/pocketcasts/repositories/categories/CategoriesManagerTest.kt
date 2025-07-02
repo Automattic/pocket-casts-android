@@ -36,7 +36,7 @@ internal class CategoriesManagerTest {
             skipItems(1)
             val state = awaitItem()
             assert(state is CategoriesManager.State.Idle)
-            assertEquals(testCategories.filter { popularCategoryIds.contains(it.id) }, (state as CategoriesManager.State.Idle).featuredCategories)
+            assertEquals(testCategories.filter { popularCategoryIds.contains(it.id) }.map { it.id }, (state as CategoriesManager.State.Idle).featuredCategories.map { it.id })
         }
     }
 

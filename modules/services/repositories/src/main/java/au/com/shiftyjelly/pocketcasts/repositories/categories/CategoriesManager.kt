@@ -47,8 +47,8 @@ class CategoriesManager @Inject constructor(
                 .sortedByDescending { it.totalVisits }
             val groupedBySponsoredWithVisits = categoriesWithVisits.groupBy { rowInfo.sponsoredCategoryIds.contains(it.id) }
             val featuredCategories = buildList {
-                addAll(groupedBySponsoredWithVisits[true] ?: emptyList())
-                addAll(groupedBySponsoredWithVisits[false] ?: emptyList())
+                addAll((groupedBySponsoredWithVisits[true] ?: emptyList()).map { it.copy(isSponsored = true) })
+                addAll((groupedBySponsoredWithVisits[false] ?: emptyList()).map { it.copy(isSponsored = false) })
 
                 if (size < FEATURED_CATEGORY_COUNT) {
                     val popularFillers = categories
@@ -60,10 +60,12 @@ class CategoriesManager @Inject constructor(
                 }
             }.ifEmpty {
                 categories
-            }.take(FEATURED_CATEGORY_COUNT)
+            }.take(FEATURED_CATEGORY_COUNT).mapIndexed { index, item ->
+                item.copy(featuredIndex = index)
+            }
             State.Idle(
                 featuredCategories = featuredCategories,
-                allCategories = categories,
+                allCategories = categories.map { it.copy(isSponsored = rowInfo.sponsoredCategoryIds.contains(it.id)) },
                 areAllCategoriesShown = areAllShown,
             )
         }
