@@ -345,7 +345,7 @@ class PodcastsFragment :
                                 .show(parentFragmentManager, "notifications_prompt")
                         }
                     } else {
-                        (parentFragmentManager.findFragmentByTag("notifications_prompt") as? DialogFragment)?.dismissNow()
+                        (parentFragmentManager.findFragmentByTag("notifications_prompt") as? DialogFragment)?.dismiss()
 
                         if (areFoldersAvailable && viewModel.isEligibleForSuggestedFoldersPopup()) {
                             showSuggestedFoldersCreation(SuggestedFoldersFragment.Source.Popup)
