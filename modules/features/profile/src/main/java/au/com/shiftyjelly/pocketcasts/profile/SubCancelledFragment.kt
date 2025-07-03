@@ -15,10 +15,11 @@ import au.com.shiftyjelly.pocketcasts.ui.helper.FragmentHostListener
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseFragment
 import dagger.hilt.android.AndroidEntryPoint
 import java.text.SimpleDateFormat
-import java.util.Date
+import java.time.Instant
 import javax.inject.Inject
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.reactive.collect
+import timber.log.Timber
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 @AndroidEntryPoint
@@ -29,7 +30,8 @@ class SubCancelledFragment : BaseFragment() {
         }
     }
 
-    @Inject lateinit var settings: Settings
+    @Inject
+    lateinit var settings: Settings
 
     private val viewModel: AccountDetailsViewModel by viewModels()
     private val dateFormatter = SimpleDateFormat.getDateInstance()
@@ -50,9 +52,14 @@ class SubCancelledFragment : BaseFragment() {
         viewLifecycleOwner.lifecycleScope.launch {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
                 viewModel.signInState.collect { signInState ->
-                    val expiryDate = (signInState as? SignInState.SignedIn)?.subscription?.expiryDate ?: Date()
-                    val endDate = dateFormatter.format(expiryDate)
-                    binding?.txtHint0?.text = getString(LR.string.profile_sub_cancel_hint0) + " " + endDate
+                    val expiryDate = (signInState as? SignInState.SignedIn)?.subscription?.expiryDate ?: Instant.now()
+                    runCatching {
+                        dateFormatter.format(expiryDate)
+                    }.onSuccess {
+                        binding?.txtHint0?.text = getString(LR.string.profile_sub_cancel_hint0) + " " + it
+                    }.onFailure {
+                        Timber.w("Failed to format date $expiryDate: $it")
+                    }.getOrNull()
                 }
             }
         }
