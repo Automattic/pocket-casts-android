@@ -5,16 +5,24 @@ import au.com.shiftyjelly.pocketcasts.models.db.dao.UserCategoryVisitsDao
 import au.com.shiftyjelly.pocketcasts.models.entity.UserCategoryVisits
 import au.com.shiftyjelly.pocketcasts.repositories.lists.ListRepository
 import au.com.shiftyjelly.pocketcasts.servers.model.DiscoverCategory
+import au.com.shiftyjelly.pocketcasts.sharedtest.InMemoryFeatureFlagRule
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
+import org.junit.Rule
 import org.junit.Test
 import org.mockito.kotlin.any
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever
 
 internal class CategoriesManagerTest {
+    @get:Rule
+    val featureFlagRule = InMemoryFeatureFlagRule()
+
     private val listRepository = mock<ListRepository>()
     private val userCategoryVisitsDao = mock<UserCategoryVisitsDao>()
 
@@ -24,6 +32,7 @@ internal class CategoriesManagerTest {
 
     @Test
     fun `GIVEN no visits WHEN categories evaluated THEN popular categories are returned`() = runBlocking {
+        FeatureFlag.setEnabled(Feature.SMART_CATEGORIES, true)
         whenever(listRepository.getCategoriesList(any())).thenReturn(testCategories)
         whenever(userCategoryVisitsDao.getCategoryVisitsOrdered()).thenReturn(emptyList())
 
@@ -42,6 +51,7 @@ internal class CategoriesManagerTest {
 
     @Test
     fun `GIVEN less than 6 visited categories WHEN categories evaluated THEN visited categories are ordered as expected`() = runBlocking {
+        FeatureFlag.setEnabled(Feature.SMART_CATEGORIES, true)
         whenever(listRepository.getCategoriesList(any())).thenReturn(testCategories)
         whenever(userCategoryVisitsDao.getCategoryVisitsOrdered()).thenReturn(
             listOf(
@@ -67,6 +77,7 @@ internal class CategoriesManagerTest {
 
     @Test
     fun `GIVEN more than 6 visited categories WHEN categories evaluated THEN visited categories are ordered as expected`() = runBlocking {
+        FeatureFlag.setEnabled(Feature.SMART_CATEGORIES, true)
         whenever(listRepository.getCategoriesList(any())).thenReturn(testCategories)
         whenever(userCategoryVisitsDao.getCategoryVisitsOrdered()).thenReturn(
             listOf(
@@ -94,6 +105,7 @@ internal class CategoriesManagerTest {
 
     @Test
     fun `GIVEN no visited categories and no populars WHEN categories evaluated THEN categories are ordered as expected`() = runBlocking {
+        FeatureFlag.setEnabled(Feature.SMART_CATEGORIES, true)
         whenever(listRepository.getCategoriesList(any())).thenReturn(testCategories)
         whenever(userCategoryVisitsDao.getCategoryVisitsOrdered()).thenReturn(
             emptyList(),
@@ -108,6 +120,26 @@ internal class CategoriesManagerTest {
             val state = awaitItem()
             assert(state is CategoriesManager.State.Idle)
             assertEquals((0..5).toList(), (state as CategoriesManager.State.Idle).featuredCategories.map { it.id })
+        }
+    }
+
+    @Test
+    fun `GIVEN FF disabled WHEN categories evaluated THEN popular categories are returned`() = runTest {
+        FeatureFlag.setEnabled(Feature.SMART_CATEGORIES, false)
+        whenever(listRepository.getCategoriesList(any())).thenReturn(testCategories)
+        whenever(userCategoryVisitsDao.getCategoryVisitsOrdered()).thenReturn(
+            emptyList(),
+        )
+
+        val categoriesManager = CategoriesManager(listRepository, userCategoryVisitsDao, CoroutineScope(Dispatchers.Default))
+        categoriesManager.loadCategories("whatever")
+        categoriesManager.setRowInfo(popularCategoryIds = (5..9).toList(), sponsoredCategoryIds = listOf(4, 5, 6, 7))
+
+        categoriesManager.state.test {
+            skipItems(1)
+            val state = awaitItem()
+            assert(state is CategoriesManager.State.Idle)
+            assertEquals((5..9).toList(), (state as CategoriesManager.State.Idle).featuredCategories.map { it.id })
         }
     }
 }

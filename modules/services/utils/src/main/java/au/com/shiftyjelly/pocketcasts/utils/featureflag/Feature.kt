@@ -130,6 +130,14 @@ enum class Feature(
         hasFirebaseRemoteFlag = false,
         hasDevToggle = true,
     ),
+    SMART_CATEGORIES(
+        key = "smart_categories",
+        title = "Smart Categories",
+        defaultValue = BuildConfig.DEBUG,
+        tier = FeatureTier.Free,
+        hasFirebaseRemoteFlag = false,
+        hasDevToggle = true,
+    ),
 
     // This is set of features used only for testing purposes.
     TEST_FREE_FEATURE(
