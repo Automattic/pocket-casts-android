@@ -14,32 +14,7 @@ sealed interface Transcript {
         override val isGenerated: Boolean,
         override val episodeUuid: String,
         override val podcastUuid: String?,
-    ) : Transcript {
-        fun getExcerpt(): String {
-            val concatenatedEntries = buildString {
-                entries.asSequence()
-                    .filterIsInstance<TranscriptEntry.Text>()
-                    .takeWhile { length <= 140 }
-                    .forEachIndexed { index, entry ->
-                        if (index != 0) {
-                            append(' ')
-                        }
-                        append(entry.value)
-                    }
-            }
-            return concatenatedEntries
-                .take(140)
-                .trimEnd()
-                .let { string ->
-                    val shouldAppendEllipsis = concatenatedEntries.length > 140
-                    if (shouldAppendEllipsis) {
-                        string + "…"
-                    } else {
-                        string
-                    }
-                }
-        }
-    }
+    ) : Transcript
 
     data class Web(
         override val url: String,

@@ -235,6 +235,14 @@
             app:layout_constraintTop_toTopOf="@+id/lblDate"
             tools:text="1h 50m left" />
 
+        <androidx.compose.ui.platform.ComposeView
+            android:id="@+id/episodeTranscript"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/lblDate" />
+
         <FrameLayout
             android:id="@+id/webViewShowNotes"
             android:layout_width="match_parent"
@@ -246,7 +254,7 @@
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintLeft_toLeftOf="parent"
             app:layout_constraintRight_toRightOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/lblDate" />
+            app:layout_constraintTop_toBottomOf="@+id/episodeTranscript" />
 
         <ProgressBar
             android:id="@+id/webViewLoader"
@@ -257,7 +265,7 @@
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintLeft_toLeftOf="parent"
             app:layout_constraintRight_toRightOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/lblDate" />
+            app:layout_constraintTop_toBottomOf="@+id/episodeTranscript" />
 
         <androidx.constraintlayout.widget.Guideline
             android:id="@+id/center_vertical_guideline"
