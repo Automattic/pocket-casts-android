@@ -1,7 +1,6 @@
 package au.com.shiftyjelly.pocketcasts.discover.view
 
 import android.view.LayoutInflater
-import android.view.View
 import android.view.ViewGroup
 import androidx.core.view.isVisible
 import androidx.recyclerview.widget.DiffUtil
@@ -103,7 +102,7 @@ class CollectionListRowAdapter(
 
         private val imageRequestFactory = PocketCastsImageRequestFactory(
             binding.root.context,
-            placeholderType = PlaceholderType.Large,
+            placeholderType = PlaceholderType.None,
         ).themed()
 
         init {
@@ -118,18 +117,6 @@ class CollectionListRowAdapter(
             imageRequestFactory.createForFileOrUrl(header.imageUrl).loadInto(binding.imageHeader)
             binding.root.contentDescription =
                 binding.root.context.getString(LR.string.discover_collection_header_content_description, header.title)
-        }
-
-        fun updateVisibility(isVisible: Boolean) {
-            if (isVisible) {
-                binding.root.animate()
-                    .alpha(1f)
-                    .setDuration(300)
-                    .withStartAction { binding.root.visibility = View.VISIBLE }
-                    .start()
-            } else {
-                binding.root.visibility = View.INVISIBLE
-            }
         }
     }
 

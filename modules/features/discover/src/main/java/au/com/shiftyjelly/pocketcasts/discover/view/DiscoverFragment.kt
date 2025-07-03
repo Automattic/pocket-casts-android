@@ -158,7 +158,14 @@ class DiscoverFragment :
     override fun onSelectCategory(category: DiscoverCategory) {
         analyticsTracker.track(
             AnalyticsEvent.DISCOVER_CATEGORIES_PILL_TAPPED,
-            mapOf("name" to category.name, "id" to category.id, "region" to viewModel.currentRegionCode.orEmpty()),
+            mapOf(
+                "name" to category.name,
+                "id" to category.id,
+                "region" to viewModel.currentRegionCode.orEmpty(),
+                "index" to (category.featuredIndex ?: -1),
+                "sponsored" to (category.isSponsored == true),
+                "visits" to category.totalVisits,
+            ),
         )
 
         categoriesManager.selectCategory(category.id)
@@ -203,8 +210,8 @@ class DiscoverFragment :
                 theme = theme,
                 loadPodcastList = { source, authenticated -> viewModel.loadPodcastList(source, authenticated) },
                 loadCarouselSponsoredPodcastList = viewModel::loadCarouselSponsoredPodcasts,
-                categoriesState = { url, popularIds ->
-                    categoriesManager.setMostPopularCategories(popularIds)
+                categoriesState = { (url, popularIds, sponsoredIds) ->
+                    categoriesManager.setRowInfo(popularCategoryIds = popularIds, sponsoredCategoryIds = sponsoredIds)
                     categoriesManager.loadCategories(url)
                     categoriesManager.state.asFlowable()
                 },

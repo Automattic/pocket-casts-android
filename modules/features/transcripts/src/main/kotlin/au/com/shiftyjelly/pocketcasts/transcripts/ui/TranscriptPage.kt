@@ -41,6 +41,7 @@ fun TranscriptPage(
     toolbarPadding: PaddingValues = PaddingValues(0.dp),
     transcriptPadding: PaddingValues = PaddingValues(0.dp),
     paywallPadding: PaddingValues = PaddingValues(0.dp),
+    toolbarTrailingContent: (@Composable (ToolbarColors) -> Unit)? = null,
 ) {
     val theme = rememberTranscriptTheme()
     val listState = rememberLazyListState()
@@ -59,6 +60,7 @@ fun TranscriptPage(
             onShowSearchBar = onShowSearchBar,
             onHideSearchBar = onHideSearchBar,
             colors = theme.toolbarColors,
+            trailingContent = toolbarTrailingContent,
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(toolbarPadding),

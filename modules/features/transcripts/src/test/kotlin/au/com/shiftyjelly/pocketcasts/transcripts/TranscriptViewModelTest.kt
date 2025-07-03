@@ -47,6 +47,7 @@ class TranscriptViewModelTest {
             },
             paymentClient = PaymentClient.test(),
             analyticsTracker = AnalyticsTracker.test(),
+            source = TranscriptViewModel.Source.Player,
         )
     }
 

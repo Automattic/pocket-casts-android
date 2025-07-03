@@ -124,6 +124,7 @@ class DiscoverDeepLinkManagerTest {
         curated: Boolean = false,
         sponsoredPodcasts: List<SponsoredPodcast> = emptyList(),
         mostPopularCategoriesId: List<Int>? = null,
+        sponsoredCategoryIds: List<Int>? = null,
     ): DiscoverRow {
         return DiscoverRow(
             id = id,
@@ -140,6 +141,7 @@ class DiscoverDeepLinkManagerTest {
             curated = curated,
             sponsoredPodcasts = sponsoredPodcasts,
             mostPopularCategoriesId = mostPopularCategoriesId,
+            sponsoredCategoryIds = sponsoredCategoryIds,
         )
     }
 }
