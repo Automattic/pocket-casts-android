@@ -239,7 +239,7 @@ sealed class TrendingAndRecommendationsNotificationType(
         const val SUBCATEGORY_RECOMMENDATIONS = "recommendations"
         const val SUBCATEGORY_TRENDING = "trending"
 
-        val values: List<NotificationType> get() = listOf(
+        val values: List<TrendingAndRecommendationsNotificationType> get() = listOf(
             Trending,
             Recommendations,
         )

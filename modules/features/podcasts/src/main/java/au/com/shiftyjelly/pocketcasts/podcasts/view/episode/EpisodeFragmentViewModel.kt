@@ -15,6 +15,7 @@ import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.models.entity.BaseEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
+import au.com.shiftyjelly.pocketcasts.models.to.Transcript
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.download.DownloadManager
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
@@ -22,6 +23,7 @@ import au.com.shiftyjelly.pocketcasts.repositories.playback.UpNextQueue
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
 import au.com.shiftyjelly.pocketcasts.repositories.shownotes.ShowNotesManager
+import au.com.shiftyjelly.pocketcasts.repositories.transcript.TranscriptManager
 import au.com.shiftyjelly.pocketcasts.servers.shownotes.ShowNotesState
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.utils.Network
@@ -41,7 +43,12 @@ import kotlin.time.Duration
 import kotlin.time.DurationUnit
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.NonCancellable
+import kotlinx.coroutines.cancelAndJoin
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.rx2.asFlowable
 
@@ -56,6 +63,7 @@ class EpisodeFragmentViewModel @Inject constructor(
     private val showNotesManager: ShowNotesManager,
     private val analyticsTracker: AnalyticsTracker,
     private val episodeAnalytics: EpisodeAnalytics,
+    private val transcriptManager: TranscriptManager,
 ) : ViewModel(), CoroutineScope {
     override val coroutineContext: CoroutineContext
         get() = Dispatchers.Default
@@ -75,6 +83,10 @@ class EpisodeFragmentViewModel @Inject constructor(
 
     private var startPlaybackTimestamp: Duration? = null
     private var autoDispatchPlay = false
+
+    private var loadTranscriptJob: Job? = null
+    private val _transcript = MutableStateFlow<Transcript?>(null)
+    val transcript = _transcript.asStateFlow()
 
     fun setup(
         episodeUuid: String,
@@ -161,6 +173,14 @@ class EpisodeFragmentViewModel @Inject constructor(
         val inUpNextObservable = playbackManager.upNextQueue.changesObservable.toFlowable(BackpressureStrategy.LATEST)
             .map { upNext -> (upNext is UpNextQueue.State.Loaded) && (upNext.episode == episode || upNext.queue.map { it.uuid }.contains(episodeUuid)) }
         inUpNext = inUpNextObservable.toLiveData()
+
+        if (transcript.value?.episodeUuid != episodeUuid) {
+            val oldJob = loadTranscriptJob
+            loadTranscriptJob = launch {
+                oldJob?.cancelAndJoin()
+                _transcript.value = transcriptManager.loadTranscript(episodeUuid)
+            }
+        }
     }
 
     override fun onCleared() {
@@ -341,6 +361,14 @@ class EpisodeFragmentViewModel @Inject constructor(
 }
 
 sealed class EpisodeFragmentState {
-    data class Loaded(val episode: PodcastEpisode, val podcast: Podcast, val showNotesState: ShowNotesState, @ColorInt val tintColor: Int, @ColorInt val podcastColor: Int, val downloadProgress: Float) : EpisodeFragmentState()
+    data class Loaded(
+        val episode: PodcastEpisode,
+        val podcast: Podcast,
+        val showNotesState: ShowNotesState,
+        @ColorInt val tintColor: Int,
+        @ColorInt val podcastColor: Int,
+        val downloadProgress: Float,
+    ) : EpisodeFragmentState()
+
     data class Error(val error: Throwable) : EpisodeFragmentState()
 }

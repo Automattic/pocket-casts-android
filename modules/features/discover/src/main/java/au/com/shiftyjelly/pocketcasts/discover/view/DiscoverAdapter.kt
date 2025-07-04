@@ -56,7 +56,6 @@ import au.com.shiftyjelly.pocketcasts.discover.util.ScrollingLinearLayoutManager
 import au.com.shiftyjelly.pocketcasts.discover.view.CollectionListRowAdapter.CollectionItem.CollectionHeader
 import au.com.shiftyjelly.pocketcasts.discover.view.CollectionListRowAdapter.CollectionItem.CollectionPodcast
 import au.com.shiftyjelly.pocketcasts.discover.view.CollectionListRowAdapter.Companion.HEADER_OFFSET
-import au.com.shiftyjelly.pocketcasts.discover.view.CollectionListRowAdapter.HeaderViewHolder
 import au.com.shiftyjelly.pocketcasts.discover.view.CollectionListRowAdapter.PodcastsViewHolder.Companion.NUMBER_OF_ROWS_PER_PAGE
 import au.com.shiftyjelly.pocketcasts.discover.view.DiscoverFragment.Companion.EPISODE_UUID_KEY
 import au.com.shiftyjelly.pocketcasts.discover.view.DiscoverFragment.Companion.LIST_ID_KEY
@@ -121,6 +120,7 @@ private const val CURRENT_PAGE = "current_page"
 private const val TOTAL_PAGES = "total_pages"
 private const val INITIAL_PREFETCH_COUNT = 1
 private const val LIST_ID = "list_id"
+private const val IMPRESSION_PROP_CATEGORY = "category"
 
 internal data class ChangeRegionRow(val region: DiscoverRegion)
 internal data class MostPopularPodcastsByCategoryRow(val listId: String?, val category: String?, val podcasts: List<DiscoverPodcast>) {
@@ -139,7 +139,7 @@ internal class DiscoverAdapter(
     val theme: Theme,
     loadPodcastList: (String, Boolean?) -> Flowable<PodcastList>,
     val loadCarouselSponsoredPodcastList: (List<SponsoredPodcast>) -> Flowable<List<CarouselSponsoredPodcast>>,
-    private val categoriesState: (String, List<Int>) -> Flowable<CategoriesManager.State>,
+    private val categoriesState: (CategoriesStateInput) -> Flowable<CategoriesManager.State>,
     private val analyticsTracker: AnalyticsTracker,
 ) : ListAdapter<Any, RecyclerView.ViewHolder>(DiscoverRowDiffCallback()) {
     interface Listener {
@@ -156,6 +156,12 @@ internal class DiscoverAdapter(
         fun onShowAllCategories()
     }
 
+    data class CategoriesStateInput(
+        val source: String,
+        val popularIds: List<Int>,
+        val sponsoredIds: List<Int>,
+    )
+
     val loadPodcastList = { source: String, authenticated: Boolean? ->
         loadPodcastList(source, authenticated).distinctUntilChanged()
     }
@@ -165,6 +171,7 @@ internal class DiscoverAdapter(
 
     private val imageRequestFactory = PocketCastsImageRequestFactory(context).smallSize().themed()
     private val placeholderDrawable = context.getThemeDrawable(UR.attr.defaultArtworkSmall)
+    private var latestSelectedCategoryId: Int? = null
 
     init {
         setHasStableIds(true)
@@ -398,7 +405,12 @@ internal class DiscoverAdapter(
                 if (listIdImpressionTracked.contains(it)) return
                 analyticsTracker.track(
                     AnalyticsEvent.DISCOVER_LIST_IMPRESSION,
-                    mapOf(LIST_ID to it),
+                    buildMap {
+                        put(LIST_ID, it)
+                        latestSelectedCategoryId?.let {
+                            put(IMPRESSION_PROP_CATEGORY, it)
+                        }
+                    },
                 )
                 listIdImpressionTracked.add(it)
             }
@@ -533,7 +545,12 @@ internal class DiscoverAdapter(
 
             analyticsTracker.track(
                 AnalyticsEvent.DISCOVER_LIST_IMPRESSION,
-                mapOf(LIST_ID to listId),
+                buildMap {
+                    put(LIST_ID, listId)
+                    latestSelectedCategoryId?.let {
+                        put(IMPRESSION_PROP_CATEGORY, it)
+                    }
+                },
             )
             listIdImpressionTracked.add(listId)
         }
@@ -578,8 +595,6 @@ internal class DiscoverAdapter(
                     if (newState == RecyclerView.SCROLL_STATE_IDLE) {
                         val position = linearLayoutManager.getCurrentPosition()
 
-                        updateHeader(recyclerView, position)
-
                         // Adds extra right padding starting from page 1 to preview the next page, except for the first page
                         if (position == 0) {
                             recyclerView.setPadding(8.dpToPx(itemView.context), 0, 0, 0)
@@ -607,14 +622,6 @@ internal class DiscoverAdapter(
                             recyclerView.setPadding(8.dpToPx(itemView.context), 0, 0, 0)
                         }
                     }
-                }
-
-                private fun updateHeader(
-                    recyclerView: RecyclerView,
-                    position: Int,
-                ) {
-                    val headerViewHolder = recyclerView.findViewHolderForAdapterPosition(0) as? HeaderViewHolder
-                    headerViewHolder?.updateVisibility(position != 1)
                 }
 
                 private fun trackPageChangedEvent(position: Int) {
@@ -841,10 +848,21 @@ internal class DiscoverAdapter(
                     val adapter = CategoriesListRowAdapter(listener::onPodcastListClicked)
                     holder.recyclerView?.adapter = adapter
                     holder.loadFlowable(
-                        categoriesState(row.source, row.mostPopularCategoriesId.orEmpty()),
+                        categoriesState(
+                            CategoriesStateInput(
+                                source = row.source,
+                                popularIds = row.mostPopularCategoriesId.orEmpty(),
+                                sponsoredIds = row.sponsoredCategoryIds.orEmpty(),
+                            ),
+                        ),
                         onNext = { state ->
-                            adapter.submitList(state.allCategories.sortedBy { it.name.tryToLocalise(resources) }) {
+                            adapter.submitList(state.allCategories.sortedBy { it.totalVisits }) {
                                 onRestoreInstanceState(holder)
+                            }
+                            latestSelectedCategoryId = if (state is CategoriesManager.State.Selected) {
+                                state.selectedCategory.id
+                            } else {
+                                null
                             }
                         },
                     )
@@ -852,9 +870,20 @@ internal class DiscoverAdapter(
 
                 is CategoryPillsViewHolder -> {
                     holder.loadFlowable(
-                        categoriesState(row.source, row.mostPopularCategoriesId.orEmpty()),
+                        categoriesState(
+                            CategoriesStateInput(
+                                source = row.source,
+                                popularIds = row.mostPopularCategoriesId.orEmpty(),
+                                sponsoredIds = row.sponsoredCategoryIds.orEmpty(),
+                            ),
+                        ),
                         onNext = { state ->
                             holder.submitState(state)
+                            latestSelectedCategoryId = if (state is CategoriesManager.State.Selected) {
+                                state.selectedCategory.id
+                            } else {
+                                null
+                            }
                         },
                     )
                 }
@@ -1032,10 +1061,13 @@ internal class DiscoverAdapter(
 
                             holder.binding.lblTitle.text = it.subtitle?.tryToLocalise(resources)
 
-                            val collectionHeader =
-                                it.collectionImageUrl?.let { imageUrl -> CollectionHeader(imageUrl, it.title, it.description) }
+                            val description = it.shortDescription ?: it.description ?: ""
+                            val collectionImageUrl = it.collectionRectangleImageUrl ?: it.collectionImageUrl
+                            val collectionHeader = collectionImageUrl?.let { imageUrl ->
+                                CollectionHeader(imageUrl, it.title, description)
+                            }
 
-                            val collectionPodcasts: List<CollectionPodcast> = podcasts.map { CollectionPodcast(it) }
+                            val collectionPodcasts: List<CollectionPodcast> = podcasts.map { podcast -> CollectionPodcast(podcast) }
 
                             holder.adapter.submitPodcastList(collectionPodcasts, collectionHeader) { onRestoreInstanceState(holder) }
                         },

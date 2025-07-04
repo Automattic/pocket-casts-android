@@ -8,7 +8,6 @@ import androidx.compose.animation.expandVertically
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.shrinkVertically
-import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -17,11 +16,11 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 
 @Composable
-fun <T : Any> ColumnScope.AnimatedNonNullVisibility(
+fun <T : Any> AnimatedNonNullVisibility(
     item: T?,
     modifier: Modifier = Modifier,
-    enter: EnterTransition = columnEnterTransition,
-    exit: ExitTransition = columnExitTransition,
+    enter: EnterTransition = defaultEnterTransition,
+    exit: ExitTransition = defaultExitTransition,
     label: String = "AnimatedVisibility",
     content: @Composable AnimatedVisibilityScope.(T) -> Unit,
 ) {
@@ -47,5 +46,5 @@ private val fadeOut = fadeOut()
 private val expandVertically = expandVertically()
 private val shrinkVertically = shrinkVertically()
 
-private val columnEnterTransition = fadeIn + expandVertically
-private val columnExitTransition = fadeOut + shrinkVertically
+private val defaultEnterTransition = fadeIn + expandVertically
+private val defaultExitTransition = fadeOut + shrinkVertically

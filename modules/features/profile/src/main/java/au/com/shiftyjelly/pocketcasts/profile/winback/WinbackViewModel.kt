@@ -404,7 +404,7 @@ class WinbackViewModel @Inject constructor(
 
     internal fun trackContinueWithCancellationTapped() {
         tracker.track(
-            event = AnalyticsEvent.WINBACK_CANCEL_CONFIRMATION_CANCEL_BUTTON_TAPPED,
+            event = AnalyticsEvent.WINBACK_WINBACK_OFFER_CANCEL_BUTTON_TAPPED,
         )
     }
 

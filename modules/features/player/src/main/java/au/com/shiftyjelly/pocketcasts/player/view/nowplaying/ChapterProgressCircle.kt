@@ -11,7 +11,6 @@ import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.map
@@ -19,7 +18,7 @@ import au.com.shiftyjelly.pocketcasts.player.viewmodel.PlayerViewModel
 import au.com.shiftyjelly.pocketcasts.utils.extensions.getActivity
 
 @Composable
-fun ChapterProgressCircle(
+private fun ChapterProgressCircle(
     modifier: Modifier = Modifier,
 ) {
     val activity = LocalContext.current.getActivity()
@@ -39,28 +38,20 @@ fun ChapterProgressCircle(
 private fun Content(
     progress: Float,
     modifier: Modifier = Modifier,
-    config: ChapterProgressConfig = ChapterProgressConfig(),
 ) {
     Canvas(
-        modifier
-            .size(config.imageSize),
+        modifier.size(28.dp),
     ) {
-        val borderWidthPx = config.strokeWidth.toPx()
         val degrees = 360f * (1f - progress)
         drawArc(
             color = Color.White.copy(alpha = 0.4f),
             startAngle = -90f,
             sweepAngle = -degrees,
             useCenter = false,
-            style = Stroke(borderWidthPx, cap = StrokeCap.Butt),
+            style = Stroke(2.dp.toPx(), cap = StrokeCap.Butt),
         )
     }
 }
-
-data class ChapterProgressConfig(
-    val imageSize: Dp = 28.dp,
-    val strokeWidth: Dp = 2.dp,
-)
 
 @Preview
 @Composable

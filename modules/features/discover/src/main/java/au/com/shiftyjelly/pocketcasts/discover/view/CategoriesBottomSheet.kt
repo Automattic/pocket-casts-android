@@ -13,6 +13,7 @@ import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.discover.R
 import au.com.shiftyjelly.pocketcasts.localization.helper.tryToLocalise
 import au.com.shiftyjelly.pocketcasts.repositories.categories.CategoriesManager
+import au.com.shiftyjelly.pocketcasts.servers.model.DiscoverCategory
 import au.com.shiftyjelly.pocketcasts.views.extensions.setSystemWindowInsetToPadding
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseDialogFragment
 import com.google.android.material.bottomsheet.BottomSheetBehavior
@@ -40,7 +41,7 @@ class CategoriesBottomSheet : BaseDialogFragment() {
         recyclerView.layoutManager = LinearLayoutManager(view.context)
 
         val adapter = CategoriesBottomSheetAdapter { category ->
-            trackCategorySelected(category.name, category.id)
+            trackCategorySelected(category)
             categoriesManager.selectCategory(category.id)
             dismiss()
         }
@@ -68,10 +69,16 @@ class CategoriesBottomSheet : BaseDialogFragment() {
         trackDismissed()
     }
 
-    private fun trackCategorySelected(name: String, id: Int) {
+    private fun trackCategorySelected(category: DiscoverCategory) {
         analyticsTracker.track(
             AnalyticsEvent.DISCOVER_CATEGORIES_PICKER_PICK,
-            mapOf("name" to name, "id" to id, "region" to region),
+            mapOf(
+                "name" to category.name,
+                "id" to category.id,
+                "region" to region,
+                "visits" to category.totalVisits,
+                "sponsored" to (category.isSponsored == true),
+            ),
         )
     }
 
