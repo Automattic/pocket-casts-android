@@ -1,12 +1,9 @@
 package au.com.shiftyjelly.pocketcasts.account.onboarding.upgrade
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -20,7 +17,6 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.pager.VerticalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
 import androidx.compose.material.MaterialTheme
@@ -32,14 +28,11 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.drawWithContent
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.painter.Painter
-import androidx.compose.ui.layout.SubcomposeLayout
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -48,15 +41,15 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
+import au.com.shiftyjelly.pocketcasts.account.onboarding.components.ScheduleItemConnection
 import au.com.shiftyjelly.pocketcasts.account.onboarding.components.UpgradeFeatureItem
+import au.com.shiftyjelly.pocketcasts.account.onboarding.components.UpgradePlanSelector
+import au.com.shiftyjelly.pocketcasts.account.onboarding.components.UpgradeTrialScheduleItem
 import au.com.shiftyjelly.pocketcasts.account.onboarding.upgrade.OnboardingUpgradeHelper.PrivacyPolicy
 import au.com.shiftyjelly.pocketcasts.account.onboarding.upgrade.OnboardingUpgradeHelper.UpgradeRowButton
 import au.com.shiftyjelly.pocketcasts.compose.AppThemeWithBackground
 import au.com.shiftyjelly.pocketcasts.compose.components.TextH10
-import au.com.shiftyjelly.pocketcasts.compose.components.TextH40
-import au.com.shiftyjelly.pocketcasts.compose.components.TextH50
 import au.com.shiftyjelly.pocketcasts.compose.components.TextP40
-import au.com.shiftyjelly.pocketcasts.compose.components.TextP50
 import au.com.shiftyjelly.pocketcasts.compose.images.SubscriptionBadge
 import au.com.shiftyjelly.pocketcasts.compose.preview.ThemePreviewParameterProvider
 import au.com.shiftyjelly.pocketcasts.compose.theme
@@ -77,7 +70,6 @@ import au.com.shiftyjelly.pocketcasts.localization.R as LR
 @Composable
 fun OnboardingUpgradeVariantsScreen(
     onClosePressed: () -> Unit,
-    onPlanChanged: (SubscriptionPlan) -> Unit,
     onSubscribePressed: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -109,7 +101,7 @@ fun OnboardingUpgradeVariantsScreen(
                     vertical = 16.dp,
                 ),
         ) {
-            val create = OnboardingSubscriptionPlan.create(
+            val mockPlan = OnboardingSubscriptionPlan.create(
                 SubscriptionPlan.WithOffer(
                     name = "plus",
                     tier = SubscriptionTier.Plus,
@@ -118,42 +110,46 @@ fun OnboardingUpgradeVariantsScreen(
                     pricingPhases = listOf(
                         PricingPhase(
                             price = Price(
-                                amount = BigDecimal.valueOf(0), currencyCode = "USD", formattedPrice = "$29.9"
+                                amount = BigDecimal.valueOf(0),
+                                currencyCode = "USD",
+                                formattedPrice = "$29.9",
                             ),
                             schedule = PricingSchedule(
                                 recurrenceMode = PricingSchedule.RecurrenceMode.Recurring(1),
                                 period = PricingSchedule.Period.Monthly,
-                                periodCount = 1
-                            )
+                                periodCount = 1,
+                            ),
                         ),
                         PricingPhase(
                             price = Price(
-                                amount = BigDecimal.valueOf(39.9), currencyCode = "USD", formattedPrice = "$29.9"
+                                amount = BigDecimal.valueOf(39.9),
+                                currencyCode = "USD",
+                                formattedPrice = "$29.9",
                             ),
                             schedule = PricingSchedule(
                                 recurrenceMode = PricingSchedule.RecurrenceMode.Infinite,
                                 period = PricingSchedule.Period.Monthly,
-                                periodCount = 11
-                            )
+                                periodCount = 11,
+                            ),
                         ),
-                    )
-                )
-            )
-            UpgradeHeader(subscriptionPlan = create.getOrNull()!!)
+                    ),
+                ),
+            ).getOrNull()
+            checkNotNull(mockPlan)
+            UpgradeHeader(subscriptionPlan = mockPlan)
             Spacer(modifier = Modifier.height(24.dp))
             UpgradeContent(
                 modifier = Modifier.weight(1f),
-                subscriptionPlan = create.getOrNull()!!
+                subscriptionPlan = mockPlan,
             )
             Spacer(modifier = Modifier.height(16.dp))
             UpgradeFooter(
                 modifier = Modifier
                     .fillMaxWidth(),
-                selectedPlan = create.getOrNull()!!,
+                selectedPlan = mockPlan,
                 onClickSubscribe = onSubscribePressed,
             )
         }
-
     }
 }
 
@@ -161,14 +157,14 @@ fun OnboardingUpgradeVariantsScreen(
 private fun UpgradeFooter(
     selectedPlan: OnboardingSubscriptionPlan,
     onClickSubscribe: () -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
     var isYearlySelected by remember { mutableStateOf(true) }
 
     Column(
-        modifier = modifier
+        modifier = modifier,
     ) {
-        TierSelector(
+        UpgradePlanSelector(
             plan = stringResource(LR.string.onboarding_upgrade_billing_cycle_yearly),
             priceAndPeriod = "$39.99/year",
             pricePerWeek = "$0.77/week",
@@ -177,7 +173,7 @@ private fun UpgradeFooter(
             savings = stringResource(LR.string.onboarding_upgrade_save_percent, 16),
         )
         Spacer(modifier = Modifier.height(10.dp))
-        TierSelector(
+        UpgradePlanSelector(
             plan = stringResource(LR.string.onboarding_upgrade_billing_cycle_monthly),
             priceAndPeriod = "$3.99/month",
             isSelected = !isYearlySelected,
@@ -199,7 +195,7 @@ private fun UpgradeFooter(
             color = MaterialTheme.theme.colors.secondaryText02,
             textAlign = TextAlign.Center,
             onPrivacyPolicyClick = {},
-            onTermsAndConditionsClick = {}
+            onTermsAndConditionsClick = {},
         )
     }
 }
@@ -230,7 +226,7 @@ private fun UpgradeHeader(
 @Composable
 private fun UpgradeContent(
     subscriptionPlan: OnboardingSubscriptionPlan,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
     Column(modifier = modifier) {
         val pagerState = rememberPagerState(initialPage = 0) { 2 }
@@ -280,7 +276,7 @@ private fun FeaturesContent(
                 TextP40(
                     text = stringResource(LR.string.onboarding_upgrade_features_trial_schedule),
                     modifier = Modifier.clickable { it() },
-                    color = MaterialTheme.theme.colors.primaryInteractive01
+                    color = MaterialTheme.theme.colors.primaryInteractive01,
                 )
             }
         }
@@ -295,7 +291,7 @@ private fun ScheduleContent(
     Column {
         val gradientColors = listOf(
             Color.Transparent,
-            MaterialTheme.colors.background.copy(alpha = 0.8f)
+            MaterialTheme.colors.background.copy(alpha = 0.8f),
         )
         val density = LocalDensity.current
         val iconSizePx = density.run { 43.dp.toPx() }
@@ -311,21 +307,21 @@ private fun ScheduleContent(
                 )
             },
         ) {
-            ScheduleItem(
+            UpgradeTrialScheduleItem(
                 modifier = Modifier.heightIn(min = 64.dp),
                 title = stringResource(LR.string.onboarding_upgrade_schedule_today),
                 message = stringResource(LR.string.onboarding_upgrade_schedule_today_message),
                 icon = painterResource(IR.drawable.ic_unlocked),
                 connection = ScheduleItemConnection.BOTTOM,
             )
-            ScheduleItem(
+            UpgradeTrialScheduleItem(
                 modifier = Modifier.heightIn(min = 64.dp),
                 title = stringResource(LR.string.onboarding_upgrade_schedule_day, pricingPhase.schedule.periodCount - 7),
                 message = stringResource(LR.string.onboarding_upgrade_schedule_notify),
                 icon = painterResource(IR.drawable.ic_envelope),
                 connection = ScheduleItemConnection.TOP_AND_BOTTOM,
             )
-            ScheduleItem(
+            UpgradeTrialScheduleItem(
                 modifier = Modifier.heightIn(min = 64.dp),
                 title = stringResource(LR.string.onboarding_upgrade_schedule_day, pricingPhase.schedule.periodCount),
                 message = stringResource(LR.string.onboarding_upgrade_schedule_billing, "September 31th"),
@@ -338,198 +334,10 @@ private fun ScheduleContent(
             TextP40(
                 text = stringResource(LR.string.onboarding_upgrade_schedule_see_features),
                 modifier = Modifier.clickable { it() },
-                color = MaterialTheme.theme.colors.primaryInteractive01
-            )
-        }
-    }
-}
-
-@Composable
-private fun ScheduleItem(
-    title: String,
-    message: String,
-    icon: Painter,
-    connection: ScheduleItemConnection,
-    modifier: Modifier = Modifier
-) {
-    val iconBackground = MaterialTheme.theme.colors.primaryInteractive01
-    val density = LocalDensity.current
-    val connectingRodWidthPx = density.run { 8.dp.toPx() }
-    val iconSize = 43.dp
-    val iconSizePx = density.run { iconSize.toPx() }
-    Row(
-        modifier = modifier
-            .drawWithContent {
-                when (connection) {
-                    ScheduleItemConnection.TOP -> drawRect(color = iconBackground, topLeft = Offset(x = iconSizePx / 2f - (connectingRodWidthPx / 2f), y = -1f), size = Size(width = connectingRodWidthPx, height = size.height / 2f))
-                    ScheduleItemConnection.BOTTOM -> drawRect(color = iconBackground, topLeft = Offset(x = iconSizePx / 2f - (connectingRodWidthPx / 2f), y = size.height / 2f), size = Size(width = connectingRodWidthPx, height = (size.height / 2f) + 1f))
-                    ScheduleItemConnection.TOP_AND_BOTTOM -> drawRect(color = iconBackground, topLeft = Offset(x = iconSizePx / 2f - (connectingRodWidthPx / 2f), y = 0f), size = Size(width = connectingRodWidthPx, height = size.height))
-                }
-                drawContent()
-            },
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.spacedBy(14.dp),
-    ) {
-        Box(
-            modifier = Modifier
-                .size(iconSize)
-                .background(color = iconBackground, shape = CircleShape),
-            contentAlignment = Alignment.Center,
-        ) {
-            Icon(
-                painter = icon,
-                tint = MaterialTheme.colors.background,
-                contentDescription = "",
-            )
-        }
-        Column(modifier = Modifier.fillMaxWidth()) {
-            TextP50(text = title, color = MaterialTheme.theme.colors.primaryText01, fontWeight = FontWeight.W700)
-            TextP50(text = message, color = MaterialTheme.theme.colors.secondaryText02)
-        }
-    }
-}
-
-private enum class ScheduleItemConnection {
-    TOP,
-    BOTTOM,
-    TOP_AND_BOTTOM
-}
-
-@Composable
-private fun TierSelector(
-    plan: String,
-    priceAndPeriod: String,
-    isSelected: Boolean,
-    onSelected: () -> Unit,
-    modifier: Modifier = Modifier,
-    savings: String? = null,
-    pricePerWeek: String? = null,
-) {
-    SubcomposeLayout(modifier = modifier) { constraints ->
-        val savingsBadge = savings?.let {
-            val badgeMeasurable = subcompose("savings") {
-                SavingsLabel(
-                    savings = savings,
-                )
-            }
-            badgeMeasurable.first().measure(constraints)
-        }
-        val badgeHeight = savingsBadge?.height ?: 0
-
-        val row = subcompose("selector_row") {
-            PlanRow(
-                modifier = Modifier.fillMaxWidth(),
-                plan = plan,
-                priceAndPeriod = priceAndPeriod,
-                isSelected = isSelected,
-                onSelected = onSelected,
-                pricePerWeek = pricePerWeek,
-            )
-        }
-        val placeable = row.first().measure(constraints)
-        val rowWidth = placeable.width
-        val rowHeight = placeable.height
-
-        val totalHeight = rowHeight + badgeHeight / 2
-        layout(rowWidth, totalHeight) {
-            placeable.placeRelative(x = 0, y = badgeHeight / 2)
-            savingsBadge?.let {
-                it.placeRelative(x = (rowWidth - it.width) / 2, y = 0)
-            }
-        }
-    }
-}
-
-@Composable
-private fun PlanRow(
-    plan: String,
-    priceAndPeriod: String,
-    isSelected: Boolean,
-    onSelected: () -> Unit,
-    modifier: Modifier = Modifier,
-    pricePerWeek: String? = null,
-) {
-    Row(
-        modifier = modifier
-            .clip(RoundedCornerShape(12.dp))
-            .then(
-                if (isSelected) {
-                    Modifier.border(
-                        width = 2.dp,
-                        color = MaterialTheme.theme.colors.primaryInteractive01,
-                        shape = RoundedCornerShape(12.dp),
-                    )
-                } else {
-                    Modifier
-                }
-            )
-            .background(
-                color = MaterialTheme.theme.colors.primaryUi03,
-            )
-            .clickable { onSelected() }
-            .padding(16.dp),
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.spacedBy(16.dp),
-    ) {
-        Box(
-            modifier = Modifier
-                .size(24.dp)
-                .clip(CircleShape)
-                .then(
-                    if (isSelected) {
-                        Modifier.background(color = MaterialTheme.theme.colors.primaryInteractive01)
-                    } else Modifier.border(
-                        width = 2.dp,
-                        color = MaterialTheme.theme.colors.primaryIcon02,
-                        shape = CircleShape,
-                    )
-                ),
-            contentAlignment = Alignment.Center
-        ) {
-            if (isSelected) {
-                Icon(
-                    painter = painterResource(IR.drawable.ic_check),
-                    contentDescription = "",
-                    tint = MaterialTheme.theme.colors.primaryInteractive02,
-                )
-            }
-        }
-
-        Column(modifier = Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(7.dp)) {
-            TextH40(
-                text = plan,
-                color = MaterialTheme.theme.colors.primaryText01,
-                fontWeight = FontWeight.W700
-            )
-            TextH40(
-                text = priceAndPeriod,
-                color = MaterialTheme.theme.colors.secondaryText02
-            )
-        }
-        pricePerWeek?.let {
-            TextH40(
-                text = pricePerWeek,
-                color = MaterialTheme.theme.colors.secondaryText02,
-            )
-        }
-    }
-}
-
-@Composable
-private fun SavingsLabel(
-    savings: String,
-    modifier: Modifier = Modifier,
-) {
-    TextH50(
-        modifier = modifier
-            .background(
                 color = MaterialTheme.theme.colors.primaryInteractive01,
-                shape = RoundedCornerShape(12.dp)
             )
-            .padding(horizontal = 12.dp, vertical = 2.dp),
-        text = savings,
-        color = MaterialTheme.theme.colors.primaryInteractive02,
-    )
+        }
+    }
 }
 
 @Preview
@@ -541,7 +349,6 @@ private fun PreviewOnboardingUpgradeFeaturesScreen(
         OnboardingUpgradeVariantsScreen(
             modifier = Modifier.fillMaxSize(),
             onSubscribePressed = {},
-            onPlanChanged = {},
             onClosePressed = {},
         )
     }

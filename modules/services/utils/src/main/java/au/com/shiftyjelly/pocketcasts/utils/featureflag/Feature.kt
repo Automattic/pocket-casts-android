@@ -144,7 +144,7 @@ enum class Feature(
         defaultValue = BuildConfig.DEBUG,
         tier = FeatureTier.Free,
         hasFirebaseRemoteFlag = false,
-        hasDevToggle = true
+        hasDevToggle = true,
     ),
 
     // This is set of features used only for testing purposes.

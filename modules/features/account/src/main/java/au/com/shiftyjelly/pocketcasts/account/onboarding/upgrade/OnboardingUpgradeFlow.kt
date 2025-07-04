@@ -118,7 +118,7 @@ fun OnboardingUpgradeFlow(
         content = {
             if (flow !is OnboardingFlow.PlusAccountUpgrade) {
                 if (FeatureFlag.isEnabled(Feature.NEW_ONBOARDING_UPGRADE)) {
-                    OnboardingUpgradeVariantsScreen(onClosePressed = onBackPressed, onPlanChanged = {}, onSubscribePressed = {})
+                    OnboardingUpgradeVariantsScreen(onClosePressed = onBackPressed, onSubscribePressed = {})
                 } else {
                     OnboardingUpgradeFeaturesPage(
                         viewModel = viewModel,
