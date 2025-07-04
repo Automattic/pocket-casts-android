@@ -1,11 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2025-06-16 13:54:03+0000
+Translation-Revision-Date: 2025-07-01 09:54:04+0000
 Plural-Forms: nplurals=6; plural=n==0 ? 0 : n==1 ? 1 : n==2 ? 2 : n%100>=3 && n%100<=10 ? 3 : n%100>=11 && n%100<=99 ? 4 : 5;
 Generator: GlotPress/2.4.0-alpha
 Language: ar
 -->
 <resources>
+    <string name="transcript_open">النص المكتوب المفتوح</string>
+    <string name="episode_description">وصف الحلقة</string>
     <string name="onboarding_plus_feature_no_banner_ads">لا توجد إعلانات شعارات</string>
     <string name="banner_ad_plus_prompt">قل وداعًا لإعلانات الشعارات وغيرها باستخدام Pocket Casts Plus</string>
     <string name="ad_report_reason_other">أخرى</string>
@@ -327,6 +329,7 @@ Language: ar
     <string name="onboarding_plus_feature_dream_with_slumber_studios">&lt;a href=\"https://slumberstudios.com/\"&gt;الحلم بمحتوى Slumber Studios&lt;/a&gt;</string>
     <string name="gift">هدية</string>
     <string name="got_it">فهمت</string>
+    <string name="transcript_search_close">إغلاق البحث</string>
     <string name="transcript_search">البحث في النص</string>
     <string name="transcript_close">إغلاق النص</string>
     <string name="onboarding_subscribe_to_plus">اشترك في Plus</string>

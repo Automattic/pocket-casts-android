@@ -1,11 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2025-06-18 09:54:07+0000
+Translation-Revision-Date: 2025-07-01 15:54:04+0000
 Plural-Forms: nplurals=2; plural=n != 1;
 Generator: GlotPress/2.4.0-alpha
 Language: nl
 -->
 <resources>
+    <string name="transcript_open">Transcriptie openen</string>
+    <string name="episode_description">Beschrijving van aflevering</string>
     <string name="onboarding_plus_feature_no_banner_ads">Geen banneradvertenties</string>
     <string name="banner_ad_plus_prompt">Zeg vaarwel tegen banneradvertenties en meer met Pocket Casts Plus</string>
     <string name="ad_report_reason_other">Anders</string>
@@ -328,6 +330,7 @@ Language: nl
     <string name="onboarding_plus_feature_dream_with_slumber_studios">&lt;a href=\"https://slumberstudios.com/\"&gt;Droom met content van Slumber Studios&lt;/a&gt;</string>
     <string name="gift">Cadeau</string>
     <string name="got_it">Duidelijk</string>
+    <string name="transcript_search_close">Zoeken sluiten</string>
     <string name="transcript_search">Transcriptie zoeken</string>
     <string name="transcript_close">Transcriptie sluiten</string>
     <string name="onboarding_subscribe_to_plus">Abonneren op Plus</string>
