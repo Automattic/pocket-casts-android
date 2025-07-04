@@ -74,7 +74,6 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flow
-import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.rx2.asObservable
@@ -313,26 +312,26 @@ class PlayerViewModel @Inject constructor(
     val playerFlow = playbackManager.playerFlow
 
     @OptIn(ExperimentalCoroutinesApi::class)
-    val activeAds = combine(
+    val activeAd = combine(
         settings.cachedSubscription.flow,
         FeatureFlag.isEnabledFlow(Feature.BANNER_ADS),
         ::Pair,
     ).flatMapLatest { (subscription, isEnabled) ->
-        if (isEnabled && subscription == null) {
-            val mockAd = BlazeAd(
-                id = "ad-id",
-                title = "wordpress.com",
-                ctaText = "Democratize publishing and eCommerce one website at a time.",
-                ctaUrl = "https://wordpress.com/",
-                imageUrl = "https://s.w.org/style/images/about/WordPress-logotype-wmark-white.png",
-            )
-            flow {
-                emit(listOf(mockAd))
+        flow<BlazeAd?> {
+            val ad = if (isEnabled && subscription == null) {
+                BlazeAd(
+                    id = "ad-id",
+                    title = "wordpress.com",
+                    ctaText = "Democratize publishing and eCommerce one website at a time.",
+                    ctaUrl = "https://wordpress.com/",
+                    imageUrl = "https://s.w.org/style/images/about/WordPress-logotype-wmark-white.png",
+                )
+            } else {
+                null
             }
-        } else {
-            flowOf(emptyList())
+            emit(ad)
         }
-    }.stateIn(viewModelScope, started = SharingStarted.Eagerly, initialValue = emptyList())
+    }.stateIn(viewModelScope, started = SharingStarted.Eagerly, initialValue = null)
 
     fun setSleepEndOfChapters(chapters: Int = 1, shouldCallUpdateTimer: Boolean = true) {
         val newValue = chapters.coerceIn(1, 240)
@@ -777,6 +776,26 @@ class PlayerViewModel @Inject constructor(
                 put(AnalyticsProp.SETTINGS, settings)
             },
             sourceView = SourceView.PLAYER_PLAYBACK_EFFECTS,
+        )
+    }
+
+    fun trackAdImpression(ad: BlazeAd) {
+        analyticsTracker.track(
+            AnalyticsEvent.BANNER_AD_IMPRESSION,
+            mapOf(
+                "promotion" to "player",
+                "id" to ad.id,
+            ),
+        )
+    }
+
+    fun trackAdTapped(ad: BlazeAd) {
+        analyticsTracker.track(
+            AnalyticsEvent.BANNER_AD_TAPPED,
+            mapOf(
+                "promotion" to "player",
+                "id" to ad.id,
+            ),
         )
     }
 

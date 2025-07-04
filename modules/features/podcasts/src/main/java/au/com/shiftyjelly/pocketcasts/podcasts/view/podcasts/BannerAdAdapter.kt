@@ -18,6 +18,7 @@ internal class BannerAdAdapter(
     private val themeType: Theme.ThemeType,
     private val onAdClick: (BlazeAd) -> Unit,
     private val onAdOptionsClick: (BlazeAd) -> Unit,
+    private val onAdImpression: (BlazeAd) -> Unit,
 ) : ListAdapter<BlazeAd, RecyclerView.ViewHolder>(BannerAdDiffCallback) {
     override fun getItemViewType(position: Int): Int {
         return AdapterViewTypeIds.BannerAdId
@@ -35,6 +36,13 @@ internal class BannerAdAdapter(
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
         (holder as BannerAdViewHolder).bind(currentList[position])
     }
+
+    override fun onViewAttachedToWindow(holder: RecyclerView.ViewHolder) {
+        val ad = requireNotNull((holder as BannerAdViewHolder).ad) {
+            "Banner ad view attached without ad data"
+        }
+        onAdImpression(ad)
+    }
 }
 
 private object BannerAdDiffCallback : DiffUtil.ItemCallback<BlazeAd>() {
@@ -49,11 +57,14 @@ private class BannerAdViewHolder(
     private val onAdClick: (BlazeAd) -> Unit,
     private val onAdOptionsClick: (BlazeAd) -> Unit,
 ) : RecyclerView.ViewHolder(composeView) {
+    var ad: BlazeAd? = null
+
     init {
         composeView.setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnDetachedFromWindowOrReleasedFromPool)
     }
 
     fun bind(ad: BlazeAd) {
+        this.ad = ad
         composeView.setContent {
             AppTheme(themeType) {
                 Box(
