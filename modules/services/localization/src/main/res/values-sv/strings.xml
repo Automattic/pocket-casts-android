@@ -1,11 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2025-06-18 09:54:04+0000
+Translation-Revision-Date: 2025-07-01 13:54:03+0000
 Plural-Forms: nplurals=2; plural=n != 1;
 Generator: GlotPress/2.4.0-alpha
 Language: sv_SE
 -->
 <resources>
+    <string name="transcript_open">Öppna transkription</string>
+    <string name="episode_description">Avsnittsbeskrivning</string>
     <string name="onboarding_plus_feature_no_banner_ads">Inga bannerannonser</string>
     <string name="banner_ad_plus_prompt">Säg adjö till bannerannonser och mer med Pocket Casts Plus</string>
     <string name="ad_report_reason_other">Övrigt</string>
@@ -329,6 +331,7 @@ Language: sv_SE
     <string name="onboarding_plus_feature_dream_with_slumber_studios">&lt;a href=\"https://slumberstudios.com/\"&gt;Dröm med Slumber Studios-innehåll&lt;/a&gt;</string>
     <string name="gift">Gåva</string>
     <string name="got_it">Uppfattat</string>
+    <string name="transcript_search_close">Stäng sökning</string>
     <string name="transcript_search">Sök kopia</string>
     <string name="transcript_close">Stäng kopia</string>
     <string name="onboarding_subscribe_to_plus">Prenumerera på Plus</string>

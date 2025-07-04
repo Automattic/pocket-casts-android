@@ -1,11 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2025-06-17 09:54:04+0000
+Translation-Revision-Date: 2025-07-01 09:54:04+0000
 Plural-Forms: nplurals=1; plural=0;
 Generator: GlotPress/2.4.0-alpha
 Language: ko_KR
 -->
 <resources>
+    <string name="transcript_open">대본 공개</string>
+    <string name="episode_description">에피소드 설명</string>
     <string name="onboarding_plus_feature_no_banner_ads">배너 광고 없음</string>
     <string name="banner_ad_plus_prompt">Pocket Casts Plus로 배너 광고를 제거하고 다양한 기능을 이용해 보세요</string>
     <string name="ad_report_reason_other">기타</string>
@@ -329,6 +331,7 @@ Language: ko_KR
     <string name="onboarding_plus_feature_dream_with_slumber_studios">&lt;a href=\"https://slumberstudios.com/\"&gt;Slumber Studios 콘텐츠로 꿈꾸기&lt;/a&gt;</string>
     <string name="gift">선물</string>
     <string name="got_it">알겠습니다</string>
+    <string name="transcript_search_close">검색 닫기</string>
     <string name="transcript_search">대본 검색</string>
     <string name="transcript_close">대본 닫기</string>
     <string name="onboarding_subscribe_to_plus">Plus 구독</string>

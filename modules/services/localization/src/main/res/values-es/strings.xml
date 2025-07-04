@@ -1,11 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2025-06-17 09:54:03+0000
+Translation-Revision-Date: 2025-07-01 11:54:03+0000
 Plural-Forms: nplurals=2; plural=n != 1;
 Generator: GlotPress/2.4.0-alpha
 Language: es
 -->
 <resources>
+    <string name="transcript_open">Transcripción abierta</string>
+    <string name="episode_description">Descripción del episodio</string>
     <string name="onboarding_plus_feature_no_banner_ads">Sin anuncios de banner</string>
     <string name="banner_ad_plus_prompt">Despídete de los banners publicitarios y más con Pocket Casts Plus</string>
     <string name="ad_report_reason_other">Otros</string>
@@ -329,6 +331,7 @@ Language: es
     <string name="onboarding_plus_feature_dream_with_slumber_studios">&lt;a href=\"https://slumberstudios.com/\"&gt;Contenido de Sueña con Slumber Studios&lt;/a&gt;</string>
     <string name="gift">Regalo</string>
     <string name="got_it">De acuerdo</string>
+    <string name="transcript_search_close">Cerrar búsqueda</string>
     <string name="transcript_search">Buscar transcripción</string>
     <string name="transcript_close">Cerrar transcripción</string>
     <string name="onboarding_subscribe_to_plus">Suscribirse a Plus</string>
