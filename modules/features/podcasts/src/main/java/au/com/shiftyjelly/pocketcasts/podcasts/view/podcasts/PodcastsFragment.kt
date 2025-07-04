@@ -280,8 +280,8 @@ class PodcastsFragment :
         }
 
         viewLifecycleOwner.lifecycleScope.launch {
-            viewModel.activeAds.collect { activeAds ->
-                bannerAdAdapter?.submitList(activeAds)
+            viewModel.activeAd.collect { activeAd ->
+                bannerAdAdapter?.submitList(listOfNotNull(activeAd))
             }
         }
 
@@ -487,7 +487,7 @@ class PodcastsFragment :
         val folderUuid = folderUuid
 
         binding.emptyView.setContentWithViewCompositionStrategy {
-            val ads by viewModel.activeAds.collectAsState()
+            val activeAd by viewModel.activeAd.collectAsState()
 
             AppTheme(themeType = theme.activeTheme) {
                 Column(
@@ -498,7 +498,7 @@ class PodcastsFragment :
                         .verticalScroll(rememberScrollState())
                         .padding(16.dp),
                 ) {
-                    ads.firstOrNull()?.let { ad ->
+                    activeAd?.let { ad ->
                         AdBanner(
                             ad = ad,
                             colors = rememberAdColors().bannerAd,

@@ -78,30 +78,30 @@ class PodcastsViewModel @AssistedInject constructor(
         )
     }
 
-    val activeAds = if (folderUuid == null) {
+    val activeAd = if (folderUuid == null) {
         combine(
             userManager.getSignInState().asFlow(),
             FeatureFlag.isEnabledFlow(Feature.BANNER_ADS),
             ::Pair,
         ).flatMapLatest { (signInState, isEnabled) ->
-            if (isEnabled && signInState.isNoAccountOrFree) {
-                val mockAd = BlazeAd(
-                    id = "ad-id",
-                    title = "wordpress.com",
-                    ctaText = "Democratize publishing and eCommerce one website at a time.",
-                    ctaUrl = "https://wordpress.com/",
-                    imageUrl = "https://s.w.org/style/images/about/WordPress-logotype-simplified.png",
-                )
-                flow {
-                    emit(listOf(mockAd))
+            flow<BlazeAd?> {
+                val ad = if (isEnabled && signInState.isNoAccountOrFree) {
+                    BlazeAd(
+                        id = "ad-id",
+                        title = "wordpress.com",
+                        ctaText = "Democratize publishing and eCommerce one website at a time.",
+                        ctaUrl = "https://wordpress.com/",
+                        imageUrl = "https://s.w.org/style/images/about/WordPress-logotype-simplified.png",
+                    )
+                } else {
+                    null
                 }
-            } else {
-                flowOf(emptyList())
+                emit(ad)
             }
         }
     } else {
-        flowOf(emptyList())
-    }.stateIn(viewModelScope, started = SharingStarted.Eagerly, initialValue = emptyList())
+        flowOf(null)
+    }.stateIn(viewModelScope, started = SharingStarted.Eagerly, initialValue = null)
 
     init {
         viewModelScope.launch {

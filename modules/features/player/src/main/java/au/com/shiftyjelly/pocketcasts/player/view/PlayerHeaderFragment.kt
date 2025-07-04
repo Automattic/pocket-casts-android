@@ -202,7 +202,7 @@ class PlayerHeaderFragment : BaseFragment(), PlayerClickListener {
         val podcastColors by remember { podcastColorsFlow() }.collectAsState(PodcastColors.ForUserEpisode)
         val headerData by remember { playerHeaderFlow() }.collectAsState(PlayerViewModel.PlayerHeader())
         val artworkOrVideoState by remember { playerVisualsStateFlow() }.collectAsState(ArtworkOrVideoState.NoContent)
-        val ads by viewModel.activeAds.collectAsState()
+        val activeAd by viewModel.activeAd.collectAsState()
 
         val isTranscriptOpen by shelfSharedViewModel.isTranscriptOpen.collectAsState()
         val transcriptUiState by transcriptViewModel.uiState.collectAsState()
@@ -232,7 +232,7 @@ class PlayerHeaderFragment : BaseFragment(), PlayerClickListener {
                             .padding(start = 16.dp, end = 16.dp, bottom = 16.dp),
                     )
                     PlayerContent(
-                        ad = ads.firstOrNull(),
+                        ad = activeAd,
                         artworkOrVideoState = artworkOrVideoState,
                         headerData = headerData,
                         playerColors = playerColors,

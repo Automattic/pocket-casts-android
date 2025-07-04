@@ -313,26 +313,26 @@ class PlayerViewModel @Inject constructor(
     val playerFlow = playbackManager.playerFlow
 
     @OptIn(ExperimentalCoroutinesApi::class)
-    val activeAds = combine(
+    val activeAd = combine(
         settings.cachedSubscription.flow,
         FeatureFlag.isEnabledFlow(Feature.BANNER_ADS),
         ::Pair,
     ).flatMapLatest { (subscription, isEnabled) ->
-        if (isEnabled && subscription == null) {
-            val mockAd = BlazeAd(
-                id = "ad-id",
-                title = "wordpress.com",
-                ctaText = "Democratize publishing and eCommerce one website at a time.",
-                ctaUrl = "https://wordpress.com/",
-                imageUrl = "https://s.w.org/style/images/about/WordPress-logotype-wmark-white.png",
-            )
-            flow {
-                emit(listOf(mockAd))
+        flow<BlazeAd?> {
+            val ad = if (isEnabled && subscription == null) {
+                BlazeAd(
+                    id = "ad-id",
+                    title = "wordpress.com",
+                    ctaText = "Democratize publishing and eCommerce one website at a time.",
+                    ctaUrl = "https://wordpress.com/",
+                    imageUrl = "https://s.w.org/style/images/about/WordPress-logotype-wmark-white.png",
+                )
+            } else {
+                null
             }
-        } else {
-            flowOf(emptyList())
+            emit(ad)
         }
-    }.stateIn(viewModelScope, started = SharingStarted.Eagerly, initialValue = emptyList())
+    }.stateIn(viewModelScope, started = SharingStarted.Eagerly, initialValue = null)
 
     fun setSleepEndOfChapters(chapters: Int = 1, shouldCallUpdateTimer: Boolean = true) {
         val newValue = chapters.coerceIn(1, 240)
