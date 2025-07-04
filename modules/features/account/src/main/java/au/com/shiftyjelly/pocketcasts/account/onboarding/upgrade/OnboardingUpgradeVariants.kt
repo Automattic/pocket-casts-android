@@ -5,7 +5,6 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
@@ -27,11 +26,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.draw.drawWithContent
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
-import androidx.compose.ui.graphics.BlendMode
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.painter.Painter
@@ -39,7 +36,6 @@ import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
@@ -63,6 +59,7 @@ import au.com.shiftyjelly.pocketcasts.ui.theme.Theme.ThemeType
 import java.math.BigDecimal
 import kotlinx.coroutines.launch
 import au.com.shiftyjelly.pocketcasts.images.R as IR
+import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 @Composable
 internal fun OnboardingUpgradeFeaturesScreen(
@@ -76,20 +73,27 @@ internal fun OnboardingUpgradeFeaturesScreen(
             onClick = onClosePressed,
             modifier = Modifier.align(Alignment.TopEnd),
         ) {
-            Icon(
-                modifier = Modifier.background(color = MaterialTheme.theme.colors.primaryUi05, shape = CircleShape),
-                painter = painterResource(IR.drawable.ic_close),
-                contentDescription = stringResource(au.com.shiftyjelly.pocketcasts.localization.R.string.close),
-                tint = MaterialTheme.theme.colors.primaryIcon01,
-            )
+            Box(
+                modifier = Modifier
+                    .size(28.dp)
+                    .background(color = MaterialTheme.theme.colors.primaryUi05, shape = CircleShape),
+                contentAlignment = Alignment.Center,
+            ) {
+                Icon(
+                    modifier = Modifier.size(24.dp),
+                    painter = painterResource(IR.drawable.ic_close),
+                    contentDescription = stringResource(au.com.shiftyjelly.pocketcasts.localization.R.string.close),
+                    tint = MaterialTheme.theme.colors.primaryIcon01,
+                )
+            }
         }
 
         Column(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(
-                    horizontal = 12.dp,
-                    vertical = 12.dp,
+                    horizontal = 24.dp,
+                    vertical = 16.dp,
                 ),
         ) {
             UpgradeContent(
@@ -140,13 +144,16 @@ private fun UpgradeContent(
                 .wrapContentHeight(),
         )
         Spacer(modifier = Modifier.height(24.dp))
-        TextH10(text = "Superpowers for your podcasts", color = MaterialTheme.theme.colors.primaryText01)
+        TextH10(
+            text = stringResource(LR.string.onboarding_upgrade_generic_title),
+            color = MaterialTheme.theme.colors.primaryText01,
+        )
         Spacer(modifier = Modifier.height(24.dp))
 
         val pagerState = rememberPagerState(initialPage = 0) { 2 }
         val coroutineScope = rememberCoroutineScope()
         VerticalPager(state = pagerState, modifier = Modifier.fillMaxSize()) { page ->
-            if (page == 1) {
+            if (page == 0) {
                 FeaturesContent(
                     featureList = subscriptionPlan.featureItems,
                     onShowScheduleClicked = {
@@ -181,7 +188,7 @@ private fun FeaturesContent(
         Spacer(modifier = Modifier.height(24.dp))
         onShowScheduleClicked?.let {
             TextP40(
-                text = "How does the free trial work?",
+                text = stringResource(LR.string.onboarding_upgrade_features_trial_schedule),
                 modifier = Modifier.clickable { it() },
                 color = MaterialTheme.theme.colors.primaryInteractive01
             )
@@ -194,54 +201,55 @@ private fun ScheduleContent(
     pricingPhase: PricingPhase,
     onShowFeaturesClicked: (() -> Unit)? = null,
 ) {
-    val gradientColors = listOf(
-        Color.Transparent,
-        Color.White.copy(alpha = .8f),
-    )
-    val density = LocalDensity.current
-    val iconSizePx = density.run { 43.dp.toPx() }
-    Column(
-        modifier = Modifier.drawWithContent {
-            drawContent()
-            drawRect(
-                brush = Brush.verticalGradient(
-                    colors = gradientColors,
-                ),
-                topLeft = Offset(x = 0f, y = 0f),
-                size = Size(width = iconSizePx, size.height),
+    Column {
+        val gradientColors = listOf(
+            Color.Transparent,
+            MaterialTheme.colors.background.copy(alpha = 0.8f)
+        )
+        val density = LocalDensity.current
+        val iconSizePx = density.run { 43.dp.toPx() }
+        Column(
+            modifier = Modifier.drawWithContent {
+                drawContent()
+                drawRect(
+                    brush = Brush.verticalGradient(
+                        colors = gradientColors,
+                    ),
+                    topLeft = Offset(x = 0f, y = 0f),
+                    size = Size(width = iconSizePx, size.height),
+                )
+            },
+        ) {
+            ScheduleItem(
+                modifier = Modifier.heightIn(min = 64.dp),
+                title = stringResource(LR.string.onboarding_upgrade_schedule_today),
+                message = stringResource(LR.string.onboarding_upgrade_schedule_today_message),
+                icon = painterResource(IR.drawable.ic_unlocked),
+                connection = ScheduleItemConnection.BOTTOM,
             )
-        },
-    ) {
-        ScheduleItem(
-            modifier = Modifier.heightIn(min = 64.dp),
-            title = "Today",
-            message = "Get access to Folders, Shuffle, Bookmarks, and exclusive contnet",
-            icon = painterResource(IR.drawable.ic_locked_large), // TODO unlock
-            connection = ScheduleItemConnection.BOTTOM,
-        )
-        ScheduleItem(
-            modifier = Modifier.heightIn(min = 64.dp),
-            title = "Day ${pricingPhase.schedule.periodCount - 7}",
-            message = "We'll notify you about your trial ending.",
-            icon = painterResource(IR.drawable.ic_notifications),
-            connection = ScheduleItemConnection.TOP_AND_BOTTOM,
-        )
-        ScheduleItem(
-            modifier = Modifier.heightIn(min = 64.dp),
-            title = "Day ${pricingPhase.schedule.periodCount}",
-            message = "You'll be charged on September 31th.\nCancel anytime before.",
-            icon = painterResource(IR.drawable.ic_star),
-            connection = ScheduleItemConnection.TOP,
-        )
-    }
-    Spacer(modifier = Modifier.height(24.dp))
-    onShowFeaturesClicked?.let {
-        TextP40(
-            textAlign = TextAlign.Start,
-            text = "See all Plus features",
-            modifier = Modifier.clickable { it() },
-            color = MaterialTheme.theme.colors.primaryInteractive01
-        )
+            ScheduleItem(
+                modifier = Modifier.heightIn(min = 64.dp),
+                title = stringResource(LR.string.onboarding_upgrade_schedule_day, pricingPhase.schedule.periodCount - 7),
+                message = stringResource(LR.string.onboarding_upgrade_schedule_notify),
+                icon = painterResource(IR.drawable.ic_envelope),
+                connection = ScheduleItemConnection.TOP_AND_BOTTOM,
+            )
+            ScheduleItem(
+                modifier = Modifier.heightIn(min = 64.dp),
+                title = stringResource(LR.string.onboarding_upgrade_schedule_day, pricingPhase.schedule.periodCount),
+                message = stringResource(LR.string.onboarding_upgrade_schedule_billing, "September 31th"),
+                icon = painterResource(IR.drawable.ic_star),
+                connection = ScheduleItemConnection.TOP,
+            )
+        }
+        Spacer(modifier = Modifier.height(24.dp))
+        onShowFeaturesClicked?.let {
+            TextP40(
+                text = stringResource(LR.string.onboarding_upgrade_schedule_see_features),
+                modifier = Modifier.clickable { it() },
+                color = MaterialTheme.theme.colors.primaryInteractive01
+            )
+        }
     }
 }
 
