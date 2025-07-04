@@ -134,7 +134,10 @@ import dagger.hilt.android.AndroidEntryPoint
 import dagger.hilt.android.lifecycle.withCreationCallback
 import javax.inject.Inject
 import kotlin.time.Duration.Companion.milliseconds
+import kotlinx.coroutines.channels.awaitClose
+import kotlinx.coroutines.channels.trySendBlocking
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
@@ -204,6 +207,7 @@ class PlayerHeaderFragment : BaseFragment(), PlayerClickListener {
         val artworkOrVideoState by remember { playerVisualsStateFlow() }.collectAsState(ArtworkOrVideoState.NoContent)
         val activeAd by viewModel.activeAd.collectAsState()
 
+        val isPlayerOpen by isPlayerOpenFlow().collectAsState(false)
         val isTranscriptOpen by shelfSharedViewModel.isTranscriptOpen.collectAsState()
         val transcriptUiState by transcriptViewModel.uiState.collectAsState()
 
@@ -252,6 +256,8 @@ class PlayerHeaderFragment : BaseFragment(), PlayerClickListener {
             playerEpisodeUuid = headerData.episodeUuid,
             transcriptEpisodeUuid = transcriptUiState.transcriptEpisodeUuid,
         )
+
+        AdImpressionEffect(activeAd, isPlayerOpen)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -506,6 +512,7 @@ class PlayerHeaderFragment : BaseFragment(), PlayerClickListener {
     }
 
     private fun openAd(ad: BlazeAd) {
+        viewModel.trackAdTapped(ad)
         runCatching {
             val intent = Intent(Intent.ACTION_VIEW, ad.ctaUrl.toUri())
             startActivity(intent)
@@ -568,6 +575,21 @@ class PlayerHeaderFragment : BaseFragment(), PlayerClickListener {
             }
 
             else -> ArtworkOrVideoState.NoContent
+        }
+    }
+
+    private fun isPlayerOpenFlow() = callbackFlow<Boolean> {
+        val callback = object : BottomSheetBehavior.BottomSheetCallback() {
+            override fun onStateChanged(bottomSheet: View, newState: Int) {
+                trySendBlocking(newState == BottomSheetBehavior.STATE_EXPANDED)
+            }
+
+            override fun onSlide(bottomSheet: View, slideOffset: Float) = Unit
+        }
+        val hostListener = (requireActivity() as FragmentHostListener)
+        hostListener.addPlayerBottomSheetCallback(callback)
+        awaitClose {
+            hostListener.removePlayerBottomSheetCallback(callback)
         }
     }
 
@@ -793,6 +815,8 @@ class PlayerHeaderFragment : BaseFragment(), PlayerClickListener {
                     onAdClick = { openAd(ad) },
                     onOptionsClick = { openAdReportSheet(ad, playerColors.podcastColors) },
                 )
+                LaunchedEffect(ad.id) {
+                }
                 Spacer(
                     modifier = Modifier.weight(3f),
                 )
@@ -1102,6 +1126,18 @@ class PlayerHeaderFragment : BaseFragment(), PlayerClickListener {
         LaunchedEffect(isTranscriptOpen, playerEpisodeUuid, transcriptEpisodeUuid) {
             if (isTranscriptOpen && playerEpisodeUuid != transcriptEpisodeUuid) {
                 transcriptViewModel.loadTranscript(playerEpisodeUuid)
+            }
+        }
+    }
+
+    @Composable
+    private fun AdImpressionEffect(
+        ad: BlazeAd?,
+        isPlayerOpen: Boolean,
+    ) {
+        LaunchedEffect(ad?.id, isPlayerOpen) {
+            if (ad != null && isPlayerOpen) {
+                viewModel.trackAdImpression(ad)
             }
         }
     }

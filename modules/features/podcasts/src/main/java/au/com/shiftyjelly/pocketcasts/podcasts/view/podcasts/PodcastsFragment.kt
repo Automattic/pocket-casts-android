@@ -9,6 +9,7 @@ import android.view.LayoutInflater
 import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
+import android.view.ViewTreeObserver
 import androidx.appcompat.widget.Toolbar
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -103,6 +104,9 @@ import au.com.shiftyjelly.pocketcasts.views.helper.UiUtil
 import dagger.hilt.android.AndroidEntryPoint
 import dagger.hilt.android.lifecycle.withCreationCallback
 import javax.inject.Inject
+import kotlinx.coroutines.channels.awaitClose
+import kotlinx.coroutines.channels.trySendBlocking
+import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.launch
 import au.com.shiftyjelly.pocketcasts.images.R as IR
@@ -181,6 +185,7 @@ class PodcastsFragment :
             themeType = theme.activeTheme,
             onAdClick = ::openAd,
             onAdOptionsClick = ::openAdReportFlow,
+            onAdImpression = ::trackAdImpression,
         )
         this.bannerAdAdapter = bannerAdAdapter
 
@@ -486,8 +491,29 @@ class PodcastsFragment :
     private fun setupEmptyStateView() {
         val folderUuid = folderUuid
 
+        val emptyViewVisibilityFlow = callbackFlow<Boolean> {
+            val view = binding.emptyView
+            var isVisible = view.isVisible
+            send(isVisible)
+
+            val listener = object : ViewTreeObserver.OnGlobalLayoutListener {
+                override fun onGlobalLayout() {
+                    val newVisibility = view.isVisible
+                    if (isVisible != newVisibility) {
+                        isVisible = newVisibility
+                    }
+                    trySendBlocking(isVisible)
+                }
+            }
+            view.viewTreeObserver.addOnGlobalLayoutListener(listener)
+            awaitClose {
+                view.viewTreeObserver.removeOnGlobalLayoutListener(listener)
+            }
+        }
+
         binding.emptyView.setContentWithViewCompositionStrategy {
             val activeAd by viewModel.activeAd.collectAsState()
+            val isViewVisible by emptyViewVisibilityFlow.collectAsState(false)
 
             AppTheme(themeType = theme.activeTheme) {
                 Column(
@@ -505,6 +531,12 @@ class PodcastsFragment :
                             onAdClick = { openAd(ad) },
                             onOptionsClick = { openAdReportFlow(ad) },
                         )
+
+                        LaunchedEffect(ad.id, isViewVisible) {
+                            if (isViewVisible) {
+                                trackAdImpression(ad)
+                            }
+                        }
                     }
 
                     Spacer(
@@ -667,6 +699,7 @@ class PodcastsFragment :
     }
 
     private fun openAd(ad: BlazeAd) {
+        trackAdTapped(ad)
         runCatching {
             val intent = Intent(Intent.ACTION_VIEW, ad.ctaUrl.toUri())
             startActivity(intent)
@@ -679,6 +712,26 @@ class PodcastsFragment :
                 .newInstance(ad, podcastColors = null)
                 .show(parentFragmentManager, "ad_report")
         }
+    }
+
+    private fun trackAdImpression(ad: BlazeAd) {
+        analyticsTracker.track(
+            AnalyticsEvent.BANNER_AD_IMPRESSION,
+            mapOf(
+                "promotion" to "podcast_list",
+                "id" to ad.id,
+            ),
+        )
+    }
+
+    fun trackAdTapped(ad: BlazeAd) {
+        analyticsTracker.track(
+            AnalyticsEvent.BANNER_AD_TAPPED,
+            mapOf(
+                "promotion" to "podcast_list",
+                "id" to ad.id,
+            ),
+        )
     }
 
     inner class SpaceItemDecoration : RecyclerView.ItemDecoration() {

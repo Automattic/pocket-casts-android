@@ -74,7 +74,6 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flow
-import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.rx2.asObservable
@@ -777,6 +776,26 @@ class PlayerViewModel @Inject constructor(
                 put(AnalyticsProp.SETTINGS, settings)
             },
             sourceView = SourceView.PLAYER_PLAYBACK_EFFECTS,
+        )
+    }
+
+    fun trackAdImpression(ad: BlazeAd) {
+        analyticsTracker.track(
+            AnalyticsEvent.BANNER_AD_IMPRESSION,
+            mapOf(
+                "promotion" to "player",
+                "id" to ad.id,
+            ),
+        )
+    }
+
+    fun trackAdTapped(ad: BlazeAd) {
+        analyticsTracker.track(
+            AnalyticsEvent.BANNER_AD_TAPPED,
+            mapOf(
+                "promotion" to "player",
+                "id" to ad.id,
+            ),
         )
     }
 
