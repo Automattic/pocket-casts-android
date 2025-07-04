@@ -1,6 +1,7 @@
 package au.com.shiftyjelly.pocketcasts.account.onboarding.upgrade
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -12,6 +13,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentHeight
@@ -19,13 +21,19 @@ import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.pager.VerticalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
 import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.drawWithContent
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
@@ -36,12 +44,17 @@ import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
 import au.com.shiftyjelly.pocketcasts.account.onboarding.components.UpgradeFeatureItem
+import au.com.shiftyjelly.pocketcasts.account.onboarding.upgrade.OnboardingUpgradeHelper.PrivacyPolicy
+import au.com.shiftyjelly.pocketcasts.account.onboarding.upgrade.OnboardingUpgradeHelper.UpgradeRowButton
 import au.com.shiftyjelly.pocketcasts.compose.AppThemeWithBackground
 import au.com.shiftyjelly.pocketcasts.compose.components.TextH10
+import au.com.shiftyjelly.pocketcasts.compose.components.TextH40
+import au.com.shiftyjelly.pocketcasts.compose.components.TextH50
 import au.com.shiftyjelly.pocketcasts.compose.components.TextP40
 import au.com.shiftyjelly.pocketcasts.compose.components.TextP50
 import au.com.shiftyjelly.pocketcasts.compose.images.SubscriptionBadge
@@ -96,35 +109,83 @@ internal fun OnboardingUpgradeFeaturesScreen(
                     vertical = 16.dp,
                 ),
         ) {
+            val create = OnboardingSubscriptionPlan.create(
+                SubscriptionPlan.WithOffer(
+                    name = "plus", tier = SubscriptionTier.Plus, billingCycle = BillingCycle.Yearly, offer = SubscriptionOffer.Trial, pricingPhases = listOf(
+                        PricingPhase(
+                            price = Price(
+                                amount = BigDecimal.valueOf(0), currencyCode = "USD", formattedPrice = "$29.9"
+                            ),
+                            schedule = PricingSchedule(recurrenceMode = PricingSchedule.RecurrenceMode.Recurring(1), period = PricingSchedule.Period.Monthly, periodCount = 1)
+                        ),
+                        PricingPhase(
+                            price = Price(
+                                amount = BigDecimal.valueOf(39.9), currencyCode = "USD", formattedPrice = "$29.9"
+                            ),
+                            schedule = PricingSchedule(recurrenceMode = PricingSchedule.RecurrenceMode.Infinite, period = PricingSchedule.Period.Monthly, periodCount = 11)
+                        ),
+                    )
+                )
+            )
             UpgradeContent(
                 modifier = Modifier.weight(1f),
-                subscriptionPlan = OnboardingSubscriptionPlan.create(
-                    SubscriptionPlan.WithOffer(
-                        name = "plus", tier = SubscriptionTier.Plus, billingCycle = BillingCycle.Yearly, offer = SubscriptionOffer.Trial, pricingPhases = listOf(
-                            PricingPhase(
-                                price = Price(
-                                    amount = BigDecimal.valueOf(0), currencyCode = "USD", formattedPrice = "$29.9"
-                                ),
-                                schedule = PricingSchedule(recurrenceMode = PricingSchedule.RecurrenceMode.Recurring(1), period = PricingSchedule.Period.Monthly, periodCount = 1)
-                            ),
-                            PricingPhase(
-                                price = Price(
-                                    amount = BigDecimal.valueOf(39.9), currencyCode = "USD", formattedPrice = "$29.9"
-                                ),
-                                schedule = PricingSchedule(recurrenceMode = PricingSchedule.RecurrenceMode.Infinite, period = PricingSchedule.Period.Monthly, periodCount = 11)
-                            ),
-                        )
-                    )
-                ).getOrNull()!!
+                subscriptionPlan = create.getOrNull()!!
             )
-            Box(
+            FooterSection(
                 modifier = Modifier
-                    .fillMaxHeight(.3f)
-                    .fillMaxWidth()
-                    .background(color = Color.Blue)
+                    .fillMaxWidth(),
+                selectedPlan = create.getOrNull()!!,
+                onClickSubscribe = onSubscribePressed,
             )
         }
 
+    }
+}
+
+@Composable
+private fun FooterSection(
+    selectedPlan: OnboardingSubscriptionPlan,
+    onClickSubscribe: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    var isYearlySelected by remember { mutableStateOf(true) }
+
+    Column(
+        modifier = modifier
+    ) {
+        TierSelector(
+            plan = "Yearly plan",
+            priceAndPeriod = "$39.99/year",
+            pricePerWeek = "$0.77/week",
+            isSelected = isYearlySelected,
+            onSelected = { isYearlySelected = true },
+            savings = "Save 16%",
+        )
+        Spacer(modifier = Modifier.height(10.dp))
+        TierSelector(
+            plan = "Monthly plan",
+            priceAndPeriod = "$3.99/month",
+            isSelected = !isYearlySelected,
+            onSelected = { isYearlySelected = false },
+        )
+        Spacer(modifier = Modifier.height(16.dp))
+        UpgradeRowButton(
+            primaryText = selectedPlan.ctaButtonText(isRenewingSubscription = false),
+            backgroundColor = MaterialTheme.theme.colors.primaryInteractive01,
+            textColor = MaterialTheme.theme.colors.primaryInteractive02,
+            fontWeight = FontWeight.W500,
+            onClick = onClickSubscribe,
+            modifier = Modifier
+                .fillMaxWidth()
+                .heightIn(min = 48.dp),
+        )
+        Spacer(modifier = Modifier.height(12.dp))
+        PrivacyPolicy(
+            color = MaterialTheme.theme.colors.secondaryText02,
+            textAlign = TextAlign.Center,
+            onPrivacyPolicyClick = {},
+            onTermsAndConditionsClick = {}
+        )
     }
 }
 
@@ -306,6 +367,109 @@ private enum class ScheduleItemConnection {
     TOP,
     BOTTOM,
     TOP_AND_BOTTOM
+}
+
+@Composable
+private fun TierSelector(
+    plan: String,
+    priceAndPeriod: String,
+    isSelected: Boolean,
+    onSelected: () -> Unit,
+    modifier: Modifier = Modifier,
+    savings: String? = null,
+    pricePerWeek: String? = null,
+) {
+    Box(modifier = modifier) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .offset(y = 13.dp)
+                .clip(RoundedCornerShape(12.dp))
+                .then(
+                    if (isSelected) {
+                        Modifier.border(
+                            width = 2.dp,
+                            color = MaterialTheme.theme.colors.primaryInteractive01,
+                            shape = RoundedCornerShape(12.dp),
+                        )
+                    } else {
+                        Modifier
+                    }
+                )
+                .background(
+                    color = MaterialTheme.theme.colors.primaryUi03,
+                )
+                .clickable { onSelected() }
+                .padding(16.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(16.dp),
+        ) {
+            Box(
+                modifier = Modifier
+                    .size(24.dp)
+                    .clip(CircleShape)
+                    .then(
+                        if (isSelected) {
+                            Modifier.background(color = MaterialTheme.theme.colors.primaryInteractive01)
+                        } else Modifier.border(
+                            width = 2.dp,
+                            color = MaterialTheme.theme.colors.primaryIcon02,
+                            shape = CircleShape,
+                        )
+                    ),
+                contentAlignment = Alignment.Center
+            ) {
+                if (isSelected) {
+                    Icon(
+                        painter = painterResource(IR.drawable.ic_check),
+                        contentDescription = "",
+                        tint = MaterialTheme.theme.colors.primaryInteractive02,
+                    )
+                }
+            }
+
+            Column(modifier = Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(7.dp)) {
+                TextH40(
+                    text = plan,
+                    color = MaterialTheme.theme.colors.primaryText01,
+                    fontWeight = FontWeight.W700
+                )
+                TextH40(
+                    text = priceAndPeriod,
+                    color = MaterialTheme.theme.colors.secondaryText02
+                )
+            }
+            pricePerWeek?.let {
+                TextH40(
+                    text = pricePerWeek,
+                    color = MaterialTheme.theme.colors.secondaryText02,
+                )
+            }
+        }
+        savings?.let {
+            SavingsLabel(
+                savings = savings,
+                modifier = Modifier.align(alignment = Alignment.TopCenter)
+            )
+        }
+    }
+}
+
+@Composable
+private fun SavingsLabel(
+    savings: String,
+    modifier: Modifier = Modifier,
+) {
+    TextH50(
+        modifier = modifier
+            .background(
+                color = MaterialTheme.theme.colors.primaryInteractive01,
+                shape = RoundedCornerShape(12.dp)
+            )
+            .padding(horizontal = 12.dp, vertical = 2.dp),
+        text = savings,
+        color = MaterialTheme.theme.colors.primaryInteractive02,
+    )
 }
 
 @Preview

@@ -2475,5 +2475,7 @@
     <string name="onboarding_upgrade_features_wear">Apps for Wear OS and Apple Watch</string>
     <string name="onboarding_upgrade_features_slumber"><![CDATA[1 year of content from <a href="https://slumberstudios.com/">Slumber&#160;Studios</a>]]></string>
     <string name="onboarding_upgrade_features_trial_schedule">How does the free trial work?</string>
-
+    <string name="onboarding_upgrade_billing_cycle_monthly">Monthly plan</string>
+    <string name="onboarding_upgrade_billing_cycle_yearly">Yearly plan</string>
+    <string name="onboarding_upgrade_save_percent">Save %1$d%</string>
 </resources>
