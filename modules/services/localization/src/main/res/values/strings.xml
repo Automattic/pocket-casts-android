@@ -2473,8 +2473,7 @@
     <string name="onboarding_upgrade_features_files">20 GB Cloud Storage for your files</string>
     <string name="onboarding_upgrade_features_themes">Extra Themes and App Icons</string>
     <string name="onboarding_upgrade_features_wear">Apps for Wear OS and Apple Watch</string>
-    <string name="onboarding_upgrade_features_slumber">1 year of content from Slumber Studios</string>
-    <string name="onboarding_upgrade_features_libro">Free audiobook from Libro.fm</string>
+    <string name="onboarding_upgrade_features_slumber"><![CDATA[1 year of content from <a href="https://slumberstudios.com/">Slumber&#160;Studios</a>]]></string>
     <string name="onboarding_upgrade_features_trial_schedule">How does the free trial work?</string>
 
 </resources>

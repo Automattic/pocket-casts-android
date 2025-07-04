@@ -32,35 +32,67 @@ enum class PlusUpgradeFeatureItem(
     },
     Folders(
         image = IR.drawable.ic_plus_feature_folder,
-        title = LR.string.onboarding_plus_feature_folders_title,
+        title = if (FeatureFlag.isEnabled(Feature.NEW_ONBOARDING_UPGRADE)) {
+            LR.string.onboarding_upgrade_features_folders
+        } else {
+            LR.string.onboarding_plus_feature_folders_title
+        },
     ),
     UpNextShuffle(
         image = IR.drawable.ic_plus_feature_shuffle,
-        title = LR.string.onboarding_plus_feature_up_next_shuffle_title,
+        title = if (FeatureFlag.isEnabled(Feature.NEW_ONBOARDING_UPGRADE)) {
+            LR.string.onboarding_upgrade_features_shuffle
+        } else {
+            LR.string.onboarding_plus_feature_up_next_shuffle_title
+        },
     ),
     Bookmarks(
         image = IR.drawable.ic_plus_feature_bookmark,
-        title = LR.string.onboarding_plus_feature_bookmarks_title,
+        title = if (FeatureFlag.isEnabled(Feature.NEW_ONBOARDING_UPGRADE)) {
+            LR.string.onboarding_upgrade_features_bookmarks
+        } else {
+            LR.string.onboarding_plus_feature_bookmarks_title
+        },
     ),
     SkipChapters(
         image = IR.drawable.ic_plus_feature_chapters,
-        title = LR.string.onboarding_plus_feature_chapters_title,
+        title = if (FeatureFlag.isEnabled(Feature.NEW_ONBOARDING_UPGRADE)) {
+            LR.string.onboarding_upgrade_features_chapters
+        } else {
+            LR.string.onboarding_plus_feature_chapters_title
+        },
     ),
     CloudStorage(
         image = IR.drawable.ic_plus_feature_cloud_storage,
-        title = LR.string.onboarding_plus_feature_cloud_storage_title,
+        title = if (FeatureFlag.isEnabled(Feature.NEW_ONBOARDING_UPGRADE)) {
+            LR.string.onboarding_upgrade_features_files
+        } else {
+            LR.string.onboarding_plus_feature_cloud_storage_title
+        },
     ),
     WatchPlayback(
         image = IR.drawable.ic_plus_feature_wearable,
-        title = LR.string.onboarding_plus_feature_watch_playback,
+        title = if (FeatureFlag.isEnabled(Feature.NEW_ONBOARDING_UPGRADE)) {
+            LR.string.onboarding_upgrade_features_wear
+        } else {
+            LR.string.onboarding_plus_feature_watch_playback
+        },
     ),
     ThemesIcons(
         image = IR.drawable.ic_plus_feature_themes,
-        title = LR.string.onboarding_plus_feature_extra_themes_icons_title,
+        title = if (FeatureFlag.isEnabled(Feature.NEW_ONBOARDING_UPGRADE)) {
+            LR.string.onboarding_upgrade_features_themes
+        } else {
+            LR.string.onboarding_plus_feature_extra_themes_icons_title
+        },
     ),
     SlumberStudiosPromo(
         image = IR.drawable.ic_plus_feature_slumber_studios,
-        title = LR.string.onboarding_plus_feature_slumber_studios_title,
+        title = if (FeatureFlag.isEnabled(Feature.NEW_ONBOARDING_UPGRADE)) {
+            LR.string.onboarding_upgrade_features_slumber
+        } else {
+            LR.string.onboarding_plus_feature_slumber_studios_title
+        },
     ) {
         override val isMonthlyFeature get() = false
         override val isYearlyFeature get() = FeatureFlag.isEnabled(Feature.SLUMBER_STUDIOS_YEARLY_PROMO)

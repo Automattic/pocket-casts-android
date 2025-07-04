@@ -100,7 +100,7 @@ internal fun OnboardingUpgradeFeaturesScreen(
                 modifier = Modifier.weight(1f),
                 subscriptionPlan = OnboardingSubscriptionPlan.create(
                     SubscriptionPlan.WithOffer(
-                        name = "plus", tier = SubscriptionTier.Plus, billingCycle = BillingCycle.Monthly, offer = SubscriptionOffer.Trial, pricingPhases = listOf(
+                        name = "plus", tier = SubscriptionTier.Plus, billingCycle = BillingCycle.Yearly, offer = SubscriptionOffer.Trial, pricingPhases = listOf(
                             PricingPhase(
                                 price = Price(
                                     amount = BigDecimal.valueOf(0), currencyCode = "USD", formattedPrice = "$29.9"
@@ -183,7 +183,11 @@ private fun FeaturesContent(
 ) {
     Column {
         featureList.forEach {
-            UpgradeFeatureItem(it)
+            UpgradeFeatureItem(
+                item = it,
+                textColor = MaterialTheme.theme.colors.secondaryText02,
+                iconColor = MaterialTheme.theme.colors.primaryText01,
+            )
         }
         Spacer(modifier = Modifier.height(24.dp))
         onShowScheduleClicked?.let {
