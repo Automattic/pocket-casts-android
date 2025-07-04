@@ -8,12 +8,10 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
-import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentHeight
@@ -40,6 +38,7 @@ import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.painter.Painter
+import androidx.compose.ui.layout.SubcomposeLayout
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -127,11 +126,14 @@ internal fun OnboardingUpgradeFeaturesScreen(
                     )
                 )
             )
+            UpgradeHeader(subscriptionPlan = create.getOrNull()!!)
+            Spacer(modifier = Modifier.height(24.dp))
             UpgradeContent(
                 modifier = Modifier.weight(1f),
                 subscriptionPlan = create.getOrNull()!!
             )
-            FooterSection(
+            Spacer(modifier = Modifier.height(16.dp))
+            UpgradeFooter(
                 modifier = Modifier
                     .fillMaxWidth(),
                 selectedPlan = create.getOrNull()!!,
@@ -143,7 +145,7 @@ internal fun OnboardingUpgradeFeaturesScreen(
 }
 
 @Composable
-private fun FooterSection(
+private fun UpgradeFooter(
     selectedPlan: OnboardingSubscriptionPlan,
     onClickSubscribe: () -> Unit,
     modifier: Modifier = Modifier
@@ -154,16 +156,16 @@ private fun FooterSection(
         modifier = modifier
     ) {
         TierSelector(
-            plan = "Yearly plan",
+            plan = stringResource(LR.string.onboarding_upgrade_billing_cycle_yearly),
             priceAndPeriod = "$39.99/year",
             pricePerWeek = "$0.77/week",
             isSelected = isYearlySelected,
             onSelected = { isYearlySelected = true },
-            savings = "Save 16%",
+            savings = stringResource(LR.string.onboarding_upgrade_save_percent, 16),
         )
         Spacer(modifier = Modifier.height(10.dp))
         TierSelector(
-            plan = "Monthly plan",
+            plan = stringResource(LR.string.onboarding_upgrade_billing_cycle_monthly),
             priceAndPeriod = "$3.99/month",
             isSelected = !isYearlySelected,
             onSelected = { isYearlySelected = false },
@@ -190,9 +192,9 @@ private fun FooterSection(
 }
 
 @Composable
-private fun UpgradeContent(
+private fun UpgradeHeader(
     subscriptionPlan: OnboardingSubscriptionPlan,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
     Column(modifier = modifier) {
         SubscriptionBadge(
@@ -209,8 +211,15 @@ private fun UpgradeContent(
             text = stringResource(LR.string.onboarding_upgrade_generic_title),
             color = MaterialTheme.theme.colors.primaryText01,
         )
-        Spacer(modifier = Modifier.height(24.dp))
+    }
+}
 
+@Composable
+private fun UpgradeContent(
+    subscriptionPlan: OnboardingSubscriptionPlan,
+    modifier: Modifier = Modifier
+) {
+    Column(modifier = modifier) {
         val pagerState = rememberPagerState(initialPage = 0) { 2 }
         val coroutineScope = rememberCoroutineScope()
         VerticalPager(state = pagerState, modifier = Modifier.fillMaxSize()) { page ->
@@ -219,7 +228,7 @@ private fun UpgradeContent(
                     featureList = subscriptionPlan.featureItems,
                     onShowScheduleClicked = {
                         coroutineScope.launch {
-                            pagerState.animateScrollToPage(0)
+                            pagerState.animateScrollToPage(1)
                         }
                     },
                 )
@@ -228,7 +237,7 @@ private fun UpgradeContent(
                     pricingPhase = subscriptionPlan.pricingPhase,
                     onShowFeaturesClicked = {
                         coroutineScope.launch {
-                            pagerState.animateScrollToPage(1)
+                            pagerState.animateScrollToPage(0)
                         }
                     },
                 )
@@ -379,77 +388,111 @@ private fun TierSelector(
     savings: String? = null,
     pricePerWeek: String? = null,
 ) {
-    Box(modifier = modifier) {
-        Row(
+    SubcomposeLayout(modifier = modifier) { constraints ->
+        val savingsBadge = savings?.let {
+            val badgeMeasurable = subcompose("savings") {
+                SavingsLabel(
+                    savings = savings,
+                )
+            }
+            badgeMeasurable.first().measure(constraints)
+        }
+        val badgeHeight = savingsBadge?.height ?: 0
+
+        val row = subcompose("selector_row") {
+            PlanRow(
+                modifier = Modifier.fillMaxWidth(),
+                plan = plan,
+                priceAndPeriod = priceAndPeriod,
+                isSelected = isSelected,
+                onSelected = onSelected,
+                pricePerWeek = pricePerWeek,
+            )
+        }
+        val placeable = row.first().measure(constraints)
+        val rowWidth = placeable.width
+        val rowHeight = placeable.height
+
+        val totalHeight = rowHeight + badgeHeight / 2
+        layout(rowWidth, totalHeight) {
+            placeable.placeRelative(x = 0, y = badgeHeight / 2)
+            savingsBadge?.let {
+                it.placeRelative(x = (rowWidth - it.width) / 2, y = 0)
+            }
+        }
+    }
+}
+
+@Composable
+private fun PlanRow(
+    plan: String,
+    priceAndPeriod: String,
+    isSelected: Boolean,
+    onSelected: () -> Unit,
+    modifier: Modifier = Modifier,
+    pricePerWeek: String? = null,
+) {
+    Row(
+        modifier = modifier
+            .clip(RoundedCornerShape(12.dp))
+            .then(
+                if (isSelected) {
+                    Modifier.border(
+                        width = 2.dp,
+                        color = MaterialTheme.theme.colors.primaryInteractive01,
+                        shape = RoundedCornerShape(12.dp),
+                    )
+                } else {
+                    Modifier
+                }
+            )
+            .background(
+                color = MaterialTheme.theme.colors.primaryUi03,
+            )
+            .clickable { onSelected() }
+            .padding(16.dp),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(16.dp),
+    ) {
+        Box(
             modifier = Modifier
-                .fillMaxWidth()
-                .offset(y = 13.dp)
-                .clip(RoundedCornerShape(12.dp))
+                .size(24.dp)
+                .clip(CircleShape)
                 .then(
                     if (isSelected) {
-                        Modifier.border(
-                            width = 2.dp,
-                            color = MaterialTheme.theme.colors.primaryInteractive01,
-                            shape = RoundedCornerShape(12.dp),
-                        )
-                    } else {
-                        Modifier
-                    }
-                )
-                .background(
-                    color = MaterialTheme.theme.colors.primaryUi03,
-                )
-                .clickable { onSelected() }
-                .padding(16.dp),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy(16.dp),
-        ) {
-            Box(
-                modifier = Modifier
-                    .size(24.dp)
-                    .clip(CircleShape)
-                    .then(
-                        if (isSelected) {
-                            Modifier.background(color = MaterialTheme.theme.colors.primaryInteractive01)
-                        } else Modifier.border(
-                            width = 2.dp,
-                            color = MaterialTheme.theme.colors.primaryIcon02,
-                            shape = CircleShape,
-                        )
-                    ),
-                contentAlignment = Alignment.Center
-            ) {
-                if (isSelected) {
-                    Icon(
-                        painter = painterResource(IR.drawable.ic_check),
-                        contentDescription = "",
-                        tint = MaterialTheme.theme.colors.primaryInteractive02,
+                        Modifier.background(color = MaterialTheme.theme.colors.primaryInteractive01)
+                    } else Modifier.border(
+                        width = 2.dp,
+                        color = MaterialTheme.theme.colors.primaryIcon02,
+                        shape = CircleShape,
                     )
-                }
-            }
-
-            Column(modifier = Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(7.dp)) {
-                TextH40(
-                    text = plan,
-                    color = MaterialTheme.theme.colors.primaryText01,
-                    fontWeight = FontWeight.W700
-                )
-                TextH40(
-                    text = priceAndPeriod,
-                    color = MaterialTheme.theme.colors.secondaryText02
-                )
-            }
-            pricePerWeek?.let {
-                TextH40(
-                    text = pricePerWeek,
-                    color = MaterialTheme.theme.colors.secondaryText02,
+                ),
+            contentAlignment = Alignment.Center
+        ) {
+            if (isSelected) {
+                Icon(
+                    painter = painterResource(IR.drawable.ic_check),
+                    contentDescription = "",
+                    tint = MaterialTheme.theme.colors.primaryInteractive02,
                 )
             }
         }
-        savings?.let {
-            SavingsLabel(
-                savings = savings,
-                modifier = Modifier.align(alignment = Alignment.TopCenter)
+
+        Column(modifier = Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(7.dp)) {
+            TextH40(
+                text = plan,
+                color = MaterialTheme.theme.colors.primaryText01,
+                fontWeight = FontWeight.W700
+            )
+            TextH40(
+                text = priceAndPeriod,
+                color = MaterialTheme.theme.colors.secondaryText02
+            )
+        }
+        pricePerWeek?.let {
+            TextH40(
+                text = pricePerWeek,
+                color = MaterialTheme.theme.colors.secondaryText02,
             )
         }
     }
