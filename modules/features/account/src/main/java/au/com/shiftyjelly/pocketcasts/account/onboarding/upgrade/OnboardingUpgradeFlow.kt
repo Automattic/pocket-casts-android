@@ -26,6 +26,8 @@ import au.com.shiftyjelly.pocketcasts.payment.SubscriptionTier
 import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingFlow
 import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingUpgradeSource
 import au.com.shiftyjelly.pocketcasts.utils.extensions.getActivity
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import kotlinx.coroutines.launch
 
@@ -115,32 +117,36 @@ fun OnboardingUpgradeFlow(
         sheetShape = RoundedCornerShape(topStart = 28.dp, topEnd = 28.dp),
         content = {
             if (flow !is OnboardingFlow.PlusAccountUpgrade) {
-                OnboardingUpgradeFeaturesPage(
-                    viewModel = viewModel,
-                    state = state,
-                    flow = flow,
-                    source = source,
-                    onBackPressed = onBackPressed,
-                    onClickSubscribe = { showUpgradeBottomSheet ->
-                        if (activity != null) {
-                            if (isLoggedIn) {
-                                if (showUpgradeBottomSheet) {
-                                    coroutineScope.launch {
-                                        sheetState.show()
+                if (FeatureFlag.isEnabled(Feature.NEW_ONBOARDING_UPGRADE)) {
+                    OnboardingUpgradeVariantsScreen(onClosePressed = onBackPressed, onPlanChanged = {}, onSubscribePressed = {})
+                } else {
+                    OnboardingUpgradeFeaturesPage(
+                        viewModel = viewModel,
+                        state = state,
+                        flow = flow,
+                        source = source,
+                        onBackPressed = onBackPressed,
+                        onClickSubscribe = { showUpgradeBottomSheet ->
+                            if (activity != null) {
+                                if (isLoggedIn) {
+                                    if (showUpgradeBottomSheet) {
+                                        coroutineScope.launch {
+                                            sheetState.show()
+                                        }
+                                    } else {
+                                        viewModel.purchaseSelectedPlan(activity, onProceed)
                                     }
                                 } else {
-                                    viewModel.purchaseSelectedPlan(activity, onProceed)
+                                    onNeedLogin()
                                 }
                             } else {
-                                onNeedLogin()
+                                LogBuffer.e(LogBuffer.TAG_SUBSCRIPTIONS, NULL_ACTIVITY_ERROR)
                             }
-                        } else {
-                            LogBuffer.e(LogBuffer.TAG_SUBSCRIPTIONS, NULL_ACTIVITY_ERROR)
-                        }
-                    },
-                    onNotNowPressed = onProceed,
-                    onUpdateSystemBars = onUpdateSystemBars,
-                )
+                        },
+                        onNotNowPressed = onProceed,
+                        onUpdateSystemBars = onUpdateSystemBars,
+                    )
+                }
             }
         },
         sheetContent = {

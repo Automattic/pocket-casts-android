@@ -16,6 +16,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.layout.wrapContentWidth
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.pager.VerticalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.shape.CircleShape
@@ -74,7 +75,7 @@ import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 @Composable
-internal fun OnboardingUpgradeFeaturesScreen(
+fun OnboardingUpgradeVariantsScreen(
     onClosePressed: () -> Unit,
     onPlanChanged: (SubscriptionPlan) -> Unit,
     onSubscribePressed: () -> Unit,
@@ -110,18 +111,30 @@ internal fun OnboardingUpgradeFeaturesScreen(
         ) {
             val create = OnboardingSubscriptionPlan.create(
                 SubscriptionPlan.WithOffer(
-                    name = "plus", tier = SubscriptionTier.Plus, billingCycle = BillingCycle.Yearly, offer = SubscriptionOffer.Trial, pricingPhases = listOf(
+                    name = "plus",
+                    tier = SubscriptionTier.Plus,
+                    billingCycle = BillingCycle.Yearly,
+                    offer = SubscriptionOffer.Trial,
+                    pricingPhases = listOf(
                         PricingPhase(
                             price = Price(
                                 amount = BigDecimal.valueOf(0), currencyCode = "USD", formattedPrice = "$29.9"
                             ),
-                            schedule = PricingSchedule(recurrenceMode = PricingSchedule.RecurrenceMode.Recurring(1), period = PricingSchedule.Period.Monthly, periodCount = 1)
+                            schedule = PricingSchedule(
+                                recurrenceMode = PricingSchedule.RecurrenceMode.Recurring(1),
+                                period = PricingSchedule.Period.Monthly,
+                                periodCount = 1
+                            )
                         ),
                         PricingPhase(
                             price = Price(
                                 amount = BigDecimal.valueOf(39.9), currencyCode = "USD", formattedPrice = "$29.9"
                             ),
-                            schedule = PricingSchedule(recurrenceMode = PricingSchedule.RecurrenceMode.Infinite, period = PricingSchedule.Period.Monthly, periodCount = 11)
+                            schedule = PricingSchedule(
+                                recurrenceMode = PricingSchedule.RecurrenceMode.Infinite,
+                                period = PricingSchedule.Period.Monthly,
+                                periodCount = 11
+                            )
                         ),
                     )
                 )
@@ -251,21 +264,25 @@ private fun FeaturesContent(
     featureList: List<UpgradeFeatureItem>,
     onShowScheduleClicked: (() -> Unit)? = null,
 ) {
-    Column {
+    LazyColumn {
         featureList.forEach {
-            UpgradeFeatureItem(
-                item = it,
-                textColor = MaterialTheme.theme.colors.secondaryText02,
-                iconColor = MaterialTheme.theme.colors.primaryText01,
-            )
+            item {
+                UpgradeFeatureItem(
+                    item = it,
+                    textColor = MaterialTheme.theme.colors.secondaryText02,
+                    iconColor = MaterialTheme.theme.colors.primaryText01,
+                )
+            }
         }
-        Spacer(modifier = Modifier.height(24.dp))
-        onShowScheduleClicked?.let {
-            TextP40(
-                text = stringResource(LR.string.onboarding_upgrade_features_trial_schedule),
-                modifier = Modifier.clickable { it() },
-                color = MaterialTheme.theme.colors.primaryInteractive01
-            )
+        item {
+            onShowScheduleClicked?.let {
+                Spacer(modifier = Modifier.height(24.dp))
+                TextP40(
+                    text = stringResource(LR.string.onboarding_upgrade_features_trial_schedule),
+                    modifier = Modifier.clickable { it() },
+                    color = MaterialTheme.theme.colors.primaryInteractive01
+                )
+            }
         }
     }
 }
@@ -316,8 +333,8 @@ private fun ScheduleContent(
                 connection = ScheduleItemConnection.TOP,
             )
         }
-        Spacer(modifier = Modifier.height(24.dp))
         onShowFeaturesClicked?.let {
+            Spacer(modifier = Modifier.height(24.dp))
             TextP40(
                 text = stringResource(LR.string.onboarding_upgrade_schedule_see_features),
                 modifier = Modifier.clickable { it() },
@@ -521,7 +538,7 @@ private fun PreviewOnboardingUpgradeFeaturesScreen(
     @PreviewParameter(ThemePreviewParameterProvider::class) theme: ThemeType,
 ) {
     AppThemeWithBackground(theme) {
-        OnboardingUpgradeFeaturesScreen(
+        OnboardingUpgradeVariantsScreen(
             modifier = Modifier.fillMaxSize(),
             onSubscribePressed = {},
             onPlanChanged = {},
