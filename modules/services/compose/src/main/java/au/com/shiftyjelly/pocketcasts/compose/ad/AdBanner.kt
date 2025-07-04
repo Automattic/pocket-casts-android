@@ -34,6 +34,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalInspectionMode
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -57,6 +58,7 @@ import au.com.shiftyjelly.pocketcasts.compose.extensions.fractionedSp
 import au.com.shiftyjelly.pocketcasts.compose.preview.ThemePreviewParameterProvider
 import au.com.shiftyjelly.pocketcasts.compose.theme
 import au.com.shiftyjelly.pocketcasts.repositories.images.PocketCastsImageRequestFactory
+import au.com.shiftyjelly.pocketcasts.repositories.images.PocketCastsImageRequestFactory.PlaceholderType
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme.ThemeType
 import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
@@ -95,9 +97,11 @@ fun AdBanner(
             ) {
                 val context = LocalContext.current
                 val theme = MaterialTheme.theme
+                val isPreview = LocalInspectionMode.current
                 CoilImage(
                     imageRequest = remember(context, theme.isDark, ad.imageUrl) {
-                        PocketCastsImageRequestFactory(context).createForFileOrUrl(ad.imageUrl)
+                        val placeholder = if (isPreview) PlaceholderType.Small else PlaceholderType.None
+                        PocketCastsImageRequestFactory(context, placeholderType = placeholder).createForFileOrUrl(ad.imageUrl)
                     },
                     title = stringResource(LR.string.ad_image),
                     showTitle = false,
