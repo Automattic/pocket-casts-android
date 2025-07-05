@@ -815,8 +815,6 @@ class PlayerHeaderFragment : BaseFragment(), PlayerClickListener {
                     onAdClick = { openAd(ad) },
                     onOptionsClick = { openAdReportSheet(ad, playerColors.podcastColors) },
                 )
-                LaunchedEffect(ad.id) {
-                }
                 Spacer(
                     modifier = Modifier.weight(3f),
                 )
