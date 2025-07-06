@@ -166,6 +166,13 @@ class PodcastsFragment :
     private val folderUuid: String?
         get() = arguments?.getString(ARG_FOLDER_UUID)
 
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+
+        podcastOptionsDialog = createPodcastOptionsDialog()
+        folderOptionsDialog = createFolderOptionsDialog()
+    }
+
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         val context = context ?: return null
         realBinding = FragmentPodcastsBinding.inflate(inflater, container, false)
@@ -395,34 +402,48 @@ class PodcastsFragment :
 
     private fun openOptions() {
         if (folderUuid != null) {
-            val folder = viewModel.uiState.value.folder ?: return
-            val onOpenSortOptions = {
-                analyticsTracker.track(AnalyticsEvent.FOLDER_OPTIONS_MODAL_OPTION_TAPPED, mapOf(OPTION_KEY to SORT_BY))
-            }
-            val onSortTypeChanged = { sort: PodcastsSortType ->
-                analyticsTracker.track(AnalyticsEvent.FOLDER_SORT_BY_CHANGED, mapOf(SORT_ORDER_KEY to sort.analyticsValue))
-                viewModel.updateFolderSort(folder.uuid, sort)
-            }
-            val onEditFolder = {
-                analyticsTracker.track(AnalyticsEvent.FOLDER_OPTIONS_MODAL_OPTION_TAPPED, mapOf(OPTION_KEY to EDIT_FOLDER))
-                analyticsTracker.track(AnalyticsEvent.FOLDER_EDIT_SHOWN)
-                val fragment = FolderEditFragment.newInstance(folderUuid = folder.uuid)
-                fragment.show(parentFragmentManager, "edit_folder_card")
-            }
-            val onAddOrRemovePodcast = {
-                analyticsTracker.track(AnalyticsEvent.FOLDER_ADD_PODCASTS_BUTTON_TAPPED)
-                analyticsTracker.track(AnalyticsEvent.FOLDER_CHOOSE_PODCASTS_SHOWN)
-                val fragment = FolderEditPodcastsFragment.newInstance(folderUuid = folder.uuid)
-                fragment.show(parentFragmentManager, "add_podcasts_card")
-            }
-            folderOptionsDialog = FolderOptionsDialog(folder, onOpenSortOptions, onSortTypeChanged, onEditFolder, onAddOrRemovePodcast, this, settings).apply {
-                show()
-            }
+            folderOptionsDialog = createFolderOptionsDialog()
+            folderOptionsDialog?.show()
         } else {
-            podcastOptionsDialog = PodcastsOptionsDialog(this, settings, analyticsTracker).apply {
-                show()
-            }
+            podcastOptionsDialog = createPodcastOptionsDialog()
+            podcastOptionsDialog?.show()
         }
+    }
+
+    private fun createPodcastOptionsDialog(): PodcastsOptionsDialog {
+        return PodcastsOptionsDialog(this, settings, analyticsTracker)
+    }
+
+    private fun createFolderOptionsDialog(): FolderOptionsDialog? {
+        val folder = viewModel.uiState.value.folder ?: return null
+        val onOpenSortOptions = {
+            analyticsTracker.track(AnalyticsEvent.FOLDER_OPTIONS_MODAL_OPTION_TAPPED, mapOf(OPTION_KEY to SORT_BY))
+        }
+        val onSortTypeChanged = { sort: PodcastsSortType ->
+            analyticsTracker.track(AnalyticsEvent.FOLDER_SORT_BY_CHANGED, mapOf(SORT_ORDER_KEY to sort.analyticsValue))
+            viewModel.updateFolderSort(folder.uuid, sort)
+        }
+        val onEditFolder = {
+            analyticsTracker.track(AnalyticsEvent.FOLDER_OPTIONS_MODAL_OPTION_TAPPED, mapOf(OPTION_KEY to EDIT_FOLDER))
+            analyticsTracker.track(AnalyticsEvent.FOLDER_EDIT_SHOWN)
+            val fragment = FolderEditFragment.newInstance(folderUuid = folder.uuid)
+            fragment.show(parentFragmentManager, "edit_folder_card")
+        }
+        val onAddOrRemovePodcast = {
+            analyticsTracker.track(AnalyticsEvent.FOLDER_ADD_PODCASTS_BUTTON_TAPPED)
+            analyticsTracker.track(AnalyticsEvent.FOLDER_CHOOSE_PODCASTS_SHOWN)
+            val fragment = FolderEditPodcastsFragment.newInstance(folderUuid = folder.uuid)
+            fragment.show(parentFragmentManager, "add_podcasts_card")
+        }
+        return FolderOptionsDialog(
+            folder,
+            onOpenSortOptions,
+            onSortTypeChanged,
+            onEditFolder,
+            onAddOrRemovePodcast,
+            this,
+            settings,
+        )
     }
 
     private fun handleFolderCreation() {
@@ -445,12 +466,6 @@ class PodcastsFragment :
                 .newInstance(source)
                 .show(parentFragmentManager, "suggested_folders")
         }
-    }
-
-    override fun onPause() {
-        super.onPause()
-        podcastOptionsDialog?.dismiss()
-        folderOptionsDialog?.dismiss()
     }
 
     override fun onConfigurationChanged(newConfig: Configuration) {

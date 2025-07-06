@@ -23,14 +23,14 @@ class PodcastsOptionsDialog(
     val settings: Settings,
     private val analyticsTracker: AnalyticsTracker,
 ) {
-    private var showDialog: OptionsDialog? = null
-    private var sortDialog: OptionsDialog? = null
-    private var badgeDialog: OptionsDialog? = null
+    private val showDialog: OptionsDialog
+    private val sortDialog: OptionsDialog
+    private val badgeDialog: OptionsDialog
     private val fragmentManager: FragmentManager?
         get() = fragment.activity?.supportFragmentManager
 
-    fun show() {
-        val dialog = OptionsDialog()
+    init {
+        showDialog = (fragmentManager?.findFragmentByTag(FRAGMENT_PODCASTS_OPTIONS_DIALOG) as? OptionsDialog ?: OptionsDialog())
             .addTextOption(
                 titleId = LR.string.podcasts_menu_sort_by,
                 imageId = IR.drawable.ic_sort,
@@ -91,28 +91,17 @@ class PodcastsOptionsDialog(
                     trackTapOnModalOption(ModalOption.SHARE)
                 },
             )
-        fragmentManager?.let {
-            dialog.show(it, "podcasts_options_dialog")
-            showDialog = dialog
-        }
-    }
 
-    private fun sharePodcasts() {
-        val activity = fragment.activity ?: return
-        activity.startActivity(Intent(activity, ShareListCreateActivity::class.java))
-    }
-
-    private fun openSortOptions() {
         val sortOrder = settings.podcastsSortType.value
-        val title = fragment.getString(LR.string.sort_by)
-        val dialog = OptionsDialog().setTitle(title)
+        sortDialog = fragmentManager?.findFragmentByTag(FRAGMENT_PODCASTS_SORT_DIALOG) as? OptionsDialog ?: OptionsDialog()
+        sortDialog.setTitle(fragment.getString(LR.string.sort_by))
         val sortOptions = if (FeatureFlag.isEnabled(Feature.PODCASTS_SORT_CHANGES)) {
             PodcastsSortType.entries
         } else {
             PodcastsSortType.entries.filterNot { it == PodcastsSortType.RECENTLY_PLAYED }
         }
         for (order in sortOptions) {
-            dialog.addCheckedOption(
+            sortDialog.addCheckedOption(
                 titleId = order.labelId,
                 checked = order.clientId == sortOrder.clientId,
                 click = {
@@ -121,17 +110,10 @@ class PodcastsOptionsDialog(
                 },
             )
         }
-        fragmentManager?.let {
-            dialog.show(it, "podcasts_sort_dialog")
-            sortDialog = dialog
-        }
-    }
 
-    private fun openBadgeOptions() {
         val badgeType: BadgeType = settings.podcastBadgeType.value
-        val title = fragment.getString(LR.string.podcasts_menu_badges)
-        val dialog = OptionsDialog()
-            .setTitle(title)
+        badgeDialog = (fragmentManager?.findFragmentByTag(FRAGMENT_PODCASTS_BADGES_DIALOG) as? OptionsDialog ?: OptionsDialog())
+            .setTitle(fragment.getString(LR.string.podcasts_menu_badges))
             .addCheckedOption(
                 titleId = LR.string.podcasts_badges_off,
                 checked = badgeType == BadgeType.OFF,
@@ -159,16 +141,29 @@ class PodcastsOptionsDialog(
                     trackBadgeChanged(newBadgeType)
                 },
             )
+    }
+
+    fun show() {
         fragmentManager?.let {
-            dialog.show(it, "podcasts_badges")
-            badgeDialog = dialog
+            showDialog.show(it, FRAGMENT_PODCASTS_OPTIONS_DIALOG)
         }
     }
 
-    fun dismiss() {
-        showDialog?.dismiss()
-        sortDialog?.dismiss()
-        badgeDialog?.dismiss()
+    private fun sharePodcasts() {
+        val activity = fragment.activity ?: return
+        activity.startActivity(Intent(activity, ShareListCreateActivity::class.java))
+    }
+
+    private fun openSortOptions() {
+        fragmentManager?.let {
+            sortDialog.show(it, FRAGMENT_PODCASTS_SORT_DIALOG)
+        }
+    }
+
+    private fun openBadgeOptions() {
+        fragmentManager?.let {
+            badgeDialog.show(it, FRAGMENT_PODCASTS_BADGES_DIALOG)
+        }
     }
 
     private fun trackTapOnModalOption(option: ModalOption) {
@@ -199,5 +194,9 @@ class PodcastsOptionsDialog(
         private const val SORT_BY_KEY = "sort_by"
         private const val LAYOUT_KEY = "layout"
         private const val TYPE_KEY = "type"
+
+        private const val FRAGMENT_PODCASTS_OPTIONS_DIALOG = "podcasts_options_dialog"
+        private const val FRAGMENT_PODCASTS_SORT_DIALOG = "podcasts_sort_dialog"
+        private const val FRAGMENT_PODCASTS_BADGES_DIALOG = "podcasts_badges"
     }
 }
