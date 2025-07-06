@@ -167,8 +167,9 @@ class ProfileViewModel @Inject constructor(
             ProfileSection.Bookmarks -> AnalyticsEvent.PROFILE_BOOKMARKS_SHOWN
             ProfileSection.ListeningHistory -> AnalyticsEvent.LISTENING_HISTORY_SHOWN
             ProfileSection.Help -> AnalyticsEvent.SETTINGS_HELP_SHOWN
+            ProfileSection.Hack -> null // don't track it for now
         }
-        tracker.track(event)
+        event?.let(tracker::track)
     }
 
     internal fun refreshProfile() {
