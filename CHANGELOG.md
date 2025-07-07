@@ -10,6 +10,8 @@
         ([#4153](https://github.com/Automattic/pocket-casts-android/pull/4153))
     *   Bring back landscape UI
         ([#4156](https://github.com/Automattic/pocket-casts-android/pull/4156))
+    *   Podcast and folder options dialogs will stay open through config changes (like screen rotation)
+        ([#4197](https://github.com/Automattic/pocket-casts-android/pull/4197))
 *   Bug Fixes
     *   Collapse player when opening a notification
         ([#4150](https://github.com/Automattic/pocket-casts-android/pull/4150))
