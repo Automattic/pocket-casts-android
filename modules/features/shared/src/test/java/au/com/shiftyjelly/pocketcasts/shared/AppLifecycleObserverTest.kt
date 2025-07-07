@@ -7,15 +7,16 @@ import au.com.shiftyjelly.pocketcasts.analytics.AppLifecycleAnalytics
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.preferences.UserSetting
 import au.com.shiftyjelly.pocketcasts.repositories.notification.NotificationScheduler
+import au.com.shiftyjelly.pocketcasts.sharedtest.MainCoroutineRule
 import au.com.shiftyjelly.pocketcasts.utils.AppPlatform
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.providers.DefaultReleaseFeatureProvider
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.providers.FirebaseRemoteFeatureProvider
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.providers.PreferencesFeatureProvider
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.test.runTest
 import org.junit.Before
+import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.Mock
@@ -76,6 +77,9 @@ class AppLifecycleObserverTest {
 
     @Mock private lateinit var notificationScheduler: NotificationScheduler
 
+    @get:Rule
+    val coroutineRule = MainCoroutineRule()
+
     lateinit var appLifecycleObserver: AppLifecycleObserver
 
     @Before
@@ -103,7 +107,7 @@ class AppLifecycleObserverTest {
             versionCode = VERSION_CODE_AFTER_SECOND_INSTALL,
             settings = settings,
             networkConnectionWatcher = networkConnectionWatcher,
-            applicationScope = CoroutineScope(Dispatchers.Default),
+            applicationScope = CoroutineScope(coroutineRule.testDispatcher),
             notificationScheduler = notificationScheduler,
         )
     }
