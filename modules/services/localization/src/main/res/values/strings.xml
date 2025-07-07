@@ -2422,50 +2422,36 @@
     <!-- Notifications -->
     <string name="notification_sync_title">Your shows, on any device!</string>
     <string name="notification_sync_message">Create a free account to sync your shows and listen anywhere.</string>
-
     <string name="notification_import_title">Easily import your podcasts</string>
     <string name="notification_import_message">Switching from another app? Bring all your favorite shows to Pocket Casts.</string>
-
     <string name="notification_up_next_title">Simplify your queue</string>
     <string name="notification_up_next_message">Build a playback queue and say goodbye to jumping around between episodes.</string>
-
     <string name="notification_filters_title">Organize your episodes</string>
     <string name="notification_filters_message">Create smart filters to organize your episodes.</string>
-
     <string name="notification_themes_title">Time for a new look</string>
     <string name="notification_themes_message">Browse our themes and find the one that suits your style.</string>
-
     <string name="notification_staff_picks_title">Explore our Staff Picks</string>
     <string name="notification_staff_picks_message">Perfectly ripe podcasts, picked just for you by real, podcast-loving humans.</string>
-
     <string name="notification_plus_upsell_title">Level up your podcast game</string>
     <string name="notification_plus_upsell_message">Unlock exclusive features like folders, bookmarks, and more with Plus!</string>
-
     <string name="notification_reengage_we_miss_you_title">We miss you!</string>
     <string name="notification_reengage_we_miss_you_message">It\'s been a while since you\'ve listened. Jump back in and enjoy!</string>
-
     <string name="notification_reengage_catch_up_offline_title">Catch up offline</string>
     <plurals name="notification_reengage_catch_up_offline_message">
         <item quantity="one">You have %d new episode downloaded and ready to go!</item>
         <item quantity="other">You have %d new episodes downloaded and ready to go!</item>
     </plurals>
-
     <string name="notification_content_recommendations_trending_title">Trending this week</string>
     <string name="notification_content_recommendations_trending_message">Check out what everyone else is listening this week.</string>
-
     <string name="notification_content_recommendations_title">New recommendations for you</string>
     <string name="notification_content_recommendations_message">Wondering what to listen to next? Check out these shows!</string>
-
     <string name="notifications_settings_turn_on_push_title">Turn on push notifications?</string>
     <string name="notifications_settings_turn_on_push_message">To get notifications from Pocket Casts, you\'ll need to turn them on in your device settings.</string>
     <string name="notifications_settings_turn_on_push_button">Go to device settings</string>
-
     <string name="notification_new_features_smart_folders_title">Your podcasts organized</string>
     <string name="notification_new_features_smart_folders_message">Try Plus and automatically organize your shows with folders</string>
-
     <string name="notification_offers_upgrade_title">Level up your podcast game</string>
     <string name="notification_offers_upgrade_message">Unblock exclusive features like folders, bookmarks, and more with Plus!</string>
-
     <string name="notification_prompt_title">Stay up to date!</string>
     <string name="notification_prompt_message">Notifications are the best way to keep track of new episodes, get recommendations of new shows and tips about Pocket Casts.</string>
     <string name="notification_prompt_cta">Allow Notifications</string>
@@ -2475,5 +2461,22 @@
 
     <!-- Onboarding Upgrade -->
     <string name="onboarding_upgrade_generic_title">Superpowers for your podcasts</string>
+    <string name="onboarding_upgrade_schedule_today">Today</string>
+    <string name="onboarding_upgrade_schedule_today_message">Get access to Folders, Shuffle, Bookmarks, and exclusive content</string>
+    <string name="onboarding_upgrade_schedule_day">Day %1$d</string>
+    <string name="onboarding_upgrade_schedule_notify">We\'ll notify you about your trial ending.</string>
+    <string name="onboarding_upgrade_schedule_billing">You\'ll be charged on %1$s. Cancel anytime before.</string>
+    <string name="onboarding_upgrade_schedule_see_features">See all Plus features</string>
+    <string name="onboarding_upgrade_features_folders">Tidy your collection with Folders</string>
+    <string name="onboarding_upgrade_features_shuffle">Shuffle your queue</string>
+    <string name="onboarding_upgrade_features_bookmarks">Keep timestamps with Bookmarks</string>
+    <string name="onboarding_upgrade_features_chapters">Save time with Preselect Chapters</string>
+    <string name="onboarding_upgrade_features_files">20 GB Cloud Storage for your files</string>
+    <string name="onboarding_upgrade_features_themes">Extra Themes and App Icons</string>
+    <string name="onboarding_upgrade_features_wear">Apps for Wear OS and Apple Watch</string>
+    <string name="onboarding_upgrade_features_slumber"><![CDATA[1 year of content from <a href="https://slumberstudios.com/">Slumber&#160;Studios</a>]]></string>
+    <string name="onboarding_upgrade_features_trial_schedule">How does the free trial work?</string>
+    <string name="onboarding_upgrade_billing_cycle_monthly">Monthly plan</string>
+    <string name="onboarding_upgrade_billing_cycle_yearly">Yearly plan</string>
     <string name="onboarding_upgrade_save_percent">Save %1$d\%%</string>
 </resources>
