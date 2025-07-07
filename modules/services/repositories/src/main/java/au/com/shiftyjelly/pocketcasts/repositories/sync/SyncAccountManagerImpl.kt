@@ -30,7 +30,8 @@ import kotlinx.coroutines.withContext
 open class SyncAccountManagerImpl @Inject constructor(
     private val tokenErrorNotification: TokenErrorNotification,
     private val accountManager: AccountManager,
-) : TokenHandler, SyncAccountManager {
+) : TokenHandler,
+    SyncAccountManager {
     override fun getAccount(): Account? {
         return accountManager.getAccountsByType(AccountConstants.ACCOUNT_TYPE).firstOrNull()
     }
@@ -75,10 +76,9 @@ open class SyncAccountManagerImpl @Inject constructor(
         }, BackpressureStrategy.BUFFER)
     }
 
-    override fun getUuid(): String? =
-        getAccount()?.let { account ->
-            accountManager.getUserData(account, AccountConstants.UUID)
-        }
+    override fun getUuid(): String? = getAccount()?.let { account ->
+        accountManager.getUserData(account, AccountConstants.UUID)
+    }
 
     override fun getLoginIdentity(): LoginIdentity? {
         val account = getAccount() ?: return null
@@ -86,14 +86,13 @@ open class SyncAccountManagerImpl @Inject constructor(
         return LoginIdentity.valueOf(loginIdentity) ?: LoginIdentity.PocketCasts
     }
 
-    override fun peekAccessToken(account: Account): AccessToken? =
-        accountManager.peekAuthToken(account, AccountConstants.TOKEN_TYPE)?.let {
-            if (it.isNotEmpty()) {
-                AccessToken(it)
-            } else {
-                null
-            }
+    override fun peekAccessToken(account: Account): AccessToken? = accountManager.peekAuthToken(account, AccountConstants.TOKEN_TYPE)?.let {
+        if (it.isNotEmpty()) {
+            AccessToken(it)
+        } else {
+            null
         }
+    }
 
     override suspend fun getAccessToken(): AccessToken? {
         val account = getAccount() ?: return null
@@ -173,15 +172,14 @@ open class SyncAccountManagerImpl @Inject constructor(
         accountManager.setAuthToken(account, AccountConstants.TOKEN_TYPE, accessToken.value)
     }
 
-    override fun getRefreshToken(account: Account?): RefreshToken? =
-        (account ?: getAccount())?.let {
-            val refreshToken = accountManager.getPassword(it)
-            if (refreshToken != null && refreshToken.isNotEmpty()) {
-                RefreshToken(refreshToken)
-            } else {
-                null
-            }
+    override fun getRefreshToken(account: Account?): RefreshToken? = (account ?: getAccount())?.let {
+        val refreshToken = accountManager.getPassword(it)
+        if (refreshToken != null && refreshToken.isNotEmpty()) {
+            RefreshToken(refreshToken)
+        } else {
+            null
         }
+    }
 
     override fun setEmail(email: String) {
         val account = getAccount() ?: return

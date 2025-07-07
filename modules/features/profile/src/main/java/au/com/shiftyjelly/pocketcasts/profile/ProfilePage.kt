@@ -106,7 +106,7 @@ internal fun ProfilePage(
                 item {
                     VerticalSpacer()
                 }
-                HeaderWithStats(
+                headerWithStats(
                     headerState = state.headerState,
                     statsState = state.statsState,
                     onHeaderClick = onHeaderClick,
@@ -275,7 +275,7 @@ private fun Toolbar(
     }
 }
 
-private fun LazyListScope.HeaderWithStats(
+private fun LazyListScope.headerWithStats(
     headerState: ProfileHeaderState,
     statsState: ProfileStatsState,
     onHeaderClick: () -> Unit,

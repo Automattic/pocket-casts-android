@@ -51,22 +51,20 @@ class LoggingInScreenViewModelTest {
     }
 
     @Test
-    fun `shouldClose with minimum delay when state is CompleteButDelaying`() =
-        runBlocking {
-            LoggingInScreenViewModel.State.CompleteButDelaying("test@email.com")
+    fun `shouldClose with minimum delay when state is CompleteButDelaying`() = runBlocking {
+        LoggingInScreenViewModel.State.CompleteButDelaying("test@email.com")
 
-            val result = testSubject.shouldClose(withMinimumDelay = true)
+        val result = testSubject.shouldClose(withMinimumDelay = true)
 
-            assertEquals(true, result)
-        }
+        assertEquals(true, result)
+    }
 
     @Test
-    fun `shouldClose without delay when state is CompleteButDelaying and withMinimumDelay is false`() =
-        runBlocking {
-            LoggingInScreenViewModel.State.CompleteButDelaying("test@email.com")
+    fun `shouldClose without delay when state is CompleteButDelaying and withMinimumDelay is false`() = runBlocking {
+        LoggingInScreenViewModel.State.CompleteButDelaying("test@email.com")
 
-            val result = testSubject.shouldClose(withMinimumDelay = false)
+        val result = testSubject.shouldClose(withMinimumDelay = false)
 
-            assertEquals(true, result)
-        }
+        assertEquals(true, result)
+    }
 }

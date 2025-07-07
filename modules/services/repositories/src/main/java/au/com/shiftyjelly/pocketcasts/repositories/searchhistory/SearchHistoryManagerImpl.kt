@@ -11,7 +11,8 @@ private const val MAX_HISTORY_COUNT = 20
 
 class SearchHistoryManagerImpl @Inject constructor(
     appDatabase: AppDatabase,
-) : SearchHistoryManager, CoroutineScope {
+) : SearchHistoryManager,
+    CoroutineScope {
 
     override val coroutineContext: CoroutineContext
         get() = Dispatchers.Default

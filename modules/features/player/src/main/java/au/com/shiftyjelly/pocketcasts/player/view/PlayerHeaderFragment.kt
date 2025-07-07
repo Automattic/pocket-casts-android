@@ -150,7 +150,9 @@ import au.com.shiftyjelly.pocketcasts.transcripts.UiState as TranscriptsUiState
 
 @OptIn(ExperimentalMaterial3WindowSizeClassApi::class)
 @AndroidEntryPoint
-class PlayerHeaderFragment : BaseFragment(), PlayerClickListener {
+class PlayerHeaderFragment :
+    BaseFragment(),
+    PlayerClickListener {
     @Inject
     lateinit var playbackManager: PlaybackManager
 
@@ -173,7 +175,7 @@ class PlayerHeaderFragment : BaseFragment(), PlayerClickListener {
         showViewBookmarksSnackbar(result)
     }
 
-    private val ShowUpNextFlingBehavior = object : FlingBehavior {
+    private val showUpNextFlingBehavior = object : FlingBehavior {
         override suspend fun ScrollScope.performFling(initialVelocity: Float): Float {
             if (isPlayerExpanded() && isUpNextCollapsed() && initialVelocity > 2000f) {
                 (parentFragment as PlayerContainerFragment).openUpNext()
@@ -642,7 +644,7 @@ class PlayerHeaderFragment : BaseFragment(), PlayerClickListener {
                     if (transitionData.isTranscriptOpen) {
                         Modifier
                     } else {
-                        Modifier.verticalScroll(scrollState, flingBehavior = ShowUpNextFlingBehavior)
+                        Modifier.verticalScroll(scrollState, flingBehavior = showUpNextFlingBehavior)
                     },
                 ),
         ) {
@@ -763,7 +765,7 @@ class PlayerHeaderFragment : BaseFragment(), PlayerClickListener {
                 modifier = Modifier
                     .weight(1f)
                     .fillMaxHeight()
-                    .verticalScroll(rememberScrollState(), flingBehavior = ShowUpNextFlingBehavior)
+                    .verticalScroll(rememberScrollState(), flingBehavior = showUpNextFlingBehavior)
                     .navigationBarsPadding(),
             ) {
                 AdAndArtworkHorizontal(
@@ -803,7 +805,7 @@ class PlayerHeaderFragment : BaseFragment(), PlayerClickListener {
                 modifier = Modifier
                     .weight(1f)
                     .fillMaxHeight()
-                    .verticalScroll(rememberScrollState(), flingBehavior = ShowUpNextFlingBehavior)
+                    .verticalScroll(rememberScrollState(), flingBehavior = showUpNextFlingBehavior)
                     .navigationBarsPadding(),
             ) {
                 Spacer(
@@ -832,7 +834,7 @@ class PlayerHeaderFragment : BaseFragment(), PlayerClickListener {
         Column(
             modifier = modifier
                 .fillMaxSize()
-                .verticalScroll(rememberScrollState(), flingBehavior = ShowUpNextFlingBehavior)
+                .verticalScroll(rememberScrollState(), flingBehavior = showUpNextFlingBehavior)
                 .navigationBarsPadding(),
         ) {
             Row {

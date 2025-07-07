@@ -44,7 +44,7 @@ class ShareListIncomingAdapter(
     private var description: String? = null
     private var podcasts: List<Podcast>? = null
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): androidx.recyclerview.widget.RecyclerView.ViewHolder {
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
         val inflater = LayoutInflater.from(parent.context)
 
         return when (viewType) {
@@ -55,7 +55,7 @@ class ShareListIncomingAdapter(
         }
     }
 
-    override fun onBindViewHolder(holder: androidx.recyclerview.widget.RecyclerView.ViewHolder, position: Int) {
+    override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
         val viewType = getItemViewType(position)
         when (viewType) {
             TYPE_PODCAST -> bindPodcastView(holder as PodcastViewHolder, position)
@@ -174,7 +174,9 @@ class ShareListIncomingAdapter(
         fun onSubscribeClick(podcast: Podcast)
     }
 
-    inner class PodcastViewHolder(view: View) : androidx.recyclerview.widget.RecyclerView.ViewHolder(view), View.OnClickListener {
+    inner class PodcastViewHolder(view: View) :
+        RecyclerView.ViewHolder(view),
+        View.OnClickListener {
         var titleText = view.findViewById(R.id.podcast_title) as TextView
         var descText = view.findViewById(R.id.description) as TextView
         var image = view.findViewById(R.id.image) as ImageView
@@ -194,12 +196,14 @@ class ShareListIncomingAdapter(
         }
     }
 
-    inner class HeaderViewHolder(view: View) : androidx.recyclerview.widget.RecyclerView.ViewHolder(view) {
+    inner class HeaderViewHolder(view: View) : RecyclerView.ViewHolder(view) {
         var titleText = view.findViewById(R.id.header_title) as TextView
         var descText = view.findViewById(R.id.header_description) as TextView
     }
 
-    inner class FooterViewHolder(view: View) : androidx.recyclerview.widget.RecyclerView.ViewHolder(view), View.OnClickListener {
+    inner class FooterViewHolder(view: View) :
+        RecyclerView.ViewHolder(view),
+        View.OnClickListener {
         var countText = view.findViewById(R.id.incoming_podcast_count) as TextView
         var allButton = view.findViewById(R.id.incoming_subscribe_to_all) as TextView
 

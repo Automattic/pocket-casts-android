@@ -52,7 +52,7 @@ internal fun NumberOfShowsStory(
     val smallSpacingSize = smallCoverSize / 10
     val largeCoverSize = 200.dp * measurements.scale
     val largeSpacingSize = smallCoverSize / 10
-    val carouselRotationOffset = (measurements.width / 1.5f) * tan(StoryRotationRadians)
+    val carouselRotationOffset = (measurements.width / 1.5f) * tan(STORY_ROTATION_RADIANS)
 
     Box(
         modifier = Modifier
@@ -63,7 +63,7 @@ internal fun NumberOfShowsStory(
         Column(
             modifier = Modifier
                 .align(Alignment.TopCenter)
-                .rotate(StoryRotationDegrees)
+                .rotate(STORY_ROTATION_DEGREES)
                 .offset(y = measurements.closeButtonBottomEdge + 8.dp - carouselRotationOffset)
                 .requiredWidth(measurements.width * 1.5f), // Increase the size to account for rotation
         ) {
@@ -149,7 +149,7 @@ private fun PodcastCoverCarousel(
     }
 }
 
-@Preview(device = Devices.PortraitRegular)
+@Preview(device = Devices.PORTRAIT_REGULAR)
 @Composable
 private fun NumberOfShowsPreview() {
     PreviewBox(currentPage = 1) { measurements ->

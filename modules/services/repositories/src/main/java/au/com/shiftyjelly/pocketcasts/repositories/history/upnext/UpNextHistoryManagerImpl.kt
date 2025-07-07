@@ -23,9 +23,7 @@ class UpNextHistoryManagerImpl @Inject constructor(
         }
     }
 
-    override suspend fun findAllHistoryEntries() =
-        upNextHistoryDao.findAllHistoryEntries()
+    override suspend fun findAllHistoryEntries() = upNextHistoryDao.findAllHistoryEntries()
 
-    override suspend fun findEpisodeUuidsForDate(date: Date) =
-        upNextHistoryDao.findEpisodeUuidsForDate(date)
+    override suspend fun findEpisodeUuidsForDate(date: Date) = upNextHistoryDao.findEpisodeUuidsForDate(date)
 }

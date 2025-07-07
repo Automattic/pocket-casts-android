@@ -34,8 +34,8 @@ import com.google.android.horologist.compose.layout.ScalingLazyColumn
 import com.google.android.horologist.compose.layout.ScalingLazyColumnState
 
 object PodcastScreen {
-    const val argument = "podcastUuid"
-    const val route = "podcast/{$argument}"
+    const val ARGUMENT = "podcastUuid"
+    const val ROUTE = "podcast/{$ARGUMENT}"
     val podcastImageSize = 72.dp
 
     fun navigateRoute(podcastUuid: String) = "podcast/$podcastUuid"

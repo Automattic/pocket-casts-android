@@ -428,7 +428,7 @@ private fun NoRatingsInfo(
     }
 }
 
-@Preview(device = Devices.PortraitRegular)
+@Preview(device = Devices.PORTRAIT_REGULAR)
 @Composable
 private fun RatingsHighPreview() {
     PreviewBox(currentPage = 4) { measurements ->
@@ -451,7 +451,7 @@ private fun RatingsHighPreview() {
     }
 }
 
-@Preview(device = Devices.PortraitRegular)
+@Preview(device = Devices.PORTRAIT_REGULAR)
 @Composable
 private fun RatingsLowPreview() {
     PreviewBox(currentPage = 4) { measurements ->
@@ -474,7 +474,7 @@ private fun RatingsLowPreview() {
     }
 }
 
-@Preview(device = Devices.PortraitRegular)
+@Preview(device = Devices.PORTRAIT_REGULAR)
 @Composable
 private fun RatingsNonePreview() {
     PreviewBox(currentPage = 4) { measurements ->

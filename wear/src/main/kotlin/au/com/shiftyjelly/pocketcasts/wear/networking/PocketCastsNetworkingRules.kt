@@ -32,25 +32,23 @@ object PocketCastsNetworkingRules : NetworkingRules {
     override fun getPreferredNetwork(
         networks: Networks,
         requestType: RequestType,
-    ): NetworkStatus? =
-
-        when (requestType) {
-            is RequestType.MediaRequest, RequestType.ImageRequest -> {
-                getPreferredNetworkForMedia(networks, requestType)
-            }
-
-            is RequestType.ImageRequest,
-            RequestType.ApiRequest,
-            -> {
-                networks.networks.prefer(NetworkType.Wifi, NetworkType.Cell)
-            }
-
-            else -> {
-                networks.networks.prefer(NetworkType.Wifi)
-            }
-        }.also { networkStatus ->
-            LogBuffer.i(LogBuffer.TAG_BACKGROUND_TASKS, "Preferred network according to networking rules: $networkStatus")
+    ): NetworkStatus? = when (requestType) {
+        is RequestType.MediaRequest, RequestType.ImageRequest -> {
+            getPreferredNetworkForMedia(networks, requestType)
         }
+
+        is RequestType.ImageRequest,
+        RequestType.ApiRequest,
+        -> {
+            networks.networks.prefer(NetworkType.Wifi, NetworkType.Cell)
+        }
+
+        else -> {
+            networks.networks.prefer(NetworkType.Wifi)
+        }
+    }.also { networkStatus ->
+        LogBuffer.i(LogBuffer.TAG_BACKGROUND_TASKS, "Preferred network according to networking rules: $networkStatus")
+    }
 
     private fun getPreferredNetworkForMedia(
         networks: Networks,
@@ -82,7 +80,6 @@ object PocketCastsNetworkingRules : NetworkingRules {
  * available, the first available network is returned. See test cases for examples.
  */
 @VisibleForTesting
-internal fun List<NetworkStatus>.prefer(vararg types: NetworkType): NetworkStatus? =
-    types.firstNotNullOfOrNull { type ->
-        firstOrNull { it.networkInfo.type == type }
-    } ?: firstOrNull()
+internal fun List<NetworkStatus>.prefer(vararg types: NetworkType): NetworkStatus? = types.firstNotNullOfOrNull { type ->
+    firstOrNull { it.networkInfo.type == type }
+} ?: firstOrNull()

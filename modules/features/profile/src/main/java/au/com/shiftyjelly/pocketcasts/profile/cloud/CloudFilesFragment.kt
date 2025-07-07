@@ -72,7 +72,9 @@ import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 @AndroidEntryPoint
-class CloudFilesFragment : BaseFragment(), Toolbar.OnMenuItemClickListener {
+class CloudFilesFragment :
+    BaseFragment(),
+    Toolbar.OnMenuItemClickListener {
     @Inject lateinit var downloadManager: DownloadManager
 
     @Inject lateinit var playbackManager: PlaybackManager

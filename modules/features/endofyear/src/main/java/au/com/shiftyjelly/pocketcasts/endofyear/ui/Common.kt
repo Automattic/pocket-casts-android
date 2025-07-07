@@ -38,8 +38,8 @@ import kotlinx.coroutines.launch
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 import au.com.shiftyjelly.pocketcasts.ui.R as UR
 
-internal const val StoryRotationDegrees = -15f
-internal const val StoryRotationRadians = (StoryRotationDegrees * Math.PI / 180).toFloat()
+internal const val STORY_ROTATION_DEGREES = -15f
+internal const val STORY_ROTATION_RADIANS = (STORY_ROTATION_DEGREES * Math.PI / 180).toFloat()
 
 internal val humaneFontFamily = FontFamily(
     Font(R.font.humane_regular, FontWeight.Normal),

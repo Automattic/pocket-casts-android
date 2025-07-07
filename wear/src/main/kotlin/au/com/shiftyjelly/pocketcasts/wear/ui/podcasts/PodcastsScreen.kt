@@ -37,9 +37,9 @@ import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 object PodcastsScreen {
-    const val argumentFolderUuid = "folderUuid"
-    const val routeFolder = "podcasts/{$argumentFolderUuid}"
-    const val routeHomeFolder = "podcasts"
+    const val ARGUMENT_FOLDER_UUID = "folderUuid"
+    const val ROUTE_FOLDER = "podcasts/{$ARGUMENT_FOLDER_UUID}"
+    const val ROUTE_HOME_FOLDER = "podcasts"
 
     fun navigateRoute(folderUuid: String) = "podcasts/$folderUuid"
 }

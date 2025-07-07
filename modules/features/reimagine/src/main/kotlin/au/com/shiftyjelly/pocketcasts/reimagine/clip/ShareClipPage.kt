@@ -761,71 +761,71 @@ private fun AnimatedVisiblity(
     }
 }
 
-@Preview(name = "Regular", device = Devices.PortraitRegular, group = "vertical")
+@Preview(name = "Regular", device = Devices.PORTRAIT_REGULAR, group = "vertical")
 @Composable
 private fun ShareClipVerticalRegularPreview() = ShareClipPagePreview()
 
-@Preview(name = "Regular keyboard", device = Devices.PortraitRegular, group = "vertical")
+@Preview(name = "Regular keyboard", device = Devices.PORTRAIT_REGULAR, group = "vertical")
 @Composable
 private fun ShareClipVerticalRegularKeyboardPreview() = ShareClipPagePreview(
     useKeyboardInput = true,
 )
 
-@Preview(name = "Regular sharing", device = Devices.PortraitRegular, group = "vertical")
+@Preview(name = "Regular sharing", device = Devices.PORTRAIT_REGULAR, group = "vertical")
 @Composable
 private fun ShareClipVerticalRegularSharingPreview() = ShareClipPagePreview(
     sharingState = SharingState(step = Step.PlatformSelection, iSharing = false),
 )
 
-@Preview(name = "Regular clipping", device = Devices.PortraitRegular, group = "vertical")
+@Preview(name = "Regular clipping", device = Devices.PORTRAIT_REGULAR, group = "vertical")
 @Composable
 private fun ShareClipVerticalRegularClippingPreview() = ShareClipPagePreview(
     sharingState = SharingState(step = Step.PlatformSelection, iSharing = true),
 )
 
-@Preview(name = "Small", device = Devices.PortraitSmall, group = "vertical")
+@Preview(name = "Small", device = Devices.PORTRAIT_SMALL, group = "vertical")
 @Composable
 private fun ShareClipVerticalSmallPreviewPreview() = ShareClipPagePreview()
 
-@Preview(name = "Regular", device = Devices.LandscapeRegular, group = "horizontal")
+@Preview(name = "Regular", device = Devices.LANDSCAPE_REGULAR, group = "horizontal")
 @Composable
 private fun ShareClipHorizontalRegularPreview() = ShareClipPagePreview()
 
-@Preview(name = "Regular keyboard", device = Devices.LandscapeRegular, group = "horizontal")
+@Preview(name = "Regular keyboard", device = Devices.LANDSCAPE_REGULAR, group = "horizontal")
 @Composable
 private fun ShareClipHorizontalRegularKeyboardPreview() = ShareClipPagePreview(
     useKeyboardInput = true,
 )
 
-@Preview(name = "Regular sharing", device = Devices.LandscapeRegular, group = "horizontal")
+@Preview(name = "Regular sharing", device = Devices.LANDSCAPE_REGULAR, group = "horizontal")
 @Composable
 private fun ShareClipHorizontalRegularSharingPreview() = ShareClipPagePreview(
     sharingState = SharingState(step = Step.PlatformSelection, iSharing = false),
 )
 
-@Preview(name = "Regular clipping", device = Devices.LandscapeRegular, group = "horizontal")
+@Preview(name = "Regular clipping", device = Devices.LANDSCAPE_REGULAR, group = "horizontal")
 @Composable
 private fun ShareClipHorizontalRegularClippingPreview() = ShareClipPagePreview(
     sharingState = SharingState(step = Step.PlatformSelection, iSharing = true),
 )
 
-@Preview(name = "Small", device = Devices.LandscapeSmall, group = "horizontal")
+@Preview(name = "Small", device = Devices.LANDSCAPE_SMALL, group = "horizontal")
 @Composable
 private fun ShareClipHorizontalSmallPreviewPreview() = ShareClipPagePreview()
 
-@Preview(name = "Foldable", device = Devices.PortraitFoldable, group = "irregular")
+@Preview(name = "Foldable", device = Devices.PORTRAIT_FOLDABLE, group = "irregular")
 @Composable
 private fun ShareClipVerticalFoldablePreviewPreview() = ShareClipPagePreview()
 
-@Preview(name = "Foldable", device = Devices.LandscapeFoldable, group = "irregular")
+@Preview(name = "Foldable", device = Devices.LANDSCAPE_FOLDABLE, group = "irregular")
 @Composable
 private fun ShareClipHorizontalFoldablePreviewPreview() = ShareClipPagePreview()
 
-@Preview(name = "Tablet", device = Devices.PortraitTablet, group = "irregular")
+@Preview(name = "Tablet", device = Devices.PORTRAIT_TABLET, group = "irregular")
 @Composable
 private fun ShareClipVerticalTabletPreview() = ShareClipPagePreview()
 
-@Preview(name = "Tablet", device = Devices.LandscapeTablet, group = "irregular")
+@Preview(name = "Tablet", device = Devices.LANDSCAPE_TABLET, group = "irregular")
 @Composable
 private fun ShareClipHorizontalTabletPreview() = ShareClipPagePreview()
 

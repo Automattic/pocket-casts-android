@@ -28,8 +28,10 @@ class MultiSelectTouchCallback(
     }
 
     override fun onMove(recyclerView: RecyclerView, viewHolder: RecyclerView.ViewHolder, target: RecyclerView.ViewHolder): Boolean {
-        if (viewHolder is MultiSelectAdapter.ItemViewHolder && target is MultiSelectAdapter.ItemViewHolder &&
-            viewHolder.bindingAdapterPosition != RecyclerView.NO_POSITION && target.bindingAdapterPosition != RecyclerView.NO_POSITION
+        if (viewHolder is MultiSelectAdapter.ItemViewHolder &&
+            target is MultiSelectAdapter.ItemViewHolder &&
+            viewHolder.bindingAdapterPosition != RecyclerView.NO_POSITION &&
+            target.bindingAdapterPosition != RecyclerView.NO_POSITION
         ) {
             listener.onItemMove(viewHolder.bindingAdapterPosition, target.bindingAdapterPosition)
             return true

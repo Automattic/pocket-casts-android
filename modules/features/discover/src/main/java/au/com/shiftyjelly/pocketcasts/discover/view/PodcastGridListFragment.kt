@@ -53,7 +53,9 @@ import kotlinx.coroutines.launch
 import timber.log.Timber
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
-open class PodcastGridListFragment : BaseFragment(), Toolbar.OnMenuItemClickListener {
+open class PodcastGridListFragment :
+    BaseFragment(),
+    Toolbar.OnMenuItemClickListener {
 
     @Inject lateinit var podcastManager: PodcastManager
 

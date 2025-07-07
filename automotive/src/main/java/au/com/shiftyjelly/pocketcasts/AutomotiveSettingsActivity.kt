@@ -16,7 +16,9 @@ import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.profile.R as PR
 
 @AndroidEntryPoint
-class AutomotiveSettingsActivity : AppCompatActivity(), FragmentHostListener {
+class AutomotiveSettingsActivity :
+    AppCompatActivity(),
+    FragmentHostListener {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

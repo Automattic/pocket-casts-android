@@ -65,7 +65,9 @@ import kotlinx.coroutines.withContext
 import timber.log.Timber
 
 @HiltAndroidApp
-class PocketCastsApplication : Application(), Configuration.Provider {
+class PocketCastsApplication :
+    Application(),
+    Configuration.Provider {
 
     @Inject lateinit var appLifecycleObserver: AppLifecycleObserver
 

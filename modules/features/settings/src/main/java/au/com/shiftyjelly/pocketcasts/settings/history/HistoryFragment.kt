@@ -35,7 +35,9 @@ import au.com.shiftyjelly.pocketcasts.localization.R as LR
 import au.com.shiftyjelly.pocketcasts.ui.R as UR
 
 @AndroidEntryPoint
-class HistoryFragment : BaseFragment(), HasBackstack {
+class HistoryFragment :
+    BaseFragment(),
+    HasBackstack {
 
     @Inject
     lateinit var settings: Settings
@@ -53,26 +55,26 @@ class HistoryFragment : BaseFragment(), HasBackstack {
 
             NavHost(
                 navController = navController,
-                startDestination = HistoryNavRoutes.History,
+                startDestination = HistoryNavRoutes.HISTORY,
                 enterTransition = { slideInToStart() },
                 exitTransition = { slideOutToStart() },
                 popEnterTransition = { slideInToEnd() },
                 popExitTransition = { slideOutToEnd() },
                 modifier = Modifier.fillMaxSize(),
             ) {
-                composable(HistoryNavRoutes.History) {
+                composable(HistoryNavRoutes.HISTORY) {
                     HistoryPage(
                         onBackClick = {
                             navController.popBackStack()
                             onBackClick()
                         },
                         onUpNextHistoryClick = {
-                            navController.navigate(HistoryNavRoutes.UpNextHistory)
+                            navController.navigate(HistoryNavRoutes.UP_NEXT_HISTORY)
                         },
                         bottomInset = bottomInsetDp,
                     )
                 }
-                composable(HistoryNavRoutes.UpNextHistory) {
+                composable(HistoryNavRoutes.UP_NEXT_HISTORY) {
                     UpNextHistoryPage(
                         onHistoryEntryClick = { date ->
                             navController.navigate(
@@ -88,7 +90,7 @@ class HistoryFragment : BaseFragment(), HasBackstack {
                 composable(
                     HistoryNavRoutes.upNextHistoryDetailsRoute(),
                     listOf(
-                        navArgument(HistoryNavRoutes.UpNextHistoryDateArgument) {
+                        navArgument(HistoryNavRoutes.UP_NEXT_HISTORY_DATE_ARGUMENT) {
                             type = NavType.LongType
                         },
                     ),
@@ -96,7 +98,7 @@ class HistoryFragment : BaseFragment(), HasBackstack {
                     val arguments =
                         requireNotNull(backStackEntry.arguments) { "Missing back stack entry arguments" }
                     val date =
-                        requireNotNull(arguments.getLong(HistoryNavRoutes.UpNextHistoryDateArgument)) {
+                        requireNotNull(arguments.getLong(HistoryNavRoutes.UP_NEXT_HISTORY_DATE_ARGUMENT)) {
                             "Missing date argument"
                         }
                     UpNextHistoryDetailsPage(
@@ -137,20 +139,19 @@ class HistoryFragment : BaseFragment(), HasBackstack {
         activity?.onBackPressed()
     }
 
-    override fun onBackPressed() =
-        if (navController.currentDestination?.route == HistoryNavRoutes.History) {
-            super.onBackPressed()
-        } else {
-            navController.popBackStack()
-        }
+    override fun onBackPressed() = if (navController.currentDestination?.route == HistoryNavRoutes.HISTORY) {
+        super.onBackPressed()
+    } else {
+        navController.popBackStack()
+    }
 
     object HistoryNavRoutes {
-        const val History = "main"
-        const val UpNextHistory = "up_next_history"
-        private const val UpNextHistoryDetails = "up_next_history_details"
+        const val HISTORY = "main"
+        const val UP_NEXT_HISTORY = "up_next_history"
+        private const val UP_NEXT_HISTORY_DETAILS = "up_next_history_details"
 
-        const val UpNextHistoryDateArgument = "upNextHistoryDate"
-        fun upNextHistoryDetailsRoute() = "$UpNextHistoryDetails/{$UpNextHistoryDateArgument}"
-        fun upNextHistoryDetailsDestination(date: Long) = "$UpNextHistoryDetails/$date"
+        const val UP_NEXT_HISTORY_DATE_ARGUMENT = "upNextHistoryDate"
+        fun upNextHistoryDetailsRoute() = "$UP_NEXT_HISTORY_DETAILS/{$UP_NEXT_HISTORY_DATE_ARGUMENT}"
+        fun upNextHistoryDetailsDestination(date: Long) = "$UP_NEXT_HISTORY_DETAILS/$date"
     }
 }

@@ -50,7 +50,9 @@ class FilterAutoDownloadAdapter(private val filters: List<Playlist>, private val
         fun onSettingsClicked(filter: Playlist)
     }
 
-    inner class ViewHolder(view: View) : androidx.recyclerview.widget.RecyclerView.ViewHolder(view), View.OnClickListener {
+    inner class ViewHolder(view: View) :
+        androidx.recyclerview.widget.RecyclerView.ViewHolder(view),
+        View.OnClickListener {
         val title = view.findViewById(R.id.title) as TextView
         val image = view.findViewById(R.id.image) as ImageView
         val button = view.findViewById(R.id.row_button) as View

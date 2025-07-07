@@ -27,8 +27,7 @@ class EpisodeChipViewModel @Inject constructor(
         .getChangesObservableWithLiveCurrentEpisode(episodeManager, podcastManager)
         .asFlow()
 
-    fun observeByUuid(episode: BaseEpisode): StateFlow<BaseEpisode> =
-        episodeManager
-            .findEpisodeByUuidFlow(episode.uuid)
-            .stateIn(viewModelScope, SharingStarted.Eagerly, episode)
+    fun observeByUuid(episode: BaseEpisode): StateFlow<BaseEpisode> = episodeManager
+        .findEpisodeByUuidFlow(episode.uuid)
+        .stateIn(viewModelScope, SharingStarted.Eagerly, episode)
 }

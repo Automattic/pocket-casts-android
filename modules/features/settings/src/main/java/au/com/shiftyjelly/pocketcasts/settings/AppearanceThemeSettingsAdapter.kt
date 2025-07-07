@@ -73,7 +73,9 @@ class AppearanceThemeSettingsAdapter(
         notifyDataSetChanged()
     }
 
-    inner class ViewHolder(val binding: AdapterAppearanceThemeItemBinding) : RecyclerView.ViewHolder(binding.root), View.OnClickListener {
+    inner class ViewHolder(val binding: AdapterAppearanceThemeItemBinding) :
+        RecyclerView.ViewHolder(binding.root),
+        View.OnClickListener {
 
         private val selectColor = itemView.context.getThemeColor(UR.attr.support_01)
         private val deselectColor = itemView.context.getThemeColor(UR.attr.primary_ui_04)

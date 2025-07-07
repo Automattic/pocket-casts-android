@@ -15,12 +15,11 @@ import dagger.hilt.components.SingletonComponent
 object SharingModule {
     @Provides
     fun provideShareDialogFactory(): ShareDialogFactory = object : ShareDialogFactory {
-        override fun shareEpisode(podcast: Podcast, episode: PodcastEpisode, source: SourceView) =
-            ShareDialogFragment.newInstance(
-                podcast,
-                episode,
-                source,
-                options = listOf(ShareDialogFragment.Options.Episode),
-            )
+        override fun shareEpisode(podcast: Podcast, episode: PodcastEpisode, source: SourceView) = ShareDialogFragment.newInstance(
+            podcast,
+            episode,
+            source,
+            options = listOf(ShareDialogFragment.Options.Episode),
+        )
     }
 }

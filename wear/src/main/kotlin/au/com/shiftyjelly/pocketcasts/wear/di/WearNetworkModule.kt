@@ -51,25 +51,23 @@ object WearNetworkModule {
     fun provideNetworkingRulesEngine(
         networkRepository: NetworkRepository,
         networkingRules: NetworkingRules,
-    ): NetworkingRulesEngine =
-        NetworkingRulesEngine(
-            networkRepository = networkRepository,
-            logger = NetworkStatusLogger.Logging,
-            networkingRules = networkingRules,
-        )
+    ): NetworkingRulesEngine = NetworkingRulesEngine(
+        networkRepository = networkRepository,
+        logger = NetworkStatusLogger.Logging,
+        networkingRules = networkingRules,
+    )
 
     @Provides
     @Singleton
     fun provideHighBandwidthNetworkMediator(
         connectivityManager: ConnectivityManager,
         @ApplicationScope coroutineScope: CoroutineScope,
-    ): HighBandwidthNetworkMediator =
-        StandardHighBandwidthNetworkMediator(
-            logger = NetworkStatusLogger.Logging,
-            networkRequester = NetworkRequesterImpl(connectivityManager),
-            coroutineScope = coroutineScope,
-            delayToRelease = 3.seconds,
-        )
+    ): HighBandwidthNetworkMediator = StandardHighBandwidthNetworkMediator(
+        logger = NetworkStatusLogger.Logging,
+        networkRequester = NetworkRequesterImpl(connectivityManager),
+        coroutineScope = coroutineScope,
+        delayToRelease = 3.seconds,
+    )
 
     @Provides
     fun provideNetworkLogger(): NetworkStatusLogger = NetworkStatusLogger.Logging

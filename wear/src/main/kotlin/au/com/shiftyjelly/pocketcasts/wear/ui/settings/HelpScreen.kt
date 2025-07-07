@@ -21,7 +21,7 @@ import com.google.android.horologist.compose.layout.rememberColumnState
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 object HelpScreen {
-    const val route = "help_screen"
+    const val ROUTE = "help_screen"
 }
 
 @Composable

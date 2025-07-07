@@ -688,17 +688,16 @@ class DownloadEpisodeTask @AssistedInject constructor(
  * Have to use enqueue for high bandwidth requests on the watch app
  * See https://github.com/google/horologist/blob/7bd044a4766e379f85ee3f5a01272853eec3155d/network-awareness/src/main/java/com/google/android/horologist/networks/okhttp/impl/HighBandwidthCall.kt#L93-L92
  */
-private fun Call.blockingEnqueue(): Response =
-    runBlocking {
-        suspendCoroutine { cont ->
-            this@blockingEnqueue.enqueue(object : Callback {
-                override fun onFailure(call: Call, e: IOException) {
-                    cont.resumeWithException(e)
-                }
+private fun Call.blockingEnqueue(): Response = runBlocking {
+    suspendCoroutine { cont ->
+        this@blockingEnqueue.enqueue(object : Callback {
+            override fun onFailure(call: Call, e: IOException) {
+                cont.resumeWithException(e)
+            }
 
-                override fun onResponse(call: Call, response: Response) {
-                    cont.resume(response)
-                }
-            })
-        }
+            override fun onResponse(call: Call, response: Response) {
+                cont.resume(response)
+            }
+        })
     }
+}

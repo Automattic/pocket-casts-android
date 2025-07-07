@@ -16,7 +16,7 @@ import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 object WearAboutScreen {
-    const val route = "wear_about_screen"
+    const val ROUTE = "wear_about_screen"
 }
 
 @Composable

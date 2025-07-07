@@ -56,7 +56,11 @@ import kotlinx.coroutines.launch
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 @AndroidEntryPoint
-class EffectsFragment : BaseDialogFragment(), CompoundButton.OnCheckedChangeListener, MaterialButtonToggleGroup.OnButtonCheckedListener, View.OnClickListener {
+class EffectsFragment :
+    BaseDialogFragment(),
+    CompoundButton.OnCheckedChangeListener,
+    MaterialButtonToggleGroup.OnButtonCheckedListener,
+    View.OnClickListener {
 
     @Inject lateinit var stats: StatsManager
 

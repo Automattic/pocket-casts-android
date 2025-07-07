@@ -72,7 +72,7 @@ private fun ColumnScope.WaitSection(
         modifier = Modifier
             .weight(1f)
             .requiredWidth(measurements.width * 1.5f)
-            .rotate(StoryRotationDegrees),
+            .rotate(STORY_ROTATION_DEGREES),
     ) {
         WaitText(
             scrollDirection = HorizontalDirection.Left,
@@ -163,7 +163,7 @@ private fun PlusInfo(
     }
 }
 
-@Preview(device = Devices.PortraitRegular)
+@Preview(device = Devices.PORTRAIT_REGULAR)
 @Composable
 private fun PlusInterstitialPreview() {
     PreviewBox(currentPage = 7, progress = 1f) { measurements ->

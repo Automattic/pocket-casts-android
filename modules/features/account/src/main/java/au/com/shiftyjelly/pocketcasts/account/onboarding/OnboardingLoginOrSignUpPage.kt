@@ -325,18 +325,14 @@ private object Artwork {
         CoverModel(imageResId = R.drawable.thedaily, size = 0.183f, x = 0.25f, y = -0.3f),
     )
 
-    fun getAspectRatio(configuration: Configuration, googleSignInShown: Boolean) =
-        if (configuration.orientation == ORIENTATION_LANDSCAPE || googleSignInShown) {
-            2.2f
-        } else {
-            2.6f
-        }
-    fun getScaleFactor(googleSignInShown: Boolean) =
-        if (googleSignInShown) 1.65f else 1.85f
-    fun getOffsetFactor(googleSignInShown: Boolean) =
-        if (googleSignInShown) 0.06f else 0.0f
-    fun getCoverYOffsetFactor(configuration: Configuration) =
-        if (configuration.orientation == ORIENTATION_LANDSCAPE) 0.75f else 0.95f
+    fun getAspectRatio(configuration: Configuration, googleSignInShown: Boolean) = if (configuration.orientation == ORIENTATION_LANDSCAPE || googleSignInShown) {
+        2.2f
+    } else {
+        2.6f
+    }
+    fun getScaleFactor(googleSignInShown: Boolean) = if (googleSignInShown) 1.65f else 1.85f
+    fun getOffsetFactor(googleSignInShown: Boolean) = if (googleSignInShown) 0.06f else 0.0f
+    fun getCoverYOffsetFactor(configuration: Configuration) = if (configuration.orientation == ORIENTATION_LANDSCAPE) 0.75f else 0.95f
 }
 
 @Preview(showBackground = true)

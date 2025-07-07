@@ -151,14 +151,13 @@ abstract class AppDatabase : RoomDatabase() {
     abstract fun userNotificationsDao(): UserNotificationsDao
     abstract fun userCategoryVisitsDao(): UserCategoryVisitsDao
 
-    fun databaseFiles() =
-        openHelper.readableDatabase.path?.let {
-            listOf(
-                File(it),
-                File("$it-wal"),
-                File("$it-shm"),
-            )
-        }
+    fun databaseFiles() = openHelper.readableDatabase.path?.let {
+        listOf(
+            File(it),
+            File("$it-wal"),
+            File("$it-shm"),
+        )
+    }
 
     companion object {
         val MIGRATION_45_46 = addMigration(45, 46) { database ->

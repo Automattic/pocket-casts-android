@@ -510,7 +510,8 @@ data class SharingRequest internal constructor(
 
         class Podcast internal constructor(
             override val podcast: PodcastModel,
-        ) : Data, Sociable {
+        ) : Data,
+            Sociable {
             override fun sharingUrl(host: String) = "$host/podcast/${podcast.uuid}"
 
             override fun sharingTitle() = podcast.title
@@ -523,7 +524,8 @@ data class SharingRequest internal constructor(
         class Episode internal constructor(
             override val podcast: PodcastModel,
             val episode: EpisodeModel,
-        ) : Data, Sociable {
+        ) : Data,
+            Sociable {
             override fun sharingUrl(host: String) = "$host/episode/${episode.uuid}"
 
             override fun sharingTitle() = episode.title
@@ -538,7 +540,8 @@ data class SharingRequest internal constructor(
             val episode: EpisodeModel,
             val position: Duration,
             val type: TimestampType,
-        ) : Data, Sociable {
+        ) : Data,
+            Sociable {
             override fun sharingUrl(host: String) = "$host/episode/${episode.uuid}?t=${position.inWholeSeconds}"
 
             override fun sharingTitle() = episode.title

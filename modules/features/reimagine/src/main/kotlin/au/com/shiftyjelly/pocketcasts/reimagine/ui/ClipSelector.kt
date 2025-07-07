@@ -759,22 +759,22 @@ private class HHMmSsVisualTransformation(
 }
 
 @ShowkaseComposable(name = "Clip selector", group = "Sharing")
-@Preview(name = "Paused", device = Devices.PortraitRegular)
+@Preview(name = "Paused", device = Devices.PORTRAIT_REGULAR)
 @Composable
 fun ClipSelectorPausedPreview() = ClipSelectorPreview()
 
-@Preview(name = "Playing", device = Devices.PortraitRegular)
+@Preview(name = "Playing", device = Devices.PORTRAIT_REGULAR)
 @Composable
 private fun ClipSelectorPlayingPreview() = ClipSelectorPreview(isPlaying = true)
 
-@Preview(name = "Zoomed in", device = Devices.PortraitRegular)
+@Preview(name = "Zoomed in", device = Devices.PORTRAIT_REGULAR)
 @Composable
 private fun ClipSelectorZoomedPreview() = ClipSelectorPreview(
     clipEnd = 10.seconds,
     scale = 5f,
 )
 
-@Preview(name = "Scrolled", device = Devices.PortraitRegular)
+@Preview(name = "Scrolled", device = Devices.PORTRAIT_REGULAR)
 @Composable
 private fun ClipSelectorScrolledPreview() = ClipSelectorPreview(
     clipStart = 35.seconds,
@@ -782,32 +782,32 @@ private fun ClipSelectorScrolledPreview() = ClipSelectorPreview(
     firstVisibleItemIndex = 25,
 )
 
-@Preview(name = "No start handle", device = Devices.PortraitRegular)
+@Preview(name = "No start handle", device = Devices.PORTRAIT_REGULAR)
 @Composable
 private fun ClipSelectorNoStartHandlePreview() = ClipSelectorPreview(
     firstVisibleItemIndex = 5,
 )
 
-@Preview(name = "No end handle", device = Devices.PortraitRegular)
+@Preview(name = "No end handle", device = Devices.PORTRAIT_REGULAR)
 @Composable
 private fun ClipSelectorNoEndHandlePreview() = ClipSelectorPreview(
     clipStart = 35.seconds,
     clipEnd = 75.seconds,
 )
 
-@Preview(name = "Playback in middle", device = Devices.PortraitRegular)
+@Preview(name = "Playback in middle", device = Devices.PORTRAIT_REGULAR)
 @Composable
 private fun ClipSelectorInProgressPreview() = ClipSelectorPreview(
     progressPlayback = 10.seconds,
 )
 
-@Preview(name = "Playback at end", device = Devices.PortraitRegular)
+@Preview(name = "Playback at end", device = Devices.PORTRAIT_REGULAR)
 @Composable
 private fun ClipSelectorPlayedPreview() = ClipSelectorPreview(
     progressPlayback = 15.seconds,
 )
 
-@Preview(name = "Keyboard", device = Devices.PortraitRegular)
+@Preview(name = "Keyboard", device = Devices.PORTRAIT_REGULAR)
 @Composable
 private fun ClipSelectorKeyboardPreview() = ClipSelectorPreview(
     useKeyboardInput = true,

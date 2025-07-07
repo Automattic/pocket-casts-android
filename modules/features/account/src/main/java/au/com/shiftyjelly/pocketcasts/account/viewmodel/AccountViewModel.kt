@@ -7,7 +7,9 @@ import kotlin.coroutines.CoroutineContext
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 
-abstract class AccountViewModel : ViewModel(), CoroutineScope {
+abstract class AccountViewModel :
+    ViewModel(),
+    CoroutineScope {
 
     val email = MutableLiveData<String>().apply { postValue("") }
     val password = MutableLiveData<String>().apply { postValue("") }

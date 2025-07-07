@@ -34,7 +34,8 @@ class PodcastRatingsViewModel
 @Inject constructor(
     private val ratingsManager: RatingsManager,
     private val analyticsTracker: AnalyticsTracker,
-) : ViewModel(), CoroutineScope {
+) : ViewModel(),
+    CoroutineScope {
     override val coroutineContext: CoroutineContext
         get() = Dispatchers.Default
 

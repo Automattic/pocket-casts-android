@@ -40,7 +40,7 @@ import au.com.shiftyjelly.pocketcasts.localization.R as LR
 import au.com.shiftyjelly.pocketcasts.settings.R as SR
 
 object SettingsScreen {
-    const val route = "settings_screen"
+    const val ROUTE = "settings_screen"
 }
 
 @Composable

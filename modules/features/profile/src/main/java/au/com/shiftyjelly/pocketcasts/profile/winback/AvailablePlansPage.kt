@@ -456,7 +456,7 @@ private fun SubscriptionPlan.Base.price() = when (billingCycle) {
     BillingCycle.Yearly -> stringResource(LR.string.plus_per_year, pricingPhase.price.formattedPrice)
 }
 
-@Preview(device = Devices.PortraitRegular)
+@Preview(device = Devices.PORTRAIT_REGULAR)
 @Composable
 private fun AvailablePlansPagePreview(
     @PreviewParameter(ThemePreviewParameterProvider::class) theme: ThemeType,
@@ -482,7 +482,7 @@ private fun AvailablePlansPagePreview(
     }
 }
 
-@Preview(device = Devices.PortraitRegular)
+@Preview(device = Devices.PORTRAIT_REGULAR)
 @Composable
 private fun AvailablePlansPageFailureTooManyPreview(
     @PreviewParameter(ThemePreviewParameterProvider::class) theme: ThemeType,
@@ -500,7 +500,7 @@ private fun AvailablePlansPageFailureTooManyPreview(
     }
 }
 
-@Preview(device = Devices.PortraitRegular)
+@Preview(device = Devices.PORTRAIT_REGULAR)
 @Composable
 private fun AvailablePlansPageFailureDefaultPreview(
     @PreviewParameter(ThemePreviewParameterProvider::class) theme: ThemeType,

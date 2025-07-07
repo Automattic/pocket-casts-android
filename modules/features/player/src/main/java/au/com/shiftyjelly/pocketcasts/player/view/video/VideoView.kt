@@ -19,7 +19,9 @@ class VideoView @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet? = null,
     defStyleAttr: Int = 0,
-) : FrameLayout(context, attrs, defStyleAttr), SurfaceHolder.Callback, SimplePlayer.VideoChangedListener {
+) : FrameLayout(context, attrs, defStyleAttr),
+    SurfaceHolder.Callback,
+    SimplePlayer.VideoChangedListener {
     var player: Player? = null
     private var isSurfaceCreated = false
     private var isSurfaceConnectionPending = false

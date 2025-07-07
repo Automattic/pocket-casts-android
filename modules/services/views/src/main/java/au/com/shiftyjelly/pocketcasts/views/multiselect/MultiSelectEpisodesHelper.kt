@@ -70,8 +70,7 @@ class MultiSelectEpisodesHelper @Inject constructor(
             }
         }
 
-    override fun isSelected(multiSelectable: BaseEpisode) =
-        selectedList.count { it.uuid == multiSelectable.uuid } > 0
+    override fun isSelected(multiSelectable: BaseEpisode) = selectedList.count { it.uuid == multiSelectable.uuid } > 0
 
     override fun onMenuItemSelected(itemId: Int, resources: Resources, activity: FragmentActivity): Boolean {
         val fragmentManager = activity.supportFragmentManager

@@ -44,7 +44,7 @@ import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 object EffectsScreen {
-    const val route = "effects"
+    const val ROUTE = "effects"
 }
 
 @Composable

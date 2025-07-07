@@ -607,7 +607,7 @@ class PodcastsFragment :
                 override fun getSpanSize(position: Int): Int {
                     val itemViewTtype = adapter?.getItemViewType(position)
                     return when (itemViewTtype) {
-                        AdapterViewTypeIds.BannerAdId -> spanCount
+                        AdapterViewTypeIds.BANNER_AD_ID -> spanCount
                         else -> defaultLookup.getSpanSize(position)
                     }
                 }

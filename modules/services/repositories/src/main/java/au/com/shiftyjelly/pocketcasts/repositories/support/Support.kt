@@ -186,15 +186,14 @@ class Support @Inject constructor(
         null -> ""
     }
 
-    suspend fun getLogs(): String =
-        withContext(Dispatchers.IO) {
-            buildString {
-                append(getUserDebug(false))
-                val outputStream = ByteArrayOutputStream()
-                LogBuffer.output(outputStream)
-                append(outputStream.toString())
-            }
+    suspend fun getLogs(): String = withContext(Dispatchers.IO) {
+        buildString {
+            append(getUserDebug(false))
+            val outputStream = ByteArrayOutputStream()
+            LogBuffer.output(outputStream)
+            append(outputStream.toString())
         }
+    }
 
     @Suppress("DEPRECATION")
     suspend fun getUserDebug(html: Boolean): String {

@@ -394,8 +394,8 @@ private fun BenefitEntry(
     }
 }
 
-@Preview(device = Devices.PortraitRegular)
-@Preview(device = Devices.PortraitSmall)
+@Preview(device = Devices.PORTRAIT_REGULAR)
+@Preview(device = Devices.PORTRAIT_SMALL)
 @Composable
 private fun AccountBenefitsPagePreview(
     @PreviewParameter(ThemePreviewParameterProvider::class) themeType: Theme.ThemeType,

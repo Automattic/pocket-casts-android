@@ -11,12 +11,11 @@ data class EpisodeItem(
     val podcastUuid: String,
     val podcastTitle: String,
 ) {
-    fun toEpisode() =
-        PodcastEpisode(
-            uuid = uuid,
-            title = title,
-            duration = duration,
-            publishedDate = publishedAt,
-            podcastUuid = podcastUuid,
-        )
+    fun toEpisode() = PodcastEpisode(
+        uuid = uuid,
+        title = title,
+        duration = duration,
+        publishedDate = publishedAt,
+        podcastUuid = podcastUuid,
+    )
 }

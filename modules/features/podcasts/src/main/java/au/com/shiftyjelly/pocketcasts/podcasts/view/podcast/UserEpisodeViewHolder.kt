@@ -59,7 +59,8 @@ class UserEpisodeViewHolder(
     private val swipeButtonLayoutFactory: SwipeButtonLayoutFactory,
     private val userBookmarksObservable: Observable<List<Bookmark>>,
     private val artworkContext: ArtworkConfiguration.Element,
-) : RecyclerView.ViewHolder(binding.root), RowSwipeable {
+) : RecyclerView.ViewHolder(binding.root),
+    RowSwipeable {
 
     private var episodeInstance: BaseEpisode? = null
     private var isUpNext: Boolean? = null

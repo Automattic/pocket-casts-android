@@ -22,7 +22,7 @@ import com.google.android.horologist.compose.layout.ScalingLazyColumnState
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 object FilesScreen {
-    const val route = "files_screen"
+    const val ROUTE = "files_screen"
 }
 
 @Composable

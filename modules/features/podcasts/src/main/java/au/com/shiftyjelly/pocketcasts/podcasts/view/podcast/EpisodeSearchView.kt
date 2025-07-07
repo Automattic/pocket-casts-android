@@ -25,7 +25,9 @@ class EpisodeSearchView @JvmOverloads constructor(context: Context, attrs: Attri
                 searchText.setSelection(value.length)
             }
         }
-        get() { return searchText.text.toString() }
+        get() {
+            return searchText.text.toString()
+        }
 
     private val textChangeListener = object : TextWatcher {
         override fun afterTextChanged(text: Editable) {}

@@ -20,8 +20,9 @@ val CATEGORY_DIFF = object : DiffUtil.ItemCallback<DiscoverCategory>() {
     }
 }
 
-class CategoriesListRowAdapter(val onPodcastListClick: (NetworkLoadableList) -> Unit) :
-    ListAdapter<DiscoverCategory, CategoriesListRowAdapter.CategoryViewHolder>(CATEGORY_DIFF) {
+class CategoriesListRowAdapter(
+    val onPodcastListClick: (NetworkLoadableList) -> Unit,
+) : ListAdapter<DiscoverCategory, CategoriesListRowAdapter.CategoryViewHolder>(CATEGORY_DIFF) {
     class CategoryViewHolder(
         val binding: ItemCategoryBinding,
         onItemClicked: (Int) -> Unit,

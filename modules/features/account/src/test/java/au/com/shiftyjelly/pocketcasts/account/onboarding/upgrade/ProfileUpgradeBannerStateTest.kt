@@ -20,7 +20,7 @@ class ProfileUpgradeBannerStateTest {
 
     @Test
     fun `state without current subscription with intro offer enabled`() {
-        val IntroSubscritpionPlan = SubscriptionPlans.Preview.findOfferPlan(
+        val introSubscritpionPlan = SubscriptionPlans.Preview.findOfferPlan(
             SubscriptionTier.Plus,
             BillingCycle.Yearly,
             SubscriptionOffer.IntroOffer,
@@ -36,7 +36,7 @@ class ProfileUpgradeBannerStateTest {
 
         assertEquals(
             listOf(
-                OnboardingSubscriptionPlan.create(IntroSubscritpionPlan).getOrNull()!!,
+                OnboardingSubscriptionPlan.create(introSubscritpionPlan).getOrNull()!!,
                 OnboardingSubscriptionPlan.create(SubscriptionPlan.PatronYearlyPreview),
             ),
             state.onboardingPlans,
@@ -45,7 +45,7 @@ class ProfileUpgradeBannerStateTest {
 
     @Test
     fun `state without current subscription with intro offer disabled`() {
-        val TrialSubscriptionPlan = SubscriptionPlans.Preview.findOfferPlan(
+        val trialSubscriptionPlan = SubscriptionPlans.Preview.findOfferPlan(
             SubscriptionTier.Plus,
             BillingCycle.Yearly,
             SubscriptionOffer.Trial,
@@ -61,7 +61,7 @@ class ProfileUpgradeBannerStateTest {
 
         assertEquals(
             listOf(
-                OnboardingSubscriptionPlan.create(TrialSubscriptionPlan).getOrNull()!!,
+                OnboardingSubscriptionPlan.create(trialSubscriptionPlan).getOrNull()!!,
                 OnboardingSubscriptionPlan.create(SubscriptionPlan.PatronYearlyPreview),
             ),
             state.onboardingPlans,

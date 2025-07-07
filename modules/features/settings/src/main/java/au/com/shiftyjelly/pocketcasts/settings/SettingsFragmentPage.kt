@@ -305,10 +305,9 @@ private fun AdvancedRow(onClick: () -> Unit) {
     )
 }
 
-fun Modifier.rowModifier(onClick: () -> Unit): Modifier =
-    this
-        .clickable { onClick() }
-        .padding(vertical = 6.dp)
+fun Modifier.rowModifier(onClick: () -> Unit): Modifier = this
+    .clickable { onClick() }
+    .padding(vertical = 6.dp)
 
 @Preview
 @Composable

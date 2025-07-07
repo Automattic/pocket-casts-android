@@ -167,8 +167,10 @@ class SearchHandler @Inject constructor(
             val searchEpisodesResult = serverSearchResults.episodeSearch.episodes
 
             val hasResults =
-                serverSearchResults.searchTerm.isEmpty() || // if the search term is empty, we don't have "no results"
-                    (searchPodcastsResult.isNotEmpty() || searchEpisodesResult.isNotEmpty()) || // check if there are any results
+                serverSearchResults.searchTerm.isEmpty() ||
+                    // if the search term is empty, we don't have "no results"
+                    (searchPodcastsResult.isNotEmpty() || searchEpisodesResult.isNotEmpty()) ||
+                    // check if there are any results
                     serverSearchResults.error != null // an error is a result
             if (hasResults) {
                 serverSearchResults.error?.let {

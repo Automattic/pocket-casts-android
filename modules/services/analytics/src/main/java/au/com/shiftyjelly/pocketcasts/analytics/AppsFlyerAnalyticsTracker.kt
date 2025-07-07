@@ -13,7 +13,8 @@ import timber.log.Timber
 class AppsFlyerAnalyticsTracker @Inject constructor(
     private val appsFlyerAnalytics: AppsFlyerAnalyticsWrapper,
     @PublicSharedPreferences preferences: SharedPreferences,
-) : IdentifyingTracker(preferences), CoroutineScope {
+) : IdentifyingTracker(preferences),
+    CoroutineScope {
     companion object {
         private const val ANON_ID = "anon_id_apps_flyer_anon_id"
         private val EVENTS = listOf(
@@ -49,8 +50,7 @@ class AppsFlyerAnalyticsTracker @Inject constructor(
             AnalyticsEvent.PODCAST_SUBSCRIBED,
         )
 
-        private fun shouldTrack(event: AnalyticsEvent) =
-            EVENTS.contains(event)
+        private fun shouldTrack(event: AnalyticsEvent) = EVENTS.contains(event)
     }
 
     override val anonIdPrefKey = ANON_ID

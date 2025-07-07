@@ -24,7 +24,7 @@ import com.google.android.horologist.compose.layout.ScalingLazyColumnState
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 object FiltersScreen {
-    const val route = "filters_screen"
+    const val ROUTE = "filters_screen"
 }
 
 @Composable

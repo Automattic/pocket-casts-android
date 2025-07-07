@@ -112,9 +112,9 @@ class WinbackFragment : BaseDialogFragment() {
                     NavHost(
                         navController = navController,
                         startDestination = if (params.hasGoogleSubscription) {
-                            WinbackNavRoutes.Main
+                            WinbackNavRoutes.MAIN
                         } else {
-                            WinbackNavRoutes.CancelConfirmation
+                            WinbackNavRoutes.CANCEL_CONFIRMATION
                         },
                         enterTransition = { slideInToStart() },
                         exitTransition = { slideOutToStart() },
@@ -122,32 +122,32 @@ class WinbackFragment : BaseDialogFragment() {
                         popExitTransition = { slideOutToEnd() },
                         modifier = Modifier.fillMaxSize(),
                     ) {
-                        composable(WinbackNavRoutes.Main) {
+                        composable(WinbackNavRoutes.MAIN) {
                             CancelOfferPage(
                                 onSeeAvailablePlans = {
                                     viewModel.trackAvailablePlansTapped()
-                                    navController.navigate(WinbackNavRoutes.AvailablePlans)
+                                    navController.navigate(WinbackNavRoutes.AVAILABLE_PLANS)
                                 },
                                 onSeeHelpAndFeedback = {
                                     viewModel.trackHelpAndFeedbackTapped()
-                                    navController.navigate(WinbackNavRoutes.HelpAndFeedback)
+                                    navController.navigate(WinbackNavRoutes.HELP_AND_FEEDBACK)
                                 },
                                 onContinueToCancellation = {
                                     viewModel.trackContinueCancellationTapped()
-                                    navController.navigate(WinbackNavRoutes.CancelConfirmation)
+                                    navController.navigate(WinbackNavRoutes.CANCEL_CONFIRMATION)
                                 },
                             )
                         }
                         composable(
                             WinbackNavRoutes.offerClaimedRoute(),
                             listOf(
-                                navArgument(WinbackNavRoutes.OfferClaimedBillingCycleArgument) {
+                                navArgument(WinbackNavRoutes.OFER_CLAIMED_BILLING_CYCLE_ARGUMENT) {
                                     type = NavType.EnumType(BillingCycle::class.java)
                                 },
                             ),
                         ) { backStackEntry ->
                             val arguments = requireNotNull(backStackEntry.arguments) { "Missing back stack entry arguments" }
-                            val billingCycle = requireNotNull(BundleCompat.getSerializable(arguments, WinbackNavRoutes.OfferClaimedBillingCycleArgument, BillingCycle::class.java)) {
+                            val billingCycle = requireNotNull(BundleCompat.getSerializable(arguments, WinbackNavRoutes.OFER_CLAIMED_BILLING_CYCLE_ARGUMENT, BillingCycle::class.java)) {
                                 "Missing billing cycle argument"
                             }
                             OfferClaimedPage(
@@ -158,7 +158,7 @@ class WinbackFragment : BaseDialogFragment() {
                                 },
                             )
                         }
-                        composable(WinbackNavRoutes.AvailablePlans) {
+                        composable(WinbackNavRoutes.AVAILABLE_PLANS) {
                             AvailablePlansPage(
                                 plansState = state.subscriptionPlansState,
                                 onSelectPlan = { plan -> viewModel.changePlan(plan, requireActivity()) },
@@ -176,30 +176,30 @@ class WinbackFragment : BaseDialogFragment() {
                                 },
                             )
                         }
-                        composable(WinbackNavRoutes.HelpAndFeedback) {
+                        composable(WinbackNavRoutes.HELP_AND_FEEDBACK) {
                             HelpPage(
                                 activity = requireActivity(),
                                 appBarInsets = AppBarDefaults.topAppBarWindowInsets.only(WindowInsetsSides.Horizontal),
-                                onShowLogs = { navController.navigate(WinbackNavRoutes.SupportLogs) },
-                                onShowStatusPage = { navController.navigate(WinbackNavRoutes.StatusCheck) },
+                                onShowLogs = { navController.navigate(WinbackNavRoutes.SUPPORT_LOGS) },
+                                onShowStatusPage = { navController.navigate(WinbackNavRoutes.STATUS_CHECK) },
                                 onGoBack = { navController.popBackStack() },
                             )
                         }
-                        composable(WinbackNavRoutes.SupportLogs) {
+                        composable(WinbackNavRoutes.SUPPORT_LOGS) {
                             LogsPage(
                                 bottomInset = 0.dp,
                                 appBarInsets = AppBarDefaults.topAppBarWindowInsets.only(WindowInsetsSides.Horizontal),
                                 onBackPressed = { navController.popBackStack() },
                             )
                         }
-                        composable(WinbackNavRoutes.StatusCheck) {
+                        composable(WinbackNavRoutes.STATUS_CHECK) {
                             StatusPage(
                                 bottomInset = 0.dp,
                                 appBarInsets = AppBarDefaults.topAppBarWindowInsets.only(WindowInsetsSides.Horizontal),
                                 onBackPressed = { navController.popBackStack() },
                             )
                         }
-                        composable(WinbackNavRoutes.CancelConfirmation) {
+                        composable(WinbackNavRoutes.CANCEL_CONFIRMATION) {
                             CancelConfirmationPage(
                                 expirationDate = state.currentSubscriptionExpirationDate,
                                 onKeepSubscription = {
@@ -212,12 +212,12 @@ class WinbackFragment : BaseDialogFragment() {
                                     if (offer == null) {
                                         handleSubscriptionCancellation(state.subscriptionPlansState)
                                     } else {
-                                        navController.navigate(WinbackNavRoutes.WinbackOffer)
+                                        navController.navigate(WinbackNavRoutes.WINBACK_OFFER)
                                     }
                                 },
                             )
                         }
-                        composable(WinbackNavRoutes.WinbackOffer) {
+                        composable(WinbackNavRoutes.WINBACK_OFFER) {
                             val offer = state.winbackOfferState?.offer
                             if (offer != null) {
                                 WinbackOfferPage(
@@ -253,7 +253,7 @@ class WinbackFragment : BaseDialogFragment() {
                             viewModel.consumeClaimedOffer()
                             val billingCycle = offerState.offer.billingCycle
                             navController.navigate(WinbackNavRoutes.offerClaimedDestination(billingCycle)) {
-                                popUpTo(WinbackNavRoutes.Main) {
+                                popUpTo(WinbackNavRoutes.MAIN) {
                                     inclusive = true
                                 }
                             }
@@ -373,20 +373,20 @@ data class WinbackInitParams(
 }
 
 private object WinbackNavRoutes {
-    const val Main = "main"
-    const val AvailablePlans = "available_plans"
-    const val HelpAndFeedback = "help_and_feedback"
-    const val SupportLogs = "logs"
-    const val StatusCheck = "connection_status"
-    const val CancelConfirmation = "cancel_confirmation"
-    const val WinbackOffer = "winback_offer"
-    private const val OfferClaimed = "offer_claimed"
+    const val MAIN = "main"
+    const val AVAILABLE_PLANS = "available_plans"
+    const val HELP_AND_FEEDBACK = "help_and_feedback"
+    const val SUPPORT_LOGS = "logs"
+    const val STATUS_CHECK = "connection_status"
+    const val CANCEL_CONFIRMATION = "cancel_confirmation"
+    const val WINBACK_OFFER = "winback_offer"
+    private const val OFFER_CLAIMED = "offer_claimed"
 
-    const val OfferClaimedBillingCycleArgument = "billingCycle"
+    const val OFER_CLAIMED_BILLING_CYCLE_ARGUMENT = "billingCycle"
 
-    fun offerClaimedRoute() = "$OfferClaimed/{$OfferClaimedBillingCycleArgument}"
+    fun offerClaimedRoute() = "$OFFER_CLAIMED/{$OFER_CLAIMED_BILLING_CYCLE_ARGUMENT}"
 
-    fun offerClaimedDestination(billingCycle: BillingCycle) = "$OfferClaimed/$billingCycle"
+    fun offerClaimedDestination(billingCycle: BillingCycle) = "$OFFER_CLAIMED/$billingCycle"
 }
 
 private val intOffsetAnimationSpec = tween<IntOffset>(350)

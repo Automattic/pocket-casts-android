@@ -57,7 +57,9 @@ import au.com.shiftyjelly.pocketcasts.localization.R as LR
 import au.com.shiftyjelly.pocketcasts.views.R as VR
 
 @AndroidEntryPoint
-class PlayerContainerFragment : BaseFragment(), HasBackstack {
+class PlayerContainerFragment :
+    BaseFragment(),
+    HasBackstack {
     @Inject
     lateinit var settings: Settings
 

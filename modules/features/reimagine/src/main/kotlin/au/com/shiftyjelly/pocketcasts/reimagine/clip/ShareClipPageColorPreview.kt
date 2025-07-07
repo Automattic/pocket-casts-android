@@ -30,7 +30,7 @@ private class PodcastColorProvider : PreviewParameterProvider<Long> {
     ).map { Color.parseColor("#$it").toLong() }
 }
 
-@Preview(device = Devices.PortraitRegular)
+@Preview(device = Devices.PORTRAIT_REGULAR)
 @Composable
 private fun VerticalCardPreview(
     @PreviewParameter(PodcastColorProvider::class) color: Long,

@@ -43,7 +43,9 @@ import kotlinx.coroutines.Dispatchers
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 @AndroidEntryPoint
-class CreateFilterChipFragment : BaseFragment(), CoroutineScope {
+class CreateFilterChipFragment :
+    BaseFragment(),
+    CoroutineScope {
     @Inject lateinit var settings: Settings
 
     override val coroutineContext: CoroutineContext

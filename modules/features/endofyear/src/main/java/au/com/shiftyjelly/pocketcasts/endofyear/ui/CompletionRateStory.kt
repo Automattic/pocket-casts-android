@@ -344,7 +344,7 @@ private fun CompletionRateInfo(
     }
 }
 
-@Preview(device = Devices.PortraitRegular)
+@Preview(device = Devices.PORTRAIT_REGULAR)
 @Composable
 private fun CompletionRatePreview(
     @PreviewParameter(CompletedCountProvider::class) count: Int,

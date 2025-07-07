@@ -23,7 +23,7 @@ import com.google.android.horologist.compose.layout.rememberColumnState
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 object PrivacySettingsScreen {
-    const val route = "analytics_settings_screen"
+    const val ROUTE = "analytics_settings_screen"
 }
 
 @Composable

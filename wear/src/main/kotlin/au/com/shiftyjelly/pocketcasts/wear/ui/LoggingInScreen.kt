@@ -37,8 +37,8 @@ import com.google.android.horologist.compose.layout.ScreenScaffold
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 object LoggingInScreen {
-    const val route = "loggingInScreen"
-    const val routeWithDelay = "loggingInScreenWithDelay"
+    const val ROUTE = "loggingInScreen"
+    const val ROUTE_WITH_DELAY = "loggingInScreenWithDelay"
 }
 
 /**

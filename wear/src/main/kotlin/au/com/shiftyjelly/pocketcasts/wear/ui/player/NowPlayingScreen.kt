@@ -43,8 +43,7 @@ import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 object NowPlayingScreen {
-    const val route = "now_playing"
-    const val pagerIndex = 1
+    const val PAGER_INDEX = 1
 }
 
 @OptIn(ExperimentalWearFoundationApi::class)
@@ -59,7 +58,7 @@ fun NowPlayingScreen(
     // Listen for results from streaming confirmation screen
     navController.currentBackStackEntry?.savedStateHandle
         ?.getStateFlow<StreamingConfirmationScreen.Result?>(
-            key = StreamingConfirmationScreen.resultKey,
+            key = StreamingConfirmationScreen.RESULT_KEY,
             initialValue = null,
         )
         ?.collectAsStateWithLifecycle()?.value?.let { streamingConfirmationResult ->
@@ -72,7 +71,7 @@ fun NowPlayingScreen(
                     .currentBackStackEntry
                     ?.savedStateHandle
                     ?.remove<StreamingConfirmationScreen.Result?>(
-                        key = StreamingConfirmationScreen.resultKey,
+                        key = StreamingConfirmationScreen.RESULT_KEY,
                     )
             }
         }
@@ -118,7 +117,7 @@ fun NowPlayingScreen(
                             onPlayButtonClick = {
                                 playerViewModel.onPlayButtonClick(
                                     showStreamingConfirmation = {
-                                        navController.navigate(StreamingConfirmationScreen.route)
+                                        navController.navigate(StreamingConfirmationScreen.ROUTE)
                                     },
                                 )
                             },
@@ -167,7 +166,7 @@ fun NowPlayingScreen(
                 if (state is NowPlayingViewModel.State.Loaded) {
                     NowPlayingSettingsButtons(
                         volumeUiState = volumeUiState,
-                        onVolumeClick = { navController.navigate(PCVolumeScreen.route) },
+                        onVolumeClick = { navController.navigate(PCVolumeScreen.ROUTE) },
                         navController = navController,
                     )
                 }
@@ -215,7 +214,7 @@ fun NowPlayingSettingsButtons(
     ) {
         IconButton(
             onClick = {
-                navController.navigate(EffectsScreen.route)
+                navController.navigate(EffectsScreen.ROUTE)
             },
         ) {
             Icon(

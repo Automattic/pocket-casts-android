@@ -662,9 +662,13 @@ private class DiscoverAdapter : DeepLinkAdapter {
                 "/recommendations" -> {
                     RecommendationsDeepLink
                 }
-                else -> { null }
+                else -> {
+                    null
+                }
             }
-        } else { null }
+        } else {
+            null
+        }
     }
 }
 

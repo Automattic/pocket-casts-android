@@ -28,16 +28,16 @@ import kotlinx.coroutines.launch
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 object EpisodeScreenFlow {
-    const val episodeUuidArgument = "episodeUuid"
-    const val route = "episode/{$episodeUuidArgument}"
+    const val EPISODE_UUID_ARGUMENT = "episodeUuid"
+    const val ROUTE = "episode/{$EPISODE_UUID_ARGUMENT}"
     fun navigateRoute(episodeUuid: String) = "episode/$episodeUuid"
 
     // Routes
-    const val episodeScreen = "episodeScreen"
-    private const val upNextOptionsScreen = "upNextOptionsScreen"
-    private const val deleteDownloadConfirmationScreen = "deleteDownloadConfirmationScreen"
-    private const val deleteDownloadNotificationScreen = "deleteDownloadNotificationScreen"
-    private const val removeFromUpNextNotificationScreen = "removeFromUpNextNotificationScreen"
+    const val EPISODE_SCREEN = "episodeScreen"
+    private const val UP_NEXT_OPTIONS_SCREEN = "upNextOptionsScreen"
+    private const val DELETE_DOWNLOAD_CONFIRMATION_SCREEN = "deleteDownloadConfirmationScreen"
+    private const val DELETE_DOWNLOAD_NOTIFICATION_SCREEN = "deleteDownloadNotificationScreen"
+    private const val REMOVE_FROM_UP_NEXT_NOTIFICAGTIONS_SCREEN = "removeFromUpNextNotificationScreen"
 
     fun NavGraphBuilder.episodeGraph(
         navigateToPodcast: (podcastUuid: String) -> Unit,
@@ -45,27 +45,27 @@ object EpisodeScreenFlow {
         swipeToDismissState: SwipeToDismissBoxState,
     ) {
         navigation(
-            route = this@EpisodeScreenFlow.route,
-            startDestination = episodeScreen,
+            route = this@EpisodeScreenFlow.ROUTE,
+            startDestination = EPISODE_SCREEN,
             arguments = listOf(
-                navArgument(episodeUuidArgument) {
+                navArgument(EPISODE_UUID_ARGUMENT) {
                     type = NavType.StringType
                 },
             ),
         ) {
             composable(
-                route = episodeScreen,
+                route = EPISODE_SCREEN,
             ) {
                 // Listen for results from streaming confirmation screen
                 navController.currentBackStackEntry?.savedStateHandle
-                    ?.getStateFlow<StreamingConfirmationScreen.Result?>(StreamingConfirmationScreen.resultKey, null)
+                    ?.getStateFlow<StreamingConfirmationScreen.Result?>(StreamingConfirmationScreen.RESULT_KEY, null)
                     ?.collectAsStateWithLifecycle()?.value?.let { streamingConfirmationResult ->
                         val viewModel = hiltViewModel<EpisodeViewModel>()
                         LaunchedEffect(streamingConfirmationResult) {
                             viewModel.onStreamingConfirmationResult(streamingConfirmationResult)
                             // Clear result once consumed
                             navController.currentBackStackEntry?.savedStateHandle
-                                ?.remove<StreamingConfirmationScreen.Result?>(StreamingConfirmationScreen.resultKey)
+                                ?.remove<StreamingConfirmationScreen.Result?>(StreamingConfirmationScreen.RESULT_KEY)
                         }
                     }
 
@@ -82,19 +82,19 @@ object EpisodeScreenFlow {
                             ),
                         ),
                         navigateToPodcast = navigateToPodcast,
-                        navigateToUpNextOptions = { navController.navigate(upNextOptionsScreen) },
+                        navigateToUpNextOptions = { navController.navigate(UP_NEXT_OPTIONS_SCREEN) },
                         navigateToConfirmDeleteDownload = {
-                            navController.navigate(deleteDownloadConfirmationScreen)
+                            navController.navigate(DELETE_DOWNLOAD_CONFIRMATION_SCREEN)
                         },
                         navigateToRemoveFromUpNextNotification = {
-                            navController.navigate(removeFromUpNextNotificationScreen)
+                            navController.navigate(REMOVE_FROM_UP_NEXT_NOTIFICAGTIONS_SCREEN)
                         },
                         navigateToStreamingConfirmation = {
-                            navController.navigate(StreamingConfirmationScreen.route)
+                            navController.navigate(StreamingConfirmationScreen.ROUTE)
                         },
                         navigateToNowPlaying = {
                             coroutineScope.launch {
-                                pagerState.animateScrollToPage(NowPlayingScreen.pagerIndex)
+                                pagerState.animateScrollToPage(NowPlayingScreen.PAGER_INDEX)
                             }
                         },
                     )
@@ -102,10 +102,10 @@ object EpisodeScreenFlow {
             }
 
             composable(
-                route = upNextOptionsScreen,
+                route = UP_NEXT_OPTIONS_SCREEN,
             ) {
                 val episodeScreenBackStackEntry = remember(it) {
-                    navController.getBackStackEntry(episodeScreen)
+                    navController.getBackStackEntry(EPISODE_SCREEN)
                 }
                 UpNextOptionsScreen(
                     episodeScreenViewModelStoreOwner = episodeScreenBackStackEntry, // Reuse view model from EpisodeScreen
@@ -114,11 +114,11 @@ object EpisodeScreenFlow {
             }
 
             composable(
-                route = deleteDownloadConfirmationScreen,
+                route = DELETE_DOWNLOAD_CONFIRMATION_SCREEN,
             ) {
                 // Reuse view model from EpisodeScreen
                 val episodeScreenViewModelStoreOwner = remember(it) {
-                    navController.getBackStackEntry(episodeScreen)
+                    navController.getBackStackEntry(EPISODE_SCREEN)
                 }
                 val viewModel = hiltViewModel<EpisodeViewModel>(episodeScreenViewModelStoreOwner)
 
@@ -126,8 +126,8 @@ object EpisodeScreenFlow {
                     text = stringResource(LR.string.podcast_remove_downloaded_file),
                     onConfirm = {
                         viewModel.deleteDownloadedEpisode()
-                        navController.navigate(deleteDownloadNotificationScreen) {
-                            popUpTo(episodeScreen) {
+                        navController.navigate(DELETE_DOWNLOAD_NOTIFICATION_SCREEN) {
+                            popUpTo(EPISODE_SCREEN) {
                                 inclusive = false
                             }
                         }
@@ -137,7 +137,7 @@ object EpisodeScreenFlow {
             }
 
             composable(
-                route = deleteDownloadNotificationScreen,
+                route = DELETE_DOWNLOAD_NOTIFICATION_SCREEN,
             ) {
                 NotificationScreen(
                     text = stringResource(LR.string.removed),
@@ -146,7 +146,7 @@ object EpisodeScreenFlow {
             }
 
             composable(
-                route = removeFromUpNextNotificationScreen,
+                route = REMOVE_FROM_UP_NEXT_NOTIFICAGTIONS_SCREEN,
             ) {
                 NotificationScreen(
                     text = stringResource(LR.string.episode_removed_from_up_next),

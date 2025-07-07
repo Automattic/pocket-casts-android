@@ -91,7 +91,9 @@ import au.com.shiftyjelly.pocketcasts.views.R as VR
 private const val ARG_MODE = "profile_list_mode"
 
 @AndroidEntryPoint
-class ProfileEpisodeListFragment : BaseFragment(), Toolbar.OnMenuItemClickListener {
+class ProfileEpisodeListFragment :
+    BaseFragment(),
+    Toolbar.OnMenuItemClickListener {
     sealed class Mode(
         val index: Int,
         val showMenu: Boolean,

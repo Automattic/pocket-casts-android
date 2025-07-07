@@ -65,7 +65,8 @@ class UserManagerImpl @Inject constructor(
     private val experimentProvider: ExperimentProvider,
     private val endOfYearSync: EndOfYearSync,
     private val notificationScheduler: NotificationScheduler,
-) : UserManager, CoroutineScope {
+) : UserManager,
+    CoroutineScope {
 
     companion object {
         private const val KEY_USER_INITIATED = "user_initiated"

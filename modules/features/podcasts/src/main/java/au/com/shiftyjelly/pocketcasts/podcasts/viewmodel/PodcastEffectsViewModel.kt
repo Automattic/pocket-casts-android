@@ -28,7 +28,8 @@ class PodcastEffectsViewModel
     private val podcastManager: PodcastManager,
     private val playbackManager: PlaybackManager,
     private val settings: Settings,
-) : ViewModel(), CoroutineScope {
+) : ViewModel(),
+    CoroutineScope {
 
     override val coroutineContext: CoroutineContext
         get() = Dispatchers.Default

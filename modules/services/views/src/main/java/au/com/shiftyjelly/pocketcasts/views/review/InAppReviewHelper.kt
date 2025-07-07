@@ -26,8 +26,7 @@ class InAppReviewHelper @Inject constructor(
         delayInMs: Long,
         sourceView: SourceView,
     ) {
-        if (settings.getReviewRequestedDates().isNotEmpty()
-        ) {
+        if (settings.getReviewRequestedDates().isNotEmpty()) {
             return
         }
         delay(delayInMs)
@@ -50,8 +49,7 @@ class InAppReviewHelper @Inject constructor(
     }
 
     private object AnalyticsProp {
-        private const val source = "source"
-        fun addSource(sourceView: SourceView) =
-            mapOf(source to sourceView.analyticsValue)
+        private const val SOURCE = "source"
+        fun addSource(sourceView: SourceView) = mapOf(SOURCE to sourceView.analyticsValue)
     }
 }

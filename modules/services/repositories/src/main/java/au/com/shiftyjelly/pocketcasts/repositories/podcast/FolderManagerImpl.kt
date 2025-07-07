@@ -19,7 +19,8 @@ class FolderManagerImpl @Inject constructor(
     appDatabase: AppDatabase,
     private val podcastManager: PodcastManager,
     private val settings: Settings,
-) : FolderManager, CoroutineScope {
+) : FolderManager,
+    CoroutineScope {
 
     private val folderDao = appDatabase.folderDao()
 

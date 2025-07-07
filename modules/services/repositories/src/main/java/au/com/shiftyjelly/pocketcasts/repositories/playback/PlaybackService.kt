@@ -107,7 +107,9 @@ const val CONTENT_STYLE_GRID_ITEM_HINT_VALUE = 2
 private const val EPISODE_LIMIT = 100
 
 @AndroidEntryPoint
-open class PlaybackService : MediaBrowserServiceCompat(), CoroutineScope {
+open class PlaybackService :
+    MediaBrowserServiceCompat(),
+    CoroutineScope {
     inner class LocalBinder : Binder() {
         val service: PlaybackService
             get() = this@PlaybackService
@@ -440,7 +442,7 @@ open class PlaybackService : MediaBrowserServiceCompat(), CoroutineScope {
         }
     }
 
-    private val NUM_SUGGESTED_ITEMS = 8
+    private val numSuggestedItems = 8
     suspend fun loadSuggestedChildren(): List<MediaBrowserCompat.MediaItem> {
         Timber.d("Loading suggested children")
         val episodes = mutableListOf<BaseEpisode>()
@@ -449,14 +451,14 @@ open class PlaybackService : MediaBrowserServiceCompat(), CoroutineScope {
         if (currentEpisode != null) {
             episodes.add(currentEpisode)
         }
-        episodes.addAll(upNextQueue.queueEpisodes.take(NUM_SUGGESTED_ITEMS - 1))
+        episodes.addAll(upNextQueue.queueEpisodes.take(numSuggestedItems - 1))
         // add episodes from the top filter
-        if (episodes.size < NUM_SUGGESTED_ITEMS) {
+        if (episodes.size < numSuggestedItems) {
             val topFilter = playlistManager.findAll().firstOrNull()
             if (topFilter != null) {
                 val filterEpisodes = playlistManager.findEpisodesBlocking(topFilter, episodeManager, playbackManager)
                 for (filterEpisode in filterEpisodes) {
-                    if (episodes.size >= NUM_SUGGESTED_ITEMS) {
+                    if (episodes.size >= numSuggestedItems) {
                         break
                     }
                     if (episodes.none { it.uuid == filterEpisode.uuid }) {
@@ -466,7 +468,7 @@ open class PlaybackService : MediaBrowserServiceCompat(), CoroutineScope {
             }
         }
         // add the latest episode
-        if (episodes.size < NUM_SUGGESTED_ITEMS) {
+        if (episodes.size < numSuggestedItems) {
             val latestEpisode = episodeManager.findLatestEpisodeToPlayBlocking()
             if (latestEpisode != null && episodes.none { it.uuid == latestEpisode.uuid }) {
                 episodes.add(latestEpisode)

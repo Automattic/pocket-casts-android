@@ -215,7 +215,7 @@ class SubscriptionPlansTest {
 
     @Test
     fun `do not create plans when plus monthly product is missing`() {
-        val products = products.filter { it.id != SubscriptionPlan.PlusMonthlyProductId }
+        val products = products.filter { it.id != SubscriptionPlan.PLUS_MONTHLY_PRODUCT_ID }
 
         val plans = SubscriptionPlans.create(products).getOrNull()
 
@@ -224,7 +224,7 @@ class SubscriptionPlansTest {
 
     @Test
     fun `do not create plans when plus yearly product is missing`() {
-        val products = products.filter { it.id != SubscriptionPlan.PlusYearlyProductId }
+        val products = products.filter { it.id != SubscriptionPlan.PLUS_YEARLY_PRODUCT_ID }
 
         val plans = SubscriptionPlans.create(products).getOrNull()
 
@@ -233,7 +233,7 @@ class SubscriptionPlansTest {
 
     @Test
     fun `do not create plans when patron monthly product is missing`() {
-        val products = products.filter { it.id != SubscriptionPlan.PatronMonthlyProductId }
+        val products = products.filter { it.id != SubscriptionPlan.PATRON_MONTHLY_PRODUCT_ID }
 
         val plans = SubscriptionPlans.create(products).getOrNull()
 
@@ -242,7 +242,7 @@ class SubscriptionPlansTest {
 
     @Test
     fun `do not create plans when patron yearly product is missing`() {
-        val products = products.filter { it.id != SubscriptionPlan.PatronYearlyProductId }
+        val products = products.filter { it.id != SubscriptionPlan.PATRON_YEARLY_PRODUCT_ID }
 
         val plans = SubscriptionPlans.create(products).getOrNull()
 
@@ -252,7 +252,7 @@ class SubscriptionPlansTest {
     @Test
     fun `do not create plans when base plan has multiple pricing phases`() {
         val products = products.map { product ->
-            if (product.id == SubscriptionPlan.PatronYearlyProductId) {
+            if (product.id == SubscriptionPlan.PATRON_YEARLY_PRODUCT_ID) {
                 val basePlan = product.pricingPlans.basePlan.copy(pricingPhases = listOf(pricingPhase, pricingPhase))
                 val pricingPlans = product.pricingPlans.copy(basePlan = basePlan)
                 product.copy(pricingPlans = pricingPlans)

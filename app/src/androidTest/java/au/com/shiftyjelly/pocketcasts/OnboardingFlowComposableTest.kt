@@ -86,7 +86,7 @@ class OnboardingFlowComposableTest {
     @Test
     fun startDestination_LoggedOut() {
         assertStartDestinationForFlow(
-            startDestination = OnboardingNavRoute.logInOrSignUp,
+            startDestination = OnboardingNavRoute.LOG_IN_OR_SIGN_UP,
             flow = OnboardingFlow.LoggedOut,
         )
     }
@@ -94,7 +94,7 @@ class OnboardingFlowComposableTest {
     @Test
     fun startDestination_PlusAccountUpgradeNeedsLogin() {
         assertStartDestinationForFlow(
-            startDestination = OnboardingNavRoute.logInOrSignUp,
+            startDestination = OnboardingNavRoute.LOG_IN_OR_SIGN_UP,
             flow = OnboardingFlow.PlusAccountUpgradeNeedsLogin,
         )
     }
@@ -102,7 +102,7 @@ class OnboardingFlowComposableTest {
     @Test
     fun startDestination_InitialOnboarding() {
         assertStartDestinationForFlow(
-            startDestination = OnboardingNavRoute.logInOrSignUp,
+            startDestination = OnboardingNavRoute.LOG_IN_OR_SIGN_UP,
             flow = OnboardingFlow.InitialOnboarding,
         )
     }
@@ -110,7 +110,7 @@ class OnboardingFlowComposableTest {
     @Test
     fun startDestination_PlusAccountUpgrade() {
         assertStartDestinationForFlow(
-            startDestination = OnboardingNavRoute.PlusUpgrade.route,
+            startDestination = OnboardingNavRoute.PlusUpgrade.ROUTE,
             flow = OnboardingFlow.PlusAccountUpgrade(OnboardingUpgradeSource.ACCOUNT_DETAILS, SubscriptionTier.Plus, BillingCycle.Yearly),
         )
     }
@@ -118,7 +118,7 @@ class OnboardingFlowComposableTest {
     @Test
     fun startDestination_PlusFlow_PlusAccountUpgrade() {
         assertStartDestinationForFlow(
-            startDestination = OnboardingNavRoute.PlusUpgrade.route,
+            startDestination = OnboardingNavRoute.PlusUpgrade.ROUTE,
             flow = OnboardingFlow.PlusAccountUpgrade(OnboardingUpgradeSource.ACCOUNT_DETAILS, SubscriptionTier.Plus, BillingCycle.Yearly),
         )
     }
@@ -126,7 +126,7 @@ class OnboardingFlowComposableTest {
     @Test
     fun startDestination_PlusFlow_PlusUpsell() {
         assertStartDestinationForFlow(
-            startDestination = OnboardingNavRoute.PlusUpgrade.route,
+            startDestination = OnboardingNavRoute.PlusUpgrade.ROUTE,
             flow = OnboardingFlow.Upsell(OnboardingUpgradeSource.ACCOUNT_DETAILS),
         )
     }
@@ -134,7 +134,7 @@ class OnboardingFlowComposableTest {
     @Test
     fun startDestination_PlusFlow_PatronAccountUpgrade() {
         assertStartDestinationForFlow(
-            startDestination = OnboardingNavRoute.PlusUpgrade.route,
+            startDestination = OnboardingNavRoute.PlusUpgrade.ROUTE,
             flow = OnboardingFlow.PatronAccountUpgrade(OnboardingUpgradeSource.ACCOUNT_DETAILS),
         )
     }

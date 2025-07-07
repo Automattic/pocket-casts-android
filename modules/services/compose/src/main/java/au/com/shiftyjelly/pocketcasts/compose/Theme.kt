@@ -50,19 +50,18 @@ fun AppTheme(
 }
 
 @Composable
-fun themeTypeToColors(themeType: Theme.ThemeType) =
-    when (themeType) {
-        Theme.ThemeType.LIGHT -> ThemeLightColors
-        Theme.ThemeType.DARK -> ThemeDarkColors
-        Theme.ThemeType.EXTRA_DARK -> ThemeExtraDarkColors
-        Theme.ThemeType.CLASSIC_LIGHT -> ThemeClassicLightColors
-        Theme.ThemeType.ELECTRIC -> ThemeElectricityColors
-        Theme.ThemeType.INDIGO -> ThemeIndigoColors
-        Theme.ThemeType.RADIOACTIVE -> ThemeRadioactiveColors
-        Theme.ThemeType.ROSE -> ThemeRoseColors
-        Theme.ThemeType.LIGHT_CONTRAST -> ThemeLightContrastColors
-        Theme.ThemeType.DARK_CONTRAST -> ThemeDarkContrastColors
-    }
+fun themeTypeToColors(themeType: Theme.ThemeType) = when (themeType) {
+    Theme.ThemeType.LIGHT -> ThemeLightColors
+    Theme.ThemeType.DARK -> ThemeDarkColors
+    Theme.ThemeType.EXTRA_DARK -> ThemeExtraDarkColors
+    Theme.ThemeType.CLASSIC_LIGHT -> ThemeClassicLightColors
+    Theme.ThemeType.ELECTRIC -> ThemeElectricityColors
+    Theme.ThemeType.INDIGO -> ThemeIndigoColors
+    Theme.ThemeType.RADIOACTIVE -> ThemeRadioactiveColors
+    Theme.ThemeType.ROSE -> ThemeRoseColors
+    Theme.ThemeType.LIGHT_CONTRAST -> ThemeLightContrastColors
+    Theme.ThemeType.DARK_CONTRAST -> ThemeDarkContrastColors
+}
 
 @Composable
 fun AutomotiveTheme(content: @Composable () -> Unit) {

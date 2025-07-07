@@ -215,7 +215,7 @@ private fun formatDate(date: Long) = remember(date) {
     dateFormat.format(date)
 }
 
-@Preview(device = Devices.PortraitRegular)
+@Preview(device = Devices.PORTRAIT_REGULAR)
 @Composable
 private fun UpNextHistoryDetailsViewPreview(
     @PreviewParameter(ThemePreviewParameterProvider::class) themeType: Theme.ThemeType,
@@ -247,7 +247,7 @@ private fun UpNextHistoryDetailsViewPreview(
     }
 }
 
-@Preview(device = Devices.PortraitRegular)
+@Preview(device = Devices.PORTRAIT_REGULAR)
 @Composable
 private fun UpNextHistoryDetailsErrorViewPreview(
     @PreviewParameter(ThemePreviewParameterProvider::class) themeType: Theme.ThemeType,

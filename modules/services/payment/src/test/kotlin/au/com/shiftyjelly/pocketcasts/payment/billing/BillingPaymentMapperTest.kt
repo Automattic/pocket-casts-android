@@ -4,11 +4,11 @@ import au.com.shiftyjelly.pocketcasts.payment.Price
 import au.com.shiftyjelly.pocketcasts.payment.PricingSchedule
 import au.com.shiftyjelly.pocketcasts.payment.PurchaseState
 import au.com.shiftyjelly.pocketcasts.payment.TestListener
-import com.android.billingclient.api.GoogleOfferDetails
-import com.android.billingclient.api.GooglePricingPhase
-import com.android.billingclient.api.GoogleProductDetails
-import com.android.billingclient.api.GooglePurchase
 import com.android.billingclient.api.ProductDetails.RecurrenceMode
+import com.android.billingclient.api.createGoogleOfferDetails
+import com.android.billingclient.api.createGooglePricingPhase
+import com.android.billingclient.api.createGoogleProductDetails
+import com.android.billingclient.api.createGooglePurchase
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNotNull
 import org.junit.Assert.assertNull
@@ -26,19 +26,19 @@ class BillingPaymentMapperTest {
 
     @Test
     fun `map product`() {
-        assertNotNull(mapper.toProduct(GoogleProductDetails()))
+        assertNotNull(mapper.toProduct(createGoogleProductDetails()))
     }
 
     @Test
     fun `no errors are logged when product is mapped successfully`() {
-        mapper.toProduct(GoogleProductDetails())
+        mapper.toProduct(createGoogleProductDetails())
 
         listener.assertMessages()
     }
 
     @Test
     fun `map base product properties`() {
-        val googleProduct = GoogleProductDetails(
+        val googleProduct = createGoogleProductDetails(
             productId = "ID 1234",
             name = "Cool product",
         )
@@ -51,13 +51,13 @@ class BillingPaymentMapperTest {
 
     @Test
     fun `map product without offers`() {
-        val googleProduct = GoogleProductDetails(
+        val googleProduct = createGoogleProductDetails(
             subscriptionOfferDetails = listOf(
-                GoogleOfferDetails(
+                createGoogleOfferDetails(
                     basePlanId = "Base plan ID",
                     offerId = null,
                     pricingPhases = listOf(
-                        GooglePricingPhase(
+                        createGooglePricingPhase(
                             priceAmountMicros = 200_500_000,
                             priceCurrencyCode = "AUD",
                             formattedPrice = "$200.50",
@@ -90,10 +90,10 @@ class BillingPaymentMapperTest {
 
     @Test
     fun `map product with offers`() {
-        val googleProduct = GoogleProductDetails(
+        val googleProduct = createGoogleProductDetails(
             subscriptionOfferDetails = listOf(
-                GoogleOfferDetails(offerId = null),
-                GoogleOfferDetails(
+                createGoogleOfferDetails(offerId = null),
+                createGoogleOfferDetails(
                     basePlanId = "Offer base plan ID",
                     offerId = "Offer ID",
                     offerTags = listOf("Offer Tag", "Another offer tag"),
@@ -112,23 +112,23 @@ class BillingPaymentMapperTest {
 
     @Test
     fun `map product prices`() {
-        val googleProduct = GoogleProductDetails(
+        val googleProduct = createGoogleProductDetails(
             subscriptionOfferDetails = listOf(
-                GoogleOfferDetails(offerId = null),
-                GoogleOfferDetails(
+                createGoogleOfferDetails(offerId = null),
+                createGoogleOfferDetails(
                     offerId = "ID",
                     pricingPhases = listOf(
-                        GooglePricingPhase(
+                        createGooglePricingPhase(
                             priceAmountMicros = 10_000_000,
                             priceCurrencyCode = "USD",
                             formattedPrice = "$10.00",
                         ),
-                        GooglePricingPhase(
+                        createGooglePricingPhase(
                             priceAmountMicros = 15_000_000,
                             priceCurrencyCode = "EUR",
                             formattedPrice = "15.00 €",
                         ),
-                        GooglePricingPhase(
+                        createGooglePricingPhase(
                             priceAmountMicros = 20_000_000,
                             priceCurrencyCode = "PLN",
                             formattedPrice = "20.00 zł",
@@ -155,83 +155,83 @@ class BillingPaymentMapperTest {
 
     @Test
     fun `map product pricing schedules`() {
-        val googleProduct = GoogleProductDetails(
+        val googleProduct = createGoogleProductDetails(
             subscriptionOfferDetails = listOf(
-                GoogleOfferDetails(offerId = null),
-                GoogleOfferDetails(
+                createGoogleOfferDetails(offerId = null),
+                createGoogleOfferDetails(
                     offerId = "ID",
                     pricingPhases = listOf(
-                        GooglePricingPhase(
+                        createGooglePricingPhase(
                             billingPeriod = "P1M",
                             billingCycleCount = 0,
                             recurrenceMode = RecurrenceMode.INFINITE_RECURRING,
                         ),
                     ),
                 ),
-                GoogleOfferDetails(
+                createGoogleOfferDetails(
                     offerId = "ID",
                     pricingPhases = listOf(
-                        GooglePricingPhase(
+                        createGooglePricingPhase(
                             billingPeriod = "P1M",
                             billingCycleCount = 0,
                             recurrenceMode = RecurrenceMode.NON_RECURRING,
                         ),
                     ),
                 ),
-                GoogleOfferDetails(
+                createGoogleOfferDetails(
                     offerId = "ID",
                     pricingPhases = listOf(
-                        GooglePricingPhase(
+                        createGooglePricingPhase(
                             billingPeriod = "P1M",
                             billingCycleCount = 1,
                             recurrenceMode = RecurrenceMode.FINITE_RECURRING,
                         ),
                     ),
                 ),
-                GoogleOfferDetails(
+                createGoogleOfferDetails(
                     offerId = "ID",
                     pricingPhases = listOf(
-                        GooglePricingPhase(
+                        createGooglePricingPhase(
                             billingPeriod = "P1M",
                             billingCycleCount = 2,
                             recurrenceMode = RecurrenceMode.FINITE_RECURRING,
                         ),
                     ),
                 ),
-                GoogleOfferDetails(
+                createGoogleOfferDetails(
                     offerId = "ID",
                     pricingPhases = listOf(
-                        GooglePricingPhase(
+                        createGooglePricingPhase(
                             billingPeriod = "P2M",
                             billingCycleCount = 0,
                             recurrenceMode = RecurrenceMode.INFINITE_RECURRING,
                         ),
                     ),
                 ),
-                GoogleOfferDetails(
+                createGoogleOfferDetails(
                     offerId = "ID",
                     pricingPhases = listOf(
-                        GooglePricingPhase(
+                        createGooglePricingPhase(
                             billingPeriod = "P1W",
                             billingCycleCount = 0,
                             recurrenceMode = RecurrenceMode.INFINITE_RECURRING,
                         ),
                     ),
                 ),
-                GoogleOfferDetails(
+                createGoogleOfferDetails(
                     offerId = "ID",
                     pricingPhases = listOf(
-                        GooglePricingPhase(
+                        createGooglePricingPhase(
                             billingPeriod = "P3Y",
                             billingCycleCount = 0,
                             recurrenceMode = RecurrenceMode.INFINITE_RECURRING,
                         ),
                     ),
                 ),
-                GoogleOfferDetails(
+                createGoogleOfferDetails(
                     offerId = "ID",
                     pricingPhases = listOf(
-                        GooglePricingPhase(
+                        createGooglePricingPhase(
                             billingPeriod = "P2D",
                             billingCycleCount = 0,
                             recurrenceMode = RecurrenceMode.INFINITE_RECURRING,
@@ -295,7 +295,7 @@ class BillingPaymentMapperTest {
 
     @Test
     fun `do not map product with unknown type`() {
-        val googleProduct = GoogleProductDetails(
+        val googleProduct = createGoogleProductDetails(
             productId = "Product ID",
             type = "foo",
         )
@@ -306,7 +306,7 @@ class BillingPaymentMapperTest {
 
     @Test
     fun `do not map product with no subscription offers`() {
-        val googleProduct = GoogleProductDetails(
+        val googleProduct = createGoogleProductDetails(
             productId = "Product ID",
             subscriptionOfferDetails = null,
         )
@@ -317,7 +317,7 @@ class BillingPaymentMapperTest {
 
     @Test
     fun `do not map product with empty subscription offers`() {
-        val googleProduct = GoogleProductDetails(
+        val googleProduct = createGoogleProductDetails(
             productId = "Product ID",
             subscriptionOfferDetails = emptyList(),
         )
@@ -328,10 +328,10 @@ class BillingPaymentMapperTest {
 
     @Test
     fun `do not map product with no base offer`() {
-        val googleProduct = GoogleProductDetails(
+        val googleProduct = createGoogleProductDetails(
             productId = "Product ID",
             subscriptionOfferDetails = listOf(
-                GoogleOfferDetails(offerId = "Offer ID"),
+                createGoogleOfferDetails(offerId = "Offer ID"),
             ),
         )
 
@@ -341,11 +341,11 @@ class BillingPaymentMapperTest {
 
     @Test
     fun `do not map product with multiple base offer`() {
-        val googleProduct = GoogleProductDetails(
+        val googleProduct = createGoogleProductDetails(
             productId = "Product ID",
             subscriptionOfferDetails = listOf(
-                GoogleOfferDetails(),
-                GoogleOfferDetails(),
+                createGoogleOfferDetails(),
+                createGoogleOfferDetails(),
             ),
         )
 
@@ -355,14 +355,14 @@ class BillingPaymentMapperTest {
 
     @Test
     fun `do not map product with unknown recurrence mode`() {
-        val googleProduct = GoogleProductDetails(
+        val googleProduct = createGoogleProductDetails(
             productId = "Product ID",
             subscriptionOfferDetails = listOf(
-                GoogleOfferDetails(),
-                GoogleOfferDetails(
+                createGoogleOfferDetails(),
+                createGoogleOfferDetails(
                     basePlanId = "Base plan ID",
                     offerId = "Offer ID",
-                    pricingPhases = listOf(GooglePricingPhase(recurrenceMode = -100)),
+                    pricingPhases = listOf(createGooglePricingPhase(recurrenceMode = -100)),
                 ),
             ),
         )
@@ -375,12 +375,12 @@ class BillingPaymentMapperTest {
     fun `do not map product with invalid billing duration`() {
         val durations = listOf("1M", "D1M", "PM", "P-1M", "P1U", "P1MY", "P1")
         val googleProducts = durations.map { duration ->
-            GoogleProductDetails(
+            createGoogleProductDetails(
                 productId = "Product ID",
                 subscriptionOfferDetails = listOf(
-                    GoogleOfferDetails(
+                    createGoogleOfferDetails(
                         basePlanId = "Base plan ID",
-                        pricingPhases = listOf(GooglePricingPhase(billingPeriod = duration)),
+                        pricingPhases = listOf(createGooglePricingPhase(billingPeriod = duration)),
                     ),
                 ),
             )
@@ -402,19 +402,19 @@ class BillingPaymentMapperTest {
 
     @Test
     fun `map purchase`() {
-        assertNotNull(mapper.toPurchase(GooglePurchase()))
+        assertNotNull(mapper.toPurchase(createGooglePurchase()))
     }
 
     @Test
     fun `no errors are logged when purchase is mapped`() {
-        mapper.toPurchase(GooglePurchase())
+        mapper.toPurchase(createGooglePurchase())
 
         listener.assertMessages()
     }
 
     @Test
     fun `map base purchase properties`() {
-        val googlePurchase = GooglePurchase(
+        val googlePurchase = createGooglePurchase(
             orderId = "Order ID",
             purchaseToken = "Purchase token",
             productIds = listOf("Product ID 1", "Product ID 2"),
@@ -434,7 +434,7 @@ class BillingPaymentMapperTest {
 
     @Test
     fun `map pending purchase state`() {
-        val googlePurchase = GooglePurchase(isPurchased = false)
+        val googlePurchase = createGooglePurchase(isPurchased = false)
 
         val purchase = mapper.toPurchase(googlePurchase)
 
@@ -443,7 +443,7 @@ class BillingPaymentMapperTest {
 
     @Test
     fun `map purchase with purchased state and without order ID to unspecified state`() {
-        val googlePurchase = GooglePurchase(isPurchased = true, orderId = null)
+        val googlePurchase = createGooglePurchase(isPurchased = true, orderId = null)
 
         val purchase = mapper.toPurchase(googlePurchase)
 

@@ -168,7 +168,7 @@ private fun formatDate(date: Date) = remember(date) {
     dateFormat.format(date)
 }
 
-@Preview(device = Devices.PortraitRegular)
+@Preview(device = Devices.PORTRAIT_REGULAR)
 @Composable
 private fun UpNextHistoryPageViewPreview(
     @PreviewParameter(ThemePreviewParameterProvider::class) themeType: Theme.ThemeType,
@@ -194,7 +194,7 @@ private fun UpNextHistoryPageViewPreview(
     }
 }
 
-@Preview(device = Devices.PortraitRegular)
+@Preview(device = Devices.PORTRAIT_REGULAR)
 @Composable
 private fun UpNextHistoryErrorViewPreview(
     @PreviewParameter(ThemePreviewParameterProvider::class) themeType: Theme.ThemeType,

@@ -30,7 +30,7 @@ import com.google.android.horologist.compose.layout.ScalingLazyColumnState
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 object UpNextScreen {
-    const val route = "up_next_screen"
+    const val ROUTE = "up_next_screen"
 }
 
 @Composable
