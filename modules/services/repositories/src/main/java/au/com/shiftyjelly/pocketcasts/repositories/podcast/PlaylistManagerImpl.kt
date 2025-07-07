@@ -26,6 +26,7 @@ import java.util.Date
 import java.util.UUID
 import javax.inject.Inject
 import kotlin.coroutines.CoroutineContext
+import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
@@ -38,6 +39,7 @@ class PlaylistManagerImpl @Inject constructor(
     private val playlistUpdateAnalytics: PlaylistUpdateAnalytics,
     private val syncManager: SyncManager,
     private val notificationManager: NotificationManager,
+    private val dispatcher: CoroutineDispatcher = Dispatchers.Default,
     @ApplicationContext private val context: Context,
     appDatabase: AppDatabase,
 ) : PlaylistManager, CoroutineScope {
@@ -59,7 +61,7 @@ class PlaylistManagerImpl @Inject constructor(
     }
 
     override val coroutineContext: CoroutineContext
-        get() = Dispatchers.Default
+        get() = dispatcher
 
     private fun setupDefaultPlaylists() {
         val existingNewRelease = playlistDao.findByUuidBlocking(NEW_RELEASE_UUID)

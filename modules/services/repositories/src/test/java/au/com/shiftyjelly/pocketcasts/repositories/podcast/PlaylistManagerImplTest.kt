@@ -63,13 +63,14 @@ class PlaylistManagerImplTest {
         whenever(playlistUpdateAnalytics.update(any(), any(), any())).then { }
 
         return PlaylistManagerImpl(
-            settings,
-            downloadManager,
-            playlistUpdateAnalytics,
-            syncManager,
-            notificationManager,
-            context,
-            appDatabase,
+            settings = settings,
+            downloadManager = downloadManager,
+            playlistUpdateAnalytics = playlistUpdateAnalytics,
+            syncManager = syncManager,
+            notificationManager = notificationManager,
+            dispatcher = coroutineRule.testDispatcher,
+            context = context,
+            appDatabase = appDatabase,
         )
     }
 }
