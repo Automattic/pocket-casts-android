@@ -7,16 +7,18 @@ import au.com.shiftyjelly.pocketcasts.analytics.AppLifecycleAnalytics
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.preferences.UserSetting
 import au.com.shiftyjelly.pocketcasts.repositories.notification.NotificationScheduler
-import au.com.shiftyjelly.pocketcasts.sharedtest.MainCoroutineRule
 import au.com.shiftyjelly.pocketcasts.utils.AppPlatform
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.providers.DefaultReleaseFeatureProvider
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.providers.FirebaseRemoteFeatureProvider
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.providers.PreferencesFeatureProvider
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.cancel
+import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
+import org.junit.After
 import org.junit.Before
-import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.Mock
@@ -33,6 +35,7 @@ private const val VERSION_CODE_DEFAULT = 0
 private const val VERSION_CODE_AFTER_FIRST_INSTALL = 1
 private const val VERSION_CODE_AFTER_SECOND_INSTALL = 2
 
+@OptIn(ExperimentalCoroutinesApi::class)
 @RunWith(MockitoJUnitRunner::class)
 class AppLifecycleObserverTest {
 
@@ -77,8 +80,7 @@ class AppLifecycleObserverTest {
 
     @Mock private lateinit var notificationScheduler: NotificationScheduler
 
-    @get:Rule
-    val coroutineRule = MainCoroutineRule()
+    private var coroutineScope = CoroutineScope(UnconfinedTestDispatcher())
 
     lateinit var appLifecycleObserver: AppLifecycleObserver
 
@@ -107,9 +109,14 @@ class AppLifecycleObserverTest {
             versionCode = VERSION_CODE_AFTER_SECOND_INSTALL,
             settings = settings,
             networkConnectionWatcher = networkConnectionWatcher,
-            applicationScope = CoroutineScope(coroutineRule.testDispatcher),
+            applicationScope = coroutineScope,
             notificationScheduler = notificationScheduler,
         )
+    }
+
+    @After
+    fun tearDown() {
+        coroutineScope.cancel()
     }
 
     /* NEW INSTALL */

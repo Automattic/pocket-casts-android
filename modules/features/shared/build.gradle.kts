@@ -41,6 +41,4 @@ dependencies {
     testImplementation(libs.lifecycle.runtime.testing)
     testImplementation(libs.mockito.core)
     testImplementation(libs.mockito.kotlin)
-
-    testImplementation(projects.modules.services.sharedtest)
 }
