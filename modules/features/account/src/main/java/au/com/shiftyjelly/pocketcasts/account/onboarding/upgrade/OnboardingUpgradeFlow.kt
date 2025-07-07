@@ -118,7 +118,7 @@ fun OnboardingUpgradeFlow(
         content = {
             if (flow !is OnboardingFlow.PlusAccountUpgrade) {
                 if (FeatureFlag.isEnabled(Feature.NEW_ONBOARDING_UPGRADE)) {
-                    OnboardingUpgradeScreen(onClosePress = onBackPress, onSubscribePress = {})
+                    OnboardingUpgradeScreen(onClosePress = onBackPress, onSubscribePress = {}, variant = Variants.VARIANT_FEATURES)
                 } else {
                     OnboardingUpgradeFeaturesPage(
                         viewModel = @Suppress("ktlint:compose:vm-forwarding-check") viewModel,

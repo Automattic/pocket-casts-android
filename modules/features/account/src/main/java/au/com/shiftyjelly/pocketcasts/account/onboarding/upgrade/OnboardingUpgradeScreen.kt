@@ -1,5 +1,7 @@
 package au.com.shiftyjelly.pocketcasts.account.onboarding.upgrade
 
+import UpgradeTrialItem
+import UpgradeTrialTimeline
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -19,6 +21,7 @@ import androidx.compose.foundation.layout.statusBars
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.layout.wrapContentWidth
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.pager.VerticalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.shape.CircleShape
@@ -41,12 +44,13 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
+import au.com.shiftyjelly.pocketcasts.account.onboarding.components.UpgradeFeatureItem
 import au.com.shiftyjelly.pocketcasts.account.onboarding.components.UpgradePlanRow
 import au.com.shiftyjelly.pocketcasts.account.onboarding.upgrade.OnboardingUpgradeHelper.PrivacyPolicy
 import au.com.shiftyjelly.pocketcasts.account.onboarding.upgrade.OnboardingUpgradeHelper.UpgradeRowButton
 import au.com.shiftyjelly.pocketcasts.compose.AppThemeWithBackground
 import au.com.shiftyjelly.pocketcasts.compose.components.TextH10
-import au.com.shiftyjelly.pocketcasts.compose.components.TextH40
+import au.com.shiftyjelly.pocketcasts.compose.components.TextP40
 import au.com.shiftyjelly.pocketcasts.compose.images.SubscriptionBadge
 import au.com.shiftyjelly.pocketcasts.compose.preview.ThemePreviewParameterProvider
 import au.com.shiftyjelly.pocketcasts.compose.theme
@@ -54,10 +58,18 @@ import au.com.shiftyjelly.pocketcasts.images.R
 import au.com.shiftyjelly.pocketcasts.payment.SubscriptionPlan
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme.ThemeType
 import kotlinx.coroutines.launch
+import previewItems
+import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
+
+enum class Variants {
+    VARIANT_FEATURES,
+    VARIANT_TRIAL_TIMELINE,
+}
 
 @Composable
 fun OnboardingUpgradeScreen(
+    variant: Variants,
     onClosePress: () -> Unit,
     onSubscribePress: () -> Unit,
     modifier: Modifier = Modifier,
@@ -68,6 +80,7 @@ fun OnboardingUpgradeScreen(
     )
 
     var selectedPlan by remember { mutableStateOf(plans[0]) }
+    val selectedOnboardingPlan = remember(selectedPlan) { OnboardingSubscriptionPlan.create(selectedPlan) }
 
     Column(
         modifier = modifier
@@ -80,12 +93,16 @@ fun OnboardingUpgradeScreen(
             ),
     ) {
         UpgradeHeader(
-            selectedPlan = selectedPlan,
+            selectedPlan = selectedOnboardingPlan,
             onClosePress = onClosePress,
         )
         Spacer(modifier = Modifier.height(24.dp))
         UpgradeContent(
             modifier = Modifier.weight(1f),
+            pages = variant.toContentPages(
+                currentPlan = selectedOnboardingPlan,
+                isEligibleForTrial = true,
+            ),
         )
         Spacer(modifier = Modifier.height(16.dp))
         UpgradeFooter(
@@ -93,6 +110,7 @@ fun OnboardingUpgradeScreen(
                 .fillMaxWidth(),
             plans = plans,
             selectedPlan = selectedPlan,
+            selectedOnboardingPlan = selectedOnboardingPlan,
             onSelectedChange = { selectedPlan = it },
             onClickSubscribe = { onSubscribePress() },
         )
@@ -104,11 +122,10 @@ private fun UpgradeFooter(
     plans: List<SubscriptionPlan.Base>,
     selectedPlan: SubscriptionPlan.Base,
     onSelectedChange: (SubscriptionPlan.Base) -> Unit,
+    selectedOnboardingPlan: OnboardingSubscriptionPlan,
     onClickSubscribe: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    val selectedOnboardingPlan = remember(selectedPlan) { OnboardingSubscriptionPlan.create(selectedPlan) }
-
     Column(
         modifier = modifier,
     ) {
@@ -144,12 +161,10 @@ private fun UpgradeFooter(
 
 @Composable
 private fun UpgradeHeader(
-    selectedPlan: SubscriptionPlan.Base,
+    selectedPlan: OnboardingSubscriptionPlan,
     onClosePress: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    val selectedOnboardingPlan = remember(selectedPlan) { OnboardingSubscriptionPlan.create(selectedPlan) }
-
     Column(modifier = modifier) {
         Row(
             modifier = Modifier.fillMaxWidth(),
@@ -157,8 +172,8 @@ private fun UpgradeHeader(
             verticalAlignment = Alignment.CenterVertically,
         ) {
             SubscriptionBadge(
-                iconRes = selectedOnboardingPlan.badgeIconRes,
-                shortNameRes = selectedOnboardingPlan.shortNameRes,
+                iconRes = selectedPlan.badgeIconRes,
+                shortNameRes = selectedPlan.shortNameRes,
                 backgroundColor = Color.Black,
                 textColor = Color.White,
                 modifier = Modifier
@@ -192,60 +207,120 @@ private fun UpgradeHeader(
 }
 
 @Composable
+private fun Variants.toContentPages(currentPlan: OnboardingSubscriptionPlan, isEligibleForTrial: Boolean) = buildList {
+    when (this@toContentPages) {
+        Variants.VARIANT_FEATURES -> {
+            add(
+                ContentPage.Features(
+                    features = currentPlan.featureItems,
+                    showCta = true,
+                ),
+            )
+            if (isEligibleForTrial) {
+                add(
+                    ContentPage.TrialSchedule(
+                        timelineItems = previewItems(),
+                        showCta = false,
+                    ),
+                )
+            }
+        }
+
+        Variants.VARIANT_TRIAL_TIMELINE -> {
+            add(
+                ContentPage.TrialSchedule(
+                    timelineItems = previewItems(),
+                    showCta = true,
+                ),
+            )
+            add(
+                ContentPage.Features(
+                    features = currentPlan.featureItems,
+                    showCta = false,
+                ),
+            )
+        }
+    }
+}
+
+sealed interface ContentPage {
+    val showCta: Boolean
+
+    data class Features(val features: List<UpgradeFeatureItem>, override val showCta: Boolean) : ContentPage
+    data class TrialSchedule(val timelineItems: List<UpgradeTrialItem>, override val showCta: Boolean) : ContentPage
+}
+
+@Composable
 private fun UpgradeContent(
+    pages: List<ContentPage>,
     modifier: Modifier = Modifier,
 ) {
-    val pagerState = rememberPagerState(initialPage = 0) { 2 }
-    val coroutineScope = rememberCoroutineScope()
-    VerticalPager(
-        modifier = modifier,
-        state = pagerState,
-    ) { page ->
-        if (page == 0) {
-            FeaturesContent(
-                onClick = {
-                    coroutineScope.launch {
-                        pagerState.animateScrollToPage(1)
-                    }
-                },
-            )
-        } else {
-            ScheduleContent(
-                onClick = {
-                    coroutineScope.launch {
-                        pagerState.animateScrollToPage(0)
-                    }
-                },
-            )
+    Column(modifier = modifier) {
+        val pagerState = rememberPagerState(initialPage = 0) { pages.size }
+        val coroutineScope = rememberCoroutineScope()
+        VerticalPager(state = pagerState, modifier = Modifier.fillMaxSize()) { page ->
+            when (val currentPage = pages[page]) {
+                is ContentPage.Features -> FeaturesContent(
+                    features = currentPage,
+                    onCtaClicked = { coroutineScope.launch { pagerState.animateScrollToPage(pages.size - page - 1) } },
+                )
+
+                is ContentPage.TrialSchedule -> ScheduleContent(
+                    trialSchedule = currentPage,
+                    onCtaClicked = { coroutineScope.launch { pagerState.animateScrollToPage(pages.size - page - 1) } },
+                )
+            }
         }
     }
 }
 
 @Composable
 private fun FeaturesContent(
-    onClick: (() -> Unit)? = null,
+    features: ContentPage.Features,
+    onCtaClicked: () -> Unit,
 ) {
-    Box(
-        contentAlignment = Alignment.Center,
-        modifier = Modifier
-            .fillMaxWidth()
-            .heightIn(min = 92.dp),
-    ) {
-        TextH40(text = "Features content", modifier = Modifier.clickable { onClick?.invoke() })
+    LazyColumn {
+        items(features.features.size) {
+            UpgradeFeatureItem(
+                item = features.features[it],
+                iconColor = MaterialTheme.theme.colors.primaryText01,
+                textColor = MaterialTheme.theme.colors.secondaryText02,
+            )
+        }
+        if (features.showCta) {
+            item {
+                Spacer(modifier = Modifier.height(24.dp))
+                TextP40(
+                    text = stringResource(LR.string.onboarding_upgrade_features_trial_schedule),
+                    modifier = Modifier.clickable { onCtaClicked() },
+                    color = MaterialTheme.theme.colors.primaryInteractive01,
+                )
+            }
+        }
     }
 }
 
 @Composable
 private fun ScheduleContent(
-    onClick: (() -> Unit)? = null,
+    trialSchedule: ContentPage.TrialSchedule,
+    onCtaClicked: () -> Unit,
 ) {
-    Box(
-        contentAlignment = Alignment.Center,
-        modifier = Modifier
-            .fillMaxWidth()
-            .heightIn(min = 92.dp),
-    ) {
-        TextH40(text = "Schedule content", modifier = Modifier.clickable { onClick?.invoke() })
+    LazyColumn {
+        item {
+            UpgradeTrialTimeline(
+                items = trialSchedule.timelineItems,
+            )
+        }
+        if (trialSchedule.showCta) {
+            item {
+                Spacer(modifier = Modifier.height(24.dp))
+                TextP40(
+                    text = stringResource(LR.string.onboarding_upgrade_schedule_see_features),
+                    modifier = Modifier.clickable { onCtaClicked() },
+                    color = MaterialTheme.theme.colors.primaryInteractive01,
+                )
+            }
+        }
     }
 }
 
@@ -259,6 +334,7 @@ private fun PreviewOnboardingUpgradeScreen(
             modifier = Modifier.fillMaxSize(),
             onSubscribePress = {},
             onClosePress = {},
+            variant = Variants.VARIANT_FEATURES,
         )
     }
 }

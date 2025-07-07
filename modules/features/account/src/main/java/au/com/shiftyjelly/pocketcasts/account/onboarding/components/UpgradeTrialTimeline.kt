@@ -20,6 +20,7 @@ import androidx.compose.ui.layout.Layout
 import androidx.compose.ui.layout.Placeable
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
@@ -32,11 +33,31 @@ import au.com.shiftyjelly.pocketcasts.compose.theme
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme.ThemeType
 import kotlin.math.max
 import au.com.shiftyjelly.pocketcasts.images.R as IR
+import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 data class UpgradeTrialItem(
     @DrawableRes val iconResId: Int,
     val title: String,
     val message: String,
+)
+
+@Composable
+fun previewItems() = listOf(
+    UpgradeTrialItem(
+        iconResId = IR.drawable.ic_unlocked,
+        title = stringResource(LR.string.onboarding_upgrade_schedule_today),
+        message = stringResource(LR.string.onboarding_upgrade_schedule_today_message),
+    ),
+    UpgradeTrialItem(
+        iconResId = IR.drawable.ic_envelope,
+        title = stringResource(LR.string.onboarding_upgrade_schedule_day, 24),
+        message = stringResource(LR.string.onboarding_upgrade_schedule_notify),
+    ),
+    UpgradeTrialItem(
+        iconResId =IR.drawable.ic_star,
+        title = stringResource(LR.string.onboarding_upgrade_schedule_day, 31),
+        message = stringResource(LR.string.onboarding_upgrade_schedule_billing, "September 31th"),
+    ),
 )
 
 @Composable

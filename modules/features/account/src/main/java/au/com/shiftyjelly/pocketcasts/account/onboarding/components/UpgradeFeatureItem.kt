@@ -23,7 +23,8 @@ import au.com.shiftyjelly.pocketcasts.ui.R as UR
 fun UpgradeFeatureItem(
     item: UpgradeFeatureItem,
     modifier: Modifier = Modifier,
-    color: Color = Color.Black,
+    iconColor: Color = Color.Black,
+    textColor: Color = Color.Black,
 ) {
     Row(
         modifier = modifier
@@ -35,7 +36,7 @@ fun UpgradeFeatureItem(
         Icon(
             painter = painterResource(item.image),
             contentDescription = null,
-            tint = color,
+            tint = iconColor,
             modifier = Modifier
                 .size(20.dp)
                 .padding(2.dp),
@@ -43,8 +44,8 @@ fun UpgradeFeatureItem(
         Spacer(Modifier.width(16.dp))
         HtmlText(
             html = stringResource(id = item.title),
-            color = color,
-            linkColor = color,
+            color = textColor,
+            linkColor = textColor,
             textStyleResId = UR.style.H50,
         )
     }
