@@ -171,7 +171,6 @@ fun PasswordField(
     focusRequester: FocusRequester = remember { FocusRequester() },
     isCreatingAccount: Boolean,
     onUpdatePassword: (String) -> Unit,
-
 ) {
     var showPassword by remember { mutableStateOf(false) }
 

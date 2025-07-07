@@ -30,7 +30,9 @@ private const val ARG_PLAYLIST_UUID = "playlist_uuid"
 private const val ARG_OPTIONS_TYPE = "options_type"
 
 @AndroidEntryPoint
-class TimeOptionsFragment : BaseFragment(), CoroutineScope {
+class TimeOptionsFragment :
+    BaseFragment(),
+    CoroutineScope {
     sealed class OptionsType(val type: String) {
         object Time : OptionsType("time")
         object Downloaded : OptionsType("downloaded")
@@ -185,8 +187,20 @@ class TimeOptionsFragment : BaseFragment(), CoroutineScope {
 
             selectedPosition = when (optionType) {
                 OptionsType.Time -> options.indexOfFirst { it.playlistValue!! >= playlist.filterHours }
-                OptionsType.Downloaded -> if (playlist.downloaded && playlist.notDownloaded) 0 else if (playlist.downloaded) 1 else 2
-                OptionsType.AudioVideo -> if (playlist.audioVideo == Playlist.AUDIO_VIDEO_FILTER_ALL) 0 else if (playlist.audioVideo == Playlist.AUDIO_VIDEO_FILTER_AUDIO_ONLY) 1 else 2
+                OptionsType.Downloaded -> if (playlist.downloaded && playlist.notDownloaded) {
+                    0
+                } else if (playlist.downloaded) {
+                    1
+                } else {
+                    2
+                }
+                OptionsType.AudioVideo -> if (playlist.audioVideo == Playlist.AUDIO_VIDEO_FILTER_ALL) {
+                    0
+                } else if (playlist.audioVideo == Playlist.AUDIO_VIDEO_FILTER_AUDIO_ONLY) {
+                    1
+                } else {
+                    2
+                }
             }
 
             updatedSelected(0, selectedPosition)

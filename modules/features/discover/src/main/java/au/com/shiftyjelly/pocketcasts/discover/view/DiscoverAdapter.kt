@@ -417,7 +417,9 @@ internal class DiscoverAdapter(
         }
     }
 
-    inner class SmallListViewHolder(val binding: RowPodcastSmallListBinding) : NetworkLoadableViewHolder(binding.root), ShowAllRow {
+    inner class SmallListViewHolder(val binding: RowPodcastSmallListBinding) :
+        NetworkLoadableViewHolder(binding.root),
+        ShowAllRow {
         var currentPage = 0
             private set
 
@@ -560,7 +562,9 @@ internal class DiscoverAdapter(
     class SingleEpisodeViewHolder(val binding: RowSingleEpisodeBinding) : NetworkLoadableViewHolder(binding.root)
     class CollectionListDeprecatedViewHolder(val binding: RowCollectionListDeprecatedBinding) : NetworkLoadableViewHolder(binding.root)
 
-    inner class CollectionListViewHolder(val binding: RowCollectionListBinding) : NetworkLoadableViewHolder(binding.root), ShowAllRow {
+    inner class CollectionListViewHolder(val binding: RowCollectionListBinding) :
+        NetworkLoadableViewHolder(binding.root),
+        ShowAllRow {
         val adapter = CollectionListRowAdapter(
             listener::onPodcastClicked,
             onPodcastSubscribe = { podcast, listId ->
@@ -1200,8 +1204,7 @@ internal class DiscoverAdapter(
     }
 }
 
-private fun MutableList<DiscoverPodcast>.addSafely(item: DiscoverPodcast, position: Int) =
-    add(min(position, count()), item)
+private fun MutableList<DiscoverPodcast>.addSafely(item: DiscoverPodcast, position: Int) = add(min(position, count()), item)
 
 private class DiscoverRowDiffCallback : DiffUtil.ItemCallback<Any>() {
     override fun areItemsTheSame(old: Any, new: Any): Boolean {

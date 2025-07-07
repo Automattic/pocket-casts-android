@@ -47,8 +47,8 @@ private val gradientTop = Color(0x00000000)
 private val gradientBottom = Color(0x33000000)
 private val topPodcastImageGradient = listOf(Color(0x00000000), Color(0x16000000))
 private val bottomPodcastImageGradient = listOf(Color(0x16000000), Color(0x33000000))
-private const val paddingImageRatio = 4f / 120f
-private const val imageSizeRatio = 38f / 120f
+private const val PADDING_IMAGE_RATIO = 4f / 120f
+private const val IMAGE_SIZE_RATIO = 38f / 120f
 
 @Composable
 fun FolderImage(
@@ -86,13 +86,13 @@ fun FolderImage(
                     )
                     .fillMaxSize(),
             ) {}
-            val podcastSize = (constraints.maxWidth.value * imageSizeRatio).dp
+            val podcastSize = (constraints.maxWidth.value * IMAGE_SIZE_RATIO).dp
             Column(
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.Center,
                 modifier = Modifier.fillMaxWidth(),
             ) {
-                val imagePadding = (constraints.maxWidth.value * paddingImageRatio).dp
+                val imagePadding = (constraints.maxWidth.value * PADDING_IMAGE_RATIO).dp
                 Spacer(modifier = Modifier.height(imagePadding))
                 Row(horizontalArrangement = Arrangement.Center) {
                     Column(horizontalAlignment = Alignment.End) {

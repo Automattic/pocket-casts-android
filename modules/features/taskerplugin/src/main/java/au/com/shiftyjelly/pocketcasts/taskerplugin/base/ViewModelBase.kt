@@ -12,7 +12,9 @@ import com.joaomgcd.taskerpluginlibrary.input.TaskerInput
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 
-abstract class ViewModelBase<TInput : Any, TOutput : Any, THelper : TaskerPluginConfigHelper<TInput, TOutput, out TaskerPluginRunnerAction<TInput, TOutput>>>(application: Application) : AndroidViewModel(application), TaskerPluginConfig<TInput> {
+abstract class ViewModelBase<TInput : Any, TOutput : Any, THelper : TaskerPluginConfigHelper<TInput, TOutput, out TaskerPluginRunnerAction<TInput, TOutput>>>(application: Application) :
+    AndroidViewModel(application),
+    TaskerPluginConfig<TInput> {
     override val context get() = getApplication<Application>()
     abstract fun getNewHelper(pluginConfig: TaskerPluginConfig<TInput>): THelper
     private val taskerHelper by lazy { getNewHelper(this) }
@@ -56,15 +58,14 @@ abstract class ViewModelBase<TInput : Any, TOutput : Any, THelper : TaskerPlugin
     }
 
     @JvmName("InputFieldEnumResId")
-    protected inline fun <reified T : Enum<T>> InputFieldEnum(@StringRes labelResId: Int, @DrawableRes iconResId: Int, noinline valueGetter: TInput.() -> String?, noinline valueSetter: TInput.(String?) -> Unit, noinline valueDescriptionResIdGetter: ((T?) -> Int?)? = null): InputFieldBase<T> =
-        InputFieldEnumStringDescription(labelResId, iconResId, valueGetter, valueSetter) { item ->
-            if (valueDescriptionResIdGetter == null) return@InputFieldEnumStringDescription null
-            val resId = valueDescriptionResIdGetter(item) ?: return@InputFieldEnumStringDescription null
-            context.getString(resId)
-        }
+    protected inline fun <reified T : Enum<T>> createInputFieldEnum(@StringRes labelResId: Int, @DrawableRes iconResId: Int, noinline valueGetter: TInput.() -> String?, noinline valueSetter: TInput.(String?) -> Unit, noinline valueDescriptionResIdGetter: ((T?) -> Int?)? = null): InputFieldBase<T> = createInputFieldEnumStringDescription(labelResId, iconResId, valueGetter, valueSetter) { item ->
+        if (valueDescriptionResIdGetter == null) return@createInputFieldEnumStringDescription null
+        val resId = valueDescriptionResIdGetter(item) ?: return@createInputFieldEnumStringDescription null
+        context.getString(resId)
+    }
 
     @JvmName("InputFieldEnumString")
-    protected inline fun <reified T : Enum<T>> InputFieldEnumStringDescription(@StringRes labelResId: Int, @DrawableRes iconResId: Int, noinline valueGetter: TInput.() -> String?, noinline valueSetter: TInput.(String?) -> Unit, noinline valueDescriptionGetter: ((T?) -> String?)? = null) = object : InputFieldBase<T>(labelResId, iconResId, valueGetter, valueSetter) {
+    protected inline fun <reified T : Enum<T>> createInputFieldEnumStringDescription(@StringRes labelResId: Int, @DrawableRes iconResId: Int, noinline valueGetter: TInput.() -> String?, noinline valueSetter: TInput.(String?) -> Unit, noinline valueDescriptionGetter: ((T?) -> String?)? = null) = object : InputFieldBase<T>(labelResId, iconResId, valueGetter, valueSetter) {
         override val askFor get() = true
         override fun getPossibleValues() = MutableStateFlow(T::class.java.enumConstants?.toList() ?: listOf())
         override fun getValueDescriptionSpecific(possibleValue: T?): String? {

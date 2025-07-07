@@ -19,15 +19,21 @@ val PocketCastsIcons.StarFull: ImageVector
             return _starFull!!
         }
         _starFull = Builder(
-            name = "StarFull", defaultWidth = 16.0.dp, defaultHeight = 16.0.dp,
-            viewportWidth = 16.0f, viewportHeight = 16.0f,
+            name = "StarFull",
+            defaultWidth = 16.0.dp,
+            defaultHeight = 16.0.dp,
+            viewportWidth = 16.0f,
+            viewportHeight = 16.0f,
         ).apply {
             path(
-                fill = SolidColor(Color(0xFF808080)), stroke = SolidColor(Color(0xFF808080)),
-                strokeLineWidth = 1.0f, strokeLineCap = Round,
+                fill = SolidColor(Color(0xFF808080)),
+                stroke = SolidColor(Color(0xFF808080)),
+                strokeLineWidth = 1.0f,
+                strokeLineCap = Round,
                 strokeLineJoin =
                 StrokeJoin.Companion.Round,
-                strokeLineMiter = 4.0f, pathFillType = NonZero,
+                strokeLineMiter = 4.0f,
+                pathFillType = NonZero,
             ) {
                 moveTo(8.402f, 2.2885f)
                 lineTo(10.1827f, 5.8149f)
@@ -55,8 +61,12 @@ val PocketCastsIcons.StarFull: ImageVector
                 close()
             }
             path(
-                fill = SolidColor(Color(0xFF808080)), stroke = null, strokeLineWidth = 0.0f,
-                strokeLineCap = Butt, strokeLineJoin = Miter, strokeLineMiter = 4.0f,
+                fill = SolidColor(Color(0xFF808080)),
+                stroke = null,
+                strokeLineWidth = 0.0f,
+                strokeLineCap = Butt,
+                strokeLineJoin = Miter,
+                strokeLineMiter = 4.0f,
                 pathFillType = NonZero,
             ) {
                 moveTo(8.0f, 2.0002f)

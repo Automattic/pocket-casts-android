@@ -18,7 +18,7 @@ import java.util.Date
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 object DownloadsScreen {
-    const val route = "downloads_screen"
+    const val ROUTE = "downloads_screen"
 }
 
 @Composable

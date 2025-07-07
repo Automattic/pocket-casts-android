@@ -35,7 +35,7 @@ import au.com.shiftyjelly.pocketcasts.ui.extensions.inPortrait
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.utils.Util
 
-private const val ContentMaxWidthDp = 600
+private val ContentMaxWidthDp = 600.dp
 private val ContentPadding = 16.dp
 private val OutlinedBorder: BorderStroke
     @Composable
@@ -84,8 +84,7 @@ fun BottomSheetContent(
         contentAlignment = Alignment.TopCenter,
     ) {
         Column(
-            modifier = modifier
-                .widthIn(max = ContentMaxWidthDp.dp),
+            modifier = modifier.widthIn(max = ContentMaxWidthDp),
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
             val context = LocalContext.current

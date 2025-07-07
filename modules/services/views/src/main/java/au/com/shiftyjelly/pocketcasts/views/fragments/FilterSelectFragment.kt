@@ -50,13 +50,12 @@ class FilterSelectFragment private constructor() : BaseFragment() {
         fun newInstance(
             source: Source,
             shouldFilterPlaylistsWithAllPodcasts: Boolean = false,
-        ): Fragment =
-            FilterSelectFragment().apply {
-                arguments = bundleOf(
-                    ARG_FILTER_ALL_PODCAST_FILTERS to shouldFilterPlaylistsWithAllPodcasts,
-                    ARG_FILTER_SOURCE to source,
-                )
-            }
+        ): Fragment = FilterSelectFragment().apply {
+            arguments = bundleOf(
+                ARG_FILTER_ALL_PODCAST_FILTERS to shouldFilterPlaylistsWithAllPodcasts,
+                ARG_FILTER_SOURCE to source,
+            )
+        }
     }
 
     private val viewModel: FilterSelectViewModel by viewModels()

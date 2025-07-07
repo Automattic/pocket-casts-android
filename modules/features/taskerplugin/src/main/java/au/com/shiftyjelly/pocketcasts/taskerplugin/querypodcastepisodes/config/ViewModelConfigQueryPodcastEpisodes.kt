@@ -19,7 +19,8 @@ import au.com.shiftyjelly.pocketcasts.images.R as RD
 @HiltViewModel
 class ViewModelConfigQueryPodcastEpisodes @Inject constructor(
     application: Application,
-) : ViewModelBase<InputQueryPodcastEpisodes, Array<OutputQueryEpisodes>, ActionHelperQueryPodcastEpisodes>(application), TaskerPluginConfig<InputQueryPodcastEpisodes> {
+) : ViewModelBase<InputQueryPodcastEpisodes, Array<OutputQueryEpisodes>, ActionHelperQueryPodcastEpisodes>(application),
+    TaskerPluginConfig<InputQueryPodcastEpisodes> {
     override fun getNewHelper(pluginConfig: TaskerPluginConfig<InputQueryPodcastEpisodes>) = ActionHelperQueryPodcastEpisodes(pluginConfig)
 
     private inner class InputField constructor(@StringRes labelResId: Int, @DrawableRes iconResId: Int, valueGetter: InputQueryPodcastEpisodes.() -> String?, valueSetter: InputQueryPodcastEpisodes.(String?) -> Unit) : InputFieldBase<String>(labelResId, iconResId, valueGetter, valueSetter) {

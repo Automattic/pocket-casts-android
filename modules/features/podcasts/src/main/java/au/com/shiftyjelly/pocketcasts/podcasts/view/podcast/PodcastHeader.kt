@@ -910,7 +910,7 @@ private val previewColors = listOf(
     Color(0xFFFF6663),
 )
 
-@Preview(device = Devices.PortraitRegular)
+@Preview(device = Devices.PORTRAIT_REGULAR)
 @Composable
 private fun PodcastHeaderPreview(
     @PreviewParameter(ThemePreviewParameterProvider::class) themeType: Theme.ThemeType,

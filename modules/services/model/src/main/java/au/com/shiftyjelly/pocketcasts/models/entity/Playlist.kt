@@ -162,8 +162,7 @@ data class Playlist(
         ;
 
         companion object {
-            fun fromInt(value: Int) =
-                SortOrder.values().find { it.value == value }
+            fun fromInt(value: Int) = SortOrder.values().find { it.value == value }
         }
     }
 }

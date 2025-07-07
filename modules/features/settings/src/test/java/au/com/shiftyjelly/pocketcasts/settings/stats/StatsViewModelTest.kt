@@ -64,64 +64,58 @@ class StatsViewModelTest {
     }
 
     @Test
-    fun `given last 7 days played upto sum more than 2_5 hrs, when stats are loaded, then app review dialog is shown`() =
-        runTest {
-            initViewModel(playedUpToSumInHours = 3.0)
+    fun `given last 7 days played upto sum more than 2_5 hrs, when stats are loaded, then app review dialog is shown`() = runTest {
+        initViewModel(playedUpToSumInHours = 3.0)
 
-            viewModel.loadStats()
+        viewModel.loadStats()
 
-            assertTrue((viewModel.state.value as StatsViewModel.State.Loaded).showAppReviewDialog)
-        }
-
-    @Test
-    fun `given last 7 days played upto sum less than 2_5 hrs, when stats are loaded, then app review dialog  is not shown`() =
-        runTest {
-            initViewModel(playedUpToSumInHours = 2.0)
-
-            viewModel.loadStats()
-
-            assertFalse((viewModel.state.value as StatsViewModel.State.Loaded).showAppReviewDialog)
-        }
+        assertTrue((viewModel.state.value as StatsViewModel.State.Loaded).showAppReviewDialog)
+    }
 
     @Test
-    fun `given stats started more than 7 days, when stats are loaded, then app review dialog is shown`() =
-        runTest {
-            initViewModel(statsStartedAt = LocalDateTime.now().minusDays(8.toLong()))
+    fun `given last 7 days played upto sum less than 2_5 hrs, when stats are loaded, then app review dialog  is not shown`() = runTest {
+        initViewModel(playedUpToSumInHours = 2.0)
 
-            viewModel.loadStats()
+        viewModel.loadStats()
 
-            assertTrue((viewModel.state.value as StatsViewModel.State.Loaded).showAppReviewDialog)
-        }
-
-    @Test
-    fun `given stats started less than 7 days, when stats are loaded, then app review dialog is not shown`() =
-        runTest {
-            initViewModel(statsStartedAt = LocalDateTime.now().minusDays(6.toLong()))
-
-            viewModel.loadStats()
-
-            assertFalse((viewModel.state.value as StatsViewModel.State.Loaded).showAppReviewDialog)
-        }
+        assertFalse((viewModel.state.value as StatsViewModel.State.Loaded).showAppReviewDialog)
+    }
 
     @Test
-    fun `given stats started equal to 7 days, when stats are loaded, then app review dialog is not shown`() =
-        runTest {
-            initViewModel(statsStartedAt = LocalDateTime.now().minusDays(7.toLong()))
+    fun `given stats started more than 7 days, when stats are loaded, then app review dialog is shown`() = runTest {
+        initViewModel(statsStartedAt = LocalDateTime.now().minusDays(8.toLong()))
 
-            viewModel.loadStats()
+        viewModel.loadStats()
 
-            assertFalse((viewModel.state.value as StatsViewModel.State.Loaded).showAppReviewDialog)
-        }
+        assertTrue((viewModel.state.value as StatsViewModel.State.Loaded).showAppReviewDialog)
+    }
 
     @Test
-    fun `given stats started at unix epoch, when stats are loaded, then app review dialog is not shown`() =
-        runTest {
-            initViewModel(statsStartedAt = LocalDateTime.ofInstant(Instant.EPOCH, ZoneId.systemDefault()))
+    fun `given stats started less than 7 days, when stats are loaded, then app review dialog is not shown`() = runTest {
+        initViewModel(statsStartedAt = LocalDateTime.now().minusDays(6.toLong()))
 
-            viewModel.loadStats()
+        viewModel.loadStats()
 
-            assertFalse((viewModel.state.value as StatsViewModel.State.Loaded).showAppReviewDialog)
-        }
+        assertFalse((viewModel.state.value as StatsViewModel.State.Loaded).showAppReviewDialog)
+    }
+
+    @Test
+    fun `given stats started equal to 7 days, when stats are loaded, then app review dialog is not shown`() = runTest {
+        initViewModel(statsStartedAt = LocalDateTime.now().minusDays(7.toLong()))
+
+        viewModel.loadStats()
+
+        assertFalse((viewModel.state.value as StatsViewModel.State.Loaded).showAppReviewDialog)
+    }
+
+    @Test
+    fun `given stats started at unix epoch, when stats are loaded, then app review dialog is not shown`() = runTest {
+        initViewModel(statsStartedAt = LocalDateTime.ofInstant(Instant.EPOCH, ZoneId.systemDefault()))
+
+        viewModel.loadStats()
+
+        assertFalse((viewModel.state.value as StatsViewModel.State.Loaded).showAppReviewDialog)
+    }
 
     private suspend fun initViewModel(
         statsStartedAt: LocalDateTime = LocalDateTime.now().minusDays(8.toLong()),

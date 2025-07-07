@@ -289,13 +289,11 @@ private fun DialogFramePreview(
 
 @Preview
 @Composable
-private fun DialogFramePreview_horizontal() =
-    DialogFramePreview(orientation = DialogButtonOrientation.Horizontal, theme = Theme.ThemeType.LIGHT)
+private fun DialogFramePreview_horizontal() = DialogFramePreview(orientation = DialogButtonOrientation.Horizontal, theme = Theme.ThemeType.LIGHT)
 
 @Preview
 @Composable
-private fun DialogFramePreview_vertical() =
-    DialogFramePreview(orientation = DialogButtonOrientation.Vertical, theme = Theme.ThemeType.DARK)
+private fun DialogFramePreview_vertical() = DialogFramePreview(orientation = DialogButtonOrientation.Vertical, theme = Theme.ThemeType.DARK)
 
 @Composable
 private fun RadioDialogPreview(theme: Theme.ThemeType) {

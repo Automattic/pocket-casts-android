@@ -95,30 +95,27 @@ class EpisodeAnalytics @Inject constructor(
     }
 
     private object AnalyticsProp {
-        private const val source = "source"
-        private const val podcast_uuid = "podcast_uuid"
-        private const val episode_uuid = "episode_uuid"
-        private const val count = "count"
-        private const val to_top = "to_top"
-        fun sourceAndUuidMap(eventSource: SourceView, uuid: String) =
-            mapOf(source to eventSource.analyticsValue, episode_uuid to uuid)
+        private const val SOURCE = "source"
+        private const val PODCAST_UUID = "podcast_uuid"
+        private const val EPISODE_UUID = "episode_uuid"
+        private const val COUNT = "count"
+        private const val TO_TOP = "to_top"
+        fun sourceAndUuidMap(eventSource: SourceView, uuid: String) = mapOf(SOURCE to eventSource.analyticsValue, EPISODE_UUID to uuid)
 
-        fun uuidMap(uuid: String) = mapOf(episode_uuid to uuid)
-        fun sourceAndToTopMap(eventSource: SourceView, toTop: Boolean, episode: BaseEpisode) =
-            mapOf(
-                source to eventSource.analyticsValue,
-                to_top to toTop,
-                podcast_uuid to episode.podcastOrSubstituteUuid,
-                episode_uuid to episode.uuid,
-            )
+        fun uuidMap(uuid: String) = mapOf(EPISODE_UUID to uuid)
+        fun sourceAndToTopMap(eventSource: SourceView, toTop: Boolean, episode: BaseEpisode) = mapOf(
+            SOURCE to eventSource.analyticsValue,
+            TO_TOP to toTop,
+            PODCAST_UUID to episode.podcastOrSubstituteUuid,
+            EPISODE_UUID to episode.uuid,
+        )
 
-        fun bulkMap(eventSource: SourceView, count: Int) =
-            mapOf(source to eventSource.analyticsValue, this.count to count)
+        fun bulkMap(eventSource: SourceView, count: Int) = mapOf(SOURCE to eventSource.analyticsValue, this.COUNT to count)
 
         fun bulkToTopMap(eventSource: SourceView, count: Int, toTop: Boolean) = mapOf(
-            source to eventSource.analyticsValue,
-            this.count to count,
-            to_top to toTop,
+            SOURCE to eventSource.analyticsValue,
+            this.COUNT to count,
+            TO_TOP to toTop,
         )
     }
 }

@@ -28,8 +28,7 @@ class FakeEncryptedLogging : EncryptedLogging {
         toUpload += (file to if (shouldUploadImmediately) IN_PROGRESS else NOT_STARTED)
     }
 
-    override fun observeEncryptedLogsUploadResult(): StateFlow<OnEncryptedLogUploaded?> =
-        MutableStateFlow(null)
+    override fun observeEncryptedLogsUploadResult(): StateFlow<OnEncryptedLogUploaded?> = MutableStateFlow(null)
 
     override fun resetUploadStates() {
         toUpload = toUpload.map {

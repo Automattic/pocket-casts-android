@@ -41,7 +41,8 @@ class FilterEpisodeListViewModel @Inject constructor(
     private val downloadManager: DownloadManager,
     private val settings: Settings,
     private val analyticsTracker: AnalyticsTracker,
-) : ViewModel(), CoroutineScope {
+) : ViewModel(),
+    CoroutineScope {
 
     companion object {
         const val MAX_DOWNLOAD_ALL = Settings.MAX_DOWNLOAD

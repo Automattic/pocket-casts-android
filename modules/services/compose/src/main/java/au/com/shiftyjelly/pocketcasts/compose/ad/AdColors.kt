@@ -49,7 +49,7 @@ fun rememberAdColors(): AdColors {
                 AdColors.Banner(
                     background = playerColors.contrast06,
                     ctaLabel = playerColors.contrast01,
-                    titleLabel = if (titleLabelContrast >= WcagAaTextContrastRequirement) playerColors.highlight01 else Color.White,
+                    titleLabel = if (titleLabelContrast >= WCGA_AA_TEXT_CONTRAST_REQUIREMENT) playerColors.highlight01 else Color.White,
                     adLabelBackground = playerColors.contrast06,
                     adLabel = playerColors.contrast01,
                     icon = playerColors.contrast02,
@@ -91,4 +91,4 @@ fun rememberAdColors(): AdColors {
     }
 }
 
-private const val WcagAaTextContrastRequirement = 4.5
+private const val WCGA_AA_TEXT_CONTRAST_REQUIREMENT = 4.5

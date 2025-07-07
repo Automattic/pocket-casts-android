@@ -68,7 +68,8 @@ class EpisodeManagerImpl @Inject constructor(
     private val userEpisodeManager: UserEpisodeManager,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
     private val episodeAnalytics: EpisodeAnalytics,
-) : EpisodeManager, CoroutineScope {
+) : EpisodeManager,
+    CoroutineScope {
 
     override val coroutineContext: CoroutineContext
         get() = Dispatchers.Default
@@ -91,18 +92,14 @@ class EpisodeManagerImpl @Inject constructor(
         return episodes + userEpisodes
     }
 
-    override suspend fun findByUuid(uuid: String): PodcastEpisode? =
-        episodeDao.findByUuid(uuid)
+    override suspend fun findByUuid(uuid: String): PodcastEpisode? = episodeDao.findByUuid(uuid)
 
-    private suspend fun findByUuids(episodeUuids: List<String>): List<PodcastEpisode> =
-        episodeDao.findByUuids(episodeUuids)
+    private suspend fun findByUuids(episodeUuids: List<String>): List<PodcastEpisode> = episodeDao.findByUuids(episodeUuids)
 
     @Deprecated("Use findByUuid suspended method instead")
-    override fun findByUuidRxMaybe(uuid: String): Maybe<PodcastEpisode> =
-        episodeDao.findByUuidRxMaybe(uuid)
+    override fun findByUuidRxMaybe(uuid: String): Maybe<PodcastEpisode> = episodeDao.findByUuidRxMaybe(uuid)
 
-    override fun findByUuidFlow(uuid: String): Flow<PodcastEpisode> =
-        episodeDao.findByUuidFlow(uuid).filterNotNull()
+    override fun findByUuidFlow(uuid: String): Flow<PodcastEpisode> = episodeDao.findByUuidFlow(uuid).filterNotNull()
 
     override fun findEpisodeByUuidRxFlowable(uuid: String): Flowable<BaseEpisode> {
         @Suppress("DEPRECATION")
@@ -111,14 +108,12 @@ class EpisodeManagerImpl @Inject constructor(
             .switchIfEmpty(userEpisodeManager.episodeRxFlowable(uuid))
     }
 
-    override fun findEpisodeByUuidFlow(uuid: String): Flow<BaseEpisode> =
-        merge(
-            episodeDao.findByUuidFlow(uuid), // if it is a PodcastEpisode
-            userEpisodeManager.episodeFlow(uuid), // if it is a UserEpisode
-        ).filterNotNull() // because it is not going to be both a PodcastEpisode and a UserEpisode
+    override fun findEpisodeByUuidFlow(uuid: String): Flow<BaseEpisode> = merge(
+        episodeDao.findByUuidFlow(uuid), // if it is a PodcastEpisode
+        userEpisodeManager.episodeFlow(uuid), // if it is a UserEpisode
+    ).filterNotNull() // because it is not going to be both a PodcastEpisode and a UserEpisode
 
-    override suspend fun findFirstBySearchQuery(query: String): PodcastEpisode? =
-        episodeDao.findFirstBySearchQuery(query)
+    override suspend fun findFirstBySearchQuery(query: String): PodcastEpisode? = episodeDao.findFirstBySearchQuery(query)
 
     /**
      * Find a podcast episodes
@@ -1068,16 +1063,15 @@ class EpisodeManagerImpl @Inject constructor(
      * the locally saved downloadUrl if it is different
      * @return the latest download url for the episode
      */
-    override suspend fun updateDownloadUrl(episode: PodcastEpisode): String? =
-        withContext(Dispatchers.IO) {
-            val newDownloadUrl = podcastCacheServiceManager.getEpisodeUrl(episode)
-            if (newDownloadUrl != null && episode.downloadUrl != newDownloadUrl) {
-                Timber.i("Updating PodcastEpisode url in database for ${episode.uuid} to $newDownloadUrl")
-                episodeDao.updateDownloadUrl(newDownloadUrl, episode.uuid)
-            }
-
-            return@withContext newDownloadUrl ?: episode.downloadUrl
+    override suspend fun updateDownloadUrl(episode: PodcastEpisode): String? = withContext(Dispatchers.IO) {
+        val newDownloadUrl = podcastCacheServiceManager.getEpisodeUrl(episode)
+        if (newDownloadUrl != null && episode.downloadUrl != newDownloadUrl) {
+            Timber.i("Updating PodcastEpisode url in database for ${episode.uuid} to $newDownloadUrl")
+            episodeDao.updateDownloadUrl(newDownloadUrl, episode.uuid)
         }
+
+        return@withContext newDownloadUrl ?: episode.downloadUrl
+    }
 
     override suspend fun getAllPodcastEpisodes(pageLimit: Int): Flow<Pair<PodcastEpisode, Int>> = flow {
         var offset = 0

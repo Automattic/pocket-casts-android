@@ -8,8 +8,8 @@ import com.google.android.horologist.compose.layout.ScreenScaffold
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 object StreamingConfirmationScreen {
-    const val route = "streaming_confirmation"
-    const val resultKey = "${route}_result"
+    const val ROUTE = "streaming_confirmation"
+    const val RESULT_KEY = "${ROUTE}_result"
 
     enum class Result {
         CONFIRMED,

@@ -29,7 +29,9 @@ import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
 @AndroidEntryPoint
-class HelpFragment : BaseFragment(), HasBackstack {
+class HelpFragment :
+    BaseFragment(),
+    HasBackstack {
     @Inject
     lateinit var settings: Settings
 

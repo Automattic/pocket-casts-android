@@ -190,11 +190,10 @@ class PackageValidator(context: Context, @XmlRes xmlResId: Int) {
      */
     @Suppress("DEPRECATION")
     @SuppressLint("PackageManagerGetSignatures")
-    private fun getPackageInfo(callingPackage: String): PackageInfo? =
-        packageManager.getPackageInfo(
-            callingPackage,
-            PackageManager.GET_SIGNATURES or PackageManager.GET_PERMISSIONS,
-        )
+    private fun getPackageInfo(callingPackage: String): PackageInfo? = packageManager.getPackageInfo(
+        callingPackage,
+        PackageManager.GET_SIGNATURES or PackageManager.GET_PERMISSIONS,
+    )
 
     /**
      * Gets the signature of a given package's [PackageInfo].
@@ -289,10 +288,9 @@ class PackageValidator(context: Context, @XmlRes xmlResId: Int) {
     /**
      * Finds the Android platform signing key signature. This key is never null.
      */
-    private fun getSystemSignature(): String =
-        getPackageInfo(ANDROID_PLATFORM)?.let { platformInfo ->
-            getSignature(platformInfo)
-        } ?: throw IllegalStateException("Platform signature not found")
+    private fun getSystemSignature(): String = getPackageInfo(ANDROID_PLATFORM)?.let { platformInfo ->
+        getSignature(platformInfo)
+    } ?: throw IllegalStateException("Platform signature not found")
 
     /**
      * Creates a SHA-256 signature given a Base64 encoded certificate.

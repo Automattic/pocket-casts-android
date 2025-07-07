@@ -26,7 +26,7 @@ class CategoriesBottomSheet : BaseDialogFragment() {
 
     @Inject lateinit var analyticsTracker: AnalyticsTracker
 
-    private val region get() = requireArguments().getString(RegionKey, "")
+    private val region get() = requireArguments().getString(REGION_KEY, "")
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -97,10 +97,10 @@ class CategoriesBottomSheet : BaseDialogFragment() {
     }
 
     companion object {
-        private const val RegionKey = "Region"
+        private const val REGION_KEY = "Region"
 
         fun newInstance(region: String) = CategoriesBottomSheet().apply {
-            arguments = bundleOf(RegionKey to region)
+            arguments = bundleOf(REGION_KEY to region)
         }
     }
 }

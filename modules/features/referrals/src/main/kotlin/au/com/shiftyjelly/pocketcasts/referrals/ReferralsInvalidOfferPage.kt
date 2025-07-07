@@ -40,8 +40,8 @@ import au.com.shiftyjelly.pocketcasts.compose.components.TextH10
 import au.com.shiftyjelly.pocketcasts.compose.components.TextH50
 import au.com.shiftyjelly.pocketcasts.compose.extensions.plusBackgroundBrush
 import au.com.shiftyjelly.pocketcasts.compose.images.SubscriptionBadge
+import au.com.shiftyjelly.pocketcasts.referrals.ReferralPageDefaults.PAGE_WIDTH_PERCENT
 import au.com.shiftyjelly.pocketcasts.referrals.ReferralPageDefaults.pageCornerRadius
-import au.com.shiftyjelly.pocketcasts.referrals.ReferralPageDefaults.pageWidthPercent
 import au.com.shiftyjelly.pocketcasts.referrals.ReferralPageDefaults.shouldShowFullScreen
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.utils.extensions.getActivity
@@ -83,7 +83,7 @@ private fun ReferralsInvalidOfferPageContent(
             .fillMaxSize(),
     ) {
         val showFullScreen = shouldShowFullScreen(windowWidthSizeClass, windowHeightSizeClass)
-        val pageWidth = if (showFullScreen) maxWidth else (maxWidth.value * pageWidthPercent).dp
+        val pageWidth = if (showFullScreen) maxWidth else (maxWidth.value * PAGE_WIDTH_PERCENT).dp
         val pageModifier = if (showFullScreen) {
             Modifier
                 .fillMaxSize()
@@ -157,7 +157,7 @@ private fun ReferralsInvalidOfferPageContent(
     }
 }
 
-@Preview(device = Devices.PortraitRegular)
+@Preview(device = Devices.PORTRAIT_REGULAR)
 @Composable
 fun ReferralsInvalidOfferPagePortraitPhonePreview() {
     ReferralsInvalidOfferPageContentPreview(
@@ -166,7 +166,7 @@ fun ReferralsInvalidOfferPagePortraitPhonePreview() {
     )
 }
 
-@Preview(device = Devices.LandscapeRegular)
+@Preview(device = Devices.LANDSCAPE_REGULAR)
 @Composable
 fun ReferralsInvalidOfferPageLandscapePhonePreview() {
     ReferralsInvalidOfferPageContentPreview(
@@ -175,7 +175,7 @@ fun ReferralsInvalidOfferPageLandscapePhonePreview() {
     )
 }
 
-@Preview(device = Devices.PortraitTablet)
+@Preview(device = Devices.PORTRAIT_TABLET)
 @Composable
 fun ReferralsInvalidOfferPagePortraitTabletPreview() {
     ReferralsInvalidOfferPageContentPreview(
@@ -184,7 +184,7 @@ fun ReferralsInvalidOfferPagePortraitTabletPreview() {
     )
 }
 
-@Preview(device = Devices.LandscapeTablet)
+@Preview(device = Devices.LANDSCAPE_TABLET)
 @Composable
 fun ReferralsInvalidOfferPageLandscapeTabletPreview() {
     ReferralsInvalidOfferPageContentPreview(

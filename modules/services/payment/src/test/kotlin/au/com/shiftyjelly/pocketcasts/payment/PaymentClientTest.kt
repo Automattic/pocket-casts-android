@@ -49,25 +49,25 @@ class PaymentClientTest {
         dataSource.loadedPurchases = listOf(
             purchase.copy(
                 state = PurchaseState.Purchased("order-id-1"),
-                productIds = listOf(SubscriptionPlan.PlusMonthlyProductId),
+                productIds = listOf(SubscriptionPlan.PLUS_MONTHLY_PRODUCT_ID),
                 isAcknowledged = true,
                 isAutoRenewing = true,
             ),
             purchase.copy(
                 state = PurchaseState.Purchased("order-id-2"),
-                productIds = listOf(SubscriptionPlan.PlusYearlyProductId),
+                productIds = listOf(SubscriptionPlan.PLUS_YEARLY_PRODUCT_ID),
                 isAcknowledged = true,
                 isAutoRenewing = true,
             ),
             purchase.copy(
                 state = PurchaseState.Purchased("order-id-3"),
-                productIds = listOf(SubscriptionPlan.PatronMonthlyProductId),
+                productIds = listOf(SubscriptionPlan.PATRON_MONTHLY_PRODUCT_ID),
                 isAcknowledged = true,
                 isAutoRenewing = true,
             ),
             purchase.copy(
                 state = PurchaseState.Purchased("order-id-4"),
-                productIds = listOf(SubscriptionPlan.PatronYearlyProductId),
+                productIds = listOf(SubscriptionPlan.PATRON_YEARLY_PRODUCT_ID),
                 isAcknowledged = true,
                 isAutoRenewing = false,
             ),
@@ -113,8 +113,8 @@ class PaymentClientTest {
         dataSource.loadedPurchases = listOf(
             purchase.copy(
                 productIds = listOf(
-                    SubscriptionPlan.PlusMonthlyProductId,
-                    SubscriptionPlan.PlusYearlyProductId,
+                    SubscriptionPlan.PLUS_MONTHLY_PRODUCT_ID,
+                    SubscriptionPlan.PLUS_YEARLY_PRODUCT_ID,
                 ),
             ),
         )
@@ -151,7 +151,7 @@ class PaymentClientTest {
         dataSource.loadedPurchases = listOf(
             purchase.copy(
                 state = PurchaseState.Purchased("order-id"),
-                productIds = listOf(SubscriptionPlan.PlusMonthlyProductId),
+                productIds = listOf(SubscriptionPlan.PLUS_MONTHLY_PRODUCT_ID),
                 isAcknowledged = true,
                 isAutoRenewing = true,
             ),

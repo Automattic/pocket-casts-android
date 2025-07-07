@@ -269,18 +269,15 @@ class Theme @Inject constructor(private val settings: Settings) {
         }
     }
 
-    private fun getThemeFromPreferences(): ThemeType =
-        ThemeType.fromThemeSetting(settings.theme.value)
+    private fun getThemeFromPreferences(): ThemeType = ThemeType.fromThemeSetting(settings.theme.value)
 
     private fun setThemeToPreferences(theme: ThemeType) {
         settings.theme.set(theme.themeSetting, updateModifiedAt = true)
     }
 
-    private fun getPreferredDarkThemeFromPreferences(): ThemeType =
-        ThemeType.fromThemeSetting(settings.darkThemePreference.value)
+    private fun getPreferredDarkThemeFromPreferences(): ThemeType = ThemeType.fromThemeSetting(settings.darkThemePreference.value)
 
-    private fun getPreferredLightFromPreferences(): ThemeType =
-        ThemeType.fromThemeSetting(settings.lightThemePreference.value)
+    private fun getPreferredLightFromPreferences(): ThemeType = ThemeType.fromThemeSetting(settings.lightThemePreference.value)
 
     private fun setPreferredDarkThemeToPreferences(theme: ThemeType) {
         settings.darkThemePreference.set(theme.themeSetting, updateModifiedAt = true)
@@ -478,6 +475,5 @@ class Theme @Inject constructor(private val settings: Settings) {
     }
 
     @DrawableRes
-    fun verticalPlusLogoRes() =
-        if (isDarkTheme) IR.drawable.plus_logo_vertical_dark else IR.drawable.plus_logo_vertical_white
+    fun verticalPlusLogoRes() = if (isDarkTheme) IR.drawable.plus_logo_vertical_dark else IR.drawable.plus_logo_vertical_white
 }

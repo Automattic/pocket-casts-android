@@ -114,47 +114,46 @@ internal fun NotificationsSettingsScreen(
 @Composable
 private fun PreviewNotificationSettingsScreen(
     @PreviewParameter(ThemePreviewParameterProvider::class) themeType: Theme.ThemeType,
-) =
-    AppTheme(themeType) {
-        NotificationsSettingsScreen(
-            state = NotificationsSettingsViewModel.State(
-                areSystemNotificationsEnabled = false,
-                categories = listOf(
-                    CategoryModel(
-                        title = TextResource.fromText("My episodes"),
-                        preferences = listOf(
-                            NotificationPreferenceType.NotifyMeOnNewEpisodes(
-                                title = TextResource.fromText("Notify me"),
-                                isEnabled = false,
-                            ),
+) = AppTheme(themeType) {
+    NotificationsSettingsScreen(
+        state = NotificationsSettingsViewModel.State(
+            areSystemNotificationsEnabled = false,
+            categories = listOf(
+                CategoryModel(
+                    title = TextResource.fromText("My episodes"),
+                    preferences = listOf(
+                        NotificationPreferenceType.NotifyMeOnNewEpisodes(
+                            title = TextResource.fromText("Notify me"),
+                            isEnabled = false,
                         ),
                     ),
-                    CategoryModel(
-                        title = TextResource.fromText("Settings"),
-                        preferences = listOf(
-                            NotificationPreferenceType.PlayOverNotifications(
-                                title = TextResource.fromText("Play over notifications"),
-                                value = PlayOverNotificationSetting.DUCK,
-                                displayValue = TextResource.fromText("Duck"),
-                                options = emptyList(),
-                            ),
-                            NotificationPreferenceType.HidePlaybackNotificationOnPause(
-                                title = TextResource.fromText("Hide playback notification on pause"),
-                                isEnabled = true,
-                            ),
+                ),
+                CategoryModel(
+                    title = TextResource.fromText("Settings"),
+                    preferences = listOf(
+                        NotificationPreferenceType.PlayOverNotifications(
+                            title = TextResource.fromText("Play over notifications"),
+                            value = PlayOverNotificationSetting.DUCK,
+                            displayValue = TextResource.fromText("Duck"),
+                            options = emptyList(),
+                        ),
+                        NotificationPreferenceType.HidePlaybackNotificationOnPause(
+                            title = TextResource.fromText("Hide playback notification on pause"),
+                            isEnabled = true,
                         ),
                     ),
                 ),
             ),
-            onPreferenceChanged = {},
-            onAdvancedSettingsClicked = {},
-            onBackPressed = {},
-            bottomInset = 0.dp,
-            onSelectRingtoneClicked = {},
-            onSelectPodcastsClicked = {},
-            onSystemNotificationsSettingsClicked = {},
-        )
-    }
+        ),
+        onPreferenceChanged = {},
+        onAdvancedSettingsClicked = {},
+        onBackPressed = {},
+        bottomInset = 0.dp,
+        onSelectRingtoneClicked = {},
+        onSelectPodcastsClicked = {},
+        onSystemNotificationsSettingsClicked = {},
+    )
+}
 
 @Preview
 @Composable

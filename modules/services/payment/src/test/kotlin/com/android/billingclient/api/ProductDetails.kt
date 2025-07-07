@@ -6,13 +6,13 @@ import org.json.JSONArray
 import org.json.JSONObject
 import com.android.billingclient.api.Purchase as GooglePurchase
 
-fun GoogleProductDetails(
+fun createGoogleProductDetails(
     productId: String = "product-id",
     type: String = "subs",
     title: String = "title",
     name: String = "name",
     skuDetailsToken: String = "sku-details-token",
-    subscriptionOfferDetails: List<SubscriptionOfferDetails>? = listOf(GoogleOfferDetails()),
+    subscriptionOfferDetails: List<SubscriptionOfferDetails>? = listOf(createGoogleOfferDetails()),
 ): ProductDetails {
     val json = JSONObject()
         .put("productId", productId)
@@ -24,11 +24,11 @@ fun GoogleProductDetails(
     return ProductDetails(json.toString())
 }
 
-fun GoogleOfferDetails(
+fun createGoogleOfferDetails(
     basePlanId: String = "base-plan-id",
     offerId: String? = null,
     offerIdToken: String = "offer-id-token",
-    pricingPhases: List<PricingPhase> = listOf(GooglePricingPhase()),
+    pricingPhases: List<PricingPhase> = listOf(createGooglePricingPhase()),
     offerTags: List<String> = emptyList(),
 ): SubscriptionOfferDetails {
     val json = JSONObject()
@@ -40,7 +40,7 @@ fun GoogleOfferDetails(
     return SubscriptionOfferDetails(json)
 }
 
-fun GooglePricingPhase(
+fun createGooglePricingPhase(
     priceAmountMicros: Long = 100_000_000,
     priceCurrencyCode: String = "USD",
     formattedPrice: String = "$100.00",
@@ -58,7 +58,7 @@ fun GooglePricingPhase(
     return PricingPhase(json)
 }
 
-fun GooglePurchase(
+fun createGooglePurchase(
     orderId: String? = "order-id",
     purchaseToken: String = "purchase-token",
     productIds: List<String> = listOf("product-id"),

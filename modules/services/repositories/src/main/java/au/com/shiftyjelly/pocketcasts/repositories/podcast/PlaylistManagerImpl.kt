@@ -40,7 +40,8 @@ class PlaylistManagerImpl @Inject constructor(
     private val notificationManager: NotificationManager,
     @ApplicationContext private val context: Context,
     appDatabase: AppDatabase,
-) : PlaylistManager, CoroutineScope {
+) : PlaylistManager,
+    CoroutineScope {
 
     companion object {
         const val NEW_RELEASE_UUID = "2797DCF8-1C93-4999-B52A-D1849736FA2C"

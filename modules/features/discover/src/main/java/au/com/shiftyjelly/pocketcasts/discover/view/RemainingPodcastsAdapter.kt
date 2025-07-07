@@ -42,18 +42,17 @@ class RemainingPodcastsAdapter(
         }
     }
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): PodcastViewHolder =
-        PodcastViewHolder(
-            PodcastRow(parent.context),
-            onPodcastClick = {
-                val podcast = getItem(it) as DiscoverPodcast
-                onPodcastClick(podcast, podcast.listId)
-            },
-            onPodcastSubscribe = {
-                val podcast = getItem(it) as DiscoverPodcast
-                onPodcastSubscribe(podcast, podcast.listId)
-            },
-        )
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): PodcastViewHolder = PodcastViewHolder(
+        PodcastRow(parent.context),
+        onPodcastClick = {
+            val podcast = getItem(it) as DiscoverPodcast
+            onPodcastClick(podcast, podcast.listId)
+        },
+        onPodcastSubscribe = {
+            val podcast = getItem(it) as DiscoverPodcast
+            onPodcastSubscribe(podcast, podcast.listId)
+        },
+    )
 
     override fun onBindViewHolder(holder: PodcastViewHolder, position: Int) {
         holder.bind(getItem(position))

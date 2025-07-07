@@ -15,7 +15,7 @@ class OnboardingImportViewModel @Inject constructor(
     fun onImportStartPageShown(flow: OnboardingFlow) {
         analyticsTracker.track(
             AnalyticsEvent.ONBOARDING_IMPORT_SHOWN,
-            mapOf(flowKey to flow.analyticsValue),
+            mapOf(FLOW_KEY to flow.analyticsValue),
         )
     }
 
@@ -23,8 +23,8 @@ class OnboardingImportViewModel @Inject constructor(
         analyticsTracker.track(
             AnalyticsEvent.ONBOARDING_IMPORT_OPEN_APP_SELECTED,
             mapOf(
-                flowKey to flow.analyticsValue,
-                appNameKey to appName,
+                FLOW_KEY to flow.analyticsValue,
+                APP_NAME_KEY to appName,
             ),
         )
     }
@@ -32,19 +32,19 @@ class OnboardingImportViewModel @Inject constructor(
     fun onAppSelected(flow: OnboardingFlow, appName: String) {
         analyticsTracker.track(
             AnalyticsEvent.ONBOARDING_IMPORT_APP_SELECTED,
-            mapOf(flowKey to flow, appNameKey to appName),
+            mapOf(FLOW_KEY to flow, APP_NAME_KEY to appName),
         )
     }
 
     fun onImportDismissed(flow: OnboardingFlow) {
         analyticsTracker.track(
             AnalyticsEvent.ONBOARDING_IMPORT_DISMISSED,
-            mapOf(flowKey to flow.analyticsValue),
+            mapOf(FLOW_KEY to flow.analyticsValue),
         )
     }
 
     companion object {
-        const val flowKey = "flow"
-        const val appNameKey = "app"
+        const val FLOW_KEY = "flow"
+        const val APP_NAME_KEY = "app"
     }
 }

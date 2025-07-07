@@ -28,7 +28,8 @@ class FolderViewHolder(
     val podcastsLayout: PodcastGridLayoutType,
     val onFolderClick: (Folder) -> Unit,
     val podcastGridLayout: PodcastGridLayoutType,
-) : RecyclerView.ViewHolder(composeView), PodcastTouchCallback.ItemTouchHelperViewHolder {
+) : RecyclerView.ViewHolder(composeView),
+    PodcastTouchCallback.ItemTouchHelperViewHolder {
 
     init {
         /* Setting non-default view composition strategy to temporarily fix flickering in folders:

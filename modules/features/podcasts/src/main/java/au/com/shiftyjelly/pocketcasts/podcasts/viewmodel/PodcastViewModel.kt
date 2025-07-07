@@ -31,7 +31,6 @@ import au.com.shiftyjelly.pocketcasts.preferences.model.BookmarksSortTypeForPodc
 import au.com.shiftyjelly.pocketcasts.repositories.bookmark.BookmarkManager
 import au.com.shiftyjelly.pocketcasts.repositories.chromecast.CastManager
 import au.com.shiftyjelly.pocketcasts.repositories.di.ApplicationScope
-import au.com.shiftyjelly.pocketcasts.repositories.di.IoDispatcher
 import au.com.shiftyjelly.pocketcasts.repositories.download.DownloadManager
 import au.com.shiftyjelly.pocketcasts.repositories.notification.NotificationHelper
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
@@ -57,7 +56,6 @@ import io.reactivex.schedulers.Schedulers
 import javax.inject.Inject
 import kotlin.coroutines.CoroutineContext
 import kotlin.math.min
-import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -70,8 +68,7 @@ import timber.log.Timber
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 @HiltViewModel
-class PodcastViewModel
-@Inject constructor(
+class PodcastViewModel @Inject constructor(
     private val playbackManager: PlaybackManager,
     private val podcastManager: PodcastManager,
     private val folderManager: FolderManager,
@@ -91,9 +88,9 @@ class PodcastViewModel
     private val settings: Settings,
     private val podcastAndEpisodeDetailsCoordinator: PodcastAndEpisodeDetailsCoordinator,
     private val notificationHelper: NotificationHelper,
-    @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
     @ApplicationScope private val applicationScope: CoroutineScope,
-) : ViewModel(), CoroutineScope {
+) : ViewModel(),
+    CoroutineScope {
 
     private val disposables = CompositeDisposable()
     val podcast = MutableLiveData<Podcast>()
@@ -619,8 +616,7 @@ class PodcastViewModel
         )
     }
 
-    private fun getCurrentTab() =
-        (uiState.value as? UiState.Loaded)?.showTab ?: PodcastTab.EPISODES
+    private fun getCurrentTab() = (uiState.value as? UiState.Loaded)?.showTab ?: PodcastTab.EPISODES
 
     fun onHeadsetSettingsClicked() {
         analyticsTracker.track(
@@ -756,14 +752,11 @@ class PodcastViewModel
         private const val SHOW_ARCHIVED = "show_archived"
         private const val SOURCE_KEY = "source"
         private const val UUID_KEY = "uuid"
-        fun archiveToggled(archived: Boolean) =
-            mapOf(SHOW_ARCHIVED to archived)
+        fun archiveToggled(archived: Boolean) = mapOf(SHOW_ARCHIVED to archived)
 
-        fun notificationEnabled(show: Boolean) =
-            mapOf(ENABLED_KEY to show)
+        fun notificationEnabled(show: Boolean) = mapOf(ENABLED_KEY to show)
 
-        fun podcastSubscribeToggled(source: SourceView, uuid: String) =
-            mapOf(SOURCE_KEY to source.analyticsValue, UUID_KEY to uuid)
+        fun podcastSubscribeToggled(source: SourceView, uuid: String) = mapOf(SOURCE_KEY to source.analyticsValue, UUID_KEY to uuid)
     }
 }
 
@@ -872,14 +865,13 @@ private fun Flowable<CombinedData>.buildUiState(
 private fun <T> Flowable<List<T>>.withSearchResult(
     filterCondition: (T) -> Boolean,
     searchResults: SearchHandler.SearchResult,
-) =
-    this.flatMap { list ->
-        if (searchResults.searchUuids == null) {
-            Flowable.just(Pair(list, list))
-        } else {
-            Flowable.just(Pair(list.filter { filterCondition(it) }, list))
-        }
+) = this.flatMap { list ->
+    if (searchResults.searchUuids == null) {
+        Flowable.just(Pair(list, list))
+    } else {
+        Flowable.just(Pair(list.filter { filterCondition(it) }, list))
     }
+}
 
 private fun Maybe<Podcast>.downloadMissingPodcast(uuid: String, podcastManager: PodcastManager): Single<Podcast> {
     return this.switchIfEmpty(

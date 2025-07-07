@@ -17,12 +17,11 @@ data class AnonymousBumpStatsRequest(
         @field:Json(name = "_via_ua") val source: String,
     ) {
         companion object {
-            fun get() =
-                CommonProps(
-                    language = Locale.getDefault().toString(),
-                    requestTime = System.currentTimeMillis(),
-                    source = "Pocket Casts Android",
-                )
+            fun get() = CommonProps(
+                language = Locale.getDefault().toString(),
+                requestTime = System.currentTimeMillis(),
+                source = "Pocket Casts Android",
+            )
         }
     }
 }

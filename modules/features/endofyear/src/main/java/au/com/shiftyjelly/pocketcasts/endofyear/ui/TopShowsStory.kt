@@ -286,7 +286,7 @@ private fun Modifier.fadeScrollingEdges(
         },
 )
 
-@Preview(device = Devices.PortraitRegular)
+@Preview(device = Devices.PORTRAIT_REGULAR)
 @Composable
 private fun TopShowsPreview() {
     PreviewBox(currentPage = 3) { measurements ->

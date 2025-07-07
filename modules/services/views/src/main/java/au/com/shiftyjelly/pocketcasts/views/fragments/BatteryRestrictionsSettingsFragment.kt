@@ -61,12 +61,11 @@ private const val ARG_CLOSE_BUTTON = "close_button"
 @AndroidEntryPoint
 class BatteryRestrictionsSettingsFragment : BaseFragment() {
     companion object {
-        fun newInstance(closeButton: Boolean) =
-            BatteryRestrictionsSettingsFragment().apply {
-                arguments = Bundle().apply {
-                    putBoolean(ARG_CLOSE_BUTTON, closeButton)
-                }
+        fun newInstance(closeButton: Boolean) = BatteryRestrictionsSettingsFragment().apply {
+            arguments = Bundle().apply {
+                putBoolean(ARG_CLOSE_BUTTON, closeButton)
             }
+        }
     }
 
     @Inject

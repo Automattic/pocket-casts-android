@@ -40,7 +40,8 @@ class UpNextQueueImpl @Inject constructor(
     private val episodeManager: EpisodeManager,
     private val syncManager: SyncManager,
     @ApplicationContext private val application: Context,
-) : UpNextQueue, CoroutineScope {
+) : UpNextQueue,
+    CoroutineScope {
 
     private val upNextDao = appDatabase.upNextDao()
     private val upNextChangeDao = appDatabase.upNextChangeDao()

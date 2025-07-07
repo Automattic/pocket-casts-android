@@ -55,8 +55,8 @@ import au.com.shiftyjelly.pocketcasts.payment.SubscriptionPlans
 import au.com.shiftyjelly.pocketcasts.payment.SubscriptionTier
 import au.com.shiftyjelly.pocketcasts.payment.flatMap
 import au.com.shiftyjelly.pocketcasts.payment.getOrNull
+import au.com.shiftyjelly.pocketcasts.referrals.ReferralPageDefaults.PAGE_WIDTH_PERCENT
 import au.com.shiftyjelly.pocketcasts.referrals.ReferralPageDefaults.pageCornerRadius
-import au.com.shiftyjelly.pocketcasts.referrals.ReferralPageDefaults.pageWidthPercent
 import au.com.shiftyjelly.pocketcasts.referrals.ReferralPageDefaults.shouldShowFullScreen
 import au.com.shiftyjelly.pocketcasts.referrals.ReferralsSendGuestPassViewModel.ReferralSendGuestPassError
 import au.com.shiftyjelly.pocketcasts.referrals.ReferralsSendGuestPassViewModel.UiState
@@ -121,7 +121,7 @@ private fun ReferralsSendGuestPassContent(
             .fillMaxSize(),
     ) {
         val showFullScreen = shouldShowFullScreen(windowWidthSizeClass, windowHeightSizeClass)
-        val pageWidth = if (showFullScreen) maxWidth else (maxWidth.value * pageWidthPercent).dp
+        val pageWidth = if (showFullScreen) maxWidth else (maxWidth.value * PAGE_WIDTH_PERCENT).dp
         val pageModifier = if (showFullScreen) {
             Modifier
                 .fillMaxSize()
@@ -265,7 +265,7 @@ private fun ReferralsPassCardsStack(
     }
 }
 
-@Preview(device = Devices.PortraitRegular)
+@Preview(device = Devices.PORTRAIT_REGULAR)
 @Composable
 fun ReferralsSendGuestPassPortraitPhonePreview() {
     ReferralsSendGuestPassContentPreview(
@@ -274,7 +274,7 @@ fun ReferralsSendGuestPassPortraitPhonePreview() {
     )
 }
 
-@Preview(device = Devices.LandscapeRegular)
+@Preview(device = Devices.LANDSCAPE_REGULAR)
 @Composable
 fun ReferralsSendGuestPassLandscapePhonePreview() {
     ReferralsSendGuestPassContentPreview(
@@ -283,7 +283,7 @@ fun ReferralsSendGuestPassLandscapePhonePreview() {
     )
 }
 
-@Preview(device = Devices.PortraitTablet)
+@Preview(device = Devices.PORTRAIT_TABLET)
 @Composable
 fun ReferralsSendGuestPassPortraitTabletPreview() {
     ReferralsSendGuestPassContentPreview(
@@ -292,7 +292,7 @@ fun ReferralsSendGuestPassPortraitTabletPreview() {
     )
 }
 
-@Preview(device = Devices.LandscapeTablet)
+@Preview(device = Devices.LANDSCAPE_TABLET)
 @Composable
 fun ReferralsSendGuestPassLandscapeTabletPreview() {
     ReferralsSendGuestPassContentPreview(

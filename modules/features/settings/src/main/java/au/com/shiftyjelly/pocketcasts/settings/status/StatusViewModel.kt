@@ -26,7 +26,8 @@ import au.com.shiftyjelly.pocketcasts.localization.R as LR
 class StatusViewModel @Inject constructor(
     private val serviceStatusChecker: ServiceStatusChecker,
     val support: Support,
-) : ViewModel(), CoroutineScope {
+) : ViewModel(),
+    CoroutineScope {
 
     override val coroutineContext: CoroutineContext
         get() = Dispatchers.Default

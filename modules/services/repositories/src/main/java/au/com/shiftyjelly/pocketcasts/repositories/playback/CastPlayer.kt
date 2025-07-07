@@ -52,7 +52,8 @@ class CastPlayer(val context: Context, override val onPlayerEvent: (Player, Play
         get() = isConnected &&
             (remoteMediaClient?.hasMediaSession() ?: false) &&
             TextUtils.equals(localEpisodeUuid, remoteEpisodeUuid) &&
-            state != PlaybackStateCompat.STATE_NONE && state != PlaybackStateCompat.STATE_STOPPED
+            state != PlaybackStateCompat.STATE_NONE &&
+            state != PlaybackStateCompat.STATE_STOPPED
 
     private var episodeLocation: EpisodeLocation? = null
 

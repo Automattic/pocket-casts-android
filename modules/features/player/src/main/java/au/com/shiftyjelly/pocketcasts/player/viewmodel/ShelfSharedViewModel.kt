@@ -320,8 +320,7 @@ class ShelfSharedViewModel @Inject constructor(
     sealed interface NavigationState {
         data object ShowEffectsOption : NavigationState
         data object ShowSleepTimerOptions : NavigationState
-        data class ShowShareDialog(val podcast: Podcast, val episode: PodcastEpisode) :
-            NavigationState
+        data class ShowShareDialog(val podcast: Podcast, val episode: PodcastEpisode) : NavigationState
 
         data class ShowPodcast(val podcast: Podcast) : NavigationState
         data object ShowCloudFiles : NavigationState
@@ -366,10 +365,6 @@ class ShelfSharedViewModel @Inject constructor(
             const val ACTION = "action"
             const val SHELF = "shelf"
             const val OVERFLOW_MENU = "overflow_menu"
-            private const val EPISODE_UUID = "episode_uuid"
-            private const val PODCAST_UUID = "podcast_uuid"
-            fun transcriptDismissed(episodeId: String, podcastId: String) =
-                mapOf(episodeId to EPISODE_UUID, podcastId to PODCAST_UUID)
         }
     }
 }

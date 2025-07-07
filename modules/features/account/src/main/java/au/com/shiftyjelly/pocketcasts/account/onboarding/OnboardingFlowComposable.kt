@@ -90,7 +90,7 @@ private fun Content(
         is OnboardingFlow.InitialOnboarding,
         is OnboardingFlow.EngageSdk,
         is OnboardingFlow.ReferralLoginOrSignUp,
-        -> OnboardingNavRoute.logInOrSignUp
+        -> OnboardingNavRoute.LOG_IN_OR_SIGN_UP
 
         // Cannot use OnboardingNavRoute.PlusUpgrade.routeWithSource here, it is set as a defaultValue in the PlusUpgrade composable,
         // see https://stackoverflow.com/a/70410872/1910286
@@ -98,18 +98,18 @@ private fun Content(
         is OnboardingFlow.PatronAccountUpgrade,
         is OnboardingFlow.Upsell,
         is OnboardingFlow.UpsellSuggestedFolder,
-        -> OnboardingNavRoute.PlusUpgrade.route
+        -> OnboardingNavRoute.PlusUpgrade.ROUTE
 
-        is OnboardingFlow.Welcome -> OnboardingNavRoute.welcome
+        is OnboardingFlow.Welcome -> OnboardingNavRoute.WELCOME
 
-        is OnboardingFlow.AccountEncouragement -> OnboardingNavRoute.encourageFreeAccount
+        is OnboardingFlow.AccountEncouragement -> OnboardingNavRoute.ENCOURAGE_FREE_ACCOUNT
     }
 
     val onAccountCreated: () -> Unit = {
         fun goBack() {
-            navController.navigate(OnboardingRecommendationsFlow.route) {
+            navController.navigate(OnboardingRecommendationsFlow.ROUTE) {
                 // clear backstack after account is created
-                popUpTo(OnboardingNavRoute.logInOrSignUp) {
+                popUpTo(OnboardingNavRoute.LOG_IN_OR_SIGN_UP) {
                     inclusive = true
                 }
             }
@@ -118,7 +118,7 @@ private fun Content(
         fun goToUpsell() {
             navController.navigate(OnboardingNavRoute.PlusUpgrade.routeWithSource(flow.source, forcePurchase = true)) {
                 // clear backstack after account is created
-                popUpTo(OnboardingNavRoute.logInOrSignUp) {
+                popUpTo(OnboardingNavRoute.LOG_IN_OR_SIGN_UP) {
                     inclusive = true
                 }
             }
@@ -162,7 +162,7 @@ private fun Content(
             onComplete = {
                 navController.navigate(
                     if (signInState.isSignedInAsPlusOrPatron) {
-                        OnboardingNavRoute.welcome
+                        OnboardingNavRoute.WELCOME
                     } else {
                         OnboardingNavRoute.PlusUpgrade.routeWithSource(OnboardingUpgradeSource.RECOMMENDATIONS)
                     },
@@ -172,7 +172,7 @@ private fun Content(
             onUpdateSystemBars = onUpdateSystemBars,
         )
 
-        composable(OnboardingNavRoute.encourageFreeAccount) {
+        composable(OnboardingNavRoute.ENCOURAGE_FREE_ACCOUNT) {
             val viewModel = hiltViewModel<OnboardingAccountBenefitsViewModel>()
 
             CallOnce {
@@ -183,16 +183,16 @@ private fun Content(
                 AccountBenefitsPage(
                     onGetStarted = {
                         viewModel.onGetStartedClick()
-                        navController.navigate(OnboardingNavRoute.logInOrSignUp) {
-                            popUpTo(OnboardingNavRoute.encourageFreeAccount) {
+                        navController.navigate(OnboardingNavRoute.LOG_IN_OR_SIGN_UP) {
+                            popUpTo(OnboardingNavRoute.ENCOURAGE_FREE_ACCOUNT) {
                                 inclusive = true
                             }
                         }
                     },
                     onLogIn = {
                         viewModel.onLogInClick()
-                        navController.navigate(OnboardingNavRoute.logInOrSignUp) {
-                            popUpTo(OnboardingNavRoute.encourageFreeAccount) {
+                        navController.navigate(OnboardingNavRoute.LOG_IN_OR_SIGN_UP) {
+                            popUpTo(OnboardingNavRoute.ENCOURAGE_FREE_ACCOUNT) {
                                 inclusive = true
                             }
                         }
@@ -209,7 +209,7 @@ private fun Content(
             }
         }
 
-        composable(OnboardingNavRoute.logInOrSignUp) {
+        composable(OnboardingNavRoute.LOG_IN_OR_SIGN_UP) {
             OnboardingLoginOrSignUpPage(
                 theme = theme,
                 flow = flow,
@@ -239,8 +239,8 @@ private fun Content(
                         -> exitOnboarding(OnboardingExitInfo.Simple)
                     }
                 },
-                onSignUpClicked = { navController.navigate(OnboardingNavRoute.createFreeAccount) },
-                onLoginClicked = { navController.navigate(OnboardingNavRoute.logIn) },
+                onSignUpClicked = { navController.navigate(OnboardingNavRoute.CREATE_FREE_ACCOUNT) },
+                onLoginClicked = { navController.navigate(OnboardingNavRoute.LOG_IN) },
                 onContinueWithGoogleComplete = { state, subscription ->
                     if (state.isNewAccount) {
                         onAccountCreated()
@@ -252,7 +252,7 @@ private fun Content(
             )
         }
 
-        composable(OnboardingNavRoute.createFreeAccount) {
+        composable(OnboardingNavRoute.CREATE_FREE_ACCOUNT) {
             OnboardingCreateAccountPage(
                 theme = theme,
                 onBackPressed = { navController.popBackStack() },
@@ -261,19 +261,19 @@ private fun Content(
             )
         }
 
-        composable(OnboardingNavRoute.logIn) {
+        composable(OnboardingNavRoute.LOG_IN) {
             OnboardingLoginPage(
                 theme = theme,
                 onBackPressed = { navController.popBackStack() },
                 onLoginComplete = { subscription ->
                     onLoginToExistingAccount(flow, subscription, exitOnboarding, navController)
                 },
-                onForgotPasswordTapped = { navController.navigate(OnboardingNavRoute.forgotPassword) },
+                onForgotPasswordTapped = { navController.navigate(OnboardingNavRoute.FORGOT_PASSWORD) },
                 onUpdateSystemBars = onUpdateSystemBars,
             )
         }
 
-        composable(OnboardingNavRoute.forgotPassword) {
+        composable(OnboardingNavRoute.FORGOT_PASSWORD) {
             OnboardingForgotPasswordPage(
                 theme = theme,
                 onBackPressed = { navController.popBackStack() },
@@ -283,9 +283,9 @@ private fun Content(
         }
 
         composable(
-            route = OnboardingNavRoute.PlusUpgrade.route,
+            route = OnboardingNavRoute.PlusUpgrade.ROUTE,
             arguments = listOf(
-                navArgument(OnboardingNavRoute.PlusUpgrade.sourceArgumentKey) {
+                navArgument(OnboardingNavRoute.PlusUpgrade.SOURCE_ARGUMENT_KEY) {
                     type = NavType.EnumType(OnboardingUpgradeSource::class.java)
                     /* Set default value for onboarding flows with startDestination. */
                     when (flow) {
@@ -308,18 +308,18 @@ private fun Content(
                         -> Unit
                     }
                 },
-                navArgument(OnboardingNavRoute.PlusUpgrade.forcePurchaseArgumentKey) {
+                navArgument(OnboardingNavRoute.PlusUpgrade.FORCE_PURCHASE_ARGUMENT_KEY) {
                     type = NavType.BoolType
                     defaultValue = false
                 },
             ),
         ) { navBackStackEntry ->
             val upgradeSource = navBackStackEntry.arguments
-                ?.getSerializableCompat(OnboardingNavRoute.PlusUpgrade.sourceArgumentKey, OnboardingUpgradeSource::class.java)
+                ?.getSerializableCompat(OnboardingNavRoute.PlusUpgrade.SOURCE_ARGUMENT_KEY, OnboardingUpgradeSource::class.java)
                 ?: throw IllegalStateException("Missing upgrade source argument")
 
             val forcePurchase = navBackStackEntry.arguments
-                ?.getBoolean(OnboardingNavRoute.PlusUpgrade.forcePurchaseArgumentKey)
+                ?.getBoolean(OnboardingNavRoute.PlusUpgrade.FORCE_PURCHASE_ARGUMENT_KEY)
                 ?: throw IllegalStateException("Missing force purchase argument")
 
             val userCreatedNewAccount = when (upgradeSource) {
@@ -367,10 +367,10 @@ private fun Content(
                         exitOnboarding(OnboardingExitInfo.Simple)
                     }
                 },
-                onNeedLogin = { navController.navigate(OnboardingNavRoute.logInOrSignUp) },
+                onNeedLogin = { navController.navigate(OnboardingNavRoute.LOG_IN_OR_SIGN_UP) },
                 onProceed = {
                     if (userCreatedNewAccount || forcePurchase) {
-                        navController.navigate(OnboardingNavRoute.welcome)
+                        navController.navigate(OnboardingNavRoute.WELCOME)
                     } else {
                         finishOnboardingFlow()
                     }
@@ -379,7 +379,7 @@ private fun Content(
             )
         }
 
-        composable(OnboardingNavRoute.welcome) {
+        composable(OnboardingNavRoute.WELCOME) {
             OnboardingWelcomePage(
                 theme = theme,
                 flow = flow,
@@ -388,7 +388,7 @@ private fun Content(
                     finishOnboardingFlow()
                 },
                 onContinueToDiscover = completeOnboardingToDiscover,
-                onImportTapped = { navController.navigate(OnboardingImportFlow.route) },
+                onImportTapped = { navController.navigate(OnboardingImportFlow.ROUTE) },
                 onBackPressed = {
                     // Don't allow navigation back to the upgrade screen after the user upgrades
                     if (signInState.isSignedInAsPlusOrPatron) {
@@ -430,7 +430,7 @@ private fun onLoginToExistingAccount(
             if (subscription == null) {
                 navController.navigate(OnboardingNavRoute.PlusUpgrade.routeWithSource(OnboardingUpgradeSource.LOGIN)) {
                     // clear backstack after successful login
-                    popUpTo(OnboardingNavRoute.logInOrSignUp) { inclusive = true }
+                    popUpTo(OnboardingNavRoute.LOG_IN_OR_SIGN_UP) { inclusive = true }
                 }
             } else {
                 val exitInfo = if (flow is OnboardingFlow.UpsellSuggestedFolder) {
@@ -447,30 +447,30 @@ private fun onLoginToExistingAccount(
 @VisibleForTesting
 object OnboardingNavRoute {
 
-    const val createFreeAccount = "create_free_account"
-    const val encourageFreeAccount = "encourage_free_account"
-    const val forgotPassword = "forgot_password"
-    const val logIn = "log_in"
-    const val logInOrSignUp = "log_in_or_sign_up"
-    const val welcome = "welcome"
+    const val CREATE_FREE_ACCOUNT = "create_free_account"
+    const val ENCOURAGE_FREE_ACCOUNT = "encourage_free_account"
+    const val FORGOT_PASSWORD = "forgot_password"
+    const val LOG_IN = "log_in"
+    const val LOG_IN_OR_SIGN_UP = "log_in_or_sign_up"
+    const val WELCOME = "welcome"
 
     object PlusUpgrade {
-        private const val routeBase = "plus_upgrade"
+        private const val ROUTE_BASE = "plus_upgrade"
 
-        const val sourceArgumentKey = "source"
-        const val forcePurchaseArgumentKey = "force_purchase"
+        const val SOURCE_ARGUMENT_KEY = "source"
+        const val FORCE_PURCHASE_ARGUMENT_KEY = "force_purchase"
 
         // The route variable should only be used to navigate to the PlusUpgrade screens
         // when they are the startDestination and the args for these startDestinations are set using default values.
         // They are parsed based on this deep-link-like route by the navigation component.
         // For more details check here: https://developer.android.com/jetpack/compose/navigation#nav-with-args
         // In all other cases, use the routeWithSource function.
-        const val route = "$routeBase/{$sourceArgumentKey}?$forcePurchaseArgumentKey={$forcePurchaseArgumentKey}"
+        const val ROUTE = "$ROUTE_BASE/{$SOURCE_ARGUMENT_KEY}?$FORCE_PURCHASE_ARGUMENT_KEY={$FORCE_PURCHASE_ARGUMENT_KEY}"
 
         fun routeWithSource(
             source: OnboardingUpgradeSource,
             forcePurchase: Boolean = false,
-        ) = "$routeBase/$source?$forcePurchaseArgumentKey=$forcePurchase"
+        ) = "$ROUTE_BASE/$source?$FORCE_PURCHASE_ARGUMENT_KEY=$forcePurchase"
     }
 }
 

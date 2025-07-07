@@ -24,7 +24,9 @@ import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 @AndroidEntryPoint
-class SonosAppLinkActivity : AppCompatActivity(), CoroutineScope {
+class SonosAppLinkActivity :
+    AppCompatActivity(),
+    CoroutineScope {
 
     companion object {
         const val SONOS_APP_ACTIVITY_RESULT = 1007

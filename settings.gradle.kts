@@ -92,7 +92,7 @@ include(":modules:services:sharedtest")
 val developerProperties = loadPropertiesFromFile(File("${rootDir.path}/developer.properties"))
 val secretsFile = File("${rootDir.path}/secret.properties")
 val secretProperties = loadPropertiesFromFile(secretsFile)
-val USE_REMOTE_BUILD_CACHE_LOCALLY = "use_remote_build_cache_locally"
+val useRemoteBuildCacheLocally = "use_remote_build_cache_locally"
 
 buildCache {
     if (System.getenv("CI")?.toBoolean() == true) {
@@ -106,7 +106,7 @@ buildCache {
                 password = System.getenv("GRADLE_CACHE_NODE_PASSWORD")
             }
         }
-    } else if (developerProperties.getProperty(USE_REMOTE_BUILD_CACHE_LOCALLY).toBoolean()) {
+    } else if (developerProperties.getProperty(useRemoteBuildCacheLocally).toBoolean()) {
 
         checkForRemoteBuildCacheOptimizedExperience()
 

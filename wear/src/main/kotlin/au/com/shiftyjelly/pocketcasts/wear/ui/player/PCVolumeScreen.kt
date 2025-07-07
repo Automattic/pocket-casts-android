@@ -6,7 +6,7 @@ import com.google.android.horologist.audio.ui.VolumeScreen
 import com.google.android.horologist.compose.layout.ScreenScaffold
 
 object PCVolumeScreen {
-    const val route = "volume"
+    const val ROUTE = "volume"
 }
 
 @Composable

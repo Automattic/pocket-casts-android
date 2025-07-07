@@ -425,8 +425,8 @@ class UpNextFragment :
         }
     }
 
-    private fun isEmbeddedExpanded() =
-        isEmbedded && (parentFragment as? PlayerContainerFragment)?.upNextBottomSheetBehavior?.state == BottomSheetBehavior.STATE_EXPANDED
+    private fun isEmbeddedExpanded() = isEmbedded &&
+        (parentFragment as? PlayerContainerFragment)?.upNextBottomSheetBehavior?.state == BottomSheetBehavior.STATE_EXPANDED
 
     override fun onClearUpNext() {
         playerViewModel.clearUpNext(context = requireContext(), upNextSource = upNextSource)

@@ -106,7 +106,7 @@ fun ReferralGuestPassCardView(
     }
 }
 
-@Preview(device = Devices.PortraitRegular)
+@Preview(device = Devices.PORTRAIT_REGULAR)
 @Composable
 fun ReferralPassCardSendViewPreview() {
     ReferralGuestPassCardView(
@@ -119,7 +119,7 @@ fun ReferralPassCardSendViewPreview() {
     )
 }
 
-@Preview(device = Devices.PortraitRegular)
+@Preview(device = Devices.PORTRAIT_REGULAR)
 @Composable
 fun ReferralPassCardProfileBannerViewPreview() {
     ReferralGuestPassCardView(

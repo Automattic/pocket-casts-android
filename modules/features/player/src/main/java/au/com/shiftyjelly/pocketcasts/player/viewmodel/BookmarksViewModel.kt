@@ -227,7 +227,8 @@ class BookmarksViewModel
                         episode = it,
                         sortType = sortType as BookmarksSortTypeDefault,
                     )
-                } ?: run { // This shouldn't happen in the ideal world
+                } ?: run {
+                    // This shouldn't happen in the ideal world
                     LogBuffer.e(LogBuffer.TAG_INVALID_STATE, "Episode not found.")
                     flowOf(emptyList())
                 }

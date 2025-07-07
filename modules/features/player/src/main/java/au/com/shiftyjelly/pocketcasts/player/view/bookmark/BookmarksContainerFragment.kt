@@ -27,8 +27,7 @@ import au.com.shiftyjelly.pocketcasts.localization.R as LR
 import au.com.shiftyjelly.pocketcasts.ui.R as UR
 
 @AndroidEntryPoint
-class BookmarksContainerFragment :
-    BaseDialogFragment() {
+class BookmarksContainerFragment : BaseDialogFragment() {
     companion object {
         private const val ARG_EPISODE_UUID = "episodeUUID"
         private const val ARG_SOURCE_VIEW = "sourceView"

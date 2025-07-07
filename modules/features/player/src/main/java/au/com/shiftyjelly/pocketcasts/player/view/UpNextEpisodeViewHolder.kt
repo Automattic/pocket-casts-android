@@ -139,7 +139,8 @@ class UpNextEpisodeViewHolder(
         binding.itemContainer.setBackgroundColor(if (isMultiSelecting && isSelected) selectedColor else unselectedColor)
 
         binding.reorder.visibility = if (isMultiSelecting) View.INVISIBLE else View.VISIBLE
-        binding.reorder.updateLayoutParams<ConstraintLayout.LayoutParams> { // Adjust the spacing of the play button to avoid line wrapping when turning on multiselect
+        binding.reorder.updateLayoutParams<ConstraintLayout.LayoutParams> {
+            // Adjust the spacing of the play button to avoid line wrapping when turning on multiselect
             rightMargin = if (isMultiSelecting) -binding.checkbox.marginLeft else 0.dpToPx(itemView.context)
             width = if (isMultiSelecting) 16.dpToPx(itemView.context) else 52.dpToPx(itemView.context)
         }

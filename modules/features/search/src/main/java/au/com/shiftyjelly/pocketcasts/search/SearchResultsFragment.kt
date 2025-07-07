@@ -147,8 +147,7 @@ class SearchResultsFragment : BaseFragment() {
             ;
 
             companion object {
-                fun fromString(value: String?) =
-                    ResultsType.values().find { it.value == value } ?: UNKNOWN
+                fun fromString(value: String?) = ResultsType.values().find { it.value == value } ?: UNKNOWN
             }
         }
 

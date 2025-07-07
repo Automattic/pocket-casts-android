@@ -109,25 +109,24 @@ private fun Loading() {
     }
 }
 
-private const val key = "key"
+private const val KEY = "key"
 
 @Composable
-private fun getLauncher(onResult: (String) -> Unit) =
-    rememberLauncherForActivityResult(ActivityResultContracts.StartActivityForResult()) {
-        it.data?.let { data ->
-            val results: Bundle = RemoteInput.getResultsFromIntent(data)
-            results.getCharSequence(key)?.let { chars ->
-                onResult(chars.toString())
-            }
+private fun getLauncher(onResult: (String) -> Unit) = rememberLauncherForActivityResult(ActivityResultContracts.StartActivityForResult()) {
+    it.data?.let { data ->
+        val results: Bundle = RemoteInput.getResultsFromIntent(data)
+        results.getCharSequence(KEY)?.let { chars ->
+            onResult(chars.toString())
         }
     }
+}
 
 private fun launchRemoteInput(
     label: String,
     launcher: ManagedActivityResultLauncher<Intent, ActivityResult>,
 ) {
     val remoteInputs: List<RemoteInput> = listOf(
-        RemoteInput.Builder(key)
+        RemoteInput.Builder(KEY)
             .setLabel(label)
             .wearableExtender {
                 setEmojisAllowed(false)

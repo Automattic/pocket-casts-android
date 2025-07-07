@@ -22,8 +22,7 @@ import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 object OnboardingImportFlow {
-
-    const val route = "onboardingImportFlow"
+    const val ROUTE = "onboardingImportFlow"
 
     fun NavGraphBuilder.importFlowGraph(
         theme: Theme.ThemeType,
@@ -32,25 +31,25 @@ object OnboardingImportFlow {
         onUpdateSystemBars: (SystemBarsStyles) -> Unit,
     ) {
         navigation(
-            route = this@OnboardingImportFlow.route,
-            startDestination = NavigationRoutes.start,
+            route = ROUTE,
+            startDestination = NavigationRoutes.START,
         ) {
-            composable(NavigationRoutes.start) {
+            composable(NavigationRoutes.START) {
                 val viewModel = hiltViewModel<OnboardingImportViewModel>()
                 OnboardingImportStartPage(
                     theme = theme,
                     onShown = { viewModel.onImportStartPageShown(flow) },
                     onCastboxClick = {
-                        viewModel.onAppSelected(flow, AnalyticsProps.castbox)
-                        navController.navigate(NavigationRoutes.castbox)
+                        viewModel.onAppSelected(flow, AnalyticsProps.CASTBOX)
+                        navController.navigate(NavigationRoutes.CASTBOX)
                     },
                     onOtherAppsClick = {
-                        viewModel.onAppSelected(flow, AnalyticsProps.otherApps)
-                        navController.navigate(NavigationRoutes.otherApps)
+                        viewModel.onAppSelected(flow, AnalyticsProps.OTHER_APPS)
+                        navController.navigate(NavigationRoutes.OTHER_APPS)
                     },
                     onImportFromUrlClick = {
-                        viewModel.onAppSelected(flow, AnalyticsProps.opmlFromUrl)
-                        navController.navigate(NavigationRoutes.opmlFromUrl)
+                        viewModel.onAppSelected(flow, AnalyticsProps.OPML_FROM_URL)
+                        navController.navigate(NavigationRoutes.OPML_FROM_URL)
                     },
                     onBackPressed = {
                         viewModel.onImportDismissed(flow)
@@ -60,7 +59,7 @@ object OnboardingImportFlow {
                 )
             }
 
-            composable(NavigationRoutes.castbox) {
+            composable(NavigationRoutes.CASTBOX) {
                 val viewModel = hiltViewModel<OnboardingImportViewModel>()
                 OnboardingImportFrom(
                     theme = theme,
@@ -76,7 +75,7 @@ object OnboardingImportFlow {
                     buttonText = stringResource(LR.string.onboarding_import_from_castbox_open),
                     buttonClick = openCastboxFun()?.let { function ->
                         {
-                            viewModel.onOpenApp(flow, AnalyticsProps.castbox)
+                            viewModel.onOpenApp(flow, AnalyticsProps.CASTBOX)
                             function()
                         }
                     },
@@ -85,7 +84,7 @@ object OnboardingImportFlow {
                 )
             }
 
-            composable(NavigationRoutes.otherApps) {
+            composable(NavigationRoutes.OTHER_APPS) {
                 OnboardingImportFrom(
                     theme = theme,
                     drawableRes = IR.drawable.other_apps,
@@ -100,7 +99,7 @@ object OnboardingImportFlow {
                 )
             }
 
-            composable(NavigationRoutes.opmlFromUrl) {
+            composable(NavigationRoutes.OPML_FROM_URL) {
                 val context = LocalContext.current
                 val isImporting by remember {
                     OpmlImportTask.workInfos(context).map { infos -> infos.any { !it.state.isFinished } }
@@ -137,14 +136,14 @@ private fun openCastboxFun(): (() -> Unit)? {
 }
 
 private object NavigationRoutes {
-    const val start = "start"
-    const val castbox = "castbox"
-    const val otherApps = "otherApps"
-    const val opmlFromUrl = "opmlFromUrl"
+    const val START = "start"
+    const val CASTBOX = "castbox"
+    const val OTHER_APPS = "otherApps"
+    const val OPML_FROM_URL = "opmlFromUrl"
 }
 
 private object AnalyticsProps {
-    const val castbox = "castbox"
-    const val otherApps = "other_apps"
-    const val opmlFromUrl = "opml_from_url"
+    const val CASTBOX = "castbox"
+    const val OTHER_APPS = "other_apps"
+    const val OPML_FROM_URL = "opml_from_url"
 }

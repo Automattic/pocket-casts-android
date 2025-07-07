@@ -142,22 +142,19 @@ class PocketCastsNetworkingRulesTest {
         assertEquals(expectedNetworkType, resultNetworkStatus!!.networkInfo.type)
     }
 
-    private fun mockNetworksWithTypes(networkTypes: List<NetworkType>): Networks =
-        mock<Networks>().apply {
-            val networkStatuses = networkTypes.map { mockNetworkStatus(it) }
-            whenever(this.networks).thenReturn(networkStatuses)
-        }
+    private fun mockNetworksWithTypes(networkTypes: List<NetworkType>): Networks = mock<Networks>().apply {
+        val networkStatuses = networkTypes.map { mockNetworkStatus(it) }
+        whenever(this.networks).thenReturn(networkStatuses)
+    }
 
-    private fun mockNetworkStatus(networkType: NetworkType): NetworkStatus =
-        mock<NetworkStatus>().apply {
-            val networkInfo = mockNetworkInfo(networkType)
-            whenever(this.networkInfo).thenReturn(networkInfo)
-        }
+    private fun mockNetworkStatus(networkType: NetworkType): NetworkStatus = mock<NetworkStatus>().apply {
+        val networkInfo = mockNetworkInfo(networkType)
+        whenever(this.networkInfo).thenReturn(networkInfo)
+    }
 
-    private fun mockNetworkInfo(networkType: NetworkType): NetworkInfo =
-        mock<NetworkInfo>().apply {
-            whenever(this.type).thenReturn(networkType)
-        }
+    private fun mockNetworkInfo(networkType: NetworkType): NetworkInfo = mock<NetworkInfo>().apply {
+        whenever(this.type).thenReturn(networkType)
+    }
 
     private fun assertPrefers(
         input: List<NetworkType>,

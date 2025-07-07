@@ -39,7 +39,9 @@ import timber.log.Timber
 
 @SuppressLint("LogNotTimber")
 @HiltAndroidApp
-class AutomotiveApplication : Application(), Configuration.Provider {
+class AutomotiveApplication :
+    Application(),
+    Configuration.Provider {
 
     @Inject lateinit var podcastManager: PodcastManager
 

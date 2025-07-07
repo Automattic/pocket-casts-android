@@ -27,8 +27,8 @@ import com.google.android.horologist.compose.layout.ScalingLazyColumnState
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 object FilterScreen {
-    const val argumentFilterUuid = "filterUuid"
-    const val route = "filter/{$argumentFilterUuid}"
+    const val ARGUMENT_FILTER_UUID = "filterUuid"
+    const val ROUTE = "filter/{$ARGUMENT_FILTER_UUID}"
 
     fun navigateRoute(filterUuid: String) = "filter/$filterUuid"
 }

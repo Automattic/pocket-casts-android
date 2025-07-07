@@ -129,8 +129,7 @@ class EpisodeFragment : BaseFragment() {
             }
         }
 
-        private fun extractArgs(bundle: Bundle?): EpisodeFragmentArgs? =
-            bundle?.let { BundleCompat.getParcelable(it, NEW_INSTANCE_ARG, EpisodeFragmentArgs::class.java) }
+        private fun extractArgs(bundle: Bundle?): EpisodeFragmentArgs? = bundle?.let { BundleCompat.getParcelable(it, NEW_INSTANCE_ARG, EpisodeFragmentArgs::class.java) }
     }
 
     override lateinit var statusBarIconColor: StatusBarIconColor

@@ -19,15 +19,15 @@ class RatingsManagerImpl @Inject constructor(
     private val cacheServiceManager: PodcastCacheServiceManager,
     private val syncManager: SyncManager,
     appDatabase: AppDatabase,
-) : RatingsManager, CoroutineScope {
+) : RatingsManager,
+    CoroutineScope {
     private val podcastRatingsDao = appDatabase.podcastRatingsDao()
 
     override val coroutineContext: CoroutineContext
         get() = Dispatchers.Default
 
-    override fun podcastRatings(podcastUuid: String) =
-        podcastRatingsDao.podcastRatingsFlow(podcastUuid)
-            .map { it.firstOrNull() ?: noRatings(podcastUuid) }
+    override fun podcastRatings(podcastUuid: String) = podcastRatingsDao.podcastRatingsFlow(podcastUuid)
+        .map { it.firstOrNull() ?: noRatings(podcastUuid) }
 
     override suspend fun refreshPodcastRatings(podcastUuid: String, useCache: Boolean) {
         try {

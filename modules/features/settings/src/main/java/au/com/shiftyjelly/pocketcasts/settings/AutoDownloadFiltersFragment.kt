@@ -27,7 +27,9 @@ import au.com.shiftyjelly.pocketcasts.ui.R as UR
 import au.com.shiftyjelly.pocketcasts.views.R as VR
 
 @AndroidEntryPoint
-class AutoDownloadFiltersFragment : androidx.fragment.app.Fragment(), FilterAutoDownloadAdapter.ClickListener {
+class AutoDownloadFiltersFragment :
+    androidx.fragment.app.Fragment(),
+    FilterAutoDownloadAdapter.ClickListener {
 
     @Inject lateinit var playlistManager: PlaylistManager
 

@@ -39,7 +39,7 @@ fun RecyclerView.quickScrollToTop() {
 
             return if (scrollRange > 0 && scrollOffset > 0) {
                 val pixelsInRange = scrollRange * scrollOffset / scrollRange.toFloat()
-                (MillisPerRange / pixelsInRange).coerceAtMost(MaxMillisPerInch / displayMetrics.densityDpi)
+                (MILLIS_PER_RANGE / pixelsInRange).coerceAtMost(MAX_MILLIS_PER_INCH / displayMetrics.densityDpi)
             } else {
                 super.calculateSpeedPerPixel(displayMetrics)
             }
@@ -59,5 +59,5 @@ fun RecyclerView.ViewHolder.showRow() {
     itemView.layoutParams.height = ViewGroup.LayoutParams.WRAP_CONTENT
 }
 
-private const val MillisPerRange = 1000f
-private const val MaxMillisPerInch = 50f
+private const val MILLIS_PER_RANGE = 1000f
+private const val MAX_MILLIS_PER_INCH = 50f

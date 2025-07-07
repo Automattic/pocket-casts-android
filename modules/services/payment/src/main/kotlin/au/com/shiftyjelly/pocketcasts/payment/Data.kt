@@ -214,10 +214,10 @@ sealed interface SubscriptionPlan {
     }
 
     companion object {
-        const val PlusMonthlyProductId = "com.pocketcasts.plus.monthly"
-        const val PlusYearlyProductId = "com.pocketcasts.plus.yearly"
-        const val PatronMonthlyProductId = "com.pocketcasts.monthly.patron"
-        const val PatronYearlyProductId = "com.pocketcasts.yearly.patron"
+        const val PLUS_MONTHLY_PRODUCT_ID = "com.pocketcasts.plus.monthly"
+        const val PLUS_YEARLY_PRODUCT_ID = "com.pocketcasts.plus.yearly"
+        const val PATRON_MONTHLY_PRODUCT_ID = "com.pocketcasts.monthly.patron"
+        const val PATRON_YEARLY_PRODUCT_ID = "com.pocketcasts.yearly.patron"
 
         val PlusMonthlyPreview get() = SubscriptionPlans.Preview.getBasePlan(SubscriptionTier.Plus, BillingCycle.Monthly)
         val PlusYearlyPreview get() = SubscriptionPlans.Preview.getBasePlan(SubscriptionTier.Plus, BillingCycle.Yearly)
@@ -229,13 +229,13 @@ sealed interface SubscriptionPlan {
             billingCycle: BillingCycle,
         ) = when (tier) {
             SubscriptionTier.Plus -> when (billingCycle) {
-                BillingCycle.Monthly -> PlusMonthlyProductId
-                BillingCycle.Yearly -> PlusYearlyProductId
+                BillingCycle.Monthly -> PLUS_MONTHLY_PRODUCT_ID
+                BillingCycle.Yearly -> PLUS_YEARLY_PRODUCT_ID
             }
 
             SubscriptionTier.Patron -> when (billingCycle) {
-                BillingCycle.Monthly -> PatronMonthlyProductId
-                BillingCycle.Yearly -> PatronYearlyProductId
+                BillingCycle.Monthly -> PATRON_MONTHLY_PRODUCT_ID
+                BillingCycle.Yearly -> PATRON_YEARLY_PRODUCT_ID
             }
         }
 

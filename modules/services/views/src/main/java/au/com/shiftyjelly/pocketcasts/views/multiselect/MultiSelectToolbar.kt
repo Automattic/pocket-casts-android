@@ -151,9 +151,8 @@ class MultiSelectToolbar @JvmOverloads constructor(
     }
 
     private object AnalyticsProp {
-        private const val source = "source"
+        private const val SOURCE = "source"
 
-        fun sourceMap(eventSource: SourceView) =
-            mapOf(source to eventSource.analyticsValue)
+        fun sourceMap(eventSource: SourceView) = mapOf(SOURCE to eventSource.analyticsValue)
     }
 }

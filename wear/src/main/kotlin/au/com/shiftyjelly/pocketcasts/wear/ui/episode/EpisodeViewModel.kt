@@ -134,7 +134,7 @@ class EpisodeViewModel @Inject constructor(
     val showNowPlaying = _showNowPlaying.asSharedFlow()
 
     init {
-        val episodeUuid = savedStateHandle.get<String>(EpisodeScreenFlow.episodeUuidArgument)
+        val episodeUuid = savedStateHandle.get<String>(EpisodeScreenFlow.EPISODE_UUID_ARGUMENT)
             ?: throw IllegalStateException("EpisodeViewModel must have an episode uuid in the SavedStateHandle")
 
         val episodeFlow = episodeManager.findEpisodeByUuidFlow(episodeUuid)
@@ -235,11 +235,10 @@ class EpisodeViewModel @Inject constructor(
     private fun isInUpNext(
         upNext: UpNextQueue.State?,
         episode: BaseEpisode,
-    ) =
-        (upNext is UpNextQueue.State.Loaded) &&
-            (upNext.queue + upNext.episode)
-                .map { it.uuid }
-                .contains(episode.uuid)
+    ) = (upNext is UpNextQueue.State.Loaded) &&
+        (upNext.queue + upNext.episode)
+            .map { it.uuid }
+            .contains(episode.uuid)
 
     private suspend fun getTintColor(
         episode: BaseEpisode,
@@ -469,34 +468,33 @@ class EpisodeViewModel @Inject constructor(
         }
     }
 
-    private suspend fun extractColorFromEpisodeArtwork(userEpisode: UserEpisode): Color =
-        userEpisode.artworkUrl?.let { artworkUrl ->
-            val context = getApplication<Application>()
-            val loader = ImageLoader(context)
-            val request = ImageRequest.Builder(context)
-                .data(artworkUrl)
-                .allowHardware(false) // Disable hardware bitmaps.
-                .build()
+    private suspend fun extractColorFromEpisodeArtwork(userEpisode: UserEpisode): Color = userEpisode.artworkUrl?.let { artworkUrl ->
+        val context = getApplication<Application>()
+        val loader = ImageLoader(context)
+        val request = ImageRequest.Builder(context)
+            .data(artworkUrl)
+            .allowHardware(false) // Disable hardware bitmaps.
+            .build()
 
-            val successResult = loader.execute(request) as? SuccessResult
-                ?: return@let null
-            val resultDrawable = successResult.drawable as? BitmapDrawable
-                ?: return@let null
-            val bitmap = resultDrawable.bitmap
+        val successResult = loader.execute(request) as? SuccessResult
+            ?: return@let null
+        val resultDrawable = successResult.drawable as? BitmapDrawable
+            ?: return@let null
+        val bitmap = resultDrawable.bitmap
 
-            // Set a timeout to make sure the user isn't blocked for too long just
-            // because we're trying to extract a tint color.
-            withTimeoutOrNull(2000L) {
-                suspendCoroutine { continuation ->
-                    Palette.from(bitmap).generate { palette ->
-                        val lightVibrantHsl = palette?.lightVibrantSwatch?.hsl
-                        continuation.resume(
-                            lightVibrantHsl?.let { hsl ->
-                                Color.hsl(hsl[0], hsl[1], hsl[2])
-                            },
-                        )
-                    }
+        // Set a timeout to make sure the user isn't blocked for too long just
+        // because we're trying to extract a tint color.
+        withTimeoutOrNull(2000L) {
+            suspendCoroutine { continuation ->
+                Palette.from(bitmap).generate { palette ->
+                    val lightVibrantHsl = palette?.lightVibrantSwatch?.hsl
+                    continuation.resume(
+                        lightVibrantHsl?.let { hsl ->
+                            Color.hsl(hsl[0], hsl[1], hsl[2])
+                        },
+                    )
                 }
             }
-        } ?: Color.White
+        }
+    } ?: Color.White
 }

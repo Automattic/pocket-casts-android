@@ -322,8 +322,7 @@ class OnboardingRecommendationsStartPageViewModel @Inject constructor(
             const val SUBSCRIPTIONS = "subscriptions"
             const val UUID = "uuid"
             const val SOURCE = "source"
-            fun podcastSubscribeToggled(uuid: String) =
-                mapOf(UUID to uuid, SOURCE to ONBOARDING_RECOMMENDATIONS)
+            fun podcastSubscribeToggled(uuid: String) = mapOf(UUID to uuid, SOURCE to ONBOARDING_RECOMMENDATIONS)
         }
 
         const val NUM_TO_SHOW_DEFAULT = 6

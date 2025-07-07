@@ -24,7 +24,7 @@ import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 object WatchListScreen {
-    const val route = "watch_list_screen"
+    const val ROUTE = "watch_list_screen"
 }
 
 @Composable
@@ -65,7 +65,7 @@ fun WatchListScreen(
                 iconRes = IR.drawable.ic_podcasts,
                 onClick = {
                     viewModel.onPodcastsClicked()
-                    navigateToRoute(PodcastsScreen.routeHomeFolder)
+                    navigateToRoute(PodcastsScreen.ROUTE_HOME_FOLDER)
                 },
             )
         }
@@ -76,7 +76,7 @@ fun WatchListScreen(
                 iconRes = IR.drawable.ic_download,
                 onClick = {
                     viewModel.onDownloadsClicked()
-                    navigateToRoute(DownloadsScreen.route)
+                    navigateToRoute(DownloadsScreen.ROUTE)
                 },
             )
         }
@@ -87,7 +87,7 @@ fun WatchListScreen(
                 iconRes = IR.drawable.ic_filters,
                 onClick = {
                     viewModel.onFiltersClicked()
-                    navigateToRoute(FiltersScreen.route)
+                    navigateToRoute(FiltersScreen.ROUTE)
                 },
             )
         }
@@ -98,7 +98,7 @@ fun WatchListScreen(
                 iconRes = IR.drawable.ic_file,
                 onClick = {
                     viewModel.onFilesClicked()
-                    navigateToRoute(FilesScreen.route)
+                    navigateToRoute(FilesScreen.ROUTE)
                 },
             )
         }
@@ -109,7 +109,7 @@ fun WatchListScreen(
                 iconRes = IR.drawable.ic_profile_settings,
                 onClick = {
                     viewModel.onSettingsClicked()
-                    navigateToRoute(SettingsScreen.route)
+                    navigateToRoute(SettingsScreen.ROUTE)
                 },
             )
         }

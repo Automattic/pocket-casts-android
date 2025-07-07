@@ -355,7 +355,7 @@ private val Context.sizeLimit: DpSize?
         }
     }
 
-@Preview(device = Devices.PortraitRegular)
+@Preview(device = Devices.PORTRAIT_REGULAR)
 @Composable
 private fun ErrorMessagePreview() {
     ErrorMessage(

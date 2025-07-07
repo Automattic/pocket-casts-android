@@ -67,7 +67,6 @@ object SearchBarDefaults {
         focusedBorderColor: Color = Color.Transparent,
         unfocusedBorderColor: Color = Color.Transparent,
         disabledBorderColorColor: Color = Color.Transparent,
-
     ) = TextFieldDefaults.outlinedTextFieldColors(
         cursorColor = cursorColor,
         textColor = textColor,

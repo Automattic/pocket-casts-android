@@ -39,7 +39,10 @@ import au.com.shiftyjelly.pocketcasts.ui.R as UR
 private const val ARG_PLAYLIST_UUID = "playlist_uuid"
 
 @AndroidEntryPoint
-class PodcastOptionsFragment : BaseFragment(), PodcastSelectFragment.Listener, CoroutineScope {
+class PodcastOptionsFragment :
+    BaseFragment(),
+    PodcastSelectFragment.Listener,
+    CoroutineScope {
     companion object {
         fun newInstance(playlist: Playlist): PodcastOptionsFragment {
             val bundle = Bundle()

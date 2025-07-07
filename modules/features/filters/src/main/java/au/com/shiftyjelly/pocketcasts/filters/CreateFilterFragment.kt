@@ -49,7 +49,9 @@ private const val ARG_MODE = "mode"
 private const val ARG_PLAYLIST_UUID = "playlist_uuid"
 
 @AndroidEntryPoint
-class CreateFilterFragment : BaseFragment(), CoroutineScope {
+class CreateFilterFragment :
+    BaseFragment(),
+    CoroutineScope {
     sealed class Mode(val string: String) {
         object Create : Mode("create")
         data class Edit(val playlist: Playlist) : Mode("edit")
@@ -62,7 +64,8 @@ class CreateFilterFragment : BaseFragment(), CoroutineScope {
         fun newInstance(mode: Mode): CreateFilterFragment {
             return CreateFilterFragment().apply {
                 arguments = bundleOf(
-                    ARG_MODE to mode.string, ARG_PLAYLIST_UUID to (mode as? Mode.Edit)?.playlist?.uuid,
+                    ARG_MODE to mode.string,
+                    ARG_PLAYLIST_UUID to (mode as? Mode.Edit)?.playlist?.uuid,
                 )
             }
         }

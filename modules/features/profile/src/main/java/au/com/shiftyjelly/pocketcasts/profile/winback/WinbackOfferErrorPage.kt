@@ -81,7 +81,7 @@ internal fun WinbackOfferErrorPage(
     }
 }
 
-@Preview(device = Devices.PortraitRegular)
+@Preview(device = Devices.PORTRAIT_REGULAR)
 @Composable
 private fun WinbackOfferErrorPagePreview(
     @PreviewParameter(ThemePreviewParameterProvider::class) theme: ThemeType,

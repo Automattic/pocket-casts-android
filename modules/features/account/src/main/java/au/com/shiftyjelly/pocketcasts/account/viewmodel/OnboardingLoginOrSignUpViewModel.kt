@@ -94,10 +94,10 @@ class OnboardingLoginOrSignUpViewModel @Inject constructor(
         object AnalyticsProp {
             fun flow(flow: OnboardingFlow) = "flow" to flow.analyticsValue
             object ButtonTapped {
-                private const val button = "button"
-                val signIn = button to "sign_in"
-                val createAccount = button to "create_account"
-                val continueWithGoogle = button to "continue_with_google"
+                private const val BUTTON = "button"
+                val signIn = BUTTON to "sign_in"
+                val createAccount = BUTTON to "create_account"
+                val continueWithGoogle = BUTTON to "continue_with_google"
             }
         }
     }

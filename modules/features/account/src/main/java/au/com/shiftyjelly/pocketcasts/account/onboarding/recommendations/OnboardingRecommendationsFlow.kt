@@ -15,11 +15,10 @@ import au.com.shiftyjelly.pocketcasts.utils.Network
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 object OnboardingRecommendationsFlow {
+    const val ROUTE = "onboardingRecommendationsFlow"
 
-    const val route = "onboardingRecommendationsFlow"
-
-    private const val start = "start"
-    private const val search = "search"
+    private const val START = "start"
+    private const val SEARCH = "search"
 
     fun NavGraphBuilder.onboardingRecommendationsFlowGraph(
         theme: Theme.ThemeType,
@@ -30,19 +29,19 @@ object OnboardingRecommendationsFlow {
         onUpdateSystemBars: (SystemBarsStyles) -> Unit,
     ) {
         navigation(
-            route = this@OnboardingRecommendationsFlow.route,
-            startDestination = start,
+            route = this@OnboardingRecommendationsFlow.ROUTE,
+            startDestination = START,
         ) {
             importFlowGraph(theme, navController, flow, onUpdateSystemBars)
 
-            composable(start) {
+            composable(START) {
                 OnboardingRecommendationsStartPage(
                     theme,
-                    onImportClicked = { navController.navigate(OnboardingImportFlow.route) },
+                    onImportClicked = { navController.navigate(OnboardingImportFlow.ROUTE) },
                     onSearch = with(LocalContext.current) {
                         {
                             if (Network.isConnected(this)) {
-                                navController.navigate(search)
+                                navController.navigate(SEARCH)
                             } else {
                                 Toast.makeText(
                                     this,
@@ -57,7 +56,7 @@ object OnboardingRecommendationsFlow {
                     onUpdateSystemBars = onUpdateSystemBars,
                 )
             }
-            composable(search) {
+            composable(SEARCH) {
                 OnboardingRecommendationsSearchPage(
                     theme = theme,
                     onBackPressed = { navController.popBackStack() },

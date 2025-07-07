@@ -26,13 +26,13 @@ import timber.log.Timber
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 object UrlScreenRoutes {
-    const val termsOfService = "url_screen_terms_of_service"
-    const val privacy = "url_screen_privacy_policy"
+    const val TERMS_OF_SERVICES = "url_screen_terms_of_service"
+    const val PRIVACY = "url_screen_privacy_policy"
 }
 
 fun NavGraphBuilder.settingsUrlScreens() {
     composable(
-        route = UrlScreenRoutes.termsOfService,
+        route = UrlScreenRoutes.TERMS_OF_SERVICES,
     ) {
         UrlScreen(
             title = stringResource(LR.string.settings_about_terms_of_serivce),
@@ -42,7 +42,7 @@ fun NavGraphBuilder.settingsUrlScreens() {
     }
 
     composable(
-        route = UrlScreenRoutes.privacy,
+        route = UrlScreenRoutes.PRIVACY,
     ) {
         UrlScreen(
             title = stringResource(id = LR.string.settings_about_privacy_policy),
