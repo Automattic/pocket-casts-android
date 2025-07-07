@@ -98,7 +98,7 @@ class PlaybackSettingsFragment : BaseFragment() {
             val bottomInset = settings.bottomInset.collectAsStateWithLifecycle(0)
             PlaybackSettings(
                 settings = settings,
-                onBackClick = {
+                onBackPress = {
                     @Suppress("DEPRECATION")
                     activity?.onBackPressed()
                 },
@@ -111,7 +111,7 @@ class PlaybackSettingsFragment : BaseFragment() {
     @Composable
     private fun PlaybackSettings(
         settings: Settings,
-        onBackClick: () -> Unit,
+        onBackPress: () -> Unit,
         scrollToSleepTimer: Boolean,
         bottomInset: Dp,
     ) {
@@ -132,7 +132,7 @@ class PlaybackSettingsFragment : BaseFragment() {
         Column {
             ThemedTopAppBar(
                 title = stringResource(LR.string.settings_title_playback),
-                onNavigationClick = onBackClick,
+                onNavigationClick = onBackPress,
                 bottomShadow = true,
             )
             LazyColumn(

@@ -20,6 +20,7 @@ val LocalColors = staticCompositionLocalOf { PocketCastsTheme(type = Theme.Theme
  * does not support the use of contentColor.
  * @see <a href="https://developer.android.com/jetpack/compose/themes/material#content-color</a> for more details
  */
+@Suppress("ktlint:compose:modifier-missing-check")
 @Composable
 fun AppThemeWithBackground(
     themeType: Theme.ThemeType,

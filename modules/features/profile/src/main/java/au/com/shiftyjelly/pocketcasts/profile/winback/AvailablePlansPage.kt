@@ -80,7 +80,7 @@ internal fun AvailablePlansPage(
     modifier: Modifier = Modifier,
 ) {
     Column(
-        modifier = Modifier.nestedScroll(rememberViewInteropNestedScrollConnection()),
+        modifier = modifier.nestedScroll(rememberViewInteropNestedScrollConnection()),
     ) {
         BottomSheetAppBar(
             onNavigationClick = onGoBack,
@@ -88,7 +88,7 @@ internal fun AvailablePlansPage(
         AnimatedContent(
             targetState = plansState,
             contentKey = { state -> state.javaClass },
-            modifier = modifier,
+            modifier = Modifier,
         ) { state ->
             when (state) {
                 is SubscriptionPlansState.Loading -> LoadingState()

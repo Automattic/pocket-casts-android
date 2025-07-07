@@ -21,10 +21,10 @@ import au.com.shiftyjelly.pocketcasts.localization.R as LR
 @Composable
 fun ShelfTitleRow(
     item: ShelfTitle,
+    modifier: Modifier = Modifier,
 ) {
     Row(
-        modifier = Modifier
-            .padding(16.dp),
+        modifier = modifier.padding(16.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
         TextH40(
@@ -36,7 +36,7 @@ fun ShelfTitleRow(
 
 @Preview
 @Composable
-fun ShelfTitlePreview(
+private fun ShelfTitlePreview(
     @PreviewParameter(ThemePreviewParameterProvider::class) themeType: Theme.ThemeType,
 ) {
     AppTheme(themeType) {

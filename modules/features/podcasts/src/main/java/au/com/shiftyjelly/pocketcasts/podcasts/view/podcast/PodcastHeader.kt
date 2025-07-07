@@ -718,7 +718,7 @@ private fun PodcastDetails(
         )
         PodcastInfoView(
             state = podcastInfoState,
-            onWebsiteLinkClicked = onClickWebsiteLink,
+            onWebsiteLinkClick = onClickWebsiteLink,
         )
     }
 }
@@ -772,7 +772,7 @@ private fun PodcastBackgroundArtwork(
 private fun ImageOrPreview(
     uuid: String,
     onArtworkAvailable: () -> Unit,
-    modifier: Modifier,
+    modifier: Modifier = Modifier,
 ) {
     if (!LocalInspectionMode.current) {
         val context = LocalContext.current

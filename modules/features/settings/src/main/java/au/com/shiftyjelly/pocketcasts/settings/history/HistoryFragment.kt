@@ -64,9 +64,9 @@ class HistoryFragment :
             ) {
                 composable(HistoryNavRoutes.HISTORY) {
                     HistoryPage(
-                        onBackClick = {
+                        onBackPress = {
                             navController.popBackStack()
-                            onBackClick()
+                            onBackPress()
                         },
                         onUpNextHistoryClick = {
                             navController.navigate(HistoryNavRoutes.UP_NEXT_HISTORY)
@@ -83,7 +83,7 @@ class HistoryFragment :
                                 ),
                             )
                         },
-                        onBackClick = navController::popBackStack,
+                        onBackPress = navController::popBackStack,
                         bottomInset = bottomInsetDp,
                     )
                 }
@@ -104,7 +104,7 @@ class HistoryFragment :
                     UpNextHistoryDetailsPage(
                         date = date,
                         onRestoreClick = ::onRestoreClick,
-                        onBackClick = navController::popBackStack,
+                        onBackPress = navController::popBackStack,
                         bottomInset = bottomInsetDp,
                     )
                 }
@@ -135,7 +135,7 @@ class HistoryFragment :
     }
 
     @Suppress("DEPRECATION")
-    private fun onBackClick() {
+    private fun onBackPress() {
         activity?.onBackPressed()
     }
 

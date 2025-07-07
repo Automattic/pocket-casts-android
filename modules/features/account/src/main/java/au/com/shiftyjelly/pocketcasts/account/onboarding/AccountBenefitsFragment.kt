@@ -8,7 +8,6 @@ import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.compose.AppTheme
 import au.com.shiftyjelly.pocketcasts.compose.CallOnce
-import au.com.shiftyjelly.pocketcasts.compose.theme
 import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingFlow
 import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingLauncher
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseDialogFragment
@@ -31,7 +30,7 @@ class AccountBenefitsFragment : BaseDialogFragment() {
 
         AppTheme(theme.activeTheme) {
             AccountBenefitsDialog(
-                onGetStarted = {
+                onGetStartedClick = {
                     tracker.track(AnalyticsEvent.INFORMATIONAL_MODAL_VIEW_GET_STARTED_TAP)
                     dismiss()
                     OnboardingLauncher.openOnboardingFlow(requireActivity(), OnboardingFlow.LoggedOut)
@@ -41,7 +40,7 @@ class AccountBenefitsFragment : BaseDialogFragment() {
                     dismiss()
                     OnboardingLauncher.openOnboardingFlow(requireActivity(), OnboardingFlow.LoggedOut)
                 },
-                onBenefitShown = { benefit ->
+                onShowBenefit = { benefit ->
                     tracker.track(AnalyticsEvent.INFORMATIONAL_MODAL_VIEW_CARD_SHOWED, mapOf("card" to benefit.analyticsValue))
                 },
                 onDismiss = {

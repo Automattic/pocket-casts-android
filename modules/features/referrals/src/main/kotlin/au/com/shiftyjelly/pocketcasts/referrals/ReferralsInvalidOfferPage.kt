@@ -159,7 +159,7 @@ private fun ReferralsInvalidOfferPageContent(
 
 @Preview(device = Devices.PORTRAIT_REGULAR)
 @Composable
-fun ReferralsInvalidOfferPagePortraitPhonePreview() {
+private fun ReferralsInvalidOfferPagePortraitPhonePreview() {
     ReferralsInvalidOfferPageContentPreview(
         windowWidthSizeClass = WindowWidthSizeClass.Compact,
         windowHeightSizeClass = WindowHeightSizeClass.Medium,
@@ -168,7 +168,7 @@ fun ReferralsInvalidOfferPagePortraitPhonePreview() {
 
 @Preview(device = Devices.LANDSCAPE_REGULAR)
 @Composable
-fun ReferralsInvalidOfferPageLandscapePhonePreview() {
+private fun ReferralsInvalidOfferPageLandscapePhonePreview() {
     ReferralsInvalidOfferPageContentPreview(
         windowWidthSizeClass = WindowWidthSizeClass.Compact,
         windowHeightSizeClass = WindowHeightSizeClass.Compact,
@@ -177,7 +177,7 @@ fun ReferralsInvalidOfferPageLandscapePhonePreview() {
 
 @Preview(device = Devices.PORTRAIT_TABLET)
 @Composable
-fun ReferralsInvalidOfferPagePortraitTabletPreview() {
+private fun ReferralsInvalidOfferPagePortraitTabletPreview() {
     ReferralsInvalidOfferPageContentPreview(
         windowWidthSizeClass = WindowWidthSizeClass.Medium,
         windowHeightSizeClass = WindowHeightSizeClass.Medium,
@@ -186,7 +186,7 @@ fun ReferralsInvalidOfferPagePortraitTabletPreview() {
 
 @Preview(device = Devices.LANDSCAPE_TABLET)
 @Composable
-fun ReferralsInvalidOfferPageLandscapeTabletPreview() {
+private fun ReferralsInvalidOfferPageLandscapeTabletPreview() {
     ReferralsInvalidOfferPageContentPreview(
         windowWidthSizeClass = WindowWidthSizeClass.Medium,
         windowHeightSizeClass = WindowHeightSizeClass.Expanded,

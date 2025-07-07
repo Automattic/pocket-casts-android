@@ -55,7 +55,7 @@ private fun Content(
 
 @Preview
 @Composable
-fun ChapterProgressCirclePreview() {
+private fun ChapterProgressCirclePreview() {
     Content(
         progress = 0.25f,
     )

@@ -118,7 +118,7 @@ private fun BarsSection(
     story: Story.CompletionRate,
     areBarsVisible: Boolean,
     forceBarsVisible: Boolean,
-    modifier: Modifier,
+    modifier: Modifier = Modifier,
 ) {
     BoxWithConstraints(
         modifier = modifier

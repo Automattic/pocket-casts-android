@@ -58,10 +58,10 @@ import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 @Composable
 internal fun AccountBenefitsPage(
-    onGetStarted: () -> Unit,
+    onGetStartedClick: () -> Unit,
     onLogIn: () -> Unit,
     onClose: () -> Unit,
-    onBenefitShown: (AccountBenefit) -> Unit,
+    onShowBenefit: (AccountBenefit) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Column(
@@ -75,12 +75,12 @@ internal fun AccountBenefitsPage(
         )
 
         BenefitsAdaptiveContent(
-            onBenefitShown = onBenefitShown,
+            noShownBenefit = onShowBenefit,
             modifier = Modifier.weight(1f),
         )
 
         ActionButtons(
-            onGetStarted = onGetStarted,
+            onGetStartedClick = onGetStartedClick,
             onLogIn = onLogIn,
             modifier = Modifier.padding(
                 start = 16.dp,
@@ -150,7 +150,7 @@ private fun HeaderText(
 
 @Composable
 private fun ActionButtons(
-    onGetStarted: () -> Unit,
+    onGetStartedClick: () -> Unit,
     onLogIn: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -164,7 +164,7 @@ private fun ActionButtons(
                 contentColor = MaterialTheme.theme.colors.primaryUi01,
             ),
             includePadding = false,
-            onClick = onGetStarted,
+            onClick = onGetStartedClick,
         )
 
         Spacer(
@@ -184,7 +184,7 @@ private fun ActionButtons(
 
 @Composable
 private fun BenefitsAdaptiveContent(
-    onBenefitShown: (AccountBenefit) -> Unit,
+    noShownBenefit: (AccountBenefit) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     SubcomposeLayout(
@@ -219,7 +219,7 @@ private fun BenefitsAdaptiveContent(
                         modifier = Modifier.padding(24.dp),
                     )
                     BenefitPager(
-                        onBenefitShown = onBenefitShown,
+                        onShowBenefit = noShownBenefit,
                         contentPadding = PaddingValues(horizontal = 24.dp),
                         contentSpacing = 16.dp,
                         modifier = Modifier.padding(vertical = 20.dp),
@@ -257,9 +257,9 @@ private fun BenefitsAdaptiveContent(
 
 @Composable
 private fun BenefitPager(
-    onBenefitShown: (AccountBenefit) -> Unit,
     contentPadding: PaddingValues,
     contentSpacing: Dp,
+    onShowBenefit: (AccountBenefit) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Column(
@@ -269,9 +269,9 @@ private fun BenefitPager(
         val benefits = AccountBenefit.entries
         val pagerState = PagerState { benefits.size }
 
-        LaunchedEffect(pagerState) {
+        LaunchedEffect(pagerState, onShowBenefit) {
             snapshotFlow { pagerState.currentPage }.collect { page ->
-                onBenefitShown(benefits[page])
+                onShowBenefit(benefits[page])
             }
         }
 
@@ -375,9 +375,7 @@ private fun BenefitEntry(
             modifier = Modifier.width(24.dp),
         )
 
-        Column(
-            modifier = modifier,
-        ) {
+        Column {
             TextH40(
                 text = stringResource(benefit.title),
             )
@@ -402,10 +400,10 @@ private fun AccountBenefitsPagePreview(
 ) {
     AppTheme(themeType = themeType) {
         AccountBenefitsPage(
-            onGetStarted = {},
+            onGetStartedClick = {},
             onLogIn = {},
             onClose = {},
-            onBenefitShown = {},
+            onShowBenefit = {},
         )
     }
 }

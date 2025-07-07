@@ -27,20 +27,23 @@ object PrivacySettingsScreen {
 }
 
 @Composable
-fun PrivacySettingsScreen() {
-    val viewModel = hiltViewModel<PrivacySettingsViewModel>()
+fun PrivacySettingsScreen(
+    modifier: Modifier = Modifier,
+    viewModel: PrivacySettingsViewModel = hiltViewModel(),
+) {
     val state by viewModel.state.collectAsState()
     val scrollState = rememberColumnState()
 
     ScreenScaffold(
         scrollState = scrollState,
+        modifier = modifier,
     ) {
         Content(
             scrollState = scrollState,
             state = state,
-            onAnalyticsChanged = viewModel::onAnalyticsChanged,
-            onCrashReportingChanged = viewModel::onCrashReportingChanged,
-            onLinkCrashReportsToUserChanged = viewModel::onLinkCrashReportsToUserChanged,
+            onAnalyticsChange = viewModel::onAnalyticsChanged,
+            onCrashReportingChange = viewModel::onCrashReportingChanged,
+            onLinkUserAccountChange = viewModel::onLinkCrashReportsToUserChanged,
         )
     }
 }
@@ -49,9 +52,9 @@ fun PrivacySettingsScreen() {
 private fun Content(
     scrollState: ScalingLazyColumnState,
     state: PrivacySettingsViewModel.State,
-    onAnalyticsChanged: (Boolean) -> Unit,
-    onCrashReportingChanged: (Boolean) -> Unit,
-    onLinkCrashReportsToUserChanged: (Boolean) -> Unit,
+    onAnalyticsChange: (Boolean) -> Unit,
+    onCrashReportingChange: (Boolean) -> Unit,
+    onLinkUserAccountChange: (Boolean) -> Unit,
 ) {
     ScalingLazyColumn(columnState = scrollState) {
         item {
@@ -67,7 +70,7 @@ private fun Content(
             ToggleChip(
                 label = analyticsLabel,
                 checked = state.sendAnalytics,
-                onCheckedChanged = onAnalyticsChanged,
+                onToggle = onAnalyticsChange,
             )
         }
 
@@ -80,7 +83,7 @@ private fun Content(
             ToggleChip(
                 label = analyticsLabel,
                 checked = state.sendCrashReports,
-                onCheckedChanged = onCrashReportingChanged,
+                onToggle = onCrashReportingChange,
             )
         }
 
@@ -93,7 +96,7 @@ private fun Content(
             ToggleChip(
                 label = analyticsLabel,
                 checked = state.linkCrashReportsToUser,
-                onCheckedChanged = onLinkCrashReportsToUserChanged,
+                onToggle = onLinkUserAccountChange,
             )
         }
 
@@ -126,9 +129,9 @@ private fun Preview() {
                 sendCrashReports = true,
                 linkCrashReportsToUser = false,
             ),
-            onAnalyticsChanged = {},
-            onCrashReportingChanged = {},
-            onLinkCrashReportsToUserChanged = {},
+            onAnalyticsChange = {},
+            onCrashReportingChange = {},
+            onLinkUserAccountChange = {},
         )
     }
 }

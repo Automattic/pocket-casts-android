@@ -92,7 +92,7 @@ fun ListPodcastSubscribeRow(
 @Preview
 @ShowkaseComposable(name = "PodcastSubscribeRow", group = "Row")
 @Composable
-fun ListPodcastSubscribeRowPreview(
+private fun ListPodcastSubscribeRowPreview(
     @PreviewParameter(ThemePreviewParameterProvider::class) theme: Theme.ThemeType,
 ) {
     AppThemeWithBackground(theme) {

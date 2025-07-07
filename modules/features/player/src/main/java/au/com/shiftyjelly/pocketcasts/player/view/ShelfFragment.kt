@@ -48,7 +48,7 @@ class ShelfFragment : BaseFragment() {
                 shelfViewModel = shelfViewModel,
                 shelfSharedViewModel = shelfSharedViewModel,
                 playerViewModel = playerViewModel,
-                onBackPressed = {
+                onBackPress = {
                     (activity as? FragmentHostListener)?.closeModal(this)
                 },
             )

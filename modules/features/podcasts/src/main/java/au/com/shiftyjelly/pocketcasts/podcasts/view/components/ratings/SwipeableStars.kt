@@ -52,11 +52,11 @@ private const val NUM_STARS = 5
 
 @Composable
 fun SwipeableStars(
-    onStarsChanged: (Double) -> Unit,
+    onStarsChange: (Double) -> Unit,
     modifier: Modifier = Modifier,
     initialRate: Int? = null,
+    viewModel: SwipeableStarsViewModel = hiltViewModel(),
 ) {
-    val viewModel = hiltViewModel<SwipeableStarsViewModel>()
     val isTalkBackEnabled by viewModel.accessibilityActiveState.collectAsState()
 
     var stopPointType by remember { mutableStateOf(StopPointType.InitialStars) }
@@ -71,7 +71,7 @@ fun SwipeableStars(
         stopPointType = stopPointType,
         initialRate,
     )
-    onStarsChanged(getStarsDouble(stopPoints, desiredStopPoint))
+    onStarsChange(getStarsDouble(stopPoints, desiredStopPoint))
 
     val sliderPosition = remember {
         Animatable(initialValue = 0f)
@@ -266,7 +266,7 @@ private fun getDesiredStopPoint(
 }
 
 @Composable
-fun Stars(
+private fun Stars(
     filled: Boolean,
     modifier: @Composable (index: Int) -> Modifier = { Modifier },
 ) {
@@ -329,7 +329,7 @@ private enum class ChangeType {
 @Composable
 private fun SwipeableStarsPreview() {
     SwipeableStars(
-        onStarsChanged = {},
+        onStarsChange = {},
         modifier = Modifier.size(
             height = 30.dp,
             width = 150.dp,

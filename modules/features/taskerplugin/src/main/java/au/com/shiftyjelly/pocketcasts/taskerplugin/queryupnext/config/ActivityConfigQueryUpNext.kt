@@ -35,6 +35,7 @@ private fun ComposableConfigQueryUpNextPreview() {
                     MutableStateFlow(listOf("New Releases", "Up Next")),
                 ),
             ),
-        ) {}
+            onFinish = {},
+        )
     }
 }

@@ -37,24 +37,24 @@ import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 @Composable
 internal fun ChampionDialog(
-    modifier: Modifier = Modifier,
     onRateClick: () -> Unit,
+    modifier: Modifier = Modifier,
 ) {
     Box(
+        contentAlignment = Alignment.Center,
         modifier = modifier
             .fillMaxWidth()
             .padding(16.dp)
             .windowInsetsPadding(WindowInsets.safeDrawing.only(WindowInsetsSides.Bottom)),
-        contentAlignment = Alignment.Center,
     ) {
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
             Image(
-                painterResource(IR.drawable.crown),
+                painter = painterResource(IR.drawable.crown),
                 contentDescription = stringResource(LR.string.pocket_casts_logo),
                 contentScale = ContentScale.Fit,
-                modifier = modifier
+                modifier = Modifier
                     .width(122.dp)
                     .height(132.dp)
                     .padding(bottom = 32.dp),
@@ -63,7 +63,7 @@ internal fun ChampionDialog(
             TextH20(
                 text = stringResource(LR.string.pocket_casts_champion_dialog_title),
                 textAlign = TextAlign.Center,
-                modifier = modifier.padding(bottom = 16.dp),
+                modifier = Modifier.padding(bottom = 16.dp),
             )
 
             TextP40(
@@ -71,13 +71,13 @@ internal fun ChampionDialog(
                 fontSize = 14.sp,
                 color = MaterialTheme.theme.colors.primaryText02,
                 textAlign = TextAlign.Center,
-                modifier = modifier.padding(bottom = 16.dp),
+                modifier = Modifier.padding(bottom = 16.dp),
             )
 
             RowButton(
                 text = stringResource(LR.string.rate_pocket_casts),
                 contentDescription = stringResource(LR.string.rate_pocket_casts),
-                onClick = { onRateClick() },
+                onClick = onRateClick,
                 includePadding = false,
                 textColor = MaterialTheme.theme.colors.primaryInteractive02,
                 colors = ButtonDefaults.buttonColors(
@@ -90,7 +90,7 @@ internal fun ChampionDialog(
 
 @Preview(showBackground = true)
 @Composable
-fun PreviewChampionDialog(@PreviewParameter(ThemePreviewParameterProvider::class) themeType: Theme.ThemeType) {
+private fun PreviewChampionDialog(@PreviewParameter(ThemePreviewParameterProvider::class) themeType: Theme.ThemeType) {
     AppThemeWithBackground(themeType) {
         ChampionDialog(
             onRateClick = {},

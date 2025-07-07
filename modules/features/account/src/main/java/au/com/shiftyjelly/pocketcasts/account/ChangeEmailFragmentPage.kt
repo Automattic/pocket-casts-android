@@ -45,14 +45,15 @@ fun ChangeEmailFragmentPage(
     email: String,
     existingEmail: String,
     password: String,
+    changeEmailState: ChangeEmailState,
+    bottomOffset: Dp,
     updateEmail: (String) -> Unit,
     updatePassword: (String) -> Unit,
     changeEmail: () -> Unit,
     clearServerError: () -> Unit,
     onSuccess: () -> Unit,
-    onBackPressed: () -> Unit,
-    changeEmailState: ChangeEmailState,
-    bottomOffset: Dp,
+    onBackPress: () -> Unit,
+    modifier: Modifier = Modifier,
 ) {
     val keyboardController = LocalSoftwareKeyboardController.current
     val focusManager = LocalFocusManager.current
@@ -67,7 +68,7 @@ fun ChangeEmailFragmentPage(
         changeEmail()
     }
 
-    LaunchedEffect(changeEmailState) {
+    LaunchedEffect(changeEmailState, onSuccess, clearServerError) {
         when (changeEmailState) {
             is ChangeEmailState.Failure -> {
                 isEmailInvalid = changeEmailState.errors.contains(ChangeEmailError.INVALID_EMAIL)
@@ -96,13 +97,13 @@ fun ChangeEmailFragmentPage(
     }
 
     Column(
-        modifier = Modifier
+        modifier = modifier
             .fillMaxSize(),
     ) {
         ThemedTopAppBar(
             title = stringResource(LR.string.profile_change_email_address_title),
             bottomShadow = true,
-            onNavigationClick = onBackPressed,
+            onNavigationClick = onBackPress,
         )
 
         LazyColumn(
@@ -152,7 +153,7 @@ fun ChangeEmailFragmentPage(
                         showPasswordError = false,
                         enabled = true,
                         focusEnabled = false,
-                        onDone = onFormSubmit,
+                        onConfirm = onFormSubmit,
                         onUpdateEmail = updateEmail,
                         onUpdatePassword = updatePassword,
                         showPasswordErrorMessage = false,
@@ -191,7 +192,7 @@ private fun ChangeEmailFragmentPagePreview(@PreviewParameter(ThemePreviewParamet
             updateEmail = {},
             updatePassword = {},
             changeEmailState = ChangeEmailState.Empty,
-            onBackPressed = {},
+            onBackPress = {},
             changeEmail = {},
             clearServerError = {},
             onSuccess = {},

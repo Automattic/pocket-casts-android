@@ -298,7 +298,7 @@ class EffectsFragment :
                         PlaybackEffectsSettingsTab.AllPodcasts
                     },
                     selectedTabTextColor = selectedTabTextColor,
-                    onItemSelected = {
+                    onItemSelect = {
                         viewModel.onEffectsSettingsSegmentedTabSelected(podcast, PlaybackEffectsSettingsTab.entries[it])
                     },
                     modifier = Modifier
@@ -310,10 +310,10 @@ class EffectsFragment :
 
     @Composable
     private fun EffectsSettingsSegmentedTabBar(
-        modifier: Modifier = Modifier,
         selectedTabTextColor: Color,
         selectedItem: PlaybackEffectsSettingsTab,
-        onItemSelected: (selectedItemIndex: Int) -> Unit,
+        onItemSelect: (Int) -> Unit,
+        modifier: Modifier = Modifier,
     ) {
         SegmentedTabBar(
             items = PlaybackEffectsSettingsTab.entries.map { stringResource(it.labelResId) },
@@ -325,7 +325,7 @@ class EffectsFragment :
             ),
             cornerRadius = 120.dp,
             modifier = modifier.fillMaxWidth(),
-            onItemSelected = onItemSelected,
+            onSelectItem = onItemSelect,
         )
     }
 
@@ -335,7 +335,7 @@ class EffectsFragment :
         EffectsSettingsSegmentedTabBar(
             selectedItem = PlaybackEffectsSettingsTab.AllPodcasts,
             selectedTabTextColor = Color.Black,
-            onItemSelected = {},
+            onItemSelect = {},
         )
     }
 }

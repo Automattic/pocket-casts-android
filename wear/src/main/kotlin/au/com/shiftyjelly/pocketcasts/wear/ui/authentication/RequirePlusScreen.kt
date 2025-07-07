@@ -33,14 +33,15 @@ object RequirePlusScreen {
 @Composable
 fun RequirePlusScreen(
     onContinueToLogin: () -> Unit,
+    modifier: Modifier = Modifier,
+    viewModel: RequirePlusViewModel = hiltViewModel(),
 ) {
     val columnState = rememberResponsiveColumnState()
 
     ScreenScaffold(
         scrollState = columnState,
+        modifier = modifier,
     ) {
-        val viewModel = hiltViewModel<RequirePlusViewModel>()
-
         CallOnce {
             viewModel.onShown()
         }

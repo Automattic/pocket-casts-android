@@ -36,7 +36,7 @@ import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 @Composable
 fun FolderEditColorPage(
-    onBackClick: () -> Unit,
+    onBackPress: () -> Unit,
     onSaveClick: () -> Unit,
     viewModel: FolderEditViewModel,
 ) {
@@ -53,7 +53,7 @@ fun FolderEditColorPage(
         colorId = colorId,
         folderName = folderName,
         gridImageWidthDp = gridImageWidthDp,
-        onBackClick = onBackClick,
+        onBackPress = onBackPress,
         onSaveClick = onSaveClick,
         onColorChange = { viewModel.changeColor(it) },
     )
@@ -65,7 +65,7 @@ private fun FolderEditColorForm(
     colorId: Int,
     folderName: String,
     gridImageWidthDp: Int,
-    onBackClick: () -> Unit,
+    onBackPress: () -> Unit,
     onSaveClick: () -> Unit,
     onColorChange: (Int) -> Unit,
 ) {
@@ -75,7 +75,7 @@ private fun FolderEditColorForm(
             BottomSheetAppBar(
                 title = stringResource(LR.string.folder_choose_a_color),
                 navigationButton = NavigationButton.Back,
-                onNavigationClick = { onBackClick() },
+                onNavigationClick = { onBackPress() },
             )
             Column(
                 modifier = Modifier
@@ -176,7 +176,7 @@ private fun FolderEditColorFormPreview(themeType: Theme.ThemeType = Theme.ThemeT
             colorId = 0,
             folderName = "New folder",
             gridImageWidthDp = 100,
-            onBackClick = {},
+            onBackPress = {},
             onSaveClick = {},
             onColorChange = {},
         )

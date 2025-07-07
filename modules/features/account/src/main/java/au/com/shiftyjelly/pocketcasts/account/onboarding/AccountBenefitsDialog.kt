@@ -46,10 +46,10 @@ import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 
 @Composable
 internal fun AccountBenefitsDialog(
-    onGetStarted: () -> Unit,
+    onGetStartedClick: () -> Unit,
     onLogIn: () -> Unit,
     onDismiss: () -> Unit,
-    onBenefitShown: (AccountBenefit) -> Unit,
+    onShowBenefit: (AccountBenefit) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Dialog(
@@ -75,7 +75,7 @@ internal fun AccountBenefitsDialog(
             )
 
             BenefitsPager(
-                onBenefitShown = onBenefitShown,
+                onShowBenefit = onShowBenefit,
             )
 
             Spacer(
@@ -83,7 +83,7 @@ internal fun AccountBenefitsDialog(
             )
 
             ActionButtons(
-                onGetStarted = onGetStarted,
+                onGetStartedClick = onGetStartedClick,
                 onLogIn = onLogIn,
                 modifier = Modifier.padding(horizontal = 70.dp),
             )
@@ -152,15 +152,15 @@ private fun HeaderTexts(
 
 @Composable
 private fun BenefitsPager(
-    onBenefitShown: (AccountBenefit) -> Unit,
+    onShowBenefit: (AccountBenefit) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val benefits = AccountBenefit.entries
     val pagerState = PagerState { benefits.size }
 
-    LaunchedEffect(pagerState) {
+    LaunchedEffect(pagerState, onShowBenefit) {
         snapshotFlow { pagerState.currentPage }.collect { page ->
-            onBenefitShown(benefits[page])
+            onShowBenefit(benefits[page])
         }
     }
 
@@ -218,7 +218,7 @@ private fun BenefitsPager(
 
 @Composable
 private fun ActionButtons(
-    onGetStarted: () -> Unit,
+    onGetStartedClick: () -> Unit,
     onLogIn: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -228,7 +228,7 @@ private fun ActionButtons(
         RowButton(
             text = stringResource(au.com.shiftyjelly.pocketcasts.localization.R.string.onboarding_get_started),
             includePadding = false,
-            onClick = onGetStarted,
+            onClick = onGetStartedClick,
         )
 
         Spacer(
@@ -253,10 +253,10 @@ private fun AccountBenefitsDialogPreview(
 ) {
     AppTheme(themeType = themeType) {
         AccountBenefitsDialog(
-            onGetStarted = {},
+            onGetStartedClick = {},
             onLogIn = {},
             onDismiss = {},
-            onBenefitShown = {},
+            onShowBenefit = {},
         )
     }
 }

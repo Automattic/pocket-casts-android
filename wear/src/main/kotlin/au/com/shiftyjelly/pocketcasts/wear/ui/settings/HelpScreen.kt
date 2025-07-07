@@ -25,8 +25,7 @@ object HelpScreen {
 }
 
 @Composable
-fun HelpScreen() {
-    val viewModel = hiltViewModel<HelpScreenViewModel>()
+fun HelpScreen(viewModel: HelpScreenViewModel = hiltViewModel()) {
     val state = viewModel.state.collectAsState().value
     val context = LocalContext.current
     val columnState = rememberColumnState()

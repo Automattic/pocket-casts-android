@@ -191,7 +191,6 @@ private fun FolderPodcastImage(
                 elevation = elevation,
                 shape = RoundedCornerShape(corners),
                 backgroundColor = color,
-                modifier = modifier,
             ) {
                 Box(
                     modifier = Modifier
@@ -216,7 +215,7 @@ private fun FolderPodcastImage(
 @ShowkaseComposable(name = "FolderImage", group = "Folder", styleName = "Light", defaultStyle = true)
 @Preview(name = "Light")
 @Composable
-fun FolderImageLightPreview() {
+private fun FolderImageLightPreview() {
     AppThemeWithBackground(Theme.ThemeType.LIGHT) {
         FolderImagePreview()
     }
@@ -225,7 +224,7 @@ fun FolderImageLightPreview() {
 @ShowkaseComposable(name = "FolderImage", group = "Folder", styleName = "Dark")
 @Preview(name = "Dark")
 @Composable
-fun FolderImageDarkPreview() {
+private fun FolderImageDarkPreview() {
     AppThemeWithBackground(Theme.ThemeType.DARK) {
         FolderImagePreview()
     }

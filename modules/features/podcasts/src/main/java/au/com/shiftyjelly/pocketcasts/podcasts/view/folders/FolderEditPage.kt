@@ -33,15 +33,18 @@ import au.com.shiftyjelly.pocketcasts.views.R as VR
 
 @Composable
 fun FolderEditPage(
-    onBackClick: () -> Unit,
+    onBackPress: () -> Unit,
     onDeleteClick: () -> Unit,
     viewModel: FolderEditViewModel,
+    modifier: Modifier = Modifier,
 ) {
     val folderName: String by viewModel.folderName.collectAsState()
     val colorId: Int by viewModel.colorId.collectAsState()
     val focusManager = LocalFocusManager.current
     val resources = LocalContext.current.resources
-    Column {
+    Column(
+        modifier = modifier,
+    ) {
         Column(
             modifier = Modifier
                 .padding(bottom = 16.dp)
@@ -50,7 +53,7 @@ fun FolderEditPage(
             BottomSheetAppBar(
                 title = stringResource(LR.string.edit_folder),
                 navigationButton = NavigationButton.Close,
-                onNavigationClick = { onBackClick() },
+                onNavigationClick = { onBackPress() },
             )
             TextC70(
                 text = stringResource(LR.string.name),

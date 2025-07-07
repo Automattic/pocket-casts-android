@@ -29,10 +29,10 @@ fun FolderListRow(
     color: Color,
     name: String,
     podcastUuids: List<String>,
+    onClick: (() -> Unit)?,
     modifier: Modifier = Modifier,
     badgeCount: Int = 0,
     badgeType: BadgeType = BadgeType.OFF,
-    onClick: (() -> Unit)?,
 ) {
     Row(
         verticalAlignment = Alignment.CenterVertically,

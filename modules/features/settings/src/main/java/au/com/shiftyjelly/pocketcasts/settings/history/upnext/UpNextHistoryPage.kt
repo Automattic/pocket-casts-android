@@ -45,20 +45,20 @@ import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 @Composable
 fun UpNextHistoryPage(
-    viewModel: UpNextHistoryViewModel = hiltViewModel(),
-    onBackClick: () -> Unit,
-    onHistoryEntryClick: (Date) -> Unit,
     bottomInset: Dp,
+    onBackPress: () -> Unit,
+    onHistoryEntryClick: (Date) -> Unit,
+    viewModel: UpNextHistoryViewModel = hiltViewModel(),
 ) {
     val state by viewModel.uiState.collectAsStateWithLifecycle()
     UpNextHistoryPageView(
         state = state,
-        onBackClick = onBackClick,
+        onBackPress = onBackPress,
         onHistoryEntryClick = { viewModel.onHistoryEntryClick(it) },
         bottomInset = bottomInset,
     )
 
-    LaunchedEffect(Unit) {
+    LaunchedEffect(onHistoryEntryClick) {
         viewModel.navigationState.collect { navigationState ->
             when (navigationState) {
                 is NavigationState.ShowHistoryDetails -> onHistoryEntryClick(navigationState.date)
@@ -70,14 +70,14 @@ fun UpNextHistoryPage(
 @Composable
 private fun UpNextHistoryPageView(
     state: UiState,
-    onBackClick: () -> Unit,
-    onHistoryEntryClick: (UpNextHistoryEntry) -> Unit,
     bottomInset: Dp,
+    onBackPress: () -> Unit,
+    onHistoryEntryClick: (UpNextHistoryEntry) -> Unit,
 ) {
     Column {
         ThemedTopAppBar(
             title = stringResource(LR.string.up_next_history),
-            onNavigationClick = onBackClick,
+            onNavigationClick = onBackPress,
         )
 
         when (state) {
@@ -187,7 +187,7 @@ private fun UpNextHistoryPageViewPreview(
                     ),
                 ),
             ),
-            onBackClick = {},
+            onBackPress = {},
             onHistoryEntryClick = {},
             bottomInset = 0.dp,
         )
@@ -203,7 +203,7 @@ private fun UpNextHistoryErrorViewPreview(
         UpNextHistoryPageView(
             state = UiState.Error,
             onHistoryEntryClick = {},
-            onBackClick = {},
+            onBackPress = {},
             bottomInset = 0.dp,
         )
     }

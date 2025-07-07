@@ -52,7 +52,7 @@ class ChangeEmailFragment : BaseFragment() {
                 password = password,
                 updateEmail = viewModel::updateEmail,
                 updatePassword = viewModel::updatePassword,
-                onBackPressed = {
+                onBackPress = {
                     @Suppress("DEPRECATION")
                     activity?.onBackPressed()
                 },

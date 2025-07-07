@@ -22,8 +22,8 @@ internal fun PlayerSeekBar(
     isBuffering: Boolean,
     bufferedUpTo: Duration,
     playerColors: PlayerColors,
-    modifier: Modifier = Modifier,
     onSeekToPosition: (Duration, onSeekComplete: () -> Unit) -> Unit,
+    modifier: Modifier = Modifier,
 ) {
     val theme = MaterialTheme.theme.type
 

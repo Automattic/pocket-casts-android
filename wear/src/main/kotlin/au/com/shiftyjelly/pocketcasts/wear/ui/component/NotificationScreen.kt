@@ -31,6 +31,7 @@ import au.com.shiftyjelly.pocketcasts.images.R as IR
 fun NotificationScreen(
     text: String,
     onClose: () -> Unit,
+    modifier: Modifier = Modifier,
     closeAfterDuration: Duration? = 2.seconds,
     icon: @Composable () -> Unit = {
         Icon(
@@ -43,8 +44,9 @@ fun NotificationScreen(
 ) {
     ScreenScaffold(
         timeText = null,
+        modifier = modifier,
     ) {
-        LaunchedEffect(closeAfterDuration) {
+        LaunchedEffect(closeAfterDuration, onClose) {
             if (closeAfterDuration != null) {
                 delay(closeAfterDuration)
                 onClose()

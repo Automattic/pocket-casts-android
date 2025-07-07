@@ -98,7 +98,7 @@ fun ProductAmountHorizontalText(
                 text = period,
                 fontSize = originalPriceFontSize,
                 color = secondaryTextColor,
-                modifier = modifier.padding(start = 4.dp),
+                modifier = Modifier.padding(start = 4.dp),
             )
         }
 

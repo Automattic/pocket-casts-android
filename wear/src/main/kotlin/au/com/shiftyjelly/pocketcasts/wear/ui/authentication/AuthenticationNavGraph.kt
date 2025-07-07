@@ -55,7 +55,7 @@ fun NavGraphBuilder.authenticationNavGraph(
             route = AuthenticationNavRoutes.LOGIN_WITH_PHONE,
         ) {
             LoginWithPhoneScreen(
-                onDone = { navController.popBackStack() },
+                onLoginClick = { navController.popBackStack() },
             )
         }
 
@@ -64,7 +64,7 @@ fun NavGraphBuilder.authenticationNavGraph(
         ) {
             LoginWithGoogleScreen(
                 signInSuccessScreen = googleSignInSuccessScreen,
-                onAuthCanceled = { navController.popBackStack() },
+                onCancel = { navController.popBackStack() },
             )
         }
     }

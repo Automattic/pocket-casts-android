@@ -108,14 +108,14 @@ fun ButtonTabs(
 @ShowkaseComposable(name = "ButtonTabs", group = "Button", styleName = "Light", defaultStyle = true)
 @Preview(name = "Light")
 @Composable
-fun ButtonTabsLightPreview() {
+private fun ButtonTabsLightPreview() {
     ButtonTabsPreview(Theme.ThemeType.LIGHT)
 }
 
 @ShowkaseComposable(name = "ButtonTabs", group = "Button", styleName = "Dark")
 @Preview(name = "Dark")
 @Composable
-fun ButtonTabsDarkPreview() {
+private fun ButtonTabsDarkPreview() {
     ButtonTabsPreview(Theme.ThemeType.DARK)
 }
 

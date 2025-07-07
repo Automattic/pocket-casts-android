@@ -38,6 +38,7 @@ object NowPlayingPager {
 fun NowPlayingPager(
     navController: NavController,
     swipeToDismissState: SwipeToDismissBoxState,
+    modifier: Modifier = Modifier,
     showTimeText: Boolean = true,
     allowSwipeToDismiss: Boolean = true,
     firstPageContent: @Composable NowPlayingPagerScope.() -> Unit,
@@ -53,6 +54,7 @@ fun NowPlayingPager(
         } else {
             {}
         },
+        modifier = modifier,
     ) {
         // Don't allow swipe to dismiss on first screen (because there is no where to swipe back to--instead
         // just let the app close) or when the pager is not on the initial page (because we want to avoid
@@ -62,15 +64,13 @@ fun NowPlayingPager(
             snapshotFlow { pagerState.currentPage }.map { allowSwipeToDismiss && it == 0 }
         }.collectAsState(initial = false)
 
-        val modifier = if (isSwipeToDismissEnabled) {
-            Modifier.edgeSwipeToDismiss(swipeToDismissState)
-        } else {
-            Modifier
-        }
-
         PagerScreen(
             state = pagerState,
-            modifier = modifier,
+            modifier = if (isSwipeToDismissEnabled) {
+                Modifier.edgeSwipeToDismiss(swipeToDismissState)
+            } else {
+                Modifier
+            },
         ) { page ->
             when (page) {
                 0 -> firstPageContent(pagerScope)

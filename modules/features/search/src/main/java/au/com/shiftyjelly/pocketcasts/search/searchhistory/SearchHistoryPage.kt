@@ -102,7 +102,7 @@ fun SearchHistoryView(
         if (state.entries.isNotEmpty()) {
             item {
                 Row(
-                    modifier = modifier
+                    modifier = Modifier
                         .fillMaxWidth()
                         .padding(start = 16.dp, top = 8.dp, end = 4.dp, bottom = 4.dp),
                     verticalAlignment = Alignment.CenterVertically,
@@ -110,14 +110,14 @@ fun SearchHistoryView(
                     TextH20(
                         text = stringResource(LR.string.search_history_recent_searches),
                         color = MaterialTheme.theme.colors.primaryText01,
-                        modifier = modifier.weight(1f),
+                        modifier = Modifier.weight(1f),
 
                     )
                     TextP60(
                         text = stringResource(LR.string.clear_all).uppercase(),
                         color = MaterialTheme.theme.colors.support03,
                         fontWeight = FontWeight.W700,
-                        modifier = modifier
+                        modifier = Modifier
                             .clickable { onClearAllClick() }
                             .padding(12.dp),
                     )
@@ -164,10 +164,12 @@ fun SearchHistoryRow(
     modifier: Modifier = Modifier,
     content: @Composable () -> Unit = {},
 ) {
-    Column {
+    Column(
+        modifier = modifier,
+    ) {
         Row(
             verticalAlignment = Alignment.CenterVertically,
-            modifier = modifier
+            modifier = Modifier
                 .clickable { onRowClick() }
                 .fillMaxWidth(),
         ) {
@@ -200,16 +202,18 @@ fun SearchHistoryEpisodeView(
 ) {
     val context = LocalContext.current
     val durationMs = entry.duration * 1000
-    Column {
+    Column(
+        modifier = modifier,
+    ) {
         Row(
             verticalAlignment = Alignment.Top,
-            modifier = modifier
+            modifier = Modifier
                 .fillMaxWidth()
                 .padding(start = 16.dp, top = 12.dp, bottom = 12.dp),
         ) {
             PodcastImage(
                 uuid = entry.podcastUuid,
-                modifier = modifier.size(IconSize),
+                modifier = Modifier.size(IconSize),
             )
             val formattedDuration = TimeHelper.getTimeDurationMediumString(durationMs.toInt(), context)
             val subTitle = stringResource(
@@ -218,7 +222,7 @@ fun SearchHistoryEpisodeView(
                 entry.podcastTitle,
             )
             Column(
-                modifier = modifier
+                modifier = Modifier
                     .padding(start = 8.dp)
                     .weight(1f),
             ) {
@@ -231,7 +235,7 @@ fun SearchHistoryEpisodeView(
                     text = subTitle,
                     maxLines = 1,
                     color = MaterialTheme.theme.colors.primaryText02,
-                    modifier = modifier.padding(top = 2.dp),
+                    modifier = Modifier.padding(top = 2.dp),
                 )
             }
         }
@@ -244,10 +248,12 @@ fun SearchHistoryFolderView(
     modifier: Modifier = Modifier,
 ) {
     val color = MaterialTheme.theme.colors.getFolderColor(entry.color)
-    Column {
+    Column(
+        modifier = modifier,
+    ) {
         Row(
             verticalAlignment = Alignment.Top,
-            modifier = modifier
+            modifier = Modifier
                 .fillMaxWidth()
                 .background(MaterialTheme.theme.colors.primaryUi01)
                 .padding(start = 16.dp, top = 12.dp, bottom = 12.dp),
@@ -260,7 +266,7 @@ fun SearchHistoryFolderView(
                 podcastImageSize = 20.dp,
             )
             Column(
-                modifier = modifier
+                modifier = Modifier
                     .padding(start = 12.dp)
                     .weight(1f),
             ) {
@@ -268,7 +274,7 @@ fun SearchHistoryFolderView(
                     text = entry.title,
                     maxLines = 2,
                     color = MaterialTheme.theme.colors.primaryText01,
-                    modifier = modifier.padding(bottom = 2.dp),
+                    modifier = Modifier.padding(bottom = 2.dp),
                 )
                 val podcastCount = if (entry.podcastIds.size == 1) {
                     stringResource(LR.string.podcasts_singular)
@@ -294,16 +300,18 @@ fun SearchHistoryPodcastView(
     entry: SearchHistoryEntry.Podcast,
     modifier: Modifier = Modifier,
 ) {
-    Column {
+    Column(
+        modifier = modifier,
+    ) {
         Row(
             verticalAlignment = Alignment.Top,
-            modifier = modifier
+            modifier = Modifier
                 .fillMaxWidth()
                 .padding(start = 16.dp, top = 12.dp, bottom = 12.dp),
         ) {
             PodcastImage(
                 uuid = entry.uuid,
-                modifier = modifier
+                modifier = Modifier
                     .size(IconSize),
             )
             val subTitle = if (entry.author.isNotEmpty()) {
@@ -312,7 +320,7 @@ fun SearchHistoryPodcastView(
                 stringResource(LR.string.podcast)
             }
             Column(
-                modifier = modifier
+                modifier = Modifier
                     .padding(start = 8.dp)
                     .weight(1f),
             ) {
@@ -325,7 +333,7 @@ fun SearchHistoryPodcastView(
                     text = subTitle,
                     maxLines = 1,
                     color = MaterialTheme.theme.colors.primaryText02,
-                    modifier = modifier.padding(top = 2.dp),
+                    modifier = Modifier.padding(top = 2.dp),
                 )
             }
         }
@@ -337,16 +345,18 @@ fun SearchHistoryTermView(
     entry: SearchHistoryEntry.SearchTerm,
     modifier: Modifier = Modifier,
 ) {
-    Column {
+    Column(
+        modifier = modifier,
+    ) {
         Row(
             verticalAlignment = Alignment.CenterVertically,
-            modifier = modifier
+            modifier = Modifier
                 .fillMaxWidth()
                 .background(MaterialTheme.theme.colors.primaryUi01)
                 .padding(start = 16.dp, top = 12.dp, bottom = 12.dp),
         ) {
             Box(
-                modifier = modifier.size(IconSize),
+                modifier = Modifier.size(IconSize),
                 contentAlignment = Alignment.Center,
             ) {
                 Icon(
@@ -359,7 +369,7 @@ fun SearchHistoryTermView(
                 text = entry.term,
                 color = MaterialTheme.theme.colors.primaryText01,
                 maxLines = 2,
-                modifier = modifier
+                modifier = Modifier
                     .padding(start = 12.dp)
                     .weight(1f),
             )

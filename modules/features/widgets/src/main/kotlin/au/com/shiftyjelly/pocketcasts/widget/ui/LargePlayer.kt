@@ -32,7 +32,7 @@ internal fun LargePlayer(state: LargePlayerWidgetState) {
         RounderCornerBox(
             contentAlignment = Alignment.TopCenter,
             backgroundTint = LocalWidgetTheme.current.background,
-            modifierCompat = GlanceModifier.fillMaxWidth().height(headerAndPaddingHeight + expectedContentHeight),
+            compatModifier = GlanceModifier.fillMaxWidth().height(headerAndPaddingHeight + expectedContentHeight),
             modifier = GlanceModifier
                 .clickable(OpenPocketCastsAction.action())
                 .fillMaxWidth()

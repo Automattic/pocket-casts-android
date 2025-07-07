@@ -46,6 +46,7 @@ import au.com.shiftyjelly.pocketcasts.compose.preview.ThemePreviewParameterProvi
 import au.com.shiftyjelly.pocketcasts.compose.theme
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import com.google.android.gms.cast.framework.CastButtonFactory
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.launch
 import au.com.shiftyjelly.pocketcasts.images.R as IR
@@ -63,7 +64,7 @@ internal fun PodcastToolbar(
     modifier: Modifier = Modifier,
 ) {
     val colors = toolbarColors(transparencyProgress)
-    LaunchedEffect(colors.backgroundColor) {
+    LaunchedEffect(colors.backgroundColor, onBackgroundColorChange) {
         onBackgroundColorChange(colors.backgroundColor)
     }
 
@@ -158,7 +159,7 @@ private fun ToolbarButton(
 
 @Composable
 private fun MediaRouteButton(
-    clickTrigger: MutableSharedFlow<Unit>,
+    clickTrigger: Flow<Unit>,
 ) {
     val scope = rememberCoroutineScope()
     AndroidView(

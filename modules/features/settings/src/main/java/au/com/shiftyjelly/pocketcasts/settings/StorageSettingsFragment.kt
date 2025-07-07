@@ -53,7 +53,7 @@ class StorageSettingsFragment : BaseFragment() {
             val bottomInset = settings.bottomInset.collectAsStateWithLifecycle(0)
             StorageSettingsPage(
                 viewModel = viewModel,
-                onBackPressed = {
+                onBackPress = {
                     @Suppress("DEPRECATION")
                     activity?.onBackPressed()
                 },

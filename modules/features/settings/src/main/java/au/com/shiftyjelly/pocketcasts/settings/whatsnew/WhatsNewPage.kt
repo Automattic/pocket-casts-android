@@ -45,9 +45,9 @@ import au.com.shiftyjelly.pocketcasts.settings.whatsnew.WhatsNewViewModel.WhatsN
 
 @Composable
 fun WhatsNewPage(
-    viewModel: WhatsNewViewModel = hiltViewModel(),
-    onConfirm: (WhatsNewViewModel.NavigationState) -> Unit,
     onClose: () -> Unit,
+    onConfirm: (WhatsNewViewModel.NavigationState) -> Unit,
+    viewModel: WhatsNewViewModel = hiltViewModel(),
 ) {
     val state by viewModel.state.collectAsState()
     when (state) {
@@ -67,7 +67,7 @@ fun WhatsNewPage(
         }
     }
 
-    LaunchedEffect(Unit) {
+    LaunchedEffect(onConfirm) {
         viewModel.navigationState.collect { navigationState ->
             onConfirm(navigationState)
         }
@@ -77,9 +77,9 @@ fun WhatsNewPage(
 @Composable
 private fun WhatsNewPageLoaded(
     state: UiState.Loaded,
-    header: @Composable () -> Unit,
     onConfirm: () -> Unit,
     onClose: () -> Unit,
+    header: @Composable () -> Unit,
 ) {
     var closing by remember { mutableStateOf(false) }
     val targetAlpha = if (closing) 0f else 0.66f

@@ -38,8 +38,8 @@ import au.com.shiftyjelly.pocketcasts.localization.R.string.profile_confirm
 
 @Composable
 fun ChangeDonePage(
-    modifier: Modifier = Modifier,
     viewModel: DoneViewModel,
+    modifier: Modifier = Modifier,
     closeForm: () -> Unit,
 ) {
     val configuration = LocalConfiguration.current
@@ -52,7 +52,7 @@ fun ChangeDonePage(
             colorFilter = ColorFilter.tint(MaterialTheme.theme.colors.primaryIcon01),
             painter = painterResource(id = ic_close),
             contentDescription = stringResource(id = close),
-            modifier = modifier
+            modifier = Modifier
                 .padding(start = 24.dp, top = 24.dp)
                 .width(24.dp)
                 .height(24.dp)

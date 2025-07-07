@@ -32,12 +32,12 @@ private val plusBackgroundBrush = Brush.horizontalGradient(
 @Composable
 fun GradientRowButton(
     primaryText: String,
+    textColor: Color,
+    onClick: () -> Unit,
     modifier: Modifier = Modifier,
     secondaryText: String? = null,
     fontWeight: FontWeight = FontWeight.W600,
-    textColor: Color,
     gradientBackgroundColor: Brush = plusBackgroundBrush,
-    onClick: () -> Unit,
 ) {
     Box(
         modifier = modifier
@@ -75,7 +75,7 @@ fun GradientRowButton(
 @ShowkaseComposable(name = "GradientRowButton", group = "Button")
 @Preview
 @Composable
-fun GradientRowButtonPreview() {
+private fun GradientRowButtonPreview() {
     GradientRowButton(
         primaryText = "Upgrade Now",
         textColor = Color.Black,

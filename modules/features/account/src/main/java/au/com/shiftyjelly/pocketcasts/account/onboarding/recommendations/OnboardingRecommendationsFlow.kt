@@ -23,7 +23,7 @@ object OnboardingRecommendationsFlow {
     fun NavGraphBuilder.onboardingRecommendationsFlowGraph(
         theme: Theme.ThemeType,
         flow: OnboardingFlow,
-        onBackPressed: () -> Unit,
+        onBackPress: () -> Unit,
         onComplete: () -> Unit,
         navController: NavController,
         onUpdateSystemBars: (SystemBarsStyles) -> Unit,
@@ -37,7 +37,7 @@ object OnboardingRecommendationsFlow {
             composable(START) {
                 OnboardingRecommendationsStartPage(
                     theme,
-                    onImportClicked = { navController.navigate(OnboardingImportFlow.ROUTE) },
+                    onImportClick = { navController.navigate(OnboardingImportFlow.ROUTE) },
                     onSearch = with(LocalContext.current) {
                         {
                             if (Network.isConnected(this)) {
@@ -51,7 +51,7 @@ object OnboardingRecommendationsFlow {
                             }
                         }
                     },
-                    onBackPressed = onBackPressed,
+                    onBackPress = onBackPress,
                     onComplete = onComplete,
                     onUpdateSystemBars = onUpdateSystemBars,
                 )
@@ -59,7 +59,7 @@ object OnboardingRecommendationsFlow {
             composable(SEARCH) {
                 OnboardingRecommendationsSearchPage(
                     theme = theme,
-                    onBackPressed = { navController.popBackStack() },
+                    onBackPress = { navController.popBackStack() },
                     onUpdateSystemBars = onUpdateSystemBars,
                 )
             }

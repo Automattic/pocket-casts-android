@@ -823,7 +823,7 @@ class MainActivity :
                             onClick = {
                                 showStoriesOrAccount(StoriesSource.MODAL.value)
                             },
-                            onExpanded = {
+                            onExpand = {
                                 analyticsTracker.track(
                                     AnalyticsEvent.END_OF_YEAR_MODAL_SHOWN,
                                     mapOf("year" to EndOfYearManager.YEAR_TO_SYNC.value),

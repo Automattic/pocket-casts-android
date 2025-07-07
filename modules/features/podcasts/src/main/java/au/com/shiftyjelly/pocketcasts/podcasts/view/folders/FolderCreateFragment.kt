@@ -81,7 +81,7 @@ class FolderCreateFragment : BaseDialogFragment() {
                 }
                 composable(NavRoutes.NAME) {
                     FolderEditNamePage(
-                        onBackClick = { navController.popBackStack() },
+                        onBackPress = { navController.popBackStack() },
                         onNextClick = {
                             viewModel.trackCreateFolderNavigation(AnalyticsEvent.FOLDER_CREATE_COLOR_SHOWN)
                             navController.navigate(NavRoutes.COLOR)
@@ -92,7 +92,7 @@ class FolderCreateFragment : BaseDialogFragment() {
                 composable(NavRoutes.COLOR) {
                     val colors = MaterialTheme.theme.colors
                     FolderEditColorPage(
-                        onBackClick = { navController.popBackStack() },
+                        onBackPress = { navController.popBackStack() },
                         onSaveClick = {
                             viewModel.saveFolder(resources = resources) { folder ->
                                 sharedViewModel.folderUuid = folder.uuid

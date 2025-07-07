@@ -102,7 +102,8 @@ dependencyAnalysis {
     }
 }
 
-val ktlintVersion = libs.versions.ktlint.get()
+val ktlintVersion = libs.versions.ktlint.asProvider().get()
+val ktlintComposeRules = libs.ktlint.compose.rules.get().toString()
 
 spotless {
     val ktLintConfigOverride = mapOf(
@@ -110,6 +111,9 @@ spotless {
         "ktlint_standard_multiline-expression-wrapping" to "disabled",
         "ktlint_standard_backing-property-naming" to "disabled",
         "ktlint_function_naming_ignore_when_annotated_with" to "Composable",
+    )
+    val ktLintConfigComposeOverride = mapOf(
+        "ktlint_compose_compositionlocal-allowlist" to "disabled",
     )
 
     kotlin {
@@ -119,7 +123,9 @@ spotless {
             "modules/**/src/**/*.kt",
             "wear/src/**/*.kt",
         )
-        ktlint(ktlintVersion).editorConfigOverride(ktLintConfigOverride)
+        ktlint(ktlintVersion)
+            .editorConfigOverride(ktLintConfigOverride + ktLintConfigComposeOverride)
+            .customRuleSets(listOf(ktlintComposeRules))
     }
 
     kotlinGradle {

@@ -28,6 +28,7 @@ import au.com.shiftyjelly.pocketcasts.images.R as IR
 @Composable
 fun RowButton(
     text: String,
+    onClick: () -> Unit,
     modifier: Modifier = Modifier,
     includePadding: Boolean = true,
     enabled: Boolean = true,
@@ -39,7 +40,6 @@ fun RowButton(
     fontFamily: FontFamily? = null,
     fontWeight: FontWeight? = null,
     @DrawableRes leadingIcon: Int? = null,
-    onClick: () -> Unit,
     cornerRadius: Dp = 12.dp,
     textVerticalPadding: Dp = 6.dp,
     @DrawableRes textIcon: Int? = null,
@@ -81,7 +81,7 @@ fun RowButton(
 @ShowkaseComposable(name = "RowButton", group = "Button", styleName = "Light", defaultStyle = true)
 @Preview(name = "Light")
 @Composable
-fun RowButtonLightPreview() {
+private fun RowButtonLightPreview() {
     AppThemeWithBackground(Theme.ThemeType.LIGHT) {
         RowButton(text = "Accept", onClick = {})
     }
@@ -90,7 +90,7 @@ fun RowButtonLightPreview() {
 @ShowkaseComposable(name = "RowButton", group = "Button", styleName = "Dark")
 @Preview(name = "Dark")
 @Composable
-fun RowButtonDarkPreview() {
+private fun RowButtonDarkPreview() {
     AppThemeWithBackground(Theme.ThemeType.DARK) {
         RowButton(text = "Accept", onClick = {})
     }
@@ -99,7 +99,7 @@ fun RowButtonDarkPreview() {
 @ShowkaseComposable(name = "RowButton", group = "Button", styleName = "Disabled")
 @Preview(name = "Disabled")
 @Composable
-fun RowButtonDisabledPreview() {
+private fun RowButtonDisabledPreview() {
     AppThemeWithBackground(Theme.ThemeType.LIGHT) {
         RowButton(text = "Accept", enabled = false, onClick = {})
     }
@@ -108,7 +108,7 @@ fun RowButtonDisabledPreview() {
 @ShowkaseComposable(name = "RowButton", group = "Button", styleName = "No padding")
 @Preview(name = "No padding")
 @Composable
-fun RowButtonNoPaddingPreview() {
+private fun RowButtonNoPaddingPreview() {
     AppThemeWithBackground(Theme.ThemeType.LIGHT) {
         RowButton(text = "Accept", includePadding = false, onClick = {})
     }
@@ -117,7 +117,7 @@ fun RowButtonNoPaddingPreview() {
 @ShowkaseComposable(name = "RowButton", group = "Button", styleName = "Text icon")
 @Preview(name = "Text icon")
 @Composable
-fun RowButtonTextIconPreview() {
+private fun RowButtonTextIconPreview() {
     AppThemeWithBackground(Theme.ThemeType.LIGHT) {
         RowButton(
             text = "Share",

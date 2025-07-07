@@ -24,9 +24,9 @@ object DownloadsScreen {
 @Composable
 fun DownloadsScreen(
     columnState: ScalingLazyColumnState,
+    viewModel: DownloadsScreenViewModel = hiltViewModel(),
     onItemClick: (PodcastEpisode) -> Unit,
 ) {
-    val viewModel = hiltViewModel<DownloadsScreenViewModel>()
     val state by viewModel.stateFlow.collectAsState()
     val artworkConfiguration by viewModel.artworkConfiguration.collectAsState()
 

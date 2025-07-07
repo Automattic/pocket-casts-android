@@ -44,16 +44,19 @@ fun SettingsFragmentPage(
     signInState: SignInState,
     isDebug: Boolean,
     isUnrestrictedBattery: Boolean,
-    onBackPressed: () -> Unit,
-    openFragment: (Fragment) -> Unit,
     bottomInset: Dp,
+    onBackPress: () -> Unit,
+    openFragment: (Fragment) -> Unit,
+    modifier: Modifier = Modifier,
 ) {
     val context = LocalContext.current
-    Column {
+    Column(
+        modifier = modifier,
+    ) {
         ThemedTopAppBar(
             title = stringResource(LR.string.settings),
             bottomShadow = true,
-            onNavigationClick = onBackPressed,
+            onNavigationClick = onBackPress,
         )
         LazyColumn(
             contentPadding = PaddingValues(top = 8.dp, bottom = bottomInset + 8.dp),
@@ -317,7 +320,7 @@ private fun SettingsPagePreview(@PreviewParameter(ThemePreviewParameterProvider:
             signInState = SignInState.SignedOut,
             isDebug = true,
             isUnrestrictedBattery = false,
-            onBackPressed = {},
+            onBackPress = {},
             openFragment = {},
             bottomInset = 0.dp,
         )

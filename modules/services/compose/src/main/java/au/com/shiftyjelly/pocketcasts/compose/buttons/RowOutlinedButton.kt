@@ -44,6 +44,7 @@ private val outlinedBorder: BorderStroke
 @Composable
 fun RowOutlinedButton(
     text: String,
+    onClick: () -> Unit,
     modifier: Modifier = Modifier,
     includePadding: Boolean = true,
     border: BorderStroke? = outlinedBorder,
@@ -57,7 +58,6 @@ fun RowOutlinedButton(
     fontWeight: FontWeight? = null,
     leadingIcon: Painter? = null,
     tintIcon: Boolean = true,
-    onClick: () -> Unit,
     fullWidth: Boolean = true,
 ) {
     Row(
@@ -118,7 +118,7 @@ private fun RowOutlinedImage(image: Painter?, colors: ButtonColors, tintIcon: Bo
 @ShowkaseComposable(name = "RowOutlinedButton", group = "Button", styleName = "Light", defaultStyle = true)
 @Preview(name = "Light")
 @Composable
-fun RowOutlinedButtonLightPreview() {
+private fun RowOutlinedButtonLightPreview() {
     AppThemeWithBackground(Theme.ThemeType.LIGHT) {
         RowOutlinedButton(
             text = "Share",
@@ -131,7 +131,7 @@ fun RowOutlinedButtonLightPreview() {
 @ShowkaseComposable(name = "RowOutlinedButton", group = "Button", styleName = "Dark")
 @Preview(name = "Dark")
 @Composable
-fun RowOutlinedButtonDarkPreview() {
+private fun RowOutlinedButtonDarkPreview() {
     AppThemeWithBackground(Theme.ThemeType.DARK) {
         RowOutlinedButton(
             text = "Share",
@@ -144,7 +144,7 @@ fun RowOutlinedButtonDarkPreview() {
 @ShowkaseComposable(name = "RowOutlinedButton", group = "Button", styleName = "Leading icon")
 @Preview(name = "Leading icon")
 @Composable
-fun RowOutlinedButtonLeadingIconPreview() {
+private fun RowOutlinedButtonLeadingIconPreview() {
     AppThemeWithBackground(Theme.ThemeType.LIGHT) {
         RowOutlinedButton(
             text = stringResource(LR.string.onboarding_continue_with_google),

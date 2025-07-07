@@ -94,10 +94,13 @@ private fun DialogTitle(text: String) {
 }
 
 @Composable
-fun DialogText(text: String) {
+fun DialogText(
+    text: String,
+    modifier: Modifier = Modifier,
+) {
     TextP40(
         text = text,
-        modifier = Modifier
+        modifier = modifier
             .padding(bottom = 12.dp)
             .padding(horizontal = 24.dp),
     )
@@ -144,6 +147,7 @@ fun <T> RadioDialog(
     savedOption: T,
     onSave: (T) -> Unit,
     dismissDialog: () -> Unit,
+    modifier: Modifier = Modifier,
 ) {
     var selected by remember { mutableStateOf(savedOption) }
 
@@ -164,7 +168,9 @@ fun <T> RadioDialog(
         ),
         onDismissRequest = dismissDialog,
     ) {
-        Column {
+        Column(
+            modifier = modifier,
+        ) {
             options.forEach { (item, itemLabel) ->
                 DialogRadioButton(
                     text = itemLabel,
@@ -253,13 +259,13 @@ fun ProgressDialog(
                 ),
         ) {
             Row(
-                modifier.padding(16.dp),
+                Modifier.padding(16.dp),
                 verticalAlignment = Alignment.CenterVertically,
             ) {
                 CircularProgressIndicator()
                 TextP40(
                     text = text,
-                    modifier = modifier.padding(start = 16.dp),
+                    modifier = Modifier.padding(start = 16.dp),
                 )
             }
         }
@@ -268,8 +274,8 @@ fun ProgressDialog(
 
 @Composable
 private fun DialogFramePreview(
-    theme: Theme.ThemeType = Theme.ThemeType.LIGHT,
     orientation: DialogButtonOrientation,
+    theme: Theme.ThemeType = Theme.ThemeType.LIGHT,
 ) {
     AppTheme(theme) {
         DialogFrame(

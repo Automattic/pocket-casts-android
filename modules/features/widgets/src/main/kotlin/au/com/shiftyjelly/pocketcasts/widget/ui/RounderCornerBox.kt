@@ -19,7 +19,7 @@ import au.com.shiftyjelly.pocketcasts.images.R as IR
 @Composable
 internal fun RounderCornerBox(
     modifier: GlanceModifier = GlanceModifier,
-    modifierCompat: GlanceModifier = GlanceModifier.fillMaxSize(),
+    compatModifier: GlanceModifier = GlanceModifier.fillMaxSize(),
     contentAlignment: Alignment = Alignment.Center,
     backgroundTint: ColorProvider? = null,
     content: @Composable () -> Unit,
@@ -35,7 +35,7 @@ internal fun RounderCornerBox(
                 provider = ImageProvider(IR.drawable.rounded_rectangle),
                 contentDescription = null,
                 colorFilter = backgroundTint?.let(ColorFilter::tint),
-                modifier = modifierCompat,
+                modifier = compatModifier,
             )
         }
         content()

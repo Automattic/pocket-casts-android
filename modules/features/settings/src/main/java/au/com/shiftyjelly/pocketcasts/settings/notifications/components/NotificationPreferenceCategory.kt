@@ -30,7 +30,7 @@ import kotlinx.collections.immutable.toImmutableList
 internal fun NotificationPreferenceCategory(
     categoryTitle: String,
     items: List<NotificationPreferenceType>,
-    onItemClicked: (NotificationPreferenceType) -> Unit,
+    onItemClick: (NotificationPreferenceType) -> Unit,
     modifier: Modifier = Modifier,
     isEnabled: Boolean = true,
 ) {
@@ -45,11 +45,11 @@ internal fun NotificationPreferenceCategory(
                         enabled = isEnabled,
                         primaryText = item.title.asString(),
                         toggle = SettingRowToggle.Switch(checked = item.isEnabled, enabled = isEnabled),
-                        modifier = modifier.toggleable(
+                        modifier = Modifier.toggleable(
                             enabled = isEnabled,
                             value = item.isEnabled,
                             role = Role.Switch,
-                        ) { onItemClicked(item.copy(isEnabled = !item.isEnabled)) },
+                        ) { onItemClick(item.copy(isEnabled = !item.isEnabled)) },
                     )
                 }
 
@@ -58,11 +58,11 @@ internal fun NotificationPreferenceCategory(
                         enabled = isEnabled,
                         primaryText = item.title.asString(),
                         toggle = SettingRowToggle.Switch(checked = item.isEnabled, enabled = isEnabled),
-                        modifier = modifier.toggleable(
+                        modifier = Modifier.toggleable(
                             enabled = isEnabled,
                             value = item.isEnabled,
                             role = Role.Switch,
-                        ) { onItemClicked(item.copy(isEnabled = !item.isEnabled)) },
+                        ) { onItemClick(item.copy(isEnabled = !item.isEnabled)) },
                     )
                 }
 
@@ -71,11 +71,11 @@ internal fun NotificationPreferenceCategory(
                         enabled = isEnabled,
                         primaryText = item.title.asString(),
                         toggle = SettingRowToggle.Switch(checked = item.isEnabled, enabled = isEnabled),
-                        modifier = modifier.toggleable(
+                        modifier = Modifier.toggleable(
                             enabled = isEnabled,
                             value = item.isEnabled,
                             role = Role.Switch,
-                        ) { onItemClicked(item.copy(isEnabled = !item.isEnabled)) },
+                        ) { onItemClick(item.copy(isEnabled = !item.isEnabled)) },
                     )
                 }
 
@@ -84,11 +84,11 @@ internal fun NotificationPreferenceCategory(
                         enabled = isEnabled,
                         primaryText = item.title.asString(),
                         toggle = SettingRowToggle.Switch(checked = item.isEnabled, enabled = isEnabled),
-                        modifier = modifier.toggleable(
+                        modifier = Modifier.toggleable(
                             enabled = isEnabled,
                             value = item.isEnabled,
                             role = Role.Switch,
-                        ) { onItemClicked(item.copy(isEnabled = !item.isEnabled)) },
+                        ) { onItemClick(item.copy(isEnabled = !item.isEnabled)) },
                     )
                 }
 
@@ -97,11 +97,11 @@ internal fun NotificationPreferenceCategory(
                         enabled = isEnabled,
                         primaryText = item.title.asString(),
                         toggle = SettingRowToggle.Switch(checked = item.isEnabled, enabled = isEnabled),
-                        modifier = modifier.toggleable(
+                        modifier = Modifier.toggleable(
                             enabled = isEnabled,
                             value = item.isEnabled,
                             role = Role.Switch,
-                        ) { onItemClicked(item.copy(isEnabled = !item.isEnabled)) },
+                        ) { onItemClick(item.copy(isEnabled = !item.isEnabled)) },
                     )
                 }
 
@@ -109,10 +109,10 @@ internal fun NotificationPreferenceCategory(
                     SettingRow(
                         primaryText = item.title.asString(),
                         toggle = SettingRowToggle.Switch(checked = item.isEnabled),
-                        modifier = modifier.toggleable(
+                        modifier = Modifier.toggleable(
                             value = item.isEnabled,
                             role = Role.Switch,
-                        ) { onItemClicked(item.copy(isEnabled = !item.isEnabled)) },
+                        ) { onItemClick(item.copy(isEnabled = !item.isEnabled)) },
                     )
                 }
 
@@ -121,7 +121,7 @@ internal fun NotificationPreferenceCategory(
                         enabled = isEnabled,
                         primaryText = item.title.asString(),
                         secondaryText = item.displayValue.asString(),
-                        modifier = modifier.clickable(enabled = isEnabled) { onItemClicked(item) },
+                        modifier = Modifier.clickable(enabled = isEnabled) { onItemClick(item) },
                     )
                 }
 
@@ -130,7 +130,7 @@ internal fun NotificationPreferenceCategory(
                         enabled = isEnabled,
                         primaryText = item.title.asString(),
                         secondaryText = item.description.asString(),
-                        modifier = modifier.clickable(enabled = isEnabled) { onItemClicked(item) },
+                        modifier = Modifier.clickable(enabled = isEnabled) { onItemClick(item) },
                     )
                 }
 
@@ -139,7 +139,7 @@ internal fun NotificationPreferenceCategory(
                         enabled = isEnabled,
                         primaryText = item.title.asString(),
                         secondaryText = item.description.asString(),
-                        modifier = modifier.clickable(enabled = isEnabled) { onItemClicked(item) },
+                        modifier = Modifier.clickable(enabled = isEnabled) { onItemClick(item) },
                     )
                 }
 
@@ -148,7 +148,7 @@ internal fun NotificationPreferenceCategory(
                         enabled = isEnabled,
                         primaryText = item.title.asString(),
                         secondaryText = item.description.asString(),
-                        modifier = modifier.clickable(enabled = isEnabled) { onItemClicked(item) },
+                        modifier = Modifier.clickable(enabled = isEnabled) { onItemClick(item) },
                     )
                 }
 
@@ -157,7 +157,7 @@ internal fun NotificationPreferenceCategory(
                         enabled = isEnabled,
                         primaryText = item.title.asString(),
                         secondaryText = item.description.asString(),
-                        modifier = modifier.clickable(enabled = isEnabled) { onItemClicked(item) },
+                        modifier = Modifier.clickable(enabled = isEnabled) { onItemClick(item) },
                     )
                 }
 
@@ -166,7 +166,7 @@ internal fun NotificationPreferenceCategory(
                         enabled = isEnabled,
                         primaryText = item.title.asString(),
                         secondaryText = item.description.asString(),
-                        modifier = modifier.clickable(enabled = isEnabled) { onItemClicked(item) },
+                        modifier = Modifier.clickable(enabled = isEnabled) { onItemClick(item) },
                     )
                 }
 
@@ -175,7 +175,7 @@ internal fun NotificationPreferenceCategory(
                         enabled = isEnabled,
                         primaryText = item.title.asString(),
                         secondaryText = item.displayedSoundName,
-                        modifier = modifier.clickable(enabled = isEnabled) { onItemClicked(item) },
+                        modifier = Modifier.clickable(enabled = isEnabled) { onItemClick(item) },
                     )
                 }
 
@@ -191,7 +191,7 @@ internal fun NotificationPreferenceCategory(
                             context.getString(it.summary)
                         },
                         onSave = { value ->
-                            onItemClicked(
+                            onItemClick(
                                 item.copy(value = value),
                             )
                         },
@@ -209,7 +209,7 @@ internal fun NotificationPreferenceCategory(
                             context.getString(it.titleRes)
                         },
                         onSave = { value ->
-                            onItemClicked(
+                            onItemClick(
                                 item.copy(value = value),
                             )
                         },
@@ -222,7 +222,7 @@ internal fun NotificationPreferenceCategory(
                         enabled = isEnabled,
                         primaryText = item.title.asString(),
                         secondaryText = item.displayValue,
-                        modifier = modifier.clickable(enabled = isEnabled) {
+                        modifier = Modifier.clickable(enabled = isEnabled) {
                             val initialActions = item.value
                             val selectedActions = initialActions.toMutableList()
                             val initialSelection = selectedActions.map(NewEpisodeNotificationAction::ordinal).toIntArray()
@@ -244,7 +244,7 @@ internal fun NotificationPreferenceCategory(
                                     positiveButton(
                                         res = R.string.ok,
                                         click = {
-                                            onItemClicked(
+                                            onItemClick(
                                                 item.copy(value = selectedActions.toImmutableList()),
                                             )
                                         },
@@ -296,7 +296,7 @@ private fun NotificationCategoryPreview(
                     options = emptyList(),
                 ),
             ),
-            onItemClicked = { },
+            onItemClick = { },
         )
     }
 }

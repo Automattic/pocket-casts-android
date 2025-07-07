@@ -49,19 +49,19 @@ import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 @Composable
 fun DeveloperPage(
-    modifier: Modifier = Modifier,
-    onBackClick: () -> Unit,
+    bottomInset: Dp,
+    onBackPress: () -> Unit,
     onShowkaseClick: () -> Unit,
     onForceRefreshClick: () -> Unit,
     onTriggerNotificationClick: () -> Unit,
     onDeleteFirstEpisodeClick: () -> Unit,
     onTriggerUpdateEpisodeDetails: () -> Unit,
     onTriggerResetEoYModalProfileBadge: () -> Unit,
-    bottomInset: Dp,
     onSendCrash: (String) -> Unit,
     onShowWhatsNewClick: () -> Unit,
     onShowNotificationsTestingClick: () -> Unit,
     onResetSuggestedFoldersSuggestion: () -> Unit,
+    modifier: Modifier = Modifier,
 ) {
     var openCrashMessageDialog by remember { mutableStateOf(false) }
     var crashMessage by remember { mutableStateOf("Test crash") }
@@ -73,7 +73,7 @@ fun DeveloperPage(
         item {
             ThemedTopAppBar(
                 title = stringResource(LR.string.settings_developer),
-                onNavigationClick = onBackClick,
+                onNavigationClick = onBackPress,
             )
         }
         item {
@@ -334,7 +334,7 @@ private fun DeveloperPageDarkPreview() {
 @Composable
 private fun DeveloperPagePreview() {
     DeveloperPage(
-        onBackClick = {},
+        onBackPress = {},
         onShowkaseClick = {},
         onForceRefreshClick = {},
         onTriggerNotificationClick = {},
