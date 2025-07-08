@@ -208,6 +208,7 @@
     <string name="price_per_month">%1$.2f %2$s/month</string>
     <!-- %1$.2f is price with 2 decimal points precision, \u0024 is a dollar sign -->
     <string name="price_per_month_usd">\u0024%1$.2f/month</string>
+    <string name="best_value">Best Value</string>
     <!-- "Ad" means here advertisement. It should be a short form if possible. -->
     <string name="ad">Ad</string>
     <string name="ad_options">Advertisement options</string>
@@ -2472,4 +2473,5 @@
     <string name="notification_snack_cta">Open Settings</string>
     <string name="notification_mockup_image_description">Mockup image</string>
 
+    <string name="onboarding_upgrade_save_percent">Save %1$d\%%</string>
 </resources>
