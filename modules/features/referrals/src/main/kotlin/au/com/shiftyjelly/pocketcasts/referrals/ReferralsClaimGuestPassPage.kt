@@ -105,7 +105,7 @@ fun ReferralsClaimGuestPassPage(
             snackbarHostState = snackbarHostState,
         )
 
-        LaunchedEffect(Unit) {
+        LaunchedEffect(onDismiss) {
             viewModel.navigationEvent.collect { navigationEvent ->
                 when (navigationEvent) {
                     NavigationEvent.InValidOffer -> {
@@ -333,7 +333,7 @@ private fun ClaimGuestPassContent(
 
 @Preview(device = Devices.PORTRAIT_REGULAR)
 @Composable
-fun ReferralsClaimGuestPassPortraitPhonePreview() {
+private fun ReferralsClaimGuestPassPortraitPhonePreview() {
     ReferralsClaimGuestPassContentPreview(
         windowWidthSizeClass = WindowWidthSizeClass.Compact,
         windowHeightSizeClass = WindowHeightSizeClass.Medium,
@@ -342,7 +342,7 @@ fun ReferralsClaimGuestPassPortraitPhonePreview() {
 
 @Preview(device = Devices.LANDSCAPE_REGULAR)
 @Composable
-fun ReferralsClaimGuestPassLandscapePhonePreview() {
+private fun ReferralsClaimGuestPassLandscapePhonePreview() {
     ReferralsClaimGuestPassContentPreview(
         windowWidthSizeClass = WindowWidthSizeClass.Compact,
         windowHeightSizeClass = WindowHeightSizeClass.Compact,
@@ -351,7 +351,7 @@ fun ReferralsClaimGuestPassLandscapePhonePreview() {
 
 @Preview(device = Devices.PORTRAIT_TABLET)
 @Composable
-fun ReferralsClaimGuestPassPortraitTabletPreview() {
+private fun ReferralsClaimGuestPassPortraitTabletPreview() {
     ReferralsClaimGuestPassContentPreview(
         windowWidthSizeClass = WindowWidthSizeClass.Medium,
         windowHeightSizeClass = WindowHeightSizeClass.Medium,
@@ -360,7 +360,7 @@ fun ReferralsClaimGuestPassPortraitTabletPreview() {
 
 @Preview(device = Devices.LANDSCAPE_TABLET)
 @Composable
-fun ReferralsClaimGuestPassLandscapeTabletPreview() {
+private fun ReferralsClaimGuestPassLandscapeTabletPreview() {
     ReferralsClaimGuestPassContentPreview(
         windowWidthSizeClass = WindowWidthSizeClass.Medium,
         windowHeightSizeClass = WindowHeightSizeClass.Expanded,

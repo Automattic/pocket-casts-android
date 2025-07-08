@@ -74,7 +74,7 @@ private fun ReferralCardAnimatedBackgroundView(
 
         Box(
             contentAlignment = Alignment.Center,
-            modifier = modifier
+            modifier = Modifier
                 .blur(maxWidth / 10)
                 .background(Color.Black),
         ) {
@@ -273,7 +273,7 @@ private val computedAnimationSpec = spring(
 
 @Preview
 @Composable
-fun CardBackgroundPreview(
+private fun CardBackgroundPreview(
     @PreviewParameter(OrientationDataProvider::class) data: OrientationData,
 ) {
     ReferralCardAnimatedBackgroundView(

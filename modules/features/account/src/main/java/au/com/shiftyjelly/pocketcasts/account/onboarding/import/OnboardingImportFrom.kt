@@ -46,12 +46,13 @@ fun OnboardingImportFrom(
     theme: Theme.ThemeType,
     @DrawableRes drawableRes: Int,
     title: String,
-    text: String? = null,
     steps: List<String>,
+    onBackPress: () -> Unit,
+    onUpdateSystemBars: (SystemBarsStyles) -> Unit,
+    modifier: Modifier = Modifier,
+    text: String? = null,
     buttonText: String? = null,
     buttonClick: (() -> Unit)? = null,
-    onBackPressed: () -> Unit,
-    onUpdateSystemBars: (SystemBarsStyles) -> Unit,
 ) {
     val pocketCastsTheme = MaterialTheme.theme
     // Use secondaryUI01 so the status bar matches the ThemedTopAppBar
@@ -60,12 +61,12 @@ fun OnboardingImportFrom(
     onUpdateSystemBars(SystemBarsStyles(statusBar, navigationBar))
 
     Column(
-        modifier = Modifier
+        modifier = modifier
             .fillMaxHeight()
             .windowInsetsPadding(WindowInsets.safeDrawing.only(WindowInsetsSides.Horizontal)),
     ) {
         ThemedTopAppBar(
-            onNavigationClick = onBackPressed,
+            onNavigationClick = onBackPress,
         )
 
         Column(
@@ -166,7 +167,7 @@ private fun OnboardingImportFromPreview(
             ),
             buttonText = "A button",
             buttonClick = {},
-            onBackPressed = {},
+            onBackPress = {},
             onUpdateSystemBars = {},
         )
     }

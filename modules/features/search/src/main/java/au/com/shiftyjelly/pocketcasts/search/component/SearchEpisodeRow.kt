@@ -33,20 +33,22 @@ fun SearchEpisodeItem(
     val context = LocalContext.current
     val durationMs = episode.duration * 1000
     val dateFormatter = RelativeDateFormatter(context)
-    Column {
+    Column(
+        modifier = modifier,
+    ) {
         Row(
             verticalAlignment = Alignment.Top,
-            modifier = modifier
+            modifier = Modifier
                 .fillMaxWidth()
                 .clickable { onClick(episode) }
                 .padding(16.dp),
         ) {
             PodcastImage(
                 uuid = episode.podcastUuid,
-                modifier = modifier.size(IconSize),
+                modifier = Modifier.size(IconSize),
             )
             Column(
-                modifier = modifier
+                modifier = Modifier
                     .padding(start = 12.dp, end = 16.dp)
                     .weight(1f),
             ) {

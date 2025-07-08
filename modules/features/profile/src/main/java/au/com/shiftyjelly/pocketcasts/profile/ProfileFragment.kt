@@ -83,7 +83,7 @@ class ProfileFragment :
             onReferralsTooltipClick = {
                 referralsViewModel.onTooltipClick()
             },
-            onReferralsTooltipShown = {
+            onReferralsTooltipShow = {
                 referralsViewModel.onTooltipShown()
             },
             onSettingsClick = {
@@ -118,10 +118,10 @@ class ProfileFragment :
             onHideReferralsCardClick = {
                 referralsViewModel.onHideBannerClick()
             },
-            onReferralsCardShown = {
+            onReferralsCardShow = {
                 referralsViewModel.onBannerShown()
             },
-            onShowReferralsSheet = {
+            onReferralsSheetShow = {
                 requireActivity().supportFragmentManager
                     .findFragmentByTag(ReferralsGuestPassFragment::class.java.name)
                     ?.let { fragmentHostListener.showBottomSheet(it) }

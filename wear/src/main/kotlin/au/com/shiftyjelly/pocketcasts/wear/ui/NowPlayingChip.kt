@@ -41,10 +41,9 @@ import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 @Composable
 fun NowPlayingChip(
+    viewModel: NowPlayingChipViewModel = hiltViewModel(),
     onClick: () -> Unit,
 ) {
-    val viewModel = hiltViewModel<NowPlayingChipViewModel>()
-
     val state by viewModel.state.collectAsState()
     val playbackState = state.playbackState
     val artworkConfiguration by viewModel.artworkConfiguration.collectAsState()

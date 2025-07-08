@@ -43,6 +43,7 @@ private fun ComposableConfigControlPlaybackPreview() {
                     listOf("%test"),
                 ),
             ),
-        ) {}
+            onFinish = {},
+        )
     }
 }

@@ -13,8 +13,8 @@ import coil.request.ImageRequest
 @Composable
 fun ProfileImage(
     avatarUrl: String?,
-    modifier: Modifier = Modifier,
     contentDescription: String?,
+    modifier: Modifier = Modifier,
     placeholder: @Composable (() -> Unit) = {},
 ) {
     val avatarPainter = rememberAsyncImagePainter(

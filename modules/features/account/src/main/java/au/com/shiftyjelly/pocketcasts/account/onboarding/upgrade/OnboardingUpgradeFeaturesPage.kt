@@ -105,21 +105,21 @@ internal fun OnboardingUpgradeFeaturesPage(
     state: OnboardingUpgradeFeaturesState,
     flow: OnboardingFlow,
     source: OnboardingUpgradeSource,
-    onBackPressed: () -> Unit,
+    onBackPress: () -> Unit,
     onClickSubscribe: (showUpgradeBottomSheet: Boolean) -> Unit,
-    onNotNowPressed: () -> Unit,
+    onNotNowPress: () -> Unit,
     onUpdateSystemBars: (SystemBarsStyles) -> Unit,
 ) {
     @Suppress("NAME_SHADOWING")
-    val onNotNowPressed = {
+    val onNotNowPress = {
         viewModel.onNotNow(flow, source)
-        onNotNowPressed()
+        onNotNowPress()
     }
 
     @Suppress("NAME_SHADOWING")
-    val onBackPressed = {
+    val onBackPress = {
         viewModel.onDismiss(flow, source)
-        onBackPressed()
+        onBackPress()
     }
 
     CallOnce {
@@ -136,8 +136,8 @@ internal fun OnboardingUpgradeFeaturesPage(
                 state = state,
                 source = source,
                 scrollState = scrollState,
-                onBackPress = onBackPressed,
-                onNotNowPress = onNotNowPressed,
+                onBackPress = onBackPress,
+                onNotNowPress = onNotNowPress,
                 onChangeBillingCycle = { viewModel.changeBillingCycle(it) },
                 onChangeSubscriptionTier = { viewModel.changeSubscriptionTier(it) },
                 onClickSubscribe = { onClickSubscribe(false) },
@@ -149,9 +149,9 @@ internal fun OnboardingUpgradeFeaturesPage(
         is OnboardingUpgradeFeaturesState.NoSubscriptions -> {
             NoSubscriptionsLayout(
                 showNotNow = source == OnboardingUpgradeSource.RECOMMENDATIONS,
-                onTryAgain = { viewModel.loadSubscriptionPlans() },
-                onNotNowPressed = onNotNowPressed,
-                onBackPressed = onBackPressed,
+                onTryAgainClick = { viewModel.loadSubscriptionPlans() },
+                onNotNowClick = onNotNowPress,
+                onBackPress = onBackPress,
             )
         }
     }
@@ -259,7 +259,7 @@ private fun UpgradeLayout(
                             SegmentedTabBar(
                                 items = billingCycles.map { stringResource(it.labelRes) },
                                 selectedIndex = billingCycles.indexOf(state.selectedPlan.key.billingCycle),
-                                onItemSelected = { index -> onChangeBillingCycle(billingCycles[index]) },
+                                onSelectItem = { index -> onChangeBillingCycle(billingCycles[index]) },
                                 modifier = Modifier.width(IntrinsicSize.Max),
                             )
                         }
@@ -333,7 +333,7 @@ fun FeatureCards(
         modifier = modifier,
         pageCount = subscriptionPlans.size,
         initialPage = subscriptionPlans.indexOf(state.selectedPlan).takeIf { it != -1 } ?: 0,
-        onPageChanged = { index -> onChangeSubscriptionTier(subscriptionPlans[index].key.tier) },
+        onPageChange = { index -> onChangeSubscriptionTier(subscriptionPlans[index].key.tier) },
         showPageIndicator = subscriptionPlans.size > 1,
         pageSize = PageSize.Fixed(LocalConfiguration.current.screenWidthDp.dp - 64.dp),
         contentPadding = PaddingValues(horizontal = 32.dp),
@@ -525,7 +525,7 @@ private fun SetStatusBarBackground(
         Color.Transparent.toArgb()
     }
 
-    LaunchedEffect(statusBarBackground) {
+    LaunchedEffect(statusBarBackground, onUpdateSystemBars) {
         val statusBar = SystemBarStyle.dark(statusBarBackground)
         val navigationBar = SystemBarStyle.dark(Color.Transparent.toArgb())
         onUpdateSystemBars(SystemBarsStyles(statusBar, navigationBar))
@@ -545,11 +545,11 @@ internal fun BoxWithConstraintsScope.calculateMinimumHeightWithInsets(): Dp {
 }
 
 @Composable
-fun NoSubscriptionsLayout(
+private fun NoSubscriptionsLayout(
     showNotNow: Boolean,
-    onTryAgain: () -> Unit,
-    onNotNowPressed: () -> Unit,
-    onBackPressed: () -> Unit,
+    onTryAgainClick: () -> Unit,
+    onNotNowClick: () -> Unit,
+    onBackPress: () -> Unit,
 ) {
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
@@ -566,7 +566,7 @@ fun NoSubscriptionsLayout(
             verticalAlignment = Alignment.CenterVertically,
         ) {
             NavigationIconButton(
-                onNavigationClick = onBackPressed,
+                onNavigationClick = onBackPress,
                 iconColor = MaterialTheme.theme.colors.primaryText01,
                 modifier = Modifier
                     .height(48.dp)
@@ -580,9 +580,9 @@ fun NoSubscriptionsLayout(
             body = stringResource(LR.string.onboarding_upgrade_no_plans_found_body),
             iconResourceId = IR.drawable.ic_warning,
             primaryButtonText = stringResource(LR.string.try_again),
-            onPrimaryButtonClick = onTryAgain,
+            onPrimaryButtonClick = onTryAgainClick,
             secondaryButtonText = if (showNotNow) stringResource(LR.string.skip_for_now) else null,
-            onSecondaryButtonClick = onNotNowPressed,
+            onSecondaryButtonClick = onNotNowClick,
         )
 
         Spacer(modifier = Modifier.weight(1.5f))

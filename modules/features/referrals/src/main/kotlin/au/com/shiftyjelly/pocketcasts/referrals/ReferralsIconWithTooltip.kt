@@ -31,10 +31,10 @@ fun ReferralsIconWithTooltip(
     state: ReferralsViewModel.UiState,
     onIconClick: () -> Unit,
     onTooltipClick: () -> Unit,
-    onTooltipShown: () -> Unit,
+    onTooltipShow: () -> Unit,
 ) {
     CallOnce {
-        onTooltipShown()
+        onTooltipShow()
     }
 
     when (state) {

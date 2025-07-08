@@ -15,9 +15,9 @@ import com.airbnb.android.showkase.annotation.ShowkaseComposable
 @Composable
 fun LinkText(
     text: String,
+    onClick: () -> Unit,
     modifier: Modifier = Modifier,
     textAlign: TextAlign? = null,
-    onClick: () -> Unit,
 ) {
     TextH40(
         text = text,
@@ -30,7 +30,7 @@ fun LinkText(
 @ShowkaseComposable(name = "LinkText", group = "Button", styleName = "Light", defaultStyle = true)
 @Preview(name = "Light")
 @Composable
-fun LinkTextLightPreview() {
+private fun LinkTextLightPreview() {
     AppThemeWithBackground(Theme.ThemeType.LIGHT) {
         LinkText(text = "Hello World", onClick = {})
     }
@@ -39,7 +39,7 @@ fun LinkTextLightPreview() {
 @ShowkaseComposable(name = "LinkText", group = "Button", styleName = "Dark")
 @Preview(name = "Dark")
 @Composable
-fun LinkTextDarkPreview() {
+private fun LinkTextDarkPreview() {
     AppThemeWithBackground(Theme.ThemeType.DARK) {
         LinkText(text = "Hello World", onClick = {})
     }

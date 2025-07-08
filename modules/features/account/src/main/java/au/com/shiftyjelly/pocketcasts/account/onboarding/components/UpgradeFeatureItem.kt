@@ -36,7 +36,7 @@ fun UpgradeFeatureItem(
             painter = painterResource(item.image),
             contentDescription = null,
             tint = color,
-            modifier = modifier
+            modifier = Modifier
                 .size(20.dp)
                 .padding(2.dp),
         )

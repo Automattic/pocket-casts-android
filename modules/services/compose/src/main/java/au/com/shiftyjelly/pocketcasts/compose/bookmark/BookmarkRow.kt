@@ -113,13 +113,13 @@ fun BookmarkRow(
                             episode = episode,
                             corners = 8.dp,
                             useEpisodeArtwork = useEpisodeArtwork,
-                            modifier = modifier.size(56.dp),
+                            modifier = Modifier.size(56.dp),
                         )
                     } else {
                         Image(
                             painter = painterResource(if (MaterialTheme.theme.isDark) IR.drawable.defaultartwork_dark else IR.drawable.defaultartwork),
                             contentDescription = bookmark.title,
-                            modifier = modifier
+                            modifier = Modifier
                                 .size(56.dp)
                                 .clip(RoundedCornerShape(8.dp)),
                         )

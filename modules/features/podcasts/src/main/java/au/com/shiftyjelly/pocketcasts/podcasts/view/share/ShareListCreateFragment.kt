@@ -62,7 +62,7 @@ class ShareListCreateFragment : BaseFragment() {
                 }
                 composable(NavRoutes.TITLE) {
                     ShareListCreateTitlePage(
-                        onBackClick = { navController.popBackStack() },
+                        onBackPress = { navController.popBackStack() },
                         onNextClick = { createShareLink(navController) },
                         viewModel = viewModel,
                     )

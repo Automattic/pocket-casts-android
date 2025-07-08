@@ -46,11 +46,11 @@ object PodcastsScreen {
 
 @Composable
 fun PodcastsScreen(
-    modifier: Modifier = Modifier,
-    viewModel: PodcastsViewModel = hiltViewModel(),
     columnState: ScalingLazyColumnState,
     navigateToPodcast: (String) -> Unit,
     navigateToFolder: (String) -> Unit,
+    modifier: Modifier = Modifier,
+    viewModel: PodcastsViewModel = hiltViewModel(),
 ) {
     when (val uiState = viewModel.uiState.collectAsState().value) {
         is PodcastsViewModel.UiState.Empty -> {

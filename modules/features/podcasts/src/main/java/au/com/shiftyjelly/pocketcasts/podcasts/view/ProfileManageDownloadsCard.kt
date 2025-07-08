@@ -102,7 +102,7 @@ fun ManageDownloadsCard(
 
 @Preview
 @Composable
-fun ManageDownloadsCardPreview(
+private fun ManageDownloadsCardPreview(
     @PreviewParameter(ThemePreviewParameterProvider::class) themeType: Theme.ThemeType,
 ) {
     AppThemeWithBackground(themeType) {

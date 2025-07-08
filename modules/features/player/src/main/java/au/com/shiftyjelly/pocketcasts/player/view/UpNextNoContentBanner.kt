@@ -10,7 +10,7 @@ import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 @Composable
 fun UpNextNoContentBanner(
-    onDiscoverTapped: () -> Unit,
+    onDiscoverClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     NoContentBanner(
@@ -18,7 +18,7 @@ fun UpNextNoContentBanner(
         body = stringResource(LR.string.player_up_next_empty_subtitle),
         iconResourceId = R.drawable.mini_player_upnext,
         primaryButtonText = stringResource(LR.string.go_to_discover),
-        onPrimaryButtonClick = onDiscoverTapped,
+        onPrimaryButtonClick = onDiscoverClick,
         modifier = modifier,
     )
 }
@@ -27,6 +27,6 @@ fun UpNextNoContentBanner(
 @Composable
 private fun UpNextNoContentBannerPreview() {
     UpNextNoContentBanner(
-        onDiscoverTapped = {},
+        onDiscoverClick = {},
     )
 }

@@ -28,9 +28,9 @@ object FilesScreen {
 @Composable
 fun FilesScreen(
     columnState: ScalingLazyColumnState,
+    viewModel: FilesViewModel = hiltViewModel(),
     navigateToEpisode: (episodeUuid: String) -> Unit,
 ) {
-    val viewModel = hiltViewModel<FilesViewModel>()
     val userEpisodesState = viewModel.userEpisodes.collectAsState(null)
     val userEpisodes = userEpisodesState.value
     val artworkCollection by viewModel.artworkConfiguration.collectAsState()

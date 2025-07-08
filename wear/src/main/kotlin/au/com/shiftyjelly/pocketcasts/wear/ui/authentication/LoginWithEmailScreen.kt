@@ -35,11 +35,13 @@ import au.com.shiftyjelly.pocketcasts.localization.R as LR
 @Composable
 fun LoginWithEmailScreen(
     onSignInSuccess: () -> Unit,
+    modifier: Modifier = Modifier,
+    viewModel: SignInViewModel = hiltViewModel(),
 ) {
     ScreenScaffold(
         timeText = {},
+        modifier = modifier,
     ) {
-        val viewModel = hiltViewModel<SignInViewModel>()
         val signInState by viewModel.signInState.observeAsState()
         val email by viewModel.email.observeAsState()
         val password by viewModel.password.observeAsState()
@@ -47,9 +49,7 @@ fun LoginWithEmailScreen(
         var loading by remember { mutableStateOf(false) }
 
         when (signInState) {
-            null,
-            SignInState.Empty,
-            -> {
+            SignInState.Empty, null -> {
                 loading = false
 
                 if (email.isNullOrBlank()) {
@@ -76,7 +76,7 @@ fun LoginWithEmailScreen(
             }
 
             is SignInState.Success -> {
-                LaunchedEffect(Unit) {
+                LaunchedEffect(Unit, onSignInSuccess) {
                     onSignInSuccess()
                 }
             }

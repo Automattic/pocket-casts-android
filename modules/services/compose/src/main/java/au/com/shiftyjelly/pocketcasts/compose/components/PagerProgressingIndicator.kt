@@ -53,7 +53,7 @@ fun PagerProgressingIndicator(
                 SolidColor(if (isProgressedActive) activeColor else inactiveColor)
             }
             Box(
-                modifier
+                Modifier
                     .weight(1f)
                     .height(2.dp)
                     .background(brush, CircleShape),

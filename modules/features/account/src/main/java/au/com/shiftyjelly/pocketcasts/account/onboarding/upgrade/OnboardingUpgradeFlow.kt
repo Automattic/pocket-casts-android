@@ -39,7 +39,7 @@ fun OnboardingUpgradeFlow(
     source: OnboardingUpgradeSource,
     isLoggedIn: Boolean,
     forcePurchase: Boolean,
-    onBackPressed: () -> Unit,
+    onBackPress: () -> Unit,
     onNeedLogin: () -> Unit,
     onProceed: () -> Unit,
     onUpdateSystemBars: (SystemBarsStyles) -> Unit,
@@ -72,7 +72,7 @@ fun OnboardingUpgradeFlow(
         skipHalfExpanded = true,
     )
 
-    LaunchedEffect(sheetState.targetValue) {
+    LaunchedEffect(sheetState.targetValue, onBackPress) {
         when (sheetState.targetValue) {
             ModalBottomSheetValue.Hidden -> {
                 // Don't fire event when initially loading the screen and both current and target are "Hidden"
@@ -80,7 +80,7 @@ fun OnboardingUpgradeFlow(
                     viewModel.onSelectPaymentFrequencyDismissed(flow, source)
                     if (flow is OnboardingFlow.PlusAccountUpgrade) {
                         viewModel.onDismiss(flow, source)
-                        onBackPressed()
+                        onBackPress()
                     }
                 }
             }
@@ -90,12 +90,12 @@ fun OnboardingUpgradeFlow(
         }
     }
 
-    LaunchedEffect(sheetState.currentValue) {
+    LaunchedEffect(sheetState.currentValue, onBackPress) {
         // We need to check if the screen was initialized with the expanded state.
         // Otherwise, the sheet will never be shown since the initial state is Hidden.
         // This will trigger this event, and onBackPressed will be called.
         if (sheetState.currentValue == ModalBottomSheetValue.Hidden && startSelectPaymentFrequencyInExpandedState) {
-            onBackPressed()
+            onBackPress()
         }
     }
 
@@ -104,7 +104,7 @@ fun OnboardingUpgradeFlow(
             coroutineScope.launch { sheetState.hide() }
         } else {
             viewModel.onDismiss(flow, source)
-            onBackPressed()
+            onBackPress()
         }
     }
 
@@ -116,11 +116,11 @@ fun OnboardingUpgradeFlow(
         content = {
             if (flow !is OnboardingFlow.PlusAccountUpgrade) {
                 OnboardingUpgradeFeaturesPage(
-                    viewModel = viewModel,
+                    viewModel = @Suppress("ktlint:compose:vm-forwarding-check") viewModel,
                     state = state,
                     flow = flow,
                     source = source,
-                    onBackPressed = onBackPressed,
+                    onBackPress = onBackPress,
                     onClickSubscribe = { showUpgradeBottomSheet ->
                         if (activity != null) {
                             if (isLoggedIn) {
@@ -138,14 +138,14 @@ fun OnboardingUpgradeFlow(
                             LogBuffer.e(LogBuffer.TAG_SUBSCRIPTIONS, NULL_ACTIVITY_ERROR)
                         }
                     },
-                    onNotNowPressed = onProceed,
+                    onNotNowPress = onProceed,
                     onUpdateSystemBars = onUpdateSystemBars,
                 )
             }
         },
         sheetContent = {
             OnboardingUpgradeBottomSheet(
-                viewModel = viewModel,
+                viewModel = @Suppress("ktlint:compose:vm-forwarding-check") viewModel,
                 state = state,
                 onClickSubscribe = {
                     if (activity != null) {

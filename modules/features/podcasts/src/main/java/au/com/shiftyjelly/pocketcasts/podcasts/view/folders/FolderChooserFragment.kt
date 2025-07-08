@@ -92,14 +92,14 @@ class FolderChooserFragment : BaseDialogFragment() {
                 }
                 composable(NavRoutes.NAME) {
                     FolderEditNamePage(
-                        onBackClick = { navController.popBackStack() },
+                        onBackPress = { navController.popBackStack() },
                         onNextClick = { navController.navigate(NavRoutes.COLOR) },
                         viewModel = viewModel,
                     )
                 }
                 composable(NavRoutes.COLOR) {
                     FolderEditColorPage(
-                        onBackClick = { navController.popBackStack() },
+                        onBackPress = { navController.popBackStack() },
                         onSaveClick = {
                             viewModel.saveFolder(resources = resources) {
                                 dismiss()

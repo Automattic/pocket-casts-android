@@ -71,7 +71,7 @@ class EpisodeArtworkConfigurationFragment : BaseFragment() {
                     }
                     settings.artworkConfiguration.set(configuration, updateModifiedAt = true)
                 },
-                onBackPressed = {
+                onBackPress = {
                     @Suppress("DEPRECATION")
                     activity?.onBackPressed()
                 },
@@ -85,14 +85,14 @@ class EpisodeArtworkConfigurationFragment : BaseFragment() {
         elements: List<ArtworkConfiguration.Element>,
         bottomInset: Dp,
         onUpdateConfiguration: (ArtworkConfiguration) -> Unit,
-        onBackPressed: () -> Unit,
+        onBackPress: () -> Unit,
     ) {
         Column(
             modifier = Modifier.background(MaterialTheme.theme.colors.primaryUi02),
         ) {
             ThemedTopAppBar(
                 title = stringResource(LR.string.settings_use_episode_artwork_title),
-                onNavigationClick = onBackPressed,
+                onNavigationClick = onBackPress,
                 bottomShadow = true,
             )
             Column(

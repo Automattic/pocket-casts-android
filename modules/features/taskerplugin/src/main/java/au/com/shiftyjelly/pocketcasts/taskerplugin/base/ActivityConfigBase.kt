@@ -32,9 +32,12 @@ abstract class ActivityConfigBase<TViewModel : ViewModelBase<*, *, *>> : Compone
                         Text(field.getValueDescription(it))
                     }
                 }
-                ComposableTaskerInputFieldList(inputs) {
-                    viewModel.finishForTasker()
-                }
+                ComposableTaskerInputFieldList(
+                    inputs,
+                    onFinish = {
+                        viewModel.finishForTasker()
+                    },
+                )
             }
         }
     }

@@ -223,7 +223,7 @@ class UpNextFragment :
                         modifier = Modifier.verticalScroll(rememberScrollState()),
                     ) {
                         UpNextNoContentBanner(
-                            onDiscoverTapped = ::onDiscoverTapped,
+                            onDiscoverClick = ::onDiscoverTapped,
                             modifier = Modifier.padding(vertical = 24.dp),
                         )
                     }

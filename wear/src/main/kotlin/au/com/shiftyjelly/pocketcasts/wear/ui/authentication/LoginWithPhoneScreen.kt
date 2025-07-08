@@ -19,16 +19,18 @@ import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 @Composable
 fun LoginWithPhoneScreen(
-    onDone: () -> Unit,
+    onLoginClick: () -> Unit,
+    modifier: Modifier = Modifier,
 ) {
     val columnState = rememberColumnState()
 
     ScreenScaffold(
         scrollState = columnState,
+        modifier = modifier,
     ) {
         ScalingLazyColumn(
             columnState = columnState,
-            modifier = Modifier.clickable(onClick = onDone),
+            modifier = Modifier.clickable(onClick = onLoginClick),
         ) {
             item {
                 Text(

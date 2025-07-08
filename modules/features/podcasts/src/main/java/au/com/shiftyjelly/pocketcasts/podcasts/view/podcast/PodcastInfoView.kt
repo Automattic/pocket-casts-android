@@ -31,14 +31,14 @@ import au.com.shiftyjelly.pocketcasts.podcasts.R as IR
 @Composable
 fun PodcastInfoView(
     state: PodcastInfoState,
-    onWebsiteLinkClicked: () -> Unit,
+    onWebsiteLinkClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Card(
         shape = RoundedCornerShape(8.dp),
         elevation = 0.dp,
         backgroundColor = MaterialTheme.theme.colors.primaryUi02,
-        modifier = Modifier
+        modifier = modifier
             .border(
                 width = 1.dp,
                 color = MaterialTheme.theme.colors.primaryUi05,
@@ -48,7 +48,7 @@ fun PodcastInfoView(
     ) {
         Column(
             verticalArrangement = Arrangement.spacedBy(12.dp),
-            modifier = modifier.padding(16.dp),
+            modifier = Modifier.padding(16.dp),
         ) {
             PodcastInfoItem(
                 state.author,
@@ -60,7 +60,7 @@ fun PodcastInfoView(
                     text = state.link,
                     icon = IR.drawable.ic_link,
                     isLink = true,
-                    onWebsiteLinkClicked = onWebsiteLinkClicked,
+                    onWebsiteLinkClick = onWebsiteLinkClick,
                 )
             }
 
@@ -87,7 +87,7 @@ private fun PodcastInfoItem(
     icon: Int,
     modifier: Modifier = Modifier,
     isLink: Boolean = false,
-    onWebsiteLinkClicked: () -> Unit = {},
+    onWebsiteLinkClick: () -> Unit = {},
 ) {
     Row(
         modifier = modifier
@@ -110,7 +110,7 @@ private fun PodcastInfoItem(
                 color = MaterialTheme.theme.colors.support05,
                 fontWeight = FontWeight.W400,
                 modifier = Modifier.clickable {
-                    onWebsiteLinkClicked.invoke()
+                    onWebsiteLinkClick.invoke()
                 },
             )
         } else {
@@ -126,7 +126,7 @@ private fun PodcastInfoItem(
 
 @Preview
 @Composable
-fun PreviewPodcastInfoView(
+private fun PreviewPodcastInfoView(
     @PreviewParameter(ThemePreviewParameterProvider::class) themeType: Theme.ThemeType,
 ) {
     AppTheme(themeType) {
@@ -137,7 +137,7 @@ fun PreviewPodcastInfoView(
                 "Every two weeks",
                 "Episode 2",
             ),
-            onWebsiteLinkClicked = {},
+            onWebsiteLinkClick = {},
             modifier = Modifier.fillMaxWidth(),
         )
     }

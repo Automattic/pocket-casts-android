@@ -49,7 +49,7 @@ fun HtmlText(
 
 @Preview(name = "Light")
 @Composable
-fun HtmlTextLightPreview() {
+private fun HtmlTextLightPreview() {
     AppThemeWithBackground(Theme.ThemeType.LIGHT) {
         HtmlText(
             html = "<a href=\"https://pocketcasts.com\">Pocket Casts</a> is a powerful podcast platform.",
@@ -59,7 +59,7 @@ fun HtmlTextLightPreview() {
 
 @Preview(name = "Dark")
 @Composable
-fun HtmlTextDarkPreview() {
+private fun HtmlTextDarkPreview() {
     AppThemeWithBackground(Theme.ThemeType.DARK) {
         HtmlText(
             html = "<a href=\"https://pocketcasts.com\">Pocket Casts</a> is a powerful podcast platform.",

@@ -35,12 +35,12 @@ import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 @Composable
 fun ChangePasswordPage(
-    modifier: Modifier = Modifier,
+    bottomOffset: Dp,
     changePassword: () -> Unit,
     onSuccess: () -> Unit,
-    onBackPressed: () -> Unit,
-    bottomOffset: Dp,
+    onBackPress: () -> Unit,
     viewModel: ChangePwdViewModel,
+    modifier: Modifier = Modifier,
 ) {
     val keyboardController = LocalSoftwareKeyboardController.current
     val focusManager = LocalFocusManager.current
@@ -68,7 +68,7 @@ fun ChangePasswordPage(
         changePassword()
     }
 
-    LaunchedEffect(state) {
+    LaunchedEffect(state, onSuccess) {
         when (state) {
             is ChangePasswordState.Failure -> {
                 val failureState = state as ChangePasswordState.Failure
@@ -104,11 +104,11 @@ fun ChangePasswordPage(
         ThemedTopAppBar(
             title = stringResource(LR.string.profile_change_password_title),
             bottomShadow = true,
-            onNavigationClick = onBackPressed,
+            onNavigationClick = onBackPress,
         )
 
         LazyColumn(
-            modifier = modifier
+            modifier = Modifier
                 .weight(1f, false)
                 .padding(vertical = 16.dp, horizontal = 16.dp),
             verticalArrangement = Arrangement.spacedBy(16.dp),

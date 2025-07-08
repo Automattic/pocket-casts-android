@@ -43,10 +43,10 @@ object PodcastScreen {
 
 @Composable
 fun PodcastScreen(
+    columnState: ScalingLazyColumnState,
     onEpisodeTap: (PodcastEpisode) -> Unit,
     modifier: Modifier = Modifier,
     viewModel: PodcastViewModel = hiltViewModel(),
-    columnState: ScalingLazyColumnState,
 ) {
     val artworkConfiguration by viewModel.artworkConfiguration.collectAsState()
 
@@ -67,20 +67,22 @@ fun PodcastScreen(
 private fun Content(
     state: UiState.Loaded,
     useEpisodeArtwork: Boolean,
+    columnState: ScalingLazyColumnState,
     onEpisodeTap: (PodcastEpisode) -> Unit,
     modifier: Modifier = Modifier,
-    columnState: ScalingLazyColumnState,
 ) {
     val podcast = state.podcast ?: return
-    Box(modifier = modifier.fillMaxWidth()) {
+    Box(
+        modifier = modifier.fillMaxWidth(),
+    ) {
         PodcastColorBackground(
             podcast = podcast,
             theme = state.theme,
-            modifier = modifier,
+            modifier = Modifier,
         )
 
         ScalingLazyColumn(
-            modifier = modifier.fillMaxWidth(),
+            modifier = Modifier.fillMaxWidth(),
             columnState = columnState,
         ) {
             item { Spacer(Modifier.height(4.dp)) }
@@ -94,14 +96,14 @@ private fun Content(
             item {
                 Column {
                     Text(
-                        modifier = modifier.fillMaxWidth(),
+                        modifier = Modifier.fillMaxWidth(),
                         textAlign = TextAlign.Center,
                         color = MaterialTheme.colors.onPrimary,
                         text = podcast.title,
                         style = MaterialTheme.typography.button,
                     )
                     Text(
-                        modifier = modifier
+                        modifier = Modifier
                             .fillMaxWidth()
                             .padding(bottom = 8.dp),
                         textAlign = TextAlign.Center,

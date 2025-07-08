@@ -34,12 +34,12 @@ import au.com.shiftyjelly.pocketcasts.settings.notifications.model.NotificationP
 @Composable
 internal fun NotificationsSettingsScreen(
     state: NotificationsSettingsViewModel.State,
-    onPreferenceChanged: (NotificationPreferenceType) -> Unit,
-    onAdvancedSettingsClicked: (type: NotificationPreferenceType) -> Unit,
-    onSelectRingtoneClicked: (String?) -> Unit,
-    onSelectPodcastsClicked: () -> Unit,
-    onSystemNotificationsSettingsClicked: () -> Unit,
-    onBackPressed: () -> Unit,
+    onPreferenceChange: (NotificationPreferenceType) -> Unit,
+    onAdvancedSettingsClick: (type: NotificationPreferenceType) -> Unit,
+    onSelectRingtoneClick: (String?) -> Unit,
+    onSelectPodcastsClick: () -> Unit,
+    onSystemNotificationsSettingsClick: () -> Unit,
+    onBackPress: () -> Unit,
     bottomInset: Dp,
     modifier: Modifier = Modifier,
 ) {
@@ -51,7 +51,7 @@ internal fun NotificationsSettingsScreen(
         ThemedTopAppBar(
             title = stringResource(R.string.settings_title_notifications),
             bottomShadow = true,
-            onNavigationClick = onBackPressed,
+            onNavigationClick = onBackPress,
         )
         LazyColumn(
             contentPadding = PaddingValues(bottom = bottomInset),
@@ -67,7 +67,7 @@ internal fun NotificationsSettingsScreen(
                         description = stringResource(LR.string.notifications_settings_turn_on_push_message),
                         actionLabel = stringResource(LR.string.notifications_settings_turn_on_push_button),
                         icon = painterResource(IR.drawable.ic_notifications),
-                        onActionClick = onSystemNotificationsSettingsClicked,
+                        onActionClick = onSystemNotificationsSettingsClick,
                         onDismiss = null,
                     )
                 }
@@ -79,7 +79,7 @@ internal fun NotificationsSettingsScreen(
                         isEnabled = state.areSystemNotificationsEnabled,
                         categoryTitle = category.title.asString(),
                         items = category.preferences,
-                        onItemClicked = { preference ->
+                        onItemClick = { preference ->
                             when (preference) {
                                 is NotificationPreferenceType.AdvancedSettings,
                                 is NotificationPreferenceType.DailyReminderSettings,
@@ -87,20 +87,20 @@ internal fun NotificationsSettingsScreen(
                                 is NotificationPreferenceType.NewFeaturesAndTipsSettings,
                                 is NotificationPreferenceType.OffersSettings,
                                 -> {
-                                    onAdvancedSettingsClicked(preference)
+                                    onAdvancedSettingsClick(preference)
                                 }
 
                                 is NotificationPreferenceType.NotifyOnThesePodcasts -> {
-                                    onSelectPodcastsClicked()
+                                    onSelectPodcastsClick()
                                 }
 
                                 is NotificationPreferenceType.NotificationSoundPreference -> {
-                                    onSelectRingtoneClicked(preference.notificationSound.path)
+                                    onSelectRingtoneClick(preference.notificationSound.path)
                                 }
 
                                 else -> Unit
                             }
-                            onPreferenceChanged(preference)
+                            onPreferenceChange(preference)
                         },
                         modifier = Modifier.fillMaxWidth(),
                     )
@@ -145,13 +145,13 @@ private fun PreviewNotificationSettingsScreen(
                 ),
             ),
         ),
-        onPreferenceChanged = {},
-        onAdvancedSettingsClicked = {},
-        onBackPressed = {},
+        onPreferenceChange = {},
+        onAdvancedSettingsClick = {},
+        onBackPress = {},
         bottomInset = 0.dp,
-        onSelectRingtoneClicked = {},
-        onSelectPodcastsClicked = {},
-        onSystemNotificationsSettingsClicked = {},
+        onSelectRingtoneClick = {},
+        onSelectPodcastsClick = {},
+        onSystemNotificationsSettingsClick = {},
     )
 }
 
@@ -188,12 +188,12 @@ private fun PreviewDisabledNotificationsSettingsScreen() = AppTheme(Theme.ThemeT
                 ),
             ),
         ),
-        onPreferenceChanged = {},
-        onAdvancedSettingsClicked = {},
-        onBackPressed = {},
+        onPreferenceChange = {},
+        onAdvancedSettingsClick = {},
+        onBackPress = {},
         bottomInset = 0.dp,
-        onSelectRingtoneClicked = {},
-        onSelectPodcastsClicked = {},
-        onSystemNotificationsSettingsClicked = {},
+        onSelectRingtoneClick = {},
+        onSelectPodcastsClick = {},
+        onSystemNotificationsSettingsClick = {},
     )
 }

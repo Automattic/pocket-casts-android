@@ -32,8 +32,9 @@ fun WatchListScreen(
     columnState: ScalingLazyColumnState,
     navigateToRoute: (String) -> Unit,
     toNowPlaying: () -> Unit,
+    modifier: Modifier = Modifier,
+    viewModel: WatchListScreenViewModel = hiltViewModel(),
 ) {
-    val viewModel = hiltViewModel<WatchListScreenViewModel>()
     val state by viewModel.state.collectAsState()
     val upNextState = state.upNextQueue
 
@@ -43,7 +44,7 @@ fun WatchListScreen(
 
     ScalingLazyColumn(
         columnState = columnState,
-        modifier = Modifier.fillMaxWidth(),
+        modifier = modifier.fillMaxWidth(),
     ) {
         item {
             // Need this to position the first chip correctly when the screen loads

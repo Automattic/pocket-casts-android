@@ -68,8 +68,8 @@ import au.com.shiftyjelly.pocketcasts.localization.R as LR
 @OptIn(ExperimentalMaterial3WindowSizeClassApi::class)
 @Composable
 fun ReferralsSendGuestPassPage(
-    viewModel: ReferralsSendGuestPassViewModel = hiltViewModel(),
     onDismiss: () -> Unit,
+    viewModel: ReferralsSendGuestPassViewModel = hiltViewModel(),
 ) {
     AppTheme(Theme.ThemeType.DARK) {
         val context = LocalContext.current
@@ -102,9 +102,9 @@ fun ReferralsSendGuestPassPage(
 
 @Composable
 private fun ReferralsSendGuestPassContent(
+    state: UiState,
     windowWidthSizeClass: WindowWidthSizeClass,
     windowHeightSizeClass: WindowHeightSizeClass,
-    state: UiState,
     onRetry: () -> Unit,
     onDismiss: () -> Unit,
     onShare: (String, String, String) -> Unit,
@@ -241,8 +241,8 @@ private fun SendGuestPassContent(
 @Composable
 private fun ReferralsPassCardsStack(
     state: UiState.Loaded,
-    cardsCount: Int = 3,
     width: Dp,
+    cardsCount: Int = 3,
 ) {
     BoxWithConstraints(
         contentAlignment = Alignment.TopCenter,
@@ -267,7 +267,7 @@ private fun ReferralsPassCardsStack(
 
 @Preview(device = Devices.PORTRAIT_REGULAR)
 @Composable
-fun ReferralsSendGuestPassPortraitPhonePreview() {
+private fun ReferralsSendGuestPassPortraitPhonePreview() {
     ReferralsSendGuestPassContentPreview(
         windowWidthSizeClass = WindowWidthSizeClass.Compact,
         windowHeightSizeClass = WindowHeightSizeClass.Medium,
@@ -276,7 +276,7 @@ fun ReferralsSendGuestPassPortraitPhonePreview() {
 
 @Preview(device = Devices.LANDSCAPE_REGULAR)
 @Composable
-fun ReferralsSendGuestPassLandscapePhonePreview() {
+private fun ReferralsSendGuestPassLandscapePhonePreview() {
     ReferralsSendGuestPassContentPreview(
         windowWidthSizeClass = WindowWidthSizeClass.Compact,
         windowHeightSizeClass = WindowHeightSizeClass.Compact,
@@ -285,7 +285,7 @@ fun ReferralsSendGuestPassLandscapePhonePreview() {
 
 @Preview(device = Devices.PORTRAIT_TABLET)
 @Composable
-fun ReferralsSendGuestPassPortraitTabletPreview() {
+private fun ReferralsSendGuestPassPortraitTabletPreview() {
     ReferralsSendGuestPassContentPreview(
         windowWidthSizeClass = WindowWidthSizeClass.Medium,
         windowHeightSizeClass = WindowHeightSizeClass.Medium,
@@ -294,7 +294,7 @@ fun ReferralsSendGuestPassPortraitTabletPreview() {
 
 @Preview(device = Devices.LANDSCAPE_TABLET)
 @Composable
-fun ReferralsSendGuestPassLandscapeTabletPreview() {
+private fun ReferralsSendGuestPassLandscapeTabletPreview() {
     ReferralsSendGuestPassContentPreview(
         windowWidthSizeClass = WindowWidthSizeClass.Medium,
         windowHeightSizeClass = WindowHeightSizeClass.Expanded,

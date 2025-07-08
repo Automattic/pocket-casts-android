@@ -23,8 +23,8 @@ import androidx.compose.ui.unit.sp
 import au.com.shiftyjelly.pocketcasts.account.onboarding.upgrade.ProfileUpgradeBanner
 import au.com.shiftyjelly.pocketcasts.account.onboarding.upgrade.ProfileUpgradeBannerState
 import au.com.shiftyjelly.pocketcasts.compose.AppTheme
-import au.com.shiftyjelly.pocketcasts.compose.AutomotivePreview
-import au.com.shiftyjelly.pocketcasts.compose.OrientationPreview
+import au.com.shiftyjelly.pocketcasts.compose.PreviewAutomotive
+import au.com.shiftyjelly.pocketcasts.compose.PreviewOrientation
 import au.com.shiftyjelly.pocketcasts.compose.bars.ThemedTopAppBar
 import au.com.shiftyjelly.pocketcasts.compose.components.UserAvatarConfig
 import au.com.shiftyjelly.pocketcasts.compose.preview.ThemePreviewParameterProvider
@@ -116,7 +116,7 @@ internal fun AccountDetailsPage(
             }
             LazyColumn(
                 verticalArrangement = Arrangement.spacedBy(16.dp),
-                modifier = modifier.fillMaxSize(),
+                modifier = Modifier.fillMaxSize(),
             ) {
                 item {
                     Spacer(Modifier.height(16.dp))
@@ -178,7 +178,7 @@ internal data class AccountDetailsPageState(
     val sectionsState: AccountSectionsState,
 )
 
-@OrientationPreview
+@PreviewOrientation
 @Composable
 private fun AccountDetailsPagePreview() {
     AccountDetailsPageStub(Theme.ThemeType.ELECTRIC)
@@ -190,7 +190,7 @@ private fun AccountDetailsPageNoUpgradePreview() {
     AccountDetailsPageStub(Theme.ThemeType.ELECTRIC, upgradeBannerState = null)
 }
 
-@AutomotivePreview
+@PreviewAutomotive
 @Composable
 private fun AccountDetailsPageAutomotivePreview() {
     AccountDetailsPageStub(Theme.ThemeType.DARK, isAutomotive = true)

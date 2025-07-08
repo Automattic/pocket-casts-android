@@ -38,7 +38,7 @@ object OnboardingImportFlow {
                 val viewModel = hiltViewModel<OnboardingImportViewModel>()
                 OnboardingImportStartPage(
                     theme = theme,
-                    onShown = { viewModel.onImportStartPageShown(flow) },
+                    onShow = { viewModel.onImportStartPageShown(flow) },
                     onCastboxClick = {
                         viewModel.onAppSelected(flow, AnalyticsProps.CASTBOX)
                         navController.navigate(NavigationRoutes.CASTBOX)
@@ -51,7 +51,7 @@ object OnboardingImportFlow {
                         viewModel.onAppSelected(flow, AnalyticsProps.OPML_FROM_URL)
                         navController.navigate(NavigationRoutes.OPML_FROM_URL)
                     },
-                    onBackPressed = {
+                    onBackPress = {
                         viewModel.onImportDismissed(flow)
                         navController.popBackStack()
                     },
@@ -79,7 +79,7 @@ object OnboardingImportFlow {
                             function()
                         }
                     },
-                    onBackPressed = { navController.popBackStack() },
+                    onBackPress = { navController.popBackStack() },
                     onUpdateSystemBars = onUpdateSystemBars,
                 )
             }
@@ -94,7 +94,7 @@ object OnboardingImportFlow {
                         stringResource(LR.string.onboarding_import_from_other_apps_step_1),
                         stringResource(LR.string.onboarding_import_from_other_apps_step_2),
                     ),
-                    onBackPressed = { navController.popBackStack() },
+                    onBackPress = { navController.popBackStack() },
                     onUpdateSystemBars = onUpdateSystemBars,
                 )
             }
@@ -110,7 +110,7 @@ object OnboardingImportFlow {
                     onImport = {
                         OpmlImportTask.run(it, context.applicationContext)
                     },
-                    onPressBackButton = { navController.popBackStack() },
+                    onBackPress = { navController.popBackStack() },
                     onUpdateSystemBars = onUpdateSystemBars,
                 )
             }

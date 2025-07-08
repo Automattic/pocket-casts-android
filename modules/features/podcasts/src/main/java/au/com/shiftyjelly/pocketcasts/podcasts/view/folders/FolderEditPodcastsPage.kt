@@ -3,6 +3,7 @@ package au.com.shiftyjelly.pocketcasts.podcasts.view.folders
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -51,28 +52,31 @@ import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 @Composable
 fun FolderEditPodcastsPage(
-    onCloseClick: () -> Unit,
-    onNextClick: () -> Unit,
-    viewModel: FolderEditViewModel,
-    navigationButton: NavigationButton = NavigationButton.Close,
     settings: Settings,
     fragmentManager: FragmentManager,
+    viewModel: FolderEditViewModel,
+    onCloseClick: () -> Unit,
+    onNextClick: () -> Unit,
+    modifier: Modifier = Modifier,
+    navigationButton: NavigationButton = NavigationButton.Close,
 ) {
     val state: FolderEditViewModel.State by viewModel.state.collectAsState()
     val context = LocalContext.current
-    Surface(modifier = Modifier.nestedScroll(rememberViewInteropNestedScrollConnection())) {
+    Surface(modifier = modifier.nestedScroll(rememberViewInteropNestedScrollConnection())) {
         Column {
             BottomSheetAppBar(
                 navigationButton = navigationButton,
                 onNavigationClick = onCloseClick,
             )
             PageList(
+                state = state,
                 onNextClick = onNextClick,
                 onSortClick = {
                     SelectSortByDialog(settings, viewModel::changeSortOrder).show(context = context, fragmentManager = fragmentManager)
                 },
-                state = state,
-                viewModel = viewModel,
+                onSearchPodcasts = viewModel::searchPodcasts,
+                onAddPodcast = viewModel::addPodcast,
+                onRemovePodcast = viewModel::removePodcast,
                 modifier = Modifier.weight(1f),
             )
         }
@@ -80,11 +84,13 @@ fun FolderEditPodcastsPage(
 }
 
 @Composable
-private fun PageList(
+private fun ColumnScope.PageList(
+    state: FolderEditViewModel.State,
     onNextClick: () -> Unit,
     onSortClick: () -> Unit,
-    state: FolderEditViewModel.State,
-    viewModel: FolderEditViewModel,
+    onSearchPodcasts: (String) -> Unit,
+    onAddPodcast: (String) -> Unit,
+    onRemovePodcast: (String) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     LazyColumn(modifier = modifier) {
@@ -93,7 +99,7 @@ private fun PageList(
                 LargePageTitle(text = stringResource(if (state.isCreateFolder) LR.string.create_folder else LR.string.filters_choose_podcasts))
                 SearchSortBar(
                     searchText = state.searchText,
-                    onSearchTextChanged = { text -> viewModel.searchPodcasts(text) },
+                    onSearchTextChange = onSearchPodcasts,
                     onSortClick = onSortClick,
                 )
                 HorizontalDivider()
@@ -113,8 +119,8 @@ private fun PageList(
                 podcast = podcastWithFolder.podcast,
                 folder = if (state.folder?.uuid == podcastWithFolder.folder?.uuid) null else podcastWithFolder.folder,
                 selected = state.isSelected(podcastWithFolder.podcast),
-                addPodcast = { uuid -> viewModel.addPodcast(uuid) },
-                removePodcast = { uuid -> viewModel.removePodcast(uuid) },
+                addPodcast = onAddPodcast,
+                removePodcast = onRemovePodcast,
             )
         }
         item {
@@ -132,7 +138,12 @@ private fun PageList(
 }
 
 @Composable
-private fun SearchSortBar(searchText: String, onSearchTextChanged: (String) -> Unit, onSortClick: () -> Unit, modifier: Modifier = Modifier) {
+private fun SearchSortBar(
+    searchText: String,
+    onSearchTextChange: (String) -> Unit,
+    onSortClick: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
     Row(
         verticalAlignment = Alignment.CenterVertically,
         modifier = modifier
@@ -142,7 +153,7 @@ private fun SearchSortBar(searchText: String, onSearchTextChanged: (String) -> U
         SearchBar(
             text = searchText,
             placeholder = stringResource(LR.string.search_podcasts),
-            onTextChanged = onSearchTextChanged,
+            onTextChange = onSearchTextChange,
             modifier = Modifier
                 .padding(start = 16.dp)
                 .weight(1f),

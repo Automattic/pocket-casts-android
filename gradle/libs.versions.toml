@@ -35,6 +35,7 @@ kotlin = "2.1.21"
 kotlin-coroutines = "1.10.2"
 ksp = "2.1.21-2.0.2"
 ktlint = "1.6.0"
+ktlint-compose-rules = "0.4.22"
 lifecycle = "2.9.1"
 lottie = "6.6.7"
 measure-builds = "3.2.1"
@@ -150,6 +151,7 @@ lifecycle-viewmodel-compose = { module = "androidx.lifecycle:lifecycle-viewmodel
 # Linting
 # CLI included to be picked up by dependencies update automation
 ktlint-cli = { module = "com.pinterest.ktlint:ktlint-cli", version.ref = "ktlint"}
+ktlint-compose-rules = { module = "io.nlopez.compose.rules:ktlint", version.ref = "ktlint-compose-rules"}
 security-lint = { module = "com.android.security.lint:lint", version.ref = "security-lint" }
 
 # Lottie

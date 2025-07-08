@@ -45,7 +45,7 @@ fun OnboardingFlowComposable(
 ) {
     if (flow is OnboardingFlow.PlusAccountUpgrade) {
         Content(
-            featuresViewModel = featuresViewModel,
+            featuresViewModel = @Suppress("ktlint:compose:vm-forwarding-check") featuresViewModel,
             state = state,
             theme = theme,
             flow = flow,
@@ -58,7 +58,7 @@ fun OnboardingFlowComposable(
     } else {
         AppThemeWithBackground(theme) {
             Content(
-                featuresViewModel = featuresViewModel,
+                featuresViewModel = @Suppress("ktlint:compose:vm-forwarding-check") featuresViewModel,
                 state = state,
                 theme = theme,
                 flow = flow,
@@ -158,7 +158,7 @@ private fun Content(
         onboardingRecommendationsFlowGraph(
             theme,
             flow = flow,
-            onBackPressed = { exitOnboarding(OnboardingExitInfo.Simple) },
+            onBackPress = { exitOnboarding(OnboardingExitInfo.Simple) },
             onComplete = {
                 navController.navigate(
                     if (signInState.isSignedInAsPlusOrPatron) {
@@ -181,7 +181,7 @@ private fun Content(
 
             AppTheme(theme) {
                 AccountBenefitsPage(
-                    onGetStarted = {
+                    onGetStartedClick = {
                         viewModel.onGetStartedClick()
                         navController.navigate(OnboardingNavRoute.LOG_IN_OR_SIGN_UP) {
                             popUpTo(OnboardingNavRoute.ENCOURAGE_FREE_ACCOUNT) {
@@ -201,7 +201,7 @@ private fun Content(
                         viewModel.onDismissClick()
                         exitOnboarding(OnboardingExitInfo.Simple)
                     },
-                    onBenefitShown = { benefit ->
+                    onShowBenefit = { benefit ->
                         viewModel.onBenefitShown(benefit.analyticsValue)
                     },
                     modifier = Modifier.fillMaxSize(),
@@ -239,8 +239,8 @@ private fun Content(
                         -> exitOnboarding(OnboardingExitInfo.Simple)
                     }
                 },
-                onSignUpClicked = { navController.navigate(OnboardingNavRoute.CREATE_FREE_ACCOUNT) },
-                onLoginClicked = { navController.navigate(OnboardingNavRoute.LOG_IN) },
+                onSignUpClick = { navController.navigate(OnboardingNavRoute.CREATE_FREE_ACCOUNT) },
+                onLoginClick = { navController.navigate(OnboardingNavRoute.LOG_IN) },
                 onContinueWithGoogleComplete = { state, subscription ->
                     if (state.isNewAccount) {
                         onAccountCreated()
@@ -255,8 +255,8 @@ private fun Content(
         composable(OnboardingNavRoute.CREATE_FREE_ACCOUNT) {
             OnboardingCreateAccountPage(
                 theme = theme,
-                onBackPressed = { navController.popBackStack() },
-                onAccountCreated = onAccountCreated,
+                onBackPress = { navController.popBackStack() },
+                onCreateAccount = onAccountCreated,
                 onUpdateSystemBars = onUpdateSystemBars,
             )
         }
@@ -264,11 +264,11 @@ private fun Content(
         composable(OnboardingNavRoute.LOG_IN) {
             OnboardingLoginPage(
                 theme = theme,
-                onBackPressed = { navController.popBackStack() },
+                onBackPress = { navController.popBackStack() },
                 onLoginComplete = { subscription ->
                     onLoginToExistingAccount(flow, subscription, exitOnboarding, navController)
                 },
-                onForgotPasswordTapped = { navController.navigate(OnboardingNavRoute.FORGOT_PASSWORD) },
+                onForgotPasswordClick = { navController.navigate(OnboardingNavRoute.FORGOT_PASSWORD) },
                 onUpdateSystemBars = onUpdateSystemBars,
             )
         }
@@ -276,8 +276,8 @@ private fun Content(
         composable(OnboardingNavRoute.FORGOT_PASSWORD) {
             OnboardingForgotPasswordPage(
                 theme = theme,
-                onBackPressed = { navController.popBackStack() },
-                onCompleted = { exitOnboarding(OnboardingExitInfo.Simple) },
+                onBackPress = { navController.popBackStack() },
+                onComplete = { exitOnboarding(OnboardingExitInfo.Simple) },
                 onUpdateSystemBars = onUpdateSystemBars,
             )
         }
@@ -354,13 +354,13 @@ private fun Content(
             }
 
             OnboardingUpgradeFlow(
-                viewModel = featuresViewModel,
+                viewModel = @Suppress("ktlint:compose:vm-forwarding-check") featuresViewModel,
                 state = state,
                 flow = flow,
                 source = upgradeSource,
                 isLoggedIn = signInState.isSignedIn,
                 forcePurchase = forcePurchase,
-                onBackPressed = {
+                onBackPress = {
                     if (userCreatedNewAccount) {
                         navController.popBackStack()
                     } else {
@@ -384,12 +384,12 @@ private fun Content(
                 theme = theme,
                 flow = flow,
                 isSignedInAsPlusOrPatron = signInState.isSignedInAsPlusOrPatron,
-                onDone = {
+                onComplete = {
                     finishOnboardingFlow()
                 },
                 onContinueToDiscover = completeOnboardingToDiscover,
-                onImportTapped = { navController.navigate(OnboardingImportFlow.ROUTE) },
-                onBackPressed = {
+                onImportclick = { navController.navigate(OnboardingImportFlow.ROUTE) },
+                onBackPress = {
                     // Don't allow navigation back to the upgrade screen after the user upgrades
                     if (signInState.isSignedInAsPlusOrPatron) {
                         finishOnboardingFlow()

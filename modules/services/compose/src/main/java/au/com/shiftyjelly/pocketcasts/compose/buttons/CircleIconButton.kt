@@ -23,9 +23,9 @@ fun CircleIconButton(
     icon: ImageVector,
     contentDescription: String,
     backgroundColor: Color,
+    onClick: () -> Unit,
     modifier: Modifier = Modifier,
     iconColor: Color = Color.White,
-    onClick: () -> Unit,
 ) {
     CircleButton(
         size = size,
@@ -42,13 +42,13 @@ fun CircleIconButton(
 fun CircleIconButton(
     size: Dp,
     icon: Painter,
+    contentDescription: String,
+    backgroundColor: Color,
+    onClick: () -> Unit,
     modifier: Modifier = Modifier,
     iconSize: Dp? = null,
     iconVisible: Boolean = true,
-    contentDescription: String,
-    backgroundColor: Color,
     iconColor: Color = Color.White,
-    onClick: () -> Unit,
 ) {
     CircleButton(
         size = size,
@@ -71,7 +71,7 @@ fun CircleIconButton(
 @ShowkaseComposable(name = "CircleIconButton", group = "Button", styleName = "Light", defaultStyle = true)
 @Preview(name = "Light")
 @Composable
-fun CircleIconButtonLightPreview() {
+private fun CircleIconButtonLightPreview() {
     AppTheme(Theme.ThemeType.LIGHT) {
         CircleIconButtonPreview()
     }
@@ -80,7 +80,7 @@ fun CircleIconButtonLightPreview() {
 @ShowkaseComposable(name = "CircleIconButton", group = "Button", styleName = "Dark")
 @Preview(name = "Dark")
 @Composable
-fun CircleIconButtonDarkPreview() {
+private fun CircleIconButtonDarkPreview() {
     AppTheme(Theme.ThemeType.DARK) {
         CircleIconButtonPreview()
     }

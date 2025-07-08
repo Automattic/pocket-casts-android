@@ -49,6 +49,7 @@ object ThemedTopAppBar {
 
 @Composable
 fun ThemedTopAppBar(
+    onNavigationClick: () -> Unit,
     modifier: Modifier = Modifier,
     title: String? = null,
     navigationButton: NavigationButton = NavigationButton.Back,
@@ -69,7 +70,6 @@ fun ThemedTopAppBar(
     titleOverflow: TextOverflow = TextOverflow.Ellipsis,
     windowInsets: WindowInsets = AppBarDefaults.topAppBarWindowInsets,
     actions: @Composable RowScope.(Color) -> Unit = {},
-    onNavigationClick: () -> Unit,
 ) {
     CompositionLocalProvider(
         LocalRippleConfiguration provides RippleConfiguration(color = iconColor),
@@ -109,9 +109,9 @@ fun ThemedTopAppBar(
 @Composable
 fun NavigationIconButton(
     onNavigationClick: () -> Unit,
+    modifier: Modifier = Modifier,
     navigationButton: NavigationButton = NavigationButton.Back,
     iconColor: Color = MaterialTheme.theme.colors.secondaryIcon01,
-    modifier: Modifier = Modifier,
 ) {
     IconButton(
         onClick = onNavigationClick,

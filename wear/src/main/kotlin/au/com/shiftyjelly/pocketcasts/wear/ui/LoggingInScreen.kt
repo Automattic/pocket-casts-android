@@ -49,10 +49,10 @@ fun LoggingInScreen(
     avatarUrl: String? = null,
     name: String? = null,
     withMinimumDelay: Boolean = false,
+    viewModel: LoggingInScreenViewModel = hiltViewModel(),
     onClose: () -> Unit,
 ) {
     ScreenScaffold {
-        val viewModel = hiltViewModel<LoggingInScreenViewModel>()
         val state = viewModel.state.collectAsState().value
 
         if (viewModel.shouldClose(withMinimumDelay)) {

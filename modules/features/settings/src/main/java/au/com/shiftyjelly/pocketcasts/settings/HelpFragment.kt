@@ -69,8 +69,8 @@ class HelpFragment :
                     @Suppress("DEPRECATION")
                     activity?.onBackPressed()
                 },
-                onWebViewCreated = { webView = it },
-                onWebViewDisposed = { webView = null },
+                onWebViewCreate = { webView = it },
+                onWebViewDispose = { webView = null },
                 modifier = Modifier
                     .fillMaxSize()
                     .padding(bottom = totalPadding),

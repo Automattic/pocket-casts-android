@@ -35,10 +35,10 @@ object UpNextScreen {
 
 @Composable
 fun UpNextScreen(
+    columnState: ScalingLazyColumnState,
     navigateToEpisode: (episodeUuid: String) -> Unit,
     modifier: Modifier = Modifier,
     viewModel: UpNextViewModel = hiltViewModel(),
-    columnState: ScalingLazyColumnState,
 ) {
     val queueState by viewModel.upNextQueue.subscribeAsState(initial = null)
     val artworkConfiguration by viewModel.artworkConfiguration.collectAsState()
@@ -55,10 +55,11 @@ fun UpNextScreen(
             } else {
                 Scaffold(
                     positionIndicator = { PositionIndicator(scalingLazyListState = columnState.state) },
+                    modifier = modifier,
                 ) {
                     ScalingLazyColumn(
                         columnState = columnState,
-                        modifier = modifier.fillMaxWidth(),
+                        modifier = Modifier.fillMaxWidth(),
                     ) {
                         item { ScreenHeaderChip(LR.string.up_next) }
 

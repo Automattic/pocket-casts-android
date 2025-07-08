@@ -70,7 +70,7 @@ class SearchResultsFragment : BaseFragment() {
                         viewModel = viewModel,
                         onFolderClick = ::onFolderClick,
                         onPodcastClick = ::onPodcastClick,
-                        onBackClick = ::onBackClick,
+                        onBackPress = ::onBackPress,
                         bottomInset = bottomInsetDp,
                     )
                 }
@@ -78,7 +78,7 @@ class SearchResultsFragment : BaseFragment() {
                 ResultsType.EPISODES -> {
                     SearchEpisodeResultsPage(
                         viewModel = viewModel,
-                        onBackClick = ::onBackClick,
+                        onBackPress = ::onBackPress,
                         onEpisodeClick = ::onEpisodeClick,
                         bottomInset = bottomInsetDp,
                     )
@@ -135,7 +135,7 @@ class SearchResultsFragment : BaseFragment() {
         listener?.onSearchPodcastClick(podcast.uuid, SourceView.SEARCH_RESULTS)
     }
 
-    private fun onBackClick() {
+    private fun onBackPress() {
         parentFragmentManager.popBackStack()
     }
 

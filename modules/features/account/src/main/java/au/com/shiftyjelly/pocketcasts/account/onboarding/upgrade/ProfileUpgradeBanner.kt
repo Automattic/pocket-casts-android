@@ -45,7 +45,7 @@ fun ProfileUpgradeBanner(
         initialPage = state.selectedFeatureCard?.let { selectedPlan ->
             state.onboardingPlans.indexOfFirst { it.key == selectedPlan }.takeIf { it != -1 }
         } ?: 0,
-        onPageChanged = { onChangeFeatureCard(state.onboardingPlans[it].key) },
+        onPageChange = { onChangeFeatureCard(state.onboardingPlans[it].key) },
         showPageIndicator = state.onboardingPlans.size > 1,
         pageIndicatorColor = MaterialTheme.theme.colors.primaryText01,
         modifier = modifier,

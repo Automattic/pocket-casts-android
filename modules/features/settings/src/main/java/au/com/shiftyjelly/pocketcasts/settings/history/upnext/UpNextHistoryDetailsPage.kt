@@ -54,35 +54,35 @@ import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 @Composable
 fun UpNextHistoryDetailsPage(
-    viewModel: UpNextHistoryDetailsViewModel = hiltViewModel(),
     date: Long,
-    onRestoreClick: (UiState, restoreUpNext: () -> Unit) -> Unit,
-    onBackClick: () -> Unit,
     bottomInset: Dp,
+    onRestoreClick: (UiState, restoreUpNext: () -> Unit) -> Unit,
+    onBackPress: () -> Unit,
+    viewModel: UpNextHistoryDetailsViewModel = hiltViewModel(),
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
     UpNextHistoryDetailsView(
         date = date,
         state = state,
         onRestoreClick = { onRestoreClick(state) { viewModel.restoreUpNext() } },
-        onBackClick = onBackClick,
+        onBackPress = onBackPress,
         bottomInset = bottomInset,
     )
 }
 
 @Composable
 private fun UpNextHistoryDetailsView(
-    date: Long,
     state: UiState,
-    onRestoreClick: () -> Unit,
-    onBackClick: () -> Unit,
+    date: Long,
     bottomInset: Dp,
+    onRestoreClick: () -> Unit,
+    onBackPress: () -> Unit,
 ) {
     Column {
         ThemedTopAppBar(
             title = formatDate(date),
-            onNavigationClick = onBackClick,
-            actions = { iconColor ->
+            onNavigationClick = onBackPress,
+            actions = {
                 TextButton(
                     onClick = onRestoreClick,
                     enabled = state is UiState.Loaded,
@@ -169,14 +169,14 @@ private fun EpisodeRow(
 
     Row(
         verticalAlignment = Alignment.CenterVertically,
-        modifier = Modifier
+        modifier = modifier
             .fillMaxWidth()
             .padding(horizontal = 16.dp, vertical = 12.dp),
     ) {
         EpisodeImage(
             episode = episode,
             useEpisodeArtwork = useEpisodeArtwork,
-            modifier = modifier.size(56.dp),
+            modifier = Modifier.size(56.dp),
         )
 
         Column(
@@ -241,7 +241,7 @@ private fun UpNextHistoryDetailsViewPreview(
                 useEpisodeArtwork = true,
             ),
             onRestoreClick = {},
-            onBackClick = {},
+            onBackPress = {},
             bottomInset = 0.dp,
         )
     }
@@ -257,7 +257,7 @@ private fun UpNextHistoryDetailsErrorViewPreview(
             date = Date().time,
             state = UiState.Error,
             onRestoreClick = {},
-            onBackClick = {},
+            onBackPress = {},
             bottomInset = 0.dp,
         )
     }

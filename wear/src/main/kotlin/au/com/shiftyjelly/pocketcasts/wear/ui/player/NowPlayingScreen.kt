@@ -49,11 +49,11 @@ object NowPlayingScreen {
 @OptIn(ExperimentalWearFoundationApi::class)
 @Composable
 fun NowPlayingScreen(
+    navController: NavController,
+    navigateToEpisode: (episodeUuid: String) -> Unit,
     modifier: Modifier = Modifier,
     playerViewModel: NowPlayingViewModel = hiltViewModel(),
     volumeViewModel: PCVolumeViewModel = hiltViewModel(),
-    navigateToEpisode: (episodeUuid: String) -> Unit,
-    navController: NavController,
 ) {
     // Listen for results from streaming confirmation screen
     navController.currentBackStackEntry?.savedStateHandle
@@ -88,7 +88,7 @@ fun NowPlayingScreen(
                     NowPlayingViewModel.State.Loading -> {
                         MessageMediaDisplay(
                             message = stringResource(R.string.nothing_playing),
-                            modifier = modifier,
+                            modifier = Modifier,
                         )
                     }
 
@@ -96,8 +96,7 @@ fun NowPlayingScreen(
                         MarqueeTextMediaDisplay(
                             title = state.title,
                             artist = state.subtitle,
-                            modifier = modifier
-                                .clickable { navigateToEpisode(state.episodeUuid) },
+                            modifier = Modifier.clickable { navigateToEpisode(state.episodeUuid) },
                             isPlaybackError = state.error,
                         )
                     }
@@ -105,7 +104,7 @@ fun NowPlayingScreen(
                     is NowPlayingViewModel.State.Empty -> {
                         MessageMediaDisplay(
                             message = stringResource(LR.string.empty_play_state),
-                            modifier = modifier,
+                            modifier = Modifier,
                         )
                     }
                 }

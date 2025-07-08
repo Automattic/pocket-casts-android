@@ -88,14 +88,10 @@ object SearchBarDefaults {
 @Composable
 fun SearchBar(
     text: String,
-    onTextChanged: (String) -> Unit,
+    onTextChange: (String) -> Unit,
     modifier: Modifier = Modifier,
-    onClearButtonTapped: () -> Unit = {},
-    leadingContent: @Composable (() -> Unit)? = null,
-    trailingContent: @Composable (() -> Unit)? = null,
-    placeholder: String = stringResource(LR.string.search_podcasts_or_add_url),
-    onSearch: () -> Unit = {},
     enabled: Boolean = true,
+    placeholder: String = stringResource(LR.string.search_podcasts_or_add_url),
     textStyle: TextStyle = LocalTextStyle.current,
     cornerRadius: Dp = 10.dp,
     colors: TextFieldColors = SearchBarDefaults.colors(),
@@ -103,6 +99,10 @@ fun SearchBar(
         top = 0.dp,
         bottom = 0.dp,
     ),
+    onClickClear: () -> Unit = {},
+    onSearch: () -> Unit = {},
+    leadingContent: @Composable (() -> Unit)? = null,
+    trailingContent: @Composable (() -> Unit)? = null,
 ) {
     val focusManager = LocalFocusManager.current
     val textColor = textStyle.color.takeOrElse {
@@ -114,7 +114,7 @@ fun SearchBar(
     BasicTextField(
         value = text,
         onValueChange = {
-            onTextChanged(it.removeNewLines())
+            onTextChange(it.removeNewLines())
         },
         keyboardOptions = KeyboardOptions(imeAction = ImeAction.Search),
         keyboardActions = KeyboardActions(
@@ -163,8 +163,8 @@ fun SearchBar(
                     if (text.isNotEmpty()) {
                         IconButton(
                             onClick = {
-                                onClearButtonTapped()
-                                onTextChanged("")
+                                onClickClear()
+                                onTextChange("")
                                 focusManager.clearFocus()
                             },
                         ) {
@@ -207,7 +207,7 @@ fun SearchBarButton(
         SearchBar(
             text = "",
             placeholder = text,
-            onTextChanged = {},
+            onTextChange = {},
             modifier = Modifier.fillMaxWidth(),
         )
 
@@ -238,7 +238,7 @@ private fun SearchBarDarkPreview() {
 @Composable
 private fun SearchBarPreview() {
     Column(modifier = Modifier.padding(8.dp)) {
-        SearchBar("Material", onTextChanged = {}, modifier = Modifier.padding(bottom = 8.dp))
-        SearchBar("", onTextChanged = {})
+        SearchBar("Material", onTextChange = {}, modifier = Modifier.padding(bottom = 8.dp))
+        SearchBar("", onTextChange = {})
     }
 }

@@ -1,6 +1,7 @@
 package au.com.shiftyjelly.pocketcasts.wear.ui.player
 
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import au.com.shiftyjelly.pocketcasts.wear.ui.component.ObtainConfirmationScreen
 import au.com.shiftyjelly.pocketcasts.wear.ui.player.StreamingConfirmationScreen.Result
@@ -19,15 +20,17 @@ object StreamingConfirmationScreen {
 
 @Composable
 fun StreamingConfirmationScreen(
-    onFinished: (Result) -> Unit,
+    onFinish: (Result) -> Unit,
+    modifier: Modifier = Modifier,
 ) {
     ScreenScaffold(
         timeText = {},
+        modifier = modifier,
     ) {
         ObtainConfirmationScreen(
             text = stringResource(LR.string.stream_warning_summary_short),
-            onConfirm = { onFinished(Result.CONFIRMED) },
-            onCancel = { onFinished(Result.CANCELLED) },
+            onConfirm = { onFinish(Result.CONFIRMED) },
+            onCancel = { onFinish(Result.CANCELLED) },
         )
     }
 }

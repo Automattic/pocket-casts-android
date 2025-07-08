@@ -32,9 +32,9 @@ fun ContinueWithGoogleButton(
     flow: OnboardingFlow?,
     fontSize: TextUnit? = null,
     includePadding: Boolean = true,
+    viewModel: GoogleSignInButtonViewModel = hiltViewModel(),
     onComplete: (GoogleSignInState, Subscription?) -> Unit,
 ) {
-    val viewModel = hiltViewModel<GoogleSignInButtonViewModel>()
     val context = LocalContext.current
 
     val showContinueWithGoogleButton = GoogleSignInButtonViewModel.showContinueWithGoogleButton(context)

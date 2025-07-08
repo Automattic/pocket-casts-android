@@ -30,10 +30,11 @@ fun DividerSubTitle(
     @DrawableRes icon: Int,
     title: String,
     onClick: (() -> Unit)?,
+    modifier: Modifier = Modifier,
 ) {
     Row(
         verticalAlignment = Alignment.CenterVertically,
-        modifier = Modifier
+        modifier = modifier
             .fillMaxWidth()
             .then(
                 if (onClick != null) {
@@ -60,7 +61,7 @@ fun DividerSubTitle(
 
 @Preview
 @Composable
-fun DividerSubTitlePreview(
+private fun DividerSubTitlePreview(
     @PreviewParameter(ThemePreviewParameterProvider::class) theme: Theme.ThemeType,
 ) {
     AppThemeWithBackground(theme) {

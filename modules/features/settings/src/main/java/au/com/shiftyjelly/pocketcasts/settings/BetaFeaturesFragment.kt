@@ -56,8 +56,8 @@ class BetaFeaturesFragment : BaseFragment() {
             val bottomInset = settings.bottomInset.collectAsStateWithLifecycle(0)
             BetaFeaturesPage(
                 state = state,
-                onFeatureEnabled = viewModel::setFeatureEnabled,
-                onBackClick = {
+                onFeatureChange = viewModel::setFeatureEnabled,
+                onBackPress = {
                     @Suppress("DEPRECATION")
                     activity?.onBackPressed()
                 },
@@ -70,8 +70,8 @@ class BetaFeaturesFragment : BaseFragment() {
 @Composable
 private fun BetaFeaturesPage(
     state: BetaFeaturesViewModel.State,
-    onFeatureEnabled: (Feature, Boolean) -> Unit,
-    onBackClick: () -> Unit,
+    onFeatureChange: (Feature, Boolean) -> Unit,
+    onBackPress: () -> Unit,
     bottomInset: Dp,
 ) {
     Column(
@@ -79,7 +79,7 @@ private fun BetaFeaturesPage(
     ) {
         ThemedTopAppBar(
             title = stringResource(R.string.settings_beta_features),
-            onNavigationClick = { onBackClick() },
+            onNavigationClick = { onBackPress() },
         )
         LazyColumn(
             contentPadding = PaddingValues(vertical = 16.dp),
@@ -93,7 +93,7 @@ private fun BetaFeaturesPage(
                             value = feature.isEnabled,
                             role = Role.Switch,
                         ) {
-                            onFeatureEnabled(feature.featureFlag, it)
+                            onFeatureChange(feature.featureFlag, it)
                         },
                         indent = false,
                     )
@@ -111,8 +111,8 @@ private fun BetaFeaturesPagePreview(
     AppTheme(themeType) {
         BetaFeaturesPage(
             state = BetaFeaturesViewModel.State(featureFlags = Feature.entries.map { BetaFeaturesViewModel.FeatureFlagWrapper(featureFlag = it, isEnabled = true) }),
-            onFeatureEnabled = { _, _ -> },
-            onBackClick = {},
+            onFeatureChange = { _, _ -> },
+            onBackPress = {},
             bottomInset = 0.dp,
         )
     }

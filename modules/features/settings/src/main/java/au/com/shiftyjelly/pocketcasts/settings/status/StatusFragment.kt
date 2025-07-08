@@ -34,9 +34,9 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.fragment.app.viewModels
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.viewmodel.compose.viewModel
 import au.com.shiftyjelly.pocketcasts.compose.AppThemeWithBackground
 import au.com.shiftyjelly.pocketcasts.compose.bars.ThemedTopAppBar
 import au.com.shiftyjelly.pocketcasts.compose.extensions.contentWithoutConsumedInsets
@@ -54,7 +54,6 @@ import au.com.shiftyjelly.pocketcasts.localization.R as LR
 class StatusFragment : BaseFragment() {
     @Inject
     lateinit var settings: Settings
-    private val viewModel: StatusViewModel by viewModels()
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -65,9 +64,8 @@ class StatusFragment : BaseFragment() {
         val bottomInset = settings.bottomInset.collectAsStateWithLifecycle(initialValue = 0)
         AppThemeWithBackground(theme.activeTheme) {
             StatusPage(
-                viewModel = viewModel,
                 bottomInset = bottomInset.value.pxToDp(LocalContext.current).dp,
-                onBackPressed = { closeFragment() },
+                onBackPress = { closeFragment() },
             )
         }
     }
@@ -80,28 +78,39 @@ class StatusFragment : BaseFragment() {
 @Composable
 fun StatusPage(
     bottomInset: Dp,
-    onBackPressed: () -> Unit,
+    onBackPress: () -> Unit,
+    modifier: Modifier = Modifier,
     appBarInsets: WindowInsets = AppBarDefaults.topAppBarWindowInsets,
     viewModel: StatusViewModel = hiltViewModel(),
 ) {
     LazyColumn(
         contentPadding = PaddingValues(bottom = bottomInset),
+        modifier = modifier,
     ) {
         item {
             ThemedTopAppBar(
                 title = stringResource(LR.string.settings_status_page),
                 windowInsets = appBarInsets,
-                onNavigationClick = onBackPressed,
+                onNavigationClick = onBackPress,
             )
         }
         item {
-            StatusPageContent(viewModel = viewModel)
+            val context = LocalContext.current
+            StatusPageContent(
+                state = viewModel.uiState.collectAsState().value,
+                onRun = viewModel::run,
+                onSendReport = { viewModel.sendReport(context) },
+            )
         }
     }
 }
 
 @Composable
-fun StatusPageContent(viewModel: StatusViewModel) {
+private fun StatusPageContent(
+    state: StatusUiState,
+    onRun: () -> Unit,
+    onSendReport: () -> Unit,
+) {
     Column(
         modifier = Modifier
             .padding(16.dp)
@@ -113,21 +122,30 @@ fun StatusPageContent(viewModel: StatusViewModel) {
             style = MaterialTheme.typography.body1.copy(lineHeight = 20.sp),
             modifier = Modifier.padding(bottom = 16.dp),
         )
-        when (val state = viewModel.uiState.collectAsState().value) {
-            is StatusUiState.Welcome -> StatusWelcomePage(viewModel = viewModel)
-            is StatusUiState.ListServices -> StatusServicesPage(state = state, viewModel = viewModel)
+        when (state) {
+            is StatusUiState.Welcome -> StatusWelcomePage(
+                onRun = onRun,
+            )
+
+            is StatusUiState.ListServices -> StatusServicesPage(
+                state = state,
+                onRun = onRun,
+                onSendReport = onSendReport,
+            )
         }
     }
 }
 
 @Composable
-fun StatusWelcomePage(viewModel: StatusViewModel) {
+private fun StatusWelcomePage(
+    onRun: () -> Unit,
+) {
     Row(
         modifier = Modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.Center,
     ) {
         Button(
-            onClick = { viewModel.run() },
+            onClick = onRun,
         ) {
             Text(stringResource(LR.string.settings_status_run))
         }
@@ -135,7 +153,11 @@ fun StatusWelcomePage(viewModel: StatusViewModel) {
 }
 
 @Composable
-fun StatusServicesPage(state: StatusUiState.ListServices, viewModel: StatusViewModel) {
+private fun StatusServicesPage(
+    state: StatusUiState.ListServices,
+    onRun: () -> Unit,
+    onSendReport: () -> Unit,
+) {
     val context = LocalContext.current
     Column {
         state.services.forEach { service ->
@@ -154,14 +176,14 @@ fun StatusServicesPage(state: StatusUiState.ListServices, viewModel: StatusViewM
             horizontalArrangement = Arrangement.Center,
         ) {
             Button(
-                onClick = { viewModel.run() },
+                onClick = onRun,
                 enabled = !state.running,
             ) {
                 Text(stringResource(LR.string.settings_status_retry))
             }
             Spacer(modifier = Modifier.width(24.dp))
             Button(
-                onClick = { viewModel.sendReport(context) },
+                onClick = onSendReport,
                 enabled = !state.running,
             ) {
                 Text(stringResource(LR.string.settings_status_send_report))
@@ -171,7 +193,7 @@ fun StatusServicesPage(state: StatusUiState.ListServices, viewModel: StatusViewM
 }
 
 @Composable
-fun ServiceStatusRow(title: String, summary: String, help: String, status: ServiceStatus) {
+private fun ServiceStatusRow(title: String, summary: String, help: String, status: ServiceStatus) {
     Row(
         modifier = Modifier
             .padding(vertical = 16.dp)
@@ -186,6 +208,7 @@ fun ServiceStatusRow(title: String, summary: String, help: String, status: Servi
                         tint = MaterialTheme.theme.colors.support02,
                     )
                 }
+
                 is ServiceStatus.Failed -> {
                     Icon(
                         imageVector = Icons.Default.Close,
@@ -193,6 +216,7 @@ fun ServiceStatusRow(title: String, summary: String, help: String, status: Servi
                         tint = MaterialTheme.theme.colors.support05,
                     )
                 }
+
                 is ServiceStatus.Running -> {
                     CircularProgressIndicator(
                         modifier = Modifier
@@ -201,6 +225,7 @@ fun ServiceStatusRow(title: String, summary: String, help: String, status: Servi
                         strokeWidth = 2.dp,
                     )
                 }
+
                 else -> Spacer(
                     modifier = Modifier
                         .width(24.dp)

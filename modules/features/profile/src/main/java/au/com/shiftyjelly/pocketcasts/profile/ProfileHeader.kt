@@ -87,8 +87,8 @@ data class ProfileHeaderConfig(
 fun VerticalProfileHeader(
     state: ProfileHeaderState,
     config: ProfileHeaderConfig,
-    modifier: Modifier = Modifier,
     onClick: () -> Unit,
+    modifier: Modifier = Modifier,
 ) {
     val accountLabel = if (state.email == null) {
         stringResource(LR.string.profile_set_up_account)
@@ -156,8 +156,8 @@ fun VerticalProfileHeader(
 fun HorizontalProfileHeader(
     state: ProfileHeaderState,
     config: ProfileHeaderConfig,
-    modifier: Modifier = Modifier,
     onClick: () -> Unit,
+    modifier: Modifier = Modifier,
 ) {
     val accountLabel = if (state.email == null) {
         stringResource(LR.string.profile_set_up_account)

@@ -8,8 +8,8 @@ import au.com.shiftyjelly.pocketcasts.utils.Gravatar
 @Composable
 fun GravatarProfileImage(
     email: String,
-    modifier: Modifier = Modifier,
     contentDescription: String?,
+    modifier: Modifier = Modifier,
     placeholder: @Composable (() -> Unit) = {},
 ) {
     val gravatarUrl = remember(email) {

@@ -25,9 +25,9 @@ import com.google.android.horologist.annotations.ExperimentalHorologistApi
 @ExperimentalHorologistApi
 @Composable
 fun PlayPauseButtonStyled(
+    playing: Boolean,
     onPlayClick: () -> Unit,
     onPauseClick: () -> Unit,
-    playing: Boolean,
     modifier: Modifier = Modifier,
     enabled: Boolean = true,
     colors: ButtonColors = ButtonDefaults.iconButtonColors(),
@@ -52,7 +52,6 @@ fun PlayPauseButtonStyled(
             PauseButtonStyled(
                 onClick = onPauseClick,
                 enabled = enabled,
-                modifier = modifier,
                 colors = colors,
                 iconSize = iconSize,
                 icon = pauseIcon,
@@ -61,7 +60,6 @@ fun PlayPauseButtonStyled(
             PlayButtonStyled(
                 onClick = onPlayClick,
                 enabled = enabled,
-                modifier = modifier,
                 colors = colors,
                 iconSize = iconSize,
                 icon = playIcon,

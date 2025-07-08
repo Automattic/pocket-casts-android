@@ -67,7 +67,7 @@ class MainActivity : ComponentActivity() {
                 WearApp(
                     signInState = state.signInState,
                     showLoggingInScreen = state.showLoggingInScreen,
-                    onLoggingInScreenShown = viewModel::onSignInConfirmationActionHandled,
+                    onShowLoginScreen = viewModel::onSignInConfirmationActionHandled,
                     signOut = viewModel::signOut,
                 )
             }
@@ -81,10 +81,10 @@ class MainActivity : ComponentActivity() {
 }
 
 @Composable
-fun WearApp(
+private fun WearApp(
     signInState: SignInState,
     showLoggingInScreen: Boolean,
-    onLoggingInScreenShown: () -> Unit,
+    onShowLoginScreen: () -> Unit,
     signOut: () -> Unit,
 ) {
     val navController = rememberSwipeDismissableNavController()
@@ -93,7 +93,7 @@ fun WearApp(
 
     if (showLoggingInScreen) {
         navController.navigate(LoggingInScreen.ROUTE_WITH_DELAY)
-        onLoggingInScreenShown()
+        onShowLoginScreen()
     }
 
     val userCanAccessWatch = signInState.isSignedInAsPlusOrPatron == true
@@ -150,7 +150,7 @@ fun WearApp(
                 route = StreamingConfirmationScreen.ROUTE,
             ) {
                 StreamingConfirmationScreen(
-                    onFinished = { result ->
+                    onFinish = { result ->
                         navController.previousBackStackEntry?.savedStateHandle?.set(
                             StreamingConfirmationScreen.RESULT_KEY,
                             result,
@@ -399,7 +399,7 @@ private fun DefaultPreview() {
     WearApp(
         signInState = SignInState.SignedOut,
         showLoggingInScreen = false,
-        onLoggingInScreenShown = {},
+        onShowLoginScreen = {},
         signOut = {},
     )
 }

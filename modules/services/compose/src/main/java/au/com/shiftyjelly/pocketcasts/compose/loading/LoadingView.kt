@@ -38,7 +38,7 @@ fun LoadingView(
 @ShowkaseComposable(name = "Circular Loading Indicator", group = "Loading Indicator", styleName = "Dark")
 @Preview(name = "Dark")
 @Composable
-fun BookmarkRowDarkPreview() {
+private fun BookmarkRowDarkPreview() {
     AppThemeWithBackground(themeType = Theme.ThemeType.DARK) {
         LoadingView()
     }
@@ -47,7 +47,7 @@ fun BookmarkRowDarkPreview() {
 @ShowkaseComposable(name = "Circular Loading Indicator", group = "Loading Indicator", styleName = "Light")
 @Preview(name = "Light")
 @Composable
-fun BookmarkRowLightPreview() {
+private fun BookmarkRowLightPreview() {
     AppThemeWithBackground(themeType = Theme.ThemeType.LIGHT) {
         LoadingView()
     }

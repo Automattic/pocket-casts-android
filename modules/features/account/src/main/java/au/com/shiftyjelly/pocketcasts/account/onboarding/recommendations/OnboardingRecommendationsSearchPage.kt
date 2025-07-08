@@ -49,15 +49,16 @@ import au.com.shiftyjelly.pocketcasts.localization.R as LR
 @Composable
 fun OnboardingRecommendationsSearchPage(
     theme: Theme.ThemeType,
-    onBackPressed: () -> Unit,
+    onBackPress: () -> Unit,
     onUpdateSystemBars: (SystemBarsStyles) -> Unit,
+    modifier: Modifier = Modifier,
+    viewModel: OnboardingRecommendationsSearchViewModel = hiltViewModel(),
 ) {
-    val viewModel = hiltViewModel<OnboardingRecommendationsSearchViewModel>()
     val state by viewModel.state.collectAsState()
 
     val focusRequester = remember { FocusRequester() }
     val pocketCastsTheme = MaterialTheme.theme
-    LaunchedEffect(Unit) {
+    LaunchedEffect(onUpdateSystemBars) {
         focusRequester.requestFocus()
         // Use secondaryUI01 so the status bar matches the ThemedTopAppBar
         val statusBar = SystemBarStyle.singleAuto(pocketCastsTheme.colors.secondaryUi01) { theme.darkTheme }
@@ -67,11 +68,11 @@ fun OnboardingRecommendationsSearchPage(
 
     BackHandler {
         viewModel.onBackPressed()
-        onBackPressed()
+        onBackPress()
     }
 
     Column(
-        Modifier
+        modifier = modifier
             .windowInsetsPadding(WindowInsets.statusBars)
             .windowInsetsPadding(WindowInsets.ime)
             .fillMaxHeight(),
@@ -80,14 +81,14 @@ fun OnboardingRecommendationsSearchPage(
             title = stringResource(LR.string.onboarding_find_podcasts),
             onNavigationClick = {
                 viewModel.onBackPressed()
-                onBackPressed()
+                onBackPress()
             },
         )
 
         SearchBar(
             text = state.searchQuery,
             placeholder = stringResource(LR.string.search),
-            onTextChanged = viewModel::updateSearchQuery,
+            onTextChange = viewModel::updateSearchQuery,
             onSearch = with(LocalContext.current) {
                 {
                     viewModel.queryImmediately(this)
@@ -140,7 +141,7 @@ private fun OnboardingRecommendationSearchPage_Preview(
     AppThemeWithBackground(themeType) {
         OnboardingRecommendationsSearchPage(
             theme = themeType,
-            onBackPressed = {},
+            onBackPress = {},
             onUpdateSystemBars = {},
         )
     }

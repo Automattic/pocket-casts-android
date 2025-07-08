@@ -189,14 +189,14 @@ class WinbackFragment : BaseDialogFragment() {
                             LogsPage(
                                 bottomInset = 0.dp,
                                 appBarInsets = AppBarDefaults.topAppBarWindowInsets.only(WindowInsetsSides.Horizontal),
-                                onBackPressed = { navController.popBackStack() },
+                                onBackPress = { navController.popBackStack() },
                             )
                         }
                         composable(WinbackNavRoutes.STATUS_CHECK) {
                             StatusPage(
                                 bottomInset = 0.dp,
                                 appBarInsets = AppBarDefaults.topAppBarWindowInsets.only(WindowInsetsSides.Horizontal),
-                                onBackPressed = { navController.popBackStack() },
+                                onBackPress = { navController.popBackStack() },
                             )
                         }
                         composable(WinbackNavRoutes.CANCEL_CONFIRMATION) {

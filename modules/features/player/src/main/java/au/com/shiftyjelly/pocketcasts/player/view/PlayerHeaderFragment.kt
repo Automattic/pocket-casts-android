@@ -771,7 +771,7 @@ class PlayerHeaderFragment :
                 AdAndArtworkHorizontal(
                     artworkOrVideoState = artworkOrVideoState,
                     playerColors = playerColors,
-                    modifier = modifier.fillMaxWidth(),
+                    modifier = Modifier.fillMaxWidth(),
                 )
                 Spacer(
                     modifier = Modifier.height(16.dp),
@@ -1006,7 +1006,7 @@ class PlayerHeaderFragment :
     private fun AdAndArtworkHorizontal(
         artworkOrVideoState: ArtworkOrVideoState,
         playerColors: PlayerColors,
-        modifier: Modifier,
+        modifier: Modifier = Modifier,
     ) {
         when (artworkOrVideoState) {
             is ArtworkOrVideoState.Artwork -> {

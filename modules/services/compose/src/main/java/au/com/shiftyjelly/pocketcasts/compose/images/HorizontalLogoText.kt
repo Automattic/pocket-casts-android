@@ -31,7 +31,7 @@ fun HorizontalLogoText(
 @ShowkaseComposable(name = "Logo", group = "Images", styleName = "HorizontalLogoText - Dark", defaultStyle = true)
 @Preview(name = "Dark")
 @Composable
-fun HorizontalLogoTextDarkPreview() {
+private fun HorizontalLogoTextDarkPreview() {
     AppThemeWithBackground(Theme.ThemeType.LIGHT) {
         HorizontalLogoText()
     }
@@ -40,7 +40,7 @@ fun HorizontalLogoTextDarkPreview() {
 @ShowkaseComposable(name = "Logo", group = "Images", styleName = "HorizontalLogoText - Light")
 @Preview(name = "Light")
 @Composable
-fun HorizontalLogoTextLightPreview() {
+private fun HorizontalLogoTextLightPreview() {
     AppThemeWithBackground(Theme.ThemeType.DARK) {
         HorizontalLogoText()
     }
