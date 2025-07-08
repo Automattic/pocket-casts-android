@@ -128,8 +128,9 @@ class FocusManager(
 
     private fun getAudioFocusRequest(): AudioFocusRequestCompat {
         val attributes = AudioAttributesCompat.Builder()
-            .setContentType(AudioAttributesCompat.CONTENT_TYPE_SPEECH)
-            .setUsage(AudioAttributesCompat.USAGE_MEDIA).build()
+            .setContentType(AudioAttributesCompat.CONTENT_TYPE_MUSIC)
+            .setUsage(AudioAttributesCompat.USAGE_MEDIA)
+            .build()
         return AudioFocusRequestCompat.Builder(AudioManagerCompat.AUDIOFOCUS_GAIN)
             .setWillPauseWhenDucked(true)
             .setOnAudioFocusChangeListener(this)
