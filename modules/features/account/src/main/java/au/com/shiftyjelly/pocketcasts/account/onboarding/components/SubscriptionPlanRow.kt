@@ -31,6 +31,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import au.com.shiftyjelly.pocketcasts.compose.AppThemeWithBackground
@@ -58,7 +59,7 @@ fun AvailablePlanRow(
         isSelected = isSelected,
         onClick = onClick,
         modifier = modifier,
-        badgeConfig = BadgeConfig.availablePlansConfig(),
+        rowConfig = RowConfig.availablePlansConfig(),
     )
 }
 
@@ -68,20 +69,27 @@ fun UpgradePlanRow(
     isSelected: Boolean,
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
-    otherPlan: SubscriptionPlan.Base? = null,
+    priceComparisonPlan: SubscriptionPlan.Base? = null,
 ) {
     SubscriptionPlanRow(
         plan = plan,
         isSelected = isSelected,
         onClick = onClick,
         modifier = modifier,
-        badgeConfig = BadgeConfig.upgradePlansConfig(calculatedSavingPercent = otherPlan?.let { plan.savingsPercent(otherPlan) }),
+        rowConfig = RowConfig.upgradePlansConfig(
+            calculatedSavingPercent = priceComparisonPlan?.let { plan.savingsPercent(priceComparisonPlan) },
+        ),
     )
 }
 
 private enum class BadgePosition {
     RIGHT,
     CENTER,
+}
+
+private enum class PricePerPeriod {
+    PRICE_PER_MONTH,
+    PRICE_PER_WEEK,
 }
 
 private sealed interface BadgeText {
@@ -105,19 +113,28 @@ private sealed interface BadgeText {
     }
 }
 
-private data class BadgeConfig(
+private data class RowConfig(
     val badgeText: BadgeText,
     val badgePosition: BadgePosition,
+    val verticalPadding: Dp,
+    val labelSpacing: Dp,
+    val pricePerPeriod: PricePerPeriod,
 ) {
     companion object {
-        fun availablePlansConfig() = BadgeConfig(
+        fun availablePlansConfig() = RowConfig(
             badgeText = BadgeText.StaticTextResource(LR.string.best_value),
             badgePosition = BadgePosition.RIGHT,
+            verticalPadding = 0.dp,
+            labelSpacing = 0.dp,
+            pricePerPeriod = PricePerPeriod.PRICE_PER_MONTH,
         )
 
-        fun upgradePlansConfig(calculatedSavingPercent: Int?) = BadgeConfig(
+        fun upgradePlansConfig(calculatedSavingPercent: Int?) = RowConfig(
             badgeText = BadgeText.CalculatedText { calculatedSavingPercent?.let { stringResource(LR.string.onboarding_upgrade_save_percent, calculatedSavingPercent) }.orEmpty() },
             badgePosition = BadgePosition.CENTER,
+            verticalPadding = 4.dp,
+            labelSpacing = 4.dp,
+            pricePerPeriod = PricePerPeriod.PRICE_PER_WEEK,
         )
     }
 }
@@ -127,8 +144,8 @@ private fun SubscriptionPlanRow(
     plan: SubscriptionPlan.Base,
     isSelected: Boolean,
     onClick: () -> Unit,
+    rowConfig: RowConfig,
     modifier: Modifier = Modifier,
-    badgeConfig: BadgeConfig,
 ) {
     Box(
         modifier = modifier.fillMaxWidth(),
@@ -156,6 +173,7 @@ private fun SubscriptionPlanRow(
                     indication = ripple(color = MaterialTheme.theme.colors.primaryIcon01),
                     interactionSource = null,
                 )
+                .padding(vertical = rowConfig.verticalPadding)
                 .padding(16.dp),
         ) {
             CheckMark(
@@ -169,6 +187,7 @@ private fun SubscriptionPlanRow(
             )
             Column(
                 modifier = Modifier.weight(1f),
+                verticalArrangement = Arrangement.spacedBy(rowConfig.labelSpacing),
             ) {
                 TextH30(
                     text = plan.name,
@@ -180,14 +199,9 @@ private fun SubscriptionPlanRow(
                     lineHeight = 21.sp,
                 )
             }
-            if (plan.billingCycle == BillingCycle.Yearly) {
-                val currencyCode = plan.pricingPhase.price.currencyCode
+            plan.pricePerPeriod(rowConfig)?.let {
                 TextP40(
-                    text = if (currencyCode == "USD") {
-                        stringResource(LR.string.price_per_month_usd, plan.pricePerMonth)
-                    } else {
-                        stringResource(LR.string.price_per_month, plan.pricePerMonth, currencyCode)
-                    },
+                    text = it,
                     color = MaterialTheme.theme.colors.primaryText02,
                     fontSize = 15.sp,
                     lineHeight = 21.sp,
@@ -196,21 +210,29 @@ private fun SubscriptionPlanRow(
             }
         }
 
-        if (plan.tier == SubscriptionTier.Plus && plan.billingCycle == BillingCycle.Yearly) {
+        val displayLabel = rowConfig.badgeText.text()
+        if (plan.tier == SubscriptionTier.Plus && plan.billingCycle == BillingCycle.Yearly && displayLabel.isNotEmpty()) {
             Box(
                 modifier = Modifier
                     .align(
-                        when (badgeConfig.badgePosition) {
+                        when (rowConfig.badgePosition) {
                             BadgePosition.RIGHT -> Alignment.TopEnd
                             BadgePosition.CENTER -> Alignment.TopCenter
                         },
                     )
-                    .offset(x = (-10).dp, y = (-10).dp)
+                    .offset(
+                        x = if (rowConfig.badgePosition == BadgePosition.RIGHT) {
+                            (-10).dp
+                        } else {
+                            0.dp
+                        },
+                        y = (-10).dp,
+                    )
                     .background(MaterialTheme.theme.colors.primaryField03Active, CircleShape)
                     .padding(horizontal = 12.dp, vertical = 2.dp),
             ) {
                 TextH50(
-                    text = badgeConfig.badgeText.text(),
+                    text = displayLabel,
                     color = MaterialTheme.theme.colors.primaryUi01,
                     disableAutoScale = true,
                 )
@@ -254,17 +276,50 @@ private fun CheckMark(
 
 private val SubscriptionPlan.Base.pricePerMonth: Float
     get() {
-        val pricePerWeek = when (billingCycle) {
+        val pricePerMonth = when (billingCycle) {
             BillingCycle.Monthly -> pricingPhase.price.amount
             BillingCycle.Yearly -> pricingPhase.price.amount / 12.toBigDecimal()
+        }
+        return pricePerMonth.toFloat()
+    }
+
+private val SubscriptionPlan.Base.pricePerWeek: Float
+    get() {
+        val pricePerWeek = when (billingCycle) {
+            BillingCycle.Monthly -> pricingPhase.price.amount / 4.toBigDecimal()
+            BillingCycle.Yearly -> pricingPhase.price.amount / 52.toBigDecimal()
         }
         return pricePerWeek.toFloat()
     }
 
-private fun SubscriptionPlan.Base.savingsPercent(otherPlan: SubscriptionPlan.Base): Int {
-    if (this.billingCycle != BillingCycle.Yearly || otherPlan.billingCycle != BillingCycle.Monthly) return 0
-    return 100 - ((this.pricePerMonth / otherPlan.pricePerMonth) * 100).toInt()
+@Composable
+private fun SubscriptionPlan.Base.pricePerPeriod(config: RowConfig): String? {
+    return if (this.billingCycle == BillingCycle.Yearly) {
+        when (config.pricePerPeriod) {
+            PricePerPeriod.PRICE_PER_MONTH -> {
+                val currencyCode = pricingPhase.price.currencyCode
+                if (currencyCode == "USD") {
+                    stringResource(LR.string.price_per_month_usd, pricePerMonth)
+                } else {
+                    stringResource(LR.string.price_per_month, pricePerMonth, currencyCode)
+                }
+            }
+
+            PricePerPeriod.PRICE_PER_WEEK -> {
+                val currencyCode = pricingPhase.price.currencyCode
+                if (currencyCode == "USD") {
+                    stringResource(LR.string.price_per_week_usd, pricePerWeek)
+                } else {
+                    stringResource(LR.string.price_per_week, pricePerWeek, currencyCode)
+                }
+            }
+        }
+    } else {
+        null
+    }
 }
+
+private fun SubscriptionPlan.Base.savingsPercent(otherPlan: SubscriptionPlan.Base) = 100 - ((this.pricePerMonth / otherPlan.pricePerMonth) * 100).toInt()
 
 @Composable
 @ReadOnlyComposable
@@ -314,7 +369,7 @@ private fun PreviewUpgradePlanSelectors(
                 isSelected = true,
                 modifier = Modifier.fillMaxWidth(),
                 onClick = {},
-                otherPlan = SubscriptionPlan.PlusMonthlyPreview,
+                priceComparisonPlan = SubscriptionPlan.PlusMonthlyPreview,
             )
             UpgradePlanRow(
                 plan = SubscriptionPlan.PlusMonthlyPreview,
