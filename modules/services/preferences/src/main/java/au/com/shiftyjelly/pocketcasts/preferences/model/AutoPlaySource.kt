@@ -31,7 +31,7 @@ sealed interface AutoPlaySource {
     }
 
     companion object {
-        private val Constants = listOf(None, Downloads, Files, Starred)
+        private val Constants by lazy(LazyThreadSafetyMode.NONE) { listOf(None, Downloads, Files, Starred) }
 
         fun fromId(id: String) = when {
             runCatching { UUID.fromString(id) }.isSuccess -> PodcastOrFilter(id)
