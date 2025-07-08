@@ -5,6 +5,6 @@ import com.squareup.moshi.JsonClass
 
 @JsonClass(generateAdapter = true)
 data class SubscriptionPurchaseRequest(
-    @field:Json(name = "purchaseToken") val purchaseToken: String,
-    @field:Json(name = "sku") val sku: String,
+    @Json(name = "purchaseToken") val purchaseToken: String,
+    @Json(name = "sku") val sku: String,
 )

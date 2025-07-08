@@ -7,7 +7,7 @@ import com.squareup.moshi.JsonClass
 
 @JsonClass(generateAdapter = true)
 data class ColorsResponse(
-    @field:Json(name = "colors") val colors: Colors?,
+    @Json(name = "colors") val colors: Colors?,
 ) {
 
     fun toArtworkColors(): ArtworkColors {
@@ -26,7 +26,7 @@ data class ColorsResponse(
 
 @JsonClass(generateAdapter = true)
 data class Colors(
-    @field:Json(name = "background") val background: String,
-    @field:Json(name = "tintForDarkBg") val tintForDarkBg: String,
-    @field:Json(name = "tintForLightBg") val tintForLightBg: String,
+    @Json(name = "background") val background: String,
+    @Json(name = "tintForDarkBg") val tintForDarkBg: String,
+    @Json(name = "tintForLightBg") val tintForLightBg: String,
 )

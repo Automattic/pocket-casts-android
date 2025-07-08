@@ -7,78 +7,78 @@ import java.util.Date
 
 @JsonClass(generateAdapter = true)
 data class FilePostBody(
-    @field:Json(name = "files") val files: List<FilePost>,
+    @Json(name = "files") val files: List<FilePost>,
 )
 
 @JsonClass(generateAdapter = true)
 data class FilePost(
-    @field:Json(name = "uuid") val uuid: String,
-    @field:Json(name = "title") val title: String,
-    @field:Json(name = "colour") val colour: Int,
-    @field:Json(name = "playedUpTo") val playedUpTo: Int,
-    @field:Json(name = "playingStatus") val playingStatus: Int,
-    @field:Json(name = "duration") val duration: Int,
-    @field:Json(name = "hasCustomImage") val hasCustomImage: Boolean,
+    @Json(name = "uuid") val uuid: String,
+    @Json(name = "title") val title: String,
+    @Json(name = "colour") val colour: Int,
+    @Json(name = "playedUpTo") val playedUpTo: Int,
+    @Json(name = "playingStatus") val playingStatus: Int,
+    @Json(name = "duration") val duration: Int,
+    @Json(name = "hasCustomImage") val hasCustomImage: Boolean,
 )
 
 @JsonClass(generateAdapter = true)
 data class FileUploadData(
-    @field:Json(name = "uuid") val uuid: String,
-    @field:Json(name = "title") val title: String,
-    @field:Json(name = "colour") val colour: Int,
-    @field:Json(name = "contentType") val contentType: String,
-    @field:Json(name = "duration") val duration: Int,
+    @Json(name = "uuid") val uuid: String,
+    @Json(name = "title") val title: String,
+    @Json(name = "colour") val colour: Int,
+    @Json(name = "contentType") val contentType: String,
+    @Json(name = "duration") val duration: Int,
 )
 
 @JsonClass(generateAdapter = true)
 data class FileImageUploadData(
-    @field:Json(name = "uuid") val uuid: String,
-    @field:Json(name = "size") val size: Long,
-    @field:Json(name = "contentType") val contentType: String,
+    @Json(name = "uuid") val uuid: String,
+    @Json(name = "size") val size: Long,
+    @Json(name = "contentType") val contentType: String,
 )
 
 @JsonClass(generateAdapter = true)
 data class ServerFile(
-    @field:Json(name = "uuid") val uuid: String,
-    @field:Json(name = "colour") val colour: Int,
-    @field:Json(name = "contentType") val contentType: String,
-    @field:Json(name = "duration") val duration: Int,
-    @field:Json(name = "hasCustomImage") val hasCustomImage: Boolean,
-    @field:Json(name = "imageUrl") val imageUrl: String,
-    @field:Json(name = "playedUpTo") val playedUpTo: Int,
-    @field:Json(name = "playedUpToModified") val playedUpToModified: Long,
-    @field:Json(name = "playingStatus") val playingStatus: EpisodePlayingStatus,
-    @field:Json(name = "playingStatusModified") val playingStatusModified: Long,
-    @field:Json(name = "published") val publishedDate: Date,
-    @field:Json(name = "size") val size: Long,
-    @field:Json(name = "title") val title: String,
+    @Json(name = "uuid") val uuid: String,
+    @Json(name = "colour") val colour: Int,
+    @Json(name = "contentType") val contentType: String,
+    @Json(name = "duration") val duration: Int,
+    @Json(name = "hasCustomImage") val hasCustomImage: Boolean,
+    @Json(name = "imageUrl") val imageUrl: String,
+    @Json(name = "playedUpTo") val playedUpTo: Int,
+    @Json(name = "playedUpToModified") val playedUpToModified: Long,
+    @Json(name = "playingStatus") val playingStatus: EpisodePlayingStatus,
+    @Json(name = "playingStatusModified") val playingStatusModified: Long,
+    @Json(name = "published") val publishedDate: Date,
+    @Json(name = "size") val size: Long,
+    @Json(name = "title") val title: String,
 )
 
 @JsonClass(generateAdapter = true)
 data class FileAccount(
-    @field:Json(name = "totalFiles") val totalFiles: Int,
-    @field:Json(name = "totalSize") val totalSize: Long,
-    @field:Json(name = "usedSize") val usedSize: Long,
+    @Json(name = "totalFiles") val totalFiles: Int,
+    @Json(name = "totalSize") val totalSize: Long,
+    @Json(name = "usedSize") val usedSize: Long,
 )
 
 @JsonClass(generateAdapter = true)
 data class FilesResponse(
-    @field:Json(name = "files") val files: List<ServerFile>,
-    @field:Json(name = "account") val account: FileAccount,
+    @Json(name = "files") val files: List<ServerFile>,
+    @Json(name = "account") val account: FileAccount,
 )
 
 @JsonClass(generateAdapter = true)
 data class FileUploadResponse(
-    @field:Json(name = "uuid") val uuid: String,
-    @field:Json(name = "url") val url: String,
+    @Json(name = "uuid") val uuid: String,
+    @Json(name = "url") val url: String,
 )
 
 @JsonClass(generateAdapter = true)
 data class FileUrlResponse(
-    @field:Json(name = "url") val url: String,
+    @Json(name = "url") val url: String,
 )
 
 @JsonClass(generateAdapter = true)
 data class FileUploadStatusResponse(
-    @field:Json(name = "success") val success: Boolean,
+    @Json(name = "success") val success: Boolean,
 )

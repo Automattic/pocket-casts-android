@@ -10,14 +10,14 @@ import java.util.Date
 
 @JsonClass(generateAdapter = true)
 data class PodcastResponse(
-    @field:Json(name = "episode_frequency") val episodeFrequency: String,
-    @field:Json(name = "estimated_next_episode_at") val estimatedNextEpisodeAt: String?,
-    @field:Json(name = "episode_count") val episodeCount: Int,
-    @field:Json(name = "has_more_episodes") val hasMoreEpisodes: Boolean,
-    @field:Json(name = "has_seasons") val hasSeasons: Boolean,
-    @field:Json(name = "season_count") val seasonCount: Int,
-    @field:Json(name = "refresh_allowed") val refreshAllowed: Boolean?,
-    @field:Json(name = "podcast") val podcastInfo: PodcastInfo,
+    @Json(name = "episode_frequency") val episodeFrequency: String,
+    @Json(name = "estimated_next_episode_at") val estimatedNextEpisodeAt: String?,
+    @Json(name = "episode_count") val episodeCount: Int,
+    @Json(name = "has_more_episodes") val hasMoreEpisodes: Boolean,
+    @Json(name = "has_seasons") val hasSeasons: Boolean,
+    @Json(name = "season_count") val seasonCount: Int,
+    @Json(name = "refresh_allowed") val refreshAllowed: Boolean?,
+    @Json(name = "podcast") val podcastInfo: PodcastInfo,
 ) {
 
     // for the moshi code generation to attach a helper
@@ -34,18 +34,18 @@ data class PodcastResponse(
 
 @JsonClass(generateAdapter = true)
 data class PodcastInfo(
-    @field:Json(name = "uuid") val uuid: String,
-    @field:Json(name = "url") val url: String?,
-    @field:Json(name = "title") val title: String?,
-    @field:Json(name = "author") val author: String?,
-    @field:Json(name = "description") val description: String?,
-    @field:Json(name = "description_html") val descriptionHtml: String?,
-    @field:Json(name = "show_type") val showType: String?,
-    @field:Json(name = "category") val category: String?,
-    @field:Json(name = "audio") val audio: Boolean?,
-    @field:Json(name = "episodes") val episodes: List<EpisodeInfo>?,
-    @field:Json(name = "is_private") val isPrivate: Boolean?,
-    @field:Json(name = "fundings") val fundings: List<Funding>?,
+    @Json(name = "uuid") val uuid: String,
+    @Json(name = "url") val url: String?,
+    @Json(name = "title") val title: String?,
+    @Json(name = "author") val author: String?,
+    @Json(name = "description") val description: String?,
+    @Json(name = "description_html") val descriptionHtml: String?,
+    @Json(name = "show_type") val showType: String?,
+    @Json(name = "category") val category: String?,
+    @Json(name = "audio") val audio: Boolean?,
+    @Json(name = "episodes") val episodes: List<EpisodeInfo>?,
+    @Json(name = "is_private") val isPrivate: Boolean?,
+    @Json(name = "fundings") val fundings: List<Funding>?,
 ) {
 
     fun toPodcast(): Podcast {
@@ -69,22 +69,22 @@ data class PodcastInfo(
 
 @JsonClass(generateAdapter = true)
 data class Funding(
-    @field:Json(name = "url") val url: String,
-    @field:Json(name = "title") val title: String?,
+    @Json(name = "url") val url: String,
+    @Json(name = "title") val title: String?,
 )
 
 @JsonClass(generateAdapter = true)
 data class EpisodeInfo(
-    @field:Json(name = "uuid") val uuid: String,
-    @field:Json(name = "title") val title: String?,
-    @field:Json(name = "season") val season: Long?,
-    @field:Json(name = "number") val number: Long?,
-    @field:Json(name = "type") val type: String?,
-    @field:Json(name = "url") val url: String,
-    @field:Json(name = "file_type") val fileType: String?,
-    @field:Json(name = "file_size") val fileSize: Long?,
-    @field:Json(name = "duration") val duration: Double?,
-    @field:Json(name = "published") val published: String,
+    @Json(name = "uuid") val uuid: String,
+    @Json(name = "title") val title: String?,
+    @Json(name = "season") val season: Long?,
+    @Json(name = "number") val number: Long?,
+    @Json(name = "type") val type: String?,
+    @Json(name = "url") val url: String,
+    @Json(name = "file_type") val fileType: String?,
+    @Json(name = "file_size") val fileSize: Long?,
+    @Json(name = "duration") val duration: Double?,
+    @Json(name = "published") val published: String,
 ) {
 
     fun toEpisode(podcastUuid: String): PodcastEpisode? {
