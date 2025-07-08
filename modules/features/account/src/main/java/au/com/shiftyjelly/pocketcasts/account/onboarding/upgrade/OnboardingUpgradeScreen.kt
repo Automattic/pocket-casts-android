@@ -2,15 +2,21 @@ package au.com.shiftyjelly.pocketcasts.account.onboarding.upgrade
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
+import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.statusBars
+import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.pager.VerticalPager
@@ -44,16 +50,16 @@ import au.com.shiftyjelly.pocketcasts.compose.components.TextH40
 import au.com.shiftyjelly.pocketcasts.compose.images.SubscriptionBadge
 import au.com.shiftyjelly.pocketcasts.compose.preview.ThemePreviewParameterProvider
 import au.com.shiftyjelly.pocketcasts.compose.theme
+import au.com.shiftyjelly.pocketcasts.images.R
 import au.com.shiftyjelly.pocketcasts.payment.SubscriptionPlan
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme.ThemeType
 import kotlinx.coroutines.launch
-import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 @Composable
 fun OnboardingUpgradeScreen(
-    onClosePressed: () -> Unit,
-    onSubscribePressed: () -> Unit,
+    onClosePress: () -> Unit,
+    onSubscribePress: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val plans = listOf(
@@ -63,49 +69,33 @@ fun OnboardingUpgradeScreen(
 
     var selectedPlan by remember { mutableStateOf(plans[0]) }
 
-    Box(modifier = modifier.background(color = MaterialTheme.colors.background)) {
-        IconButton(
-            onClick = onClosePressed,
-            modifier = Modifier.align(Alignment.TopEnd),
-        ) {
-            Box(
-                modifier = Modifier
-                    .size(28.dp)
-                    .background(color = MaterialTheme.theme.colors.primaryUi05, shape = CircleShape),
-                contentAlignment = Alignment.Center,
-            ) {
-                Icon(
-                    modifier = Modifier.size(24.dp),
-                    painter = painterResource(IR.drawable.ic_close),
-                    contentDescription = stringResource(au.com.shiftyjelly.pocketcasts.localization.R.string.close),
-                    tint = MaterialTheme.theme.colors.primaryIcon01,
-                )
-            }
-        }
-
-        Column(
+    Column(
+        modifier = modifier
+            .windowInsetsPadding(WindowInsets.statusBars)
+            .windowInsetsPadding(WindowInsets.navigationBars)
+            .background(color = MaterialTheme.colors.background)
+            .fillMaxSize()
+            .padding(
+                horizontal = 24.dp,
+            ),
+    ) {
+        UpgradeHeader(
+            selectedPlan = selectedPlan,
+            onClosePress = onClosePress,
+        )
+        Spacer(modifier = Modifier.height(24.dp))
+        UpgradeContent(
+            modifier = Modifier.weight(1f),
+        )
+        Spacer(modifier = Modifier.height(16.dp))
+        UpgradeFooter(
             modifier = Modifier
-                .fillMaxSize()
-                .padding(
-                    horizontal = 24.dp,
-                    vertical = 16.dp,
-                ),
-        ) {
-            UpgradeHeader(selectedPlan = selectedPlan)
-            Spacer(modifier = Modifier.height(24.dp))
-            UpgradeContent(
-                modifier = Modifier.weight(1f),
-            )
-            Spacer(modifier = Modifier.height(16.dp))
-            UpgradeFooter(
-                modifier = Modifier
-                    .fillMaxWidth(),
-                plans = plans,
-                selectedPlan = selectedPlan,
-                onSelectedChanged = { selectedPlan = it },
-                onClickSubscribe = { onSubscribePressed() },
-            )
-        }
+                .fillMaxWidth(),
+            plans = plans,
+            selectedPlan = selectedPlan,
+            onSelectedChange = { selectedPlan = it },
+            onClickSubscribe = { onSubscribePress() },
+        )
     }
 }
 
@@ -113,7 +103,7 @@ fun OnboardingUpgradeScreen(
 private fun UpgradeFooter(
     plans: List<SubscriptionPlan.Base>,
     selectedPlan: SubscriptionPlan.Base,
-    onSelectedChanged: (SubscriptionPlan.Base) -> Unit,
+    onSelectedChange: (SubscriptionPlan.Base) -> Unit,
     onClickSubscribe: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -126,8 +116,8 @@ private fun UpgradeFooter(
             UpgradePlanRow(
                 plan = item,
                 isSelected = selectedPlan == item,
-                onClick = { onSelectedChanged(item) },
-                otherPlan = SubscriptionPlan.PlusMonthlyPreview,
+                onClick = { onSelectedChange(item) },
+                priceComparisonPlan = SubscriptionPlan.PlusMonthlyPreview,
             )
             Spacer(modifier = Modifier.height(10.dp))
         }
@@ -155,20 +145,44 @@ private fun UpgradeFooter(
 @Composable
 private fun UpgradeHeader(
     selectedPlan: SubscriptionPlan.Base,
+    onClosePress: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val selectedOnboardingPlan = remember(selectedPlan) { OnboardingSubscriptionPlan.create(selectedPlan) }
 
     Column(modifier = modifier) {
-        SubscriptionBadge(
-            iconRes = selectedOnboardingPlan.badgeIconRes,
-            shortNameRes = selectedOnboardingPlan.shortNameRes,
-            backgroundColor = Color.Black,
-            textColor = Color.White,
-            modifier = Modifier
-                .wrapContentWidth()
-                .wrapContentHeight(),
-        )
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            SubscriptionBadge(
+                iconRes = selectedOnboardingPlan.badgeIconRes,
+                shortNameRes = selectedOnboardingPlan.shortNameRes,
+                backgroundColor = Color.Black,
+                textColor = Color.White,
+                modifier = Modifier
+                    .wrapContentWidth()
+                    .wrapContentHeight(),
+            )
+            IconButton(
+                onClick = onClosePress,
+            ) {
+                Box(
+                    modifier = Modifier
+                        .size(28.dp)
+                        .background(color = MaterialTheme.theme.colors.primaryUi05, shape = CircleShape),
+                    contentAlignment = Alignment.Center,
+                ) {
+                    Icon(
+                        modifier = Modifier.size(24.dp),
+                        painter = painterResource(R.drawable.ic_close),
+                        contentDescription = stringResource(LR.string.close),
+                        tint = MaterialTheme.theme.colors.primaryIcon01,
+                    )
+                }
+            }
+        }
         Spacer(modifier = Modifier.height(24.dp))
         TextH10(
             text = stringResource(LR.string.onboarding_upgrade_generic_title),
@@ -181,34 +195,35 @@ private fun UpgradeHeader(
 private fun UpgradeContent(
     modifier: Modifier = Modifier,
 ) {
-    Column(modifier = modifier) {
-        val pagerState = rememberPagerState(initialPage = 0) { 2 }
-        val coroutineScope = rememberCoroutineScope()
-        VerticalPager(state = pagerState, modifier = Modifier.fillMaxSize()) { page ->
-            if (page == 0) {
-                FeaturesContent(
-                    onClicked = {
-                        coroutineScope.launch {
-                            pagerState.animateScrollToPage(1)
-                        }
-                    },
-                )
-            } else {
-                ScheduleContent(
-                    onClicked = {
-                        coroutineScope.launch {
-                            pagerState.animateScrollToPage(0)
-                        }
-                    },
-                )
-            }
+    val pagerState = rememberPagerState(initialPage = 0) { 2 }
+    val coroutineScope = rememberCoroutineScope()
+    VerticalPager(
+        modifier = modifier,
+        state = pagerState,
+    ) { page ->
+        if (page == 0) {
+            FeaturesContent(
+                onClick = {
+                    coroutineScope.launch {
+                        pagerState.animateScrollToPage(1)
+                    }
+                },
+            )
+        } else {
+            ScheduleContent(
+                onClick = {
+                    coroutineScope.launch {
+                        pagerState.animateScrollToPage(0)
+                    }
+                },
+            )
         }
     }
 }
 
 @Composable
 private fun FeaturesContent(
-    onClicked: (() -> Unit)? = null,
+    onClick: (() -> Unit)? = null,
 ) {
     Box(
         contentAlignment = Alignment.Center,
@@ -216,13 +231,13 @@ private fun FeaturesContent(
             .fillMaxWidth()
             .heightIn(min = 92.dp),
     ) {
-        TextH40(text = "Features content", modifier = Modifier.clickable { onClicked?.invoke() })
+        TextH40(text = "Features content", modifier = Modifier.clickable { onClick?.invoke() })
     }
 }
 
 @Composable
 private fun ScheduleContent(
-    onClicked: (() -> Unit)? = null,
+    onClick: (() -> Unit)? = null,
 ) {
     Box(
         contentAlignment = Alignment.Center,
@@ -230,7 +245,7 @@ private fun ScheduleContent(
             .fillMaxWidth()
             .heightIn(min = 92.dp),
     ) {
-        TextH40(text = "Schedule content", modifier = Modifier.clickable { onClicked?.invoke() })
+        TextH40(text = "Schedule content", modifier = Modifier.clickable { onClick?.invoke() })
     }
 }
 
@@ -242,8 +257,8 @@ private fun PreviewOnboardingUpgradeScreen(
     AppThemeWithBackground(theme) {
         OnboardingUpgradeScreen(
             modifier = Modifier.fillMaxSize(),
-            onSubscribePressed = {},
-            onClosePressed = {},
+            onSubscribePress = {},
+            onClosePress = {},
         )
     }
 }
