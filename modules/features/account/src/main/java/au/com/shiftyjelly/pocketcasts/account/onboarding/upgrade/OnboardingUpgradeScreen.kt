@@ -59,7 +59,6 @@ import au.com.shiftyjelly.pocketcasts.images.R
 import au.com.shiftyjelly.pocketcasts.payment.SubscriptionPlan
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme.ThemeType
 import kotlinx.coroutines.launch
-import previewItems
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 enum class Variants {
@@ -219,7 +218,7 @@ private fun Variants.toContentPages(currentPlan: OnboardingSubscriptionPlan, isE
             if (isEligibleForTrial) {
                 add(
                     UpgradePagerContent.TrialSchedule(
-                        timelineItems = previewItems(),
+                        timelineItems = UpgradeTrialItem.getPreviewItems(),
                         showCta = false,
                     ),
                 )
@@ -229,7 +228,7 @@ private fun Variants.toContentPages(currentPlan: OnboardingSubscriptionPlan, isE
         Variants.VARIANT_TRIAL_TIMELINE -> {
             add(
                 UpgradePagerContent.TrialSchedule(
-                    timelineItems = previewItems(),
+                    timelineItems = UpgradeTrialItem.getPreviewItems(),
                     showCta = true,
                 ),
             )
@@ -262,12 +261,12 @@ private fun UpgradeContent(
             when (val currentPage = pages[page]) {
                 is UpgradePagerContent.Features -> FeaturesContent(
                     features = currentPage,
-                    onCtaClicked = { coroutineScope.launch { pagerState.animateScrollToPage(pagerState.currentPage + 1) } },
+                    onCtaClick = { coroutineScope.launch { pagerState.animateScrollToPage(pagerState.currentPage + 1) } },
                 )
 
                 is UpgradePagerContent.TrialSchedule -> ScheduleContent(
                     trialSchedule = currentPage,
-                    onCtaClicked = { coroutineScope.launch { pagerState.animateScrollToPage(pagerState.currentPage - 1) } },
+                    onCtaClick = { coroutineScope.launch { pagerState.animateScrollToPage(pagerState.currentPage - 1) } },
                 )
             }
         }
@@ -277,7 +276,7 @@ private fun UpgradeContent(
 @Composable
 private fun FeaturesContent(
     features: UpgradePagerContent.Features,
-    onCtaClicked: () -> Unit,
+    onCtaClick: () -> Unit,
 ) {
     FadedLazyColumn {
         items(features.features.size) {
@@ -291,7 +290,7 @@ private fun FeaturesContent(
             item {
                 TextP40(
                     text = stringResource(LR.string.onboarding_upgrade_features_trial_schedule),
-                    modifier = Modifier.clickable { onCtaClicked() }.padding(top = 24.dp),
+                    modifier = Modifier.clickable { onCtaClick() }.padding(top = 24.dp),
                     color = MaterialTheme.theme.colors.primaryInteractive01,
                 )
             }
@@ -302,7 +301,7 @@ private fun FeaturesContent(
 @Composable
 private fun ScheduleContent(
     trialSchedule: UpgradePagerContent.TrialSchedule,
-    onCtaClicked: () -> Unit,
+    onCtaClick: () -> Unit,
 ) {
     FadedLazyColumn {
         item {
@@ -315,7 +314,7 @@ private fun ScheduleContent(
             item {
                 TextP40(
                     text = stringResource(LR.string.onboarding_upgrade_schedule_see_features),
-                    modifier = Modifier.clickable { onCtaClicked() }.padding(top = 24.dp),
+                    modifier = Modifier.clickable { onCtaClick() }.padding(top = 24.dp),
                     color = MaterialTheme.theme.colors.primaryInteractive01,
                 )
             }

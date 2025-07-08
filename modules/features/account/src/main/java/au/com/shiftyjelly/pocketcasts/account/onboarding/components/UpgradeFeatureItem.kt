@@ -43,7 +43,7 @@ fun UpgradeFeatureItem(
         )
         Spacer(Modifier.width(16.dp))
         HtmlText(
-            html = stringResource(id = item.title),
+            html = stringResource(id = item.title()),
             color = textColor,
             linkColor = textColor,
             textStyleResId = UR.style.H50,
