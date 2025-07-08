@@ -158,6 +158,9 @@ subprojects {
             compilerOptions {
                 jvmTarget.set(javaTarget)
                 allWarningsAsErrors.set(true)
+                freeCompilerArgs.addAll(
+                    "-Xannotation-default-target=param-property",
+                )
                 optIn.addAll("kotlin.RequiresOptIn")
             }
         }

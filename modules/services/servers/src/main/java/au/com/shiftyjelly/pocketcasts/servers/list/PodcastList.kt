@@ -6,11 +6,11 @@ import com.squareup.moshi.JsonClass
 
 @JsonClass(generateAdapter = true)
 data class PodcastList(
-    @field:Json(name = "title") val title: String,
-    @field:Json(name = "description") val description: String?,
-    @field:Json(name = "podcasts") val podcasts: List<ListPodcast>,
-    @field:Json(name = "datetime") val date: String?,
-    @field:Json(name = "h") val hash: String?,
+    @Json(name = "title") val title: String,
+    @Json(name = "description") val description: String?,
+    @Json(name = "podcasts") val podcasts: List<ListPodcast>,
+    @Json(name = "datetime") val date: String?,
+    @Json(name = "h") val hash: String?,
 ) {
     val fullPodcasts: List<Podcast>
         get() = podcasts.map { it.toPodcast() }
@@ -18,9 +18,9 @@ data class PodcastList(
 
 @JsonClass(generateAdapter = true)
 data class ListPodcast(
-    @field:Json(name = "uuid") val uuid: String,
-    @field:Json(name = "title") val title: String,
-    @field:Json(name = "author") val author: String,
+    @Json(name = "uuid") val uuid: String,
+    @Json(name = "title") val title: String,
+    @Json(name = "author") val author: String,
 ) {
     companion object {
         fun fromPodcast(podcast: Podcast): ListPodcast {

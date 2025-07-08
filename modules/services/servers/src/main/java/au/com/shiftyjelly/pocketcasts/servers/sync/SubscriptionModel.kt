@@ -11,27 +11,27 @@ import java.util.Date
 
 @JsonClass(generateAdapter = true)
 data class SubscriptionStatusResponse(
-    @field:Json(name = "autoRenewing") val autoRenewing: Boolean,
-    @field:Json(name = "expiryDate") val expiryDate: Date?,
-    @field:Json(name = "giftDays") val giftDays: Int,
-    @field:Json(name = "paid") val paid: Int,
-    @field:Json(name = "platform") val platform: Int,
-    @field:Json(name = "frequency") val frequency: Int,
-    @field:Json(name = "subscriptions") val subscriptions: List<SubscriptionResponse>?,
-    @field:Json(name = "type") val type: Int,
-    @field:Json(name = "tier") val tier: String?,
-    @field:Json(name = "index") val index: Int,
+    @Json(name = "autoRenewing") val autoRenewing: Boolean,
+    @Json(name = "expiryDate") val expiryDate: Date?,
+    @Json(name = "giftDays") val giftDays: Int,
+    @Json(name = "paid") val paid: Int,
+    @Json(name = "platform") val platform: Int,
+    @Json(name = "frequency") val frequency: Int,
+    @Json(name = "subscriptions") val subscriptions: List<SubscriptionResponse>?,
+    @Json(name = "type") val type: Int,
+    @Json(name = "tier") val tier: String?,
+    @Json(name = "index") val index: Int,
 )
 
 @JsonClass(generateAdapter = true)
 data class SubscriptionResponse(
-    @field:Json(name = "type") val type: Int,
-    @field:Json(name = "tier") val tier: String?,
-    @field:Json(name = "platform") val platform: Int,
-    @field:Json(name = "frequency") val frequency: Int,
-    @field:Json(name = "expiryDate") val expiryDate: Date?,
-    @field:Json(name = "autoRenewing") val autoRenewing: Boolean,
-    @field:Json(name = "giftDays") val giftDays: Int,
+    @Json(name = "type") val type: Int,
+    @Json(name = "tier") val tier: String?,
+    @Json(name = "platform") val platform: Int,
+    @Json(name = "frequency") val frequency: Int,
+    @Json(name = "expiryDate") val expiryDate: Date?,
+    @Json(name = "autoRenewing") val autoRenewing: Boolean,
+    @Json(name = "giftDays") val giftDays: Int,
 )
 
 fun SubscriptionStatusResponse.toSubscription(): Subscription? {

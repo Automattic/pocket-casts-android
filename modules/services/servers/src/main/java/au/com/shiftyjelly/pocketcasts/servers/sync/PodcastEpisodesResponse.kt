@@ -5,19 +5,19 @@ import com.squareup.moshi.JsonClass
 
 @JsonClass(generateAdapter = true)
 data class PodcastEpisodesResponse(
-    @field:Json(name = "episodesSortOrder") val episodesSortOrder: Int?,
-    @field:Json(name = "autoStartFrom") val autoStartFrom: Int?,
-    @field:Json(name = "subscribed") val subscribed: Boolean?,
-    @field:Json(name = "episodes") val episodes: List<PodcastEpisode>?,
+    @Json(name = "episodesSortOrder") val episodesSortOrder: Int?,
+    @Json(name = "autoStartFrom") val autoStartFrom: Int?,
+    @Json(name = "subscribed") val subscribed: Boolean?,
+    @Json(name = "episodes") val episodes: List<PodcastEpisode>?,
 )
 
 @JsonClass(generateAdapter = true)
 data class PodcastEpisode(
-    @field:Json(name = "uuid") val uuid: String,
-    @field:Json(name = "duration") val duration: Long?,
-    @field:Json(name = "playingStatus") val playingStatus: Int?,
-    @field:Json(name = "playedUpTo") val playedUpTo: Int?,
-    @field:Json(name = "isDeleted") val isArchived: Boolean?,
-    @field:Json(name = "starred") val starred: Boolean?,
-    @field:Json(name = "deselectedChapters") val deselectedChapters: String?,
+    @Json(name = "uuid") val uuid: String,
+    @Json(name = "duration") val duration: Long?,
+    @Json(name = "playingStatus") val playingStatus: Int?,
+    @Json(name = "playedUpTo") val playedUpTo: Int?,
+    @Json(name = "isDeleted") val isArchived: Boolean?,
+    @Json(name = "starred") val starred: Boolean?,
+    @Json(name = "deselectedChapters") val deselectedChapters: String?,
 )

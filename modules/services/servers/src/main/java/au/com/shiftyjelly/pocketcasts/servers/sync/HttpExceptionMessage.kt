@@ -20,8 +20,8 @@ fun HttpException.parseErrorResponse(moshi: Moshi): ErrorResponse? {
 
 @JsonClass(generateAdapter = true)
 data class ErrorResponse(
-    @field:Json(name = "errorMessage") val message: String,
-    @field:Json(name = "errorMessageId") val messageId: String,
+    @Json(name = "errorMessage") val message: String,
+    @Json(name = "errorMessageId") val messageId: String,
 ) {
 
     fun messageLocalized(resources: Resources): String {

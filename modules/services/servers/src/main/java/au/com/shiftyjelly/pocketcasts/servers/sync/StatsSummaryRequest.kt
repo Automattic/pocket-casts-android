@@ -5,6 +5,6 @@ import com.squareup.moshi.JsonClass
 
 @JsonClass(generateAdapter = true)
 data class StatsSummaryRequest(
-    @field:Json(name = "deviceId") val deviceId: String,
-    @field:Json(name = "deviceType") val deviceType: Int = 2,
+    @Json(name = "deviceId") val deviceId: String,
+    @Json(name = "deviceType") val deviceType: Int = 2,
 )

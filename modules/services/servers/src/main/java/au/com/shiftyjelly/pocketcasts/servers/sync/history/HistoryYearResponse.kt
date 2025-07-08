@@ -6,6 +6,6 @@ import com.squareup.moshi.JsonClass
 
 @JsonClass(generateAdapter = true)
 data class HistoryYearResponse(
-    @field:Json(name = "count") val count: Long?,
-    @field:Json(name = "history") val history: HistorySyncResponse?,
+    @Json(name = "count") val count: Long?,
+    @Json(name = "history") val history: HistorySyncResponse?,
 )
