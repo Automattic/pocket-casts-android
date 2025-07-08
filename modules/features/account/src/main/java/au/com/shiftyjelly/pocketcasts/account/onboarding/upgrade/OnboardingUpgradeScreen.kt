@@ -20,8 +20,8 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBars
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.layout.wrapContentHeight
+import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.layout.wrapContentWidth
-import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.pager.VerticalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.shape.CircleShape
@@ -49,6 +49,7 @@ import au.com.shiftyjelly.pocketcasts.account.onboarding.components.UpgradePlanR
 import au.com.shiftyjelly.pocketcasts.account.onboarding.upgrade.OnboardingUpgradeHelper.PrivacyPolicy
 import au.com.shiftyjelly.pocketcasts.account.onboarding.upgrade.OnboardingUpgradeHelper.UpgradeRowButton
 import au.com.shiftyjelly.pocketcasts.compose.AppThemeWithBackground
+import au.com.shiftyjelly.pocketcasts.compose.components.FadedLazyColumn
 import au.com.shiftyjelly.pocketcasts.compose.components.TextH10
 import au.com.shiftyjelly.pocketcasts.compose.components.TextP40
 import au.com.shiftyjelly.pocketcasts.compose.images.SubscriptionBadge
@@ -59,7 +60,6 @@ import au.com.shiftyjelly.pocketcasts.payment.SubscriptionPlan
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme.ThemeType
 import kotlinx.coroutines.launch
 import previewItems
-import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 enum class Variants {
@@ -211,14 +211,14 @@ private fun Variants.toContentPages(currentPlan: OnboardingSubscriptionPlan, isE
     when (this@toContentPages) {
         Variants.VARIANT_FEATURES -> {
             add(
-                ContentPage.Features(
+                UpgradePagerContent.Features(
                     features = currentPlan.featureItems,
                     showCta = true,
                 ),
             )
             if (isEligibleForTrial) {
                 add(
-                    ContentPage.TrialSchedule(
+                    UpgradePagerContent.TrialSchedule(
                         timelineItems = previewItems(),
                         showCta = false,
                     ),
@@ -228,13 +228,13 @@ private fun Variants.toContentPages(currentPlan: OnboardingSubscriptionPlan, isE
 
         Variants.VARIANT_TRIAL_TIMELINE -> {
             add(
-                ContentPage.TrialSchedule(
+                UpgradePagerContent.TrialSchedule(
                     timelineItems = previewItems(),
                     showCta = true,
                 ),
             )
             add(
-                ContentPage.Features(
+                UpgradePagerContent.Features(
                     features = currentPlan.featureItems,
                     showCta = false,
                 ),
@@ -243,16 +243,16 @@ private fun Variants.toContentPages(currentPlan: OnboardingSubscriptionPlan, isE
     }
 }
 
-sealed interface ContentPage {
+private sealed interface UpgradePagerContent {
     val showCta: Boolean
 
-    data class Features(val features: List<UpgradeFeatureItem>, override val showCta: Boolean) : ContentPage
-    data class TrialSchedule(val timelineItems: List<UpgradeTrialItem>, override val showCta: Boolean) : ContentPage
+    data class Features(val features: List<UpgradeFeatureItem>, override val showCta: Boolean) : UpgradePagerContent
+    data class TrialSchedule(val timelineItems: List<UpgradeTrialItem>, override val showCta: Boolean) : UpgradePagerContent
 }
 
 @Composable
 private fun UpgradeContent(
-    pages: List<ContentPage>,
+    pages: List<UpgradePagerContent>,
     modifier: Modifier = Modifier,
 ) {
     Column(modifier = modifier) {
@@ -260,14 +260,14 @@ private fun UpgradeContent(
         val coroutineScope = rememberCoroutineScope()
         VerticalPager(state = pagerState, modifier = Modifier.fillMaxSize()) { page ->
             when (val currentPage = pages[page]) {
-                is ContentPage.Features -> FeaturesContent(
+                is UpgradePagerContent.Features -> FeaturesContent(
                     features = currentPage,
-                    onCtaClicked = { coroutineScope.launch { pagerState.animateScrollToPage(pages.size - page - 1) } },
+                    onCtaClicked = { coroutineScope.launch { pagerState.animateScrollToPage(pagerState.currentPage + 1) } },
                 )
 
-                is ContentPage.TrialSchedule -> ScheduleContent(
+                is UpgradePagerContent.TrialSchedule -> ScheduleContent(
                     trialSchedule = currentPage,
-                    onCtaClicked = { coroutineScope.launch { pagerState.animateScrollToPage(pages.size - page - 1) } },
+                    onCtaClicked = { coroutineScope.launch { pagerState.animateScrollToPage(pagerState.currentPage - 1) } },
                 )
             }
         }
@@ -276,10 +276,10 @@ private fun UpgradeContent(
 
 @Composable
 private fun FeaturesContent(
-    features: ContentPage.Features,
+    features: UpgradePagerContent.Features,
     onCtaClicked: () -> Unit,
 ) {
-    LazyColumn {
+    FadedLazyColumn {
         items(features.features.size) {
             UpgradeFeatureItem(
                 item = features.features[it],
@@ -289,10 +289,9 @@ private fun FeaturesContent(
         }
         if (features.showCta) {
             item {
-                Spacer(modifier = Modifier.height(24.dp))
                 TextP40(
                     text = stringResource(LR.string.onboarding_upgrade_features_trial_schedule),
-                    modifier = Modifier.clickable { onCtaClicked() },
+                    modifier = Modifier.clickable { onCtaClicked() }.padding(top = 24.dp),
                     color = MaterialTheme.theme.colors.primaryInteractive01,
                 )
             }
@@ -302,21 +301,21 @@ private fun FeaturesContent(
 
 @Composable
 private fun ScheduleContent(
-    trialSchedule: ContentPage.TrialSchedule,
+    trialSchedule: UpgradePagerContent.TrialSchedule,
     onCtaClicked: () -> Unit,
 ) {
-    LazyColumn {
+    FadedLazyColumn {
         item {
             UpgradeTrialTimeline(
+                modifier = Modifier.wrapContentSize(),
                 items = trialSchedule.timelineItems,
             )
         }
         if (trialSchedule.showCta) {
             item {
-                Spacer(modifier = Modifier.height(24.dp))
                 TextP40(
                     text = stringResource(LR.string.onboarding_upgrade_schedule_see_features),
-                    modifier = Modifier.clickable { onCtaClicked() },
+                    modifier = Modifier.clickable { onCtaClicked() }.padding(top = 24.dp),
                     color = MaterialTheme.theme.colors.primaryInteractive01,
                 )
             }
