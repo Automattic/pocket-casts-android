@@ -21,6 +21,8 @@
         ([#4167](https://github.com/Automattic/pocket-casts-android/pull/4167))
     *   Fix revamped notifications showing up on wear and automotive
         ([#4177](https://github.com/Automattic/pocket-casts-android/pull/4177))
+    *   Fix upsell notifications showing up even if the user already has an active subscription
+        ([#4216](https://github.com/Automattic/pocket-casts-android/pull/4216))
 
 7.92
 -----
