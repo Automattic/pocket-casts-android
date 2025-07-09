@@ -43,7 +43,7 @@ data class UpgradeTrialItem(
 fun UpgradeTrialTimeline(
     items: List<UpgradeTrialItem>,
     modifier: Modifier = Modifier,
-    spaceBetweenItems: Dp = 16.dp,
+    spaceBetweenItems: Dp = 34.dp,
     iconSize: Dp = 43.dp,
     timelineWidth: Dp = 7.dp,
     iconRightPadding: Dp = 14.dp,
@@ -111,6 +111,7 @@ fun UpgradeTrialTimeline(
                     TextP50(
                         text = item.message,
                         color = MaterialTheme.theme.colors.primaryText01.copy(alpha = 0.5f),
+                        maxLines = 2,
                     )
                 }
             }
@@ -140,13 +141,14 @@ fun UpgradeTrialTimeline(
         }.sum() + max(0, (spaceBetweenItems.toPx().toInt() * (items.size - 1)))
 
         layout(constraints.maxWidth, totalHeight) {
-            var yPosition = 0f
+            var offsetY = 0
             val textOffsetX = iconSizePx + iconPaddingPx
             iconPlaceables.zip(textPlaceables) { icon, text ->
-                iconCenterYPositions.add((yPosition + icon.height / 2f))
-                icon.placeRelative(0, yPosition.toInt())
-                text.placeRelative(textOffsetX.toInt(), yPosition.toInt() + ((icon.height - text.height) / 2))
-                yPosition += icon.height + spaceBetweenItems.toPx()
+                val iconTopOffset = max(0, (text.height - icon.height) / 2)
+                iconCenterYPositions.add((offsetY + iconTopOffset + icon.height / 2f))
+                icon.placeRelative(0, offsetY + iconTopOffset)
+                text.placeRelative(textOffsetX.toInt(), offsetY + max(0, (icon.height - text.height) / 2))
+                offsetY += max(icon.height, text.height) + spaceBetweenItems.toPx().toInt()
             }
         }
     }
@@ -160,9 +162,9 @@ private fun PreviewUpgradeTimeline(
     AppThemeWithBackground(theme) {
         UpgradeTrialTimeline(
             items = listOf(
-                UpgradeTrialItem(iconResId = IR.drawable.ic_star, title = "Star", message = "Message"),
+                UpgradeTrialItem(iconResId = IR.drawable.ic_star, title = "Star", message = "Message".repeat(10)),
                 UpgradeTrialItem(iconResId = IR.drawable.ic_envelope, title = "Envelope", message = "Message"),
-                UpgradeTrialItem(iconResId = IR.drawable.ic_unlocked, title = "Unlocked", message = "Message"),
+                UpgradeTrialItem(iconResId = IR.drawable.ic_unlocked, title = "Unlocked", message = "Message".repeat(20)),
             ),
         )
     }
