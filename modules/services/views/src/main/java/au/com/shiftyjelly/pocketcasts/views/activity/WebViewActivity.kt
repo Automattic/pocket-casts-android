@@ -100,6 +100,7 @@ class WebViewActivity : AppCompatActivity(), CoroutineScope {
         }
 
         binding.webview.settings.javaScriptEnabled = true
+        binding.webview.settings.domStorageEnabled = true
 
         if (savedInstanceState == null) {
             extraUrl?.let { url ->
