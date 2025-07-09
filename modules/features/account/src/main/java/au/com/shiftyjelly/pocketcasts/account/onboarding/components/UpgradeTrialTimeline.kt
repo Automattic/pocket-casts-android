@@ -20,9 +20,11 @@ import androidx.compose.ui.layout.Layout
 import androidx.compose.ui.layout.Placeable
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
+import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import au.com.shiftyjelly.pocketcasts.compose.AppThemeWithBackground
@@ -32,12 +34,34 @@ import au.com.shiftyjelly.pocketcasts.compose.theme
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme.ThemeType
 import kotlin.math.max
 import au.com.shiftyjelly.pocketcasts.images.R as IR
+import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 data class UpgradeTrialItem(
     @DrawableRes val iconResId: Int,
     val title: String,
     val message: String,
-)
+) {
+    companion object {
+        @Composable
+        fun getPreviewItems() = listOf(
+            UpgradeTrialItem(
+                iconResId = IR.drawable.ic_unlocked,
+                title = stringResource(LR.string.onboarding_upgrade_schedule_today),
+                message = stringResource(LR.string.onboarding_upgrade_schedule_today_message),
+            ),
+            UpgradeTrialItem(
+                iconResId = IR.drawable.ic_envelope,
+                title = stringResource(LR.string.onboarding_upgrade_schedule_day, 24),
+                message = stringResource(LR.string.onboarding_upgrade_schedule_notify),
+            ),
+            UpgradeTrialItem(
+                iconResId = IR.drawable.ic_star,
+                title = stringResource(LR.string.onboarding_upgrade_schedule_day, 31),
+                message = stringResource(LR.string.onboarding_upgrade_schedule_billing, "September 31th"),
+            ),
+        )
+    }
+}
 
 @Composable
 fun UpgradeTrialTimeline(
@@ -125,7 +149,11 @@ fun UpgradeTrialTimeline(
         // restrict amount of vertical and horizontal space each item may take
         val modifiedConstraints = constraints.copy(
             minHeight = iconSizePx.toInt(),
-            maxHeight = max(iconSizePx.toInt(), constraints.maxHeight / max(1, items.size)),
+            maxHeight = if (constraints.maxHeight == Constraints.Infinity) {
+                Constraints.Infinity
+            } else {
+                max(iconSizePx.toInt(), constraints.maxHeight / max(1, items.size))
+            },
             minWidth = iconSizePx.toInt(),
             maxWidth = max(iconSizePx.toInt(), (constraints.maxWidth - iconPaddingPx - iconSizePx).toInt()),
         )
@@ -161,11 +189,7 @@ private fun PreviewUpgradeTimeline(
 ) {
     AppThemeWithBackground(theme) {
         UpgradeTrialTimeline(
-            items = listOf(
-                UpgradeTrialItem(iconResId = IR.drawable.ic_star, title = "Star", message = "Message".repeat(10)),
-                UpgradeTrialItem(iconResId = IR.drawable.ic_envelope, title = "Envelope", message = "Message"),
-                UpgradeTrialItem(iconResId = IR.drawable.ic_unlocked, title = "Unlocked", message = "Message".repeat(20)),
-            ),
+            items = UpgradeTrialItem.getPreviewItems(),
         )
     }
 }
