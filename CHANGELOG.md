@@ -15,6 +15,8 @@
     *   Bring back landscape UI
         ([#4156](https://github.com/Automattic/pocket-casts-android/pull/4156))
 *   Bug Fixes
+    *   Fix clip links causing app being unresponsive.
+        ([#4217](https://github.com/Automattic/pocket-casts-android/pull/4217))
     *   Collapse player when opening a notification
         ([#4150](https://github.com/Automattic/pocket-casts-android/pull/4150))
     *   Fix episodes not being removed from the downloads list
