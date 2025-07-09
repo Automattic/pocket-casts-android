@@ -35,7 +35,7 @@ import au.com.shiftyjelly.pocketcasts.ui.extensions.inPortrait
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.utils.Util
 
-private const val ContentMaxWidthDp = 600
+private val ContentMaxWidthDp = 600.dp
 private val ContentPadding = 16.dp
 private val OutlinedBorder: BorderStroke
     @Composable
@@ -84,8 +84,7 @@ fun BottomSheetContent(
         contentAlignment = Alignment.TopCenter,
     ) {
         Column(
-            modifier = modifier
-                .widthIn(max = ContentMaxWidthDp.dp),
+            modifier = Modifier.widthIn(max = ContentMaxWidthDp),
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
             val context = LocalContext.current
@@ -93,25 +92,25 @@ fun BottomSheetContent(
 
             Pill()
 
-            Spacer(modifier = modifier.height(16.dp))
+            Spacer(modifier = Modifier.height(16.dp))
 
             state.content.imageContent?.let { imageContent ->
                 if (LocalConfiguration.current.inPortrait() || Util.isTablet(context)) {
                     imageContent.invoke()
-                    Spacer(modifier = modifier.height(16.dp))
+                    Spacer(modifier = Modifier.height(16.dp))
                 }
             }
 
             SummaryText(content)
 
-            Spacer(modifier = modifier.height(16.dp))
+            Spacer(modifier = Modifier.height(16.dp))
 
-            ConfirmButton(onDismiss, content.primaryButton)
+            ConfirmButton(content.primaryButton, onDismiss)
 
-            Spacer(modifier = modifier.height(16.dp))
+            Spacer(modifier = Modifier.height(16.dp))
 
             if (content.secondaryButton != null) {
-                DismissButton(onDismiss, content.secondaryButton)
+                DismissButton(content.secondaryButton, onDismiss)
             }
         }
     }
@@ -119,8 +118,8 @@ fun BottomSheetContent(
 
 @Composable
 fun Pill(
-    backgroundColor: Color = MaterialTheme.theme.colors.primaryIcon02,
     modifier: Modifier = Modifier,
+    backgroundColor: Color = MaterialTheme.theme.colors.primaryIcon02,
 ) {
     Box(
         modifier = modifier
@@ -141,8 +140,8 @@ private fun SummaryText(content: BottomSheetContentState.Content) {
 
 @Composable
 private fun ConfirmButton(
-    onDismiss: () -> Unit,
     primaryButton: BottomSheetContentState.Content.Button.Primary,
+    onDismiss: () -> Unit,
 ) {
     RowButton(
         text = primaryButton.label,
@@ -160,8 +159,8 @@ private fun ConfirmButton(
 
 @Composable
 private fun DismissButton(
-    onDismiss: () -> Unit,
     secondaryButton: BottomSheetContentState.Content.Button.Secondary,
+    onDismiss: () -> Unit,
 ) {
     RowOutlinedButton(
         text = secondaryButton.label,

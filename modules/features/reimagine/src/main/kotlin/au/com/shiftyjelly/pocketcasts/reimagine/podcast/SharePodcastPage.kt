@@ -158,27 +158,27 @@ private fun HorizontalSharePodcastPage(
     )
 }
 
-@Preview(name = "SharePodcastVerticalRegularPreview", device = Devices.PortraitRegular)
+@Preview(name = "SharePodcastVerticalRegularPreview", device = Devices.PORTRAIT_REGULAR)
 @Composable
 private fun SharePodcastVerticalRegularPreview() = SharePodcastPagePreview()
 
-@Preview(name = "SharePodcastVerticalSmallPreview", device = Devices.PortraitSmall)
+@Preview(name = "SharePodcastVerticalSmallPreview", device = Devices.PORTRAIT_SMALL)
 @Composable
 private fun SharePodcastVerticalSmallPreviewPreview() = SharePodcastPagePreview()
 
-@Preview(name = "SharePodcastVerticalTabletPreview", device = Devices.PortraitTablet)
+@Preview(name = "SharePodcastVerticalTabletPreview", device = Devices.PORTRAIT_TABLET)
 @Composable
 private fun SharePodcastVerticalTabletPreview() = SharePodcastPagePreview()
 
-@Preview(name = "SharePodcastHorizontalRegularPreview", device = Devices.LandscapeRegular)
+@Preview(name = "SharePodcastHorizontalRegularPreview", device = Devices.LANDSCAPE_REGULAR)
 @Composable
 private fun SharePodcastHorizontalRegularPreview() = SharePodcastPagePreview()
 
-@Preview(name = "SharePodcastHorizontalSmallPreview", device = Devices.LandscapeSmall)
+@Preview(name = "SharePodcastHorizontalSmallPreview", device = Devices.LANDSCAPE_SMALL)
 @Composable
 private fun SharePodcastHorizontalSmallPreviewPreview() = SharePodcastPagePreview()
 
-@Preview(name = "SharePodcastHorizontalTabletPreview", device = Devices.LandscapeTablet)
+@Preview(name = "SharePodcastHorizontalTabletPreview", device = Devices.LANDSCAPE_TABLET)
 @Composable
 private fun SharePodcastHorizontalTabletPreview() = SharePodcastPagePreview()
 

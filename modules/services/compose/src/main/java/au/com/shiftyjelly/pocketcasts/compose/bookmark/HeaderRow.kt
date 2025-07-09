@@ -29,13 +29,14 @@ import au.com.shiftyjelly.pocketcasts.localization.R as LR
 @Composable
 fun HeaderRow(
     title: String,
-    onOptionsMenuClicked: () -> Unit,
+    onOptionsMenuClick: () -> Unit,
+    modifier: Modifier = Modifier,
     colors: HeaderRowColors = HeaderRowColors.default(MaterialTheme.theme.colors),
 ) {
     Row(
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically,
-        modifier = Modifier
+        modifier = modifier
             .fillMaxWidth()
             .padding(start = 16.dp, end = 4.dp, top = 4.dp, bottom = 4.dp),
     ) {
@@ -44,7 +45,7 @@ fun HeaderRow(
             color = colors.text,
         )
         IconButton(
-            onClick = { onOptionsMenuClicked() },
+            onClick = { onOptionsMenuClick() },
         ) {
             Icon(
                 painter = painterResource(IR.drawable.ic_more_vert_black_24dp),
@@ -80,7 +81,7 @@ private fun HeaderRowPlayerPreview(
     AppThemeWithBackground(themeType) {
         HeaderRow(
             title = "Header Row",
-            onOptionsMenuClicked = {},
+            onOptionsMenuClick = {},
         )
     }
 }

@@ -69,7 +69,7 @@ fun MarqueeTextMediaDisplay(
 
 @Preview
 @Composable
-fun MarqueeTextMediaDisplayPreview() {
+private fun MarqueeTextMediaDisplayPreview() {
     MarqueeTextMediaDisplay(
         title = "Title",
         artist = "Artist",

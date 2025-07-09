@@ -34,5 +34,4 @@ class PlaybackManagerNetworkWatcher @AssistedInject constructor(
     }
 }
 
-fun NetworkCapabilities.isMetered() =
-    !hasCapability(NetworkCapabilities.NET_CAPABILITY_NOT_METERED)
+fun NetworkCapabilities.isMetered() = !hasCapability(NetworkCapabilities.NET_CAPABILITY_NOT_METERED)

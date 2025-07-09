@@ -37,7 +37,7 @@ import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import au.com.shiftyjelly.pocketcasts.compose.AppTheme
-import au.com.shiftyjelly.pocketcasts.compose.OrientationPreview
+import au.com.shiftyjelly.pocketcasts.compose.PreviewOrientation
 import au.com.shiftyjelly.pocketcasts.compose.components.Banner
 import au.com.shiftyjelly.pocketcasts.compose.components.HorizontalDivider
 import au.com.shiftyjelly.pocketcasts.compose.preview.ThemePreviewParameterProvider
@@ -68,7 +68,7 @@ internal fun ProfilePage(
     themeType: Theme.ThemeType,
     onSendReferralsClick: () -> Unit,
     onReferralsTooltipClick: () -> Unit,
-    onReferralsTooltipShown: () -> Unit,
+    onReferralsTooltipShow: () -> Unit,
     onSettingsClick: () -> Unit,
     onHeaderClick: () -> Unit,
     onCreateFreeAccountBannerClick: () -> Unit,
@@ -76,8 +76,8 @@ internal fun ProfilePage(
     onPlaybackClick: () -> Unit,
     onClaimReferralsClick: () -> Unit,
     onHideReferralsCardClick: () -> Unit,
-    onReferralsCardShown: () -> Unit,
-    onShowReferralsSheet: () -> Unit,
+    onReferralsCardShow: () -> Unit,
+    onReferralsSheetShow: () -> Unit,
     onSectionClick: (ProfileSection) -> Unit,
     onRefreshClick: () -> Unit,
     onUpgradeProfileClick: () -> Unit,
@@ -96,17 +96,17 @@ internal fun ProfilePage(
                 state = state.referralsState,
                 onSendReferralsClick = onSendReferralsClick,
                 onReferralsTooltipClick = onReferralsTooltipClick,
-                onReferralsTooltipShown = onReferralsTooltipShown,
+                onReferralsTooltipShow = onReferralsTooltipShow,
                 onSettingsClick = onSettingsClick,
             )
             LazyColumn(
                 state = listState,
-                modifier = modifier.fillMaxSize(),
+                modifier = Modifier.fillMaxSize(),
             ) {
                 item {
                     VerticalSpacer()
                 }
-                HeaderWithStats(
+                headerWithStats(
                     headerState = state.headerState,
                     statsState = state.statsState,
                     onHeaderClick = onHeaderClick,
@@ -149,8 +149,8 @@ internal fun ProfilePage(
                         state = state.referralsState,
                         onClick = onClaimReferralsClick,
                         onHideBannerClick = onHideReferralsCardClick,
-                        onBannerShown = onReferralsCardShown,
-                        onShowReferralsSheet = onShowReferralsSheet,
+                        onBannerShow = onReferralsCardShow,
+                        onShowReferralsSheet = onReferralsSheetShow,
                         modifier = Modifier.padding(horizontal = horizontalPadding),
                     )
                 }
@@ -239,7 +239,7 @@ private fun Toolbar(
     state: ReferralsViewModel.UiState,
     onSendReferralsClick: () -> Unit,
     onReferralsTooltipClick: () -> Unit,
-    onReferralsTooltipShown: () -> Unit,
+    onReferralsTooltipShow: () -> Unit,
     onSettingsClick: () -> Unit,
 ) {
     Row(
@@ -256,7 +256,7 @@ private fun Toolbar(
             state = state,
             onIconClick = onSendReferralsClick,
             onTooltipClick = onReferralsTooltipClick,
-            onTooltipShown = onReferralsTooltipShown,
+            onTooltipShow = onReferralsTooltipShow,
         )
         if (LocalConfiguration.current.orientation != Configuration.ORIENTATION_LANDSCAPE) {
             Spacer(
@@ -275,7 +275,7 @@ private fun Toolbar(
     }
 }
 
-private fun LazyListScope.HeaderWithStats(
+private fun LazyListScope.headerWithStats(
     headerState: ProfileHeaderState,
     statsState: ProfileStatsState,
     onHeaderClick: () -> Unit,
@@ -343,7 +343,7 @@ private fun MiniPlayerPadding(
     )
 }
 
-@OrientationPreview
+@PreviewOrientation
 @Composable
 private fun ProfilePagePreview() {
     ProfilePageStub(Theme.ThemeType.ROSE)
@@ -393,7 +393,7 @@ private fun ProfilePageStub(
         themeType = theme,
         onClaimReferralsClick = {},
         onReferralsTooltipClick = {},
-        onReferralsTooltipShown = {},
+        onReferralsTooltipShow = {},
         onSettingsClick = {},
         onHeaderClick = {},
         onCreateFreeAccountBannerClick = {},
@@ -401,8 +401,8 @@ private fun ProfilePageStub(
         onPlaybackClick = {},
         onSendReferralsClick = {},
         onHideReferralsCardClick = {},
-        onReferralsCardShown = {},
-        onShowReferralsSheet = {},
+        onReferralsCardShow = {},
+        onReferralsSheetShow = {},
         onSectionClick = {},
         onRefreshClick = {},
         onUpgradeProfileClick = {},

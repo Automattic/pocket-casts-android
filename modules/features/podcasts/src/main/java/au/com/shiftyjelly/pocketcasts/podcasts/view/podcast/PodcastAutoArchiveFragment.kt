@@ -7,6 +7,7 @@ import android.view.ViewGroup
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.selection.toggleable
 import androidx.compose.foundation.verticalScroll
@@ -74,7 +75,7 @@ class PodcastAutoArchiveFragment : BaseFragment() {
         AppThemeWithBackground(themeType = theme.activeTheme) {
             AutoArchiveSettings(
                 state = state,
-                onBackPressed = {
+                onBackPress = {
                     @Suppress("DEPRECATION")
                     activity?.onBackPressed()
                 },
@@ -101,7 +102,7 @@ class PodcastAutoArchiveFragment : BaseFragment() {
     @Composable
     private fun AutoArchiveSettings(
         state: PodcastAutoArchiveViewModel.State,
-        onBackPressed: () -> Unit,
+        onBackPress: () -> Unit,
         modifier: Modifier = Modifier,
     ) {
         Column(
@@ -122,7 +123,7 @@ class PodcastAutoArchiveFragment : BaseFragment() {
             }
             ThemedTopAppBar(
                 title = stringResource(LR.string.settings_title_auto_archive),
-                onNavigationClick = onBackPressed,
+                onNavigationClick = onBackPress,
                 iconColor = Color(toolbarColors.iconColor),
                 textColor = Color(toolbarColors.titleColor),
                 backgroundColor = Color(toolbarColors.backgroundColor),
@@ -163,7 +164,7 @@ class PodcastAutoArchiveFragment : BaseFragment() {
     }
 
     @Composable
-    private fun AutoArchiveSection(
+    private fun ColumnScope.AutoArchiveSection(
         archiveAfterPlaying: AutoArchiveAfterPlaying,
         archiveInactive: AutoArchiveInactive,
         modifier: Modifier = Modifier,
@@ -216,7 +217,7 @@ class PodcastAutoArchiveFragment : BaseFragment() {
     }
 
     @Composable
-    private fun EpisodeLimitSection(
+    private fun ColumnScope.EpisodeLimitSection(
         limit: AutoArchiveLimit,
         modifier: Modifier = Modifier,
     ) {
@@ -253,9 +254,9 @@ class PodcastAutoArchiveFragment : BaseFragment() {
     @Composable
     private fun AutoArchiveAfterPlayedDialog(
         archiveAfterPlaying: AutoArchiveAfterPlaying,
-        modifier: Modifier = Modifier,
         onConfirm: (AutoArchiveAfterPlaying) -> Unit,
         onDismiss: () -> Unit,
+        modifier: Modifier = Modifier,
     ) {
         RadioOptionsDialog(
             title = stringResource(LR.string.podcast_settings_played_episodes),
@@ -271,9 +272,9 @@ class PodcastAutoArchiveFragment : BaseFragment() {
     @Composable
     private fun AutoArchiveInactiveDialog(
         archiveInactive: AutoArchiveInactive,
-        modifier: Modifier = Modifier,
         onConfirm: (AutoArchiveInactive) -> Unit,
         onDismiss: () -> Unit,
+        modifier: Modifier = Modifier,
     ) {
         RadioOptionsDialog(
             title = stringResource(LR.string.settings_inactive_episodes),
@@ -289,9 +290,9 @@ class PodcastAutoArchiveFragment : BaseFragment() {
     @Composable
     private fun EpisodeLimitDialog(
         limit: AutoArchiveLimit,
-        modifier: Modifier = Modifier,
         onConfirm: (AutoArchiveLimit) -> Unit,
         onDismiss: () -> Unit,
+        modifier: Modifier = Modifier,
     ) {
         RadioOptionsDialog(
             title = stringResource(LR.string.settings_auto_archive_episode_limit),

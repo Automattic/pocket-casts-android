@@ -37,7 +37,9 @@ import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
-class ProfileFragment : BaseFragment(), TopScrollable {
+class ProfileFragment :
+    BaseFragment(),
+    TopScrollable {
     private val profileViewModel by viewModels<ProfileViewModel>()
     private val referralsViewModel by viewModels<ReferralsViewModel>()
 
@@ -81,7 +83,7 @@ class ProfileFragment : BaseFragment(), TopScrollable {
             onReferralsTooltipClick = {
                 referralsViewModel.onTooltipClick()
             },
-            onReferralsTooltipShown = {
+            onReferralsTooltipShow = {
                 referralsViewModel.onTooltipShown()
             },
             onSettingsClick = {
@@ -116,10 +118,10 @@ class ProfileFragment : BaseFragment(), TopScrollable {
             onHideReferralsCardClick = {
                 referralsViewModel.onHideBannerClick()
             },
-            onReferralsCardShown = {
+            onReferralsCardShow = {
                 referralsViewModel.onBannerShown()
             },
-            onShowReferralsSheet = {
+            onReferralsSheetShow = {
                 requireActivity().supportFragmentManager
                     .findFragmentByTag(ReferralsGuestPassFragment::class.java.name)
                     ?.let { fragmentHostListener.showBottomSheet(it) }

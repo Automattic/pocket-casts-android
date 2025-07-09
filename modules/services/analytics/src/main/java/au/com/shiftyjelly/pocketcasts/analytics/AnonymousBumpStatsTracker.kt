@@ -11,7 +11,8 @@ import kotlinx.coroutines.launch
 
 class AnonymousBumpStatsTracker @Inject constructor(
     appDatabase: AppDatabase,
-) : Tracker, CoroutineScope {
+) : Tracker,
+    CoroutineScope {
     companion object {
         private val PAID_SPONSOR_RELATED_EVENTS = listOf(
             AnalyticsEvent.DISCOVER_LIST_IMPRESSION,
@@ -22,8 +23,7 @@ class AnonymousBumpStatsTracker @Inject constructor(
             AnalyticsEvent.DISCOVER_LIST_PODCAST_TAPPED,
         )
 
-        private fun shouldTrack(event: AnalyticsEvent) =
-            PAID_SPONSOR_RELATED_EVENTS.contains(event)
+        private fun shouldTrack(event: AnalyticsEvent) = PAID_SPONSOR_RELATED_EVENTS.contains(event)
     }
 
     override val coroutineContext: CoroutineContext = Dispatchers.IO

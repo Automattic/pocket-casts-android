@@ -418,7 +418,11 @@ open class BottomNavigator internal constructor() : ViewModel() {
 
         activityDelegate?.clear()
         activityDelegate = ActivityDelegate(
-            fragmentContainer, modalContainer, fragmentManagerFactory, activity.lifecycle, bottomNavigationView,
+            fragmentContainer,
+            modalContainer,
+            fragmentManagerFactory,
+            activity.lifecycle,
+            bottomNavigationView,
             this,
         )
 

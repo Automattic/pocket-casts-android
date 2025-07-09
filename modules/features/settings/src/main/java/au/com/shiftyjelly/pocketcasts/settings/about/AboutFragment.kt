@@ -2,7 +2,6 @@ package au.com.shiftyjelly.pocketcasts.settings.about
 
 import android.content.Context
 import android.content.Intent
-import android.net.Uri
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.ViewGroup
@@ -49,6 +48,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.core.net.toUri
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
@@ -101,33 +101,33 @@ class AboutFragment : BaseFragment() {
                     analyticsTracker.track(AnalyticsEvent.SETTINGS_ABOUT_LEGAL_AND_MORE_TAPPED, mapOf("row" to "acknowledgements"))
                     (activity as? FragmentHostListener)?.addFragment(fragment)
                 },
-                onBackPressed = { closeFragment() },
+                onBackPress = { closeFragment() },
                 bottomInset = bottomInset.value.pxToDp(LocalContext.current).dp,
-                onRateUsTapped = {
+                onRateUsClick = {
                     analyticsTracker.track(AnalyticsEvent.RATE_US_TAPPED, mapOf("source" to SourceView.ABOUT.analyticsValue))
                 },
-                onShareWithFriendsTapped = {
+                onShareWithFriendsClick = {
                     analyticsTracker.track(AnalyticsEvent.SETTINGS_ABOUT_SHARE_WITH_FRIENDS_TAPPED)
                 },
-                onWebsiteTapped = {
+                onWebsiteClick = {
                     analyticsTracker.track(AnalyticsEvent.SETTINGS_ABOUT_WEBSITE_TAPPED)
                 },
-                onInstagramTapped = {
+                onInstagramClick = {
                     analyticsTracker.track(AnalyticsEvent.SETTINGS_ABOUT_INSTAGRAM_TAPPED)
                 },
-                onXTapped = {
+                onXClick = {
                     analyticsTracker.track(AnalyticsEvent.SETTINGS_ABOUT_X_TAPPED)
                 },
-                onAutomatticFamilyTapped = {
+                onAutomatticFamilyClick = {
                     analyticsTracker.track(AnalyticsEvent.SETTINGS_ABOUT_AUTOMATTIC_FAMILY_TAPPED)
                 },
-                onWorkWithUsTapped = {
+                onWorkWithUsClick = {
                     analyticsTracker.track(AnalyticsEvent.SETTINGS_ABOUT_WORK_WITH_US_TAPPED)
                 },
-                onTermsOfServiceTapped = {
+                onTermsOfServiceClick = {
                     analyticsTracker.track(AnalyticsEvent.SETTINGS_ABOUT_LEGAL_AND_MORE_TAPPED, mapOf("row" to "terms_of_service"))
                 },
-                onPrivacyPolicyTapped = {
+                onPrivacyPolicyClick = {
                     analyticsTracker.track(AnalyticsEvent.SETTINGS_ABOUT_LEGAL_AND_MORE_TAPPED, mapOf("row" to "privacy_policy"))
                 },
             )
@@ -198,18 +198,18 @@ private val icons = listOf(
 
 @Composable
 private fun AboutPage(
-    onBackPressed: () -> Unit,
-    onRateUsTapped: () -> Unit,
-    onShareWithFriendsTapped: () -> Unit,
-    onWebsiteTapped: () -> Unit,
-    onInstagramTapped: () -> Unit,
-    onXTapped: () -> Unit,
-    onAutomatticFamilyTapped: () -> Unit = {},
-    onWorkWithUsTapped: () -> Unit = {},
-    onTermsOfServiceTapped: () -> Unit = {},
-    onPrivacyPolicyTapped: () -> Unit = {},
     bottomInset: Dp,
+    onBackPress: () -> Unit,
+    onRateUsClick: () -> Unit,
+    onShareWithFriendsClick: () -> Unit,
+    onWebsiteClick: () -> Unit,
+    onInstagramClick: () -> Unit,
+    onXClick: () -> Unit,
     openFragment: (Fragment) -> Unit,
+    onAutomatticFamilyClick: () -> Unit = {},
+    onWorkWithUsClick: () -> Unit = {},
+    onTermsOfServiceClick: () -> Unit = {},
+    onPrivacyPolicyClick: () -> Unit = {},
 ) {
     val context = LocalContext.current
     Column(
@@ -218,7 +218,7 @@ private fun AboutPage(
     ) {
         ThemedTopAppBar(
             title = stringResource(LR.string.settings_title_about),
-            onNavigationClick = onBackPressed,
+            onNavigationClick = onBackPress,
         )
         LazyColumn(
             horizontalAlignment = Alignment.CenterHorizontally,
@@ -249,7 +249,7 @@ private fun AboutPage(
                 RowTextButton(
                     text = stringResource(LR.string.settings_about_rate_us),
                     onClick = {
-                        onRateUsTapped()
+                        onRateUsClick()
                         rateUs(context)
                     },
                 )
@@ -258,7 +258,7 @@ private fun AboutPage(
                 RowTextButton(
                     text = stringResource(LR.string.settings_about_share_with_friends),
                     onClick = {
-                        onShareWithFriendsTapped()
+                        onShareWithFriendsClick()
                         shareWithFriends(context)
                     },
                 )
@@ -271,7 +271,7 @@ private fun AboutPage(
                     text = stringResource(LR.string.settings_about_website),
                     secondaryText = "pocketcasts.com",
                     onClick = {
-                        onWebsiteTapped()
+                        onWebsiteClick()
                         openUrl("https://www.pocketcasts.com", context)
                     },
                 )
@@ -281,7 +281,7 @@ private fun AboutPage(
                     text = stringResource(LR.string.settings_about_instagram),
                     secondaryText = "@pocketcasts",
                     onClick = {
-                        onInstagramTapped()
+                        onInstagramClick()
                         openUrl("https://www.instagram.com/pocketcasts/", context)
                     },
                 )
@@ -291,7 +291,7 @@ private fun AboutPage(
                     text = stringResource(LR.string.settings_about_x),
                     secondaryText = "@pocketcasts",
                     onClick = {
-                        onXTapped()
+                        onXClick()
                         openUrl("https://x.com/pocketcasts", context)
                     },
                 )
@@ -300,13 +300,13 @@ private fun AboutPage(
                 HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
             }
             item {
-                AutomatticFamilyRow(onAutomatticFamilyTapped = onAutomatticFamilyTapped)
+                AutomatticFamilyRow(onAutomatticFamilyClick = onAutomatticFamilyClick)
             }
             item {
                 HorizontalDivider(modifier = Modifier.padding(bottom = 8.dp))
             }
             item {
-                LegalAndMoreRow(onTermsOfServiceTapped, onPrivacyPolicyTapped, openFragment)
+                LegalAndMoreRow(onTermsOfServiceClick, onPrivacyPolicyClick, openFragment)
             }
             item {
                 HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
@@ -315,7 +315,7 @@ private fun AboutPage(
                 Column(
                     modifier = Modifier
                         .clickable {
-                            onWorkWithUsTapped()
+                            onWorkWithUsClick()
                             openUrl("https://automattic.com/work-with-us/", context)
                         }
                         .fillMaxWidth()
@@ -338,7 +338,7 @@ private fun AboutPage(
                 Spacer(modifier = Modifier.height(24.dp))
             }
             item {
-                AutomatticLogo(onAutomatticFamilyTapped = onAutomatticFamilyTapped)
+                AutomatticLogo(onAutomatticFamilyClick = onAutomatticFamilyClick)
             }
             item {
                 Spacer(modifier = Modifier.height(24.dp))
@@ -348,16 +348,16 @@ private fun AboutPage(
 }
 
 @Composable
-fun AutomatticLogo(
+private fun AutomatticLogo(
     modifier: Modifier = Modifier,
-    onAutomatticFamilyTapped: () -> Unit = {},
+    onAutomatticFamilyClick: () -> Unit = {},
 ) {
     val context = LocalContext.current
     Box(
         modifier = modifier
             .fillMaxWidth()
             .clickable {
-                onAutomatticFamilyTapped()
+                onAutomatticFamilyClick()
                 openUrl("https://automattic.com", context)
             }
             .padding(16.dp),
@@ -372,8 +372,8 @@ fun AutomatticLogo(
 }
 
 @Composable
-fun AutomatticFamilyRow(
-    onAutomatticFamilyTapped: () -> Unit = {},
+private fun AutomatticFamilyRow(
+    onAutomatticFamilyClick: () -> Unit = {},
 ) {
     val context = LocalContext.current
     val configuration = LocalConfiguration.current
@@ -384,7 +384,7 @@ fun AutomatticFamilyRow(
     Box(
         modifier = Modifier
             .clickable {
-                onAutomatticFamilyTapped()
+                onAutomatticFamilyClick()
                 openUrl("https://automattic.com", context)
             }
             .height(180.dp)
@@ -417,7 +417,7 @@ fun AutomatticFamilyRow(
 }
 
 @Composable
-fun LegalAndMoreRow(
+private fun LegalAndMoreRow(
     termsOfService: () -> Unit,
     privacyPolicy: () -> Unit,
     openFragment: (Fragment) -> Unit,
@@ -482,7 +482,7 @@ private fun shareWithFriends(context: Context) {
 
 private fun openUrl(url: String, context: Context) {
     try {
-        context.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(url)))
+        context.startActivity(Intent(Intent.ACTION_VIEW, url.toUri()))
     } catch (e: Exception) {
         Timber.i("Failed to open url $url")
     }
@@ -491,7 +491,15 @@ private fun openUrl(url: String, context: Context) {
 private data class AppIcon(@AttrRes val image: Int, @StringRes val text: Int, val url: String, @AttrRes val color: Int, val x: Double, val y: Double, val rotate: Int)
 
 @Composable
-private fun AppLogoImage(width: Dp, image: Painter, text: String, color: Color, modifier: Modifier = Modifier, rotateImage: Int = 0, onClick: () -> Unit) {
+private fun AppLogoImage(
+    width: Dp,
+    image: Painter,
+    text: String,
+    color: Color,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier,
+    rotateImage: Int = 0,
+) {
     Box(
         modifier = modifier
             .size(width)
@@ -514,15 +522,15 @@ private fun AppLogoImage(width: Dp, image: Painter, text: String, color: Color, 
 @Composable
 private fun AboutPagePreview() {
     AboutPage(
-        onBackPressed = {},
+        onBackPress = {},
         bottomInset = 0.dp,
         openFragment = {},
-        onRateUsTapped = {},
-        onShareWithFriendsTapped = {},
-        onWebsiteTapped = {},
-        onInstagramTapped = {},
-        onXTapped = {},
-        onAutomatticFamilyTapped = {},
-        onWorkWithUsTapped = {},
+        onRateUsClick = {},
+        onShareWithFriendsClick = {},
+        onWebsiteClick = {},
+        onInstagramClick = {},
+        onXClick = {},
+        onAutomatticFamilyClick = {},
+        onWorkWithUsClick = {},
     )
 }

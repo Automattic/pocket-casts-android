@@ -11,5 +11,4 @@ fun Clipboard.getPrimaryClipText(): String? = try {
     null
 }
 
-fun ClipData.getItemAtOrNull(index: Int): ClipData.Item? =
-    if (itemCount == 0 || index < 0 || index >= itemCount) null else getItemAt(index)
+fun ClipData.getItemAtOrNull(index: Int): ClipData.Item? = if (itemCount == 0 || index < 0 || index >= itemCount) null else getItemAt(index)

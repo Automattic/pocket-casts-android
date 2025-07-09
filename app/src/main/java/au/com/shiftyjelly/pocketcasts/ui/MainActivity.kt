@@ -367,9 +367,7 @@ class MainActivity :
     private fun checkForNotificationPermission(onPermissionGranted: () -> Unit = {}) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             when {
-                ContextCompat.checkSelfPermission(
-                    this, Manifest.permission.POST_NOTIFICATIONS,
-                ) == PackageManager.PERMISSION_GRANTED -> {
+                ContextCompat.checkSelfPermission(this, Manifest.permission.POST_NOTIFICATIONS) == PackageManager.PERMISSION_GRANTED -> {
                     onPermissionGranted()
                 }
 
@@ -825,7 +823,7 @@ class MainActivity :
                             onClick = {
                                 showStoriesOrAccount(StoriesSource.MODAL.value)
                             },
-                            onExpanded = {
+                            onExpand = {
                                 analyticsTracker.track(
                                     AnalyticsEvent.END_OF_YEAR_MODAL_SHOWN,
                                     mapOf("year" to EndOfYearManager.YEAR_TO_SYNC.value),

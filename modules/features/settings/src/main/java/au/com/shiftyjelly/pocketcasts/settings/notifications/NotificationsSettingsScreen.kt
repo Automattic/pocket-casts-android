@@ -34,12 +34,12 @@ import au.com.shiftyjelly.pocketcasts.settings.notifications.model.NotificationP
 @Composable
 internal fun NotificationsSettingsScreen(
     state: NotificationsSettingsViewModel.State,
-    onPreferenceChanged: (NotificationPreferenceType) -> Unit,
-    onAdvancedSettingsClicked: (type: NotificationPreferenceType) -> Unit,
-    onSelectRingtoneClicked: (String?) -> Unit,
-    onSelectPodcastsClicked: () -> Unit,
-    onSystemNotificationsSettingsClicked: () -> Unit,
-    onBackPressed: () -> Unit,
+    onPreferenceChange: (NotificationPreferenceType) -> Unit,
+    onAdvancedSettingsClick: (type: NotificationPreferenceType) -> Unit,
+    onSelectRingtoneClick: (String?) -> Unit,
+    onSelectPodcastsClick: () -> Unit,
+    onSystemNotificationsSettingsClick: () -> Unit,
+    onBackPress: () -> Unit,
     bottomInset: Dp,
     modifier: Modifier = Modifier,
 ) {
@@ -51,7 +51,7 @@ internal fun NotificationsSettingsScreen(
         ThemedTopAppBar(
             title = stringResource(R.string.settings_title_notifications),
             bottomShadow = true,
-            onNavigationClick = onBackPressed,
+            onNavigationClick = onBackPress,
         )
         LazyColumn(
             contentPadding = PaddingValues(bottom = bottomInset),
@@ -67,7 +67,7 @@ internal fun NotificationsSettingsScreen(
                         description = stringResource(LR.string.notifications_settings_turn_on_push_message),
                         actionLabel = stringResource(LR.string.notifications_settings_turn_on_push_button),
                         icon = painterResource(IR.drawable.ic_notifications),
-                        onActionClick = onSystemNotificationsSettingsClicked,
+                        onActionClick = onSystemNotificationsSettingsClick,
                         onDismiss = null,
                     )
                 }
@@ -79,7 +79,7 @@ internal fun NotificationsSettingsScreen(
                         isEnabled = state.areSystemNotificationsEnabled,
                         categoryTitle = category.title.asString(),
                         items = category.preferences,
-                        onItemClicked = { preference ->
+                        onItemClick = { preference ->
                             when (preference) {
                                 is NotificationPreferenceType.AdvancedSettings,
                                 is NotificationPreferenceType.DailyReminderSettings,
@@ -87,20 +87,20 @@ internal fun NotificationsSettingsScreen(
                                 is NotificationPreferenceType.NewFeaturesAndTipsSettings,
                                 is NotificationPreferenceType.OffersSettings,
                                 -> {
-                                    onAdvancedSettingsClicked(preference)
+                                    onAdvancedSettingsClick(preference)
                                 }
 
                                 is NotificationPreferenceType.NotifyOnThesePodcasts -> {
-                                    onSelectPodcastsClicked()
+                                    onSelectPodcastsClick()
                                 }
 
                                 is NotificationPreferenceType.NotificationSoundPreference -> {
-                                    onSelectRingtoneClicked(preference.notificationSound.path)
+                                    onSelectRingtoneClick(preference.notificationSound.path)
                                 }
 
                                 else -> Unit
                             }
-                            onPreferenceChanged(preference)
+                            onPreferenceChange(preference)
                         },
                         modifier = Modifier.fillMaxWidth(),
                     )
@@ -114,47 +114,46 @@ internal fun NotificationsSettingsScreen(
 @Composable
 private fun PreviewNotificationSettingsScreen(
     @PreviewParameter(ThemePreviewParameterProvider::class) themeType: Theme.ThemeType,
-) =
-    AppTheme(themeType) {
-        NotificationsSettingsScreen(
-            state = NotificationsSettingsViewModel.State(
-                areSystemNotificationsEnabled = false,
-                categories = listOf(
-                    CategoryModel(
-                        title = TextResource.fromText("My episodes"),
-                        preferences = listOf(
-                            NotificationPreferenceType.NotifyMeOnNewEpisodes(
-                                title = TextResource.fromText("Notify me"),
-                                isEnabled = false,
-                            ),
+) = AppTheme(themeType) {
+    NotificationsSettingsScreen(
+        state = NotificationsSettingsViewModel.State(
+            areSystemNotificationsEnabled = false,
+            categories = listOf(
+                CategoryModel(
+                    title = TextResource.fromText("My episodes"),
+                    preferences = listOf(
+                        NotificationPreferenceType.NotifyMeOnNewEpisodes(
+                            title = TextResource.fromText("Notify me"),
+                            isEnabled = false,
                         ),
                     ),
-                    CategoryModel(
-                        title = TextResource.fromText("Settings"),
-                        preferences = listOf(
-                            NotificationPreferenceType.PlayOverNotifications(
-                                title = TextResource.fromText("Play over notifications"),
-                                value = PlayOverNotificationSetting.DUCK,
-                                displayValue = TextResource.fromText("Duck"),
-                                options = emptyList(),
-                            ),
-                            NotificationPreferenceType.HidePlaybackNotificationOnPause(
-                                title = TextResource.fromText("Hide playback notification on pause"),
-                                isEnabled = true,
-                            ),
+                ),
+                CategoryModel(
+                    title = TextResource.fromText("Settings"),
+                    preferences = listOf(
+                        NotificationPreferenceType.PlayOverNotifications(
+                            title = TextResource.fromText("Play over notifications"),
+                            value = PlayOverNotificationSetting.DUCK,
+                            displayValue = TextResource.fromText("Duck"),
+                            options = emptyList(),
+                        ),
+                        NotificationPreferenceType.HidePlaybackNotificationOnPause(
+                            title = TextResource.fromText("Hide playback notification on pause"),
+                            isEnabled = true,
                         ),
                     ),
                 ),
             ),
-            onPreferenceChanged = {},
-            onAdvancedSettingsClicked = {},
-            onBackPressed = {},
-            bottomInset = 0.dp,
-            onSelectRingtoneClicked = {},
-            onSelectPodcastsClicked = {},
-            onSystemNotificationsSettingsClicked = {},
-        )
-    }
+        ),
+        onPreferenceChange = {},
+        onAdvancedSettingsClick = {},
+        onBackPress = {},
+        bottomInset = 0.dp,
+        onSelectRingtoneClick = {},
+        onSelectPodcastsClick = {},
+        onSystemNotificationsSettingsClick = {},
+    )
+}
 
 @Preview
 @Composable
@@ -189,12 +188,12 @@ private fun PreviewDisabledNotificationsSettingsScreen() = AppTheme(Theme.ThemeT
                 ),
             ),
         ),
-        onPreferenceChanged = {},
-        onAdvancedSettingsClicked = {},
-        onBackPressed = {},
+        onPreferenceChange = {},
+        onAdvancedSettingsClick = {},
+        onBackPress = {},
         bottomInset = 0.dp,
-        onSelectRingtoneClicked = {},
-        onSelectPodcastsClicked = {},
-        onSystemNotificationsSettingsClicked = {},
+        onSelectRingtoneClick = {},
+        onSelectPodcastsClick = {},
+        onSystemNotificationsSettingsClick = {},
     )
 }

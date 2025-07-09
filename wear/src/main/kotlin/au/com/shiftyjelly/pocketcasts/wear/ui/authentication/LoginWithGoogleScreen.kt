@@ -5,6 +5,7 @@ package au.com.shiftyjelly.pocketcasts.wear.ui.authentication
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -20,11 +21,14 @@ import com.google.android.horologist.auth.composables.R as HR
 
 @Composable
 fun LoginWithGoogleScreen(
+    onCancel: () -> Unit,
+    modifier: Modifier = Modifier,
+    viewModel: LoginWithGoogleScreenViewModel = hiltViewModel(),
     signInSuccessScreen: @Composable (GoogleSignInAccount?) -> Unit,
-    onAuthCanceled: () -> Unit,
 ) {
-    ScreenScaffold {
-        val viewModel = hiltViewModel<LoginWithGoogleScreenViewModel>()
+    ScreenScaffold(
+        modifier = modifier,
+    ) {
         val state by viewModel.state.collectAsState()
         val context = LocalContext.current
 
@@ -37,7 +41,7 @@ fun LoginWithGoogleScreen(
             viewModel = viewModel.googleSignInViewModel,
             onAuthCancelled = {
                 Timber.i("Google sign in cancelled")
-                onAuthCanceled()
+                onCancel()
             },
             failedContent = {
                 val message = if (Network.isConnected(context)) {

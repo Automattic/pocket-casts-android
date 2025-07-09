@@ -48,15 +48,15 @@ import au.com.shiftyjelly.pocketcasts.compose.theme
 import kotlin.math.abs
 import kotlin.math.max
 
-private const val numStars = 5
+private const val NUM_STARS = 5
 
 @Composable
 fun SwipeableStars(
-    onStarsChanged: (Double) -> Unit,
+    onStarsChange: (Double) -> Unit,
     modifier: Modifier = Modifier,
     initialRate: Int? = null,
+    viewModel: SwipeableStarsViewModel = hiltViewModel(),
 ) {
-    val viewModel = hiltViewModel<SwipeableStarsViewModel>()
     val isTalkBackEnabled by viewModel.accessibilityActiveState.collectAsState()
 
     var stopPointType by remember { mutableStateOf(StopPointType.InitialStars) }
@@ -71,7 +71,7 @@ fun SwipeableStars(
         stopPointType = stopPointType,
         initialRate,
     )
-    onStarsChanged(getStarsDouble(stopPoints, desiredStopPoint))
+    onStarsChange(getStarsDouble(stopPoints, desiredStopPoint))
 
     val sliderPosition = remember {
         Animatable(initialValue = 0f)
@@ -180,23 +180,22 @@ fun SwipeableStars(
 // are the positions we want to fill to in order to get unfilled,
 // half-filled, and fully-filled icons.
 @Composable
-private fun stopPointsFromIconPositions(positions: List<Position>) =
-    remember(positions) {
-        if (positions.isEmpty()) {
-            emptyList()
-        } else {
-            val intermediate = positions
-                .flatMap { listOf(it.left, it.right) }
-                .windowed(size = 2, step = 1)
-                .map { it.average() }
+private fun stopPointsFromIconPositions(positions: List<Position>) = remember(positions) {
+    if (positions.isEmpty()) {
+        emptyList()
+    } else {
+        val intermediate = positions
+            .flatMap { listOf(it.left, it.right) }
+            .windowed(size = 2, step = 1)
+            .map { it.average() }
 
-            buildList {
-                add(positions.first().left.toDouble())
-                addAll(intermediate)
-                add(positions.last().right.toDouble())
-            }
+        buildList {
+            add(positions.first().left.toDouble())
+            addAll(intermediate)
+            add(positions.last().right.toDouble())
         }
     }
+}
 
 @Composable
 private fun getDesiredStopPoint(
@@ -214,7 +213,7 @@ private fun getDesiredStopPoint(
             // result in every star being either entirely filled or entirely unfilled
             val betweenStarStopPoints = stopPoints.filterIndexed { i, _ -> i % 2 == 0 }
 
-            val numberOfEmptyStars = numStars - initialRate // get the number of empty stars
+            val numberOfEmptyStars = NUM_STARS - initialRate // get the number of empty stars
 
             val indexOfFullStars = betweenStarStopPoints.lastIndex - numberOfEmptyStars
 
@@ -267,12 +266,12 @@ private fun getDesiredStopPoint(
 }
 
 @Composable
-fun Stars(
+private fun Stars(
     filled: Boolean,
     modifier: @Composable (index: Int) -> Modifier = { Modifier },
 ) {
     Row {
-        for (index in 0 until numStars) {
+        for (index in 0 until NUM_STARS) {
             Icon(
                 imageVector = if (filled) {
                     Icons.Filled.Star
@@ -330,7 +329,7 @@ private enum class ChangeType {
 @Composable
 private fun SwipeableStarsPreview() {
     SwipeableStars(
-        onStarsChanged = {},
+        onStarsChange = {},
         modifier = Modifier.size(
             height = 30.dp,
             width = 150.dp,

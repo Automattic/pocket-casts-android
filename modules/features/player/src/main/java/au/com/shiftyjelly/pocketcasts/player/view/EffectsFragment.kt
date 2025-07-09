@@ -56,7 +56,11 @@ import kotlinx.coroutines.launch
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 @AndroidEntryPoint
-class EffectsFragment : BaseDialogFragment(), CompoundButton.OnCheckedChangeListener, MaterialButtonToggleGroup.OnButtonCheckedListener, View.OnClickListener {
+class EffectsFragment :
+    BaseDialogFragment(),
+    CompoundButton.OnCheckedChangeListener,
+    MaterialButtonToggleGroup.OnButtonCheckedListener,
+    View.OnClickListener {
 
     @Inject lateinit var stats: StatsManager
 
@@ -294,7 +298,7 @@ class EffectsFragment : BaseDialogFragment(), CompoundButton.OnCheckedChangeList
                         PlaybackEffectsSettingsTab.AllPodcasts
                     },
                     selectedTabTextColor = selectedTabTextColor,
-                    onItemSelected = {
+                    onItemSelect = {
                         viewModel.onEffectsSettingsSegmentedTabSelected(podcast, PlaybackEffectsSettingsTab.entries[it])
                     },
                     modifier = Modifier
@@ -306,10 +310,10 @@ class EffectsFragment : BaseDialogFragment(), CompoundButton.OnCheckedChangeList
 
     @Composable
     private fun EffectsSettingsSegmentedTabBar(
-        modifier: Modifier = Modifier,
         selectedTabTextColor: Color,
         selectedItem: PlaybackEffectsSettingsTab,
-        onItemSelected: (selectedItemIndex: Int) -> Unit,
+        onItemSelect: (Int) -> Unit,
+        modifier: Modifier = Modifier,
     ) {
         SegmentedTabBar(
             items = PlaybackEffectsSettingsTab.entries.map { stringResource(it.labelResId) },
@@ -321,7 +325,7 @@ class EffectsFragment : BaseDialogFragment(), CompoundButton.OnCheckedChangeList
             ),
             cornerRadius = 120.dp,
             modifier = modifier.fillMaxWidth(),
-            onItemSelected = onItemSelected,
+            onSelectItem = onItemSelect,
         )
     }
 
@@ -331,7 +335,7 @@ class EffectsFragment : BaseDialogFragment(), CompoundButton.OnCheckedChangeList
         EffectsSettingsSegmentedTabBar(
             selectedItem = PlaybackEffectsSettingsTab.AllPodcasts,
             selectedTabTextColor = Color.Black,
-            onItemSelected = {},
+            onItemSelect = {},
         )
     }
 }

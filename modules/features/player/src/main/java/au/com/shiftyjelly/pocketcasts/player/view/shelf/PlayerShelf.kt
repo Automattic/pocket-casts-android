@@ -266,12 +266,12 @@ private fun EffectsButton(
 
 @Composable
 private fun SleepButton(
-    isSleepRunning: Boolean = false,
     playerColors: PlayerColors,
     onClick: () -> Unit,
+    isSleepRunning: Boolean = false,
 ) {
     val sleepTint = if (isSleepRunning) playerColors.highlight01 else playerColors.contrast03
-    val alpha = if (isSleepRunning) 1F else AndroidColor.alpha(sleepTint.toArgb()) / 255F * 2F
+    val alpha = if (isSleepRunning) 1f else AndroidColor.alpha(sleepTint.toArgb()) / 255f * 2f
     val lottieComposition by rememberLottieComposition(LottieCompositionSpec.RawRes(R.raw.sleep_button))
     val progress by animateLottieCompositionAsState(
         lottieComposition,

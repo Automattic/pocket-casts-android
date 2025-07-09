@@ -19,6 +19,7 @@ class SystemBatteryRestrictions @Inject constructor(@ApplicationContext private 
         Restricted("restricted"),
         Other("other"),
         ;
+
         // "Other" occurs when battery use is unrestricted but background processing is restricted
         // The only way I know that users can get into this state is if the app is set to be restricted
         // and the user accepts the dialog from Settings.ACTION_REQUEST_IGNORE_BATTERY_OPTIMIZATIONS

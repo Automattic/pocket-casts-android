@@ -467,7 +467,9 @@ class AutoDownloadSettingsFragment :
         }
 
         onFollowPodcastPreference?.summary = resources.getQuantityString(
-            LR.plurals.settings_auto_download_on_follow_podcast_description, limitDownloads, localizedLimitDownloads,
+            LR.plurals.settings_auto_download_on_follow_podcast_description,
+            limitDownloads,
+            localizedLimitDownloads,
         )
     }
 }

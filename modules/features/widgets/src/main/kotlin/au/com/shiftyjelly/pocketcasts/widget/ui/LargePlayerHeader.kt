@@ -33,7 +33,7 @@ internal fun LargePlayerHeader(
     ) {
         Row(
             verticalAlignment = Alignment.Top,
-            modifier = modifier.fillMaxSize(),
+            modifier = GlanceModifier.fillMaxSize(),
         ) {
             EpisodeImage(
                 episode = episode,

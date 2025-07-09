@@ -93,7 +93,8 @@ private val differ: DiffUtil.ItemCallback<Any> = object : DiffUtil.ItemCallback<
             return true
         } else if (oldItem is PodcastAdapter.EpisodeHeader && newItem is PodcastAdapter.EpisodeHeader) {
             // don't compare search term because we don't what the row to recreate while typing
-            return oldItem.searchTerm.isNotEmpty() || newItem.searchTerm.isNotEmpty() ||
+            return oldItem.searchTerm.isNotEmpty() ||
+                newItem.searchTerm.isNotEmpty() ||
                 (
                     oldItem.archivedCount == newItem.archivedCount &&
                         oldItem.episodeCount == newItem.episodeCount &&
@@ -429,7 +430,11 @@ class PodcastAdapter(
         }
         this.podcast = podcast
         val isHtmlDescription = podcast.podcastHtmlDescription.isNotEmpty()
-        val rawDescription = if (isHtmlDescription) { podcast.podcastHtmlDescription } else { podcast.podcastDescription }
+        val rawDescription = if (isHtmlDescription) {
+            podcast.podcastHtmlDescription
+        } else {
+            podcast.podcastDescription
+        }
         this.podcastDescription = HtmlCompat.fromHtml(
             rawDescription,
             HtmlCompat.FROM_HTML_MODE_COMPACT and
@@ -579,7 +584,7 @@ class PodcastAdapter(
                         bookmarks.map {
                             BookmarkItemData(
                                 bookmark = it,
-                                episode = episodes.find { episode -> episode.uuid == it.episodeUuid } ?: NoOpEpisode,
+                                episode = episodes.find { episode -> episode.uuid == it.episodeUuid } ?: noOpEpisode,
                                 onBookmarkPlayClicked = onBookmarkPlayClicked,
                                 onBookmarkRowLongPress = onBookmarkRowLongPress,
                                 onBookmarkRowClick = { bookmark, adapterPosition ->
@@ -839,7 +844,7 @@ class PodcastAdapter(
         }
     }
 
-    private val NoOpEpisode = PodcastEpisode(uuid = "", publishedDate = Date())
+    private val noOpEpisode = PodcastEpisode(uuid = "", publishedDate = Date())
 }
 
 // We can't simply apply 'WindowInsets.statusBars' inset.

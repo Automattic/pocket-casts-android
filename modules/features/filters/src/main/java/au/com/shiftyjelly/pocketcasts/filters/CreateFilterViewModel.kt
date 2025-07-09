@@ -56,8 +56,9 @@ class CreateFilterViewModel @Inject constructor(
 
     var playlist: LiveData<Playlist>? = null
 
-    suspend fun createFilter(name: String, iconId: Int, colorId: Int) =
-        withContext(Dispatchers.IO) { playlistManager.createPlaylistBlocking(name, Playlist.calculateCombinedIconId(colorId, iconId), draft = true) }
+    suspend fun createFilter(name: String, iconId: Int, colorId: Int) = withContext(Dispatchers.IO) {
+        playlistManager.createPlaylistBlocking(name, Playlist.calculateCombinedIconId(colorId, iconId), draft = true)
+    }
 
     val filterName = MutableStateFlow("")
     var iconId: Int = 0
@@ -157,10 +158,9 @@ class CreateFilterViewModel @Inject constructor(
         hasBeenInitialised = true
     }
 
-    fun observeFilter(filter: Playlist): LiveData<List<PodcastEpisode>> =
-        playlistManager
-            .observeEpisodesPreviewBlocking(filter, episodeManager, playbackManager)
-            .toLiveData()
+    fun observeFilter(filter: Playlist): LiveData<List<PodcastEpisode>> = playlistManager
+        .observeEpisodesPreviewBlocking(filter, episodeManager, playbackManager)
+        .toLiveData()
 
     fun updateDownloadLimit(limit: Int) {
         userChangedAutoDownloadEpisodeCount.recordUserChange()

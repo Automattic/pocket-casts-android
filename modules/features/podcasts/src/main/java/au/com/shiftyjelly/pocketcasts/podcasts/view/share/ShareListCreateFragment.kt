@@ -28,10 +28,10 @@ class ShareListCreateFragment : BaseFragment() {
     private var navHostController: NavHostController? = null
 
     private object NavRoutes {
-        const val podcasts = "share_podcasts"
-        const val title = "share_tile"
-        const val building = "building"
-        const val failed = "failed"
+        const val PODCASTS = "share_podcasts"
+        const val TITLE = "share_tile"
+        const val BUILDING = "building"
+        const val FAILED = "failed"
     }
 
     override fun onCreateView(
@@ -44,10 +44,10 @@ class ShareListCreateFragment : BaseFragment() {
             val navController = navHostController ?: return@AppThemeWithBackground
             NavHost(
                 navController = navController,
-                startDestination = NavRoutes.podcasts,
+                startDestination = NavRoutes.PODCASTS,
                 modifier = Modifier.windowInsetsPadding(WindowInsets.safeDrawing.only(WindowInsetsSides.Horizontal + WindowInsetsSides.Bottom)),
             ) {
-                composable(NavRoutes.podcasts) {
+                composable(NavRoutes.PODCASTS) {
                     ShareListCreatePodcastsPage(
                         onCloseClick = { activity?.finish() },
                         onNextClick = { selectedPodcastsCount ->
@@ -55,25 +55,25 @@ class ShareListCreateFragment : BaseFragment() {
                                 AnalyticsEvent.SHARE_PODCASTS_PODCASTS_SELECTED,
                                 AnalyticsProp.countMap(selectedPodcastsCount),
                             )
-                            navController.navigate(NavRoutes.title)
+                            navController.navigate(NavRoutes.TITLE)
                         },
                         viewModel = viewModel,
                     )
                 }
-                composable(NavRoutes.title) {
+                composable(NavRoutes.TITLE) {
                     ShareListCreateTitlePage(
-                        onBackClick = { navController.popBackStack() },
+                        onBackPress = { navController.popBackStack() },
                         onNextClick = { createShareLink(navController) },
                         viewModel = viewModel,
                     )
                 }
-                composable(NavRoutes.building) {
+                composable(NavRoutes.BUILDING) {
                     ShareListCreateBuildingPage(
                         onCloseClick = { activity?.finish() },
                         viewModel = viewModel,
                     )
                 }
-                composable(NavRoutes.failed) {
+                composable(NavRoutes.FAILED) {
                     ShareListCreateFailedPage(
                         onCloseClick = { activity?.finish() },
                         onRetryClick = { createShareLink(navController) },
@@ -91,9 +91,9 @@ class ShareListCreateFragment : BaseFragment() {
         viewModel.sharePodcasts(
             context = requireContext(),
             label = getString(LR.string.podcasts_share_via),
-            onBefore = { navController.navigate(NavRoutes.building) },
+            onBefore = { navController.navigate(NavRoutes.BUILDING) },
             onSuccess = { activity?.finish() },
-            onFailure = { navController.navigate(NavRoutes.failed) },
+            onFailure = { navController.navigate(NavRoutes.FAILED) },
         )
     }
 
@@ -104,6 +104,6 @@ class ShareListCreateFragment : BaseFragment() {
 }
 
 private object AnalyticsProp {
-    private const val count = "count"
-    fun countMap(count: Int) = mapOf(this.count to count)
+    private const val COUNT = "count"
+    fun countMap(count: Int) = mapOf(this.COUNT to count)
 }

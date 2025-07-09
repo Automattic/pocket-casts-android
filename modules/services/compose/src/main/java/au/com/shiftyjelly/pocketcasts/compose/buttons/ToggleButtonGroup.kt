@@ -21,7 +21,7 @@ import androidx.compose.material.ripple
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -42,13 +42,16 @@ data class ToggleButtonOption(
 )
 
 @Composable
-fun ToggleButtonGroup(options: List<ToggleButtonOption>?) {
+fun ToggleButtonGroup(
+    options: List<ToggleButtonOption>?,
+    modifier: Modifier = Modifier,
+) {
     if (options.isNullOrEmpty()) {
         return
     }
-    var selectedImageId by remember { mutableStateOf(options.first { it.isOn() }.imageId) }
+    var selectedImageId by remember { mutableIntStateOf(options.first { it.isOn() }.imageId) }
     Row(
-        modifier = Modifier
+        modifier = modifier
             .padding(horizontal = 20.dp)
             .border(
                 width = 2.dp,

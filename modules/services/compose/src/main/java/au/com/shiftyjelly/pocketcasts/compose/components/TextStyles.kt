@@ -509,7 +509,7 @@ private fun TextUnit.scaled(disabled: Boolean, fontScale: Float) = (if (disabled
 @ShowkaseComposable(name = "Text", group = "Text", styleName = "Light", defaultStyle = true)
 @Preview(name = "Light")
 @Composable
-fun TextStylesLightPreview() {
+private fun TextStylesLightPreview() {
     AppThemeWithBackground(Theme.ThemeType.LIGHT) {
         TextStylesPreview()
     }
@@ -518,7 +518,7 @@ fun TextStylesLightPreview() {
 @ShowkaseComposable(name = "Text", group = "Text", styleName = "Dark")
 @Preview(name = "Dark")
 @Composable
-fun TextStylesDarkPreview() {
+private fun TextStylesDarkPreview() {
     AppThemeWithBackground(Theme.ThemeType.DARK) {
         TextStylesPreview()
     }

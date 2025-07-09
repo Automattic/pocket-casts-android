@@ -102,9 +102,20 @@ dependencyAnalysis {
     }
 }
 
-val ktlintVersion = libs.versions.ktlint.get()
+val ktlintVersion = libs.versions.ktlint.asProvider().get()
+val ktlintComposeRules = libs.ktlint.compose.rules.get().toString()
 
 spotless {
+    val ktLintConfigOverride = mapOf(
+        "ktlint_standard_function-expression-body" to "disabled",
+        "ktlint_standard_multiline-expression-wrapping" to "disabled",
+        "ktlint_standard_backing-property-naming" to "disabled",
+        "ktlint_function_naming_ignore_when_annotated_with" to "Composable",
+    )
+    val ktLintConfigComposeOverride = mapOf(
+        "ktlint_compose_compositionlocal-allowlist" to "disabled",
+    )
+
     kotlin {
         target(
             "app/src/**/*.kt",
@@ -113,11 +124,13 @@ spotless {
             "wear/src/**/*.kt",
         )
         ktlint(ktlintVersion)
+            .editorConfigOverride(ktLintConfigOverride + ktLintConfigComposeOverride)
+            .customRuleSets(listOf(ktlintComposeRules))
     }
 
     kotlinGradle {
         target("*.kts")
-        ktlint(ktlintVersion)
+        ktlint(ktlintVersion).editorConfigOverride(ktLintConfigOverride)
     }
 }
 
@@ -145,6 +158,9 @@ subprojects {
             compilerOptions {
                 jvmTarget.set(javaTarget)
                 allWarningsAsErrors.set(true)
+                freeCompilerArgs.addAll(
+                    "-Xannotation-default-target=param-property",
+                )
                 optIn.addAll("kotlin.RequiresOptIn")
             }
         }
@@ -197,18 +213,18 @@ subprojects {
         checkReleaseBuilds = false
     }
 
-    val SERVER_MAIN_URL_PROD = "\"https://refresh.pocketcasts.com\""
-    val SERVER_API_URL_PROD = "\"https://api.pocketcasts.com\""
-    val SERVER_CACHE_URL_PROD = "\"https://cache.pocketcasts.com\""
-    val SERVER_CACHE_HOST_PROD = "\"cache.pocketcasts.com\""
-    val SERVER_STATIC_URL_PROD = "\"https://static.pocketcasts.com\""
-    val SERVER_SHARING_URL_PROD = "\"https://sharing.pocketcasts.com\""
-    val SERVER_LIST_URL_PROD = "\"https://lists.pocketcasts.com\""
-    val SERVER_LIST_HOST_PROD = "\"lists.pocketcasts.com\""
-    val SERVER_SHORT_URL_PROD = "\"https://pca.st\""
-    val SERVER_SHORT_HOST_PROD = "\"pca.st\""
-    val SERVER_WEB_PLAYER_HOST_PROD = "\"play.pocketcasts.com\""
-    val WEB_BASE_HOST_PROD = "\"pocketcasts.com\""
+    val serverMainUrlProd = "\"https://refresh.pocketcasts.com\""
+    val serverApiUrlProd = "\"https://api.pocketcasts.com\""
+    val serverCacheUrlProd = "\"https://cache.pocketcasts.com\""
+    val serverCacheHostProd = "\"cache.pocketcasts.com\""
+    val serverStaticUrlProd = "\"https://static.pocketcasts.com\""
+    val serverSharingUrlProd = "\"https://sharing.pocketcasts.com\""
+    val serverListUrlProd = "\"https://lists.pocketcasts.com\""
+    val serverListHostProd = "\"lists.pocketcasts.com\""
+    val serverShortUrlProd = "\"https://pca.st\""
+    val serverShortHostProd = "\"pca.st\""
+    val serverWebPlayerHostProd = "\"play.pocketcasts.com\""
+    val webBaseHostProd = "\"pocketcasts.com\""
 
     plugins.withType<BasePlugin>().configureEach {
         configure<BaseExtension> {
@@ -306,36 +322,36 @@ subprojects {
                     enableAndroidTestCoverage = false
                     ext.set("alwaysUpdateBuildId", false)
 
-                    buildConfigField("String", "SERVER_MAIN_URL", SERVER_MAIN_URL_PROD)
-                    buildConfigField("String", "SERVER_API_URL", SERVER_API_URL_PROD)
-                    buildConfigField("String", "SERVER_CACHE_URL", SERVER_CACHE_URL_PROD)
-                    buildConfigField("String", "SERVER_CACHE_HOST", SERVER_CACHE_HOST_PROD)
-                    buildConfigField("String", "SERVER_STATIC_URL", SERVER_STATIC_URL_PROD)
-                    buildConfigField("String", "SERVER_SHARING_URL", SERVER_SHARING_URL_PROD)
-                    buildConfigField("String", "SERVER_SHORT_URL", SERVER_SHORT_URL_PROD)
-                    buildConfigField("String", "SERVER_SHORT_HOST", SERVER_SHORT_HOST_PROD)
-                    buildConfigField("String", "SERVER_WEB_PLAYER_HOST", SERVER_WEB_PLAYER_HOST_PROD)
-                    buildConfigField("String", "WEB_BASE_HOST", WEB_BASE_HOST_PROD)
-                    buildConfigField("String", "SERVER_LIST_URL", SERVER_LIST_URL_PROD)
-                    buildConfigField("String", "SERVER_LIST_HOST", SERVER_LIST_HOST_PROD)
+                    buildConfigField("String", "SERVER_MAIN_URL", serverMainUrlProd)
+                    buildConfigField("String", "SERVER_API_URL", serverApiUrlProd)
+                    buildConfigField("String", "SERVER_CACHE_URL", serverCacheUrlProd)
+                    buildConfigField("String", "SERVER_CACHE_HOST", serverCacheHostProd)
+                    buildConfigField("String", "SERVER_STATIC_URL", serverStaticUrlProd)
+                    buildConfigField("String", "SERVER_SHARING_URL", serverSharingUrlProd)
+                    buildConfigField("String", "SERVER_SHORT_URL", serverShortUrlProd)
+                    buildConfigField("String", "SERVER_SHORT_HOST", serverShortHostProd)
+                    buildConfigField("String", "SERVER_WEB_PLAYER_HOST", serverWebPlayerHostProd)
+                    buildConfigField("String", "WEB_BASE_HOST", webBaseHostProd)
+                    buildConfigField("String", "SERVER_LIST_URL", serverListUrlProd)
+                    buildConfigField("String", "SERVER_LIST_HOST", serverListHostProd)
 
                     signingConfig = signingConfigs.getByName("debug")
                 }
 
                 named("release") {
 
-                    buildConfigField("String", "SERVER_MAIN_URL", SERVER_MAIN_URL_PROD)
-                    buildConfigField("String", "SERVER_API_URL", SERVER_API_URL_PROD)
-                    buildConfigField("String", "SERVER_CACHE_URL", SERVER_CACHE_URL_PROD)
-                    buildConfigField("String", "SERVER_CACHE_HOST", SERVER_CACHE_HOST_PROD)
-                    buildConfigField("String", "SERVER_STATIC_URL", SERVER_STATIC_URL_PROD)
-                    buildConfigField("String", "SERVER_SHARING_URL", SERVER_SHARING_URL_PROD)
-                    buildConfigField("String", "SERVER_SHORT_URL", SERVER_SHORT_URL_PROD)
-                    buildConfigField("String", "SERVER_SHORT_HOST", SERVER_SHORT_HOST_PROD)
-                    buildConfigField("String", "SERVER_WEB_PLAYER_HOST", SERVER_WEB_PLAYER_HOST_PROD)
-                    buildConfigField("String", "WEB_BASE_HOST", WEB_BASE_HOST_PROD)
-                    buildConfigField("String", "SERVER_LIST_URL", SERVER_LIST_URL_PROD)
-                    buildConfigField("String", "SERVER_LIST_HOST", SERVER_LIST_HOST_PROD)
+                    buildConfigField("String", "SERVER_MAIN_URL", serverMainUrlProd)
+                    buildConfigField("String", "SERVER_API_URL", serverApiUrlProd)
+                    buildConfigField("String", "SERVER_CACHE_URL", serverCacheUrlProd)
+                    buildConfigField("String", "SERVER_CACHE_HOST", serverCacheHostProd)
+                    buildConfigField("String", "SERVER_STATIC_URL", serverStaticUrlProd)
+                    buildConfigField("String", "SERVER_SHARING_URL", serverSharingUrlProd)
+                    buildConfigField("String", "SERVER_SHORT_URL", serverShortUrlProd)
+                    buildConfigField("String", "SERVER_SHORT_HOST", serverShortHostProd)
+                    buildConfigField("String", "SERVER_WEB_PLAYER_HOST", serverWebPlayerHostProd)
+                    buildConfigField("String", "WEB_BASE_HOST", webBaseHostProd)
+                    buildConfigField("String", "SERVER_LIST_URL", serverListUrlProd)
+                    buildConfigField("String", "SERVER_LIST_HOST", serverListHostProd)
 
                     if (canSignRelease) {
                         signingConfig = signingConfigs.getByName("release")

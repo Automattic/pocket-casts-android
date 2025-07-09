@@ -56,7 +56,7 @@ class FolderEditFragment : BaseDialogFragment() {
             FolderEditPage(
                 viewModel = viewModel,
                 onDeleteClick = { confirmFolderDelete() },
-                onBackClick = { dismiss() },
+                onBackPress = { dismiss() },
             )
         }
     }

@@ -49,9 +49,9 @@ abstract class ChapterDao {
     protected abstract suspend fun findEpisodeChapters(episodeUuid: String): List<Chapter>
 
     @Query("SELECT * FROM episode_chapters WHERE episode_uuid IS :episodeUuid ORDER BY start_time ASC")
-    protected abstract fun _observerChaptersForEpisode(episodeUuid: String): Flow<List<Chapter>>
+    protected abstract fun observeRawChaptersForEpisode(episodeUuid: String): Flow<List<Chapter>>
 
-    fun observerChaptersForEpisode(episodeUuid: String) = _observerChaptersForEpisode(episodeUuid).distinctUntilChanged()
+    fun observeChaptersForEpisode(episodeUuid: String) = observeRawChaptersForEpisode(episodeUuid).distinctUntilChanged()
 
     @Transaction
     open suspend fun selectChapter(episodeUuid: String, chapterIndex: Int, select: Boolean, modifiedAt: Date = Date()) {

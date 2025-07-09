@@ -34,6 +34,7 @@ private fun ComposableConfigPlayPlaylistPreview() {
                     MutableStateFlow(listOf("New Releases", "Up Next")),
                 ),
             ),
-        ) {}
+            onFinish = {},
+        )
     }
 }

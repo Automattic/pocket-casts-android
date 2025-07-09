@@ -54,14 +54,14 @@ fun ReferralsClaimGuestPassBannerCard(
     state: UiState,
     onClick: () -> Unit,
     onHideBannerClick: () -> Unit,
-    onBannerShown: () -> Unit,
+    onBannerShow: () -> Unit,
     onShowReferralsSheet: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     CallOnce {
-        onBannerShown()
+        onBannerShow()
     }
-    LaunchedEffect(Unit) {
+    LaunchedEffect(onShowReferralsSheet) {
         onShowReferralsSheet()
     }
 
@@ -173,7 +173,7 @@ private fun ReferralsClaimGuestPassBannerCardPreview(
             ),
             onClick = {},
             onHideBannerClick = {},
-            onBannerShown = {},
+            onBannerShow = {},
             onShowReferralsSheet = {},
         )
     }

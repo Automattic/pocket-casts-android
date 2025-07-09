@@ -203,11 +203,12 @@ class UpNextSyncWorker @AssistedInject constructor(
             .plus(upNextQueue.queueEpisodes)
             .distinct()
         val allMatch = response.episodes?.let { episodes ->
-            episodes.size == localEpisodes.size && episodes.all { episode ->
-                localEpisodes.any { queueEpisode ->
-                    episode.uuid == queueEpisode.uuid
+            episodes.size == localEpisodes.size &&
+                episodes.all { episode ->
+                    localEpisodes.any { queueEpisode ->
+                        episode.uuid == queueEpisode.uuid
+                    }
                 }
-            }
         } == true
 
         if (!allMatch) {

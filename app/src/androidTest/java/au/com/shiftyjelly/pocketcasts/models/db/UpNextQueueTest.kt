@@ -42,8 +42,8 @@ class UpNextQueueTest {
         val episodeManager = mock<EpisodeManager> {}
         val settings = mock<Settings> {
             on { autoDownloadUpNext } doReturn UserSetting.Mock(true, mock())
-            on { lastAutoPlaySource } doReturn UserSetting.Mock(AutoPlaySource.None, mock())
-            on { trackingAutoPlaySource } doReturn UserSetting.Mock(AutoPlaySource.None, mock())
+            on { lastAutoPlaySource } doReturn UserSetting.Mock(AutoPlaySource.Predefined.None, mock())
+            on { trackingAutoPlaySource } doReturn UserSetting.Mock(AutoPlaySource.Predefined.None, mock())
         }
         val syncManager = mock<SyncManager> {}
 

@@ -62,8 +62,8 @@ import au.com.shiftyjelly.pocketcasts.payment.SubscriptionPlans
 import au.com.shiftyjelly.pocketcasts.payment.SubscriptionTier
 import au.com.shiftyjelly.pocketcasts.payment.flatMap
 import au.com.shiftyjelly.pocketcasts.payment.getOrNull
+import au.com.shiftyjelly.pocketcasts.referrals.ReferralPageDefaults.PAGE_WIDTH_PERCENT
 import au.com.shiftyjelly.pocketcasts.referrals.ReferralPageDefaults.pageCornerRadius
-import au.com.shiftyjelly.pocketcasts.referrals.ReferralPageDefaults.pageWidthPercent
 import au.com.shiftyjelly.pocketcasts.referrals.ReferralPageDefaults.shouldShowFullScreen
 import au.com.shiftyjelly.pocketcasts.referrals.ReferralsClaimGuestPassViewModel.NavigationEvent
 import au.com.shiftyjelly.pocketcasts.referrals.ReferralsClaimGuestPassViewModel.ReferralsClaimGuestPassError
@@ -105,7 +105,7 @@ fun ReferralsClaimGuestPassPage(
             snackbarHostState = snackbarHostState,
         )
 
-        LaunchedEffect(Unit) {
+        LaunchedEffect(onDismiss) {
             viewModel.navigationEvent.collect { navigationEvent ->
                 when (navigationEvent) {
                     NavigationEvent.InValidOffer -> {
@@ -125,7 +125,9 @@ fun ReferralsClaimGuestPassPage(
                         )
                     }
 
-                    NavigationEvent.Close -> { onDismiss() }
+                    NavigationEvent.Close -> {
+                        onDismiss()
+                    }
                     NavigationEvent.Welcome -> openOnboardingFlow(
                         activity = requireNotNull(activity),
                         onboardingFlow = OnboardingFlow.Welcome,
@@ -177,7 +179,7 @@ private fun ReferralsClaimGuestPassContent(
             .fillMaxSize(),
     ) {
         val showFullScreen = shouldShowFullScreen(windowWidthSizeClass, windowHeightSizeClass)
-        val pageWidth = if (showFullScreen) maxWidth else (maxWidth.value * pageWidthPercent).dp
+        val pageWidth = if (showFullScreen) maxWidth else (maxWidth.value * PAGE_WIDTH_PERCENT).dp
         val pageModifier = if (showFullScreen) {
             Modifier
                 .fillMaxSize()
@@ -329,36 +331,36 @@ private fun ClaimGuestPassContent(
     }
 }
 
-@Preview(device = Devices.PortraitRegular)
+@Preview(device = Devices.PORTRAIT_REGULAR)
 @Composable
-fun ReferralsClaimGuestPassPortraitPhonePreview() {
+private fun ReferralsClaimGuestPassPortraitPhonePreview() {
     ReferralsClaimGuestPassContentPreview(
         windowWidthSizeClass = WindowWidthSizeClass.Compact,
         windowHeightSizeClass = WindowHeightSizeClass.Medium,
     )
 }
 
-@Preview(device = Devices.LandscapeRegular)
+@Preview(device = Devices.LANDSCAPE_REGULAR)
 @Composable
-fun ReferralsClaimGuestPassLandscapePhonePreview() {
+private fun ReferralsClaimGuestPassLandscapePhonePreview() {
     ReferralsClaimGuestPassContentPreview(
         windowWidthSizeClass = WindowWidthSizeClass.Compact,
         windowHeightSizeClass = WindowHeightSizeClass.Compact,
     )
 }
 
-@Preview(device = Devices.PortraitTablet)
+@Preview(device = Devices.PORTRAIT_TABLET)
 @Composable
-fun ReferralsClaimGuestPassPortraitTabletPreview() {
+private fun ReferralsClaimGuestPassPortraitTabletPreview() {
     ReferralsClaimGuestPassContentPreview(
         windowWidthSizeClass = WindowWidthSizeClass.Medium,
         windowHeightSizeClass = WindowHeightSizeClass.Medium,
     )
 }
 
-@Preview(device = Devices.LandscapeTablet)
+@Preview(device = Devices.LANDSCAPE_TABLET)
 @Composable
-fun ReferralsClaimGuestPassLandscapeTabletPreview() {
+private fun ReferralsClaimGuestPassLandscapeTabletPreview() {
     ReferralsClaimGuestPassContentPreview(
         windowWidthSizeClass = WindowWidthSizeClass.Medium,
         windowHeightSizeClass = WindowHeightSizeClass.Expanded,

@@ -23,11 +23,11 @@ import au.com.shiftyjelly.pocketcasts.localization.R as LR
 fun NumberStepper(
     onMinusClick: () -> Unit,
     onPlusClick: () -> Unit,
+    modifier: Modifier = Modifier,
     minusContentDescription: Int = LR.string.number_stepper_minus_content_description,
     plusContentDescription: Int = LR.string.number_stepper_plus_content_description,
     size: Dp = 44.dp,
     tint: Color = MaterialTheme.theme.colors.playerContrast01,
-    modifier: Modifier = Modifier,
 ) {
     Row(
         modifier = modifier.padding(4.dp),
@@ -59,7 +59,7 @@ fun NumberStepper(
 
 @Preview(showBackground = false)
 @Composable
-fun NumberStepperPreview() {
+private fun NumberStepperPreview() {
     NumberStepper(
         onMinusClick = { },
         onPlusClick = { },

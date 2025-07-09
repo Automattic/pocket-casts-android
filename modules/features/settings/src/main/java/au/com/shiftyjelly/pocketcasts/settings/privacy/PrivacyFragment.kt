@@ -86,7 +86,7 @@ class PrivacyFragment : BaseFragment() {
                     analyticsTracker.track(AnalyticsEvent.SETTINGS_SHOW_PRIVACY_POLICY)
                     context.startActivityViewUrl(Settings.INFO_PRIVACY_URL)
                 },
-                onBackClick = {
+                onBackPress = {
                     @Suppress("DEPRECATION")
                     activity?.onBackPressed()
                 },
@@ -108,7 +108,7 @@ class PrivacyFragment : BaseFragment() {
         onCrashReportsClick: (Boolean) -> Unit,
         onLinkAccountClick: (Boolean) -> Unit,
         onPrivacyPolicyClick: () -> Unit,
-        onBackClick: () -> Unit,
+        onBackPress: () -> Unit,
         bottomInset: Dp,
         modifier: Modifier = Modifier,
     ) {
@@ -119,7 +119,7 @@ class PrivacyFragment : BaseFragment() {
         ) {
             ThemedTopAppBar(
                 title = stringResource(LR.string.settings_title_privacy),
-                onNavigationClick = onBackClick,
+                onNavigationClick = onBackPress,
             )
             LazyColumn(
                 contentPadding = PaddingValues(bottom = bottomInset),

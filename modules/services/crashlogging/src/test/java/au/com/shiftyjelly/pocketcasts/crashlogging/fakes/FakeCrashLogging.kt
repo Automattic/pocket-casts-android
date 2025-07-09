@@ -16,9 +16,7 @@ class FakeCrashLogging : CrashLogging {
 
     override fun recordException(exception: Throwable, category: String?) = Unit
 
-    override fun sendJavaScriptReport(jsException: JsException, callback: JsExceptionCallback) =
-        Unit
+    override fun sendJavaScriptReport(jsException: JsException, callback: JsExceptionCallback) = Unit
 
-    override fun sendReport(exception: Throwable?, tags: Map<String, String>, message: String?) =
-        Unit
+    override fun sendReport(exception: Throwable?, tags: Map<String, String>, message: String?) = Unit
 }

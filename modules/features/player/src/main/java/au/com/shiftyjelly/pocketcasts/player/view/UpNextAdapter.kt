@@ -185,7 +185,7 @@ class UpNextAdapter(
                     AppTheme(theme) {
                         if (header.episodePlaying && header.episodeCount == 0) {
                             UpNextNoContentBanner(
-                                onDiscoverTapped = listener::onDiscoverTapped,
+                                onDiscoverClick = listener::onDiscoverTapped,
                                 modifier = Modifier.padding(top = 24.dp),
                             )
                         }

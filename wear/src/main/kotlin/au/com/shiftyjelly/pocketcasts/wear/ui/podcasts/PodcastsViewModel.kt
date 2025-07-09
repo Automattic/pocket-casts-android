@@ -19,7 +19,7 @@ class PodcastsViewModel @Inject constructor(
     private val folderManager: FolderManager,
 ) : ViewModel() {
 
-    private val folderUuid: String = savedStateHandle[PodcastsScreen.argumentFolderUuid] ?: ""
+    private val folderUuid: String = savedStateHandle[PodcastsScreen.ARGUMENT_FOLDER_UUID] ?: ""
 
     sealed class UiState {
         object Empty : UiState()

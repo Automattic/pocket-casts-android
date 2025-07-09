@@ -22,8 +22,8 @@ internal fun PlayerSeekBar(
     isBuffering: Boolean,
     bufferedUpTo: Duration,
     playerColors: PlayerColors,
-    modifier: Modifier = Modifier,
     onSeekToPosition: (Duration, onSeekComplete: () -> Unit) -> Unit,
+    modifier: Modifier = Modifier,
 ) {
     val theme = MaterialTheme.theme.type
 
@@ -43,14 +43,14 @@ internal fun PlayerSeekBar(
         },
         update = { seekBar ->
             seekBar.apply {
-                setCurrentTime(playbackPosition)
+                setTintColor(playerColors.highlight01.toArgb(), theme)
                 setDuration(playbackDuration)
                 setAdjustDuration(adjustPlaybackDuration)
                 setPlaybackSpeed(playbackSpeed)
                 setChapters(chapters)
                 this.isBuffering = isBuffering
                 bufferedUpToInSecs = bufferedUpTo.inWholeSeconds.toInt()
-                setTintColor(playerColors.highlight01.toArgb(), theme)
+                setCurrentTime(playbackPosition)
             }
         },
         modifier = modifier.fillMaxWidth(),

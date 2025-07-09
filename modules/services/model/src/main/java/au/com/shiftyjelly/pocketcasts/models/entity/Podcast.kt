@@ -171,9 +171,9 @@ data class Podcast(
 
     @Suppress("DEPRECATION_ERROR")
     var folderUuid: String?
-        get() = rawFolderUuid?.takeIf { it != Folder.homeFolderUuid }
+        get() = rawFolderUuid?.takeIf { it != Folder.HOME_FOLDER_UUID }
         set(value) {
-            rawFolderUuid = value?.takeIf { it != Folder.homeFolderUuid }
+            rawFolderUuid = value?.takeIf { it != Folder.HOME_FOLDER_UUID }
         }
 
     @Suppress("DEPRECATION_ERROR")
@@ -204,7 +204,8 @@ data class Podcast(
         }
 
     enum class Licensing {
-        KEEP_EPISODES, DELETE_EPISODES
+        KEEP_EPISODES,
+        DELETE_EPISODES,
     }
 
     fun getFirstCategoryUnlocalised() = podcastCategory.split("\n").first().trim()

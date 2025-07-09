@@ -42,44 +42,40 @@ class SearchHistoryViewModelTest {
     )
 
     @Test
-    fun `given paid subscription status and local + remote search, when search history shown, then folders included`() =
-        runTest {
-            val viewModel = initViewModel(isPlusUser = true, isOnlySearchRemote = false)
+    fun `given paid subscription status and local + remote search, when search history shown, then folders included`() = runTest {
+        val viewModel = initViewModel(isPlusUser = true, isOnlySearchRemote = false)
 
-            viewModel.start()
+        viewModel.start()
 
-            verify(searchHistoryManager).findAll(showFolders = eq(true))
-        }
-
-    @Test
-    fun `given free subscription status and local + remote only search, when search history shown, then folders not included`() =
-        runTest {
-            val viewModel = initViewModel(isPlusUser = false, isOnlySearchRemote = true)
-
-            viewModel.start()
-
-            verify(searchHistoryManager).findAll(showFolders = eq(false))
-        }
+        verify(searchHistoryManager).findAll(showFolders = eq(true))
+    }
 
     @Test
-    fun `given paid subscription status and remote only search, when search history shown, then folders not included`() =
-        runTest {
-            val viewModel = initViewModel(isPlusUser = true, isOnlySearchRemote = true)
+    fun `given free subscription status and local + remote only search, when search history shown, then folders not included`() = runTest {
+        val viewModel = initViewModel(isPlusUser = false, isOnlySearchRemote = true)
 
-            viewModel.start()
+        viewModel.start()
 
-            verify(searchHistoryManager).findAll(showFolders = eq(false))
-        }
+        verify(searchHistoryManager).findAll(showFolders = eq(false))
+    }
 
     @Test
-    fun `given free subscription status and remote only search, when search history shown, then folders not included`() =
-        runTest {
-            val viewModel = initViewModel(isPlusUser = false, isOnlySearchRemote = true)
+    fun `given paid subscription status and remote only search, when search history shown, then folders not included`() = runTest {
+        val viewModel = initViewModel(isPlusUser = true, isOnlySearchRemote = true)
 
-            viewModel.start()
+        viewModel.start()
 
-            verify(searchHistoryManager).findAll(showFolders = eq(false))
-        }
+        verify(searchHistoryManager).findAll(showFolders = eq(false))
+    }
+
+    @Test
+    fun `given free subscription status and remote only search, when search history shown, then folders not included`() = runTest {
+        val viewModel = initViewModel(isPlusUser = false, isOnlySearchRemote = true)
+
+        viewModel.start()
+
+        verify(searchHistoryManager).findAll(showFolders = eq(false))
+    }
 
     private suspend fun initViewModel(
         isPlusUser: Boolean = false,

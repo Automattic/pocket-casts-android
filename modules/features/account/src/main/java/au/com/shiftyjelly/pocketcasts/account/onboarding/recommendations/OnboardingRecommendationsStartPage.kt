@@ -68,13 +68,14 @@ import au.com.shiftyjelly.pocketcasts.localization.R as LR
 @Composable
 fun OnboardingRecommendationsStartPage(
     theme: Theme.ThemeType,
-    onImportClicked: () -> Unit,
+    onImportClick: () -> Unit,
     onSearch: () -> Unit,
-    onBackPressed: () -> Unit,
+    onBackPress: () -> Unit,
     onComplete: () -> Unit,
     onUpdateSystemBars: (SystemBarsStyles) -> Unit,
+    modifier: Modifier = Modifier,
+    viewModel: OnboardingRecommendationsStartPageViewModel = hiltViewModel(),
 ) {
-    val viewModel = hiltViewModel<OnboardingRecommendationsStartPageViewModel>()
     val state by viewModel.state.collectAsState()
 
     val pocketCastsTheme = MaterialTheme.theme
@@ -83,24 +84,24 @@ fun OnboardingRecommendationsStartPage(
         viewModel.onShown()
     }
 
-    LaunchedEffect(Unit) {
+    LaunchedEffect(onUpdateSystemBars) {
         val statusBar = SystemBarStyle.singleAuto(pocketCastsTheme.colors.primaryUi01.copy(alpha = 0.9f)) { theme.darkTheme }
         val navigationBar = SystemBarStyle.transparent { theme.darkTheme }
         onUpdateSystemBars(SystemBarsStyles(statusBar, navigationBar))
     }
     BackHandler {
         viewModel.onBackPressed()
-        onBackPressed()
+        onBackPress()
     }
 
     Content(
         state = state,
         buttonRes = state.buttonRes,
-        onImportClicked = {
+        onImportClick = {
             viewModel.onImportClick()
-            onImportClicked()
+            onImportClick()
         },
-        onSubscribeTap = viewModel::updateSubscribed,
+        onSubscribeClick = viewModel::updateSubscribed,
         onSearch = {
             viewModel.onSearch()
             onSearch()
@@ -109,6 +110,7 @@ fun OnboardingRecommendationsStartPage(
             viewModel.onComplete()
             onComplete()
         },
+        modifier = modifier,
     )
 }
 
@@ -116,12 +118,15 @@ fun OnboardingRecommendationsStartPage(
 private fun Content(
     state: OnboardingRecommendationsStartPageViewModel.State,
     buttonRes: Int,
-    onImportClicked: () -> Unit,
-    onSubscribeTap: (Podcast) -> Unit,
+    onImportClick: () -> Unit,
+    onSubscribeClick: (Podcast) -> Unit,
     onSearch: () -> Unit,
     onComplete: () -> Unit,
+    modifier: Modifier = Modifier,
 ) {
-    Column {
+    Column(
+        modifier = modifier,
+    ) {
         val numToShowDefault = OnboardingRecommendationsStartPageViewModel.NUM_TO_SHOW_DEFAULT
         val numColumns = when (LocalConfiguration.current.orientation) {
             Configuration.ORIENTATION_LANDSCAPE -> numToShowDefault
@@ -148,7 +153,7 @@ private fun Content(
                         TextH30(
                             text = stringResource(LR.string.onboarding_recommendations_import),
                             modifier = Modifier
-                                .clickable { onImportClicked() }
+                                .clickable { onImportClick() }
                                 .padding(horizontal = 16.dp, vertical = 9.dp),
                         )
                     }
@@ -174,7 +179,7 @@ private fun Content(
             state.sections.forEach { section ->
                 section(
                     section = section,
-                    onSubscribeTap = onSubscribeTap,
+                    onSubscribeClick = onSubscribeClick,
                 )
             }
 
@@ -199,7 +204,7 @@ private fun Content(
 
 private fun LazyGridScope.section(
     section: Section,
-    onSubscribeTap: (Podcast) -> Unit,
+    onSubscribeClick: (Podcast) -> Unit,
 ) {
     if (section.visiblePodcasts.isEmpty()) return
 
@@ -226,7 +231,7 @@ private fun LazyGridScope.section(
                 podcastUuid = it.uuid,
                 podcastTitle = it.title,
                 podcastSubscribed = it.isSubscribed,
-                onSubscribeClick = { onSubscribeTap(it) },
+                onSubscribeClick = { onSubscribeClick(it) },
             )
 
             Spacer(Modifier.height(8.dp))
@@ -285,8 +290,8 @@ private fun Preview(
                 showLoadingSpinner = true,
             ),
             buttonRes = LR.string.not_now,
-            onImportClicked = {},
-            onSubscribeTap = {},
+            onImportClick = {},
+            onSubscribeClick = {},
             onSearch = {},
             onComplete = {},
         )

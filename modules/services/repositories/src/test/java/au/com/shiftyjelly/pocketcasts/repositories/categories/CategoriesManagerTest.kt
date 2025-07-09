@@ -9,9 +9,12 @@ import au.com.shiftyjelly.pocketcasts.sharedtest.InMemoryFeatureFlagRule
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.cancel
 import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
+import org.junit.After
 import org.junit.Assert.assertEquals
 import org.junit.Rule
 import org.junit.Test
@@ -19,15 +22,22 @@ import org.mockito.kotlin.any
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever
 
+@OptIn(ExperimentalCoroutinesApi::class)
 internal class CategoriesManagerTest {
     @get:Rule
     val featureFlagRule = InMemoryFeatureFlagRule()
 
     private val listRepository = mock<ListRepository>()
     private val userCategoryVisitsDao = mock<UserCategoryVisitsDao>()
+    private val coroutineScope = CoroutineScope(UnconfinedTestDispatcher())
 
     companion object {
         val testCategories = List(10) { DiscoverCategory(id = it, name = "name$it", icon = "", source = "") }
+    }
+
+    @After
+    fun tearDown() {
+        coroutineScope.cancel()
     }
 
     @Test
@@ -36,13 +46,12 @@ internal class CategoriesManagerTest {
         whenever(listRepository.getCategoriesList(any())).thenReturn(testCategories)
         whenever(userCategoryVisitsDao.getCategoryVisitsOrdered()).thenReturn(emptyList())
 
-        val categoriesManager = CategoriesManager(listRepository, userCategoryVisitsDao, CoroutineScope(Dispatchers.Default))
+        val categoriesManager = CategoriesManager(listRepository, userCategoryVisitsDao, coroutineScope)
         categoriesManager.loadCategories("whatever")
         val popularCategoryIds = (0 until 6).toList()
         categoriesManager.setRowInfo(popularCategoryIds = popularCategoryIds, sponsoredCategoryIds = listOf(4, 5, 6, 7))
 
         categoriesManager.state.test {
-            skipItems(1)
             val state = awaitItem()
             assert(state is CategoriesManager.State.Idle)
             assertEquals(testCategories.filter { popularCategoryIds.contains(it.id) }.map { it.id }, (state as CategoriesManager.State.Idle).featuredCategories.map { it.id })
@@ -62,13 +71,12 @@ internal class CategoriesManagerTest {
             ),
         )
 
-        val categoriesManager = CategoriesManager(listRepository, userCategoryVisitsDao, CoroutineScope(Dispatchers.Default))
+        val categoriesManager = CategoriesManager(listRepository, userCategoryVisitsDao, coroutineScope)
         categoriesManager.loadCategories("whatever")
         val popularCategoryIds = (0 until 6).toList()
         categoriesManager.setRowInfo(popularCategoryIds = popularCategoryIds, sponsoredCategoryIds = listOf(4, 5, 6, 7))
 
         categoriesManager.state.test {
-            skipItems(1)
             val state = awaitItem()
             assert(state is CategoriesManager.State.Idle)
             assertEquals(listOf(5, 4, 9, 8, 0, 1), (state as CategoriesManager.State.Idle).featuredCategories.map { it.id })
@@ -90,13 +98,12 @@ internal class CategoriesManagerTest {
             ),
         )
 
-        val categoriesManager = CategoriesManager(listRepository, userCategoryVisitsDao, CoroutineScope(Dispatchers.Default))
+        val categoriesManager = CategoriesManager(listRepository, userCategoryVisitsDao, coroutineScope)
         categoriesManager.loadCategories("whatever")
         val popularCategoryIds = (0 until 6).toList()
         categoriesManager.setRowInfo(popularCategoryIds = popularCategoryIds, sponsoredCategoryIds = listOf(4, 5, 6, 7))
 
         categoriesManager.state.test {
-            skipItems(1)
             val state = awaitItem()
             assert(state is CategoriesManager.State.Idle)
             assertEquals(listOf(5, 4, 9, 1, 8, 2), (state as CategoriesManager.State.Idle).featuredCategories.map { it.id })
@@ -111,12 +118,11 @@ internal class CategoriesManagerTest {
             emptyList(),
         )
 
-        val categoriesManager = CategoriesManager(listRepository, userCategoryVisitsDao, CoroutineScope(Dispatchers.Default))
+        val categoriesManager = CategoriesManager(listRepository, userCategoryVisitsDao, coroutineScope)
         categoriesManager.loadCategories("whatever")
         categoriesManager.setRowInfo(popularCategoryIds = emptyList(), sponsoredCategoryIds = listOf(4, 5, 6, 7))
 
         categoriesManager.state.test {
-            skipItems(1)
             val state = awaitItem()
             assert(state is CategoriesManager.State.Idle)
             assertEquals((0..5).toList(), (state as CategoriesManager.State.Idle).featuredCategories.map { it.id })
@@ -131,12 +137,11 @@ internal class CategoriesManagerTest {
             emptyList(),
         )
 
-        val categoriesManager = CategoriesManager(listRepository, userCategoryVisitsDao, CoroutineScope(Dispatchers.Default))
+        val categoriesManager = CategoriesManager(listRepository, userCategoryVisitsDao, coroutineScope)
         categoriesManager.loadCategories("whatever")
         categoriesManager.setRowInfo(popularCategoryIds = (5..9).toList(), sponsoredCategoryIds = listOf(4, 5, 6, 7))
 
         categoriesManager.state.test {
-            skipItems(1)
             val state = awaitItem()
             assert(state is CategoriesManager.State.Idle)
             assertEquals((5..9).toList(), (state as CategoriesManager.State.Idle).featuredCategories.map { it.id })

@@ -22,17 +22,20 @@ import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 @Composable
 fun FolderEditNamePage(
-    onBackClick: () -> Unit,
+    onBackPress: () -> Unit,
     onNextClick: () -> Unit,
     viewModel: FolderEditViewModel,
+    modifier: Modifier = Modifier,
 ) {
     val folderName: String by viewModel.folderName.collectAsState()
     val focusRequester = remember { FocusRequester() }
-    Column {
+    Column(
+        modifier = modifier,
+    ) {
         BottomSheetAppBar(
             title = stringResource(LR.string.name_your_folder),
             navigationButton = NavigationButton.Back,
-            onNavigationClick = { onBackClick() },
+            onNavigationClick = { onBackPress() },
         )
         TextC70(
             text = stringResource(LR.string.name),

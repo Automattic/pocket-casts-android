@@ -718,7 +718,7 @@ private fun PodcastDetails(
         )
         PodcastInfoView(
             state = podcastInfoState,
-            onWebsiteLinkClicked = onClickWebsiteLink,
+            onWebsiteLinkClick = onClickWebsiteLink,
         )
     }
 }
@@ -772,7 +772,7 @@ private fun PodcastBackgroundArtwork(
 private fun ImageOrPreview(
     uuid: String,
     onArtworkAvailable: () -> Unit,
-    modifier: Modifier,
+    modifier: Modifier = Modifier,
 ) {
     if (!LocalInspectionMode.current) {
         val context = LocalContext.current
@@ -910,7 +910,7 @@ private val previewColors = listOf(
     Color(0xFFFF6663),
 )
 
-@Preview(device = Devices.PortraitRegular)
+@Preview(device = Devices.PORTRAIT_REGULAR)
 @Composable
 private fun PodcastHeaderPreview(
     @PreviewParameter(ThemePreviewParameterProvider::class) themeType: Theme.ThemeType,

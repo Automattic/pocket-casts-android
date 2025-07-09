@@ -72,7 +72,9 @@ import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 @AndroidEntryPoint
-class CloudFilesFragment : BaseFragment(), Toolbar.OnMenuItemClickListener {
+class CloudFilesFragment :
+    BaseFragment(),
+    Toolbar.OnMenuItemClickListener {
     @Inject lateinit var downloadManager: DownloadManager
 
     @Inject lateinit var playbackManager: PlaybackManager
@@ -156,7 +158,7 @@ class CloudFilesFragment : BaseFragment(), Toolbar.OnMenuItemClickListener {
 
     override fun onResume() {
         super.onResume()
-        settings.trackingAutoPlaySource.set(AutoPlaySource.Files, updateModifiedAt = false)
+        settings.trackingAutoPlaySource.set(AutoPlaySource.Predefined.Files, updateModifiedAt = false)
     }
 
     override fun onPause() {

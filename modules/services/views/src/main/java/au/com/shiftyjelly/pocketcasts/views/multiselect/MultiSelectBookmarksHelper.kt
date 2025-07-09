@@ -55,8 +55,7 @@ class MultiSelectBookmarksHelper @Inject constructor(
         }
     }
 
-    override fun isSelected(multiSelectable: Bookmark) =
-        selectedList.count { it.uuid == multiSelectable.uuid } > 0
+    override fun isSelected(multiSelectable: Bookmark) = selectedList.count { it.uuid == multiSelectable.uuid } > 0
 
     override fun onMenuItemSelected(
         itemId: Int,

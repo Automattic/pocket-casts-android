@@ -71,7 +71,7 @@ fun AdReportContent(
     }
 }
 
-@Preview(device = Devices.PortraitRegular)
+@Preview(device = Devices.PORTRAIT_REGULAR)
 @Composable
 private fun AdReportContentPreview() {
     AppTheme(ThemeType.LIGHT) {

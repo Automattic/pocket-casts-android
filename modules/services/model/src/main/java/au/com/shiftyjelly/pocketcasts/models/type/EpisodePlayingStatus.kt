@@ -17,13 +17,12 @@ enum class EpisodePlayingStatus {
     }
 
     companion object {
-        fun fromInt(n: Int) =
-            when (n) {
-                1 -> NOT_PLAYED
-                2 -> IN_PROGRESS
-                3 -> COMPLETED
-                else -> NOT_PLAYED
-            }
+        fun fromInt(n: Int) = when (n) {
+            1 -> NOT_PLAYED
+            2 -> IN_PROGRESS
+            3 -> COMPLETED
+            else -> NOT_PLAYED
+        }
     }
 }
 

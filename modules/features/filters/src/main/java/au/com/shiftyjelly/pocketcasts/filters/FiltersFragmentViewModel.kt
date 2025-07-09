@@ -39,7 +39,8 @@ class FiltersFragmentViewModel @Inject constructor(
     private val episodeManager: EpisodeManager,
     private val playbackManager: PlaybackManager,
     private val userManager: UserManager,
-) : ViewModel(), CoroutineScope {
+) : ViewModel(),
+    CoroutineScope {
 
     companion object {
         private const val FILTER_COUNT_KEY = "filter_count"

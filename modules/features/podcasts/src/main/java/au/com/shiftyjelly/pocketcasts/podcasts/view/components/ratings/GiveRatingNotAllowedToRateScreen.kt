@@ -34,17 +34,18 @@ import au.com.shiftyjelly.pocketcasts.podcasts.viewmodel.GiveRatingViewModel
 fun GiveRatingNotAllowedToRate(
     state: GiveRatingViewModel.State.NotAllowedToRate,
     onDismiss: () -> Unit,
-    viewModel: GiveRatingViewModel,
+    onShow: () -> Unit,
+    modifier: Modifier = Modifier,
 ) {
     val configuration = LocalConfiguration.current
     val isLandscape = configuration.orientation == Configuration.ORIENTATION_LANDSCAPE
 
     CallOnce {
-        viewModel.trackOnNotAllowedToRateScreenShown(state.podcastUuid)
+        onShow()
     }
 
     Box(
-        modifier = Modifier.fillMaxSize(),
+        modifier = modifier.fillMaxSize(),
     ) {
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,

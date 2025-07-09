@@ -1,11 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2025-06-17 09:54:03+0000
+Translation-Revision-Date: 2025-07-01 09:54:04+0000
 Plural-Forms: nplurals=1; plural=0;
 Generator: GlotPress/2.4.0-alpha
 Language: ja_JP
 -->
 <resources>
+    <string name="transcript_open">トランスクリプトを開く</string>
+    <string name="episode_description">エピソードの説明</string>
     <string name="onboarding_plus_feature_no_banner_ads">バナー広告なし</string>
     <string name="banner_ad_plus_prompt">Pocket Casts Plus でバナー広告などにさよならしましょう</string>
     <string name="ad_report_reason_other">その他</string>

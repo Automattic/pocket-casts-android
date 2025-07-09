@@ -281,7 +281,7 @@ private fun TextInfo(
     }
 }
 
-@Preview(device = Devices.PortraitRegular)
+@Preview(device = Devices.PORTRAIT_REGULAR)
 @Composable
 private fun LongestEpisodePreview() {
     PreviewBox(currentPage = 6) { measurements ->

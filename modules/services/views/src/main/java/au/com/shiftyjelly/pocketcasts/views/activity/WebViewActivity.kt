@@ -27,7 +27,9 @@ private const val EXTRA_TITLE = "EXTRA_TITLE"
 private const val EXTRA_URL = "EXTRA_URL"
 
 @AndroidEntryPoint
-class WebViewActivity : AppCompatActivity(), CoroutineScope {
+class WebViewActivity :
+    AppCompatActivity(),
+    CoroutineScope {
     override val coroutineContext: CoroutineContext
         get() = Dispatchers.Main
 

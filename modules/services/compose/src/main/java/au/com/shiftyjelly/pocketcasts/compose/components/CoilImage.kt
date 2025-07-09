@@ -31,11 +31,14 @@ internal fun CoilImage(
         contentScale = contentScale,
     )
 
-    Box(contentAlignment = Alignment.Center) {
+    Box(
+        contentAlignment = Alignment.Center,
+        modifier = modifier,
+    ) {
         Image(
             painter = painter,
             contentDescription = title,
-            modifier = modifier.clip(if (corners == null) RectangleShape else RoundedCornerShape(corners)),
+            modifier = Modifier.clip(if (corners == null) RectangleShape else RoundedCornerShape(corners)),
         )
         val state = painter.state
         if (showTitle && state is AsyncImagePainter.State.Error) {

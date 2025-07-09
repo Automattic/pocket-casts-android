@@ -25,7 +25,8 @@ class ShareListIncomingViewModel
     val listServiceManager: ListServiceManager,
     val playbackManager: PlaybackManager,
     val analyticsTracker: AnalyticsTracker,
-) : ViewModel(), CoroutineScope {
+) : ViewModel(),
+    CoroutineScope {
     var isFragmentChangingConfigurations: Boolean = false
     val share = MutableLiveData<ShareState>()
     val subscribedUuids =

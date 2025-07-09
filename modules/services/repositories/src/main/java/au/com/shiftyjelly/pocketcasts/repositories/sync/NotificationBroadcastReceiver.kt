@@ -22,7 +22,9 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
-class NotificationBroadcastReceiver : BroadcastReceiver(), CoroutineScope {
+class NotificationBroadcastReceiver :
+    BroadcastReceiver(),
+    CoroutineScope {
 
     @Inject lateinit var settings: Settings
 

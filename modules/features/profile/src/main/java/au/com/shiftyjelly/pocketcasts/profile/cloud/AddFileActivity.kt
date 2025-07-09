@@ -622,8 +622,7 @@ class AddFileActivity :
         }
     }
 
-    private suspend fun getUserEpisode(existingUuid: String) =
-        withContext(Dispatchers.Default) { userEpisodeManager.findEpisodeByUuid(existingUuid) }
+    private suspend fun getUserEpisode(existingUuid: String) = withContext(Dispatchers.Default) { userEpisodeManager.findEpisodeByUuid(existingUuid) }
 
     private fun saveBitmapToFile(): File? {
         val bitmap = this.bitmap ?: return null

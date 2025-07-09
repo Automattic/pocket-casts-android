@@ -54,17 +54,15 @@ class PodcastSelectFragment : BaseFragment() {
             @ColorInt tintColor: Int? = null,
             showToolbar: Boolean = false,
             source: PodcastSelectFragmentSource,
-        ): PodcastSelectFragment =
-            PodcastSelectFragment().apply {
-                arguments = createArgs(
-                    tintColor = tintColor,
-                    showToolbar = showToolbar,
-                    source = source,
-                )
-            }
+        ): PodcastSelectFragment = PodcastSelectFragment().apply {
+            arguments = createArgs(
+                tintColor = tintColor,
+                showToolbar = showToolbar,
+                source = source,
+            )
+        }
 
-        private fun extractArgs(bundle: Bundle?): PodcastSelectFragmentArgs? =
-            bundle?.let { BundleCompat.getParcelable(it, NEW_INSTANCE_ARG, PodcastSelectFragmentArgs::class.java) }
+        private fun extractArgs(bundle: Bundle?): PodcastSelectFragmentArgs? = bundle?.let { BundleCompat.getParcelable(it, NEW_INSTANCE_ARG, PodcastSelectFragmentArgs::class.java) }
     }
 
     interface Listener {

@@ -141,8 +141,8 @@ private fun TouchClipSelector(
     isPlaying: Boolean,
     shareColors: ShareColors,
     listener: ShareClipPageListener,
-    modifier: Modifier = Modifier,
     state: ClipSelectorState,
+    modifier: Modifier = Modifier,
 ) {
     val coroutineScope = rememberCoroutineScope()
     val density = LocalDensity.current
@@ -565,7 +565,7 @@ private fun KeyboardClipSelector(
                 hoursDescription = stringResource(LR.string.share_start_hours),
                 minutesDescription = stringResource(LR.string.share_start_minutes),
                 secondsDescription = stringResource(LR.string.share_start_seconds),
-                onValueChanged = listener::onUpdateClipStart,
+                onValueChange = listener::onUpdateClipStart,
             )
         }
         Column(
@@ -590,7 +590,7 @@ private fun KeyboardClipSelector(
                 hoursDescription = stringResource(LR.string.share_end_hours),
                 minutesDescription = stringResource(LR.string.share_end_minutes),
                 secondsDescription = stringResource(LR.string.share_end_seconds),
-                onValueChanged = listener::onUpdateClipEnd,
+                onValueChange = listener::onUpdateClipEnd,
             )
         }
     }
@@ -604,7 +604,7 @@ private fun HhMmSsTextInput(
     hoursDescription: String,
     minutesDescription: String,
     secondsDescription: String,
-    onValueChanged: (Duration) -> Unit,
+    onValueChange: (Duration) -> Unit,
 ) {
     var hours by remember { mutableStateOf(value.inWholeHours.hours) }
     var minutes by remember { mutableStateOf((value.inWholeMinutes % 60).minutes) }
@@ -626,9 +626,9 @@ private fun HhMmSsTextInput(
                 showSeparator = true,
                 shareColors = shareColors,
                 contentDescription = hoursDescription,
-                onValueChanged = {
+                onValueChange = {
                     hours = it
-                    onValueChanged(hours + minutes + seconds)
+                    onValueChange(hours + minutes + seconds)
                 },
             )
         }
@@ -643,9 +643,9 @@ private fun HhMmSsTextInput(
                 showSeparator = true,
                 shareColors = shareColors,
                 contentDescription = minutesDescription,
-                onValueChanged = {
+                onValueChange = {
                     minutes = it
-                    onValueChanged(hours + minutes + seconds)
+                    onValueChange(hours + minutes + seconds)
                 },
             )
         }
@@ -660,9 +660,9 @@ private fun HhMmSsTextInput(
                 showSeparator = false,
                 shareColors = shareColors,
                 contentDescription = secondsDescription,
-                onValueChanged = {
+                onValueChange = {
                     seconds = it
-                    onValueChanged(hours + minutes + seconds)
+                    onValueChange(hours + minutes + seconds)
                 },
             )
         }
@@ -676,7 +676,7 @@ private fun TimeTextField(
     showSeparator: Boolean,
     shareColors: ShareColors,
     contentDescription: String,
-    onValueChanged: (Duration) -> Unit,
+    onValueChange: (Duration) -> Unit,
 ) {
     var displyedValue by remember { mutableStateOf(TextFieldValue(formatter.durationToComponenet(value).toString())) }
     val focusManager = LocalFocusManager.current
@@ -687,7 +687,7 @@ private fun TimeTextField(
             val longValue = newValue.toLongOrNull()?.takeIf { it <= formatter.maxComponentValue }
             if (newValue.isEmpty() || longValue != null) {
                 displyedValue = textFieldValue.copy(text = newValue)
-                onValueChanged(longValue?.let { formatter.componentToDuration(it) } ?: Duration.ZERO)
+                onValueChange(longValue?.let { formatter.componentToDuration(it) } ?: Duration.ZERO)
             }
         },
         maxLines = 1,
@@ -759,22 +759,22 @@ private class HHMmSsVisualTransformation(
 }
 
 @ShowkaseComposable(name = "Clip selector", group = "Sharing")
-@Preview(name = "Paused", device = Devices.PortraitRegular)
+@Preview(name = "Paused", device = Devices.PORTRAIT_REGULAR)
 @Composable
-fun ClipSelectorPausedPreview() = ClipSelectorPreview()
+private fun ClipSelectorPausedPreview() = ClipSelectorPreview()
 
-@Preview(name = "Playing", device = Devices.PortraitRegular)
+@Preview(name = "Playing", device = Devices.PORTRAIT_REGULAR)
 @Composable
 private fun ClipSelectorPlayingPreview() = ClipSelectorPreview(isPlaying = true)
 
-@Preview(name = "Zoomed in", device = Devices.PortraitRegular)
+@Preview(name = "Zoomed in", device = Devices.PORTRAIT_REGULAR)
 @Composable
 private fun ClipSelectorZoomedPreview() = ClipSelectorPreview(
     clipEnd = 10.seconds,
     scale = 5f,
 )
 
-@Preview(name = "Scrolled", device = Devices.PortraitRegular)
+@Preview(name = "Scrolled", device = Devices.PORTRAIT_REGULAR)
 @Composable
 private fun ClipSelectorScrolledPreview() = ClipSelectorPreview(
     clipStart = 35.seconds,
@@ -782,32 +782,32 @@ private fun ClipSelectorScrolledPreview() = ClipSelectorPreview(
     firstVisibleItemIndex = 25,
 )
 
-@Preview(name = "No start handle", device = Devices.PortraitRegular)
+@Preview(name = "No start handle", device = Devices.PORTRAIT_REGULAR)
 @Composable
 private fun ClipSelectorNoStartHandlePreview() = ClipSelectorPreview(
     firstVisibleItemIndex = 5,
 )
 
-@Preview(name = "No end handle", device = Devices.PortraitRegular)
+@Preview(name = "No end handle", device = Devices.PORTRAIT_REGULAR)
 @Composable
 private fun ClipSelectorNoEndHandlePreview() = ClipSelectorPreview(
     clipStart = 35.seconds,
     clipEnd = 75.seconds,
 )
 
-@Preview(name = "Playback in middle", device = Devices.PortraitRegular)
+@Preview(name = "Playback in middle", device = Devices.PORTRAIT_REGULAR)
 @Composable
 private fun ClipSelectorInProgressPreview() = ClipSelectorPreview(
     progressPlayback = 10.seconds,
 )
 
-@Preview(name = "Playback at end", device = Devices.PortraitRegular)
+@Preview(name = "Playback at end", device = Devices.PORTRAIT_REGULAR)
 @Composable
 private fun ClipSelectorPlayedPreview() = ClipSelectorPreview(
     progressPlayback = 15.seconds,
 )
 
-@Preview(name = "Keyboard", device = Devices.PortraitRegular)
+@Preview(name = "Keyboard", device = Devices.PORTRAIT_REGULAR)
 @Composable
 private fun ClipSelectorKeyboardPreview() = ClipSelectorPreview(
     useKeyboardInput = true,

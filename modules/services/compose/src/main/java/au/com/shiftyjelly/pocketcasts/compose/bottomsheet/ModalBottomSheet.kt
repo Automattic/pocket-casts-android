@@ -15,6 +15,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshotFlow
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.CoroutineScope
@@ -23,9 +24,10 @@ import kotlinx.coroutines.launch
 @Composable
 fun ModalBottomSheet(
     parent: ViewGroup,
-    onExpanded: () -> Unit,
     shouldShow: Boolean,
     content: BottomSheetContentState.Content,
+    onExpand: () -> Unit,
+    modifier: Modifier = Modifier,
     sheetState: ModalBottomSheetState = rememberModalBottomSheetState(
         initialValue = ModalBottomSheetValue.Hidden,
         skipHalfExpanded = true,
@@ -50,6 +52,7 @@ fun ModalBottomSheet(
         },
         sheetShape = RoundedCornerShape(topStart = 16.dp, topEnd = 16.dp),
         scrimColor = Color.Black.copy(alpha = .25f),
+        modifier = modifier,
         content = {},
     )
 
@@ -57,7 +60,7 @@ fun ModalBottomSheet(
         snapshotFlow { sheetState.currentValue }
             .collect {
                 if (sheetState.currentValue == ModalBottomSheetValue.Expanded) {
-                    onExpanded.invoke()
+                    onExpand.invoke()
                 } else if (sheetState.currentValue == ModalBottomSheetValue.Hidden) {
                     if (isSheetShown) {
                         /* Remove bottom sheet from parent view when bottom sheet is hidden

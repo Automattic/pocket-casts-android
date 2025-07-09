@@ -47,13 +47,15 @@ import au.com.shiftyjelly.pocketcasts.localization.R as LR
 fun EpisodeChip(
     episode: BaseEpisode,
     useEpisodeArtwork: Boolean,
-    useUpNextIcon: Boolean = true,
     onClick: () -> Unit,
+    modifier: Modifier = Modifier,
+    useUpNextIcon: Boolean = true,
     showImage: Boolean = true,
+    viewModel: EpisodeChipViewModel = hiltViewModel(),
 ) {
     Box(
         contentAlignment = Alignment.Center,
-        modifier = Modifier
+        modifier = modifier
             .clip(RoundedCornerShape(24.dp))
             .background(MaterialTheme.colors.surface)
             .clickable { onClick() }
@@ -61,8 +63,6 @@ fun EpisodeChip(
             .fillMaxWidth()
             .padding(vertical = 10.dp),
     ) {
-        val viewModel = hiltViewModel<EpisodeChipViewModel>()
-
         // Make sure the episode is always up-to-date
         @Suppress("NAME_SHADOWING")
         val episode by viewModel
@@ -172,7 +172,7 @@ fun EpisodeChip(
 private fun IconsRow(
     showUpNextIcon: Boolean,
     episode: BaseEpisode,
-    modifier: Modifier,
+    modifier: Modifier = Modifier,
 ) {
     Row(
         horizontalArrangement = spacedBy(4.dp),

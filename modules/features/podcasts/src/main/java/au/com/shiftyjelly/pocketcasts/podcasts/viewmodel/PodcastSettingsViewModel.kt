@@ -33,7 +33,8 @@ class PodcastSettingsViewModel @Inject constructor(
     private val playlistManager: PlaylistManager,
     private val analyticsTracker: AnalyticsTracker,
     settings: Settings,
-) : ViewModel(), CoroutineScope {
+) : ViewModel(),
+    CoroutineScope {
 
     override val coroutineContext: CoroutineContext
         get() = Dispatchers.Default
@@ -160,7 +161,6 @@ class PodcastSettingsViewModel @Inject constructor(
     private object AnalyticsProp {
         private const val SOURCE_KEY = "source"
         private const val UUID_KEY = "uuid"
-        fun podcastUnsubscribed(source: SourceView, uuid: String) =
-            mapOf(SOURCE_KEY to source.analyticsValue, UUID_KEY to uuid)
+        fun podcastUnsubscribed(source: SourceView, uuid: String) = mapOf(SOURCE_KEY to source.analyticsValue, UUID_KEY to uuid)
     }
 }

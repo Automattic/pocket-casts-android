@@ -50,20 +50,20 @@ import au.com.shiftyjelly.pocketcasts.localization.R as LR
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun MenuActionRearrange(
-    modifier: Modifier = Modifier,
-    header: @Composable (() -> Unit)? = null,
-    menuActions: List<MenuAction>,
-    onActionsOrderChanged: (List<MenuAction>) -> Unit,
-    onActionMoved: (fromIndex: Int, toIndex: Int, action: MenuAction) -> Unit = { _, _, _ -> },
     chooseCount: Int,
-    actionsTitle: String? = null,
     otherActionsTitle: String,
+    menuActions: List<MenuAction>,
+    onChangeOrder: (List<MenuAction>) -> Unit,
+    modifier: Modifier = Modifier,
+    actionsTitle: String? = null,
     enabled: Boolean = true,
     contentPadding: PaddingValues = PaddingValues(0.dp),
     hoverColor: Color = MaterialTheme.theme.colors.primaryUi02Active,
     textColor: Color = MaterialTheme.theme.colors.primaryText01,
     titleTextColor: Color = MaterialTheme.theme.colors.primaryText02,
     iconColor: Color = MaterialTheme.theme.colors.primaryIcon01,
+    onMoveAction: (fromIndex: Int, toIndex: Int, action: MenuAction) -> Unit = { _, _, _ -> },
+    header: @Composable (() -> Unit)? = null,
 ) {
     val lazyListState = rememberLazyListState()
     val reorderableLazyListState = rememberReorderableLazyListState(lazyListState) { from, to ->
@@ -79,10 +79,10 @@ fun MenuActionRearrange(
                 fromIndex -= 1
             }
             val action = removeAt(fromIndex)
-            onActionMoved(fromIndex, toIndex, action)
+            onMoveAction(fromIndex, toIndex, action)
             add(toIndex, action)
         }
-        onActionsOrderChanged(actions)
+        onChangeOrder(actions)
     }
 
     val alphaModifier = if (enabled) Modifier else Modifier.alpha(0.4f)
@@ -133,7 +133,7 @@ fun MenuActionRearrange(
                                 .then(rowDraggableModifier)
                                 .then(alphaModifier)
                                 .semantics {
-                                    customActions = accessibilityActions(index = index, menuActions = menuActions, onActionsOrderChanged = onActionsOrderChanged, resources = resources)
+                                    customActions = accessibilityActions(index = index, menuActions = menuActions, onActionsOrderChanged = onChangeOrder, resources = resources)
                                 },
                         ) {
                             Spacer(Modifier.width(24.dp))
@@ -213,7 +213,7 @@ data class MenuAction(
 @ShowkaseComposable(name = "MenuActionRearrange", group = "Rearrange")
 @Preview
 @Composable
-fun MenuActionRearrangePreview() {
+private fun MenuActionRearrangePreview() {
     AppThemeWithBackground(Theme.ThemeType.LIGHT) {
         MenuActionRearrange(
             header = {
@@ -230,7 +230,7 @@ fun MenuActionRearrangePreview() {
                 MenuAction("4", LR.string.playback_speed, IR.drawable.ic_speed_number),
                 MenuAction("5", LR.string.star, IR.drawable.ic_star),
             ),
-            onActionsOrderChanged = {},
+            onChangeOrder = {},
             chooseCount = 3,
             actionsTitle = "Shortcut on player",
             otherActionsTitle = "Other Actions",

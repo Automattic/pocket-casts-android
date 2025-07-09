@@ -98,7 +98,7 @@ class PlaybackSettingsFragment : BaseFragment() {
             val bottomInset = settings.bottomInset.collectAsStateWithLifecycle(0)
             PlaybackSettings(
                 settings = settings,
-                onBackClick = {
+                onBackPress = {
                     @Suppress("DEPRECATION")
                     activity?.onBackPressed()
                 },
@@ -111,7 +111,7 @@ class PlaybackSettingsFragment : BaseFragment() {
     @Composable
     private fun PlaybackSettings(
         settings: Settings,
-        onBackClick: () -> Unit,
+        onBackPress: () -> Unit,
         scrollToSleepTimer: Boolean,
         bottomInset: Dp,
     ) {
@@ -132,7 +132,7 @@ class PlaybackSettingsFragment : BaseFragment() {
         Column {
             ThemedTopAppBar(
                 title = stringResource(LR.string.settings_title_playback),
-                onNavigationClick = onBackClick,
+                onNavigationClick = onBackPress,
                 bottomShadow = true,
             )
             LazyColumn(
@@ -597,64 +597,58 @@ class PlaybackSettingsFragment : BaseFragment() {
     }
 
     @Composable
-    private fun KeepScreenAwake(saved: Boolean, onSave: (Boolean) -> Unit) =
-        SettingRow(
-            primaryText = stringResource(LR.string.settings_keep_screen_awake),
-            secondaryText = stringResource(LR.string.settings_keep_screen_awake_summary),
-            toggle = SettingRowToggle.Switch(checked = saved),
-            modifier = Modifier.toggleable(value = saved, role = Role.Switch) { onSave(!saved) },
-            indent = false,
-        )
+    private fun KeepScreenAwake(saved: Boolean, onSave: (Boolean) -> Unit) = SettingRow(
+        primaryText = stringResource(LR.string.settings_keep_screen_awake),
+        secondaryText = stringResource(LR.string.settings_keep_screen_awake_summary),
+        toggle = SettingRowToggle.Switch(checked = saved),
+        modifier = Modifier.toggleable(value = saved, role = Role.Switch) { onSave(!saved) },
+        indent = false,
+    )
 
     @Composable
-    private fun OpenPlayerAutomatically(saved: Boolean, onSave: (Boolean) -> Unit) =
-        SettingRow(
-            primaryText = stringResource(id = LR.string.settings_open_player_automatically),
-            secondaryText = stringResource(id = LR.string.settings_open_player_automatically_summary),
-            toggle = SettingRowToggle.Switch(checked = saved),
-            modifier = Modifier.toggleable(value = saved, role = Role.Switch) { onSave(!saved) },
-            indent = false,
-        )
+    private fun OpenPlayerAutomatically(saved: Boolean, onSave: (Boolean) -> Unit) = SettingRow(
+        primaryText = stringResource(id = LR.string.settings_open_player_automatically),
+        secondaryText = stringResource(id = LR.string.settings_open_player_automatically_summary),
+        toggle = SettingRowToggle.Switch(checked = saved),
+        modifier = Modifier.toggleable(value = saved, role = Role.Switch) { onSave(!saved) },
+        indent = false,
+    )
 
     @Composable
-    private fun IntelligentPlaybackResumption(saved: Boolean, onSave: (Boolean) -> Unit) =
-        SettingRow(
-            primaryText = stringResource(LR.string.settings_playback_resumption),
-            secondaryText = stringResource(LR.string.settings_playback_resumption_summary),
-            toggle = SettingRowToggle.Switch(checked = saved),
-            modifier = Modifier.toggleable(value = saved, role = Role.Switch) { onSave(!saved) },
-            indent = false,
-        )
+    private fun IntelligentPlaybackResumption(saved: Boolean, onSave: (Boolean) -> Unit) = SettingRow(
+        primaryText = stringResource(LR.string.settings_playback_resumption),
+        secondaryText = stringResource(LR.string.settings_playback_resumption_summary),
+        toggle = SettingRowToggle.Switch(checked = saved),
+        modifier = Modifier.toggleable(value = saved, role = Role.Switch) { onSave(!saved) },
+        indent = false,
+    )
 
     @Composable
-    private fun PlayUpNextOnTap(saved: Boolean, onSave: (Boolean) -> Unit) =
-        SettingRow(
-            primaryText = stringResource(LR.string.settings_up_next_tap),
-            secondaryText = stringResource(LR.string.settings_up_next_tap_summary),
-            toggle = SettingRowToggle.Switch(checked = saved),
-            modifier = Modifier.toggleable(value = saved, role = Role.Switch) { onSave(!saved) },
-            indent = false,
-        )
+    private fun PlayUpNextOnTap(saved: Boolean, onSave: (Boolean) -> Unit) = SettingRow(
+        primaryText = stringResource(LR.string.settings_up_next_tap),
+        secondaryText = stringResource(LR.string.settings_up_next_tap_summary),
+        toggle = SettingRowToggle.Switch(checked = saved),
+        modifier = Modifier.toggleable(value = saved, role = Role.Switch) { onSave(!saved) },
+        indent = false,
+    )
 
     @Composable
-    private fun ShakeToResetSleepTimer(saved: Boolean, onSave: (Boolean) -> Unit) =
-        SettingRow(
-            primaryText = stringResource(LR.string.settings_sleep_timer_shake_to_reset),
-            secondaryText = stringResource(LR.string.settings_sleep_timer_shake_to_reset_summary),
-            toggle = SettingRowToggle.Switch(checked = saved),
-            modifier = Modifier.toggleable(value = saved, role = Role.Switch) { onSave(!saved) },
-            indent = false,
-        )
+    private fun ShakeToResetSleepTimer(saved: Boolean, onSave: (Boolean) -> Unit) = SettingRow(
+        primaryText = stringResource(LR.string.settings_sleep_timer_shake_to_reset),
+        secondaryText = stringResource(LR.string.settings_sleep_timer_shake_to_reset_summary),
+        toggle = SettingRowToggle.Switch(checked = saved),
+        modifier = Modifier.toggleable(value = saved, role = Role.Switch) { onSave(!saved) },
+        indent = false,
+    )
 
     @Composable
-    private fun AutoSleepTimerRestart(saved: Boolean, onSave: (Boolean) -> Unit) =
-        SettingRow(
-            primaryText = stringResource(LR.string.settings_sleep_timer_auto_restart),
-            secondaryText = stringResource(LR.string.settings_sleep_timer_auto_restart_summary),
-            toggle = SettingRowToggle.Switch(checked = saved),
-            modifier = Modifier.toggleable(value = saved, role = Role.Switch) { onSave(!saved) },
-            indent = false,
-        )
+    private fun AutoSleepTimerRestart(saved: Boolean, onSave: (Boolean) -> Unit) = SettingRow(
+        primaryText = stringResource(LR.string.settings_sleep_timer_auto_restart),
+        secondaryText = stringResource(LR.string.settings_sleep_timer_auto_restart_summary),
+        toggle = SettingRowToggle.Switch(checked = saved),
+        modifier = Modifier.toggleable(value = saved, role = Role.Switch) { onSave(!saved) },
+        indent = false,
+    )
 
     @Composable
     private fun AutoPlayNextOnEmpty(

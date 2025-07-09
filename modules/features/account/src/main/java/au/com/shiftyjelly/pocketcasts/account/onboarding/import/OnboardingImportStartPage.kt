@@ -48,20 +48,21 @@ import au.com.shiftyjelly.pocketcasts.localization.R as LR
 @Composable
 fun OnboardingImportStartPage(
     theme: Theme.ThemeType,
-    onShown: () -> Unit,
+    onShow: () -> Unit,
     onCastboxClick: () -> Unit,
     onOtherAppsClick: () -> Unit,
     onImportFromUrlClick: () -> Unit,
-    onBackPressed: () -> Unit,
+    onBackPress: () -> Unit,
     onUpdateSystemBars: (SystemBarsStyles) -> Unit,
+    modifier: Modifier = Modifier,
 ) {
     val pocketCastsTheme = MaterialTheme.theme
 
     CallOnce {
-        onShown()
+        onShow()
     }
 
-    LaunchedEffect(Unit) {
+    LaunchedEffect(onUpdateSystemBars) {
         // Use secondaryUI01 so the status bar matches the ThemedTopAppBar
         val statusBar = SystemBarStyle.singleAuto(pocketCastsTheme.colors.secondaryUi01) { theme.darkTheme }
         val navigationBar = SystemBarStyle.transparent { theme.darkTheme }
@@ -69,13 +70,13 @@ fun OnboardingImportStartPage(
     }
 
     Column(
-        modifier = Modifier
+        modifier = modifier
             .fillMaxSize()
             .windowInsetsPadding(WindowInsets.safeDrawing.only(WindowInsetsSides.Horizontal)),
 
     ) {
         ThemedTopAppBar(
-            onNavigationClick = onBackPressed,
+            onNavigationClick = onBackPress,
         )
 
         Column(
@@ -151,11 +152,11 @@ private fun OnboardingImportStartPagePreview(
     AppThemeWithBackground(themeType) {
         OnboardingImportStartPage(
             theme = themeType,
-            onShown = {},
+            onShow = {},
             onCastboxClick = {},
             onOtherAppsClick = {},
             onImportFromUrlClick = {},
-            onBackPressed = {},
+            onBackPress = {},
             onUpdateSystemBars = {},
         )
     }

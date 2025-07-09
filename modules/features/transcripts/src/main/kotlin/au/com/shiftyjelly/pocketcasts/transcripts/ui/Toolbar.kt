@@ -285,7 +285,7 @@ private fun SearchBar(
                 )
             },
             placeholder = stringResource(LR.string.search),
-            onTextChanged = onUpdateSearchTerm,
+            onTextChange = onUpdateSearchTerm,
             cornerRadius = 16.dp,
             colors = SearchBarDefaults.colors(
                 backgroundColor = colors.searchBarBackground,

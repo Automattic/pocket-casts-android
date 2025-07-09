@@ -15,7 +15,13 @@ import androidx.compose.ui.unit.sp
 import au.com.shiftyjelly.pocketcasts.compose.theme
 
 @Composable
-fun RowTextButton(text: String, modifier: Modifier = Modifier, secondaryText: String? = null, onClick: () -> Unit, fontSize: TextUnit = 17.sp) {
+fun RowTextButton(
+    text: String,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier,
+    secondaryText: String? = null,
+    fontSize: TextUnit = 17.sp,
+) {
     Row(
         modifier = modifier
             .clickable { onClick() }

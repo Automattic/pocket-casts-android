@@ -65,7 +65,7 @@ class SettingsFragment : BaseFragment() {
                     val bottomInset = settings.bottomInset.collectAsStateWithLifecycle(0)
                     SettingsFragmentPage(
                         signInState = signInState,
-                        onBackPressed = {
+                        onBackPress = {
                             @Suppress("DEPRECATION")
                             activity?.onBackPressed()
                         },

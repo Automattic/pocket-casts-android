@@ -29,36 +29,41 @@ import au.com.shiftyjelly.pocketcasts.localization.R as LR
 fun ChaptersHeader(
     totalChaptersCount: Int,
     hiddenChaptersCount: Int,
-    onSkipChaptersClick: (Boolean) -> Unit,
     isTogglingChapters: Boolean,
     showSubscriptionIcon: Boolean,
+    onSkipChaptersClick: (Boolean) -> Unit,
+    modifier: Modifier = Modifier,
 ) {
-    HeaderRow(
-        text = getHeaderTitle(totalChaptersCount, hiddenChaptersCount),
-        toggle = TextToggle(
-            checked = isTogglingChapters,
-            text = if (isTogglingChapters) {
-                stringResource(LR.string.done)
-            } else {
-                stringResource(LR.string.skip_chapters)
-            },
-        ),
-        showSubscriptionIcon = showSubscriptionIcon,
-        onClick = { onSkipChaptersClick(!isTogglingChapters) },
-    )
-    Divider(
-        color = LocalChaptersTheme.current.divider,
-        thickness = 1.dp,
-    )
+    Column(
+        modifier = modifier,
+    ) {
+        HeaderRow(
+            text = getHeaderTitle(totalChaptersCount, hiddenChaptersCount),
+            toggle = TextToggle(
+                checked = isTogglingChapters,
+                text = if (isTogglingChapters) {
+                    stringResource(LR.string.done)
+                } else {
+                    stringResource(LR.string.skip_chapters)
+                },
+            ),
+            showSubscriptionIcon = showSubscriptionIcon,
+            onClick = { onSkipChaptersClick(!isTogglingChapters) },
+        )
+        Divider(
+            color = LocalChaptersTheme.current.divider,
+            thickness = 1.dp,
+        )
+    }
 }
 
 @Composable
 private fun HeaderRow(
     text: String,
-    modifier: Modifier = Modifier,
     toggle: TextToggle,
     showSubscriptionIcon: Boolean,
     onClick: () -> Unit,
+    modifier: Modifier = Modifier,
 ) {
     Row(
         horizontalArrangement = Arrangement.SpaceBetween,
@@ -146,52 +151,52 @@ data class TextToggle(
 @ShowkaseComposable(name = "ChaptersHeader", group = "Chapter", styleName = "Light")
 @Preview(name = "Light")
 @Composable
-fun ChaptersHeaderLightPreview() = ChaptersHeaderPreview(Theme.ThemeType.LIGHT)
+private fun ChaptersHeaderLightPreview() = ChaptersHeaderPreview(Theme.ThemeType.LIGHT)
 
 @ShowkaseComposable(name = "ChaptersHeader", group = "Chapter", styleName = "Dark")
 @Preview(name = "Dark")
 @Composable
-fun ChaptersHeaderDarkPreview() = ChaptersHeaderPreview(Theme.ThemeType.DARK)
+private fun ChaptersHeaderDarkPreview() = ChaptersHeaderPreview(Theme.ThemeType.DARK)
 
 @ShowkaseComposable(name = "ChaptersHeader", group = "Chapter", styleName = "Rose")
 @Preview(name = "Rose")
 @Composable
-fun ChaptersHeaderRosePreview() = ChaptersHeaderPreview(Theme.ThemeType.ROSE)
+private fun ChaptersHeaderRosePreview() = ChaptersHeaderPreview(Theme.ThemeType.ROSE)
 
 @ShowkaseComposable(name = "ChaptersHeader", group = "Chapter", styleName = "Indigo")
 @Preview(name = "Indigo")
 @Composable
-fun ChaptersHeaderIndigoPreview() = ChaptersHeaderPreview(Theme.ThemeType.INDIGO)
+private fun ChaptersHeaderIndigoPreview() = ChaptersHeaderPreview(Theme.ThemeType.INDIGO)
 
 @ShowkaseComposable(name = "ChaptersHeader", group = "Chapter", styleName = "ExtraDark")
 @Preview(name = "ExtraDark")
 @Composable
-fun ChaptersHeaderExtraDarkPreview() = ChaptersHeaderPreview(Theme.ThemeType.EXTRA_DARK)
+private fun ChaptersHeaderExtraDarkPreview() = ChaptersHeaderPreview(Theme.ThemeType.EXTRA_DARK)
 
 @ShowkaseComposable(name = "ChaptersHeader", group = "Chapter", styleName = "DarkContrast")
 @Preview(name = "DarkContrast")
 @Composable
-fun ChaptersHeaderDarkContrastPreview() = ChaptersHeaderPreview(Theme.ThemeType.DARK_CONTRAST)
+private fun ChaptersHeaderDarkContrastPreview() = ChaptersHeaderPreview(Theme.ThemeType.DARK_CONTRAST)
 
 @ShowkaseComposable(name = "ChaptersHeader", group = "Chapter", styleName = "LightContrast")
 @Preview(name = "LightContrast")
 @Composable
-fun ChaptersHeaderLightContrastPreview() = ChaptersHeaderPreview(Theme.ThemeType.LIGHT_CONTRAST)
+private fun ChaptersHeaderLightContrastPreview() = ChaptersHeaderPreview(Theme.ThemeType.LIGHT_CONTRAST)
 
 @ShowkaseComposable(name = "ChaptersHeader", group = "Chapter", styleName = "Electric")
 @Preview(name = "Electric")
 @Composable
-fun ChaptersHeaderElectricPreview() = ChaptersHeaderPreview(Theme.ThemeType.ELECTRIC)
+private fun ChaptersHeaderElectricPreview() = ChaptersHeaderPreview(Theme.ThemeType.ELECTRIC)
 
 @ShowkaseComposable(name = "ChaptersHeader", group = "Chapter", styleName = "Classic")
 @Preview(name = "Classic")
 @Composable
-fun ChaptersHeaderClassicPreview() = ChaptersHeaderPreview(Theme.ThemeType.CLASSIC_LIGHT)
+private fun ChaptersHeaderClassicPreview() = ChaptersHeaderPreview(Theme.ThemeType.CLASSIC_LIGHT)
 
 @ShowkaseComposable(name = "ChaptersHeader", group = "Chapter", styleName = "Radioactive")
 @Preview(name = "Radioactive")
 @Composable
-fun ChaptersHeaderRadioactivePreview() = ChaptersHeaderPreview(Theme.ThemeType.RADIOACTIVE)
+private fun ChaptersHeaderRadioactivePreview() = ChaptersHeaderPreview(Theme.ThemeType.RADIOACTIVE)
 
 @Composable
 private fun ChaptersHeaderPreview(theme: Theme.ThemeType) {

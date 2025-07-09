@@ -80,7 +80,7 @@ class WinbackViewModelTest {
 
         viewModel.uiState.test {
             val state = awaitLoadedState()
-            assertEquals(state.currentSubscription.productId, SubscriptionPlan.PlusYearlyProductId)
+            assertEquals(state.currentSubscription.productId, SubscriptionPlan.PLUS_YEARLY_PRODUCT_ID)
         }
     }
 
@@ -183,7 +183,7 @@ class WinbackViewModelTest {
     fun `change subscription plan successfully`() = runTest {
         val newPurchase = createPurchase(
             orderId = "new-order-id",
-            productIds = listOf(SubscriptionPlan.PlusMonthlyProductId),
+            productIds = listOf(SubscriptionPlan.PLUS_MONTHLY_PRODUCT_ID),
         )
         val newSubscription = AcknowledgedSubscription("new-order-id", SubscriptionTier.Plus, BillingCycle.Monthly, isAutoRenewing = true)
 
@@ -270,7 +270,7 @@ class WinbackViewModelTest {
     @Test
     fun `plus monthly winback offer`() = runTest {
         paymentDataSource.loadedPurchases = listOf(
-            createPurchase(productIds = listOf(SubscriptionPlan.PlusMonthlyProductId)),
+            createPurchase(productIds = listOf(SubscriptionPlan.PLUS_MONTHLY_PRODUCT_ID)),
         )
         wheneverBlocking { referralManager.getWinbackResponse() } doReturn createSuccessReferralResult(
             offerId = SubscriptionOffer.Winback.offerId(SubscriptionTier.Plus, BillingCycle.Monthly)!!,
@@ -311,7 +311,7 @@ class WinbackViewModelTest {
     @Test
     fun `patron monthly winback offer`() = runTest {
         paymentDataSource.loadedPurchases = listOf(
-            createPurchase(productIds = listOf(SubscriptionPlan.PatronMonthlyProductId)),
+            createPurchase(productIds = listOf(SubscriptionPlan.PATRON_MONTHLY_PRODUCT_ID)),
         )
         wheneverBlocking { referralManager.getWinbackResponse() } doReturn createSuccessReferralResult(
             offerId = SubscriptionOffer.Winback.offerId(SubscriptionTier.Patron, BillingCycle.Monthly)!!,
@@ -335,7 +335,7 @@ class WinbackViewModelTest {
     @Test
     fun `patron yearly winback offer`() = runTest {
         paymentDataSource.loadedPurchases = listOf(
-            createPurchase(productIds = listOf(SubscriptionPlan.PatronYearlyProductId)),
+            createPurchase(productIds = listOf(SubscriptionPlan.PATRON_YEARLY_PRODUCT_ID)),
         )
         wheneverBlocking { referralManager.getWinbackResponse() } doReturn createSuccessReferralResult(
             offerId = SubscriptionOffer.Winback.offerId(SubscriptionTier.Patron, BillingCycle.Yearly)!!,
@@ -371,7 +371,7 @@ class WinbackViewModelTest {
     fun `change winback offer after changing subscription plan successfully`() = runTest {
         val newPurchase = createPurchase(
             orderId = "new-order-id",
-            productIds = listOf(SubscriptionPlan.PatronYearlyProductId),
+            productIds = listOf(SubscriptionPlan.PATRON_YEARLY_PRODUCT_ID),
         )
         val newSubscription = AcknowledgedSubscription("new-order-id", SubscriptionTier.Patron, BillingCycle.Yearly, isAutoRenewing = true)
 
@@ -431,7 +431,7 @@ class WinbackViewModelTest {
     @Test
     fun `winback offer with no matching product ID`() = runTest {
         paymentDataSource.loadedPurchases = listOf(
-            createPurchase(productIds = listOf(SubscriptionPlan.PlusYearlyProductId)),
+            createPurchase(productIds = listOf(SubscriptionPlan.PLUS_YEARLY_PRODUCT_ID)),
         )
         wheneverBlocking { referralManager.getWinbackResponse() } doReturn createSuccessReferralResult(
             offerId = SubscriptionOffer.Winback.offerId(SubscriptionTier.Plus, BillingCycle.Monthly)!!,
@@ -612,7 +612,7 @@ class WinbackViewModelTest {
     @Test
     fun `track claim plus monthly offer tapped`() = runTest {
         paymentDataSource.loadedPurchases = listOf(
-            createPurchase(productIds = listOf(SubscriptionPlan.PlusMonthlyProductId)),
+            createPurchase(productIds = listOf(SubscriptionPlan.PLUS_MONTHLY_PRODUCT_ID)),
         )
 
         viewModel.loadWinbackData()
@@ -635,7 +635,7 @@ class WinbackViewModelTest {
     @Test
     fun `track claim plus yearly offer tapped`() = runTest {
         paymentDataSource.loadedPurchases = listOf(
-            createPurchase(productIds = listOf(SubscriptionPlan.PlusYearlyProductId)),
+            createPurchase(productIds = listOf(SubscriptionPlan.PLUS_YEARLY_PRODUCT_ID)),
         )
 
         viewModel.loadWinbackData()
@@ -658,7 +658,7 @@ class WinbackViewModelTest {
     @Test
     fun `track claim patron monthly offer tapped`() = runTest {
         paymentDataSource.loadedPurchases = listOf(
-            createPurchase(productIds = listOf(SubscriptionPlan.PatronMonthlyProductId)),
+            createPurchase(productIds = listOf(SubscriptionPlan.PATRON_MONTHLY_PRODUCT_ID)),
         )
 
         viewModel.loadWinbackData()
@@ -681,7 +681,7 @@ class WinbackViewModelTest {
     @Test
     fun `track claim patron yearly offer tapped`() = runTest {
         paymentDataSource.loadedPurchases = listOf(
-            createPurchase(productIds = listOf(SubscriptionPlan.PatronYearlyProductId)),
+            createPurchase(productIds = listOf(SubscriptionPlan.PATRON_YEARLY_PRODUCT_ID)),
         )
 
         viewModel.loadWinbackData()
@@ -755,7 +755,7 @@ class WinbackViewModelTest {
     fun `track plan change`() = runTest {
         val newPurchase = createPurchase(
             orderId = "new-order-id",
-            productIds = listOf(SubscriptionPlan.PlusMonthlyProductId),
+            productIds = listOf(SubscriptionPlan.PLUS_MONTHLY_PRODUCT_ID),
         )
 
         viewModel.loadWinbackData()
@@ -767,14 +767,14 @@ class WinbackViewModelTest {
                 TrackEvent(
                     AnalyticsEvent.WINBACK_AVAILABLE_PLANS_SELECT_PLAN,
                     mapOf(
-                        "product" to SubscriptionPlan.PlusMonthlyProductId,
+                        "product" to SubscriptionPlan.PLUS_MONTHLY_PRODUCT_ID,
                     ),
                 ),
                 TrackEvent(
                     AnalyticsEvent.WINBACK_AVAILABLE_PLANS_NEW_PLAN_PURCHASE_SUCCESSFUL,
                     mapOf(
-                        "current_product" to SubscriptionPlan.PlusYearlyProductId,
-                        "new_product" to SubscriptionPlan.PlusMonthlyProductId,
+                        "current_product" to SubscriptionPlan.PLUS_YEARLY_PRODUCT_ID,
+                        "new_product" to SubscriptionPlan.PLUS_MONTHLY_PRODUCT_ID,
                     ),
                 ),
             ),
@@ -815,7 +815,7 @@ private suspend fun TurbineTestContext<WinbackViewModel.UiState>.awaitOfferState
 
 private fun createPurchase(
     orderId: String? = "order-id",
-    productIds: List<String> = listOf(SubscriptionPlan.PlusYearlyProductId),
+    productIds: List<String> = listOf(SubscriptionPlan.PLUS_YEARLY_PRODUCT_ID),
     isAcknowledged: Boolean = true,
     isAutoRenewing: Boolean = true,
 ) = Purchase(

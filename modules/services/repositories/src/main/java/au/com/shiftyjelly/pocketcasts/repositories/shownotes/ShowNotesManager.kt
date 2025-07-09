@@ -20,23 +20,21 @@ class ShowNotesManager @Inject constructor(
     private val transcriptsService: TranscriptService,
 ) {
 
-    fun loadShowNotesFlow(podcastUuid: String, episodeUuid: String): Flow<ShowNotesState> =
-        showNotesServiceManager.loadShowNotesFlow(
-            podcastUuid = podcastUuid,
-            episodeUuid = episodeUuid,
-            processShowNotes = {
-                scope.launch { showNotesProcessor.process(episodeUuid, it) }
-            },
-        )
+    fun loadShowNotesFlow(podcastUuid: String, episodeUuid: String): Flow<ShowNotesState> = showNotesServiceManager.loadShowNotesFlow(
+        podcastUuid = podcastUuid,
+        episodeUuid = episodeUuid,
+        processShowNotes = {
+            scope.launch { showNotesProcessor.process(episodeUuid, it) }
+        },
+    )
 
-    suspend fun loadShowNotes(podcastUuid: String, episodeUuid: String): ShowNotesState =
-        showNotesServiceManager.loadShowNotes(
-            podcastUuid = podcastUuid,
-            episodeUuid = episodeUuid,
-            processShowNotes = {
-                scope.launch { showNotesProcessor.process(episodeUuid, it) }
-            },
-        )
+    suspend fun loadShowNotes(podcastUuid: String, episodeUuid: String): ShowNotesState = showNotesServiceManager.loadShowNotes(
+        podcastUuid = podcastUuid,
+        episodeUuid = episodeUuid,
+        processShowNotes = {
+            scope.launch { showNotesProcessor.process(episodeUuid, it) }
+        },
+    )
 
     suspend fun downloadToCacheShowNotes(podcastUuid: String, episodeUuid: String) {
         showNotesServiceManager.downloadToCacheShowNotes(

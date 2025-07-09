@@ -92,7 +92,8 @@ data class DeleteBookmarkDeepLink(
 data class ShowPodcastDeepLink(
     val podcastUuid: String,
     val sourceView: String?,
-) : IntentableDeepLink, UriDeepLink {
+) : IntentableDeepLink,
+    UriDeepLink {
     override fun toIntent(context: Context) = context.launcherIntent
         .setAction(ACTION_OPEN_PODCAST)
         .putExtra(EXTRA_PODCAST_UUID, podcastUuid)
@@ -116,7 +117,8 @@ data class ShowEpisodeDeepLink(
     val autoPlay: Boolean,
     val startTimestamp: Duration? = null,
     val endTimestamp: Duration? = null,
-) : IntentableDeepLink, UriDeepLink {
+) : IntentableDeepLink,
+    UriDeepLink {
     override fun toIntent(context: Context) = context.launcherIntent
         .setAction(ACTION_OPEN_EPISODE)
         .addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP)

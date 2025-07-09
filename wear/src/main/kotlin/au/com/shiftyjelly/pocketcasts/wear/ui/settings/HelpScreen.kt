@@ -21,12 +21,11 @@ import com.google.android.horologist.compose.layout.rememberColumnState
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 object HelpScreen {
-    const val route = "help_screen"
+    const val ROUTE = "help_screen"
 }
 
 @Composable
-fun HelpScreen() {
-    val viewModel = hiltViewModel<HelpScreenViewModel>()
+fun HelpScreen(viewModel: HelpScreenViewModel = hiltViewModel()) {
     val state = viewModel.state.collectAsState().value
     val context = LocalContext.current
     val columnState = rememberColumnState()

@@ -43,8 +43,8 @@ data class AnonymousBumpStat(
 
         private val rootJsonKeys = JsonKey.values().map { it.value }
 
-        const val userTypeValue = "anon"
-        const val uuidValue = "ANONYMOUS"
+        const val USER_TYPE_VALUE = "anon"
+        const val UUID_VALUE = "ANONYMOUS"
     }
 
     @ProvidedTypeConverter
@@ -60,10 +60,9 @@ data class AnonymousBumpStat(
         )
 
         @TypeConverter
-        fun toCustomEventProps(value: String?): Map<String, Any>? =
-            value?.let {
-                adapter.fromJson(it)
-            }
+        fun toCustomEventProps(value: String?): Map<String, Any>? = value?.let {
+            adapter.fromJson(it)
+        }
 
         @TypeConverter
         fun toJsonString(value: Map<String, Any>?): String? = adapter.toJson(value)
@@ -71,18 +70,17 @@ data class AnonymousBumpStat(
 
     object Adapter {
         @ToJson
-        fun toJson(bumpStat: AnonymousBumpStat): Map<String, Any> =
-            buildMap {
-                put(JsonKey.NAME.value, bumpStat.name)
-                put(JsonKey.EVENT_TIME.value, bumpStat.eventTime)
-                put(JsonKey.UUID.value, uuidValue)
-                put(JsonKey.USER_TYPE.value, userTypeValue)
+        fun toJson(bumpStat: AnonymousBumpStat): Map<String, Any> = buildMap {
+            put(JsonKey.NAME.value, bumpStat.name)
+            put(JsonKey.EVENT_TIME.value, bumpStat.eventTime)
+            put(JsonKey.UUID.value, UUID_VALUE)
+            put(JsonKey.USER_TYPE.value, USER_TYPE_VALUE)
 
-                // include custom event props in root object
-                bumpStat.customEventProps.forEach { (k, v) ->
-                    put(k, v)
-                }
+            // include custom event props in root object
+            bumpStat.customEventProps.forEach { (k, v) ->
+                put(k, v)
             }
+        }
 
         @FromJson
         fun fromJson(bumpStatMap: Map<String, Any>): AnonymousBumpStat? {

@@ -26,7 +26,9 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 
 @AndroidEntryPoint
-open class BaseDialogFragment : BottomSheetDialogFragment(), CoroutineScope {
+open class BaseDialogFragment :
+    BottomSheetDialogFragment(),
+    CoroutineScope {
 
     open val statusBarIconColor: StatusBarIconColor = StatusBarIconColor.Theme
     open val navigationBarColor: NavigationBarColor = NavigationBarColor.Theme

@@ -796,4 +796,8 @@ enum class AnalyticsEvent(val key: String) {
     INFORMATIONAL_MODAL_VIEW_CARD_SHOWED("informational_modal_view_card_showed"),
     INFORMATIONAL_BANNER_VIEW_DISMISSED("informational_banner_view_dismissed"),
     INFORMATIONAL_BANNER_VIEW_CREATE_ACCOUNT_TAP("informational_banner_view_create_account_tap"),
+
+    /* Banner Ads */
+    BANNER_AD_IMPRESSION("banner_ad_impression"),
+    BANNER_AD_TAPPED("banner_ad_tapped"),
 }

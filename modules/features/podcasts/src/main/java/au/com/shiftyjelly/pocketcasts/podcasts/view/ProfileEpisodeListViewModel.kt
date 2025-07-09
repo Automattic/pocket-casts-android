@@ -41,7 +41,8 @@ class ProfileEpisodeListViewModel @Inject constructor(
     private val analyticsTracker: AnalyticsTracker,
     private val settings: Settings,
     private val userManager: UserManager,
-) : ViewModel(), CoroutineScope {
+) : ViewModel(),
+    CoroutineScope {
     override val coroutineContext: CoroutineContext
         get() = Dispatchers.Default
 
@@ -169,12 +170,11 @@ class ProfileEpisodeListViewModel @Inject constructor(
                     }
                 }
 
-                fun iconRes(mode: Mode): Int =
-                    when (mode) {
-                        is Mode.Downloaded -> IR.drawable.ic_download
-                        is Mode.Starred -> IR.drawable.ic_starred
-                        is Mode.History -> IR.drawable.ic_listen_history
-                    }
+                fun iconRes(mode: Mode): Int = when (mode) {
+                    is Mode.Downloaded -> IR.drawable.ic_download
+                    is Mode.Starred -> IR.drawable.ic_starred
+                    is Mode.History -> IR.drawable.ic_listen_history
+                }
             }
         }
 

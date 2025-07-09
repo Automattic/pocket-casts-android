@@ -49,18 +49,18 @@ import au.com.shiftyjelly.pocketcasts.localization.R as LR
 fun EmailAndPasswordFields(
     email: String,
     password: String,
+    enabled: Boolean,
+    isCreatingAccount: Boolean,
+    showEmailError: Boolean,
+    showPasswordError: Boolean,
+    onConfirm: () -> Unit,
+    onUpdateEmail: (String) -> Unit,
+    onUpdatePassword: (String) -> Unit,
     modifier: Modifier = Modifier,
     emailPlaceholder: String = stringResource(LR.string.profile_email_address),
     passwordPlaceholder: String = stringResource(LR.string.profile_password),
-    showEmailError: Boolean,
-    showPasswordError: Boolean,
     showPasswordErrorMessage: Boolean = showPasswordError,
-    enabled: Boolean,
-    isCreatingAccount: Boolean,
     focusEnabled: Boolean = true,
-    onDone: () -> Unit,
-    onUpdateEmail: (String) -> Unit,
-    onUpdatePassword: (String) -> Unit,
 ) {
     val emailFocusRequester = remember { FocusRequester() }
     val passwordFocusRequester = remember { FocusRequester() }
@@ -96,7 +96,7 @@ fun EmailAndPasswordFields(
             placeholder = passwordPlaceholder,
             enabled = enabled,
             imeAction = ImeAction.Done,
-            onImeAction = onDone,
+            onImeAction = onConfirm,
             focusRequester = passwordFocusRequester,
             isCreatingAccount = isCreatingAccount,
             onUpdatePassword = onUpdatePassword,
@@ -124,13 +124,13 @@ fun EmailField(
     email: String,
     enabled: Boolean,
     isError: Boolean,
+    isCreatingAccount: Boolean,
+    onImeAction: () -> Unit,
+    onUpdateEmail: (String) -> Unit,
     modifier: Modifier = Modifier,
     placeholder: String = stringResource(LR.string.profile_email_address),
-    onUpdateEmail: (String) -> Unit,
     imeAction: ImeAction = ImeAction.Next,
-    onImeAction: () -> Unit,
     focusRequester: FocusRequester = remember { FocusRequester() },
-    isCreatingAccount: Boolean,
 ) {
     val formModifier = modifier.focusRequester(focusRequester)
         .semantics {
@@ -164,14 +164,13 @@ fun PasswordField(
     password: String,
     enabled: Boolean,
     isError: Boolean,
+    isCreatingAccount: Boolean,
+    onImeAction: () -> Unit,
+    onUpdatePassword: (String) -> Unit,
     modifier: Modifier = Modifier,
     placeholder: String = stringResource(LR.string.profile_password),
     imeAction: ImeAction = ImeAction.Done,
-    onImeAction: () -> Unit,
     focusRequester: FocusRequester = remember { FocusRequester() },
-    isCreatingAccount: Boolean,
-    onUpdatePassword: (String) -> Unit,
-
 ) {
     var showPassword by remember { mutableStateOf(false) }
 
@@ -217,7 +216,7 @@ fun PasswordField(
 @ShowkaseComposable(name = "EmailAndPasswordFields", group = "Form", styleName = "Light", defaultStyle = true)
 @Preview(name = "Light")
 @Composable
-fun UserPasswordFieldsLightPreview() {
+private fun UserPasswordFieldsLightPreview() {
     AppThemeWithBackground(Theme.ThemeType.LIGHT) {
         UserPasswordFieldsPreview()
     }
@@ -226,7 +225,7 @@ fun UserPasswordFieldsLightPreview() {
 @ShowkaseComposable(name = "EmailAndPasswordFields", group = "Form", styleName = "Dark")
 @Preview(name = "Dark")
 @Composable
-fun UserPasswordFieldsDarkPreview() {
+private fun UserPasswordFieldsDarkPreview() {
     AppThemeWithBackground(Theme.ThemeType.DARK) {
         UserPasswordFieldsPreview()
     }
@@ -241,7 +240,7 @@ private fun UserPasswordFieldsPreview() {
         showPasswordError = false,
         enabled = true,
         focusEnabled = false,
-        onDone = {},
+        onConfirm = {},
         onUpdateEmail = {},
         onUpdatePassword = {},
         showPasswordErrorMessage = false,

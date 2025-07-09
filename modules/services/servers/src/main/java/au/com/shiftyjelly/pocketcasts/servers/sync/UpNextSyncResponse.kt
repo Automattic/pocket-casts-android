@@ -10,17 +10,17 @@ import java.util.Date
 
 @JsonClass(generateAdapter = true)
 data class UpNextSyncResponse(
-    @field:Json(name = "serverModified") val serverModified: Long,
-    @field:Json(name = "episodes") val episodes: List<Episode>?,
+    @Json(name = "serverModified") val serverModified: Long,
+    @Json(name = "episodes") val episodes: List<Episode>?,
 ) {
 
     @JsonClass(generateAdapter = true)
     data class Episode(
-        @field:Json(name = "uuid") val uuid: String,
-        @field:Json(name = "title") val title: String?,
-        @field:Json(name = "url") val url: String?,
-        @field:Json(name = "podcast") val podcast: String?,
-        @field:Json(name = "published") val published: String?,
+        @Json(name = "uuid") val uuid: String,
+        @Json(name = "title") val title: String?,
+        @Json(name = "url") val url: String?,
+        @Json(name = "podcast") val podcast: String?,
+        @Json(name = "published") val published: String?,
     ) {
         fun toSkeletonEpisode(podcastUuid: String): PodcastEpisode {
             return PodcastEpisode(

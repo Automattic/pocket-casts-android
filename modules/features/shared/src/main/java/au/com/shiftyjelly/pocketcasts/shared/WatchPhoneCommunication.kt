@@ -3,7 +3,7 @@ package au.com.shiftyjelly.pocketcasts.shared
 import android.content.Context
 import android.content.Intent
 import au.com.shiftyjelly.pocketcasts.repositories.support.Support
-import au.com.shiftyjelly.pocketcasts.shared.WatchPhoneCommunication.Companion.Paths.emailLogsToSupport
+import au.com.shiftyjelly.pocketcasts.shared.WatchPhoneCommunication.Companion.Paths.EMIL_LOGS_TO_SUPPORT
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import com.google.android.gms.wearable.CapabilityClient
 import com.google.android.gms.wearable.CapabilityInfo
@@ -28,11 +28,11 @@ class WatchPhoneCommunication {
 
     companion object {
         private object Paths {
-            private const val prefix = "/pocket_casts_wear_communication"
-            const val emailLogsToSupport = "$prefix/email_support"
+            private const val PREFIX = "/pocket_casts_wear_communication"
+            const val EMIL_LOGS_TO_SUPPORT = "$PREFIX/email_support"
         }
 
-        private const val capabilityName = "pocket_casts_wear_listener"
+        private const val CAPABILITY_NAME = "pocket_casts_wear_listener"
     }
 
     class Watch @Inject constructor(
@@ -62,7 +62,7 @@ class WatchPhoneCommunication {
             coroutineScope.launch {
                 val capabilityInfo =
                     Wearable.getCapabilityClient(appContext)
-                        .getCapability(capabilityName, CapabilityClient.FILTER_REACHABLE)
+                        .getCapability(CAPABILITY_NAME, CapabilityClient.FILTER_REACHABLE)
                         .await()
                 onCapabilityChangedListener.onCapabilityChanged(capabilityInfo)
             }
@@ -70,13 +70,13 @@ class WatchPhoneCommunication {
             Wearable.getCapabilityClient(appContext)
                 .addListener({
                     onCapabilityChangedListener.onCapabilityChanged(it)
-                }, capabilityName)
+                }, CAPABILITY_NAME)
         }
 
         suspend fun emailLogsToSupportMessage(): WatchMessageSendState {
             return withContext(Dispatchers.IO) {
                 withAvailableNode { node ->
-                    val path = emailLogsToSupport
+                    val path = EMIL_LOGS_TO_SUPPORT
                     val data = support.getLogs().toByteArray()
                     try {
                         Wearable
@@ -114,7 +114,7 @@ class WatchPhoneCommunication {
 
         fun handleMessage(messageEvent: MessageEvent) {
             when (messageEvent.path) {
-                emailLogsToSupport -> handleEmailLogsToSupportMessage(messageEvent)
+                EMIL_LOGS_TO_SUPPORT -> handleEmailLogsToSupportMessage(messageEvent)
 
                 else -> {
                     val message = "${this::class.java.simpleName} received message with unexpected path: ${messageEvent.path}"

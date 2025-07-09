@@ -42,17 +42,17 @@ class MediaActionsFragment : BaseFragment() {
             val context = LocalContext.current
             MediaActionsPage(
                 state = state,
-                onShowCustomActionsChanged = viewModel::setShowCustomActionsChanged,
-                onNextPreviousTrackSkipButtonsChanged = viewModel::setNextPreviousTrackSkipButtonsChanged,
-                onActionsOrderChanged = viewModel::onActionsOrderChanged,
-                onActionMoved = viewModel::onActionMoved,
-                onBackClick = ::onBackClick,
+                onShowCustomActionsChange = viewModel::setShowCustomActionsChanged,
+                onNextPreviousTrackSkipButtonsChange = viewModel::setNextPreviousTrackSkipButtonsChanged,
+                onActionsOrderChange = viewModel::onActionsOrderChanged,
+                onActionMove = viewModel::onActionMoved,
+                onBackPress = ::onBackPress,
                 bottomInset = bottomInset.value.pxToDp(context).dp,
             )
         }
     }
 
-    fun onBackClick() {
+    fun onBackPress() {
         (activity as? FragmentHostListener)?.closeModal(this)
     }
 }

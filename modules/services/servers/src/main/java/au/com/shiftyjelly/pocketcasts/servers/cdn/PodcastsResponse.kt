@@ -7,7 +7,7 @@ import io.reactivex.Observable
 
 @JsonClass(generateAdapter = true)
 data class PodcastsResponse(
-    @field:Json(name = "result") val result: Result?,
+    @Json(name = "result") val result: Result?,
 ) {
 
     fun toPodcasts(): Observable<Podcast> {
@@ -21,19 +21,19 @@ data class PodcastsResponse(
 
 @JsonClass(generateAdapter = true)
 data class Result(
-    @field:Json(name = "podcasts") val podcasts: List<ResultPodcast>?,
+    @Json(name = "podcasts") val podcasts: List<ResultPodcast>?,
 )
 
 @JsonClass(generateAdapter = true)
 data class ResultPodcast(
-    @field:Json(name = "uuid") val uuid: String,
-    @field:Json(name = "title") val title: String?,
-    @field:Json(name = "url") val url: String?,
-    @field:Json(name = "author") val author: String?,
-    @field:Json(name = "category") val category: String?,
-    @field:Json(name = "description") val description: String?,
-    @field:Json(name = "language") val language: String?,
-    @field:Json(name = "media_type") val mediaType: String?,
+    @Json(name = "uuid") val uuid: String,
+    @Json(name = "title") val title: String?,
+    @Json(name = "url") val url: String?,
+    @Json(name = "author") val author: String?,
+    @Json(name = "category") val category: String?,
+    @Json(name = "description") val description: String?,
+    @Json(name = "language") val language: String?,
+    @Json(name = "media_type") val mediaType: String?,
 ) {
 
     fun toPodcast(): Podcast {

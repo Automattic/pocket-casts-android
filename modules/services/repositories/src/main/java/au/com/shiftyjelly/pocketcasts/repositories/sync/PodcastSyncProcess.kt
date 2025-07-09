@@ -493,7 +493,7 @@ class PodcastSyncProcess(
                         put("is_deleted", if (podcast.isSubscribed) "0" else "1")
                         put("auto_start_from", podcast.startFromSecs)
                         put("auto_skip_last", podcast.skipLastSecs)
-                        put("folder_uuid", if (podcast.folderUuid.isNullOrEmpty()) Folder.homeFolderUuid else podcast.folderUuid)
+                        put("folder_uuid", if (podcast.folderUuid.isNullOrEmpty()) Folder.HOME_FOLDER_UUID else podcast.folderUuid)
                         put("sort_position", podcast.sortPosition)
                         put("date_added", podcast.addedDate?.toIsoString())
                     }

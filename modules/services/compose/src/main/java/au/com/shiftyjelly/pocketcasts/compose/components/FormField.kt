@@ -70,7 +70,7 @@ fun FormField(
 @ShowkaseComposable(name = "FormField", group = "Form", styleName = "Light", defaultStyle = true)
 @Preview(name = "Light")
 @Composable
-fun FormFieldLightPreview() {
+private fun FormFieldLightPreview() {
     AppTheme(Theme.ThemeType.LIGHT) {
         FormFieldPreview()
     }
@@ -79,7 +79,7 @@ fun FormFieldLightPreview() {
 @ShowkaseComposable(name = "FormField", group = "Form", styleName = "Dark")
 @Preview(name = "Dark")
 @Composable
-fun FormFieldDarkPreview() {
+private fun FormFieldDarkPreview() {
     AppTheme(Theme.ThemeType.DARK) {
         FormFieldPreview()
     }

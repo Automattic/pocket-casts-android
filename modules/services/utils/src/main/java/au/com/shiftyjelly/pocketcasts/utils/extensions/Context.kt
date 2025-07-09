@@ -26,8 +26,7 @@ fun Context.getActivity(): AppCompatActivity? = when (this) {
     else -> null
 }
 
-fun Context.isLandscape() =
-    resources.configuration.orientation == Configuration.ORIENTATION_LANDSCAPE
+fun Context.isLandscape() = resources.configuration.orientation == Configuration.ORIENTATION_LANDSCAPE
 
 fun Context.isAppForeground(): Boolean {
     val activityManager =

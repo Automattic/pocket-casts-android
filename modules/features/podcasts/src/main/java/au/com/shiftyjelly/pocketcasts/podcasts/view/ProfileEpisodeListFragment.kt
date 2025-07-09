@@ -91,7 +91,9 @@ import au.com.shiftyjelly.pocketcasts.views.R as VR
 private const val ARG_MODE = "profile_list_mode"
 
 @AndroidEntryPoint
-class ProfileEpisodeListFragment : BaseFragment(), Toolbar.OnMenuItemClickListener {
+class ProfileEpisodeListFragment :
+    BaseFragment(),
+    Toolbar.OnMenuItemClickListener {
     sealed class Mode(
         val index: Int,
         val showMenu: Boolean,
@@ -241,9 +243,9 @@ class ProfileEpisodeListFragment : BaseFragment(), Toolbar.OnMenuItemClickListen
         super.onResume()
         binding?.recyclerView?.adapter = adapter
         when (mode) {
-            Mode.Downloaded -> AutoPlaySource.Downloads
-            Mode.History -> AutoPlaySource.None
-            Mode.Starred -> AutoPlaySource.Starred
+            Mode.Downloaded -> AutoPlaySource.Predefined.Downloads
+            Mode.History -> AutoPlaySource.Predefined.None
+            Mode.Starred -> AutoPlaySource.Predefined.Starred
         }.let { settings.trackingAutoPlaySource.set(it, updateModifiedAt = false) }
     }
 

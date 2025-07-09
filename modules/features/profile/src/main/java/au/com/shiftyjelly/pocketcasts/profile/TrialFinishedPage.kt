@@ -41,9 +41,9 @@ import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 @Composable
 fun TrialFinishedPage(
+    modifier: Modifier = Modifier,
     onUpgradeClick: () -> Unit = {},
     onDoneClick: () -> Unit = {},
-    modifier: Modifier = Modifier,
 ) {
     Column(
         modifier = modifier
@@ -102,9 +102,9 @@ fun TrialFinishedPage(
 
 @Composable
 private fun TrialFinishedFooter(
+    modifier: Modifier = Modifier,
     onUpgradeClick: () -> Unit = {},
     onDoneClick: () -> Unit = {},
-    modifier: Modifier = Modifier,
 ) {
     Card(
         elevation = 8.dp,
@@ -150,7 +150,7 @@ private fun TrialFinishedFooter(
 
 @Preview(showBackground = true)
 @Composable
-fun TrialFinishedPagePreview(@PreviewParameter(ThemePreviewParameterProvider::class) themeType: Theme.ThemeType) {
+private fun TrialFinishedPagePreview(@PreviewParameter(ThemePreviewParameterProvider::class) themeType: Theme.ThemeType) {
     AppThemeWithBackground(themeType) {
         TrialFinishedPage(
             onUpgradeClick = {},

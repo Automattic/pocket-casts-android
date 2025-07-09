@@ -5,7 +5,7 @@ import com.squareup.moshi.JsonClass
 
 @JsonClass(generateAdapter = true)
 data class UpdatePasswordRequest(
-    @field:Json(name = "new_password") val newPassword: String,
-    @field:Json(name = "old_password") val oldPassword: String,
-    @field:Json(name = "scope") val scope: String,
+    @Json(name = "new_password") val newPassword: String,
+    @Json(name = "old_password") val oldPassword: String,
+    @Json(name = "scope") val scope: String,
 )

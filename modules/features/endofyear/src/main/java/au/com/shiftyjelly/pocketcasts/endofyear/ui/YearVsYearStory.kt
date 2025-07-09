@@ -337,7 +337,7 @@ private fun TextInfo(
     }
 }
 
-@Preview(device = Devices.PortraitRegular)
+@Preview(device = Devices.PORTRAIT_REGULAR)
 @Composable
 private fun TotalTimePreview(
     @PreviewParameter(YearVsYearRatioProvider::class) durations: Pair<Int, Int>,
@@ -357,7 +357,7 @@ private fun TotalTimePreview(
     }
 }
 
-@Preview(device = Devices.PortraitRegular)
+@Preview(device = Devices.PORTRAIT_REGULAR)
 @Composable
 private fun YearVsYearPatronPreview() {
     PreviewBox(currentPage = 8) { measurements ->

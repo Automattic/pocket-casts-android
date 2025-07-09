@@ -17,8 +17,8 @@ fun ControlButtonLayoutStyled(
     leftButton: @Composable () -> Unit,
     middleButton: @Composable () -> Unit,
     rightButton: @Composable () -> Unit,
-    sidePadding: Dp = 17.dp,
     modifier: Modifier = Modifier,
+    sidePadding: Dp = 17.dp,
 ) {
     Row(
         modifier = modifier.fillMaxWidth(),

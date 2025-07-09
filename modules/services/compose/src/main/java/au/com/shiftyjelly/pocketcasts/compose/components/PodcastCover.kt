@@ -58,16 +58,15 @@ fun RectangleCover(
     }
 }
 
-fun Modifier.transformPodcastCover() =
-    drawWithContent {
-        withTransform({
-            scale(1f, .6f)
-            rotate(-45f)
-            scale(1.25f, 1.25f)
-        }) {
-            this@drawWithContent.drawContent()
-        }
+fun Modifier.transformPodcastCover() = drawWithContent {
+    withTransform({
+        scale(1f, .6f)
+        rotate(-45f)
+        scale(1.25f, 1.25f)
+    }) {
+        this@drawWithContent.drawContent()
     }
+}
 
 enum class CoverSize {
     SMALL,

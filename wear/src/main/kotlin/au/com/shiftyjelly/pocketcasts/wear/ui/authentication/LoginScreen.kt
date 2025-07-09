@@ -17,6 +17,7 @@ import au.com.shiftyjelly.pocketcasts.localization.R as LR
 fun LoginScreen(
     onLoginWithGoogleClick: () -> Unit,
     onLoginWithPhoneClick: () -> Unit,
+    viewModel: LoginViewModel = hiltViewModel(),
     onLoginWithEmailClick: () -> Unit,
 ) {
     val columnState = rememberColumnState()
@@ -24,8 +25,6 @@ fun LoginScreen(
     ScreenScaffold(
         scrollState = columnState,
     ) {
-        val viewModel = hiltViewModel<LoginViewModel>()
-
         CallOnce {
             viewModel.onShown()
         }

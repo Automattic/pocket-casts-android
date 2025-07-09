@@ -195,7 +195,7 @@ private val indigoSparkle = Color(0xFF5C8BCC) to Color(0xFF95B0E6)
 private val greenSparkle = Color(0xFF78D549) to Color(0xFF9BE45E)
 private val graySparkle = Color(0xFFCCD6D9) to Color(0xFFE5F7FF)
 
-@Preview(device = Devices.PortraitRegular)
+@Preview(device = Devices.PORTRAIT_REGULAR)
 @Composable
 private fun WinbackOfferPageBillingPeriodPreview(
     @PreviewParameter(BillingPeriodParameterProvider::class) billingPeriod: BillingCycle,
@@ -210,7 +210,7 @@ private fun WinbackOfferPageBillingPeriodPreview(
     }
 }
 
-@Preview(device = Devices.PortraitRegular)
+@Preview(device = Devices.PORTRAIT_REGULAR)
 @Composable
 private fun WinbackOfferPageThemePreview(
     @PreviewParameter(ThemePreviewParameterProvider::class) theme: ThemeType,

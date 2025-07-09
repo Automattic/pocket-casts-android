@@ -70,13 +70,14 @@ fun OnboardingWelcomePage(
     theme: Theme.ThemeType,
     flow: OnboardingFlow,
     isSignedInAsPlusOrPatron: Boolean,
-    onDone: () -> Unit,
+    onComplete: () -> Unit,
     onContinueToDiscover: () -> Unit,
-    onImportTapped: () -> Unit,
-    onBackPressed: () -> Unit,
+    onImportclick: () -> Unit,
+    onBackPress: () -> Unit,
     onUpdateSystemBars: (SystemBarsStyles) -> Unit,
+    modifier: Modifier = Modifier,
+    viewModel: OnboardingWelcomeViewModel = hiltViewModel(),
 ) {
-    val viewModel = hiltViewModel<OnboardingWelcomeViewModel>()
     val state by viewModel.stateFlow.collectAsState()
 
     val pocketCastsTheme = MaterialTheme.theme
@@ -85,7 +86,7 @@ fun OnboardingWelcomePage(
         viewModel.onShown(flow)
     }
 
-    LaunchedEffect(Unit) {
+    LaunchedEffect(onUpdateSystemBars) {
         val statusBar = SystemBarStyle.custom(pocketCastsTheme.colors.primaryUi01.copy(alpha = 0.9f), theme.darkTheme)
         val navigationBar = SystemBarStyle.transparent { theme.darkTheme }
         onUpdateSystemBars(SystemBarsStyles(statusBar, navigationBar))
@@ -93,7 +94,7 @@ fun OnboardingWelcomePage(
 
     BackHandler {
         viewModel.onDismiss(flow, persistNewsletter = false)
-        onBackPressed()
+        onBackPress()
     }
 
     // Do not prompt for discover if the user was adding a file because we don't want to break them
@@ -107,22 +108,27 @@ fun OnboardingWelcomePage(
             viewModel.onContinueToDiscover(flow)
             onContinueToDiscover()
         },
-        onImportTapped = {
+        onImportClick = {
             viewModel.onImportTapped(flow)
-            onImportTapped()
+            onImportclick()
             /* Mark confetti as shown if import tapped before confetti animation ends. */
             viewModel.onConfettiShown()
         },
         state = state,
-        onDone = {
+        onComplete = {
             viewModel.onDismiss(flow, persistNewsletter = true)
-            onDone()
+            onComplete()
         },
-        onNewsletterCheckedChanged = viewModel::updateNewsletter,
+        onNewsletterCheckedChange = viewModel::updateNewsletter,
+        modifier = modifier,
     )
 
     if (state.showConfetti) {
-        Confetti { viewModel.onConfettiShown() }
+        Confetti(
+            onShowConfetti = {
+                viewModel.onConfettiShown()
+            },
+        )
     }
 }
 
@@ -130,14 +136,15 @@ fun OnboardingWelcomePage(
 private fun Content(
     isSignedInAsPlusOrPatron: Boolean,
     showDiscover: Boolean,
-    onContinueToDiscover: () -> Unit,
-    onImportTapped: () -> Unit,
     state: OnboardingWelcomeState,
-    onDone: () -> Unit,
-    onNewsletterCheckedChanged: (Boolean) -> Unit,
+    onContinueToDiscover: () -> Unit,
+    onImportClick: () -> Unit,
+    onComplete: () -> Unit,
+    onNewsletterCheckedChange: (Boolean) -> Unit,
+    modifier: Modifier = Modifier,
 ) {
     Column(
-        Modifier
+        modifier
             .padding(horizontal = 24.dp)
             .fillMaxHeight()
             .verticalScroll(rememberScrollState()),
@@ -169,7 +176,7 @@ private fun Content(
             descriptionRes = LR.string.onboarding_import_podcasts_text,
             actionRes = LR.string.onboarding_import_podcasts_button,
             iconRes = IR.drawable.pc_bw_import,
-            onClick = onImportTapped,
+            onClick = onImportClick,
         )
 
         if (showDiscover) {
@@ -188,14 +195,14 @@ private fun Content(
 
         NewsletterSwitch(
             checked = state.newsletter,
-            onCheckedChange = onNewsletterCheckedChanged,
+            onCheckedChange = onNewsletterCheckedChange,
         )
 
         Spacer(Modifier.height(16.dp))
         RowButton(
             text = stringResource(LR.string.done),
             includePadding = false,
-            onClick = onDone,
+            onClick = onComplete,
 
         )
 
@@ -346,10 +353,10 @@ private fun OnboardingWelcomePagePreview(@PreviewParameter(ThemePreviewParameter
             isSignedInAsPlusOrPatron = false,
             showDiscover = true,
             onContinueToDiscover = {},
-            onImportTapped = {},
+            onImportClick = {},
             state = OnboardingWelcomeState(newsletter = false),
-            onDone = {},
-            onNewsletterCheckedChanged = {},
+            onComplete = {},
+            onNewsletterCheckedChange = {},
         )
     }
 }
@@ -362,10 +369,10 @@ private fun OnboardingWelcomePagePlusPreview(@PreviewParameter(ThemePreviewParam
             isSignedInAsPlusOrPatron = true,
             showDiscover = true,
             onContinueToDiscover = {},
-            onImportTapped = {},
+            onImportClick = {},
             state = OnboardingWelcomeState(newsletter = false),
-            onDone = {},
-            onNewsletterCheckedChanged = {},
+            onComplete = {},
+            onNewsletterCheckedChange = {},
         )
     }
 }

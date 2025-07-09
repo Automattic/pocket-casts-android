@@ -63,7 +63,8 @@ class EpisodeViewHolder(
     val settings: Settings,
     private val swipeButtonLayoutFactory: SwipeButtonLayoutFactory,
     private val artworkContext: ArtworkConfiguration.Element?,
-) : RecyclerView.ViewHolder(binding.root), RowSwipeable {
+) : RecyclerView.ViewHolder(binding.root),
+    RowSwipeable {
     override val episodeRow: ViewGroup
         get() = binding.episodeRow
     override val leftRightIcon1: ImageView
@@ -314,7 +315,8 @@ class EpisodeViewHolder(
         binding.episodeRow.setBackgroundColor(if (isMultiSelecting && isSelected) selectedColor else unselectedColor)
 
         binding.playButton.visibility = if (multiSelectEnabled) View.INVISIBLE else View.VISIBLE
-        binding.playButton.updateLayoutParams<ConstraintLayout.LayoutParams> { // Adjust the spacing of the play button to avoid line wrapping when turning on multiselect
+        binding.playButton.updateLayoutParams<ConstraintLayout.LayoutParams> {
+            // Adjust the spacing of the play button to avoid line wrapping when turning on multiselect
             rightMargin = if (multiSelectEnabled) -checkbox.marginLeft else 0.dpToPx(context)
             width = if (multiSelectEnabled) 16.dpToPx(context) else 52.dpToPx(context)
         }

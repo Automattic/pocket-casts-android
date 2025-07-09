@@ -185,7 +185,7 @@ private abstract class SwipeToArchiveCallback(
         }
 
     companion object {
-        private const val maxButtonWidth = 140
+        private const val MAX_BUTTON_WIDTH = 140
     }
 
     override fun getMovementFlags(recyclerView: RecyclerView, viewHolder: RecyclerView.ViewHolder): Int {
@@ -225,10 +225,10 @@ private abstract class SwipeToArchiveCallback(
         }
 
         return if (hasTwoButtons) {
-            maxButtonWidth
+            MAX_BUTTON_WIDTH
         } else {
             // only one button on the right
-            maxButtonWidth / 2
+            MAX_BUTTON_WIDTH / 2
         }.dpToPx(viewHolder.itemView.context).toFloat()
     }
 
@@ -237,7 +237,7 @@ private abstract class SwipeToArchiveCallback(
     }
 
     override fun getSwipeThreshold(viewHolder: RecyclerView.ViewHolder): Float {
-        return maxButtonWidth - 1f
+        return MAX_BUTTON_WIDTH - 1f
     }
 
     override fun augmentUpdateDxDy(dx: Float, dy: Float): Pair<Float, Float> {
@@ -261,8 +261,10 @@ private abstract class SwipeToArchiveCallback(
             ?: return
 
         if (actionState == MultiSwipeHelper.ACTION_STATE_IDLE ||
-            (swipeDirection ?: 0) > 0 && dX <= 0 ||
-            (swipeDirection ?: 0) < 0 && dX >= 0 ||
+            (swipeDirection ?: 0) > 0 &&
+            dX <= 0 ||
+            (swipeDirection ?: 0) < 0 &&
+            dX >= 0 ||
             episodeViewHolder.isMultiSelecting
         ) {
             return

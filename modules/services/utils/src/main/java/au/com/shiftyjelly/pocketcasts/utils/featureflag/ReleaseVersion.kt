@@ -26,18 +26,17 @@ data class ReleaseVersion(
             fromString(BuildConfig.VERSION_NAME) ?: error("Invalid version name: ${BuildConfig.VERSION_NAME}")
         }
 
-        fun ReleaseVersion.comparedToEarlyPatronAccess(patronExclusiveAccessRelease: ReleaseVersion): EarlyAccessState =
-            when {
-                this.major < patronExclusiveAccessRelease.major ||
-                    (this.major == patronExclusiveAccessRelease.major && this.minor < patronExclusiveAccessRelease.minor)
-                -> EarlyAccessState.Before
+        fun ReleaseVersion.comparedToEarlyPatronAccess(patronExclusiveAccessRelease: ReleaseVersion): EarlyAccessState = when {
+            this.major < patronExclusiveAccessRelease.major ||
+                (this.major == patronExclusiveAccessRelease.major && this.minor < patronExclusiveAccessRelease.minor)
+            -> EarlyAccessState.Before
 
-                this.major > patronExclusiveAccessRelease.major ||
-                    (this.major == patronExclusiveAccessRelease.major && this.minor > patronExclusiveAccessRelease.minor)
-                -> EarlyAccessState.After
+            this.major > patronExclusiveAccessRelease.major ||
+                (this.major == patronExclusiveAccessRelease.major && this.minor > patronExclusiveAccessRelease.minor)
+            -> EarlyAccessState.After
 
-                else -> EarlyAccessState.During
-            }
+            else -> EarlyAccessState.During
+        }
 
         fun fromString(versionName: String): ReleaseVersion? {
             val regex = Regex("""(\d+)\.(\d+)(?:\.(\d+))?(?:-rc-(\d+))?""")

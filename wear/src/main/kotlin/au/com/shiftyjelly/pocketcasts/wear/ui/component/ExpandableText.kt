@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -25,18 +26,18 @@ import androidx.wear.compose.material.Text
 
 @Composable
 fun ExpandableText(
+    text: String,
     modifier: Modifier = Modifier,
     textModifier: Modifier = Modifier,
     style: TextStyle = LocalTextStyle.current,
     fontStyle: FontStyle? = null,
-    text: String,
     collapsedMaxLine: Int = 3,
     textAlign: TextAlign? = null,
     onClick: (isExpanded: Boolean) -> Unit = {},
 ) {
     var isExpanded by remember { mutableStateOf(false) }
     var hasOverflow by remember { mutableStateOf(false) }
-    var lastCharIndex by remember { mutableStateOf(0) }
+    var lastCharIndex by remember { mutableIntStateOf(0) }
     val showCollapsedState by remember { derivedStateOf { hasOverflow && !isExpanded } }
 
     Box(

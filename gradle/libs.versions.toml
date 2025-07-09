@@ -31,10 +31,11 @@ hilt = "2.56.2"
 hilt-compiler = "1.2.0"
 horologist = "0.6.23"
 java = "17"
-kotlin = "2.1.21"
+kotlin = "2.2.0"
 kotlin-coroutines = "1.10.2"
-ksp = "2.1.21-2.0.2"
-ktlint = "0.50.0"
+ksp = "2.2.0-2.0.2"
+ktlint = "1.6.0"
+ktlint-compose-rules = "0.4.22"
 lifecycle = "2.9.1"
 lottie = "6.6.7"
 measure-builds = "3.2.1"
@@ -146,6 +147,12 @@ lifecycle-reactivestreams-ktx = { module = "androidx.lifecycle:lifecycle-reactiv
 lifecycle-runtime-compose = { module = "androidx.lifecycle:lifecycle-runtime-compose", version.ref = "lifecycle" }
 lifecycle-runtime-testing = { module = "androidx.lifecycle:lifecycle-runtime-testing", version.ref = "lifecycle" }
 lifecycle-viewmodel-compose = { module = "androidx.lifecycle:lifecycle-viewmodel-compose", version.ref = "lifecycle" }
+
+# Linting
+# CLI included to be picked up by dependencies update automation
+ktlint-cli = { module = "com.pinterest.ktlint:ktlint-cli", version.ref = "ktlint"}
+ktlint-compose-rules = { module = "io.nlopez.compose.rules:ktlint", version.ref = "ktlint-compose-rules"}
+security-lint = { module = "com.android.security.lint:lint", version.ref = "security-lint" }
 
 # Lottie
 lottie = { module = "com.airbnb.android:lottie", version.ref = "lottie" }
@@ -284,7 +291,6 @@ play-review = "com.google.android.play:review-ktx:2.0.2"
 play-wearable = "com.google.android.gms:play-services-wearable:19.0.0"
 reorderable = "sh.calvin.reorderable:reorderable:2.5.1"
 robolectric = "org.robolectric:robolectric:4.15.1"
-security-lint = { module = "com.android.security.lint:lint", version.ref = "security-lint" }
 timber = "com.jakewharton.timber:timber:5.0.1"
 turbine = "app.cash.turbine:turbine:1.2.1"
 

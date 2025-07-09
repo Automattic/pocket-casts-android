@@ -134,7 +134,10 @@ import dagger.hilt.android.AndroidEntryPoint
 import dagger.hilt.android.lifecycle.withCreationCallback
 import javax.inject.Inject
 import kotlin.time.Duration.Companion.milliseconds
+import kotlinx.coroutines.channels.awaitClose
+import kotlinx.coroutines.channels.trySendBlocking
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
@@ -147,7 +150,9 @@ import au.com.shiftyjelly.pocketcasts.transcripts.UiState as TranscriptsUiState
 
 @OptIn(ExperimentalMaterial3WindowSizeClassApi::class)
 @AndroidEntryPoint
-class PlayerHeaderFragment : BaseFragment(), PlayerClickListener {
+class PlayerHeaderFragment :
+    BaseFragment(),
+    PlayerClickListener {
     @Inject
     lateinit var playbackManager: PlaybackManager
 
@@ -170,7 +175,7 @@ class PlayerHeaderFragment : BaseFragment(), PlayerClickListener {
         showViewBookmarksSnackbar(result)
     }
 
-    private val ShowUpNextFlingBehavior = object : FlingBehavior {
+    private val showUpNextFlingBehavior = object : FlingBehavior {
         override suspend fun ScrollScope.performFling(initialVelocity: Float): Float {
             if (isPlayerExpanded() && isUpNextCollapsed() && initialVelocity > 2000f) {
                 (parentFragment as PlayerContainerFragment).openUpNext()
@@ -202,8 +207,9 @@ class PlayerHeaderFragment : BaseFragment(), PlayerClickListener {
         val podcastColors by remember { podcastColorsFlow() }.collectAsState(PodcastColors.ForUserEpisode)
         val headerData by remember { playerHeaderFlow() }.collectAsState(PlayerViewModel.PlayerHeader())
         val artworkOrVideoState by remember { playerVisualsStateFlow() }.collectAsState(ArtworkOrVideoState.NoContent)
-        val ads by viewModel.activeAds.collectAsState()
+        val activeAd by viewModel.activeAd.collectAsState()
 
+        val isPlayerOpen by isPlayerOpenFlow().collectAsState(false)
         val isTranscriptOpen by shelfSharedViewModel.isTranscriptOpen.collectAsState()
         val transcriptUiState by transcriptViewModel.uiState.collectAsState()
 
@@ -232,7 +238,7 @@ class PlayerHeaderFragment : BaseFragment(), PlayerClickListener {
                             .padding(start = 16.dp, end = 16.dp, bottom = 16.dp),
                     )
                     PlayerContent(
-                        ad = ads.firstOrNull(),
+                        ad = activeAd,
                         artworkOrVideoState = artworkOrVideoState,
                         headerData = headerData,
                         playerColors = playerColors,
@@ -252,6 +258,8 @@ class PlayerHeaderFragment : BaseFragment(), PlayerClickListener {
             playerEpisodeUuid = headerData.episodeUuid,
             transcriptEpisodeUuid = transcriptUiState.transcriptEpisodeUuid,
         )
+
+        AdImpressionEffect(activeAd, isPlayerOpen)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -506,6 +514,7 @@ class PlayerHeaderFragment : BaseFragment(), PlayerClickListener {
     }
 
     private fun openAd(ad: BlazeAd) {
+        viewModel.trackAdTapped(ad)
         runCatching {
             val intent = Intent(Intent.ACTION_VIEW, ad.ctaUrl.toUri())
             startActivity(intent)
@@ -571,6 +580,21 @@ class PlayerHeaderFragment : BaseFragment(), PlayerClickListener {
         }
     }
 
+    private fun isPlayerOpenFlow() = callbackFlow<Boolean> {
+        val callback = object : BottomSheetBehavior.BottomSheetCallback() {
+            override fun onStateChanged(bottomSheet: View, newState: Int) {
+                trySendBlocking(newState == BottomSheetBehavior.STATE_EXPANDED)
+            }
+
+            override fun onSlide(bottomSheet: View, slideOffset: Float) = Unit
+        }
+        val hostListener = (requireActivity() as FragmentHostListener)
+        hostListener.addPlayerBottomSheetCallback(callback)
+        awaitClose {
+            hostListener.removePlayerBottomSheetCallback(callback)
+        }
+    }
+
     @Composable
     private fun PlayerContent(
         ad: BlazeAd?,
@@ -620,7 +644,7 @@ class PlayerHeaderFragment : BaseFragment(), PlayerClickListener {
                     if (transitionData.isTranscriptOpen) {
                         Modifier
                     } else {
-                        Modifier.verticalScroll(scrollState, flingBehavior = ShowUpNextFlingBehavior)
+                        Modifier.verticalScroll(scrollState, flingBehavior = showUpNextFlingBehavior)
                     },
                 ),
         ) {
@@ -741,13 +765,13 @@ class PlayerHeaderFragment : BaseFragment(), PlayerClickListener {
                 modifier = Modifier
                     .weight(1f)
                     .fillMaxHeight()
-                    .verticalScroll(rememberScrollState(), flingBehavior = ShowUpNextFlingBehavior)
+                    .verticalScroll(rememberScrollState(), flingBehavior = showUpNextFlingBehavior)
                     .navigationBarsPadding(),
             ) {
                 AdAndArtworkHorizontal(
                     artworkOrVideoState = artworkOrVideoState,
                     playerColors = playerColors,
-                    modifier = modifier.fillMaxWidth(),
+                    modifier = Modifier.fillMaxWidth(),
                 )
                 Spacer(
                     modifier = Modifier.height(16.dp),
@@ -781,7 +805,7 @@ class PlayerHeaderFragment : BaseFragment(), PlayerClickListener {
                 modifier = Modifier
                     .weight(1f)
                     .fillMaxHeight()
-                    .verticalScroll(rememberScrollState(), flingBehavior = ShowUpNextFlingBehavior)
+                    .verticalScroll(rememberScrollState(), flingBehavior = showUpNextFlingBehavior)
                     .navigationBarsPadding(),
             ) {
                 Spacer(
@@ -810,7 +834,7 @@ class PlayerHeaderFragment : BaseFragment(), PlayerClickListener {
         Column(
             modifier = modifier
                 .fillMaxSize()
-                .verticalScroll(rememberScrollState(), flingBehavior = ShowUpNextFlingBehavior)
+                .verticalScroll(rememberScrollState(), flingBehavior = showUpNextFlingBehavior)
                 .navigationBarsPadding(),
         ) {
             Row {
@@ -982,7 +1006,7 @@ class PlayerHeaderFragment : BaseFragment(), PlayerClickListener {
     private fun AdAndArtworkHorizontal(
         artworkOrVideoState: ArtworkOrVideoState,
         playerColors: PlayerColors,
-        modifier: Modifier,
+        modifier: Modifier = Modifier,
     ) {
         when (artworkOrVideoState) {
             is ArtworkOrVideoState.Artwork -> {
@@ -1102,6 +1126,18 @@ class PlayerHeaderFragment : BaseFragment(), PlayerClickListener {
         LaunchedEffect(isTranscriptOpen, playerEpisodeUuid, transcriptEpisodeUuid) {
             if (isTranscriptOpen && playerEpisodeUuid != transcriptEpisodeUuid) {
                 transcriptViewModel.loadTranscript(playerEpisodeUuid)
+            }
+        }
+    }
+
+    @Composable
+    private fun AdImpressionEffect(
+        ad: BlazeAd?,
+        isPlayerOpen: Boolean,
+    ) {
+        LaunchedEffect(ad?.id, isPlayerOpen) {
+            if (ad != null && isPlayerOpen) {
+                viewModel.trackAdImpression(ad)
             }
         }
     }

@@ -25,7 +25,6 @@ enum class EpisodeViewSource(val value: String) {
     ;
 
     companion object {
-        fun fromString(source: String?) =
-            EpisodeViewSource.values().find { it.value == source } ?: UNKNOWN
+        fun fromString(source: String?) = EpisodeViewSource.values().find { it.value == source } ?: UNKNOWN
     }
 }
