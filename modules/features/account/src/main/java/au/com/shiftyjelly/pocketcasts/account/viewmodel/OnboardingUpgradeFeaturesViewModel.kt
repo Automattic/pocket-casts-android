@@ -13,7 +13,6 @@ import au.com.shiftyjelly.pocketcasts.payment.SubscriptionOffer
 import au.com.shiftyjelly.pocketcasts.payment.SubscriptionPlan
 import au.com.shiftyjelly.pocketcasts.payment.SubscriptionPlans
 import au.com.shiftyjelly.pocketcasts.payment.SubscriptionTier
-import au.com.shiftyjelly.pocketcasts.payment.flatMap
 import au.com.shiftyjelly.pocketcasts.payment.getOrNull
 import au.com.shiftyjelly.pocketcasts.repositories.notification.NotificationManager
 import au.com.shiftyjelly.pocketcasts.repositories.notification.OnboardingNotificationType
@@ -48,12 +47,18 @@ class OnboardingUpgradeFeaturesViewModel @AssistedInject constructor(
     private fun createInitialLoadedState(
         subscriptionPlans: SubscriptionPlans,
     ): OnboardingUpgradeFeaturesState.Loaded {
-        val showPatronOnly = flow.source == OnboardingUpgradeSource.ACCOUNT_DETAILS
+        val plansFilter = if (FeatureFlag.isEnabled(Feature.NEW_ONBOARDING_UPGRADE)) {
+            OnboardingUpgradeFeaturesState.LoadedPlansFilter.PLUS_ONLY
+        } else if (flow.source == OnboardingUpgradeSource.ACCOUNT_DETAILS) {
+            OnboardingUpgradeFeaturesState.LoadedPlansFilter.PATRON_ONLY
+        } else {
+            OnboardingUpgradeFeaturesState.LoadedPlansFilter.BOTH
+        }
         return OnboardingUpgradeFeaturesState.Loaded(
             subscriptionPlans,
             selectedBillingCycle = flow.preselectedBillingCycle,
-            selectedTier = if (showPatronOnly) SubscriptionTier.Patron else flow.preselectedTier,
-            showOnlyPatronPlans = showPatronOnly,
+            selectedTier = if (plansFilter == OnboardingUpgradeFeaturesState.LoadedPlansFilter.PATRON_ONLY) SubscriptionTier.Patron else flow.preselectedTier,
+            plansFilter = plansFilter,
             purchaseFailed = false,
         )
     }
@@ -175,19 +180,34 @@ sealed class OnboardingUpgradeFeaturesState {
 
     data object NoSubscriptions : OnboardingUpgradeFeaturesState()
 
+    enum class LoadedPlansFilter {
+        PATRON_ONLY,
+        PLUS_ONLY,
+        BOTH,
+    }
+
     data class Loaded(
         val subscriptionPlans: SubscriptionPlans,
         val selectedTier: SubscriptionTier,
         val selectedBillingCycle: BillingCycle,
-        val showOnlyPatronPlans: Boolean,
+        val plansFilter: LoadedPlansFilter,
         val purchaseFailed: Boolean,
     ) : OnboardingUpgradeFeaturesState() {
-        val availablePlans = listOfNotNull(
-            plusYearlyPlanWithOffer().takeUnless { showOnlyPatronPlans },
-            plusMonthlyPlan().takeUnless { showOnlyPatronPlans },
-            patronYearlyPlan(),
-            patronMonthlyPlan(),
+        val availableBasePlans = listOfNotNull(
+            plusYearlyPlanWithOffer().takeUnless { plansFilter == LoadedPlansFilter.PATRON_ONLY },
+            plusMonthlyPlan().takeUnless { plansFilter == LoadedPlansFilter.PATRON_ONLY },
+            patronYearlyPlan().takeUnless { plansFilter == LoadedPlansFilter.PLUS_ONLY },
+            patronMonthlyPlan().takeUnless { plansFilter == LoadedPlansFilter.PLUS_ONLY },
         )
+
+        val availablePlans: List<OnboardingSubscriptionPlan> by lazy {
+            availableBasePlans.mapNotNull {
+                when (it) {
+                    is SubscriptionPlan.WithOffer -> OnboardingSubscriptionPlan.create(it).getOrNull()
+                    is SubscriptionPlan.Base -> OnboardingSubscriptionPlan.create(it)
+                }
+            }
+        }
 
         val selectedPlan get() = getPlan(selectedTier, selectedBillingCycle)
 
@@ -195,32 +215,35 @@ sealed class OnboardingUpgradeFeaturesState {
             plan.key.tier == tier && plan.key.billingCycle == billingCycle
         }
 
-        private fun plusYearlyPlanWithOffer(): OnboardingSubscriptionPlan {
+        private fun plusYearlyPlanWithOffer(): SubscriptionPlan {
             val offer = if (FeatureFlag.isEnabled(Feature.INTRO_PLUS_OFFER_ENABLED)) {
                 SubscriptionOffer.IntroOffer
             } else {
                 SubscriptionOffer.Trial
             }
-            return subscriptionPlans.findOfferPlan(SubscriptionTier.Plus, BillingCycle.Yearly, offer)
-                .flatMap { OnboardingSubscriptionPlan.create(it) }
-                .getOrNull()
-                ?: plusYearlyPlan()
+
+            val offerPlan = subscriptionPlans.findOfferPlan(SubscriptionTier.Plus, BillingCycle.Yearly, offer).getOrNull()
+            return if (offerPlan == null || OnboardingSubscriptionPlan.create(offerPlan).getOrNull() == null) {
+                plusYearlyPlan()
+            } else {
+                offerPlan
+            }
         }
 
-        private fun plusYearlyPlan(): OnboardingSubscriptionPlan {
-            return OnboardingSubscriptionPlan.create(subscriptionPlans.getBasePlan(SubscriptionTier.Plus, BillingCycle.Yearly))
+        private fun plusYearlyPlan(): SubscriptionPlan.Base {
+            return subscriptionPlans.getBasePlan(SubscriptionTier.Plus, BillingCycle.Yearly)
         }
 
-        private fun patronYearlyPlan(): OnboardingSubscriptionPlan {
-            return OnboardingSubscriptionPlan.create(subscriptionPlans.getBasePlan(SubscriptionTier.Patron, BillingCycle.Yearly))
+        private fun patronYearlyPlan(): SubscriptionPlan.Base {
+            return subscriptionPlans.getBasePlan(SubscriptionTier.Patron, BillingCycle.Yearly)
         }
 
-        private fun plusMonthlyPlan(): OnboardingSubscriptionPlan {
-            return OnboardingSubscriptionPlan.create(subscriptionPlans.getBasePlan(SubscriptionTier.Plus, BillingCycle.Monthly))
+        private fun plusMonthlyPlan(): SubscriptionPlan.Base {
+            return subscriptionPlans.getBasePlan(SubscriptionTier.Plus, BillingCycle.Monthly)
         }
 
-        private fun patronMonthlyPlan(): OnboardingSubscriptionPlan {
-            return OnboardingSubscriptionPlan.create(subscriptionPlans.getBasePlan(SubscriptionTier.Patron, BillingCycle.Monthly))
+        private fun patronMonthlyPlan(): SubscriptionPlan.Base {
+            return subscriptionPlans.getBasePlan(SubscriptionTier.Patron, BillingCycle.Monthly)
         }
     }
 }
