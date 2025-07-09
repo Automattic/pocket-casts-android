@@ -2473,5 +2473,7 @@
     <string name="notification_snack_cta">Open Settings</string>
     <string name="notification_mockup_image_description">Mockup image</string>
 
+    <!-- Onboarding Upgrade -->
+    <string name="onboarding_upgrade_generic_title">Superpowers for your podcasts</string>
     <string name="onboarding_upgrade_save_percent">Save %1$d\%%</string>
 </resources>
