@@ -73,7 +73,9 @@ class NotificationWorker @AssistedInject constructor(
                 val folders = suggestedFoldersManager.observeSuggestedFolders().firstOrNull()
                 !folders.isNullOrEmpty()
             }
-            is OffersNotificationType.UpgradeNow -> {
+            is OnboardingNotificationType.PlusUpsell,
+            is OffersNotificationType.UpgradeNow,
+            -> {
                 val subscription = settings.cachedSubscription.value
                 subscription == null || subscription.expiryDate.isBefore(Instant.now())
             }
