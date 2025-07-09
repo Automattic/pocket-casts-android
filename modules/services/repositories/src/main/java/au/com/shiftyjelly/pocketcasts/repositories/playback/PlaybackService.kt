@@ -566,7 +566,7 @@ open class PlaybackService :
         val playlist = if (DOWNLOADS_ROOT == parentId) playlistManager.getSystemDownloadsFilter() else playlistManager.findByUuidBlocking(parentId)
         if (playlist != null) {
             val episodeList = if (DOWNLOADS_ROOT == parentId) {
-                autoPlaySource = AutoPlaySource.Downloads
+                autoPlaySource = AutoPlaySource.Predefined.Downloads
                 episodeManager.findDownloadedEpisodesRxFlowable().blockingFirst()
             } else {
                 autoPlaySource = AutoPlaySource.fromId(parentId)
@@ -610,14 +610,14 @@ open class PlaybackService :
     }
 
     protected suspend fun loadFilesChildren(): List<MediaBrowserCompat.MediaItem> {
-        setAutoPlaySource(AutoPlaySource.Files)
+        setAutoPlaySource(AutoPlaySource.Predefined.Files)
         return userEpisodeManager.findUserEpisodes().map {
             AutoConverter.convertEpisodeToMediaItem(this, it, Podcast.userPodcast, useEpisodeArtwork = settings.artworkConfiguration.value.useEpisodeArtwork)
         }
     }
 
     protected suspend fun loadStarredChildren(): List<MediaBrowserCompat.MediaItem> {
-        setAutoPlaySource(AutoPlaySource.Starred)
+        setAutoPlaySource(AutoPlaySource.Predefined.Starred)
         return episodeManager.findStarredEpisodes().take(EPISODE_LIMIT).mapNotNull { episode ->
             podcastManager.findPodcastByUuidBlocking(episode.podcastUuid)?.let { podcast ->
                 AutoConverter.convertEpisodeToMediaItem(context = this, episode = episode, parentPodcast = podcast, useEpisodeArtwork = settings.artworkConfiguration.value.useEpisodeArtwork)

@@ -243,9 +243,9 @@ class ProfileEpisodeListFragment :
         super.onResume()
         binding?.recyclerView?.adapter = adapter
         when (mode) {
-            Mode.Downloaded -> AutoPlaySource.Downloads
-            Mode.History -> AutoPlaySource.None
-            Mode.Starred -> AutoPlaySource.Starred
+            Mode.Downloaded -> AutoPlaySource.Predefined.Downloads
+            Mode.History -> AutoPlaySource.Predefined.None
+            Mode.Starred -> AutoPlaySource.Predefined.Starred
         }.let { settings.trackingAutoPlaySource.set(it, updateModifiedAt = false) }
     }
 

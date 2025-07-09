@@ -483,8 +483,8 @@ private fun AutoPlaySource.prettyPrint(
         }
         "Podcast or filter: $uuid"
     }
-    is AutoPlaySource.Downloads -> "Downloads"
-    is AutoPlaySource.Files -> "Files"
-    is AutoPlaySource.Starred -> "Starred"
-    is AutoPlaySource.None -> "None"
+    AutoPlaySource.Predefined.Downloads -> "Downloads"
+    AutoPlaySource.Predefined.Files -> "Files"
+    AutoPlaySource.Predefined.Starred -> "Starred"
+    AutoPlaySource.Predefined.None -> "None"
 }

@@ -158,7 +158,7 @@ class CloudFilesFragment :
 
     override fun onResume() {
         super.onResume()
-        settings.trackingAutoPlaySource.set(AutoPlaySource.Files, updateModifiedAt = false)
+        settings.trackingAutoPlaySource.set(AutoPlaySource.Predefined.Files, updateModifiedAt = false)
     }
 
     override fun onPause() {

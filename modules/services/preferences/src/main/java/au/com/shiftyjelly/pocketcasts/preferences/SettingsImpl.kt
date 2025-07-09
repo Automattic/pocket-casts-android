@@ -1385,7 +1385,7 @@ class SettingsImpl @Inject constructor(
 
     override val lastAutoPlaySource = UserSetting.PrefFromString(
         sharedPrefKey = "LastSelectedPodcastOrFilterUuid", // legacy name
-        defaultValue = AutoPlaySource.None,
+        defaultValue = AutoPlaySource.Predefined.None,
         sharedPrefs = sharedPreferences,
         fromString = AutoPlaySource::fromId,
         toString = AutoPlaySource::id,
@@ -1393,7 +1393,7 @@ class SettingsImpl @Inject constructor(
 
     override val trackingAutoPlaySource = UserSetting.PrefFromString(
         sharedPrefKey = "localAutoPlaySource",
-        defaultValue = AutoPlaySource.None,
+        defaultValue = AutoPlaySource.Predefined.None,
         sharedPrefs = sharedPreferences,
         fromString = AutoPlaySource::fromId,
         toString = AutoPlaySource::id,

@@ -1374,9 +1374,10 @@ open class PlaybackManager @Inject constructor(
         var episodeSource = settings.lastAutoPlaySource.value.toString().lowercase()
 
         val allEpisodes: List<BaseEpisode> = when (val autoSource = settings.lastAutoPlaySource.value) {
-            is AutoPlaySource.Downloads -> episodeManager.findDownloadEpisodesRxFlowable().asFlow().firstOrNull()
-            is AutoPlaySource.Files -> cloudFilesManager.sortedCloudFiles.firstOrNull()
-            is AutoPlaySource.Starred -> episodeManager.findStarredEpisodesRxFlowable().asFlow().firstOrNull()
+            AutoPlaySource.Predefined.Downloads -> episodeManager.findDownloadEpisodesRxFlowable().asFlow().firstOrNull()
+            AutoPlaySource.Predefined.Files -> cloudFilesManager.sortedCloudFiles.firstOrNull()
+            AutoPlaySource.Predefined.Starred -> episodeManager.findStarredEpisodesRxFlowable().asFlow().firstOrNull()
+            AutoPlaySource.Predefined.None -> null
             // First check if it is a podcast uuid, then check if it is from a filter
             is AutoPlaySource.PodcastOrFilter -> {
                 episodeSource = "podcast"
@@ -1388,7 +1389,6 @@ open class PlaybackManager @Inject constructor(
                             playlistManager.findEpisodesBlocking(playlist, episodeManager, this)
                         }
             }
-            is AutoPlaySource.None -> null
         } ?: emptyList()
 
         val allEpisodeUuids = allEpisodes.map { it.uuid }

@@ -20,28 +20,28 @@ class AutoPlaySourceTest {
 
         val source = AutoPlaySource.fromId(malformedUuid)
 
-        assertEquals(AutoPlaySource.None, source)
+        assertEquals(AutoPlaySource.Predefined.None, source)
     }
 
     @Test
     fun `create Files from ID`() {
         val source = AutoPlaySource.fromId("files")
 
-        assertEquals(AutoPlaySource.Files, source)
+        assertEquals(AutoPlaySource.Predefined.Files, source)
     }
 
     @Test
     fun `create Downloads from ID`() {
         val source = AutoPlaySource.fromId("downloads")
 
-        assertEquals(AutoPlaySource.Downloads, source)
+        assertEquals(AutoPlaySource.Predefined.Downloads, source)
     }
 
     @Test
     fun `create Starred from ID`() {
         val source = AutoPlaySource.fromId("starred")
 
-        assertEquals(AutoPlaySource.Starred, source)
+        assertEquals(AutoPlaySource.Predefined.Starred, source)
     }
 
     @Test
@@ -59,27 +59,27 @@ class AutoPlaySourceTest {
 
         val source = AutoPlaySource.fromServerId(malformedUuid)
 
-        assertEquals(AutoPlaySource.None, source)
+        assertEquals(AutoPlaySource.Predefined.None, source)
     }
 
     @Test
     fun `create Files from server ID`() {
         val source = AutoPlaySource.fromServerId("files")
 
-        assertEquals(AutoPlaySource.Files, source)
+        assertEquals(AutoPlaySource.Predefined.Files, source)
     }
 
     @Test
     fun `create Downloads from server ID`() {
         val source = AutoPlaySource.fromServerId("downloads")
 
-        assertEquals(AutoPlaySource.Downloads, source)
+        assertEquals(AutoPlaySource.Predefined.Downloads, source)
     }
 
     @Test
     fun `create Starred from server ID`() {
         val source = AutoPlaySource.fromServerId("starred")
 
-        assertEquals(AutoPlaySource.Starred, source)
+        assertEquals(AutoPlaySource.Predefined.Starred, source)
     }
 }
