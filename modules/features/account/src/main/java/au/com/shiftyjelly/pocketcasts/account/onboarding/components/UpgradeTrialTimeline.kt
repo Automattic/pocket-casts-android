@@ -24,6 +24,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
+import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import au.com.shiftyjelly.pocketcasts.compose.AppThemeWithBackground
@@ -148,7 +149,11 @@ fun UpgradeTrialTimeline(
         // restrict amount of vertical and horizontal space each item may take
         val modifiedConstraints = constraints.copy(
             minHeight = iconSizePx.toInt(),
-            maxHeight = max(iconSizePx.toInt(), constraints.maxHeight / max(1, items.size)),
+            maxHeight = if (constraints.maxHeight == Constraints.Infinity) {
+                Constraints.Infinity
+            } else {
+                max(iconSizePx.toInt(), constraints.maxHeight / max(1, items.size))
+            },
             minWidth = iconSizePx.toInt(),
             maxWidth = max(iconSizePx.toInt(), (constraints.maxWidth - iconPaddingPx - iconSizePx).toInt()),
         )

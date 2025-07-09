@@ -4,7 +4,6 @@ import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.ModalBottomSheetLayout
 import androidx.compose.material.ModalBottomSheetValue
 import androidx.compose.material.rememberModalBottomSheetState
@@ -110,7 +109,6 @@ fun OnboardingUpgradeFlow(
         }
     }
 
-    @OptIn(ExperimentalMaterialApi::class)
     ModalBottomSheetLayout(
         sheetState = sheetState,
         scrimColor = Color.Black.copy(alpha = 0.5f),

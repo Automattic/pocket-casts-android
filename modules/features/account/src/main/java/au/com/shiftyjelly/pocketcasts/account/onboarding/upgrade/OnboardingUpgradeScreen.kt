@@ -20,7 +20,6 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBars
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.layout.wrapContentHeight
-import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.pager.VerticalPager
 import androidx.compose.foundation.pager.rememberPagerState
@@ -261,12 +260,12 @@ private fun UpgradeContent(
             when (val currentPage = pages[page]) {
                 is UpgradePagerContent.Features -> FeaturesContent(
                     features = currentPage,
-                    onCtaClick = { coroutineScope.launch { pagerState.animateScrollToPage(pagerState.currentPage + 1) } },
+                    onCtaClick = { coroutineScope.launch { pagerState.animateScrollToPage(pages.size - page) } },
                 )
 
                 is UpgradePagerContent.TrialSchedule -> ScheduleContent(
                     trialSchedule = currentPage,
-                    onCtaClick = { coroutineScope.launch { pagerState.animateScrollToPage(pagerState.currentPage - 1) } },
+                    onCtaClick = { coroutineScope.launch { pagerState.animateScrollToPage(pages.size - page) } },
                 )
             }
         }
@@ -290,7 +289,8 @@ private fun FeaturesContent(
             item {
                 TextP40(
                     text = stringResource(LR.string.onboarding_upgrade_features_trial_schedule),
-                    modifier = Modifier.clickable { onCtaClick() }.padding(top = 24.dp),
+                    modifier = Modifier.padding(top = 24.dp)
+                        .clickable { onCtaClick() },
                     color = MaterialTheme.theme.colors.primaryInteractive01,
                 )
             }
@@ -306,7 +306,6 @@ private fun ScheduleContent(
     FadedLazyColumn {
         item {
             UpgradeTrialTimeline(
-                modifier = Modifier.wrapContentSize(),
                 items = trialSchedule.timelineItems,
             )
         }
@@ -314,7 +313,8 @@ private fun ScheduleContent(
             item {
                 TextP40(
                     text = stringResource(LR.string.onboarding_upgrade_schedule_see_features),
-                    modifier = Modifier.clickable { onCtaClick() }.padding(top = 24.dp),
+                    modifier = Modifier.padding(top = 24.dp)
+                        .clickable { onCtaClick() },
                     color = MaterialTheme.theme.colors.primaryInteractive01,
                 )
             }
