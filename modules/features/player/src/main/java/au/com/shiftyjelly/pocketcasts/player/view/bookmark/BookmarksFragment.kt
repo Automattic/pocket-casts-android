@@ -1,5 +1,6 @@
 package au.com.shiftyjelly.pocketcasts.player.view.bookmark
 
+import android.os.Build
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.ViewGroup
@@ -159,10 +160,12 @@ class BookmarksFragment : BaseFragment() {
                         onHeadphoneControlsButtonTapped = {
                             bookmarksViewModel.onHeadphoneControlsButtonTapped()
                         },
-                        bottomInset = if (sourceView == SourceView.PROFILE) {
-                            bottomInset.value.pxToDp(LocalContext.current).dp
-                        } else {
-                            WindowInsets.navigationBars.asPaddingValues().calculateBottomPadding()
+                        bottomInset = when {
+                            sourceView == SourceView.PROFILE -> {
+                                bottomInset.value.pxToDp(LocalContext.current).dp
+                            }
+                            Build.VERSION.SDK_INT > 29 -> WindowInsets.navigationBars.asPaddingValues().calculateBottomPadding()
+                            else -> 56.dp
                         },
                     )
                 }

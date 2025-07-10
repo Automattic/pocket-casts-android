@@ -3,7 +3,7 @@ package au.com.shiftyjelly.pocketcasts.navigation
 import androidx.fragment.app.FragmentManager
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleObserver
-import com.google.android.material.bottomnavigation.BottomNavigationView
+import com.google.android.material.navigation.NavigationBarView
 import io.reactivex.disposables.CompositeDisposable
 
 /**
@@ -14,7 +14,7 @@ internal class ActivityDelegate(
     private val modalContainer: Int,
     fragmentManagerFactory: () -> FragmentManager,
     private val lifecycle: Lifecycle,
-    val bottomNavigationView: BottomNavigationView,
+    val bottomNavigationView: NavigationBarView,
     private val bottomNavigator: BottomNavigator,
 ) : LifecycleObserver {
     fun clear() {
@@ -33,8 +33,7 @@ internal class ActivityDelegate(
     @androidx.lifecycle.OnLifecycleEvent(Lifecycle.Event.ON_START)
     fun onActivityStart() {
         bin.clear()
-        val fragmentTransactionHandler =
-            FragmentTransactionHandler(fragmentManager, fragmentContainer, modalContainer)
+        val fragmentTransactionHandler = FragmentTransactionHandler(fragmentManager, fragmentContainer, modalContainer)
         bottomNavigator.fragmentTransactionPublisher
             .subscribe { command ->
                 fragmentTransactionHandler.handle(command)
@@ -70,6 +69,5 @@ internal class ActivityDelegate(
     @androidx.lifecycle.OnLifecycleEvent(Lifecycle.Event.ON_STOP)
     fun onActivityStop() {
         bin.clear()
-        bottomNavigationView.setOnNavigationItemSelectedListener(null)
     }
 }
