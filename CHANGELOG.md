@@ -25,6 +25,8 @@
         ([#4177](https://github.com/Automattic/pocket-casts-android/pull/4177))
     *   Fix upsell notifications showing up even if the user already has an active subscription
         ([#4216](https://github.com/Automattic/pocket-casts-android/pull/4216))
+    *   Fix navigation bar obstructing content on older Android systems
+        ([#4218](https://github.com/Automattic/pocket-casts-android/pull/4218))
 
 7.92
 -----

@@ -763,8 +763,7 @@ class PlayerHeaderFragment : BaseFragment(), PlayerClickListener {
                 modifier = Modifier
                     .weight(1f)
                     .fillMaxHeight()
-                    .verticalScroll(rememberScrollState(), flingBehavior = ShowUpNextFlingBehavior)
-                    .navigationBarsPadding(),
+                    .verticalScroll(rememberScrollState(), flingBehavior = ShowUpNextFlingBehavior),
             ) {
                 AdAndArtworkHorizontal(
                     artworkOrVideoState = artworkOrVideoState,
@@ -803,8 +802,7 @@ class PlayerHeaderFragment : BaseFragment(), PlayerClickListener {
                 modifier = Modifier
                     .weight(1f)
                     .fillMaxHeight()
-                    .verticalScroll(rememberScrollState(), flingBehavior = ShowUpNextFlingBehavior)
-                    .navigationBarsPadding(),
+                    .verticalScroll(rememberScrollState(), flingBehavior = ShowUpNextFlingBehavior),
             ) {
                 Spacer(
                     modifier = Modifier.weight(1f),
@@ -832,8 +830,7 @@ class PlayerHeaderFragment : BaseFragment(), PlayerClickListener {
         Column(
             modifier = modifier
                 .fillMaxSize()
-                .verticalScroll(rememberScrollState(), flingBehavior = ShowUpNextFlingBehavior)
-                .navigationBarsPadding(),
+                .verticalScroll(rememberScrollState(), flingBehavior = ShowUpNextFlingBehavior),
         ) {
             Row {
                 val windowWithPx = LocalWindowInfo.current.containerSize.width
