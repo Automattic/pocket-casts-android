@@ -26,6 +26,9 @@
         ([#4151](https://github.com/Automattic/pocket-casts-android/pull/4151))
     *   Fix issue with notification prompt showing too often
         ([#4162](https://github.com/Automattic/pocket-casts-android/pull/4162))
+*   Hotfixes
+    *   Fix broken downloads experience
+        ([#4231](https://github.com/Automattic/pocket-casts-android/pull/4231))
 
 7.91
 -----
