@@ -24,10 +24,13 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.platform.ComposeView
 import androidx.core.content.ContextCompat
+import androidx.core.view.ViewCompat
 import androidx.core.view.WindowCompat
+import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.isVisible
 import androidx.core.view.updateLayoutParams
 import androidx.core.view.updatePadding
+import androidx.dynamicanimation.animation.DynamicAnimation.TRANSLATION_Y
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.commitNow
 import androidx.lifecycle.Lifecycle
@@ -174,8 +177,8 @@ import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import au.com.shiftyjelly.pocketcasts.utils.observeOnce
 import au.com.shiftyjelly.pocketcasts.view.LockableBottomSheetBehavior
 import au.com.shiftyjelly.pocketcasts.views.activity.WebViewActivity
-import au.com.shiftyjelly.pocketcasts.views.extensions.setSystemWindowInsetToPadding
 import au.com.shiftyjelly.pocketcasts.views.extensions.showAllowingStateLoss
+import au.com.shiftyjelly.pocketcasts.views.extensions.spring
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseFragment
 import au.com.shiftyjelly.pocketcasts.views.fragments.TopScrollable
 import au.com.shiftyjelly.pocketcasts.views.helper.HasBackstack
@@ -420,22 +423,21 @@ class MainActivity :
         }
 
         binding = ActivityMainBinding.inflate(layoutInflater)
-        val view = binding.root
-        setContentView(view)
+        setContentView(binding.root)
         checkForNotificationPermission()
 
-        binding.root.setSystemWindowInsetToPadding(left = true, right = true)
+        ViewCompat.setOnApplyWindowInsetsListener(binding.root) { view, windowInsets ->
+            val insets = windowInsets.getInsets(WindowInsetsCompat.Type.systemBars() or WindowInsetsCompat.Type.displayCutout())
+            binding.root.updatePadding(left = insets.left, right = insets.right)
+            binding.bottomNavigation.updatePadding(bottom = insets.bottom)
+            windowInsets
+        }
+        binding.bottomNavigation.addOnLayoutChangeListener { view, _, _, _, _, _, _, _, _ ->
+            binding.mainFragment.updatePadding(bottom = view.height)
 
-        binding.bottomNavigation.addOnLayoutChangeListener { _, _, _, _, _, _, _, _, _ ->
-            val miniPlayerHeight = miniPlayerHeight
-            val bottomNavigationHeight = binding.bottomNavigation.height
-            val bottomSheetBehavior = BottomSheetBehavior.from(binding.playerBottomSheet)
-            // Set the player bottom sheet position to show the mini player above the bottom navigation
-            bottomSheetBehavior.peekHeight = miniPlayerHeight + bottomNavigationHeight
-            // Add padding to the main content so the end of the page isn't under the bottom navigation
-            binding.mainFragment.updatePadding(bottom = bottomNavigationHeight)
-            // Position the snackbar above the bottom navigation or the mini player if it's shown
-            updateSnackbarPosition(miniPlayerOpen = false)
+            BottomSheetBehavior.from(binding.playerBottomSheet).apply {
+                peekHeight = miniPlayerHeight + view.height
+            }
         }
 
         lifecycleScope.launch {
@@ -1103,7 +1105,9 @@ class MainActivity :
     }
 
     override fun onPlayerBottomSheetSlide(bottomSheetView: View, slideOffset: Float) {
-        binding.bottomNavigation.translationY = bottomSheetView.height * slideOffset
+        val view = binding.bottomNavigation
+        val targetPosition = 2 * view.height * slideOffset
+        view.spring(TRANSLATION_Y).animateToFinalPosition(targetPosition)
     }
 
     override fun updateSystemColors() {

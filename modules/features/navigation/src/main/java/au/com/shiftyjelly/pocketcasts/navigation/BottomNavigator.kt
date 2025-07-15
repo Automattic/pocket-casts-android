@@ -19,6 +19,8 @@ package au.com.shiftyjelly.pocketcasts.navigation
 import android.view.MenuItem
 import androidx.annotation.IdRes
 import androidx.annotation.VisibleForTesting
+import androidx.core.view.get
+import androidx.core.view.size
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.ViewModel
@@ -31,6 +33,7 @@ import au.com.shiftyjelly.pocketcasts.navigation.FragmentTransactionCommand.Remo
 import au.com.shiftyjelly.pocketcasts.navigation.FragmentTransactionCommand.ShowAndRemove
 import au.com.shiftyjelly.pocketcasts.navigation.FragmentTransactionCommand.ShowExisting
 import com.google.android.material.bottomnavigation.BottomNavigationView
+import com.google.android.material.navigation.NavigationBarView
 import hu.akarnokd.rxjava2.subjects.UnicastWorkSubject
 import io.reactivex.Observable
 import io.reactivex.subjects.PublishSubject
@@ -377,7 +380,7 @@ open class BottomNavigator internal constructor() : ViewModel() {
             @IdRes defaultTab: Int,
             @IdRes fragmentContainer: Int,
             @IdRes modalContainer: Int,
-            bottomNavigationView: BottomNavigationView,
+            bottomNavigationView: NavigationBarView,
         ): BottomNavigator {
             val navigator = ViewModelProvider(activity).get(BottomNavigator::class.java)
             navigator.onCreate(
@@ -408,7 +411,7 @@ open class BottomNavigator internal constructor() : ViewModel() {
         activity: FragmentActivity,
         fragmentContainer: Int,
         modalContainer: Int,
-        bottomNavigationView: BottomNavigationView,
+        bottomNavigationView: NavigationBarView,
     ) {
         validateInputs(bottomNavigationView, rootFragmentsFactory, defaultTab)
         this.rootFragmentsFactory = rootFragmentsFactory
@@ -436,12 +439,11 @@ open class BottomNavigator internal constructor() : ViewModel() {
     }
 
     private fun validateInputs(
-        bottomNavigationView: BottomNavigationView,
+        bottomNavigationView: NavigationBarView,
         rootFragmentsFactory: Map<Int, () -> FragmentInfo>,
         defaultTab: Int,
     ) {
-        val bottomNavItems =
-            (0 until bottomNavigationView.menu.size()).map { bottomNavigationView.menu.getItem(it) }
+        val bottomNavItems = List(bottomNavigationView.menu.size) { bottomNavigationView.menu[it] }
         var foundDefaultTab = false
         bottomNavItems.forEach {
             if (rootFragmentsFactory[it.itemId] == null) {
