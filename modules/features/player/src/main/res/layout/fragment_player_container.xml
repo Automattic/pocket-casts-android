@@ -105,9 +105,6 @@
             android:importantForAccessibility="no"
             android:layout_weight="1" />
 
-        <au.com.shiftyjelly.pocketcasts.views.component.NavigationBarSpacer
-            android:layout_width="match_parent"
-            android:layout_height="0dp" />
     </LinearLayout>
 
     <FrameLayout

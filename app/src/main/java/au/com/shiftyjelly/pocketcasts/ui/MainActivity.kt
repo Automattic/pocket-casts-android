@@ -4,7 +4,6 @@ import android.Manifest
 import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.Intent
-import android.content.pm.ActivityInfo
 import android.content.pm.PackageManager
 import android.content.res.Configuration
 import android.net.Uri
@@ -24,10 +23,13 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.platform.ComposeView
 import androidx.core.content.ContextCompat
+import androidx.core.view.ViewCompat
 import androidx.core.view.WindowCompat
+import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.isVisible
 import androidx.core.view.updateLayoutParams
 import androidx.core.view.updatePadding
+import androidx.dynamicanimation.animation.DynamicAnimation.TRANSLATION_Y
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.commitNow
 import androidx.lifecycle.Lifecycle
@@ -62,6 +64,7 @@ import au.com.shiftyjelly.pocketcasts.deeplink.CreateAccountDeepLink
 import au.com.shiftyjelly.pocketcasts.deeplink.DeepLink.Companion.EXTRA_PAGE
 import au.com.shiftyjelly.pocketcasts.deeplink.DeepLinkFactory
 import au.com.shiftyjelly.pocketcasts.deeplink.DeleteBookmarkDeepLink
+import au.com.shiftyjelly.pocketcasts.deeplink.DeveloperOptionsDeeplink
 import au.com.shiftyjelly.pocketcasts.deeplink.DownloadsDeepLink
 import au.com.shiftyjelly.pocketcasts.deeplink.ImportDeepLink
 import au.com.shiftyjelly.pocketcasts.deeplink.NativeShareDeepLink
@@ -156,6 +159,7 @@ import au.com.shiftyjelly.pocketcasts.servers.model.NetworkLoadableList.Companio
 import au.com.shiftyjelly.pocketcasts.settings.AppearanceSettingsFragment
 import au.com.shiftyjelly.pocketcasts.settings.ExportSettingsFragment
 import au.com.shiftyjelly.pocketcasts.settings.SettingsFragment
+import au.com.shiftyjelly.pocketcasts.settings.developer.DeveloperFragment
 import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingFlow
 import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingLauncher
 import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingUpgradeSource
@@ -174,8 +178,8 @@ import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import au.com.shiftyjelly.pocketcasts.utils.observeOnce
 import au.com.shiftyjelly.pocketcasts.view.LockableBottomSheetBehavior
 import au.com.shiftyjelly.pocketcasts.views.activity.WebViewActivity
-import au.com.shiftyjelly.pocketcasts.views.extensions.setSystemWindowInsetToPadding
 import au.com.shiftyjelly.pocketcasts.views.extensions.showAllowingStateLoss
+import au.com.shiftyjelly.pocketcasts.views.extensions.spring
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseFragment
 import au.com.shiftyjelly.pocketcasts.views.fragments.TopScrollable
 import au.com.shiftyjelly.pocketcasts.views.helper.HasBackstack
@@ -407,7 +411,6 @@ class MainActivity :
         WindowCompat.setDecorFitsSystemWindows(window, false)
         super.onCreate(savedInstanceState)
         theme.setupThemeForConfig(this, resources.configuration)
-        requestPortraitOrientation()
         enableEdgeToEdge(navigationBarStyle = theme.getNavigationBarStyle(this))
         bottomSheetTag = savedInstanceState?.getString(SAVEDSTATE_BOTTOM_SHEET_TAG)
 
@@ -420,22 +423,21 @@ class MainActivity :
         }
 
         binding = ActivityMainBinding.inflate(layoutInflater)
-        val view = binding.root
-        setContentView(view)
+        setContentView(binding.root)
         checkForNotificationPermission()
 
-        binding.root.setSystemWindowInsetToPadding(left = true, right = true)
+        ViewCompat.setOnApplyWindowInsetsListener(binding.root) { view, windowInsets ->
+            val insets = windowInsets.getInsets(WindowInsetsCompat.Type.systemBars() or WindowInsetsCompat.Type.displayCutout())
+            binding.root.updatePadding(left = insets.left, right = insets.right)
+            binding.bottomNavigation.updatePadding(bottom = insets.bottom)
+            windowInsets
+        }
+        binding.bottomNavigation.addOnLayoutChangeListener { view, _, _, _, _, _, _, _, _ ->
+            binding.mainFragment.updatePadding(bottom = view.height)
 
-        binding.bottomNavigation.addOnLayoutChangeListener { _, _, _, _, _, _, _, _, _ ->
-            val miniPlayerHeight = miniPlayerHeight
-            val bottomNavigationHeight = binding.bottomNavigation.height
-            val bottomSheetBehavior = BottomSheetBehavior.from(binding.playerBottomSheet)
-            // Set the player bottom sheet position to show the mini player above the bottom navigation
-            bottomSheetBehavior.peekHeight = miniPlayerHeight + bottomNavigationHeight
-            // Add padding to the main content so the end of the page isn't under the bottom navigation
-            binding.mainFragment.updatePadding(bottom = bottomNavigationHeight)
-            // Position the snackbar above the bottom navigation or the mini player if it's shown
-            updateSnackbarPosition(miniPlayerOpen = false)
+            BottomSheetBehavior.from(binding.playerBottomSheet).apply {
+                peekHeight = miniPlayerHeight + view.height
+            }
         }
 
         lifecycleScope.launch {
@@ -1103,7 +1105,9 @@ class MainActivity :
     }
 
     override fun onPlayerBottomSheetSlide(bottomSheetView: View, slideOffset: Float) {
-        binding.bottomNavigation.translationY = bottomSheetView.height * slideOffset
+        val view = binding.bottomNavigation
+        val targetPosition = 2 * view.height * slideOffset
+        view.spring(TRANSLATION_Y).animateToFinalPosition(targetPosition)
     }
 
     override fun updateSystemColors() {
@@ -1335,6 +1339,7 @@ class MainActivity :
                     closeToRoot()
                 }
                 is DownloadsDeepLink -> {
+                    closePlayer()
                     closeToRoot()
                     addFragment(ProfileEpisodeListFragment.newInstance(ProfileEpisodeListFragment.Mode.Downloaded))
                 }
@@ -1368,6 +1373,7 @@ class MainActivity :
                 }
 
                 is ShowPodcastDeepLink -> {
+                    closePlayer()
                     openPodcastPage(deepLink.podcastUuid, deepLink.sourceView)
                 }
 
@@ -1383,9 +1389,11 @@ class MainActivity :
                     )
                 }
                 is ShowPodcastsDeepLink -> {
+                    closePlayer()
                     openTab(VR.id.navigation_podcasts)
                 }
                 is ShowDiscoverDeepLink -> {
+                    closePlayer()
                     openTab(VR.id.navigation_discover)
                 }
                 is ShowUpNextModalDeepLink -> {
@@ -1401,6 +1409,7 @@ class MainActivity :
                             withContext(Dispatchers.Main) {
                                 settings.setSelectedFilter(it.uuid)
                                 // HACK: Go diving to find if a filter fragment
+                                closePlayer()
                                 openTab(VR.id.navigation_filters)
                                 val filtersFragment = supportFragmentManager.fragments.find { it is FiltersFragment } as? FiltersFragment
                                 filtersFragment?.openPlaylist(it)
@@ -1437,11 +1446,13 @@ class MainActivity :
                     openCloudFiles()
                 }
                 is UpsellDeepLink -> {
+                    closePlayer()
                     openOnboardingFlow(OnboardingFlow.Upsell(OnboardingUpgradeSource.DEEP_LINK))
                 }
                 is SmartFoldersDeepLink -> {
                     if (supportFragmentManager.findFragmentByTag("suggested_folders") == null) {
-                        SuggestedFoldersFragment.newInstance(SuggestedFoldersFragment.Source.DEEPLINK).showNow(supportFragmentManager, "suggested_folders")
+                        closePlayer()
+                        SuggestedFoldersFragment.newInstance(SuggestedFoldersFragment.Source.DEEPLINK).show(supportFragmentManager, "suggested_folders")
                     }
                     openTab(VR.id.navigation_podcasts)
                 }
@@ -1455,6 +1466,7 @@ class MainActivity :
                     openSharingUrl(deepLink)
                 }
                 is OpmlImportDeepLink -> {
+                    closePlayer()
                     OpmlImportTask.run(deepLink.uri, this)
                 }
                 is ImportDeepLink -> {
@@ -1493,7 +1505,12 @@ class MainActivity :
                     openOnboardingFlow(onboardingFlow)
                 }
                 is ThemesDeepLink -> {
+                    closePlayer()
                     addFragment(AppearanceSettingsFragment.newInstance())
+                }
+                is DeveloperOptionsDeeplink -> {
+                    closePlayer()
+                    addFragment(DeveloperFragment())
                 }
                 null -> {
                     LogBuffer.i("DeepLink", "Did not find any matching deep link for: $intent")
@@ -1506,6 +1523,7 @@ class MainActivity :
     }
 
     private fun openDiscoverListDeeplink(listId: String) {
+        closePlayer()
         openTab(VR.id.navigation_discover)
         lifecycleScope.launch {
             val discoverList = discoverDeepLinkManager.getDiscoverList(listId, resources) ?: return@launch
@@ -1782,12 +1800,5 @@ class MainActivity :
         openTab(VR.id.navigation_profile)
         addFragment(SettingsFragment())
         addFragment(ExportSettingsFragment())
-    }
-
-    @SuppressLint("SourceLockedOrientationActivity")
-    private fun requestPortraitOrientation() {
-        if (resources.getBoolean(R.bool.force_portrait_orientation)) {
-            setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_SENSOR_PORTRAIT)
-        }
     }
 }

@@ -10,6 +10,8 @@ import android.view.animation.OvershootInterpolator
 import android.widget.FrameLayout
 import androidx.coordinatorlayout.widget.CoordinatorLayout
 import androidx.core.view.doOnLayout
+import androidx.core.view.isInvisible
+import androidx.core.view.isVisible
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.player.R
@@ -23,13 +25,7 @@ import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackState
 import au.com.shiftyjelly.pocketcasts.repositories.playback.UpNextQueue
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.utils.extensions.dpToPx
-import au.com.shiftyjelly.pocketcasts.views.extensions.hide
-import au.com.shiftyjelly.pocketcasts.views.extensions.isHidden
-import au.com.shiftyjelly.pocketcasts.views.extensions.isVisible
-import au.com.shiftyjelly.pocketcasts.views.extensions.show
 import com.google.android.material.bottomsheet.BottomSheetBehavior
-import com.google.android.material.bottomsheet.ViewPager2AwareBottomSheetBehavior
-import com.google.android.material.bottomsheet.ViewPager2AwareBottomSheetBehavior.PreFlingInterceptor
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 import kotlin.coroutines.CoroutineContext
@@ -99,9 +95,6 @@ class PlayerBottomSheet @JvmOverloads constructor(context: Context, attrs: Attri
             val callback = createBottomSheetCallback(rootView = parent as CoordinatorLayout)
             addBottomSheetCallback(callback)
 
-            val preFlingInterceptor = createPreFlingInterceptor(behavior = this)
-            (this as ViewPager2AwareBottomSheetBehavior).setPreFlingInterceptor(preFlingInterceptor)
-
             doOnLayout {
                 if (state == BottomSheetBehavior.STATE_EXPANDED) {
                     callback.onSlide(this@PlayerBottomSheet, 1f)
@@ -139,8 +132,8 @@ class PlayerBottomSheet @JvmOverloads constructor(context: Context, attrs: Attri
 
         // only show the mini player when an episode is loaded
         if (upNext is UpNextQueue.State.Loaded) {
-            if ((isHidden() || !hasLoadedFirstTime)) {
-                show()
+            if (isInvisible || !hasLoadedFirstTime) {
+                isVisible = true
                 if (shouldAnimateOnAttach) {
                     translationY = 68.dpToPx(context).toFloat()
                     animate().translationY(0f).setListener(object : AnimatorListenerAdapter() {
@@ -157,12 +150,10 @@ class PlayerBottomSheet @JvmOverloads constructor(context: Context, attrs: Attri
                     }
                 }
             }
-        } else {
-            if (isVisible()) {
-                hide()
-                closePlayer()
-                listener?.onMiniPlayerHidden()
-            }
+        } else if (isVisible) {
+            isInvisible = true
+            closePlayer()
+            listener?.onMiniPlayerHidden()
         }
     }
 
@@ -219,22 +210,6 @@ class PlayerBottomSheet @JvmOverloads constructor(context: Context, attrs: Attri
                     BottomSheetBehavior.STATE_SETTLING -> onSettling()
                     BottomSheetBehavior.STATE_EXPANDED -> onExpanded()
                 }
-            }
-        }
-    }
-
-    private fun createPreFlingInterceptor(
-        behavior: BottomSheetBehavior<*>,
-    ) = object : PreFlingInterceptor {
-        override fun shouldInterceptFlingGesture(velocityX: Float, velocityY: Float): Boolean {
-            return behavior.calculateSlideOffset() > 0.75f && velocityY in -4000f..0f
-        }
-
-        override fun onFlingIntercepted(velocityX: Float, velocityY: Float) {
-            behavior.state = if (velocityY > 0f) {
-                BottomSheetBehavior.STATE_COLLAPSED
-            } else {
-                BottomSheetBehavior.STATE_EXPANDED
             }
         }
     }

@@ -1,8 +1,13 @@
 package au.com.shiftyjelly.pocketcasts.player.view.chapters
 
+import android.os.Build
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
@@ -30,6 +35,11 @@ fun ChaptersPage(
 ) {
     LazyColumn(
         state = lazyListState,
+        contentPadding = if (Build.VERSION.SDK_INT > 29) {
+            WindowInsets.navigationBars.asPaddingValues()
+        } else {
+            PaddingValues(bottom = 56.dp)
+        },
         modifier = modifier
             .background(LocalChaptersTheme.current.background)
             .fillMaxSize()

@@ -77,9 +77,9 @@ enum class Feature(
     GUEST_LISTS_NETWORK_HIGHLIGHTS_REDESIGN(
         key = "guest_lists_network_highlights_redesign",
         title = "Guest Lists and Network Highlights Redesign",
-        defaultValue = BuildConfig.DEBUG,
+        defaultValue = true,
         tier = FeatureTier.Free,
-        hasFirebaseRemoteFlag = false,
+        hasFirebaseRemoteFlag = true,
         hasDevToggle = true,
     ),
     APPSFLYER_ANALYTICS(
@@ -128,6 +128,14 @@ enum class Feature(
         defaultValue = BuildConfig.DEBUG,
         tier = FeatureTier.Free,
         hasFirebaseRemoteFlag = false,
+        hasDevToggle = true,
+    ),
+    SMART_CATEGORIES(
+        key = "smart_categories",
+        title = "Smart Categories",
+        defaultValue = BuildConfig.DEBUG,
+        tier = FeatureTier.Free,
+        hasFirebaseRemoteFlag = true,
         hasDevToggle = true,
     ),
 

@@ -13,6 +13,7 @@ import au.com.shiftyjelly.pocketcasts.models.db.dao.PodcastDao
 import au.com.shiftyjelly.pocketcasts.models.db.dao.TranscriptDao
 import au.com.shiftyjelly.pocketcasts.models.db.dao.UpNextDao
 import au.com.shiftyjelly.pocketcasts.models.db.dao.UpNextHistoryDao
+import au.com.shiftyjelly.pocketcasts.models.db.dao.UserCategoryVisitsDao
 import au.com.shiftyjelly.pocketcasts.models.db.dao.UserNotificationsDao
 import au.com.shiftyjelly.pocketcasts.models.entity.AnonymousBumpStat
 import com.squareup.moshi.Moshi
@@ -76,6 +77,9 @@ object ModelModule {
 
     @Provides
     fun userNotificationsDao(database: AppDatabase): UserNotificationsDao = database.userNotificationsDao()
+
+    @Provides
+    fun userCategoryVisits(database: AppDatabase): UserCategoryVisitsDao = database.userCategoryVisitsDao()
 }
 
 @Qualifier

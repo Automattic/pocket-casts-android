@@ -1,18 +1,17 @@
+*   New Features
+    *   Display transcripts in the episode details UI
+        ([#4143](https://github.com/Automattic/pocket-casts-android/pull/4143))
+    *   Smart Categories - featured categories are now ordered by visits on the Discover tab
+        ([#4186](https://github.com/Automattic/pocket-casts-android/pull/4186))
 *   Updates
-    *   Improve transcripts parsing and loading
-        ([#4115](https://github.com/Automattic/pocket-casts-android/pull/4115))
-    *   Remove bottom padding with empty episode list
-        ([#4121](https://github.com/Automattic/pocket-casts-android/pull/4121))
+    *   New design for the Guest List and Network Highlight sections in Discover
+        ([#4153](https://github.com/Automattic/pocket-casts-android/pull/4153))
+    *   Bring back landscape UI
+        ([#4156](https://github.com/Automattic/pocket-casts-android/pull/4156))
 *   Bug Fixes
-    *   Fix keyboard blocking WebView input fields in Help & Feedback page
-        ([#4109](https://github.com/Automattic/pocket-casts-android/pull/4109))
-    *   Fix player's theming responsiveness
-        ([#4091](https://github.com/Automattic/pocket-casts-android/pull/4091))
-    *   Respect embedded file artwork in media notifications
-        ([#4103](https://github.com/Automattic/pocket-casts-android/pull/4103))
-    *   Specify what files to be backed up on Android 12 and up
-        ([#4119](https://github.com/Automattic/pocket-casts-android/pull/4119))
-    *   Fix podcast selector overlapping system status bar on auto add to up next podcast selector
-        ([#4132](https://github.com/Automattic/pocket-casts-android/pull/4132))
-    *   Fix downloading episodes after backup and restore
-        ([#4130](https://github.com/Automattic/pocket-casts-android/pull/4130))
+    *   Collapse player when opening a notification
+        ([#4150](https://github.com/Automattic/pocket-casts-android/pull/4150))
+    *   Fix episodes not being removed from the downloads list
+        ([#4167](https://github.com/Automattic/pocket-casts-android/pull/4167))
+    *   Fix revamped notifications showing up on wear and automotive
+        ([#4177](https://github.com/Automattic/pocket-casts-android/pull/4177))

@@ -72,6 +72,7 @@ data class DiscoverRow(
     @field:Json(name = "authenticated") override val authenticated: Boolean? = false,
     @field:Json(name = "sponsored_podcasts") val sponsoredPodcasts: List<SponsoredPodcast> = emptyList(),
     @field:Json(name = "popular") val mostPopularCategoriesId: List<Int>?,
+    @field:Json(name = "sponsored_ids") val sponsoredCategoryIds: List<Int>?,
 ) : NetworkLoadableList {
 
     override fun transformWithReplacements(replacements: Map<String, String>, resources: Resources): DiscoverRow {
@@ -108,6 +109,7 @@ data class DiscoverRow(
             sponsoredPodcasts = sponsoredPodcasts,
             mostPopularCategoriesId = mostPopularCategoriesId,
             authenticated = authenticated,
+            sponsoredCategoryIds = sponsoredCategoryIds,
         )
     }
 }
@@ -124,11 +126,13 @@ data class ListFeed(
     @field:Json(name = "title") val title: String?,
     @field:Json(name = "subtitle") val subtitle: String?,
     @field:Json(name = "description") val description: String?,
+    @field:Json(name = "short_description") val shortDescription: String?,
     @field:Json(name = "datetime") val date: String?,
     @field:Json(name = "podcasts") var podcasts: List<DiscoverPodcast>?,
     @field:Json(name = "episodes") var episodes: List<DiscoverEpisode>?,
     @field:Json(name = "podroll") var podroll: List<DiscoverPodcast>?,
     @field:Json(name = "collection_image") var collectionImageUrl: String?,
+    @field:Json(name = "collection_rectangle_image") var collectionRectangleImageUrl: String?,
     @field:Json(name = "feature_image") var featureImage: String?,
     @field:Json(name = "header_image") var headerImageUrl: String?,
     @field:Json(name = "colors") var tintColors: DiscoverFeedTintColors?,
@@ -258,6 +262,9 @@ data class DiscoverCategory(
     @field:Json(name = "icon") val icon: String,
     @field:Json(name = "source") override val source: String,
     override val curated: Boolean = false,
+    val totalVisits: Int = 0,
+    val isSponsored: Boolean? = null,
+    val featuredIndex: Int? = null,
 ) : NetworkLoadableList {
     override val title: String
         get() = name

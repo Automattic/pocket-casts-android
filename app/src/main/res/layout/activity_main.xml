@@ -22,19 +22,19 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:elevation="8dp"
-            android:visibility="gone"
+            android:visibility="invisible"
             app:behavior_peekHeight="@dimen/miniPlayerPeekHeight"
             app:layout_behavior="com.google.android.material.bottomsheet.ViewPager2AwareBottomSheetBehavior" />
 
-        <com.google.android.material.bottomnavigation.BottomNavigationView
+        <au.com.shiftyjelly.pocketcasts.views.component.BottomNavigationView
             android:id="@+id/bottomNavigation"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_gravity="bottom"
-            android:elevation="8dp"
             android:background="?attr/primary_ui_03"
-            app:itemTextColor="@color/navigation_color"
+            android:elevation="8dp"
             app:itemIconTint="@color/navigation_color"
+            app:itemTextColor="@color/navigation_color"
             app:labelVisibilityMode="labeled"
             app:menu="@menu/navigation" />
 

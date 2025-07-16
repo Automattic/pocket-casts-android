@@ -7,12 +7,17 @@ import androidx.work.OneTimeWorkRequest
 import androidx.work.PeriodicWorkRequest
 import androidx.work.WorkManager
 import androidx.work.workDataOf
+import au.com.shiftyjelly.pocketcasts.repositories.notification.NotificationWorker.Companion.DOWNLOADED_EPISODES
+import au.com.shiftyjelly.pocketcasts.repositories.notification.NotificationWorker.Companion.SUBCATEGORY
 import au.com.shiftyjelly.pocketcasts.repositories.notification.ReEngagementNotificationType.Companion.SUBCATEGORY_REENGAGE_CATCH_UP_OFFLINE
 import au.com.shiftyjelly.pocketcasts.repositories.notification.ReEngagementNotificationType.Companion.SUBCATEGORY_REENGAGE_WE_MISS_YOU
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
+import au.com.shiftyjelly.pocketcasts.utils.AppPlatform
+import au.com.shiftyjelly.pocketcasts.utils.Util
 import dagger.hilt.android.qualifiers.ApplicationContext
 import jakarta.inject.Inject
 import java.util.concurrent.TimeUnit
+import kotlin.time.Duration
 
 class NotificationSchedulerImpl @Inject constructor(
     @ApplicationContext private val context: Context,
@@ -21,9 +26,6 @@ class NotificationSchedulerImpl @Inject constructor(
 ) : NotificationScheduler {
 
     companion object {
-        const val SUBCATEGORY = "subcategory"
-        const val DOWNLOADED_EPISODES = "downloaded_episodes"
-
         const val TAG_TRENDING_RECOMMENDATIONS = "trending_and_recommendations"
         private const val TAG_REENGAGEMENT = "daily_re_engagement_check"
         private const val TAG_ONBOARDING = "onboarding_notification"
@@ -31,7 +33,9 @@ class NotificationSchedulerImpl @Inject constructor(
         private const val TAG_OFFERS = "offers"
     }
 
-    override fun setupOnboardingNotifications() {
+    override fun setupOnboardingNotifications(delayProvider: ((OnboardingNotificationType) -> Duration)?) {
+        if (!isRunningOnPhone) return
+
         listOf(
             OnboardingNotificationType.Sync,
             OnboardingNotificationType.Import,
@@ -41,7 +45,7 @@ class NotificationSchedulerImpl @Inject constructor(
             OnboardingNotificationType.StaffPicks,
             OnboardingNotificationType.PlusUpsell,
         ).forEach { type ->
-            val delay = delayCalculator.calculateDelayForOnboardingNotification(type)
+            val delay = delayProvider?.invoke(type)?.inWholeMilliseconds ?: delayCalculator.calculateDelayForOnboardingNotification(type)
 
             val workData = workDataOf(
                 SUBCATEGORY to type.subcategory,
@@ -57,8 +61,10 @@ class NotificationSchedulerImpl @Inject constructor(
         }
     }
 
-    override suspend fun setupReEngagementNotification() {
-        val initialDelay = delayCalculator.calculateDelayForReEngagementCheck()
+    override suspend fun setupReEngagementNotification(delayProvider: ((ReEngagementNotificationType) -> Duration)?) {
+        if (!isRunningOnPhone) return
+
+        val initialDelay = delayProvider?.invoke(ReEngagementNotificationType.WeMissYou)?.inWholeMilliseconds ?: delayCalculator.calculateDelayForReEngagementCheck()
 
         val downloadedEpisodes = episodeManager.downloadedEpisodesThatHaveNotBeenPlayedCount()
         val subcategory =
@@ -82,9 +88,11 @@ class NotificationSchedulerImpl @Inject constructor(
         )
     }
 
-    override suspend fun setupTrendingAndRecommendationsNotifications() {
+    override suspend fun setupTrendingAndRecommendationsNotifications(delayProvider: ((TrendingAndRecommendationsNotificationType) -> Duration)?) {
+        if (!isRunningOnPhone) return
+
         TrendingAndRecommendationsNotificationType.values.forEachIndexed { index, notification ->
-            val initialDelay = delayCalculator.calculateDelayForRecommendations(index)
+            val initialDelay = delayProvider?.invoke(notification)?.inWholeMilliseconds ?: delayCalculator.calculateDelayForRecommendations(index)
             val workData = workDataOf(
                 SUBCATEGORY to notification.subcategory,
             )
@@ -104,14 +112,16 @@ class NotificationSchedulerImpl @Inject constructor(
         }
     }
 
-    override suspend fun setupNewFeaturesAndTipsNotifications() {
+    override suspend fun setupNewFeaturesAndTipsNotifications(delayProvider: ((NewFeaturesAndTipsNotificationType) -> Duration)?) {
+        if (!isRunningOnPhone) return
+
         // this should be later updated to fire the desired feature for the given release
         val workData = workDataOf(
             SUBCATEGORY to NewFeaturesAndTipsNotificationType.SmartFolders.subcategory,
         )
         val notificationWork = OneTimeWorkRequest.Builder(NotificationWorker::class.java)
             .setInputData(workData)
-            .setInitialDelay(delayCalculator.calculateDelayForNewFeatures(), TimeUnit.MILLISECONDS)
+            .setInitialDelay(delayProvider?.invoke(NewFeaturesAndTipsNotificationType.SmartFolders)?.inWholeMilliseconds ?: delayCalculator.calculateDelayForNewFeatures(), TimeUnit.MILLISECONDS)
             .addTag(TAG_FEATURES)
             .build()
 
@@ -122,13 +132,15 @@ class NotificationSchedulerImpl @Inject constructor(
         )
     }
 
-    override suspend fun setupOffersNotifications() {
+    override suspend fun setupOffersNotifications(delayProvider: ((OffersNotificationType) -> Duration)?) {
+        if (!isRunningOnPhone) return
+
         val workData = workDataOf(
             SUBCATEGORY to OffersNotificationType.UpgradeNow.subcategory,
         )
         val notificationWork = PeriodicWorkRequest.Builder(NotificationWorker::class.java, 14, TimeUnit.DAYS)
             .setInputData(workData)
-            .setInitialDelay(delayCalculator.calculateDelayForOffers(), TimeUnit.MILLISECONDS)
+            .setInitialDelay(delayProvider?.invoke(OffersNotificationType.UpgradeNow)?.inWholeMilliseconds ?: delayCalculator.calculateDelayForOffers(), TimeUnit.MILLISECONDS)
             .addTag(TAG_OFFERS)
             .build()
 
@@ -170,4 +182,6 @@ class NotificationSchedulerImpl @Inject constructor(
             }
         }
     }
+
+    private val isRunningOnPhone = Util.getAppPlatform(context) == AppPlatform.Phone
 }

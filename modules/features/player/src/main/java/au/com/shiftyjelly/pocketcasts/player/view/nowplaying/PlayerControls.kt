@@ -5,11 +5,8 @@ import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.LocalRippleConfiguration
@@ -28,7 +25,6 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
-import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.clearAndSetSemantics
@@ -100,17 +96,10 @@ private fun Content(
     playerColors: PlayerColors = MaterialTheme.theme.rememberPlayerColorsOrDefault(),
 ) {
     Row(
-        modifier = modifier
-            .fillMaxWidth()
-            .wrapContentHeight()
-            .padding(bottom = dimensionResource(R.dimen.large_play_button_margin_bottom)),
-        horizontalArrangement = Arrangement.SpaceBetween,
+        modifier = modifier,
+        horizontalArrangement = Arrangement.SpaceAround,
         verticalAlignment = Alignment.CenterVertically,
     ) {
-        Spacer(
-            modifier = Modifier.size(8.dp),
-        )
-
         SkipButton(
             skipDuration = playerControlsData.skipBackInSecs,
             contentDescription = stringResource(LR.string.skip_back),
@@ -123,6 +112,7 @@ private fun Content(
             onClick = onPlayPauseClick,
             iconTint = playerColors.background01,
             circleColor = playerColors.contrast01,
+            modifier = Modifier.padding(horizontal = 24.dp),
         )
 
         SkipButton(
@@ -132,10 +122,6 @@ private fun Content(
             tintColor = playerColors.contrast01,
             onClick = onSkipForwardClick,
             onLongClick = onSkipForwardLongPress,
-        )
-
-        Spacer(
-            modifier = Modifier.size(8.dp),
         )
     }
 }
@@ -172,7 +158,7 @@ private fun SkipButton(
     ) {
         Box(
             modifier = modifier
-                .size(103.dp)
+                .size(80.dp)
                 .clip(CircleShape)
                 .combinedClickable(
                     role = Role.Button,

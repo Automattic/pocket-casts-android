@@ -34,6 +34,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalInspectionMode
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -53,9 +54,11 @@ import au.com.shiftyjelly.pocketcasts.compose.LocalPodcastColors
 import au.com.shiftyjelly.pocketcasts.compose.PodcastColors
 import au.com.shiftyjelly.pocketcasts.compose.PodcastColorsParameterProvider
 import au.com.shiftyjelly.pocketcasts.compose.components.CoilImage
+import au.com.shiftyjelly.pocketcasts.compose.extensions.fractionedSp
 import au.com.shiftyjelly.pocketcasts.compose.preview.ThemePreviewParameterProvider
 import au.com.shiftyjelly.pocketcasts.compose.theme
 import au.com.shiftyjelly.pocketcasts.repositories.images.PocketCastsImageRequestFactory
+import au.com.shiftyjelly.pocketcasts.repositories.images.PocketCastsImageRequestFactory.PlaceholderType
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme.ThemeType
 import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
@@ -94,9 +97,11 @@ fun AdBanner(
             ) {
                 val context = LocalContext.current
                 val theme = MaterialTheme.theme
+                val isPreview = LocalInspectionMode.current
                 CoilImage(
                     imageRequest = remember(context, theme.isDark, ad.imageUrl) {
-                        PocketCastsImageRequestFactory(context).createForFileOrUrl(ad.imageUrl)
+                        val placeholder = if (isPreview) PlaceholderType.Small else PlaceholderType.None
+                        PocketCastsImageRequestFactory(context, placeholderType = placeholder).createForFileOrUrl(ad.imageUrl)
                     },
                     title = stringResource(LR.string.ad_image),
                     showTitle = false,
@@ -118,8 +123,8 @@ fun AdBanner(
                     Text(
                         text = ad.ctaText,
                         color = colors.ctaLabel,
-                        fontSize = 14.sp,
-                        lineHeight = 18.sp,
+                        fontSize = 14f.fractionedSp(fraction = 0.4f),
+                        lineHeight = 18f.fractionedSp(fraction = 0.4f),
                         letterSpacing = 0.sp,
                     )
 
@@ -166,8 +171,8 @@ private fun AdTitle(
         Text(
             text = stringResource(LR.string.ad).uppercase(),
             color = colors.adLabel,
-            fontSize = 8.sp,
-            lineHeight = 8.sp,
+            fontSize = 8f.fractionedSp(fraction = 0.4f),
+            lineHeight = 8f.fractionedSp(fraction = 0.4f),
             fontWeight = FontWeight.SemiBold,
             letterSpacing = 0.sp,
             modifier = Modifier
@@ -182,8 +187,8 @@ private fun AdTitle(
         Text(
             text = ad.title,
             color = colors.titleLabel,
-            fontSize = 12.sp,
-            lineHeight = 12.sp,
+            fontSize = 12f.fractionedSp(fraction = 0.4f),
+            lineHeight = 12f.fractionedSp(fraction = 0.4f),
             fontWeight = FontWeight.SemiBold,
             letterSpacing = 0.sp,
         )

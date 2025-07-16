@@ -13,10 +13,10 @@ import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.R
-import au.com.shiftyjelly.pocketcasts.repositories.notification.NotificationSchedulerImpl.Companion.DOWNLOADED_EPISODES
-import au.com.shiftyjelly.pocketcasts.repositories.notification.NotificationSchedulerImpl.Companion.SUBCATEGORY
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.SuggestedFoldersManager
 import au.com.shiftyjelly.pocketcasts.repositories.user.UserManager
+import au.com.shiftyjelly.pocketcasts.utils.AppPlatform
+import au.com.shiftyjelly.pocketcasts.utils.Util
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import dagger.assisted.Assisted
@@ -37,21 +37,25 @@ class NotificationWorker @AssistedInject constructor(
     private val userManager: UserManager,
 ) : CoroutineWorker(context, params) {
     override suspend fun doWork(): Result {
+        if (Util.getAppPlatform(applicationContext) != AppPlatform.Phone) return Result.failure()
+
         val subcategory = inputData.getString(SUBCATEGORY) ?: return Result.failure()
 
         val type = NotificationType.fromSubCategory(subcategory) ?: return Result.failure()
 
-        if (!type.isSettingsToggleOn(settings)) {
+        val shouldSkipValidations = inputData.getBoolean(SHOULD_SKIP_VALIDATIONS, false)
+
+        if (!shouldSkipValidations && !type.isSettingsToggleOn(settings)) {
             return Result.failure()
         }
 
-        if (notificationManager.hasUserInteractedWithFeature(type) || !shouldSchedule(type)) {
+        if (!shouldSkipValidations && (notificationManager.hasUserInteractedWithFeature(type) || !shouldSchedule(type))) {
             return Result.failure()
         }
 
         val notification = getNotificationBuilder(type).build()
 
-        if (ActivityCompat.checkSelfPermission(applicationContext, Manifest.permission.POST_NOTIFICATIONS) == PackageManager.PERMISSION_GRANTED && FeatureFlag.isEnabled(Feature.NOTIFICATIONS_REVAMP)) {
+        if (ActivityCompat.checkSelfPermission(applicationContext, Manifest.permission.POST_NOTIFICATIONS) == PackageManager.PERMISSION_GRANTED && (shouldSkipValidations || FeatureFlag.isEnabled(Feature.NOTIFICATIONS_REVAMP))) {
             NotificationManagerCompat.from(applicationContext).notify(type.notificationId, notification)
             notificationManager.updateNotificationSent(type)
         }
@@ -69,7 +73,9 @@ class NotificationWorker @AssistedInject constructor(
                 val folders = suggestedFoldersManager.observeSuggestedFolders().firstOrNull()
                 !folders.isNullOrEmpty()
             }
-            is OffersNotificationType.UpgradeNow -> {
+            is OnboardingNotificationType.PlusUpsell,
+            is OffersNotificationType.UpgradeNow,
+            -> {
                 val subscription = settings.cachedSubscription.value
                 subscription == null || subscription.expiryDate.isBefore(Instant.now())
             }
@@ -113,5 +119,11 @@ class NotificationWorker @AssistedInject constructor(
             type.toIntent(applicationContext),
             PendingIntent.FLAG_CANCEL_CURRENT or PendingIntent.FLAG_IMMUTABLE,
         )
+    }
+
+    companion object {
+        const val SUBCATEGORY = "subcategory"
+        const val DOWNLOADED_EPISODES = "downloaded_episodes"
+        const val SHOULD_SKIP_VALIDATIONS = "should_skip_validations"
     }
 }
