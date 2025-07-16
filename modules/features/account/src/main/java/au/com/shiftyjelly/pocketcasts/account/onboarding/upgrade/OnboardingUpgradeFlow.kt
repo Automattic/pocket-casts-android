@@ -127,10 +127,10 @@ fun OnboardingUpgradeFlow(
                                         sheetState.show()
                                     }
                                 } else {
-                                    onNeedLogin()
+                                    viewModel.purchaseSelectedPlan(activity, onProceed)
                                 }
                             } else {
-                                LogBuffer.e(LogBuffer.TAG_SUBSCRIPTIONS, NULL_ACTIVITY_ERROR)
+                                onNeedLogin()
                             }
                         } else {
                             LogBuffer.e(LogBuffer.TAG_SUBSCRIPTIONS, NULL_ACTIVITY_ERROR)
