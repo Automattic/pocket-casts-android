@@ -35,10 +35,11 @@ fun ReferralsGuestPassError(
     errorMessage: String,
     onRetry: () -> Unit,
     onDismiss: () -> Unit,
+    modifier: Modifier = Modifier,
 ) {
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
-        modifier = Modifier
+        modifier = modifier
             .fillMaxSize()
             .padding(horizontal = 16.dp, vertical = 8.dp)
             .statusBarsPadding()
@@ -81,7 +82,7 @@ fun ReferralsGuestPassError(
 
 @Preview
 @Composable
-fun ReferralsSendGuestPassErrorPreview() {
+private fun ReferralsSendGuestPassErrorPreview() {
     AppTheme(Theme.ThemeType.DARK) {
         ReferralsGuestPassError(
             errorMessage = stringResource(LR.string.error_no_network),

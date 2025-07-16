@@ -66,7 +66,8 @@ class PodcastManagerImpl @Inject constructor(
     private val podcastRefresher: PodcastRefresher,
     @ApplicationScope private val applicationScope: CoroutineScope,
     appDatabase: AppDatabase,
-) : PodcastManager, CoroutineScope {
+) : PodcastManager,
+    CoroutineScope {
 
     companion object {
         private const val FIVE_MINUTES_IN_MILLIS = (5 * 60 * 1000).toLong()

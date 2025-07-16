@@ -19,7 +19,7 @@ data class Subscription(
         get() = !isAutoRenewing && expiryDate.isBefore(Instant.now().plus(30, ChronoUnit.DAYS))
 
     val isChampion
-        get() = platform == SubscriptionPlatform.Gift && giftDays > ChampionGiftLowerBound
+        get() = platform == SubscriptionPlatform.Gift && giftDays > CHAMPION_GIFT_LOWER_BOUND
 
     companion object {
         val PlusPreview
@@ -44,4 +44,4 @@ data class Subscription(
     }
 }
 
-private const val ChampionGiftLowerBound = 10 * 365
+private const val CHAMPION_GIFT_LOWER_BOUND = 10 * 365

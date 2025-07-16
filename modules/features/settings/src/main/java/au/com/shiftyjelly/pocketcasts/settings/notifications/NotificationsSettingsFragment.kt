@@ -39,7 +39,10 @@ import javax.inject.Inject
 import kotlinx.coroutines.runBlocking
 
 @AndroidEntryPoint
-internal class NotificationsSettingsFragment : BaseFragment(), PodcastSelectFragment.Listener, HasBackstack {
+internal class NotificationsSettingsFragment :
+    BaseFragment(),
+    PodcastSelectFragment.Listener,
+    HasBackstack {
 
     private val viewModel: NotificationsSettingsViewModel by viewModels()
 
@@ -82,13 +85,13 @@ internal class NotificationsSettingsFragment : BaseFragment(), PodcastSelectFrag
 
                 NotificationsSettingsScreen(
                     state = state,
-                    onPreferenceChanged = viewModel::onPreferenceChanged,
-                    onBackPressed = {
+                    onPreferenceChange = viewModel::onPreferenceChanged,
+                    onBackPress = {
                         @Suppress("DEPRECATION")
                         activity?.onBackPressed()
                     },
                     bottomInset = bottomInset.value.pxToDp(LocalContext.current).dp,
-                    onAdvancedSettingsClicked = { preference ->
+                    onAdvancedSettingsClick = { preference ->
                         when (preference) {
                             is NotificationPreferenceType.AdvancedSettings -> notificationHelper.openEpisodeNotificationSettings(requireActivity())
                             is NotificationPreferenceType.DailyReminderSettings -> notificationHelper.openDailyReminderNotificationSettings(requireActivity())
@@ -98,9 +101,9 @@ internal class NotificationsSettingsFragment : BaseFragment(), PodcastSelectFrag
                             else -> Unit
                         }
                     },
-                    onSelectRingtoneClicked = ::showRingtoneSelector,
-                    onSelectPodcastsClicked = ::showPodcastSelector,
-                    onSystemNotificationsSettingsClicked = {
+                    onSelectRingtoneClick = ::showRingtoneSelector,
+                    onSelectPodcastsClick = ::showPodcastSelector,
+                    onSystemNotificationsSettingsClick = {
                         viewModel.reportSystemNotificationsSettingsOpened()
                         notificationHelper.openNotificationSettings(requireActivity())
                     },

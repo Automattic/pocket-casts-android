@@ -129,12 +129,12 @@ private fun Content(
 @OptIn(ExperimentalMaterialApi::class, ExperimentalFoundationApi::class)
 @Composable
 private fun SkipButton(
-    modifier: Modifier = Modifier,
     skipDuration: Duration,
-    scaleX: Float = 1f,
     contentDescription: String,
     tintColor: Color,
     onClick: () -> Unit,
+    modifier: Modifier = Modifier,
+    scaleX: Float = 1f,
     onLongClick: (() -> Unit)? = null,
 ) {
     val composition by rememberLottieComposition(LottieCompositionSpec.RawRes(R.raw.skip_button))

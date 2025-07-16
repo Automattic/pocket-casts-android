@@ -25,16 +25,19 @@ import au.com.shiftyjelly.pocketcasts.localization.R as LR
 @Composable
 fun SearchPodcastResultsPage(
     viewModel: SearchViewModel,
+    bottomInset: Dp,
     onFolderClick: (Folder, List<Podcast>) -> Unit,
     onPodcastClick: (Podcast) -> Unit,
-    onBackClick: () -> Unit,
-    bottomInset: Dp,
+    onBackPress: () -> Unit,
+    modifier: Modifier = Modifier,
 ) {
     val state by viewModel.state.collectAsState()
-    Column {
+    Column(
+        modifier = modifier,
+    ) {
         ThemedTopAppBar(
             title = stringResource(LR.string.search_results_all_podcasts),
-            onNavigationClick = { onBackClick() },
+            onNavigationClick = { onBackPress() },
         )
         SearchPodcastResultsView(
             state = state as SearchState.Results,

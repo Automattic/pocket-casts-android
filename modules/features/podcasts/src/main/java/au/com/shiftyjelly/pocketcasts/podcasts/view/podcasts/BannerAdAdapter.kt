@@ -21,7 +21,7 @@ internal class BannerAdAdapter(
     private val onAdImpression: (BlazeAd) -> Unit,
 ) : ListAdapter<BlazeAd, RecyclerView.ViewHolder>(BannerAdDiffCallback) {
     override fun getItemViewType(position: Int): Int {
-        return AdapterViewTypeIds.BannerAdId
+        return AdapterViewTypeIds.BANNER_AD_ID
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {

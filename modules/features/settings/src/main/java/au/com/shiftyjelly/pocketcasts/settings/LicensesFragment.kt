@@ -46,7 +46,7 @@ class LicensesFragment : BaseFragment() {
         savedInstanceState: Bundle?,
     ) = contentWithoutConsumedInsets {
         AppThemeWithBackground(theme.activeTheme) {
-            LicensesPage(onBackPressed = { closeFragment() })
+            LicensesPage(onBackPress = { closeFragment() })
         }
     }
 
@@ -66,14 +66,16 @@ class LicensesFragment : BaseFragment() {
     }
 
     @Composable
-    private fun LicensesPage(onBackPressed: () -> Unit, modifier: Modifier = Modifier) {
+    private fun LicensesPage(
+        onBackPress: () -> Unit,
+    ) {
         Column {
             ThemedTopAppBar(
                 title = stringResource(LR.string.settings_about_acknowledgements),
-                onNavigationClick = onBackPressed,
+                onNavigationClick = onBackPress,
             )
             LibrariesContainer(
-                modifier = modifier.fillMaxSize(),
+                modifier = Modifier.fillMaxSize(),
                 showAuthor = true,
                 showVersion = false,
                 showLicenseBadges = true,

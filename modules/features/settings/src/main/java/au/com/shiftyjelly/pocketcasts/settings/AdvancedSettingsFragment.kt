@@ -30,7 +30,7 @@ class AdvancedSettingsFragment : BaseFragment() {
         AppThemeWithBackground(theme.activeTheme) {
             AdvancedSettingsPage(
                 viewModel = viewModel,
-                onBackPressed = {
+                onBackPress = {
                     @Suppress("DEPRECATION")
                     activity?.onBackPressed()
                 },

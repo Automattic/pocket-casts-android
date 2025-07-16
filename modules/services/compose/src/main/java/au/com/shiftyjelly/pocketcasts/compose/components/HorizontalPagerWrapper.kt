@@ -45,7 +45,7 @@ import kotlinx.coroutines.launch
 fun HorizontalPagerWrapper(
     pageCount: Int,
     initialPage: Int,
-    onPageChanged: (Int) -> Unit,
+    onPageChange: (Int) -> Unit,
     modifier: Modifier = Modifier,
     showPageIndicator: Boolean = true,
     pageIndicatorColor: Color = Color.White,
@@ -55,9 +55,9 @@ fun HorizontalPagerWrapper(
 ) {
     val pagerState = rememberPagerState(initialPage = initialPage) { pageCount }
 
-    LaunchedEffect(pagerState) {
+    LaunchedEffect(pagerState, onPageChange) {
         snapshotFlow { pagerState.currentPage }.collect { index ->
-            onPageChanged(index)
+            onPageChange(index)
         }
     }
 

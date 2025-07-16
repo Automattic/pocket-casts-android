@@ -177,17 +177,13 @@ class SearchViewModel @Inject constructor(
         private const val RESULT_TYPE = "result_type"
         private const val DISPLAYING = "displaying"
 
-        fun searchResultTapped(source: SourceView, uuid: String, type: SearchResultType) =
-            mapOf(SOURCE to source.analyticsValue, UUID to uuid, RESULT_TYPE to type.value)
+        fun searchResultTapped(source: SourceView, uuid: String, type: SearchResultType) = mapOf(SOURCE to source.analyticsValue, UUID to uuid, RESULT_TYPE to type.value)
 
-        fun searchShownOrDismissed(source: SourceView) =
-            mapOf(SOURCE to source.analyticsValue)
+        fun searchShownOrDismissed(source: SourceView) = mapOf(SOURCE to source.analyticsValue)
 
-        fun podcastSubscribed(source: SourceView, uuid: String) =
-            mapOf(SOURCE to "${source.analyticsValue}_search", UUID to uuid)
+        fun podcastSubscribed(source: SourceView, uuid: String) = mapOf(SOURCE to "${source.analyticsValue}_search", UUID to uuid)
 
-        fun searchListShown(source: SourceView, type: ResultsType) =
-            mapOf(SOURCE to source.analyticsValue, DISPLAYING to type.value)
+        fun searchListShown(source: SourceView, type: ResultsType) = mapOf(SOURCE to source.analyticsValue, DISPLAYING to type.value)
     }
 }
 

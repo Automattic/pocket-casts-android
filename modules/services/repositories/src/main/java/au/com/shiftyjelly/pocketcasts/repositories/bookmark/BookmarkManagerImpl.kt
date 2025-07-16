@@ -26,7 +26,8 @@ import kotlinx.coroutines.flow.flowOf
 class BookmarkManagerImpl @Inject constructor(
     appDatabase: AppDatabase,
     private val analyticsTracker: AnalyticsTracker,
-) : BookmarkManager, CoroutineScope {
+) : BookmarkManager,
+    CoroutineScope {
 
     override val coroutineContext: CoroutineContext
         get() = Dispatchers.Default
@@ -180,11 +181,9 @@ class BookmarkManagerImpl @Inject constructor(
                 .flatMapLatest { helper -> flowOf(helper.map { it.toBookmark() }) }
     }
 
-    override suspend fun searchInPodcastByTitle(podcastUuid: String, title: String) =
-        bookmarkDao.searchInPodcastByTitle(podcastUuid, "%$title%").map { it.uuid }
+    override suspend fun searchInPodcastByTitle(podcastUuid: String, title: String) = bookmarkDao.searchInPodcastByTitle(podcastUuid, "%$title%").map { it.uuid }
 
-    override suspend fun searchByBookmarkOrEpisodeTitle(title: String) =
-        bookmarkDao.searchByBookmarkOrEpisodeTitle("%$title%").map { it.uuid }
+    override suspend fun searchByBookmarkOrEpisodeTitle(title: String) = bookmarkDao.searchByBookmarkOrEpisodeTitle("%$title%").map { it.uuid }
 
     /**
      * Mark the bookmark as deleted so it can be synced to other devices.
@@ -220,6 +219,5 @@ class BookmarkManagerImpl @Inject constructor(
         return bookmark
     }
 
-    override fun findUserEpisodesBookmarksFlow() =
-        bookmarkDao.findUserEpisodesBookmarksFlow()
+    override fun findUserEpisodesBookmarksFlow() = bookmarkDao.findUserEpisodesBookmarksFlow()
 }

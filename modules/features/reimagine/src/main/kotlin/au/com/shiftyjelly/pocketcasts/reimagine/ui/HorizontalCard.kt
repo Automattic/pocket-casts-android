@@ -83,7 +83,7 @@ internal fun HorizontalEpisodeCard(
 @ShowkaseComposable(name = "Horizontal podcast card", group = "Sharing")
 @Preview(name = "HorizontalPodcastCardDark")
 @Composable
-fun HorizontalPodcastCardDarkPreview() = HorizontalPodcastCardPreview(
+private fun HorizontalPodcastCardDarkPreview() = HorizontalPodcastCardPreview(
     baseColor = Color(0xFFEC0404),
 )
 
@@ -187,7 +187,7 @@ private fun HorizontalPodcastCardLightPreview() = HorizontalPodcastCardPreview(
 @ShowkaseComposable(name = "Horizontal episode card", group = "Sharing")
 @Preview(name = "HorizontalEpisodeCardDark")
 @Composable
-fun HorizontalEpisodeCardDarkPreview() = HorizontalEpisodeCardPreview(
+private fun HorizontalEpisodeCardDarkPreview() = HorizontalEpisodeCardPreview(
     baseColor = Color(0xFFEC0404),
 )
 

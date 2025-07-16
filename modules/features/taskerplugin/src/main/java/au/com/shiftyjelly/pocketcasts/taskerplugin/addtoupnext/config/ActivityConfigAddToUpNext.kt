@@ -34,6 +34,7 @@ private fun ComposableConfigAddToUpNextPreview() {
                     MutableStateFlow(listOf("New Releases", "Up Next")),
                 ),
             ),
-        ) {}
+            onFinish = {},
+        )
     }
 }

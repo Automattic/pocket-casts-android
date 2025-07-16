@@ -96,7 +96,7 @@ class FakePaymentDataSource : PaymentDataSource {
             get() = Purchase(
                 state = PurchaseState.Purchased("order-id"),
                 token = "purchase-token",
-                productIds = listOf(SubscriptionPlan.PlusYearlyProductId),
+                productIds = listOf(SubscriptionPlan.PLUS_YEARLY_PRODUCT_ID),
                 isAcknowledged = true,
                 isAutoRenewing = true,
             )
@@ -105,7 +105,7 @@ class FakePaymentDataSource : PaymentDataSource {
             get() = Purchase(
                 state = PurchaseState.Purchased("order-id"),
                 token = "purchase-token",
-                productIds = listOf(SubscriptionPlan.PlusYearlyProductId),
+                productIds = listOf(SubscriptionPlan.PLUS_YEARLY_PRODUCT_ID),
                 isAcknowledged = false,
                 isAutoRenewing = true,
             )

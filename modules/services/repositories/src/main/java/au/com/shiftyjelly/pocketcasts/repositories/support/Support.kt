@@ -186,15 +186,14 @@ class Support @Inject constructor(
         null -> ""
     }
 
-    suspend fun getLogs(): String =
-        withContext(Dispatchers.IO) {
-            buildString {
-                append(getUserDebug(false))
-                val outputStream = ByteArrayOutputStream()
-                LogBuffer.output(outputStream)
-                append(outputStream.toString())
-            }
+    suspend fun getLogs(): String = withContext(Dispatchers.IO) {
+        buildString {
+            append(getUserDebug(false))
+            val outputStream = ByteArrayOutputStream()
+            LogBuffer.output(outputStream)
+            append(outputStream.toString())
         }
+    }
 
     @Suppress("DEPRECATION")
     suspend fun getUserDebug(html: Boolean): String {
@@ -484,8 +483,8 @@ private fun AutoPlaySource.prettyPrint(
         }
         "Podcast or filter: $uuid"
     }
-    is AutoPlaySource.Downloads -> "Downloads"
-    is AutoPlaySource.Files -> "Files"
-    is AutoPlaySource.Starred -> "Starred"
-    is AutoPlaySource.None -> "None"
+    AutoPlaySource.Predefined.Downloads -> "Downloads"
+    AutoPlaySource.Predefined.Files -> "Files"
+    AutoPlaySource.Predefined.Starred -> "Starred"
+    AutoPlaySource.Predefined.None -> "None"
 }

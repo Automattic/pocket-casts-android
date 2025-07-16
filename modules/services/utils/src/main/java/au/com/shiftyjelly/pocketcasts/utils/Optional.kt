@@ -9,12 +9,11 @@ class Optional<T> {
             return Optional()
         }
 
-        fun <T> of(value: T?): Optional<T> =
-            if (value == null) {
-                empty()
-            } else {
-                Optional(value)
-            }
+        fun <T> of(value: T?): Optional<T> = if (value == null) {
+            empty()
+        } else {
+            Optional(value)
+        }
     }
 
     private var value: T? = null

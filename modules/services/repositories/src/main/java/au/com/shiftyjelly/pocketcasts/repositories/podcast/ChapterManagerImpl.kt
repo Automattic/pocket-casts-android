@@ -29,7 +29,7 @@ class ChapterManagerImpl @Inject constructor(
 
     override fun observerChaptersForEpisode(episodeUuid: String) = combine(
         episodeManager.findEpisodeByUuidFlow(episodeUuid).distinctUntilChangedBy(BaseEpisode::deselectedChapters),
-        chapterDao.observerChaptersForEpisode(episodeUuid),
+        chapterDao.observeChaptersForEpisode(episodeUuid),
     ) { episode, dbChapters -> Chapters(dbChapters.fixChapterTimestamps(episode)) }
 
     private fun List<DbChapter>.fixChapterTimestamps(episode: BaseEpisode) = asSequence()

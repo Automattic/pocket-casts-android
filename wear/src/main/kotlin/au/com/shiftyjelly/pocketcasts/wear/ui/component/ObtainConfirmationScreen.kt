@@ -33,9 +33,11 @@ fun ObtainConfirmationScreen(
     text: String,
     onConfirm: () -> Unit,
     onCancel: () -> Unit,
+    modifier: Modifier = Modifier,
 ) {
     ScreenScaffold(
         timeText = {},
+        modifier = modifier,
     ) {
         Column(
             verticalArrangement = Arrangement.SpaceEvenly,

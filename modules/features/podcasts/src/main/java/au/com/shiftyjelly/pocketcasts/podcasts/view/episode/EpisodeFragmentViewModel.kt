@@ -64,7 +64,8 @@ class EpisodeFragmentViewModel @Inject constructor(
     private val analyticsTracker: AnalyticsTracker,
     private val episodeAnalytics: EpisodeAnalytics,
     private val transcriptManager: TranscriptManager,
-) : ViewModel(), CoroutineScope {
+) : ViewModel(),
+    CoroutineScope {
     override val coroutineContext: CoroutineContext
         get() = Dispatchers.Default
 

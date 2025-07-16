@@ -18,15 +18,15 @@ import java.util.Date
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 object DownloadsScreen {
-    const val route = "downloads_screen"
+    const val ROUTE = "downloads_screen"
 }
 
 @Composable
 fun DownloadsScreen(
     columnState: ScalingLazyColumnState,
+    viewModel: DownloadsScreenViewModel = hiltViewModel(),
     onItemClick: (PodcastEpisode) -> Unit,
 ) {
-    val viewModel = hiltViewModel<DownloadsScreenViewModel>()
     val state by viewModel.stateFlow.collectAsState()
     val artworkConfiguration by viewModel.artworkConfiguration.collectAsState()
 

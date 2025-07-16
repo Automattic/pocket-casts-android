@@ -230,7 +230,7 @@ internal class NotificationsPreferencesRepositoryImpl @Inject constructor(
             null -> ""
             else -> {
                 val title = ringtone.getTitle(context)
-                if (title == NotificationSound.defaultPath) {
+                if (title == NotificationSound.DEFAULT_SOUND) {
                     context.getString(LR.string.settings_notification_default_sound)
                 } else {
                     title

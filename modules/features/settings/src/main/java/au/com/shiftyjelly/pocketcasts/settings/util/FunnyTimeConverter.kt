@@ -9,7 +9,7 @@ import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 class FunnyTimeConverter {
 
-    private val TIME_UNITS = arrayOf(
+    private val timeUnits = arrayOf(
         FunnyTimeUnit(LR.string.settings_stats_funny_babies, 250.0),
         FunnyTimeUnit(LR.string.settings_stats_funny_blinked, 7.0),
         FunnyTimeUnit(LR.string.settings_stats_funny_lightning, 360.0),
@@ -31,8 +31,8 @@ class FunnyTimeConverter {
 
         val rand = Random()
         while (true) {
-            val randomIndex = rand.nextInt(TIME_UNITS.size)
-            val unit = TIME_UNITS[randomIndex]
+            val randomIndex = rand.nextInt(timeUnits.size)
+            val unit = timeUnits[randomIndex]
             if (unit.suitableFor(timeSecs)) return unit.funnyTextForSecs(timeSecs, resources)
         }
     }

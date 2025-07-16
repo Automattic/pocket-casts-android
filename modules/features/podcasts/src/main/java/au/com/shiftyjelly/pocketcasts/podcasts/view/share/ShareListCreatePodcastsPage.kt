@@ -46,8 +46,8 @@ fun ShareListCreatePodcastsPage(
         PodcastSelectGrid(
             podcasts = state.podcasts,
             selectedPodcasts = state.selectedPodcasts,
-            onPodcastSelected = { podcast -> viewModel.selectPodcast(podcast) },
-            onPodcastUnselected = { podcast -> viewModel.unselectPodcast(podcast) },
+            onSelectPodcast = { podcast -> viewModel.selectPodcast(podcast) },
+            onDeselectPodcast = { podcast -> viewModel.unselectPodcast(podcast) },
             onSelectAll = { viewModel.selectAll() },
             onSelectNone = { viewModel.selectNone() },
         )

@@ -50,21 +50,21 @@ import au.com.shiftyjelly.pocketcasts.localization.R as LR
 @Composable
 internal fun OnboardingLoginPage(
     theme: Theme.ThemeType,
-    onBackPressed: () -> Unit,
+    onBackPress: () -> Unit,
     onLoginComplete: (Subscription?) -> Unit,
-    onForgotPasswordTapped: () -> Unit,
+    onForgotPasswordClick: () -> Unit,
     onUpdateSystemBars: (SystemBarsStyles) -> Unit,
+    modifier: Modifier = Modifier,
+    viewModel: OnboardingLogInViewModel = hiltViewModel(),
 ) {
     val pocketCastsTheme = MaterialTheme.theme
-
-    val viewModel = hiltViewModel<OnboardingLogInViewModel>()
     val state by viewModel.state.collectAsState()
 
     CallOnce {
         viewModel.onShown()
     }
 
-    LaunchedEffect(Unit) {
+    LaunchedEffect(onUpdateSystemBars) {
         // Use secondaryUI01 so the status bar matches the ThemedTopAppBar
         val statusBar = SystemBarStyle.custom(pocketCastsTheme.colors.secondaryUi01, theme.toolbarLightIcons)
         val navigationBar = SystemBarStyle.transparent { theme.darkTheme }
@@ -72,7 +72,7 @@ internal fun OnboardingLoginPage(
     }
     BackHandler {
         viewModel.onBackPressed()
-        onBackPressed()
+        onBackPress()
     }
 
     val view = LocalView.current
@@ -84,7 +84,7 @@ internal fun OnboardingLoginPage(
     }
 
     Column(
-        Modifier
+        modifier = modifier
             .windowInsetsPadding(WindowInsets.statusBars)
             .windowInsetsPadding(WindowInsets.navigationBars)
             .windowInsetsPadding(WindowInsets.ime),
@@ -93,7 +93,7 @@ internal fun OnboardingLoginPage(
             title = stringResource(LR.string.onboarding_welcome_back),
             onNavigationClick = {
                 viewModel.onBackPressed()
-                onBackPressed()
+                onBackPress()
             },
         )
 
@@ -108,7 +108,7 @@ internal fun OnboardingLoginPage(
                 showEmailError = state.showEmailError,
                 showPasswordError = state.showPasswordError,
                 enabled = state.enableSubmissionFields,
-                onDone = { viewModel.logIn(onLoginComplete) },
+                onConfirm = { viewModel.logIn(onLoginComplete) },
                 onUpdateEmail = viewModel::updateEmail,
                 onUpdatePassword = viewModel::updatePassword,
                 isCreatingAccount = false,
@@ -133,7 +133,7 @@ internal fun OnboardingLoginPage(
                 text = stringResource(LR.string.onboarding_forgot_password),
                 color = MaterialTheme.theme.colors.primaryText02,
                 modifier = Modifier
-                    .clickable { onForgotPasswordTapped() }
+                    .clickable { onForgotPasswordClick() }
                     .align(Alignment.CenterHorizontally),
             )
 
@@ -156,9 +156,9 @@ private fun OnboardingLoginPage_Preview(
     AppThemeWithBackground(themeType) {
         OnboardingLoginPage(
             theme = themeType,
-            onBackPressed = {},
+            onBackPress = {},
             onLoginComplete = {},
-            onForgotPasswordTapped = {},
+            onForgotPasswordClick = {},
             onUpdateSystemBars = {},
         )
     }

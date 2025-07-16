@@ -10,9 +10,6 @@ import android.widget.TextView
 import androidx.core.view.isVisible
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
-import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsParameter.listDate
-import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsParameter.listId
-import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsParameter.podcastUuid
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.analytics.discoverListPodcastSubscribed
 import au.com.shiftyjelly.pocketcasts.analytics.discoverListPodcastTapped

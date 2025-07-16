@@ -1,8 +1,10 @@
 package au.com.shiftyjelly.pocketcasts.transcripts.ui
 
 import android.os.Build
+import androidx.compose.foundation.layout.Box
 import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.webkit.WebSettingsCompat
 import androidx.webkit.WebViewFeature
@@ -23,31 +25,34 @@ internal fun TranscriptWebView(
     val isDarkOrPlayer = materialTheme.isDark || materialTheme.rememberPlayerColors() != null
 
     val state = rememberWebViewState(transcript.url)
-    WebView(
-        state = state,
-        onCreated = { webView ->
-            if (isDarkOrPlayer) {
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-                    webView.settings.isAlgorithmicDarkeningAllowed = true
-                } else {
-                    if (WebViewFeature.isFeatureSupported(WebViewFeature.FORCE_DARK)) {
-                        @Suppress("DEPRECATION")
-                        WebSettingsCompat.setForceDark(webView.settings, WebSettingsCompat.FORCE_DARK_ON)
+    Box(
+        modifier = modifier,
+    ) {
+        WebView(
+            state = state,
+            onCreated = { webView ->
+                if (isDarkOrPlayer) {
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                        webView.settings.isAlgorithmicDarkeningAllowed = true
+                    } else {
+                        if (WebViewFeature.isFeatureSupported(WebViewFeature.FORCE_DARK)) {
+                            @Suppress("DEPRECATION")
+                            WebSettingsCompat.setForceDark(webView.settings, WebSettingsCompat.FORCE_DARK_ON)
+                        }
                     }
                 }
+            },
+        )
+
+        when (state.loadingState) {
+            is LoadingState.Initializing, is LoadingState.Loading -> {
+                LoadingView(
+                    color = theme.primaryText,
+                    modifier = Modifier.align(Alignment.Center),
+                )
             }
-        },
-        modifier = modifier,
-    )
 
-    when (state.loadingState) {
-        is LoadingState.Initializing, is LoadingState.Loading -> {
-            LoadingView(
-                color = theme.primaryText,
-                modifier = modifier,
-            )
+            LoadingState.Finished -> Unit
         }
-
-        LoadingState.Finished -> Unit
     }
 }

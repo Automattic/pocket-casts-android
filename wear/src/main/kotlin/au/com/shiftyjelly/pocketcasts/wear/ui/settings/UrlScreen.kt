@@ -2,13 +2,14 @@ package au.com.shiftyjelly.pocketcasts.wear.ui.settings
 
 import android.content.Context
 import android.content.Intent
-import android.net.Uri
 import android.widget.Toast
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
+import androidx.core.net.toUri
 import androidx.navigation.NavGraphBuilder
 import androidx.wear.compose.material.Text
 import androidx.wear.compose.navigation.composable
@@ -26,13 +27,13 @@ import timber.log.Timber
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 object UrlScreenRoutes {
-    const val termsOfService = "url_screen_terms_of_service"
-    const val privacy = "url_screen_privacy_policy"
+    const val TERMS_OF_SERVICES = "url_screen_terms_of_service"
+    const val PRIVACY = "url_screen_privacy_policy"
 }
 
 fun NavGraphBuilder.settingsUrlScreens() {
     composable(
-        route = UrlScreenRoutes.termsOfService,
+        route = UrlScreenRoutes.TERMS_OF_SERVICES,
     ) {
         UrlScreen(
             title = stringResource(LR.string.settings_about_terms_of_serivce),
@@ -42,7 +43,7 @@ fun NavGraphBuilder.settingsUrlScreens() {
     }
 
     composable(
-        route = UrlScreenRoutes.privacy,
+        route = UrlScreenRoutes.PRIVACY,
     ) {
         UrlScreen(
             title = stringResource(id = LR.string.settings_about_privacy_policy),
@@ -57,11 +58,13 @@ fun UrlScreen(
     title: String,
     message: String,
     url: String,
+    modifier: Modifier = Modifier,
 ) {
     val columnState = rememberColumnState()
 
     ScreenScaffold(
         scrollState = columnState,
+        modifier = modifier,
     ) {
         val coroutineScope = rememberCoroutineScope()
 
@@ -98,7 +101,7 @@ private suspend fun openUrlOnPhone(url: String, context: Context) {
     try {
         val intent = Intent(Intent.ACTION_VIEW)
             .addCategory(Intent.CATEGORY_BROWSABLE)
-            .setData(Uri.parse(url))
+            .setData(url.toUri())
         RemoteActivityHelper(context, Executors.newSingleThreadExecutor())
             .startRemoteActivity(intent)
             .await()

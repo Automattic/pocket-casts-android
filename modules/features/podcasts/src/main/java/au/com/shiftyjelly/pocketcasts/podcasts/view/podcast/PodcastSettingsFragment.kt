@@ -53,7 +53,10 @@ import au.com.shiftyjelly.pocketcasts.settings.R as SR
 import au.com.shiftyjelly.pocketcasts.ui.R as UR
 
 @AndroidEntryPoint
-class PodcastSettingsFragment : BasePreferenceFragment(), FilterSelectFragment.Listener, HasBackstack {
+class PodcastSettingsFragment :
+    BasePreferenceFragment(),
+    FilterSelectFragment.Listener,
+    HasBackstack {
     @Inject
     lateinit var theme: Theme
 

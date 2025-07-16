@@ -15,7 +15,12 @@ import au.com.shiftyjelly.pocketcasts.images.R
 import au.com.shiftyjelly.pocketcasts.wear.theme.WearAppTheme
 
 @Composable
-fun QueueButton(inUpNext: Boolean, tint: Color, onClick: () -> Unit) {
+fun QueueButton(
+    inUpNext: Boolean,
+    tint: Color,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
     val icon = if (inUpNext) {
         R.drawable.ic_upnext_remove
     } else {
@@ -26,7 +31,7 @@ fun QueueButton(inUpNext: Boolean, tint: Color, onClick: () -> Unit) {
         painter = painterResource(icon),
         tint = tint,
         contentDescription = stringResource(au.com.shiftyjelly.pocketcasts.localization.R.string.podcasts_up_next),
-        modifier = Modifier
+        modifier = modifier
             .size(24.dp)
             .clickable { onClick() },
     )

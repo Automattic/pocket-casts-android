@@ -262,7 +262,7 @@ class SearchFragment : BaseFragment() {
                         onPodcastClick = ::onPodcastClick,
                         onFolderClick = ::onFolderClick,
                         onShowAllCLick = ::onShowAllClick,
-                        onSubscribeToPodcast = ::onSubscribeToPodcast,
+                        onFollowPodcast = ::onSubscribeToPodcast,
                         onScroll = { UiUtil.hideKeyboard(searchView) },
                         onlySearchRemote = onlySearchRemote,
                         bottomInset = bottomInset.pxToDp(LocalContext.current).dp,

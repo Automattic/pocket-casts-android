@@ -232,7 +232,7 @@ private fun TopShowInfo(
     }
 }
 
-@Preview(device = Devices.PortraitRegular)
+@Preview(device = Devices.PORTRAIT_REGULAR)
 @Composable
 private fun TopShowPreview() {
     PreviewBox(currentPage = 2) { measurements ->

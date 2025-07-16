@@ -118,19 +118,19 @@ private val AllSubscriptionsQueryProductDetailsParams = QueryProductDetailsParam
     .setProductList(
         listOf(
             QueryProductDetailsParams.Product.newBuilder()
-                .setProductId(SubscriptionPlan.PlusMonthlyProductId)
+                .setProductId(SubscriptionPlan.PLUS_MONTHLY_PRODUCT_ID)
                 .setProductType(BillingClient.ProductType.SUBS)
                 .build(),
             QueryProductDetailsParams.Product.newBuilder()
-                .setProductId(SubscriptionPlan.PlusYearlyProductId)
+                .setProductId(SubscriptionPlan.PLUS_YEARLY_PRODUCT_ID)
                 .setProductType(BillingClient.ProductType.SUBS)
                 .build(),
             QueryProductDetailsParams.Product.newBuilder()
-                .setProductId(SubscriptionPlan.PatronMonthlyProductId)
+                .setProductId(SubscriptionPlan.PATRON_MONTHLY_PRODUCT_ID)
                 .setProductType(BillingClient.ProductType.SUBS)
                 .build(),
             QueryProductDetailsParams.Product.newBuilder()
-                .setProductId(SubscriptionPlan.PatronYearlyProductId)
+                .setProductId(SubscriptionPlan.PATRON_YEARLY_PRODUCT_ID)
                 .setProductType(BillingClient.ProductType.SUBS)
                 .build(),
         ),

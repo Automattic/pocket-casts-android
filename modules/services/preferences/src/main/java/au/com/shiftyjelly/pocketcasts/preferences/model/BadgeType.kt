@@ -35,12 +35,11 @@ enum class BadgeType(
     companion object {
         val defaultValue = OFF
 
-        fun fromPersistedInt(value: Int): BadgeType =
-            BadgeType.values().find { it.persistedInt == value }
-                ?: run {
-                    LogBuffer.e(LogBuffer.TAG_INVALID_STATE, "Unknown persisted int for badge type: $value")
-                    defaultValue
-                }
+        fun fromPersistedInt(value: Int): BadgeType = BadgeType.values().find { it.persistedInt == value }
+            ?: run {
+                LogBuffer.e(LogBuffer.TAG_INVALID_STATE, "Unknown persisted int for badge type: $value")
+                defaultValue
+            }
 
         fun fromServerId(id: Int) = entries.find { it.serverId == id } ?: defaultValue
     }

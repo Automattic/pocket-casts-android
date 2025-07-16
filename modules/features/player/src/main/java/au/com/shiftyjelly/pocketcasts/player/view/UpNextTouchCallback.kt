@@ -35,8 +35,10 @@ class UpNextTouchCallback(
     }
 
     override fun onMove(recyclerView: RecyclerView, viewHolder: RecyclerView.ViewHolder, target: RecyclerView.ViewHolder): Boolean {
-        if (viewHolder is UpNextEpisodeViewHolder && target is UpNextEpisodeViewHolder &&
-            viewHolder.bindingAdapterPosition != NO_POSITION && target.bindingAdapterPosition != NO_POSITION
+        if (viewHolder is UpNextEpisodeViewHolder &&
+            target is UpNextEpisodeViewHolder &&
+            viewHolder.bindingAdapterPosition != NO_POSITION &&
+            target.bindingAdapterPosition != NO_POSITION
         ) {
             adapter.onUpNextEpisodeMove(viewHolder.bindingAdapterPosition, target.bindingAdapterPosition)
             return true

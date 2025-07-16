@@ -34,7 +34,6 @@ open class AnalyticsTracker(
     }
 
     companion object {
-        fun test(vararg trackers: Tracker, isFirstPartyEnabled: Boolean = false, isThirdPartyEnabled: Boolean = false) =
-            AnalyticsTracker(trackers.toList(), { isFirstPartyEnabled }, { isThirdPartyEnabled })
+        fun test(vararg trackers: Tracker, isFirstPartyEnabled: Boolean = false, isThirdPartyEnabled: Boolean = false) = AnalyticsTracker(trackers.toList(), { isFirstPartyEnabled }, { isThirdPartyEnabled })
     }
 }

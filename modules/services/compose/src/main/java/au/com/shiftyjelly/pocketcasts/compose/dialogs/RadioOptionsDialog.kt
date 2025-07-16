@@ -35,10 +35,10 @@ fun <T> RadioOptionsDialog(
     title: String,
     selectedOption: T,
     allOptions: List<T>,
-    modifier: Modifier = Modifier,
-    optionName: @Composable (T) -> String,
     onSelectOption: (T) -> Unit,
     onDismiss: () -> Unit,
+    modifier: Modifier = Modifier,
+    optionName: @Composable (T) -> String,
 ) {
     var selection by remember { mutableStateOf(selectedOption) }
 

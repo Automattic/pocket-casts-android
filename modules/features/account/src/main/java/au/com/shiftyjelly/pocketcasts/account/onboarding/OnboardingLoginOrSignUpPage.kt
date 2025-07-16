@@ -77,10 +77,11 @@ internal fun OnboardingLoginOrSignUpPage(
     theme: Theme.ThemeType,
     flow: OnboardingFlow,
     onDismiss: () -> Unit,
-    onSignUpClicked: () -> Unit,
-    onLoginClicked: () -> Unit,
+    onSignUpClick: () -> Unit,
+    onLoginClick: () -> Unit,
     onContinueWithGoogleComplete: (GoogleSignInState, Subscription?) -> Unit,
     onUpdateSystemBars: (SystemBarsStyles) -> Unit,
+    modifier: Modifier = Modifier,
     viewModel: OnboardingLoginOrSignUpViewModel = hiltViewModel(),
 ) {
     val pocketCastsTheme = MaterialTheme.theme
@@ -89,7 +90,7 @@ internal fun OnboardingLoginOrSignUpPage(
         viewModel.onShown(flow)
     }
 
-    LaunchedEffect(Unit) {
+    LaunchedEffect(onUpdateSystemBars) {
         val statusBar = SystemBarStyle.custom(pocketCastsTheme.colors.primaryUi01.copy(alpha = 0.9f), theme.darkTheme)
         val navigationBar = SystemBarStyle.transparent { theme.darkTheme }
         onUpdateSystemBars(SystemBarsStyles(statusBar, navigationBar))
@@ -112,17 +113,18 @@ internal fun OnboardingLoginOrSignUpPage(
         trackingConsentRequired = trackingConsentRequired,
         flow = flow,
         showContinueWithGoogleButton = viewModel.showContinueWithGoogleButton,
-        onSignUpClicked = {
+        onSignUpClick = {
             viewModel.onSignUpClicked(flow)
-            onSignUpClicked()
+            onSignUpClick()
         },
-        onLoginClicked = {
+        onLoginClick = {
             viewModel.onLoginClicked(flow)
-            onLoginClicked()
+            onLoginClick()
         },
         onContinueWithGoogleComplete = onContinueWithGoogleComplete,
         onNavigationClick = onNavigationClick,
         onUpdateTrackingConsent = viewModel::updateTrackingConsent,
+        modifier = modifier,
     )
 }
 
@@ -133,8 +135,8 @@ private fun Content(
     flow: OnboardingFlow,
     showContinueWithGoogleButton: Boolean,
     onNavigationClick: () -> Unit,
-    onSignUpClicked: () -> Unit,
-    onLoginClicked: () -> Unit,
+    onSignUpClick: () -> Unit,
+    onLoginClick: () -> Unit,
     onContinueWithGoogleComplete: (GoogleSignInState, Subscription?) -> Unit,
     onUpdateTrackingConsent: (Boolean) -> Unit,
     modifier: Modifier = Modifier,
@@ -217,8 +219,8 @@ private fun Content(
                 Spacer(Modifier.height(8.dp))
             }
 
-            SignUpButton(onClick = onSignUpClicked)
-            LogInButton(onClick = onLoginClicked)
+            SignUpButton(onClick = onSignUpClick)
+            LogInButton(onClick = onLoginClick)
             Spacer(Modifier.windowInsetsPadding(WindowInsets.navigationBars))
         }
         // Only show the consent dialog to new users
@@ -325,18 +327,14 @@ private object Artwork {
         CoverModel(imageResId = R.drawable.thedaily, size = 0.183f, x = 0.25f, y = -0.3f),
     )
 
-    fun getAspectRatio(configuration: Configuration, googleSignInShown: Boolean) =
-        if (configuration.orientation == ORIENTATION_LANDSCAPE || googleSignInShown) {
-            2.2f
-        } else {
-            2.6f
-        }
-    fun getScaleFactor(googleSignInShown: Boolean) =
-        if (googleSignInShown) 1.65f else 1.85f
-    fun getOffsetFactor(googleSignInShown: Boolean) =
-        if (googleSignInShown) 0.06f else 0.0f
-    fun getCoverYOffsetFactor(configuration: Configuration) =
-        if (configuration.orientation == ORIENTATION_LANDSCAPE) 0.75f else 0.95f
+    fun getAspectRatio(configuration: Configuration, googleSignInShown: Boolean) = if (configuration.orientation == ORIENTATION_LANDSCAPE || googleSignInShown) {
+        2.2f
+    } else {
+        2.6f
+    }
+    fun getScaleFactor(googleSignInShown: Boolean) = if (googleSignInShown) 1.65f else 1.85f
+    fun getOffsetFactor(googleSignInShown: Boolean) = if (googleSignInShown) 0.06f else 0.0f
+    fun getCoverYOffsetFactor(configuration: Configuration) = if (configuration.orientation == ORIENTATION_LANDSCAPE) 0.75f else 0.95f
 }
 
 @Preview(showBackground = true)
@@ -347,8 +345,8 @@ private fun OnboardingLoginOrSignUpPagePreview(@PreviewParameter(ThemePreviewPar
             theme = themeType,
             flow = OnboardingFlow.InitialOnboarding,
             onDismiss = {},
-            onSignUpClicked = {},
-            onLoginClicked = {},
+            onSignUpClick = {},
+            onLoginClick = {},
             onContinueWithGoogleComplete = { _, _ -> },
             onUpdateSystemBars = {},
         )

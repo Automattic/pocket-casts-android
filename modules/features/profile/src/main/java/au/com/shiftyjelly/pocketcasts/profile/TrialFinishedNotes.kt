@@ -85,7 +85,7 @@ private fun NotesItemRow(
 
 @Preview(showBackground = true)
 @Composable
-fun NotesCardPreview() {
+private fun NotesCardPreview() {
     TrialFinishedNotesCard()
 }
 

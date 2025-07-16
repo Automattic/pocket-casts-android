@@ -40,14 +40,14 @@ import au.com.shiftyjelly.pocketcasts.localization.R as LR
 @Composable
 fun AdvancedSettingsPage(
     viewModel: AdvancedSettingsViewModel,
-    onBackPressed: () -> Unit,
+    onBackPress: () -> Unit,
     bottomInset: Dp,
     modifier: Modifier = Modifier,
 ) {
     val state: AdvancedSettingsViewModel.State by viewModel.state.collectAsState()
     AdvancedSettingsView(
         state = state,
-        onBackPressed = onBackPressed,
+        onBackPress = onBackPress,
         bottomInset = bottomInset,
         modifier = modifier,
     )
@@ -60,22 +60,24 @@ fun AdvancedSettingsPage(
 @Composable
 fun AdvancedSettingsView(
     state: AdvancedSettingsViewModel.State,
-    onBackPressed: () -> Unit,
+    onBackPress: () -> Unit,
     bottomInset: Dp,
     modifier: Modifier = Modifier,
 ) {
-    Column {
+    Column(
+        modifier = modifier,
+    ) {
         ThemedTopAppBar(
             title = stringResource(LR.string.settings_title_advanced),
             bottomShadow = true,
-            onNavigationClick = { onBackPressed() },
+            onNavigationClick = { onBackPress() },
         )
 
         LazyColumn(
-            modifier
+            contentPadding = PaddingValues(bottom = bottomInset),
+            modifier = Modifier
                 .background(MaterialTheme.theme.colors.primaryUi02)
                 .fillMaxHeight(),
-            contentPadding = PaddingValues(bottom = bottomInset),
         ) {
             item {
                 TextP50(
@@ -181,7 +183,7 @@ private fun AdvancedSettingsPreview(
                     onCheckedChange = {},
                 ),
             ),
-            onBackPressed = {},
+            onBackPress = {},
             bottomInset = 0.dp,
         )
     }

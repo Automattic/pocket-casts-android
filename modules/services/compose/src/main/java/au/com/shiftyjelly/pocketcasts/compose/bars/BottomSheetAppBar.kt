@@ -40,7 +40,7 @@ fun BottomSheetAppBar(
 @ShowkaseComposable(name = "BottomSheetAppBar", group = "Bottom sheet", styleName = "Light", defaultStyle = true)
 @Preview(name = "Light")
 @Composable
-fun BottomSheetAppBarLightPreview() {
+private fun BottomSheetAppBarLightPreview() {
     AppThemeWithBackground(Theme.ThemeType.LIGHT) {
         BottomSheetAppBar(title = "Hello World", navigationButton = NavigationButton.Close, onNavigationClick = {})
     }
@@ -49,7 +49,7 @@ fun BottomSheetAppBarLightPreview() {
 @ShowkaseComposable(name = "BottomSheetAppBar", group = "Bottom sheet", styleName = "Back")
 @Preview(name = "Back")
 @Composable
-fun BottomSheetAppBarBackPreview() {
+private fun BottomSheetAppBarBackPreview() {
     AppThemeWithBackground(Theme.ThemeType.LIGHT) {
         BottomSheetAppBar(title = "Hello World", navigationButton = NavigationButton.Back, onNavigationClick = {})
     }
@@ -58,7 +58,7 @@ fun BottomSheetAppBarBackPreview() {
 @ShowkaseComposable(name = "BottomSheetAppBar", group = "Bottom sheet", styleName = "Dark")
 @Preview(name = "Dark")
 @Composable
-fun BottomSheetAppBarDarkPreview() {
+private fun BottomSheetAppBarDarkPreview() {
     AppThemeWithBackground(Theme.ThemeType.DARK) {
         BottomSheetAppBar(title = "Hello World", navigationButton = NavigationButton.Close, onNavigationClick = {})
     }

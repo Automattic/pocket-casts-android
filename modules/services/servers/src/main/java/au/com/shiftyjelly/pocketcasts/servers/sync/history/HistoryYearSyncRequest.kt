@@ -5,7 +5,7 @@ import com.squareup.moshi.JsonClass
 
 @JsonClass(generateAdapter = true)
 data class HistoryYearSyncRequest(
-    @field:Json(name = "version") val version: String = "1",
-    @field:Json(name = "count") val count: Boolean,
-    @field:Json(name = "year") val year: Int,
+    @Json(name = "version") val version: String = "1",
+    @Json(name = "count") val count: Boolean,
+    @Json(name = "year") val year: Int,
 )

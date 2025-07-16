@@ -16,7 +16,9 @@ import kotlinx.coroutines.Dispatchers
 import au.com.shiftyjelly.pocketcasts.ui.R as UR
 
 @AndroidEntryPoint
-open class BaseAppCompatDialogFragment : AppCompatDialogFragment(), CoroutineScope {
+open class BaseAppCompatDialogFragment :
+    AppCompatDialogFragment(),
+    CoroutineScope {
 
     open val statusBarIconColor: StatusBarIconColor? = StatusBarIconColor.Theme
 

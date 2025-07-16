@@ -67,14 +67,14 @@ class FolderAdapter(
 
     override fun getItemViewType(position: Int): Int {
         return when (getItem(position)) {
-            is FolderItem.Podcast -> AdapterViewTypeIds.PodcastId
-            is FolderItem.Folder -> AdapterViewTypeIds.FolderId
+            is FolderItem.Podcast -> AdapterViewTypeIds.PODCAST_ID
+            is FolderItem.Folder -> AdapterViewTypeIds.FOLDER_ID
         }
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
         return when (viewType) {
-            AdapterViewTypeIds.PodcastId -> {
+            AdapterViewTypeIds.PODCAST_ID -> {
                 val isLayoutListView = settings.podcastGridLayout.value == PodcastGridLayoutType.LIST_VIEW
                 val layoutId = if (isLayoutListView) R.layout.adapter_podcast_list else R.layout.adapter_podcast_grid
                 val view = parent.inflate(layoutId, attachToThis = false)
@@ -87,7 +87,7 @@ class FolderAdapter(
                 )
             }
 
-            AdapterViewTypeIds.FolderId -> {
+            AdapterViewTypeIds.FOLDER_ID -> {
                 val podcastsLayout = settings.podcastGridLayout.value
                 FolderViewHolder(
                     composeView = ComposeView(parent.context),
@@ -168,7 +168,8 @@ class FolderAdapter(
         private val imageRequestFactory: PocketCastsImageRequestFactory,
         podcastGridLayout: PodcastGridLayoutType,
         val theme: Theme,
-    ) : RecyclerView.ViewHolder(view), PodcastTouchCallback.ItemTouchHelperViewHolder {
+    ) : RecyclerView.ViewHolder(view),
+        PodcastTouchCallback.ItemTouchHelperViewHolder {
 
         val button: View? = view.findViewById(R.id.button)
         val podcastThumbnail: ImageView = view.findViewById(R.id.podcast_artwork)

@@ -18,42 +18,37 @@ object Util {
     private const val MINIMUM_SMALLEST_WIDTH_DP_FOR_TABLET = 570
     private var appPlatform: AppPlatform? = null
 
-    fun isAndroidAutoConnectedFlow(context: Context) =
-        CarConnection(context).type
-            .map { it == CarConnection.CONNECTION_TYPE_PROJECTION }
-            .asFlow()
+    fun isAndroidAutoConnectedFlow(context: Context) = CarConnection(context).type
+        .map { it == CarConnection.CONNECTION_TYPE_PROJECTION }
+        .asFlow()
 
     fun isCarUiMode(context: Context): Boolean {
         val uiModeManager = context.getSystemService(Context.UI_MODE_SERVICE) as UiModeManager
         return uiModeManager.currentModeType == Configuration.UI_MODE_TYPE_CAR
     }
 
-    fun isAutomotive(context: Context): Boolean =
-        appInfoHasBoolean("pocketcasts_automotive", context)
+    fun isAutomotive(context: Context): Boolean = appInfoHasBoolean("pocketcasts_automotive", context)
 
-    fun isWearOs(context: Context): Boolean =
-        appInfoHasBoolean("pocketcasts_wear_os", context)
+    fun isWearOs(context: Context): Boolean = appInfoHasBoolean("pocketcasts_wear_os", context)
 
     // Caching this value since it will always be the same for a given app
-    fun getAppPlatform(context: Context): AppPlatform =
-        appPlatform ?: run {
-            val value = when {
-                isAutomotive(context) -> AppPlatform.Automotive
-                isWearOs(context) -> AppPlatform.WearOs
-                else -> AppPlatform.Phone
-            }
-            appPlatform = value
-            value
+    fun getAppPlatform(context: Context): AppPlatform = appPlatform ?: run {
+        val value = when {
+            isAutomotive(context) -> AppPlatform.Automotive
+            isWearOs(context) -> AppPlatform.WearOs
+            else -> AppPlatform.Phone
         }
+        appPlatform = value
+        value
+    }
 
     private fun appInfoHasBoolean(key: String, context: Context, default: Boolean = false): Boolean {
         val appInfo = context.packageManager.getApplicationInfo(context.packageName, PackageManager.GET_META_DATA).metaData
         return appInfo?.getBoolean(key, default) ?: default
     }
 
-    fun isTablet(context: Context) =
-        !isAutomotive(context) &&
-            context.resources.configuration.smallestScreenWidthDp > MINIMUM_SMALLEST_WIDTH_DP_FOR_TABLET
+    fun isTablet(context: Context) = !isAutomotive(context) &&
+        context.resources.configuration.smallestScreenWidthDp > MINIMUM_SMALLEST_WIDTH_DP_FOR_TABLET
 
     fun isTalkbackOn(context: Context): Boolean {
         val am = context.getSystemService(ACCESSIBILITY_SERVICE) as AccessibilityManager?

@@ -460,31 +460,45 @@ object ThemeColor {
     val secondaryInteractive01ActiveLightContrast = Color.parseColor("#404040")
     val secondaryInteractive01ActiveDarkContrast = Color.parseColor("#c0c0c0")
 
-    @ColorInt fun podcastUi01Light(@ColorInt podcastColor: Int): Int { return Color.parseColor("#FFFFFF") }
+    @ColorInt fun podcastUi01Light(@ColorInt podcastColor: Int): Int {
+        return Color.parseColor("#FFFFFF")
+    }
 
-    @ColorInt fun podcastUi01Dark(@ColorInt podcastColor: Int): Int { return Color.parseColor("#292B2E") }
+    @ColorInt fun podcastUi01Dark(@ColorInt podcastColor: Int): Int {
+        return Color.parseColor("#292B2E")
+    }
 
-    @ColorInt fun podcastUi01ExtraDark(@ColorInt podcastColor: Int): Int { return Color.parseColor("#000000") }
+    @ColorInt fun podcastUi01ExtraDark(@ColorInt podcastColor: Int): Int {
+        return Color.parseColor("#000000")
+    }
 
     @ColorInt fun podcastUi01ClassicLight(@ColorInt podcastColor: Int): Int {
         return podcastColor
     }
 
-    @ColorInt fun podcastUi01Electric(@ColorInt podcastColor: Int): Int { return Color.parseColor("#212835") }
+    @ColorInt fun podcastUi01Electric(@ColorInt podcastColor: Int): Int {
+        return Color.parseColor("#212835")
+    }
 
     @ColorInt fun podcastUi01Indigo(@ColorInt podcastColor: Int): Int {
         return ColorUtils.calculateCombinedColor(Color.parseColor("#737B80"), ColorUtils.colorWithAlpha(podcastColor, 89))
     }
 
-    @ColorInt fun podcastUi01Radioactive(@ColorInt podcastColor: Int): Int { return Color.parseColor("#162f1e") }
+    @ColorInt fun podcastUi01Radioactive(@ColorInt podcastColor: Int): Int {
+        return Color.parseColor("#162f1e")
+    }
 
     @ColorInt fun podcastUi01Rose(@ColorInt podcastColor: Int): Int {
         return ColorUtils.calculateCombinedColor(Color.parseColor("#FBE2DD"), ColorUtils.colorWithAlpha(podcastColor, 26))
     }
 
-    @ColorInt fun podcastUi01LightContrast(@ColorInt podcastColor: Int): Int { return Color.parseColor("#ffffff") }
+    @ColorInt fun podcastUi01LightContrast(@ColorInt podcastColor: Int): Int {
+        return Color.parseColor("#ffffff")
+    }
 
-    @ColorInt fun podcastUi01DarkContrast(@ColorInt podcastColor: Int): Int { return Color.parseColor("#000000") }
+    @ColorInt fun podcastUi01DarkContrast(@ColorInt podcastColor: Int): Int {
+        return Color.parseColor("#000000")
+    }
 
     @ColorInt fun podcastUi02Light(@ColorInt podcastColor: Int): Int {
         return ColorUtils.calculateCombinedColor(Color.parseColor("#FFFFFF"), ColorUtils.colorWithAlpha(podcastColor, 18))
@@ -502,15 +516,21 @@ object ThemeColor {
         return ColorUtils.calculateCombinedColor(Color.parseColor("#FFFFFF"), ColorUtils.colorWithAlpha(podcastColor, 18))
     }
 
-    @ColorInt fun podcastUi02Electric(@ColorInt podcastColor: Int): Int { return Color.parseColor("#152431") }
+    @ColorInt fun podcastUi02Electric(@ColorInt podcastColor: Int): Int {
+        return Color.parseColor("#152431")
+    }
 
     @ColorInt fun podcastUi02Indigo(@ColorInt podcastColor: Int): Int {
         return ColorUtils.calculateCombinedColor(Color.parseColor("#DBDBD5"), ColorUtils.colorWithAlpha(podcastColor, 13))
     }
 
-    @ColorInt fun podcastUi02Radioactive(@ColorInt podcastColor: Int): Int { return Color.parseColor("#162F1E") }
+    @ColorInt fun podcastUi02Radioactive(@ColorInt podcastColor: Int): Int {
+        return Color.parseColor("#162F1E")
+    }
 
-    @ColorInt fun podcastUi02Rose(@ColorInt podcastColor: Int): Int { return Color.parseColor("#FFD9D9") }
+    @ColorInt fun podcastUi02Rose(@ColorInt podcastColor: Int): Int {
+        return Color.parseColor("#FFD9D9")
+    }
 
     @ColorInt fun podcastUi02LightContrast(@ColorInt podcastColor: Int): Int {
         return ColorUtils.calculateCombinedColor(Color.parseColor("#FFFFFF"), ColorUtils.colorWithAlpha(podcastColor, 20))
@@ -536,47 +556,69 @@ object ThemeColor {
         return ColorUtils.calculateCombinedColor(Color.parseColor("#000000"), ColorUtils.colorWithAlpha(podcastColor, 77))
     }
 
-    @ColorInt fun podcastUi03Electric(@ColorInt podcastColor: Int): Int { return Color.parseColor("#212835") }
+    @ColorInt fun podcastUi03Electric(@ColorInt podcastColor: Int): Int {
+        return Color.parseColor("#212835")
+    }
 
     @ColorInt fun podcastUi03Indigo(@ColorInt podcastColor: Int): Int {
         return ColorUtils.calculateCombinedColor(Color.parseColor("#17181F"), ColorUtils.colorWithAlpha(podcastColor, 51))
     }
 
-    @ColorInt fun podcastUi03Radioactive(@ColorInt podcastColor: Int): Int { return Color.parseColor("#112417") }
+    @ColorInt fun podcastUi03Radioactive(@ColorInt podcastColor: Int): Int {
+        return Color.parseColor("#112417")
+    }
 
     @ColorInt fun podcastUi03Rose(@ColorInt podcastColor: Int): Int {
         return ColorUtils.calculateCombinedColor(Color.parseColor("#996B72"), ColorUtils.colorWithAlpha(podcastColor, 102))
     }
 
-    @ColorInt fun podcastUi03LightContrast(@ColorInt podcastColor: Int): Int { return Color.parseColor("#000000") }
+    @ColorInt fun podcastUi03LightContrast(@ColorInt podcastColor: Int): Int {
+        return Color.parseColor("#000000")
+    }
 
-    @ColorInt fun podcastUi03DarkContrast(@ColorInt podcastColor: Int): Int { return Color.parseColor("#141414") }
+    @ColorInt fun podcastUi03DarkContrast(@ColorInt podcastColor: Int): Int {
+        return Color.parseColor("#141414")
+    }
 
-    @ColorInt fun podcastUi04Light(@ColorInt podcastColor: Int): Int { return Color.parseColor("#E0E6EA") }
+    @ColorInt fun podcastUi04Light(@ColorInt podcastColor: Int): Int {
+        return Color.parseColor("#E0E6EA")
+    }
 
-    @ColorInt fun podcastUi04Dark(@ColorInt podcastColor: Int): Int { return Color.parseColor("#383A3C") }
+    @ColorInt fun podcastUi04Dark(@ColorInt podcastColor: Int): Int {
+        return Color.parseColor("#383A3C")
+    }
 
-    @ColorInt fun podcastUi04ExtraDark(@ColorInt podcastColor: Int): Int { return Color.parseColor("#1A1C1E") }
+    @ColorInt fun podcastUi04ExtraDark(@ColorInt podcastColor: Int): Int {
+        return Color.parseColor("#1A1C1E")
+    }
 
     @ColorInt fun podcastUi04ClassicLight(@ColorInt podcastColor: Int): Int {
         return podcastColor
     }
 
-    @ColorInt fun podcastUi04Electric(@ColorInt podcastColor: Int): Int { return Color.parseColor("#2E3A4F") }
+    @ColorInt fun podcastUi04Electric(@ColorInt podcastColor: Int): Int {
+        return Color.parseColor("#2E3A4F")
+    }
 
     @ColorInt fun podcastUi04Indigo(@ColorInt podcastColor: Int): Int {
         return ColorUtils.calculateCombinedColor(Color.parseColor("#737B80"), ColorUtils.colorWithAlpha(podcastColor, 89))
     }
 
-    @ColorInt fun podcastUi04Radioactive(@ColorInt podcastColor: Int): Int { return Color.parseColor("#27591a") }
+    @ColorInt fun podcastUi04Radioactive(@ColorInt podcastColor: Int): Int {
+        return Color.parseColor("#27591a")
+    }
 
     @ColorInt fun podcastUi04Rose(@ColorInt podcastColor: Int): Int {
         return ColorUtils.calculateCombinedColor(Color.parseColor("#EBD3CE"), ColorUtils.colorWithAlpha(podcastColor, 38))
     }
 
-    @ColorInt fun podcastUi04LightContrast(@ColorInt podcastColor: Int): Int { return Color.parseColor("#bebebe") }
+    @ColorInt fun podcastUi04LightContrast(@ColorInt podcastColor: Int): Int {
+        return Color.parseColor("#bebebe")
+    }
 
-    @ColorInt fun podcastUi04DarkContrast(@ColorInt podcastColor: Int): Int { return Color.parseColor("#404040") }
+    @ColorInt fun podcastUi04DarkContrast(@ColorInt podcastColor: Int): Int {
+        return Color.parseColor("#404040")
+    }
 
     @ColorInt fun podcastUi05Light(@ColorInt podcastColor: Int): Int {
         return ColorUtils.calculateCombinedColor(Color.parseColor("#1A1A1A"), ColorUtils.colorWithAlpha(podcastColor, 102))
@@ -594,13 +636,17 @@ object ThemeColor {
         return ColorUtils.calculateCombinedColor(Color.parseColor("#1A1A1A"), ColorUtils.colorWithAlpha(podcastColor, 102))
     }
 
-    @ColorInt fun podcastUi05Electric(@ColorInt podcastColor: Int): Int { return Color.parseColor("#2B3547") }
+    @ColorInt fun podcastUi05Electric(@ColorInt podcastColor: Int): Int {
+        return Color.parseColor("#2B3547")
+    }
 
     @ColorInt fun podcastUi05Indigo(@ColorInt podcastColor: Int): Int {
         return ColorUtils.calculateCombinedColor(Color.parseColor("#272938"), ColorUtils.colorWithAlpha(podcastColor, 77))
     }
 
-    @ColorInt fun podcastUi05Radioactive(@ColorInt podcastColor: Int): Int { return Color.parseColor("#1D3D27") }
+    @ColorInt fun podcastUi05Radioactive(@ColorInt podcastColor: Int): Int {
+        return Color.parseColor("#1D3D27")
+    }
 
     @ColorInt fun podcastUi05Rose(@ColorInt podcastColor: Int): Int {
         return ColorUtils.calculateCombinedColor(Color.parseColor("#B27982"), ColorUtils.colorWithAlpha(podcastColor, 102))
@@ -630,13 +676,17 @@ object ThemeColor {
         return ColorUtils.calculateCombinedColor(Color.parseColor("#333333"), ColorUtils.colorWithAlpha(podcastColor, 128))
     }
 
-    @ColorInt fun podcastUi06Electric(@ColorInt podcastColor: Int): Int { return Color.parseColor("#36425A") }
+    @ColorInt fun podcastUi06Electric(@ColorInt podcastColor: Int): Int {
+        return Color.parseColor("#36425A")
+    }
 
     @ColorInt fun podcastUi06Indigo(@ColorInt podcastColor: Int): Int {
         return ColorUtils.calculateCombinedColor(Color.parseColor("#343852"), ColorUtils.colorWithAlpha(podcastColor, 102))
     }
 
-    @ColorInt fun podcastUi06Radioactive(@ColorInt podcastColor: Int): Int { return Color.parseColor("#254B31") }
+    @ColorInt fun podcastUi06Radioactive(@ColorInt podcastColor: Int): Int {
+        return Color.parseColor("#254B31")
+    }
 
     @ColorInt fun podcastUi06Rose(@ColorInt podcastColor: Int): Int {
         return ColorUtils.calculateCombinedColor(Color.parseColor("#CC8F98"), ColorUtils.colorWithAlpha(podcastColor, 115))
@@ -662,23 +712,33 @@ object ThemeColor {
         return podcastColor
     }
 
-    @ColorInt fun podcastIcon01ClassicLight(@ColorInt podcastColor: Int): Int { return Color.parseColor("#FFFFFF") }
+    @ColorInt fun podcastIcon01ClassicLight(@ColorInt podcastColor: Int): Int {
+        return Color.parseColor("#FFFFFF")
+    }
 
-    @ColorInt fun podcastIcon01Electric(@ColorInt podcastColor: Int): Int { return Color.parseColor("#3FD2E6") }
+    @ColorInt fun podcastIcon01Electric(@ColorInt podcastColor: Int): Int {
+        return Color.parseColor("#3FD2E6")
+    }
 
     @ColorInt fun podcastIcon01Indigo(@ColorInt podcastColor: Int): Int {
         return ColorUtils.calculateCombinedColor(Color.parseColor("#F3F1E4"), ColorUtils.colorWithAlpha(podcastColor, 38))
     }
 
-    @ColorInt fun podcastIcon01Radioactive(@ColorInt podcastColor: Int): Int { return Color.parseColor("#70e84e") }
+    @ColorInt fun podcastIcon01Radioactive(@ColorInt podcastColor: Int): Int {
+        return Color.parseColor("#70e84e")
+    }
 
     @ColorInt fun podcastIcon01Rose(@ColorInt podcastColor: Int): Int {
         return ColorUtils.calculateCombinedColor(Color.parseColor("#B2365F"), ColorUtils.colorWithAlpha(podcastColor, 115))
     }
 
-    @ColorInt fun podcastIcon01LightContrast(@ColorInt podcastColor: Int): Int { return Color.parseColor("#000000") }
+    @ColorInt fun podcastIcon01LightContrast(@ColorInt podcastColor: Int): Int {
+        return Color.parseColor("#000000")
+    }
 
-    @ColorInt fun podcastIcon01DarkContrast(@ColorInt podcastColor: Int): Int { return Color.parseColor("#ffffff") }
+    @ColorInt fun podcastIcon01DarkContrast(@ColorInt podcastColor: Int): Int {
+        return Color.parseColor("#ffffff")
+    }
 
     @ColorInt fun podcastIcon02Light(@ColorInt podcastColor: Int): Int {
         return podcastColor
@@ -696,47 +756,69 @@ object ThemeColor {
         return podcastColor
     }
 
-    @ColorInt fun podcastIcon02Electric(@ColorInt podcastColor: Int): Int { return Color.parseColor("#3FD2E6") }
+    @ColorInt fun podcastIcon02Electric(@ColorInt podcastColor: Int): Int {
+        return Color.parseColor("#3FD2E6")
+    }
 
     @ColorInt fun podcastIcon02Indigo(@ColorInt podcastColor: Int): Int {
         return ColorUtils.calculateCombinedColor(Color.parseColor("#919CB2"), ColorUtils.colorWithAlpha(podcastColor, 89))
     }
 
-    @ColorInt fun podcastIcon02Radioactive(@ColorInt podcastColor: Int): Int { return Color.parseColor("#74f864") }
+    @ColorInt fun podcastIcon02Radioactive(@ColorInt podcastColor: Int): Int {
+        return Color.parseColor("#74f864")
+    }
 
     @ColorInt fun podcastIcon02Rose(@ColorInt podcastColor: Int): Int {
         return ColorUtils.calculateCombinedColor(Color.parseColor("#A66C7F"), ColorUtils.colorWithAlpha(podcastColor, 89))
     }
 
-    @ColorInt fun podcastIcon02LightContrast(@ColorInt podcastColor: Int): Int { return Color.parseColor("#000000") }
+    @ColorInt fun podcastIcon02LightContrast(@ColorInt podcastColor: Int): Int {
+        return Color.parseColor("#000000")
+    }
 
-    @ColorInt fun podcastIcon02DarkContrast(@ColorInt podcastColor: Int): Int { return Color.parseColor("#ffffff") }
+    @ColorInt fun podcastIcon02DarkContrast(@ColorInt podcastColor: Int): Int {
+        return Color.parseColor("#ffffff")
+    }
 
     @ColorInt fun podcastIcon03Light(@ColorInt podcastColor: Int): Int {
         return podcastColor
     }
 
-    @ColorInt fun podcastIcon03Dark(@ColorInt podcastColor: Int): Int { return Color.parseColor("#FFFFFF") }
+    @ColorInt fun podcastIcon03Dark(@ColorInt podcastColor: Int): Int {
+        return Color.parseColor("#FFFFFF")
+    }
 
-    @ColorInt fun podcastIcon03ExtraDark(@ColorInt podcastColor: Int): Int { return Color.parseColor("#FFFFFF") }
+    @ColorInt fun podcastIcon03ExtraDark(@ColorInt podcastColor: Int): Int {
+        return Color.parseColor("#FFFFFF")
+    }
 
     @ColorInt fun podcastIcon03ClassicLight(@ColorInt podcastColor: Int): Int {
         return podcastColor
     }
 
-    @ColorInt fun podcastIcon03Electric(@ColorInt podcastColor: Int): Int { return Color.parseColor("#3FD2E6") }
+    @ColorInt fun podcastIcon03Electric(@ColorInt podcastColor: Int): Int {
+        return Color.parseColor("#3FD2E6")
+    }
 
     @ColorInt fun podcastIcon03Indigo(@ColorInt podcastColor: Int): Int {
         return ColorUtils.calculateCombinedColor(Color.parseColor("#45516E"), ColorUtils.colorWithAlpha(podcastColor, 51))
     }
 
-    @ColorInt fun podcastIcon03Radioactive(@ColorInt podcastColor: Int): Int { return Color.parseColor("#70e84e") }
+    @ColorInt fun podcastIcon03Radioactive(@ColorInt podcastColor: Int): Int {
+        return Color.parseColor("#70e84e")
+    }
 
-    @ColorInt fun podcastIcon03Rose(@ColorInt podcastColor: Int): Int { return Color.parseColor("#FF737E") }
+    @ColorInt fun podcastIcon03Rose(@ColorInt podcastColor: Int): Int {
+        return Color.parseColor("#FF737E")
+    }
 
-    @ColorInt fun podcastIcon03LightContrast(@ColorInt podcastColor: Int): Int { return Color.parseColor("#000000") }
+    @ColorInt fun podcastIcon03LightContrast(@ColorInt podcastColor: Int): Int {
+        return Color.parseColor("#000000")
+    }
 
-    @ColorInt fun podcastIcon03DarkContrast(@ColorInt podcastColor: Int): Int { return Color.parseColor("#ffffff") }
+    @ColorInt fun podcastIcon03DarkContrast(@ColorInt podcastColor: Int): Int {
+        return Color.parseColor("#ffffff")
+    }
 
     @ColorInt fun podcastText01Light(@ColorInt podcastColor: Int): Int {
         return podcastColor
@@ -750,21 +832,33 @@ object ThemeColor {
         return podcastColor
     }
 
-    @ColorInt fun podcastText01ClassicLight(@ColorInt podcastColor: Int): Int { return Color.parseColor("#FFFFFF") }
+    @ColorInt fun podcastText01ClassicLight(@ColorInt podcastColor: Int): Int {
+        return Color.parseColor("#FFFFFF")
+    }
 
-    @ColorInt fun podcastText01Electric(@ColorInt podcastColor: Int): Int { return Color.parseColor("#3FD2E6") }
+    @ColorInt fun podcastText01Electric(@ColorInt podcastColor: Int): Int {
+        return Color.parseColor("#3FD2E6")
+    }
 
-    @ColorInt fun podcastText01Indigo(@ColorInt podcastColor: Int): Int { return Color.parseColor("#EAE8DD") }
+    @ColorInt fun podcastText01Indigo(@ColorInt podcastColor: Int): Int {
+        return Color.parseColor("#EAE8DD")
+    }
 
-    @ColorInt fun podcastText01Radioactive(@ColorInt podcastColor: Int): Int { return Color.parseColor("#74f864") }
+    @ColorInt fun podcastText01Radioactive(@ColorInt podcastColor: Int): Int {
+        return Color.parseColor("#74f864")
+    }
 
     @ColorInt fun podcastText01Rose(@ColorInt podcastColor: Int): Int {
         return ColorUtils.calculateCombinedColor(Color.parseColor("#4D262C"), ColorUtils.colorWithAlpha(podcastColor, 77))
     }
 
-    @ColorInt fun podcastText01LightContrast(@ColorInt podcastColor: Int): Int { return Color.parseColor("#000000") }
+    @ColorInt fun podcastText01LightContrast(@ColorInt podcastColor: Int): Int {
+        return Color.parseColor("#000000")
+    }
 
-    @ColorInt fun podcastText01DarkContrast(@ColorInt podcastColor: Int): Int { return Color.parseColor("#ffffff") }
+    @ColorInt fun podcastText01DarkContrast(@ColorInt podcastColor: Int): Int {
+        return Color.parseColor("#ffffff")
+    }
 
     @ColorInt fun podcastText02Light(@ColorInt podcastColor: Int): Int {
         return podcastColor
@@ -782,21 +876,29 @@ object ThemeColor {
         return podcastColor
     }
 
-    @ColorInt fun podcastText02Electric(@ColorInt podcastColor: Int): Int { return Color.parseColor("#3FD2E6") }
+    @ColorInt fun podcastText02Electric(@ColorInt podcastColor: Int): Int {
+        return Color.parseColor("#3FD2E6")
+    }
 
     @ColorInt fun podcastText02Indigo(@ColorInt podcastColor: Int): Int {
         return ColorUtils.calculateCombinedColor(Color.parseColor("#919CB2"), ColorUtils.colorWithAlpha(podcastColor, 89))
     }
 
-    @ColorInt fun podcastText02Radioactive(@ColorInt podcastColor: Int): Int { return Color.parseColor("#59bc3d") }
+    @ColorInt fun podcastText02Radioactive(@ColorInt podcastColor: Int): Int {
+        return Color.parseColor("#59bc3d")
+    }
 
     @ColorInt fun podcastText02Rose(@ColorInt podcastColor: Int): Int {
         return ColorUtils.calculateCombinedColor(Color.parseColor("#A66C7F"), ColorUtils.colorWithAlpha(podcastColor, 89))
     }
 
-    @ColorInt fun podcastText02LightContrast(@ColorInt podcastColor: Int): Int { return Color.parseColor("#333333") }
+    @ColorInt fun podcastText02LightContrast(@ColorInt podcastColor: Int): Int {
+        return Color.parseColor("#333333")
+    }
 
-    @ColorInt fun podcastText02DarkContrast(@ColorInt podcastColor: Int): Int { return Color.parseColor("#cccccc") }
+    @ColorInt fun podcastText02DarkContrast(@ColorInt podcastColor: Int): Int {
+        return Color.parseColor("#cccccc")
+    }
 
     @ColorInt fun podcastInteractive01Light(@ColorInt podcastColor: Int): Int {
         return podcastColor
@@ -814,21 +916,29 @@ object ThemeColor {
         return podcastColor
     }
 
-    @ColorInt fun podcastInteractive01Electric(@ColorInt podcastColor: Int): Int { return Color.parseColor("#3FD2E6") }
+    @ColorInt fun podcastInteractive01Electric(@ColorInt podcastColor: Int): Int {
+        return Color.parseColor("#3FD2E6")
+    }
 
     @ColorInt fun podcastInteractive01Indigo(@ColorInt podcastColor: Int): Int {
         return ColorUtils.calculateCombinedColor(Color.parseColor("#919CB2"), ColorUtils.colorWithAlpha(podcastColor, 89))
     }
 
-    @ColorInt fun podcastInteractive01Radioactive(@ColorInt podcastColor: Int): Int { return Color.parseColor("#74f864") }
+    @ColorInt fun podcastInteractive01Radioactive(@ColorInt podcastColor: Int): Int {
+        return Color.parseColor("#74f864")
+    }
 
     @ColorInt fun podcastInteractive01Rose(@ColorInt podcastColor: Int): Int {
         return ColorUtils.calculateCombinedColor(Color.parseColor("#A66C7F"), ColorUtils.colorWithAlpha(podcastColor, 89))
     }
 
-    @ColorInt fun podcastInteractive01LightContrast(@ColorInt podcastColor: Int): Int { return Color.parseColor("#000000") }
+    @ColorInt fun podcastInteractive01LightContrast(@ColorInt podcastColor: Int): Int {
+        return Color.parseColor("#000000")
+    }
 
-    @ColorInt fun podcastInteractive01DarkContrast(@ColorInt podcastColor: Int): Int { return Color.parseColor("#f2f2f2") }
+    @ColorInt fun podcastInteractive01DarkContrast(@ColorInt podcastColor: Int): Int {
+        return Color.parseColor("#f2f2f2")
+    }
 
     @ColorInt fun podcastInteractive01ActiveLight(@ColorInt podcastColor: Int): Int {
         return ColorUtils.colorWithAlpha(podcastColor, 153)
@@ -846,41 +956,69 @@ object ThemeColor {
         return ColorUtils.calculateCombinedColor(Color.parseColor("#FFFFFF"), ColorUtils.colorWithAlpha(podcastColor, 128))
     }
 
-    @ColorInt fun podcastInteractive01ActiveElectric(@ColorInt podcastColor: Int): Int { return Color.parseColor("#A0E8F2") }
+    @ColorInt fun podcastInteractive01ActiveElectric(@ColorInt podcastColor: Int): Int {
+        return Color.parseColor("#A0E8F2")
+    }
 
     @ColorInt fun podcastInteractive01ActiveIndigo(@ColorInt podcastColor: Int): Int {
         return ColorUtils.calculateCombinedColor(Color.parseColor("#91A5CC"), ColorUtils.colorWithAlpha(podcastColor, 89))
     }
 
-    @ColorInt fun podcastInteractive01ActiveRadioactive(@ColorInt podcastColor: Int): Int { return Color.parseColor("#9FF2B1") }
+    @ColorInt fun podcastInteractive01ActiveRadioactive(@ColorInt podcastColor: Int): Int {
+        return Color.parseColor("#9FF2B1")
+    }
 
     @ColorInt fun podcastInteractive01ActiveRose(@ColorInt podcastColor: Int): Int {
         return ColorUtils.calculateCombinedColor(Color.parseColor("#A66C7F"), ColorUtils.colorWithAlpha(podcastColor, 77))
     }
 
-    @ColorInt fun podcastInteractive01ActiveLightContrast(@ColorInt podcastColor: Int): Int { return Color.parseColor("#3f3f3f") }
+    @ColorInt fun podcastInteractive01ActiveLightContrast(@ColorInt podcastColor: Int): Int {
+        return Color.parseColor("#3f3f3f")
+    }
 
-    @ColorInt fun podcastInteractive01ActiveDarkContrast(@ColorInt podcastColor: Int): Int { return Color.parseColor("#cbcbcb") }
+    @ColorInt fun podcastInteractive01ActiveDarkContrast(@ColorInt podcastColor: Int): Int {
+        return Color.parseColor("#cbcbcb")
+    }
 
-    @ColorInt fun podcastInteractive02Light(@ColorInt podcastColor: Int): Int { return Color.parseColor("#FFFFFF") }
+    @ColorInt fun podcastInteractive02Light(@ColorInt podcastColor: Int): Int {
+        return Color.parseColor("#FFFFFF")
+    }
 
-    @ColorInt fun podcastInteractive02Dark(@ColorInt podcastColor: Int): Int { return Color.parseColor("#292B2E") }
+    @ColorInt fun podcastInteractive02Dark(@ColorInt podcastColor: Int): Int {
+        return Color.parseColor("#292B2E")
+    }
 
-    @ColorInt fun podcastInteractive02ExtraDark(@ColorInt podcastColor: Int): Int { return Color.parseColor("#000000") }
+    @ColorInt fun podcastInteractive02ExtraDark(@ColorInt podcastColor: Int): Int {
+        return Color.parseColor("#000000")
+    }
 
-    @ColorInt fun podcastInteractive02ClassicLight(@ColorInt podcastColor: Int): Int { return Color.parseColor("#FFFFFF") }
+    @ColorInt fun podcastInteractive02ClassicLight(@ColorInt podcastColor: Int): Int {
+        return Color.parseColor("#FFFFFF")
+    }
 
-    @ColorInt fun podcastInteractive02Electric(@ColorInt podcastColor: Int): Int { return Color.parseColor("#212835") }
+    @ColorInt fun podcastInteractive02Electric(@ColorInt podcastColor: Int): Int {
+        return Color.parseColor("#212835")
+    }
 
-    @ColorInt fun podcastInteractive02Indigo(@ColorInt podcastColor: Int): Int { return Color.parseColor("#FFFFFF") }
+    @ColorInt fun podcastInteractive02Indigo(@ColorInt podcastColor: Int): Int {
+        return Color.parseColor("#FFFFFF")
+    }
 
-    @ColorInt fun podcastInteractive02Radioactive(@ColorInt podcastColor: Int): Int { return Color.parseColor("#0B0D0F") }
+    @ColorInt fun podcastInteractive02Radioactive(@ColorInt podcastColor: Int): Int {
+        return Color.parseColor("#0B0D0F")
+    }
 
-    @ColorInt fun podcastInteractive02Rose(@ColorInt podcastColor: Int): Int { return Color.parseColor("#F8EDED") }
+    @ColorInt fun podcastInteractive02Rose(@ColorInt podcastColor: Int): Int {
+        return Color.parseColor("#F8EDED")
+    }
 
-    @ColorInt fun podcastInteractive02LightContrast(@ColorInt podcastColor: Int): Int { return Color.parseColor("#ffffff") }
+    @ColorInt fun podcastInteractive02LightContrast(@ColorInt podcastColor: Int): Int {
+        return Color.parseColor("#ffffff")
+    }
 
-    @ColorInt fun podcastInteractive02DarkContrast(@ColorInt podcastColor: Int): Int { return Color.parseColor("#ffffff") }
+    @ColorInt fun podcastInteractive02DarkContrast(@ColorInt podcastColor: Int): Int {
+        return Color.parseColor("#ffffff")
+    }
 
     @ColorInt fun podcastInteractive03Light(@ColorInt podcastColor: Int): Int {
         return ColorUtils.calculateCombinedColor(Color.parseColor("#FFFFFF"), ColorUtils.colorWithAlpha(podcastColor, 191))
@@ -898,21 +1036,29 @@ object ThemeColor {
         return ColorUtils.calculateCombinedColor(Color.parseColor("#FFFFFF"), ColorUtils.colorWithAlpha(podcastColor, 191))
     }
 
-    @ColorInt fun podcastInteractive03Electric(@ColorInt podcastColor: Int): Int { return Color.parseColor("#3FD2E6") }
+    @ColorInt fun podcastInteractive03Electric(@ColorInt podcastColor: Int): Int {
+        return Color.parseColor("#3FD2E6")
+    }
 
     @ColorInt fun podcastInteractive03Indigo(@ColorInt podcastColor: Int): Int {
         return ColorUtils.calculateCombinedColor(Color.parseColor("#807D73"), ColorUtils.colorWithAlpha(podcastColor, 166))
     }
 
-    @ColorInt fun podcastInteractive03Radioactive(@ColorInt podcastColor: Int): Int { return Color.parseColor("#74f864") }
+    @ColorInt fun podcastInteractive03Radioactive(@ColorInt podcastColor: Int): Int {
+        return Color.parseColor("#74f864")
+    }
 
     @ColorInt fun podcastInteractive03Rose(@ColorInt podcastColor: Int): Int {
         return ColorUtils.calculateCombinedColor(Color.parseColor("#A66C7F"), ColorUtils.colorWithAlpha(podcastColor, 166))
     }
 
-    @ColorInt fun podcastInteractive03LightContrast(@ColorInt podcastColor: Int): Int { return Color.parseColor("#000000") }
+    @ColorInt fun podcastInteractive03LightContrast(@ColorInt podcastColor: Int): Int {
+        return Color.parseColor("#000000")
+    }
 
-    @ColorInt fun podcastInteractive03DarkContrast(@ColorInt podcastColor: Int): Int { return Color.parseColor("#ffffff") }
+    @ColorInt fun podcastInteractive03DarkContrast(@ColorInt podcastColor: Int): Int {
+        return Color.parseColor("#ffffff")
+    }
 
     @ColorInt fun podcastInteractive03ActiveLight(@ColorInt podcastColor: Int): Int {
         return ColorUtils.calculateCombinedColor(Color.parseColor("#FFFFFF"), ColorUtils.colorWithAlpha(podcastColor, 140))
@@ -930,13 +1076,17 @@ object ThemeColor {
         return ColorUtils.calculateCombinedColor(Color.parseColor("#FFFFFF"), ColorUtils.colorWithAlpha(podcastColor, 140))
     }
 
-    @ColorInt fun podcastInteractive03ActiveElectric(@ColorInt podcastColor: Int): Int { return Color.parseColor("#A0E8F2") }
+    @ColorInt fun podcastInteractive03ActiveElectric(@ColorInt podcastColor: Int): Int {
+        return Color.parseColor("#A0E8F2")
+    }
 
     @ColorInt fun podcastInteractive03ActiveIndigo(@ColorInt podcastColor: Int): Int {
         return ColorUtils.calculateCombinedColor(Color.parseColor("#807D74"), ColorUtils.colorWithAlpha(podcastColor, 89))
     }
 
-    @ColorInt fun podcastInteractive03ActiveRadioactive(@ColorInt podcastColor: Int): Int { return Color.parseColor("#9FF2B1") }
+    @ColorInt fun podcastInteractive03ActiveRadioactive(@ColorInt podcastColor: Int): Int {
+        return Color.parseColor("#9FF2B1")
+    }
 
     @ColorInt fun podcastInteractive03ActiveRose(@ColorInt podcastColor: Int): Int {
         return ColorUtils.calculateCombinedColor(Color.parseColor("#A66C7F"), ColorUtils.colorWithAlpha(podcastColor, 89))
@@ -950,25 +1100,45 @@ object ThemeColor {
         return ColorUtils.colorWithAlpha(Color.parseColor("#ffffff"), 153)
     }
 
-    @ColorInt fun podcastInteractive04Light(@ColorInt podcastColor: Int): Int { return Color.parseColor("#000000") }
+    @ColorInt fun podcastInteractive04Light(@ColorInt podcastColor: Int): Int {
+        return Color.parseColor("#000000")
+    }
 
-    @ColorInt fun podcastInteractive04Dark(@ColorInt podcastColor: Int): Int { return Color.parseColor("#000000") }
+    @ColorInt fun podcastInteractive04Dark(@ColorInt podcastColor: Int): Int {
+        return Color.parseColor("#000000")
+    }
 
-    @ColorInt fun podcastInteractive04ExtraDark(@ColorInt podcastColor: Int): Int { return Color.parseColor("#000000") }
+    @ColorInt fun podcastInteractive04ExtraDark(@ColorInt podcastColor: Int): Int {
+        return Color.parseColor("#000000")
+    }
 
-    @ColorInt fun podcastInteractive04ClassicLight(@ColorInt podcastColor: Int): Int { return Color.parseColor("#000000") }
+    @ColorInt fun podcastInteractive04ClassicLight(@ColorInt podcastColor: Int): Int {
+        return Color.parseColor("#000000")
+    }
 
-    @ColorInt fun podcastInteractive04Electric(@ColorInt podcastColor: Int): Int { return Color.parseColor("#212835") }
+    @ColorInt fun podcastInteractive04Electric(@ColorInt podcastColor: Int): Int {
+        return Color.parseColor("#212835")
+    }
 
-    @ColorInt fun podcastInteractive04Indigo(@ColorInt podcastColor: Int): Int { return Color.parseColor("#000000") }
+    @ColorInt fun podcastInteractive04Indigo(@ColorInt podcastColor: Int): Int {
+        return Color.parseColor("#000000")
+    }
 
-    @ColorInt fun podcastInteractive04Radioactive(@ColorInt podcastColor: Int): Int { return Color.parseColor("#0B0D0F") }
+    @ColorInt fun podcastInteractive04Radioactive(@ColorInt podcastColor: Int): Int {
+        return Color.parseColor("#0B0D0F")
+    }
 
-    @ColorInt fun podcastInteractive04Rose(@ColorInt podcastColor: Int): Int { return Color.parseColor("#000000") }
+    @ColorInt fun podcastInteractive04Rose(@ColorInt podcastColor: Int): Int {
+        return Color.parseColor("#000000")
+    }
 
-    @ColorInt fun podcastInteractive04LightContrast(@ColorInt podcastColor: Int): Int { return Color.parseColor("#ffffff") }
+    @ColorInt fun podcastInteractive04LightContrast(@ColorInt podcastColor: Int): Int {
+        return Color.parseColor("#ffffff")
+    }
 
-    @ColorInt fun podcastInteractive04DarkContrast(@ColorInt podcastColor: Int): Int { return Color.parseColor("#000000") }
+    @ColorInt fun podcastInteractive04DarkContrast(@ColorInt podcastColor: Int): Int {
+        return Color.parseColor("#000000")
+    }
 
     @ColorInt fun podcastInteractive05Light(@ColorInt podcastColor: Int): Int {
         return ColorUtils.calculateCombinedColor(Color.parseColor("#FFFFFF"), ColorUtils.colorWithAlpha(podcastColor, 153))
@@ -986,21 +1156,29 @@ object ThemeColor {
         return ColorUtils.calculateCombinedColor(Color.parseColor("#FFFFFF"), ColorUtils.colorWithAlpha(podcastColor, 153))
     }
 
-    @ColorInt fun podcastInteractive05Electric(@ColorInt podcastColor: Int): Int { return Color.parseColor("#3FD2E6") }
+    @ColorInt fun podcastInteractive05Electric(@ColorInt podcastColor: Int): Int {
+        return Color.parseColor("#3FD2E6")
+    }
 
     @ColorInt fun podcastInteractive05Indigo(@ColorInt podcastColor: Int): Int {
         return ColorUtils.calculateCombinedColor(Color.parseColor("#807D74"), ColorUtils.colorWithAlpha(podcastColor, 115))
     }
 
-    @ColorInt fun podcastInteractive05Radioactive(@ColorInt podcastColor: Int): Int { return Color.parseColor("#74f864") }
+    @ColorInt fun podcastInteractive05Radioactive(@ColorInt podcastColor: Int): Int {
+        return Color.parseColor("#74f864")
+    }
 
     @ColorInt fun podcastInteractive05Rose(@ColorInt podcastColor: Int): Int {
         return ColorUtils.calculateCombinedColor(Color.parseColor("#4D262C"), ColorUtils.colorWithAlpha(podcastColor, 77))
     }
 
-    @ColorInt fun podcastInteractive05LightContrast(@ColorInt podcastColor: Int): Int { return Color.parseColor("#000000") }
+    @ColorInt fun podcastInteractive05LightContrast(@ColorInt podcastColor: Int): Int {
+        return Color.parseColor("#000000")
+    }
 
-    @ColorInt fun podcastInteractive05DarkContrast(@ColorInt podcastColor: Int): Int { return Color.parseColor("#ffffff") }
+    @ColorInt fun podcastInteractive05DarkContrast(@ColorInt podcastColor: Int): Int {
+        return Color.parseColor("#ffffff")
+    }
 
     @ColorInt fun podcastOndarkLight(@ColorInt podcastColor: Int): Int {
         return podcastColor
@@ -1026,7 +1204,9 @@ object ThemeColor {
         return podcastColor
     }
 
-    @ColorInt fun podcastOndarkRadioactive(@ColorInt podcastColor: Int): Int { return Color.parseColor("#428C2E") }
+    @ColorInt fun podcastOndarkRadioactive(@ColorInt podcastColor: Int): Int {
+        return Color.parseColor("#428C2E")
+    }
 
     @ColorInt fun podcastOndarkRose(@ColorInt podcastColor: Int): Int {
         return podcastColor
@@ -1064,7 +1244,9 @@ object ThemeColor {
         return podcastColor
     }
 
-    @ColorInt fun podcastOnlightRadioactive(@ColorInt podcastColor: Int): Int { return Color.parseColor("#27591A") }
+    @ColorInt fun podcastOnlightRadioactive(@ColorInt podcastColor: Int): Int {
+        return Color.parseColor("#27591A")
+    }
 
     @ColorInt fun podcastOnlightRose(@ColorInt podcastColor: Int): Int {
         return podcastColor
@@ -1078,31 +1260,45 @@ object ThemeColor {
         return podcastColor
     }
 
-    @ColorInt fun filterUi01Light(@ColorInt filterColor: Int): Int { return Color.parseColor("#FFFFFF") }
+    @ColorInt fun filterUi01Light(@ColorInt filterColor: Int): Int {
+        return Color.parseColor("#FFFFFF")
+    }
 
-    @ColorInt fun filterUi01Dark(@ColorInt filterColor: Int): Int { return Color.parseColor("#292B2E") }
+    @ColorInt fun filterUi01Dark(@ColorInt filterColor: Int): Int {
+        return Color.parseColor("#292B2E")
+    }
 
-    @ColorInt fun filterUi01ExtraDark(@ColorInt filterColor: Int): Int { return Color.parseColor("#000000") }
+    @ColorInt fun filterUi01ExtraDark(@ColorInt filterColor: Int): Int {
+        return Color.parseColor("#000000")
+    }
 
     @ColorInt fun filterUi01ClassicLight(@ColorInt filterColor: Int): Int {
         return filterColor
     }
 
-    @ColorInt fun filterUi01Electric(@ColorInt filterColor: Int): Int { return Color.parseColor("#212835") }
+    @ColorInt fun filterUi01Electric(@ColorInt filterColor: Int): Int {
+        return Color.parseColor("#212835")
+    }
 
     @ColorInt fun filterUi01Indigo(@ColorInt filterColor: Int): Int {
         return filterColor
     }
 
-    @ColorInt fun filterUi01Radioactive(@ColorInt filterColor: Int): Int { return Color.parseColor("#162f1e") }
+    @ColorInt fun filterUi01Radioactive(@ColorInt filterColor: Int): Int {
+        return Color.parseColor("#162f1e")
+    }
 
     @ColorInt fun filterUi01Rose(@ColorInt filterColor: Int): Int {
         return ColorUtils.calculateCombinedColor(Color.parseColor("#FCEEEB"), ColorUtils.colorWithAlpha(filterColor, 77))
     }
 
-    @ColorInt fun filterUi01LightContrast(@ColorInt filterColor: Int): Int { return Color.parseColor("#ffffff") }
+    @ColorInt fun filterUi01LightContrast(@ColorInt filterColor: Int): Int {
+        return Color.parseColor("#ffffff")
+    }
 
-    @ColorInt fun filterUi01DarkContrast(@ColorInt filterColor: Int): Int { return Color.parseColor("#000000") }
+    @ColorInt fun filterUi01DarkContrast(@ColorInt filterColor: Int): Int {
+        return Color.parseColor("#000000")
+    }
 
     @ColorInt fun filterUi02Light(@ColorInt filterColor: Int): Int {
         return ColorUtils.calculateCombinedColor(Color.parseColor("#FFFFFF"), ColorUtils.colorWithAlpha(filterColor, 18))
@@ -1120,19 +1316,29 @@ object ThemeColor {
         return ColorUtils.calculateCombinedColor(Color.parseColor("#FFFFFF"), ColorUtils.colorWithAlpha(filterColor, 18))
     }
 
-    @ColorInt fun filterUi02Electric(@ColorInt filterColor: Int): Int { return Color.parseColor("#152431") }
+    @ColorInt fun filterUi02Electric(@ColorInt filterColor: Int): Int {
+        return Color.parseColor("#152431")
+    }
 
-    @ColorInt fun filterUi02Indigo(@ColorInt filterColor: Int): Int { return Color.parseColor("#F19D38") }
+    @ColorInt fun filterUi02Indigo(@ColorInt filterColor: Int): Int {
+        return Color.parseColor("#F19D38")
+    }
 
-    @ColorInt fun filterUi02Radioactive(@ColorInt filterColor: Int): Int { return Color.parseColor("#162F1E") }
+    @ColorInt fun filterUi02Radioactive(@ColorInt filterColor: Int): Int {
+        return Color.parseColor("#162F1E")
+    }
 
     @ColorInt fun filterUi02Rose(@ColorInt filterColor: Int): Int {
         return ColorUtils.calculateCombinedColor(Color.parseColor("#FBEBE8"), ColorUtils.colorWithAlpha(filterColor, 51))
     }
 
-    @ColorInt fun filterUi02LightContrast(@ColorInt filterColor: Int): Int { return Color.parseColor("#ffffff") }
+    @ColorInt fun filterUi02LightContrast(@ColorInt filterColor: Int): Int {
+        return Color.parseColor("#ffffff")
+    }
 
-    @ColorInt fun filterUi02DarkContrast(@ColorInt filterColor: Int): Int { return Color.parseColor("#000000") }
+    @ColorInt fun filterUi02DarkContrast(@ColorInt filterColor: Int): Int {
+        return Color.parseColor("#000000")
+    }
 
     @ColorInt fun filterUi03Light(@ColorInt filterColor: Int): Int {
         return ColorUtils.calculateCombinedColor(Color.parseColor("#000000"), ColorUtils.colorWithAlpha(filterColor, 77))
@@ -1150,45 +1356,69 @@ object ThemeColor {
         return ColorUtils.calculateCombinedColor(Color.parseColor("#000000"), ColorUtils.colorWithAlpha(filterColor, 77))
     }
 
-    @ColorInt fun filterUi03Electric(@ColorInt filterColor: Int): Int { return Color.parseColor("#212835") }
+    @ColorInt fun filterUi03Electric(@ColorInt filterColor: Int): Int {
+        return Color.parseColor("#212835")
+    }
 
-    @ColorInt fun filterUi03Indigo(@ColorInt filterColor: Int): Int { return Color.parseColor("#F19D38") }
+    @ColorInt fun filterUi03Indigo(@ColorInt filterColor: Int): Int {
+        return Color.parseColor("#F19D38")
+    }
 
-    @ColorInt fun filterUi03Radioactive(@ColorInt filterColor: Int): Int { return Color.parseColor("#112417") }
+    @ColorInt fun filterUi03Radioactive(@ColorInt filterColor: Int): Int {
+        return Color.parseColor("#112417")
+    }
 
     @ColorInt fun filterUi03Rose(@ColorInt filterColor: Int): Int {
         return ColorUtils.calculateCombinedColor(Color.parseColor("#261316"), ColorUtils.colorWithAlpha(filterColor, 89))
     }
 
-    @ColorInt fun filterUi03LightContrast(@ColorInt filterColor: Int): Int { return Color.parseColor("#000000") }
+    @ColorInt fun filterUi03LightContrast(@ColorInt filterColor: Int): Int {
+        return Color.parseColor("#000000")
+    }
 
-    @ColorInt fun filterUi03DarkContrast(@ColorInt filterColor: Int): Int { return Color.parseColor("#000000") }
+    @ColorInt fun filterUi03DarkContrast(@ColorInt filterColor: Int): Int {
+        return Color.parseColor("#000000")
+    }
 
-    @ColorInt fun filterUi04Light(@ColorInt filterColor: Int): Int { return Color.parseColor("#E0E6EA") }
+    @ColorInt fun filterUi04Light(@ColorInt filterColor: Int): Int {
+        return Color.parseColor("#E0E6EA")
+    }
 
-    @ColorInt fun filterUi04Dark(@ColorInt filterColor: Int): Int { return Color.parseColor("#383A3C") }
+    @ColorInt fun filterUi04Dark(@ColorInt filterColor: Int): Int {
+        return Color.parseColor("#383A3C")
+    }
 
-    @ColorInt fun filterUi04ExtraDark(@ColorInt filterColor: Int): Int { return Color.parseColor("#1A1C1E") }
+    @ColorInt fun filterUi04ExtraDark(@ColorInt filterColor: Int): Int {
+        return Color.parseColor("#1A1C1E")
+    }
 
     @ColorInt fun filterUi04ClassicLight(@ColorInt filterColor: Int): Int {
         return filterColor
     }
 
-    @ColorInt fun filterUi04Electric(@ColorInt filterColor: Int): Int { return Color.parseColor("#2E3A4F") }
+    @ColorInt fun filterUi04Electric(@ColorInt filterColor: Int): Int {
+        return Color.parseColor("#2E3A4F")
+    }
 
     @ColorInt fun filterUi04Indigo(@ColorInt filterColor: Int): Int {
         return filterColor
     }
 
-    @ColorInt fun filterUi04Radioactive(@ColorInt filterColor: Int): Int { return Color.parseColor("#27591a") }
+    @ColorInt fun filterUi04Radioactive(@ColorInt filterColor: Int): Int {
+        return Color.parseColor("#27591a")
+    }
 
     @ColorInt fun filterUi04Rose(@ColorInt filterColor: Int): Int {
         return ColorUtils.calculateCombinedColor(Color.parseColor("#FCEEEB"), ColorUtils.colorWithAlpha(filterColor, 128))
     }
 
-    @ColorInt fun filterUi04LightContrast(@ColorInt filterColor: Int): Int { return Color.parseColor("#bebebe") }
+    @ColorInt fun filterUi04LightContrast(@ColorInt filterColor: Int): Int {
+        return Color.parseColor("#bebebe")
+    }
 
-    @ColorInt fun filterUi04DarkContrast(@ColorInt filterColor: Int): Int { return Color.parseColor("#404040") }
+    @ColorInt fun filterUi04DarkContrast(@ColorInt filterColor: Int): Int {
+        return Color.parseColor("#404040")
+    }
 
     @ColorInt fun filterIcon01Light(@ColorInt filterColor: Int): Int {
         return filterColor
@@ -1202,15 +1432,21 @@ object ThemeColor {
         return filterColor
     }
 
-    @ColorInt fun filterIcon01ClassicLight(@ColorInt filterColor: Int): Int { return Color.parseColor("#FFFFFF") }
+    @ColorInt fun filterIcon01ClassicLight(@ColorInt filterColor: Int): Int {
+        return Color.parseColor("#FFFFFF")
+    }
 
     @ColorInt fun filterIcon01Electric(@ColorInt filterColor: Int): Int {
         return filterColor
     }
 
-    @ColorInt fun filterIcon01Indigo(@ColorInt filterColor: Int): Int { return Color.parseColor("#F4F5F2") }
+    @ColorInt fun filterIcon01Indigo(@ColorInt filterColor: Int): Int {
+        return Color.parseColor("#F4F5F2")
+    }
 
-    @ColorInt fun filterIcon01Radioactive(@ColorInt filterColor: Int): Int { return Color.parseColor("#3fe664") }
+    @ColorInt fun filterIcon01Radioactive(@ColorInt filterColor: Int): Int {
+        return Color.parseColor("#3fe664")
+    }
 
     @ColorInt fun filterIcon01Rose(@ColorInt filterColor: Int): Int {
         return ColorUtils.calculateCombinedColor(Color.parseColor("#401920"), ColorUtils.colorWithAlpha(filterColor, 153))
@@ -1248,7 +1484,9 @@ object ThemeColor {
         return filterColor
     }
 
-    @ColorInt fun filterIcon02Radioactive(@ColorInt filterColor: Int): Int { return Color.parseColor("#3fe664") }
+    @ColorInt fun filterIcon02Radioactive(@ColorInt filterColor: Int): Int {
+        return Color.parseColor("#3fe664")
+    }
 
     @ColorInt fun filterIcon02Rose(@ColorInt filterColor: Int): Int {
         return filterColor
@@ -1274,23 +1512,33 @@ object ThemeColor {
         return filterColor
     }
 
-    @ColorInt fun filterText01ClassicLight(@ColorInt filterColor: Int): Int { return Color.parseColor("#FFFFFF") }
+    @ColorInt fun filterText01ClassicLight(@ColorInt filterColor: Int): Int {
+        return Color.parseColor("#FFFFFF")
+    }
 
     @ColorInt fun filterText01Electric(@ColorInt filterColor: Int): Int {
         return filterColor
     }
 
-    @ColorInt fun filterText01Indigo(@ColorInt filterColor: Int): Int { return Color.parseColor("#E9EAE5") }
+    @ColorInt fun filterText01Indigo(@ColorInt filterColor: Int): Int {
+        return Color.parseColor("#E9EAE5")
+    }
 
-    @ColorInt fun filterText01Radioactive(@ColorInt filterColor: Int): Int { return Color.parseColor("#3fe664") }
+    @ColorInt fun filterText01Radioactive(@ColorInt filterColor: Int): Int {
+        return Color.parseColor("#3fe664")
+    }
 
     @ColorInt fun filterText01Rose(@ColorInt filterColor: Int): Int {
         return ColorUtils.calculateCombinedColor(Color.parseColor("#591F2A"), ColorUtils.colorWithAlpha(filterColor, 102))
     }
 
-    @ColorInt fun filterText01LightContrast(@ColorInt filterColor: Int): Int { return Color.parseColor("#000000") }
+    @ColorInt fun filterText01LightContrast(@ColorInt filterColor: Int): Int {
+        return Color.parseColor("#000000")
+    }
 
-    @ColorInt fun filterText01DarkContrast(@ColorInt filterColor: Int): Int { return Color.parseColor("#FFFFFF") }
+    @ColorInt fun filterText01DarkContrast(@ColorInt filterColor: Int): Int {
+        return Color.parseColor("#FFFFFF")
+    }
 
     @ColorInt fun filterText02Light(@ColorInt filterColor: Int): Int {
         return filterColor
@@ -1312,17 +1560,25 @@ object ThemeColor {
         return filterColor
     }
 
-    @ColorInt fun filterText02Indigo(@ColorInt filterColor: Int): Int { return Color.parseColor("#FFFFFF") }
+    @ColorInt fun filterText02Indigo(@ColorInt filterColor: Int): Int {
+        return Color.parseColor("#FFFFFF")
+    }
 
-    @ColorInt fun filterText02Radioactive(@ColorInt filterColor: Int): Int { return Color.parseColor("#3fe664") }
+    @ColorInt fun filterText02Radioactive(@ColorInt filterColor: Int): Int {
+        return Color.parseColor("#3fe664")
+    }
 
     @ColorInt fun filterText02Rose(@ColorInt filterColor: Int): Int {
         return filterColor
     }
 
-    @ColorInt fun filterText02LightContrast(@ColorInt filterColor: Int): Int { return Color.parseColor("#000000") }
+    @ColorInt fun filterText02LightContrast(@ColorInt filterColor: Int): Int {
+        return Color.parseColor("#000000")
+    }
 
-    @ColorInt fun filterText02DarkContrast(@ColorInt filterColor: Int): Int { return Color.parseColor("#FFFFFF") }
+    @ColorInt fun filterText02DarkContrast(@ColorInt filterColor: Int): Int {
+        return Color.parseColor("#FFFFFF")
+    }
 
     @ColorInt fun filterInteractive01Light(@ColorInt filterColor: Int): Int {
         return filterColor
@@ -1348,7 +1604,9 @@ object ThemeColor {
         return filterColor
     }
 
-    @ColorInt fun filterInteractive01Radioactive(@ColorInt filterColor: Int): Int { return Color.parseColor("#74f864") }
+    @ColorInt fun filterInteractive01Radioactive(@ColorInt filterColor: Int): Int {
+        return Color.parseColor("#74f864")
+    }
 
     @ColorInt fun filterInteractive01Rose(@ColorInt filterColor: Int): Int {
         return filterColor
@@ -1386,7 +1644,9 @@ object ThemeColor {
         return ColorUtils.calculateCombinedColor(Color.parseColor("#FFFFFF"), ColorUtils.colorWithAlpha(filterColor, 191))
     }
 
-    @ColorInt fun filterInteractive01ActiveRadioactive(@ColorInt filterColor: Int): Int { return Color.parseColor("#9FF2B1") }
+    @ColorInt fun filterInteractive01ActiveRadioactive(@ColorInt filterColor: Int): Int {
+        return Color.parseColor("#9FF2B1")
+    }
 
     @ColorInt fun filterInteractive01ActiveRose(@ColorInt filterColor: Int): Int {
         return ColorUtils.calculateCombinedColor(Color.parseColor("#FBEBE8"), ColorUtils.colorWithAlpha(filterColor, 153))
@@ -1400,27 +1660,45 @@ object ThemeColor {
         return filterColor
     }
 
-    @ColorInt fun filterInteractive02Light(@ColorInt filterColor: Int): Int { return Color.parseColor("#FFFFFF") }
+    @ColorInt fun filterInteractive02Light(@ColorInt filterColor: Int): Int {
+        return Color.parseColor("#FFFFFF")
+    }
 
-    @ColorInt fun filterInteractive02Dark(@ColorInt filterColor: Int): Int { return Color.parseColor("#292B2E") }
+    @ColorInt fun filterInteractive02Dark(@ColorInt filterColor: Int): Int {
+        return Color.parseColor("#292B2E")
+    }
 
-    @ColorInt fun filterInteractive02ExtraDark(@ColorInt filterColor: Int): Int { return Color.parseColor("#000000") }
+    @ColorInt fun filterInteractive02ExtraDark(@ColorInt filterColor: Int): Int {
+        return Color.parseColor("#000000")
+    }
 
-    @ColorInt fun filterInteractive02ClassicLight(@ColorInt filterColor: Int): Int { return Color.parseColor("#FFFFFF") }
+    @ColorInt fun filterInteractive02ClassicLight(@ColorInt filterColor: Int): Int {
+        return Color.parseColor("#FFFFFF")
+    }
 
-    @ColorInt fun filterInteractive02Electric(@ColorInt filterColor: Int): Int { return Color.parseColor("#212835") }
+    @ColorInt fun filterInteractive02Electric(@ColorInt filterColor: Int): Int {
+        return Color.parseColor("#212835")
+    }
 
-    @ColorInt fun filterInteractive02Indigo(@ColorInt filterColor: Int): Int { return Color.parseColor("#FFFFFF") }
+    @ColorInt fun filterInteractive02Indigo(@ColorInt filterColor: Int): Int {
+        return Color.parseColor("#FFFFFF")
+    }
 
-    @ColorInt fun filterInteractive02Radioactive(@ColorInt filterColor: Int): Int { return Color.parseColor("#0B0D0F") }
+    @ColorInt fun filterInteractive02Radioactive(@ColorInt filterColor: Int): Int {
+        return Color.parseColor("#0B0D0F")
+    }
 
     @ColorInt fun filterInteractive02Rose(@ColorInt filterColor: Int): Int {
         return ColorUtils.calculateCombinedColor(Color.parseColor("#FCF3F0"), ColorUtils.colorWithAlpha(filterColor, 26))
     }
 
-    @ColorInt fun filterInteractive02LightContrast(@ColorInt filterColor: Int): Int { return Color.parseColor("#ffffff") }
+    @ColorInt fun filterInteractive02LightContrast(@ColorInt filterColor: Int): Int {
+        return Color.parseColor("#ffffff")
+    }
 
-    @ColorInt fun filterInteractive02DarkContrast(@ColorInt filterColor: Int): Int { return Color.parseColor("#000000") }
+    @ColorInt fun filterInteractive02DarkContrast(@ColorInt filterColor: Int): Int {
+        return Color.parseColor("#000000")
+    }
 
     @ColorInt fun filterInteractive03Light(@ColorInt filterColor: Int): Int {
         return filterColor
@@ -1434,23 +1712,33 @@ object ThemeColor {
         return filterColor
     }
 
-    @ColorInt fun filterInteractive03ClassicLight(@ColorInt filterColor: Int): Int { return Color.parseColor("#FFFFFF") }
+    @ColorInt fun filterInteractive03ClassicLight(@ColorInt filterColor: Int): Int {
+        return Color.parseColor("#FFFFFF")
+    }
 
     @ColorInt fun filterInteractive03Electric(@ColorInt filterColor: Int): Int {
         return filterColor
     }
 
-    @ColorInt fun filterInteractive03Indigo(@ColorInt filterColor: Int): Int { return Color.parseColor("#F3F1E4") }
+    @ColorInt fun filterInteractive03Indigo(@ColorInt filterColor: Int): Int {
+        return Color.parseColor("#F3F1E4")
+    }
 
-    @ColorInt fun filterInteractive03Radioactive(@ColorInt filterColor: Int): Int { return Color.parseColor("#70e84e") }
+    @ColorInt fun filterInteractive03Radioactive(@ColorInt filterColor: Int): Int {
+        return Color.parseColor("#70e84e")
+    }
 
     @ColorInt fun filterInteractive03Rose(@ColorInt filterColor: Int): Int {
         return ColorUtils.calculateCombinedColor(Color.parseColor("#732836"), ColorUtils.colorWithAlpha(filterColor, 153))
     }
 
-    @ColorInt fun filterInteractive03LightContrast(@ColorInt filterColor: Int): Int { return Color.parseColor("#000000") }
+    @ColorInt fun filterInteractive03LightContrast(@ColorInt filterColor: Int): Int {
+        return Color.parseColor("#000000")
+    }
 
-    @ColorInt fun filterInteractive03DarkContrast(@ColorInt filterColor: Int): Int { return Color.parseColor("#ffffff") }
+    @ColorInt fun filterInteractive03DarkContrast(@ColorInt filterColor: Int): Int {
+        return Color.parseColor("#ffffff")
+    }
 
     @ColorInt fun filterInteractive03ActiveLight(@ColorInt filterColor: Int): Int {
         return ColorUtils.calculateCombinedColor(Color.parseColor("#FFFFFF"), ColorUtils.colorWithAlpha(filterColor, 153))
@@ -1464,15 +1752,21 @@ object ThemeColor {
         return ColorUtils.calculateCombinedColor(Color.parseColor("#FFFFFF"), ColorUtils.colorWithAlpha(filterColor, 204))
     }
 
-    @ColorInt fun filterInteractive03ActiveClassicLight(@ColorInt filterColor: Int): Int { return Color.parseColor("#FFFFFF") }
+    @ColorInt fun filterInteractive03ActiveClassicLight(@ColorInt filterColor: Int): Int {
+        return Color.parseColor("#FFFFFF")
+    }
 
     @ColorInt fun filterInteractive03ActiveElectric(@ColorInt filterColor: Int): Int {
         return ColorUtils.calculateCombinedColor(Color.parseColor("#FFFFFF"), ColorUtils.colorWithAlpha(filterColor, 128))
     }
 
-    @ColorInt fun filterInteractive03ActiveIndigo(@ColorInt filterColor: Int): Int { return Color.parseColor("#F3F1E4") }
+    @ColorInt fun filterInteractive03ActiveIndigo(@ColorInt filterColor: Int): Int {
+        return Color.parseColor("#F3F1E4")
+    }
 
-    @ColorInt fun filterInteractive03ActiveRadioactive(@ColorInt filterColor: Int): Int { return Color.parseColor("#9ff2b1") }
+    @ColorInt fun filterInteractive03ActiveRadioactive(@ColorInt filterColor: Int): Int {
+        return Color.parseColor("#9ff2b1")
+    }
 
     @ColorInt fun filterInteractive03ActiveRose(@ColorInt filterColor: Int): Int {
         return ColorUtils.calculateCombinedColor(Color.parseColor("#401920"), ColorUtils.colorWithAlpha(filterColor, 230))
@@ -1486,79 +1780,125 @@ object ThemeColor {
         return filterColor
     }
 
-    @ColorInt fun filterInteractive04Light(@ColorInt filterColor: Int): Int { return Color.parseColor("#FFFFFF") }
+    @ColorInt fun filterInteractive04Light(@ColorInt filterColor: Int): Int {
+        return Color.parseColor("#FFFFFF")
+    }
 
-    @ColorInt fun filterInteractive04Dark(@ColorInt filterColor: Int): Int { return Color.parseColor("#292B2E") }
+    @ColorInt fun filterInteractive04Dark(@ColorInt filterColor: Int): Int {
+        return Color.parseColor("#292B2E")
+    }
 
-    @ColorInt fun filterInteractive04ExtraDark(@ColorInt filterColor: Int): Int { return Color.parseColor("#000000") }
+    @ColorInt fun filterInteractive04ExtraDark(@ColorInt filterColor: Int): Int {
+        return Color.parseColor("#000000")
+    }
 
     @ColorInt fun filterInteractive04ClassicLight(@ColorInt filterColor: Int): Int {
         return filterColor
     }
 
-    @ColorInt fun filterInteractive04Electric(@ColorInt filterColor: Int): Int { return Color.parseColor("#212835") }
+    @ColorInt fun filterInteractive04Electric(@ColorInt filterColor: Int): Int {
+        return Color.parseColor("#212835")
+    }
 
     @ColorInt fun filterInteractive04Indigo(@ColorInt filterColor: Int): Int {
         return filterColor
     }
 
-    @ColorInt fun filterInteractive04Radioactive(@ColorInt filterColor: Int): Int { return Color.parseColor("#0B0D0F") }
+    @ColorInt fun filterInteractive04Radioactive(@ColorInt filterColor: Int): Int {
+        return Color.parseColor("#0B0D0F")
+    }
 
     @ColorInt fun filterInteractive04Rose(@ColorInt filterColor: Int): Int {
         return ColorUtils.calculateCombinedColor(Color.parseColor("#FBEBE8"), ColorUtils.colorWithAlpha(filterColor, 51))
     }
 
-    @ColorInt fun filterInteractive04LightContrast(@ColorInt filterColor: Int): Int { return Color.parseColor("#ffffff") }
+    @ColorInt fun filterInteractive04LightContrast(@ColorInt filterColor: Int): Int {
+        return Color.parseColor("#ffffff")
+    }
 
-    @ColorInt fun filterInteractive04DarkContrast(@ColorInt filterColor: Int): Int { return Color.parseColor("#000000") }
+    @ColorInt fun filterInteractive04DarkContrast(@ColorInt filterColor: Int): Int {
+        return Color.parseColor("#000000")
+    }
 
-    @ColorInt fun filterInteractive05Light(@ColorInt filterColor: Int): Int { return Color.parseColor("#686C74") }
+    @ColorInt fun filterInteractive05Light(@ColorInt filterColor: Int): Int {
+        return Color.parseColor("#686C74")
+    }
 
-    @ColorInt fun filterInteractive05Dark(@ColorInt filterColor: Int): Int { return Color.parseColor("#686C74") }
+    @ColorInt fun filterInteractive05Dark(@ColorInt filterColor: Int): Int {
+        return Color.parseColor("#686C74")
+    }
 
-    @ColorInt fun filterInteractive05ExtraDark(@ColorInt filterColor: Int): Int { return Color.parseColor("#686C74") }
+    @ColorInt fun filterInteractive05ExtraDark(@ColorInt filterColor: Int): Int {
+        return Color.parseColor("#686C74")
+    }
 
-    @ColorInt fun filterInteractive05ClassicLight(@ColorInt filterColor: Int): Int { return Color.parseColor("#FFFFFF") }
+    @ColorInt fun filterInteractive05ClassicLight(@ColorInt filterColor: Int): Int {
+        return Color.parseColor("#FFFFFF")
+    }
 
     @ColorInt fun filterInteractive05Electric(@ColorInt filterColor: Int): Int {
         return filterColor
     }
 
-    @ColorInt fun filterInteractive05Indigo(@ColorInt filterColor: Int): Int { return Color.parseColor("#ECEDE6") }
+    @ColorInt fun filterInteractive05Indigo(@ColorInt filterColor: Int): Int {
+        return Color.parseColor("#ECEDE6")
+    }
 
-    @ColorInt fun filterInteractive05Radioactive(@ColorInt filterColor: Int): Int { return Color.parseColor("#70e84e") }
+    @ColorInt fun filterInteractive05Radioactive(@ColorInt filterColor: Int): Int {
+        return Color.parseColor("#70e84e")
+    }
 
     @ColorInt fun filterInteractive05Rose(@ColorInt filterColor: Int): Int {
         return ColorUtils.calculateCombinedColor(Color.parseColor("#401920"), ColorUtils.colorWithAlpha(filterColor, 77))
     }
 
-    @ColorInt fun filterInteractive05LightContrast(@ColorInt filterColor: Int): Int { return Color.parseColor("#000000") }
+    @ColorInt fun filterInteractive05LightContrast(@ColorInt filterColor: Int): Int {
+        return Color.parseColor("#000000")
+    }
 
-    @ColorInt fun filterInteractive05DarkContrast(@ColorInt filterColor: Int): Int { return Color.parseColor("#ffffff") }
+    @ColorInt fun filterInteractive05DarkContrast(@ColorInt filterColor: Int): Int {
+        return Color.parseColor("#ffffff")
+    }
 
-    @ColorInt fun filterInteractive06Light(@ColorInt filterColor: Int): Int { return Color.parseColor("#686C74") }
+    @ColorInt fun filterInteractive06Light(@ColorInt filterColor: Int): Int {
+        return Color.parseColor("#686C74")
+    }
 
-    @ColorInt fun filterInteractive06Dark(@ColorInt filterColor: Int): Int { return Color.parseColor("#686C74") }
+    @ColorInt fun filterInteractive06Dark(@ColorInt filterColor: Int): Int {
+        return Color.parseColor("#686C74")
+    }
 
-    @ColorInt fun filterInteractive06ExtraDark(@ColorInt filterColor: Int): Int { return Color.parseColor("#686C75") }
+    @ColorInt fun filterInteractive06ExtraDark(@ColorInt filterColor: Int): Int {
+        return Color.parseColor("#686C75")
+    }
 
-    @ColorInt fun filterInteractive06ClassicLight(@ColorInt filterColor: Int): Int { return Color.parseColor("#686C74") }
+    @ColorInt fun filterInteractive06ClassicLight(@ColorInt filterColor: Int): Int {
+        return Color.parseColor("#686C74")
+    }
 
     @ColorInt fun filterInteractive06Electric(@ColorInt filterColor: Int): Int {
         return filterColor
     }
 
-    @ColorInt fun filterInteractive06Indigo(@ColorInt filterColor: Int): Int { return Color.parseColor("#7C839E") }
+    @ColorInt fun filterInteractive06Indigo(@ColorInt filterColor: Int): Int {
+        return Color.parseColor("#7C839E")
+    }
 
-    @ColorInt fun filterInteractive06Radioactive(@ColorInt filterColor: Int): Int { return Color.parseColor("#70e84e") }
+    @ColorInt fun filterInteractive06Radioactive(@ColorInt filterColor: Int): Int {
+        return Color.parseColor("#70e84e")
+    }
 
     @ColorInt fun filterInteractive06Rose(@ColorInt filterColor: Int): Int {
         return ColorUtils.calculateCombinedColor(Color.parseColor("#401920"), ColorUtils.colorWithAlpha(filterColor, 230))
     }
 
-    @ColorInt fun filterInteractive06LightContrast(@ColorInt filterColor: Int): Int { return Color.parseColor("#000001") }
+    @ColorInt fun filterInteractive06LightContrast(@ColorInt filterColor: Int): Int {
+        return Color.parseColor("#000001")
+    }
 
-    @ColorInt fun filterInteractive06DarkContrast(@ColorInt filterColor: Int): Int { return Color.parseColor("#ffffff") }
+    @ColorInt fun filterInteractive06DarkContrast(@ColorInt filterColor: Int): Int {
+        return Color.parseColor("#ffffff")
+    }
 
     val support01Light = Color.parseColor("#03A9F4")
     val support01Dark = Color.parseColor("#33B8F4")
@@ -1669,27 +2009,37 @@ object ThemeColor {
         return ColorUtils.calculateCombinedColor(Color.parseColor("#000000"), ColorUtils.colorWithAlpha(podcastColor, 51))
     }
 
-    @ColorInt fun playerBackground01ExtraDark(@ColorInt podcastColor: Int): Int { return Color.parseColor("#000000") }
+    @ColorInt fun playerBackground01ExtraDark(@ColorInt podcastColor: Int): Int {
+        return Color.parseColor("#000000")
+    }
 
     @ColorInt fun playerBackground01ClassicLight(@ColorInt podcastColor: Int): Int {
         return ColorUtils.calculateCombinedColor(Color.parseColor("#000000"), ColorUtils.colorWithAlpha(podcastColor, 51))
     }
 
-    @ColorInt fun playerBackground01Electric(@ColorInt podcastColor: Int): Int { return Color.parseColor("#152431") }
+    @ColorInt fun playerBackground01Electric(@ColorInt podcastColor: Int): Int {
+        return Color.parseColor("#152431")
+    }
 
     @ColorInt fun playerBackground01Indigo(@ColorInt podcastColor: Int): Int {
         return ColorUtils.calculateCombinedColor(Color.parseColor("#17181F"), ColorUtils.colorWithAlpha(podcastColor, 20))
     }
 
-    @ColorInt fun playerBackground01Radioactive(@ColorInt podcastColor: Int): Int { return Color.parseColor("#162f1e") }
+    @ColorInt fun playerBackground01Radioactive(@ColorInt podcastColor: Int): Int {
+        return Color.parseColor("#162f1e")
+    }
 
     @ColorInt fun playerBackground01Rose(@ColorInt podcastColor: Int): Int {
         return ColorUtils.calculateCombinedColor(Color.parseColor("#260006"), ColorUtils.colorWithAlpha(podcastColor, 38))
     }
 
-    @ColorInt fun playerBackground01LightContrast(@ColorInt podcastColor: Int): Int { return Color.parseColor("#000000") }
+    @ColorInt fun playerBackground01LightContrast(@ColorInt podcastColor: Int): Int {
+        return Color.parseColor("#000000")
+    }
 
-    @ColorInt fun playerBackground01DarkContrast(@ColorInt podcastColor: Int): Int { return Color.parseColor("#000000") }
+    @ColorInt fun playerBackground01DarkContrast(@ColorInt podcastColor: Int): Int {
+        return Color.parseColor("#000000")
+    }
 
     @ColorInt fun playerBackground02Light(@ColorInt podcastColor: Int): Int {
         return ColorUtils.calculateCombinedColor(Color.parseColor("#000000"), ColorUtils.colorWithAlpha(podcastColor, 77))
@@ -1699,27 +2049,37 @@ object ThemeColor {
         return ColorUtils.calculateCombinedColor(Color.parseColor("#000000"), ColorUtils.colorWithAlpha(podcastColor, 77))
     }
 
-    @ColorInt fun playerBackground02ExtraDark(@ColorInt podcastColor: Int): Int { return Color.parseColor("#1A1A1A") }
+    @ColorInt fun playerBackground02ExtraDark(@ColorInt podcastColor: Int): Int {
+        return Color.parseColor("#1A1A1A")
+    }
 
     @ColorInt fun playerBackground02ClassicLight(@ColorInt podcastColor: Int): Int {
         return ColorUtils.calculateCombinedColor(Color.parseColor("#000000"), ColorUtils.colorWithAlpha(podcastColor, 77))
     }
 
-    @ColorInt fun playerBackground02Electric(@ColorInt podcastColor: Int): Int { return Color.parseColor("#18334A") }
+    @ColorInt fun playerBackground02Electric(@ColorInt podcastColor: Int): Int {
+        return Color.parseColor("#18334A")
+    }
 
     @ColorInt fun playerBackground02Indigo(@ColorInt podcastColor: Int): Int {
         return ColorUtils.calculateCombinedColor(Color.parseColor("#17181F"), ColorUtils.colorWithAlpha(podcastColor, 41))
     }
 
-    @ColorInt fun playerBackground02Radioactive(@ColorInt podcastColor: Int): Int { return Color.parseColor("#19451F") }
+    @ColorInt fun playerBackground02Radioactive(@ColorInt podcastColor: Int): Int {
+        return Color.parseColor("#19451F")
+    }
 
     @ColorInt fun playerBackground02Rose(@ColorInt podcastColor: Int): Int {
         return ColorUtils.calculateCombinedColor(Color.parseColor("#3B060E"), ColorUtils.colorWithAlpha(podcastColor, 56))
     }
 
-    @ColorInt fun playerBackground02LightContrast(@ColorInt podcastColor: Int): Int { return Color.parseColor("#000000") }
+    @ColorInt fun playerBackground02LightContrast(@ColorInt podcastColor: Int): Int {
+        return Color.parseColor("#000000")
+    }
 
-    @ColorInt fun playerBackground02DarkContrast(@ColorInt podcastColor: Int): Int { return Color.parseColor("#1B1B1B") }
+    @ColorInt fun playerBackground02DarkContrast(@ColorInt podcastColor: Int): Int {
+        return Color.parseColor("#1B1B1B")
+    }
 
     @ColorInt fun playerHighlight01Light(@ColorInt podcastColor: Int): Int {
         return podcastColor
@@ -1745,7 +2105,9 @@ object ThemeColor {
         return ColorUtils.colorWithAlpha(podcastColor, 204)
     }
 
-    @ColorInt fun playerHighlight01Radioactive(@ColorInt podcastColor: Int): Int { return Color.parseColor("#A5FF8C") }
+    @ColorInt fun playerHighlight01Radioactive(@ColorInt podcastColor: Int): Int {
+        return Color.parseColor("#A5FF8C")
+    }
 
     @ColorInt fun playerHighlight01Rose(@ColorInt podcastColor: Int): Int {
         return ColorUtils.colorWithAlpha(podcastColor, 237)

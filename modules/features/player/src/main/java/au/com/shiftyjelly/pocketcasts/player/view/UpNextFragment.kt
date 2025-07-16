@@ -223,7 +223,7 @@ class UpNextFragment :
                         modifier = Modifier.verticalScroll(rememberScrollState()),
                     ) {
                         UpNextNoContentBanner(
-                            onDiscoverTapped = ::onDiscoverTapped,
+                            onDiscoverClick = ::onDiscoverTapped,
                             modifier = Modifier.padding(vertical = 24.dp),
                         )
                     }
@@ -425,8 +425,8 @@ class UpNextFragment :
         }
     }
 
-    private fun isEmbeddedExpanded() =
-        isEmbedded && (parentFragment as? PlayerContainerFragment)?.upNextBottomSheetBehavior?.state == BottomSheetBehavior.STATE_EXPANDED
+    private fun isEmbeddedExpanded() = isEmbedded &&
+        (parentFragment as? PlayerContainerFragment)?.upNextBottomSheetBehavior?.state == BottomSheetBehavior.STATE_EXPANDED
 
     override fun onClearUpNext() {
         playerViewModel.clearUpNext(context = requireContext(), upNextSource = upNextSource)

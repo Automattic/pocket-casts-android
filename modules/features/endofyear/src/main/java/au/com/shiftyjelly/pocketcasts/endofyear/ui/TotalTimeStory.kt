@@ -148,7 +148,7 @@ private data class ListeningTimeTexts(
     val subtitle: String,
 )
 
-@Preview(device = Devices.PortraitRegular)
+@Preview(device = Devices.PORTRAIT_REGULAR)
 @Composable
 private fun TotalTimePreview(
     @PreviewParameter(PlaybackTimeProvider::class) duration: Duration,

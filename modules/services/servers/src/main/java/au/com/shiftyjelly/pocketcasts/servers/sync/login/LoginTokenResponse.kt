@@ -7,11 +7,11 @@ import com.squareup.moshi.JsonClass
 
 @JsonClass(generateAdapter = true)
 data class LoginTokenResponse(
-    @field:Json(name = "email") val email: String,
-    @field:Json(name = "uuid") val uuid: String,
-    @field:Json(name = "isNew") val isNew: Boolean,
-    @field:Json(name = "accessToken") val accessToken: AccessToken,
-    @field:Json(name = "refreshToken") val refreshToken: RefreshToken,
-    @field:Json(name = "tokenType") val tokenType: String,
-    @field:Json(name = "expiresIn") val expiresIn: Int,
+    @Json(name = "email") val email: String,
+    @Json(name = "uuid") val uuid: String,
+    @Json(name = "isNew") val isNew: Boolean,
+    @Json(name = "accessToken") val accessToken: AccessToken,
+    @Json(name = "refreshToken") val refreshToken: RefreshToken,
+    @Json(name = "tokenType") val tokenType: String,
+    @Json(name = "expiresIn") val expiresIn: Int,
 )

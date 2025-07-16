@@ -5,11 +5,11 @@ import com.squareup.moshi.JsonClass
 
 @JsonClass(generateAdapter = true)
 data class EpisodeSyncRequest(
-    @field:Json(name = "uuid") val uuid: String,
-    @field:Json(name = "podcast") val podcast: String,
-    @field:Json(name = "position") val position: Long,
-    @field:Json(name = "duration") val duration: Long,
-    @field:Json(name = "status") val status: Int,
+    @Json(name = "uuid") val uuid: String,
+    @Json(name = "podcast") val podcast: String,
+    @Json(name = "position") val position: Long,
+    @Json(name = "duration") val duration: Long,
+    @Json(name = "status") val status: Int,
 ) {
     companion object {
         const val STATUS_UNPLAYED = 1

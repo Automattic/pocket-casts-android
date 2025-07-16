@@ -11,8 +11,8 @@ interface UpgradeFeatureItem {
     @get:DrawableRes
     val image: Int
 
-    @get:StringRes
-    val title: Int
+    @StringRes
+    fun title(): Int
 
     val isYearlyFeature: Boolean
 
@@ -21,57 +21,95 @@ interface UpgradeFeatureItem {
 
 enum class PlusUpgradeFeatureItem(
     override val image: Int,
-    override val title: Int,
 ) : UpgradeFeatureItem {
     BannerAds(
         image = IR.drawable.ic_remove_ads,
-        title = LR.string.onboarding_plus_feature_no_banner_ads,
     ) {
         override val isYearlyFeature get() = FeatureFlag.isEnabled(Feature.BANNER_ADS)
         override val isMonthlyFeature get() = FeatureFlag.isEnabled(Feature.BANNER_ADS)
+        override fun title() = LR.string.onboarding_plus_feature_no_banner_ads
     },
     Folders(
         image = IR.drawable.ic_plus_feature_folder,
-        title = LR.string.onboarding_plus_feature_folders_title,
-    ),
+    ) {
+        override fun title() = if (FeatureFlag.isEnabled(Feature.NEW_ONBOARDING_UPGRADE)) {
+            LR.string.onboarding_upgrade_features_folders
+        } else {
+            LR.string.onboarding_plus_feature_folders_title
+        }
+    },
     UpNextShuffle(
         image = IR.drawable.ic_plus_feature_shuffle,
-        title = LR.string.onboarding_plus_feature_up_next_shuffle_title,
-    ),
+    ) {
+        override fun title() = if (FeatureFlag.isEnabled(Feature.NEW_ONBOARDING_UPGRADE)) {
+            LR.string.onboarding_upgrade_features_shuffle
+        } else {
+            LR.string.onboarding_plus_feature_up_next_shuffle_title
+        }
+    },
     Bookmarks(
         image = IR.drawable.ic_plus_feature_bookmark,
-        title = LR.string.onboarding_plus_feature_bookmarks_title,
-    ),
+    ) {
+        override fun title() = if (FeatureFlag.isEnabled(Feature.NEW_ONBOARDING_UPGRADE)) {
+            LR.string.onboarding_upgrade_features_bookmarks
+        } else {
+            LR.string.onboarding_plus_feature_bookmarks_title
+        }
+    },
     SkipChapters(
         image = IR.drawable.ic_plus_feature_chapters,
-        title = LR.string.onboarding_plus_feature_chapters_title,
-    ),
+    ) {
+        override fun title() = if (FeatureFlag.isEnabled(Feature.NEW_ONBOARDING_UPGRADE)) {
+            LR.string.onboarding_upgrade_features_chapters
+        } else {
+            LR.string.onboarding_plus_feature_chapters_title
+        }
+    },
     CloudStorage(
         image = IR.drawable.ic_plus_feature_cloud_storage,
-        title = LR.string.onboarding_plus_feature_cloud_storage_title,
-    ),
+    ) {
+        override fun title() = if (FeatureFlag.isEnabled(Feature.NEW_ONBOARDING_UPGRADE)) {
+            LR.string.onboarding_upgrade_features_files
+        } else {
+            LR.string.onboarding_plus_feature_cloud_storage_title
+        }
+    },
     WatchPlayback(
         image = IR.drawable.ic_plus_feature_wearable,
-        title = LR.string.onboarding_plus_feature_watch_playback,
-    ),
+    ) {
+        override fun title() = if (FeatureFlag.isEnabled(Feature.NEW_ONBOARDING_UPGRADE)) {
+            LR.string.onboarding_upgrade_features_wear
+        } else {
+            LR.string.onboarding_plus_feature_watch_playback
+        }
+    },
     ThemesIcons(
         image = IR.drawable.ic_plus_feature_themes,
-        title = LR.string.onboarding_plus_feature_extra_themes_icons_title,
-    ),
+    ) {
+        override fun title() = if (FeatureFlag.isEnabled(Feature.NEW_ONBOARDING_UPGRADE)) {
+            LR.string.onboarding_upgrade_features_themes
+        } else {
+            LR.string.onboarding_plus_feature_extra_themes_icons_title
+        }
+    },
     SlumberStudiosPromo(
         image = IR.drawable.ic_plus_feature_slumber_studios,
-        title = LR.string.onboarding_plus_feature_slumber_studios_title,
     ) {
         override val isMonthlyFeature get() = false
         override val isYearlyFeature get() = FeatureFlag.isEnabled(Feature.SLUMBER_STUDIOS_YEARLY_PROMO)
+        override fun title() = if (FeatureFlag.isEnabled(Feature.NEW_ONBOARDING_UPGRADE)) {
+            LR.string.onboarding_upgrade_features_slumber
+        } else {
+            LR.string.onboarding_plus_feature_slumber_studios_title
+        }
     },
     LibroFm(
         image = IR.drawable.ic_plus_feature_libro,
-        title = LR.string.onboarding_plus_feature_libro_title,
     ) {
 
         override val isYearlyFeature get() = FeatureFlag.isEnabled(Feature.LIBRO_FM)
         override val isMonthlyFeature get() = FeatureFlag.isEnabled(Feature.LIBRO_FM)
+        override fun title() = LR.string.onboarding_plus_feature_libro_title
     },
     ;
 
@@ -81,32 +119,37 @@ enum class PlusUpgradeFeatureItem(
 
 enum class PatronUpgradeFeatureItem(
     override val image: Int,
-    override val title: Int,
 ) : UpgradeFeatureItem {
     EverythingInPlus(
         image = IR.drawable.ic_check,
-        title = LR.string.onboarding_patron_feature_everything_in_plus_title,
-    ),
+    ) {
+        override fun title() = LR.string.onboarding_patron_feature_everything_in_plus_title
+    },
     EarlyAccess(
         image = IR.drawable.ic_new_features,
-        title = LR.string.onboarding_patron_feature_early_access_title,
-    ),
+    ) {
+        override fun title() = LR.string.onboarding_patron_feature_early_access_title
+    },
     CloudStorage(
         image = IR.drawable.ic_cloud_storage,
-        title = LR.string.onboarding_patron_feature_cloud_storage_title,
-    ),
+    ) {
+        override fun title() = LR.string.onboarding_patron_feature_cloud_storage_title
+    },
     ProfileBadge(
         image = IR.drawable.ic_profile_badge,
-        title = LR.string.onboarding_patron_feature_profile_badge_title,
-    ),
+    ) {
+        override fun title() = LR.string.onboarding_patron_feature_profile_badge_title
+    },
     SpecialIcons(
         image = IR.drawable.ic_icons,
-        title = LR.string.onboarding_patron_feature_special_icons_title,
-    ),
+    ) {
+        override fun title() = LR.string.onboarding_patron_feature_special_icons_title
+    },
     UndyingGratitude(
         image = IR.drawable.ic_heart,
-        title = LR.string.onboarding_patron_feature_gratitude_title,
-    ),
+    ) {
+        override fun title() = LR.string.onboarding_patron_feature_gratitude_title
+    },
     ;
 
     override val isYearlyFeature get() = true

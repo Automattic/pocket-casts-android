@@ -24,8 +24,8 @@ internal class OpmlUrlReader {
     private fun String.splitOutlineTags() = split("<outline")
 
     private fun String.readXmlUrlAttribute(): String? {
-        val attributeString = substringAfter(XmlUrlAttribute, missingDelimiterValue = NoValueToken)
-        if (attributeString === NoValueToken) {
+        val attributeString = substringAfter(XML_URL_ATTRIBUTE, missingDelimiterValue = NO_VALUE_TOKEN)
+        if (attributeString === NO_VALUE_TOKEN) {
             return null
         }
 
@@ -50,8 +50,8 @@ internal class OpmlUrlReader {
     }
 
     private companion object {
-        const val XmlUrlAttribute = "xmlUrl="
-        const val NoValueToken = "NoValue"
+        const val XML_URL_ATTRIBUTE = "xmlUrl="
+        const val NO_VALUE_TOKEN = "NoValue"
 
         val entitiesToChars = mapOf(
             "&lt;" to "<",

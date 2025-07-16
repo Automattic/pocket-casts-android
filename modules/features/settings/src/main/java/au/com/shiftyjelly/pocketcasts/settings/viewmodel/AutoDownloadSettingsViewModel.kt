@@ -23,7 +23,8 @@ class AutoDownloadSettingsViewModel @Inject constructor(
     private val downloadManager: DownloadManager,
     private val podcastManager: PodcastManager,
     private val settings: Settings,
-) : ViewModel(), CoroutineScope {
+) : ViewModel(),
+    CoroutineScope {
 
     override val coroutineContext = Dispatchers.Default
     private var isFragmentChangingConfigurations: Boolean = false

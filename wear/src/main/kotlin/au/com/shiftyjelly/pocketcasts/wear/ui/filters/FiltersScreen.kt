@@ -24,15 +24,15 @@ import com.google.android.horologist.compose.layout.ScalingLazyColumnState
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 object FiltersScreen {
-    const val route = "filters_screen"
+    const val ROUTE = "filters_screen"
 }
 
 @Composable
 fun FiltersScreen(
+    columnState: ScalingLazyColumnState,
     onFilterTap: (String) -> Unit,
     modifier: Modifier = Modifier,
     viewModel: FiltersViewModel = hiltViewModel(),
-    columnState: ScalingLazyColumnState,
 ) {
     val uiState by viewModel.uiState.collectAsState()
     when (val state = uiState) { // the state needs to be immutable or the following error will happen 'Smart cast is impossible'
@@ -48,10 +48,10 @@ fun FiltersScreen(
 
 @Composable
 private fun Content(
+    columnState: ScalingLazyColumnState,
     filters: List<Playlist>,
     onFilterTap: (String) -> Unit,
     modifier: Modifier = Modifier,
-    columnState: ScalingLazyColumnState,
 ) {
     ScalingLazyColumn(
         modifier = modifier.fillMaxWidth(),

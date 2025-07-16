@@ -127,7 +127,8 @@ class UserEpisodeManagerImpl @Inject constructor(
     val downloadManager: DownloadManager,
     @ApplicationContext val context: Context,
     val episodeAnalytics: EpisodeAnalytics,
-) : UserEpisodeManager, CoroutineScope {
+) : UserEpisodeManager,
+    CoroutineScope {
     override val coroutineContext: CoroutineContext
         get() = Dispatchers.IO
 
@@ -486,8 +487,7 @@ class UserEpisodeManagerImpl @Inject constructor(
             )
     }
 
-    override fun uploadImageToServerRxCompletable(userEpisode: UserEpisode, imageFile: File): Completable =
-        syncManager.uploadImageToServerRxCompletable(userEpisode, imageFile)
+    override fun uploadImageToServerRxCompletable(userEpisode: UserEpisode, imageFile: File): Completable = syncManager.uploadImageToServerRxCompletable(userEpisode, imageFile)
 
     override fun cancelUpload(userEpisode: UserEpisode) {
         if (userEpisode.uploadTaskId == null) return

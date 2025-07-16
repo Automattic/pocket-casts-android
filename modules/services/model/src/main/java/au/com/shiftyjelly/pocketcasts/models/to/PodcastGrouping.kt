@@ -110,8 +110,7 @@ sealed class PodcastGrouping(
             return list
         }
 
-        private fun getSeasonGroupId(firstEpisode: PodcastEpisode) =
-            firstEpisode.season?.toInt()?.takeIf { season -> season > 0 } ?: 0
+        private fun getSeasonGroupId(firstEpisode: PodcastEpisode) = firstEpisode.season?.toInt()?.takeIf { season -> season > 0 } ?: 0
     }
 
     data object Starred : PodcastGrouping(

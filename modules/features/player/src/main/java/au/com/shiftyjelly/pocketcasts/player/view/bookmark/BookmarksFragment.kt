@@ -132,7 +132,7 @@ class BookmarksFragment : BaseFragment() {
                         sourceView = sourceView,
                         bookmarksViewModel = bookmarksViewModel,
                         multiSelectHelper = bookmarksViewModel.multiSelectHelper,
-                        onRowLongPressed = { bookmark ->
+                        onRowLongClick = { bookmark ->
                             bookmarksViewModel.multiSelectHelper.defaultLongPress(
                                 multiSelectable = bookmark,
                                 fragmentManager = childFragmentManager,
@@ -141,7 +141,7 @@ class BookmarksFragment : BaseFragment() {
                         },
                         onShareBookmarkClick = ::onShareBookmarkClick,
                         onEditBookmarkClick = ::onEditBookmarkClick,
-                        onUpgradeClicked = ::onUpgradeClicked,
+                        onUpgradeClick = ::onUpgradeClicked,
                         showOptionsDialog = { showOptionsDialog(it) },
                         openFragment = { fragment ->
                             val bottomSheet = (parentFragment as? BottomSheetDialogFragment)
@@ -154,10 +154,10 @@ class BookmarksFragment : BaseFragment() {
                                 addFragment(fragment)
                             }
                         },
-                        onSearchBarClearButtonTapped = {
+                        onSearchBarClearButtonClick = {
                             bookmarksViewModel.searchBarClearButtonTapped()
                         },
-                        onHeadphoneControlsButtonTapped = {
+                        onHeadphoneControlsButtonClick = {
                             bookmarksViewModel.onHeadphoneControlsButtonTapped()
                         },
                         bottomInset = when {

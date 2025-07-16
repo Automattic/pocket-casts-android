@@ -200,7 +200,8 @@ abstract class MultiSelectHelper<T> : CoroutineScope {
         coordinatorLayout?.let {
             val snackbar = Snackbar.make(it, snackText, Snackbar.LENGTH_LONG)
             snackbar.show()
-        } ?: run { // If we don't have a coordinator layout, fallback to a toast
+        } ?: run {
+            // If we don't have a coordinator layout, fallback to a toast
             context?.let { context ->
                 Toast.makeText(context, snackText, Toast.LENGTH_SHORT).show()
             }

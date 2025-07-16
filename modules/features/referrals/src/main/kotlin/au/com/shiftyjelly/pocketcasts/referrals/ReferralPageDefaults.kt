@@ -13,5 +13,5 @@ object ReferralPageDefaults {
 
     fun pageCornerRadius(showFullScreen: Boolean) = if (showFullScreen) 0.dp else 8.dp
 
-    const val pageWidthPercent = 0.5
+    const val PAGE_WIDTH_PERCENT = 0.5
 }

@@ -28,7 +28,8 @@ class ShiftyAudioRendererV2(
     eventHandler: Handler?,
     eventListener: AudioRendererEventListener?,
     audioSink: AudioSink,
-) : MediaCodecAudioRenderer(context, mediaCodecSelector, eventHandler, eventListener, audioSink), MediaClock {
+) : MediaCodecAudioRenderer(context, mediaCodecSelector, eventHandler, eventListener, audioSink),
+    MediaClock {
 
     private var lastSeenBufferIndex = -1
     private var lastPresentationTimeUs = 0L

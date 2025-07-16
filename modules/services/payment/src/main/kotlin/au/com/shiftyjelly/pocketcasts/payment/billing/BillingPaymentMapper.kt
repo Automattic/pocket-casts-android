@@ -26,7 +26,7 @@ internal class BillingPaymentMapper(
     fun toProduct(productDetails: GoogleProduct): Product? {
         val mappingContext = mapOf("productId" to productDetails.productId)
 
-        if (productDetails.productType != SubscriptionType) {
+        if (productDetails.productType != SUBSCRIPTION_TYPE) {
             dispatchMessage("Unrecognized product type '${productDetails.productType}'", mappingContext)
             return null
         }
@@ -307,31 +307,31 @@ internal class BillingPaymentMapper(
         newPlanKey: SubscriptionPlan.Key,
     ) = when (newPlanKey.offer) {
         null -> when (currentPlanId) {
-            SubscriptionPlan.PlusMonthlyProductId -> when (newPlanKey.productId) {
-                SubscriptionPlan.PatronMonthlyProductId -> ReplacementMode.CHARGE_PRORATED_PRICE
-                SubscriptionPlan.PlusYearlyProductId -> ReplacementMode.CHARGE_FULL_PRICE
-                SubscriptionPlan.PatronYearlyProductId -> ReplacementMode.CHARGE_FULL_PRICE
+            SubscriptionPlan.PLUS_MONTHLY_PRODUCT_ID -> when (newPlanKey.productId) {
+                SubscriptionPlan.PATRON_MONTHLY_PRODUCT_ID -> ReplacementMode.CHARGE_PRORATED_PRICE
+                SubscriptionPlan.PLUS_YEARLY_PRODUCT_ID -> ReplacementMode.CHARGE_FULL_PRICE
+                SubscriptionPlan.PATRON_YEARLY_PRODUCT_ID -> ReplacementMode.CHARGE_FULL_PRICE
                 else -> null
             }
 
-            SubscriptionPlan.PatronMonthlyProductId -> when (newPlanKey.productId) {
-                SubscriptionPlan.PlusMonthlyProductId -> ReplacementMode.WITH_TIME_PRORATION
-                SubscriptionPlan.PlusYearlyProductId -> ReplacementMode.CHARGE_FULL_PRICE
-                SubscriptionPlan.PatronYearlyProductId -> ReplacementMode.CHARGE_FULL_PRICE
+            SubscriptionPlan.PATRON_MONTHLY_PRODUCT_ID -> when (newPlanKey.productId) {
+                SubscriptionPlan.PLUS_MONTHLY_PRODUCT_ID -> ReplacementMode.WITH_TIME_PRORATION
+                SubscriptionPlan.PLUS_YEARLY_PRODUCT_ID -> ReplacementMode.CHARGE_FULL_PRICE
+                SubscriptionPlan.PATRON_YEARLY_PRODUCT_ID -> ReplacementMode.CHARGE_FULL_PRICE
                 else -> null
             }
 
-            SubscriptionPlan.PlusYearlyProductId -> when (newPlanKey.productId) {
-                SubscriptionPlan.PlusMonthlyProductId -> ReplacementMode.WITH_TIME_PRORATION
-                SubscriptionPlan.PatronMonthlyProductId -> ReplacementMode.WITH_TIME_PRORATION
-                SubscriptionPlan.PatronYearlyProductId -> ReplacementMode.CHARGE_PRORATED_PRICE
+            SubscriptionPlan.PLUS_YEARLY_PRODUCT_ID -> when (newPlanKey.productId) {
+                SubscriptionPlan.PLUS_MONTHLY_PRODUCT_ID -> ReplacementMode.WITH_TIME_PRORATION
+                SubscriptionPlan.PATRON_MONTHLY_PRODUCT_ID -> ReplacementMode.WITH_TIME_PRORATION
+                SubscriptionPlan.PATRON_YEARLY_PRODUCT_ID -> ReplacementMode.CHARGE_PRORATED_PRICE
                 else -> null
             }
 
-            SubscriptionPlan.PatronYearlyProductId -> when (newPlanKey.productId) {
-                SubscriptionPlan.PlusMonthlyProductId -> ReplacementMode.WITH_TIME_PRORATION
-                SubscriptionPlan.PatronMonthlyProductId -> ReplacementMode.WITH_TIME_PRORATION
-                SubscriptionPlan.PlusYearlyProductId -> ReplacementMode.WITH_TIME_PRORATION
+            SubscriptionPlan.PATRON_YEARLY_PRODUCT_ID -> when (newPlanKey.productId) {
+                SubscriptionPlan.PLUS_MONTHLY_PRODUCT_ID -> ReplacementMode.WITH_TIME_PRORATION
+                SubscriptionPlan.PATRON_MONTHLY_PRODUCT_ID -> ReplacementMode.WITH_TIME_PRORATION
+                SubscriptionPlan.PLUS_YEARLY_PRODUCT_ID -> ReplacementMode.WITH_TIME_PRORATION
                 else -> null
             }
 
@@ -348,4 +348,4 @@ internal class BillingPaymentMapper(
     }
 }
 
-private const val SubscriptionType = "subs"
+private const val SUBSCRIPTION_TYPE = "subs"

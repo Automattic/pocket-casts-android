@@ -26,7 +26,10 @@ import kotlinx.coroutines.Dispatchers
 import au.com.shiftyjelly.pocketcasts.ui.R as UR
 
 @AndroidEntryPoint
-open class BaseFragment : Fragment(), CoroutineScope, HasBackstack {
+open class BaseFragment :
+    Fragment(),
+    CoroutineScope,
+    HasBackstack {
 
     open var statusBarIconColor: StatusBarIconColor = StatusBarIconColor.Theme
     open var backgroundTransparent: Boolean = false

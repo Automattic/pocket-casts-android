@@ -94,8 +94,7 @@ class EpisodeContainerFragment :
                 )
             }
         }
-        private fun extractArgs(bundle: Bundle?): EpisodeFragmentArgs? =
-            bundle?.let { BundleCompat.getParcelable(it, NEW_INSTANCE_ARG, EpisodeFragmentArgs::class.java) }
+        private fun extractArgs(bundle: Bundle?): EpisodeFragmentArgs? = bundle?.let { BundleCompat.getParcelable(it, NEW_INSTANCE_ARG, EpisodeFragmentArgs::class.java) }
     }
 
     override val includeNavigationBarPadding: Boolean = false

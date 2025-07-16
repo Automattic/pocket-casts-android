@@ -8,7 +8,6 @@ import androidx.compose.animation.core.tween
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.runtime.getValue
-import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.composed
 import androidx.compose.ui.draw.drawWithCache
@@ -28,8 +27,6 @@ import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 
-private const val Black60 = 0x99000000
-
 // From https://stackoverflow.com/a/71376469/1910286
 fun Modifier.brush(brush: Brush) = this
     .graphicsLayer(alpha = 0.99f)
@@ -43,21 +40,19 @@ fun Modifier.brush(brush: Brush) = this
 /**
  * When the user presses enter run the action.
  */
-@OptIn(ExperimentalComposeUiApi::class)
-fun Modifier.onEnter(onEnter: () -> Unit): Modifier =
-    this.onPreviewKeyEvent {
-        if (it.key == Key.Enter && it.nativeKeyEvent.action == KeyEvent.ACTION_DOWN) {
-            onEnter()
-            true
-        } else {
-            false
-        }
+fun Modifier.onEnter(onEnter: () -> Unit): Modifier = this.onPreviewKeyEvent {
+    if (it.key == Key.Enter && it.nativeKeyEvent.action == KeyEvent.ACTION_DOWN) {
+        onEnter()
+        true
+    } else {
+        false
     }
+}
 
 /**
  * When the user presses tab move the focus to the next field.
  */
-@OptIn(ExperimentalComposeUiApi::class)
+@Suppress("ktlint:compose:modifier-composed-check")
 fun Modifier.onTabMoveFocus(): Modifier = composed {
     val focusManager = LocalFocusManager.current
     this.onPreviewKeyEvent {
@@ -70,35 +65,7 @@ fun Modifier.onTabMoveFocus(): Modifier = composed {
     }
 }
 
-fun Modifier.gradientBackground(
-    baseColor: Color,
-    colorStops: List<Color> = listOf(Color.Black, Color(Black60)),
-    direction: FadeDirection = FadeDirection.TopToBottom,
-) =
-    graphicsLayer {
-        /*
-        https://rb.gy/iju6fn
-        This is required to render to an offscreen buffer
-        The Clear blend mode will not work without it */
-        alpha = 0.99f
-    }.drawWithContent {
-        drawRect(color = baseColor)
-        drawRect(
-            brush = Brush.verticalGradient(
-                colorStops,
-                startY = if (direction == FadeDirection.BottomToTop) Float.POSITIVE_INFINITY else 0f,
-                endY = if (direction == FadeDirection.BottomToTop) 0f else Float.POSITIVE_INFINITY,
-            ),
-            blendMode = BlendMode.DstIn,
-        )
-        drawContent()
-    }
-
-enum class FadeDirection {
-    TopToBottom,
-    BottomToTop,
-}
-
+@Suppress("ktlint:compose:modifier-composed-check")
 fun Modifier.verticalScrollBar(
     scrollState: LazyListState,
     width: Dp = 4.dp,

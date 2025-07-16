@@ -55,8 +55,9 @@ import au.com.shiftyjelly.pocketcasts.localization.R as LR
 fun OnboardingImportOpmlUrl(
     isImporting: Boolean,
     onImport: (HttpUrl) -> Unit,
-    onPressBackButton: () -> Unit,
+    onBackPress: () -> Unit,
     onUpdateSystemBars: (SystemBarsStyles) -> Unit,
+    modifier: Modifier = Modifier,
 ) {
     val theme = MaterialTheme.theme
     // Use secondaryUI01 so the status bar matches the ThemedTopAppBar
@@ -68,13 +69,13 @@ fun OnboardingImportOpmlUrl(
     var showError by remember { mutableStateOf(false) }
 
     Column(
-        modifier = Modifier
+        modifier = modifier
             .fillMaxSize()
             .windowInsetsPadding(WindowInsets.safeDrawing.only(WindowInsetsSides.Horizontal))
             .windowInsetsPadding(WindowInsets.ime),
     ) {
         ThemedTopAppBar(
-            onNavigationClick = onPressBackButton,
+            onNavigationClick = onBackPress,
         )
 
         Column(
@@ -174,7 +175,7 @@ private fun OnboardingImportOpmlUrlImportingPreview() {
         OnboardingImportOpmlUrl(
             isImporting = true,
             onImport = {},
-            onPressBackButton = {},
+            onBackPress = {},
             onUpdateSystemBars = {},
         )
     }
@@ -189,7 +190,7 @@ private fun OnboardingImportOpmlUrlPreview(
         OnboardingImportOpmlUrl(
             isImporting = false,
             onImport = {},
-            onPressBackButton = {},
+            onBackPress = {},
             onUpdateSystemBars = {},
         )
     }

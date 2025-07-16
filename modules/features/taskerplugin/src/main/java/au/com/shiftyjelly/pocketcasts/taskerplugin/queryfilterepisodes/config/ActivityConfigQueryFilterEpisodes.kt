@@ -34,6 +34,7 @@ private fun ComposableConfigQueryFilterEpisodesPreview() {
                     MutableStateFlow(listOf("New Releases", "Up Next")),
                 ),
             ),
-        ) {}
+            onFinish = {},
+        )
     }
 }

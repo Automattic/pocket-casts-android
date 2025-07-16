@@ -24,10 +24,11 @@ fun PlayButton(
     isPlaying: Boolean,
     backgroundColor: Color,
     onClick: () -> Unit,
+    modifier: Modifier = Modifier,
 ) {
     Box(
         contentAlignment = Alignment.Center,
-        modifier = Modifier
+        modifier = modifier
             .size(52.dp)
             .clip(CircleShape)
             .background(color = backgroundColor)

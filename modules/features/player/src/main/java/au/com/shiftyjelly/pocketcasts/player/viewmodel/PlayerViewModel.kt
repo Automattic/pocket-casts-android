@@ -96,7 +96,8 @@ class PlayerViewModel @Inject constructor(
     private val episodeAnalytics: EpisodeAnalytics,
     @ApplicationContext private val context: Context,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
-) : ViewModel(), CoroutineScope {
+) : ViewModel(),
+    CoroutineScope {
 
     override val coroutineContext: CoroutineContext
         get() = Dispatchers.Default

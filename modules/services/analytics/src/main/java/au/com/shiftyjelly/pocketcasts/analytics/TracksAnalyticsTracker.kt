@@ -23,7 +23,8 @@ class TracksAnalyticsTracker @Inject constructor(
     private val displayUtil: DisplayUtil,
     private val settings: Settings,
     private val accountStatusInfo: AccountStatusInfo,
-) : IdentifyingTracker(preferences), CoroutineScope {
+) : IdentifyingTracker(preferences),
+    CoroutineScope {
     private val tracksClient: TracksClient? = TracksClient.getClient(appContext)
     override val anonIdPrefKey: String = TRACKS_ANON_ID
     override val coroutineContext: CoroutineContext = Dispatchers.IO

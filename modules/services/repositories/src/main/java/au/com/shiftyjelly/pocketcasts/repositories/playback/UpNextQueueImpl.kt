@@ -40,7 +40,8 @@ class UpNextQueueImpl @Inject constructor(
     private val episodeManager: EpisodeManager,
     private val syncManager: SyncManager,
     @ApplicationContext private val application: Context,
-) : UpNextQueue, CoroutineScope {
+) : UpNextQueue,
+    CoroutineScope {
 
     private val upNextDao = appDatabase.upNextDao()
     private val upNextChangeDao = appDatabase.upNextChangeDao()
@@ -321,8 +322,8 @@ class UpNextQueueImpl @Inject constructor(
         // clear last loaded uuid if anything gets added to the up next queue
         val hasQueuedItems = currentEpisode != null
         if (hasQueuedItems) {
-            settings.trackingAutoPlaySource.set(AutoPlaySource.None, updateModifiedAt = false)
-            settings.lastAutoPlaySource.set(AutoPlaySource.None, updateModifiedAt = true)
+            settings.trackingAutoPlaySource.set(AutoPlaySource.Predefined.None, updateModifiedAt = false)
+            settings.lastAutoPlaySource.set(AutoPlaySource.Predefined.None, updateModifiedAt = true)
         }
     }
 

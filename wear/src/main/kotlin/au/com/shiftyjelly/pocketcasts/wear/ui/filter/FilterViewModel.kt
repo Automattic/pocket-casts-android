@@ -27,7 +27,7 @@ class FilterViewModel @Inject constructor(
     settings: Settings,
 ) : ViewModel() {
 
-    private val filterUuid: String = savedStateHandle[FilterScreen.argumentFilterUuid] ?: ""
+    private val filterUuid: String = savedStateHandle[FilterScreen.ARGUMENT_FILTER_UUID] ?: ""
 
     sealed class UiState {
         object Loading : UiState()

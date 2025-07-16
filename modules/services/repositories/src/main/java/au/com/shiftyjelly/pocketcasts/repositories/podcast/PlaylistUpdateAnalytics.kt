@@ -58,59 +58,55 @@ class PlaylistUpdateAnalytics @Inject constructor(
         analyticsTracker.track(AnalyticsEvent.FILTER_CREATED, properties)
     }
 
-    private fun iconAnalyticsValue(playlist: Playlist) =
-        when (playlist.drawableId) {
-            IR.drawable.ic_filters_list -> Value.IconName.LIST
-            IR.drawable.ic_filters_headphones -> Value.IconName.HEADPHONES
-            IR.drawable.ic_filters_clock -> Value.IconName.CLOCK
-            IR.drawable.ic_filters_download -> Value.IconName.DOWNLOADED
-            IR.drawable.ic_filters_play -> Value.IconName.PLAY
-            IR.drawable.ic_filters_volume -> Value.IconName.VOLUME
-            IR.drawable.ic_filters_video -> Value.IconName.VIDEO
-            IR.drawable.ic_filters_star -> Value.IconName.STARRED
-            else -> {
-                Timber.e("No matching analytics icon found")
-                null
-            }
+    private fun iconAnalyticsValue(playlist: Playlist) = when (playlist.drawableId) {
+        IR.drawable.ic_filters_list -> Value.IconName.LIST
+        IR.drawable.ic_filters_headphones -> Value.IconName.HEADPHONES
+        IR.drawable.ic_filters_clock -> Value.IconName.CLOCK
+        IR.drawable.ic_filters_download -> Value.IconName.DOWNLOADED
+        IR.drawable.ic_filters_play -> Value.IconName.PLAY
+        IR.drawable.ic_filters_volume -> Value.IconName.VOLUME
+        IR.drawable.ic_filters_video -> Value.IconName.VIDEO
+        IR.drawable.ic_filters_star -> Value.IconName.STARRED
+        else -> {
+            Timber.e("No matching analytics icon found")
+            null
         }
+    }
 
-    private fun mediaTypeAnalyticsValue(playlist: Playlist) =
-        when (playlist.audioVideo) {
-            Playlist.AUDIO_VIDEO_FILTER_ALL -> Value.MediaType.ALL
-            Playlist.AUDIO_VIDEO_FILTER_AUDIO_ONLY -> Value.MediaType.AUDIO
-            Playlist.AUDIO_VIDEO_FILTER_VIDEO_ONLY -> Value.MediaType.VIDEO
-            else -> {
-                Timber.e("No match found for audioVideo Int")
-                null
-            }
+    private fun mediaTypeAnalyticsValue(playlist: Playlist) = when (playlist.audioVideo) {
+        Playlist.AUDIO_VIDEO_FILTER_ALL -> Value.MediaType.ALL
+        Playlist.AUDIO_VIDEO_FILTER_AUDIO_ONLY -> Value.MediaType.AUDIO
+        Playlist.AUDIO_VIDEO_FILTER_VIDEO_ONLY -> Value.MediaType.VIDEO
+        else -> {
+            Timber.e("No match found for audioVideo Int")
+            null
         }
+    }
 
-    private fun releaseDateAnalyticsValue(playlist: Playlist) =
-        when (playlist.filterHours) {
-            Playlist.ANYTIME -> Value.ReleaseDate.ANYTIME
-            Playlist.LAST_24_HOURS -> Value.ReleaseDate.TWENTY_FOUR_HOURS
-            Playlist.LAST_3_DAYS -> Value.ReleaseDate.THREE_DAYS
-            Playlist.LAST_WEEK -> Value.ReleaseDate.WEEK
-            Playlist.LAST_2_WEEKS -> Value.ReleaseDate.TWO_WEEKS
-            Playlist.LAST_MONTH -> Value.ReleaseDate.MONTH
-            else -> {
-                Timber.e("Unexpected filter hours value")
-                null
-            }
+    private fun releaseDateAnalyticsValue(playlist: Playlist) = when (playlist.filterHours) {
+        Playlist.ANYTIME -> Value.ReleaseDate.ANYTIME
+        Playlist.LAST_24_HOURS -> Value.ReleaseDate.TWENTY_FOUR_HOURS
+        Playlist.LAST_3_DAYS -> Value.ReleaseDate.THREE_DAYS
+        Playlist.LAST_WEEK -> Value.ReleaseDate.WEEK
+        Playlist.LAST_2_WEEKS -> Value.ReleaseDate.TWO_WEEKS
+        Playlist.LAST_MONTH -> Value.ReleaseDate.MONTH
+        else -> {
+            Timber.e("Unexpected filter hours value")
+            null
         }
+    }
 
-    private fun colorAnalyticsValue(playlist: Playlist) =
-        when (playlist.colorIndex) {
-            0 -> Value.Color.RED
-            1 -> Value.Color.BLUE
-            2 -> Value.Color.GREEN
-            3 -> Value.Color.PURPLE
-            4 -> Value.Color.YELLOW
-            else -> {
-                Timber.e("No matching analytics color found")
-                null
-            }
+    private fun colorAnalyticsValue(playlist: Playlist) = when (playlist.colorIndex) {
+        0 -> Value.Color.RED
+        1 -> Value.Color.BLUE
+        2 -> Value.Color.GREEN
+        3 -> Value.Color.PURPLE
+        4 -> Value.Color.YELLOW
+        else -> {
+            Timber.e("No matching analytics color found")
+            null
         }
+    }
 
     private fun sendPlaylistUpdateEvent(userPlaylistUpdate: UserPlaylistUpdate?) {
         userPlaylistUpdate?.properties?.map { playlistProperty ->

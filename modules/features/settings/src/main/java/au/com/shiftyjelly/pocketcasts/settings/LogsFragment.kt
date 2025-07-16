@@ -71,7 +71,7 @@ class LogsFragment : BaseFragment() {
             val bottomInset = settings.bottomInset.collectAsStateWithLifecycle(initialValue = 0)
             LogsPage(
                 bottomInset = bottomInset.value.pxToDp(LocalContext.current).dp,
-                onBackPressed = ::closeFragment,
+                onBackPress = ::closeFragment,
             )
         }
     }
@@ -84,44 +84,49 @@ class LogsFragment : BaseFragment() {
 @Composable
 fun LogsPage(
     bottomInset: Dp,
+    onBackPress: () -> Unit,
+    modifier: Modifier = Modifier,
     appBarInsets: WindowInsets = AppBarDefaults.topAppBarWindowInsets,
-    onBackPressed: () -> Unit,
+    viewModel: LogsViewModel = hiltViewModel(),
 ) {
-    val viewModel = hiltViewModel<LogsViewModel>()
     val state by viewModel.state.collectAsState()
     val logs = state.logs
     val logLines = state.logLines
     val context = LocalContext.current
 
     LogsContent(
-        onBackPressed = onBackPressed,
+        onBackPress = onBackPress,
         onCopyToClipboard = { viewModel.copyToClipboard(context, logs) },
         onShareLogs = { viewModel.shareLogs(context) },
         includeAppBar = !Util.isAutomotive(context),
         logLines = logLines,
         bottomInset = bottomInset,
         appBarInsets = appBarInsets,
+        modifier = modifier,
     )
 }
 
 @Composable
 private fun LogsContent(
-    onBackPressed: () -> Unit,
+    onBackPress: () -> Unit,
     onCopyToClipboard: () -> Unit,
     onShareLogs: () -> Unit,
     logLines: List<String>,
     includeAppBar: Boolean,
     bottomInset: Dp,
     appBarInsets: WindowInsets,
+    modifier: Modifier = Modifier,
 ) {
     val logScrollState = rememberLazyListState()
-    Column {
+    Column(
+        modifier = modifier,
+    ) {
         if (includeAppBar) {
             val coroutineScope = rememberCoroutineScope()
             AppBarWithShare(
                 appBarInsets = appBarInsets,
                 logsAvailable = logLines.isNotEmpty(),
-                onBackPressed = onBackPressed,
+                onBackPress = onBackPress,
                 onCopyToClipboard = onCopyToClipboard,
                 onShareLogs = onShareLogs,
                 onScrollToTop = {
@@ -180,7 +185,7 @@ private fun LogsContent(
 
 @Composable
 private fun AppBarWithShare(
-    onBackPressed: () -> Unit,
+    onBackPress: () -> Unit,
     onCopyToClipboard: () -> Unit,
     onShareLogs: () -> Unit,
     onScrollToTop: () -> Unit,
@@ -192,7 +197,7 @@ private fun AppBarWithShare(
     ThemedTopAppBar(
         title = stringResource(LR.string.settings_logs),
         windowInsets = appBarInsets,
-        onNavigationClick = onBackPressed,
+        onNavigationClick = onBackPress,
         actions = {
             IconButton(
                 onClick = onScrollToTop,
@@ -240,7 +245,7 @@ private fun AppBarWithShare(
 private fun LogsContentPreview(@PreviewParameter(ThemePreviewParameterProvider::class) themeType: Theme.ThemeType) {
     AppThemeWithBackground(themeType) {
         LogsContent(
-            onBackPressed = {},
+            onBackPress = {},
             onCopyToClipboard = {},
             onShareLogs = {},
             logLines = listOf(
@@ -260,7 +265,7 @@ private fun LogsContentPreview(@PreviewParameter(ThemePreviewParameterProvider::
 private fun LogsContentLoadingPreview(@PreviewParameter(ThemePreviewParameterProvider::class) themeType: Theme.ThemeType) {
     AppThemeWithBackground(themeType) {
         LogsContent(
-            onBackPressed = {},
+            onBackPress = {},
             onCopyToClipboard = {},
             onShareLogs = {},
             logLines = emptyList(),

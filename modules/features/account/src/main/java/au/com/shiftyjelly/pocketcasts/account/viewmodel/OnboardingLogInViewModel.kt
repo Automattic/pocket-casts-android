@@ -34,7 +34,8 @@ class OnboardingLogInViewModel @Inject constructor(
     private val syncManager: SyncManager,
     private val experiments: ExperimentProvider,
     @ApplicationContext context: Context,
-) : AndroidViewModel(context as Application), CoroutineScope {
+) : AndroidViewModel(context as Application),
+    CoroutineScope {
 
     override val coroutineContext: CoroutineContext
         get() = Dispatchers.Default

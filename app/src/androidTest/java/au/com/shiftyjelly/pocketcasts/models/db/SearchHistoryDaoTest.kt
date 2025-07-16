@@ -305,29 +305,33 @@ class SearchHistoryDaoTest {
         modified: Long = System.currentTimeMillis(),
     ) = SearchHistoryItem(term = term, modified = modified)
 
-    private fun createPodcastSearchHistoryItem(uuid: String) =
-        SearchHistoryItem(
-            podcast = Podcast(
-                uuid = uuid,
-                title = "",
-                author = "",
-            ),
-        )
+    private fun createPodcastSearchHistoryItem(uuid: String) = SearchHistoryItem(
+        podcast = Podcast(
+            uuid = uuid,
+            title = "",
+            author = "",
+        ),
+    )
 
-    private fun createFolderSearchHistoryItem(uuid: String) =
-        SearchHistoryItem(folder = Folder(uuid = uuid, title = "", color = 0, podcastIds = ""))
+    private fun createFolderSearchHistoryItem(uuid: String) = SearchHistoryItem(
+        folder = Folder(
+            uuid = uuid,
+            title = "",
+            color = 0,
+            podcastIds = "",
+        ),
+    )
 
-    private fun createEpisodeSearchHistoryItem(uuid: String) =
-        SearchHistoryItem(
-            episode = SearchHistoryItem.Episode(
-                uuid = uuid,
-                title = "",
-                duration = 0.0,
-                podcastUuid = "",
-                podcastTitle = "",
-                artworkUrl = "",
-            ),
-        )
+    private fun createEpisodeSearchHistoryItem(uuid: String) = SearchHistoryItem(
+        episode = SearchHistoryItem.Episode(
+            uuid = uuid,
+            title = "",
+            duration = 0.0,
+            podcastUuid = "",
+            podcastTitle = "",
+            artworkUrl = "",
+        ),
+    )
 
     private suspend fun findSearchHistory(
         showFolders: Boolean = true,

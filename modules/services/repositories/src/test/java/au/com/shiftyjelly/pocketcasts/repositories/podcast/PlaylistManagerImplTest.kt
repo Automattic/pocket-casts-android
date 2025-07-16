@@ -8,11 +8,9 @@ import au.com.shiftyjelly.pocketcasts.repositories.download.DownloadManager
 import au.com.shiftyjelly.pocketcasts.repositories.notification.NotificationManager
 import au.com.shiftyjelly.pocketcasts.repositories.notification.OnboardingNotificationType
 import au.com.shiftyjelly.pocketcasts.repositories.sync.SyncManager
-import au.com.shiftyjelly.pocketcasts.sharedtest.MainCoroutineRule
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
-import org.junit.Rule
 import org.junit.Test
 import org.mockito.Mockito.mock
 import org.mockito.kotlin.any
@@ -22,9 +20,6 @@ import org.mockito.kotlin.whenever
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class PlaylistManagerImplTest {
-
-    @get:Rule
-    val coroutineRule = MainCoroutineRule()
 
     private val settings: Settings = mock()
     private val downloadManager: DownloadManager = mock()
@@ -63,13 +58,13 @@ class PlaylistManagerImplTest {
         whenever(playlistUpdateAnalytics.update(any(), any(), any())).then { }
 
         return PlaylistManagerImpl(
-            settings,
-            downloadManager,
-            playlistUpdateAnalytics,
-            syncManager,
-            notificationManager,
-            context,
-            appDatabase,
+            settings = settings,
+            downloadManager = downloadManager,
+            playlistUpdateAnalytics = playlistUpdateAnalytics,
+            syncManager = syncManager,
+            notificationManager = notificationManager,
+            context = context,
+            appDatabase = appDatabase,
         )
     }
 }

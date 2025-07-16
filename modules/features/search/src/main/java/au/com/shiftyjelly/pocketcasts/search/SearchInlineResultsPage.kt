@@ -64,17 +64,19 @@ private const val MAX_ITEM_COUNT = 20
 fun SearchInlineResultsPage(
     state: SearchState,
     loading: Boolean,
+    onlySearchRemote: Boolean,
+    bottomInset: Dp,
     onEpisodeClick: (EpisodeItem) -> Unit,
     onPodcastClick: (Podcast) -> Unit,
     onFolderClick: (Folder, List<Podcast>) -> Unit,
     onShowAllCLick: (ResultsType) -> Unit,
-    onSubscribeToPodcast: (Podcast) -> Unit,
+    onFollowPodcast: (Podcast) -> Unit,
     onScroll: () -> Unit,
-    onlySearchRemote: Boolean,
-    bottomInset: Dp,
     modifier: Modifier = Modifier,
 ) {
-    Column {
+    Column(
+        modifier = modifier,
+    ) {
         when (state) {
             is SearchState.NoResults -> NoResultsView()
             is SearchState.Results -> {
@@ -85,7 +87,7 @@ fun SearchInlineResultsPage(
                         onPodcastClick = onPodcastClick,
                         onFolderClick = onFolderClick,
                         onShowAllCLick = onShowAllCLick,
-                        onSubscribeToPodcast = onSubscribeToPodcast,
+                        onFollowPodcast = onFollowPodcast,
                         onScroll = onScroll,
                         bottomInset = bottomInset,
                     )
@@ -97,12 +99,12 @@ fun SearchInlineResultsPage(
         if (loading) {
             Box(
                 contentAlignment = Alignment.Center,
-                modifier = modifier
+                modifier = Modifier
                     .padding(top = 16.dp)
                     .fillMaxWidth(),
             ) {
                 CircularProgressIndicator(
-                    modifier = modifier.size(24.dp),
+                    modifier = Modifier.size(24.dp),
                     color = MaterialTheme.theme.colors.secondaryIcon01,
                 )
             }
@@ -113,13 +115,13 @@ fun SearchInlineResultsPage(
 @Composable
 private fun SearchResultsView(
     state: SearchState.Results,
+    bottomInset: Dp,
     onEpisodeClick: (EpisodeItem) -> Unit,
     onPodcastClick: (Podcast) -> Unit,
     onFolderClick: (Folder, List<Podcast>) -> Unit,
     onShowAllCLick: (ResultsType) -> Unit,
-    onSubscribeToPodcast: (Podcast) -> Unit,
+    onFollowPodcast: (Podcast) -> Unit,
     onScroll: () -> Unit,
-    bottomInset: Dp,
     modifier: Modifier = Modifier,
 ) {
     val nestedScrollConnection = remember {
@@ -182,7 +184,7 @@ private fun SearchResultsView(
                                 podcast = folderItem.podcast,
                                 onClick = { onPodcastClick(folderItem.podcast) },
                                 onSubscribeClick = if (!folderItem.podcast.isSubscribed) {
-                                    { onSubscribeToPodcast(folderItem.podcast) }
+                                    { onFollowPodcast(folderItem.podcast) }
                                 } else {
                                     null
                                 },
@@ -196,7 +198,7 @@ private fun SearchResultsView(
             item {
                 HorizontalDivider(
                     startIndent = 16.dp,
-                    modifier = modifier.padding(top = 20.dp, bottom = 4.dp),
+                    modifier = Modifier.padding(top = 20.dp, bottom = 4.dp),
                 )
             }
         }
@@ -235,13 +237,13 @@ private fun SearchResultsHeaderView(
         TextH20(
             text = title,
             color = MaterialTheme.theme.colors.primaryText01,
-            modifier = modifier.weight(1f),
+            modifier = Modifier.weight(1f),
         )
         TextP60(
             text = stringResource(LR.string.search_show_all).uppercase(),
             color = MaterialTheme.theme.colors.support03,
             fontWeight = FontWeight.W700,
-            modifier = modifier
+            modifier = Modifier
                 .clickable { onShowAllCLick() }
                 .padding(12.dp),
         )
@@ -281,18 +283,18 @@ private fun MessageView(
             painter = painterResource(id = imageResId),
             contentDescription = null,
             colorFilter = ColorFilter.tint(MaterialTheme.theme.colors.primaryIcon01),
-            modifier = modifier
+            modifier = Modifier
                 .size(96.dp)
                 .padding(top = 32.dp, bottom = 16.dp),
         )
         TextH20(
             text = stringResource(titleResId),
-            modifier = modifier
+            modifier = Modifier
                 .padding(start = 16.dp, end = 16.dp, bottom = 8.dp),
         )
         TextP50(
             text = stringResource(summaryResId),
-            modifier = modifier
+            modifier = Modifier
                 .padding(start = 16.dp, end = 16.dp, bottom = 8.dp),
             color = MaterialTheme.theme.colors.primaryText02,
         )
@@ -347,7 +349,7 @@ private fun SearchResultsViewPreview(
             onPodcastClick = {},
             onFolderClick = { _, _ -> },
             onShowAllCLick = {},
-            onSubscribeToPodcast = {},
+            onFollowPodcast = {},
             onScroll = {},
             bottomInset = 0.dp,
         )

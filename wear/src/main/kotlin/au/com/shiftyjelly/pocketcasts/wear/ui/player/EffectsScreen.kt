@@ -44,7 +44,7 @@ import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 object EffectsScreen {
-    const val route = "effects"
+    const val ROUTE = "effects"
 }
 
 @Composable
@@ -69,7 +69,7 @@ fun EffectsScreen(
 }
 
 @Composable
-fun Content(
+private fun Content(
     columnState: ScalingLazyColumnState,
     state: EffectsViewModel.State,
     increasePlaybackSpeed: () -> Unit,
@@ -90,8 +90,8 @@ fun Content(
                 item {
                     SpeedChip(
                         state = state,
-                        onPlusClicked = { increasePlaybackSpeed() },
-                        onMinusClicked = { decreasePlaybackSpeed() },
+                        onPlusClick = { increasePlaybackSpeed() },
+                        onMinusClick = { decreasePlaybackSpeed() },
                     )
                 }
                 val trimSilence = state.playbackEffects.trimMode != TrimMode.OFF
@@ -99,7 +99,7 @@ fun Content(
                     ToggleChip(
                         label = stringResource(LR.string.player_effects_trim_silence),
                         checked = trimSilence,
-                        onCheckedChanged = { value ->
+                        onToggle = { value ->
                             val newValue = if (value) TrimMode.LOW else TrimMode.OFF
                             updateTrimSilence(newValue)
                         },
@@ -109,7 +109,7 @@ fun Content(
                     item {
                         TrimSilenceSlider(
                             trimMode = state.playbackEffects.trimMode,
-                            onValueChanged = {
+                            onValueChange = {
                                 updateTrimSilence(TrimMode.values()[it])
                             },
                         )
@@ -119,7 +119,7 @@ fun Content(
                     ToggleChip(
                         label = stringResource(LR.string.player_effects_volume_boost),
                         checked = state.playbackEffects.isVolumeBoosted,
-                        onCheckedChanged = { updateBoostVolume(it) },
+                        onToggle = { updateBoostVolume(it) },
                     )
                 }
             }
@@ -130,15 +130,14 @@ fun Content(
 @Composable
 private fun SpeedChip(
     state: EffectsViewModel.State.Loaded,
-    modifier: Modifier = Modifier,
-    onPlusClicked: () -> Unit,
-    onMinusClicked: () -> Unit,
+    onPlusClick: () -> Unit,
+    onMinusClick: () -> Unit,
 ) {
     Chip(
         onClick = { },
         colors = ChipDefaults.secondaryChipColors(),
         shape = MaterialTheme.shapes.large,
-        modifier = modifier
+        modifier = Modifier
             .height(96.dp)
             .fillMaxWidth(),
         label = {
@@ -168,7 +167,7 @@ private fun SpeedChip(
                     verticalAlignment = Alignment.CenterVertically,
                     modifier = Modifier.fillMaxWidth(),
                 ) {
-                    IconButton(onClick = onMinusClicked) {
+                    IconButton(onClick = onMinusClick) {
                         Icon(
                             painter = painterResource(IR.drawable.minus_simple),
                             contentDescription = stringResource(LR.string.player_effects_speed_up),
@@ -178,7 +177,7 @@ private fun SpeedChip(
                         text = String.format("%.1fx", state.playbackEffects.playbackSpeed),
                         color = MaterialTheme.colors.onPrimary,
                     )
-                    IconButton(onClick = onPlusClicked) {
+                    IconButton(onClick = onPlusClick) {
                         Icon(
                             painter = painterResource(IR.drawable.plus_simple),
                             contentDescription = stringResource(LR.string.player_effects_speed_down),
@@ -191,9 +190,9 @@ private fun SpeedChip(
 }
 
 @Composable
-fun TrimSilenceSlider(
+private fun TrimSilenceSlider(
     trimMode: TrimMode,
-    onValueChanged: (Int) -> Unit,
+    onValueChange: (Int) -> Unit,
 ) {
     Column(
         verticalArrangement = Arrangement.spacedBy(10.dp),
@@ -219,7 +218,7 @@ fun TrimSilenceSlider(
 
         InlineSlider(
             value = trimMode.ordinal.toFloat(),
-            onValueChange = { onValueChanged(it.toInt()) },
+            onValueChange = { onValueChange(it.toInt()) },
             increaseIcon = {
                 Icon(
                     InlineSliderDefaults.Increase,

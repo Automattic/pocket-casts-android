@@ -87,7 +87,7 @@ internal class EnableNotificationsPromptFragment : BaseDialogFragment() {
                         .fillMaxSize()
                         .padding(16.dp)
                         .windowInsetsPadding(WindowInsets.safeDrawing.only(WindowInsetsSides.Horizontal)),
-                    onCtaClicked = {
+                    onCtaClick = {
                         analyticsTracker.track(AnalyticsEvent.NOTIFICATIONS_PERMISSIONS_ALLOW_TAPPED)
                         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
                             if (shouldShowRequestPermissionRationale(Manifest.permission.POST_NOTIFICATIONS)) {
@@ -98,7 +98,7 @@ internal class EnableNotificationsPromptFragment : BaseDialogFragment() {
                             }
                         }
                     },
-                    onDismissClicked = {
+                    onDismissClick = {
                         isFinalizingActionUsed = true
                         handleDismissedByUser()
                         dismiss()

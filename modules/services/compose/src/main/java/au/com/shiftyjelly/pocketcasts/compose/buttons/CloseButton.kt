@@ -32,7 +32,7 @@ fun CloseButton(
 @ShowkaseComposable(name = "CloseButton", group = "Button", styleName = "Light")
 @Preview(name = "Light")
 @Composable
-fun CloseButtonLightPreview() {
+private fun CloseButtonLightPreview() {
     AppThemeWithBackground(Theme.ThemeType.DARK) {
         CloseButton(
             onClick = {},
@@ -43,7 +43,7 @@ fun CloseButtonLightPreview() {
 @ShowkaseComposable(name = "CloseButton", group = "Button", styleName = "Dark")
 @Preview(name = "Dark")
 @Composable
-fun CloseButtonDarkPreview() {
+private fun CloseButtonDarkPreview() {
     AppThemeWithBackground(Theme.ThemeType.LIGHT) {
         CloseButton(
             onClick = {},

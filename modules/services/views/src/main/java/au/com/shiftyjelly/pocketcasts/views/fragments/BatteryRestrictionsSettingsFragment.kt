@@ -61,12 +61,11 @@ private const val ARG_CLOSE_BUTTON = "close_button"
 @AndroidEntryPoint
 class BatteryRestrictionsSettingsFragment : BaseFragment() {
     companion object {
-        fun newInstance(closeButton: Boolean) =
-            BatteryRestrictionsSettingsFragment().apply {
-                arguments = Bundle().apply {
-                    putBoolean(ARG_CLOSE_BUTTON, closeButton)
-                }
+        fun newInstance(closeButton: Boolean) = BatteryRestrictionsSettingsFragment().apply {
+            arguments = Bundle().apply {
+                putBoolean(ARG_CLOSE_BUTTON, closeButton)
             }
+        }
     }
 
     @Inject
@@ -107,7 +106,7 @@ class BatteryRestrictionsSettingsFragment : BaseFragment() {
             Page(
                 isUnrestricted = isUnrestricted,
                 navigationButton = navigationButton,
-                onBackPressed = {
+                onBackPress = {
                     @Suppress("DEPRECATION")
                     activity?.onBackPressed()
                 },
@@ -115,7 +114,7 @@ class BatteryRestrictionsSettingsFragment : BaseFragment() {
                     analyticsTracker.track(AnalyticsEvent.BATTERY_RESTRICTIONS_TOGGLED, mapOf("current_status" to batteryRestrictions.status.analyticsValue))
                     batteryRestrictions.promptToUpdateBatteryRestriction(context)
                 },
-                openUrl = { url ->
+                onOpenUrl = { url ->
                     startActivity(
                         Intent(Intent.ACTION_VIEW, Uri.parse(url)),
                     )
@@ -129,16 +128,16 @@ class BatteryRestrictionsSettingsFragment : BaseFragment() {
 private fun Page(
     isUnrestricted: Boolean,
     navigationButton: NavigationButton,
-    onBackPressed: () -> Unit,
+    onBackPress: () -> Unit,
     onClick: () -> Unit,
-    openUrl: (String) -> Unit,
+    onOpenUrl: (String) -> Unit,
 ) {
     Column {
         ThemedTopAppBar(
             title = stringResource(LR.string.settings_battery),
             bottomShadow = true,
             navigationButton = navigationButton,
-            onNavigationClick = onBackPressed,
+            onNavigationClick = onBackPress,
         )
 
         val startPadding = 72.dp
@@ -184,7 +183,7 @@ private fun Page(
             val learnMoreUrl = stringResource(LR.string.settings_battery_learn_more_url)
             Column(
                 Modifier.clickable(
-                    onClick = { openUrl(learnMoreUrl) },
+                    onClick = { onOpenUrl(learnMoreUrl) },
                     onClickLabel = stringResource(LR.string.settings_battery_learn_more),
                 ),
             ) {
@@ -250,9 +249,9 @@ private fun PagePreview_restricted(@PreviewParameter(ThemePreviewParameterProvid
         Page(
             isUnrestricted = false,
             navigationButton = NavigationButton.Close,
-            onBackPressed = {},
+            onBackPress = {},
             onClick = {},
-            openUrl = {},
+            onOpenUrl = {},
         )
     }
 }
@@ -264,9 +263,9 @@ private fun PagePreview_unrestricted(@PreviewParameter(ThemePreviewParameterProv
         Page(
             isUnrestricted = true,
             navigationButton = NavigationButton.Back,
-            onBackPressed = {},
+            onBackPress = {},
             onClick = {},
-            openUrl = {},
+            onOpenUrl = {},
         )
     }
 }

@@ -178,15 +178,13 @@ class SettingsImpl @Inject constructor(
         setBoolean(Settings.PREFERENCE_SYNC_ON_METERED, shouldSyncOnMetered)
     }
 
-    override fun getWorkManagerNetworkTypeConstraint(): NetworkType =
-        if (syncOnMeteredNetwork()) {
-            NetworkType.CONNECTED
-        } else {
-            NetworkType.UNMETERED
-        }
+    override fun getWorkManagerNetworkTypeConstraint(): NetworkType = if (syncOnMeteredNetwork()) {
+        NetworkType.CONNECTED
+    } else {
+        NetworkType.UNMETERED
+    }
 
-    override fun refreshPodcastsOnResume(isUnmetered: Boolean): Boolean =
-        syncOnMeteredNetwork() || isUnmetered
+    override fun refreshPodcastsOnResume(isUnmetered: Boolean): Boolean = syncOnMeteredNetwork() || isUnmetered
 
     override val backgroundRefreshPodcasts = UserSetting.BoolPref(
         sharedPrefKey = "backgroundRefresh",
@@ -1170,17 +1168,15 @@ class SettingsImpl @Inject constructor(
 
     override val deleteLocalFileAfterPlaying = UserSetting.BoolPref(
         sharedPrefKey = "deleteLocalFileAfterPlaying",
-        defaultValue =
         // Use value stored under previous key if it exists
-        getBoolean("cloudDeleteAfterPlaying", false),
+        defaultValue = getBoolean("cloudDeleteAfterPlaying", false),
         sharedPrefs = sharedPreferences,
     )
 
     override val deleteCloudFileAfterPlaying = UserSetting.BoolPref(
         sharedPrefKey = "deleteCloudFileAfterPlaying",
-        defaultValue =
         // Use value stored under previous key if it exists
-        sharedPreferences.getBoolean("cloudDeleteCloudAfterPlaying", false),
+        defaultValue = sharedPreferences.getBoolean("cloudDeleteCloudAfterPlaying", false),
         sharedPrefs = sharedPreferences,
 
     )
@@ -1319,8 +1315,7 @@ class SettingsImpl @Inject constructor(
         setInt(SHOWN_BATTERY_WARNING_KEY, max(0, value))
     }
 
-    override fun getTimesToShowBatteryWarning(): Int =
-        getInt(SHOWN_BATTERY_WARNING_KEY, 4)
+    override fun getTimesToShowBatteryWarning(): Int = getInt(SHOWN_BATTERY_WARNING_KEY, 4)
 
     override val collectAnalytics = UserSetting.BoolPref(
         sharedPrefKey = "SendUsageStatsKey",
@@ -1350,15 +1345,13 @@ class SettingsImpl @Inject constructor(
         setBoolean(END_OF_YEAR_SHOW_BADGE_2023_KEY, value)
     }
 
-    override fun getEndOfYearShowBadge2023(): Boolean =
-        getBoolean(END_OF_YEAR_SHOW_BADGE_2023_KEY, true)
+    override fun getEndOfYearShowBadge2023(): Boolean = getBoolean(END_OF_YEAR_SHOW_BADGE_2023_KEY, true)
 
     override fun setEndOfYearShowModal(value: Boolean) {
         setBoolean(END_OF_YEAR_SHOW_MODAL_2023_KEY, value)
     }
 
-    override fun getEndOfYearShowModal(): Boolean =
-        getBoolean(END_OF_YEAR_SHOW_MODAL_2023_KEY, true)
+    override fun getEndOfYearShowModal(): Boolean = getBoolean(END_OF_YEAR_SHOW_MODAL_2023_KEY, true)
 
     override fun hasCompletedOnboarding() = getBoolean(DONE_INITIAL_ONBOARDING_KEY, false)
 
@@ -1378,8 +1371,7 @@ class SettingsImpl @Inject constructor(
         sharedPrefs = sharedPreferences,
     )
 
-    override fun isNotificationsDisabledMessageShown() =
-        getBoolean(NOTIFICATIONS_DISABLED_MESSAGE_SHOWN, false)
+    override fun isNotificationsDisabledMessageShown() = getBoolean(NOTIFICATIONS_DISABLED_MESSAGE_SHOWN, false)
 
     override fun setNotificationsDisabledMessageShown(value: Boolean) {
         setBoolean(NOTIFICATIONS_DISABLED_MESSAGE_SHOWN, value)
@@ -1389,12 +1381,11 @@ class SettingsImpl @Inject constructor(
         setBoolean(PROCESSED_SIGNOUT_KEY, boolean)
     }
 
-    override fun getFullySignedOut(): Boolean =
-        getBoolean(PROCESSED_SIGNOUT_KEY, true)
+    override fun getFullySignedOut(): Boolean = getBoolean(PROCESSED_SIGNOUT_KEY, true)
 
     override val lastAutoPlaySource = UserSetting.PrefFromString(
         sharedPrefKey = "LastSelectedPodcastOrFilterUuid", // legacy name
-        defaultValue = AutoPlaySource.None,
+        defaultValue = AutoPlaySource.Predefined.None,
         sharedPrefs = sharedPreferences,
         fromString = AutoPlaySource::fromId,
         toString = AutoPlaySource::id,
@@ -1402,7 +1393,7 @@ class SettingsImpl @Inject constructor(
 
     override val trackingAutoPlaySource = UserSetting.PrefFromString(
         sharedPrefKey = "localAutoPlaySource",
-        defaultValue = AutoPlaySource.None,
+        defaultValue = AutoPlaySource.Predefined.None,
         sharedPrefs = sharedPreferences,
         fromString = AutoPlaySource::fromId,
         toString = AutoPlaySource::id,

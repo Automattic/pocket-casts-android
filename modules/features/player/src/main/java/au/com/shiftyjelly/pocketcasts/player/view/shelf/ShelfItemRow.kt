@@ -108,7 +108,7 @@ fun ShelfItemRow(
 
 @Preview
 @Composable
-fun ShelfItemWithoutSubtitlePreview(
+private fun ShelfItemWithoutSubtitlePreview(
     @PreviewParameter(ThemePreviewParameterProvider::class) themeType: Theme.ThemeType,
 ) {
     AppTheme(themeType) {
@@ -126,7 +126,7 @@ fun ShelfItemWithoutSubtitlePreview(
 
 @Preview
 @Composable
-fun ShelfItemWithSubtitlePreview(
+private fun ShelfItemWithSubtitlePreview(
     @PreviewParameter(ThemePreviewParameterProvider::class) themeType: Theme.ThemeType,
 ) {
     AppTheme(themeType) {

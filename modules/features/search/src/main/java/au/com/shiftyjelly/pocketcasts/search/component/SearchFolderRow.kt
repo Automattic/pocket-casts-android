@@ -26,13 +26,20 @@ import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 @Composable
-fun SearchFolderRow(folder: Folder, podcasts: List<Podcast>, onClick: (() -> Unit)?, modifier: Modifier = Modifier) {
+fun SearchFolderRow(
+    folder: Folder,
+    podcasts: List<Podcast>,
+    onClick: (() -> Unit)?,
+    modifier: Modifier = Modifier,
+) {
     val color = MaterialTheme.theme.colors.getFolderColor(folder.color)
     val podcastUuids = podcasts.map { it.uuid }
-    Column {
+    Column(
+        modifier = modifier,
+    ) {
         Row(
             verticalAlignment = Alignment.CenterVertically,
-            modifier = modifier
+            modifier = Modifier
                 .fillMaxWidth()
                 .background(MaterialTheme.theme.colors.primaryUi01)
                 .then(if (onClick == null) Modifier else Modifier.clickable { onClick() }),

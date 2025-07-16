@@ -64,23 +64,22 @@ class DatabaseExportHelperTest {
     }
 
     @Test
-    fun `prepareExportFolder copies logs, shared prefs, database files into export folder`() =
-        runTest {
-            whenever(mockFile.name).thenReturn(DATABASE_PATH)
-            initDatabaseExportHelper(mockFile)
+    fun `prepareExportFolder copies logs, shared prefs, database files into export folder`() = runTest {
+        whenever(mockFile.name).thenReturn(DATABASE_PATH)
+        initDatabaseExportHelper(mockFile)
 
-            databaseExportHelper.prepareExportFolder(exportFolder)
+        databaseExportHelper.prepareExportFolder(exportFolder)
 
-            verify(fileUtil).copy(
-                eq(File(context.filesDir, "logs/debug.log")),
-                eq(File(exportFolder, "/logs.txt")),
-            )
-            verify(fileUtil).copyPreferences(
-                eq(sharedPrefs),
-                eq(File(exportFolder, "/preferences.xml")),
-            )
-            verify(fileUtil).copy(eq(mockFile), eq(File(exportFolder, DATABASE_PATH)))
-        }
+        verify(fileUtil).copy(
+            eq(File(context.filesDir, "logs/debug.log")),
+            eq(File(exportFolder, "/logs.txt")),
+        )
+        verify(fileUtil).copyPreferences(
+            eq(sharedPrefs),
+            eq(File(exportFolder, "/preferences.xml")),
+        )
+        verify(fileUtil).copy(eq(mockFile), eq(File(exportFolder, DATABASE_PATH)))
+    }
 
     @Test
     fun `getExportFile zips export folder`() = runTest {

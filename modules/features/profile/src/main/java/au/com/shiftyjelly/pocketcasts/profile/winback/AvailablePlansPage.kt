@@ -3,21 +3,15 @@ package au.com.shiftyjelly.pocketcasts.profile.winback
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.Button
@@ -25,12 +19,9 @@ import androidx.compose.material.ButtonDefaults
 import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
-import androidx.compose.material.ripple
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.ReadOnlyComposable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.input.nestedscroll.nestedScroll
@@ -45,13 +36,13 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import au.com.shiftyjelly.pocketcasts.account.onboarding.components.AvailablePlanRow
 import au.com.shiftyjelly.pocketcasts.compose.AppThemeWithBackground
 import au.com.shiftyjelly.pocketcasts.compose.Devices
 import au.com.shiftyjelly.pocketcasts.compose.bars.BottomSheetAppBar
 import au.com.shiftyjelly.pocketcasts.compose.components.ProgressDialog
 import au.com.shiftyjelly.pocketcasts.compose.components.TextH30
 import au.com.shiftyjelly.pocketcasts.compose.components.TextH40
-import au.com.shiftyjelly.pocketcasts.compose.components.TextH50
 import au.com.shiftyjelly.pocketcasts.compose.components.TextP40
 import au.com.shiftyjelly.pocketcasts.compose.components.TextP50
 import au.com.shiftyjelly.pocketcasts.compose.components.rememberViewInteropNestedScrollConnection
@@ -80,7 +71,7 @@ internal fun AvailablePlansPage(
     modifier: Modifier = Modifier,
 ) {
     Column(
-        modifier = Modifier.nestedScroll(rememberViewInteropNestedScrollConnection()),
+        modifier = modifier.nestedScroll(rememberViewInteropNestedScrollConnection()),
     ) {
         BottomSheetAppBar(
             onNavigationClick = onGoBack,
@@ -88,7 +79,7 @@ internal fun AvailablePlansPage(
         AnimatedContent(
             targetState = plansState,
             contentKey = { state -> state.javaClass },
-            modifier = modifier,
+            modifier = Modifier,
         ) { state ->
             when (state) {
                 is SubscriptionPlansState.Loading -> LoadingState()
@@ -148,7 +139,7 @@ private fun LoadedState(
                 modifier = Modifier.height(24.dp),
             )
             plans.forEach { plan ->
-                SubscriptionRow(
+                AvailablePlanRow(
                     plan = plan,
                     isSelected = plan.productId == userPlanId,
                     onClick = { onSelectPlan(plan) },
@@ -299,130 +290,6 @@ private fun PocketCastsLogo(
 }
 
 @Composable
-private fun SubscriptionRow(
-    plan: SubscriptionPlan.Base,
-    isSelected: Boolean,
-    onClick: () -> Unit,
-    modifier: Modifier = Modifier,
-) {
-    Box(
-        modifier = modifier.fillMaxWidth(),
-    ) {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .clip(RoundedCornerShape(8.dp))
-                .background(MaterialTheme.theme.colors.primaryUi01Active)
-                .then(
-                    if (isSelected) {
-                        Modifier.border(
-                            width = 2.dp,
-                            color = MaterialTheme.theme.colors.primaryField03Active,
-                            shape = RoundedCornerShape(8.dp),
-                        )
-                    } else {
-                        Modifier
-                    },
-                )
-                .clickable(
-                    enabled = !isSelected,
-                    onClick = onClick,
-                    role = Role.Button,
-                    indication = ripple(color = MaterialTheme.theme.colors.primaryIcon01),
-                    interactionSource = null,
-                )
-                .padding(start = 20.dp, end = 10.dp, top = 10.dp, bottom = 10.dp),
-        ) {
-            CheckMark(
-                isSelected = isSelected,
-                modifier = Modifier
-                    .align(Alignment.CenterVertically)
-                    .size(22.dp),
-            )
-            Spacer(
-                modifier = Modifier.width(16.dp),
-            )
-            Column(
-                modifier = Modifier.weight(1f),
-            ) {
-                TextH30(
-                    text = plan.name,
-                )
-                TextP40(
-                    text = plan.price(),
-                    color = MaterialTheme.theme.colors.primaryText02,
-                    fontSize = 15.sp,
-                    lineHeight = 21.sp,
-                )
-            }
-            if (plan.billingCycle == BillingCycle.Yearly) {
-                val currencyCode = plan.pricingPhase.price.currencyCode
-                TextP40(
-                    text = if (currencyCode == "USD") {
-                        stringResource(LR.string.price_per_month_usd, plan.pricePerMonth)
-                    } else {
-                        stringResource(LR.string.price_per_month, plan.pricePerMonth, currencyCode)
-                    },
-                    color = MaterialTheme.theme.colors.primaryText02,
-                    fontSize = 15.sp,
-                    lineHeight = 21.sp,
-                    modifier = Modifier.align(Alignment.CenterVertically),
-                )
-            }
-        }
-
-        if (plan.tier == SubscriptionTier.Plus && plan.billingCycle == BillingCycle.Yearly) {
-            Box(
-                modifier = Modifier
-                    .align(Alignment.TopEnd)
-                    .offset(x = -10.dp, y = -10.dp)
-                    .background(MaterialTheme.theme.colors.primaryField03Active, CircleShape)
-                    .padding(horizontal = 12.dp, vertical = 2.dp),
-            ) {
-                TextH50(
-                    text = "Best Value",
-                    color = MaterialTheme.theme.colors.primaryUi01,
-                    disableAutoScale = true,
-                )
-            }
-        }
-    }
-}
-
-@Composable
-private fun CheckMark(
-    isSelected: Boolean,
-    modifier: Modifier = Modifier,
-) {
-    if (isSelected) {
-        Box(
-            contentAlignment = Alignment.Center,
-            modifier = modifier.background(
-                color = MaterialTheme.theme.colors.primaryField03Active,
-                shape = CircleShape,
-            ),
-        ) {
-            Image(
-                painter = painterResource(IR.drawable.ic_checkmark_small),
-                colorFilter = ColorFilter.tint(MaterialTheme.theme.colors.primaryUi01),
-                contentDescription = null,
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(5.dp),
-            )
-        }
-    } else {
-        Box(
-            modifier = modifier.border(
-                width = 1.dp,
-                color = MaterialTheme.theme.colors.primaryIcon02,
-                shape = CircleShape,
-            ),
-        )
-    }
-}
-
-@Composable
 private fun ManageSubscriptions(
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
@@ -440,23 +307,7 @@ private fun ManageSubscriptions(
     }
 }
 
-private val SubscriptionPlan.Base.pricePerMonth: Float
-    get() {
-        val pricePerWeek = when (billingCycle) {
-            BillingCycle.Monthly -> pricingPhase.price.amount
-            BillingCycle.Yearly -> pricingPhase.price.amount / 12.toBigDecimal()
-        }
-        return pricePerWeek.toFloat()
-    }
-
-@Composable
-@ReadOnlyComposable
-private fun SubscriptionPlan.Base.price() = when (billingCycle) {
-    BillingCycle.Monthly -> stringResource(LR.string.plus_per_month, pricingPhase.price.formattedPrice)
-    BillingCycle.Yearly -> stringResource(LR.string.plus_per_year, pricingPhase.price.formattedPrice)
-}
-
-@Preview(device = Devices.PortraitRegular)
+@Preview(device = Devices.PORTRAIT_REGULAR)
 @Composable
 private fun AvailablePlansPagePreview(
     @PreviewParameter(ThemePreviewParameterProvider::class) theme: ThemeType,
@@ -482,7 +333,7 @@ private fun AvailablePlansPagePreview(
     }
 }
 
-@Preview(device = Devices.PortraitRegular)
+@Preview(device = Devices.PORTRAIT_REGULAR)
 @Composable
 private fun AvailablePlansPageFailureTooManyPreview(
     @PreviewParameter(ThemePreviewParameterProvider::class) theme: ThemeType,
@@ -500,7 +351,7 @@ private fun AvailablePlansPageFailureTooManyPreview(
     }
 }
 
-@Preview(device = Devices.PortraitRegular)
+@Preview(device = Devices.PORTRAIT_REGULAR)
 @Composable
 private fun AvailablePlansPageFailureDefaultPreview(
     @PreviewParameter(ThemePreviewParameterProvider::class) theme: ThemeType,

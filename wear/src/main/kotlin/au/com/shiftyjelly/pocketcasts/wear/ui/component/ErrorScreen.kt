@@ -26,6 +26,7 @@ import au.com.shiftyjelly.pocketcasts.wear.theme.WearAppTheme
 @Composable
 fun ErrorScreen(
     text: String,
+    modifier: Modifier = Modifier,
     icon: @Composable () -> Unit = {
         Icon(
             imageVector = Icons.Default.Error,
@@ -38,7 +39,7 @@ fun ErrorScreen(
     Column(
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally,
-        modifier = Modifier
+        modifier = modifier
             .padding(16.dp)
             .fillMaxSize()
             .verticalScroll(rememberScrollState()),

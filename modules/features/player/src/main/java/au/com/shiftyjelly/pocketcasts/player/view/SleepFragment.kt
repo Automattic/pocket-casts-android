@@ -214,7 +214,8 @@ class SleepFragment : BaseDialogFragment() {
                 binding.buttonEndOfEpisode2.strokeColor = tintColorStateList
                 binding.buttonEndOfEpisode2.setTextColor(tintColorStateList)
 
-                binding.sleepAnimation.post { // this only works the second time it's called unless it's in a post
+                binding.sleepAnimation.post {
+                    // this only works the second time it's called unless it's in a post
                     binding.sleepAnimation.addValueCallback(KeyPath("**"), LottieProperty.COLOR) { tintColor }
                 }
             },

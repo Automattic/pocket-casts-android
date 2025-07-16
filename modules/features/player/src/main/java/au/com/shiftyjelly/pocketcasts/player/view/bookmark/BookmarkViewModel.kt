@@ -27,7 +27,8 @@ class BookmarkViewModel
     private val userEpisodeManager: UserEpisodeManager,
     private val bookmarkManager: BookmarkManager,
     private val analyticsTracker: AnalyticsTracker,
-) : ViewModel(), CoroutineScope {
+) : ViewModel(),
+    CoroutineScope {
 
     private lateinit var arguments: BookmarkArguments
 

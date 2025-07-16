@@ -22,15 +22,15 @@ import com.google.android.horologist.compose.layout.ScalingLazyColumnState
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 object FilesScreen {
-    const val route = "files_screen"
+    const val ROUTE = "files_screen"
 }
 
 @Composable
 fun FilesScreen(
     columnState: ScalingLazyColumnState,
+    viewModel: FilesViewModel = hiltViewModel(),
     navigateToEpisode: (episodeUuid: String) -> Unit,
 ) {
-    val viewModel = hiltViewModel<FilesViewModel>()
     val userEpisodesState = viewModel.userEpisodes.collectAsState(null)
     val userEpisodes = userEpisodesState.value
     val artworkCollection by viewModel.artworkConfiguration.collectAsState()

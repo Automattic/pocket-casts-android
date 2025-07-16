@@ -55,8 +55,8 @@ import au.com.shiftyjelly.pocketcasts.payment.SubscriptionPlans
 import au.com.shiftyjelly.pocketcasts.payment.SubscriptionTier
 import au.com.shiftyjelly.pocketcasts.payment.flatMap
 import au.com.shiftyjelly.pocketcasts.payment.getOrNull
+import au.com.shiftyjelly.pocketcasts.referrals.ReferralPageDefaults.PAGE_WIDTH_PERCENT
 import au.com.shiftyjelly.pocketcasts.referrals.ReferralPageDefaults.pageCornerRadius
-import au.com.shiftyjelly.pocketcasts.referrals.ReferralPageDefaults.pageWidthPercent
 import au.com.shiftyjelly.pocketcasts.referrals.ReferralPageDefaults.shouldShowFullScreen
 import au.com.shiftyjelly.pocketcasts.referrals.ReferralsSendGuestPassViewModel.ReferralSendGuestPassError
 import au.com.shiftyjelly.pocketcasts.referrals.ReferralsSendGuestPassViewModel.UiState
@@ -68,8 +68,8 @@ import au.com.shiftyjelly.pocketcasts.localization.R as LR
 @OptIn(ExperimentalMaterial3WindowSizeClassApi::class)
 @Composable
 fun ReferralsSendGuestPassPage(
-    viewModel: ReferralsSendGuestPassViewModel = hiltViewModel(),
     onDismiss: () -> Unit,
+    viewModel: ReferralsSendGuestPassViewModel = hiltViewModel(),
 ) {
     AppTheme(Theme.ThemeType.DARK) {
         val context = LocalContext.current
@@ -102,9 +102,9 @@ fun ReferralsSendGuestPassPage(
 
 @Composable
 private fun ReferralsSendGuestPassContent(
+    state: UiState,
     windowWidthSizeClass: WindowWidthSizeClass,
     windowHeightSizeClass: WindowHeightSizeClass,
-    state: UiState,
     onRetry: () -> Unit,
     onDismiss: () -> Unit,
     onShare: (String, String, String) -> Unit,
@@ -121,7 +121,7 @@ private fun ReferralsSendGuestPassContent(
             .fillMaxSize(),
     ) {
         val showFullScreen = shouldShowFullScreen(windowWidthSizeClass, windowHeightSizeClass)
-        val pageWidth = if (showFullScreen) maxWidth else (maxWidth.value * pageWidthPercent).dp
+        val pageWidth = if (showFullScreen) maxWidth else (maxWidth.value * PAGE_WIDTH_PERCENT).dp
         val pageModifier = if (showFullScreen) {
             Modifier
                 .fillMaxSize()
@@ -241,8 +241,8 @@ private fun SendGuestPassContent(
 @Composable
 private fun ReferralsPassCardsStack(
     state: UiState.Loaded,
-    cardsCount: Int = 3,
     width: Dp,
+    cardsCount: Int = 3,
 ) {
     BoxWithConstraints(
         contentAlignment = Alignment.TopCenter,
@@ -265,36 +265,36 @@ private fun ReferralsPassCardsStack(
     }
 }
 
-@Preview(device = Devices.PortraitRegular)
+@Preview(device = Devices.PORTRAIT_REGULAR)
 @Composable
-fun ReferralsSendGuestPassPortraitPhonePreview() {
+private fun ReferralsSendGuestPassPortraitPhonePreview() {
     ReferralsSendGuestPassContentPreview(
         windowWidthSizeClass = WindowWidthSizeClass.Compact,
         windowHeightSizeClass = WindowHeightSizeClass.Medium,
     )
 }
 
-@Preview(device = Devices.LandscapeRegular)
+@Preview(device = Devices.LANDSCAPE_REGULAR)
 @Composable
-fun ReferralsSendGuestPassLandscapePhonePreview() {
+private fun ReferralsSendGuestPassLandscapePhonePreview() {
     ReferralsSendGuestPassContentPreview(
         windowWidthSizeClass = WindowWidthSizeClass.Compact,
         windowHeightSizeClass = WindowHeightSizeClass.Compact,
     )
 }
 
-@Preview(device = Devices.PortraitTablet)
+@Preview(device = Devices.PORTRAIT_TABLET)
 @Composable
-fun ReferralsSendGuestPassPortraitTabletPreview() {
+private fun ReferralsSendGuestPassPortraitTabletPreview() {
     ReferralsSendGuestPassContentPreview(
         windowWidthSizeClass = WindowWidthSizeClass.Medium,
         windowHeightSizeClass = WindowHeightSizeClass.Medium,
     )
 }
 
-@Preview(device = Devices.LandscapeTablet)
+@Preview(device = Devices.LANDSCAPE_TABLET)
 @Composable
-fun ReferralsSendGuestPassLandscapeTabletPreview() {
+private fun ReferralsSendGuestPassLandscapeTabletPreview() {
     ReferralsSendGuestPassContentPreview(
         windowWidthSizeClass = WindowWidthSizeClass.Medium,
         windowHeightSizeClass = WindowHeightSizeClass.Expanded,

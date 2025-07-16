@@ -50,6 +50,7 @@ fun OnboardingUpgradeBottomSheet(
     viewModel: OnboardingUpgradeFeaturesViewModel,
     state: OnboardingUpgradeFeaturesState,
     onClickSubscribe: () -> Unit,
+    modifier: Modifier = Modifier,
     onPrivacyPolicyClick: () -> Unit = {},
     onTermsAndConditionsClick: () -> Unit = {},
 ) {
@@ -59,7 +60,7 @@ fun OnboardingUpgradeBottomSheet(
 
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
-        modifier = Modifier
+        modifier = modifier
             .background(Color(0xFF282829))
             .verticalScroll(rememberScrollState())
             .padding(horizontal = 20.dp)

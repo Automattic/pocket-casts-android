@@ -76,8 +76,10 @@ class ShelfViewModel @AssistedInject constructor(
         toPosition: Int,
     ) {
         val listData = _uiState.value.shelfRowItems.toMutableList()
-        if (toPosition !in listData.indices || fromPosition !in listData.indices ||
-            listData[fromPosition] is ShelfTitle || listData[toPosition] is ShelfTitle
+        if (toPosition !in listData.indices ||
+            fromPosition !in listData.indices ||
+            listData[fromPosition] is ShelfTitle ||
+            listData[toPosition] is ShelfTitle
         ) {
             throw IllegalArgumentException("$ERROR_SHELF_ITEM_INVALID_MOVE_POSITION from: $fromPosition to: $toPosition")
         }
@@ -117,8 +119,7 @@ class ShelfViewModel @AssistedInject constructor(
         settings.shelfItems.set(_uiState.value.shelfRowItems.filterIsInstance<ShelfItem>(), updateModifiedAt = true)
     }
 
-    private fun sectionTitleAt(position: Int) =
-        if (position < _uiState.value.shelfRowItems.indexOf(moreActionsTitle)) AnalyticsProp.Value.SHELF else AnalyticsProp.Value.OVERFLOW_MENU
+    private fun sectionTitleAt(position: Int) = if (position < _uiState.value.shelfRowItems.indexOf(moreActionsTitle)) AnalyticsProp.Value.SHELF else AnalyticsProp.Value.OVERFLOW_MENU
 
     fun onEditButtonClick() {
         analyticsTracker.track(AnalyticsEvent.PLAYER_SHELF_OVERFLOW_MENU_REARRANGE_STARTED)

@@ -24,7 +24,7 @@ import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 object WatchListScreen {
-    const val route = "watch_list_screen"
+    const val ROUTE = "watch_list_screen"
 }
 
 @Composable
@@ -32,8 +32,9 @@ fun WatchListScreen(
     columnState: ScalingLazyColumnState,
     navigateToRoute: (String) -> Unit,
     toNowPlaying: () -> Unit,
+    modifier: Modifier = Modifier,
+    viewModel: WatchListScreenViewModel = hiltViewModel(),
 ) {
-    val viewModel = hiltViewModel<WatchListScreenViewModel>()
     val state by viewModel.state.collectAsState()
     val upNextState = state.upNextQueue
 
@@ -43,7 +44,7 @@ fun WatchListScreen(
 
     ScalingLazyColumn(
         columnState = columnState,
-        modifier = Modifier.fillMaxWidth(),
+        modifier = modifier.fillMaxWidth(),
     ) {
         item {
             // Need this to position the first chip correctly when the screen loads
@@ -65,7 +66,7 @@ fun WatchListScreen(
                 iconRes = IR.drawable.ic_podcasts,
                 onClick = {
                     viewModel.onPodcastsClicked()
-                    navigateToRoute(PodcastsScreen.routeHomeFolder)
+                    navigateToRoute(PodcastsScreen.ROUTE_HOME_FOLDER)
                 },
             )
         }
@@ -76,7 +77,7 @@ fun WatchListScreen(
                 iconRes = IR.drawable.ic_download,
                 onClick = {
                     viewModel.onDownloadsClicked()
-                    navigateToRoute(DownloadsScreen.route)
+                    navigateToRoute(DownloadsScreen.ROUTE)
                 },
             )
         }
@@ -87,7 +88,7 @@ fun WatchListScreen(
                 iconRes = IR.drawable.ic_filters,
                 onClick = {
                     viewModel.onFiltersClicked()
-                    navigateToRoute(FiltersScreen.route)
+                    navigateToRoute(FiltersScreen.ROUTE)
                 },
             )
         }
@@ -98,7 +99,7 @@ fun WatchListScreen(
                 iconRes = IR.drawable.ic_file,
                 onClick = {
                     viewModel.onFilesClicked()
-                    navigateToRoute(FilesScreen.route)
+                    navigateToRoute(FilesScreen.ROUTE)
                 },
             )
         }
@@ -109,7 +110,7 @@ fun WatchListScreen(
                 iconRes = IR.drawable.ic_profile_settings,
                 onClick = {
                     viewModel.onSettingsClicked()
-                    navigateToRoute(SettingsScreen.route)
+                    navigateToRoute(SettingsScreen.ROUTE)
                 },
             )
         }

@@ -16,5 +16,7 @@ class FolderCreateSharedViewModel : ViewModel() {
 
     var folderUuid: String?
         get() = folderUuidMutable.value
-        set(value) { folderUuidMutable.value = value }
+        set(value) {
+            folderUuidMutable.value = value
+        }
 }

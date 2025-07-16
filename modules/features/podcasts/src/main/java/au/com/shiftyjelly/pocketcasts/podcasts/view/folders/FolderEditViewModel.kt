@@ -43,7 +43,8 @@ class FolderEditViewModel
     private val settings: Settings,
     private val analyticsTracker: AnalyticsTracker,
     private val notificationManager: NotificationManager,
-) : ViewModel(), CoroutineScope {
+) : ViewModel(),
+    CoroutineScope {
 
     data class State(
         val podcastsWithFolders: List<PodcastFolder> = emptyList(),

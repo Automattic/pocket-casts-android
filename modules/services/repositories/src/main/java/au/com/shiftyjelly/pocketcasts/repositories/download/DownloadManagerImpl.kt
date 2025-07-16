@@ -67,7 +67,8 @@ class DownloadManagerImpl @Inject constructor(
     private val notificationHelper: NotificationHelper,
     @ApplicationContext private val context: Context,
     private val episodeAnalytics: EpisodeAnalytics,
-) : DownloadManager, CoroutineScope {
+) : DownloadManager,
+    CoroutineScope {
 
     companion object {
         private const val MIN_TIME_BETWEEN_UPDATE_REPORTS: Long = 500 // 500ms;
@@ -121,7 +122,8 @@ class DownloadManagerImpl @Inject constructor(
             val toBeReQueued = cleanUpStaleDownloads(workManager)
             podcastManager.checkForEpisodesToDownloadBlocking(toBeReQueued, this@DownloadManagerImpl)
             val episodeFlowable = episodeManager.findDownloadingEpisodesRxFlowable()
-                .distinctUntilChanged { t1, t2 -> // We only really need to make sure we have all the downloading episodes available, we don't care when their metadata changes
+                .distinctUntilChanged { t1, t2 ->
+                    // We only really need to make sure we have all the downloading episodes available, we don't care when their metadata changes
                     t1.map { it.uuid }.toSet() == t2.map { it.uuid }.toSet()
                 }
                 .map { list ->
@@ -344,10 +346,9 @@ class DownloadManagerImpl @Inject constructor(
         }
     }
 
-    private suspend fun getRequirementsAsync(episode: BaseEpisode): NetworkRequirements =
-        withContext(downloadsCoroutineContext) {
-            networkRequiredForEpisode(episode)
-        }
+    private suspend fun getRequirementsAsync(episode: BaseEpisode): NetworkRequirements = withContext(downloadsCoroutineContext) {
+        networkRequiredForEpisode(episode)
+    }
 
     override suspend fun getRequirementsAndSetStatusAsync(episode: BaseEpisode): NetworkRequirements {
         return withContext(downloadsCoroutineContext) {

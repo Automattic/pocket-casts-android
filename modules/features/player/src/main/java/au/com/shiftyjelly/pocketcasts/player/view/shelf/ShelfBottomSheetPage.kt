@@ -13,6 +13,7 @@ import androidx.compose.material.IconButton
 import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -41,6 +42,7 @@ import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingUpgradeSourc
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import com.google.android.gms.cast.framework.CastButtonFactory
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.launch
 import au.com.shiftyjelly.pocketcasts.images.R as IR
@@ -68,8 +70,9 @@ fun ShelfBottomSheetPage(
             )
         },
     ) {
+        val uiState by shelfViewModel.uiState.collectAsState()
         MenuShelfItems(
-            shelfViewModel = shelfViewModel,
+            state = uiState,
             onClick = { item, enabled ->
                 when (item) {
                     ShelfItem.Effects -> shelfSharedViewModel.onEffectsClick(ShelfItemSource.OverflowMenu)
@@ -125,6 +128,9 @@ fun ShelfBottomSheetPage(
                     }
                 }
                 if (item != ShelfItem.Cast) onDismiss()
+            },
+            onMove = { from, to ->
+                shelfViewModel.onShelfItemMove(from, to)
             },
         )
     }
@@ -182,7 +188,7 @@ private fun Content(
 
 @Composable
 private fun MediaRouteButton(
-    clickTrigger: MutableSharedFlow<Unit>,
+    clickTrigger: Flow<Unit>,
 ) {
     val scope = rememberCoroutineScope()
     AndroidView(

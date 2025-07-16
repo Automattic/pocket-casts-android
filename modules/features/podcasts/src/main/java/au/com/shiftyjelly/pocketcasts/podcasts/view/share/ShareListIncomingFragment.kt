@@ -15,7 +15,6 @@ import au.com.shiftyjelly.pocketcasts.podcasts.databinding.FragmentShareIncoming
 import au.com.shiftyjelly.pocketcasts.podcasts.view.podcast.PodcastFragment
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
-import au.com.shiftyjelly.pocketcasts.servers.ServiceManager
 import au.com.shiftyjelly.pocketcasts.ui.extensions.getThemeTintedDrawable
 import au.com.shiftyjelly.pocketcasts.ui.helper.FragmentHostListener
 import au.com.shiftyjelly.pocketcasts.views.dialog.OptionsDialog
@@ -29,11 +28,11 @@ import au.com.shiftyjelly.pocketcasts.localization.R as LR
 import au.com.shiftyjelly.pocketcasts.ui.R as UR
 
 @AndroidEntryPoint
-class ShareListIncomingFragment : BaseFragment(), ShareListIncomingAdapter.ClickListener {
+class ShareListIncomingFragment :
+    BaseFragment(),
+    ShareListIncomingAdapter.ClickListener {
 
     @Inject lateinit var podcastManager: PodcastManager
-
-    @Inject lateinit var serviceManager: ServiceManager
 
     @Inject lateinit var settings: Settings
 
@@ -177,11 +176,10 @@ class ShareListIncomingFragment : BaseFragment(), ShareListIncomingAdapter.Click
     }
 
     private object AnalyticsProp {
-        private const val count = "count"
-        private const val source = "source"
-        private const val uuid = "uuid"
-        fun countMap(count: Int) = mapOf(this.count to count)
-        fun subscribeToggledMap(uuid: String) =
-            mapOf(this.source to "incoming_share_list", this.uuid to uuid)
+        private const val COUNT = "count"
+        private const val SOURCE = "source"
+        private const val UUID = "uuid"
+        fun countMap(count: Int) = mapOf(this.COUNT to count)
+        fun subscribeToggledMap(uuid: String) = mapOf(this.SOURCE to "incoming_share_list", this.UUID to uuid)
     }
 }

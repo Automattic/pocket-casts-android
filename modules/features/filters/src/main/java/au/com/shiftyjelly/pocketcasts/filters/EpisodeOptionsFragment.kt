@@ -29,7 +29,9 @@ import au.com.shiftyjelly.pocketcasts.localization.R as LR
 private const val ARG_PLAYLIST_UUID = "playlist_uuid"
 
 @AndroidEntryPoint
-class EpisodeOptionsFragment : BaseFragment(), CoroutineScope {
+class EpisodeOptionsFragment :
+    BaseFragment(),
+    CoroutineScope {
     companion object {
         fun newInstance(playlist: Playlist): EpisodeOptionsFragment {
             val bundle = Bundle()

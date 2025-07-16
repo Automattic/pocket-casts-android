@@ -132,14 +132,14 @@ class SuggestedFoldersFragment : BaseDialogFragment() {
 
                     NavHost(
                         navController = navController,
-                        startDestination = SuggestedFoldersNavRoutes.SuggestedFolders,
+                        startDestination = SuggestedFoldersNavRoutes.SUGGESTED_FOLDERS,
                         enterTransition = { slideInToStart() },
                         exitTransition = { slideOutToStart() },
                         popEnterTransition = { slideInToEnd() },
                         popExitTransition = { slideOutToEnd() },
                         modifier = Modifier.fillMaxSize(),
                     ) {
-                        composable(SuggestedFoldersNavRoutes.SuggestedFolders) {
+                        composable(SuggestedFoldersNavRoutes.SUGGESTED_FOLDERS) {
                             SuggestedFoldersPage(
                                 folders = state.suggestedFolders,
                                 action = state.action,
@@ -155,13 +155,13 @@ class SuggestedFoldersFragment : BaseDialogFragment() {
                         composable(
                             SuggestedFoldersNavRoutes.folderDetailsRoute(),
                             listOf(
-                                navArgument(SuggestedFoldersNavRoutes.SuggestedFolderNameArgument) {
+                                navArgument(SuggestedFoldersNavRoutes.SUGGESTED_FOLDER_NAME_ARGUMENT) {
                                     type = NavType.StringType
                                 },
                             ),
                         ) { backStackEntry ->
                             val arguments = requireNotNull(backStackEntry.arguments) { "Missing back stack entry arguments" }
-                            val folderName = requireNotNull(arguments.getString(SuggestedFoldersNavRoutes.SuggestedFolderNameArgument)) {
+                            val folderName = requireNotNull(arguments.getString(SuggestedFoldersNavRoutes.SUGGESTED_FOLDER_NAME_ARGUMENT)) {
                                 "Missing folder name period argument"
                             }
                             SuggestedFolderPodcastsPage(
@@ -290,12 +290,12 @@ class SuggestedFoldersFragment : BaseDialogFragment() {
 }
 
 private object SuggestedFoldersNavRoutes {
-    const val SuggestedFolders = "main"
-    private const val FolderDetails = "suggested_folder_details"
+    const val SUGGESTED_FOLDERS = "main"
+    private const val FOLDER_DETAILS = "suggested_folder_details"
 
-    const val SuggestedFolderNameArgument = "folderName"
+    const val SUGGESTED_FOLDER_NAME_ARGUMENT = "folderName"
 
-    fun folderDetailsRoute() = "$FolderDetails/{$SuggestedFolderNameArgument}"
+    fun folderDetailsRoute() = "$FOLDER_DETAILS/{$SUGGESTED_FOLDER_NAME_ARGUMENT}"
 
-    fun folderDetailsDestination(folderName: String) = "$FolderDetails/$folderName"
+    fun folderDetailsDestination(folderName: String) = "$FOLDER_DETAILS/$folderName"
 }

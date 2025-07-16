@@ -70,20 +70,19 @@ class PodcastCacheServiceManagerImpl @Inject constructor(
         }
     }
 
-    override suspend fun getEpisodeUrl(episode: PodcastEpisode): String? =
-        withContext(Dispatchers.IO) {
-            try {
-                val response = service.getEpisodeUrl(episode.podcastUuid, episode.uuid)
-                if (response.isSuccessful) {
-                    response.body()?.string()
-                } else {
-                    null
-                }
-            } catch (e: Exception) {
-                Timber.e(e)
+    override suspend fun getEpisodeUrl(episode: PodcastEpisode): String? = withContext(Dispatchers.IO) {
+        try {
+            val response = service.getEpisodeUrl(episode.podcastUuid, episode.uuid)
+            if (response.isSuccessful) {
+                response.body()?.string()
+            } else {
                 null
             }
+        } catch (e: Exception) {
+            Timber.e(e)
+            null
         }
+    }
 
     override suspend fun suggestedFolders(request: SuggestedFoldersRequest): List<SuggestedFolder> {
         return service.suggestedFolders(request).toSuggestedFolders()

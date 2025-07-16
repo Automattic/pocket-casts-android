@@ -35,11 +35,13 @@ import au.com.shiftyjelly.pocketcasts.localization.R as LR
 @Composable
 fun LoginWithEmailScreen(
     onSignInSuccess: () -> Unit,
+    modifier: Modifier = Modifier,
+    viewModel: SignInViewModel = hiltViewModel(),
 ) {
     ScreenScaffold(
         timeText = {},
+        modifier = modifier,
     ) {
-        val viewModel = hiltViewModel<SignInViewModel>()
         val signInState by viewModel.signInState.observeAsState()
         val email by viewModel.email.observeAsState()
         val password by viewModel.password.observeAsState()
@@ -47,9 +49,7 @@ fun LoginWithEmailScreen(
         var loading by remember { mutableStateOf(false) }
 
         when (signInState) {
-            null,
-            SignInState.Empty,
-            -> {
+            SignInState.Empty, null -> {
                 loading = false
 
                 if (email.isNullOrBlank()) {
@@ -76,7 +76,7 @@ fun LoginWithEmailScreen(
             }
 
             is SignInState.Success -> {
-                LaunchedEffect(Unit) {
+                LaunchedEffect(Unit, onSignInSuccess) {
                     onSignInSuccess()
                 }
             }
@@ -109,25 +109,24 @@ private fun Loading() {
     }
 }
 
-private const val key = "key"
+private const val KEY = "key"
 
 @Composable
-private fun getLauncher(onResult: (String) -> Unit) =
-    rememberLauncherForActivityResult(ActivityResultContracts.StartActivityForResult()) {
-        it.data?.let { data ->
-            val results: Bundle = RemoteInput.getResultsFromIntent(data)
-            results.getCharSequence(key)?.let { chars ->
-                onResult(chars.toString())
-            }
+private fun getLauncher(onResult: (String) -> Unit) = rememberLauncherForActivityResult(ActivityResultContracts.StartActivityForResult()) {
+    it.data?.let { data ->
+        val results: Bundle = RemoteInput.getResultsFromIntent(data)
+        results.getCharSequence(KEY)?.let { chars ->
+            onResult(chars.toString())
         }
     }
+}
 
 private fun launchRemoteInput(
     label: String,
     launcher: ManagedActivityResultLauncher<Intent, ActivityResult>,
 ) {
     val remoteInputs: List<RemoteInput> = listOf(
-        RemoteInput.Builder(key)
+        RemoteInput.Builder(KEY)
             .setLabel(label)
             .wearableExtender {
                 setEmojisAllowed(false)

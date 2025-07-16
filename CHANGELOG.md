@@ -1,6 +1,8 @@
 7.94
 -----
-
+*   Bug Fixes
+    *   Fix player's playback position being incorrect after app restart
+        ([#4208](https://github.com/Automattic/pocket-casts-android/pull/4208))
 
 7.93
 -----

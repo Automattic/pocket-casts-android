@@ -122,42 +122,39 @@ class ShelfSharedViewModelTest {
     }
 
     @Test
-    fun `given transcript available, when transcript button clicked, it is toggled`() =
-        runTest {
-            initViewModel()
+    fun `given transcript available, when transcript button clicked, it is toggled`() = runTest {
+        initViewModel()
 
-            shelfSharedViewModel.isTranscriptOpen.test {
-                assertFalse(awaitItem())
+        shelfSharedViewModel.isTranscriptOpen.test {
+            assertFalse(awaitItem())
 
-                shelfSharedViewModel.onTranscriptClick(true, ShelfItemSource.Shelf)
-                assertTrue(awaitItem())
+            shelfSharedViewModel.onTranscriptClick(true, ShelfItemSource.Shelf)
+            assertTrue(awaitItem())
 
-                shelfSharedViewModel.closeTranscript()
-                assertFalse(awaitItem())
-            }
+            shelfSharedViewModel.closeTranscript()
+            assertFalse(awaitItem())
         }
+    }
 
     @Test
-    fun `given transcript not available, when transcript button clicked, then transcript not available snackbar message is shown`() =
-        runTest {
-            initViewModel()
+    fun `given transcript not available, when transcript button clicked, then transcript not available snackbar message is shown`() = runTest {
+        initViewModel()
 
-            shelfSharedViewModel.snackbarMessages.test {
-                shelfSharedViewModel.onTranscriptClick(false, ShelfItemSource.Shelf)
-                assertEquals(SnackbarMessage.TranscriptNotAvailable, awaitItem())
-            }
+        shelfSharedViewModel.snackbarMessages.test {
+            shelfSharedViewModel.onTranscriptClick(false, ShelfItemSource.Shelf)
+            assertEquals(SnackbarMessage.TranscriptNotAvailable, awaitItem())
         }
+    }
 
     @Test
-    fun `when download button clicked, then episode download started snackbar message is shown`() =
-        runTest {
-            initViewModel()
+    fun `when download button clicked, then episode download started snackbar message is shown`() = runTest {
+        initViewModel()
 
-            shelfSharedViewModel.snackbarMessages.test {
-                shelfSharedViewModel.onEpisodeDownloadStart(ShelfItemSource.Shelf)
-                assertEquals(SnackbarMessage.EpisodeDownloadStarted, awaitItem())
-            }
+        shelfSharedViewModel.snackbarMessages.test {
+            shelfSharedViewModel.onEpisodeDownloadStart(ShelfItemSource.Shelf)
+            assertEquals(SnackbarMessage.EpisodeDownloadStarted, awaitItem())
         }
+    }
 
     @Test
     fun `when remove button clicked, then episode removed snackbar message is shown`() = runTest {
@@ -182,27 +179,25 @@ class ShelfSharedViewModelTest {
     }
 
     @Test
-    fun `given podcast available, when show podcast or cloud files button clicked, then podcast is shown`() =
-        runTest {
-            val podcast = Podcast("podcastUuid")
-            initViewModel()
+    fun `given podcast available, when show podcast or cloud files button clicked, then podcast is shown`() = runTest {
+        val podcast = Podcast("podcastUuid")
+        initViewModel()
 
-            shelfSharedViewModel.navigationState.test {
-                shelfSharedViewModel.onShowPodcastOrCloudFiles(podcast, ShelfItemSource.Shelf)
-                assertEquals(NavigationState.ShowPodcast(podcast), awaitItem())
-            }
+        shelfSharedViewModel.navigationState.test {
+            shelfSharedViewModel.onShowPodcastOrCloudFiles(podcast, ShelfItemSource.Shelf)
+            assertEquals(NavigationState.ShowPodcast(podcast), awaitItem())
         }
+    }
 
     @Test
-    fun `given podcast not available, when show podcast or cloud files button clicked, then cloud files are shown`() =
-        runTest {
-            initViewModel()
+    fun `given podcast not available, when show podcast or cloud files button clicked, then cloud files are shown`() = runTest {
+        initViewModel()
 
-            shelfSharedViewModel.navigationState.test {
-                shelfSharedViewModel.onShowPodcastOrCloudFiles(null, ShelfItemSource.Shelf)
-                assertEquals(NavigationState.ShowCloudFiles, awaitItem())
-            }
+        shelfSharedViewModel.navigationState.test {
+            shelfSharedViewModel.onShowPodcastOrCloudFiles(null, ShelfItemSource.Shelf)
+            assertEquals(NavigationState.ShowCloudFiles, awaitItem())
         }
+    }
 
     @Test
     fun `when played button clicked, then mark as played confirmation is shown`() = runTest {
@@ -217,61 +212,57 @@ class ShelfSharedViewModelTest {
     }
 
     @Test
-    fun `given bookmark feature available, when add bookmark button clicked, then add bookmark is shown`() =
-        runTest {
-            initViewModel()
+    fun `given bookmark feature available, when add bookmark button clicked, then add bookmark is shown`() = runTest {
+        initViewModel()
 
-            shelfSharedViewModel.navigationState.test {
-                shelfSharedViewModel.onAddBookmarkClick(
-                    OnboardingUpgradeSource.BOOKMARKS_SHELF_ACTION,
-                    ShelfItemSource.Shelf,
-                )
-                assertEquals(NavigationState.ShowAddBookmark, awaitItem())
-            }
+        shelfSharedViewModel.navigationState.test {
+            shelfSharedViewModel.onAddBookmarkClick(
+                OnboardingUpgradeSource.BOOKMARKS_SHELF_ACTION,
+                ShelfItemSource.Shelf,
+            )
+            assertEquals(NavigationState.ShowAddBookmark, awaitItem())
         }
+    }
 
     @Test
-    fun `given bookmark feature not available, when add bookmark button clicked, then upsell flow is started`() =
-        runTest {
-            initViewModel(subscription = null)
+    fun `given bookmark feature not available, when add bookmark button clicked, then upsell flow is started`() = runTest {
+        initViewModel(subscription = null)
 
-            shelfSharedViewModel.navigationState.test {
-                shelfSharedViewModel.onAddBookmarkClick(
-                    OnboardingUpgradeSource.BOOKMARKS_SHELF_ACTION,
-                    ShelfItemSource.Shelf,
-                )
-                assertEquals(
-                    NavigationState.StartUpsellFlow(OnboardingUpgradeSource.BOOKMARKS_SHELF_ACTION),
-                    awaitItem(),
-                )
-            }
+        shelfSharedViewModel.navigationState.test {
+            shelfSharedViewModel.onAddBookmarkClick(
+                OnboardingUpgradeSource.BOOKMARKS_SHELF_ACTION,
+                ShelfItemSource.Shelf,
+            )
+            assertEquals(
+                NavigationState.StartUpsellFlow(OnboardingUpgradeSource.BOOKMARKS_SHELF_ACTION),
+                awaitItem(),
+            )
         }
+    }
 
     @Test
-    fun `given episode is podcast episode, when archive button clicked, then podcast episode archive confirmation is shown`() =
-        runTest {
-            val episode = PodcastEpisode("episodeUuid", publishedDate = Date())
-            whenever(upNextQueue.currentEpisode).thenReturn(episode)
-            initViewModel()
+    fun `given episode is podcast episode, when archive button clicked, then podcast episode archive confirmation is shown`() = runTest {
+        val episode = PodcastEpisode("episodeUuid", publishedDate = Date())
+        whenever(upNextQueue.currentEpisode).thenReturn(episode)
+        initViewModel()
 
-            shelfSharedViewModel.navigationState.test {
-                shelfSharedViewModel.onArchiveClick({}, ShelfItemSource.Shelf)
-                assertTrue(awaitItem() is NavigationState.ShowPodcastEpisodeArchiveConfirmation)
-            }
+        shelfSharedViewModel.navigationState.test {
+            shelfSharedViewModel.onArchiveClick({}, ShelfItemSource.Shelf)
+            assertTrue(awaitItem() is NavigationState.ShowPodcastEpisodeArchiveConfirmation)
         }
+    }
 
     @Test
-    fun `given episode is user episode, when archive button clicked, then user episode delete confirmation is shown`() =
-        runTest {
-            val episode = UserEpisode("episodeUuid", publishedDate = Date())
-            whenever(upNextQueue.currentEpisode).thenReturn(episode)
-            initViewModel()
+    fun `given episode is user episode, when archive button clicked, then user episode delete confirmation is shown`() = runTest {
+        val episode = UserEpisode("episodeUuid", publishedDate = Date())
+        whenever(upNextQueue.currentEpisode).thenReturn(episode)
+        initViewModel()
 
-            shelfSharedViewModel.navigationState.test {
-                shelfSharedViewModel.onArchiveClick({}, ShelfItemSource.Shelf)
-                assertTrue(awaitItem() is NavigationState.ShowUserEpisodeDeleteConfirmation)
-            }
+        shelfSharedViewModel.navigationState.test {
+            shelfSharedViewModel.onArchiveClick({}, ShelfItemSource.Shelf)
+            assertTrue(awaitItem() is NavigationState.ShowUserEpisodeDeleteConfirmation)
         }
+    }
 
     @Test
     fun `when more button clicked, then more actions are shown`() = runTest {

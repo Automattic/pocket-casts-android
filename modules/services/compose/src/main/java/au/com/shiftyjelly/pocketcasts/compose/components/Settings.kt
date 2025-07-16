@@ -26,6 +26,7 @@ import androidx.compose.material.icons.filled.Share
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -107,6 +108,7 @@ fun SettingSection(
 @Composable
 fun SettingSectionHeader(
     text: String,
+    modifier: Modifier = Modifier,
     indent: Boolean = true,
     paddingValues: PaddingValues = PaddingValues(
         start = if (indent) indentedStartPadding else horizontalPadding,
@@ -118,7 +120,7 @@ fun SettingSectionHeader(
     TextH40(
         text = text,
         color = MaterialTheme.theme.colors.primaryInteractive01,
-        modifier = Modifier.padding(paddingValues),
+        modifier = modifier.padding(paddingValues),
     )
 }
 
@@ -181,7 +183,7 @@ fun SettingRow(
     showFlashWithDelay: Duration? = null, // if null, no flash is shown
     additionalContent: @Composable () -> Unit = {},
 ) {
-    var flashAlphaTarget by remember { mutableStateOf(0f) }
+    var flashAlphaTarget by remember { mutableFloatStateOf(0f) }
     LaunchedEffect(showFlashWithDelay) {
         if (showFlashWithDelay != null) {
             delay(showFlashWithDelay)
@@ -355,7 +357,7 @@ private fun SettingSectionPreview(
 @ShowkaseComposable(name = "SettingRow", group = "Setting", styleName = "Light", defaultStyle = true)
 @Preview(name = "Light")
 @Composable
-fun SettingRowLightPreview() {
+private fun SettingRowLightPreview() {
     AppThemeWithBackground(Theme.ThemeType.LIGHT) {
         SettingRow(
             primaryText = "Primary text",
@@ -367,7 +369,7 @@ fun SettingRowLightPreview() {
 @ShowkaseComposable(name = "SettingRow", group = "Setting", styleName = "Dark")
 @Preview(name = "Dark")
 @Composable
-fun SettingRowDarkPreview() {
+private fun SettingRowDarkPreview() {
     AppThemeWithBackground(Theme.ThemeType.DARK) {
         SettingRow(
             primaryText = "Primary text",
@@ -379,7 +381,7 @@ fun SettingRowDarkPreview() {
 @ShowkaseComposable(name = "SettingRow", group = "Setting", styleName = "Icon (Project)")
 @Preview(name = "Icon (Project)")
 @Composable
-fun SettingRowIconProjectPreview() {
+private fun SettingRowIconProjectPreview() {
     AppThemeWithBackground(Theme.ThemeType.LIGHT) {
         SettingRow(
             primaryText = "Row with icon",
@@ -391,7 +393,7 @@ fun SettingRowIconProjectPreview() {
 @ShowkaseComposable(name = "SettingRow", group = "Setting", styleName = "Icon (Material)")
 @Preview(name = "Icon (Material)")
 @Composable
-fun SettingRowIconMaterialPreview() {
+private fun SettingRowIconMaterialPreview() {
     AppThemeWithBackground(Theme.ThemeType.LIGHT) {
         SettingRow(
             primaryText = "Row with icon",
@@ -403,7 +405,7 @@ fun SettingRowIconMaterialPreview() {
 @ShowkaseComposable(name = "SettingRow", group = "Setting", styleName = "Icon (Gradient)")
 @Preview(name = "Icon (Gradient)")
 @Composable
-fun SettingRowIconGradientPreview() {
+private fun SettingRowIconGradientPreview() {
     AppThemeWithBackground(Theme.ThemeType.LIGHT) {
         SettingRow(
             primaryText = "Row with icon",
@@ -416,7 +418,7 @@ fun SettingRowIconGradientPreview() {
 @ShowkaseComposable(name = "SettingRow", group = "Setting", styleName = "Switch")
 @Preview(name = "Switch")
 @Composable
-fun SettingRowSwitchPreview() {
+private fun SettingRowSwitchPreview() {
     AppThemeWithBackground(Theme.ThemeType.LIGHT) {
         SettingRow(
             primaryText = "Row with switch",
@@ -428,7 +430,7 @@ fun SettingRowSwitchPreview() {
 @ShowkaseComposable(name = "SettingRow", group = "Setting", styleName = "Checkbox")
 @Preview(name = "Checkbox")
 @Composable
-fun SettingRowCheckboxPreview() {
+private fun SettingRowCheckboxPreview() {
     AppThemeWithBackground(Theme.ThemeType.LIGHT) {
         SettingRow(
             primaryText = "Row with checkbox",
@@ -440,7 +442,7 @@ fun SettingRowCheckboxPreview() {
 @ShowkaseComposable(name = "SettingSection", group = "Setting", styleName = "Light", defaultStyle = true)
 @Preview(name = "Light")
 @Composable
-fun SettingSectionLightPreview() {
+private fun SettingSectionLightPreview() {
     AppThemeWithBackground(Theme.ThemeType.LIGHT) {
         SettingSection(heading = "Section heading") {
             SettingRow(primaryText = "Setting row")
@@ -451,7 +453,7 @@ fun SettingSectionLightPreview() {
 @ShowkaseComposable(name = "SettingSection", group = "Setting", styleName = "Dark")
 @Preview(name = "Dark")
 @Composable
-fun SettingSectionDarkPreview() {
+private fun SettingSectionDarkPreview() {
     AppThemeWithBackground(Theme.ThemeType.DARK) {
         SettingSection(heading = "Section heading") {
             SettingRow(primaryText = "Setting row")
@@ -462,7 +464,7 @@ fun SettingSectionDarkPreview() {
 @ShowkaseComposable(name = "SettingInfoRow", group = "Setting")
 @Preview(name = "Info")
 @Composable
-fun SettingInfoRowPreview() {
+private fun SettingInfoRowPreview() {
     AppThemeWithBackground(Theme.ThemeType.LIGHT) {
         SettingInfoRow(
             text = "The quick brown fox jumps over the lazy dog",
