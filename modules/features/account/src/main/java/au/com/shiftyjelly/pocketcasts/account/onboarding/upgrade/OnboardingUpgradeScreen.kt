@@ -53,6 +53,7 @@ import au.com.shiftyjelly.pocketcasts.compose.preview.ThemePreviewParameterProvi
 import au.com.shiftyjelly.pocketcasts.compose.theme
 import au.com.shiftyjelly.pocketcasts.images.R
 import au.com.shiftyjelly.pocketcasts.payment.BillingCycle
+import au.com.shiftyjelly.pocketcasts.payment.SubscriptionOffer
 import au.com.shiftyjelly.pocketcasts.payment.SubscriptionPlan
 import au.com.shiftyjelly.pocketcasts.payment.SubscriptionPlans
 import au.com.shiftyjelly.pocketcasts.payment.SubscriptionTier
@@ -95,7 +96,7 @@ fun OnboardingUpgradeScreen(
             modifier = Modifier.weight(1f),
             pages = variant.toContentPages(
                 currentPlan = state.selectedPlan,
-                isEligibleForTrial = state.availableBasePlans.any { it.offer != null },
+                isEligibleForTrial = state.availableBasePlans.any { it.offer == SubscriptionOffer.Trial },
             ),
         )
         Spacer(modifier = Modifier.height(24.dp))
