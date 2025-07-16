@@ -135,12 +135,12 @@ private fun UpgradeFooter(
     Column(
         modifier = modifier,
     ) {
-        plans.forEach { item ->
+        plans.forEachIndexed { index, item ->
             UpgradePlanRow(
                 plan = item,
                 isSelected = selectedOnboardingPlan.key == item.key,
                 onClick = { onSelectedChange(item) },
-                priceComparisonPlan = SubscriptionPlan.PlusMonthlyPreview,
+                priceComparisonPlan = plans.getOrNull(index + 1),
             )
             Spacer(modifier = Modifier.height(10.dp))
         }
