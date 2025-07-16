@@ -211,7 +211,13 @@ sealed class OnboardingUpgradeFeaturesState {
 
         val selectedPlan get() = getPlan(selectedTier, selectedBillingCycle)
 
+        val selectedBasePlan get() = getBasePlan(selectedTier, selectedBillingCycle)
+
         private fun getPlan(tier: SubscriptionTier, billingCycle: BillingCycle) = availablePlans.first { plan ->
+            plan.key.tier == tier && plan.key.billingCycle == billingCycle
+        }
+
+        private fun getBasePlan(tier: SubscriptionTier, billingCycle: BillingCycle) = availableBasePlans.first { plan ->
             plan.key.tier == tier && plan.key.billingCycle == billingCycle
         }
 

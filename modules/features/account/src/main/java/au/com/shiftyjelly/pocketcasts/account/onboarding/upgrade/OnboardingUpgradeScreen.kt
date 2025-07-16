@@ -53,11 +53,17 @@ import au.com.shiftyjelly.pocketcasts.compose.preview.ThemePreviewParameterProvi
 import au.com.shiftyjelly.pocketcasts.compose.theme
 import au.com.shiftyjelly.pocketcasts.images.R
 import au.com.shiftyjelly.pocketcasts.payment.BillingCycle
+import au.com.shiftyjelly.pocketcasts.payment.PricingSchedule
+import au.com.shiftyjelly.pocketcasts.payment.PricingSchedule.RecurrenceMode
 import au.com.shiftyjelly.pocketcasts.payment.SubscriptionOffer
 import au.com.shiftyjelly.pocketcasts.payment.SubscriptionPlan
 import au.com.shiftyjelly.pocketcasts.payment.SubscriptionPlans
 import au.com.shiftyjelly.pocketcasts.payment.SubscriptionTier
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme.ThemeType
+import java.time.ZonedDateTime
+import java.time.format.DateTimeFormatter
+import java.time.format.FormatStyle
+import java.time.temporal.ChronoUnit
 import kotlinx.coroutines.launch
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
@@ -96,7 +102,8 @@ fun OnboardingUpgradeScreen(
             modifier = Modifier.weight(1f),
             pages = variant.toContentPages(
                 currentPlan = state.selectedPlan,
-                isEligibleForTrial = state.availableBasePlans.any { it.offer == SubscriptionOffer.Trial },
+                isEligibleForTrial = state.selectedBasePlan.offer == SubscriptionOffer.Trial,
+                plan = state.selectedBasePlan,
             ),
         )
         Spacer(modifier = Modifier.height(24.dp))
@@ -206,7 +213,48 @@ private fun UpgradeHeader(
 }
 
 @Composable
-private fun Variants.toContentPages(currentPlan: OnboardingSubscriptionPlan, isEligibleForTrial: Boolean) = buildList {
+private fun SubscriptionPlan.trialSchedule(): List<UpgradeTrialItem> {
+    val offerPlan = this as? SubscriptionPlan.WithOffer ?: return emptyList()
+
+    val discountedPhase = offerPlan.pricingPhases.find { it.schedule.recurrenceMode is PricingSchedule.RecurrenceMode.Recurring } ?: return emptyList()
+
+    val recurringPeriods = (discountedPhase.schedule.recurrenceMode as RecurrenceMode.Recurring).value
+    val chronoUnit = when (discountedPhase.schedule.period) {
+        PricingSchedule.Period.Daily -> ChronoUnit.DAYS
+        PricingSchedule.Period.Weekly -> ChronoUnit.WEEKS
+        PricingSchedule.Period.Monthly -> ChronoUnit.MONTHS
+        PricingSchedule.Period.Yearly -> ChronoUnit.YEARS
+    }
+    val now = ZonedDateTime.now()
+    val dateFromNow = now.plus(recurringPeriods.toLong(), chronoUnit)
+    val formattedDate = DateTimeFormatter.ofLocalizedDate(FormatStyle.LONG).format(dateFromNow)
+    val daysFromNow = ChronoUnit.DAYS.between(now, dateFromNow)
+
+    return listOf(
+        UpgradeTrialItem(
+            iconResId = R.drawable.ic_unlocked,
+            title = stringResource(LR.string.onboarding_upgrade_schedule_today),
+            message = stringResource(LR.string.onboarding_upgrade_schedule_today_message),
+        ),
+        UpgradeTrialItem(
+            iconResId = R.drawable.ic_envelope,
+            title = stringResource(LR.string.onboarding_upgrade_schedule_day, daysFromNow - 7),
+            message = stringResource(LR.string.onboarding_upgrade_schedule_notify),
+        ),
+        UpgradeTrialItem(
+            iconResId = R.drawable.ic_star,
+            title = stringResource(LR.string.onboarding_upgrade_schedule_day, daysFromNow),
+            message = stringResource(LR.string.onboarding_upgrade_schedule_billing, formattedDate),
+        ),
+    )
+}
+
+@Composable
+private fun Variants.toContentPages(
+    currentPlan: OnboardingSubscriptionPlan,
+    isEligibleForTrial: Boolean,
+    plan: SubscriptionPlan,
+) = buildList {
     when (this@toContentPages) {
         Variants.VARIANT_FEATURES -> {
             add(
@@ -218,7 +266,7 @@ private fun Variants.toContentPages(currentPlan: OnboardingSubscriptionPlan, isE
             if (isEligibleForTrial) {
                 add(
                     UpgradePagerContent.TrialSchedule(
-                        timelineItems = UpgradeTrialItem.getPreviewItems(),
+                        timelineItems = plan.trialSchedule(),
                         showCta = false,
                     ),
                 )
@@ -228,7 +276,7 @@ private fun Variants.toContentPages(currentPlan: OnboardingSubscriptionPlan, isE
         Variants.VARIANT_TRIAL_TIMELINE -> {
             add(
                 UpgradePagerContent.TrialSchedule(
-                    timelineItems = UpgradeTrialItem.getPreviewItems(),
+                    timelineItems = plan.trialSchedule(),
                     showCta = true,
                 ),
             )
@@ -290,7 +338,8 @@ private fun FeaturesContent(
             item {
                 TextP40(
                     text = stringResource(LR.string.onboarding_upgrade_features_trial_schedule),
-                    modifier = Modifier.padding(top = 24.dp)
+                    modifier = Modifier
+                        .padding(top = 24.dp)
                         .clickable { onCtaClick() },
                     color = MaterialTheme.theme.colors.primaryInteractive01,
                 )
@@ -314,7 +363,8 @@ private fun ScheduleContent(
             item {
                 TextP40(
                     text = stringResource(LR.string.onboarding_upgrade_schedule_see_features),
-                    modifier = Modifier.padding(top = 24.dp)
+                    modifier = Modifier
+                        .padding(top = 24.dp)
                         .clickable { onCtaClick() },
                     color = MaterialTheme.theme.colors.primaryInteractive01,
                 )
