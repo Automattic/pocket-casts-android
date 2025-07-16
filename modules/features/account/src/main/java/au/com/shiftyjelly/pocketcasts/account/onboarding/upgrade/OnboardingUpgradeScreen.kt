@@ -21,8 +21,8 @@ import androidx.compose.foundation.layout.statusBars
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.layout.wrapContentWidth
-import androidx.compose.foundation.pager.VerticalPager
-import androidx.compose.foundation.pager.rememberPagerState
+import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
@@ -102,7 +102,7 @@ fun OnboardingUpgradeScreen(
                 isEligibleForTrial = true,
             ),
         )
-        Spacer(modifier = Modifier.height(16.dp))
+        Spacer(modifier = Modifier.height(24.dp))
         UpgradeFooter(
             modifier = Modifier
                 .fillMaxWidth(),
@@ -253,19 +253,30 @@ private fun UpgradeContent(
     pages: List<UpgradePagerContent>,
     modifier: Modifier = Modifier,
 ) {
-    Column(modifier = modifier) {
-        val pagerState = rememberPagerState(initialPage = 0) { pages.size }
-        val coroutineScope = rememberCoroutineScope()
-        VerticalPager(state = pagerState, modifier = Modifier.fillMaxSize()) { page ->
-            when (val currentPage = pages[page]) {
+    val coroutineScope = rememberCoroutineScope()
+    val listState = rememberLazyListState()
+    FadedLazyColumn(
+        modifier = modifier,
+        state = listState,
+    ) {
+        itemsIndexed(pages) { index, page ->
+            when (page) {
                 is UpgradePagerContent.Features -> FeaturesContent(
-                    features = currentPage,
-                    onCtaClick = { coroutineScope.launch { pagerState.animateScrollToPage(pages.size - page) } },
+                    features = page,
+                    onCtaClick = {
+                        coroutineScope.launch {
+                            listState.scrollToItem(pages.size - index)
+                        }
+                    },
                 )
 
                 is UpgradePagerContent.TrialSchedule -> ScheduleContent(
-                    trialSchedule = currentPage,
-                    onCtaClick = { coroutineScope.launch { pagerState.animateScrollToPage(pages.size - page) } },
+                    trialSchedule = page,
+                    onCtaClick = {
+                        coroutineScope.launch {
+                            listState.scrollToItem(pages.size - index)
+                        }
+                    },
                 )
             }
         }
@@ -277,23 +288,25 @@ private fun FeaturesContent(
     features: UpgradePagerContent.Features,
     onCtaClick: () -> Unit,
 ) {
-    FadedLazyColumn {
-        items(features.features.size) {
+    Column {
+        features.features.forEach { item ->
             UpgradeFeatureItem(
-                item = features.features[it],
+                item = item,
                 iconColor = MaterialTheme.theme.colors.primaryText01,
                 textColor = MaterialTheme.theme.colors.secondaryText02,
             )
         }
         if (features.showCta) {
-            item {
-                TextP40(
-                    text = stringResource(LR.string.onboarding_upgrade_features_trial_schedule),
-                    modifier = Modifier.padding(top = 24.dp)
-                        .clickable { onCtaClick() },
-                    color = MaterialTheme.theme.colors.primaryInteractive01,
-                )
-            }
+            TextP40(
+                text = stringResource(LR.string.onboarding_upgrade_features_trial_schedule),
+                modifier = Modifier
+                    .padding(
+                        top = 24.dp,
+                        bottom = 24.dp,
+                    )
+                    .clickable { onCtaClick() },
+                color = MaterialTheme.theme.colors.primaryInteractive01,
+            )
         }
     }
 }
@@ -303,21 +316,21 @@ private fun ScheduleContent(
     trialSchedule: UpgradePagerContent.TrialSchedule,
     onCtaClick: () -> Unit,
 ) {
-    FadedLazyColumn {
-        item {
-            UpgradeTrialTimeline(
-                items = trialSchedule.timelineItems,
-            )
-        }
+    Column {
+        UpgradeTrialTimeline(
+            items = trialSchedule.timelineItems,
+        )
         if (trialSchedule.showCta) {
-            item {
-                TextP40(
-                    text = stringResource(LR.string.onboarding_upgrade_schedule_see_features),
-                    modifier = Modifier.padding(top = 24.dp)
-                        .clickable { onCtaClick() },
-                    color = MaterialTheme.theme.colors.primaryInteractive01,
-                )
-            }
+            TextP40(
+                text = stringResource(LR.string.onboarding_upgrade_schedule_see_features),
+                modifier = Modifier
+                    .padding(
+                        top = 24.dp,
+                        bottom = 24.dp,
+                    )
+                    .clickable { onCtaClick() },
+                color = MaterialTheme.theme.colors.primaryInteractive01,
+            )
         }
     }
 }
