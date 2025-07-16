@@ -242,4 +242,13 @@ class FeatureFlagTest {
 
         assertEquals(flow1, flow2)
     }
+
+    @Test
+    fun `immutable value doesn't change`() {
+        FeatureFlag.setEnabled(Feature.TEST_FREE_FEATURE, false)
+        assertFalse(FeatureFlag.isEnabledImmutable(Feature.TEST_FREE_FEATURE))
+
+        FeatureFlag.setEnabled(Feature.TEST_FREE_FEATURE, true)
+        assertFalse(FeatureFlag.isEnabledImmutable(Feature.TEST_FREE_FEATURE))
+    }
 }
