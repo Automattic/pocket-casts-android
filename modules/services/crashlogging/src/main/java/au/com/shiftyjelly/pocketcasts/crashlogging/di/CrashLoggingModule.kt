@@ -10,7 +10,6 @@ import au.com.shiftyjelly.pocketcasts.crashlogging.LocaleProvider
 import au.com.shiftyjelly.pocketcasts.crashlogging.PocketCastsCrashLoggingDataProvider
 import com.automattic.android.tracks.crashlogging.CrashLogging
 import com.automattic.android.tracks.crashlogging.CrashLoggingProvider
-import com.automattic.encryptedlogging.AutomatticEncryptedLogging
 import com.automattic.encryptedlogging.EncryptedLogging
 import dagger.Binds
 import dagger.Module
@@ -31,8 +30,8 @@ abstract class CrashLoggingModule {
     companion object {
         @Provides
         fun provideEncryptedLogging(@ApplicationContext context: Context): EncryptedLogging {
-            return AutomatticEncryptedLogging(
-                context,
+            return EncryptedLogging.getInstance(
+                context = context,
                 encryptedLoggingKey = BuildConfig.ENCRYPTION_KEY,
                 clientSecret = BuildConfig.APP_SECRET,
             )
