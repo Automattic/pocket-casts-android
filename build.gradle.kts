@@ -414,6 +414,7 @@ subprojects {
         dependencies {
             val lintChecks by configurations
             lintChecks(libs.security.lint)
+            lintChecks(libs.wordpress.lint)
         }
     }
 }
