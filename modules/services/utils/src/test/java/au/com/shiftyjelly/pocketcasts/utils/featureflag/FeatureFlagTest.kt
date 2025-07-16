@@ -246,9 +246,9 @@ class FeatureFlagTest {
     @Test
     fun `immutable value doesn't change`() {
         FeatureFlag.setEnabled(Feature.TEST_FREE_FEATURE, false)
-        assertFalse(FeatureFlag.isEnabledImmutable(Feature.TEST_FREE_FEATURE))
+        assertFalse(FeatureFlag.isEnabled(Feature.TEST_FREE_FEATURE, immutable = true))
 
         FeatureFlag.setEnabled(Feature.TEST_FREE_FEATURE, true)
-        assertFalse(FeatureFlag.isEnabledImmutable(Feature.TEST_FREE_FEATURE))
+        assertFalse(FeatureFlag.isEnabled(Feature.TEST_FREE_FEATURE, immutable = true))
     }
 }

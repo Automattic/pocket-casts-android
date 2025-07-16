@@ -27,22 +27,23 @@ object FeatureFlag {
         updateFeatureFlowValues()
     }
 
+    /**
+     * Returns whether the [feature] is enabled. If [immutable] property is set to [true]
+     * then the value is snapshotted for any future calls with the [immutable] flag present.
+     */
     fun isEnabled(
         feature: Feature,
+        immutable: Boolean = false,
     ): Boolean {
-        return findProviderForFeature<FeatureProvider>(feature)
-            ?.isEnabled(feature)
-            ?: feature.defaultValue
-    }
-
-    /**
-     * Returns the value of the [feature] that remains constant regardless of data source changes.
-     * The initial value is snapshotted the first time [isEnabledImmutable] is called.
-     */
-    fun isEnabledImmutable(
-        feature: Feature
-    ): Boolean {
-        return immutableValues.computeIfAbsent(feature, ::isEnabled)
+        return if (immutable) {
+            immutableValues.computeIfAbsent(feature) {
+                isEnabled(feature, immutable = false)
+            }
+        } else {
+            findProviderForFeature<FeatureProvider>(feature)
+                ?.isEnabled(feature)
+                ?: feature.defaultValue
+        }
     }
 
     fun isEnabledFlow(
