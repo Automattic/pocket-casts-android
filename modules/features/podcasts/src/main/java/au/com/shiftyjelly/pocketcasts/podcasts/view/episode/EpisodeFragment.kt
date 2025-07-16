@@ -516,7 +516,7 @@ class EpisodeFragment : BaseFragment() {
         binding?.episodeTranscript?.setContentWithViewCompositionStrategy {
             val transcript = viewModel.transcript.collectAsState().value
 
-            AppTheme(theme.activeTheme) {
+            AppTheme(activeTheme) {
                 Column(
                     modifier = Modifier.fillMaxWidth(),
                 ) {

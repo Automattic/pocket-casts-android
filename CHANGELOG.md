@@ -17,12 +17,18 @@
     *   Bring back landscape UI
         ([#4156](https://github.com/Automattic/pocket-casts-android/pull/4156))
 *   Bug Fixes
+    *   Fix clip links causing app being unresponsive.
+        ([#4217](https://github.com/Automattic/pocket-casts-android/pull/4217))
     *   Collapse player when opening a notification
         ([#4150](https://github.com/Automattic/pocket-casts-android/pull/4150))
     *   Fix episodes not being removed from the downloads list
         ([#4167](https://github.com/Automattic/pocket-casts-android/pull/4167))
     *   Fix revamped notifications showing up on wear and automotive
         ([#4177](https://github.com/Automattic/pocket-casts-android/pull/4177))
+    *   Fix upsell notifications showing up even if the user already has an active subscription
+        ([#4216](https://github.com/Automattic/pocket-casts-android/pull/4216))
+    *   Fix navigation bar obstructing content on older Android systems
+        ([#4219](https://github.com/Automattic/pocket-casts-android/pull/4219))
 
 7.92
 -----
@@ -48,6 +54,9 @@
         ([#4151](https://github.com/Automattic/pocket-casts-android/pull/4151))
     *   Fix issue with notification prompt showing too often
         ([#4162](https://github.com/Automattic/pocket-casts-android/pull/4162))
+*   Hotfixes
+    *   Fix broken downloads experience
+        ([#4231](https://github.com/Automattic/pocket-casts-android/pull/4231))
 
 7.91
 -----

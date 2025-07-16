@@ -25,20 +25,11 @@ fun View.hide() {
     this.visibility = View.GONE
 }
 
-fun View.toggleVisibility(): Boolean {
-    this.visibility = if (this.visibility == View.GONE) View.VISIBLE else View.GONE
-    return this.visibility == View.VISIBLE
-}
-
 fun View.findToolbar(): Toolbar {
     return findViewById(R.id.toolbar)
 }
 
 fun View.isVisible() = visibility == View.VISIBLE
-
-fun View.isInvisible() = visibility == View.INVISIBLE
-
-fun View.isHidden() = visibility == View.GONE
 
 fun View.setRippleBackground(borderless: Boolean = false) {
     val resId = if (borderless) android.R.attr.selectableItemBackgroundBorderless else android.R.attr.selectableItemBackground
