@@ -287,7 +287,7 @@ private val SubscriptionPlan.pricePerMonth: Float
 
 private val SubscriptionPlan.recurringPrice: Price? get() = when (this) {
     is SubscriptionPlan.Base -> pricingPhase.price
-    is SubscriptionPlan.WithOffer -> pricingPhases.find { it.schedule.recurrenceMode is PricingSchedule.RecurrenceMode.Recurring }?.price
+    is SubscriptionPlan.WithOffer -> pricingPhases.find { it.schedule.recurrenceMode is PricingSchedule.RecurrenceMode.Infinite }?.price
 }
 
 private val SubscriptionPlan.pricePerWeek: Float
