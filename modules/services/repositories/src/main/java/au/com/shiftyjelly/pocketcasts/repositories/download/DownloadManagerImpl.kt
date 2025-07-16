@@ -6,6 +6,7 @@ import android.content.Context
 import androidx.core.app.NotificationCompat
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.LiveData
+import androidx.lifecycle.Observer
 import androidx.lifecycle.toLiveData
 import androidx.work.Constraints
 import androidx.work.Data
@@ -53,6 +54,7 @@ import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
@@ -118,7 +120,6 @@ class DownloadManagerImpl @Inject constructor(
         launch(downloadsCoroutineContext) {
             val toBeReQueued = cleanUpStaleDownloads(workManager)
             podcastManager.checkForEpisodesToDownloadBlocking(toBeReQueued, this@DownloadManagerImpl)
-
             val episodeFlowable = episodeManager.findDownloadingEpisodesRxFlowable()
                 .distinctUntilChanged { t1, t2 -> // We only really need to make sure we have all the downloading episodes available, we don't care when their metadata changes
                     t1.map { it.uuid }.toSet() == t2.map { it.uuid }.toSet()
@@ -131,115 +132,131 @@ class DownloadManagerImpl @Inject constructor(
             workManagerListener = workManager.getWorkInfosByTagLiveData(DownloadManager.WORK_MANAGER_DOWNLOAD_TAG).combineLatest(episodeLiveData)
 
             withContext(Dispatchers.Main) {
-                workManagerListener?.observeForever { (tasks, episodeUuids) ->
-                    tasks.forEach { workInfo ->
-                        val taskId = workInfo.id.toString()
-                        val episodeUUID = episodeUuids[taskId]
-                        if (episodeUUID != null) {
-                            val info = DownloadingInfo(episodeUUID, workInfo.id)
-                            when (workInfo.state) {
-                                WorkInfo.State.ENQUEUED, WorkInfo.State.BLOCKED -> {
-                                    launch(downloadsCoroutineContext) {
-                                        pendingQueue[episodeUUID] = DownloadingInfo(episodeUUID, workInfo.id)
-                                        episodeManager.findEpisodeByUuid(episodeUUID)?.let { episode ->
+                suspendCancellableCoroutine<Unit> { continuation ->
+                    val myObserver = WorkInfoObserver(workManager, ::updateNotification)
+                    workManagerListener?.observeForever(myObserver)
+                    continuation.invokeOnCancellation {
+                        workManagerListener?.removeObserver(myObserver)
+                    }
+                }
+            }
+        }
+    }
 
-                                            // FIXME this is a hack to avoid an issue where this listener says downloads
-                                            //  on the watch app are enqueued when they are actually still running.
-                                            val queriedState = workManager.getWorkInfoById(workInfo.id).get()?.state
-                                            if (Util.isWearOs(context) && queriedState == WorkInfo.State.RUNNING) {
-                                                getRequirementsAsync(episode)
-                                            } else {
-                                                getRequirementsAndSetStatusAsync(episode)
-                                            }
-                                        }
-                                        synchronized(downloadingQueue) {
-                                            if (downloadingQueue.contains(info)) {
-                                                downloadingQueue.remove(info)
-                                            }
-                                        }
+    private inner class WorkInfoObserver(
+        private val workManager: WorkManager,
+        private val updateNotifications: () -> Unit,
+    ) : Observer<Pair<List<WorkInfo>, Map<String?, String>>> {
+        override fun onChanged(value: Pair<List<WorkInfo>, Map<String?, String>>) {
+            val tasks = value.first
+            val episodeUuids = value.second
+            tasks.forEach { workInfo ->
+                val taskId = workInfo.id.toString()
+                val episodeUUID = episodeUuids[taskId]
+                if (episodeUUID != null) {
+                    val info = DownloadingInfo(episodeUUID, workInfo.id)
+                    when (workInfo.state) {
+                        WorkInfo.State.ENQUEUED, WorkInfo.State.BLOCKED -> {
+                            launch(downloadsCoroutineContext) {
+                                pendingQueue[episodeUUID] = DownloadingInfo(episodeUUID, workInfo.id)
+                                episodeManager.findEpisodeByUuid(episodeUUID)?.let { episode ->
+
+                                    // FIXME this is a hack to avoid an issue where this listener says downloads
+                                    //  on the watch app are enqueued when they are actually still running.
+                                    val queriedState = workManager.getWorkInfoById(workInfo.id).get()?.state
+                                    if (Util.isWearOs(context) && queriedState == WorkInfo.State.RUNNING) {
+                                        getRequirementsAsync(episode)
+                                    } else {
+                                        getRequirementsAndSetStatusAsync(episode)
                                     }
                                 }
-
-                                WorkInfo.State.RUNNING -> {
-                                    pendingQueue.remove(episodeUUID)
-                                    launch(downloadsCoroutineContext) {
-                                        synchronized(downloadingQueue) {
-                                            if (!downloadingQueue.contains(info)) {
-                                                downloadingQueue.add(info)
-                                            }
-                                        }
-                                        workInfo.progress.toDownloadProgressUpdate()?.let {
-                                            updateProgress(it)
-                                        }
+                                synchronized(downloadingQueue) {
+                                    if (downloadingQueue.contains(info)) {
+                                        downloadingQueue.remove(info)
                                     }
                                 }
+                            }
+                        }
 
-                                WorkInfo.State.CANCELLED -> {
-                                    pendingQueue.remove(episodeUUID)
-                                    launch(downloadsCoroutineContext) {
-                                        synchronized(downloadingQueue) {
-                                            downloadingQueue.remove(info)
-                                        }
-                                        stopDownloadingEpisode(episodeUUID, "work manager cancel status")
-
-                                        episodeManager.findEpisodeByUuid(episodeUUID)?.let {
-                                            episodeManager.updateDownloadTaskId(it, null)
-                                            if (!it.isDownloaded && it.episodeStatus != EpisodeStatusEnum.NOT_DOWNLOADED) {
-                                                episodeManager.updateEpisodeStatus(it, EpisodeStatusEnum.NOT_DOWNLOADED)
-                                            }
-                                        }
+                        WorkInfo.State.RUNNING -> {
+                            pendingQueue.remove(episodeUUID)
+                            launch(downloadsCoroutineContext) {
+                                synchronized(downloadingQueue) {
+                                    if (!downloadingQueue.contains(info)) {
+                                        downloadingQueue.add(info)
                                     }
                                 }
+                                workInfo.progress.toDownloadProgressUpdate()?.let {
+                                    updateProgress(it)
+                                }
+                            }
+                        }
 
-                                WorkInfo.State.FAILED -> {
-                                    launch(downloadsCoroutineContext) {
-                                        synchronized(downloadingQueue) {
-                                            downloadingQueue.remove(info)
-                                        }
+                        WorkInfo.State.CANCELLED -> {
+                            pendingQueue.remove(episodeUUID)
+                            launch(downloadsCoroutineContext) {
+                                synchronized(downloadingQueue) {
+                                    downloadingQueue.remove(info)
+                                }
+                                stopDownloadingEpisode(episodeUUID, "work manager cancel status")
 
-                                        val error = EpisodeDownloadError.fromProperties(workInfo.outputData.keyValueMap)
-                                        val errorMessage = workInfo.outputData.getString(DownloadEpisodeTask.OUTPUT_ERROR_MESSAGE)
-                                        episodeDidDownload(DownloadResult.failedResult(error, errorMessage))
+                                episodeManager.findEpisodeByUuid(episodeUUID)?.let {
+                                    episodeManager.updateDownloadTaskId(it, null)
+                                    if (!it.isDownloaded && it.episodeStatus != EpisodeStatusEnum.NOT_DOWNLOADED) {
+                                        episodeManager.updateEpisodeStatus(it, EpisodeStatusEnum.NOT_DOWNLOADED)
                                     }
                                 }
+                            }
+                        }
 
-                                WorkInfo.State.SUCCEEDED -> {
-                                    launch(downloadsCoroutineContext) {
-                                        Timber.d("Worker succeeded: $episodeUUID")
-                                        synchronized(downloadingQueue) {
-                                            downloadingQueue.remove(info)
-                                        }
+                        WorkInfo.State.FAILED -> {
+                            launch(downloadsCoroutineContext) {
+                                synchronized(downloadingQueue) {
+                                    downloadingQueue.remove(info)
+                                }
 
-                                        val wasCancelled = workInfo.outputData.getBoolean(
-                                            DownloadEpisodeTask.OUTPUT_CANCELLED,
-                                            false,
-                                        )
-                                        if (!wasCancelled) {
-                                            episodeDidDownload(DownloadResult.successResult(episodeUUID))
-                                        } else {
-                                            episodeManager.findEpisodeByUuid(episodeUUID)?.let { episode ->
-                                                episodeManager.updateDownloadTaskId(episode, null)
-                                                if (!episode.isDownloaded && episode.episodeStatus != EpisodeStatusEnum.NOT_DOWNLOADED) {
-                                                    episodeManager.updateEpisodeStatus(episode, EpisodeStatusEnum.NOT_DOWNLOADED)
-                                                }
-                                                LogBuffer.e(LogBuffer.TAG_BACKGROUND_TASKS, "Cleaned up workmanager cancelled download task for ${episode.uuid}.")
-                                            }
+                                val error = EpisodeDownloadError.fromProperties(workInfo.outputData.keyValueMap)
+                                val errorMessage = workInfo.outputData.getString(DownloadEpisodeTask.OUTPUT_ERROR_MESSAGE)
+                                episodeDidDownload(DownloadResult.failedResult(error, errorMessage))
+                            }
+                        }
+
+                        WorkInfo.State.SUCCEEDED -> {
+                            launch(downloadsCoroutineContext) {
+                                Timber.d("Worker succeeded: $episodeUUID")
+                                synchronized(downloadingQueue) {
+                                    downloadingQueue.remove(info)
+                                }
+
+                                val wasCancelled = workInfo.outputData.getBoolean(
+                                    DownloadEpisodeTask.OUTPUT_CANCELLED,
+                                    false,
+                                )
+                                if (!wasCancelled) {
+                                    episodeDidDownload(DownloadResult.successResult(episodeUUID))
+                                } else {
+                                    episodeManager.findEpisodeByUuid(episodeUUID)?.let { episode ->
+                                        episodeManager.updateDownloadTaskId(episode, null)
+                                        if (!episode.isDownloaded && episode.episodeStatus != EpisodeStatusEnum.NOT_DOWNLOADED) {
+                                            episodeManager.updateEpisodeStatus(episode, EpisodeStatusEnum.NOT_DOWNLOADED)
                                         }
+                                        LogBuffer.e(LogBuffer.TAG_BACKGROUND_TASKS, "Cleaned up workmanager cancelled download task for ${episode.uuid}.")
                                     }
                                 }
                             }
                         }
                     }
                 }
-                updateNotification()
             }
+
+            updateNotifications()
         }
     }
 
     // Due to a previous bug it is possible to have episodes with workmanager task ids that aren't in workmanager. This may also happen when the user migrates the database to a new phone or restores a backup.
     // this causes them to not download. We clean them up here.
     // returns with a list of episode ids that should be re-added to queue
-    private suspend fun cleanUpStaleDownloads(workManager: WorkManager): List<String> = withContext(downloadsCoroutineContext) {
+    private suspend fun cleanUpStaleDownloads(workManager: WorkManager): List<String> {
         val staleDownloads = episodeManager.findStaleDownloads()
 
         Timber.i("Cleaning up ${staleDownloads.size} stale downloads.")
@@ -266,7 +283,7 @@ class DownloadManagerImpl @Inject constructor(
             }
         }
 
-        episodesUuidsForReQueue.toList()
+        return episodesUuidsForReQueue.toList()
     }
 
     override fun hasPendingOrRunningDownloads(): Boolean {
