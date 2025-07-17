@@ -899,6 +899,10 @@
     <string name="filters_tooltip_title">Organize your episodes</string>
     <string name="filters_tooltip_subtitle">Create smart filters to organize your episodes. Filter by duration, release date, media type, and more.</string>
 
+    <!-- Playlists -->
+
+    <string name="playlists">Playlists</string>
+
     <!-- Profile -->
 
     <string name="profile">Profile</string>

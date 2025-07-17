@@ -18,6 +18,7 @@ import kotlinx.coroutines.flow.StateFlow
 object FeatureFlag {
     private val providers = CopyOnWriteArrayList<FeatureProvider>()
     private val featureFlows = ConcurrentHashMap<Feature, MutableStateFlow<Boolean>>()
+    private val immutableValues = ConcurrentHashMap<Feature, Boolean>()
 
     fun initialize(
         providers: List<FeatureProvider>,
@@ -26,12 +27,23 @@ object FeatureFlag {
         updateFeatureFlowValues()
     }
 
+    /**
+     * Returns whether the [feature] is enabled. If [immutable] property is set to [true]
+     * then the value is snapshotted for any future calls with the [immutable] flag present.
+     */
     fun isEnabled(
         feature: Feature,
+        immutable: Boolean = false,
     ): Boolean {
-        return findProviderForFeature<FeatureProvider>(feature)
-            ?.isEnabled(feature)
-            ?: feature.defaultValue
+        return if (immutable) {
+            immutableValues.computeIfAbsent(feature) {
+                isEnabled(feature, immutable = false)
+            }
+        } else {
+            findProviderForFeature<FeatureProvider>(feature)
+                ?.isEnabled(feature)
+                ?: feature.defaultValue
+        }
     }
 
     fun isEnabledFlow(

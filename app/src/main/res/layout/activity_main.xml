@@ -35,8 +35,7 @@
             android:elevation="8dp"
             app:itemIconTint="@color/navigation_color"
             app:itemTextColor="@color/navigation_color"
-            app:labelVisibilityMode="labeled"
-            app:menu="@menu/navigation" />
+            app:labelVisibilityMode="labeled" />
 
         <FrameLayout
             android:id="@+id/fragmentOverBottomNav"
