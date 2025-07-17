@@ -43,10 +43,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.MaterialTheme
-import androidx.compose.material3.windowsizeclass.ExperimentalMaterial3WindowSizeClassApi
-import androidx.compose.material3.windowsizeclass.WindowHeightSizeClass
-import androidx.compose.material3.windowsizeclass.WindowWidthSizeClass
-import androidx.compose.material3.windowsizeclass.calculateWindowSizeClass
+import androidx.compose.material3.adaptive.currentWindowAdaptiveInfo
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
@@ -87,6 +84,8 @@ import au.com.shiftyjelly.pocketcasts.compose.PodcastColors
 import au.com.shiftyjelly.pocketcasts.compose.ad.AdBanner
 import au.com.shiftyjelly.pocketcasts.compose.ad.BlazeAd
 import au.com.shiftyjelly.pocketcasts.compose.ad.rememberAdColors
+import au.com.shiftyjelly.pocketcasts.compose.adaptive.isAtLeastMediumHeight
+import au.com.shiftyjelly.pocketcasts.compose.adaptive.isAtLeastMediumWidth
 import au.com.shiftyjelly.pocketcasts.compose.components.AnimatedNonNullVisibility
 import au.com.shiftyjelly.pocketcasts.compose.components.rememberNestedScrollLockableInteropConnection
 import au.com.shiftyjelly.pocketcasts.compose.extensions.contentWithoutConsumedInsets
@@ -148,7 +147,6 @@ import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 import au.com.shiftyjelly.pocketcasts.transcripts.UiState as TranscriptsUiState
 
-@OptIn(ExperimentalMaterial3WindowSizeClassApi::class)
 @AndroidEntryPoint
 class PlayerHeaderFragment :
     BaseFragment(),
@@ -199,10 +197,10 @@ class PlayerHeaderFragment :
         container: ViewGroup?,
         savedInstanceState: Bundle?,
     ) = contentWithoutConsumedInsets {
-        val windowSize = calculateWindowSizeClass(requireActivity())
+        val windowSize = currentWindowAdaptiveInfo().windowSizeClass
         val isPortraitConfiguration = LocalConfiguration.current.inPortrait()
-        val isPortraitPlayer = isPortraitConfiguration || windowSize.heightSizeClass >= WindowHeightSizeClass.Medium
-        val maxWidthFraction = if (isPortraitConfiguration && windowSize.widthSizeClass >= WindowWidthSizeClass.Medium) 0.8f else 1f
+        val isPortraitPlayer = isPortraitConfiguration || windowSize.isAtLeastMediumHeight()
+        val maxWidthFraction = if (isPortraitConfiguration && windowSize.isAtLeastMediumWidth()) 0.8f else 1f
 
         val podcastColors by remember { podcastColorsFlow() }.collectAsState(PodcastColors.ForUserEpisode)
         val headerData by remember { playerHeaderFlow() }.collectAsState(PlayerViewModel.PlayerHeader())

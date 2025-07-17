@@ -1,15 +1,14 @@
 package au.com.shiftyjelly.pocketcasts.referrals
 
-import androidx.compose.material3.windowsizeclass.WindowHeightSizeClass
-import androidx.compose.material3.windowsizeclass.WindowWidthSizeClass
 import androidx.compose.ui.unit.dp
+import androidx.window.core.layout.WindowSizeClass
+import au.com.shiftyjelly.pocketcasts.compose.adaptive.isAtMostMediumHeight
+import au.com.shiftyjelly.pocketcasts.compose.adaptive.isAtMostMediumWidth
 
 object ReferralPageDefaults {
     fun shouldShowFullScreen(
-        windowWidthSizeClass: WindowWidthSizeClass,
-        windowHeightSizeClass: WindowHeightSizeClass,
-    ) = windowWidthSizeClass == WindowWidthSizeClass.Compact ||
-        windowHeightSizeClass == WindowHeightSizeClass.Compact
+        windowSizeClass: WindowSizeClass,
+    ) = windowSizeClass.isAtMostMediumHeight() || windowSizeClass.isAtMostMediumWidth()
 
     fun pageCornerRadius(showFullScreen: Boolean) = if (showFullScreen) 0.dp else 8.dp
 
