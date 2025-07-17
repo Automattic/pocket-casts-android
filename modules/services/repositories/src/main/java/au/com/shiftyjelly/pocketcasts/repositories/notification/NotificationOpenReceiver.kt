@@ -24,6 +24,7 @@ class NotificationOpenReceiver : BroadcastReceiver() {
                 event = AnalyticsEvent.NOTIFICATION_OPENED,
                 properties = mapOf(
                     "type" to it.analyticsType,
+                    "category" to CATEGORY_DEEP_LINK
                 ),
             )
             val target = it.toIntent(context).apply { flags = Intent.FLAG_ACTIVITY_NEW_TASK }
@@ -38,6 +39,7 @@ class NotificationOpenReceiver : BroadcastReceiver() {
     companion object {
         private const val ACTION_NOTIFICATION_OPENED = "au.com.shiftyjelly.pocketcasts.ACTION_NOTIFICATION_OPENED"
         private const val EXTRA_TYPE = "extras.notification.type"
+        private const val CATEGORY_DEEP_LINK = "DEEP_LINK"
 
         fun NotificationType.toBroadcast(context: Context) = Intent(context, NotificationOpenReceiver::class.java).apply {
             action = ACTION_NOTIFICATION_OPENED
