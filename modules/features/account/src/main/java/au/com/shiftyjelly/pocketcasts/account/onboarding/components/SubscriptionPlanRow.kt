@@ -41,11 +41,10 @@ import au.com.shiftyjelly.pocketcasts.compose.components.TextP40
 import au.com.shiftyjelly.pocketcasts.compose.preview.ThemePreviewParameterProvider
 import au.com.shiftyjelly.pocketcasts.compose.theme
 import au.com.shiftyjelly.pocketcasts.payment.BillingCycle
-import au.com.shiftyjelly.pocketcasts.payment.Price
-import au.com.shiftyjelly.pocketcasts.payment.PricingSchedule
 import au.com.shiftyjelly.pocketcasts.payment.SubscriptionPlan
 import au.com.shiftyjelly.pocketcasts.payment.SubscriptionTier
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme.ThemeType
+import java.math.RoundingMode
 import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
@@ -279,24 +278,19 @@ private fun CheckMark(
 private val SubscriptionPlan.pricePerMonth: Float
     get() {
         val pricePerMonth = when (billingCycle) {
-            BillingCycle.Monthly -> recurringPrice?.amount?.toFloat() ?: 0f
-            BillingCycle.Yearly -> (recurringPrice?.amount?.toFloat() ?: 0f) / 12f
+            BillingCycle.Monthly -> recurringPrice.amount
+            BillingCycle.Yearly -> recurringPrice.amount.divide(12.toBigDecimal(), 2, RoundingMode.HALF_UP)
         }
-        return pricePerMonth
+        return pricePerMonth.toFloat()
     }
-
-private val SubscriptionPlan.recurringPrice: Price? get() = when (this) {
-    is SubscriptionPlan.Base -> pricingPhase.price
-    is SubscriptionPlan.WithOffer -> pricingPhases.find { it.schedule.recurrenceMode is PricingSchedule.RecurrenceMode.Infinite }?.price
-}
 
 private val SubscriptionPlan.pricePerWeek: Float
     get() {
         val pricePerWeek = when (billingCycle) {
-            BillingCycle.Monthly -> (recurringPrice?.amount?.toFloat() ?: 0f) / 4f
-            BillingCycle.Yearly -> (recurringPrice?.amount?.toFloat() ?: 0f) / 52f
+            BillingCycle.Monthly -> (recurringPrice.amount.times(12.toBigDecimal()))
+            BillingCycle.Yearly -> (recurringPrice.amount)
         }
-        return pricePerWeek
+        return pricePerWeek.divide(52.toBigDecimal(), 2, RoundingMode.HALF_UP).toFloat()
     }
 
 @Composable
@@ -304,20 +298,20 @@ private fun SubscriptionPlan.pricePerPeriod(config: RowConfig): String? {
     return if (this.billingCycle == BillingCycle.Yearly) {
         when (config.pricePerPeriod) {
             PricePerPeriod.PRICE_PER_MONTH -> {
-                val currencyCode = recurringPrice?.currencyCode
+                val currencyCode = recurringPrice.currencyCode
                 if (currencyCode == "USD") {
                     stringResource(LR.string.price_per_month_usd, pricePerMonth)
                 } else {
-                    stringResource(LR.string.price_per_month, pricePerMonth, currencyCode.orEmpty())
+                    stringResource(LR.string.price_per_month, pricePerMonth, currencyCode)
                 }
             }
 
             PricePerPeriod.PRICE_PER_WEEK -> {
-                val currencyCode = recurringPrice?.currencyCode
+                val currencyCode = recurringPrice.currencyCode
                 if (currencyCode == "USD") {
                     stringResource(LR.string.price_per_week_usd, pricePerWeek)
                 } else {
-                    stringResource(LR.string.price_per_week, pricePerWeek, currencyCode.orEmpty())
+                    stringResource(LR.string.price_per_week, pricePerWeek, currencyCode)
                 }
             }
         }
@@ -331,7 +325,7 @@ private fun SubscriptionPlan.savingsPercent(otherPlan: SubscriptionPlan) = 100 -
 @Composable
 @ReadOnlyComposable
 private fun SubscriptionPlan.price(): String {
-    val formattedPrice = recurringPrice?.formattedPrice ?: return ""
+    val formattedPrice = recurringPrice.formattedPrice
 
     return when (billingCycle) {
         BillingCycle.Monthly -> stringResource(LR.string.plus_per_month, formattedPrice)

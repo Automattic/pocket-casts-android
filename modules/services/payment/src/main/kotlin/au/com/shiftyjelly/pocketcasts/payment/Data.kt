@@ -182,6 +182,10 @@ sealed interface SubscriptionPlan {
     val productId get() = key.productId
     val basePlanId get() = key.basePlanId
     val offerId get() = key.offerId
+    val recurringPrice get() = when (this) {
+        is Base -> pricingPhase.price
+        is WithOffer -> pricingPhases.last().price
+    }
 
     data class Base(
         override val name: String,

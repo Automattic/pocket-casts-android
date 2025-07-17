@@ -289,7 +289,7 @@ class SubscriptionPlansTest {
     }
 
     @Test
-    fun `do not find offers when ther are multiple matching ones`() {
+    fun `do not find offers when there are multiple matching ones`() {
         val products = products.map { product ->
             val offerPlans = product.pricingPlans.offerPlans
             val pricingPlans = product.pricingPlans.copy(offerPlans = offerPlans + offerPlans)
@@ -304,5 +304,23 @@ class SubscriptionPlansTest {
         ).getOrNull()
 
         assertNull(plan)
+    }
+
+    @Test
+    fun `verify recurringPrice property is calculated properly`() {
+        val plans = SubscriptionPlans.create(products).getOrNull()!!
+        for (tier in SubscriptionTier.entries) {
+            for (cycle in BillingCycle.entries) {
+                val basePlan = plans.getBasePlan(tier = tier, billingCycle = cycle)
+                assertEquals(basePlan.pricingPhase.price, basePlan.recurringPrice)
+
+                for (offer in SubscriptionOffer.entries) {
+                    val offerPlan = plans.findOfferPlan(tier = tier, billingCycle = cycle, offer = offer).getOrNull() ?: continue
+
+                    val expectedPrice = offerPlan.pricingPhases.find { it.schedule.recurrenceMode == PricingSchedule.RecurrenceMode.Infinite }?.price
+                    assertEquals(expectedPrice, offerPlan.recurringPrice)
+                }
+            }
+        }
     }
 }
