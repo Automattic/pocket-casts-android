@@ -201,7 +201,6 @@ subprojects {
         checkAllWarnings = false
         warningsAsErrors = false
 
-        checkDependencies = true
         checkTestSources = false
         checkGeneratedSources = false
 
@@ -373,6 +372,11 @@ subprojects {
                     isMinifyEnabled = false
                 }
             }
+        }
+        dependencies {
+            val lintChecks by configurations
+            lintChecks(libs.security.lint)
+            lintChecks(libs.wordpress.lint)
         }
     }
 
