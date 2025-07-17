@@ -168,4 +168,8 @@ class DeveloperViewModel
             settings.suggestedFoldersDismissTimestamp.set(null, updateModifiedAt = false)
         }
     }
+
+    fun resetPlaylistsOnboarding() {
+        settings.showPlaylistsOnboarding.set(true, updateModifiedAt = false)
+    }
 }

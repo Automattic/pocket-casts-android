@@ -1620,4 +1620,10 @@ class SettingsImpl @Inject constructor(
         defaultValue = true,
         sharedPrefs = sharedPreferences,
     )
+
+    override val showPlaylistsOnboarding = UserSetting.BoolPref(
+        sharedPrefKey = "show_playlists_onboarding",
+        defaultValue = true,
+        sharedPrefs = sharedPreferences,
+    )
 }
