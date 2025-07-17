@@ -4,6 +4,7 @@ import android.content.Context
 import android.content.Intent
 import android.content.Intent.ACTION_VIEW
 import android.net.Uri
+import android.os.Parcelable
 import au.com.shiftyjelly.pocketcasts.deeplink.DeepLink.Companion.ACTION_OPEN_ADD_BOOKMARK
 import au.com.shiftyjelly.pocketcasts.deeplink.DeepLink.Companion.ACTION_OPEN_BOOKMARK
 import au.com.shiftyjelly.pocketcasts.deeplink.DeepLink.Companion.ACTION_OPEN_CHANGE_BOOKMARK_TITLE
@@ -19,6 +20,7 @@ import au.com.shiftyjelly.pocketcasts.deeplink.DeepLink.Companion.EXTRA_PAGE
 import au.com.shiftyjelly.pocketcasts.deeplink.DeepLink.Companion.EXTRA_PODCAST_UUID
 import au.com.shiftyjelly.pocketcasts.deeplink.DeepLink.Companion.EXTRA_SOURCE_VIEW
 import kotlin.time.Duration
+import kotlinx.parcelize.Parcelize
 
 sealed interface DeepLink {
     companion object {
@@ -110,6 +112,7 @@ data class ShowPodcastDeepLink(
     }
 }
 
+@Parcelize
 data class ShowEpisodeDeepLink(
     val episodeUuid: String,
     val podcastUuid: String?,
@@ -118,7 +121,7 @@ data class ShowEpisodeDeepLink(
     val startTimestamp: Duration? = null,
     val endTimestamp: Duration? = null,
 ) : IntentableDeepLink,
-    UriDeepLink {
+    UriDeepLink, Parcelable {
     override fun toIntent(context: Context) = context.launcherIntent
         .setAction(ACTION_OPEN_EPISODE)
         .addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP)
