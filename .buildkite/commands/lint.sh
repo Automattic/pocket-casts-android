@@ -1,4 +1,4 @@
-#!/bin/bash -eu
+#!/bin/bash -u
 
 if "$(dirname "${BASH_SOURCE[0]}")/should-skip-job.sh" --job-type lint; then
   exit 0
