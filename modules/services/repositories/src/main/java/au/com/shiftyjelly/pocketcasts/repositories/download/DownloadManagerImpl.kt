@@ -34,8 +34,8 @@ import au.com.shiftyjelly.pocketcasts.repositories.file.StorageException
 import au.com.shiftyjelly.pocketcasts.repositories.notification.NotificationHelper
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
-import au.com.shiftyjelly.pocketcasts.repositories.podcast.PlaylistManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
+import au.com.shiftyjelly.pocketcasts.repositories.podcast.SmartPlaylistManager
 import au.com.shiftyjelly.pocketcasts.repositories.refresh.RefreshPodcastsThread
 import au.com.shiftyjelly.pocketcasts.utils.Network
 import au.com.shiftyjelly.pocketcasts.utils.Power
@@ -82,7 +82,7 @@ class DownloadManagerImpl @Inject constructor(
     private var notificationBuilder: NotificationCompat.Builder? = null
     private lateinit var podcastManager: PodcastManager
     private lateinit var episodeManager: EpisodeManager
-    private lateinit var playlistManager: PlaylistManager
+    private lateinit var smartPlaylistManager: SmartPlaylistManager
     private lateinit var playbackManager: PlaybackManager
 
     private val pendingQueue = HashMap<String, DownloadingInfo>()
@@ -96,10 +96,10 @@ class DownloadManagerImpl @Inject constructor(
 
     private var sourceView: SourceView = SourceView.UNKNOWN
 
-    override fun setup(episodeManager: EpisodeManager, podcastManager: PodcastManager, playlistManager: PlaylistManager, playbackManager: PlaybackManager) {
+    override fun setup(episodeManager: EpisodeManager, podcastManager: PodcastManager, smartPlaylistManager: SmartPlaylistManager, playbackManager: PlaybackManager) {
         this.episodeManager = episodeManager
         this.podcastManager = podcastManager
-        this.playlistManager = playlistManager
+        this.smartPlaylistManager = smartPlaylistManager
         this.playbackManager = playbackManager
 
         progressUpdateRelay

@@ -6,7 +6,7 @@ import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.analytics.TracksAnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.models.entity.Bookmark
-import au.com.shiftyjelly.pocketcasts.models.entity.Playlist
+import au.com.shiftyjelly.pocketcasts.models.entity.SmartPlaylist
 import au.com.shiftyjelly.pocketcasts.models.entity.UserEpisode
 import au.com.shiftyjelly.pocketcasts.models.to.HistorySyncRequest
 import au.com.shiftyjelly.pocketcasts.models.to.HistorySyncResponse
@@ -382,7 +382,7 @@ class SyncManagerImpl @Inject constructor(
         syncServiceManager.exchangeSonos(token)
     }
 
-    override suspend fun getFilters(): List<Playlist> = getCacheTokenOrLogin { token ->
+    override suspend fun getFilters(): List<SmartPlaylist> = getCacheTokenOrLogin { token ->
         syncServiceManager.getFilters(token)
     }
 

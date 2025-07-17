@@ -2,7 +2,7 @@ package au.com.shiftyjelly.pocketcasts.repositories.podcast
 
 import android.content.Context
 import au.com.shiftyjelly.pocketcasts.models.db.AppDatabase
-import au.com.shiftyjelly.pocketcasts.models.db.dao.PlaylistDao
+import au.com.shiftyjelly.pocketcasts.models.db.dao.SmartPlaylistDao
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.download.DownloadManager
 import au.com.shiftyjelly.pocketcasts.repositories.notification.NotificationManager
@@ -19,7 +19,7 @@ import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 
 @OptIn(ExperimentalCoroutinesApi::class)
-class PlaylistManagerImplTest {
+class SmartSmartPlaylistManagerImplTest {
 
     private val settings: Settings = mock()
     private val downloadManager: DownloadManager = mock()
@@ -28,7 +28,7 @@ class PlaylistManagerImplTest {
     private val notificationManager: NotificationManager = mock()
     private val context: Context = mock()
     private val appDatabase: AppDatabase = mock()
-    private val playlistDao: PlaylistDao = mock()
+    private val smartPlaylistDao: SmartPlaylistDao = mock()
 
     @Test
     fun `should mark the user as having interacted with the feature when creating a filter`() = runTest {
@@ -52,12 +52,12 @@ class PlaylistManagerImplTest {
         verify(notificationManager, never()).updateUserFeatureInteraction(OnboardingNotificationType.Filters)
     }
 
-    private fun initViewModel(): PlaylistManagerImpl {
-        whenever(appDatabase.playlistDao()).thenReturn(playlistDao)
-        whenever(playlistDao.updateBlocking(any())).then { }
+    private fun initViewModel(): SmartPlaylistManagerImpl {
+        whenever(appDatabase.smartPlaylistDao()).thenReturn(smartPlaylistDao)
+        whenever(smartPlaylistDao.updateBlocking(any())).then { }
         whenever(playlistUpdateAnalytics.update(any(), any(), any())).then { }
 
-        return PlaylistManagerImpl(
+        return SmartPlaylistManagerImpl(
             settings = settings,
             downloadManager = downloadManager,
             playlistUpdateAnalytics = playlistUpdateAnalytics,

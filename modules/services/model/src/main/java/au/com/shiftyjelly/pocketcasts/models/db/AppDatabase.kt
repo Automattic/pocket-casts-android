@@ -40,10 +40,10 @@ import au.com.shiftyjelly.pocketcasts.models.db.dao.EndOfYearDao
 import au.com.shiftyjelly.pocketcasts.models.db.dao.EpisodeDao
 import au.com.shiftyjelly.pocketcasts.models.db.dao.ExternalDataDao
 import au.com.shiftyjelly.pocketcasts.models.db.dao.FolderDao
-import au.com.shiftyjelly.pocketcasts.models.db.dao.PlaylistDao
 import au.com.shiftyjelly.pocketcasts.models.db.dao.PodcastDao
 import au.com.shiftyjelly.pocketcasts.models.db.dao.PodcastRatingsDao
 import au.com.shiftyjelly.pocketcasts.models.db.dao.SearchHistoryDao
+import au.com.shiftyjelly.pocketcasts.models.db.dao.SmartPlaylistDao
 import au.com.shiftyjelly.pocketcasts.models.db.dao.SuggestedFoldersDao
 import au.com.shiftyjelly.pocketcasts.models.db.dao.TranscriptDao
 import au.com.shiftyjelly.pocketcasts.models.db.dao.UpNextChangeDao
@@ -57,12 +57,12 @@ import au.com.shiftyjelly.pocketcasts.models.entity.Bookmark
 import au.com.shiftyjelly.pocketcasts.models.entity.ChapterIndices
 import au.com.shiftyjelly.pocketcasts.models.entity.CuratedPodcast
 import au.com.shiftyjelly.pocketcasts.models.entity.Folder
-import au.com.shiftyjelly.pocketcasts.models.entity.Playlist
 import au.com.shiftyjelly.pocketcasts.models.entity.PlaylistEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastRatings
 import au.com.shiftyjelly.pocketcasts.models.entity.SearchHistoryItem
+import au.com.shiftyjelly.pocketcasts.models.entity.SmartPlaylist
 import au.com.shiftyjelly.pocketcasts.models.entity.SuggestedFolder
 import au.com.shiftyjelly.pocketcasts.models.entity.Transcript
 import au.com.shiftyjelly.pocketcasts.models.entity.UpNextChange
@@ -85,7 +85,7 @@ import au.com.shiftyjelly.pocketcasts.localization.R as LR
         PodcastEpisode::class,
         Folder::class,
         SuggestedFolder::class,
-        Playlist::class,
+        SmartPlaylist::class,
         PlaylistEpisode::class,
         Podcast::class,
         SearchHistoryItem::class,
@@ -133,7 +133,7 @@ import au.com.shiftyjelly.pocketcasts.localization.R as LR
 abstract class AppDatabase : RoomDatabase() {
     abstract fun podcastDao(): PodcastDao
     abstract fun episodeDao(): EpisodeDao
-    abstract fun playlistDao(): PlaylistDao
+    abstract fun smartPlaylistDao(): SmartPlaylistDao
     abstract fun upNextDao(): UpNextDao
     abstract fun upNextChangeDao(): UpNextChangeDao
     abstract fun userEpisodeDao(): UserEpisodeDao

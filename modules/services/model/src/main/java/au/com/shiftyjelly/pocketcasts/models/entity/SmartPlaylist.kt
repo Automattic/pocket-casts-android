@@ -15,7 +15,7 @@ import au.com.shiftyjelly.pocketcasts.localization.R as LR
         Index(name = "filters_uuid", value = arrayOf("uuid")),
     ],
 )
-data class Playlist(
+data class SmartPlaylist(
     @PrimaryKey @ColumnInfo(name = "_id") var id: Long? = null,
     @ColumnInfo(name = "uuid") var uuid: String,
     @ColumnInfo(name = "title") var title: String = "",

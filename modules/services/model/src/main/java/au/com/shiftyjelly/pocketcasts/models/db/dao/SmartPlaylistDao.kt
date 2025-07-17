@@ -7,43 +7,43 @@ import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Transaction
 import androidx.room.Update
-import au.com.shiftyjelly.pocketcasts.models.entity.Playlist
+import au.com.shiftyjelly.pocketcasts.models.entity.SmartPlaylist
 import io.reactivex.Flowable
 import io.reactivex.Maybe
 import kotlinx.coroutines.flow.Flow
 
 @Dao
-abstract class PlaylistDao {
+abstract class SmartPlaylistDao {
 
     @Query("SELECT * FROM filters WHERE _id = :id")
-    abstract fun findByIdBlocking(id: Long): Playlist?
+    abstract fun findByIdBlocking(id: Long): SmartPlaylist?
 
     @Query("SELECT * FROM filters WHERE manual = 0 AND deleted = 0 AND draft = 0 ORDER BY sortPosition ASC")
-    abstract fun findAllBlocking(): List<Playlist>
+    abstract fun findAllBlocking(): List<SmartPlaylist>
 
     @Query("SELECT * FROM filters WHERE manual = 0 AND deleted = 0 AND draft = 0 ORDER BY sortPosition ASC")
-    abstract suspend fun findAll(): List<Playlist>
+    abstract suspend fun findAll(): List<SmartPlaylist>
 
     @Query("SELECT * FROM filters WHERE manual = 0 AND deleted = 0 AND draft = 0 ORDER BY sortPosition ASC")
-    abstract fun findAllFlow(): Flow<List<Playlist>>
+    abstract fun findAllFlow(): Flow<List<SmartPlaylist>>
 
     @Query("SELECT * FROM filters WHERE manual = 0 AND deleted = 0 AND draft = 0 ORDER BY sortPosition ASC")
-    abstract fun findAllRxFlowable(): Flowable<List<Playlist>>
+    abstract fun findAllRxFlowable(): Flowable<List<SmartPlaylist>>
 
     @Query("SELECT * FROM filters WHERE uuid = :uuid LIMIT 1")
-    abstract fun findByUuidBlocking(uuid: String): Playlist?
+    abstract fun findByUuidBlocking(uuid: String): SmartPlaylist?
 
     @Query("SELECT * FROM filters WHERE uuid = :uuid LIMIT 1")
-    abstract suspend fun findByUuid(uuid: String): Playlist?
+    abstract suspend fun findByUuid(uuid: String): SmartPlaylist?
 
     @Query("SELECT * FROM filters WHERE uuid = :uuid LIMIT 1")
-    abstract fun findByUuidRxMaybe(uuid: String): Maybe<Playlist>
+    abstract fun findByUuidRxMaybe(uuid: String): Maybe<SmartPlaylist>
 
     @Query("SELECT * FROM filters WHERE uuid = :uuid LIMIT 1")
-    abstract fun findByUuidRxFlowable(uuid: String): Flowable<Playlist>
+    abstract fun findByUuidRxFlowable(uuid: String): Flowable<SmartPlaylist>
 
     @Query("SELECT * FROM filters WHERE uuid = :uuid")
-    abstract fun findByUuidAsListRxFlowable(uuid: String): Flowable<List<Playlist>>
+    abstract fun findByUuidAsListRxFlowable(uuid: String): Flowable<List<SmartPlaylist>>
 
     @Query("SELECT COUNT(*) FROM filters")
     abstract suspend fun count(): Int
@@ -52,19 +52,19 @@ abstract class PlaylistDao {
     abstract fun countBlocking(): Int
 
     @Update
-    abstract suspend fun update(playlist: Playlist)
+    abstract suspend fun update(smartPlaylist: SmartPlaylist)
 
     @Update
-    abstract fun updateBlocking(playlist: Playlist)
+    abstract fun updateBlocking(smartPlaylist: SmartPlaylist)
 
     @Update
-    abstract fun updateAllBlocking(playlists: List<Playlist>)
+    abstract fun updateAllBlocking(smartPlaylists: List<SmartPlaylist>)
 
     @Delete
-    abstract suspend fun delete(playlist: Playlist)
+    abstract suspend fun delete(smartPlaylist: SmartPlaylist)
 
     @Delete
-    abstract fun deleteBlocking(playlist: Playlist)
+    abstract fun deleteBlocking(smartPlaylist: SmartPlaylist)
 
     @Query("DELETE FROM filters")
     abstract suspend fun deleteAll()
@@ -73,10 +73,10 @@ abstract class PlaylistDao {
     abstract fun deleteDeletedBlocking()
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    abstract suspend fun insert(playlist: Playlist): Long
+    abstract suspend fun insert(smartPlaylist: SmartPlaylist): Long
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    abstract fun insertBlocking(playlist: Playlist): Long
+    abstract fun insertBlocking(smartPlaylist: SmartPlaylist): Long
 
     @Query("UPDATE filters SET sortPosition = :position WHERE uuid = :uuid")
     abstract fun updateSortPositionBlocking(position: Int, uuid: String)
@@ -88,20 +88,20 @@ abstract class PlaylistDao {
     abstract suspend fun updateAllSyncStatus(syncStatus: Int)
 
     @Query("SELECT * FROM filters WHERE UPPER(title) = UPPER(:title)")
-    abstract fun searchByTitleBlocking(title: String): Playlist?
+    abstract fun searchByTitleBlocking(title: String): SmartPlaylist?
 
-    @Query("SELECT * FROM filters WHERE manual = 0 AND draft = 0 AND syncStatus = " + Playlist.SYNC_STATUS_NOT_SYNCED)
-    abstract fun findNotSyncedBlocking(): List<Playlist>
+    @Query("SELECT * FROM filters WHERE manual = 0 AND draft = 0 AND syncStatus = " + SmartPlaylist.SYNC_STATUS_NOT_SYNCED)
+    abstract fun findNotSyncedBlocking(): List<SmartPlaylist>
 
     @Transaction
-    open fun updateSortPositionsBlocking(playlists: List<Playlist>) {
-        for (index in playlists.indices) {
-            val playlist = playlists[index]
+    open fun updateSortPositionsBlocking(smartPlaylists: List<SmartPlaylist>) {
+        for (index in smartPlaylists.indices) {
+            val playlist = smartPlaylists[index]
             val position = index + 1
             playlist.sortPosition = position
-            playlist.syncStatus = Playlist.SYNC_STATUS_NOT_SYNCED
+            playlist.syncStatus = SmartPlaylist.SYNC_STATUS_NOT_SYNCED
             updateSortPositionBlocking(position, playlist.uuid)
-            updateSyncStatusBlocking(Playlist.SYNC_STATUS_NOT_SYNCED, playlist.uuid)
+            updateSyncStatusBlocking(SmartPlaylist.SYNC_STATUS_NOT_SYNCED, playlist.uuid)
         }
     }
 }

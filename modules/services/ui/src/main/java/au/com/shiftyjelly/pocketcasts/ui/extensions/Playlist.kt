@@ -3,7 +3,7 @@ package au.com.shiftyjelly.pocketcasts.ui.extensions
 import android.content.Context
 import android.graphics.Color
 import au.com.shiftyjelly.pocketcasts.localization.helper.TimeHelper
-import au.com.shiftyjelly.pocketcasts.models.entity.Playlist
+import au.com.shiftyjelly.pocketcasts.models.entity.SmartPlaylist
 import au.com.shiftyjelly.pocketcasts.repositories.extensions.colorIndex
 import au.com.shiftyjelly.pocketcasts.ui.R
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
@@ -16,7 +16,7 @@ private val filterThemeColors = listOf(
     R.attr.filter_03,
 )
 
-fun Playlist.getStringForDuration(context: Context?): String {
+fun SmartPlaylist.getStringForDuration(context: Context?): String {
     return when {
         context == null -> ""
         !filterDuration -> context.getString(LR.string.filters_duration)
@@ -28,14 +28,14 @@ fun Playlist.getStringForDuration(context: Context?): String {
     }
 }
 
-val Playlist.Companion.themeColors: List<Int>
+val SmartPlaylist.Companion.themeColors: List<Int>
     get() = filterThemeColors
 
-fun Playlist.getColor(context: Context?): Int {
+fun SmartPlaylist.getColor(context: Context?): Int {
     val themeColor = filterThemeColors.getOrNull(colorIndex) ?: return Color.WHITE
     return context?.getThemeColor(themeColor) ?: Color.WHITE
 }
 
-fun Playlist.Companion.getColors(context: Context?): List<Int> {
+fun SmartPlaylist.Companion.getColors(context: Context?): List<Int> {
     return filterThemeColors.mapNotNull { context?.getThemeColor(it) }
 }

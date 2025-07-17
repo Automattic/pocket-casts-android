@@ -14,9 +14,9 @@ import au.com.shiftyjelly.pocketcasts.preferences.UserSetting
 import au.com.shiftyjelly.pocketcasts.repositories.download.DownloadManager
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
-import au.com.shiftyjelly.pocketcasts.repositories.podcast.PlaylistManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManagerImpl
+import au.com.shiftyjelly.pocketcasts.repositories.podcast.SmartPlaylistManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.SubscribeManager
 import au.com.shiftyjelly.pocketcasts.repositories.sync.PodcastRefresher
 import au.com.shiftyjelly.pocketcasts.repositories.sync.SyncManager
@@ -51,7 +51,7 @@ class PodcastManagerTest {
         val context = InstrumentationRegistry.getInstrumentation().targetContext
 
         val episodeManager = mock<EpisodeManager>()
-        val playlistManager = mock<PlaylistManager>()
+        val smartPlaylistManager = mock<SmartPlaylistManager>()
         val downloadManager = mock<DownloadManager>()
         val podcastRefresher = mock<PodcastRefresher>()
 
@@ -87,7 +87,7 @@ class PodcastManagerTest {
         podcastDao = appDatabase.podcastDao()
         podcastManagerSignedOut = PodcastManagerImpl(
             episodeManager = episodeManager,
-            playlistManager = playlistManager,
+            smartPlaylistManager = smartPlaylistManager,
             settings = settings,
             context = application,
             subscribeManager = subscribeManager,
@@ -99,7 +99,7 @@ class PodcastManagerTest {
         )
         podcastManagerSignedIn = PodcastManagerImpl(
             episodeManager = episodeManager,
-            playlistManager = playlistManager,
+            smartPlaylistManager = smartPlaylistManager,
             settings = settings,
             context = application,
             subscribeManager = subscribeManager,

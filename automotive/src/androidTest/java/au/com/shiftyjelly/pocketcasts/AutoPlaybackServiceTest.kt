@@ -5,9 +5,9 @@ import android.os.IBinder
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.rule.ServiceTestRule
-import au.com.shiftyjelly.pocketcasts.models.entity.Playlist
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
+import au.com.shiftyjelly.pocketcasts.models.entity.SmartPlaylist
 import au.com.shiftyjelly.pocketcasts.models.type.Subscription
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.preferences.UserSetting
@@ -70,13 +70,13 @@ class AutoPlaybackServiceTest {
     @Test
     fun testLoadFilters() {
         runBlocking {
-            val playlist = Playlist(uuid = UUID.randomUUID().toString(), title = "Test title", iconId = 0)
-            service.playlistManager = mock { on { findAllBlocking() }.doReturn(listOf(playlist)) }
+            val smartPlaylist = SmartPlaylist(uuid = UUID.randomUUID().toString(), title = "Test title", iconId = 0)
+            service.smartPlaylistManager = mock { on { findAllBlocking() }.doReturn(listOf(smartPlaylist)) }
 
             val filtersRoot = service.loadFiltersRoot()
             assertTrue("Filters should not be empty", filtersRoot.isNotEmpty())
-            assertTrue("Filter uuid should be equal", filtersRoot[0].mediaId == playlist.uuid)
-            assertTrue("Filter title should be correct", filtersRoot[0].description.title == playlist.title)
+            assertTrue("Filter uuid should be equal", filtersRoot[0].mediaId == smartPlaylist.uuid)
+            assertTrue("Filter title should be correct", filtersRoot[0].description.title == smartPlaylist.title)
             assertTrue("Filter should have an icon", filtersRoot[0].description.iconUri != null)
         }
     }
@@ -108,7 +108,7 @@ class AutoPlaybackServiceTest {
             val podcast = Podcast(UUID.randomUUID().toString(), title = "Test podcast")
             val episode = PodcastEpisode(UUID.randomUUID().toString(), title = "Test episode", publishedDate = Date())
 
-            service.playlistManager = mock { on { findByUuidBlocking(any()) }.doReturn(null) }
+            service.smartPlaylistManager = mock { on { findByUuidBlocking(any()) }.doReturn(null) }
             service.podcastManager = mock { on { runBlocking { findPodcastByUuid(any()) } }.doReturn(podcast) }
             service.episodeManager = mock { on { findEpisodesByPodcastOrderedBlocking(any()) }.doReturn(listOf(episode)) }
 

@@ -18,7 +18,7 @@ import androidx.lifecycle.repeatOnLifecycle
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import au.com.shiftyjelly.pocketcasts.filters.databinding.FragmentCreateFilterBinding
-import au.com.shiftyjelly.pocketcasts.models.entity.Playlist
+import au.com.shiftyjelly.pocketcasts.models.entity.SmartPlaylist
 import au.com.shiftyjelly.pocketcasts.repositories.extensions.colorIndex
 import au.com.shiftyjelly.pocketcasts.repositories.extensions.drawableIndex
 import au.com.shiftyjelly.pocketcasts.repositories.extensions.iconDrawables
@@ -54,7 +54,7 @@ class CreateFilterFragment :
     CoroutineScope {
     sealed class Mode(val string: String) {
         object Create : Mode("create")
-        data class Edit(val playlist: Playlist) : Mode("edit")
+        data class Edit(val smartPlaylist: SmartPlaylist) : Mode("edit")
     }
 
     private var rootView: View? = null
@@ -65,7 +65,7 @@ class CreateFilterFragment :
             return CreateFilterFragment().apply {
                 arguments = bundleOf(
                     ARG_MODE to mode.string,
-                    ARG_PLAYLIST_UUID to (mode as? Mode.Edit)?.playlist?.uuid,
+                    ARG_PLAYLIST_UUID to (mode as? Mode.Edit)?.smartPlaylist?.uuid,
                 )
             }
         }
@@ -136,15 +136,15 @@ class CreateFilterFragment :
             runBlocking { viewModel.setup(playlistUUID) }
         }
 
-        val colors = Playlist.getColors(context)
+        val colors = SmartPlaylist.getColors(context)
         colorAdapter = ColorAdapter(colors.toIntArray(), false) { index, fromUserInteraction ->
-            tintColor = context?.getThemeColor(Playlist.themeColors[index]) ?: Color.WHITE
+            tintColor = context?.getThemeColor(SmartPlaylist.themeColors[index]) ?: Color.WHITE
             viewModel.colorIndex.value = index
             if (fromUserInteraction) {
                 viewModel.userChangedColor()
             }
         }
-        tintColor = view.context.getThemeColor(Playlist.themeColors.first())
+        tintColor = view.context.getThemeColor(SmartPlaylist.themeColors.first())
 
         setupIconViews()
 
@@ -222,8 +222,8 @@ class CreateFilterFragment :
         val context = context ?: return
         val binding = binding ?: return
 
-        Playlist.iconDrawables.forEachIndexed { index, _ ->
-            val imgRes = Playlist.iconDrawables[index]
+        SmartPlaylist.iconDrawables.forEachIndexed { index, _ ->
+            val imgRes = SmartPlaylist.iconDrawables[index]
             val view = IconView(context)
             val layoutParams = RecyclerView.LayoutParams(44.dpToPx(context), 44.dpToPx(context))
             layoutParams.marginEnd = 16.dpToPx(context)
@@ -281,7 +281,7 @@ class CreateFilterFragment :
     }
 
     private fun observePlaylist() {
-        viewModel.playlist?.observe(viewLifecycleOwner) { filter ->
+        viewModel.smartPlaylist?.observe(viewLifecycleOwner) { filter ->
             if (binding == null) return@observe
 
             if (filter.title.isEmpty()) {
@@ -314,7 +314,7 @@ class CreateFilterFragment :
             repeatOnLifecycle(Lifecycle.State.RESUMED) {
                 viewModel.colorIndex.collect {
                     if (binding == null) return@collect
-                    val colorResId = Playlist.themeColors.getOrNull(it) ?: 0
+                    val colorResId = SmartPlaylist.themeColors.getOrNull(it) ?: 0
                     val tintColor = requireContext().getThemeColor(colorResId)
                     binding!!.nameInputLayout.boxStrokeColor = tintColor
                     TextViewCompat.setCompoundDrawableTintList(binding!!.txtName, ColorStateList.valueOf(tintColor))

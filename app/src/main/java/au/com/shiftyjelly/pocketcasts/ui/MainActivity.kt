@@ -146,8 +146,8 @@ import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackState
 import au.com.shiftyjelly.pocketcasts.repositories.playback.UpNextSource
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
-import au.com.shiftyjelly.pocketcasts.repositories.podcast.PlaylistManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
+import au.com.shiftyjelly.pocketcasts.repositories.podcast.SmartPlaylistManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.UserEpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.refresh.RefreshPodcastsTask
 import au.com.shiftyjelly.pocketcasts.repositories.shortcuts.PocketCastsShortcuts
@@ -248,7 +248,7 @@ class MainActivity :
     lateinit var podcastManager: PodcastManager
 
     @Inject
-    lateinit var playlistManager: PlaylistManager
+    lateinit var smartPlaylistManager: SmartPlaylistManager
 
     @Inject
     lateinit var episodeManager: EpisodeManager
@@ -680,7 +680,7 @@ class MainActivity :
 
         lifecycleScope.launch {
             PocketCastsShortcuts.update(
-                playlistManager = playlistManager,
+                smartPlaylistManager = smartPlaylistManager,
                 force = true,
                 context = this@MainActivity,
                 source = PocketCastsShortcuts.Source.REFRESH_APP,
@@ -1418,7 +1418,7 @@ class MainActivity :
                 }
                 is ShowFilterDeepLink -> {
                     launch(Dispatchers.Default) {
-                        playlistManager.findByIdBlocking(deepLink.filterId)?.let {
+                        smartPlaylistManager.findByIdBlocking(deepLink.filterId)?.let {
                             withContext(Dispatchers.Main) {
                                 settings.setSelectedFilter(it.uuid)
                                 // HACK: Go diving to find if a filter fragment

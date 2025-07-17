@@ -8,9 +8,9 @@ import androidx.core.view.updatePadding
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
-import au.com.shiftyjelly.pocketcasts.models.entity.Playlist
+import au.com.shiftyjelly.pocketcasts.models.entity.SmartPlaylist
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
-import au.com.shiftyjelly.pocketcasts.repositories.podcast.PlaylistManager
+import au.com.shiftyjelly.pocketcasts.repositories.podcast.SmartPlaylistManager
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.views.adapter.FilterAutoDownloadAdapter
 import dagger.hilt.android.AndroidEntryPoint
@@ -31,13 +31,13 @@ class AutoDownloadFiltersFragment :
     androidx.fragment.app.Fragment(),
     FilterAutoDownloadAdapter.ClickListener {
 
-    @Inject lateinit var playlistManager: PlaylistManager
+    @Inject lateinit var smartPlaylistManager: SmartPlaylistManager
 
     @Inject lateinit var theme: Theme
 
     @Inject lateinit var settings: Settings
 
-    private val filters = mutableListOf<Playlist>()
+    private val filters = mutableListOf<SmartPlaylist>()
     private val adapter = FilterAutoDownloadAdapter(filters, this, theme.isDarkTheme)
     private val disposables = CompositeDisposable()
 
@@ -73,12 +73,12 @@ class AutoDownloadFiltersFragment :
     }
 
     private fun loadFilters() {
-        playlistManager.findAllRxFlowable()
+        smartPlaylistManager.findAllRxFlowable()
             .firstOrError()
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
-            .subscribeWith(object : DisposableSingleObserver<List<Playlist>>() {
-                override fun onSuccess(list: List<Playlist>) {
+            .subscribeWith(object : DisposableSingleObserver<List<SmartPlaylist>>() {
+                override fun onSuccess(list: List<SmartPlaylist>) {
                     filters.clear()
                     filters.addAll(list)
                     adapter.notifyDataSetChanged()
@@ -90,8 +90,8 @@ class AutoDownloadFiltersFragment :
             }).addTo(disposables)
     }
 
-    override fun onAutoDownloadChanged(filter: Playlist, on: Boolean) {
-        playlistManager.updateAutoDownloadStatusRxCompletable(filter, on, true, false)
+    override fun onAutoDownloadChanged(filter: SmartPlaylist, on: Boolean) {
+        smartPlaylistManager.updateAutoDownloadStatusRxCompletable(filter, on, true, false)
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
             .subscribeWith(object : DisposableCompletableObserver() {
@@ -106,7 +106,7 @@ class AutoDownloadFiltersFragment :
             .addTo(disposables)
     }
 
-    override fun onSettingsClicked(filter: Playlist) {
+    override fun onSettingsClicked(filter: SmartPlaylist) {
 //        val intent = Intent(activity, PlaylistEditActivity::class.java)
 //        intent.putExtra(PlaylistEditActivity.EXTRA_PLAYLIST_ID, filter.id)
 //        intent.putExtra(PlaylistEditActivity.EXTRA_PLAYLIST_TITLE, filter.title)

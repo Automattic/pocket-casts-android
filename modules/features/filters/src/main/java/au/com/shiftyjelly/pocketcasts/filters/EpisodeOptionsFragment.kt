@@ -8,10 +8,10 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import au.com.shiftyjelly.pocketcasts.filters.databinding.FilterOptionsFragmentBinding
-import au.com.shiftyjelly.pocketcasts.models.entity.Playlist
-import au.com.shiftyjelly.pocketcasts.repositories.podcast.PlaylistManager
+import au.com.shiftyjelly.pocketcasts.models.entity.SmartPlaylist
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PlaylistProperty
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PlaylistUpdateSource
+import au.com.shiftyjelly.pocketcasts.repositories.podcast.SmartPlaylistManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.UserPlaylistUpdate
 import au.com.shiftyjelly.pocketcasts.ui.extensions.getColor
 import au.com.shiftyjelly.pocketcasts.ui.helper.FragmentHostListener
@@ -33,9 +33,9 @@ class EpisodeOptionsFragment :
     BaseFragment(),
     CoroutineScope {
     companion object {
-        fun newInstance(playlist: Playlist): EpisodeOptionsFragment {
+        fun newInstance(smartPlaylist: SmartPlaylist): EpisodeOptionsFragment {
             val bundle = Bundle()
-            bundle.putString(ARG_PLAYLIST_UUID, playlist.uuid)
+            bundle.putString(ARG_PLAYLIST_UUID, smartPlaylist.uuid)
             val fragment = EpisodeOptionsFragment()
             fragment.arguments = bundle
             return fragment
@@ -45,9 +45,9 @@ class EpisodeOptionsFragment :
     override val coroutineContext: CoroutineContext
         get() = Dispatchers.Main
 
-    @Inject lateinit var playlistManager: PlaylistManager
+    @Inject lateinit var smartPlaylistManager: SmartPlaylistManager
 
-    var playlist: Playlist? = null
+    var smartPlaylist: SmartPlaylist? = null
     private var binding: FilterOptionsFragmentBinding? = null
     private var userChanged = false
 
@@ -75,8 +75,8 @@ class EpisodeOptionsFragment :
         launch {
             val uuid = requireArguments().getString(ARG_PLAYLIST_UUID)!!
             Timber.d("Loading playlist $uuid")
-            val playlist = playlistManager.findByUuid(uuid) ?: return@launch
-            this@EpisodeOptionsFragment.playlist = playlist
+            val playlist = smartPlaylistManager.findByUuid(uuid) ?: return@launch
+            this@EpisodeOptionsFragment.smartPlaylist = playlist
 
             val unplayedOption = FilterOption(LR.string.unplayed, playlist.unplayed, { v, _ ->
                 playlist.unplayed = v
@@ -106,9 +106,9 @@ class EpisodeOptionsFragment :
         }
 
         btnSave.setOnClickListener {
-            playlist?.let { playlist ->
+            smartPlaylist?.let { playlist ->
                 launch(Dispatchers.Default) {
-                    playlist.syncStatus = Playlist.SYNC_STATUS_NOT_SYNCED
+                    playlist.syncStatus = SmartPlaylist.SYNC_STATUS_NOT_SYNCED
 
                     val userPlaylistUpdate = if (userChanged) {
                         UserPlaylistUpdate(
@@ -118,7 +118,7 @@ class EpisodeOptionsFragment :
                     } else {
                         null
                     }
-                    playlistManager.updateBlocking(playlist, userPlaylistUpdate)
+                    smartPlaylistManager.updateBlocking(playlist, userPlaylistUpdate)
 
                     launch(Dispatchers.Main) { (activity as FragmentHostListener).closeModal(this@EpisodeOptionsFragment) }
                 }

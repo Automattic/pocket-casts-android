@@ -6,8 +6,8 @@ import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.models.entity.BaseEpisode
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
-import au.com.shiftyjelly.pocketcasts.repositories.podcast.PlaylistManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
+import au.com.shiftyjelly.pocketcasts.repositories.podcast.SmartPlaylistManager
 import io.reactivex.subjects.Subject
 
 interface DownloadManager {
@@ -18,7 +18,7 @@ interface DownloadManager {
     val progressUpdates: Map<String, DownloadProgressUpdate>
     val progressUpdateRelay: Subject<DownloadProgressUpdate>
 
-    fun setup(episodeManager: EpisodeManager, podcastManager: PodcastManager, playlistManager: PlaylistManager, playbackManager: PlaybackManager)
+    fun setup(episodeManager: EpisodeManager, podcastManager: PodcastManager, smartPlaylistManager: SmartPlaylistManager, playbackManager: PlaybackManager)
     fun beginMonitoringWorkManager(context: Context)
     fun hasPendingOrRunningDownloads(): Boolean
     fun addEpisodeToQueue(episode: BaseEpisode, from: String, fireEvent: Boolean, source: SourceView)
