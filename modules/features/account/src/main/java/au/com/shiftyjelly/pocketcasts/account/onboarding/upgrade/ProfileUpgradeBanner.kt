@@ -103,6 +103,7 @@ private fun FeatureCard(
         subscriptionPlan.featureItems.forEach { item ->
             UpgradeFeatureItem(
                 item = item,
+                iconColor = MaterialTheme.theme.colors.primaryText01,
                 textColor = MaterialTheme.theme.colors.primaryText01,
             )
         }
