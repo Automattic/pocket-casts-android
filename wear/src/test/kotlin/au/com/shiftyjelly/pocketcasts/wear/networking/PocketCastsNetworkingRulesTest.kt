@@ -1,5 +1,6 @@
 package au.com.shiftyjelly.pocketcasts.wear.networking
 
+import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import com.google.android.horologist.networks.data.NetworkInfo
 import com.google.android.horologist.networks.data.NetworkStatus
 import com.google.android.horologist.networks.data.NetworkType
@@ -14,6 +15,8 @@ import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever
 
 class PocketCastsNetworkingRulesTest {
+
+    val mock: Podcast = mock()
 
     @Test
     fun `prefer returns match`() {

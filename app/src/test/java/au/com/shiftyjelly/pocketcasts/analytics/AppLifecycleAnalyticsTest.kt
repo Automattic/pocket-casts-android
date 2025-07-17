@@ -2,15 +2,20 @@ package au.com.shiftyjelly.pocketcasts.analytics
 
 import au.com.shiftyjelly.pocketcasts.analytics.AppLifecycleAnalytics.Companion.KEY_PREVIOUS_VERSION_CODE
 import au.com.shiftyjelly.pocketcasts.analytics.AppLifecycleAnalytics.Companion.KEY_TIME_IN_APP
+import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.Mock
 import org.mockito.junit.MockitoJUnitRunner
+import org.mockito.kotlin.mock
 import org.mockito.kotlin.verify
 
 @RunWith(MockitoJUnitRunner::class)
 class AppLifecycleAnalyticsTest {
+
+    val mock: Podcast = mock()
+
     @Mock
     private lateinit var analyticsTracker: AnalyticsTracker
     lateinit var appLifecycleAnalytics: AppLifecycleAnalytics

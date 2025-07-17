@@ -36,6 +36,8 @@ class AutoPlaybackServiceTest {
 
     private lateinit var service: AutoPlaybackService
 
+    val mock: Podcast = mock()
+
     @Before
     fun setup() {
         val serviceIntent = Intent(
