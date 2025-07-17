@@ -260,23 +260,20 @@ private fun UpgradeContent(
         state = listState,
     ) {
         itemsIndexed(pages) { index, page ->
+            val scrollToNext: () -> Unit = {
+                coroutineScope.launch {
+                    listState.animateScrollToItem((index + 1) % pages.size)
+                }
+            }
             when (page) {
                 is UpgradePagerContent.Features -> FeaturesContent(
                     features = page,
-                    onCtaClick = {
-                        coroutineScope.launch {
-                            listState.scrollToItem(pages.size - index)
-                        }
-                    },
+                    onCtaClick = scrollToNext,
                 )
 
                 is UpgradePagerContent.TrialSchedule -> ScheduleContent(
                     trialSchedule = page,
-                    onCtaClick = {
-                        coroutineScope.launch {
-                            listState.scrollToItem(pages.size - index)
-                        }
-                    },
+                    onCtaClick = scrollToNext,
                 )
             }
         }
@@ -300,10 +297,7 @@ private fun FeaturesContent(
             TextP40(
                 text = stringResource(LR.string.onboarding_upgrade_features_trial_schedule),
                 modifier = Modifier
-                    .padding(
-                        top = 24.dp,
-                        bottom = 24.dp,
-                    )
+                    .padding(vertical = 24.dp)
                     .clickable { onCtaClick() },
                 color = MaterialTheme.theme.colors.primaryInteractive01,
             )
@@ -324,10 +318,7 @@ private fun ScheduleContent(
             TextP40(
                 text = stringResource(LR.string.onboarding_upgrade_schedule_see_features),
                 modifier = Modifier
-                    .padding(
-                        top = 24.dp,
-                        bottom = 24.dp,
-                    )
+                    .padding(vertical = 24.dp)
                     .clickable { onCtaClick() },
                 color = MaterialTheme.theme.colors.primaryInteractive01,
             )
