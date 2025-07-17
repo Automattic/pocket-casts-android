@@ -13,6 +13,7 @@ import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.R
+import au.com.shiftyjelly.pocketcasts.repositories.notification.NotificationOpenReceiver.Companion.toBroadcast
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.SuggestedFoldersManager
 import au.com.shiftyjelly.pocketcasts.repositories.user.UserManager
 import au.com.shiftyjelly.pocketcasts.utils.AppPlatform
@@ -109,15 +110,15 @@ class NotificationWorker @AssistedInject constructor(
             .setContentText(type.formattedMessage(applicationContext, downloadedEpisodes))
             .setColor(ContextCompat.getColor(applicationContext, R.color.notification_color))
             .setAutoCancel(true)
-            .setContentIntent(openPageIntent(type))
+            .setContentIntent(broadcastIntent(type))
     }
 
-    private fun openPageIntent(type: NotificationType): PendingIntent {
-        return PendingIntent.getActivity(
+    private fun broadcastIntent(type: NotificationType): PendingIntent {
+        return PendingIntent.getBroadcast(
             applicationContext,
             0,
-            type.toIntent(applicationContext),
-            PendingIntent.FLAG_CANCEL_CURRENT or PendingIntent.FLAG_IMMUTABLE,
+            type.toBroadcast(applicationContext),
+            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE,
         )
     }
 
