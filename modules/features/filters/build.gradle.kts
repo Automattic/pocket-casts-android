@@ -42,6 +42,7 @@ dependencies {
     implementation(libs.androidx.preference.ktx)
     implementation(libs.coroutines.core)
     implementation(libs.coroutines.rx2)
+    implementation(libs.fragment.compose)
     implementation(libs.fragment.ktx)
     implementation(libs.lifecycle.reactivestreams.ktx)
     implementation(libs.rx2.android)
