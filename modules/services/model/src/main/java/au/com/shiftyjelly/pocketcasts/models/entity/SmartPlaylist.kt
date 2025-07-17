@@ -10,9 +10,9 @@ import java.io.Serializable
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 @Entity(
-    tableName = "filters",
+    tableName = "smart_playlists",
     indices = [
-        Index(name = "filters_uuid", value = arrayOf("uuid")),
+        Index(name = "smart_playlists_uuid", value = arrayOf("uuid")),
     ],
 )
 data class SmartPlaylist(
