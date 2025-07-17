@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:ignore="UnusedResources">
+
+    <item
+        android:id="@+id/navigation_podcasts"
+        android:icon="@drawable/ic_podcasts"
+        android:title="@string/podcasts" />
+
+    <item
+        android:id="@+id/navigation_filters"
+        android:icon="@drawable/ic_playlists"
+        android:title="@string/playlists" />
+
+    <item
+        android:id="@+id/navigation_discover"
+        android:icon="@drawable/ic_discover"
+        android:title="@string/discover" />
+
+    <item
+        android:id="@+id/navigation_upnext"
+        android:icon="@drawable/ic_upnext_tab"
+        android:title="@string/up_next" />
+
+    <item
+        android:id="@+id/navigation_profile"
+        android:icon="@drawable/ic_profile"
+        android:title="@string/profile" />
+
+</menu>

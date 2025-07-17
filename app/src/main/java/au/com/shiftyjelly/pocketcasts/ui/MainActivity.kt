@@ -121,6 +121,7 @@ import au.com.shiftyjelly.pocketcasts.player.view.bookmark.BookmarkActivityContr
 import au.com.shiftyjelly.pocketcasts.player.view.bookmark.BookmarksContainerFragment
 import au.com.shiftyjelly.pocketcasts.player.view.dialog.MiniPlayerDialog
 import au.com.shiftyjelly.pocketcasts.player.view.video.VideoActivity
+import au.com.shiftyjelly.pocketcasts.playlists.PlaylistsFragment
 import au.com.shiftyjelly.pocketcasts.podcasts.view.ProfileEpisodeListFragment
 import au.com.shiftyjelly.pocketcasts.podcasts.view.episode.EpisodeContainerFragment
 import au.com.shiftyjelly.pocketcasts.podcasts.view.folders.SuggestedFoldersFragment
@@ -424,7 +425,7 @@ class MainActivity :
         setContentView(binding.root)
         checkForNotificationPermission()
 
-        ViewCompat.setOnApplyWindowInsetsListener(binding.root) { view, windowInsets ->
+        ViewCompat.setOnApplyWindowInsetsListener(binding.root) { _, windowInsets ->
             val insets = windowInsets.getInsets(WindowInsetsCompat.Type.systemBars() or WindowInsetsCompat.Type.displayCutout())
             binding.root.updatePadding(left = insets.left, right = insets.right)
             binding.bottomNavigation.updatePadding(bottom = insets.bottom)
@@ -437,6 +438,13 @@ class MainActivity :
                 peekHeight = miniPlayerHeight + view.height
             }
         }
+
+        val menuId = if (FeatureFlag.isEnabled(Feature.PLAYLISTS_REBRANDING, immutable = true)) {
+            VR.menu.navigation_playlists
+        } else {
+            VR.menu.navigation
+        }
+        binding.bottomNavigation.inflateMenu(menuId)
 
         lifecycleScope.launch {
             lifecycle.repeatOnLifecycle(Lifecycle.State.CREATED) {
@@ -455,7 +463,14 @@ class MainActivity :
         var selectedTab = settings.selectedTab()
         val tabs = buildMap {
             put(VR.id.navigation_podcasts) { FragmentInfo(PodcastsFragment(), true) }
-            put(VR.id.navigation_filters) { FragmentInfo(FiltersFragment(), true) }
+            put(VR.id.navigation_filters) {
+                val fragment = if (FeatureFlag.isEnabled(Feature.PLAYLISTS_REBRANDING, immutable = true)) {
+                    PlaylistsFragment()
+                } else {
+                    FiltersFragment()
+                }
+                FragmentInfo(fragment, true)
+            }
             put(VR.id.navigation_discover) { FragmentInfo(DiscoverFragment(), false) }
             put(VR.id.navigation_profile) { FragmentInfo(ProfileFragment(), true) }
             put(VR.id.navigation_upnext) {

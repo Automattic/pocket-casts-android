@@ -3,8 +3,6 @@ package au.com.shiftyjelly.pocketcasts.crashlogging
 import au.com.shiftyjelly.pocketcasts.crashlogging.fakes.FakeCrashLogging
 import au.com.shiftyjelly.pocketcasts.crashlogging.fakes.FakeEncryptedLogging
 import java.io.File
-import kotlinx.coroutines.test.TestScope
-import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
@@ -13,7 +11,6 @@ internal class InitializeRemoteLoggingTest {
 
     val crashLogging = FakeCrashLogging()
     val encryptedLogging = FakeEncryptedLogging()
-    val testScope = TestScope()
 
     private lateinit var sut: InitializeRemoteLogging
 
@@ -22,7 +19,7 @@ internal class InitializeRemoteLoggingTest {
         sut = InitializeRemoteLogging(
             crashLogging,
             encryptedLogging,
-        ) { testScope }
+        )
     }
 
     @Test
@@ -62,11 +59,8 @@ internal class InitializeRemoteLoggingTest {
             false,
         )
 
-        testScope.runTest {
-            sut()
-            testScheduler.runCurrent()
+        sut()
 
-            assertTrue(encryptedLogging.uploaded.size == 2)
-        }
+        assertTrue(encryptedLogging.uploaded.size == 2)
     }
 }
