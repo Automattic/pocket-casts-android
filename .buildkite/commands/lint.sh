@@ -27,5 +27,7 @@ else
 fi
 
 upload_sarif_to_github 'app/build/reports/lint-results-release.sarif'
+upload_sarif_to_github 'automotive/build/reports/lint-results-release.sarif'
+upload_sarif_to_github 'wear/build/reports/lint-results-release.sarif'
 
 exit $lint_exit_code
