@@ -19,15 +19,18 @@ class FolderOptionsDialog(
     val fragment: Fragment,
     val settings: Settings,
 ) {
+    companion object {
+        private const val FRAGMENT_FOLDER_OPTIONS_DIALOG = "folder_options_dialog"
+        private const val FRAGMENT_FOLDER_SORT_DIALOG = "folder_sort_dialog"
+    }
 
-    private var showDialog: OptionsDialog? = null
-    private var sortDialog: OptionsDialog? = null
+    private val showDialog: OptionsDialog
+    private val sortDialog: OptionsDialog
     private val fragmentManager: FragmentManager?
         get() = fragment.activity?.supportFragmentManager
 
-    fun show() {
-        val fragmentManager = fragmentManager ?: return
-        val dialog = OptionsDialog()
+    init {
+        showDialog = (fragmentManager?.findFragmentByTag(FRAGMENT_FOLDER_OPTIONS_DIALOG) as? OptionsDialog ?: OptionsDialog())
             .addTextOption(
                 titleId = LR.string.podcasts_menu_sort_by,
                 imageId = IR.drawable.ic_sort,
@@ -42,7 +45,6 @@ class FolderOptionsDialog(
                 imageId = R.drawable.ic_pencil_edit,
                 click = {
                     onEditFolder()
-                    dismiss()
                 },
             )
             .addTextOption(
@@ -52,17 +54,12 @@ class FolderOptionsDialog(
                     onAddOrRemovePodcast()
                 },
             )
-        dialog.show(fragmentManager, "podcasts_options_dialog")
-        showDialog = dialog
-    }
 
-    private fun openSortOptions() {
-        val fragmentManager = fragmentManager ?: return
         val podcastsSortType = folder.podcastsSortType
-        val title = fragment.getString(LR.string.sort_by)
-        val dialog = OptionsDialog().setTitle(title)
-        for (sortType in PodcastsSortType.values()) {
-            dialog.addCheckedOption(
+        sortDialog = (fragmentManager?.findFragmentByTag(FRAGMENT_FOLDER_SORT_DIALOG) as? OptionsDialog ?: OptionsDialog())
+        sortDialog.setTitle(fragment.getString(LR.string.sort_by))
+        for (sortType in PodcastsSortType.entries) {
+            sortDialog.addCheckedOption(
                 titleId = sortType.labelId,
                 checked = sortType == podcastsSortType,
                 click = {
@@ -70,12 +67,17 @@ class FolderOptionsDialog(
                 },
             )
         }
-        dialog.show(fragmentManager, "podcasts_sort_dialog")
-        sortDialog = dialog
     }
 
-    fun dismiss() {
-        showDialog?.dismiss()
-        sortDialog?.dismiss()
+    fun show() {
+        fragmentManager?.let {
+            showDialog.show(it, FRAGMENT_FOLDER_OPTIONS_DIALOG)
+        }
+    }
+
+    private fun openSortOptions() {
+        fragmentManager?.let {
+            sortDialog.show(it, FRAGMENT_FOLDER_SORT_DIALOG)
+        }
     }
 }

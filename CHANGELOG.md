@@ -3,6 +3,9 @@
 *   Bug Fixes
     *   Fix player's playback position being incorrect after app restart
         ([#4208](https://github.com/Automattic/pocket-casts-android/pull/4208))
+*   Updates
+    *   Podcast and folder options dialogs will stay open through config changes (like screen rotation)
+        ([#4197](https://github.com/Automattic/pocket-casts-android/pull/4197))
 
 7.93
 -----
