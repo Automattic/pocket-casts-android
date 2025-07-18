@@ -6,9 +6,13 @@ import org.junit.Assert.assertNull
 import org.junit.Test
 
 class SubscriptionPlansTest {
-    private val pricingPhase = PricingPhase(
+    private val initialPricingPhase = PricingPhase(
+        Price(100.toBigDecimal(), "USD", "$10.00"),
+        PricingSchedule(PricingSchedule.RecurrenceMode.Recurring(1), PricingSchedule.Period.Yearly, periodCount = 1),
+    )
+    private val infinitePricingPhase = PricingPhase(
         Price(100.toBigDecimal(), "USD", "$100.00"),
-        PricingSchedule(PricingSchedule.RecurrenceMode.Infinite, PricingSchedule.Period.Yearly, periodCount = 1),
+        PricingSchedule(PricingSchedule.RecurrenceMode.Infinite, PricingSchedule.Period.Yearly, periodCount = 0),
     )
 
     private val products = SubscriptionTier.entries.flatMap { tier ->
@@ -19,7 +23,7 @@ class SubscriptionPlansTest {
                 pricingPlans = PricingPlans(
                     basePlan = PricingPlan.Base(
                         planId = SubscriptionPlan.basePlanId(tier, billingCycle),
-                        pricingPhases = listOf(pricingPhase),
+                        pricingPhases = listOf(infinitePricingPhase),
                         tags = emptyList(),
                     ),
                     offerPlans = SubscriptionOffer.entries
@@ -28,7 +32,7 @@ class SubscriptionPlansTest {
                             PricingPlan.Offer(
                                 offerId = offerId,
                                 planId = SubscriptionPlan.basePlanId(tier, billingCycle),
-                                pricingPhases = listOf(pricingPhase, pricingPhase),
+                                pricingPhases = listOf(initialPricingPhase, infinitePricingPhase),
                                 tags = emptyList(),
                             )
                         },
@@ -253,7 +257,7 @@ class SubscriptionPlansTest {
     fun `do not create plans when base plan has multiple pricing phases`() {
         val products = products.map { product ->
             if (product.id == SubscriptionPlan.PATRON_YEARLY_PRODUCT_ID) {
-                val basePlan = product.pricingPlans.basePlan.copy(pricingPhases = listOf(pricingPhase, pricingPhase))
+                val basePlan = product.pricingPlans.basePlan.copy(pricingPhases = listOf(initialPricingPhase, infinitePricingPhase))
                 val pricingPlans = product.pricingPlans.copy(basePlan = basePlan)
                 product.copy(pricingPlans = pricingPlans)
             } else {
@@ -307,20 +311,59 @@ class SubscriptionPlansTest {
     }
 
     @Test
-    fun `verify recurringPrice property is calculated properly`() {
-        val plans = SubscriptionPlans.create(products).getOrNull()!!
-        for (tier in SubscriptionTier.entries) {
-            for (cycle in BillingCycle.entries) {
-                val basePlan = plans.getBasePlan(tier = tier, billingCycle = cycle)
-                assertEquals(basePlan.pricingPhase.price, basePlan.recurringPrice)
-
-                for (offer in SubscriptionOffer.entries) {
-                    val offerPlan = plans.findOfferPlan(tier = tier, billingCycle = cycle, offer = offer).getOrNull() ?: continue
-
-                    val expectedPrice = offerPlan.pricingPhases.find { it.schedule.recurrenceMode == PricingSchedule.RecurrenceMode.Infinite }?.price
-                    assertEquals(expectedPrice, offerPlan.recurringPrice)
-                }
+    fun `do not create offers when base has non infinte pricing phase`() {
+        val products = products.map { product ->
+            if (product.id == SubscriptionPlan.PATRON_YEARLY_PRODUCT_ID) {
+                val basePlan = product.pricingPlans.basePlan.copy(pricingPhases = listOf(initialPricingPhase))
+                val pricingPlans = product.pricingPlans.copy(basePlan = basePlan)
+                product.copy(pricingPlans = pricingPlans)
+            } else {
+                product
             }
+        }
+
+        val plans = SubscriptionPlans.create(products).getOrNull()
+
+        assertNull(plans)
+    }
+
+    @Test
+    fun `do not find offers when there are multiple infinite pricing phases`() {
+        val products = products.map { product ->
+            val offerPlans = product.pricingPlans.offerPlans.map { offerPlan ->
+                offerPlan.copy(pricingPhases = offerPlan.pricingPhases + initialPricingPhase)
+            }
+            val pricingPlans = product.pricingPlans.copy(offerPlans = offerPlans)
+            product.copy(pricingPlans = pricingPlans)
+        }
+        val plans = SubscriptionPlans.create(products).getOrNull()!!
+
+        val plan = plans.findOfferPlan(
+            SubscriptionTier.Plus,
+            BillingCycle.Yearly,
+            SubscriptionOffer.Winback,
+        ).getOrNull()
+
+        assertNull(plan)
+    }
+
+    @Test
+    fun `plans have correct recurring price`() {
+        val plans = SubscriptionPlans.create(products).getOrNull()!!
+        val basePlans = SubscriptionTier.entries.flatMap { tier ->
+            BillingCycle.entries.map { billingCycle ->
+                plans.getBasePlan(tier, billingCycle)
+            }
+        }
+        val offerPlans = SubscriptionOffer.entries.flatMap { offer ->
+            basePlans.mapNotNull { basePlan ->
+                plans.findOfferPlan(basePlan.tier, basePlan.billingCycle, offer).getOrNull()
+            }
+        }
+        val allPlans = basePlans + offerPlans
+
+        for (plan in allPlans) {
+            assertEquals(plan.recurringPrice, infinitePricingPhase.price)
         }
     }
 }

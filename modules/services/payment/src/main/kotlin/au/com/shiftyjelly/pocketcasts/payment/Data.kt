@@ -1,6 +1,7 @@
 package au.com.shiftyjelly.pocketcasts.payment
 
 import androidx.annotation.Keep
+import au.com.shiftyjelly.pocketcasts.payment.PricingSchedule.RecurrenceMode
 import java.math.BigDecimal
 
 data class Product(
@@ -45,7 +46,7 @@ data class Price(
 )
 
 data class PricingSchedule(
-    val recurrenceMode: PricingSchedule.RecurrenceMode,
+    val recurrenceMode: RecurrenceMode,
     val period: PricingSchedule.Period,
     val periodCount: Int,
 ) {
@@ -141,9 +142,12 @@ data class SubscriptionPlans private constructor(
         private fun List<Product>.findMatchingProducts(key: SubscriptionPlan.Key): List<Product> {
             return filter { product ->
                 val offerCondition = if (key.offer != null) {
-                    product.pricingPlans.offerPlans.singleOrNull { it.offerId == key.offerId } != null
+                    val pricingPhases = product.pricingPlans.offerPlans.singleOrNull { it.offerId == key.offerId }?.pricingPhases
+                    val infinitePricingPhase = pricingPhases?.singleOrNull { it.schedule.recurrenceMode == RecurrenceMode.Infinite }
+                    infinitePricingPhase != null && infinitePricingPhase == pricingPhases.last()
                 } else {
-                    product.pricingPlans.basePlan.pricingPhases.size == 1
+                    val pricingPhase = product.pricingPlans.basePlan.pricingPhases.singleOrNull()
+                    pricingPhase?.schedule?.recurrenceMode == RecurrenceMode.Infinite
                 }
                 product.id == key.productId && product.pricingPlans.basePlan.planId == key.basePlanId && offerCondition
             }
