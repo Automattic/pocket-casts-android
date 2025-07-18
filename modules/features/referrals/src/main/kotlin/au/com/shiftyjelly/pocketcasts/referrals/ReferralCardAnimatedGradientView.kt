@@ -10,6 +10,7 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.requiredSize
 import androidx.compose.foundation.layout.size
@@ -76,7 +77,8 @@ private fun ReferralCardAnimatedBackgroundView(
             contentAlignment = Alignment.Center,
             modifier = Modifier
                 .blur(maxWidth / 10)
-                .background(Color.Black),
+                .background(Color.Black)
+                .fillMaxSize(),
         ) {
             val density = LocalDensity.current
             val circleSize = maxHeight * 1.3f
