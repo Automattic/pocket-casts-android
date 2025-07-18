@@ -201,7 +201,6 @@ subprojects {
         checkAllWarnings = false
         warningsAsErrors = false
 
-        checkDependencies = true
         checkTestSources = false
         checkGeneratedSources = false
 
@@ -374,6 +373,11 @@ subprojects {
                 }
             }
         }
+        dependencies {
+            val lintChecks by configurations
+            lintChecks(libs.security.lint)
+            lintChecks(libs.wordpress.lint)
+        }
     }
 
     plugins.withType<AppPlugin>().configureEach {
@@ -414,6 +418,7 @@ subprojects {
         dependencies {
             val lintChecks by configurations
             lintChecks(libs.security.lint)
+            lintChecks(libs.wordpress.lint)
         }
     }
 }

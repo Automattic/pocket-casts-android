@@ -35,6 +35,10 @@ android {
             manifestPlaceholders["appIcon"] = "@mipmap/ic_launcher"
         }
     }
+
+    lint {
+        checkDependencies = false
+    }
 }
 
 dependencies {

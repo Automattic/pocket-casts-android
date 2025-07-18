@@ -57,6 +57,7 @@ test = "1.6.1"
 tracks = "6.0.4"
 wear-compose = "1.4.1"
 webkit = "1.14.0"
+wordpress-lint = "2.2.0"
 work = "2.10.0"
 
 [libraries]
@@ -152,6 +153,7 @@ lifecycle-viewmodel-compose = { module = "androidx.lifecycle:lifecycle-viewmodel
 # CLI included to be picked up by dependencies update automation
 ktlint-cli = { module = "com.pinterest.ktlint:ktlint-cli", version.ref = "ktlint"}
 ktlint-compose-rules = { module = "io.nlopez.compose.rules:ktlint", version.ref = "ktlint-compose-rules"}
+wordpress-lint = { module = "org.wordpress:lint", version.ref = "wordpress-lint" }
 security-lint = { module = "com.android.security.lint:lint", version.ref = "security-lint" }
 
 # Lottie
