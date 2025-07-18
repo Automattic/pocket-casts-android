@@ -1,11 +1,32 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2025-07-01 15:54:04+0000
+Translation-Revision-Date: 2025-07-16 13:54:04+0000
 Plural-Forms: nplurals=2; plural=n > 1;
 Generator: GlotPress/2.4.0-alpha
 Language: fr
 -->
 <resources>
+    <string name="onboarding_upgrade_billing_cycle_yearly">Plan annuel</string>
+    <string name="onboarding_upgrade_billing_cycle_monthly">Plan mensuel</string>
+    <string name="onboarding_upgrade_features_trial_schedule">Comment fonctionne l’essai gratuit ?</string>
+    <string name="onboarding_upgrade_features_slumber">1 an de contenu de &lt;a href=\"https://slumberstudios.com/\"&gt;Slumber Studios&lt;/a&gt;</string>
+    <string name="onboarding_upgrade_features_wear">Applications pour Wear OS et Apple Watch</string>
+    <string name="onboarding_upgrade_features_themes">Thèmes et icônes d’application supplémentaires</string>
+    <string name="onboarding_upgrade_features_files">20 Go de stockage cloud pour vos fichiers</string>
+    <string name="onboarding_upgrade_features_chapters">Gagnez du temps avec la présélection de chapitres</string>
+    <string name="onboarding_upgrade_features_bookmarks">Conservez des horodatages avec les signets</string>
+    <string name="onboarding_upgrade_features_shuffle">Lisez votre file d’attente en mode aléatoire</string>
+    <string name="onboarding_upgrade_features_folders">Nettoyez votre collection avec les dossiers</string>
+    <string name="onboarding_upgrade_schedule_see_features">Voir toutes les fonctionnalités Plus</string>
+    <string name="onboarding_upgrade_schedule_billing">La facturation aura lieu le %1$s. Annulez à tout moment avant cette date.</string>
+    <string name="onboarding_upgrade_schedule_notify">Nous vous informerons de la fin de votre essai.</string>
+    <string name="onboarding_upgrade_schedule_day">Jour %1$d</string>
+    <string name="onboarding_upgrade_schedule_today_message">Accédez aux dossiers, à la lecture aléatoire, aux signets et à du contenu exclusif</string>
+    <string name="onboarding_upgrade_schedule_today">Aujourd’hui</string>
+    <string name="onboarding_upgrade_generic_title">Des superpouvoirs pour vos podcasts</string>
+    <string name="onboarding_upgrade_save_percent">Économiser %1$d %%</string>
+    <string name="best_value">Meilleur rapport qualité-prix</string>
+    <string name="view_transcript">Voir la transcription</string>
     <string name="transcript_open">Ouvrir la transcription</string>
     <string name="episode_description">Description de l’épisode</string>
     <string name="onboarding_plus_feature_no_banner_ads">Aucune bannière publicitaire</string>

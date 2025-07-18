@@ -1,11 +1,32 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2025-07-01 09:54:04+0000
+Translation-Revision-Date: 2025-07-16 11:54:03+0000
 Plural-Forms: nplurals=1; plural=0;
 Generator: GlotPress/2.4.0-alpha
 Language: zh_CN
 -->
 <resources>
+    <string name="onboarding_upgrade_billing_cycle_yearly">年度套餐</string>
+    <string name="onboarding_upgrade_billing_cycle_monthly">月度套餐</string>
+    <string name="onboarding_upgrade_features_trial_schedule">免费试用版如何使用？</string>
+    <string name="onboarding_upgrade_features_slumber">由 &lt;a href=\"https://slumberstudios.com/\"&gt;Slumber Studios&lt;/a&gt; 提供的一年内容</string>
+    <string name="onboarding_upgrade_features_wear">适用于 Wear OS 和 Apple Watch 的应用程序</string>
+    <string name="onboarding_upgrade_features_themes">更多主题和应用程序图标</string>
+    <string name="onboarding_upgrade_features_files">供您存放文件的 20 GB 云存储空间</string>
+    <string name="onboarding_upgrade_features_chapters">通过预选章节功能节省时间</string>
+    <string name="onboarding_upgrade_features_bookmarks">使用书签保留时间戳</string>
+    <string name="onboarding_upgrade_features_shuffle">随机播放您的队列</string>
+    <string name="onboarding_upgrade_features_folders">使用文件夹整理您的收藏</string>
+    <string name="onboarding_upgrade_schedule_see_features">查看所有 Plus 功能</string>
+    <string name="onboarding_upgrade_schedule_billing">系统将于 %1$s 向您收取费用。 您在此之前可以随时取消。</string>
+    <string name="onboarding_upgrade_schedule_notify">我们会在试用期结束时通知您。</string>
+    <string name="onboarding_upgrade_schedule_day">第 %1$d 天</string>
+    <string name="onboarding_upgrade_schedule_today_message">获取文件夹、随机播放功能、书签及独家内容的专属访问权限</string>
+    <string name="onboarding_upgrade_schedule_today">今天</string>
+    <string name="onboarding_upgrade_generic_title">为您的播客赋予强大功能</string>
+    <string name="onboarding_upgrade_save_percent">节省 %1$d%%</string>
+    <string name="best_value">最佳价值</string>
+    <string name="view_transcript">查看文字转录稿</string>
     <string name="transcript_open">打开文字转录稿</string>
     <string name="episode_description">剧集描述</string>
     <string name="onboarding_plus_feature_no_banner_ads">无横幅广告</string>
