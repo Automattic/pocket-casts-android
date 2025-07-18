@@ -17,6 +17,7 @@ import androidx.compose.material.Card
 import androidx.compose.material.Text
 import androidx.compose.material.TextButton
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.outlined.PlaylistPlay
 import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material.icons.outlined.BugReport
 import androidx.compose.material.icons.outlined.Delete
@@ -61,6 +62,7 @@ fun DeveloperPage(
     onShowWhatsNewClick: () -> Unit,
     onShowNotificationsTestingClick: () -> Unit,
     onResetSuggestedFoldersSuggestion: () -> Unit,
+    onResetPlaylistsOnboarding: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     var openCrashMessageDialog by remember { mutableStateOf(false) }
@@ -108,6 +110,9 @@ fun DeveloperPage(
         }
         item {
             NotificationsTesting(onClick = onShowNotificationsTestingClick)
+        }
+        item {
+            ResetPlaylistsOnboarding(onClick = onResetPlaylistsOnboarding)
         }
 
         if (openCrashMessageDialog) {
@@ -303,6 +308,19 @@ private fun NotificationsTesting(
 }
 
 @Composable
+private fun ResetPlaylistsOnboarding(
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    SettingRow(
+        primaryText = "Reset Playlists onboarding",
+        secondaryText = "Show Playlists onboarding and tooltips",
+        icon = rememberVectorPainter(Icons.AutoMirrored.Outlined.PlaylistPlay),
+        modifier = modifier.clickable { onClick() },
+    )
+}
+
+@Composable
 private fun ResetSuggestedFoldersSuggestion(
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
@@ -346,6 +364,7 @@ private fun DeveloperPagePreview() {
         onShowWhatsNewClick = {},
         onResetSuggestedFoldersSuggestion = {},
         onShowNotificationsTestingClick = {},
+        onResetPlaylistsOnboarding = {},
     )
 }
 
