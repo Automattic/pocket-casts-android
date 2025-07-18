@@ -11,8 +11,8 @@ import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import au.com.shiftyjelly.pocketcasts.localization.extensions.getStringPlural
-import au.com.shiftyjelly.pocketcasts.models.entity.Playlist
-import au.com.shiftyjelly.pocketcasts.repositories.podcast.PlaylistManager
+import au.com.shiftyjelly.pocketcasts.models.entity.SmartPlaylist
+import au.com.shiftyjelly.pocketcasts.repositories.podcast.SmartPlaylistManager
 import au.com.shiftyjelly.pocketcasts.utils.extensions.getSerializableCompat
 import au.com.shiftyjelly.pocketcasts.views.databinding.FragmentFilterSelectBinding
 import au.com.shiftyjelly.pocketcasts.views.databinding.SettingsRowFilterBinding
@@ -65,7 +65,7 @@ class FilterSelectFragment private constructor() : BaseFragment() {
     private var binding: FragmentFilterSelectBinding? = null
     private var hasChanged = false
 
-    @Inject lateinit var playlistManager: PlaylistManager
+    @Inject lateinit var smartPlaylistManager: SmartPlaylistManager
 
     val disposables = CompositeDisposable()
 
@@ -87,7 +87,7 @@ class FilterSelectFragment private constructor() : BaseFragment() {
 
         val layoutManager = LinearLayoutManager(context, RecyclerView.VERTICAL, false)
 
-        playlistManager.findAllRxFlowable().firstOrError()
+        smartPlaylistManager.findAllRxFlowable().firstOrError()
             .zipWith(Single.fromCallable { listener.filterSelectFragmentGetCurrentSelection() })
             .map {
                 val filters = it.first
@@ -165,11 +165,11 @@ class FilterSelectFragment private constructor() : BaseFragment() {
     }
 }
 
-private data class SelectableFilter(val filter: Playlist, var selected: Boolean)
-private class FilterSelectAdapter(val isDarkTheme: Boolean, val list: List<SelectableFilter>, val onSelectionChanged: (selected: List<Playlist>) -> Unit) : RecyclerView.Adapter<FilterSelectAdapter.FilterViewHolder>() {
+private data class SelectableFilter(val filter: SmartPlaylist, var selected: Boolean)
+private class FilterSelectAdapter(val isDarkTheme: Boolean, val list: List<SelectableFilter>, val onSelectionChanged: (selected: List<SmartPlaylist>) -> Unit) : RecyclerView.Adapter<FilterSelectAdapter.FilterViewHolder>() {
     class FilterViewHolder(val binding: SettingsRowFilterBinding) : RecyclerView.ViewHolder(binding.root)
 
-    val selectedFilters: List<Playlist>
+    val selectedFilters: List<SmartPlaylist>
         get() = list.filter { it.selected }.map { it.filter }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): FilterViewHolder {

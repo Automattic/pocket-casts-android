@@ -27,10 +27,10 @@ import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.type.AutoDownloadLimitSetting
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.preferences.Settings.Companion.GLOBAL_AUTO_DOWNLOAD_NONE
-import au.com.shiftyjelly.pocketcasts.repositories.podcast.PlaylistManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PlaylistProperty
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PlaylistUpdateSource
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
+import au.com.shiftyjelly.pocketcasts.repositories.podcast.SmartPlaylistManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.UserPlaylistUpdate
 import au.com.shiftyjelly.pocketcasts.settings.viewmodel.AutoDownloadSettingsViewModel
 import au.com.shiftyjelly.pocketcasts.settings.viewmodel.ManualCleanupViewModel
@@ -93,7 +93,7 @@ class AutoDownloadSettingsFragment :
 
     @Inject lateinit var podcastManager: PodcastManager
 
-    @Inject lateinit var playlistManager: PlaylistManager
+    @Inject lateinit var smartPlaylistManager: SmartPlaylistManager
 
     @Inject lateinit var settings: Settings
 
@@ -346,14 +346,14 @@ class AutoDownloadSettingsFragment :
 
     override fun filterSelectFragmentGetCurrentSelection(): List<String> {
         return runBlocking {
-            val filters = withContext(Dispatchers.Default) { playlistManager.findAllBlocking() }.filter { it.autoDownload }
+            val filters = withContext(Dispatchers.Default) { smartPlaylistManager.findAllBlocking() }.filter { it.autoDownload }
             filters.map { it.uuid }
         }
     }
 
     override fun filterSelectFragmentSelectionChanged(newSelection: List<String>) {
         lifecycleScope.launch(Dispatchers.Default) {
-            playlistManager.findAllBlocking().forEach {
+            smartPlaylistManager.findAllBlocking().forEach {
                 val autoDownloadStatus = newSelection.contains(it.uuid)
                 val userChanged = autoDownloadStatus != it.autoDownload
                 it.autoDownload = autoDownloadStatus
@@ -366,7 +366,7 @@ class AutoDownloadSettingsFragment :
                 } else {
                     null
                 }
-                playlistManager.updateBlocking(it, userPlaylistUpdate)
+                smartPlaylistManager.updateBlocking(it, userPlaylistUpdate)
             }
             launch(Dispatchers.Main) { updateFiltersSelectedSummary() }
         }
@@ -374,7 +374,7 @@ class AutoDownloadSettingsFragment :
 
     private fun updateFiltersSelectedSummary() {
         lifecycleScope.launch {
-            val count = withContext(Dispatchers.Default) { playlistManager.findAllBlocking() }.filter { it.autoDownload }.count()
+            val count = withContext(Dispatchers.Default) { smartPlaylistManager.findAllBlocking() }.filter { it.autoDownload }.count()
             val preference = preferenceManager.findPreference<Preference>(PREFERENCE_CHOOSE_FILTERS)
             preference?.summary = context?.resources?.getStringPlural(count = count, singular = LR.string.filters_chosen_singular, plural = LR.string.filters_chosen_plural)
         }

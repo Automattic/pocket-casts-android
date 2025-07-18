@@ -31,8 +31,8 @@ import au.com.shiftyjelly.pocketcasts.repositories.bookmark.BookmarkManager
 import au.com.shiftyjelly.pocketcasts.repositories.playback.auto.AutoConverter
 import au.com.shiftyjelly.pocketcasts.repositories.playback.auto.AutoMediaId
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
-import au.com.shiftyjelly.pocketcasts.repositories.podcast.PlaylistManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
+import au.com.shiftyjelly.pocketcasts.repositories.podcast.SmartPlaylistManager
 import au.com.shiftyjelly.pocketcasts.utils.Optional
 import au.com.shiftyjelly.pocketcasts.utils.Util
 import au.com.shiftyjelly.pocketcasts.utils.extensions.getLaunchActivityPendingIntent
@@ -68,7 +68,7 @@ class MediaSessionManager(
     val playbackManager: PlaybackManager,
     val podcastManager: PodcastManager,
     val episodeManager: EpisodeManager,
-    val playlistManager: PlaylistManager,
+    val smartPlaylistManager: SmartPlaylistManager,
     val settings: Settings,
     val context: Context,
     val episodeAnalytics: EpisodeAnalytics,
@@ -875,14 +875,14 @@ class MediaSessionManager(
             }
 
             for (option in options) {
-                val playlist = playlistManager.findFirstByTitleBlocking(option) ?: continue
+                val playlist = smartPlaylistManager.findFirstByTitleBlocking(option) ?: continue
 
                 Timber.i("Playing matched playlist '$option'")
 
-                val episodeCount = playlistManager.countEpisodesBlocking(playlist.id, episodeManager, playbackManager)
+                val episodeCount = smartPlaylistManager.countEpisodesBlocking(playlist.id, episodeManager, playbackManager)
                 if (episodeCount == 0) return@launch
 
-                val episodesToPlay = playlistManager.findEpisodesBlocking(playlist, episodeManager, playbackManager).take(5)
+                val episodesToPlay = smartPlaylistManager.findEpisodesBlocking(playlist, episodeManager, playbackManager).take(5)
                 if (episodesToPlay.isEmpty()) return@launch
 
                 playEpisodes(episodesToPlay, sourceView)

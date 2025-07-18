@@ -8,14 +8,14 @@ import androidx.lifecycle.viewModelScope
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
-import au.com.shiftyjelly.pocketcasts.models.entity.Playlist
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
+import au.com.shiftyjelly.pocketcasts.models.entity.SmartPlaylist
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
-import au.com.shiftyjelly.pocketcasts.repositories.podcast.PlaylistManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PlaylistProperty
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PlaylistUpdateSource
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
+import au.com.shiftyjelly.pocketcasts.repositories.podcast.SmartPlaylistManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.UserPlaylistUpdate
 import dagger.hilt.android.lifecycle.HiltViewModel
 import io.reactivex.schedulers.Schedulers
@@ -30,7 +30,7 @@ import kotlinx.coroutines.launch
 class PodcastSettingsViewModel @Inject constructor(
     private val podcastManager: PodcastManager,
     private val playbackManager: PlaybackManager,
-    private val playlistManager: PlaylistManager,
+    private val smartPlaylistManager: SmartPlaylistManager,
     private val analyticsTracker: AnalyticsTracker,
     settings: Settings,
 ) : ViewModel(),
@@ -41,8 +41,8 @@ class PodcastSettingsViewModel @Inject constructor(
 
     var podcastUuid: String? = null
     lateinit var podcast: LiveData<Podcast>
-    lateinit var includedFilters: LiveData<List<Playlist>>
-    lateinit var availableFilters: LiveData<List<Playlist>>
+    lateinit var includedFilters: LiveData<List<SmartPlaylist>>
+    lateinit var availableFilters: LiveData<List<SmartPlaylist>>
 
     val globalSettings = settings.autoAddUpNextLimit.flow
         .combine(settings.autoAddUpNextLimitBehaviour.flow, ::Pair)
@@ -55,12 +55,12 @@ class PodcastSettingsViewModel @Inject constructor(
             .subscribeOn(Schedulers.io())
             .toLiveData()
 
-        val filters = playlistManager.findAllRxFlowable().map {
+        val filters = smartPlaylistManager.findAllRxFlowable().map {
             it.filter { filter -> filter.podcastUuidList.contains(uuid) }
         }
         includedFilters = filters.toLiveData()
 
-        val availablePodcastFilters = playlistManager.findAllRxFlowable().map {
+        val availablePodcastFilters = smartPlaylistManager.findAllRxFlowable().map {
             it.filter { filter -> !filter.allPodcasts }
         }
         availableFilters = availablePodcastFilters.toLiveData()
@@ -129,7 +129,7 @@ class PodcastSettingsViewModel @Inject constructor(
     fun filterSelectionChanged(newSelection: List<String>) {
         launch {
             podcastUuid?.let { podcastUuid ->
-                playlistManager.findAllBlocking().forEach { playlist ->
+                smartPlaylistManager.findAllBlocking().forEach { playlist ->
                     val currentSelection = playlist.podcastUuidList.toMutableList()
                     val included = newSelection.contains(playlist.uuid)
 
@@ -146,12 +146,12 @@ class PodcastSettingsViewModel @Inject constructor(
 
                     if (isUpdated) {
                         playlist.podcastUuidList = currentSelection
-                        playlist.syncStatus = Playlist.SYNC_STATUS_NOT_SYNCED
+                        playlist.syncStatus = SmartPlaylist.SYNC_STATUS_NOT_SYNCED
                         val userPlaylistUpdate = UserPlaylistUpdate(
                             listOf(PlaylistProperty.Podcasts),
                             PlaylistUpdateSource.PODCAST_SETTINGS,
                         )
-                        playlistManager.updateBlocking(playlist, userPlaylistUpdate)
+                        smartPlaylistManager.updateBlocking(playlist, userPlaylistUpdate)
                     }
                 }
             }

@@ -8,17 +8,17 @@ import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.rule.ServiceTestRule
 import au.com.shiftyjelly.pocketcasts.PocketCastsApplication
-import au.com.shiftyjelly.pocketcasts.models.entity.Playlist
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
+import au.com.shiftyjelly.pocketcasts.models.entity.SmartPlaylist
 import au.com.shiftyjelly.pocketcasts.preferences.Settings.NotificationId
 import au.com.shiftyjelly.pocketcasts.repositories.notification.NotificationHelper
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackService
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlayerNotificationManager
 import au.com.shiftyjelly.pocketcasts.repositories.playback.UpNextQueue
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
-import au.com.shiftyjelly.pocketcasts.repositories.podcast.PlaylistManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
+import au.com.shiftyjelly.pocketcasts.repositories.podcast.SmartPlaylistManager
 import au.com.shiftyjelly.pocketcasts.utils.SchedulerProvider
 import java.util.Date
 import java.util.UUID
@@ -74,7 +74,7 @@ class PlaybackServiceTest {
             PodcastEpisode(uuid = UUID.randomUUID().toString(), podcastUuid = podcastTwo.uuid, publishedDate = Date(), title = "Episode 2"),
             PodcastEpisode(uuid = UUID.randomUUID().toString(), podcastUuid = podcastOne.uuid, publishedDate = Date(), title = "Episode 3"),
         )
-        val filter = Playlist(uuid = UUID.randomUUID().toString(), title = "New Releases")
+        val filter = SmartPlaylist(uuid = UUID.randomUUID().toString(), title = "New Releases")
         val filters = listOf(filter)
         val filterEpisodes = listOf(
             PodcastEpisode(uuid = UUID.randomUUID().toString(), podcastUuid = podcastOne.uuid, publishedDate = Date(), title = "Episode 4"),
@@ -98,12 +98,12 @@ class PlaybackServiceTest {
             onBlocking { findLatestEpisodeToPlayBlocking() }.doReturn(latestEpisode)
         }
         service.episodeManager = episodeManager
-        val playlistManager = mock<PlaylistManager> {
+        val smartPlaylistManager = mock<SmartPlaylistManager> {
             onBlocking { findAll() }.doReturn(filters)
             onBlocking { findByUuid(filter.uuid) }.doReturn(filter)
-            on { findEpisodesBlocking(playlist = filters.first(), episodeManager = episodeManager, playbackManager = service.playbackManager) }.doReturn(filterEpisodes)
+            on { findEpisodesBlocking(smartPlaylist = filters.first(), episodeManager = episodeManager, playbackManager = service.playbackManager) }.doReturn(filterEpisodes)
         }
-        service.playlistManager = playlistManager
+        service.smartPlaylistManager = smartPlaylistManager
 
         runTest {
             val mediaItems = service.loadSuggestedChildren()

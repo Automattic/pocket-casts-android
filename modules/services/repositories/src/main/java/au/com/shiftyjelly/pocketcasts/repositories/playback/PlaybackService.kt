@@ -38,8 +38,8 @@ import au.com.shiftyjelly.pocketcasts.repositories.playback.auto.AutoConverter.c
 import au.com.shiftyjelly.pocketcasts.repositories.playback.auto.PackageValidator
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.FolderManager
-import au.com.shiftyjelly.pocketcasts.repositories.podcast.PlaylistManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
+import au.com.shiftyjelly.pocketcasts.repositories.podcast.SmartPlaylistManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.UserEpisodeManager
 import au.com.shiftyjelly.pocketcasts.servers.ServiceManager
 import au.com.shiftyjelly.pocketcasts.servers.list.ListServiceManager
@@ -123,7 +123,7 @@ open class PlaybackService :
 
     @Inject lateinit var userEpisodeManager: UserEpisodeManager
 
-    @Inject lateinit var playlistManager: PlaylistManager
+    @Inject lateinit var smartPlaylistManager: SmartPlaylistManager
 
     @Inject lateinit var playbackManager: PlaybackManager
 
@@ -454,9 +454,9 @@ open class PlaybackService :
         episodes.addAll(upNextQueue.queueEpisodes.take(numSuggestedItems - 1))
         // add episodes from the top filter
         if (episodes.size < numSuggestedItems) {
-            val topFilter = playlistManager.findAll().firstOrNull()
+            val topFilter = smartPlaylistManager.findAll().firstOrNull()
             if (topFilter != null) {
-                val filterEpisodes = playlistManager.findEpisodesBlocking(topFilter, episodeManager, playbackManager)
+                val filterEpisodes = smartPlaylistManager.findEpisodesBlocking(topFilter, episodeManager, playbackManager)
                 for (filterEpisode in filterEpisodes) {
                     if (episodes.size >= numSuggestedItems) {
                         break
@@ -505,7 +505,7 @@ open class PlaybackService :
         rootItems.add(podcastItem)
 
         // playlists
-        for (playlist in playlistManager.findAllBlocking().filterNot { it.manual }) {
+        for (playlist in smartPlaylistManager.findAllBlocking().filterNot { it.manual }) {
             if (playlist.title.equals("video", ignoreCase = true)) continue
 
             val playlistItem = AutoConverter.convertPlaylistToMediaItem(this, playlist)
@@ -563,14 +563,14 @@ open class PlaybackService :
         val episodeItems = mutableListOf<MediaBrowserCompat.MediaItem>()
         val autoPlaySource: AutoPlaySource
 
-        val playlist = if (DOWNLOADS_ROOT == parentId) playlistManager.getSystemDownloadsFilter() else playlistManager.findByUuidBlocking(parentId)
+        val playlist = if (DOWNLOADS_ROOT == parentId) smartPlaylistManager.getSystemDownloadsFilter() else smartPlaylistManager.findByUuidBlocking(parentId)
         if (playlist != null) {
             val episodeList = if (DOWNLOADS_ROOT == parentId) {
                 autoPlaySource = AutoPlaySource.Predefined.Downloads
                 episodeManager.findDownloadedEpisodesRxFlowable().blockingFirst()
             } else {
                 autoPlaySource = AutoPlaySource.fromId(parentId)
-                playlistManager.findEpisodesBlocking(playlist, episodeManager, playbackManager)
+                smartPlaylistManager.findEpisodesBlocking(playlist, episodeManager, playbackManager)
             }
             val topEpisodes = episodeList.take(EPISODE_LIMIT)
             if (topEpisodes.isNotEmpty()) {

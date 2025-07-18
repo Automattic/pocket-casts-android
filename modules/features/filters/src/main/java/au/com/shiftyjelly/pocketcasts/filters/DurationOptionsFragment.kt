@@ -7,10 +7,10 @@ import android.view.View
 import android.view.ViewGroup
 import au.com.shiftyjelly.pocketcasts.filters.databinding.DurationOptionsFragmentBinding
 import au.com.shiftyjelly.pocketcasts.localization.helper.TimeHelper
-import au.com.shiftyjelly.pocketcasts.models.entity.Playlist
-import au.com.shiftyjelly.pocketcasts.repositories.podcast.PlaylistManager
+import au.com.shiftyjelly.pocketcasts.models.entity.SmartPlaylist
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PlaylistProperty
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PlaylistUpdateSource
+import au.com.shiftyjelly.pocketcasts.repositories.podcast.SmartPlaylistManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.UserPlaylistUpdate
 import au.com.shiftyjelly.pocketcasts.ui.extensions.getColor
 import au.com.shiftyjelly.pocketcasts.ui.helper.FragmentHostListener
@@ -29,17 +29,17 @@ private const val ARG_PLAYLIST_UUID = "playlist_uuid"
 @AndroidEntryPoint
 class DurationOptionsFragment : BaseFragment() {
     companion object {
-        fun newInstance(playlist: Playlist): DurationOptionsFragment {
+        fun newInstance(smartPlaylist: SmartPlaylist): DurationOptionsFragment {
             val bundle = Bundle()
-            bundle.putString(ARG_PLAYLIST_UUID, playlist.uuid)
+            bundle.putString(ARG_PLAYLIST_UUID, smartPlaylist.uuid)
             val fragment = DurationOptionsFragment()
             fragment.arguments = bundle
             return fragment
         }
     }
 
-    @Inject lateinit var playlistManager: PlaylistManager
-    var playlist: Playlist? = null
+    @Inject lateinit var smartPlaylistManager: SmartPlaylistManager
+    var smartPlaylist: SmartPlaylist? = null
 
     private var binding: DurationOptionsFragmentBinding? = null
     private var userChanged = false
@@ -91,7 +91,7 @@ class DurationOptionsFragment : BaseFragment() {
 
         val switchDuration = binding.switchDuration
         switchDuration.setOnCheckedChangeListener { _, isChecked ->
-            playlist?.filterDuration = isChecked
+            smartPlaylist?.filterDuration = isChecked
             enableDurations(isChecked)
             if (switchDurationInitialized) {
                 userChanged = true
@@ -101,8 +101,8 @@ class DurationOptionsFragment : BaseFragment() {
         val btnClose = binding.btnClose
 
         launch {
-            val playlist = playlistManager.findByUuid(requireArguments().getString(ARG_PLAYLIST_UUID)!!) ?: return@launch
-            this@DurationOptionsFragment.playlist = playlist
+            val playlist = smartPlaylistManager.findByUuid(requireArguments().getString(ARG_PLAYLIST_UUID)!!) ?: return@launch
+            this@DurationOptionsFragment.smartPlaylist = playlist
 
             enableDurations(playlist.filterDuration)
             switchDurationInitialized = false
@@ -142,9 +142,9 @@ class DurationOptionsFragment : BaseFragment() {
                 return@setOnClickListener
             }
 
-            playlist?.let { playlist ->
+            smartPlaylist?.let { playlist ->
                 launch(Dispatchers.Default) {
-                    playlist.syncStatus = Playlist.SYNC_STATUS_NOT_SYNCED
+                    playlist.syncStatus = SmartPlaylist.SYNC_STATUS_NOT_SYNCED
                     playlist.shorterThan = shorterValue
                     playlist.longerThan = longerValue
                     val userPlaylistUpdate = if (userChanged) {
@@ -155,7 +155,7 @@ class DurationOptionsFragment : BaseFragment() {
                     } else {
                         null
                     }
-                    playlistManager.updateBlocking(playlist, userPlaylistUpdate)
+                    smartPlaylistManager.updateBlocking(playlist, userPlaylistUpdate)
                     launch(Dispatchers.Main) { (activity as FragmentHostListener).closeModal(this@DurationOptionsFragment) }
                 }
             }

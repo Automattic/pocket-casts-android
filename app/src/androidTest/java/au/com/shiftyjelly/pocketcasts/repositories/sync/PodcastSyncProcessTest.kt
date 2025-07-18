@@ -15,8 +15,8 @@ import au.com.shiftyjelly.pocketcasts.repositories.bookmark.BookmarkManager
 import au.com.shiftyjelly.pocketcasts.repositories.bookmark.BookmarkManagerImpl
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.FolderManager
-import au.com.shiftyjelly.pocketcasts.repositories.podcast.PlaylistManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
+import au.com.shiftyjelly.pocketcasts.repositories.podcast.SmartPlaylistManager
 import au.com.shiftyjelly.pocketcasts.repositories.user.StatsManager
 import au.com.shiftyjelly.pocketcasts.servers.di.ServersModule
 import au.com.shiftyjelly.pocketcasts.servers.sync.SyncServiceManager
@@ -87,8 +87,8 @@ class PodcastSyncProcessTest {
             val episodeManager: EpisodeManager = mock()
             whenever(episodeManager.findEpisodesToSyncBlocking()).thenReturn(emptyList())
 
-            val playlistManager: PlaylistManager = mock()
-            whenever(playlistManager.findPlaylistsToSyncBlocking()).thenReturn(emptyList())
+            val smartPlaylistManager: SmartPlaylistManager = mock()
+            whenever(smartPlaylistManager.findPlaylistsToSyncBlocking()).thenReturn(emptyList())
 
             val folderManager: FolderManager = mock()
             whenever(folderManager.findFoldersToSyncBlocking()).thenReturn(emptyList())
@@ -151,7 +151,7 @@ class PodcastSyncProcessTest {
                 settings = settings,
                 episodeManager = episodeManager,
                 podcastManager = podcastManager,
-                playlistManager = playlistManager,
+                smartPlaylistManager = smartPlaylistManager,
                 bookmarkManager = bookmarkManager,
                 statsManager = statsManager,
                 fileStorage = mock(),

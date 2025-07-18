@@ -12,9 +12,9 @@ import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.models.entity.Bookmark
 import au.com.shiftyjelly.pocketcasts.models.entity.ChapterIndices
 import au.com.shiftyjelly.pocketcasts.models.entity.Folder
-import au.com.shiftyjelly.pocketcasts.models.entity.Playlist
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
+import au.com.shiftyjelly.pocketcasts.models.entity.SmartPlaylist
 import au.com.shiftyjelly.pocketcasts.models.entity.UserPodcastRating
 import au.com.shiftyjelly.pocketcasts.models.to.StatsBundle
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodePlayingStatus
@@ -27,8 +27,8 @@ import au.com.shiftyjelly.pocketcasts.repositories.file.FileStorage
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.FolderManager
-import au.com.shiftyjelly.pocketcasts.repositories.podcast.PlaylistManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
+import au.com.shiftyjelly.pocketcasts.repositories.podcast.SmartPlaylistManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.UserEpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.ratings.RatingsManager
 import au.com.shiftyjelly.pocketcasts.repositories.shortcuts.PocketCastsShortcuts
@@ -76,7 +76,7 @@ class PodcastSyncProcess(
     var settings: Settings,
     var episodeManager: EpisodeManager,
     var podcastManager: PodcastManager,
-    var playlistManager: PlaylistManager,
+    var smartPlaylistManager: SmartPlaylistManager,
     var bookmarkManager: BookmarkManager,
     var statsManager: StatsManager,
     var fileStorage: FileStorage,
@@ -95,7 +95,7 @@ class PodcastSyncProcess(
 
     fun run(): Completable {
         if (!syncManager.isLoggedIn()) {
-            playlistManager.deleteSyncedBlocking()
+            smartPlaylistManager.deleteSyncedBlocking()
 
             Timber.i("SyncProcess: User not logged in")
             return Completable.complete()
@@ -404,7 +404,7 @@ class PodcastSyncProcess(
 
     private fun uploadPlaylistChanges(records: JSONArray) {
         try {
-            val playlists = playlistManager.findPlaylistsToSyncBlocking()
+            val playlists = smartPlaylistManager.findPlaylistsToSyncBlocking()
             for (playlist in playlists) {
                 val fields = JSONObject()
 
@@ -629,11 +629,11 @@ class PodcastSyncProcess(
         return rxCompletable { markAllLocalItemsSynced(episodes) }
             .andThen(importEpisodes(response.episodes))
             .andThen(importPodcasts(response.podcasts))
-            .andThen(rxCompletable { importFilters(response.playlists) })
+            .andThen(rxCompletable { importFilters(response.smartPlaylists) })
             .andThen(importFolders(response.folders))
             .andThen(rxCompletable { importBookmarks(response.bookmarks) })
             .andThen(updateSettings(response))
-            .andThen(rxCompletable { updateShortcuts(response.playlists) })
+            .andThen(rxCompletable { updateShortcuts(response.smartPlaylists) })
             .andThen(rxCompletable { cacheStats() })
             .toSingle { response.lastModified }
     }
@@ -646,7 +646,7 @@ class PodcastSyncProcess(
     private suspend fun markAllLocalItemsSynced(episodes: List<PodcastEpisode>) {
         podcastManager.markAllPodcastsSynced()
         episodeManager.markAllEpisodesSynced(episodes)
-        playlistManager.markAllSynced()
+        smartPlaylistManager.markAllSynced()
         folderManager.markAllSynced()
     }
 
@@ -664,11 +664,11 @@ class PodcastSyncProcess(
         }
     }
 
-    private suspend fun updateShortcuts(playlists: List<Playlist>) {
+    private suspend fun updateShortcuts(smartPlaylists: List<SmartPlaylist>) {
         // if any playlists have changed update the launcher shortcuts
-        if (playlists.isNotEmpty() && Build.VERSION.SDK_INT >= Build.VERSION_CODES.N_MR1) {
+        if (smartPlaylists.isNotEmpty() && Build.VERSION.SDK_INT >= Build.VERSION_CODES.N_MR1) {
             PocketCastsShortcuts.update(
-                playlistManager = playlistManager,
+                smartPlaylistManager = smartPlaylistManager,
                 force = true,
                 context = context,
                 source = PocketCastsShortcuts.Source.UPDATE_SHORTCUTS,
@@ -695,8 +695,8 @@ class PodcastSyncProcess(
             .ignoreElements()
     }
 
-    private suspend fun importFilters(playlists: List<Playlist>) {
-        for (playlist in playlists) {
+    private suspend fun importFilters(smartPlaylists: List<SmartPlaylist>) {
+        for (playlist in smartPlaylists) {
             importPlaylist(playlist)
         }
     }
@@ -722,7 +722,7 @@ class PodcastSyncProcess(
         }
     }
 
-    private suspend fun importPlaylist(sync: Playlist): Playlist? {
+    private suspend fun importPlaylist(sync: SmartPlaylist): SmartPlaylist? {
         val uuid = sync.uuid
         if (uuid.isBlank()) {
             return null
@@ -732,14 +732,14 @@ class PodcastSyncProcess(
             return null
         }
 
-        var playlist = playlistManager.findByUuid(uuid)
+        var playlist = smartPlaylistManager.findByUuid(uuid)
         if (sync.deleted) {
-            playlist?.let { playlistManager.deleteSynced(it) }
+            playlist?.let { smartPlaylistManager.deleteSynced(it) }
             return null
         }
 
         if (playlist == null) {
-            playlist = Playlist(uuid = sync.uuid)
+            playlist = SmartPlaylist(uuid = sync.uuid)
         }
 
         with(playlist) {
@@ -759,16 +759,16 @@ class PodcastSyncProcess(
             allPodcasts = sync.allPodcasts
             podcastUuids = sync.podcastUuids
             filterHours = sync.filterHours
-            syncStatus = Playlist.SYNC_STATUS_SYNCED
+            syncStatus = SmartPlaylist.SYNC_STATUS_SYNCED
             filterDuration = sync.filterDuration
             longerThan = sync.longerThan
             shorterThan = sync.shorterThan
         }
 
         if (playlist.id == null) {
-            playlist.id = playlistManager.create(playlist)
+            playlist.id = smartPlaylistManager.create(playlist)
         } else {
-            playlistManager.update(playlist, userPlaylistUpdate = null)
+            smartPlaylistManager.update(playlist, userPlaylistUpdate = null)
         }
 
         return playlist

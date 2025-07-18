@@ -2,7 +2,7 @@ package au.com.shiftyjelly.pocketcasts.servers.sync
 
 import android.os.Build
 import au.com.shiftyjelly.pocketcasts.models.entity.Bookmark
-import au.com.shiftyjelly.pocketcasts.models.entity.Playlist
+import au.com.shiftyjelly.pocketcasts.models.entity.SmartPlaylist
 import au.com.shiftyjelly.pocketcasts.models.entity.UserEpisode
 import au.com.shiftyjelly.pocketcasts.models.to.HistorySyncRequest
 import au.com.shiftyjelly.pocketcasts.models.to.HistorySyncResponse
@@ -157,7 +157,7 @@ open class SyncServiceManager @Inject constructor(
         return service.getPodcastEpisodes(addBearer(token), request)
     }
 
-    suspend fun getFilters(token: AccessToken): List<Playlist> {
+    suspend fun getFilters(token: AccessToken): List<SmartPlaylist> {
         val response = service.getFilterList(addBearer(token), buildBasicRequest())
         return response.filters?.mapNotNull { it.toFilter() } ?: emptyList()
     }

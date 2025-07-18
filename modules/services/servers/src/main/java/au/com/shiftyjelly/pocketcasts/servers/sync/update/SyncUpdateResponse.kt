@@ -3,14 +3,14 @@ package au.com.shiftyjelly.pocketcasts.servers.sync.update
 import au.com.shiftyjelly.pocketcasts.models.entity.Bookmark
 import au.com.shiftyjelly.pocketcasts.models.entity.ChapterIndices
 import au.com.shiftyjelly.pocketcasts.models.entity.Folder
-import au.com.shiftyjelly.pocketcasts.models.entity.Playlist
+import au.com.shiftyjelly.pocketcasts.models.entity.SmartPlaylist
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodePlayingStatus
 import java.util.Date
 
 data class SyncUpdateResponse(
     var lastModified: String? = null,
     var token: String? = null,
-    val playlists: MutableList<Playlist> = mutableListOf(),
+    val smartPlaylists: MutableList<SmartPlaylist> = mutableListOf(),
     val episodes: MutableList<EpisodeSync> = mutableListOf(),
     val podcasts: MutableList<PodcastSync> = mutableListOf(),
     val folders: MutableList<Folder> = mutableListOf(),

@@ -30,8 +30,8 @@ import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.repositories.playback.UpNextQueue
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.FolderManager
-import au.com.shiftyjelly.pocketcasts.repositories.podcast.PlaylistManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
+import au.com.shiftyjelly.pocketcasts.repositories.podcast.SmartPlaylistManager
 import au.com.shiftyjelly.pocketcasts.repositories.searchhistory.SearchHistoryManager
 import au.com.shiftyjelly.pocketcasts.repositories.sync.SyncManager
 import au.com.shiftyjelly.pocketcasts.repositories.user.UserManager
@@ -66,7 +66,7 @@ class AutomotiveSettingsFragment : BaseFragment() {
     lateinit var folderManager: FolderManager
 
     @Inject
-    lateinit var playlistManager: PlaylistManager
+    lateinit var smartPlaylistManager: SmartPlaylistManager
 
     @Inject
     lateinit var searchHistoryManager: SearchHistoryManager
@@ -172,7 +172,7 @@ class AutomotiveSettingsFragment : BaseFragment() {
                     userManager.signOutAndClearData(
                         playbackManager = playbackManager,
                         upNextQueue = upNextQueue,
-                        playlistManager = playlistManager,
+                        smartPlaylistManager = smartPlaylistManager,
                         folderManager = folderManager,
                         searchHistoryManager = searchHistoryManager,
                         episodeManager = episodeManager,

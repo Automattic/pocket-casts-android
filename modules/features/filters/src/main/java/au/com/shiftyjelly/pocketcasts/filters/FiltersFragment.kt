@@ -46,10 +46,10 @@ import au.com.shiftyjelly.pocketcasts.compose.components.TipPosition
 import au.com.shiftyjelly.pocketcasts.compose.components.Tooltip
 import au.com.shiftyjelly.pocketcasts.compose.extensions.setContentWithViewCompositionStrategy
 import au.com.shiftyjelly.pocketcasts.filters.databinding.FragmentFiltersBinding
-import au.com.shiftyjelly.pocketcasts.models.entity.Playlist
+import au.com.shiftyjelly.pocketcasts.models.entity.SmartPlaylist
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.chromecast.CastManager
-import au.com.shiftyjelly.pocketcasts.repositories.podcast.PlaylistManager
+import au.com.shiftyjelly.pocketcasts.repositories.podcast.SmartPlaylistManager
 import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingFlow
 import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingLauncher
 import au.com.shiftyjelly.pocketcasts.ui.helper.FragmentHostListener
@@ -75,7 +75,7 @@ class FiltersFragment :
     TopScrollable {
     @Inject lateinit var settings: Settings
 
-    @Inject lateinit var playlistManager: PlaylistManager
+    @Inject lateinit var smartPlaylistManager: SmartPlaylistManager
 
     @Inject lateinit var castManager: CastManager
 
@@ -83,7 +83,7 @@ class FiltersFragment :
     private var trackFilterListShown = false
     var filterCount: Int? = null
     var lastFilterUuidShown: String? = null
-    var previousLastFilter: Playlist? = null
+    var previousLastFilter: SmartPlaylist? = null
 
     private var binding: FragmentFiltersBinding? = null
 
@@ -242,13 +242,13 @@ class FiltersFragment :
         (activity as FragmentHostListener).showModal(fragment)
     }
 
-    fun openPlaylist(playlist: Playlist, isNewFilter: Boolean = false) {
+    fun openPlaylist(smartPlaylist: SmartPlaylist, isNewFilter: Boolean = false) {
         val context = context ?: return
 
-        lastFilterUuidShown = playlist.uuid
-        settings.setSelectedFilter(playlist.uuid)
+        lastFilterUuidShown = smartPlaylist.uuid
+        settings.setSelectedFilter(smartPlaylist.uuid)
 
-        val playlistFragment = FilterEpisodeListFragment.newInstance(playlist, isNewFilter, context)
+        val playlistFragment = FilterEpisodeListFragment.newInstance(smartPlaylist, isNewFilter, context)
         (activity as? FragmentHostListener)?.addFragment(playlistFragment)
 
         playlistFragment.view?.requestFocus() // Jump to new page for talk back

@@ -35,8 +35,8 @@ import au.com.shiftyjelly.pocketcasts.repositories.notification.NotificationHelp
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.FolderManager
-import au.com.shiftyjelly.pocketcasts.repositories.podcast.PlaylistManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
+import au.com.shiftyjelly.pocketcasts.repositories.podcast.SmartPlaylistManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.UserEpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.ratings.RatingsManager
 import au.com.shiftyjelly.pocketcasts.repositories.subscription.SubscriptionManager
@@ -79,7 +79,7 @@ class RefreshPodcastsThread(
     interface RefreshPodcastsThreadEntryPoint {
         fun serviceManager(): ServiceManager
         fun podcastManager(): PodcastManager
-        fun playlistManager(): PlaylistManager
+        fun smartPlaylistManager(): SmartPlaylistManager
         fun bookmarkManager(): BookmarkManager
         fun statsManager(): StatsManager
         fun fileStorage(): FileStorage
@@ -202,7 +202,7 @@ class RefreshPodcastsThread(
         val podcastManager = entryPoint.podcastManager()
         val playbackManager = entryPoint.playbackManager()
         val episodeManager = entryPoint.episodeManager()
-        val playlistManager = entryPoint.playlistManager()
+        val playlistManager = entryPoint.smartPlaylistManager()
         val downloadManager = entryPoint.downloadManager()
         val settings = entryPoint.settings()
         val notificationHelper = entryPoint.notificationHelper()
@@ -251,7 +251,7 @@ class RefreshPodcastsThread(
             settings = entryPoint.settings(),
             episodeManager = entryPoint.episodeManager(),
             podcastManager = entryPoint.podcastManager(),
-            playlistManager = entryPoint.playlistManager(),
+            smartPlaylistManager = entryPoint.smartPlaylistManager(),
             bookmarkManager = entryPoint.bookmarkManager(),
             statsManager = entryPoint.statsManager(),
             fileStorage = entryPoint.fileStorage(),

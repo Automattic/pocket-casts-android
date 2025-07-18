@@ -52,8 +52,8 @@ import au.com.shiftyjelly.pocketcasts.repositories.playback.LocalPlayer.Companio
 import au.com.shiftyjelly.pocketcasts.repositories.playback.LocalPlayer.Companion.VOLUME_NORMAL
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.ChapterManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
-import au.com.shiftyjelly.pocketcasts.repositories.podcast.PlaylistManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
+import au.com.shiftyjelly.pocketcasts.repositories.podcast.SmartPlaylistManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.UserEpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.toServerPostFile
 import au.com.shiftyjelly.pocketcasts.repositories.shownotes.ShowNotesManager
@@ -125,7 +125,7 @@ open class PlaybackManager @Inject constructor(
     private val playerManager: PlayerFactory,
     private var castManager: CastManager,
     @ApplicationContext private val application: Context,
-    private val playlistManager: PlaylistManager,
+    private val smartPlaylistManager: SmartPlaylistManager,
     private val downloadManager: DownloadManager,
     val upNextQueue: UpNextQueue,
     private val notificationHelper: NotificationHelper,
@@ -217,7 +217,7 @@ open class PlaybackManager @Inject constructor(
         playbackManager = this,
         podcastManager = podcastManager,
         episodeManager = episodeManager,
-        playlistManager = playlistManager,
+        smartPlaylistManager = smartPlaylistManager,
         settings = settings,
         context = application,
         episodeAnalytics = episodeAnalytics,
@@ -1383,10 +1383,10 @@ open class PlaybackManager @Inject constructor(
                 episodeSource = "podcast"
                 podcastManager.findPodcastByUuidBlocking(autoSource.uuid)
                     ?.let { podcast -> autoPlayOrderForPodcastEpisodes(podcast) }
-                    ?: playlistManager.findByUuidBlocking(autoSource.uuid)
+                    ?: smartPlaylistManager.findByUuidBlocking(autoSource.uuid)
                         ?.let { playlist ->
                             episodeSource = "filter"
-                            playlistManager.findEpisodesBlocking(playlist, episodeManager, this)
+                            smartPlaylistManager.findEpisodesBlocking(playlist, episodeManager, this)
                         }
             }
         } ?: emptyList()

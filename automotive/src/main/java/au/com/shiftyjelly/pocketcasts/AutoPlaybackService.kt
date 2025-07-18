@@ -126,7 +126,7 @@ class AutoPlaybackService : PlaybackService() {
     }
 
     suspend fun loadFiltersRoot(): List<MediaBrowserCompat.MediaItem> {
-        return playlistManager.findAll().mapNotNull {
+        return smartPlaylistManager.findAll().mapNotNull {
             Log.d(Settings.LOG_TAG_AUTO, "Filters ${it.title}")
 
             try {

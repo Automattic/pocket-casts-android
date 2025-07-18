@@ -3,7 +3,7 @@ package au.com.shiftyjelly.pocketcasts.servers.sync.update
 import au.com.shiftyjelly.pocketcasts.models.entity.Bookmark
 import au.com.shiftyjelly.pocketcasts.models.entity.ChapterIndices
 import au.com.shiftyjelly.pocketcasts.models.entity.Folder
-import au.com.shiftyjelly.pocketcasts.models.entity.Playlist
+import au.com.shiftyjelly.pocketcasts.models.entity.SmartPlaylist
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodePlayingStatus
 import au.com.shiftyjelly.pocketcasts.models.type.PodcastsSortType
 import au.com.shiftyjelly.pocketcasts.models.type.SyncStatus
@@ -159,38 +159,38 @@ class SyncUpdateResponseParser : JsonAdapter<SyncUpdateResponse>() {
     }
 
     private fun readPlaylist(reader: JsonReader, response: SyncUpdateResponse) {
-        val playlist = Playlist()
-        playlist.allPodcasts = true
+        val smartPlaylist = SmartPlaylist()
+        smartPlaylist.allPodcasts = true
         reader.beginObject()
         while (reader.hasNext()) {
             when (reader.nextName()) {
-                "uuid" -> playlist.uuid = reader.nextStringOrNull() ?: ""
-                "title" -> playlist.title = reader.nextStringOrNull() ?: ""
-                "all_podcasts" -> playlist.allPodcasts = reader.nextBooleanOrDefault(true)
-                "podcast_uuids" -> playlist.podcastUuids = reader.nextStringOrNull()
-                "audio_video" -> playlist.audioVideo = reader.nextIntOrDefault(0)
-                "not_downloaded" -> playlist.notDownloaded = reader.nextBooleanOrDefault(false)
-                "downloaded" -> playlist.downloaded = reader.nextBooleanOrDefault(false)
-                "downloading" -> playlist.downloading = reader.nextBooleanOrDefault(false)
-                "finished" -> playlist.finished = reader.nextBooleanOrDefault(false)
-                "partially_played" -> playlist.partiallyPlayed = reader.nextBooleanOrDefault(false)
-                "unplayed" -> playlist.unplayed = reader.nextBooleanOrDefault(false)
-                "starred" -> playlist.starred = reader.nextBooleanOrDefault(false)
-                "manual" -> playlist.manual = reader.nextBooleanOrDefault(false)
-                "episode_uuids" -> playlist.episodeUuids = reader.nextStringOrNull()
-                "sort_position" -> playlist.sortPosition = reader.nextIntOrDefault(0)
-                "sort_type" -> playlist.sortId = reader.nextIntOrDefault(0)
-                "icon_id" -> playlist.iconId = reader.nextIntOrDefault(0)
-                "is_deleted" -> playlist.deleted = reader.nextBooleanOrDefault(false)
-                "filter_hours" -> playlist.filterHours = reader.nextIntOrDefault(0)
-                "filter_duration" -> playlist.filterDuration = reader.nextBooleanOrDefault(false)
-                "shorter_than" -> playlist.shorterThan = reader.nextIntOrDefault(0)
-                "longer_than" -> playlist.longerThan = reader.nextIntOrDefault(0)
+                "uuid" -> smartPlaylist.uuid = reader.nextStringOrNull() ?: ""
+                "title" -> smartPlaylist.title = reader.nextStringOrNull() ?: ""
+                "all_podcasts" -> smartPlaylist.allPodcasts = reader.nextBooleanOrDefault(true)
+                "podcast_uuids" -> smartPlaylist.podcastUuids = reader.nextStringOrNull()
+                "audio_video" -> smartPlaylist.audioVideo = reader.nextIntOrDefault(0)
+                "not_downloaded" -> smartPlaylist.notDownloaded = reader.nextBooleanOrDefault(false)
+                "downloaded" -> smartPlaylist.downloaded = reader.nextBooleanOrDefault(false)
+                "downloading" -> smartPlaylist.downloading = reader.nextBooleanOrDefault(false)
+                "finished" -> smartPlaylist.finished = reader.nextBooleanOrDefault(false)
+                "partially_played" -> smartPlaylist.partiallyPlayed = reader.nextBooleanOrDefault(false)
+                "unplayed" -> smartPlaylist.unplayed = reader.nextBooleanOrDefault(false)
+                "starred" -> smartPlaylist.starred = reader.nextBooleanOrDefault(false)
+                "manual" -> smartPlaylist.manual = reader.nextBooleanOrDefault(false)
+                "episode_uuids" -> smartPlaylist.episodeUuids = reader.nextStringOrNull()
+                "sort_position" -> smartPlaylist.sortPosition = reader.nextIntOrDefault(0)
+                "sort_type" -> smartPlaylist.sortId = reader.nextIntOrDefault(0)
+                "icon_id" -> smartPlaylist.iconId = reader.nextIntOrDefault(0)
+                "is_deleted" -> smartPlaylist.deleted = reader.nextBooleanOrDefault(false)
+                "filter_hours" -> smartPlaylist.filterHours = reader.nextIntOrDefault(0)
+                "filter_duration" -> smartPlaylist.filterDuration = reader.nextBooleanOrDefault(false)
+                "shorter_than" -> smartPlaylist.shorterThan = reader.nextIntOrDefault(0)
+                "longer_than" -> smartPlaylist.longerThan = reader.nextIntOrDefault(0)
                 else -> reader.skipValue()
             }
         }
         reader.endObject()
-        response.playlists.add(playlist)
+        response.smartPlaylists.add(smartPlaylist)
     }
 
     private fun readFolder(reader: JsonReader, response: SyncUpdateResponse) {

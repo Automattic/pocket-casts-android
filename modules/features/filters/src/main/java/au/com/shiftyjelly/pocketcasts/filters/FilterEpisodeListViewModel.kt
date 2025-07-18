@@ -7,15 +7,15 @@ import androidx.lifecycle.toLiveData
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
-import au.com.shiftyjelly.pocketcasts.models.entity.Playlist
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
+import au.com.shiftyjelly.pocketcasts.models.entity.SmartPlaylist
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.download.DownloadManager
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
-import au.com.shiftyjelly.pocketcasts.repositories.podcast.PlaylistManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PlaylistProperty
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PlaylistUpdateSource
+import au.com.shiftyjelly.pocketcasts.repositories.podcast.SmartPlaylistManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.UserPlaylistUpdate
 import dagger.hilt.android.lifecycle.HiltViewModel
 import io.reactivex.BackpressureStrategy
@@ -35,7 +35,7 @@ import timber.log.Timber
 
 @HiltViewModel
 class FilterEpisodeListViewModel @Inject constructor(
-    private val playlistManager: PlaylistManager,
+    private val smartPlaylistManager: SmartPlaylistManager,
     private val episodeManager: EpisodeManager,
     private val playbackManager: PlaybackManager,
     private val downloadManager: DownloadManager,
@@ -55,7 +55,7 @@ class FilterEpisodeListViewModel @Inject constructor(
         get() = Dispatchers.Default
 
     lateinit var episodesList: LiveData<List<PodcastEpisode>>
-    val playlist: MutableLiveData<Playlist> = MutableLiveData()
+    val smartPlaylist: MutableLiveData<SmartPlaylist> = MutableLiveData()
     val playlistDeleted: MutableLiveData<Boolean> = MutableLiveData(false)
 
     lateinit var playlistUUID: String
@@ -68,13 +68,13 @@ class FilterEpisodeListViewModel @Inject constructor(
             settings.streamingMode.flow.asObservable(coroutineContext),
         )
             .toFlowable(BackpressureStrategy.LATEST)
-            .switchMap { playlistManager.findByUuidAsListRxFlowable(playlistUUID) }
+            .switchMap { smartPlaylistManager.findByUuidAsListRxFlowable(playlistUUID) }
             .switchMap { playlists ->
-                Timber.d("Loading playlist $playlist")
+                Timber.d("Loading playlist $smartPlaylist")
                 val playlist = playlists.firstOrNull() // We observe as a list to get notified on delete
                 if (playlist != null) {
-                    this.playlist.postValue(playlist)
-                    playlistManager.observeEpisodesBlocking(playlist, episodeManager, playbackManager)
+                    this.smartPlaylist.postValue(playlist)
+                    smartPlaylistManager.observeEpisodesBlocking(playlist, episodeManager, playbackManager)
                 } else {
                     this.playlistDeleted.postValue(true)
                     Flowable.just(emptyList())
@@ -92,8 +92,8 @@ class FilterEpisodeListViewModel @Inject constructor(
 
     fun deletePlaylist() {
         launch {
-            playlistManager.findByUuid(playlistUUID)?.let { playlist ->
-                playlistManager.deleteBlocking(playlist)
+            smartPlaylistManager.findByUuid(playlistUUID)?.let { playlist ->
+                smartPlaylistManager.deleteBlocking(playlist)
                 analyticsTracker.track(AnalyticsEvent.FILTER_DELETED)
             }
         }
@@ -111,30 +111,30 @@ class FilterEpisodeListViewModel @Inject constructor(
         }
     }
 
-    fun changeSort(sortOrder: Playlist.SortOrder) {
+    fun changeSort(sortOrder: SmartPlaylist.SortOrder) {
         launch {
-            playlist.value?.let { playlist ->
+            smartPlaylist.value?.let { playlist ->
                 playlist.sortId = sortOrder.value
 
                 val userPlaylistUpdate = UserPlaylistUpdate(
                     listOf(PlaylistProperty.Sort(sortOrder)),
                     PlaylistUpdateSource.FILTER_EPISODE_LIST,
                 )
-                playlistManager.updateBlocking(playlist, userPlaylistUpdate)
+                smartPlaylistManager.updateBlocking(playlist, userPlaylistUpdate)
             }
         }
     }
 
     fun starredChipTapped() {
         launch {
-            playlist.value?.let { playlist ->
+            smartPlaylist.value?.let { playlist ->
                 playlist.starred = !playlist.starred
 
                 val userPlaylistUpdate = UserPlaylistUpdate(
                     listOf(PlaylistProperty.Starred),
                     PlaylistUpdateSource.FILTER_EPISODE_LIST,
                 )
-                playlistManager.updateBlocking(playlist, userPlaylistUpdate)
+                smartPlaylistManager.updateBlocking(playlist, userPlaylistUpdate)
             }
         }
     }

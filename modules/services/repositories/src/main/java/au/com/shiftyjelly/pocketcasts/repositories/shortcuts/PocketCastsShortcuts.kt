@@ -7,7 +7,7 @@ import android.graphics.drawable.Icon
 import android.os.Build
 import au.com.shiftyjelly.pocketcasts.deeplink.ShowFilterDeepLink
 import au.com.shiftyjelly.pocketcasts.repositories.extensions.shortcutDrawableId
-import au.com.shiftyjelly.pocketcasts.repositories.podcast.PlaylistManager
+import au.com.shiftyjelly.pocketcasts.repositories.podcast.SmartPlaylistManager
 import au.com.shiftyjelly.pocketcasts.utils.AppPlatform
 import au.com.shiftyjelly.pocketcasts.utils.Util
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
@@ -21,7 +21,7 @@ object PocketCastsShortcuts {
      * - Top Filter
      */
     suspend fun update(
-        playlistManager: PlaylistManager,
+        smartPlaylistManager: SmartPlaylistManager,
         force: Boolean,
         context: Context,
         source: Source,
@@ -31,7 +31,7 @@ object PocketCastsShortcuts {
         }
         val shortcutManager = context.getSystemService(ShortcutManager::class.java) ?: return
 
-        val topPlaylist = playlistManager.findAll().firstOrNull()
+        val topPlaylist = smartPlaylistManager.findAll().firstOrNull()
 
         if (topPlaylist == null) {
             if (shortcutManager.dynamicShortcuts.size == 1) {

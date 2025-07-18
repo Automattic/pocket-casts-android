@@ -5,8 +5,8 @@ import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.download.DownloadManager
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
-import au.com.shiftyjelly.pocketcasts.repositories.podcast.PlaylistManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
+import au.com.shiftyjelly.pocketcasts.repositories.podcast.SmartPlaylistManager
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import dagger.hilt.EntryPoint
 import dagger.hilt.InstallIn
@@ -27,8 +27,8 @@ interface PlaybackManagerEntryPoint {
 
 @InstallIn(SingletonComponent::class)
 @EntryPoint
-interface PlaylistManagerEntryPoint {
-    fun getPlaylistManager(): PlaylistManager
+interface SmartPlaylistManagerEntryPoint {
+    fun getSmartPlaylistManager(): SmartPlaylistManager
 }
 
 @InstallIn(SingletonComponent::class)
@@ -57,7 +57,7 @@ interface DownloadManagerEntryPoint {
 
 val Context.appTheme get() = EntryPointAccessors.fromApplication(applicationContext, ThemeEntryPoint::class.java).getTheme()
 val Context.playbackManager get() = EntryPointAccessors.fromApplication(applicationContext, PlaybackManagerEntryPoint::class.java).getPlaybackManager()
-val Context.playlistManager get() = EntryPointAccessors.fromApplication(applicationContext, PlaylistManagerEntryPoint::class.java).getPlaylistManager()
+val Context.smartPlaylistManager get() = EntryPointAccessors.fromApplication(applicationContext, SmartPlaylistManagerEntryPoint::class.java).getSmartPlaylistManager()
 val Context.episodeManager get() = EntryPointAccessors.fromApplication(applicationContext, EpisodeManagerEntryPoint::class.java).getEpisodeManager()
 val Context.podcastManager get() = EntryPointAccessors.fromApplication(applicationContext, PodcastManagerEntryPoint::class.java).getPodcastManager()
 val Context.downloadManager get() = EntryPointAccessors.fromApplication(applicationContext, DownloadManagerEntryPoint::class.java).getDownloadManager()
