@@ -196,7 +196,6 @@ class VersionMigrationsWorker @AssistedInject constructor(
         // don't migrate when first installing
         if (previousVersionCode == 0) {
             settings.setWhatsNewVersionCode(Settings.WHATS_NEW_VERSION_CODE)
-            settings.showPlaylistsOnboarding.set(false, updateModifiedAt = false)
             return
         }
 
