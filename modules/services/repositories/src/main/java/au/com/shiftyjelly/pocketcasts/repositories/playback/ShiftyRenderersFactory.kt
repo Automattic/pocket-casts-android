@@ -23,7 +23,8 @@ class ShiftyRenderersFactory(
     context: Context,
     statsManager: StatsManager,
     private var boostVolume: Boolean,
-) : DefaultRenderersFactory(context), AnalyticsListener {
+) : DefaultRenderersFactory(context),
+    AnalyticsListener {
     private var playbackSpeed = 0f
     private var internalRenderer: ShiftyAudioRendererV2? = null
     private var audioSink: AudioSink? = null

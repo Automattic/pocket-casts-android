@@ -11,7 +11,7 @@ import au.com.shiftyjelly.pocketcasts.repositories.di.IoDispatcher
 import au.com.shiftyjelly.pocketcasts.repositories.history.upnext.UpNextHistoryManager
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
-import au.com.shiftyjelly.pocketcasts.settings.history.HistoryFragment.HistoryNavRoutes.UpNextHistoryDateArgument
+import au.com.shiftyjelly.pocketcasts.settings.history.HistoryFragment.HistoryNavRoutes.UP_NEXT_HISTORY_DATE_ARGUMENT
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import dagger.hilt.android.lifecycle.HiltViewModel
 import java.util.Date
@@ -37,7 +37,7 @@ class UpNextHistoryDetailsViewModel @Inject constructor(
     private val _state = MutableStateFlow<UiState>(UiState.Loading)
     val state: StateFlow<UiState> = _state.asStateFlow()
 
-    private val date = checkNotNull(savedStateHandle.get<Long>(UpNextHistoryDateArgument))
+    private val date = checkNotNull(savedStateHandle.get<Long>(UP_NEXT_HISTORY_DATE_ARGUMENT))
 
     init {
         loadEpisodes()

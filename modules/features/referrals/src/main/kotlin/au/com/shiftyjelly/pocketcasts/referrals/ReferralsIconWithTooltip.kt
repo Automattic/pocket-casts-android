@@ -31,10 +31,10 @@ fun ReferralsIconWithTooltip(
     state: ReferralsViewModel.UiState,
     onIconClick: () -> Unit,
     onTooltipClick: () -> Unit,
-    onTooltipShown: () -> Unit,
+    onTooltipShow: () -> Unit,
 ) {
     CallOnce {
-        onTooltipShown()
+        onTooltipShow()
     }
 
     when (state) {
@@ -87,7 +87,7 @@ private fun Icon(
     }
 }
 
-@Preview(device = Devices.PortraitRegular)
+@Preview(device = Devices.PORTRAIT_REGULAR)
 @Composable
 private fun IconWithBadgePreview(
     @PreviewParameter(ThemePreviewParameterProvider::class) themeType: Theme.ThemeType,

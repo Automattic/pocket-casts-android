@@ -6,10 +6,8 @@ import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 class PodcastAutoUpNextConverter {
 
     @TypeConverter
-    fun toPodcastAutoUpNext(value: Int?) =
-        Podcast.AutoAddUpNext.fromDatabaseInt(value)
+    fun toPodcastAutoUpNext(value: Int?) = Podcast.AutoAddUpNext.fromDatabaseInt(value)
 
     @TypeConverter
-    fun toInt(value: Podcast.AutoAddUpNext?) =
-        value?.databaseInt
+    fun toInt(value: Podcast.AutoAddUpNext?) = value?.databaseInt
 }

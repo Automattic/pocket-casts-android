@@ -47,9 +47,10 @@ fun FolderChooserPage(
     onCloseClick: () -> Unit,
     onNewFolderClick: () -> Unit,
     viewModel: FolderEditViewModel,
+    modifier: Modifier = Modifier,
 ) {
     val state: FolderEditViewModel.State by viewModel.state.collectAsState()
-    Surface(modifier = Modifier.nestedScroll(rememberViewInteropNestedScrollConnection())) {
+    Surface(modifier = modifier.nestedScroll(rememberViewInteropNestedScrollConnection())) {
         Column {
             BottomSheetAppBar(
                 title = null,
@@ -88,7 +89,7 @@ private fun FolderList(
     folderUuidToPodcastCount: Map<String?, Int>,
     onFolderClick: (Folder) -> Unit,
     onNewFolderClick: () -> Unit,
-    modifier: Modifier,
+    modifier: Modifier = Modifier,
 ) {
     LazyColumn(modifier = modifier) {
         item {
@@ -99,18 +100,21 @@ private fun FolderList(
         }
         item {
             Column {
-                FolderMoveRow {
-                    onNewFolderClick()
-                }
+                FolderMoveRow(
+                    onClick = onNewFolderClick,
+                )
                 HorizontalDivider()
             }
         }
         items(folders) { folder ->
             Column {
                 val selected = currentFolder != null && currentFolder.uuid == folder.uuid
-                FolderSelectRow(folder = folder, podcastCount = folderUuidToPodcastCount[folder.uuid] ?: 0, selected = selected) {
-                    onFolderClick(folder)
-                }
+                FolderSelectRow(
+                    folder = folder,
+                    podcastCount = folderUuidToPodcastCount[folder.uuid] ?: 0,
+                    selected = selected,
+                    onClick = { onFolderClick(folder) },
+                )
                 HorizontalDivider()
             }
         }
@@ -121,7 +125,13 @@ private fun FolderList(
 }
 
 @Composable
-private fun FolderSelectRow(folder: Folder, podcastCount: Int, selected: Boolean, modifier: Modifier = Modifier, onClick: () -> Unit) {
+private fun FolderSelectRow(
+    folder: Folder,
+    podcastCount: Int,
+    selected: Boolean,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
     val context = LocalContext.current
     Row(
         verticalAlignment = Alignment.CenterVertically,
@@ -161,7 +171,10 @@ private fun FolderSelectRow(folder: Folder, podcastCount: Int, selected: Boolean
 }
 
 @Composable
-fun FolderMoveRow(modifier: Modifier = Modifier, onClick: () -> Unit) {
+fun FolderMoveRow(
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
     Row(
         verticalAlignment = Alignment.CenterVertically,
         modifier = modifier

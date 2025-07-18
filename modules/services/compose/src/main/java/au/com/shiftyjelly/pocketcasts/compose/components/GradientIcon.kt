@@ -64,9 +64,9 @@ fun GradientIcon(
 fun GradientIcon(
     painter: Painter,
     gradientBrush: Brush,
+    modifier: Modifier = Modifier,
     contentDescription: String? = null,
     blendMode: BlendMode = BlendMode.SrcAtop,
-    modifier: Modifier = Modifier,
 ) {
     Icon(
         modifier = modifier
@@ -82,7 +82,7 @@ fun GradientIcon(
 
 @Preview
 @Composable
-fun GradientIconWithBrushPreview() {
+private fun GradientIconWithBrushPreview() {
     AppThemeWithBackground(Theme.ThemeType.LIGHT) {
         GradientIcon(
             painter = painterResource(IR.drawable.ic_plus),
@@ -95,7 +95,7 @@ fun GradientIconWithBrushPreview() {
 @ShowkaseComposable(name = "GradientIcon", group = "Images", styleName = "Light", defaultStyle = true)
 @Preview(name = "Light")
 @Composable
-fun GradientIconLightPreview() {
+private fun GradientIconLightPreview() {
     AppThemeWithBackground(Theme.ThemeType.LIGHT) {
         GradientIconPreview()
     }
@@ -104,7 +104,7 @@ fun GradientIconLightPreview() {
 @ShowkaseComposable(name = "GradientIcon", group = "Images", styleName = "Dark")
 @Preview(name = "Dark")
 @Composable
-fun GradientIconDarkPreview() {
+private fun GradientIconDarkPreview() {
     AppThemeWithBackground(Theme.ThemeType.DARK) {
         GradientIconPreview()
     }

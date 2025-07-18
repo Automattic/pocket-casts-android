@@ -35,7 +35,7 @@ class DeveloperFragment : BaseFragment() {
         AppThemeWithBackground(theme.activeTheme) {
             val bottomInset = settings.bottomInset.collectAsStateWithLifecycle(0)
             DeveloperPage(
-                onBackClick = ::onBackClick,
+                onBackPress = ::onBackPress,
                 onShowkaseClick = ::onShowkaseClick,
                 onForceRefreshClick = viewModel::forceRefresh,
                 onTriggerNotificationClick = viewModel::triggerNotification,
@@ -47,12 +47,13 @@ class DeveloperFragment : BaseFragment() {
                 onShowWhatsNewClick = ::onShowWhatsNewClick,
                 onResetSuggestedFoldersSuggestion = viewModel::resetSuggestedFoldersSuggestion,
                 onShowNotificationsTestingClick = ::onShowNotificationsTestingClick,
+                onResetPlaylistsOnboarding = viewModel::resetPlaylistsOnboarding,
             )
         }
     }
 
     @Suppress("DEPRECATION")
-    private fun onBackClick() {
+    private fun onBackPress() {
         activity?.onBackPressed()
     }
 

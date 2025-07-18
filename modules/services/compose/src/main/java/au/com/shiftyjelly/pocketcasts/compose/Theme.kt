@@ -20,6 +20,7 @@ val LocalColors = staticCompositionLocalOf { PocketCastsTheme(type = Theme.Theme
  * does not support the use of contentColor.
  * @see <a href="https://developer.android.com/jetpack/compose/themes/material#content-color</a> for more details
  */
+@Suppress("ktlint:compose:modifier-missing-check")
 @Composable
 fun AppThemeWithBackground(
     themeType: Theme.ThemeType,
@@ -50,19 +51,18 @@ fun AppTheme(
 }
 
 @Composable
-fun themeTypeToColors(themeType: Theme.ThemeType) =
-    when (themeType) {
-        Theme.ThemeType.LIGHT -> ThemeLightColors
-        Theme.ThemeType.DARK -> ThemeDarkColors
-        Theme.ThemeType.EXTRA_DARK -> ThemeExtraDarkColors
-        Theme.ThemeType.CLASSIC_LIGHT -> ThemeClassicLightColors
-        Theme.ThemeType.ELECTRIC -> ThemeElectricityColors
-        Theme.ThemeType.INDIGO -> ThemeIndigoColors
-        Theme.ThemeType.RADIOACTIVE -> ThemeRadioactiveColors
-        Theme.ThemeType.ROSE -> ThemeRoseColors
-        Theme.ThemeType.LIGHT_CONTRAST -> ThemeLightContrastColors
-        Theme.ThemeType.DARK_CONTRAST -> ThemeDarkContrastColors
-    }
+fun themeTypeToColors(themeType: Theme.ThemeType) = when (themeType) {
+    Theme.ThemeType.LIGHT -> ThemeLightColors
+    Theme.ThemeType.DARK -> ThemeDarkColors
+    Theme.ThemeType.EXTRA_DARK -> ThemeExtraDarkColors
+    Theme.ThemeType.CLASSIC_LIGHT -> ThemeClassicLightColors
+    Theme.ThemeType.ELECTRIC -> ThemeElectricityColors
+    Theme.ThemeType.INDIGO -> ThemeIndigoColors
+    Theme.ThemeType.RADIOACTIVE -> ThemeRadioactiveColors
+    Theme.ThemeType.ROSE -> ThemeRoseColors
+    Theme.ThemeType.LIGHT_CONTRAST -> ThemeLightContrastColors
+    Theme.ThemeType.DARK_CONTRAST -> ThemeDarkContrastColors
+}
 
 @Composable
 fun AutomotiveTheme(content: @Composable () -> Unit) {

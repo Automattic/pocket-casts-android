@@ -2,7 +2,6 @@ package au.com.shiftyjelly.pocketcasts.podcasts.view.share
 
 import android.content.Context
 import android.content.Intent
-import androidx.core.content.ContextCompat.startActivity
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
@@ -126,7 +125,7 @@ class ShareListCreateViewModel @Inject constructor(
     }
 
     private object AnalyticsProp {
-        private const val count = "count"
-        fun countMap(count: Int) = mapOf(this.count to count)
+        private const val COUNT = "count"
+        fun countMap(count: Int) = mapOf(this.COUNT to count)
     }
 }

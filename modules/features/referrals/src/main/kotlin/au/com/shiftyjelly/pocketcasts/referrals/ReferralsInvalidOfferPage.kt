@@ -1,6 +1,5 @@
 package au.com.shiftyjelly.pocketcasts.referrals
 
-import android.app.Activity
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
@@ -18,16 +17,12 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.Card
-import androidx.compose.material3.windowsizeclass.ExperimentalMaterial3WindowSizeClassApi
-import androidx.compose.material3.windowsizeclass.WindowHeightSizeClass
-import androidx.compose.material3.windowsizeclass.WindowWidthSizeClass
-import androidx.compose.material3.windowsizeclass.calculateWindowSizeClass
+import androidx.compose.material3.adaptive.currentWindowAdaptiveInfo
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
@@ -40,26 +35,19 @@ import au.com.shiftyjelly.pocketcasts.compose.components.TextH10
 import au.com.shiftyjelly.pocketcasts.compose.components.TextH50
 import au.com.shiftyjelly.pocketcasts.compose.extensions.plusBackgroundBrush
 import au.com.shiftyjelly.pocketcasts.compose.images.SubscriptionBadge
+import au.com.shiftyjelly.pocketcasts.referrals.ReferralPageDefaults.PAGE_WIDTH_PERCENT
 import au.com.shiftyjelly.pocketcasts.referrals.ReferralPageDefaults.pageCornerRadius
-import au.com.shiftyjelly.pocketcasts.referrals.ReferralPageDefaults.pageWidthPercent
 import au.com.shiftyjelly.pocketcasts.referrals.ReferralPageDefaults.shouldShowFullScreen
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
-import au.com.shiftyjelly.pocketcasts.utils.extensions.getActivity
 import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
-@OptIn(ExperimentalMaterial3WindowSizeClassApi::class)
 @Composable
 fun ReferralsInvalidOfferPage(
     onDismiss: () -> Unit,
 ) {
     AppTheme(Theme.ThemeType.DARK) {
-        val context = LocalContext.current
-        val windowSize = calculateWindowSizeClass(context.getActivity() as Activity)
-
         ReferralsInvalidOfferPageContent(
-            windowWidthSizeClass = windowSize.widthSizeClass,
-            windowHeightSizeClass = windowSize.heightSizeClass,
             onDismiss = onDismiss,
         )
     }
@@ -67,10 +55,10 @@ fun ReferralsInvalidOfferPage(
 
 @Composable
 private fun ReferralsInvalidOfferPageContent(
-    windowWidthSizeClass: WindowWidthSizeClass,
-    windowHeightSizeClass: WindowHeightSizeClass,
     onDismiss: () -> Unit,
 ) {
+    val windowSize = currentWindowAdaptiveInfo().windowSizeClass
+
     BoxWithConstraints(
         contentAlignment = Alignment.Center,
         modifier = Modifier
@@ -82,8 +70,8 @@ private fun ReferralsInvalidOfferPageContent(
             )
             .fillMaxSize(),
     ) {
-        val showFullScreen = shouldShowFullScreen(windowWidthSizeClass, windowHeightSizeClass)
-        val pageWidth = if (showFullScreen) maxWidth else (maxWidth.value * pageWidthPercent).dp
+        val showFullScreen = shouldShowFullScreen(windowSize)
+        val pageWidth = if (showFullScreen) maxWidth else (maxWidth.value * PAGE_WIDTH_PERCENT).dp
         val pageModifier = if (showFullScreen) {
             Modifier
                 .fillMaxSize()
@@ -157,51 +145,34 @@ private fun ReferralsInvalidOfferPageContent(
     }
 }
 
-@Preview(device = Devices.PortraitRegular)
+@Preview(device = Devices.PORTRAIT_REGULAR)
 @Composable
-fun ReferralsInvalidOfferPagePortraitPhonePreview() {
-    ReferralsInvalidOfferPageContentPreview(
-        windowWidthSizeClass = WindowWidthSizeClass.Compact,
-        windowHeightSizeClass = WindowHeightSizeClass.Medium,
-    )
+private fun ReferralsInvalidOfferPagePortraitPhonePreview() {
+    ReferralsInvalidOfferPageContentPreview()
 }
 
-@Preview(device = Devices.LandscapeRegular)
+@Preview(device = Devices.LANDSCAPE_REGULAR)
 @Composable
-fun ReferralsInvalidOfferPageLandscapePhonePreview() {
-    ReferralsInvalidOfferPageContentPreview(
-        windowWidthSizeClass = WindowWidthSizeClass.Compact,
-        windowHeightSizeClass = WindowHeightSizeClass.Compact,
-    )
+private fun ReferralsInvalidOfferPageLandscapePhonePreview() {
+    ReferralsInvalidOfferPageContentPreview()
 }
 
-@Preview(device = Devices.PortraitTablet)
+@Preview(device = Devices.PORTRAIT_TABLET)
 @Composable
-fun ReferralsInvalidOfferPagePortraitTabletPreview() {
-    ReferralsInvalidOfferPageContentPreview(
-        windowWidthSizeClass = WindowWidthSizeClass.Medium,
-        windowHeightSizeClass = WindowHeightSizeClass.Medium,
-    )
+private fun ReferralsInvalidOfferPagePortraitTabletPreview() {
+    ReferralsInvalidOfferPageContentPreview()
 }
 
-@Preview(device = Devices.LandscapeTablet)
+@Preview(device = Devices.LANDSCAPE_TABLET)
 @Composable
-fun ReferralsInvalidOfferPageLandscapeTabletPreview() {
-    ReferralsInvalidOfferPageContentPreview(
-        windowWidthSizeClass = WindowWidthSizeClass.Medium,
-        windowHeightSizeClass = WindowHeightSizeClass.Expanded,
-    )
+private fun ReferralsInvalidOfferPageLandscapeTabletPreview() {
+    ReferralsInvalidOfferPageContentPreview()
 }
 
 @Composable
-fun ReferralsInvalidOfferPageContentPreview(
-    windowWidthSizeClass: WindowWidthSizeClass,
-    windowHeightSizeClass: WindowHeightSizeClass,
-) {
+fun ReferralsInvalidOfferPageContentPreview() {
     AppTheme(Theme.ThemeType.DARK) {
         ReferralsInvalidOfferPageContent(
-            windowWidthSizeClass = windowWidthSizeClass,
-            windowHeightSizeClass = windowHeightSizeClass,
             onDismiss = {},
         )
     }

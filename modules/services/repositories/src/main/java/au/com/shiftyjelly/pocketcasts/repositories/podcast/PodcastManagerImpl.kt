@@ -57,7 +57,7 @@ import timber.log.Timber
 
 class PodcastManagerImpl @Inject constructor(
     private val episodeManager: EpisodeManager,
-    private val playlistManager: PlaylistManager,
+    private val smartPlaylistManager: SmartPlaylistManager,
     private val settings: Settings,
     @ApplicationContext private val context: Context,
     private val subscribeManager: SubscribeManager,
@@ -66,7 +66,8 @@ class PodcastManagerImpl @Inject constructor(
     private val podcastRefresher: PodcastRefresher,
     @ApplicationScope private val applicationScope: CoroutineScope,
     appDatabase: AppDatabase,
-) : PodcastManager, CoroutineScope {
+) : PodcastManager,
+    CoroutineScope {
 
     companion object {
         private const val FIVE_MINUTES_IN_MILLIS = (5 * 60 * 1000).toLong()
@@ -102,7 +103,7 @@ class PodcastManagerImpl @Inject constructor(
                     podcastDao.deleteBlocking(podcast)
                     episodeDao.deleteAllBlocking(episodes)
                 }
-                playlistManager.removePodcastFromPlaylistsBlocking(podcastUuid)
+                smartPlaylistManager.removePodcastFromPlaylistsBlocking(podcastUuid)
 
                 unsubscribeRelay.accept(podcastUuid)
             }

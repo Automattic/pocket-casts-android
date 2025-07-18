@@ -66,7 +66,6 @@ enum class SourceView(val analyticsValue: String) {
     fun skipTracking() = this in listOf(AUTO_PLAY, AUTO_PAUSE)
 
     companion object {
-        fun fromString(source: String?) =
-            SourceView.entries.find { it.analyticsValue == source } ?: UNKNOWN
+        fun fromString(source: String?) = SourceView.entries.find { it.analyticsValue == source } ?: UNKNOWN
     }
 }

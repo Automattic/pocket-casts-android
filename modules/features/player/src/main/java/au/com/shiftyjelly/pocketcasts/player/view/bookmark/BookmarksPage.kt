@@ -65,14 +65,15 @@ fun BookmarksPage(
     bottomInset: Dp,
     bookmarksViewModel: BookmarksViewModel,
     multiSelectHelper: MultiSelectBookmarksHelper,
-    onRowLongPressed: (Bookmark) -> Unit,
+    onRowLongClick: (Bookmark) -> Unit,
     onShareBookmarkClick: () -> Unit,
     onEditBookmarkClick: () -> Unit,
-    onUpgradeClicked: () -> Unit,
+    onUpgradeClick: () -> Unit,
     showOptionsDialog: (Int) -> Unit,
     openFragment: (Fragment) -> Unit,
-    onSearchBarClearButtonTapped: () -> Unit,
-    onHeadphoneControlsButtonTapped: () -> Unit,
+    onSearchBarClearButtonClick: () -> Unit,
+    onHeadphoneControlsButtonClick: () -> Unit,
+    modifier: Modifier = Modifier,
 ) {
     val context = LocalContext.current
     val state by bookmarksViewModel.uiState.collectAsStateWithLifecycle()
@@ -82,18 +83,19 @@ fun BookmarksPage(
         state = state,
         colors = bookmarkColors,
         bottomInset = bottomInset,
-        onRowLongPressed = onRowLongPressed,
-        onBookmarksOptionsMenuClicked = { bookmarksViewModel.onOptionsMenuClicked() },
+        onRowLongClick = onRowLongClick,
+        onBookmarksOptionsMenuClick = { bookmarksViewModel.onOptionsMenuClicked() },
         onPlayClick = { bookmark ->
             bookmarksViewModel.play(bookmark)
         },
-        onSearchTextChanged = { bookmarksViewModel.onSearchTextChanged(it) },
-        onUpgradeClicked = onUpgradeClicked,
+        onSearchTextChange = { bookmarksViewModel.onSearchTextChanged(it) },
+        onUpgradeClick = onUpgradeClick,
         openFragment = openFragment,
-        onSearchBarClearButtonTapped = onSearchBarClearButtonTapped,
-        onHeadphoneControlsButtonTapped = onHeadphoneControlsButtonTapped,
+        onSearchBarClearButtonClick = onSearchBarClearButtonClick,
+        onHeadphoneControlsButtonClick = onHeadphoneControlsButtonClick,
+        modifier = modifier,
     )
-    LaunchedEffect(episodeUuid) {
+    LaunchedEffect(episodeUuid, showOptionsDialog) {
         bookmarksViewModel.loadBookmarks(
             episodeUuid = episodeUuid,
             sourceView = sourceView,
@@ -104,7 +106,7 @@ fun BookmarksPage(
             }
     }
 
-    LaunchedEffect(context) {
+    LaunchedEffect(context, onShareBookmarkClick, onEditBookmarkClick) {
         multiSelectHelper.navigationState
             .collect { navigationState ->
                 when (navigationState) {
@@ -131,19 +133,20 @@ private fun Content(
     state: UiState,
     colors: BookmarkColors,
     bottomInset: Dp,
-    onRowLongPressed: (Bookmark) -> Unit,
+    onRowLongClick: (Bookmark) -> Unit,
     onPlayClick: (Bookmark) -> Unit,
-    onBookmarksOptionsMenuClicked: () -> Unit,
-    onSearchTextChanged: (String) -> Unit,
-    onUpgradeClicked: () -> Unit,
+    onBookmarksOptionsMenuClick: () -> Unit,
+    onSearchTextChange: (String) -> Unit,
+    onUpgradeClick: () -> Unit,
     openFragment: (Fragment) -> Unit,
-    onSearchBarClearButtonTapped: () -> Unit,
-    onHeadphoneControlsButtonTapped: () -> Unit,
+    onSearchBarClearButtonClick: () -> Unit,
+    onHeadphoneControlsButtonClick: () -> Unit,
+    modifier: Modifier = Modifier,
 ) {
     val playerColors = MaterialTheme.theme.rememberPlayerColors()
     Box(
         contentAlignment = Alignment.Center,
-        modifier = Modifier
+        modifier = modifier
             .fillMaxSize()
             .background(color = playerColors?.background01 ?: MaterialTheme.theme.colors.primaryUi01),
     ) {
@@ -154,11 +157,11 @@ private fun Content(
                 state = state,
                 colors = colors,
                 bottomInset = bottomInset,
-                onRowLongPressed = onRowLongPressed,
-                onOptionsMenuClicked = onBookmarksOptionsMenuClicked,
+                onRowLongClick = onRowLongClick,
+                onOptionsMenuClick = onBookmarksOptionsMenuClick,
                 onPlayClick = onPlayClick,
-                onSearchTextChanged = onSearchTextChanged,
-                onSearchBarClearButtonTapped = onSearchBarClearButtonTapped,
+                onSearchTextChange = onSearchTextChange,
+                onSearchBarClearButtonClick = onSearchBarClearButtonClick,
             )
 
             is UiState.Empty -> Column(
@@ -171,7 +174,7 @@ private fun Content(
                     primaryButtonText = stringResource(LR.string.bookmarks_headphone_settings),
                     colors = colors.noContent,
                     onPrimaryButtonClick = {
-                        onHeadphoneControlsButtonTapped()
+                        onHeadphoneControlsButtonClick()
                         openFragment(HeadphoneControlsSettingsFragment())
                     },
                 )
@@ -186,7 +189,7 @@ private fun Content(
                     iconResourceId = IR.drawable.ic_bookmark,
                     primaryButtonText = stringResource(LR.string.bookmarks_free_user_empty_state_button),
                     colors = colors.noContent,
-                    onPrimaryButtonClick = onUpgradeClicked,
+                    onPrimaryButtonClick = onUpgradeClick,
                 )
             }
         }
@@ -198,11 +201,11 @@ private fun BookmarksView(
     state: UiState.Loaded,
     bottomInset: Dp,
     colors: BookmarkColors,
-    onRowLongPressed: (Bookmark) -> Unit,
-    onOptionsMenuClicked: () -> Unit,
+    onRowLongClick: (Bookmark) -> Unit,
+    onOptionsMenuClick: () -> Unit,
     onPlayClick: (Bookmark) -> Unit,
-    onSearchTextChanged: (String) -> Unit,
-    onSearchBarClearButtonTapped: () -> Unit,
+    onSearchTextChange: (String) -> Unit,
+    onSearchBarClearButtonClick: () -> Unit,
 ) {
     val focusRequester = remember { FocusRequester() }
     LazyColumn(
@@ -215,8 +218,8 @@ private fun BookmarksView(
                 SearchBar(
                     text = state.searchText,
                     placeholder = stringResource(LR.string.search),
-                    onTextChanged = onSearchTextChanged,
-                    onClearButtonTapped = onSearchBarClearButtonTapped,
+                    onTextChange = onSearchTextChange,
+                    onClickClear = onSearchBarClearButtonClick,
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(horizontal = 16.dp)
@@ -248,7 +251,7 @@ private fun BookmarksView(
 
                 HeaderRow(
                     title = title,
-                    onOptionsMenuClicked = onOptionsMenuClicked,
+                    onOptionsMenuClick = onOptionsMenuClick,
                     colors = colors.headerRow,
                 )
             }
@@ -267,7 +270,7 @@ private fun BookmarksView(
                 onPlayClick = { onPlayClick(bookmark) },
                 modifier = Modifier.pointerInput(bookmark.adapterId) {
                     detectTapGestures(
-                        onLongPress = { onRowLongPressed(bookmark) },
+                        onLongPress = { onRowLongClick(bookmark) },
                         onTap = { state.onRowClick(bookmark) },
                     )
                 },
@@ -311,13 +314,13 @@ private fun BookmarksPreview(
             bottomInset = 0.dp,
             colors = rememberBookmarkColors(),
             onPlayClick = {},
-            onRowLongPressed = {},
-            onBookmarksOptionsMenuClicked = {},
-            onSearchTextChanged = {},
-            onUpgradeClicked = {},
+            onRowLongClick = {},
+            onBookmarksOptionsMenuClick = {},
+            onSearchTextChange = {},
+            onUpgradeClick = {},
             openFragment = {},
-            onSearchBarClearButtonTapped = {},
-            onHeadphoneControlsButtonTapped = {},
+            onSearchBarClearButtonClick = {},
+            onHeadphoneControlsButtonClick = {},
         )
     }
 }

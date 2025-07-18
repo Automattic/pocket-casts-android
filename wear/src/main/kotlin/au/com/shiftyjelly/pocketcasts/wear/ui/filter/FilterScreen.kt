@@ -27,18 +27,18 @@ import com.google.android.horologist.compose.layout.ScalingLazyColumnState
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 object FilterScreen {
-    const val argumentFilterUuid = "filterUuid"
-    const val route = "filter/{$argumentFilterUuid}"
+    const val ARGUMENT_FILTER_UUID = "filterUuid"
+    const val ROUTE = "filter/{$ARGUMENT_FILTER_UUID}"
 
     fun navigateRoute(filterUuid: String) = "filter/$filterUuid"
 }
 
 @Composable
 fun FilterScreen(
+    columnState: ScalingLazyColumnState,
     onEpisodeTap: (PodcastEpisode) -> Unit,
     modifier: Modifier = Modifier,
     viewModel: FilterViewModel = hiltViewModel(),
-    columnState: ScalingLazyColumnState,
 ) {
     val uiState by viewModel.uiState.collectAsState(UiState.Loading)
     val artworkConfiguration by viewModel.artworkConfiguration.collectAsState()
@@ -52,12 +52,14 @@ fun FilterScreen(
             listState = columnState,
         )
 
-        is UiState.Loading -> LoadingScreen()
+        is UiState.Loading -> LoadingScreen(
+            modifier = modifier,
+        )
         is UiState.Empty -> {
             Column(
                 verticalArrangement = Arrangement.Center,
                 horizontalAlignment = Alignment.CenterHorizontally,
-                modifier = Modifier.fillMaxSize(),
+                modifier = modifier.fillMaxSize(),
             ) {
                 state.filter?.let {
                     ScreenHeaderChip(it.title)
@@ -84,11 +86,11 @@ fun FilterScreen(
 
 @Composable
 private fun Content(
+    listState: ScalingLazyColumnState,
     state: UiState.Loaded,
     useEpisodeArtwork: Boolean,
     onEpisodeTap: (PodcastEpisode) -> Unit,
     modifier: Modifier = Modifier,
-    listState: ScalingLazyColumnState,
 ) {
     ScalingLazyColumn(
         modifier = modifier.fillMaxWidth(),

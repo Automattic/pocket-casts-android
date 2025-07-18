@@ -92,7 +92,7 @@ fun AnimatedPlayPauseButton(
 
 @Preview(widthDp = 80, heightDp = 80)
 @Composable
-fun AnimatedPlayButtonPreview() {
+private fun AnimatedPlayButtonPreview() {
     AnimatedPlayPauseButton(
         isPlaying = false,
         onClick = {},

@@ -19,9 +19,10 @@ import au.com.shiftyjelly.pocketcasts.localization.R
 @Composable
 fun GiveRatingErrorScreen(
     onDismiss: () -> Unit,
+    modifier: Modifier = Modifier,
 ) {
     Box(
-        modifier = Modifier
+        modifier = modifier
             .fillMaxSize()
             .padding(16.dp),
         contentAlignment = Alignment.Center,

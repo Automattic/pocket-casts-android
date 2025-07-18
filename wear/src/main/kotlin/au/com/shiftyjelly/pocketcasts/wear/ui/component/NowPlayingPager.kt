@@ -24,7 +24,7 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 
 object NowPlayingPager {
-    const val pageCount = 3
+    const val PAGE_COUNT = 3
 }
 
 /**
@@ -38,17 +38,23 @@ object NowPlayingPager {
 fun NowPlayingPager(
     navController: NavController,
     swipeToDismissState: SwipeToDismissBoxState,
+    modifier: Modifier = Modifier,
     showTimeText: Boolean = true,
     allowSwipeToDismiss: Boolean = true,
     firstPageContent: @Composable NowPlayingPagerScope.() -> Unit,
 ) {
-    val pagerState = rememberPagerState { NowPlayingPager.pageCount }
+    val pagerState = rememberPagerState { NowPlayingPager.PAGE_COUNT }
     val columState = rememberColumnState()
     val pagerScope = remember(pagerState, columState) { NowPlayingPagerScope(pagerState, columState) }
 
     ScreenScaffold(
         scrollState = columState,
-        timeText = if (showTimeText) { null } else { {} },
+        timeText = if (showTimeText) {
+            null
+        } else {
+            {}
+        },
+        modifier = modifier,
     ) {
         // Don't allow swipe to dismiss on first screen (because there is no where to swipe back to--instead
         // just let the app close) or when the pager is not on the initial page (because we want to avoid
@@ -58,15 +64,13 @@ fun NowPlayingPager(
             snapshotFlow { pagerState.currentPage }.map { allowSwipeToDismiss && it == 0 }
         }.collectAsState(initial = false)
 
-        val modifier = if (isSwipeToDismissEnabled) {
-            Modifier.edgeSwipeToDismiss(swipeToDismissState)
-        } else {
-            Modifier
-        }
-
         PagerScreen(
             state = pagerState,
-            modifier = modifier,
+            modifier = if (isSwipeToDismissEnabled) {
+                Modifier.edgeSwipeToDismiss(swipeToDismissState)
+            } else {
+                Modifier
+            },
         ) { page ->
             when (page) {
                 0 -> firstPageContent(pagerScope)
@@ -78,12 +82,12 @@ fun NowPlayingPager(
                         navigateToEpisode = { episodeUuid ->
                             coroutineScope.launch {
                                 val alreadyOnEpisodeScreen =
-                                    navController.currentDestination?.route == EpisodeScreenFlow.episodeScreen
+                                    navController.currentDestination?.route == EpisodeScreenFlow.EPISODE_SCREEN
                                 val alreadyOnCorrectEpisode by lazy {
                                     navController
                                         .currentBackStackEntry
                                         ?.arguments
-                                        ?.getString(EpisodeScreenFlow.episodeUuidArgument)
+                                        ?.getString(EpisodeScreenFlow.EPISODE_UUID_ARGUMENT)
                                         ?.let { currentScreenEpisodeUuid ->
                                             episodeUuid == currentScreenEpisodeUuid
                                         } ?: false

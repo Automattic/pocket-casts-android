@@ -25,8 +25,8 @@ import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.filters.databinding.FragmentFilterBinding
 import au.com.shiftyjelly.pocketcasts.localization.extensions.getStringPluralPodcasts
 import au.com.shiftyjelly.pocketcasts.models.entity.BaseEpisode
-import au.com.shiftyjelly.pocketcasts.models.entity.Playlist
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
+import au.com.shiftyjelly.pocketcasts.models.entity.SmartPlaylist
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodeViewSource
 import au.com.shiftyjelly.pocketcasts.podcasts.view.components.PlayButton
 import au.com.shiftyjelly.pocketcasts.podcasts.view.episode.EpisodeContainerFragment
@@ -75,13 +75,13 @@ private const val STATE_LAYOUT_MANAGER = "layout_manager"
 @AndroidEntryPoint
 class FilterEpisodeListFragment : BaseFragment() {
     companion object {
-        fun newInstance(playlist: Playlist, isNewFilter: Boolean, context: Context): FilterEpisodeListFragment {
+        fun newInstance(smartPlaylist: SmartPlaylist, isNewFilter: Boolean, context: Context): FilterEpisodeListFragment {
             val fragment = FilterEpisodeListFragment()
             val bundle = Bundle()
-            bundle.putString(ARG_PLAYLIST_UUID, playlist.uuid)
-            bundle.putString(ARG_PLAYLIST_TITLE, playlist.title)
+            bundle.putString(ARG_PLAYLIST_UUID, smartPlaylist.uuid)
+            bundle.putString(ARG_PLAYLIST_TITLE, smartPlaylist.title)
             bundle.putBoolean(ARG_FILTER_IS_NEW, isNewFilter)
-            bundle.putInt(ARG_COLOR, playlist.getColor(context))
+            bundle.putInt(ARG_COLOR, smartPlaylist.getColor(context))
             fragment.arguments = bundle
             return fragment
         }
@@ -312,7 +312,7 @@ class FilterEpisodeListFragment : BaseFragment() {
             updateUIColors(color)
         }
 
-        viewModel.playlist.observe(viewLifecycleOwner) { playlist ->
+        viewModel.smartPlaylist.observe(viewLifecycleOwner) { playlist ->
             toolbar.title = playlist.title
 
             val color = playlist.getColor(context)
@@ -581,35 +581,35 @@ class FilterEpisodeListFragment : BaseFragment() {
     }
 
     fun showSortOptions() {
-        viewModel.playlist.value?.let {
+        viewModel.smartPlaylist.value?.let {
             val dialog = OptionsDialog()
                 .setTitle(getString(LR.string.sort_by))
                 .addCheckedOption(
                     titleId = LR.string.episode_sort_newest_to_oldest,
-                    click = { viewModel.changeSort(Playlist.SortOrder.NEWEST_TO_OLDEST) },
-                    checked = (it.sortOrder() == Playlist.SortOrder.NEWEST_TO_OLDEST),
+                    click = { viewModel.changeSort(SmartPlaylist.SortOrder.NEWEST_TO_OLDEST) },
+                    checked = (it.sortOrder() == SmartPlaylist.SortOrder.NEWEST_TO_OLDEST),
                 )
                 .addCheckedOption(
                     titleId = LR.string.episode_sort_oldest_to_newest,
-                    click = { viewModel.changeSort(Playlist.SortOrder.OLDEST_TO_NEWEST) },
-                    checked = (it.sortOrder() == Playlist.SortOrder.OLDEST_TO_NEWEST),
+                    click = { viewModel.changeSort(SmartPlaylist.SortOrder.OLDEST_TO_NEWEST) },
+                    checked = (it.sortOrder() == SmartPlaylist.SortOrder.OLDEST_TO_NEWEST),
                 )
                 .addCheckedOption(
                     titleId = LR.string.episode_sort_short_to_long,
-                    click = { viewModel.changeSort(Playlist.SortOrder.SHORTEST_TO_LONGEST) },
-                    checked = (it.sortOrder() == Playlist.SortOrder.SHORTEST_TO_LONGEST),
+                    click = { viewModel.changeSort(SmartPlaylist.SortOrder.SHORTEST_TO_LONGEST) },
+                    checked = (it.sortOrder() == SmartPlaylist.SortOrder.SHORTEST_TO_LONGEST),
                 )
                 .addCheckedOption(
                     titleId = LR.string.episode_sort_long_to_short,
-                    click = { viewModel.changeSort(Playlist.SortOrder.LONGEST_TO_SHORTEST) },
-                    checked = (it.sortOrder() == Playlist.SortOrder.LONGEST_TO_SHORTEST),
+                    click = { viewModel.changeSort(SmartPlaylist.SortOrder.LONGEST_TO_SHORTEST) },
+                    checked = (it.sortOrder() == SmartPlaylist.SortOrder.LONGEST_TO_SHORTEST),
                 )
             dialog.show(parentFragmentManager, "sort_options")
         }
     }
 
     fun showFilterSettings() {
-        viewModel.playlist.value?.let {
+        viewModel.smartPlaylist.value?.let {
             val fragment = CreateFilterFragment.newInstance(CreateFilterFragment.Mode.Edit(it))
             (activity as? FragmentHostListener)?.addFragment(fragment)
         }
@@ -687,7 +687,7 @@ class FilterEpisodeListFragment : BaseFragment() {
 
     private fun clearSelectedFilter() {
         // Only clear the selected filter if the currently displayed filter is the selected filter
-        if (settings.selectedFilter() == viewModel.playlist.value?.uuid) {
+        if (settings.selectedFilter() == viewModel.smartPlaylist.value?.uuid) {
             settings.setSelectedFilter(null)
         }
     }

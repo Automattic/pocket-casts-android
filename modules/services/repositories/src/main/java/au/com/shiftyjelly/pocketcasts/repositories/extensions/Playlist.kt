@@ -1,6 +1,6 @@
 package au.com.shiftyjelly.pocketcasts.repositories.extensions
 
-import au.com.shiftyjelly.pocketcasts.models.entity.Playlist
+import au.com.shiftyjelly.pocketcasts.models.entity.SmartPlaylist
 import au.com.shiftyjelly.pocketcasts.images.R as IR
 
 private const val FILTER_COLOR_SIZE = 5
@@ -49,27 +49,27 @@ private val AUTOMOTIVE_DRAWABLES = arrayOf(
     IR.drawable.automotive_filter_star,
 )
 
-val Playlist.drawableIndex: Int
+val SmartPlaylist.drawableIndex: Int
     get() = iconId / FILTER_COLOR_SIZE % ICON_DRAWABLES.size
 
-val Playlist.shortcutDrawableId: Int
+val SmartPlaylist.shortcutDrawableId: Int
     get() = SHORTCUT_DRAWABLES.getOrNull(drawableIndex) ?: SHORTCUT_DRAWABLES.first()
 
-val Playlist.drawableId: Int
+val SmartPlaylist.drawableId: Int
     get() = ICON_DRAWABLES.getOrNull(drawableIndex) ?: ICON_DRAWABLES.first()
 
-val Playlist.autoDrawableId: Int
+val SmartPlaylist.autoDrawableId: Int
     get() = AUTO_DRAWABLES.getOrNull(drawableIndex) ?: AUTO_DRAWABLES.first()
 
-val Playlist.automotiveDrawableId: Int
+val SmartPlaylist.automotiveDrawableId: Int
     get() = AUTOMOTIVE_DRAWABLES.getOrNull(drawableIndex) ?: AUTOMOTIVE_DRAWABLES.first()
 
-val Playlist.colorIndex: Int
+val SmartPlaylist.colorIndex: Int
     get() = iconId % FILTER_COLOR_SIZE
 
-val Playlist.Companion.iconDrawables: List<Int>
+val SmartPlaylist.Companion.iconDrawables: List<Int>
     get() = ICON_DRAWABLES
 
-fun Playlist.Companion.calculateCombinedIconId(colorIndex: Int, iconIndex: Int): Int {
+fun SmartPlaylist.Companion.calculateCombinedIconId(colorIndex: Int, iconIndex: Int): Int {
     return iconIndex * FILTER_COLOR_SIZE + colorIndex
 }

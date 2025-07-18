@@ -57,7 +57,8 @@ class BottomNavigationView @JvmOverloads constructor(
             defStyleRes,
         )
         isItemHorizontalTranslationEnabled = attributes.getBoolean(
-            R.styleable.BottomNavigationView_itemHorizontalTranslationEnabled, true,
+            R.styleable.BottomNavigationView_itemHorizontalTranslationEnabled,
+            true,
         )
         if (attributes.hasValue(R.styleable.BottomNavigationView_android_minHeight)) {
             minimumHeight = attributes.getDimensionPixelSize(R.styleable.BottomNavigationView_android_minHeight, 0)

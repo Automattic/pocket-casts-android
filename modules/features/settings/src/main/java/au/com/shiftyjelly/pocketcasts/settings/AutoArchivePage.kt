@@ -38,10 +38,10 @@ import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 @Composable
 fun AutoArchiveSettingsPage(
-    modifier: Modifier = Modifier,
     bottomInset: Dp,
-    onBackPressed: () -> Unit,
+    onBackPress: () -> Unit,
     viewModel: AutoArchiveFragmentViewModel,
+    modifier: Modifier = Modifier,
 ) {
     val state: State by viewModel.state.collectAsState()
     var openArchiveAfterPlayingDialog by remember { mutableStateOf(false) }
@@ -54,7 +54,7 @@ fun AutoArchiveSettingsPage(
     ) {
         ThemedTopAppBar(
             title = stringResource(LR.string.settings_title_auto_archive),
-            onNavigationClick = onBackPressed,
+            onNavigationClick = onBackPress,
         )
 
         LazyColumn(
@@ -94,7 +94,7 @@ fun AutoArchiveSettingsPage(
                     primaryText = stringResource(LR.string.settings_auto_archive_starred),
                     secondaryText = stringResource(if (state.starredEpisodes) LR.string.settings_auto_archive_starred_summary else LR.string.settings_auto_archive_no_starred_summary),
                     toggle = SettingRowToggle.Switch(checked = state.starredEpisodes),
-                    modifier = modifier
+                    modifier = Modifier
                         .toggleable(
                             value = state.starredEpisodes,
                             role = Role.Switch,

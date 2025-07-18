@@ -28,7 +28,7 @@ class ManualCleanupFragment : BaseFragment() {
         AppThemeWithBackground(theme.activeTheme) {
             ManualCleanupPage(
                 viewModel = viewModel,
-                onBackClick = {
+                onBackPress = {
                     @Suppress("DEPRECATION")
                     activity?.onBackPressed()
                 },

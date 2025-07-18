@@ -15,11 +15,9 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import au.com.shiftyjelly.pocketcasts.compose.AppTheme
 import au.com.shiftyjelly.pocketcasts.compose.preview.ThemePreviewParameterProvider
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
-import au.com.shiftyjelly.pocketcasts.player.viewmodel.ShelfViewModel
 import au.com.shiftyjelly.pocketcasts.player.viewmodel.ShelfViewModel.Companion.moreActionsTitle
 import au.com.shiftyjelly.pocketcasts.player.viewmodel.ShelfViewModel.Companion.shortcutTitle
 import au.com.shiftyjelly.pocketcasts.player.viewmodel.ShelfViewModel.UiState
@@ -32,31 +30,13 @@ import sh.calvin.reorderable.rememberReorderableLazyListState
 
 @Composable
 fun MenuShelfItems(
-    shelfViewModel: ShelfViewModel,
-    normalBackgroundColor: Color = Color.Transparent,
-    selectedBackgroundColor: Color = Color.Black,
-    navigationBarPadding: Boolean = false,
-    onClick: ((ShelfItem, Boolean) -> Unit)? = null,
-) {
-    val uiState by shelfViewModel.uiState.collectAsStateWithLifecycle()
-    Content(
-        state = uiState,
-        selectedBackgroundColor = selectedBackgroundColor,
-        normalBackgroundColor = normalBackgroundColor,
-        onClick = onClick,
-        includeNavigationBarsPadding = navigationBarPadding,
-        onMove = { from, to -> shelfViewModel.onShelfItemMove(from, to) },
-    )
-}
-
-@Composable
-private fun Content(
     state: UiState,
-    selectedBackgroundColor: Color,
-    normalBackgroundColor: Color,
+    onMove: (from: Int, to: Int) -> Unit,
+    modifier: Modifier = Modifier,
+    selectedBackgroundColor: Color = Color.Black,
+    normalBackgroundColor: Color = Color.Transparent,
     includeNavigationBarsPadding: Boolean = true,
     onClick: ((ShelfItem, Boolean) -> Unit)? = null,
-    onMove: (from: Int, to: Int) -> Unit,
 ) {
     val lazyListState = rememberLazyListState()
     val items by rememberUpdatedState(state.shelfRowItems)
@@ -66,6 +46,7 @@ private fun Content(
 
     LazyColumn(
         state = lazyListState,
+        modifier = modifier,
     ) {
         items.forEach { listItem ->
             when (listItem) {
@@ -113,7 +94,7 @@ private fun MenuShelfItemsNonEditableContentPreview(
     @PreviewParameter(ThemePreviewParameterProvider::class) themeType: Theme.ThemeType,
 ) {
     AppTheme(themeType) {
-        Content(
+        MenuShelfItems(
             state = UiState(
                 shelfRowItems = buildList {
                     addAll(ShelfItem.entries.toList().take(6))
@@ -124,7 +105,7 @@ private fun MenuShelfItemsNonEditableContentPreview(
             ),
             selectedBackgroundColor = Color.Transparent,
             normalBackgroundColor = Color.Transparent,
-            onMove = { from, to -> },
+            onMove = { _, _ -> },
         )
     }
 }
@@ -135,7 +116,7 @@ private fun MenuShelfItemsEditableContentPreview(
     @PreviewParameter(ThemePreviewParameterProvider::class) themeType: Theme.ThemeType,
 ) {
     AppTheme(themeType) {
-        Content(
+        MenuShelfItems(
             state = UiState(
                 shelfRowItems = buildList {
                     add(shortcutTitle)
@@ -148,7 +129,7 @@ private fun MenuShelfItemsEditableContentPreview(
             ),
             selectedBackgroundColor = Color.Transparent,
             normalBackgroundColor = Color.Transparent,
-            onMove = { from, to -> },
+            onMove = { _, _ -> },
         )
     }
 }

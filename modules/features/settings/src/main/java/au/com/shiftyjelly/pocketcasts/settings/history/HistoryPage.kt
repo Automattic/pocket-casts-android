@@ -15,10 +15,10 @@ import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 @Composable
 fun HistoryPage(
-    modifier: Modifier = Modifier,
-    onBackClick: () -> Unit,
-    onUpNextHistoryClick: () -> Unit,
     bottomInset: Dp,
+    onBackPress: () -> Unit,
+    onUpNextHistoryClick: () -> Unit,
+    modifier: Modifier = Modifier,
 ) {
     LazyColumn(
         modifier = modifier,
@@ -27,7 +27,7 @@ fun HistoryPage(
         item {
             ThemedTopAppBar(
                 title = stringResource(LR.string.restore_from_local_history),
-                onNavigationClick = onBackClick,
+                onNavigationClick = onBackPress,
             )
         }
         item {

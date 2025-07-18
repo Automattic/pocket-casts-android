@@ -10,13 +10,13 @@ import androidx.compose.runtime.saveable.rememberSaveable
  * configuration changes. Compare to LaunchedEffect(Unit), which will
  * call the function again after configuration changes.
  *
- * @param onShown The function to call when the composable is first shown.
+ * @param onCall The function to call when the composable is first shown.
  */
 @Composable
-fun CallOnce(onShown: () -> Unit) {
+fun CallOnce(onCall: () -> Unit) {
     val shown = rememberSaveable { mutableStateOf(false) }
     if (!shown.value) {
-        onShown()
+        onCall()
     }
     shown.value = true
 }

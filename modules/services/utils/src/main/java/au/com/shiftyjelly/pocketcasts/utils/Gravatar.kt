@@ -5,8 +5,7 @@ import java.net.URLEncoder
 
 object Gravatar {
 
-    fun getGravatarChangeAvatarUrl(email: String): String =
-        "https://gravatar.com/profile?is_quick_editor=true&email=${URLEncoder.encode(email, "UTF-8")}&scope=avatars&is_app_origin=true"
+    fun getGravatarChangeAvatarUrl(email: String): String = "https://gravatar.com/profile?is_quick_editor=true&email=${URLEncoder.encode(email, "UTF-8")}&scope=avatars&is_app_origin=true"
 
     /**
      * The timestamp is used to force a refresh of the gravatar image. We use it as a cache buster.
@@ -21,10 +20,9 @@ object Gravatar {
      * _=lastTimeStamp: cache buster
      * https://en.gravatar.com/site/implement/images/
      */
-    fun getUrl(email: String): String? =
-        email.sha256()?.let { sha256Email ->
-            "https://www.gravatar.com/avatar/$sha256Email?d=404&s=400&_=$lastTimeStamp"
-        }
+    fun getUrl(email: String): String? = email.sha256()?.let { sha256Email ->
+        "https://www.gravatar.com/avatar/$sha256Email?d=404&s=400&_=$lastTimeStamp"
+    }
 
     fun refreshGravatarTimestamp() {
         lastTimeStamp = System.currentTimeMillis()

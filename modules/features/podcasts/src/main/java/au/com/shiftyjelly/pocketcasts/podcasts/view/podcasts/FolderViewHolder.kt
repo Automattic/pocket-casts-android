@@ -28,7 +28,8 @@ class FolderViewHolder(
     val podcastsLayout: PodcastGridLayoutType,
     val onFolderClick: (Folder) -> Unit,
     val podcastGridLayout: PodcastGridLayoutType,
-) : RecyclerView.ViewHolder(composeView), PodcastTouchCallback.ItemTouchHelperViewHolder {
+) : RecyclerView.ViewHolder(composeView),
+    PodcastTouchCallback.ItemTouchHelperViewHolder {
 
     init {
         /* Setting non-default view composition strategy to temporarily fix flickering in folders:
@@ -90,7 +91,16 @@ class FolderViewHolder(
 }
 
 @Composable
-private fun FolderGridAdapter(color: Color, name: String, podcastUuids: List<String>, badgeCount: Int, badgeType: BadgeType, podcastGridLayout: PodcastGridLayoutType, modifier: Modifier = Modifier, onClick: () -> Unit) {
+private fun FolderGridAdapter(
+    color: Color,
+    name: String,
+    podcastUuids: List<String>,
+    badgeCount: Int,
+    badgeType: BadgeType,
+    podcastGridLayout: PodcastGridLayoutType,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
     FolderImage(
         name = name,
         color = color,
@@ -103,15 +113,24 @@ private fun FolderGridAdapter(color: Color, name: String, podcastUuids: List<Str
 }
 
 @Composable
-private fun FolderListAdapter(color: Color, name: String, podcastUuids: List<String>, badgeCount: Int, badgeType: BadgeType, modifier: Modifier = Modifier, onClick: () -> Unit) {
-    Column {
+private fun FolderListAdapter(
+    color: Color,
+    name: String,
+    podcastUuids: List<String>,
+    badgeCount: Int,
+    badgeType: BadgeType,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    Column(
+        modifier = modifier,
+    ) {
         FolderListRow(
             color = color,
             name = name,
             podcastUuids = podcastUuids,
             badgeCount = badgeCount,
             badgeType = badgeType,
-            modifier = modifier,
             onClick = onClick,
         )
         HorizontalDivider()

@@ -70,9 +70,9 @@ object OnboardingUpgradeHelper {
     fun UpgradeRowButton(
         primaryText: String,
         textColor: Color,
+        backgroundColor: Color,
         onClick: () -> Unit,
         modifier: Modifier = Modifier,
-        backgroundColor: Color,
         fontWeight: FontWeight = FontWeight.W600,
         secondaryText: String? = null,
     ) {
@@ -134,10 +134,10 @@ object OnboardingUpgradeHelper {
     fun OutlinedRowButton(
         text: String,
         brush: Brush,
+        subscriptionTier: SubscriptionTier,
         onClick: () -> Unit,
         modifier: Modifier = Modifier,
         topText: String? = null,
-        subscriptionTier: SubscriptionTier,
         selectedCheckMark: Boolean = false,
         interactionSource: MutableInteractionSource = remember { MutableInteractionSource() },
     ) {
@@ -191,9 +191,9 @@ object OnboardingUpgradeHelper {
     fun UnselectedOutlinedRowButton(
         text: String,
         onClick: () -> Unit,
+        subscriptionTier: SubscriptionTier,
         modifier: Modifier = Modifier,
         topText: String? = null,
-        subscriptionTier: SubscriptionTier,
         interactionSource: MutableInteractionSource = remember { MutableInteractionSource() },
     ) {
         ConstraintLayout(modifier) {
@@ -298,9 +298,9 @@ object OnboardingUpgradeHelper {
 
     @Composable
     fun UpgradeBackground(
-        modifier: Modifier = Modifier,
         tier: SubscriptionTier,
         @DrawableRes backgroundGlowsRes: Int,
+        modifier: Modifier = Modifier,
         content: @Composable () -> Unit,
     ) {
         Box(modifier) {
@@ -420,7 +420,7 @@ object OnboardingUpgradeHelper {
 
 @Preview(showBackground = true)
 @Composable
-fun UpgradeRowButtonWithGradientBackgroundPreview() {
+private fun UpgradeRowButtonWithGradientBackgroundPreview() {
     UpgradeRowButton(
         primaryText = "Upgrade Now",
         textColor = Color.Black,
@@ -431,7 +431,7 @@ fun UpgradeRowButtonWithGradientBackgroundPreview() {
 
 @Preview(showBackground = true)
 @Composable
-fun UpgradeRowButtonPreview() {
+private fun UpgradeRowButtonPreview() {
     UpgradeRowButton(
         primaryText = "Upgrade Now",
         textColor = Color.Black,

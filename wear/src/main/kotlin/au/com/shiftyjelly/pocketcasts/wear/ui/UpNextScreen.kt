@@ -30,15 +30,15 @@ import com.google.android.horologist.compose.layout.ScalingLazyColumnState
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 object UpNextScreen {
-    const val route = "up_next_screen"
+    const val ROUTE = "up_next_screen"
 }
 
 @Composable
 fun UpNextScreen(
+    columnState: ScalingLazyColumnState,
     navigateToEpisode: (episodeUuid: String) -> Unit,
     modifier: Modifier = Modifier,
     viewModel: UpNextViewModel = hiltViewModel(),
-    columnState: ScalingLazyColumnState,
 ) {
     val queueState by viewModel.upNextQueue.subscribeAsState(initial = null)
     val artworkConfiguration by viewModel.artworkConfiguration.collectAsState()
@@ -55,10 +55,11 @@ fun UpNextScreen(
             } else {
                 Scaffold(
                     positionIndicator = { PositionIndicator(scalingLazyListState = columnState.state) },
+                    modifier = modifier,
                 ) {
                     ScalingLazyColumn(
                         columnState = columnState,
-                        modifier = modifier.fillMaxWidth(),
+                        modifier = Modifier.fillMaxWidth(),
                     ) {
                         item { ScreenHeaderChip(LR.string.up_next) }
 

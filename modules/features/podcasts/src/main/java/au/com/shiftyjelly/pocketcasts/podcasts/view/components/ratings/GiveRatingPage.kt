@@ -3,6 +3,7 @@ package au.com.shiftyjelly.pocketcasts.podcasts.view.components.ratings
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.Modifier
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import au.com.shiftyjelly.pocketcasts.podcasts.viewmodel.GiveRatingViewModel
 
@@ -13,6 +14,7 @@ fun GiveRatingPage(
     submitRating: () -> Unit,
     onDismiss: () -> Unit,
     onUserSignedOut: () -> Unit,
+    modifier: Modifier = Modifier,
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
 
@@ -28,18 +30,30 @@ fun GiveRatingPage(
     when (val currentState = state) {
         is GiveRatingViewModel.State.Loaded -> GiveRatingScreen(
             state = currentState,
-            viewModel = viewModel,
+            onRatingUpdate = viewModel::setRating,
             submitRating = submitRating,
             onDismiss = onDismiss,
+            onShow = {
+                viewModel.trackOnGiveRatingScreenShown(currentState.podcastUuid)
+            },
+            modifier = modifier,
         )
-        is GiveRatingViewModel.State.Loading -> GiveRatingLoadingScreen()
+        is GiveRatingViewModel.State.Loading -> GiveRatingLoadingScreen(
+            modifier = modifier,
+        )
         is GiveRatingViewModel.State.NotAllowedToRate -> GiveRatingNotAllowedToRate(
-            viewModel = viewModel,
             state = currentState,
             onDismiss = onDismiss,
+            onShow = {
+                viewModel.trackOnNotAllowedToRateScreenShown(currentState.podcastUuid)
+            },
+            modifier = modifier,
         )
         is GiveRatingViewModel.State.ErrorWhenLoadingPodcast -> {
-            GiveRatingErrorScreen(onDismiss)
+            GiveRatingErrorScreen(
+                onDismiss = onDismiss,
+                modifier = modifier,
+            )
         }
     }
 }

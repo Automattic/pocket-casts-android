@@ -29,7 +29,9 @@ import kotlin.time.Duration
 import au.com.shiftyjelly.pocketcasts.ui.R as UR
 
 @AndroidEntryPoint
-class VideoFragment : Fragment(), PlayerSeekBar.OnUserSeekListener {
+class VideoFragment :
+    Fragment(),
+    PlayerSeekBar.OnUserSeekListener {
 
     @Inject lateinit var playbackManager: PlaybackManager
 

@@ -12,7 +12,9 @@ sealed interface BaseEpisode {
          * Returns true if the objects are the same.
          */
         val isMediaSessionEqual: (t1: BaseEpisode?, t2: BaseEpisode?) -> Boolean = { t1, t2 ->
-            t1 != null && t2 != null && t1.uuid == t2.uuid &&
+            t1 != null &&
+                t2 != null &&
+                t1.uuid == t2.uuid &&
                 (
                     (t1 is PodcastEpisode && t2 is PodcastEpisode && t1.isStarred == t2.isStarred) ||
                         (t1 is UserEpisode && t2 is UserEpisode && t1.tintColorIndex == t2.tintColorIndex)

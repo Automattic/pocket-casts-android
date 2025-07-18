@@ -24,9 +24,9 @@ import au.com.shiftyjelly.pocketcasts.localization.helper.RelativeDateFormatter
 import au.com.shiftyjelly.pocketcasts.localization.helper.tryToLocaliseFilters
 import au.com.shiftyjelly.pocketcasts.models.entity.BaseEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.Folder
-import au.com.shiftyjelly.pocketcasts.models.entity.Playlist
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
+import au.com.shiftyjelly.pocketcasts.models.entity.SmartPlaylist
 import au.com.shiftyjelly.pocketcasts.models.entity.UserEpisode
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodePlayingStatus
 import au.com.shiftyjelly.pocketcasts.repositories.extensions.autoDrawableId
@@ -119,11 +119,11 @@ object AutoConverter {
         }
     }
 
-    fun convertPlaylistToMediaItem(context: Context, playlist: Playlist): MediaBrowserCompat.MediaItem {
+    fun convertPlaylistToMediaItem(context: Context, smartPlaylist: SmartPlaylist): MediaBrowserCompat.MediaItem {
         val mediaDescription = MediaDescriptionCompat.Builder()
-            .setTitle(playlist.title.tryToLocaliseFilters(context.resources))
-            .setMediaId(playlist.uuid)
-            .setIconUri(getPlaylistBitmapUri(playlist, context))
+            .setTitle(smartPlaylist.title.tryToLocaliseFilters(context.resources))
+            .setMediaId(smartPlaylist.uuid)
+            .setIconUri(getPlaylistBitmapUri(smartPlaylist, context))
             .build()
 
         return MediaBrowserCompat.MediaItem(mediaDescription, MediaBrowserCompat.MediaItem.FLAG_BROWSABLE)
@@ -189,12 +189,12 @@ object AutoConverter {
         return getBitmapUri(drawable = IR.drawable.auto_tab_podcasts, context = context)
     }
 
-    fun getPlaylistBitmapUri(playlist: Playlist?, context: Context): Uri {
+    fun getPlaylistBitmapUri(smartPlaylist: SmartPlaylist?, context: Context): Uri {
         val drawableId = if (Util.isAutomotive(context)) {
             // the Automotive UI displays the icon in a list that requires more padding around the icon
-            playlist?.automotiveDrawableId ?: IR.drawable.automotive_filter_play
+            smartPlaylist?.automotiveDrawableId ?: IR.drawable.automotive_filter_play
         } else {
-            playlist?.autoDrawableId ?: IR.drawable.auto_filter_play
+            smartPlaylist?.autoDrawableId ?: IR.drawable.auto_filter_play
         }
         return getBitmapUri(drawableId, context)
     }

@@ -33,7 +33,7 @@ fun RowCloseButton(
 @ShowkaseComposable(name = "RowCloseButton", group = "Button", styleName = "Light")
 @Preview(name = "Light")
 @Composable
-fun RowCloseButtonLightPreview() {
+private fun RowCloseButtonLightPreview() {
     AppThemeWithBackground(Theme.ThemeType.DARK) {
         RowCloseButton(
             onClose = {},
@@ -44,7 +44,7 @@ fun RowCloseButtonLightPreview() {
 @ShowkaseComposable(name = "RowCloseButton", group = "Button", styleName = "Dark")
 @Preview(name = "Dark")
 @Composable
-fun RowCloseButtonDarkPreview() {
+private fun RowCloseButtonDarkPreview() {
     AppThemeWithBackground(Theme.ThemeType.LIGHT) {
         RowCloseButton(
             onClose = {},

@@ -1317,7 +1317,7 @@ class PodcastFragment : BaseFragment() {
     ) : Parcelable
 }
 
-private class ToolbarController() {
+private class ToolbarController {
     private var text by mutableStateOf("")
 
     fun setToolbarTitle(title: String) {

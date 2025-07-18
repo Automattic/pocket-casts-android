@@ -43,17 +43,20 @@ import au.com.shiftyjelly.pocketcasts.localization.R as LR
  */
 @Composable
 fun ShareListCreateTitlePage(
-    onBackClick: () -> Unit,
+    onBackPress: () -> Unit,
     onNextClick: () -> Unit,
     viewModel: ShareListCreateViewModel,
+    modifier: Modifier = Modifier,
 ) {
     val state: ShareListCreateViewModel.State by viewModel.state.collectAsState()
 
-    Column {
+    Column(
+        modifier = modifier,
+    ) {
         ThemedTopAppBar(
             title = stringResource(LR.string.podcasts_share_create_list),
             navigationButton = NavigationButton.Back,
-            onNavigationClick = onBackClick,
+            onNavigationClick = onBackPress,
             actions = {
                 IconButton(onClick = onNextClick, enabled = state.title.isNotBlank()) {
                     Icon(
@@ -88,7 +91,9 @@ private fun ShareListCreateTitleContent(
     val configuration = LocalConfiguration.current
     val inLandscape = configuration.orientation == Configuration.ORIENTATION_LANDSCAPE
     val imageMinSize = if (inLandscape) 120.dp else 80.dp
-    Column {
+    Column(
+        modifier = modifier,
+    ) {
         if (!inLandscape) {
             TitleDescriptionFields(
                 title = title,
@@ -105,7 +110,6 @@ private fun ShareListCreateTitleContent(
             contentPadding = PaddingValues(16.dp),
             verticalArrangement = Arrangement.spacedBy(8.dp),
             horizontalArrangement = Arrangement.spacedBy(8.dp),
-            modifier = modifier,
         ) {
             if (inLandscape) {
                 header {

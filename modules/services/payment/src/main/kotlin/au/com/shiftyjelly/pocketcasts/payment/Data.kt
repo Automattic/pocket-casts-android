@@ -1,6 +1,7 @@
 package au.com.shiftyjelly.pocketcasts.payment
 
 import androidx.annotation.Keep
+import au.com.shiftyjelly.pocketcasts.payment.PricingSchedule.RecurrenceMode
 import java.math.BigDecimal
 
 data class Product(
@@ -45,7 +46,7 @@ data class Price(
 )
 
 data class PricingSchedule(
-    val recurrenceMode: PricingSchedule.RecurrenceMode,
+    val recurrenceMode: RecurrenceMode,
     val period: PricingSchedule.Period,
     val periodCount: Int,
 ) {
@@ -141,9 +142,12 @@ data class SubscriptionPlans private constructor(
         private fun List<Product>.findMatchingProducts(key: SubscriptionPlan.Key): List<Product> {
             return filter { product ->
                 val offerCondition = if (key.offer != null) {
-                    product.pricingPlans.offerPlans.singleOrNull { it.offerId == key.offerId } != null
+                    val pricingPhases = product.pricingPlans.offerPlans.singleOrNull { it.offerId == key.offerId }?.pricingPhases
+                    val infinitePricingPhase = pricingPhases?.singleOrNull { it.schedule.recurrenceMode == RecurrenceMode.Infinite }
+                    infinitePricingPhase != null && infinitePricingPhase == pricingPhases.last()
                 } else {
-                    product.pricingPlans.basePlan.pricingPhases.size == 1
+                    val pricingPhase = product.pricingPlans.basePlan.pricingPhases.singleOrNull()
+                    pricingPhase?.schedule?.recurrenceMode == RecurrenceMode.Infinite
                 }
                 product.id == key.productId && product.pricingPlans.basePlan.planId == key.basePlanId && offerCondition
             }
@@ -182,6 +186,10 @@ sealed interface SubscriptionPlan {
     val productId get() = key.productId
     val basePlanId get() = key.basePlanId
     val offerId get() = key.offerId
+    val recurringPrice get() = when (this) {
+        is Base -> pricingPhase.price
+        is WithOffer -> pricingPhases.last().price
+    }
 
     data class Base(
         override val name: String,
@@ -214,10 +222,10 @@ sealed interface SubscriptionPlan {
     }
 
     companion object {
-        const val PlusMonthlyProductId = "com.pocketcasts.plus.monthly"
-        const val PlusYearlyProductId = "com.pocketcasts.plus.yearly"
-        const val PatronMonthlyProductId = "com.pocketcasts.monthly.patron"
-        const val PatronYearlyProductId = "com.pocketcasts.yearly.patron"
+        const val PLUS_MONTHLY_PRODUCT_ID = "com.pocketcasts.plus.monthly"
+        const val PLUS_YEARLY_PRODUCT_ID = "com.pocketcasts.plus.yearly"
+        const val PATRON_MONTHLY_PRODUCT_ID = "com.pocketcasts.monthly.patron"
+        const val PATRON_YEARLY_PRODUCT_ID = "com.pocketcasts.yearly.patron"
 
         val PlusMonthlyPreview get() = SubscriptionPlans.Preview.getBasePlan(SubscriptionTier.Plus, BillingCycle.Monthly)
         val PlusYearlyPreview get() = SubscriptionPlans.Preview.getBasePlan(SubscriptionTier.Plus, BillingCycle.Yearly)
@@ -229,13 +237,13 @@ sealed interface SubscriptionPlan {
             billingCycle: BillingCycle,
         ) = when (tier) {
             SubscriptionTier.Plus -> when (billingCycle) {
-                BillingCycle.Monthly -> PlusMonthlyProductId
-                BillingCycle.Yearly -> PlusYearlyProductId
+                BillingCycle.Monthly -> PLUS_MONTHLY_PRODUCT_ID
+                BillingCycle.Yearly -> PLUS_YEARLY_PRODUCT_ID
             }
 
             SubscriptionTier.Patron -> when (billingCycle) {
-                BillingCycle.Monthly -> PatronMonthlyProductId
-                BillingCycle.Yearly -> PatronYearlyProductId
+                BillingCycle.Monthly -> PATRON_MONTHLY_PRODUCT_ID
+                BillingCycle.Yearly -> PATRON_YEARLY_PRODUCT_ID
             }
         }
 

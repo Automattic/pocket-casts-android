@@ -32,7 +32,8 @@ class OnboardingCreateAccountViewModel @Inject constructor(
     private val podcastManager: PodcastManager,
     private val experimentProvider: ExperimentProvider,
     @ApplicationContext context: Context,
-) : AndroidViewModel(context as Application), CoroutineScope {
+) : AndroidViewModel(context as Application),
+    CoroutineScope {
     override val coroutineContext: CoroutineContext
         get() = Dispatchers.Default
 

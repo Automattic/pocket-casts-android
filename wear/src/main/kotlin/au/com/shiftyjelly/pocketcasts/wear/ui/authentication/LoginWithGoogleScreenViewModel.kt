@@ -23,7 +23,8 @@ class LoginWithGoogleScreenViewModel @Inject constructor(
     googleSignInClient: GoogleSignInClient,
     private val podcastManager: PodcastManager,
     private val syncManager: SyncManager,
-) : ViewModel(), GoogleSignInEventListener {
+) : ViewModel(),
+    GoogleSignInEventListener {
 
     data class State(
         val googleSignInAccount: GoogleSignInAccount?,

@@ -28,7 +28,11 @@ data class PlaybackState(
     val transientLoss: Boolean = false,
 ) {
     enum class State {
-        EMPTY, PAUSED, PLAYING, STOPPED, ERROR
+        EMPTY,
+        PAUSED,
+        PLAYING,
+        STOPPED,
+        ERROR,
     }
 
     val isEmpty: Boolean

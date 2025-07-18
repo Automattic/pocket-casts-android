@@ -319,11 +319,11 @@ class ChapterDaoTest {
     }
 
     @Test
-    fun observerChaptersForEpisodeInAscendingOrder() = runBlocking {
+    fun observeChaptersForEpisodeInAscendingOrder() = runBlocking {
         val id1 = "episode-id-1"
         val id2 = "episode-id-2"
 
-        chapterDao.observerChaptersForEpisode(id1).test {
+        chapterDao.observeChaptersForEpisode(id1).test {
             assertEquals(emptyList<Chapter>(), awaitItem())
 
             val chaptersEpisode1 = List(3) { index ->

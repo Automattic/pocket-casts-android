@@ -17,8 +17,8 @@
 
 [versions]
 aboutlibraries = "12.2.0"
-android-gradle-plugin = "8.11.0"
-billing = "7.0.0"
+android-gradle-plugin = "8.11.1"
+billing = "8.0.0"
 coil = "2.7.0"
 compose = "2025.05.01" # https://developer.android.com/jetpack/compose/bom/bom-mapping
 datastore = "1.1.7"
@@ -31,10 +31,11 @@ hilt = "2.56.2"
 hilt-compiler = "1.2.0"
 horologist = "0.6.23"
 java = "17"
-kotlin = "2.1.21"
+kotlin = "2.2.0"
 kotlin-coroutines = "1.10.2"
-ksp = "2.1.21-2.0.2"
-ktlint = "0.50.0"
+ksp = "2.2.0-2.0.2"
+ktlint = "1.6.0"
+ktlint-compose-rules = "0.4.22"
 lifecycle = "2.9.1"
 lottie = "6.6.7"
 measure-builds = "3.2.1"
@@ -42,8 +43,8 @@ media3 = "1.7.1"
 mockito = "5.18.0"
 mockito-kotlin = "5.4.0"
 moshi = "1.15.2"
-navigation = "2.9.0"
-okhttp = "4.12.0"
+navigation = "2.9.1"
+okhttp = "5.1.0"
 protobuf = "4.31.1"
 protobuf-plugin = "0.9.5"
 retrofit = "3.0.0"
@@ -53,7 +54,7 @@ sentry-plugin = "5.8.0"
 showkase = "1.0.4"
 tasker-plugin = "0.4.10"
 test = "1.6.1"
-tracks = "6.0.3"
+tracks = "6.0.4"
 wear-compose = "1.4.1"
 webkit = "1.14.0"
 work = "2.10.0"
@@ -82,7 +83,7 @@ compose-material = { module = "androidx.compose.material:material" }
 compose-material-icons-core = { module = "androidx.compose.material:material-icons-core" }
 compose-material-icons-extended = { module = "androidx.compose.material:material-icons-extended" }
 compose-material3 = { module = "androidx.compose.material3:material3" }
-compose-material3-window-size = { module = "androidx.compose.material3:material3-window-size-class-android" }
+compose-material3-adaptive = "androidx.compose.material3.adaptive:adaptive:1.2.0-alpha09" # Using alpha version until breakpoint APIs are available
 compose-runtime = { module = "androidx.compose.runtime:runtime" }
 compose-rxjava2 = { module = "androidx.compose.runtime:runtime-rxjava2" }
 compose-ui = { module = "androidx.compose.ui:ui" }
@@ -146,6 +147,12 @@ lifecycle-reactivestreams-ktx = { module = "androidx.lifecycle:lifecycle-reactiv
 lifecycle-runtime-compose = { module = "androidx.lifecycle:lifecycle-runtime-compose", version.ref = "lifecycle" }
 lifecycle-runtime-testing = { module = "androidx.lifecycle:lifecycle-runtime-testing", version.ref = "lifecycle" }
 lifecycle-viewmodel-compose = { module = "androidx.lifecycle:lifecycle-viewmodel-compose", version.ref = "lifecycle" }
+
+# Linting
+# CLI included to be picked up by dependencies update automation
+ktlint-cli = { module = "com.pinterest.ktlint:ktlint-cli", version.ref = "ktlint"}
+ktlint-compose-rules = { module = "io.nlopez.compose.rules:ktlint", version.ref = "ktlint-compose-rules"}
+security-lint = { module = "com.android.security.lint:lint", version.ref = "security-lint" }
 
 # Lottie
 lottie = { module = "com.airbnb.android:lottie", version.ref = "lottie" }
@@ -255,7 +262,7 @@ androidx-car = "androidx.car.app:app:1.4.0"
 androidx-cardview = "androidx.cardview:cardview:1.0.0"
 androidx-constraintlayout = "androidx.constraintlayout:constraintlayout:2.2.1"
 androidx-core-ktx = "androidx.core:core-ktx:1.16.0"
-androidx-mediarouter = "androidx.mediarouter:mediarouter:1.8.0"
+androidx-mediarouter = "androidx.mediarouter:mediarouter:1.8.1"
 androidx-palette = "androidx.palette:palette:1.0.0"
 androidx-preference-ktx = "androidx.preference:preference-ktx:1.2.1"
 androidx-recyclerview = "androidx.recyclerview:recyclerview:1.4.0"
@@ -267,7 +274,7 @@ capturable = "dev.shreyaspatil:capturable:3.0.1"
 compose-webview = "io.github.kevinnzou:compose-webview:0.33.6"
 desugar-jdk = "com.android.tools:desugar_jdk_libs:2.1.5"
 device-names = "com.jaredrummler:android-device-names:2.1.1"
-encryptedlogging = "com.automattic:encryptedlogging:0.0.2"
+encryptedlogging = "com.automattic:encryptedlogging:1.0.0"
 engage = "com.google.android.engage:engage-core:1.5.8"
 flexbox = "com.google.android.flexbox:flexbox:3.0.0"
 guava = "com.google.guava:guava:33.4.8-android" # Required to fix conflict between versions in exoplayer and workmanager
@@ -284,7 +291,6 @@ play-review = "com.google.android.play:review-ktx:2.0.2"
 play-wearable = "com.google.android.gms:play-services-wearable:19.0.0"
 reorderable = "sh.calvin.reorderable:reorderable:2.5.1"
 robolectric = "org.robolectric:robolectric:4.15.1"
-security-lint = { module = "com.android.security.lint:lint", version.ref = "security-lint" }
 timber = "com.jakewharton.timber:timber:5.0.1"
 turbine = "app.cash.turbine:turbine:1.2.1"
 
@@ -303,5 +309,5 @@ measure-builds = { id = "com.automattic.android.measure-builds", version.ref = "
 protobuf = { id = "com.google.protobuf", version.ref = "protobuf-plugin" }
 room = { id = "androidx.room", version.ref = "room" }
 sentry = { id = "io.sentry.android.gradle", version.ref = "sentry-plugin" }
-spotless = "com.diffplug.spotless:7.0.4"
+spotless = "com.diffplug.spotless:7.1.0"
 compose-compiler = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }

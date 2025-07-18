@@ -93,8 +93,8 @@ fun HelpPage(
     modifier: Modifier = Modifier,
     appBarInsets: WindowInsets = AppBarDefaults.topAppBarWindowInsets,
     viewModel: HelpViewModel = hiltViewModel(),
-    onWebViewCreated: (WebView) -> Unit = {},
-    onWebViewDisposed: (WebView) -> Unit = {},
+    onWebViewCreate: (WebView) -> Unit = {},
+    onWebViewDispose: (WebView) -> Unit = {},
 ) {
     val scope = rememberCoroutineScope()
     var isExportingDatabase by remember { mutableStateOf(false) }
@@ -146,8 +146,8 @@ fun HelpPage(
                 }
             },
             onGoBack = onGoBack,
-            onWebViewCreated = onWebViewCreated,
-            onWebViewDisposed = onWebViewDisposed,
+            onWebViewCreate = onWebViewCreate,
+            onWebViewDispose = onWebViewDispose,
             modifier = Modifier.fillMaxSize(),
         )
 
@@ -173,8 +173,8 @@ private fun HelpPage(
     onShowStatusPage: () -> Unit,
     onExportDatabase: () -> Unit,
     onGoBack: () -> Unit,
-    onWebViewCreated: (WebView) -> Unit,
-    onWebViewDisposed: (WebView) -> Unit,
+    onWebViewCreate: (WebView) -> Unit,
+    onWebViewDispose: (WebView) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Box(
@@ -196,8 +196,8 @@ private fun HelpPage(
                 onSendFeedbackEmail = onSendFeedbackEmail,
                 onContactSupport = onContactSupport,
                 onTapUri = onTapUri,
-                onWebViewCreated = onWebViewCreated,
-                onWebViewDisposed = onWebViewDisposed,
+                onWebViewCreate = onWebViewCreate,
+                onWebViewDispose = onWebViewDispose,
                 modifier = Modifier
                     .weight(1f)
                     .zIndex(1f),
@@ -216,10 +216,10 @@ private fun HelpPage(
 
 @Composable
 private fun AppBar(
+    windowInsets: WindowInsets,
     onGoBack: () -> Unit,
     onShowActions: () -> Unit,
     modifier: Modifier = Modifier,
-    windowInsets: WindowInsets,
 ) {
     ThemedTopAppBar(
         modifier = modifier.fillMaxWidth(),
@@ -345,8 +345,8 @@ private fun HelpWebViewContainer(
     onSendFeedbackEmail: () -> Unit,
     onContactSupport: () -> Unit,
     onTapUri: (Uri) -> Unit,
-    onWebViewCreated: (WebView) -> Unit,
-    onWebViewDisposed: (WebView) -> Unit,
+    onWebViewCreate: (WebView) -> Unit,
+    onWebViewDispose: (WebView) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Box(
@@ -389,8 +389,8 @@ private fun HelpWebViewContainer(
             onContactSupport = onContactSupport,
             onTapUri = onTapUri,
             onLoadUrl = { initialUrl = it },
-            onWebViewCreated = onWebViewCreated,
-            onWebViewDisposed = onWebViewDisposed,
+            onWebViewCreate = onWebViewCreate,
+            onWebViewDispose = onWebViewDispose,
             modifier = Modifier
                 .fillMaxSize()
                 .alpha(alpha),
@@ -470,8 +470,8 @@ private fun HelpWebView(
     onContactSupport: () -> Unit,
     onTapUri: (Uri) -> Unit,
     onLoadUrl: (String) -> Unit,
-    onWebViewCreated: (WebView) -> Unit,
-    onWebViewDisposed: (WebView) -> Unit,
+    onWebViewCreate: (WebView) -> Unit,
+    onWebViewDispose: (WebView) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val backgroundColor = MaterialTheme.theme.colors.primaryUi01
@@ -494,9 +494,9 @@ private fun HelpWebView(
                 domStorageEnabled = true
                 textZoom = 100
             }
-            onWebViewCreated(webView)
+            onWebViewCreate(webView)
         },
-        onDispose = onWebViewDisposed,
+        onDispose = onWebViewDispose,
     )
 }
 

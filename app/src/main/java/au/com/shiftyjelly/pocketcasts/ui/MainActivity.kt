@@ -121,6 +121,7 @@ import au.com.shiftyjelly.pocketcasts.player.view.bookmark.BookmarkActivityContr
 import au.com.shiftyjelly.pocketcasts.player.view.bookmark.BookmarksContainerFragment
 import au.com.shiftyjelly.pocketcasts.player.view.dialog.MiniPlayerDialog
 import au.com.shiftyjelly.pocketcasts.player.view.video.VideoActivity
+import au.com.shiftyjelly.pocketcasts.playlists.PlaylistsFragment
 import au.com.shiftyjelly.pocketcasts.podcasts.view.ProfileEpisodeListFragment
 import au.com.shiftyjelly.pocketcasts.podcasts.view.episode.EpisodeContainerFragment
 import au.com.shiftyjelly.pocketcasts.podcasts.view.folders.SuggestedFoldersFragment
@@ -145,8 +146,8 @@ import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackState
 import au.com.shiftyjelly.pocketcasts.repositories.playback.UpNextSource
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
-import au.com.shiftyjelly.pocketcasts.repositories.podcast.PlaylistManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
+import au.com.shiftyjelly.pocketcasts.repositories.podcast.SmartPlaylistManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.UserEpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.refresh.RefreshPodcastsTask
 import au.com.shiftyjelly.pocketcasts.repositories.shortcuts.PocketCastsShortcuts
@@ -247,7 +248,7 @@ class MainActivity :
     lateinit var podcastManager: PodcastManager
 
     @Inject
-    lateinit var playlistManager: PlaylistManager
+    lateinit var smartPlaylistManager: SmartPlaylistManager
 
     @Inject
     lateinit var episodeManager: EpisodeManager
@@ -370,9 +371,7 @@ class MainActivity :
     private fun checkForNotificationPermission(onPermissionGranted: () -> Unit = {}) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             when {
-                ContextCompat.checkSelfPermission(
-                    this, Manifest.permission.POST_NOTIFICATIONS,
-                ) == PackageManager.PERMISSION_GRANTED -> {
+                ContextCompat.checkSelfPermission(this, Manifest.permission.POST_NOTIFICATIONS) == PackageManager.PERMISSION_GRANTED -> {
                     onPermissionGranted()
                 }
 
@@ -426,7 +425,7 @@ class MainActivity :
         setContentView(binding.root)
         checkForNotificationPermission()
 
-        ViewCompat.setOnApplyWindowInsetsListener(binding.root) { view, windowInsets ->
+        ViewCompat.setOnApplyWindowInsetsListener(binding.root) { _, windowInsets ->
             val insets = windowInsets.getInsets(WindowInsetsCompat.Type.systemBars() or WindowInsetsCompat.Type.displayCutout())
             binding.root.updatePadding(left = insets.left, right = insets.right)
             binding.bottomNavigation.updatePadding(bottom = insets.bottom)
@@ -439,6 +438,13 @@ class MainActivity :
                 peekHeight = miniPlayerHeight + view.height
             }
         }
+
+        val menuId = if (FeatureFlag.isEnabled(Feature.PLAYLISTS_REBRANDING, immutable = true)) {
+            VR.menu.navigation_playlists
+        } else {
+            VR.menu.navigation
+        }
+        binding.bottomNavigation.inflateMenu(menuId)
 
         lifecycleScope.launch {
             lifecycle.repeatOnLifecycle(Lifecycle.State.CREATED) {
@@ -457,7 +463,14 @@ class MainActivity :
         var selectedTab = settings.selectedTab()
         val tabs = buildMap {
             put(VR.id.navigation_podcasts) { FragmentInfo(PodcastsFragment(), true) }
-            put(VR.id.navigation_filters) { FragmentInfo(FiltersFragment(), true) }
+            put(VR.id.navigation_filters) {
+                val fragment = if (FeatureFlag.isEnabled(Feature.PLAYLISTS_REBRANDING, immutable = true)) {
+                    PlaylistsFragment()
+                } else {
+                    FiltersFragment()
+                }
+                FragmentInfo(fragment, true)
+            }
             put(VR.id.navigation_discover) { FragmentInfo(DiscoverFragment(), false) }
             put(VR.id.navigation_profile) { FragmentInfo(ProfileFragment(), true) }
             put(VR.id.navigation_upnext) {
@@ -667,7 +680,7 @@ class MainActivity :
 
         lifecycleScope.launch {
             PocketCastsShortcuts.update(
-                playlistManager = playlistManager,
+                smartPlaylistManager = smartPlaylistManager,
                 force = true,
                 context = this@MainActivity,
                 source = PocketCastsShortcuts.Source.REFRESH_APP,
@@ -827,7 +840,7 @@ class MainActivity :
                             onClick = {
                                 showStoriesOrAccount(StoriesSource.MODAL.value)
                             },
-                            onExpanded = {
+                            onExpand = {
                                 analyticsTracker.track(
                                     AnalyticsEvent.END_OF_YEAR_MODAL_SHOWN,
                                     mapOf("year" to EndOfYearManager.YEAR_TO_SYNC.value),
@@ -1405,7 +1418,7 @@ class MainActivity :
                 }
                 is ShowFilterDeepLink -> {
                     launch(Dispatchers.Default) {
-                        playlistManager.findByIdBlocking(deepLink.filterId)?.let {
+                        smartPlaylistManager.findByIdBlocking(deepLink.filterId)?.let {
                             withContext(Dispatchers.Main) {
                                 settings.setSelectedFilter(it.uuid)
                                 // HACK: Go diving to find if a filter fragment

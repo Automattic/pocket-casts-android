@@ -1,6 +1,10 @@
 7.94
 -----
-
+*   Bug Fixes
+    *   Fix player's playback position being incorrect after app restart
+        ([#4208](https://github.com/Automattic/pocket-casts-android/pull/4208))
+    *   Fix icon colors of the upgrade account banner
+        ([#4246](https://github.com/Automattic/pocket-casts-android/pull/4246))
 
 7.93
 -----

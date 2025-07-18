@@ -31,8 +31,8 @@ import au.com.shiftyjelly.pocketcasts.localization.R as LR
 fun PodcastSelectGrid(
     podcasts: List<Podcast>,
     selectedPodcasts: Set<Podcast>,
-    onPodcastSelected: (Podcast) -> Unit,
-    onPodcastUnselected: (Podcast) -> Unit,
+    onSelectPodcast: (Podcast) -> Unit,
+    onDeselectPodcast: (Podcast) -> Unit,
     onSelectAll: () -> Unit,
     onSelectNone: () -> Unit,
     modifier: Modifier = Modifier,
@@ -45,14 +45,14 @@ fun PodcastSelectGrid(
             contentPadding = PaddingValues(16.dp),
             verticalArrangement = Arrangement.spacedBy(8.dp),
             horizontalArrangement = Arrangement.spacedBy(8.dp),
-            modifier = modifier.weight(1f),
+            modifier = Modifier.weight(1f),
         ) {
             items(items = podcasts) { podcast ->
                 PodcastSelectImage(
                     podcast = podcast,
                     selected = selectedPodcasts.contains(podcast),
-                    onPodcastSelected = { onPodcastSelected(podcast) },
-                    onPodcastUnselected = { onPodcastUnselected(podcast) },
+                    onSelectPodcast = { onSelectPodcast(podcast) },
+                    onDeselectPodcast = { onDeselectPodcast(podcast) },
                 )
             }
         }
@@ -73,7 +73,10 @@ private fun SelectGridFooter(
     onSelectNone: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    Row(modifier = modifier.padding(top = 4.dp, start = 16.dp, bottom = 4.dp, end = 8.dp), verticalAlignment = Alignment.CenterVertically) {
+    Row(
+        verticalAlignment = Alignment.CenterVertically,
+        modifier = modifier.padding(top = 4.dp, start = 16.dp, bottom = 4.dp, end = 8.dp),
+    ) {
         val amountSelected = when (selectedPodcasts.size) {
             podcasts.size -> stringResource(LR.string.podcasts_share_all_selected)
             else -> stringResource(LR.string.podcasts_share_selected, selectedPodcasts.size)
@@ -92,7 +95,7 @@ private fun SelectGridFooter(
                     onSelectAll()
                 }
             },
-            modifier = modifier.padding(8.dp),
+            modifier = Modifier.padding(8.dp),
         )
     }
 }
@@ -105,8 +108,8 @@ private fun PodcastSelectListPreview() {
             PodcastSelectGrid(
                 podcasts = listOf(Podcast(uuid = "e7a6f7d0-02f2-0133-1c51-059c869cc4eb"), Podcast(uuid = "3782b780-0bc5-012e-fb02-00163e1b201c")),
                 selectedPodcasts = setOf(Podcast(uuid = "3782b780-0bc5-012e-fb02-00163e1b201c")),
-                onPodcastSelected = {},
-                onPodcastUnselected = {},
+                onSelectPodcast = {},
+                onDeselectPodcast = {},
                 onSelectAll = {},
                 onSelectNone = {},
             )

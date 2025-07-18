@@ -49,11 +49,12 @@ import au.com.shiftyjelly.pocketcasts.localization.R as LR
 @Composable
 fun OnboardingForgotPasswordPage(
     theme: Theme.ThemeType,
-    onBackPressed: () -> Unit,
-    onCompleted: () -> Unit,
+    onBackPress: () -> Unit,
+    onComplete: () -> Unit,
     onUpdateSystemBars: (SystemBarsStyles) -> Unit,
+    modifier: Modifier = Modifier,
+    viewModel: OnboardingForgotPasswordViewModel = hiltViewModel(),
 ) {
-    val viewModel = hiltViewModel<OnboardingForgotPasswordViewModel>()
     val state by viewModel.stateFlow.collectAsState()
 
     val emailFocusRequester = remember { FocusRequester() }
@@ -66,7 +67,7 @@ fun OnboardingForgotPasswordPage(
             context,
             context.getString(LR.string.profile_reset_password_sent),
             context.getString(LR.string.profile_reset_password_check_email),
-            onComplete = onCompleted,
+            onComplete = onComplete,
         )
     }
 
@@ -76,7 +77,7 @@ fun OnboardingForgotPasswordPage(
         viewModel.onShown()
     }
 
-    LaunchedEffect(Unit) {
+    LaunchedEffect(onUpdateSystemBars) {
         emailFocusRequester.requestFocus()
         // Use secondaryUI01 so the status bar matches the ThemedTopAppBar
         val statusBar = SystemBarStyle.custom(pocketCastsTheme.colors.secondaryUi01, theme.toolbarLightIcons)
@@ -85,11 +86,11 @@ fun OnboardingForgotPasswordPage(
     }
     BackHandler {
         viewModel.onBackPressed()
-        onBackPressed()
+        onBackPress()
     }
 
     Column(
-        Modifier
+        modifier
             .windowInsetsPadding(WindowInsets.statusBars)
             .windowInsetsPadding(WindowInsets.navigationBars)
             .windowInsetsPadding(WindowInsets.ime),
@@ -98,7 +99,7 @@ fun OnboardingForgotPasswordPage(
             title = stringResource(LR.string.profile_reset_password),
             onNavigationClick = {
                 viewModel.onBackPressed()
-                onBackPressed()
+                onBackPress()
             },
         )
 
@@ -149,8 +150,8 @@ private fun OnboardingForgotPasswordPreview(
     AppThemeWithBackground(themeType) {
         OnboardingForgotPasswordPage(
             theme = themeType,
-            onBackPressed = {},
-            onCompleted = {},
+            onBackPress = {},
+            onComplete = {},
             onUpdateSystemBars = {},
         )
     }

@@ -12,7 +12,8 @@ import javax.inject.Inject
 @HiltViewModel
 class ViewModelConfigQueryUpNext @Inject constructor(
     application: Application,
-) : ViewModelBase<InputQueryUpNext, Array<OutputQueryEpisodes>, ActionHelperQueryUpNext>(application), TaskerPluginConfig<InputQueryUpNext> {
+) : ViewModelBase<InputQueryUpNext, Array<OutputQueryEpisodes>, ActionHelperQueryUpNext>(application),
+    TaskerPluginConfig<InputQueryUpNext> {
     override fun getNewHelper(pluginConfig: TaskerPluginConfig<InputQueryUpNext>) = ActionHelperQueryUpNext(pluginConfig)
     override val inputFields: List<InputFieldBase<*>> = listOf()
 }

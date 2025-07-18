@@ -14,29 +14,29 @@ sealed interface AutoPlaySource {
         override val id get() = uuid
     }
 
-    data object Downloads : AutoPlaySource {
-        override val id = "downloads"
-    }
-
-    data object Files : AutoPlaySource {
-        override val id = "files"
-    }
-
-    data object Starred : AutoPlaySource {
-        override val id = "starred"
-    }
-
-    data object None : AutoPlaySource {
-        override val id = ""
+    enum class Predefined(
+        override val id: String,
+    ) : AutoPlaySource {
+        Downloads(
+            id = "downloads",
+        ),
+        Files(
+            id = "files",
+        ),
+        Starred(
+            id = "starred",
+        ),
+        None(
+            id = "",
+        ),
     }
 
     companion object {
-        private val Constants = listOf(None, Downloads, Files, Starred)
-
-        fun fromId(id: String) = when {
-            runCatching { UUID.fromString(id) }.isSuccess -> PodcastOrFilter(id)
-            else -> Constants.find { it.id == id } ?: None
-        }
+        fun fromId(id: String) = runCatching { UUID.fromString(id) }
+            .map { PodcastOrFilter(id) }
+            .recover { Predefined.entries.find { it.id == id } }
+            .getOrNull()
+            ?: Predefined.None
 
         fun fromServerId(id: String) = fromId(id)
     }

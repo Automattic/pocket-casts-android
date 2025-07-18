@@ -9,13 +9,13 @@ import androidx.navigation.compose.navigation
 import androidx.wear.compose.navigation.composable
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount
 
-const val authenticationSubGraph = "authentication_graph"
+const val AUTHENTICATION_SUB_GRAPH = "authentication_graph"
 
 private object AuthenticationNavRoutes {
-    const val loginScreen = "login_screen"
-    const val loginWithGoogle = "login_with_google"
-    const val loginWithPhone = "login_with_phone"
-    const val loginWithEmail = "login_with_email"
+    const val LOGIN_SCREEN = "login_screen"
+    const val LOGIN_WITH_GOOGLE = "login_with_google"
+    const val LOGIN_WITH_PHONE = "login_with_phone"
+    const val LOGIN_WITH_EMAIL = "login_with_email"
 }
 
 fun NavGraphBuilder.authenticationNavGraph(
@@ -24,27 +24,27 @@ fun NavGraphBuilder.authenticationNavGraph(
     googleSignInSuccessScreen: @Composable (GoogleSignInAccount?) -> Unit,
 ) {
     navigation(
-        startDestination = AuthenticationNavRoutes.loginScreen,
-        route = authenticationSubGraph,
+        startDestination = AuthenticationNavRoutes.LOGIN_SCREEN,
+        route = AUTHENTICATION_SUB_GRAPH,
     ) {
         composable(
-            route = AuthenticationNavRoutes.loginScreen,
+            route = AuthenticationNavRoutes.LOGIN_SCREEN,
         ) {
             LoginScreen(
                 onLoginWithGoogleClick = {
-                    navController.navigate(AuthenticationNavRoutes.loginWithGoogle)
+                    navController.navigate(AuthenticationNavRoutes.LOGIN_WITH_GOOGLE)
                 },
                 onLoginWithPhoneClick = {
-                    navController.navigate(AuthenticationNavRoutes.loginWithPhone)
+                    navController.navigate(AuthenticationNavRoutes.LOGIN_WITH_PHONE)
                 },
                 onLoginWithEmailClick = {
-                    navController.navigate(AuthenticationNavRoutes.loginWithEmail)
+                    navController.navigate(AuthenticationNavRoutes.LOGIN_WITH_EMAIL)
                 },
             )
         }
 
         composable(
-            route = AuthenticationNavRoutes.loginWithEmail,
+            route = AuthenticationNavRoutes.LOGIN_WITH_EMAIL,
         ) {
             LoginWithEmailScreen(
                 onSignInSuccess = onEmailSignInSuccess,
@@ -52,19 +52,19 @@ fun NavGraphBuilder.authenticationNavGraph(
         }
 
         composable(
-            route = AuthenticationNavRoutes.loginWithPhone,
+            route = AuthenticationNavRoutes.LOGIN_WITH_PHONE,
         ) {
             LoginWithPhoneScreen(
-                onDone = { navController.popBackStack() },
+                onLoginClick = { navController.popBackStack() },
             )
         }
 
         composable(
-            route = AuthenticationNavRoutes.loginWithGoogle,
+            route = AuthenticationNavRoutes.LOGIN_WITH_GOOGLE,
         ) {
             LoginWithGoogleScreen(
                 signInSuccessScreen = googleSignInSuccessScreen,
-                onAuthCanceled = { navController.popBackStack() },
+                onCancel = { navController.popBackStack() },
             )
         }
     }

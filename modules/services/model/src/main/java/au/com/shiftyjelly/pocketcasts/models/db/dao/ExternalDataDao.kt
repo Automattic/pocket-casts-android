@@ -244,9 +244,9 @@ abstract class ExternalDataDao {
           :limit
         """,
     )
-    protected abstract fun _observerUpNexteQueue(limit: Int): Flow<List<ExternalPodcastOrUserEpisode>>
+    protected abstract fun observeRawUpNextQueue(limit: Int): Flow<List<ExternalPodcastOrUserEpisode>>
 
-    final fun observeUpNextQueue(limit: Int) = _observerUpNexteQueue(limit).map { queue ->
+    final fun observeUpNextQueue(limit: Int) = observeRawUpNextQueue(limit).map { queue ->
         queue.mapNotNull { it.toExternalEpisode() }
     }
 }

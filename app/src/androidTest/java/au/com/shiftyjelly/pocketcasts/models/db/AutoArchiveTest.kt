@@ -105,7 +105,7 @@ class AutoArchiveTest {
     }
 
     private fun upNextQueueFor(db: AppDatabase, episodeManager: EpisodeManager): UpNextQueue {
-        val settings = mock<Settings>() {
+        val settings = mock<Settings> {
             on { autoDownloadUpNext } doReturn UserSetting.Mock(false, mock())
         }
         val context = mock<Context>()

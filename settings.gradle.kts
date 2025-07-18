@@ -92,7 +92,7 @@ include(":modules:services:sharedtest")
 val developerProperties = loadPropertiesFromFile(File("${rootDir.path}/developer.properties"))
 val secretsFile = File("${rootDir.path}/secret.properties")
 val secretProperties = loadPropertiesFromFile(secretsFile)
-val USE_REMOTE_BUILD_CACHE_LOCALLY = "use_remote_build_cache_locally"
+val useRemoteBuildCacheLocally = "use_remote_build_cache_locally"
 
 buildCache {
     if (System.getenv("CI")?.toBoolean() == true) {
@@ -106,7 +106,7 @@ buildCache {
                 password = System.getenv("GRADLE_CACHE_NODE_PASSWORD")
             }
         }
-    } else if (developerProperties.getProperty(USE_REMOTE_BUILD_CACHE_LOCALLY).toBoolean()) {
+    } else if (developerProperties.getProperty(useRemoteBuildCacheLocally).toBoolean()) {
 
         checkForRemoteBuildCacheOptimizedExperience()
 
@@ -125,7 +125,7 @@ buildCache {
 
 private fun checkForRemoteBuildCacheOptimizedExperience() {
     assertSecretsApplied()
-    assertJava17Amazon()
+    assertJava21Amazon()
 }
 
 private fun assertSecretsApplied() {
@@ -134,10 +134,10 @@ private fun assertSecretsApplied() {
     }
 }
 
-private fun assertJava17Amazon() {
+private fun assertJava21Amazon() {
     val version = System.getProperty("java.version")
     val vendor = System.getProperty("java.vendor")
-    val expectedJdkVersion = "17.0.14"
+    val expectedJdkVersion = "21.0.6"
 
     if (!(version.contains(expectedJdkVersion) && vendor.contains("amazon", ignoreCase = true))) {
         logger.error("Java version: $version, vendor: $vendor")

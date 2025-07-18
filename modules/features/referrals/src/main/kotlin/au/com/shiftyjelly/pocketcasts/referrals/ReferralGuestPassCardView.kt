@@ -106,9 +106,9 @@ fun ReferralGuestPassCardView(
     }
 }
 
-@Preview(device = Devices.PortraitRegular)
+@Preview(device = Devices.PORTRAIT_REGULAR)
 @Composable
-fun ReferralPassCardSendViewPreview() {
+private fun ReferralPassCardSendViewPreview() {
     ReferralGuestPassCardView(
         referralPlan = SubscriptionPlans.Preview
             .findOfferPlan(SubscriptionTier.Plus, BillingCycle.Yearly, SubscriptionOffer.Referral)
@@ -119,9 +119,9 @@ fun ReferralPassCardSendViewPreview() {
     )
 }
 
-@Preview(device = Devices.PortraitRegular)
+@Preview(device = Devices.PORTRAIT_REGULAR)
 @Composable
-fun ReferralPassCardProfileBannerViewPreview() {
+private fun ReferralPassCardProfileBannerViewPreview() {
     ReferralGuestPassCardView(
         referralPlan = SubscriptionPlans.Preview
             .findOfferPlan(SubscriptionTier.Plus, BillingCycle.Yearly, SubscriptionOffer.Referral)

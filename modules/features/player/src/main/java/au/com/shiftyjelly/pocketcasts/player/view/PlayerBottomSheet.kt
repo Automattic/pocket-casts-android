@@ -33,7 +33,9 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 
 @AndroidEntryPoint
-class PlayerBottomSheet @JvmOverloads constructor(context: Context, attrs: AttributeSet? = null) : FrameLayout(context, attrs), CoroutineScope {
+class PlayerBottomSheet @JvmOverloads constructor(context: Context, attrs: AttributeSet? = null) :
+    FrameLayout(context, attrs),
+    CoroutineScope {
 
     @Inject lateinit var analyticsTracker: AnalyticsTracker
 
@@ -51,7 +53,9 @@ class PlayerBottomSheet @JvmOverloads constructor(context: Context, attrs: Attri
     var listener: PlayerBottomSheetListener? = null
     var isDragEnabled: Boolean
         get() = sheetBehavior?.isDraggable == true
-        set(value) { sheetBehavior?.isDraggable = value }
+        set(value) {
+            sheetBehavior?.isDraggable = value
+        }
 
     private var hasLoadedFirstTime = false
 

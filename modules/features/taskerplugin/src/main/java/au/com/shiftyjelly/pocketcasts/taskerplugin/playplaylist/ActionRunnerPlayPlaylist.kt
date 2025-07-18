@@ -5,7 +5,7 @@ import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.localization.R
 import au.com.shiftyjelly.pocketcasts.taskerplugin.base.hilt.episodeManager
 import au.com.shiftyjelly.pocketcasts.taskerplugin.base.hilt.playbackManager
-import au.com.shiftyjelly.pocketcasts.taskerplugin.base.hilt.playlistManager
+import au.com.shiftyjelly.pocketcasts.taskerplugin.base.hilt.smartPlaylistManager
 import com.joaomgcd.taskerpluginlibrary.action.TaskerPluginRunnerActionNoOutput
 import com.joaomgcd.taskerpluginlibrary.input.TaskerInput
 import com.joaomgcd.taskerpluginlibrary.runner.TaskerPluginResult
@@ -21,7 +21,7 @@ class ActionRunnerPlayPlaylist : TaskerPluginRunnerActionNoOutput<InputPlayPlayl
     override fun run(context: Context, input: TaskerInput<InputPlayPlaylist>): TaskerPluginResult<Unit> {
         val title = input.regular.title ?: return TaskerPluginResultError(ERROR_NO_TITLE_PROVIDED, context.getString(R.string.must_provide_filter_name))
         val playbackManager = context.playbackManager
-        val playlistManager = context.playlistManager
+        val playlistManager = context.smartPlaylistManager
         val episodeManager = context.episodeManager
 
         playbackManager.upNextQueue.removeAll()

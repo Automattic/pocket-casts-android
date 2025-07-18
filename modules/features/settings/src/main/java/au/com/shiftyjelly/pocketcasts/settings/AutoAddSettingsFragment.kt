@@ -43,7 +43,9 @@ import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 @AndroidEntryPoint
-class AutoAddSettingsFragment : BaseFragment(), PodcastSelectFragment.Listener {
+class AutoAddSettingsFragment :
+    BaseFragment(),
+    PodcastSelectFragment.Listener {
     @Inject lateinit var settings: Settings
 
     private var _binding: FragmentAutoAddSettingsBinding? = null

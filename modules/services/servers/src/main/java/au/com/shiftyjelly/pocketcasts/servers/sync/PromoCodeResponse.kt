@@ -6,13 +6,13 @@ import java.util.Date
 
 @JsonClass(generateAdapter = true)
 data class PromoCodeRequest(
-    @field:Json(name = "code") val code: String,
+    @Json(name = "code") val code: String,
 )
 
 @JsonClass(generateAdapter = true)
 data class PromoCodeResponse(
-    @field:Json(name = "code") val code: String,
-    @field:Json(name = "description") val description: String,
-    @field:Json(name = "starts_at") val startsAt: Date,
-    @field:Json(name = "ends_at") val endsAt: Date,
+    @Json(name = "code") val code: String,
+    @Json(name = "description") val description: String,
+    @Json(name = "starts_at") val startsAt: Date,
+    @Json(name = "ends_at") val endsAt: Date,
 )

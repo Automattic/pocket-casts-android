@@ -40,7 +40,7 @@ import au.com.shiftyjelly.pocketcasts.localization.R as LR
 import au.com.shiftyjelly.pocketcasts.settings.R as SR
 
 object SettingsScreen {
-    const val route = "settings_screen"
+    const val ROUTE = "settings_screen"
 }
 
 @Composable
@@ -49,25 +49,27 @@ fun SettingsScreen(
     navigateToPrivacySettings: () -> Unit,
     navigateToAbout: () -> Unit,
     navigateToHelp: () -> Unit,
+    modifier: Modifier = Modifier,
+    viewModel: SettingsViewModel = hiltViewModel(),
 ) {
-    val viewModel = hiltViewModel<SettingsViewModel>()
     val state by viewModel.state.collectAsState()
     val scrollState = rememberColumnState()
 
     ScreenScaffold(
         scrollState = scrollState,
+        modifier = modifier,
     ) {
         Content(
             scrollState = scrollState,
             state = state,
-            onWarnOnMeteredChanged = { viewModel.setWarnOnMeteredNetwork(it) },
-            onRefreshInBackgroundChanged = { viewModel.setRefreshPodcastsInBackground(it) },
+            onWarnOnMeteredChange = { viewModel.setWarnOnMeteredNetwork(it) },
+            onRefreshInBackgroundChange = { viewModel.setRefreshPodcastsInBackground(it) },
             signInClick = signInClick,
-            onSignOutClicked = viewModel::signOut,
-            onRefreshClicked = viewModel::refresh,
-            onPrivacyClicked = navigateToPrivacySettings,
-            onAboutClicked = navigateToAbout,
-            onHelpClicked = navigateToHelp,
+            onSignOutClick = viewModel::signOut,
+            onRefreshClick = viewModel::refresh,
+            onPrivacyClick = navigateToPrivacySettings,
+            onAboutClick = navigateToAbout,
+            onHelpClick = navigateToHelp,
         )
     }
 }
@@ -76,14 +78,14 @@ fun SettingsScreen(
 private fun Content(
     scrollState: ScalingLazyColumnState,
     state: SettingsViewModel.State,
-    onWarnOnMeteredChanged: (Boolean) -> Unit,
-    onRefreshInBackgroundChanged: (Boolean) -> Unit,
+    onWarnOnMeteredChange: (Boolean) -> Unit,
+    onRefreshInBackgroundChange: (Boolean) -> Unit,
     signInClick: () -> Unit,
-    onSignOutClicked: () -> Unit,
-    onRefreshClicked: () -> Unit,
-    onPrivacyClicked: () -> Unit,
-    onAboutClicked: () -> Unit,
-    onHelpClicked: () -> Unit,
+    onSignOutClick: () -> Unit,
+    onRefreshClick: () -> Unit,
+    onPrivacyClick: () -> Unit,
+    onAboutClick: () -> Unit,
+    onHelpClick: () -> Unit,
 ) {
     ScalingLazyColumn(columnState = scrollState) {
         item {
@@ -94,7 +96,7 @@ private fun Content(
             ToggleChip(
                 label = stringResource(LR.string.settings_metered_data_warning),
                 checked = state.showDataWarning,
-                onCheckedChanged = onWarnOnMeteredChanged,
+                onToggle = onWarnOnMeteredChange,
             )
         }
 
@@ -108,7 +110,7 @@ private fun Content(
             ToggleChip(
                 label = stringResource(LR.string.settings_storage_background_refresh),
                 checked = state.refreshInBackground,
-                onCheckedChanged = onRefreshInBackgroundChanged,
+                onToggle = onRefreshInBackgroundChange,
             )
         }
 
@@ -128,7 +130,7 @@ private fun Content(
 
         item {
             val title = stringResource(LR.string.profile_refresh_now)
-            val rotation = RotationAnimation(
+            val rotation = rotationAnimation(
                 state = state.refreshState,
                 durationMillis = 800,
             )
@@ -143,7 +145,7 @@ private fun Content(
                         },
                     )
                 },
-                onClick = onRefreshClicked,
+                onClick = onRefreshClick,
             )
         }
 
@@ -151,7 +153,7 @@ private fun Content(
             WatchListChip(
                 title = stringResource(LR.string.settings_privacy_analytics),
                 iconRes = SR.drawable.whatsnew_privacy,
-                onClick = onPrivacyClicked,
+                onClick = onPrivacyClick,
             )
         }
 
@@ -163,7 +165,7 @@ private fun Content(
                         title = stringResource(LR.string.log_out),
                         secondaryLabel = signInState.email,
                         iconRes = IR.drawable.ic_signout,
-                        onClick = onSignOutClicked,
+                        onClick = onSignOutClick,
                     )
                 }
 
@@ -181,7 +183,7 @@ private fun Content(
             WatchListChip(
                 title = stringResource(LR.string.settings_title_help),
                 iconRes = IR.drawable.ic_help,
-                onClick = onHelpClicked,
+                onClick = onHelpClick,
             )
         }
 
@@ -189,14 +191,14 @@ private fun Content(
             WatchListChip(
                 title = stringResource(LR.string.settings_title_about),
                 iconRes = SR.drawable.settings_about,
-                onClick = onAboutClicked,
+                onClick = onAboutClick,
             )
         }
     }
 }
 
 @Composable
-private fun RotationAnimation(state: RefreshState?, durationMillis: Int): Animatable<Float, AnimationVector1D> {
+private fun rotationAnimation(state: RefreshState?, durationMillis: Int): Animatable<Float, AnimationVector1D> {
     val anim = remember { Animatable(0f) }
     LaunchedEffect(state, anim.isRunning) {
         if (anim.value == 360f) {
@@ -232,18 +234,20 @@ private fun RotationAnimation(state: RefreshState?, durationMillis: Int): Animat
 fun ToggleChip(
     label: String,
     checked: Boolean,
-    onCheckedChanged: (Boolean) -> Unit,
+    onToggle: (Boolean) -> Unit,
+    modifier: Modifier = Modifier,
 ) {
     val color = MaterialTheme.colors.error
     ToggleChip(
         checked = checked,
-        onCheckedChanged = { onCheckedChanged(it) },
+        onCheckedChanged = { onToggle(it) },
         label = label,
         toggleControl = ToggleChipToggleControl.Switch,
         colors = ToggleChipDefaults.toggleChipColors(
             checkedEndBackgroundColor = color.copy(alpha = 0.32f),
             checkedToggleControlColor = color,
         ),
+        modifier = modifier,
     )
 }
 
@@ -267,13 +271,13 @@ private fun SettingsScreenPreview_unchecked() {
                 refreshState = null,
             ),
             signInClick = {},
-            onWarnOnMeteredChanged = {},
-            onRefreshInBackgroundChanged = {},
-            onSignOutClicked = {},
-            onRefreshClicked = {},
-            onPrivacyClicked = {},
-            onAboutClicked = {},
-            onHelpClicked = {},
+            onWarnOnMeteredChange = {},
+            onRefreshInBackgroundChange = {},
+            onSignOutClick = {},
+            onRefreshClick = {},
+            onPrivacyClick = {},
+            onAboutClick = {},
+            onHelpClick = {},
         )
     }
 }
@@ -298,13 +302,13 @@ private fun SettingsScreenPreview_checked() {
                 refreshState = null,
             ),
             signInClick = {},
-            onWarnOnMeteredChanged = {},
-            onRefreshInBackgroundChanged = {},
-            onSignOutClicked = {},
-            onRefreshClicked = {},
-            onPrivacyClicked = {},
-            onAboutClicked = {},
-            onHelpClicked = {},
+            onWarnOnMeteredChange = {},
+            onRefreshInBackgroundChange = {},
+            onSignOutClick = {},
+            onRefreshClick = {},
+            onPrivacyClick = {},
+            onAboutClick = {},
+            onHelpClick = {},
         )
     }
 }

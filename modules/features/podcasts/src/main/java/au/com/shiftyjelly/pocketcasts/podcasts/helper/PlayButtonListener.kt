@@ -30,7 +30,8 @@ class PlayButtonListener @Inject constructor(
     private val warningsHelper: WarningsHelper,
     @ActivityContext private val activity: Context,
     private val episodeAnalytics: EpisodeAnalytics,
-) : PlayButton.OnClickListener, CoroutineScope {
+) : PlayButton.OnClickListener,
+    CoroutineScope {
     override val coroutineContext: CoroutineContext
         get() = Dispatchers.Default
 

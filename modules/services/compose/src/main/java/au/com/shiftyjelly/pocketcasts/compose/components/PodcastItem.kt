@@ -35,20 +35,22 @@ fun PodcastItem(
     onPlusClick: (() -> Unit)? = null,
     maxLines: Int = 1,
 ) {
-    Column {
+    Column(
+        modifier = modifier,
+    ) {
         Row(
             verticalAlignment = Alignment.CenterVertically,
-            modifier = modifier
+            modifier = Modifier
                 .fillMaxWidth()
                 .then(if (onClick == null) Modifier else Modifier.clickable { onClick() })
                 .padding(horizontal = 16.dp, vertical = 8.dp),
         ) {
             PodcastImage(
                 uuid = podcast.uuid,
-                modifier = modifier.size(iconSize),
+                modifier = Modifier.size(iconSize),
             )
             Column(
-                modifier = modifier
+                modifier = Modifier
                     .padding(start = 12.dp, end = 16.dp)
                     .weight(1f),
             ) {
@@ -75,7 +77,7 @@ fun PodcastItem(
                     painter = painterResource(IR.drawable.plus_simple),
                     contentDescription = stringResource(LR.string.subscribe),
                     tint = MaterialTheme.theme.colors.primaryIcon02,
-                    modifier = modifier
+                    modifier = Modifier
                         .then(if (onPlusClick == null) Modifier else Modifier.clickable { onPlusClick() }),
 
                 )

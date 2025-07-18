@@ -25,8 +25,8 @@ import okhttp3.logging.HttpLoggingInterceptor
 @InstallIn(SingletonComponent::class)
 @Module
 object InterceptorModule {
-    const val PocketCastsPublicUserAgent = "Pocket Casts"
-    const val PocketCastsInternalUserAgent = "$PocketCastsPublicUserAgent/Android/${BuildConfig.VERSION_NAME}"
+    const val PC_PUBLIC_USER_AGENT = "Pocket Casts"
+    const val PC_INTERNAL_USER_AGENT = "$PC_PUBLIC_USER_AGENT/Android/${BuildConfig.VERSION_NAME}"
 
     private val fiveMinutes = 5.minutes.inWholeSeconds
     private val cacheControlHeader = "Cache-Control"
@@ -40,13 +40,13 @@ object InterceptorModule {
 
     private val publicUserAgentInterceptor = Interceptor { chain ->
         val request = chain.request().newBuilder()
-        request.header("User-Agent", PocketCastsPublicUserAgent)
+        request.header("User-Agent", PC_PUBLIC_USER_AGENT)
         chain.proceed(request.build())
     }
 
     private val internalUserAgentInterceptor = Interceptor { chain ->
         val request = chain.request().newBuilder()
-        request.header("User-Agent", PocketCastsInternalUserAgent)
+        request.header("User-Agent", PC_INTERNAL_USER_AGENT)
         chain.proceed(request.build())
     }
 

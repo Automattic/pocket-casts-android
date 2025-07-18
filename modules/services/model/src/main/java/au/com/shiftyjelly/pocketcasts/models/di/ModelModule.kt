@@ -3,7 +3,6 @@ package au.com.shiftyjelly.pocketcasts.models.di
 import android.app.Application
 import androidx.room.Room
 import androidx.room.RoomDatabase
-import au.com.shiftyjelly.pocketcasts.model.BuildConfig
 import au.com.shiftyjelly.pocketcasts.models.db.AppDatabase
 import au.com.shiftyjelly.pocketcasts.models.db.dao.ChapterDao
 import au.com.shiftyjelly.pocketcasts.models.db.dao.EndOfYearDao
@@ -41,12 +40,8 @@ object ModelModule {
         application: Application,
         @RoomConverters converters: List<@JvmSuppressWildcards Any>,
     ): AppDatabase {
-        val databaseBuilder = Room.databaseBuilder(application, AppDatabase::class.java, "pocketcasts")
-        AppDatabase.addMigrations(databaseBuilder, application)
-        if (BuildConfig.DEBUG) {
-            databaseBuilder.fallbackToDestructiveMigration(dropAllTables = true)
-        }
-        return databaseBuilder
+        return Room.databaseBuilder(application, AppDatabase::class.java, "pocketcasts")
+            .also { builder -> AppDatabase.addMigrations(builder, application) }
             .addTypeConverters(converters)
             .build()
     }

@@ -20,8 +20,8 @@ private fun AnalyticsTracker.discoverListEvent(analyticsEvent: AnalyticsEvent, l
     track(
         event = analyticsEvent,
         properties = mapOf(
-            AnalyticsParameter.listId to listId,
-            AnalyticsParameter.listDate to listDate,
+            AnalyticsParameter.LIST_ID to listId,
+            AnalyticsParameter.LIST_DATE to listDate,
         ),
     )
 }
@@ -51,9 +51,9 @@ private fun AnalyticsTracker.discoverListPodcastEvent(analyticsEvent: AnalyticsE
     track(
         event = analyticsEvent,
         properties = mapOf(
-            AnalyticsParameter.podcastUuid to podcastUuid,
-            AnalyticsParameter.listId to listId,
-            AnalyticsParameter.listDate to listDate.orEmpty(),
+            AnalyticsParameter.PODCAST_UUID to podcastUuid,
+            AnalyticsParameter.LIST_ID to listId,
+            AnalyticsParameter.LIST_DATE to listDate.orEmpty(),
         ),
     )
 }

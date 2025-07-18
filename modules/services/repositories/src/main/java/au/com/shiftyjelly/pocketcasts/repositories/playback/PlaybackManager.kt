@@ -52,8 +52,8 @@ import au.com.shiftyjelly.pocketcasts.repositories.playback.LocalPlayer.Companio
 import au.com.shiftyjelly.pocketcasts.repositories.playback.LocalPlayer.Companion.VOLUME_NORMAL
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.ChapterManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
-import au.com.shiftyjelly.pocketcasts.repositories.podcast.PlaylistManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
+import au.com.shiftyjelly.pocketcasts.repositories.podcast.SmartPlaylistManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.UserEpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.toServerPostFile
 import au.com.shiftyjelly.pocketcasts.repositories.shownotes.ShowNotesManager
@@ -125,7 +125,7 @@ open class PlaybackManager @Inject constructor(
     private val playerManager: PlayerFactory,
     private var castManager: CastManager,
     @ApplicationContext private val application: Context,
-    private val playlistManager: PlaylistManager,
+    private val smartPlaylistManager: SmartPlaylistManager,
     private val downloadManager: DownloadManager,
     val upNextQueue: UpNextQueue,
     private val notificationHelper: NotificationHelper,
@@ -143,7 +143,9 @@ open class PlaybackManager @Inject constructor(
     private val crashLogging: CrashLogging,
     private val upNextHistoryManager: UpNextHistoryManager,
     private val notificationManager: NotificationManager,
-) : FocusManager.FocusChangeListener, AudioNoisyManager.AudioBecomingNoisyListener, CoroutineScope {
+) : FocusManager.FocusChangeListener,
+    AudioNoisyManager.AudioBecomingNoisyListener,
+    CoroutineScope {
 
     companion object {
         private const val UPDATE_EVERY = 5
@@ -215,7 +217,7 @@ open class PlaybackManager @Inject constructor(
         playbackManager = this,
         podcastManager = podcastManager,
         episodeManager = episodeManager,
-        playlistManager = playlistManager,
+        smartPlaylistManager = smartPlaylistManager,
         settings = settings,
         context = application,
         episodeAnalytics = episodeAnalytics,
@@ -396,12 +398,12 @@ open class PlaybackManager @Inject constructor(
         return settings.warnOnMeteredNetwork.value && !Network.isUnmeteredConnection(application) && lastWarnedPlayedEpisodeUuid != episodeUUID
     }
 
-    private fun shouldWarnWhenSwitchingToMeteredConnection(episodeUUID: String): Boolean =
-        settings.warnOnMeteredNetwork.value &&
-            lastWarnedPlayedEpisodeUuid != episodeUUID &&
-            (player is LocalPlayer) && // don't warn if chromecasting
-            isStreaming() &&
-            isPlaying()
+    private fun shouldWarnWhenSwitchingToMeteredConnection(episodeUUID: String): Boolean = settings.warnOnMeteredNetwork.value &&
+        lastWarnedPlayedEpisodeUuid != episodeUUID &&
+        (player is LocalPlayer) &&
+        // don't warn if chromecasting
+        isStreaming() &&
+        isPlaying()
 
     fun getPlaybackSpeed(): Double {
         return playbackStateRelay.blockingFirst().playbackSpeed
@@ -520,83 +522,82 @@ open class PlaybackManager @Inject constructor(
     // Returning null means a source should not affect the auto play behavior. Listening history is not
     // returning null because it should actively disable auto play if a user plays an episode from the
     // listening history screen.
-    private fun autoPlaySource(sourceView: SourceView, episode: BaseEpisode): AutoPlaySource? =
-        when (sourceView) {
-            SourceView.AUTO_PAUSE,
-            SourceView.AUTO_PLAY,
-            SourceView.AUTO_DOWNLOAD,
-            SourceView.CLIP_SHARING,
-            SourceView.CHROMECAST,
-            SourceView.DISCOVER,
-            SourceView.DISCOVER_PLAIN_LIST,
-            SourceView.DISCOVER_PODCAST_LIST,
-            SourceView.DISCOVER_RANKED_LIST,
-            SourceView.ENGAGE_SDK_CONTINUATION,
-            SourceView.ENGAGE_SDK_FEATURED,
-            SourceView.ENGAGE_SDK_RECOMMENDATIONS,
-            SourceView.ENGAGE_SDK_SIGN_IN,
-            SourceView.FULL_SCREEN_VIDEO,
-            SourceView.MINIPLAYER,
-            SourceView.MULTI_SELECT,
-            SourceView.ONBOARDING_RECOMMENDATIONS,
-            SourceView.ONBOARDING_RECOMMENDATIONS_SEARCH,
-            SourceView.PODCAST_LIST,
-            SourceView.PODCAST_SETTINGS,
-            SourceView.PLAYER,
-            SourceView.PLAYER_BROADCAST_ACTION,
-            SourceView.PLAYER_PLAYBACK_EFFECTS,
-            SourceView.PROFILE,
-            SourceView.EPISODE_SWIPE_ACTION,
-            SourceView.TASKER,
-            SourceView.UNKNOWN,
-            SourceView.UP_NEXT,
-            SourceView.UP_NEXT_HISTORY,
-            SourceView.FILES_SETTINGS,
-            SourceView.STATS,
-            SourceView.WHATS_NEW,
-            SourceView.ABOUT,
-            SourceView.APPEARANCE,
-            SourceView.STORAGE_AND_DATA_USAGE,
-            SourceView.NOTIFICATION_BOOKMARK,
-            SourceView.METERED_NETWORK_CHANGE,
-            SourceView.WIDGET_PLAYER_SMALL,
-            SourceView.WIDGET_PLAYER_MEDIUM,
-            SourceView.WIDGET_PLAYER_LARGE,
-            SourceView.WIDGET_PLAYER_OLD,
-            SourceView.SHARE_LIST,
-            SourceView.BOTTOM_SHELF,
-            SourceView.REFERRALS,
-            SourceView.SEARCH,
-            SourceView.SEARCH_RESULTS,
-            SourceView.NOVA_LAUNCHER_RECENTLY_PLAYED,
-            SourceView.NOVA_LAUNCHER_SUBSCRIBED_PODCASTS,
-            SourceView.NOVA_LAUNCHER_TRENDING_PODCASTS,
-            -> null
+    private fun autoPlaySource(sourceView: SourceView, episode: BaseEpisode): AutoPlaySource? = when (sourceView) {
+        SourceView.AUTO_PAUSE,
+        SourceView.AUTO_PLAY,
+        SourceView.AUTO_DOWNLOAD,
+        SourceView.CLIP_SHARING,
+        SourceView.CHROMECAST,
+        SourceView.DISCOVER,
+        SourceView.DISCOVER_PLAIN_LIST,
+        SourceView.DISCOVER_PODCAST_LIST,
+        SourceView.DISCOVER_RANKED_LIST,
+        SourceView.ENGAGE_SDK_CONTINUATION,
+        SourceView.ENGAGE_SDK_FEATURED,
+        SourceView.ENGAGE_SDK_RECOMMENDATIONS,
+        SourceView.ENGAGE_SDK_SIGN_IN,
+        SourceView.FULL_SCREEN_VIDEO,
+        SourceView.MINIPLAYER,
+        SourceView.MULTI_SELECT,
+        SourceView.ONBOARDING_RECOMMENDATIONS,
+        SourceView.ONBOARDING_RECOMMENDATIONS_SEARCH,
+        SourceView.PODCAST_LIST,
+        SourceView.PODCAST_SETTINGS,
+        SourceView.PLAYER,
+        SourceView.PLAYER_BROADCAST_ACTION,
+        SourceView.PLAYER_PLAYBACK_EFFECTS,
+        SourceView.PROFILE,
+        SourceView.EPISODE_SWIPE_ACTION,
+        SourceView.TASKER,
+        SourceView.UNKNOWN,
+        SourceView.UP_NEXT,
+        SourceView.UP_NEXT_HISTORY,
+        SourceView.FILES_SETTINGS,
+        SourceView.STATS,
+        SourceView.WHATS_NEW,
+        SourceView.ABOUT,
+        SourceView.APPEARANCE,
+        SourceView.STORAGE_AND_DATA_USAGE,
+        SourceView.NOTIFICATION_BOOKMARK,
+        SourceView.METERED_NETWORK_CHANGE,
+        SourceView.WIDGET_PLAYER_SMALL,
+        SourceView.WIDGET_PLAYER_MEDIUM,
+        SourceView.WIDGET_PLAYER_LARGE,
+        SourceView.WIDGET_PLAYER_OLD,
+        SourceView.SHARE_LIST,
+        SourceView.BOTTOM_SHELF,
+        SourceView.REFERRALS,
+        SourceView.SEARCH,
+        SourceView.SEARCH_RESULTS,
+        SourceView.NOVA_LAUNCHER_RECENTLY_PLAYED,
+        SourceView.NOVA_LAUNCHER_SUBSCRIBED_PODCASTS,
+        SourceView.NOVA_LAUNCHER_TRENDING_PODCASTS,
+        -> null
 
-            SourceView.MEDIA_BUTTON_BROADCAST_SEARCH_ACTION,
-            SourceView.NOTIFICATION,
-            -> {
-                val source = (episode as? PodcastEpisode)?.let { AutoPlaySource.fromId(it.podcastUuid) }
-                if (source != null) {
-                    settings.trackingAutoPlaySource.set(source, updateModifiedAt = false)
-                }
-                source
+        SourceView.MEDIA_BUTTON_BROADCAST_SEARCH_ACTION,
+        SourceView.NOTIFICATION,
+        -> {
+            val source = (episode as? PodcastEpisode)?.let { AutoPlaySource.fromId(it.podcastUuid) }
+            if (source != null) {
+                settings.trackingAutoPlaySource.set(source, updateModifiedAt = false)
             }
-
-            // These screens should be setting an appropriate value for [AutomaticUpNextSource.mostRecentList]
-            // when the user views them, otherwise [AutomaticUpNextSource.create] will not return the proper
-            // value.
-            SourceView.LISTENING_HISTORY,
-            SourceView.DOWNLOADS,
-            SourceView.EPISODE_DETAILS,
-            SourceView.EPISODE_TRANSCRIPT,
-            SourceView.FILES,
-            SourceView.FILTERS,
-            SourceView.PODCAST_SCREEN,
-            SourceView.STARRED,
-            SourceView.MEDIA_BUTTON_BROADCAST_ACTION,
-            -> settings.trackingAutoPlaySource.value
+            source
         }
+
+        // These screens should be setting an appropriate value for [AutomaticUpNextSource.mostRecentList]
+        // when the user views them, otherwise [AutomaticUpNextSource.create] will not return the proper
+        // value.
+        SourceView.LISTENING_HISTORY,
+        SourceView.DOWNLOADS,
+        SourceView.EPISODE_DETAILS,
+        SourceView.EPISODE_TRANSCRIPT,
+        SourceView.FILES,
+        SourceView.FILTERS,
+        SourceView.PODCAST_SCREEN,
+        SourceView.STARRED,
+        SourceView.MEDIA_BUTTON_BROADCAST_ACTION,
+        -> settings.trackingAutoPlaySource.value
+    }
 
     suspend fun play(
         upNextPosition: UpNextPosition,
@@ -1373,21 +1374,21 @@ open class PlaybackManager @Inject constructor(
         var episodeSource = settings.lastAutoPlaySource.value.toString().lowercase()
 
         val allEpisodes: List<BaseEpisode> = when (val autoSource = settings.lastAutoPlaySource.value) {
-            is AutoPlaySource.Downloads -> episodeManager.findDownloadEpisodesRxFlowable().asFlow().firstOrNull()
-            is AutoPlaySource.Files -> cloudFilesManager.sortedCloudFiles.firstOrNull()
-            is AutoPlaySource.Starred -> episodeManager.findStarredEpisodesRxFlowable().asFlow().firstOrNull()
+            AutoPlaySource.Predefined.Downloads -> episodeManager.findDownloadEpisodesRxFlowable().asFlow().firstOrNull()
+            AutoPlaySource.Predefined.Files -> cloudFilesManager.sortedCloudFiles.firstOrNull()
+            AutoPlaySource.Predefined.Starred -> episodeManager.findStarredEpisodesRxFlowable().asFlow().firstOrNull()
+            AutoPlaySource.Predefined.None -> null
             // First check if it is a podcast uuid, then check if it is from a filter
             is AutoPlaySource.PodcastOrFilter -> {
                 episodeSource = "podcast"
                 podcastManager.findPodcastByUuidBlocking(autoSource.uuid)
                     ?.let { podcast -> autoPlayOrderForPodcastEpisodes(podcast) }
-                    ?: playlistManager.findByUuidBlocking(autoSource.uuid)
+                    ?: smartPlaylistManager.findByUuidBlocking(autoSource.uuid)
                         ?.let { playlist ->
                             episodeSource = "filter"
-                            playlistManager.findEpisodesBlocking(playlist, episodeManager, this)
+                            smartPlaylistManager.findEpisodesBlocking(playlist, episodeManager, this)
                         }
             }
-            is AutoPlaySource.None -> null
         } ?: emptyList()
 
         val allEpisodeUuids = allEpisodes.map { it.uuid }
@@ -1789,7 +1790,8 @@ open class PlaybackManager @Inject constructor(
         episodeSubscription?.dispose()
         if (!episode.isDownloaded) {
             if (!Util.isCarUiMode(application) &&
-                !Util.isWearOs(application) && // The watch handles these warnings before this is called
+                !Util.isWearOs(application) &&
+                // The watch handles these warnings before this is called
                 settings.warnOnMeteredNetwork.value &&
                 episode.uuid != lastWarnedPlayedEpisodeUuid &&
                 !Network.isUnmeteredConnection(application) &&

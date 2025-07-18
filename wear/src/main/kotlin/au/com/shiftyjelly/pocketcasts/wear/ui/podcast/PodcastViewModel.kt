@@ -29,7 +29,7 @@ class PodcastViewModel @Inject constructor(
     settings: Settings,
 ) : ViewModel() {
 
-    private val podcastUuid: String = savedStateHandle[PodcastScreen.argument] ?: ""
+    private val podcastUuid: String = savedStateHandle[PodcastScreen.ARGUMENT] ?: ""
 
     sealed class UiState {
         object Empty : UiState()

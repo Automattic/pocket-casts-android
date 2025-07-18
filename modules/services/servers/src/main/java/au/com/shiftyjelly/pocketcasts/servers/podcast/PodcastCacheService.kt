@@ -19,28 +19,28 @@ import retrofit2.http.Url
 typealias SuggestedFoldersResponse = Map<String, List<String>>
 
 @JsonClass(generateAdapter = true)
-data class SearchBody(@field:Json(name = "podcastuuid") val podcastuuid: String, @field:Json(name = "searchterm") val searchterm: String)
+data class SearchBody(@Json(name = "podcastuuid") val podcastuuid: String, @Json(name = "searchterm") val searchterm: String)
 
 @JsonClass(generateAdapter = true)
-data class SearchResultBody(@field:Json(name = "episodes") val episodes: List<SearchResult>)
+data class SearchResultBody(@Json(name = "episodes") val episodes: List<SearchResult>)
 
 @JsonClass(generateAdapter = true)
-data class SearchResult(@field:Json(name = "uuid") val uuid: String)
+data class SearchResult(@Json(name = "uuid") val uuid: String)
 
 @JsonClass(generateAdapter = true)
-data class SearchEpisodesBody(@field:Json(name = "term") val term: String)
+data class SearchEpisodesBody(@Json(name = "term") val term: String)
 
 @JsonClass(generateAdapter = true)
-data class SearchEpisodesResultBody(@field:Json(name = "episodes") val episodes: List<SearchEpisodeResult>)
+data class SearchEpisodesResultBody(@Json(name = "episodes") val episodes: List<SearchEpisodeResult>)
 
 @JsonClass(generateAdapter = true)
 data class SearchEpisodeResult(
-    @field:Json(name = "uuid") val uuid: String,
-    @field:Json(name = "title") val title: String?,
-    @field:Json(name = "duration") val duration: Double?,
-    @field:Json(name = "published_date") val publishedAt: Date?,
-    @field:Json(name = "podcast_uuid") val podcastUuid: String,
-    @field:Json(name = "podcast_title") val podcastTitle: String?,
+    @Json(name = "uuid") val uuid: String,
+    @Json(name = "title") val title: String?,
+    @Json(name = "duration") val duration: Double?,
+    @Json(name = "published_date") val publishedAt: Date?,
+    @Json(name = "podcast_uuid") val podcastUuid: String,
+    @Json(name = "podcast_title") val podcastTitle: String?,
 ) {
     fun toEpisodeItem(): EpisodeItem {
         return EpisodeItem(
@@ -56,8 +56,8 @@ data class SearchEpisodeResult(
 
 @JsonClass(generateAdapter = true)
 data class PodcastRatingsResponse(
-    @field:Json(name = "average") val average: Double?,
-    @field:Json(name = "total") val total: Int?,
+    @Json(name = "average") val average: Double?,
+    @Json(name = "total") val total: Int?,
 ) {
     fun toPodcastRatings(podcastUuid: String) = PodcastRatings(
         podcastUuid = podcastUuid,
@@ -68,7 +68,7 @@ data class PodcastRatingsResponse(
 
 @JsonClass(generateAdapter = true)
 data class SuggestedFoldersRequest(
-    @field:Json(name = "uuids") val uuids: List<String>,
+    @Json(name = "uuids") val uuids: List<String>,
 )
 
 interface PodcastCacheService {

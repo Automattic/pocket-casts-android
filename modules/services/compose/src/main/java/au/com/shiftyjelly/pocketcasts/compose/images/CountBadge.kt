@@ -147,7 +147,7 @@ sealed class CountBadgeStyle {
 @ShowkaseComposable(name = "CountBadge", group = "Images", styleName = "Small")
 @Preview(name = "Small")
 @Composable
-fun CountBadgeSmallPreview() {
+private fun CountBadgeSmallPreview() {
     CountBadgePreview(
         style = CountBadgeStyle.Small,
     )
@@ -156,7 +156,7 @@ fun CountBadgeSmallPreview() {
 @ShowkaseComposable(name = "CountBadge", group = "Images", styleName = "Medium")
 @Preview(name = "Medium")
 @Composable
-fun CountBadgeMediumPreview() {
+private fun CountBadgeMediumPreview() {
     CountBadgePreview(
         style = CountBadgeStyle.Medium,
     )
@@ -165,7 +165,7 @@ fun CountBadgeMediumPreview() {
 @ShowkaseComposable(name = "CountBadge", group = "Images", styleName = "Big")
 @Preview(name = "Big")
 @Composable
-fun CountBadgeBigPreview() {
+private fun CountBadgeBigPreview() {
     CountBadgePreview(
         style = CountBadgeStyle.Big,
     )
@@ -174,7 +174,7 @@ fun CountBadgeBigPreview() {
 @ShowkaseComposable(name = "CountBadge", group = "Images", styleName = "Custom")
 @Preview(name = "Custom")
 @Composable
-fun CountBadgeCustomPreview() {
+private fun CountBadgeCustomPreview() {
     CountBadgePreview(
         style = CountBadgeStyle.Custom(
             backgroundColor = MaterialTheme.theme.colors.primaryIcon01,

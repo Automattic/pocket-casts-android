@@ -3,39 +3,39 @@ package au.com.shiftyjelly.pocketcasts.wear.ui.settings
 import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.wear.compose.navigation.composable
-import au.com.shiftyjelly.pocketcasts.wear.ui.authentication.authenticationSubGraph
+import au.com.shiftyjelly.pocketcasts.wear.ui.authentication.AUTHENTICATION_SUB_GRAPH
 
 fun NavGraphBuilder.settingsRoutes(navController: NavController) {
     settingsUrlScreens()
 
     composable(
-        route = SettingsScreen.route,
+        route = SettingsScreen.ROUTE,
     ) {
         SettingsScreen(
-            signInClick = { navController.navigate(authenticationSubGraph) },
-            navigateToPrivacySettings = { navController.navigate(PrivacySettingsScreen.route) },
-            navigateToAbout = { navController.navigate(WearAboutScreen.route) },
-            navigateToHelp = { navController.navigate(HelpScreen.route) },
+            signInClick = { navController.navigate(AUTHENTICATION_SUB_GRAPH) },
+            navigateToPrivacySettings = { navController.navigate(PrivacySettingsScreen.ROUTE) },
+            navigateToAbout = { navController.navigate(WearAboutScreen.ROUTE) },
+            navigateToHelp = { navController.navigate(HelpScreen.ROUTE) },
         )
     }
 
     composable(
-        route = PrivacySettingsScreen.route,
+        route = PrivacySettingsScreen.ROUTE,
     ) {
         PrivacySettingsScreen()
     }
 
     composable(
-        route = WearAboutScreen.route,
+        route = WearAboutScreen.ROUTE,
     ) {
         WearAboutScreen(
-            onTermsOfServiceClick = { navController.navigate(UrlScreenRoutes.termsOfService) },
-            onPrivacyClick = { navController.navigate(UrlScreenRoutes.privacy) },
+            onTermsOfServiceClick = { navController.navigate(UrlScreenRoutes.TERMS_OF_SERVICES) },
+            onPrivacyClick = { navController.navigate(UrlScreenRoutes.PRIVACY) },
         )
     }
 
     composable(
-        route = HelpScreen.route,
+        route = HelpScreen.ROUTE,
     ) {
         HelpScreen()
     }

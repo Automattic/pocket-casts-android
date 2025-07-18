@@ -22,12 +22,9 @@ class PreferencesFeatureProvider @Inject constructor(
 
     override fun hasFeature(feature: Feature): Boolean = true
 
-    override fun isEnabled(feature: Feature) =
-        preferences.getBoolean(feature.key, feature.defaultValue)
+    override fun isEnabled(feature: Feature) = preferences.getBoolean(feature.key, feature.defaultValue)
 
-    override fun setEnabled(feature: Feature, enabled: Boolean) =
-        preferences.edit().putBoolean(feature.key, enabled).apply()
+    override fun setEnabled(feature: Feature, enabled: Boolean) = preferences.edit().putBoolean(feature.key, enabled).apply()
 
-    private fun Context.featureFlagsSharedPrefs() =
-        this.getSharedPreferences("POCKETCASTS_FEATURE_FLAGS", Context.MODE_PRIVATE)
+    private fun Context.featureFlagsSharedPrefs() = this.getSharedPreferences("POCKETCASTS_FEATURE_FLAGS", Context.MODE_PRIVATE)
 }

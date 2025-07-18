@@ -37,8 +37,8 @@ import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 @Composable
 internal fun EnableNotificationsPromptScreen(
-    onCtaClicked: () -> Unit,
-    onDismissClicked: () -> Unit,
+    onCtaClick: () -> Unit,
+    onDismissClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val configuration = LocalConfiguration.current
@@ -49,7 +49,7 @@ internal fun EnableNotificationsPromptScreen(
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
         IconButton(
-            onClick = onDismissClicked,
+            onClick = onDismissClick,
             modifier = Modifier.align(Alignment.End),
         ) {
             Icon(
@@ -95,7 +95,7 @@ internal fun EnableNotificationsPromptScreen(
                             backgroundColor = MaterialTheme.theme.colors.primaryInteractive01,
                         ),
                         includePadding = false,
-                        onClick = onCtaClicked,
+                        onClick = onCtaClick,
                     )
                 }
             }
@@ -127,7 +127,7 @@ internal fun EnableNotificationsPromptScreen(
                     backgroundColor = MaterialTheme.theme.colors.primaryInteractive01,
                 ),
                 includePadding = false,
-                onClick = onCtaClicked,
+                onClick = onCtaClick,
             )
         }
     }
@@ -139,7 +139,7 @@ private fun EnableNotificationsPromptScreenPreview(
     @PreviewParameter(ThemePreviewParameterProvider::class) themeType: Theme.ThemeType,
 ) = AppThemeWithBackground(themeType) {
     EnableNotificationsPromptScreen(
-        onDismissClicked = {},
-        onCtaClicked = {},
+        onDismissClick = {},
+        onCtaClick = {},
     )
 }

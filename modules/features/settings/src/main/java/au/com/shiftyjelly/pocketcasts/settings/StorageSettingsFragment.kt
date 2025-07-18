@@ -53,7 +53,7 @@ class StorageSettingsFragment : BaseFragment() {
             val bottomInset = settings.bottomInset.collectAsStateWithLifecycle(0)
             StorageSettingsPage(
                 viewModel = viewModel,
-                onBackPressed = {
+                onBackPress = {
                     @Suppress("DEPRECATION")
                     activity?.onBackPressed()
                 },
@@ -105,9 +105,8 @@ class StorageSettingsFragment : BaseFragment() {
 
     private fun getFileLocations() = StorageOptions().getFolderLocations(requireActivity())
 
-    private fun permissionGranted() =
-        ContextCompat.checkSelfPermission(
-            requireContext(),
-            Manifest.permission.WRITE_EXTERNAL_STORAGE,
-        ) == PackageManager.PERMISSION_GRANTED
+    private fun permissionGranted() = ContextCompat.checkSelfPermission(
+        requireContext(),
+        Manifest.permission.WRITE_EXTERNAL_STORAGE,
+    ) == PackageManager.PERMISSION_GRANTED
 }

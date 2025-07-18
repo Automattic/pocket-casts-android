@@ -15,6 +15,5 @@ object WearAppModule {
     @Provides
     fun connectivityManager(
         @ApplicationContext application: Context,
-    ): ConnectivityManager =
-        application.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+    ): ConnectivityManager = application.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
 }

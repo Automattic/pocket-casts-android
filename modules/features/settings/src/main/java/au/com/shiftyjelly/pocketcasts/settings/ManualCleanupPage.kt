@@ -42,28 +42,31 @@ import au.com.shiftyjelly.pocketcasts.localization.R as LR
 @Composable
 fun ManualCleanupPage(
     viewModel: ManualCleanupViewModel,
-    onBackClick: () -> Unit,
+    onBackPress: () -> Unit,
+    modifier: Modifier = Modifier,
 ) {
     val state: ManualCleanupViewModel.State by viewModel.state.collectAsState()
     var includeStarredSwitchState: Boolean by remember { mutableStateOf(false) }
     val context = LocalContext.current
-    Column {
+    Column(
+        modifier = modifier,
+    ) {
         ThemedTopAppBar(
             title = stringResource(id = LR.string.settings_title_manage_downloads),
             navigationButton = NavigationButton.Back,
-            onNavigationClick = onBackClick,
+            onNavigationClick = onBackPress,
         )
         ManageDownloadsView(
             state = state,
             includeStarredSwitchState = includeStarredSwitchState,
-            onDiskSpaceCheckedChanged = { isChecked, diskSpaceView ->
+            onDiskSpaceCheckedChange = { isChecked, diskSpaceView ->
                 viewModel.onDiskSpaceCheckedChanged(isChecked, diskSpaceView)
             },
-            onStarredSwitchClicked = {
+            onStarredSwitchClick = {
                 viewModel.onStarredSwitchClicked(it)
                 includeStarredSwitchState = it
             },
-            onDeleteButtonClicked = { viewModel.onDeleteButtonClicked() },
+            onDeleteButtonClick = { viewModel.onDeleteButtonClicked() },
         )
         LaunchedEffect(Unit) {
             viewModel.snackbarMessage
@@ -78,9 +81,9 @@ fun ManualCleanupPage(
 private fun ManageDownloadsView(
     state: ManualCleanupViewModel.State,
     includeStarredSwitchState: Boolean,
-    onDiskSpaceCheckedChanged: (Boolean, diskSpaceView: ManualCleanupViewModel.State.DiskSpaceView) -> Unit,
-    onStarredSwitchClicked: (Boolean) -> Unit,
-    onDeleteButtonClicked: () -> Unit,
+    onDiskSpaceCheckedChange: (Boolean, diskSpaceView: ManualCleanupViewModel.State.DiskSpaceView) -> Unit,
+    onStarredSwitchClick: (Boolean) -> Unit,
+    onDeleteButtonClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val deleteButtonColor = MaterialTheme.theme.colors.support05
@@ -90,8 +93,8 @@ private fun ManageDownloadsView(
             .fillMaxHeight()
             .verticalScroll(rememberScrollState()),
     ) {
-        state.diskSpaceViews.forEach { DiskSpaceSizeRow(it, onDiskSpaceCheckedChanged) }
-        IncludeStarredRow(includeStarredSwitchState, onStarredSwitchClicked)
+        state.diskSpaceViews.forEach { DiskSpaceSizeRow(it, onDiskSpaceCheckedChange) }
+        IncludeStarredRow(includeStarredSwitchState, onStarredSwitchClick)
         TotalSelectedDownloadSizeRow(state.totalSelectedDownloadSize)
         RowButton(
             text = stringResource(LR.string.settings_downloads_clean_up),
@@ -100,7 +103,7 @@ private fun ManageDownloadsView(
                 backgroundColor = deleteButtonColor,
                 disabledBackgroundColor = deleteButtonColor.copy(alpha = ContentAlpha.disabled),
             ),
-            onClick = onDeleteButtonClicked,
+            onClick = onDeleteButtonClick,
         )
     }
 }
@@ -108,7 +111,7 @@ private fun ManageDownloadsView(
 @Composable
 private fun DiskSpaceSizeRow(
     diskSpaceSizeView: ManualCleanupViewModel.State.DiskSpaceView,
-    onDiskSpaceCheckedChanged: (Boolean, diskSpaceView: ManualCleanupViewModel.State.DiskSpaceView) -> Unit,
+    onDiskSpaceCheckedChange: (Boolean, diskSpaceView: ManualCleanupViewModel.State.DiskSpaceView) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val context = LocalContext.current
@@ -119,14 +122,14 @@ private fun DiskSpaceSizeRow(
         modifier = modifier.toggleable(
             value = diskSpaceSizeView.isChecked,
             role = Role.Checkbox,
-        ) { onDiskSpaceCheckedChanged(it, diskSpaceSizeView) },
+        ) { onDiskSpaceCheckedChange(it, diskSpaceSizeView) },
     )
 }
 
 @Composable
 private fun IncludeStarredRow(
     checkedState: Boolean,
-    onStarredSwitchClicked: (Boolean) -> Unit,
+    onStarredSwitchClick: (Boolean) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     SettingRow(
@@ -135,7 +138,7 @@ private fun IncludeStarredRow(
         modifier = modifier.toggleable(
             value = checkedState,
             role = Role.Switch,
-        ) { onStarredSwitchClicked(it) },
+        ) { onStarredSwitchClick(it) },
     )
 }
 
@@ -186,9 +189,9 @@ private fun ManualCleanupPagePreview(
         ManageDownloadsView(
             state = ManualCleanupViewModel.State(),
             includeStarredSwitchState = false,
-            onDiskSpaceCheckedChanged = { _, _ -> },
-            onStarredSwitchClicked = {},
-            onDeleteButtonClicked = {},
+            onDiskSpaceCheckedChange = { _, _ -> },
+            onStarredSwitchClick = {},
+            onDeleteButtonClick = {},
         )
     }
 }

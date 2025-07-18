@@ -14,13 +14,13 @@ import com.airbnb.android.showkase.annotation.ShowkaseComposable
 @Composable
 fun RowTextButton(
     text: String,
+    onClick: () -> Unit,
     modifier: Modifier = Modifier,
     includePadding: Boolean = true,
     colors: ButtonColors = ButtonDefaults.outlinedButtonColors(),
     textIcon: Painter? = null,
     fontSize: TextUnit? = null,
     tintIcon: Boolean = true,
-    onClick: () -> Unit,
     fullWidth: Boolean = true,
 ) {
     RowOutlinedButton(
@@ -40,7 +40,7 @@ fun RowTextButton(
 @ShowkaseComposable(name = "RowTextButton", group = "Button", styleName = "Light", defaultStyle = true)
 @Preview(name = "Light")
 @Composable
-fun RowTextButtonLightPreview() {
+private fun RowTextButtonLightPreview() {
     AppThemeWithBackground(Theme.ThemeType.LIGHT) {
         RowTextButton(text = "Log in", onClick = {})
     }
@@ -49,7 +49,7 @@ fun RowTextButtonLightPreview() {
 @ShowkaseComposable(name = "RowTextButton", group = "Button", styleName = "Dark")
 @Preview(name = "Dark")
 @Composable
-fun RowTextButtonDarkPreview() {
+private fun RowTextButtonDarkPreview() {
     AppThemeWithBackground(Theme.ThemeType.LIGHT) {
         RowTextButton(text = "Log in", onClick = {})
     }

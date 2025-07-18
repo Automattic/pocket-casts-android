@@ -44,11 +44,12 @@ import au.com.shiftyjelly.pocketcasts.localization.R as LR
 @Composable
 internal fun OnboardingCreateAccountPage(
     theme: Theme.ThemeType,
-    onBackPressed: () -> Unit,
-    onAccountCreated: () -> Unit,
+    onBackPress: () -> Unit,
+    onCreateAccount: () -> Unit,
     onUpdateSystemBars: (SystemBarsStyles) -> Unit,
+    modifier: Modifier = Modifier,
+    viewModel: OnboardingCreateAccountViewModel = hiltViewModel(),
 ) {
-    val viewModel = hiltViewModel<OnboardingCreateAccountViewModel>()
     val state by viewModel.stateFlow.collectAsState()
 
     val pocketCastsTheme = MaterialTheme.theme
@@ -57,7 +58,7 @@ internal fun OnboardingCreateAccountPage(
         viewModel.onShown()
     }
 
-    LaunchedEffect(Unit) {
+    LaunchedEffect(onUpdateSystemBars) {
         // Use secondaryUI01 so the status bar matches the ThemedTopAppBar
         val statusBar = SystemBarStyle.custom(pocketCastsTheme.colors.secondaryUi01, theme.toolbarLightIcons)
         val navigationBar = SystemBarStyle.transparent { theme.darkTheme }
@@ -66,7 +67,7 @@ internal fun OnboardingCreateAccountPage(
 
     BackHandler {
         viewModel.onBackPressed()
-        onBackPressed()
+        onBackPress()
     }
 
     val view = LocalView.current
@@ -74,11 +75,11 @@ internal fun OnboardingCreateAccountPage(
     @Suppress("NAME_SHADOWING")
     val onAccountCreated = {
         UiUtil.hideKeyboard(view)
-        onAccountCreated()
+        onCreateAccount()
     }
 
     Column(
-        Modifier
+        modifier = modifier
             .windowInsetsPadding(WindowInsets.statusBars)
             .windowInsetsPadding(WindowInsets.navigationBars)
             .windowInsetsPadding(WindowInsets.ime),
@@ -87,7 +88,7 @@ internal fun OnboardingCreateAccountPage(
             title = stringResource(LR.string.create_account),
             onNavigationClick = {
                 viewModel.onBackPressed()
-                onBackPressed()
+                onBackPress()
             },
         )
 
@@ -103,7 +104,7 @@ internal fun OnboardingCreateAccountPage(
                 showPasswordError = state.showPasswordError,
                 showPasswordErrorMessage = false,
                 enabled = state.enableSubmissionFields,
-                onDone = { viewModel.createAccount(onAccountCreated) },
+                onConfirm = { viewModel.createAccount(onAccountCreated) },
                 onUpdateEmail = viewModel::updateEmail,
                 onUpdatePassword = viewModel::updatePassword,
                 isCreatingAccount = true,
@@ -151,8 +152,8 @@ private fun OnboardingCreateAccountPagePreview(
     AppThemeWithBackground(themeType) {
         OnboardingCreateAccountPage(
             theme = themeType,
-            onBackPressed = {},
-            onAccountCreated = {},
+            onBackPress = {},
+            onCreateAccount = {},
             onUpdateSystemBars = {},
         )
     }

@@ -29,7 +29,7 @@ enum class Feature(
     INTRO_PLUS_OFFER_ENABLED(
         key = "intro_plus_offer_enabled",
         title = "Intro Offer Plus",
-        defaultValue = BuildConfig.DEBUG,
+        defaultValue = false,
         tier = FeatureTier.Free,
         hasFirebaseRemoteFlag = true,
         hasDevToggle = true,
@@ -136,6 +136,22 @@ enum class Feature(
         defaultValue = BuildConfig.DEBUG,
         tier = FeatureTier.Free,
         hasFirebaseRemoteFlag = true,
+        hasDevToggle = true,
+    ),
+    NEW_ONBOARDING_UPGRADE(
+        key = "new_onboarding_upgrade",
+        title = "New Onboarding Upgrade",
+        defaultValue = BuildConfig.DEBUG,
+        tier = FeatureTier.Free,
+        hasFirebaseRemoteFlag = false,
+        hasDevToggle = true,
+    ),
+    PLAYLISTS_REBRANDING(
+        key = "playlists_rebranding",
+        title = "Playlists",
+        defaultValue = BuildConfig.DEBUG,
+        tier = FeatureTier.Free,
+        hasFirebaseRemoteFlag = false,
         hasDevToggle = true,
     ),
 

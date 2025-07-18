@@ -15,8 +15,8 @@ import kotlinx.coroutines.withContext
 
 @JsonClass(generateAdapter = true)
 data class WatchSyncAuthData(
-    @field:Json(name = "refreshToken") val refreshToken: RefreshToken,
-    @field:Json(name = "loginIdentity") val loginIdentity: LoginIdentity,
+    @Json(name = "refreshToken") val refreshToken: RefreshToken,
+    @Json(name = "loginIdentity") val loginIdentity: LoginIdentity,
 )
 
 class WatchSyncAuthDataSerializer @Inject constructor(

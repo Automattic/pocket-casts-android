@@ -13,8 +13,11 @@ import au.com.shiftyjelly.pocketcasts.utils.featureflag.providers.FirebaseRemote
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.providers.PreferencesFeatureProvider
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.cancel
+import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
+import org.junit.After
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -32,6 +35,7 @@ private const val VERSION_CODE_DEFAULT = 0
 private const val VERSION_CODE_AFTER_FIRST_INSTALL = 1
 private const val VERSION_CODE_AFTER_SECOND_INSTALL = 2
 
+@OptIn(ExperimentalCoroutinesApi::class)
 @RunWith(MockitoJUnitRunner::class)
 class AppLifecycleObserverTest {
 
@@ -76,6 +80,8 @@ class AppLifecycleObserverTest {
 
     @Mock private lateinit var notificationScheduler: NotificationScheduler
 
+    private var coroutineScope = CoroutineScope(UnconfinedTestDispatcher())
+
     lateinit var appLifecycleObserver: AppLifecycleObserver
 
     @Before
@@ -103,9 +109,14 @@ class AppLifecycleObserverTest {
             versionCode = VERSION_CODE_AFTER_SECOND_INSTALL,
             settings = settings,
             networkConnectionWatcher = networkConnectionWatcher,
-            applicationScope = CoroutineScope(Dispatchers.Default),
+            applicationScope = coroutineScope,
             notificationScheduler = notificationScheduler,
         )
+    }
+
+    @After
+    fun tearDown() {
+        coroutineScope.cancel()
     }
 
     /* NEW INSTALL */

@@ -61,17 +61,17 @@ import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 @Composable
 fun StorageSettingsPage(
-    viewModel: StorageSettingsViewModel,
-    onBackPressed: () -> Unit,
-    onManageDownloadedFilesClick: () -> Unit,
     bottomInset: Dp,
+    onBackPress: () -> Unit,
+    onManageDownloadedFilesClick: () -> Unit,
+    viewModel: StorageSettingsViewModel,
     modifier: Modifier = Modifier,
 ) {
     val state: StorageSettingsViewModel.State by viewModel.state.collectAsState()
     val context = LocalContext.current
     StorageSettingsView(
         state = state,
-        onBackPressed = onBackPressed,
+        onBackPress = onBackPress,
         onClearDownloadCacheClick = { viewModel.onClearDownloadCacheClick() },
         onManageDownloadedFilesClick = onManageDownloadedFilesClick,
         onFixDownloadsClick = { viewModel.fixDownloadedFiles() },
@@ -123,26 +123,28 @@ fun StorageSettingsPage(
 
 @Composable
 fun StorageSettingsView(
+    bottomInset: Dp,
     state: StorageSettingsViewModel.State,
-    onBackPressed: () -> Unit,
+    onBackPress: () -> Unit,
     onClearDownloadCacheClick: () -> Unit,
     onManageDownloadedFilesClick: () -> Unit,
     onFixDownloadsClick: () -> Unit,
-    bottomInset: Dp,
     modifier: Modifier = Modifier,
 ) {
-    Column {
+    Column(
+        modifier = modifier,
+    ) {
         ThemedTopAppBar(
             title = stringResource(LR.string.settings_title_storage),
             bottomShadow = true,
-            onNavigationClick = { onBackPressed() },
+            onNavigationClick = { onBackPress() },
         )
 
         LazyColumn(
-            modifier
+            contentPadding = PaddingValues(bottom = bottomInset),
+            modifier = Modifier
                 .background(MaterialTheme.theme.colors.primaryUi02)
                 .fillMaxHeight(),
-            contentPadding = PaddingValues(bottom = bottomInset),
         ) {
             item {
                 SettingSection(heading = stringResource(LR.string.settings_storage_section_heading_usage)) {
@@ -356,8 +358,7 @@ private fun StorageDataWarningRow(
             text = stringResource(LR.string.settings_storage_data_warning_car),
             style = MaterialTheme.typography.body1,
             color = MaterialTheme.theme.colors.primaryText02,
-            modifier = modifier
-                .padding(top = 16.dp),
+            modifier = Modifier.padding(top = 16.dp),
         )
     }
 }
@@ -437,7 +438,7 @@ private fun StorageSettingsPreview(
                     onCheckedChange = {},
                 ),
             ),
-            onBackPressed = {},
+            onBackPress = {},
             onClearDownloadCacheClick = {},
             onManageDownloadedFilesClick = {},
             onFixDownloadsClick = {},

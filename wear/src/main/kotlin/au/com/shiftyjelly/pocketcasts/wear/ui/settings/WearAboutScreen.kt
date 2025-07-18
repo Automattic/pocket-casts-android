@@ -2,6 +2,7 @@ package au.com.shiftyjelly.pocketcasts.wear.ui.settings
 
 import androidx.compose.foundation.Image
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
@@ -16,17 +17,19 @@ import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 object WearAboutScreen {
-    const val route = "wear_about_screen"
+    const val ROUTE = "wear_about_screen"
 }
 
 @Composable
 fun WearAboutScreen(
     onTermsOfServiceClick: () -> Unit,
     onPrivacyClick: () -> Unit,
+    modifier: Modifier = Modifier,
 ) {
     val columnState = rememberColumnState()
     ScreenScaffold(
         scrollState = columnState,
+        modifier = modifier,
     ) {
         ScalingLazyColumn(
             columnState = columnState,

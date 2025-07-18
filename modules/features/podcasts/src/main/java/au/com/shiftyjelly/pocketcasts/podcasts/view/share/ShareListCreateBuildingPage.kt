@@ -14,7 +14,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -41,10 +41,13 @@ import au.com.shiftyjelly.pocketcasts.localization.R as LR
 fun ShareListCreateBuildingPage(
     onCloseClick: () -> Unit,
     viewModel: ShareListCreateViewModel,
+    modifier: Modifier = Modifier,
 ) {
     val state: ShareListCreateViewModel.State by viewModel.state.collectAsState()
 
-    Column {
+    Column(
+        modifier = modifier,
+    ) {
         ThemedTopAppBar(
             title = stringResource(LR.string.podcasts_share_creating_list),
             navigationButton = NavigationButton.Close,
@@ -56,8 +59,12 @@ fun ShareListCreateBuildingPage(
 }
 
 @Composable
-private fun CreateBuildingContent(title: String, podcasts: List<Podcast>, modifier: Modifier = Modifier) {
-    var progress by remember { mutableStateOf(0f) }
+private fun CreateBuildingContent(
+    title: String,
+    podcasts: List<Podcast>,
+    modifier: Modifier = Modifier,
+) {
+    var progress by remember { mutableFloatStateOf(0f) }
     val progressAnimation by animateFloatAsState(
         targetValue = progress,
         animationSpec = tween(durationMillis = 5000, easing = FastOutSlowInEasing),

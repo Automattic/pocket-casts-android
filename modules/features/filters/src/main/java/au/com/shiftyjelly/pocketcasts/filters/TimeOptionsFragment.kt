@@ -9,10 +9,10 @@ import androidx.annotation.StringRes
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import au.com.shiftyjelly.pocketcasts.filters.databinding.FilterOptionsFragmentBinding
-import au.com.shiftyjelly.pocketcasts.models.entity.Playlist
-import au.com.shiftyjelly.pocketcasts.repositories.podcast.PlaylistManager
+import au.com.shiftyjelly.pocketcasts.models.entity.SmartPlaylist
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PlaylistProperty
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PlaylistUpdateSource
+import au.com.shiftyjelly.pocketcasts.repositories.podcast.SmartPlaylistManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.UserPlaylistUpdate
 import au.com.shiftyjelly.pocketcasts.ui.extensions.getColor
 import au.com.shiftyjelly.pocketcasts.ui.helper.FragmentHostListener
@@ -30,7 +30,9 @@ private const val ARG_PLAYLIST_UUID = "playlist_uuid"
 private const val ARG_OPTIONS_TYPE = "options_type"
 
 @AndroidEntryPoint
-class TimeOptionsFragment : BaseFragment(), CoroutineScope {
+class TimeOptionsFragment :
+    BaseFragment(),
+    CoroutineScope {
     sealed class OptionsType(val type: String) {
         object Time : OptionsType("time")
         object Downloaded : OptionsType("downloaded")
@@ -38,9 +40,9 @@ class TimeOptionsFragment : BaseFragment(), CoroutineScope {
     }
 
     companion object {
-        fun newInstance(playlist: Playlist, options: OptionsType): TimeOptionsFragment {
+        fun newInstance(smartPlaylist: SmartPlaylist, options: OptionsType): TimeOptionsFragment {
             val bundle = Bundle()
-            bundle.putString(ARG_PLAYLIST_UUID, playlist.uuid)
+            bundle.putString(ARG_PLAYLIST_UUID, smartPlaylist.uuid)
             bundle.putString(ARG_OPTIONS_TYPE, options.type)
             val fragment = TimeOptionsFragment()
             fragment.arguments = bundle
@@ -52,7 +54,7 @@ class TimeOptionsFragment : BaseFragment(), CoroutineScope {
         get() = Dispatchers.Main
 
     @Inject
-    lateinit var playlistManager: PlaylistManager
+    lateinit var smartPlaylistManager: SmartPlaylistManager
 
     private var userChanged = false
 
@@ -68,7 +70,7 @@ class TimeOptionsFragment : BaseFragment(), CoroutineScope {
     private lateinit var options: List<FilterOption>
     private var binding: FilterOptionsFragmentBinding? = null
 
-    var playlist: Playlist? = null
+    var smartPlaylist: SmartPlaylist? = null
     var adapter: FilterOptionsAdapter? = null
     var selectedPosition: Int = 0
 
@@ -93,19 +95,19 @@ class TimeOptionsFragment : BaseFragment(), CoroutineScope {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        val anytime = filterOptionForTitle(LR.string.filters_time_anytime, Playlist.ANYTIME)
-        val last24Hours = filterOptionForTitle(LR.string.filters_time_24_hours, Playlist.LAST_24_HOURS)
-        val last3Days = filterOptionForTitle(LR.string.filters_time_3_days, Playlist.LAST_3_DAYS)
-        val lastWeek = filterOptionForTitle(LR.string.filters_time_week, Playlist.LAST_WEEK)
-        val last2Weeks = filterOptionForTitle(LR.string.filters_time_2_weeks, Playlist.LAST_2_WEEKS)
-        val lastMonth = filterOptionForTitle(LR.string.filters_time_month, Playlist.LAST_MONTH)
+        val anytime = filterOptionForTitle(LR.string.filters_time_anytime, SmartPlaylist.ANYTIME)
+        val last24Hours = filterOptionForTitle(LR.string.filters_time_24_hours, SmartPlaylist.LAST_24_HOURS)
+        val last3Days = filterOptionForTitle(LR.string.filters_time_3_days, SmartPlaylist.LAST_3_DAYS)
+        val lastWeek = filterOptionForTitle(LR.string.filters_time_week, SmartPlaylist.LAST_WEEK)
+        val last2Weeks = filterOptionForTitle(LR.string.filters_time_2_weeks, SmartPlaylist.LAST_2_WEEKS)
+        val lastMonth = filterOptionForTitle(LR.string.filters_time_month, SmartPlaylist.LAST_MONTH)
 
         val downloadAll = FilterOption(
             LR.string.all,
             false,
             { v, position ->
-                playlist?.downloaded = true
-                playlist?.notDownloaded = true
+                smartPlaylist?.downloaded = true
+                smartPlaylist?.notDownloaded = true
                 onCheckedChanged(v, position)
             },
         )
@@ -114,8 +116,8 @@ class TimeOptionsFragment : BaseFragment(), CoroutineScope {
             LR.string.downloaded,
             false,
             { v, position ->
-                playlist?.downloaded = true
-                playlist?.notDownloaded = false
+                smartPlaylist?.downloaded = true
+                smartPlaylist?.notDownloaded = false
                 onCheckedChanged(v, position)
             },
         )
@@ -123,8 +125,8 @@ class TimeOptionsFragment : BaseFragment(), CoroutineScope {
             LR.string.not_downloaded,
             false,
             { v, position ->
-                playlist?.downloaded = false
-                playlist?.notDownloaded = true
+                smartPlaylist?.downloaded = false
+                smartPlaylist?.notDownloaded = true
                 onCheckedChanged(v, position)
             },
         )
@@ -134,7 +136,7 @@ class TimeOptionsFragment : BaseFragment(), CoroutineScope {
             false,
             { v, position ->
                 if (v) {
-                    playlist?.audioVideo = Playlist.AUDIO_VIDEO_FILTER_ALL
+                    smartPlaylist?.audioVideo = SmartPlaylist.AUDIO_VIDEO_FILTER_ALL
                     onCheckedChanged(v, position)
                 }
             },
@@ -144,7 +146,7 @@ class TimeOptionsFragment : BaseFragment(), CoroutineScope {
             false,
             { v, position ->
                 if (v) {
-                    playlist?.audioVideo = Playlist.AUDIO_VIDEO_FILTER_AUDIO_ONLY
+                    smartPlaylist?.audioVideo = SmartPlaylist.AUDIO_VIDEO_FILTER_AUDIO_ONLY
                     onCheckedChanged(v, position)
                 }
             },
@@ -154,7 +156,7 @@ class TimeOptionsFragment : BaseFragment(), CoroutineScope {
             false,
             { v, position ->
                 if (v) {
-                    playlist?.audioVideo = Playlist.AUDIO_VIDEO_FILTER_VIDEO_ONLY
+                    smartPlaylist?.audioVideo = SmartPlaylist.AUDIO_VIDEO_FILTER_VIDEO_ONLY
                     onCheckedChanged(v, position)
                 }
             },
@@ -180,13 +182,25 @@ class TimeOptionsFragment : BaseFragment(), CoroutineScope {
         val recyclerView = binding.recyclerView
 
         launch {
-            val playlist = playlistManager.findByUuid(requireArguments().getString(ARG_PLAYLIST_UUID)!!) ?: return@launch
-            this@TimeOptionsFragment.playlist = playlist
+            val playlist = smartPlaylistManager.findByUuid(requireArguments().getString(ARG_PLAYLIST_UUID)!!) ?: return@launch
+            this@TimeOptionsFragment.smartPlaylist = playlist
 
             selectedPosition = when (optionType) {
                 OptionsType.Time -> options.indexOfFirst { it.playlistValue!! >= playlist.filterHours }
-                OptionsType.Downloaded -> if (playlist.downloaded && playlist.notDownloaded) 0 else if (playlist.downloaded) 1 else 2
-                OptionsType.AudioVideo -> if (playlist.audioVideo == Playlist.AUDIO_VIDEO_FILTER_ALL) 0 else if (playlist.audioVideo == Playlist.AUDIO_VIDEO_FILTER_AUDIO_ONLY) 1 else 2
+                OptionsType.Downloaded -> if (playlist.downloaded && playlist.notDownloaded) {
+                    0
+                } else if (playlist.downloaded) {
+                    1
+                } else {
+                    2
+                }
+                OptionsType.AudioVideo -> if (playlist.audioVideo == SmartPlaylist.AUDIO_VIDEO_FILTER_ALL) {
+                    0
+                } else if (playlist.audioVideo == SmartPlaylist.AUDIO_VIDEO_FILTER_AUDIO_ONLY) {
+                    1
+                } else {
+                    2
+                }
             }
 
             updatedSelected(0, selectedPosition)
@@ -205,7 +219,7 @@ class TimeOptionsFragment : BaseFragment(), CoroutineScope {
         }
 
         btnSave.setOnClickListener {
-            playlist?.let { playlist ->
+            smartPlaylist?.let { playlist ->
                 when (optionType) {
                     OptionsType.Time -> {
                         playlist.filterHours = options[selectedPosition].playlistValue ?: 0
@@ -229,14 +243,14 @@ class TimeOptionsFragment : BaseFragment(), CoroutineScope {
                     }
 
                     OptionsType.AudioVideo -> when (selectedPosition) {
-                        0 -> playlist.audioVideo = Playlist.AUDIO_VIDEO_FILTER_ALL
-                        1 -> playlist.audioVideo = Playlist.AUDIO_VIDEO_FILTER_AUDIO_ONLY
-                        2 -> playlist.audioVideo = Playlist.AUDIO_VIDEO_FILTER_VIDEO_ONLY
+                        0 -> playlist.audioVideo = SmartPlaylist.AUDIO_VIDEO_FILTER_ALL
+                        1 -> playlist.audioVideo = SmartPlaylist.AUDIO_VIDEO_FILTER_AUDIO_ONLY
+                        2 -> playlist.audioVideo = SmartPlaylist.AUDIO_VIDEO_FILTER_VIDEO_ONLY
                     }
                 }
 
                 launch(Dispatchers.Default) {
-                    playlist.syncStatus = Playlist.SYNC_STATUS_NOT_SYNCED
+                    playlist.syncStatus = SmartPlaylist.SYNC_STATUS_NOT_SYNCED
 
                     val playlistProperty = when (optionType) {
                         OptionsType.AudioVideo -> PlaylistProperty.MediaType
@@ -252,7 +266,7 @@ class TimeOptionsFragment : BaseFragment(), CoroutineScope {
                         null
                     }
 
-                    playlistManager.updateBlocking(playlist, userPlaylistUpdate)
+                    smartPlaylistManager.updateBlocking(playlist, userPlaylistUpdate)
                     launch(Dispatchers.Main) { (activity as FragmentHostListener).closeModal(this@TimeOptionsFragment) }
                 }
             }

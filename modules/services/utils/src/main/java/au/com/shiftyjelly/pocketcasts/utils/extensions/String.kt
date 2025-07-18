@@ -70,11 +70,10 @@ fun String.removeNewLines(): String {
     return this.replace("[\n\r]".toRegex(), "")
 }
 
-fun String.removeAccents() =
-    Normalizer.normalize(this, Normalizer.Form.NFD)
-        .replace("\\p{Mn}+".toRegex(), "")
-        .replace("\u0141", "L") // Remove L with stroke
-        .replace("\u0142", "l") // Remove l with stroke
+fun String.removeAccents() = Normalizer.normalize(this, Normalizer.Form.NFD)
+    .replace("\\p{Mn}+".toRegex(), "")
+    .replace("\u0141", "L") // Remove L with stroke
+    .replace("\u0142", "l") // Remove l with stroke
 
 fun String.sha1(): String? = hashString("SHA-1")
 fun String.sha256(): String? = hashString("SHA-256")
@@ -84,12 +83,11 @@ fun List<String>.md5(): String? = this.joinToString(",").hashString("MD5")
  * For information on permitted algorithms, see
  * https://developer.android.com/reference/kotlin/java/security/MessageDigest
  */
-private fun String.hashString(algorithm: String) =
-    try {
-        MessageDigest.getInstance(algorithm)
-            .digest(toByteArray())
-            .joinToString("") { "%02x".format(it) }
-    } catch (e: Exception) {
-        LogBuffer.e(LogBuffer.TAG_INVALID_STATE, "Error applying $algorithm to $this: ${e.message}")
-        null
-    }
+private fun String.hashString(algorithm: String) = try {
+    MessageDigest.getInstance(algorithm)
+        .digest(toByteArray())
+        .joinToString("") { "%02x".format(it) }
+} catch (e: Exception) {
+    LogBuffer.e(LogBuffer.TAG_INVALID_STATE, "Error applying $algorithm to $this: ${e.message}")
+    null
+}

@@ -47,7 +47,9 @@ import kotlin.math.abs
  *
  * Most of the time you only need to override `onChildDraw`.
  */
-open class MultiSwipeHelper(internal var mCallback: Callback) : RecyclerView.ItemDecoration(), RecyclerView.OnChildAttachStateChangeListener {
+open class MultiSwipeHelper(internal var mCallback: Callback) :
+    RecyclerView.ItemDecoration(),
+    RecyclerView.OnChildAttachStateChangeListener {
 
     /**
      * Views, whose state should be cleared after they are detached from RecyclerView.
@@ -594,7 +596,8 @@ open class MultiSwipeHelper(internal var mCallback: Callback) : RecyclerView.Ite
         // wait until animations are complete.
         mRecyclerView!!.post(object : Runnable {
             override fun run() {
-                if (mRecyclerView != null && mRecyclerView!!.isAttachedToWindow &&
+                if (mRecyclerView != null &&
+                    mRecyclerView!!.isAttachedToWindow &&
                     !anim.mOverridden &&
                     anim.mViewHolder.bindingAdapterPosition != RecyclerView.NO_POSITION
                 ) {
@@ -679,14 +682,16 @@ open class MultiSwipeHelper(internal var mCallback: Callback) : RecyclerView.Ite
         if (scrollX != 0) {
             scrollX = mCallback.interpolateOutOfBoundsScroll(
                 mRecyclerView!!,
-                mSelected!!.itemView.width, scrollX,
+                mSelected!!.itemView.width,
+                scrollX,
                 scrollDuration,
             )
         }
         if (scrollY != 0) {
             scrollY = mCallback.interpolateOutOfBoundsScroll(
                 mRecyclerView!!,
-                mSelected!!.itemView.height, scrollY,
+                mSelected!!.itemView.height,
+                scrollY,
                 scrollDuration,
             )
         }
@@ -723,8 +728,10 @@ open class MultiSwipeHelper(internal var mCallback: Callback) : RecyclerView.Ite
             if (other === viewHolder.itemView) {
                 continue // myself!
             }
-            if (other!!.bottom < top || other.top > bottom ||
-                other.right < left || other.left > right
+            if (other!!.bottom < top ||
+                other.top > bottom ||
+                other.right < left ||
+                other.left > right
             ) {
                 continue
             }
@@ -767,7 +774,8 @@ open class MultiSwipeHelper(internal var mCallback: Callback) : RecyclerView.Ite
         val threshold = mCallback.getMoveThreshold()
         val x = (mSelectedStartX + mDx).toInt()
         val y = (mSelectedStartY + mDy).toInt()
-        if (Math.abs(y - viewHolder.itemView.top) < viewHolder.itemView.height * threshold && Math.abs(
+        if (Math.abs(y - viewHolder.itemView.top) < viewHolder.itemView.height * threshold &&
+            Math.abs(
                 x - viewHolder.itemView.left,
             ) < viewHolder.itemView.width * threshold
         ) {
@@ -888,8 +896,10 @@ open class MultiSwipeHelper(internal var mCallback: Callback) : RecyclerView.Ite
         motionEvent: MotionEvent,
         pointerIndex: Int,
     ) {
-        if (mSelected != null || action != MotionEvent.ACTION_MOVE ||
-            mActionState == ACTION_STATE_DRAG || !mCallback.isItemViewSwipeEnabled
+        if (mSelected != null ||
+            action != MotionEvent.ACTION_MOVE ||
+            mActionState == ACTION_STATE_DRAG ||
+            !mCallback.isItemViewSwipeEnabled
         ) {
             return
         }
@@ -1170,7 +1180,8 @@ open class MultiSwipeHelper(internal var mCallback: Callback) : RecyclerView.Ite
                 val yVelocity = mVelocityTracker!!.getYVelocity(mActivePointerId)
                 val velDirFlag = if (xVelocity > 0f) RIGHT else LEFT
                 val absXVelocity = Math.abs(xVelocity)
-                if (velDirFlag and flags != 0 && dirFlag == velDirFlag &&
+                if (velDirFlag and flags != 0 &&
+                    dirFlag == velDirFlag &&
                     absXVelocity >= mCallback.getSwipeEscapeVelocity(mSwipeEscapeVelocity) &&
                     absXVelocity > Math.abs(yVelocity)
                 ) {
@@ -1199,7 +1210,8 @@ open class MultiSwipeHelper(internal var mCallback: Callback) : RecyclerView.Ite
                 val yVelocity = mVelocityTracker!!.getYVelocity(mActivePointerId)
                 val velDirFlag = if (yVelocity > 0f) DOWN else UP
                 val absYVelocity = Math.abs(yVelocity)
-                if (velDirFlag and flags != 0 && velDirFlag == dirFlag &&
+                if (velDirFlag and flags != 0 &&
+                    velDirFlag == dirFlag &&
                     absYVelocity >= mCallback.getSwipeEscapeVelocity(mSwipeEscapeVelocity) &&
                     absYVelocity > Math.abs(xVelocity)
                 ) {
@@ -2273,7 +2285,10 @@ open class MultiSwipeHelper(internal var mCallback: Callback) : RecyclerView.Ite
      * composed of [.LEFT], [.RIGHT], [.START], [                  ][.END],
      * [.UP] and [.DOWN].
      */
-    (private var mDefaultDragDirs: Int, private var mDefaultSwipeDirs: Int) : Callback() {
+    constructor(
+        private var mDefaultDragDirs: Int,
+        private var mDefaultSwipeDirs: Int,
+    ) : Callback() {
 
         /**
          * Updates the default swipe directions. For example, you can use this method to toggle
@@ -2332,8 +2347,7 @@ open class MultiSwipeHelper(internal var mCallback: Callback) : RecyclerView.Ite
         }
     }
 
-    private inner class ItemTouchHelperGestureListener internal constructor() :
-        GestureDetector.SimpleOnGestureListener() {
+    private inner class ItemTouchHelperGestureListener internal constructor() : GestureDetector.SimpleOnGestureListener() {
 
         /**
          * Whether to execute code in response to the the invoking of
@@ -2505,6 +2519,7 @@ open class MultiSwipeHelper(internal var mCallback: Callback) : RecyclerView.Ite
 
         // If you change these relative direction values, update Callback#convertToAbsoluteDirection,
         // Callback#convertToRelativeDirection.
+
         /**
          * Horizontal start direction. Resolved to LEFT or RIGHT depending on RecyclerView's layout
          * direction. Used for swipe & drag control.

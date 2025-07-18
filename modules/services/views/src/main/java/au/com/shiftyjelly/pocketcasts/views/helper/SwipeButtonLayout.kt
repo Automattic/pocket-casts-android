@@ -166,45 +166,44 @@ class SwipeButtonLayoutFactory(
     private val fragmentManager: FragmentManager,
     private val swipeSource: EpisodeItemTouchHelper.SwipeSource,
 ) {
-    fun forEpisode(episode: BaseEpisode): SwipeButtonLayout =
-        swipeButtonLayoutViewModel.getSwipeButtonLayout(
-            episode = episode,
-            swipeSource = swipeSource,
-            defaultUpNextSwipeAction = defaultUpNextSwipeAction,
-            showShareButton = showShareButton,
-            buttons = SwipeButtonLayoutViewModel.SwipeButtons(
-                addToUpNextTop = SwipeButton.AddToUpNextTop(
-                    onItemUpdated = onItemUpdated,
-                    swipeSource = swipeSource,
-                    viewModel = swipeButtonLayoutViewModel,
-                ),
-                addToUpNextBottom = SwipeButton.AddToUpNextBottom(
-                    onItemUpdated = onItemUpdated,
-                    swipeSource = swipeSource,
-                    viewModel = swipeButtonLayoutViewModel,
-                ),
-                removeFromUpNext = SwipeButton.RemoveFromUpNext(
-                    onItemUpdated = onItemUpdated,
-                    swipeSource = swipeSource,
-                    viewModel = swipeButtonLayoutViewModel,
-                ),
-                archive = SwipeButton.ArchiveButton(
-                    episode = episode,
-                    onItemUpdated = onItemUpdated,
-                    swipeSource = swipeSource,
-                    viewModel = swipeButtonLayoutViewModel,
-                ),
-                deleteFile = SwipeButton.DeleteFileButton(
-                    onItemModified = onItemUpdated,
-                    swipeSource = swipeSource,
-                    fragmentManager = fragmentManager,
-                    viewModel = swipeButtonLayoutViewModel,
-                ),
-                share = SwipeButton.ShareButton(
-                    swipeSource = swipeSource,
-                    fragmentManager = fragmentManager,
-                    viewModel = swipeButtonLayoutViewModel,
-                ),
+    fun forEpisode(episode: BaseEpisode): SwipeButtonLayout = swipeButtonLayoutViewModel.getSwipeButtonLayout(
+        episode = episode,
+        swipeSource = swipeSource,
+        defaultUpNextSwipeAction = defaultUpNextSwipeAction,
+        showShareButton = showShareButton,
+        buttons = SwipeButtonLayoutViewModel.SwipeButtons(
+            addToUpNextTop = SwipeButton.AddToUpNextTop(
+                onItemUpdated = onItemUpdated,
+                swipeSource = swipeSource,
+                viewModel = swipeButtonLayoutViewModel,
             ),
-        )
+            addToUpNextBottom = SwipeButton.AddToUpNextBottom(
+                onItemUpdated = onItemUpdated,
+                swipeSource = swipeSource,
+                viewModel = swipeButtonLayoutViewModel,
+            ),
+            removeFromUpNext = SwipeButton.RemoveFromUpNext(
+                onItemUpdated = onItemUpdated,
+                swipeSource = swipeSource,
+                viewModel = swipeButtonLayoutViewModel,
+            ),
+            archive = SwipeButton.ArchiveButton(
+                episode = episode,
+                onItemUpdated = onItemUpdated,
+                swipeSource = swipeSource,
+                viewModel = swipeButtonLayoutViewModel,
+            ),
+            deleteFile = SwipeButton.DeleteFileButton(
+                onItemModified = onItemUpdated,
+                swipeSource = swipeSource,
+                fragmentManager = fragmentManager,
+                viewModel = swipeButtonLayoutViewModel,
+            ),
+            share = SwipeButton.ShareButton(
+                swipeSource = swipeSource,
+                fragmentManager = fragmentManager,
+                viewModel = swipeButtonLayoutViewModel,
+            ),
+        ),
+    )
 }

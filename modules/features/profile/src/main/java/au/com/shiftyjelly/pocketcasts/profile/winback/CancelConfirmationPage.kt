@@ -232,7 +232,7 @@ private fun PerkRow(
     PerkRow(image, AnnotatedString(text), modifier)
 }
 
-@Preview(device = Devices.PortraitRegular)
+@Preview(device = Devices.PORTRAIT_REGULAR)
 @Composable
 private fun CancelConfirmationPagePreview(
     @PreviewParameter(ThemePreviewParameterProvider::class) theme: Theme.ThemeType,

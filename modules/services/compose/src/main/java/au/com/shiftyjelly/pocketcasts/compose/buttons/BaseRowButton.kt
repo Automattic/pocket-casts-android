@@ -35,6 +35,7 @@ import au.com.shiftyjelly.pocketcasts.compose.theme
 @Composable
 fun BaseRowButton(
     text: String,
+    onClick: () -> Unit,
     modifier: Modifier = Modifier,
     includePadding: Boolean = true,
     enabled: Boolean = true,
@@ -46,7 +47,6 @@ fun BaseRowButton(
     fontFamily: FontFamily? = null,
     fontWeight: FontWeight? = null,
     leadingIcon: @Composable (() -> Unit)? = null,
-    onClick: () -> Unit,
     cornerRadius: Dp = 12.dp,
     textVerticalPadding: Dp = 6.dp,
     @DrawableRes textIcon: Int? = null,
@@ -103,13 +103,13 @@ fun BaseRowButton(
 
 @Composable
 fun BaseRowButton(
+    onClick: () -> Unit,
     modifier: Modifier = Modifier,
     includePadding: Boolean = true,
     enabled: Boolean = true,
     border: BorderStroke? = null,
     colors: ButtonColors = ButtonDefaults.buttonColors(),
     elevation: ButtonElevation? = ButtonDefaults.elevation(),
-    onClick: () -> Unit,
     cornerRadius: Dp = 12.dp,
     contentDescription: String? = null,
     content: @Composable () -> Unit,

@@ -37,11 +37,18 @@ dependencies {
     api(projects.modules.services.views)
     api(projects.modules.services.compose)
 
+    implementation(platform(libs.compose.bom))
+
     implementation(libs.androidx.constraintlayout)
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.preference.ktx)
+    implementation(libs.compose.material)
+    implementation(libs.compose.material3.adaptive)
+    implementation(libs.compose.ui)
+    implementation(libs.compose.ui.tooling.preview)
     implementation(libs.coroutines.core)
     implementation(libs.coroutines.rx2)
+    implementation(libs.fragment.compose)
     implementation(libs.fragment.ktx)
     implementation(libs.lifecycle.reactivestreams.ktx)
     implementation(libs.rx2.android)

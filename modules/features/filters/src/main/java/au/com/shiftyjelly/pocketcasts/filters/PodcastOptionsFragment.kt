@@ -12,11 +12,11 @@ import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.filters.databinding.PodcastOptionsFragmentBinding
-import au.com.shiftyjelly.pocketcasts.models.entity.Playlist
-import au.com.shiftyjelly.pocketcasts.repositories.podcast.PlaylistManager
+import au.com.shiftyjelly.pocketcasts.models.entity.SmartPlaylist
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PlaylistProperty
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PlaylistUpdateSource
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
+import au.com.shiftyjelly.pocketcasts.repositories.podcast.SmartPlaylistManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.UserPlaylistUpdate
 import au.com.shiftyjelly.pocketcasts.ui.extensions.getColor
 import au.com.shiftyjelly.pocketcasts.ui.extensions.getThemeColor
@@ -39,11 +39,14 @@ import au.com.shiftyjelly.pocketcasts.ui.R as UR
 private const val ARG_PLAYLIST_UUID = "playlist_uuid"
 
 @AndroidEntryPoint
-class PodcastOptionsFragment : BaseFragment(), PodcastSelectFragment.Listener, CoroutineScope {
+class PodcastOptionsFragment :
+    BaseFragment(),
+    PodcastSelectFragment.Listener,
+    CoroutineScope {
     companion object {
-        fun newInstance(playlist: Playlist): PodcastOptionsFragment {
+        fun newInstance(smartPlaylist: SmartPlaylist): PodcastOptionsFragment {
             val bundle = Bundle()
-            bundle.putString(ARG_PLAYLIST_UUID, playlist.uuid)
+            bundle.putString(ARG_PLAYLIST_UUID, smartPlaylist.uuid)
             val fragment = PodcastOptionsFragment()
             fragment.arguments = bundle
             return fragment
@@ -55,12 +58,12 @@ class PodcastOptionsFragment : BaseFragment(), PodcastSelectFragment.Listener, C
 
     @Inject lateinit var podcastManager: PodcastManager
 
-    @Inject lateinit var playlistManager: PlaylistManager
+    @Inject lateinit var smartPlaylistManager: SmartPlaylistManager
 
     @Inject lateinit var analyticsTracker: AnalyticsTracker
 
     var podcastSelection: List<String> = listOf()
-    var playlist: Playlist? = null
+    var smartPlaylist: SmartPlaylist? = null
     private var binding: PodcastOptionsFragmentBinding? = null
     private var userChanged = false
 
@@ -86,8 +89,8 @@ class PodcastOptionsFragment : BaseFragment(), PodcastSelectFragment.Listener, C
         launch {
             val subscribedPodcasts = withContext(Dispatchers.Default) { podcastManager.findSubscribedBlocking() }.map { it.uuid }
             val playlistUuid = requireArguments().getString(ARG_PLAYLIST_UUID) ?: return@launch
-            val playlist = playlistManager.findByUuid(playlistUuid) ?: return@launch
-            this@PodcastOptionsFragment.playlist = playlist
+            val playlist = smartPlaylistManager.findByUuid(playlistUuid) ?: return@launch
+            this@PodcastOptionsFragment.smartPlaylist = playlist
 
             val color = playlist.getColor(context)
 
@@ -127,11 +130,11 @@ class PodcastOptionsFragment : BaseFragment(), PodcastSelectFragment.Listener, C
         }
 
         btnSave.setOnClickListener {
-            playlist?.let { playlist ->
+            smartPlaylist?.let { playlist ->
                 playlist.podcastUuidList = podcastSelection
                 playlist.allPodcasts = switchAllPodcasts.isChecked || podcastSelection.isEmpty()
                 launch(Dispatchers.Default) {
-                    playlist.syncStatus = Playlist.SYNC_STATUS_NOT_SYNCED
+                    playlist.syncStatus = SmartPlaylist.SYNC_STATUS_NOT_SYNCED
 
                     val podcastSelectFragment = childFragmentManager.findFragmentById(R.id.podcastSelectFrame) as? PodcastSelectFragment
                     if (podcastSelectFragment == null) {
@@ -147,7 +150,7 @@ class PodcastOptionsFragment : BaseFragment(), PodcastSelectFragment.Listener, C
                     } else {
                         null
                     }
-                    playlistManager.updateBlocking(playlist, userPlaylistUpdate)
+                    smartPlaylistManager.updateBlocking(playlist, userPlaylistUpdate)
 
                     launch(Dispatchers.Main) { (activity as? FragmentHostListener)?.closeModal(this@PodcastOptionsFragment) }
                 }

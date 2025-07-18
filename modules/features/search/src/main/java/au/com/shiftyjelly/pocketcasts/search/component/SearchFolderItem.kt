@@ -3,7 +3,6 @@ package au.com.shiftyjelly.pocketcasts.search.component
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
@@ -48,9 +47,9 @@ fun SearchFolderItem(
             .then(if (onClick == null) Modifier else Modifier.clickable { onClick() })
             .padding(8.dp),
     ) {
-        BoxWithConstraints(
-            modifier = modifier.aspectRatio(1f),
+        Box(
             contentAlignment = Alignment.Center,
+            modifier = Modifier.aspectRatio(1f),
         ) {
             FolderImageSmall(
                 color = color,
@@ -82,7 +81,7 @@ fun SearchFolderItem(
         }
 
         Column(
-            modifier = modifier
+            modifier = Modifier
                 .padding(top = 10.dp),
         ) {
             TextH40(

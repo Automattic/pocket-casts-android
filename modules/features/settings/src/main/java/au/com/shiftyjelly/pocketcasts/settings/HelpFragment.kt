@@ -29,7 +29,9 @@ import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
 @AndroidEntryPoint
-class HelpFragment : BaseFragment(), HasBackstack {
+class HelpFragment :
+    BaseFragment(),
+    HasBackstack {
     @Inject
     lateinit var settings: Settings
 
@@ -67,8 +69,8 @@ class HelpFragment : BaseFragment(), HasBackstack {
                     @Suppress("DEPRECATION")
                     activity?.onBackPressed()
                 },
-                onWebViewCreated = { webView = it },
-                onWebViewDisposed = { webView = null },
+                onWebViewCreate = { webView = it },
+                onWebViewDispose = { webView = null },
                 modifier = Modifier
                     .fillMaxSize()
                     .padding(bottom = totalPadding),

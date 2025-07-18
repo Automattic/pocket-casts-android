@@ -25,7 +25,9 @@ import timber.log.Timber
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 @AndroidEntryPoint
-class MultiSelectFragment : BaseFragment(), MultiSelectTouchCallback.ItemTouchHelperAdapter {
+class MultiSelectFragment :
+    BaseFragment(),
+    MultiSelectTouchCallback.ItemTouchHelperAdapter {
     @Inject lateinit var settings: Settings
 
     @Inject lateinit var analyticsTracker: AnalyticsTracker
@@ -143,8 +145,7 @@ class MultiSelectFragment : BaseFragment(), MultiSelectTouchCallback.ItemTouchHe
         trackItemMovedEvent(position)
     }
 
-    private fun sectionTitleAt(position: Int) =
-        if (position <= multiSelectEpisodesHelper.maxToolbarIcons) AnalyticsProp.Value.SHELF else AnalyticsProp.Value.OVERFLOW_MENU
+    private fun sectionTitleAt(position: Int) = if (position <= multiSelectEpisodesHelper.maxToolbarIcons) AnalyticsProp.Value.SHELF else AnalyticsProp.Value.OVERFLOW_MENU
 
     private fun trackRearrangeFinishedEvent() {
         analyticsTracker.track(

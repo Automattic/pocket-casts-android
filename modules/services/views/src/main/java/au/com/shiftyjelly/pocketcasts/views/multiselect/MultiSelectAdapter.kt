@@ -52,7 +52,9 @@ class MultiSelectAdapter(val editable: Boolean, val listener: ((MultiSelectActio
 
     class TitleViewHolder(val binding: AdapterMultiselectTitleBinding) : RecyclerView.ViewHolder(binding.root)
 
-    inner class ItemViewHolder(val binding: AdapterMultiselectItemBinding) : RecyclerView.ViewHolder(binding.root), MultiSelectTouchCallback.ItemTouchHelperViewHolder {
+    inner class ItemViewHolder(val binding: AdapterMultiselectItemBinding) :
+        RecyclerView.ViewHolder(binding.root),
+        MultiSelectTouchCallback.ItemTouchHelperViewHolder {
 
         override fun onItemDrag() {
             AnimatorSet().apply {

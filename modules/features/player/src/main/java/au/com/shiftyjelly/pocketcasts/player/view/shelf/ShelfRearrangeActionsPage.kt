@@ -6,6 +6,7 @@ import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
@@ -31,7 +32,8 @@ fun ShelfRearrangeActionsPage(
     shelfViewModel: ShelfViewModel,
     shelfSharedViewModel: ShelfSharedViewModel,
     playerViewModel: PlayerViewModel,
-    onBackPressed: () -> Unit,
+    onBackPress: () -> Unit,
+    modifier: Modifier = Modifier,
 ) {
     val iconColor = Color(ThemeColor.playerContrast01(theme.activeTheme))
     val backgroundColorInt = theme.playerBackground2Color(playerViewModel.podcast)
@@ -51,13 +53,15 @@ fun ShelfRearrangeActionsPage(
         backgroundColor = backgroundColor,
         toolbarColor = toolbarColor,
         iconColor = iconColor,
-        onBackPressed = onBackPressed,
+        onBackPress = onBackPress,
+        modifier = modifier,
     ) {
+        val uiState by shelfViewModel.uiState.collectAsState()
         MenuShelfItems(
-            shelfViewModel = shelfViewModel,
-            navigationBarPadding = true,
+            state = uiState,
             normalBackgroundColor = Color(backgroundColorInt),
             selectedBackgroundColor = Color(selectedBackgroundInt),
+            onMove = { from, to -> shelfViewModel.onShelfItemMove(from, to) },
         )
     }
 
@@ -79,17 +83,18 @@ private fun Content(
     backgroundColor: Color,
     toolbarColor: Color,
     iconColor: Color,
-    onBackPressed: () -> Unit,
+    onBackPress: () -> Unit,
+    modifier: Modifier = Modifier,
     menuShelfItems: @Composable () -> Unit,
 ) {
-    Column(modifier = Modifier.background(backgroundColor)) {
+    Column(modifier = modifier.background(backgroundColor)) {
         ThemedTopAppBar(
             title = stringResource(LR.string.rearrange_actions),
             backgroundColor = toolbarColor,
             textColor = MaterialTheme.theme.colors.playerContrast01,
             iconColor = iconColor,
             bottomShadow = true,
-            onNavigationClick = { onBackPressed() },
+            onNavigationClick = onBackPress,
         )
 
         menuShelfItems()

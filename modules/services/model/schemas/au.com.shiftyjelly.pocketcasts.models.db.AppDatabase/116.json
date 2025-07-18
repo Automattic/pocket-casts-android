@@ -2,7 +2,7 @@
   "formatVersion": 1,
   "database": {
     "version": 116,
-    "identityHash": "f9de5a7309b8c1f5f17bcb5cc344689f",
+    "identityHash": "dd04c611cd28d03f5132893f3837e20c",
     "entities": [
       {
         "tableName": "bump_stats",
@@ -452,7 +452,7 @@
         }
       },
       {
-        "tableName": "filters",
+        "tableName": "smart_playlists",
         "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`_id` INTEGER, `uuid` TEXT NOT NULL, `title` TEXT NOT NULL, `sortPosition` INTEGER, `manual` INTEGER NOT NULL, `unplayed` INTEGER NOT NULL, `partiallyPlayed` INTEGER NOT NULL, `finished` INTEGER NOT NULL, `audioVideo` INTEGER NOT NULL, `allPodcasts` INTEGER NOT NULL, `podcastUuids` TEXT, `downloaded` INTEGER NOT NULL, `downloading` INTEGER NOT NULL, `notDownloaded` INTEGER NOT NULL, `autoDownload` INTEGER NOT NULL, `autoDownloadWifiOnly` INTEGER NOT NULL, `autoDownloadPowerOnly` INTEGER NOT NULL, `sortId` INTEGER NOT NULL, `iconId` INTEGER NOT NULL, `filterHours` INTEGER NOT NULL, `starred` INTEGER NOT NULL, `deleted` INTEGER NOT NULL, `syncStatus` INTEGER NOT NULL, `autoDownloadLimit` INTEGER NOT NULL, `filterDuration` INTEGER NOT NULL, `longerThan` INTEGER NOT NULL, `shorterThan` INTEGER NOT NULL, `draft` INTEGER NOT NULL, PRIMARY KEY(`_id`))",
         "fields": [
           {
@@ -629,13 +629,13 @@
         },
         "indices": [
           {
-            "name": "filters_uuid",
+            "name": "smart_playlists_uuid",
             "unique": false,
             "columnNames": [
               "uuid"
             ],
             "orders": [],
-            "createSql": "CREATE INDEX IF NOT EXISTS `filters_uuid` ON `${TABLE_NAME}` (`uuid`)"
+            "createSql": "CREATE INDEX IF NOT EXISTS `smart_playlists_uuid` ON `${TABLE_NAME}` (`uuid`)"
           }
         ]
       },
@@ -1895,7 +1895,7 @@
     ],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'f9de5a7309b8c1f5f17bcb5cc344689f')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'dd04c611cd28d03f5132893f3837e20c')"
     ]
   }
 }

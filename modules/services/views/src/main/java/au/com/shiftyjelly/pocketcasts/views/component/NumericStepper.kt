@@ -21,7 +21,8 @@ class NumericStepper @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet? = null,
     defStyleAttr: Int = 0,
-) : LinearLayout(context, attrs, defStyleAttr), View.OnTouchListener {
+) : LinearLayout(context, attrs, defStyleAttr),
+    View.OnTouchListener {
 
     var initialDelay = 1000L
     var repeatDelay = 150L

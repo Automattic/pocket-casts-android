@@ -18,7 +18,7 @@ class PodcastTest {
     @Test
     fun ignoreHomeFolderUuid() {
         val podcast = Podcast()
-        podcast.folderUuid = Folder.homeFolderUuid
+        podcast.folderUuid = Folder.HOME_FOLDER_UUID
 
         assertNull(podcast.folderUuid)
     }

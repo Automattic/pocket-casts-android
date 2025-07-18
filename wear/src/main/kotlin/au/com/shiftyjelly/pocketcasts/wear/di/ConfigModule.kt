@@ -30,20 +30,17 @@ object ConfigModule {
     @Provides
     fun audioOutputSelector(
         systemAudioRepository: SystemAudioRepository,
-    ): AudioOutputSelector =
-        BluetoothSettingsOutputSelector(systemAudioRepository)
+    ): AudioOutputSelector = BluetoothSettingsOutputSelector(systemAudioRepository)
 
     @Singleton
     @Provides
     fun systemAudioRepository(
         @ApplicationContext application: Context,
-    ): SystemAudioRepository =
-        SystemAudioRepository.fromContext(application)
+    ): SystemAudioRepository = SystemAudioRepository.fromContext(application)
 
     @Singleton
     @Provides
     fun vibrator(
         @ApplicationContext application: Context,
-    ): Vibrator =
-        application.getSystemService(Vibrator::class.java)
+    ): Vibrator = application.getSystemService(Vibrator::class.java)
 }

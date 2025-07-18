@@ -159,8 +159,7 @@ class OnboardingRecommendationsSearchViewModel @Inject constructor(
         private object AnalyticsProp {
             const val UUID = "uuid"
             const val SOURCE = "source"
-            fun podcastSubscribeToggled(uuid: String) =
-                mapOf(UUID to uuid, SOURCE to SourceView.ONBOARDING_RECOMMENDATIONS_SEARCH)
+            fun podcastSubscribeToggled(uuid: String) = mapOf(UUID to uuid, SOURCE to SourceView.ONBOARDING_RECOMMENDATIONS_SEARCH)
         }
     }
 }

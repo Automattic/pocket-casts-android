@@ -32,10 +32,10 @@ import au.com.shiftyjelly.pocketcasts.localization.R as LR
 @Composable
 fun EndOfYearLaunchBottomSheet(
     parent: ViewGroup,
+    onClick: () -> Unit,
+    onExpand: () -> Unit,
     modifier: Modifier = Modifier,
     shouldShow: Boolean = true,
-    onClick: () -> Unit,
-    onExpanded: () -> Unit,
 ) {
     val sheetState = rememberModalBottomSheetState(
         initialValue = ModalBottomSheetValue.Hidden,
@@ -46,7 +46,7 @@ fun EndOfYearLaunchBottomSheet(
         parent = parent,
         sheetState = sheetState,
         shouldShow = shouldShow,
-        onExpanded = onExpanded,
+        onExpand = onExpand,
         content = BottomSheetContentState.Content(
             imageContent = {
                 ImageContent(

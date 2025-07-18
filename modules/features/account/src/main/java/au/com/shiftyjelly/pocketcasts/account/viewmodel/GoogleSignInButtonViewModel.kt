@@ -42,9 +42,8 @@ class GoogleSignInButtonViewModel @Inject constructor(
 ) : ViewModel() {
 
     companion object {
-        fun showContinueWithGoogleButton(context: Context) =
-            Settings.GOOGLE_SIGN_IN_SERVER_CLIENT_ID.isNotEmpty() &&
-                GoogleApiAvailability.getInstance().isGooglePlayServicesAvailableSuccess(context)
+        fun showContinueWithGoogleButton(context: Context) = Settings.GOOGLE_SIGN_IN_SERVER_CLIENT_ID.isNotEmpty() &&
+            GoogleApiAvailability.getInstance().isGooglePlayServicesAvailableSuccess(context)
     }
 
     /**
@@ -192,15 +191,14 @@ class GoogleSignInButtonViewModel @Inject constructor(
         idToken: String,
         onSuccess: (GoogleSignInState, Subscription?) -> Unit,
         onError: suspend () -> Unit,
-    ) =
-        when (val authResult = syncManager.loginWithGoogle(idToken = idToken, signInSource = SignInSource.UserInitiated.Onboarding)) {
-            is LoginResult.Success -> {
-                podcastManager.refreshPodcastsAfterSignIn()
-                val subscritpion = subscriptionManager.fetchFreshSubscription()
-                onSuccess(GoogleSignInState(isNewAccount = authResult.result.isNewAccount), subscritpion)
-            }
-            is LoginResult.Failed -> {
-                onError()
-            }
+    ) = when (val authResult = syncManager.loginWithGoogle(idToken = idToken, signInSource = SignInSource.UserInitiated.Onboarding)) {
+        is LoginResult.Success -> {
+            podcastManager.refreshPodcastsAfterSignIn()
+            val subscritpion = subscriptionManager.fetchFreshSubscription()
+            onSuccess(GoogleSignInState(isNewAccount = authResult.result.isNewAccount), subscritpion)
         }
+        is LoginResult.Failed -> {
+            onError()
+        }
+    }
 }

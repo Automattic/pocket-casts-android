@@ -14,8 +14,8 @@ import au.com.shiftyjelly.pocketcasts.repositories.jobs.VersionMigrationsWorker
 import au.com.shiftyjelly.pocketcasts.repositories.notification.NotificationHelper
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
-import au.com.shiftyjelly.pocketcasts.repositories.podcast.PlaylistManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
+import au.com.shiftyjelly.pocketcasts.repositories.podcast.SmartPlaylistManager
 import au.com.shiftyjelly.pocketcasts.repositories.sync.SyncManager
 import au.com.shiftyjelly.pocketcasts.repositories.user.UserManager
 import au.com.shiftyjelly.pocketcasts.shared.AppLifecycleObserver
@@ -34,7 +34,9 @@ import kotlinx.coroutines.withContext
 import timber.log.Timber
 
 @HiltAndroidApp
-class PocketCastsWearApplication : Application(), Configuration.Provider {
+class PocketCastsWearApplication :
+    Application(),
+    Configuration.Provider {
 
     @Inject lateinit var appLifecycleObserver: AppLifecycleObserver
 
@@ -46,7 +48,7 @@ class PocketCastsWearApplication : Application(), Configuration.Provider {
 
     @Inject lateinit var playbackManager: PlaybackManager
 
-    @Inject lateinit var playlistManager: PlaylistManager
+    @Inject lateinit var smartPlaylistManager: SmartPlaylistManager
 
     @Inject lateinit var podcastManager: PodcastManager
 
@@ -95,7 +97,7 @@ class PocketCastsWearApplication : Application(), Configuration.Provider {
 
             withContext(Dispatchers.Default) {
                 playbackManager.setup()
-                downloadManager.setup(episodeManager, podcastManager, playlistManager, playbackManager)
+                downloadManager.setup(episodeManager, podcastManager, smartPlaylistManager, playbackManager)
 
                 val storageChoice = settings.getStorageChoice()
                 if (storageChoice == null) {

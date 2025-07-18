@@ -134,13 +134,14 @@ internal class ViewInteropNestedScrollConnection(
         val dispatched = viewHelper.dispatchNestedPreFling(
             available.x * -1f, // velocityX
             available.y * -1f, // velocityY
-        ) || viewHelper.dispatchNestedFling(
-            available.x * -1f, // velocityX
-            available.y * -1f, // velocityY
-            // consumed. We don't know at this point if the fling was consumed by the child or not, so we assume yes.
-            // In reality most parents don't look at this value.
-            true,
-        )
+        ) ||
+            viewHelper.dispatchNestedFling(
+                available.x * -1f, // velocityX
+                available.y * -1f, // velocityY
+                // consumed. We don't know at this point if the fling was consumed by the child or not, so we assume yes.
+                // In reality most parents don't look at this value.
+                true,
+            )
 
         // Stop any nested scrolls which are on-going...
         if (viewHelper.hasNestedScrollingParent(TYPE_TOUCH)) {

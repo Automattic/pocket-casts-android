@@ -10,12 +10,12 @@ import java.io.Serializable
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 @Entity(
-    tableName = "filters",
+    tableName = "smart_playlists",
     indices = [
-        Index(name = "filters_uuid", value = arrayOf("uuid")),
+        Index(name = "smart_playlists_uuid", value = arrayOf("uuid")),
     ],
 )
-data class Playlist(
+data class SmartPlaylist(
     @PrimaryKey @ColumnInfo(name = "_id") var id: Long? = null,
     @ColumnInfo(name = "uuid") var uuid: String,
     @ColumnInfo(name = "title") var title: String = "",
@@ -162,8 +162,7 @@ data class Playlist(
         ;
 
         companion object {
-            fun fromInt(value: Int) =
-                SortOrder.values().find { it.value == value }
+            fun fromInt(value: Int) = SortOrder.values().find { it.value == value }
         }
     }
 }

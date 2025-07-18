@@ -56,8 +56,9 @@ fun EpisodeScreen(
     navigateToRemoveFromUpNextNotification: () -> Unit,
     navigateToStreamingConfirmation: () -> Unit,
     navigateToNowPlaying: () -> Unit,
+    modifier: Modifier = Modifier,
+    viewModel: EpisodeViewModel = hiltViewModel(),
 ) {
-    val viewModel = hiltViewModel<EpisodeViewModel>()
     val state = viewModel.stateFlow.collectAsState().value
     if (state !is EpisodeViewModel.State.Loaded) return
 
@@ -70,8 +71,7 @@ fun EpisodeScreen(
 
     ScalingLazyColumn(
         columnState = columnState,
-        modifier = Modifier
-            .fillMaxSize(),
+        modifier = modifier.fillMaxSize(),
     ) {
         val headingLineHeight = 14.sp
         item {

@@ -28,7 +28,7 @@ class ChapterManagerImplTest {
     fun `observe no chapters`() = runBlocking {
         val episode = PodcastEpisode("id", publishedDate = Date(), duration = 0.001)
 
-        whenever(chapterDao.observerChaptersForEpisode("id")).thenReturn(flowOf(emptyList()))
+        whenever(chapterDao.observeChaptersForEpisode("id")).thenReturn(flowOf(emptyList()))
         whenever(episodeManager.findEpisodeByUuidFlow("id")).thenReturn(flowOf(episode))
 
         chapterManager.observerChaptersForEpisode("id").test {
@@ -51,7 +51,7 @@ class ChapterManagerImplTest {
             url = "https://pocketcasts.com/",
         )
 
-        whenever(chapterDao.observerChaptersForEpisode("id")).thenReturn(flowOf(listOf(dbChapter)))
+        whenever(chapterDao.observeChaptersForEpisode("id")).thenReturn(flowOf(listOf(dbChapter)))
         whenever(episodeManager.findEpisodeByUuidFlow("id")).thenReturn(flowOf(episode))
 
         chapterManager.observerChaptersForEpisode("id").test {
@@ -98,7 +98,7 @@ class ChapterManagerImplTest {
             ),
         )
 
-        whenever(chapterDao.observerChaptersForEpisode("id")).thenReturn(flowOf(dbChapters))
+        whenever(chapterDao.observeChaptersForEpisode("id")).thenReturn(flowOf(dbChapters))
         whenever(episodeManager.findEpisodeByUuidFlow("id")).thenReturn(flowOf(episode))
 
         chapterManager.observerChaptersForEpisode("id").test {
@@ -147,7 +147,7 @@ class ChapterManagerImplTest {
             url = "https://pocketcasts.com/",
         )
 
-        whenever(chapterDao.observerChaptersForEpisode("id")).thenReturn(flowOf(listOf(dbChapter)))
+        whenever(chapterDao.observeChaptersForEpisode("id")).thenReturn(flowOf(listOf(dbChapter)))
         whenever(episodeManager.findEpisodeByUuidFlow("id")).thenReturn(flowOf(episode))
 
         chapterManager.observerChaptersForEpisode("id").test {
@@ -180,7 +180,7 @@ class ChapterManagerImplTest {
             url = "https://pocketcasts.com/",
         )
 
-        whenever(chapterDao.observerChaptersForEpisode("id")).thenReturn(flowOf(listOf(dbChapter)))
+        whenever(chapterDao.observeChaptersForEpisode("id")).thenReturn(flowOf(listOf(dbChapter)))
         whenever(episodeManager.findEpisodeByUuidFlow("id")).thenReturn(flowOf(episode))
 
         chapterManager.observerChaptersForEpisode("id").test {
@@ -213,7 +213,7 @@ class ChapterManagerImplTest {
             url = null,
         )
 
-        whenever(chapterDao.observerChaptersForEpisode("id")).thenReturn(flowOf(listOf(dbChapter)))
+        whenever(chapterDao.observeChaptersForEpisode("id")).thenReturn(flowOf(listOf(dbChapter)))
         whenever(episodeManager.findEpisodeByUuidFlow("id")).thenReturn(flowOf(episode))
 
         chapterManager.observerChaptersForEpisode("id").test {
@@ -246,7 +246,7 @@ class ChapterManagerImplTest {
             url = "Invalid Url",
         )
 
-        whenever(chapterDao.observerChaptersForEpisode("id")).thenReturn(flowOf(listOf(dbChapter)))
+        whenever(chapterDao.observeChaptersForEpisode("id")).thenReturn(flowOf(listOf(dbChapter)))
         whenever(episodeManager.findEpisodeByUuidFlow("id")).thenReturn(flowOf(episode))
 
         chapterManager.observerChaptersForEpisode("id").test {
@@ -300,7 +300,7 @@ class ChapterManagerImplTest {
             ),
         )
 
-        whenever(chapterDao.observerChaptersForEpisode("id")).thenReturn(flowOf(dbChapters))
+        whenever(chapterDao.observeChaptersForEpisode("id")).thenReturn(flowOf(dbChapters))
         whenever(episodeManager.findEpisodeByUuidFlow("id")).thenReturn(flowOf(episode))
 
         chapterManager.observerChaptersForEpisode("id").test {
@@ -371,7 +371,7 @@ class ChapterManagerImplTest {
             ),
         )
 
-        whenever(chapterDao.observerChaptersForEpisode("id")).thenReturn(flowOf(dbChapters))
+        whenever(chapterDao.observeChaptersForEpisode("id")).thenReturn(flowOf(dbChapters))
         whenever(episodeManager.findEpisodeByUuidFlow("id")).thenReturn(flowOf(episode))
 
         chapterManager.observerChaptersForEpisode("id").test {
@@ -427,7 +427,7 @@ class ChapterManagerImplTest {
             ),
         )
 
-        whenever(chapterDao.observerChaptersForEpisode("id")).thenReturn(flowOf(dbChapters))
+        whenever(chapterDao.observeChaptersForEpisode("id")).thenReturn(flowOf(dbChapters))
         whenever(episodeManager.findEpisodeByUuidFlow("id")).thenReturn(flowOf(episode))
 
         chapterManager.observerChaptersForEpisode("id").test {
@@ -467,7 +467,7 @@ class ChapterManagerImplTest {
             title = "Title",
         )
 
-        whenever(chapterDao.observerChaptersForEpisode("id")).thenReturn(flowOf(listOf(dbChapter)))
+        whenever(chapterDao.observeChaptersForEpisode("id")).thenReturn(flowOf(listOf(dbChapter)))
         whenever(episodeManager.findEpisodeByUuidFlow("id")).thenReturn(episodesFlow)
 
         chapterManager.observerChaptersForEpisode("id").test {
@@ -510,7 +510,7 @@ class ChapterManagerImplTest {
             ),
         )
 
-        whenever(chapterDao.observerChaptersForEpisode("id")).thenReturn(flowOf(dbChapters))
+        whenever(chapterDao.observeChaptersForEpisode("id")).thenReturn(flowOf(dbChapters))
         whenever(episodeManager.findEpisodeByUuidFlow("id")).thenReturn(flowOf(episode))
 
         chapterManager.observerChaptersForEpisode("id").test {
@@ -558,7 +558,7 @@ class ChapterManagerImplTest {
             ),
         )
 
-        whenever(chapterDao.observerChaptersForEpisode("id")).thenReturn(flowOf(dbChapters))
+        whenever(chapterDao.observeChaptersForEpisode("id")).thenReturn(flowOf(dbChapters))
         whenever(episodeManager.findEpisodeByUuidFlow("id")).thenReturn(flowOf(episode))
 
         chapterManager.observerChaptersForEpisode("id").test {
@@ -627,7 +627,7 @@ class ChapterManagerImplTest {
             ),
         )
 
-        whenever(chapterDao.observerChaptersForEpisode("id")).thenReturn(flowOf(dbChapters))
+        whenever(chapterDao.observeChaptersForEpisode("id")).thenReturn(flowOf(dbChapters))
         whenever(episodeManager.findEpisodeByUuidFlow("id")).thenReturn(flowOf(episode))
 
         chapterManager.observerChaptersForEpisode("id").test {

@@ -357,7 +357,7 @@ private fun buildTranscript(block: TranscriptBuilder.() -> Unit): List<Transcrip
     return TranscriptBuilder().apply(block).build()
 }
 
-private class TranscriptBuilder() {
+private class TranscriptBuilder {
     private val entries = mutableListOf<TranscriptEntry>()
 
     fun text(value: String) {

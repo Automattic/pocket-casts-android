@@ -38,8 +38,8 @@ import au.com.shiftyjelly.pocketcasts.repositories.playback.auto.AutoConverter.c
 import au.com.shiftyjelly.pocketcasts.repositories.playback.auto.PackageValidator
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.FolderManager
-import au.com.shiftyjelly.pocketcasts.repositories.podcast.PlaylistManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
+import au.com.shiftyjelly.pocketcasts.repositories.podcast.SmartPlaylistManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.UserEpisodeManager
 import au.com.shiftyjelly.pocketcasts.servers.ServiceManager
 import au.com.shiftyjelly.pocketcasts.servers.list.ListServiceManager
@@ -107,7 +107,9 @@ const val CONTENT_STYLE_GRID_ITEM_HINT_VALUE = 2
 private const val EPISODE_LIMIT = 100
 
 @AndroidEntryPoint
-open class PlaybackService : MediaBrowserServiceCompat(), CoroutineScope {
+open class PlaybackService :
+    MediaBrowserServiceCompat(),
+    CoroutineScope {
     inner class LocalBinder : Binder() {
         val service: PlaybackService
             get() = this@PlaybackService
@@ -121,7 +123,7 @@ open class PlaybackService : MediaBrowserServiceCompat(), CoroutineScope {
 
     @Inject lateinit var userEpisodeManager: UserEpisodeManager
 
-    @Inject lateinit var playlistManager: PlaylistManager
+    @Inject lateinit var smartPlaylistManager: SmartPlaylistManager
 
     @Inject lateinit var playbackManager: PlaybackManager
 
@@ -440,7 +442,7 @@ open class PlaybackService : MediaBrowserServiceCompat(), CoroutineScope {
         }
     }
 
-    private val NUM_SUGGESTED_ITEMS = 8
+    private val numSuggestedItems = 8
     suspend fun loadSuggestedChildren(): List<MediaBrowserCompat.MediaItem> {
         Timber.d("Loading suggested children")
         val episodes = mutableListOf<BaseEpisode>()
@@ -449,14 +451,14 @@ open class PlaybackService : MediaBrowserServiceCompat(), CoroutineScope {
         if (currentEpisode != null) {
             episodes.add(currentEpisode)
         }
-        episodes.addAll(upNextQueue.queueEpisodes.take(NUM_SUGGESTED_ITEMS - 1))
+        episodes.addAll(upNextQueue.queueEpisodes.take(numSuggestedItems - 1))
         // add episodes from the top filter
-        if (episodes.size < NUM_SUGGESTED_ITEMS) {
-            val topFilter = playlistManager.findAll().firstOrNull()
+        if (episodes.size < numSuggestedItems) {
+            val topFilter = smartPlaylistManager.findAll().firstOrNull()
             if (topFilter != null) {
-                val filterEpisodes = playlistManager.findEpisodesBlocking(topFilter, episodeManager, playbackManager)
+                val filterEpisodes = smartPlaylistManager.findEpisodesBlocking(topFilter, episodeManager, playbackManager)
                 for (filterEpisode in filterEpisodes) {
-                    if (episodes.size >= NUM_SUGGESTED_ITEMS) {
+                    if (episodes.size >= numSuggestedItems) {
                         break
                     }
                     if (episodes.none { it.uuid == filterEpisode.uuid }) {
@@ -466,7 +468,7 @@ open class PlaybackService : MediaBrowserServiceCompat(), CoroutineScope {
             }
         }
         // add the latest episode
-        if (episodes.size < NUM_SUGGESTED_ITEMS) {
+        if (episodes.size < numSuggestedItems) {
             val latestEpisode = episodeManager.findLatestEpisodeToPlayBlocking()
             if (latestEpisode != null && episodes.none { it.uuid == latestEpisode.uuid }) {
                 episodes.add(latestEpisode)
@@ -503,7 +505,7 @@ open class PlaybackService : MediaBrowserServiceCompat(), CoroutineScope {
         rootItems.add(podcastItem)
 
         // playlists
-        for (playlist in playlistManager.findAllBlocking().filterNot { it.manual }) {
+        for (playlist in smartPlaylistManager.findAllBlocking().filterNot { it.manual }) {
             if (playlist.title.equals("video", ignoreCase = true)) continue
 
             val playlistItem = AutoConverter.convertPlaylistToMediaItem(this, playlist)
@@ -561,14 +563,14 @@ open class PlaybackService : MediaBrowserServiceCompat(), CoroutineScope {
         val episodeItems = mutableListOf<MediaBrowserCompat.MediaItem>()
         val autoPlaySource: AutoPlaySource
 
-        val playlist = if (DOWNLOADS_ROOT == parentId) playlistManager.getSystemDownloadsFilter() else playlistManager.findByUuidBlocking(parentId)
+        val playlist = if (DOWNLOADS_ROOT == parentId) smartPlaylistManager.getSystemDownloadsFilter() else smartPlaylistManager.findByUuidBlocking(parentId)
         if (playlist != null) {
             val episodeList = if (DOWNLOADS_ROOT == parentId) {
-                autoPlaySource = AutoPlaySource.Downloads
+                autoPlaySource = AutoPlaySource.Predefined.Downloads
                 episodeManager.findDownloadedEpisodesRxFlowable().blockingFirst()
             } else {
                 autoPlaySource = AutoPlaySource.fromId(parentId)
-                playlistManager.findEpisodesBlocking(playlist, episodeManager, playbackManager)
+                smartPlaylistManager.findEpisodesBlocking(playlist, episodeManager, playbackManager)
             }
             val topEpisodes = episodeList.take(EPISODE_LIMIT)
             if (topEpisodes.isNotEmpty()) {
@@ -608,14 +610,14 @@ open class PlaybackService : MediaBrowserServiceCompat(), CoroutineScope {
     }
 
     protected suspend fun loadFilesChildren(): List<MediaBrowserCompat.MediaItem> {
-        setAutoPlaySource(AutoPlaySource.Files)
+        setAutoPlaySource(AutoPlaySource.Predefined.Files)
         return userEpisodeManager.findUserEpisodes().map {
             AutoConverter.convertEpisodeToMediaItem(this, it, Podcast.userPodcast, useEpisodeArtwork = settings.artworkConfiguration.value.useEpisodeArtwork)
         }
     }
 
     protected suspend fun loadStarredChildren(): List<MediaBrowserCompat.MediaItem> {
-        setAutoPlaySource(AutoPlaySource.Starred)
+        setAutoPlaySource(AutoPlaySource.Predefined.Starred)
         return episodeManager.findStarredEpisodes().take(EPISODE_LIMIT).mapNotNull { episode ->
             podcastManager.findPodcastByUuidBlocking(episode.podcastUuid)?.let { podcast ->
                 AutoConverter.convertEpisodeToMediaItem(context = this, episode = episode, parentPodcast = podcast, useEpisodeArtwork = settings.artworkConfiguration.value.useEpisodeArtwork)

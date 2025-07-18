@@ -19,8 +19,8 @@ import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.repositories.playback.UpNextQueue
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.FolderManager
-import au.com.shiftyjelly.pocketcasts.repositories.podcast.PlaylistManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
+import au.com.shiftyjelly.pocketcasts.repositories.podcast.SmartPlaylistManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.UserEpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.searchhistory.SearchHistoryManager
 import au.com.shiftyjelly.pocketcasts.repositories.subscription.SubscriptionManager
@@ -48,7 +48,7 @@ interface UserManager {
     fun beginMonitoringAccountManager(playbackManager: PlaybackManager)
     fun getSignInState(): Flowable<SignInState>
     fun signOut(playbackManager: PlaybackManager, wasInitiatedByUser: Boolean)
-    fun signOutAndClearData(playbackManager: PlaybackManager, upNextQueue: UpNextQueue, playlistManager: PlaylistManager, folderManager: FolderManager, searchHistoryManager: SearchHistoryManager, episodeManager: EpisodeManager, wasInitiatedByUser: Boolean)
+    fun signOutAndClearData(playbackManager: PlaybackManager, upNextQueue: UpNextQueue, smartPlaylistManager: SmartPlaylistManager, folderManager: FolderManager, searchHistoryManager: SearchHistoryManager, episodeManager: EpisodeManager, wasInitiatedByUser: Boolean)
 }
 
 class UserManagerImpl @Inject constructor(
@@ -65,7 +65,8 @@ class UserManagerImpl @Inject constructor(
     private val experimentProvider: ExperimentProvider,
     private val endOfYearSync: EndOfYearSync,
     private val notificationScheduler: NotificationScheduler,
-) : UserManager, CoroutineScope {
+) : UserManager,
+    CoroutineScope {
 
     companion object {
         private const val KEY_USER_INITIATED = "user_initiated"
@@ -161,7 +162,7 @@ class UserManagerImpl @Inject constructor(
     override fun signOutAndClearData(
         playbackManager: PlaybackManager,
         upNextQueue: UpNextQueue,
-        playlistManager: PlaylistManager,
+        smartPlaylistManager: SmartPlaylistManager,
         folderManager: FolderManager,
         searchHistoryManager: SearchHistoryManager,
         episodeManager: EpisodeManager,
@@ -182,7 +183,7 @@ class UserManagerImpl @Inject constructor(
         runBlocking(Dispatchers.IO) {
             upNextQueue.removeAllIncludingChanges()
 
-            playlistManager.resetDb()
+            smartPlaylistManager.resetDb()
             folderManager.deleteAll()
             searchHistoryManager.clearAll()
 

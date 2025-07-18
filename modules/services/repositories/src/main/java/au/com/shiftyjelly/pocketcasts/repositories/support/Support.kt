@@ -23,8 +23,8 @@ import au.com.shiftyjelly.pocketcasts.repositories.file.FileStorage
 import au.com.shiftyjelly.pocketcasts.repositories.file.StorageOptions
 import au.com.shiftyjelly.pocketcasts.repositories.playback.UpNextQueue
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
-import au.com.shiftyjelly.pocketcasts.repositories.podcast.PlaylistManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
+import au.com.shiftyjelly.pocketcasts.repositories.podcast.SmartPlaylistManager
 import au.com.shiftyjelly.pocketcasts.repositories.subscription.SubscriptionManager
 import au.com.shiftyjelly.pocketcasts.repositories.sync.SyncManager
 import au.com.shiftyjelly.pocketcasts.utils.FileUtil
@@ -58,7 +58,7 @@ import timber.log.Timber
 class Support @Inject constructor(
     private val podcastManager: PodcastManager,
     private val episodeManager: EpisodeManager,
-    private val playlistManager: PlaylistManager,
+    private val smartPlaylistManager: SmartPlaylistManager,
     private val settings: Settings,
     private val fileStorage: FileStorage,
     private val upNextQueue: UpNextQueue,
@@ -186,15 +186,14 @@ class Support @Inject constructor(
         null -> ""
     }
 
-    suspend fun getLogs(): String =
-        withContext(Dispatchers.IO) {
-            buildString {
-                append(getUserDebug(false))
-                val outputStream = ByteArrayOutputStream()
-                LogBuffer.output(outputStream)
-                append(outputStream.toString())
-            }
+    suspend fun getLogs(): String = withContext(Dispatchers.IO) {
+        buildString {
+            append(getUserDebug(false))
+            val outputStream = ByteArrayOutputStream()
+            LogBuffer.output(outputStream)
+            append(outputStream.toString())
         }
+    }
 
     @Suppress("DEPRECATION")
     suspend fun getUserDebug(html: Boolean): String {
@@ -300,7 +299,7 @@ class Support @Inject constructor(
             output.append(eol)
             output.append("Auto-play settings").append(eol)
             output.append("  Is enabled? ${settings.autoPlayNextEpisodeOnEmpty.value}").append(eol)
-            output.append("  Latest source: ${settings.lastAutoPlaySource.value.prettyPrint(podcastManager, playlistManager)}").append(eol)
+            output.append("  Latest source: ${settings.lastAutoPlaySource.value.prettyPrint(podcastManager, smartPlaylistManager)}").append(eol)
 
             output.append(eol)
             output.append("Current connection").append(eol)
@@ -402,7 +401,7 @@ class Support @Inject constructor(
                 output.append("Database").append(eol)
                     .append(" ").append(podcastManager.countPodcastsBlocking()).append(" Podcasts ").append(eol)
                     .append(" ").append(episodeManager.countEpisodes()).append(" Episodes ").append(eol)
-                    .append(" ").append(playlistManager.findAllBlocking().size).append(" Playlists ").append(eol)
+                    .append(" ").append(smartPlaylistManager.findAllBlocking().size).append(" Playlists ").append(eol)
                     .append(" ").append(queue.size).append(" Up Next ").append(eol).append(eol)
 
                 output.append(podcastsOutput.toString())
@@ -410,7 +409,7 @@ class Support @Inject constructor(
                 output.append("Filters").append(eol).append("-------").append(eol).append(eol)
 
                 try {
-                    val playlists = playlistManager.findAllBlocking()
+                    val playlists = smartPlaylistManager.findAllBlocking()
                     for (playlist in playlists) {
                         output.append(playlist.title).append(eol)
                         output.append("Auto Download? ").append(playlist.autoDownload).append(" Unmetered only? ").append(playlist.autoDownloadUnmeteredOnly).append(" Power only? ").append(playlist.autoDownloadPowerOnly).append(eol)
@@ -473,19 +472,19 @@ class Support @Inject constructor(
 
 private fun AutoPlaySource.prettyPrint(
     podcastManager: PodcastManager,
-    playlistManager: PlaylistManager,
+    smartPlaylistManager: SmartPlaylistManager,
 ): String = when (this) {
     is AutoPlaySource.PodcastOrFilter -> {
         podcastManager.findPodcastByUuidBlocking(uuid)?.let { podcast ->
             return "Podcast / ${podcast.title} / ${podcast.uuid}"
         }
-        playlistManager.findByUuidBlocking(uuid)?.let { filter ->
+        smartPlaylistManager.findByUuidBlocking(uuid)?.let { filter ->
             return "Filter / ${filter.title} / ${filter.uuid}"
         }
         "Podcast or filter: $uuid"
     }
-    is AutoPlaySource.Downloads -> "Downloads"
-    is AutoPlaySource.Files -> "Files"
-    is AutoPlaySource.Starred -> "Starred"
-    is AutoPlaySource.None -> "None"
+    AutoPlaySource.Predefined.Downloads -> "Downloads"
+    AutoPlaySource.Predefined.Files -> "Files"
+    AutoPlaySource.Predefined.Starred -> "Starred"
+    AutoPlaySource.Predefined.None -> "None"
 }
