@@ -1,11 +1,32 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2025-07-01 09:54:03+0000
+Translation-Revision-Date: 2025-07-16 09:54:04+0000
 Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);
 Generator: GlotPress/2.4.0-alpha
 Language: ru
 -->
 <resources>
+    <string name="onboarding_upgrade_billing_cycle_yearly">Годовой тарифный план</string>
+    <string name="onboarding_upgrade_billing_cycle_monthly">Тарифный план с помесячной оплатой</string>
+    <string name="onboarding_upgrade_features_trial_schedule">Что такое бесплатный пробный период?</string>
+    <string name="onboarding_upgrade_features_slumber">Контент от &lt;a href=\"https://slumberstudios.com/\"&gt;Slumber Studios&lt;/a&gt; на 1 год</string>
+    <string name="onboarding_upgrade_features_wear">Приложения для Wear OS и Apple Watch</string>
+    <string name="onboarding_upgrade_features_themes">Дополнительные темы и значки приложений</string>
+    <string name="onboarding_upgrade_features_files">20 ГБ облачного хранилища для ваших файлов</string>
+    <string name="onboarding_upgrade_features_chapters">Экономьте время, пользуясь функцией «Предварительный выбор глав»</string>
+    <string name="onboarding_upgrade_features_bookmarks">Сохраняйте отметки времени в закладках</string>
+    <string name="onboarding_upgrade_features_shuffle">Прослушивайте подкасты в случайном порядке</string>
+    <string name="onboarding_upgrade_features_folders">Организуйте подкасты, разложив их по папкам</string>
+    <string name="onboarding_upgrade_schedule_see_features">Посмотреть все возможности Plus</string>
+    <string name="onboarding_upgrade_schedule_billing">Плата будет списана %1$s. Можно отменить в любой момент до этой даты.</string>
+    <string name="onboarding_upgrade_schedule_notify">Мы уведомим вас об окончании пробного периода.</string>
+    <string name="onboarding_upgrade_schedule_day">День %1$d</string>
+    <string name="onboarding_upgrade_schedule_today_message">Пользуйтесь папками и закладками, прослушивайте подкасты в случайном порядке, в том числе эксклюзивный контент</string>
+    <string name="onboarding_upgrade_schedule_today">Сегодня</string>
+    <string name="onboarding_upgrade_generic_title">Сверхсила ваших подкастов</string>
+    <string name="onboarding_upgrade_save_percent">Сэкономьте %1$d%%</string>
+    <string name="best_value">Оптимальная стоимость</string>
+    <string name="view_transcript">Просмотреть расшифровку</string>
     <string name="transcript_open">Показать расшифровку</string>
     <string name="episode_description">Описание выпуска</string>
     <string name="onboarding_plus_feature_no_banner_ads">Никаких рекламных баннеров</string>

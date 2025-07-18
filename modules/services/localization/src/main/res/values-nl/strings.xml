@@ -1,11 +1,32 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2025-07-01 15:54:04+0000
+Translation-Revision-Date: 2025-07-17 11:54:02+0000
 Plural-Forms: nplurals=2; plural=n != 1;
 Generator: GlotPress/2.4.0-alpha
 Language: nl
 -->
 <resources>
+    <string name="onboarding_upgrade_billing_cycle_yearly">Jaarbonnement</string>
+    <string name="onboarding_upgrade_billing_cycle_monthly">Maandabonnement</string>
+    <string name="onboarding_upgrade_features_trial_schedule">Hoe werkt de gratis proefversie?</string>
+    <string name="onboarding_upgrade_features_slumber">1 jaar lang content van &lt;a href=\"https://slumberstudios.com/\"&gt;Slumber Studios&lt;/a&gt;</string>
+    <string name="onboarding_upgrade_features_wear">Apps voor Wear OS en Apple Watch</string>
+    <string name="onboarding_upgrade_features_themes">Extra thema\'s en app-pictogrammen</string>
+    <string name="onboarding_upgrade_features_files">20 GB cloudopslag voor je bestanden</string>
+    <string name="onboarding_upgrade_features_chapters">Bespaar tijd met voorselectie van hoofdstukken</string>
+    <string name="onboarding_upgrade_features_bookmarks">Tijdstempels bewaren met bladwijzers</string>
+    <string name="onboarding_upgrade_features_shuffle">Shuffle je wachtrij</string>
+    <string name="onboarding_upgrade_features_folders">Ruim je collectie op met mappen</string>
+    <string name="onboarding_upgrade_schedule_see_features">Bekijk alle functies van Plus</string>
+    <string name="onboarding_upgrade_schedule_billing">Je wordt op %1$s gefactureerd. Zeg je abonnement op ieder moment voor deze datum op.</string>
+    <string name="onboarding_upgrade_schedule_notify">We laten je weten wanneer je proefabonnement afloopt.</string>
+    <string name="onboarding_upgrade_schedule_day">Dag %1$d</string>
+    <string name="onboarding_upgrade_schedule_today_message">Krijg toegang tot mappen, shuffle, bladwijzers en exclusieve content</string>
+    <string name="onboarding_upgrade_schedule_today">Vandaag</string>
+    <string name="onboarding_upgrade_generic_title">Superkrachten voor je podcasts</string>
+    <string name="onboarding_upgrade_save_percent">Opslaan %1$d%%</string>
+    <string name="best_value">Beste deal</string>
+    <string name="view_transcript">Transcriptie bekijken</string>
     <string name="transcript_open">Transcriptie openen</string>
     <string name="episode_description">Beschrijving van aflevering</string>
     <string name="onboarding_plus_feature_no_banner_ads">Geen banneradvertenties</string>

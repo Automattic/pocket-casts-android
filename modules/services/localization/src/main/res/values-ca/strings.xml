@@ -1,11 +1,32 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2025-07-03 17:08:39+0000
+Translation-Revision-Date: 2025-07-17 18:47:50+0000
 Plural-Forms: nplurals=2; plural=n != 1;
 Generator: GlotPress/2.4.0-alpha
 Language: ca
 -->
 <resources>
+    <string name="playlists">Llistes de reproducció</string>
+    <string name="onboarding_upgrade_billing_cycle_yearly">Pla anual</string>
+    <string name="onboarding_upgrade_billing_cycle_monthly">Pla mensual</string>
+    <string name="onboarding_upgrade_features_trial_schedule">Com funciona la prova gratuïta?</string>
+    <string name="onboarding_upgrade_features_slumber">1 any de contingut d\'&lt;a href=\"https://slumberstudios.com/\"&gt;Slumber Studios&lt;/a&gt;</string>
+    <string name="onboarding_upgrade_features_wear">Apps per a Wear OS i Apple Watch</string>
+    <string name="onboarding_upgrade_features_themes">Més temes i icones de l\'aplicació</string>
+    <string name="onboarding_upgrade_features_files">20 GB d\'emmagatzematge al núvol per als teus fitxers</string>
+    <string name="onboarding_upgrade_features_chapters">Estalvia temps amb els capítols preseleccionats</string>
+    <string name="onboarding_upgrade_features_bookmarks">Conserva moments destacats amb els marcadors</string>
+    <string name="onboarding_upgrade_features_shuffle">Posa en mode aleatori la teva cua</string>
+    <string name="onboarding_upgrade_features_folders">Organitza la teva col·lecció amb les carpetes</string>
+    <string name="onboarding_upgrade_schedule_see_features">Veure totes les funcions Plus</string>
+    <string name="onboarding_upgrade_schedule_billing">Se\'t cobrarà el %1$s. Cancel·la en qualsevol moment abans.</string>
+    <string name="onboarding_upgrade_schedule_notify">T\'informarem del final del teu període gratuït.</string>
+    <string name="onboarding_upgrade_schedule_day">Dia %1$d</string>
+    <string name="onboarding_upgrade_schedule_today_message">Accedeix a carpetes, mode aleatori, marcadors i contingut exclusiu</string>
+    <string name="onboarding_upgrade_schedule_today">Avui</string>
+    <string name="onboarding_upgrade_generic_title">Superpoders per als teus pòdcasts</string>
+    <string name="onboarding_upgrade_save_percent">Estalvia %1$d%%</string>
+    <string name="best_value">Millor preu</string>
     <string name="view_transcript">Veure la transcripció</string>
     <string name="transcript_open">Obrir la transcripció</string>
     <string name="episode_description">Descripció de l\'episodi</string>

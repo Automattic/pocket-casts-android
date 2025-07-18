@@ -1,11 +1,32 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2025-07-01 09:54:04+0000
+Translation-Revision-Date: 2025-07-16 09:54:04+0000
 Plural-Forms: nplurals=1; plural=0;
 Generator: GlotPress/2.4.0-alpha
 Language: ko_KR
 -->
 <resources>
+    <string name="onboarding_upgrade_billing_cycle_yearly">연간 요금제</string>
+    <string name="onboarding_upgrade_billing_cycle_monthly">월간 요금제</string>
+    <string name="onboarding_upgrade_features_trial_schedule">무료 평가판은 어떻게 사용하나요?</string>
+    <string name="onboarding_upgrade_features_slumber">1년간 &lt;a href=\"https://slumberstudios.com/\"&gt;Slumber Studios&lt;/a&gt; 콘텐츠 이용</string>
+    <string name="onboarding_upgrade_features_wear">Wear OS 및 Apple Watch용 앱</string>
+    <string name="onboarding_upgrade_features_themes">추가 테마 및 아이콘</string>
+    <string name="onboarding_upgrade_features_files">파일을 위한 20GB 클라우드 저장 공간</string>
+    <string name="onboarding_upgrade_features_chapters">미리 선택된 챕터로 시간 절약</string>
+    <string name="onboarding_upgrade_features_bookmarks">북마크로 타임스탬프 저장</string>
+    <string name="onboarding_upgrade_features_shuffle">대기열 셔플</string>
+    <string name="onboarding_upgrade_features_folders">폴더로 컬렉션 정리</string>
+    <string name="onboarding_upgrade_schedule_see_features">모든 Plus 기능 보기</string>
+    <string name="onboarding_upgrade_schedule_billing">%1$s에 요금이 청구됩니다. 언제든지 취소 가능합니다.</string>
+    <string name="onboarding_upgrade_schedule_notify">평가판 기간이 종료되면 알려드립니다.</string>
+    <string name="onboarding_upgrade_schedule_day">%1$d일</string>
+    <string name="onboarding_upgrade_schedule_today_message">폴더, 셔플, 북마크, 독점 콘텐츠를 이용하세요</string>
+    <string name="onboarding_upgrade_schedule_today">오늘</string>
+    <string name="onboarding_upgrade_generic_title">팟캐스트를 위한 강력한 기능</string>
+    <string name="onboarding_upgrade_save_percent">%1$d%% 절약</string>
+    <string name="best_value">최고의 가성비</string>
+    <string name="view_transcript">대본 보기</string>
     <string name="transcript_open">대본 공개</string>
     <string name="episode_description">에피소드 설명</string>
     <string name="onboarding_plus_feature_no_banner_ads">배너 광고 없음</string>
