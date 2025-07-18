@@ -44,7 +44,6 @@ import au.com.shiftyjelly.pocketcasts.payment.BillingCycle
 import au.com.shiftyjelly.pocketcasts.payment.SubscriptionPlan
 import au.com.shiftyjelly.pocketcasts.payment.SubscriptionTier
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme.ThemeType
-import java.math.RoundingMode
 import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
@@ -279,7 +278,7 @@ private val SubscriptionPlan.pricePerMonth: Float
     get() {
         val pricePerMonth = when (billingCycle) {
             BillingCycle.Monthly -> recurringPrice.amount
-            BillingCycle.Yearly -> recurringPrice.amount.divide(12.toBigDecimal(), 2, RoundingMode.HALF_UP)
+            BillingCycle.Yearly -> recurringPrice.amount / monthsInYear
         }
         return pricePerMonth.toFloat()
     }
@@ -287,11 +286,14 @@ private val SubscriptionPlan.pricePerMonth: Float
 private val SubscriptionPlan.pricePerWeek: Float
     get() {
         val pricePerWeek = when (billingCycle) {
-            BillingCycle.Monthly -> (recurringPrice.amount.times(12.toBigDecimal()))
-            BillingCycle.Yearly -> (recurringPrice.amount)
-        }
-        return pricePerWeek.divide(52.toBigDecimal(), 2, RoundingMode.HALF_UP).toFloat()
+            BillingCycle.Monthly -> recurringPrice.amount * monthsInYear
+            BillingCycle.Yearly -> recurringPrice.amount
+        } / weeksInYear
+        return pricePerWeek.toFloat()
     }
+
+private val monthsInYear = 12.toBigDecimal()
+private val weeksInYear = 52.toBigDecimal()
 
 @Composable
 private fun SubscriptionPlan.pricePerPeriod(config: RowConfig): String? {
