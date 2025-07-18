@@ -1,11 +1,32 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2025-07-01 09:54:04+0000
+Translation-Revision-Date: 2025-07-16 11:54:03+0000
 Plural-Forms: nplurals=6; plural=n==0 ? 0 : n==1 ? 1 : n==2 ? 2 : n%100>=3 && n%100<=10 ? 3 : n%100>=11 && n%100<=99 ? 4 : 5;
 Generator: GlotPress/2.4.0-alpha
 Language: ar
 -->
 <resources>
+    <string name="onboarding_upgrade_billing_cycle_yearly">خطة سنوية</string>
+    <string name="onboarding_upgrade_billing_cycle_monthly">خطة شهرية</string>
+    <string name="onboarding_upgrade_features_trial_schedule">كيف يعمل الإصدار التجريبي المجاني؟</string>
+    <string name="onboarding_upgrade_features_slumber">عام واحد من المحتوى الحصري من &lt;a href=\"https://slumberstudios.com/\"&gt;Slumber Studios&lt;/a&gt;</string>
+    <string name="onboarding_upgrade_features_wear">تطبيقات مخصصة لـ Wear OS وApple Watch</string>
+    <string name="onboarding_upgrade_features_themes">أيقونات القوالب والتطبيقات الإضافية</string>
+    <string name="onboarding_upgrade_features_files">مساحة تخزين سحابي بسعة 20 جيجابايت لملفاتك</string>
+    <string name="onboarding_upgrade_features_chapters">توفير الوقت باستخدام فصول Presselect</string>
+    <string name="onboarding_upgrade_features_bookmarks">احتفظ بالطوابع الزمنية مع الإشارات المرجعية</string>
+    <string name="onboarding_upgrade_features_shuffle">أعِد ترتيب قائمة إنتظارك</string>
+    <string name="onboarding_upgrade_features_folders">ترتيب مجموعتك باستخدام المجلدات</string>
+    <string name="onboarding_upgrade_schedule_see_features">اطلع على جميع ميزات Plus</string>
+    <string name="onboarding_upgrade_schedule_billing">سيتم تحصيل الرسوم منك في ⁦%1$s⁩. يمكنك الإلغاء في أي وقت قبل.</string>
+    <string name="onboarding_upgrade_schedule_notify">سنخطرك بشأن انتهاء إصدارك التجريبي.</string>
+    <string name="onboarding_upgrade_schedule_day">يوم ⁦%1$d⁩</string>
+    <string name="onboarding_upgrade_schedule_today_message">احصل على صلاحية الوصول إلى المجلدات، والتبديل العشوائي، والإشارات المرجعية، والمحتوى الحصري.</string>
+    <string name="onboarding_upgrade_schedule_today">اليوم</string>
+    <string name="onboarding_upgrade_generic_title">قوى خارقة لبثك الصوتي</string>
+    <string name="onboarding_upgrade_save_percent">وفّر ⁦%1$d⁩%%</string>
+    <string name="best_value">أفضل قيمة</string>
+    <string name="view_transcript">عرض النص المكتوب</string>
     <string name="transcript_open">النص المكتوب المفتوح</string>
     <string name="episode_description">وصف الحلقة</string>
     <string name="onboarding_plus_feature_no_banner_ads">لا توجد إعلانات شعارات</string>
