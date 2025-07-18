@@ -28,11 +28,7 @@ import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
 import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -47,6 +43,7 @@ import au.com.shiftyjelly.pocketcasts.account.onboarding.components.UpgradeFeatu
 import au.com.shiftyjelly.pocketcasts.account.onboarding.components.UpgradePlanRow
 import au.com.shiftyjelly.pocketcasts.account.onboarding.upgrade.OnboardingUpgradeHelper.PrivacyPolicy
 import au.com.shiftyjelly.pocketcasts.account.onboarding.upgrade.OnboardingUpgradeHelper.UpgradeRowButton
+import au.com.shiftyjelly.pocketcasts.account.viewmodel.OnboardingUpgradeFeaturesState
 import au.com.shiftyjelly.pocketcasts.compose.AppThemeWithBackground
 import au.com.shiftyjelly.pocketcasts.compose.components.FadedLazyColumn
 import au.com.shiftyjelly.pocketcasts.compose.components.TextH10
@@ -55,8 +52,18 @@ import au.com.shiftyjelly.pocketcasts.compose.images.SubscriptionBadge
 import au.com.shiftyjelly.pocketcasts.compose.preview.ThemePreviewParameterProvider
 import au.com.shiftyjelly.pocketcasts.compose.theme
 import au.com.shiftyjelly.pocketcasts.images.R
+import au.com.shiftyjelly.pocketcasts.payment.BillingCycle
+import au.com.shiftyjelly.pocketcasts.payment.PricingSchedule
+import au.com.shiftyjelly.pocketcasts.payment.PricingSchedule.RecurrenceMode
+import au.com.shiftyjelly.pocketcasts.payment.SubscriptionOffer
 import au.com.shiftyjelly.pocketcasts.payment.SubscriptionPlan
+import au.com.shiftyjelly.pocketcasts.payment.SubscriptionPlans
+import au.com.shiftyjelly.pocketcasts.payment.SubscriptionTier
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme.ThemeType
+import java.time.ZonedDateTime
+import java.time.format.DateTimeFormatter
+import java.time.format.FormatStyle
+import java.time.temporal.ChronoUnit
 import kotlinx.coroutines.launch
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
@@ -67,19 +74,15 @@ enum class Variants {
 
 @Composable
 fun OnboardingUpgradeScreen(
+    state: OnboardingUpgradeFeaturesState.Loaded,
     variant: Variants,
     onClosePress: () -> Unit,
     onSubscribePress: () -> Unit,
+    onChangeSelectedPlan: (SubscriptionPlan) -> Unit,
+    onClickPrivacyPolicy: () -> Unit,
+    onClickTermsAndConditions: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    val plans = listOf(
-        SubscriptionPlan.PlusYearlyPreview,
-        SubscriptionPlan.PlusMonthlyPreview,
-    )
-
-    var selectedPlan by remember { mutableStateOf(plans[0]) }
-    val selectedOnboardingPlan = remember(selectedPlan) { OnboardingSubscriptionPlan.create(selectedPlan) }
-
     Column(
         modifier = modifier
             .windowInsetsPadding(WindowInsets.statusBars)
@@ -91,48 +94,53 @@ fun OnboardingUpgradeScreen(
             ),
     ) {
         UpgradeHeader(
-            selectedPlan = selectedOnboardingPlan,
+            selectedPlan = state.selectedPlan,
             onClosePress = onClosePress,
         )
         Spacer(modifier = Modifier.height(24.dp))
         UpgradeContent(
             modifier = Modifier.weight(1f),
             pages = variant.toContentPages(
-                currentPlan = selectedOnboardingPlan,
-                isEligibleForTrial = true,
+                currentPlan = state.selectedPlan,
+                isEligibleForTrial = state.selectedBasePlan.offer == SubscriptionOffer.Trial,
+                plan = state.selectedBasePlan,
             ),
         )
         Spacer(modifier = Modifier.height(24.dp))
         UpgradeFooter(
             modifier = Modifier
                 .fillMaxWidth(),
-            plans = plans,
-            selectedPlan = selectedPlan,
-            selectedOnboardingPlan = selectedOnboardingPlan,
-            onSelectedChange = { selectedPlan = it },
-            onClickSubscribe = { onSubscribePress() },
+            plans = state.availableBasePlans,
+            selectedOnboardingPlan = state.selectedPlan,
+            onSelectedChange = {
+                onChangeSelectedPlan(it)
+            },
+            onClickSubscribe = onSubscribePress,
+            onPrivacyPolicyClick = onClickPrivacyPolicy,
+            onTermsAndConditionsClick = onClickTermsAndConditions,
         )
     }
 }
 
 @Composable
 private fun UpgradeFooter(
-    plans: List<SubscriptionPlan.Base>,
-    selectedPlan: SubscriptionPlan.Base,
-    onSelectedChange: (SubscriptionPlan.Base) -> Unit,
+    plans: List<SubscriptionPlan>,
+    onSelectedChange: (SubscriptionPlan) -> Unit,
     selectedOnboardingPlan: OnboardingSubscriptionPlan,
     onClickSubscribe: () -> Unit,
+    onPrivacyPolicyClick: () -> Unit,
+    onTermsAndConditionsClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Column(
         modifier = modifier,
     ) {
-        plans.forEach { item ->
+        plans.forEachIndexed { index, item ->
             UpgradePlanRow(
                 plan = item,
-                isSelected = selectedPlan == item,
+                isSelected = selectedOnboardingPlan.key == item.key,
                 onClick = { onSelectedChange(item) },
-                priceComparisonPlan = SubscriptionPlan.PlusMonthlyPreview,
+                priceComparisonPlan = plans.getOrNull(index + 1),
             )
             Spacer(modifier = Modifier.height(10.dp))
         }
@@ -151,8 +159,8 @@ private fun UpgradeFooter(
         PrivacyPolicy(
             color = MaterialTheme.theme.colors.secondaryText02,
             textAlign = TextAlign.Center,
-            onPrivacyPolicyClick = {},
-            onTermsAndConditionsClick = {},
+            onPrivacyPolicyClick = onPrivacyPolicyClick,
+            onTermsAndConditionsClick = onTermsAndConditionsClick,
         )
     }
 }
@@ -196,7 +204,7 @@ private fun UpgradeHeader(
                 }
             }
         }
-        Spacer(modifier = Modifier.height(24.dp))
+        Spacer(modifier = Modifier.height(8.dp))
         TextH10(
             text = stringResource(LR.string.onboarding_upgrade_generic_title),
             color = MaterialTheme.theme.colors.primaryText01,
@@ -205,19 +213,60 @@ private fun UpgradeHeader(
 }
 
 @Composable
-private fun Variants.toContentPages(currentPlan: OnboardingSubscriptionPlan, isEligibleForTrial: Boolean) = buildList {
+private fun SubscriptionPlan.trialSchedule(): List<UpgradeTrialItem> {
+    val offerPlan = this as? SubscriptionPlan.WithOffer ?: return emptyList()
+
+    val discountedPhase = offerPlan.pricingPhases.find { it.schedule.recurrenceMode is PricingSchedule.RecurrenceMode.Recurring } ?: return emptyList()
+
+    val recurringPeriods = (discountedPhase.schedule.recurrenceMode as RecurrenceMode.Recurring).value
+    val chronoUnit = when (discountedPhase.schedule.period) {
+        PricingSchedule.Period.Daily -> ChronoUnit.DAYS
+        PricingSchedule.Period.Weekly -> ChronoUnit.WEEKS
+        PricingSchedule.Period.Monthly -> ChronoUnit.MONTHS
+        PricingSchedule.Period.Yearly -> ChronoUnit.YEARS
+    }
+    val now = ZonedDateTime.now()
+    val dateFromNow = now.plus(recurringPeriods.toLong(), chronoUnit)
+    val formattedDate = DateTimeFormatter.ofLocalizedDate(FormatStyle.LONG).format(dateFromNow)
+    val daysFromNow = ChronoUnit.DAYS.between(now, dateFromNow)
+
+    return listOf(
+        UpgradeTrialItem(
+            iconResId = R.drawable.ic_unlocked,
+            title = stringResource(LR.string.onboarding_upgrade_schedule_today),
+            message = stringResource(LR.string.onboarding_upgrade_schedule_today_message),
+        ),
+        UpgradeTrialItem(
+            iconResId = R.drawable.ic_envelope,
+            title = stringResource(LR.string.onboarding_upgrade_schedule_day, daysFromNow - 7),
+            message = stringResource(LR.string.onboarding_upgrade_schedule_notify),
+        ),
+        UpgradeTrialItem(
+            iconResId = R.drawable.ic_star,
+            title = stringResource(LR.string.onboarding_upgrade_schedule_day, daysFromNow),
+            message = stringResource(LR.string.onboarding_upgrade_schedule_billing, formattedDate),
+        ),
+    )
+}
+
+@Composable
+private fun Variants.toContentPages(
+    currentPlan: OnboardingSubscriptionPlan,
+    isEligibleForTrial: Boolean,
+    plan: SubscriptionPlan,
+) = buildList {
     when (this@toContentPages) {
         Variants.VARIANT_FEATURES -> {
             add(
                 UpgradePagerContent.Features(
                     features = currentPlan.featureItems,
-                    showCta = true,
+                    showCta = isEligibleForTrial,
                 ),
             )
             if (isEligibleForTrial) {
                 add(
                     UpgradePagerContent.TrialSchedule(
-                        timelineItems = UpgradeTrialItem.getPreviewItems(),
+                        timelineItems = plan.trialSchedule(),
                         showCta = false,
                     ),
                 )
@@ -227,7 +276,7 @@ private fun Variants.toContentPages(currentPlan: OnboardingSubscriptionPlan, isE
         Variants.VARIANT_TRIAL_TIMELINE -> {
             add(
                 UpgradePagerContent.TrialSchedule(
-                    timelineItems = UpgradeTrialItem.getPreviewItems(),
+                    timelineItems = plan.trialSchedule(),
                     showCta = true,
                 ),
             )
@@ -333,10 +382,20 @@ private fun PreviewOnboardingUpgradeScreen(
 ) {
     AppThemeWithBackground(theme) {
         OnboardingUpgradeScreen(
+            state = OnboardingUpgradeFeaturesState.Loaded(
+                selectedTier = SubscriptionTier.Plus,
+                selectedBillingCycle = BillingCycle.Yearly,
+                subscriptionPlans = SubscriptionPlans.Preview,
+                plansFilter = OnboardingUpgradeFeaturesState.LoadedPlansFilter.PLUS_ONLY,
+                purchaseFailed = false,
+            ),
             modifier = Modifier.fillMaxSize(),
             onSubscribePress = {},
             onClosePress = {},
             variant = Variants.VARIANT_FEATURES,
+            onClickPrivacyPolicy = {},
+            onClickTermsAndConditions = {},
+            onChangeSelectedPlan = {},
         )
     }
 }

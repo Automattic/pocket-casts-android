@@ -49,7 +49,7 @@ import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 @Composable
 fun AvailablePlanRow(
-    plan: SubscriptionPlan.Base,
+    plan: SubscriptionPlan,
     isSelected: Boolean,
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
@@ -65,11 +65,11 @@ fun AvailablePlanRow(
 
 @Composable
 fun UpgradePlanRow(
-    plan: SubscriptionPlan.Base,
+    plan: SubscriptionPlan,
     isSelected: Boolean,
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
-    priceComparisonPlan: SubscriptionPlan.Base? = null,
+    priceComparisonPlan: SubscriptionPlan? = null,
 ) {
     SubscriptionPlanRow(
         plan = plan,
@@ -141,7 +141,7 @@ private data class RowConfig(
 
 @Composable
 private fun SubscriptionPlanRow(
-    plan: SubscriptionPlan.Base,
+    plan: SubscriptionPlan,
     isSelected: Boolean,
     onClick: () -> Unit,
     rowConfig: RowConfig,
@@ -274,30 +274,33 @@ private fun CheckMark(
     }
 }
 
-private val SubscriptionPlan.Base.pricePerMonth: Float
+private val SubscriptionPlan.pricePerMonth: Float
     get() {
         val pricePerMonth = when (billingCycle) {
-            BillingCycle.Monthly -> pricingPhase.price.amount
-            BillingCycle.Yearly -> pricingPhase.price.amount / 12.toBigDecimal()
+            BillingCycle.Monthly -> recurringPrice.amount
+            BillingCycle.Yearly -> recurringPrice.amount / monthsInYear
         }
         return pricePerMonth.toFloat()
     }
 
-private val SubscriptionPlan.Base.pricePerWeek: Float
+private val SubscriptionPlan.pricePerWeek: Float
     get() {
         val pricePerWeek = when (billingCycle) {
-            BillingCycle.Monthly -> pricingPhase.price.amount / 4.toBigDecimal()
-            BillingCycle.Yearly -> pricingPhase.price.amount / 52.toBigDecimal()
-        }
+            BillingCycle.Monthly -> recurringPrice.amount * monthsInYear
+            BillingCycle.Yearly -> recurringPrice.amount
+        } / weeksInYear
         return pricePerWeek.toFloat()
     }
 
+private val monthsInYear = 12.toBigDecimal()
+private val weeksInYear = 52.toBigDecimal()
+
 @Composable
-private fun SubscriptionPlan.Base.pricePerPeriod(config: RowConfig): String? {
+private fun SubscriptionPlan.pricePerPeriod(config: RowConfig): String? {
     return if (this.billingCycle == BillingCycle.Yearly) {
         when (config.pricePerPeriod) {
             PricePerPeriod.PRICE_PER_MONTH -> {
-                val currencyCode = pricingPhase.price.currencyCode
+                val currencyCode = recurringPrice.currencyCode
                 if (currencyCode == "USD") {
                     stringResource(LR.string.price_per_month_usd, pricePerMonth)
                 } else {
@@ -306,7 +309,7 @@ private fun SubscriptionPlan.Base.pricePerPeriod(config: RowConfig): String? {
             }
 
             PricePerPeriod.PRICE_PER_WEEK -> {
-                val currencyCode = pricingPhase.price.currencyCode
+                val currencyCode = recurringPrice.currencyCode
                 if (currencyCode == "USD") {
                     stringResource(LR.string.price_per_week_usd, pricePerWeek)
                 } else {
@@ -319,13 +322,17 @@ private fun SubscriptionPlan.Base.pricePerPeriod(config: RowConfig): String? {
     }
 }
 
-private fun SubscriptionPlan.Base.savingsPercent(otherPlan: SubscriptionPlan.Base) = 100 - ((this.pricePerMonth / otherPlan.pricePerMonth) * 100).toInt()
+private fun SubscriptionPlan.savingsPercent(otherPlan: SubscriptionPlan) = 100 - ((this.pricePerMonth / otherPlan.pricePerMonth) * 100).toInt()
 
 @Composable
 @ReadOnlyComposable
-private fun SubscriptionPlan.Base.price() = when (billingCycle) {
-    BillingCycle.Monthly -> stringResource(LR.string.plus_per_month, pricingPhase.price.formattedPrice)
-    BillingCycle.Yearly -> stringResource(LR.string.plus_per_year, pricingPhase.price.formattedPrice)
+private fun SubscriptionPlan.price(): String {
+    val formattedPrice = recurringPrice.formattedPrice
+
+    return when (billingCycle) {
+        BillingCycle.Monthly -> stringResource(LR.string.plus_per_month, formattedPrice)
+        BillingCycle.Yearly -> stringResource(LR.string.plus_per_year, formattedPrice)
+    }
 }
 
 @Preview

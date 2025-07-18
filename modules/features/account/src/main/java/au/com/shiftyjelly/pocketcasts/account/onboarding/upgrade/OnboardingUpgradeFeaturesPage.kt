@@ -93,6 +93,8 @@ import au.com.shiftyjelly.pocketcasts.payment.SubscriptionTier
 import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingFlow
 import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingUpgradeSource
 import au.com.shiftyjelly.pocketcasts.utils.extensions.pxToDp
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
@@ -132,18 +134,30 @@ internal fun OnboardingUpgradeFeaturesPage(
     when (state) {
         is OnboardingUpgradeFeaturesState.Loading -> Unit // Do Nothing
         is OnboardingUpgradeFeaturesState.Loaded -> {
-            UpgradeLayout(
-                state = state,
-                source = source,
-                scrollState = scrollState,
-                onBackPress = onBackPress,
-                onNotNowPress = onNotNowPress,
-                onChangeBillingCycle = { viewModel.changeBillingCycle(it) },
-                onChangeSubscriptionTier = { viewModel.changeSubscriptionTier(it) },
-                onClickSubscribe = { onClickSubscribe(false) },
-                onClickPrivacyPolicy = { viewModel.onPrivacyPolicyPressed() },
-                onClickTermsAndConditions = { viewModel.onTermsAndConditionsPressed() },
-            )
+            if (FeatureFlag.isEnabled(Feature.NEW_ONBOARDING_UPGRADE)) {
+                OnboardingUpgradeScreen(
+                    variant = Variants.VARIANT_FEATURES,
+                    onClosePress = onBackPress,
+                    state = state,
+                    onChangeSelectedPlan = { viewModel.changeBillingCycle(it.billingCycle) },
+                    onSubscribePress = { onClickSubscribe(false) },
+                    onClickPrivacyPolicy = { viewModel.onPrivacyPolicyPressed() },
+                    onClickTermsAndConditions = { viewModel.onTermsAndConditionsPressed() },
+                )
+            } else {
+                UpgradeLayout(
+                    state = state,
+                    source = source,
+                    scrollState = scrollState,
+                    onBackPress = onBackPress,
+                    onNotNowPress = onNotNowPress,
+                    onChangeBillingCycle = { viewModel.changeBillingCycle(it) },
+                    onChangeSubscriptionTier = { viewModel.changeSubscriptionTier(it) },
+                    onClickSubscribe = { onClickSubscribe(false) },
+                    onClickPrivacyPolicy = { viewModel.onPrivacyPolicyPressed() },
+                    onClickTermsAndConditions = { viewModel.onTermsAndConditionsPressed() },
+                )
+            }
         }
 
         is OnboardingUpgradeFeaturesState.NoSubscriptions -> {

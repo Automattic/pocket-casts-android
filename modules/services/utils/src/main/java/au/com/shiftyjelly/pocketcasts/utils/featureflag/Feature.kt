@@ -29,7 +29,7 @@ enum class Feature(
     INTRO_PLUS_OFFER_ENABLED(
         key = "intro_plus_offer_enabled",
         title = "Intro Offer Plus",
-        defaultValue = BuildConfig.DEBUG,
+        defaultValue = false,
         tier = FeatureTier.Free,
         hasFirebaseRemoteFlag = true,
         hasDevToggle = true,

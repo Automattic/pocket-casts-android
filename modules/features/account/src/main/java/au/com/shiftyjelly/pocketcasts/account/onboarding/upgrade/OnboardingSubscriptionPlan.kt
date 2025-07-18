@@ -17,6 +17,8 @@ import au.com.shiftyjelly.pocketcasts.payment.SubscriptionOffer
 import au.com.shiftyjelly.pocketcasts.payment.SubscriptionPlan
 import au.com.shiftyjelly.pocketcasts.payment.SubscriptionTier
 import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingUpgradeSource
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import java.math.BigDecimal
 import java.time.ZonedDateTime
 import java.time.format.DateTimeFormatter
@@ -189,7 +191,10 @@ data class OnboardingSubscriptionPlan private constructor(
     val featureItems: List<UpgradeFeatureItem>
         get() {
             val items = when (key.tier) {
-                SubscriptionTier.Plus -> PlusUpgradeFeatureItem.entries
+                SubscriptionTier.Plus -> PlusUpgradeFeatureItem.entries.filter {
+                    !FeatureFlag.isEnabled(Feature.NEW_ONBOARDING_UPGRADE) || it != PlusUpgradeFeatureItem.BannerAds
+                }
+
                 SubscriptionTier.Patron -> PatronUpgradeFeatureItem.entries
             }
             return items.filter { item ->
