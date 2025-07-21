@@ -46,12 +46,7 @@ data class SmartRules(
                     }
                 }
                 append("episode.playing_status IN (")
-                statuses.forEachIndexed { index, status ->
-                    if (index != 0) {
-                        append(',')
-                    }
-                    append(status.ordinal)
-                }
+                append(statuses.joinToString(separator = ",") { status -> "${status.ordinal}" })
                 append(')')
             }
         }
@@ -90,12 +85,7 @@ data class SmartRules(
                     }
                 }
                 append("episode.episode_status IN (")
-                statuses.forEachIndexed { index, status ->
-                    if (index != 0) {
-                        append(',')
-                    }
-                    append(status.ordinal)
-                }
+                append(statuses.joinToString(separator = ",") { status -> "${status.ordinal}" })
                 append(')')
 
                 if (isSystemDownloadsPlaylist) {
@@ -181,14 +171,7 @@ data class SmartRules(
         ) : PodcastsRule {
             override fun toSqlWhereClause(clock: Clock, playlistId: Long?) = buildString {
                 append("episode.podcast_id IN (")
-                uuids.forEachIndexed { index, uuid ->
-                    if (index != 0) {
-                        append(',')
-                    }
-                    append('\'')
-                    append(uuid)
-                    append('\'')
-                }
+                append(uuids.joinToString(separator = ",") { uuid -> "'$uuid'" })
                 append(')')
             }
         }
