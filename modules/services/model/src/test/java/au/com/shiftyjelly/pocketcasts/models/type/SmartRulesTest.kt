@@ -14,7 +14,7 @@ class SmartRulesTest {
     fun `unplayed episodes`() {
         val rule = SmartRules.EpisodeStatusRule(
             unplayed = true,
-            inProgres = false,
+            inProgress = false,
             completed = false,
         )
 
@@ -27,7 +27,7 @@ class SmartRulesTest {
     fun `in progress episodes`() {
         val rule = SmartRules.EpisodeStatusRule(
             unplayed = false,
-            inProgres = true,
+            inProgress = true,
             completed = false,
         )
 
@@ -40,7 +40,7 @@ class SmartRulesTest {
     fun `completed episodes`() {
         val rule = SmartRules.EpisodeStatusRule(
             unplayed = false,
-            inProgres = false,
+            inProgress = false,
             completed = true,
         )
 
@@ -53,7 +53,7 @@ class SmartRulesTest {
     fun `mixed episode played statuses`() {
         val rule = SmartRules.EpisodeStatusRule(
             unplayed = true,
-            inProgres = false,
+            inProgress = false,
             completed = true,
         )
 
@@ -66,7 +66,7 @@ class SmartRulesTest {
     fun `all episode played statuses`() {
         val rule = SmartRules.EpisodeStatusRule(
             unplayed = true,
-            inProgres = true,
+            inProgress = true,
             completed = true,
         )
 
@@ -79,7 +79,7 @@ class SmartRulesTest {
     fun `no episode played statuses`() {
         val rule = SmartRules.EpisodeStatusRule(
             unplayed = false,
-            inProgres = false,
+            inProgress = false,
             completed = false,
         )
 

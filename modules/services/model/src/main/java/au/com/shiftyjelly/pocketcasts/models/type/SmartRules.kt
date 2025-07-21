@@ -29,7 +29,7 @@ data class SmartRules(
 
     data class EpisodeStatusRule(
         val unplayed: Boolean,
-        val inProgres: Boolean,
+        val inProgress: Boolean,
         val completed: Boolean,
     ) : SmartRule {
         override fun toSqlWhereClause(clock: Clock, playlistId: Long?) = buildString {
@@ -38,7 +38,7 @@ data class SmartRules(
                     if (unplayed) {
                         add(EpisodePlayingStatus.NOT_PLAYED)
                     }
-                    if (inProgres) {
+                    if (inProgress) {
                         add(EpisodePlayingStatus.IN_PROGRESS)
                     }
                     if (completed) {
@@ -56,9 +56,9 @@ data class SmartRules(
             }
         }
 
-        private val areAllConstraintsTicked get() = unplayed && inProgres && completed
+        private val areAllConstraintsTicked get() = unplayed && inProgress && completed
 
-        private val isAnyConstraintTicked get() = unplayed || inProgres || completed
+        private val isAnyConstraintTicked get() = unplayed || inProgress || completed
     }
 
     enum class DownloadStatusRule : SmartRule {
@@ -239,7 +239,7 @@ data class SmartRules(
 
     companion object {
         val Default = SmartRules(
-            EpisodeStatusRule(unplayed = true, inProgres = true, completed = true),
+            EpisodeStatusRule(unplayed = true, inProgress = true, completed = true),
             DownloadStatusRule.Any,
             MediaTypeRule.Any,
             ReleaseDateRule.AnyTime,
