@@ -53,7 +53,7 @@ class SmartPlaylistEpisodeSortTypeManagerImplTest {
         playlistManager.updateBlocking(
             smartPlaylist = SmartPlaylist(),
             userPlaylistUpdate = UserPlaylistUpdate(listOf(PlaylistProperty.Color), PlaylistUpdateSource.AUTO_DOWNLOAD_SETTINGS),
-            isCreatingFilter = false
+            isCreatingFilter = false,
         )
 
         advanceUntilIdle()
