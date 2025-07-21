@@ -1,7 +1,6 @@
 package au.com.shiftyjelly.pocketcasts.repositories.notification
 
 import android.content.BroadcastReceiver
-import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
@@ -41,14 +40,17 @@ class NotificationOpenReceiver : BroadcastReceiver() {
                         action = intent.getStringExtra(it)
                         intent.removeExtra(it)
                     }
+
                     EXTRA_ORIGINAL_FLAGS -> {
                         flags = intent.getIntExtra(it, 0)
                         intent.removeExtra(it)
                     }
+
                     EXTRA_ORIGINAL_COMPONENT -> {
                         component = @Suppress("DEPRECATION") intent.getParcelableExtra(it)
                         intent.removeExtra(it)
                     }
+
                     EXTRA_CATEGORY -> intent.removeExtra(it)
                     else -> Unit
                 }
@@ -78,7 +80,7 @@ class NotificationOpenReceiver : BroadcastReceiver() {
 
     private fun tryLaunchIntent(intent: Intent, context: Context) {
         try {
-            context.startActivity(intent.apply {  flags = Intent.FLAG_ACTIVITY_NEW_TASK })
+            context.startActivity(intent.apply { flags = Intent.FLAG_ACTIVITY_NEW_TASK })
         } catch (t: Throwable) {
             Timber.w("Failed to launch activity for intent $intent")
         }
@@ -115,6 +117,18 @@ class NotificationOpenReceiver : BroadcastReceiver() {
         fun toPodcastIntentRelay(context: Context, intent: Intent) = Intent(context, NotificationOpenReceiver::class.java).apply {
             putExtras(intent)
             putExtra(EXTRA_CATEGORY, CATEGORY_PODCAST)
+            putExtra(EXTRA_ORIGINAL_FLAGS, intent.flags)
+            intent.component?.let {
+                putExtra(EXTRA_ORIGINAL_COMPONENT, it)
+            }
+            intent.action?.let {
+                putExtra(EXTRA_ORIGINAL_ACTION, it)
+            }
+        }
+
+        fun toDeeplinkIntentRelay(context: Context, intent: Intent) = Intent(context, NotificationOpenReceiver::class.java).apply {
+            putExtras(intent)
+            putExtra(EXTRA_CATEGORY, CATEGORY_DEEP_LINK)
             putExtra(EXTRA_ORIGINAL_FLAGS, intent.flags)
             intent.component?.let {
                 putExtra(EXTRA_ORIGINAL_COMPONENT, it)
