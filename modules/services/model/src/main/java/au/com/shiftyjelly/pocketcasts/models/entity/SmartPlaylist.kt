@@ -46,9 +46,6 @@ data class SmartPlaylist(
     @ColumnInfo(name = "shorterThan") var shorterThan: Int = 40,
     @ColumnInfo(name = "draft") var draft: Boolean = false, // Used when creating a new filter
 ) : Serializable {
-
-    constructor() : this(uuid = "")
-
     companion object {
         const val PLAYLIST_ID_SYSTEM_DOWNLOADS: Long = -100L
 
