@@ -22,7 +22,6 @@
             android:exported="true">
             <intent-filter>
                 <action android:name="au.com.shiftyjelly.pocketcasts.ACTION_REVAMPED_NOTIFICATION_OPENED" />
-                <action android:name="au.com.shiftyjelly.pocketcasts.ACTION_OLD_NOTIFICATION_OPENED" />
             </intent-filter>
         </receiver>
     </application>

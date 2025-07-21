@@ -33,7 +33,6 @@ import au.com.shiftyjelly.pocketcasts.repositories.file.FileStorage
 import au.com.shiftyjelly.pocketcasts.repositories.images.PocketCastsImageRequestFactory
 import au.com.shiftyjelly.pocketcasts.repositories.notification.NotificationHelper
 import au.com.shiftyjelly.pocketcasts.repositories.notification.NotificationOpenReceiver
-import au.com.shiftyjelly.pocketcasts.repositories.notification.NotificationOpenReceiver.Companion.toBroadcast
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.FolderManager
@@ -484,13 +483,12 @@ class RefreshPodcastsThread(
                 autoPlay = false,
             )
 
-            val actionAppendix = System.currentTimeMillis() + intentId
+            val intent = showEpisodeDeepLink.toIntent(context).apply {
+                action += System.currentTimeMillis() + intentId
+            }
             val pendingIntent = if (Util.getAppPlatform(context) == AppPlatform.Phone) {
-                PendingIntent.getBroadcast(context, intentId, showEpisodeDeepLink.toBroadcast(context, actionAppendix.toString()), PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE)
+                PendingIntent.getBroadcast(context, intentId, NotificationOpenReceiver.toEpisodeIntentRelay(context, intent), PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE)
             } else {
-                val intent = showEpisodeDeepLink.toIntent(context).apply {
-                    action += actionAppendix
-                }
                 PendingIntent.getActivity(context, intentId, intent, PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE)
             }
             intentId += 1
@@ -618,8 +616,8 @@ class RefreshPodcastsThread(
                 flags = Intent.FLAG_ACTIVITY_SINGLE_TOP
                 action = Settings.INTENT_OPEN_APP_NEW_EPISODES
             }
-            val pendingIntent = if (Util.getAppPlatform(context) == AppPlatform.Phone) {
-                PendingIntent.getBroadcast(context, intentIndex, NotificationOpenReceiver.groupedNotificationsBroadcast(context), PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE)
+            val pendingIntent = if (Util.getAppPlatform(context) == AppPlatform.Phone && intent != null) {
+                PendingIntent.getBroadcast(context, intentIndex, NotificationOpenReceiver.toPodcastIntentRelay(context, intent), PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE)
             } else {
                 PendingIntent.getActivity(context, intentIndex, intent, PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE)
             }
