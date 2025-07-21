@@ -20,7 +20,7 @@ class SmartRulesTest {
 
         val clause = rule.toSqlWhereClause(clock, playlistId = null)
 
-        assertEquals("playing_status IN (0)", clause)
+        assertEquals("episode.playing_status IN (0)", clause)
     }
 
     @Test
@@ -33,7 +33,7 @@ class SmartRulesTest {
 
         val clause = rule.toSqlWhereClause(clock, playlistId = null)
 
-        assertEquals("playing_status IN (1)", clause)
+        assertEquals("episode.playing_status IN (1)", clause)
     }
 
     @Test
@@ -46,7 +46,7 @@ class SmartRulesTest {
 
         val clause = rule.toSqlWhereClause(clock, playlistId = null)
 
-        assertEquals("playing_status IN (2)", clause)
+        assertEquals("episode.playing_status IN (2)", clause)
     }
 
     @Test
@@ -59,7 +59,7 @@ class SmartRulesTest {
 
         val clause = rule.toSqlWhereClause(clock, playlistId = null)
 
-        assertEquals("playing_status IN (0,2)", clause)
+        assertEquals("episode.playing_status IN (0,2)", clause)
     }
 
     @Test
@@ -94,7 +94,7 @@ class SmartRulesTest {
 
         val clause = rule.toSqlWhereClause(clock, playlistId = null)
 
-        assertEquals("episode_status IN (4)", clause)
+        assertEquals("episode.episode_status IN (4)", clause)
     }
 
     @Test
@@ -103,7 +103,7 @@ class SmartRulesTest {
 
         val clause = rule.toSqlWhereClause(clock, playlistId = SmartPlaylist.PLAYLIST_ID_SYSTEM_DOWNLOADS)
 
-        assertEquals("episode_status IN (4,2,1,6,5) OR (episode_status = 3 AND last_download_attempt_date > -${7.days.inWholeMilliseconds})", clause)
+        assertEquals("episode.episode_status IN (4,2,1,6,5) OR (episode.episode_status = 3 AND episode.last_download_attempt_date > -${7.days.inWholeMilliseconds})", clause)
     }
 
     @Test
@@ -112,7 +112,7 @@ class SmartRulesTest {
 
         val clause = rule.toSqlWhereClause(clock, playlistId = null)
 
-        assertEquals("episode_status IN (2,1,6,5,0,3)", clause)
+        assertEquals("episode.episode_status IN (2,1,6,5,0,3)", clause)
     }
 
     @Test
@@ -130,7 +130,7 @@ class SmartRulesTest {
 
         val clause = rule.toSqlWhereClause(clock, playlistId = null)
 
-        assertEquals("file_type LIKE 'audio/%'", clause)
+        assertEquals("episode.file_type LIKE 'audio/%'", clause)
     }
 
     @Test
@@ -139,7 +139,7 @@ class SmartRulesTest {
 
         val clause = rule.toSqlWhereClause(clock, playlistId = null)
 
-        assertEquals("file_type LIKE 'video/%'", clause)
+        assertEquals("episode.file_type LIKE 'video/%'", clause)
     }
 
     @Test
@@ -157,7 +157,7 @@ class SmartRulesTest {
 
         val clause = rule.toSqlWhereClause(clock, playlistId = null)
 
-        assertEquals("published_date > -${1.days.inWholeMilliseconds}", clause)
+        assertEquals("episode.published_date > -${1.days.inWholeMilliseconds}", clause)
     }
 
     @Test
@@ -166,7 +166,7 @@ class SmartRulesTest {
 
         val clause = rule.toSqlWhereClause(clock, playlistId = null)
 
-        assertEquals("published_date > -${3.days.inWholeMilliseconds}", clause)
+        assertEquals("episode.published_date > -${3.days.inWholeMilliseconds}", clause)
     }
 
     @Test
@@ -175,7 +175,7 @@ class SmartRulesTest {
 
         val clause = rule.toSqlWhereClause(clock, playlistId = null)
 
-        assertEquals("published_date > -${7.days.inWholeMilliseconds}", clause)
+        assertEquals("episode.published_date > -${7.days.inWholeMilliseconds}", clause)
     }
 
     @Test
@@ -184,7 +184,7 @@ class SmartRulesTest {
 
         val clause = rule.toSqlWhereClause(clock, playlistId = null)
 
-        assertEquals("published_date > -${14.days.inWholeMilliseconds}", clause)
+        assertEquals("episode.published_date > -${14.days.inWholeMilliseconds}", clause)
     }
 
     @Test
@@ -193,7 +193,7 @@ class SmartRulesTest {
 
         val clause = rule.toSqlWhereClause(clock, playlistId = null)
 
-        assertEquals("published_date > -${31.days.inWholeMilliseconds}", clause)
+        assertEquals("episode.published_date > -${31.days.inWholeMilliseconds}", clause)
     }
 
     @Test
@@ -211,7 +211,7 @@ class SmartRulesTest {
 
         val clause = rule.toSqlWhereClause(clock, playlistId = null)
 
-        assertEquals("starred = 1", clause)
+        assertEquals("episode.starred = 1", clause)
     }
 
     @Test
@@ -231,7 +231,7 @@ class SmartRulesTest {
 
         val clause = rule.toSqlWhereClause(clock, playlistId = null)
 
-        assertEquals("podcast_id IN ('id-1','id-2')", clause)
+        assertEquals("episode.podcast_id IN ('id-1','id-2')", clause)
     }
 
     @Test
@@ -252,7 +252,7 @@ class SmartRulesTest {
 
         val clause = rule.toSqlWhereClause(clock, playlistId = null)
 
-        assertEquals("(duration BETWEEN 128 AND 200)", clause)
+        assertEquals("(episode.duration BETWEEN 128 AND 200)", clause)
     }
 
     @Test
@@ -270,7 +270,7 @@ class SmartRulesTest {
 
         val clause = rules.toSqlWhereClause(clock, playlistId = null)
 
-        assertEquals("(archived = 0)", clause)
+        assertEquals("(episode.archived = 0) AND (podcast.subscribed = 1)", clause)
     }
 
     @Test
@@ -286,6 +286,6 @@ class SmartRulesTest {
 
         val clause = rules.toSqlWhereClause(clock, playlistId = null)
 
-        assertEquals("(episode_status IN (4)) AND (file_type LIKE 'video/%') AND ((duration BETWEEN 10 AND 50)) AND (archived = 0)", clause)
+        assertEquals("(episode.episode_status IN (4)) AND (episode.file_type LIKE 'video/%') AND ((episode.duration BETWEEN 10 AND 50)) AND (episode.archived = 0) AND (podcast.subscribed = 1)", clause)
     }
 }

@@ -24,6 +24,7 @@ data class SmartRules(
         podcastsRule.run { append(clock, playlistId) }
         episodeDuration.run { append(clock, playlistId) }
         NonArchivedRule.run { append(clock, playlistId) }
+        FollowedPodcastRule.run { append(clock, playlistId) }
     }
 
     data class EpisodeStatusRule(
@@ -44,7 +45,7 @@ data class SmartRules(
                         add(EpisodePlayingStatus.COMPLETED)
                     }
                 }
-                append("playing_status IN (")
+                append("episode.playing_status IN (")
                 statuses.forEachIndexed { index, status ->
                     if (index != 0) {
                         append(',')
@@ -88,7 +89,7 @@ data class SmartRules(
                         add(EpisodeStatusEnum.DOWNLOAD_FAILED)
                     }
                 }
-                append("episode_status IN (")
+                append("episode.episode_status IN (")
                 statuses.forEachIndexed { index, status ->
                     if (index != 0) {
                         append(',')
@@ -101,9 +102,9 @@ data class SmartRules(
                     if (isNotEmpty()) {
                         append(" OR ")
                     }
-                    append("(episode_status = ")
+                    append("(episode.episode_status = ")
                     append(EpisodeStatusEnum.DOWNLOAD_FAILED.ordinal)
-                    append(" AND last_download_attempt_date > ")
+                    append(" AND episode.last_download_attempt_date > ")
                     append(clock.instant().minus(7, ChronoUnit.DAYS).toEpochMilli())
                     append(')')
                 }
@@ -120,8 +121,8 @@ data class SmartRules(
         override fun toSqlWhereClause(clock: Clock, playlistId: Long?) = buildString {
             when (this@MediaTypeRule) {
                 Any -> Unit
-                Audio -> append("file_type LIKE 'audio/%'")
-                Video -> append("file_type LIKE 'video/%'")
+                Audio -> append("episode.file_type LIKE 'audio/%'")
+                Video -> append("episode.file_type LIKE 'video/%'")
             }
         }
     }
@@ -151,7 +152,7 @@ data class SmartRules(
 
         override fun toSqlWhereClause(clock: Clock, playlistId: Long?) = buildString {
             if (duration != Duration.INFINITE) {
-                append("published_date > ")
+                append("episode.published_date > ")
                 append(clock.instant().minusMillis(duration.inWholeMilliseconds).toEpochMilli())
             }
         }
@@ -165,7 +166,7 @@ data class SmartRules(
         override fun toSqlWhereClause(clock: Clock, playlistId: Long?) = buildString {
             when (this@StarredRule) {
                 Any -> Unit
-                Starred -> append("starred = 1")
+                Starred -> append("episode.starred = 1")
             }
         }
     }
@@ -179,7 +180,7 @@ data class SmartRules(
             val uuids: List<String>,
         ) : PodcastsRule {
             override fun toSqlWhereClause(clock: Clock, playlistId: Long?) = buildString {
-                append("podcast_id IN (")
+                append("episode.podcast_id IN (")
                 uuids.forEachIndexed { index, uuid ->
                     if (index != 0) {
                         append(',')
@@ -203,7 +204,7 @@ data class SmartRules(
             val shorterThan: Duration,
         ) : EpisodeDurationRule {
             override fun toSqlWhereClause(clock: Clock, playlistId: Long?) = buildString {
-                append("(duration BETWEEN ")
+                append("(episode.duration BETWEEN ")
                 append(longerThan.inWholeSeconds)
                 append(" AND ")
                 append(shorterThan.inWholeSeconds)
@@ -213,7 +214,11 @@ data class SmartRules(
     }
 
     data object NonArchivedRule : SmartRule {
-        override fun toSqlWhereClause(clock: Clock, playlistId: Long?) = "archived = 0"
+        override fun toSqlWhereClause(clock: Clock, playlistId: Long?) = "episode.archived = 0"
+    }
+
+    data object FollowedPodcastRule : SmartRule {
+        override fun toSqlWhereClause(clock: Clock, playlistId: Long?) = "podcast.subscribed = 1"
     }
 
     sealed interface SmartRule {
