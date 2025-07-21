@@ -309,5 +309,5 @@ measure-builds = { id = "com.automattic.android.measure-builds", version.ref = "
 protobuf = { id = "com.google.protobuf", version.ref = "protobuf-plugin" }
 room = { id = "androidx.room", version.ref = "room" }
 sentry = { id = "io.sentry.android.gradle", version.ref = "sentry-plugin" }
-spotless = "com.diffplug.spotless:7.1.0"
+spotless = "com.diffplug.spotless:7.2.0"
 compose-compiler = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
