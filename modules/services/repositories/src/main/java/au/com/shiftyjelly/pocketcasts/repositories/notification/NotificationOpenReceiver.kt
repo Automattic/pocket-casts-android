@@ -30,7 +30,7 @@ class NotificationOpenReceiver : BroadcastReceiver() {
             event = AnalyticsEvent.NOTIFICATION_OPENED,
             properties = buildMap {
                 put("category", category)
-            }
+            },
         )
 
         val originalIntent = Intent().apply {
@@ -47,7 +47,9 @@ class NotificationOpenReceiver : BroadcastReceiver() {
                     }
 
                     EXTRA_ORIGINAL_COMPONENT -> {
-                        component = @Suppress("DEPRECATION") intent.getParcelableExtra(it)
+                        component =
+                            @Suppress("DEPRECATION")
+                            intent.getParcelableExtra(it)
                         intent.removeExtra(it)
                     }
 
@@ -70,7 +72,7 @@ class NotificationOpenReceiver : BroadcastReceiver() {
                 event = AnalyticsEvent.NOTIFICATION_OPENED,
                 properties = mapOf(
                     "type" to it.analyticsType,
-                    "category" to CATEGORY_DEEP_LINK
+                    "category" to CATEGORY_DEEP_LINK,
                 ),
             )
             val target = it.toIntent(context)
