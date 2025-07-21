@@ -17,7 +17,7 @@ import au.com.shiftyjelly.pocketcasts.localization.R as LR
 )
 data class SmartPlaylist(
     @PrimaryKey @ColumnInfo(name = "_id") var id: Long? = null,
-    @ColumnInfo(name = "uuid") var uuid: String,
+    @ColumnInfo(name = "uuid") var uuid: String = "",
     @ColumnInfo(name = "title") var title: String = "",
     @ColumnInfo(name = "sortPosition") var sortPosition: Int? = null,
     @ColumnInfo(name = "manual") var manual: Boolean = false,
