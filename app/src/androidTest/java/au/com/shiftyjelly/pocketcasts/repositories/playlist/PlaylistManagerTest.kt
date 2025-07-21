@@ -210,7 +210,7 @@ class PlaylistManagerTest {
 
     @Test
     fun sortEpisodesInPlaylistPreviewByNewestToOldest() = runTest {
-        playlistDao.upsertSmartPlaylist(SmartPlaylist(sortId = NewestToOldest.serverId))
+        playlistDao.upsertSmartPlaylist(SmartPlaylist(sortType = NewestToOldest))
         podcastDao.insertSuspend(Podcast(uuid = "podcast-id", isSubscribed = true))
         episodeDao.insertAll(
             listOf(
@@ -254,7 +254,7 @@ class PlaylistManagerTest {
 
     @Test
     fun sortEpisodesInPlaylistPreviewByOldestToNewest() = runTest {
-        playlistDao.upsertSmartPlaylist(SmartPlaylist(sortId = OldestToNewest.serverId))
+        playlistDao.upsertSmartPlaylist(SmartPlaylist(sortType = OldestToNewest))
         podcastDao.insertSuspend(Podcast(uuid = "podcast-id", isSubscribed = true))
         episodeDao.insertAll(
             listOf(
@@ -298,7 +298,7 @@ class PlaylistManagerTest {
 
     @Test
     fun sortEpisodesInPlaylistPreviewByShortestToLongest() = runTest {
-        playlistDao.upsertSmartPlaylist(SmartPlaylist(sortId = ShortestToLongest.serverId))
+        playlistDao.upsertSmartPlaylist(SmartPlaylist(sortType = ShortestToLongest))
         podcastDao.insertSuspend(Podcast(uuid = "podcast-id", isSubscribed = true))
         episodeDao.insertAll(
             listOf(
@@ -346,7 +346,7 @@ class PlaylistManagerTest {
 
     @Test
     fun sortEpisodesInPlaylistPreviewByLongestToShortest() = runTest {
-        playlistDao.upsertSmartPlaylist(SmartPlaylist(sortId = LongestToShortest.serverId))
+        playlistDao.upsertSmartPlaylist(SmartPlaylist(sortType = LongestToShortest))
         podcastDao.insertSuspend(Podcast(uuid = "podcast-id", isSubscribed = true))
         episodeDao.insertAll(
             listOf(
@@ -394,7 +394,7 @@ class PlaylistManagerTest {
 
     @Test
     fun sortEpisodesInPlaylistPreviewByLastDownloadAttempt() = runTest {
-        playlistDao.upsertSmartPlaylist(SmartPlaylist(sortId = LastDownloadAttempt.serverId))
+        playlistDao.upsertSmartPlaylist(SmartPlaylist(sortType = LastDownloadAttempt))
         podcastDao.insertSuspend(Podcast(uuid = "podcast-id", isSubscribed = true))
         episodeDao.insertAll(
             listOf(

@@ -429,7 +429,7 @@ class PodcastSyncProcess(
                     fields.put("starred", if (playlist.starred) "1" else "0")
                     fields.put("manual", "0")
                     fields.put("sort_position", playlist.sortPosition)
-                    fields.put("sort_type", playlist.sortId)
+                    fields.put("sort_type", playlist.sortType.serverId)
                     fields.put("icon_id", playlist.iconId)
                     fields.put("filter_hours", playlist.filterHours)
                     fields.put("filter_duration", playlist.filterDuration)
@@ -754,7 +754,7 @@ class PodcastSyncProcess(
             starred = sync.starred
             manual = sync.manual
             sortPosition = sync.sortPosition
-            sortId = sync.sortId
+            sortType = sync.sortType
             iconId = sync.iconId
             allPodcasts = sync.allPodcasts
             podcastUuids = sync.podcastUuids

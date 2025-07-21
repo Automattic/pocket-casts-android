@@ -92,15 +92,5 @@ class PlaylistManagerImpl(
             },
         )
 
-    private val SmartPlaylist.sortType
-        get() = when (sortOrder()) {
-            SmartPlaylist.SortOrder.NEWEST_TO_OLDEST -> PlaylistEpisodeSortType.NewestToOldest
-            SmartPlaylist.SortOrder.OLDEST_TO_NEWEST -> PlaylistEpisodeSortType.OldestToNewest
-            SmartPlaylist.SortOrder.SHORTEST_TO_LONGEST -> PlaylistEpisodeSortType.ShortestToLongest
-            SmartPlaylist.SortOrder.LONGEST_TO_SHORTEST -> PlaylistEpisodeSortType.LongestToShortest
-            SmartPlaylist.SortOrder.LAST_DOWNLOAD_ATTEMPT_DATE -> PlaylistEpisodeSortType.LastDownloadAttempt
-            null -> PlaylistEpisodeSortType.NewestToOldest
-        }
-
     private val SmartPlaylist.episodeLimit get() = if (sortType == PlaylistEpisodeSortType.LastDownloadAttempt) 1000 else 500
 }

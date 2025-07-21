@@ -5,6 +5,7 @@ import androidx.room.Entity
 import androidx.room.Ignore
 import androidx.room.Index
 import androidx.room.PrimaryKey
+import au.com.shiftyjelly.pocketcasts.models.type.PlaylistEpisodeSortType
 import au.com.shiftyjelly.pocketcasts.utils.extensions.splitIgnoreEmpty
 import java.io.Serializable
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
@@ -33,7 +34,7 @@ data class SmartPlaylist(
     @ColumnInfo(name = "autoDownload") var autoDownload: Boolean = false,
     @ColumnInfo(name = "autoDownloadWifiOnly") var autoDownloadUnmeteredOnly: Boolean = false,
     @ColumnInfo(name = "autoDownloadPowerOnly") var autoDownloadPowerOnly: Boolean = false,
-    @ColumnInfo(name = "sortId") var sortId: Int = SortOrder.NEWEST_TO_OLDEST.value,
+    @ColumnInfo(name = "sortId") var sortType: PlaylistEpisodeSortType = PlaylistEpisodeSortType.NewestToOldest,
     @ColumnInfo(name = "iconId") var iconId: Int = 0,
     @ColumnInfo(name = "filterHours") var filterHours: Int = 0,
     @ColumnInfo(name = "starred") var starred: Boolean = false,
@@ -150,19 +151,4 @@ data class SmartPlaylist(
 
     val isAllEpisodes: Boolean
         get() = unplayed && partiallyPlayed && finished && notDownloaded && downloaded && audioVideo == AUDIO_VIDEO_FILTER_ALL && allPodcasts && !filterDuration && filterHours == 0 && !starred
-
-    fun sortOrder() = SortOrder.fromInt(sortId)
-
-    enum class SortOrder(val value: Int) {
-        NEWEST_TO_OLDEST(0),
-        OLDEST_TO_NEWEST(1),
-        SHORTEST_TO_LONGEST(2),
-        LONGEST_TO_SHORTEST(3),
-        LAST_DOWNLOAD_ATTEMPT_DATE(100),
-        ;
-
-        companion object {
-            fun fromInt(value: Int) = SortOrder.values().find { it.value == value }
-        }
-    }
 }

@@ -1,6 +1,7 @@
 package au.com.shiftyjelly.pocketcasts.servers.sync
 
 import au.com.shiftyjelly.pocketcasts.models.entity.SmartPlaylist
+import au.com.shiftyjelly.pocketcasts.models.type.PlaylistEpisodeSortType
 import com.squareup.moshi.Json
 import com.squareup.moshi.JsonClass
 
@@ -52,7 +53,7 @@ data class FilterResponse(
         downloaded?.let { filter.downloaded = it }
         downloading?.let { filter.downloading = it }
         notDownloaded?.let { filter.notDownloaded = it }
-        sortType?.let { filter.sortId = it }
+        sortType?.let(PlaylistEpisodeSortType::fromServerId)?.let { filter.sortType = it }
         iconId?.let { filter.iconId = it }
         filterHours?.let { filter.filterHours = it }
         starred?.let { filter.starred = it }
