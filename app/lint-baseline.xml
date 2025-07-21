@@ -6413,4 +6413,400 @@
             column="1"/>
     </issue>
 
+    <issue
+        id="DoNotMockDataClass"
+        message="&apos;au.com.shiftyjelly.pocketcasts.models.entity.Bookmark&apos; is a data class, so mocking it should not be necessary"
+        errorLine1="    @Mock"
+        errorLine2="    ^">
+        <location
+            file="src/test/java/au/com/shiftyjelly/pocketcasts/ui/MainActivityViewModelTest.kt"
+            line="78"
+            column="5"/>
+    </issue>
+
+    <issue
+        id="DoNotMockDataClass"
+        message="&apos;au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode&apos; is a data class, so mocking it should not be necessary"
+        errorLine1="        whenever(episodeManager.findEpisodeByUuid(TEST_EPISODE_UUID)).thenReturn(mock&lt;PodcastEpisode>())"
+        errorLine2="                                                                                 ~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/test/java/au/com/shiftyjelly/pocketcasts/ui/MainActivityViewModelTest.kt"
+            line="157"
+            column="82"/>
+    </issue>
+
+    <issue
+        id="DoNotMockDataClass"
+        message="&apos;au.com.shiftyjelly.pocketcasts.models.entity.UserEpisode&apos; is a data class, so mocking it should not be necessary"
+        errorLine1="        whenever(episodeManager.findEpisodeByUuid(TEST_EPISODE_UUID)).thenReturn(mock&lt;UserEpisode>())"
+        errorLine2="                                                                                 ~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/test/java/au/com/shiftyjelly/pocketcasts/ui/MainActivityViewModelTest.kt"
+            line="171"
+            column="82"/>
+    </issue>
+
+    <issue
+        id="DoNotMockDataClass"
+        message="&apos;au.com.shiftyjelly.pocketcasts.models.entity.Bookmark&apos; is a data class, so mocking it should not be necessary"
+        errorLine1="        whenever(bookmarkManager.findBookmark(TEST_BOOKMARK_UUID)).thenReturn(mock())"
+        errorLine2="                                                                              ~~~~~~">
+        <location
+            file="src/test/java/au/com/shiftyjelly/pocketcasts/ui/MainActivityViewModelTest.kt"
+            line="182"
+            column="79"/>
+    </issue>
+
+    <issue
+        id="DoNotMockDataClass"
+        message="&apos;au.com.shiftyjelly.pocketcasts.models.entity.Bookmark&apos; is a data class, so mocking it should not be necessary"
+        errorLine1="        whenever(bookmarkManager.findBookmark(TEST_BOOKMARK_UUID)).thenReturn(mock())"
+        errorLine2="                                                                              ~~~~~~">
+        <location
+            file="src/test/java/au/com/shiftyjelly/pocketcasts/ui/MainActivityViewModelTest.kt"
+            line="192"
+            column="79"/>
+    </issue>
+
+    <issue
+        id="DoNotMockDataClass"
+        message="&apos;au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode&apos; is a data class, so mocking it should not be necessary"
+        errorLine1="    @Mock"
+        errorLine2="    ^">
+        <location
+            file="src/test/java/au/com/shiftyjelly/pocketcasts/player/viewmodel/PlayerViewModelTest.kt"
+            line="106"
+            column="5"/>
+    </issue>
+
+    <issue
+        id="DoNotMockDataClass"
+        message="&apos;au.com.shiftyjelly.pocketcasts.models.entity.UserEpisode&apos; is a data class, so mocking it should not be necessary"
+        errorLine1="    @Mock"
+        errorLine2="    ^">
+        <location
+            file="src/test/java/au/com/shiftyjelly/pocketcasts/player/viewmodel/PlayerViewModelTest.kt"
+            line="109"
+            column="5"/>
+    </issue>
+
+    <issue
+        id="DoNotMockDataClass"
+        message="&apos;au.com.shiftyjelly.pocketcasts.models.entity.Podcast&apos; is a data class, so mocking it should not be necessary"
+        errorLine1="    @Mock"
+        errorLine2="    ^">
+        <location
+            file="src/test/java/au/com/shiftyjelly/pocketcasts/player/viewmodel/PlayerViewModelTest.kt"
+            line="112"
+            column="5"/>
+    </issue>
+
+    <issue
+        id="DoNotMockDataClass"
+        message="&apos;au.com.shiftyjelly.pocketcasts.models.entity.Playlist&apos; is a data class, so mocking it should not be necessary"
+        errorLine1="        playlistManager.updateBlocking(mock(), mock(), isCreatingFilter = true)"
+        errorLine2="                                       ~~~~~~">
+        <location
+            file="src/test/java/au/com/shiftyjelly/pocketcasts/repositories/podcast/PlaylistManagerImplTest.kt"
+            line="37"
+            column="40"/>
+    </issue>
+
+    <issue
+        id="DoNotMockDataClass"
+        message="&apos;au.com.shiftyjelly.pocketcasts.repositories.podcast.UserPlaylistUpdate&apos; is a data class, so mocking it should not be necessary"
+        errorLine1="        playlistManager.updateBlocking(mock(), mock(), isCreatingFilter = true)"
+        errorLine2="                                               ~~~~~~">
+        <location
+            file="src/test/java/au/com/shiftyjelly/pocketcasts/repositories/podcast/PlaylistManagerImplTest.kt"
+            line="37"
+            column="48"/>
+    </issue>
+
+    <issue
+        id="DoNotMockDataClass"
+        message="&apos;au.com.shiftyjelly.pocketcasts.models.entity.Playlist&apos; is a data class, so mocking it should not be necessary"
+        errorLine1="        playlistManager.updateBlocking(mock(), mock(), isCreatingFilter = false)"
+        errorLine2="                                       ~~~~~~">
+        <location
+            file="src/test/java/au/com/shiftyjelly/pocketcasts/repositories/podcast/PlaylistManagerImplTest.kt"
+            line="48"
+            column="40"/>
+    </issue>
+
+    <issue
+        id="DoNotMockDataClass"
+        message="&apos;au.com.shiftyjelly.pocketcasts.repositories.podcast.UserPlaylistUpdate&apos; is a data class, so mocking it should not be necessary"
+        errorLine1="        playlistManager.updateBlocking(mock(), mock(), isCreatingFilter = false)"
+        errorLine2="                                               ~~~~~~">
+        <location
+            file="src/test/java/au/com/shiftyjelly/pocketcasts/repositories/podcast/PlaylistManagerImplTest.kt"
+            line="48"
+            column="48"/>
+    </issue>
+
+    <issue
+        id="DoNotMockDataClass"
+        message="&apos;au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode&apos; is a data class, so mocking it should not be necessary"
+        errorLine1="    private val downloadedEpisodesMock = listOf(mock&lt;PodcastEpisode>())"
+        errorLine2="                                                ~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/test/java/au/com/shiftyjelly/pocketcasts/podcasts/view/ProfileEpisodeListViewModelTest.kt"
+            line="42"
+            column="49"/>
+    </issue>
+
+    <issue
+        id="DoNotMockDataClass"
+        message="&apos;au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode&apos; is a data class, so mocking it should not be necessary"
+        errorLine1="    private val starredEpisodesMock = listOf(mock&lt;PodcastEpisode>())"
+        errorLine2="                                             ~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/test/java/au/com/shiftyjelly/pocketcasts/podcasts/view/ProfileEpisodeListViewModelTest.kt"
+            line="43"
+            column="46"/>
+    </issue>
+
+    <issue
+        id="DoNotMockDataClass"
+        message="&apos;au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode&apos; is a data class, so mocking it should not be necessary"
+        errorLine1="    private val listeningHistoryEpisodesMock = listOf(mock&lt;PodcastEpisode>())"
+        errorLine2="                                                      ~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/test/java/au/com/shiftyjelly/pocketcasts/podcasts/view/ProfileEpisodeListViewModelTest.kt"
+            line="44"
+            column="55"/>
+    </issue>
+
+    <issue
+        id="DoNotMockDataClass"
+        message="&apos;au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode&apos; is a data class, so mocking it should not be necessary"
+        errorLine1="        val filteredEpisodes = listOf(mock&lt;PodcastEpisode>())"
+        errorLine2="                                      ~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/test/java/au/com/shiftyjelly/pocketcasts/podcasts/view/ProfileEpisodeListViewModelTest.kt"
+            line="147"
+            column="39"/>
+    </issue>
+
+    <issue
+        id="DoNotMockDataClass"
+        message="&apos;au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode&apos; is a data class, so mocking it should not be necessary"
+        errorLine1="        val episode = mock&lt;PodcastEpisode>()"
+        errorLine2="                      ~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/test/java/au/com/shiftyjelly/pocketcasts/player/viewmodel/ShelfViewModelTest.kt"
+            line="56"
+            column="23"/>
+    </issue>
+
+    <issue
+        id="DoNotMockDataClass"
+        message="&apos;au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode&apos; is a data class, so mocking it should not be necessary"
+        errorLine1="        val episode = mock&lt;PodcastEpisode>()"
+        errorLine2="                      ~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/test/java/au/com/shiftyjelly/pocketcasts/player/viewmodel/ShelfViewModelTest.kt"
+            line="75"
+            column="23"/>
+    </issue>
+
+    <issue
+        id="DoNotMockDataClass"
+        message="&apos;au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode&apos; is a data class, so mocking it should not be necessary"
+        errorLine1="        val episode = mock&lt;PodcastEpisode>()"
+        errorLine2="                      ~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/test/java/au/com/shiftyjelly/pocketcasts/player/viewmodel/ShelfViewModelTest.kt"
+            line="97"
+            column="23"/>
+    </issue>
+
+    <issue
+        id="DoNotMockDataClass"
+        message="&apos;au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode&apos; is a data class, so mocking it should not be necessary"
+        errorLine1="        shelfViewModel.setData(items, mock&lt;PodcastEpisode>())"
+        errorLine2="                                      ~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/test/java/au/com/shiftyjelly/pocketcasts/player/viewmodel/ShelfViewModelTest.kt"
+            line="207"
+            column="39"/>
+    </issue>
+
+    <issue
+        id="DoNotMockDataClass"
+        message="&apos;au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode&apos; is a data class, so mocking it should not be necessary"
+        errorLine1="            episode = mock&lt;PodcastEpisode>(),"
+        errorLine2="                      ~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/test/java/au/com/shiftyjelly/pocketcasts/views/helper/SwipeButtonLayoutViewModelTest.kt"
+            line="110"
+            column="23"/>
+    </issue>
+
+    <issue
+        id="DoNotMockDataClass"
+        message="&apos;au.com.shiftyjelly.pocketcasts.models.entity.UserEpisode&apos; is a data class, so mocking it should not be necessary"
+        errorLine1="            episode = mock&lt;UserEpisode>(),"
+        errorLine2="                      ~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/test/java/au/com/shiftyjelly/pocketcasts/views/helper/SwipeButtonLayoutViewModelTest.kt"
+            line="117"
+            column="23"/>
+    </issue>
+
+    <issue
+        id="DoNotMockDataClass"
+        message="&apos;au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode&apos; is a data class, so mocking it should not be necessary"
+        errorLine1="            episode = mock&lt;PodcastEpisode>(),"
+        errorLine2="                      ~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/test/java/au/com/shiftyjelly/pocketcasts/views/helper/SwipeButtonLayoutViewModelTest.kt"
+            line="136"
+            column="23"/>
+    </issue>
+
+    <issue
+        id="DoNotMockDataClass"
+        message="&apos;au.com.shiftyjelly.pocketcasts.models.entity.UserEpisode&apos; is a data class, so mocking it should not be necessary"
+        errorLine1="            episode = mock&lt;UserEpisode>(),"
+        errorLine2="                      ~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/test/java/au/com/shiftyjelly/pocketcasts/views/helper/SwipeButtonLayoutViewModelTest.kt"
+            line="143"
+            column="23"/>
+    </issue>
+
+    <issue
+        id="DoNotMockDataClass"
+        message="&apos;au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode&apos; is a data class, so mocking it should not be necessary"
+        errorLine1="            episode = mock&lt;PodcastEpisode>(),"
+        errorLine2="                      ~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/test/java/au/com/shiftyjelly/pocketcasts/views/helper/SwipeButtonLayoutViewModelTest.kt"
+            line="172"
+            column="23"/>
+    </issue>
+
+    <issue
+        id="DoNotMockDataClass"
+        message="&apos;au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode&apos; is a data class, so mocking it should not be necessary"
+        errorLine1="            episode = mock&lt;PodcastEpisode>(),"
+        errorLine2="                      ~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/test/java/au/com/shiftyjelly/pocketcasts/views/helper/SwipeButtonLayoutViewModelTest.kt"
+            line="177"
+            column="23"/>
+    </issue>
+
+    <issue
+        id="DoNotMockDataClass"
+        message="&apos;au.com.shiftyjelly.pocketcasts.models.entity.UserEpisode&apos; is a data class, so mocking it should not be necessary"
+        errorLine1="            episode = mock&lt;UserEpisode>(),"
+        errorLine2="                      ~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/test/java/au/com/shiftyjelly/pocketcasts/views/helper/SwipeButtonLayoutViewModelTest.kt"
+            line="201"
+            column="23"/>
+    </issue>
+
+    <issue
+        id="DoNotMockDataClass"
+        message="&apos;au.com.shiftyjelly.pocketcasts.models.entity.UserEpisode&apos; is a data class, so mocking it should not be necessary"
+        errorLine1="            episode = mock&lt;UserEpisode>(),"
+        errorLine2="                      ~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/test/java/au/com/shiftyjelly/pocketcasts/views/helper/SwipeButtonLayoutViewModelTest.kt"
+            line="206"
+            column="23"/>
+    </issue>
+
+    <issue
+        id="DoNotMockDataClass"
+        message="&apos;au.com.shiftyjelly.pocketcasts.models.entity.UserEpisode&apos; is a data class, so mocking it should not be necessary"
+        errorLine1="            episode = mock&lt;UserEpisode>(),"
+        errorLine2="                      ~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/test/java/au/com/shiftyjelly/pocketcasts/views/helper/SwipeButtonLayoutViewModelTest.kt"
+            line="237"
+            column="23"/>
+    </issue>
+
+    <issue
+        id="DoNotMockDataClass"
+        message="&apos;au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode&apos; is a data class, so mocking it should not be necessary"
+        errorLine1="            episode = mock&lt;PodcastEpisode>(),"
+        errorLine2="                      ~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/test/java/au/com/shiftyjelly/pocketcasts/views/helper/SwipeButtonLayoutViewModelTest.kt"
+            line="247"
+            column="23"/>
+    </issue>
+
+    <issue
+        id="DoNotMockDataClass"
+        message="&apos;au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode&apos; is a data class, so mocking it should not be necessary"
+        errorLine1="        episode: BaseEpisode = mock&lt;PodcastEpisode>(),"
+        errorLine2="                               ~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/test/java/au/com/shiftyjelly/pocketcasts/views/helper/SwipeButtonLayoutViewModelTest.kt"
+            line="266"
+            column="32"/>
+    </issue>
+
+    <issue
+        id="DoNotMockDataClass"
+        message="&apos;au.com.shiftyjelly.pocketcasts.servers.sync.login.LoginTokenResponse&apos; is a data class, so mocking it should not be necessary"
+        errorLine1="        return mock&lt;LoginTokenResponse>().apply {"
+        errorLine2="               ~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/test/java/au/com/shiftyjelly/pocketcasts/repositories/sync/SyncManagerImplTest.kt"
+            line="90"
+            column="16"/>
+    </issue>
+
+    <issue
+        id="DoNotMockDataClass"
+        message="&apos;au.com.shiftyjelly.pocketcasts.preferences.RefreshToken&apos; is a data class, so mocking it should not be necessary"
+        errorLine1="            whenever(refreshToken).thenReturn(mock())"
+        errorLine2="                                              ~~~~~~">
+        <location
+            file="src/test/java/au/com/shiftyjelly/pocketcasts/repositories/sync/SyncManagerImplTest.kt"
+            line="93"
+            column="47"/>
+    </issue>
+
+    <issue
+        id="DoNotMockDataClass"
+        message="&apos;au.com.shiftyjelly.pocketcasts.preferences.AccessToken&apos; is a data class, so mocking it should not be necessary"
+        errorLine1="            whenever(accessToken).thenReturn(mock())"
+        errorLine2="                                             ~~~~~~">
+        <location
+            file="src/test/java/au/com/shiftyjelly/pocketcasts/repositories/sync/SyncManagerImplTest.kt"
+            line="94"
+            column="46"/>
+    </issue>
+
+    <issue
+        id="DoNotMockDataClass"
+        message="&apos;au.com.shiftyjelly.pocketcasts.models.entity.UserEpisode&apos; is a data class, so mocking it should not be necessary"
+        errorLine1="    @Mock"
+        errorLine2="    ^">
+        <location
+            file="src/test/java/au/com/shiftyjelly/pocketcasts/repositories/podcast/UserEpisodeManagerImplTest.kt"
+            line="34"
+            column="5"/>
+    </issue>
+
+    <issue
+        id="DoNotMockSealedClass"
+        message="&apos;au.com.shiftyjelly.pocketcasts.models.type.SignInState&apos; is a sealed type and has a restricted type hierarchy, use a subtype instead."
+        errorLine1="        signInState: SignInState = mock(),"
+        errorLine2="                                   ~~~~~~">
+        <location
+            file="src/androidTest/java/au/com/shiftyjelly/pocketcasts/OnboardingFlowComposableTest.kt"
+            line="47"
+            column="36"/>
+    </issue>
+
 </issues>
