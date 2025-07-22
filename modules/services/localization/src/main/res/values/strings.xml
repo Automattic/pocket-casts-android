@@ -906,7 +906,7 @@
     <string name="playlists_onboarding_smart_playlist_description">They still work exactly the same, using rules to auto-add your episodes. All your existing Filters are right here, nothing’s changed but the name.</string>
     <string name="playlists_onboarding_playlist_title">Introducing Playlists</string>
     <string name="playlists_onboarding_playlist_description">Want more control? Manual Playlists let you build custom queues, great for trips, themes, or just your current vibe. Whether Smart or Manual, playlists work the way you do.</string>
-    <string name="smart_playlists">Smart Playlists</string>
+    <string name="smart_playlist">Smart Playlist</string>
 
     <!-- Profile -->
 

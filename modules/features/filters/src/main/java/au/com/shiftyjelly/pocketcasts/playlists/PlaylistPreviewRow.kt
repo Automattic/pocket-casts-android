@@ -59,7 +59,7 @@ fun PlaylistPreviewRow(
                     text = playlist.title,
                 )
                 TextP50(
-                    text = stringResource(LR.string.smart_playlists),
+                    text = stringResource(LR.string.smart_playlist),
                     color = MaterialTheme.theme.colors.primaryText02,
                 )
             }
