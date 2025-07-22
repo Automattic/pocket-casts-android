@@ -48,7 +48,6 @@ class PlaylistsFragment :
                     PlaylistPreviewRow(
                         playlist = playlist,
                         showDivider = index != uiState.playlists.lastIndex,
-                        useEpisodeArtwork = uiState.showEpisodeArtwork,
                     )
                 }
             }

@@ -25,8 +25,7 @@ import androidx.compose.ui.unit.dp
 import au.com.shiftyjelly.pocketcasts.compose.AppTheme
 import au.com.shiftyjelly.pocketcasts.compose.preview.ThemePreviewParameterProvider
 import au.com.shiftyjelly.pocketcasts.compose.theme
-import au.com.shiftyjelly.pocketcasts.models.entity.BaseEpisode
-import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
+import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.repositories.images.PocketCastsImageRequestFactory
 import au.com.shiftyjelly.pocketcasts.ui.extensions.themed
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
@@ -36,13 +35,12 @@ import au.com.shiftyjelly.pocketcasts.images.R as IR
 
 @Composable
 fun PlaylistArtwork(
-    episodes: List<BaseEpisode>,
+    podcasts: List<Podcast>,
     artworkSize: Dp,
-    useEpisodeArtwork: Boolean,
     modifier: Modifier = Modifier,
 ) {
     val cornerSize = artworkSize / 14
-    when (episodes.size) {
+    when (podcasts.size) {
         0 -> NoImage(
             artworkSize = artworkSize,
             cornerSize = cornerSize,
@@ -50,19 +48,17 @@ fun PlaylistArtwork(
         )
 
         in 1..3 -> SingleImage(
-            episode = episodes[0],
-            useEpisodeArtwork = useEpisodeArtwork,
+            podcast = podcasts[0],
             artworkSize = artworkSize,
             cornerSize = cornerSize,
             modifier = modifier,
         )
 
         else -> QuadImage(
-            episode1 = episodes[0],
-            episode2 = episodes[1],
-            episode3 = episodes[2],
-            episode4 = episodes[3],
-            useEpisodeArtwork = useEpisodeArtwork,
+            podcast1 = podcasts[0],
+            podcast2 = podcasts[1],
+            podcast3 = podcasts[2],
+            podcast4 = podcasts[3],
             artworkSize = artworkSize,
             cornerSize = cornerSize,
             modifier = modifier,
@@ -94,15 +90,14 @@ private fun NoImage(
 
 @Composable
 private fun SingleImage(
-    episode: BaseEpisode,
+    podcast: Podcast,
     artworkSize: Dp,
     cornerSize: Dp,
-    useEpisodeArtwork: Boolean,
     modifier: Modifier = Modifier,
 ) {
     val context = LocalContext.current
-    val imageRequest = remember(episode.uuid, useEpisodeArtwork) {
-        PocketCastsImageRequestFactory(context).themed().create(episode, useEpisodeArtwork)
+    val imageRequest = remember(podcast.uuid) {
+        PocketCastsImageRequestFactory(context).themed().create(podcast)
     }
     Image(
         painter = rememberAsyncImagePainter(imageRequest, contentScale = ContentScale.Crop),
@@ -115,28 +110,27 @@ private fun SingleImage(
 
 @Composable
 private fun QuadImage(
-    episode1: BaseEpisode,
-    episode2: BaseEpisode,
-    episode3: BaseEpisode,
-    episode4: BaseEpisode,
+    podcast1: Podcast,
+    podcast2: Podcast,
+    podcast3: Podcast,
+    podcast4: Podcast,
     artworkSize: Dp,
     cornerSize: Dp,
-    useEpisodeArtwork: Boolean,
     modifier: Modifier = Modifier,
 ) {
     val context = LocalContext.current
     val requestFactory = remember { PocketCastsImageRequestFactory(context).themed() }
-    val imageRequest1 = remember(episode1.uuid, useEpisodeArtwork) {
-        requestFactory.create(episode1, useEpisodeArtwork)
+    val imageRequest1 = remember(podcast1.uuid) {
+        requestFactory.create(podcast1)
     }
-    val imageRequest2 = remember(episode2.uuid, useEpisodeArtwork) {
-        requestFactory.create(episode2, useEpisodeArtwork)
+    val imageRequest2 = remember(podcast2.uuid) {
+        requestFactory.create(podcast2)
     }
-    val imageRequest3 = remember(episode3.uuid, useEpisodeArtwork) {
-        requestFactory.create(episode3, useEpisodeArtwork)
+    val imageRequest3 = remember(podcast3.uuid) {
+        requestFactory.create(podcast3)
     }
-    val imageRequest4 = remember(episode4.uuid, useEpisodeArtwork) {
-        requestFactory.create(episode4, useEpisodeArtwork)
+    val imageRequest4 = remember(podcast4.uuid) {
+        requestFactory.create(podcast4)
     }
     Row(
         modifier = modifier.size(artworkSize),
@@ -191,9 +185,8 @@ private fun PlaylistArtworkNoEpisodePreview(
 ) {
     AppTheme(themeType) {
         PlaylistArtwork(
-            episodes = emptyList(),
+            podcasts = emptyList(),
             artworkSize = 80.dp,
-            useEpisodeArtwork = false,
         )
     }
 }
@@ -202,9 +195,8 @@ private fun PlaylistArtworkNoEpisodePreview(
 @Composable
 private fun PlaylistArtworkSingleEpisodePreview() {
     PlaylistArtwork(
-        episodes = List(1) { PodcastEpisode(uuid = "$it", publishedDate = Date()) },
+        podcasts = List(1) { Podcast(uuid = "$it") },
         artworkSize = 80.dp,
-        useEpisodeArtwork = false,
     )
 }
 
@@ -212,8 +204,7 @@ private fun PlaylistArtworkSingleEpisodePreview() {
 @Composable
 private fun PlaylistArtworkQuadEpisodePreview() {
     PlaylistArtwork(
-        episodes = List(4) { PodcastEpisode(uuid = "$it", publishedDate = Date()) },
+        podcasts = List(4) { Podcast(uuid = "$it", Date()) },
         artworkSize = 80.dp,
-        useEpisodeArtwork = false,
     )
 }

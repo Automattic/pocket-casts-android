@@ -24,10 +24,9 @@ import au.com.shiftyjelly.pocketcasts.compose.components.TextH40
 import au.com.shiftyjelly.pocketcasts.compose.components.TextP50
 import au.com.shiftyjelly.pocketcasts.compose.preview.ThemePreviewParameterProvider
 import au.com.shiftyjelly.pocketcasts.compose.theme
-import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
+import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.repositories.playlist.PlaylistPreview
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
-import java.util.Date
 import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
@@ -35,7 +34,6 @@ import au.com.shiftyjelly.pocketcasts.localization.R as LR
 fun PlaylistPreviewRow(
     playlist: PlaylistPreview,
     showDivider: Boolean,
-    useEpisodeArtwork: Boolean,
     modifier: Modifier = Modifier,
 ) {
     Column(
@@ -46,9 +44,8 @@ fun PlaylistPreviewRow(
             modifier = Modifier.padding(horizontal = 16.dp, vertical = 12.dp),
         ) {
             PlaylistArtwork(
-                episodes = playlist.artworkEpisodes,
+                podcasts = playlist.podcasts,
                 artworkSize = 56.dp,
-                useEpisodeArtwork = useEpisodeArtwork,
             )
             Spacer(
                 modifier = Modifier.width(16.dp),
@@ -99,10 +96,9 @@ private fun PlaylistPreviewRowPreview(
                     uuid = "",
                     title = "New Releases",
                     episodeCount = 0,
-                    artworkEpisodes = emptyList(),
+                    podcasts = emptyList(),
                 ),
                 showDivider = true,
-                useEpisodeArtwork = false,
                 modifier = Modifier.fillMaxWidth(),
             )
             PlaylistPreviewRow(
@@ -110,10 +106,9 @@ private fun PlaylistPreviewRowPreview(
                     uuid = "",
                     title = "In progress",
                     episodeCount = 1,
-                    artworkEpisodes = List(1) { PodcastEpisode(uuid = "$it", publishedDate = Date()) },
+                    podcasts = List(1) { Podcast(uuid = "$it") },
                 ),
                 showDivider = true,
-                useEpisodeArtwork = false,
                 modifier = Modifier.fillMaxWidth(),
             )
             PlaylistPreviewRow(
@@ -121,10 +116,9 @@ private fun PlaylistPreviewRowPreview(
                     uuid = "",
                     title = "Starred",
                     episodeCount = 328,
-                    artworkEpisodes = List(4) { PodcastEpisode(uuid = "$it", publishedDate = Date()) },
+                    podcasts = List(4) { Podcast(uuid = "$it") },
                 ),
                 showDivider = false,
-                useEpisodeArtwork = false,
                 modifier = Modifier.fillMaxWidth(),
             )
         }
