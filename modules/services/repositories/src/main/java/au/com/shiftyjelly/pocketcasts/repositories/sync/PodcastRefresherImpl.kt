@@ -54,7 +54,10 @@ class PodcastRefresherImpl @Inject constructor(
                     existingEpisode.title = newEpisode.title
                     existingEpisode.downloadUrl = newEpisode.downloadUrl
                     existingEpisode.fileType = newEpisode.fileType
-                    existingEpisode.sizeInBytes = newEpisode.sizeInBytes
+                    // after downloading an episode use file size instead of the feed XML size
+                    if (newEpisode.sizeInBytes > 0 && !existingEpisode.isDownloaded) {
+                        existingEpisode.sizeInBytes = newEpisode.sizeInBytes
+                    }
                     if (newEpisode.duration != 0.0) {
                         existingEpisode.duration = newEpisode.duration
                     }
