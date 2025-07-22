@@ -32,7 +32,7 @@ import au.com.shiftyjelly.pocketcasts.images.R as IR
 
 @Composable
 fun PlaylistPreviewRow(
-    playlistPreview: PlaylistPreview,
+    playlist: PlaylistPreview,
     showDivider: Boolean,
     useEpisodeArtwork: Boolean,
     modifier: Modifier = Modifier,
@@ -45,7 +45,7 @@ fun PlaylistPreviewRow(
             modifier = Modifier.padding(horizontal = 16.dp, vertical = 12.dp),
         ) {
             PlaylistArtwork(
-                episodes = playlistPreview.artworkEpisodes,
+                episodes = playlist.artworkEpisodes,
                 artworkSize = 56.dp,
                 useEpisodeArtwork = useEpisodeArtwork,
             )
@@ -54,7 +54,7 @@ fun PlaylistPreviewRow(
             )
             Column {
                 TextH40(
-                    text = playlistPreview.title,
+                    text = playlist.title,
                 )
                 TextP50(
                     text = "Smart Playlist",
@@ -65,7 +65,7 @@ fun PlaylistPreviewRow(
                 modifier = Modifier.weight(1f),
             )
             TextP50(
-                text = "${playlistPreview.episodeCount}",
+                text = "${playlist.episodeCount}",
                 color = MaterialTheme.theme.colors.primaryText02,
             )
             Image(
@@ -92,7 +92,7 @@ private fun PlaylistPreviewRowPreview(
     AppThemeWithBackground(themeType) {
         Column {
             PlaylistPreviewRow(
-                playlistPreview = PlaylistPreview(
+                playlist = PlaylistPreview(
                     uuid = "",
                     title = "New Releases",
                     episodeCount = 0,
@@ -103,7 +103,7 @@ private fun PlaylistPreviewRowPreview(
                 modifier = Modifier.fillMaxWidth(),
             )
             PlaylistPreviewRow(
-                playlistPreview = PlaylistPreview(
+                playlist = PlaylistPreview(
                     uuid = "",
                     title = "In progress",
                     episodeCount = 1,
@@ -114,7 +114,7 @@ private fun PlaylistPreviewRowPreview(
                 modifier = Modifier.fillMaxWidth(),
             )
             PlaylistPreviewRow(
-                playlistPreview = PlaylistPreview(
+                playlist = PlaylistPreview(
                     uuid = "",
                     title = "Starred",
                     episodeCount = 328,

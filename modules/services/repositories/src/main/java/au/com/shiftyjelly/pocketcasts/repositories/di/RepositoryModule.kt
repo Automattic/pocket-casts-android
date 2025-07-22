@@ -34,6 +34,8 @@ import au.com.shiftyjelly.pocketcasts.repositories.playback.PlayerFactory
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlayerFactoryImpl
 import au.com.shiftyjelly.pocketcasts.repositories.playback.UpNextQueue
 import au.com.shiftyjelly.pocketcasts.repositories.playback.UpNextQueueImpl
+import au.com.shiftyjelly.pocketcasts.repositories.playlist.PlaylistManager
+import au.com.shiftyjelly.pocketcasts.repositories.playlist.PlaylistManagerImpl
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.ChapterManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.ChapterManagerImpl
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
@@ -215,6 +217,9 @@ abstract class RepositoryModule {
 
     @Binds
     abstract fun provideTranscriptManager(transcriptsManagerImpl: TranscriptManagerImpl): TranscriptManager
+
+    @Binds
+    abstract fun providePlalistManager(playlistManagerImpl: PlaylistManagerImpl): PlaylistManager
 
     companion object {
         @Provides

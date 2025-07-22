@@ -10,7 +10,6 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -18,12 +17,10 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.Dp
-import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import au.com.shiftyjelly.pocketcasts.compose.AppTheme
 import au.com.shiftyjelly.pocketcasts.compose.preview.ThemePreviewParameterProvider
@@ -84,13 +81,13 @@ private fun NoImage(
         modifier = modifier
             .size(artworkSize)
             .clip(RoundedCornerShape(cornerSize))
-            .background(MaterialTheme.theme.colors.primaryUi05)
+            .background(MaterialTheme.theme.colors.primaryUi05),
     ) {
         Image(
             painter = painterResource(IR.drawable.ic_playlists),
             contentDescription = null,
             colorFilter = ColorFilter.tint(MaterialTheme.theme.colors.primaryIcon03),
-            modifier = Modifier.size(artworkSize * 0.43f)
+            modifier = Modifier.size(artworkSize * 0.43f),
         )
     }
 }
@@ -158,7 +155,7 @@ private fun QuadImage(
             Image(
                 painter = rememberAsyncImagePainter(imageRequest2, contentScale = ContentScale.Crop),
                 contentDescription = null,
-                modifier = modifier
+                modifier = Modifier
                     .weight(1f)
                     .aspectRatio(1f, matchHeightConstraintsFirst = true)
                     .clip(RoundedCornerShape(bottomStart = cornerSize)),
