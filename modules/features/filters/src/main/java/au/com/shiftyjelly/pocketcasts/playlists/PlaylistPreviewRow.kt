@@ -39,6 +39,7 @@ import androidx.compose.ui.platform.LocalWindowInfo
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.rememberTextMeasurer
 import androidx.compose.ui.tooling.preview.Preview
@@ -163,7 +164,8 @@ fun PlaylistPreviewRow(
                     orientation = Orientation.Horizontal,
                     enabled = draggableState.currentValue != SwipeToDeleteAnchor.Delete,
                 )
-                .background(MaterialTheme.theme.colors.primaryUi01),
+                .background(MaterialTheme.theme.colors.primaryUi01)
+                .semantics(mergeDescendants = true) {},
         ) {
             Row(
                 verticalAlignment = Alignment.CenterVertically,
