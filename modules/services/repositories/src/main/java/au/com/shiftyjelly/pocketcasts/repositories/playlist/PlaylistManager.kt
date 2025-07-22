@@ -4,4 +4,6 @@ import kotlinx.coroutines.flow.Flow
 
 interface PlaylistManager {
     fun observePlaylistsPreview(): Flow<List<PlaylistPreview>>
+
+    suspend fun deletePlaylist(uuid: String)
 }

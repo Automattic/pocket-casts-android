@@ -40,6 +40,10 @@ class PlaylistManagerImpl @Inject constructor(
             .debounce(50.milliseconds)
     }
 
+    override suspend fun deletePlaylist(uuid: String) {
+        playlistDao.markPlaylistAsDeleted(uuid)
+    }
+
     private fun List<SmartPlaylist>.toPreviewFlows() = map { playlist ->
         val podcastsFlow = playlistDao
             .observeSmartPlaylistPodcasts(

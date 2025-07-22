@@ -8,6 +8,7 @@ import androidx.room.Upsert
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.SmartPlaylist
+import au.com.shiftyjelly.pocketcasts.models.entity.SmartPlaylist.Companion.SYNC_STATUS_NOT_SYNCED
 import au.com.shiftyjelly.pocketcasts.models.type.PlaylistEpisodeSortType
 import au.com.shiftyjelly.pocketcasts.models.type.PlaylistEpisodeSortType.LastDownloadAttempt
 import au.com.shiftyjelly.pocketcasts.models.type.PlaylistEpisodeSortType.LongestToShortest
@@ -28,6 +29,9 @@ abstract class PlaylistDao {
 
     @Query("SELECT * FROM smart_playlists WHERE manual = 0 AND deleted = 0 AND draft = 0 ORDER BY sortPosition ASC")
     abstract fun observeSmartPlaylists(): Flow<List<SmartPlaylist>>
+
+    @Query("UPDATE smart_playlists SET deleted = 1, syncStatus = ${SYNC_STATUS_NOT_SYNCED} WHERE uuid = :uuid")
+    abstract suspend fun markPlaylistAsDeleted(uuid: String)
 
     @RawQuery(observedEntities = [Podcast::class, PodcastEpisode::class])
     protected abstract fun observeSmartPlaylistEpisodeCount(query: RoomRawQuery): Flow<Int>

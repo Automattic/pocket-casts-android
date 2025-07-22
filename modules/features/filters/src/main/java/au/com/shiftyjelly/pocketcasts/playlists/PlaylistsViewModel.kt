@@ -10,6 +10,7 @@ import javax.inject.Inject
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.launch
 
 @HiltViewModel
 class PlaylistsViewModel @Inject constructor(
@@ -21,6 +22,12 @@ class PlaylistsViewModel @Inject constructor(
         settings.showPlaylistsOnboarding.flow,
         ::UiState,
     ).stateIn(viewModelScope, SharingStarted.Eagerly, UiState.Empty)
+
+    fun deletePlaylist(uuid: String) {
+        viewModelScope.launch {
+            playlistManager.deletePlaylist(uuid)
+        }
+    }
 
     internal data class UiState(
         val playlists: List<PlaylistPreview>,

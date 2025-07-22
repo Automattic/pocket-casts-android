@@ -23,7 +23,6 @@ import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
-import timber.log.Timber
 
 @AndroidEntryPoint
 class PlaylistsFragment :
@@ -45,13 +44,15 @@ class PlaylistsFragment :
                 state = listState,
                 modifier = Modifier.statusBarsPadding(),
             ) {
-                itemsIndexed(uiState.playlists) { index, playlist ->
+                itemsIndexed(
+                    items = uiState.playlists,
+                    key = { _, item -> item.uuid },
+                ) { index, playlist ->
                     PlaylistPreviewRow(
                         playlist = playlist,
                         showDivider = index != uiState.playlists.lastIndex,
-                        onDelete = {
-                            Timber.tag("LOG_TAG").i("Delete: ${playlist.title}")
-                        },
+                        onDelete = { viewModel.deletePlaylist(playlist.uuid) },
+                        modifier = Modifier.animateItem(),
                     )
                 }
             }
