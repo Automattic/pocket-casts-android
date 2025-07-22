@@ -9,7 +9,7 @@ import au.com.shiftyjelly.pocketcasts.models.db.dao.PlaylistDao
 import au.com.shiftyjelly.pocketcasts.models.db.dao.PodcastDao
 import au.com.shiftyjelly.pocketcasts.models.di.ModelModule
 import au.com.shiftyjelly.pocketcasts.models.di.addTypeConverters
-import au.com.shiftyjelly.pocketcasts.models.entity.EpisodeUuids
+import au.com.shiftyjelly.pocketcasts.models.entity.EpisodeImageData
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.SmartPlaylist
@@ -65,8 +65,8 @@ class PlaylistManagerTest {
             playlistDao.upsertSmartPlaylists(listOf(playlist1, playlist2))
             assertEquals(
                 listOf(
-                    PlaylistPreview(uuid = "id-1", title = "Title 1", episodeUuids = emptyList()),
-                    PlaylistPreview(uuid = "id-2", title = "Title 2", episodeUuids = emptyList()),
+                    PlaylistPreview(uuid = "id-1", title = "Title 1", episodeImages = emptyList()),
+                    PlaylistPreview(uuid = "id-2", title = "Title 2", episodeImages = emptyList()),
                 ),
                 awaitItem(),
             )
@@ -78,23 +78,23 @@ class PlaylistManagerTest {
         playlistDao.upsertSmartPlaylist(SmartPlaylist())
         podcastDao.insertSuspend(Podcast(uuid = "podcast-id-1", isSubscribed = true))
         podcastDao.insertSuspend(Podcast(uuid = "podcast-id-2", isSubscribed = true))
-        episodeDao.insert(PodcastEpisode(uuid = "episode-id-1", podcastUuid = "podcast-id-1", publishedDate = Date(1)))
+        episodeDao.insert(PodcastEpisode(uuid = "episode-id-1", podcastUuid = "podcast-id-1", imageUrl = "image-url", publishedDate = Date(1)))
 
         manager.observePlaylistsPreview().test {
             assertEquals(
                 listOf(
-                    EpisodeUuids("episode-id-1", "podcast-id-1"),
+                    EpisodeImageData("episode-id-1", "podcast-id-1", "image-url"),
                 ),
-                awaitItem().single().episodeUuids,
+                awaitItem().single().episodeImages,
             )
 
             episodeDao.insert(PodcastEpisode(uuid = "episode-id-2", podcastUuid = "podcast-id-2", publishedDate = Date(0)))
             assertEquals(
                 listOf(
-                    EpisodeUuids("episode-id-1", "podcast-id-1"),
-                    EpisodeUuids("episode-id-2", "podcast-id-2"),
+                    EpisodeImageData("episode-id-1", "podcast-id-1", "image-url"),
+                    EpisodeImageData("episode-id-2", "podcast-id-2", imageUrl = null),
                 ),
-                awaitItem().single().episodeUuids,
+                awaitItem().single().episodeImages,
             )
         }
     }
@@ -148,7 +148,7 @@ class PlaylistManagerTest {
         episodeDao.insert(PodcastEpisode(uuid = "episode-id-1", podcastUuid = "podcast-id-1", publishedDate = Date()))
         episodeDao.insert(PodcastEpisode(uuid = "episode-id-2", podcastUuid = "podcast-id-2", publishedDate = Date()))
 
-        val episodesUuids = manager.observePlaylistsPreview().first().single().episodeUuids
+        val episodesUuids = manager.observePlaylistsPreview().first().single().episodeImages
 
         assertTrue(episodesUuids.isEmpty())
     }
@@ -197,12 +197,12 @@ class PlaylistManagerTest {
             ),
         )
 
-        val episodesUuids = manager.observePlaylistsPreview().first().single().episodeUuids
+        val episodesUuids = manager.observePlaylistsPreview().first().single().episodeImages
 
         assertEquals(
             listOf(
-                EpisodeUuids("episode-id-1", "podcast-id"),
-                EpisodeUuids("episode-id-2", "podcast-id"),
+                EpisodeImageData("episode-id-1", "podcast-id", imageUrl = null),
+                EpisodeImageData("episode-id-2", "podcast-id", imageUrl = null),
             ),
             episodesUuids,
         )
@@ -239,14 +239,14 @@ class PlaylistManagerTest {
             ),
         )
 
-        val episodesUuids = manager.observePlaylistsPreview().first().single().episodeUuids
+        val episodesUuids = manager.observePlaylistsPreview().first().single().episodeImages
 
         assertEquals(
             listOf(
-                EpisodeUuids("episode-id-4", "podcast-id"),
-                EpisodeUuids("episode-id-3", "podcast-id"),
-                EpisodeUuids("episode-id-2", "podcast-id"),
-                EpisodeUuids("episode-id-1", "podcast-id"),
+                EpisodeImageData("episode-id-4", "podcast-id", imageUrl = null),
+                EpisodeImageData("episode-id-3", "podcast-id", imageUrl = null),
+                EpisodeImageData("episode-id-2", "podcast-id", imageUrl = null),
+                EpisodeImageData("episode-id-1", "podcast-id", imageUrl = null),
             ),
             episodesUuids,
         )
@@ -283,14 +283,14 @@ class PlaylistManagerTest {
             ),
         )
 
-        val episodesUuids = manager.observePlaylistsPreview().first().single().episodeUuids
+        val episodesUuids = manager.observePlaylistsPreview().first().single().episodeImages
 
         assertEquals(
             listOf(
-                EpisodeUuids("episode-id-4", "podcast-id"),
-                EpisodeUuids("episode-id-3", "podcast-id"),
-                EpisodeUuids("episode-id-2", "podcast-id"),
-                EpisodeUuids("episode-id-1", "podcast-id"),
+                EpisodeImageData("episode-id-4", "podcast-id", imageUrl = null),
+                EpisodeImageData("episode-id-3", "podcast-id", imageUrl = null),
+                EpisodeImageData("episode-id-2", "podcast-id", imageUrl = null),
+                EpisodeImageData("episode-id-1", "podcast-id", imageUrl = null),
             ),
             episodesUuids,
         )
@@ -331,14 +331,14 @@ class PlaylistManagerTest {
             ),
         )
 
-        val episodesUuids = manager.observePlaylistsPreview().first().single().episodeUuids
+        val episodesUuids = manager.observePlaylistsPreview().first().single().episodeImages
 
         assertEquals(
             listOf(
-                EpisodeUuids("episode-id-4", "podcast-id"),
-                EpisodeUuids("episode-id-3", "podcast-id"),
-                EpisodeUuids("episode-id-2", "podcast-id"),
-                EpisodeUuids("episode-id-1", "podcast-id"),
+                EpisodeImageData("episode-id-4", "podcast-id", imageUrl = null),
+                EpisodeImageData("episode-id-3", "podcast-id", imageUrl = null),
+                EpisodeImageData("episode-id-2", "podcast-id", imageUrl = null),
+                EpisodeImageData("episode-id-1", "podcast-id", imageUrl = null),
             ),
             episodesUuids,
         )
@@ -379,14 +379,14 @@ class PlaylistManagerTest {
             ),
         )
 
-        val episodesUuids = manager.observePlaylistsPreview().first().single().episodeUuids
+        val episodesUuids = manager.observePlaylistsPreview().first().single().episodeImages
 
         assertEquals(
             listOf(
-                EpisodeUuids("episode-id-4", "podcast-id"),
-                EpisodeUuids("episode-id-3", "podcast-id"),
-                EpisodeUuids("episode-id-2", "podcast-id"),
-                EpisodeUuids("episode-id-1", "podcast-id"),
+                EpisodeImageData("episode-id-4", "podcast-id", imageUrl = null),
+                EpisodeImageData("episode-id-3", "podcast-id", imageUrl = null),
+                EpisodeImageData("episode-id-2", "podcast-id", imageUrl = null),
+                EpisodeImageData("episode-id-1", "podcast-id", imageUrl = null),
             ),
             episodesUuids,
         )
@@ -431,15 +431,15 @@ class PlaylistManagerTest {
             ),
         )
 
-        val episodesUuids = manager.observePlaylistsPreview().first().single().episodeUuids
+        val episodesUuids = manager.observePlaylistsPreview().first().single().episodeImages
 
         assertEquals(
             listOf(
-                EpisodeUuids("episode-id-5", "podcast-id"),
-                EpisodeUuids("episode-id-4", "podcast-id"),
-                EpisodeUuids("episode-id-3", "podcast-id"),
-                EpisodeUuids("episode-id-2", "podcast-id"),
-                EpisodeUuids("episode-id-1", "podcast-id"),
+                EpisodeImageData("episode-id-5", "podcast-id", imageUrl = null),
+                EpisodeImageData("episode-id-4", "podcast-id", imageUrl = null),
+                EpisodeImageData("episode-id-3", "podcast-id", imageUrl = null),
+                EpisodeImageData("episode-id-2", "podcast-id", imageUrl = null),
+                EpisodeImageData("episode-id-1", "podcast-id", imageUrl = null),
             ),
             episodesUuids,
         )
