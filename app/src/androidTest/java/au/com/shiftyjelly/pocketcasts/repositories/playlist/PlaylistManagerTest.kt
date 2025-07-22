@@ -435,4 +435,56 @@ class PlaylistManagerTest {
         assertEquals(4, playlist.episodeCount)
         assertEquals(podcasts.reversed(), playlist.podcasts)
     }
+
+    @Test
+    fun selectDistinctPodcastInPlaylistPreview() = runTest(testDispatcher) {
+        playlistDao.upsertSmartPlaylist(SmartPlaylist(sortType = PlaylistEpisodeSortType.LastDownloadAttempt))
+        val podcasts = listOf(
+            Podcast(uuid = "podcast-id-1", isSubscribed = true),
+            Podcast(uuid = "podcast-id-2", isSubscribed = true),
+            Podcast(uuid = "podcast-id-3", isSubscribed = true),
+            Podcast(uuid = "podcast-id-4", isSubscribed = true),
+            Podcast(uuid = "podcast-id-5", isSubscribed = true),
+        )
+        podcasts.forEach { podcastDao.insertSuspend(it) }
+        episodeDao.insertAll(
+            listOf(
+                PodcastEpisode(
+                    uuid = "episode-id-1",
+                    podcastUuid = "podcast-id-1",
+                    publishedDate = Date(6),
+                ),
+                PodcastEpisode(
+                    uuid = "episode-id-2",
+                    podcastUuid = "podcast-id-2",
+                    publishedDate = Date(5),
+                ),
+                PodcastEpisode(
+                    uuid = "episode-id-3",
+                    podcastUuid = "podcast-id-2",
+                    publishedDate = Date(4),
+                ),
+                PodcastEpisode(
+                    uuid = "episode-id-4",
+                    podcastUuid = "podcast-id-3",
+                    publishedDate = Date(3),
+                ),
+                PodcastEpisode(
+                    uuid = "episode-id-5",
+                    podcastUuid = "podcast-id-4",
+                    publishedDate = Date(2),
+                ),
+                PodcastEpisode(
+                    uuid = "episode-id-6",
+                    podcastUuid = "podcast-id-5",
+                    publishedDate = Date(1),
+                ),
+            ),
+        )
+
+        val playlist = manager.observePlaylistsPreview().first().single()
+
+        assertEquals(6, playlist.episodeCount)
+        assertEquals(podcasts.take(4), playlist.podcasts)
+    }
 }
