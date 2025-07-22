@@ -12,7 +12,6 @@ import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -82,10 +81,9 @@ fun PlaylistPreviewRow(
                     .size(24.dp),
             )
         }
-        HorizontalDivider(
-            startIndent = 16.dp,
-            color = if (showDivider) null else Color.Transparent,
-        )
+        if (showDivider) {
+            HorizontalDivider(startIndent = 16.dp)
+        }
     }
 }
 
