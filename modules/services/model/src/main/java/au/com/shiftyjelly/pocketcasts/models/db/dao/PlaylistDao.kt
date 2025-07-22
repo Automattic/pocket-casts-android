@@ -5,7 +5,6 @@ import androidx.room.Query
 import androidx.room.RawQuery
 import androidx.room.RoomRawQuery
 import androidx.room.Upsert
-import au.com.shiftyjelly.pocketcasts.models.entity.EpisodeImageData
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.SmartPlaylist
@@ -31,39 +30,64 @@ abstract class PlaylistDao {
     abstract fun observeSmartPlaylists(): Flow<List<SmartPlaylist>>
 
     @RawQuery(observedEntities = [Podcast::class, PodcastEpisode::class])
-    protected abstract fun observeEpisodeUuids(query: RoomRawQuery): Flow<List<EpisodeImageData>>
+    protected abstract fun observeSmartPlaylistEpisodeCount(query: RoomRawQuery): Flow<Int>
+
+    fun observeSmartPlaylistEpisodeCount(
+        smartRules: SmartRules,
+        limit: Int,
+    ): (Clock, playlistId: Long?) -> Flow<Int> = { clock, playlistId ->
+        val query = buildString {
+            append("SELECT COUNT(*) FROM (")
+            append(
+                createSmartPlaylistEpisodeQuery(
+                    whereClause = smartRules.toSqlWhereClause(clock, playlistId),
+                    orderByClause = null,
+                    limit = limit,
+                ),
+            )
+            append(')')
+        }
+        observeSmartPlaylistEpisodeCount(RoomRawQuery(query))
+    }
+
+    @RawQuery(observedEntities = [Podcast::class, PodcastEpisode::class])
+    protected abstract fun observeSmartPlaylistEpisodes(query: RoomRawQuery): Flow<List<PodcastEpisode>>
 
     fun observeSmartPlaylistEpisodeUuids(
         smartRules: SmartRules,
         sortType: PlaylistEpisodeSortType,
         limit: Int,
-    ): (Clock, playlistId: Long?) -> Flow<List<EpisodeImageData>> = { clock, playlistId ->
-        val orderByClause = when (sortType) {
-            NewestToOldest -> "published_date DESC, episode.added_date DESC"
-            OldestToNewest -> "episode.published_date ASC, episode.added_date ASC"
-            ShortestToLongest -> "duration ASC, episode.added_date DESC"
-            LongestToShortest -> "duration DESC, episode.added_date DESC"
-            LastDownloadAttempt -> "IFNULL(episode.last_download_attempt_date, -1) DESC, episode.published_date DESC"
-        }
-        val query = RoomRawQuery(
-            sql = """
-                |SELECT
-                |  episode.uuid AS episode_uuid,
-                |  episode.podcast_id AS podcast_uuid,
-                |  episode.image_url AS image_url
-                |FROM
-                |  podcast_episodes AS episode
-                |JOIN
-                |  podcasts AS podcast
-                |  ON episode.podcast_id = podcast.uuid  
-                |WHERE
-                |  ${smartRules.toSqlWhereClause(clock, playlistId)}
-                |ORDER BY
-                |  $orderByClause
-                |LIMIT
-                |  $limit
-            """.trimMargin(),
+    ): (Clock, playlistId: Long?) -> Flow<List<PodcastEpisode>> = { clock, playlistId ->
+        val query = createSmartPlaylistEpisodeQuery(
+            whereClause = smartRules.toSqlWhereClause(clock, playlistId),
+            orderByClause = sortType.toOrderByClause(),
+            limit = limit,
         )
-        observeEpisodeUuids(query)
+        observeSmartPlaylistEpisodes(RoomRawQuery(query))
+    }
+
+    private fun createSmartPlaylistEpisodeQuery(
+        whereClause: String,
+        orderByClause: String?,
+        limit: Int?,
+    ) = buildString {
+        append("SELECT episode.* ")
+        append("FROM podcast_episodes AS episode ")
+        append("JOIN podcasts AS podcast ON episode.podcast_id = podcast.uuid ")
+        append("WHERE $whereClause ")
+        if (orderByClause != null) {
+            append("ORDER BY $orderByClause ")
+        }
+        if (limit != null) {
+            append("LIMIT $limit")
+        }
+    }
+
+    private fun PlaylistEpisodeSortType.toOrderByClause() = when (this) {
+        NewestToOldest -> "published_date DESC, episode.added_date DESC"
+        OldestToNewest -> "episode.published_date ASC, episode.added_date ASC"
+        ShortestToLongest -> "duration ASC, episode.added_date DESC"
+        LongestToShortest -> "duration DESC, episode.added_date DESC"
+        LastDownloadAttempt -> "IFNULL(episode.last_download_attempt_date, -1) DESC, episode.published_date DESC"
     }
 }

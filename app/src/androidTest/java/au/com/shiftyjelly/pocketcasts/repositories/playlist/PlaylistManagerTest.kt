@@ -9,17 +9,12 @@ import au.com.shiftyjelly.pocketcasts.models.db.dao.PlaylistDao
 import au.com.shiftyjelly.pocketcasts.models.db.dao.PodcastDao
 import au.com.shiftyjelly.pocketcasts.models.di.ModelModule
 import au.com.shiftyjelly.pocketcasts.models.di.addTypeConverters
-import au.com.shiftyjelly.pocketcasts.models.entity.EpisodeImageData
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.SmartPlaylist
 import au.com.shiftyjelly.pocketcasts.models.entity.SmartPlaylist.Companion.AUDIO_VIDEO_FILTER_VIDEO_ONLY
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodePlayingStatus
-import au.com.shiftyjelly.pocketcasts.models.type.PlaylistEpisodeSortType.LastDownloadAttempt
-import au.com.shiftyjelly.pocketcasts.models.type.PlaylistEpisodeSortType.LongestToShortest
-import au.com.shiftyjelly.pocketcasts.models.type.PlaylistEpisodeSortType.NewestToOldest
-import au.com.shiftyjelly.pocketcasts.models.type.PlaylistEpisodeSortType.OldestToNewest
-import au.com.shiftyjelly.pocketcasts.models.type.PlaylistEpisodeSortType.ShortestToLongest
+import au.com.shiftyjelly.pocketcasts.models.type.PlaylistEpisodeSortType
 import au.com.shiftyjelly.pocketcasts.sharedtest.MutableClock
 import com.squareup.moshi.Moshi
 import java.util.Date
@@ -65,8 +60,8 @@ class PlaylistManagerTest {
             playlistDao.upsertSmartPlaylists(listOf(playlist1, playlist2))
             assertEquals(
                 listOf(
-                    PlaylistPreview(uuid = "id-1", title = "Title 1", episodeImages = emptyList()),
-                    PlaylistPreview(uuid = "id-2", title = "Title 2", episodeImages = emptyList()),
+                    PlaylistPreview(uuid = "id-1", title = "Title 1", episodeCount = 0, artworkEpisodes = emptyList()),
+                    PlaylistPreview(uuid = "id-2", title = "Title 2", episodeCount = 0, artworkEpisodes = emptyList()),
                 ),
                 awaitItem(),
             )
@@ -78,23 +73,25 @@ class PlaylistManagerTest {
         playlistDao.upsertSmartPlaylist(SmartPlaylist())
         podcastDao.insertSuspend(Podcast(uuid = "podcast-id-1", isSubscribed = true))
         podcastDao.insertSuspend(Podcast(uuid = "podcast-id-2", isSubscribed = true))
-        episodeDao.insert(PodcastEpisode(uuid = "episode-id-1", podcastUuid = "podcast-id-1", imageUrl = "image-url", publishedDate = Date(1)))
+        val episode1 = PodcastEpisode(uuid = "episode-id-1", podcastUuid = "podcast-id-1", imageUrl = "image-url", publishedDate = Date(1))
+        episodeDao.insert(episode1)
 
         manager.observePlaylistsPreview().test {
             assertEquals(
                 listOf(
-                    EpisodeImageData("episode-id-1", "podcast-id-1", "image-url"),
+                    PlaylistPreview(artworkEpisodes = listOf(episode1), episodeCount = 1, uuid = "", title = ""),
                 ),
-                awaitItem().single().episodeImages,
+                awaitItem(),
             )
 
-            episodeDao.insert(PodcastEpisode(uuid = "episode-id-2", podcastUuid = "podcast-id-2", publishedDate = Date(0)))
+            val episode2 = PodcastEpisode(uuid = "episode-id-2", podcastUuid = "podcast-id-2", publishedDate = Date(0))
+            episodeDao.insert(episode2)
+            skipItems(1) // Skip sync between episode count and artwork episodes
             assertEquals(
                 listOf(
-                    EpisodeImageData("episode-id-1", "podcast-id-1", "image-url"),
-                    EpisodeImageData("episode-id-2", "podcast-id-2", imageUrl = null),
+                    PlaylistPreview(artworkEpisodes = listOf(episode1, episode2), episodeCount = 2, uuid = "", title = ""),
                 ),
-                awaitItem().single().episodeImages,
+                awaitItem(),
             )
         }
     }
@@ -148,9 +145,10 @@ class PlaylistManagerTest {
         episodeDao.insert(PodcastEpisode(uuid = "episode-id-1", podcastUuid = "podcast-id-1", publishedDate = Date()))
         episodeDao.insert(PodcastEpisode(uuid = "episode-id-2", podcastUuid = "podcast-id-2", publishedDate = Date()))
 
-        val episodesUuids = manager.observePlaylistsPreview().first().single().episodeImages
+        val playlist = manager.observePlaylistsPreview().first().single()
 
-        assertTrue(episodesUuids.isEmpty())
+        assertEquals(0, playlist.episodeCount)
+        assertTrue(playlist.artworkEpisodes.isEmpty())
     }
 
     @Test
@@ -164,284 +162,255 @@ class PlaylistManagerTest {
             ),
         )
         podcastDao.insertSuspend(Podcast(uuid = "podcast-id", isSubscribed = true))
-        episodeDao.insertAll(
-            listOf(
-                PodcastEpisode(
-                    uuid = "episode-id-1",
-                    podcastUuid = "podcast-id",
-                    publishedDate = Date(4),
-                    playingStatus = EpisodePlayingStatus.NOT_PLAYED,
-                    fileType = "video/mp4",
-                ),
-                PodcastEpisode(
-                    uuid = "episode-id-2",
-                    podcastUuid = "podcast-id",
-                    publishedDate = Date(3),
-                    playingStatus = EpisodePlayingStatus.COMPLETED,
-                    fileType = "video/mov",
-                ),
-                PodcastEpisode(
-                    uuid = "episode-id-3",
-                    podcastUuid = "podcast-id",
-                    publishedDate = Date(2),
-                    playingStatus = EpisodePlayingStatus.NOT_PLAYED,
-                    fileType = "audio/mp3",
-                ),
-                PodcastEpisode(
-                    uuid = "episode-id-4",
-                    podcastUuid = "podcast-id",
-                    publishedDate = Date(1),
-                    playingStatus = EpisodePlayingStatus.IN_PROGRESS,
-                    fileType = "video/mp4",
-                ),
+        val episodes = listOf(
+            PodcastEpisode(
+                uuid = "episode-id-1",
+                podcastUuid = "podcast-id",
+                publishedDate = Date(4),
+                playingStatus = EpisodePlayingStatus.NOT_PLAYED,
+                fileType = "video/mp4",
+            ),
+            PodcastEpisode(
+                uuid = "episode-id-2",
+                podcastUuid = "podcast-id",
+                publishedDate = Date(3),
+                playingStatus = EpisodePlayingStatus.COMPLETED,
+                fileType = "video/mov",
+            ),
+            PodcastEpisode(
+                uuid = "episode-id-3",
+                podcastUuid = "podcast-id",
+                publishedDate = Date(2),
+                playingStatus = EpisodePlayingStatus.NOT_PLAYED,
+                fileType = "audio/mp3",
+            ),
+            PodcastEpisode(
+                uuid = "episode-id-4",
+                podcastUuid = "podcast-id",
+                publishedDate = Date(1),
+                playingStatus = EpisodePlayingStatus.IN_PROGRESS,
+                fileType = "video/mp4",
             ),
         )
+        episodeDao.insertAll(episodes)
 
-        val episodesUuids = manager.observePlaylistsPreview().first().single().episodeImages
+        val previewEpisodes = manager.observePlaylistsPreview().first().single().artworkEpisodes
 
         assertEquals(
             listOf(
-                EpisodeImageData("episode-id-1", "podcast-id", imageUrl = null),
-                EpisodeImageData("episode-id-2", "podcast-id", imageUrl = null),
+                episodes[0],
+                episodes[1],
             ),
-            episodesUuids,
+            previewEpisodes,
         )
     }
 
     @Test
     fun sortEpisodesInPlaylistPreviewByNewestToOldest() = runTest {
-        playlistDao.upsertSmartPlaylist(SmartPlaylist(sortType = NewestToOldest))
+        playlistDao.upsertSmartPlaylist(SmartPlaylist(sortType = PlaylistEpisodeSortType.NewestToOldest))
         podcastDao.insertSuspend(Podcast(uuid = "podcast-id", isSubscribed = true))
-        episodeDao.insertAll(
-            listOf(
-                PodcastEpisode(
-                    uuid = "episode-id-1",
-                    podcastUuid = "podcast-id",
-                    publishedDate = Date(0),
-                ),
-                PodcastEpisode(
-                    uuid = "episode-id-2",
-                    podcastUuid = "podcast-id",
-                    publishedDate = Date(1),
-                    addedDate = Date(0),
-                ),
-                PodcastEpisode(
-                    uuid = "episode-id-3",
-                    podcastUuid = "podcast-id",
-                    publishedDate = Date(1),
-                    addedDate = Date(1),
-                ),
-                PodcastEpisode(
-                    uuid = "episode-id-4",
-                    podcastUuid = "podcast-id",
-                    publishedDate = Date(2),
-                ),
+        val episodes = listOf(
+            PodcastEpisode(
+                uuid = "episode-id-1",
+                podcastUuid = "podcast-id",
+                publishedDate = Date(0),
+            ),
+            PodcastEpisode(
+                uuid = "episode-id-2",
+                podcastUuid = "podcast-id",
+                publishedDate = Date(1),
+                addedDate = Date(0),
+            ),
+            PodcastEpisode(
+                uuid = "episode-id-3",
+                podcastUuid = "podcast-id",
+                publishedDate = Date(1),
+                addedDate = Date(1),
+            ),
+            PodcastEpisode(
+                uuid = "episode-id-4",
+                podcastUuid = "podcast-id",
+                publishedDate = Date(2),
             ),
         )
+        episodeDao.insertAll(episodes)
 
-        val episodesUuids = manager.observePlaylistsPreview().first().single().episodeImages
+        val previewEpisodes = manager.observePlaylistsPreview().first().single().artworkEpisodes
 
-        assertEquals(
-            listOf(
-                EpisodeImageData("episode-id-4", "podcast-id", imageUrl = null),
-                EpisodeImageData("episode-id-3", "podcast-id", imageUrl = null),
-                EpisodeImageData("episode-id-2", "podcast-id", imageUrl = null),
-                EpisodeImageData("episode-id-1", "podcast-id", imageUrl = null),
-            ),
-            episodesUuids,
-        )
+        assertEquals(episodes.reversed(), previewEpisodes)
     }
 
     @Test
     fun sortEpisodesInPlaylistPreviewByOldestToNewest() = runTest {
-        playlistDao.upsertSmartPlaylist(SmartPlaylist(sortType = OldestToNewest))
+        playlistDao.upsertSmartPlaylist(SmartPlaylist(sortType = PlaylistEpisodeSortType.OldestToNewest))
         podcastDao.insertSuspend(Podcast(uuid = "podcast-id", isSubscribed = true))
-        episodeDao.insertAll(
-            listOf(
-                PodcastEpisode(
-                    uuid = "episode-id-1",
-                    podcastUuid = "podcast-id",
-                    publishedDate = Date(2),
-                ),
-                PodcastEpisode(
-                    uuid = "episode-id-2",
-                    podcastUuid = "podcast-id",
-                    publishedDate = Date(1),
-                    addedDate = Date(1),
-                ),
-                PodcastEpisode(
-                    uuid = "episode-id-3",
-                    podcastUuid = "podcast-id",
-                    publishedDate = Date(1),
-                    addedDate = Date(0),
-                ),
-                PodcastEpisode(
-                    uuid = "episode-id-4",
-                    podcastUuid = "podcast-id",
-                    publishedDate = Date(0),
-                ),
+        val episodes = listOf(
+            PodcastEpisode(
+                uuid = "episode-id-1",
+                podcastUuid = "podcast-id",
+                publishedDate = Date(2),
+            ),
+            PodcastEpisode(
+                uuid = "episode-id-2",
+                podcastUuid = "podcast-id",
+                publishedDate = Date(1),
+                addedDate = Date(1),
+            ),
+            PodcastEpisode(
+                uuid = "episode-id-3",
+                podcastUuid = "podcast-id",
+                publishedDate = Date(1),
+                addedDate = Date(0),
+            ),
+            PodcastEpisode(
+                uuid = "episode-id-4",
+                podcastUuid = "podcast-id",
+                publishedDate = Date(0),
             ),
         )
+        episodeDao.insertAll(episodes)
 
-        val episodesUuids = manager.observePlaylistsPreview().first().single().episodeImages
+        val previewEpisodes = manager.observePlaylistsPreview().first().single().artworkEpisodes
 
-        assertEquals(
-            listOf(
-                EpisodeImageData("episode-id-4", "podcast-id", imageUrl = null),
-                EpisodeImageData("episode-id-3", "podcast-id", imageUrl = null),
-                EpisodeImageData("episode-id-2", "podcast-id", imageUrl = null),
-                EpisodeImageData("episode-id-1", "podcast-id", imageUrl = null),
-            ),
-            episodesUuids,
-        )
+        assertEquals(episodes.reversed(), previewEpisodes)
     }
 
     @Test
     fun sortEpisodesInPlaylistPreviewByShortestToLongest() = runTest {
-        playlistDao.upsertSmartPlaylist(SmartPlaylist(sortType = ShortestToLongest))
+        playlistDao.upsertSmartPlaylist(SmartPlaylist(sortType = PlaylistEpisodeSortType.ShortestToLongest))
         podcastDao.insertSuspend(Podcast(uuid = "podcast-id", isSubscribed = true))
-        episodeDao.insertAll(
-            listOf(
-                PodcastEpisode(
-                    uuid = "episode-id-1",
-                    podcastUuid = "podcast-id",
-                    publishedDate = Date(),
-                    duration = 2.0,
-                ),
-                PodcastEpisode(
-                    uuid = "episode-id-2",
-                    podcastUuid = "podcast-id",
-                    publishedDate = Date(),
-                    duration = 1.0,
-                    addedDate = Date(0),
-                ),
-                PodcastEpisode(
-                    uuid = "episode-id-3",
-                    podcastUuid = "podcast-id",
-                    publishedDate = Date(),
-                    duration = 1.0,
-                    addedDate = Date(1),
-                ),
-                PodcastEpisode(
-                    uuid = "episode-id-4",
-                    podcastUuid = "podcast-id",
-                    publishedDate = Date(),
-                    duration = 0.0,
-                ),
+        val episodes = listOf(
+            PodcastEpisode(
+                uuid = "episode-id-1",
+                podcastUuid = "podcast-id",
+                publishedDate = Date(),
+                duration = 2.0,
+            ),
+            PodcastEpisode(
+                uuid = "episode-id-2",
+                podcastUuid = "podcast-id",
+                publishedDate = Date(),
+                duration = 1.0,
+                addedDate = Date(0),
+            ),
+            PodcastEpisode(
+                uuid = "episode-id-3",
+                podcastUuid = "podcast-id",
+                publishedDate = Date(),
+                duration = 1.0,
+                addedDate = Date(1),
+            ),
+            PodcastEpisode(
+                uuid = "episode-id-4",
+                podcastUuid = "podcast-id",
+                publishedDate = Date(),
+                duration = 0.0,
             ),
         )
+        episodeDao.insertAll(episodes)
 
-        val episodesUuids = manager.observePlaylistsPreview().first().single().episodeImages
+        val previewEpisodes = manager.observePlaylistsPreview().first().single().artworkEpisodes
 
-        assertEquals(
-            listOf(
-                EpisodeImageData("episode-id-4", "podcast-id", imageUrl = null),
-                EpisodeImageData("episode-id-3", "podcast-id", imageUrl = null),
-                EpisodeImageData("episode-id-2", "podcast-id", imageUrl = null),
-                EpisodeImageData("episode-id-1", "podcast-id", imageUrl = null),
-            ),
-            episodesUuids,
-        )
+        assertEquals(episodes.reversed(), previewEpisodes)
     }
 
     @Test
     fun sortEpisodesInPlaylistPreviewByLongestToShortest() = runTest {
-        playlistDao.upsertSmartPlaylist(SmartPlaylist(sortType = LongestToShortest))
+        playlistDao.upsertSmartPlaylist(SmartPlaylist(sortType = PlaylistEpisodeSortType.LongestToShortest))
         podcastDao.insertSuspend(Podcast(uuid = "podcast-id", isSubscribed = true))
-        episodeDao.insertAll(
-            listOf(
-                PodcastEpisode(
-                    uuid = "episode-id-1",
-                    podcastUuid = "podcast-id",
-                    publishedDate = Date(),
-                    duration = 0.0,
-                ),
-                PodcastEpisode(
-                    uuid = "episode-id-2",
-                    podcastUuid = "podcast-id",
-                    publishedDate = Date(),
-                    duration = 1.0,
-                    addedDate = Date(0),
-                ),
-                PodcastEpisode(
-                    uuid = "episode-id-3",
-                    podcastUuid = "podcast-id",
-                    publishedDate = Date(),
-                    duration = 1.0,
-                    addedDate = Date(1),
-                ),
-                PodcastEpisode(
-                    uuid = "episode-id-4",
-                    podcastUuid = "podcast-id",
-                    publishedDate = Date(),
-                    duration = 2.0,
-                ),
+        val episodes = listOf(
+            PodcastEpisode(
+                uuid = "episode-id-1",
+                podcastUuid = "podcast-id",
+                publishedDate = Date(),
+                duration = 0.0,
+            ),
+            PodcastEpisode(
+                uuid = "episode-id-2",
+                podcastUuid = "podcast-id",
+                publishedDate = Date(),
+                duration = 1.0,
+                addedDate = Date(0),
+            ),
+            PodcastEpisode(
+                uuid = "episode-id-3",
+                podcastUuid = "podcast-id",
+                publishedDate = Date(),
+                duration = 1.0,
+                addedDate = Date(1),
+            ),
+            PodcastEpisode(
+                uuid = "episode-id-4",
+                podcastUuid = "podcast-id",
+                publishedDate = Date(),
+                duration = 2.0,
             ),
         )
+        episodeDao.insertAll(episodes)
 
-        val episodesUuids = manager.observePlaylistsPreview().first().single().episodeImages
+        val previewEpisodes = manager.observePlaylistsPreview().first().single().artworkEpisodes
 
-        assertEquals(
-            listOf(
-                EpisodeImageData("episode-id-4", "podcast-id", imageUrl = null),
-                EpisodeImageData("episode-id-3", "podcast-id", imageUrl = null),
-                EpisodeImageData("episode-id-2", "podcast-id", imageUrl = null),
-                EpisodeImageData("episode-id-1", "podcast-id", imageUrl = null),
-            ),
-            episodesUuids,
-        )
+        assertEquals(episodes.reversed(), previewEpisodes)
     }
 
     @Test
     fun sortEpisodesInPlaylistPreviewByLastDownloadAttempt() = runTest {
-        playlistDao.upsertSmartPlaylist(SmartPlaylist(sortType = LastDownloadAttempt))
+        playlistDao.upsertSmartPlaylist(SmartPlaylist(sortType = PlaylistEpisodeSortType.LastDownloadAttempt))
         podcastDao.insertSuspend(Podcast(uuid = "podcast-id", isSubscribed = true))
-        episodeDao.insertAll(
-            listOf(
-                PodcastEpisode(
-                    uuid = "episode-id-1",
-                    podcastUuid = "podcast-id",
-                    publishedDate = Date(),
-                    lastDownloadAttemptDate = null,
-                ),
-                PodcastEpisode(
-                    uuid = "episode-id-2",
-                    podcastUuid = "podcast-id",
-                    publishedDate = Date(),
-                    lastDownloadAttemptDate = Date(0),
-                ),
-                PodcastEpisode(
-                    uuid = "episode-id-3",
-                    podcastUuid = "podcast-id",
-                    publishedDate = Date(0),
-                    lastDownloadAttemptDate = Date(1),
-                ),
-                PodcastEpisode(
-                    uuid = "episode-id-4",
-                    podcastUuid = "podcast-id",
-                    publishedDate = Date(1),
-                    lastDownloadAttemptDate = Date(1),
-                ),
-                PodcastEpisode(
-                    uuid = "episode-id-5",
-                    podcastUuid = "podcast-id",
-                    publishedDate = Date(),
-                    lastDownloadAttemptDate = Date(2),
-                ),
+        val episodes = listOf(
+            PodcastEpisode(
+                uuid = "episode-id-1",
+                podcastUuid = "podcast-id",
+                publishedDate = Date(),
+                lastDownloadAttemptDate = null,
+            ),
+            PodcastEpisode(
+                uuid = "episode-id-2",
+                podcastUuid = "podcast-id",
+                publishedDate = Date(),
+                lastDownloadAttemptDate = Date(0),
+            ),
+            PodcastEpisode(
+                uuid = "episode-id-4",
+                podcastUuid = "podcast-id",
+                publishedDate = Date(1),
+                lastDownloadAttemptDate = Date(1),
+            ),
+            PodcastEpisode(
+                uuid = "episode-id-5",
+                podcastUuid = "podcast-id",
+                publishedDate = Date(),
+                lastDownloadAttemptDate = Date(2),
             ),
         )
+        episodeDao.insertAll(episodes)
 
-        val episodesUuids = manager.observePlaylistsPreview().first().single().episodeImages
+        val previewEpisodes = manager.observePlaylistsPreview().first().single().artworkEpisodes
 
-        assertEquals(
-            listOf(
-                EpisodeImageData("episode-id-5", "podcast-id", imageUrl = null),
-                EpisodeImageData("episode-id-4", "podcast-id", imageUrl = null),
-                EpisodeImageData("episode-id-3", "podcast-id", imageUrl = null),
-                EpisodeImageData("episode-id-2", "podcast-id", imageUrl = null),
-                EpisodeImageData("episode-id-1", "podcast-id", imageUrl = null),
-            ),
-            episodesUuids,
-        )
+        assertEquals(episodes.reversed(), previewEpisodes)
+    }
+
+    @Test
+    fun limitEpisodeCountForRegularPlaylists() = runTest {
+        playlistDao.upsertSmartPlaylist(SmartPlaylist())
+        podcastDao.insertSuspend(Podcast(uuid = "podcast-id", isSubscribed = true))
+        episodeDao.insertAll(List(501) { PodcastEpisode(uuid = "$it", podcastUuid = "podcast-id", publishedDate = Date()) })
+
+        val playlist = manager.observePlaylistsPreview().first().single()
+
+        assertEquals(500, playlist.episodeCount)
+        assertEquals(4, playlist.artworkEpisodes.size)
+    }
+
+    @Test
+    fun limitEpisodeCountForLastDownloadAttemptSortOrder() = runTest {
+        playlistDao.upsertSmartPlaylist(SmartPlaylist(sortType = PlaylistEpisodeSortType.LastDownloadAttempt))
+        podcastDao.insertSuspend(Podcast(uuid = "podcast-id", isSubscribed = true))
+        episodeDao.insertAll(List(1001) { PodcastEpisode(uuid = "$it", podcastUuid = "podcast-id", publishedDate = Date()) })
+
+        val playlist = manager.observePlaylistsPreview().first().single()
+
+        assertEquals(1000, playlist.episodeCount)
+        assertEquals(4, playlist.artworkEpisodes.size)
     }
 }

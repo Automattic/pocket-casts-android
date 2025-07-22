@@ -8,14 +8,14 @@ import java.time.Clock
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flowOf
-import kotlinx.coroutines.flow.map
 
-@OptIn(ExperimentalCoroutinesApi::class)
+@OptIn(ExperimentalCoroutinesApi::class, FlowPreview::class)
 class PlaylistManagerImpl(
     private val playlistDao: PlaylistDao,
     private val clock: Clock,
@@ -30,20 +30,30 @@ class PlaylistManagerImpl(
                     combine(playlists.toPreviewFlows()) { previewArray -> previewArray.toList() }
                 }
             }
-            .distinctUntilChanged()
     }
 
     private fun List<SmartPlaylist>.toPreviewFlows() = map { playlist ->
-        playlistDao
+        val episodesFlow = playlistDao
             .observeSmartPlaylistEpisodeUuids(
                 smartRules = playlist.smartRules,
                 sortType = playlist.sortType,
+                limit = PLAYLIST_ARTWORK_EPISODE_LIMIT,
+            )
+            .invoke(clock, playlist.id)
+        val episodeCountFlow = playlistDao
+            .observeSmartPlaylistEpisodeCount(
+                smartRules = playlist.smartRules,
                 limit = playlist.episodeLimit,
             )
             .invoke(clock, playlist.id)
-            .map { episodes ->
-                PlaylistPreview(playlist.uuid, playlist.title, episodes)
-            }
+        combine(episodesFlow, episodeCountFlow) { episodes, count ->
+            PlaylistPreview(
+                uuid = playlist.uuid,
+                title = playlist.title,
+                artworkEpisodes = episodes,
+                episodeCount = count,
+            )
+        }.distinctUntilChanged()
     }
 
     private val SmartPlaylist.smartRules
@@ -93,4 +103,8 @@ class PlaylistManagerImpl(
         )
 
     private val SmartPlaylist.episodeLimit get() = if (sortType == PlaylistEpisodeSortType.LastDownloadAttempt) 1000 else 500
+
+    private companion object {
+        const val PLAYLIST_ARTWORK_EPISODE_LIMIT = 4
+    }
 }
