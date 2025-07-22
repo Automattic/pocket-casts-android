@@ -66,6 +66,12 @@ data class OnboardingSubscriptionPlan private constructor(
             SubscriptionTier.Patron -> IR.drawable.ic_patron
         }
 
+    val pageTitle
+        get() = when (key.tier) {
+            SubscriptionTier.Plus -> LR.string.onboarding_upgrade_generic_title
+            SubscriptionTier.Patron -> LR.string.onboarding_upgrade_patron_title
+        }
+
     val pricePerPeriodText
         @Composable get() = when (key.offer) {
             SubscriptionOffer.IntroOffer -> when (key.billingCycle) {

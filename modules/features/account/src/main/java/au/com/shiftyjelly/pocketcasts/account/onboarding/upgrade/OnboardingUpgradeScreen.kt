@@ -38,6 +38,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
+import androidx.compose.ui.tooling.preview.PreviewParameterProvider
 import androidx.compose.ui.unit.dp
 import au.com.shiftyjelly.pocketcasts.account.onboarding.components.UpgradeFeatureItem
 import au.com.shiftyjelly.pocketcasts.account.onboarding.components.UpgradePlanRow
@@ -49,7 +50,6 @@ import au.com.shiftyjelly.pocketcasts.compose.components.FadedLazyColumn
 import au.com.shiftyjelly.pocketcasts.compose.components.TextH10
 import au.com.shiftyjelly.pocketcasts.compose.components.TextP40
 import au.com.shiftyjelly.pocketcasts.compose.images.SubscriptionBadge
-import au.com.shiftyjelly.pocketcasts.compose.preview.ThemePreviewParameterProvider
 import au.com.shiftyjelly.pocketcasts.compose.theme
 import au.com.shiftyjelly.pocketcasts.images.R
 import au.com.shiftyjelly.pocketcasts.payment.BillingCycle
@@ -206,7 +206,7 @@ private fun UpgradeHeader(
         }
         Spacer(modifier = Modifier.height(8.dp))
         TextH10(
-            text = stringResource(LR.string.onboarding_upgrade_generic_title),
+            text = stringResource(selectedPlan.pageTitle),
             color = MaterialTheme.theme.colors.primaryText01,
         )
     }
@@ -378,15 +378,18 @@ private fun ScheduleContent(
 @Preview
 @Composable
 private fun PreviewOnboardingUpgradeScreen(
-    @PreviewParameter(ThemePreviewParameterProvider::class) theme: ThemeType,
+    @PreviewParameter(ThemedTierParameterProvider::class) pair: Pair<ThemeType, SubscriptionTier>,
 ) {
-    AppThemeWithBackground(theme) {
+    AppThemeWithBackground(pair.first) {
         OnboardingUpgradeScreen(
             state = OnboardingUpgradeFeaturesState.Loaded(
-                selectedTier = SubscriptionTier.Plus,
+                selectedTier = pair.second,
                 selectedBillingCycle = BillingCycle.Yearly,
                 subscriptionPlans = SubscriptionPlans.Preview,
-                plansFilter = OnboardingUpgradeFeaturesState.LoadedPlansFilter.PLUS_ONLY,
+                plansFilter = when (pair.second) {
+                    SubscriptionTier.Plus -> OnboardingUpgradeFeaturesState.LoadedPlansFilter.PLUS_ONLY
+                    SubscriptionTier.Patron -> OnboardingUpgradeFeaturesState.LoadedPlansFilter.PATRON_ONLY
+                },
                 purchaseFailed = false,
             ),
             modifier = Modifier.fillMaxSize(),
@@ -398,4 +401,13 @@ private fun PreviewOnboardingUpgradeScreen(
             onChangeSelectedPlan = {},
         )
     }
+}
+
+private class ThemedTierParameterProvider : PreviewParameterProvider<Pair<ThemeType, SubscriptionTier>> {
+    override val values = ThemeType.entries.map { theme ->
+        SubscriptionTier.entries.map { tier ->
+            theme to tier
+        }
+    }.flatten()
+        .asSequence()
 }
