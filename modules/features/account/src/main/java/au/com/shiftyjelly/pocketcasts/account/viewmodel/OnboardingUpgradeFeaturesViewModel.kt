@@ -47,13 +47,14 @@ class OnboardingUpgradeFeaturesViewModel @AssistedInject constructor(
     private fun createInitialLoadedState(
         subscriptionPlans: SubscriptionPlans,
     ): OnboardingUpgradeFeaturesState.Loaded {
-        val plansFilter = if (FeatureFlag.isEnabled(Feature.NEW_ONBOARDING_UPGRADE)) {
-            OnboardingUpgradeFeaturesState.LoadedPlansFilter.PLUS_ONLY
-        } else if (flow.source == OnboardingUpgradeSource.ACCOUNT_DETAILS) {
-            OnboardingUpgradeFeaturesState.LoadedPlansFilter.PATRON_ONLY
-        } else {
-            OnboardingUpgradeFeaturesState.LoadedPlansFilter.BOTH
-        }
+        val plansFilter =
+            if (flow is OnboardingFlow.PatronAccountUpgrade) {
+                OnboardingUpgradeFeaturesState.LoadedPlansFilter.PATRON_ONLY
+            } else if (FeatureFlag.isEnabled(Feature.NEW_ONBOARDING_UPGRADE)) {
+                OnboardingUpgradeFeaturesState.LoadedPlansFilter.PLUS_ONLY
+            } else {
+                OnboardingUpgradeFeaturesState.LoadedPlansFilter.BOTH
+            }
         return OnboardingUpgradeFeaturesState.Loaded(
             subscriptionPlans,
             selectedBillingCycle = flow.preselectedBillingCycle,
@@ -82,8 +83,7 @@ class OnboardingUpgradeFeaturesViewModel @AssistedInject constructor(
     fun changeBillingCycle(billingCycle: BillingCycle) {
         analyticsTracker.track(AnalyticsEvent.PLUS_PROMOTION_SUBSCRIPTION_FREQUENCY_CHANGED, mapOf("value" to billingCycle.analyticsValue))
         _state.update { state ->
-            (_state.value as? OnboardingUpgradeFeaturesState.Loaded)
-                ?.let { loadedState -> loadedState.copy(selectedBillingCycle = billingCycle) }
+            (_state.value as? OnboardingUpgradeFeaturesState.Loaded)?.copy(selectedBillingCycle = billingCycle)
                 ?: state
         }
     }
@@ -91,8 +91,7 @@ class OnboardingUpgradeFeaturesViewModel @AssistedInject constructor(
     fun changeSubscriptionTier(tier: SubscriptionTier) {
         analyticsTracker.track(AnalyticsEvent.PLUS_PROMOTION_SUBSCRIPTION_TIER_CHANGED, mapOf("value" to tier.analyticsValue))
         _state.update { state ->
-            (_state.value as? OnboardingUpgradeFeaturesState.Loaded)
-                ?.let { loadedState -> loadedState.copy(selectedTier = tier) }
+            (_state.value as? OnboardingUpgradeFeaturesState.Loaded)?.copy(selectedTier = tier)
                 ?: state
         }
     }
