@@ -5,12 +5,14 @@ import au.com.shiftyjelly.pocketcasts.models.entity.SmartPlaylist
 import au.com.shiftyjelly.pocketcasts.models.type.PlaylistEpisodeSortType
 import au.com.shiftyjelly.pocketcasts.models.type.SmartRules
 import java.time.Clock
+import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flowOf
@@ -30,6 +32,12 @@ class PlaylistManagerImpl(
                     combine(playlists.toPreviewFlows()) { previewArray -> previewArray.toList() }
                 }
             }
+            // Add a small debounce to synchronize updates between episodesFlow and episodeCountFlow.
+            // When the database is updated, both flows emit events almost simultaneously.
+            // Without debouncing, this can briefly cause inconsistent data. For example, showing an inccorect count
+            // before the updated episodes are received. This is rather imperceptible to the user,
+            // but adding a short debounce helps avoid these inconsistencies and prevents redundant downstream emissions.
+            .debounce(50.milliseconds)
     }
 
     private fun List<SmartPlaylist>.toPreviewFlows() = map { playlist ->

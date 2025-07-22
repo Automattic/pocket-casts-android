@@ -19,6 +19,7 @@ import au.com.shiftyjelly.pocketcasts.sharedtest.MutableClock
 import com.squareup.moshi.Moshi
 import java.util.Date
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
@@ -26,6 +27,8 @@ import org.junit.Before
 import org.junit.Test
 
 class PlaylistManagerTest {
+    private val testDispatcher = StandardTestDispatcher()
+
     private val clock = MutableClock()
     private lateinit var podcastDao: PodcastDao
     private lateinit var episodeDao: EpisodeDao
@@ -39,6 +42,7 @@ class PlaylistManagerTest {
         val moshi = Moshi.Builder().build()
         val appDatabase = Room.inMemoryDatabaseBuilder(context, AppDatabase::class.java)
             .addTypeConverters(ModelModule.provideRoomConverters(moshi))
+            .setQueryCoroutineContext(testDispatcher)
             .build()
         podcastDao = appDatabase.podcastDao()
         episodeDao = appDatabase.episodeDao()
@@ -50,7 +54,7 @@ class PlaylistManagerTest {
     }
 
     @Test
-    fun observePlaylistPreviews() = runTest {
+    fun observePlaylistPreviews() = runTest(testDispatcher) {
         val playlist1 = SmartPlaylist(uuid = "id-1", title = "Title 1")
         val playlist2 = SmartPlaylist(uuid = "id-2", title = "Title 2")
 
@@ -69,7 +73,7 @@ class PlaylistManagerTest {
     }
 
     @Test
-    fun observeEpisodesInPreviews() = runTest {
+    fun observeEpisodesInPreviews() = runTest(testDispatcher) {
         playlistDao.upsertSmartPlaylist(SmartPlaylist())
         podcastDao.insertSuspend(Podcast(uuid = "podcast-id-1", isSubscribed = true))
         podcastDao.insertSuspend(Podcast(uuid = "podcast-id-2", isSubscribed = true))
@@ -86,7 +90,6 @@ class PlaylistManagerTest {
 
             val episode2 = PodcastEpisode(uuid = "episode-id-2", podcastUuid = "podcast-id-2", publishedDate = Date(0))
             episodeDao.insert(episode2)
-            skipItems(1) // Skip sync between episode count and artwork episodes
             assertEquals(
                 listOf(
                     PlaylistPreview(artworkEpisodes = listOf(episode1, episode2), episodeCount = 2, uuid = "", title = ""),
@@ -97,7 +100,7 @@ class PlaylistManagerTest {
     }
 
     @Test
-    fun doNotObserveManualPlaylistPreviews() = runTest {
+    fun doNotObserveManualPlaylistPreviews() = runTest(testDispatcher) {
         playlistDao.upsertSmartPlaylist(SmartPlaylist(manual = true))
 
         val plalylists = manager.observePlaylistsPreview().first()
@@ -106,7 +109,7 @@ class PlaylistManagerTest {
     }
 
     @Test
-    fun doNotObserveDeletedPlaylistPreviews() = runTest {
+    fun doNotObserveDeletedPlaylistPreviews() = runTest(testDispatcher) {
         playlistDao.upsertSmartPlaylist(SmartPlaylist(deleted = true))
 
         val plalylists = manager.observePlaylistsPreview().first()
@@ -115,7 +118,7 @@ class PlaylistManagerTest {
     }
 
     @Test
-    fun doNotObserveDraftPlaylistPreviews() = runTest {
+    fun doNotObserveDraftPlaylistPreviews() = runTest(testDispatcher) {
         playlistDao.upsertSmartPlaylist(SmartPlaylist(draft = true))
 
         val plalylists = manager.observePlaylistsPreview().first()
@@ -124,7 +127,7 @@ class PlaylistManagerTest {
     }
 
     @Test
-    fun sortPlaylistPreviewsByPosition() = runTest {
+    fun sortPlaylistPreviewsByPosition() = runTest(testDispatcher) {
         playlistDao.upsertSmartPlaylists(
             listOf(
                 SmartPlaylist(uuid = "id-1", sortPosition = 1),
@@ -139,7 +142,7 @@ class PlaylistManagerTest {
     }
 
     @Test
-    fun doNotIncludeEpisodesFromNotFollowedPodcastsInPreviews() = runTest {
+    fun doNotIncludeEpisodesFromNotFollowedPodcastsInPreviews() = runTest(testDispatcher) {
         playlistDao.upsertSmartPlaylist(SmartPlaylist())
         podcastDao.insertSuspend(Podcast(uuid = "podcast-id-1", isSubscribed = false))
         episodeDao.insert(PodcastEpisode(uuid = "episode-id-1", podcastUuid = "podcast-id-1", publishedDate = Date()))
@@ -152,7 +155,7 @@ class PlaylistManagerTest {
     }
 
     @Test
-    fun applySmartRulesInPreviews() = runTest {
+    fun applySmartRulesInPreviews() = runTest(testDispatcher) {
         playlistDao.upsertSmartPlaylist(
             SmartPlaylist(
                 unplayed = true,
@@ -206,7 +209,7 @@ class PlaylistManagerTest {
     }
 
     @Test
-    fun sortEpisodesInPlaylistPreviewByNewestToOldest() = runTest {
+    fun sortEpisodesInPlaylistPreviewByNewestToOldest() = runTest(testDispatcher) {
         playlistDao.upsertSmartPlaylist(SmartPlaylist(sortType = PlaylistEpisodeSortType.NewestToOldest))
         podcastDao.insertSuspend(Podcast(uuid = "podcast-id", isSubscribed = true))
         val episodes = listOf(
@@ -241,7 +244,7 @@ class PlaylistManagerTest {
     }
 
     @Test
-    fun sortEpisodesInPlaylistPreviewByOldestToNewest() = runTest {
+    fun sortEpisodesInPlaylistPreviewByOldestToNewest() = runTest(testDispatcher) {
         playlistDao.upsertSmartPlaylist(SmartPlaylist(sortType = PlaylistEpisodeSortType.OldestToNewest))
         podcastDao.insertSuspend(Podcast(uuid = "podcast-id", isSubscribed = true))
         val episodes = listOf(
@@ -276,7 +279,7 @@ class PlaylistManagerTest {
     }
 
     @Test
-    fun sortEpisodesInPlaylistPreviewByShortestToLongest() = runTest {
+    fun sortEpisodesInPlaylistPreviewByShortestToLongest() = runTest(testDispatcher) {
         playlistDao.upsertSmartPlaylist(SmartPlaylist(sortType = PlaylistEpisodeSortType.ShortestToLongest))
         podcastDao.insertSuspend(Podcast(uuid = "podcast-id", isSubscribed = true))
         val episodes = listOf(
@@ -315,7 +318,7 @@ class PlaylistManagerTest {
     }
 
     @Test
-    fun sortEpisodesInPlaylistPreviewByLongestToShortest() = runTest {
+    fun sortEpisodesInPlaylistPreviewByLongestToShortest() = runTest(testDispatcher) {
         playlistDao.upsertSmartPlaylist(SmartPlaylist(sortType = PlaylistEpisodeSortType.LongestToShortest))
         podcastDao.insertSuspend(Podcast(uuid = "podcast-id", isSubscribed = true))
         val episodes = listOf(
@@ -354,7 +357,7 @@ class PlaylistManagerTest {
     }
 
     @Test
-    fun sortEpisodesInPlaylistPreviewByLastDownloadAttempt() = runTest {
+    fun sortEpisodesInPlaylistPreviewByLastDownloadAttempt() = runTest(testDispatcher) {
         playlistDao.upsertSmartPlaylist(SmartPlaylist(sortType = PlaylistEpisodeSortType.LastDownloadAttempt))
         podcastDao.insertSuspend(Podcast(uuid = "podcast-id", isSubscribed = true))
         val episodes = listOf(
@@ -391,7 +394,7 @@ class PlaylistManagerTest {
     }
 
     @Test
-    fun limitEpisodeCountForRegularPlaylists() = runTest {
+    fun limitEpisodeCountForRegularPlaylists() = runTest(testDispatcher) {
         playlistDao.upsertSmartPlaylist(SmartPlaylist())
         podcastDao.insertSuspend(Podcast(uuid = "podcast-id", isSubscribed = true))
         episodeDao.insertAll(List(501) { PodcastEpisode(uuid = "$it", podcastUuid = "podcast-id", publishedDate = Date()) })
@@ -403,7 +406,7 @@ class PlaylistManagerTest {
     }
 
     @Test
-    fun limitEpisodeCountForLastDownloadAttemptSortOrder() = runTest {
+    fun limitEpisodeCountForLastDownloadAttemptSortOrder() = runTest(testDispatcher) {
         playlistDao.upsertSmartPlaylist(SmartPlaylist(sortType = PlaylistEpisodeSortType.LastDownloadAttempt))
         podcastDao.insertSuspend(Podcast(uuid = "podcast-id", isSubscribed = true))
         episodeDao.insertAll(List(1001) { PodcastEpisode(uuid = "$it", podcastUuid = "podcast-id", publishedDate = Date()) })
