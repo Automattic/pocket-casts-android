@@ -23,6 +23,7 @@ import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
+import timber.log.Timber
 
 @AndroidEntryPoint
 class PlaylistsFragment :
@@ -48,6 +49,9 @@ class PlaylistsFragment :
                     PlaylistPreviewRow(
                         playlist = playlist,
                         showDivider = index != uiState.playlists.lastIndex,
+                        onDelete = {
+                            Timber.tag("LOG_TAG").i("Delete: ${playlist.title}")
+                        },
                     )
                 }
             }
