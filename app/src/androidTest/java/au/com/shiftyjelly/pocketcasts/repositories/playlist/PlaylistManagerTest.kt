@@ -392,28 +392,4 @@ class PlaylistManagerTest {
 
         assertEquals(episodes.reversed(), previewEpisodes)
     }
-
-    @Test
-    fun limitEpisodeCountForRegularPlaylists() = runTest(testDispatcher) {
-        playlistDao.upsertSmartPlaylist(SmartPlaylist())
-        podcastDao.insertSuspend(Podcast(uuid = "podcast-id", isSubscribed = true))
-        episodeDao.insertAll(List(501) { PodcastEpisode(uuid = "$it", podcastUuid = "podcast-id", publishedDate = Date()) })
-
-        val playlist = manager.observePlaylistsPreview().first().single()
-
-        assertEquals(500, playlist.episodeCount)
-        assertEquals(4, playlist.artworkEpisodes.size)
-    }
-
-    @Test
-    fun limitEpisodeCountForLastDownloadAttemptSortOrder() = runTest(testDispatcher) {
-        playlistDao.upsertSmartPlaylist(SmartPlaylist(sortType = PlaylistEpisodeSortType.LastDownloadAttempt))
-        podcastDao.insertSuspend(Podcast(uuid = "podcast-id", isSubscribed = true))
-        episodeDao.insertAll(List(1001) { PodcastEpisode(uuid = "$it", podcastUuid = "podcast-id", publishedDate = Date()) })
-
-        val playlist = manager.observePlaylistsPreview().first().single()
-
-        assertEquals(1000, playlist.episodeCount)
-        assertEquals(4, playlist.artworkEpisodes.size)
-    }
 }

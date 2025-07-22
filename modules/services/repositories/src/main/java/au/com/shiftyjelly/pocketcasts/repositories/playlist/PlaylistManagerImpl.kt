@@ -2,7 +2,6 @@ package au.com.shiftyjelly.pocketcasts.repositories.playlist
 
 import au.com.shiftyjelly.pocketcasts.models.db.dao.PlaylistDao
 import au.com.shiftyjelly.pocketcasts.models.entity.SmartPlaylist
-import au.com.shiftyjelly.pocketcasts.models.type.PlaylistEpisodeSortType
 import au.com.shiftyjelly.pocketcasts.models.type.SmartRules
 import java.time.Clock
 import kotlin.time.Duration.Companion.milliseconds
@@ -51,7 +50,6 @@ class PlaylistManagerImpl(
         val episodeCountFlow = playlistDao
             .observeSmartPlaylistEpisodeCount(
                 smartRules = playlist.smartRules,
-                limit = playlist.episodeLimit,
             )
             .invoke(clock, playlist.id)
         combine(episodesFlow, episodeCountFlow) { episodes, count ->
@@ -109,8 +107,6 @@ class PlaylistManagerImpl(
                 SmartRules.EpisodeDurationRule.Any
             },
         )
-
-    private val SmartPlaylist.episodeLimit get() = if (sortType == PlaylistEpisodeSortType.LastDownloadAttempt) 1000 else 500
 
     private companion object {
         const val PLAYLIST_ARTWORK_EPISODE_LIMIT = 4

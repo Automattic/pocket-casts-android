@@ -34,19 +34,13 @@ abstract class PlaylistDao {
 
     fun observeSmartPlaylistEpisodeCount(
         smartRules: SmartRules,
-        limit: Int,
     ): (Clock, playlistId: Long?) -> Flow<Int> = { clock, playlistId ->
-        val query = buildString {
-            append("SELECT COUNT(*) FROM (")
-            append(
-                createSmartPlaylistEpisodeQuery(
-                    whereClause = smartRules.toSqlWhereClause(clock, playlistId),
-                    orderByClause = null,
-                    limit = limit,
-                ),
-            )
-            append(')')
-        }
+        val query = createSmartPlaylistEpisodeQuery(
+            selectClause = "COUNT(*)",
+            whereClause = smartRules.toSqlWhereClause(clock, playlistId),
+            orderByClause = null,
+            limit = null,
+        )
         observeSmartPlaylistEpisodeCount(RoomRawQuery(query))
     }
 
@@ -59,6 +53,7 @@ abstract class PlaylistDao {
         limit: Int,
     ): (Clock, playlistId: Long?) -> Flow<List<PodcastEpisode>> = { clock, playlistId ->
         val query = createSmartPlaylistEpisodeQuery(
+            selectClause = "episode.*",
             whereClause = smartRules.toSqlWhereClause(clock, playlistId),
             orderByClause = sortType.toOrderByClause(),
             limit = limit,
@@ -67,11 +62,12 @@ abstract class PlaylistDao {
     }
 
     private fun createSmartPlaylistEpisodeQuery(
+        selectClause: String,
         whereClause: String,
         orderByClause: String?,
         limit: Int?,
     ) = buildString {
-        append("SELECT episode.* ")
+        append("SELECT $selectClause ")
         append("FROM podcast_episodes AS episode ")
         append("JOIN podcasts AS podcast ON episode.podcast_id = podcast.uuid ")
         append("WHERE $whereClause ")
