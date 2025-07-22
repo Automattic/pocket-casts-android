@@ -1,9 +1,10 @@
 package au.com.shiftyjelly.pocketcasts.repositories.notification
 
 import android.content.BroadcastReceiver
+import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
-import android.os.Bundle
+import androidx.core.content.IntentCompat
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import dagger.hilt.android.AndroidEntryPoint
@@ -15,55 +16,37 @@ class NotificationOpenReceiver : BroadcastReceiver() {
     @Inject
     lateinit var analyticsTracker: AnalyticsTracker
 
-    override fun onReceive(context: Context?, intent: Intent?) {
-        when (intent?.action) {
+    override fun onReceive(context: Context, intent: Intent) {
+        when (intent.action) {
             ACTION_REVAMP_NOTIFICATION_OPENED -> handleRevampedNotificationOpen(intent, context)
-            else -> handleRelayedNotificationOpen(intent ?: Intent(), context)
+            else -> handleRelayedNotificationOpen(intent, context)
         }
     }
 
-    private fun handleRelayedNotificationOpen(intent: Intent, context: Context?) {
-        val category = intent.getStringExtra(EXTRA_CATEGORY)
-        if (context == null || category == null) return
+    private fun handleRelayedNotificationOpen(intent: Intent, context: Context) {
+        val category = intent.getStringExtra(EXTRA_CATEGORY) ?: return
 
         analyticsTracker.track(
             event = AnalyticsEvent.NOTIFICATION_OPENED,
-            properties = buildMap {
-                put("category", category)
-            },
+            properties = mapOf(
+                "category" to category,
+            ),
         )
 
         val originalIntent = Intent().apply {
-            intent.extras?.keySet()?.forEach {
-                when (it) {
-                    EXTRA_ORIGINAL_ACTION -> {
-                        action = intent.getStringExtra(it)
-                        intent.removeExtra(it)
-                    }
-
-                    EXTRA_ORIGINAL_FLAGS -> {
-                        flags = intent.getIntExtra(it, 0)
-                        intent.removeExtra(it)
-                    }
-
-                    EXTRA_ORIGINAL_COMPONENT -> {
-                        component =
-                            @Suppress("DEPRECATION")
-                            intent.getParcelableExtra(it)
-                        intent.removeExtra(it)
-                    }
-
-                    EXTRA_CATEGORY -> intent.removeExtra(it)
-                    else -> Unit
-                }
+            flags = intent.flags
+            action = intent.action
+            IntentCompat.getParcelableExtra(intent, EXTRA_ORIGINAL_COMPONENT, ComponentName::class.java)?.let {
+                component = it
             }
-            putExtras(intent.extras ?: Bundle())
+            putExtras(intent)
+            removeExtra(EXTRA_CATEGORY)
+            removeExtra(EXTRA_ORIGINAL_COMPONENT)
         }
         tryLaunchIntent(originalIntent, context)
     }
 
-    private fun handleRevampedNotificationOpen(intent: Intent, context: Context?) {
-        if (context == null) return
+    private fun handleRevampedNotificationOpen(intent: Intent, context: Context) {
         val subCategory = intent.getStringExtra(EXTRA_REVAMPED_TYPE) ?: return
 
         val notificationType = NotificationType.fromSubCategory(subCategory)
@@ -90,11 +73,9 @@ class NotificationOpenReceiver : BroadcastReceiver() {
 
     companion object {
         private const val ACTION_REVAMP_NOTIFICATION_OPENED = "au.com.shiftyjelly.pocketcasts.ACTION_REVAMPED_NOTIFICATION_OPENED"
-        private const val EXTRA_REVAMPED_TYPE = "extras.revamped.notification.type"
-        private const val EXTRA_CATEGORY = "extras.notification.category"
-        private const val EXTRA_ORIGINAL_COMPONENT = "extras.notification.component"
-        private const val EXTRA_ORIGINAL_FLAGS = "extras.notification.flags"
-        private const val EXTRA_ORIGINAL_ACTION = "extras.notification.action"
+        private const val EXTRA_REVAMPED_TYPE = "au.com.shiftyjelly.pocketcasts.extras.revamped.notification.type"
+        private const val EXTRA_CATEGORY = "au.com.shiftyjelly.pocketcasts.extras.notification.category"
+        private const val EXTRA_ORIGINAL_COMPONENT = "au.com.shiftyjelly.pocketcasts.extras.notification.component"
         private const val CATEGORY_DEEP_LINK = "DEEP_LINK"
         private const val CATEGORY_EPISODE = "ep"
         private const val CATEGORY_PODCAST = "po"
@@ -104,40 +85,21 @@ class NotificationOpenReceiver : BroadcastReceiver() {
             putExtra(EXTRA_REVAMPED_TYPE, this@toBroadcast.subcategory)
         }
 
-        fun toEpisodeIntentRelay(context: Context, intent: Intent) = Intent(context, NotificationOpenReceiver::class.java).apply {
-            putExtras(intent)
-            putExtra(EXTRA_CATEGORY, CATEGORY_EPISODE)
-            putExtra(EXTRA_ORIGINAL_FLAGS, intent.flags)
-            intent.component?.let {
-                putExtra(EXTRA_ORIGINAL_COMPONENT, it)
-            }
-            intent.action?.let {
-                putExtra(EXTRA_ORIGINAL_ACTION, it)
-            }
-        }
+        fun toEpisodeIntentRelay(context: Context, intent: Intent) = Intent(context, NotificationOpenReceiver::class.java).copyCommonIntentProps(intent, CATEGORY_EPISODE)
 
-        fun toPodcastIntentRelay(context: Context, intent: Intent) = Intent(context, NotificationOpenReceiver::class.java).apply {
-            putExtras(intent)
-            putExtra(EXTRA_CATEGORY, CATEGORY_PODCAST)
-            putExtra(EXTRA_ORIGINAL_FLAGS, intent.flags)
-            intent.component?.let {
-                putExtra(EXTRA_ORIGINAL_COMPONENT, it)
-            }
-            intent.action?.let {
-                putExtra(EXTRA_ORIGINAL_ACTION, it)
-            }
-        }
+        fun toPodcastIntentRelay(context: Context, intent: Intent) = Intent(context, NotificationOpenReceiver::class.java).copyCommonIntentProps(intent, CATEGORY_PODCAST)
 
-        fun toDeeplinkIntentRelay(context: Context, intent: Intent) = Intent(context, NotificationOpenReceiver::class.java).apply {
-            putExtras(intent)
-            putExtra(EXTRA_CATEGORY, CATEGORY_DEEP_LINK)
-            putExtra(EXTRA_ORIGINAL_FLAGS, intent.flags)
-            intent.component?.let {
+        fun toDeeplinkIntentRelay(context: Context, intent: Intent) = Intent(context, NotificationOpenReceiver::class.java).copyCommonIntentProps(intent, CATEGORY_DEEP_LINK)
+
+        private fun Intent.copyCommonIntentProps(source: Intent, category: String): Intent {
+            flags = source.flags
+            action = source.action
+            putExtras(source)
+            source.component?.let {
                 putExtra(EXTRA_ORIGINAL_COMPONENT, it)
             }
-            intent.action?.let {
-                putExtra(EXTRA_ORIGINAL_ACTION, it)
-            }
+            putExtra(EXTRA_CATEGORY, category)
+            return this
         }
     }
 }
