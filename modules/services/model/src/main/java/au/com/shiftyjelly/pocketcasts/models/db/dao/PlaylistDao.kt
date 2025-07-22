@@ -45,20 +45,20 @@ abstract class PlaylistDao {
     }
 
     @RawQuery(observedEntities = [Podcast::class, PodcastEpisode::class])
-    protected abstract fun observeSmartPlaylistEpisodes(query: RoomRawQuery): Flow<List<PodcastEpisode>>
+    protected abstract fun observeSmartPlaylistPodcasts(query: RoomRawQuery): Flow<List<Podcast>>
 
-    fun observeSmartPlaylistEpisodeUuids(
+    fun observeSmartPlaylistPodcasts(
         smartRules: SmartRules,
         sortType: PlaylistEpisodeSortType,
         limit: Int,
-    ): (Clock, playlistId: Long?) -> Flow<List<PodcastEpisode>> = { clock, playlistId ->
+    ): (Clock, playlistId: Long?) -> Flow<List<Podcast>> = { clock, playlistId ->
         val query = createSmartPlaylistEpisodeQuery(
-            selectClause = "episode.*",
+            selectClause = "DISTINCT podcast.*",
             whereClause = smartRules.toSqlWhereClause(clock, playlistId),
             orderByClause = sortType.toOrderByClause(),
             limit = limit,
         )
-        observeSmartPlaylistEpisodes(RoomRawQuery(query))
+        observeSmartPlaylistPodcasts(RoomRawQuery(query))
     }
 
     private fun createSmartPlaylistEpisodeQuery(
@@ -80,10 +80,10 @@ abstract class PlaylistDao {
     }
 
     private fun PlaylistEpisodeSortType.toOrderByClause() = when (this) {
-        NewestToOldest -> "published_date DESC, episode.added_date DESC"
+        NewestToOldest -> "episode.published_date DESC, episode.added_date DESC"
         OldestToNewest -> "episode.published_date ASC, episode.added_date ASC"
-        ShortestToLongest -> "duration ASC, episode.added_date DESC"
-        LongestToShortest -> "duration DESC, episode.added_date DESC"
+        ShortestToLongest -> "episode.duration ASC, episode.added_date DESC"
+        LongestToShortest -> "episode.duration DESC, episode.added_date DESC"
         LastDownloadAttempt -> "IFNULL(episode.last_download_attempt_date, -1) DESC, episode.published_date DESC"
     }
 }
