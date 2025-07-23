@@ -44,10 +44,15 @@ class PlaylistsFragment :
                 state = listState,
                 modifier = Modifier.statusBarsPadding(),
             ) {
-                itemsIndexed(uiState.playlists) { index, playlist ->
+                itemsIndexed(
+                    items = uiState.playlists,
+                    key = { _, item -> item.uuid },
+                ) { index, playlist ->
                     PlaylistPreviewRow(
                         playlist = playlist,
                         showDivider = index != uiState.playlists.lastIndex,
+                        onDelete = { viewModel.deletePlaylist(playlist.uuid) },
+                        modifier = Modifier.animateItem(),
                     )
                 }
             }
