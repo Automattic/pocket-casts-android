@@ -98,6 +98,7 @@ private fun Content(
         is OnboardingFlow.PatronAccountUpgrade,
         is OnboardingFlow.Upsell,
         is OnboardingFlow.UpsellSuggestedFolder,
+        is OnboardingFlow.NewOnboardingAccountUpgrade,
         -> OnboardingNavRoute.PlusUpgrade.ROUTE
 
         is OnboardingFlow.Welcome -> OnboardingNavRoute.WELCOME
@@ -225,6 +226,7 @@ private fun Content(
                         is OnboardingFlow.PlusAccountUpgradeNeedsLogin,
                         is OnboardingFlow.Upsell,
                         is OnboardingFlow.UpsellSuggestedFolder,
+                        is OnboardingFlow.NewOnboardingAccountUpgrade,
                         -> {
                             val popped = navController.popBackStack()
                             if (!popped) {
@@ -293,6 +295,7 @@ private fun Content(
                         is OnboardingFlow.PlusAccountUpgrade,
                         is OnboardingFlow.Upsell,
                         is OnboardingFlow.UpsellSuggestedFolder,
+                        is OnboardingFlow.NewOnboardingAccountUpgrade,
                         -> {
                             defaultValue = flow.source
                         }
@@ -426,6 +429,7 @@ private fun onLoginToExistingAccount(
         is OnboardingFlow.PlusAccountUpgradeNeedsLogin,
         is OnboardingFlow.Upsell,
         is OnboardingFlow.UpsellSuggestedFolder,
+        is OnboardingFlow.NewOnboardingAccountUpgrade,
         -> {
             if (subscription == null) {
                 navController.navigate(OnboardingNavRoute.PlusUpgrade.routeWithSource(OnboardingUpgradeSource.LOGIN)) {

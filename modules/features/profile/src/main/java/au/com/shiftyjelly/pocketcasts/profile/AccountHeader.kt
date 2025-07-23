@@ -81,7 +81,7 @@ internal fun AccountHeader(
                         MaterialTheme.theme.colors.primaryText02
                     } else {
                         MaterialTheme.theme.colors.primaryText01
-                    }
+                    },
                 )
             } else {
                 TextH50(
@@ -92,7 +92,7 @@ internal fun AccountHeader(
                         MaterialTheme.theme.colors.primaryText02
                     } else {
                         MaterialTheme.theme.colors.primaryText01
-                    }
+                    },
                 )
             }
         }

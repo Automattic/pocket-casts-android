@@ -158,7 +158,10 @@ class AccountDetailsFragment : BaseFragment() {
             },
             onSignOut = { signOut() },
             onDeleteAccount = { deleteAccount() },
-            onUpgradeClick = { },
+            onUpgradeClick = { planKey ->
+                val onboardingFlow = OnboardingFlow.NewOnboardingAccountUpgrade
+                OnboardingLauncher.openOnboardingFlow(requireActivity(), onboardingFlow)
+            },
         )
     }
 

@@ -73,7 +73,7 @@ internal fun AccountDetailsPage(
     onShowTermsOfUse: () -> Unit,
     onSignOut: () -> Unit,
     onDeleteAccount: () -> Unit,
-    onUpgradeClick: () -> Unit,
+    onUpgradeClick: (SubscriptionPlan.Key) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val headerConfig = remember(state.isAutomotive) {
@@ -141,7 +141,7 @@ internal fun AccountDetailsPage(
                             MaterialTheme.theme.colors.primaryUi03
                         } else {
                             MaterialTheme.theme.colors.primaryUi02
-                        }
+                        },
                     ),
             ) {
                 item {
@@ -177,7 +177,7 @@ internal fun AccountDetailsPage(
                         item {
                             Box(modifier = Modifier.padding(horizontal = 24.dp)) {
                                 NewUpgradeAccountCard(
-                                    onClickSubscribe = onUpgradeClick,
+                                    onClickSubscribe = { onUpgradeClick(bannerState.recommendedSubscription.key) },
                                     recommendedPlan = bannerState.recommendedSubscription,
                                 )
                             }
@@ -220,7 +220,7 @@ private fun NewUpgradeAccountCard(
     Card(
         modifier = modifier,
         shape = RoundedCornerShape(8.dp),
-        backgroundColor = MaterialTheme.theme.colors.primaryUi01
+        backgroundColor = MaterialTheme.theme.colors.primaryUi01,
     ) {
         Column(
             modifier = Modifier
