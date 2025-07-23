@@ -16,6 +16,14 @@
             android:name="androidx.work.impl.foreground.SystemForegroundService"
             android:foregroundServiceType="dataSync"
             tools:node="merge" />
+
+        <receiver
+            android:name=".notification.NotificationOpenReceiver"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="au.com.shiftyjelly.pocketcasts.ACTION_REVAMPED_NOTIFICATION_OPENED" />
+            </intent-filter>
+        </receiver>
     </application>
 
 </manifest>
