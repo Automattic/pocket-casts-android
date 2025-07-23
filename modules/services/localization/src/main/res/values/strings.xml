@@ -2488,7 +2488,7 @@
     <string name="onboarding_upgrade_billing_cycle_monthly">Monthly plan</string>
     <string name="onboarding_upgrade_billing_cycle_yearly">Yearly plan</string>
     <string name="onboarding_upgrade_save_percent">Save %1$d\%%</string>
-    <string name="onboarding_upgrade_patron_title">Believe in what we do and wanna show your your support?</string>
+    <string name="onboarding_upgrade_patron_title">Believe in what we do and wanna show your support?</string>
     <string name="onboarding_upgrade_patron_plus_features">All the features in Plus</string>
     <string name="onboarding_upgrade_patron_early_access">Early access to new features</string>
     <string name="onboarding_upgrade_patron_cloud_storage">100 GB Cloud Storage for your files</string>
