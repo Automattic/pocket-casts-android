@@ -31,7 +31,7 @@ class PlaylistManagerImpl(
                     combine(playlists.toPreviewFlows()) { previewArray -> previewArray.toList() }
                 }
             }
-            // Add a small debounce to synchronize updates between episodesFlow and episodeCountFlow.
+            // Add a small debounce to synchronize updates between episode count and podcasts.
             // When the database is updated, both flows emit events almost simultaneously.
             // Without debouncing, this can briefly cause inconsistent data. For example, showing an inccorect count
             // before the updated episodes are received. This is rather imperceptible to the user,
