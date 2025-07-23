@@ -615,6 +615,7 @@ enum class AnalyticsEvent(val key: String) {
     NOTIFICATIONS_PERMISSIONS_SHOWN("notifications_permissions_shown"),
     NOTIFICATIONS_PERMISSIONS_ALLOW_TAPPED("notifications_permissions_allow_tapped"),
     NOTIFICATIONS_PERMISSIONS_DISMISSED("notifications_permissions_not_now_tapped"),
+    NOTIFICATION_OPENED("notification_opened"),
 
     /* Settings - Notifications */
     SETTINGS_NOTIFICATIONS_SHOWN("settings_notifications_shown"),

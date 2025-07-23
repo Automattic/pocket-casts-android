@@ -22,6 +22,7 @@ import au.com.shiftyjelly.pocketcasts.localization.R as LR
 sealed interface NotificationType {
     val notificationId: Int
     val subcategory: String
+    val analyticsType: String
 
     @get:StringRes
     val titleRes: Int
@@ -59,6 +60,7 @@ sealed interface NotificationType {
 sealed class OnboardingNotificationType(
     override val notificationId: Int,
     override val subcategory: String,
+    override val analyticsType: String,
     @StringRes override val titleRes: Int,
     @StringRes override val messageRes: Int,
     val dayOffset: Int,
@@ -76,6 +78,7 @@ sealed class OnboardingNotificationType(
         titleRes = LR.string.notification_sync_title,
         messageRes = LR.string.notification_sync_message,
         dayOffset = 0,
+        analyticsType = "onboardingSignUp",
     ) {
         override fun toIntent(context: Context) = CreateAccountDeepLink.toIntent(context)
     }
@@ -86,6 +89,7 @@ sealed class OnboardingNotificationType(
         titleRes = LR.string.notification_import_title,
         messageRes = LR.string.notification_import_message,
         dayOffset = 1,
+        analyticsType = "onboardingImport",
     ) {
         override fun toIntent(context: Context) = ImportDeepLink.toIntent(context)
     }
@@ -96,6 +100,7 @@ sealed class OnboardingNotificationType(
         titleRes = LR.string.notification_up_next_title,
         messageRes = LR.string.notification_up_next_message,
         dayOffset = 2,
+        analyticsType = "onboardingUpNext",
     ) {
         override fun toIntent(context: Context) = ShowUpNextTabDeepLink.toIntent(context)
     }
@@ -106,6 +111,7 @@ sealed class OnboardingNotificationType(
         titleRes = LR.string.notification_filters_title,
         messageRes = LR.string.notification_filters_message,
         dayOffset = 3,
+        analyticsType = "onboardingFilters",
     ) {
         override fun toIntent(context: Context) = ShowFiltersDeepLink.toIntent(context)
     }
@@ -116,6 +122,7 @@ sealed class OnboardingNotificationType(
         titleRes = LR.string.notification_themes_title,
         messageRes = LR.string.notification_themes_message,
         dayOffset = 4,
+        analyticsType = "onboardingThemes",
     ) {
         override fun toIntent(context: Context) = ThemesDeepLink.toIntent(context)
     }
@@ -126,6 +133,7 @@ sealed class OnboardingNotificationType(
         titleRes = LR.string.notification_staff_picks_title,
         messageRes = LR.string.notification_staff_picks_message,
         dayOffset = 5,
+        analyticsType = "onboardingStaffPicks",
     ) {
         override fun toIntent(context: Context) = StaffPicksDeepLink.toIntent(context)
     }
@@ -136,6 +144,7 @@ sealed class OnboardingNotificationType(
         titleRes = LR.string.notification_plus_upsell_title,
         messageRes = LR.string.notification_plus_upsell_message,
         dayOffset = 6,
+        analyticsType = "onboardingUpsell",
     ) {
         override fun toIntent(context: Context) = UpsellDeepLink.toIntent(context)
     }
@@ -176,6 +185,9 @@ sealed class ReEngagementNotificationType(
         return settings.newFeaturesNotification.value
     }
 
+    override val analyticsType: String
+        get() = "reengagementWeekly"
+
     data object WeMissYou : ReEngagementNotificationType(
         subcategory = SUBCATEGORY_REENGAGE_WE_MISS_YOU,
         titleRes = LR.string.notification_reengage_we_miss_you_title,
@@ -210,6 +222,7 @@ sealed class ReEngagementNotificationType(
 sealed class TrendingAndRecommendationsNotificationType(
     override val notificationId: Int,
     override val subcategory: String,
+    override val analyticsType: String,
     @StringRes override val titleRes: Int,
     @StringRes override val messageRes: Int? = null,
     @PluralsRes override val messagePluralRes: Int? = null,
@@ -222,6 +235,7 @@ sealed class TrendingAndRecommendationsNotificationType(
         subcategory = SUBCATEGORY_TRENDING,
         titleRes = LR.string.notification_content_recommendations_trending_title,
         messageRes = LR.string.notification_content_recommendations_trending_message,
+        analyticsType = "recommendationsTrending",
     ) {
         override fun toIntent(context: Context) = TrendingDeepLink.toIntent(context)
     }
@@ -231,6 +245,7 @@ sealed class TrendingAndRecommendationsNotificationType(
         subcategory = SUBCATEGORY_RECOMMENDATIONS,
         titleRes = LR.string.notification_content_recommendations_title,
         messageRes = LR.string.notification_content_recommendations_message,
+        analyticsType = "recommendationsYouMightLike",
     ) {
         override fun toIntent(context: Context) = RecommendationsDeepLink.toIntent(context)
     }
@@ -249,6 +264,7 @@ sealed class TrendingAndRecommendationsNotificationType(
 sealed class NewFeaturesAndTipsNotificationType(
     override val notificationId: Int,
     override val subcategory: String,
+    override val analyticsType: String,
     @StringRes override val titleRes: Int,
     @StringRes override val messageRes: Int? = null,
     @PluralsRes override val messagePluralRes: Int? = null,
@@ -261,6 +277,7 @@ sealed class NewFeaturesAndTipsNotificationType(
         subcategory = SUBCATEGORY_SMART_FOLDERS,
         titleRes = LR.string.notification_new_features_smart_folders_title,
         messageRes = LR.string.notification_new_features_smart_folders_message,
+        analyticsType = "newFeatureSuggestedFolders",
     ) {
         override fun toIntent(context: Context) = SmartFoldersDeepLink.toIntent(context)
     }
@@ -277,6 +294,7 @@ sealed class NewFeaturesAndTipsNotificationType(
 sealed class OffersNotificationType(
     override val notificationId: Int,
     override val subcategory: String,
+    override val analyticsType: String,
     @StringRes override val titleRes: Int,
     @StringRes override val messageRes: Int? = null,
     @PluralsRes override val messagePluralRes: Int? = null,
@@ -289,6 +307,7 @@ sealed class OffersNotificationType(
         subcategory = UPGRADE_NOW,
         titleRes = LR.string.notification_offers_upgrade_title,
         messageRes = LR.string.notification_offers_upgrade_message,
+        analyticsType = "upsell",
     ) {
         override fun toIntent(context: Context) = UpsellDeepLink.toIntent(context)
     }
