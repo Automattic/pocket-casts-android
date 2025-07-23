@@ -3,6 +3,7 @@ package au.com.shiftyjelly.pocketcasts.repositories.podcast
 import android.content.Context
 import au.com.shiftyjelly.pocketcasts.models.db.AppDatabase
 import au.com.shiftyjelly.pocketcasts.models.db.dao.SmartPlaylistDao
+import au.com.shiftyjelly.pocketcasts.models.entity.SmartPlaylist
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.download.DownloadManager
 import au.com.shiftyjelly.pocketcasts.repositories.notification.NotificationManager
@@ -34,7 +35,11 @@ class SmartSmartPlaylistManagerImplTest {
     fun `should mark the user as having interacted with the feature when creating a filter`() = runTest {
         val playlistManager = initViewModel()
 
-        playlistManager.updateBlocking(mock(), mock(), isCreatingFilter = true)
+        playlistManager.updateBlocking(
+            smartPlaylist = SmartPlaylist(),
+            userPlaylistUpdate = UserPlaylistUpdate(listOf(PlaylistProperty.Color), PlaylistUpdateSource.AUTO_DOWNLOAD_SETTINGS),
+            isCreatingFilter = true,
+        )
 
         advanceUntilIdle()
 
@@ -45,7 +50,11 @@ class SmartSmartPlaylistManagerImplTest {
     fun `should not mark the user as having interacted with the feature when a filter is not being created`() = runTest {
         val playlistManager = initViewModel()
 
-        playlistManager.updateBlocking(mock(), mock(), isCreatingFilter = false)
+        playlistManager.updateBlocking(
+            smartPlaylist = SmartPlaylist(),
+            userPlaylistUpdate = UserPlaylistUpdate(listOf(PlaylistProperty.Color), PlaylistUpdateSource.AUTO_DOWNLOAD_SETTINGS),
+            isCreatingFilter = false,
+        )
 
         advanceUntilIdle()
 
