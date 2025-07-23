@@ -15,6 +15,8 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import au.com.shiftyjelly.pocketcasts.compose.AppThemeWithBackground
 import au.com.shiftyjelly.pocketcasts.compose.extensions.contentWithoutConsumedInsets
+import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingFlow
+import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingLauncher
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseFragment
 import au.com.shiftyjelly.pocketcasts.views.fragments.TopScrollable
 import dagger.hilt.android.AndroidEntryPoint
@@ -45,6 +47,14 @@ class PlaylistsFragment :
                 onCreate = { Timber.i("Create playlist clicked") },
                 onDelete = { playlist -> viewModel.deletePlaylist(playlist.uuid) },
                 onShowOptions = { Timber.i("Show playlists options clicked") },
+                onFreeAccountBannerCtaClick = {
+                    viewModel.trackFreeAccountCtaClick()
+                    OnboardingLauncher.openOnboardingFlow(
+                        activity = requireActivity(),
+                        onboardingFlow = OnboardingFlow.LoggedOut,
+                    )
+                },
+                onFreeAccountBannerDismiss = viewModel::dismissFreeAccountBanner,
                 modifier = Modifier.statusBarsPadding(),
             )
         }
