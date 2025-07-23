@@ -3,14 +3,12 @@ package au.com.shiftyjelly.pocketcasts.playlists
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.ViewGroup
-import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.ui.Modifier
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import au.com.shiftyjelly.pocketcasts.compose.AppThemeWithBackground
@@ -55,7 +53,6 @@ class PlaylistsFragment :
                     )
                 },
                 onFreeAccountBannerDismiss = viewModel::dismissFreeAccountBanner,
-                modifier = Modifier.statusBarsPadding(),
             )
         }
 

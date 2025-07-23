@@ -38,6 +38,7 @@ class PlaylistsViewModel @Inject constructor(
         playlistManager.observePlaylistsPreview(),
         settings.showPlaylistsOnboarding.flow,
         showFreeAccountBanner,
+        settings.bottomInset,
         ::UiState,
     ).stateIn(viewModelScope, SharingStarted.Eagerly, UiState.Empty)
 
@@ -60,12 +61,14 @@ class PlaylistsViewModel @Inject constructor(
         val playlists: List<PlaylistPreview>,
         val showOnboarding: Boolean,
         val showFreeAccountBanner: Boolean,
+        val miniPlayerInset: Int,
     ) {
         companion object {
             val Empty = UiState(
                 playlists = emptyList(),
                 showOnboarding = false,
                 showFreeAccountBanner = false,
+                miniPlayerInset = 0,
             )
         }
     }

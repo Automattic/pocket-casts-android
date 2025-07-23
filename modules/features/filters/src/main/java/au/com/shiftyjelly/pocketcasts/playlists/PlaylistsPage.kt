@@ -7,11 +7,14 @@ import androidx.compose.animation.fadeOut
 import androidx.compose.animation.shrinkVertically
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.itemsIndexed
@@ -28,12 +31,14 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
 import au.com.shiftyjelly.pocketcasts.compose.AppThemeWithBackground
+import au.com.shiftyjelly.pocketcasts.compose.Devices
 import au.com.shiftyjelly.pocketcasts.compose.components.Banner
 import au.com.shiftyjelly.pocketcasts.compose.preview.ThemePreviewParameterProvider
 import au.com.shiftyjelly.pocketcasts.compose.theme
@@ -56,7 +61,8 @@ internal fun PlaylistsPage(
 ) {
     Column(
         modifier = Modifier
-            .background(MaterialTheme.theme.colors.secondaryUi01)
+            .background(MaterialTheme.theme.colors.primaryUi01)
+            .fillMaxSize()
             .then(modifier),
     ) {
         Toolbar(
@@ -84,6 +90,9 @@ internal fun PlaylistsPage(
 
         LazyColumn(
             state = listState,
+            contentPadding = PaddingValues(
+                bottom = LocalDensity.current.run { uiState.miniPlayerInset.toDp() },
+            ),
         ) {
             itemsIndexed(
                 items = uiState.playlists,
@@ -110,13 +119,14 @@ private fun Toolbar(
         verticalAlignment = Alignment.CenterVertically,
         modifier = modifier
             .background(MaterialTheme.theme.colors.secondaryUi01)
+            .statusBarsPadding()
             .fillMaxWidth()
             .heightIn(min = 56.dp),
     ) {
         ProvideTextStyle(value = MaterialTheme.typography.h6) {
             Text(
                 text = "Playlists",
-                color = MaterialTheme.theme.colors.primaryText01,
+                color = MaterialTheme.theme.colors.secondaryText01,
                 modifier = Modifier.padding(start = 16.dp),
             )
         }
@@ -129,7 +139,7 @@ private fun Toolbar(
             Icon(
                 painter = painterResource(IR.drawable.ic_add_black_24dp),
                 contentDescription = null,
-                tint = MaterialTheme.theme.colors.primaryIcon01,
+                tint = MaterialTheme.theme.colors.secondaryIcon01,
             )
         }
         IconButton(
@@ -138,7 +148,7 @@ private fun Toolbar(
             Icon(
                 painter = painterResource(IR.drawable.ic_overflow),
                 contentDescription = null,
-                tint = MaterialTheme.theme.colors.primaryIcon01,
+                tint = MaterialTheme.theme.colors.secondaryIcon01,
             )
         }
     }
@@ -147,7 +157,7 @@ private fun Toolbar(
 private val BannerEnterTransition = fadeIn() + expandVertically()
 private val BannerExitTransition = fadeOut() + shrinkVertically()
 
-@Preview
+@Preview(device = Devices.PORTRAIT_REGULAR)
 @Composable
 private fun PlaylistPagePreview(
     @PreviewParameter(ThemePreviewParameterProvider::class) themeType: Theme.ThemeType,
@@ -155,7 +165,7 @@ private fun PlaylistPagePreview(
     var uiState by remember {
         mutableStateOf(
             UiState(
-                playlists = List(10) { index ->
+                playlists = List(3) { index ->
                     PlaylistPreview(
                         uuid = "uuid-$index",
                         title = "Playlist $index",
@@ -165,6 +175,7 @@ private fun PlaylistPagePreview(
                 },
                 showOnboarding = false,
                 showFreeAccountBanner = true,
+                miniPlayerInset = 0,
             ),
         )
     }
