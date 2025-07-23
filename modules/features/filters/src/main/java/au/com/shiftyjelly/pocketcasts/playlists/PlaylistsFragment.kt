@@ -4,9 +4,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.compose.foundation.layout.statusBarsPadding
-import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
-import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -40,22 +38,12 @@ class PlaylistsFragment :
         val uiState by viewModel.uiState.collectAsState()
 
         AppThemeWithBackground(theme.activeTheme) {
-            LazyColumn(
-                state = listState,
+            PlaylistsPage(
+                uiState = uiState,
+                listState = listState,
+                onDelete = { playlist -> viewModel.deletePlaylist(playlist.uuid) },
                 modifier = Modifier.statusBarsPadding(),
-            ) {
-                itemsIndexed(
-                    items = uiState.playlists,
-                    key = { _, item -> item.uuid },
-                ) { index, playlist ->
-                    PlaylistPreviewRow(
-                        playlist = playlist,
-                        showDivider = index != uiState.playlists.lastIndex,
-                        onDelete = { viewModel.deletePlaylist(playlist.uuid) },
-                        modifier = Modifier.animateItem(),
-                    )
-                }
-            }
+            )
         }
 
         ScrollToTopEffect(listState)
