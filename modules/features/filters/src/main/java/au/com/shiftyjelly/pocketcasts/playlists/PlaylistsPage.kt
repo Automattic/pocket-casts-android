@@ -79,7 +79,7 @@ internal fun PlaylistsPage(
                 title = stringResource(LR.string.encourage_account_filters_banner_title),
                 description = stringResource(LR.string.encourage_account_filters_banner_description),
                 actionLabel = stringResource(LR.string.encourage_account_banner_action_label),
-                icon = painterResource(IR.drawable.ic_refresh),
+                icon = painterResource(IR.drawable.ic_retry),
                 onActionClick = onFreeAccountBannerCtaClick,
                 onDismiss = onFreeAccountBannerDismiss,
                 modifier = Modifier
@@ -125,7 +125,7 @@ private fun Toolbar(
     ) {
         ProvideTextStyle(value = MaterialTheme.typography.h6) {
             Text(
-                text = "Playlists",
+                text = stringResource(LR.string.playlists),
                 color = MaterialTheme.theme.colors.secondaryText01,
                 modifier = Modifier.padding(start = 16.dp),
             )

@@ -28,10 +28,10 @@ class PlaylistsViewModel @Inject constructor(
 ) : ViewModel() {
     private val showFreeAccountBanner = combine(
         settings.isFreeAccountFiltersBannerDismissed.flow,
-        userManager.getSignInState().asFlow().map { it.isSignedIn },
+        userManager.getSignInState().asFlow().map { it.isSignedOut },
         FeatureFlag.isEnabledFlow(Feature.ENCOURAGE_ACCOUNT_CREATION),
-    ) { isBannerDismissed, isSignedIn, isFeatureEnabled ->
-        isSignedIn && !isBannerDismissed && isFeatureEnabled
+    ) { isBannerDismissed, isSignedOut, isFeatureEnabled ->
+        isSignedOut && !isBannerDismissed && isFeatureEnabled
     }
 
     internal val uiState = combine(
