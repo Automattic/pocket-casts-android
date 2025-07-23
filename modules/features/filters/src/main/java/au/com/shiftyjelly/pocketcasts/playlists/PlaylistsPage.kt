@@ -22,7 +22,6 @@ import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
 import androidx.compose.material.MaterialTheme
-import androidx.compose.material.ProvideTextStyle
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -123,13 +122,12 @@ private fun Toolbar(
             .fillMaxWidth()
             .heightIn(min = 56.dp),
     ) {
-        ProvideTextStyle(value = MaterialTheme.typography.h6) {
-            Text(
-                text = stringResource(LR.string.playlists),
-                color = MaterialTheme.theme.colors.secondaryText01,
-                modifier = Modifier.padding(start = 16.dp),
-            )
-        }
+        Text(
+            text = stringResource(LR.string.playlists),
+            style = MaterialTheme.typography.h6,
+            color = MaterialTheme.theme.colors.secondaryText01,
+            modifier = Modifier.padding(start = 16.dp),
+        )
         Spacer(
             modifier = Modifier.weight(1f),
         )
