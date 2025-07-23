@@ -123,32 +123,56 @@ enum class PatronUpgradeFeatureItem(
     EverythingInPlus(
         image = IR.drawable.ic_check,
     ) {
-        override fun title() = LR.string.onboarding_patron_feature_everything_in_plus_title
+        override fun title() = if (FeatureFlag.isEnabled(Feature.NEW_ONBOARDING_UPGRADE)) {
+            LR.string.onboarding_upgrade_patron_plus_features
+        } else {
+            LR.string.onboarding_patron_feature_everything_in_plus_title
+        }
     },
     EarlyAccess(
         image = IR.drawable.ic_new_features,
     ) {
-        override fun title() = LR.string.onboarding_patron_feature_early_access_title
+        override fun title() = if (FeatureFlag.isEnabled(Feature.NEW_ONBOARDING_UPGRADE)) {
+            LR.string.onboarding_upgrade_patron_early_access
+        } else {
+            LR.string.onboarding_patron_feature_early_access_title
+        }
     },
     CloudStorage(
         image = IR.drawable.ic_cloud_storage,
     ) {
-        override fun title() = LR.string.onboarding_patron_feature_cloud_storage_title
+        override fun title() = if (FeatureFlag.isEnabled(Feature.NEW_ONBOARDING_UPGRADE)) {
+            LR.string.onboarding_upgrade_patron_cloud_storage
+        } else {
+            LR.string.onboarding_patron_feature_cloud_storage_title
+        }
     },
     ProfileBadge(
         image = IR.drawable.ic_profile_badge,
     ) {
-        override fun title() = LR.string.onboarding_patron_feature_profile_badge_title
+        override fun title() = if (FeatureFlag.isEnabled(Feature.NEW_ONBOARDING_UPGRADE)) {
+            LR.string.onboarding_upgrade_patron_badge
+        } else {
+            LR.string.onboarding_patron_feature_profile_badge_title
+        }
     },
     SpecialIcons(
         image = IR.drawable.ic_icons,
     ) {
-        override fun title() = LR.string.onboarding_patron_feature_special_icons_title
+        override fun title() = if (FeatureFlag.isEnabled(Feature.NEW_ONBOARDING_UPGRADE)) {
+            LR.string.onboarding_upgrade_app_icons
+        } else {
+            LR.string.onboarding_patron_feature_special_icons_title
+        }
     },
     UndyingGratitude(
         image = IR.drawable.ic_heart,
     ) {
-        override fun title() = LR.string.onboarding_patron_feature_gratitude_title
+        override fun title() = if (FeatureFlag.isEnabled(Feature.NEW_ONBOARDING_UPGRADE)) {
+            LR.string.onboarding_upgrade_gratitude
+        } else {
+            LR.string.onboarding_patron_feature_gratitude_title
+        }
     },
     ;
 
