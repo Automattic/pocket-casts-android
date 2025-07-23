@@ -2,31 +2,48 @@ package au.com.shiftyjelly.pocketcasts.profile
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.wrapContentHeight
+import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.Card
 import androidx.compose.material.Divider
 import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import au.com.shiftyjelly.pocketcasts.account.onboarding.upgrade.OnboardingSubscriptionPlan
+import au.com.shiftyjelly.pocketcasts.account.onboarding.upgrade.OnboardingUpgradeHelper
 import au.com.shiftyjelly.pocketcasts.account.onboarding.upgrade.ProfileUpgradeBanner
 import au.com.shiftyjelly.pocketcasts.account.onboarding.upgrade.ProfileUpgradeBannerState
 import au.com.shiftyjelly.pocketcasts.compose.AppTheme
 import au.com.shiftyjelly.pocketcasts.compose.PreviewAutomotive
 import au.com.shiftyjelly.pocketcasts.compose.PreviewOrientation
 import au.com.shiftyjelly.pocketcasts.compose.bars.ThemedTopAppBar
+import au.com.shiftyjelly.pocketcasts.compose.components.TextH10
+import au.com.shiftyjelly.pocketcasts.compose.components.TextH50
+import au.com.shiftyjelly.pocketcasts.compose.components.TextP30
+import au.com.shiftyjelly.pocketcasts.compose.components.TextP60
 import au.com.shiftyjelly.pocketcasts.compose.components.UserAvatarConfig
+import au.com.shiftyjelly.pocketcasts.compose.images.SubscriptionBadge
 import au.com.shiftyjelly.pocketcasts.compose.preview.ThemePreviewParameterProvider
 import au.com.shiftyjelly.pocketcasts.compose.theme
 import au.com.shiftyjelly.pocketcasts.payment.BillingCycle
@@ -56,6 +73,7 @@ internal fun AccountDetailsPage(
     onShowTermsOfUse: () -> Unit,
     onSignOut: () -> Unit,
     onDeleteAccount: () -> Unit,
+    onUpgradeClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val headerConfig = remember(state.isAutomotive) {
@@ -132,18 +150,33 @@ internal fun AccountDetailsPage(
                             .then(if (state.isAutomotive) Modifier.padding(top = 32.dp) else Modifier),
                     )
                 }
-                if (bannerState != null) {
-                    item {
-                        Divider()
+                when (bannerState) {
+                    is ProfileUpgradeBannerState.OldProfileUpgradeBannerState -> {
+                        item {
+                            Divider()
+                        }
+                        item {
+                            ProfileUpgradeBanner(
+                                state = bannerState,
+                                onClickSubscribe = onClickSubscribe,
+                                onChangeFeatureCard = onChangeFeatureCard,
+                                modifier = Modifier.fillMaxWidth(),
+                            )
+                        }
                     }
-                    item {
-                        ProfileUpgradeBanner(
-                            state = bannerState,
-                            onClickSubscribe = onClickSubscribe,
-                            onChangeFeatureCard = onChangeFeatureCard,
-                            modifier = Modifier.fillMaxWidth(),
-                        )
+
+                    is ProfileUpgradeBannerState.NewOnboardingUpgradeState -> {
+                        item {
+                            Box(modifier = Modifier.padding(24.dp)) {
+                                NewUpgradeAccountCard(
+                                    onClickSubscribe = onUpgradeClick,
+                                    recommendedPlan = bannerState.recommendedSubscription,
+                                )
+                            }
+                        }
                     }
+
+                    else -> Unit
                 }
                 item {
                     AccountSections(
@@ -166,6 +199,56 @@ internal fun AccountDetailsPage(
                     Spacer(Modifier.height(state.miniPlayerPadding))
                 }
             }
+        }
+    }
+}
+
+@Composable
+private fun NewUpgradeAccountCard(
+    recommendedPlan: OnboardingSubscriptionPlan,
+    onClickSubscribe: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    Card(
+        modifier = modifier,
+        shape = RoundedCornerShape(8.dp),
+    ) {
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(16.dp),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.spacedBy(12.dp),
+        ) {
+            SubscriptionBadge(
+                iconRes = recommendedPlan.badgeIconRes,
+                shortNameRes = recommendedPlan.shortNameRes,
+                backgroundColor = Color.Black,
+                textColor = Color.White,
+                modifier = Modifier
+                    .wrapContentWidth()
+                    .wrapContentHeight(),
+            )
+            TextP30(
+                text = stringResource(recommendedPlan.pageTitle),
+                color = MaterialTheme.theme.colors.primaryText01,
+                fontWeight = FontWeight.W700,
+            )
+            TextP60(
+                text = stringResource(LR.string.onboarding_upgrade_account_message),
+                color = MaterialTheme.theme.colors.primaryText02,
+                textAlign = TextAlign.Center,
+            )
+            OnboardingUpgradeHelper.UpgradeRowButton(
+                primaryText = recommendedPlan.ctaButtonText(false),
+                backgroundColor = recommendedPlan.ctaButtonBackgroundColor,
+                fontWeight = FontWeight.W500,
+                textColor = recommendedPlan.ctaButtonTextColor,
+                onClick = onClickSubscribe,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .heightIn(min = 48.dp),
+            )
         }
     }
 }
@@ -204,11 +287,24 @@ private fun AccountDetailsPageThemePreview(
     AccountDetailsPageStub(theme)
 }
 
+@Preview
+@Composable
+private fun AccountDetailsPageNewUpgradePreview(
+    @PreviewParameter(ThemePreviewParameterProvider::class) theme: Theme.ThemeType,
+) {
+    AccountDetailsPageStub(
+        theme = theme,
+        upgradeBannerState = ProfileUpgradeBannerState.NewOnboardingUpgradeState(
+            recommendedSubscription = OnboardingSubscriptionPlan.create(SubscriptionPlan.PlusMonthlyPreview),
+        ),
+    )
+}
+
 @Composable
 private fun AccountDetailsPageStub(
     theme: Theme.ThemeType,
     isAutomotive: Boolean = false,
-    upgradeBannerState: ProfileUpgradeBannerState? = ProfileUpgradeBannerState(
+    upgradeBannerState: ProfileUpgradeBannerState? = ProfileUpgradeBannerState.OldProfileUpgradeBannerState(
         subscriptionPlans = SubscriptionPlans.Preview,
         selectedFeatureCard = null,
         currentSubscription = null,
@@ -253,5 +349,6 @@ private fun AccountDetailsPageStub(
         onShowTermsOfUse = {},
         onSignOut = {},
         onDeleteAccount = {},
+        onUpgradeClick = {},
     )
 }

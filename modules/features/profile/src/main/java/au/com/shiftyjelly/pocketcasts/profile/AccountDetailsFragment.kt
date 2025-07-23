@@ -158,6 +158,7 @@ class AccountDetailsFragment : BaseFragment() {
             },
             onSignOut = { signOut() },
             onDeleteAccount = { deleteAccount() },
+            onUpgradeClick = { },
         )
     }
 
