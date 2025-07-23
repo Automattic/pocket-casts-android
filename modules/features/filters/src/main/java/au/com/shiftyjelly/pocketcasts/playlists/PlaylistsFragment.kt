@@ -21,6 +21,7 @@ import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
+import timber.log.Timber
 
 @AndroidEntryPoint
 class PlaylistsFragment :
@@ -41,7 +42,9 @@ class PlaylistsFragment :
             PlaylistsPage(
                 uiState = uiState,
                 listState = listState,
+                onCreate = { Timber.i("Create playlist clicked") },
                 onDelete = { playlist -> viewModel.deletePlaylist(playlist.uuid) },
+                onShowOptions = { Timber.i("Show playlists options clicked") },
                 modifier = Modifier.statusBarsPadding(),
             )
         }
