@@ -3,26 +3,25 @@ package au.com.shiftyjelly.pocketcasts.playlists
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.ViewGroup
-import androidx.compose.foundation.layout.statusBarsPadding
-import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
-import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.ui.Modifier
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import au.com.shiftyjelly.pocketcasts.compose.AppThemeWithBackground
 import au.com.shiftyjelly.pocketcasts.compose.extensions.contentWithoutConsumedInsets
+import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingFlow
+import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingLauncher
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseFragment
 import au.com.shiftyjelly.pocketcasts.views.fragments.TopScrollable
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
+import timber.log.Timber
 
 @AndroidEntryPoint
 class PlaylistsFragment :
@@ -40,22 +39,21 @@ class PlaylistsFragment :
         val uiState by viewModel.uiState.collectAsState()
 
         AppThemeWithBackground(theme.activeTheme) {
-            LazyColumn(
-                state = listState,
-                modifier = Modifier.statusBarsPadding(),
-            ) {
-                itemsIndexed(
-                    items = uiState.playlists,
-                    key = { _, item -> item.uuid },
-                ) { index, playlist ->
-                    PlaylistPreviewRow(
-                        playlist = playlist,
-                        showDivider = index != uiState.playlists.lastIndex,
-                        onDelete = { viewModel.deletePlaylist(playlist.uuid) },
-                        modifier = Modifier.animateItem(),
+            PlaylistsPage(
+                uiState = uiState,
+                listState = listState,
+                onCreate = { Timber.i("Create playlist clicked") },
+                onDelete = { playlist -> viewModel.deletePlaylist(playlist.uuid) },
+                onShowOptions = { Timber.i("Show playlists options clicked") },
+                onFreeAccountBannerCtaClick = {
+                    viewModel.trackFreeAccountCtaClick()
+                    OnboardingLauncher.openOnboardingFlow(
+                        activity = requireActivity(),
+                        onboardingFlow = OnboardingFlow.LoggedOut,
                     )
-                }
-            }
+                },
+                onFreeAccountBannerDismiss = viewModel::dismissFreeAccountBanner,
+            )
         }
 
         ScrollToTopEffect(listState)

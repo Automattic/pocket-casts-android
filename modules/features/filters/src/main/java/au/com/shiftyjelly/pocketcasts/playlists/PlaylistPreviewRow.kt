@@ -163,7 +163,7 @@ fun PlaylistPreviewRow(
                     orientation = Orientation.Horizontal,
                     enabled = draggableState.currentValue != SwipeToDeleteAnchor.Delete,
                 )
-                .background(MaterialTheme.theme.colors.primaryUi01)
+                .background(MaterialTheme.theme.colors.primaryUi02)
                 .semantics(mergeDescendants = true) {},
         ) {
             Row(
