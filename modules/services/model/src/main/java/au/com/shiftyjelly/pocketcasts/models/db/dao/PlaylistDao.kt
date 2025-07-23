@@ -34,7 +34,7 @@ abstract class PlaylistDao {
 
     fun observeSmartPlaylistEpisodeCount(
         smartRules: SmartRules,
-    ): (Clock, playlistId: Long?) -> Flow<Int> = { clock, playlistId ->
+    ): (Clock, Long?) -> Flow<Int> = { clock, playlistId ->
         val query = createSmartPlaylistEpisodeQuery(
             selectClause = "COUNT(*)",
             whereClause = smartRules.toSqlWhereClause(clock, playlistId),
@@ -51,7 +51,7 @@ abstract class PlaylistDao {
         smartRules: SmartRules,
         sortType: PlaylistEpisodeSortType,
         limit: Int,
-    ): (Clock, playlistId: Long?) -> Flow<List<Podcast>> = { clock, playlistId ->
+    ): (Clock, Long?) -> Flow<List<Podcast>> = { clock, playlistId ->
         val query = createSmartPlaylistEpisodeQuery(
             selectClause = "DISTINCT podcast.*",
             whereClause = smartRules.toSqlWhereClause(clock, playlistId),
