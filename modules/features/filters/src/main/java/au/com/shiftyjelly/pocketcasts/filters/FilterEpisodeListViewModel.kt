@@ -9,6 +9,7 @@ import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.SmartPlaylist
+import au.com.shiftyjelly.pocketcasts.models.type.PlaylistEpisodeSortType
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.download.DownloadManager
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
@@ -111,10 +112,10 @@ class FilterEpisodeListViewModel @Inject constructor(
         }
     }
 
-    fun changeSort(sortOrder: SmartPlaylist.SortOrder) {
+    fun changeSort(sortOrder: PlaylistEpisodeSortType) {
         launch {
             smartPlaylist.value?.let { playlist ->
-                playlist.sortId = sortOrder.value
+                playlist.sortType = sortOrder
 
                 val userPlaylistUpdate = UserPlaylistUpdate(
                     listOf(PlaylistProperty.Sort(sortOrder)),

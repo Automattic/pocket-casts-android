@@ -28,6 +28,7 @@ import au.com.shiftyjelly.pocketcasts.models.entity.BaseEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.SmartPlaylist
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodeViewSource
+import au.com.shiftyjelly.pocketcasts.models.type.PlaylistEpisodeSortType
 import au.com.shiftyjelly.pocketcasts.podcasts.view.components.PlayButton
 import au.com.shiftyjelly.pocketcasts.podcasts.view.episode.EpisodeContainerFragment
 import au.com.shiftyjelly.pocketcasts.podcasts.view.podcast.EpisodeListAdapter
@@ -586,23 +587,23 @@ class FilterEpisodeListFragment : BaseFragment() {
                 .setTitle(getString(LR.string.sort_by))
                 .addCheckedOption(
                     titleId = LR.string.episode_sort_newest_to_oldest,
-                    click = { viewModel.changeSort(SmartPlaylist.SortOrder.NEWEST_TO_OLDEST) },
-                    checked = (it.sortOrder() == SmartPlaylist.SortOrder.NEWEST_TO_OLDEST),
+                    click = { viewModel.changeSort(PlaylistEpisodeSortType.NewestToOldest) },
+                    checked = (it.sortType == PlaylistEpisodeSortType.NewestToOldest),
                 )
                 .addCheckedOption(
                     titleId = LR.string.episode_sort_oldest_to_newest,
-                    click = { viewModel.changeSort(SmartPlaylist.SortOrder.OLDEST_TO_NEWEST) },
-                    checked = (it.sortOrder() == SmartPlaylist.SortOrder.OLDEST_TO_NEWEST),
+                    click = { viewModel.changeSort(PlaylistEpisodeSortType.OldestToNewest) },
+                    checked = (it.sortType == PlaylistEpisodeSortType.OldestToNewest),
                 )
                 .addCheckedOption(
                     titleId = LR.string.episode_sort_short_to_long,
-                    click = { viewModel.changeSort(SmartPlaylist.SortOrder.SHORTEST_TO_LONGEST) },
-                    checked = (it.sortOrder() == SmartPlaylist.SortOrder.SHORTEST_TO_LONGEST),
+                    click = { viewModel.changeSort(PlaylistEpisodeSortType.ShortestToLongest) },
+                    checked = (it.sortType == PlaylistEpisodeSortType.ShortestToLongest),
                 )
                 .addCheckedOption(
                     titleId = LR.string.episode_sort_long_to_short,
-                    click = { viewModel.changeSort(SmartPlaylist.SortOrder.LONGEST_TO_SHORTEST) },
-                    checked = (it.sortOrder() == SmartPlaylist.SortOrder.LONGEST_TO_SHORTEST),
+                    click = { viewModel.changeSort(PlaylistEpisodeSortType.LongestToShortest) },
+                    checked = (it.sortType == PlaylistEpisodeSortType.LongestToShortest),
                 )
             dialog.show(parentFragmentManager, "sort_options")
         }

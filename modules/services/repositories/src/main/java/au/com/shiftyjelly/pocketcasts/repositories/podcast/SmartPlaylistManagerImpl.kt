@@ -8,6 +8,7 @@ import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.SmartPlaylist
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodePlayingStatus
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodeStatusEnum
+import au.com.shiftyjelly.pocketcasts.models.type.PlaylistEpisodeSortType
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.download.DownloadHelper
 import au.com.shiftyjelly.pocketcasts.repositories.download.DownloadManager
@@ -156,7 +157,7 @@ class SmartPlaylistManagerImpl @Inject constructor(
     override fun findEpisodesBlocking(smartPlaylist: SmartPlaylist, episodeManager: EpisodeManager, playbackManager: PlaybackManager): List<PodcastEpisode> {
         val where = buildPlaylistWhere(smartPlaylist, playbackManager)
         val orderBy = getPlaylistOrderByString(smartPlaylist)
-        val limit = if (smartPlaylist.sortOrder() == SmartPlaylist.SortOrder.LAST_DOWNLOAD_ATTEMPT_DATE) 1000 else 500
+        val limit = if (smartPlaylist.sortType == PlaylistEpisodeSortType.LastDownloadAttempt) 1000 else 500
         return episodeManager.findEpisodesWhereBlocking("$where ORDER BY $orderBy LIMIT $limit")
     }
 
@@ -167,7 +168,7 @@ class SmartPlaylistManagerImpl @Inject constructor(
     }
 
     override fun observeEpisodesBlocking(smartPlaylist: SmartPlaylist, episodeManager: EpisodeManager, playbackManager: PlaybackManager): Flowable<List<PodcastEpisode>> {
-        val limitCount = if (smartPlaylist.sortOrder() == SmartPlaylist.SortOrder.LAST_DOWNLOAD_ATTEMPT_DATE) 1000 else 500
+        val limitCount = if (smartPlaylist.sortType == PlaylistEpisodeSortType.LastDownloadAttempt) 1000 else 500
         val queryAfterWhere = getPlaylistQuery(smartPlaylist, limit = limitCount, playbackManager = playbackManager)
         return episodeManager.findEpisodesWhereRxFlowable(queryAfterWhere)
     }
@@ -177,29 +178,27 @@ class SmartPlaylistManagerImpl @Inject constructor(
         return episodeManager.findEpisodesWhereRxFlowable(queryAfterWhere)
     }
 
-    private fun getPlaylistOrderByString(smartPlaylist: SmartPlaylist): String? = when (smartPlaylist.sortOrder()) {
-        SmartPlaylist.SortOrder.NEWEST_TO_OLDEST,
-        SmartPlaylist.SortOrder.OLDEST_TO_NEWEST,
+    private fun getPlaylistOrderByString(smartPlaylist: SmartPlaylist): String? = when (val sortType = smartPlaylist.sortType) {
+        PlaylistEpisodeSortType.NewestToOldest,
+        PlaylistEpisodeSortType.OldestToNewest,
         -> {
             "published_date " +
-                (if (smartPlaylist.sortOrder() == SmartPlaylist.SortOrder.NEWEST_TO_OLDEST) "DESC" else "ASC") +
+                (if (sortType == PlaylistEpisodeSortType.NewestToOldest) "DESC" else "ASC") +
                 ", added_date " +
-                if (smartPlaylist.sortOrder() == SmartPlaylist.SortOrder.NEWEST_TO_OLDEST) "DESC" else "ASC"
+                if (sortType == PlaylistEpisodeSortType.NewestToOldest) "DESC" else "ASC"
         }
 
-        SmartPlaylist.SortOrder.SHORTEST_TO_LONGEST,
-        SmartPlaylist.SortOrder.LONGEST_TO_SHORTEST,
+        PlaylistEpisodeSortType.ShortestToLongest,
+        PlaylistEpisodeSortType.LongestToShortest,
         -> {
             "duration " +
-                (if (smartPlaylist.sortOrder() == SmartPlaylist.SortOrder.SHORTEST_TO_LONGEST) "ASC" else "DESC") +
+                (if (sortType == PlaylistEpisodeSortType.ShortestToLongest) "ASC" else "DESC") +
                 ", added_date DESC"
         }
 
-        SmartPlaylist.SortOrder.LAST_DOWNLOAD_ATTEMPT_DATE -> {
+        PlaylistEpisodeSortType.LastDownloadAttempt -> {
             "last_download_attempt_date DESC, published_date DESC"
         }
-
-        else -> null
     }
 
     override suspend fun create(smartPlaylist: SmartPlaylist): Long {
@@ -556,7 +555,7 @@ class SmartPlaylistManagerImpl @Inject constructor(
             audioVideo = SmartPlaylist.AUDIO_VIDEO_FILTER_ALL,
             allPodcasts = true,
             autoDownload = false,
-            sortId = SmartPlaylist.SortOrder.LAST_DOWNLOAD_ATTEMPT_DATE.value,
+            sortType = PlaylistEpisodeSortType.LastDownloadAttempt,
         )
     }
 

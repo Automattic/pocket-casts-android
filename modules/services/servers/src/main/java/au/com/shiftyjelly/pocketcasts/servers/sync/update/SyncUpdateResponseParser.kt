@@ -5,6 +5,7 @@ import au.com.shiftyjelly.pocketcasts.models.entity.ChapterIndices
 import au.com.shiftyjelly.pocketcasts.models.entity.Folder
 import au.com.shiftyjelly.pocketcasts.models.entity.SmartPlaylist
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodePlayingStatus
+import au.com.shiftyjelly.pocketcasts.models.type.PlaylistEpisodeSortType
 import au.com.shiftyjelly.pocketcasts.models.type.PodcastsSortType
 import au.com.shiftyjelly.pocketcasts.models.type.SyncStatus
 import au.com.shiftyjelly.pocketcasts.servers.extensions.nextBooleanOrDefault
@@ -179,7 +180,7 @@ class SyncUpdateResponseParser : JsonAdapter<SyncUpdateResponse>() {
                 "manual" -> smartPlaylist.manual = reader.nextBooleanOrDefault(false)
                 "episode_uuids" -> smartPlaylist.episodeUuids = reader.nextStringOrNull()
                 "sort_position" -> smartPlaylist.sortPosition = reader.nextIntOrDefault(0)
-                "sort_type" -> smartPlaylist.sortId = reader.nextIntOrDefault(0)
+                "sort_type" -> smartPlaylist.sortType = reader.nextIntOrNull()?.let(PlaylistEpisodeSortType::fromServerId) ?: PlaylistEpisodeSortType.NewestToOldest
                 "icon_id" -> smartPlaylist.iconId = reader.nextIntOrDefault(0)
                 "is_deleted" -> smartPlaylist.deleted = reader.nextBooleanOrDefault(false)
                 "filter_hours" -> smartPlaylist.filterHours = reader.nextIntOrDefault(0)
