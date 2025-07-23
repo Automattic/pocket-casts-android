@@ -4,6 +4,7 @@ import au.com.shiftyjelly.pocketcasts.models.db.dao.PlaylistDao
 import au.com.shiftyjelly.pocketcasts.models.entity.SmartPlaylist
 import au.com.shiftyjelly.pocketcasts.models.type.SmartRules
 import java.time.Clock
+import javax.inject.Inject
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
@@ -17,7 +18,7 @@ import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flowOf
 
 @OptIn(ExperimentalCoroutinesApi::class, FlowPreview::class)
-class PlaylistManagerImpl(
+class PlaylistManagerImpl @Inject constructor(
     private val playlistDao: PlaylistDao,
     private val clock: Clock,
 ) : PlaylistManager {

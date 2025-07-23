@@ -3,22 +3,16 @@ package au.com.shiftyjelly.pocketcasts.playlists
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.ViewGroup
-import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
-import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import au.com.shiftyjelly.pocketcasts.compose.AppThemeWithBackground
@@ -48,17 +42,12 @@ class PlaylistsFragment :
         AppThemeWithBackground(theme.activeTheme) {
             LazyColumn(
                 state = listState,
+                modifier = Modifier.statusBarsPadding(),
             ) {
-                items(30) { index ->
-                    Text(
-                        text = "Item $index",
-                        color = Color.White,
-                        textAlign = TextAlign.Center,
-                        fontSize = 16.sp,
-                        modifier = Modifier
-                            .background(if (index % 2 == 0) Color.Red else Color.Blue)
-                            .fillMaxWidth()
-                            .padding(vertical = 16.dp),
+                itemsIndexed(uiState.playlists) { index, playlist ->
+                    PlaylistPreviewRow(
+                        playlist = playlist,
+                        showDivider = index != uiState.playlists.lastIndex,
                     )
                 }
             }
