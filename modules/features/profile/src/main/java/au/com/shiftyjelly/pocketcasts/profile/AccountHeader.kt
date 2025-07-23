@@ -26,6 +26,7 @@ import androidx.compose.ui.unit.dp
 import au.com.shiftyjelly.pocketcasts.compose.AppTheme
 import au.com.shiftyjelly.pocketcasts.compose.ThemeColors
 import au.com.shiftyjelly.pocketcasts.compose.components.TextH50
+import au.com.shiftyjelly.pocketcasts.compose.components.TextH70
 import au.com.shiftyjelly.pocketcasts.compose.components.UserAvatar
 import au.com.shiftyjelly.pocketcasts.compose.components.UserAvatarConfig
 import au.com.shiftyjelly.pocketcasts.compose.images.SubscriptionBadgeDisplayMode
@@ -37,6 +38,8 @@ import au.com.shiftyjelly.pocketcasts.payment.BillingCycle
 import au.com.shiftyjelly.pocketcasts.payment.SubscriptionTier
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.utils.extensions.toLocalizedFormatLongStyle
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import java.util.Date
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.days
@@ -69,11 +72,29 @@ internal fun AccountHeader(
                 config = config.avatarConfig,
                 showBadge = false,
             )
-            TextH50(
-                text = state.email,
-                fontScale = config.infoFontScale,
-                textAlign = TextAlign.Center,
-            )
+            if (FeatureFlag.isEnabled(Feature.NEW_ONBOARDING_UPGRADE)) {
+                TextH70(
+                    text = state.email,
+                    fontScale = config.infoFontScale,
+                    textAlign = TextAlign.Center,
+                    color = if (FeatureFlag.isEnabled(Feature.NEW_ONBOARDING_UPGRADE)) {
+                        MaterialTheme.theme.colors.primaryText02
+                    } else {
+                        MaterialTheme.theme.colors.primaryText01
+                    }
+                )
+            } else {
+                TextH50(
+                    text = state.email,
+                    fontScale = config.infoFontScale,
+                    textAlign = TextAlign.Center,
+                    color = if (FeatureFlag.isEnabled(Feature.NEW_ONBOARDING_UPGRADE)) {
+                        MaterialTheme.theme.colors.primaryText02
+                    } else {
+                        MaterialTheme.theme.colors.primaryText01
+                    }
+                )
+            }
         }
         val tier = state.subscription.tier
         if (tier != null) {
@@ -90,21 +111,32 @@ internal fun AccountHeader(
         }
         Row(
             modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.Center,
         ) {
             val labels = state.subscription.labels()
             if (labels.start != null) {
-                TextH50(
-                    text = labels.start.text,
-                    fontScale = config.infoFontScale,
-                    color = labels.start.color(MaterialTheme.theme.colors),
-                    textAlign = TextAlign.Start,
-                    modifier = Modifier.weight(1f),
-                )
+                if (FeatureFlag.isEnabled(Feature.NEW_ONBOARDING_UPGRADE) && labels.end == null) {
+                    TextH70(
+                        text = labels.start.text,
+                        fontScale = config.infoFontScale,
+                        color = labels.start.color(MaterialTheme.theme.colors),
+                        textAlign = TextAlign.Center,
+                        modifier = Modifier.weight(1f),
+                    )
+                } else {
+                    TextH50(
+                        text = labels.start.text,
+                        fontScale = config.infoFontScale,
+                        color = labels.start.color(MaterialTheme.theme.colors),
+                        textAlign = TextAlign.Start,
+                        modifier = Modifier.weight(1f),
+                    )
+                }
             }
-            Spacer(
-                modifier = Modifier.width(16.dp),
-            )
             if (labels.end != null) {
+                Spacer(
+                    modifier = Modifier.width(16.dp),
+                )
                 TextH50(
                     text = labels.end.text,
                     fontScale = config.infoFontScale,

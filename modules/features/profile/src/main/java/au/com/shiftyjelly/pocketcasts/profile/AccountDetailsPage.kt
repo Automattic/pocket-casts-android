@@ -31,15 +31,13 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import au.com.shiftyjelly.pocketcasts.account.onboarding.upgrade.OnboardingSubscriptionPlan
-import au.com.shiftyjelly.pocketcasts.account.onboarding.upgrade.OnboardingUpgradeHelper
+import au.com.shiftyjelly.pocketcasts.account.onboarding.upgrade.OnboardingUpgradeHelper.UpgradeRowButton
 import au.com.shiftyjelly.pocketcasts.account.onboarding.upgrade.ProfileUpgradeBanner
 import au.com.shiftyjelly.pocketcasts.account.onboarding.upgrade.ProfileUpgradeBannerState
 import au.com.shiftyjelly.pocketcasts.compose.AppTheme
 import au.com.shiftyjelly.pocketcasts.compose.PreviewAutomotive
 import au.com.shiftyjelly.pocketcasts.compose.PreviewOrientation
 import au.com.shiftyjelly.pocketcasts.compose.bars.ThemedTopAppBar
-import au.com.shiftyjelly.pocketcasts.compose.components.TextH10
-import au.com.shiftyjelly.pocketcasts.compose.components.TextH50
 import au.com.shiftyjelly.pocketcasts.compose.components.TextP30
 import au.com.shiftyjelly.pocketcasts.compose.components.TextP60
 import au.com.shiftyjelly.pocketcasts.compose.components.UserAvatarConfig
@@ -52,6 +50,8 @@ import au.com.shiftyjelly.pocketcasts.payment.SubscriptionPlans
 import au.com.shiftyjelly.pocketcasts.payment.SubscriptionTier
 import au.com.shiftyjelly.pocketcasts.profile.winback.WinbackInitParams
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import kotlin.time.Duration.Companion.days
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
@@ -134,7 +134,15 @@ internal fun AccountDetailsPage(
             }
             LazyColumn(
                 verticalArrangement = Arrangement.spacedBy(16.dp),
-                modifier = Modifier.fillMaxSize(),
+                modifier = Modifier
+                    .fillMaxSize()
+                    .background(
+                        if (FeatureFlag.isEnabled(Feature.NEW_ONBOARDING_UPGRADE)) {
+                            MaterialTheme.theme.colors.primaryUi03
+                        } else {
+                            MaterialTheme.theme.colors.primaryUi02
+                        }
+                    ),
             ) {
                 item {
                     Spacer(Modifier.height(16.dp))
@@ -167,7 +175,7 @@ internal fun AccountDetailsPage(
 
                     is ProfileUpgradeBannerState.NewOnboardingUpgradeState -> {
                         item {
-                            Box(modifier = Modifier.padding(24.dp)) {
+                            Box(modifier = Modifier.padding(horizontal = 24.dp)) {
                                 NewUpgradeAccountCard(
                                     onClickSubscribe = onUpgradeClick,
                                     recommendedPlan = bannerState.recommendedSubscription,
@@ -192,7 +200,7 @@ internal fun AccountDetailsPage(
                         onShowTermsOfUse = onShowTermsOfUse,
                         onSignOut = onSignOut,
                         onDeleteAccount = onDeleteAccount,
-                        modifier = Modifier.fillMaxWidth(),
+                        modifier = Modifier.fillMaxWidth().background(MaterialTheme.theme.colors.primaryUi02),
                     )
                 }
                 item {
@@ -212,6 +220,7 @@ private fun NewUpgradeAccountCard(
     Card(
         modifier = modifier,
         shape = RoundedCornerShape(8.dp),
+        backgroundColor = MaterialTheme.theme.colors.primaryUi01
     ) {
         Column(
             modifier = Modifier
@@ -239,11 +248,11 @@ private fun NewUpgradeAccountCard(
                 color = MaterialTheme.theme.colors.primaryText02,
                 textAlign = TextAlign.Center,
             )
-            OnboardingUpgradeHelper.UpgradeRowButton(
-                primaryText = recommendedPlan.ctaButtonText(false),
-                backgroundColor = recommendedPlan.ctaButtonBackgroundColor,
+            UpgradeRowButton(
+                primaryText = recommendedPlan.ctaButtonText(isRenewingSubscription = false),
+                backgroundColor = MaterialTheme.theme.colors.primaryInteractive01,
+                textColor = MaterialTheme.theme.colors.primaryInteractive02,
                 fontWeight = FontWeight.W500,
-                textColor = recommendedPlan.ctaButtonTextColor,
                 onClick = onClickSubscribe,
                 modifier = Modifier
                     .fillMaxWidth()
