@@ -10,7 +10,6 @@ import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.SmartPlaylist
 import au.com.shiftyjelly.pocketcasts.models.entity.SmartPlaylist.Companion.SYNC_STATUS_NOT_SYNCED
 import au.com.shiftyjelly.pocketcasts.models.type.PlaylistEpisodeSortType
-import au.com.shiftyjelly.pocketcasts.models.type.PlaylistEpisodeSortType.LastDownloadAttempt
 import au.com.shiftyjelly.pocketcasts.models.type.PlaylistEpisodeSortType.LongestToShortest
 import au.com.shiftyjelly.pocketcasts.models.type.PlaylistEpisodeSortType.NewestToOldest
 import au.com.shiftyjelly.pocketcasts.models.type.PlaylistEpisodeSortType.OldestToNewest
@@ -37,32 +36,34 @@ abstract class PlaylistDao {
     protected abstract fun observeSmartPlaylistEpisodeCount(query: RoomRawQuery): Flow<Int>
 
     fun observeSmartPlaylistEpisodeCount(
+        clock: Clock,
         smartRules: SmartRules,
-    ): (Clock, Long?) -> Flow<Int> = { clock, playlistId ->
+    ): Flow<Int> {
         val query = createSmartPlaylistEpisodeQuery(
             selectClause = "COUNT(*)",
-            whereClause = smartRules.toSqlWhereClause(clock, playlistId),
+            whereClause = smartRules.toSqlWhereClause(clock),
             orderByClause = null,
             limit = null,
         )
-        observeSmartPlaylistEpisodeCount(RoomRawQuery(query))
+        return observeSmartPlaylistEpisodeCount(RoomRawQuery(query))
     }
 
     @RawQuery(observedEntities = [Podcast::class, PodcastEpisode::class])
     protected abstract fun observeSmartPlaylistPodcasts(query: RoomRawQuery): Flow<List<Podcast>>
 
     fun observeSmartPlaylistPodcasts(
+        clock: Clock,
         smartRules: SmartRules,
         sortType: PlaylistEpisodeSortType,
         limit: Int,
-    ): (Clock, Long?) -> Flow<List<Podcast>> = { clock, playlistId ->
+    ): Flow<List<Podcast>> {
         val query = createSmartPlaylistEpisodeQuery(
             selectClause = "DISTINCT podcast.*",
-            whereClause = smartRules.toSqlWhereClause(clock, playlistId),
+            whereClause = smartRules.toSqlWhereClause(clock),
             orderByClause = sortType.toOrderByClause(),
             limit = limit,
         )
-        observeSmartPlaylistPodcasts(RoomRawQuery(query))
+        return observeSmartPlaylistPodcasts(RoomRawQuery(query))
     }
 
     private fun createSmartPlaylistEpisodeQuery(
@@ -88,6 +89,5 @@ abstract class PlaylistDao {
         OldestToNewest -> "episode.published_date ASC, episode.added_date ASC"
         ShortestToLongest -> "episode.duration ASC, episode.added_date DESC"
         LongestToShortest -> "episode.duration DESC, episode.added_date DESC"
-        LastDownloadAttempt -> "IFNULL(episode.last_download_attempt_date, -1) DESC, episode.published_date DESC"
     }
 }

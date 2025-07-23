@@ -392,53 +392,8 @@ class PlaylistManagerTest {
     }
 
     @Test
-    fun sortPodcastsInPlaylistPreviewByLastDownloadAttempt() = runTest(testDispatcher) {
-        playlistDao.upsertSmartPlaylist(SmartPlaylist(sortType = PlaylistEpisodeSortType.LastDownloadAttempt))
-        val podcasts = listOf(
-            Podcast(uuid = "podcast-id-1", isSubscribed = true),
-            Podcast(uuid = "podcast-id-2", isSubscribed = true),
-            Podcast(uuid = "podcast-id-3", isSubscribed = true),
-            Podcast(uuid = "podcast-id-4", isSubscribed = true),
-        )
-        podcasts.forEach { podcastDao.insertSuspend(it) }
-        episodeDao.insertAll(
-            listOf(
-                PodcastEpisode(
-                    uuid = "episode-id-1",
-                    podcastUuid = "podcast-id-1",
-                    publishedDate = Date(),
-                    lastDownloadAttemptDate = null,
-                ),
-                PodcastEpisode(
-                    uuid = "episode-id-2",
-                    podcastUuid = "podcast-id-2",
-                    publishedDate = Date(),
-                    lastDownloadAttemptDate = Date(0),
-                ),
-                PodcastEpisode(
-                    uuid = "episode-id-4",
-                    podcastUuid = "podcast-id-3",
-                    publishedDate = Date(1),
-                    lastDownloadAttemptDate = Date(1),
-                ),
-                PodcastEpisode(
-                    uuid = "episode-id-5",
-                    podcastUuid = "podcast-id-4",
-                    publishedDate = Date(),
-                    lastDownloadAttemptDate = Date(2),
-                ),
-            ),
-        )
-
-        val playlist = manager.observePlaylistsPreview().first().single()
-
-        assertEquals(4, playlist.episodeCount)
-        assertEquals(podcasts.reversed(), playlist.podcasts)
-    }
-
-    @Test
     fun selectDistinctPodcastInPlaylistPreview() = runTest(testDispatcher) {
-        playlistDao.upsertSmartPlaylist(SmartPlaylist(sortType = PlaylistEpisodeSortType.LastDownloadAttempt))
+        playlistDao.upsertSmartPlaylist(SmartPlaylist())
         val podcasts = listOf(
             Podcast(uuid = "podcast-id-1", isSubscribed = true),
             Podcast(uuid = "podcast-id-2", isSubscribed = true),

@@ -47,8 +47,6 @@ data class SmartPlaylist(
     @ColumnInfo(name = "draft") var draft: Boolean = false, // Used when creating a new filter
 ) : Serializable {
     companion object {
-        const val PLAYLIST_ID_SYSTEM_DOWNLOADS: Long = -100L
-
         const val AUDIO_VIDEO_FILTER_ALL = 0
         const val AUDIO_VIDEO_FILTER_AUDIO_ONLY = 1
         const val AUDIO_VIDEO_FILTER_VIDEO_ONLY = 2
@@ -69,9 +67,6 @@ data class SmartPlaylist(
 
     @Ignore
     var episodeCount: Int = 0
-
-    val isSystemDownloadsFilter: Boolean
-        get() = id != null && id == PLAYLIST_ID_SYSTEM_DOWNLOADS
 
     val isAudioOnly: Boolean
         get() = audioVideo == AUDIO_VIDEO_FILTER_AUDIO_ONLY

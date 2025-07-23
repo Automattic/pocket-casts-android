@@ -139,7 +139,6 @@ class PlaylistUpdateAnalytics @Inject constructor(
                         PlaylistEpisodeSortType.OldestToNewest -> "oldest_to_newest"
                         PlaylistEpisodeSortType.ShortestToLongest -> "shortest_to_longest"
                         PlaylistEpisodeSortType.LongestToShortest -> "longest_to_shortest"
-                        PlaylistEpisodeSortType.LastDownloadAttempt -> "last_download_attempt_date"
                     }
                     val properties = mapOf(Key.SORT_ORDER to sortOrderString)
                     analyticsTracker.track(AnalyticsEvent.FILTER_SORT_BY_CHANGED, properties)

@@ -15,9 +15,6 @@ enum class PlaylistEpisodeSortType(
     LongestToShortest(
         serverId = 3,
     ),
-    LastDownloadAttempt(
-        serverId = 100,
-    ),
     ;
 
     companion object {
