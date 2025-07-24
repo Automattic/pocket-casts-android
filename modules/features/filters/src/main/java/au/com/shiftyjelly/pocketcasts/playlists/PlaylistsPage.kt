@@ -12,13 +12,10 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.itemsIndexed
@@ -28,7 +25,6 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
 import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.setValue
@@ -42,6 +38,7 @@ import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
 import au.com.shiftyjelly.pocketcasts.compose.AppThemeWithBackground
 import au.com.shiftyjelly.pocketcasts.compose.Devices
+import au.com.shiftyjelly.pocketcasts.compose.bars.ThemedTopAppBar
 import au.com.shiftyjelly.pocketcasts.compose.components.Banner
 import au.com.shiftyjelly.pocketcasts.compose.components.NoContentBanner
 import au.com.shiftyjelly.pocketcasts.compose.preview.ThemePreviewParameterProvider
@@ -192,29 +189,15 @@ private fun Toolbar(
     onShowOptions: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    Row(
-        verticalAlignment = Alignment.CenterVertically,
-        modifier = modifier
-            .background(MaterialTheme.theme.colors.secondaryUi01)
-            .statusBarsPadding()
-            .fillMaxWidth()
-            .heightIn(min = 56.dp),
-    ) {
-        Text(
-            text = stringResource(LR.string.playlists),
-            style = MaterialTheme.typography.h6,
-            color = MaterialTheme.theme.colors.secondaryText01,
-            modifier = Modifier.padding(start = 16.dp),
-        )
-        Spacer(
-            modifier = Modifier.weight(1f),
-        )
-        AnimatedVisibility(
-            visible = showActionButtons,
-            enter = FadeIn,
-            exit = FadeOut,
-        ) {
-            Row {
+    ThemedTopAppBar(
+        title = stringResource(LR.string.playlists),
+        navigationButton = null,
+        actions = {
+            AnimatedVisibility(
+                visible = showActionButtons,
+                enter = FadeIn,
+                exit = FadeOut,
+            ) {
                 IconButton(
                     onClick = onCreatePlaylist,
                 ) {
@@ -224,6 +207,13 @@ private fun Toolbar(
                         tint = MaterialTheme.theme.colors.secondaryIcon01,
                     )
                 }
+            }
+
+            AnimatedVisibility(
+                visible = showActionButtons,
+                enter = FadeIn,
+                exit = FadeOut,
+            ) {
                 IconButton(
                     onClick = onShowOptions,
                 ) {
@@ -234,8 +224,9 @@ private fun Toolbar(
                     )
                 }
             }
-        }
-    }
+        },
+        modifier = modifier,
+    )
 }
 
 @Composable
