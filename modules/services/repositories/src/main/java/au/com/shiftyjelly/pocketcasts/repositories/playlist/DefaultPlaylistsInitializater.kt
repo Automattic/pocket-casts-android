@@ -1,14 +1,6 @@
 package au.com.shiftyjelly.pocketcasts.repositories.playlist
 
-import android.content.Context
-import androidx.work.CoroutineWorker
-import androidx.work.Data
-import androidx.work.ExistingWorkPolicy
-import androidx.work.OneTimeWorkRequestBuilder
-import androidx.work.WorkManager
-import androidx.work.WorkerParameters
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
-import dagger.assisted.Assisted
 import javax.inject.Inject
 import javax.inject.Singleton
 import kotlinx.coroutines.sync.Mutex
@@ -23,8 +15,8 @@ class DefaultPlaylistsInitializater @Inject constructor(
 
     suspend fun initialize(force: Boolean = false) = mutex.withLock {
         if (force || !settings.getBooleanForKey(CREATED_DEFAULT_PLAYLISTS_KEY, false)) {
-            playlistManager.createPlaylist(PlaylistDraft.NewReleases)
-            playlistManager.createPlaylist(PlaylistDraft.InProgress)
+            playlistManager.upsertPlaylist(PlaylistDraft.NewReleases)
+            playlistManager.upsertPlaylist(PlaylistDraft.InProgress)
             settings.setBooleanForKey(CREATED_DEFAULT_PLAYLISTS_KEY, true)
         }
     }

@@ -65,7 +65,7 @@ class PlaylistManagerImpl @Inject constructor(
         playlistDao.markPlaylistAsDeleted(uuid)
     }
 
-    override suspend fun createPlaylist(draft: PlaylistDraft) {
+    override suspend fun upsertPlaylist(draft: PlaylistDraft) {
         appDatabase.withTransaction {
             val uuids = playlistDao.getAllPlaylistUuids()
             val uuid = if (draft === PlaylistDraft.NewReleases) {

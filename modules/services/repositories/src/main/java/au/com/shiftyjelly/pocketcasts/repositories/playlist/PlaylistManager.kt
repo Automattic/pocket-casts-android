@@ -7,5 +7,5 @@ interface PlaylistManager {
 
     suspend fun deletePlaylist(uuid: String)
 
-    suspend fun createPlaylist(draft: PlaylistDraft)
+    suspend fun upsertPlaylist(draft: PlaylistDraft)
 }
