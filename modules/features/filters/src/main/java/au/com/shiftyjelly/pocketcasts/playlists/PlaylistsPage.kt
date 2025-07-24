@@ -214,23 +214,25 @@ private fun Toolbar(
             enter = FadeIn,
             exit = FadeOut,
         ) {
-            IconButton(
-                onClick = onCreatePlaylist,
-            ) {
-                Icon(
-                    painter = painterResource(IR.drawable.ic_add_black_24dp),
-                    contentDescription = stringResource(LR.string.new_playlist),
-                    tint = MaterialTheme.theme.colors.secondaryIcon01,
-                )
-            }
-            IconButton(
-                onClick = onShowOptions,
-            ) {
-                Icon(
-                    painter = painterResource(IR.drawable.ic_overflow),
-                    contentDescription = stringResource(LR.string.options),
-                    tint = MaterialTheme.theme.colors.secondaryIcon01,
-                )
+            Row {
+                IconButton(
+                    onClick = onCreatePlaylist,
+                ) {
+                    Icon(
+                        painter = painterResource(IR.drawable.ic_add_black_24dp),
+                        contentDescription = stringResource(LR.string.new_playlist),
+                        tint = MaterialTheme.theme.colors.secondaryIcon01,
+                    )
+                }
+                IconButton(
+                    onClick = onShowOptions,
+                ) {
+                    Icon(
+                        painter = painterResource(IR.drawable.ic_overflow),
+                        contentDescription = stringResource(LR.string.options),
+                        tint = MaterialTheme.theme.colors.secondaryIcon01,
+                    )
+                }
             }
         }
     }
