@@ -20,31 +20,33 @@ data class SmartPlaylist(
     @PrimaryKey @ColumnInfo(name = "_id") var id: Long? = null,
     @ColumnInfo(name = "uuid") var uuid: String = "",
     @ColumnInfo(name = "title") var title: String = "",
+    @ColumnInfo(name = "iconId") var iconId: Int = 0,
     @ColumnInfo(name = "sortPosition") var sortPosition: Int? = null,
+    @ColumnInfo(name = "sortId") var sortType: PlaylistEpisodeSortType = PlaylistEpisodeSortType.NewestToOldest,
     @ColumnInfo(name = "manual") var manual: Boolean = false,
-    @ColumnInfo(name = "unplayed") var unplayed: Boolean = true,
-    @ColumnInfo(name = "partiallyPlayed") var partiallyPlayed: Boolean = true,
-    @ColumnInfo(name = "finished") var finished: Boolean = true,
-    @ColumnInfo(name = "audioVideo") var audioVideo: Int = AUDIO_VIDEO_FILTER_ALL,
-    @ColumnInfo(name = "allPodcasts") var allPodcasts: Boolean = true,
-    @ColumnInfo(name = "podcastUuids") var podcastUuids: String? = null,
-    @ColumnInfo(name = "downloaded") var downloaded: Boolean = true,
-    @ColumnInfo(name = "downloading") var downloading: Boolean = true,
-    @ColumnInfo(name = "notDownloaded") var notDownloaded: Boolean = true,
+    @ColumnInfo(name = "draft") var draft: Boolean = false, // Used when creating a new filter
+    @ColumnInfo(name = "deleted") var deleted: Boolean = false,
+    @ColumnInfo(name = "syncStatus") var syncStatus: Int = SYNC_STATUS_SYNCED,
+    // Auto download configuration
     @ColumnInfo(name = "autoDownload") var autoDownload: Boolean = false,
     @ColumnInfo(name = "autoDownloadWifiOnly") var autoDownloadUnmeteredOnly: Boolean = false,
     @ColumnInfo(name = "autoDownloadPowerOnly") var autoDownloadPowerOnly: Boolean = false,
-    @ColumnInfo(name = "sortId") var sortType: PlaylistEpisodeSortType = PlaylistEpisodeSortType.NewestToOldest,
-    @ColumnInfo(name = "iconId") var iconId: Int = 0,
+    @ColumnInfo(name = "autoDownloadLimit") var autodownloadLimit: Int = 10,
+    // Filter rules
+    @ColumnInfo(name = "unplayed") var unplayed: Boolean = true,
+    @ColumnInfo(name = "partiallyPlayed") var partiallyPlayed: Boolean = true,
+    @ColumnInfo(name = "finished") var finished: Boolean = true,
+    @ColumnInfo(name = "downloaded") var downloaded: Boolean = true,
+    @ColumnInfo(name = "notDownloaded") var notDownloaded: Boolean = true,
+    @ColumnInfo(name = "downloading") var downloading: Boolean = true, // Legacy field
+    @ColumnInfo(name = "audioVideo") var audioVideo: Int = AUDIO_VIDEO_FILTER_ALL,
     @ColumnInfo(name = "filterHours") var filterHours: Int = 0,
     @ColumnInfo(name = "starred") var starred: Boolean = false,
-    @ColumnInfo(name = "deleted") var deleted: Boolean = false,
-    @ColumnInfo(name = "syncStatus") var syncStatus: Int = SYNC_STATUS_SYNCED,
-    @ColumnInfo(name = "autoDownloadLimit") var autodownloadLimit: Int = 10,
+    @ColumnInfo(name = "allPodcasts") var allPodcasts: Boolean = true,
+    @ColumnInfo(name = "podcastUuids") var podcastUuids: String? = null,
     @ColumnInfo(name = "filterDuration") var filterDuration: Boolean = false,
     @ColumnInfo(name = "longerThan") var longerThan: Int = 20,
     @ColumnInfo(name = "shorterThan") var shorterThan: Int = 40,
-    @ColumnInfo(name = "draft") var draft: Boolean = false, // Used when creating a new filter
 ) : Serializable {
     companion object {
         const val AUDIO_VIDEO_FILTER_ALL = 0

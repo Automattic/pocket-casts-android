@@ -12,12 +12,31 @@ import au.com.shiftyjelly.pocketcasts.models.di.addTypeConverters
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.SmartPlaylist
+import au.com.shiftyjelly.pocketcasts.models.entity.SmartPlaylist.Companion.ANYTIME
+import au.com.shiftyjelly.pocketcasts.models.entity.SmartPlaylist.Companion.AUDIO_VIDEO_FILTER_ALL
+import au.com.shiftyjelly.pocketcasts.models.entity.SmartPlaylist.Companion.AUDIO_VIDEO_FILTER_AUDIO_ONLY
 import au.com.shiftyjelly.pocketcasts.models.entity.SmartPlaylist.Companion.AUDIO_VIDEO_FILTER_VIDEO_ONLY
+import au.com.shiftyjelly.pocketcasts.models.entity.SmartPlaylist.Companion.LAST_24_HOURS
+import au.com.shiftyjelly.pocketcasts.models.entity.SmartPlaylist.Companion.LAST_2_WEEKS
+import au.com.shiftyjelly.pocketcasts.models.entity.SmartPlaylist.Companion.LAST_3_DAYS
+import au.com.shiftyjelly.pocketcasts.models.entity.SmartPlaylist.Companion.LAST_MONTH
+import au.com.shiftyjelly.pocketcasts.models.entity.SmartPlaylist.Companion.LAST_WEEK
+import au.com.shiftyjelly.pocketcasts.models.entity.SmartPlaylist.Companion.SYNC_STATUS_NOT_SYNCED
+import au.com.shiftyjelly.pocketcasts.models.entity.SmartPlaylist.Companion.SYNC_STATUS_SYNCED
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodePlayingStatus
 import au.com.shiftyjelly.pocketcasts.models.type.PlaylistEpisodeSortType
+import au.com.shiftyjelly.pocketcasts.models.type.SmartRules
+import au.com.shiftyjelly.pocketcasts.models.type.SmartRules.DownloadStatusRule
+import au.com.shiftyjelly.pocketcasts.models.type.SmartRules.EpisodeDurationRule
+import au.com.shiftyjelly.pocketcasts.models.type.SmartRules.EpisodeStatusRule
+import au.com.shiftyjelly.pocketcasts.models.type.SmartRules.MediaTypeRule
+import au.com.shiftyjelly.pocketcasts.models.type.SmartRules.PodcastsRule
+import au.com.shiftyjelly.pocketcasts.models.type.SmartRules.ReleaseDateRule
+import au.com.shiftyjelly.pocketcasts.models.type.SmartRules.StarredRule
 import au.com.shiftyjelly.pocketcasts.sharedtest.MutableClock
 import com.squareup.moshi.Moshi
 import java.util.Date
+import kotlin.time.Duration.Companion.minutes
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.runTest
@@ -48,7 +67,7 @@ class PlaylistManagerTest {
         episodeDao = appDatabase.episodeDao()
         playlistDao = appDatabase.playlistDao()
         manager = PlaylistManagerImpl(
-            playlistDao = playlistDao,
+            appDatabase = appDatabase,
             clock = clock,
         )
     }
@@ -441,5 +460,302 @@ class PlaylistManagerTest {
 
         assertEquals(6, playlist.episodeCount)
         assertEquals(podcasts.take(4), playlist.podcasts)
+    }
+
+    @Test
+    fun createPlaylists() = runTest(testDispatcher) {
+        val drafts = listOf(
+            PlaylistDraft(
+                title = "Title",
+                rules = SmartRules.Default,
+            ),
+            PlaylistDraft(
+                title = "Title",
+                rules = SmartRules.Default.copy(
+                    episodeStatus = EpisodeStatusRule(
+                        unplayed = true,
+                        inProgress = false,
+                        completed = false,
+                    ),
+                ),
+            ),
+            PlaylistDraft(
+                title = "Title",
+                rules = SmartRules.Default.copy(
+                    episodeStatus = EpisodeStatusRule(
+                        unplayed = false,
+                        inProgress = true,
+                        completed = false,
+                    ),
+                ),
+            ),
+            PlaylistDraft(
+                title = "Title",
+                rules = SmartRules.Default.copy(
+                    episodeStatus = EpisodeStatusRule(
+                        unplayed = false,
+                        inProgress = false,
+                        completed = true,
+                    ),
+                ),
+            ),
+            PlaylistDraft(
+                title = "Title",
+                rules = SmartRules.Default.copy(
+                    downloadStatus = DownloadStatusRule.Any,
+                ),
+            ),
+            PlaylistDraft(
+                title = "Title",
+                rules = SmartRules.Default.copy(
+                    downloadStatus = DownloadStatusRule.Downloaded,
+                ),
+            ),
+            PlaylistDraft(
+                title = "Title",
+                rules = SmartRules.Default.copy(
+                    downloadStatus = DownloadStatusRule.NotDownloaded,
+                ),
+            ),
+            PlaylistDraft(
+                title = "Title",
+                rules = SmartRules.Default.copy(
+                    mediaType = MediaTypeRule.Any,
+                ),
+            ),
+            PlaylistDraft(
+                title = "Title",
+                rules = SmartRules.Default.copy(
+                    mediaType = MediaTypeRule.Audio,
+                ),
+            ),
+            PlaylistDraft(
+                title = "Title",
+                rules = SmartRules.Default.copy(
+                    mediaType = MediaTypeRule.Video,
+                ),
+            ),
+            PlaylistDraft(
+                title = "Title",
+                rules = SmartRules.Default.copy(
+                    releaseDate = ReleaseDateRule.AnyTime,
+                ),
+            ),
+            PlaylistDraft(
+                title = "Title",
+                rules = SmartRules.Default.copy(
+                    releaseDate = ReleaseDateRule.Last24Hours,
+                ),
+            ),
+            PlaylistDraft(
+                title = "Title",
+                rules = SmartRules.Default.copy(
+                    releaseDate = ReleaseDateRule.Last3Days,
+                ),
+            ),
+            PlaylistDraft(
+                title = "Title",
+                rules = SmartRules.Default.copy(
+                    releaseDate = ReleaseDateRule.LastWeek,
+                ),
+            ),
+            PlaylistDraft(
+                title = "Title",
+                rules = SmartRules.Default.copy(
+                    releaseDate = ReleaseDateRule.Last2Weeks,
+                ),
+            ),
+            PlaylistDraft(
+                title = "Title",
+                rules = SmartRules.Default.copy(
+                    releaseDate = ReleaseDateRule.LastMonth,
+                ),
+            ),
+            PlaylistDraft(
+                title = "Title",
+                rules = SmartRules.Default.copy(
+                    starred = StarredRule.Any,
+                ),
+            ),
+            PlaylistDraft(
+                title = "Title",
+                rules = SmartRules.Default.copy(
+                    starred = StarredRule.Starred,
+                ),
+            ),
+            PlaylistDraft(
+                title = "Title",
+                rules = SmartRules.Default.copy(
+                    podcastsRule = PodcastsRule.Any,
+                ),
+            ),
+            PlaylistDraft(
+                title = "Title",
+                rules = SmartRules.Default.copy(
+                    podcastsRule = PodcastsRule.Selected(uuids = listOf("id-1", "id-2")),
+                ),
+            ),
+            PlaylistDraft(
+                title = "Title",
+                rules = SmartRules.Default.copy(
+                    episodeDuration = EpisodeDurationRule.Any,
+                ),
+            ),
+            PlaylistDraft(
+                title = "Title",
+                rules = SmartRules.Default.copy(
+                    episodeDuration = EpisodeDurationRule.Constrained(longerThan = 50.minutes, shorterThan = 60.minutes),
+                ),
+            ),
+        )
+
+        drafts.forEach { draft -> manager.createPlaylist(draft) }
+        val playlists = playlistDao.observeSmartPlaylists().first()
+
+        // Check that UUIDs are unique
+        assertEquals(playlists, playlists.distinctBy { it.uuid })
+
+        val defaultPlaylist = SmartPlaylist(
+            id = playlists[0].id,
+            uuid = playlists[0].uuid,
+            title = "Title",
+            iconId = 0,
+            sortPosition = playlists[0].sortPosition,
+            sortType = PlaylistEpisodeSortType.NewestToOldest,
+            manual = false,
+            draft = false,
+            deleted = false,
+            syncStatus = SYNC_STATUS_NOT_SYNCED,
+            autoDownload = false,
+            autoDownloadUnmeteredOnly = false,
+            autoDownloadPowerOnly = false,
+            autodownloadLimit = 10,
+            unplayed = true,
+            partiallyPlayed = true,
+            finished = true,
+            downloaded = true,
+            notDownloaded = true,
+            downloading = true,
+            audioVideo = AUDIO_VIDEO_FILTER_ALL,
+            filterHours = ANYTIME,
+            starred = false,
+            allPodcasts = true,
+            podcastUuids = null,
+            filterDuration = false,
+            longerThan = 20,
+            shorterThan = 40,
+        )
+        fun assertPlaylist(index: Int, message: String, func: (SmartPlaylist) -> SmartPlaylist) {
+            val playlist = playlists[index]
+            val indexedPlaylist = defaultPlaylist.copy(
+                id = playlist.id,
+                uuid = playlist.uuid,
+                sortPosition = playlist.sortPosition,
+            )
+            assertEquals(message, func(indexedPlaylist), playlist)
+        }
+
+        assertPlaylist(index = 0, "Default") { defaultPlaylist }
+        assertPlaylist(index = 1, "Unplayed") { it.copy(unplayed = true, partiallyPlayed = false, finished = false) }
+        assertPlaylist(index = 2, "In progress") { it.copy(unplayed = false, partiallyPlayed = true, finished = false) }
+        assertPlaylist(index = 3, "Played") { it.copy(unplayed = false, partiallyPlayed = false, finished = true) }
+        assertPlaylist(index = 4, "Any downloaded status") { it.copy(downloaded = true, notDownloaded = true, downloading = true) }
+        assertPlaylist(index = 5, "Downloaded") { it.copy(downloaded = true, notDownloaded = false, downloading = false) }
+        assertPlaylist(index = 6, "Not downloaded") { it.copy(downloaded = false, notDownloaded = true, downloading = true) }
+        assertPlaylist(index = 7, "Audio / Video") { it.copy(audioVideo = AUDIO_VIDEO_FILTER_ALL) }
+        assertPlaylist(index = 8, "Audio") { it.copy(audioVideo = AUDIO_VIDEO_FILTER_AUDIO_ONLY) }
+        assertPlaylist(index = 9, "Video") { it.copy(audioVideo = AUDIO_VIDEO_FILTER_VIDEO_ONLY) }
+        assertPlaylist(index = 10, "Released any time") { it.copy(filterHours = ANYTIME) }
+        assertPlaylist(index = 11, "Last day") { it.copy(filterHours = LAST_24_HOURS) }
+        assertPlaylist(index = 12, "Last 3 days") { it.copy(filterHours = LAST_3_DAYS) }
+        assertPlaylist(index = 13, "Last week") { it.copy(filterHours = LAST_WEEK) }
+        assertPlaylist(index = 14, "Last 2 weeks") { it.copy(filterHours = LAST_2_WEEKS) }
+        assertPlaylist(index = 15, "Last month") { it.copy(filterHours = LAST_MONTH) }
+        assertPlaylist(index = 16, "Any starred status") { it.copy(starred = false) }
+        assertPlaylist(index = 17, "Starred") { it.copy(starred = true) }
+        assertPlaylist(index = 18, "All podcasts") { it.copy(allPodcasts = true, podcastUuids = null) }
+        assertPlaylist(index = 19, "Selected podcasts") { it.copy(allPodcasts = false, podcastUuids = "id-1,id-2") }
+        assertPlaylist(index = 20, "Any duration") { it.copy(filterDuration = false, longerThan = 20, shorterThan = 40) }
+        assertPlaylist(index = 21, "Limited duration") { it.copy(filterDuration = true, longerThan = 50, shorterThan = 60) }
+    }
+
+    @Test
+    fun createDefaultNewReleasesPlaylist() = runTest(testDispatcher) {
+        manager.createPlaylist(PlaylistDraft.NewReleases)
+        val playlists = playlistDao.observeSmartPlaylists().first()
+
+        assertEquals(
+            SmartPlaylist(
+                id = 1,
+                uuid = Playlist.NEW_RELEASES_UUID,
+                title = "New Releases",
+                iconId = 10,
+                sortPosition = 1,
+                sortType = PlaylistEpisodeSortType.NewestToOldest,
+                manual = false,
+                draft = false,
+                deleted = false,
+                syncStatus = SYNC_STATUS_SYNCED,
+                autoDownload = false,
+                autoDownloadUnmeteredOnly = false,
+                autoDownloadPowerOnly = false,
+                autodownloadLimit = 10,
+                unplayed = true,
+                partiallyPlayed = true,
+                finished = true,
+                downloaded = true,
+                notDownloaded = true,
+                downloading = true,
+                audioVideo = AUDIO_VIDEO_FILTER_ALL,
+                filterHours = LAST_2_WEEKS,
+                starred = false,
+                allPodcasts = true,
+                podcastUuids = null,
+                filterDuration = false,
+                longerThan = 20,
+                shorterThan = 40,
+            ),
+            playlists[0],
+        )
+    }
+
+    @Test
+    fun createDefaultInProgressPlaylist() = runTest(testDispatcher) {
+        manager.createPlaylist(PlaylistDraft.InProgress)
+        val playlists = playlistDao.observeSmartPlaylists().first()
+
+        assertEquals(
+            SmartPlaylist(
+                id = 1,
+                uuid = Playlist.IN_PROGRESS_UUID,
+                title = "In Progress",
+                iconId = 43,
+                sortPosition = 1,
+                sortType = PlaylistEpisodeSortType.NewestToOldest,
+                manual = false,
+                draft = false,
+                deleted = false,
+                syncStatus = SYNC_STATUS_SYNCED,
+                autoDownload = false,
+                autoDownloadUnmeteredOnly = false,
+                autoDownloadPowerOnly = false,
+                autodownloadLimit = 10,
+                unplayed = false,
+                partiallyPlayed = true,
+                finished = false,
+                downloaded = true,
+                notDownloaded = true,
+                downloading = true,
+                audioVideo = AUDIO_VIDEO_FILTER_ALL,
+                filterHours = LAST_MONTH,
+                starred = false,
+                allPodcasts = true,
+                podcastUuids = null,
+                filterDuration = false,
+                longerThan = 20,
+                shorterThan = 40,
+            ),
+            playlists[0],
+        )
     }
 }

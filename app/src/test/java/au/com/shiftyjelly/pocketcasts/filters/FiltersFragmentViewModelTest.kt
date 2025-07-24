@@ -4,10 +4,9 @@ import au.com.shiftyjelly.pocketcasts.models.entity.SmartPlaylist
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.preferences.UserSetting
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
+import au.com.shiftyjelly.pocketcasts.repositories.playlist.Playlist
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.SmartPlaylistManager
-import au.com.shiftyjelly.pocketcasts.repositories.podcast.SmartPlaylistManagerImpl.Companion.IN_PROGRESS_UUID
-import au.com.shiftyjelly.pocketcasts.repositories.podcast.SmartPlaylistManagerImpl.Companion.NEW_RELEASE_UUID
 import au.com.shiftyjelly.pocketcasts.repositories.user.UserManager
 import au.com.shiftyjelly.pocketcasts.sharedtest.MainCoroutineRule
 import io.reactivex.Flowable
@@ -28,8 +27,8 @@ class FiltersFragmentViewModelTest {
     val coroutineRule = MainCoroutineRule()
 
     private val defaultFilters = listOf(
-        SmartPlaylist(id = 1, uuid = NEW_RELEASE_UUID),
-        SmartPlaylist(id = 2, uuid = IN_PROGRESS_UUID),
+        SmartPlaylist(id = 1, uuid = Playlist.NEW_RELEASES_UUID),
+        SmartPlaylist(id = 2, uuid = Playlist.IN_PROGRESS_UUID),
     )
 
     @Before
