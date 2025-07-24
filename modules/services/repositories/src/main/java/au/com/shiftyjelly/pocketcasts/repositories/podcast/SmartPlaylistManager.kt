@@ -48,8 +48,6 @@ interface SmartPlaylistManager {
 
     fun removePodcastFromPlaylistsBlocking(podcastUuid: String)
 
-    fun getSystemDownloadsFilter(): SmartPlaylist
-
     suspend fun markAllSynced()
 
     fun updateAllBlocking(smartPlaylists: List<SmartPlaylist>)

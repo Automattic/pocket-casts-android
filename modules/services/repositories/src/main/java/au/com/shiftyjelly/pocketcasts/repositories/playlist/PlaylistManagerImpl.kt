@@ -45,18 +45,16 @@ class PlaylistManagerImpl @Inject constructor(
     }
 
     private fun List<SmartPlaylist>.toPreviewFlows() = map { playlist ->
-        val podcastsFlow = playlistDao
-            .observeSmartPlaylistPodcasts(
-                smartRules = playlist.smartRules,
-                sortType = playlist.sortType,
-                limit = PLAYLIST_ARTWORK_EPISODE_LIMIT,
-            )
-            .invoke(clock, playlist.id)
-        val episodeCountFlow = playlistDao
-            .observeSmartPlaylistEpisodeCount(
-                smartRules = playlist.smartRules,
-            )
-            .invoke(clock, playlist.id)
+        val podcastsFlow = playlistDao.observeSmartPlaylistPodcasts(
+            clock = clock,
+            smartRules = playlist.smartRules,
+            sortType = playlist.sortType,
+            limit = PLAYLIST_ARTWORK_EPISODE_LIMIT,
+        )
+        val episodeCountFlow = playlistDao.observeSmartPlaylistEpisodeCount(
+            clock = clock,
+            smartRules = playlist.smartRules,
+        )
         combine(podcastsFlow, episodeCountFlow) { podcasts, count ->
             PlaylistPreview(
                 uuid = playlist.uuid,

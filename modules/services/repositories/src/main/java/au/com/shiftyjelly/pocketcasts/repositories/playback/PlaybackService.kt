@@ -563,28 +563,31 @@ open class PlaybackService :
         val episodeItems = mutableListOf<MediaBrowserCompat.MediaItem>()
         val autoPlaySource: AutoPlaySource
 
-        val playlist = if (DOWNLOADS_ROOT == parentId) smartPlaylistManager.getSystemDownloadsFilter() else smartPlaylistManager.findByUuidBlocking(parentId)
-        if (playlist != null) {
-            val episodeList = if (DOWNLOADS_ROOT == parentId) {
-                autoPlaySource = AutoPlaySource.Predefined.Downloads
-                episodeManager.findDownloadedEpisodesRxFlowable().blockingFirst()
+        val episodesWithSource = if (DOWNLOADS_ROOT == parentId) {
+            autoPlaySource = AutoPlaySource.Predefined.Downloads
+            episodeManager.findDownloadedEpisodesRxFlowable().blockingFirst() to ""
+        } else {
+            autoPlaySource = AutoPlaySource.fromId(parentId)
+            val playlist = smartPlaylistManager.findByUuidBlocking(parentId)
+            if (playlist != null) {
+                smartPlaylistManager.findEpisodesBlocking(playlist, episodeManager, playbackManager) to playlist.uuid
             } else {
-                autoPlaySource = AutoPlaySource.fromId(parentId)
-                smartPlaylistManager.findEpisodesBlocking(playlist, episodeManager, playbackManager)
+                null
             }
+        }
+        if (episodesWithSource != null) {
+            val (episodeList, sourceId) = episodesWithSource
             val topEpisodes = episodeList.take(EPISODE_LIMIT)
             if (topEpisodes.isNotEmpty()) {
                 for (episode in topEpisodes) {
                     podcastManager.findPodcastByUuid(episode.podcastUuid)?.let { parentPodcast ->
-                        episodeItems.add(AutoConverter.convertEpisodeToMediaItem(this, episode, parentPodcast, sourceId = playlist.uuid, useEpisodeArtwork = settings.artworkConfiguration.value.useEpisodeArtwork))
+                        episodeItems.add(AutoConverter.convertEpisodeToMediaItem(this, episode, parentPodcast, sourceId = sourceId, useEpisodeArtwork = settings.artworkConfiguration.value.useEpisodeArtwork))
                     }
                 }
             }
         } else {
-            autoPlaySource = AutoPlaySource.fromId(parentId)
             val podcastFound = podcastManager.findPodcastByUuid(parentId) ?: podcastManager.findOrDownloadPodcastRxSingle(parentId).toMaybe().onErrorComplete().awaitSingleOrNull()
             podcastFound?.let { podcast ->
-
                 val showPlayed = settings.autoShowPlayed.value
                 val episodes = episodeManager
                     .findEpisodesByPodcastOrderedBlocking(podcast)
