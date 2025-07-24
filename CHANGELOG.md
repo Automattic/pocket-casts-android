@@ -3,6 +3,8 @@
 *   Bug Fixes
     *   Fix missing file sizes on the episode page
         ([#4262](https://github.com/Automattic/pocket-casts-android/pull/4262))
+*   Updates
+    *   Open podcast search when Discover button is double-tapped
 
 7.94
 -----
