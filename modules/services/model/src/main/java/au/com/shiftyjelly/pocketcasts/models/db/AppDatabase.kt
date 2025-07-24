@@ -103,7 +103,7 @@ import au.com.shiftyjelly.pocketcasts.localization.R as LR
         UserNotifications::class,
         UserCategoryVisits::class,
     ],
-    version = 117,
+    version = 118,
     exportSchema = true,
     autoMigrations = [
         AutoMigration(from = 81, to = 82, spec = AppDatabase.Companion.DeleteSilenceRemovedMigration::class),
@@ -1060,6 +1060,115 @@ abstract class AppDatabase : RoomDatabase() {
             }
         }
 
+        val MIGRATION_117_118 = addMigration(117, 118) { database ->
+            with(database) {
+                beginTransaction()
+                try {
+                    execSQL(
+                        """
+                        |CREATE TABLE smart_playlists_temp (
+                        |  uuid TEXT NOT NULL PRIMARY KEY,
+                        |  title TEXT NOT NULL,
+                        |  iconId INTEGER NOT NULL,
+                        |  sortPosition INTEGER,
+                        |  sortId INTEGER NOT NULL,
+                        |  manual INTEGER NOT NULL,
+                        |  draft INTEGER NOT NULL,
+                        |  deleted INTEGER NOT NULL,
+                        |  syncStatus INTEGER NOT NULL,
+                        |  autoDownload INTEGER NOT NULL,
+                        |  autoDownloadWifiOnly INTEGER NOT NULL,
+                        |  autoDownloadPowerOnly INTEGER NOT NULL,
+                        |  autoDownloadLimit INTEGER NOT NULL,
+                        |  unplayed INTEGER NOT NULL,
+                        |  partiallyPlayed INTEGER NOT NULL,
+                        |  finished INTEGER NOT NULL,
+                        |  downloaded INTEGER NOT NULL,
+                        |  notDownloaded INTEGER NOT NULL,
+                        |  audioVideo INTEGER NOT NULL,
+                        |  filterHours INTEGER NOT NULL,
+                        |  starred INTEGER NOT NULL,
+                        |  allPodcasts INTEGER NOT NULL,
+                        |  podcastUuids TEXT,
+                        |  filterDuration INTEGER NOT NULL,
+                        |  longerThan INTEGER NOT NULL,
+                        |  shorterThan INTEGER NOT NULL
+                        |)
+                        """.trimMargin(),
+                    )
+                    execSQL(
+                        """
+                        |INSERT INTO smart_playlists_temp (
+                        |  uuid,
+                        |  title,
+                        |  iconId,
+                        |  sortPosition,
+                        |  sortId,
+                        |  manual,
+                        |  draft,
+                        |  deleted,
+                        |  syncStatus,
+                        |  autoDownload,
+                        |  autoDownloadWifiOnly,
+                        |  autoDownloadPowerOnly,
+                        |  autoDownloadLimit,
+                        |  unplayed,
+                        |  partiallyPlayed,
+                        |  finished,
+                        |  downloaded,
+                        |  notDownloaded,
+                        |  audioVideo,
+                        |  filterHours,
+                        |  starred,
+                        |  allPodcasts,
+                        |  podcastUuids,
+                        |  filterDuration,
+                        |  longerThan,
+                        |  shorterThan
+                        |)
+                        |SELECT
+                        |  uuid,
+                        |  title,
+                        |  iconId,
+                        |  sortPosition,
+                        |  sortId,
+                        |  manual,
+                        |  draft,
+                        |  deleted,
+                        |  syncStatus,
+                        |  autoDownload,
+                        |  autoDownloadWifiOnly,
+                        |  autoDownloadPowerOnly,
+                        |  autoDownloadLimit,
+                        |  unplayed,
+                        |  partiallyPlayed,
+                        |  finished,
+                        |  downloaded,
+                        |  notDownloaded,
+                        |  audioVideo,
+                        |  filterHours,
+                        |  starred,
+                        |  allPodcasts,
+                        |  podcastUuids,
+                        |  filterDuration,
+                        |  longerThan,
+                        |  shorterThan
+                        |FROM
+                        |  smart_playlists
+                        |GROUP BY
+                        |  uuid
+                        |
+                        """.trimMargin(),
+                    )
+                    execSQL("DROP TABLE smart_playlists")
+                    execSQL("ALTER TABLE smart_playlists_temp RENAME TO smart_playlists")
+                    setTransactionSuccessful()
+                } finally {
+                    endTransaction()
+                }
+            }
+        }
+
         fun addMigrations(databaseBuilder: Builder<AppDatabase>, context: Context) {
             databaseBuilder.addMigrations(
                 addMigration(1, 2) { },
@@ -1467,6 +1576,7 @@ abstract class AppDatabase : RoomDatabase() {
                 MIGRATION_114_115,
                 MIGRATION_115_116,
                 MIGRATION_116_117,
+                MIGRATION_117_118,
             )
         }
 

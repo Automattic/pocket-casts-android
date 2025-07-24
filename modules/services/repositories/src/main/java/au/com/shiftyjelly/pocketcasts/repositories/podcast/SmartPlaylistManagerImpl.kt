@@ -63,52 +63,38 @@ class SmartPlaylistManagerImpl @Inject constructor(
         get() = Dispatchers.Default
 
     private fun setupDefaultPlaylists() {
-        val existingNewRelease = playlistDao.findByUuidBlocking(NEW_RELEASE_UUID)
-        if (existingNewRelease == null) {
-            val newRelease = SmartPlaylist()
-            newRelease.apply {
-                unplayed = true
-                partiallyPlayed = true
-                audioVideo = SmartPlaylist.AUDIO_VIDEO_FILTER_ALL
-                allPodcasts = true
-                sortPosition = 0
-                title = NEW_RELEASE_TITLE
-                downloaded = true
-                notDownloaded = true
-                filterHours = SmartPlaylist.LAST_2_WEEKS
-                uuid = NEW_RELEASE_UUID
-                syncStatus = SmartPlaylist.SYNC_STATUS_SYNCED
-                iconId = SmartPlaylist.calculateCombinedIconId(colorIndex = 0, iconIndex = 2) // Red clock
-            }
-            playlistDao.insertBlocking(newRelease)
-        } else {
-            existingNewRelease.iconId = 10
-            playlistDao.updateBlocking(existingNewRelease)
+        val newRelease = SmartPlaylist().apply {
+            unplayed = true
+            partiallyPlayed = true
+            audioVideo = SmartPlaylist.AUDIO_VIDEO_FILTER_ALL
+            allPodcasts = true
+            sortPosition = 0
+            title = NEW_RELEASE_TITLE
+            downloaded = true
+            notDownloaded = true
+            filterHours = SmartPlaylist.LAST_2_WEEKS
+            uuid = NEW_RELEASE_UUID
+            syncStatus = SmartPlaylist.SYNC_STATUS_SYNCED
+            iconId = SmartPlaylist.calculateCombinedIconId(colorIndex = 0, iconIndex = 2) // Red clock
         }
+        playlistDao.upsertBlocking(newRelease)
 
-        val existingInProgress = playlistDao.findByUuidBlocking(IN_PROGRESS_UUID)
-        if (existingInProgress == null) {
-            val inProgress = SmartPlaylist()
-            inProgress.apply {
-                allPodcasts = true
-                audioVideo = SmartPlaylist.AUDIO_VIDEO_FILTER_ALL
-                sortPosition = 2
-                title = IN_PROGRESS_TITLE
-                downloaded = true
-                notDownloaded = true
-                unplayed = false
-                partiallyPlayed = true
-                finished = false
-                filterHours = SmartPlaylist.LAST_MONTH
-                uuid = IN_PROGRESS_UUID
-                syncStatus = SmartPlaylist.SYNC_STATUS_SYNCED
-                iconId = SmartPlaylist.calculateCombinedIconId(colorIndex = 3, iconIndex = 4) // Purple play
-            }
-            playlistDao.insertBlocking(inProgress)
-        } else {
-            existingInProgress.iconId = 43
-            playlistDao.updateBlocking(existingInProgress)
+        val inProgress = SmartPlaylist().apply {
+            allPodcasts = true
+            audioVideo = SmartPlaylist.AUDIO_VIDEO_FILTER_ALL
+            sortPosition = 2
+            title = IN_PROGRESS_TITLE
+            downloaded = true
+            notDownloaded = true
+            unplayed = false
+            partiallyPlayed = true
+            finished = false
+            filterHours = SmartPlaylist.LAST_MONTH
+            uuid = IN_PROGRESS_UUID
+            syncStatus = SmartPlaylist.SYNC_STATUS_SYNCED
+            iconId = SmartPlaylist.calculateCombinedIconId(colorIndex = 3, iconIndex = 4) // Purple play
         }
+        playlistDao.upsertBlocking(inProgress)
 
         settings.setBooleanForKey(CREATED_DEFAULT_PLAYLISTS, true)
     }
@@ -147,10 +133,6 @@ class SmartPlaylistManagerImpl @Inject constructor(
 
     override fun findByUuidAsListRxFlowable(playlistUuid: String): Flowable<List<SmartPlaylist>> {
         return playlistDao.findByUuidAsListRxFlowable(playlistUuid)
-    }
-
-    override fun findByIdBlocking(id: Long): SmartPlaylist? {
-        return playlistDao.findByIdBlocking(id)
     }
 
     override fun findEpisodesBlocking(smartPlaylist: SmartPlaylist, episodeManager: EpisodeManager, playbackManager: PlaybackManager): List<PodcastEpisode> {
@@ -194,8 +176,8 @@ class SmartPlaylistManagerImpl @Inject constructor(
         }
     }
 
-    override suspend fun create(smartPlaylist: SmartPlaylist): Long {
-        val id = playlistDao.insert(smartPlaylist)
+    override suspend fun upsert(smartPlaylist: SmartPlaylist) {
+        playlistDao.upsert(smartPlaylist)
         if (countPlaylists() == 1 && Build.VERSION.SDK_INT >= Build.VERSION_CODES.N_MR1) {
             PocketCastsShortcuts.update(
                 smartPlaylistManager = this,
@@ -204,7 +186,6 @@ class SmartPlaylistManagerImpl @Inject constructor(
                 source = PocketCastsShortcuts.Source.CREATE_PLAYLIST,
             )
         }
-        return id
     }
 
     /**
@@ -264,7 +245,7 @@ class SmartPlaylistManagerImpl @Inject constructor(
         )
 
         Timber.d("Creating playlist ${smartPlaylist.uuid}")
-        smartPlaylist.id = playlistDao.insertBlocking(smartPlaylist)
+        playlistDao.upsertBlocking(smartPlaylist)
         return smartPlaylist
     }
 
@@ -306,11 +287,8 @@ class SmartPlaylistManagerImpl @Inject constructor(
         return episodeManager.episodeCountRxFlowable(query)
     }
 
-    override fun countEpisodesBlocking(id: Long?, episodeManager: EpisodeManager, playbackManager: PlaybackManager): Int {
-        if (id == null) {
-            return 0
-        }
-        val playlist = findByIdBlocking(id) ?: return 0
+    override fun countEpisodesBlocking(playlistUuid: String, episodeManager: EpisodeManager, playbackManager: PlaybackManager): Int {
+        val playlist = findByUuidBlocking(playlistUuid) ?: return 0
         val where = buildPlaylistWhere(playlist, playbackManager)
         return episodeManager.countEpisodesWhereBlocking(where)
     }

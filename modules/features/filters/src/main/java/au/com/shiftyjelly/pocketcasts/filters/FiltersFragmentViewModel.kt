@@ -129,7 +129,7 @@ class FiltersFragmentViewModel @Inject constructor(
 
         withContext(Dispatchers.IO) {
             val showTooltip = filters.all { playlist ->
-                val episodeCount = smartPlaylistManager.countEpisodesBlocking(playlist.id, episodeManager, playbackManager)
+                val episodeCount = smartPlaylistManager.countEpisodesBlocking(playlist.uuid, episodeManager, playbackManager)
                 episodeCount == 0
             }
             if (showTooltip) {

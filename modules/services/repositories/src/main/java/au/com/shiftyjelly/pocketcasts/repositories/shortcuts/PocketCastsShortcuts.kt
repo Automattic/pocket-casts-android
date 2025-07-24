@@ -42,7 +42,7 @@ object PocketCastsShortcuts {
         LogBuffer.i(PocketCastsShortcuts::class.java.simpleName, "Shortcut update from ${source.value}, top filter title: ${topPlaylist.title}")
 
         if (shortcutManager.dynamicShortcuts.isEmpty() || force) {
-            val filterId = topPlaylist.id ?: return
+            val filterId = topPlaylist.uuid ?: return
             val filterIntent = ShowFilterDeepLink(filterId).toIntent(context)
 
             val playlistTitle = topPlaylist.title.ifEmpty { "Top filter" }

@@ -1418,7 +1418,7 @@ class MainActivity :
                 }
                 is ShowFilterDeepLink -> {
                     launch(Dispatchers.Default) {
-                        smartPlaylistManager.findByIdBlocking(deepLink.filterId)?.let {
+                        smartPlaylistManager.findByUuidBlocking(deepLink.filterUuid)?.let {
                             withContext(Dispatchers.Main) {
                                 settings.setSelectedFilter(it.uuid)
                                 // HACK: Go diving to find if a filter fragment

@@ -168,12 +168,12 @@ data object ShowUpNextModalDeepLink : ShowPageDeepLink {
 }
 
 data class ShowFilterDeepLink(
-    val filterId: Long,
+    val filterUuid: String,
 ) : ShowPageDeepLink {
     override val pageId = "playlist"
 
     override fun toIntent(context: Context) = super.toIntent(context)
-        .putExtra(EXTRA_FILTER_ID, filterId)
+        .putExtra(EXTRA_FILTER_ID, filterUuid)
 }
 
 data object ShowFiltersDeepLink : IntentableDeepLink {

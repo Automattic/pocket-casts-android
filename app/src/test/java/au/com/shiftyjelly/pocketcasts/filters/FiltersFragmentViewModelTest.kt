@@ -28,8 +28,8 @@ class FiltersFragmentViewModelTest {
     val coroutineRule = MainCoroutineRule()
 
     private val defaultFilters = listOf(
-        SmartPlaylist(id = 1, uuid = NEW_RELEASE_UUID),
-        SmartPlaylist(id = 2, uuid = IN_PROGRESS_UUID),
+        SmartPlaylist(uuid = NEW_RELEASE_UUID),
+        SmartPlaylist(uuid = IN_PROGRESS_UUID),
     )
 
     @Before
@@ -60,7 +60,7 @@ class FiltersFragmentViewModelTest {
     @Test
     fun `should not show tooltip if created custom filter`() = runTest {
         var showTooltip = false
-        viewModel.shouldShowTooltip(defaultFilters + listOf(SmartPlaylist(id = 3, uuid = "custom"))) {
+        viewModel.shouldShowTooltip(defaultFilters + listOf(SmartPlaylist(uuid = "custom"))) {
             showTooltip = true
         }
 
@@ -99,7 +99,7 @@ class FiltersFragmentViewModelTest {
         whenever(smartPlaylistManager.findAllRxFlowable()).thenReturn(mock())
 
         if (shouldMockEpisodeForFirstFilter) {
-            whenever(smartPlaylistManager.countEpisodesBlocking(1, episodeManager, playbackManager)).thenReturn(5)
+            whenever(smartPlaylistManager.countEpisodesBlocking(NEW_RELEASE_UUID, episodeManager, playbackManager)).thenReturn(5)
         }
 
         return FiltersFragmentViewModel(smartPlaylistManager, mock(), settings, episodeManager, playbackManager, userManager)

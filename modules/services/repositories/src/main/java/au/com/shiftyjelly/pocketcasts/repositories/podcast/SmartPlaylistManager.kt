@@ -14,7 +14,6 @@ interface SmartPlaylistManager {
     fun findAllFlow(): Flow<List<SmartPlaylist>>
     fun findAllRxFlowable(): Flowable<List<SmartPlaylist>>
 
-    fun findByIdBlocking(id: Long): SmartPlaylist?
     suspend fun findByUuid(playlistUuid: String): SmartPlaylist?
     fun findByUuidBlocking(playlistUuid: String): SmartPlaylist?
     fun findByUuidRxMaybe(playlistUuid: String): Maybe<SmartPlaylist>
@@ -28,7 +27,7 @@ interface SmartPlaylistManager {
 
     fun createPlaylistBlocking(name: String, iconId: Int, draft: Boolean): SmartPlaylist
 
-    suspend fun create(smartPlaylist: SmartPlaylist): Long
+    suspend fun upsert(smartPlaylist: SmartPlaylist)
     suspend fun update(smartPlaylist: SmartPlaylist, userPlaylistUpdate: UserPlaylistUpdate?, isCreatingFilter: Boolean = false)
     fun updateBlocking(smartPlaylist: SmartPlaylist, userPlaylistUpdate: UserPlaylistUpdate?, isCreatingFilter: Boolean = false)
 
@@ -41,7 +40,7 @@ interface SmartPlaylistManager {
     suspend fun deleteSynced(smartPlaylist: SmartPlaylist)
     fun deleteSyncedBlocking(smartPlaylist: SmartPlaylist)
 
-    fun countEpisodesBlocking(id: Long?, episodeManager: EpisodeManager, playbackManager: PlaybackManager): Int
+    fun countEpisodesBlocking(playlistUuid: String, episodeManager: EpisodeManager, playbackManager: PlaybackManager): Int
     fun countEpisodesRxFlowable(smartPlaylist: SmartPlaylist, episodeManager: EpisodeManager, playbackManager: PlaybackManager): Flowable<Int>
 
     fun checkForEpisodesToDownloadBlocking(episodeManager: EpisodeManager, playbackManager: PlaybackManager)

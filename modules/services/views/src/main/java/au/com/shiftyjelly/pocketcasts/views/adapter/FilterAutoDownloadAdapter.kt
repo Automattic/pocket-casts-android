@@ -6,11 +6,13 @@ import android.view.ViewGroup
 import android.widget.CheckBox
 import android.widget.ImageView
 import android.widget.TextView
+import androidx.recyclerview.widget.RecyclerView
 import au.com.shiftyjelly.pocketcasts.models.entity.SmartPlaylist
 import au.com.shiftyjelly.pocketcasts.views.R
 import au.com.shiftyjelly.pocketcasts.views.helper.PlaylistHelper
+import java.util.UUID
 
-class FilterAutoDownloadAdapter(private val filters: List<SmartPlaylist>, private val clickListener: ClickListener, val isDarkTheme: Boolean) : androidx.recyclerview.widget.RecyclerView.Adapter<FilterAutoDownloadAdapter.ViewHolder>() {
+class FilterAutoDownloadAdapter(private val filters: List<SmartPlaylist>, private val clickListener: ClickListener, val isDarkTheme: Boolean) : RecyclerView.Adapter<FilterAutoDownloadAdapter.ViewHolder>() {
 
     init {
         setHasStableIds(true)
@@ -37,7 +39,9 @@ class FilterAutoDownloadAdapter(private val filters: List<SmartPlaylist>, privat
     }
 
     override fun getItemId(position: Int): Long {
-        return filters[position].id ?: androidx.recyclerview.widget.RecyclerView.NO_ID
+        return runCatching { UUID.fromString(filters[position].uuid) }
+            .map { it.leastSignificantBits }
+            .getOrElse { RecyclerView.NO_ID }
     }
 
     private fun addTalkBack(filter: SmartPlaylist, view: View) {
@@ -51,7 +55,7 @@ class FilterAutoDownloadAdapter(private val filters: List<SmartPlaylist>, privat
     }
 
     inner class ViewHolder(view: View) :
-        androidx.recyclerview.widget.RecyclerView.ViewHolder(view),
+        RecyclerView.ViewHolder(view),
         View.OnClickListener {
         val title = view.findViewById(R.id.title) as TextView
         val image = view.findViewById(R.id.image) as ImageView

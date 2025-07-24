@@ -192,7 +192,7 @@ private class ShowPageAdapter : DeepLinkAdapter {
             "podcasts" -> ShowPodcastsDeepLink
             "search" -> ShowDiscoverDeepLink
             "upnext" -> ShowUpNextModalDeepLink
-            "playlist" -> ShowFilterDeepLink(filterId = intent.getLongExtra(EXTRA_FILTER_ID, -1))
+            "playlist" -> ShowFilterDeepLink(filterUuid = intent.getStringExtra(EXTRA_FILTER_ID).orEmpty())
             else -> null
         }
     } else {

@@ -879,7 +879,7 @@ class MediaSessionManager(
 
                 Timber.i("Playing matched playlist '$option'")
 
-                val episodeCount = smartPlaylistManager.countEpisodesBlocking(playlist.id, episodeManager, playbackManager)
+                val episodeCount = smartPlaylistManager.countEpisodesBlocking(playlist.uuid, episodeManager, playbackManager)
                 if (episodeCount == 0) return@launch
 
                 val episodesToPlay = smartPlaylistManager.findEpisodesBlocking(playlist, episodeManager, playbackManager).take(5)
