@@ -73,7 +73,7 @@ internal fun AccountDetailsPage(
     onShowTermsOfUse: () -> Unit,
     onSignOut: () -> Unit,
     onDeleteAccount: () -> Unit,
-    onUpgradeClick: (SubscriptionPlan.Key) -> Unit,
+    onAccountUpgradeClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val headerConfig = remember(state.isAutomotive) {
@@ -177,7 +177,7 @@ internal fun AccountDetailsPage(
                         item {
                             Box(modifier = Modifier.padding(horizontal = 24.dp)) {
                                 NewUpgradeAccountCard(
-                                    onClickSubscribe = { onUpgradeClick(bannerState.recommendedSubscription.key) },
+                                    onClickSubscribe = onAccountUpgradeClick,
                                     recommendedPlan = bannerState.recommendedSubscription,
                                 )
                             }
@@ -358,6 +358,6 @@ private fun AccountDetailsPageStub(
         onShowTermsOfUse = {},
         onSignOut = {},
         onDeleteAccount = {},
-        onUpgradeClick = {},
+        onAccountUpgradeClick = {},
     )
 }

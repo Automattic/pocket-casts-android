@@ -134,7 +134,7 @@ class AccountDetailsViewModel @Inject constructor(
             email = signedInState?.email,
             winbackInitParams = computeWinbackParams(signInState),
             canChangeCredentials = !syncManager.isGoogleLogin(),
-            canUpgradeAccount = signedInState?.isSignedInAsPlus == true && isGiftExpiring,
+            canUpgradeAccount = signedInState?.isSignedInAsPlus == true && (isGiftExpiring || FeatureFlag.isEnabled(Feature.NEW_ONBOARDING_UPGRADE)),
             canCancelSubscription = signedInState?.isSignedInAsPaid == true,
         )
     }.stateIn(
