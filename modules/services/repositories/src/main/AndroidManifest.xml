@@ -11,6 +11,16 @@
             android:authorities="${applicationId}.media.library.provider"
             android:exported="true" />
 
+        <provider
+            android:name="androidx.startup.InitializationProvider"
+            android:authorities="${applicationId}.androidx-startup"
+            android:exported="false"
+            tools:node="merge">
+            <meta-data
+                android:name="au.com.shiftyjelly.pocketcasts.repositories.playlist.DefaultPlaylistsStartupInitializater"
+                android:value="androidx.startup" />
+        </provider>
+
         <!-- Workers -->
         <service
             android:name="androidx.work.impl.foreground.SystemForegroundService"
