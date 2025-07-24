@@ -2454,7 +2454,7 @@
         <item quantity="other">You have %d new episodes downloaded and ready to go!</item>
     </plurals>
     <string name="notification_content_recommendations_trending_title">Trending this week</string>
-    <string name="notification_content_recommendations_trending_message">Check out what everyone else is listening this week.</string>
+    <string name="notification_content_recommendations_trending_message">Check out what everyone else is listening to this week.</string>
     <string name="notification_content_recommendations_title">New recommendations for you</string>
     <string name="notification_content_recommendations_message">Wondering what to listen to next? Check out these shows!</string>
     <string name="notifications_settings_turn_on_push_title">Turn on push notifications?</string>
