@@ -510,6 +510,18 @@ class MainActivity :
         navigator.resetRootFragmentCommand()
             .subscribe({ fragment ->
                 (fragment as? TopScrollable)?.scrollToTop()
+
+                // Open search UI when Discover button is double-tapped
+                val discoverId = VR.id.navigation_discover
+                val currentFragmentIsDiscover = navigator.currentTab() == discoverId
+                if (currentFragmentIsDiscover) {
+                    val searchFragment = SearchFragment.newInstance(
+                        floating = true,
+                        onlySearchRemote = true,
+                        source = SourceView.DISCOVER,
+                    )
+                    addFragment(searchFragment, onTop = true)
+                }
             })
             .addTo(disposables)
 
