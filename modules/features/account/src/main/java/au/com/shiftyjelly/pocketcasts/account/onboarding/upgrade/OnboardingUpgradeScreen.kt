@@ -268,12 +268,14 @@ private fun OnboardingUpgradeFeaturesState.NewOnboardingVariant.toContentPages(
         }
 
         OnboardingUpgradeFeaturesState.NewOnboardingVariant.TRIAL_FIRST_WHEN_ELIGIBLE -> {
-            add(
-                UpgradePagerContent.TrialSchedule(
-                    timelineItems = plan.trialSchedule(),
-                    showCta = true,
-                ),
-            )
+            if (isEligibleForTrial) {
+                add(
+                    UpgradePagerContent.TrialSchedule(
+                        timelineItems = plan.trialSchedule(),
+                        showCta = true,
+                    ),
+                )
+            }
             add(
                 UpgradePagerContent.Features(
                     features = currentPlan.featureItems,
