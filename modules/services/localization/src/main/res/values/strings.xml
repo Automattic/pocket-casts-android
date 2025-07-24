@@ -907,6 +907,9 @@
     <string name="playlists_onboarding_playlist_title">Introducing Playlists</string>
     <string name="playlists_onboarding_playlist_description">Want more control? Manual Playlists let you build custom queues, great for trips, themes, or just your current vibe. Whether Smart or Manual, playlists work the way you do.</string>
     <string name="smart_playlist">Smart Playlist</string>
+    <string name="playlists_empty_state_title">Organize episodes your way</string>
+    <string name="playlists_empty_state_body">Playlists let you organize episodes manually or automatically with Smart Rules.</string>
+    <string name="new_playlist">New Playlist</string>
 
     <!-- Profile -->
 
