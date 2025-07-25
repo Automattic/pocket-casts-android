@@ -729,7 +729,7 @@ class PlaylistManagerTest {
                 id = 1,
                 uuid = Playlist.IN_PROGRESS_UUID,
                 title = "In Progress",
-                iconId = 43,
+                iconId = 23,
                 sortPosition = 1,
                 sortType = PlaylistEpisodeSortType.NewestToOldest,
                 manual = false,
