@@ -6,6 +6,9 @@ import androidx.lifecycle.viewModelScope
 import au.com.shiftyjelly.pocketcasts.account.onboarding.upgrade.OnboardingSubscriptionPlan
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
+import au.com.shiftyjelly.pocketcasts.analytics.experiments.Experiment
+import au.com.shiftyjelly.pocketcasts.analytics.experiments.ExperimentProvider
+import au.com.shiftyjelly.pocketcasts.analytics.experiments.Variation
 import au.com.shiftyjelly.pocketcasts.payment.BillingCycle
 import au.com.shiftyjelly.pocketcasts.payment.PaymentClient
 import au.com.shiftyjelly.pocketcasts.payment.PurchaseResult
@@ -35,6 +38,7 @@ class OnboardingUpgradeFeaturesViewModel @AssistedInject constructor(
     private val paymentClient: PaymentClient,
     private val analyticsTracker: AnalyticsTracker,
     private val notificationManager: NotificationManager,
+    private val experimentProvider: ExperimentProvider,
     @Assisted private val flow: OnboardingFlow,
 ) : ViewModel() {
     private val _state = MutableStateFlow<OnboardingUpgradeFeaturesState>(OnboardingUpgradeFeaturesState.Loading)
@@ -46,6 +50,7 @@ class OnboardingUpgradeFeaturesViewModel @AssistedInject constructor(
 
     private fun createInitialLoadedState(
         subscriptionPlans: SubscriptionPlans,
+        variant: OnboardingUpgradeFeaturesState.NewOnboardingVariant,
     ): OnboardingUpgradeFeaturesState.Loaded {
         val plansFilter =
             if (flow is OnboardingFlow.PatronAccountUpgrade) {
@@ -61,6 +66,7 @@ class OnboardingUpgradeFeaturesViewModel @AssistedInject constructor(
             selectedTier = if (plansFilter == OnboardingUpgradeFeaturesState.LoadedPlansFilter.PATRON_ONLY) SubscriptionTier.Patron else flow.preselectedTier,
             plansFilter = plansFilter,
             purchaseFailed = false,
+            onboardingVariant = variant,
         )
     }
 
@@ -75,9 +81,18 @@ class OnboardingUpgradeFeaturesViewModel @AssistedInject constructor(
             if (subscriptionPlans == null) {
                 _state.value = OnboardingUpgradeFeaturesState.NoSubscriptions
             } else {
-                _state.value = createInitialLoadedState(subscriptionPlans)
+                val variant = experimentProvider.getVariation(Experiment.NewOnboardingABTest).toNewOnboardingVariant()
+                _state.value = createInitialLoadedState(
+                    subscriptionPlans = subscriptionPlans,
+                    variant = variant,
+                )
             }
         }
+    }
+
+    private fun Variation?.toNewOnboardingVariant() = when (this) {
+        is Variation.Treatment -> OnboardingUpgradeFeaturesState.NewOnboardingVariant.TRIAL_FIRST_WHEN_ELIGIBLE
+        else -> OnboardingUpgradeFeaturesState.NewOnboardingVariant.FEATURES_FIRST
     }
 
     fun changeBillingCycle(billingCycle: BillingCycle) {
@@ -185,12 +200,18 @@ sealed class OnboardingUpgradeFeaturesState {
         BOTH,
     }
 
+    enum class NewOnboardingVariant {
+        FEATURES_FIRST,
+        TRIAL_FIRST_WHEN_ELIGIBLE,
+    }
+
     data class Loaded(
         val subscriptionPlans: SubscriptionPlans,
         val selectedTier: SubscriptionTier,
         val selectedBillingCycle: BillingCycle,
         val plansFilter: LoadedPlansFilter,
         val purchaseFailed: Boolean,
+        val onboardingVariant: NewOnboardingVariant,
     ) : OnboardingUpgradeFeaturesState() {
         val availableBasePlans = listOfNotNull(
             plusYearlyPlanWithOffer().takeUnless { plansFilter == LoadedPlansFilter.PATRON_ONLY },

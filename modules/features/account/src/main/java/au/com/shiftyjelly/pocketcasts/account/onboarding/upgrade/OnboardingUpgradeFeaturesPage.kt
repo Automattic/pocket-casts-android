@@ -136,7 +136,6 @@ internal fun OnboardingUpgradeFeaturesPage(
         is OnboardingUpgradeFeaturesState.Loaded -> {
             if (FeatureFlag.isEnabled(Feature.NEW_ONBOARDING_UPGRADE)) {
                 OnboardingUpgradeScreen(
-                    variant = Variants.VARIANT_FEATURES,
                     onClosePress = onBackPress,
                     state = state,
                     onChangeSelectedPlan = { viewModel.changeBillingCycle(it.billingCycle) },

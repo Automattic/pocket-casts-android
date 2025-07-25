@@ -67,15 +67,9 @@ import java.time.temporal.ChronoUnit
 import kotlinx.coroutines.launch
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
-enum class Variants {
-    VARIANT_FEATURES,
-    VARIANT_TRIAL_TIMELINE,
-}
-
 @Composable
 fun OnboardingUpgradeScreen(
     state: OnboardingUpgradeFeaturesState.Loaded,
-    variant: Variants,
     onClosePress: () -> Unit,
     onSubscribePress: () -> Unit,
     onChangeSelectedPlan: (SubscriptionPlan) -> Unit,
@@ -100,7 +94,7 @@ fun OnboardingUpgradeScreen(
         Spacer(modifier = Modifier.height(24.dp))
         UpgradeContent(
             modifier = Modifier.weight(1f),
-            pages = variant.toContentPages(
+            pages = state.onboardingVariant.toContentPages(
                 currentPlan = state.selectedPlan,
                 isEligibleForTrial = state.selectedBasePlan.offer == SubscriptionOffer.Trial,
                 plan = state.selectedBasePlan,
@@ -216,7 +210,7 @@ private fun UpgradeHeader(
 private fun SubscriptionPlan.trialSchedule(): List<UpgradeTrialItem> {
     val offerPlan = this as? SubscriptionPlan.WithOffer ?: return emptyList()
 
-    val discountedPhase = offerPlan.pricingPhases.find { it.schedule.recurrenceMode is PricingSchedule.RecurrenceMode.Recurring } ?: return emptyList()
+    val discountedPhase = offerPlan.pricingPhases.find { it.schedule.recurrenceMode is RecurrenceMode.Recurring } ?: return emptyList()
 
     val recurringPeriods = (discountedPhase.schedule.recurrenceMode as RecurrenceMode.Recurring).value
     val chronoUnit = when (discountedPhase.schedule.period) {
@@ -250,13 +244,13 @@ private fun SubscriptionPlan.trialSchedule(): List<UpgradeTrialItem> {
 }
 
 @Composable
-private fun Variants.toContentPages(
+private fun OnboardingUpgradeFeaturesState.NewOnboardingVariant.toContentPages(
     currentPlan: OnboardingSubscriptionPlan,
     isEligibleForTrial: Boolean,
     plan: SubscriptionPlan,
 ) = buildList {
     when (this@toContentPages) {
-        Variants.VARIANT_FEATURES -> {
+        OnboardingUpgradeFeaturesState.NewOnboardingVariant.FEATURES_FIRST -> {
             add(
                 UpgradePagerContent.Features(
                     features = currentPlan.featureItems,
@@ -273,13 +267,15 @@ private fun Variants.toContentPages(
             }
         }
 
-        Variants.VARIANT_TRIAL_TIMELINE -> {
-            add(
-                UpgradePagerContent.TrialSchedule(
-                    timelineItems = plan.trialSchedule(),
-                    showCta = true,
-                ),
-            )
+        OnboardingUpgradeFeaturesState.NewOnboardingVariant.TRIAL_FIRST_WHEN_ELIGIBLE -> {
+            if (isEligibleForTrial) {
+                add(
+                    UpgradePagerContent.TrialSchedule(
+                        timelineItems = plan.trialSchedule(),
+                        showCta = true,
+                    ),
+                )
+            }
             add(
                 UpgradePagerContent.Features(
                     features = currentPlan.featureItems,
@@ -391,11 +387,11 @@ private fun PreviewOnboardingUpgradeScreen(
                     SubscriptionTier.Patron -> OnboardingUpgradeFeaturesState.LoadedPlansFilter.PATRON_ONLY
                 },
                 purchaseFailed = false,
+                onboardingVariant = OnboardingUpgradeFeaturesState.NewOnboardingVariant.FEATURES_FIRST,
             ),
             modifier = Modifier.fillMaxSize(),
             onSubscribePress = {},
             onClosePress = {},
-            variant = Variants.VARIANT_FEATURES,
             onClickPrivacyPolicy = {},
             onClickTermsAndConditions = {},
             onChangeSelectedPlan = {},
