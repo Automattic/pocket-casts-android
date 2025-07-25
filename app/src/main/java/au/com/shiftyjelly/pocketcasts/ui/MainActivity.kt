@@ -509,7 +509,20 @@ class MainActivity :
 
         navigator.resetRootFragmentCommand()
             .subscribe({ fragment ->
-                (fragment as? TopScrollable)?.scrollToTop()
+                val didScroll = (fragment as? TopScrollable)?.scrollToTop()
+
+                // Open search UI when tapping the Discover navigation button
+                // while at the top of the Discover page already
+                val discoverId = VR.id.navigation_discover
+                val currentFragmentIsDiscover = navigator.currentTab() == discoverId
+                if (currentFragmentIsDiscover && didScroll == false) {
+                    val searchFragment = SearchFragment.newInstance(
+                        floating = true,
+                        onlySearchRemote = true,
+                        source = SourceView.DISCOVER,
+                    )
+                    addFragment(searchFragment, onTop = true)
+                }
             })
             .addTo(disposables)
 
