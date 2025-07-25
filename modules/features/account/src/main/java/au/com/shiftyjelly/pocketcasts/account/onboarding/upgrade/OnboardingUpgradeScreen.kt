@@ -2,6 +2,11 @@ package au.com.shiftyjelly.pocketcasts.account.onboarding.upgrade
 
 import UpgradeTrialItem
 import UpgradeTrialTimeline
+import androidx.compose.animation.core.Animatable
+import androidx.compose.animation.core.LinearEasing
+import androidx.compose.animation.core.animateFloat
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.core.updateTransition
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -29,10 +34,19 @@ import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
 import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -40,6 +54,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.tooling.preview.PreviewParameterProvider
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import au.com.shiftyjelly.pocketcasts.account.onboarding.components.UpgradeFeatureItem
 import au.com.shiftyjelly.pocketcasts.account.onboarding.components.UpgradePlanRow
@@ -49,6 +64,7 @@ import au.com.shiftyjelly.pocketcasts.account.viewmodel.OnboardingUpgradeFeature
 import au.com.shiftyjelly.pocketcasts.compose.AppThemeWithBackground
 import au.com.shiftyjelly.pocketcasts.compose.components.FadedLazyColumn
 import au.com.shiftyjelly.pocketcasts.compose.components.TextH10
+import au.com.shiftyjelly.pocketcasts.compose.components.TextP30
 import au.com.shiftyjelly.pocketcasts.compose.components.TextP40
 import au.com.shiftyjelly.pocketcasts.compose.images.SubscriptionBadge
 import au.com.shiftyjelly.pocketcasts.compose.theme
@@ -66,6 +82,8 @@ import java.time.ZonedDateTime
 import java.time.format.DateTimeFormatter
 import java.time.format.FormatStyle
 import java.time.temporal.ChronoUnit
+import kotlin.random.Random
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
@@ -261,13 +279,13 @@ private fun OnboardingUpgradeFeaturesState.NewOnboardingVariant.toContentPages(
         OnboardingUpgradeSource.SUGGESTED_FOLDERS,
         OnboardingUpgradeSource.FOLDERS,
             -> {
-                add(UpgradePagerContent.Folders)
-                add(
-                    UpgradePagerContent.Features(
-                        features = currentPlan.featureItems,
-                        showCta = false,
-                    ),
-                )
+            add(UpgradePagerContent.Folders)
+            add(
+                UpgradePagerContent.Features(
+                    features = currentPlan.featureItems,
+                    showCta = false,
+                ),
+            )
         }
 
         else -> {
@@ -413,9 +431,161 @@ private fun FoldersUpgradeContent(
             color = MaterialTheme.theme.colors.primaryInteractive01,
         )
 
-        Box(modifier = Modifier
-            .size(219.dp)
-            .background(color = MaterialTheme.theme.colors.primaryIcon01, shape = RoundedCornerShape(16.dp)))
+        PodcastTileAnimation(
+            modifier = Modifier.fillMaxWidth(),
+            folders = previewFolders,
+            tiles = previewTiles,
+        )
+    }
+}
+
+enum class FolderPosition {
+    LEFT,
+    CENTER,
+    RIGHT,
+}
+
+private data class FolderConfig(
+    val position: FolderPosition,
+    val folderName: String,
+    val color: Color,
+)
+
+private val previewFolders = listOf(
+    FolderConfig(
+        folderName = "Books",
+        position = FolderPosition.LEFT,
+        color = Color.Cyan,
+    ),
+    FolderConfig(
+        folderName = "Favorites",
+        position = FolderPosition.CENTER,
+        color = Color.Blue,
+    ),
+    FolderConfig(
+        folderName = "Sports",
+        position = FolderPosition.RIGHT,
+        color = Color.Yellow,
+    ),
+)
+
+private val previewTiles = (1..8).map {
+    TileConfig(
+        index = it, color = Color(
+            red = Random.nextFloat(),
+            green = Random.nextFloat(),
+            blue = Random.nextFloat(),
+            alpha = 1f,
+        ), anchor = when (it) {
+            2 -> Offset(1f, 1f)
+            3 -> Offset(0f, 1f)
+            6 -> Offset(1f, 0f)
+            7 -> Offset(0f, 0f)
+            else -> Offset(0f, 0f)
+        }
+    )
+}
+private val edgeFadeIndices = listOf(1, 4, 5, 8)
+
+private data class TileConfig(
+    val index: Int,
+    val color: Color,
+    val anchor: Offset,
+)
+
+@Composable
+private fun PodcastTileAnimation(
+    tiles: List<TileConfig>,
+    folders: List<FolderConfig>,
+    modifier: Modifier = Modifier,
+) {
+    var edgeTilesVisible by remember { mutableStateOf(true) }
+    val edgeFadeTransition = updateTransition(edgeTilesVisible, "edge tiles fade")
+    val edgeFade by edgeFadeTransition.animateFloat(
+        transitionSpec = {
+            tween(durationMillis = 400, easing = LinearEasing)
+        }, label = "alphaAnimation"
+    ) { isVisible ->
+        if (isVisible) {
+            1f
+        } else {
+            0f
+        }
+    }
+    val shrinkAnimationsIndexed = remember {
+        mapOf(
+            2 to Animatable(initialValue = 1f),
+            3 to Animatable(initialValue = 1f),
+            6 to Animatable(initialValue = 1f),
+            7 to Animatable(initialValue = 1f),
+        )
+    }
+
+    LaunchedEffect("animations") {
+        edgeTilesVisible = false
+        shrinkAnimationsIndexed.entries.forEachIndexed { index, entry ->
+            entry.value.animateTo(0.8f, animationSpec = tween(durationMillis = 900, easing = LinearEasing, delayMillis = index * 50))
+        }
+    }
+
+    // Wrap tiles in rows of 4
+    Column(
+        modifier = modifier,
+        verticalArrangement = Arrangement.spacedBy(8.dp)
+    ) {
+        tiles.chunked(4).forEach { rowTiles ->
+            Row(
+                horizontalArrangement = Arrangement.spacedBy(8.dp),
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                rowTiles.forEach { tile ->
+                    val density = LocalDensity.current
+                    val boxSizePx = with(density) {
+                        80.dp.roundToPx()
+                    }
+                    Box(
+                        modifier = Modifier
+                            .size(80.dp)
+                            .graphicsLayer {
+                                if (edgeFadeIndices.contains(tile.index)) {
+                                    alpha = edgeFade
+                                }
+                                shrinkAnimationsIndexed[tile.index]?.let { shrink ->
+                                    scaleX = shrink.value
+                                    scaleY = shrink.value
+
+                                    val deltaScale = shrink.value - 1f
+                                    val shiftX = -deltaScale * tile.anchor.x * boxSizePx
+                                    val shiftY = -deltaScale * tile.anchor.y * boxSizePx
+                                    translationX = shiftX
+                                    translationY = shiftY
+                                }
+
+                            }
+                            .clip(RoundedCornerShape(8.dp))
+                            .background(color = tile.color)
+                    ) {
+                        TextP30(text = tile.index.toString())
+                    }
+                }
+            }
+        }
+    }
+}
+
+@Composable
+private fun Folder(
+    spec: FolderConfig,
+    size: Dp,
+) {
+    Box(
+        modifier = Modifier
+            .size(size)
+            .clip(RoundedCornerShape(24.dp))
+            .background(color = spec.color, shape = RoundedCornerShape(24.dp)),
+        contentAlignment = Alignment.BottomCenter
+    ) {
+        TextP40(text = spec.folderName, color = MaterialTheme.theme.colors.secondaryText02)
     }
 }
 
