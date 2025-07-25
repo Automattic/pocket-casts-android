@@ -124,7 +124,13 @@ internal fun AccountDetailsPage(
         Column(
             modifier = modifier
                 .fillMaxSize()
-                .background(MaterialTheme.theme.colors.primaryUi02),
+                .background(
+                    if (FeatureFlag.isEnabled(Feature.NEW_ONBOARDING_UPGRADE)) {
+                        MaterialTheme.theme.colors.primaryUi03
+                    } else {
+                        MaterialTheme.theme.colors.primaryUi02
+                    },
+                ),
         ) {
             if (!state.isAutomotive) {
                 ThemedTopAppBar(
@@ -135,17 +141,18 @@ internal fun AccountDetailsPage(
             LazyColumn(
                 verticalArrangement = Arrangement.spacedBy(16.dp),
                 modifier = Modifier
-                    .fillMaxSize()
-                    .background(
-                        if (FeatureFlag.isEnabled(Feature.NEW_ONBOARDING_UPGRADE)) {
-                            MaterialTheme.theme.colors.primaryUi03
-                        } else {
-                            MaterialTheme.theme.colors.primaryUi02
-                        },
-                    ),
+                    .fillMaxSize(),
             ) {
                 item {
-                    Spacer(Modifier.height(16.dp))
+                    Spacer(
+                        Modifier.height(
+                            if (FeatureFlag.isEnabled(Feature.NEW_ONBOARDING_UPGRADE)) {
+                                0.dp
+                            } else {
+                                16.dp
+                            },
+                        ),
+                    )
                 }
                 item {
                     AccountHeader(
@@ -227,7 +234,6 @@ private fun NewUpgradeAccountCard(
                 .fillMaxWidth()
                 .padding(16.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.spacedBy(12.dp),
         ) {
             SubscriptionBadge(
                 iconRes = recommendedPlan.badgeIconRes,
@@ -238,16 +244,21 @@ private fun NewUpgradeAccountCard(
                     .wrapContentWidth()
                     .wrapContentHeight(),
             )
+            Spacer(modifier = Modifier.height(12.dp))
             TextP30(
                 text = stringResource(recommendedPlan.pageTitle),
                 color = MaterialTheme.theme.colors.primaryText01,
                 fontWeight = FontWeight.W700,
             )
+            Spacer(modifier = Modifier.height(8.dp))
             TextP60(
                 text = stringResource(LR.string.onboarding_upgrade_account_message),
-                color = MaterialTheme.theme.colors.primaryText02,
+                color = MaterialTheme.theme.colors.primaryText01,
+                fontSize = 13.sp,
+                lineHeight = 19.5.sp,
                 textAlign = TextAlign.Center,
             )
+            Spacer(modifier = Modifier.height(12.dp))
             UpgradeRowButton(
                 primaryText = recommendedPlan.ctaButtonText(isRenewingSubscription = false),
                 backgroundColor = MaterialTheme.theme.colors.primaryInteractive01,

@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.material.MaterialTheme
@@ -53,7 +54,6 @@ internal fun AccountHeader(
     config: AccountHeaderConfig = AccountHeaderConfig(),
 ) {
     Column(
-        verticalArrangement = Arrangement.spacedBy(16.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
         modifier = modifier.clickable(
             onClick = onClick,
@@ -77,27 +77,28 @@ internal fun AccountHeader(
                     text = state.email,
                     fontScale = config.infoFontScale,
                     textAlign = TextAlign.Center,
-                    color = if (FeatureFlag.isEnabled(Feature.NEW_ONBOARDING_UPGRADE)) {
-                        MaterialTheme.theme.colors.primaryText02
-                    } else {
-                        MaterialTheme.theme.colors.primaryText01
-                    },
+                    color = MaterialTheme.theme.colors.primaryText01,
                 )
             } else {
                 TextH50(
                     text = state.email,
                     fontScale = config.infoFontScale,
                     textAlign = TextAlign.Center,
-                    color = if (FeatureFlag.isEnabled(Feature.NEW_ONBOARDING_UPGRADE)) {
-                        MaterialTheme.theme.colors.primaryText02
-                    } else {
-                        MaterialTheme.theme.colors.primaryText01
-                    },
+                    color = MaterialTheme.theme.colors.primaryText01,
                 )
             }
         }
         val tier = state.subscription.tier
         if (tier != null) {
+            Spacer(
+                modifier = Modifier.height(
+                    if (FeatureFlag.isEnabled(Feature.NEW_ONBOARDING_UPGRADE)) {
+                        8.dp
+                    } else {
+                        16.dp
+                    },
+                ),
+            )
             SubscriptionBadgeForTier(
                 tier = tier,
                 displayMode = when (tier) {
@@ -109,6 +110,15 @@ internal fun AccountHeader(
                 padding = config.avatarConfig.badgeContentPadding,
             )
         }
+        Spacer(
+            modifier = Modifier.height(
+                if (FeatureFlag.isEnabled(Feature.NEW_ONBOARDING_UPGRADE)) {
+                    8.dp
+                } else {
+                    16.dp
+                },
+            ),
+        )
         Row(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.Center,
@@ -119,7 +129,7 @@ internal fun AccountHeader(
                     TextH70(
                         text = labels.start.text,
                         fontScale = config.infoFontScale,
-                        color = labels.start.color(MaterialTheme.theme.colors),
+                        color = MaterialTheme.theme.colors.primaryText01,
                         textAlign = TextAlign.Center,
                         modifier = Modifier.weight(1f),
                     )
@@ -278,7 +288,7 @@ private data class Label(
 private fun AccountHeaderPreview(
     @PreviewParameter(AccountHeaderStateParameterProvider::class) state: AccountHeaderState,
 ) {
-    AppTheme(Theme.ThemeType.ELECTRIC) {
+    AppTheme(Theme.ThemeType.LIGHT) {
         Box(
             modifier = Modifier.background(MaterialTheme.theme.colors.primaryUi02),
         ) {
@@ -302,7 +312,7 @@ private fun AccountHeaderPreview(
 @Preview(fontScale = 2f)
 @Composable
 private fun AccountHeaderFontSizePreview() {
-    AppTheme(Theme.ThemeType.ELECTRIC) {
+    AppTheme(Theme.ThemeType.LIGHT) {
         Box(
             modifier = Modifier.background(MaterialTheme.theme.colors.primaryUi02),
         ) {
