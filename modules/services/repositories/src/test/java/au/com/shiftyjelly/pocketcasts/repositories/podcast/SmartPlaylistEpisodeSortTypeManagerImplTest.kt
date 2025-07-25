@@ -74,6 +74,7 @@ class SmartPlaylistEpisodeSortTypeManagerImplTest {
             notificationManager = notificationManager,
             context = context,
             appDatabase = appDatabase,
+            playlistsInitializater = mock(),
         )
     }
 }

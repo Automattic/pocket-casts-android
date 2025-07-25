@@ -12,10 +12,11 @@ import au.com.shiftyjelly.pocketcasts.models.type.PlaylistEpisodeSortType
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.download.DownloadHelper
 import au.com.shiftyjelly.pocketcasts.repositories.download.DownloadManager
-import au.com.shiftyjelly.pocketcasts.repositories.extensions.calculateCombinedIconId
 import au.com.shiftyjelly.pocketcasts.repositories.notification.NotificationManager
 import au.com.shiftyjelly.pocketcasts.repositories.notification.OnboardingNotificationType
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
+import au.com.shiftyjelly.pocketcasts.repositories.playlist.DefaultPlaylistsInitializater
+import au.com.shiftyjelly.pocketcasts.repositories.playlist.PlaylistManager
 import au.com.shiftyjelly.pocketcasts.repositories.shortcuts.PocketCastsShortcuts
 import au.com.shiftyjelly.pocketcasts.repositories.sync.SyncManager
 import dagger.hilt.android.qualifiers.ApplicationContext
@@ -40,78 +41,14 @@ class SmartPlaylistManagerImpl @Inject constructor(
     private val notificationManager: NotificationManager,
     @ApplicationContext private val context: Context,
     appDatabase: AppDatabase,
+    private val playlistsInitializater: DefaultPlaylistsInitializater,
 ) : SmartPlaylistManager,
     CoroutineScope {
 
-    companion object {
-        const val NEW_RELEASE_UUID = "2797DCF8-1C93-4999-B52A-D1849736FA2C"
-        const val IN_PROGRESS_UUID = "D89A925C-5CE1-41A4-A879-2751838CE5CE"
-        private const val NEW_RELEASE_TITLE = "New Releases"
-        private const val IN_PROGRESS_TITLE = "In Progress"
-        private const val CREATED_DEFAULT_PLAYLISTS = "createdDefaultPlaylists"
-    }
-
     private val playlistDao = appDatabase.smartPlaylistDao()
-
-    init {
-        if (!settings.getBooleanForKey(CREATED_DEFAULT_PLAYLISTS, false)) {
-            launch { setupDefaultPlaylists() }
-        }
-    }
 
     override val coroutineContext: CoroutineContext
         get() = Dispatchers.Default
-
-    private fun setupDefaultPlaylists() {
-        val existingNewRelease = playlistDao.findByUuidBlocking(NEW_RELEASE_UUID)
-        if (existingNewRelease == null) {
-            val newRelease = SmartPlaylist()
-            newRelease.apply {
-                unplayed = true
-                partiallyPlayed = true
-                audioVideo = SmartPlaylist.AUDIO_VIDEO_FILTER_ALL
-                allPodcasts = true
-                sortPosition = 0
-                title = NEW_RELEASE_TITLE
-                downloaded = true
-                notDownloaded = true
-                filterHours = SmartPlaylist.LAST_2_WEEKS
-                uuid = NEW_RELEASE_UUID
-                syncStatus = SmartPlaylist.SYNC_STATUS_SYNCED
-                iconId = SmartPlaylist.calculateCombinedIconId(colorIndex = 0, iconIndex = 2) // Red clock
-            }
-            playlistDao.insertBlocking(newRelease)
-        } else {
-            existingNewRelease.iconId = 10
-            playlistDao.updateBlocking(existingNewRelease)
-        }
-
-        val existingInProgress = playlistDao.findByUuidBlocking(IN_PROGRESS_UUID)
-        if (existingInProgress == null) {
-            val inProgress = SmartPlaylist()
-            inProgress.apply {
-                allPodcasts = true
-                audioVideo = SmartPlaylist.AUDIO_VIDEO_FILTER_ALL
-                sortPosition = 2
-                title = IN_PROGRESS_TITLE
-                downloaded = true
-                notDownloaded = true
-                unplayed = false
-                partiallyPlayed = true
-                finished = false
-                filterHours = SmartPlaylist.LAST_MONTH
-                uuid = IN_PROGRESS_UUID
-                syncStatus = SmartPlaylist.SYNC_STATUS_SYNCED
-                iconId = SmartPlaylist.calculateCombinedIconId(colorIndex = 3, iconIndex = 4) // Purple play
-            }
-            playlistDao.insertBlocking(inProgress)
-        } else {
-            existingInProgress.iconId = 43
-            playlistDao.updateBlocking(existingInProgress)
-        }
-
-        settings.setBooleanForKey(CREATED_DEFAULT_PLAYLISTS, true)
-    }
 
     override fun findAllBlocking(): List<SmartPlaylist> {
         return playlistDao.findAllBlocking()
@@ -290,7 +227,7 @@ class SmartPlaylistManagerImpl @Inject constructor(
 
     override suspend fun resetDb() {
         playlistDao.deleteAll()
-        setupDefaultPlaylists()
+        playlistsInitializater.initialize(force = true)
     }
 
     override suspend fun deleteSynced(smartPlaylist: SmartPlaylist) {

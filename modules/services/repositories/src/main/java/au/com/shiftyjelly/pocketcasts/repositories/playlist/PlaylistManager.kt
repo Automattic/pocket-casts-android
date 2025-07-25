@@ -6,4 +6,6 @@ interface PlaylistManager {
     fun observePlaylistsPreview(): Flow<List<PlaylistPreview>>
 
     suspend fun deletePlaylist(uuid: String)
+
+    suspend fun upsertPlaylist(draft: PlaylistDraft)
 }
