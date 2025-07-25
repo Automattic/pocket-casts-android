@@ -45,6 +45,8 @@ class ProfileFragment :
 
     private val scrollToTopSignal = MutableSharedFlow<Unit>()
 
+    private var getCanScrollBackward: () -> Boolean = { false }
+
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -65,6 +67,8 @@ class ProfileFragment :
         )
 
         val listState = rememberLazyListState()
+
+        getCanScrollBackward = { listState.canScrollBackward }
 
         LaunchedEffect(listState) {
             scrollToTopSignal.collectLatest {
@@ -171,9 +175,13 @@ class ProfileFragment :
         return super.onBackPressed()
     }
 
-    override fun scrollToTop() {
+    override fun scrollToTop(): Boolean {
+        val canScroll = getCanScrollBackward()
+
         lifecycleScope.launch {
             scrollToTopSignal.emit(Unit)
         }
+
+        return canScroll
     }
 }

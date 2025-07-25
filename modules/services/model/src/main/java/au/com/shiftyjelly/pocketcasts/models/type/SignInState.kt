@@ -8,6 +8,9 @@ sealed interface SignInState {
 
     val isSignedInAsFree: Boolean
 
+    val isSignedOut: Boolean
+        get() = !isSignedIn
+
     val isNoAccountOrFree: Boolean
         get() = !isSignedIn || isSignedInAsFree
 

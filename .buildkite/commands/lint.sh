@@ -1,4 +1,4 @@
-#!/bin/bash -eu
+#!/bin/bash -u
 
 if "$(dirname "${BASH_SOURCE[0]}")/should-skip-job.sh" --job-type lint; then
   exit 0
@@ -26,6 +26,8 @@ else
   lint_exit_code=0
 fi
 
-upload_sarif_to_github 'app/build/reports/lint-results-release.sarif'
+upload_sarif_to_github 'app/build/reports/lint-results-release.sarif' 'app'
+upload_sarif_to_github 'automotive/build/reports/lint-results-release.sarif' 'automotive'
+upload_sarif_to_github 'wear/build/reports/lint-results-release.sarif' 'wear'
 
 exit $lint_exit_code

@@ -1,6 +1,6 @@
 package au.com.shiftyjelly.pocketcasts.repositories.podcast
 
-import au.com.shiftyjelly.pocketcasts.models.entity.SmartPlaylist
+import au.com.shiftyjelly.pocketcasts.models.type.PlaylistEpisodeSortType
 
 sealed interface FilterUpdatedEvent {
     val groupValue: String
@@ -42,7 +42,7 @@ sealed class PlaylistProperty {
         override val groupValue = "release_date"
     }
 
-    data class Sort(val sortOrder: SmartPlaylist.SortOrder) : PlaylistProperty()
+    data class Sort(val sortOrder: PlaylistEpisodeSortType) : PlaylistProperty()
 
     object Starred : PlaylistProperty(), FilterUpdatedEvent {
         override val groupValue = "starred"

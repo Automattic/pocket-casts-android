@@ -38,6 +38,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
+import androidx.compose.ui.tooling.preview.PreviewParameterProvider
 import androidx.compose.ui.unit.dp
 import au.com.shiftyjelly.pocketcasts.account.onboarding.components.UpgradeFeatureItem
 import au.com.shiftyjelly.pocketcasts.account.onboarding.components.UpgradePlanRow
@@ -49,7 +50,6 @@ import au.com.shiftyjelly.pocketcasts.compose.components.FadedLazyColumn
 import au.com.shiftyjelly.pocketcasts.compose.components.TextH10
 import au.com.shiftyjelly.pocketcasts.compose.components.TextP40
 import au.com.shiftyjelly.pocketcasts.compose.images.SubscriptionBadge
-import au.com.shiftyjelly.pocketcasts.compose.preview.ThemePreviewParameterProvider
 import au.com.shiftyjelly.pocketcasts.compose.theme
 import au.com.shiftyjelly.pocketcasts.images.R
 import au.com.shiftyjelly.pocketcasts.payment.BillingCycle
@@ -67,15 +67,9 @@ import java.time.temporal.ChronoUnit
 import kotlinx.coroutines.launch
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
-enum class Variants {
-    VARIANT_FEATURES,
-    VARIANT_TRIAL_TIMELINE,
-}
-
 @Composable
 fun OnboardingUpgradeScreen(
     state: OnboardingUpgradeFeaturesState.Loaded,
-    variant: Variants,
     onClosePress: () -> Unit,
     onSubscribePress: () -> Unit,
     onChangeSelectedPlan: (SubscriptionPlan) -> Unit,
@@ -100,7 +94,7 @@ fun OnboardingUpgradeScreen(
         Spacer(modifier = Modifier.height(24.dp))
         UpgradeContent(
             modifier = Modifier.weight(1f),
-            pages = variant.toContentPages(
+            pages = state.onboardingVariant.toContentPages(
                 currentPlan = state.selectedPlan,
                 isEligibleForTrial = state.selectedBasePlan.offer == SubscriptionOffer.Trial,
                 plan = state.selectedBasePlan,
@@ -206,7 +200,7 @@ private fun UpgradeHeader(
         }
         Spacer(modifier = Modifier.height(8.dp))
         TextH10(
-            text = stringResource(LR.string.onboarding_upgrade_generic_title),
+            text = stringResource(selectedPlan.pageTitle),
             color = MaterialTheme.theme.colors.primaryText01,
         )
     }
@@ -216,7 +210,7 @@ private fun UpgradeHeader(
 private fun SubscriptionPlan.trialSchedule(): List<UpgradeTrialItem> {
     val offerPlan = this as? SubscriptionPlan.WithOffer ?: return emptyList()
 
-    val discountedPhase = offerPlan.pricingPhases.find { it.schedule.recurrenceMode is PricingSchedule.RecurrenceMode.Recurring } ?: return emptyList()
+    val discountedPhase = offerPlan.pricingPhases.find { it.schedule.recurrenceMode is RecurrenceMode.Recurring } ?: return emptyList()
 
     val recurringPeriods = (discountedPhase.schedule.recurrenceMode as RecurrenceMode.Recurring).value
     val chronoUnit = when (discountedPhase.schedule.period) {
@@ -250,13 +244,13 @@ private fun SubscriptionPlan.trialSchedule(): List<UpgradeTrialItem> {
 }
 
 @Composable
-private fun Variants.toContentPages(
+private fun OnboardingUpgradeFeaturesState.NewOnboardingVariant.toContentPages(
     currentPlan: OnboardingSubscriptionPlan,
     isEligibleForTrial: Boolean,
     plan: SubscriptionPlan,
 ) = buildList {
     when (this@toContentPages) {
-        Variants.VARIANT_FEATURES -> {
+        OnboardingUpgradeFeaturesState.NewOnboardingVariant.FEATURES_FIRST -> {
             add(
                 UpgradePagerContent.Features(
                     features = currentPlan.featureItems,
@@ -273,13 +267,15 @@ private fun Variants.toContentPages(
             }
         }
 
-        Variants.VARIANT_TRIAL_TIMELINE -> {
-            add(
-                UpgradePagerContent.TrialSchedule(
-                    timelineItems = plan.trialSchedule(),
-                    showCta = true,
-                ),
-            )
+        OnboardingUpgradeFeaturesState.NewOnboardingVariant.TRIAL_FIRST_WHEN_ELIGIBLE -> {
+            if (isEligibleForTrial) {
+                add(
+                    UpgradePagerContent.TrialSchedule(
+                        timelineItems = plan.trialSchedule(),
+                        showCta = true,
+                    ),
+                )
+            }
             add(
                 UpgradePagerContent.Features(
                     features = currentPlan.featureItems,
@@ -378,24 +374,36 @@ private fun ScheduleContent(
 @Preview
 @Composable
 private fun PreviewOnboardingUpgradeScreen(
-    @PreviewParameter(ThemePreviewParameterProvider::class) theme: ThemeType,
+    @PreviewParameter(ThemedTierParameterProvider::class) pair: Pair<ThemeType, SubscriptionTier>,
 ) {
-    AppThemeWithBackground(theme) {
+    AppThemeWithBackground(pair.first) {
         OnboardingUpgradeScreen(
             state = OnboardingUpgradeFeaturesState.Loaded(
-                selectedTier = SubscriptionTier.Plus,
+                selectedTier = pair.second,
                 selectedBillingCycle = BillingCycle.Yearly,
                 subscriptionPlans = SubscriptionPlans.Preview,
-                plansFilter = OnboardingUpgradeFeaturesState.LoadedPlansFilter.PLUS_ONLY,
+                plansFilter = when (pair.second) {
+                    SubscriptionTier.Plus -> OnboardingUpgradeFeaturesState.LoadedPlansFilter.PLUS_ONLY
+                    SubscriptionTier.Patron -> OnboardingUpgradeFeaturesState.LoadedPlansFilter.PATRON_ONLY
+                },
                 purchaseFailed = false,
+                onboardingVariant = OnboardingUpgradeFeaturesState.NewOnboardingVariant.FEATURES_FIRST,
             ),
             modifier = Modifier.fillMaxSize(),
             onSubscribePress = {},
             onClosePress = {},
-            variant = Variants.VARIANT_FEATURES,
             onClickPrivacyPolicy = {},
             onClickTermsAndConditions = {},
             onChangeSelectedPlan = {},
         )
     }
+}
+
+private class ThemedTierParameterProvider : PreviewParameterProvider<Pair<ThemeType, SubscriptionTier>> {
+    override val values = ThemeType.entries.map { theme ->
+        SubscriptionTier.entries.map { tier ->
+            theme to tier
+        }
+    }.flatten()
+        .asSequence()
 }

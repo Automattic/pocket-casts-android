@@ -906,6 +906,10 @@
     <string name="playlists_onboarding_smart_playlist_description">They still work exactly the same, using rules to auto-add your episodes. All your existing Filters are right here, nothing’s changed but the name.</string>
     <string name="playlists_onboarding_playlist_title">Introducing Playlists</string>
     <string name="playlists_onboarding_playlist_description">Want more control? Manual Playlists let you build custom queues, great for trips, themes, or just your current vibe. Whether Smart or Manual, playlists work the way you do.</string>
+    <string name="smart_playlist">Smart Playlist</string>
+    <string name="playlists_empty_state_title">Organize episodes your way</string>
+    <string name="playlists_empty_state_body">Playlists let you organize episodes manually or automatically with Smart Rules.</string>
+    <string name="new_playlist">New Playlist</string>
 
     <!-- Profile -->
 
@@ -2450,7 +2454,7 @@
         <item quantity="other">You have %d new episodes downloaded and ready to go!</item>
     </plurals>
     <string name="notification_content_recommendations_trending_title">Trending this week</string>
-    <string name="notification_content_recommendations_trending_message">Check out what everyone else is listening this week.</string>
+    <string name="notification_content_recommendations_trending_message">Check out what everyone else is listening to this week.</string>
     <string name="notification_content_recommendations_title">New recommendations for you</string>
     <string name="notification_content_recommendations_message">Wondering what to listen to next? Check out these shows!</string>
     <string name="notifications_settings_turn_on_push_title">Turn on push notifications?</string>
@@ -2487,4 +2491,11 @@
     <string name="onboarding_upgrade_billing_cycle_monthly">Monthly plan</string>
     <string name="onboarding_upgrade_billing_cycle_yearly">Yearly plan</string>
     <string name="onboarding_upgrade_save_percent">Save %1$d\%%</string>
+    <string name="onboarding_upgrade_patron_title">Believe in what we do and wanna show your support?</string>
+    <string name="onboarding_upgrade_patron_plus_features">All the features in Plus</string>
+    <string name="onboarding_upgrade_patron_early_access">Early access to new features</string>
+    <string name="onboarding_upgrade_patron_cloud_storage">100 GB Cloud Storage for your files</string>
+    <string name="onboarding_upgrade_patron_badge">Supporters profile badge</string>
+    <string name="onboarding_upgrade_app_icons">Special Pocket Casts app icons</string>
+    <string name="onboarding_upgrade_gratitude">The undying gratitude of everyone here at Pocket Casts</string>
 </resources>

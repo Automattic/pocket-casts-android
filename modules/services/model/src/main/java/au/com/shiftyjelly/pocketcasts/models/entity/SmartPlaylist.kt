@@ -5,6 +5,7 @@ import androidx.room.Entity
 import androidx.room.Ignore
 import androidx.room.Index
 import androidx.room.PrimaryKey
+import au.com.shiftyjelly.pocketcasts.models.type.PlaylistEpisodeSortType
 import au.com.shiftyjelly.pocketcasts.utils.extensions.splitIgnoreEmpty
 import java.io.Serializable
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
@@ -17,7 +18,7 @@ import au.com.shiftyjelly.pocketcasts.localization.R as LR
 )
 data class SmartPlaylist(
     @PrimaryKey @ColumnInfo(name = "_id") var id: Long? = null,
-    @ColumnInfo(name = "uuid") var uuid: String,
+    @ColumnInfo(name = "uuid") var uuid: String = "",
     @ColumnInfo(name = "title") var title: String = "",
     @ColumnInfo(name = "sortPosition") var sortPosition: Int? = null,
     @ColumnInfo(name = "manual") var manual: Boolean = false,
@@ -33,7 +34,7 @@ data class SmartPlaylist(
     @ColumnInfo(name = "autoDownload") var autoDownload: Boolean = false,
     @ColumnInfo(name = "autoDownloadWifiOnly") var autoDownloadUnmeteredOnly: Boolean = false,
     @ColumnInfo(name = "autoDownloadPowerOnly") var autoDownloadPowerOnly: Boolean = false,
-    @ColumnInfo(name = "sortId") var sortId: Int = SortOrder.NEWEST_TO_OLDEST.value,
+    @ColumnInfo(name = "sortId") var sortType: PlaylistEpisodeSortType = PlaylistEpisodeSortType.NewestToOldest,
     @ColumnInfo(name = "iconId") var iconId: Int = 0,
     @ColumnInfo(name = "filterHours") var filterHours: Int = 0,
     @ColumnInfo(name = "starred") var starred: Boolean = false,
@@ -45,12 +46,7 @@ data class SmartPlaylist(
     @ColumnInfo(name = "shorterThan") var shorterThan: Int = 40,
     @ColumnInfo(name = "draft") var draft: Boolean = false, // Used when creating a new filter
 ) : Serializable {
-
-    constructor() : this(uuid = "")
-
     companion object {
-        const val PLAYLIST_ID_SYSTEM_DOWNLOADS: Long = -100L
-
         const val AUDIO_VIDEO_FILTER_ALL = 0
         const val AUDIO_VIDEO_FILTER_AUDIO_ONLY = 1
         const val AUDIO_VIDEO_FILTER_VIDEO_ONLY = 2
@@ -71,9 +67,6 @@ data class SmartPlaylist(
 
     @Ignore
     var episodeCount: Int = 0
-
-    val isSystemDownloadsFilter: Boolean
-        get() = id != null && id == PLAYLIST_ID_SYSTEM_DOWNLOADS
 
     val isAudioOnly: Boolean
         get() = audioVideo == AUDIO_VIDEO_FILTER_AUDIO_ONLY
@@ -150,19 +143,4 @@ data class SmartPlaylist(
 
     val isAllEpisodes: Boolean
         get() = unplayed && partiallyPlayed && finished && notDownloaded && downloaded && audioVideo == AUDIO_VIDEO_FILTER_ALL && allPodcasts && !filterDuration && filterHours == 0 && !starred
-
-    fun sortOrder() = SortOrder.fromInt(sortId)
-
-    enum class SortOrder(val value: Int) {
-        NEWEST_TO_OLDEST(0),
-        OLDEST_TO_NEWEST(1),
-        SHORTEST_TO_LONGEST(2),
-        LONGEST_TO_SHORTEST(3),
-        LAST_DOWNLOAD_ATTEMPT_DATE(100),
-        ;
-
-        companion object {
-            fun fromInt(value: Int) = SortOrder.values().find { it.value == value }
-        }
-    }
 }

@@ -3,32 +3,25 @@ package au.com.shiftyjelly.pocketcasts.playlists
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.ViewGroup
-import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.rememberLazyListState
-import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import au.com.shiftyjelly.pocketcasts.compose.AppThemeWithBackground
 import au.com.shiftyjelly.pocketcasts.compose.extensions.contentWithoutConsumedInsets
+import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingFlow
+import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingLauncher
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseFragment
 import au.com.shiftyjelly.pocketcasts.views.fragments.TopScrollable
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
+import timber.log.Timber
 
 @AndroidEntryPoint
 class PlaylistsFragment :
@@ -36,6 +29,8 @@ class PlaylistsFragment :
     TopScrollable {
     private val scrollToTopSignal = MutableSharedFlow<Unit>()
     private val viewModel by viewModels<PlaylistsViewModel>()
+
+    private var getCanScrollBackward: () -> Boolean = { false }
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -45,23 +40,24 @@ class PlaylistsFragment :
         val listState = rememberLazyListState()
         val uiState by viewModel.uiState.collectAsState()
 
+        getCanScrollBackward = { listState.canScrollBackward }
+
         AppThemeWithBackground(theme.activeTheme) {
-            LazyColumn(
-                state = listState,
-            ) {
-                items(30) { index ->
-                    Text(
-                        text = "Item $index",
-                        color = Color.White,
-                        textAlign = TextAlign.Center,
-                        fontSize = 16.sp,
-                        modifier = Modifier
-                            .background(if (index % 2 == 0) Color.Red else Color.Blue)
-                            .fillMaxWidth()
-                            .padding(vertical = 16.dp),
+            PlaylistsPage(
+                uiState = uiState,
+                listState = listState,
+                onCreatePlaylist = { Timber.i("Create playlist clicked") },
+                onDeletePlaylist = { playlist -> viewModel.deletePlaylist(playlist.uuid) },
+                onShowOptions = { Timber.i("Show playlists options clicked") },
+                onFreeAccountBannerCtaClick = {
+                    viewModel.trackFreeAccountCtaClick()
+                    OnboardingLauncher.openOnboardingFlow(
+                        activity = requireActivity(),
+                        onboardingFlow = OnboardingFlow.LoggedOut,
                     )
-                }
-            }
+                },
+                onFreeAccountBannerDismiss = viewModel::dismissFreeAccountBanner,
+            )
         }
 
         ScrollToTopEffect(listState)
@@ -86,9 +82,13 @@ class PlaylistsFragment :
         }
     }
 
-    override fun scrollToTop() {
+    override fun scrollToTop(): Boolean {
+        val canScroll = getCanScrollBackward()
+
         lifecycleScope.launch {
             scrollToTopSignal.emit(Unit)
         }
+
+        return canScroll
     }
 }

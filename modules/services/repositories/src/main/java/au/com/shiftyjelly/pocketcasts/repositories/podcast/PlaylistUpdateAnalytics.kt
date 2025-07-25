@@ -3,6 +3,7 @@ package au.com.shiftyjelly.pocketcasts.repositories.podcast
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.models.entity.SmartPlaylist
+import au.com.shiftyjelly.pocketcasts.models.type.PlaylistEpisodeSortType
 import au.com.shiftyjelly.pocketcasts.repositories.extensions.colorIndex
 import au.com.shiftyjelly.pocketcasts.repositories.extensions.drawableId
 import javax.inject.Inject
@@ -134,11 +135,10 @@ class PlaylistUpdateAnalytics @Inject constructor(
 
                 is PlaylistProperty.Sort -> {
                     val sortOrderString = when (playlistProperty.sortOrder) {
-                        SmartPlaylist.SortOrder.NEWEST_TO_OLDEST -> "newest_to_oldest"
-                        SmartPlaylist.SortOrder.OLDEST_TO_NEWEST -> "oldest_to_newest"
-                        SmartPlaylist.SortOrder.SHORTEST_TO_LONGEST -> "shortest_to_longest"
-                        SmartPlaylist.SortOrder.LONGEST_TO_SHORTEST -> "longest_to_shortest"
-                        SmartPlaylist.SortOrder.LAST_DOWNLOAD_ATTEMPT_DATE -> "last_download_attempt_date"
+                        PlaylistEpisodeSortType.NewestToOldest -> "newest_to_oldest"
+                        PlaylistEpisodeSortType.OldestToNewest -> "oldest_to_newest"
+                        PlaylistEpisodeSortType.ShortestToLongest -> "shortest_to_longest"
+                        PlaylistEpisodeSortType.LongestToShortest -> "longest_to_shortest"
                     }
                     val properties = mapOf(Key.SORT_ORDER to sortOrderString)
                     analyticsTracker.track(AnalyticsEvent.FILTER_SORT_BY_CHANGED, properties)
