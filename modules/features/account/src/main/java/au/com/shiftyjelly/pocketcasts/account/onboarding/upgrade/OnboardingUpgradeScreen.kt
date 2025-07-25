@@ -24,6 +24,7 @@ import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
 import androidx.compose.material.MaterialTheme
@@ -101,6 +102,7 @@ fun OnboardingUpgradeScreen(
                 currentPlan = state.selectedPlan,
                 isEligibleForTrial = state.selectedBasePlan.offer == SubscriptionOffer.Trial,
                 plan = state.selectedBasePlan,
+                source = source,
             ),
         )
         Spacer(modifier = Modifier.height(24.dp))
@@ -250,42 +252,60 @@ private fun SubscriptionPlan.trialSchedule(): List<UpgradeTrialItem> {
 @Composable
 private fun OnboardingUpgradeFeaturesState.NewOnboardingVariant.toContentPages(
     currentPlan: OnboardingSubscriptionPlan,
+    source: OnboardingUpgradeSource,
     isEligibleForTrial: Boolean,
     plan: SubscriptionPlan,
 ) = buildList {
-    when (this@toContentPages) {
-        OnboardingUpgradeFeaturesState.NewOnboardingVariant.FEATURES_FIRST -> {
-            add(
-                UpgradePagerContent.Features(
-                    features = currentPlan.featureItems,
-                    showCta = isEligibleForTrial,
-                ),
-            )
-            if (isEligibleForTrial) {
+    when (source) {
+        OnboardingUpgradeSource.FOLDERS_PODCAST_SCREEN,
+        OnboardingUpgradeSource.SUGGESTED_FOLDERS,
+        OnboardingUpgradeSource.FOLDERS,
+            -> {
+                add(UpgradePagerContent.Folders)
                 add(
-                    UpgradePagerContent.TrialSchedule(
-                        timelineItems = plan.trialSchedule(),
+                    UpgradePagerContent.Features(
+                        features = currentPlan.featureItems,
                         showCta = false,
                     ),
                 )
-            }
         }
 
-        OnboardingUpgradeFeaturesState.NewOnboardingVariant.TRIAL_FIRST_WHEN_ELIGIBLE -> {
-            if (isEligibleForTrial) {
-                add(
-                    UpgradePagerContent.TrialSchedule(
-                        timelineItems = plan.trialSchedule(),
-                        showCta = true,
-                    ),
-                )
+        else -> {
+            when (this@toContentPages) {
+                OnboardingUpgradeFeaturesState.NewOnboardingVariant.FEATURES_FIRST -> {
+                    add(
+                        UpgradePagerContent.Features(
+                            features = currentPlan.featureItems,
+                            showCta = isEligibleForTrial,
+                        ),
+                    )
+                    if (isEligibleForTrial) {
+                        add(
+                            UpgradePagerContent.TrialSchedule(
+                                timelineItems = plan.trialSchedule(),
+                                showCta = false,
+                            ),
+                        )
+                    }
+                }
+
+                OnboardingUpgradeFeaturesState.NewOnboardingVariant.TRIAL_FIRST_WHEN_ELIGIBLE -> {
+                    if (isEligibleForTrial) {
+                        add(
+                            UpgradePagerContent.TrialSchedule(
+                                timelineItems = plan.trialSchedule(),
+                                showCta = true,
+                            ),
+                        )
+                    }
+                    add(
+                        UpgradePagerContent.Features(
+                            features = currentPlan.featureItems,
+                            showCta = false,
+                        ),
+                    )
+                }
             }
-            add(
-                UpgradePagerContent.Features(
-                    features = currentPlan.featureItems,
-                    showCta = false,
-                ),
-            )
         }
     }
 }
@@ -295,6 +315,9 @@ private sealed interface UpgradePagerContent {
 
     data class Features(val features: List<UpgradeFeatureItem>, override val showCta: Boolean) : UpgradePagerContent
     data class TrialSchedule(val timelineItems: List<UpgradeTrialItem>, override val showCta: Boolean) : UpgradePagerContent
+    data object Folders : UpgradePagerContent {
+        override val showCta get() = true
+    }
 }
 
 @Composable
@@ -324,6 +347,8 @@ private fun UpgradeContent(
                     trialSchedule = page,
                     onCtaClick = scrollToNext,
                 )
+
+                is UpgradePagerContent.Folders -> FoldersUpgradeContent(onCtaClick = scrollToNext)
             }
         }
     }
@@ -375,6 +400,25 @@ private fun ScheduleContent(
     }
 }
 
+@Composable
+private fun FoldersUpgradeContent(
+    onCtaClick: () -> Unit
+) {
+    Column {
+        TextP40(
+            text = stringResource(LR.string.onboarding_upgrade_schedule_see_features),
+            modifier = Modifier
+                .padding(vertical = 24.dp)
+                .clickable { onCtaClick() },
+            color = MaterialTheme.theme.colors.primaryInteractive01,
+        )
+
+        Box(modifier = Modifier
+            .size(219.dp)
+            .background(color = MaterialTheme.theme.colors.primaryIcon01, shape = RoundedCornerShape(16.dp)))
+    }
+}
+
 @Preview
 @Composable
 private fun PreviewOnboardingUpgradeScreen(
@@ -399,6 +443,7 @@ private fun PreviewOnboardingUpgradeScreen(
             onClickPrivacyPolicy = {},
             onClickTermsAndConditions = {},
             onChangeSelectedPlan = {},
+            source = OnboardingUpgradeSource.ACCOUNT_DETAILS,
         )
     }
 }
