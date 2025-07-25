@@ -14,6 +14,7 @@ import au.com.shiftyjelly.pocketcasts.deeplink.DeleteBookmarkDeepLink
 import au.com.shiftyjelly.pocketcasts.deeplink.ShowBookmarkDeepLink
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.R
+import au.com.shiftyjelly.pocketcasts.repositories.notification.NotificationOpenReceiver
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.utils.AppPlatform
 import au.com.shiftyjelly.pocketcasts.utils.Util
@@ -86,6 +87,17 @@ private fun buildAndShowNotification(
         buildPendingIntent(context, DeleteBookmarkDeepLink(bookmarkUuid).toIntent(context)),
     )
 
+    val originalContentIntent = ShowBookmarkDeepLink(bookmarkUuid).toIntent(context)
+    val contentIntent = if (Util.getAppPlatform(context) == AppPlatform.Phone) {
+        PendingIntent.getBroadcast(
+            context,
+            0,
+            NotificationOpenReceiver.toDeeplinkIntentRelay(context, originalContentIntent),
+            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE,
+        )
+    } else {
+        buildPendingIntent(context, originalContentIntent)
+    }
     val notification = NotificationCompat.Builder(
         context,
         Settings.NotificationChannel.NOTIFICATION_CHANNEL_ID_BOOKMARK.id,
@@ -96,7 +108,7 @@ private fun buildAndShowNotification(
         .setSmallIcon(IR.drawable.notification)
         .setAutoCancel(true)
         .setOnlyAlertOnce(true)
-        .setContentIntent(buildPendingIntent(context, ShowBookmarkDeepLink(bookmarkUuid).toIntent(context)))
+        .setContentIntent(contentIntent)
         .addAction(changeTitleAction)
         .addAction(deleteAction)
         .build()

@@ -32,11 +32,13 @@ import au.com.shiftyjelly.pocketcasts.repositories.download.task.UpdateShowNotes
 import au.com.shiftyjelly.pocketcasts.repositories.file.FileStorage
 import au.com.shiftyjelly.pocketcasts.repositories.file.StorageException
 import au.com.shiftyjelly.pocketcasts.repositories.notification.NotificationHelper
+import au.com.shiftyjelly.pocketcasts.repositories.notification.NotificationOpenReceiver
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.SmartPlaylistManager
 import au.com.shiftyjelly.pocketcasts.repositories.refresh.RefreshPodcastsThread
+import au.com.shiftyjelly.pocketcasts.utils.AppPlatform
 import au.com.shiftyjelly.pocketcasts.utils.Network
 import au.com.shiftyjelly.pocketcasts.utils.Power
 import au.com.shiftyjelly.pocketcasts.utils.Util
@@ -643,7 +645,11 @@ class DownloadManagerImpl @Inject constructor(
 
     private fun openDownloadingPageIntent(): PendingIntent {
         val intent = DownloadsDeepLink.toIntent(context)
-        return PendingIntent.getActivity(context, 0, intent, PendingIntent.FLAG_CANCEL_CURRENT or PendingIntent.FLAG_IMMUTABLE)
+        return if (Util.getAppPlatform(context) == AppPlatform.Phone) {
+            PendingIntent.getBroadcast(context, 0, NotificationOpenReceiver.toDeeplinkIntentRelay(context, intent), PendingIntent.FLAG_CANCEL_CURRENT or PendingIntent.FLAG_IMMUTABLE)
+        } else {
+            PendingIntent.getActivity(context, 0, intent, PendingIntent.FLAG_CANCEL_CURRENT or PendingIntent.FLAG_IMMUTABLE)
+        }
     }
 
     private fun updateSource(source: SourceView) {

@@ -32,6 +32,7 @@ import au.com.shiftyjelly.pocketcasts.repositories.download.DownloadManager
 import au.com.shiftyjelly.pocketcasts.repositories.file.FileStorage
 import au.com.shiftyjelly.pocketcasts.repositories.images.PocketCastsImageRequestFactory
 import au.com.shiftyjelly.pocketcasts.repositories.notification.NotificationHelper
+import au.com.shiftyjelly.pocketcasts.repositories.notification.NotificationOpenReceiver
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.FolderManager
@@ -50,7 +51,9 @@ import au.com.shiftyjelly.pocketcasts.servers.ServerResponseException
 import au.com.shiftyjelly.pocketcasts.servers.ServiceManager
 import au.com.shiftyjelly.pocketcasts.servers.podcast.PodcastCacheServiceManagerImpl
 import au.com.shiftyjelly.pocketcasts.servers.sync.exception.RefreshTokenExpiredException
+import au.com.shiftyjelly.pocketcasts.utils.AppPlatform
 import au.com.shiftyjelly.pocketcasts.utils.Network
+import au.com.shiftyjelly.pocketcasts.utils.Util
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import coil.executeBlocking
 import coil.imageLoader
@@ -473,16 +476,21 @@ class RefreshPodcastsThread(
             val sortKey = String.format("%04d", episodeIndex)
             var intentId = intentId
             val manager = NotificationManagerCompat.from(context)
-
-            val intent = ShowEpisodeDeepLink(
+            val showEpisodeDeepLink = ShowEpisodeDeepLink(
                 episodeUuid = episode.uuid,
                 podcastUuid = podcast.uuid,
                 sourceView = EpisodeViewSource.NOTIFICATION.value,
                 autoPlay = false,
-            ).toIntent(context).apply {
-                action = action + System.currentTimeMillis() + intentId
+            )
+
+            val intent = showEpisodeDeepLink.toIntent(context).apply {
+                action += System.currentTimeMillis() + intentId
             }
-            val pendingIntent = PendingIntent.getActivity(context, intentId, intent, PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE)
+            val pendingIntent = if (Util.getAppPlatform(context) == AppPlatform.Phone) {
+                PendingIntent.getBroadcast(context, intentId, NotificationOpenReceiver.toEpisodeIntentRelay(context, intent), PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE)
+            } else {
+                PendingIntent.getActivity(context, intentId, intent, PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE)
+            }
             intentId += 1
 
             val notificationTag = if (isGroupNotification) {
@@ -608,7 +616,11 @@ class RefreshPodcastsThread(
                 flags = Intent.FLAG_ACTIVITY_SINGLE_TOP
                 action = Settings.INTENT_OPEN_APP_NEW_EPISODES
             }
-            val pendingIntent = PendingIntent.getActivity(context, intentIndex, intent, PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE)
+            val pendingIntent = if (Util.getAppPlatform(context) == AppPlatform.Phone && intent != null) {
+                PendingIntent.getBroadcast(context, intentIndex, NotificationOpenReceiver.toPodcastIntentRelay(context, intent), PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE)
+            } else {
+                PendingIntent.getActivity(context, intentIndex, intent, PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE)
+            }
             intentIndex += 1
 
             val inboxStyle = NotificationCompat.InboxStyle()
