@@ -77,6 +77,11 @@ sealed interface OnboardingFlow : Parcelable {
     data object AccountEncouragement : OnboardingFlow {
         override val analyticsValue get() = "account_encouragement"
     }
+
+    @Parcelize
+    data object NewOnboardingAccountUpgrade : OnboardingFlow {
+        override val analyticsValue get() = "new_onboarding_account_upgrade"
+    }
 }
 
 enum class SuggestedFoldersAction {

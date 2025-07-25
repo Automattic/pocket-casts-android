@@ -35,7 +35,7 @@ import au.com.shiftyjelly.pocketcasts.ui.theme.Theme.ThemeType
 
 @Composable
 fun ProfileUpgradeBanner(
-    state: ProfileUpgradeBannerState,
+    state: ProfileUpgradeBannerState.OldProfileUpgradeBannerState,
     onChangeFeatureCard: (SubscriptionPlan.Key) -> Unit,
     onClickSubscribe: (SubscriptionPlan.Key) -> Unit,
     modifier: Modifier = Modifier,
