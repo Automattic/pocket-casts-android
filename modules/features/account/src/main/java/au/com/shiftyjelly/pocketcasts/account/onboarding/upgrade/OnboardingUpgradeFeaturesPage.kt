@@ -138,6 +138,7 @@ internal fun OnboardingUpgradeFeaturesPage(
                 OnboardingUpgradeScreen(
                     onClosePress = onBackPress,
                     state = state,
+                    source = source,
                     onChangeSelectedPlan = { viewModel.changeBillingCycle(it.billingCycle) },
                     onSubscribePress = { onClickSubscribe(false) },
                     onClickPrivacyPolicy = { viewModel.onPrivacyPolicyPressed() },

@@ -59,6 +59,7 @@ import au.com.shiftyjelly.pocketcasts.payment.SubscriptionOffer
 import au.com.shiftyjelly.pocketcasts.payment.SubscriptionPlan
 import au.com.shiftyjelly.pocketcasts.payment.SubscriptionPlans
 import au.com.shiftyjelly.pocketcasts.payment.SubscriptionTier
+import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingUpgradeSource
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme.ThemeType
 import java.time.ZonedDateTime
 import java.time.format.DateTimeFormatter
@@ -70,6 +71,7 @@ import au.com.shiftyjelly.pocketcasts.localization.R as LR
 @Composable
 fun OnboardingUpgradeScreen(
     state: OnboardingUpgradeFeaturesState.Loaded,
+    source: OnboardingUpgradeSource,
     onClosePress: () -> Unit,
     onSubscribePress: () -> Unit,
     onChangeSelectedPlan: (SubscriptionPlan) -> Unit,
@@ -89,6 +91,7 @@ fun OnboardingUpgradeScreen(
     ) {
         UpgradeHeader(
             selectedPlan = state.selectedPlan,
+            source = source,
             onClosePress = onClosePress,
         )
         Spacer(modifier = Modifier.height(24.dp))
@@ -162,6 +165,7 @@ private fun UpgradeFooter(
 @Composable
 private fun UpgradeHeader(
     selectedPlan: OnboardingSubscriptionPlan,
+    source: OnboardingUpgradeSource,
     onClosePress: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -200,7 +204,7 @@ private fun UpgradeHeader(
         }
         Spacer(modifier = Modifier.height(8.dp))
         TextH10(
-            text = stringResource(selectedPlan.pageTitle),
+            text = stringResource(selectedPlan.customFeatureTitle(source)),
             color = MaterialTheme.theme.colors.primaryText01,
         )
     }

@@ -2498,4 +2498,5 @@
     <string name="onboarding_upgrade_patron_badge">Supporters profile badge</string>
     <string name="onboarding_upgrade_app_icons">Special Pocket Casts app icons</string>
     <string name="onboarding_upgrade_gratitude">The undying gratitude of everyone here at Pocket Casts</string>
+    <string name="onboarding_folders_title">Folders: your podcasts, perfectly placed</string>
 </resources>
