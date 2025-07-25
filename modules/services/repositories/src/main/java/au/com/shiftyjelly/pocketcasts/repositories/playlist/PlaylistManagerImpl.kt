@@ -157,7 +157,7 @@ class PlaylistManagerImpl @Inject constructor(
         iconId = if (this === PlaylistDraft.NewReleases) {
             10 // Red clock
         } else if (this === PlaylistDraft.InProgress) {
-            43 // Purple play
+            23 // Purple play
         } else {
             0
         },
