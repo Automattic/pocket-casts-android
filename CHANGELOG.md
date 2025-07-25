@@ -6,6 +6,8 @@
 * Bug Fixes
     *   Fix missing file sizes on the episode page
         ([#4262](https://github.com/Automattic/pocket-casts-android/pull/4262))
+    *   Fix the notification message for "Trending this week"
+        ([#4273](https://github.com/Automattic/pocket-casts-android/pull/4273))
 
 7.94
 -----

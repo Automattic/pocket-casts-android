@@ -49,10 +49,10 @@ object ThemedTopAppBar {
 
 @Composable
 fun ThemedTopAppBar(
-    onNavigationClick: () -> Unit,
     modifier: Modifier = Modifier,
     title: String? = null,
-    navigationButton: NavigationButton = NavigationButton.Back,
+    navigationButton: NavigationButton? = NavigationButton.Back,
+    onNavigationClick: (() -> Unit)? = null,
     style: ThemedTopAppBar.Style = ThemedTopAppBar.Style.Solid,
     iconColor: Color = when (style) {
         ThemedTopAppBar.Style.Solid -> MaterialTheme.theme.colors.secondaryIcon01
@@ -75,12 +75,16 @@ fun ThemedTopAppBar(
         LocalRippleConfiguration provides RippleConfiguration(color = iconColor),
     ) {
         TopAppBar(
-            navigationIcon = {
-                NavigationIconButton(
-                    onNavigationClick = onNavigationClick,
-                    navigationButton = navigationButton,
-                    iconColor = iconColor,
-                )
+            navigationIcon = if (navigationButton != null) {
+                {
+                    NavigationIconButton(
+                        onNavigationClick = onNavigationClick ?: {},
+                        navigationButton = navigationButton,
+                        iconColor = iconColor,
+                    )
+                }
+            } else {
+                null
             },
             title = {
                 if (title != null) {
@@ -130,6 +134,7 @@ fun NavigationIconButton(
 private fun ThemedTopAppBarPreview(@PreviewParameter(ThemePreviewParameterProvider::class) themeType: Theme.ThemeType) {
     AppTheme(themeType) {
         Column {
+            ThemedTopAppBar(title = "Hello World", navigationButton = null)
             ThemedTopAppBar(title = "Hello World", navigationButton = NavigationButton.Back, onNavigationClick = {})
             ThemedTopAppBar(title = "Hello World", navigationButton = NavigationButton.Close, onNavigationClick = {})
             ThemedTopAppBar(title = "Hello World", navigationButton = NavigationButton.Back, style = ThemedTopAppBar.Style.Immersive, onNavigationClick = {})

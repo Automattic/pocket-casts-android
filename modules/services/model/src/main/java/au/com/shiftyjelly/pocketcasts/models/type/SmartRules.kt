@@ -1,8 +1,6 @@
 package au.com.shiftyjelly.pocketcasts.models.type
 
-import au.com.shiftyjelly.pocketcasts.models.entity.SmartPlaylist
 import java.time.Clock
-import java.time.temporal.ChronoUnit
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.days
 
@@ -15,16 +13,16 @@ data class SmartRules(
     val podcastsRule: PodcastsRule,
     val episodeDuration: EpisodeDurationRule,
 ) {
-    fun toSqlWhereClause(clock: Clock, playlistId: Long?) = buildString {
-        episodeStatus.run { append(clock, playlistId) }
-        downloadStatus.run { append(clock, playlistId) }
-        mediaType.run { append(clock, playlistId) }
-        releaseDate.run { append(clock, playlistId) }
-        starred.run { append(clock, playlistId) }
-        podcastsRule.run { append(clock, playlistId) }
-        episodeDuration.run { append(clock, playlistId) }
-        NonArchivedRule.run { append(clock, playlistId) }
-        FollowedPodcastRule.run { append(clock, playlistId) }
+    fun toSqlWhereClause(clock: Clock) = buildString {
+        episodeStatus.run { appendSqlQuery(clock) }
+        downloadStatus.run { appendSqlQuery(clock) }
+        mediaType.run { appendSqlQuery(clock) }
+        releaseDate.run { appendSqlQuery(clock) }
+        starred.run { appendSqlQuery(clock) }
+        podcastsRule.run { appendSqlQuery(clock) }
+        episodeDuration.run { appendSqlQuery(clock) }
+        NonArchivedRule.run { appendSqlQuery(clock) }
+        FollowedPodcastRule.run { appendSqlQuery(clock) }
     }
 
     data class EpisodeStatusRule(
@@ -32,7 +30,7 @@ data class SmartRules(
         val inProgress: Boolean,
         val completed: Boolean,
     ) : SmartRule {
-        override fun toSqlWhereClause(clock: Clock, playlistId: Long?) = buildString {
+        override fun toSqlWhereClause(clock: Clock) = buildString {
             if (!areAllConstraintsTicked && isAnyConstraintTicked) {
                 val statuses = buildList {
                     if (unplayed) {
@@ -62,43 +60,22 @@ data class SmartRules(
         NotDownloaded,
         ;
 
-        override fun toSqlWhereClause(clock: Clock, playlistId: Long?) = buildString {
-            if (this@DownloadStatusRule != Any) {
-                val isSystemDownloadsPlaylist = playlistId == SmartPlaylist.PLAYLIST_ID_SYSTEM_DOWNLOADS
-                val includeDownloaded = this@DownloadStatusRule == Downloaded
-                val includeDownloading = isSystemDownloadsPlaylist || this@DownloadStatusRule == NotDownloaded
-                val includeNotDownloaded = this@DownloadStatusRule == NotDownloaded
-
-                val statuses = buildList {
-                    if (includeDownloaded) {
-                        add(EpisodeStatusEnum.DOWNLOADED)
-                    }
-                    if (includeDownloading) {
-                        add(EpisodeStatusEnum.DOWNLOADING)
-                        add(EpisodeStatusEnum.QUEUED)
-                        add(EpisodeStatusEnum.WAITING_FOR_POWER)
-                        add(EpisodeStatusEnum.WAITING_FOR_WIFI)
-                    }
-                    if (includeNotDownloaded) {
-                        add(EpisodeStatusEnum.NOT_DOWNLOADED)
-                        add(EpisodeStatusEnum.DOWNLOAD_FAILED)
-                    }
-                }
-                append("episode.episode_status IN (")
-                append(statuses.joinToString(separator = ",") { status -> "${status.ordinal}" })
-                append(')')
-
-                if (isSystemDownloadsPlaylist) {
-                    if (isNotEmpty()) {
-                        append(" OR ")
-                    }
-                    append("(episode.episode_status = ")
-                    append(EpisodeStatusEnum.DOWNLOAD_FAILED.ordinal)
-                    append(" AND episode.last_download_attempt_date > ")
-                    append(clock.instant().minus(7, ChronoUnit.DAYS).toEpochMilli())
-                    append(')')
-                }
+        override fun toSqlWhereClause(clock: Clock) = buildString {
+            val statuses = when (this@DownloadStatusRule) {
+                Any -> return@buildString
+                Downloaded -> listOf(EpisodeStatusEnum.DOWNLOADED)
+                NotDownloaded -> listOf(
+                    EpisodeStatusEnum.DOWNLOADING,
+                    EpisodeStatusEnum.QUEUED,
+                    EpisodeStatusEnum.WAITING_FOR_POWER,
+                    EpisodeStatusEnum.WAITING_FOR_WIFI,
+                    EpisodeStatusEnum.NOT_DOWNLOADED,
+                    EpisodeStatusEnum.DOWNLOAD_FAILED,
+                )
             }
+            append("episode.episode_status IN (")
+            append(statuses.joinToString(separator = ",") { status -> "${status.ordinal}" })
+            append(')')
         }
     }
 
@@ -108,7 +85,7 @@ data class SmartRules(
         Video,
         ;
 
-        override fun toSqlWhereClause(clock: Clock, playlistId: Long?) = buildString {
+        override fun toSqlWhereClause(clock: Clock) = buildString {
             when (this@MediaTypeRule) {
                 Any -> Unit
                 Audio -> append("episode.file_type LIKE 'audio/%'")
@@ -140,7 +117,7 @@ data class SmartRules(
         ),
         ;
 
-        override fun toSqlWhereClause(clock: Clock, playlistId: Long?) = buildString {
+        override fun toSqlWhereClause(clock: Clock) = buildString {
             if (duration != Duration.INFINITE) {
                 append("episode.published_date > ")
                 append(clock.instant().minusMillis(duration.inWholeMilliseconds).toEpochMilli())
@@ -153,7 +130,7 @@ data class SmartRules(
         Starred,
         ;
 
-        override fun toSqlWhereClause(clock: Clock, playlistId: Long?) = buildString {
+        override fun toSqlWhereClause(clock: Clock) = buildString {
             when (this@StarredRule) {
                 Any -> Unit
                 Starred -> append("episode.starred = 1")
@@ -163,13 +140,13 @@ data class SmartRules(
 
     sealed interface PodcastsRule : SmartRule {
         data object Any : PodcastsRule {
-            override fun toSqlWhereClause(clock: Clock, playlistId: Long?) = ""
+            override fun toSqlWhereClause(clock: Clock) = ""
         }
 
         data class Selected(
             val uuids: List<String>,
         ) : PodcastsRule {
-            override fun toSqlWhereClause(clock: Clock, playlistId: Long?) = buildString {
+            override fun toSqlWhereClause(clock: Clock) = buildString {
                 append("episode.podcast_id IN (")
                 append(uuids.joinToString(separator = ",") { uuid -> "'$uuid'" })
                 append(')')
@@ -179,14 +156,14 @@ data class SmartRules(
 
     sealed interface EpisodeDurationRule : SmartRule {
         data object Any : EpisodeDurationRule {
-            override fun toSqlWhereClause(clock: Clock, playlistId: Long?) = ""
+            override fun toSqlWhereClause(clock: Clock) = ""
         }
 
         data class Constrained(
             val longerThan: Duration,
             val shorterThan: Duration,
         ) : EpisodeDurationRule {
-            override fun toSqlWhereClause(clock: Clock, playlistId: Long?) = buildString {
+            override fun toSqlWhereClause(clock: Clock) = buildString {
                 append("(episode.duration BETWEEN ")
                 append(longerThan.inWholeSeconds)
                 append(" AND ")
@@ -197,16 +174,16 @@ data class SmartRules(
     }
 
     data object NonArchivedRule : SmartRule {
-        override fun toSqlWhereClause(clock: Clock, playlistId: Long?) = "episode.archived = 0"
+        override fun toSqlWhereClause(clock: Clock) = "episode.archived = 0"
     }
 
     data object FollowedPodcastRule : SmartRule {
-        override fun toSqlWhereClause(clock: Clock, playlistId: Long?) = "podcast.subscribed = 1"
+        override fun toSqlWhereClause(clock: Clock) = "podcast.subscribed = 1"
     }
 
     sealed interface SmartRule {
-        fun StringBuilder.append(clock: Clock, playlistId: Long?) {
-            val sqlString = toSqlWhereClause(clock, playlistId)
+        fun StringBuilder.appendSqlQuery(clock: Clock) {
+            val sqlString = toSqlWhereClause(clock)
             if (sqlString.isNotEmpty()) {
                 if (isNotEmpty()) {
                     append(" AND ")
@@ -217,7 +194,7 @@ data class SmartRules(
             }
         }
 
-        fun toSqlWhereClause(clock: Clock, playlistId: Long?): String
+        fun toSqlWhereClause(clock: Clock): String
     }
 
     companion object {

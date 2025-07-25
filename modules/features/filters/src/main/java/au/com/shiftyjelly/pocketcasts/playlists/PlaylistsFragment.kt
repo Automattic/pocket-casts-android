@@ -46,8 +46,8 @@ class PlaylistsFragment :
             PlaylistsPage(
                 uiState = uiState,
                 listState = listState,
-                onCreate = { Timber.i("Create playlist clicked") },
-                onDelete = { playlist -> viewModel.deletePlaylist(playlist.uuid) },
+                onCreatePlaylist = { Timber.i("Create playlist clicked") },
+                onDeletePlaylist = { playlist -> viewModel.deletePlaylist(playlist.uuid) },
                 onShowOptions = { Timber.i("Show playlists options clicked") },
                 onFreeAccountBannerCtaClick = {
                     viewModel.trackFreeAccountCtaClick()

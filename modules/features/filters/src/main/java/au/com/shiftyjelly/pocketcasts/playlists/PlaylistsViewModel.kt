@@ -39,8 +39,14 @@ class PlaylistsViewModel @Inject constructor(
         settings.showPlaylistsOnboarding.flow,
         showFreeAccountBanner,
         settings.bottomInset,
-        ::UiState,
-    ).stateIn(viewModelScope, SharingStarted.Eagerly, UiState.Empty)
+    ) { playlists, showOnboarding, showFreeAccountBanner, bottomInset ->
+        UiState(
+            playlists = PlaylistsState.Loaded(playlists),
+            showOnboarding = showOnboarding,
+            showFreeAccountBanner = showFreeAccountBanner,
+            miniPlayerInset = bottomInset,
+        )
+    }.stateIn(viewModelScope, SharingStarted.Eagerly, UiState.Empty)
 
     fun deletePlaylist(uuid: String) {
         viewModelScope.launch {
@@ -58,18 +64,30 @@ class PlaylistsViewModel @Inject constructor(
     }
 
     internal data class UiState(
-        val playlists: List<PlaylistPreview>,
+        val playlists: PlaylistsState,
         val showOnboarding: Boolean,
         val showFreeAccountBanner: Boolean,
         val miniPlayerInset: Int,
     ) {
+        val showEmptyState get() = when (playlists) {
+            is PlaylistsState.Loading -> false
+            is PlaylistsState.Loaded -> playlists.value.isEmpty()
+        }
+
         companion object {
             val Empty = UiState(
-                playlists = emptyList(),
+                playlists = PlaylistsState.Loading,
                 showOnboarding = false,
                 showFreeAccountBanner = false,
                 miniPlayerInset = 0,
             )
         }
+    }
+
+    internal sealed interface PlaylistsState {
+        data object Loading : PlaylistsState
+
+        @JvmInline
+        value class Loaded(val value: List<PlaylistPreview>) : PlaylistsState
     }
 }
