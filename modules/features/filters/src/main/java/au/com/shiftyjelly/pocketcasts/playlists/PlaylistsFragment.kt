@@ -30,6 +30,8 @@ class PlaylistsFragment :
     private val scrollToTopSignal = MutableSharedFlow<Unit>()
     private val viewModel by viewModels<PlaylistsViewModel>()
 
+    private var getCanScrollBackward: () -> Boolean = { false }
+
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -37,6 +39,8 @@ class PlaylistsFragment :
     ) = contentWithoutConsumedInsets {
         val listState = rememberLazyListState()
         val uiState by viewModel.uiState.collectAsState()
+
+        getCanScrollBackward = { listState.canScrollBackward }
 
         AppThemeWithBackground(theme.activeTheme) {
             PlaylistsPage(
@@ -78,9 +82,13 @@ class PlaylistsFragment :
         }
     }
 
-    override fun scrollToTop() {
+    override fun scrollToTop(): Boolean {
+        val canScroll = getCanScrollBackward()
+
         lifecycleScope.launch {
             scrollToTopSignal.emit(Unit)
         }
+
+        return canScroll
     }
 }

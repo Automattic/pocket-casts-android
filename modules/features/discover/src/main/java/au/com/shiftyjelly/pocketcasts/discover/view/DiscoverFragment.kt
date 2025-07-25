@@ -304,8 +304,10 @@ class DiscoverFragment :
         }
     }
 
-    override fun scrollToTop() {
+    override fun scrollToTop(): Boolean {
+        val canScroll = binding?.recyclerView?.canScrollVertically(-1) ?: false
         binding?.recyclerView?.quickScrollToTop()
+        return canScroll
     }
 
     companion object {
