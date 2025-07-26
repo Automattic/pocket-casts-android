@@ -114,6 +114,46 @@ fun FoldersAnimation(
     folders: List<FolderConfig>,
     modifier: Modifier = Modifier,
 ) {
+    var showFolders by remember { mutableStateOf(false) }
+
+    // Wrap tiles in rows of 4
+    SharedTransitionLayout(modifier = modifier) {
+        AnimatedContent(
+            targetState = showFolders,
+            label = "shared magic"
+        ) { targetState ->
+            if (targetState) {
+                FolderRow(
+                    left = folders[0],
+                    center = folders[1],
+                    right = folders[2],
+                    modifier = Modifier.fillMaxWidth(),
+                    sharedTransitionScope = this@SharedTransitionLayout,
+                    animatedVisibilityScope = this
+                )
+            } else {
+                TileRows(
+                    tiles = tiles,
+                    folders = folders,
+                    sharedTransitionScope = this@SharedTransitionLayout,
+                    animatedVisibilityScope = this,
+                    onShowFolders = { showFolders = true }
+                )
+            }
+        }
+    }
+}
+
+@OptIn(ExperimentalSharedTransitionApi::class)
+@Composable
+private fun TileRows(
+    tiles: List<TileConfig>,
+    folders: List<FolderConfig>,
+    onShowFolders: () -> Unit,
+    modifier: Modifier = Modifier,
+    sharedTransitionScope: SharedTransitionScope? = null,
+    animatedVisibilityScope: AnimatedVisibilityScope? = null
+) {
     var edgeTilesVisible by remember { mutableStateOf(true) }
     val edgeFadeTransition = updateTransition(edgeTilesVisible, "edge tiles fade")
     val edgeFade by edgeFadeTransition.animateFloat(
@@ -136,8 +176,6 @@ fun FoldersAnimation(
         )
     }
 
-    var showFolders by remember { mutableStateOf(false) }
-
     LaunchedEffect("animations") {
         edgeTilesVisible = false
         shrinkAnimationsIndexed.entries.forEachIndexed { index, entry ->
@@ -146,71 +184,56 @@ fun FoldersAnimation(
             }
         }
         delay(1050)
-        showFolders = true
+        onShowFolders()
     }
 
-    // Wrap tiles in rows of 4
-    SharedTransitionLayout {
-        AnimatedContent(
-            targetState = showFolders,
-            label = "shared magic"
-        ) { targetState ->
-            if (targetState) {
-                FolderRow(
-                    left = folders[0],
-                    center = folders[1],
-                    right = folders[2],
-                    modifier = Modifier.fillMaxWidth()
-                )
-            } else {
-                Column(
-                    modifier = modifier,
-                    verticalArrangement = Arrangement.spacedBy(8.dp)
-                ) {
-                    tiles.chunked(4).forEach { rowTiles ->
-                        Row(
-                            horizontalArrangement = Arrangement.spacedBy(8.dp),
-                            modifier = Modifier.fillMaxWidth()
-                        ) {
-                            rowTiles.forEach { tile ->
-                                val density = LocalDensity.current
-                                val boxSizePx = with(density) {
-                                    80.dp.roundToPx()
-                                }
-                                Tile(
-                                    tileConfig = tile,
-                                    modifier = Modifier
-                                        .then(
-                                            if (folders[1].tiles.map { it.index }.contains(tile.index)) {
-                                                Modifier.sharedElement(
-                                                    sharedContentState = rememberSharedContentState("tile${tile.index}"),
-                                                    animatedVisibilityScope = this@AnimatedContent
-                                                )
-                                            } else {
-                                                Modifier
-                                            }
-                                        )
-                                        .size(80.dp)
-                                        .graphicsLayer {
-                                            if (edgeFadeIndices.contains(tile.index)) {
-                                                alpha = edgeFade
-                                            }
-                                            shrinkAnimationsIndexed[tile.index]?.let { shrink ->
-                                                scaleX = shrink.value
-                                                scaleY = shrink.value
-
-                                                val deltaScale = shrink.value - 1f
-                                                val shiftX = -deltaScale * tile.anchor.x * boxSizePx
-                                                val shiftY = -deltaScale * tile.anchor.y * boxSizePx
-                                                translationX = shiftX
-                                                translationY = shiftY
-                                            }
-
-                                        }
-                                )
-                            }
-                        }
+    Column(
+        modifier = modifier,
+        verticalArrangement = Arrangement.spacedBy(8.dp)
+    ) {
+        tiles.chunked(4).forEach { rowTiles ->
+            Row(
+                horizontalArrangement = Arrangement.spacedBy(8.dp),
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                rowTiles.forEach { tile ->
+                    val density = LocalDensity.current
+                    val boxSizePx = with(density) {
+                        80.dp.roundToPx()
                     }
+                    Tile(
+                        tileConfig = tile,
+                        modifier = Modifier
+                            .then(
+                                if (folders[1].tiles.map { it.index }.contains(tile.index) && sharedTransitionScope != null && animatedVisibilityScope != null) {
+                                    with(sharedTransitionScope) {
+                                        Modifier.sharedElement(
+                                            sharedContentState = rememberSharedContentState("tile${tile.index}"),
+                                            animatedVisibilityScope = animatedVisibilityScope
+                                        )
+                                    }
+                                } else {
+                                    Modifier
+                                }
+                            )
+                            .size(80.dp)
+                            .graphicsLayer {
+                                if (edgeFadeIndices.contains(tile.index)) {
+                                    alpha = edgeFade
+                                }
+                                shrinkAnimationsIndexed[tile.index]?.let { shrink ->
+                                    scaleX = shrink.value
+                                    scaleY = shrink.value
+
+                                    val deltaScale = shrink.value - 1f
+                                    val shiftX = -deltaScale * tile.anchor.x * boxSizePx
+                                    val shiftY = -deltaScale * tile.anchor.y * boxSizePx
+                                    translationX = shiftX
+                                    translationY = shiftY
+                                }
+
+                            }
+                    )
                 }
             }
         }
@@ -227,6 +250,8 @@ private fun FolderRow(
     sharedTransitionScope: SharedTransitionScope? = null,
     animatedVisibilityScope: AnimatedVisibilityScope? = null,
 ) {
+
+
     Layout(
         modifier = modifier,
         content = {
@@ -347,6 +372,20 @@ private fun PreviewFolder(
             animatedVisibilityScope = null
         )
     }
+}
+
+@ExperimentalSharedTransitionApi
+@Preview
+@Composable
+private fun PreviewTileRows(
+    @PreviewParameter(ThemePreviewParameterProvider::class) theme: Theme.ThemeType,
+) = AppTheme(theme) {
+    TileRows(
+        modifier = Modifier.fillMaxWidth(),
+        tiles = previewTiles,
+        folders = previewFolders,
+        onShowFolders = {}
+    )
 }
 
 
