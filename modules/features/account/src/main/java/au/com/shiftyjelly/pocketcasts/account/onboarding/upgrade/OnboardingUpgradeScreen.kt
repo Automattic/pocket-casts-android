@@ -425,13 +425,13 @@ private fun FoldersUpgradeContent(
         TextP40(
             text = stringResource(LR.string.onboarding_upgrade_schedule_see_features),
             modifier = Modifier
-                .padding(vertical = 24.dp, horizontal = 24.dp)
+                .padding(24.dp)
                 .clickable { onCtaClick() },
             color = MaterialTheme.theme.colors.primaryInteractive01,
         )
 
         FoldersAnimation(
-            modifier = Modifier.fillMaxWidth(),
+            modifier = Modifier.fillMaxWidth().heightIn(min = 320.dp),
             folders = previewFolders,
             tiles = previewTiles,
         )
