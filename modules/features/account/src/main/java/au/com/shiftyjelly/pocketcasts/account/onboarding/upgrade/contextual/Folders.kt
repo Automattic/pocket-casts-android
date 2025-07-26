@@ -35,7 +35,6 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.Layout
-import androidx.compose.ui.layout.Placeable
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
@@ -46,17 +45,10 @@ import au.com.shiftyjelly.pocketcasts.compose.components.TextH30
 import au.com.shiftyjelly.pocketcasts.compose.components.TextP30
 import au.com.shiftyjelly.pocketcasts.compose.preview.ThemePreviewParameterProvider
 import au.com.shiftyjelly.pocketcasts.compose.theme
-import au.com.shiftyjelly.pocketcasts.models.entity.Folder
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import kotlin.random.Random
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-
-enum class FolderPosition {
-    LEFT,
-    CENTER,
-    RIGHT,
-}
 
 val previewTiles = (1..8).map {
     TileConfig(
@@ -84,7 +76,6 @@ val mockTile = TileConfig(
 )
 
 data class FolderConfig(
-    val position: FolderPosition,
     val folderName: String,
     val color: Color,
     val tiles: List<TileConfig>,
@@ -93,24 +84,20 @@ data class FolderConfig(
 val previewFolders = listOf(
     FolderConfig(
         folderName = "Books",
-        position = FolderPosition.LEFT,
         color = Color.Cyan,
         tiles = listOf(mockTile, previewTiles[0], mockTile, previewTiles[4])
     ),
     FolderConfig(
         folderName = "Favorites",
-        position = FolderPosition.CENTER,
         color = Color.Blue,
         tiles = listOf(previewTiles[1], previewTiles[2], previewTiles[5], previewTiles[6])
     ),
     FolderConfig(
         folderName = "Sports",
-        position = FolderPosition.RIGHT,
         color = Color.Yellow,
         tiles = listOf(previewTiles[3], mockTile, previewTiles[7], mockTile)
     ),
 )
-
 
 private val edgeFadeIndices = listOf(1, 4, 5, 8)
 
@@ -170,9 +157,9 @@ fun FoldersAnimation(
         ) { targetState ->
             if (targetState) {
                 FolderRow(
-                    left = folders.find { it.position == FolderPosition.LEFT }!!,
-                    center = folders.find { it.position == FolderPosition.CENTER }!!,
-                    right = folders.find { it.position == FolderPosition.RIGHT }!!,
+                    left = folders[0],
+                    center = folders[1],
+                    right = folders[2],
                     modifier = Modifier.fillMaxWidth()
                 )
             } else {
@@ -194,7 +181,7 @@ fun FoldersAnimation(
                                     tileConfig = tile,
                                     modifier = Modifier
                                         .then(
-                                            if ((folders.find { it.position == FolderPosition.CENTER }?.tiles?.map { it.index } ?: emptyList()).contains(tile.index)) {
+                                            if (folders[1].tiles.map { it.index }.contains(tile.index)) {
                                                 Modifier.sharedElement(
                                                     sharedContentState = rememberSharedContentState("tile${tile.index}"),
                                                     animatedVisibilityScope = this@AnimatedContent
@@ -351,7 +338,6 @@ private fun PreviewFolder(
         Folder(
             size = 219.dp,
             spec = FolderConfig(
-                position = FolderPosition.CENTER,
                 folderName = "Favorites",
                 color = Color.Blue,
                 tiles = previewTiles.take(4)
@@ -371,9 +357,9 @@ private fun PreviewFolderRow(
     @PreviewParameter(ThemePreviewParameterProvider::class) theme: Theme.ThemeType,
 ) = AppTheme(theme) {
     FolderRow(
-        left = previewFolders.find { it.position == FolderPosition.LEFT }!!,
-        center = previewFolders.find { it.position == FolderPosition.CENTER }!!,
-        right = previewFolders.find { it.position == FolderPosition.RIGHT }!!,
+        left = previewFolders[0],
+        center = previewFolders[1],
+        right = previewFolders[2],
         modifier = Modifier.fillMaxWidth()
     )
 }
