@@ -89,12 +89,12 @@ fun OnboardingUpgradeScreen(
             .windowInsetsPadding(WindowInsets.statusBars)
             .windowInsetsPadding(WindowInsets.navigationBars)
             .background(color = MaterialTheme.colors.background)
-            .fillMaxSize()
-            .padding(
-                horizontal = 24.dp,
-            ),
+            .fillMaxSize(),
     ) {
         UpgradeHeader(
+            modifier = Modifier.padding(
+                horizontal = 24.dp,
+            ),
             selectedPlan = state.selectedPlan,
             source = source,
             onClosePress = onClosePress,
@@ -112,6 +112,9 @@ fun OnboardingUpgradeScreen(
         Spacer(modifier = Modifier.height(24.dp))
         UpgradeFooter(
             modifier = Modifier
+                .padding(
+                    horizontal = 24.dp,
+                )
                 .fillMaxWidth(),
             plans = state.availableBasePlans,
             selectedOnboardingPlan = state.selectedPlan,
@@ -344,11 +347,17 @@ private fun UpgradeContent(
             }
             when (page) {
                 is UpgradePagerContent.Features -> FeaturesContent(
+                    modifier = Modifier.padding(
+                        horizontal = 24.dp,
+                    ),
                     features = page,
                     onCtaClick = scrollToNext,
                 )
 
                 is UpgradePagerContent.TrialSchedule -> ScheduleContent(
+                    modifier = Modifier.padding(
+                        horizontal = 24.dp,
+                    ),
                     trialSchedule = page,
                     onCtaClick = scrollToNext,
                 )
@@ -363,8 +372,9 @@ private fun UpgradeContent(
 private fun FeaturesContent(
     features: UpgradePagerContent.Features,
     onCtaClick: () -> Unit,
+    modifier: Modifier = Modifier,
 ) {
-    Column {
+    Column(modifier = modifier) {
         features.features.forEach { item ->
             UpgradeFeatureItem(
                 item = item,
@@ -388,8 +398,9 @@ private fun FeaturesContent(
 private fun ScheduleContent(
     trialSchedule: UpgradePagerContent.TrialSchedule,
     onCtaClick: () -> Unit,
+    modifier: Modifier = Modifier,
 ) {
-    Column {
+    Column(modifier = modifier) {
         UpgradeTrialTimeline(
             items = trialSchedule.timelineItems,
         )
@@ -414,7 +425,7 @@ private fun FoldersUpgradeContent(
         TextP40(
             text = stringResource(LR.string.onboarding_upgrade_schedule_see_features),
             modifier = Modifier
-                .padding(vertical = 24.dp)
+                .padding(vertical = 24.dp, horizontal = 24.dp)
                 .clickable { onCtaClick() },
             color = MaterialTheme.theme.colors.primaryInteractive01,
         )
