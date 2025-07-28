@@ -27,7 +27,7 @@ class ProfileUpgradeBannerStateTest {
         ).getOrNull()!!
 
         FeatureFlag.setEnabled(Feature.INTRO_PLUS_OFFER_ENABLED, true)
-        val state = ProfileUpgradeBannerState(
+        val state = ProfileUpgradeBannerState.OldProfileUpgradeBannerState(
             subscriptionPlans = SubscriptionPlans.Preview,
             currentSubscription = null,
             isRenewingSubscription = false,
@@ -52,7 +52,7 @@ class ProfileUpgradeBannerStateTest {
         ).getOrNull()!!
 
         FeatureFlag.setEnabled(Feature.INTRO_PLUS_OFFER_ENABLED, false)
-        val state = ProfileUpgradeBannerState(
+        val state = ProfileUpgradeBannerState.OldProfileUpgradeBannerState(
             subscriptionPlans = SubscriptionPlans.Preview,
             currentSubscription = null,
             isRenewingSubscription = false,
@@ -70,7 +70,7 @@ class ProfileUpgradeBannerStateTest {
 
     @Test
     fun `state with Plus Monthly renewing current subscription`() {
-        val state = ProfileUpgradeBannerState(
+        val state = ProfileUpgradeBannerState.OldProfileUpgradeBannerState(
             subscriptionPlans = SubscriptionPlans.Preview,
             currentSubscription = SubscriptionPlan.PlusMonthlyPreview.key,
             isRenewingSubscription = true,
@@ -88,7 +88,7 @@ class ProfileUpgradeBannerStateTest {
 
     @Test
     fun `state with Plus Yearly renewing current subscription`() {
-        val state = ProfileUpgradeBannerState(
+        val state = ProfileUpgradeBannerState.OldProfileUpgradeBannerState(
             subscriptionPlans = SubscriptionPlans.Preview,
             currentSubscription = SubscriptionPlan.PlusYearlyPreview.key,
             isRenewingSubscription = true,
@@ -106,7 +106,7 @@ class ProfileUpgradeBannerStateTest {
 
     @Test
     fun `state with Patron Monthly renewing current subscription`() {
-        val state = ProfileUpgradeBannerState(
+        val state = ProfileUpgradeBannerState.OldProfileUpgradeBannerState(
             subscriptionPlans = SubscriptionPlans.Preview,
             currentSubscription = SubscriptionPlan.PatronMonthlyPreview.key,
             isRenewingSubscription = true,
@@ -123,7 +123,7 @@ class ProfileUpgradeBannerStateTest {
 
     @Test
     fun `state with Patron Yearly renewing current subscription`() {
-        val state = ProfileUpgradeBannerState(
+        val state = ProfileUpgradeBannerState.OldProfileUpgradeBannerState(
             subscriptionPlans = SubscriptionPlans.Preview,
             currentSubscription = SubscriptionPlan.PatronYearlyPreview.key,
             isRenewingSubscription = true,
@@ -140,7 +140,7 @@ class ProfileUpgradeBannerStateTest {
 
     @Test
     fun `state with not renewing current subscription`() {
-        val state = ProfileUpgradeBannerState(
+        val state = ProfileUpgradeBannerState.OldProfileUpgradeBannerState(
             subscriptionPlans = SubscriptionPlans.Preview,
             currentSubscription = SubscriptionPlan.PlusYearlyPreview.key,
             isRenewingSubscription = false,
