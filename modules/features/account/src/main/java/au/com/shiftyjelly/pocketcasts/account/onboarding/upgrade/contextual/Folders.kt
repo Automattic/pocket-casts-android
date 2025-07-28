@@ -2,6 +2,8 @@ package au.com.shiftyjelly.pocketcasts.account.onboarding.upgrade.contextual
 
 import androidx.compose.animation.ExperimentalSharedTransitionApi
 import androidx.compose.animation.core.Animatable
+import androidx.compose.animation.core.Easing
+import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.animateFloat
 import androidx.compose.animation.core.tween
@@ -10,11 +12,11 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentSize
@@ -26,7 +28,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
@@ -34,6 +35,9 @@ import androidx.compose.ui.graphics.TransformOrigin
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.Layout
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.semantics.role
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.Constraints
@@ -47,7 +51,20 @@ import au.com.shiftyjelly.pocketcasts.compose.theme
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import kotlin.math.min
 import kotlin.random.Random
+
+data class TileConfig(
+    val index: Int,
+    val color: Color,
+    val anchor: TransformOrigin,
+)
+
+data class FolderConfig(
+    val folderName: String,
+    val color: Color,
+    val tiles: List<TileConfig>,
+)
 
 private fun randomColor() = Color(
     red = Random.nextFloat(),
@@ -56,7 +73,7 @@ private fun randomColor() = Color(
     alpha = 1f,
 )
 
-val previewTiles = (1..8).map {
+private val previewTiles = (1..8).map {
     TileConfig(
         index = it,
         color = randomColor(),
@@ -66,54 +83,41 @@ val previewTiles = (1..8).map {
             6 -> TransformOrigin(1f, 0f)
             7 -> TransformOrigin(0f, 0f)
             else -> TransformOrigin(0f, 0f)
-        }
+        },
     )
 }
 
-val mockTile = TileConfig(
+private val mockTile = TileConfig(
     index = -1,
     color = Color.Transparent,
     anchor = TransformOrigin(0f, 0f),
 )
 
-data class FolderConfig(
-    val folderName: String,
-    val color: Color,
-    val tiles: List<TileConfig>,
-)
-
-val previewFolders = listOf(
+private val previewFolders = listOf(
     FolderConfig(
         folderName = "Books",
         color = Color.Cyan,
-        tiles = listOf(mockTile, previewTiles[0], mockTile, previewTiles[4])
+        tiles = listOf(mockTile, previewTiles[0], mockTile, previewTiles[4]),
     ),
     FolderConfig(
         folderName = "Favorites",
         color = Color.Blue,
-        tiles = emptyList()
+        tiles = List(4) { mockTile },
     ),
     FolderConfig(
         folderName = "Sports",
         color = Color.Yellow,
-        tiles = listOf(previewTiles[3], mockTile, previewTiles[7], mockTile)
+        tiles = listOf(previewTiles[3], mockTile, previewTiles[7], mockTile),
     ),
 )
 
 private val edgeFadeIndices = listOf(1, 4, 5, 8)
 
-data class TileConfig(
-    val index: Int,
-    val color: Color,
-    val anchor: TransformOrigin,
-)
-
-@ExperimentalSharedTransitionApi
 @Composable
 fun FoldersAnimation(
-    tiles: List<TileConfig>,
-    folders: List<FolderConfig>,
     modifier: Modifier = Modifier,
+    tiles: List<TileConfig> = previewTiles,
+    folders: List<FolderConfig> = previewFolders,
 ) {
     var showFolders by remember { mutableStateOf(false) }
 
@@ -123,14 +127,14 @@ fun FoldersAnimation(
     }
 
     Box(
-        modifier = modifier,
-//            .background(color = Color.Gray.copy(alpha = 0.3f)),
+        modifier = modifier
+            .semantics { role = Role.Image },
     ) {
         if (showFolders) {
             FolderRow(
-                modifier = Modifier.fillMaxHeight()
+                modifier = Modifier
+                    .fillMaxHeight()
                     .padding(vertical = 24.dp),
-//                    .background(color = Color.Blue.copy(alpha = .3f)),
                 left = folders[0],
                 center = folders[1],
                 right = folders[2],
@@ -139,7 +143,6 @@ fun FoldersAnimation(
         TileRows(
             tiles = tiles,
             modifier = Modifier.fillMaxHeight(),
-//                .background(color = Color.Red.copy(alpha = .3f))
         )
     }
 }
@@ -153,8 +156,9 @@ private fun TileRows(
     val edgeFadeTransition = updateTransition(edgeTilesVisible, "edge tiles fade")
     val edgeFade by edgeFadeTransition.animateFloat(
         transitionSpec = {
-            tween(durationMillis = 400, easing = LinearEasing)
-        }, label = "alphaAnimation"
+            tween(durationMillis = 400, easing = FastOutSlowInEasing)
+        },
+        label = "alphaAnimation",
     ) { isVisible ->
         if (isVisible) {
             1f
@@ -175,14 +179,17 @@ private fun TileRows(
         edgeTilesVisible = false
         shrinkAnimationsIndexed.entries.forEachIndexed { index, entry ->
             launch {
-                entry.value.animateTo(0.6f, animationSpec = tween(durationMillis = 900, easing = LinearEasing, delayMillis = index * 50))
+                entry.value.animateTo(
+                    0.6f,
+                    animationSpec = tween(durationMillis = 900, easing = LinearEasing, delayMillis = index * 50)
+                )
             }
         }
     }
 
     Column(
         modifier = modifier,
-        verticalArrangement = Arrangement.spacedBy(12.dp)
+        verticalArrangement = Arrangement.spacedBy(12.dp),
     ) {
         tiles.chunked(4).forEach { rowTiles ->
             TruncatedRow(
@@ -202,7 +209,7 @@ private fun TileRows(
                                     scaleY = shrink.value
                                     transformOrigin = tile.anchor
                                 }
-                            }
+                            },
                     )
                 }
             }
@@ -211,15 +218,15 @@ private fun TileRows(
 }
 
 @Composable
-fun TruncatedRow(
+private fun TruncatedRow(
     modifier: Modifier = Modifier,
     peekWidth: Dp = 32.dp,
     spacing: Dp = 12.dp,
-    content: @Composable () -> Unit
+    content: @Composable () -> Unit,
 ) {
     Layout(
         modifier = modifier,
-        content = content
+        content = content,
     ) { measurables, constraints ->
         val itemCount = measurables.size
         if (itemCount == 0) {
@@ -247,15 +254,17 @@ fun TruncatedRow(
     }
 }
 
-@ExperimentalSharedTransitionApi
 @Composable
 private fun FolderRow(
     left: FolderConfig,
     center: FolderConfig,
     right: FolderConfig,
     modifier: Modifier = Modifier,
+    spaceBetweenFolders: Dp = 32.dp,
+    edgeFolderSizePercent: Int = 70,
+    showFolders: Boolean = false,
 ) {
-    val animationStarters = remember { List(3) { mutableStateOf(false) } }
+    val animationStarters = remember { List(3) { mutableStateOf(showFolders) } }
 
     LaunchedEffect("animations") {
         animationStarters[1].value = true
@@ -268,22 +277,43 @@ private fun FolderRow(
     Layout(
         modifier = modifier,
         content = {
-            Folder(spec = left, size = 153.dp, tileSize = 42.dp, startTransition = animationStarters[0].value)
             Folder(
+                modifier = Modifier.aspectRatio(1f),
+                spec = left,
+                startTransition = animationStarters[0].value,
+                alphaTargetValue = 0.33f
+            )
+            Folder(
+                modifier = Modifier.aspectRatio(1f),
                 spec = center,
-                size = 219.dp,
-                tileSize = 69.dp,
                 startTransition = animationStarters[1].value,
                 floatInOffset = 24.dp,
-                animationDurationMillis = 400
+                animationDurationMillis = 400,
+                easing = LinearEasing,
             )
-            Folder(spec = right, size = 153.dp, tileSize = 42.dp, startTransition = animationStarters[2].value)
-        }
+            Folder(
+                modifier = Modifier.aspectRatio(1f),
+                spec = right,
+                startTransition = animationStarters[2].value,
+                alphaTargetValue = 0.66f
+            )
+        },
     ) { measurables, constraints ->
-        val placeables = measurables.map { it.measure(constraints) }
+        val spacingPx = spaceBetweenFolders.roundToPx()
+        val itemCount = 3
+        val totalSpacing = spacingPx * (itemCount - 1)
 
-        val maxHeight = placeables.map { it.height }.maxBy { it }
+        val centerItemSize = (constraints.maxWidth - totalSpacing) / (1 + (edgeFolderSizePercent / 100f))
+        val edgeItemSize = centerItemSize * (edgeFolderSizePercent / 100f)
+        val placeables = measurables.mapIndexed { index, item ->
+            if (index == 1) {
+                item.measure(Constraints.fixedWidth(centerItemSize.toInt()))
+            } else {
+                item.measure(Constraints.fixedWidth(edgeItemSize.toInt()))
+            }
+        }
 
+        val maxHeight = placeables.maxOf { it.height }
         layout(constraints.maxWidth, maxHeight) {
             val horizontalCenter = constraints.maxWidth / 2
 
@@ -304,7 +334,6 @@ private fun FolderRow(
                 y = maxHeight - placeables[2].height,
                 zIndex = 0.5f,
             )
-
         }
     }
 }
@@ -317,21 +346,23 @@ private fun Tile(
     Box(
         modifier = modifier
             .clip(RoundedCornerShape(8.dp))
-            .background(color = tileConfig.color)
+            .background(color = tileConfig.color),
     ) {
         TextP30(text = tileConfig.index.toString())
     }
 }
 
-@ExperimentalSharedTransitionApi
 @Composable
 private fun Folder(
     spec: FolderConfig,
-    size: Dp,
-    tileSize: Dp,
-    floatInOffset: Dp = 64.dp,
     startTransition: Boolean,
+    modifier: Modifier = Modifier,
+    spacing: Dp = 8.dp,
+    floatInOffset: Dp = 64.dp,
+    titleTopPadding: Dp = 14.dp,
     animationDurationMillis: Int = 900,
+    easing: Easing = FastOutSlowInEasing,
+    alphaTargetValue: Float = 1f,
 ) {
     val floatInOffsetPx = LocalDensity.current.run {
         floatInOffset.toPx()
@@ -339,19 +370,19 @@ private fun Folder(
     val transition = updateTransition(startTransition)
     val alphaAnim by transition.animateFloat(
         transitionSpec = {
-            tween(durationMillis = animationDurationMillis, easing = LinearEasing)
-        }
+            tween(durationMillis = animationDurationMillis, easing = easing)
+        },
     ) { isVisible ->
         if (isVisible) {
-            1f
+            alphaTargetValue
         } else {
             0f
         }
     }
     val translationYAnim by transition.animateFloat(
         transitionSpec = {
-            tween(durationMillis = animationDurationMillis, easing = LinearEasing)
-        }
+            tween(durationMillis = animationDurationMillis, easing = easing)
+        },
     ) { isVisible ->
         if (isVisible) {
             0f
@@ -360,36 +391,62 @@ private fun Folder(
         }
     }
 
-    Column(
-        modifier = Modifier
+    Layout(
+        modifier = modifier
             .graphicsLayer {
                 alpha = alphaAnim
                 translationY = translationYAnim
             }
             .wrapContentSize()
-            .size(size)
             .clip(RoundedCornerShape(32.dp))
             .background(color = spec.color, shape = RoundedCornerShape(32.dp))
-            .padding(top = 20.dp, bottom = 12.dp),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.spacedBy(8.dp)
-    ) {
-        spec.tiles.chunked(2).forEach { rowTiles ->
-            Row(
-                horizontalArrangement = Arrangement.spacedBy(8.dp)
-            ) {
-                rowTiles.forEach {
-                    Tile(
-                        modifier = Modifier
-                            .size(tileSize),
-                        tileConfig = it
+            .padding(top = 20.dp, bottom = 12.dp)
+            .padding(horizontal = 20.dp),
+        content = {
+            spec.tiles.take(4).forEach {
+                Tile(
+                    modifier = Modifier.aspectRatio(1f),
+                    tileConfig = it,
+                )
+            }
+            TextH30(
+                text = spec.folderName,
+                color = MaterialTheme.theme.colors.primaryInteractive02,
+                maxLines = 1,
+            )
+        },
+    ) { measurables, constraints ->
+        val spacingPx = spacing.roundToPx()
+        val itemSizeHorizontal = (constraints.maxWidth - spacingPx) / 2
+        val itemSizeVertical = (constraints.maxHeight - spacingPx) / 2 - titleTopPadding.toPx()
+        val itemSize = min(itemSizeHorizontal, itemSizeVertical.toInt())
+        val placeables = measurables.mapIndexed { index, item ->
+            if (index >= 4) {
+                item.measure(constraints)
+            } else {
+                item.measure(Constraints.fixedWidth(itemSize))
+            }
+        }
+
+        layout(constraints.maxWidth, constraints.maxHeight) {
+            placeables.forEachIndexed { index, item ->
+                if (index >= 4) {
+                    item.placeRelative(
+                        x = (constraints.maxWidth - item.width) / 2,
+                        y = constraints.maxHeight - item.height,
+                    )
+                } else {
+                    val row = index / 2
+                    val col = index % 2
+                    val centerX = constraints.maxWidth / 2
+
+                    item.placeRelative(
+                        x = centerX + if (col == 0) -spacingPx / 2 - item.width else spacingPx / 2,
+                        y = row * (item.height + spacingPx),
                     )
                 }
             }
         }
-        Spacer(modifier = Modifier.weight(1f))
-
-        TextH30(text = spec.folderName, color = MaterialTheme.theme.colors.primaryInteractive02)
     }
 }
 
@@ -399,16 +456,25 @@ private fun Folder(
 private fun PreviewFolder(
     @PreviewParameter(ThemePreviewParameterProvider::class) theme: Theme.ThemeType,
 ) = AppTheme(theme) {
-    Box(contentAlignment = Alignment.Center) {
+    Column {
         Folder(
-            size = 219.dp,
+            modifier = Modifier.size(219.dp),
             spec = FolderConfig(
                 folderName = "Favorites",
                 color = Color.Blue,
-                tiles = previewTiles.take(4)
+                tiles = previewTiles.take(4),
             ),
-            tileSize = 69.dp,
-            startTransition = true
+            startTransition = true,
+        )
+        Spacer(Modifier.height(12.dp))
+        Folder(
+            modifier = Modifier.size(120.dp),
+            spec = FolderConfig(
+                folderName = "Small sized long name",
+                color = Color.Blue,
+                tiles = previewTiles.take(4),
+            ),
+            startTransition = true,
         )
     }
 }
@@ -425,19 +491,21 @@ private fun PreviewTileRows(
     )
 }
 
-
 @ExperimentalSharedTransitionApi
 @Preview
 @Composable
 private fun PreviewFolderRow(
     @PreviewParameter(ThemePreviewParameterProvider::class) theme: Theme.ThemeType,
 ) = AppTheme(theme) {
-    FolderRow(
-        left = previewFolders[0],
-        center = previewFolders[1],
-        right = previewFolders[2],
-        modifier = Modifier.fillMaxWidth()
-    )
+    Column {
+        FolderRow(
+            modifier = Modifier.fillMaxWidth(),
+            left = previewFolders[0],
+            center = previewFolders[1],
+            right = previewFolders[2],
+            showFolders = true,
+        )
+    }
 }
 
 @ExperimentalSharedTransitionApi
@@ -452,7 +520,7 @@ private fun PreviewTruncatedRow(
                 modifier = Modifier
                     .aspectRatio(1f)
                     .clip(RoundedCornerShape(12.dp))
-                    .background(randomColor())
+                    .background(randomColor()),
             )
         }
     }

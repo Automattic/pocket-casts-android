@@ -222,7 +222,7 @@ data class OnboardingSubscriptionPlan private constructor(
             OnboardingUpgradeSource.FOLDERS,
             OnboardingUpgradeSource.FOLDERS_PODCAST_SCREEN,
             OnboardingUpgradeSource.SUGGESTED_FOLDERS,
-                -> if (FeatureFlag.isEnabled(Feature.NEW_ONBOARDING_UPGRADE)) {
+            -> if (FeatureFlag.isEnabled(Feature.NEW_ONBOARDING_UPGRADE)) {
                 LR.string.onboarding_folders_title
             } else {
                 LR.string.folders_plus_prompt

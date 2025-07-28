@@ -46,8 +46,6 @@ import au.com.shiftyjelly.pocketcasts.account.onboarding.components.UpgradePlanR
 import au.com.shiftyjelly.pocketcasts.account.onboarding.upgrade.OnboardingUpgradeHelper.PrivacyPolicy
 import au.com.shiftyjelly.pocketcasts.account.onboarding.upgrade.OnboardingUpgradeHelper.UpgradeRowButton
 import au.com.shiftyjelly.pocketcasts.account.onboarding.upgrade.contextual.FoldersAnimation
-import au.com.shiftyjelly.pocketcasts.account.onboarding.upgrade.contextual.previewFolders
-import au.com.shiftyjelly.pocketcasts.account.onboarding.upgrade.contextual.previewTiles
 import au.com.shiftyjelly.pocketcasts.account.viewmodel.OnboardingUpgradeFeaturesState
 import au.com.shiftyjelly.pocketcasts.compose.AppThemeWithBackground
 import au.com.shiftyjelly.pocketcasts.compose.components.FadedLazyColumn
@@ -72,7 +70,6 @@ import java.time.temporal.ChronoUnit
 import kotlinx.coroutines.launch
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
-@ExperimentalSharedTransitionApi
 @Composable
 fun OnboardingUpgradeScreen(
     state: OnboardingUpgradeFeaturesState.Loaded,
@@ -327,7 +324,6 @@ private sealed interface UpgradePagerContent {
     }
 }
 
-@ExperimentalSharedTransitionApi
 @Composable
 private fun UpgradeContent(
     pages: List<UpgradePagerContent>,
@@ -416,10 +412,9 @@ private fun ScheduleContent(
     }
 }
 
-@ExperimentalSharedTransitionApi
 @Composable
 private fun FoldersUpgradeContent(
-    onCtaClick: () -> Unit
+    onCtaClick: () -> Unit,
 ) {
     Column {
         TextP40(
@@ -431,9 +426,9 @@ private fun FoldersUpgradeContent(
         )
 
         FoldersAnimation(
-            modifier = Modifier.fillMaxWidth().heightIn(min = 320.dp),
-            folders = previewFolders,
-            tiles = previewTiles,
+            modifier = Modifier
+                .fillMaxWidth()
+                .heightIn(min = 320.dp),
         )
     }
 }
