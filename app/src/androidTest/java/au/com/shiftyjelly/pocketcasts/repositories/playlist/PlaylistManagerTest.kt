@@ -36,6 +36,7 @@ import au.com.shiftyjelly.pocketcasts.models.type.SmartRules.StarredRule
 import au.com.shiftyjelly.pocketcasts.sharedtest.MutableClock
 import com.squareup.moshi.Moshi
 import java.util.Date
+import java.util.UUID
 import kotlin.time.Duration.Companion.minutes
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.test.StandardTestDispatcher
@@ -756,6 +757,52 @@ class PlaylistManagerTest {
                 shorterThan = 40,
             ),
             playlists[0],
+        )
+    }
+
+    @Test
+    fun orderPlaylists() = runTest(testDispatcher) {
+        val playlists = List(100) { index ->
+            SmartPlaylist(uuid = UUID.randomUUID().toString(), sortPosition = index)
+        }
+        playlistDao.upsertSmartPlaylists(playlists)
+
+        val reorderedPlaylistsUuids = playlists.shuffled().map(SmartPlaylist::uuid)
+        manager.updatePlaylistsOrder(reorderedPlaylistsUuids)
+
+        val reorderedPlaylists = playlistDao.getSmartPlaylists()
+        assertEquals(reorderedPlaylistsUuids, reorderedPlaylists.map(SmartPlaylist::uuid))
+        assertTrue(reorderedPlaylists.all { it.syncStatus == SYNC_STATUS_NOT_SYNCED })
+    }
+
+    @Test
+    fun moveUnspecifiedPlaylistsToTheBottom() = runTest(testDispatcher) {
+        val playlists = listOf(
+            SmartPlaylist(uuid = UUID.randomUUID().toString(), sortPosition = 0),
+            SmartPlaylist(uuid = UUID.randomUUID().toString(), sortPosition = 1),
+            SmartPlaylist(uuid = UUID.randomUUID().toString(), sortPosition = 2),
+            SmartPlaylist(uuid = UUID.randomUUID().toString(), sortPosition = 3),
+            SmartPlaylist(uuid = UUID.randomUUID().toString(), sortPosition = 4),
+        )
+        playlistDao.upsertSmartPlaylists(playlists)
+
+        val reorderedPlaylistsUuids = listOf(
+            playlists[4].uuid,
+            playlists[1].uuid,
+            playlists[3].uuid,
+        )
+        manager.updatePlaylistsOrder(reorderedPlaylistsUuids)
+
+        val reorderedPlaylists = playlistDao.getSmartPlaylists()
+        assertEquals(
+            listOf(
+                playlists[4].uuid,
+                playlists[1].uuid,
+                playlists[3].uuid,
+                playlists[0].uuid,
+                playlists[2].uuid,
+            ),
+            reorderedPlaylists.map(SmartPlaylist::uuid),
         )
     }
 }

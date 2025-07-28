@@ -9,5 +9,5 @@ interface PlaylistManager {
 
     suspend fun upsertPlaylist(draft: PlaylistDraft)
 
-    suspend fun updatePlaylistPosition(playlistUuids: List<String>)
+    suspend fun updatePlaylistsOrder(sortedUuids: List<String>)
 }

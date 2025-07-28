@@ -33,10 +33,8 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.distinctUntilChanged
-import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flowOf
-import timber.log.Timber
 
 @OptIn(ExperimentalCoroutinesApi::class, FlowPreview::class)
 class PlaylistManagerImpl @Inject constructor(
@@ -82,12 +80,13 @@ class PlaylistManagerImpl @Inject constructor(
         }
     }
 
-    override suspend fun updatePlaylistPosition(playlistUuids: List<String>) {
+    override suspend fun updatePlaylistsOrder(sortedUuids: List<String>) {
         appDatabase.withTransaction {
-            val playlists = playlistDao
-                .getSmartPlaylists()
-                .sortedBy { playlist -> playlistUuids.indexOf(playlist.uuid) }
-                .mapIndexed { index, playlist -> playlist.copy(sortPosition = index, syncStatus = SYNC_STATUS_NOT_SYNCED) }
+            var missingPlaylistIndex = sortedUuids.size
+            val playlists = playlistDao.getSmartPlaylists().map { playlist ->
+                val index = sortedUuids.indexOf(playlist.uuid).takeIf { it != -1 } ?: missingPlaylistIndex++
+                playlist.copy(sortPosition = index, syncStatus = SYNC_STATUS_NOT_SYNCED)
+            }
             playlistDao.upsertSmartPlaylists(playlists)
         }
     }
