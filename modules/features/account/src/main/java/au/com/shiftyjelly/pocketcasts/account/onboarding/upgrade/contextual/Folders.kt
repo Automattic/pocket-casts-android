@@ -4,7 +4,10 @@ import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.ExperimentalSharedTransitionApi
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.LinearEasing
+import androidx.compose.animation.core.Transition
 import androidx.compose.animation.core.animateFloat
+import androidx.compose.animation.core.animateInt
+import androidx.compose.animation.core.animateOffset
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.core.updateTransition
 import androidx.compose.foundation.background
@@ -34,6 +37,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.TransformOrigin
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.Layout
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.Constraints
@@ -117,31 +121,33 @@ fun FoldersAnimation(
 ) {
     var showFolders by remember { mutableStateOf(false) }
 
-    AnimatedContent(
+    Box(
         modifier = modifier,
-        targetState = showFolders,
-        label = "shared magic"
-    ) { targetState ->
-        if (targetState) {
-            FolderRow(
-                left = folders[0],
-                center = folders[1],
-                right = folders[2],
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .fillMaxHeight(),
-            )
-        } else {
-            TileRows(
-                tiles = tiles,
-                folders = folders,
-                onShowFolders = { showFolders = true }
-            )
+    ) {
+        AnimatedContent(
+            targetState = showFolders,
+            label = "shared magic"
+        ) { targetState ->
+            if (targetState) {
+                FolderRow(
+                    left = folders[0],
+                    center = folders[1],
+                    right = folders[2],
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .fillMaxHeight(),
+                )
+            } else {
+                TileRows(
+                    tiles = tiles,
+                    folders = folders,
+                    onShowFolders = { showFolders = true }
+                )
+            }
         }
     }
 }
 
-@OptIn(ExperimentalSharedTransitionApi::class)
 @Composable
 private fun TileRows(
     tiles: List<TileConfig>,
@@ -257,14 +263,22 @@ private fun FolderRow(
     right: FolderConfig,
     modifier: Modifier = Modifier,
 ) {
+    val animationStarters = remember { List(3) { mutableStateOf(false) } }
 
+    LaunchedEffect("animations") {
+        animationStarters[1].value = true
+        delay(400L)
+        animationStarters[0].value = true
+        delay(10L)
+        animationStarters[2].value = true
+    }
 
     Layout(
         modifier = modifier,
         content = {
-            Folder(spec = left, size = 132.dp, tileSize = 42.dp)
-            Folder(spec = center, size = 219.dp, tileSize = 69.dp)
-            Folder(spec = right, size = 132.dp, tileSize = 42.dp)
+            Folder(spec = left, size = 132.dp, tileSize = 42.dp, startTransition = animationStarters[0].value)
+            Folder(spec = center, size = 219.dp, tileSize = 69.dp, startTransition = animationStarters[1].value, floatInOffset = 24.dp, animationDurationMillis = 400)
+            Folder(spec = right, size = 132.dp, tileSize = 42.dp, startTransition = animationStarters[2].value)
         }
     ) { measurables, constraints ->
         val placeables = measurables.map { it.measure(constraints) }
@@ -316,9 +330,31 @@ private fun Folder(
     spec: FolderConfig,
     size: Dp,
     tileSize: Dp,
+    floatInOffset: Dp = 64.dp,
+    startTransition: Boolean,
+    animationDurationMillis: Int = 900,
 ) {
+    val floatInOffsetPx = LocalDensity.current.run {
+        floatInOffset.toPx()
+    }
+    val transition = updateTransition(startTransition)
+    val alphaAnim by transition.animateFloat(
+        transitionSpec = {
+            tween(durationMillis = animationDurationMillis, easing = LinearEasing)
+        }
+    ) { isVisible -> if (isVisible) { 1f } else { 0f } }
+    val translationYAnim by transition.animateFloat(
+        transitionSpec = {
+            tween(durationMillis = animationDurationMillis, easing = LinearEasing)
+        }
+    ) { isVisible ->  if (isVisible) { 0f } else { floatInOffsetPx } }
+
     Column(
         modifier = Modifier
+            .graphicsLayer {
+                alpha = alphaAnim
+                translationY = translationYAnim
+            }
             .wrapContentSize()
             .size(size)
             .clip(RoundedCornerShape(32.dp))
@@ -361,6 +397,7 @@ private fun PreviewFolder(
                 tiles = previewTiles.take(4)
             ),
             tileSize = 69.dp,
+            startTransition = true
         )
     }
 }
