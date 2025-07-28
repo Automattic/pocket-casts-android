@@ -120,6 +120,7 @@ private fun ColumnScope.PlaylistsContent(
                     contentPadding = contentPadding,
                     onDelete = onDeletePlaylist,
                     onReorderPlaylists = onReorderPlaylists,
+                    modifier = Modifier.fillMaxSize(),
                 )
             } else {
                 NoPlaylistsContent(
