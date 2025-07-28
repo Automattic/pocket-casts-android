@@ -133,11 +133,15 @@ fun <T : Any, K : Any> rememberReorderableLazyListDataSource(
     itemKey: (T) -> K,
     onCommit: (List<T>) -> Unit,
     enabled: Boolean = true,
+    onMove: (() -> Unit)? = null,
 ) = rememberReorderableDataSource(
     items = items,
     itemKey = itemKey,
-    rememberState = { onMove ->
-        rememberReorderableLazyListState(listState) { from, to -> onMove(from, to) }
+    rememberState = { onMoveDelegate ->
+        rememberReorderableLazyListState(listState) { from, to ->
+            onMoveDelegate(from, to)
+            onMove?.invoke()
+        }
     },
     getIndex = LazyListItemInfo::index,
     onCommit = onCommit,

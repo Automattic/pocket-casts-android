@@ -35,7 +35,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.compositeOver
+import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
@@ -154,10 +156,14 @@ private fun PlaylistsColumn(
     onReorderPlaylists: (List<String>) -> Unit,
     modifier: Modifier = Modifier,
 ) {
+    val hapticFeedback = LocalHapticFeedback.current
     val (displayItems, reorderableState) = rememberReorderableLazyListDataSource(
         listState = listState,
         items = playlists,
         itemKey = PlaylistPreview::uuid,
+        onMove = {
+            hapticFeedback.performHapticFeedback(HapticFeedbackType.SegmentFrequentTick)
+        },
         onCommit = { orderedList ->
             onReorderPlaylists(orderedList.map(PlaylistPreview::uuid))
         },
@@ -187,7 +193,14 @@ private fun PlaylistsColumn(
                     backgroundColor = backgroundColor,
                     onDelete = { onDelete(playlist) },
                     modifier = Modifier
-                        .longPressDraggableHandle()
+                        .longPressDraggableHandle(
+                            onDragStarted = {
+                                hapticFeedback.performHapticFeedback(HapticFeedbackType.LongPress)
+                            },
+                            onDragStopped = {
+                                hapticFeedback.performHapticFeedback(HapticFeedbackType.GestureEnd)
+                            },
+                        )
                         .animateItem()
                         .shadow(elevation),
                 )
