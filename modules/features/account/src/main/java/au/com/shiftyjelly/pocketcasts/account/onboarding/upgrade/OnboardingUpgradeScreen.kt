@@ -264,7 +264,7 @@ private fun OnboardingUpgradeFeaturesState.NewOnboardingVariant.toContentPages(
         OnboardingUpgradeSource.FOLDERS_PODCAST_SCREEN,
         OnboardingUpgradeSource.SUGGESTED_FOLDERS,
         OnboardingUpgradeSource.FOLDERS,
-            -> {
+        -> {
             add(UpgradePagerContent.Folders)
             add(
                 UpgradePagerContent.Features(

@@ -32,6 +32,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.TransformOrigin
 import androidx.compose.ui.graphics.graphicsLayer
@@ -51,10 +52,10 @@ import au.com.shiftyjelly.pocketcasts.compose.components.TextH30
 import au.com.shiftyjelly.pocketcasts.compose.preview.ThemePreviewParameterProvider
 import au.com.shiftyjelly.pocketcasts.compose.theme
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
 import kotlin.math.min
 import kotlin.random.Random
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import au.com.shiftyjelly.pocketcasts.images.R as IR
 
 data class TileConfig(
@@ -194,7 +195,7 @@ private fun TileRows(
             launch {
                 entry.value.animateTo(
                     0.6f,
-                    animationSpec = tween(durationMillis = 900, easing = LinearEasing, delayMillis = index * 50)
+                    animationSpec = tween(durationMillis = 900, easing = LinearEasing, delayMillis = index * 50),
                 )
             }
         }
@@ -294,7 +295,7 @@ private fun FolderRow(
                 modifier = Modifier.aspectRatio(1f),
                 spec = left,
                 startTransition = animationStarters[0].value,
-                alphaTargetValue = 0.33f
+                alphaTargetValue = 0.33f,
             )
             Folder(
                 modifier = Modifier.aspectRatio(1f),
@@ -308,7 +309,7 @@ private fun FolderRow(
                 modifier = Modifier.aspectRatio(1f),
                 spec = right,
                 startTransition = animationStarters[2].value,
-                alphaTargetValue = 0.66f
+                alphaTargetValue = 0.66f,
             )
         },
     ) { measurables, constraints ->
@@ -361,10 +362,9 @@ private fun Tile(
             modifier = modifier
                 .clip(RoundedCornerShape(8.dp)),
             painter = painterResource(it),
-            contentDescription = ""
+            contentDescription = "",
         )
     } ?: Box(modifier = modifier)
-
 }
 
 @Composable
@@ -415,6 +415,7 @@ private fun Folder(
             .wrapContentSize()
             .clip(RoundedCornerShape(32.dp))
             .background(color = spec.color, shape = RoundedCornerShape(32.dp))
+            .background(brush = Brush.linearGradient(colors = listOf(Color.Transparent, Color.Black.copy(alpha = .2f))))
             .padding(top = 20.dp, bottom = 12.dp)
             .padding(horizontal = 20.dp),
         content = {
