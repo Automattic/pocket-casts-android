@@ -38,6 +38,7 @@ import au.com.shiftyjelly.pocketcasts.compose.AppTheme
 import au.com.shiftyjelly.pocketcasts.compose.PreviewAutomotive
 import au.com.shiftyjelly.pocketcasts.compose.PreviewOrientation
 import au.com.shiftyjelly.pocketcasts.compose.bars.ThemedTopAppBar
+import au.com.shiftyjelly.pocketcasts.compose.components.AnimatedNonNullVisibility
 import au.com.shiftyjelly.pocketcasts.compose.components.TextP30
 import au.com.shiftyjelly.pocketcasts.compose.components.TextP60
 import au.com.shiftyjelly.pocketcasts.compose.components.UserAvatarConfig
@@ -165,34 +166,36 @@ internal fun AccountDetailsPage(
                             .then(if (state.isAutomotive) Modifier.padding(top = 32.dp) else Modifier),
                     )
                 }
-                when (bannerState) {
-                    is ProfileUpgradeBannerState.OldProfileUpgradeBannerState -> {
-                        item {
-                            Divider()
-                        }
-                        item {
-                            ProfileUpgradeBanner(
-                                state = bannerState,
-                                onClickSubscribe = onClickSubscribe,
-                                onChangeFeatureCard = onChangeFeatureCard,
-                                modifier = Modifier.fillMaxWidth(),
-                            )
-                        }
-                    }
 
-                    is ProfileUpgradeBannerState.NewOnboardingUpgradeState -> {
-                        item {
-                            Box(modifier = Modifier.padding(horizontal = 24.dp)) {
-                                NewUpgradeAccountCard(
-                                    onClickSubscribe = onAccountUpgradeClick,
-                                    recommendedPlan = bannerState.recommendedSubscription,
-                                )
+                item {
+                    AnimatedNonNullVisibility(bannerState) { bannerState ->
+                        when (bannerState) {
+                            is ProfileUpgradeBannerState.OldProfileUpgradeBannerState -> {
+                                Column(
+                                    verticalArrangement = Arrangement.spacedBy(16.dp),
+                                ) {
+                                    Divider()
+                                    ProfileUpgradeBanner(
+                                        state = bannerState,
+                                        onClickSubscribe = onClickSubscribe,
+                                        onChangeFeatureCard = onChangeFeatureCard,
+                                        modifier = Modifier.fillMaxWidth(),
+                                    )
+                                }
+                            }
+
+                            is ProfileUpgradeBannerState.NewOnboardingUpgradeState -> {
+                                Box(modifier = Modifier.padding(horizontal = 24.dp)) {
+                                    NewUpgradeAccountCard(
+                                        onClickSubscribe = onAccountUpgradeClick,
+                                        recommendedPlan = bannerState.recommendedSubscription,
+                                    )
+                                }
                             }
                         }
                     }
-
-                    else -> Unit
                 }
+
                 item {
                     AccountSections(
                         state = sectionsState,
@@ -207,7 +210,9 @@ internal fun AccountDetailsPage(
                         onShowTermsOfUse = onShowTermsOfUse,
                         onSignOut = onSignOut,
                         onDeleteAccount = onDeleteAccount,
-                        modifier = Modifier.fillMaxWidth().background(MaterialTheme.theme.colors.primaryUi02),
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .background(MaterialTheme.theme.colors.primaryUi02),
                     )
                 }
                 item {
