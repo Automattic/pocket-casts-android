@@ -56,7 +56,6 @@ internal fun PlaylistsPage(
     onCreatePlaylist: () -> Unit,
     onDeletePlaylist: (PlaylistPreview) -> Unit,
     onReorderPlaylists: (List<String>) -> Unit,
-    onShowOptions: () -> Unit,
     onFreeAccountBannerCtaClick: () -> Unit,
     onFreeAccountBannerDismiss: () -> Unit,
     modifier: Modifier = Modifier,
@@ -71,7 +70,6 @@ internal fun PlaylistsPage(
         Toolbar(
             showActionButtons = !uiState.showEmptyState,
             onCreatePlaylist = onCreatePlaylist,
-            onShowOptions = onShowOptions,
         )
 
         FreeAccountBanner(
@@ -210,7 +208,6 @@ private fun ColumnScope.NoPlaylistsContent(
 private fun Toolbar(
     showActionButtons: Boolean,
     onCreatePlaylist: () -> Unit,
-    onShowOptions: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     ThemedTopAppBar(
@@ -228,22 +225,6 @@ private fun Toolbar(
                     Icon(
                         painter = painterResource(IR.drawable.ic_add_black_24dp),
                         contentDescription = stringResource(LR.string.new_playlist),
-                        tint = MaterialTheme.theme.colors.secondaryIcon01,
-                    )
-                }
-            }
-
-            AnimatedVisibility(
-                visible = showActionButtons,
-                enter = FadeIn,
-                exit = FadeOut,
-            ) {
-                IconButton(
-                    onClick = onShowOptions,
-                ) {
-                    Icon(
-                        painter = painterResource(IR.drawable.ic_overflow),
-                        contentDescription = stringResource(LR.string.options),
                         tint = MaterialTheme.theme.colors.secondaryIcon01,
                     )
                 }
@@ -299,7 +280,6 @@ private fun PlaylistsPageEmptyStatePreview() {
             ),
             onCreatePlaylist = {},
             onDeletePlaylist = {},
-            onShowOptions = {},
             onFreeAccountBannerCtaClick = {},
             onFreeAccountBannerDismiss = {},
             onReorderPlaylists = {},
@@ -320,7 +300,6 @@ private fun PlaylistsPageEmptyStateNoBannerPreview() {
             ),
             onCreatePlaylist = {},
             onDeletePlaylist = {},
-            onShowOptions = {},
             onFreeAccountBannerCtaClick = {},
             onFreeAccountBannerDismiss = {},
             onReorderPlaylists = {},
@@ -352,7 +331,6 @@ private fun PlaylistPagePreview(
             ),
             onCreatePlaylist = {},
             onDeletePlaylist = {},
-            onShowOptions = {},
             onFreeAccountBannerCtaClick = {},
             onFreeAccountBannerDismiss = {},
             onReorderPlaylists = {},
