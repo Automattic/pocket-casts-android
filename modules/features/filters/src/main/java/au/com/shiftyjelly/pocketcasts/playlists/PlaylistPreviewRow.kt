@@ -68,6 +68,7 @@ fun PlaylistPreviewRow(
     showDivider: Boolean,
     onDelete: () -> Unit,
     modifier: Modifier = Modifier,
+    backgroundColor: Color = MaterialTheme.theme.colors.primaryUi01,
 ) {
     Box(
         modifier = modifier.height(IntrinsicSize.Min),
@@ -163,7 +164,7 @@ fun PlaylistPreviewRow(
                     orientation = Orientation.Horizontal,
                     enabled = draggableState.currentValue != SwipeToDeleteAnchor.Delete,
                 )
-                .background(MaterialTheme.theme.colors.primaryUi01)
+                .background(backgroundColor)
                 .semantics(mergeDescendants = true) {},
         ) {
             Row(

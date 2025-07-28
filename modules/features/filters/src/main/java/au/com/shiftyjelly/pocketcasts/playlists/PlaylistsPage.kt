@@ -2,6 +2,8 @@ package au.com.shiftyjelly.pocketcasts.playlists
 
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.animateColorAsState
+import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.animation.expandVertically
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
@@ -26,8 +28,13 @@ import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
 import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.compositeOver
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -45,6 +52,8 @@ import au.com.shiftyjelly.pocketcasts.compose.theme
 import au.com.shiftyjelly.pocketcasts.playlists.PlaylistsViewModel.PlaylistsState
 import au.com.shiftyjelly.pocketcasts.playlists.PlaylistsViewModel.UiState
 import au.com.shiftyjelly.pocketcasts.repositories.playlist.PlaylistPreview
+import au.com.shiftyjelly.pocketcasts.ui.helper.ColorUtils
+import au.com.shiftyjelly.pocketcasts.ui.helper.modifyHsv
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme.ThemeType
 import sh.calvin.reorderable.ReorderableItem
 import au.com.shiftyjelly.pocketcasts.images.R as IR
@@ -153,6 +162,11 @@ private fun PlaylistsColumn(
             onReorderPlaylists(orderedList.map(PlaylistPreview::uuid))
         },
     )
+    val baseColor = MaterialTheme.theme.colors.primaryUi01
+    val highlightColor = MaterialTheme.theme.colors.primaryIcon01
+    val draggedColor = remember(highlightColor, baseColor) {
+        highlightColor.copy(alpha = 0.15f).compositeOver(baseColor.copy(alpha = 1f))
+    }
 
     LazyColumn(
         state = listState,
@@ -163,14 +177,19 @@ private fun PlaylistsColumn(
             items = displayItems,
             key = { _, item -> item.uuid },
         ) { index, playlist ->
-            ReorderableItem(reorderableState, key = playlist.uuid) {
+            ReorderableItem(reorderableState, key = playlist.uuid) { isDragging ->
+                val elevation by animateDpAsState(if (isDragging) 4.dp else 0.dp)
+                val backgroundColor by animateColorAsState(if (isDragging) draggedColor else baseColor)
+
                 PlaylistPreviewRow(
                     playlist = playlist,
                     showDivider = index != displayItems.lastIndex,
+                    backgroundColor = backgroundColor,
                     onDelete = { onDelete(playlist) },
                     modifier = Modifier
                         .longPressDraggableHandle()
-                        .animateItem(),
+                        .animateItem()
+                        .shadow(elevation),
                 )
             }
         }
