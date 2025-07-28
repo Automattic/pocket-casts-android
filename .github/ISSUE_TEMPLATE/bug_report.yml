@@ -1,6 +1,6 @@
 name: 🐞 Bug report
 description: Report a bug if something isn't working as expected in the Pocket Casts Android app.
-labels: ["[Type] Bug"]
+labels: ["Bug"]
 body:
 
     - type: markdown
