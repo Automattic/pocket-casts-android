@@ -8,4 +8,6 @@ interface PlaylistManager {
     suspend fun deletePlaylist(uuid: String)
 
     suspend fun upsertPlaylist(draft: PlaylistDraft)
+
+    suspend fun updatePlaylistPosition(playlistUuids: List<String>)
 }

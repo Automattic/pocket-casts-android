@@ -48,6 +48,7 @@ class PlaylistsFragment :
                 listState = listState,
                 onCreatePlaylist = { Timber.i("Create playlist clicked") },
                 onDeletePlaylist = { playlist -> viewModel.deletePlaylist(playlist.uuid) },
+                onReorderPlaylists = viewModel::updatePlaylistPosition,
                 onShowOptions = { Timber.i("Show playlists options clicked") },
                 onFreeAccountBannerCtaClick = {
                     viewModel.trackFreeAccountCtaClick()

@@ -32,6 +32,9 @@ abstract class PlaylistDao {
     @Query("SELECT * FROM smart_playlists WHERE manual = 0 AND deleted = 0 AND draft = 0 ORDER BY sortPosition ASC")
     abstract fun observeSmartPlaylists(): Flow<List<SmartPlaylist>>
 
+    @Query("SELECT * FROM smart_playlists WHERE manual = 0 AND deleted = 0 AND draft = 0 ORDER BY sortPosition ASC")
+    abstract suspend fun getSmartPlaylists(): List<SmartPlaylist>
+
     @Query("UPDATE smart_playlists SET deleted = 1, syncStatus = ${SYNC_STATUS_NOT_SYNCED} WHERE uuid = :uuid")
     abstract suspend fun markPlaylistAsDeleted(uuid: String)
 

@@ -17,6 +17,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyListItemInfo
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
@@ -26,7 +27,11 @@ import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
 import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -42,11 +47,18 @@ import au.com.shiftyjelly.pocketcasts.compose.bars.ThemedTopAppBar
 import au.com.shiftyjelly.pocketcasts.compose.components.Banner
 import au.com.shiftyjelly.pocketcasts.compose.components.NoContentBanner
 import au.com.shiftyjelly.pocketcasts.compose.preview.ThemePreviewParameterProvider
+import au.com.shiftyjelly.pocketcasts.compose.reorderable.rememberReorderableDataSource
 import au.com.shiftyjelly.pocketcasts.compose.theme
 import au.com.shiftyjelly.pocketcasts.playlists.PlaylistsViewModel.PlaylistsState
 import au.com.shiftyjelly.pocketcasts.playlists.PlaylistsViewModel.UiState
+import au.com.shiftyjelly.pocketcasts.repositories.playlist.Playlist
 import au.com.shiftyjelly.pocketcasts.repositories.playlist.PlaylistPreview
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme.ThemeType
+import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.delay
+import sh.calvin.reorderable.ReorderableItem
+import sh.calvin.reorderable.rememberReorderableLazyListState
+import timber.log.Timber
 import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
@@ -55,6 +67,7 @@ internal fun PlaylistsPage(
     uiState: UiState,
     onCreatePlaylist: () -> Unit,
     onDeletePlaylist: (PlaylistPreview) -> Unit,
+    onReorderPlaylists: (List<String>) -> Unit,
     onShowOptions: () -> Unit,
     onFreeAccountBannerCtaClick: () -> Unit,
     onFreeAccountBannerDismiss: () -> Unit,
@@ -87,6 +100,7 @@ internal fun PlaylistsPage(
             ),
             onCreatePlaylist = onCreatePlaylist,
             onDeletePlaylist = onDeletePlaylist,
+            onReorderPlaylists = onReorderPlaylists,
         )
     }
 }
@@ -98,25 +112,33 @@ private fun ColumnScope.PlaylistsContent(
     contentPadding: PaddingValues,
     onCreatePlaylist: () -> Unit,
     onDeletePlaylist: (PlaylistPreview) -> Unit,
+    onReorderPlaylists: (List<String>) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     AnimatedContent(
         targetState = playlistsState,
         transitionSpec = { ContentTransitionSpec },
+        contentKey = { playlists ->
+            when (playlists) {
+                is PlaylistsState.Loaded -> if (playlists.value.isNotEmpty()) "content" else "no_content"
+                is PlaylistsState.Loading -> "loading"
+            }
+        },
         modifier = modifier,
     ) { playlists ->
         when (playlists) {
-            is PlaylistsState.Loaded -> if (playlists.value.isEmpty()) {
-                NoPlaylistsContent(
-                    onCreatePlaylist = onCreatePlaylist,
-                    modifier = Modifier.padding(contentPadding),
-                )
-            } else {
+            is PlaylistsState.Loaded -> if (playlists.value.isNotEmpty()) {
                 PlaylistsColumn(
                     playlists = playlists.value,
                     listState = listState,
                     contentPadding = contentPadding,
                     onDelete = onDeletePlaylist,
+                    onReorderPlaylists = onReorderPlaylists,
+                )
+            } else {
+                NoPlaylistsContent(
+                    onCreatePlaylist = onCreatePlaylist,
+                    modifier = Modifier.padding(contentPadding),
                 )
             }
 
@@ -133,23 +155,42 @@ private fun PlaylistsColumn(
     listState: LazyListState,
     contentPadding: PaddingValues,
     onDelete: (PlaylistPreview) -> Unit,
+    onReorderPlaylists: (List<String>) -> Unit,
     modifier: Modifier = Modifier,
 ) {
+    val (displayItems, reorderableState) = rememberReorderableDataSource(
+        items = playlists,
+        keyOf = PlaylistPreview::uuid,
+        rememberState = { onMove ->
+            rememberReorderableLazyListState(listState) { from, to ->
+                onMove(from, to)
+            }
+        },
+        getIndex = LazyListItemInfo::index,
+        onCommit = { orderedList ->
+            onReorderPlaylists(orderedList.map(PlaylistPreview::uuid))
+        },
+    )
+
     LazyColumn(
         state = listState,
         contentPadding = contentPadding,
         modifier = modifier,
     ) {
         itemsIndexed(
-            items = playlists,
+            items = displayItems,
             key = { _, item -> item.uuid },
         ) { index, playlist ->
-            PlaylistPreviewRow(
-                playlist = playlist,
-                showDivider = index != playlists.lastIndex,
-                onDelete = { onDelete(playlist) },
-                modifier = Modifier.animateItem(),
-            )
+            ReorderableItem(reorderableState, key = playlist.uuid) {
+                PlaylistPreviewRow(
+                    playlist = playlist,
+                    showDivider = index != displayItems.lastIndex,
+                    onDelete = { onDelete(playlist) },
+                    modifier = Modifier
+                        .longPressDraggableHandle()
+                        .animateItem(),
+                )
+            }
         }
     }
 }
@@ -278,6 +319,7 @@ private fun PlaylistsPageEmptyStatePreview() {
             onShowOptions = {},
             onFreeAccountBannerCtaClick = {},
             onFreeAccountBannerDismiss = {},
+            onReorderPlaylists = {},
         )
     }
 }
@@ -298,6 +340,7 @@ private fun PlaylistsPageEmptyStateNoBannerPreview() {
             onShowOptions = {},
             onFreeAccountBannerCtaClick = {},
             onFreeAccountBannerDismiss = {},
+            onReorderPlaylists = {},
         )
     }
 }
@@ -329,6 +372,7 @@ private fun PlaylistPagePreview(
             onShowOptions = {},
             onFreeAccountBannerCtaClick = {},
             onFreeAccountBannerDismiss = {},
+            onReorderPlaylists = {},
         )
     }
 }
