@@ -1,5 +1,6 @@
 package au.com.shiftyjelly.pocketcasts.account.onboarding.upgrade.contextual
 
+import androidx.annotation.DrawableRes
 import androidx.compose.animation.ExperimentalSharedTransitionApi
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.Easing
@@ -8,6 +9,7 @@ import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.animateFloat
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.core.updateTransition
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -35,6 +37,7 @@ import androidx.compose.ui.graphics.TransformOrigin
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.Layout
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.role
 import androidx.compose.ui.semantics.semantics
@@ -45,7 +48,6 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import au.com.shiftyjelly.pocketcasts.compose.AppTheme
 import au.com.shiftyjelly.pocketcasts.compose.components.TextH30
-import au.com.shiftyjelly.pocketcasts.compose.components.TextP30
 import au.com.shiftyjelly.pocketcasts.compose.preview.ThemePreviewParameterProvider
 import au.com.shiftyjelly.pocketcasts.compose.theme
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
@@ -53,10 +55,11 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlin.math.min
 import kotlin.random.Random
+import au.com.shiftyjelly.pocketcasts.images.R as IR
 
 data class TileConfig(
     val index: Int,
-    val color: Color,
+    @DrawableRes val drawableResId: Int?,
     val anchor: TransformOrigin,
 )
 
@@ -76,7 +79,16 @@ private fun randomColor() = Color(
 private val previewTiles = (1..8).map {
     TileConfig(
         index = it,
-        color = randomColor(),
+        drawableResId = when (it) {
+            1 -> IR.drawable.artwork_0
+            2 -> IR.drawable.artwork_2
+            3 -> IR.drawable.artwork_3
+            4 -> IR.drawable.artwork_6
+            5 -> IR.drawable.artwork_1
+            6 -> IR.drawable.artwork_4
+            7 -> IR.drawable.artwork_5
+            else -> IR.drawable.artwork_7
+        },
         anchor = when (it) {
             2 -> TransformOrigin(1f, 1f)
             3 -> TransformOrigin(0f, 1f)
@@ -89,24 +101,25 @@ private val previewTiles = (1..8).map {
 
 private val mockTile = TileConfig(
     index = -1,
-    color = Color.Transparent,
+    drawableResId = null,
     anchor = TransformOrigin(0f, 0f),
 )
 
-private val previewFolders = listOf(
+@Composable
+private fun previewFolders() = listOf(
     FolderConfig(
         folderName = "Books",
-        color = Color.Cyan,
+        color = Color(0xFF9BA2FF),
         tiles = listOf(mockTile, previewTiles[0], mockTile, previewTiles[4]),
     ),
     FolderConfig(
         folderName = "Favorites",
-        color = Color.Blue,
+        color = MaterialTheme.theme.colors.primaryInteractive01,
         tiles = List(4) { mockTile },
     ),
     FolderConfig(
         folderName = "Sports",
-        color = Color.Yellow,
+        color = Color(0xFF32D9A9),
         tiles = listOf(previewTiles[3], mockTile, previewTiles[7], mockTile),
     ),
 )
@@ -117,7 +130,7 @@ private val edgeFadeIndices = listOf(1, 4, 5, 8)
 fun FoldersAnimation(
     modifier: Modifier = Modifier,
     tiles: List<TileConfig> = previewTiles,
-    folders: List<FolderConfig> = previewFolders,
+    folders: List<FolderConfig> = previewFolders(),
 ) {
     var showFolders by remember { mutableStateOf(false) }
 
@@ -270,7 +283,7 @@ private fun FolderRow(
         animationStarters[1].value = true
         delay(400L)
         animationStarters[0].value = true
-        delay(10L)
+        delay(20L)
         animationStarters[2].value = true
     }
 
@@ -343,13 +356,15 @@ private fun Tile(
     tileConfig: TileConfig,
     modifier: Modifier = Modifier,
 ) {
-    Box(
-        modifier = modifier
-            .clip(RoundedCornerShape(8.dp))
-            .background(color = tileConfig.color),
-    ) {
-        TextP30(text = tileConfig.index.toString())
-    }
+    tileConfig.drawableResId?.let {
+        Image(
+            modifier = modifier
+                .clip(RoundedCornerShape(8.dp)),
+            painter = painterResource(it),
+            contentDescription = ""
+        )
+    } ?: Box(modifier = modifier)
+
 }
 
 @Composable
@@ -498,6 +513,7 @@ private fun PreviewFolderRow(
     @PreviewParameter(ThemePreviewParameterProvider::class) theme: Theme.ThemeType,
 ) = AppTheme(theme) {
     Column {
+        val previewFolders = previewFolders()
         FolderRow(
             modifier = Modifier.fillMaxWidth(),
             left = previewFolders[0],

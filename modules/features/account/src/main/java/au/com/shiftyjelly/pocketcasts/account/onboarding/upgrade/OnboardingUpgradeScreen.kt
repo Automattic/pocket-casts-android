@@ -96,7 +96,7 @@ fun OnboardingUpgradeScreen(
             source = source,
             onClosePress = onClosePress,
         )
-        Spacer(modifier = Modifier.height(24.dp))
+        Spacer(modifier = Modifier.height(12.dp))
         UpgradeContent(
             modifier = Modifier.weight(1f),
             pages = state.onboardingVariant.toContentPages(
@@ -420,7 +420,8 @@ private fun FoldersUpgradeContent(
         TextP40(
             text = stringResource(LR.string.onboarding_upgrade_schedule_see_features),
             modifier = Modifier
-                .padding(24.dp)
+                .padding(horizontal = 24.dp)
+                .padding(bottom = 24.dp)
                 .clickable { onCtaClick() },
             color = MaterialTheme.theme.colors.primaryInteractive01,
         )
