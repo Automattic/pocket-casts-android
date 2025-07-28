@@ -54,26 +54,57 @@ class PlaylistsViewModel @Inject constructor(
     fun deletePlaylist(uuid: String) {
         viewModelScope.launch {
             playlistManager.deletePlaylist(uuid)
+            trackPlaylistDeleted()
         }
-    }
-
-    fun trackFreeAccountCtaClick() {
-        analyticsTracker.track(AnalyticsEvent.INFORMATIONAL_BANNER_VIEW_CREATE_ACCOUNT_TAP, mapOf("source" to "filters"))
-    }
-
-    fun dismissFreeAccountBanner() {
-        analyticsTracker.track(AnalyticsEvent.INFORMATIONAL_BANNER_VIEW_DISMISSED, mapOf("source" to "filters"))
-        settings.isFreeAccountFiltersBannerDismissed.set(true, updateModifiedAt = true)
     }
 
     fun updatePlaylistsOrder(playlistUuids: List<String>) {
         viewModelScope.launch {
             playlistManager.updatePlaylistsOrder(playlistUuids)
+            trackPlaylistsReodered()
         }
     }
 
+    fun dismissFreeAccountBanner() {
+        trackFreeAccountBannerDismissed()
+        settings.isFreeAccountFiltersBannerDismissed.set(true, updateModifiedAt = true)
+    }
+
     fun dismissPremadePlaylistsTooltip() {
+        trackTooltipDismissed()
         settings.showEmptyFiltersListTooltip.set(false, updateModifiedAt = false)
+    }
+
+    fun trackPlaylistsShown(playlistCount: Int) {
+        analyticsTracker.track(AnalyticsEvent.FILTER_LIST_SHOWN, mapOf("filter_count" to playlistCount))
+    }
+
+    fun trackPlaylistsReodered() {
+        analyticsTracker.track(AnalyticsEvent.FILTER_LIST_REORDERED)
+    }
+
+    fun trackPlaylistDeleted() {
+        analyticsTracker.track(AnalyticsEvent.FILTER_DELETED)
+    }
+
+    fun trackCreatePlaylistClicked() {
+        analyticsTracker.track(AnalyticsEvent.FILTER_CREATE_BUTTON_TAPPED)
+    }
+
+    fun trackTooltipShown() {
+        analyticsTracker.track(AnalyticsEvent.FILTER_TOOLTIP_SHOWN)
+    }
+
+    fun trackTooltipDismissed() {
+        analyticsTracker.track(AnalyticsEvent.FILTER_TOOLTIP_CLOSED)
+    }
+
+    fun trackFreeAccountCtaClicked() {
+        analyticsTracker.track(AnalyticsEvent.INFORMATIONAL_BANNER_VIEW_CREATE_ACCOUNT_TAP, mapOf("source" to "filters"))
+    }
+
+    fun trackFreeAccountBannerDismissed() {
+        analyticsTracker.track(AnalyticsEvent.INFORMATIONAL_BANNER_VIEW_DISMISSED, mapOf("source" to "filters"))
     }
 
     private fun shouldShowPremadePlaylistsTooltip(

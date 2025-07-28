@@ -29,6 +29,7 @@ import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
 import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -68,12 +69,16 @@ internal fun PlaylistsPage(
     onCreatePlaylist: () -> Unit,
     onDeletePlaylist: (PlaylistPreview) -> Unit,
     onReorderPlaylists: (List<String>) -> Unit,
+    onShowPlaylists: (List<PlaylistPreview>) -> Unit,
     onFreeAccountBannerCtaClick: () -> Unit,
     onFreeAccountBannerDismiss: () -> Unit,
+    onShowPremadePlaylistsTooltip: () -> Unit,
     onDismissPremadePlaylistsTooltip: () -> Unit,
     modifier: Modifier = Modifier,
     listState: LazyListState = rememberLazyListState(),
 ) {
+    val showTooltip = uiState.showPremadePlaylistsTooltip
+
     Box(
         modifier = Modifier
             .background(MaterialTheme.theme.colors.primaryUi01)
@@ -94,7 +99,7 @@ internal fun PlaylistsPage(
 
             PlaylistsContent(
                 playlistsState = uiState.playlists,
-                showPremadePlaylistsTooltip = uiState.showPremadePlaylistsTooltip,
+                showPremadePlaylistsTooltip = showTooltip,
                 listState = listState,
                 contentPadding = PaddingValues(
                     bottom = LocalDensity.current.run { uiState.miniPlayerInset.toDp() },
@@ -102,10 +107,11 @@ internal fun PlaylistsPage(
                 onCreatePlaylist = onCreatePlaylist,
                 onDeletePlaylist = onDeletePlaylist,
                 onReorderPlaylists = onReorderPlaylists,
+                onShowPlaylists = onShowPlaylists,
                 onDismissPremadePlaylistsTooltip = onDismissPremadePlaylistsTooltip,
             )
         }
-        if (uiState.showPremadePlaylistsTooltip) {
+        if (showTooltip) {
             // We use a separate box to dismiss the tooltip instead of tooltip's 'onClickOutside'
             // in order to not dismiss the tooltip when the bottom navigation bar is tapped.
             Box(
@@ -117,6 +123,12 @@ internal fun PlaylistsPage(
                         onClick = onDismissPremadePlaylistsTooltip,
                     ),
             )
+
+            LaunchedEffect(showTooltip, onShowPremadePlaylistsTooltip) {
+                if (showTooltip) {
+                    onShowPremadePlaylistsTooltip()
+                }
+            }
         }
     }
 }
@@ -130,6 +142,7 @@ private fun ColumnScope.PlaylistsContent(
     onCreatePlaylist: () -> Unit,
     onDeletePlaylist: (PlaylistPreview) -> Unit,
     onReorderPlaylists: (List<String>) -> Unit,
+    onShowPlaylists: (List<PlaylistPreview>) -> Unit,
     onDismissPremadePlaylistsTooltip: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -143,24 +156,30 @@ private fun ColumnScope.PlaylistsContent(
             }
         },
         modifier = modifier,
-    ) { playlists ->
-        when (playlists) {
-            is PlaylistsState.Loaded -> if (playlists.value.isNotEmpty()) {
-                PlaylistsColumn(
-                    playlists = playlists.value,
-                    showPremadePlaylistsTooltip = showPremadePlaylistsTooltip,
-                    listState = listState,
-                    contentPadding = contentPadding,
-                    onDelete = onDeletePlaylist,
-                    onReorderPlaylists = onReorderPlaylists,
-                    onDismissPremadePlaylistsTooltip = onDismissPremadePlaylistsTooltip,
-                    modifier = Modifier.fillMaxSize(),
-                )
-            } else {
-                NoPlaylistsContent(
-                    onCreatePlaylist = onCreatePlaylist,
-                    modifier = Modifier.padding(contentPadding),
-                )
+    ) { targetState ->
+        when (targetState) {
+            is PlaylistsState.Loaded -> {
+                val playlists = targetState.value
+                if (playlists.isNotEmpty()) {
+                    PlaylistsColumn(
+                        playlists = playlists,
+                        showPremadePlaylistsTooltip = showPremadePlaylistsTooltip,
+                        listState = listState,
+                        contentPadding = contentPadding,
+                        onDelete = onDeletePlaylist,
+                        onReorderPlaylists = onReorderPlaylists,
+                        onDismissPremadePlaylistsTooltip = onDismissPremadePlaylistsTooltip,
+                        modifier = Modifier.fillMaxSize(),
+                    )
+                } else {
+                    NoPlaylistsContent(
+                        onCreatePlaylist = onCreatePlaylist,
+                        modifier = Modifier.padding(contentPadding),
+                    )
+                }
+                LaunchedEffect(onShowPlaylists) {
+                    onShowPlaylists(playlists)
+                }
             }
 
             is PlaylistsState.Loading -> Box(
@@ -342,8 +361,10 @@ private fun PlaylistsPageEmptyStatePreview() {
             onCreatePlaylist = {},
             onDeletePlaylist = {},
             onReorderPlaylists = {},
+            onShowPlaylists = {},
             onFreeAccountBannerCtaClick = {},
             onFreeAccountBannerDismiss = {},
+            onShowPremadePlaylistsTooltip = {},
             onDismissPremadePlaylistsTooltip = {},
         )
     }
@@ -364,8 +385,10 @@ private fun PlaylistsPageEmptyStateNoBannerPreview() {
             onCreatePlaylist = {},
             onDeletePlaylist = {},
             onReorderPlaylists = {},
+            onShowPlaylists = {},
             onFreeAccountBannerCtaClick = {},
             onFreeAccountBannerDismiss = {},
+            onShowPremadePlaylistsTooltip = {},
             onDismissPremadePlaylistsTooltip = {},
         )
     }
@@ -397,8 +420,10 @@ private fun PlaylistPagePreview(
             onCreatePlaylist = {},
             onDeletePlaylist = {},
             onReorderPlaylists = {},
+            onShowPlaylists = {},
             onFreeAccountBannerCtaClick = {},
             onFreeAccountBannerDismiss = {},
+            onShowPremadePlaylistsTooltip = {},
             onDismissPremadePlaylistsTooltip = {},
         )
     }
