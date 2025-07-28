@@ -44,13 +44,18 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.rememberTextMeasurer
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
+import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.IntOffset
+import androidx.compose.ui.unit.coerceAtMost
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.window.PopupProperties
 import au.com.shiftyjelly.pocketcasts.compose.AppThemeWithBackground
 import au.com.shiftyjelly.pocketcasts.compose.components.HorizontalDivider
 import au.com.shiftyjelly.pocketcasts.compose.components.TextH40
 import au.com.shiftyjelly.pocketcasts.compose.components.TextP50
+import au.com.shiftyjelly.pocketcasts.compose.components.TipPosition
+import au.com.shiftyjelly.pocketcasts.compose.components.TooltipPopup
 import au.com.shiftyjelly.pocketcasts.compose.preview.ThemePreviewParameterProvider
 import au.com.shiftyjelly.pocketcasts.compose.theme
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
@@ -65,8 +70,10 @@ import au.com.shiftyjelly.pocketcasts.localization.R as LR
 @Composable
 fun PlaylistPreviewRow(
     playlist: PlaylistPreview,
+    showTooltip: Boolean,
     showDivider: Boolean,
     onDelete: () -> Unit,
+    onClickTooltip: () -> Unit,
     modifier: Modifier = Modifier,
     backgroundColor: Color = MaterialTheme.theme.colors.primaryUi01,
 ) {
@@ -173,11 +180,23 @@ fun PlaylistPreviewRow(
                     .fillMaxWidth()
                     .padding(horizontal = 16.dp, vertical = 12.dp),
             ) {
-                PlaylistArtwork(
-                    podcasts = playlist.podcasts,
-                    artworkSize = 56.dp,
-
-                )
+                Box {
+                    PlaylistArtwork(
+                        podcasts = playlist.podcasts,
+                        artworkSize = 56.dp,
+                    )
+                    TooltipPopup(
+                        show = showTooltip,
+                        title = stringResource(LR.string.premade_playlists_tooltip_title),
+                        body = stringResource(LR.string.premade_playlists_tooltip_body),
+                        tipPosition = TipPosition.TopStart,
+                        maxWidthFraction = 0.75f,
+                        maxWidth = 400.dp,
+                        elevation = 8.dp,
+                        anchorOffset = DpOffset(x = -8.dp, y = 4.dp),
+                        onClick = onClickTooltip,
+                    )
+                }
                 Spacer(
                     modifier = Modifier.width(16.dp),
                 )
@@ -246,8 +265,10 @@ private fun PlaylistPreviewRowPreview(
                     episodeCount = 0,
                     podcasts = emptyList(),
                 ),
+                showTooltip = false,
                 showDivider = true,
                 onDelete = {},
+                onClickTooltip = {},
                 modifier = Modifier.fillMaxWidth(),
             )
             PlaylistPreviewRow(
@@ -257,8 +278,10 @@ private fun PlaylistPreviewRowPreview(
                     episodeCount = 1,
                     podcasts = List(1) { Podcast(uuid = "$it") },
                 ),
+                showTooltip = false,
                 showDivider = true,
                 onDelete = {},
+                onClickTooltip = {},
                 modifier = Modifier.fillMaxWidth(),
             )
             PlaylistPreviewRow(
@@ -268,8 +291,10 @@ private fun PlaylistPreviewRowPreview(
                     episodeCount = 328,
                     podcasts = List(4) { Podcast(uuid = "$it") },
                 ),
+                showTooltip = false,
                 showDivider = false,
                 onDelete = {},
+                onClickTooltip = {},
                 modifier = Modifier.fillMaxWidth(),
             )
         }

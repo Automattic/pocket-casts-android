@@ -910,6 +910,8 @@
     <string name="playlists_empty_state_title">Organize episodes your way</string>
     <string name="playlists_empty_state_body">Playlists let you organize episodes manually or automatically with Smart Rules.</string>
     <string name="new_playlist">New Playlist</string>
+    <string name="premade_playlists_tooltip_title">Smart Playlists, ready to go</string>
+    <string name="premade_playlists_tooltip_body">We made these to help you get started.\nThey auto-update based on your listening.</string>
 
     <!-- Profile -->
 

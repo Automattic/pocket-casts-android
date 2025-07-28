@@ -1,5 +1,6 @@
 package au.com.shiftyjelly.pocketcasts.compose.components
 
+import android.icu.text.ListFormatter.Width
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
@@ -8,6 +9,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.widthIn
@@ -35,6 +37,7 @@ import androidx.compose.ui.unit.IntRect
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.max
 import androidx.compose.ui.window.Popup
 import androidx.compose.ui.window.PopupPositionProvider
 import androidx.compose.ui.window.PopupProperties
@@ -49,6 +52,8 @@ fun TooltipPopup(
     title: String,
     tipPosition: TipPosition,
     body: String? = null,
+    maxWidthFraction: Float = 1f,
+    maxWidth: Dp? = null,
     elevation: Dp = 16.dp,
     anchorOffset: DpOffset = DpOffset.Zero,
     properties: PopupProperties = PopupProperties(dismissOnClickOutside = false),
@@ -74,11 +79,22 @@ fun TooltipPopup(
                 body = body,
                 tipPosition = tipPosition,
                 elevation = elevation,
-                modifier = if (onClick != null) {
-                    Modifier.clickable(onClick = onClick)
-                } else {
-                    Modifier
-                },
+                modifier = Modifier
+                    .fillMaxWidth(fraction = maxWidthFraction)
+                    .then(
+                        if (maxWidth != null) {
+                            Modifier.widthIn(max = maxWidth)
+                        } else {
+                            Modifier
+                        },
+                    )
+                    .then(
+                        if (onClick != null) {
+                            Modifier.clickable(onClick = onClick)
+                        } else {
+                            Modifier
+                        },
+                    ),
             )
         }
     }
@@ -102,6 +118,7 @@ fun Tooltip(
         modifier = (if (elevation > 0.dp) Modifier.shadow(elevation, tooltipShape) else Modifier)
             .clip(tooltipShape)
             .background(backgroundColor)
+            .fillMaxWidth(0.75f)
             .then(modifier),
     ) {
         Column(
