@@ -1,5 +1,7 @@
 package au.com.shiftyjelly.pocketcasts.compose.reorderable
 
+import androidx.compose.foundation.lazy.LazyListItemInfo
+import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.derivedStateOf
@@ -10,6 +12,7 @@ import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.setValue
 import kotlinx.coroutines.CoroutineScope
 import sh.calvin.reorderable.ReorderableLazyCollectionState
+import sh.calvin.reorderable.rememberReorderableLazyListState
 import timber.log.Timber
 
 // Author: Evtim - https://github.com/Calvin-LL/Reorderable/issues/88#issuecomment-3030356851
@@ -28,7 +31,7 @@ import timber.log.Timber
  * @param S Reorderable state type.
  * @param items Source list.
  * @param enabled Enables or disables drag handling.
- * @param keyOf Extracts a stable key from each item.
+ * @param itemKey Extracts a stable key from each item.
  * @param rememberState Factory for the reorderable state with an onMove handler.
  * @param getIndex Maps reorderable identity to index.
  * @param onCommit Called after drag ends with the final reordered list.
@@ -38,7 +41,7 @@ import timber.log.Timber
 @Composable
 fun <T : Any, K : Any, I : Any, S : ReorderableLazyCollectionState<I>> rememberReorderableDataSource(
     items: List<T>,
-    keyOf: (T) -> K,
+    itemKey: (T) -> K,
     rememberState: @Composable (onMove: CoroutineScope.(I, I) -> Unit) -> S,
     getIndex: (I) -> Int,
     onCommit: (List<T>) -> Unit,
@@ -78,8 +81,8 @@ fun <T : Any, K : Any, I : Any, S : ReorderableLazyCollectionState<I>> rememberR
         if (isDragging) {
             // Updater workingOrder to latest snapshot if not dragging
             if (sourceState == ReorderableDataSourceState.Normal) {
-                workingOrder = items.map(keyOf)
-                keyToItem = items.associateBy(keyOf)
+                workingOrder = items.map(itemKey)
+                keyToItem = items.associateBy(itemKey)
             }
             // Update state
             sourceState = ReorderableDataSourceState.Dragging
@@ -122,6 +125,24 @@ fun <T : Any, K : Any, I : Any, S : ReorderableLazyCollectionState<I>> rememberR
 
     return display to reorderState
 }
+
+@Composable
+fun <T : Any, K : Any> rememberReorderableLazyListDataSource(
+    listState: LazyListState,
+    items: List<T>,
+    itemKey: (T) -> K,
+    onCommit: (List<T>) -> Unit,
+    enabled: Boolean = true,
+) = rememberReorderableDataSource(
+    items = items,
+    itemKey = itemKey,
+    rememberState = { onMove ->
+        rememberReorderableLazyListState(listState) { from, to -> onMove(from, to) }
+    },
+    getIndex = LazyListItemInfo::index,
+    onCommit = onCommit,
+    enabled = enabled,
+)
 
 private enum class ReorderableDataSourceState {
     Normal,
