@@ -228,12 +228,24 @@ data class OnboardingSubscriptionPlan private constructor(
             OnboardingUpgradeSource.FOLDERS,
             OnboardingUpgradeSource.FOLDERS_PODCAST_SCREEN,
             OnboardingUpgradeSource.SUGGESTED_FOLDERS,
-            -> LR.string.folders_plus_prompt
+            -> if (FeatureFlag.isEnabled(Feature.NEW_ONBOARDING_UPGRADE)) {
+                LR.string.onboarding_folders_title
+            } else {
+                LR.string.folders_plus_prompt
+            }
 
-            else -> LR.string.onboarding_plus_features_title
+            else -> if (FeatureFlag.isEnabled(Feature.NEW_ONBOARDING_UPGRADE)) {
+                LR.string.onboarding_upgrade_generic_title
+            } else {
+                LR.string.onboarding_plus_features_title
+            }
         }
 
-        SubscriptionTier.Patron -> LR.string.onboarding_patron_features_title
+        SubscriptionTier.Patron -> if (FeatureFlag.isEnabled(Feature.NEW_ONBOARDING_UPGRADE)) {
+            LR.string.onboarding_upgrade_patron_title
+        } else {
+            LR.string.onboarding_patron_features_title
+        }
     }
 
     companion object {
