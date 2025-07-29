@@ -7,12 +7,14 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.text.input.TextFieldState
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.OutlinedTextField
 import androidx.compose.material.Text
 import androidx.compose.material.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -42,6 +44,49 @@ fun FormField(
     OutlinedTextField(
         value = value,
         onValueChange = { onValueChange(if (singleLine) it.removeNewLines() else it) },
+        isError = isError,
+        colors = TextFieldDefaults.outlinedTextFieldColors(
+            textColor = MaterialTheme.theme.colors.primaryText01,
+            placeholderColor = MaterialTheme.theme.colors.primaryText02,
+            unfocusedBorderColor = if (isError) MaterialTheme.theme.colors.support05 else MaterialTheme.theme.colors.primaryField03,
+            errorTrailingIconColor = MaterialTheme.colors.onSurface.copy(alpha = TextFieldDefaults.IconOpacity), // Keep trailing icon the same color in error states
+        ),
+        enabled = enabled,
+        placeholder = { Text(placeholder) },
+        shape = RoundedCornerShape(6.dp),
+        keyboardOptions = keyboardOptions,
+        keyboardActions = KeyboardActions { onImeAction() },
+        singleLine = singleLine,
+        visualTransformation = visualTransformation,
+        leadingIcon = leadingIcon,
+        trailingIcon = trailingIcon,
+        modifier = modifier
+            .fillMaxWidth()
+            .onTabMoveFocus()
+            .let {
+                if (singleLine) it.onEnter(onImeAction) else it
+            },
+    )
+}
+
+@Composable
+fun FormField(
+    value: TextFieldValue,
+    placeholder: String,
+    onValueChange: (TextFieldValue) -> Unit,
+    modifier: Modifier = Modifier,
+    onImeAction: () -> Unit = {},
+    singleLine: Boolean = true,
+    enabled: Boolean = true,
+    isError: Boolean = false,
+    keyboardOptions: KeyboardOptions = FormFieldDefaults.keyboardOptions,
+    visualTransformation: VisualTransformation = VisualTransformation.None,
+    leadingIcon: @Composable (() -> Unit)? = null,
+    trailingIcon: @Composable (() -> Unit)? = null,
+) {
+    OutlinedTextField(
+        value = value,
+        onValueChange = onValueChange,
         isError = isError,
         colors = TextFieldDefaults.outlinedTextFieldColors(
             textColor = MaterialTheme.theme.colors.primaryText01,
