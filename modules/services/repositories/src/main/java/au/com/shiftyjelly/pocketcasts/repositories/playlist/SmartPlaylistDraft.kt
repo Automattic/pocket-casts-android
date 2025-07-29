@@ -29,6 +29,20 @@ data class SmartPlaylistDraft(
         episodeDuration = episodeDuration ?: SmartRules.Default.episodeDuration,
     )
 
+    val creationRules = if (
+        episodeStatus != null ||
+        downloadStatus != null ||
+        mediaType != null ||
+        releaseDate != null ||
+        starred != null ||
+        podcasts != null ||
+        episodeDuration != null
+    ) {
+        rules
+    } else {
+        null
+    }
+
     companion object {
         val NewReleases = SmartPlaylistDraft(
             title = "New Releases",
