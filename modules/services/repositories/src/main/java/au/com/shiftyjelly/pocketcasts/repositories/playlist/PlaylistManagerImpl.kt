@@ -83,11 +83,10 @@ class PlaylistManagerImpl @Inject constructor(
     override suspend fun updatePlaylistsOrder(sortedUuids: List<String>) {
         appDatabase.withTransaction {
             var missingPlaylistIndex = sortedUuids.size
-            val playlists = playlistDao.getSmartPlaylists().map { playlist ->
-                val index = sortedUuids.indexOf(playlist.uuid).takeIf { it != -1 } ?: missingPlaylistIndex++
-                playlist.copy(sortPosition = index, syncStatus = SYNC_STATUS_NOT_SYNCED)
+            playlistDao.getSmartPlaylists().forEach { playlist ->
+                val position = sortedUuids.indexOf(playlist.uuid).takeIf { it != -1 } ?: missingPlaylistIndex++
+                playlistDao.updateSortPosition(playlist.uuid, position)
             }
-            playlistDao.upsertSmartPlaylists(playlists)
         }
     }
 
