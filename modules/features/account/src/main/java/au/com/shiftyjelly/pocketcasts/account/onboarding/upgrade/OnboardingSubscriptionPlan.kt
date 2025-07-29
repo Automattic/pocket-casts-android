@@ -234,6 +234,14 @@ data class OnboardingSubscriptionPlan private constructor(
                 LR.string.folders_plus_prompt
             }
 
+            OnboardingUpgradeSource.BOOKMARKS,
+            OnboardingUpgradeSource.BOOKMARKS_SHELF_ACTION,
+            -> if (FeatureFlag.isEnabled(Feature.NEW_ONBOARDING_UPGRADE)) {
+                LR.string.onboarding_bookmarks_title
+            } else {
+                LR.string.onboarding_plus_features_title
+            }
+
             else -> if (FeatureFlag.isEnabled(Feature.NEW_ONBOARDING_UPGRADE)) {
                 LR.string.onboarding_upgrade_generic_title
             } else {

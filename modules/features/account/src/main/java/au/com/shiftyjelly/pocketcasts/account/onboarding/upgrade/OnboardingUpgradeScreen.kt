@@ -44,6 +44,7 @@ import au.com.shiftyjelly.pocketcasts.account.onboarding.components.UpgradeFeatu
 import au.com.shiftyjelly.pocketcasts.account.onboarding.components.UpgradePlanRow
 import au.com.shiftyjelly.pocketcasts.account.onboarding.upgrade.OnboardingUpgradeHelper.PrivacyPolicy
 import au.com.shiftyjelly.pocketcasts.account.onboarding.upgrade.OnboardingUpgradeHelper.UpgradeRowButton
+import au.com.shiftyjelly.pocketcasts.account.onboarding.upgrade.contextual.BookmarksAnimation
 import au.com.shiftyjelly.pocketcasts.account.onboarding.upgrade.contextual.FoldersAnimation
 import au.com.shiftyjelly.pocketcasts.account.viewmodel.OnboardingUpgradeFeaturesState
 import au.com.shiftyjelly.pocketcasts.compose.AppThemeWithBackground
@@ -272,6 +273,17 @@ private fun OnboardingUpgradeFeaturesState.NewOnboardingVariant.toContentPages(
                 ),
             )
         }
+        OnboardingUpgradeSource.BOOKMARKS,
+        OnboardingUpgradeSource.BOOKMARKS_SHELF_ACTION,
+        -> {
+            add(UpgradePagerContent.Bookmarks)
+            add(
+                UpgradePagerContent.Features(
+                    features = currentPlan.featureItems,
+                    showCta = false,
+                ),
+            )
+        }
 
         else -> {
             when (this@toContentPages) {
@@ -321,6 +333,9 @@ private sealed interface UpgradePagerContent {
     data object Folders : UpgradePagerContent {
         override val showCta get() = true
     }
+    data object Bookmarks : UpgradePagerContent {
+        override val showCta get() = true
+    }
 }
 
 @Composable
@@ -358,6 +373,7 @@ private fun UpgradeContent(
                 )
 
                 is UpgradePagerContent.Folders -> FoldersUpgradeContent(onCtaClick = scrollToNext)
+                is UpgradePagerContent.Bookmarks -> BookmarksUpgradeContent(onCtaClick = scrollToNext)
             }
         }
     }
@@ -429,6 +445,28 @@ private fun FoldersUpgradeContent(
             modifier = Modifier
                 .fillMaxWidth()
                 .heightIn(min = 320.dp),
+        )
+    }
+}
+
+@Composable
+private fun BookmarksUpgradeContent(
+    onCtaClick: () -> Unit,
+) {
+    Column {
+        TextP40(
+            text = stringResource(LR.string.onboarding_upgrade_schedule_see_features),
+            modifier = Modifier
+                .padding(horizontal = 24.dp)
+                .padding(bottom = 24.dp)
+                .clickable { onCtaClick() },
+            color = MaterialTheme.theme.colors.primaryInteractive01,
+        )
+
+        BookmarksAnimation(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(bottom = 42.dp),
         )
     }
 }
