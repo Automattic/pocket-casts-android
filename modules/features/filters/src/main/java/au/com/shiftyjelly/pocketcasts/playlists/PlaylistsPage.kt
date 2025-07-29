@@ -308,8 +308,8 @@ private fun ColumnScope.FreeAccountBanner(
         modifier = modifier,
     ) {
         Banner(
-            title = stringResource(LR.string.encourage_account_filters_banner_title),
-            description = stringResource(LR.string.encourage_account_filters_banner_description),
+            title = stringResource(LR.string.encourage_account_playlists_banner_title),
+            description = stringResource(LR.string.encourage_account_playlists_banner_description),
             actionLabel = stringResource(LR.string.encourage_account_banner_action_label),
             icon = painterResource(IR.drawable.ic_retry),
             onActionClick = onFreeAccountBannerCtaClick,
