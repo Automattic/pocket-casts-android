@@ -13,6 +13,7 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import au.com.shiftyjelly.pocketcasts.compose.AppThemeWithBackground
 import au.com.shiftyjelly.pocketcasts.compose.extensions.contentWithoutConsumedInsets
+import au.com.shiftyjelly.pocketcasts.playlists.create.CreatePlaylistFragment
 import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingFlow
 import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingLauncher
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseFragment
@@ -48,7 +49,10 @@ class PlaylistsFragment :
                 listState = listState,
                 onCreatePlaylist = {
                     viewModel.trackCreatePlaylistClicked()
-                    Timber.i("Create playlist clicked")
+                    val fragment = childFragmentManager.findFragmentByTag("createPlaylist")
+                    if (fragment == null) {
+                        CreatePlaylistFragment().show(childFragmentManager, "create_playlist")
+                    }
                 },
                 onDeletePlaylist = { playlist -> viewModel.deletePlaylist(playlist.uuid) },
                 onReorderPlaylists = viewModel::updatePlaylistsOrder,
