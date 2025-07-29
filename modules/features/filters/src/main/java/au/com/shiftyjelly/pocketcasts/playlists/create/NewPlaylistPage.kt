@@ -17,15 +17,16 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.input.TextFieldState
+import androidx.compose.foundation.text.input.clearText
+import androidx.compose.foundation.text.input.rememberTextFieldState
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
 import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
@@ -37,7 +38,6 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.semantics
-import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
@@ -57,8 +57,7 @@ import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 @Composable
 fun NewPlaylistPage(
-    playlistTitle: TextFieldValue,
-    onUpdatePlaylistTitle: (TextFieldValue) -> Unit,
+    titleState: TextFieldState,
     onCreateManualPlaylist: () -> Unit,
     onContinueToSmartPlaylist: () -> Unit,
     onClickClose: () -> Unit,
@@ -90,16 +89,16 @@ fun NewPlaylistPage(
                 modifier = Modifier.height(16.dp),
             )
             FormField(
-                value = playlistTitle,
+                state = titleState,
                 placeholder = stringResource(LR.string.new_playlists_title_placeholder),
                 trailingIcon = {
                     AnimatedVisibility(
-                        visible = playlistTitle.text.isNotBlank(),
+                        visible = titleState.text.isNotBlank(),
                         enter = ClearButtonEnterTransition,
                         exit = ClearButtonExitTransition,
                     ) {
                         IconButton(
-                            onClick = { onUpdatePlaylistTitle(TextFieldValue("")) },
+                            onClick = { titleState.clearText() },
                         ) {
                             Icon(
                                 painter = painterResource(IR.drawable.ic_close_outlined),
@@ -109,7 +108,6 @@ fun NewPlaylistPage(
                         }
                     }
                 },
-                onValueChange = onUpdatePlaylistTitle,
                 onImeAction = onCreateManualPlaylist,
                 modifier = Modifier.focusRequester(focusRequester),
             )
@@ -117,7 +115,7 @@ fun NewPlaylistPage(
                 modifier = Modifier.height(16.dp),
             )
             SmartPlaylistButton(
-                enabled = playlistTitle.text.isNotBlank(),
+                enabled = titleState.text.isNotBlank(),
                 onClick = onContinueToSmartPlaylist,
                 modifier = Modifier.fillMaxWidth(),
             )
@@ -126,7 +124,7 @@ fun NewPlaylistPage(
             )
             RowButton(
                 text = stringResource(LR.string.create_playlist),
-                enabled = playlistTitle.text.isNotBlank(),
+                enabled = titleState.text.isNotBlank(),
                 onClick = onCreateManualPlaylist,
                 includePadding = false,
             )
@@ -193,11 +191,10 @@ private val ClearButtonEnterTransition = fadeIn()
 private fun NewPlaylistPagerPreview(
     @PreviewParameter(ThemePreviewParameterProvider::class) themeType: ThemeType,
 ) {
-    var title by remember { mutableStateOf(TextFieldValue("My Playlist")) }
+    val titleState = rememberTextFieldState(initialText = "My Playlist")
     AppThemeWithBackground(themeType) {
         NewPlaylistPage(
-            playlistTitle = title,
-            onUpdatePlaylistTitle = { title = it },
+            titleState = titleState,
             onCreateManualPlaylist = {},
             onContinueToSmartPlaylist = {},
             onClickClose = {},

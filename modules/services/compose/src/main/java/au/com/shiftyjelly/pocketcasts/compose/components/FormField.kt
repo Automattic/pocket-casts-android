@@ -7,6 +7,8 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.text.input.KeyboardActionHandler
+import androidx.compose.foundation.text.input.TextFieldLineLimits
 import androidx.compose.foundation.text.input.TextFieldState
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.OutlinedTextField
@@ -14,7 +16,6 @@ import androidx.compose.material.Text
 import androidx.compose.material.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -71,22 +72,19 @@ fun FormField(
 
 @Composable
 fun FormField(
-    value: TextFieldValue,
+    state: TextFieldState,
     placeholder: String,
-    onValueChange: (TextFieldValue) -> Unit,
     modifier: Modifier = Modifier,
     onImeAction: () -> Unit = {},
-    singleLine: Boolean = true,
+    lineLimits: TextFieldLineLimits = TextFieldLineLimits.SingleLine,
     enabled: Boolean = true,
     isError: Boolean = false,
     keyboardOptions: KeyboardOptions = FormFieldDefaults.keyboardOptions,
-    visualTransformation: VisualTransformation = VisualTransformation.None,
     leadingIcon: @Composable (() -> Unit)? = null,
     trailingIcon: @Composable (() -> Unit)? = null,
 ) {
     OutlinedTextField(
-        value = value,
-        onValueChange = onValueChange,
+        state = state,
         isError = isError,
         colors = TextFieldDefaults.outlinedTextFieldColors(
             textColor = MaterialTheme.theme.colors.primaryText01,
@@ -98,17 +96,20 @@ fun FormField(
         placeholder = { Text(placeholder) },
         shape = RoundedCornerShape(6.dp),
         keyboardOptions = keyboardOptions,
-        keyboardActions = KeyboardActions { onImeAction() },
-        singleLine = singleLine,
-        visualTransformation = visualTransformation,
+        onKeyboardAction = KeyboardActionHandler { onImeAction() },
+        lineLimits = lineLimits,
         leadingIcon = leadingIcon,
         trailingIcon = trailingIcon,
         modifier = modifier
             .fillMaxWidth()
             .onTabMoveFocus()
-            .let {
-                if (singleLine) it.onEnter(onImeAction) else it
-            },
+            .then(
+                if (lineLimits is TextFieldLineLimits.SingleLine) {
+                    Modifier.onEnter(onImeAction)
+                } else {
+                    Modifier
+                },
+            ),
     )
 }
 
