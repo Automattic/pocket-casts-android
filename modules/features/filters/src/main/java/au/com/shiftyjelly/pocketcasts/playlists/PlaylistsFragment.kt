@@ -46,17 +46,22 @@ class PlaylistsFragment :
             PlaylistsPage(
                 uiState = uiState,
                 listState = listState,
-                onCreatePlaylist = { Timber.i("Create playlist clicked") },
+                onCreatePlaylist = {
+                    viewModel.trackCreatePlaylistClicked()
+                    Timber.i("Create playlist clicked")
+                },
                 onDeletePlaylist = { playlist -> viewModel.deletePlaylist(playlist.uuid) },
                 onReorderPlaylists = viewModel::updatePlaylistsOrder,
+                onShowPlaylists = { playlists -> viewModel.trackPlaylistsShown(playlists.size) },
                 onFreeAccountBannerCtaClick = {
-                    viewModel.trackFreeAccountCtaClick()
+                    viewModel.trackFreeAccountCtaClicked()
                     OnboardingLauncher.openOnboardingFlow(
                         activity = requireActivity(),
                         onboardingFlow = OnboardingFlow.LoggedOut,
                     )
                 },
                 onFreeAccountBannerDismiss = viewModel::dismissFreeAccountBanner,
+                onShowPremadePlaylistsTooltip = viewModel::trackTooltipShown,
                 onDismissPremadePlaylistsTooltip = viewModel::dismissPremadePlaylistsTooltip,
             )
         }
