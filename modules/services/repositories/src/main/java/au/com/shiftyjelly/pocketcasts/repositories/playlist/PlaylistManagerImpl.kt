@@ -80,6 +80,16 @@ class PlaylistManagerImpl @Inject constructor(
         }
     }
 
+    override suspend fun updatePlaylistsOrder(sortedUuids: List<String>) {
+        appDatabase.withTransaction {
+            var missingPlaylistIndex = sortedUuids.size
+            playlistDao.getSmartPlaylists().forEach { playlist ->
+                val position = sortedUuids.indexOf(playlist.uuid).takeIf { it != -1 } ?: missingPlaylistIndex++
+                playlistDao.updateSortPosition(playlist.uuid, position)
+            }
+        }
+    }
+
     private fun List<SmartPlaylist>.toPreviewFlows() = map { playlist ->
         val podcastsFlow = playlistDao.observeSmartPlaylistPodcasts(
             clock = clock,

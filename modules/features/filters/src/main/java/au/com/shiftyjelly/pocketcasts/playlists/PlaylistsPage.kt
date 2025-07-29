@@ -2,6 +2,8 @@ package au.com.shiftyjelly.pocketcasts.playlists
 
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.animateColorAsState
+import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.animation.expandVertically
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
@@ -27,10 +29,15 @@ import androidx.compose.material.IconButton
 import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.setValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.compositeOver
+import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
@@ -42,11 +49,15 @@ import au.com.shiftyjelly.pocketcasts.compose.bars.ThemedTopAppBar
 import au.com.shiftyjelly.pocketcasts.compose.components.Banner
 import au.com.shiftyjelly.pocketcasts.compose.components.NoContentBanner
 import au.com.shiftyjelly.pocketcasts.compose.preview.ThemePreviewParameterProvider
+import au.com.shiftyjelly.pocketcasts.compose.reorderable.rememberReorderableLazyListDataSource
 import au.com.shiftyjelly.pocketcasts.compose.theme
 import au.com.shiftyjelly.pocketcasts.playlists.PlaylistsViewModel.PlaylistsState
 import au.com.shiftyjelly.pocketcasts.playlists.PlaylistsViewModel.UiState
 import au.com.shiftyjelly.pocketcasts.repositories.playlist.PlaylistPreview
+import au.com.shiftyjelly.pocketcasts.ui.helper.ColorUtils
+import au.com.shiftyjelly.pocketcasts.ui.helper.modifyHsv
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme.ThemeType
+import sh.calvin.reorderable.ReorderableItem
 import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
@@ -55,7 +66,7 @@ internal fun PlaylistsPage(
     uiState: UiState,
     onCreatePlaylist: () -> Unit,
     onDeletePlaylist: (PlaylistPreview) -> Unit,
-    onShowOptions: () -> Unit,
+    onReorderPlaylists: (List<String>) -> Unit,
     onFreeAccountBannerCtaClick: () -> Unit,
     onFreeAccountBannerDismiss: () -> Unit,
     modifier: Modifier = Modifier,
@@ -70,7 +81,6 @@ internal fun PlaylistsPage(
         Toolbar(
             showActionButtons = !uiState.showEmptyState,
             onCreatePlaylist = onCreatePlaylist,
-            onShowOptions = onShowOptions,
         )
 
         FreeAccountBanner(
@@ -87,6 +97,7 @@ internal fun PlaylistsPage(
             ),
             onCreatePlaylist = onCreatePlaylist,
             onDeletePlaylist = onDeletePlaylist,
+            onReorderPlaylists = onReorderPlaylists,
         )
     }
 }
@@ -98,25 +109,34 @@ private fun ColumnScope.PlaylistsContent(
     contentPadding: PaddingValues,
     onCreatePlaylist: () -> Unit,
     onDeletePlaylist: (PlaylistPreview) -> Unit,
+    onReorderPlaylists: (List<String>) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     AnimatedContent(
         targetState = playlistsState,
         transitionSpec = { ContentTransitionSpec },
+        contentKey = { playlists ->
+            when (playlists) {
+                is PlaylistsState.Loaded -> if (playlists.value.isNotEmpty()) "content" else "no_content"
+                is PlaylistsState.Loading -> "loading"
+            }
+        },
         modifier = modifier,
     ) { playlists ->
         when (playlists) {
-            is PlaylistsState.Loaded -> if (playlists.value.isEmpty()) {
-                NoPlaylistsContent(
-                    onCreatePlaylist = onCreatePlaylist,
-                    modifier = Modifier.padding(contentPadding),
-                )
-            } else {
+            is PlaylistsState.Loaded -> if (playlists.value.isNotEmpty()) {
                 PlaylistsColumn(
                     playlists = playlists.value,
                     listState = listState,
                     contentPadding = contentPadding,
                     onDelete = onDeletePlaylist,
+                    onReorderPlaylists = onReorderPlaylists,
+                    modifier = Modifier.fillMaxSize(),
+                )
+            } else {
+                NoPlaylistsContent(
+                    onCreatePlaylist = onCreatePlaylist,
+                    modifier = Modifier.padding(contentPadding),
                 )
             }
 
@@ -133,23 +153,58 @@ private fun PlaylistsColumn(
     listState: LazyListState,
     contentPadding: PaddingValues,
     onDelete: (PlaylistPreview) -> Unit,
+    onReorderPlaylists: (List<String>) -> Unit,
     modifier: Modifier = Modifier,
 ) {
+    val hapticFeedback = LocalHapticFeedback.current
+    val (displayItems, reorderableState) = rememberReorderableLazyListDataSource(
+        listState = listState,
+        items = playlists,
+        itemKey = PlaylistPreview::uuid,
+        onMove = {
+            hapticFeedback.performHapticFeedback(HapticFeedbackType.SegmentFrequentTick)
+        },
+        onCommit = { orderedList ->
+            onReorderPlaylists(orderedList.map(PlaylistPreview::uuid))
+        },
+    )
+    val baseColor = MaterialTheme.theme.colors.primaryUi01
+    val highlightColor = MaterialTheme.theme.colors.primaryIcon01
+    val draggedColor = remember(highlightColor, baseColor) {
+        highlightColor.copy(alpha = 0.15f).compositeOver(baseColor.copy(alpha = 1f))
+    }
+
     LazyColumn(
         state = listState,
         contentPadding = contentPadding,
         modifier = modifier,
     ) {
         itemsIndexed(
-            items = playlists,
+            items = displayItems,
             key = { _, item -> item.uuid },
         ) { index, playlist ->
-            PlaylistPreviewRow(
-                playlist = playlist,
-                showDivider = index != playlists.lastIndex,
-                onDelete = { onDelete(playlist) },
-                modifier = Modifier.animateItem(),
-            )
+            ReorderableItem(reorderableState, key = playlist.uuid) { isDragging ->
+                val elevation by animateDpAsState(if (isDragging) 4.dp else 0.dp)
+                val backgroundColor by animateColorAsState(if (isDragging) draggedColor else baseColor)
+
+                PlaylistPreviewRow(
+                    playlist = playlist,
+                    showDivider = index != displayItems.lastIndex,
+                    backgroundColor = backgroundColor,
+                    onDelete = { onDelete(playlist) },
+                    modifier = Modifier
+                        .longPressDraggableHandle(
+                            onDragStarted = {
+                                hapticFeedback.performHapticFeedback(HapticFeedbackType.LongPress)
+                            },
+                            onDragStopped = {
+                                hapticFeedback.performHapticFeedback(HapticFeedbackType.GestureEnd)
+                            },
+                        )
+                        .animateItem()
+                        .shadow(elevation),
+                )
+            }
         }
     }
 }
@@ -186,7 +241,6 @@ private fun ColumnScope.NoPlaylistsContent(
 private fun Toolbar(
     showActionButtons: Boolean,
     onCreatePlaylist: () -> Unit,
-    onShowOptions: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     ThemedTopAppBar(
@@ -204,22 +258,6 @@ private fun Toolbar(
                     Icon(
                         painter = painterResource(IR.drawable.ic_add_black_24dp),
                         contentDescription = stringResource(LR.string.new_playlist),
-                        tint = MaterialTheme.theme.colors.secondaryIcon01,
-                    )
-                }
-            }
-
-            AnimatedVisibility(
-                visible = showActionButtons,
-                enter = FadeIn,
-                exit = FadeOut,
-            ) {
-                IconButton(
-                    onClick = onShowOptions,
-                ) {
-                    Icon(
-                        painter = painterResource(IR.drawable.ic_overflow),
-                        contentDescription = stringResource(LR.string.options),
                         tint = MaterialTheme.theme.colors.secondaryIcon01,
                     )
                 }
@@ -275,9 +313,9 @@ private fun PlaylistsPageEmptyStatePreview() {
             ),
             onCreatePlaylist = {},
             onDeletePlaylist = {},
-            onShowOptions = {},
             onFreeAccountBannerCtaClick = {},
             onFreeAccountBannerDismiss = {},
+            onReorderPlaylists = {},
         )
     }
 }
@@ -295,9 +333,9 @@ private fun PlaylistsPageEmptyStateNoBannerPreview() {
             ),
             onCreatePlaylist = {},
             onDeletePlaylist = {},
-            onShowOptions = {},
             onFreeAccountBannerCtaClick = {},
             onFreeAccountBannerDismiss = {},
+            onReorderPlaylists = {},
         )
     }
 }
@@ -326,9 +364,9 @@ private fun PlaylistPagePreview(
             ),
             onCreatePlaylist = {},
             onDeletePlaylist = {},
-            onShowOptions = {},
             onFreeAccountBannerCtaClick = {},
             onFreeAccountBannerDismiss = {},
+            onReorderPlaylists = {},
         )
     }
 }

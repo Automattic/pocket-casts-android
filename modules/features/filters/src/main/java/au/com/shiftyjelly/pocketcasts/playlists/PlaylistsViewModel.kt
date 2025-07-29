@@ -63,6 +63,12 @@ class PlaylistsViewModel @Inject constructor(
         settings.isFreeAccountFiltersBannerDismissed.set(true, updateModifiedAt = true)
     }
 
+    fun updatePlaylistsOrder(playlistUuids: List<String>) {
+        viewModelScope.launch {
+            playlistManager.updatePlaylistsOrder(playlistUuids)
+        }
+    }
+
     internal data class UiState(
         val playlists: PlaylistsState,
         val showOnboarding: Boolean,

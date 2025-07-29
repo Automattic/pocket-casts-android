@@ -52,6 +52,7 @@ dependencies {
     implementation(libs.fragment.compose)
     implementation(libs.fragment.ktx)
     implementation(libs.lifecycle.reactivestreams.ktx)
+    implementation(libs.reorderable)
     implementation(libs.rx2.android)
     implementation(libs.rx2.kotlin)
     implementation(libs.timber)
