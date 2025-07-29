@@ -14,12 +14,17 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.rememberNestedScrollInteropConnection
-import androidx.compose.ui.text.TextRange
-import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
 import androidx.fragment.app.viewModels
 import androidx.fragment.compose.content
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.rememberNavController
 import au.com.shiftyjelly.pocketcasts.compose.AppThemeWithBackground
+import au.com.shiftyjelly.pocketcasts.compose.extensions.slideInToEnd
+import au.com.shiftyjelly.pocketcasts.compose.extensions.slideInToStart
+import au.com.shiftyjelly.pocketcasts.compose.extensions.slideOutToEnd
+import au.com.shiftyjelly.pocketcasts.compose.extensions.slideOutToStart
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseDialogFragment
 import dagger.hilt.android.AndroidEntryPoint
 import dagger.hilt.android.lifecycle.withCreationCallback
@@ -49,18 +54,51 @@ class CreatePlaylistFragment : BaseDialogFragment() {
             AppThemeWithBackground(
                 themeType = theme.activeTheme,
             ) {
-                NewPlaylistPage(
-                    titleState = viewModel.playlistNameState,
-                    onCreateManualPlaylist = { Timber.i("Create Manual Playlist") },
-                    onContinueToSmartPlaylist = { Timber.i("Continue to Smart Playlist") },
-                    onClickClose = ::dismiss,
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .navigationBarsPadding()
-                        .nestedScroll(rememberNestedScrollInteropConnection())
-                        .verticalScroll(rememberScrollState()),
-                )
+                val navController = rememberNavController()
+                NavHost(
+                    navController = navController,
+                    startDestination = NavigationRoutes.NEW_PLAYLIST,
+                    enterTransition = { slideInToStart() },
+                    exitTransition = { slideOutToStart() },
+                    popEnterTransition = { slideInToEnd() },
+                    popExitTransition = { slideOutToEnd() },
+                    modifier = Modifier.fillMaxSize(),
+                ) {
+                    composable(NavigationRoutes.NEW_PLAYLIST) {
+                        NewPlaylistPage(
+                            titleState = viewModel.playlistNameState,
+                            onCreateManualPlaylist = { Timber.i("Create Manual Playlist") },
+                            onContinueToSmartPlaylist = {
+                                navController.navigate(NavigationRoutes.SMART_PLAYLIST_PREVIEW) {
+                                    popUpTo(NavigationRoutes.NEW_PLAYLIST) {
+                                        inclusive = true
+                                    }
+                                }
+                            },
+                            onClickClose = ::dismiss,
+                            modifier = Modifier
+                                .fillMaxSize()
+                                .navigationBarsPadding()
+                                .nestedScroll(rememberNestedScrollInteropConnection())
+                                .verticalScroll(rememberScrollState()),
+                        )
+                    }
+                    composable(NavigationRoutes.SMART_PLAYLIST_PREVIEW) {
+                        SmartPlaylistPreviewPage(
+                            modifier = Modifier
+                                .fillMaxSize()
+                                .navigationBarsPadding()
+                                .nestedScroll(rememberNestedScrollInteropConnection())
+                                .verticalScroll(rememberScrollState()),
+                        )
+                    }
+                }
             }
         }
     }
+}
+
+private object NavigationRoutes {
+    const val NEW_PLAYLIST = "new_playlist"
+    const val SMART_PLAYLIST_PREVIEW = "smart_playlist_preview"
 }
