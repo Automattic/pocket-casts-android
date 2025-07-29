@@ -918,6 +918,8 @@
     <string name="new_smart_playlist_banner_title">Make into Smart Playlist</string>
     <string name="new_smart_playlist_banner_body">Automatically add episodes based on rules</string>
     <string name="create_playlist">Create Playlist</string>
+    <string name="create_smart_playlist">Create Smart Playlist</string>
+    <string name="smart_rules_description">Set up Smart Rules to automatically add episodes to your Smart Playlist.</string>
 
     <!-- Profile -->
 

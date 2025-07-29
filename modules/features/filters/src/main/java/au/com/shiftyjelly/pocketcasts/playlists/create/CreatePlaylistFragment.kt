@@ -7,6 +7,8 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.rememberNestedScrollInteropConnection
@@ -40,6 +42,8 @@ class CreatePlaylistFragment : BaseDialogFragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?,
     ) = content {
+        val uiState by viewModel.uiState.collectAsState()
+
         DialogBox {
             val navController = rememberNavController()
             NavHost(
@@ -63,20 +67,16 @@ class CreatePlaylistFragment : BaseDialogFragment() {
                             }
                         },
                         onClickClose = ::dismiss,
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .navigationBarsPadding()
-                            .nestedScroll(rememberNestedScrollInteropConnection())
-                            .verticalScroll(rememberScrollState()),
+                        modifier = Modifier.nestedScroll(rememberNestedScrollInteropConnection()),
                     )
                 }
                 composable(NavigationRoutes.SMART_PLAYLIST_PREVIEW) {
                     SmartPlaylistPreviewPage(
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .navigationBarsPadding()
-                            .nestedScroll(rememberNestedScrollInteropConnection())
-                            .verticalScroll(rememberScrollState()),
+                        draft = uiState.smartPlaylistDraft,
+                        onCreateSmartPlaylist = { Timber.i("On create smart playlist") },
+                        onClickRule = { Timber.i("On edit rule: $it") },
+                        onClickClose = ::dismiss,
+                        modifier = Modifier.nestedScroll(rememberNestedScrollInteropConnection()),
                     )
                 }
             }
