@@ -2500,5 +2500,8 @@
     <string name="onboarding_upgrade_gratitude">The undying gratitude of everyone here at Pocket Casts</string>
     <string name="onboarding_upgrade_account_message">Unlock all paid features like Folders, Shuffle, Bookmarks and many more</string>
     <string name="onboarding_folders_title">Folders: your podcasts, perfectly placed</string>
+    <string name="onboarding_folders_title_1">Books</string>
+    <string name="onboarding_folders_title_2">Favorites</string>
+    <string name="onboarding_folders_title_3">Sports</string>
 
 </resources>

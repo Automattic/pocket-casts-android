@@ -1,7 +1,7 @@
 package au.com.shiftyjelly.pocketcasts.account.onboarding.upgrade.contextual
 
 import androidx.annotation.DrawableRes
-import androidx.compose.animation.ExperimentalSharedTransitionApi
+import androidx.annotation.StringRes
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.Easing
 import androidx.compose.animation.core.FastOutSlowInEasing
@@ -26,6 +26,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.ReadOnlyComposable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -39,6 +40,7 @@ import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.Layout
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.role
 import androidx.compose.ui.semantics.semantics
@@ -57,27 +59,21 @@ import kotlin.random.Random
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import au.com.shiftyjelly.pocketcasts.images.R as IR
+import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
-data class TileConfig(
+private data class TileConfig(
     val index: Int,
     @DrawableRes val drawableResId: Int?,
     val anchor: TransformOrigin,
 )
 
-data class FolderConfig(
-    val folderName: String,
+private data class FolderConfig(
+    @StringRes val folderNameRes: Int,
     val color: Color,
     val tiles: List<TileConfig>,
 )
 
-private fun randomColor() = Color(
-    red = Random.nextFloat(),
-    green = Random.nextFloat(),
-    blue = Random.nextFloat(),
-    alpha = 1f,
-)
-
-private val previewTiles = (1..8).map {
+private val predefinedTiles = (1..8).map {
     TileConfig(
         index = it,
         drawableResId = when (it) {
@@ -100,28 +96,29 @@ private val previewTiles = (1..8).map {
     )
 }
 
-private val mockTile = TileConfig(
+private val placeholderTile = TileConfig(
     index = -1,
     drawableResId = null,
     anchor = TransformOrigin(0f, 0f),
 )
 
+@ReadOnlyComposable
 @Composable
-private fun previewFolders() = listOf(
+private fun predefinedFolders() = listOf(
     FolderConfig(
-        folderName = "Books",
+        folderNameRes = LR.string.onboarding_folders_title_1,
         color = Color(0xFF9BA2FF),
-        tiles = listOf(mockTile, previewTiles[0], mockTile, previewTiles[4]),
+        tiles = listOf(placeholderTile, predefinedTiles[0], placeholderTile, predefinedTiles[4]),
     ),
     FolderConfig(
-        folderName = "Favorites",
+        folderNameRes = LR.string.onboarding_folders_title_2,
         color = MaterialTheme.theme.colors.primaryInteractive01,
-        tiles = List(4) { mockTile },
+        tiles = List(4) { placeholderTile },
     ),
     FolderConfig(
-        folderName = "Sports",
+        folderNameRes = LR.string.onboarding_folders_title_3,
         color = Color(0xFF32D9A9),
-        tiles = listOf(previewTiles[3], mockTile, previewTiles[7], mockTile),
+        tiles = listOf(predefinedTiles[3], placeholderTile, predefinedTiles[7], placeholderTile),
     ),
 )
 
@@ -130,9 +127,9 @@ private val edgeFadeIndices = listOf(1, 4, 5, 8)
 @Composable
 fun FoldersAnimation(
     modifier: Modifier = Modifier,
-    tiles: List<TileConfig> = previewTiles,
-    folders: List<FolderConfig> = previewFolders(),
 ) {
+    val tiles: List<TileConfig> = predefinedTiles
+    val folders: List<FolderConfig> = predefinedFolders()
     var showFolders by remember { mutableStateOf(false) }
 
     LaunchedEffect("showFolders") {
@@ -426,9 +423,10 @@ private fun Folder(
                 )
             }
             TextH30(
-                text = spec.folderName,
+                text = stringResource(spec.folderNameRes),
                 color = MaterialTheme.theme.colors.primaryInteractive02,
                 maxLines = 1,
+                disableAutoScale = true,
             )
         },
     ) { measurables, constraints ->
@@ -466,7 +464,6 @@ private fun Folder(
     }
 }
 
-@ExperimentalSharedTransitionApi
 @Preview
 @Composable
 private fun PreviewFolder(
@@ -476,9 +473,9 @@ private fun PreviewFolder(
         Folder(
             modifier = Modifier.size(219.dp),
             spec = FolderConfig(
-                folderName = "Favorites",
+                folderNameRes = LR.string.onboarding_folders_title_1,
                 color = Color.Blue,
-                tiles = previewTiles.take(4),
+                tiles = predefinedTiles.take(4),
             ),
             startTransition = true,
         )
@@ -486,16 +483,15 @@ private fun PreviewFolder(
         Folder(
             modifier = Modifier.size(120.dp),
             spec = FolderConfig(
-                folderName = "Small sized long name",
+                folderNameRes = LR.string.onboarding_folders_title_3,
                 color = Color.Blue,
-                tiles = previewTiles.take(4),
+                tiles = predefinedTiles.take(4),
             ),
             startTransition = true,
         )
     }
 }
 
-@ExperimentalSharedTransitionApi
 @Preview
 @Composable
 private fun PreviewTileRows(
@@ -503,18 +499,17 @@ private fun PreviewTileRows(
 ) = AppTheme(theme) {
     TileRows(
         modifier = Modifier.fillMaxWidth(),
-        tiles = previewTiles,
+        tiles = predefinedTiles,
     )
 }
 
-@ExperimentalSharedTransitionApi
 @Preview
 @Composable
 private fun PreviewFolderRow(
     @PreviewParameter(ThemePreviewParameterProvider::class) theme: Theme.ThemeType,
 ) = AppTheme(theme) {
     Column {
-        val previewFolders = previewFolders()
+        val previewFolders = predefinedFolders()
         FolderRow(
             modifier = Modifier.fillMaxWidth(),
             left = previewFolders[0],
@@ -525,7 +520,6 @@ private fun PreviewFolderRow(
     }
 }
 
-@ExperimentalSharedTransitionApi
 @Preview
 @Composable
 private fun PreviewTruncatedRow(
@@ -542,3 +536,10 @@ private fun PreviewTruncatedRow(
         }
     }
 }
+
+private fun randomColor() = Color(
+    red = Random.nextFloat(),
+    green = Random.nextFloat(),
+    blue = Random.nextFloat(),
+    alpha = 1f,
+)

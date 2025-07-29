@@ -2,7 +2,6 @@ package au.com.shiftyjelly.pocketcasts.account.onboarding.upgrade
 
 import UpgradeTrialItem
 import UpgradeTrialTimeline
-import androidx.compose.animation.ExperimentalSharedTransitionApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -434,7 +433,6 @@ private fun FoldersUpgradeContent(
     }
 }
 
-@ExperimentalSharedTransitionApi
 @Preview
 @Composable
 private fun PreviewOnboardingUpgradeScreen(
