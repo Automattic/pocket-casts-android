@@ -37,6 +37,9 @@ import androidx.compose.ui.graphics.TransformOrigin
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.semantics.role
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.IntOffset
@@ -84,7 +87,7 @@ fun BookmarksAnimation(
     }
 
     Box(
-        modifier = modifier,
+        modifier = modifier.semantics { role = Role.Image },
         contentAlignment = Alignment.TopCenter,
     ) {
         bookmarks.forEachIndexed { index, item ->
@@ -215,6 +218,7 @@ private fun Bookmark(
         TextP40(
             text = bookmarkConfig.text,
             color = MaterialTheme.theme.colors.primaryInteractive02,
+            disableAutoScale = true,
         )
         Row(
             modifier = Modifier
@@ -229,6 +233,7 @@ private fun Bookmark(
             TextP40(
                 text = bookmarkConfig.timestamp,
                 color = MaterialTheme.theme.colors.primaryText01,
+                disableAutoScale = true,
             )
             Icon(painter = painterResource(IR.drawable.ic_play), contentDescription = "", tint = MaterialTheme.theme.colors.primaryText01)
         }
