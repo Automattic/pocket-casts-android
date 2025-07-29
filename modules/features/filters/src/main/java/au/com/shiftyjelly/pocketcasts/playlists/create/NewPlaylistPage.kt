@@ -178,7 +178,7 @@ private fun SmartPlaylistButton(
         Image(
             painter = painterResource(IR.drawable.ic_chevron_trimmed),
             contentDescription = null,
-            colorFilter = ColorFilter.tint(MaterialTheme.theme.colors.primaryText02),
+            colorFilter = ColorFilter.tint(MaterialTheme.theme.colors.primaryIcon02),
         )
     }
 }
