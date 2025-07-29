@@ -26,6 +26,7 @@ import androidx.core.content.ContextCompat
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
+import androidx.core.view.doOnLayout
 import androidx.core.view.isVisible
 import androidx.core.view.updateLayoutParams
 import androidx.core.view.updatePadding
@@ -1132,8 +1133,10 @@ class MainActivity :
 
     override fun onPlayerBottomSheetSlide(bottomSheetView: View, slideOffset: Float) {
         val view = binding.bottomNavigation
-        val targetPosition = 2 * view.height * slideOffset
-        view.spring(TRANSLATION_Y).animateToFinalPosition(targetPosition)
+        view.doOnLayout {
+            val targetPosition = 2 * view.height * slideOffset
+            view.spring(TRANSLATION_Y).animateToFinalPosition(targetPosition)
+        }
     }
 
     override fun updateSystemColors() {
