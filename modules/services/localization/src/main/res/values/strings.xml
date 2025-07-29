@@ -2516,5 +2516,6 @@
     <string name="onboarding_folders_title_2">Favorites</string>
     <string name="onboarding_folders_title_3">Sports</string>
     <string name="onboarding_bookmarks_title">Bookmarks: no more \"where was that?\"</string>
+    <string name="onboarding_shuffle_title">Shuffle: The joy of now choosing</string>
 
 </resources>

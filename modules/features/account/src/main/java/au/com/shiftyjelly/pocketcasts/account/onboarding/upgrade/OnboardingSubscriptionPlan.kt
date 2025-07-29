@@ -221,7 +221,12 @@ data class OnboardingSubscriptionPlan private constructor(
         SubscriptionTier.Plus -> when (source) {
             OnboardingUpgradeSource.BANNER_AD -> LR.string.banner_ad_plus_prompt
             OnboardingUpgradeSource.SKIP_CHAPTERS -> LR.string.skip_chapters_plus_prompt
-            OnboardingUpgradeSource.UP_NEXT_SHUFFLE -> LR.string.up_next_shuffle_plus_prompt
+            OnboardingUpgradeSource.UP_NEXT_SHUFFLE -> if (FeatureFlag.isEnabled(Feature.NEW_ONBOARDING_UPGRADE)) {
+                LR.string.onboarding_shuffle_title
+            } else {
+                LR.string.up_next_shuffle_plus_prompt
+            }
+
             OnboardingUpgradeSource.THEMES -> LR.string.themes_plus_prompt
             OnboardingUpgradeSource.ICONS -> LR.string.icons_plus_prompt
             OnboardingUpgradeSource.FILES -> LR.string.files_plus_prompt
