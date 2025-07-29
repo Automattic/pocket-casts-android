@@ -910,6 +910,8 @@
     <string name="playlists_empty_state_title">Organize episodes your way</string>
     <string name="playlists_empty_state_body">Playlists let you organize episodes manually or automatically with Smart Rules.</string>
     <string name="new_playlist">New Playlist</string>
+    <string name="premade_playlists_tooltip_title">Smart Playlists, ready to go</string>
+    <string name="premade_playlists_tooltip_body">We made these to help you get started.\nThey auto-update based on your listening.</string>
 
     <!-- Profile -->
 
@@ -2428,6 +2430,8 @@
     <string name="encourage_account_sync_banner_description">Create a free account to sync your shows and listen anywhere.</string>
     <string name="encourage_account_filters_banner_title">Keep your filters in sync</string>
     <string name="encourage_account_filters_banner_description">Create a free account to sync your filters on any device.</string>
+    <string name="encourage_account_playlists_banner_title">Keep your playlists in sync</string>
+    <string name="encourage_account_playlists_banner_description">Create a free account to sync your playlists on any device.</string>
     <string name="encourage_account_history_banner_title">Keep track of what you’ve played</string>
     <string name="encourage_account_history_banner_description">Create a free account to sync your listening history everywhere.</string>
 

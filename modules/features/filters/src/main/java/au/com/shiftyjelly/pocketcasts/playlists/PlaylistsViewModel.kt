@@ -5,6 +5,7 @@ import androidx.lifecycle.viewModelScope
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
+import au.com.shiftyjelly.pocketcasts.repositories.playlist.Playlist
 import au.com.shiftyjelly.pocketcasts.repositories.playlist.PlaylistManager
 import au.com.shiftyjelly.pocketcasts.repositories.playlist.PlaylistPreview
 import au.com.shiftyjelly.pocketcasts.repositories.user.UserManager
@@ -38,12 +39,14 @@ class PlaylistsViewModel @Inject constructor(
         playlistManager.observePlaylistsPreview(),
         settings.showPlaylistsOnboarding.flow,
         showFreeAccountBanner,
+        settings.showEmptyFiltersListTooltip.flow,
         settings.bottomInset,
-    ) { playlists, showOnboarding, showFreeAccountBanner, bottomInset ->
+    ) { playlists, showOnboarding, showFreeAccountBanner, showTooltip, bottomInset ->
         UiState(
             playlists = PlaylistsState.Loaded(playlists),
             showOnboarding = showOnboarding,
             showFreeAccountBanner = showFreeAccountBanner,
+            showPremadePlaylistsTooltip = shouldShowPremadePlaylistsTooltip(showTooltip, playlists),
             miniPlayerInset = bottomInset,
         )
     }.stateIn(viewModelScope, SharingStarted.Eagerly, UiState.Empty)
@@ -69,10 +72,22 @@ class PlaylistsViewModel @Inject constructor(
         }
     }
 
+    fun dismissPremadePlaylistsTooltip() {
+        settings.showEmptyFiltersListTooltip.set(false, updateModifiedAt = false)
+    }
+
+    private fun shouldShowPremadePlaylistsTooltip(
+        tooltipFlag: Boolean,
+        playlists: List<PlaylistPreview>,
+    ) = tooltipFlag &&
+        playlists.size == PremadePlaylistUuids.size &&
+        playlists.all { playlist -> playlist.uuid in PremadePlaylistUuids }
+
     internal data class UiState(
         val playlists: PlaylistsState,
         val showOnboarding: Boolean,
         val showFreeAccountBanner: Boolean,
+        val showPremadePlaylistsTooltip: Boolean,
         val miniPlayerInset: Int,
     ) {
         val showEmptyState get() = when (playlists) {
@@ -85,6 +100,7 @@ class PlaylistsViewModel @Inject constructor(
                 playlists = PlaylistsState.Loading,
                 showOnboarding = false,
                 showFreeAccountBanner = false,
+                showPremadePlaylistsTooltip = false,
                 miniPlayerInset = 0,
             )
         }
@@ -95,5 +111,9 @@ class PlaylistsViewModel @Inject constructor(
 
         @JvmInline
         value class Loaded(val value: List<PlaylistPreview>) : PlaylistsState
+    }
+
+    private companion object {
+        val PremadePlaylistUuids = setOf(Playlist.NEW_RELEASES_UUID, Playlist.IN_PROGRESS_UUID)
     }
 }
