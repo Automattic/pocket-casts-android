@@ -65,12 +65,12 @@ class PlaylistManagerImpl @Inject constructor(
         playlistDao.markPlaylistAsDeleted(uuid)
     }
 
-    override suspend fun upsertPlaylist(draft: PlaylistDraft) {
+    override suspend fun upsertSmartPlaylist(draft: SmartPlaylistDraft) {
         appDatabase.withTransaction {
             val uuids = playlistDao.getAllPlaylistUuids()
-            val uuid = if (draft === PlaylistDraft.NewReleases) {
+            val uuid = if (draft === SmartPlaylistDraft.NewReleases) {
                 Playlist.NEW_RELEASES_UUID
-            } else if (draft === PlaylistDraft.InProgress) {
+            } else if (draft === SmartPlaylistDraft.InProgress) {
                 Playlist.IN_PROGRESS_UUID
             } else {
                 generateUniqueUuid(uuids)
@@ -142,7 +142,7 @@ class PlaylistManagerImpl @Inject constructor(
             } else {
                 StarredRule.Any
             },
-            podcastsRule = if (podcastUuidList.isEmpty()) {
+            podcasts = if (podcastUuidList.isEmpty()) {
                 PodcastsRule.Any
             } else {
                 PodcastsRule.Selected(podcastUuidList)
@@ -157,16 +157,16 @@ class PlaylistManagerImpl @Inject constructor(
             },
         )
 
-    private fun PlaylistDraft.toSmartPlaylist(
+    private fun SmartPlaylistDraft.toSmartPlaylist(
         uuid: String,
         sortPosition: Int,
     ) = SmartPlaylist(
         uuid = uuid,
         title = title,
         // We use referential equality so only predefined playlists use preset icons
-        iconId = if (this === PlaylistDraft.NewReleases) {
+        iconId = if (this === SmartPlaylistDraft.NewReleases) {
             10 // Red clock
-        } else if (this === PlaylistDraft.InProgress) {
+        } else if (this === SmartPlaylistDraft.InProgress) {
             23 // Purple play
         } else {
             0
@@ -176,7 +176,7 @@ class PlaylistManagerImpl @Inject constructor(
         draft = false,
         deleted = false,
         // We use referential equality so only predefined playlists are synced by default
-        syncStatus = if (this === PlaylistDraft.NewReleases || this === PlaylistDraft.InProgress) {
+        syncStatus = if (this === SmartPlaylistDraft.NewReleases || this === SmartPlaylistDraft.InProgress) {
             SYNC_STATUS_SYNCED
         } else {
             SYNC_STATUS_NOT_SYNCED
@@ -204,11 +204,11 @@ class PlaylistManagerImpl @Inject constructor(
             StarredRule.Any -> false
             StarredRule.Starred -> true
         },
-        allPodcasts = when (rules.podcastsRule) {
+        allPodcasts = when (rules.podcasts) {
             is PodcastsRule.Any -> true
             is PodcastsRule.Selected -> false
         },
-        podcastUuids = when (val rule = rules.podcastsRule) {
+        podcastUuids = when (val rule = rules.podcasts) {
             is PodcastsRule.Any -> null
             is PodcastsRule.Selected -> rule.uuids.joinToString(separator = ",")
         },
