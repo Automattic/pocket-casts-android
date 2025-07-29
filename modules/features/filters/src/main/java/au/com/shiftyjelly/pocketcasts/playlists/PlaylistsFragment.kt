@@ -49,7 +49,7 @@ class PlaylistsFragment :
                 listState = listState,
                 onCreatePlaylist = {
                     viewModel.trackCreatePlaylistClicked()
-                    val fragment = childFragmentManager.findFragmentByTag("createPlaylist")
+                    val fragment = childFragmentManager.findFragmentByTag("create_playlist")
                     if (fragment == null) {
                         CreatePlaylistFragment().show(childFragmentManager, "create_playlist")
                     }
