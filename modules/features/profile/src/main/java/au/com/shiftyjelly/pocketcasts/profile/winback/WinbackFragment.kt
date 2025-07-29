@@ -9,15 +9,11 @@ import android.view.ViewGroup
 import androidx.compose.animation.AnimatedContentTransitionScope
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.WindowInsetsSides
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.only
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.safeDrawing
-import androidx.compose.foundation.layout.windowInsetsPadding
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.AppBarDefaults
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Snackbar
@@ -30,7 +26,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.res.stringResource
@@ -47,7 +42,6 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
-import au.com.shiftyjelly.pocketcasts.compose.AppThemeWithBackground
 import au.com.shiftyjelly.pocketcasts.compose.CallOnce
 import au.com.shiftyjelly.pocketcasts.compose.components.ProgressDialog
 import au.com.shiftyjelly.pocketcasts.compose.components.TextH50
@@ -93,212 +87,204 @@ class WinbackFragment : BaseDialogFragment() {
         val scope = rememberCoroutineScope()
         val state by viewModel.uiState.collectAsState()
 
-        Box(
-            modifier = Modifier
-                .fillMaxHeight(0.93f)
-                .clip(RoundedCornerShape(topStart = 16.dp, topEnd = 16.dp)),
-        ) {
-            AppThemeWithBackground(
-                themeType = theme.activeTheme,
+        val navController = rememberNavController()
+        val snackbarHostState = remember { SnackbarHostState() }
+
+        DialogBox {
+            Box(
+                modifier = Modifier
+                    .navigationBarsPadding()
+                    .padding(top = 8.dp),
             ) {
-                val navController = rememberNavController()
-                val snackbarHostState = remember { SnackbarHostState() }
-
-                Box(
-                    modifier = Modifier
-                        .windowInsetsPadding(WindowInsets.safeDrawing.only(WindowInsetsSides.Horizontal + WindowInsetsSides.Bottom))
-                        .padding(top = 8.dp),
+                NavHost(
+                    navController = navController,
+                    startDestination = if (params.hasGoogleSubscription) {
+                        WinbackNavRoutes.MAIN
+                    } else {
+                        WinbackNavRoutes.CANCEL_CONFIRMATION
+                    },
+                    enterTransition = { slideInToStart() },
+                    exitTransition = { slideOutToStart() },
+                    popEnterTransition = { slideInToEnd() },
+                    popExitTransition = { slideOutToEnd() },
+                    modifier = Modifier.fillMaxSize(),
                 ) {
-                    NavHost(
-                        navController = navController,
-                        startDestination = if (params.hasGoogleSubscription) {
-                            WinbackNavRoutes.MAIN
-                        } else {
-                            WinbackNavRoutes.CANCEL_CONFIRMATION
-                        },
-                        enterTransition = { slideInToStart() },
-                        exitTransition = { slideOutToStart() },
-                        popEnterTransition = { slideInToEnd() },
-                        popExitTransition = { slideOutToEnd() },
-                        modifier = Modifier.fillMaxSize(),
-                    ) {
-                        composable(WinbackNavRoutes.MAIN) {
-                            CancelOfferPage(
-                                onSeeAvailablePlans = {
-                                    viewModel.trackAvailablePlansTapped()
-                                    navController.navigate(WinbackNavRoutes.AVAILABLE_PLANS)
-                                },
-                                onSeeHelpAndFeedback = {
-                                    viewModel.trackHelpAndFeedbackTapped()
-                                    navController.navigate(WinbackNavRoutes.HELP_AND_FEEDBACK)
-                                },
-                                onContinueToCancellation = {
-                                    viewModel.trackContinueCancellationTapped()
-                                    navController.navigate(WinbackNavRoutes.CANCEL_CONFIRMATION)
-                                },
-                            )
-                        }
-                        composable(
-                            WinbackNavRoutes.offerClaimedRoute(),
-                            listOf(
-                                navArgument(WinbackNavRoutes.OFER_CLAIMED_BILLING_CYCLE_ARGUMENT) {
-                                    type = NavType.EnumType(BillingCycle::class.java)
-                                },
-                            ),
-                        ) { backStackEntry ->
-                            val arguments = requireNotNull(backStackEntry.arguments) { "Missing back stack entry arguments" }
-                            val billingCycle = requireNotNull(BundleCompat.getSerializable(arguments, WinbackNavRoutes.OFER_CLAIMED_BILLING_CYCLE_ARGUMENT, BillingCycle::class.java)) {
-                                "Missing billing cycle argument"
-                            }
-                            OfferClaimedPage(
-                                billingCycle = billingCycle,
-                                onConfirm = {
-                                    viewModel.trackOfferClaimedConfirmationTapped()
-                                    dismiss()
-                                },
-                            )
-                        }
-                        composable(WinbackNavRoutes.AVAILABLE_PLANS) {
-                            AvailablePlansPage(
-                                plansState = state.subscriptionPlansState,
-                                onSelectPlan = { plan -> viewModel.changePlan(plan, requireActivity()) },
-                                onGoToSubscriptions = {
-                                    if (!goToPlayStoreSubscriptions()) {
-                                        scope.launch {
-                                            snackbarHostState.showSnackbar(getString(LR.string.error_generic_message))
-                                        }
-                                    }
-                                },
-                                onReload = { viewModel.loadWinbackData() },
-                                onGoBack = {
-                                    viewModel.trackPlansBackButtonTapped()
-                                    navController.popBackStack()
-                                },
-                            )
-                        }
-                        composable(WinbackNavRoutes.HELP_AND_FEEDBACK) {
-                            HelpPage(
-                                activity = requireActivity(),
-                                appBarInsets = AppBarDefaults.topAppBarWindowInsets.only(WindowInsetsSides.Horizontal),
-                                onShowLogs = { navController.navigate(WinbackNavRoutes.SUPPORT_LOGS) },
-                                onShowStatusPage = { navController.navigate(WinbackNavRoutes.STATUS_CHECK) },
-                                onGoBack = { navController.popBackStack() },
-                            )
-                        }
-                        composable(WinbackNavRoutes.SUPPORT_LOGS) {
-                            LogsPage(
-                                bottomInset = 0.dp,
-                                appBarInsets = AppBarDefaults.topAppBarWindowInsets.only(WindowInsetsSides.Horizontal),
-                                onBackPress = { navController.popBackStack() },
-                            )
-                        }
-                        composable(WinbackNavRoutes.STATUS_CHECK) {
-                            StatusPage(
-                                bottomInset = 0.dp,
-                                appBarInsets = AppBarDefaults.topAppBarWindowInsets.only(WindowInsetsSides.Horizontal),
-                                onBackPress = { navController.popBackStack() },
-                            )
-                        }
-                        composable(WinbackNavRoutes.CANCEL_CONFIRMATION) {
-                            CancelConfirmationPage(
-                                expirationDate = state.currentSubscriptionExpirationDate,
-                                onKeepSubscription = {
-                                    viewModel.trackKeepSubscriptionTapped()
-                                    dismiss()
-                                },
-                                onCancelSubscription = {
-                                    viewModel.trackCancelSubscriptionTapped()
-                                    val offer = state.winbackOfferState?.offer
-                                    if (offer == null) {
-                                        handleSubscriptionCancellation(state.subscriptionPlansState)
-                                    } else {
-                                        navController.navigate(WinbackNavRoutes.WINBACK_OFFER)
-                                    }
-                                },
-                            )
-                        }
-                        composable(WinbackNavRoutes.WINBACK_OFFER) {
-                            val offer = state.winbackOfferState?.offer
-                            if (offer != null) {
-                                WinbackOfferPage(
-                                    offer = offer,
-                                    onAcceptOffer = {
-                                        viewModel.claimOffer(requireActivity())
-                                    },
-                                    onCancelSubscription = {
-                                        viewModel.trackContinueWithCancellationTapped()
-                                        handleSubscriptionCancellation(state.subscriptionPlansState)
-                                    },
-                                )
-                            } else {
-                                WinbackOfferErrorPage(
-                                    onDismiss = {
-                                        dismiss()
-                                    },
-                                )
-                            }
-                        }
-                    }
-
-                    val offerState = state.winbackOfferState
-                    if (offerState?.isClaimingOffer == true) {
-                        ProgressDialog(
-                            text = stringResource(LR.string.winback_claiming_offer),
-                            onDismiss = {},
+                    composable(WinbackNavRoutes.MAIN) {
+                        CancelOfferPage(
+                            onSeeAvailablePlans = {
+                                viewModel.trackAvailablePlansTapped()
+                                navController.navigate(WinbackNavRoutes.AVAILABLE_PLANS)
+                            },
+                            onSeeHelpAndFeedback = {
+                                viewModel.trackHelpAndFeedbackTapped()
+                                navController.navigate(WinbackNavRoutes.HELP_AND_FEEDBACK)
+                            },
+                            onContinueToCancellation = {
+                                viewModel.trackContinueCancellationTapped()
+                                navController.navigate(WinbackNavRoutes.CANCEL_CONFIRMATION)
+                            },
                         )
                     }
-
-                    if (offerState?.isOfferClaimed == true) {
-                        LaunchedEffect(Unit) {
-                            viewModel.consumeClaimedOffer()
-                            val billingCycle = offerState.offer.billingCycle
-                            navController.navigate(WinbackNavRoutes.offerClaimedDestination(billingCycle)) {
-                                popUpTo(WinbackNavRoutes.MAIN) {
-                                    inclusive = true
+                    composable(
+                        WinbackNavRoutes.offerClaimedRoute(),
+                        listOf(
+                            navArgument(WinbackNavRoutes.OFER_CLAIMED_BILLING_CYCLE_ARGUMENT) {
+                                type = NavType.EnumType(BillingCycle::class.java)
+                            },
+                        ),
+                    ) { backStackEntry ->
+                        val arguments = requireNotNull(backStackEntry.arguments) { "Missing back stack entry arguments" }
+                        val billingCycle = requireNotNull(BundleCompat.getSerializable(arguments, WinbackNavRoutes.OFER_CLAIMED_BILLING_CYCLE_ARGUMENT, BillingCycle::class.java)) {
+                            "Missing billing cycle argument"
+                        }
+                        OfferClaimedPage(
+                            billingCycle = billingCycle,
+                            onConfirm = {
+                                viewModel.trackOfferClaimedConfirmationTapped()
+                                dismiss()
+                            },
+                        )
+                    }
+                    composable(WinbackNavRoutes.AVAILABLE_PLANS) {
+                        AvailablePlansPage(
+                            plansState = state.subscriptionPlansState,
+                            onSelectPlan = { plan -> viewModel.changePlan(plan, requireActivity()) },
+                            onGoToSubscriptions = {
+                                if (!goToPlayStoreSubscriptions()) {
+                                    scope.launch {
+                                        snackbarHostState.showSnackbar(getString(LR.string.error_generic_message))
+                                    }
                                 }
-                            }
-                        }
+                            },
+                            onReload = { viewModel.loadWinbackData() },
+                            onGoBack = {
+                                viewModel.trackPlansBackButtonTapped()
+                                navController.popBackStack()
+                            },
+                        )
                     }
-
-                    val hasClaimOfferFailed = offerState?.hasOfferClaimFailed == true
-                    if (hasClaimOfferFailed) {
-                        LaunchedEffect(Unit) {
-                            snackbarHostState.showSnackbar(getString(LR.string.error_generic_message))
-                        }
+                    composable(WinbackNavRoutes.HELP_AND_FEEDBACK) {
+                        HelpPage(
+                            activity = requireActivity(),
+                            appBarInsets = AppBarDefaults.topAppBarWindowInsets.only(WindowInsetsSides.Horizontal),
+                            onShowLogs = { navController.navigate(WinbackNavRoutes.SUPPORT_LOGS) },
+                            onShowStatusPage = { navController.navigate(WinbackNavRoutes.STATUS_CHECK) },
+                            onGoBack = { navController.popBackStack() },
+                        )
                     }
-
-                    val hasPlanChangeFailed = (state.subscriptionPlansState as? SubscriptionPlansState.Loaded)?.hasPlanChangeFailed == true
-                    if (hasPlanChangeFailed) {
-                        LaunchedEffect(Unit) {
-                            snackbarHostState.showSnackbar(getString(LR.string.error_generic_message))
-                        }
+                    composable(WinbackNavRoutes.SUPPORT_LOGS) {
+                        LogsPage(
+                            bottomInset = 0.dp,
+                            appBarInsets = AppBarDefaults.topAppBarWindowInsets.only(WindowInsetsSides.Horizontal),
+                            onBackPress = { navController.popBackStack() },
+                        )
                     }
-
-                    LaunchedEffect(navController) {
-                        navController.currentBackStackEntryFlow.collect { entry ->
-                            val screenId = entry.destination.route
-                                ?.substringBefore('/') // Track only the top part of the route
-                                .also { currentScreenId = it }
-                            if (screenId != null) {
-                                viewModel.trackScreenShown(screenId)
-                            }
-                        }
+                    composable(WinbackNavRoutes.STATUS_CHECK) {
+                        StatusPage(
+                            bottomInset = 0.dp,
+                            appBarInsets = AppBarDefaults.topAppBarWindowInsets.only(WindowInsetsSides.Horizontal),
+                            onBackPress = { navController.popBackStack() },
+                        )
                     }
-
-                    SnackbarHost(
-                        hostState = snackbarHostState,
-                        snackbar = { data ->
-                            val isLightTheme = MaterialTheme.theme.isLight
-                            Snackbar(
-                                backgroundColor = if (isLightTheme) Color.Black else Color.White,
-                                content = { TextH50(data.message, color = if (isLightTheme) Color.White else Color.Black) },
+                    composable(WinbackNavRoutes.CANCEL_CONFIRMATION) {
+                        CancelConfirmationPage(
+                            expirationDate = state.currentSubscriptionExpirationDate,
+                            onKeepSubscription = {
+                                viewModel.trackKeepSubscriptionTapped()
+                                dismiss()
+                            },
+                            onCancelSubscription = {
+                                viewModel.trackCancelSubscriptionTapped()
+                                val offer = state.winbackOfferState?.offer
+                                if (offer == null) {
+                                    handleSubscriptionCancellation(state.subscriptionPlansState)
+                                } else {
+                                    navController.navigate(WinbackNavRoutes.WINBACK_OFFER)
+                                }
+                            },
+                        )
+                    }
+                    composable(WinbackNavRoutes.WINBACK_OFFER) {
+                        val offer = state.winbackOfferState?.offer
+                        if (offer != null) {
+                            WinbackOfferPage(
+                                offer = offer,
+                                onAcceptOffer = {
+                                    viewModel.claimOffer(requireActivity())
+                                },
+                                onCancelSubscription = {
+                                    viewModel.trackContinueWithCancellationTapped()
+                                    handleSubscriptionCancellation(state.subscriptionPlansState)
+                                },
                             )
-                        },
-                        modifier = Modifier
-                            .align(Alignment.BottomCenter)
-                            .padding(16.dp),
+                        } else {
+                            WinbackOfferErrorPage(
+                                onDismiss = {
+                                    dismiss()
+                                },
+                            )
+                        }
+                    }
+                }
+
+                val offerState = state.winbackOfferState
+                if (offerState?.isClaimingOffer == true) {
+                    ProgressDialog(
+                        text = stringResource(LR.string.winback_claiming_offer),
+                        onDismiss = {},
                     )
                 }
+
+                if (offerState?.isOfferClaimed == true) {
+                    LaunchedEffect(Unit) {
+                        viewModel.consumeClaimedOffer()
+                        val billingCycle = offerState.offer.billingCycle
+                        navController.navigate(WinbackNavRoutes.offerClaimedDestination(billingCycle)) {
+                            popUpTo(WinbackNavRoutes.MAIN) {
+                                inclusive = true
+                            }
+                        }
+                    }
+                }
+
+                val hasClaimOfferFailed = offerState?.hasOfferClaimFailed == true
+                if (hasClaimOfferFailed) {
+                    LaunchedEffect(Unit) {
+                        snackbarHostState.showSnackbar(getString(LR.string.error_generic_message))
+                    }
+                }
+
+                val hasPlanChangeFailed = (state.subscriptionPlansState as? SubscriptionPlansState.Loaded)?.hasPlanChangeFailed == true
+                if (hasPlanChangeFailed) {
+                    LaunchedEffect(Unit) {
+                        snackbarHostState.showSnackbar(getString(LR.string.error_generic_message))
+                    }
+                }
+
+                LaunchedEffect(navController) {
+                    navController.currentBackStackEntryFlow.collect { entry ->
+                        val screenId = entry.destination.route
+                            ?.substringBefore('/') // Track only the top part of the route
+                            .also { currentScreenId = it }
+                        if (screenId != null) {
+                            viewModel.trackScreenShown(screenId)
+                        }
+                    }
+                }
+
+                SnackbarHost(
+                    hostState = snackbarHostState,
+                    snackbar = { data ->
+                        val isLightTheme = MaterialTheme.theme.isLight
+                        Snackbar(
+                            backgroundColor = if (isLightTheme) Color.Black else Color.White,
+                            content = { TextH50(data.message, color = if (isLightTheme) Color.White else Color.Black) },
+                        )
+                    },
+                    modifier = Modifier
+                        .align(Alignment.BottomCenter)
+                        .padding(16.dp),
+                )
             }
         }
     }

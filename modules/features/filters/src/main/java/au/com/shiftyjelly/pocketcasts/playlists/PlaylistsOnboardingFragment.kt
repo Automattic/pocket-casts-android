@@ -6,11 +6,9 @@ import android.view.ViewGroup
 import androidx.annotation.DrawableRes
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -20,14 +18,12 @@ import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material3.adaptive.currentWindowAdaptiveInfo
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
@@ -65,19 +61,11 @@ class PlaylistsOnboardingFragment : BaseDialogFragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?,
     ) = content {
-        Box(
-            modifier = Modifier
-                .fillMaxHeight(0.93f)
-                .nestedScroll(rememberViewInteropNestedScrollConnection())
-                .clip(RoundedCornerShape(topStart = 16.dp, topEnd = 16.dp)),
-        ) {
-            AppThemeWithBackground(
-                themeType = theme.activeTheme,
-            ) {
-                OnboardingContent(
-                    onGotItClick = ::dismiss,
-                )
-            }
+        DialogBox {
+            OnboardingContent(
+                onGotItClick = ::dismiss,
+                modifier = Modifier.nestedScroll(rememberViewInteropNestedScrollConnection()),
+            )
         }
 
         CallOnce {

@@ -36,10 +36,7 @@ fun AdReportContent(
 
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
-        modifier = modifier.background(
-            color = colors.surface,
-            shape = RoundedCornerShape(topStart = 8.dp, topEnd = 8.dp),
-        ),
+        modifier = modifier.background(color = colors.surface),
     ) {
         Spacer(
             modifier = Modifier.height(8.dp),
