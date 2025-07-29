@@ -4,19 +4,14 @@ import android.os.Bundle
 import android.os.Parcelable
 import android.view.LayoutInflater
 import android.view.ViewGroup
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.unit.dp
 import androidx.core.content.res.ResourcesCompat
@@ -25,7 +20,6 @@ import androidx.core.os.bundleOf
 import androidx.fragment.app.viewModels
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
-import au.com.shiftyjelly.pocketcasts.compose.AppTheme
 import au.com.shiftyjelly.pocketcasts.compose.CallOnce
 import au.com.shiftyjelly.pocketcasts.compose.components.AnimatedPlayPauseButton
 import au.com.shiftyjelly.pocketcasts.compose.components.rememberViewInteropNestedScrollConnection
@@ -93,53 +87,46 @@ class TranscriptFragment : BaseDialogFragment() {
             )
         }
 
-        AppTheme(theme.activeTheme) {
+        DialogBox {
             val uiState by viewModel.uiState.collectAsState()
 
-            Box(
-                contentAlignment = Alignment.Center,
+            TranscriptPage(
+                uiState = uiState,
+                toolbarPadding = PaddingValues(start = 20.dp, end = 20.dp, top = 16.dp),
+                paywallPadding = PaddingValues(start = 16.dp, end = 16.dp, bottom = 16.dp),
+                transcriptPadding = PaddingValues(start = 20.dp, end = 20.dp, bottom = 16.dp),
+                onClickClose = {
+                    viewModel.hideSearch()
+                    dismiss()
+                },
+                onClickReload = viewModel::reloadTranscript,
+                onUpdateSearchTerm = viewModel::searchInTranscript,
+                onClearSearchTerm = viewModel::clearSearch,
+                onSelectPreviousSearch = viewModel::selectPreviousSearchMatch,
+                onSelectNextSearch = viewModel::selectNextSearchMatch,
+                onShowSearchBar = viewModel::openSearch,
+                onHideSearchBar = viewModel::hideSearch,
+                onClickSubscribe = {
+                    viewModel.track(AnalyticsEvent.TRANSCRIPT_GENERATED_PAYWALL_SUBSCRIBE_TAPPED)
+                    OnboardingLauncher.openOnboardingFlow(requireActivity(), OnboardingFlow.Upsell(OnboardingUpgradeSource.GENERATED_TRANSCRIPTS))
+                },
+                onShowTranscript = { transcript ->
+                    val properties = mapOf(
+                        "type" to transcript.type.analyticsValue,
+                        "show_as_webpage" to (transcript is Transcript.Web),
+                    )
+                    viewModel.track(AnalyticsEvent.TRANSCRIPT_SHOWN, properties)
+                },
+                onShowTransciptPaywall = {
+                    viewModel.track(AnalyticsEvent.TRANSCRIPT_GENERATED_PAYWALL_SHOWN)
+                },
+                toolbarTrailingContent = { toolbarColors ->
+                    PlayPauseButton(toolbarColors)
+                },
                 modifier = Modifier
-                    .fillMaxHeight(0.93f)
-                    .clip(RoundedCornerShape(topStart = 16.dp, topEnd = 16.dp)),
-            ) {
-                TranscriptPage(
-                    uiState = uiState,
-                    toolbarPadding = PaddingValues(start = 20.dp, end = 20.dp, top = 16.dp),
-                    paywallPadding = PaddingValues(start = 16.dp, end = 16.dp, bottom = 16.dp),
-                    transcriptPadding = PaddingValues(start = 20.dp, end = 20.dp, bottom = 16.dp),
-                    onClickClose = {
-                        viewModel.hideSearch()
-                        dismiss()
-                    },
-                    onClickReload = viewModel::reloadTranscript,
-                    onUpdateSearchTerm = viewModel::searchInTranscript,
-                    onClearSearchTerm = viewModel::clearSearch,
-                    onSelectPreviousSearch = viewModel::selectPreviousSearchMatch,
-                    onSelectNextSearch = viewModel::selectNextSearchMatch,
-                    onShowSearchBar = viewModel::openSearch,
-                    onHideSearchBar = viewModel::hideSearch,
-                    onClickSubscribe = {
-                        viewModel.track(AnalyticsEvent.TRANSCRIPT_GENERATED_PAYWALL_SUBSCRIBE_TAPPED)
-                        OnboardingLauncher.openOnboardingFlow(requireActivity(), OnboardingFlow.Upsell(OnboardingUpgradeSource.GENERATED_TRANSCRIPTS))
-                    },
-                    onShowTranscript = { transcript ->
-                        val properties = mapOf(
-                            "type" to transcript.type.analyticsValue,
-                            "show_as_webpage" to (transcript is Transcript.Web),
-                        )
-                        viewModel.track(AnalyticsEvent.TRANSCRIPT_SHOWN, properties)
-                    },
-                    onShowTransciptPaywall = {
-                        viewModel.track(AnalyticsEvent.TRANSCRIPT_GENERATED_PAYWALL_SHOWN)
-                    },
-                    toolbarTrailingContent = { toolbarColors ->
-                        PlayPauseButton(toolbarColors)
-                    },
-                    modifier = Modifier
-                        .fillMaxWidth(fraction = ResourcesCompat.getFloat(resources, UR.dimen.player_max_content_width_fraction))
-                        .nestedScroll(rememberViewInteropNestedScrollConnection()),
-                )
-            }
+                    .fillMaxWidth(fraction = ResourcesCompat.getFloat(resources, UR.dimen.player_max_content_width_fraction))
+                    .nestedScroll(rememberViewInteropNestedScrollConnection()),
+            )
         }
     }
 

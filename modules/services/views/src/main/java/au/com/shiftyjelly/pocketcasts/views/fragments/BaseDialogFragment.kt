@@ -7,10 +7,25 @@ import android.os.Bundle
 import android.view.View
 import android.widget.FrameLayout
 import androidx.annotation.ColorInt
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxScope
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.WindowInsetsSides
+import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.only
+import androidx.compose.foundation.layout.safeDrawing
+import androidx.compose.foundation.layout.windowInsetsPadding
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.unit.dp
 import androidx.core.graphics.ColorUtils
 import androidx.core.view.WindowInsetsControllerCompat
 import androidx.core.view.doOnLayout
 import androidx.navigation.NavHostController
+import au.com.shiftyjelly.pocketcasts.compose.AppTheme
+import au.com.shiftyjelly.pocketcasts.compose.AppThemeWithBackground
 import au.com.shiftyjelly.pocketcasts.ui.helper.FragmentHostListener
 import au.com.shiftyjelly.pocketcasts.ui.helper.NavigationBarColor
 import au.com.shiftyjelly.pocketcasts.ui.helper.StatusBarIconColor
@@ -150,5 +165,39 @@ open class BaseDialogFragment :
         @ColorInt color: Int,
     ) {
         bottomSheetView()?.backgroundTintList = ColorStateList.valueOf(color)
+    }
+
+    @Composable
+    protected fun DialogBox(
+        useThemeBackground: Boolean = true,
+        fillMaxHeight: Boolean = true,
+        content: @Composable BoxScope.() -> Unit,
+    ) {
+        Box(
+            modifier = Modifier
+                .then(if (fillMaxHeight) Modifier.fillMaxHeight(0.93f) else Modifier)
+                .clip(RoundedCornerShape(topStart = 16.dp, topEnd = 16.dp)),
+        ) {
+            if (useThemeBackground) {
+                AppThemeWithBackground(theme.activeTheme) {
+                    DialogContent(content)
+                }
+            } else {
+                AppTheme(theme.activeTheme) {
+                    DialogContent(content)
+                }
+            }
+        }
+    }
+
+    @Composable
+    private fun DialogContent(
+        content: @Composable BoxScope.() -> Unit,
+    ) {
+        val insets = WindowInsets.safeDrawing.only(WindowInsetsSides.Horizontal)
+        Box(
+            modifier = Modifier.windowInsetsPadding(insets),
+            content = content,
+        )
     }
 }
