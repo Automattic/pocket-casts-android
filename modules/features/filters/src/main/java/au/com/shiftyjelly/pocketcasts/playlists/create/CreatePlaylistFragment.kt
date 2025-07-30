@@ -76,8 +76,13 @@ class CreatePlaylistFragment : BaseDialogFragment() {
                     SmartPlaylistPreviewPage(
                         draft = uiState.smartPlaylistDraft,
                         onCreateSmartPlaylist = { Timber.i("On create smart playlist") },
-                        onClickRule = { Timber.i("On edit rule: $it") },
+                        onClickRule = { rule -> navController.navigate(rule.toNavigationRoute()) },
                         onClickClose = ::dismiss,
+                        modifier = Modifier.nestedScroll(rememberNestedScrollInteropConnection()),
+                    )
+                }
+                composable(NavigationRoutes.SMART_RULE_PODCASTS) {
+                    PodcastsRulePage(
                         modifier = Modifier.nestedScroll(rememberNestedScrollInteropConnection()),
                     )
                 }
@@ -112,4 +117,15 @@ class CreatePlaylistFragment : BaseDialogFragment() {
 private object NavigationRoutes {
     const val NEW_PLAYLIST = "new_playlist"
     const val SMART_PLAYLIST_PREVIEW = "smart_playlist_preview"
+    const val SMART_RULE_PODCASTS = "smart_rule_podcasts"
+}
+
+private fun RuleType.toNavigationRoute() = when (this) {
+    RuleType.Podcasts -> NavigationRoutes.SMART_RULE_PODCASTS
+    RuleType.EpisodeStatus -> NavigationRoutes.SMART_PLAYLIST_PREVIEW
+    RuleType.ReleaseDate -> NavigationRoutes.SMART_PLAYLIST_PREVIEW
+    RuleType.EpisodeDuration -> NavigationRoutes.SMART_PLAYLIST_PREVIEW
+    RuleType.DownloadStatus -> NavigationRoutes.SMART_PLAYLIST_PREVIEW
+    RuleType.MediaType -> NavigationRoutes.SMART_PLAYLIST_PREVIEW
+    RuleType.Starred -> NavigationRoutes.SMART_PLAYLIST_PREVIEW
 }
