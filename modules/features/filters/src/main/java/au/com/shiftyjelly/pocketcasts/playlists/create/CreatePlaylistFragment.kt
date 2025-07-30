@@ -7,11 +7,13 @@ import android.view.ViewGroup
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.rememberNestedScrollInteropConnection
 import androidx.fragment.app.viewModels
 import androidx.fragment.compose.content
+import androidx.navigation.NavOptionsBuilder
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
@@ -48,6 +50,17 @@ class CreatePlaylistFragment : BaseDialogFragment() {
 
         DialogBox {
             val navController = rememberNavController()
+
+            fun goBackToPlaylistPreview() {
+                navController.popBackStack(NavigationRoutes.SMART_PLAYLIST_PREVIEW, inclusive = false)
+            }
+
+            fun navigateOnce(route: String, builder: NavOptionsBuilder.() -> Unit = {}) {
+                if (navController.currentDestination?.route != route) {
+                    navController.navigate(route, builder)
+                }
+            }
+
             NavHost(
                 navController = navController,
                 startDestination = NavigationRoutes.NEW_PLAYLIST,
@@ -55,35 +68,46 @@ class CreatePlaylistFragment : BaseDialogFragment() {
                 exitTransition = { slideOutToStart() },
                 popEnterTransition = { slideInToEnd() },
                 popExitTransition = { slideOutToEnd() },
-                modifier = Modifier.fillMaxSize(),
+                modifier = Modifier
+                    .fillMaxSize()
+                    .nestedScroll(rememberNestedScrollInteropConnection()),
             ) {
                 composable(NavigationRoutes.NEW_PLAYLIST) {
                     NewPlaylistPage(
                         titleState = viewModel.playlistNameState,
                         onCreateManualPlaylist = { Timber.i("Create Manual Playlist") },
                         onContinueToSmartPlaylist = {
-                            navController.navigate(NavigationRoutes.SMART_PLAYLIST_PREVIEW) {
+                            navigateOnce(NavigationRoutes.SMART_PLAYLIST_PREVIEW) {
                                 popUpTo(NavigationRoutes.NEW_PLAYLIST) {
                                     inclusive = true
                                 }
                             }
                         },
                         onClickClose = ::dismiss,
-                        modifier = Modifier.nestedScroll(rememberNestedScrollInteropConnection()),
                     )
                 }
                 composable(NavigationRoutes.SMART_PLAYLIST_PREVIEW) {
                     SmartPlaylistPreviewPage(
-                        draft = uiState.smartPlaylistDraft,
+                        playlistTitle = viewModel.playlistNameState.text.toString(),
+                        appliedRules = uiState.appliedRules,
                         onCreateSmartPlaylist = { Timber.i("On create smart playlist") },
-                        onClickRule = { rule -> navController.navigate(rule.toNavigationRoute()) },
+                        onClickRule = { rule -> navigateOnce(rule.toNavigationRoute()) },
                         onClickClose = ::dismiss,
-                        modifier = Modifier.nestedScroll(rememberNestedScrollInteropConnection()),
                     )
                 }
                 composable(NavigationRoutes.SMART_RULE_PODCASTS) {
                     PodcastsRulePage(
-                        modifier = Modifier.nestedScroll(rememberNestedScrollInteropConnection()),
+                        useAllPodcasts = uiState.rulesBuilder.useAllPodcasts,
+                        selectedPodcastUuids = uiState.rulesBuilder.selectedPodcasts,
+                        podcasts = uiState.followedPodcasts,
+                        onToggleAllPodcasts = viewModel::useAllPodcasts,
+                        onSelectPodcast = viewModel::selectPodcast,
+                        onDeselectPodcast = viewModel::deselectPodcast,
+                        onSaveRule = {
+                            viewModel.applyRule(RuleType.Podcasts)
+                            goBackToPlaylistPreview()
+                        },
+                        onClickBack = ::goBackToPlaylistPreview,
                     )
                 }
             }

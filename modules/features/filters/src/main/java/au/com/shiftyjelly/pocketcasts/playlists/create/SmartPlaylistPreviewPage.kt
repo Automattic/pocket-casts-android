@@ -46,6 +46,7 @@ import au.com.shiftyjelly.pocketcasts.compose.components.TextP50
 import au.com.shiftyjelly.pocketcasts.compose.preview.ThemePreviewParameterProvider
 import au.com.shiftyjelly.pocketcasts.compose.theme
 import au.com.shiftyjelly.pocketcasts.images.R
+import au.com.shiftyjelly.pocketcasts.playlists.create.CreatePlaylistViewModel.AppliedRules
 import au.com.shiftyjelly.pocketcasts.repositories.playlist.SmartPlaylistDraft
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme.ThemeType
 import au.com.shiftyjelly.pocketcasts.images.R as IR
@@ -87,7 +88,8 @@ enum class RuleType(
 
 @Composable
 fun SmartPlaylistPreviewPage(
-    draft: SmartPlaylistDraft,
+    playlistTitle: String,
+    appliedRules: AppliedRules,
     onCreateSmartPlaylist: () -> Unit,
     onClickRule: (RuleType) -> Unit,
     onClickClose: () -> Unit,
@@ -112,14 +114,14 @@ fun SmartPlaylistPreviewPage(
                 .weight(1f)
                 .padding(horizontal = 16.dp),
         ) {
-            val activeRules = rememberActiveRules(draft)
+            val activeRules = rememberAppliedRules(appliedRules)
             FadedLazyColumn(
                 modifier = Modifier.weight(1f),
             ) {
                 if (activeRules.isEmpty()) {
                     item {
                         NoRulesContent(
-                            title = draft.title,
+                            title = playlistTitle,
                             onClickRule = onClickRule,
                         )
                     }
@@ -127,7 +129,7 @@ fun SmartPlaylistPreviewPage(
             }
             RowButton(
                 text = stringResource(LR.string.create_smart_playlist),
-                enabled = draft.creationRules != null,
+                enabled = appliedRules.isAnyRuleApplied,
                 onClick = onCreateSmartPlaylist,
                 includePadding = false,
                 modifier = Modifier.navigationBarsPadding(),
@@ -263,17 +265,17 @@ private fun RuleRow(
 }
 
 @Composable
-private fun rememberActiveRules(draft: SmartPlaylistDraft): List<RuleType> {
-    return remember(draft) {
+private fun rememberAppliedRules(rules: AppliedRules): List<RuleType> {
+    return remember(rules) {
         RuleType.entries.filter { type ->
             when (type) {
-                RuleType.EpisodeStatus -> draft.episodeStatus != null
-                RuleType.DownloadStatus -> draft.downloadStatus != null
-                RuleType.MediaType -> draft.mediaType != null
-                RuleType.ReleaseDate -> draft.releaseDate != null
-                RuleType.Starred -> draft.starred != null
-                RuleType.Podcasts -> draft.podcasts != null
-                RuleType.EpisodeDuration -> draft.episodeDuration != null
+                RuleType.EpisodeStatus -> rules.episodeStatus != null
+                RuleType.DownloadStatus -> rules.downloadStatus != null
+                RuleType.MediaType -> rules.mediaType != null
+                RuleType.ReleaseDate -> rules.releaseDate != null
+                RuleType.Starred -> rules.starred != null
+                RuleType.Podcasts -> rules.podcasts != null
+                RuleType.EpisodeDuration -> rules.episodeDuration != null
             }
         }
     }
@@ -286,7 +288,8 @@ private fun SmartPlaylistPreviewPagePreview(
 ) {
     AppThemeWithBackground(themeType) {
         SmartPlaylistPreviewPage(
-            draft = SmartPlaylistDraft("Comedy"),
+            playlistTitle = "Comedy",
+            appliedRules = AppliedRules.Empty,
             onCreateSmartPlaylist = {},
             onClickRule = {},
             onClickClose = {},
