@@ -14,6 +14,7 @@ import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Rule
 import org.junit.Test
+import org.mockito.kotlin.any
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
 
@@ -25,6 +26,9 @@ class CreatePlaylistViewModelTest {
         initialPlaylistTitle = "Playlist name",
         podcastManager = mock {
             on { findSubscribedFlow() } doReturn flowOf(emptyList())
+        },
+        playlistManager = mock {
+            on { observeSmartEpisodes(any()) } doReturn flowOf(emptyList())
         },
     )
 
