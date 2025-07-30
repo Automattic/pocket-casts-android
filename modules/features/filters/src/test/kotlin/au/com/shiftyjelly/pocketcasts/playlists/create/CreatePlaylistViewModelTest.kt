@@ -11,7 +11,7 @@ class CreatePlaylistViewModelTest {
     val coroutineRule = MainCoroutineRule()
 
     private val viewModel = CreatePlaylistViewModel(
-        initialPlaylistName = "Playlist name",
+        initialPlaylistTitle = "Playlist name",
     )
 
     @Test
