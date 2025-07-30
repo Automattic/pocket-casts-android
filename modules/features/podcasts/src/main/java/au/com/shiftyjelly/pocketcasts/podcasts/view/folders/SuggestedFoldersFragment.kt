@@ -106,55 +106,53 @@ class SuggestedFoldersFragment : BaseDialogFragment() {
 
         val state by viewModel.state.collectAsState()
 
-        DialogBox {
-            Box(
-                modifier = Modifier
-                    .nestedScroll(rememberNestedScrollInteropConnection())
-                    .fillMaxSize(),
-            ) {
-                val navController = rememberNavController()
+        DialogBox(
+            modifier = Modifier
+                .nestedScroll(rememberNestedScrollInteropConnection())
+                .fillMaxSize(),
+        ) {
+            val navController = rememberNavController()
 
-                NavHost(
-                    navController = navController,
-                    startDestination = SuggestedFoldersNavRoutes.SUGGESTED_FOLDERS,
-                    enterTransition = { slideInToStart() },
-                    exitTransition = { slideOutToStart() },
-                    popEnterTransition = { slideInToEnd() },
-                    popExitTransition = { slideOutToEnd() },
-                    modifier = Modifier.fillMaxSize(),
-                ) {
-                    composable(SuggestedFoldersNavRoutes.SUGGESTED_FOLDERS) {
-                        SuggestedFoldersPage(
-                            folders = state.suggestedFolders,
-                            action = state.action,
-                            onActionClick = { state.action?.let { handleSuggestedAction(it, state.signInState.isSignedInAsPlusOrPatron) } },
-                            onCreateCustomFolderClick = { handleCustomFolderCreation(state.signInState.isSignedInAsPlusOrPatron) },
-                            onFolderClick = { folder ->
-                                viewModel.trackPreviewFolderTapped(folder)
-                                navController.navigate(SuggestedFoldersNavRoutes.folderDetailsDestination(folder.name))
-                            },
-                            onCloseClick = ::dismiss,
-                        )
+            NavHost(
+                navController = navController,
+                startDestination = SuggestedFoldersNavRoutes.SUGGESTED_FOLDERS,
+                enterTransition = { slideInToStart() },
+                exitTransition = { slideOutToStart() },
+                popEnterTransition = { slideInToEnd() },
+                popExitTransition = { slideOutToEnd() },
+                modifier = Modifier.fillMaxSize(),
+            ) {
+                composable(SuggestedFoldersNavRoutes.SUGGESTED_FOLDERS) {
+                    SuggestedFoldersPage(
+                        folders = state.suggestedFolders,
+                        action = state.action,
+                        onActionClick = { state.action?.let { handleSuggestedAction(it, state.signInState.isSignedInAsPlusOrPatron) } },
+                        onCreateCustomFolderClick = { handleCustomFolderCreation(state.signInState.isSignedInAsPlusOrPatron) },
+                        onFolderClick = { folder ->
+                            viewModel.trackPreviewFolderTapped(folder)
+                            navController.navigate(SuggestedFoldersNavRoutes.folderDetailsDestination(folder.name))
+                        },
+                        onCloseClick = ::dismiss,
+                    )
+                }
+                composable(
+                    SuggestedFoldersNavRoutes.folderDetailsRoute(),
+                    listOf(
+                        navArgument(SuggestedFoldersNavRoutes.SUGGESTED_FOLDER_NAME_ARGUMENT) {
+                            type = NavType.StringType
+                        },
+                    ),
+                ) { backStackEntry ->
+                    val arguments = requireNotNull(backStackEntry.arguments) { "Missing back stack entry arguments" }
+                    val folderName = requireNotNull(arguments.getString(SuggestedFoldersNavRoutes.SUGGESTED_FOLDER_NAME_ARGUMENT)) {
+                        "Missing folder name period argument"
                     }
-                    composable(
-                        SuggestedFoldersNavRoutes.folderDetailsRoute(),
-                        listOf(
-                            navArgument(SuggestedFoldersNavRoutes.SUGGESTED_FOLDER_NAME_ARGUMENT) {
-                                type = NavType.StringType
-                            },
-                        ),
-                    ) { backStackEntry ->
-                        val arguments = requireNotNull(backStackEntry.arguments) { "Missing back stack entry arguments" }
-                        val folderName = requireNotNull(arguments.getString(SuggestedFoldersNavRoutes.SUGGESTED_FOLDER_NAME_ARGUMENT)) {
-                            "Missing folder name period argument"
-                        }
-                        SuggestedFolderPodcastsPage(
-                            folder = remember(folderName, state.suggestedFolders) {
-                                state.suggestedFolders.find { it.name == folderName }
-                            },
-                            onGoBackClick = navController::popBackStack,
-                        )
-                    }
+                    SuggestedFolderPodcastsPage(
+                        folder = remember(folderName, state.suggestedFolders) {
+                            state.suggestedFolders.find { it.name == folderName }
+                        },
+                        onGoBackClick = navController::popBackStack,
+                    )
                 }
             }
         }

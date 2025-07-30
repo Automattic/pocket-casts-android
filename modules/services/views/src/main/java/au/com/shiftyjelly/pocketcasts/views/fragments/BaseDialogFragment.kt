@@ -17,6 +17,8 @@ import androidx.compose.foundation.layout.safeDrawing
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.movableContentOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.dp
@@ -167,8 +169,10 @@ open class BaseDialogFragment :
         bottomSheetView()?.backgroundTintList = ColorStateList.valueOf(color)
     }
 
+    @Suppress("ktlint:compose:modifier-not-used-at-root")
     @Composable
     protected fun DialogBox(
+        modifier: Modifier = Modifier,
         useThemeBackground: Boolean = true,
         fillMaxHeight: Boolean = true,
         content: @Composable BoxScope.() -> Unit,
@@ -178,26 +182,33 @@ open class BaseDialogFragment :
                 .then(if (fillMaxHeight) Modifier.fillMaxHeight(0.93f) else Modifier)
                 .clip(RoundedCornerShape(topStart = 16.dp, topEnd = 16.dp)),
         ) {
-            if (useThemeBackground) {
-                AppThemeWithBackground(theme.activeTheme) {
-                    DialogContent(content)
-                }
-            } else {
-                AppTheme(theme.activeTheme) {
-                    DialogContent(content)
-                }
+            Background(useThemeBackground) {
+                DialogContent(modifier, content)
             }
         }
     }
 
     @Composable
     private fun DialogContent(
+        modifier: Modifier = Modifier,
         content: @Composable BoxScope.() -> Unit,
     ) {
         val insets = WindowInsets.safeDrawing.only(WindowInsetsSides.Horizontal)
         Box(
-            modifier = Modifier.windowInsetsPadding(insets),
+            modifier = modifier.windowInsetsPadding(insets),
             content = content,
         )
+    }
+
+    @Composable
+    private fun Background(
+        useThemeBackground: Boolean,
+        content: @Composable () -> Unit,
+    ) {
+        if (useThemeBackground) {
+            AppThemeWithBackground(theme.activeTheme, content)
+        } else {
+            AppTheme(theme.activeTheme, content)
+        }
     }
 }
