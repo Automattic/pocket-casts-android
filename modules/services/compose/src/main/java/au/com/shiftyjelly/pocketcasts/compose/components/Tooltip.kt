@@ -1,6 +1,7 @@
 package au.com.shiftyjelly.pocketcasts.compose.components
 
 import android.icu.text.ListFormatter.Width
+import androidx.annotation.FloatRange
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
@@ -52,7 +53,7 @@ fun TooltipPopup(
     title: String,
     tipPosition: TipPosition,
     body: String? = null,
-    maxWidthFraction: Float = 1f,
+    @FloatRange(from = 0.0, to = 1.0) maxWidthFraction: Float? = null,
     maxWidth: Dp? = null,
     elevation: Dp = 16.dp,
     anchorOffset: DpOffset = DpOffset.Zero,
@@ -80,7 +81,13 @@ fun TooltipPopup(
                 tipPosition = tipPosition,
                 elevation = elevation,
                 modifier = Modifier
-                    .fillMaxWidth(fraction = maxWidthFraction)
+                    .then(
+                        if (maxWidthFraction != null) {
+                            Modifier.fillMaxWidth(maxWidthFraction)
+                        } else {
+                            Modifier
+                        },
+                    )
                     .then(
                         if (maxWidth != null) {
                             Modifier.widthIn(max = maxWidth)
@@ -118,7 +125,6 @@ fun Tooltip(
         modifier = (if (elevation > 0.dp) Modifier.shadow(elevation, tooltipShape) else Modifier)
             .clip(tooltipShape)
             .background(backgroundColor)
-            .fillMaxWidth(0.75f)
             .then(modifier),
     ) {
         Column(
