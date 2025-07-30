@@ -62,4 +62,10 @@ dependencies {
     implementation(projects.modules.services.utils)
 
     implementation(libs.compose.ui.tooling.preview)
+
+    testImplementation(libs.coroutines.test)
+    testImplementation(libs.junit)
+    testImplementation(libs.turbine)
+
+    testImplementation(projects.modules.services.sharedtest)
 }

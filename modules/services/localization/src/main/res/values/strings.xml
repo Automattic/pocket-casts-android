@@ -36,6 +36,8 @@
     <string name="close">Close</string>
     <string name="create_account">Create account</string>
     <string name="delete">Delete</string>
+    <!-- Verb, as in to clear something  -->
+    <string name="clear">Clear</string>
     <string name="dismiss">Dismiss</string>
     <string name="donate">Donate</string>
     <string name="done">Done</string>
@@ -912,6 +914,10 @@
     <string name="new_playlist">New Playlist</string>
     <string name="premade_playlists_tooltip_title">Smart Playlists, ready to go</string>
     <string name="premade_playlists_tooltip_body">We made these to help you get started.\nThey auto-update based on your listening.</string>
+    <string name="new_playlists_title_placeholder">Playlist’s title</string>
+    <string name="new_smart_playlist_banner_title">Make into Smart Playlist</string>
+    <string name="new_smart_playlist_banner_body">Automatically add episodes based on rules</string>
+    <string name="create_playlist">Create Playlist</string>
 
     <!-- Profile -->
 
