@@ -500,7 +500,7 @@ private fun ShuffleUpgradeContent(
         )
 
         ShuffleAnimation(
-            modifier = Modifier.padding(horizontal = 32.dp)
+            modifier = Modifier.padding(horizontal = 32.dp),
         )
     }
 }

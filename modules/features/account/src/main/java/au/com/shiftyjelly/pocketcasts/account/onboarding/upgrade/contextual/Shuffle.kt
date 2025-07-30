@@ -1,6 +1,10 @@
 package au.com.shiftyjelly.pocketcasts.account.onboarding.upgrade.contextual
 
 import androidx.annotation.DrawableRes
+import androidx.compose.animation.core.FastOutSlowInEasing
+import androidx.compose.animation.core.animateFloat
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.core.updateTransition
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -15,12 +19,19 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Card
 import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.ReadOnlyComposable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.Layout
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
@@ -45,17 +56,29 @@ import java.time.format.DateTimeFormatter
 import java.time.format.FormatStyle
 import java.time.temporal.ChronoUnit
 import kotlin.random.Random
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 @Composable
 fun ShuffleAnimation(
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
+    var activeDataSet by remember { mutableIntStateOf(0) }
+
+    LaunchedEffect("animation") {
+        repeat(predefinedShuffle.chunked(3).size - 1) {
+            delay(1500)
+            activeDataSet++
+        }
+    }
+
     Box(modifier = modifier) {
-        predefinedShuffle.chunked(3).forEach {
+        predefinedShuffle.chunked(3).forEachIndexed { index, dataSet ->
             ShuffleContainer(
-                items = it,
+                items = dataSet,
+                isDisplayed = index == activeDataSet,
             )
         }
     }
@@ -129,14 +152,30 @@ private val predefinedShuffle = listOf(
 
 @Composable
 private fun ShuffleContainer(
-    modifier: Modifier = Modifier,
     items: List<ShuffleConfig>,
+    modifier: Modifier = Modifier,
     middleItemScale: Float = 1.1f,
     horizontalPadding: Dp = 32.dp,
     itemsOverlap: Dp = 18.dp,
+    isDisplayed: Boolean = true,
 ) {
     if (items.size % 2 == 0) {
         error("must have odd number of elements!")
+    }
+
+    val rowAnimations = remember {
+        List(items.size) {
+            mutableStateOf(false)
+        }
+    }
+
+    LaunchedEffect(isDisplayed) {
+        rowAnimations.forEach { item ->
+            launch {
+                item.value = isDisplayed
+                delay(100)
+            }
+        }
     }
 
     Layout(
@@ -144,6 +183,8 @@ private fun ShuffleContainer(
         content = {
             items.forEachIndexed { index, item ->
                 ShuffleItem(
+                    index = items.size - index,
+                    isDisplayed = rowAnimations[index].value,
                     config = item,
                     scale = if (items.isMiddleIndex(index)) {
                         middleItemScale
@@ -154,10 +195,10 @@ private fun ShuffleContainer(
                         4.dp
                     } else {
                         2.dp
-                    }
+                    },
                 )
             }
-        }
+        },
     ) { measurables, constraints ->
         val regularItemWidth = constraints.maxWidth - 2 * horizontalPadding.roundToPx()
         val focusedItemWidth = (regularItemWidth * middleItemScale).toInt()
@@ -188,7 +229,7 @@ private fun ShuffleContainer(
                         placeables.size
                     } else {
                         index
-                    }.toFloat()
+                    }.toFloat(),
                 )
             }
         }
@@ -198,18 +239,68 @@ private fun ShuffleContainer(
 @Composable
 private fun ShuffleItem(
     config: ShuffleConfig,
+    index: Int,
     modifier: Modifier = Modifier,
     scale: Float = 1f,
-    elevation: Dp = 2.dp
+    elevation: Dp = 2.dp,
+    isDisplayed: Boolean = true,
+    floatInDistance: Dp = 32.dp,
 ) {
+    var wasVisible by remember { mutableStateOf(false) }
+    val floatInDistancePx = LocalDensity.current.run { floatInDistance.toPx() }
+    val transition = updateTransition(isDisplayed)
+
+    LaunchedEffect(isDisplayed) {
+        if (isDisplayed) {
+            wasVisible = isDisplayed
+        }
+    }
+
+    val alphaAnim by transition.animateFloat(
+        transitionSpec = {
+            tween(
+                durationMillis = if (isDisplayed) 800 else 400,
+                delayMillis = index * 100,
+                easing = FastOutSlowInEasing,
+            )
+        },
+    ) { visible ->
+        if (visible) {
+            1f
+        } else {
+            0f
+        }
+    }
+    val transitionAnim by transition.animateFloat(
+        transitionSpec = {
+            tween(
+                durationMillis = if (isDisplayed) 800 else 400,
+                delayMillis = index * 100,
+                easing = FastOutSlowInEasing,
+            )
+        },
+    ) { visible ->
+        if (visible) {
+            0f
+        } else {
+            if (wasVisible) {
+                -floatInDistancePx
+            } else {
+                floatInDistancePx
+            }
+        }
+    }
+
     Card(
-        elevation = elevation,
         modifier = modifier.graphicsLayer {
             scaleY = scale
             scaleX = scale
+            alpha = alphaAnim
+            translationY = transitionAnim
         },
+        elevation = elevation,
         backgroundColor = MaterialTheme.theme.colors.primaryUi03,
-        shape = RoundedCornerShape(3.dp)
+        shape = RoundedCornerShape(3.dp),
     ) {
         Row(
             modifier = Modifier
@@ -222,10 +313,10 @@ private fun ShuffleItem(
                     .size(48.dp)
                     .clip(RoundedCornerShape(3.dp)),
                 painter = painterResource(config.artworkResId),
-                contentDescription = ""
+                contentDescription = "",
             )
             Column(
-                verticalArrangement = Arrangement.spacedBy(1.dp)
+                verticalArrangement = Arrangement.spacedBy(1.dp),
             ) {
                 TextH70(
                     fontSize = 10.sp,
@@ -283,7 +374,7 @@ private fun PreviewShuffleContainer(
     @PreviewParameter(ThemePreviewParameterProvider::class) theme: Theme.ThemeType,
 ) = AppTheme(theme) {
     Column(
-        modifier = Modifier.padding(horizontal = 32.dp)
+        modifier = Modifier.padding(horizontal = 32.dp),
     ) {
         ShuffleContainer(
             items = predefinedShuffle.take(3),
@@ -302,16 +393,17 @@ private fun PreviewShuffle(
 ) = AppTheme(theme) {
     Column(
         modifier = Modifier.padding(horizontal = 32.dp),
-        verticalArrangement = Arrangement.spacedBy(8.dp)
+        verticalArrangement = Arrangement.spacedBy(8.dp),
     ) {
         ShuffleItem(
             config = predefinedShuffle[0],
+            index = 0,
         )
         ShuffleItem(
             config = predefinedShuffle[1],
             scale = 1.2f,
             elevation = 4.dp,
+            index = 0,
         )
     }
-
 }
