@@ -25,6 +25,7 @@ import au.com.shiftyjelly.pocketcasts.models.entity.SmartPlaylist.Companion.SYNC
 import au.com.shiftyjelly.pocketcasts.models.entity.SmartPlaylist.Companion.SYNC_STATUS_SYNCED
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodePlayingStatus
 import au.com.shiftyjelly.pocketcasts.models.type.PlaylistEpisodeSortType
+import au.com.shiftyjelly.pocketcasts.models.type.SmartRules
 import au.com.shiftyjelly.pocketcasts.models.type.SmartRules.DownloadStatusRule
 import au.com.shiftyjelly.pocketcasts.models.type.SmartRules.EpisodeDurationRule
 import au.com.shiftyjelly.pocketcasts.models.type.SmartRules.EpisodeStatusRule
@@ -760,5 +761,64 @@ class PlaylistManagerTest {
             ),
             reorderedPlaylists.map(SmartPlaylist::uuid),
         )
+    }
+
+    @Test
+    fun observeSmartEpisodes() = runTest(testDispatcher) {
+        podcastDao.insertSuspend(Podcast(uuid = "podcast-id", isSubscribed = true))
+
+        val smartRules = SmartRules.Default.copy(
+            episodeStatus = EpisodeStatusRule(
+                unplayed = true,
+                inProgress = true,
+                completed = false,
+            ),
+            mediaType = MediaTypeRule.Audio,
+            episodeDuration = EpisodeDurationRule.Constrained(longerThan = 10.minutes, shorterThan = 35.minutes),
+        )
+
+        manager.observeSmartEpisodes(smartRules).test {
+            assertEquals(emptyList<PodcastEpisode>(), awaitItem())
+
+            val episode1 = PodcastEpisode(
+                uuid = "id-1",
+                podcastUuid = "podcast-id",
+                publishedDate = Date(100),
+                playingStatus = EpisodePlayingStatus.NOT_PLAYED,
+                fileType = "audio/mp3",
+                duration = 15.minutes.inWholeSeconds.toDouble(),
+            )
+            episodeDao.insert(episode1)
+            assertEquals(listOf(episode1), awaitItem())
+
+            val episode2 = PodcastEpisode(
+                uuid = "id-2",
+                podcastUuid = "podcast-id",
+                publishedDate = Date(99),
+                playingStatus = EpisodePlayingStatus.IN_PROGRESS,
+                fileType = "audio/mp3",
+                duration = 30.minutes.inWholeSeconds.toDouble(),
+            )
+            episodeDao.insert(episode2)
+            assertEquals(listOf(episode1, episode2), awaitItem())
+
+            episodeDao.insert(
+                PodcastEpisode(
+                    uuid = "id-3",
+                    podcastUuid = "podcast-id",
+                    publishedDate = Date(98),
+                    playingStatus = EpisodePlayingStatus.COMPLETED,
+                    fileType = "audio/mp3",
+                    duration = 30.minutes.inWholeSeconds.toDouble(),
+                ),
+            )
+            expectNoEvents()
+
+            episodeDao.update(episode1.copy(fileType = "video/mov"))
+            assertEquals(listOf(episode2), awaitItem())
+
+            episodeDao.update(episode2.copy(duration = 0.0))
+            assertEquals(emptyList<PodcastEpisode>(), awaitItem())
+        }
     }
 }
