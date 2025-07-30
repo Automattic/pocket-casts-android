@@ -499,7 +499,9 @@ private fun ShuffleUpgradeContent(
             color = MaterialTheme.theme.colors.primaryInteractive01,
         )
 
-        ShuffleAnimation()
+        ShuffleAnimation(
+            modifier = Modifier.padding(horizontal = 32.dp)
+        )
     }
 }
 
