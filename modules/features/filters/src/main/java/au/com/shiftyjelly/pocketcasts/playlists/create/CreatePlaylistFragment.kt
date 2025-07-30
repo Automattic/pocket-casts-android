@@ -7,7 +7,6 @@ import android.view.ViewGroup
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.rememberNestedScrollInteropConnection
@@ -90,6 +89,7 @@ class CreatePlaylistFragment : BaseDialogFragment() {
                     SmartPlaylistPreviewPage(
                         playlistTitle = viewModel.playlistNameState.text.toString(),
                         appliedRules = uiState.appliedRules,
+                        availableEpisodes = uiState.smartEpisodes,
                         onCreateSmartPlaylist = { Timber.i("On create smart playlist") },
                         onClickRule = { rule -> navigateOnce(rule.toNavigationRoute()) },
                         onClickClose = ::dismiss,
