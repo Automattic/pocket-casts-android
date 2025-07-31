@@ -1101,7 +1101,12 @@ class MainActivity :
     }
 
     override fun snackBarView(): View {
-        return binding.snackbarFragment
+        val playerView = supportFragmentManager
+            .takeIf { viewModel.isPlayerOpen }
+            ?.fragments
+            ?.firstNotNullOfOrNull { it as? PlayerContainerFragment }
+            ?.view
+        return playerView ?: binding.snackbarFragment
     }
 
     override fun setFullScreenDarkOverlayViewVisibility(visible: Boolean) {
