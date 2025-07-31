@@ -2,7 +2,7 @@ package au.com.shiftyjelly.pocketcasts.playlists.create
 
 import androidx.compose.ui.text.TextRange
 import app.cash.turbine.test
-import au.com.shiftyjelly.pocketcasts.models.type.SmartRules
+import au.com.shiftyjelly.pocketcasts.models.type.SmartRules.EpisodeDurationRule
 import au.com.shiftyjelly.pocketcasts.models.type.SmartRules.EpisodeStatusRule
 import au.com.shiftyjelly.pocketcasts.models.type.SmartRules.PodcastsRule
 import au.com.shiftyjelly.pocketcasts.models.type.SmartRules.ReleaseDateRule
@@ -10,6 +10,7 @@ import au.com.shiftyjelly.pocketcasts.playlists.create.CreatePlaylistViewModel.U
 import au.com.shiftyjelly.pocketcasts.preferences.UserSetting
 import au.com.shiftyjelly.pocketcasts.preferences.model.ArtworkConfiguration
 import au.com.shiftyjelly.pocketcasts.sharedtest.MainCoroutineRule
+import kotlin.time.Duration.Companion.minutes
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
@@ -172,6 +173,98 @@ class CreatePlaylistViewModelTest {
             viewModel.applyRule(RuleType.ReleaseDate)
             state = awaitItem()
             assertEquals(ReleaseDateRule.Last2Weeks, state.appliedRules.releaseDate)
+        }
+    }
+
+    @Test
+    fun `manage episode duration rule`() = runTest {
+        viewModel.uiState.test {
+            var state = awaitItem()
+            assertEquals(UiState.Empty, state)
+
+            viewModel.constrainDuration(true)
+            state = awaitItem()
+            assertTrue(state.rulesBuilder.isEpisodeDurationConstrained)
+            assertEquals(20.minutes, state.rulesBuilder.minEpisodeDuration)
+            assertEquals(40.minutes, state.rulesBuilder.maxEpisodeDuration)
+            assertNull(state.appliedRules.episodeDuration)
+
+            viewModel.decrementMinDuration()
+            state = awaitItem()
+            assertTrue(state.rulesBuilder.isEpisodeDurationConstrained)
+            assertEquals(15.minutes, state.rulesBuilder.minEpisodeDuration)
+            assertEquals(40.minutes, state.rulesBuilder.maxEpisodeDuration)
+            assertNull(state.appliedRules.episodeDuration)
+
+            viewModel.incrementMinDuration()
+            state = awaitItem()
+            assertTrue(state.rulesBuilder.isEpisodeDurationConstrained)
+            assertEquals(20.minutes, state.rulesBuilder.minEpisodeDuration)
+            assertEquals(40.minutes, state.rulesBuilder.maxEpisodeDuration)
+            assertNull(state.appliedRules.episodeDuration)
+
+            viewModel.incrementMaxDuration()
+            state = awaitItem()
+            assertTrue(state.rulesBuilder.isEpisodeDurationConstrained)
+            assertEquals(20.minutes, state.rulesBuilder.minEpisodeDuration)
+            assertEquals(45.minutes, state.rulesBuilder.maxEpisodeDuration)
+            assertNull(state.appliedRules.episodeDuration)
+
+            viewModel.decrementMaxDuration()
+            state = awaitItem()
+            assertTrue(state.rulesBuilder.isEpisodeDurationConstrained)
+            assertEquals(20.minutes, state.rulesBuilder.minEpisodeDuration)
+            assertEquals(40.minutes, state.rulesBuilder.maxEpisodeDuration)
+            assertNull(state.appliedRules.episodeDuration)
+
+            viewModel.applyRule(RuleType.EpisodeDuration)
+            state = awaitItem()
+            assertEquals(
+                EpisodeDurationRule.Constrained(
+                    longerThan = 20.minutes,
+                    shorterThan = 40.minutes,
+                ),
+                state.appliedRules.episodeDuration,
+            )
+
+            viewModel.constrainDuration(false)
+            state = awaitItem()
+            assertFalse(state.rulesBuilder.isEpisodeDurationConstrained)
+
+            viewModel.applyRule(RuleType.EpisodeDuration)
+            state = awaitItem()
+            assertEquals(EpisodeDurationRule.Any, state.appliedRules.episodeDuration)
+        }
+    }
+
+    @Test
+    fun `min and max episode durations cannot overlap`() = runTest {
+        viewModel.constrainDuration(true)
+        repeat(4) {
+            viewModel.decrementMinDuration()
+        }
+        repeat(6) {
+            viewModel.decrementMaxDuration()
+        }
+
+        viewModel.uiState.test {
+            var state = awaitItem()
+            assertEquals(0.minutes, state.rulesBuilder.minEpisodeDuration)
+            assertEquals(10.minutes, state.rulesBuilder.maxEpisodeDuration)
+
+            viewModel.decrementMinDuration()
+            expectNoEvents()
+
+            viewModel.incrementMinDuration()
+            state = awaitItem()
+            assertEquals(5.minutes, state.rulesBuilder.minEpisodeDuration)
+            assertEquals(10.minutes, state.rulesBuilder.maxEpisodeDuration)
+
+            viewModel.incrementMinDuration()
+            expectNoEvents()
+
+            viewModel.decrementMaxDuration()
+            expectNoEvents()
         }
     }
 }
