@@ -548,7 +548,41 @@ private fun AppliedRules.description(ruleType: RuleType) = when (ruleType) {
         null -> null
     }
 
-    RuleType.EpisodeStatus -> TODO()
+    RuleType.EpisodeStatus -> {
+        if (episodeStatus != null) {
+            when {
+                episodeStatus.unplayed -> when {
+                    episodeStatus.inProgress && episodeStatus.completed -> {
+                        stringResource(LR.string.episode_status_rule_description, stringResource(LR.string.unplayed), 2)
+                    }
+                    episodeStatus.inProgress || episodeStatus.completed -> {
+                        stringResource(LR.string.episode_status_rule_description, stringResource(LR.string.unplayed), 1)
+                    }
+                    else -> {
+                        stringResource(LR.string.unplayed)
+                    }
+                }
+
+                episodeStatus.inProgress -> when {
+                    episodeStatus.completed -> {
+                        stringResource(LR.string.episode_status_rule_description, stringResource(LR.string.in_progress_uppercase), 1)
+                    }
+
+                    else -> {
+                        stringResource(LR.string.in_progress_uppercase)
+                    }
+                }
+
+                episodeStatus.completed -> {
+                    stringResource(LR.string.played)
+                }
+                else -> null
+            }
+        } else {
+            null
+        }
+    }
+
     RuleType.ReleaseDate -> TODO()
     RuleType.EpisodeDuration -> TODO()
     RuleType.DownloadStatus -> TODO()
