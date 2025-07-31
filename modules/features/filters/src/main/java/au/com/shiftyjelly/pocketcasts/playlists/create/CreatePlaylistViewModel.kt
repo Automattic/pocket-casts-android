@@ -68,17 +68,24 @@ class CreatePlaylistViewModel @AssistedInject constructor(
     ).stateIn(viewModelScope, SharingStarted.Eagerly, initialValue = UiState.Empty)
 
     fun applyRule(type: RuleType) {
-        val rule = when (type) {
-            RuleType.Podcasts -> rulesBuilder.value.podcastsRule
-            RuleType.EpisodeStatus -> TODO()
+        when (type) {
+            RuleType.Podcasts -> {
+                val rule = rulesBuilder.value.podcastsRule
+                appliedRules.update { rules ->
+                    rules.copy(podcasts = rule)
+                }
+            }
+            RuleType.EpisodeStatus -> {
+                val rule = rulesBuilder.value.episodeStatusRule
+                appliedRules.update { rules ->
+                    rules.copy(episodeStatus = rule)
+                }
+            }
             RuleType.ReleaseDate -> TODO()
             RuleType.EpisodeDuration -> TODO()
             RuleType.DownloadStatus -> TODO()
             RuleType.MediaType -> TODO()
             RuleType.Starred -> TODO()
-        }
-        appliedRules.update { rules ->
-            rules.copy(podcasts = rule)
         }
     }
 
@@ -99,6 +106,27 @@ class CreatePlaylistViewModel @AssistedInject constructor(
         rulesBuilder.update { builder ->
             val podcasts = builder.selectedPodcasts - uuid
             builder.copy(selectedPodcasts = podcasts)
+        }
+    }
+
+    fun useUnplayedEpisodes(use: Boolean) {
+        rulesBuilder.update { builder ->
+            val rule = builder.episodeStatusRule.copy(unplayed = use)
+            builder.copy(episodeStatusRule = rule)
+        }
+    }
+
+    fun useInProgressEpisodes(use: Boolean) {
+        rulesBuilder.update { builder ->
+            val rule = builder.episodeStatusRule.copy(inProgress = use)
+            builder.copy(episodeStatusRule = rule)
+        }
+    }
+
+    fun useCompletedEpisodes(use: Boolean) {
+        rulesBuilder.update { builder ->
+            val rule = builder.episodeStatusRule.copy(completed = use)
+            builder.copy(episodeStatusRule = rule)
         }
     }
 
@@ -167,6 +195,7 @@ class CreatePlaylistViewModel @AssistedInject constructor(
     data class RulesBuilder(
         val useAllPodcasts: Boolean,
         val selectedPodcasts: Set<String>,
+        val episodeStatusRule: EpisodeStatusRule,
     ) {
         val podcastsRule
             get() = if (useAllPodcasts) {
@@ -179,6 +208,7 @@ class CreatePlaylistViewModel @AssistedInject constructor(
             val Empty = RulesBuilder(
                 useAllPodcasts = true,
                 selectedPodcasts = emptySet(),
+                episodeStatusRule = SmartRules.Default.episodeStatus,
             )
         }
     }
