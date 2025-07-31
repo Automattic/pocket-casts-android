@@ -69,6 +69,8 @@ import au.com.shiftyjelly.pocketcasts.compose.theme
 import au.com.shiftyjelly.pocketcasts.localization.helper.RelativeDateFormatter
 import au.com.shiftyjelly.pocketcasts.localization.helper.TimeHelper
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
+import au.com.shiftyjelly.pocketcasts.models.type.SmartRules
+import au.com.shiftyjelly.pocketcasts.models.type.SmartRules.EpisodeDurationRule
 import au.com.shiftyjelly.pocketcasts.models.type.SmartRules.PodcastsRule
 import au.com.shiftyjelly.pocketcasts.models.type.SmartRules.ReleaseDateRule
 import au.com.shiftyjelly.pocketcasts.playlists.create.CreatePlaylistViewModel.AppliedRules
@@ -593,7 +595,16 @@ private fun AppliedRules.description(ruleType: RuleType) = when (ruleType) {
         null -> null
     }
 
-    RuleType.EpisodeDuration -> TODO()
+    RuleType.EpisodeDuration -> when (episodeDuration) {
+        is EpisodeDurationRule.Any -> stringResource(LR.string.any_duration)
+        is EpisodeDurationRule.Constrained -> {
+            val context = LocalContext.current
+            val min = TimeHelper.getTimeDurationShortString(episodeDuration.longerThan.inWholeMilliseconds, context)
+            val max = TimeHelper.getTimeDurationShortString(episodeDuration.shorterThan.inWholeMilliseconds, context)
+            "$min - $max"
+        }
+        null -> null
+    }
     RuleType.DownloadStatus -> TODO()
     RuleType.MediaType -> TODO()
     RuleType.Starred -> TODO()

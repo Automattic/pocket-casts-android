@@ -238,6 +238,7 @@
         <item quantity="other">%d episodes</item>
     </plurals>
     <string name="empty_play_state">Pick an episode to begin</string>
+    <string name="any_duration">Any duration</string>
 
     <string name="seconds_label">Seconds</string>
     <string name="seconds_singular">1 second</string>
@@ -934,6 +935,10 @@
     <string name="smart_playlist_create_no_content_body">None of the episodes in your podcasts match these rules.\n\nTry adjusting the rules, or save this playlist for future episodes that might fit.</string>
     <!-- %1$s is status like 'In Progress' and %2$d is count of other episode statuses -->
     <string name="episode_status_rule_description">%1$s + %2$d</string>
+    <string name="decrement_longer_than_duration">Decrement "longer than" duration</string>
+    <string name="increment_longer_than_duration">Increment "longer than" duration</string>
+    <string name="decrement_shorter_than_duration">Decrement "shorter than" duration</string>
+    <string name="increment_shorter_than_duration">Increment "shorter than" duration</string>
 
     <!-- Profile -->
 
