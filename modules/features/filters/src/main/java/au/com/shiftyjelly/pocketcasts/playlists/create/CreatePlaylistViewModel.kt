@@ -14,6 +14,8 @@ import au.com.shiftyjelly.pocketcasts.models.type.SmartRules.MediaTypeRule
 import au.com.shiftyjelly.pocketcasts.models.type.SmartRules.PodcastsRule
 import au.com.shiftyjelly.pocketcasts.models.type.SmartRules.ReleaseDateRule
 import au.com.shiftyjelly.pocketcasts.models.type.SmartRules.StarredRule
+import au.com.shiftyjelly.pocketcasts.preferences.Settings
+import au.com.shiftyjelly.pocketcasts.preferences.model.ArtworkConfiguration.Element
 import au.com.shiftyjelly.pocketcasts.repositories.playlist.PlaylistManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
 import dagger.assisted.Assisted
@@ -26,6 +28,7 @@ import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 
@@ -34,6 +37,7 @@ import kotlinx.coroutines.flow.update
 class CreatePlaylistViewModel @AssistedInject constructor(
     private val playlistManager: PlaylistManager,
     private val podcastManager: PodcastManager,
+    private val settings: Settings,
     @Assisted initialPlaylistTitle: String,
 ) : ViewModel() {
     val playlistNameState = TextFieldState(
@@ -59,6 +63,7 @@ class CreatePlaylistViewModel @AssistedInject constructor(
         rulesBuilder,
         podcastManager.findSubscribedFlow(),
         smartEpisodes,
+        settings.artworkConfiguration.flow.map { it.useEpisodeArtwork(Element.Filters) },
         ::UiState,
     ).stateIn(viewModelScope, SharingStarted.Eagerly, initialValue = UiState.Empty)
 
@@ -102,6 +107,7 @@ class CreatePlaylistViewModel @AssistedInject constructor(
         val rulesBuilder: RulesBuilder,
         val followedPodcasts: List<Podcast>,
         val smartEpisodes: List<PodcastEpisode>,
+        val useEpisodeArtwork: Boolean,
     ) {
         companion object {
             val Empty = UiState(
@@ -109,6 +115,7 @@ class CreatePlaylistViewModel @AssistedInject constructor(
                 rulesBuilder = RulesBuilder.Empty,
                 followedPodcasts = emptyList(),
                 smartEpisodes = emptyList(),
+                useEpisodeArtwork = false,
             )
         }
     }

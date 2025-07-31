@@ -122,6 +122,7 @@ fun SmartPlaylistPreviewPage(
     playlistTitle: String,
     appliedRules: AppliedRules,
     availableEpisodes: List<PodcastEpisode>,
+    useEpisodeArtwork: Boolean,
     onCreateSmartPlaylist: () -> Unit,
     onClickRule: (RuleType) -> Unit,
     onClickClose: () -> Unit,
@@ -194,7 +195,7 @@ fun SmartPlaylistPreviewPage(
                         ) { episode ->
                             EpisodeRow(
                                 episode = episode,
-                                useEpisodeArtwork = false,
+                                useEpisodeArtwork = useEpisodeArtwork,
                             )
                         }
                     } else {
@@ -566,6 +567,7 @@ private fun SmartPlaylistsPreviewNoRulesPreview(
             playlistTitle = "Comedy",
             appliedRules = AppliedRules.Empty,
             availableEpisodes = emptyList(),
+            useEpisodeArtwork = false,
             onCreateSmartPlaylist = {},
             onClickRule = {},
             onClickClose = {},
@@ -593,6 +595,7 @@ private fun SmartPlaylistsPreviewEpisodessPreview(
                     publishedDate = Date(0),
                 )
             },
+            useEpisodeArtwork = false,
             onCreateSmartPlaylist = {},
             onClickRule = {},
             onClickClose = {},
@@ -613,6 +616,7 @@ private fun SmartPlaylistsPreviewNoEpisodesPreview(
                 podcasts = PodcastsRule.Any,
             ),
             availableEpisodes = emptyList(),
+            useEpisodeArtwork = false,
             onCreateSmartPlaylist = {},
             onClickRule = {},
             onClickClose = {},
