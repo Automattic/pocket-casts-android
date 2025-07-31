@@ -90,6 +90,7 @@ class CreatePlaylistFragment : BaseDialogFragment() {
                         playlistTitle = viewModel.playlistNameState.text.toString(),
                         appliedRules = uiState.appliedRules,
                         availableEpisodes = uiState.smartEpisodes,
+                        useEpisodeArtwork = uiState.useEpisodeArtwork,
                         onCreateSmartPlaylist = { Timber.i("On create smart playlist") },
                         onClickRule = { rule -> navigateOnce(rule.toNavigationRoute()) },
                         onClickClose = ::dismiss,
