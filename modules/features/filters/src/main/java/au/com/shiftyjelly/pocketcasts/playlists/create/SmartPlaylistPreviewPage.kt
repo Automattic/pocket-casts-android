@@ -56,31 +56,31 @@ enum class RuleType(
     @StringRes val titleId: Int,
 ) {
     Podcasts(
-        iconId = IR.drawable.ic_podcasts,
+        iconId = IR.drawable.ic_rule_podcasts,
         titleId = LR.string.podcasts,
     ),
     EpisodeStatus(
-        iconId = IR.drawable.ic_filters_play,
+        iconId = IR.drawable.ic_rule_episode_status,
         titleId = LR.string.filters_chip_episode_status,
     ),
     ReleaseDate(
-        iconId = IR.drawable.ic_calendar,
+        iconId = IR.drawable.ic_rule_release_date,
         titleId = LR.string.filters_release_date,
     ),
     EpisodeDuration(
-        iconId = IR.drawable.ic_filters_clock,
+        iconId = IR.drawable.ic_rule_duration,
         titleId = LR.string.filters_duration,
     ),
     DownloadStatus(
-        iconId = IR.drawable.ic_profile_download,
+        iconId = IR.drawable.ic_rule_download_status,
         titleId = LR.string.filters_chip_download_status,
     ),
     MediaType(
-        iconId = IR.drawable.ic_headphone,
+        iconId = IR.drawable.ic_rule_media_type,
         titleId = LR.string.filters_chip_media_type,
     ),
     Starred(
-        iconId = IR.drawable.ic_star,
+        iconId = IR.drawable.ic_rule_starred,
         titleId = LR.string.filters_chip_starred,
     ),
 }
