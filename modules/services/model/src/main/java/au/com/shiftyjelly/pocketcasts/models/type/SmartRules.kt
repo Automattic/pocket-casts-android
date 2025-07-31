@@ -10,7 +10,7 @@ data class SmartRules(
     val mediaType: MediaTypeRule,
     val releaseDate: ReleaseDateRule,
     val starred: StarredRule,
-    val podcastsRule: PodcastsRule,
+    val podcasts: PodcastsRule,
     val episodeDuration: EpisodeDurationRule,
 ) {
     fun toSqlWhereClause(clock: Clock) = buildString {
@@ -19,7 +19,7 @@ data class SmartRules(
         mediaType.run { appendSqlQuery(clock) }
         releaseDate.run { appendSqlQuery(clock) }
         starred.run { appendSqlQuery(clock) }
-        podcastsRule.run { appendSqlQuery(clock) }
+        podcasts.run { appendSqlQuery(clock) }
         episodeDuration.run { appendSqlQuery(clock) }
         NonArchivedRule.run { appendSqlQuery(clock) }
         FollowedPodcastRule.run { appendSqlQuery(clock) }
