@@ -22,7 +22,6 @@ import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Icon
-import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -47,10 +46,9 @@ import androidx.compose.ui.unit.dp
 import au.com.shiftyjelly.pocketcasts.compose.AppTheme
 import au.com.shiftyjelly.pocketcasts.compose.components.TextP40
 import au.com.shiftyjelly.pocketcasts.compose.preview.ThemePreviewParameterProvider
-import au.com.shiftyjelly.pocketcasts.compose.theme
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
-import kotlin.random.Random
 import kotlinx.coroutines.delay
+import kotlin.random.Random
 import au.com.shiftyjelly.pocketcasts.images.R as IR
 
 private data class AnimationParams(
@@ -217,7 +215,7 @@ private fun Bookmark(
         )
         TextP40(
             text = bookmarkConfig.text,
-            color = MaterialTheme.theme.colors.primaryInteractive02,
+            color = Color.White,
             disableAutoScale = true,
         )
         Row(
@@ -225,17 +223,21 @@ private fun Bookmark(
                 .height(36.dp)
                 .wrapContentWidth()
                 .clip(RoundedCornerShape(18.dp))
-                .background(color = MaterialTheme.theme.colors.primaryInteractive02, shape = RoundedCornerShape(18.dp))
+                .background(color = Color.White, shape = RoundedCornerShape(18.dp))
                 .padding(horizontal = 17.dp, vertical = 8.dp),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.spacedBy(10.dp),
         ) {
             TextP40(
                 text = bookmarkConfig.timestamp,
-                color = MaterialTheme.theme.colors.primaryText01,
+                color = Color.Black,
                 disableAutoScale = true,
             )
-            Icon(painter = painterResource(IR.drawable.ic_play), contentDescription = "", tint = MaterialTheme.theme.colors.primaryText01)
+            Icon(
+                painter = painterResource(IR.drawable.ic_play),
+                contentDescription = "",
+                tint = Color.Black,
+            )
         }
     }
 }
