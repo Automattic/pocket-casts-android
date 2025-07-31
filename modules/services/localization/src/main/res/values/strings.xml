@@ -2515,5 +2515,6 @@
     <string name="onboarding_folders_title_1">Books</string>
     <string name="onboarding_folders_title_2">Favorites</string>
     <string name="onboarding_folders_title_3">Sports</string>
+    <string name="onboarding_bookmarks_title">Bookmarks: no more \"where was that?\"</string>
 
 </resources>
