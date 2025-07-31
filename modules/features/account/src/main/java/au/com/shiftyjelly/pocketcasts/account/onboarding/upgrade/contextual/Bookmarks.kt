@@ -2,7 +2,8 @@ package au.com.shiftyjelly.pocketcasts.account.onboarding.upgrade.contextual
 
 import androidx.annotation.DrawableRes
 import androidx.compose.animation.core.FastOutLinearInEasing
-import androidx.compose.animation.core.FastOutSlowInEasing
+import androidx.compose.animation.core.LinearEasing
+import androidx.compose.animation.core.LinearOutSlowInEasing
 import androidx.compose.animation.core.animateFloat
 import androidx.compose.animation.core.animateInt
 import androidx.compose.animation.core.tween
@@ -47,8 +48,8 @@ import au.com.shiftyjelly.pocketcasts.compose.AppTheme
 import au.com.shiftyjelly.pocketcasts.compose.components.TextP40
 import au.com.shiftyjelly.pocketcasts.compose.preview.ThemePreviewParameterProvider
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
-import kotlinx.coroutines.delay
 import kotlin.random.Random
+import kotlinx.coroutines.delay
 import au.com.shiftyjelly.pocketcasts.images.R as IR
 
 private data class AnimationParams(
@@ -71,7 +72,7 @@ fun BookmarksAnimation(
                 AnimationParams(
                     shouldStart = false,
                     centerOffset = IntOffset(Random.nextInt(centerOffsetTolerance), Random.nextInt(centerOffsetTolerance)),
-                    rotationOffset = Random.nextInt(12),
+                    rotationOffset = Random.nextInt(10),
                 ),
             )
         }
@@ -91,9 +92,9 @@ fun BookmarksAnimation(
         bookmarks.forEachIndexed { index, item ->
             val animParams = animationTriggers[index].value
             val startRotation = if (index % 2 == 0) {
-                60 - animParams.rotationOffset
+                30 - animParams.rotationOffset
             } else {
-                -60 + animParams.rotationOffset
+                -30 + animParams.rotationOffset
             }
             val endRotation = if (index % 2 == 0) {
                 0 + animParams.rotationOffset
@@ -158,7 +159,7 @@ private fun Bookmark(
 ) {
     val transition = updateTransition(startAnimation, "bookmarkAnimation")
     val rotationAnim by transition.animateInt(
-        transitionSpec = { tween(durationMillis = 1000, easing = FastOutLinearInEasing) },
+        transitionSpec = { tween(durationMillis = 600, easing = LinearEasing) },
     ) { visible ->
         if (visible) {
             endRotation
@@ -167,7 +168,7 @@ private fun Bookmark(
         }
     }
     val alphaAnim by transition.animateFloat(
-        transitionSpec = { tween(durationMillis = 600, easing = FastOutSlowInEasing) },
+        transitionSpec = { tween(durationMillis = 600, easing = LinearOutSlowInEasing) },
     ) { visible ->
         if (visible) {
             1f
@@ -176,7 +177,7 @@ private fun Bookmark(
         }
     }
     val scaleAnim by transition.animateFloat(
-        transitionSpec = { tween(durationMillis = 1000, easing = FastOutLinearInEasing) },
+        transitionSpec = { tween(durationMillis = 600, easing = FastOutLinearInEasing) },
     ) { visible ->
         if (visible) {
             1f
