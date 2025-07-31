@@ -2,6 +2,8 @@ package au.com.shiftyjelly.pocketcasts.playlists.create
 
 import androidx.compose.ui.text.TextRange
 import app.cash.turbine.test
+import au.com.shiftyjelly.pocketcasts.models.type.SmartRules
+import au.com.shiftyjelly.pocketcasts.models.type.SmartRules.DownloadStatusRule
 import au.com.shiftyjelly.pocketcasts.models.type.SmartRules.EpisodeDurationRule
 import au.com.shiftyjelly.pocketcasts.models.type.SmartRules.EpisodeStatusRule
 import au.com.shiftyjelly.pocketcasts.models.type.SmartRules.PodcastsRule
@@ -234,6 +236,33 @@ class CreatePlaylistViewModelTest {
             viewModel.applyRule(RuleType.EpisodeDuration)
             state = awaitItem()
             assertEquals(EpisodeDurationRule.Any, state.appliedRules.episodeDuration)
+        }
+    }
+
+    @Test
+    fun `manage download status rule`() = runTest {
+        viewModel.uiState.test {
+            var state = awaitItem()
+            assertEquals(UiState.Empty, state)
+
+            viewModel.useDownloadStatus(DownloadStatusRule.Downloaded)
+            state = awaitItem()
+            assertEquals(DownloadStatusRule.Downloaded, state.rulesBuilder.downloadStatusRule)
+            assertNull(state.appliedRules.downloadStatus)
+
+            viewModel.useDownloadStatus(DownloadStatusRule.Any)
+            state = awaitItem()
+            assertEquals(DownloadStatusRule.Any, state.rulesBuilder.downloadStatusRule)
+            assertNull(state.appliedRules.downloadStatus)
+
+            viewModel.useDownloadStatus(DownloadStatusRule.NotDownloaded)
+            state = awaitItem()
+            assertEquals(DownloadStatusRule.NotDownloaded, state.rulesBuilder.downloadStatusRule)
+            assertNull(state.appliedRules.downloadStatus)
+
+            viewModel.applyRule(RuleType.DownloadStatus)
+            state = awaitItem()
+            assertEquals(DownloadStatusRule.NotDownloaded, state.rulesBuilder.downloadStatusRule)
         }
     }
 }
