@@ -51,7 +51,10 @@ class AdReportFragment : BaseDialogFragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?,
     ) = contentWithoutConsumedInsets {
-        AppTheme(theme.activeTheme) {
+        DialogBox(
+            fillMaxHeight = false,
+            useThemeBackground = false,
+        ) {
             CompositionLocalProvider(LocalPodcastColors provides args.podcastColors) {
                 val sheetColors = rememberAdColors().reportSheet
                 AdReportContent(

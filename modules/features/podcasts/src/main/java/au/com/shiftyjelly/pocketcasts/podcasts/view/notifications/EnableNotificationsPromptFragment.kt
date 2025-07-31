@@ -7,23 +7,13 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.WindowInsets
-import androidx.compose.foundation.layout.WindowInsetsSides
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.only
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.safeDrawing
-import androidx.compose.foundation.layout.windowInsetsPadding
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.dp
 import androidx.fragment.compose.content
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
-import au.com.shiftyjelly.pocketcasts.compose.AppThemeWithBackground
 import au.com.shiftyjelly.pocketcasts.compose.CallOnce
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.notification.NotificationHelper
@@ -71,40 +61,28 @@ internal class EnableNotificationsPromptFragment : BaseDialogFragment() {
             analyticsTracker.track(AnalyticsEvent.NOTIFICATIONS_PERMISSIONS_SHOWN)
         }
 
-        Box(
-            modifier = Modifier
-                .fillMaxHeight(0.93f)
-                .clip(
-                    RoundedCornerShape(
-                        topStart = 16.dp,
-                        topEnd = 16.dp,
-                    ),
-                ),
-        ) {
-            AppThemeWithBackground(theme.activeTheme) {
-                EnableNotificationsPromptScreen(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .padding(16.dp)
-                        .windowInsetsPadding(WindowInsets.safeDrawing.only(WindowInsetsSides.Horizontal)),
-                    onCtaClick = {
-                        analyticsTracker.track(AnalyticsEvent.NOTIFICATIONS_PERMISSIONS_ALLOW_TAPPED)
-                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-                            if (shouldShowRequestPermissionRationale(Manifest.permission.POST_NOTIFICATIONS)) {
-                                permissionRequester.launch(Manifest.permission.POST_NOTIFICATIONS)
-                                analyticsTracker.track(AnalyticsEvent.NOTIFICATIONS_OPT_IN_SHOWN)
-                            } else {
-                                notificationHelper.openNotificationSettings(requireActivity())
-                            }
+        DialogBox {
+            EnableNotificationsPromptScreen(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(16.dp),
+                onCtaClick = {
+                    analyticsTracker.track(AnalyticsEvent.NOTIFICATIONS_PERMISSIONS_ALLOW_TAPPED)
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                        if (shouldShowRequestPermissionRationale(Manifest.permission.POST_NOTIFICATIONS)) {
+                            permissionRequester.launch(Manifest.permission.POST_NOTIFICATIONS)
+                            analyticsTracker.track(AnalyticsEvent.NOTIFICATIONS_OPT_IN_SHOWN)
+                        } else {
+                            notificationHelper.openNotificationSettings(requireActivity())
                         }
-                    },
-                    onDismissClick = {
-                        isFinalizingActionUsed = true
-                        handleDismissedByUser()
-                        dismiss()
-                    },
-                )
-            }
+                    }
+                },
+                onDismissClick = {
+                    isFinalizingActionUsed = true
+                    handleDismissedByUser()
+                    dismiss()
+                },
+            )
         }
     }
 
