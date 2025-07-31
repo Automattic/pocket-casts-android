@@ -81,7 +81,12 @@ class CreatePlaylistViewModel @AssistedInject constructor(
                     rules.copy(episodeStatus = rule)
                 }
             }
-            RuleType.ReleaseDate -> TODO()
+            RuleType.ReleaseDate -> {
+                val rule = rulesBuilder.value.releaseDateRule
+                appliedRules.update { rules ->
+                    rules.copy(releaseDate = rule)
+                }
+            }
             RuleType.EpisodeDuration -> TODO()
             RuleType.DownloadStatus -> TODO()
             RuleType.MediaType -> TODO()
@@ -127,6 +132,12 @@ class CreatePlaylistViewModel @AssistedInject constructor(
         rulesBuilder.update { builder ->
             val rule = builder.episodeStatusRule.copy(completed = use)
             builder.copy(episodeStatusRule = rule)
+        }
+    }
+
+    fun useReleaseDate(rule: ReleaseDateRule) {
+        rulesBuilder.update { builder ->
+            builder.copy(releaseDateRule = rule)
         }
     }
 
@@ -196,6 +207,7 @@ class CreatePlaylistViewModel @AssistedInject constructor(
         val useAllPodcasts: Boolean,
         val selectedPodcasts: Set<String>,
         val episodeStatusRule: EpisodeStatusRule,
+        val releaseDateRule: ReleaseDateRule,
     ) {
         val podcastsRule
             get() = if (useAllPodcasts) {
@@ -209,6 +221,7 @@ class CreatePlaylistViewModel @AssistedInject constructor(
                 useAllPodcasts = true,
                 selectedPodcasts = emptySet(),
                 episodeStatusRule = SmartRules.Default.episodeStatus,
+                releaseDateRule = SmartRules.Default.releaseDate,
             )
         }
     }
