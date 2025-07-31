@@ -28,6 +28,9 @@ import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.semantics.role
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.Dp
@@ -46,7 +49,6 @@ import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 @Composable
 fun PreselectChaptersAnimation(modifier: Modifier = Modifier) {
-
     val animationTriggers = remember {
         List(predefinedChapters.size) {
             mutableStateOf(AnimatedState.HIDDEN)
@@ -69,14 +71,17 @@ fun PreselectChaptersAnimation(modifier: Modifier = Modifier) {
     }
 
     Column(
-        modifier = modifier,
-        verticalArrangement = Arrangement.spacedBy(6.dp)
+        modifier = modifier
+            .semantics(true) {
+                role = Role.Image
+            },
+        verticalArrangement = Arrangement.spacedBy(6.dp),
     ) {
         predefinedChapters.forEachIndexed { index, item ->
             ChapterRow(
                 modifier = Modifier.fillMaxWidth(),
                 chapterData = item,
-                animatedState = animationTriggers[index].value
+                animatedState = animationTriggers[index].value,
             )
         }
     }
@@ -96,12 +101,14 @@ private val predefinedTitles = listOf(
 private val predefinedChapters = (0 until 3).map {
     ChapterData(
         index = it + 1,
-        title = predefinedTitles[it]
+        title = predefinedTitles[it],
     )
 }.toList()
 
 private enum class AnimatedState {
-    HIDDEN, VISIBLE, DISABLED
+    HIDDEN,
+    VISIBLE,
+    DISABLED,
 }
 
 @Composable
@@ -118,7 +125,7 @@ private fun ChapterRow(
     val alphaAnim by transition.animateFloat(
         transitionSpec = {
             tween(durationMillis = 600)
-        }
+        },
     ) { state ->
         when (state) {
             AnimatedState.HIDDEN -> 0f
@@ -129,7 +136,7 @@ private fun ChapterRow(
     val offsetYAnim by transition.animateInt(
         transitionSpec = {
             tween(durationMillis = 700)
-        }
+        },
     ) { state -> if (state == AnimatedState.HIDDEN) floatInDistancePx else 0 }
 
     Card(
@@ -143,7 +150,7 @@ private fun ChapterRow(
         Row(
             modifier = Modifier.padding(12.dp),
             verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy(12.dp)
+            horizontalArrangement = Arrangement.spacedBy(12.dp),
         ) {
             Icon(
                 painter = painterResource(IR.drawable.ic_check_black_24dp),
@@ -179,7 +186,7 @@ private fun PreviewChapterItem(
 ) = AppTheme(theme) {
     Column {
         ChapterRow(
-            chapterData = predefinedChapters[0]
+            chapterData = predefinedChapters[0],
         )
     }
 }

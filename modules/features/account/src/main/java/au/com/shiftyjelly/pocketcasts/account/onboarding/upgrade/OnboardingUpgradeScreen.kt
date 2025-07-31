@@ -536,7 +536,7 @@ private fun PreselectChaptersUpgradeContent(
         PreselectChaptersAnimation(
             modifier = Modifier.fillMaxWidth()
                 .padding(horizontal = 32.dp)
-                .padding(bottom = 64.dp)
+                .padding(bottom = 64.dp),
         )
     }
 }
