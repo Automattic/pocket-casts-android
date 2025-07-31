@@ -271,7 +271,7 @@ class CreatePlaylistViewModel @AssistedInject constructor(
             copy(minEpisodeDuration = duration)
         }
 
-        fun withMaxDuration(duration: Duration) = if (duration < minEpisodeDuration) {
+        fun withMaxDuration(duration: Duration) = if (duration <= minEpisodeDuration) {
             this
         } else {
             copy(maxEpisodeDuration = duration)
