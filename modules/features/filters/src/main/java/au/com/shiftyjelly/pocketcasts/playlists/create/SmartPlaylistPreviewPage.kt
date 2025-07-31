@@ -3,7 +3,6 @@ package au.com.shiftyjelly.pocketcasts.playlists.create
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
 import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.animateContentSize
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -41,7 +40,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.rotate
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
@@ -123,8 +121,10 @@ fun SmartPlaylistPreviewPage(
     appliedRules: AppliedRules,
     availableEpisodes: List<PodcastEpisode>,
     useEpisodeArtwork: Boolean,
+    areOtherOptionsExpanded: Boolean,
     onCreateSmartPlaylist: () -> Unit,
     onClickRule: (RuleType) -> Unit,
+    toggleOtherOptions: () -> Unit,
     onClickClose: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -147,7 +147,6 @@ fun SmartPlaylistPreviewPage(
         ) {
             val activeRules = rememberActiveRules(appliedRules)
             val inactiveRules = rememberInactiveRules(activeRules)
-            var isInactiveExpanded by remember { mutableStateOf(false) }
 
             FadedLazyColumn(
                 contentPadding = PaddingValues(bottom = 24.dp),
@@ -171,9 +170,9 @@ fun SmartPlaylistPreviewPage(
                         ) {
                             InactiveRulesContent(
                                 rules = inactiveRules,
-                                isExpanded = isInactiveExpanded,
+                                isExpanded = areOtherOptionsExpanded,
                                 onClickRule = onClickRule,
-                                onToggleExpand = { isInactiveExpanded = !isInactiveExpanded },
+                                onToggleExpand = toggleOtherOptions,
                                 modifier = Modifier.padding(vertical = 32.dp),
                             )
                         }
@@ -562,15 +561,18 @@ private fun AppliedRules.description(ruleType: RuleType) = when (ruleType) {
 private fun SmartPlaylistsPreviewNoRulesPreview(
     @PreviewParameter(ThemePreviewParameterProvider::class) themeType: ThemeType,
 ) {
+    var expanded by remember { mutableStateOf(false) }
     AppThemeWithBackground(themeType) {
         SmartPlaylistPreviewPage(
             playlistTitle = "Comedy",
             appliedRules = AppliedRules.Empty,
             availableEpisodes = emptyList(),
             useEpisodeArtwork = false,
+            areOtherOptionsExpanded = expanded,
             onCreateSmartPlaylist = {},
             onClickRule = {},
             onClickClose = {},
+            toggleOtherOptions = { expanded = !expanded },
             modifier = Modifier.fillMaxSize(),
         )
     }
@@ -581,6 +583,7 @@ private fun SmartPlaylistsPreviewNoRulesPreview(
 private fun SmartPlaylistsPreviewEpisodessPreview(
     @PreviewParameter(ThemePreviewParameterProvider::class) themeType: ThemeType,
 ) {
+    var expanded by remember { mutableStateOf(false) }
     AppThemeWithBackground(themeType) {
         SmartPlaylistPreviewPage(
             playlistTitle = "Comedy",
@@ -596,9 +599,11 @@ private fun SmartPlaylistsPreviewEpisodessPreview(
                 )
             },
             useEpisodeArtwork = false,
+            areOtherOptionsExpanded = expanded,
             onCreateSmartPlaylist = {},
             onClickRule = {},
             onClickClose = {},
+            toggleOtherOptions = { expanded = !expanded },
             modifier = Modifier.fillMaxSize(),
         )
     }
@@ -609,6 +614,7 @@ private fun SmartPlaylistsPreviewEpisodessPreview(
 private fun SmartPlaylistsPreviewNoEpisodesPreview(
     @PreviewParameter(ThemePreviewParameterProvider::class) themeType: ThemeType,
 ) {
+    var expanded by remember { mutableStateOf(false) }
     AppThemeWithBackground(themeType) {
         SmartPlaylistPreviewPage(
             playlistTitle = "Comedy",
@@ -617,9 +623,11 @@ private fun SmartPlaylistsPreviewNoEpisodesPreview(
             ),
             availableEpisodes = emptyList(),
             useEpisodeArtwork = false,
+            areOtherOptionsExpanded = expanded,
             onCreateSmartPlaylist = {},
             onClickRule = {},
             onClickClose = {},
+            toggleOtherOptions = { expanded = !expanded },
             modifier = Modifier.fillMaxSize(),
         )
     }

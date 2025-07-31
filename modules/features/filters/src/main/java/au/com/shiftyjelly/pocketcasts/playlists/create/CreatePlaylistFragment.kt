@@ -7,6 +7,9 @@ import android.view.ViewGroup
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.rememberNestedScrollInteropConnection
@@ -46,6 +49,7 @@ class CreatePlaylistFragment : BaseDialogFragment() {
         savedInstanceState: Bundle?,
     ) = content {
         val uiState by viewModel.uiState.collectAsState()
+        var areOtherOptionsExpanded by remember { mutableStateOf(false) }
 
         DialogBox {
             val navController = rememberNavController()
@@ -91,8 +95,10 @@ class CreatePlaylistFragment : BaseDialogFragment() {
                         appliedRules = uiState.appliedRules,
                         availableEpisodes = uiState.smartEpisodes,
                         useEpisodeArtwork = uiState.useEpisodeArtwork,
+                        areOtherOptionsExpanded = areOtherOptionsExpanded,
                         onCreateSmartPlaylist = { Timber.i("On create smart playlist") },
                         onClickRule = { rule -> navigateOnce(rule.toNavigationRoute()) },
+                        toggleOtherOptions = { areOtherOptionsExpanded = !areOtherOptionsExpanded },
                         onClickClose = ::dismiss,
                     )
                 }
