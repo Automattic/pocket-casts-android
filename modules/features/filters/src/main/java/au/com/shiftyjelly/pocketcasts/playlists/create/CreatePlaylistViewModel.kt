@@ -5,6 +5,8 @@ import androidx.compose.ui.text.TextRange
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
+import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
+import au.com.shiftyjelly.pocketcasts.models.type.SmartRules
 import au.com.shiftyjelly.pocketcasts.models.type.SmartRules.DownloadStatusRule
 import au.com.shiftyjelly.pocketcasts.models.type.SmartRules.EpisodeDurationRule
 import au.com.shiftyjelly.pocketcasts.models.type.SmartRules.EpisodeStatusRule
@@ -12,20 +14,30 @@ import au.com.shiftyjelly.pocketcasts.models.type.SmartRules.MediaTypeRule
 import au.com.shiftyjelly.pocketcasts.models.type.SmartRules.PodcastsRule
 import au.com.shiftyjelly.pocketcasts.models.type.SmartRules.ReleaseDateRule
 import au.com.shiftyjelly.pocketcasts.models.type.SmartRules.StarredRule
+import au.com.shiftyjelly.pocketcasts.preferences.Settings
+import au.com.shiftyjelly.pocketcasts.preferences.model.ArtworkConfiguration.Element
+import au.com.shiftyjelly.pocketcasts.repositories.playlist.PlaylistManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 
+@OptIn(ExperimentalCoroutinesApi::class)
 @HiltViewModel(assistedFactory = CreatePlaylistViewModel.Factory::class)
 class CreatePlaylistViewModel @AssistedInject constructor(
+    private val playlistManager: PlaylistManager,
     private val podcastManager: PodcastManager,
+    private val settings: Settings,
     @Assisted initialPlaylistTitle: String,
 ) : ViewModel() {
     val playlistNameState = TextFieldState(
@@ -34,19 +46,26 @@ class CreatePlaylistViewModel @AssistedInject constructor(
     )
 
     private val appliedRules = MutableStateFlow(AppliedRules.Empty)
+
     private val rulesBuilder = MutableStateFlow(RulesBuilder.Empty)
+
+    private val smartEpisodes = appliedRules.flatMapLatest { appliedRules ->
+        val smartRules = appliedRules.toSmartRules()
+        if (smartRules != null) {
+            playlistManager.observeSmartEpisodes(smartRules)
+        } else {
+            flowOf(emptyList())
+        }
+    }
 
     val uiState = combine(
         appliedRules,
         rulesBuilder,
         podcastManager.findSubscribedFlow(),
-    ) { appliedRules, rulesBuilder, followedPodcasts ->
-        UiState(
-            appliedRules,
-            rulesBuilder,
-            followedPodcasts,
-        )
-    }.stateIn(viewModelScope, SharingStarted.Eagerly, initialValue = UiState.Empty)
+        smartEpisodes,
+        settings.artworkConfiguration.flow.map { it.useEpisodeArtwork(Element.Filters) },
+        ::UiState,
+    ).stateIn(viewModelScope, SharingStarted.Eagerly, initialValue = UiState.Empty)
 
     fun applyRule(type: RuleType) {
         val rule = when (type) {
@@ -87,12 +106,16 @@ class CreatePlaylistViewModel @AssistedInject constructor(
         val appliedRules: AppliedRules,
         val rulesBuilder: RulesBuilder,
         val followedPodcasts: List<Podcast>,
+        val smartEpisodes: List<PodcastEpisode>,
+        val useEpisodeArtwork: Boolean,
     ) {
         companion object {
             val Empty = UiState(
                 appliedRules = AppliedRules.Empty,
                 rulesBuilder = RulesBuilder.Empty,
                 followedPodcasts = emptyList(),
+                smartEpisodes = emptyList(),
+                useEpisodeArtwork = false,
             )
         }
     }
@@ -114,6 +137,20 @@ class CreatePlaylistViewModel @AssistedInject constructor(
             podcasts != null ||
             episodeDuration != null
 
+        fun toSmartRules() = if (isAnyRuleApplied) {
+            SmartRules(
+                episodeStatus = episodeStatus ?: SmartRules.Default.episodeStatus,
+                downloadStatus = downloadStatus ?: SmartRules.Default.downloadStatus,
+                mediaType = mediaType ?: SmartRules.Default.mediaType,
+                releaseDate = releaseDate ?: SmartRules.Default.releaseDate,
+                starred = starred ?: SmartRules.Default.starred,
+                podcasts = podcasts ?: SmartRules.Default.podcasts,
+                episodeDuration = episodeDuration ?: SmartRules.Default.episodeDuration,
+            )
+        } else {
+            null
+        }
+
         companion object {
             val Empty = AppliedRules(
                 episodeStatus = null,
@@ -131,11 +168,12 @@ class CreatePlaylistViewModel @AssistedInject constructor(
         val useAllPodcasts: Boolean,
         val selectedPodcasts: Set<String>,
     ) {
-        val podcastsRule get() = if (useAllPodcasts) {
-            PodcastsRule.Any
-        } else {
-            PodcastsRule.Selected(selectedPodcasts.toList())
-        }
+        val podcastsRule
+            get() = if (useAllPodcasts) {
+                PodcastsRule.Any
+            } else {
+                PodcastsRule.Selected(selectedPodcasts.toList())
+            }
 
         companion object {
             val Empty = RulesBuilder(

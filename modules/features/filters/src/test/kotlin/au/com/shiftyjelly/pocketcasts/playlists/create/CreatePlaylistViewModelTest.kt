@@ -2,10 +2,12 @@ package au.com.shiftyjelly.pocketcasts.playlists.create
 
 import androidx.compose.ui.text.TextRange
 import app.cash.turbine.test
-import au.com.shiftyjelly.pocketcasts.models.type.SmartRules
 import au.com.shiftyjelly.pocketcasts.models.type.SmartRules.PodcastsRule
 import au.com.shiftyjelly.pocketcasts.playlists.create.CreatePlaylistViewModel.UiState
+import au.com.shiftyjelly.pocketcasts.preferences.UserSetting
+import au.com.shiftyjelly.pocketcasts.preferences.model.ArtworkConfiguration
 import au.com.shiftyjelly.pocketcasts.sharedtest.MainCoroutineRule
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
@@ -14,6 +16,7 @@ import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Rule
 import org.junit.Test
+import org.mockito.kotlin.any
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
 
@@ -25,6 +28,17 @@ class CreatePlaylistViewModelTest {
         initialPlaylistTitle = "Playlist name",
         podcastManager = mock {
             on { findSubscribedFlow() } doReturn flowOf(emptyList())
+        },
+        playlistManager = mock {
+            on { observeSmartEpisodes(any()) } doReturn flowOf(emptyList())
+        },
+        settings = run {
+            val settingMock = mock<UserSetting<ArtworkConfiguration>> {
+                on { flow } doReturn MutableStateFlow(ArtworkConfiguration(false))
+            }
+            mock {
+                on { artworkConfiguration } doReturn settingMock
+            }
         },
     )
 

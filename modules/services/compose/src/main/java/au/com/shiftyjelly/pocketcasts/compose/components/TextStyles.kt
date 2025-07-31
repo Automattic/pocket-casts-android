@@ -505,6 +505,30 @@ fun TextC70(
 }
 
 @Composable
+fun TextC70(
+    text: AnnotatedString,
+    modifier: Modifier = Modifier,
+    maxLines: Int = Int.MAX_VALUE,
+    disableAutoScale: Boolean = false,
+    fontScale: Float = 1f,
+    fontSize: TextUnit = 12.sp,
+    fontWeight: FontWeight = FontWeight.W500,
+) {
+    Text(
+        text = text,
+        color = MaterialTheme.theme.colors.primaryText02,
+        fontFamily = FontFamily.SansSerif,
+        fontSize = fontSize.scaled(disableAutoScale, fontScale),
+        lineHeight = 14.sp.scaled(disableAutoScale, fontScale),
+        letterSpacing = 0.6.sp.scaled(disableAutoScale, fontScale),
+        fontWeight = fontWeight,
+        maxLines = maxLines,
+        overflow = TextOverflow.Ellipsis,
+        modifier = modifier,
+    )
+}
+
+@Composable
 private fun TextUnit.scaled(disabled: Boolean, fontScale: Float) = (if (disabled) value.nonScaledSp else this) * fontScale
 
 @ShowkaseComposable(name = "Text", group = "Text", styleName = "Light", defaultStyle = true)
