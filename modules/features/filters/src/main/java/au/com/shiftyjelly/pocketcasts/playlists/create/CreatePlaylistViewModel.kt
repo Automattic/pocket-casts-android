@@ -22,6 +22,9 @@ import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlin.time.Duration
+import kotlin.time.Duration.Companion.ZERO
+import kotlin.time.Duration.Companion.minutes
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -75,19 +78,28 @@ class CreatePlaylistViewModel @AssistedInject constructor(
                     rules.copy(podcasts = rule)
                 }
             }
+
             RuleType.EpisodeStatus -> {
                 val rule = rulesBuilder.value.episodeStatusRule
                 appliedRules.update { rules ->
                     rules.copy(episodeStatus = rule)
                 }
             }
+
             RuleType.ReleaseDate -> {
                 val rule = rulesBuilder.value.releaseDateRule
                 appliedRules.update { rules ->
                     rules.copy(releaseDate = rule)
                 }
             }
-            RuleType.EpisodeDuration -> TODO()
+
+            RuleType.EpisodeDuration -> {
+                val rule = rulesBuilder.value.episodeDurationRule
+                appliedRules.update { rules ->
+                    rules.copy(episodeDuration = rule)
+                }
+            }
+
             RuleType.DownloadStatus -> TODO()
             RuleType.MediaType -> TODO()
             RuleType.Starred -> TODO()
@@ -138,6 +150,40 @@ class CreatePlaylistViewModel @AssistedInject constructor(
     fun useReleaseDate(rule: ReleaseDateRule) {
         rulesBuilder.update { builder ->
             builder.copy(releaseDateRule = rule)
+        }
+    }
+
+    fun constrainDuration(constrain: Boolean) {
+        rulesBuilder.update { builder ->
+            builder.copy(isEpisodeDurationConstrained = constrain)
+        }
+    }
+
+    fun decrementMinDuration() {
+        rulesBuilder.update { builder ->
+            val duration = builder.minEpisodeDuration - 5.minutes
+            builder.withMinDuration(duration)
+        }
+    }
+
+    fun incrementMinDuration() {
+        rulesBuilder.update { builder ->
+            val duration = builder.minEpisodeDuration + 5.minutes
+            builder.withMinDuration(duration)
+        }
+    }
+
+    fun decrementMaxDuration() {
+        rulesBuilder.update { builder ->
+            val duration = builder.maxEpisodeDuration - 5.minutes
+            builder.withMaxDuration(duration)
+        }
+    }
+
+    fun incrementMaxDuration() {
+        rulesBuilder.update { builder ->
+            val duration = builder.maxEpisodeDuration + 5.minutes
+            builder.withMaxDuration(duration)
         }
     }
 
@@ -208,6 +254,9 @@ class CreatePlaylistViewModel @AssistedInject constructor(
         val selectedPodcasts: Set<String>,
         val episodeStatusRule: EpisodeStatusRule,
         val releaseDateRule: ReleaseDateRule,
+        val isEpisodeDurationConstrained: Boolean,
+        val minEpisodeDuration: Duration,
+        val maxEpisodeDuration: Duration,
     ) {
         val podcastsRule
             get() = if (useAllPodcasts) {
@@ -216,12 +265,34 @@ class CreatePlaylistViewModel @AssistedInject constructor(
                 PodcastsRule.Selected(selectedPodcasts.toList())
             }
 
+        fun withMinDuration(duration: Duration) = if (duration < ZERO || duration >= maxEpisodeDuration) {
+            this
+        } else {
+            copy(minEpisodeDuration = duration)
+        }
+
+        fun withMaxDuration(duration: Duration) = if (duration < minEpisodeDuration) {
+            this
+        } else {
+            copy(maxEpisodeDuration = duration)
+        }
+
+        val episodeDurationRule
+            get() = if (isEpisodeDurationConstrained) {
+                EpisodeDurationRule.Constrained(minEpisodeDuration, maxEpisodeDuration)
+            } else {
+                EpisodeDurationRule.Any
+            }
+
         companion object {
             val Empty = RulesBuilder(
                 useAllPodcasts = true,
                 selectedPodcasts = emptySet(),
                 episodeStatusRule = SmartRules.Default.episodeStatus,
                 releaseDateRule = SmartRules.Default.releaseDate,
+                isEpisodeDurationConstrained = false,
+                minEpisodeDuration = 20.minutes,
+                maxEpisodeDuration = 40.minutes,
             )
         }
     }
