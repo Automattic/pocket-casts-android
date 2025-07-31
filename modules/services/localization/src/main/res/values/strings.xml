@@ -50,6 +50,7 @@
     <string name="go_to_podcast">Go to podcast</string>
     <string name="go_to_files">Go to files</string>
     <string name="in_progress">In progress</string>
+    <string name="in_progress_uppercase">In Progress</string>
     <string name="log_in">Log in</string>
     <string name="log_in_subtitle">Start listening to your favorite podcasts</string>
     <string name="log_out">Log out</string>
@@ -931,6 +932,8 @@
     <string name="preview_playlist">Preview %1$s</string>
     <string name="smart_playlist_create_no_content_title">No matching episodes</string>
     <string name="smart_playlist_create_no_content_body">None of the episodes in your podcasts match these rules.\n\nTry adjusting the rules, or save this playlist for future episodes that might fit.</string>
+    <!-- %1$s is status like 'In Progress' and %2$d is count of other episode statuses -->
+    <string name="episode_status_rule_description">%1$s + %2$d</string>
 
     <!-- Profile -->
 

@@ -2,6 +2,8 @@ package au.com.shiftyjelly.pocketcasts.playlists.create
 
 import androidx.compose.ui.text.TextRange
 import app.cash.turbine.test
+import au.com.shiftyjelly.pocketcasts.models.type.SmartRules
+import au.com.shiftyjelly.pocketcasts.models.type.SmartRules.EpisodeStatusRule
 import au.com.shiftyjelly.pocketcasts.models.type.SmartRules.PodcastsRule
 import au.com.shiftyjelly.pocketcasts.playlists.create.CreatePlaylistViewModel.UiState
 import au.com.shiftyjelly.pocketcasts.preferences.UserSetting
@@ -84,6 +86,69 @@ class CreatePlaylistViewModelTest {
             viewModel.applyRule(RuleType.Podcasts)
             state = awaitItem()
             assertEquals(PodcastsRule.Selected(listOf("id-1", "id-2")), state.appliedRules.podcasts)
+        }
+    }
+
+    @Test
+    fun `manage episode status rule`() = runTest {
+        viewModel.uiState.test {
+            var state = awaitItem()
+            assertEquals(UiState.Empty, state)
+
+            viewModel.useUnplayedEpisodes(false)
+            state = awaitItem()
+            assertFalse(state.rulesBuilder.episodeStatusRule.unplayed)
+            assertNull(state.appliedRules.episodeStatus)
+
+            viewModel.useInProgressEpisodes(false)
+            state = awaitItem()
+            assertFalse(state.rulesBuilder.episodeStatusRule.inProgress)
+            assertNull(state.appliedRules.episodeStatus)
+
+            viewModel.useCompletedEpisodes(false)
+            state = awaitItem()
+            assertFalse(state.rulesBuilder.episodeStatusRule.completed)
+            assertNull(state.appliedRules.episodeStatus)
+
+            viewModel.applyRule(RuleType.EpisodeStatus)
+            state = awaitItem()
+            assertEquals(
+                EpisodeStatusRule(unplayed = false, inProgress = false, completed = false),
+                state.appliedRules.episodeStatus,
+            )
+
+            viewModel.useUnplayedEpisodes(true)
+            state = awaitItem()
+            assertTrue(state.rulesBuilder.episodeStatusRule.unplayed)
+
+            viewModel.applyRule(RuleType.EpisodeStatus)
+            state = awaitItem()
+            assertEquals(
+                EpisodeStatusRule(unplayed = true, inProgress = false, completed = false),
+                state.appliedRules.episodeStatus,
+            )
+
+            viewModel.useInProgressEpisodes(true)
+            state = awaitItem()
+            assertTrue(state.rulesBuilder.episodeStatusRule.inProgress)
+
+            viewModel.applyRule(RuleType.EpisodeStatus)
+            state = awaitItem()
+            assertEquals(
+                EpisodeStatusRule(unplayed = true, inProgress = true, completed = false),
+                state.appliedRules.episodeStatus,
+            )
+
+            viewModel.useCompletedEpisodes(true)
+            state = awaitItem()
+            assertTrue(state.rulesBuilder.episodeStatusRule.completed)
+
+            viewModel.applyRule(RuleType.EpisodeStatus)
+            state = awaitItem()
+            assertEquals(
+                EpisodeStatusRule(unplayed = true, inProgress = true, completed = true),
+                state.appliedRules.episodeStatus,
+            )
         }
     }
 }
