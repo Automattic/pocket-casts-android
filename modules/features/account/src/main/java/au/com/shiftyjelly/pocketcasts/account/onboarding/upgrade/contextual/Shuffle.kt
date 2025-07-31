@@ -41,6 +41,9 @@ import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.semantics.role
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.intl.Locale
 import androidx.compose.ui.text.toUpperCase
@@ -80,7 +83,7 @@ fun ShuffleAnimation(
         }
     }
 
-    Box(modifier = modifier) {
+    Box(modifier = modifier.semantics { role = Role.Image }) {
         predefinedShuffle.chunked(3).forEachIndexed { index, dataSet ->
             ShuffleContainer(
                 items = dataSet,
@@ -370,49 +373,51 @@ private fun List<Any>.isMiddleIndex(index: Int): Boolean {
 private fun Modifier.simulateShadow(
     cornerRadius: Dp,
     elevation: Dp,
-): Modifier = this.then(Modifier.drawBehind {
-    val radius = cornerRadius.toPx()
+): Modifier = this.then(
+    Modifier.drawBehind {
+        val radius = cornerRadius.toPx()
 
-    drawIntoCanvas { canvas ->
-        val paint = Paint().asFrameworkPaint().apply {
-            color = android.graphics.Color.BLACK
-            setShadowLayer(elevation.toPx(), 0f, 4f, android.graphics.Color.BLACK)
-            this.alpha = (0.2f * 255).toInt()
-            isAntiAlias = true
+        drawIntoCanvas { canvas ->
+            val paint = Paint().asFrameworkPaint().apply {
+                color = android.graphics.Color.BLACK
+                setShadowLayer(elevation.toPx(), 0f, 4f, android.graphics.Color.BLACK)
+                this.alpha = (0.2f * 255).toInt()
+                isAntiAlias = true
+            }
+
+            // Bottom shadow
+            canvas.nativeCanvas.drawLine(
+                0f,
+                size.height,
+                size.width,
+                size.height,
+                paint,
+            )
+
+            canvas.nativeCanvas.drawArc(
+                RectF(
+                    size.width - 2 * radius,
+                    size.height - 2 * radius,
+                    2 * radius,
+                    2 * radius,
+                ),
+                0f,
+                90f,
+                true,
+                paint,
+            )
+
+            // Right shadow
+            canvas.nativeCanvas.drawLine(
+                size.width,
+                0f,
+                size.width,
+                size.height,
+                paint,
+            )
         }
-
-        // Bottom shadow
-        canvas.nativeCanvas.drawLine(
-            0f,
-            size.height,
-            size.width,
-            size.height,
-            paint,
-        )
-
-        canvas.nativeCanvas.drawArc(
-            RectF(
-                size.width - 2 * radius,
-                size.height - 2 * radius,
-                2 * radius,
-                2 * radius,
-            ),
-            0f,
-            90f,
-            true,
-            paint,
-        )
-
-        // Right shadow
-        canvas.nativeCanvas.drawLine(
-            size.width,
-            0f,
-            size.width,
-            size.height,
-            paint,
-        )
-    }
-})
+    },
+)
 
 @ReadOnlyComposable
 @Composable
