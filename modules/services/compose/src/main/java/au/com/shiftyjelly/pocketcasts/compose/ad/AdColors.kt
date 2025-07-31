@@ -63,7 +63,7 @@ fun rememberAdColors(): AdColors {
             val themeColors = theme.colors
             AdColors(
                 AdColors.Banner(
-                    background = themeColors.primaryUi06,
+                    background = themeColors.primaryUi01,
                     ctaLabel = themeColors.primaryText01,
                     titleLabel = themeColors.primaryInteractive01,
                     adLabelBackground = themeColors.primaryInteractive01,
