@@ -22,10 +22,13 @@ import au.com.shiftyjelly.pocketcasts.compose.extensions.contentWithoutConsumedI
 import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingFlow
 import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingLauncher
 import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingUpgradeSource
+import au.com.shiftyjelly.pocketcasts.ui.helper.FragmentHostListener
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseDialogFragment
+import com.google.android.material.snackbar.Snackbar
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.parcelize.Parcelize
 import timber.log.Timber
+import au.com.shiftyjelly.pocketcasts.localization.R as LR
 import com.google.android.material.R as MR
 
 @AndroidEntryPoint
@@ -60,7 +63,12 @@ class AdReportFragment : BaseDialogFragment() {
                         OnboardingLauncher.openOnboardingFlow(requireActivity(), OnboardingFlow.Upsell(OnboardingUpgradeSource.BANNER_AD))
                         dismiss()
                     },
-                    onReportAd = { reason -> Timber.i("Report ad: $reason, ${args.ad.id}") },
+                    onReportAd = { reason ->
+                        Timber.i("Report ad: $reason, ${args.ad.id}")
+                        val snackbarView = (requireActivity() as FragmentHostListener).snackBarView()
+                        Snackbar.make(snackbarView, getString(LR.string.ad_report_confirmation), Snackbar.LENGTH_LONG).show()
+                        dismiss()
+                    },
                 )
 
                 val surfaceColor = sheetColors.surface

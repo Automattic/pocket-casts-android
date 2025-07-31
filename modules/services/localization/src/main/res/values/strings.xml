@@ -224,6 +224,7 @@
     <string name="ad_report_reason_too_often">See this ad too often</string>
     <string name="ad_report_reason_other">Other</string>
     <string name="banner_ad_plus_prompt">Say goodbye to banner ads and more with Pocket Casts Plus</string>
+    <string name="ad_report_confirmation">You reported this ad.</string>
 
     <string name="multiselect_actions_shown">Shortcut in toolbar</string>
     <string name="multiselect_actions_hidden">In overflow</string>
