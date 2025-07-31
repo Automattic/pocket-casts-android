@@ -153,9 +153,9 @@ class CreatePlaylistViewModel @AssistedInject constructor(
         }
     }
 
-    fun constrainDuration(constrain: Boolean) {
+    fun constrainDuration(isConstrained: Boolean) {
         rulesBuilder.update { builder ->
-            builder.copy(isEpisodeDurationConstrained = constrain)
+            builder.copy(isEpisodeDurationConstrained = isConstrained)
         }
     }
 
