@@ -46,6 +46,7 @@ import au.com.shiftyjelly.pocketcasts.account.onboarding.upgrade.OnboardingUpgra
 import au.com.shiftyjelly.pocketcasts.account.onboarding.upgrade.OnboardingUpgradeHelper.UpgradeRowButton
 import au.com.shiftyjelly.pocketcasts.account.onboarding.upgrade.contextual.BookmarksAnimation
 import au.com.shiftyjelly.pocketcasts.account.onboarding.upgrade.contextual.FoldersAnimation
+import au.com.shiftyjelly.pocketcasts.account.onboarding.upgrade.contextual.PreselectChaptersAnimation
 import au.com.shiftyjelly.pocketcasts.account.onboarding.upgrade.contextual.ShuffleAnimation
 import au.com.shiftyjelly.pocketcasts.account.viewmodel.OnboardingUpgradeFeaturesState
 import au.com.shiftyjelly.pocketcasts.compose.AppThemeWithBackground
@@ -294,6 +295,15 @@ private fun OnboardingUpgradeFeaturesState.NewOnboardingVariant.toContentPages(
                 ),
             )
         }
+        OnboardingUpgradeSource.SKIP_CHAPTERS -> {
+            add(UpgradePagerContent.PreselectChapters)
+            add(
+                UpgradePagerContent.Features(
+                    features = currentPlan.featureItems,
+                    showCta = false,
+                ),
+            )
+        }
 
         else -> {
             when (this@toContentPages) {
@@ -349,6 +359,9 @@ private sealed interface UpgradePagerContent {
     data object Shuffle : UpgradePagerContent {
         override val showCta get() = true
     }
+    data object PreselectChapters : UpgradePagerContent {
+        override val showCta get() = true
+    }
 }
 
 @Composable
@@ -388,6 +401,7 @@ private fun UpgradeContent(
                 is UpgradePagerContent.Folders -> FoldersUpgradeContent(onCtaClick = scrollToNext)
                 is UpgradePagerContent.Bookmarks -> BookmarksUpgradeContent(onCtaClick = scrollToNext)
                 is UpgradePagerContent.Shuffle -> ShuffleUpgradeContent(onCtaClick = scrollToNext)
+                is UpgradePagerContent.PreselectChapters -> PreselectChaptersUpgradeContent(onCtaClick = scrollToNext)
             }
         }
     }
@@ -502,6 +516,24 @@ private fun ShuffleUpgradeContent(
         ShuffleAnimation(
             modifier = Modifier.padding(horizontal = 32.dp),
         )
+    }
+}
+
+@Composable
+private fun PreselectChaptersUpgradeContent(
+    onCtaClick: () -> Unit,
+) {
+    Column {
+        TextP40(
+            text = stringResource(LR.string.onboarding_upgrade_schedule_see_features),
+            modifier = Modifier
+                .padding(horizontal = 24.dp)
+                .padding(bottom = 24.dp)
+                .clickable { onCtaClick() },
+            color = MaterialTheme.theme.colors.primaryInteractive01,
+        )
+
+        PreselectChaptersAnimation()
     }
 }
 
