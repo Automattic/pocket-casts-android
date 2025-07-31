@@ -533,7 +533,11 @@ private fun PreselectChaptersUpgradeContent(
             color = MaterialTheme.theme.colors.primaryInteractive01,
         )
 
-        PreselectChaptersAnimation()
+        PreselectChaptersAnimation(
+            modifier = Modifier.fillMaxWidth()
+                .padding(horizontal = 32.dp)
+                .padding(bottom = 64.dp)
+        )
     }
 }
 

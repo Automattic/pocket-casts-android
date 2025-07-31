@@ -2523,5 +2523,6 @@
     </plurals>
     <string name="onboarding_shuffle_item_duration_hours">%1$dh %2$dm</string>
     <string name="onboarding_preselect_chapters_title">Preselect Chapters: cut to the good stuff</string>
+    <string name="onboarding_preselect_chapters_chapter_title">Chapter %1$d</string>
 
 </resources>
