@@ -160,31 +160,19 @@ class CreatePlaylistViewModel @AssistedInject constructor(
     }
 
     fun decrementMinDuration() {
-        rulesBuilder.update { builder ->
-            val duration = builder.minEpisodeDuration - 5.minutes
-            builder.withMinDuration(duration)
-        }
+        rulesBuilder.update { builder -> builder.decrementMinDuration() }
     }
 
     fun incrementMinDuration() {
-        rulesBuilder.update { builder ->
-            val duration = builder.minEpisodeDuration + 5.minutes
-            builder.withMinDuration(duration)
-        }
+        rulesBuilder.update { builder -> builder.incrementMinDuration() }
     }
 
     fun decrementMaxDuration() {
-        rulesBuilder.update { builder ->
-            val duration = builder.maxEpisodeDuration - 5.minutes
-            builder.withMaxDuration(duration)
-        }
+        rulesBuilder.update { builder -> builder.decrementMaxDuration() }
     }
 
     fun incrementMaxDuration() {
-        rulesBuilder.update { builder ->
-            val duration = builder.maxEpisodeDuration + 5.minutes
-            builder.withMaxDuration(duration)
-        }
+        rulesBuilder.update { builder -> builder.incrementMaxDuration() }
     }
 
     data class UiState(
@@ -265,16 +253,44 @@ class CreatePlaylistViewModel @AssistedInject constructor(
                 PodcastsRule.Selected(selectedPodcasts.toList())
             }
 
-        fun withMinDuration(duration: Duration) = if (duration < ZERO || duration >= maxEpisodeDuration) {
-            this
-        } else {
-            copy(minEpisodeDuration = duration)
+        fun decrementMinDuration(): RulesBuilder {
+            val minDuration = minEpisodeDuration
+            val newDuration = minDuration - if (minDuration > 5.minutes) 5.minutes else 1.minutes
+            return if (newDuration >= ZERO && newDuration < maxEpisodeDuration) {
+                copy(minEpisodeDuration = newDuration)
+            } else {
+                this
+            }
         }
 
-        fun withMaxDuration(duration: Duration) = if (duration <= minEpisodeDuration) {
-            this
-        } else {
-            copy(maxEpisodeDuration = duration)
+        fun incrementMinDuration(): RulesBuilder {
+            val minDuration = minEpisodeDuration
+            val newDuration = minDuration + if (minDuration >= 5.minutes) 5.minutes else 1.minutes
+            return if (newDuration >= ZERO && newDuration < maxEpisodeDuration) {
+                copy(minEpisodeDuration = newDuration)
+            } else {
+                this
+            }
+        }
+
+        fun decrementMaxDuration(): RulesBuilder {
+            val maxDuration = maxEpisodeDuration
+            val newDuration = maxDuration - if (maxDuration > 5.minutes) 5.minutes else 1.minutes
+            return if (newDuration > ZERO && newDuration > minEpisodeDuration) {
+                copy(maxEpisodeDuration = newDuration)
+            } else {
+                this
+            }
+        }
+
+        fun incrementMaxDuration(): RulesBuilder {
+            val maxDuration = maxEpisodeDuration
+            val newDuration = maxDuration + if (maxDuration >= 5.minutes) 5.minutes else 1.minutes
+            return if (newDuration > ZERO && newDuration > minEpisodeDuration) {
+                copy(maxEpisodeDuration = newDuration)
+            } else {
+                this
+            }
         }
 
         val episodeDurationRule

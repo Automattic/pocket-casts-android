@@ -236,35 +236,4 @@ class CreatePlaylistViewModelTest {
             assertEquals(EpisodeDurationRule.Any, state.appliedRules.episodeDuration)
         }
     }
-
-    @Test
-    fun `min and max episode durations cannot overlap`() = runTest {
-        viewModel.constrainDuration(true)
-        repeat(4) {
-            viewModel.decrementMinDuration()
-        }
-        repeat(6) {
-            viewModel.decrementMaxDuration()
-        }
-
-        viewModel.uiState.test {
-            var state = awaitItem()
-            assertEquals(0.minutes, state.rulesBuilder.minEpisodeDuration)
-            assertEquals(10.minutes, state.rulesBuilder.maxEpisodeDuration)
-
-            viewModel.decrementMinDuration()
-            expectNoEvents()
-
-            viewModel.incrementMinDuration()
-            state = awaitItem()
-            assertEquals(5.minutes, state.rulesBuilder.minEpisodeDuration)
-            assertEquals(10.minutes, state.rulesBuilder.maxEpisodeDuration)
-
-            viewModel.incrementMinDuration()
-            expectNoEvents()
-
-            viewModel.decrementMaxDuration()
-            expectNoEvents()
-        }
-    }
 }

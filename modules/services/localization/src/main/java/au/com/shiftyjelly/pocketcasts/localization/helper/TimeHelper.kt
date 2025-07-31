@@ -32,7 +32,7 @@ object TimeHelper {
             output = context.getString(R.string.time_short_hours_minutes, hours, mins) // "${hours}h ${mins}m"
         } else if (mins > 0) {
             output = context.getString(R.string.time_short_minutes, mins) // "${mins}m"
-        } else if (secs > 0 && mins == 0L) {
+        } else if (secs >= 0 && mins == 0L) {
             output = context.getString(R.string.time_short_seconds, secs) // "${secs}s"
         }
         return output.ifEmpty { emptyString }
