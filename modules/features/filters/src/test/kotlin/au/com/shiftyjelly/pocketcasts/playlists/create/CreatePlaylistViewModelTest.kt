@@ -5,6 +5,7 @@ import app.cash.turbine.test
 import au.com.shiftyjelly.pocketcasts.models.type.SmartRules
 import au.com.shiftyjelly.pocketcasts.models.type.SmartRules.EpisodeStatusRule
 import au.com.shiftyjelly.pocketcasts.models.type.SmartRules.PodcastsRule
+import au.com.shiftyjelly.pocketcasts.models.type.SmartRules.ReleaseDateRule
 import au.com.shiftyjelly.pocketcasts.playlists.create.CreatePlaylistViewModel.UiState
 import au.com.shiftyjelly.pocketcasts.preferences.UserSetting
 import au.com.shiftyjelly.pocketcasts.preferences.model.ArtworkConfiguration
@@ -149,6 +150,28 @@ class CreatePlaylistViewModelTest {
                 EpisodeStatusRule(unplayed = true, inProgress = true, completed = true),
                 state.appliedRules.episodeStatus,
             )
+        }
+    }
+
+    @Test
+    fun `manage release date rule`() = runTest {
+        viewModel.uiState.test {
+            var state = awaitItem()
+            assertEquals(UiState.Empty, state)
+
+            viewModel.useReleaseDate(ReleaseDateRule.LastMonth)
+            state = awaitItem()
+            assertEquals(ReleaseDateRule.LastMonth, state.rulesBuilder.releaseDateRule)
+            assertNull(state.appliedRules.releaseDate)
+
+            viewModel.useReleaseDate(ReleaseDateRule.Last2Weeks)
+            state = awaitItem()
+            assertEquals(ReleaseDateRule.Last2Weeks, state.rulesBuilder.releaseDateRule)
+            assertNull(state.appliedRules.releaseDate)
+
+            viewModel.applyRule(RuleType.ReleaseDate)
+            state = awaitItem()
+            assertEquals(ReleaseDateRule.Last2Weeks, state.appliedRules.releaseDate)
         }
     }
 }

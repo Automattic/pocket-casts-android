@@ -130,6 +130,17 @@ class CreatePlaylistFragment : BaseDialogFragment() {
                         onClickBack = ::goBackToPlaylistPreview,
                     )
                 }
+                composable(NavigationRoutes.SMART_RULE_RELEASE_DATE) {
+                    ReleaseDateRulePage(
+                        selectedRule = uiState.rulesBuilder.releaseDateRule,
+                        onSelectReleaseDate = viewModel::useReleaseDate,
+                        onSaveRule = {
+                            viewModel.applyRule(RuleType.ReleaseDate)
+                            goBackToPlaylistPreview()
+                        },
+                        onClickBack = ::goBackToPlaylistPreview,
+                    )
+                }
             }
         }
     }
@@ -163,12 +174,13 @@ private object NavigationRoutes {
     const val SMART_PLAYLIST_PREVIEW = "smart_playlist_preview"
     const val SMART_RULE_PODCASTS = "smart_rule_podcasts"
     const val SMART_RULE_EPISODE_STATUS = "smart_rule_episode_status"
+    const val SMART_RULE_RELEASE_DATE = "smart_rule_release_date"
 }
 
 private fun RuleType.toNavigationRoute() = when (this) {
     RuleType.Podcasts -> NavigationRoutes.SMART_RULE_PODCASTS
     RuleType.EpisodeStatus -> NavigationRoutes.SMART_RULE_EPISODE_STATUS
-    RuleType.ReleaseDate -> NavigationRoutes.SMART_PLAYLIST_PREVIEW
+    RuleType.ReleaseDate -> NavigationRoutes.SMART_RULE_RELEASE_DATE
     RuleType.EpisodeDuration -> NavigationRoutes.SMART_PLAYLIST_PREVIEW
     RuleType.DownloadStatus -> NavigationRoutes.SMART_PLAYLIST_PREVIEW
     RuleType.MediaType -> NavigationRoutes.SMART_PLAYLIST_PREVIEW
