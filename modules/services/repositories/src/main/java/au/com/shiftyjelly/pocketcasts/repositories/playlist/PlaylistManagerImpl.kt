@@ -2,6 +2,7 @@ package au.com.shiftyjelly.pocketcasts.repositories.playlist
 
 import androidx.room.withTransaction
 import au.com.shiftyjelly.pocketcasts.models.db.AppDatabase
+import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.SmartPlaylist
 import au.com.shiftyjelly.pocketcasts.models.entity.SmartPlaylist.Companion.ANYTIME
 import au.com.shiftyjelly.pocketcasts.models.entity.SmartPlaylist.Companion.AUDIO_VIDEO_FILTER_ALL
@@ -14,6 +15,7 @@ import au.com.shiftyjelly.pocketcasts.models.entity.SmartPlaylist.Companion.LAST
 import au.com.shiftyjelly.pocketcasts.models.entity.SmartPlaylist.Companion.LAST_WEEK
 import au.com.shiftyjelly.pocketcasts.models.entity.SmartPlaylist.Companion.SYNC_STATUS_NOT_SYNCED
 import au.com.shiftyjelly.pocketcasts.models.entity.SmartPlaylist.Companion.SYNC_STATUS_SYNCED
+import au.com.shiftyjelly.pocketcasts.models.type.PlaylistEpisodeSortType
 import au.com.shiftyjelly.pocketcasts.models.type.SmartRules
 import au.com.shiftyjelly.pocketcasts.models.type.SmartRules.DownloadStatusRule
 import au.com.shiftyjelly.pocketcasts.models.type.SmartRules.EpisodeDurationRule
@@ -59,6 +61,15 @@ class PlaylistManagerImpl @Inject constructor(
             // before the updated episodes are received. This is rather imperceptible to the user,
             // but adding a short debounce helps avoid these inconsistencies and prevents redundant downstream emissions.
             .debounce(50.milliseconds)
+    }
+
+    override fun observeSmartEpisodes(rules: SmartRules): Flow<List<PodcastEpisode>> {
+        return playlistDao.observeSmartPlaylistEpisodes(
+            clock = clock,
+            smartRules = rules,
+            sortType = PlaylistEpisodeSortType.NewestToOldest,
+            limit = SMART_PLAYLIST_EPISODE_LIMIT,
+        ).distinctUntilChanged()
     }
 
     override suspend fun deletePlaylist(uuid: String) {
@@ -237,5 +248,6 @@ class PlaylistManagerImpl @Inject constructor(
 
     private companion object {
         const val PLAYLIST_ARTWORK_EPISODE_LIMIT = 4
+        const val SMART_PLAYLIST_EPISODE_LIMIT = 500
     }
 }

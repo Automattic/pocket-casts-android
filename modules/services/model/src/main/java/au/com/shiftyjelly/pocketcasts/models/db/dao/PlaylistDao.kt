@@ -75,6 +75,24 @@ abstract class PlaylistDao {
         return observeSmartPlaylistPodcasts(RoomRawQuery(query))
     }
 
+    @RawQuery(observedEntities = [Podcast::class, PodcastEpisode::class])
+    protected abstract fun observeSmartPlaylistEpisodes(query: RoomRawQuery): Flow<List<PodcastEpisode>>
+
+    fun observeSmartPlaylistEpisodes(
+        clock: Clock,
+        smartRules: SmartRules,
+        sortType: PlaylistEpisodeSortType,
+        limit: Int,
+    ): Flow<List<PodcastEpisode>> {
+        val query = createSmartPlaylistEpisodeQuery(
+            selectClause = "DISTINCT episode.*",
+            whereClause = smartRules.toSqlWhereClause(clock),
+            orderByClause = sortType.toOrderByClause(),
+            limit = limit,
+        )
+        return observeSmartPlaylistEpisodes(RoomRawQuery(query))
+    }
+
     private fun createSmartPlaylistEpisodeQuery(
         selectClause: String,
         whereClause: String,
