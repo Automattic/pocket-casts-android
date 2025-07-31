@@ -50,14 +50,14 @@ import au.com.shiftyjelly.pocketcasts.compose.components.TextP60
 import au.com.shiftyjelly.pocketcasts.compose.preview.ThemePreviewParameterProvider
 import au.com.shiftyjelly.pocketcasts.compose.theme
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import java.time.Instant
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
 import java.time.format.FormatStyle
 import java.time.temporal.ChronoUnit
 import kotlin.random.Random
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
 import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
@@ -154,7 +154,7 @@ private val predefinedShuffle = listOf(
 private fun ShuffleContainer(
     items: List<ShuffleConfig>,
     modifier: Modifier = Modifier,
-    middleItemScale: Float = 1.1f,
+    middleItemScale: Float = 1.05f,
     horizontalPadding: Dp = 32.dp,
     itemsOverlap: Dp = 18.dp,
     isDisplayed: Boolean = true,
@@ -182,19 +182,25 @@ private fun ShuffleContainer(
         modifier = modifier,
         content = {
             items.forEachIndexed { index, item ->
+                val middleIndex = items.isMiddleIndex(index)
                 ShuffleItem(
                     index = items.size - index,
                     isDisplayed = rowAnimations[index].value,
                     config = item,
-                    scale = if (items.isMiddleIndex(index)) {
+                    scale = if (middleIndex) {
                         middleItemScale
                     } else {
                         1f
                     },
-                    elevation = if (items.isMiddleIndex(index)) {
-                        4.dp
+                    elevation = if (middleIndex) {
+                        8.dp
                     } else {
-                        2.dp
+                        4.dp
+                    },
+                    visibleAlpha = if (middleIndex) {
+                        1f
+                    } else {
+                        0.6f
                     },
                 )
             }
@@ -226,9 +232,9 @@ private fun ShuffleContainer(
                     x = (constraints.maxWidth - item.width) / 2,
                     y = index * (regularItemHeight - itemsOverlap.roundToPx()) - offset,
                     zIndex = if (isCurrentFocused) {
-                        placeables.size
+                        1f
                     } else {
-                        index
+                        0f
                     }.toFloat(),
                 )
             }
@@ -244,10 +250,13 @@ private fun ShuffleItem(
     scale: Float = 1f,
     elevation: Dp = 2.dp,
     isDisplayed: Boolean = true,
-    floatInDistance: Dp = 32.dp,
+    floatInDistance: Dp = 24.dp,
+    visibleAlpha: Float = 1f,
 ) {
+    val floatInDistancePx = LocalDensity.current.run {
+        floatInDistance.toPx()
+    }
     var wasVisible by remember { mutableStateOf(false) }
-    val floatInDistancePx = LocalDensity.current.run { floatInDistance.toPx() }
     val transition = updateTransition(isDisplayed)
 
     LaunchedEffect(isDisplayed) {
@@ -266,7 +275,7 @@ private fun ShuffleItem(
         },
     ) { visible ->
         if (visible) {
-            1f
+            visibleAlpha
         } else {
             0f
         }
@@ -292,14 +301,15 @@ private fun ShuffleItem(
     }
 
     Card(
-        modifier = modifier.graphicsLayer {
-            scaleY = scale
-            scaleX = scale
-            alpha = alphaAnim
-            translationY = transitionAnim
-        },
+        modifier = modifier
+            .graphicsLayer {
+                scaleY = scale
+                scaleX = scale
+                translationY = transitionAnim
+                alpha = alphaAnim
+            },
         elevation = elevation,
-        backgroundColor = MaterialTheme.theme.colors.primaryUi03,
+        backgroundColor = MaterialTheme.theme.colors.primaryUi04,
         shape = RoundedCornerShape(3.dp),
     ) {
         Row(
