@@ -117,7 +117,7 @@ open class BaseDialogFragment :
         bottomSheetView()?.let { bottomSheet ->
             val behavior = BottomSheetBehavior.from(bottomSheet)
             behavior.state = BottomSheetBehavior.STATE_EXPANDED
-            behavior.peekHeight = BottomSheetBehavior.PEEK_HEIGHT_AUTO
+            behavior.peekHeight = 0
             behavior.skipCollapsed = true
         }
     }

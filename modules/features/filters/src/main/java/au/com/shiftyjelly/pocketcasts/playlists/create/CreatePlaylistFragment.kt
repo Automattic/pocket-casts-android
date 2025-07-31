@@ -2,11 +2,9 @@ package au.com.shiftyjelly.pocketcasts.playlists.create
 
 import android.os.Bundle
 import android.view.LayoutInflater
+import android.view.View
 import android.view.ViewGroup
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.navigationBarsPadding
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
@@ -21,9 +19,13 @@ import au.com.shiftyjelly.pocketcasts.compose.extensions.slideInToEnd
 import au.com.shiftyjelly.pocketcasts.compose.extensions.slideInToStart
 import au.com.shiftyjelly.pocketcasts.compose.extensions.slideOutToEnd
 import au.com.shiftyjelly.pocketcasts.compose.extensions.slideOutToStart
+import au.com.shiftyjelly.pocketcasts.utils.extensions.pxToDp
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseDialogFragment
+import com.google.android.material.bottomsheet.BottomSheetBehavior
+import com.google.android.material.bottomsheet.ViewPager2AwareBottomSheetBehavior
 import dagger.hilt.android.AndroidEntryPoint
 import dagger.hilt.android.lifecycle.withCreationCallback
+import kotlin.math.roundToInt
 import timber.log.Timber
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
@@ -81,6 +83,29 @@ class CreatePlaylistFragment : BaseDialogFragment() {
                 }
             }
         }
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        bottomSheetView()
+            ?.let { BottomSheetBehavior.from(it) as? ViewPager2AwareBottomSheetBehavior }
+            ?.let { behavior ->
+                behavior.setPreFlingInterceptor(
+                    object : ViewPager2AwareBottomSheetBehavior.PreFlingInterceptor {
+                        override fun shouldInterceptFlingGesture(velocityX: Float, velocityY: Float): Boolean {
+                            val offsetPx = (view.height * (1f - behavior.calculateSlideOffset())).roundToInt()
+                            val offsetDp = offsetPx.pxToDp(requireContext())
+                            return offsetDp < 150
+                        }
+
+                        override fun onFlingIntercepted(velocityX: Float, velocityY: Float) {
+                            view.post {
+                                behavior.state = BottomSheetBehavior.STATE_EXPANDED
+                            }
+                        }
+                    },
+                )
+            }
     }
 }
 
