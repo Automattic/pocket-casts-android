@@ -100,7 +100,13 @@ class CreatePlaylistViewModel @AssistedInject constructor(
                 }
             }
 
-            RuleType.DownloadStatus -> TODO()
+            RuleType.DownloadStatus -> {
+                val rule = rulesBuilder.value.downloadStatusRule
+                appliedRules.update { rules ->
+                    rules.copy(downloadStatus = rule)
+                }
+            }
+
             RuleType.MediaType -> TODO()
             RuleType.Starred -> TODO()
         }
@@ -175,6 +181,12 @@ class CreatePlaylistViewModel @AssistedInject constructor(
         rulesBuilder.update { builder -> builder.incrementMaxDuration() }
     }
 
+    fun useDownloadStatus(rule: DownloadStatusRule) {
+        rulesBuilder.update { builder ->
+            builder.copy(downloadStatusRule = rule)
+        }
+    }
+
     data class UiState(
         val appliedRules: AppliedRules,
         val rulesBuilder: RulesBuilder,
@@ -245,6 +257,7 @@ class CreatePlaylistViewModel @AssistedInject constructor(
         val isEpisodeDurationConstrained: Boolean,
         val minEpisodeDuration: Duration,
         val maxEpisodeDuration: Duration,
+        val downloadStatusRule: DownloadStatusRule,
     ) {
         val podcastsRule
             get() = if (useAllPodcasts) {
@@ -309,6 +322,7 @@ class CreatePlaylistViewModel @AssistedInject constructor(
                 isEpisodeDurationConstrained = false,
                 minEpisodeDuration = 20.minutes,
                 maxEpisodeDuration = 40.minutes,
+                downloadStatusRule = SmartRules.Default.downloadStatus,
             )
         }
     }
