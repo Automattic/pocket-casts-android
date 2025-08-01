@@ -23,6 +23,14 @@ import au.com.shiftyjelly.pocketcasts.compose.extensions.slideInToEnd
 import au.com.shiftyjelly.pocketcasts.compose.extensions.slideInToStart
 import au.com.shiftyjelly.pocketcasts.compose.extensions.slideOutToEnd
 import au.com.shiftyjelly.pocketcasts.compose.extensions.slideOutToStart
+import au.com.shiftyjelly.pocketcasts.playlists.rules.AppliedRulesPage
+import au.com.shiftyjelly.pocketcasts.playlists.rules.DownloadStatusRulePage
+import au.com.shiftyjelly.pocketcasts.playlists.rules.EpisodeDurationRulePage
+import au.com.shiftyjelly.pocketcasts.playlists.rules.EpisodeStatusRulePage
+import au.com.shiftyjelly.pocketcasts.playlists.rules.MediaTypeRulePage
+import au.com.shiftyjelly.pocketcasts.playlists.rules.PodcastsRulePage
+import au.com.shiftyjelly.pocketcasts.playlists.rules.ReleaseDateRulePage
+import au.com.shiftyjelly.pocketcasts.playlists.rules.RuleType
 import au.com.shiftyjelly.pocketcasts.utils.extensions.pxToDp
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseDialogFragment
 import com.google.android.material.bottomsheet.BottomSheetBehavior
@@ -90,13 +98,13 @@ class CreatePlaylistFragment : BaseDialogFragment() {
                     )
                 }
                 composable(NavigationRoutes.SMART_PLAYLIST_PREVIEW) {
-                    SmartPlaylistPreviewPage(
+                    AppliedRulesPage(
                         playlistTitle = viewModel.playlistNameState.text.toString(),
                         appliedRules = uiState.appliedRules,
                         availableEpisodes = uiState.smartEpisodes,
                         useEpisodeArtwork = uiState.useEpisodeArtwork,
                         areOtherOptionsExpanded = areOtherOptionsExpanded,
-                        onCreateSmartPlaylist = { Timber.i("On create smart playlist") },
+                        onCreatePlaylist = { Timber.i("On create smart playlist") },
                         onClickRule = { rule -> navigateOnce(rule.toNavigationRoute()) },
                         toggleOtherOptions = { areOtherOptionsExpanded = !areOtherOptionsExpanded },
                         onClickClose = ::dismiss,
@@ -120,9 +128,9 @@ class CreatePlaylistFragment : BaseDialogFragment() {
                 composable(NavigationRoutes.SMART_RULE_EPISODE_STATUS) {
                     EpisodeStatusRulePage(
                         rule = uiState.rulesBuilder.episodeStatusRule,
-                        onToggleUnplayedStatus = viewModel::useUnplayedEpisodes,
-                        onToggleInProgressStatus = viewModel::useInProgressEpisodes,
-                        onToggleCompletedStatus = viewModel::useCompletedEpisodes,
+                        onChangeUnplayedStatus = viewModel::useUnplayedEpisodes,
+                        onChangeInProgressStatus = viewModel::useInProgressEpisodes,
+                        onChangeCompletedStatus = viewModel::useCompletedEpisodes,
                         onSaveRule = {
                             viewModel.applyRule(RuleType.EpisodeStatus)
                             goBackToPlaylistPreview()
@@ -146,7 +154,7 @@ class CreatePlaylistFragment : BaseDialogFragment() {
                         isDurationConstrained = uiState.rulesBuilder.isEpisodeDurationConstrained,
                         minDuration = uiState.rulesBuilder.minEpisodeDuration,
                         maxDuration = uiState.rulesBuilder.maxEpisodeDuration,
-                        onToggleConstrainDuration = viewModel::constrainDuration,
+                        onChangeConstrainDuration = viewModel::useConstrainedDuration,
                         onDecrementMinDuration = viewModel::decrementMinDuration,
                         onIncrementMinDuration = viewModel::incrementMinDuration,
                         onDecrementMaxDuration = viewModel::decrementMaxDuration,

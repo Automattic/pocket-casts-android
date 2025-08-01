@@ -18,6 +18,9 @@ object Devices {
 }
 
 @Preview(device = Devices.PORTRAIT_REGULAR)
+annotation class PreviewRegularDevice
+
+@Preview(device = Devices.PORTRAIT_REGULAR)
 @Preview(device = Devices.LANDSCAPE_REGULAR)
 annotation class PreviewOrientation
 

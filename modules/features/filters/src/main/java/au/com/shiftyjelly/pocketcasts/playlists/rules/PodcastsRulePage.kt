@@ -1,4 +1,4 @@
-package au.com.shiftyjelly.pocketcasts.playlists.create
+package au.com.shiftyjelly.pocketcasts.playlists.rules
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.animateContentSize
@@ -38,9 +38,11 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import au.com.shiftyjelly.pocketcasts.compose.AppThemeWithBackground
 import au.com.shiftyjelly.pocketcasts.compose.Devices
+import au.com.shiftyjelly.pocketcasts.compose.PreviewRegularDevice
 import au.com.shiftyjelly.pocketcasts.compose.buttons.RowButton
 import au.com.shiftyjelly.pocketcasts.compose.components.FadedLazyColumn
 import au.com.shiftyjelly.pocketcasts.compose.components.PodcastImage
@@ -68,30 +70,16 @@ fun PodcastsRulePage(
     onClickBack: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    Column(
-        modifier = modifier
-            .fillMaxSize()
-            .verticalScroll(rememberScrollState()),
-    ) {
-        IconButton(
-            onClick = onClickBack,
-        ) {
-            Icon(
-                painter = painterResource(R.drawable.ic_arrow_back),
-                contentDescription = stringResource(LR.string.back),
-                tint = MaterialTheme.theme.colors.primaryIcon03,
-            )
-        }
+    RulePage(
+        title = stringResource(LR.string.smart_rule_podcasts_title),
+        onSaveRule = onSaveRule,
+        isSaveEnabled = useAllPodcasts || selectedPodcastUuids.isNotEmpty(),
+        onClickBack = onClickBack,
+        modifier = modifier,
+    ) { bottomPadding ->
         Column(
-            modifier = Modifier.weight(1f),
+            modifier = Modifier.padding(top = 24.dp),
         ) {
-            TextH20(
-                text = stringResource(LR.string.smart_rule_podcasts_title),
-                modifier = Modifier.padding(horizontal = 16.dp),
-            )
-            Spacer(
-                modifier = Modifier.height(24.dp),
-            )
             AllPodcastsToggle(
                 useAllPodcasts = useAllPodcasts,
                 onToggleAllPodcasts = onToggleAllPodcasts,
@@ -105,20 +93,8 @@ fun PodcastsRulePage(
                 podcasts = podcasts,
                 onSelectPodcast = onSelectPodcast,
                 onDeselectPodcast = onDeselectPodcast,
+                bottomPadding = bottomPadding,
                 modifier = Modifier.weight(1f),
-            )
-            RowButton(
-                text = stringResource(LR.string.save_smart_rule),
-                enabled = if (useAllPodcasts) {
-                    true
-                } else {
-                    selectedPodcastUuids.isNotEmpty()
-                },
-                onClick = onSaveRule,
-                includePadding = false,
-                modifier = Modifier
-                    .padding(horizontal = 16.dp)
-                    .navigationBarsPadding(),
             )
         }
     }
@@ -180,11 +156,12 @@ private fun PodcastsColumn(
     podcasts: List<Podcast>,
     onSelectPodcast: (String) -> Unit,
     onDeselectPodcast: (String) -> Unit,
+    bottomPadding: Dp,
     modifier: Modifier = Modifier,
 ) {
     val alpha by animateFloatAsState(if (useAllPodcasts) 0.4f else 1f)
     FadedLazyColumn(
-        contentPadding = PaddingValues(bottom = 24.dp),
+        contentPadding = PaddingValues(bottom = bottomPadding),
         modifier = modifier.alpha(alpha),
     ) {
         items(podcasts) { podcast ->
@@ -266,8 +243,8 @@ private fun PodcastRow(
     }
 }
 
-@Preview(device = Devices.PORTRAIT_REGULAR)
 @Composable
+@PreviewRegularDevice
 private fun PodcastsRulePreview(
     @PreviewParameter(ThemePreviewParameterProvider::class) themeType: ThemeType,
 ) {
