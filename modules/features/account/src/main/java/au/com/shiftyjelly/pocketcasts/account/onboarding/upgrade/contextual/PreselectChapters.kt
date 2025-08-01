@@ -13,6 +13,7 @@ import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Card
 import androidx.compose.material.Icon
 import androidx.compose.material.MaterialTheme
@@ -144,7 +145,12 @@ private fun ChapterRow(
             .offset { IntOffset(x = 0, y = offsetYAnim) }
             .graphicsLayer {
                 alpha = alphaAnim
+                shadowElevation = alphaAnim * 4.dp.toPx()
+                shape = RoundedCornerShape(4.dp)
+                clip = false
             },
+        shape = RoundedCornerShape(4.dp),
+        elevation = 0.dp,
         backgroundColor = MaterialTheme.theme.colors.primaryUi04,
     ) {
         Row(
