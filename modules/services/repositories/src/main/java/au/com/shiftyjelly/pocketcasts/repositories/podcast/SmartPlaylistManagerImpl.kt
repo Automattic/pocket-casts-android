@@ -8,13 +8,15 @@ import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.SmartPlaylist
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodePlayingStatus
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodeStatusEnum
+import au.com.shiftyjelly.pocketcasts.models.type.PlaylistEpisodeSortType
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.download.DownloadHelper
 import au.com.shiftyjelly.pocketcasts.repositories.download.DownloadManager
-import au.com.shiftyjelly.pocketcasts.repositories.extensions.calculateCombinedIconId
 import au.com.shiftyjelly.pocketcasts.repositories.notification.NotificationManager
 import au.com.shiftyjelly.pocketcasts.repositories.notification.OnboardingNotificationType
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
+import au.com.shiftyjelly.pocketcasts.repositories.playlist.DefaultPlaylistsInitializater
+import au.com.shiftyjelly.pocketcasts.repositories.playlist.PlaylistManager
 import au.com.shiftyjelly.pocketcasts.repositories.shortcuts.PocketCastsShortcuts
 import au.com.shiftyjelly.pocketcasts.repositories.sync.SyncManager
 import dagger.hilt.android.qualifiers.ApplicationContext
@@ -22,7 +24,6 @@ import io.reactivex.Completable
 import io.reactivex.Flowable
 import io.reactivex.Maybe
 import java.util.Calendar
-import java.util.Date
 import java.util.UUID
 import javax.inject.Inject
 import kotlin.coroutines.CoroutineContext
@@ -40,78 +41,14 @@ class SmartPlaylistManagerImpl @Inject constructor(
     private val notificationManager: NotificationManager,
     @ApplicationContext private val context: Context,
     appDatabase: AppDatabase,
+    private val playlistsInitializater: DefaultPlaylistsInitializater,
 ) : SmartPlaylistManager,
     CoroutineScope {
 
-    companion object {
-        const val NEW_RELEASE_UUID = "2797DCF8-1C93-4999-B52A-D1849736FA2C"
-        const val IN_PROGRESS_UUID = "D89A925C-5CE1-41A4-A879-2751838CE5CE"
-        private const val NEW_RELEASE_TITLE = "New Releases"
-        private const val IN_PROGRESS_TITLE = "In Progress"
-        private const val CREATED_DEFAULT_PLAYLISTS = "createdDefaultPlaylists"
-    }
-
     private val playlistDao = appDatabase.smartPlaylistDao()
-
-    init {
-        if (!settings.getBooleanForKey(CREATED_DEFAULT_PLAYLISTS, false)) {
-            launch { setupDefaultPlaylists() }
-        }
-    }
 
     override val coroutineContext: CoroutineContext
         get() = Dispatchers.Default
-
-    private fun setupDefaultPlaylists() {
-        val existingNewRelease = playlistDao.findByUuidBlocking(NEW_RELEASE_UUID)
-        if (existingNewRelease == null) {
-            val newRelease = SmartPlaylist()
-            newRelease.apply {
-                unplayed = true
-                partiallyPlayed = true
-                audioVideo = SmartPlaylist.AUDIO_VIDEO_FILTER_ALL
-                allPodcasts = true
-                sortPosition = 0
-                title = NEW_RELEASE_TITLE
-                downloaded = true
-                notDownloaded = true
-                filterHours = SmartPlaylist.LAST_2_WEEKS
-                uuid = NEW_RELEASE_UUID
-                syncStatus = SmartPlaylist.SYNC_STATUS_SYNCED
-                iconId = SmartPlaylist.calculateCombinedIconId(colorIndex = 0, iconIndex = 2) // Red clock
-            }
-            playlistDao.insertBlocking(newRelease)
-        } else {
-            existingNewRelease.iconId = 10
-            playlistDao.updateBlocking(existingNewRelease)
-        }
-
-        val existingInProgress = playlistDao.findByUuidBlocking(IN_PROGRESS_UUID)
-        if (existingInProgress == null) {
-            val inProgress = SmartPlaylist()
-            inProgress.apply {
-                allPodcasts = true
-                audioVideo = SmartPlaylist.AUDIO_VIDEO_FILTER_ALL
-                sortPosition = 2
-                title = IN_PROGRESS_TITLE
-                downloaded = true
-                notDownloaded = true
-                unplayed = false
-                partiallyPlayed = true
-                finished = false
-                filterHours = SmartPlaylist.LAST_MONTH
-                uuid = IN_PROGRESS_UUID
-                syncStatus = SmartPlaylist.SYNC_STATUS_SYNCED
-                iconId = SmartPlaylist.calculateCombinedIconId(colorIndex = 3, iconIndex = 4) // Purple play
-            }
-            playlistDao.insertBlocking(inProgress)
-        } else {
-            existingInProgress.iconId = 43
-            playlistDao.updateBlocking(existingInProgress)
-        }
-
-        settings.setBooleanForKey(CREATED_DEFAULT_PLAYLISTS, true)
-    }
 
     override fun findAllBlocking(): List<SmartPlaylist> {
         return playlistDao.findAllBlocking()
@@ -156,8 +93,7 @@ class SmartPlaylistManagerImpl @Inject constructor(
     override fun findEpisodesBlocking(smartPlaylist: SmartPlaylist, episodeManager: EpisodeManager, playbackManager: PlaybackManager): List<PodcastEpisode> {
         val where = buildPlaylistWhere(smartPlaylist, playbackManager)
         val orderBy = getPlaylistOrderByString(smartPlaylist)
-        val limit = if (smartPlaylist.sortOrder() == SmartPlaylist.SortOrder.LAST_DOWNLOAD_ATTEMPT_DATE) 1000 else 500
-        return episodeManager.findEpisodesWhereBlocking("$where ORDER BY $orderBy LIMIT $limit")
+        return episodeManager.findEpisodesWhereBlocking("$where ORDER BY $orderBy LIMIT 500")
     }
 
     private fun getPlaylistQuery(smartPlaylist: SmartPlaylist, limit: Int?, playbackManager: PlaybackManager): String {
@@ -167,8 +103,7 @@ class SmartPlaylistManagerImpl @Inject constructor(
     }
 
     override fun observeEpisodesBlocking(smartPlaylist: SmartPlaylist, episodeManager: EpisodeManager, playbackManager: PlaybackManager): Flowable<List<PodcastEpisode>> {
-        val limitCount = if (smartPlaylist.sortOrder() == SmartPlaylist.SortOrder.LAST_DOWNLOAD_ATTEMPT_DATE) 1000 else 500
-        val queryAfterWhere = getPlaylistQuery(smartPlaylist, limit = limitCount, playbackManager = playbackManager)
+        val queryAfterWhere = getPlaylistQuery(smartPlaylist, limit = 500, playbackManager = playbackManager)
         return episodeManager.findEpisodesWhereRxFlowable(queryAfterWhere)
     }
 
@@ -177,29 +112,23 @@ class SmartPlaylistManagerImpl @Inject constructor(
         return episodeManager.findEpisodesWhereRxFlowable(queryAfterWhere)
     }
 
-    private fun getPlaylistOrderByString(smartPlaylist: SmartPlaylist): String? = when (smartPlaylist.sortOrder()) {
-        SmartPlaylist.SortOrder.NEWEST_TO_OLDEST,
-        SmartPlaylist.SortOrder.OLDEST_TO_NEWEST,
+    private fun getPlaylistOrderByString(smartPlaylist: SmartPlaylist): String? = when (val sortType = smartPlaylist.sortType) {
+        PlaylistEpisodeSortType.NewestToOldest,
+        PlaylistEpisodeSortType.OldestToNewest,
         -> {
             "published_date " +
-                (if (smartPlaylist.sortOrder() == SmartPlaylist.SortOrder.NEWEST_TO_OLDEST) "DESC" else "ASC") +
+                (if (sortType == PlaylistEpisodeSortType.NewestToOldest) "DESC" else "ASC") +
                 ", added_date " +
-                if (smartPlaylist.sortOrder() == SmartPlaylist.SortOrder.NEWEST_TO_OLDEST) "DESC" else "ASC"
+                if (sortType == PlaylistEpisodeSortType.NewestToOldest) "DESC" else "ASC"
         }
 
-        SmartPlaylist.SortOrder.SHORTEST_TO_LONGEST,
-        SmartPlaylist.SortOrder.LONGEST_TO_SHORTEST,
+        PlaylistEpisodeSortType.ShortestToLongest,
+        PlaylistEpisodeSortType.LongestToShortest,
         -> {
             "duration " +
-                (if (smartPlaylist.sortOrder() == SmartPlaylist.SortOrder.SHORTEST_TO_LONGEST) "ASC" else "DESC") +
+                (if (sortType == PlaylistEpisodeSortType.ShortestToLongest) "ASC" else "DESC") +
                 ", added_date DESC"
         }
-
-        SmartPlaylist.SortOrder.LAST_DOWNLOAD_ATTEMPT_DATE -> {
-            "last_download_attempt_date DESC, published_date DESC"
-        }
-
-        else -> null
     }
 
     override suspend fun create(smartPlaylist: SmartPlaylist): Long {
@@ -298,7 +227,7 @@ class SmartPlaylistManagerImpl @Inject constructor(
 
     override suspend fun resetDb() {
         playlistDao.deleteAll()
-        setupDefaultPlaylists()
+        playlistsInitializater.initialize(force = true)
     }
 
     override suspend fun deleteSynced(smartPlaylist: SmartPlaylist) {
@@ -385,15 +314,13 @@ class SmartPlaylistManagerImpl @Inject constructor(
         val finished = smartPlaylist.finished
         val partiallyPlayed = smartPlaylist.partiallyPlayed
         val downloaded = smartPlaylist.downloaded
-        val downloading = smartPlaylist.isSystemDownloadsFilter || smartPlaylist.notDownloaded // regular filters no longer have a downloading but the not downloaded one should show in progress downloads
+        val downloading = smartPlaylist.notDownloaded // regular filters no longer have a downloading but the not downloaded one should show in progress downloads
         val notDownloaded = smartPlaylist.notDownloaded
         val audioVideo = smartPlaylist.audioVideo
         val filterHours = smartPlaylist.filterHours
         val starred = smartPlaylist.starred
         val allPodcasts = smartPlaylist.allPodcasts
         val podcastUuids = smartPlaylist.podcastUuidList
-
-        val includeFailedDownloads = smartPlaylist.isSystemDownloadsFilter
 
         // don't do any constraint if they are all unticked or ticked
         if (!(unplayed && partiallyPlayed && finished) && (unplayed || partiallyPlayed || finished)) {
@@ -433,17 +360,6 @@ class SmartPlaylistManagerImpl @Inject constructor(
                     .append(EpisodeStatusEnum.WAITING_FOR_POWER.ordinal)
                     .append(",")
                     .append(EpisodeStatusEnum.WAITING_FOR_WIFI.ordinal)
-                    .append(")")
-            }
-            if (includeFailedDownloads) {
-                if (sectionWhere.isNotEmpty()) {
-                    sectionWhere.append(" OR ")
-                }
-                // download failed in the last one weeks
-                sectionWhere.append("(episode_status = ")
-                    .append(EpisodeStatusEnum.DOWNLOAD_FAILED.ordinal)
-                    .append(" AND last_download_attempt_date > ")
-                    .append(Date().time - 604800000)
                     .append(")")
             }
             if (notDownloaded) {
@@ -539,25 +455,6 @@ class SmartPlaylistManagerImpl @Inject constructor(
 
     fun countPlaylistsBlocking(): Int {
         return playlistDao.countBlocking()
-    }
-
-    override fun getSystemDownloadsFilter(): SmartPlaylist {
-        return SmartPlaylist(
-            id = SmartPlaylist.PLAYLIST_ID_SYSTEM_DOWNLOADS,
-            uuid = "",
-            title = "Downloads",
-            manual = false,
-            downloaded = true,
-            downloading = true,
-            notDownloaded = false,
-            unplayed = true,
-            partiallyPlayed = true,
-            finished = true,
-            audioVideo = SmartPlaylist.AUDIO_VIDEO_FILTER_ALL,
-            allPodcasts = true,
-            autoDownload = false,
-            sortId = SmartPlaylist.SortOrder.LAST_DOWNLOAD_ATTEMPT_DATE.value,
-        )
     }
 
     override suspend fun markAllSynced() {

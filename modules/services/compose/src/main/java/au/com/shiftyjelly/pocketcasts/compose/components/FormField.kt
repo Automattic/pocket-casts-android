@@ -7,6 +7,9 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.text.input.KeyboardActionHandler
+import androidx.compose.foundation.text.input.TextFieldLineLimits
+import androidx.compose.foundation.text.input.TextFieldState
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.OutlinedTextField
 import androidx.compose.material.Text
@@ -64,6 +67,49 @@ fun FormField(
             .let {
                 if (singleLine) it.onEnter(onImeAction) else it
             },
+    )
+}
+
+@Composable
+fun FormField(
+    state: TextFieldState,
+    placeholder: String,
+    modifier: Modifier = Modifier,
+    onImeAction: () -> Unit = {},
+    lineLimits: TextFieldLineLimits = TextFieldLineLimits.SingleLine,
+    enabled: Boolean = true,
+    isError: Boolean = false,
+    keyboardOptions: KeyboardOptions = FormFieldDefaults.keyboardOptions,
+    leadingIcon: @Composable (() -> Unit)? = null,
+    trailingIcon: @Composable (() -> Unit)? = null,
+) {
+    OutlinedTextField(
+        state = state,
+        isError = isError,
+        colors = TextFieldDefaults.outlinedTextFieldColors(
+            textColor = MaterialTheme.theme.colors.primaryText01,
+            placeholderColor = MaterialTheme.theme.colors.primaryText02,
+            unfocusedBorderColor = if (isError) MaterialTheme.theme.colors.support05 else MaterialTheme.theme.colors.primaryField03,
+            errorTrailingIconColor = MaterialTheme.colors.onSurface.copy(alpha = TextFieldDefaults.IconOpacity), // Keep trailing icon the same color in error states
+        ),
+        enabled = enabled,
+        placeholder = { Text(placeholder) },
+        shape = RoundedCornerShape(6.dp),
+        keyboardOptions = keyboardOptions,
+        onKeyboardAction = KeyboardActionHandler { onImeAction() },
+        lineLimits = lineLimits,
+        leadingIcon = leadingIcon,
+        trailingIcon = trailingIcon,
+        modifier = modifier
+            .fillMaxWidth()
+            .onTabMoveFocus()
+            .then(
+                if (lineLimits is TextFieldLineLimits.SingleLine) {
+                    Modifier.onEnter(onImeAction)
+                } else {
+                    Modifier
+                },
+            ),
     )
 }
 

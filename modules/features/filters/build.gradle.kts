@@ -42,8 +42,10 @@ dependencies {
     implementation(libs.androidx.constraintlayout)
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.preference.ktx)
+    implementation(libs.coil.compose)
     implementation(libs.compose.material)
     implementation(libs.compose.material3.adaptive)
+    implementation(libs.navigation.compose)
     implementation(libs.compose.ui)
     implementation(libs.compose.ui.tooling.preview)
     implementation(libs.coroutines.core)
@@ -51,6 +53,7 @@ dependencies {
     implementation(libs.fragment.compose)
     implementation(libs.fragment.ktx)
     implementation(libs.lifecycle.reactivestreams.ktx)
+    implementation(libs.reorderable)
     implementation(libs.rx2.android)
     implementation(libs.rx2.kotlin)
     implementation(libs.timber)
@@ -60,4 +63,12 @@ dependencies {
     implementation(projects.modules.services.utils)
 
     implementation(libs.compose.ui.tooling.preview)
+
+    testImplementation(libs.coroutines.test)
+    testImplementation(libs.junit)
+    testImplementation(libs.mockito.core)
+    testImplementation(libs.mockito.kotlin)
+    testImplementation(libs.turbine)
+
+    testImplementation(projects.modules.services.sharedtest)
 }

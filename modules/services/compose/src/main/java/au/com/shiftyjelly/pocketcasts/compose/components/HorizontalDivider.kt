@@ -18,12 +18,13 @@ import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 fun HorizontalDivider(
     modifier: Modifier = Modifier,
     startIndent: Dp = 0.dp,
+    thickness: Dp = 1.dp,
     color: Color? = null,
 ) {
     Divider(
         modifier = modifier,
         color = color ?: MaterialTheme.theme.colors.primaryUi05,
-        thickness = 1.dp,
+        thickness = thickness,
         startIndent = startIndent,
     )
 }

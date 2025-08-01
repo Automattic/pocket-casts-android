@@ -7,10 +7,27 @@ import android.os.Bundle
 import android.view.View
 import android.widget.FrameLayout
 import androidx.annotation.ColorInt
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxScope
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.WindowInsetsSides
+import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.only
+import androidx.compose.foundation.layout.safeDrawing
+import androidx.compose.foundation.layout.windowInsetsPadding
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.movableContentOf
+import androidx.compose.runtime.remember
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.unit.dp
 import androidx.core.graphics.ColorUtils
 import androidx.core.view.WindowInsetsControllerCompat
 import androidx.core.view.doOnLayout
 import androidx.navigation.NavHostController
+import au.com.shiftyjelly.pocketcasts.compose.AppTheme
+import au.com.shiftyjelly.pocketcasts.compose.AppThemeWithBackground
 import au.com.shiftyjelly.pocketcasts.ui.helper.FragmentHostListener
 import au.com.shiftyjelly.pocketcasts.ui.helper.NavigationBarColor
 import au.com.shiftyjelly.pocketcasts.ui.helper.StatusBarIconColor
@@ -100,7 +117,7 @@ open class BaseDialogFragment :
         bottomSheetView()?.let { bottomSheet ->
             val behavior = BottomSheetBehavior.from(bottomSheet)
             behavior.state = BottomSheetBehavior.STATE_EXPANDED
-            behavior.peekHeight = BottomSheetBehavior.PEEK_HEIGHT_AUTO
+            behavior.peekHeight = 0
             behavior.skipCollapsed = true
         }
     }
@@ -150,5 +167,48 @@ open class BaseDialogFragment :
         @ColorInt color: Int,
     ) {
         bottomSheetView()?.backgroundTintList = ColorStateList.valueOf(color)
+    }
+
+    @Suppress("ktlint:compose:modifier-not-used-at-root")
+    @Composable
+    protected fun DialogBox(
+        modifier: Modifier = Modifier,
+        useThemeBackground: Boolean = true,
+        fillMaxHeight: Boolean = true,
+        content: @Composable BoxScope.() -> Unit,
+    ) {
+        Box(
+            modifier = Modifier
+                .then(if (fillMaxHeight) Modifier.fillMaxHeight(0.93f) else Modifier)
+                .clip(RoundedCornerShape(topStart = 16.dp, topEnd = 16.dp)),
+        ) {
+            Background(useThemeBackground) {
+                DialogContent(modifier, content)
+            }
+        }
+    }
+
+    @Composable
+    private fun DialogContent(
+        modifier: Modifier = Modifier,
+        content: @Composable BoxScope.() -> Unit,
+    ) {
+        val insets = WindowInsets.safeDrawing.only(WindowInsetsSides.Horizontal)
+        Box(
+            modifier = modifier.windowInsetsPadding(insets),
+            content = content,
+        )
+    }
+
+    @Composable
+    private fun Background(
+        useThemeBackground: Boolean,
+        content: @Composable () -> Unit,
+    ) {
+        if (useThemeBackground) {
+            AppThemeWithBackground(theme.activeTheme, content)
+        } else {
+            AppTheme(theme.activeTheme, content)
+        }
     }
 }

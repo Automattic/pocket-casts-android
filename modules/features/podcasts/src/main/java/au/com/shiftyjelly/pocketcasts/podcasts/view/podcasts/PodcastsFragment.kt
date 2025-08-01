@@ -639,8 +639,10 @@ class PodcastsFragment :
         (activity as FragmentHostListener).addFragment(fragment)
     }
 
-    override fun scrollToTop() {
+    override fun scrollToTop(): Boolean {
+        val canScroll = binding.recyclerView.canScrollVertically(-1)
         binding.recyclerView.quickScrollToTop()
+        return canScroll
     }
 
     private fun showTooltip() {

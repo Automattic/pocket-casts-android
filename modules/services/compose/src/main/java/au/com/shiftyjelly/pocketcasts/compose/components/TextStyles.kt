@@ -379,13 +379,14 @@ fun TextP60(
     disableAutoScale: Boolean = false,
     fontScale: Float = 1f,
     letterSpacing: TextUnit = 0.sp,
+    lineHeight: TextUnit = 15.sp,
 ) {
     val fontSizeUpdated = fontSize ?: 13.sp
     Text(
         text = text,
         color = color,
         fontSize = fontSizeUpdated.scaled(disableAutoScale, fontScale),
-        lineHeight = 15.sp.scaled(disableAutoScale, fontScale),
+        lineHeight = lineHeight.scaled(disableAutoScale, fontScale),
         letterSpacing = letterSpacing,
         maxLines = maxLines,
         overflow = TextOverflow.Ellipsis,

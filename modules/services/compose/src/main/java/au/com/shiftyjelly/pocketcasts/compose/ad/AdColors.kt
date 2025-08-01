@@ -39,17 +39,11 @@ fun rememberAdColors(): AdColors {
     val playerColors = theme.rememberPlayerColors()
     return remember(theme.type, playerColors) {
         if (playerColors != null) {
-            val adBackgroundColor = playerColors.contrast06.compositeOver(playerColors.background01)
-            val titleLabelContrast = ColorUtils.calculateContrast(
-                backgroundColor = adBackgroundColor.copy(alpha = 1f),
-                foregroundColor = playerColors.highlight01.copy(alpha = 1f),
-            )
-
             AdColors(
                 AdColors.Banner(
                     background = playerColors.contrast06,
                     ctaLabel = playerColors.contrast01,
-                    titleLabel = if (titleLabelContrast >= WCGA_AA_TEXT_CONTRAST_REQUIREMENT) playerColors.highlight01 else Color.White,
+                    titleLabel = playerColors.contrast01,
                     adLabelBackground = playerColors.contrast06,
                     adLabel = playerColors.contrast01,
                     icon = playerColors.contrast02,
@@ -69,7 +63,7 @@ fun rememberAdColors(): AdColors {
             val themeColors = theme.colors
             AdColors(
                 AdColors.Banner(
-                    background = themeColors.primaryUi06,
+                    background = themeColors.primaryUi01,
                     ctaLabel = themeColors.primaryText01,
                     titleLabel = themeColors.primaryInteractive01,
                     adLabelBackground = themeColors.primaryInteractive01,
@@ -90,5 +84,3 @@ fun rememberAdColors(): AdColors {
         }
     }
 }
-
-private const val WCGA_AA_TEXT_CONTRAST_REQUIREMENT = 4.5

@@ -2,22 +2,27 @@ package au.com.shiftyjelly.pocketcasts.profile
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import au.com.shiftyjelly.pocketcasts.account.onboarding.upgrade.OnboardingSubscriptionPlan
 import au.com.shiftyjelly.pocketcasts.account.onboarding.upgrade.ProfileUpgradeBannerState
 import au.com.shiftyjelly.pocketcasts.account.viewmodel.NewsletterSource
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.models.type.SignInState
 import au.com.shiftyjelly.pocketcasts.models.type.SubscriptionPlatform
+import au.com.shiftyjelly.pocketcasts.payment.BillingCycle
 import au.com.shiftyjelly.pocketcasts.payment.PaymentClient
 import au.com.shiftyjelly.pocketcasts.payment.PaymentResult
+import au.com.shiftyjelly.pocketcasts.payment.SubscriptionOffer
 import au.com.shiftyjelly.pocketcasts.payment.SubscriptionPlan
+import au.com.shiftyjelly.pocketcasts.payment.SubscriptionTier
 import au.com.shiftyjelly.pocketcasts.payment.getOrNull
-import au.com.shiftyjelly.pocketcasts.payment.map
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.profile.winback.WinbackInitParams
 import au.com.shiftyjelly.pocketcasts.repositories.sync.SyncManager
 import au.com.shiftyjelly.pocketcasts.repositories.user.UserManager
 import au.com.shiftyjelly.pocketcasts.utils.Gravatar
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import au.com.shiftyjelly.pocketcasts.utils.toDurationFromNow
 import com.automattic.android.tracks.crashlogging.CrashLogging
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -85,9 +90,23 @@ class AccountDetailsViewModel @Inject constructor(
         val signedInState = signInState as? SignInState.SignedIn
         val isExpiring = signedInState?.subscription?.isExpiring == true
 
-        paymentClient.loadSubscriptionPlans()
-            .map { subscriptionPlans ->
-                ProfileUpgradeBannerState(
+        val subscriptionPlans = paymentClient.loadSubscriptionPlans().getOrNull()
+        return@combine if (subscriptionPlans == null) {
+            null
+        } else {
+            if (FeatureFlag.isEnabled(Feature.NEW_ONBOARDING_UPGRADE)) {
+                if (signedInState?.subscription != null) {
+                    null
+                } else {
+                    val recommendedPlan = subscriptionPlans.findOfferPlan(tier = SubscriptionTier.Plus, BillingCycle.Yearly, offer = SubscriptionOffer.Trial).getOrNull()?.let {
+                        OnboardingSubscriptionPlan.create(plan = it).getOrNull()
+                    } ?: OnboardingSubscriptionPlan.create(subscriptionPlans.getBasePlan(tier = SubscriptionTier.Plus, billingCycle = BillingCycle.Yearly))
+                    ProfileUpgradeBannerState.NewOnboardingUpgradeState(
+                        recommendedSubscription = recommendedPlan,
+                    )
+                }
+            } else {
+                ProfileUpgradeBannerState.OldProfileUpgradeBannerState(
                     subscriptionPlans = subscriptionPlans,
                     selectedFeatureCard = featureCard,
                     currentSubscription = signedInState?.subscription?.let { subscription ->
@@ -100,7 +119,7 @@ class AccountDetailsViewModel @Inject constructor(
                     isRenewingSubscription = isExpiring,
                 )
             }
-            .getOrNull()
+        }
             .takeIf { signInState.isSignedInAsFree || isExpiring }
     }.stateIn(viewModelScope, started = SharingStarted.Eagerly, initialValue = null)
 
@@ -115,7 +134,7 @@ class AccountDetailsViewModel @Inject constructor(
             email = signedInState?.email,
             winbackInitParams = computeWinbackParams(signInState),
             canChangeCredentials = !syncManager.isGoogleLogin(),
-            canUpgradeAccount = signedInState?.isSignedInAsPlus == true && isGiftExpiring,
+            canUpgradeAccount = signedInState?.isSignedInAsPlus == true && (isGiftExpiring || FeatureFlag.isEnabled(Feature.NEW_ONBOARDING_UPGRADE)),
             canCancelSubscription = signedInState?.isSignedInAsPaid == true,
         )
     }.stateIn(

@@ -26,6 +26,7 @@ import androidx.core.content.ContextCompat
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
+import androidx.core.view.doOnLayout
 import androidx.core.view.isVisible
 import androidx.core.view.updateLayoutParams
 import androidx.core.view.updatePadding
@@ -509,7 +510,20 @@ class MainActivity :
 
         navigator.resetRootFragmentCommand()
             .subscribe({ fragment ->
-                (fragment as? TopScrollable)?.scrollToTop()
+                val didScroll = (fragment as? TopScrollable)?.scrollToTop()
+
+                // Open search UI when tapping the Discover navigation button
+                // while at the top of the Discover page already
+                val discoverId = VR.id.navigation_discover
+                val currentFragmentIsDiscover = navigator.currentTab() == discoverId
+                if (currentFragmentIsDiscover && didScroll == false) {
+                    val searchFragment = SearchFragment.newInstance(
+                        floating = true,
+                        onlySearchRemote = true,
+                        source = SourceView.DISCOVER,
+                    )
+                    addFragment(searchFragment, onTop = true)
+                }
             })
             .addTo(disposables)
 
@@ -1087,7 +1101,12 @@ class MainActivity :
     }
 
     override fun snackBarView(): View {
-        return binding.snackbarFragment
+        val playerView = supportFragmentManager
+            .takeIf { viewModel.isPlayerOpen }
+            ?.fragments
+            ?.firstNotNullOfOrNull { it as? PlayerContainerFragment }
+            ?.view
+        return playerView ?: binding.snackbarFragment
     }
 
     override fun setFullScreenDarkOverlayViewVisibility(visible: Boolean) {
@@ -1119,8 +1138,10 @@ class MainActivity :
 
     override fun onPlayerBottomSheetSlide(bottomSheetView: View, slideOffset: Float) {
         val view = binding.bottomNavigation
-        val targetPosition = 2 * view.height * slideOffset
-        view.spring(TRANSLATION_Y).animateToFinalPosition(targetPosition)
+        view.doOnLayout {
+            val targetPosition = 2 * view.height * slideOffset
+            view.spring(TRANSLATION_Y).animateToFinalPosition(targetPosition)
+        }
     }
 
     override fun updateSystemColors() {

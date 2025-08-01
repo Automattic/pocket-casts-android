@@ -38,18 +38,20 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
+import androidx.compose.ui.tooling.preview.PreviewParameterProvider
 import androidx.compose.ui.unit.dp
 import au.com.shiftyjelly.pocketcasts.account.onboarding.components.UpgradeFeatureItem
 import au.com.shiftyjelly.pocketcasts.account.onboarding.components.UpgradePlanRow
 import au.com.shiftyjelly.pocketcasts.account.onboarding.upgrade.OnboardingUpgradeHelper.PrivacyPolicy
 import au.com.shiftyjelly.pocketcasts.account.onboarding.upgrade.OnboardingUpgradeHelper.UpgradeRowButton
+import au.com.shiftyjelly.pocketcasts.account.onboarding.upgrade.contextual.BookmarksAnimation
+import au.com.shiftyjelly.pocketcasts.account.onboarding.upgrade.contextual.FoldersAnimation
 import au.com.shiftyjelly.pocketcasts.account.viewmodel.OnboardingUpgradeFeaturesState
 import au.com.shiftyjelly.pocketcasts.compose.AppThemeWithBackground
 import au.com.shiftyjelly.pocketcasts.compose.components.FadedLazyColumn
 import au.com.shiftyjelly.pocketcasts.compose.components.TextH10
 import au.com.shiftyjelly.pocketcasts.compose.components.TextP40
 import au.com.shiftyjelly.pocketcasts.compose.images.SubscriptionBadge
-import au.com.shiftyjelly.pocketcasts.compose.preview.ThemePreviewParameterProvider
 import au.com.shiftyjelly.pocketcasts.compose.theme
 import au.com.shiftyjelly.pocketcasts.images.R
 import au.com.shiftyjelly.pocketcasts.payment.BillingCycle
@@ -59,6 +61,7 @@ import au.com.shiftyjelly.pocketcasts.payment.SubscriptionOffer
 import au.com.shiftyjelly.pocketcasts.payment.SubscriptionPlan
 import au.com.shiftyjelly.pocketcasts.payment.SubscriptionPlans
 import au.com.shiftyjelly.pocketcasts.payment.SubscriptionTier
+import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingUpgradeSource
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme.ThemeType
 import java.time.ZonedDateTime
 import java.time.format.DateTimeFormatter
@@ -67,15 +70,10 @@ import java.time.temporal.ChronoUnit
 import kotlinx.coroutines.launch
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
-enum class Variants {
-    VARIANT_FEATURES,
-    VARIANT_TRIAL_TIMELINE,
-}
-
 @Composable
 fun OnboardingUpgradeScreen(
     state: OnboardingUpgradeFeaturesState.Loaded,
-    variant: Variants,
+    source: OnboardingUpgradeSource,
     onClosePress: () -> Unit,
     onSubscribePress: () -> Unit,
     onChangeSelectedPlan: (SubscriptionPlan) -> Unit,
@@ -88,27 +86,32 @@ fun OnboardingUpgradeScreen(
             .windowInsetsPadding(WindowInsets.statusBars)
             .windowInsetsPadding(WindowInsets.navigationBars)
             .background(color = MaterialTheme.colors.background)
-            .fillMaxSize()
-            .padding(
-                horizontal = 24.dp,
-            ),
+            .fillMaxSize(),
     ) {
         UpgradeHeader(
+            modifier = Modifier.padding(
+                horizontal = 24.dp,
+            ),
             selectedPlan = state.selectedPlan,
+            source = source,
             onClosePress = onClosePress,
         )
-        Spacer(modifier = Modifier.height(24.dp))
+        Spacer(modifier = Modifier.height(12.dp))
         UpgradeContent(
             modifier = Modifier.weight(1f),
-            pages = variant.toContentPages(
+            pages = state.onboardingVariant.toContentPages(
                 currentPlan = state.selectedPlan,
                 isEligibleForTrial = state.selectedBasePlan.offer == SubscriptionOffer.Trial,
                 plan = state.selectedBasePlan,
+                source = source,
             ),
         )
         Spacer(modifier = Modifier.height(24.dp))
         UpgradeFooter(
             modifier = Modifier
+                .padding(
+                    horizontal = 24.dp,
+                )
                 .fillMaxWidth(),
             plans = state.availableBasePlans,
             selectedOnboardingPlan = state.selectedPlan,
@@ -168,6 +171,7 @@ private fun UpgradeFooter(
 @Composable
 private fun UpgradeHeader(
     selectedPlan: OnboardingSubscriptionPlan,
+    source: OnboardingUpgradeSource,
     onClosePress: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -206,7 +210,7 @@ private fun UpgradeHeader(
         }
         Spacer(modifier = Modifier.height(8.dp))
         TextH10(
-            text = stringResource(LR.string.onboarding_upgrade_generic_title),
+            text = stringResource(selectedPlan.customFeatureTitle(source)),
             color = MaterialTheme.theme.colors.primaryText01,
         )
     }
@@ -216,7 +220,7 @@ private fun UpgradeHeader(
 private fun SubscriptionPlan.trialSchedule(): List<UpgradeTrialItem> {
     val offerPlan = this as? SubscriptionPlan.WithOffer ?: return emptyList()
 
-    val discountedPhase = offerPlan.pricingPhases.find { it.schedule.recurrenceMode is PricingSchedule.RecurrenceMode.Recurring } ?: return emptyList()
+    val discountedPhase = offerPlan.pricingPhases.find { it.schedule.recurrenceMode is RecurrenceMode.Recurring } ?: return emptyList()
 
     val recurringPeriods = (discountedPhase.schedule.recurrenceMode as RecurrenceMode.Recurring).value
     val chronoUnit = when (discountedPhase.schedule.period) {
@@ -250,42 +254,73 @@ private fun SubscriptionPlan.trialSchedule(): List<UpgradeTrialItem> {
 }
 
 @Composable
-private fun Variants.toContentPages(
+private fun OnboardingUpgradeFeaturesState.NewOnboardingVariant.toContentPages(
     currentPlan: OnboardingSubscriptionPlan,
+    source: OnboardingUpgradeSource,
     isEligibleForTrial: Boolean,
     plan: SubscriptionPlan,
 ) = buildList {
-    when (this@toContentPages) {
-        Variants.VARIANT_FEATURES -> {
-            add(
-                UpgradePagerContent.Features(
-                    features = currentPlan.featureItems,
-                    showCta = isEligibleForTrial,
-                ),
-            )
-            if (isEligibleForTrial) {
-                add(
-                    UpgradePagerContent.TrialSchedule(
-                        timelineItems = plan.trialSchedule(),
-                        showCta = false,
-                    ),
-                )
-            }
-        }
-
-        Variants.VARIANT_TRIAL_TIMELINE -> {
-            add(
-                UpgradePagerContent.TrialSchedule(
-                    timelineItems = plan.trialSchedule(),
-                    showCta = true,
-                ),
-            )
+    when (source) {
+        OnboardingUpgradeSource.FOLDERS_PODCAST_SCREEN,
+        OnboardingUpgradeSource.SUGGESTED_FOLDERS,
+        OnboardingUpgradeSource.FOLDERS,
+        -> {
+            add(UpgradePagerContent.Folders)
             add(
                 UpgradePagerContent.Features(
                     features = currentPlan.featureItems,
                     showCta = false,
                 ),
             )
+        }
+        OnboardingUpgradeSource.BOOKMARKS,
+        OnboardingUpgradeSource.BOOKMARKS_SHELF_ACTION,
+        -> {
+            add(UpgradePagerContent.Bookmarks)
+            add(
+                UpgradePagerContent.Features(
+                    features = currentPlan.featureItems,
+                    showCta = false,
+                ),
+            )
+        }
+
+        else -> {
+            when (this@toContentPages) {
+                OnboardingUpgradeFeaturesState.NewOnboardingVariant.FEATURES_FIRST -> {
+                    add(
+                        UpgradePagerContent.Features(
+                            features = currentPlan.featureItems,
+                            showCta = isEligibleForTrial,
+                        ),
+                    )
+                    if (isEligibleForTrial) {
+                        add(
+                            UpgradePagerContent.TrialSchedule(
+                                timelineItems = plan.trialSchedule(),
+                                showCta = false,
+                            ),
+                        )
+                    }
+                }
+
+                OnboardingUpgradeFeaturesState.NewOnboardingVariant.TRIAL_FIRST_WHEN_ELIGIBLE -> {
+                    if (isEligibleForTrial) {
+                        add(
+                            UpgradePagerContent.TrialSchedule(
+                                timelineItems = plan.trialSchedule(),
+                                showCta = true,
+                            ),
+                        )
+                    }
+                    add(
+                        UpgradePagerContent.Features(
+                            features = currentPlan.featureItems,
+                            showCta = false,
+                        ),
+                    )
+                }
+            }
         }
     }
 }
@@ -295,6 +330,12 @@ private sealed interface UpgradePagerContent {
 
     data class Features(val features: List<UpgradeFeatureItem>, override val showCta: Boolean) : UpgradePagerContent
     data class TrialSchedule(val timelineItems: List<UpgradeTrialItem>, override val showCta: Boolean) : UpgradePagerContent
+    data object Folders : UpgradePagerContent {
+        override val showCta get() = true
+    }
+    data object Bookmarks : UpgradePagerContent {
+        override val showCta get() = true
+    }
 }
 
 @Composable
@@ -316,14 +357,23 @@ private fun UpgradeContent(
             }
             when (page) {
                 is UpgradePagerContent.Features -> FeaturesContent(
+                    modifier = Modifier.padding(
+                        horizontal = 24.dp,
+                    ),
                     features = page,
                     onCtaClick = scrollToNext,
                 )
 
                 is UpgradePagerContent.TrialSchedule -> ScheduleContent(
+                    modifier = Modifier.padding(
+                        horizontal = 24.dp,
+                    ),
                     trialSchedule = page,
                     onCtaClick = scrollToNext,
                 )
+
+                is UpgradePagerContent.Folders -> FoldersUpgradeContent(onCtaClick = scrollToNext)
+                is UpgradePagerContent.Bookmarks -> BookmarksUpgradeContent(onCtaClick = scrollToNext)
             }
         }
     }
@@ -333,8 +383,9 @@ private fun UpgradeContent(
 private fun FeaturesContent(
     features: UpgradePagerContent.Features,
     onCtaClick: () -> Unit,
+    modifier: Modifier = Modifier,
 ) {
-    Column {
+    Column(modifier = modifier) {
         features.features.forEach { item ->
             UpgradeFeatureItem(
                 item = item,
@@ -358,8 +409,9 @@ private fun FeaturesContent(
 private fun ScheduleContent(
     trialSchedule: UpgradePagerContent.TrialSchedule,
     onCtaClick: () -> Unit,
+    modifier: Modifier = Modifier,
 ) {
-    Column {
+    Column(modifier = modifier) {
         UpgradeTrialTimeline(
             items = trialSchedule.timelineItems,
         )
@@ -375,27 +427,84 @@ private fun ScheduleContent(
     }
 }
 
+@Composable
+private fun FoldersUpgradeContent(
+    onCtaClick: () -> Unit,
+) {
+    Column {
+        TextP40(
+            text = stringResource(LR.string.onboarding_upgrade_schedule_see_features),
+            modifier = Modifier
+                .padding(horizontal = 24.dp)
+                .padding(bottom = 24.dp)
+                .clickable { onCtaClick() },
+            color = MaterialTheme.theme.colors.primaryInteractive01,
+        )
+
+        FoldersAnimation(
+            modifier = Modifier
+                .fillMaxWidth()
+                .heightIn(min = 320.dp),
+        )
+    }
+}
+
+@Composable
+private fun BookmarksUpgradeContent(
+    onCtaClick: () -> Unit,
+) {
+    Column {
+        TextP40(
+            text = stringResource(LR.string.onboarding_upgrade_schedule_see_features),
+            modifier = Modifier
+                .padding(horizontal = 24.dp)
+                .padding(bottom = 24.dp)
+                .clickable { onCtaClick() },
+            color = MaterialTheme.theme.colors.primaryInteractive01,
+        )
+
+        BookmarksAnimation(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(bottom = 42.dp),
+        )
+    }
+}
+
 @Preview
 @Composable
 private fun PreviewOnboardingUpgradeScreen(
-    @PreviewParameter(ThemePreviewParameterProvider::class) theme: ThemeType,
+    @PreviewParameter(ThemedTierParameterProvider::class) pair: Pair<ThemeType, SubscriptionTier>,
 ) {
-    AppThemeWithBackground(theme) {
+    AppThemeWithBackground(pair.first) {
         OnboardingUpgradeScreen(
             state = OnboardingUpgradeFeaturesState.Loaded(
-                selectedTier = SubscriptionTier.Plus,
+                selectedTier = pair.second,
                 selectedBillingCycle = BillingCycle.Yearly,
                 subscriptionPlans = SubscriptionPlans.Preview,
-                plansFilter = OnboardingUpgradeFeaturesState.LoadedPlansFilter.PLUS_ONLY,
+                plansFilter = when (pair.second) {
+                    SubscriptionTier.Plus -> OnboardingUpgradeFeaturesState.LoadedPlansFilter.PLUS_ONLY
+                    SubscriptionTier.Patron -> OnboardingUpgradeFeaturesState.LoadedPlansFilter.PATRON_ONLY
+                },
                 purchaseFailed = false,
+                onboardingVariant = OnboardingUpgradeFeaturesState.NewOnboardingVariant.FEATURES_FIRST,
             ),
             modifier = Modifier.fillMaxSize(),
             onSubscribePress = {},
             onClosePress = {},
-            variant = Variants.VARIANT_FEATURES,
             onClickPrivacyPolicy = {},
             onClickTermsAndConditions = {},
             onChangeSelectedPlan = {},
+            source = OnboardingUpgradeSource.ACCOUNT_DETAILS,
         )
     }
+}
+
+private class ThemedTierParameterProvider : PreviewParameterProvider<Pair<ThemeType, SubscriptionTier>> {
+    override val values = ThemeType.entries.map { theme ->
+        SubscriptionTier.entries.map { tier ->
+            theme to tier
+        }
+    }.flatten()
+        .asSequence()
 }

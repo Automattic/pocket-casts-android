@@ -36,6 +36,8 @@
     <string name="close">Close</string>
     <string name="create_account">Create account</string>
     <string name="delete">Delete</string>
+    <!-- Verb, as in to clear something  -->
+    <string name="clear">Clear</string>
     <string name="dismiss">Dismiss</string>
     <string name="donate">Donate</string>
     <string name="done">Done</string>
@@ -222,6 +224,7 @@
     <string name="ad_report_reason_too_often">See this ad too often</string>
     <string name="ad_report_reason_other">Other</string>
     <string name="banner_ad_plus_prompt">Say goodbye to banner ads and more with Pocket Casts Plus</string>
+    <string name="ad_report_confirmation">You reported this ad.</string>
 
     <string name="multiselect_actions_shown">Shortcut in toolbar</string>
     <string name="multiselect_actions_hidden">In overflow</string>
@@ -906,6 +909,22 @@
     <string name="playlists_onboarding_smart_playlist_description">They still work exactly the same, using rules to auto-add your episodes. All your existing Filters are right here, nothing’s changed but the name.</string>
     <string name="playlists_onboarding_playlist_title">Introducing Playlists</string>
     <string name="playlists_onboarding_playlist_description">Want more control? Manual Playlists let you build custom queues, great for trips, themes, or just your current vibe. Whether Smart or Manual, playlists work the way you do.</string>
+    <string name="smart_playlist">Smart Playlist</string>
+    <string name="playlists_empty_state_title">Organize episodes your way</string>
+    <string name="playlists_empty_state_body">Playlists let you organize episodes manually or automatically with Smart Rules.</string>
+    <string name="new_playlist">New Playlist</string>
+    <string name="premade_playlists_tooltip_title">Smart Playlists, ready to go</string>
+    <string name="premade_playlists_tooltip_body">We made these to help you get started.\nThey auto-update based on your listening.</string>
+    <string name="new_playlists_title_placeholder">Playlist’s title</string>
+    <string name="new_smart_playlist_banner_title">Make into Smart Playlist</string>
+    <string name="new_smart_playlist_banner_body">Automatically add episodes based on rules</string>
+    <string name="create_playlist">Create Playlist</string>
+    <string name="create_smart_playlist">Create Smart Playlist</string>
+    <string name="smart_rules_description">Set up Smart Rules to automatically add episodes to your Smart Playlist.</string>
+    <string name="smart_rule_podcasts_title">Choose Podcasts</string>
+    <string name="smart_rule_podcasts_all_label">All Followed Podcasts</string>
+    <string name="smart_rule_podcasts_all_description">New podcasts you follow will be automatically added.</string>
+    <string name="save_smart_rule">Save Smart Rule</string>
 
     <!-- Profile -->
 
@@ -2424,6 +2443,8 @@
     <string name="encourage_account_sync_banner_description">Create a free account to sync your shows and listen anywhere.</string>
     <string name="encourage_account_filters_banner_title">Keep your filters in sync</string>
     <string name="encourage_account_filters_banner_description">Create a free account to sync your filters on any device.</string>
+    <string name="encourage_account_playlists_banner_title">Keep your playlists in sync</string>
+    <string name="encourage_account_playlists_banner_description">Create a free account to sync your playlists on any device.</string>
     <string name="encourage_account_history_banner_title">Keep track of what you’ve played</string>
     <string name="encourage_account_history_banner_description">Create a free account to sync your listening history everywhere.</string>
 
@@ -2450,7 +2471,7 @@
         <item quantity="other">You have %d new episodes downloaded and ready to go!</item>
     </plurals>
     <string name="notification_content_recommendations_trending_title">Trending this week</string>
-    <string name="notification_content_recommendations_trending_message">Check out what everyone else is listening this week.</string>
+    <string name="notification_content_recommendations_trending_message">Check out what everyone else is listening to this week.</string>
     <string name="notification_content_recommendations_title">New recommendations for you</string>
     <string name="notification_content_recommendations_message">Wondering what to listen to next? Check out these shows!</string>
     <string name="notifications_settings_turn_on_push_title">Turn on push notifications?</string>
@@ -2487,4 +2508,18 @@
     <string name="onboarding_upgrade_billing_cycle_monthly">Monthly plan</string>
     <string name="onboarding_upgrade_billing_cycle_yearly">Yearly plan</string>
     <string name="onboarding_upgrade_save_percent">Save %1$d\%%</string>
+    <string name="onboarding_upgrade_patron_title">Believe in what we do and wanna show your support?</string>
+    <string name="onboarding_upgrade_patron_plus_features">All the features in Plus</string>
+    <string name="onboarding_upgrade_patron_early_access">Early access to new features</string>
+    <string name="onboarding_upgrade_patron_cloud_storage">100 GB Cloud Storage for your files</string>
+    <string name="onboarding_upgrade_patron_badge">Supporters profile badge</string>
+    <string name="onboarding_upgrade_app_icons">Special Pocket Casts app icons</string>
+    <string name="onboarding_upgrade_gratitude">The undying gratitude of everyone here at Pocket Casts</string>
+    <string name="onboarding_upgrade_account_message">Unlock all paid features like Folders, Shuffle, Bookmarks and many more</string>
+    <string name="onboarding_folders_title">Folders: your podcasts, perfectly placed</string>
+    <string name="onboarding_folders_title_1">Books</string>
+    <string name="onboarding_folders_title_2">Favorites</string>
+    <string name="onboarding_folders_title_3">Sports</string>
+    <string name="onboarding_bookmarks_title">Bookmarks: no more \"where was that?\"</string>
+
 </resources>

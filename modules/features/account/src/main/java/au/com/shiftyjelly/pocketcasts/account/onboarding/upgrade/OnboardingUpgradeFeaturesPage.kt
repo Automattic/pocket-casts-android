@@ -1,6 +1,7 @@
 package au.com.shiftyjelly.pocketcasts.account.onboarding.upgrade
 
 import androidx.activity.SystemBarStyle
+import androidx.compose.animation.ExperimentalSharedTransitionApi
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Image
@@ -136,9 +137,9 @@ internal fun OnboardingUpgradeFeaturesPage(
         is OnboardingUpgradeFeaturesState.Loaded -> {
             if (FeatureFlag.isEnabled(Feature.NEW_ONBOARDING_UPGRADE)) {
                 OnboardingUpgradeScreen(
-                    variant = Variants.VARIANT_FEATURES,
                     onClosePress = onBackPress,
                     state = state,
+                    source = source,
                     onChangeSelectedPlan = { viewModel.changeBillingCycle(it.billingCycle) },
                     onSubscribePress = { onClickSubscribe(false) },
                     onClickPrivacyPolicy = { viewModel.onPrivacyPolicyPressed() },

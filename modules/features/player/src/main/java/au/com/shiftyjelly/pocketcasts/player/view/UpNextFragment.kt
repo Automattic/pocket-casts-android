@@ -548,7 +548,9 @@ class UpNextFragment :
         analyticsTracker.track(event, properties)
     }
 
-    override fun scrollToTop() {
+    override fun scrollToTop(): Boolean {
+        val canScroll = binding.recyclerView.canScrollVertically(-1)
         binding.recyclerView.quickScrollToTop()
+        return canScroll
     }
 }

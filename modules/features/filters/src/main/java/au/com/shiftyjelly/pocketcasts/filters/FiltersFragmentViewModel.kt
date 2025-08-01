@@ -9,10 +9,9 @@ import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.models.entity.SmartPlaylist
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
+import au.com.shiftyjelly.pocketcasts.repositories.playlist.Playlist
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.SmartPlaylistManager
-import au.com.shiftyjelly.pocketcasts.repositories.podcast.SmartPlaylistManagerImpl.Companion.IN_PROGRESS_UUID
-import au.com.shiftyjelly.pocketcasts.repositories.podcast.SmartPlaylistManagerImpl.Companion.NEW_RELEASE_UUID
 import au.com.shiftyjelly.pocketcasts.repositories.user.UserManager
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
@@ -122,7 +121,7 @@ class FiltersFragmentViewModel @Inject constructor(
         if (!settings.showEmptyFiltersListTooltip.value) return
         if (filters.size > 2) return
 
-        val requiredUuids = setOf(NEW_RELEASE_UUID, IN_PROGRESS_UUID)
+        val requiredUuids = setOf(Playlist.NEW_RELEASES_UUID, Playlist.IN_PROGRESS_UUID)
         val filterUuids = filters.map { it.uuid }.toSet()
 
         if (filterUuids != requiredUuids) return
