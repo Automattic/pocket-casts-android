@@ -391,14 +391,14 @@ object OnboardingUpgradeHelper {
                 LR.string.onboarding_upgrade_pp
             } else {
                 LR.string.onboarding_plus_privacy_policy
-            }
+            },
         )
         val termsAndConditionsText = stringResource(
             if (FeatureFlag.isEnabled(Feature.NEW_ONBOARDING_UPGRADE)) {
                 LR.string.onboarding_upgrade_tnc
             } else {
                 LR.string.onboarding_plus_terms_and_conditions
-            }
+            },
         )
         val text = stringResource(
             LR.string.onboarding_plus_continuing_agrees_to,

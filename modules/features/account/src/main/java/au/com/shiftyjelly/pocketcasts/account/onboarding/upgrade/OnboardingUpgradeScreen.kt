@@ -162,6 +162,8 @@ private fun UpgradeFooter(
         )
         Spacer(modifier = Modifier.height(12.dp))
         PrivacyPolicy(
+            modifier = Modifier.fillMaxWidth()
+                .padding(bottom = 12.dp),
             color = MaterialTheme.theme.colors.secondaryText02,
             textAlign = TextAlign.Center,
             onPrivacyPolicyClick = onPrivacyPolicyClick,
