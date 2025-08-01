@@ -1,7 +1,5 @@
-package au.com.shiftyjelly.pocketcasts.playlists.create
+package au.com.shiftyjelly.pocketcasts.playlists.rules
 
-import androidx.annotation.DrawableRes
-import androidx.annotation.StringRes
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.Image
@@ -14,6 +12,7 @@ import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -27,7 +26,6 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.Icon
-import androidx.compose.material.IconButton
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
@@ -53,6 +51,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import au.com.shiftyjelly.pocketcasts.compose.AppThemeWithBackground
 import au.com.shiftyjelly.pocketcasts.compose.Devices
+import au.com.shiftyjelly.pocketcasts.compose.bars.NavigationButton
+import au.com.shiftyjelly.pocketcasts.compose.bars.ThemedTopAppBar
 import au.com.shiftyjelly.pocketcasts.compose.buttons.RowButton
 import au.com.shiftyjelly.pocketcasts.compose.components.EpisodeImage
 import au.com.shiftyjelly.pocketcasts.compose.components.FadedLazyColumn
@@ -66,7 +66,6 @@ import au.com.shiftyjelly.pocketcasts.compose.components.TextP50
 import au.com.shiftyjelly.pocketcasts.compose.preview.ThemePreviewParameterProvider
 import au.com.shiftyjelly.pocketcasts.compose.text.toAnnotatedString
 import au.com.shiftyjelly.pocketcasts.compose.theme
-import au.com.shiftyjelly.pocketcasts.images.R
 import au.com.shiftyjelly.pocketcasts.localization.helper.RelativeDateFormatter
 import au.com.shiftyjelly.pocketcasts.localization.helper.TimeHelper
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
@@ -75,7 +74,6 @@ import au.com.shiftyjelly.pocketcasts.models.type.SmartRules.EpisodeDurationRule
 import au.com.shiftyjelly.pocketcasts.models.type.SmartRules.MediaTypeRule
 import au.com.shiftyjelly.pocketcasts.models.type.SmartRules.PodcastsRule
 import au.com.shiftyjelly.pocketcasts.models.type.SmartRules.ReleaseDateRule
-import au.com.shiftyjelly.pocketcasts.playlists.create.CreatePlaylistViewModel.AppliedRules
 import au.com.shiftyjelly.pocketcasts.repositories.extensions.getSummaryText
 import au.com.shiftyjelly.pocketcasts.repositories.images.PocketCastsImageRequestFactory.PlaceholderType
 import au.com.shiftyjelly.pocketcasts.ui.extensions.getThemeColor
@@ -85,48 +83,14 @@ import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 import au.com.shiftyjelly.pocketcasts.ui.R as UR
 
-enum class RuleType(
-    @DrawableRes val iconId: Int,
-    @StringRes val titleId: Int,
-) {
-    Podcasts(
-        iconId = IR.drawable.ic_podcasts,
-        titleId = LR.string.podcasts,
-    ),
-    EpisodeStatus(
-        iconId = IR.drawable.ic_filters_play,
-        titleId = LR.string.filters_chip_episode_status,
-    ),
-    ReleaseDate(
-        iconId = IR.drawable.ic_calendar,
-        titleId = LR.string.filters_release_date,
-    ),
-    EpisodeDuration(
-        iconId = IR.drawable.ic_filters_clock,
-        titleId = LR.string.filters_duration,
-    ),
-    DownloadStatus(
-        iconId = IR.drawable.ic_profile_download,
-        titleId = LR.string.filters_chip_download_status,
-    ),
-    MediaType(
-        iconId = IR.drawable.ic_headphone,
-        titleId = LR.string.filters_chip_media_type,
-    ),
-    Starred(
-        iconId = IR.drawable.ic_star,
-        titleId = LR.string.filters_chip_starred,
-    ),
-}
-
 @Composable
-fun SmartPlaylistPreviewPage(
+fun AppliedRulesPage(
     playlistTitle: String,
     appliedRules: AppliedRules,
     availableEpisodes: List<PodcastEpisode>,
     useEpisodeArtwork: Boolean,
     areOtherOptionsExpanded: Boolean,
-    onCreateSmartPlaylist: () -> Unit,
+    onCreatePlaylist: () -> Unit,
     onClickRule: (RuleType) -> Unit,
     toggleOtherOptions: () -> Unit,
     onClickClose: () -> Unit,
@@ -137,15 +101,13 @@ fun SmartPlaylistPreviewPage(
             .fillMaxSize()
             .verticalScroll(rememberScrollState()),
     ) {
-        IconButton(
-            onClick = onClickClose,
-        ) {
-            Icon(
-                painter = painterResource(R.drawable.ic_close),
-                contentDescription = stringResource(au.com.shiftyjelly.pocketcasts.localization.R.string.close),
-                tint = MaterialTheme.theme.colors.primaryIcon03,
-            )
-        }
+        ThemedTopAppBar(
+            navigationButton = NavigationButton.Close,
+            style = ThemedTopAppBar.Style.Immersive,
+            iconColor = MaterialTheme.theme.colors.primaryIcon03,
+            windowInsets = WindowInsets(0),
+            onNavigationClick = onClickClose,
+        )
         Column(
             modifier = Modifier.weight(1f),
         ) {
@@ -234,7 +196,7 @@ fun SmartPlaylistPreviewPage(
             RowButton(
                 text = stringResource(LR.string.create_smart_playlist),
                 enabled = appliedRules.isAnyRuleApplied,
-                onClick = onCreateSmartPlaylist,
+                onClick = onCreatePlaylist,
                 includePadding = false,
                 modifier = Modifier
                     .padding(horizontal = 16.dp)
@@ -627,18 +589,18 @@ private fun AppliedRules.description(ruleType: RuleType) = when (ruleType) {
 
 @Preview(device = Devices.PORTRAIT_REGULAR)
 @Composable
-private fun SmartPlaylistsPreviewNoRulesPreview(
+private fun AppliedRulesPageNoRulesPreview(
     @PreviewParameter(ThemePreviewParameterProvider::class) themeType: ThemeType,
 ) {
     var expanded by remember { mutableStateOf(false) }
     AppThemeWithBackground(themeType) {
-        SmartPlaylistPreviewPage(
+        AppliedRulesPage(
             playlistTitle = "Comedy",
             appliedRules = AppliedRules.Empty,
             availableEpisodes = emptyList(),
             useEpisodeArtwork = false,
             areOtherOptionsExpanded = expanded,
-            onCreateSmartPlaylist = {},
+            onCreatePlaylist = {},
             onClickRule = {},
             onClickClose = {},
             toggleOtherOptions = { expanded = !expanded },
@@ -649,12 +611,12 @@ private fun SmartPlaylistsPreviewNoRulesPreview(
 
 @Preview(device = Devices.PORTRAIT_REGULAR)
 @Composable
-private fun SmartPlaylistsPreviewEpisodessPreview(
+private fun AppliedRulesPageEpisodessPreview(
     @PreviewParameter(ThemePreviewParameterProvider::class) themeType: ThemeType,
 ) {
     var expanded by remember { mutableStateOf(false) }
     AppThemeWithBackground(themeType) {
-        SmartPlaylistPreviewPage(
+        AppliedRulesPage(
             playlistTitle = "Comedy",
             appliedRules = AppliedRules.Empty.copy(
                 podcasts = PodcastsRule.Any,
@@ -669,7 +631,7 @@ private fun SmartPlaylistsPreviewEpisodessPreview(
             },
             useEpisodeArtwork = false,
             areOtherOptionsExpanded = expanded,
-            onCreateSmartPlaylist = {},
+            onCreatePlaylist = {},
             onClickRule = {},
             onClickClose = {},
             toggleOtherOptions = { expanded = !expanded },
@@ -680,12 +642,12 @@ private fun SmartPlaylistsPreviewEpisodessPreview(
 
 @Preview(device = Devices.PORTRAIT_REGULAR)
 @Composable
-private fun SmartPlaylistsPreviewNoEpisodesPreview(
+private fun AppliedRulesPageNoEpisodesPreview(
     @PreviewParameter(ThemePreviewParameterProvider::class) themeType: ThemeType,
 ) {
     var expanded by remember { mutableStateOf(false) }
     AppThemeWithBackground(themeType) {
-        SmartPlaylistPreviewPage(
+        AppliedRulesPage(
             playlistTitle = "Comedy",
             appliedRules = AppliedRules.Empty.copy(
                 podcasts = PodcastsRule.Any,
@@ -693,7 +655,7 @@ private fun SmartPlaylistsPreviewNoEpisodesPreview(
             availableEpisodes = emptyList(),
             useEpisodeArtwork = false,
             areOtherOptionsExpanded = expanded,
-            onCreateSmartPlaylist = {},
+            onCreatePlaylist = {},
             onClickRule = {},
             onClickClose = {},
             toggleOtherOptions = { expanded = !expanded },

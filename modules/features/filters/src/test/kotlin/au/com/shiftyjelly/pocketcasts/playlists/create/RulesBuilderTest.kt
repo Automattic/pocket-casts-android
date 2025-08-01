@@ -1,7 +1,6 @@
 package au.com.shiftyjelly.pocketcasts.playlists.create
 
-import androidx.navigation.NavDeepLinkRequest
-import au.com.shiftyjelly.pocketcasts.playlists.create.CreatePlaylistViewModel.RulesBuilder
+import au.com.shiftyjelly.pocketcasts.playlists.rules.RulesBuilder
 import kotlin.time.Duration.Companion.minutes
 import org.junit.Assert.assertEquals
 import org.junit.Test
