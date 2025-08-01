@@ -6,6 +6,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
+import au.com.shiftyjelly.pocketcasts.models.type.SmartRules
 import au.com.shiftyjelly.pocketcasts.models.type.SmartRules.DownloadStatusRule
 import au.com.shiftyjelly.pocketcasts.models.type.SmartRules.MediaTypeRule
 import au.com.shiftyjelly.pocketcasts.models.type.SmartRules.ReleaseDateRule
@@ -15,12 +16,16 @@ import au.com.shiftyjelly.pocketcasts.playlists.rules.RulesBuilder
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.preferences.model.ArtworkConfiguration.Element
 import au.com.shiftyjelly.pocketcasts.repositories.playlist.PlaylistManager
+import au.com.shiftyjelly.pocketcasts.repositories.playlist.SmartPlaylistDraft
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.CompletableDeferred
+import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.combine
@@ -29,6 +34,7 @@ import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalCoroutinesApi::class)
 @HiltViewModel(assistedFactory = CreatePlaylistViewModel.Factory::class)
@@ -38,6 +44,10 @@ class CreatePlaylistViewModel @AssistedInject constructor(
     private val settings: Settings,
     @Assisted initialPlaylistTitle: String,
 ) : ViewModel() {
+    private val _createdSmartPlaylistUuid = CompletableDeferred<String>(viewModelScope.coroutineContext[Job])
+
+    val createdSmartPlaylistUuid: Deferred<String> = _createdSmartPlaylistUuid
+
     val playlistNameState = TextFieldState(
         initialText = initialPlaylistTitle,
         initialSelection = TextRange(0, initialPlaylistTitle.length),
@@ -202,6 +212,25 @@ class CreatePlaylistViewModel @AssistedInject constructor(
     fun useStarredEpisodes(shouldUse: Boolean) {
         rulesBuilder.update { builder ->
             builder.copy(useStarredEpisode = shouldUse)
+        }
+    }
+
+    private var isCreationTriggered = false
+
+    fun createSmartPlaylist() {
+        val rules = appliedRules.value.toSmartRules() ?: SmartRules.Default
+        if (isCreationTriggered) {
+            return
+        }
+        isCreationTriggered = true
+
+        val draft = SmartPlaylistDraft(
+            title = playlistNameState.text.toString(),
+            rules = rules,
+        )
+        viewModelScope.launch {
+            val playlistUuid = playlistManager.upsertSmartPlaylist(draft)
+            _createdSmartPlaylistUuid.complete(playlistUuid)
         }
     }
 
