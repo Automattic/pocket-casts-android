@@ -114,7 +114,12 @@ class CreatePlaylistViewModel @AssistedInject constructor(
                 }
             }
 
-            RuleType.Starred -> TODO()
+            RuleType.Starred -> {
+                val rule = rulesBuilder.value.starredRule
+                appliedRules.update { rules ->
+                    rules.copy(starred = rule)
+                }
+            }
         }
     }
 
@@ -199,6 +204,12 @@ class CreatePlaylistViewModel @AssistedInject constructor(
         }
     }
 
+    fun useStarredEpisodes(shouldUse: Boolean) {
+        rulesBuilder.update { builder ->
+            builder.copy(useStarredEpisode = shouldUse)
+        }
+    }
+
     data class UiState(
         val appliedRules: AppliedRules,
         val rulesBuilder: RulesBuilder,
@@ -271,12 +282,27 @@ class CreatePlaylistViewModel @AssistedInject constructor(
         val maxEpisodeDuration: Duration,
         val downloadStatusRule: DownloadStatusRule,
         val mediaTypeRule: MediaTypeRule,
+        val useStarredEpisode: Boolean,
     ) {
         val podcastsRule
             get() = if (useAllPodcasts) {
                 PodcastsRule.Any
             } else {
                 PodcastsRule.Selected(selectedPodcasts.toList())
+            }
+
+        val episodeDurationRule
+            get() = if (isEpisodeDurationConstrained) {
+                EpisodeDurationRule.Constrained(minEpisodeDuration, maxEpisodeDuration)
+            } else {
+                EpisodeDurationRule.Any
+            }
+
+        val starredRule
+            get() = if (useStarredEpisode) {
+                StarredRule.Starred
+            } else {
+                StarredRule.Any
             }
 
         fun decrementMinDuration(): RulesBuilder {
@@ -319,13 +345,6 @@ class CreatePlaylistViewModel @AssistedInject constructor(
             }
         }
 
-        val episodeDurationRule
-            get() = if (isEpisodeDurationConstrained) {
-                EpisodeDurationRule.Constrained(minEpisodeDuration, maxEpisodeDuration)
-            } else {
-                EpisodeDurationRule.Any
-            }
-
         companion object {
             val Empty = RulesBuilder(
                 useAllPodcasts = true,
@@ -337,6 +356,7 @@ class CreatePlaylistViewModel @AssistedInject constructor(
                 maxEpisodeDuration = 40.minutes,
                 downloadStatusRule = SmartRules.Default.downloadStatus,
                 mediaTypeRule = SmartRules.MediaTypeRule.Any,
+                useStarredEpisode = false,
             )
         }
     }
