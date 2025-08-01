@@ -56,6 +56,7 @@ fun EpisodeDurationRulePage(
 ) {
     RulePage(
         title = stringResource(LR.string.filters_episode_duration),
+        isSaveEnabled = maxDuration > minDuration,
         onSaveRule = onSaveRule,
         onClickBack = onClickBack,
         modifier = modifier,

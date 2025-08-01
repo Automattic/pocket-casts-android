@@ -73,6 +73,7 @@ fun PodcastsRulePage(
     RulePage(
         title = stringResource(LR.string.smart_rule_podcasts_title),
         onSaveRule = onSaveRule,
+        isSaveEnabled = useAllPodcasts || selectedPodcastUuids.isNotEmpty(),
         onClickBack = onClickBack,
         modifier = modifier,
     ) { bottomPadding ->
