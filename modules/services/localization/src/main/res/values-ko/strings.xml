@@ -1,11 +1,28 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2025-07-16 09:54:04+0000
+Translation-Revision-Date: 2025-07-30 14:10:08+0000
 Plural-Forms: nplurals=1; plural=0;
 Generator: GlotPress/2.4.0-alpha
 Language: ko_KR
 -->
 <resources>
+    <string name="clear">지우기</string>
+    <string name="new_playlist">새 재생목록</string>
+    <string name="playlists_empty_state_body">재생목록을 통해 스마트 규칙으로 에피소드를 수동 또는 자동으로 구성할 수 있습니다.</string>
+    <string name="playlists_empty_state_title">원하는 방식으로 에피소드 정리</string>
+    <string name="onboarding_upgrade_gratitude">Pocket Casts에서 여러분께 드리는 감사 선물</string>
+    <string name="onboarding_upgrade_app_icons">특별한 Pocket Casts 앱 아이콘</string>
+    <string name="onboarding_upgrade_patron_badge">후원자 프로필 배지</string>
+    <string name="onboarding_upgrade_patron_cloud_storage">파일을 위한 100GB 클라우드 저장 공간</string>
+    <string name="onboarding_upgrade_patron_early_access">새로운 기능 조기 접근</string>
+    <string name="onboarding_upgrade_patron_plus_features">Plus의 모든 기능</string>
+    <string name="onboarding_upgrade_patron_title">저희가 하는 일을 믿고 후원해 주시겠어요?</string>
+    <string name="smart_playlist">스마트 재생목록</string>
+    <string name="playlists_onboarding_playlist_description">직접 설정하고 싶나요? 수동 재생목록을 사용하면 맞춤형 대기열을 만들 수 있습니다. 여행용으로, 테마별로 또는 지금 기분에 맞게 만들어 보세요. 스마트 재생목록과 수동 재생목록 모두 회원님이 원하는 대로 작동합니다.</string>
+    <string name="playlists_onboarding_playlist_title">재생목록 소개</string>
+    <string name="playlists_onboarding_smart_playlist_description">기존과 동일한 방식으로 작동하며, 규칙을 기반으로 에피소드를 자동으로 추가합니다. 모든 기존 필터는 그대로 있으며, 이름만 변경되었습니다.</string>
+    <string name="playlists_onboarding_smart_playlist_title">필터가 이제 스마트 재생목록으로 변경되었습니다</string>
+    <string name="playlists">재생목록</string>
     <string name="onboarding_upgrade_billing_cycle_yearly">연간 요금제</string>
     <string name="onboarding_upgrade_billing_cycle_monthly">월간 요금제</string>
     <string name="onboarding_upgrade_features_trial_schedule">무료 평가판은 어떻게 사용하나요?</string>
