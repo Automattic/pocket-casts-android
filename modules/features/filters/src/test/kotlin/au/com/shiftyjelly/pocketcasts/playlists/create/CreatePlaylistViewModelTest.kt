@@ -32,13 +32,13 @@ class CreatePlaylistViewModelTest {
     @get:Rule
     val coroutineRule = MainCoroutineRule()
 
+    private val playlistManager = FakePlaylistManager()
+
     private val viewModel = CreatePlaylistViewModel(
         initialPlaylistTitle = "Playlist name",
+        playlistManager = playlistManager,
         podcastManager = mock {
             on { findSubscribedFlow() } doReturn flowOf(emptyList())
-        },
-        playlistManager = mock {
-            on { observeSmartEpisodes(any()) } doReturn flowOf(emptyList())
         },
         settings = run {
             val settingMock = mock<UserSetting<ArtworkConfiguration>> {
