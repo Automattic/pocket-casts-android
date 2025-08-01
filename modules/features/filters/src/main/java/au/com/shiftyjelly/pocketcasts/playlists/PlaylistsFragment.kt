@@ -17,6 +17,7 @@ import au.com.shiftyjelly.pocketcasts.compose.extensions.contentWithoutConsumedI
 import au.com.shiftyjelly.pocketcasts.playlists.create.CreatePlaylistFragment
 import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingFlow
 import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingLauncher
+import au.com.shiftyjelly.pocketcasts.ui.helper.FragmentHostListener
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseFragment
 import au.com.shiftyjelly.pocketcasts.views.fragments.TopScrollable
 import dagger.hilt.android.AndroidEntryPoint
@@ -56,6 +57,10 @@ class PlaylistsFragment :
                     }
                 },
                 onDeletePlaylist = { playlist -> viewModel.deletePlaylist(playlist.uuid) },
+                onOpenPlaylist = { playlist ->
+                    val fragment = SmartPlaylistFragment.newInstance(playlist.uuid)
+                    (requireActivity() as FragmentHostListener).addFragment(fragment)
+                },
                 onReorderPlaylists = viewModel::updatePlaylistsOrder,
                 onShowPlaylists = { playlists -> viewModel.trackPlaylistsShown(playlists.size) },
                 onFreeAccountBannerCtaClick = {
