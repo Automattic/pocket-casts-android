@@ -32,6 +32,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.Layout
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.pluralStringResource
@@ -88,7 +89,18 @@ fun ShuffleAnimation(
     }
 }
 
-private val dateFormatter = DateTimeFormatter.ofLocalizedDate(FormatStyle.MEDIUM).withZone(ZoneId.systemDefault())
+private val dateFormatter: DateTimeFormatter
+    @Composable
+    get() {
+        val configuration = LocalConfiguration.current
+        return remember(configuration) {
+            val locale = configuration.locales[0]
+            DateTimeFormatter
+                .ofLocalizedDate(FormatStyle.MEDIUM)
+                .withLocale(locale)
+                .withZone(ZoneId.systemDefault())
+        }
+    }
 
 private data class ShuffleConfig(
     @DrawableRes val artworkResId: Int,
@@ -163,9 +175,7 @@ private fun ShuffleContainer(
     itemsOverlap: Dp = 18.dp,
     isDisplayed: Boolean = true,
 ) {
-    if (items.size % 2 == 0) {
-        error("must have odd number of elements!")
-    }
+    require(items.size % 2 == 0) { "must have odd number of elements!" }
 
     val rowAnimations = remember {
         List(items.size) {
