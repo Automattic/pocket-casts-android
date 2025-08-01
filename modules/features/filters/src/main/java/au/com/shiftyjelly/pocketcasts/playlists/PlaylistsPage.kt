@@ -42,6 +42,8 @@ import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
@@ -68,6 +70,7 @@ internal fun PlaylistsPage(
     uiState: UiState,
     onCreatePlaylist: () -> Unit,
     onDeletePlaylist: (PlaylistPreview) -> Unit,
+    onOpenPlaylist: (PlaylistPreview) -> Unit,
     onReorderPlaylists: (List<String>) -> Unit,
     onShowPlaylists: (List<PlaylistPreview>) -> Unit,
     onFreeAccountBannerCtaClick: () -> Unit,
@@ -106,6 +109,7 @@ internal fun PlaylistsPage(
                 ),
                 onCreatePlaylist = onCreatePlaylist,
                 onDeletePlaylist = onDeletePlaylist,
+                onOpenPlaylist = onOpenPlaylist,
                 onReorderPlaylists = onReorderPlaylists,
                 onShowPlaylists = onShowPlaylists,
                 onDismissPremadePlaylistsTooltip = onDismissPremadePlaylistsTooltip,
@@ -141,6 +145,7 @@ private fun ColumnScope.PlaylistsContent(
     contentPadding: PaddingValues,
     onCreatePlaylist: () -> Unit,
     onDeletePlaylist: (PlaylistPreview) -> Unit,
+    onOpenPlaylist: (PlaylistPreview) -> Unit,
     onReorderPlaylists: (List<String>) -> Unit,
     onShowPlaylists: (List<PlaylistPreview>) -> Unit,
     onDismissPremadePlaylistsTooltip: () -> Unit,
@@ -167,6 +172,7 @@ private fun ColumnScope.PlaylistsContent(
                         listState = listState,
                         contentPadding = contentPadding,
                         onDelete = onDeletePlaylist,
+                        onOpen = onOpenPlaylist,
                         onReorderPlaylists = onReorderPlaylists,
                         onDismissPremadePlaylistsTooltip = onDismissPremadePlaylistsTooltip,
                         modifier = Modifier.fillMaxSize(),
@@ -196,6 +202,7 @@ private fun PlaylistsColumn(
     listState: LazyListState,
     contentPadding: PaddingValues,
     onDelete: (PlaylistPreview) -> Unit,
+    onOpen: (PlaylistPreview) -> Unit,
     onReorderPlaylists: (List<String>) -> Unit,
     onDismissPremadePlaylistsTooltip: () -> Unit,
     modifier: Modifier = Modifier,
@@ -239,6 +246,10 @@ private fun PlaylistsColumn(
                     onDelete = { onDelete(playlist) },
                     onClickTooltip = onDismissPremadePlaylistsTooltip,
                     modifier = Modifier
+                        .clickable(
+                            role = Role.Button,
+                            onClick = { onOpen(playlist) },
+                        )
                         .longPressDraggableHandle(
                             onDragStarted = {
                                 hapticFeedback.performHapticFeedback(HapticFeedbackType.LongPress)
@@ -248,7 +259,8 @@ private fun PlaylistsColumn(
                             },
                         )
                         .animateItem()
-                        .shadow(elevation),
+                        .shadow(elevation)
+                        .semantics(mergeDescendants = true) {},
                 )
             }
         }
@@ -360,6 +372,7 @@ private fun PlaylistsPageEmptyStatePreview() {
             ),
             onCreatePlaylist = {},
             onDeletePlaylist = {},
+            onOpenPlaylist = {},
             onReorderPlaylists = {},
             onShowPlaylists = {},
             onFreeAccountBannerCtaClick = {},
@@ -384,6 +397,7 @@ private fun PlaylistsPageEmptyStateNoBannerPreview() {
             ),
             onCreatePlaylist = {},
             onDeletePlaylist = {},
+            onOpenPlaylist = {},
             onReorderPlaylists = {},
             onShowPlaylists = {},
             onFreeAccountBannerCtaClick = {},
@@ -419,6 +433,7 @@ private fun PlaylistPagePreview(
             ),
             onCreatePlaylist = {},
             onDeletePlaylist = {},
+            onOpenPlaylist = {},
             onReorderPlaylists = {},
             onShowPlaylists = {},
             onFreeAccountBannerCtaClick = {},
