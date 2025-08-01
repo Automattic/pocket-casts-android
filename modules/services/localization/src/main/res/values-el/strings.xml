@@ -36,7 +36,6 @@ Language: el_GR
     <string name="notifications_settings_turn_on_push_title">Ενεργοποίηση ειδοποιήσων push;</string>
     <string name="notification_content_recommendations_message">Αναρωτιέσαι τι να ακούσεις μετά; Δες αυτές τις εκπομπές!</string>
     <string name="notification_content_recommendations_title">Νέες προτάσεις για σένα</string>
-    <string name="notification_content_recommendations_trending_message">Δες τι ακούει ο κόσμος αυτή την εβδομάδα.</string>
     <string name="notification_content_recommendations_trending_title">Δημοφιλή αυτή την εβδομάδα</string>
     <string name="notification_reengage_catch_up_offline_title">Πρόφτασε εκτός σύνδεσης</string>
     <string name="notification_reengage_we_miss_you_message">Έχει περάσει καιρός από τότε που άκουσες. Μπες ξανά και απόλαυσε!</string>
