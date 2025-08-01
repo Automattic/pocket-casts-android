@@ -123,9 +123,9 @@ class CreatePlaylistViewModel @AssistedInject constructor(
         }
     }
 
-    fun useAllPodcasts(use: Boolean) {
+    fun useAllPodcasts(shouldUse: Boolean) {
         rulesBuilder.update { builder ->
-            builder.copy(useAllPodcasts = use)
+            builder.copy(useAllPodcasts = shouldUse)
         }
     }
 
@@ -143,23 +143,23 @@ class CreatePlaylistViewModel @AssistedInject constructor(
         }
     }
 
-    fun useUnplayedEpisodes(use: Boolean) {
+    fun useUnplayedEpisodes(shouldUse: Boolean) {
         rulesBuilder.update { builder ->
-            val rule = builder.episodeStatusRule.copy(unplayed = use)
+            val rule = builder.episodeStatusRule.copy(unplayed = shouldUse)
             builder.copy(episodeStatusRule = rule)
         }
     }
 
-    fun useInProgressEpisodes(use: Boolean) {
+    fun useInProgressEpisodes(shouldUse: Boolean) {
         rulesBuilder.update { builder ->
-            val rule = builder.episodeStatusRule.copy(inProgress = use)
+            val rule = builder.episodeStatusRule.copy(inProgress = shouldUse)
             builder.copy(episodeStatusRule = rule)
         }
     }
 
-    fun useCompletedEpisodes(use: Boolean) {
+    fun useCompletedEpisodes(shouldUse: Boolean) {
         rulesBuilder.update { builder ->
-            val rule = builder.episodeStatusRule.copy(completed = use)
+            val rule = builder.episodeStatusRule.copy(completed = shouldUse)
             builder.copy(episodeStatusRule = rule)
         }
     }
@@ -170,9 +170,9 @@ class CreatePlaylistViewModel @AssistedInject constructor(
         }
     }
 
-    fun constrainDuration(isConstrained: Boolean) {
+    fun useConstrainedDuration(shouldUse: Boolean) {
         rulesBuilder.update { builder ->
-            builder.copy(isEpisodeDurationConstrained = isConstrained)
+            builder.copy(isEpisodeDurationConstrained = shouldUse)
         }
     }
 
