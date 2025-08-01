@@ -23,12 +23,14 @@ import au.com.shiftyjelly.pocketcasts.compose.extensions.slideInToEnd
 import au.com.shiftyjelly.pocketcasts.compose.extensions.slideInToStart
 import au.com.shiftyjelly.pocketcasts.compose.extensions.slideOutToEnd
 import au.com.shiftyjelly.pocketcasts.compose.extensions.slideOutToStart
+import au.com.shiftyjelly.pocketcasts.playlists.rules.AppliedRulesPage
 import au.com.shiftyjelly.pocketcasts.playlists.rules.DownloadStatusRulePage
 import au.com.shiftyjelly.pocketcasts.playlists.rules.EpisodeDurationRulePage
 import au.com.shiftyjelly.pocketcasts.playlists.rules.EpisodeStatusRulePage
 import au.com.shiftyjelly.pocketcasts.playlists.rules.MediaTypeRulePage
 import au.com.shiftyjelly.pocketcasts.playlists.rules.PodcastsRulePage
 import au.com.shiftyjelly.pocketcasts.playlists.rules.ReleaseDateRulePage
+import au.com.shiftyjelly.pocketcasts.playlists.rules.RuleType
 import au.com.shiftyjelly.pocketcasts.utils.extensions.pxToDp
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseDialogFragment
 import com.google.android.material.bottomsheet.BottomSheetBehavior
@@ -96,13 +98,13 @@ class CreatePlaylistFragment : BaseDialogFragment() {
                     )
                 }
                 composable(NavigationRoutes.SMART_PLAYLIST_PREVIEW) {
-                    SmartPlaylistPreviewPage(
+                    AppliedRulesPage(
                         playlistTitle = viewModel.playlistNameState.text.toString(),
                         appliedRules = uiState.appliedRules,
                         availableEpisodes = uiState.smartEpisodes,
                         useEpisodeArtwork = uiState.useEpisodeArtwork,
                         areOtherOptionsExpanded = areOtherOptionsExpanded,
-                        onCreateSmartPlaylist = { Timber.i("On create smart playlist") },
+                        onCreatePlaylist = { Timber.i("On create smart playlist") },
                         onClickRule = { rule -> navigateOnce(rule.toNavigationRoute()) },
                         toggleOtherOptions = { areOtherOptionsExpanded = !areOtherOptionsExpanded },
                         onClickClose = ::dismiss,
