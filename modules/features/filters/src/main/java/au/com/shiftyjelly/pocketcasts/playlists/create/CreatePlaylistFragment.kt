@@ -152,7 +152,7 @@ class CreatePlaylistFragment : BaseDialogFragment() {
                         isDurationConstrained = uiState.rulesBuilder.isEpisodeDurationConstrained,
                         minDuration = uiState.rulesBuilder.minEpisodeDuration,
                         maxDuration = uiState.rulesBuilder.maxEpisodeDuration,
-                        onChangeConstrainDuration = viewModel::constrainDuration,
+                        onChangeConstrainDuration = viewModel::useConstrainedDuration,
                         onDecrementMinDuration = viewModel::decrementMinDuration,
                         onIncrementMinDuration = viewModel::incrementMinDuration,
                         onDecrementMaxDuration = viewModel::decrementMaxDuration,
