@@ -24,6 +24,7 @@ import au.com.shiftyjelly.pocketcasts.compose.extensions.slideInToStart
 import au.com.shiftyjelly.pocketcasts.compose.extensions.slideOutToEnd
 import au.com.shiftyjelly.pocketcasts.compose.extensions.slideOutToStart
 import au.com.shiftyjelly.pocketcasts.playlists.rules.DownloadStatusRulePage
+import au.com.shiftyjelly.pocketcasts.playlists.rules.EpisodeStatusRulePage
 import au.com.shiftyjelly.pocketcasts.playlists.rules.MediaTypeRulePage
 import au.com.shiftyjelly.pocketcasts.playlists.rules.ReleaseDateRulePage
 import au.com.shiftyjelly.pocketcasts.utils.extensions.pxToDp
@@ -123,9 +124,9 @@ class CreatePlaylistFragment : BaseDialogFragment() {
                 composable(NavigationRoutes.SMART_RULE_EPISODE_STATUS) {
                     EpisodeStatusRulePage(
                         rule = uiState.rulesBuilder.episodeStatusRule,
-                        onToggleUnplayedStatus = viewModel::useUnplayedEpisodes,
-                        onToggleInProgressStatus = viewModel::useInProgressEpisodes,
-                        onToggleCompletedStatus = viewModel::useCompletedEpisodes,
+                        onChangeUnplayedStatus = viewModel::useUnplayedEpisodes,
+                        onChangeInProgressStatus = viewModel::useInProgressEpisodes,
+                        onChangeCompletedStatus = viewModel::useCompletedEpisodes,
                         onSaveRule = {
                             viewModel.applyRule(RuleType.EpisodeStatus)
                             goBackToPlaylistPreview()
