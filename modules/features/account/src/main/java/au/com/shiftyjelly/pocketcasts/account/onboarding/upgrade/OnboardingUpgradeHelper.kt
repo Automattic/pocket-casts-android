@@ -58,6 +58,8 @@ import au.com.shiftyjelly.pocketcasts.compose.patronGradientBrush
 import au.com.shiftyjelly.pocketcasts.compose.plusGradientBrush
 import au.com.shiftyjelly.pocketcasts.payment.SubscriptionTier
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 import au.com.shiftyjelly.pocketcasts.ui.R as UR
@@ -384,8 +386,20 @@ object OnboardingUpgradeHelper {
         onPrivacyPolicyClick: () -> Unit = {},
         onTermsAndConditionsClick: () -> Unit = {},
     ) {
-        val privacyPolicyText = stringResource(LR.string.onboarding_plus_privacy_policy)
-        val termsAndConditionsText = stringResource(LR.string.onboarding_plus_terms_and_conditions)
+        val privacyPolicyText = stringResource(
+            if (FeatureFlag.isEnabled(Feature.NEW_ONBOARDING_UPGRADE)) {
+                LR.string.onboarding_upgrade_pp
+            } else {
+                LR.string.onboarding_plus_privacy_policy
+            }
+        )
+        val termsAndConditionsText = stringResource(
+            if (FeatureFlag.isEnabled(Feature.NEW_ONBOARDING_UPGRADE)) {
+                LR.string.onboarding_upgrade_tnc
+            } else {
+                LR.string.onboarding_plus_terms_and_conditions
+            }
+        )
         val text = stringResource(
             LR.string.onboarding_plus_continuing_agrees_to,
             privacyPolicyText,
