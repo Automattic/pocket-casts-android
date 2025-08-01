@@ -32,6 +32,7 @@ fun EpisodeStatusRulePage(
     RulePage(
         title = stringResource(LR.string.filters_chip_episode_status),
         onSaveRule = onSaveRule,
+        isSaveEnabled = rule.unplayed || rule.inProgress || rule.completed,
         onClickBack = onClickBack,
         modifier = modifier,
     ) { bottomPadding ->
