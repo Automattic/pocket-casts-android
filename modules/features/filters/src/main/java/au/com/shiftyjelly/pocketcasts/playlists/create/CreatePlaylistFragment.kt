@@ -24,6 +24,7 @@ import au.com.shiftyjelly.pocketcasts.compose.extensions.slideInToStart
 import au.com.shiftyjelly.pocketcasts.compose.extensions.slideOutToEnd
 import au.com.shiftyjelly.pocketcasts.compose.extensions.slideOutToStart
 import au.com.shiftyjelly.pocketcasts.playlists.rules.DownloadStatusRulePage
+import au.com.shiftyjelly.pocketcasts.playlists.rules.EpisodeDurationRulePage
 import au.com.shiftyjelly.pocketcasts.playlists.rules.EpisodeStatusRulePage
 import au.com.shiftyjelly.pocketcasts.playlists.rules.MediaTypeRulePage
 import au.com.shiftyjelly.pocketcasts.playlists.rules.ReleaseDateRulePage
@@ -150,7 +151,7 @@ class CreatePlaylistFragment : BaseDialogFragment() {
                         isDurationConstrained = uiState.rulesBuilder.isEpisodeDurationConstrained,
                         minDuration = uiState.rulesBuilder.minEpisodeDuration,
                         maxDuration = uiState.rulesBuilder.maxEpisodeDuration,
-                        onToggleConstrainDuration = viewModel::constrainDuration,
+                        onChangeConstrainDuration = viewModel::constrainDuration,
                         onDecrementMinDuration = viewModel::decrementMinDuration,
                         onIncrementMinDuration = viewModel::incrementMinDuration,
                         onDecrementMaxDuration = viewModel::decrementMaxDuration,
