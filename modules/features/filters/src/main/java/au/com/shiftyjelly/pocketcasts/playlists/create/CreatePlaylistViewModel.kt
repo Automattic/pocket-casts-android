@@ -107,7 +107,13 @@ class CreatePlaylistViewModel @AssistedInject constructor(
                 }
             }
 
-            RuleType.MediaType -> TODO()
+            RuleType.MediaType -> {
+                val rule = rulesBuilder.value.mediaTypeRule
+                appliedRules.update { rules ->
+                    rules.copy(mediaType = rule)
+                }
+            }
+
             RuleType.Starred -> TODO()
         }
     }
@@ -187,6 +193,12 @@ class CreatePlaylistViewModel @AssistedInject constructor(
         }
     }
 
+    fun useMediaType(rule: MediaTypeRule) {
+        rulesBuilder.update { builder ->
+            builder.copy(mediaTypeRule = rule)
+        }
+    }
+
     data class UiState(
         val appliedRules: AppliedRules,
         val rulesBuilder: RulesBuilder,
@@ -258,6 +270,7 @@ class CreatePlaylistViewModel @AssistedInject constructor(
         val minEpisodeDuration: Duration,
         val maxEpisodeDuration: Duration,
         val downloadStatusRule: DownloadStatusRule,
+        val mediaTypeRule: MediaTypeRule,
     ) {
         val podcastsRule
             get() = if (useAllPodcasts) {
@@ -323,6 +336,7 @@ class CreatePlaylistViewModel @AssistedInject constructor(
                 minEpisodeDuration = 20.minutes,
                 maxEpisodeDuration = 40.minutes,
                 downloadStatusRule = SmartRules.Default.downloadStatus,
+                mediaTypeRule = SmartRules.MediaTypeRule.Any,
             )
         }
     }

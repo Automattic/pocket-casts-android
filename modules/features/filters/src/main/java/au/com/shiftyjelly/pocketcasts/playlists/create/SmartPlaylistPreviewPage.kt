@@ -69,9 +69,9 @@ import au.com.shiftyjelly.pocketcasts.compose.theme
 import au.com.shiftyjelly.pocketcasts.localization.helper.RelativeDateFormatter
 import au.com.shiftyjelly.pocketcasts.localization.helper.TimeHelper
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
-import au.com.shiftyjelly.pocketcasts.models.type.SmartRules
 import au.com.shiftyjelly.pocketcasts.models.type.SmartRules.DownloadStatusRule
 import au.com.shiftyjelly.pocketcasts.models.type.SmartRules.EpisodeDurationRule
+import au.com.shiftyjelly.pocketcasts.models.type.SmartRules.MediaTypeRule
 import au.com.shiftyjelly.pocketcasts.models.type.SmartRules.PodcastsRule
 import au.com.shiftyjelly.pocketcasts.models.type.SmartRules.ReleaseDateRule
 import au.com.shiftyjelly.pocketcasts.playlists.create.CreatePlaylistViewModel.AppliedRules
@@ -613,7 +613,14 @@ private fun AppliedRules.description(ruleType: RuleType) = when (ruleType) {
         DownloadStatusRule.NotDownloaded -> stringResource(LR.string.not_downloaded)
         null -> null
     }
-    RuleType.MediaType -> TODO()
+
+    RuleType.MediaType -> when (mediaType) {
+        MediaTypeRule.Any -> stringResource(LR.string.all)
+        MediaTypeRule.Audio -> stringResource(LR.string.audio)
+        MediaTypeRule.Video -> stringResource(LR.string.video)
+        null -> null
+    }
+
     RuleType.Starred -> TODO()
 }
 
