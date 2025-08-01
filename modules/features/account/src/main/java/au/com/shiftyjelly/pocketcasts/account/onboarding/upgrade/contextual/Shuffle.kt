@@ -1,6 +1,5 @@
 package au.com.shiftyjelly.pocketcasts.account.onboarding.upgrade.contextual
 
-import android.graphics.RectF
 import androidx.annotation.DrawableRes
 import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.animation.core.animateFloat
@@ -18,11 +17,11 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.Card
 import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.ReadOnlyComposable
-import androidx.compose.runtime.Stable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
@@ -31,11 +30,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.drawBehind
-import androidx.compose.ui.graphics.Paint
-import androidx.compose.ui.graphics.drawscope.drawIntoCanvas
 import androidx.compose.ui.graphics.graphicsLayer
-import androidx.compose.ui.graphics.nativeCanvas
 import androidx.compose.ui.layout.Layout
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
@@ -202,7 +197,7 @@ private fun ShuffleContainer(
                         1f
                     },
                     elevation = if (middleIndex) {
-                        32.dp
+                        12.dp
                     } else {
                         8.dp
                     },
@@ -244,7 +239,7 @@ private fun ShuffleContainer(
                         1f
                     } else {
                         0f
-                    }.toFloat(),
+                    },
                 )
             }
         }
@@ -309,53 +304,59 @@ private fun ShuffleItem(
         }
     }
 
-    Row(
+    Card(
         modifier = modifier
             .graphicsLayer {
                 scaleY = scale
                 scaleX = scale
                 translationY = transitionAnim
                 alpha = alphaAnim
+
+                shadowElevation = (elevation * alphaAnim).toPx()
+                shape = RoundedCornerShape(4.dp)
+                clip = false
             }
-            .background(color = MaterialTheme.theme.colors.primaryUi04, shape = RoundedCornerShape(3.dp))
-            .clip(RoundedCornerShape(3.dp))
-            .simulateShadow(cornerRadius = 3.dp, elevation = elevation)
-            .padding(vertical = 8.dp, horizontal = 16.dp),
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.spacedBy(10.dp),
+            .background(color = MaterialTheme.theme.colors.primaryUi04, shape = RoundedCornerShape(4.dp)),
+        elevation = 0.dp,
     ) {
-        Image(
-            modifier = Modifier
-                .size(48.dp)
-                .clip(RoundedCornerShape(3.dp)),
-            painter = painterResource(config.artworkResId),
-            contentDescription = "",
-        )
-        Column(
-            verticalArrangement = Arrangement.spacedBy(1.dp),
+        Row(
+            modifier = Modifier.padding(vertical = 8.dp, horizontal = 16.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(10.dp),
         ) {
-            TextH70(
-                fontSize = 10.sp,
-                text = dateFormatter.format(config.date).toUpperCase(Locale.current),
-                color = MaterialTheme.theme.colors.primaryText02,
-                modifier = Modifier.fillMaxWidth(),
-                disableAutoScale = true,
+            Image(
+                modifier = Modifier
+                    .size(48.dp)
+                    .clip(RoundedCornerShape(3.dp)),
+                painter = painterResource(config.artworkResId),
+                contentDescription = "",
             )
-            TextP60(
-                text = config.title,
-                fontWeight = FontWeight.W500,
-                modifier = Modifier.fillMaxWidth(),
-                maxLines = 1,
-                color = MaterialTheme.theme.colors.primaryText01,
-                disableAutoScale = true,
-            )
-            TextH70(
-                fontSize = 10.sp,
-                text = formatDuration(config.durationSeconds),
-                color = MaterialTheme.theme.colors.primaryText02,
-                modifier = Modifier.fillMaxWidth(),
-                disableAutoScale = true,
-            )
+            Column(
+                verticalArrangement = Arrangement.spacedBy(1.dp),
+            ) {
+                TextH70(
+                    fontSize = 10.sp,
+                    text = dateFormatter.format(config.date).toUpperCase(Locale.current),
+                    color = MaterialTheme.theme.colors.primaryText02,
+                    modifier = Modifier.fillMaxWidth(),
+                    disableAutoScale = true,
+                )
+                TextP60(
+                    text = config.title,
+                    fontWeight = FontWeight.W500,
+                    modifier = Modifier.fillMaxWidth(),
+                    maxLines = 1,
+                    color = MaterialTheme.theme.colors.primaryText01,
+                    disableAutoScale = true,
+                )
+                TextH70(
+                    fontSize = 10.sp,
+                    text = formatDuration(config.durationSeconds),
+                    color = MaterialTheme.theme.colors.primaryText02,
+                    modifier = Modifier.fillMaxWidth(),
+                    disableAutoScale = true,
+                )
+            }
         }
     }
 }
@@ -368,56 +369,6 @@ private fun List<Any>.isMiddleIndex(index: Int): Boolean {
         index == middleIndex
     }
 }
-
-@Stable
-private fun Modifier.simulateShadow(
-    cornerRadius: Dp,
-    elevation: Dp,
-): Modifier = this.then(
-    Modifier.drawBehind {
-        val radius = cornerRadius.toPx()
-
-        drawIntoCanvas { canvas ->
-            val paint = Paint().asFrameworkPaint().apply {
-                color = android.graphics.Color.BLACK
-                setShadowLayer(elevation.toPx(), 0f, 4f, android.graphics.Color.BLACK)
-                this.alpha = (0.2f * 255).toInt()
-                isAntiAlias = true
-            }
-
-            // Bottom shadow
-            canvas.nativeCanvas.drawLine(
-                0f,
-                size.height,
-                size.width,
-                size.height,
-                paint,
-            )
-
-            canvas.nativeCanvas.drawArc(
-                RectF(
-                    size.width - 2 * radius,
-                    size.height - 2 * radius,
-                    2 * radius,
-                    2 * radius,
-                ),
-                0f,
-                90f,
-                true,
-                paint,
-            )
-
-            // Right shadow
-            canvas.nativeCanvas.drawLine(
-                size.width,
-                0f,
-                size.width,
-                size.height,
-                paint,
-            )
-        }
-    },
-)
 
 @ReadOnlyComposable
 @Composable
