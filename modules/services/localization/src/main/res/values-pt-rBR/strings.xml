@@ -1,11 +1,28 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2025-07-14 19:54:03+0000
+Translation-Revision-Date: 2025-07-30 14:10:08+0000
 Plural-Forms: nplurals=2; plural=(n > 1);
 Generator: GlotPress/2.4.0-alpha
 Language: pt_BR
 -->
 <resources>
+    <string name="clear">Limpar</string>
+    <string name="new_playlist">Nova lista de reprodução</string>
+    <string name="playlists_empty_state_body">As listas de reprodução permitem que você organize episódios manual ou automaticamente com Regras inteligentes.</string>
+    <string name="playlists_empty_state_title">Organize episódios do seu jeito</string>
+    <string name="onboarding_upgrade_gratitude">A eterna gratidão de todos aqui no Pocket Casts</string>
+    <string name="onboarding_upgrade_app_icons">Ícones especiais do aplicativo do Pocket Casts</string>
+    <string name="onboarding_upgrade_patron_badge">Selo do perfil de apoiadores</string>
+    <string name="onboarding_upgrade_patron_cloud_storage">100 GB de armazenamento na nuvem para seus arquivos</string>
+    <string name="onboarding_upgrade_patron_early_access">Acesso antecipado a novas funcionalidades</string>
+    <string name="onboarding_upgrade_patron_plus_features">Todas as funcionalidades no Plus</string>
+    <string name="onboarding_upgrade_patron_title">Acredita no nosso trabalho e quer mostrar seu apoio?</string>
+    <string name="smart_playlist">Lista de reprodução inteligente</string>
+    <string name="playlists_onboarding_playlist_description">Quer ter mais controle? Com as listas de reprodução manuais, você cria filas personalizadas, ótimas para viagens, temas ou apenas sua vibe atual. Sejam inteligentes ou manuais, as listas de reprodução funcionam do seu jeito.</string>
+    <string name="playlists_onboarding_playlist_title">Apresentamos as listas de reprodução</string>
+    <string name="playlists_onboarding_smart_playlist_description">Elas ainda funcionam da mesma forma, usando regras para adicionar seus episódios automaticamente. Todos os filtros existentes estão bem aqui, nada mudou além do nome.</string>
+    <string name="playlists_onboarding_smart_playlist_title">Agora os filtros são listas de reprodução inteligentes</string>
+    <string name="playlists">Listas de reprodução</string>
     <string name="onboarding_upgrade_billing_cycle_yearly">Plano anual</string>
     <string name="onboarding_upgrade_billing_cycle_monthly">Plano mensal</string>
     <string name="onboarding_upgrade_features_trial_schedule">Como funciona o teste gratuito?</string>

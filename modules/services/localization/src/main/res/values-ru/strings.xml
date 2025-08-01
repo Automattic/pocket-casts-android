@@ -1,11 +1,28 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2025-07-16 09:54:04+0000
+Translation-Revision-Date: 2025-07-30 14:54:04+0000
 Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);
 Generator: GlotPress/2.4.0-alpha
 Language: ru
 -->
 <resources>
+    <string name="clear">Очистить</string>
+    <string name="new_playlist">Новый плейлист</string>
+    <string name="playlists_empty_state_body">Плейлисты позволяют упорядочивать выпуски вручную или автоматически по умным правилам.</string>
+    <string name="playlists_empty_state_title">Слушайте выпуски в нужном вам порядке</string>
+    <string name="onboarding_upgrade_gratitude">Огромное вам спасибо от всей команды Pocket Casts</string>
+    <string name="onboarding_upgrade_app_icons">Специальные значки приложения Pocket Casts</string>
+    <string name="onboarding_upgrade_patron_badge">Значок профиля для спонсоров</string>
+    <string name="onboarding_upgrade_patron_cloud_storage">100 ГБ облачного хранилища для ваших файлов</string>
+    <string name="onboarding_upgrade_patron_early_access">Ранний доступ к новым возможностям</string>
+    <string name="onboarding_upgrade_patron_plus_features">Все функции Plus</string>
+    <string name="onboarding_upgrade_patron_title">Вам нравится то, что мы делаем, и вы хотите нас поддержать?</string>
+    <string name="smart_playlist">Умный плейлист</string>
+    <string name="playlists_onboarding_playlist_description">Хотите расширить возможности управления? Свои плейлисты — это функция, дающая вам возможность составлять собственные списки воспроизведения. Создавайте тематические плейлисты, сборники в дорогу или просто списки под настроение. Плейлисты — «свои» или «умные» — действуют так же, как и вы сами.</string>
+    <string name="playlists_onboarding_playlist_title">Знакомьтесь: плейлисты</string>
+    <string name="playlists_onboarding_smart_playlist_description">Всё работает точно так же, как и раньше: выпуски автоматически добавляются по установленным правилам. Все ваши фильтры никуда не делись, и ничего не изменилось, кроме названия.</string>
+    <string name="playlists_onboarding_smart_playlist_title">Умные плейлисты — это новое название фильтров</string>
+    <string name="playlists">Плейлисты</string>
     <string name="onboarding_upgrade_billing_cycle_yearly">Годовой тарифный план</string>
     <string name="onboarding_upgrade_billing_cycle_monthly">Тарифный план с помесячной оплатой</string>
     <string name="onboarding_upgrade_features_trial_schedule">Что такое бесплатный пробный период?</string>

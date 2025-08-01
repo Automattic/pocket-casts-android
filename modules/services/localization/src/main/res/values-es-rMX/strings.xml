@@ -1,11 +1,28 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2025-07-15 14:54:04+0000
+Translation-Revision-Date: 2025-07-30 14:10:08+0000
 Plural-Forms: nplurals=2; plural=n != 1;
 Generator: GlotPress/2.4.0-alpha
 Language: es
 -->
 <resources>
+    <string name="clear">Borrar</string>
+    <string name="new_playlist">Nueva lista de reproducción</string>
+    <string name="playlists_empty_state_body">Las listas de reproducción te permiten organizar episodios de forma manual o automática con Smart Rules.</string>
+    <string name="playlists_empty_state_title">Organiza tus episodios como quieras</string>
+    <string name="onboarding_upgrade_gratitude">El eterno agradecimiento del equipo de Pocket Casts</string>
+    <string name="onboarding_upgrade_app_icons">Iconos especiales de la aplicación Pocket Casts</string>
+    <string name="onboarding_upgrade_patron_badge">Insignia de perfil de miembro de pago</string>
+    <string name="onboarding_upgrade_patron_cloud_storage">100 GB de almacenamiento en la nube para tus archivos</string>
+    <string name="onboarding_upgrade_patron_early_access">Acceso anticipado a las nuevas funciones</string>
+    <string name="onboarding_upgrade_patron_plus_features">Todas las funciones de Plus</string>
+    <string name="onboarding_upgrade_patron_title">¿Confías en nuestro trabajo y quieres mostrarnos tu apoyo?</string>
+    <string name="smart_playlist">Lista de reproducción inteligente</string>
+    <string name="playlists_onboarding_playlist_description">¿Quieres tener más control? Con las listas de reproducción manuales puedes crear colas personalizadas, una opción ideal para viajes, temas o que se adapten a cómo te sientes en ese momento. Inteligentes o manuales, las listas de reproducción te siguen el ritmo.</string>
+    <string name="playlists_onboarding_playlist_title">Presentamos las listas de reproducción</string>
+    <string name="playlists_onboarding_smart_playlist_description">Funcionan exactamente igual que antes y utilizan reglas para añadir automáticamente tus episodios. Todos los filtros que utilizas siguen aquí, solo hemos cambiado el nombre.</string>
+    <string name="playlists_onboarding_smart_playlist_title">Los filtros son ahora listas de reproducción inteligentes</string>
+    <string name="playlists">Listas de reproducción</string>
     <string name="onboarding_upgrade_billing_cycle_yearly">Plan anual</string>
     <string name="onboarding_upgrade_billing_cycle_monthly">Plan mensual</string>
     <string name="onboarding_upgrade_features_trial_schedule">¿Cómo funciona la prueba gratuita?</string>
@@ -59,7 +76,7 @@ Language: es
     <string name="notifications_settings_turn_on_push_title">¿Activar las notificaciones push?</string>
     <string name="notification_content_recommendations_message">¿No sabes qué escuchar a continuación? Echa un vistazo a estos programas.</string>
     <string name="notification_content_recommendations_title">Nuevas recomendaciones para ti</string>
-    <string name="notification_content_recommendations_trending_message">Echa un vistazo a lo que todo el mundo escucha esta semana.</string>
+    <string name="notification_content_recommendations_trending_message">Echa un vistazo a lo que todo el mundo está escuchando esta semana.</string>
     <string name="notification_content_recommendations_trending_title">Tendencias de esta semana</string>
     <string name="notification_reengage_catch_up_offline_title">Ponte al día sin conexión</string>
     <string name="notification_reengage_we_miss_you_message">Hace tiempo que no escuchas nada. Vuelve a entrar y disfruta.</string>

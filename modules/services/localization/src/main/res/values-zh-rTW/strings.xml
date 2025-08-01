@@ -1,11 +1,28 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2025-07-16 13:54:03+0000
+Translation-Revision-Date: 2025-07-30 14:10:08+0000
 Plural-Forms: nplurals=1; plural=0;
 Generator: GlotPress/2.4.0-alpha
 Language: zh_TW
 -->
 <resources>
+    <string name="clear">清除</string>
+    <string name="new_playlist">新播放清單</string>
+    <string name="playlists_empty_state_body">有了播放清單，你就能透過「智慧規則」手動或自動整理節目內容。</string>
+    <string name="playlists_empty_state_title">用自己的方式整理節目內容</string>
+    <string name="onboarding_upgrade_gratitude">Pocket Casts 全體成員向你致上誠摯謝意</string>
+    <string name="onboarding_upgrade_app_icons">特殊 Pocket Casts 應用程式圖示</string>
+    <string name="onboarding_upgrade_patron_badge">支持者個人檔案徽章</string>
+    <string name="onboarding_upgrade_patron_cloud_storage">100 GB 雲端儲存空間，供你的檔案使用</string>
+    <string name="onboarding_upgrade_patron_early_access">搶先使用新功能</string>
+    <string name="onboarding_upgrade_patron_plus_features">Plus 的所有功能</string>
+    <string name="onboarding_upgrade_patron_title">肯定我們的服務，並想表達支持嗎？</string>
+    <string name="smart_playlist">智慧播放清單</string>
+    <string name="playlists_onboarding_playlist_description">想獲得更全面的控制功能嗎？ 不妨運用手動播放清單建立自訂佇列，搭配旅遊、佈景主題或目前的氣氛。 不論是智慧或手動播放清單，都能配合你的需求。</string>
+    <string name="playlists_onboarding_playlist_title">隆重介紹播放清單</string>
+    <string name="playlists_onboarding_smart_playlist_description">播放清單的運作方式不變：可依據你設定的規則，自動加入單集。 你原有的「篩選」都還在，只是名稱有所調整。</string>
+    <string name="playlists_onboarding_smart_playlist_title">「篩選」現在改名為「智慧播放清單」</string>
+    <string name="playlists">播放清單</string>
     <string name="onboarding_upgrade_billing_cycle_yearly">年繳方案</string>
     <string name="onboarding_upgrade_billing_cycle_monthly">月繳方案</string>
     <string name="onboarding_upgrade_features_trial_schedule">免費試用提供哪些內容？</string>
@@ -59,7 +76,7 @@ Language: zh_TW
     <string name="notifications_settings_turn_on_push_title">是否開啟推播通知？</string>
     <string name="notification_content_recommendations_message">還不知道接下來要聽什麼嗎？ 不妨試試這些節目！</string>
     <string name="notification_content_recommendations_title">適合你的全新推薦內容</string>
-    <string name="notification_content_recommendations_trending_message">查看其他人這週都在聽什麼。</string>
+    <string name="notification_content_recommendations_trending_message">查看其他人本週都在聽什麼。</string>
     <string name="notification_content_recommendations_trending_title">本週熱播</string>
     <string name="notification_reengage_catch_up_offline_title">離線補聽</string>
     <string name="notification_reengage_we_miss_you_message">距離你上次收聽已經有一段時間了。 重新加入並盡情暢聽！</string>

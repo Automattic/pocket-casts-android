@@ -1,11 +1,28 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2025-07-16 11:54:03+0000
+Translation-Revision-Date: 2025-07-30 14:10:08+0000
 Plural-Forms: nplurals=1; plural=0;
 Generator: GlotPress/2.4.0-alpha
 Language: zh_CN
 -->
 <resources>
+    <string name="clear">清除</string>
+    <string name="new_playlist">新播放列表</string>
+    <string name="playlists_empty_state_body">播放列表支持手动整理剧集，也可通过智能规则实现自动管理。</string>
+    <string name="playlists_empty_state_title">按照您自己的方式整理剧集</string>
+    <string name="onboarding_upgrade_gratitude">Pocket Casts 的每个人始终心怀感激</string>
+    <string name="onboarding_upgrade_app_icons">特殊的 Pocket Casts 应用程序图标</string>
+    <string name="onboarding_upgrade_patron_badge">支持者个人资料徽章</string>
+    <string name="onboarding_upgrade_patron_cloud_storage">供您存放文件的 100 GB 云存储空间</string>
+    <string name="onboarding_upgrade_patron_early_access">抢先体验新功能</string>
+    <string name="onboarding_upgrade_patron_plus_features">Plus 中的所有功能</string>
+    <string name="onboarding_upgrade_patron_title">认可我们的理念并想给予支持？</string>
+    <string name="smart_playlist">智能播放列表</string>
+    <string name="playlists_onboarding_playlist_description">想要更多控制权？ 通过手动播放列表，您可以构建适合旅途、主题或当下心情的自定义队列。 无论是智能推荐还是手动编排，播放列表都能如您所愿。</string>
+    <string name="playlists_onboarding_playlist_title">播放列表简介</string>
+    <string name="playlists_onboarding_smart_playlist_description">功能依旧，体验不变，通过规则自动添加剧集。 您现有的所有筛选器仍保留在此，除名称外没有任何变化。</string>
+    <string name="playlists_onboarding_smart_playlist_title">筛选器现已变更为智能播放列表</string>
+    <string name="playlists">播放列表</string>
     <string name="onboarding_upgrade_billing_cycle_yearly">年度套餐</string>
     <string name="onboarding_upgrade_billing_cycle_monthly">月度套餐</string>
     <string name="onboarding_upgrade_features_trial_schedule">免费试用版如何使用？</string>
