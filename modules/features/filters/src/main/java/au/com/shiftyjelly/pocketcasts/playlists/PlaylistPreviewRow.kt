@@ -70,6 +70,7 @@ fun PlaylistPreviewRow(
     playlist: PlaylistPreview,
     showTooltip: Boolean,
     showDivider: Boolean,
+    onClick: () -> Unit,
     onDelete: () -> Unit,
     onClickTooltip: () -> Unit,
     modifier: Modifier = Modifier,
@@ -164,6 +165,10 @@ fun PlaylistPreviewRow(
                         y = 0,
                     )
                 }
+                .clickable(
+                    role = Role.Button,
+                    onClick = onClick,
+                )
                 .anchoredDraggable(
                     state = draggableState,
                     orientation = Orientation.Horizontal,
@@ -265,6 +270,7 @@ private fun PlaylistPreviewRowPreview(
                 ),
                 showTooltip = false,
                 showDivider = true,
+                onClick = {},
                 onDelete = {},
                 onClickTooltip = {},
                 modifier = Modifier.fillMaxWidth(),
@@ -278,6 +284,7 @@ private fun PlaylistPreviewRowPreview(
                 ),
                 showTooltip = false,
                 showDivider = true,
+                onClick = {},
                 onDelete = {},
                 onClickTooltip = {},
                 modifier = Modifier.fillMaxWidth(),
@@ -291,6 +298,7 @@ private fun PlaylistPreviewRowPreview(
                 ),
                 showTooltip = false,
                 showDivider = false,
+                onClick = {},
                 onDelete = {},
                 onClickTooltip = {},
                 modifier = Modifier.fillMaxWidth(),
