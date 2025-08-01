@@ -27,6 +27,7 @@ import au.com.shiftyjelly.pocketcasts.playlists.rules.DownloadStatusRulePage
 import au.com.shiftyjelly.pocketcasts.playlists.rules.EpisodeDurationRulePage
 import au.com.shiftyjelly.pocketcasts.playlists.rules.EpisodeStatusRulePage
 import au.com.shiftyjelly.pocketcasts.playlists.rules.MediaTypeRulePage
+import au.com.shiftyjelly.pocketcasts.playlists.rules.PodcastsRulePage
 import au.com.shiftyjelly.pocketcasts.playlists.rules.ReleaseDateRulePage
 import au.com.shiftyjelly.pocketcasts.utils.extensions.pxToDp
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseDialogFragment
