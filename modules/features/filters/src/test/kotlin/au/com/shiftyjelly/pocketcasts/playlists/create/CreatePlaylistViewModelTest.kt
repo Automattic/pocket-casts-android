@@ -18,9 +18,7 @@ import au.com.shiftyjelly.pocketcasts.sharedtest.MainCoroutineRule
 import kotlin.time.Duration.Companion.minutes
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.flowOf
-import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.runTest
-import kotlinx.coroutines.yield
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNull
@@ -31,9 +29,8 @@ import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
 
 class CreatePlaylistViewModelTest {
-    private val testDispatcher = StandardTestDispatcher()
-
-    @get:Rule val coroutineRule = MainCoroutineRule(testDispatcher)
+    @get:Rule
+    val coroutineRule = MainCoroutineRule()
 
     private val playlistManager = FakePlaylistManager()
 
@@ -60,7 +57,7 @@ class CreatePlaylistViewModelTest {
     }
 
     @Test
-    fun `manage podcasts rule`() = runTest(testDispatcher) {
+    fun `manage podcasts rule`() = runTest {
         viewModel.uiState.test {
             var state = awaitItem()
             assertEquals(UiState.Empty, state)
@@ -99,7 +96,7 @@ class CreatePlaylistViewModelTest {
     }
 
     @Test
-    fun `manage episode status rule`() = runTest(testDispatcher) {
+    fun `manage episode status rule`() = runTest {
         viewModel.uiState.test {
             var state = awaitItem()
             assertEquals(UiState.Empty, state)
@@ -162,7 +159,7 @@ class CreatePlaylistViewModelTest {
     }
 
     @Test
-    fun `manage release date rule`() = runTest(testDispatcher) {
+    fun `manage release date rule`() = runTest {
         viewModel.uiState.test {
             var state = awaitItem()
             assertEquals(UiState.Empty, state)
@@ -184,7 +181,7 @@ class CreatePlaylistViewModelTest {
     }
 
     @Test
-    fun `manage episode duration rule`() = runTest(testDispatcher) {
+    fun `manage episode duration rule`() = runTest {
         viewModel.uiState.test {
             var state = awaitItem()
             assertEquals(UiState.Empty, state)
@@ -245,7 +242,7 @@ class CreatePlaylistViewModelTest {
     }
 
     @Test
-    fun `manage download status rule`() = runTest(testDispatcher) {
+    fun `manage download status rule`() = runTest {
         viewModel.uiState.test {
             var state = awaitItem()
             assertEquals(UiState.Empty, state)
@@ -272,7 +269,7 @@ class CreatePlaylistViewModelTest {
     }
 
     @Test
-    fun `manage media type rule`() = runTest(testDispatcher) {
+    fun `manage media type rule`() = runTest {
         viewModel.uiState.test {
             var state = awaitItem()
             assertEquals(UiState.Empty, state)
@@ -299,7 +296,7 @@ class CreatePlaylistViewModelTest {
     }
 
     @Test
-    fun `manage starred episodes rule`() = runTest(testDispatcher) {
+    fun `manage starred episodes rule`() = runTest {
         viewModel.uiState.test {
             var state = awaitItem()
             assertEquals(UiState.Empty, state)
@@ -321,21 +318,30 @@ class CreatePlaylistViewModelTest {
     }
 
     @Test
-    fun `create smart playlist with applied rules`() = runTest(testDispatcher) {
-        viewModel.useAllPodcasts(false)
-        viewModel.selectPodcast("id-1")
-        viewModel.selectPodcast("id-2")
-        viewModel.useCompletedEpisodes(false)
-        viewModel.useReleaseDate(ReleaseDateRule.Last2Weeks)
-        viewModel.useConstrainedDuration(true)
-        viewModel.useMediaType(MediaTypeRule.Audio)
-        viewModel.useStarredEpisodes(true)
-        RuleType.entries.forEach { ruleType ->
-            viewModel.applyRule(ruleType)
-        }
-
+    fun `create smart playlist with applied rules`() = runTest {
         viewModel.uiState.test {
             skipItems(1)
+
+            viewModel.useAllPodcasts(false)
+            skipItems(1)
+            viewModel.selectPodcast("id-1")
+            skipItems(1)
+            viewModel.selectPodcast("id-2")
+            skipItems(1)
+            viewModel.useCompletedEpisodes(false)
+            skipItems(1)
+            viewModel.useReleaseDate(ReleaseDateRule.Last2Weeks)
+            skipItems(1)
+            viewModel.useConstrainedDuration(true)
+            skipItems(1)
+            viewModel.useMediaType(MediaTypeRule.Audio)
+            skipItems(1)
+            viewModel.useStarredEpisodes(true)
+            skipItems(1)
+            RuleType.entries.forEach { ruleType ->
+                viewModel.applyRule(ruleType)
+                skipItems(1)
+            }
 
             assertFalse(viewModel.createdSmartPlaylistUuid.isCompleted)
 
@@ -352,7 +358,7 @@ class CreatePlaylistViewModelTest {
     }
 
     @Test
-    fun `do not create more than a single smart playlist`() = runTest(testDispatcher) {
+    fun `do not create more than a single smart playlist`() = runTest {
         viewModel.uiState.test {
             skipItems(1)
 
