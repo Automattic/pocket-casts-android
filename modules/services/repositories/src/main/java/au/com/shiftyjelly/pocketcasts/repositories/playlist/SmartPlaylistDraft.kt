@@ -11,52 +11,26 @@ import au.com.shiftyjelly.pocketcasts.models.type.SmartRules.StarredRule
 
 data class SmartPlaylistDraft(
     val title: String,
-    val episodeStatus: EpisodeStatusRule? = null,
-    val downloadStatus: DownloadStatusRule? = null,
-    val mediaType: MediaTypeRule? = null,
-    val releaseDate: ReleaseDateRule? = null,
-    val starred: StarredRule? = null,
-    val podcasts: PodcastsRule? = null,
-    val episodeDuration: EpisodeDurationRule? = null,
+    val rules: SmartRules,
 ) {
-    val rules = SmartRules(
-        episodeStatus = episodeStatus ?: SmartRules.Default.episodeStatus,
-        downloadStatus = downloadStatus ?: SmartRules.Default.downloadStatus,
-        mediaType = mediaType ?: SmartRules.Default.mediaType,
-        releaseDate = releaseDate ?: SmartRules.Default.releaseDate,
-        starred = starred ?: SmartRules.Default.starred,
-        podcasts = podcasts ?: SmartRules.Default.podcasts,
-        episodeDuration = episodeDuration ?: SmartRules.Default.episodeDuration,
-    )
-
-    val creationRules = if (
-        episodeStatus != null ||
-        downloadStatus != null ||
-        mediaType != null ||
-        releaseDate != null ||
-        starred != null ||
-        podcasts != null ||
-        episodeDuration != null
-    ) {
-        rules
-    } else {
-        null
-    }
-
     companion object {
         val NewReleases = SmartPlaylistDraft(
             title = "New Releases",
-            releaseDate = ReleaseDateRule.Last2Weeks,
+            rules = SmartRules.Default.copy(
+                releaseDate = ReleaseDateRule.Last2Weeks,
+            ),
         )
 
         val InProgress = SmartPlaylistDraft(
             title = "In Progress",
-            episodeStatus = EpisodeStatusRule(
-                unplayed = false,
-                inProgress = true,
-                completed = false,
+            rules = SmartRules.Default.copy(
+                episodeStatus = EpisodeStatusRule(
+                    unplayed = false,
+                    inProgress = true,
+                    completed = false,
+                ),
+                releaseDate = ReleaseDateRule.LastMonth,
             ),
-            releaseDate = ReleaseDateRule.LastMonth,
         )
     }
 }
