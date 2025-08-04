@@ -66,7 +66,6 @@ import au.com.shiftyjelly.pocketcasts.compose.components.TextP50
 import au.com.shiftyjelly.pocketcasts.compose.preview.ThemePreviewParameterProvider
 import au.com.shiftyjelly.pocketcasts.compose.text.toAnnotatedString
 import au.com.shiftyjelly.pocketcasts.compose.theme
-import au.com.shiftyjelly.pocketcasts.images.R
 import au.com.shiftyjelly.pocketcasts.localization.helper.RelativeDateFormatter
 import au.com.shiftyjelly.pocketcasts.localization.helper.TimeHelper
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
@@ -137,8 +136,8 @@ fun SmartPlaylistPreviewPage(
             onClick = onClickClose,
         ) {
             Icon(
-                painter = painterResource(R.drawable.ic_close),
-                contentDescription = stringResource(au.com.shiftyjelly.pocketcasts.localization.R.string.close),
+                painter = painterResource(IR.drawable.ic_close),
+                contentDescription = stringResource(LR.string.close),
                 tint = MaterialTheme.theme.colors.primaryIcon03,
             )
         }
