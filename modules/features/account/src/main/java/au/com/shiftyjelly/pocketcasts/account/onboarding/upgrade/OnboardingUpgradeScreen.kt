@@ -70,6 +70,7 @@ import java.time.format.DateTimeFormatter
 import java.time.format.FormatStyle
 import java.time.temporal.ChronoUnit
 import kotlinx.coroutines.launch
+import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 @Composable
@@ -147,7 +148,9 @@ private fun UpgradeFooter(
                 onClick = { onSelectedChange(item) },
                 priceComparisonPlan = plans.getOrNull(index + 1),
             )
-            Spacer(modifier = Modifier.height(10.dp))
+            if (index < plans.lastIndex) {
+                Spacer(modifier = Modifier.height(10.dp))
+            }
         }
         Spacer(modifier = Modifier.height(16.dp))
         UpgradeRowButton(
@@ -205,7 +208,7 @@ private fun UpgradeHeader(
                 ) {
                     Icon(
                         modifier = Modifier.size(24.dp),
-                        painter = painterResource(R.drawable.ic_close),
+                        painter = painterResource(IR.drawable.ic_close),
                         contentDescription = stringResource(LR.string.close),
                         tint = MaterialTheme.theme.colors.primaryIcon01,
                     )
@@ -277,6 +280,7 @@ private fun OnboardingUpgradeFeaturesState.NewOnboardingVariant.toContentPages(
                 ),
             )
         }
+
         OnboardingUpgradeSource.BOOKMARKS,
         OnboardingUpgradeSource.BOOKMARKS_SHELF_ACTION,
         -> {
@@ -288,6 +292,7 @@ private fun OnboardingUpgradeFeaturesState.NewOnboardingVariant.toContentPages(
                 ),
             )
         }
+
         OnboardingUpgradeSource.UP_NEXT_SHUFFLE -> {
             add(UpgradePagerContent.Shuffle)
             add(
@@ -297,6 +302,7 @@ private fun OnboardingUpgradeFeaturesState.NewOnboardingVariant.toContentPages(
                 ),
             )
         }
+
         OnboardingUpgradeSource.SKIP_CHAPTERS -> {
             add(UpgradePagerContent.PreselectChapters)
             add(
@@ -355,12 +361,15 @@ private sealed interface UpgradePagerContent {
     data object Folders : UpgradePagerContent {
         override val showCta get() = true
     }
+
     data object Bookmarks : UpgradePagerContent {
         override val showCta get() = true
     }
+
     data object Shuffle : UpgradePagerContent {
         override val showCta get() = true
     }
+
     data object PreselectChapters : UpgradePagerContent {
         override val showCta get() = true
     }
@@ -373,6 +382,7 @@ private fun UpgradeContent(
 ) {
     val coroutineScope = rememberCoroutineScope()
     val listState = rememberLazyListState()
+
     FadedLazyColumn(
         modifier = modifier,
         state = listState,
