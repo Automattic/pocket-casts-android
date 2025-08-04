@@ -1,8 +1,10 @@
 package au.com.shiftyjelly.pocketcasts.account.onboarding
 
+import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.Context
 import android.content.Intent
+import android.content.pm.ActivityInfo
 import android.os.Bundle
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
@@ -46,10 +48,12 @@ class OnboardingActivity : AppCompatActivity() {
             "Onboarding flow is not set"
         }
 
+    @SuppressLint("SourceLockedOrientationActivity")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         // Make content edge-to-edge
         WindowCompat.setDecorFitsSystemWindows(window, false)
+        requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_SENSOR_PORTRAIT
 
         setContent {
             val onboardingState by upgradeFeaturesViewModel.state.collectAsState()
