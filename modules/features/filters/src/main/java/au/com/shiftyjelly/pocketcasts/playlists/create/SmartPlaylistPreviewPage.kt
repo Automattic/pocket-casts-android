@@ -70,6 +70,7 @@ import au.com.shiftyjelly.pocketcasts.localization.helper.RelativeDateFormatter
 import au.com.shiftyjelly.pocketcasts.localization.helper.TimeHelper
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.models.type.SmartRules
+import au.com.shiftyjelly.pocketcasts.models.type.SmartRules.DownloadStatusRule
 import au.com.shiftyjelly.pocketcasts.models.type.SmartRules.EpisodeDurationRule
 import au.com.shiftyjelly.pocketcasts.models.type.SmartRules.PodcastsRule
 import au.com.shiftyjelly.pocketcasts.models.type.SmartRules.ReleaseDateRule
@@ -605,7 +606,13 @@ private fun AppliedRules.description(ruleType: RuleType) = when (ruleType) {
         }
         null -> null
     }
-    RuleType.DownloadStatus -> TODO()
+
+    RuleType.DownloadStatus -> when (downloadStatus) {
+        DownloadStatusRule.Any -> stringResource(LR.string.all)
+        DownloadStatusRule.Downloaded -> stringResource(LR.string.downloaded)
+        DownloadStatusRule.NotDownloaded -> stringResource(LR.string.not_downloaded)
+        null -> null
+    }
     RuleType.MediaType -> TODO()
     RuleType.Starred -> TODO()
 }
