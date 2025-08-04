@@ -117,6 +117,19 @@ class CreatePlaylistFragment : BaseDialogFragment() {
                         onClickBack = ::goBackToPlaylistPreview,
                     )
                 }
+                composable(NavigationRoutes.SMART_RULE_EPISODE_STATUS) {
+                    EpisodeStatusRulePage(
+                        rule = uiState.rulesBuilder.episodeStatusRule,
+                        onToggleUnplayedStatus = viewModel::useUnplayedEpisodes,
+                        onToggleInProgressStatus = viewModel::useInProgressEpisodes,
+                        onToggleCompletedStatus = viewModel::useCompletedEpisodes,
+                        onSaveRule = {
+                            viewModel.applyRule(RuleType.EpisodeStatus)
+                            goBackToPlaylistPreview()
+                        },
+                        onClickBack = ::goBackToPlaylistPreview,
+                    )
+                }
             }
         }
     }
@@ -149,11 +162,12 @@ private object NavigationRoutes {
     const val NEW_PLAYLIST = "new_playlist"
     const val SMART_PLAYLIST_PREVIEW = "smart_playlist_preview"
     const val SMART_RULE_PODCASTS = "smart_rule_podcasts"
+    const val SMART_RULE_EPISODE_STATUS = "smart_rule_episode_status"
 }
 
 private fun RuleType.toNavigationRoute() = when (this) {
     RuleType.Podcasts -> NavigationRoutes.SMART_RULE_PODCASTS
-    RuleType.EpisodeStatus -> NavigationRoutes.SMART_PLAYLIST_PREVIEW
+    RuleType.EpisodeStatus -> NavigationRoutes.SMART_RULE_EPISODE_STATUS
     RuleType.ReleaseDate -> NavigationRoutes.SMART_PLAYLIST_PREVIEW
     RuleType.EpisodeDuration -> NavigationRoutes.SMART_PLAYLIST_PREVIEW
     RuleType.DownloadStatus -> NavigationRoutes.SMART_PLAYLIST_PREVIEW

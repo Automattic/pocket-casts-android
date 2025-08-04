@@ -66,7 +66,6 @@ import au.com.shiftyjelly.pocketcasts.compose.components.TextP50
 import au.com.shiftyjelly.pocketcasts.compose.preview.ThemePreviewParameterProvider
 import au.com.shiftyjelly.pocketcasts.compose.text.toAnnotatedString
 import au.com.shiftyjelly.pocketcasts.compose.theme
-import au.com.shiftyjelly.pocketcasts.images.R
 import au.com.shiftyjelly.pocketcasts.localization.helper.RelativeDateFormatter
 import au.com.shiftyjelly.pocketcasts.localization.helper.TimeHelper
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
@@ -137,8 +136,8 @@ fun SmartPlaylistPreviewPage(
             onClick = onClickClose,
         ) {
             Icon(
-                painter = painterResource(R.drawable.ic_close),
-                contentDescription = stringResource(au.com.shiftyjelly.pocketcasts.localization.R.string.close),
+                painter = painterResource(IR.drawable.ic_close),
+                contentDescription = stringResource(LR.string.close),
                 tint = MaterialTheme.theme.colors.primaryIcon03,
             )
         }
@@ -548,7 +547,41 @@ private fun AppliedRules.description(ruleType: RuleType) = when (ruleType) {
         null -> null
     }
 
-    RuleType.EpisodeStatus -> TODO()
+    RuleType.EpisodeStatus -> {
+        if (episodeStatus != null) {
+            when {
+                episodeStatus.unplayed -> when {
+                    episodeStatus.inProgress && episodeStatus.completed -> {
+                        stringResource(LR.string.episode_status_rule_description, stringResource(LR.string.unplayed), 2)
+                    }
+                    episodeStatus.inProgress || episodeStatus.completed -> {
+                        stringResource(LR.string.episode_status_rule_description, stringResource(LR.string.unplayed), 1)
+                    }
+                    else -> {
+                        stringResource(LR.string.unplayed)
+                    }
+                }
+
+                episodeStatus.inProgress -> when {
+                    episodeStatus.completed -> {
+                        stringResource(LR.string.episode_status_rule_description, stringResource(LR.string.in_progress_uppercase), 1)
+                    }
+
+                    else -> {
+                        stringResource(LR.string.in_progress_uppercase)
+                    }
+                }
+
+                episodeStatus.completed -> {
+                    stringResource(LR.string.played)
+                }
+                else -> null
+            }
+        } else {
+            null
+        }
+    }
+
     RuleType.ReleaseDate -> TODO()
     RuleType.EpisodeDuration -> TODO()
     RuleType.DownloadStatus -> TODO()
