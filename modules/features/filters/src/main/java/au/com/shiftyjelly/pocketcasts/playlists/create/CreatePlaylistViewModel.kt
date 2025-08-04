@@ -6,14 +6,12 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
-import au.com.shiftyjelly.pocketcasts.models.type.SmartRules
 import au.com.shiftyjelly.pocketcasts.models.type.SmartRules.DownloadStatusRule
-import au.com.shiftyjelly.pocketcasts.models.type.SmartRules.EpisodeDurationRule
-import au.com.shiftyjelly.pocketcasts.models.type.SmartRules.EpisodeStatusRule
 import au.com.shiftyjelly.pocketcasts.models.type.SmartRules.MediaTypeRule
-import au.com.shiftyjelly.pocketcasts.models.type.SmartRules.PodcastsRule
 import au.com.shiftyjelly.pocketcasts.models.type.SmartRules.ReleaseDateRule
-import au.com.shiftyjelly.pocketcasts.models.type.SmartRules.StarredRule
+import au.com.shiftyjelly.pocketcasts.playlists.rules.AppliedRules
+import au.com.shiftyjelly.pocketcasts.playlists.rules.RuleType
+import au.com.shiftyjelly.pocketcasts.playlists.rules.RulesBuilder
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.preferences.model.ArtworkConfiguration.Element
 import au.com.shiftyjelly.pocketcasts.repositories.playlist.PlaylistManager
@@ -22,9 +20,6 @@ import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlin.time.Duration
-import kotlin.time.Duration.Companion.ZERO
-import kotlin.time.Duration.Companion.minutes
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -123,9 +118,9 @@ class CreatePlaylistViewModel @AssistedInject constructor(
         }
     }
 
-    fun useAllPodcasts(use: Boolean) {
+    fun useAllPodcasts(shouldUse: Boolean) {
         rulesBuilder.update { builder ->
-            builder.copy(useAllPodcasts = use)
+            builder.copy(useAllPodcasts = shouldUse)
         }
     }
 
@@ -143,23 +138,23 @@ class CreatePlaylistViewModel @AssistedInject constructor(
         }
     }
 
-    fun useUnplayedEpisodes(use: Boolean) {
+    fun useUnplayedEpisodes(shouldUse: Boolean) {
         rulesBuilder.update { builder ->
-            val rule = builder.episodeStatusRule.copy(unplayed = use)
+            val rule = builder.episodeStatusRule.copy(unplayed = shouldUse)
             builder.copy(episodeStatusRule = rule)
         }
     }
 
-    fun useInProgressEpisodes(use: Boolean) {
+    fun useInProgressEpisodes(shouldUse: Boolean) {
         rulesBuilder.update { builder ->
-            val rule = builder.episodeStatusRule.copy(inProgress = use)
+            val rule = builder.episodeStatusRule.copy(inProgress = shouldUse)
             builder.copy(episodeStatusRule = rule)
         }
     }
 
-    fun useCompletedEpisodes(use: Boolean) {
+    fun useCompletedEpisodes(shouldUse: Boolean) {
         rulesBuilder.update { builder ->
-            val rule = builder.episodeStatusRule.copy(completed = use)
+            val rule = builder.episodeStatusRule.copy(completed = shouldUse)
             builder.copy(episodeStatusRule = rule)
         }
     }
@@ -170,9 +165,9 @@ class CreatePlaylistViewModel @AssistedInject constructor(
         }
     }
 
-    fun constrainDuration(isConstrained: Boolean) {
+    fun useConstrainedDuration(shouldUse: Boolean) {
         rulesBuilder.update { builder ->
-            builder.copy(isEpisodeDurationConstrained = isConstrained)
+            builder.copy(isEpisodeDurationConstrained = shouldUse)
         }
     }
 
@@ -224,139 +219,6 @@ class CreatePlaylistViewModel @AssistedInject constructor(
                 followedPodcasts = emptyList(),
                 smartEpisodes = emptyList(),
                 useEpisodeArtwork = false,
-            )
-        }
-    }
-
-    data class AppliedRules(
-        val episodeStatus: EpisodeStatusRule?,
-        val downloadStatus: DownloadStatusRule?,
-        val mediaType: MediaTypeRule?,
-        val releaseDate: ReleaseDateRule?,
-        val starred: StarredRule?,
-        val podcasts: PodcastsRule?,
-        val episodeDuration: EpisodeDurationRule?,
-    ) {
-        val isAnyRuleApplied = episodeStatus != null ||
-            downloadStatus != null ||
-            mediaType != null ||
-            releaseDate != null ||
-            starred != null ||
-            podcasts != null ||
-            episodeDuration != null
-
-        fun toSmartRules() = if (isAnyRuleApplied) {
-            SmartRules(
-                episodeStatus = episodeStatus ?: SmartRules.Default.episodeStatus,
-                downloadStatus = downloadStatus ?: SmartRules.Default.downloadStatus,
-                mediaType = mediaType ?: SmartRules.Default.mediaType,
-                releaseDate = releaseDate ?: SmartRules.Default.releaseDate,
-                starred = starred ?: SmartRules.Default.starred,
-                podcasts = podcasts ?: SmartRules.Default.podcasts,
-                episodeDuration = episodeDuration ?: SmartRules.Default.episodeDuration,
-            )
-        } else {
-            null
-        }
-
-        companion object {
-            val Empty = AppliedRules(
-                episodeStatus = null,
-                downloadStatus = null,
-                mediaType = null,
-                releaseDate = null,
-                starred = null,
-                podcasts = null,
-                episodeDuration = null,
-            )
-        }
-    }
-
-    data class RulesBuilder(
-        val useAllPodcasts: Boolean,
-        val selectedPodcasts: Set<String>,
-        val episodeStatusRule: EpisodeStatusRule,
-        val releaseDateRule: ReleaseDateRule,
-        val isEpisodeDurationConstrained: Boolean,
-        val minEpisodeDuration: Duration,
-        val maxEpisodeDuration: Duration,
-        val downloadStatusRule: DownloadStatusRule,
-        val mediaTypeRule: MediaTypeRule,
-        val useStarredEpisode: Boolean,
-    ) {
-        val podcastsRule
-            get() = if (useAllPodcasts) {
-                PodcastsRule.Any
-            } else {
-                PodcastsRule.Selected(selectedPodcasts.toList())
-            }
-
-        val episodeDurationRule
-            get() = if (isEpisodeDurationConstrained) {
-                EpisodeDurationRule.Constrained(minEpisodeDuration, maxEpisodeDuration)
-            } else {
-                EpisodeDurationRule.Any
-            }
-
-        val starredRule
-            get() = if (useStarredEpisode) {
-                StarredRule.Starred
-            } else {
-                StarredRule.Any
-            }
-
-        fun decrementMinDuration(): RulesBuilder {
-            val minDuration = minEpisodeDuration
-            val newDuration = minDuration - if (minDuration > 5.minutes) 5.minutes else 1.minutes
-            return if (newDuration >= ZERO && newDuration < maxEpisodeDuration) {
-                copy(minEpisodeDuration = newDuration)
-            } else {
-                this
-            }
-        }
-
-        fun incrementMinDuration(): RulesBuilder {
-            val minDuration = minEpisodeDuration
-            val newDuration = minDuration + if (minDuration >= 5.minutes) 5.minutes else 1.minutes
-            return if (newDuration >= ZERO && newDuration < maxEpisodeDuration) {
-                copy(minEpisodeDuration = newDuration)
-            } else {
-                this
-            }
-        }
-
-        fun decrementMaxDuration(): RulesBuilder {
-            val maxDuration = maxEpisodeDuration
-            val newDuration = maxDuration - if (maxDuration > 5.minutes) 5.minutes else 1.minutes
-            return if (newDuration > ZERO && newDuration > minEpisodeDuration) {
-                copy(maxEpisodeDuration = newDuration)
-            } else {
-                this
-            }
-        }
-
-        fun incrementMaxDuration(): RulesBuilder {
-            val maxDuration = maxEpisodeDuration
-            val newDuration = maxDuration + if (maxDuration >= 5.minutes) 5.minutes else 1.minutes
-            return if (newDuration > ZERO && newDuration > minEpisodeDuration) {
-                copy(maxEpisodeDuration = newDuration)
-            } else {
-                this
-            }
-        }
-
-        companion object {
-            val Empty = RulesBuilder(
-                useAllPodcasts = true,
-                selectedPodcasts = emptySet(),
-                episodeStatusRule = SmartRules.Default.episodeStatus,
-                releaseDateRule = SmartRules.Default.releaseDate,
-                isEpisodeDurationConstrained = false,
-                minEpisodeDuration = 20.minutes,
-                maxEpisodeDuration = 40.minutes,
-                downloadStatusRule = SmartRules.Default.downloadStatus,
-                mediaTypeRule = SmartRules.MediaTypeRule.Any,
-                useStarredEpisode = false,
             )
         }
     }

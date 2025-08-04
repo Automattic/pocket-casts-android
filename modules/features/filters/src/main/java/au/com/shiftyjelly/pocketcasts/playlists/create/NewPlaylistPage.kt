@@ -10,6 +10,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -47,6 +48,8 @@ import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
 import au.com.shiftyjelly.pocketcasts.compose.AppThemeWithBackground
 import au.com.shiftyjelly.pocketcasts.compose.Devices
+import au.com.shiftyjelly.pocketcasts.compose.bars.NavigationButton
+import au.com.shiftyjelly.pocketcasts.compose.bars.ThemedTopAppBar
 import au.com.shiftyjelly.pocketcasts.compose.buttons.RowButton
 import au.com.shiftyjelly.pocketcasts.compose.components.FormField
 import au.com.shiftyjelly.pocketcasts.compose.components.SparkleImage
@@ -78,15 +81,13 @@ fun NewPlaylistPage(
             .navigationBarsPadding()
             .imePadding(),
     ) {
-        IconButton(
-            onClick = onClickClose,
-        ) {
-            Icon(
-                painter = painterResource(IR.drawable.ic_close),
-                contentDescription = stringResource(LR.string.close),
-                tint = MaterialTheme.theme.colors.primaryIcon03,
-            )
-        }
+        ThemedTopAppBar(
+            navigationButton = NavigationButton.Close,
+            style = ThemedTopAppBar.Style.Immersive,
+            iconColor = MaterialTheme.theme.colors.primaryIcon03,
+            windowInsets = WindowInsets(0),
+            onNavigationClick = onClickClose,
+        )
         Column(
             modifier = Modifier.padding(horizontal = 16.dp),
         ) {

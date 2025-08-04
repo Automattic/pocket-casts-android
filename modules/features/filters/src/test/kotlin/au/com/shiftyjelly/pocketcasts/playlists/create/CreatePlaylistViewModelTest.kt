@@ -2,7 +2,6 @@ package au.com.shiftyjelly.pocketcasts.playlists.create
 
 import androidx.compose.ui.text.TextRange
 import app.cash.turbine.test
-import au.com.shiftyjelly.pocketcasts.models.type.SmartRules
 import au.com.shiftyjelly.pocketcasts.models.type.SmartRules.DownloadStatusRule
 import au.com.shiftyjelly.pocketcasts.models.type.SmartRules.EpisodeDurationRule
 import au.com.shiftyjelly.pocketcasts.models.type.SmartRules.EpisodeStatusRule
@@ -11,6 +10,7 @@ import au.com.shiftyjelly.pocketcasts.models.type.SmartRules.PodcastsRule
 import au.com.shiftyjelly.pocketcasts.models.type.SmartRules.ReleaseDateRule
 import au.com.shiftyjelly.pocketcasts.models.type.SmartRules.StarredRule
 import au.com.shiftyjelly.pocketcasts.playlists.create.CreatePlaylistViewModel.UiState
+import au.com.shiftyjelly.pocketcasts.playlists.rules.RuleType
 import au.com.shiftyjelly.pocketcasts.preferences.UserSetting
 import au.com.shiftyjelly.pocketcasts.preferences.model.ArtworkConfiguration
 import au.com.shiftyjelly.pocketcasts.sharedtest.MainCoroutineRule
@@ -186,7 +186,7 @@ class CreatePlaylistViewModelTest {
             var state = awaitItem()
             assertEquals(UiState.Empty, state)
 
-            viewModel.constrainDuration(true)
+            viewModel.useConstrainedDuration(true)
             state = awaitItem()
             assertTrue(state.rulesBuilder.isEpisodeDurationConstrained)
             assertEquals(20.minutes, state.rulesBuilder.minEpisodeDuration)
@@ -231,7 +231,7 @@ class CreatePlaylistViewModelTest {
                 state.appliedRules.episodeDuration,
             )
 
-            viewModel.constrainDuration(false)
+            viewModel.useConstrainedDuration(false)
             state = awaitItem()
             assertFalse(state.rulesBuilder.isEpisodeDurationConstrained)
 
