@@ -2,6 +2,7 @@ package au.com.shiftyjelly.pocketcasts.account.onboarding.upgrade
 
 import UpgradeTrialItem
 import UpgradeTrialTimeline
+import android.content.res.Configuration
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -23,7 +24,9 @@ import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
 import androidx.compose.material.MaterialTheme
@@ -32,6 +35,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -50,6 +54,7 @@ import au.com.shiftyjelly.pocketcasts.account.onboarding.upgrade.contextual.Pres
 import au.com.shiftyjelly.pocketcasts.account.onboarding.upgrade.contextual.ShuffleAnimation
 import au.com.shiftyjelly.pocketcasts.account.viewmodel.OnboardingUpgradeFeaturesState
 import au.com.shiftyjelly.pocketcasts.compose.AppThemeWithBackground
+import au.com.shiftyjelly.pocketcasts.compose.Devices
 import au.com.shiftyjelly.pocketcasts.compose.components.FadedLazyColumn
 import au.com.shiftyjelly.pocketcasts.compose.components.TextH10
 import au.com.shiftyjelly.pocketcasts.compose.components.TextP40
@@ -84,46 +89,147 @@ fun OnboardingUpgradeScreen(
     onClickTermsAndConditions: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
+    val isPortrait = LocalConfiguration.current.orientation == Configuration.ORIENTATION_PORTRAIT
+
+    if (isPortrait) {
+        Column(
+            modifier = modifier
+                .windowInsetsPadding(WindowInsets.statusBars)
+                .windowInsetsPadding(WindowInsets.navigationBars)
+                .background(color = MaterialTheme.colors.background)
+                .fillMaxSize(),
+        ) {
+            UpgradeHeader(
+                modifier = Modifier.padding(
+                    horizontal = 24.dp,
+                ),
+                selectedPlan = state.selectedPlan,
+                source = source,
+                onClosePress = onClosePress,
+            )
+            Spacer(modifier = Modifier.height(12.dp))
+            UpgradeContent(
+                modifier = Modifier.weight(1f),
+                pages = state.onboardingVariant.toContentPages(
+                    currentPlan = state.selectedPlan,
+                    isEligibleForTrial = state.selectedBasePlan.offer == SubscriptionOffer.Trial,
+                    plan = state.selectedBasePlan,
+                    source = source,
+                ),
+            )
+            Spacer(modifier = Modifier.height(24.dp))
+            UpgradeFooter(
+                modifier = Modifier
+                    .padding(
+                        horizontal = 24.dp,
+                    )
+                    .fillMaxWidth(),
+                plans = state.availableBasePlans,
+                selectedOnboardingPlan = state.selectedPlan,
+                onSelectedChange = {
+                    onChangeSelectedPlan(it)
+                },
+                onClickSubscribe = onSubscribePress,
+                onPrivacyPolicyClick = onClickPrivacyPolicy,
+                onTermsAndConditionsClick = onClickTermsAndConditions,
+            )
+        }
+    } else {
+        Row(
+            modifier = modifier
+                .windowInsetsPadding(WindowInsets.statusBars)
+                .windowInsetsPadding(WindowInsets.navigationBars)
+                .background(color = MaterialTheme.colors.background)
+                .fillMaxSize(),
+        ) {
+            UpgradeContent(
+                modifier = Modifier.fillMaxWidth(.5f)
+                    .padding(vertical = 8.dp),
+                pages = state.onboardingVariant.toContentPages(
+                    currentPlan = state.selectedPlan,
+                    isEligibleForTrial = state.selectedBasePlan.offer == SubscriptionOffer.Trial,
+                    plan = state.selectedBasePlan,
+                    source = source,
+                ),
+            )
+            Column {
+                UpgradeHeader(
+                    modifier = Modifier.padding(
+                        horizontal = 24.dp,
+                    ),
+                    selectedPlan = state.selectedPlan,
+                    source = source,
+                    onClosePress = onClosePress,
+                )
+                Spacer(modifier = Modifier.height(16.dp))
+                ScrollableFooter(
+                    modifier = Modifier
+                        .padding(
+                            horizontal = 24.dp,
+                        )
+                        .fillMaxWidth(),
+                    plans = state.availableBasePlans,
+                    selectedOnboardingPlan = state.selectedPlan,
+                    onSelectedChange = {
+                        onChangeSelectedPlan(it)
+                    },
+                    onClickSubscribe = onSubscribePress,
+                    onPrivacyPolicyClick = onClickPrivacyPolicy,
+                    onTermsAndConditionsClick = onClickTermsAndConditions,
+                )
+            }
+        }
+    }
+}
+
+@Composable
+fun ScrollableFooter(
+    plans: List<SubscriptionPlan>,
+    onSelectedChange: (SubscriptionPlan) -> Unit,
+    selectedOnboardingPlan: OnboardingSubscriptionPlan,
+    onClickSubscribe: () -> Unit,
+    onPrivacyPolicyClick: () -> Unit,
+    onTermsAndConditionsClick: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
     Column(
-        modifier = modifier
-            .windowInsetsPadding(WindowInsets.statusBars)
-            .windowInsetsPadding(WindowInsets.navigationBars)
-            .background(color = MaterialTheme.colors.background)
-            .fillMaxSize(),
+        modifier = modifier,
     ) {
-        UpgradeHeader(
-            modifier = Modifier.padding(
-                horizontal = 24.dp,
-            ),
-            selectedPlan = state.selectedPlan,
-            source = source,
-            onClosePress = onClosePress,
+        Column(
+            modifier = Modifier
+                .weight(1f)
+                .verticalScroll(rememberScrollState()),
+        ) {
+            plans.forEachIndexed { index, item ->
+                UpgradePlanRow(
+                    modifier = Modifier.padding(top = 12.dp),
+                    plan = item,
+                    isSelected = selectedOnboardingPlan.key == item.key,
+                    onClick = { onSelectedChange(item) },
+                    priceComparisonPlan = plans.getOrNull(index + 1),
+                )
+            }
+        }
+        Spacer(modifier = Modifier.height(16.dp))
+        UpgradeRowButton(
+            primaryText = selectedOnboardingPlan.ctaButtonText(isRenewingSubscription = false),
+            backgroundColor = MaterialTheme.theme.colors.primaryInteractive01,
+            textColor = MaterialTheme.theme.colors.primaryInteractive02,
+            fontWeight = FontWeight.W500,
+            onClick = onClickSubscribe,
+            modifier = Modifier
+                .fillMaxWidth()
+                .heightIn(min = 48.dp),
         )
         Spacer(modifier = Modifier.height(12.dp))
-        UpgradeContent(
-            modifier = Modifier.weight(1f),
-            pages = state.onboardingVariant.toContentPages(
-                currentPlan = state.selectedPlan,
-                isEligibleForTrial = state.selectedBasePlan.offer == SubscriptionOffer.Trial,
-                plan = state.selectedBasePlan,
-                source = source,
-            ),
-        )
-        Spacer(modifier = Modifier.height(24.dp))
-        UpgradeFooter(
+        PrivacyPolicy(
             modifier = Modifier
-                .padding(
-                    horizontal = 24.dp,
-                )
-                .fillMaxWidth(),
-            plans = state.availableBasePlans,
-            selectedOnboardingPlan = state.selectedPlan,
-            onSelectedChange = {
-                onChangeSelectedPlan(it)
-            },
-            onClickSubscribe = onSubscribePress,
-            onPrivacyPolicyClick = onClickPrivacyPolicy,
-            onTermsAndConditionsClick = onClickTermsAndConditions,
+                .fillMaxWidth()
+                .padding(bottom = 12.dp),
+            color = MaterialTheme.theme.colors.secondaryText02,
+            textAlign = TextAlign.Center,
+            onPrivacyPolicyClick = onPrivacyPolicyClick,
+            onTermsAndConditionsClick = onTermsAndConditionsClick,
         )
     }
 }
@@ -165,7 +271,8 @@ private fun UpgradeFooter(
         )
         Spacer(modifier = Modifier.height(12.dp))
         PrivacyPolicy(
-            modifier = Modifier.fillMaxWidth()
+            modifier = Modifier
+                .fillMaxWidth()
                 .padding(bottom = 12.dp),
             color = MaterialTheme.theme.colors.secondaryText02,
             textAlign = TextAlign.Center,
@@ -546,7 +653,8 @@ private fun PreselectChaptersUpgradeContent(
         )
 
         PreselectChaptersAnimation(
-            modifier = Modifier.fillMaxWidth()
+            modifier = Modifier
+                .fillMaxWidth()
                 .padding(horizontal = 32.dp)
                 .padding(bottom = 64.dp),
         )
@@ -556,6 +664,35 @@ private fun PreselectChaptersUpgradeContent(
 @Preview
 @Composable
 private fun PreviewOnboardingUpgradeScreen(
+    @PreviewParameter(ThemedTierParameterProvider::class) pair: Pair<ThemeType, SubscriptionTier>,
+) {
+    AppThemeWithBackground(pair.first) {
+        OnboardingUpgradeScreen(
+            state = OnboardingUpgradeFeaturesState.Loaded(
+                selectedTier = pair.second,
+                selectedBillingCycle = BillingCycle.Yearly,
+                subscriptionPlans = SubscriptionPlans.Preview,
+                plansFilter = when (pair.second) {
+                    SubscriptionTier.Plus -> OnboardingUpgradeFeaturesState.LoadedPlansFilter.PLUS_ONLY
+                    SubscriptionTier.Patron -> OnboardingUpgradeFeaturesState.LoadedPlansFilter.PATRON_ONLY
+                },
+                purchaseFailed = false,
+                onboardingVariant = OnboardingUpgradeFeaturesState.NewOnboardingVariant.FEATURES_FIRST,
+            ),
+            modifier = Modifier.fillMaxSize(),
+            onSubscribePress = {},
+            onClosePress = {},
+            onClickPrivacyPolicy = {},
+            onClickTermsAndConditions = {},
+            onChangeSelectedPlan = {},
+            source = OnboardingUpgradeSource.ACCOUNT_DETAILS,
+        )
+    }
+}
+
+@Preview(device = Devices.LANDSCAPE_REGULAR)
+@Composable
+private fun PreviewOnboardingUpgradeScreenLandscape(
     @PreviewParameter(ThemedTierParameterProvider::class) pair: Pair<ThemeType, SubscriptionTier>,
 ) {
     AppThemeWithBackground(pair.first) {
