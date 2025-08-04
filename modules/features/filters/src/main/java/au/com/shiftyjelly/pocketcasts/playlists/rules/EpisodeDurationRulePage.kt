@@ -6,7 +6,9 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.selection.toggleable
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
 import androidx.compose.material.MaterialTheme
@@ -62,7 +64,9 @@ fun EpisodeDurationRulePage(
         modifier = modifier,
     ) { bottomPadding ->
         Column(
-            modifier = Modifier.padding(top = 12.dp, bottom = bottomPadding),
+            modifier = Modifier
+                .verticalScroll(rememberScrollState())
+                .padding(top = 12.dp, bottom = bottomPadding),
         ) {
             Row(
                 verticalAlignment = Alignment.CenterVertically,
