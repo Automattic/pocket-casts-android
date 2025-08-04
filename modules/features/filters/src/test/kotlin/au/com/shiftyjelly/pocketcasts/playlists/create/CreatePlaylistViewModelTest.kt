@@ -6,8 +6,10 @@ import au.com.shiftyjelly.pocketcasts.models.type.SmartRules
 import au.com.shiftyjelly.pocketcasts.models.type.SmartRules.DownloadStatusRule
 import au.com.shiftyjelly.pocketcasts.models.type.SmartRules.EpisodeDurationRule
 import au.com.shiftyjelly.pocketcasts.models.type.SmartRules.EpisodeStatusRule
+import au.com.shiftyjelly.pocketcasts.models.type.SmartRules.MediaTypeRule
 import au.com.shiftyjelly.pocketcasts.models.type.SmartRules.PodcastsRule
 import au.com.shiftyjelly.pocketcasts.models.type.SmartRules.ReleaseDateRule
+import au.com.shiftyjelly.pocketcasts.models.type.SmartRules.StarredRule
 import au.com.shiftyjelly.pocketcasts.playlists.create.CreatePlaylistViewModel.UiState
 import au.com.shiftyjelly.pocketcasts.preferences.UserSetting
 import au.com.shiftyjelly.pocketcasts.preferences.model.ArtworkConfiguration
@@ -262,7 +264,56 @@ class CreatePlaylistViewModelTest {
 
             viewModel.applyRule(RuleType.DownloadStatus)
             state = awaitItem()
-            assertEquals(DownloadStatusRule.NotDownloaded, state.rulesBuilder.downloadStatusRule)
+            assertEquals(DownloadStatusRule.NotDownloaded, state.appliedRules.downloadStatus)
+        }
+    }
+
+    @Test
+    fun `manage media type rule`() = runTest {
+        viewModel.uiState.test {
+            var state = awaitItem()
+            assertEquals(UiState.Empty, state)
+
+            viewModel.useMediaType(MediaTypeRule.Audio)
+            state = awaitItem()
+            assertEquals(MediaTypeRule.Audio, state.rulesBuilder.mediaTypeRule)
+            assertNull(state.appliedRules.mediaType)
+
+            viewModel.useMediaType(MediaTypeRule.Any)
+            state = awaitItem()
+            assertEquals(MediaTypeRule.Any, state.rulesBuilder.mediaTypeRule)
+            assertNull(state.appliedRules.mediaType)
+
+            viewModel.useMediaType(MediaTypeRule.Video)
+            state = awaitItem()
+            assertEquals(MediaTypeRule.Video, state.rulesBuilder.mediaTypeRule)
+            assertNull(state.appliedRules.mediaType)
+
+            viewModel.applyRule(RuleType.MediaType)
+            state = awaitItem()
+            assertEquals(MediaTypeRule.Video, state.appliedRules.mediaType)
+        }
+    }
+
+    @Test
+    fun `manage starred episodes rule`() = runTest {
+        viewModel.uiState.test {
+            var state = awaitItem()
+            assertEquals(UiState.Empty, state)
+
+            viewModel.useStarredEpisodes(true)
+            state = awaitItem()
+            assertEquals(StarredRule.Starred, state.rulesBuilder.starredRule)
+            assertNull(state.appliedRules.starred)
+
+            viewModel.useStarredEpisodes(false)
+            state = awaitItem()
+            assertEquals(StarredRule.Any, state.rulesBuilder.starredRule)
+            assertNull(state.appliedRules.starred)
+
+            viewModel.applyRule(RuleType.Starred)
+            state = awaitItem()
+            assertEquals(StarredRule.Any, state.appliedRules.starred)
         }
     }
 }
