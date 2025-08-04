@@ -35,13 +35,13 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.compositeOver
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
@@ -56,8 +56,6 @@ import au.com.shiftyjelly.pocketcasts.compose.theme
 import au.com.shiftyjelly.pocketcasts.playlists.PlaylistsViewModel.PlaylistsState
 import au.com.shiftyjelly.pocketcasts.playlists.PlaylistsViewModel.UiState
 import au.com.shiftyjelly.pocketcasts.repositories.playlist.PlaylistPreview
-import au.com.shiftyjelly.pocketcasts.ui.helper.ColorUtils
-import au.com.shiftyjelly.pocketcasts.ui.helper.modifyHsv
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme.ThemeType
 import sh.calvin.reorderable.ReorderableItem
 import au.com.shiftyjelly.pocketcasts.images.R as IR
@@ -68,6 +66,7 @@ internal fun PlaylistsPage(
     uiState: UiState,
     onCreatePlaylist: () -> Unit,
     onDeletePlaylist: (PlaylistPreview) -> Unit,
+    onOpenPlaylist: (PlaylistPreview) -> Unit,
     onReorderPlaylists: (List<String>) -> Unit,
     onShowPlaylists: (List<PlaylistPreview>) -> Unit,
     onFreeAccountBannerCtaClick: () -> Unit,
@@ -106,6 +105,7 @@ internal fun PlaylistsPage(
                 ),
                 onCreatePlaylist = onCreatePlaylist,
                 onDeletePlaylist = onDeletePlaylist,
+                onOpenPlaylist = onOpenPlaylist,
                 onReorderPlaylists = onReorderPlaylists,
                 onShowPlaylists = onShowPlaylists,
                 onDismissPremadePlaylistsTooltip = onDismissPremadePlaylistsTooltip,
@@ -141,6 +141,7 @@ private fun ColumnScope.PlaylistsContent(
     contentPadding: PaddingValues,
     onCreatePlaylist: () -> Unit,
     onDeletePlaylist: (PlaylistPreview) -> Unit,
+    onOpenPlaylist: (PlaylistPreview) -> Unit,
     onReorderPlaylists: (List<String>) -> Unit,
     onShowPlaylists: (List<PlaylistPreview>) -> Unit,
     onDismissPremadePlaylistsTooltip: () -> Unit,
@@ -167,6 +168,7 @@ private fun ColumnScope.PlaylistsContent(
                         listState = listState,
                         contentPadding = contentPadding,
                         onDelete = onDeletePlaylist,
+                        onOpen = onOpenPlaylist,
                         onReorderPlaylists = onReorderPlaylists,
                         onDismissPremadePlaylistsTooltip = onDismissPremadePlaylistsTooltip,
                         modifier = Modifier.fillMaxSize(),
@@ -196,6 +198,7 @@ private fun PlaylistsColumn(
     listState: LazyListState,
     contentPadding: PaddingValues,
     onDelete: (PlaylistPreview) -> Unit,
+    onOpen: (PlaylistPreview) -> Unit,
     onReorderPlaylists: (List<String>) -> Unit,
     onDismissPremadePlaylistsTooltip: () -> Unit,
     modifier: Modifier = Modifier,
@@ -237,6 +240,7 @@ private fun PlaylistsColumn(
                     showDivider = index != displayItems.lastIndex,
                     backgroundColor = backgroundColor,
                     onDelete = { onDelete(playlist) },
+                    onClick = { onOpen(playlist) },
                     onClickTooltip = onDismissPremadePlaylistsTooltip,
                     modifier = Modifier
                         .longPressDraggableHandle(
@@ -360,6 +364,7 @@ private fun PlaylistsPageEmptyStatePreview() {
             ),
             onCreatePlaylist = {},
             onDeletePlaylist = {},
+            onOpenPlaylist = {},
             onReorderPlaylists = {},
             onShowPlaylists = {},
             onFreeAccountBannerCtaClick = {},
@@ -384,6 +389,7 @@ private fun PlaylistsPageEmptyStateNoBannerPreview() {
             ),
             onCreatePlaylist = {},
             onDeletePlaylist = {},
+            onOpenPlaylist = {},
             onReorderPlaylists = {},
             onShowPlaylists = {},
             onFreeAccountBannerCtaClick = {},
@@ -419,6 +425,7 @@ private fun PlaylistPagePreview(
             ),
             onCreatePlaylist = {},
             onDeletePlaylist = {},
+            onOpenPlaylist = {},
             onReorderPlaylists = {},
             onShowPlaylists = {},
             onFreeAccountBannerCtaClick = {},

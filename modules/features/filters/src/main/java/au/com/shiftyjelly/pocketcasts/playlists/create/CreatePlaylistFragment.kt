@@ -1,10 +1,13 @@
 package au.com.shiftyjelly.pocketcasts.playlists.create
 
+import android.content.DialogInterface
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -23,6 +26,7 @@ import au.com.shiftyjelly.pocketcasts.compose.extensions.slideInToEnd
 import au.com.shiftyjelly.pocketcasts.compose.extensions.slideInToStart
 import au.com.shiftyjelly.pocketcasts.compose.extensions.slideOutToEnd
 import au.com.shiftyjelly.pocketcasts.compose.extensions.slideOutToStart
+import au.com.shiftyjelly.pocketcasts.playlists.SmartPlaylistFragment
 import au.com.shiftyjelly.pocketcasts.playlists.rules.AppliedRulesPage
 import au.com.shiftyjelly.pocketcasts.playlists.rules.DownloadStatusRulePage
 import au.com.shiftyjelly.pocketcasts.playlists.rules.EpisodeDurationRulePage
@@ -31,6 +35,7 @@ import au.com.shiftyjelly.pocketcasts.playlists.rules.MediaTypeRulePage
 import au.com.shiftyjelly.pocketcasts.playlists.rules.PodcastsRulePage
 import au.com.shiftyjelly.pocketcasts.playlists.rules.ReleaseDateRulePage
 import au.com.shiftyjelly.pocketcasts.playlists.rules.RuleType
+import au.com.shiftyjelly.pocketcasts.ui.helper.FragmentHostListener
 import au.com.shiftyjelly.pocketcasts.utils.extensions.pxToDp
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseDialogFragment
 import com.google.android.material.bottomsheet.BottomSheetBehavior
@@ -58,6 +63,8 @@ class CreatePlaylistFragment : BaseDialogFragment() {
     ) = content {
         val uiState by viewModel.uiState.collectAsState()
         var areOtherOptionsExpanded by remember { mutableStateOf(false) }
+
+        OpenCreatedPlaylistEffect()
 
         DialogBox {
             val navController = rememberNavController()
@@ -104,7 +111,7 @@ class CreatePlaylistFragment : BaseDialogFragment() {
                         availableEpisodes = uiState.smartEpisodes,
                         useEpisodeArtwork = uiState.useEpisodeArtwork,
                         areOtherOptionsExpanded = areOtherOptionsExpanded,
-                        onCreatePlaylist = { Timber.i("On create smart playlist") },
+                        onCreatePlaylist = viewModel::createSmartPlaylist,
                         onClickRule = { rule -> navigateOnce(rule.toNavigationRoute()) },
                         toggleOtherOptions = { areOtherOptionsExpanded = !areOtherOptionsExpanded },
                         onClickClose = ::dismiss,
@@ -189,6 +196,16 @@ class CreatePlaylistFragment : BaseDialogFragment() {
                     )
                 }
             }
+        }
+    }
+
+    @Composable
+    private fun OpenCreatedPlaylistEffect() {
+        LaunchedEffect(Unit) {
+            val uuid = viewModel.createdSmartPlaylistUuid.await()
+            dismiss()
+            val fragment = SmartPlaylistFragment.newInstance(uuid)
+            (requireActivity() as FragmentHostListener).addFragment(fragment)
         }
     }
 

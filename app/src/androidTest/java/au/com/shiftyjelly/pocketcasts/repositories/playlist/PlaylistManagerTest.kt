@@ -468,105 +468,147 @@ class PlaylistManagerTest {
         val drafts = listOf(
             SmartPlaylistDraft(
                 title = "Title",
+                rules = SmartRules.Default,
             ),
             SmartPlaylistDraft(
                 title = "Title",
-                episodeStatus = EpisodeStatusRule(
-                    unplayed = true,
-                    inProgress = false,
-                    completed = false,
+                rules = SmartRules.Default.copy(
+                    episodeStatus = EpisodeStatusRule(
+                        unplayed = true,
+                        inProgress = false,
+                        completed = false,
+                    ),
                 ),
             ),
             SmartPlaylistDraft(
                 title = "Title",
-                episodeStatus = EpisodeStatusRule(
-                    unplayed = false,
-                    inProgress = true,
-                    completed = false,
+                rules = SmartRules.Default.copy(
+                    episodeStatus = EpisodeStatusRule(
+                        unplayed = false,
+                        inProgress = true,
+                        completed = false,
+                    ),
                 ),
             ),
             SmartPlaylistDraft(
                 title = "Title",
-                episodeStatus = EpisodeStatusRule(
-                    unplayed = false,
-                    inProgress = false,
-                    completed = true,
+                rules = SmartRules.Default.copy(
+                    episodeStatus = EpisodeStatusRule(
+                        unplayed = false,
+                        inProgress = false,
+                        completed = true,
+                    ),
                 ),
             ),
             SmartPlaylistDraft(
                 title = "Title",
-                downloadStatus = DownloadStatusRule.Any,
+                rules = SmartRules.Default.copy(
+                    downloadStatus = DownloadStatusRule.Any,
+                ),
             ),
             SmartPlaylistDraft(
                 title = "Title",
-                downloadStatus = DownloadStatusRule.Downloaded,
+                rules = SmartRules.Default.copy(
+                    downloadStatus = DownloadStatusRule.Downloaded,
+                ),
             ),
             SmartPlaylistDraft(
                 title = "Title",
-                downloadStatus = DownloadStatusRule.NotDownloaded,
+                rules = SmartRules.Default.copy(
+                    downloadStatus = DownloadStatusRule.NotDownloaded,
+                ),
             ),
             SmartPlaylistDraft(
                 title = "Title",
-                mediaType = MediaTypeRule.Any,
+                rules = SmartRules.Default.copy(
+                    mediaType = MediaTypeRule.Any,
+                ),
             ),
             SmartPlaylistDraft(
                 title = "Title",
-                mediaType = MediaTypeRule.Audio,
+                rules = SmartRules.Default.copy(
+                    mediaType = MediaTypeRule.Audio,
+                ),
             ),
             SmartPlaylistDraft(
                 title = "Title",
-                mediaType = MediaTypeRule.Video,
+                rules = SmartRules.Default.copy(
+                    mediaType = MediaTypeRule.Video,
+                ),
             ),
             SmartPlaylistDraft(
                 title = "Title",
-                releaseDate = ReleaseDateRule.AnyTime,
+                rules = SmartRules.Default.copy(
+                    releaseDate = ReleaseDateRule.AnyTime,
+                ),
             ),
             SmartPlaylistDraft(
                 title = "Title",
-                releaseDate = ReleaseDateRule.Last24Hours,
+                rules = SmartRules.Default.copy(
+                    releaseDate = ReleaseDateRule.Last24Hours,
+                ),
             ),
             SmartPlaylistDraft(
                 title = "Title",
-                releaseDate = ReleaseDateRule.Last3Days,
+                rules = SmartRules.Default.copy(
+                    releaseDate = ReleaseDateRule.Last3Days,
+                ),
             ),
             SmartPlaylistDraft(
                 title = "Title",
-                releaseDate = ReleaseDateRule.LastWeek,
+                rules = SmartRules.Default.copy(
+                    releaseDate = ReleaseDateRule.LastWeek,
+                ),
             ),
             SmartPlaylistDraft(
                 title = "Title",
-                releaseDate = ReleaseDateRule.Last2Weeks,
+                rules = SmartRules.Default.copy(
+                    releaseDate = ReleaseDateRule.Last2Weeks,
+                ),
             ),
             SmartPlaylistDraft(
                 title = "Title",
-                releaseDate = ReleaseDateRule.LastMonth,
+                rules = SmartRules.Default.copy(
+                    releaseDate = ReleaseDateRule.LastMonth,
+                ),
             ),
             SmartPlaylistDraft(
                 title = "Title",
-                starred = StarredRule.Any,
+                rules = SmartRules.Default.copy(
+                    starred = StarredRule.Any,
+                ),
             ),
             SmartPlaylistDraft(
                 title = "Title",
-                starred = StarredRule.Starred,
+                rules = SmartRules.Default.copy(
+                    starred = StarredRule.Starred,
+                ),
             ),
             SmartPlaylistDraft(
                 title = "Title",
-                podcasts = PodcastsRule.Any,
+                rules = SmartRules.Default.copy(
+                    podcasts = PodcastsRule.Any,
+                ),
             ),
             SmartPlaylistDraft(
                 title = "Title",
-                podcasts = PodcastsRule.Selected(uuids = listOf("id-1", "id-2")),
+                rules = SmartRules.Default.copy(
+                    podcasts = PodcastsRule.Selected(uuids = listOf("id-1", "id-2")),
+                ),
             ),
             SmartPlaylistDraft(
                 title = "Title",
-                episodeDuration = EpisodeDurationRule.Any,
+                rules = SmartRules.Default.copy(
+                    episodeDuration = EpisodeDurationRule.Any,
+                ),
             ),
             SmartPlaylistDraft(
                 title = "Title",
-                episodeDuration = EpisodeDurationRule.Constrained(longerThan = 50.minutes, shorterThan = 60.minutes),
+                rules = SmartRules.Default.copy(
+                    episodeDuration = EpisodeDurationRule.Constrained(longerThan = 50.minutes, shorterThan = 60.minutes),
+                ),
             ),
         )
-
         drafts.forEach { draft -> manager.upsertSmartPlaylist(draft) }
         val playlists = playlistDao.observeSmartPlaylists().first()
 
