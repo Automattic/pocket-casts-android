@@ -69,7 +69,10 @@ import au.com.shiftyjelly.pocketcasts.compose.theme
 import au.com.shiftyjelly.pocketcasts.localization.helper.RelativeDateFormatter
 import au.com.shiftyjelly.pocketcasts.localization.helper.TimeHelper
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
+import au.com.shiftyjelly.pocketcasts.models.type.SmartRules
+import au.com.shiftyjelly.pocketcasts.models.type.SmartRules.EpisodeDurationRule
 import au.com.shiftyjelly.pocketcasts.models.type.SmartRules.PodcastsRule
+import au.com.shiftyjelly.pocketcasts.models.type.SmartRules.ReleaseDateRule
 import au.com.shiftyjelly.pocketcasts.playlists.create.CreatePlaylistViewModel.AppliedRules
 import au.com.shiftyjelly.pocketcasts.repositories.extensions.getSummaryText
 import au.com.shiftyjelly.pocketcasts.repositories.images.PocketCastsImageRequestFactory.PlaceholderType
@@ -582,8 +585,26 @@ private fun AppliedRules.description(ruleType: RuleType) = when (ruleType) {
         }
     }
 
-    RuleType.ReleaseDate -> TODO()
-    RuleType.EpisodeDuration -> TODO()
+    RuleType.ReleaseDate -> when (releaseDate) {
+        ReleaseDateRule.AnyTime -> stringResource(LR.string.filters_time_anytime)
+        ReleaseDateRule.Last24Hours -> stringResource(LR.string.filters_time_24_hours)
+        ReleaseDateRule.Last3Days -> stringResource(LR.string.filters_time_3_days)
+        ReleaseDateRule.LastWeek -> stringResource(LR.string.filters_time_week)
+        ReleaseDateRule.Last2Weeks -> stringResource(LR.string.filters_time_2_weeks)
+        ReleaseDateRule.LastMonth -> stringResource(LR.string.filters_time_month)
+        null -> null
+    }
+
+    RuleType.EpisodeDuration -> when (episodeDuration) {
+        is EpisodeDurationRule.Any -> stringResource(LR.string.any_duration)
+        is EpisodeDurationRule.Constrained -> {
+            val context = LocalContext.current
+            val min = TimeHelper.getTimeDurationShortString(episodeDuration.longerThan.inWholeMilliseconds, context)
+            val max = TimeHelper.getTimeDurationShortString(episodeDuration.shorterThan.inWholeMilliseconds, context)
+            "$min - $max"
+        }
+        null -> null
+    }
     RuleType.DownloadStatus -> TODO()
     RuleType.MediaType -> TODO()
     RuleType.Starred -> TODO()
