@@ -26,7 +26,6 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.Icon
-import androidx.compose.material.IconButton
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
@@ -102,15 +101,6 @@ fun AppliedRulesPage(
             .fillMaxSize()
             .verticalScroll(rememberScrollState()),
     ) {
-        IconButton(
-            onClick = onClickClose,
-        ) {
-            Icon(
-                painter = painterResource(IR.drawable.ic_close),
-                contentDescription = stringResource(LR.string.close),
-                tint = MaterialTheme.theme.colors.primaryIcon03,
-            )
-        }
         ThemedTopAppBar(
             navigationButton = NavigationButton.Close,
             style = ThemedTopAppBar.Style.Immersive,
