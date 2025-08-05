@@ -6,6 +6,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -165,7 +166,8 @@ private fun UpgradeFooter(
         )
         Spacer(modifier = Modifier.height(12.dp))
         PrivacyPolicy(
-            modifier = Modifier.fillMaxWidth()
+            modifier = Modifier
+                .fillMaxWidth()
                 .padding(bottom = 12.dp),
             color = MaterialTheme.theme.colors.secondaryText02,
             textAlign = TextAlign.Center,
@@ -383,37 +385,67 @@ private fun UpgradeContent(
     val coroutineScope = rememberCoroutineScope()
     val listState = rememberLazyListState()
 
-    FadedLazyColumn(
+    BoxWithConstraints(
         modifier = modifier,
-        state = listState,
     ) {
-        itemsIndexed(pages) { index, page ->
-            val scrollToNext: () -> Unit = {
-                coroutineScope.launch {
-                    listState.animateScrollToItem((index + 1) % pages.size)
+        val itemHeight = this@BoxWithConstraints.maxHeight
+        FadedLazyColumn(
+            modifier = Modifier.fillMaxSize(),
+            state = listState,
+        ) {
+            itemsIndexed(pages) { index, page ->
+                val topPaddingForGenericContent = if (index != 0) 32.dp else 0.dp
+                val baseModifier = Modifier.heightIn(min = itemHeight)
+                val scrollToNext: () -> Unit = {
+                    coroutineScope.launch {
+                        listState.animateScrollToItem((index + 1) % pages.size)
+                    }
                 }
-            }
-            when (page) {
-                is UpgradePagerContent.Features -> FeaturesContent(
-                    modifier = Modifier.padding(
-                        horizontal = 24.dp,
-                    ),
-                    features = page,
-                    onCtaClick = scrollToNext,
-                )
+                when (page) {
+                    is UpgradePagerContent.Features -> FeaturesContent(
+                        modifier = baseModifier
+                            .padding(
+                                horizontal = 24.dp,
+                            )
+                            .padding(
+                                top = topPaddingForGenericContent,
+                            ),
+                        features = page,
+                        onCtaClick = scrollToNext,
+                    )
 
-                is UpgradePagerContent.TrialSchedule -> ScheduleContent(
-                    modifier = Modifier.padding(
-                        horizontal = 24.dp,
-                    ),
-                    trialSchedule = page,
-                    onCtaClick = scrollToNext,
-                )
+                    is UpgradePagerContent.TrialSchedule -> ScheduleContent(
+                        modifier = baseModifier
+                            .padding(
+                                horizontal = 24.dp,
+                            )
+                            .padding(
+                                top = topPaddingForGenericContent,
+                            ),
+                        trialSchedule = page,
+                        onCtaClick = scrollToNext,
+                    )
 
-                is UpgradePagerContent.Folders -> FoldersUpgradeContent(onCtaClick = scrollToNext)
-                is UpgradePagerContent.Bookmarks -> BookmarksUpgradeContent(onCtaClick = scrollToNext)
-                is UpgradePagerContent.Shuffle -> ShuffleUpgradeContent(onCtaClick = scrollToNext)
-                is UpgradePagerContent.PreselectChapters -> PreselectChaptersUpgradeContent(onCtaClick = scrollToNext)
+                    is UpgradePagerContent.Folders -> FoldersUpgradeContent(
+                        modifier = baseModifier,
+                        onCtaClick = scrollToNext,
+                    )
+
+                    is UpgradePagerContent.Bookmarks -> BookmarksUpgradeContent(
+                        modifier = baseModifier,
+                        onCtaClick = scrollToNext,
+                    )
+
+                    is UpgradePagerContent.Shuffle -> ShuffleUpgradeContent(
+                        modifier = baseModifier,
+                        onCtaClick = scrollToNext,
+                    )
+
+                    is UpgradePagerContent.PreselectChapters -> PreselectChaptersUpgradeContent(
+                        modifier = baseModifier,
+                        onCtaClick = scrollToNext,
+                    )
+                }
             }
         }
     }
@@ -470,8 +502,9 @@ private fun ScheduleContent(
 @Composable
 private fun FoldersUpgradeContent(
     onCtaClick: () -> Unit,
+    modifier: Modifier = Modifier,
 ) {
-    Column {
+    Column(modifier = modifier) {
         TextP40(
             text = stringResource(LR.string.onboarding_upgrade_schedule_see_features),
             modifier = Modifier
@@ -492,8 +525,9 @@ private fun FoldersUpgradeContent(
 @Composable
 private fun BookmarksUpgradeContent(
     onCtaClick: () -> Unit,
+    modifier: Modifier = Modifier,
 ) {
-    Column {
+    Column(modifier = modifier) {
         TextP40(
             text = stringResource(LR.string.onboarding_upgrade_schedule_see_features),
             modifier = Modifier
@@ -514,8 +548,9 @@ private fun BookmarksUpgradeContent(
 @Composable
 private fun ShuffleUpgradeContent(
     onCtaClick: () -> Unit,
+    modifier: Modifier = Modifier,
 ) {
-    Column {
+    Column(modifier = modifier) {
         TextP40(
             text = stringResource(LR.string.onboarding_upgrade_schedule_see_features),
             modifier = Modifier
@@ -534,8 +569,9 @@ private fun ShuffleUpgradeContent(
 @Composable
 private fun PreselectChaptersUpgradeContent(
     onCtaClick: () -> Unit,
+    modifier: Modifier = Modifier,
 ) {
-    Column {
+    Column(modifier = modifier) {
         TextP40(
             text = stringResource(LR.string.onboarding_upgrade_schedule_see_features),
             modifier = Modifier
@@ -546,7 +582,8 @@ private fun PreselectChaptersUpgradeContent(
         )
 
         PreselectChaptersAnimation(
-            modifier = Modifier.fillMaxWidth()
+            modifier = Modifier
+                .fillMaxWidth()
                 .padding(horizontal = 32.dp)
                 .padding(bottom = 64.dp),
         )
