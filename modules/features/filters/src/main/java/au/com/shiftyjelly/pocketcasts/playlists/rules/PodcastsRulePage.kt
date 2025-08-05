@@ -6,6 +6,7 @@ import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
@@ -32,6 +33,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
@@ -75,14 +77,8 @@ fun PodcastsRulePage(
                 exit = fadeOut,
                 visible = !useAllPodcasts,
             ) {
-                Text(
-                    text = if (podcasts.size == selectedPodcastUuids.size) {
-                        stringResource(LR.string.smart_rule_podcasts_deselect_all)
-                    } else {
-                        stringResource(LR.string.smart_rule_podcasts_select_all)
-                    },
-                    fontSize = 17.sp,
-                    lineHeight = 22.sp,
+                Box(
+                    contentAlignment = Alignment.Center,
                     modifier = Modifier
                         .heightIn(min = 48.dp)
                         .clickable(
@@ -94,8 +90,21 @@ fun PodcastsRulePage(
                                     onSelectAllPodcasts()
                                 }
                             },
-                        ),
-                )
+                        )
+                        .padding(horizontal = 16.dp)
+                        .semantics(mergeDescendants = true) {},
+                ) {
+                    Text(
+                        text = if (podcasts.size == selectedPodcastUuids.size) {
+                            stringResource(LR.string.smart_rule_podcasts_deselect_all)
+                        } else {
+                            stringResource(LR.string.smart_rule_podcasts_select_all)
+                        },
+                        color = MaterialTheme.theme.colors.primaryText02,
+                        fontSize = 17.sp,
+                        lineHeight = 22.sp,
+                    )
+                }
             }
         },
         modifier = modifier,
