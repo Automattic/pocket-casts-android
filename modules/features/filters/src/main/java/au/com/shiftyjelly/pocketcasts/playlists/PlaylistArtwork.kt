@@ -150,7 +150,7 @@ private fun QuadImage(
                     .clip(RoundedCornerShape(topStart = cornerSize)),
             )
             Image(
-                painter = rememberAsyncImagePainter(imageRequest2, contentScale = ContentScale.Crop),
+                painter = rememberAsyncImagePainter(imageRequest3, contentScale = ContentScale.Crop),
                 contentScale = ContentScale.Crop,
                 alignment = Alignment.BottomCenter,
                 contentDescription = null,
@@ -161,7 +161,7 @@ private fun QuadImage(
         }
         Column {
             Image(
-                painter = rememberAsyncImagePainter(imageRequest3, contentScale = ContentScale.Crop),
+                painter = rememberAsyncImagePainter(imageRequest2, contentScale = ContentScale.Crop),
                 contentScale = ContentScale.Crop,
                 alignment = Alignment.BottomCenter,
                 contentDescription = null,
