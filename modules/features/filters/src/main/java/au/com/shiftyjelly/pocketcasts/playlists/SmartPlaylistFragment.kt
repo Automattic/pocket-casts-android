@@ -7,10 +7,10 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.core.os.BundleCompat
 import androidx.core.os.bundleOf
-import androidx.core.view.updatePadding
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
+import androidx.recyclerview.widget.ConcatAdapter
 import au.com.shiftyjelly.pocketcasts.PlaylistEpisodesAdapterFactory
 import au.com.shiftyjelly.pocketcasts.filters.databinding.SmartPlaylistFragmentBinding
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseFragment
@@ -47,19 +47,23 @@ class SmartPlaylistFragment :
         savedInstanceState: Bundle?,
     ): View {
         val binding = SmartPlaylistFragmentBinding.inflate(inflater, container, false)
-        val adapter = adapterFactory.create(
+        val headerAdapter = PlaylistHeaderAdapter(
+            themeType = theme.activeTheme,
+        )
+        val episodesAdapter = adapterFactory.create(
             multiSelectToolbar = binding.multiSelectToolbar,
             onChangeMultiSelect = { isMultiSelecting -> Timber.i("Is multi selecting: $isMultiSelecting") },
             getEpisodes = { viewModel.uiState.value.smartPlaylist?.episodes.orEmpty() },
         )
-        binding.content.adapter = adapter
+        binding.content.adapter = ConcatAdapter(headerAdapter, episodesAdapter)
         EpisodeItemTouchHelper().attachToRecyclerView(binding.content)
         viewLifecycleOwner.lifecycleScope.launch {
             viewModel.uiState
                 .flowWithLifecycle(viewLifecycleOwner.lifecycle)
                 .collect { uiState ->
                     val episodes = uiState.smartPlaylist?.episodes.orEmpty()
-                    adapter.submitList(episodes)
+                    episodesAdapter.submitList(episodes)
+                    headerAdapter.submitHeader(uiState.smartPlaylist?.title.orEmpty())
                 }
         }
         return binding.root
