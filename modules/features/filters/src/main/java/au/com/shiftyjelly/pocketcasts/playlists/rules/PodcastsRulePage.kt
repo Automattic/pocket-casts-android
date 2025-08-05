@@ -134,6 +134,7 @@ private fun AllPodcastsToggle(
                     )
                     TextP50(
                         text = stringResource(LR.string.smart_rule_podcasts_all_description),
+                        color = MaterialTheme.theme.colors.primaryText02,
                         modifier = Modifier.widthIn(max = 280.dp),
                     )
                 }
