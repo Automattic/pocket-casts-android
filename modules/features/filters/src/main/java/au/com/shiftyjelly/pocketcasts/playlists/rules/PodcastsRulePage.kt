@@ -1,7 +1,11 @@
 package au.com.shiftyjelly.pocketcasts.playlists.rules
 
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.animateContentSize
 import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
@@ -17,6 +21,7 @@ import androidx.compose.foundation.selection.toggleable
 import androidx.compose.material.Checkbox
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Switch
+import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -30,6 +35,7 @@ import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import au.com.shiftyjelly.pocketcasts.compose.AppThemeWithBackground
 import au.com.shiftyjelly.pocketcasts.compose.PreviewRegularDevice
 import au.com.shiftyjelly.pocketcasts.compose.components.FadedLazyColumn
@@ -52,6 +58,8 @@ fun PodcastsRulePage(
     onToggleAllPodcasts: (Boolean) -> Unit,
     onSelectPodcast: (String) -> Unit,
     onDeselectPodcast: (String) -> Unit,
+    onSelectAllPodcasts: () -> Unit,
+    onDeselectAllPodcasts: () -> Unit,
     onSaveRule: () -> Unit,
     onClickBack: () -> Unit,
     modifier: Modifier = Modifier,
@@ -61,6 +69,35 @@ fun PodcastsRulePage(
         onSaveRule = onSaveRule,
         isSaveEnabled = useAllPodcasts || selectedPodcastUuids.isNotEmpty(),
         onClickBack = onClickBack,
+        toolbarActions = {
+            AnimatedVisibility(
+                enter = fadeIn,
+                exit = fadeOut,
+                visible = !useAllPodcasts,
+            ) {
+                Text(
+                    text = if (podcasts.size == selectedPodcastUuids.size) {
+                        stringResource(LR.string.smart_rule_podcasts_deselect_all)
+                    } else {
+                        stringResource(LR.string.smart_rule_podcasts_select_all)
+                    },
+                    fontSize = 17.sp,
+                    lineHeight = 22.sp,
+                    modifier = Modifier
+                        .heightIn(min = 48.dp)
+                        .clickable(
+                            role = Role.Button,
+                            onClick = {
+                                if (podcasts.size == selectedPodcastUuids.size) {
+                                    onDeselectAllPodcasts()
+                                } else {
+                                    onSelectAllPodcasts()
+                                }
+                            },
+                        ),
+                )
+            }
+        },
         modifier = modifier,
     ) { bottomPadding ->
         Column(
@@ -228,6 +265,9 @@ private fun PodcastRow(
     }
 }
 
+private val fadeIn = fadeIn()
+private val fadeOut = fadeOut()
+
 @Composable
 @PreviewRegularDevice
 private fun PodcastsRulePreview(
@@ -246,6 +286,8 @@ private fun PodcastsRulePreview(
             onToggleAllPodcasts = { useAllPodcasts = it },
             onSelectPodcast = { podcastUuids += it },
             onDeselectPodcast = { podcastUuids -= it },
+            onSelectAllPodcasts = {},
+            onDeselectAllPodcasts = {},
             onSaveRule = {},
             onClickBack = {},
         )
