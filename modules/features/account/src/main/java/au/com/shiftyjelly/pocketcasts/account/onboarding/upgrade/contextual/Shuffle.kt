@@ -175,7 +175,7 @@ private fun ShuffleContainer(
     itemsOverlap: Dp = 18.dp,
     isDisplayed: Boolean = true,
 ) {
-    require(items.size % 2 == 0) { "must have odd number of elements!" }
+    require(items.size % 2 == 1) { "must have odd number of elements!" }
 
     val rowAnimations = remember {
         List(items.size) {
