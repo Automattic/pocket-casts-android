@@ -5,8 +5,8 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
@@ -38,8 +38,8 @@ fun PlaylistArtwork(
     podcasts: List<Podcast>,
     artworkSize: Dp,
     modifier: Modifier = Modifier,
+    cornerSize: Dp = artworkSize / 14,
 ) {
-    val cornerSize = artworkSize / 14
     when (podcasts.size) {
         0 -> NoImage(
             artworkSize = artworkSize,
@@ -81,6 +81,8 @@ private fun NoImage(
     ) {
         Image(
             painter = painterResource(IR.drawable.ic_playlists),
+            contentScale = ContentScale.Crop,
+            alignment = Alignment.BottomCenter,
             contentDescription = null,
             colorFilter = ColorFilter.tint(MaterialTheme.theme.colors.primaryIcon03),
             modifier = Modifier.size(artworkSize * 0.43f),
@@ -101,6 +103,8 @@ private fun SingleImage(
     }
     Image(
         painter = rememberAsyncImagePainter(imageRequest, contentScale = ContentScale.Crop),
+        contentScale = ContentScale.Crop,
+        alignment = Alignment.BottomCenter,
         contentDescription = null,
         modifier = modifier
             .size(artworkSize)
@@ -135,43 +139,43 @@ private fun QuadImage(
     Row(
         modifier = modifier.size(artworkSize),
     ) {
-        Column(
-            modifier = Modifier.weight(1f),
-        ) {
+        Column {
             Image(
                 painter = rememberAsyncImagePainter(imageRequest1, contentScale = ContentScale.Crop),
+                contentScale = ContentScale.Crop,
+                alignment = Alignment.BottomCenter,
                 contentDescription = null,
                 modifier = Modifier
-                    .weight(1f)
-                    .aspectRatio(1f, matchHeightConstraintsFirst = true)
+                    .size(artworkSize / 2)
                     .clip(RoundedCornerShape(topStart = cornerSize)),
             )
             Image(
                 painter = rememberAsyncImagePainter(imageRequest2, contentScale = ContentScale.Crop),
+                contentScale = ContentScale.Crop,
+                alignment = Alignment.BottomCenter,
                 contentDescription = null,
                 modifier = Modifier
-                    .weight(1f)
-                    .aspectRatio(1f, matchHeightConstraintsFirst = true)
+                    .size(artworkSize / 2)
                     .clip(RoundedCornerShape(bottomStart = cornerSize)),
             )
         }
-        Column(
-            modifier = Modifier.weight(1f),
-        ) {
+        Column {
             Image(
                 painter = rememberAsyncImagePainter(imageRequest3, contentScale = ContentScale.Crop),
+                contentScale = ContentScale.Crop,
+                alignment = Alignment.BottomCenter,
                 contentDescription = null,
                 modifier = Modifier
-                    .weight(1f)
-                    .aspectRatio(1f, matchHeightConstraintsFirst = true)
+                    .size(artworkSize / 2)
                     .clip(RoundedCornerShape(topEnd = cornerSize)),
             )
             Image(
                 painter = rememberAsyncImagePainter(imageRequest4, contentScale = ContentScale.Crop),
+                contentScale = ContentScale.Crop,
+                alignment = Alignment.BottomCenter,
                 contentDescription = null,
                 modifier = Modifier
-                    .weight(1f)
-                    .aspectRatio(1f, matchHeightConstraintsFirst = true)
+                    .size(artworkSize / 2)
                     .clip(RoundedCornerShape(bottomEnd = cornerSize)),
             )
         }

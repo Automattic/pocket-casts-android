@@ -63,7 +63,13 @@ class SmartPlaylistFragment :
                 .collect { uiState ->
                     val episodes = uiState.smartPlaylist?.episodes.orEmpty()
                     episodesAdapter.submitList(episodes)
-                    headerAdapter.submitHeader(uiState.smartPlaylist?.title.orEmpty())
+
+                    val playlistHeaderData = uiState.smartPlaylist?.let { playlist ->
+                        PlaylistHeaderData(
+                            artworkPodcasts = playlist.artworkPodcasts,
+                        )
+                    }
+                    headerAdapter.submitHeader(playlistHeaderData)
                 }
         }
         return binding.root
