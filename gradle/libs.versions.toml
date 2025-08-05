@@ -239,7 +239,7 @@ automattic-tracks = { module = "com.automattic:Automattic-Tracks-Android", versi
 automattic-explat = { module = "com.automattic.tracks:experimentation", version.ref = "tracks" }
 
 # Wear
-wear-input = "androidx.wear:wear-input:1.2.0-alpha04"
+wear-input = "androidx.wear:wear-input:1.2.0-beta01"
 wear-remote-interactions = "androidx.wear:wear-remote-interactions:1.1.0"
 wear-tooling-preview = "androidx.wear:wear-tooling-preview:1.0.0"
 
