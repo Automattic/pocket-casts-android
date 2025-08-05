@@ -1,6 +1,5 @@
 package au.com.shiftyjelly.pocketcasts.playlists.create
 
-import android.content.DialogInterface
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -125,6 +124,8 @@ class CreatePlaylistFragment : BaseDialogFragment() {
                         onToggleAllPodcasts = viewModel::useAllPodcasts,
                         onSelectPodcast = viewModel::selectPodcast,
                         onDeselectPodcast = viewModel::deselectPodcast,
+                        onSelectAllPodcasts = viewModel::selectAllPodcasts,
+                        onDeselectAllPodcasts = viewModel::deselectAllPodcasts,
                         onSaveRule = {
                             viewModel.applyRule(RuleType.Podcasts)
                             goBackToPlaylistPreview()

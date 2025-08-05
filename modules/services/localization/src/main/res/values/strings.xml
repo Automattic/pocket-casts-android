@@ -927,6 +927,9 @@
     <string name="smart_rule_podcasts_title">Choose Podcasts</string>
     <string name="smart_rule_podcasts_all_label">All Followed Podcasts</string>
     <string name="smart_rule_podcasts_all_description">New podcasts you follow will be automatically added.</string>
+    <string name="smart_rule_podcasts_all_description_disabled">New podcasts you follow will not be automatically added.</string>
+    <string name="smart_rule_podcasts_select_all">Select All</string>
+    <string name="smart_rule_podcasts_deselect_all">Deselect All</string>
     <string name="save_smart_rule">Save Smart Rule</string>
     <string name="enabled_rules">Enabled Rules</string>
     <!-- %1$s is playlist's title -->
