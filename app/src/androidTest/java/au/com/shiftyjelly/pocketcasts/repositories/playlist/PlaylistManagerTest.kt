@@ -11,7 +11,6 @@ import au.com.shiftyjelly.pocketcasts.models.di.ModelModule
 import au.com.shiftyjelly.pocketcasts.models.di.addTypeConverters
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
-import au.com.shiftyjelly.pocketcasts.models.entity.SmartPlaylist
 import au.com.shiftyjelly.pocketcasts.models.entity.SmartPlaylist.Companion.ANYTIME
 import au.com.shiftyjelly.pocketcasts.models.entity.SmartPlaylist.Companion.AUDIO_VIDEO_FILTER_ALL
 import au.com.shiftyjelly.pocketcasts.models.entity.SmartPlaylist.Companion.AUDIO_VIDEO_FILTER_AUDIO_ONLY
@@ -42,9 +41,11 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
+import au.com.shiftyjelly.pocketcasts.models.entity.SmartPlaylist as DbPlaylist
 
 class PlaylistManagerTest {
     private val testDispatcher = StandardTestDispatcher()
@@ -75,8 +76,8 @@ class PlaylistManagerTest {
 
     @Test
     fun observePlaylistPreviews() = runTest(testDispatcher) {
-        val playlist1 = SmartPlaylist(uuid = "id-1", title = "Title 1")
-        val playlist2 = SmartPlaylist(uuid = "id-2", title = "Title 2")
+        val playlist1 = DbPlaylist(uuid = "id-1", title = "Title 1")
+        val playlist2 = DbPlaylist(uuid = "id-2", title = "Title 2")
 
         manager.observePlaylistsPreview().test {
             assertTrue(awaitItem().isEmpty())
@@ -94,7 +95,7 @@ class PlaylistManagerTest {
 
     @Test
     fun observePodcastsInPreviews() = runTest(testDispatcher) {
-        playlistDao.upsertSmartPlaylist(SmartPlaylist())
+        playlistDao.upsertSmartPlaylist(DbPlaylist())
         val podcast1 = Podcast(uuid = "podcast-id-1", isSubscribed = true)
         podcastDao.insertSuspend(podcast1)
         val podcast2 = Podcast(uuid = "podcast-id-2", isSubscribed = true)
@@ -122,38 +123,38 @@ class PlaylistManagerTest {
 
     @Test
     fun doNotObserveManualPlaylistPreviews() = runTest(testDispatcher) {
-        playlistDao.upsertSmartPlaylist(SmartPlaylist(manual = true))
+        playlistDao.upsertSmartPlaylist(DbPlaylist(manual = true))
 
-        val plalylists = manager.observePlaylistsPreview().first()
+        val playlists = manager.observePlaylistsPreview().first()
 
-        assertTrue(plalylists.isEmpty())
+        assertTrue(playlists.isEmpty())
     }
 
     @Test
     fun doNotObserveDeletedPlaylistPreviews() = runTest(testDispatcher) {
-        playlistDao.upsertSmartPlaylist(SmartPlaylist(deleted = true))
+        playlistDao.upsertSmartPlaylist(DbPlaylist(deleted = true))
 
-        val plalylists = manager.observePlaylistsPreview().first()
+        val playlists = manager.observePlaylistsPreview().first()
 
-        assertTrue(plalylists.isEmpty())
+        assertTrue(playlists.isEmpty())
     }
 
     @Test
     fun doNotObserveDraftPlaylistPreviews() = runTest(testDispatcher) {
-        playlistDao.upsertSmartPlaylist(SmartPlaylist(draft = true))
+        playlistDao.upsertSmartPlaylist(DbPlaylist(draft = true))
 
-        val plalylists = manager.observePlaylistsPreview().first()
+        val playlists = manager.observePlaylistsPreview().first()
 
-        assertTrue(plalylists.isEmpty())
+        assertTrue(playlists.isEmpty())
     }
 
     @Test
     fun sortPlaylistPreviewsByPosition() = runTest(testDispatcher) {
         playlistDao.upsertSmartPlaylists(
             listOf(
-                SmartPlaylist(uuid = "id-1", sortPosition = 1),
-                SmartPlaylist(uuid = "id-2", sortPosition = 0),
-                SmartPlaylist(uuid = "id-3", sortPosition = null),
+                DbPlaylist(uuid = "id-1", sortPosition = 1),
+                DbPlaylist(uuid = "id-2", sortPosition = 0),
+                DbPlaylist(uuid = "id-3", sortPosition = null),
             ),
         )
 
@@ -164,7 +165,7 @@ class PlaylistManagerTest {
 
     @Test
     fun doNotIncludeNotFollowedPodcastsInPreviews() = runTest(testDispatcher) {
-        playlistDao.upsertSmartPlaylist(SmartPlaylist())
+        playlistDao.upsertSmartPlaylist(DbPlaylist())
         podcastDao.insertSuspend(Podcast(uuid = "podcast-id-1", isSubscribed = false))
         episodeDao.insert(PodcastEpisode(uuid = "episode-id-1", podcastUuid = "podcast-id-1", publishedDate = Date()))
         episodeDao.insert(PodcastEpisode(uuid = "episode-id-2", podcastUuid = "podcast-id-2", publishedDate = Date()))
@@ -178,7 +179,7 @@ class PlaylistManagerTest {
     @Test
     fun applySmartRulesInPreviews() = runTest(testDispatcher) {
         playlistDao.upsertSmartPlaylist(
-            SmartPlaylist(
+            DbPlaylist(
                 unplayed = true,
                 partiallyPlayed = false,
                 finished = true,
@@ -233,7 +234,7 @@ class PlaylistManagerTest {
 
     @Test
     fun sortPodcastsInPlaylistPreviewByNewestToOldest() = runTest(testDispatcher) {
-        playlistDao.upsertSmartPlaylist(SmartPlaylist(sortType = PlaylistEpisodeSortType.NewestToOldest))
+        playlistDao.upsertSmartPlaylist(DbPlaylist(sortType = PlaylistEpisodeSortType.NewestToOldest))
         val podcasts = listOf(
             Podcast(uuid = "podcast-id-1", isSubscribed = true),
             Podcast(uuid = "podcast-id-2", isSubscribed = true),
@@ -276,7 +277,7 @@ class PlaylistManagerTest {
 
     @Test
     fun sortPodcastsInPlaylistPreviewByOldestToNewest() = runTest(testDispatcher) {
-        playlistDao.upsertSmartPlaylist(SmartPlaylist(sortType = PlaylistEpisodeSortType.OldestToNewest))
+        playlistDao.upsertSmartPlaylist(DbPlaylist(sortType = PlaylistEpisodeSortType.OldestToNewest))
         val podcasts = listOf(
             Podcast(uuid = "podcast-id-1", isSubscribed = true),
             Podcast(uuid = "podcast-id-2", isSubscribed = true),
@@ -319,7 +320,7 @@ class PlaylistManagerTest {
 
     @Test
     fun sortPodcastsInPlaylistPreviewByShortestToLongest() = runTest(testDispatcher) {
-        playlistDao.upsertSmartPlaylist(SmartPlaylist(sortType = PlaylistEpisodeSortType.ShortestToLongest))
+        playlistDao.upsertSmartPlaylist(DbPlaylist(sortType = PlaylistEpisodeSortType.ShortestToLongest))
         val podcasts = listOf(
             Podcast(uuid = "podcast-id-1", isSubscribed = true),
             Podcast(uuid = "podcast-id-2", isSubscribed = true),
@@ -366,7 +367,7 @@ class PlaylistManagerTest {
 
     @Test
     fun sortPodcastsInPlaylistPreviewByLongestToShortest() = runTest(testDispatcher) {
-        playlistDao.upsertSmartPlaylist(SmartPlaylist(sortType = PlaylistEpisodeSortType.LongestToShortest))
+        playlistDao.upsertSmartPlaylist(DbPlaylist(sortType = PlaylistEpisodeSortType.LongestToShortest))
         val podcasts = listOf(
             Podcast(uuid = "podcast-id-1", isSubscribed = true),
             Podcast(uuid = "podcast-id-2", isSubscribed = true),
@@ -413,7 +414,7 @@ class PlaylistManagerTest {
 
     @Test
     fun selectDistinctPodcastInPlaylistPreview() = runTest(testDispatcher) {
-        playlistDao.upsertSmartPlaylist(SmartPlaylist())
+        playlistDao.upsertSmartPlaylist(DbPlaylist())
         val podcasts = listOf(
             Podcast(uuid = "podcast-id-1", isSubscribed = true),
             Podcast(uuid = "podcast-id-2", isSubscribed = true),
@@ -615,7 +616,7 @@ class PlaylistManagerTest {
         // Check that UUIDs are unique
         assertEquals(playlists, playlists.distinctBy { it.uuid })
 
-        val defaultPlaylist = SmartPlaylist(
+        val defaultPlaylist = DbPlaylist(
             id = playlists[0].id,
             uuid = playlists[0].uuid,
             title = "Title",
@@ -645,7 +646,8 @@ class PlaylistManagerTest {
             longerThan = 20,
             shorterThan = 40,
         )
-        fun assertPlaylist(index: Int, message: String, func: (SmartPlaylist) -> SmartPlaylist) {
+
+        fun assertPlaylist(index: Int, message: String, func: (DbPlaylist) -> DbPlaylist) {
             val playlist = playlists[index]
             val indexedPlaylist = defaultPlaylist.copy(
                 id = playlist.id,
@@ -685,7 +687,7 @@ class PlaylistManagerTest {
         val playlists = playlistDao.observeSmartPlaylists().first()
 
         assertEquals(
-            SmartPlaylist(
+            DbPlaylist(
                 id = 1,
                 uuid = Playlist.NEW_RELEASES_UUID,
                 title = "New Releases",
@@ -725,7 +727,7 @@ class PlaylistManagerTest {
         val playlists = playlistDao.observeSmartPlaylists().first()
 
         assertEquals(
-            SmartPlaylist(
+            DbPlaylist(
                 id = 1,
                 uuid = Playlist.IN_PROGRESS_UUID,
                 title = "In Progress",
@@ -762,26 +764,26 @@ class PlaylistManagerTest {
     @Test
     fun orderPlaylists() = runTest(testDispatcher) {
         val playlists = List(100) { index ->
-            SmartPlaylist(uuid = UUID.randomUUID().toString(), sortPosition = index)
+            DbPlaylist(uuid = UUID.randomUUID().toString(), sortPosition = index)
         }
         playlistDao.upsertSmartPlaylists(playlists)
 
-        val reorderedPlaylistsUuids = playlists.shuffled().map(SmartPlaylist::uuid)
+        val reorderedPlaylistsUuids = playlists.shuffled().map(DbPlaylist::uuid)
         manager.updatePlaylistsOrder(reorderedPlaylistsUuids)
 
         val reorderedPlaylists = playlistDao.getSmartPlaylists()
-        assertEquals(reorderedPlaylistsUuids, reorderedPlaylists.map(SmartPlaylist::uuid))
+        assertEquals(reorderedPlaylistsUuids, reorderedPlaylists.map(DbPlaylist::uuid))
         assertTrue(reorderedPlaylists.all { it.syncStatus == SYNC_STATUS_NOT_SYNCED })
     }
 
     @Test
     fun moveUnspecifiedPlaylistsToTheBottom() = runTest(testDispatcher) {
         val playlists = listOf(
-            SmartPlaylist(uuid = UUID.randomUUID().toString(), sortPosition = 0),
-            SmartPlaylist(uuid = UUID.randomUUID().toString(), sortPosition = 1),
-            SmartPlaylist(uuid = UUID.randomUUID().toString(), sortPosition = 2),
-            SmartPlaylist(uuid = UUID.randomUUID().toString(), sortPosition = 3),
-            SmartPlaylist(uuid = UUID.randomUUID().toString(), sortPosition = 4),
+            DbPlaylist(uuid = UUID.randomUUID().toString(), sortPosition = 0),
+            DbPlaylist(uuid = UUID.randomUUID().toString(), sortPosition = 1),
+            DbPlaylist(uuid = UUID.randomUUID().toString(), sortPosition = 2),
+            DbPlaylist(uuid = UUID.randomUUID().toString(), sortPosition = 3),
+            DbPlaylist(uuid = UUID.randomUUID().toString(), sortPosition = 4),
         )
         playlistDao.upsertSmartPlaylists(playlists)
 
@@ -801,7 +803,7 @@ class PlaylistManagerTest {
                 playlists[0].uuid,
                 playlists[2].uuid,
             ),
-            reorderedPlaylists.map(SmartPlaylist::uuid),
+            reorderedPlaylists.map(DbPlaylist::uuid),
         )
     }
 
@@ -861,6 +863,38 @@ class PlaylistManagerTest {
 
             episodeDao.update(episode2.copy(duration = 0.0))
             assertEquals(emptyList<PodcastEpisode>(), awaitItem())
+        }
+    }
+
+    @Test
+    fun observeSmartPlaylist() = runTest(testDispatcher) {
+        podcastDao.insertSuspend(Podcast(uuid = "podcast-id-1", isSubscribed = true))
+        podcastDao.insertSuspend(Podcast(uuid = "podcast-id-2", isSubscribed = true))
+
+        manager.observeSmartPlaylist("playlist-id").test {
+            assertNull(awaitItem())
+
+            playlistDao.upsertSmartPlaylist(DbPlaylist(uuid = "playlist-id", title = "Title 1"))
+            assertEquals(
+                SmartPlaylist(
+                    uuid = "playlist-id",
+                    title = "Title 1",
+                    episodes = emptyList(),
+                ),
+                awaitItem(),
+            )
+
+            val episodes = listOf(
+                PodcastEpisode(uuid = "id-1", podcastUuid = "podcast-id-1", publishedDate = Date(2)),
+                PodcastEpisode(uuid = "id-2", podcastUuid = "podcast-id-1", publishedDate = Date(1)),
+                PodcastEpisode(uuid = "id-3", podcastUuid = "podcast-id-2", publishedDate = Date(0)),
+            )
+            episodeDao.insertAll(episodes)
+            assertEquals(episodes, awaitItem()?.episodes)
+
+            val playlist = playlistDao.observeSmartPlaylist("playlist-id").first()!!
+            playlistDao.upsertSmartPlaylist(playlist.copy(allPodcasts = false, podcastUuids = "podcast-id-2"))
+            assertEquals(listOf(episodes[2]), awaitItem()?.episodes)
         }
     }
 }

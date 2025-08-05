@@ -7,6 +7,8 @@ import kotlinx.coroutines.flow.Flow
 interface PlaylistManager {
     fun observePlaylistsPreview(): Flow<List<PlaylistPreview>>
 
+    fun observeSmartPlaylist(uuid: String): Flow<SmartPlaylist?>
+
     fun observeSmartEpisodes(rules: SmartRules): Flow<List<PodcastEpisode>>
 
     suspend fun deletePlaylist(uuid: String)

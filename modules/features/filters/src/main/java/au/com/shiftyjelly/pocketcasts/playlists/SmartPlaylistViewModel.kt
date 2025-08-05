@@ -3,6 +3,7 @@ package au.com.shiftyjelly.pocketcasts.playlists
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import au.com.shiftyjelly.pocketcasts.repositories.playlist.PlaylistManager
+import au.com.shiftyjelly.pocketcasts.repositories.playlist.SmartPlaylist
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
@@ -14,26 +15,25 @@ import kotlinx.coroutines.flow.stateIn
 
 @HiltViewModel(assistedFactory = SmartPlaylistViewModel.Factory::class)
 class SmartPlaylistViewModel @AssistedInject constructor(
-    @Assisted playlistUuuid: String,
+    @Assisted playlistUuid: String,
     private val playlistManager: PlaylistManager,
 ) : ViewModel() {
-    val uiState = playlistManager.observePlaylistsPreview()
-        .mapNotNull { playlists -> playlists.firstOrNull { it.uuid == playlistUuuid } }
-        .map { UiState(it.title) }
+    val uiState = playlistManager.observeSmartPlaylist(playlistUuid)
+        .map { UiState(it) }
         .stateIn(viewModelScope, SharingStarted.Lazily, initialValue = UiState.Empty)
 
     data class UiState(
-        val playlistTitle: String,
+        val smartPlaylist: SmartPlaylist?,
     ) {
         companion object {
             val Empty = UiState(
-                playlistTitle = "",
+                smartPlaylist = null,
             )
         }
     }
 
     @AssistedFactory
     interface Factory {
-        fun create(playlistUuuid: String): SmartPlaylistViewModel
+        fun create(playlistUuid: String): SmartPlaylistViewModel
     }
 }
