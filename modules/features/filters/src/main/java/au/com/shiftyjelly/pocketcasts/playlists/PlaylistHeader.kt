@@ -192,7 +192,7 @@ internal fun PlaylistHeader(
             ) {
                 ActionButton(
                     data = data?.leftButton,
-                    style = ActionButtonStyle.Solid,
+                    style = ActionButtonStyle.Immersive,
                     contentAlignment = Alignment.TopEnd,
                     modifier = Modifier
                         .weight(1f)
@@ -200,7 +200,7 @@ internal fun PlaylistHeader(
                 )
                 ActionButton(
                     data = data?.rightButton,
-                    style = ActionButtonStyle.Immersive,
+                    style = ActionButtonStyle.Solid,
                     contentAlignment = Alignment.TopStart,
                     modifier = Modifier
                         .weight(1f)
