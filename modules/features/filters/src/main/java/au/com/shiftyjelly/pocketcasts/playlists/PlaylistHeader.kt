@@ -54,20 +54,12 @@ internal fun PlaylistHeader(
         val artworkSize = minOf(maxWidth * 0.48f, 192.dp)
         val podcasts = data?.artworkPodcasts
 
-        Crossfade(
-            targetState = podcasts?.takeIf { it.isNotEmpty() },
-            animationSpec = artworkCrossfadeSpec,
-            modifier = Modifier.blurOrScrim(useBlur = useBlurredArtwork),
-        ) { podcasts ->
-            if (podcasts != null) {
-                PlaylistBackgroundArtwork(
-                    podcasts = podcasts,
-                    useBlurredArtwork = useBlurredArtwork,
-                    maxWidth = maxWidth,
-                    bottomAnchor = contentPadding.calculateTopPadding() + artworkSize * 0.75f,
-                )
-            }
-        }
+        PlaylistBackgroundArtwork(
+            podcasts = podcasts,
+            useBlurredArtwork = useBlurredArtwork,
+            maxWidth = maxWidth,
+            bottomAnchor = contentPadding.calculateTopPadding() + artworkSize * 0.75f,
+        )
 
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,
@@ -100,7 +92,7 @@ internal fun PlaylistHeader(
 
 @Composable
 private fun PlaylistBackgroundArtwork(
-    podcasts: List<Podcast>,
+    podcasts: List<Podcast>?,
     useBlurredArtwork: Boolean,
     maxWidth: Dp,
     bottomAnchor: Dp,
@@ -112,9 +104,9 @@ private fun PlaylistBackgroundArtwork(
     val artworkBottomOffset = artworkSize - bottomAnchor
     val artworkBottomOffsetPx = LocalDensity.current.run { artworkBottomOffset.roundToPx() }
 
-    ArtworkOrPreview(
-        podcasts = podcasts,
-        artworkSize = artworkSize,
+    Crossfade(
+        targetState = podcasts?.takeIf { it.isNotEmpty() },
+        animationSpec = artworkCrossfadeSpec,
         modifier = modifier
             .layout { measurable, constraints ->
                 val artworkHeightPx = if (useBlurredArtwork) {
@@ -138,8 +130,16 @@ private fun PlaylistBackgroundArtwork(
                     0
                 }
                 layout(width, height - offset) { placeable.place(0, -offset) }
-            },
-    )
+            }
+            .blurOrScrim(useBlur = useBlurredArtwork),
+    ) { podcasts ->
+        if (podcasts != null) {
+            ArtworkOrPreview(
+                podcasts = podcasts,
+                artworkSize = artworkSize,
+            )
+        }
+    }
 }
 
 @Composable
