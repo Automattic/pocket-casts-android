@@ -2535,7 +2535,7 @@
     <string name="onboarding_folders_title_2">Favorites</string>
     <string name="onboarding_folders_title_3">Sports</string>
     <string name="onboarding_bookmarks_title">Bookmarks: no more \"where was that?\"</string>
-    <string name="onboarding_shuffle_title">Shuffle: The joy of now choosing</string>
+    <string name="onboarding_shuffle_title">Shuffle: The joy of not choosing</string>
     <plurals name="onboarding_shuffle_item_duration_minutes">
         <item quantity="one">%1$d min</item>
         <item quantity="other">%1$d mins</item>
