@@ -1,6 +1,5 @@
 package au.com.shiftyjelly.pocketcasts.playlists
 
-import android.annotation.SuppressLint
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.Crossfade
 import androidx.compose.animation.core.Spring
@@ -120,7 +119,6 @@ internal data class PlaylistHeaderData(
     )
 }
 
-@SuppressLint("UnusedBoxWithConstraintsScope")
 @Composable
 internal fun PlaylistHeader(
     data: PlaylistHeaderData?,
@@ -331,7 +329,6 @@ private fun PlaylistInfoText(
     )
 }
 
-@SuppressLint("UnusedBoxWithConstraintsScope")
 @Composable
 private fun ActionButtons(
     hasAnyEpisodes: Boolean,
@@ -542,8 +539,10 @@ private val actionButtonsOuterPadding = 42.dp
 private val actionButtonsOffsetSpec = spring<IntOffset>(stiffness = Spring.StiffnessLow)
 private val actionButtonsAlphaSpec = spring<Float>(stiffness = Spring.StiffnessLow)
 
-private val noContentEnterTransition = fadeIn(spring(stiffness = Spring.StiffnessLow)) + expandVertically(spring(stiffness = Spring.StiffnessLow))
-private val noContentExitTransition = fadeOut(spring(stiffness = Spring.StiffnessLow)) + shrinkVertically(spring(stiffness = Spring.StiffnessLow))
+private val noContentEnterTransition =
+    fadeIn(spring(stiffness = Spring.StiffnessLow)) + expandVertically(spring(stiffness = Spring.StiffnessLow))
+private val noContentExitTransition =
+    fadeOut(spring(stiffness = Spring.StiffnessLow)) + shrinkVertically(spring(stiffness = Spring.StiffnessLow))
 
 private val previewColors = listOf(
     Color(0xFFCC99C9),
