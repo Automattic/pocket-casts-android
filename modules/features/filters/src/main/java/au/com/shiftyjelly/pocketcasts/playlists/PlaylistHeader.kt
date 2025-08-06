@@ -13,9 +13,12 @@ import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
 import androidx.compose.material.AppBarDefaults
 import androidx.compose.material.MaterialTheme
+import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.BlurredEdgeTreatment
@@ -27,20 +30,37 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.CompositingStrategy
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.layout
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalInspectionMode
+import androidx.compose.ui.res.pluralStringResource
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.constrainHeight
 import androidx.compose.ui.unit.constrainWidth
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import au.com.shiftyjelly.pocketcasts.compose.AppTheme
 import au.com.shiftyjelly.pocketcasts.compose.PreviewRegularDevice
+import au.com.shiftyjelly.pocketcasts.compose.components.TextP60
+import au.com.shiftyjelly.pocketcasts.compose.preview.ThemePreviewParameterProvider
 import au.com.shiftyjelly.pocketcasts.compose.theme
+import au.com.shiftyjelly.pocketcasts.localization.helper.toFriendlyString
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme.ThemeType
+import kotlin.time.Duration
+import kotlin.time.Duration.Companion.days
+import kotlin.time.Duration.Companion.hours
+import kotlin.time.Duration.Companion.minutes
+import kotlin.time.Duration.Companion.seconds
+import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 internal data class PlaylistHeaderData(
     val title: String,
+    val episodeCount: Int,
+    val playbackDurationLeft: Duration,
     val artworkPodcasts: List<Podcast>,
 )
 
@@ -90,9 +110,40 @@ internal fun PlaylistHeader(
                     )
                 }
             }
-            // Temporary empty space
             Spacer(
-                modifier = Modifier.height(100.dp),
+                modifier = Modifier.height(20.dp),
+            )
+            Text(
+                text = data?.title.orEmpty(),
+                color = MaterialTheme.theme.colors.primaryText01,
+                fontSize = 22.sp,
+                fontWeight = FontWeight.Bold,
+                lineHeight = 22.sp,
+                textAlign = TextAlign.Center,
+                modifier = Modifier.padding(horizontal = 64.dp),
+            )
+            Spacer(
+                modifier = Modifier.height(8.dp),
+            )
+            TextP60(
+                text = buildString {
+                    if (data != null) {
+                        val episodeCount = data.episodeCount
+                        append(pluralStringResource(LR.plurals.episode_count, episodeCount, episodeCount))
+                        append(" • ")
+                        val context = LocalContext.current
+                        val timeLeft = remember(data.playbackDurationLeft, context) {
+                            data.playbackDurationLeft.toFriendlyString(
+                                resources = context.resources,
+                                pluralResourceId = { unit -> unit.shortResourceId },
+                            )
+                        }
+                        append(timeLeft)
+                    }
+                },
+                color = MaterialTheme.theme.colors.primaryText02,
+                textAlign = TextAlign.Center,
+                modifier = Modifier.padding(horizontal = 64.dp),
             )
         }
     }
@@ -230,6 +281,8 @@ private fun PlaylistHeaderNoPodcastPreview() {
             PlaylistHeader(
                 data = PlaylistHeaderData(
                     title = "My Playlist",
+                    episodeCount = 0,
+                    playbackDurationLeft = 0.seconds,
                     artworkPodcasts = emptyList(),
                 ),
                 useBlurredArtwork = false,
@@ -250,6 +303,8 @@ private fun PlaylistHeaderSinglePodcastPreview() {
             PlaylistHeader(
                 data = PlaylistHeaderData(
                     title = "My Playlist",
+                    episodeCount = 100,
+                    playbackDurationLeft = 200.days + 12.hours,
                     artworkPodcasts = listOf(Podcast(uuid = "id-0")),
                 ),
                 useBlurredArtwork = false,
@@ -270,6 +325,32 @@ private fun PlaylistHeaderMultiPodcastPreview() {
             PlaylistHeader(
                 data = PlaylistHeaderData(
                     title = "My Playlist",
+                    episodeCount = 5,
+                    playbackDurationLeft = 1.hours + 15.minutes,
+                    artworkPodcasts = List(4) { index -> Podcast(uuid = "id-$index") },
+                ),
+                useBlurredArtwork = false,
+            )
+        }
+    }
+}
+
+@PreviewRegularDevice
+@Composable
+private fun PlaylistHeaderThemePreview(
+    @PreviewParameter(ThemePreviewParameterProvider::class) themeType: ThemeType,
+) {
+    AppTheme(themeType) {
+        Box(
+            modifier = Modifier
+                .background(MaterialTheme.theme.colors.primaryUi02)
+                .fillMaxSize(),
+        ) {
+            PlaylistHeader(
+                data = PlaylistHeaderData(
+                    title = "My Playlist",
+                    episodeCount = 5,
+                    playbackDurationLeft = 1.hours + 15.minutes,
                     artworkPodcasts = List(4) { index -> Podcast(uuid = "id-$index") },
                 ),
                 useBlurredArtwork = false,

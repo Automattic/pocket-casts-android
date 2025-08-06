@@ -732,6 +732,26 @@
         <item quantity="one">second</item>
         <item quantity="other">seconds</item>
     </plurals>
+   <!-- A short form representing days. Some like 1 d, 2 d, etc. -->
+    <plurals name="day_short">
+        <item quantity="one">d</item>
+        <item quantity="other">d</item>
+    </plurals>
+    <!-- A short form representing hours. Some like 1 hr, 2 hrs, etc. -->
+    <plurals name="hour_short">
+        <item quantity="one">hr</item>
+        <item quantity="other">hrs</item>
+    </plurals>
+    <!-- A short form representing minutes. Some like 1 min, 2 mins, etc. -->
+    <plurals name="minute_short">
+        <item quantity="one">min</item>
+        <item quantity="other">mins</item>
+    </plurals>
+    <!-- A short form representing seconds. Some like 1 sec, 2 secs, etc. -->
+    <plurals name="second_short">
+        <item quantity="one">sec</item>
+        <item quantity="other">secs</item>
+    </plurals>
     <!-- %1$s is a podcast's title -->
     <string name="notifications_enabled_message">We’ll notify you with new episodes of %1$s.</string>
     <string name="podcast_header_redesign_title">We’ve made some changes!</string>
