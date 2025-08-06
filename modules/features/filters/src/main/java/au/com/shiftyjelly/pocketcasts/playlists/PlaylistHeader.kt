@@ -1,8 +1,14 @@
 package au.com.shiftyjelly.pocketcasts.playlists
 
+import android.annotation.SuppressLint
 import androidx.compose.animation.Crossfade
+import androidx.compose.animation.core.Spring
+import androidx.compose.animation.core.animateFloat
 import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.animateIntOffset
+import androidx.compose.animation.core.spring
 import androidx.compose.animation.core.tween
+import androidx.compose.animation.core.updateTransition
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -19,6 +25,7 @@ import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -54,6 +61,7 @@ import androidx.compose.ui.layout.layout
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalInspectionMode
+import androidx.compose.ui.platform.LocalWindowInfo
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.semantics.Role
@@ -64,12 +72,14 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.constrainHeight
 import androidx.compose.ui.unit.constrainWidth
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import au.com.shiftyjelly.pocketcasts.compose.AppTheme
 import au.com.shiftyjelly.pocketcasts.compose.PreviewRegularDevice
+import au.com.shiftyjelly.pocketcasts.compose.components.AnimatedNonNullVisibility
 import au.com.shiftyjelly.pocketcasts.compose.components.TextH20
 import au.com.shiftyjelly.pocketcasts.compose.components.TextH40
 import au.com.shiftyjelly.pocketcasts.compose.components.TextP60
@@ -103,6 +113,7 @@ internal data class PlaylistHeaderData(
     )
 }
 
+@SuppressLint("UnusedBoxWithConstraintsScope")
 @Composable
 internal fun PlaylistHeader(
     data: PlaylistHeaderData?,
@@ -184,27 +195,11 @@ internal fun PlaylistHeader(
             Spacer(
                 modifier = Modifier.height(16.dp),
             )
-            Row(
-                horizontalArrangement = Arrangement.spacedBy(8.dp),
-                modifier = Modifier
-                    .height(IntrinsicSize.Max)
-                    .padding(horizontal = 42.dp),
-            ) {
-                ActionButton(
-                    data = data?.leftButton,
-                    style = ActionButtonStyle.Immersive,
-                    contentAlignment = Alignment.TopEnd,
-                    modifier = Modifier
-                        .weight(1f)
-                        .fillMaxHeight(),
-                )
-                ActionButton(
-                    data = data?.rightButton,
-                    style = ActionButtonStyle.Solid,
-                    contentAlignment = Alignment.TopStart,
-                    modifier = Modifier
-                        .weight(1f)
-                        .fillMaxHeight(),
+            if (data != null) {
+                ActionButtons(
+                    hasAnyEpisodes = data.episodeCount > 0,
+                    leftButton = data.leftButton,
+                    rightButton = data.rightButton,
                 )
             }
             Spacer(
@@ -295,6 +290,61 @@ private fun ArtworkOrPreview(
     }
 }
 
+@SuppressLint("UnusedBoxWithConstraintsScope")
+@Composable
+private fun ActionButtons(
+    hasAnyEpisodes: Boolean,
+    leftButton: PlaylistHeaderData.ActionButton,
+    rightButton: PlaylistHeaderData.ActionButton,
+    modifier: Modifier = Modifier,
+) {
+    val density = LocalDensity.current
+    val windowWidth = density.run { LocalWindowInfo.current.containerSize.width.toDp() }
+    val buttonWidth = minOf((windowWidth - actionButtonsOuterPadding * 2) / 2, actionButtonMaxWidth)
+    val targetOffset = buttonWidth / 2 + actionButtonsInnerPadding / 2
+    val targetOffsetPx = density.run { targetOffset.roundToPx() }
+
+    val transition = updateTransition(hasAnyEpisodes)
+    val offset by transition.animateIntOffset(
+        transitionSpec = { spring(stiffness = Spring.StiffnessLow) },
+        targetValueByState = { hasEpisodes -> if (hasEpisodes) IntOffset.Zero else IntOffset(targetOffsetPx, 0) },
+    )
+    val alpha by transition.animateFloat(
+        transitionSpec = { spring(stiffness = Spring.StiffnessLow) },
+        targetValueByState = { hasEpisodes -> if (hasEpisodes) 1f else 0f },
+    )
+
+    Row(
+        horizontalArrangement = Arrangement.spacedBy(
+            space = actionButtonsInnerPadding,
+            alignment = Alignment.CenterHorizontally,
+        ),
+        modifier = modifier
+            .offset { offset }
+            .height(IntrinsicSize.Max)
+            .padding(horizontal = actionButtonsOuterPadding),
+    ) {
+        ActionButton(
+            data = leftButton,
+            style = ActionButtonStyle.Immersive,
+            contentAlignment = Alignment.TopEnd,
+            modifier = Modifier
+                .weight(1f)
+                .fillMaxHeight(),
+        )
+        ActionButton(
+            data = rightButton,
+            style = ActionButtonStyle.Solid,
+            contentAlignment = Alignment.TopStart,
+            isEnabled = hasAnyEpisodes,
+            modifier = Modifier
+                .weight(1f)
+                .fillMaxHeight()
+                .alpha(alpha),
+        )
+    }
+}
+
 private fun Modifier.blurOrScrim(useBlur: Boolean) = if (useBlur) {
     blur(80.dp, BlurredEdgeTreatment.Unbounded)
 } else {
@@ -319,63 +369,52 @@ private fun Modifier.blurOrScrim(useBlur: Boolean) = if (useBlur) {
 
 @Composable
 private fun ActionButton(
-    data: PlaylistHeaderData.ActionButton?,
+    data: PlaylistHeaderData.ActionButton,
     contentAlignment: Alignment,
     style: ActionButtonStyle,
     modifier: Modifier = Modifier,
+    isEnabled: Boolean = true,
 ) {
     CompositionLocalProvider(LocalRippleConfiguration provides style.rememberRippleConfiguration()) {
         Box(
             contentAlignment = contentAlignment,
             modifier = modifier,
         ) {
-            val alpha by animateFloatAsState(targetValue = if (data == null) 0f else 1f)
             Row(
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.Center,
                 modifier = Modifier
-                    .alpha(alpha)
-                    .widthIn(max = 200.dp)
+                    .widthIn(max = actionButtonMaxWidth)
                     .fillMaxSize()
                     .clip(actionButtonShape)
                     .background(style.backgroundColor(), actionButtonShape)
                     .border(2.dp, style.borderColor(), actionButtonShape)
-                    .then(
-                        if (data != null) {
-                            Modifier.clickable(
-                                role = Role.Button,
-                                onClick = data.onClick,
-                            )
-                        } else {
-                            Modifier
-                        },
+                    .clickable(
+                        enabled = isEnabled,
+                        role = Role.Button,
+                        onClick = data.onClick,
                     )
                     .padding(vertical = 12.dp, horizontal = 8.dp)
                     .semantics(mergeDescendants = true) {},
             ) {
-                if (data != null) {
-                    Image(
-                        painter = painterResource(data.iconId),
-                        colorFilter = ColorFilter.tint(style.onBackgroundColor()),
-                        contentDescription = null,
-                        modifier = Modifier.size(18.dp),
-                    )
-                    Spacer(
-                        modifier = Modifier.width(8.dp),
-                    )
-                    TightWrapText(
-                        text = data.label,
-                        style = TextStyle(
-                            fontSize = 15.sp,
-                            lineHeight = 21.sp,
-                            fontWeight = FontWeight.Medium,
-                            color = style.onBackgroundColor(),
-                        ),
-                    )
-                } else {
-                    // Empty text to keep the height
-                    TextH40(text = "")
-                }
+                Image(
+                    painter = painterResource(data.iconId),
+                    colorFilter = ColorFilter.tint(style.onBackgroundColor()),
+                    contentDescription = null,
+                    modifier = Modifier.size(18.dp),
+                )
+                Spacer(
+                    modifier = Modifier.width(8.dp),
+                )
+                TightWrapText(
+                    text = data.label,
+                    style = TextStyle(
+                        fontSize = 15.sp,
+                        lineHeight = 21.sp,
+                        fontWeight = FontWeight.Medium,
+                        color = style.onBackgroundColor(),
+                    ),
+                )
             }
         }
     }
@@ -454,6 +493,9 @@ private enum class ActionButtonStyle {
 
 private val artworkCrossfadeSpec = tween<Float>(durationMillis = 1000)
 private val actionButtonShape = RoundedCornerShape(8.dp)
+private val actionButtonMaxWidth = 200.dp
+private val actionButtonsInnerPadding = 8.dp
+private val actionButtonsOuterPadding = 42.dp
 
 private val previewColors = listOf(
     Color(0xFFCC99C9),
