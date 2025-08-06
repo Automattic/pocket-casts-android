@@ -34,6 +34,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -93,7 +94,7 @@ fun OnboardingUpgradeScreen(
             .background(color = MaterialTheme.colors.background)
             .fillMaxSize(),
     ) {
-        if (this.maxHeight <= 360.dp) {
+        if (this.maxHeight <= 480.dp || (this.maxHeight <= 640.dp && LocalConfiguration.current.fontScale >= 1.5f)) {
             CompactHeightUpscaledFontUpgradeScreen(
                 state = state,
                 source = source,
@@ -381,7 +382,7 @@ private fun OnboardingUpgradeFeaturesState.NewOnboardingVariant.toContentPages(
         OnboardingUpgradeSource.FOLDERS_PODCAST_SCREEN,
         OnboardingUpgradeSource.SUGGESTED_FOLDERS,
         OnboardingUpgradeSource.FOLDERS,
-            -> {
+        -> {
             add(UpgradePagerContent.Folders)
             add(
                 UpgradePagerContent.Features(
@@ -393,7 +394,7 @@ private fun OnboardingUpgradeFeaturesState.NewOnboardingVariant.toContentPages(
 
         OnboardingUpgradeSource.BOOKMARKS,
         OnboardingUpgradeSource.BOOKMARKS_SHELF_ACTION,
-            -> {
+        -> {
             add(UpgradePagerContent.Bookmarks)
             add(
                 UpgradePagerContent.Features(
@@ -738,7 +739,7 @@ private fun PreviewOnboardingUpgradeScreen(
     }
 }
 
-@Preview(fontScale = 2f, heightDp = 480)
+@Preview(fontScale = 2f, heightDp = 360)
 @Composable
 private fun PreviewOnboardingUpgradeScreenSmall(
     @PreviewParameter(ThemedTierParameterProvider::class) pair: Pair<ThemeType, SubscriptionTier>,
