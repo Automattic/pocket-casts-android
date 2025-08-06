@@ -14,7 +14,6 @@ import au.com.shiftyjelly.pocketcasts.compose.AppTheme
 import au.com.shiftyjelly.pocketcasts.compose.theme
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
 import au.com.shiftyjelly.pocketcasts.ui.R as UR
 
 // This adapter uses an unconventional configuration: it has only a single view holder, and data is provided via a Flow.
@@ -33,38 +32,32 @@ internal class PlaylistHeaderAdapter(
     override fun getItemCount() = 1
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
-        return PlaylistHeaderViewHolder(
-            composeView = ComposeView(parent.context),
-            themeType = themeType,
-            headerDataFlow = headerDataFlow,
-        )
+        return PlaylistHeaderViewHolder(ComposeView(parent.context))
     }
 
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
         (holder as PlaylistHeaderViewHolder).bind()
     }
-}
 
-private class PlaylistHeaderViewHolder(
-    private val composeView: ComposeView,
-    private val themeType: Theme.ThemeType,
-    private val headerDataFlow: StateFlow<PlaylistHeaderData?>,
-) : RecyclerView.ViewHolder(composeView) {
-    init {
-        composeView.setTag(UR.id.playlist_view_header_tag, true)
-        composeView.setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnDetachedFromWindowOrReleasedFromPool)
-    }
+    private inner class PlaylistHeaderViewHolder(
+        private val composeView: ComposeView,
+    ) : RecyclerView.ViewHolder(composeView) {
+        init {
+            composeView.setTag(UR.id.playlist_view_header_tag, true)
+            composeView.setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnDetachedFromWindowOrReleasedFromPool)
+        }
 
-    fun bind() {
-        composeView.setContent {
-            val headerData by headerDataFlow.collectAsState()
+        fun bind() {
+            composeView.setContent {
+                val headerData by headerDataFlow.collectAsState()
 
-            AppTheme(themeType) {
-                PlaylistHeader(
-                    data = headerData,
-                    useBlurredArtwork = Build.VERSION.SDK_INT >= 31,
-                    modifier = Modifier.background(MaterialTheme.theme.colors.primaryUi02),
-                )
+                AppTheme(themeType) {
+                    PlaylistHeader(
+                        data = headerData,
+                        useBlurredArtwork = Build.VERSION.SDK_INT >= 31,
+                        modifier = Modifier.background(MaterialTheme.theme.colors.primaryUi02),
+                    )
+                }
             }
         }
     }

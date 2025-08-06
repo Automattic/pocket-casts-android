@@ -34,6 +34,8 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import kotlinx.parcelize.Parcelize
 import timber.log.Timber
+import au.com.shiftyjelly.pocketcasts.images.R as IR
+import au.com.shiftyjelly.pocketcasts.localization.R as LR
 import au.com.shiftyjelly.pocketcasts.ui.R as UR
 
 @AndroidEntryPoint
@@ -66,6 +68,17 @@ class SmartPlaylistFragment :
     }
 
     private fun SmartPlaylistFragmentBinding.setupContent() {
+        val leftButton = PlaylistHeaderData.ActionButton(
+            iconId = IR.drawable.ic_playlist_smart_rules,
+            label = getString(LR.string.smart_rules),
+            onClick = { Timber.tag("Edit smart rules") },
+        )
+        val rightButton = PlaylistHeaderData.ActionButton(
+            iconId = IR.drawable.ic_playlist_play,
+            label = getString(LR.string.playlist_play_all),
+            onClick = { Timber.tag("Play all episodes") },
+        )
+
         val headerAdapter = PlaylistHeaderAdapter(
             themeType = theme.activeTheme,
         )
@@ -90,6 +103,8 @@ class SmartPlaylistFragment :
                             episodeCount = playlist.totalEpisodeCount,
                             playbackDurationLeft = playlist.playbackDurationLeft,
                             artworkPodcasts = playlist.artworkPodcasts,
+                            leftButton = leftButton,
+                            rightButton = rightButton,
                         )
                     }
                     headerAdapter.submitHeader(playlistHeaderData)
