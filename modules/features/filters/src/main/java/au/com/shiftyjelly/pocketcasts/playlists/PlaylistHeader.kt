@@ -1,13 +1,17 @@
 package au.com.shiftyjelly.pocketcasts.playlists
 
 import android.annotation.SuppressLint
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.Crossfade
 import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.animateFloat
 import androidx.compose.animation.core.animateIntOffset
 import androidx.compose.animation.core.spring
-import androidx.compose.animation.core.tween
 import androidx.compose.animation.core.updateTransition
+import androidx.compose.animation.expandVertically
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.shrinkVertically
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -40,6 +44,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.ReadOnlyComposable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -63,6 +68,7 @@ import androidx.compose.ui.platform.LocalInspectionMode
 import androidx.compose.ui.platform.LocalWindowInfo
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.pluralStringResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.TextLayoutResult
@@ -79,6 +85,8 @@ import androidx.compose.ui.unit.sp
 import au.com.shiftyjelly.pocketcasts.compose.AppTheme
 import au.com.shiftyjelly.pocketcasts.compose.PreviewRegularDevice
 import au.com.shiftyjelly.pocketcasts.compose.components.AnimatedNonNullVisibility
+import au.com.shiftyjelly.pocketcasts.compose.components.Banner
+import au.com.shiftyjelly.pocketcasts.compose.components.NoContentBanner
 import au.com.shiftyjelly.pocketcasts.compose.components.TextH20
 import au.com.shiftyjelly.pocketcasts.compose.components.TextH40
 import au.com.shiftyjelly.pocketcasts.compose.components.TextP60
@@ -188,6 +196,20 @@ internal fun PlaylistHeader(
             Spacer(
                 modifier = Modifier.height(16.dp),
             )
+            if (data != null) {
+                AnimatedVisibility(
+                    visible = data.episodeCount == 0,
+                    enter = noContentEnterTransition,
+                    exit = noContentExitTransition,
+                ) {
+                    NoContentBanner(
+                        title = stringResource(LR.string.smart_playlist_no_content_title),
+                        body = stringResource(LR.string.smart_playlist_no_content_body),
+                        iconResourceId = IR.drawable.ic_info,
+                        modifier = Modifier.padding(top = 60.dp, bottom = 24.dp),
+                    )
+                }
+            }
         }
     }
 }
@@ -512,12 +534,16 @@ private enum class ActionButtonStyle {
 
 private val artworkCrossfadeFastSpec = spring<Float>(stiffness = Spring.StiffnessLow)
 private val artworkCrossfadeSpec = spring<Float>(stiffness = Spring.StiffnessVeryLow)
+
 private val actionButtonShape = RoundedCornerShape(8.dp)
 private val actionButtonMaxWidth = 200.dp
 private val actionButtonsInnerPadding = 8.dp
 private val actionButtonsOuterPadding = 42.dp
 private val actionButtonsOffsetSpec = spring<IntOffset>(stiffness = Spring.StiffnessLow)
 private val actionButtonsAlphaSpec = spring<Float>(stiffness = Spring.StiffnessLow)
+
+private val noContentEnterTransition = fadeIn(spring(stiffness = Spring.StiffnessLow)) + expandVertically(spring(stiffness = Spring.StiffnessLow))
+private val noContentExitTransition = fadeOut(spring(stiffness = Spring.StiffnessLow)) + shrinkVertically(spring(stiffness = Spring.StiffnessLow))
 
 private val previewColors = listOf(
     Color(0xFFCC99C9),
@@ -537,6 +563,8 @@ private val previewColors = listOf(
 @PreviewRegularDevice
 @Composable
 private fun PlaylistHeaderNoPodcastPreview() {
+    var episodeCount by remember { mutableIntStateOf(0) }
+
     AppTheme(ThemeType.LIGHT) {
         Box(
             modifier = Modifier
@@ -546,18 +574,18 @@ private fun PlaylistHeaderNoPodcastPreview() {
             PlaylistHeader(
                 data = PlaylistHeaderData(
                     title = "My Playlist",
-                    episodeCount = 0,
+                    episodeCount = episodeCount,
                     playbackDurationLeft = 0.seconds,
                     artworkPodcasts = emptyList(),
                     leftButton = PlaylistHeaderData.ActionButton(
                         iconId = IR.drawable.sleep_timer_cog,
                         label = "Smart Rules",
-                        onClick = {},
+                        onClick = { episodeCount = 1 },
                     ),
                     rightButton = PlaylistHeaderData.ActionButton(
                         iconId = IR.drawable.ic_filters_play,
                         label = "Play All",
-                        onClick = {},
+                        onClick = { episodeCount = 0 },
                     ),
                 ),
                 useBlurredArtwork = false,
