@@ -4,7 +4,6 @@ import android.annotation.SuppressLint
 import androidx.compose.animation.Crossfade
 import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.animateFloat
-import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.animateIntOffset
 import androidx.compose.animation.core.spring
 import androidx.compose.animation.core.tween
@@ -147,7 +146,7 @@ internal fun PlaylistHeader(
             )
             Crossfade(
                 targetState = podcasts,
-                animationSpec = artworkCrossfadeSpec,
+                animationSpec = if (podcasts.isNullOrEmpty()) artworkCrossfadeFastSpec else artworkCrossfadeSpec,
             ) { podcasts ->
                 if (podcasts != null) {
                     PlaylistArtwork(
@@ -172,25 +171,9 @@ internal fun PlaylistHeader(
             Spacer(
                 modifier = Modifier.height(8.dp),
             )
-            TextP60(
-                text = buildString {
-                    if (data != null) {
-                        val episodeCount = data.episodeCount
-                        append(pluralStringResource(LR.plurals.episode_count, episodeCount, episodeCount))
-                        append(" • ")
-                        val context = LocalContext.current
-                        val timeLeft = remember(data.playbackDurationLeft, context) {
-                            data.playbackDurationLeft.toFriendlyString(
-                                resources = context.resources,
-                                pluralResourceId = { unit -> unit.shortResourceId },
-                            )
-                        }
-                        append(timeLeft)
-                    }
-                },
-                color = MaterialTheme.theme.colors.primaryText02,
-                textAlign = TextAlign.Center,
-                modifier = Modifier.padding(horizontal = 64.dp),
+            PlaylistInfoText(
+                episodeCount = data?.episodeCount,
+                playbackDurationLeft = data?.playbackDurationLeft,
             )
             Spacer(
                 modifier = Modifier.height(16.dp),
@@ -225,7 +208,7 @@ private fun PlaylistBackgroundArtwork(
 
     Crossfade(
         targetState = podcasts?.takeIf { it.isNotEmpty() },
-        animationSpec = artworkCrossfadeSpec,
+        animationSpec = if (podcasts.isNullOrEmpty()) artworkCrossfadeFastSpec else artworkCrossfadeSpec,
         modifier = modifier
             .layout { measurable, constraints ->
                 val artworkHeightPx = if (useBlurredArtwork) {
@@ -290,6 +273,42 @@ private fun ArtworkOrPreview(
     }
 }
 
+@Composable
+private fun PlaylistInfoText(
+    episodeCount: Int?,
+    playbackDurationLeft: Duration?,
+    modifier: Modifier = Modifier,
+) {
+    val context = LocalContext.current
+    val episodeCountText = if (episodeCount != null) {
+        pluralStringResource(LR.plurals.episode_count, episodeCount, episodeCount)
+    } else {
+        null
+    }
+    val durationLeftText = remember(context, playbackDurationLeft, episodeCount) {
+        playbackDurationLeft
+            ?.takeIf { episodeCount != null && episodeCount > 0 }
+            ?.toFriendlyString(context.resources, pluralResourceId = { unit -> unit.shortResourceId })
+    }
+    val playlistInfoText = remember(episodeCountText, durationLeftText) {
+        buildString {
+            if (episodeCountText != null) {
+                append(episodeCountText)
+                if (durationLeftText != null) {
+                    append(" • ")
+                    append(durationLeftText)
+                }
+            }
+        }
+    }
+    TextP60(
+        text = playlistInfoText,
+        color = MaterialTheme.theme.colors.primaryText02,
+        textAlign = TextAlign.Center,
+        modifier = modifier.padding(horizontal = 64.dp),
+    )
+}
+
 @SuppressLint("UnusedBoxWithConstraintsScope")
 @Composable
 private fun ActionButtons(
@@ -306,11 +325,11 @@ private fun ActionButtons(
 
     val transition = updateTransition(hasAnyEpisodes)
     val offset by transition.animateIntOffset(
-        transitionSpec = { spring(stiffness = Spring.StiffnessLow) },
+        transitionSpec = { actionButtonsOffsetSpec },
         targetValueByState = { hasEpisodes -> if (hasEpisodes) IntOffset.Zero else IntOffset(targetOffsetPx, 0) },
     )
     val alpha by transition.animateFloat(
-        transitionSpec = { spring(stiffness = Spring.StiffnessLow) },
+        transitionSpec = { actionButtonsAlphaSpec },
         targetValueByState = { hasEpisodes -> if (hasEpisodes) 1f else 0f },
     )
 
@@ -491,11 +510,14 @@ private enum class ActionButtonStyle {
     }
 }
 
-private val artworkCrossfadeSpec = tween<Float>(durationMillis = 1000)
+private val artworkCrossfadeFastSpec = spring<Float>(stiffness = Spring.StiffnessLow)
+private val artworkCrossfadeSpec = spring<Float>(stiffness = Spring.StiffnessVeryLow)
 private val actionButtonShape = RoundedCornerShape(8.dp)
 private val actionButtonMaxWidth = 200.dp
 private val actionButtonsInnerPadding = 8.dp
 private val actionButtonsOuterPadding = 42.dp
+private val actionButtonsOffsetSpec = spring<IntOffset>(stiffness = Spring.StiffnessLow)
+private val actionButtonsAlphaSpec = spring<Float>(stiffness = Spring.StiffnessLow)
 
 private val previewColors = listOf(
     Color(0xFFCC99C9),
