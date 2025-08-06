@@ -29,13 +29,11 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
 import androidx.compose.material.MaterialTheme
-import androidx.compose.material3.adaptive.currentWindowAdaptiveInfo
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -54,7 +52,6 @@ import au.com.shiftyjelly.pocketcasts.account.onboarding.upgrade.contextual.Pres
 import au.com.shiftyjelly.pocketcasts.account.onboarding.upgrade.contextual.ShuffleAnimation
 import au.com.shiftyjelly.pocketcasts.account.viewmodel.OnboardingUpgradeFeaturesState
 import au.com.shiftyjelly.pocketcasts.compose.AppThemeWithBackground
-import au.com.shiftyjelly.pocketcasts.compose.adaptive.isAtMostMediumHeight
 import au.com.shiftyjelly.pocketcasts.compose.components.FadedLazyColumn
 import au.com.shiftyjelly.pocketcasts.compose.components.TextH10
 import au.com.shiftyjelly.pocketcasts.compose.components.TextP40
@@ -89,39 +86,34 @@ fun OnboardingUpgradeScreen(
     onClickTermsAndConditions: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    val configuration = LocalConfiguration.current
-    val windowSizeClass = currentWindowAdaptiveInfo().windowSizeClass
-
-    if (windowSizeClass.isAtMostMediumHeight() && configuration.fontScale >= 1.5) {
-        CompactHeightUpscaledFontUpgradeScreen(
-            state = state,
-            source = source,
-            onClosePress = onClosePress,
-            onSubscribePress = onSubscribePress,
-            onChangeSelectedPlan = onChangeSelectedPlan,
-            onClickPrivacyPolicy = onClickPrivacyPolicy,
-            onClickTermsAndConditions = onClickTermsAndConditions,
-            modifier = modifier
-                .windowInsetsPadding(WindowInsets.statusBars)
-                .windowInsetsPadding(WindowInsets.navigationBars)
-                .background(color = MaterialTheme.colors.background)
-                .fillMaxSize(),
-        )
-    } else {
-        RegularUpgradeScreen(
-            state = state,
-            source = source,
-            onClosePress = onClosePress,
-            onSubscribePress = onSubscribePress,
-            onChangeSelectedPlan = onChangeSelectedPlan,
-            onClickPrivacyPolicy = onClickPrivacyPolicy,
-            onClickTermsAndConditions = onClickTermsAndConditions,
-            modifier = modifier
-                .windowInsetsPadding(WindowInsets.statusBars)
-                .windowInsetsPadding(WindowInsets.navigationBars)
-                .background(color = MaterialTheme.colors.background)
-                .fillMaxSize(),
-        )
+    BoxWithConstraints(
+        modifier = modifier
+            .windowInsetsPadding(WindowInsets.statusBars)
+            .windowInsetsPadding(WindowInsets.navigationBars)
+            .background(color = MaterialTheme.colors.background)
+            .fillMaxSize(),
+    ) {
+        if (this.maxHeight <= 360.dp) {
+            CompactHeightUpscaledFontUpgradeScreen(
+                state = state,
+                source = source,
+                onClosePress = onClosePress,
+                onSubscribePress = onSubscribePress,
+                onChangeSelectedPlan = onChangeSelectedPlan,
+                onClickPrivacyPolicy = onClickPrivacyPolicy,
+                onClickTermsAndConditions = onClickTermsAndConditions,
+            )
+        } else {
+            RegularUpgradeScreen(
+                state = state,
+                source = source,
+                onClosePress = onClosePress,
+                onSubscribePress = onSubscribePress,
+                onChangeSelectedPlan = onChangeSelectedPlan,
+                onClickPrivacyPolicy = onClickPrivacyPolicy,
+                onClickTermsAndConditions = onClickTermsAndConditions,
+            )
+        }
     }
 }
 
@@ -218,7 +210,7 @@ private fun RegularUpgradeScreen(
         )
         Spacer(modifier = Modifier.height(12.dp))
         UpgradeContent(
-            modifier = Modifier.weight(1f),
+            modifier = Modifier.weight(weight = 1f),
             pages = state.onboardingVariant.toContentPages(
                 currentPlan = state.selectedPlan,
                 isEligibleForTrial = state.selectedBasePlan.offer == SubscriptionOffer.Trial,
@@ -389,7 +381,7 @@ private fun OnboardingUpgradeFeaturesState.NewOnboardingVariant.toContentPages(
         OnboardingUpgradeSource.FOLDERS_PODCAST_SCREEN,
         OnboardingUpgradeSource.SUGGESTED_FOLDERS,
         OnboardingUpgradeSource.FOLDERS,
-        -> {
+            -> {
             add(UpgradePagerContent.Folders)
             add(
                 UpgradePagerContent.Features(
@@ -401,7 +393,7 @@ private fun OnboardingUpgradeFeaturesState.NewOnboardingVariant.toContentPages(
 
         OnboardingUpgradeSource.BOOKMARKS,
         OnboardingUpgradeSource.BOOKMARKS_SHELF_ACTION,
-        -> {
+            -> {
             add(UpgradePagerContent.Bookmarks)
             add(
                 UpgradePagerContent.Features(
