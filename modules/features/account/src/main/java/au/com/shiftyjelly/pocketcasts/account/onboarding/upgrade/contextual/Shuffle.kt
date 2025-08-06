@@ -33,6 +33,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.Layout
 import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.pluralStringResource
@@ -55,6 +56,7 @@ import au.com.shiftyjelly.pocketcasts.compose.components.TextP60
 import au.com.shiftyjelly.pocketcasts.compose.preview.ThemePreviewParameterProvider
 import au.com.shiftyjelly.pocketcasts.compose.theme
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
+import au.com.shiftyjelly.pocketcasts.utils.Util
 import java.time.Instant
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
@@ -313,6 +315,10 @@ private fun ShuffleItem(
             }
         }
     }
+    val isTablet = Util.isTablet(LocalContext.current)
+    val iconSize = if (isTablet) 64.dp else 48.dp
+    val secondaryTextSize = if (isTablet) 14.sp else 10.sp
+    val mainTextSize = if (isTablet) 18.sp else 14.sp
 
     Card(
         modifier = modifier
@@ -336,7 +342,7 @@ private fun ShuffleItem(
         ) {
             Image(
                 modifier = Modifier
-                    .size(48.dp)
+                    .size(iconSize)
                     .clip(RoundedCornerShape(3.dp)),
                 painter = painterResource(config.artworkResId),
                 contentDescription = "",
@@ -345,13 +351,14 @@ private fun ShuffleItem(
                 verticalArrangement = Arrangement.spacedBy(1.dp),
             ) {
                 TextH70(
-                    fontSize = 10.sp,
+                    fontSize = secondaryTextSize,
                     text = dateFormatter.format(config.date).toUpperCase(Locale.current),
                     color = MaterialTheme.theme.colors.primaryText02,
                     modifier = Modifier.fillMaxWidth(),
                     disableAutoScale = true,
                 )
                 TextP60(
+                    fontSize = mainTextSize,
                     text = config.title,
                     fontWeight = FontWeight.W500,
                     modifier = Modifier.fillMaxWidth(),
@@ -360,7 +367,7 @@ private fun ShuffleItem(
                     disableAutoScale = true,
                 )
                 TextH70(
-                    fontSize = 10.sp,
+                    fontSize = secondaryTextSize,
                     text = formatDuration(config.durationSeconds),
                     color = MaterialTheme.theme.colors.primaryText02,
                     modifier = Modifier.fillMaxWidth(),

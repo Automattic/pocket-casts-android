@@ -643,8 +643,7 @@ private fun FoldersUpgradeContent(
 
         FoldersAnimation(
             modifier = Modifier
-                .fillMaxWidth()
-                .heightIn(min = 320.dp),
+                .fillMaxWidth(),
         )
     }
 }
@@ -688,7 +687,8 @@ private fun ShuffleUpgradeContent(
         )
 
         ShuffleAnimation(
-            modifier = Modifier.padding(horizontal = 32.dp),
+            modifier = Modifier
+                .padding(horizontal = 32.dp),
         )
     }
 }
