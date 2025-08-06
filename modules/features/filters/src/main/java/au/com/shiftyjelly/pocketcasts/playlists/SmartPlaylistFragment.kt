@@ -12,6 +12,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.util.lerp
 import androidx.core.os.BundleCompat
 import androidx.core.os.bundleOf
+import androidx.core.view.updatePadding
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
@@ -109,6 +110,12 @@ class SmartPlaylistFragment :
                     }
                     headerAdapter.submitHeader(playlistHeaderData)
                 }
+        }
+        viewLifecycleOwner.lifecycleScope.launch {
+            val initialPadding = content.paddingBottom
+            viewModel.bottomInset.collect { inset ->
+                content.updatePadding(bottom = initialPadding + inset)
+            }
         }
     }
 

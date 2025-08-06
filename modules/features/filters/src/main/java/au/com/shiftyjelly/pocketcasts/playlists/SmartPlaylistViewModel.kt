@@ -2,6 +2,7 @@ package au.com.shiftyjelly.pocketcasts.playlists
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.playlist.PlaylistManager
 import au.com.shiftyjelly.pocketcasts.repositories.playlist.SmartPlaylist
 import dagger.assisted.Assisted
@@ -17,7 +18,10 @@ import kotlinx.coroutines.flow.stateIn
 class SmartPlaylistViewModel @AssistedInject constructor(
     @Assisted playlistUuid: String,
     private val playlistManager: PlaylistManager,
+    private val settings: Settings,
 ) : ViewModel() {
+    val bottomInset = settings.bottomInset
+
     val uiState = playlistManager.observeSmartPlaylist(playlistUuid)
         .map { UiState(it) }
         .stateIn(viewModelScope, SharingStarted.Lazily, initialValue = UiState.Empty)
