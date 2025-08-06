@@ -6,14 +6,15 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
+import androidx.compose.material.AppBarDefaults
+import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -32,12 +33,14 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.constrainHeight
 import androidx.compose.ui.unit.constrainWidth
 import androidx.compose.ui.unit.dp
-import au.com.shiftyjelly.pocketcasts.compose.AppThemeWithBackground
+import au.com.shiftyjelly.pocketcasts.compose.AppTheme
 import au.com.shiftyjelly.pocketcasts.compose.PreviewRegularDevice
+import au.com.shiftyjelly.pocketcasts.compose.theme
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme.ThemeType
 
 internal data class PlaylistHeaderData(
+    val title: String,
     val artworkPodcasts: List<Podcast>,
 )
 
@@ -45,28 +48,33 @@ internal data class PlaylistHeaderData(
 internal fun PlaylistHeader(
     data: PlaylistHeaderData?,
     useBlurredArtwork: Boolean,
-    contentPadding: PaddingValues,
     modifier: Modifier = Modifier,
 ) {
     BoxWithConstraints(
         modifier = modifier,
     ) {
-        val artworkSize = minOf(maxWidth * 0.48f, 192.dp)
         val podcasts = data?.artworkPodcasts
+
+        val toolbarInsets = AppBarDefaults.topAppBarWindowInsets
+        val toolbarTopPadding = toolbarInsets.asPaddingValues().calculateTopPadding()
+        val toolbarHeight = 48.dp
+        val artworkTopPadding = 16.dp
+        val artworkSize = minOf(maxWidth * 0.48f, 192.dp)
 
         PlaylistBackgroundArtwork(
             podcasts = podcasts,
             useBlurredArtwork = useBlurredArtwork,
             maxWidth = maxWidth,
-            bottomAnchor = contentPadding.calculateTopPadding() + artworkSize * 0.75f,
+            bottomAnchor = toolbarTopPadding + toolbarHeight + artworkTopPadding + artworkSize * 0.75f,
         )
 
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(contentPadding),
+            modifier = Modifier.fillMaxWidth(),
         ) {
+            Spacer(
+                modifier = Modifier.height(toolbarTopPadding + toolbarHeight + artworkTopPadding),
+            )
             Crossfade(
                 targetState = podcasts,
                 animationSpec = artworkCrossfadeSpec,
@@ -213,16 +221,16 @@ private val previewColors = listOf(
 @PreviewRegularDevice
 @Composable
 private fun PlaylistHeaderNoPodcastPreview() {
-    AppThemeWithBackground(ThemeType.LIGHT) {
+    AppTheme(ThemeType.LIGHT) {
         Box(
-            modifier = Modifier.fillMaxSize(),
+            modifier = Modifier
+                .background(MaterialTheme.theme.colors.primaryUi02)
+                .fillMaxSize(),
         ) {
             PlaylistHeader(
                 data = PlaylistHeaderData(
+                    title = "My Playlist",
                     artworkPodcasts = emptyList(),
-                ),
-                contentPadding = PaddingValues(
-                    top = 56.dp,
                 ),
                 useBlurredArtwork = false,
             )
@@ -233,16 +241,16 @@ private fun PlaylistHeaderNoPodcastPreview() {
 @PreviewRegularDevice
 @Composable
 private fun PlaylistHeaderSinglePodcastPreview() {
-    AppThemeWithBackground(ThemeType.LIGHT) {
+    AppTheme(ThemeType.LIGHT) {
         Box(
-            modifier = Modifier.fillMaxSize(),
+            modifier = Modifier
+                .background(MaterialTheme.theme.colors.primaryUi02)
+                .fillMaxSize(),
         ) {
             PlaylistHeader(
                 data = PlaylistHeaderData(
+                    title = "My Playlist",
                     artworkPodcasts = listOf(Podcast(uuid = "id-0")),
-                ),
-                contentPadding = PaddingValues(
-                    top = 56.dp,
                 ),
                 useBlurredArtwork = false,
             )
@@ -253,16 +261,16 @@ private fun PlaylistHeaderSinglePodcastPreview() {
 @PreviewRegularDevice
 @Composable
 private fun PlaylistHeaderMultiPodcastPreview() {
-    AppThemeWithBackground(ThemeType.LIGHT) {
+    AppTheme(ThemeType.LIGHT) {
         Box(
-            modifier = Modifier.fillMaxSize(),
+            modifier = Modifier
+                .background(MaterialTheme.theme.colors.primaryUi02)
+                .fillMaxSize(),
         ) {
             PlaylistHeader(
                 data = PlaylistHeaderData(
+                    title = "My Playlist",
                     artworkPodcasts = List(4) { index -> Podcast(uuid = "id-$index") },
-                ),
-                contentPadding = PaddingValues(
-                    top = 56.dp,
                 ),
                 useBlurredArtwork = false,
             )

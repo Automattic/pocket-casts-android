@@ -14,6 +14,11 @@
         android:scrollbars="vertical"
         app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager" />
 
+    <androidx.compose.ui.platform.ComposeView
+        android:id="@+id/playlistToolbar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+
     <au.com.shiftyjelly.pocketcasts.views.multiselect.MultiSelectToolbar
         android:id="@+id/multiSelectToolbar"
         android:layout_width="match_parent"

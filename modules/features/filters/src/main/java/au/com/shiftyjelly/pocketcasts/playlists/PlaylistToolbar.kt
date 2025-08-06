@@ -7,7 +7,6 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -27,6 +26,8 @@ import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
@@ -47,7 +48,6 @@ internal fun PlaylistToolbar(
     onClickBack: () -> Unit,
     onClickOptions: () -> Unit,
     modifier: Modifier = Modifier,
-    windowInsets: WindowInsets = AppBarDefaults.topAppBarWindowInsets,
 ) {
     val colors = rememberToolbarColors(backgroundAlpha)
     TopAppBar(
@@ -87,7 +87,7 @@ internal fun PlaylistToolbar(
         },
         backgroundColor = colors.backgroundColor,
         elevation = 0.dp,
-        windowInsets = windowInsets,
+        windowInsets = AppBarDefaults.topAppBarWindowInsets,
         modifier = modifier.fillMaxWidth(),
     )
 }
@@ -107,7 +107,11 @@ private fun ToolbarButton(
             .size(40.dp)
             .clip(CircleShape)
             .background(backgroundColor)
-            .clickable(onClick = onClick),
+            .clickable(
+                role = Role.Button,
+                onClick = onClick,
+            )
+            .semantics(mergeDescendants = true) {},
     ) {
         Image(
             painter = painterResource(iconId),
