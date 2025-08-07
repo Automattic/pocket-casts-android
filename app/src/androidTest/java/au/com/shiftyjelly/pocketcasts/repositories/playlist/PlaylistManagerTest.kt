@@ -868,8 +868,11 @@ class PlaylistManagerTest {
 
     @Test
     fun observeSmartPlaylist() = runTest(testDispatcher) {
-        podcastDao.insertSuspend(Podcast(uuid = "podcast-id-1", isSubscribed = true))
-        podcastDao.insertSuspend(Podcast(uuid = "podcast-id-2", isSubscribed = true))
+        val podcasts = listOf(
+            Podcast(uuid = "podcast-id-1", isSubscribed = true),
+            Podcast(uuid = "podcast-id-2", isSubscribed = true),
+        )
+        podcasts.forEach { podcast -> podcastDao.insertSuspend(podcast) }
 
         manager.observeSmartPlaylist("playlist-id").test {
             assertNull(awaitItem())
@@ -880,6 +883,7 @@ class PlaylistManagerTest {
                     uuid = "playlist-id",
                     title = "Title 1",
                     episodes = emptyList(),
+                    artworkPodcasts = emptyList(),
                 ),
                 awaitItem(),
             )
@@ -890,11 +894,43 @@ class PlaylistManagerTest {
                 PodcastEpisode(uuid = "id-3", podcastUuid = "podcast-id-2", publishedDate = Date(0)),
             )
             episodeDao.insertAll(episodes)
-            assertEquals(episodes, awaitItem()?.episodes)
+            var playlist = awaitItem()
+            assertEquals(episodes, playlist?.episodes)
+            assertEquals(podcasts, playlist?.artworkPodcasts)
 
-            val playlist = playlistDao.observeSmartPlaylist("playlist-id").first()!!
-            playlistDao.upsertSmartPlaylist(playlist.copy(allPodcasts = false, podcastUuids = "podcast-id-2"))
-            assertEquals(listOf(episodes[2]), awaitItem()?.episodes)
+            playlistDao.observeSmartPlaylist("playlist-id").first()!!.let {
+                playlistDao.upsertSmartPlaylist(it.copy(allPodcasts = false, podcastUuids = "podcast-id-2"))
+            }
+            playlist = awaitItem()
+            assertEquals(listOf(episodes[2]), playlist?.episodes)
+            assertEquals(listOf(podcasts[1]), playlist?.artworkPodcasts)
+        }
+    }
+
+    @Test
+    fun limitArtworkPodcastsSize() = runTest(testDispatcher) {
+        val podcasts = listOf(
+            Podcast(uuid = "podcast-id-1", isSubscribed = true),
+            Podcast(uuid = "podcast-id-2", isSubscribed = true),
+            Podcast(uuid = "podcast-id-3", isSubscribed = true),
+            Podcast(uuid = "podcast-id-4", isSubscribed = true),
+            Podcast(uuid = "podcast-id-5", isSubscribed = true),
+        )
+        podcasts.forEach { podcast -> podcastDao.insertSuspend(podcast) }
+        val episodes = listOf(
+            PodcastEpisode(uuid = "id-1", podcastUuid = "podcast-id-1", publishedDate = Date(5)),
+            PodcastEpisode(uuid = "id-2", podcastUuid = "podcast-id-2", publishedDate = Date(4)),
+            PodcastEpisode(uuid = "id-3", podcastUuid = "podcast-id-3", publishedDate = Date(3)),
+            PodcastEpisode(uuid = "id-4", podcastUuid = "podcast-id-4", publishedDate = Date(2)),
+            PodcastEpisode(uuid = "id-5", podcastUuid = "podcast-id-5", publishedDate = Date(1)),
+        )
+        episodeDao.insertAll(episodes)
+        playlistDao.upsertSmartPlaylist(DbPlaylist(uuid = "playlist-id", title = "Title 1"))
+
+        manager.observeSmartPlaylist("playlist-id").test {
+            val playlist = awaitItem()
+            assertEquals(episodes, playlist?.episodes)
+            assertEquals(podcasts.take(4), playlist?.artworkPodcasts)
         }
     }
 }

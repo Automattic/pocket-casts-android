@@ -35,7 +35,6 @@ import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flowOf
-import kotlinx.coroutines.flow.map
 import au.com.shiftyjelly.pocketcasts.models.entity.SmartPlaylist as DbPlaylist
 
 @OptIn(ExperimentalCoroutinesApi::class, FlowPreview::class)
@@ -65,16 +64,21 @@ class PlaylistManagerImpl @Inject constructor(
                 if (playlist == null) {
                     flowOf(null)
                 } else {
-                    println("!!! ${playlist.smartRules.podcasts} !!!")
-                    observeSmartEpisodes(playlist.smartRules)
-                        .map { episodes ->
-                            SmartPlaylist(
-                                uuid = playlist.uuid,
-                                title = playlist.title,
-                                episodes = episodes,
-                            )
-                        }
-                        .keepPodcastEpisodesSynced()
+                    val podcastsFlow = playlistDao.observeSmartPlaylistPodcasts(
+                        clock = clock,
+                        smartRules = playlist.smartRules,
+                        sortType = playlist.sortType,
+                        limit = PLAYLIST_ARTWORK_EPISODE_LIMIT,
+                    )
+                    val episodesFlow = observeSmartEpisodes(playlist.smartRules)
+                    combine(podcastsFlow, episodesFlow) { podcasts, episodes ->
+                        SmartPlaylist(
+                            uuid = playlist.uuid,
+                            title = playlist.title,
+                            episodes = episodes,
+                            artworkPodcasts = podcasts,
+                        )
+                    }.keepPodcastEpisodesSynced()
                 }
             }
             .distinctUntilChanged()
