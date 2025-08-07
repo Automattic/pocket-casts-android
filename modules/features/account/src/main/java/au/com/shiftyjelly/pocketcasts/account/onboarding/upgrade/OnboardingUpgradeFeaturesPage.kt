@@ -137,7 +137,13 @@ internal fun OnboardingUpgradeFeaturesPage(
         is OnboardingUpgradeFeaturesState.Loaded -> {
             if (FeatureFlag.isEnabled(Feature.NEW_ONBOARDING_UPGRADE)) {
                 OnboardingUpgradeScreen(
-                    onClosePress = onBackPress,
+                    onClosePress = {
+                        if (source == OnboardingUpgradeSource.RECOMMENDATIONS) {
+                            onNotNowPress()
+                        } else {
+                            onBackPress()
+                        }
+                    },
                     state = state,
                     source = source,
                     onChangeSelectedPlan = { viewModel.changeBillingCycle(it.billingCycle) },

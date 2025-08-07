@@ -5,6 +5,7 @@ import androidx.compose.animation.core.animateInt
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.core.updateTransition
 import androidx.compose.foundation.background
+import androidx.compose.foundation.focusable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -26,6 +27,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -43,6 +45,7 @@ import au.com.shiftyjelly.pocketcasts.compose.components.TextP60
 import au.com.shiftyjelly.pocketcasts.compose.preview.ThemePreviewParameterProvider
 import au.com.shiftyjelly.pocketcasts.compose.theme
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
+import au.com.shiftyjelly.pocketcasts.utils.Util
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import au.com.shiftyjelly.pocketcasts.images.R as IR
@@ -73,9 +76,8 @@ fun PreselectChaptersAnimation(modifier: Modifier = Modifier) {
 
     Column(
         modifier = modifier
-            .semantics(true) {
-                role = Role.Image
-            },
+            .semantics(mergeDescendants = true) { role = Role.Image }
+            .focusable(false),
         verticalArrangement = Arrangement.spacedBy(6.dp),
     ) {
         predefinedChapters.forEachIndexed { index, item ->
@@ -140,6 +142,11 @@ private fun ChapterRow(
         },
     ) { state -> if (state == AnimatedState.HIDDEN) floatInDistancePx else 0 }
 
+    val isTablet = Util.isTablet(LocalContext.current)
+    val iconSize = if (isTablet) 36.dp else 24.dp
+    val labelSize = if (isTablet) 14.sp else 10.sp
+    val titleSize = if (isTablet) 16.sp else 13.sp
+
     Card(
         modifier = modifier
             .offset { IntOffset(x = 0, y = offsetYAnim) }
@@ -163,14 +170,14 @@ private fun ChapterRow(
                 contentDescription = "",
                 tint = MaterialTheme.theme.colors.primaryUi04,
                 modifier = Modifier
-                    .size(24.dp)
+                    .size(iconSize)
                     .clip(CircleShape)
                     .background(color = MaterialTheme.theme.colors.primaryIcon02, shape = CircleShape)
                     .padding(4.dp),
             )
             Column {
                 TextP60(
-                    fontSize = 10.sp,
+                    fontSize = labelSize,
                     text = stringResource(LR.string.onboarding_preselect_chapters_chapter_title, chapterData.index).uppercase(),
                     color = MaterialTheme.theme.colors.primaryText02,
                     disableAutoScale = true,
@@ -179,6 +186,7 @@ private fun ChapterRow(
                     text = chapterData.title,
                     color = MaterialTheme.theme.colors.primaryText01,
                     disableAutoScale = true,
+                    fontSize = titleSize,
                 )
             }
         }

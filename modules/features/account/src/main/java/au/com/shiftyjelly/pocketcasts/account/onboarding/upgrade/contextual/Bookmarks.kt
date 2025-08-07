@@ -10,8 +10,10 @@ import androidx.compose.animation.core.tween
 import androidx.compose.animation.core.updateTransition
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.focusable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.aspectRatio
@@ -85,10 +87,13 @@ fun BookmarksAnimation(
         }
     }
 
-    Box(
-        modifier = modifier.semantics { role = Role.Image },
+    BoxWithConstraints(
+        modifier = modifier
+            .semantics(mergeDescendants = true) { role = Role.Image }
+            .focusable(false),
         contentAlignment = Alignment.TopCenter,
     ) {
+        val itemWidth = this.maxWidth * .4f
         bookmarks.forEachIndexed { index, item ->
             val animParams = animationTriggers[index].value
             val startRotation = if (index % 2 == 0) {
@@ -103,7 +108,7 @@ fun BookmarksAnimation(
             }
             Bookmark(
                 modifier = Modifier
-                    .widthIn(max = 230.dp)
+                    .widthIn(max = itemWidth)
                     .aspectRatio(1f),
                 bookmarkConfig = item,
                 startAnimation = animationTriggers[index].value.shouldStart,

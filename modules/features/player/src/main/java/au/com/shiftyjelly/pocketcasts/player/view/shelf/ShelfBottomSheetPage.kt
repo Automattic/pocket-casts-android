@@ -117,7 +117,7 @@ fun ShelfBottomSheetPage(
                     }
 
                     ShelfItem.Bookmark -> shelfSharedViewModel.onAddBookmarkClick(
-                        OnboardingUpgradeSource.OVERFLOW_MENU,
+                        OnboardingUpgradeSource.BOOKMARKS_SHELF_ACTION,
                         ShelfItemSource.OverflowMenu,
                     )
                     ShelfItem.Download -> {
