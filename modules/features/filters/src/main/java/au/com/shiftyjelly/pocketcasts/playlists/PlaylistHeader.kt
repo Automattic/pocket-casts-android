@@ -1,11 +1,17 @@
 package au.com.shiftyjelly.pocketcasts.playlists
 
 import androidx.compose.animation.Crossfade
+import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.asPaddingValues
@@ -14,25 +20,47 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.widthIn
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.BasicText
 import androidx.compose.material.AppBarDefaults
+import androidx.compose.material.LocalRippleConfiguration
 import androidx.compose.material.MaterialTheme
+import androidx.compose.material.RippleConfiguration
+import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.ReadOnlyComposable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.BlurredEdgeTreatment
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.blur
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.drawWithContent
 import androidx.compose.ui.graphics.BlendMode
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.CompositingStrategy
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.layout
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalInspectionMode
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.pluralStringResource
+import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.text.TextLayoutResult
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.Dp
@@ -43,17 +71,21 @@ import androidx.compose.ui.unit.sp
 import au.com.shiftyjelly.pocketcasts.compose.AppTheme
 import au.com.shiftyjelly.pocketcasts.compose.PreviewRegularDevice
 import au.com.shiftyjelly.pocketcasts.compose.components.TextH20
+import au.com.shiftyjelly.pocketcasts.compose.components.TextH40
 import au.com.shiftyjelly.pocketcasts.compose.components.TextP60
 import au.com.shiftyjelly.pocketcasts.compose.preview.ThemePreviewParameterProvider
 import au.com.shiftyjelly.pocketcasts.compose.theme
 import au.com.shiftyjelly.pocketcasts.localization.helper.toFriendlyString
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme.ThemeType
+import kotlin.math.ceil
+import kotlin.math.floor
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.days
 import kotlin.time.Duration.Companion.hours
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
+import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 internal data class PlaylistHeaderData(
@@ -61,7 +93,15 @@ internal data class PlaylistHeaderData(
     val episodeCount: Int,
     val playbackDurationLeft: Duration,
     val artworkPodcasts: List<Podcast>,
-)
+    val leftButton: ActionButton,
+    val rightButton: ActionButton,
+) {
+    data class ActionButton(
+        val iconId: Int,
+        val label: String,
+        val onClick: () -> Unit,
+    )
+}
 
 @Composable
 internal fun PlaylistHeader(
@@ -140,6 +180,35 @@ internal fun PlaylistHeader(
                 color = MaterialTheme.theme.colors.primaryText02,
                 textAlign = TextAlign.Center,
                 modifier = Modifier.padding(horizontal = 64.dp),
+            )
+            Spacer(
+                modifier = Modifier.height(16.dp),
+            )
+            Row(
+                horizontalArrangement = Arrangement.spacedBy(8.dp),
+                modifier = Modifier
+                    .height(IntrinsicSize.Max)
+                    .padding(horizontal = 42.dp),
+            ) {
+                ActionButton(
+                    data = data?.leftButton,
+                    style = ActionButtonStyle.Immersive,
+                    contentAlignment = Alignment.TopEnd,
+                    modifier = Modifier
+                        .weight(1f)
+                        .fillMaxHeight(),
+                )
+                ActionButton(
+                    data = data?.rightButton,
+                    style = ActionButtonStyle.Solid,
+                    contentAlignment = Alignment.TopStart,
+                    modifier = Modifier
+                        .weight(1f)
+                        .fillMaxHeight(),
+                )
+            }
+            Spacer(
+                modifier = Modifier.height(16.dp),
             )
         }
     }
@@ -248,7 +317,143 @@ private fun Modifier.blurOrScrim(useBlur: Boolean) = if (useBlur) {
     }
 }
 
+@Composable
+private fun ActionButton(
+    data: PlaylistHeaderData.ActionButton?,
+    contentAlignment: Alignment,
+    style: ActionButtonStyle,
+    modifier: Modifier = Modifier,
+) {
+    CompositionLocalProvider(LocalRippleConfiguration provides style.rememberRippleConfiguration()) {
+        Box(
+            contentAlignment = contentAlignment,
+            modifier = modifier,
+        ) {
+            val alpha by animateFloatAsState(targetValue = if (data == null) 0f else 1f)
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.Center,
+                modifier = Modifier
+                    .alpha(alpha)
+                    .widthIn(max = 200.dp)
+                    .fillMaxSize()
+                    .clip(actionButtonShape)
+                    .background(style.backgroundColor(), actionButtonShape)
+                    .border(2.dp, style.borderColor(), actionButtonShape)
+                    .then(
+                        if (data != null) {
+                            Modifier.clickable(
+                                role = Role.Button,
+                                onClick = data.onClick,
+                            )
+                        } else {
+                            Modifier
+                        },
+                    )
+                    .padding(vertical = 12.dp, horizontal = 8.dp)
+                    .semantics(mergeDescendants = true) {},
+            ) {
+                if (data != null) {
+                    Image(
+                        painter = painterResource(data.iconId),
+                        colorFilter = ColorFilter.tint(style.onBackgroundColor()),
+                        contentDescription = null,
+                        modifier = Modifier.size(18.dp),
+                    )
+                    Spacer(
+                        modifier = Modifier.width(8.dp),
+                    )
+                    TightWrapText(
+                        text = data.label,
+                        style = TextStyle(
+                            fontSize = 15.sp,
+                            lineHeight = 21.sp,
+                            fontWeight = FontWeight.Medium,
+                            color = style.onBackgroundColor(),
+                        ),
+                    )
+                } else {
+                    // Empty text to keep the height
+                    TextH40(text = "")
+                }
+            }
+        }
+    }
+}
+
+// https://issuetracker.google.com/issues/206039942
+@Composable
+private fun TightWrapText(
+    text: String,
+    style: TextStyle,
+    modifier: Modifier = Modifier,
+) {
+    var textLayoutResult by remember { mutableStateOf<TextLayoutResult?>(null) }
+    BasicText(
+        text = text,
+        style = style,
+        modifier = modifier
+            .layout { measurable, constraints ->
+                val placeable = measurable.measure(constraints)
+                val newTextLayoutResult = textLayoutResult
+
+                if (newTextLayoutResult == null || newTextLayoutResult.lineCount == 0) {
+                    layout(placeable.width, placeable.height) {
+                        placeable.placeRelative(0, 0)
+                    }
+                } else {
+                    val minX = (0 until newTextLayoutResult.lineCount).minOf(newTextLayoutResult::getLineLeft)
+                    val maxX = (0 until newTextLayoutResult.lineCount).maxOf(newTextLayoutResult::getLineRight)
+
+                    layout(ceil(maxX - minX).toInt(), placeable.height) {
+                        placeable.place(-floor(minX).toInt(), 0)
+                    }
+                }
+            },
+        onTextLayout = { textLayoutResult = it },
+    )
+}
+
+private enum class ActionButtonStyle {
+    Solid,
+    Immersive,
+    ;
+
+    @Composable
+    @ReadOnlyComposable
+    fun backgroundColor() = when (this) {
+        Solid -> MaterialTheme.theme.colors.primaryText01
+        Immersive -> Color.Unspecified
+    }
+
+    @Composable
+    @ReadOnlyComposable
+    fun onBackgroundColor() = when (this) {
+        Solid -> MaterialTheme.theme.colors.primaryUi02
+        Immersive -> MaterialTheme.theme.colors.primaryText01
+    }
+
+    @Composable
+    @ReadOnlyComposable
+    fun borderColor() = when (this) {
+        Solid -> Color.Unspecified
+        Immersive -> MaterialTheme.theme.colors.primaryText01.copy(alpha = 0.2f)
+    }
+
+    @Composable
+    fun rememberRippleConfiguration(): RippleConfiguration {
+        val color = when (this) {
+            Solid -> MaterialTheme.theme.colors.primaryUi02
+            Immersive -> MaterialTheme.theme.colors.primaryText01
+        }
+        return remember(color) {
+            RippleConfiguration(color = color)
+        }
+    }
+}
+
 private val artworkCrossfadeSpec = tween<Float>(durationMillis = 1000)
+private val actionButtonShape = RoundedCornerShape(8.dp)
 
 private val previewColors = listOf(
     Color(0xFFCC99C9),
@@ -280,6 +485,16 @@ private fun PlaylistHeaderNoPodcastPreview() {
                     episodeCount = 0,
                     playbackDurationLeft = 0.seconds,
                     artworkPodcasts = emptyList(),
+                    leftButton = PlaylistHeaderData.ActionButton(
+                        iconId = IR.drawable.sleep_timer_cog,
+                        label = "Smart Rules",
+                        onClick = {},
+                    ),
+                    rightButton = PlaylistHeaderData.ActionButton(
+                        iconId = IR.drawable.ic_filters_play,
+                        label = "Play All",
+                        onClick = {},
+                    ),
                 ),
                 useBlurredArtwork = false,
             )
@@ -302,6 +517,16 @@ private fun PlaylistHeaderSinglePodcastPreview() {
                     episodeCount = 100,
                     playbackDurationLeft = 200.days + 12.hours,
                     artworkPodcasts = listOf(Podcast(uuid = "id-0")),
+                    leftButton = PlaylistHeaderData.ActionButton(
+                        iconId = IR.drawable.sleep_timer_cog,
+                        label = "Smart Rules",
+                        onClick = {},
+                    ),
+                    rightButton = PlaylistHeaderData.ActionButton(
+                        iconId = IR.drawable.ic_filters_play,
+                        label = "Play All",
+                        onClick = {},
+                    ),
                 ),
                 useBlurredArtwork = false,
             )
@@ -324,6 +549,16 @@ private fun PlaylistHeaderMultiPodcastPreview() {
                     episodeCount = 5,
                     playbackDurationLeft = 1.hours + 15.minutes,
                     artworkPodcasts = List(4) { index -> Podcast(uuid = "id-$index") },
+                    leftButton = PlaylistHeaderData.ActionButton(
+                        iconId = IR.drawable.sleep_timer_cog,
+                        label = "Smart Rules",
+                        onClick = {},
+                    ),
+                    rightButton = PlaylistHeaderData.ActionButton(
+                        iconId = IR.drawable.ic_filters_play,
+                        label = "Play All",
+                        onClick = {},
+                    ),
                 ),
                 useBlurredArtwork = false,
             )
@@ -348,6 +583,16 @@ private fun PlaylistHeaderThemePreview(
                     episodeCount = 5,
                     playbackDurationLeft = 1.hours + 15.minutes,
                     artworkPodcasts = List(4) { index -> Podcast(uuid = "id-$index") },
+                    leftButton = PlaylistHeaderData.ActionButton(
+                        iconId = IR.drawable.sleep_timer_cog,
+                        label = "Smart Rules",
+                        onClick = {},
+                    ),
+                    rightButton = PlaylistHeaderData.ActionButton(
+                        iconId = IR.drawable.ic_filters_play,
+                        label = "Play All",
+                        onClick = {},
+                    ),
                 ),
                 useBlurredArtwork = false,
             )

@@ -933,6 +933,7 @@
     <string name="playlists_onboarding_playlist_title">Introducing Playlists</string>
     <string name="playlists_onboarding_playlist_description">Want more control? Manual Playlists let you build custom queues, great for trips, themes, or just your current vibe. Whether Smart or Manual, playlists work the way you do.</string>
     <string name="smart_playlist">Smart Playlist</string>
+    <string name="smart_rules">Smart Rules</string>
     <string name="playlists_empty_state_title">Organize episodes your way</string>
     <string name="playlists_empty_state_body">Playlists let you organize episodes manually or automatically with Smart Rules.</string>
     <string name="new_playlist">New Playlist</string>
@@ -962,6 +963,7 @@
     <string name="increment_longer_than_duration">Increment \"longer than\" duration</string>
     <string name="decrement_shorter_than_duration">Decrement \"shorter than\" duration</string>
     <string name="increment_shorter_than_duration">Increment \"shorter than\" duration</string>
+    <string name="playlist_play_all">Play All</string>
 
     <!-- Profile -->
 
