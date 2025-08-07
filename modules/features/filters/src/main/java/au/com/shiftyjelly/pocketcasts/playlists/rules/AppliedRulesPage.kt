@@ -60,12 +60,12 @@ fun AppliedRulesPage(
     availableEpisodes: List<PodcastEpisode>,
     totalEpisodeCount: Int,
     useEpisodeArtwork: Boolean,
-    areOtherOptionsExpanded: Boolean,
-    onCreatePlaylist: () -> Unit,
     onClickRule: (RuleType) -> Unit,
-    toggleOtherOptions: () -> Unit,
     onClickClose: () -> Unit,
     modifier: Modifier = Modifier,
+    areOtherOptionsExpanded: Boolean = false,
+    toggleOtherOptions: (() -> Unit)? = null,
+    onCreatePlaylist: (() -> Unit)? = null,
 ) {
     Column(
         modifier = modifier
@@ -101,7 +101,7 @@ fun AppliedRulesPage(
                             onClickRule = onClickRule,
                         )
                     }
-                    if (inactiveRules.isNotEmpty()) {
+                    if (inactiveRules.isNotEmpty() && toggleOtherOptions != null) {
                         item(
                             key = "inactive-rules",
                             contentType = "inactive-rules",
@@ -111,7 +111,7 @@ fun AppliedRulesPage(
                                 isExpanded = areOtherOptionsExpanded,
                                 onClickRule = onClickRule,
                                 onToggleExpand = toggleOtherOptions,
-                                modifier = Modifier.padding(vertical = 32.dp),
+                                modifier = Modifier.padding(top = 32.dp),
                             )
                         }
                     }
@@ -121,7 +121,9 @@ fun AppliedRulesPage(
                     ) {
                         TextH20(
                             text = stringResource(LR.string.preview_playlist, playlistTitle),
-                            modifier = Modifier.padding(horizontal = 16.dp),
+                            modifier = Modifier
+                                .padding(horizontal = 16.dp)
+                                .padding(top = 32.dp),
                         )
                     }
                     if (availableEpisodes.isNotEmpty()) {
@@ -165,15 +167,17 @@ fun AppliedRulesPage(
                     }
                 }
             }
-            RowButton(
-                text = stringResource(LR.string.create_smart_playlist),
-                enabled = appliedRules.isAnyRuleApplied,
-                onClick = onCreatePlaylist,
-                includePadding = false,
-                modifier = Modifier
-                    .padding(horizontal = 16.dp)
-                    .navigationBarsPadding(),
-            )
+            if (onCreatePlaylist != null) {
+                RowButton(
+                    text = stringResource(LR.string.create_smart_playlist),
+                    enabled = appliedRules.isAnyRuleApplied,
+                    onClick = onCreatePlaylist,
+                    includePadding = false,
+                    modifier = Modifier
+                        .padding(horizontal = 16.dp)
+                        .navigationBarsPadding(),
+                )
+            }
         }
     }
 }

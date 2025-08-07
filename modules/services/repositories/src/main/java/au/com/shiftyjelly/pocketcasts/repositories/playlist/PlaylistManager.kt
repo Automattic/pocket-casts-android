@@ -14,6 +14,8 @@ interface PlaylistManager {
 
     fun observeEpisodeMetadata(rules: SmartRules): Flow<PlaylistEpisodeMetadata>
 
+    suspend fun updateSmartRules(uuid: String, rules: SmartRules)
+
     suspend fun deletePlaylist(uuid: String)
 
     suspend fun upsertSmartPlaylist(draft: SmartPlaylistDraft): String

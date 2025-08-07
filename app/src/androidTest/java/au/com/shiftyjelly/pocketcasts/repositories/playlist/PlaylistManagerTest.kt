@@ -884,6 +884,7 @@ class PlaylistManagerTest {
                 SmartPlaylist(
                     uuid = "playlist-id",
                     title = "Title 1",
+                    smartRules = SmartRules.Default,
                     totalEpisodeCount = 0,
                     playbackDurationLeft = Duration.ZERO,
                     episodes = emptyList(),
@@ -906,6 +907,7 @@ class PlaylistManagerTest {
                 playlistDao.upsertSmartPlaylist(it.copy(allPodcasts = false, podcastUuids = "podcast-id-2"))
             }
             playlist = awaitItem()
+            assertEquals(PodcastsRule.Selected(listOf("podcast-id-2")), playlist?.smartRules?.podcasts)
             assertEquals(listOf(episodes[2]), playlist?.episodes)
             assertEquals(listOf(podcasts[1]), playlist?.artworkPodcasts)
         }
