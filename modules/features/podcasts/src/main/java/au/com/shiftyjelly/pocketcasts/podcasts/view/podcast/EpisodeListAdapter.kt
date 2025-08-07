@@ -39,6 +39,9 @@ val PLAYBACK_DIFF: DiffUtil.ItemCallback<BaseEpisode> = object : DiffUtil.ItemCa
     override fun areContentsTheSame(oldItem: BaseEpisode, newItem: BaseEpisode): Boolean {
         return oldItem == newItem
     }
+
+    // Return Unit to avoid flashing animation
+    override fun getChangePayload(oldItem: BaseEpisode, newItem: BaseEpisode) = Unit
 }
 
 class EpisodeListAdapter(

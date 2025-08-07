@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="?attr/primary_ui_02">
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/content"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:clipToPadding="false"
+        android:scrollbarStyle="outsideOverlay"
+        android:scrollbars="vertical"
+        app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager" />
+
+    <androidx.compose.ui.platform.ComposeView
+        android:id="@+id/playlistToolbar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+
+    <au.com.shiftyjelly.pocketcasts.views.multiselect.MultiSelectToolbar
+        android:id="@+id/multiSelectToolbar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:minHeight="?android:attr/actionBarSize"
+        android:visibility="gone"
+        app:navigationIcon="?attr/homeAsUpIndicator" />
+</FrameLayout>

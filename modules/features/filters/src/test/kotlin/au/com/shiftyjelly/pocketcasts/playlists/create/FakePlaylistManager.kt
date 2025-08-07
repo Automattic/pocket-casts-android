@@ -5,14 +5,23 @@ import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.models.type.SmartRules
 import au.com.shiftyjelly.pocketcasts.repositories.playlist.PlaylistManager
 import au.com.shiftyjelly.pocketcasts.repositories.playlist.PlaylistPreview
+import au.com.shiftyjelly.pocketcasts.repositories.playlist.SmartPlaylist
 import au.com.shiftyjelly.pocketcasts.repositories.playlist.SmartPlaylistDraft
 import java.util.UUID
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 
 class FakePlaylistManager : PlaylistManager {
     val playlistPreviews = MutableStateFlow(emptyList<PlaylistPreview>())
     override fun observePlaylistsPreview() = playlistPreviews.asStateFlow()
+
+    val smartPlaylist = MutableStateFlow<SmartPlaylist?>(null)
+    val smartPlaylistUuidTurbine = Turbine<String>(name = "observeSmartPlaylist:uuid")
+    override fun observeSmartPlaylist(uuid: String): Flow<SmartPlaylist?> {
+        smartPlaylistUuidTurbine.add(uuid)
+        return smartPlaylist
+    }
 
     val smartEpisodes = MutableStateFlow(emptyList<PodcastEpisode>())
     override fun observeSmartEpisodes(rules: SmartRules) = smartEpisodes.asStateFlow()

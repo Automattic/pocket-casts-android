@@ -2,6 +2,7 @@ package au.com.shiftyjelly.pocketcasts.playlists.create
 
 import androidx.compose.ui.text.TextRange
 import app.cash.turbine.test
+import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.type.SmartRules.DownloadStatusRule
 import au.com.shiftyjelly.pocketcasts.models.type.SmartRules.EpisodeDurationRule
 import au.com.shiftyjelly.pocketcasts.models.type.SmartRules.EpisodeStatusRule
@@ -17,7 +18,6 @@ import au.com.shiftyjelly.pocketcasts.repositories.playlist.SmartPlaylistDraft
 import au.com.shiftyjelly.pocketcasts.sharedtest.MainCoroutineRule
 import kotlin.time.Duration.Companion.minutes
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
@@ -34,11 +34,13 @@ class CreatePlaylistViewModelTest {
 
     private val playlistManager = FakePlaylistManager()
 
+    private val followedPodcasts = MutableStateFlow(emptyList<Podcast>())
+
     private val viewModel = CreatePlaylistViewModel(
         initialPlaylistTitle = "Playlist name",
         playlistManager = playlistManager,
         podcastManager = mock {
-            on { findSubscribedFlow() } doReturn flowOf(emptyList())
+            on { findSubscribedFlow() } doReturn followedPodcasts
         },
         settings = run {
             val settingMock = mock<UserSetting<ArtworkConfiguration>> {
@@ -92,6 +94,17 @@ class CreatePlaylistViewModelTest {
             viewModel.applyRule(RuleType.Podcasts)
             state = awaitItem()
             assertEquals(PodcastsRule.Selected(listOf("id-1", "id-2")), state.appliedRules.podcasts)
+
+            followedPodcasts.value = List(4) { index -> Podcast(uuid = "id-$index") }
+            skipItems(1)
+
+            viewModel.selectAllPodcasts()
+            state = awaitItem()
+            assertEquals(setOf("id-0", "id-1", "id-2", "id-3"), state.rulesBuilder.selectedPodcasts)
+
+            viewModel.deselectAllPodcasts()
+            state = awaitItem()
+            assertEquals(emptySet<String>(), state.rulesBuilder.selectedPodcasts)
         }
     }
 

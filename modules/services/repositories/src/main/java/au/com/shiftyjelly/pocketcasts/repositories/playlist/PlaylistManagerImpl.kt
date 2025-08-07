@@ -3,7 +3,6 @@ package au.com.shiftyjelly.pocketcasts.repositories.playlist
 import androidx.room.withTransaction
 import au.com.shiftyjelly.pocketcasts.models.db.AppDatabase
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
-import au.com.shiftyjelly.pocketcasts.models.entity.SmartPlaylist
 import au.com.shiftyjelly.pocketcasts.models.entity.SmartPlaylist.Companion.ANYTIME
 import au.com.shiftyjelly.pocketcasts.models.entity.SmartPlaylist.Companion.AUDIO_VIDEO_FILTER_ALL
 import au.com.shiftyjelly.pocketcasts.models.entity.SmartPlaylist.Companion.AUDIO_VIDEO_FILTER_AUDIO_ONLY
@@ -26,7 +25,6 @@ import au.com.shiftyjelly.pocketcasts.models.type.SmartRules.StarredRule
 import java.time.Clock
 import java.util.UUID
 import javax.inject.Inject
-import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -37,6 +35,7 @@ import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flowOf
+import au.com.shiftyjelly.pocketcasts.models.entity.SmartPlaylist as DbPlaylist
 
 @OptIn(ExperimentalCoroutinesApi::class, FlowPreview::class)
 class PlaylistManagerImpl @Inject constructor(
@@ -50,17 +49,45 @@ class PlaylistManagerImpl @Inject constructor(
             .observeSmartPlaylists()
             .flatMapLatest { playlists ->
                 if (playlists.isEmpty()) {
-                    flowOf(emptyList<PlaylistPreview>())
+                    flowOf(emptyList())
                 } else {
                     combine(playlists.toPreviewFlows()) { previewArray -> previewArray.toList() }
                 }
             }
-            // Add a small debounce to synchronize updates between episode count and podcasts.
-            // When the database is updated, both flows emit events almost simultaneously.
-            // Without debouncing, this can briefly cause inconsistent data. For example, showing an inccorect count
-            // before the updated episodes are received. This is rather imperceptible to the user,
-            // but adding a short debounce helps avoid these inconsistencies and prevents redundant downstream emissions.
-            .debounce(50.milliseconds)
+            .keepPodcastEpisodesSynced()
+    }
+
+    override fun observeSmartPlaylist(uuid: String): Flow<SmartPlaylist?> {
+        return playlistDao
+            .observeSmartPlaylist(uuid)
+            .flatMapLatest { playlist ->
+                if (playlist == null) {
+                    flowOf(null)
+                } else {
+                    val podcastsFlow = playlistDao.observeSmartPlaylistPodcasts(
+                        clock = clock,
+                        smartRules = playlist.smartRules,
+                        sortType = playlist.sortType,
+                        limit = PLAYLIST_ARTWORK_EPISODE_LIMIT,
+                    )
+                    val episodesFlow = observeSmartEpisodes(playlist.smartRules)
+                    val metadataFlow = playlistDao.observeSmartPlaylistEpisodeMetadata(
+                        clock = clock,
+                        smartRules = playlist.smartRules,
+                    )
+                    combine(podcastsFlow, episodesFlow, metadataFlow) { podcasts, episodes, metadata ->
+                        SmartPlaylist(
+                            uuid = playlist.uuid,
+                            title = playlist.title,
+                            totalEpisodeCount = metadata.episodeCount,
+                            playbackDurationLeft = metadata.timeLeftSeconds.seconds,
+                            episodes = episodes,
+                            artworkPodcasts = podcasts,
+                        )
+                    }.keepPodcastEpisodesSynced()
+                }
+            }
+            .distinctUntilChanged()
     }
 
     override fun observeSmartEpisodes(rules: SmartRules): Flow<List<PodcastEpisode>> {
@@ -102,28 +129,28 @@ class PlaylistManagerImpl @Inject constructor(
         }
     }
 
-    private fun List<SmartPlaylist>.toPreviewFlows() = map { playlist ->
+    private fun List<DbPlaylist>.toPreviewFlows() = map { playlist ->
         val podcastsFlow = playlistDao.observeSmartPlaylistPodcasts(
             clock = clock,
             smartRules = playlist.smartRules,
             sortType = playlist.sortType,
             limit = PLAYLIST_ARTWORK_EPISODE_LIMIT,
         )
-        val episodeCountFlow = playlistDao.observeSmartPlaylistEpisodeCount(
+        val episodeCountFlow = playlistDao.observeSmartPlaylistEpisodeMetadata(
             clock = clock,
             smartRules = playlist.smartRules,
         )
-        combine(podcastsFlow, episodeCountFlow) { podcasts, count ->
+        combine(podcastsFlow, episodeCountFlow) { podcasts, metadata ->
             PlaylistPreview(
                 uuid = playlist.uuid,
                 title = playlist.title,
                 podcasts = podcasts,
-                episodeCount = count,
+                episodeCount = metadata.episodeCount,
             )
         }.distinctUntilChanged()
     }
 
-    private val SmartPlaylist.smartRules
+    private val DbPlaylist.smartRules
         get() = SmartRules(
             episodeStatus = SmartRules.EpisodeStatusRule(
                 unplayed = unplayed,
@@ -172,7 +199,7 @@ class PlaylistManagerImpl @Inject constructor(
     private fun SmartPlaylistDraft.toSmartPlaylist(
         uuid: String,
         sortPosition: Int,
-    ) = SmartPlaylist(
+    ) = DbPlaylist(
         uuid = uuid,
         title = title,
         // We use referential equality so only predefined playlists use preset icons
@@ -252,3 +279,11 @@ class PlaylistManagerImpl @Inject constructor(
         const val SMART_PLAYLIST_EPISODE_LIMIT = 500
     }
 }
+
+// Add a small debounce to synchronize updates between episode count and podcasts.
+// When the database is updated, both flows emit events almost simultaneously.
+// Without debouncing, this can briefly cause inconsistent data. For example, showing an incorrect count
+// before the updated episodes are received. This is rather imperceptible to the user,
+// but adding a short debounce helps avoid these inconsistencies and prevents redundant downstream emissions.
+@OptIn(FlowPreview::class)
+private fun <T> Flow<T>.keepPodcastEpisodesSynced() = debounce(50)

@@ -148,6 +148,19 @@ class CreatePlaylistViewModel @AssistedInject constructor(
         }
     }
 
+    fun selectAllPodcasts() {
+        rulesBuilder.update { builder ->
+            val podcasts = uiState.value.followedPodcasts.mapTo(mutableSetOf(), Podcast::uuid)
+            builder.copy(selectedPodcasts = podcasts)
+        }
+    }
+
+    fun deselectAllPodcasts() {
+        rulesBuilder.update { builder ->
+            builder.copy(selectedPodcasts = emptySet())
+        }
+    }
+
     fun useUnplayedEpisodes(shouldUse: Boolean) {
         rulesBuilder.update { builder ->
             val rule = builder.episodeStatusRule.copy(unplayed = shouldUse)

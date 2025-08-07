@@ -26,7 +26,6 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.Icon
-import androidx.compose.material.IconButton
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
@@ -46,6 +45,8 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.AnnotatedString
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
@@ -102,15 +103,6 @@ fun AppliedRulesPage(
             .fillMaxSize()
             .verticalScroll(rememberScrollState()),
     ) {
-        IconButton(
-            onClick = onClickClose,
-        ) {
-            Icon(
-                painter = painterResource(IR.drawable.ic_close),
-                contentDescription = stringResource(LR.string.close),
-                tint = MaterialTheme.theme.colors.primaryIcon03,
-            )
-        }
         ThemedTopAppBar(
             navigationButton = NavigationButton.Close,
             style = ThemedTopAppBar.Style.Immersive,
@@ -433,26 +425,38 @@ private fun RuleRow(
             Spacer(
                 modifier = Modifier.width(16.dp),
             )
-            Text(
-                text = stringResource(ruleType.titleId),
-                color = MaterialTheme.theme.colors.primaryText01,
-                fontSize = 17.sp,
-                lineHeight = 22.sp,
-            )
-            Spacer(
+            Row(
                 modifier = Modifier.weight(1f),
-            )
-            if (description != null) {
+            ) {
                 Text(
-                    text = description,
-                    color = MaterialTheme.theme.colors.primaryText02,
+                    text = stringResource(ruleType.titleId),
+                    color = MaterialTheme.theme.colors.primaryText01,
                     fontSize = 17.sp,
                     lineHeight = 22.sp,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
                 )
                 Spacer(
-                    modifier = Modifier.width(14.dp),
+                    modifier = Modifier.weight(1f),
                 )
+                if (description != null) {
+                    Spacer(
+                        modifier = Modifier.width(8.dp),
+                    )
+                    Text(
+                        text = description,
+                        color = MaterialTheme.theme.colors.primaryText02,
+                        fontSize = 17.sp,
+                        lineHeight = 22.sp,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis,
+                        textAlign = TextAlign.End,
+                    )
+                }
             }
+            Spacer(
+                modifier = Modifier.width(16.dp),
+            )
             Image(
                 painter = painterResource(IR.drawable.ic_chevron_trimmed),
                 contentDescription = null,
