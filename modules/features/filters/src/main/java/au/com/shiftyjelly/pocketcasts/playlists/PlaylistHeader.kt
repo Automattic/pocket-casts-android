@@ -1,11 +1,14 @@
 package au.com.shiftyjelly.pocketcasts.playlists
 
+import android.annotation.SuppressLint
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.Crossfade
 import androidx.compose.animation.core.Spring
+import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.animation.core.animateFloat
 import androidx.compose.animation.core.animateIntOffset
 import androidx.compose.animation.core.spring
+import androidx.compose.animation.core.tween
 import androidx.compose.animation.core.updateTransition
 import androidx.compose.animation.expandVertically
 import androidx.compose.animation.fadeIn
@@ -45,6 +48,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -53,6 +57,7 @@ import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.blur
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.drawWithContent
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.BlendMode
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
@@ -115,6 +120,7 @@ internal data class PlaylistHeaderData(
     )
 }
 
+@SuppressLint("UnusedBoxWithConstraintsScope")
 @Composable
 internal fun PlaylistHeader(
     data: PlaylistHeaderData?,
@@ -145,21 +151,10 @@ internal fun PlaylistHeader(
             Spacer(
                 modifier = Modifier.height(artworkTopPadding),
             )
-            Crossfade(
-                targetState = podcasts,
-                animationSpec = if (podcasts.isNullOrEmpty()) artworkCrossfadeFastSpec else artworkCrossfadeSpec,
-            ) { podcasts ->
-                if (podcasts != null) {
-                    PlaylistArtwork(
-                        podcasts = podcasts,
-                        artworkSize = artworkSize,
-                    )
-                } else {
-                    Spacer(
-                        modifier = Modifier.height(artworkSize),
-                    )
-                }
-            }
+            PlaylistForegroundArtwork(
+                artworkSize = artworkSize,
+                podcasts = podcasts,
+            )
             Spacer(
                 modifier = Modifier.height(20.dp),
             )
@@ -202,6 +197,49 @@ internal fun PlaylistHeader(
                         modifier = Modifier.padding(top = 60.dp, bottom = 24.dp),
                     )
                 }
+            }
+        }
+    }
+}
+
+@Composable
+private fun PlaylistForegroundArtwork(
+    artworkSize: Dp,
+    podcasts: List<Podcast>?,
+    modifier: Modifier = Modifier,
+) {
+    val showShadow by rememberUpdatedState(podcasts != null)
+    val shadowBoxSize by animateDpAsState(
+        targetValue = if (showShadow) artworkSize else 0.dp,
+        animationSpec = artworkShadowSpec,
+    )
+    // Animations are smoke and mirrors. We can't simply use elevation on the PlaylistArtwork,
+    // as it causes UI glitches due to the Crossfade element.
+    //
+    // Instead, we draw a transparent box behind it that appears after a short delay.
+    // The delay comes from artworkShadowSpec.
+    Box(
+        modifier = modifier,
+    ) {
+        Box(
+            modifier = Modifier
+                .align(Alignment.Center)
+                .shadow(16.dp, RoundedCornerShape(artworkSize / 14))
+                .size(shadowBoxSize),
+        )
+        Crossfade(
+            targetState = podcasts,
+            animationSpec = if (podcasts.isNullOrEmpty()) artworkCrossfadeFastSpec else artworkCrossfadeSpec,
+        ) { podcasts ->
+            if (podcasts != null) {
+                PlaylistArtwork(
+                    podcasts = podcasts,
+                    artworkSize = artworkSize,
+                )
+            } else {
+                Spacer(
+                    modifier = Modifier.height(artworkSize),
+                )
             }
         }
     }
@@ -526,6 +564,7 @@ private enum class ActionButtonStyle {
 
 private val artworkCrossfadeFastSpec = spring<Float>(stiffness = Spring.StiffnessLow)
 private val artworkCrossfadeSpec = spring<Float>(stiffness = Spring.StiffnessVeryLow)
+private val artworkShadowSpec = tween<Dp>(durationMillis = 500, delayMillis = 1000)
 
 private val actionButtonShape = RoundedCornerShape(8.dp)
 private val actionButtonMaxWidth = 200.dp
