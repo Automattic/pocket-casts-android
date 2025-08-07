@@ -122,6 +122,7 @@ fun UpgradeTrialTimeline(
             items.forEachIndexed { index, item ->
                 Box(
                     modifier = Modifier
+                        .focusable(false)
                         .size(iconSize)
                         .background(
                             color = iconColor,
