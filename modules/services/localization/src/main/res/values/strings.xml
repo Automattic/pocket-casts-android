@@ -926,48 +926,48 @@
 
     <!-- Playlists -->
 
-    <string name="playlists">Playlists</string>
-    <string name="playlists_onboarding_smart_playlist_title">Filters are now Smart Playlists</string>
-    <string name="playlists_onboarding_smart_playlist_description">They still work exactly the same, using rules to auto-add your episodes. All your existing Filters are right here, nothing’s changed but the name.</string>
-    <string name="playlists_onboarding_playlist_title">Introducing Playlists</string>
-    <string name="playlists_onboarding_playlist_description">Want more control? Manual Playlists let you build custom queues, great for trips, themes, or just your current vibe. Whether Smart or Manual, playlists work the way you do.</string>
-    <string name="smart_playlist">Smart Playlist</string>
-    <string name="smart_rules">Smart Rules</string>
-    <string name="playlists_empty_state_title">Organize episodes your way</string>
-    <string name="playlists_empty_state_body">Playlists let you organize episodes manually or automatically with Smart Rules.</string>
-    <string name="new_playlist">New Playlist</string>
-    <string name="premade_playlists_tooltip_title">Smart Playlists, ready to go</string>
-    <string name="premade_playlists_tooltip_body">We made these to help you get started.\nThey auto-update based on your listening.</string>
-    <string name="new_playlists_title_placeholder">Playlist’s title</string>
-    <string name="new_smart_playlist_banner_title">Make into Smart Playlist</string>
-    <string name="new_smart_playlist_banner_body">Automatically add episodes based on rules</string>
     <string name="create_playlist">Create Playlist</string>
     <string name="create_smart_playlist">Create Smart Playlist</string>
-    <string name="smart_rules_description">Set up Smart Rules to automatically add episodes to your Smart Playlist.</string>
-    <string name="smart_rule_podcasts_title">Choose Podcasts</string>
-    <string name="smart_rule_podcasts_all_label">All Followed Podcasts</string>
-    <string name="smart_rule_podcasts_all_description">New podcasts you follow will be automatically added.</string>
-    <string name="smart_rule_podcasts_all_description_disabled">New podcasts you follow will not be automatically added.</string>
-    <string name="smart_rule_podcasts_select_all">Select All</string>
-    <string name="smart_rule_podcasts_deselect_all">Deselect All</string>
-    <string name="smart_rule_starred_label">Starred Episodes</string>
-    <string name="smart_rule_starred_description">Only include starred episodes that match your other rules.</string>
-    <string name="smart_rule_starred_description_disabled">Starred episodes can still appear if they match your other rules.</string>
-    <string name="save_smart_rule">Save Smart Rule</string>
+    <string name="decrement_longer_than_duration">Decrement \"longer than\" duration</string>
+    <string name="decrement_shorter_than_duration">Decrement \"shorter than\" duration</string>
     <string name="enabled_rules">Enabled Rules</string>
-    <!-- %1$s is playlist's title -->
-    <string name="preview_playlist">Preview %1$s</string>
-    <string name="smart_playlist_create_no_content_title">No matching episodes</string>
-    <string name="smart_playlist_create_no_content_body">None of the episodes in your podcasts match these rules.\n\nTry adjusting the rules, or save this playlist for future episodes that might fit.</string>
     <!-- %1$s is status like 'In Progress' and %2$d is count of other episode statuses -->
     <string name="episode_status_rule_description">%1$s + %2$d</string>
-    <string name="decrement_longer_than_duration">Decrement \"longer than\" duration</string>
     <string name="increment_longer_than_duration">Increment \"longer than\" duration</string>
-    <string name="decrement_shorter_than_duration">Decrement \"shorter than\" duration</string>
     <string name="increment_shorter_than_duration">Increment \"shorter than\" duration</string>
+    <string name="new_playlist">New Playlist</string>
+    <string name="new_playlists_title_placeholder">Playlist’s title</string>
+    <string name="new_smart_playlist_banner_body">Automatically add episodes based on rules</string>
+    <string name="new_smart_playlist_banner_title">Make into Smart Playlist</string>
     <string name="playlist_play_all">Play All</string>
-    <string name="smart_playlist_no_content_title">No episodes</string>
+    <string name="playlists">Playlists</string>
+    <string name="playlists_empty_state_body">Playlists let you organize episodes manually or automatically with Smart Rules.</string>
+    <string name="playlists_empty_state_title">Organize episodes your way</string>
+    <string name="playlists_onboarding_playlist_description">Want more control? Manual Playlists let you build custom queues, great for trips, themes, or just your current vibe. Whether Smart or Manual, playlists work the way you do.</string>
+    <string name="playlists_onboarding_playlist_title">Introducing Playlists</string>
+    <string name="playlists_onboarding_smart_playlist_description">They still work exactly the same, using rules to auto-add your episodes. All your existing Filters are right here, nothing’s changed but the name.</string>
+    <string name="playlists_onboarding_smart_playlist_title">Filters are now Smart Playlists</string>
+    <string name="premade_playlists_tooltip_body">We made these to help you get started.\nThey auto-update based on your listening.</string>
+    <string name="premade_playlists_tooltip_title">Smart Playlists, ready to go</string>
+    <!-- %1$s is playlist's title -->
+    <string name="preview_playlist">Preview %1$s</string>
+    <string name="save_smart_rule">Save Smart Rule</string>
+    <string name="smart_playlist">Smart Playlist</string>
+    <string name="smart_playlist_create_no_content_body">None of the episodes in your podcasts match these rules.\n\nTry adjusting the rules, or save this playlist for future episodes that might fit.</string>
+    <string name="smart_playlist_create_no_content_title">No matching episodes</string>
     <string name="smart_playlist_no_content_body">Either it’s time to celebrate completing this list, or edit your rules to get some more.</string>
+    <string name="smart_playlist_no_content_title">No episodes</string>
+    <string name="smart_rule_podcasts_all_description">New podcasts you follow will be automatically added.</string>
+    <string name="smart_rule_podcasts_all_description_disabled">New podcasts you follow will not be automatically added.</string>
+    <string name="smart_rule_podcasts_all_label">All Followed Podcasts</string>
+    <string name="smart_rule_podcasts_deselect_all">Deselect All</string>
+    <string name="smart_rule_podcasts_select_all">Select All</string>
+    <string name="smart_rule_podcasts_title">Choose Podcasts</string>
+    <string name="smart_rule_starred_description">Only include starred episodes that match your other rules.</string>
+    <string name="smart_rule_starred_description_disabled">Starred episodes can still appear if they match your other rules.</string>
+    <string name="smart_rule_starred_label">Starred Episodes</string>
+    <string name="smart_rules">Smart Rules</string>
+    <string name="smart_rules_description">Set up Smart Rules to automatically add episodes to your Smart Playlist.</string>
 
     <!-- Profile -->
 
