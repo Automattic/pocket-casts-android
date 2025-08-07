@@ -59,8 +59,8 @@ fun AppliedRulesColumn(
 ) {
     RulesColumn(
         rules = rules,
-        description = {rule -> appliedRules.description(rule, episodeCount) },
-        onClickRule =  onClickRule,
+        description = { rule -> appliedRules.description(rule, episodeCount) },
+        onClickRule = onClickRule,
         modifier = modifier,
     )
 }
@@ -273,7 +273,7 @@ private fun AppliedRulesColumnPreview(
                 podcasts = SmartRules.Default.podcasts,
                 episodeDuration = EpisodeDurationRule.Constrained(
                     longerThan = 15.minutes,
-                    shorterThan = 1.hours + 10.minutes
+                    shorterThan = 1.hours + 10.minutes,
                 ),
             ),
             episodeCount = 17,
