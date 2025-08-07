@@ -9,6 +9,7 @@ import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.SmartPlaylist
 import au.com.shiftyjelly.pocketcasts.models.entity.SmartPlaylist.Companion.SYNC_STATUS_NOT_SYNCED
+import au.com.shiftyjelly.pocketcasts.models.to.SmartPlaylistMetadata
 import au.com.shiftyjelly.pocketcasts.models.type.PlaylistEpisodeSortType
 import au.com.shiftyjelly.pocketcasts.models.type.PlaylistEpisodeSortType.LongestToShortest
 import au.com.shiftyjelly.pocketcasts.models.type.PlaylistEpisodeSortType.NewestToOldest
@@ -45,19 +46,19 @@ abstract class PlaylistDao {
     abstract suspend fun markPlaylistAsDeleted(uuid: String)
 
     @RawQuery(observedEntities = [Podcast::class, PodcastEpisode::class])
-    protected abstract fun observeSmartPlaylistEpisodeCount(query: RoomRawQuery): Flow<Int>
+    protected abstract fun observeSmartPlaylistEpisodeMetadata(query: RoomRawQuery): Flow<SmartPlaylistMetadata>
 
-    fun observeSmartPlaylistEpisodeCount(
+    fun observeSmartPlaylistEpisodeMetadata(
         clock: Clock,
         smartRules: SmartRules,
-    ): Flow<Int> {
+    ): Flow<SmartPlaylistMetadata> {
         val query = createSmartPlaylistEpisodeQuery(
-            selectClause = "COUNT(*)",
+            selectClause = "COUNT(*) AS episode_count, SUM(MAX(episode.duration - episode.played_up_to, 0)) AS time_left",
             whereClause = smartRules.toSqlWhereClause(clock),
             orderByClause = null,
             limit = null,
         )
-        return observeSmartPlaylistEpisodeCount(RoomRawQuery(query))
+        return observeSmartPlaylistEpisodeMetadata(RoomRawQuery(query))
     }
 
     @RawQuery(observedEntities = [Podcast::class, PodcastEpisode::class])

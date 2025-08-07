@@ -71,10 +71,16 @@ class PlaylistManagerImpl @Inject constructor(
                         limit = PLAYLIST_ARTWORK_EPISODE_LIMIT,
                     )
                     val episodesFlow = observeSmartEpisodes(playlist.smartRules)
-                    combine(podcastsFlow, episodesFlow) { podcasts, episodes ->
+                    val metadataFlow = playlistDao.observeSmartPlaylistEpisodeMetadata(
+                        clock = clock,
+                        smartRules = playlist.smartRules,
+                    )
+                    combine(podcastsFlow, episodesFlow, metadataFlow) { podcasts, episodes, metadata ->
                         SmartPlaylist(
                             uuid = playlist.uuid,
                             title = playlist.title,
+                            totalEpisodeCount = metadata.episodeCount,
+                            playbackDurationLeft = metadata.timeLeftSeconds.seconds,
                             episodes = episodes,
                             artworkPodcasts = podcasts,
                         )
@@ -130,16 +136,16 @@ class PlaylistManagerImpl @Inject constructor(
             sortType = playlist.sortType,
             limit = PLAYLIST_ARTWORK_EPISODE_LIMIT,
         )
-        val episodeCountFlow = playlistDao.observeSmartPlaylistEpisodeCount(
+        val episodeCountFlow = playlistDao.observeSmartPlaylistEpisodeMetadata(
             clock = clock,
             smartRules = playlist.smartRules,
         )
-        combine(podcastsFlow, episodeCountFlow) { podcasts, count ->
+        combine(podcastsFlow, episodeCountFlow) { podcasts, metadata ->
             PlaylistPreview(
                 uuid = playlist.uuid,
                 title = playlist.title,
                 podcasts = podcasts,
-                episodeCount = count,
+                episodeCount = metadata.episodeCount,
             )
         }.distinctUntilChanged()
     }

@@ -36,7 +36,9 @@ import au.com.shiftyjelly.pocketcasts.sharedtest.MutableClock
 import com.squareup.moshi.Moshi
 import java.util.Date
 import java.util.UUID
+import kotlin.time.Duration
 import kotlin.time.Duration.Companion.minutes
+import kotlin.time.Duration.Companion.seconds
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.runTest
@@ -882,6 +884,8 @@ class PlaylistManagerTest {
                 SmartPlaylist(
                     uuid = "playlist-id",
                     title = "Title 1",
+                    totalEpisodeCount = 0,
+                    playbackDurationLeft = Duration.ZERO,
                     episodes = emptyList(),
                     artworkPodcasts = emptyList(),
                 ),
@@ -931,6 +935,56 @@ class PlaylistManagerTest {
             val playlist = awaitItem()
             assertEquals(episodes, playlist?.episodes)
             assertEquals(podcasts.take(4), playlist?.artworkPodcasts)
+        }
+    }
+
+    @Test
+    fun playlistTotalEpisodeCountExceedsEpisodeLimit() = runTest(testDispatcher) {
+        podcastDao.insertSuspend(Podcast(uuid = "podcast-id", isSubscribed = true))
+        episodeDao.insertAll(
+            List(2000) { index ->
+                PodcastEpisode(uuid = "id-$index", podcastUuid = "podcast-id", publishedDate = Date(10000 - index.toLong()))
+            },
+        )
+        playlistDao.upsertSmartPlaylist(DbPlaylist(uuid = "playlist-id", title = "Title 1"))
+
+        manager.observeSmartPlaylist("playlist-id").test {
+            val playlist = awaitItem()
+            assertEquals(2000, playlist?.totalEpisodeCount)
+            assertEquals(500, playlist?.episodes?.size)
+        }
+    }
+
+    @Test
+    fun playlistTotalPlaybackDurationLeft() = runTest(testDispatcher) {
+        podcastDao.insertSuspend(Podcast(uuid = "podcast-id", isSubscribed = true))
+        playlistDao.upsertSmartPlaylist(DbPlaylist(uuid = "playlist-id", title = "Title 1"))
+
+        val baseEpisode = PodcastEpisode(uuid = "", podcastUuid = "podcast-id", publishedDate = Date())
+        manager.observeSmartPlaylist("playlist-id").test {
+            var playlist = awaitItem()
+            assertEquals(Duration.ZERO, playlist?.playbackDurationLeft)
+
+            episodeDao.insert(baseEpisode.copy(uuid = "id-1"))
+            playlist = awaitItem()
+            assertEquals(Duration.ZERO, playlist?.playbackDurationLeft)
+
+            episodeDao.insert(baseEpisode.copy(uuid = "id-2", duration = 20.0))
+            playlist = awaitItem()
+            assertEquals(20.seconds, playlist?.playbackDurationLeft)
+
+            episodeDao.insert(baseEpisode.copy(uuid = "id-3", duration = 15.0))
+            playlist = awaitItem()
+            assertEquals(35.seconds, playlist?.playbackDurationLeft)
+
+            episodeDao.insert(baseEpisode.copy(uuid = "id-4", duration = 15.0, playedUpTo = 10.0))
+            playlist = awaitItem()
+            assertEquals(40.seconds, playlist?.playbackDurationLeft)
+
+            // Check when the duration is unknown and playedUpTo can get above it
+            episodeDao.insert(baseEpisode.copy(uuid = "id-5", duration = 0.0, playedUpTo = 10.0))
+            playlist = awaitItem()
+            assertEquals(40.seconds, playlist?.playbackDurationLeft)
         }
     }
 }

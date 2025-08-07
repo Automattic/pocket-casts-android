@@ -87,6 +87,8 @@ class SmartPlaylistFragment :
                     val playlistHeaderData = uiState.smartPlaylist?.let { playlist ->
                         PlaylistHeaderData(
                             title = playlist.title,
+                            episodeCount = playlist.totalEpisodeCount,
+                            playbackDurationLeft = playlist.playbackDurationLeft,
                             artworkPodcasts = playlist.artworkPodcasts,
                         )
                     }
