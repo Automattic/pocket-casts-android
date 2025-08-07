@@ -5,6 +5,7 @@ import androidx.compose.animation.core.animateInt
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.core.updateTransition
 import androidx.compose.foundation.background
+import androidx.compose.foundation.focusable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -75,9 +76,8 @@ fun PreselectChaptersAnimation(modifier: Modifier = Modifier) {
 
     Column(
         modifier = modifier
-            .semantics(true) {
-                role = Role.Image
-            },
+            .semantics(mergeDescendants = true) { role = Role.Image }
+            .focusable(false),
         verticalArrangement = Arrangement.spacedBy(6.dp),
     ) {
         predefinedChapters.forEachIndexed { index, item ->

@@ -1,5 +1,6 @@
 import androidx.annotation.DrawableRes
 import androidx.compose.foundation.background
+import androidx.compose.foundation.focusable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -21,6 +22,11 @@ import androidx.compose.ui.layout.Placeable
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.CollectionInfo
+import androidx.compose.ui.semantics.CollectionItemInfo
+import androidx.compose.ui.semantics.collectionInfo
+import androidx.compose.ui.semantics.collectionItemInfo
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
@@ -85,30 +91,38 @@ fun UpgradeTrialTimeline(
     val iconCenterYPositions = mutableListOf<Float>()
 
     Layout(
-        modifier = modifier.drawWithContent {
-            if (items.size > 1) {
-                drawLine(
-                    color = iconColor,
-                    strokeWidth = timelineWidthPx,
-                    start = Offset(x = iconSizePx / 2, y = iconCenterYPositions.firstOrNull() ?: 0f),
-                    end = Offset(x = iconSizePx / 2, y = iconCenterYPositions.lastOrNull() ?: 0f),
+        modifier = modifier
+            .semantics {
+                collectionInfo = CollectionInfo(
+                    rowCount = items.size,
+                    columnCount = 0,
                 )
             }
-            drawContent()
-            if (items.size > 1) {
-                drawRect(
-                    brush = Brush.verticalGradient(
-                        colors = gradientColors,
-                    ),
-                    topLeft = Offset(x = 0f, y = 0f),
-                    size = Size(width = iconSizePx, height = (iconCenterYPositions.lastOrNull() ?: 0f) + iconSizePx),
-                )
-            }
-        },
+            .drawWithContent {
+                if (items.size > 1) {
+                    drawLine(
+                        color = iconColor,
+                        strokeWidth = timelineWidthPx,
+                        start = Offset(x = iconSizePx / 2, y = iconCenterYPositions.firstOrNull() ?: 0f),
+                        end = Offset(x = iconSizePx / 2, y = iconCenterYPositions.lastOrNull() ?: 0f),
+                    )
+                }
+                drawContent()
+                if (items.size > 1) {
+                    drawRect(
+                        brush = Brush.verticalGradient(
+                            colors = gradientColors,
+                        ),
+                        topLeft = Offset(x = 0f, y = 0f),
+                        size = Size(width = iconSizePx, height = (iconCenterYPositions.lastOrNull() ?: 0f) + iconSizePx),
+                    )
+                }
+            },
         content = {
-            items.forEach { item ->
+            items.forEachIndexed { index, item ->
                 Box(
                     modifier = Modifier
+                        .focusable(false)
                         .size(iconSize)
                         .background(
                             color = iconColor,
@@ -124,8 +138,17 @@ fun UpgradeTrialTimeline(
                 }
                 Column(
                     modifier = Modifier
+                        .focusable()
                         .fillMaxWidth()
-                        .wrapContentHeight(),
+                        .wrapContentHeight()
+                        .semantics(mergeDescendants = true) {
+                            collectionItemInfo = CollectionItemInfo(
+                                rowIndex = index,
+                                rowSpan = 0,
+                                columnIndex = 0,
+                                columnSpan = 0,
+                            )
+                        },
                 ) {
                     TextP50(
                         text = item.title,
