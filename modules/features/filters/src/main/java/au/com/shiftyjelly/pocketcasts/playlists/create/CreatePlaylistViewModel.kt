@@ -265,6 +265,11 @@ class CreatePlaylistViewModel @AssistedInject constructor(
         }
     }
 
+    fun clearTransientRules() {
+        val appliedRules = appliedRules.value
+        rulesBuilder.update { builder -> builder.applyRules(appliedRules.toSmartRulesOrDefault()) }
+    }
+
     data class UiState(
         val appliedRules: AppliedRules,
         val rulesBuilder: RulesBuilder,

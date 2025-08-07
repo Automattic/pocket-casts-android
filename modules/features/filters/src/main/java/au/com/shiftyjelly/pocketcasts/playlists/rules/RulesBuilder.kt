@@ -1,40 +1,47 @@
 package au.com.shiftyjelly.pocketcasts.playlists.rules
 
 import au.com.shiftyjelly.pocketcasts.models.type.SmartRules
+import au.com.shiftyjelly.pocketcasts.models.type.SmartRules.DownloadStatusRule
+import au.com.shiftyjelly.pocketcasts.models.type.SmartRules.EpisodeDurationRule
+import au.com.shiftyjelly.pocketcasts.models.type.SmartRules.EpisodeStatusRule
+import au.com.shiftyjelly.pocketcasts.models.type.SmartRules.MediaTypeRule
+import au.com.shiftyjelly.pocketcasts.models.type.SmartRules.PodcastsRule
+import au.com.shiftyjelly.pocketcasts.models.type.SmartRules.ReleaseDateRule
+import au.com.shiftyjelly.pocketcasts.models.type.SmartRules.StarredRule
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.minutes
 
 data class RulesBuilder(
     val useAllPodcasts: Boolean,
     val selectedPodcasts: Set<String>,
-    val episodeStatusRule: SmartRules.EpisodeStatusRule,
-    val releaseDateRule: SmartRules.ReleaseDateRule,
+    val episodeStatusRule: EpisodeStatusRule,
+    val releaseDateRule: ReleaseDateRule,
     val isEpisodeDurationConstrained: Boolean,
     val minEpisodeDuration: Duration,
     val maxEpisodeDuration: Duration,
-    val downloadStatusRule: SmartRules.DownloadStatusRule,
-    val mediaTypeRule: SmartRules.MediaTypeRule,
+    val downloadStatusRule: DownloadStatusRule,
+    val mediaTypeRule: MediaTypeRule,
     val useStarredEpisode: Boolean,
 ) {
     val podcastsRule
         get() = if (useAllPodcasts) {
-            SmartRules.PodcastsRule.Any
+            PodcastsRule.Any
         } else {
-            SmartRules.PodcastsRule.Selected(selectedPodcasts.toList())
+            PodcastsRule.Selected(selectedPodcasts.toList())
         }
 
     val episodeDurationRule
         get() = if (isEpisodeDurationConstrained) {
-            SmartRules.EpisodeDurationRule.Constrained(minEpisodeDuration, maxEpisodeDuration)
+            EpisodeDurationRule.Constrained(minEpisodeDuration, maxEpisodeDuration)
         } else {
-            SmartRules.EpisodeDurationRule.Any
+            EpisodeDurationRule.Any
         }
 
     val starredRule
         get() = if (useStarredEpisode) {
-            SmartRules.StarredRule.Starred
+            StarredRule.Starred
         } else {
-            SmartRules.StarredRule.Any
+            StarredRule.Any
         }
 
     fun decrementMinDuration(): RulesBuilder {
@@ -77,6 +84,37 @@ data class RulesBuilder(
         }
     }
 
+    fun applyRules(rules: SmartRules) = copy(
+        useAllPodcasts = when (rules.podcasts) {
+            is PodcastsRule.Any -> true
+            is PodcastsRule.Selected -> false
+        },
+        selectedPodcasts = when (val podcasts = rules.podcasts) {
+            is PodcastsRule.Any -> selectedPodcasts
+            is PodcastsRule.Selected -> podcasts.uuids.toSet()
+        },
+        episodeStatusRule = rules.episodeStatus,
+        releaseDateRule = rules.releaseDate,
+        isEpisodeDurationConstrained = when (rules.episodeDuration) {
+            is EpisodeDurationRule.Any -> false
+            is EpisodeDurationRule.Constrained -> true
+        },
+        minEpisodeDuration = when (val duration = rules.episodeDuration) {
+            is EpisodeDurationRule.Any -> minEpisodeDuration
+            is EpisodeDurationRule.Constrained -> duration.longerThan
+        },
+        maxEpisodeDuration = when (val duration = rules.episodeDuration) {
+            is EpisodeDurationRule.Any -> maxEpisodeDuration
+            is EpisodeDurationRule.Constrained -> duration.shorterThan
+        },
+        downloadStatusRule = rules.downloadStatus,
+        mediaTypeRule = rules.mediaType,
+        useStarredEpisode = when (rules.starred) {
+            StarredRule.Any -> false
+            StarredRule.Starred -> true
+        },
+    )
+
     companion object {
         val Empty = RulesBuilder(
             useAllPodcasts = true,
@@ -87,7 +125,7 @@ data class RulesBuilder(
             minEpisodeDuration = 20.minutes,
             maxEpisodeDuration = 40.minutes,
             downloadStatusRule = SmartRules.Default.downloadStatus,
-            mediaTypeRule = SmartRules.MediaTypeRule.Any,
+            mediaTypeRule = MediaTypeRule.Any,
             useStarredEpisode = false,
         )
     }
