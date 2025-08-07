@@ -11,6 +11,8 @@ import au.com.shiftyjelly.pocketcasts.models.type.SmartRules.PodcastsRule
 import au.com.shiftyjelly.pocketcasts.models.type.SmartRules.ReleaseDateRule
 import au.com.shiftyjelly.pocketcasts.models.type.SmartRules.StarredRule
 import au.com.shiftyjelly.pocketcasts.playlists.create.CreatePlaylistViewModel.UiState
+import au.com.shiftyjelly.pocketcasts.playlists.edit.SmartRulesEditor
+import au.com.shiftyjelly.pocketcasts.playlists.rules.AppliedRules
 import au.com.shiftyjelly.pocketcasts.playlists.rules.RuleType
 import au.com.shiftyjelly.pocketcasts.playlists.rules.RulesBuilder
 import au.com.shiftyjelly.pocketcasts.preferences.UserSetting
@@ -18,6 +20,7 @@ import au.com.shiftyjelly.pocketcasts.preferences.model.ArtworkConfiguration
 import au.com.shiftyjelly.pocketcasts.repositories.playlist.SmartPlaylistDraft
 import au.com.shiftyjelly.pocketcasts.sharedtest.MainCoroutineRule
 import kotlin.time.Duration.Companion.minutes
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
@@ -38,10 +41,19 @@ class CreatePlaylistViewModelTest {
     private val followedPodcasts = MutableStateFlow(emptyList<Podcast>())
 
     private val viewModel = CreatePlaylistViewModel(
-        initialPlaylistTitle = "Playlist name",
         playlistManager = playlistManager,
-        podcastManager = mock {
-            on { findSubscribedFlow() } doReturn followedPodcasts
+        rulesEditorFactory = object : SmartRulesEditor.Factory {
+            override fun create(scope: CoroutineScope, initialBuilder: RulesBuilder, initialAppliedRules: AppliedRules): SmartRulesEditor {
+                return SmartRulesEditor(
+                    playlistManager = playlistManager,
+                    podcastManager = mock {
+                        on { findSubscribedFlow() } doReturn followedPodcasts
+                    },
+                    scope = scope,
+                    initialBuilder = initialBuilder,
+                    initialAppliedRules = initialAppliedRules,
+                )
+            }
         },
         settings = run {
             val settingMock = mock<UserSetting<ArtworkConfiguration>> {
@@ -51,6 +63,7 @@ class CreatePlaylistViewModelTest {
                 on { artworkConfiguration } doReturn settingMock
             }
         },
+        initialPlaylistTitle = "Playlist name",
     )
 
     @Test
