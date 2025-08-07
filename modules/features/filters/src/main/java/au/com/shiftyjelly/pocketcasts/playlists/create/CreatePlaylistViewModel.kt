@@ -10,6 +10,7 @@ import au.com.shiftyjelly.pocketcasts.models.type.SmartRules
 import au.com.shiftyjelly.pocketcasts.models.type.SmartRules.DownloadStatusRule
 import au.com.shiftyjelly.pocketcasts.models.type.SmartRules.MediaTypeRule
 import au.com.shiftyjelly.pocketcasts.models.type.SmartRules.ReleaseDateRule
+import au.com.shiftyjelly.pocketcasts.models.type.SmartRules.StarredRule
 import au.com.shiftyjelly.pocketcasts.playlists.rules.AppliedRules
 import au.com.shiftyjelly.pocketcasts.playlists.rules.RuleType
 import au.com.shiftyjelly.pocketcasts.playlists.rules.RulesBuilder
@@ -18,6 +19,7 @@ import au.com.shiftyjelly.pocketcasts.preferences.model.ArtworkConfiguration.Ele
 import au.com.shiftyjelly.pocketcasts.repositories.playlist.PlaylistManager
 import au.com.shiftyjelly.pocketcasts.repositories.playlist.SmartPlaylistDraft
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
+import au.com.shiftyjelly.pocketcasts.utils.extensions.combine
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
@@ -28,7 +30,6 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
-import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
@@ -66,11 +67,18 @@ class CreatePlaylistViewModel @AssistedInject constructor(
         }
     }
 
+    private val smartStarredEpisodes = appliedRules.flatMapLatest { appliedRules ->
+        val smartRules = appliedRules.toSmartRules() ?: SmartRules.Default
+        val starredRules = smartRules.copy(starred = StarredRule.Starred)
+        playlistManager.observeSmartEpisodes(starredRules)
+    }
+
     val uiState = combine(
         appliedRules,
         rulesBuilder,
         podcastManager.findSubscribedFlow(),
         smartEpisodes,
+        smartStarredEpisodes,
         settings.artworkConfiguration.flow.map { it.useEpisodeArtwork(Element.Filters) },
         ::UiState,
     ).stateIn(viewModelScope, SharingStarted.Eagerly, initialValue = UiState.Empty)
@@ -252,6 +260,7 @@ class CreatePlaylistViewModel @AssistedInject constructor(
         val rulesBuilder: RulesBuilder,
         val followedPodcasts: List<Podcast>,
         val smartEpisodes: List<PodcastEpisode>,
+        val smartStarredEpisodes: List<PodcastEpisode>,
         val useEpisodeArtwork: Boolean,
     ) {
         companion object {
@@ -260,6 +269,7 @@ class CreatePlaylistViewModel @AssistedInject constructor(
                 rulesBuilder = RulesBuilder.Empty,
                 followedPodcasts = emptyList(),
                 smartEpisodes = emptyList(),
+                smartStarredEpisodes = emptyList(),
                 useEpisodeArtwork = false,
             )
         }
