@@ -96,7 +96,7 @@ enum class FriendlyDurationUnit(
         val unitCount = toUnitCount(duration)
         builder
             .append(unitCount)
-            .append(' ')
+            .append('\u00a0')
             .append(resources.getQuantityString(pluralResourceId(this), unitCount))
             .append(' ')
     }

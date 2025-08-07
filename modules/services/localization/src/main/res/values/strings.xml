@@ -964,6 +964,8 @@
     <string name="decrement_shorter_than_duration">Decrement \"shorter than\" duration</string>
     <string name="increment_shorter_than_duration">Increment \"shorter than\" duration</string>
     <string name="playlist_play_all">Play All</string>
+    <string name="smart_playlist_no_content_title">No episodes</string>
+    <string name="smart_playlist_no_content_body">Either it’s time to celebrate completing this list, or edit your rules to get some more.</string>
 
     <!-- Profile -->
 
