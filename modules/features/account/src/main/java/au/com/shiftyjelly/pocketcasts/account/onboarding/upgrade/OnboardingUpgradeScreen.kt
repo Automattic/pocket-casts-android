@@ -25,6 +25,8 @@ import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.relocation.BringIntoViewRequester
+import androidx.compose.foundation.relocation.bringIntoViewRequester
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
@@ -40,6 +42,7 @@ import androidx.compose.ui.focus.FocusRequester.Companion.FocusRequesterFactory.
 import androidx.compose.ui.focus.FocusRequester.Companion.FocusRequesterFactory.component2
 import androidx.compose.ui.focus.focusProperties
 import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.res.painterResource
@@ -530,20 +533,23 @@ private fun UpgradeContent(
                 .focusRequester(selfFocusRequester)
                 .focusProperties {
                     onExit = {
-                        selfFocusRequester.saveFocusedChild()
-
                         if (this.requestedFocusDirection == FocusDirection.Down) {
                             downFocusRequester.requestFocus()
                         }
-                    }
-                    onEnter = {
-                        selfFocusRequester.restoreFocusedChild()
                     }
                 },
             state = listState,
         ) {
             itemsIndexed(pages) { index, page ->
+                val bringIntoViewRequester = remember { BringIntoViewRequester() }
+
                 val baseModifier = Modifier.heightIn(min = itemHeight)
+                    .bringIntoViewRequester(bringIntoViewRequester)
+                    .onFocusChanged { focusState ->
+                        if (focusState.isFocused) {
+                            coroutineScope.launch { bringIntoViewRequester.bringIntoView() }
+                        }
+                    }
                 val scrollToNext: () -> Unit = {
                     coroutineScope.launch {
                         listState.animateScrollToItem((index + 1) % pages.size)
