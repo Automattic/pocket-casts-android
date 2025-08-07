@@ -125,18 +125,17 @@ internal fun PlaylistHeader(
         modifier = modifier,
     ) {
         val podcasts = data?.artworkPodcasts
-
-        val toolbarInsets = AppBarDefaults.topAppBarWindowInsets
-        val toolbarTopPadding = toolbarInsets.asPaddingValues().calculateTopPadding()
-        val toolbarHeight = 48.dp
-        val artworkTopPadding = 16.dp
+        val artworkTopPadding = AppBarDefaults.topAppBarWindowInsets
+            .asPaddingValues()
+            .calculateTopPadding()
+            .coerceAtLeast(100.dp)
         val artworkSize = minOf(maxWidth * 0.48f, 192.dp)
 
         PlaylistBackgroundArtwork(
             podcasts = podcasts,
             useBlurredArtwork = useBlurredArtwork,
             maxWidth = maxWidth,
-            bottomAnchor = toolbarTopPadding + toolbarHeight + artworkTopPadding + artworkSize * 0.75f,
+            bottomAnchor = artworkTopPadding + artworkSize * 0.75f,
         )
 
         Column(
@@ -144,7 +143,7 @@ internal fun PlaylistHeader(
             modifier = Modifier.fillMaxWidth(),
         ) {
             Spacer(
-                modifier = Modifier.height(toolbarTopPadding + toolbarHeight + artworkTopPadding),
+                modifier = Modifier.height(artworkTopPadding),
             )
             Crossfade(
                 targetState = podcasts,
