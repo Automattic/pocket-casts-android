@@ -113,6 +113,7 @@ class PlaylistManagerImpl @Inject constructor(
                 .observeSmartPlaylist(uuid)
                 .first()
                 ?.applySmartRules(rules)
+                ?.copy(syncStatus = SYNC_STATUS_NOT_SYNCED)
             if (playlist != null) {
                 playlistDao.upsertSmartPlaylist(playlist)
             }
