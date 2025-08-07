@@ -11,12 +11,14 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.rememberNestedScrollInteropConnection
 import androidx.fragment.app.viewModels
 import androidx.fragment.compose.content
+import androidx.navigation.NavController
 import androidx.navigation.NavOptionsBuilder
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -68,6 +70,7 @@ class CreatePlaylistFragment : BaseDialogFragment() {
 
         DialogBox {
             val navController = rememberNavController()
+            ClearTransientRulesStateEffect(navController)
 
             fun goBackToPlaylistPreview() {
                 navController.popBackStack(NavigationRoutes.SMART_PLAYLIST_PREVIEW, inclusive = false)
@@ -222,6 +225,20 @@ class CreatePlaylistFragment : BaseDialogFragment() {
             dismiss()
             val fragment = SmartPlaylistFragment.newInstance(uuid)
             (requireActivity() as FragmentHostListener).addFragment(fragment)
+        }
+    }
+
+    @Composable
+    private fun ClearTransientRulesStateEffect(navController: NavController) {
+        var currentRoute by rememberSaveable { mutableStateOf<String?>(null) }
+        LaunchedEffect(navController) {
+            navController.currentBackStackEntryFlow.collect { entry ->
+                val newRoute = entry.destination.route
+                if (currentRoute != newRoute) {
+                    currentRoute = newRoute
+                    viewModel.clearTransientRules()
+                }
+            }
         }
     }
 
