@@ -120,7 +120,11 @@ private fun StarredSwitchRow(
                 modifier = Modifier.height(4.dp),
             )
             TextP50(
-                text = stringResource(LR.string.smart_rule_starred_description),
+                text = if (useStarredEpisodes) {
+                    stringResource(LR.string.smart_rule_starred_description)
+                } else {
+                    stringResource(LR.string.smart_rule_starred_description_disabled)
+                },
                 color = MaterialTheme.theme.colors.primaryText02,
                 modifier = Modifier.widthIn(max = 280.dp),
             )
