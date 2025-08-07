@@ -6,6 +6,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -21,17 +22,29 @@ import androidx.compose.foundation.layout.statusBars
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.layout.wrapContentWidth
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.relocation.BringIntoViewRequester
+import androidx.compose.foundation.relocation.bringIntoViewRequester
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
 import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.FocusDirection
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.FocusRequester.Companion.FocusRequesterFactory.component1
+import androidx.compose.ui.focus.FocusRequester.Companion.FocusRequesterFactory.component2
+import androidx.compose.ui.focus.focusProperties
+import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -70,6 +83,7 @@ import java.time.format.DateTimeFormatter
 import java.time.format.FormatStyle
 import java.time.temporal.ChronoUnit
 import kotlinx.coroutines.launch
+import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 @Composable
@@ -83,12 +97,123 @@ fun OnboardingUpgradeScreen(
     onClickTermsAndConditions: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    Column(
+    BoxWithConstraints(
         modifier = modifier
             .windowInsetsPadding(WindowInsets.statusBars)
             .windowInsetsPadding(WindowInsets.navigationBars)
             .background(color = MaterialTheme.colors.background)
             .fillMaxSize(),
+    ) {
+        if (this.maxHeight <= 480.dp || (this.maxHeight <= 640.dp && LocalConfiguration.current.fontScale >= 1.5f)) {
+            CompactHeightUpscaledFontUpgradeScreen(
+                state = state,
+                source = source,
+                onClosePress = onClosePress,
+                onSubscribePress = onSubscribePress,
+                onChangeSelectedPlan = onChangeSelectedPlan,
+                onClickPrivacyPolicy = onClickPrivacyPolicy,
+                onClickTermsAndConditions = onClickTermsAndConditions,
+            )
+        } else {
+            RegularUpgradeScreen(
+                state = state,
+                source = source,
+                onClosePress = onClosePress,
+                onSubscribePress = onSubscribePress,
+                onChangeSelectedPlan = onChangeSelectedPlan,
+                onClickPrivacyPolicy = onClickPrivacyPolicy,
+                onClickTermsAndConditions = onClickTermsAndConditions,
+            )
+        }
+    }
+}
+
+@Composable
+private fun CompactHeightUpscaledFontUpgradeScreen(
+    state: OnboardingUpgradeFeaturesState.Loaded,
+    source: OnboardingUpgradeSource,
+    onClosePress: () -> Unit,
+    onSubscribePress: () -> Unit,
+    onChangeSelectedPlan: (SubscriptionPlan) -> Unit,
+    onClickPrivacyPolicy: () -> Unit,
+    onClickTermsAndConditions: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    val coroutineScope = rememberCoroutineScope()
+    val contentPages = state.onboardingVariant.toContentPages(
+        currentPlan = state.selectedPlan,
+        isEligibleForTrial = state.selectedBasePlan.offer == SubscriptionOffer.Trial,
+        plan = state.selectedBasePlan,
+        source = source,
+    )
+    val listState = rememberLazyListState()
+
+    Column(
+        modifier = modifier,
+    ) {
+        UpgradeHeader(
+            modifier = Modifier.padding(
+                horizontal = 24.dp,
+            ),
+            selectedPlan = state.selectedPlan,
+            source = source,
+            onClosePress = onClosePress,
+        )
+        Spacer(modifier = Modifier.height(12.dp))
+        LazyColumn(
+            state = listState,
+        ) {
+            contentPages.forEachIndexed { index, content ->
+                item {
+                    val scrollToNext: () -> Unit = {
+                        coroutineScope.launch {
+                            listState.animateScrollToItem((index + 1) % contentPages.size)
+                        }
+                    }
+                    content.toComponent(index = index, scrollToNext = scrollToNext)()
+                }
+            }
+            item {
+                Spacer(modifier = Modifier.height(24.dp))
+            }
+            item {
+                UpgradeFooter(
+                    modifier = Modifier
+                        .padding(
+                            horizontal = 24.dp,
+                        )
+                        .fillMaxWidth(),
+                    plans = state.availableBasePlans,
+                    selectedOnboardingPlan = state.selectedPlan,
+                    onSelectedChange = {
+                        onChangeSelectedPlan(it)
+                    },
+                    onClickSubscribe = onSubscribePress,
+                    onPrivacyPolicyClick = onClickPrivacyPolicy,
+                    onTermsAndConditionsClick = onClickTermsAndConditions,
+                    selfFocusRequester = FocusRequester.Default,
+                    upFocusRequester = FocusRequester.Default,
+                )
+            }
+        }
+    }
+}
+
+@Composable
+private fun RegularUpgradeScreen(
+    state: OnboardingUpgradeFeaturesState.Loaded,
+    source: OnboardingUpgradeSource,
+    onClosePress: () -> Unit,
+    onSubscribePress: () -> Unit,
+    onChangeSelectedPlan: (SubscriptionPlan) -> Unit,
+    onClickPrivacyPolicy: () -> Unit,
+    onClickTermsAndConditions: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    val (contentFocusRequester, footerFocusRequester) = remember { FocusRequester.createRefs() }
+
+    Column(
+        modifier = modifier,
     ) {
         UpgradeHeader(
             modifier = Modifier.padding(
@@ -100,13 +225,15 @@ fun OnboardingUpgradeScreen(
         )
         Spacer(modifier = Modifier.height(12.dp))
         UpgradeContent(
-            modifier = Modifier.weight(1f),
+            modifier = Modifier.weight(weight = 1f),
             pages = state.onboardingVariant.toContentPages(
                 currentPlan = state.selectedPlan,
                 isEligibleForTrial = state.selectedBasePlan.offer == SubscriptionOffer.Trial,
                 plan = state.selectedBasePlan,
                 source = source,
             ),
+            selfFocusRequester = contentFocusRequester,
+            downFocusRequester = footerFocusRequester,
         )
         Spacer(modifier = Modifier.height(24.dp))
         UpgradeFooter(
@@ -123,6 +250,8 @@ fun OnboardingUpgradeScreen(
             onClickSubscribe = onSubscribePress,
             onPrivacyPolicyClick = onClickPrivacyPolicy,
             onTermsAndConditionsClick = onClickTermsAndConditions,
+            selfFocusRequester = footerFocusRequester,
+            upFocusRequester = contentFocusRequester,
         )
     }
 }
@@ -135,10 +264,19 @@ private fun UpgradeFooter(
     onClickSubscribe: () -> Unit,
     onPrivacyPolicyClick: () -> Unit,
     onTermsAndConditionsClick: () -> Unit,
+    upFocusRequester: FocusRequester,
+    selfFocusRequester: FocusRequester,
     modifier: Modifier = Modifier,
 ) {
     Column(
-        modifier = modifier,
+        modifier = modifier.focusRequester(selfFocusRequester)
+            .focusProperties {
+                onExit = {
+                    if (requestedFocusDirection == FocusDirection.Up) {
+                        upFocusRequester.requestFocus()
+                    }
+                }
+            },
     ) {
         plans.forEachIndexed { index, item ->
             UpgradePlanRow(
@@ -147,7 +285,9 @@ private fun UpgradeFooter(
                 onClick = { onSelectedChange(item) },
                 priceComparisonPlan = plans.getOrNull(index + 1),
             )
-            Spacer(modifier = Modifier.height(10.dp))
+            if (index < plans.lastIndex) {
+                Spacer(modifier = Modifier.height(10.dp))
+            }
         }
         Spacer(modifier = Modifier.height(16.dp))
         UpgradeRowButton(
@@ -162,7 +302,8 @@ private fun UpgradeFooter(
         )
         Spacer(modifier = Modifier.height(12.dp))
         PrivacyPolicy(
-            modifier = Modifier.fillMaxWidth()
+            modifier = Modifier
+                .fillMaxWidth()
                 .padding(bottom = 12.dp),
             color = MaterialTheme.theme.colors.secondaryText02,
             textAlign = TextAlign.Center,
@@ -205,7 +346,7 @@ private fun UpgradeHeader(
                 ) {
                     Icon(
                         modifier = Modifier.size(24.dp),
-                        painter = painterResource(R.drawable.ic_close),
+                        painter = painterResource(IR.drawable.ic_close),
                         contentDescription = stringResource(LR.string.close),
                         tint = MaterialTheme.theme.colors.primaryIcon01,
                     )
@@ -277,6 +418,7 @@ private fun OnboardingUpgradeFeaturesState.NewOnboardingVariant.toContentPages(
                 ),
             )
         }
+
         OnboardingUpgradeSource.BOOKMARKS,
         OnboardingUpgradeSource.BOOKMARKS_SHELF_ACTION,
         -> {
@@ -288,6 +430,7 @@ private fun OnboardingUpgradeFeaturesState.NewOnboardingVariant.toContentPages(
                 ),
             )
         }
+
         OnboardingUpgradeSource.UP_NEXT_SHUFFLE -> {
             add(UpgradePagerContent.Shuffle)
             add(
@@ -297,6 +440,7 @@ private fun OnboardingUpgradeFeaturesState.NewOnboardingVariant.toContentPages(
                 ),
             )
         }
+
         OnboardingUpgradeSource.SKIP_CHAPTERS -> {
             add(UpgradePagerContent.PreselectChapters)
             add(
@@ -355,12 +499,15 @@ private sealed interface UpgradePagerContent {
     data object Folders : UpgradePagerContent {
         override val showCta get() = true
     }
+
     data object Bookmarks : UpgradePagerContent {
         override val showCta get() = true
     }
+
     data object Shuffle : UpgradePagerContent {
         override val showCta get() = true
     }
+
     data object PreselectChapters : UpgradePagerContent {
         override val showCta get() = true
     }
@@ -369,42 +516,103 @@ private sealed interface UpgradePagerContent {
 @Composable
 private fun UpgradeContent(
     pages: List<UpgradePagerContent>,
+    selfFocusRequester: FocusRequester,
+    downFocusRequester: FocusRequester,
     modifier: Modifier = Modifier,
 ) {
     val coroutineScope = rememberCoroutineScope()
     val listState = rememberLazyListState()
-    FadedLazyColumn(
+
+    BoxWithConstraints(
         modifier = modifier,
-        state = listState,
     ) {
-        itemsIndexed(pages) { index, page ->
-            val scrollToNext: () -> Unit = {
-                coroutineScope.launch {
-                    listState.animateScrollToItem((index + 1) % pages.size)
+        val itemHeight = this@BoxWithConstraints.maxHeight
+        FadedLazyColumn(
+            modifier = Modifier
+                .fillMaxSize()
+                .focusRequester(selfFocusRequester)
+                .focusProperties {
+                    onExit = {
+                        if (this.requestedFocusDirection == FocusDirection.Down) {
+                            downFocusRequester.requestFocus()
+                        }
+                    }
+                },
+            state = listState,
+        ) {
+            itemsIndexed(pages) { index, page ->
+                val bringIntoViewRequester = remember { BringIntoViewRequester() }
+
+                val baseModifier = Modifier.heightIn(min = itemHeight)
+                    .bringIntoViewRequester(bringIntoViewRequester)
+                    .onFocusChanged { focusState ->
+                        if (focusState.isFocused) {
+                            coroutineScope.launch { bringIntoViewRequester.bringIntoView() }
+                        }
+                    }
+                val scrollToNext: () -> Unit = {
+                    coroutineScope.launch {
+                        listState.animateScrollToItem((index + 1) % pages.size)
+                    }
                 }
+                page.toComponent(index = index, scrollToNext = scrollToNext, modifier = baseModifier)()
             }
-            when (page) {
-                is UpgradePagerContent.Features -> FeaturesContent(
-                    modifier = Modifier.padding(
-                        horizontal = 24.dp,
-                    ),
-                    features = page,
-                    onCtaClick = scrollToNext,
-                )
+        }
+    }
+}
 
-                is UpgradePagerContent.TrialSchedule -> ScheduleContent(
-                    modifier = Modifier.padding(
+@Composable
+private fun UpgradePagerContent.toComponent(
+    index: Int,
+    scrollToNext: () -> Unit,
+    modifier: Modifier = Modifier,
+): @Composable () -> Unit {
+    val topPaddingForGenericContent = if (index != 0) 32.dp else 0.dp
+    return {
+        when (this) {
+            is UpgradePagerContent.Features -> FeaturesContent(
+                modifier = modifier
+                    .padding(
                         horizontal = 24.dp,
+                    )
+                    .padding(
+                        top = topPaddingForGenericContent,
                     ),
-                    trialSchedule = page,
-                    onCtaClick = scrollToNext,
-                )
+                features = this,
+                onCtaClick = scrollToNext,
+            )
 
-                is UpgradePagerContent.Folders -> FoldersUpgradeContent(onCtaClick = scrollToNext)
-                is UpgradePagerContent.Bookmarks -> BookmarksUpgradeContent(onCtaClick = scrollToNext)
-                is UpgradePagerContent.Shuffle -> ShuffleUpgradeContent(onCtaClick = scrollToNext)
-                is UpgradePagerContent.PreselectChapters -> PreselectChaptersUpgradeContent(onCtaClick = scrollToNext)
-            }
+            is UpgradePagerContent.TrialSchedule -> ScheduleContent(
+                modifier = modifier
+                    .padding(
+                        horizontal = 24.dp,
+                    )
+                    .padding(
+                        top = topPaddingForGenericContent,
+                    ),
+                trialSchedule = this,
+                onCtaClick = scrollToNext,
+            )
+
+            is UpgradePagerContent.Folders -> FoldersUpgradeContent(
+                modifier = modifier,
+                onCtaClick = scrollToNext,
+            )
+
+            is UpgradePagerContent.Bookmarks -> BookmarksUpgradeContent(
+                modifier = modifier,
+                onCtaClick = scrollToNext,
+            )
+
+            is UpgradePagerContent.Shuffle -> ShuffleUpgradeContent(
+                modifier = modifier,
+                onCtaClick = scrollToNext,
+            )
+
+            is UpgradePagerContent.PreselectChapters -> PreselectChaptersUpgradeContent(
+                modifier = modifier,
+                onCtaClick = scrollToNext,
+            )
         }
     }
 }
@@ -427,7 +635,7 @@ private fun FeaturesContent(
             TextP40(
                 text = stringResource(LR.string.onboarding_upgrade_features_trial_schedule),
                 modifier = Modifier
-                    .padding(vertical = 24.dp)
+                    .padding(vertical = 16.dp)
                     .clickable { onCtaClick() },
                 color = MaterialTheme.theme.colors.primaryInteractive01,
             )
@@ -460,8 +668,9 @@ private fun ScheduleContent(
 @Composable
 private fun FoldersUpgradeContent(
     onCtaClick: () -> Unit,
+    modifier: Modifier = Modifier,
 ) {
-    Column {
+    Column(modifier = modifier) {
         TextP40(
             text = stringResource(LR.string.onboarding_upgrade_schedule_see_features),
             modifier = Modifier
@@ -473,8 +682,7 @@ private fun FoldersUpgradeContent(
 
         FoldersAnimation(
             modifier = Modifier
-                .fillMaxWidth()
-                .heightIn(min = 320.dp),
+                .fillMaxWidth(),
         )
     }
 }
@@ -482,8 +690,9 @@ private fun FoldersUpgradeContent(
 @Composable
 private fun BookmarksUpgradeContent(
     onCtaClick: () -> Unit,
+    modifier: Modifier = Modifier,
 ) {
-    Column {
+    Column(modifier = modifier) {
         TextP40(
             text = stringResource(LR.string.onboarding_upgrade_schedule_see_features),
             modifier = Modifier
@@ -504,8 +713,9 @@ private fun BookmarksUpgradeContent(
 @Composable
 private fun ShuffleUpgradeContent(
     onCtaClick: () -> Unit,
+    modifier: Modifier = Modifier,
 ) {
-    Column {
+    Column(modifier = modifier) {
         TextP40(
             text = stringResource(LR.string.onboarding_upgrade_schedule_see_features),
             modifier = Modifier
@@ -516,7 +726,8 @@ private fun ShuffleUpgradeContent(
         )
 
         ShuffleAnimation(
-            modifier = Modifier.padding(horizontal = 32.dp),
+            modifier = Modifier
+                .padding(horizontal = 32.dp),
         )
     }
 }
@@ -524,8 +735,9 @@ private fun ShuffleUpgradeContent(
 @Composable
 private fun PreselectChaptersUpgradeContent(
     onCtaClick: () -> Unit,
+    modifier: Modifier = Modifier,
 ) {
-    Column {
+    Column(modifier = modifier) {
         TextP40(
             text = stringResource(LR.string.onboarding_upgrade_schedule_see_features),
             modifier = Modifier
@@ -536,7 +748,8 @@ private fun PreselectChaptersUpgradeContent(
         )
 
         PreselectChaptersAnimation(
-            modifier = Modifier.fillMaxWidth()
+            modifier = Modifier
+                .fillMaxWidth()
                 .padding(horizontal = 32.dp)
                 .padding(bottom = 64.dp),
         )
@@ -546,6 +759,35 @@ private fun PreselectChaptersUpgradeContent(
 @Preview
 @Composable
 private fun PreviewOnboardingUpgradeScreen(
+    @PreviewParameter(ThemedTierParameterProvider::class) pair: Pair<ThemeType, SubscriptionTier>,
+) {
+    AppThemeWithBackground(pair.first) {
+        OnboardingUpgradeScreen(
+            state = OnboardingUpgradeFeaturesState.Loaded(
+                selectedTier = pair.second,
+                selectedBillingCycle = BillingCycle.Yearly,
+                subscriptionPlans = SubscriptionPlans.Preview,
+                plansFilter = when (pair.second) {
+                    SubscriptionTier.Plus -> OnboardingUpgradeFeaturesState.LoadedPlansFilter.PLUS_ONLY
+                    SubscriptionTier.Patron -> OnboardingUpgradeFeaturesState.LoadedPlansFilter.PATRON_ONLY
+                },
+                purchaseFailed = false,
+                onboardingVariant = OnboardingUpgradeFeaturesState.NewOnboardingVariant.FEATURES_FIRST,
+            ),
+            modifier = Modifier.fillMaxSize(),
+            onSubscribePress = {},
+            onClosePress = {},
+            onClickPrivacyPolicy = {},
+            onClickTermsAndConditions = {},
+            onChangeSelectedPlan = {},
+            source = OnboardingUpgradeSource.ACCOUNT_DETAILS,
+        )
+    }
+}
+
+@Preview(fontScale = 2f, heightDp = 360)
+@Composable
+private fun PreviewOnboardingUpgradeScreenSmall(
     @PreviewParameter(ThemedTierParameterProvider::class) pair: Pair<ThemeType, SubscriptionTier>,
 ) {
     AppThemeWithBackground(pair.first) {

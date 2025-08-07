@@ -5,6 +5,7 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.focusable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -29,6 +30,7 @@ import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.Dp
@@ -167,7 +169,6 @@ private fun SubscriptionPlanRow(
                     },
                 )
                 .clickable(
-                    enabled = !isSelected,
                     onClick = onClick,
                     role = Role.Button,
                     indication = ripple(color = MaterialTheme.theme.colors.primaryIcon01),
@@ -214,6 +215,7 @@ private fun SubscriptionPlanRow(
         if (plan.tier == SubscriptionTier.Plus && plan.billingCycle == BillingCycle.Yearly && displayLabel.isNotEmpty()) {
             Box(
                 modifier = Modifier
+                    .focusable(false)
                     .align(
                         when (rowConfig.badgePosition) {
                             BadgePosition.RIGHT -> Alignment.TopEnd

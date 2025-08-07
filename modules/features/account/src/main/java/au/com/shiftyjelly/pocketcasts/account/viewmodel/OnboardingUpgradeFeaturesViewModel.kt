@@ -96,7 +96,10 @@ class OnboardingUpgradeFeaturesViewModel @AssistedInject constructor(
     }
 
     fun changeBillingCycle(billingCycle: BillingCycle) {
-        analyticsTracker.track(AnalyticsEvent.PLUS_PROMOTION_SUBSCRIPTION_FREQUENCY_CHANGED, mapOf("value" to billingCycle.analyticsValue))
+        val properties = analyticsProps(flow = flow, variant = experimentProvider.getVariation(Experiment.NewOnboardingABTest).toNewOnboardingVariant()).toMutableMap().apply {
+            put("value", billingCycle.analyticsValue)
+        }
+        analyticsTracker.track(AnalyticsEvent.PLUS_PROMOTION_SUBSCRIPTION_FREQUENCY_CHANGED, properties)
         _state.update { state ->
             (_state.value as? OnboardingUpgradeFeaturesState.Loaded)?.copy(selectedBillingCycle = billingCycle)
                 ?: state
@@ -104,7 +107,10 @@ class OnboardingUpgradeFeaturesViewModel @AssistedInject constructor(
     }
 
     fun changeSubscriptionTier(tier: SubscriptionTier) {
-        analyticsTracker.track(AnalyticsEvent.PLUS_PROMOTION_SUBSCRIPTION_TIER_CHANGED, mapOf("value" to tier.analyticsValue))
+        val properties = analyticsProps(flow = flow, variant = experimentProvider.getVariation(Experiment.NewOnboardingABTest).toNewOnboardingVariant()).toMutableMap().apply {
+            put("value", tier.analyticsValue)
+        }
+        analyticsTracker.track(AnalyticsEvent.PLUS_PROMOTION_SUBSCRIPTION_TIER_CHANGED, properties)
         _state.update { state ->
             (_state.value as? OnboardingUpgradeFeaturesState.Loaded)?.copy(selectedTier = tier)
                 ?: state
@@ -149,31 +155,31 @@ class OnboardingUpgradeFeaturesViewModel @AssistedInject constructor(
     }
 
     fun onShown(flow: OnboardingFlow, source: OnboardingUpgradeSource) {
-        analyticsTracker.track(AnalyticsEvent.PLUS_PROMOTION_SHOWN, analyticsProps(flow, source))
+        analyticsTracker.track(AnalyticsEvent.PLUS_PROMOTION_SHOWN, analyticsProps(flow = flow, source = source, variant = experimentProvider.getVariation(Experiment.NewOnboardingABTest).toNewOnboardingVariant()))
     }
 
     fun onDismiss(flow: OnboardingFlow, source: OnboardingUpgradeSource) {
-        analyticsTracker.track(AnalyticsEvent.PLUS_PROMOTION_DISMISSED, analyticsProps(flow, source))
+        analyticsTracker.track(AnalyticsEvent.PLUS_PROMOTION_DISMISSED, analyticsProps(flow = flow, source = source, variant = experimentProvider.getVariation(Experiment.NewOnboardingABTest).toNewOnboardingVariant()))
     }
 
     fun onNotNow(flow: OnboardingFlow, source: OnboardingUpgradeSource) {
-        analyticsTracker.track(AnalyticsEvent.PLUS_PROMOTION_NOT_NOW_BUTTON_TAPPED, analyticsProps(flow, source))
+        analyticsTracker.track(AnalyticsEvent.PLUS_PROMOTION_NOT_NOW_BUTTON_TAPPED, analyticsProps(flow = flow, source = source, variant = experimentProvider.getVariation(Experiment.NewOnboardingABTest).toNewOnboardingVariant()))
     }
 
     fun onPrivacyPolicyPressed() {
-        analyticsTracker.track(AnalyticsEvent.PLUS_PROMOTION_PRIVACY_POLICY_TAPPED)
+        analyticsTracker.track(AnalyticsEvent.PLUS_PROMOTION_PRIVACY_POLICY_TAPPED, analyticsProps(flow = flow, variant = experimentProvider.getVariation(Experiment.NewOnboardingABTest).toNewOnboardingVariant()))
     }
 
     fun onTermsAndConditionsPressed() {
-        analyticsTracker.track(AnalyticsEvent.PLUS_PROMOTION_TERMS_AND_CONDITIONS_TAPPED)
+        analyticsTracker.track(AnalyticsEvent.PLUS_PROMOTION_TERMS_AND_CONDITIONS_TAPPED, analyticsProps(flow = flow, variant = experimentProvider.getVariation(Experiment.NewOnboardingABTest).toNewOnboardingVariant()))
     }
 
     fun onSelectPaymentFrequencyShown(flow: OnboardingFlow, source: OnboardingUpgradeSource) {
-        analyticsTracker.track(AnalyticsEvent.SELECT_PAYMENT_FREQUENCY_SHOWN, analyticsProps(flow, source))
+        analyticsTracker.track(AnalyticsEvent.SELECT_PAYMENT_FREQUENCY_SHOWN, analyticsProps(flow = flow, source = source, variant = experimentProvider.getVariation(Experiment.NewOnboardingABTest).toNewOnboardingVariant()))
     }
 
     fun onSelectPaymentFrequencyDismissed(flow: OnboardingFlow, source: OnboardingUpgradeSource) {
-        analyticsTracker.track(AnalyticsEvent.SELECT_PAYMENT_FREQUENCY_DISMISSED, analyticsProps(flow, source))
+        analyticsTracker.track(AnalyticsEvent.SELECT_PAYMENT_FREQUENCY_DISMISSED, analyticsProps(flow = flow, source = source, variant = experimentProvider.getVariation(Experiment.NewOnboardingABTest).toNewOnboardingVariant()))
     }
 
     @AssistedFactory
@@ -182,10 +188,20 @@ class OnboardingUpgradeFeaturesViewModel @AssistedInject constructor(
     }
 
     companion object {
-        private fun analyticsProps(flow: OnboardingFlow, source: OnboardingUpgradeSource) = mapOf(
-            "flow" to flow.analyticsValue,
-            "source" to source.analyticsValue,
-        )
+        private fun analyticsProps(
+            flow: OnboardingFlow,
+            variant: OnboardingUpgradeFeaturesState.NewOnboardingVariant,
+            source: OnboardingUpgradeSource? = null,
+        ) = buildMap {
+            put("flow", flow.analyticsValue)
+            source?.let {
+                put("source", it.analyticsValue)
+            }
+            if (FeatureFlag.isEnabled(Feature.NEW_ONBOARDING_UPGRADE)) {
+                put("version", "1")
+                put("variant", if (variant == OnboardingUpgradeFeaturesState.NewOnboardingVariant.FEATURES_FIRST) "A" else "B")
+            }
+        }
     }
 }
 

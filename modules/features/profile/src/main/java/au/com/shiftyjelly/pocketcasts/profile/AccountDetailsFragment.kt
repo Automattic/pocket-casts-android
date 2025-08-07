@@ -159,6 +159,7 @@ class AccountDetailsFragment : BaseFragment() {
             onSignOut = { signOut() },
             onDeleteAccount = { deleteAccount() },
             onAccountUpgradeClick = {
+                analyticsTracker.track(AnalyticsEvent.PLUS_PROMOTION_UPGRADE_BUTTON_TAPPED, mapOf("version" to "1"))
                 val onboardingFlow = OnboardingFlow.NewOnboardingAccountUpgrade
                 OnboardingLauncher.openOnboardingFlow(requireActivity(), onboardingFlow)
             },
