@@ -61,6 +61,7 @@ import au.com.shiftyjelly.pocketcasts.compose.preview.ThemePreviewParameterProvi
 import au.com.shiftyjelly.pocketcasts.compose.theme
 import au.com.shiftyjelly.pocketcasts.localization.helper.TimeHelper
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
+import au.com.shiftyjelly.pocketcasts.models.type.SmartRules
 import au.com.shiftyjelly.pocketcasts.models.type.SmartRules.DownloadStatusRule
 import au.com.shiftyjelly.pocketcasts.models.type.SmartRules.EpisodeDurationRule
 import au.com.shiftyjelly.pocketcasts.models.type.SmartRules.MediaTypeRule
@@ -76,6 +77,7 @@ fun AppliedRulesPage(
     playlistTitle: String,
     appliedRules: AppliedRules,
     availableEpisodes: List<PodcastEpisode>,
+    totalEpisodeCount: Int,
     useEpisodeArtwork: Boolean,
     areOtherOptionsExpanded: Boolean,
     onCreatePlaylist: () -> Unit,
@@ -113,6 +115,7 @@ fun AppliedRulesPage(
                     ) {
                         ActiveRulesContent(
                             rules = activeRules,
+                            totalEpisodeCount = totalEpisodeCount,
                             appliedRules = appliedRules,
                             onClickRule = onClickRule,
                         )
@@ -198,6 +201,7 @@ fun AppliedRulesPage(
 private fun ActiveRulesContent(
     rules: List<RuleType>,
     appliedRules: AppliedRules,
+    totalEpisodeCount: Int,
     onClickRule: (RuleType) -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -212,7 +216,7 @@ private fun ActiveRulesContent(
         )
         Rules(
             ruleTypes = rules,
-            description = { rule -> appliedRules.description(rule) },
+            description = { rule -> appliedRules.description(rule, totalEpisodeCount) },
             onClickRule = onClickRule,
         )
     }
@@ -439,7 +443,7 @@ private fun rememberInactiveRules(activeRules: List<RuleType>): List<RuleType> {
 
 @Composable
 @ReadOnlyComposable
-private fun AppliedRules.description(ruleType: RuleType) = when (ruleType) {
+private fun AppliedRules.description(ruleType: RuleType, episodeCount: Int) = when (ruleType) {
     RuleType.Podcasts -> when (podcasts) {
         is PodcastsRule.Any -> stringResource(LR.string.all)
         is PodcastsRule.Selected -> podcasts.uuids.size.toString()
@@ -492,7 +496,7 @@ private fun AppliedRules.description(ruleType: RuleType) = when (ruleType) {
     }
 
     RuleType.EpisodeDuration -> when (episodeDuration) {
-        is EpisodeDurationRule.Any -> stringResource(LR.string.any_duration)
+        is EpisodeDurationRule.Any -> stringResource(LR.string.off)
         is EpisodeDurationRule.Constrained -> {
             val context = LocalContext.current
             val min = TimeHelper.getTimeDurationShortString(episodeDuration.longerThan.inWholeMilliseconds, context)
@@ -516,7 +520,11 @@ private fun AppliedRules.description(ruleType: RuleType) = when (ruleType) {
         null -> null
     }
 
-    RuleType.Starred -> TODO()
+    RuleType.Starred -> when (starred) {
+        SmartRules.StarredRule.Any -> stringResource(LR.string.off)
+        SmartRules.StarredRule.Starred -> episodeCount.toString()
+        null -> null
+    }
 }
 
 @Preview(device = Devices.PORTRAIT_REGULAR)
@@ -530,6 +538,7 @@ private fun AppliedRulesPageNoRulesPreview(
             playlistTitle = "Comedy",
             appliedRules = AppliedRules.Empty,
             availableEpisodes = emptyList(),
+            totalEpisodeCount = 0,
             useEpisodeArtwork = false,
             areOtherOptionsExpanded = expanded,
             onCreatePlaylist = {},
@@ -561,6 +570,7 @@ private fun AppliedRulesPageEpisodessPreview(
                     publishedDate = Date(0),
                 )
             },
+            totalEpisodeCount = 10,
             useEpisodeArtwork = false,
             areOtherOptionsExpanded = expanded,
             onCreatePlaylist = {},
@@ -585,6 +595,7 @@ private fun AppliedRulesPageNoEpisodesPreview(
                 podcasts = PodcastsRule.Any,
             ),
             availableEpisodes = emptyList(),
+            totalEpisodeCount = 0,
             useEpisodeArtwork = false,
             areOtherOptionsExpanded = expanded,
             onCreatePlaylist = {},

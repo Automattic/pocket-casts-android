@@ -2,6 +2,7 @@ package au.com.shiftyjelly.pocketcasts.playlists.create
 
 import app.cash.turbine.Turbine
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
+import au.com.shiftyjelly.pocketcasts.models.to.PlaylistEpisodeMetadata
 import au.com.shiftyjelly.pocketcasts.models.type.SmartRules
 import au.com.shiftyjelly.pocketcasts.repositories.playlist.PlaylistManager
 import au.com.shiftyjelly.pocketcasts.repositories.playlist.PlaylistPreview
@@ -25,6 +26,9 @@ class FakePlaylistManager : PlaylistManager {
 
     val smartEpisodes = MutableStateFlow(emptyList<PodcastEpisode>())
     override fun observeSmartEpisodes(rules: SmartRules) = smartEpisodes.asStateFlow()
+
+    val episodeMetadata = MutableStateFlow(PlaylistEpisodeMetadata.Empty)
+    override fun observeEpisodeMetadata(rules: SmartRules) = episodeMetadata.asStateFlow()
 
     val deletePlaylistTurbine = Turbine<String>(name = "deletePlaylist")
     override suspend fun deletePlaylist(uuid: String) {

@@ -67,6 +67,15 @@ class CreatePlaylistViewModel @AssistedInject constructor(
         }
     }
 
+    private val totalEpisodeCount = appliedRules.flatMapLatest { appliedRules ->
+        val smartRules = appliedRules.toSmartRules()
+        if (smartRules != null) {
+            playlistManager.observeEpisodeMetadata(smartRules).map { it.episodeCount }
+        } else {
+            flowOf(0)
+        }
+    }
+
     private val smartStarredEpisodes = appliedRules.flatMapLatest { appliedRules ->
         val smartRules = appliedRules.toSmartRules() ?: SmartRules.Default
         val starredRules = smartRules.copy(starred = StarredRule.Starred)
@@ -78,6 +87,7 @@ class CreatePlaylistViewModel @AssistedInject constructor(
         rulesBuilder,
         podcastManager.findSubscribedFlow(),
         smartEpisodes,
+        totalEpisodeCount,
         smartStarredEpisodes,
         settings.artworkConfiguration.flow.map { it.useEpisodeArtwork(Element.Filters) },
         ::UiState,
@@ -260,6 +270,7 @@ class CreatePlaylistViewModel @AssistedInject constructor(
         val rulesBuilder: RulesBuilder,
         val followedPodcasts: List<Podcast>,
         val smartEpisodes: List<PodcastEpisode>,
+        val totalEpisodeCount: Int,
         val smartStarredEpisodes: List<PodcastEpisode>,
         val useEpisodeArtwork: Boolean,
     ) {
@@ -268,6 +279,7 @@ class CreatePlaylistViewModel @AssistedInject constructor(
                 appliedRules = AppliedRules.Empty,
                 rulesBuilder = RulesBuilder.Empty,
                 followedPodcasts = emptyList(),
+                totalEpisodeCount = 0,
                 smartEpisodes = emptyList(),
                 smartStarredEpisodes = emptyList(),
                 useEpisodeArtwork = false,

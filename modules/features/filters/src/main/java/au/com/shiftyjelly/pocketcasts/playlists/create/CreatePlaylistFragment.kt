@@ -109,6 +109,7 @@ class CreatePlaylistFragment : BaseDialogFragment() {
                         playlistTitle = viewModel.playlistNameState.text.toString(),
                         appliedRules = uiState.appliedRules,
                         availableEpisodes = uiState.smartEpisodes,
+                        totalEpisodeCount = uiState.totalEpisodeCount,
                         useEpisodeArtwork = uiState.useEpisodeArtwork,
                         areOtherOptionsExpanded = areOtherOptionsExpanded,
                         onCreatePlaylist = viewModel::createSmartPlaylist,
@@ -204,7 +205,7 @@ class CreatePlaylistFragment : BaseDialogFragment() {
                         useEpisodeArtwork = uiState.useEpisodeArtwork,
                         onChangeUseStarredEpisodes = viewModel::useStarredEpisodes,
                         onSaveRule = {
-                            viewModel.applyRule(RuleType.MediaType)
+                            viewModel.applyRule(RuleType.Starred)
                             goBackToPlaylistPreview()
                         },
                         onClickBack = ::goBackToPlaylistPreview,
