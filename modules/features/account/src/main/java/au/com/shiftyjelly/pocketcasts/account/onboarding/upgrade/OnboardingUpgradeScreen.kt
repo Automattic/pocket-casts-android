@@ -30,9 +30,16 @@ import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
 import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.FocusDirection
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.FocusRequester.Companion.FocusRequesterFactory.component1
+import androidx.compose.ui.focus.FocusRequester.Companion.FocusRequesterFactory.component2
+import androidx.compose.ui.focus.focusProperties
+import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.res.painterResource
@@ -181,6 +188,8 @@ private fun CompactHeightUpscaledFontUpgradeScreen(
                     onClickSubscribe = onSubscribePress,
                     onPrivacyPolicyClick = onClickPrivacyPolicy,
                     onTermsAndConditionsClick = onClickTermsAndConditions,
+                    selfFocusRequester = FocusRequester.Default,
+                    upFocusRequester = FocusRequester.Default,
                 )
             }
         }
@@ -198,6 +207,8 @@ private fun RegularUpgradeScreen(
     onClickTermsAndConditions: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
+    val (contentFocusRequester, footerFocusRequester) = remember { FocusRequester.createRefs() }
+
     Column(
         modifier = modifier,
     ) {
@@ -218,6 +229,8 @@ private fun RegularUpgradeScreen(
                 plan = state.selectedBasePlan,
                 source = source,
             ),
+            selfFocusRequester = contentFocusRequester,
+            downFocusRequester = footerFocusRequester,
         )
         Spacer(modifier = Modifier.height(24.dp))
         UpgradeFooter(
@@ -234,6 +247,8 @@ private fun RegularUpgradeScreen(
             onClickSubscribe = onSubscribePress,
             onPrivacyPolicyClick = onClickPrivacyPolicy,
             onTermsAndConditionsClick = onClickTermsAndConditions,
+            selfFocusRequester = footerFocusRequester,
+            upFocusRequester = contentFocusRequester,
         )
     }
 }
@@ -246,10 +261,19 @@ private fun UpgradeFooter(
     onClickSubscribe: () -> Unit,
     onPrivacyPolicyClick: () -> Unit,
     onTermsAndConditionsClick: () -> Unit,
+    upFocusRequester: FocusRequester,
+    selfFocusRequester: FocusRequester,
     modifier: Modifier = Modifier,
 ) {
     Column(
-        modifier = modifier,
+        modifier = modifier.focusRequester(selfFocusRequester)
+            .focusProperties {
+                onExit = {
+                    if (requestedFocusDirection == FocusDirection.Up) {
+                        upFocusRequester.requestFocus()
+                    }
+                }
+            },
     ) {
         plans.forEachIndexed { index, item ->
             UpgradePlanRow(
@@ -489,6 +513,8 @@ private sealed interface UpgradePagerContent {
 @Composable
 private fun UpgradeContent(
     pages: List<UpgradePagerContent>,
+    selfFocusRequester: FocusRequester,
+    downFocusRequester: FocusRequester,
     modifier: Modifier = Modifier,
 ) {
     val coroutineScope = rememberCoroutineScope()
@@ -499,7 +525,21 @@ private fun UpgradeContent(
     ) {
         val itemHeight = this@BoxWithConstraints.maxHeight
         FadedLazyColumn(
-            modifier = Modifier.fillMaxSize(),
+            modifier = Modifier
+                .fillMaxSize()
+                .focusRequester(selfFocusRequester)
+                .focusProperties {
+                    onExit = {
+                        selfFocusRequester.saveFocusedChild()
+
+                        if (this.requestedFocusDirection == FocusDirection.Down) {
+                            downFocusRequester.requestFocus()
+                        }
+                    }
+                    onEnter = {
+                        selfFocusRequester.restoreFocusedChild()
+                    }
+                },
             state = listState,
         ) {
             itemsIndexed(pages) { index, page ->
