@@ -25,6 +25,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
@@ -104,7 +105,8 @@ private fun StarredSwitchRow(
                 value = useStarredEpisodes,
                 onValueChange = onChangeUseStarredEpisodes,
             )
-            .padding(horizontal = 16.dp),
+            .padding(horizontal = 16.dp)
+            .semantics(mergeDescendants = true) {},
     ) {
         Column(
             modifier = Modifier
