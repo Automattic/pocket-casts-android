@@ -12,6 +12,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.util.lerp
 import androidx.core.os.BundleCompat
 import androidx.core.os.bundleOf
+import androidx.core.view.updatePadding
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
@@ -23,6 +24,7 @@ import au.com.shiftyjelly.pocketcasts.compose.AppTheme
 import au.com.shiftyjelly.pocketcasts.compose.extensions.setContentWithViewCompositionStrategy
 import au.com.shiftyjelly.pocketcasts.filters.databinding.SmartPlaylistFragmentBinding
 import au.com.shiftyjelly.pocketcasts.utils.extensions.dpToPx
+import au.com.shiftyjelly.pocketcasts.views.dialog.ConfirmationDialog
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseFragment
 import au.com.shiftyjelly.pocketcasts.views.helper.EpisodeItemTouchHelper
 import au.com.shiftyjelly.pocketcasts.views.helper.HasBackstack
@@ -76,7 +78,7 @@ class SmartPlaylistFragment :
         val rightButton = PlaylistHeaderData.ActionButton(
             iconId = IR.drawable.ic_playlist_play,
             label = getString(LR.string.playlist_play_all),
-            onClick = { Timber.tag("Play all episodes") },
+            onClick = ::playAll,
         )
 
         val headerAdapter = PlaylistHeaderAdapter(
@@ -109,6 +111,12 @@ class SmartPlaylistFragment :
                     }
                     headerAdapter.submitHeader(playlistHeaderData)
                 }
+        }
+        viewLifecycleOwner.lifecycleScope.launch {
+            val initialPadding = content.paddingBottom
+            viewModel.bottomInset.collect { inset ->
+                content.updatePadding(bottom = initialPadding + inset)
+            }
         }
     }
 
@@ -165,6 +173,26 @@ class SmartPlaylistFragment :
                     onClickOptions = { Timber.i("On click options") },
                 )
             }
+        }
+    }
+
+    private fun playAll() {
+        if (parentFragmentManager.findFragmentByTag("confirm_and_play") != null) {
+            return
+        }
+        if (viewModel.shouldShowPlayAllWarning()) {
+            val episodeCount = viewModel.uiState.value.smartPlaylist?.episodes.orEmpty().size
+            val buttonString = getString(LR.string.filters_play_episodes, episodeCount)
+
+            val dialog = ConfirmationDialog()
+                .setTitle(getString(LR.string.filters_play_all))
+                .setSummary(getString(LR.string.filters_play_all_summary))
+                .setIconId(IR.drawable.ic_play_all)
+                .setButtonType(ConfirmationDialog.ButtonType.Danger(buttonString))
+                .setOnConfirm { viewModel.playAll() }
+            dialog.show(parentFragmentManager, "confirm_play_all")
+        } else {
+            viewModel.playAll()
         }
     }
 
