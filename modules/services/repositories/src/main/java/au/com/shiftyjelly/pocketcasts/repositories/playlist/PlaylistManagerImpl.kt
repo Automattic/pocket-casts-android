@@ -14,6 +14,7 @@ import au.com.shiftyjelly.pocketcasts.models.entity.SmartPlaylist.Companion.LAST
 import au.com.shiftyjelly.pocketcasts.models.entity.SmartPlaylist.Companion.LAST_WEEK
 import au.com.shiftyjelly.pocketcasts.models.entity.SmartPlaylist.Companion.SYNC_STATUS_NOT_SYNCED
 import au.com.shiftyjelly.pocketcasts.models.entity.SmartPlaylist.Companion.SYNC_STATUS_SYNCED
+import au.com.shiftyjelly.pocketcasts.models.to.PlaylistEpisodeMetadata
 import au.com.shiftyjelly.pocketcasts.models.type.PlaylistEpisodeSortType
 import au.com.shiftyjelly.pocketcasts.models.type.SmartRules
 import au.com.shiftyjelly.pocketcasts.models.type.SmartRules.DownloadStatusRule
@@ -71,7 +72,7 @@ class PlaylistManagerImpl @Inject constructor(
                         limit = PLAYLIST_ARTWORK_EPISODE_LIMIT,
                     )
                     val episodesFlow = observeSmartEpisodes(playlist.smartRules)
-                    val metadataFlow = playlistDao.observeSmartPlaylistEpisodeMetadata(
+                    val metadataFlow = playlistDao.observeEpisodeMetadata(
                         clock = clock,
                         smartRules = playlist.smartRules,
                     )
@@ -97,6 +98,10 @@ class PlaylistManagerImpl @Inject constructor(
             sortType = PlaylistEpisodeSortType.NewestToOldest,
             limit = SMART_PLAYLIST_EPISODE_LIMIT,
         ).distinctUntilChanged()
+    }
+
+    override fun observeEpisodeMetadata(rules: SmartRules): Flow<PlaylistEpisodeMetadata> {
+        return playlistDao.observeEpisodeMetadata(clock, rules)
     }
 
     override suspend fun deletePlaylist(uuid: String) {
@@ -136,7 +141,7 @@ class PlaylistManagerImpl @Inject constructor(
             sortType = playlist.sortType,
             limit = PLAYLIST_ARTWORK_EPISODE_LIMIT,
         )
-        val episodeCountFlow = playlistDao.observeSmartPlaylistEpisodeMetadata(
+        val episodeCountFlow = playlistDao.observeEpisodeMetadata(
             clock = clock,
             smartRules = playlist.smartRules,
         )

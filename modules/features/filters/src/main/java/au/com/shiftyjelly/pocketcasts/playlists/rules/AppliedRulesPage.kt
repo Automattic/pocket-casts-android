@@ -5,15 +5,12 @@ import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -44,7 +41,6 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.semantics
-import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
@@ -56,40 +52,32 @@ import au.com.shiftyjelly.pocketcasts.compose.Devices
 import au.com.shiftyjelly.pocketcasts.compose.bars.NavigationButton
 import au.com.shiftyjelly.pocketcasts.compose.bars.ThemedTopAppBar
 import au.com.shiftyjelly.pocketcasts.compose.buttons.RowButton
-import au.com.shiftyjelly.pocketcasts.compose.components.EpisodeImage
 import au.com.shiftyjelly.pocketcasts.compose.components.FadedLazyColumn
 import au.com.shiftyjelly.pocketcasts.compose.components.HorizontalDivider
 import au.com.shiftyjelly.pocketcasts.compose.components.NoContentBanner
-import au.com.shiftyjelly.pocketcasts.compose.components.TextC70
 import au.com.shiftyjelly.pocketcasts.compose.components.TextH20
-import au.com.shiftyjelly.pocketcasts.compose.components.TextH40
-import au.com.shiftyjelly.pocketcasts.compose.components.TextH60
 import au.com.shiftyjelly.pocketcasts.compose.components.TextP50
 import au.com.shiftyjelly.pocketcasts.compose.preview.ThemePreviewParameterProvider
-import au.com.shiftyjelly.pocketcasts.compose.text.toAnnotatedString
 import au.com.shiftyjelly.pocketcasts.compose.theme
-import au.com.shiftyjelly.pocketcasts.localization.helper.RelativeDateFormatter
 import au.com.shiftyjelly.pocketcasts.localization.helper.TimeHelper
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
+import au.com.shiftyjelly.pocketcasts.models.type.SmartRules
 import au.com.shiftyjelly.pocketcasts.models.type.SmartRules.DownloadStatusRule
 import au.com.shiftyjelly.pocketcasts.models.type.SmartRules.EpisodeDurationRule
 import au.com.shiftyjelly.pocketcasts.models.type.SmartRules.MediaTypeRule
 import au.com.shiftyjelly.pocketcasts.models.type.SmartRules.PodcastsRule
 import au.com.shiftyjelly.pocketcasts.models.type.SmartRules.ReleaseDateRule
-import au.com.shiftyjelly.pocketcasts.repositories.extensions.getSummaryText
-import au.com.shiftyjelly.pocketcasts.repositories.images.PocketCastsImageRequestFactory.PlaceholderType
-import au.com.shiftyjelly.pocketcasts.ui.extensions.getThemeColor
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme.ThemeType
 import java.util.Date
 import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
-import au.com.shiftyjelly.pocketcasts.ui.R as UR
 
 @Composable
 fun AppliedRulesPage(
     playlistTitle: String,
     appliedRules: AppliedRules,
     availableEpisodes: List<PodcastEpisode>,
+    totalEpisodeCount: Int,
     useEpisodeArtwork: Boolean,
     areOtherOptionsExpanded: Boolean,
     onCreatePlaylist: () -> Unit,
@@ -127,6 +115,7 @@ fun AppliedRulesPage(
                     ) {
                         ActiveRulesContent(
                             rules = activeRules,
+                            totalEpisodeCount = totalEpisodeCount,
                             appliedRules = appliedRules,
                             onClickRule = onClickRule,
                         )
@@ -212,6 +201,7 @@ fun AppliedRulesPage(
 private fun ActiveRulesContent(
     rules: List<RuleType>,
     appliedRules: AppliedRules,
+    totalEpisodeCount: Int,
     onClickRule: (RuleType) -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -226,7 +216,7 @@ private fun ActiveRulesContent(
         )
         Rules(
             ruleTypes = rules,
-            description = { rule -> appliedRules.description(rule) },
+            description = { rule -> appliedRules.description(rule, totalEpisodeCount) },
             onClickRule = onClickRule,
         )
     }
@@ -286,55 +276,6 @@ private fun InactiveRulesContent(
                 )
             }
         }
-    }
-}
-
-@Composable
-private fun EpisodeRow(
-    episode: PodcastEpisode,
-    useEpisodeArtwork: Boolean,
-    modifier: Modifier = Modifier,
-) {
-    Column(
-        modifier = modifier,
-    ) {
-        Row(
-            verticalAlignment = Alignment.CenterVertically,
-            modifier = Modifier
-                .height(IntrinsicSize.Min)
-                .padding(vertical = 12.dp, horizontal = 12.dp),
-        ) {
-            EpisodeImage(
-                episode = episode,
-                useEpisodeArtwork = useEpisodeArtwork,
-                placeholderType = PlaceholderType.Small,
-                corners = 4.dp,
-                modifier = Modifier.size(56.dp),
-            )
-            Spacer(
-                modifier = Modifier.width(12.dp),
-            )
-            Column(
-                verticalArrangement = Arrangement.SpaceBetween,
-                modifier = Modifier.fillMaxHeight(),
-            ) {
-                TextC70(
-                    text = episode.rememberHeaderText(),
-                )
-                TextH40(
-                    text = episode.title,
-                    lineHeight = 15.sp,
-                    maxLines = 2,
-                )
-                TextH60(
-                    text = episode.rememberTimeLeftText(),
-                    color = MaterialTheme.theme.colors.primaryText02,
-                )
-            }
-        }
-        HorizontalDivider(
-            startIndent = 12.dp,
-        )
     }
 }
 
@@ -501,27 +442,8 @@ private fun rememberInactiveRules(activeRules: List<RuleType>): List<RuleType> {
 }
 
 @Composable
-private fun PodcastEpisode.rememberHeaderText(): AnnotatedString {
-    val context = LocalContext.current
-    val formatter = remember(context) { RelativeDateFormatter(context) }
-    return remember(playingStatus, isArchived) {
-        val tintColor = context.getThemeColor(UR.attr.primary_icon_01)
-        val spannable = getSummaryText(formatter, tintColor, showDuration = false, context)
-        spannable.toAnnotatedString()
-    }
-}
-
-@Composable
-private fun PodcastEpisode.rememberTimeLeftText(): String {
-    val context = LocalContext.current
-    return remember(playedUpToMs, durationMs, isInProgress, context) {
-        TimeHelper.getTimeLeft(playedUpToMs, durationMs.toLong(), isInProgress, context).text
-    }
-}
-
-@Composable
 @ReadOnlyComposable
-private fun AppliedRules.description(ruleType: RuleType) = when (ruleType) {
+private fun AppliedRules.description(ruleType: RuleType, episodeCount: Int) = when (ruleType) {
     RuleType.Podcasts -> when (podcasts) {
         is PodcastsRule.Any -> stringResource(LR.string.all)
         is PodcastsRule.Selected -> podcasts.uuids.size.toString()
@@ -574,7 +496,7 @@ private fun AppliedRules.description(ruleType: RuleType) = when (ruleType) {
     }
 
     RuleType.EpisodeDuration -> when (episodeDuration) {
-        is EpisodeDurationRule.Any -> stringResource(LR.string.any_duration)
+        is EpisodeDurationRule.Any -> stringResource(LR.string.off)
         is EpisodeDurationRule.Constrained -> {
             val context = LocalContext.current
             val min = TimeHelper.getTimeDurationShortString(episodeDuration.longerThan.inWholeMilliseconds, context)
@@ -598,7 +520,11 @@ private fun AppliedRules.description(ruleType: RuleType) = when (ruleType) {
         null -> null
     }
 
-    RuleType.Starred -> TODO()
+    RuleType.Starred -> when (starred) {
+        SmartRules.StarredRule.Any -> stringResource(LR.string.off)
+        SmartRules.StarredRule.Starred -> episodeCount.toString()
+        null -> null
+    }
 }
 
 @Preview(device = Devices.PORTRAIT_REGULAR)
@@ -612,6 +538,7 @@ private fun AppliedRulesPageNoRulesPreview(
             playlistTitle = "Comedy",
             appliedRules = AppliedRules.Empty,
             availableEpisodes = emptyList(),
+            totalEpisodeCount = 0,
             useEpisodeArtwork = false,
             areOtherOptionsExpanded = expanded,
             onCreatePlaylist = {},
@@ -643,6 +570,7 @@ private fun AppliedRulesPageEpisodessPreview(
                     publishedDate = Date(0),
                 )
             },
+            totalEpisodeCount = 10,
             useEpisodeArtwork = false,
             areOtherOptionsExpanded = expanded,
             onCreatePlaylist = {},
@@ -667,6 +595,7 @@ private fun AppliedRulesPageNoEpisodesPreview(
                 podcasts = PodcastsRule.Any,
             ),
             availableEpisodes = emptyList(),
+            totalEpisodeCount = 0,
             useEpisodeArtwork = false,
             areOtherOptionsExpanded = expanded,
             onCreatePlaylist = {},
