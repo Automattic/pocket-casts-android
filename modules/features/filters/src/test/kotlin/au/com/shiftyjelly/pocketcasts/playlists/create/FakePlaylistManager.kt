@@ -30,6 +30,13 @@ class FakePlaylistManager : PlaylistManager {
     val episodeMetadata = MutableStateFlow(PlaylistEpisodeMetadata.Empty)
     override fun observeEpisodeMetadata(rules: SmartRules) = episodeMetadata.asStateFlow()
 
+    val updateRulesUuidTurbine = Turbine<String>(name = "updateSmartRules:uuid")
+    val updateRulesRulesTurbine = Turbine<SmartRules>(name = "updateSmartRules:rules")
+    override suspend fun updateSmartRules(uuid: String, rules: SmartRules) {
+        updateRulesUuidTurbine.add(uuid)
+        updateRulesRulesTurbine.add(rules)
+    }
+
     val deletePlaylistTurbine = Turbine<String>(name = "deletePlaylist")
     override suspend fun deletePlaylist(uuid: String) {
         deletePlaylistTurbine.add(uuid)

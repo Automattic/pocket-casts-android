@@ -34,6 +34,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flowOf
 import au.com.shiftyjelly.pocketcasts.models.entity.SmartPlaylist as DbPlaylist
@@ -65,24 +66,26 @@ class PlaylistManagerImpl @Inject constructor(
                 if (playlist == null) {
                     flowOf(null)
                 } else {
+                    val smartRules = playlist.smartRules
                     val podcastsFlow = playlistDao.observeSmartPlaylistPodcasts(
                         clock = clock,
-                        smartRules = playlist.smartRules,
+                        smartRules = smartRules,
                         sortType = playlist.sortType,
                         limit = PLAYLIST_ARTWORK_EPISODE_LIMIT,
                     )
-                    val episodesFlow = observeSmartEpisodes(playlist.smartRules)
+                    val episodesFlow = observeSmartEpisodes(smartRules)
                     val metadataFlow = playlistDao.observeEpisodeMetadata(
                         clock = clock,
-                        smartRules = playlist.smartRules,
+                        smartRules = smartRules,
                     )
                     combine(podcastsFlow, episodesFlow, metadataFlow) { podcasts, episodes, metadata ->
                         SmartPlaylist(
                             uuid = playlist.uuid,
                             title = playlist.title,
+                            smartRules = smartRules,
+                            episodes = episodes,
                             totalEpisodeCount = metadata.episodeCount,
                             playbackDurationLeft = metadata.timeLeftSeconds.seconds,
-                            episodes = episodes,
                             artworkPodcasts = podcasts,
                         )
                     }.keepPodcastEpisodesSynced()
@@ -102,6 +105,19 @@ class PlaylistManagerImpl @Inject constructor(
 
     override fun observeEpisodeMetadata(rules: SmartRules): Flow<PlaylistEpisodeMetadata> {
         return playlistDao.observeEpisodeMetadata(clock, rules)
+    }
+
+    override suspend fun updateSmartRules(uuid: String, rules: SmartRules) {
+        appDatabase.withTransaction {
+            val playlist = playlistDao
+                .observeSmartPlaylist(uuid)
+                .first()
+                ?.applySmartRules(rules)
+                ?.copy(syncStatus = SYNC_STATUS_NOT_SYNCED)
+            if (playlist != null) {
+                playlistDao.upsertSmartPlaylist(playlist)
+            }
+        }
     }
 
     override suspend fun deletePlaylist(uuid: String) {
@@ -225,6 +241,9 @@ class PlaylistManagerImpl @Inject constructor(
         } else {
             SYNC_STATUS_NOT_SYNCED
         },
+    ).applySmartRules(rules)
+
+    private fun DbPlaylist.applySmartRules(rules: SmartRules) = copy(
         unplayed = rules.episodeStatus.unplayed,
         partiallyPlayed = rules.episodeStatus.inProgress,
         finished = rules.episodeStatus.completed,
