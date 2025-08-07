@@ -23,6 +23,7 @@ import au.com.shiftyjelly.pocketcasts.PlaylistEpisodesAdapterFactory
 import au.com.shiftyjelly.pocketcasts.compose.AppTheme
 import au.com.shiftyjelly.pocketcasts.compose.extensions.setContentWithViewCompositionStrategy
 import au.com.shiftyjelly.pocketcasts.filters.databinding.SmartPlaylistFragmentBinding
+import au.com.shiftyjelly.pocketcasts.playlists.edit.SmartRulesEditFragment
 import au.com.shiftyjelly.pocketcasts.utils.extensions.dpToPx
 import au.com.shiftyjelly.pocketcasts.views.dialog.ConfirmationDialog
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseFragment
@@ -73,7 +74,7 @@ class SmartPlaylistFragment :
         val leftButton = PlaylistHeaderData.ActionButton(
             iconId = IR.drawable.ic_playlist_smart_rules,
             label = getString(LR.string.smart_rules),
-            onClick = { Timber.tag("Edit smart rules") },
+            onClick = ::openEditor,
         )
         val rightButton = PlaylistHeaderData.ActionButton(
             iconId = IR.drawable.ic_playlist_play,
@@ -194,6 +195,13 @@ class SmartPlaylistFragment :
         } else {
             viewModel.playAll()
         }
+    }
+
+    private fun openEditor() {
+        if (parentFragmentManager.findFragmentByTag("playlist_editor") != null) {
+            return
+        }
+        SmartRulesEditFragment.newInstance(args.playlistUuid).show(parentFragmentManager, "playlist_editor")
     }
 
     override fun onBackPressed(): Boolean {
