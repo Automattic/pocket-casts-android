@@ -9,7 +9,9 @@ import androidx.compose.foundation.focusable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -78,7 +80,7 @@ fun PreselectChaptersAnimation(modifier: Modifier = Modifier) {
         modifier = modifier
             .semantics(mergeDescendants = true) { role = Role.Image }
             .focusable(false),
-        verticalArrangement = Arrangement.spacedBy(6.dp),
+        verticalArrangement = Arrangement.Center,
     ) {
         predefinedChapters.forEachIndexed { index, item ->
             ChapterRow(
@@ -86,6 +88,9 @@ fun PreselectChaptersAnimation(modifier: Modifier = Modifier) {
                 chapterData = item,
                 animatedState = animationTriggers[index].value,
             )
+            if (index != predefinedChapters.lastIndex) {
+                Spacer(modifier = Modifier.height(6.dp))
+            }
         }
     }
 }
