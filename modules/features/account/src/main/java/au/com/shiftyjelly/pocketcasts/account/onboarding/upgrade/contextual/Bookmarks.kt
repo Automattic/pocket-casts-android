@@ -12,7 +12,6 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.focusable
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -33,6 +32,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.TransformOrigin
@@ -50,6 +50,8 @@ import au.com.shiftyjelly.pocketcasts.compose.AppTheme
 import au.com.shiftyjelly.pocketcasts.compose.components.TextP40
 import au.com.shiftyjelly.pocketcasts.compose.preview.ThemePreviewParameterProvider
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
+import com.google.common.collect.Comparators.max
+import kotlin.math.abs
 import kotlin.random.Random
 import kotlinx.coroutines.delay
 import au.com.shiftyjelly.pocketcasts.images.R as IR
@@ -63,17 +65,18 @@ private data class AnimationParams(
 @Composable
 fun BookmarksAnimation(
     modifier: Modifier = Modifier,
-    bookmarks: List<BookmarkConfig> = demoBookmarks,
+    bookmarks: List<BookmarkConfig> = predefinedBookmarks,
 ) {
-    val centerOffsetTolerance = LocalDensity.current.run {
-        24.dp.toPx().toInt()
+    val centerYOffsetPx = LocalDensity.current.run {
+        8.dp.toPx().toInt()
     }
     val animationTriggers = remember {
         List(bookmarks.size) {
+            val totalOffset = (bookmarks.size - 1) * centerYOffsetPx
             mutableStateOf(
                 AnimationParams(
                     shouldStart = false,
-                    centerOffset = IntOffset(Random.nextInt(centerOffsetTolerance), Random.nextInt(centerOffsetTolerance)),
+                    centerOffset = IntOffset(x = 0, y = totalOffset - (it * centerYOffsetPx)),
                     rotationOffset = Random.nextInt(10),
                 ),
             )
@@ -91,24 +94,21 @@ fun BookmarksAnimation(
         modifier = modifier
             .semantics(mergeDescendants = true) { role = Role.Image }
             .focusable(false),
-        contentAlignment = Alignment.TopCenter,
+        contentAlignment = Alignment.Center,
     ) {
-        val itemWidth = this.maxWidth * .4f
+        val itemWidth = this.maxWidth * .56f
         bookmarks.forEachIndexed { index, item ->
             val animParams = animationTriggers[index].value
-            val startRotation = if (index % 2 == 0) {
-                30 - animParams.rotationOffset
+            val rotationDirection = if (index % 2 == 0) {
+                1
             } else {
-                -30 + animParams.rotationOffset
+                -1
             }
-            val endRotation = if (index % 2 == 0) {
-                0 + animParams.rotationOffset
-            } else {
-                0 - animParams.rotationOffset
-            }
+            val startRotation = (30 + abs(item.endRotationDegree)).toInt() * rotationDirection
+            val endRotation = item.endRotationDegree.toInt()
             Bookmark(
                 modifier = Modifier
-                    .widthIn(max = itemWidth)
+                    .widthIn(min = 230.dp, max = max(230.dp, itemWidth))
                     .aspectRatio(1f),
                 bookmarkConfig = item,
                 startAnimation = animationTriggers[index].value.shouldStart,
@@ -120,27 +120,30 @@ fun BookmarksAnimation(
     }
 }
 
-private val demoBookmarks = listOf(
+private val predefinedBookmarks = listOf(
     BookmarkConfig(
         backgroundStartColor = Color(0xffE4D820),
         backgroundEndColor = Color(0xffE8A92C),
-        artworkResId = IR.drawable.artwork_0,
+        artworkResId = IR.drawable.artwork_12,
         text = "Amazing quote!",
-        timestamp = "19:50",
+        timestamp = "19:05",
+        endRotationDegree = 9.6f,
     ),
     BookmarkConfig(
         backgroundStartColor = Color(0xffFF9D00),
         backgroundEndColor = Color(0xffEC4034),
-        artworkResId = IR.drawable.artwork_3,
+        artworkResId = IR.drawable.artwork_10,
         text = "This bit cracks me up",
-        timestamp = "6:10",
+        timestamp = "6:45",
+        endRotationDegree = -7.48f,
     ),
     BookmarkConfig(
         backgroundStartColor = Color(0xff27D9E9),
         backgroundEndColor = Color(0xff0202FE),
-        artworkResId = IR.drawable.artwork_4,
+        artworkResId = IR.drawable.artwork_11,
         text = "Love this part!",
         timestamp = "6:45",
+        endRotationDegree = 5.72f,
     ),
 )
 
@@ -150,6 +153,7 @@ data class BookmarkConfig(
     @DrawableRes val artworkResId: Int,
     val text: String,
     val timestamp: String,
+    val endRotationDegree: Float,
 )
 
 @Composable
@@ -205,12 +209,16 @@ private fun Bookmark(
             }
             .clip(RoundedCornerShape(13.dp))
             .background(
-                brush = Brush.linearGradient(colors = listOf(bookmarkConfig.backgroundStartColor, bookmarkConfig.backgroundEndColor)),
+                brush = Brush.linearGradient(
+                    colors = listOf(bookmarkConfig.backgroundStartColor, bookmarkConfig.backgroundEndColor),
+                    start = Offset.Zero,
+                    end = Offset.Infinite,
+                ),
                 shape = RoundedCornerShape(13.dp),
             )
-            .padding(25.dp),
+            .padding(vertical = 25.dp, horizontal = 12.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.spacedBy(17.dp),
+        verticalArrangement = Arrangement.SpaceBetween,
     ) {
         Image(
             modifier = Modifier
@@ -254,7 +262,7 @@ private fun PreviewBookmark(
     @PreviewParameter(ThemePreviewParameterProvider::class) theme: Theme.ThemeType,
 ) = AppTheme(theme) {
     Column {
-        demoBookmarks.forEach {
+        predefinedBookmarks.forEach {
             Bookmark(
                 bookmarkConfig = it,
                 modifier = Modifier

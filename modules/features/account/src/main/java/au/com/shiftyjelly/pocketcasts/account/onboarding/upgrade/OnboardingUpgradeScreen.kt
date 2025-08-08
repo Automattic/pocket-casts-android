@@ -705,7 +705,8 @@ private fun BookmarksUpgradeContent(
         BookmarksAnimation(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(bottom = 42.dp),
+                .weight(1f)
+                .padding(bottom = 24.dp),
         )
     }
 }
