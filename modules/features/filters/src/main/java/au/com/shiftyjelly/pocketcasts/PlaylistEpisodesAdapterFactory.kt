@@ -105,6 +105,10 @@ class PlaylistEpisodesAdapterFactory @Inject constructor(
         return adapter
     }
 
+    fun startMultiSelecting() {
+        multiSelectHelper.isMultiSelecting = true
+    }
+
     private fun configureDependencies(
         getAdapter: () -> EpisodeListAdapter,
         multiSelectToolbar: MultiSelectToolbar,

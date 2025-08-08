@@ -3,6 +3,7 @@ package au.com.shiftyjelly.pocketcasts.playlists.create
 import app.cash.turbine.Turbine
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.models.to.PlaylistEpisodeMetadata
+import au.com.shiftyjelly.pocketcasts.models.type.PlaylistEpisodeSortType
 import au.com.shiftyjelly.pocketcasts.models.type.SmartRules
 import au.com.shiftyjelly.pocketcasts.repositories.playlist.PlaylistManager
 import au.com.shiftyjelly.pocketcasts.repositories.playlist.PlaylistPreview
@@ -25,7 +26,7 @@ class FakePlaylistManager : PlaylistManager {
     }
 
     val smartEpisodes = MutableStateFlow(emptyList<PodcastEpisode>())
-    override fun observeSmartEpisodes(rules: SmartRules) = smartEpisodes.asStateFlow()
+    override fun observeSmartEpisodes(rules: SmartRules, sortType: PlaylistEpisodeSortType) = smartEpisodes.asStateFlow()
 
     val episodeMetadata = MutableStateFlow(PlaylistEpisodeMetadata.Empty)
     override fun observeEpisodeMetadata(rules: SmartRules) = episodeMetadata.asStateFlow()
@@ -35,6 +36,13 @@ class FakePlaylistManager : PlaylistManager {
     override suspend fun updateSmartRules(uuid: String, rules: SmartRules) {
         updateRulesUuidTurbine.add(uuid)
         updateRulesRulesTurbine.add(rules)
+    }
+
+    val updateSortTypeUuidTurbine = Turbine<String>(name = "updateSmartRules:uuid")
+    val updateSortTypeSortTypeTurbine = Turbine<PlaylistEpisodeSortType>(name = "updateSmartSortType:rules")
+    override suspend fun updateSortType(uuid: String, sortType: PlaylistEpisodeSortType) {
+        updateSortTypeUuidTurbine.add(uuid)
+        updateSortTypeSortTypeTurbine.add(sortType)
     }
 
     val deletePlaylistTurbine = Turbine<String>(name = "deletePlaylist")

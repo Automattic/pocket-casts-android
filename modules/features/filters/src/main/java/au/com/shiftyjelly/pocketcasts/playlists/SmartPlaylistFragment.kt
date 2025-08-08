@@ -23,6 +23,7 @@ import au.com.shiftyjelly.pocketcasts.PlaylistEpisodesAdapterFactory
 import au.com.shiftyjelly.pocketcasts.compose.AppTheme
 import au.com.shiftyjelly.pocketcasts.compose.extensions.setContentWithViewCompositionStrategy
 import au.com.shiftyjelly.pocketcasts.filters.databinding.SmartPlaylistFragmentBinding
+import au.com.shiftyjelly.pocketcasts.playlists.edit.SmartPlaylistsOptionsFragment
 import au.com.shiftyjelly.pocketcasts.playlists.edit.SmartRulesEditFragment
 import au.com.shiftyjelly.pocketcasts.utils.extensions.dpToPx
 import au.com.shiftyjelly.pocketcasts.views.dialog.ConfirmationDialog
@@ -115,9 +116,18 @@ class SmartPlaylistFragment :
         }
         viewLifecycleOwner.lifecycleScope.launch {
             val initialPadding = content.paddingBottom
-            viewModel.bottomInset.collect { inset ->
-                content.updatePadding(bottom = initialPadding + inset)
-            }
+            viewModel.bottomInset
+                .flowWithLifecycle(viewLifecycleOwner.lifecycle)
+                .collect { inset ->
+                    content.updatePadding(bottom = initialPadding + inset)
+                }
+        }
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewModel.startMultiSelectingSignal
+                .flowWithLifecycle(viewLifecycleOwner.lifecycle)
+                .collect {
+                    adapterFactory.startMultiSelecting()
+                }
         }
     }
 
@@ -171,7 +181,7 @@ class SmartPlaylistFragment :
                         @Suppress("DEPRECATION")
                         requireActivity().onBackPressed()
                     },
-                    onClickOptions = { Timber.i("On click options") },
+                    onClickOptions = ::openOptionsSheet,
                 )
             }
         }
@@ -202,6 +212,13 @@ class SmartPlaylistFragment :
             return
         }
         SmartRulesEditFragment.newInstance(args.playlistUuid).show(parentFragmentManager, "playlist_editor")
+    }
+
+    private fun openOptionsSheet() {
+        if (childFragmentManager.findFragmentByTag("playlist_options_sheet") != null) {
+            return
+        }
+        SmartPlaylistsOptionsFragment().show(childFragmentManager, "playlist_options_sheet")
     }
 
     override fun onBackPressed(): Boolean {

@@ -939,7 +939,11 @@
     <string name="new_playlists_title_placeholder">Playlist’s title</string>
     <string name="new_smart_playlist_banner_body">Automatically add episodes based on rules</string>
     <string name="new_smart_playlist_banner_title">Make into Smart Playlist</string>
+    <string name="playlist_download_all">Download All</string>
+    <string name="playlist_options">Playlist Options</string>
     <string name="playlist_play_all">Play All</string>
+    <string name="playlist_select_episodes">Select Episodes</string>
+    <string name="playlist_sort_by">Sort By</string>
     <string name="playlists">Playlists</string>
     <string name="playlists_empty_state_body">Playlists let you organize episodes manually or automatically with Smart Rules.</string>
     <string name="playlists_empty_state_title">Organize episodes your way</string>
