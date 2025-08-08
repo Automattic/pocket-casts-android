@@ -54,7 +54,6 @@ import au.com.shiftyjelly.pocketcasts.compose.components.TextP40
 import au.com.shiftyjelly.pocketcasts.compose.preview.ThemePreviewParameterProvider
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import kotlin.math.abs
-import kotlin.math.max
 import kotlin.random.Random
 import kotlinx.coroutines.delay
 import au.com.shiftyjelly.pocketcasts.images.R as IR
@@ -121,12 +120,9 @@ fun BookmarksAnimation(
             }
         },
     ) { measurables, constraints ->
-        // limit children width not to exceed half of parent width but still have a min width that aligns with figma
         val placeables = measurables.map {
             it.measure(
-                Constraints.fixedWidth(
-                    max(FIGMA_WIDTH_DP.dp.roundToPx(), (constraints.maxWidth * .5f).toInt()),
-                ),
+                Constraints.fixedWidth(FIGMA_WIDTH_DP.dp.roundToPx()),
             )
         }
         val maxHeight = placeables.maxOf { it.height }
