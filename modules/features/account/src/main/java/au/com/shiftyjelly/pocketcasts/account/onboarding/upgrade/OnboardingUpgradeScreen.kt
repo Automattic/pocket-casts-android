@@ -727,7 +727,9 @@ private fun ShuffleUpgradeContent(
 
         ShuffleAnimation(
             modifier = Modifier
-                .padding(horizontal = 32.dp),
+                .weight(1f)
+                .padding(horizontal = 24.dp)
+                .padding(bottom = 32.dp),
         )
     }
 }
