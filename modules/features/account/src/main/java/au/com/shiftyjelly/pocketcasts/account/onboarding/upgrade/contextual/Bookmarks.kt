@@ -12,7 +12,6 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.focusable
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.aspectRatio
@@ -37,21 +36,25 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.TransformOrigin
 import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.layout.Layout
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.role
 import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
+import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import au.com.shiftyjelly.pocketcasts.compose.AppTheme
 import au.com.shiftyjelly.pocketcasts.compose.components.TextP40
 import au.com.shiftyjelly.pocketcasts.compose.preview.ThemePreviewParameterProvider
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
-import com.google.common.collect.Comparators.max
 import kotlin.math.abs
+import kotlin.math.max
 import kotlin.random.Random
 import kotlinx.coroutines.delay
 import au.com.shiftyjelly.pocketcasts.images.R as IR
@@ -61,6 +64,8 @@ private data class AnimationParams(
     val centerOffset: IntOffset,
     val rotationOffset: Int,
 )
+
+private const val FIGMA_WIDTH_DP = 202
 
 @Composable
 fun BookmarksAnimation(
@@ -90,32 +95,48 @@ fun BookmarksAnimation(
         }
     }
 
-    BoxWithConstraints(
+    Layout(
         modifier = modifier
             .semantics(mergeDescendants = true) { role = Role.Image }
             .focusable(false),
-        contentAlignment = Alignment.Center,
-    ) {
-        val itemWidth = this.maxWidth * .56f
-        bookmarks.forEachIndexed { index, item ->
-            val animParams = animationTriggers[index].value
-            val rotationDirection = if (index % 2 == 0) {
-                1
-            } else {
-                -1
+        content = {
+            bookmarks.forEachIndexed { index, item ->
+                val animParams = animationTriggers[index].value
+                val rotationDirection = if (index % 2 == 0) {
+                    1
+                } else {
+                    -1
+                }
+                val startRotation = (30 + abs(item.endRotationDegree)).toInt() * rotationDirection
+                val endRotation = item.endRotationDegree.toInt()
+                Bookmark(
+                    modifier = Modifier
+                        .aspectRatio(FIGMA_WIDTH_DP / 219f),
+                    bookmarkConfig = item,
+                    startAnimation = animationTriggers[index].value.shouldStart,
+                    centerOffset = animParams.centerOffset,
+                    startRotation = startRotation,
+                    endRotation = endRotation,
+                )
             }
-            val startRotation = (30 + abs(item.endRotationDegree)).toInt() * rotationDirection
-            val endRotation = item.endRotationDegree.toInt()
-            Bookmark(
-                modifier = Modifier
-                    .widthIn(min = 230.dp, max = max(230.dp, itemWidth))
-                    .aspectRatio(1f),
-                bookmarkConfig = item,
-                startAnimation = animationTriggers[index].value.shouldStart,
-                centerOffset = animParams.centerOffset,
-                startRotation = startRotation,
-                endRotation = endRotation,
+        },
+    ) { measurables, constraints ->
+        // limit children width not to exceed half of parent width but still have a min width that aligns with figma
+        val placeables = measurables.map {
+            it.measure(
+                Constraints.fixedWidth(
+                    max(FIGMA_WIDTH_DP.dp.roundToPx(), (constraints.maxWidth * .5f).toInt()),
+                ),
             )
+        }
+        val maxHeight = placeables.maxOf { it.height }
+        layout(constraints.maxWidth, maxHeight) {
+            placeables.forEachIndexed { index, item ->
+                item.placeRelative(
+                    x = (constraints.maxWidth - item.width) / 2,
+                    y = 0,
+                )
+            }
         }
     }
 }
@@ -195,6 +216,10 @@ private fun Bookmark(
         }
     }
 
+    val gradientStartPx = LocalDensity.current.run {
+        24.dp.toPx()
+    }
+
     Column(
         modifier = modifier
             .offset {
@@ -211,8 +236,7 @@ private fun Bookmark(
             .background(
                 brush = Brush.linearGradient(
                     colors = listOf(bookmarkConfig.backgroundStartColor, bookmarkConfig.backgroundEndColor),
-                    start = Offset.Zero,
-                    end = Offset.Infinite,
+                    start = Offset(x = gradientStartPx, y = gradientStartPx),
                 ),
                 shape = RoundedCornerShape(13.dp),
             )
@@ -222,7 +246,7 @@ private fun Bookmark(
     ) {
         Image(
             modifier = Modifier
-                .size(77.dp)
+                .size(78.dp)
                 .clip(RoundedCornerShape(8.dp)),
             painter = painterResource(bookmarkConfig.artworkResId),
             contentDescription = "",
@@ -231,6 +255,8 @@ private fun Bookmark(
             text = bookmarkConfig.text,
             color = Color.White,
             disableAutoScale = true,
+            fontWeight = FontWeight.W500,
+            lineHeight = 20.sp,
         )
         Row(
             modifier = Modifier
@@ -240,7 +266,7 @@ private fun Bookmark(
                 .background(color = Color.White, shape = RoundedCornerShape(18.dp))
                 .padding(horizontal = 17.dp, vertical = 8.dp),
             verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy(10.dp),
+            horizontalArrangement = Arrangement.spacedBy(11.dp),
         ) {
             TextP40(
                 text = bookmarkConfig.timestamp,
