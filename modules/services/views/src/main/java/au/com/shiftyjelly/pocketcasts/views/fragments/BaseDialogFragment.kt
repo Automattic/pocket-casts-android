@@ -17,11 +17,11 @@ import androidx.compose.foundation.layout.safeDrawing
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.movableContentOf
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.dp
+import androidx.core.content.ContextCompat
 import androidx.core.graphics.ColorUtils
 import androidx.core.view.WindowInsetsControllerCompat
 import androidx.core.view.doOnLayout
@@ -32,6 +32,7 @@ import au.com.shiftyjelly.pocketcasts.ui.helper.FragmentHostListener
 import au.com.shiftyjelly.pocketcasts.ui.helper.NavigationBarColor
 import au.com.shiftyjelly.pocketcasts.ui.helper.StatusBarIconColor
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
+import au.com.shiftyjelly.pocketcasts.views.R
 import au.com.shiftyjelly.pocketcasts.views.extensions.setSystemWindowInsetToPadding
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialog
@@ -185,6 +186,9 @@ open class BaseDialogFragment :
             Background(useThemeBackground) {
                 DialogContent(modifier, content)
             }
+        }
+        LaunchedEffect(Unit) {
+            bottomSheetView()?.background = ContextCompat.getDrawable(requireContext(), R.drawable.background_dialog_fragment)
         }
     }
 
