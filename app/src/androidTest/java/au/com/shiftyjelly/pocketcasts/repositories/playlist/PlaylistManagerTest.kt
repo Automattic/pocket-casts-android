@@ -885,9 +885,10 @@ class PlaylistManagerTest {
                     uuid = "playlist-id",
                     title = "Title 1",
                     smartRules = SmartRules.Default,
+                    episodes = emptyList(),
+                    episodeSortType = PlaylistEpisodeSortType.NewestToOldest,
                     totalEpisodeCount = 0,
                     playbackDurationLeft = Duration.ZERO,
-                    episodes = emptyList(),
                     artworkPodcasts = emptyList(),
                 ),
                 awaitItem(),
@@ -987,6 +988,20 @@ class PlaylistManagerTest {
             episodeDao.insert(baseEpisode.copy(uuid = "id-5", duration = 0.0, playedUpTo = 10.0))
             playlist = awaitItem()
             assertEquals(40.seconds, playlist?.playbackDurationLeft)
+        }
+    }
+
+    @Test
+    fun updateSortType() = runTest(testDispatcher) {
+        playlistDao.upsertSmartPlaylist(DbPlaylist(uuid = "playlist-id", title = "Title 1"))
+
+        manager.observeSmartPlaylist("playlist-id").test {
+            var playlist = awaitItem()
+            assertEquals(PlaylistEpisodeSortType.NewestToOldest, playlist?.episodeSortType)
+
+            manager.updateSortType("playlist-id", PlaylistEpisodeSortType.ShortestToLongest)
+            playlist = awaitItem()
+            assertEquals(PlaylistEpisodeSortType.ShortestToLongest, playlist?.episodeSortType)
         }
     }
 }
