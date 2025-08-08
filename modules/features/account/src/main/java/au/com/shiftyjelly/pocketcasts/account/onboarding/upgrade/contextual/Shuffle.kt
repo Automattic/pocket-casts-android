@@ -34,7 +34,6 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.Layout
 import androidx.compose.ui.platform.LocalConfiguration
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.pluralStringResource
@@ -57,12 +56,12 @@ import au.com.shiftyjelly.pocketcasts.compose.components.TextP60
 import au.com.shiftyjelly.pocketcasts.compose.preview.ThemePreviewParameterProvider
 import au.com.shiftyjelly.pocketcasts.compose.theme
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
-import au.com.shiftyjelly.pocketcasts.utils.Util
 import java.time.Instant
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
 import java.time.format.FormatStyle
 import java.time.temporal.ChronoUnit
+import java.util.Calendar
 import kotlin.random.Random
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -86,6 +85,7 @@ fun ShuffleAnimation(
         modifier = modifier
             .semantics(mergeDescendants = true) { role = Role.Image }
             .focusable(false),
+        contentAlignment = Alignment.Center,
     ) {
         predefinedShuffle.chunked(3).forEachIndexed { index, dataSet ->
             ShuffleContainer(
@@ -118,58 +118,95 @@ private data class ShuffleConfig(
 
 private val predefinedShuffle = listOf(
     ShuffleConfig(
-        artworkResId = IR.drawable.artwork_0,
-        date = Instant.now().minus(Random.nextLong(60L), ChronoUnit.DAYS),
-        title = "The Sunday Read",
-        durationSeconds = Random.nextInt(7200),
-    ),
-    ShuffleConfig(
-        artworkResId = IR.drawable.artwork_1,
-        date = Instant.now().minus(Random.nextLong(60L), ChronoUnit.DAYS),
+        artworkResId = IR.drawable.artwork_8,
+        date = Instant.ofEpochMilli(
+            Calendar.getInstance().apply {
+                set(Calendar.DAY_OF_MONTH, 29)
+                set(Calendar.MONTH, 5)
+                set(Calendar.YEAR, 2024)
+            }.timeInMillis,
+        ),
         title = "What have you done today",
         durationSeconds = Random.nextInt(7200),
     ),
     ShuffleConfig(
-        artworkResId = IR.drawable.artwork_2,
+        artworkResId = IR.drawable.artwork_4,
+        date = Instant.ofEpochMilli(
+            Calendar.getInstance().apply {
+                set(Calendar.DAY_OF_MONTH, 12)
+                set(Calendar.MONTH, 6)
+                set(Calendar.YEAR, 2025)
+            }.timeInMillis,
+        ),
+        title = "The Sunday Read",
+        durationSeconds = 32 * 60,
+    ),
+    ShuffleConfig(
+        artworkResId = IR.drawable.artwork_9,
         date = Instant.now().minus(Random.nextLong(60L), ChronoUnit.DAYS),
         title = "800: Jane Doe",
-        durationSeconds = Random.nextInt(7200),
+        durationSeconds = 115 * 60,
     ),
     ShuffleConfig(
         artworkResId = IR.drawable.artwork_3,
-        date = Instant.now().minus(Random.nextLong(60L), ChronoUnit.DAYS),
+        date = Instant.ofEpochMilli(
+            Calendar.getInstance().apply {
+                set(Calendar.DAY_OF_MONTH, 13)
+                set(Calendar.MONTH, 1)
+                set(Calendar.YEAR, 2025)
+            }.timeInMillis,
+        ),
         title = "Can Lex rebuild the Coalition?",
         durationSeconds = Random.nextInt(7200),
     ),
     ShuffleConfig(
-        artworkResId = IR.drawable.artwork_4,
-        date = Instant.now().minus(Random.nextLong(60L), ChronoUnit.DAYS),
+        artworkResId = IR.drawable.artwork_0,
+        date = Instant.ofEpochMilli(
+            Calendar.getInstance().apply {
+                set(Calendar.DAY_OF_MONTH, 12)
+                set(Calendar.MONTH, 2)
+                set(Calendar.YEAR, 2025)
+            }.timeInMillis,
+        ),
         title = "David Bezmozgis Reads \"From, to\"",
-        durationSeconds = Random.nextInt(7200),
+        durationSeconds = 47 * 60,
+    ),
+    ShuffleConfig(
+        artworkResId = IR.drawable.artwork_2,
+        date = Instant.now().minus(Random.nextLong(60L), ChronoUnit.DAYS),
+        title = "The Trial of Sean Combs",
+        durationSeconds = 94 * 60,
     ),
     ShuffleConfig(
         artworkResId = IR.drawable.artwork_5,
-        date = Instant.now().minus(Random.nextLong(60L), ChronoUnit.DAYS),
-        title = "The Trial of Sean Combs",
+        date = Instant.ofEpochMilli(
+            Calendar.getInstance().apply {
+                set(Calendar.DAY_OF_MONTH, 12)
+                set(Calendar.MONTH, 5)
+                set(Calendar.YEAR, 2024)
+            }.timeInMillis,
+        ),
+
+        title = "El poder que tendrá León XIV",
         durationSeconds = Random.nextInt(7200),
     ),
     ShuffleConfig(
         artworkResId = IR.drawable.artwork_6,
-        date = Instant.now().minus(Random.nextLong(60L), ChronoUnit.DAYS),
+        date = Instant.ofEpochMilli(
+            Calendar.getInstance().apply {
+                set(Calendar.DAY_OF_MONTH, 18)
+                set(Calendar.MONTH, 5)
+                set(Calendar.YEAR, 2025)
+            }.timeInMillis,
+        ),
         title = "Jason played The Switch 2",
-        durationSeconds = Random.nextInt(7200),
+        durationSeconds = 56 * 60,
     ),
     ShuffleConfig(
         artworkResId = IR.drawable.artwork_7,
         date = Instant.now().minus(Random.nextLong(60L), ChronoUnit.DAYS),
         title = "887: Burgertory",
-        durationSeconds = Random.nextInt(7200),
-    ),
-    ShuffleConfig(
-        artworkResId = IR.drawable.artwork_8,
-        date = Instant.now().minus(Random.nextLong(60L), ChronoUnit.DAYS),
-        title = "A Knight's Tale",
-        durationSeconds = Random.nextInt(7200),
+        durationSeconds = 83 * 60,
     ),
 )
 
@@ -320,10 +357,6 @@ private fun ShuffleItem(
             }
         }
     }
-    val isTablet = Util.isTablet(LocalContext.current)
-    val iconSize = if (isTablet) 64.dp else 48.dp
-    val secondaryTextSize = if (isTablet) 14.sp else 10.sp
-    val mainTextSize = if (isTablet) 18.sp else 14.sp
 
     Card(
         modifier = modifier
@@ -347,7 +380,7 @@ private fun ShuffleItem(
         ) {
             Image(
                 modifier = Modifier
-                    .size(iconSize)
+                    .size(48.dp)
                     .clip(RoundedCornerShape(3.dp)),
                 painter = painterResource(config.artworkResId),
                 contentDescription = "",
@@ -356,14 +389,14 @@ private fun ShuffleItem(
                 verticalArrangement = Arrangement.spacedBy(1.dp),
             ) {
                 TextH70(
-                    fontSize = secondaryTextSize,
+                    fontSize = 10.sp,
                     text = dateFormatter.format(config.date).toUpperCase(Locale.current),
                     color = MaterialTheme.theme.colors.primaryText02,
                     modifier = Modifier.fillMaxWidth(),
                     disableAutoScale = true,
                 )
                 TextP60(
-                    fontSize = mainTextSize,
+                    fontSize = 14.sp,
                     text = config.title,
                     fontWeight = FontWeight.W500,
                     modifier = Modifier.fillMaxWidth(),
@@ -372,7 +405,7 @@ private fun ShuffleItem(
                     disableAutoScale = true,
                 )
                 TextH70(
-                    fontSize = secondaryTextSize,
+                    fontSize = 10.sp,
                     text = formatDuration(config.durationSeconds),
                     color = MaterialTheme.theme.colors.primaryText02,
                     modifier = Modifier.fillMaxWidth(),
