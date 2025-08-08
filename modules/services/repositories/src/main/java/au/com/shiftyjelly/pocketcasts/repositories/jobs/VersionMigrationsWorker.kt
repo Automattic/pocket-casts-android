@@ -27,6 +27,8 @@ import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
 import au.com.shiftyjelly.pocketcasts.repositories.sync.SyncManager
 import au.com.shiftyjelly.pocketcasts.utils.FileUtil
 import au.com.shiftyjelly.pocketcasts.utils.Util
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
@@ -196,6 +198,7 @@ class VersionMigrationsWorker @AssistedInject constructor(
         // don't migrate when first installing
         if (previousVersionCode == 0) {
             settings.setWhatsNewVersionCode(Settings.WHATS_NEW_VERSION_CODE)
+            configurePlaylistForNewUsersOnboarding()
             return
         }
 
@@ -321,5 +324,11 @@ class VersionMigrationsWorker @AssistedInject constructor(
 
     private fun enableDynamicColors() {
         settings.useDynamicColorsForWidget.set(true, updateModifiedAt = true)
+    }
+
+    private fun configurePlaylistForNewUsersOnboarding() {
+        if (FeatureFlag.isEnabled(Feature.PLAYLISTS_REBRANDING, immutable = true)) {
+            settings.showPlaylistsOnboarding.set(false, updateModifiedAt = false)
+        }
     }
 }
