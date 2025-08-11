@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
@@ -36,6 +37,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.scale
 import androidx.compose.ui.focus.FocusDirection
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.FocusRequester.Companion.FocusRequesterFactory.component1
@@ -45,6 +47,7 @@ import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -78,6 +81,7 @@ import au.com.shiftyjelly.pocketcasts.payment.SubscriptionPlans
 import au.com.shiftyjelly.pocketcasts.payment.SubscriptionTier
 import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingUpgradeSource
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme.ThemeType
+import au.com.shiftyjelly.pocketcasts.utils.Util
 import java.time.ZonedDateTime
 import java.time.format.DateTimeFormatter
 import java.time.format.FormatStyle
@@ -170,7 +174,7 @@ private fun CompactHeightUpscaledFontUpgradeScreen(
                             listState.animateScrollToItem((index + 1) % contentPages.size)
                         }
                     }
-                    content.toComponent(index = index, scrollToNext = scrollToNext)()
+                    content.toComponent(index = index, scrollToNext = scrollToNext, modifier = Modifier.height(IntrinsicSize.Min))()
                 }
             }
             item {
@@ -269,7 +273,8 @@ private fun UpgradeFooter(
     modifier: Modifier = Modifier,
 ) {
     Column(
-        modifier = modifier.focusRequester(selfFocusRequester)
+        modifier = modifier
+            .focusRequester(selfFocusRequester)
             .focusProperties {
                 onExit = {
                     if (requestedFocusDirection == FocusDirection.Up) {
@@ -543,7 +548,8 @@ private fun UpgradeContent(
             itemsIndexed(pages) { index, page ->
                 val bringIntoViewRequester = remember { BringIntoViewRequester() }
 
-                val baseModifier = Modifier.heightIn(min = itemHeight)
+                val baseModifier = Modifier
+                    .heightIn(min = itemHeight)
                     .bringIntoViewRequester(bringIntoViewRequester)
                     .onFocusChanged { focusState ->
                         if (focusState.isFocused) {
@@ -680,10 +686,30 @@ private fun FoldersUpgradeContent(
             color = MaterialTheme.theme.colors.primaryInteractive01,
         )
 
-        FoldersAnimation(
-            modifier = Modifier
-                .fillMaxWidth(),
-        )
+        val isTablet = Util.isTablet(LocalContext.current)
+        val widthFraction = if (isTablet) {
+            0.7f
+        } else {
+            1f
+        }
+        val scaleFactor = if (isTablet) {
+            1.4f
+        } else {
+            1f
+        }
+
+        Box(
+            modifier = Modifier.fillMaxWidth()
+                .weight(1f)
+                .padding(bottom = 32.dp),
+            contentAlignment = Alignment.Center,
+        ) {
+            FoldersAnimation(
+                modifier = Modifier
+                    .fillMaxWidth(widthFraction)
+                    .scale(scaleFactor),
+            )
+        }
     }
 }
 
@@ -702,11 +728,31 @@ private fun BookmarksUpgradeContent(
             color = MaterialTheme.theme.colors.primaryInteractive01,
         )
 
-        BookmarksAnimation(
+        val isTablet = Util.isTablet(LocalContext.current)
+        val widthFraction = if (isTablet) {
+            0.6f
+        } else {
+            1f
+        }
+        val scaleFactor = if (isTablet) {
+            1.8f
+        } else {
+            1f
+        }
+        Box(
             modifier = Modifier
+                .weight(1f)
                 .fillMaxWidth()
-                .padding(bottom = 42.dp),
-        )
+                .padding(horizontal = 24.dp * scaleFactor)
+                .padding(bottom = 24.dp),
+            contentAlignment = Alignment.Center,
+        ) {
+            BookmarksAnimation(
+                modifier = Modifier
+                    .fillMaxWidth(widthFraction)
+                    .scale(scaleFactor),
+            )
+        }
     }
 }
 
@@ -725,10 +771,31 @@ private fun ShuffleUpgradeContent(
             color = MaterialTheme.theme.colors.primaryInteractive01,
         )
 
-        ShuffleAnimation(
+        val isTablet = Util.isTablet(LocalContext.current)
+        val widthFraction = if (isTablet) {
+            0.5f
+        } else {
+            1f
+        }
+        val scaleFactor = if (isTablet) {
+            1.8f
+        } else {
+            1f
+        }
+        Box(
             modifier = Modifier
-                .padding(horizontal = 32.dp),
-        )
+                .weight(1f)
+                .fillMaxWidth()
+                .padding(horizontal = 24.dp * scaleFactor)
+                .padding(bottom = 32.dp),
+            contentAlignment = Alignment.Center,
+        ) {
+            ShuffleAnimation(
+                modifier = Modifier
+                    .fillMaxWidth(widthFraction)
+                    .scale(scaleFactor),
+            )
+        }
     }
 }
 
@@ -747,12 +814,31 @@ private fun PreselectChaptersUpgradeContent(
             color = MaterialTheme.theme.colors.primaryInteractive01,
         )
 
-        PreselectChaptersAnimation(
+        val isTablet = Util.isTablet(LocalContext.current)
+        val widthFraction = if (isTablet) {
+            0.45f
+        } else {
+            1f
+        }
+        val scaleFactor = if (isTablet) {
+            2f
+        } else {
+            1f
+        }
+        Box(
             modifier = Modifier
+                .weight(1f)
                 .fillMaxWidth()
-                .padding(horizontal = 32.dp)
-                .padding(bottom = 64.dp),
-        )
+                .padding(horizontal = 24.dp * scaleFactor)
+                .padding(bottom = 48.dp),
+            contentAlignment = Alignment.Center,
+        ) {
+            PreselectChaptersAnimation(
+                modifier = Modifier
+                    .fillMaxWidth(widthFraction)
+                    .scale(scaleFactor),
+            )
+        }
     }
 }
 
