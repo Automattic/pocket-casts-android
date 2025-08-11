@@ -4,6 +4,7 @@ import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.Easing
+import androidx.compose.animation.core.FastOutLinearInEasing
 import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.animateFloat
@@ -32,6 +33,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
@@ -39,6 +41,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.TransformOrigin
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.Layout
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -50,11 +53,13 @@ import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import au.com.shiftyjelly.pocketcasts.compose.AppTheme
 import au.com.shiftyjelly.pocketcasts.compose.components.TextH30
 import au.com.shiftyjelly.pocketcasts.compose.preview.ThemePreviewParameterProvider
 import au.com.shiftyjelly.pocketcasts.compose.theme
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
+import au.com.shiftyjelly.pocketcasts.utils.Util
 import kotlin.math.min
 import kotlin.random.Random
 import kotlinx.coroutines.delay
@@ -66,6 +71,7 @@ private data class TileConfig(
     val index: Int,
     @DrawableRes val drawableResId: Int?,
     val anchor: TransformOrigin,
+    val isElevated: Boolean = false,
 )
 
 private data class FolderConfig(
@@ -94,6 +100,7 @@ private val predefinedTiles = (1..8).map {
             7 -> TransformOrigin(0f, 0f)
             else -> TransformOrigin(0f, 0f)
         },
+        isElevated = it == 2,
     )
 }
 
@@ -134,7 +141,7 @@ fun FoldersAnimation(
     var showFolders by remember { mutableStateOf(false) }
 
     LaunchedEffect("showFolders") {
-        delay(500)
+        delay(600)
         showFolders = true
     }
 
@@ -142,12 +149,13 @@ fun FoldersAnimation(
         modifier = modifier
             .semantics(mergeDescendants = true) { role = Role.Image }
             .focusable(false),
+        contentAlignment = Alignment.Center,
     ) {
         if (showFolders) {
             FolderRow(
                 modifier = Modifier
-                    .fillMaxHeight()
-                    .padding(vertical = 24.dp),
+                    .padding(top = 24.dp)
+                    .fillMaxHeight(),
                 left = folders[0],
                 center = folders[1],
                 right = folders[2],
@@ -164,12 +172,13 @@ fun FoldersAnimation(
 private fun TileRows(
     tiles: List<TileConfig>,
     modifier: Modifier = Modifier,
+    animationDelayMillis: Int = 600,
 ) {
     var edgeTilesVisible by remember { mutableStateOf(true) }
     val edgeFadeTransition = updateTransition(edgeTilesVisible, "edge tiles fade")
     val edgeFade by edgeFadeTransition.animateFloat(
         transitionSpec = {
-            tween(durationMillis = 400, easing = FastOutSlowInEasing)
+            tween(durationMillis = 400, easing = FastOutLinearInEasing, delayMillis = animationDelayMillis)
         },
         label = "alphaAnimation",
     ) { isVisible ->
@@ -194,7 +203,7 @@ private fun TileRows(
             launch {
                 entry.value.animateTo(
                     0.6f,
-                    animationSpec = tween(durationMillis = 900, easing = LinearEasing, delayMillis = index * 50),
+                    animationSpec = tween(durationMillis = 700, easing = FastOutSlowInEasing, delayMillis = index * 60 + animationDelayMillis + 150),
                 )
             }
         }
@@ -202,9 +211,10 @@ private fun TileRows(
 
     Column(
         modifier = modifier,
-        verticalArrangement = Arrangement.spacedBy(12.dp),
+        verticalArrangement = Arrangement.Center,
     ) {
-        tiles.chunked(4).forEach { rowTiles ->
+        val rows = tiles.chunked(4)
+        rows.forEachIndexed { index, rowTiles ->
             TruncatedRow(
                 modifier = Modifier.fillMaxWidth(),
             ) {
@@ -225,6 +235,9 @@ private fun TileRows(
                             },
                     )
                 }
+            }
+            if (index != rows.lastIndex) {
+                Spacer(modifier = Modifier.height(12.dp))
             }
         }
     }
@@ -295,20 +308,23 @@ private fun FolderRow(
                 spec = left,
                 startTransition = animationStarters[0].value,
                 alphaTargetValue = 0.33f,
+                scaleFactor = edgeFolderSizePercent / 100f,
             )
             Folder(
                 modifier = Modifier.aspectRatio(1f),
                 spec = center,
                 startTransition = animationStarters[1].value,
                 floatInOffset = 24.dp,
-                animationDurationMillis = 400,
+                animationDurationMillis = 300,
                 easing = LinearEasing,
+                animationDelayMillis = 400,
             )
             Folder(
                 modifier = Modifier.aspectRatio(1f),
                 spec = right,
                 startTransition = animationStarters[2].value,
                 alphaTargetValue = 0.66f,
+                scaleFactor = edgeFolderSizePercent / 100f,
             )
         },
     ) { measurables, constraints ->
@@ -359,6 +375,17 @@ private fun Tile(
     tileConfig.drawableResId?.let {
         Image(
             modifier = modifier
+                .then(
+                    if (tileConfig.isElevated) {
+                        Modifier.graphicsLayer {
+                            shadowElevation = 8.dp.toPx()
+                            shape = RoundedCornerShape(8.dp)
+                            clip = false
+                        }
+                    } else {
+                        Modifier
+                    },
+                )
                 .clip(RoundedCornerShape(8.dp)),
             painter = painterResource(it),
             contentDescription = "",
@@ -375,8 +402,10 @@ private fun Folder(
     floatInOffset: Dp = 64.dp,
     titleTopPadding: Dp = 14.dp,
     animationDurationMillis: Int = 900,
+    animationDelayMillis: Int = 0,
     easing: Easing = FastOutSlowInEasing,
     alphaTargetValue: Float = 1f,
+    scaleFactor: Float = 1f,
 ) {
     val floatInOffsetPx = LocalDensity.current.run {
         floatInOffset.toPx()
@@ -384,7 +413,7 @@ private fun Folder(
     val transition = updateTransition(startTransition)
     val alphaAnim by transition.animateFloat(
         transitionSpec = {
-            tween(durationMillis = animationDurationMillis, easing = easing)
+            tween(durationMillis = animationDurationMillis, easing = easing, delayMillis = animationDelayMillis)
         },
     ) { isVisible ->
         if (isVisible) {
@@ -395,7 +424,7 @@ private fun Folder(
     }
     val translationYAnim by transition.animateFloat(
         transitionSpec = {
-            tween(durationMillis = animationDurationMillis, easing = easing)
+            tween(durationMillis = animationDurationMillis, easing = easing, delayMillis = animationDelayMillis)
         },
     ) { isVisible ->
         if (isVisible) {
@@ -405,6 +434,12 @@ private fun Folder(
         }
     }
 
+    val titleSize = if (Util.isTablet(LocalContext.current)) {
+        26.sp
+    } else {
+        18.sp
+    }
+
     Layout(
         modifier = modifier
             .graphicsLayer {
@@ -412,11 +447,11 @@ private fun Folder(
                 translationY = translationYAnim
             }
             .wrapContentSize()
-            .clip(RoundedCornerShape(32.dp))
-            .background(color = spec.color, shape = RoundedCornerShape(32.dp))
+            .clip(RoundedCornerShape(32.dp * scaleFactor))
+            .background(color = spec.color, shape = RoundedCornerShape(32.dp * scaleFactor))
             .background(brush = Brush.linearGradient(colors = listOf(Color.Transparent, Color.Black.copy(alpha = .2f))))
-            .padding(top = 20.dp, bottom = 12.dp)
-            .padding(horizontal = 20.dp),
+            .padding(top = 20.dp * scaleFactor, bottom = 12.dp * scaleFactor)
+            .padding(horizontal = 20.dp * scaleFactor),
         content = {
             spec.tiles.take(4).forEach {
                 Tile(
@@ -429,13 +464,15 @@ private fun Folder(
                 color = MaterialTheme.theme.colors.primaryInteractive02,
                 maxLines = 1,
                 disableAutoScale = true,
+                fontScale = scaleFactor,
+                fontSize = titleSize,
             )
         },
     ) { measurables, constraints ->
-        val spacingPx = spacing.roundToPx()
+        val spacingPx = (spacing * scaleFactor).roundToPx()
         val itemSizeHorizontal = (constraints.maxWidth - spacingPx) / 2
-        val itemSizeVertical = (constraints.maxHeight - spacingPx) / 2 - titleTopPadding.toPx()
-        val itemSize = min(itemSizeHorizontal, itemSizeVertical.toInt())
+        val itemSizeVertical = (constraints.maxHeight - spacingPx) / 2 - (titleTopPadding * scaleFactor).roundToPx()
+        val itemSize = min(itemSizeHorizontal, itemSizeVertical)
         val placeables = measurables.mapIndexed { index, item ->
             if (index >= 4) {
                 item.measure(constraints)
@@ -490,6 +527,7 @@ private fun PreviewFolder(
                 tiles = predefinedTiles.take(4),
             ),
             startTransition = true,
+            scaleFactor = .6f,
         )
     }
 }
