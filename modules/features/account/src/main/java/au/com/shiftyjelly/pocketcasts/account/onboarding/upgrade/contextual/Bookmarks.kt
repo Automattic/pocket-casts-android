@@ -64,7 +64,7 @@ private data class AnimationParams(
     val rotationOffset: Int,
 )
 
-private const val FIGMA_WIDTH_DP = 202
+private const val WIDTH_DP = 202
 
 @Composable
 fun BookmarksAnimation(
@@ -110,7 +110,7 @@ fun BookmarksAnimation(
                 val endRotation = item.endRotationDegree.toInt()
                 Bookmark(
                     modifier = Modifier
-                        .aspectRatio(FIGMA_WIDTH_DP / 219f),
+                        .aspectRatio(WIDTH_DP / 219f),
                     bookmarkConfig = item,
                     startAnimation = animationTriggers[index].value.shouldStart,
                     centerOffset = animParams.centerOffset,
@@ -122,7 +122,7 @@ fun BookmarksAnimation(
     ) { measurables, constraints ->
         val placeables = measurables.map {
             it.measure(
-                Constraints.fixedWidth(FIGMA_WIDTH_DP.dp.roundToPx()),
+                Constraints.fixedWidth(WIDTH_DP.dp.roundToPx()),
             )
         }
         val maxHeight = placeables.maxOf { it.height }

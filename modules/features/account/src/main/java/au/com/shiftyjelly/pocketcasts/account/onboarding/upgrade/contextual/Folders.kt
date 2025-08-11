@@ -434,7 +434,11 @@ private fun Folder(
         }
     }
 
-    val titleSize = if (Util.isTablet(LocalContext.current)) { 26.sp } else { 18.sp }
+    val titleSize = if (Util.isTablet(LocalContext.current)) {
+        26.sp
+    } else {
+        18.sp
+    }
 
     Layout(
         modifier = modifier
