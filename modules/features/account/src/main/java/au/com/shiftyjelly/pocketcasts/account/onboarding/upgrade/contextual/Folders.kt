@@ -33,6 +33,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
@@ -40,6 +41,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.TransformOrigin
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.Layout
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -51,11 +53,13 @@ import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import au.com.shiftyjelly.pocketcasts.compose.AppTheme
 import au.com.shiftyjelly.pocketcasts.compose.components.TextH30
 import au.com.shiftyjelly.pocketcasts.compose.preview.ThemePreviewParameterProvider
 import au.com.shiftyjelly.pocketcasts.compose.theme
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
+import au.com.shiftyjelly.pocketcasts.utils.Util
 import kotlin.math.min
 import kotlin.random.Random
 import kotlinx.coroutines.delay
@@ -145,12 +149,13 @@ fun FoldersAnimation(
         modifier = modifier
             .semantics(mergeDescendants = true) { role = Role.Image }
             .focusable(false),
+        contentAlignment = Alignment.Center,
     ) {
         if (showFolders) {
             FolderRow(
                 modifier = Modifier
-                    .fillMaxHeight()
-                    .padding(vertical = 24.dp),
+                    .padding(top = 24.dp)
+                    .fillMaxHeight(),
                 left = folders[0],
                 center = folders[1],
                 right = folders[2],
@@ -206,9 +211,10 @@ private fun TileRows(
 
     Column(
         modifier = modifier,
-        verticalArrangement = Arrangement.spacedBy(12.dp),
+        verticalArrangement = Arrangement.Center,
     ) {
-        tiles.chunked(4).forEach { rowTiles ->
+        val rows = tiles.chunked(4)
+        rows.forEachIndexed { index, rowTiles ->
             TruncatedRow(
                 modifier = Modifier.fillMaxWidth(),
             ) {
@@ -229,6 +235,9 @@ private fun TileRows(
                             },
                     )
                 }
+            }
+            if (index != rows.lastIndex) {
+                Spacer(modifier = Modifier.height(12.dp))
             }
         }
     }
@@ -425,6 +434,8 @@ private fun Folder(
         }
     }
 
+    val titleSize = if (Util.isTablet(LocalContext.current)) { 26.sp } else { 18.sp }
+
     Layout(
         modifier = modifier
             .graphicsLayer {
@@ -450,6 +461,7 @@ private fun Folder(
                 maxLines = 1,
                 disableAutoScale = true,
                 fontScale = scaleFactor,
+                fontSize = titleSize,
             )
         },
     ) { measurables, constraints ->

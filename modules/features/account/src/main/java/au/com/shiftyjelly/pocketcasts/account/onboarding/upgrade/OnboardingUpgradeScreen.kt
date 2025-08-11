@@ -686,10 +686,30 @@ private fun FoldersUpgradeContent(
             color = MaterialTheme.theme.colors.primaryInteractive01,
         )
 
-        FoldersAnimation(
-            modifier = Modifier
-                .fillMaxWidth(),
-        )
+        val isTablet = Util.isTablet(LocalContext.current)
+        val widthFraction = if (isTablet) {
+            0.7f
+        } else {
+            1f
+        }
+        val scaleFactor = if (isTablet) {
+            1.4f
+        } else {
+            1f
+        }
+
+        Box(
+            modifier = Modifier.fillMaxWidth()
+                .weight(1f)
+                .padding(bottom = 32.dp),
+            contentAlignment = Alignment.Center,
+        ) {
+            FoldersAnimation(
+                modifier = Modifier
+                    .fillMaxWidth(widthFraction)
+                    .scale(scaleFactor),
+            )
+        }
     }
 }
 
