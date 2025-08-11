@@ -732,6 +732,26 @@
         <item quantity="one">second</item>
         <item quantity="other">seconds</item>
     </plurals>
+   <!-- A short form representing days. Some like 1 d, 2 d, etc. -->
+    <plurals name="day_short">
+        <item quantity="one">d</item>
+        <item quantity="other">d</item>
+    </plurals>
+    <!-- A short form representing hours. Some like 1 hr, 2 hrs, etc. -->
+    <plurals name="hour_short">
+        <item quantity="one">hr</item>
+        <item quantity="other">hrs</item>
+    </plurals>
+    <!-- A short form representing minutes. Some like 1 min, 2 mins, etc. -->
+    <plurals name="minute_short">
+        <item quantity="one">min</item>
+        <item quantity="other">mins</item>
+    </plurals>
+    <!-- A short form representing seconds. Some like 1 sec, 2 secs, etc. -->
+    <plurals name="second_short">
+        <item quantity="one">sec</item>
+        <item quantity="other">secs</item>
+    </plurals>
     <!-- %1$s is a podcast's title -->
     <string name="notifications_enabled_message">We’ll notify you with new episodes of %1$s.</string>
     <string name="podcast_header_redesign_title">We’ve made some changes!</string>
@@ -913,6 +933,7 @@
     <string name="playlists_onboarding_playlist_title">Introducing Playlists</string>
     <string name="playlists_onboarding_playlist_description">Want more control? Manual Playlists let you build custom queues, great for trips, themes, or just your current vibe. Whether Smart or Manual, playlists work the way you do.</string>
     <string name="smart_playlist">Smart Playlist</string>
+    <string name="smart_rules">Smart Rules</string>
     <string name="playlists_empty_state_title">Organize episodes your way</string>
     <string name="playlists_empty_state_body">Playlists let you organize episodes manually or automatically with Smart Rules.</string>
     <string name="new_playlist">New Playlist</string>
@@ -927,6 +948,9 @@
     <string name="smart_rule_podcasts_title">Choose Podcasts</string>
     <string name="smart_rule_podcasts_all_label">All Followed Podcasts</string>
     <string name="smart_rule_podcasts_all_description">New podcasts you follow will be automatically added.</string>
+    <string name="smart_rule_podcasts_all_description_disabled">New podcasts you follow will not be automatically added.</string>
+    <string name="smart_rule_podcasts_select_all">Select All</string>
+    <string name="smart_rule_podcasts_deselect_all">Deselect All</string>
     <string name="save_smart_rule">Save Smart Rule</string>
     <string name="enabled_rules">Enabled Rules</string>
     <!-- %1$s is playlist's title -->
@@ -939,6 +963,9 @@
     <string name="increment_longer_than_duration">Increment \"longer than\" duration</string>
     <string name="decrement_shorter_than_duration">Decrement \"shorter than\" duration</string>
     <string name="increment_shorter_than_duration">Increment \"shorter than\" duration</string>
+    <string name="playlist_play_all">Play All</string>
+    <string name="smart_playlist_no_content_title">No episodes</string>
+    <string name="smart_playlist_no_content_body">Either it’s time to celebrate completing this list, or edit your rules to get some more.</string>
 
     <!-- Profile -->
 

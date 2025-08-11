@@ -17,7 +17,7 @@
 
 [versions]
 aboutlibraries = "12.2.0"
-android-gradle-plugin = "8.11.1"
+android-gradle-plugin = "8.12.0"
 billing = "8.0.0"
 coil = "2.7.0"
 compose = "2025.05.01" # https://developer.android.com/jetpack/compose/bom/bom-mapping
@@ -35,11 +35,11 @@ kotlin = "2.2.0"
 kotlin-coroutines = "1.10.2"
 ksp = "2.2.0-2.0.2"
 ktlint = "1.7.1"
-ktlint-compose-rules = "0.4.26"
+ktlint-compose-rules = "0.4.27"
 lifecycle = "2.9.2"
 lottie = "6.6.7"
 measure-builds = "3.2.1"
-media3 = "1.7.1"
+media3 = "1.8.0"
 mockito = "5.18.0"
 mockito-kotlin = "6.0.0"
 moshi = "1.15.2"
@@ -84,7 +84,7 @@ compose-material = { module = "androidx.compose.material:material" }
 compose-material-icons-core = { module = "androidx.compose.material:material-icons-core" }
 compose-material-icons-extended = { module = "androidx.compose.material:material-icons-extended" }
 compose-material3 = { module = "androidx.compose.material3:material3" }
-compose-material3-adaptive = "androidx.compose.material3.adaptive:adaptive:1.2.0-alpha09" # Using alpha version until breakpoint APIs are available
+compose-material3-adaptive = "androidx.compose.material3.adaptive:adaptive:1.2.0-alpha10" # Using alpha version until breakpoint APIs are available
 compose-runtime = { module = "androidx.compose.runtime:runtime" }
 compose-rxjava2 = { module = "androidx.compose.runtime:runtime-rxjava2" }
 compose-ui = { module = "androidx.compose.ui:ui" }
@@ -239,7 +239,7 @@ automattic-tracks = { module = "com.automattic:Automattic-Tracks-Android", versi
 automattic-explat = { module = "com.automattic.tracks:experimentation", version.ref = "tracks" }
 
 # Wear
-wear-input = "androidx.wear:wear-input:1.2.0-alpha04"
+wear-input = "androidx.wear:wear-input:1.2.0-beta01"
 wear-remote-interactions = "androidx.wear:wear-remote-interactions:1.1.0"
 wear-tooling-preview = "androidx.wear:wear-tooling-preview:1.0.0"
 
@@ -271,7 +271,7 @@ androidx-recyclerview = "androidx.recyclerview:recyclerview:1.4.0"
 androidx-swiperefreshlayout = "androidx.swiperefreshlayout:swiperefreshlayout:1.1.0"
 androidx-uiautomator = "androidx.test.uiautomator:uiautomator:2.3.0"
 androidx-viewpager = "androidx.viewpager2:viewpager2:1.1.0"
-appsflyer = "com.appsflyer:af-android-sdk:6.17.0"
+appsflyer = "com.appsflyer:af-android-sdk:6.17.1"
 capturable = "dev.shreyaspatil:capturable:3.0.1"
 compose-webview = "io.github.kevinnzou:compose-webview:0.33.6"
 desugar-jdk = "com.android.tools:desugar_jdk_libs:2.1.5"
