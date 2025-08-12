@@ -62,8 +62,8 @@ internal fun EnableNotificationsPromptScreen(
         isAccountCreationFlagEnabled = false,
         isNotificationSelected = false,
         isNewsletterSelected = false,
-        onNotificationChanged = {},
-        onNewsletterChanged = {}
+        onNotificationChange = {},
+        onNewsletterChange = {},
     )
 }
 
@@ -72,9 +72,9 @@ internal fun EnableNotificationsPromptScreenNewOnboarding(
     onCtaClick: () -> Unit,
     onDismissClick: () -> Unit,
     isNewsletterSelected: Boolean,
-    onNewsletterChanged: (Boolean) -> Unit,
+    onNewsletterChange: (Boolean) -> Unit,
     isNotificationSelected: Boolean,
-    onNotificationChanged: (Boolean) -> Unit,
+    onNotificationChange: (Boolean) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     EnableNotificationsPromptScreenV2(
@@ -84,11 +84,10 @@ internal fun EnableNotificationsPromptScreenNewOnboarding(
         isAccountCreationFlagEnabled = true,
         isNotificationSelected = isNotificationSelected,
         isNewsletterSelected = isNewsletterSelected,
-        onNotificationChanged = onNotificationChanged,
-        onNewsletterChanged = onNewsletterChanged
+        onNotificationChange = onNotificationChange,
+        onNewsletterChange = onNewsletterChange,
     )
 }
-
 
 @Composable
 private fun EnableNotificationsPromptScreenV2(
@@ -96,9 +95,9 @@ private fun EnableNotificationsPromptScreenV2(
     onDismissClick: () -> Unit,
     isAccountCreationFlagEnabled: Boolean,
     isNewsletterSelected: Boolean,
-    onNewsletterChanged: (Boolean) -> Unit,
+    onNewsletterChange: (Boolean) -> Unit,
     isNotificationSelected: Boolean,
-    onNotificationChanged: (Boolean) -> Unit,
+    onNotificationChange: (Boolean) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val configuration = LocalConfiguration.current
@@ -152,17 +151,17 @@ private fun EnableNotificationsPromptScreenV2(
                             modifier = Modifier
                                 .fillMaxWidth(),
                             isSelected = isNewsletterSelected,
-                            onSelectedChanged = onNewsletterChanged,
+                            onSelectedChange = onNewsletterChange,
                             title = stringResource(LR.string.onboarding_notification_popup_newsletter),
-                            subTitle = stringResource(LR.string.onboarding_notification_popup_newsletter_message)
+                            subTitle = stringResource(LR.string.onboarding_notification_popup_newsletter_message),
                         )
                         Spacer(modifier = Modifier.height(18.dp))
                         CheckboxRow(
                             modifier = Modifier.fillMaxWidth(),
                             isSelected = isNotificationSelected,
-                            onSelectedChanged = onNotificationChanged,
+                            onSelectedChange = onNotificationChange,
                             title = stringResource(LR.string.onboarding_notification_popup_notifications),
-                            subTitle = stringResource(LR.string.onboarding_notification_popup_notifications_message)
+                            subTitle = stringResource(LR.string.onboarding_notification_popup_notifications_message),
                         )
                         Spacer(modifier = Modifier.height(24.dp))
                         RowButton(
@@ -215,17 +214,17 @@ private fun EnableNotificationsPromptScreenV2(
                     modifier = Modifier
                         .fillMaxWidth(),
                     isSelected = isNewsletterSelected,
-                    onSelectedChanged = onNewsletterChanged,
+                    onSelectedChange = onNewsletterChange,
                     title = stringResource(LR.string.onboarding_notification_popup_newsletter),
-                    subTitle = stringResource(LR.string.onboarding_notification_popup_newsletter_message)
+                    subTitle = stringResource(LR.string.onboarding_notification_popup_newsletter_message),
                 )
                 Spacer(modifier = Modifier.height(18.dp))
                 CheckboxRow(
                     modifier = Modifier.fillMaxWidth(),
                     isSelected = isNotificationSelected,
-                    onSelectedChanged = onNotificationChanged,
+                    onSelectedChange = onNotificationChange,
                     title = stringResource(LR.string.onboarding_notification_popup_notifications),
-                    subTitle = stringResource(LR.string.onboarding_notification_popup_notifications_message)
+                    subTitle = stringResource(LR.string.onboarding_notification_popup_notifications_message),
                 )
                 Spacer(modifier = Modifier.height(24.dp))
                 RowButton(
@@ -259,10 +258,10 @@ private fun EnableNotificationsPromptScreenV2(
 @Composable
 private fun CheckboxRow(
     isSelected: Boolean,
-    onSelectedChanged: (Boolean) -> Unit,
+    onSelectedChange: (Boolean) -> Unit,
     title: String,
     subTitle: String,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
     Row(
         verticalAlignment = Alignment.CenterVertically,
@@ -271,13 +270,13 @@ private fun CheckboxRow(
             .toggleable(
                 value = isSelected,
                 role = Role.Checkbox,
-                onValueChange = onSelectedChanged,
+                onValueChange = onSelectedChange,
             ),
     ) {
         CircularCheckBox(
             modifier = Modifier.size(24.dp),
             isChecked = isSelected,
-            onCheckedChange = onSelectedChanged,
+            onCheckedChange = onSelectedChange,
         )
         Column(
             modifier = Modifier.weight(1f),
@@ -290,7 +289,7 @@ private fun CheckboxRow(
             TextP60(
                 text = subTitle,
                 modifier = Modifier.fillMaxWidth(),
-                color = MaterialTheme.theme.colors.primaryText01.copy(alpha = .4f)
+                color = MaterialTheme.theme.colors.primaryText01.copy(alpha = .4f),
             )
         }
     }
@@ -313,7 +312,7 @@ private fun CircularCheckBox(
                     Modifier.background(color = MaterialTheme.theme.colors.primaryIcon01)
                 } else {
                     Modifier.border(width = 2.dp, color = MaterialTheme.theme.colors.primaryInteractive01, shape = CircleShape)
-                }
+                },
             ),
         contentAlignment = Alignment.Center,
     ) {
@@ -321,7 +320,7 @@ private fun CircularCheckBox(
             Icon(
                 painter = painterResource(IR.drawable.ic_checkmark_small),
                 tint = MaterialTheme.theme.colors.primaryUi01,
-                contentDescription = ""
+                contentDescription = "",
             )
         }
     }
@@ -348,7 +347,7 @@ private fun EnableNotificationsPromptScreenV2Preview(
         onCtaClick = {},
         isNewsletterSelected = true,
         isNotificationSelected = false,
-        onNotificationChanged = {},
-        onNewsletterChanged = {}
+        onNotificationChange = {},
+        onNewsletterChange = {},
     )
 }
