@@ -1,6 +1,7 @@
 package au.com.shiftyjelly.pocketcasts.repositories.playlist
 
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
+import au.com.shiftyjelly.pocketcasts.models.to.PlaylistEpisodeMetadata
 import au.com.shiftyjelly.pocketcasts.models.type.SmartRules
 import kotlinx.coroutines.flow.Flow
 
@@ -10,6 +11,8 @@ interface PlaylistManager {
     fun observeSmartPlaylist(uuid: String): Flow<SmartPlaylist?>
 
     fun observeSmartEpisodes(rules: SmartRules): Flow<List<PodcastEpisode>>
+
+    fun observeEpisodeMetadata(rules: SmartRules): Flow<PlaylistEpisodeMetadata>
 
     suspend fun deletePlaylist(uuid: String)
 
