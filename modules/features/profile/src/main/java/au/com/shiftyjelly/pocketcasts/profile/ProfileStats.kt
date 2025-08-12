@@ -63,10 +63,10 @@ internal fun ProfileStats(
                 maxPartCount = 1,
                 pluralResourceId = { it.listenedPlural },
             )
-            text.substringBefore(' ') to text.substringAfter(' ').uppercase()
+            text.substringBefore('\u00a0') to text.substringAfter('\u00a0').uppercase()
         }
         StatsColumn(
-            numberText = listenedCount.toString(),
+            numberText = listenedCount,
             labelText = listenedText,
         )
 
@@ -76,10 +76,10 @@ internal fun ProfileStats(
                 maxPartCount = 1,
                 pluralResourceId = { it.savedPlural },
             )
-            text.substringBefore(' ') to text.substringAfter(' ').uppercase()
+            text.substringBefore('\u00a0') to text.substringAfter('\u00a0').uppercase()
         }
         StatsColumn(
-            numberText = savedCount.toString(),
+            numberText = savedCount,
             labelText = savedText,
         )
     }

@@ -12,6 +12,7 @@ import au.com.shiftyjelly.pocketcasts.models.type.SmartRules.ReleaseDateRule
 import au.com.shiftyjelly.pocketcasts.models.type.SmartRules.StarredRule
 import au.com.shiftyjelly.pocketcasts.playlists.create.CreatePlaylistViewModel.UiState
 import au.com.shiftyjelly.pocketcasts.playlists.rules.RuleType
+import au.com.shiftyjelly.pocketcasts.playlists.rules.RulesBuilder
 import au.com.shiftyjelly.pocketcasts.preferences.UserSetting
 import au.com.shiftyjelly.pocketcasts.preferences.model.ArtworkConfiguration
 import au.com.shiftyjelly.pocketcasts.repositories.playlist.SmartPlaylistDraft
@@ -380,6 +381,32 @@ class CreatePlaylistViewModelTest {
 
             viewModel.createSmartPlaylist()
             playlistManager.upsertSmartPlaylistTurbine.expectNoEvents()
+        }
+    }
+
+    @Test
+    fun `clear unsaved builder rules`() = runTest {
+        viewModel.uiState.test {
+            skipItems(1)
+
+            viewModel.useStarredEpisodes(true)
+            skipItems(1)
+
+            viewModel.useDownloadStatus(DownloadStatusRule.NotDownloaded)
+            skipItems(1)
+
+            viewModel.useMediaType(MediaTypeRule.Video)
+            skipItems(1)
+            viewModel.applyRule(RuleType.MediaType)
+            skipItems(1)
+
+            viewModel.clearTransientRules()
+            val builder = awaitItem().rulesBuilder
+
+            assertEquals(
+                RulesBuilder.Empty.copy(mediaTypeRule = MediaTypeRule.Video),
+                builder,
+            )
         }
     }
 }
