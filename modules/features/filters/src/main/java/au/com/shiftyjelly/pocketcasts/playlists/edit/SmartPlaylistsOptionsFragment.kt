@@ -57,7 +57,6 @@ class SmartPlaylistsOptionsFragment : BaseDialogFragment() {
         savedInstanceState: Bundle?,
     ) = content {
         var isSelectingSortType by rememberSaveable { mutableStateOf(false) }
-        val performMediaRouteClick = remember { MutableSharedFlow<Unit>() }
 
         val uiState by viewModel.uiState.collectAsState()
         val playlist = uiState.smartPlaylist
@@ -102,10 +101,8 @@ class SmartPlaylistsOptionsFragment : BaseDialogFragment() {
                                     dismiss()
                                 },
                                 onClickChromecast = {
-                                    viewLifecycleOwner.lifecycleScope.launch {
-                                        performMediaRouteClick.emit(Unit)
-                                        dismiss()
-                                    }
+                                    viewModel.startChromeCast()
+                                    dismiss()
                                 },
                                 onClickOpenSettings = {
                                     Timber.i("Open settings")
@@ -117,8 +114,6 @@ class SmartPlaylistsOptionsFragment : BaseDialogFragment() {
                 }
             }
         }
-
-        MediaRouteButton(performMediaRouteClick)
     }
 
     private fun downloadAll(episodeCount: Int) {
@@ -148,26 +143,5 @@ class SmartPlaylistsOptionsFragment : BaseDialogFragment() {
                 dialog.show(parentFragmentManager, "download_confirm")
             }
         }
-    }
-
-    @Composable
-    private fun MediaRouteButton(
-        clickTrigger: Flow<Unit>,
-    ) {
-        AndroidView(
-            factory = { context ->
-                MediaRouteButton(context).apply {
-                    visibility = View.GONE
-                    CastButtonFactory.setUpMediaRouteButton(context, this)
-                }
-            },
-            update = { view ->
-                viewLifecycleOwner.lifecycleScope.launch {
-                    clickTrigger
-                        .flowWithLifecycle(viewLifecycleOwner.lifecycle)
-                        .collect { view.performClick() }
-                }
-            },
-        )
     }
 }

@@ -30,6 +30,7 @@ import au.com.shiftyjelly.pocketcasts.views.dialog.ConfirmationDialog
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseFragment
 import au.com.shiftyjelly.pocketcasts.views.helper.EpisodeItemTouchHelper
 import au.com.shiftyjelly.pocketcasts.views.helper.HasBackstack
+import com.google.android.gms.cast.framework.CastButtonFactory
 import dagger.hilt.android.AndroidEntryPoint
 import dagger.hilt.android.lifecycle.withCreationCallback
 import javax.inject.Inject
@@ -68,6 +69,7 @@ class SmartPlaylistFragment :
         val binding = SmartPlaylistFragmentBinding.inflate(inflater, container, false)
         binding.setupContent()
         binding.setupToolbar()
+        binding.setupChromeCast()
         return binding.root
     }
 
@@ -184,6 +186,17 @@ class SmartPlaylistFragment :
                     onClickOptions = ::openOptionsSheet,
                 )
             }
+        }
+    }
+
+    private fun SmartPlaylistFragmentBinding.setupChromeCast() {
+        CastButtonFactory.setUpMediaRouteButton(requireContext(), chromeCastButton)
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewModel.chromeCastSignal
+                .flowWithLifecycle(viewLifecycleOwner.lifecycle)
+                .collect {
+                    chromeCastButton.performClick()
+                }
         }
     }
 

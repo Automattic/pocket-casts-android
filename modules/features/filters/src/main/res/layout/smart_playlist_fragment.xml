@@ -5,6 +5,12 @@
     android:layout_height="match_parent"
     android:background="?attr/primary_ui_02">
 
+    <androidx.mediarouter.app.MediaRouteButton
+        android:id="@+id/chromeCastButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:visibility="gone" />
+
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/content"
         android:layout_width="match_parent"
