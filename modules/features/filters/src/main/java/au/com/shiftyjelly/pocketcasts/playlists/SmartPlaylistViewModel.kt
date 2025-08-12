@@ -3,7 +3,9 @@ package au.com.shiftyjelly.pocketcasts.playlists
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
+import au.com.shiftyjelly.pocketcasts.models.type.PlaylistEpisodeSortType
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
+import au.com.shiftyjelly.pocketcasts.repositories.download.DownloadManager
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.repositories.playlist.PlaylistManager
 import au.com.shiftyjelly.pocketcasts.repositories.playlist.SmartPlaylist
@@ -13,19 +15,29 @@ import dagger.assisted.AssistedInject
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.NonCancellable
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 
 @HiltViewModel(assistedFactory = SmartPlaylistViewModel.Factory::class)
 class SmartPlaylistViewModel @AssistedInject constructor(
-    @Assisted playlistUuid: String,
+    @Assisted private val playlistUuid: String,
     private val playlistManager: PlaylistManager,
     private val playbackManager: PlaybackManager,
+    private val downloadManager: DownloadManager,
     private val settings: Settings,
 ) : ViewModel() {
     val bottomInset = settings.bottomInset
+
+    private val _startMultiSelectingSignal = MutableSharedFlow<Unit>()
+    val startMultiSelectingSignal = _startMultiSelectingSignal.asSharedFlow()
+
+    private val _chromeCastSignal = MutableSharedFlow<Unit>()
+    val chromeCastSignal = _chromeCastSignal.asSharedFlow()
 
     val uiState = playlistManager.observeSmartPlaylist(playlistUuid)
         .map { UiState(it) }
@@ -49,6 +61,31 @@ class SmartPlaylistViewModel @AssistedInject constructor(
         }
     }
 
+    fun downloadAll() {
+        val episodes = uiState.value.smartPlaylist?.episodes?.take(DOWNLOAD_ALL_LIMIT)
+        episodes?.forEach { episode ->
+            downloadManager.addEpisodeToQueue(episode, "filter download all", fireEvent = false, source = SourceView.FILTERS)
+        }
+    }
+
+    fun updateSortType(type: PlaylistEpisodeSortType) {
+        viewModelScope.launch(NonCancellable) {
+            playlistManager.updateSortType(playlistUuid, type)
+        }
+    }
+
+    fun startMultiSelecting() {
+        viewModelScope.launch {
+            _startMultiSelectingSignal.emit(Unit)
+        }
+    }
+
+    fun startChromeCast() {
+        viewModelScope.launch {
+            _chromeCastSignal.emit(Unit)
+        }
+    }
+
     data class UiState(
         val smartPlaylist: SmartPlaylist?,
     ) {
@@ -65,6 +102,7 @@ class SmartPlaylistViewModel @AssistedInject constructor(
     }
 
     companion object {
+        const val DOWNLOAD_ALL_LIMIT = 100
         private const val PLAY_ALL_WARNING_EPISODE_COUNT = 4
     }
 }

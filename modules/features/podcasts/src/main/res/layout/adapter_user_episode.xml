@@ -101,7 +101,7 @@
             android:id="@+id/artworkBox"
             android:layout_width="56dp"
             android:layout_height="56dp"
-            android:layout_marginStart="12dp"
+            android:layout_marginStart="16dp"
             android:layout_marginTop="12dp"
             android:layout_marginBottom="12dp"
             android:importantForAccessibility="noHideDescendants"
@@ -197,7 +197,7 @@
         <View
             android:layout_width="match_parent"
             android:layout_height="@dimen/divider_height"
-            android:layout_marginStart="12dp"
+            android:layout_marginStart="16dp"
             android:background="?attr/primary_ui_05"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"

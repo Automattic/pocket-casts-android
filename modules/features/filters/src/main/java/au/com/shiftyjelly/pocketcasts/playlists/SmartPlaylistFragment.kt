@@ -23,12 +23,14 @@ import au.com.shiftyjelly.pocketcasts.PlaylistEpisodesAdapterFactory
 import au.com.shiftyjelly.pocketcasts.compose.AppTheme
 import au.com.shiftyjelly.pocketcasts.compose.extensions.setContentWithViewCompositionStrategy
 import au.com.shiftyjelly.pocketcasts.filters.databinding.SmartPlaylistFragmentBinding
+import au.com.shiftyjelly.pocketcasts.playlists.edit.SmartPlaylistsOptionsFragment
 import au.com.shiftyjelly.pocketcasts.playlists.edit.SmartRulesEditFragment
 import au.com.shiftyjelly.pocketcasts.utils.extensions.dpToPx
 import au.com.shiftyjelly.pocketcasts.views.dialog.ConfirmationDialog
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseFragment
 import au.com.shiftyjelly.pocketcasts.views.helper.EpisodeItemTouchHelper
 import au.com.shiftyjelly.pocketcasts.views.helper.HasBackstack
+import com.google.android.gms.cast.framework.CastButtonFactory
 import dagger.hilt.android.AndroidEntryPoint
 import dagger.hilt.android.lifecycle.withCreationCallback
 import javax.inject.Inject
@@ -67,6 +69,7 @@ class SmartPlaylistFragment :
         val binding = SmartPlaylistFragmentBinding.inflate(inflater, container, false)
         binding.setupContent()
         binding.setupToolbar()
+        binding.setupChromeCast()
         return binding.root
     }
 
@@ -115,9 +118,18 @@ class SmartPlaylistFragment :
         }
         viewLifecycleOwner.lifecycleScope.launch {
             val initialPadding = content.paddingBottom
-            viewModel.bottomInset.collect { inset ->
-                content.updatePadding(bottom = initialPadding + inset)
-            }
+            viewModel.bottomInset
+                .flowWithLifecycle(viewLifecycleOwner.lifecycle)
+                .collect { inset ->
+                    content.updatePadding(bottom = initialPadding + inset)
+                }
+        }
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewModel.startMultiSelectingSignal
+                .flowWithLifecycle(viewLifecycleOwner.lifecycle)
+                .collect {
+                    adapterFactory.startMultiSelecting()
+                }
         }
     }
 
@@ -171,9 +183,20 @@ class SmartPlaylistFragment :
                         @Suppress("DEPRECATION")
                         requireActivity().onBackPressed()
                     },
-                    onClickOptions = { Timber.i("On click options") },
+                    onClickOptions = ::openOptionsSheet,
                 )
             }
+        }
+    }
+
+    private fun SmartPlaylistFragmentBinding.setupChromeCast() {
+        CastButtonFactory.setUpMediaRouteButton(requireContext(), chromeCastButton)
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewModel.chromeCastSignal
+                .flowWithLifecycle(viewLifecycleOwner.lifecycle)
+                .collect {
+                    chromeCastButton.performClick()
+                }
         }
     }
 
@@ -202,6 +225,13 @@ class SmartPlaylistFragment :
             return
         }
         SmartRulesEditFragment.newInstance(args.playlistUuid).show(parentFragmentManager, "playlist_editor")
+    }
+
+    private fun openOptionsSheet() {
+        if (childFragmentManager.findFragmentByTag("playlist_options_sheet") != null) {
+            return
+        }
+        SmartPlaylistsOptionsFragment().show(childFragmentManager, "playlist_options_sheet")
     }
 
     override fun onBackPressed(): Boolean {

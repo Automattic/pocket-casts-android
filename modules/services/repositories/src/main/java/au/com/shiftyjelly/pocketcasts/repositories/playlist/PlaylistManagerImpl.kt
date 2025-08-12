@@ -73,7 +73,7 @@ class PlaylistManagerImpl @Inject constructor(
                         sortType = playlist.sortType,
                         limit = PLAYLIST_ARTWORK_EPISODE_LIMIT,
                     )
-                    val episodesFlow = observeSmartEpisodes(smartRules)
+                    val episodesFlow = observeSmartEpisodes(smartRules, playlist.sortType)
                     val metadataFlow = playlistDao.observeEpisodeMetadata(
                         clock = clock,
                         smartRules = smartRules,
@@ -84,6 +84,7 @@ class PlaylistManagerImpl @Inject constructor(
                             title = playlist.title,
                             smartRules = smartRules,
                             episodes = episodes,
+                            episodeSortType = playlist.sortType,
                             totalEpisodeCount = metadata.episodeCount,
                             playbackDurationLeft = metadata.timeLeftSeconds.seconds,
                             artworkPodcasts = podcasts,
@@ -94,11 +95,11 @@ class PlaylistManagerImpl @Inject constructor(
             .distinctUntilChanged()
     }
 
-    override fun observeSmartEpisodes(rules: SmartRules): Flow<List<PodcastEpisode>> {
+    override fun observeSmartEpisodes(rules: SmartRules, sortType: PlaylistEpisodeSortType): Flow<List<PodcastEpisode>> {
         return playlistDao.observeSmartPlaylistEpisodes(
             clock = clock,
             smartRules = rules,
-            sortType = PlaylistEpisodeSortType.NewestToOldest,
+            sortType = sortType,
             limit = SMART_PLAYLIST_EPISODE_LIMIT,
         ).distinctUntilChanged()
     }
@@ -118,6 +119,10 @@ class PlaylistManagerImpl @Inject constructor(
                 playlistDao.upsertSmartPlaylist(playlist)
             }
         }
+    }
+
+    override suspend fun updateSortType(uuid: String, sortType: PlaylistEpisodeSortType) {
+        playlistDao.updateSortType(uuid, sortType)
     }
 
     override suspend fun deletePlaylist(uuid: String) {
