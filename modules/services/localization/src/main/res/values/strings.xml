@@ -2574,5 +2574,9 @@
     <string name="onboarding_preselect_chapters_chapter_title">Chapter %1$d</string>
     <string name="onboarding_upgrade_tnc">Terms\u00A0and\u00A0Conditions</string>
     <string name="onboarding_upgrade_pp">Privacy\u00A0Policy</string>
-
+    <string name="onboarding_notification_popup_newsletter">Subscribe to our Newsletter</string>
+    <string name="onboarding_notification_popup_newsletter_message">Once a month, all podcast goodness</string>
+    <string name="onboarding_notification_popup_notifications">Receive Notifications</string>
+    <string name="onboarding_notification_popup_notifications_message">Receive news, podcast suggestions and more</string>
+    <string name="onboarding_notifications_popup_save">Save Preferences</string>
 </resources>
