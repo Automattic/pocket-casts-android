@@ -36,7 +36,6 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.text.BasicText
 import androidx.compose.material.AppBarDefaults
 import androidx.compose.material.LocalRippleConfiguration
 import androidx.compose.material.MaterialTheme
@@ -46,7 +45,6 @@ import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.ReadOnlyComposable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.setValue
@@ -74,9 +72,6 @@ import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.semantics
-import androidx.compose.ui.text.TextLayoutResult
-import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.Dp
@@ -89,14 +84,13 @@ import au.com.shiftyjelly.pocketcasts.compose.AppTheme
 import au.com.shiftyjelly.pocketcasts.compose.PreviewRegularDevice
 import au.com.shiftyjelly.pocketcasts.compose.components.NoContentBanner
 import au.com.shiftyjelly.pocketcasts.compose.components.TextH20
+import au.com.shiftyjelly.pocketcasts.compose.components.TextH40
 import au.com.shiftyjelly.pocketcasts.compose.components.TextP60
 import au.com.shiftyjelly.pocketcasts.compose.preview.ThemePreviewParameterProvider
 import au.com.shiftyjelly.pocketcasts.compose.theme
 import au.com.shiftyjelly.pocketcasts.localization.helper.toFriendlyString
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme.ThemeType
-import kotlin.math.ceil
-import kotlin.math.floor
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.days
 import kotlin.time.Duration.Companion.hours
@@ -479,51 +473,14 @@ private fun ActionButton(
                 Spacer(
                     modifier = Modifier.width(8.dp),
                 )
-                TightWrapText(
+                TextH40(
                     text = data.label,
-                    style = TextStyle(
-                        fontSize = 15.sp,
-                        lineHeight = 21.sp,
-                        fontWeight = FontWeight.Medium,
-                        color = style.onBackgroundColor(),
-                    ),
+                    color = style.onBackgroundColor(),
+                    maxLines = 1,
                 )
             }
         }
     }
-}
-
-// https://issuetracker.google.com/issues/206039942
-@Composable
-private fun TightWrapText(
-    text: String,
-    style: TextStyle,
-    modifier: Modifier = Modifier,
-) {
-    var textLayoutResult by remember { mutableStateOf<TextLayoutResult?>(null) }
-    BasicText(
-        text = text,
-        style = style,
-        modifier = modifier
-            .layout { measurable, constraints ->
-                val placeable = measurable.measure(constraints)
-                val newTextLayoutResult = textLayoutResult
-
-                if (newTextLayoutResult == null || newTextLayoutResult.lineCount == 0) {
-                    layout(placeable.width, placeable.height) {
-                        placeable.placeRelative(0, 0)
-                    }
-                } else {
-                    val minX = (0 until newTextLayoutResult.lineCount).minOf(newTextLayoutResult::getLineLeft)
-                    val maxX = (0 until newTextLayoutResult.lineCount).maxOf(newTextLayoutResult::getLineRight)
-
-                    layout(ceil(maxX - minX).toInt(), placeable.height) {
-                        placeable.place(-floor(minX).toInt(), 0)
-                    }
-                }
-            },
-        onTextLayout = { textLayoutResult = it },
-    )
 }
 
 private enum class ActionButtonStyle {
@@ -571,7 +528,7 @@ private val artworkShadowSpec = tween<Dp>(durationMillis = 500, delayMillis = 50
 private val actionButtonShape = RoundedCornerShape(8.dp)
 private val actionButtonMaxWidth = 200.dp
 private val actionButtonsInnerPadding = 8.dp
-private val actionButtonsOuterPadding = 42.dp
+private val actionButtonsOuterPadding = 32.dp
 private val actionButtonsOffsetSpec = spring<IntOffset>(stiffness = Spring.StiffnessLow)
 private val actionButtonsAlphaSpec = spring<Float>(stiffness = Spring.StiffnessLow)
 
