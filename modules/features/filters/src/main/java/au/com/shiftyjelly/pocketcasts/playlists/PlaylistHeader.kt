@@ -235,6 +235,7 @@ private fun PlaylistForegroundArtwork(
                 PlaylistArtwork(
                     podcasts = podcasts,
                     artworkSize = artworkSize,
+                    elevation = 0.dp,
                 )
             } else {
                 Spacer(
@@ -308,6 +309,7 @@ private fun ArtworkOrPreview(
             podcasts = podcasts,
             artworkSize = artworkSize,
             cornerSize = 0.dp,
+            elevation = 0.dp,
             modifier = modifier,
         )
     } else {
@@ -564,7 +566,7 @@ private enum class ActionButtonStyle {
 
 private val artworkCrossfadeFastSpec = spring<Float>(stiffness = Spring.StiffnessLow)
 private val artworkCrossfadeSpec = spring<Float>(stiffness = Spring.StiffnessVeryLow)
-private val artworkShadowSpec = tween<Dp>(durationMillis = 500, delayMillis = 1000)
+private val artworkShadowSpec = tween<Dp>(durationMillis = 500, delayMillis = 500)
 
 private val actionButtonShape = RoundedCornerShape(8.dp)
 private val actionButtonMaxWidth = 200.dp
