@@ -107,7 +107,7 @@
             android:importantForAccessibility="noHideDescendants"
             android:src="@drawable/ic_uploadedfile"
             app:cardCornerRadius="4dp"
-            app:cardElevation="0dp"
+            app:cardElevation="2dp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintLeft_toRightOf="@id/checkbox"
             app:layout_constraintTop_toTopOf="parent">

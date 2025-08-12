@@ -10,11 +10,13 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.unit.dp
@@ -44,8 +46,8 @@ internal fun EpisodeRow(
         modifier = modifier,
     ) {
         Row(
-            verticalAlignment = Alignment.Companion.CenterVertically,
-            modifier = Modifier.Companion
+            verticalAlignment = Alignment.CenterVertically,
+            modifier = Modifier
                 .height(IntrinsicSize.Min)
                 .padding(vertical = 12.dp, horizontal = 12.dp),
         ) {
@@ -54,14 +56,16 @@ internal fun EpisodeRow(
                 useEpisodeArtwork = useEpisodeArtwork,
                 placeholderType = PlaceholderType.Small,
                 corners = 4.dp,
-                modifier = Modifier.Companion.size(56.dp),
+                modifier = Modifier
+                    .size(56.dp)
+                    .shadow(2.dp, RoundedCornerShape(4.dp)),
             )
             Spacer(
-                modifier = Modifier.Companion.width(12.dp),
+                modifier = Modifier.width(12.dp),
             )
             Column(
                 verticalArrangement = Arrangement.SpaceBetween,
-                modifier = Modifier.Companion.fillMaxHeight(),
+                modifier = Modifier.fillMaxHeight(),
             ) {
                 TextC70(
                     text = episode.rememberHeaderText(),
