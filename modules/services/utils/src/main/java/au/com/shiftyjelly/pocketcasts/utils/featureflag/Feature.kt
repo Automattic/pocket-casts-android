@@ -146,6 +146,14 @@ enum class Feature(
         hasFirebaseRemoteFlag = true,
         hasDevToggle = true,
     ),
+    NEW_ONBOARDING_ACCOUNT_CREATION(
+        key = "new_onboarding_account_creation",
+        title = "New Onboarding Account Creation",
+        defaultValue = BuildConfig.DEBUG,
+        tier = FeatureTier.Free,
+        hasFirebaseRemoteFlag = false,
+        hasDevToggle = true,
+    ),
     PLAYLISTS_REBRANDING(
         key = "playlists_rebranding",
         title = "Playlists",
