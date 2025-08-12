@@ -241,8 +241,8 @@ private fun PodcastRow(
     ) {
         PodcastImage(
             uuid = uuid,
-            dropShadow = false,
             cornerSize = 4.dp,
+            elevation = 2.dp,
             modifier = Modifier.size(56.dp),
         )
         Spacer(
