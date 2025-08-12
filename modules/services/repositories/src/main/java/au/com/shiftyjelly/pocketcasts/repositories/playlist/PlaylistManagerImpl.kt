@@ -85,6 +85,8 @@ class PlaylistManagerImpl @Inject constructor(
                             smartRules = smartRules,
                             episodes = episodes,
                             episodeSortType = playlist.sortType,
+                            isAutoDownloadEnabled = playlist.autoDownload,
+                            autoDownloadLimit = playlist.autodownloadLimit,
                             totalEpisodeCount = metadata.episodeCount,
                             playbackDurationLeft = metadata.timeLeftSeconds.seconds,
                             artworkPodcasts = podcasts,
@@ -123,6 +125,18 @@ class PlaylistManagerImpl @Inject constructor(
 
     override suspend fun updateSortType(uuid: String, sortType: PlaylistEpisodeSortType) {
         playlistDao.updateSortType(uuid, sortType)
+    }
+
+    override suspend fun updateAutoDownload(uuid: String, isEnabled: Boolean) {
+        playlistDao.updateAutoDownload(uuid, isEnabled)
+    }
+
+    override suspend fun updateAutoDownloadLimit(uuid: String, limit: Int) {
+        playlistDao.updateAutoDownloadLimit(uuid, limit)
+    }
+
+    override suspend fun updateName(uuid: String, name: String) {
+        playlistDao.updateName(uuid, name)
     }
 
     override suspend fun deletePlaylist(uuid: String) {

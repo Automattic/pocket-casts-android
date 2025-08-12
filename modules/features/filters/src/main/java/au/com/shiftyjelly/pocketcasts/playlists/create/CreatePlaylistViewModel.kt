@@ -143,13 +143,14 @@ class CreatePlaylistViewModel @AssistedInject constructor(
 
     fun createSmartPlaylist() {
         val rules = rulesEditor.rulesFlow.value.toSmartRulesOrDefault()
-        if (isCreationTriggered) {
+        val sanitizedName = playlistNameState.text.toString().trim()
+        if (isCreationTriggered || sanitizedName.isEmpty()) {
             return
         }
         isCreationTriggered = true
 
         val draft = SmartPlaylistDraft(
-            title = playlistNameState.text.toString(),
+            title = sanitizedName,
             rules = rules,
         )
         viewModelScope.launch {

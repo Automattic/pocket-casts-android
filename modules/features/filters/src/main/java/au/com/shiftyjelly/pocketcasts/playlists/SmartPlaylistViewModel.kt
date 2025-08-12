@@ -39,6 +39,9 @@ class SmartPlaylistViewModel @AssistedInject constructor(
     private val _chromeCastSignal = MutableSharedFlow<Unit>()
     val chromeCastSignal = _chromeCastSignal.asSharedFlow()
 
+    private val _showSettingsSignal = MutableSharedFlow<Unit>()
+    val showSettingsSignal = _showSettingsSignal.asSharedFlow()
+
     val uiState = playlistManager.observeSmartPlaylist(playlistUuid)
         .map { UiState(it) }
         .stateIn(viewModelScope, SharingStarted.Lazily, initialValue = UiState.Empty)
@@ -74,6 +77,28 @@ class SmartPlaylistViewModel @AssistedInject constructor(
         }
     }
 
+    fun updateAutoDownload(isEnabled: Boolean) {
+        viewModelScope.launch(NonCancellable) {
+            playlistManager.updateAutoDownload(playlistUuid, isEnabled)
+        }
+    }
+
+    fun updateAutoDownloadLimit(limit: Int) {
+        viewModelScope.launch(NonCancellable) {
+            playlistManager.updateAutoDownloadLimit(playlistUuid, limit)
+        }
+    }
+
+    fun updateName(name: String) {
+        val sanitizedName = name.trim()
+        if (sanitizedName.isEmpty()) {
+            return
+        }
+        viewModelScope.launch(NonCancellable) {
+            playlistManager.updateName(playlistUuid, sanitizedName)
+        }
+    }
+
     fun startMultiSelecting() {
         viewModelScope.launch {
             _startMultiSelectingSignal.emit(Unit)
@@ -83,6 +108,12 @@ class SmartPlaylistViewModel @AssistedInject constructor(
     fun startChromeCast() {
         viewModelScope.launch {
             _chromeCastSignal.emit(Unit)
+        }
+    }
+
+    fun showSettings() {
+        viewModelScope.launch {
+            _showSettingsSignal.emit(Unit)
         }
     }
 

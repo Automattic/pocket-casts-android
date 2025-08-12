@@ -2,7 +2,6 @@ package au.com.shiftyjelly.pocketcasts.playlists.edit
 
 import android.os.Bundle
 import android.view.LayoutInflater
-import android.view.View
 import android.view.ViewGroup
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.foundation.background
@@ -14,11 +13,9 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.MaterialTheme
-import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -26,24 +23,15 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.rememberNestedScrollInteropConnection
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.viewinterop.AndroidView
 import androidx.fragment.app.viewModels
 import androidx.fragment.compose.content
-import androidx.lifecycle.flowWithLifecycle
-import androidx.lifecycle.lifecycleScope
-import androidx.mediarouter.app.MediaRouteButton
 import au.com.shiftyjelly.pocketcasts.compose.theme
 import au.com.shiftyjelly.pocketcasts.playlists.SmartPlaylistViewModel
 import au.com.shiftyjelly.pocketcasts.playlists.SmartPlaylistViewModel.Companion.DOWNLOAD_ALL_LIMIT
 import au.com.shiftyjelly.pocketcasts.views.dialog.ConfirmationDialog
 import au.com.shiftyjelly.pocketcasts.views.dialog.ConfirmationDialog.ButtonType
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseDialogFragment
-import com.google.android.gms.cast.framework.CastButtonFactory
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.MutableSharedFlow
-import kotlinx.coroutines.launch
-import timber.log.Timber
 import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
@@ -105,7 +93,7 @@ class SmartPlaylistsOptionsFragment : BaseDialogFragment() {
                                     dismiss()
                                 },
                                 onClickOpenSettings = {
-                                    Timber.i("Open settings")
+                                    viewModel.showSettings()
                                     dismiss()
                                 },
                             )

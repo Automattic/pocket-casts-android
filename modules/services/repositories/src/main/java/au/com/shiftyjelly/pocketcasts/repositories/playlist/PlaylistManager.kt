@@ -19,6 +19,12 @@ interface PlaylistManager {
 
     suspend fun updateSortType(uuid: String, sortType: PlaylistEpisodeSortType)
 
+    suspend fun updateAutoDownload(uuid: String, isEnabled: Boolean)
+
+    suspend fun updateAutoDownloadLimit(uuid: String, limit: Int)
+
+    suspend fun updateName(uuid: String, name: String)
+
     suspend fun deletePlaylist(uuid: String)
 
     suspend fun upsertSmartPlaylist(draft: SmartPlaylistDraft): String

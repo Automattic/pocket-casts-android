@@ -936,7 +936,7 @@
     <string name="increment_longer_than_duration">Increment \"longer than\" duration</string>
     <string name="increment_shorter_than_duration">Increment \"shorter than\" duration</string>
     <string name="new_playlist">New Playlist</string>
-    <string name="new_playlists_title_placeholder">Playlist’s title</string>
+    <string name="new_playlists_title_placeholder">Playlist’s name</string>
     <string name="new_smart_playlist_banner_body">Automatically add episodes based on rules</string>
     <string name="new_smart_playlist_banner_title">Make into Smart Playlist</string>
     <string name="playlist_download_all">Download All</string>

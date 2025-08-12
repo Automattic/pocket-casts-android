@@ -12,6 +12,8 @@ data class SmartPlaylist(
     val smartRules: SmartRules,
     val episodes: List<PodcastEpisode>,
     val episodeSortType: PlaylistEpisodeSortType,
+    val isAutoDownloadEnabled: Boolean,
+    val autoDownloadLimit: Int,
     val totalEpisodeCount: Int,
     val playbackDurationLeft: Duration,
     val artworkPodcasts: List<Podcast>,

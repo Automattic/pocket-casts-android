@@ -887,6 +887,8 @@ class PlaylistManagerTest {
                     smartRules = SmartRules.Default,
                     episodes = emptyList(),
                     episodeSortType = PlaylistEpisodeSortType.NewestToOldest,
+                    isAutoDownloadEnabled = false,
+                    autoDownloadLimit = 10,
                     totalEpisodeCount = 0,
                     playbackDurationLeft = Duration.ZERO,
                     artworkPodcasts = emptyList(),
@@ -1002,6 +1004,48 @@ class PlaylistManagerTest {
             manager.updateSortType("playlist-id", PlaylistEpisodeSortType.ShortestToLongest)
             playlist = awaitItem()
             assertEquals(PlaylistEpisodeSortType.ShortestToLongest, playlist?.episodeSortType)
+        }
+    }
+
+    @Test
+    fun updateAutoDownload() = runTest(testDispatcher) {
+        playlistDao.upsertSmartPlaylist(DbPlaylist(uuid = "playlist-id", title = "Title 1"))
+
+        manager.observeSmartPlaylist("playlist-id").test {
+            var playlist = awaitItem()
+            assertEquals(false, playlist?.isAutoDownloadEnabled)
+
+            manager.updateAutoDownload("playlist-id", true)
+            playlist = awaitItem()
+            assertEquals(true, playlist?.isAutoDownloadEnabled)
+        }
+    }
+
+    @Test
+    fun updateAutoDownloadLimit() = runTest(testDispatcher) {
+        playlistDao.upsertSmartPlaylist(DbPlaylist(uuid = "playlist-id", title = "Title 1"))
+
+        manager.observeSmartPlaylist("playlist-id").test {
+            var playlist = awaitItem()
+            assertEquals(10, playlist?.autoDownloadLimit)
+
+            manager.updateAutoDownloadLimit("playlist-id", 85)
+            playlist = awaitItem()
+            assertEquals(85, playlist?.autoDownloadLimit)
+        }
+    }
+
+    @Test
+    fun updateName() = runTest(testDispatcher) {
+        playlistDao.upsertSmartPlaylist(DbPlaylist(uuid = "playlist-id", title = "Title 1"))
+
+        manager.observeSmartPlaylist("playlist-id").test {
+            var playlist = awaitItem()
+            assertEquals("Title 1", playlist?.title)
+
+            manager.updateName("playlist-id", "Other title")
+            playlist = awaitItem()
+            assertEquals("Other title", playlist?.title)
         }
     }
 }

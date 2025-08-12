@@ -19,11 +19,7 @@ class FakePlaylistManager : PlaylistManager {
     override fun observePlaylistsPreview() = playlistPreviews.asStateFlow()
 
     val smartPlaylist = MutableStateFlow<SmartPlaylist?>(null)
-    val smartPlaylistUuidTurbine = Turbine<String>(name = "observeSmartPlaylist:uuid")
-    override fun observeSmartPlaylist(uuid: String): Flow<SmartPlaylist?> {
-        smartPlaylistUuidTurbine.add(uuid)
-        return smartPlaylist
-    }
+    override fun observeSmartPlaylist(uuid: String): Flow<SmartPlaylist?> = smartPlaylist
 
     val smartEpisodes = MutableStateFlow(emptyList<PodcastEpisode>())
     override fun observeSmartEpisodes(rules: SmartRules, sortType: PlaylistEpisodeSortType) = smartEpisodes.asStateFlow()
@@ -31,24 +27,17 @@ class FakePlaylistManager : PlaylistManager {
     val episodeMetadata = MutableStateFlow(PlaylistEpisodeMetadata.Empty)
     override fun observeEpisodeMetadata(rules: SmartRules) = episodeMetadata.asStateFlow()
 
-    val updateRulesUuidTurbine = Turbine<String>(name = "updateSmartRules:uuid")
-    val updateRulesRulesTurbine = Turbine<SmartRules>(name = "updateSmartRules:rules")
-    override suspend fun updateSmartRules(uuid: String, rules: SmartRules) {
-        updateRulesUuidTurbine.add(uuid)
-        updateRulesRulesTurbine.add(rules)
-    }
+    override suspend fun updateSmartRules(uuid: String, rules: SmartRules) = Unit
 
-    val updateSortTypeUuidTurbine = Turbine<String>(name = "updateSmartRules:uuid")
-    val updateSortTypeSortTypeTurbine = Turbine<PlaylistEpisodeSortType>(name = "updateSmartSortType:rules")
-    override suspend fun updateSortType(uuid: String, sortType: PlaylistEpisodeSortType) {
-        updateSortTypeUuidTurbine.add(uuid)
-        updateSortTypeSortTypeTurbine.add(sortType)
-    }
+    override suspend fun updateSortType(uuid: String, sortType: PlaylistEpisodeSortType) = Unit
 
-    val deletePlaylistTurbine = Turbine<String>(name = "deletePlaylist")
-    override suspend fun deletePlaylist(uuid: String) {
-        deletePlaylistTurbine.add(uuid)
-    }
+    override suspend fun updateAutoDownload(uuid: String, isEnabled: Boolean) = Unit
+
+    override suspend fun updateAutoDownloadLimit(uuid: String, limit: Int) = Unit
+
+    override suspend fun updateName(uuid: String, name: String) = Unit
+
+    override suspend fun deletePlaylist(uuid: String) = Unit
 
     val upsertSmartPlaylistTurbine = Turbine<SmartPlaylistDraft>(name = "upsertSmartPlaylist")
     override suspend fun upsertSmartPlaylist(draft: SmartPlaylistDraft): String {
@@ -56,8 +45,5 @@ class FakePlaylistManager : PlaylistManager {
         return UUID.randomUUID().toString()
     }
 
-    val updatePlaylistsOrderTurbine = Turbine<List<String>>(name = "updatePlaylistsOrder")
-    override suspend fun updatePlaylistsOrder(sortedUuids: List<String>) {
-        updatePlaylistsOrderTurbine.add(sortedUuids)
-    }
+    override suspend fun updatePlaylistsOrder(sortedUuids: List<String>) = Unit
 }
