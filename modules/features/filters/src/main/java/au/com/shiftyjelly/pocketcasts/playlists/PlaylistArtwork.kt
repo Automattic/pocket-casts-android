@@ -6,7 +6,6 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
@@ -14,6 +13,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
@@ -39,11 +39,13 @@ fun PlaylistArtwork(
     artworkSize: Dp,
     modifier: Modifier = Modifier,
     cornerSize: Dp = artworkSize / 14,
+    elevation: Dp = 2.dp,
 ) {
     when (podcasts.size) {
         0 -> NoImage(
             artworkSize = artworkSize,
             cornerSize = cornerSize,
+            elevation = elevation,
             modifier = modifier,
         )
 
@@ -51,6 +53,7 @@ fun PlaylistArtwork(
             podcast = podcasts[0],
             artworkSize = artworkSize,
             cornerSize = cornerSize,
+            elevation = elevation,
             modifier = modifier,
         )
 
@@ -61,6 +64,7 @@ fun PlaylistArtwork(
             podcast4 = podcasts[3],
             artworkSize = artworkSize,
             cornerSize = cornerSize,
+            elevation = elevation,
             modifier = modifier,
         )
     }
@@ -70,12 +74,20 @@ fun PlaylistArtwork(
 private fun NoImage(
     artworkSize: Dp,
     cornerSize: Dp,
+    elevation: Dp,
     modifier: Modifier = Modifier,
 ) {
     Box(
         contentAlignment = Alignment.Center,
         modifier = modifier
             .size(artworkSize)
+            .then(
+                if (elevation > 0.dp) {
+                    Modifier.shadow(elevation, RoundedCornerShape(cornerSize))
+                } else {
+                    Modifier
+                },
+            )
             .clip(RoundedCornerShape(cornerSize))
             .background(MaterialTheme.theme.colors.primaryUi05),
     ) {
@@ -95,6 +107,7 @@ private fun SingleImage(
     podcast: Podcast,
     artworkSize: Dp,
     cornerSize: Dp,
+    elevation: Dp,
     modifier: Modifier = Modifier,
 ) {
     val context = LocalContext.current
@@ -108,6 +121,13 @@ private fun SingleImage(
         contentDescription = null,
         modifier = modifier
             .size(artworkSize)
+            .then(
+                if (elevation > 0.dp) {
+                    Modifier.shadow(elevation, RoundedCornerShape(cornerSize))
+                } else {
+                    Modifier
+                },
+            )
             .clip(RoundedCornerShape(cornerSize)),
     )
 }
@@ -120,6 +140,7 @@ private fun QuadImage(
     podcast4: Podcast,
     artworkSize: Dp,
     cornerSize: Dp,
+    elevation: Dp,
     modifier: Modifier = Modifier,
 ) {
     val context = LocalContext.current
@@ -137,7 +158,15 @@ private fun QuadImage(
         requestFactory.create(podcast4)
     }
     Row(
-        modifier = modifier.size(artworkSize),
+        modifier = modifier
+            .size(artworkSize)
+            .then(
+                if (elevation > 0.dp) {
+                    Modifier.shadow(elevation, RoundedCornerShape(cornerSize))
+                } else {
+                    Modifier
+                },
+            ),
     ) {
         Column {
             Image(
