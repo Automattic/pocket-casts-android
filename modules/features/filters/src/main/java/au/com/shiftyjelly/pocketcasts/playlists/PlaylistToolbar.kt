@@ -7,11 +7,12 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.statusBars
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material.AppBarDefaults
 import androidx.compose.material.LocalTextStyle
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
@@ -87,7 +88,7 @@ internal fun PlaylistToolbar(
         },
         backgroundColor = colors.backgroundColor,
         elevation = 0.dp,
-        windowInsets = AppBarDefaults.topAppBarWindowInsets,
+        windowInsets = WindowInsets.statusBars,
         modifier = modifier.fillMaxWidth(),
     )
 }
