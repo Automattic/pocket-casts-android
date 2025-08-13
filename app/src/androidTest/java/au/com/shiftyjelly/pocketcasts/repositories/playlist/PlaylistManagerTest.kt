@@ -66,12 +66,6 @@ class PlaylistManagerTest {
         val appDatabase = Room.inMemoryDatabaseBuilder(context, AppDatabase::class.java)
             .addTypeConverters(ModelModule.provideRoomConverters(moshi))
             .setQueryCoroutineContext(testDispatcher)
-            .setQueryCallback(testDispatcher) { statement, args ->
-                if (statement.contains("ORDER BY", ignoreCase = true)) {
-                    println("!!! $statement")
-                    println("!!! $args")
-                }
-            }
             .build()
         podcastDao = appDatabase.podcastDao()
         episodeDao = appDatabase.episodeDao()
