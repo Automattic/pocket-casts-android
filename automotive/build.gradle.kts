@@ -81,6 +81,7 @@ dependencies {
     implementation(libs.rx2.java)
     implementation(libs.timber)
     implementation(libs.work.runtime)
+    implementation(libs.zxing)
 
     implementation(projects.modules.features.account)
     implementation(projects.modules.features.discover)

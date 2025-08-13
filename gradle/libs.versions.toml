@@ -295,6 +295,7 @@ reorderable = "sh.calvin.reorderable:reorderable:2.5.1"
 robolectric = "org.robolectric:robolectric:4.15.1"
 timber = "com.jakewharton.timber:timber:5.0.1"
 turbine = "app.cash.turbine:turbine:1.2.1"
+zxing = "com.google.zxing:core:3.5.3"
 
 [plugins]
 aboutlibraries = { id = "com.mikepenz.aboutlibraries.plugin", version.ref = "aboutlibraries" }
