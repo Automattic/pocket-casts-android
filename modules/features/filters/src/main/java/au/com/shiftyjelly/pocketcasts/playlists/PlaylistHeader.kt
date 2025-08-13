@@ -109,7 +109,8 @@ import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 internal data class PlaylistHeaderData(
     val title: String,
-    val episodeCount: Int,
+    val totalEpisodeCount: Int,
+    val displayedEpisodeCount: Int,
     val playbackDurationLeft: Duration,
     val artworkPodcasts: List<Podcast>,
     val leftButton: ActionButton,
@@ -172,7 +173,7 @@ internal fun PlaylistHeader(
                 modifier = Modifier.height(8.dp),
             )
             PlaylistInfoText(
-                episodeCount = data?.episodeCount,
+                episodeCount = data?.totalEpisodeCount,
                 playbackDurationLeft = data?.playbackDurationLeft,
             )
             Spacer(
@@ -180,25 +181,27 @@ internal fun PlaylistHeader(
             )
             if (data != null) {
                 ActionButtons(
-                    hasAnyEpisodes = data.episodeCount > 0,
+                    hasAnyEpisodes = data.displayedEpisodeCount > 0,
                     leftButton = data.leftButton,
                     rightButton = data.rightButton,
                 )
                 Spacer(
                     modifier = Modifier.height(24.dp),
                 )
-                PlaylistSearchBar(
-                    data = data,
-                    contentTopPadding = contentTopPadding,
-                    onChangeSearchFocus = onChangeSearchFocus,
-                    onMeasureSearchTopOffset = onMeasureSearchTopOffset,
-                )
-                Spacer(
-                    modifier = Modifier.height(16.dp),
-                )
-                HorizontalDivider()
+                if (data.totalEpisodeCount > 0) {
+                    PlaylistSearchBar(
+                        data = data,
+                        contentTopPadding = contentTopPadding,
+                        onChangeSearchFocus = onChangeSearchFocus,
+                        onMeasureSearchTopOffset = onMeasureSearchTopOffset,
+                    )
+                    Spacer(
+                        modifier = Modifier.height(16.dp),
+                    )
+                    HorizontalDivider()
+                }
                 AnimatedVisibility(
-                    visible = data.episodeCount == 0,
+                    visible = data.totalEpisodeCount == 0,
                     enter = noContentEnterTransition,
                     exit = noContentExitTransition,
                 ) {
@@ -207,6 +210,18 @@ internal fun PlaylistHeader(
                         body = stringResource(LR.string.smart_playlist_no_content_body),
                         iconResourceId = IR.drawable.ic_info,
                         modifier = Modifier.padding(top = 60.dp, bottom = 24.dp),
+                    )
+                }
+                AnimatedVisibility(
+                    visible = data.totalEpisodeCount != 0 && data.displayedEpisodeCount == 0,
+                    enter = noContentEnterTransition,
+                    exit = noContentExitTransition,
+                ) {
+                    NoContentBanner(
+                        title = stringResource(LR.string.search_episodes_not_found_title),
+                        body = stringResource(LR.string.search_episodes_not_found_summary),
+                        iconResourceId = IR.drawable.ic_exclamation_circle,
+                        modifier = Modifier.padding(top = 24.dp, bottom = 24.dp),
                     )
                 }
             }
@@ -604,7 +619,7 @@ private val previewColors = listOf(
 
 @PreviewRegularDevice
 @Composable
-private fun PlaylistHeaderNoPodcastPreview() {
+private fun PlaylistHeaderNoEpisodesPreview() {
     var episodeCount by remember { mutableIntStateOf(0) }
 
     AppTheme(ThemeType.LIGHT) {
@@ -616,7 +631,8 @@ private fun PlaylistHeaderNoPodcastPreview() {
             PlaylistHeader(
                 data = PlaylistHeaderData(
                     title = "My Playlist",
-                    episodeCount = episodeCount,
+                    totalEpisodeCount = episodeCount,
+                    displayedEpisodeCount = episodeCount,
                     playbackDurationLeft = 0.seconds,
                     artworkPodcasts = emptyList(),
                     leftButton = PlaylistHeaderData.ActionButton(
@@ -641,6 +657,42 @@ private fun PlaylistHeaderNoPodcastPreview() {
 
 @PreviewRegularDevice
 @Composable
+private fun PlaylistHeaderNoDisplayedEpisodesPreview() {
+    AppTheme(ThemeType.LIGHT) {
+        Box(
+            modifier = Modifier
+                .background(MaterialTheme.theme.colors.primaryUi02)
+                .fillMaxSize(),
+        ) {
+            PlaylistHeader(
+                data = PlaylistHeaderData(
+                    title = "My Playlist",
+                    totalEpisodeCount = 20,
+                    displayedEpisodeCount = 0,
+                    playbackDurationLeft = 0.seconds,
+                    artworkPodcasts = emptyList(),
+                    leftButton = PlaylistHeaderData.ActionButton(
+                        iconId = IR.drawable.sleep_timer_cog,
+                        label = "Smart Rules",
+                        onClick = {},
+                    ),
+                    rightButton = PlaylistHeaderData.ActionButton(
+                        iconId = IR.drawable.ic_filters_play,
+                        label = "Play All",
+                        onClick = {},
+                    ),
+                    searchState = rememberTextFieldState(),
+                ),
+                useBlurredArtwork = false,
+                onMeasureSearchTopOffset = {},
+                onChangeSearchFocus = {},
+            )
+        }
+    }
+}
+
+@PreviewRegularDevice
+@Composable
 private fun PlaylistHeaderSinglePodcastPreview() {
     AppTheme(ThemeType.LIGHT) {
         Box(
@@ -651,7 +703,8 @@ private fun PlaylistHeaderSinglePodcastPreview() {
             PlaylistHeader(
                 data = PlaylistHeaderData(
                     title = "My Playlist",
-                    episodeCount = 100,
+                    totalEpisodeCount = 100,
+                    displayedEpisodeCount = 100,
                     playbackDurationLeft = 200.days + 12.hours,
                     artworkPodcasts = listOf(Podcast(uuid = "id-0")),
                     leftButton = PlaylistHeaderData.ActionButton(
@@ -686,7 +739,8 @@ private fun PlaylistHeaderMultiPodcastPreview() {
             PlaylistHeader(
                 data = PlaylistHeaderData(
                     title = "My Playlist",
-                    episodeCount = 5,
+                    totalEpisodeCount = 5,
+                    displayedEpisodeCount = 5,
                     playbackDurationLeft = 1.hours + 15.minutes,
                     artworkPodcasts = List(4) { index -> Podcast(uuid = "id-$index") },
                     leftButton = PlaylistHeaderData.ActionButton(
@@ -723,7 +777,8 @@ private fun PlaylistHeaderThemePreview(
             PlaylistHeader(
                 data = PlaylistHeaderData(
                     title = "My Playlist",
-                    episodeCount = 5,
+                    totalEpisodeCount = 5,
+                    displayedEpisodeCount = 5,
                     playbackDurationLeft = 1.hours + 15.minutes,
                     artworkPodcasts = List(4) { index -> Podcast(uuid = "id-$index") },
                     leftButton = PlaylistHeaderData.ActionButton(
