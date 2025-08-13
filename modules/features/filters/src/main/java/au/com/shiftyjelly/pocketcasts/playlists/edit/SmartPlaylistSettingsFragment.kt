@@ -21,6 +21,7 @@ import au.com.shiftyjelly.pocketcasts.views.fragments.BaseFragment
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.debounce
+import kotlinx.coroutines.flow.drop
 
 @OptIn(FlowPreview::class)
 @AndroidEntryPoint
@@ -63,10 +64,18 @@ class SmartPlaylistSettingsFragment : BaseFragment() {
     private fun UpdateNameEffect(state: TextFieldState) {
         LaunchedEffect(state) {
             snapshotFlow { state.text.toString() }
+                .drop(1) // Skip initial name
                 .debounce(300)
                 .collect { newName ->
                     viewModel.updateName(newName)
                 }
+        }
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        if (!requireActivity().isChangingConfigurations) {
+            viewModel.trackEditDismissed()
         }
     }
 

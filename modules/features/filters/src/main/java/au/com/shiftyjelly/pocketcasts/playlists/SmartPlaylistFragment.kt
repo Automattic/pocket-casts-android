@@ -64,6 +64,13 @@ class SmartPlaylistFragment :
         },
     )
 
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        if (savedInstanceState == null) {
+            viewModel.trackFilterShown()
+        }
+    }
+
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -81,12 +88,18 @@ class SmartPlaylistFragment :
         val leftButton = PlaylistHeaderData.ActionButton(
             iconId = IR.drawable.ic_playlist_smart_rules,
             label = getString(LR.string.smart_rules),
-            onClick = ::openEditor,
+            onClick = {
+                viewModel.trackEditRulesTapped()
+                openEditor()
+            },
         )
         val rightButton = PlaylistHeaderData.ActionButton(
             iconId = IR.drawable.ic_playlist_play,
             label = getString(LR.string.playlist_play_all),
-            onClick = ::playAll,
+            onClick = {
+                viewModel.trackPlayAllTapped()
+                playAll()
+            },
         )
 
         val headerAdapter = PlaylistHeaderAdapter(

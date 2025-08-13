@@ -313,6 +313,13 @@ enum class AnalyticsEvent(val key: String) {
     FILTER_OPTIONS_MODAL_OPTION_TAPPED("filter_options_modal_option_tapped"),
     FILTER_TOOLTIP_SHOWN("filter_tooltip_shown"),
     FILTER_TOOLTIP_CLOSED("filter_tooltip_closed"),
+    FILTER_EDIT_RULES_TAPPED("filter_edit_rules_tapped"),
+    FILTER_PLAY_ALL_TAPPED("filter_play_all_tapped"),
+    FILTER_SELECT_EPISODES_TAPPED("filter_select_episodes_tapped"),
+    FILTER_SORT_BY_TAPPED("filter_sort_by_tapped"),
+    FILTER_DOWNLOAD_ALL_TAPPED("filter_download_all_tapped"),
+    FILTER_CHROME_CAST_TAPPED("filter_chrome_cast_tapped"),
+    FILTER_OPTIONS_TAPPED("filter_options_tapped"),
 
     /* Discover */
     DISCOVER_SHOWN("discover_shown"),

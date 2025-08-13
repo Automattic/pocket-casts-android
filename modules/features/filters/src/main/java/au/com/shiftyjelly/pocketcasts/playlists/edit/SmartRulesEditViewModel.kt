@@ -2,6 +2,8 @@ package au.com.shiftyjelly.pocketcasts.playlists.edit
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.models.type.SmartRules.DownloadStatusRule
@@ -33,6 +35,7 @@ class SmartRulesEditViewModel @AssistedInject constructor(
     private val playlistManager: PlaylistManager,
     rulesEditorFactory: SmartRulesEditor.Factory,
     settings: Settings,
+    private val analyticsTracker: AnalyticsTracker,
     @Assisted private val playlistUuid: String,
 ) : ViewModel() {
     private var rulesEditor: SmartRulesEditor? = null
@@ -88,6 +91,7 @@ class SmartRulesEditViewModel @AssistedInject constructor(
             val smartRules = uiState.value?.appliedRules?.toSmartRules()
             if (smartRules != null) {
                 playlistManager.updateSmartRules(playlistUuid, smartRules)
+                trackRulesUpdated(type)
             }
         }
     }
@@ -162,6 +166,16 @@ class SmartRulesEditViewModel @AssistedInject constructor(
 
     fun clearTransientRules() {
         rulesEditor?.clearTransientRules()
+    }
+
+    fun trackRulesUpdated(type: RuleType) {
+        analyticsTracker.track(
+            AnalyticsEvent.FILTER_UPDATED,
+            mapOf(
+                "group" to type.analyticsValue,
+                "source" to "filters",
+            ),
+        )
     }
 
     data class UiState(

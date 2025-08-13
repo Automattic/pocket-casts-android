@@ -80,19 +80,26 @@ class SmartPlaylistsOptionsFragment : BaseDialogFragment() {
                                 sortType = playlist.episodeSortType,
                                 hasEpisodes = playlist.totalEpisodeCount > 0,
                                 onClickSelectAll = {
+                                    viewModel.trackSelectEpisodesTapped()
                                     viewModel.startMultiSelecting()
                                     dismiss()
                                 },
-                                onClickSortBy = { isSelectingSortType = true },
+                                onClickSortBy = {
+                                    viewModel.trackSortByTapped()
+                                    isSelectingSortType = true
+                                },
                                 onClickDownloadAll = {
+                                    viewModel.trackDownloadAllTapped()
                                     downloadAll(playlist.totalEpisodeCount)
                                     dismiss()
                                 },
                                 onClickChromecast = {
+                                    viewModel.trackChromeCastTapped()
                                     viewModel.startChromeCast()
                                     dismiss()
                                 },
                                 onClickOpenSettings = {
+                                    viewModel.trackFilterOptionsTapped()
                                     viewModel.showSettings()
                                     dismiss()
                                 },
