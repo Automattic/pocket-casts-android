@@ -1,5 +1,6 @@
 package au.com.shiftyjelly.pocketcasts.playlists.create
 
+import android.content.DialogInterface
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -23,6 +24,7 @@ import androidx.navigation.NavOptionsBuilder
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import au.com.shiftyjelly.pocketcasts.compose.CallOnce
 import au.com.shiftyjelly.pocketcasts.compose.extensions.slideInToEnd
 import au.com.shiftyjelly.pocketcasts.compose.extensions.slideInToStart
 import au.com.shiftyjelly.pocketcasts.compose.extensions.slideOutToEnd
@@ -50,6 +52,8 @@ import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 @AndroidEntryPoint
 class CreatePlaylistFragment : BaseDialogFragment() {
+    private var isPlaylistCreated = false
+
     private val viewModel by viewModels<CreatePlaylistViewModel>(
         extrasProducer = {
             defaultViewModelCreationExtras.withCreationCallback<CreatePlaylistViewModel.Factory> { factory ->
@@ -94,10 +98,17 @@ class CreatePlaylistFragment : BaseDialogFragment() {
                     .nestedScroll(rememberNestedScrollInteropConnection()),
             ) {
                 composable(NavigationRoutes.NEW_PLAYLIST) {
+                    CallOnce {
+                        viewModel.trackCreatePlaylistShown()
+                    }
                     NewPlaylistPage(
                         titleState = viewModel.playlistNameState,
-                        onCreateManualPlaylist = { Timber.i("Create Manual Playlist") },
+                        onCreateManualPlaylist = {
+                            viewModel.trackCreateManualPlaylist()
+                            Timber.i("Create Manual Playlist")
+                        },
                         onContinueToSmartPlaylist = {
+                            viewModel.trackCreateSmartPlaylist()
                             navigateOnce(NavigationRoutes.SMART_PLAYLIST_PREVIEW) {
                                 popUpTo(NavigationRoutes.NEW_PLAYLIST) {
                                     inclusive = true
@@ -222,6 +233,7 @@ class CreatePlaylistFragment : BaseDialogFragment() {
     private fun OpenCreatedPlaylistEffect() {
         LaunchedEffect(Unit) {
             val uuid = viewModel.createdSmartPlaylistUuid.await()
+            isPlaylistCreated = true
             dismiss()
             val fragment = SmartPlaylistFragment.newInstance(uuid)
             (requireActivity() as FragmentHostListener).addFragment(fragment)
@@ -239,6 +251,13 @@ class CreatePlaylistFragment : BaseDialogFragment() {
                     viewModel.clearTransientRules()
                 }
             }
+        }
+    }
+
+    override fun onDismiss(dialog: DialogInterface) {
+        super.onDismiss(dialog)
+        if (!requireActivity().isChangingConfigurations && !isPlaylistCreated) {
+            viewModel.trackCreatePlaylistCancelled()
         }
     }
 

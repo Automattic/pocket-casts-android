@@ -2,6 +2,7 @@ package au.com.shiftyjelly.pocketcasts.playlists.create
 
 import androidx.compose.ui.text.TextRange
 import app.cash.turbine.test
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.type.SmartRules.DownloadStatusRule
 import au.com.shiftyjelly.pocketcasts.models.type.SmartRules.EpisodeDurationRule
@@ -63,6 +64,7 @@ class CreatePlaylistViewModelTest {
                 on { artworkConfiguration } doReturn settingMock
             }
         },
+        analyticsTracker = AnalyticsTracker.test(),
         initialPlaylistTitle = "Playlist name",
     )
 
