@@ -48,6 +48,7 @@ class DeveloperFragment : BaseFragment() {
                 onResetSuggestedFoldersSuggestion = viewModel::resetSuggestedFoldersSuggestion,
                 onShowNotificationsTestingClick = ::onShowNotificationsTestingClick,
                 onResetPlaylistsOnboarding = viewModel::resetPlaylistsOnboarding,
+                onResetNotificationsPrompt = viewModel::resetNotificationsPrompt,
             )
         }
     }

@@ -63,6 +63,7 @@ fun DeveloperPage(
     onShowNotificationsTestingClick: () -> Unit,
     onResetSuggestedFoldersSuggestion: () -> Unit,
     onResetPlaylistsOnboarding: () -> Unit,
+    onResetNotificationsPrompt: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     var openCrashMessageDialog by remember { mutableStateOf(false) }
@@ -110,6 +111,9 @@ fun DeveloperPage(
         }
         item {
             NotificationsTesting(onClick = onShowNotificationsTestingClick)
+        }
+        item {
+            ResetNotificationsPrompt(onClick = onResetNotificationsPrompt)
         }
         item {
             ResetPlaylistsOnboarding(onClick = onResetPlaylistsOnboarding)
@@ -243,6 +247,19 @@ private fun TriggerNotificationSetting(
 }
 
 @Composable
+private fun ResetNotificationsPrompt(
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    SettingRow(
+        primaryText = "Reset notifications prompt",
+        secondaryText = "Show enable notifications prompt on Podcasts when the permission is missing",
+        icon = rememberVectorPainter(Icons.Outlined.Notifications),
+        modifier = modifier.clickable { onClick() },
+    )
+}
+
+@Composable
 private fun DeleteFirstEpisodeSetting(
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
@@ -365,6 +382,7 @@ private fun DeveloperPagePreview() {
         onResetSuggestedFoldersSuggestion = {},
         onShowNotificationsTestingClick = {},
         onResetPlaylistsOnboarding = {},
+        onResetNotificationsPrompt = {},
     )
 }
 
