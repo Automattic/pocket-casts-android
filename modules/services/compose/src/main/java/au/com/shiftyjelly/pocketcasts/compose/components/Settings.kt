@@ -39,6 +39,7 @@ import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import au.com.shiftyjelly.pocketcasts.compose.AppTheme
 import au.com.shiftyjelly.pocketcasts.compose.AppThemeWithBackground
@@ -181,6 +182,8 @@ fun SettingRow(
     indent: Boolean = true,
     enabled: Boolean = true,
     showFlashWithDelay: Duration? = null, // if null, no flash is shown
+    horizontalPadding: Dp = SettingsSection.horizontalPadding,
+    verticalPadding: Dp = SettingsSection.verticalPadding,
     additionalContent: @Composable () -> Unit = {},
 ) {
     var flashAlphaTarget by remember { mutableFloatStateOf(0f) }

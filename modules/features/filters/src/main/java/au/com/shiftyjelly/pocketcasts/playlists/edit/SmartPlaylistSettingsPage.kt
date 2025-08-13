@@ -4,7 +4,6 @@ import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
@@ -14,20 +13,17 @@ import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.statusBars
-import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.selection.toggleable
 import androidx.compose.foundation.text.input.TextFieldState
 import androidx.compose.foundation.text.input.rememberTextFieldState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Switch
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.pluralStringResource
@@ -41,7 +37,8 @@ import au.com.shiftyjelly.pocketcasts.compose.PreviewRegularDevice
 import au.com.shiftyjelly.pocketcasts.compose.bars.ThemedTopAppBar
 import au.com.shiftyjelly.pocketcasts.compose.bars.ThemedTopAppBar.Style
 import au.com.shiftyjelly.pocketcasts.compose.components.HorizontalDivider
-import au.com.shiftyjelly.pocketcasts.compose.components.TextH30
+import au.com.shiftyjelly.pocketcasts.compose.components.SettingRow
+import au.com.shiftyjelly.pocketcasts.compose.components.SettingRowToggle
 import au.com.shiftyjelly.pocketcasts.compose.components.TextH40
 import au.com.shiftyjelly.pocketcasts.compose.components.TextP50
 import au.com.shiftyjelly.pocketcasts.compose.preview.ThemePreviewParameterProvider
@@ -112,30 +109,18 @@ private fun AutoDownloadSwitchRow(
     onChangeAutoDownloadValue: (Boolean) -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    Row(
-        verticalAlignment = Alignment.CenterVertically,
-        modifier = modifier
-            .toggleable(
-                role = Role.Switch,
-                value = isAutoDownloadEnabled,
-                onValueChange = onChangeAutoDownloadValue,
-            )
-            .padding(horizontal = 16.dp)
-            .heightIn(min = 48.dp)
-            .semantics(mergeDescendants = true) {},
-    ) {
-        TextH30(
-            text = stringResource(LR.string.auto_download),
-            modifier = Modifier.widthIn(max = 280.dp),
-        )
-        Spacer(
-            modifier = Modifier.weight(1f),
-        )
-        Switch(
-            checked = isAutoDownloadEnabled,
-            onCheckedChange = null,
-        )
-    }
+    SettingRow(
+        primaryText = stringResource(LR.string.auto_download),
+        secondaryText = stringResource(LR.string.playlist_setting_auto_download_description),
+        toggle = SettingRowToggle.Switch(checked = isAutoDownloadEnabled),
+        horizontalPadding = 16.dp,
+        indent = false,
+        modifier = modifier.toggleable(
+            value = isAutoDownloadEnabled,
+            role = Role.Switch,
+            onValueChange = onChangeAutoDownloadValue,
+        ),
+    )
 }
 
 @Composable
@@ -144,26 +129,16 @@ private fun AutoDownloadEpisodeCountRow(
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    Column(
-        verticalArrangement = Arrangement.Center,
-        modifier = modifier
-            .fillMaxWidth()
-            .clickable(
-                role = Role.Button,
-                onClick = onClick,
-            )
-            .padding(horizontal = 16.dp)
-            .heightIn(min = 48.dp)
-            .semantics(mergeDescendants = true) {},
-    ) {
-        TextH40(
-            text = stringResource(LR.string.filters_download_first),
-        )
-        TextP50(
-            text = pluralStringResource(LR.plurals.episode_count, episodeCount, episodeCount),
-            color = MaterialTheme.theme.colors.primaryText02,
-        )
-    }
+    SettingRow(
+        primaryText = stringResource(LR.string.filters_download_first),
+        secondaryText = pluralStringResource(LR.plurals.episode_count, episodeCount, episodeCount),
+        horizontalPadding = 16.dp,
+        indent = false,
+        modifier = modifier.clickable(
+            role = Role.Button,
+            onClick = onClick,
+        ),
+    )
 }
 
 @PreviewRegularDevice
