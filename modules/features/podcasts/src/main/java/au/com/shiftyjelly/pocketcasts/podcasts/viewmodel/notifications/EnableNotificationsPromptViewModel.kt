@@ -15,7 +15,7 @@ import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.last
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.reactive.asFlow
@@ -38,7 +38,7 @@ class EnableNotificationsPromptViewModel @Inject constructor(
             viewModelScope.launch {
                 _stateFlow.update {
                     UiState.NewOnboarding(
-                        showNewsletterOptIn = userManager.getSignInState().asFlow().last().isSignedIn && !settings.marketingOptIn.value,
+                        showNewsletterOptIn = userManager.getSignInState().asFlow().first().isSignedIn && !settings.marketingOptIn.value,
                         notificationsEnabled = true,
                         subscribedToNewsletter = true,
                     )
