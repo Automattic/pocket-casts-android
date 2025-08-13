@@ -23,7 +23,7 @@ class EnableNotificationsPromptViewModel @Inject constructor(
     private val analyticsTracker: AnalyticsTracker,
 ) : ViewModel() {
 
-    private var _stateFlow: MutableStateFlow<UiState> = MutableStateFlow(UiState.PreNewOnboardingState)
+    private var _stateFlow: MutableStateFlow<UiState> = MutableStateFlow(UiState.PreNewOnboarding)
     val stateFlow: StateFlow<UiState> = _stateFlow
 
     private var _messagesFlow: MutableSharedFlow<UiMessage> = MutableSharedFlow()
@@ -32,35 +32,35 @@ class EnableNotificationsPromptViewModel @Inject constructor(
     init {
         if (FeatureFlag.isEnabled(Feature.NEW_ONBOARDING_ACCOUNT_CREATION)) {
             _stateFlow.update {
-                UiState.NewOnboardingState(
-                    isNotificationsChecked = true,
-                    isNewsletterChecked = true,
+                UiState.NewOnboarding(
+                    notificationsEnabled = true,
+                    subscribedToNewsletter = true,
                 )
             }
         }
     }
 
-    fun onCtaClick() {
-        analyticsTracker.track(AnalyticsEvent.NOTIFICATIONS_PERMISSIONS_ALLOW_TAPPED) // should we report the same?
+    fun handleCtaClick() {
+        analyticsTracker.track(AnalyticsEvent.NOTIFICATIONS_PERMISSIONS_ALLOW_TAPPED) // TODO discuss analytics with the team
         when (val state = stateFlow.value) {
-            is UiState.PreNewOnboardingState -> {
+            is UiState.PreNewOnboarding -> {
                 viewModelScope.launch {
                     _messagesFlow.emit(UiMessage.RequestPermission)
                 }
             }
 
-            is UiState.NewOnboardingState -> {
+            is UiState.NewOnboarding -> {
                 analyticsTracker.track(
                     AnalyticsEvent.NEWSLETTER_OPT_IN_CHANGED,
                     mapOf(
                         "source" to NewsletterSource.WELCOME_NEW_ACCOUNT.analyticsValue,
-                        "enabled" to state.isNewsletterChecked,
+                        "enabled" to state.subscribedToNewsletter,
                     ),
                 )
-                settings.marketingOptIn.set(state.isNewsletterChecked, updateModifiedAt = true)
+                settings.marketingOptIn.set(state.subscribedToNewsletter, updateModifiedAt = true)
                 viewModelScope.launch {
                     _messagesFlow.emit(
-                        if (state.isNotificationsChecked) {
+                        if (state.notificationsEnabled) {
                             UiMessage.RequestPermission
                         } else {
                             UiMessage.Dismiss
@@ -88,23 +88,23 @@ class EnableNotificationsPromptViewModel @Inject constructor(
         analyticsTracker.track(AnalyticsEvent.NOTIFICATIONS_PERMISSIONS_DISMISSED)
     }
 
-    fun onNewsletterChanged(isChecked: Boolean) {
+    fun changeNewsletterSubscription(isSubscribed: Boolean) {
         _stateFlow.update {
-            (it as? UiState.NewOnboardingState)?.copy(isNewsletterChecked = isChecked) ?: it
+            (it as? UiState.NewOnboarding)?.copy(subscribedToNewsletter = isSubscribed) ?: it
         }
     }
 
-    fun onNotificationsChanged(isChecked: Boolean) {
+    fun changeNotificationsEnabled(areEnabled: Boolean) {
         _stateFlow.update {
-            (it as? UiState.NewOnboardingState)?.copy(isNotificationsChecked = isChecked) ?: it
+            (it as? UiState.NewOnboarding)?.copy(notificationsEnabled = areEnabled) ?: it
         }
     }
 
     sealed interface UiState {
-        object PreNewOnboardingState : UiState
-        data class NewOnboardingState(
-            val isNewsletterChecked: Boolean,
-            val isNotificationsChecked: Boolean,
+        object PreNewOnboarding : UiState
+        data class NewOnboarding(
+            val subscribedToNewsletter: Boolean,
+            val notificationsEnabled: Boolean,
         ) : UiState
     }
 

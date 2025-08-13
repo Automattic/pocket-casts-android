@@ -44,7 +44,7 @@ class EnableNotificationsPromptViewModelTest {
         createViewModel().stateFlow.test {
             val state = awaitItem()
 
-            assert(state is EnableNotificationsPromptViewModel.UiState.PreNewOnboardingState)
+            assert(state is EnableNotificationsPromptViewModel.UiState.PreNewOnboarding)
         }
     }
 
@@ -54,7 +54,7 @@ class EnableNotificationsPromptViewModelTest {
 
         createViewModel().stateFlow.test {
             val state = awaitItem()
-            val expectedState = EnableNotificationsPromptViewModel.UiState.NewOnboardingState(isNewsletterChecked = true, isNotificationsChecked = true)
+            val expectedState = EnableNotificationsPromptViewModel.UiState.NewOnboarding(subscribedToNewsletter = true, notificationsEnabled = true)
             assertEquals(expectedState, state)
         }
     }
@@ -64,11 +64,11 @@ class EnableNotificationsPromptViewModelTest {
         FeatureFlag.setEnabled(Feature.NEW_ONBOARDING_ACCOUNT_CREATION, true)
 
         val viewModel = createViewModel()
-        viewModel.onNewsletterChanged(false)
+        viewModel.changeNewsletterSubscription(false)
 
         viewModel.stateFlow.test {
             val state = awaitItem()
-            val expectedState = EnableNotificationsPromptViewModel.UiState.NewOnboardingState(isNewsletterChecked = false, isNotificationsChecked = true)
+            val expectedState = EnableNotificationsPromptViewModel.UiState.NewOnboarding(subscribedToNewsletter = false, notificationsEnabled = true)
             assertEquals(expectedState, state)
         }
     }
@@ -78,11 +78,11 @@ class EnableNotificationsPromptViewModelTest {
         FeatureFlag.setEnabled(Feature.NEW_ONBOARDING_ACCOUNT_CREATION, true)
 
         val viewModel = createViewModel()
-        viewModel.onNotificationsChanged(false)
+        viewModel.changeNotificationsEnabled(false)
 
         viewModel.stateFlow.test {
             val state = awaitItem()
-            val expectedState = EnableNotificationsPromptViewModel.UiState.NewOnboardingState(isNewsletterChecked = true, isNotificationsChecked = false)
+            val expectedState = EnableNotificationsPromptViewModel.UiState.NewOnboarding(subscribedToNewsletter = true, notificationsEnabled = false)
             assertEquals(expectedState, state)
         }
     }
@@ -93,7 +93,7 @@ class EnableNotificationsPromptViewModelTest {
 
         val viewModel = createViewModel()
         viewModel.messagesFlow.test {
-            viewModel.onCtaClick()
+            viewModel.handleCtaClick()
             val message = awaitItem()
             assertEquals(EnableNotificationsPromptViewModel.UiMessage.RequestPermission, message)
         }
@@ -106,7 +106,7 @@ class EnableNotificationsPromptViewModelTest {
         val viewModel = createViewModel()
 
         viewModel.messagesFlow.test {
-            viewModel.onCtaClick()
+            viewModel.handleCtaClick()
             val message = awaitItem()
             assertEquals(EnableNotificationsPromptViewModel.UiMessage.RequestPermission, message)
         }
@@ -118,10 +118,10 @@ class EnableNotificationsPromptViewModelTest {
         FeatureFlag.setEnabled(Feature.NEW_ONBOARDING_ACCOUNT_CREATION, true)
 
         val viewModel = createViewModel()
-        viewModel.onNotificationsChanged(false)
+        viewModel.changeNotificationsEnabled(false)
 
         viewModel.messagesFlow.test {
-            viewModel.onCtaClick()
+            viewModel.handleCtaClick()
             val message = awaitItem()
             assertEquals(EnableNotificationsPromptViewModel.UiMessage.Dismiss, message)
         }

@@ -4,8 +4,6 @@ import android.content.res.Configuration
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -23,7 +21,6 @@ import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
 import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -141,7 +138,7 @@ private fun EnableNotificationsPromptScreenV2(
                     TextP40(
                         modifier = Modifier.padding(horizontal = 32.dp),
                         text = stringResource(LR.string.notification_prompt_message),
-                        color = MaterialTheme.theme.colors.primaryText01.copy(alpha = .5f),
+                        color = MaterialTheme.theme.colors.primaryText02,
                         textAlign = TextAlign.Center,
                     )
                     Spacer(modifier = Modifier.weight(1f))
@@ -205,7 +202,7 @@ private fun EnableNotificationsPromptScreenV2(
             TextP40(
                 modifier = Modifier.padding(horizontal = 32.dp),
                 text = stringResource(LR.string.notification_prompt_message),
-                color = MaterialTheme.theme.colors.primaryText01.copy(alpha = .5f),
+                color = MaterialTheme.theme.colors.primaryText02,
                 textAlign = TextAlign.Center,
             )
             Spacer(modifier = Modifier.weight(1f))
@@ -276,7 +273,6 @@ private fun CheckboxRow(
         CircularCheckBox(
             modifier = Modifier.size(24.dp),
             isChecked = isSelected,
-            onCheckedChange = onSelectedChange,
         )
         Column(
             modifier = Modifier.weight(1f),
@@ -289,7 +285,7 @@ private fun CheckboxRow(
             TextP60(
                 text = subTitle,
                 modifier = Modifier.fillMaxWidth(),
-                color = MaterialTheme.theme.colors.primaryText01.copy(alpha = .4f),
+                color = MaterialTheme.theme.colors.primaryText02,
             )
         }
     }
@@ -298,15 +294,11 @@ private fun CheckboxRow(
 @Composable
 private fun CircularCheckBox(
     isChecked: Boolean,
-    onCheckedChange: (Boolean) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Box(
         modifier = modifier
             .clip(CircleShape)
-            .clickable(interactionSource = remember { MutableInteractionSource() }, indication = null) {
-                onCheckedChange(!isChecked)
-            }
             .then(
                 if (isChecked) {
                     Modifier.background(color = MaterialTheme.theme.colors.primaryIcon01)
@@ -320,7 +312,7 @@ private fun CircularCheckBox(
             Icon(
                 painter = painterResource(IR.drawable.ic_checkmark_small),
                 tint = MaterialTheme.theme.colors.primaryUi01,
-                contentDescription = "",
+                contentDescription = null,
             )
         }
     }

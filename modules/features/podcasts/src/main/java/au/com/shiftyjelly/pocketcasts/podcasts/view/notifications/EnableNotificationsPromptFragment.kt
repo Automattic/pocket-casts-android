@@ -56,7 +56,7 @@ internal class EnableNotificationsPromptFragment : BaseDialogFragment() {
             viewModel.messagesFlow.collect {
                 when (it) {
                     is EnableNotificationsPromptViewModel.UiMessage.RequestPermission -> requestPermission()
-                    is EnableNotificationsPromptViewModel.UiMessage.Dismiss -> dismissSelf()
+                    is EnableNotificationsPromptViewModel.UiMessage.Dismiss -> finalizeAndDismiss()
                 }
             }
         }
@@ -69,27 +69,27 @@ internal class EnableNotificationsPromptFragment : BaseDialogFragment() {
 
         DialogBox {
             when (state) {
-                is EnableNotificationsPromptViewModel.UiState.NewOnboardingState -> {
+                is EnableNotificationsPromptViewModel.UiState.NewOnboarding -> {
                     EnableNotificationsPromptScreenNewOnboarding(
                         modifier = Modifier
                             .fillMaxSize()
                             .padding(22.dp),
-                        onCtaClick = viewModel::onCtaClick,
-                        onDismissClick = ::dismissSelf,
-                        isNewsletterSelected = state.isNewsletterChecked,
-                        isNotificationSelected = state.isNotificationsChecked,
-                        onNotificationChange = viewModel::onNotificationsChanged,
-                        onNewsletterChange = viewModel::onNewsletterChanged,
+                        onCtaClick = viewModel::handleCtaClick,
+                        onDismissClick = ::finalizeAndDismiss,
+                        isNewsletterSelected = state.subscribedToNewsletter,
+                        isNotificationSelected = state.notificationsEnabled,
+                        onNotificationChange = viewModel::changeNotificationsEnabled,
+                        onNewsletterChange = viewModel::changeNewsletterSubscription,
                     )
                 }
 
-                is EnableNotificationsPromptViewModel.UiState.PreNewOnboardingState -> {
+                is EnableNotificationsPromptViewModel.UiState.PreNewOnboarding -> {
                     EnableNotificationsPromptScreen(
                         modifier = Modifier
                             .fillMaxSize()
                             .padding(16.dp),
-                        onCtaClick = viewModel::onCtaClick,
-                        onDismissClick = ::dismissSelf,
+                        onCtaClick = viewModel::handleCtaClick,
+                        onDismissClick = ::finalizeAndDismiss,
                     )
                 }
             }
@@ -103,7 +103,7 @@ internal class EnableNotificationsPromptFragment : BaseDialogFragment() {
         }
     }
 
-    private fun dismissSelf() {
+    private fun finalizeAndDismiss() {
         isFinalizingActionUsed = true
         viewModel.handleDismissedByUser()
         dismiss()
