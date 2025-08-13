@@ -11,7 +11,7 @@ import androidx.core.app.NotificationManagerCompat
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
-import au.com.shiftyjelly.pocketcasts.repositories.notification.NotificationOpenReceiver
+import au.com.shiftyjelly.pocketcasts.repositories.notification.NotificationOpenReceiverActivity
 import au.com.shiftyjelly.pocketcasts.utils.AppPlatform
 import au.com.shiftyjelly.pocketcasts.utils.Util
 import dagger.hilt.android.qualifiers.ApplicationContext
@@ -33,7 +33,7 @@ open class TokenErrorNotification @Inject constructor(
 
         if (ActivityCompat.checkSelfPermission(context, Manifest.permission.POST_NOTIFICATIONS) == PackageManager.PERMISSION_GRANTED) {
             val pendingIntent = if (Util.getAppPlatform(context) == AppPlatform.Phone) {
-                PendingIntent.getBroadcast(context, 0, NotificationOpenReceiver.toDeeplinkIntentRelay(context, intent), PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE)
+                PendingIntent.getActivity(context, 0, NotificationOpenReceiverActivity.toDeeplinkIntentRelay(context, intent), PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE)
             } else {
                 PendingIntent.getActivity(context, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE)
             }
