@@ -13,6 +13,7 @@ import androidx.compose.ui.util.lerp
 import androidx.core.os.BundleCompat
 import androidx.core.os.bundleOf
 import androidx.core.view.updatePadding
+import androidx.fragment.app.commit
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
@@ -22,7 +23,9 @@ import androidx.recyclerview.widget.RecyclerView
 import au.com.shiftyjelly.pocketcasts.PlaylistEpisodesAdapterFactory
 import au.com.shiftyjelly.pocketcasts.compose.AppTheme
 import au.com.shiftyjelly.pocketcasts.compose.extensions.setContentWithViewCompositionStrategy
+import au.com.shiftyjelly.pocketcasts.filters.R
 import au.com.shiftyjelly.pocketcasts.filters.databinding.SmartPlaylistFragmentBinding
+import au.com.shiftyjelly.pocketcasts.playlists.edit.SmartPlaylistSettingsFragment
 import au.com.shiftyjelly.pocketcasts.playlists.edit.SmartPlaylistsOptionsFragment
 import au.com.shiftyjelly.pocketcasts.playlists.edit.SmartRulesEditFragment
 import au.com.shiftyjelly.pocketcasts.utils.extensions.dpToPx
@@ -70,6 +73,7 @@ class SmartPlaylistFragment :
         binding.setupContent()
         binding.setupToolbar()
         binding.setupChromeCast()
+        binding.setupSettings()
         return binding.root
     }
 
@@ -200,6 +204,17 @@ class SmartPlaylistFragment :
         }
     }
 
+    private fun SmartPlaylistFragmentBinding.setupSettings() {
+        CastButtonFactory.setUpMediaRouteButton(requireContext(), chromeCastButton)
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewModel.showSettingsSignal
+                .flowWithLifecycle(viewLifecycleOwner.lifecycle)
+                .collect {
+                    openSettings()
+                }
+        }
+    }
+
     private fun playAll() {
         if (parentFragmentManager.findFragmentByTag("confirm_and_play") != null) {
             return
@@ -221,10 +236,10 @@ class SmartPlaylistFragment :
     }
 
     private fun openEditor() {
-        if (parentFragmentManager.findFragmentByTag("playlist_editor") != null) {
+        if (parentFragmentManager.findFragmentByTag("playlist_rules_editor") != null) {
             return
         }
-        SmartRulesEditFragment.newInstance(args.playlistUuid).show(parentFragmentManager, "playlist_editor")
+        SmartRulesEditFragment.newInstance(args.playlistUuid).show(parentFragmentManager, "playlist_rules_editor")
     }
 
     private fun openOptionsSheet() {
@@ -232,6 +247,16 @@ class SmartPlaylistFragment :
             return
         }
         SmartPlaylistsOptionsFragment().show(childFragmentManager, "playlist_options_sheet")
+    }
+
+    private fun openSettings() {
+        if (childFragmentManager.findFragmentByTag("playlist_settings") != null) {
+            return
+        }
+        childFragmentManager.commit {
+            addToBackStack("playlist_settings")
+            add(R.id.playlistFragmentContainer, SmartPlaylistSettingsFragment(), "playlist_settings")
+        }
     }
 
     override fun onBackPressed(): Boolean {

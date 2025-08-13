@@ -45,6 +45,15 @@ abstract class PlaylistDao {
     @Query("UPDATE smart_playlists SET sortId = :sortType, syncStatus = $SYNC_STATUS_NOT_SYNCED WHERE uuid = :uuid")
     abstract suspend fun updateSortType(uuid: String, sortType: PlaylistEpisodeSortType)
 
+    @Query("UPDATE smart_playlists SET autoDownload = :isEnabled, syncStatus = $SYNC_STATUS_NOT_SYNCED WHERE uuid = :uuid")
+    abstract suspend fun updateAutoDownload(uuid: String, isEnabled: Boolean)
+
+    @Query("UPDATE smart_playlists SET autoDownloadLimit = :limit, syncStatus = $SYNC_STATUS_NOT_SYNCED WHERE uuid = :uuid")
+    abstract suspend fun updateAutoDownloadLimit(uuid: String, limit: Int)
+
+    @Query("UPDATE smart_playlists SET title = :name, syncStatus = $SYNC_STATUS_NOT_SYNCED WHERE uuid = :uuid")
+    abstract suspend fun updateName(uuid: String, name: String)
+
     @Query("UPDATE smart_playlists SET deleted = 1, syncStatus = $SYNC_STATUS_NOT_SYNCED WHERE uuid = :uuid")
     abstract suspend fun markPlaylistAsDeleted(uuid: String)
 

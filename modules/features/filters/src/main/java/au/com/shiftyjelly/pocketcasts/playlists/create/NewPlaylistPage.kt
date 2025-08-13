@@ -1,9 +1,6 @@
 package au.com.shiftyjelly.pocketcasts.playlists.create
 
-import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.animateFloatAsState
-import androidx.compose.animation.fadeIn
-import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -22,11 +19,8 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.input.TextFieldState
-import androidx.compose.foundation.text.input.clearText
 import androidx.compose.foundation.text.input.rememberTextFieldState
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.Icon
-import androidx.compose.material.IconButton
 import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -51,13 +45,13 @@ import au.com.shiftyjelly.pocketcasts.compose.Devices
 import au.com.shiftyjelly.pocketcasts.compose.bars.NavigationButton
 import au.com.shiftyjelly.pocketcasts.compose.bars.ThemedTopAppBar
 import au.com.shiftyjelly.pocketcasts.compose.buttons.RowButton
-import au.com.shiftyjelly.pocketcasts.compose.components.FormField
 import au.com.shiftyjelly.pocketcasts.compose.components.SparkleImage
 import au.com.shiftyjelly.pocketcasts.compose.components.TextH20
 import au.com.shiftyjelly.pocketcasts.compose.components.TextH40
 import au.com.shiftyjelly.pocketcasts.compose.components.TextP60
 import au.com.shiftyjelly.pocketcasts.compose.preview.ThemePreviewParameterProvider
 import au.com.shiftyjelly.pocketcasts.compose.theme
+import au.com.shiftyjelly.pocketcasts.playlists.PlaylistNameField
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme.ThemeType
 import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
@@ -97,27 +91,9 @@ fun NewPlaylistPage(
             Spacer(
                 modifier = Modifier.height(16.dp),
             )
-            FormField(
+            PlaylistNameField(
                 state = titleState,
-                placeholder = stringResource(LR.string.new_playlists_title_placeholder),
-                trailingIcon = {
-                    AnimatedVisibility(
-                        visible = titleState.text.isNotBlank(),
-                        enter = ClearButtonEnterTransition,
-                        exit = ClearButtonExitTransition,
-                    ) {
-                        IconButton(
-                            onClick = { titleState.clearText() },
-                        ) {
-                            Icon(
-                                painter = painterResource(IR.drawable.ic_close_outlined),
-                                contentDescription = stringResource(LR.string.clear),
-                                tint = MaterialTheme.theme.colors.primaryIcon02,
-                            )
-                        }
-                    }
-                },
-                onImeAction = onCreateManualPlaylist,
+                onClickImeAction = onCreateManualPlaylist,
                 modifier = Modifier.focusRequester(focusRequester),
             )
             Spacer(
@@ -191,9 +167,6 @@ private fun SmartPlaylistButton(
         )
     }
 }
-
-private val ClearButtonExitTransition = fadeOut()
-private val ClearButtonEnterTransition = fadeIn()
 
 @Preview(device = Devices.PORTRAIT_REGULAR)
 @Composable

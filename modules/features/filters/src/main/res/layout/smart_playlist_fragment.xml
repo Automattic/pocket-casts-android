@@ -32,4 +32,10 @@
         android:minHeight="?android:attr/actionBarSize"
         android:visibility="gone"
         app:navigationIcon="?attr/homeAsUpIndicator" />
+
+    <androidx.fragment.app.FragmentContainerView
+        android:id="@+id/playlistFragmentContainer"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
+
 </FrameLayout>

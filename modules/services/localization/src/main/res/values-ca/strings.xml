@@ -13,7 +13,6 @@ Language: ca
     <string name="create_playlist">Crear una llista de reproducció</string>
     <string name="new_smart_playlist_banner_body">Afegeix episodis automàticament segons les regles</string>
     <string name="new_smart_playlist_banner_title">Fes-ho en una llista de reproducció intel·ligent</string>
-    <string name="new_playlists_title_placeholder">Títol de la llista de reproducció</string>
     <string name="clear">Esborrar</string>
     <string name="onboarding_folders_title_3">Esports</string>
     <string name="onboarding_folders_title_2">Preferits</string>
