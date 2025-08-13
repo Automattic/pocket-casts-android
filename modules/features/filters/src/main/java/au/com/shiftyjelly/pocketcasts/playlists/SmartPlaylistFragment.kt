@@ -12,6 +12,8 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.util.lerp
 import androidx.core.os.BundleCompat
 import androidx.core.os.bundleOf
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.updatePadding
 import androidx.fragment.app.commit
 import androidx.fragment.app.viewModels
@@ -30,6 +32,8 @@ import au.com.shiftyjelly.pocketcasts.playlists.edit.SmartPlaylistsOptionsFragme
 import au.com.shiftyjelly.pocketcasts.playlists.edit.SmartRulesEditFragment
 import au.com.shiftyjelly.pocketcasts.utils.extensions.dpToPx
 import au.com.shiftyjelly.pocketcasts.views.dialog.ConfirmationDialog
+import au.com.shiftyjelly.pocketcasts.views.extensions.hideKeyboardOnScroll
+import au.com.shiftyjelly.pocketcasts.views.extensions.smoothScrollToTop
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseFragment
 import au.com.shiftyjelly.pocketcasts.views.helper.EpisodeItemTouchHelper
 import au.com.shiftyjelly.pocketcasts.views.helper.HasBackstack
@@ -38,6 +42,7 @@ import dagger.hilt.android.AndroidEntryPoint
 import dagger.hilt.android.lifecycle.withCreationCallback
 import javax.inject.Inject
 import kotlin.math.absoluteValue
+import kotlin.math.roundToInt
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import kotlinx.parcelize.Parcelize
@@ -103,6 +108,11 @@ class SmartPlaylistFragment :
 
         val headerAdapter = PlaylistHeaderAdapter(
             themeType = theme.activeTheme,
+            onChangeSearchFocus = { hasFocus, searchTopOffset ->
+                if (hasFocus) {
+                    content.smoothScrollToTop(0, offset = -searchTopOffset.roundToInt())
+                }
+            },
         )
         val episodesAdapter = adapterFactory.create(
             multiSelectToolbar = multiSelectToolbar,
@@ -126,19 +136,13 @@ class SmartPlaylistFragment :
                             artworkPodcasts = playlist.artworkPodcasts,
                             leftButton = leftButton,
                             rightButton = rightButton,
+                            searchState = viewModel.searchState,
                         )
                     }
                     headerAdapter.submitHeader(playlistHeaderData)
                 }
         }
-        viewLifecycleOwner.lifecycleScope.launch {
-            val initialPadding = content.paddingBottom
-            viewModel.bottomInset
-                .flowWithLifecycle(viewLifecycleOwner.lifecycle)
-                .collect { inset ->
-                    content.updatePadding(bottom = initialPadding + inset)
-                }
-        }
+
         viewLifecycleOwner.lifecycleScope.launch {
             viewModel.startMultiSelectingSignal
                 .flowWithLifecycle(viewLifecycleOwner.lifecycle)
@@ -146,6 +150,26 @@ class SmartPlaylistFragment :
                     adapterFactory.startMultiSelecting()
                 }
         }
+
+        val initialPadding = content.paddingBottom
+        var miniPlayerInset = 0
+        var keyboardInset = 0
+        viewLifecycleOwner.lifecycleScope.launch {
+            val initialPadding = content.paddingBottom
+            viewModel.bottomInset
+                .flowWithLifecycle(viewLifecycleOwner.lifecycle)
+                .collect { inset ->
+                    miniPlayerInset = inset
+                    content.updatePadding(bottom = initialPadding + miniPlayerInset + keyboardInset)
+                }
+        }
+        ViewCompat.setOnApplyWindowInsetsListener(content) { _, windowInsets ->
+            val insets = windowInsets.getInsets(WindowInsetsCompat.Type.ime())
+            keyboardInset = insets.bottom
+            content.updatePadding(bottom = initialPadding + miniPlayerInset + keyboardInset)
+            windowInsets
+        }
+        content.hideKeyboardOnScroll()
     }
 
     private fun SmartPlaylistFragmentBinding.setupToolbar() {

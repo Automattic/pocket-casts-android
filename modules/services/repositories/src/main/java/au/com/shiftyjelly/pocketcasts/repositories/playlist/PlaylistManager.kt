@@ -9,7 +9,10 @@ import kotlinx.coroutines.flow.Flow
 interface PlaylistManager {
     fun observePlaylistsPreview(): Flow<List<PlaylistPreview>>
 
-    fun observeSmartPlaylist(uuid: String): Flow<SmartPlaylist?>
+    fun observeSmartPlaylist(
+        uuid: String,
+        episodeSearchTerm: String? = null,
+    ): Flow<SmartPlaylist?>
 
     fun observeSmartEpisodes(
         rules: SmartRules,

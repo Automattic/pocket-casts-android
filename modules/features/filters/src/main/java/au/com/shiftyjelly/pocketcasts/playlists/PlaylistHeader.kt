@@ -1,6 +1,5 @@
 package au.com.shiftyjelly.pocketcasts.playlists
 
-import android.annotation.SuppressLint
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.Crossfade
 import androidx.compose.animation.core.Spring
@@ -36,6 +35,8 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.input.TextFieldState
+import androidx.compose.foundation.text.input.rememberTextFieldState
 import androidx.compose.material.AppBarDefaults
 import androidx.compose.material.LocalRippleConfiguration
 import androidx.compose.material.MaterialTheme
@@ -45,6 +46,7 @@ import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.ReadOnlyComposable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.setValue
@@ -56,6 +58,8 @@ import androidx.compose.ui.draw.blur
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.drawWithContent
 import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.focus.FocusState
+import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.BlendMode
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
@@ -63,6 +67,8 @@ import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.CompositingStrategy
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.layout
+import androidx.compose.ui.layout.onGloballyPositioned
+import androidx.compose.ui.layout.positionInParent
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalInspectionMode
@@ -82,7 +88,9 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import au.com.shiftyjelly.pocketcasts.compose.AppTheme
 import au.com.shiftyjelly.pocketcasts.compose.PreviewRegularDevice
+import au.com.shiftyjelly.pocketcasts.compose.components.HorizontalDivider
 import au.com.shiftyjelly.pocketcasts.compose.components.NoContentBanner
+import au.com.shiftyjelly.pocketcasts.compose.components.SearchBar
 import au.com.shiftyjelly.pocketcasts.compose.components.TextH20
 import au.com.shiftyjelly.pocketcasts.compose.components.TextH40
 import au.com.shiftyjelly.pocketcasts.compose.components.TextP60
@@ -106,6 +114,7 @@ internal data class PlaylistHeaderData(
     val artworkPodcasts: List<Podcast>,
     val leftButton: ActionButton,
     val rightButton: ActionButton,
+    val searchState: TextFieldState,
 ) {
     data class ActionButton(
         val iconId: Int,
@@ -114,18 +123,19 @@ internal data class PlaylistHeaderData(
     )
 }
 
-@SuppressLint("UnusedBoxWithConstraintsScope")
 @Composable
 internal fun PlaylistHeader(
     data: PlaylistHeaderData?,
     useBlurredArtwork: Boolean,
+    onMeasureSearchTopOffset: (Float) -> Unit,
+    onChangeSearchFocus: (FocusState) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     BoxWithConstraints(
         modifier = modifier,
     ) {
         val podcasts = data?.artworkPodcasts
-        val artworkTopPadding = AppBarDefaults.topAppBarWindowInsets
+        val contentTopPadding = AppBarDefaults.topAppBarWindowInsets
             .asPaddingValues()
             .calculateTopPadding()
             .coerceAtLeast(100.dp)
@@ -135,7 +145,7 @@ internal fun PlaylistHeader(
             podcasts = podcasts,
             useBlurredArtwork = useBlurredArtwork,
             maxWidth = maxWidth,
-            bottomAnchor = artworkTopPadding + artworkSize * 0.75f,
+            bottomAnchor = contentTopPadding + artworkSize * 0.75f,
         )
 
         Column(
@@ -143,7 +153,7 @@ internal fun PlaylistHeader(
             modifier = Modifier.fillMaxWidth(),
         ) {
             Spacer(
-                modifier = Modifier.height(artworkTopPadding),
+                modifier = Modifier.height(contentTopPadding),
             )
             PlaylistForegroundArtwork(
                 artworkSize = artworkSize,
@@ -174,11 +184,19 @@ internal fun PlaylistHeader(
                     leftButton = data.leftButton,
                     rightButton = data.rightButton,
                 )
-            }
-            Spacer(
-                modifier = Modifier.height(16.dp),
-            )
-            if (data != null) {
+                Spacer(
+                    modifier = Modifier.height(24.dp),
+                )
+                PlaylistSearchBar(
+                    data = data,
+                    contentTopPadding = contentTopPadding,
+                    onChangeSearchFocus = onChangeSearchFocus,
+                    onMeasureSearchTopOffset = onMeasureSearchTopOffset,
+                )
+                Spacer(
+                    modifier = Modifier.height(16.dp),
+                )
+                HorizontalDivider()
                 AnimatedVisibility(
                     visible = data.episodeCount == 0,
                     enter = noContentEnterTransition,
@@ -412,6 +430,38 @@ private fun ActionButtons(
     }
 }
 
+@Composable
+private fun PlaylistSearchBar(
+    data: PlaylistHeaderData,
+    contentTopPadding: Dp,
+    onChangeSearchFocus: (FocusState) -> Unit,
+    onMeasureSearchTopOffset: (Float) -> Unit,
+) {
+    val density = LocalDensity.current
+    var isSearchPositionKnown by remember { mutableStateOf(false) }
+    SearchBar(
+        state = data.searchState,
+        placeholder = stringResource(LR.string.search),
+        modifier = Modifier
+            .padding(horizontal = 16.dp)
+            .widthIn(max = 400.dp)
+            .fillMaxWidth()
+            .onFocusChanged(onChangeSearchFocus)
+            .then(
+                if (!isSearchPositionKnown) {
+                    Modifier.onGloballyPositioned { coordinates ->
+                        val topPaddingPx = density.run { (contentTopPadding + 24.dp).toPx() }
+                        val searchTopPx = coordinates.positionInParent().y
+                        onMeasureSearchTopOffset(searchTopPx - topPaddingPx)
+                        isSearchPositionKnown = true
+                    }
+                } else {
+                    Modifier
+                },
+            ),
+    )
+}
+
 private fun Modifier.blurOrScrim(useBlur: Boolean) = if (useBlur) {
     blur(80.dp, BlurredEdgeTreatment.Unbounded)
 } else {
@@ -579,8 +629,11 @@ private fun PlaylistHeaderNoPodcastPreview() {
                         label = "Play All",
                         onClick = { episodeCount = 0 },
                     ),
+                    searchState = rememberTextFieldState(),
                 ),
                 useBlurredArtwork = false,
+                onMeasureSearchTopOffset = {},
+                onChangeSearchFocus = {},
             )
         }
     }
@@ -611,8 +664,11 @@ private fun PlaylistHeaderSinglePodcastPreview() {
                         label = "Play All",
                         onClick = {},
                     ),
+                    searchState = rememberTextFieldState(),
                 ),
                 useBlurredArtwork = false,
+                onMeasureSearchTopOffset = {},
+                onChangeSearchFocus = {},
             )
         }
     }
@@ -643,8 +699,11 @@ private fun PlaylistHeaderMultiPodcastPreview() {
                         label = "Play All",
                         onClick = {},
                     ),
+                    searchState = rememberTextFieldState(),
                 ),
                 useBlurredArtwork = false,
+                onMeasureSearchTopOffset = {},
+                onChangeSearchFocus = {},
             )
         }
     }
@@ -677,8 +736,11 @@ private fun PlaylistHeaderThemePreview(
                         label = "Play All",
                         onClick = {},
                     ),
+                    searchState = rememberTextFieldState(),
                 ),
                 useBlurredArtwork = false,
+                onMeasureSearchTopOffset = {},
+                onChangeSearchFocus = {},
             )
         }
     }
