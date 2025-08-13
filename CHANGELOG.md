@@ -17,6 +17,8 @@
         ([#4273](https://github.com/Automattic/pocket-casts-android/pull/4273))
     *   Fix navigation bar drawing on top of the player after configuration changes.
         ([#4294](https://github.com/Automattic/pocket-casts-android/pull/4294))
+    *   Fix notifications no longer open app when tapped
+        ([#4365](https://github.com/Automattic/pocket-casts-android/pull/4365))
 
 7.94
 -----
