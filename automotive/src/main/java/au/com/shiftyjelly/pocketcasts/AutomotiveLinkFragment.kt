@@ -24,7 +24,7 @@ import androidx.compose.ui.unit.sp
 import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
 import au.com.shiftyjelly.pocketcasts.compose.AutomotiveTheme
-import au.com.shiftyjelly.pocketcasts.helper.rememberQrPainter
+import au.com.shiftyjelly.pocketcasts.compose.rememberQrPainter
 
 /**
  * Fallback for when the Automotive platform doesn't have a web browser.
