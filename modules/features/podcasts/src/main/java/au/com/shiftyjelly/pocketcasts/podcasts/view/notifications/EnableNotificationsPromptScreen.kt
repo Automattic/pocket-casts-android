@@ -61,6 +61,7 @@ internal fun EnableNotificationsPromptScreen(
         isNewsletterSelected = false,
         onNotificationChange = {},
         onNewsletterChange = {},
+        showNewsletterSection = false,
     )
 }
 
@@ -68,6 +69,7 @@ internal fun EnableNotificationsPromptScreen(
 internal fun EnableNotificationsPromptScreenNewOnboarding(
     onCtaClick: () -> Unit,
     onDismissClick: () -> Unit,
+    showNewsletterSection: Boolean,
     isNewsletterSelected: Boolean,
     onNewsletterChange: (Boolean) -> Unit,
     isNotificationSelected: Boolean,
@@ -83,6 +85,7 @@ internal fun EnableNotificationsPromptScreenNewOnboarding(
         isNewsletterSelected = isNewsletterSelected,
         onNotificationChange = onNotificationChange,
         onNewsletterChange = onNewsletterChange,
+        showNewsletterSection = showNewsletterSection,
     )
 }
 
@@ -91,6 +94,7 @@ private fun EnableNotificationsPromptScreenV2(
     onCtaClick: () -> Unit,
     onDismissClick: () -> Unit,
     isAccountCreationFlagEnabled: Boolean,
+    showNewsletterSection: Boolean,
     isNewsletterSelected: Boolean,
     onNewsletterChange: (Boolean) -> Unit,
     isNotificationSelected: Boolean,
@@ -144,15 +148,17 @@ private fun EnableNotificationsPromptScreenV2(
                     Spacer(modifier = Modifier.weight(1f))
 
                     if (isAccountCreationFlagEnabled) {
-                        CheckboxRow(
-                            modifier = Modifier
-                                .fillMaxWidth(),
-                            isSelected = isNewsletterSelected,
-                            onSelectedChange = onNewsletterChange,
-                            title = stringResource(LR.string.onboarding_notification_popup_newsletter),
-                            subTitle = stringResource(LR.string.onboarding_notification_popup_newsletter_message),
-                        )
-                        Spacer(modifier = Modifier.height(18.dp))
+                        if (showNewsletterSection) {
+                            CheckboxRow(
+                                modifier = Modifier
+                                    .fillMaxWidth(),
+                                isSelected = isNewsletterSelected,
+                                onSelectedChange = onNewsletterChange,
+                                title = stringResource(LR.string.onboarding_notification_popup_newsletter),
+                                subTitle = stringResource(LR.string.onboarding_notification_popup_newsletter_message),
+                            )
+                            Spacer(modifier = Modifier.height(18.dp))
+                        }
                         CheckboxRow(
                             modifier = Modifier.fillMaxWidth(),
                             isSelected = isNotificationSelected,
@@ -207,15 +213,17 @@ private fun EnableNotificationsPromptScreenV2(
             )
             Spacer(modifier = Modifier.weight(1f))
             if (isAccountCreationFlagEnabled) {
-                CheckboxRow(
-                    modifier = Modifier
-                        .fillMaxWidth(),
-                    isSelected = isNewsletterSelected,
-                    onSelectedChange = onNewsletterChange,
-                    title = stringResource(LR.string.onboarding_notification_popup_newsletter),
-                    subTitle = stringResource(LR.string.onboarding_notification_popup_newsletter_message),
-                )
-                Spacer(modifier = Modifier.height(18.dp))
+                if (showNewsletterSection) {
+                    CheckboxRow(
+                        modifier = Modifier
+                            .fillMaxWidth(),
+                        isSelected = isNewsletterSelected,
+                        onSelectedChange = onNewsletterChange,
+                        title = stringResource(LR.string.onboarding_notification_popup_newsletter),
+                        subTitle = stringResource(LR.string.onboarding_notification_popup_newsletter_message),
+                    )
+                    Spacer(modifier = Modifier.height(18.dp))
+                }
                 CheckboxRow(
                     modifier = Modifier.fillMaxWidth(),
                     isSelected = isNotificationSelected,
@@ -341,5 +349,6 @@ private fun EnableNotificationsPromptScreenV2Preview(
         isNotificationSelected = false,
         onNotificationChange = {},
         onNewsletterChange = {},
+        showNewsletterSection = true,
     )
 }
