@@ -6,6 +6,7 @@ import au.com.shiftyjelly.pocketcasts.account.viewmodel.NewsletterSource
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
+import au.com.shiftyjelly.pocketcasts.repositories.user.UserManager
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -14,13 +15,16 @@ import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.last
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.reactive.asFlow
 
 @HiltViewModel
 class EnableNotificationsPromptViewModel @Inject constructor(
     private val settings: Settings,
     private val analyticsTracker: AnalyticsTracker,
+    private val userManager: UserManager,
 ) : ViewModel() {
 
     private var _stateFlow: MutableStateFlow<UiState> = MutableStateFlow(UiState.PreNewOnboarding)
@@ -31,11 +35,14 @@ class EnableNotificationsPromptViewModel @Inject constructor(
 
     init {
         if (FeatureFlag.isEnabled(Feature.NEW_ONBOARDING_ACCOUNT_CREATION)) {
-            _stateFlow.update {
-                UiState.NewOnboarding(
-                    notificationsEnabled = true,
-                    subscribedToNewsletter = true,
-                )
+            viewModelScope.launch {
+                _stateFlow.update {
+                    UiState.NewOnboarding(
+                        showNewsletterOptIn = userManager.getSignInState().asFlow().last().isSignedIn && !settings.marketingOptIn.value,
+                        notificationsEnabled = true,
+                        subscribedToNewsletter = true,
+                    )
+                }
             }
         }
     }
@@ -103,6 +110,7 @@ class EnableNotificationsPromptViewModel @Inject constructor(
     sealed interface UiState {
         object PreNewOnboarding : UiState
         data class NewOnboarding(
+            val showNewsletterOptIn: Boolean,
             val subscribedToNewsletter: Boolean,
             val notificationsEnabled: Boolean,
         ) : UiState
