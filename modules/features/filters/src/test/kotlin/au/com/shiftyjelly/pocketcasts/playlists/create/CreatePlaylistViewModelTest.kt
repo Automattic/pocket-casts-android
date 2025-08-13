@@ -382,7 +382,7 @@ class CreatePlaylistViewModelTest {
                 ),
                 playlistManager.upsertSmartPlaylistTurbine.awaitItem(),
             )
-            assertTrue(viewModel.createdSmartPlaylistUuid.isCompleted)
+            viewModel.createdSmartPlaylistUuid.await()
         }
     }
 
