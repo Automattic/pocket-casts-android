@@ -459,7 +459,7 @@ private fun PlaylistSearchBar(
         placeholder = stringResource(LR.string.search),
         modifier = Modifier
             .padding(horizontal = 16.dp)
-            .widthIn(max = 400.dp)
+            .widthIn(max = 640.dp)
             .fillMaxWidth()
             .onFocusChanged(onChangeSearchFocus)
             .then(
