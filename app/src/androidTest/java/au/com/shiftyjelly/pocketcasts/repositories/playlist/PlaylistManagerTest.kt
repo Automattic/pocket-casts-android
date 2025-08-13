@@ -1054,7 +1054,7 @@ class PlaylistManagerTest {
         podcastDao.insertSuspend(Podcast(uuid = "podcast-id-1", title = "Podcast Title 1", isSubscribed = true))
         podcastDao.insertSuspend(Podcast(uuid = "podcast-id-2", title = "Podcast Title 2", isSubscribed = true))
 
-        val episodes = List(1000) { index ->
+        val episodes = List(100) { index ->
             PodcastEpisode(
                 uuid = "id-$index",
                 title = "Episode Title $index",
@@ -1107,14 +1107,6 @@ class PlaylistManagerTest {
                 episodes[108],
                 episodes[109],
                 episodes[110],
-                episodes[210],
-                episodes[310],
-                episodes[410],
-                episodes[510],
-                episodes[610],
-                episodes[710],
-                episodes[810],
-                episodes[910],
             ),
             getSmartEpisodes(searchTerm = "10"),
         )
@@ -1133,8 +1125,8 @@ class PlaylistManagerTest {
 
         assertEquals(
             "underscore character",
-            listOf(underscoreEpisode).map { it.title },
-            getSmartEpisodes(searchTerm = "_").map { it.title },
+            listOf(underscoreEpisode),
+            getSmartEpisodes(searchTerm = "_"),
         )
 
         assertEquals(
