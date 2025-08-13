@@ -27,7 +27,7 @@ interface PlaylistManager {
 
     suspend fun deletePlaylist(uuid: String)
 
-    suspend fun upsertSmartPlaylist(draft: SmartPlaylistDraft): String
+    suspend fun insertSmartPlaylist(draft: SmartPlaylistDraft): String
 
     suspend fun updatePlaylistsOrder(sortedUuids: List<String>)
 }

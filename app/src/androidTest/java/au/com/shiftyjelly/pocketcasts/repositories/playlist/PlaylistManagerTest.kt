@@ -612,18 +612,18 @@ class PlaylistManagerTest {
                 ),
             ),
         )
-        drafts.forEach { draft -> manager.upsertSmartPlaylist(draft) }
+        drafts.forEach { draft -> manager.insertSmartPlaylist(draft) }
         val playlists = playlistDao.observeSmartPlaylists().first()
 
         // Check that UUIDs are unique
         assertEquals(playlists, playlists.distinctBy { it.uuid })
 
         val defaultPlaylist = DbPlaylist(
-            id = playlists[0].id,
-            uuid = playlists[0].uuid,
+            id = playlists.last().id,
+            uuid = playlists.last().uuid,
             title = "Title",
             iconId = 0,
-            sortPosition = playlists[0].sortPosition,
+            sortPosition = playlists.last().sortPosition,
             sortType = PlaylistEpisodeSortType.NewestToOldest,
             manual = false,
             draft = false,
@@ -659,33 +659,33 @@ class PlaylistManagerTest {
             assertEquals(message, func(indexedPlaylist), playlist)
         }
 
-        assertPlaylist(index = 0, "Default") { defaultPlaylist }
-        assertPlaylist(index = 1, "Unplayed") { it.copy(unplayed = true, partiallyPlayed = false, finished = false) }
-        assertPlaylist(index = 2, "In progress") { it.copy(unplayed = false, partiallyPlayed = true, finished = false) }
-        assertPlaylist(index = 3, "Played") { it.copy(unplayed = false, partiallyPlayed = false, finished = true) }
-        assertPlaylist(index = 4, "Any downloaded status") { it.copy(downloaded = true, notDownloaded = true, downloading = true) }
-        assertPlaylist(index = 5, "Downloaded") { it.copy(downloaded = true, notDownloaded = false, downloading = false) }
-        assertPlaylist(index = 6, "Not downloaded") { it.copy(downloaded = false, notDownloaded = true, downloading = true) }
-        assertPlaylist(index = 7, "Audio / Video") { it.copy(audioVideo = AUDIO_VIDEO_FILTER_ALL) }
-        assertPlaylist(index = 8, "Audio") { it.copy(audioVideo = AUDIO_VIDEO_FILTER_AUDIO_ONLY) }
-        assertPlaylist(index = 9, "Video") { it.copy(audioVideo = AUDIO_VIDEO_FILTER_VIDEO_ONLY) }
-        assertPlaylist(index = 10, "Released any time") { it.copy(filterHours = ANYTIME) }
-        assertPlaylist(index = 11, "Last day") { it.copy(filterHours = LAST_24_HOURS) }
-        assertPlaylist(index = 12, "Last 3 days") { it.copy(filterHours = LAST_3_DAYS) }
-        assertPlaylist(index = 13, "Last week") { it.copy(filterHours = LAST_WEEK) }
-        assertPlaylist(index = 14, "Last 2 weeks") { it.copy(filterHours = LAST_2_WEEKS) }
-        assertPlaylist(index = 15, "Last month") { it.copy(filterHours = LAST_MONTH) }
-        assertPlaylist(index = 16, "Any starred status") { it.copy(starred = false) }
-        assertPlaylist(index = 17, "Starred") { it.copy(starred = true) }
-        assertPlaylist(index = 18, "All podcasts") { it.copy(allPodcasts = true, podcastUuids = null) }
-        assertPlaylist(index = 19, "Selected podcasts") { it.copy(allPodcasts = false, podcastUuids = "id-1,id-2") }
-        assertPlaylist(index = 20, "Any duration") { it.copy(filterDuration = false, longerThan = 20, shorterThan = 40) }
-        assertPlaylist(index = 21, "Limited duration") { it.copy(filterDuration = true, longerThan = 50, shorterThan = 60) }
+        assertPlaylist(index = 21, "Default") { defaultPlaylist }
+        assertPlaylist(index = 20, "Unplayed") { it.copy(unplayed = true, partiallyPlayed = false, finished = false) }
+        assertPlaylist(index = 19, "In progress") { it.copy(unplayed = false, partiallyPlayed = true, finished = false) }
+        assertPlaylist(index = 18, "Played") { it.copy(unplayed = false, partiallyPlayed = false, finished = true) }
+        assertPlaylist(index = 17, "Any downloaded status") { it.copy(downloaded = true, notDownloaded = true, downloading = true) }
+        assertPlaylist(index = 16, "Downloaded") { it.copy(downloaded = true, notDownloaded = false, downloading = false) }
+        assertPlaylist(index = 15, "Not downloaded") { it.copy(downloaded = false, notDownloaded = true, downloading = true) }
+        assertPlaylist(index = 14, "Audio / Video") { it.copy(audioVideo = AUDIO_VIDEO_FILTER_ALL) }
+        assertPlaylist(index = 13, "Audio") { it.copy(audioVideo = AUDIO_VIDEO_FILTER_AUDIO_ONLY) }
+        assertPlaylist(index = 12, "Video") { it.copy(audioVideo = AUDIO_VIDEO_FILTER_VIDEO_ONLY) }
+        assertPlaylist(index = 11, "Released any time") { it.copy(filterHours = ANYTIME) }
+        assertPlaylist(index = 10, "Last day") { it.copy(filterHours = LAST_24_HOURS) }
+        assertPlaylist(index = 9, "Last 3 days") { it.copy(filterHours = LAST_3_DAYS) }
+        assertPlaylist(index = 8, "Last week") { it.copy(filterHours = LAST_WEEK) }
+        assertPlaylist(index = 7, "Last 2 weeks") { it.copy(filterHours = LAST_2_WEEKS) }
+        assertPlaylist(index = 6, "Last month") { it.copy(filterHours = LAST_MONTH) }
+        assertPlaylist(index = 5, "Any starred status") { it.copy(starred = false) }
+        assertPlaylist(index = 4, "Starred") { it.copy(starred = true) }
+        assertPlaylist(index = 3, "All podcasts") { it.copy(allPodcasts = true, podcastUuids = null) }
+        assertPlaylist(index = 2, "Selected podcasts") { it.copy(allPodcasts = false, podcastUuids = "id-1,id-2") }
+        assertPlaylist(index = 1, "Any duration") { it.copy(filterDuration = false, longerThan = 20, shorterThan = 40) }
+        assertPlaylist(index = 0, "Limited duration") { it.copy(filterDuration = true, longerThan = 50, shorterThan = 60) }
     }
 
     @Test
     fun createDefaultNewReleasesPlaylist() = runTest(testDispatcher) {
-        manager.upsertSmartPlaylist(SmartPlaylistDraft.NewReleases)
+        manager.insertSmartPlaylist(SmartPlaylistDraft.NewReleases)
         val playlists = playlistDao.observeSmartPlaylists().first()
 
         assertEquals(
@@ -725,7 +725,7 @@ class PlaylistManagerTest {
 
     @Test
     fun createDefaultInProgressPlaylist() = runTest(testDispatcher) {
-        manager.upsertSmartPlaylist(SmartPlaylistDraft.InProgress)
+        manager.insertSmartPlaylist(SmartPlaylistDraft.InProgress)
         val playlists = playlistDao.observeSmartPlaylists().first()
 
         assertEquals(

@@ -40,7 +40,7 @@ class FakePlaylistManager : PlaylistManager {
     override suspend fun deletePlaylist(uuid: String) = Unit
 
     val upsertSmartPlaylistTurbine = Turbine<SmartPlaylistDraft>(name = "upsertSmartPlaylist")
-    override suspend fun upsertSmartPlaylist(draft: SmartPlaylistDraft): String {
+    override suspend fun insertSmartPlaylist(draft: SmartPlaylistDraft): String {
         upsertSmartPlaylistTurbine.add(draft)
         return UUID.randomUUID().toString()
     }

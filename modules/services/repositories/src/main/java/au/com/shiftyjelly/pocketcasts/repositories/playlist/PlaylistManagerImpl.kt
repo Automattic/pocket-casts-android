@@ -143,7 +143,7 @@ class PlaylistManagerImpl @Inject constructor(
         playlistDao.markPlaylistAsDeleted(uuid)
     }
 
-    override suspend fun upsertSmartPlaylist(draft: SmartPlaylistDraft): String {
+    override suspend fun insertSmartPlaylist(draft: SmartPlaylistDraft): String {
         return appDatabase.withTransaction {
             val uuids = playlistDao.getAllPlaylistUuids()
             val uuid = if (draft === SmartPlaylistDraft.NewReleases) {
@@ -153,8 +153,11 @@ class PlaylistManagerImpl @Inject constructor(
             } else {
                 generateUniqueUuid(uuids)
             }
-            val playlist = draft.toSmartPlaylist(uuid, sortPosition = uuids.size + 1)
+            val playlist = draft.toSmartPlaylist(uuid, sortPosition = 1)
             playlistDao.upsertSmartPlaylist(playlist)
+            uuids.forEachIndexed { index, uuid ->
+                playlistDao.updateSortPosition(uuid, index + 2)
+            }
             uuid
         }
     }
