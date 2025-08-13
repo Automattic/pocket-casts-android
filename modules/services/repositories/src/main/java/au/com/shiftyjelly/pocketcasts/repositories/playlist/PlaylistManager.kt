@@ -11,7 +11,11 @@ interface PlaylistManager {
 
     fun observeSmartPlaylist(uuid: String): Flow<SmartPlaylist?>
 
-    fun observeSmartEpisodes(rules: SmartRules, sortType: PlaylistEpisodeSortType = PlaylistEpisodeSortType.NewestToOldest): Flow<List<PodcastEpisode>>
+    fun observeSmartEpisodes(
+        rules: SmartRules,
+        sortType: PlaylistEpisodeSortType = PlaylistEpisodeSortType.NewestToOldest,
+        searchTerm: String? = null,
+    ): Flow<List<PodcastEpisode>>
 
     fun observeEpisodeMetadata(rules: SmartRules): Flow<PlaylistEpisodeMetadata>
 

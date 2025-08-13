@@ -97,12 +97,17 @@ class PlaylistManagerImpl @Inject constructor(
             .distinctUntilChanged()
     }
 
-    override fun observeSmartEpisodes(rules: SmartRules, sortType: PlaylistEpisodeSortType): Flow<List<PodcastEpisode>> {
+    override fun observeSmartEpisodes(
+        rules: SmartRules,
+        sortType: PlaylistEpisodeSortType,
+        searchTerm: String?,
+    ): Flow<List<PodcastEpisode>> {
         return playlistDao.observeSmartPlaylistEpisodes(
             clock = clock,
             smartRules = rules,
             sortType = sortType,
             limit = SMART_PLAYLIST_EPISODE_LIMIT,
+            searchTerm = searchTerm,
         ).distinctUntilChanged()
     }
 

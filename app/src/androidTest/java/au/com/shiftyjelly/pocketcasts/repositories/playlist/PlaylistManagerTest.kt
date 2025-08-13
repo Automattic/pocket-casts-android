@@ -66,6 +66,12 @@ class PlaylistManagerTest {
         val appDatabase = Room.inMemoryDatabaseBuilder(context, AppDatabase::class.java)
             .addTypeConverters(ModelModule.provideRoomConverters(moshi))
             .setQueryCoroutineContext(testDispatcher)
+            .setQueryCallback(testDispatcher) { statement, args ->
+                if (statement.contains("ORDER BY", ignoreCase = true)) {
+                    println("!!! $statement")
+                    println("!!! $args")
+                }
+            }
             .build()
         podcastDao = appDatabase.podcastDao()
         episodeDao = appDatabase.episodeDao()
@@ -1047,5 +1053,100 @@ class PlaylistManagerTest {
             playlist = awaitItem()
             assertEquals("Other title", playlist?.title)
         }
+    }
+
+    @Test
+    fun searchSmartEpisodes() = runTest(testDispatcher) {
+        podcastDao.insertSuspend(Podcast(uuid = "podcast-id-1", title = "Podcast Title 1", isSubscribed = true))
+        podcastDao.insertSuspend(Podcast(uuid = "podcast-id-2", title = "Podcast Title 2", isSubscribed = true))
+
+        val episodes = List(1000) { index ->
+            PodcastEpisode(
+                uuid = "id-$index",
+                title = "Episode Title $index",
+                podcastUuid = if (index % 2 == 0) "podcast-id-1" else "podcast-id-2",
+                publishedDate = Date(1000000 - index.toLong()),
+            )
+        }
+        episodeDao.insertAll(episodes)
+        val percentEpisode = PodcastEpisode(uuid = "id-1000000", title = "Episode % title", podcastUuid = "podcast-id-1", publishedDate = Date(0))
+        episodeDao.insert(percentEpisode)
+        val underscoreEpisode = PodcastEpisode(uuid = "id-2000000", title = "Episode _ title", podcastUuid = "podcast-id-1", publishedDate = Date(0))
+        episodeDao.insert(underscoreEpisode)
+        val backslashEpisode = PodcastEpisode(uuid = "id-3000000", title = "Episode \\ title", podcastUuid = "podcast-id-1", publishedDate = Date(0))
+        episodeDao.insert(backslashEpisode)
+
+        suspend fun getSmartEpisodes(searchTerm: String?): List<PodcastEpisode> {
+            return manager.observeSmartEpisodes(SmartRules.Default, searchTerm = searchTerm).first()
+        }
+
+        assertEquals(
+            "null search term",
+            episodes.take(500),
+            getSmartEpisodes(searchTerm = null),
+        )
+
+        assertEquals(
+            "blank search term",
+            episodes.take(500),
+            getSmartEpisodes(searchTerm = " "),
+        )
+
+        assertEquals(
+            "podcast title search",
+            episodes.filterIndexed { index, _ -> index % 2 == 0 },
+            getSmartEpisodes(searchTerm = "podcast title 1"),
+        )
+
+        assertEquals(
+            "episode title search",
+            listOf(
+                episodes[10],
+                episodes[100],
+                episodes[101],
+                episodes[102],
+                episodes[103],
+                episodes[104],
+                episodes[105],
+                episodes[106],
+                episodes[107],
+                episodes[108],
+                episodes[109],
+                episodes[110],
+                episodes[210],
+                episodes[310],
+                episodes[410],
+                episodes[510],
+                episodes[610],
+                episodes[710],
+                episodes[810],
+                episodes[910],
+            ),
+            getSmartEpisodes(searchTerm = "10"),
+        )
+
+        assertEquals(
+            "search above episode limit",
+            listOf(episodes[515]),
+            getSmartEpisodes(searchTerm = "episode title 515"),
+        )
+
+        assertEquals(
+            "percent character",
+            listOf(percentEpisode),
+            getSmartEpisodes(searchTerm = "%"),
+        )
+
+        assertEquals(
+            "underscore character",
+            listOf(underscoreEpisode).map { it.title },
+            getSmartEpisodes(searchTerm = "_").map { it.title },
+        )
+
+        assertEquals(
+            "backslash character",
+            listOf(backslashEpisode),
+            getSmartEpisodes(searchTerm = "\\"),
+        )
     }
 }

@@ -16,6 +16,7 @@ import au.com.shiftyjelly.pocketcasts.models.type.PlaylistEpisodeSortType.Newest
 import au.com.shiftyjelly.pocketcasts.models.type.PlaylistEpisodeSortType.OldestToNewest
 import au.com.shiftyjelly.pocketcasts.models.type.PlaylistEpisodeSortType.ShortestToLongest
 import au.com.shiftyjelly.pocketcasts.models.type.SmartRules
+import au.com.shiftyjelly.pocketcasts.utils.extensions.escapeLike
 import java.time.Clock
 import kotlinx.coroutines.flow.Flow
 
@@ -99,10 +100,21 @@ abstract class PlaylistDao {
         smartRules: SmartRules,
         sortType: PlaylistEpisodeSortType,
         limit: Int,
+        searchTerm: String? = null,
     ): Flow<List<PodcastEpisode>> {
+        val escapedTerm = searchTerm?.takeIf(String::isNotBlank)?.escapeLike('\\')
         val query = createSmartPlaylistEpisodeQuery(
-            selectClause = "DISTINCT episode.*",
-            whereClause = smartRules.toSqlWhereClause(clock),
+            selectClause = "episode.*",
+            whereClause = buildString {
+                append(smartRules.toSqlWhereClause(clock))
+                if (escapedTerm != null) {
+                    append(" AND (")
+                    append("episode.title LIKE '%' || '$escapedTerm' || '%' ESCAPE '\\' COLLATE NOCASE")
+                    append(" OR ")
+                    append("podcast.title LIKE '%' || '$escapedTerm' || '%' ESCAPE '\\' COLLATE NOCASE")
+                    append(')')
+                }
+            },
             orderByClause = sortType.toOrderByClause(),
             limit = limit,
         )
