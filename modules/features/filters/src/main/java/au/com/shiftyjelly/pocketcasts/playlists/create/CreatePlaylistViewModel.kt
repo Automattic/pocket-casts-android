@@ -4,8 +4,11 @@ import androidx.compose.foundation.text.input.TextFieldState
 import androidx.compose.ui.text.TextRange
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
+import au.com.shiftyjelly.pocketcasts.models.type.SmartRules
 import au.com.shiftyjelly.pocketcasts.models.type.SmartRules.DownloadStatusRule
 import au.com.shiftyjelly.pocketcasts.models.type.SmartRules.MediaTypeRule
 import au.com.shiftyjelly.pocketcasts.models.type.SmartRules.ReleaseDateRule
@@ -35,6 +38,7 @@ class CreatePlaylistViewModel @AssistedInject constructor(
     private val playlistManager: PlaylistManager,
     rulesEditorFactory: SmartRulesEditor.Factory,
     settings: Settings,
+    private val analyticsTracker: AnalyticsTracker,
     @Assisted initialPlaylistTitle: String,
 ) : ViewModel() {
     private val _createdSmartPlaylistUuid = CompletableDeferred<String>(viewModelScope.coroutineContext[Job])
@@ -155,8 +159,29 @@ class CreatePlaylistViewModel @AssistedInject constructor(
         )
         viewModelScope.launch {
             val playlistUuid = playlistManager.insertSmartPlaylist(draft)
+            trackPlaylistCreated(rules)
             _createdSmartPlaylistUuid.complete(playlistUuid)
         }
+    }
+
+    fun trackCreatePlaylistShown() {
+        analyticsTracker.track(AnalyticsEvent.FILTER_CREATE_SHOWN)
+    }
+
+    fun trackCreatePlaylistCancelled() {
+        analyticsTracker.track(AnalyticsEvent.FILTER_CREATE_CANCELLED)
+    }
+
+    fun trackCreateManualPlaylist() {
+        analyticsTracker.track(AnalyticsEvent.FILTER_CREATE_AS_MANUAL_PLAYLIST_TAPPED)
+    }
+
+    fun trackCreateSmartPlaylist() {
+        analyticsTracker.track(AnalyticsEvent.FILTER_CREATE_AS_SMART_PLAYLIST_TAPPED)
+    }
+
+    fun trackPlaylistCreated(rules: SmartRules) {
+        analyticsTracker.track(AnalyticsEvent.FILTER_CREATED, rules.analyticsProperties())
     }
 
     data class UiState(

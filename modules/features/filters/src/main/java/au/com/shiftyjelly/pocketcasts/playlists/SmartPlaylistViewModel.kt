@@ -2,6 +2,8 @@ package au.com.shiftyjelly.pocketcasts.playlists
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.models.type.PlaylistEpisodeSortType
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
@@ -13,6 +15,7 @@ import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlin.collections.mapOf
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.NonCancellable
@@ -30,7 +33,12 @@ class SmartPlaylistViewModel @AssistedInject constructor(
     private val playbackManager: PlaybackManager,
     private val downloadManager: DownloadManager,
     private val settings: Settings,
+    private val analyticsTracker: AnalyticsTracker,
 ) : ViewModel() {
+    private var isNameChanged = false
+    private var isAutoDownloadChanged = false
+    private var isAutoDownloadLimitChanged = false
+
     val bottomInset = settings.bottomInset
 
     private val _startMultiSelectingSignal = MutableSharedFlow<Unit>()
@@ -74,18 +82,23 @@ class SmartPlaylistViewModel @AssistedInject constructor(
     fun updateSortType(type: PlaylistEpisodeSortType) {
         viewModelScope.launch(NonCancellable) {
             playlistManager.updateSortType(playlistUuid, type)
+            trackSortByChanged(type)
         }
     }
 
     fun updateAutoDownload(isEnabled: Boolean) {
         viewModelScope.launch(NonCancellable) {
             playlistManager.updateAutoDownload(playlistUuid, isEnabled)
+            isAutoDownloadChanged = true
+            trackAutoDownloadChanged(isEnabled)
         }
     }
 
     fun updateAutoDownloadLimit(limit: Int) {
         viewModelScope.launch(NonCancellable) {
             playlistManager.updateAutoDownloadLimit(playlistUuid, limit)
+            isAutoDownloadLimitChanged = true
+            trackAutoDownloadLimitChanged(limit)
         }
     }
 
@@ -95,6 +108,7 @@ class SmartPlaylistViewModel @AssistedInject constructor(
             return
         }
         viewModelScope.launch(NonCancellable) {
+            isNameChanged = true
             playlistManager.updateName(playlistUuid, sanitizedName)
         }
     }
@@ -113,8 +127,78 @@ class SmartPlaylistViewModel @AssistedInject constructor(
 
     fun showSettings() {
         viewModelScope.launch {
+            isNameChanged = false
+            isAutoDownloadChanged = false
+            isAutoDownloadLimitChanged = false
             _showSettingsSignal.emit(Unit)
         }
+    }
+
+    fun trackFilterShown() {
+        analyticsTracker.track(AnalyticsEvent.FILTER_SHOWN)
+    }
+
+    fun trackEditRulesTapped() {
+        analyticsTracker.track(AnalyticsEvent.FILTER_EDIT_RULES_TAPPED)
+    }
+
+    fun trackPlayAllTapped() {
+        analyticsTracker.track(AnalyticsEvent.FILTER_PLAY_ALL_TAPPED)
+    }
+
+    fun trackSelectEpisodesTapped() {
+        analyticsTracker.track(AnalyticsEvent.FILTER_SELECT_EPISODES_TAPPED)
+    }
+
+    fun trackSortByTapped() {
+        analyticsTracker.track(AnalyticsEvent.FILTER_SORT_BY_TAPPED)
+    }
+
+    fun trackDownloadAllTapped() {
+        analyticsTracker.track(AnalyticsEvent.FILTER_DOWNLOAD_ALL_TAPPED)
+    }
+
+    fun trackChromeCastTapped() {
+        analyticsTracker.track(AnalyticsEvent.FILTER_CHROME_CAST_TAPPED)
+    }
+
+    fun trackFilterOptionsTapped() {
+        analyticsTracker.track(AnalyticsEvent.FILTER_OPTIONS_TAPPED)
+    }
+
+    fun trackSortByChanged(type: PlaylistEpisodeSortType) {
+        analyticsTracker.track(
+            AnalyticsEvent.FILTER_SORT_BY_CHANGED,
+            mapOf("sort_order" to type.analyticsValue),
+        )
+    }
+
+    fun trackAutoDownloadChanged(isEnabled: Boolean) {
+        analyticsTracker.track(
+            AnalyticsEvent.FILTER_AUTO_DOWNLOAD_UPDATED,
+            mapOf(
+                "source" to "filters",
+                "enabled" to isEnabled,
+            ),
+        )
+    }
+
+    fun trackAutoDownloadLimitChanged(limit: Int) {
+        analyticsTracker.track(
+            AnalyticsEvent.FILTER_AUTO_DOWNLOAD_LIMIT_UPDATED,
+            mapOf("limit" to limit),
+        )
+    }
+
+    fun trackEditDismissed() {
+        analyticsTracker.track(
+            AnalyticsEvent.FILTER_EDIT_DISMISSED,
+            mapOf(
+                "did_change_name" to isNameChanged,
+                "did_change_auto_download" to isAutoDownloadChanged,
+                "did_change_episode_count" to isAutoDownloadLimitChanged,
+            ),
+        )
     }
 
     data class UiState(

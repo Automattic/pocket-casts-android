@@ -41,7 +41,6 @@ import kotlin.math.absoluteValue
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import kotlinx.parcelize.Parcelize
-import timber.log.Timber
 import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 import au.com.shiftyjelly.pocketcasts.ui.R as UR
@@ -64,6 +63,13 @@ class SmartPlaylistFragment :
         },
     )
 
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        if (savedInstanceState == null) {
+            viewModel.trackFilterShown()
+        }
+    }
+
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -81,12 +87,18 @@ class SmartPlaylistFragment :
         val leftButton = PlaylistHeaderData.ActionButton(
             iconId = IR.drawable.ic_playlist_smart_rules,
             label = getString(LR.string.smart_rules),
-            onClick = ::openEditor,
+            onClick = {
+                viewModel.trackEditRulesTapped()
+                openEditor()
+            },
         )
         val rightButton = PlaylistHeaderData.ActionButton(
             iconId = IR.drawable.ic_playlist_play,
             label = getString(LR.string.playlist_play_all),
-            onClick = ::playAll,
+            onClick = {
+                viewModel.trackPlayAllTapped()
+                playAll()
+            },
         )
 
         val headerAdapter = PlaylistHeaderAdapter(
@@ -94,7 +106,6 @@ class SmartPlaylistFragment :
         )
         val episodesAdapter = adapterFactory.create(
             multiSelectToolbar = multiSelectToolbar,
-            onChangeMultiSelect = { isMultiSelecting -> Timber.i("Is multi selecting: $isMultiSelecting") },
             getEpisodes = { viewModel.uiState.value.smartPlaylist?.episodes.orEmpty() },
         )
         content.adapter = ConcatAdapter(headerAdapter, episodesAdapter)
