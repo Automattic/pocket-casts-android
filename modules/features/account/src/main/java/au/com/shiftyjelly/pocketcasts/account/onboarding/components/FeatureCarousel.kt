@@ -45,7 +45,13 @@ fun FeatureCarousel(
                 modifier = Modifier.fillMaxSize(),
                 contentAlignment = Alignment.Center,
             ) {
-                Text(text = index.toString())
+                when (index) {
+                    0 -> BestAppAnimation(
+                        modifier = Modifier.padding(top = 64.dp),
+                        animationState = AnimationState.Disappearing
+                    )
+                    else -> Text(text = index.toString())
+                }
             }
         }
     }
