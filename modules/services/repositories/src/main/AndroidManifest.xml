@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<manifest
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
 
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
@@ -27,13 +26,14 @@
             android:foregroundServiceType="dataSync"
             tools:node="merge" />
 
-        <receiver
-            android:name=".notification.NotificationOpenReceiver"
-            android:exported="true">
+        <activity
+            android:name=".notification.NotificationOpenReceiverActivity"
+            android:exported="false"
+            android:theme="@android:style/Theme.NoDisplay">
             <intent-filter>
                 <action android:name="au.com.shiftyjelly.pocketcasts.ACTION_REVAMPED_NOTIFICATION_OPENED" />
             </intent-filter>
-        </receiver>
+        </activity>
     </application>
 
 </manifest>
