@@ -28,7 +28,8 @@
 
         <activity
             android:name=".notification.NotificationOpenReceiverActivity"
-            android:exported="false">
+            android:exported="false"
+            android:theme="@android:style/Theme.NoDisplay">
             <intent-filter>
                 <action android:name="au.com.shiftyjelly.pocketcasts.ACTION_REVAMPED_NOTIFICATION_OPENED" />
             </intent-filter>

@@ -21,10 +21,6 @@ class NotificationOpenReceiverActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
 
         trackOpen(intent)
-    }
-
-    override fun onStart() {
-        super.onStart()
 
         restoreOriginalIntent(intent, this)?.let { restored ->
             tryLaunchIntent(restored)
