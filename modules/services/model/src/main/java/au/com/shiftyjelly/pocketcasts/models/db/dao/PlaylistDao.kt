@@ -27,7 +27,7 @@ abstract class PlaylistDao {
     @Upsert
     abstract suspend fun upsertSmartPlaylists(playlists: List<SmartPlaylist>)
 
-    @Query("SELECT uuid FROM smart_playlists")
+    @Query("SELECT uuid FROM smart_playlists ORDER BY sortPosition ASC")
     abstract suspend fun getAllPlaylistUuids(): List<String>
 
     @Query("SELECT * FROM smart_playlists WHERE manual = 0 AND deleted = 0 AND draft = 0 AND uuid = :uuid")

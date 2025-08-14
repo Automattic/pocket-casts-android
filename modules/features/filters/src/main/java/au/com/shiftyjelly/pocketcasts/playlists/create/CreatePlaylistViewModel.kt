@@ -154,7 +154,7 @@ class CreatePlaylistViewModel @AssistedInject constructor(
             rules = rules,
         )
         viewModelScope.launch {
-            val playlistUuid = playlistManager.upsertSmartPlaylist(draft)
+            val playlistUuid = playlistManager.insertSmartPlaylist(draft)
             _createdSmartPlaylistUuid.complete(playlistUuid)
         }
     }
