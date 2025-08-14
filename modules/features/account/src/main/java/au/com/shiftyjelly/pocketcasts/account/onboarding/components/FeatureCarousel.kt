@@ -29,12 +29,12 @@ private const val CAROUSEL_ITEM_COUNT = 3
 
 @Composable
 fun FeatureCarousel(
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
-    val activeItemIndex by CyclingCounter(cycleRange = 0 until CAROUSEL_ITEM_COUNT)
+    val activeItemIndex by cyclicCounter(cycleRange = 0 until CAROUSEL_ITEM_COUNT)
 
     Column(
-        modifier = modifier.padding(top = 11.dp)
+        modifier = modifier.padding(top = 11.dp),
     ) {
         CarouselActiveItemIndicatorBar(
             itemCount = CAROUSEL_ITEM_COUNT,
@@ -52,7 +52,7 @@ fun FeatureCarousel(
 }
 
 @Composable
-fun CyclingCounter(
+fun cyclicCounter(
     cycleRange: IntRange,
     delayBetweenCycles: Duration = 2.seconds,
     isPerpetual: Boolean = true,
@@ -75,7 +75,7 @@ private fun CarouselActiveItemIndicatorBar(
 ) {
     Row(
         modifier = modifier,
-        horizontalArrangement = Arrangement.spacedBy(4.dp)
+        horizontalArrangement = Arrangement.spacedBy(4.dp),
     ) {
         (0 until itemCount).forEach { index ->
             CarouselActiveItemIndicator(
@@ -97,7 +97,7 @@ private fun CarouselActiveItemIndicator(
     Box(
         modifier = modifier
             .height(4.dp)
-            .background(color = if (isActive) activeColor else inactiveColor)
+            .background(color = if (isActive) activeColor else inactiveColor),
     )
 }
 
@@ -105,6 +105,6 @@ private fun CarouselActiveItemIndicator(
 @Composable
 private fun PreviewFeatureCarousel() = AppThemeWithBackground(Theme.ThemeType.LIGHT) {
     FeatureCarousel(
-        modifier = Modifier.fillMaxSize()
+        modifier = Modifier.fillMaxSize(),
     )
 }
