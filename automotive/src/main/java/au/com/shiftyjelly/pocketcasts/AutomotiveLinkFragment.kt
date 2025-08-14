@@ -32,7 +32,7 @@ import au.com.shiftyjelly.pocketcasts.compose.rememberQrPainter
 class AutomotiveLinkFragment : Fragment() {
 
     companion object {
-        const val ARGUMENT_URL = "url"
+        private const val ARGUMENT_URL = "url"
 
         fun newInstance(url: String): AutomotiveLinkFragment {
             return AutomotiveLinkFragment().apply {
@@ -42,7 +42,7 @@ class AutomotiveLinkFragment : Fragment() {
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
-        val url = arguments?.getString(ARGUMENT_URL) ?: ""
+        val url = arguments?.getString(ARGUMENT_URL).orEmpty()
         return ComposeView(requireContext()).apply {
             setContent {
                 AutomotiveTheme {

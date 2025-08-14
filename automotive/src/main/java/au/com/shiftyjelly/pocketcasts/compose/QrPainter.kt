@@ -3,12 +3,9 @@ package au.com.shiftyjelly.pocketcasts.compose
 import android.graphics.Bitmap
 import android.graphics.Color
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.DisposableEffect
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.produceState
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.graphics.painter.BitmapPainter
 import androidx.compose.ui.graphics.painter.ColorPainter
@@ -40,17 +37,11 @@ fun rememberQrPainter(
     val density = LocalDensity.current
     val sizePx = with(density) { size.roundToPx() }
 
-    var qrState by remember(content, sizePx) {
-        mutableStateOf<QrState>(QrState.Loading)
-    }
-
-    LaunchedEffect(content, sizePx) {
-        qrState = QrState.Loading
-
+    val qrState by produceState<QrState>(QrState.Loading, content, sizePx) {
         launch(Dispatchers.IO) {
             try {
                 if (content.isBlank()) {
-                    qrState = QrState.Error
+                    value = QrState.Error
                     return@launch
                 }
 
@@ -78,18 +69,16 @@ fun rememberQrPainter(
                     }
                 }
 
-                qrState = QrState.Success(newBitmap)
+                value = QrState.Success(newBitmap)
             } catch (ex: Exception) {
                 Timber.e(ex, "Failed to generate QR code")
-                qrState = QrState.Error
+                value = QrState.Error
             }
         }
-    }
 
-    // Recycle the bitmap
-    DisposableEffect(content, sizePx) {
-        onDispose {
-            val currentState = qrState
+        // Recycle the bitmap
+        awaitDispose {
+            val currentState = value
             if (currentState is QrState.Success) {
                 try {
                     if (!currentState.bitmap.isRecycled) {
