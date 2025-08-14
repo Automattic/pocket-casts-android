@@ -59,14 +59,12 @@ class PlaylistEpisodesAdapterFactory @Inject constructor(
 
     fun create(
         multiSelectToolbar: MultiSelectToolbar,
-        onChangeMultiSelect: (Boolean) -> Unit,
         getEpisodes: () -> List<BaseEpisode>,
     ): EpisodeListAdapter {
         lateinit var adapter: EpisodeListAdapter
         configureDependencies(
             getAdapter = { adapter },
             multiSelectToolbar = multiSelectToolbar,
-            onChangeMultiSelect = onChangeMultiSelect,
             getEpisodes = getEpisodes,
         )
         val parentFragmentManager = fragment.parentFragmentManager
@@ -112,7 +110,6 @@ class PlaylistEpisodesAdapterFactory @Inject constructor(
     private fun configureDependencies(
         getAdapter: () -> EpisodeListAdapter,
         multiSelectToolbar: MultiSelectToolbar,
-        onChangeMultiSelect: (Boolean) -> Unit,
         getEpisodes: () -> List<BaseEpisode>,
     ) {
         fragment.viewLifecycleOwner.lifecycle.addObserver(object : DefaultLifecycleObserver {
@@ -150,13 +147,12 @@ class PlaylistEpisodesAdapterFactory @Inject constructor(
                     AnalyticsEvent.FILTER_MULTI_SELECT_EXITED
                 }
                 analyticsTracker.track(event)
-                onChangeMultiSelect(isMultiSelecting)
                 @SuppressLint("NotifyDataSetChanged")
                 getAdapter().notifyDataSetChanged()
             }
             listener = object : MultiSelectHelper.Listener<BaseEpisode> {
                 override fun multiSelectSelectAll() {
-                    analyticsTracker.track(AnalyticsEvent.FILTER_SELECT_ALL_BUTTON_TAPPED)
+                    analyticsTracker.track(AnalyticsEvent.FILTER_SELECT_ALL)
                     val episodes = getEpisodes()
                     multiSelectHelper.selectAllInList(episodes)
                     @SuppressLint("NotifyDataSetChanged")
@@ -164,6 +160,7 @@ class PlaylistEpisodesAdapterFactory @Inject constructor(
                 }
 
                 override fun multiSelectSelectNone() {
+                    analyticsTracker.track(AnalyticsEvent.FILTER_DESELECT_ALL)
                     val episodes = getEpisodes()
                     multiSelectHelper.deselectAllInList(episodes)
                     @SuppressLint("NotifyDataSetChanged")

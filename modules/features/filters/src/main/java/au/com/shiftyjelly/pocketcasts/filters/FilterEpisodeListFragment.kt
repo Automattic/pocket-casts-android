@@ -487,7 +487,7 @@ class FilterEpisodeListFragment : BaseFragment() {
         multiSelectHelper.coordinatorLayout = (activity as FragmentHostListener).snackBarView()
         multiSelectHelper.listener = object : MultiSelectHelper.Listener<BaseEpisode> {
             override fun multiSelectSelectAll() {
-                analyticsTracker.track(AnalyticsEvent.FILTER_SELECT_ALL_BUTTON_TAPPED)
+                analyticsTracker.track(AnalyticsEvent.FILTER_SELECT_ALL)
                 val episodes = viewModel.episodesList.value
                 if (episodes != null) {
                     multiSelectHelper.selectAllInList(episodes)
@@ -496,6 +496,7 @@ class FilterEpisodeListFragment : BaseFragment() {
             }
 
             override fun multiSelectSelectNone() {
+                analyticsTracker.track(AnalyticsEvent.FILTER_DESELECT_ALL)
                 val episodes = viewModel.episodesList.value
                 if (episodes != null) {
                     multiSelectHelper.deselectAllInList(episodes)

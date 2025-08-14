@@ -41,7 +41,6 @@ import kotlin.math.absoluteValue
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import kotlinx.parcelize.Parcelize
-import timber.log.Timber
 import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 import au.com.shiftyjelly.pocketcasts.ui.R as UR
@@ -107,7 +106,6 @@ class SmartPlaylistFragment :
         )
         val episodesAdapter = adapterFactory.create(
             multiSelectToolbar = multiSelectToolbar,
-            onChangeMultiSelect = { isMultiSelecting -> Timber.i("Is multi selecting: $isMultiSelecting") },
             getEpisodes = { viewModel.uiState.value.smartPlaylist?.episodes.orEmpty() },
         )
         content.adapter = ConcatAdapter(headerAdapter, episodesAdapter)
