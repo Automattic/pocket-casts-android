@@ -13,7 +13,6 @@ import au.com.shiftyjelly.pocketcasts.payment.SubscriptionOffer
 import au.com.shiftyjelly.pocketcasts.payment.SubscriptionTier
 import au.com.shiftyjelly.pocketcasts.payment.getOrNull
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
-import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
 import au.com.shiftyjelly.pocketcasts.repositories.transcript.TranscriptManager
 import au.com.shiftyjelly.pocketcasts.repositories.user.UserManager
 import au.com.shiftyjelly.pocketcasts.sharing.SharingRequest
@@ -24,7 +23,6 @@ import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
 import dagger.hilt.android.lifecycle.HiltViewModel
-import java.io.File
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.cancelAndJoin
@@ -40,7 +38,6 @@ class TranscriptViewModel @AssistedInject constructor(
     @Assisted private val source: Source,
     private val transcriptManager: TranscriptManager,
     private val episodeManager: EpisodeManager,
-    private val podcastManager: PodcastManager,
     private val userManager: UserManager,
     private val paymentClient: PaymentClient,
     private val analyticsTracker: AnalyticsTracker,
