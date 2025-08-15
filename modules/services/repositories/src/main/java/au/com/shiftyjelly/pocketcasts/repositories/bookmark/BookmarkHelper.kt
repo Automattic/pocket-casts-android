@@ -14,7 +14,7 @@ import au.com.shiftyjelly.pocketcasts.deeplink.DeleteBookmarkDeepLink
 import au.com.shiftyjelly.pocketcasts.deeplink.ShowBookmarkDeepLink
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.R
-import au.com.shiftyjelly.pocketcasts.repositories.notification.NotificationOpenReceiver
+import au.com.shiftyjelly.pocketcasts.repositories.notification.NotificationOpenReceiverActivity
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.utils.AppPlatform
 import au.com.shiftyjelly.pocketcasts.utils.Util
@@ -89,10 +89,10 @@ private fun buildAndShowNotification(
 
     val originalContentIntent = ShowBookmarkDeepLink(bookmarkUuid).toIntent(context)
     val contentIntent = if (Util.getAppPlatform(context) == AppPlatform.Phone) {
-        PendingIntent.getBroadcast(
+        PendingIntent.getActivity(
             context,
             0,
-            NotificationOpenReceiver.toDeeplinkIntentRelay(context, originalContentIntent),
+            NotificationOpenReceiverActivity.toDeeplinkIntentRelay(context, originalContentIntent),
             PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE,
         )
     } else {

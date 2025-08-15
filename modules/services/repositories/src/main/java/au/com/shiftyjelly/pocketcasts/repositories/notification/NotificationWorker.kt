@@ -13,7 +13,7 @@ import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.R
-import au.com.shiftyjelly.pocketcasts.repositories.notification.NotificationOpenReceiver.Companion.toBroadcast
+import au.com.shiftyjelly.pocketcasts.repositories.notification.NotificationOpenReceiverActivity.Companion.toIntentRelayed
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.SuggestedFoldersManager
 import au.com.shiftyjelly.pocketcasts.repositories.user.UserManager
 import au.com.shiftyjelly.pocketcasts.utils.AppPlatform
@@ -114,10 +114,10 @@ class NotificationWorker @AssistedInject constructor(
     }
 
     private fun broadcastIntent(type: NotificationType): PendingIntent {
-        return PendingIntent.getBroadcast(
+        return PendingIntent.getActivity(
             applicationContext,
             0,
-            type.toBroadcast(applicationContext),
+            type.toIntentRelayed(applicationContext),
             PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE,
         )
     }

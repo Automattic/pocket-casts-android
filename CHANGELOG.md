@@ -6,9 +6,6 @@
 
 7.95
 -----
-*   New Features
-    *   New Onboarding Generic Upgrade screens
-        ([#4330](https://github.com/Automattic/pocket-casts-android/pull/4330))
 *   Updates
     *   Open podcast search by tapping the Discover button when the Discover page is displayed
         ([#4272](https://github.com/Automattic/pocket-casts-android/pull/4272))
@@ -19,6 +16,8 @@
         ([#4273](https://github.com/Automattic/pocket-casts-android/pull/4273))
     *   Fix navigation bar drawing on top of the player after configuration changes.
         ([#4294](https://github.com/Automattic/pocket-casts-android/pull/4294))
+    *   Fix notifications no longer open app when tapped
+        ([#4365](https://github.com/Automattic/pocket-casts-android/pull/4365))
 
 7.94
 -----
