@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
+import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.models.to.Transcript
 import au.com.shiftyjelly.pocketcasts.models.to.TranscriptEntry
 import au.com.shiftyjelly.pocketcasts.payment.BillingCycle
@@ -206,12 +207,18 @@ class TranscriptViewModel @AssistedInject constructor(
 
             val episode = episodeManager.findByUuid(transcript.episodeUuid)
 
+            val sourceView = when (source) {
+                Source.Episode -> SourceView.EPISODE_DETAILS
+                Source.Player -> SourceView.PLAYER
+            }
+
             val request = SharingRequest
                 .transcript(
                     episodeUuid = transcript.episodeUuid,
                     episodeTitle = episode?.title.orEmpty(),
                     transcript = text,
                 )
+                .setSourceView(sourceView)
                 .build()
 
             sharingClient.shareTranscript(request)
