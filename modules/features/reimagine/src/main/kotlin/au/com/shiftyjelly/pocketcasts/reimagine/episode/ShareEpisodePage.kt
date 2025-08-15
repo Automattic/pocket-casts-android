@@ -38,7 +38,7 @@ internal interface ShareEpisodePageListener {
     companion object {
         val Preview = object : ShareEpisodePageListener {
             override suspend fun onShare(podcast: Podcast, episode: PodcastEpisode, platform: SocialPlatform, cardType: VisualCardType) = SharingResponse(
-                isSuccsessful = true,
+                isSuccessful = true,
                 feedbackMessage = null,
                 error = null,
             )

@@ -298,6 +298,22 @@ class FileUtilTest {
         assertEquals(0, size)
     }
 
+    @Test
+    fun `createSafeFileName removes invalid characters`() {
+        val unsafeName = " Episode/Title\\With:Invalid*\"<>|(Characters)? "
+
+        val safeName = FileUtil.createSafeFileName(unsafeName, "fallback")
+
+        assertEquals("Episode_Title_With_Invalid_____(Characters)_", safeName)
+    }
+
+    @Test
+    fun `createSafeFileName uses fallback for a blank input`() {
+        val safeName = FileUtil.createSafeFileName("", "transcript")
+
+        assertEquals("transcript", safeName)
+    }
+
     private fun File.writeRandomBytes(count: Int) {
         sink().buffer().use { it.write(Random.nextBytes(count)) }
     }

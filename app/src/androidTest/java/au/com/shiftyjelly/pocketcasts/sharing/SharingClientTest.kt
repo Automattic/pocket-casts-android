@@ -99,7 +99,7 @@ class SharingClientTest {
         val response = client.share(request)
 
         assertNull(shareStarter.intent)
-        assertFalse(response.isSuccsessful)
+        assertFalse(response.isSuccessful)
         assertEquals(context.getString(LR.string.share_error_message), response.feedbackMessage)
         assertEquals("Sharing to Instagram requires a background image", response.error?.message)
     }
@@ -197,7 +197,7 @@ class SharingClientTest {
         val response = client.share(request)
 
         assertNull(shareStarter.intent)
-        assertFalse(response.isSuccsessful)
+        assertFalse(response.isSuccessful)
         assertEquals(context.getString(LR.string.share_error_message), response.feedbackMessage)
         assertEquals("Sharing to Instagram requires a background image", response.error?.message)
     }
@@ -304,7 +304,7 @@ class SharingClientTest {
         val response = client.share(request)
 
         assertNull(shareStarter.intent)
-        assertFalse(response.isSuccsessful)
+        assertFalse(response.isSuccessful)
         assertEquals(context.getString(LR.string.share_error_message), response.feedbackMessage)
         assertEquals("Sharing to Instagram requires a background image", response.error?.message)
     }
@@ -438,7 +438,7 @@ class SharingClientTest {
         ).build()
 
         val response = client.share(request)
-        assertTrue(response.isSuccsessful)
+        assertTrue(response.isSuccessful)
         assertNull(response.feedbackMessage)
 
         val intent = shareStarter.requireChooserIntent
@@ -456,7 +456,7 @@ class SharingClientTest {
         ).build()
 
         val response = client.share(request)
-        assertFalse(response.isSuccsessful)
+        assertFalse(response.isSuccessful)
         assertEquals(context.getString(LR.string.share_error_message), response.feedbackMessage)
 
         assertNull(shareStarter.chooserIntent)
@@ -542,7 +542,7 @@ class SharingClientTest {
                 .build()
 
             val response = client.share(request)
-            assertTrue(response.isSuccsessful)
+            assertTrue(response.isSuccessful)
             assertNull(response.feedbackMessage)
 
             val intent = shareStarter.requireChooserIntent
@@ -567,7 +567,7 @@ class SharingClientTest {
             .build()
 
         val response = client.share(request)
-        assertTrue(response.isSuccsessful)
+        assertTrue(response.isSuccessful)
         assertNull(response.feedbackMessage)
 
         val intent = shareStarter.requireChooserIntent
@@ -589,7 +589,7 @@ class SharingClientTest {
         ).build()
 
         val response = client.share(request)
-        assertFalse(response.isSuccsessful)
+        assertFalse(response.isSuccessful)
         assertEquals(context.getString(LR.string.share_error_message), response.feedbackMessage)
 
         assertNull(shareStarter.chooserIntent)
@@ -611,7 +611,7 @@ class SharingClientTest {
                 .build()
 
             val response = client.share(request)
-            assertTrue(response.isSuccsessful)
+            assertTrue(response.isSuccessful)
             assertNull(response.feedbackMessage)
 
             val intent = shareStarter.requireChooserIntent
@@ -663,7 +663,7 @@ class SharingClientTest {
             .build()
 
         val response = client.share(request)
-        assertTrue(response.isSuccsessful)
+        assertTrue(response.isSuccessful)
         assertNull(response.feedbackMessage)
 
         val intent = shareStarter.requireChooserIntent
@@ -687,7 +687,7 @@ class SharingClientTest {
         ).build()
 
         val response = client.share(request)
-        assertFalse(response.isSuccsessful)
+        assertFalse(response.isSuccessful)
         assertEquals(context.getString(LR.string.share_error_message), response.feedbackMessage)
 
         assertNull(shareStarter.chooserIntent)
@@ -705,7 +705,7 @@ class SharingClientTest {
         ).build()
 
         val response = client.share(request)
-        assertTrue(response.isSuccsessful)
+        assertTrue(response.isSuccessful)
         assertNull(response.feedbackMessage)
 
         val intent = shareStarter.requireChooserIntent
@@ -734,7 +734,7 @@ class SharingClientTest {
         val request = SharingRequest.endOfYearStory(story, Year.of(1000), screenshot).build()
 
         val response = client.share(request)
-        assertTrue(response.isSuccsessful)
+        assertTrue(response.isSuccessful)
         assertNull(response.feedbackMessage)
 
         val intent = shareStarter.requireChooserIntent
@@ -765,7 +765,7 @@ class SharingClientTest {
         val request = SharingRequest.endOfYearStory(story, Year.of(1000), screenshot).build()
 
         val response = client.share(request)
-        assertTrue(response.isSuccsessful)
+        assertTrue(response.isSuccessful)
         assertNull(response.feedbackMessage)
 
         val intent = shareStarter.requireChooserIntent
@@ -791,7 +791,7 @@ class SharingClientTest {
         val request = SharingRequest.endOfYearStory(story, Year.of(1000), screenshot).build()
 
         val response = client.share(request)
-        assertTrue(response.isSuccsessful)
+        assertTrue(response.isSuccessful)
         assertNull(response.feedbackMessage)
 
         val intent = shareStarter.requireChooserIntent
@@ -817,7 +817,7 @@ class SharingClientTest {
         val request = SharingRequest.endOfYearStory(story, Year.of(1000), screenshot).build()
 
         val response = client.share(request)
-        assertTrue(response.isSuccsessful)
+        assertTrue(response.isSuccessful)
         assertNull(response.feedbackMessage)
 
         val intent = shareStarter.requireChooserIntent
@@ -849,7 +849,7 @@ class SharingClientTest {
         val request = SharingRequest.endOfYearStory(story, Year.of(1000), screenshot).build()
 
         val response = client.share(request)
-        assertTrue(response.isSuccsessful)
+        assertTrue(response.isSuccessful)
         assertNull(response.feedbackMessage)
 
         val intent = shareStarter.requireChooserIntent
@@ -880,7 +880,7 @@ class SharingClientTest {
         val request = SharingRequest.endOfYearStory(story, Year.of(1000), screenshot).build()
 
         val response = client.share(request)
-        assertTrue(response.isSuccsessful)
+        assertTrue(response.isSuccessful)
         assertNull(response.feedbackMessage)
 
         val intent = shareStarter.requireChooserIntent
@@ -912,7 +912,7 @@ class SharingClientTest {
         val request = SharingRequest.endOfYearStory(story, Year.of(1000), screenshot).build()
 
         val response = client.share(request)
-        assertTrue(response.isSuccsessful)
+        assertTrue(response.isSuccessful)
         assertNull(response.feedbackMessage)
 
         val intent = shareStarter.requireChooserIntent
@@ -940,7 +940,7 @@ class SharingClientTest {
         val request = SharingRequest.endOfYearStory(story, Year.of(1000), screenshot).build()
 
         val response = client.share(request)
-        assertTrue(response.isSuccsessful)
+        assertTrue(response.isSuccessful)
         assertNull(response.feedbackMessage)
 
         val intent = shareStarter.requireChooserIntent
@@ -968,7 +968,7 @@ class SharingClientTest {
         val request = SharingRequest.endOfYearStory(story, Year.of(1000), screenshot).build()
 
         val response = client.share(request)
-        assertTrue(response.isSuccsessful)
+        assertTrue(response.isSuccessful)
         assertNull(response.feedbackMessage)
 
         val intent = shareStarter.requireChooserIntent
@@ -987,7 +987,7 @@ class SharingClientTest {
         val request = SharingRequest.endOfYearStory(story, Year.of(1000), screenshot).build()
 
         val response = client.share(request)
-        assertFalse(response.isSuccsessful)
+        assertFalse(response.isSuccessful)
         assertEquals(context.getString(LR.string.end_of_year_cant_share_message), response.feedbackMessage)
 
         assertNull(shareStarter.chooserIntent)
@@ -1000,7 +1000,7 @@ class SharingClientTest {
         val request = SharingRequest.endOfYearStory(story, Year.of(1000), screenshot).build()
 
         val response = client.share(request)
-        assertFalse(response.isSuccsessful)
+        assertFalse(response.isSuccessful)
         assertEquals(context.getString(LR.string.end_of_year_cant_share_message), response.feedbackMessage)
 
         assertNull(shareStarter.chooserIntent)
@@ -1013,7 +1013,7 @@ class SharingClientTest {
         val request = SharingRequest.endOfYearStory(story, Year.of(1000), screenshot).build()
 
         val response = client.share(request)
-        assertFalse(response.isSuccsessful)
+        assertFalse(response.isSuccessful)
         assertEquals(context.getString(LR.string.end_of_year_cant_share_message), response.feedbackMessage)
 
         assertNull(shareStarter.chooserIntent)
@@ -1034,10 +1034,36 @@ class SharingClientTest {
         val request = SharingRequest.endOfYearStory(story, Year.of(1000), screenshot).build()
 
         val response = client.share(request)
-        assertFalse(response.isSuccsessful)
+        assertFalse(response.isSuccessful)
         assertEquals(context.getString(LR.string.end_of_year_cant_share_message), response.feedbackMessage)
 
         assertNull(shareStarter.chooserIntent)
+    }
+
+    @Test
+    fun shareTranscript() = runTest {
+        val transcriptText = "This is a sample transcript content for testing purposes."
+        val request = SharingRequest.transcript(
+            episodeUuid = "episode-uuid",
+            episodeTitle = "Episode Title",
+            transcript = transcriptText,
+        ).build()
+
+        val response = client.share(request)
+        assertTrue(response.isSuccessful)
+        assertNull(response.feedbackMessage)
+
+        val intent = shareStarter.requireChooserIntent
+
+        assertEquals(ACTION_SEND, intent.action)
+        assertEquals("text/plain", intent.type)
+        val streamUri = IntentCompat.getParcelableExtra(intent, EXTRA_STREAM, Uri::class.java)
+        assertEquals(FLAG_GRANT_READ_URI_PERMISSION, intent.flags and FLAG_GRANT_READ_URI_PERMISSION)
+
+        // Verify the file contains the transcript content
+        val file = File(context.cacheDir, "Episode Title.txt")
+        assertTrue("Transcript file should exist", file.exists())
+        assertEquals(transcriptText, file.readText())
     }
 
     private fun createClient(

@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
+import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.models.to.Transcript
 import au.com.shiftyjelly.pocketcasts.models.to.TranscriptEntry
 import au.com.shiftyjelly.pocketcasts.payment.BillingCycle
@@ -14,6 +15,7 @@ import au.com.shiftyjelly.pocketcasts.payment.getOrNull
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.transcript.TranscriptManager
 import au.com.shiftyjelly.pocketcasts.repositories.user.UserManager
+import au.com.shiftyjelly.pocketcasts.sharing.SharingRequest
 import au.com.shiftyjelly.pocketcasts.utils.search.SearchCoordinates
 import au.com.shiftyjelly.pocketcasts.utils.search.SearchMatches
 import au.com.shiftyjelly.pocketcasts.utils.search.kmpSearch
@@ -39,7 +41,9 @@ class TranscriptViewModel @AssistedInject constructor(
     private val userManager: UserManager,
     private val paymentClient: PaymentClient,
     private val analyticsTracker: AnalyticsTracker,
+    private val sharingClient: TranscriptSharingClient,
 ) : ViewModel() {
+
     private val _uiState = MutableStateFlow(UiState.Empty)
     val uiState = _uiState.asStateFlow()
 
@@ -187,6 +191,34 @@ class TranscriptViewModel @AssistedInject constructor(
         _uiState.update { state ->
             val nextMatches = state.searchState.matches.next()
             state.copy(searchState = state.searchState.copy(matches = nextMatches))
+        }
+    }
+
+    fun shareTranscript() {
+        val transcriptState = uiState.value.transcriptState as? TranscriptState.Loaded ?: return
+        val transcript = transcriptState.transcript as? Transcript.Text ?: return
+
+        viewModelScope.launch(Dispatchers.Default) {
+            val text = transcript.buildString()
+            if (text.isBlank()) return@launch
+
+            val episode = episodeManager.findByUuid(transcript.episodeUuid)
+
+            val sourceView = when (source) {
+                Source.Episode -> SourceView.EPISODE_DETAILS
+                Source.Player -> SourceView.PLAYER
+            }
+
+            val request = SharingRequest
+                .transcript(
+                    episodeUuid = transcript.episodeUuid,
+                    episodeTitle = episode?.title.orEmpty(),
+                    transcript = text,
+                )
+                .setSourceView(sourceView)
+                .build()
+
+            sharingClient.shareTranscript(request)
         }
     }
 

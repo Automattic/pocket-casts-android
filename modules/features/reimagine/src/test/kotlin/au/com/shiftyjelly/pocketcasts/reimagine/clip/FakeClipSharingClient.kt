@@ -7,7 +7,7 @@ import kotlinx.coroutines.flow.first
 
 class FakeClipSharingClient : ClipSharingClient {
     var response = SharingResponse(
-        isSuccsessful = true,
+        isSuccessful = true,
         feedbackMessage = null,
         error = null,
     )

@@ -40,7 +40,7 @@ internal class ShareEpisodeTimestampListener @AssistedInject constructor(
             .map { sharingClient.share(it) }
             .getOrElse { error ->
                 SharingResponse(
-                    isSuccsessful = false,
+                    isSuccessful = false,
                     feedbackMessage = fragment.getString(LR.string.share_error_message),
                     error = error,
                 )

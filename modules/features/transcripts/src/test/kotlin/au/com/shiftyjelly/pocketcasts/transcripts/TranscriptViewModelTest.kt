@@ -9,6 +9,8 @@ import au.com.shiftyjelly.pocketcasts.models.type.Subscription
 import au.com.shiftyjelly.pocketcasts.payment.PaymentClient
 import au.com.shiftyjelly.pocketcasts.repositories.transcript.TranscriptManager
 import au.com.shiftyjelly.pocketcasts.sharedtest.MainCoroutineRule
+import au.com.shiftyjelly.pocketcasts.sharing.SharingRequest
+import au.com.shiftyjelly.pocketcasts.sharing.SharingResponse
 import au.com.shiftyjelly.pocketcasts.utils.search.SearchCoordinates
 import au.com.shiftyjelly.pocketcasts.utils.search.SearchMatches
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -26,6 +28,7 @@ import org.junit.Rule
 import org.junit.Test
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
+import timber.log.Timber
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class TranscriptViewModelTest {
@@ -48,6 +51,12 @@ class TranscriptViewModelTest {
             paymentClient = PaymentClient.test(),
             analyticsTracker = AnalyticsTracker.test(),
             source = TranscriptViewModel.Source.Player,
+            sharingClient = object : TranscriptSharingClient {
+                override suspend fun shareTranscript(request: SharingRequest): SharingResponse {
+                    Timber.i("Sharing transcript with request: $request")
+                    return SharingResponse(isSuccessful = true, feedbackMessage = null, error = null)
+                }
+            },
         )
     }
 

@@ -11,7 +11,7 @@ internal class SharingLogger : SharingClient.Listener {
     }
 
     override fun onShared(request: SharingRequest, response: SharingResponse) {
-        if (response.isSuccsessful) {
+        if (response.isSuccessful) {
             Timber.tag(TAG).i("Shared $request")
         } else {
             val message = "Failed to share $request. Error message: ${response.feedbackMessage}"

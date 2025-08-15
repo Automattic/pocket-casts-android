@@ -776,7 +776,7 @@ class EndOfYearViewModelTest {
     private class FakeSharingClient : StorySharingClient {
         override suspend fun shareStory(request: SharingRequest): SharingResponse {
             return SharingResponse(
-                isSuccsessful = true,
+                isSuccessful = true,
                 feedbackMessage = null,
                 error = null,
             )

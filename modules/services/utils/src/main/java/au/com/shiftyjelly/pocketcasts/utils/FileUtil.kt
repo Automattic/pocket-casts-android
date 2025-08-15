@@ -100,4 +100,23 @@ object FileUtil {
     }
 
     fun getUriForFile(context: Context, file: File): Uri = FileProvider.getUriForFile(context, context.packageName + ".fileprovider", file)
+
+    fun writeTextToTempFile(fileName: String, text: String, context: Context): File? {
+        try {
+            val tempFile = File(context.cacheDir, fileName)
+            tempFile.writeText(text)
+            return tempFile
+        } catch (e: IOException) {
+            Timber.e(e, "Failed to write text to temp file")
+        }
+        return null
+    }
+
+    fun createSafeFileName(text: String, fallback: String): String {
+        val invalidChars = """[/\\:*?"<>|]""".toRegex()
+        return text.replace(invalidChars, "_")
+            .trim()
+            .take(100)
+            .ifBlank { fallback }
+    }
 }

@@ -67,12 +67,6 @@ internal fun TranscriptLines(
         modifier = modifier
             .then(if (isContentObscured) Modifier.obsureContent() else Modifier),
     ) {
-        if (transcript.isGenerated) {
-            GeneratedTranscriptHeader(
-                theme = theme,
-            )
-        }
-
         CompositionLocalProvider(
             LocalTextToolbar provides CustomTextToolbar(
                 view = LocalView.current,
@@ -95,6 +89,14 @@ internal fun TranscriptLines(
                         contentPadding = PaddingValues(bottom = 64.dp),
                     ),
                 ) {
+                    item {
+                        if (transcript.isGenerated) {
+                            GeneratedTranscriptHeader(
+                                theme = theme,
+                                modifier = Modifier.padding(bottom = 16.dp),
+                            )
+                        }
+                    }
                     itemsIndexed(transcript.entries) { index, entry ->
                         TranscriptLine(
                             entryIndex = index,
