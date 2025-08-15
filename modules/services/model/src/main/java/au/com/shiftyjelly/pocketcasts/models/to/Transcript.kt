@@ -14,7 +14,16 @@ sealed interface Transcript {
         override val isGenerated: Boolean,
         override val episodeUuid: String,
         override val podcastUuid: String?,
-    ) : Transcript
+    ) : Transcript {
+        fun buildString(): String {
+            return entries.joinToString(separator = "\n") { entry ->
+                when (entry) {
+                    is TranscriptEntry.Text -> entry.value
+                    is TranscriptEntry.Speaker -> entry.name
+                }
+            }
+        }
+    }
 
     data class Web(
         override val url: String,

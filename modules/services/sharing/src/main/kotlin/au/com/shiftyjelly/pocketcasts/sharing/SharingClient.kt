@@ -1,5 +1,6 @@
 package au.com.shiftyjelly.pocketcasts.sharing
 
+import android.R.attr.text
 import android.content.ClipData
 import android.content.ClipboardManager
 import android.content.Context
@@ -75,7 +76,7 @@ class SharingClient(
             request.tryShare()
         } catch (error: Throwable) {
             SharingResponse(
-                isSuccsessful = false,
+                isSuccessful = false,
                 feedbackMessage = context.getString(LR.string.share_error_message),
                 error = error,
             )
@@ -95,7 +96,7 @@ class SharingClient(
                     .addFlags(FLAG_GRANT_READ_URI_PERMISSION or FLAG_ACTIVITY_NEW_TASK)
                     .share()
                 SharingResponse(
-                    isSuccsessful = true,
+                    isSuccessful = true,
                     feedbackMessage = null,
                     error = null,
                 )
@@ -104,7 +105,7 @@ class SharingClient(
             PocketCasts -> {
                 shareStarter.copyLink(context, ClipData.newPlainText(context.getString(data.linkDescription()), data.sharingUrl(hostUrl)))
                 SharingResponse(
-                    isSuccsessful = true,
+                    isSuccessful = true,
                     feedbackMessage = if (showCustomCopyFeedback) context.getString(LR.string.share_link_copied_feedback) else null,
                     error = null,
                 )
@@ -125,7 +126,7 @@ class SharingClient(
                     .toChooserIntent()
                     .share()
                 SharingResponse(
-                    isSuccsessful = true,
+                    isSuccessful = true,
                     feedbackMessage = null,
                     error = null,
                 )
@@ -144,7 +145,7 @@ class SharingClient(
                 .toChooserIntent()
                 .share()
             SharingResponse(
-                isSuccsessful = true,
+                isSuccessful = true,
                 feedbackMessage = null,
                 error = null,
             )
@@ -160,13 +161,13 @@ class SharingClient(
                     .toChooserIntent()
                     .share()
                 SharingResponse(
-                    isSuccsessful = true,
+                    isSuccessful = true,
                     feedbackMessage = null,
                     error = null,
                 )
             } else {
                 SharingResponse(
-                    isSuccsessful = false,
+                    isSuccessful = false,
                     feedbackMessage = context.getString(LR.string.share_error_message),
                     error = null,
                 )
@@ -177,7 +178,7 @@ class SharingClient(
             PocketCasts -> {
                 shareStarter.copyLink(context, ClipData.newPlainText(context.getString(data.linkDescription()), data.sharingUrl(hostUrl)))
                 SharingResponse(
-                    isSuccsessful = true,
+                    isSuccessful = true,
                     feedbackMessage = if (showCustomCopyFeedback) context.getString(LR.string.share_link_copied_feedback) else null,
                     error = null,
                 )
@@ -193,7 +194,7 @@ class SharingClient(
                     .toChooserIntent()
                     .share()
                 SharingResponse(
-                    isSuccsessful = true,
+                    isSuccessful = true,
                     feedbackMessage = null,
                     error = null,
                 )
@@ -210,7 +211,7 @@ class SharingClient(
                 .toChooserIntent()
                 .share()
             SharingResponse(
-                isSuccsessful = true,
+                isSuccessful = true,
                 feedbackMessage = null,
                 error = null,
             )
@@ -228,7 +229,7 @@ class SharingClient(
                     .addFlags(FLAG_GRANT_READ_URI_PERMISSION or FLAG_ACTIVITY_NEW_TASK)
                     .share()
                 SharingResponse(
-                    isSuccsessful = true,
+                    isSuccessful = true,
                     feedbackMessage = null,
                     error = null,
                 )
@@ -246,7 +247,7 @@ class SharingClient(
                     .toChooserIntent()
                     .share()
                 SharingResponse(
-                    isSuccsessful = true,
+                    isSuccessful = true,
                     feedbackMessage = null,
                     error = null,
                 )
@@ -277,17 +278,44 @@ class SharingClient(
                     .toChooserIntent(pendingIntent.intentSender)
                     .share()
                 SharingResponse(
-                    isSuccsessful = true,
+                    isSuccessful = true,
                     feedbackMessage = null,
                     error = null,
                 )
             } else {
                 SharingResponse(
-                    isSuccsessful = false,
+                    isSuccessful = false,
                     feedbackMessage = context.getString(LR.string.end_of_year_cant_share_message),
                     error = null,
                 )
             }
+        }
+
+        is SharingRequest.Data.Transcript -> {
+            val fileName = FileUtil.createSafeFileName(text = data.episodeTitle, fallback = "Transcript")
+
+            val file = FileUtil.writeTextToTempFile(
+                fileName = "$fileName.txt",
+                text = data.transcript,
+                context = context,
+            ) ?: return SharingResponse(
+                isSuccessful = false,
+                feedbackMessage = context.getString(LR.string.share_error_message),
+                error = null,
+            )
+
+            Intent()
+                .setAction(Intent.ACTION_SEND)
+                .setType("text/plain")
+                .setExtraStream(file)
+                .addFlags(FLAG_GRANT_READ_URI_PERMISSION)
+                .toChooserIntent()
+                .share()
+            SharingResponse(
+                isSuccessful = true,
+                feedbackMessage = null,
+                error = null,
+            )
         }
     }
 
@@ -410,6 +438,13 @@ data class SharingRequest internal constructor(
             .setAnalyticsEvent(AnalyticsEvent.END_OF_YEAR_STORY_SHARE)
             .addAnalyticsProperty("story", story.analyticsValue)
             .addAnalyticsProperty("year", year.value)
+
+        fun transcript(
+            episodeUuid: String,
+            episodeTitle: String,
+            transcript: String,
+        ) = Builder(Data.Transcript(episodeUuid, episodeTitle, transcript))
+            .setAnalyticsEvent(AnalyticsEvent.TRANSCRIPT_SHARED)
     }
 
     class Builder internal constructor(
@@ -477,6 +512,7 @@ data class SharingRequest internal constructor(
             is Data.ClipVideo -> "clip_video"
             is Data.ReferralLink -> "referral_link"
             is Data.EndOfYearStory -> "end_of_year_story"
+            is Data.Transcript -> "transcript"
         }
 
         private val SocialPlatform.analyticsValue get() = when (this) {
@@ -687,11 +723,21 @@ data class SharingRequest internal constructor(
 
             override fun toString() = "EndOfYearStory(story=$story, year=$year)"
         }
+
+        class Transcript internal constructor(
+            val episodeUuid: String,
+            val episodeTitle: String,
+            val transcript: String,
+        ) : Data {
+            override val podcast: PodcastModel? = null
+
+            override fun toString() = "Transcript(episodeUuid=$episodeUuid)"
+        }
     }
 }
 
 data class SharingResponse(
-    val isSuccsessful: Boolean,
+    val isSuccessful: Boolean,
     val feedbackMessage: String?,
     val error: Throwable?,
 )

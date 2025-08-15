@@ -12,4 +12,8 @@ interface TranscriptService {
         @Url url: String,
         @Header("Cache-Control") cacheControl: CacheControl,
     ): ResponseBody
+
+    suspend fun getTranscript(
+        @Url url: String,
+    ): ResponseBody
 }

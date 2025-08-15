@@ -753,6 +753,7 @@ enum class AnalyticsEvent(val key: String) {
     TRANSCRIPT_GENERATED_PAYWALL_SHOWN("transcript_generated_paywall_shown"),
     TRANSCRIPT_GENERATED_PAYWALL_DISMISSED("transcript_generated_paywall_dismissed"),
     TRANSCRIPT_GENERATED_PAYWALL_SUBSCRIBE_TAPPED("transcript_generated_paywall_subscribe_tapped"),
+    TRANSCRIPT_SHARED("transcript_shared"),
 
     /* Referrals */
     REFERRAL_TOOLTIP_SHOWN("referral_tooltip_shown"),

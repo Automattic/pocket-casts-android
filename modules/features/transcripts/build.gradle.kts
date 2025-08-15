@@ -26,6 +26,7 @@ dependencies {
     api(projects.modules.services.analytics)
     api(projects.modules.services.payment)
     api(projects.modules.services.repositories)
+    api(projects.modules.services.sharing)
     api(projects.modules.services.views)
 
     implementation(platform(libs.compose.bom))

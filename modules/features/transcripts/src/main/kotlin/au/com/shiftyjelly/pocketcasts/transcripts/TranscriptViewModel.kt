@@ -12,8 +12,10 @@ import au.com.shiftyjelly.pocketcasts.payment.SubscriptionOffer
 import au.com.shiftyjelly.pocketcasts.payment.SubscriptionTier
 import au.com.shiftyjelly.pocketcasts.payment.getOrNull
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
+import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
 import au.com.shiftyjelly.pocketcasts.repositories.transcript.TranscriptManager
 import au.com.shiftyjelly.pocketcasts.repositories.user.UserManager
+import au.com.shiftyjelly.pocketcasts.sharing.SharingRequest
 import au.com.shiftyjelly.pocketcasts.utils.search.SearchCoordinates
 import au.com.shiftyjelly.pocketcasts.utils.search.SearchMatches
 import au.com.shiftyjelly.pocketcasts.utils.search.kmpSearch
@@ -21,6 +23,7 @@ import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
 import dagger.hilt.android.lifecycle.HiltViewModel
+import java.io.File
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.cancelAndJoin
@@ -36,10 +39,13 @@ class TranscriptViewModel @AssistedInject constructor(
     @Assisted private val source: Source,
     private val transcriptManager: TranscriptManager,
     private val episodeManager: EpisodeManager,
+    private val podcastManager: PodcastManager,
     private val userManager: UserManager,
     private val paymentClient: PaymentClient,
     private val analyticsTracker: AnalyticsTracker,
+    private val sharingClient: TranscriptSharingClient,
 ) : ViewModel() {
+
     private val _uiState = MutableStateFlow(UiState.Empty)
     val uiState = _uiState.asStateFlow()
 
@@ -187,6 +193,28 @@ class TranscriptViewModel @AssistedInject constructor(
         _uiState.update { state ->
             val nextMatches = state.searchState.matches.next()
             state.copy(searchState = state.searchState.copy(matches = nextMatches))
+        }
+    }
+
+    fun shareTranscript() {
+        val transcriptState = uiState.value.transcriptState as? TranscriptState.Loaded ?: return
+        val transcript = transcriptState.transcript as? Transcript.Text ?: return
+
+        viewModelScope.launch(Dispatchers.Default) {
+            val text = transcript.buildString()
+            if (text.isBlank()) return@launch
+
+            val episode = episodeManager.findByUuid(transcript.episodeUuid)
+
+            val request = SharingRequest
+                .transcript(
+                    episodeUuid = transcript.episodeUuid,
+                    episodeTitle = episode?.title.orEmpty(),
+                    transcript = text,
+                )
+                .build()
+
+            sharingClient.shareTranscript(request)
         }
     }
 
