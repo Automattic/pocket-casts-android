@@ -12,16 +12,19 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.rememberNestedScrollInteropConnection
 import androidx.fragment.app.viewModels
 import androidx.fragment.compose.content
+import androidx.navigation.NavController
 import androidx.navigation.NavOptionsBuilder
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import au.com.shiftyjelly.pocketcasts.compose.CallOnce
 import au.com.shiftyjelly.pocketcasts.compose.extensions.slideInToEnd
 import au.com.shiftyjelly.pocketcasts.compose.extensions.slideInToStart
 import au.com.shiftyjelly.pocketcasts.compose.extensions.slideOutToEnd
@@ -35,6 +38,7 @@ import au.com.shiftyjelly.pocketcasts.playlists.rules.MediaTypeRulePage
 import au.com.shiftyjelly.pocketcasts.playlists.rules.PodcastsRulePage
 import au.com.shiftyjelly.pocketcasts.playlists.rules.ReleaseDateRulePage
 import au.com.shiftyjelly.pocketcasts.playlists.rules.RuleType
+import au.com.shiftyjelly.pocketcasts.playlists.rules.StarredRulePage
 import au.com.shiftyjelly.pocketcasts.ui.helper.FragmentHostListener
 import au.com.shiftyjelly.pocketcasts.utils.extensions.pxToDp
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseDialogFragment
@@ -48,6 +52,8 @@ import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 @AndroidEntryPoint
 class CreatePlaylistFragment : BaseDialogFragment() {
+    private var isPlaylistCreated = false
+
     private val viewModel by viewModels<CreatePlaylistViewModel>(
         extrasProducer = {
             defaultViewModelCreationExtras.withCreationCallback<CreatePlaylistViewModel.Factory> { factory ->
@@ -68,6 +74,7 @@ class CreatePlaylistFragment : BaseDialogFragment() {
 
         DialogBox {
             val navController = rememberNavController()
+            ClearTransientRulesStateEffect(navController)
 
             fun goBackToPlaylistPreview() {
                 navController.popBackStack(NavigationRoutes.SMART_PLAYLIST_PREVIEW, inclusive = false)
@@ -91,10 +98,17 @@ class CreatePlaylistFragment : BaseDialogFragment() {
                     .nestedScroll(rememberNestedScrollInteropConnection()),
             ) {
                 composable(NavigationRoutes.NEW_PLAYLIST) {
+                    CallOnce {
+                        viewModel.trackCreatePlaylistShown()
+                    }
                     NewPlaylistPage(
                         titleState = viewModel.playlistNameState,
-                        onCreateManualPlaylist = { Timber.i("Create Manual Playlist") },
+                        onCreateManualPlaylist = {
+                            viewModel.trackCreateManualPlaylist()
+                            Timber.i("Create Manual Playlist")
+                        },
                         onContinueToSmartPlaylist = {
+                            viewModel.trackCreateSmartPlaylist()
                             navigateOnce(NavigationRoutes.SMART_PLAYLIST_PREVIEW) {
                                 popUpTo(NavigationRoutes.NEW_PLAYLIST) {
                                     inclusive = true
@@ -109,6 +123,7 @@ class CreatePlaylistFragment : BaseDialogFragment() {
                         playlistTitle = viewModel.playlistNameState.text.toString(),
                         appliedRules = uiState.appliedRules,
                         availableEpisodes = uiState.smartEpisodes,
+                        totalEpisodeCount = uiState.totalEpisodeCount,
                         useEpisodeArtwork = uiState.useEpisodeArtwork,
                         areOtherOptionsExpanded = areOtherOptionsExpanded,
                         onCreatePlaylist = viewModel::createSmartPlaylist,
@@ -125,6 +140,8 @@ class CreatePlaylistFragment : BaseDialogFragment() {
                         onToggleAllPodcasts = viewModel::useAllPodcasts,
                         onSelectPodcast = viewModel::selectPodcast,
                         onDeselectPodcast = viewModel::deselectPodcast,
+                        onSelectAllPodcasts = viewModel::selectAllPodcasts,
+                        onDeselectAllPodcasts = viewModel::deselectAllPodcasts,
                         onSaveRule = {
                             viewModel.applyRule(RuleType.Podcasts)
                             goBackToPlaylistPreview()
@@ -195,6 +212,19 @@ class CreatePlaylistFragment : BaseDialogFragment() {
                         onClickBack = ::goBackToPlaylistPreview,
                     )
                 }
+                composable(NavigationRoutes.SMART_RULE_STARRED) {
+                    StarredRulePage(
+                        selectedRule = uiState.rulesBuilder.starredRule,
+                        starredEpisodes = uiState.smartStarredEpisodes,
+                        useEpisodeArtwork = uiState.useEpisodeArtwork,
+                        onChangeUseStarredEpisodes = viewModel::useStarredEpisodes,
+                        onSaveRule = {
+                            viewModel.applyRule(RuleType.Starred)
+                            goBackToPlaylistPreview()
+                        },
+                        onClickBack = ::goBackToPlaylistPreview,
+                    )
+                }
             }
         }
     }
@@ -203,9 +233,31 @@ class CreatePlaylistFragment : BaseDialogFragment() {
     private fun OpenCreatedPlaylistEffect() {
         LaunchedEffect(Unit) {
             val uuid = viewModel.createdSmartPlaylistUuid.await()
+            isPlaylistCreated = true
             dismiss()
             val fragment = SmartPlaylistFragment.newInstance(uuid)
             (requireActivity() as FragmentHostListener).addFragment(fragment)
+        }
+    }
+
+    @Composable
+    private fun ClearTransientRulesStateEffect(navController: NavController) {
+        var currentRoute by rememberSaveable { mutableStateOf<String?>(null) }
+        LaunchedEffect(navController) {
+            navController.currentBackStackEntryFlow.collect { entry ->
+                val newRoute = entry.destination.route
+                if (currentRoute != newRoute) {
+                    currentRoute = newRoute
+                    viewModel.clearTransientRules()
+                }
+            }
+        }
+    }
+
+    override fun onDismiss(dialog: DialogInterface) {
+        super.onDismiss(dialog)
+        if (!requireActivity().isChangingConfigurations && !isPlaylistCreated) {
+            viewModel.trackCreatePlaylistCancelled()
         }
     }
 
@@ -242,6 +294,7 @@ private object NavigationRoutes {
     const val SMART_RULE_EPISODE_DURATION = "smart_rule_episode_duration"
     const val SMART_RULE_DOWNLOAD_STATUS = "smart_rule_download_status"
     const val SMART_RULE_MEDIA_TYPE = "smart_rule_media_type"
+    const val SMART_RULE_STARRED = "smart_rule_starred"
 }
 
 private fun RuleType.toNavigationRoute() = when (this) {
@@ -251,5 +304,5 @@ private fun RuleType.toNavigationRoute() = when (this) {
     RuleType.EpisodeDuration -> NavigationRoutes.SMART_RULE_EPISODE_DURATION
     RuleType.DownloadStatus -> NavigationRoutes.SMART_RULE_DOWNLOAD_STATUS
     RuleType.MediaType -> NavigationRoutes.SMART_RULE_MEDIA_TYPE
-    RuleType.Starred -> NavigationRoutes.SMART_PLAYLIST_PREVIEW
+    RuleType.Starred -> NavigationRoutes.SMART_RULE_STARRED
 }

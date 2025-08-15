@@ -291,7 +291,7 @@ class EpisodeViewHolder(
         updateRowText(episode, captionColor, tintColor, date, title, lblStatus)
 
         val artworkVisible = viewMode is ViewMode.Artwork
-        imgArtwork.isVisible = artworkVisible
+        binding.artworkBox.isVisible = artworkVisible
         if (!sameEpisode && artworkVisible) {
             val artworkConfiguration = settings.artworkConfiguration.value
             val useEpisodeArtwork = artworkContext?.let(artworkConfiguration::useEpisodeArtwork) ?: artworkConfiguration.useEpisodeArtwork

@@ -1,12 +1,11 @@
 7.96
 -----
-
+*   Updates
+    *   When Automotive doesn't have a browser, the URL and a QR code are shown instead
+        ([#4362](https://github.com/Automattic/pocket-casts-android/pull/4362))
 
 7.95
 -----
-*   New Features
-    *   New Onboarding Generic Upgrade screens
-        ([#4330](https://github.com/Automattic/pocket-casts-android/pull/4330))
 *   Updates
     *   Open podcast search by tapping the Discover button when the Discover page is displayed
         ([#4272](https://github.com/Automattic/pocket-casts-android/pull/4272))

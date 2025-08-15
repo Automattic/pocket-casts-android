@@ -63,22 +63,27 @@ fun Duration.toFriendlyString(
 enum class FriendlyDurationUnit(
     private val durationUnit: DurationUnit,
     @PluralsRes val resourceId: Int,
+    @PluralsRes val shortResourceId: Int,
 ) {
     Second(
         durationUnit = DurationUnit.SECONDS,
         resourceId = LR.plurals.second,
+        shortResourceId = LR.plurals.second_short,
     ),
     Minute(
         durationUnit = DurationUnit.MINUTES,
         resourceId = LR.plurals.minute,
+        shortResourceId = LR.plurals.minute_short,
     ),
     Hour(
         durationUnit = DurationUnit.HOURS,
         resourceId = LR.plurals.hour,
+        shortResourceId = LR.plurals.hour_short,
     ),
     Day(
         durationUnit = DurationUnit.DAYS,
         resourceId = LR.plurals.day,
+        shortResourceId = LR.plurals.day_short,
     ),
     ;
 
@@ -91,7 +96,7 @@ enum class FriendlyDurationUnit(
         val unitCount = toUnitCount(duration)
         builder
             .append(unitCount)
-            .append(' ')
+            .append('\u00a0')
             .append(resources.getQuantityString(pluralResourceId(this), unitCount))
             .append(' ')
     }

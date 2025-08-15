@@ -172,4 +172,8 @@ class DeveloperViewModel
     fun resetPlaylistsOnboarding() {
         settings.showPlaylistsOnboarding.set(true, updateModifiedAt = false)
     }
+
+    fun resetNotificationsPrompt() {
+        settings.notificationsPromptAcknowledged.set(false, updateModifiedAt = false)
+    }
 }

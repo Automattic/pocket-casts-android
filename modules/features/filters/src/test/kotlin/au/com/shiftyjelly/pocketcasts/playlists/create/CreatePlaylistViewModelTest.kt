@@ -2,6 +2,8 @@ package au.com.shiftyjelly.pocketcasts.playlists.create
 
 import androidx.compose.ui.text.TextRange
 import app.cash.turbine.test
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
+import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.type.SmartRules.DownloadStatusRule
 import au.com.shiftyjelly.pocketcasts.models.type.SmartRules.EpisodeDurationRule
 import au.com.shiftyjelly.pocketcasts.models.type.SmartRules.EpisodeStatusRule
@@ -10,14 +12,17 @@ import au.com.shiftyjelly.pocketcasts.models.type.SmartRules.PodcastsRule
 import au.com.shiftyjelly.pocketcasts.models.type.SmartRules.ReleaseDateRule
 import au.com.shiftyjelly.pocketcasts.models.type.SmartRules.StarredRule
 import au.com.shiftyjelly.pocketcasts.playlists.create.CreatePlaylistViewModel.UiState
+import au.com.shiftyjelly.pocketcasts.playlists.edit.SmartRulesEditor
+import au.com.shiftyjelly.pocketcasts.playlists.rules.AppliedRules
 import au.com.shiftyjelly.pocketcasts.playlists.rules.RuleType
+import au.com.shiftyjelly.pocketcasts.playlists.rules.RulesBuilder
 import au.com.shiftyjelly.pocketcasts.preferences.UserSetting
 import au.com.shiftyjelly.pocketcasts.preferences.model.ArtworkConfiguration
 import au.com.shiftyjelly.pocketcasts.repositories.playlist.SmartPlaylistDraft
 import au.com.shiftyjelly.pocketcasts.sharedtest.MainCoroutineRule
 import kotlin.time.Duration.Companion.minutes
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
@@ -34,11 +39,22 @@ class CreatePlaylistViewModelTest {
 
     private val playlistManager = FakePlaylistManager()
 
+    private val followedPodcasts = MutableStateFlow(emptyList<Podcast>())
+
     private val viewModel = CreatePlaylistViewModel(
-        initialPlaylistTitle = "Playlist name",
         playlistManager = playlistManager,
-        podcastManager = mock {
-            on { findSubscribedFlow() } doReturn flowOf(emptyList())
+        rulesEditorFactory = object : SmartRulesEditor.Factory {
+            override fun create(scope: CoroutineScope, initialBuilder: RulesBuilder, initialAppliedRules: AppliedRules): SmartRulesEditor {
+                return SmartRulesEditor(
+                    playlistManager = playlistManager,
+                    podcastManager = mock {
+                        on { findSubscribedFlow() } doReturn followedPodcasts
+                    },
+                    scope = scope,
+                    initialBuilder = initialBuilder,
+                    initialAppliedRules = initialAppliedRules,
+                )
+            }
         },
         settings = run {
             val settingMock = mock<UserSetting<ArtworkConfiguration>> {
@@ -48,6 +64,8 @@ class CreatePlaylistViewModelTest {
                 on { artworkConfiguration } doReturn settingMock
             }
         },
+        analyticsTracker = AnalyticsTracker.test(),
+        initialPlaylistTitle = "Playlist name",
     )
 
     @Test
@@ -92,6 +110,17 @@ class CreatePlaylistViewModelTest {
             viewModel.applyRule(RuleType.Podcasts)
             state = awaitItem()
             assertEquals(PodcastsRule.Selected(listOf("id-1", "id-2")), state.appliedRules.podcasts)
+
+            followedPodcasts.value = List(4) { index -> Podcast(uuid = "id-$index") }
+            skipItems(1)
+
+            viewModel.selectAllPodcasts()
+            state = awaitItem()
+            assertEquals(setOf("id-0", "id-1", "id-2", "id-3"), state.rulesBuilder.selectedPodcasts)
+
+            viewModel.deselectAllPodcasts()
+            state = awaitItem()
+            assertEquals(emptySet<String>(), state.rulesBuilder.selectedPodcasts)
         }
     }
 
@@ -353,7 +382,7 @@ class CreatePlaylistViewModelTest {
                 ),
                 playlistManager.upsertSmartPlaylistTurbine.awaitItem(),
             )
-            assertTrue(viewModel.createdSmartPlaylistUuid.isCompleted)
+            viewModel.createdSmartPlaylistUuid.await()
         }
     }
 
@@ -367,6 +396,32 @@ class CreatePlaylistViewModelTest {
 
             viewModel.createSmartPlaylist()
             playlistManager.upsertSmartPlaylistTurbine.expectNoEvents()
+        }
+    }
+
+    @Test
+    fun `clear unsaved builder rules`() = runTest {
+        viewModel.uiState.test {
+            skipItems(1)
+
+            viewModel.useStarredEpisodes(true)
+            skipItems(1)
+
+            viewModel.useDownloadStatus(DownloadStatusRule.NotDownloaded)
+            skipItems(1)
+
+            viewModel.useMediaType(MediaTypeRule.Video)
+            skipItems(1)
+            viewModel.applyRule(RuleType.MediaType)
+            skipItems(1)
+
+            viewModel.clearTransientRules()
+            val builder = awaitItem().rulesBuilder
+
+            assertEquals(
+                RulesBuilder.Empty.copy(mediaTypeRule = MediaTypeRule.Video),
+                builder,
+            )
         }
     }
 }

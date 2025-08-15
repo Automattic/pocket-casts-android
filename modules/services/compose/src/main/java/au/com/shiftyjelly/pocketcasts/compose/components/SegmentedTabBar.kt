@@ -93,7 +93,7 @@ private fun RowScope.SegmentedTab(
             backgroundColor = if (isSelected) colors.selectedTabBackgroundColor else colors.unSelectedTabBackgroundColor,
         ),
         onClick = onSelectItem,
-        modifier = Modifier.Companion
+        modifier = Modifier
             .weight(1f)
             .fillMaxSize()
             .defaultMinSize(minWidth = SegmentedTabBarDefaults.tabMinSize)

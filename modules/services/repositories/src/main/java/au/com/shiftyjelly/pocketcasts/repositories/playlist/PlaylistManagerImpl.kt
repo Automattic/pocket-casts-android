@@ -3,7 +3,6 @@ package au.com.shiftyjelly.pocketcasts.repositories.playlist
 import androidx.room.withTransaction
 import au.com.shiftyjelly.pocketcasts.models.db.AppDatabase
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
-import au.com.shiftyjelly.pocketcasts.models.entity.SmartPlaylist
 import au.com.shiftyjelly.pocketcasts.models.entity.SmartPlaylist.Companion.ANYTIME
 import au.com.shiftyjelly.pocketcasts.models.entity.SmartPlaylist.Companion.AUDIO_VIDEO_FILTER_ALL
 import au.com.shiftyjelly.pocketcasts.models.entity.SmartPlaylist.Companion.AUDIO_VIDEO_FILTER_AUDIO_ONLY
@@ -15,6 +14,7 @@ import au.com.shiftyjelly.pocketcasts.models.entity.SmartPlaylist.Companion.LAST
 import au.com.shiftyjelly.pocketcasts.models.entity.SmartPlaylist.Companion.LAST_WEEK
 import au.com.shiftyjelly.pocketcasts.models.entity.SmartPlaylist.Companion.SYNC_STATUS_NOT_SYNCED
 import au.com.shiftyjelly.pocketcasts.models.entity.SmartPlaylist.Companion.SYNC_STATUS_SYNCED
+import au.com.shiftyjelly.pocketcasts.models.to.PlaylistEpisodeMetadata
 import au.com.shiftyjelly.pocketcasts.models.type.PlaylistEpisodeSortType
 import au.com.shiftyjelly.pocketcasts.models.type.SmartRules
 import au.com.shiftyjelly.pocketcasts.models.type.SmartRules.DownloadStatusRule
@@ -26,7 +26,6 @@ import au.com.shiftyjelly.pocketcasts.models.type.SmartRules.StarredRule
 import java.time.Clock
 import java.util.UUID
 import javax.inject.Inject
-import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -35,8 +34,10 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flowOf
+import au.com.shiftyjelly.pocketcasts.models.entity.SmartPlaylist as DbPlaylist
 
 @OptIn(ExperimentalCoroutinesApi::class, FlowPreview::class)
 class PlaylistManagerImpl @Inject constructor(
@@ -50,33 +51,99 @@ class PlaylistManagerImpl @Inject constructor(
             .observeSmartPlaylists()
             .flatMapLatest { playlists ->
                 if (playlists.isEmpty()) {
-                    flowOf(emptyList<PlaylistPreview>())
+                    flowOf(emptyList())
                 } else {
                     combine(playlists.toPreviewFlows()) { previewArray -> previewArray.toList() }
                 }
             }
-            // Add a small debounce to synchronize updates between episode count and podcasts.
-            // When the database is updated, both flows emit events almost simultaneously.
-            // Without debouncing, this can briefly cause inconsistent data. For example, showing an inccorect count
-            // before the updated episodes are received. This is rather imperceptible to the user,
-            // but adding a short debounce helps avoid these inconsistencies and prevents redundant downstream emissions.
-            .debounce(50.milliseconds)
+            .keepPodcastEpisodesSynced()
     }
 
-    override fun observeSmartEpisodes(rules: SmartRules): Flow<List<PodcastEpisode>> {
+    override fun observeSmartPlaylist(uuid: String): Flow<SmartPlaylist?> {
+        return playlistDao
+            .observeSmartPlaylist(uuid)
+            .flatMapLatest { playlist ->
+                if (playlist == null) {
+                    flowOf(null)
+                } else {
+                    val smartRules = playlist.smartRules
+                    val podcastsFlow = playlistDao.observeSmartPlaylistPodcasts(
+                        clock = clock,
+                        smartRules = smartRules,
+                        sortType = playlist.sortType,
+                        limit = PLAYLIST_ARTWORK_EPISODE_LIMIT,
+                    )
+                    val episodesFlow = observeSmartEpisodes(smartRules, playlist.sortType)
+                    val metadataFlow = playlistDao.observeEpisodeMetadata(
+                        clock = clock,
+                        smartRules = smartRules,
+                    )
+                    combine(podcastsFlow, episodesFlow, metadataFlow) { podcasts, episodes, metadata ->
+                        SmartPlaylist(
+                            uuid = playlist.uuid,
+                            title = playlist.title,
+                            smartRules = smartRules,
+                            episodes = episodes,
+                            episodeSortType = playlist.sortType,
+                            isAutoDownloadEnabled = playlist.autoDownload,
+                            autoDownloadLimit = playlist.autodownloadLimit,
+                            totalEpisodeCount = metadata.episodeCount,
+                            playbackDurationLeft = metadata.timeLeftSeconds.seconds,
+                            artworkPodcasts = podcasts,
+                        )
+                    }.keepPodcastEpisodesSynced()
+                }
+            }
+            .distinctUntilChanged()
+    }
+
+    override fun observeSmartEpisodes(rules: SmartRules, sortType: PlaylistEpisodeSortType): Flow<List<PodcastEpisode>> {
         return playlistDao.observeSmartPlaylistEpisodes(
             clock = clock,
             smartRules = rules,
-            sortType = PlaylistEpisodeSortType.NewestToOldest,
+            sortType = sortType,
             limit = SMART_PLAYLIST_EPISODE_LIMIT,
         ).distinctUntilChanged()
+    }
+
+    override fun observeEpisodeMetadata(rules: SmartRules): Flow<PlaylistEpisodeMetadata> {
+        return playlistDao.observeEpisodeMetadata(clock, rules)
+    }
+
+    override suspend fun updateSmartRules(uuid: String, rules: SmartRules) {
+        appDatabase.withTransaction {
+            val playlist = playlistDao
+                .observeSmartPlaylist(uuid)
+                .first()
+                ?.applySmartRules(rules)
+                ?.copy(syncStatus = SYNC_STATUS_NOT_SYNCED)
+            if (playlist != null) {
+                playlistDao.upsertSmartPlaylist(playlist)
+            }
+        }
+    }
+
+    override suspend fun updateSortType(uuid: String, sortType: PlaylistEpisodeSortType) {
+        playlistDao.updateSortType(uuid, sortType)
+    }
+
+    override suspend fun updateAutoDownload(uuid: String, isEnabled: Boolean) {
+        playlistDao.updateAutoDownload(uuid, isEnabled)
+    }
+
+    override suspend fun updateAutoDownloadLimit(uuid: String, limit: Int) {
+        playlistDao.updateAutoDownloadLimit(uuid, limit)
+    }
+
+    override suspend fun updateName(uuid: String, name: String) {
+        playlistDao.updateName(uuid, name)
     }
 
     override suspend fun deletePlaylist(uuid: String) {
         playlistDao.markPlaylistAsDeleted(uuid)
     }
 
-    override suspend fun upsertSmartPlaylist(draft: SmartPlaylistDraft): String {
+    override suspend fun insertSmartPlaylist(draft: SmartPlaylistDraft): String {
         return appDatabase.withTransaction {
             val uuids = playlistDao.getAllPlaylistUuids()
             val uuid = if (draft === SmartPlaylistDraft.NewReleases) {
@@ -86,8 +153,11 @@ class PlaylistManagerImpl @Inject constructor(
             } else {
                 generateUniqueUuid(uuids)
             }
-            val playlist = draft.toSmartPlaylist(uuid, sortPosition = uuids.size + 1)
+            val playlist = draft.toSmartPlaylist(uuid, sortPosition = 1)
             playlistDao.upsertSmartPlaylist(playlist)
+            uuids.forEachIndexed { index, uuid ->
+                playlistDao.updateSortPosition(uuid, index + 2)
+            }
             uuid
         }
     }
@@ -102,28 +172,28 @@ class PlaylistManagerImpl @Inject constructor(
         }
     }
 
-    private fun List<SmartPlaylist>.toPreviewFlows() = map { playlist ->
+    private fun List<DbPlaylist>.toPreviewFlows() = map { playlist ->
         val podcastsFlow = playlistDao.observeSmartPlaylistPodcasts(
             clock = clock,
             smartRules = playlist.smartRules,
             sortType = playlist.sortType,
             limit = PLAYLIST_ARTWORK_EPISODE_LIMIT,
         )
-        val episodeCountFlow = playlistDao.observeSmartPlaylistEpisodeCount(
+        val episodeCountFlow = playlistDao.observeEpisodeMetadata(
             clock = clock,
             smartRules = playlist.smartRules,
         )
-        combine(podcastsFlow, episodeCountFlow) { podcasts, count ->
+        combine(podcastsFlow, episodeCountFlow) { podcasts, metadata ->
             PlaylistPreview(
                 uuid = playlist.uuid,
                 title = playlist.title,
                 podcasts = podcasts,
-                episodeCount = count,
+                episodeCount = metadata.episodeCount,
             )
         }.distinctUntilChanged()
     }
 
-    private val SmartPlaylist.smartRules
+    private val DbPlaylist.smartRules
         get() = SmartRules(
             episodeStatus = SmartRules.EpisodeStatusRule(
                 unplayed = unplayed,
@@ -172,7 +242,7 @@ class PlaylistManagerImpl @Inject constructor(
     private fun SmartPlaylistDraft.toSmartPlaylist(
         uuid: String,
         sortPosition: Int,
-    ) = SmartPlaylist(
+    ) = DbPlaylist(
         uuid = uuid,
         title = title,
         // We use referential equality so only predefined playlists use preset icons
@@ -193,6 +263,9 @@ class PlaylistManagerImpl @Inject constructor(
         } else {
             SYNC_STATUS_NOT_SYNCED
         },
+    ).applySmartRules(rules)
+
+    private fun DbPlaylist.applySmartRules(rules: SmartRules) = copy(
         unplayed = rules.episodeStatus.unplayed,
         partiallyPlayed = rules.episodeStatus.inProgress,
         finished = rules.episodeStatus.completed,
@@ -252,3 +325,11 @@ class PlaylistManagerImpl @Inject constructor(
         const val SMART_PLAYLIST_EPISODE_LIMIT = 500
     }
 }
+
+// Add a small debounce to synchronize updates between episode count and podcasts.
+// When the database is updated, both flows emit events almost simultaneously.
+// Without debouncing, this can briefly cause inconsistent data. For example, showing an incorrect count
+// before the updated episodes are received. This is rather imperceptible to the user,
+// but adding a short debounce helps avoid these inconsistencies and prevents redundant downstream emissions.
+@OptIn(FlowPreview::class)
+private fun <T> Flow<T>.keepPodcastEpisodesSynced() = debounce(50)

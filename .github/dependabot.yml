@@ -30,6 +30,7 @@ updates:
           - "org.jetbrains.kotlinx*"
     ignore:
       # Automattic libraries have a custom versioning scheme which doesn't work with Dependabot.
+      - dependency-name: "org.wordpress:lint"
       - dependency-name: "com.automattic:Automattic-Tracks-Android"
       - dependency-name: "com.automattic:encryptedlogging"
       - dependency-name: "com.automattic.tracks:crashlogging"
