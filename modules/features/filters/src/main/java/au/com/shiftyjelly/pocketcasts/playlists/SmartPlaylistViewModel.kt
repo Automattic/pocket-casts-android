@@ -1,5 +1,7 @@
 package au.com.shiftyjelly.pocketcasts.playlists
 
+import androidx.compose.foundation.text.input.TextFieldState
+import androidx.compose.runtime.snapshotFlow
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
@@ -17,15 +19,23 @@ import dagger.assisted.AssistedInject
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlin.collections.mapOf
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.NonCancellable
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.asSharedFlow
+import kotlinx.coroutines.flow.debounce
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
+import timber.log.Timber
 
+@OptIn(FlowPreview::class, ExperimentalCoroutinesApi::class)
 @HiltViewModel(assistedFactory = SmartPlaylistViewModel.Factory::class)
 class SmartPlaylistViewModel @AssistedInject constructor(
     @Assisted private val playlistUuid: String,
@@ -50,7 +60,13 @@ class SmartPlaylistViewModel @AssistedInject constructor(
     private val _showSettingsSignal = MutableSharedFlow<Unit>()
     val showSettingsSignal = _showSettingsSignal.asSharedFlow()
 
-    val uiState = playlistManager.observeSmartPlaylist(playlistUuid)
+    val searchState = TextFieldState()
+
+    val uiState = snapshotFlow { searchState.text }
+        .map { it.toString().trim() }
+        .debounce { searchTerm -> if (searchTerm.isEmpty()) 0 else 300 }
+        .distinctUntilChanged()
+        .flatMapLatest { searchTerm -> playlistManager.observeSmartPlaylist(playlistUuid, searchTerm) }
         .map { UiState(it) }
         .stateIn(viewModelScope, SharingStarted.Lazily, initialValue = UiState.Empty)
 

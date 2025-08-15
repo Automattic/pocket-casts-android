@@ -6,8 +6,12 @@ import androidx.compose.foundation.background
 import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.ComposeView
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.platform.ViewCompositionStrategy
 import androidx.recyclerview.widget.RecyclerView
 import au.com.shiftyjelly.pocketcasts.compose.AppTheme
@@ -22,8 +26,10 @@ import au.com.shiftyjelly.pocketcasts.ui.R as UR
 // data from an internally stored Flow.
 internal class PlaylistHeaderAdapter(
     private val themeType: Theme.ThemeType,
+    private val onChangeSearchFocus: (Boolean, Float) -> Unit,
 ) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
     private val headerDataFlow = MutableStateFlow<PlaylistHeaderData?>(null)
+    private var searchTopOffset = 0f
 
     fun submitHeader(data: PlaylistHeaderData?) {
         headerDataFlow.value = data
@@ -50,11 +56,22 @@ internal class PlaylistHeaderAdapter(
         fun bind() {
             composeView.setContent {
                 val headerData by headerDataFlow.collectAsState()
+                var isFocused by remember { mutableStateOf<Boolean?>(null) }
+                val keyboard = LocalSoftwareKeyboardController.current
 
                 AppTheme(themeType) {
                     PlaylistHeader(
                         data = headerData,
                         useBlurredArtwork = Build.VERSION.SDK_INT >= 31,
+                        onMeasureSearchTopOffset = { topOffset -> searchTopOffset = topOffset },
+                        onChangeSearchFocus = { focusState ->
+                            val hasFocus = focusState.hasFocus
+                            if (isFocused != hasFocus) {
+                                isFocused = hasFocus
+                                onChangeSearchFocus(hasFocus, searchTopOffset)
+                                keyboard?.show()
+                            }
+                        },
                         modifier = Modifier.background(MaterialTheme.theme.colors.primaryUi02),
                     )
                 }
