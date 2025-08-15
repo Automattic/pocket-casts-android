@@ -16,7 +16,6 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.produceState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.graphicsLayer
@@ -35,7 +34,6 @@ import au.com.shiftyjelly.pocketcasts.compose.components.TextP40
 import au.com.shiftyjelly.pocketcasts.compose.images.HorizontalLogo
 import au.com.shiftyjelly.pocketcasts.compose.theme
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
-import kotlinx.coroutines.delay
 import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
@@ -51,7 +49,17 @@ fun BestAppAnimation(
 ) {
 
     val transition = updateTransition(animationState)
-    val contentYOffset by transition.animateDp(label = "contentYOffset") {
+    val contentAlpha by transition.animateFloat(
+        label = "contentAlpha",
+    ) {
+        when (it) {
+            AnimationState.Appearing -> 0f
+            AnimationState.Disappearing -> 1f
+        }
+    }
+    val contentYOffset by transition.animateDp(
+        label = "contentYOffset"
+    ) {
         when (it) {
             AnimationState.Appearing -> 32.dp
             AnimationState.Disappearing -> (-32).dp
@@ -60,7 +68,13 @@ fun BestAppAnimation(
     val mainTextAlpha by transition.animateFloat(
         label = "mainTextAlpha",
         transitionSpec = {
-            tween(durationMillis = 500, delayMillis = 300)
+            tween(
+                durationMillis = 500,
+                delayMillis = when (animationState) {
+                    AnimationState.Appearing -> 300
+                    AnimationState.Disappearing -> 0
+                }
+            )
         }
     ) {
         when (it) {
@@ -71,7 +85,13 @@ fun BestAppAnimation(
     val mainTextYOffset by transition.animateDp(
         label = "mainTextYOffset",
         transitionSpec = {
-            tween(durationMillis = 500, delayMillis = 300)
+            tween(
+                durationMillis = 500,
+                delayMillis = when (animationState) {
+                    AnimationState.Appearing -> 300
+                    AnimationState.Disappearing -> 0
+                }
+            )
         }
     ) {
         when (it) {
@@ -82,7 +102,13 @@ fun BestAppAnimation(
     val secondaryTextAlpha by transition.animateFloat(
         label = "secondaryTextAlpha",
         transitionSpec = {
-            tween(durationMillis = 500, delayMillis = 600)
+            tween(
+                durationMillis = 500,
+                delayMillis = when (animationState) {
+                    AnimationState.Appearing -> 600
+                    AnimationState.Disappearing -> 0
+                },
+            )
         }
     ) {
         when (it) {
@@ -93,7 +119,13 @@ fun BestAppAnimation(
     val secondaryTextYOffset by transition.animateDp(
         label = "secondaryTextYOffset",
         transitionSpec = {
-            tween(durationMillis = 500, delayMillis = 600)
+            tween(
+                durationMillis = 500,
+                delayMillis = when (animationState) {
+                    AnimationState.Appearing -> 600
+                    AnimationState.Disappearing -> 0
+                }
+            )
         }
     ) {
         when (it) {
@@ -111,9 +143,13 @@ fun BestAppAnimation(
         )
         Spacer(modifier = Modifier.weight(1f))
         BestAppArtworkCollage(
-            modifier = Modifier.offset {
-                IntOffset(x = 0, y = contentYOffset.roundToPx())
-            }
+            modifier = Modifier
+                .offset {
+                    IntOffset(x = 0, y = contentYOffset.roundToPx())
+                }
+                .graphicsLayer {
+                    alpha = contentAlpha
+                }
         )
         Spacer(modifier = Modifier.weight(1f))
         TextH10(
@@ -122,7 +158,8 @@ fun BestAppAnimation(
                 .padding(horizontal = 36.dp)
                 .offset {
                     IntOffset(x = 0, y = mainTextYOffset.roundToPx())
-                }.graphicsLayer {
+                }
+                .graphicsLayer {
                     alpha = mainTextAlpha
                 },
             text = stringResource(LR.string.onboarding_intro_carousel_best_app_title),
@@ -135,11 +172,13 @@ fun BestAppAnimation(
             lineHeight = 21.sp,
             text = stringResource(LR.string.onboarding_intro_carousel_pc_user),
             color = MaterialTheme.theme.colors.primaryText02,
-            modifier = Modifier.offset {
-                IntOffset(x = 0, y = secondaryTextYOffset.roundToPx())
-            }.graphicsLayer {
-                alpha = secondaryTextAlpha
-            }
+            modifier = Modifier
+                .offset {
+                    IntOffset(x = 0, y = secondaryTextYOffset.roundToPx())
+                }
+                .graphicsLayer {
+                    alpha = secondaryTextAlpha
+                }
         )
     }
 }
@@ -287,11 +326,5 @@ fun OrganizingPodcastsAnimation(modifier: Modifier = Modifier) {
 @Preview
 @Composable
 private fun PreviewBestAppAnim() = AppThemeWithBackground(Theme.ThemeType.LIGHT) {
-    val animStateIndex by produceState(0) {
-        while (true) {
-            delay(2000)
-            value = (value + 1) % AnimationState.entries.size
-        }
-    }
-    BestAppAnimation(modifier = Modifier.fillMaxWidth(), animationState = AnimationState.entries[animStateIndex])
+    BestAppAnimation(modifier = Modifier.fillMaxWidth(), animationState = AnimationState.Appearing)
 }
