@@ -6,6 +6,7 @@ import androidx.compose.animation.core.tween
 import androidx.compose.animation.core.updateTransition
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -47,140 +48,19 @@ fun BestAppAnimation(
     animationState: AnimationState,
     modifier: Modifier = Modifier
 ) {
-
-    val transition = updateTransition(animationState)
-    val contentAlpha by transition.animateFloat(
-        label = "contentAlpha",
-    ) {
-        when (it) {
-            AnimationState.Appearing -> 0f
-            AnimationState.Disappearing -> 1f
-        }
-    }
-    val contentYOffset by transition.animateDp(
-        label = "contentYOffset"
-    ) {
-        when (it) {
-            AnimationState.Appearing -> 32.dp
-            AnimationState.Disappearing -> (-32).dp
-        }
-    }
-    val mainTextAlpha by transition.animateFloat(
-        label = "mainTextAlpha",
-        transitionSpec = {
-            tween(
-                durationMillis = 500,
-                delayMillis = when (animationState) {
-                    AnimationState.Appearing -> 300
-                    AnimationState.Disappearing -> 0
-                }
-            )
-        }
-    ) {
-        when (it) {
-            AnimationState.Appearing -> 0f
-            AnimationState.Disappearing -> 1f
-        }
-    }
-    val mainTextYOffset by transition.animateDp(
-        label = "mainTextYOffset",
-        transitionSpec = {
-            tween(
-                durationMillis = 500,
-                delayMillis = when (animationState) {
-                    AnimationState.Appearing -> 300
-                    AnimationState.Disappearing -> 0
-                }
-            )
-        }
-    ) {
-        when (it) {
-            AnimationState.Appearing -> 12.dp
-            AnimationState.Disappearing -> (-12).dp
-        }
-    }
-    val secondaryTextAlpha by transition.animateFloat(
-        label = "secondaryTextAlpha",
-        transitionSpec = {
-            tween(
-                durationMillis = 500,
-                delayMillis = when (animationState) {
-                    AnimationState.Appearing -> 600
-                    AnimationState.Disappearing -> 0
-                },
-            )
-        }
-    ) {
-        when (it) {
-            AnimationState.Appearing -> 0f
-            AnimationState.Disappearing -> 1f
-        }
-    }
-    val secondaryTextYOffset by transition.animateDp(
-        label = "secondaryTextYOffset",
-        transitionSpec = {
-            tween(
-                durationMillis = 500,
-                delayMillis = when (animationState) {
-                    AnimationState.Appearing -> 600
-                    AnimationState.Disappearing -> 0
-                }
-            )
-        }
-    ) {
-        when (it) {
-            AnimationState.Appearing -> 12.dp
-            AnimationState.Disappearing -> (-12).dp
-        }
-    }
-
-    Column(
+    AnimatedCarouselItemContainer(
+        animationState = animationState,
         modifier = modifier,
-        horizontalAlignment = Alignment.CenterHorizontally,
-    ) {
-        HorizontalLogo(
-            modifier = Modifier.height(32.dp)
-        )
-        Spacer(modifier = Modifier.weight(1f))
-        BestAppArtworkCollage(
-            modifier = Modifier
-                .offset {
-                    IntOffset(x = 0, y = contentYOffset.roundToPx())
-                }
-                .graphicsLayer {
-                    alpha = contentAlpha
-                }
-        )
-        Spacer(modifier = Modifier.weight(1f))
-        TextH10(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 36.dp)
-                .offset {
-                    IntOffset(x = 0, y = mainTextYOffset.roundToPx())
-                }
-                .graphicsLayer {
-                    alpha = mainTextAlpha
-                },
-            text = stringResource(LR.string.onboarding_intro_carousel_best_app_title),
-            textAlign = TextAlign.Center,
-            color = MaterialTheme.theme.colors.primaryText01,
-        )
-        Spacer(modifier = Modifier.height(16.dp))
-        TextP40(
-            fontSize = 15.sp,
-            lineHeight = 21.sp,
-            text = stringResource(LR.string.onboarding_intro_carousel_pc_user),
-            color = MaterialTheme.theme.colors.primaryText02,
-            modifier = Modifier
-                .offset {
-                    IntOffset(x = 0, y = secondaryTextYOffset.roundToPx())
-                }
-                .graphicsLayer {
-                    alpha = secondaryTextAlpha
-                }
-        )
-    }
+        title = stringResource(LR.string.onboarding_intro_carousel_best_app_title),
+        content = {
+            HorizontalLogo(
+                modifier = Modifier.height(32.dp)
+            )
+            Spacer(modifier = Modifier.weight(1f))
+            BestAppArtworkCollage()
+            Spacer(modifier = Modifier.weight(1f))
+        },
+    )
 }
 
 @Composable
@@ -321,6 +201,147 @@ fun CustomizationIsInsaneAnimation(modifier: Modifier = Modifier) {
 
 @Composable
 fun OrganizingPodcastsAnimation(modifier: Modifier = Modifier) {
+}
+
+@Composable
+private fun AnimatedCarouselItemContainer(
+    animationState: AnimationState,
+    content: @Composable ColumnScope.() -> Unit,
+    title: String,
+    modifier: Modifier = Modifier,
+    subTitle: String = stringResource(LR.string.onboarding_intro_carousel_pc_user),
+) {
+    val transition = updateTransition(animationState)
+    val contentAlpha by transition.animateFloat(
+        label = "contentAlpha",
+    ) {
+        when (it) {
+            AnimationState.Appearing -> 0f
+            AnimationState.Disappearing -> 1f
+        }
+    }
+    val contentYOffset by transition.animateDp(
+        label = "contentYOffset"
+    ) {
+        when (it) {
+            AnimationState.Appearing -> 32.dp
+            AnimationState.Disappearing -> (-32).dp
+        }
+    }
+    val mainTextAlpha by transition.animateFloat(
+        label = "mainTextAlpha",
+        transitionSpec = {
+            tween(
+                durationMillis = 500,
+                delayMillis = when (animationState) {
+                    AnimationState.Appearing -> 300
+                    AnimationState.Disappearing -> 0
+                }
+            )
+        }
+    ) {
+        when (it) {
+            AnimationState.Appearing -> 0f
+            AnimationState.Disappearing -> 1f
+        }
+    }
+    val mainTextYOffset by transition.animateDp(
+        label = "mainTextYOffset",
+        transitionSpec = {
+            tween(
+                durationMillis = 500,
+                delayMillis = when (animationState) {
+                    AnimationState.Appearing -> 300
+                    AnimationState.Disappearing -> 0
+                }
+            )
+        }
+    ) {
+        when (it) {
+            AnimationState.Appearing -> 12.dp
+            AnimationState.Disappearing -> (-12).dp
+        }
+    }
+    val secondaryTextAlpha by transition.animateFloat(
+        label = "secondaryTextAlpha",
+        transitionSpec = {
+            tween(
+                durationMillis = 500,
+                delayMillis = when (animationState) {
+                    AnimationState.Appearing -> 600
+                    AnimationState.Disappearing -> 0
+                },
+            )
+        }
+    ) {
+        when (it) {
+            AnimationState.Appearing -> 0f
+            AnimationState.Disappearing -> 1f
+        }
+    }
+    val secondaryTextYOffset by transition.animateDp(
+        label = "secondaryTextYOffset",
+        transitionSpec = {
+            tween(
+                durationMillis = 500,
+                delayMillis = when (animationState) {
+                    AnimationState.Appearing -> 600
+                    AnimationState.Disappearing -> 0
+                }
+            )
+        }
+    ) {
+        when (it) {
+            AnimationState.Appearing -> 12.dp
+            AnimationState.Disappearing -> (-12).dp
+        }
+    }
+
+    Column(
+        modifier = modifier,
+        horizontalAlignment = Alignment.CenterHorizontally,
+    ) {
+        Column(
+            modifier = Modifier
+                .weight(1f)
+                .fillMaxWidth()
+                .offset {
+                    IntOffset(x = 0, y = contentYOffset.roundToPx())
+                }
+                .graphicsLayer {
+                    alpha = contentAlpha
+                }) {
+            content()
+        }
+        TextH10(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 36.dp)
+                .offset {
+                    IntOffset(x = 0, y = mainTextYOffset.roundToPx())
+                }
+                .graphicsLayer {
+                    alpha = mainTextAlpha
+                },
+            text = title,
+            textAlign = TextAlign.Center,
+            color = MaterialTheme.theme.colors.primaryText01,
+        )
+        Spacer(modifier = Modifier.height(16.dp))
+        TextP40(
+            fontSize = 15.sp,
+            lineHeight = 21.sp,
+            text = subTitle,
+            color = MaterialTheme.theme.colors.primaryText02,
+            modifier = Modifier
+                .offset {
+                    IntOffset(x = 0, y = secondaryTextYOffset.roundToPx())
+                }
+                .graphicsLayer {
+                    alpha = secondaryTextAlpha
+                }
+        )
+    }
 }
 
 @Preview
