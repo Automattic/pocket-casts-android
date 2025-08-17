@@ -47,25 +47,25 @@ fun FeatureCarousel(
             itemCount = CAROUSEL_ITEM_COUNT,
             activeItemIndex = activeItemIndex,
         )
-        Crossfade(targetState = activeItemIndex, modifier = Modifier.fillMaxSize()) { index ->
-            Box(
-                modifier = Modifier.fillMaxSize(),
-                contentAlignment = Alignment.Center,
-            ) {
-                when (index) {
-                    0 -> BestAppAnimation(
-                        modifier = Modifier.padding(top = 64.dp),
-                        itemDisplayDuration = 3.seconds,
-                    )
+        Crossfade(
+            targetState = activeItemIndex,
+            modifier = Modifier.fillMaxSize(),
+        ) { index ->
+            when (index) {
+                0 -> BestAppAnimation(
+                    modifier = Modifier.padding(top = 64.dp),
+                    itemDisplayDuration = delayBetweenCycles,
+                )
 
-                    1 -> CustomizationIsInsaneAnimation(
-                        itemDisplayDuration = 3.seconds,
-                    )
+                1 -> CustomizationIsInsaneAnimation(
+                    modifier = Modifier.padding(top = 24.dp),
+                    itemDisplayDuration = delayBetweenCycles,
+                )
 
-                    2 -> OrganizingPodcastsAnimation(
-                        itemDisplayDuration = 3.seconds,
-                    )
-                }
+                2 -> OrganizingPodcastsAnimation(
+                    modifier = Modifier.padding(top = 24.dp),
+                    itemDisplayDuration = delayBetweenCycles,
+                )
             }
         }
     }

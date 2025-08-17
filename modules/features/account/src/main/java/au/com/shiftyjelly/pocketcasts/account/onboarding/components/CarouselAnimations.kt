@@ -1,5 +1,7 @@
 package au.com.shiftyjelly.pocketcasts.account.onboarding.components
 
+import androidx.compose.animation.core.FastOutLinearInEasing
+import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.animation.core.animateDp
 import androidx.compose.animation.core.animateFloat
 import androidx.compose.animation.core.tween
@@ -91,6 +93,7 @@ fun CustomizationIsInsaneAnimation(
             Spacer(modifier = Modifier.weight(1f))
             Image(
                 modifier = Modifier
+                    .fillMaxWidth(.6f)
                     .align(Alignment.CenterHorizontally)
                     .drawWithContent {
                         drawContent()
@@ -106,8 +109,8 @@ fun CustomizationIsInsaneAnimation(
                             )
                         )
                     },
-                painter = painterResource(IR.drawable.intro_story_2),
                 contentScale = ContentScale.FillWidth,
+                painter = painterResource(IR.drawable.intro_story_2),
                 contentDescription = null,
             )
             Spacer(modifier = Modifier.weight(1f))
@@ -139,6 +142,7 @@ fun OrganizingPodcastsAnimation(
 }
 
 private enum class AnimationState {
+    Invisible,
     Appearing,
     Disappearing
 }
@@ -150,12 +154,13 @@ private fun AnimatedCarouselItemContainer(
     title: String,
     modifier: Modifier = Modifier,
     disappearAnimDuration: Duration = 300.milliseconds,
-    appearAnimDuration: Duration = 500.milliseconds,
+    appearAnimDuration: Duration = 600.milliseconds,
     subTitle: String = stringResource(LR.string.onboarding_intro_carousel_pc_user),
 ) {
-    var animationState by remember { mutableStateOf(AnimationState.Appearing) }
+    var animationState by remember { mutableStateOf(AnimationState.Invisible) }
 
     LaunchedEffect(itemDisplayDuration, disappearAnimDuration) {
+        animationState = AnimationState.Appearing
         delay(itemDisplayDuration.inWholeMilliseconds - disappearAnimDuration.inWholeMilliseconds)
         animationState = AnimationState.Disappearing
     }
@@ -163,99 +168,91 @@ private fun AnimatedCarouselItemContainer(
     val transition = updateTransition(animationState)
     val contentAlpha by transition.animateFloat(
         label = "contentAlpha",
-    ) {
-        when (it) {
-            AnimationState.Appearing -> 0f
-            AnimationState.Disappearing -> 1f
+        transitionSpec = {
+            tween(
+                durationMillis = animationState.durationMillis(
+                    appearAnimDuration = appearAnimDuration,
+                    disappearAnimDuration = disappearAnimDuration,
+                ),
+                easing = animationState.easing
+            )
         }
+    ) {
+        it.alpha
     }
     val contentYOffset by transition.animateDp(
-        label = "contentYOffset"
-    ) {
-        when (it) {
-            AnimationState.Appearing -> 32.dp
-            AnimationState.Disappearing -> (-32).dp
+        label = "contentYOffset",
+        transitionSpec = {
+            tween(
+                durationMillis = animationState.durationMillis(
+                    appearAnimDuration = appearAnimDuration,
+                    disappearAnimDuration = disappearAnimDuration,
+                ),
+                easing = animationState.easing
+            )
         }
+    ) {
+        it.contentOffsetY
     }
     val mainTextAlpha by transition.animateFloat(
         label = "mainTextAlpha",
         transitionSpec = {
             tween(
-                durationMillis = when (animationState) {
-                    AnimationState.Appearing -> appearAnimDuration.inWholeMilliseconds.toInt()
-                    AnimationState.Disappearing -> disappearAnimDuration.inWholeMilliseconds.toInt()
-                },
-                delayMillis = when (animationState) {
-                    AnimationState.Appearing -> 300
-                    AnimationState.Disappearing -> 0
-                }
+                durationMillis = animationState.durationMillis(
+                    appearAnimDuration = appearAnimDuration,
+                    disappearAnimDuration = disappearAnimDuration,
+                ),
+                delayMillis = animationState.textAnimDelay(300.milliseconds),
+                easing = animationState.easing
             )
         }
     ) {
-        when (it) {
-            AnimationState.Appearing -> 0f
-            AnimationState.Disappearing -> 1f
-        }
+        it.alpha
     }
     val mainTextYOffset by transition.animateDp(
         label = "mainTextYOffset",
         transitionSpec = {
             tween(
-                durationMillis = when (animationState) {
-                    AnimationState.Appearing -> appearAnimDuration.inWholeMilliseconds.toInt()
-                    AnimationState.Disappearing -> disappearAnimDuration.inWholeMilliseconds.toInt()
-                },
-                delayMillis = when (animationState) {
-                    AnimationState.Appearing -> 300
-                    AnimationState.Disappearing -> 0
-                }
+                durationMillis = animationState.durationMillis(
+                    appearAnimDuration = appearAnimDuration,
+                    disappearAnimDuration = disappearAnimDuration,
+                ),
+                delayMillis = animationState.textAnimDelay(300.milliseconds),
+                easing = animationState.easing
             )
         }
     ) {
-        when (it) {
-            AnimationState.Appearing -> 12.dp
-            AnimationState.Disappearing -> (-12).dp
-        }
+        it.textOffsetY
     }
     val secondaryTextAlpha by transition.animateFloat(
         label = "secondaryTextAlpha",
         transitionSpec = {
             tween(
-                durationMillis = when (animationState) {
-                    AnimationState.Appearing -> appearAnimDuration.inWholeMilliseconds.toInt()
-                    AnimationState.Disappearing -> disappearAnimDuration.inWholeMilliseconds.toInt()
-                },
-                delayMillis = when (animationState) {
-                    AnimationState.Appearing -> 600
-                    AnimationState.Disappearing -> 0
-                },
+                durationMillis = animationState.durationMillis(
+                    appearAnimDuration = appearAnimDuration,
+                    disappearAnimDuration = disappearAnimDuration,
+                ),
+                delayMillis = animationState.textAnimDelay(600.milliseconds),
+                easing = animationState.easing
             )
         }
     ) {
-        when (it) {
-            AnimationState.Appearing -> 0f
-            AnimationState.Disappearing -> 1f
-        }
+        it.alpha
     }
     val secondaryTextYOffset by transition.animateDp(
         label = "secondaryTextYOffset",
         transitionSpec = {
             tween(
-                durationMillis = when (animationState) {
-                    AnimationState.Appearing -> appearAnimDuration.inWholeMilliseconds.toInt()
-                    AnimationState.Disappearing -> disappearAnimDuration.inWholeMilliseconds.toInt()
-                },
-                delayMillis = when (animationState) {
-                    AnimationState.Appearing -> 600
-                    AnimationState.Disappearing -> 0
-                }
+                durationMillis = animationState.durationMillis(
+                    appearAnimDuration = appearAnimDuration,
+                    disappearAnimDuration = disappearAnimDuration,
+                ),
+                delayMillis = animationState.textAnimDelay(600.milliseconds),
+                easing = animationState.easing
             )
         }
     ) {
-        when (it) {
-            AnimationState.Appearing -> 12.dp
-            AnimationState.Disappearing -> (-12).dp
-        }
+        it.textOffsetY
     }
 
     Column(
@@ -309,6 +306,49 @@ private fun AnimatedCarouselItemContainer(
                 }
         )
     }
+}
+
+private val AnimationState.alpha
+    get() = when (this) {
+        AnimationState.Appearing -> 1f
+        AnimationState.Invisible,
+        AnimationState.Disappearing -> 0f
+    }
+
+private val AnimationState.textOffsetY
+    get() = when (this) {
+        AnimationState.Appearing -> (-6).dp
+        AnimationState.Invisible,
+        AnimationState.Disappearing -> 6.dp
+    }
+
+private val AnimationState.contentOffsetY
+    get() = when (this) {
+        AnimationState.Appearing -> (-16).dp
+        AnimationState.Invisible,
+        AnimationState.Disappearing -> 16.dp
+    }
+
+private val AnimationState.easing
+    get() = when (this) {
+        AnimationState.Appearing -> FastOutSlowInEasing
+        AnimationState.Invisible,
+        AnimationState.Disappearing -> FastOutLinearInEasing
+    }
+
+private fun AnimationState.durationMillis(
+    appearAnimDuration: Duration,
+    disappearAnimDuration : Duration,
+) = when (this) {
+    AnimationState.Invisible -> 0
+    AnimationState.Appearing -> appearAnimDuration.inWholeMilliseconds.toInt()
+    AnimationState.Disappearing -> disappearAnimDuration.inWholeMilliseconds.toInt()
+}
+
+private fun AnimationState.textAnimDelay(additionalDelay: Duration) = when (this) {
+    AnimationState.Appearing -> additionalDelay.inWholeMilliseconds.toInt()
+    AnimationState.Invisible,
+    AnimationState.Disappearing -> 0
 }
 
 @Preview
