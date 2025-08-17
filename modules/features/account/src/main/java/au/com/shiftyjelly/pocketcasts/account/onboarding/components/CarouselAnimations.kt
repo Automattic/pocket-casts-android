@@ -14,7 +14,11 @@ import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.drawWithContent
@@ -38,26 +42,28 @@ import au.com.shiftyjelly.pocketcasts.compose.components.TextP40
 import au.com.shiftyjelly.pocketcasts.compose.images.HorizontalLogo
 import au.com.shiftyjelly.pocketcasts.compose.theme
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
+import kotlinx.coroutines.delay
+import kotlin.time.Duration
+import kotlin.time.Duration.Companion.milliseconds
+import kotlin.time.Duration.Companion.seconds
 import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
-enum class AnimationState {
-    Appearing,
-    Disappearing
-}
 
 @Composable
 fun BestAppAnimation(
-    animationState: AnimationState,
-    modifier: Modifier = Modifier
+    itemDisplayDuration: Duration,
+    modifier: Modifier = Modifier,
 ) {
     AnimatedCarouselItemContainer(
-        animationState = animationState,
+        itemDisplayDuration = itemDisplayDuration,
         modifier = modifier,
         title = stringResource(LR.string.onboarding_intro_carousel_best_app_title),
         content = {
             HorizontalLogo(
-                modifier = Modifier.height(32.dp)
+                modifier = Modifier
+                    .height(32.dp)
+                    .align(Alignment.CenterHorizontally)
             )
             Spacer(modifier = Modifier.weight(1f))
             Image(
@@ -74,11 +80,11 @@ fun BestAppAnimation(
 
 @Composable
 fun CustomizationIsInsaneAnimation(
-    animationState: AnimationState,
+    itemDisplayDuration: Duration,
     modifier: Modifier = Modifier,
 ) {
     AnimatedCarouselItemContainer(
-        animationState = animationState,
+        itemDisplayDuration = itemDisplayDuration,
         modifier = modifier,
         title = stringResource(LR.string.onboarding_intro_carousel_customization_insane_title),
         content = {
@@ -111,11 +117,11 @@ fun CustomizationIsInsaneAnimation(
 
 @Composable
 fun OrganizingPodcastsAnimation(
-    animationState: AnimationState,
-    modifier: Modifier = Modifier
+    itemDisplayDuration: Duration,
+    modifier: Modifier = Modifier,
 ) {
     AnimatedCarouselItemContainer(
-        animationState = animationState,
+        itemDisplayDuration = itemDisplayDuration,
         modifier = modifier,
         title = stringResource(LR.string.onboarding_intro_carousel_organizing_podcasts_title),
         content = {
@@ -132,14 +138,28 @@ fun OrganizingPodcastsAnimation(
     )
 }
 
+private enum class AnimationState {
+    Appearing,
+    Disappearing
+}
+
 @Composable
 private fun AnimatedCarouselItemContainer(
-    animationState: AnimationState,
+    itemDisplayDuration: Duration,
     content: @Composable ColumnScope.() -> Unit,
     title: String,
     modifier: Modifier = Modifier,
+    disappearAnimDuration: Duration = 300.milliseconds,
+    appearAnimDuration: Duration = 500.milliseconds,
     subTitle: String = stringResource(LR.string.onboarding_intro_carousel_pc_user),
 ) {
+    var animationState by remember { mutableStateOf(AnimationState.Appearing) }
+
+    LaunchedEffect(itemDisplayDuration, disappearAnimDuration) {
+        delay(itemDisplayDuration.inWholeMilliseconds - disappearAnimDuration.inWholeMilliseconds)
+        animationState = AnimationState.Disappearing
+    }
+
     val transition = updateTransition(animationState)
     val contentAlpha by transition.animateFloat(
         label = "contentAlpha",
@@ -161,7 +181,10 @@ private fun AnimatedCarouselItemContainer(
         label = "mainTextAlpha",
         transitionSpec = {
             tween(
-                durationMillis = 500,
+                durationMillis = when (animationState) {
+                    AnimationState.Appearing -> appearAnimDuration.inWholeMilliseconds.toInt()
+                    AnimationState.Disappearing -> disappearAnimDuration.inWholeMilliseconds.toInt()
+                },
                 delayMillis = when (animationState) {
                     AnimationState.Appearing -> 300
                     AnimationState.Disappearing -> 0
@@ -178,7 +201,10 @@ private fun AnimatedCarouselItemContainer(
         label = "mainTextYOffset",
         transitionSpec = {
             tween(
-                durationMillis = 500,
+                durationMillis = when (animationState) {
+                    AnimationState.Appearing -> appearAnimDuration.inWholeMilliseconds.toInt()
+                    AnimationState.Disappearing -> disappearAnimDuration.inWholeMilliseconds.toInt()
+                },
                 delayMillis = when (animationState) {
                     AnimationState.Appearing -> 300
                     AnimationState.Disappearing -> 0
@@ -195,7 +221,10 @@ private fun AnimatedCarouselItemContainer(
         label = "secondaryTextAlpha",
         transitionSpec = {
             tween(
-                durationMillis = 500,
+                durationMillis = when (animationState) {
+                    AnimationState.Appearing -> appearAnimDuration.inWholeMilliseconds.toInt()
+                    AnimationState.Disappearing -> disappearAnimDuration.inWholeMilliseconds.toInt()
+                },
                 delayMillis = when (animationState) {
                     AnimationState.Appearing -> 600
                     AnimationState.Disappearing -> 0
@@ -212,7 +241,10 @@ private fun AnimatedCarouselItemContainer(
         label = "secondaryTextYOffset",
         transitionSpec = {
             tween(
-                durationMillis = 500,
+                durationMillis = when (animationState) {
+                    AnimationState.Appearing -> appearAnimDuration.inWholeMilliseconds.toInt()
+                    AnimationState.Disappearing -> disappearAnimDuration.inWholeMilliseconds.toInt()
+                },
                 delayMillis = when (animationState) {
                     AnimationState.Appearing -> 600
                     AnimationState.Disappearing -> 0
@@ -282,17 +314,17 @@ private fun AnimatedCarouselItemContainer(
 @Preview
 @Composable
 private fun PreviewBestAppAnim() = AppThemeWithBackground(Theme.ThemeType.LIGHT) {
-    BestAppAnimation(modifier = Modifier.fillMaxWidth(), animationState = AnimationState.Appearing)
+    BestAppAnimation(modifier = Modifier.fillMaxWidth(), itemDisplayDuration = 5.seconds)
 }
 
 @Preview
 @Composable
 private fun PreviewCustomizationAppAnim() = AppThemeWithBackground(Theme.ThemeType.LIGHT) {
-    CustomizationIsInsaneAnimation(modifier = Modifier.fillMaxWidth(), animationState = AnimationState.Appearing)
+    CustomizationIsInsaneAnimation(modifier = Modifier.fillMaxWidth(), itemDisplayDuration = 5.seconds)
 }
 
 @Preview
 @Composable
 private fun PreviewOrganizingAppAnim() = AppThemeWithBackground(Theme.ThemeType.LIGHT) {
-    OrganizingPodcastsAnimation(modifier = Modifier.fillMaxWidth(), animationState = AnimationState.Appearing)
+    OrganizingPodcastsAnimation(modifier = Modifier.fillMaxWidth(), itemDisplayDuration = 5.seconds)
 }

@@ -9,7 +9,6 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.State
 import androidx.compose.runtime.getValue
@@ -21,9 +20,9 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import au.com.shiftyjelly.pocketcasts.compose.AppThemeWithBackground
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
+import kotlinx.coroutines.delay
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
-import kotlinx.coroutines.delay
 
 private const val CAROUSEL_ITEM_COUNT = 3
 
@@ -31,7 +30,10 @@ private const val CAROUSEL_ITEM_COUNT = 3
 fun FeatureCarousel(
     modifier: Modifier = Modifier,
 ) {
-    val activeItemIndex by cyclicCounter(cycleRange = 0 until CAROUSEL_ITEM_COUNT)
+    val activeItemIndex by cyclicCounter(
+        cycleRange = 0 until CAROUSEL_ITEM_COUNT,
+        delayBetweenCycles = 3.seconds,
+    )
 
     Column(
         modifier = modifier.padding(top = 11.dp),
@@ -48,9 +50,16 @@ fun FeatureCarousel(
                 when (index) {
                     0 -> BestAppAnimation(
                         modifier = Modifier.padding(top = 64.dp),
-                        animationState = AnimationState.Disappearing
+                        itemDisplayDuration = 3.seconds,
                     )
-                    else -> Text(text = index.toString())
+
+                    1 -> CustomizationIsInsaneAnimation(
+                        itemDisplayDuration = 3.seconds,
+                    )
+
+                    2 -> OrganizingPodcastsAnimation(
+                        itemDisplayDuration = 3.seconds,
+                    )
                 }
             }
         }
@@ -60,7 +69,7 @@ fun FeatureCarousel(
 @Composable
 fun cyclicCounter(
     cycleRange: IntRange,
-    delayBetweenCycles: Duration = 2.seconds,
+    delayBetweenCycles: Duration = 3.seconds,
     isPerpetual: Boolean = true,
 ): State<Int> {
     return produceState(cycleRange.start) {
