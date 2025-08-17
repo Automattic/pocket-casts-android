@@ -2,10 +2,14 @@ package au.com.shiftyjelly.pocketcasts.views.extensions
 
 import android.util.DisplayMetrics
 import android.view.View
+import android.view.ViewConfiguration
 import android.view.ViewGroup
 import androidx.core.view.isVisible
 import androidx.recyclerview.widget.LinearSmoothScroller
 import androidx.recyclerview.widget.RecyclerView
+import androidx.recyclerview.widget.RecyclerView.SCROLL_STATE_DRAGGING
+import au.com.shiftyjelly.pocketcasts.views.helper.UiUtil
+import kotlin.math.absoluteValue
 
 /**
  * Scrolls the adapter position to the top of the screen.
@@ -57,6 +61,27 @@ fun RecyclerView.ViewHolder.hideRow() {
 fun RecyclerView.ViewHolder.showRow() {
     itemView.isVisible = true
     itemView.layoutParams.height = ViewGroup.LayoutParams.WRAP_CONTENT
+}
+
+fun RecyclerView.hideKeyboardOnScroll() {
+    val touchSlop = ViewConfiguration.get(context).scaledTouchSlop
+    var totalDy = 0
+    addOnScrollListener(object : RecyclerView.OnScrollListener() {
+        override fun onScrolled(
+            recyclerView: RecyclerView,
+            dx: Int,
+            dy: Int,
+        ) {
+            if (recyclerView.scrollState != SCROLL_STATE_DRAGGING) {
+                return
+            }
+            totalDy += dy.absoluteValue
+            if (totalDy >= touchSlop) {
+                totalDy = 0
+                UiUtil.hideKeyboard(this@hideKeyboardOnScroll)
+            }
+        }
+    })
 }
 
 private const val MILLIS_PER_RANGE = 1000f

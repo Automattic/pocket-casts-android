@@ -19,10 +19,10 @@ class FakePlaylistManager : PlaylistManager {
     override fun observePlaylistsPreview() = playlistPreviews.asStateFlow()
 
     val smartPlaylist = MutableStateFlow<SmartPlaylist?>(null)
-    override fun observeSmartPlaylist(uuid: String): Flow<SmartPlaylist?> = smartPlaylist
+    override fun observeSmartPlaylist(uuid: String, episodeSearchTerm: String?): Flow<SmartPlaylist?> = smartPlaylist
 
     val smartEpisodes = MutableStateFlow(emptyList<PodcastEpisode>())
-    override fun observeSmartEpisodes(rules: SmartRules, sortType: PlaylistEpisodeSortType) = smartEpisodes.asStateFlow()
+    override fun observeSmartEpisodes(rules: SmartRules, sortType: PlaylistEpisodeSortType, searchTerm: String?) = smartEpisodes.asStateFlow()
 
     val episodeMetadata = MutableStateFlow(PlaylistEpisodeMetadata.Empty)
     override fun observeEpisodeMetadata(rules: SmartRules) = episodeMetadata.asStateFlow()

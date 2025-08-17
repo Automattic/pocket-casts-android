@@ -59,7 +59,10 @@ class PlaylistManagerImpl @Inject constructor(
             .keepPodcastEpisodesSynced()
     }
 
-    override fun observeSmartPlaylist(uuid: String): Flow<SmartPlaylist?> {
+    override fun observeSmartPlaylist(
+        uuid: String,
+        episodeSearchTerm: String?,
+    ): Flow<SmartPlaylist?> {
         return playlistDao
             .observeSmartPlaylist(uuid)
             .flatMapLatest { playlist ->
@@ -73,7 +76,7 @@ class PlaylistManagerImpl @Inject constructor(
                         sortType = playlist.sortType,
                         limit = PLAYLIST_ARTWORK_EPISODE_LIMIT,
                     )
-                    val episodesFlow = observeSmartEpisodes(smartRules, playlist.sortType)
+                    val episodesFlow = observeSmartEpisodes(smartRules, playlist.sortType, episodeSearchTerm)
                     val metadataFlow = playlistDao.observeEpisodeMetadata(
                         clock = clock,
                         smartRules = smartRules,
@@ -97,12 +100,17 @@ class PlaylistManagerImpl @Inject constructor(
             .distinctUntilChanged()
     }
 
-    override fun observeSmartEpisodes(rules: SmartRules, sortType: PlaylistEpisodeSortType): Flow<List<PodcastEpisode>> {
+    override fun observeSmartEpisodes(
+        rules: SmartRules,
+        sortType: PlaylistEpisodeSortType,
+        searchTerm: String?,
+    ): Flow<List<PodcastEpisode>> {
         return playlistDao.observeSmartPlaylistEpisodes(
             clock = clock,
             smartRules = rules,
             sortType = sortType,
             limit = SMART_PLAYLIST_EPISODE_LIMIT,
+            searchTerm = searchTerm,
         ).distinctUntilChanged()
     }
 

@@ -14,6 +14,10 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.text.input.TextFieldDecorator
+import androidx.compose.foundation.text.input.TextFieldLineLimits
+import androidx.compose.foundation.text.input.TextFieldState
+import androidx.compose.foundation.text.input.clearText
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
@@ -39,6 +43,7 @@ import androidx.compose.ui.semantics.onClick
 import androidx.compose.ui.semantics.role
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
@@ -183,6 +188,102 @@ fun SearchBar(
                 contentPadding = contentPadding,
                 shape = shape,
             )
+        },
+    )
+}
+
+@OptIn(ExperimentalMaterialApi::class)
+@Composable
+fun SearchBar(
+    state: TextFieldState,
+    modifier: Modifier = Modifier,
+    enabled: Boolean = true,
+    placeholder: String = "",
+    textStyle: TextStyle = LocalTextStyle.current,
+    cornerRadius: Dp = 10.dp,
+    colors: TextFieldColors = SearchBarDefaults.colors(),
+    lineLimits: TextFieldLineLimits = TextFieldLineLimits.SingleLine,
+    keyboardOptions: KeyboardOptions = KeyboardOptions(
+        capitalization = KeyboardCapitalization.None,
+        imeAction = ImeAction.Search,
+    ),
+    contentPadding: PaddingValues = TextFieldDefaults.textFieldWithoutLabelPadding(
+        top = 0.dp,
+        bottom = 0.dp,
+    ),
+    onClickClear: () -> Unit = {},
+    onSearch: () -> Unit = {},
+    leadingContent: @Composable (() -> Unit)? = null,
+    trailingContent: @Composable (() -> Unit)? = null,
+) {
+    val focusManager = LocalFocusManager.current
+    val textColor = textStyle.color.takeOrElse {
+        colors.textColor(enabled).value
+    }
+    val mergedTextStyle = textStyle.merge(TextStyle(color = textColor))
+
+    val shape = RoundedCornerShape(cornerRadius)
+    BasicTextField(
+        state = state,
+        keyboardOptions = keyboardOptions,
+        onKeyboardAction = {
+            onSearch()
+            focusManager.clearFocus()
+        },
+        lineLimits = lineLimits,
+        enabled = enabled,
+        textStyle = mergedTextStyle,
+        cursorBrush = SolidColor(colors.cursorColor(false).value),
+        modifier = modifier
+            .background(colors.backgroundColor(enabled).value, shape)
+            .defaultMinSize(
+                minWidth = TextFieldDefaults.MinWidth,
+                minHeight = 42.dp,
+            ),
+        decorator = object : TextFieldDecorator {
+            @Composable
+            override fun Decoration(innerTextField: @Composable (() -> Unit)) {
+                TextFieldDefaults.OutlinedTextFieldDecorationBox(
+                    value = state.text.toString(),
+                    innerTextField = innerTextField,
+                    placeholder = {
+                        Text(
+                            placeholder,
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis,
+                        )
+                    },
+                    leadingIcon = leadingContent ?: {
+                        Icon(
+                            painter = painterResource(IR.drawable.ic_search),
+                            contentDescription = null,
+                        )
+                    },
+                    trailingIcon = trailingContent ?: {
+                        if (state.text.isNotEmpty()) {
+                            IconButton(
+                                onClick = {
+                                    onClickClear()
+                                    state.clearText()
+                                    focusManager.clearFocus()
+                                },
+                            ) {
+                                Icon(
+                                    painter = painterResource(IR.drawable.ic_cancel),
+                                    contentDescription = stringResource(LR.string.clear),
+                                )
+                            }
+                        }
+                    },
+                    enabled = enabled,
+                    colors = colors,
+                    singleLine = true,
+                    interactionSource = remember { MutableInteractionSource() },
+                    visualTransformation = VisualTransformation.None,
+                    contentPadding = contentPadding,
+                    shape = shape,
+                )
+            }
         },
     )
 }
