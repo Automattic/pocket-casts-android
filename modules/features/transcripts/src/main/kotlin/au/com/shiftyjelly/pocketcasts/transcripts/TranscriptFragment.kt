@@ -1,19 +1,31 @@
 package au.com.shiftyjelly.pocketcasts.transcripts
 
+import android.content.Intent
 import android.os.Bundle
 import android.os.Parcelable
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material.Icon
+import androidx.compose.material.IconButton
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Share
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.unit.dp
+import androidx.core.content.FileProvider
 import androidx.core.content.res.ResourcesCompat
 import androidx.core.os.BundleCompat
 import androidx.core.os.bundleOf
@@ -31,13 +43,18 @@ import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingLauncher
 import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingUpgradeSource
 import au.com.shiftyjelly.pocketcasts.transcripts.ui.ToolbarColors
 import au.com.shiftyjelly.pocketcasts.transcripts.ui.TranscriptPage
+import au.com.shiftyjelly.pocketcasts.transcripts.ui.TranscriptShareButton
+import au.com.shiftyjelly.pocketcasts.utils.FileUtil
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseDialogFragment
 import dagger.hilt.android.AndroidEntryPoint
 import dagger.hilt.android.lifecycle.withCreationCallback
+import java.io.File
 import javax.inject.Inject
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import kotlinx.parcelize.Parcelize
+import timber.log.Timber
+import au.com.shiftyjelly.pocketcasts.localization.R as LR
 import au.com.shiftyjelly.pocketcasts.ui.R as UR
 
 @AndroidEntryPoint
@@ -121,7 +138,17 @@ class TranscriptFragment : BaseDialogFragment() {
                     viewModel.track(AnalyticsEvent.TRANSCRIPT_GENERATED_PAYWALL_SHOWN)
                 },
                 toolbarTrailingContent = { toolbarColors ->
-                    PlayPauseButton(toolbarColors)
+                    Row(
+                        horizontalArrangement = Arrangement.spacedBy(8.dp),
+                    ) {
+                        if (uiState.isTextTranscriptLoaded) {
+                            TranscriptShareButton(
+                                toolbarColors = toolbarColors,
+                                onClick = viewModel::shareTranscript,
+                            )
+                        }
+                        PlayPauseButton(toolbarColors)
+                    }
                 },
                 modifier = Modifier
                     .fillMaxWidth(fraction = ResourcesCompat.getFloat(resources, UR.dimen.player_max_content_width_fraction))

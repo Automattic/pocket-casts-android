@@ -116,6 +116,7 @@ import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingLauncher
 import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingUpgradeSource
 import au.com.shiftyjelly.pocketcasts.transcripts.TranscriptViewModel
 import au.com.shiftyjelly.pocketcasts.transcripts.ui.TranscriptPage
+import au.com.shiftyjelly.pocketcasts.transcripts.ui.TranscriptShareButton
 import au.com.shiftyjelly.pocketcasts.ui.extensions.inPortrait
 import au.com.shiftyjelly.pocketcasts.ui.helper.FragmentHostListener
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
@@ -929,6 +930,14 @@ class PlayerHeaderFragment :
                 },
                 onShowTransciptPaywall = {
                     transcriptViewModel.track(AnalyticsEvent.TRANSCRIPT_GENERATED_PAYWALL_SHOWN)
+                },
+                toolbarTrailingContent = { toolbarColors ->
+                    if (state.isTextTranscriptLoaded) {
+                        TranscriptShareButton(
+                            toolbarColors = toolbarColors,
+                            onClick = transcriptViewModel::shareTranscript,
+                        )
+                    }
                 },
             )
         }
