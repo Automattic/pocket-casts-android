@@ -12,5 +12,5 @@ import dagger.hilt.components.SingletonComponent
 @InstallIn(SingletonComponent::class)
 object TranscriptsModule {
     @Provides
-    fun storySharingClient(client: SharingClient): TranscriptSharingClient = client.asTranscriptClient()
+    fun transcriptSharingClient(client: SharingClient): TranscriptSharingClient = client.asTranscriptClient()
 }
