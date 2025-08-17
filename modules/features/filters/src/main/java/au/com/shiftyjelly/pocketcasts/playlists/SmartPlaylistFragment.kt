@@ -156,7 +156,6 @@ class SmartPlaylistFragment :
         var miniPlayerInset = 0
         var keyboardInset = 0
         viewLifecycleOwner.lifecycleScope.launch {
-            val initialPadding = content.paddingBottom
             viewModel.bottomInset
                 .flowWithLifecycle(viewLifecycleOwner.lifecycle)
                 .collect { inset ->
@@ -175,40 +174,31 @@ class SmartPlaylistFragment :
 
     private fun SmartPlaylistFragmentBinding.setupToolbar() {
         val toolbarAlpha = mutableFloatStateOf(0f)
+        val transparencyThreshold = 40.dpToPx(requireContext())
+        val maxProgressDistance = 100.dpToPx(requireContext())
+
+        fun updateToolbarAlpha() {
+            val layoutManager = (content.layoutManager as? LinearLayoutManager) ?: return
+            val headerViewOffset = layoutManager
+                .findViewByPosition(layoutManager.findFirstVisibleItemPosition())
+                ?.takeIf { it.getTag(UR.id.playlist_view_header_tag) == true }
+                ?.top?.absoluteValue
+                ?: Int.MAX_VALUE
+            toolbarAlpha.floatValue = if (headerViewOffset > transparencyThreshold) {
+                val scrollFraction = (headerViewOffset - transparencyThreshold).toFloat() / (maxProgressDistance)
+                lerp(0f, 1f, scrollFraction).coerceIn(0f, 1f)
+            } else {
+                0f
+            }
+        }
         content.addOnScrollListener(object : RecyclerView.OnScrollListener() {
-            private var transparencyThreshold = -1
-            private var maxProgressDistance = -1
-
             override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
-                if (transparencyThreshold == -1) {
-                    transparencyThreshold = 40.dpToPx(recyclerView.context)
-                }
-                if (maxProgressDistance == -1) {
-                    maxProgressDistance = 100.dpToPx(recyclerView.context)
-                }
-
-                val layoutManager = (recyclerView.layoutManager as? LinearLayoutManager) ?: return
-                val headerViewOffset = getHeaderViewOffset(layoutManager)
-                toolbarAlpha.floatValue = computeToolbarAlpha(headerViewOffset)
-            }
-
-            private fun getHeaderViewOffset(layoutManager: LinearLayoutManager): Int {
-                return layoutManager
-                    .findViewByPosition(layoutManager.findFirstVisibleItemPosition())
-                    ?.takeIf { it.getTag(UR.id.playlist_view_header_tag) == true }
-                    ?.top?.absoluteValue
-                    ?: Int.MAX_VALUE
-            }
-
-            private fun computeToolbarAlpha(offset: Int): Float {
-                return if (offset > transparencyThreshold) {
-                    val scrollFraction = (offset - transparencyThreshold).toFloat() / (maxProgressDistance)
-                    lerp(0f, 1f, scrollFraction).coerceIn(0f, 1f)
-                } else {
-                    0f
-                }
+                updateToolbarAlpha()
             }
         })
+        content.addOnLayoutChangeListener { _, _, _, _, _, _, _, _, _ ->
+            updateToolbarAlpha()
+        }
 
         playlistToolbar.setContentWithViewCompositionStrategy {
             val title by remember {
