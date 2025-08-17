@@ -44,13 +44,12 @@ import au.com.shiftyjelly.pocketcasts.compose.components.TextP40
 import au.com.shiftyjelly.pocketcasts.compose.images.HorizontalLogo
 import au.com.shiftyjelly.pocketcasts.compose.theme
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
-import kotlinx.coroutines.delay
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.seconds
+import kotlinx.coroutines.delay
 import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
-
 
 @Composable
 fun BestAppAnimation(
@@ -65,7 +64,7 @@ fun BestAppAnimation(
             HorizontalLogo(
                 modifier = Modifier
                     .height(32.dp)
-                    .align(Alignment.CenterHorizontally)
+                    .align(Alignment.CenterHorizontally),
             )
             Spacer(modifier = Modifier.weight(1f))
             Image(
@@ -105,8 +104,8 @@ fun CustomizationIsInsaneAnimation(
                                     Color.Transparent,
                                 ),
                                 startY = 0f,
-                                endY = 64.dp.toPx()
-                            )
+                                endY = 64.dp.toPx(),
+                            ),
                         )
                     },
                 contentScale = ContentScale.FillWidth,
@@ -144,18 +143,18 @@ fun OrganizingPodcastsAnimation(
 private enum class AnimationState {
     Invisible,
     Appearing,
-    Disappearing
+    Disappearing,
 }
 
 @Composable
 private fun AnimatedCarouselItemContainer(
     itemDisplayDuration: Duration,
-    content: @Composable ColumnScope.() -> Unit,
     title: String,
     modifier: Modifier = Modifier,
     disappearAnimDuration: Duration = 300.milliseconds,
     appearAnimDuration: Duration = 600.milliseconds,
     subTitle: String = stringResource(LR.string.onboarding_intro_carousel_pc_user),
+    content: @Composable ColumnScope.() -> Unit,
 ) {
     var animationState by remember { mutableStateOf(AnimationState.Invisible) }
 
@@ -174,9 +173,9 @@ private fun AnimatedCarouselItemContainer(
                     appearAnimDuration = appearAnimDuration,
                     disappearAnimDuration = disappearAnimDuration,
                 ),
-                easing = animationState.easing
+                easing = animationState.easing,
             )
-        }
+        },
     ) {
         it.alpha
     }
@@ -188,9 +187,9 @@ private fun AnimatedCarouselItemContainer(
                     appearAnimDuration = appearAnimDuration,
                     disappearAnimDuration = disappearAnimDuration,
                 ),
-                easing = animationState.easing
+                easing = animationState.easing,
             )
-        }
+        },
     ) {
         it.contentOffsetY
     }
@@ -203,9 +202,9 @@ private fun AnimatedCarouselItemContainer(
                     disappearAnimDuration = disappearAnimDuration,
                 ),
                 delayMillis = animationState.textAnimDelay(300.milliseconds),
-                easing = animationState.easing
+                easing = animationState.easing,
             )
-        }
+        },
     ) {
         it.alpha
     }
@@ -218,9 +217,9 @@ private fun AnimatedCarouselItemContainer(
                     disappearAnimDuration = disappearAnimDuration,
                 ),
                 delayMillis = animationState.textAnimDelay(300.milliseconds),
-                easing = animationState.easing
+                easing = animationState.easing,
             )
-        }
+        },
     ) {
         it.textOffsetY
     }
@@ -233,9 +232,9 @@ private fun AnimatedCarouselItemContainer(
                     disappearAnimDuration = disappearAnimDuration,
                 ),
                 delayMillis = animationState.textAnimDelay(600.milliseconds),
-                easing = animationState.easing
+                easing = animationState.easing,
             )
-        }
+        },
     ) {
         it.alpha
     }
@@ -248,9 +247,9 @@ private fun AnimatedCarouselItemContainer(
                     disappearAnimDuration = disappearAnimDuration,
                 ),
                 delayMillis = animationState.textAnimDelay(600.milliseconds),
-                easing = animationState.easing
+                easing = animationState.easing,
             )
-        }
+        },
     ) {
         it.textOffsetY
     }
@@ -271,7 +270,8 @@ private fun AnimatedCarouselItemContainer(
                 }
                 .graphicsLayer {
                     alpha = contentAlpha
-                }) {
+                },
+        ) {
             content()
         }
         TextH10(
@@ -303,7 +303,7 @@ private fun AnimatedCarouselItemContainer(
                 }
                 .graphicsLayer {
                     alpha = secondaryTextAlpha
-                }
+                },
         )
     }
 }
@@ -312,33 +312,37 @@ private val AnimationState.alpha
     get() = when (this) {
         AnimationState.Appearing -> 1f
         AnimationState.Invisible,
-        AnimationState.Disappearing -> 0f
+        AnimationState.Disappearing,
+        -> 0f
     }
 
 private val AnimationState.textOffsetY
     get() = when (this) {
         AnimationState.Appearing -> (-6).dp
         AnimationState.Invisible,
-        AnimationState.Disappearing -> 6.dp
+        AnimationState.Disappearing,
+        -> 6.dp
     }
 
 private val AnimationState.contentOffsetY
     get() = when (this) {
         AnimationState.Appearing -> (-16).dp
         AnimationState.Invisible,
-        AnimationState.Disappearing -> 16.dp
+        AnimationState.Disappearing,
+        -> 16.dp
     }
 
 private val AnimationState.easing
     get() = when (this) {
         AnimationState.Appearing -> FastOutSlowInEasing
         AnimationState.Invisible,
-        AnimationState.Disappearing -> FastOutLinearInEasing
+        AnimationState.Disappearing,
+        -> FastOutLinearInEasing
     }
 
 private fun AnimationState.durationMillis(
     appearAnimDuration: Duration,
-    disappearAnimDuration : Duration,
+    disappearAnimDuration: Duration,
 ) = when (this) {
     AnimationState.Invisible -> 0
     AnimationState.Appearing -> appearAnimDuration.inWholeMilliseconds.toInt()
@@ -348,7 +352,8 @@ private fun AnimationState.durationMillis(
 private fun AnimationState.textAnimDelay(additionalDelay: Duration) = when (this) {
     AnimationState.Appearing -> additionalDelay.inWholeMilliseconds.toInt()
     AnimationState.Invisible,
-    AnimationState.Disappearing -> 0
+    AnimationState.Disappearing,
+    -> 0
 }
 
 @Preview

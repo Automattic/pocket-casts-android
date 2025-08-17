@@ -117,7 +117,7 @@ private fun CarouselActiveItemIndicator(
     LaunchedEffect(isActive) {
         colorAnim.animateTo(
             targetValue = if (isActive) activeColor else inactiveColor,
-            animationSpec = tween(durationMillis = 200, easing = FastOutLinearInEasing)
+            animationSpec = tween(durationMillis = 200, easing = FastOutLinearInEasing),
         )
     }
 
