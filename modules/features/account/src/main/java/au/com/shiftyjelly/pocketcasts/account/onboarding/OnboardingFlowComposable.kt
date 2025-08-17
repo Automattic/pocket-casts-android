@@ -30,6 +30,8 @@ import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingFlow
 import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingUpgradeSource
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.utils.extensions.getSerializableCompat
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 
 @Composable
 fun OnboardingFlowComposable(
@@ -211,47 +213,58 @@ private fun Content(
         }
 
         composable(OnboardingNavRoute.LOG_IN_OR_SIGN_UP) {
-            OnboardingLoginOrSignUpPage(
-                theme = theme,
-                flow = flow,
-                onDismiss = {
-                    when (flow) {
-                        // This should never happen. If the user isn't logged in they should be in the AccountUpgradeNeedsLogin flow
-                        is OnboardingFlow.PlusAccountUpgrade,
-                        is OnboardingFlow.PatronAccountUpgrade,
-                        is OnboardingFlow.Welcome,
-                        -> error("Account upgrade flow tried to present LoginOrSignupPage")
+            if (FeatureFlag.isEnabled(Feature.NEW_ONBOARDING_ACCOUNT_CREATION)) {
+                AppThemeWithBackground(Theme.ThemeType.LIGHT) {
+                    NewOnboardingGetStartedPage(
+                        flow = flow,
+                        onGetStartedClick = { navController.navigate(OnboardingNavRoute.CREATE_FREE_ACCOUNT) },
+                        onLoginClick = { navController.navigate(OnboardingNavRoute.LOG_IN) },
+                        onUpdateSystemBars = onUpdateSystemBars,
+                    )
+                }
+            } else {
+                OnboardingLoginOrSignUpPage(
+                    theme = theme,
+                    flow = flow,
+                    onDismiss = {
+                        when (flow) {
+                            // This should never happen. If the user isn't logged in they should be in the AccountUpgradeNeedsLogin flow
+                            is OnboardingFlow.PlusAccountUpgrade,
+                            is OnboardingFlow.PatronAccountUpgrade,
+                            is OnboardingFlow.Welcome,
+                            -> error("Account upgrade flow tried to present LoginOrSignupPage")
 
-                        is OnboardingFlow.AccountEncouragement,
-                        is OnboardingFlow.PlusAccountUpgradeNeedsLogin,
-                        is OnboardingFlow.Upsell,
-                        is OnboardingFlow.UpsellSuggestedFolder,
-                        is OnboardingFlow.NewOnboardingAccountUpgrade,
-                        -> {
-                            val popped = navController.popBackStack()
-                            if (!popped) {
-                                exitOnboarding(OnboardingExitInfo.Simple)
+                            is OnboardingFlow.AccountEncouragement,
+                            is OnboardingFlow.PlusAccountUpgradeNeedsLogin,
+                            is OnboardingFlow.Upsell,
+                            is OnboardingFlow.UpsellSuggestedFolder,
+                            is OnboardingFlow.NewOnboardingAccountUpgrade,
+                            -> {
+                                val popped = navController.popBackStack()
+                                if (!popped) {
+                                    exitOnboarding(OnboardingExitInfo.Simple)
+                                }
                             }
-                        }
 
-                        is OnboardingFlow.InitialOnboarding,
-                        is OnboardingFlow.LoggedOut,
-                        is OnboardingFlow.EngageSdk,
-                        is OnboardingFlow.ReferralLoginOrSignUp,
-                        -> exitOnboarding(OnboardingExitInfo.Simple)
-                    }
-                },
-                onSignUpClick = { navController.navigate(OnboardingNavRoute.CREATE_FREE_ACCOUNT) },
-                onLoginClick = { navController.navigate(OnboardingNavRoute.LOG_IN) },
-                onContinueWithGoogleComplete = { state, subscription ->
-                    if (state.isNewAccount) {
-                        onAccountCreated()
-                    } else {
-                        onLoginToExistingAccount(flow, subscription, exitOnboarding, navController)
-                    }
-                },
-                onUpdateSystemBars = onUpdateSystemBars,
-            )
+                            is OnboardingFlow.InitialOnboarding,
+                            is OnboardingFlow.LoggedOut,
+                            is OnboardingFlow.EngageSdk,
+                            is OnboardingFlow.ReferralLoginOrSignUp,
+                            -> exitOnboarding(OnboardingExitInfo.Simple)
+                        }
+                    },
+                    onSignUpClick = { navController.navigate(OnboardingNavRoute.CREATE_FREE_ACCOUNT) },
+                    onLoginClick = { navController.navigate(OnboardingNavRoute.LOG_IN) },
+                    onContinueWithGoogleComplete = { state, subscription ->
+                        if (state.isNewAccount) {
+                            onAccountCreated()
+                        } else {
+                            onLoginToExistingAccount(flow, subscription, exitOnboarding, navController)
+                        }
+                    },
+                    onUpdateSystemBars = onUpdateSystemBars,
+                )
+            }
         }
 
         composable(OnboardingNavRoute.CREATE_FREE_ACCOUNT) {

@@ -2588,4 +2588,5 @@
     <string name="onboarding_intro_carousel_customization_insane_title">\"The amount of customization is insane\"</string>
     <string name="onboarding_intro_carousel_organizing_podcasts_title">\"Organizing my podcasts by folders is genius\"</string>
     <string name="onboarding_intro_carousel_pc_user">Pocket Casts user</string>
+    <string name="onboarding_intro_get_started">Get Started</string>
 </resources>
