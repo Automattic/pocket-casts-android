@@ -18,6 +18,7 @@ import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.statusBars
+import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
@@ -42,6 +43,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import au.com.shiftyjelly.pocketcasts.account.R
 import au.com.shiftyjelly.pocketcasts.account.onboarding.components.ContinueWithGoogleButton
+import au.com.shiftyjelly.pocketcasts.account.onboarding.components.FeatureCarousel
 import au.com.shiftyjelly.pocketcasts.account.viewmodel.GoogleSignInButtonViewModel
 import au.com.shiftyjelly.pocketcasts.account.viewmodel.GoogleSignInState
 import au.com.shiftyjelly.pocketcasts.account.viewmodel.OnboardingLoginOrSignUpViewModel
@@ -71,6 +73,49 @@ import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
+
+@Composable
+fun NewOnboardingGetStartedPage(
+    flow: OnboardingFlow,
+    onGetStartedClick: () -> Unit,
+    onLoginClick: () -> Unit,
+    onUpdateSystemBars: (SystemBarsStyles) -> Unit,
+    modifier: Modifier = Modifier,
+    displayTheme: Theme.ThemeType = Theme.ThemeType.LIGHT,
+    viewModel: OnboardingLoginOrSignUpViewModel = hiltViewModel(),
+) {
+    val pocketCastsTheme = MaterialTheme.theme
+
+    CallOnce {
+        viewModel.onShown(flow)
+    }
+
+    LaunchedEffect(onUpdateSystemBars) {
+        val statusBar = SystemBarStyle.custom(pocketCastsTheme.colors.primaryUi01.copy(alpha = 0.9f), displayTheme.darkTheme)
+        val navigationBar = SystemBarStyle.transparent { displayTheme.darkTheme }
+        onUpdateSystemBars(SystemBarsStyles(statusBar, navigationBar))
+    }
+
+    Column(modifier = modifier.systemBarsPadding()) {
+        FeatureCarousel(
+            modifier = Modifier
+                .fillMaxWidth()
+                .weight(1f),
+        )
+        Spacer(modifier = Modifier.height(36.dp))
+        RowButton(
+            text = stringResource(LR.string.onboarding_intro_get_started),
+            colors = ButtonDefaults.buttonColors(
+                backgroundColor = MaterialTheme.theme.colors.primaryInteractive01,
+                contentColor = MaterialTheme.theme.colors.primaryUi01,
+            ),
+            includePadding = false,
+            onClick = onGetStartedClick,
+            modifier = Modifier.padding(horizontal = 16.dp),
+        )
+        LogInButton(onClick = onLoginClick)
+    }
+}
 
 @Composable
 internal fun OnboardingLoginOrSignUpPage(
@@ -318,6 +363,7 @@ private object Artwork {
         val x: Float,
         val y: Float,
     )
+
     val coverModels = listOf(
         CoverModel(imageResId = R.drawable.conan, size = 0.2f, x = -0.39f, y = 0.05f),
         CoverModel(imageResId = R.drawable.radiolab, size = 0.126f, x = 0.14f, y = 0.28f),
@@ -332,6 +378,7 @@ private object Artwork {
     } else {
         2.6f
     }
+
     fun getScaleFactor(googleSignInShown: Boolean) = if (googleSignInShown) 1.65f else 1.85f
     fun getOffsetFactor(googleSignInShown: Boolean) = if (googleSignInShown) 0.06f else 0.0f
     fun getCoverYOffsetFactor(configuration: Configuration) = if (configuration.orientation == ORIENTATION_LANDSCAPE) 0.75f else 0.95f
