@@ -279,7 +279,7 @@ private fun PlaylistEpisodeSortType.displayLabel() = when (this) {
 
 @Preview
 @Composable
-private fun SmartPlaylistOptionsColumnPreview(
+private fun OptionsColumnPreview(
     @PreviewParameter(ThemePreviewParameterProvider::class) themeType: ThemeType,
 ) {
     AppThemeWithBackground(themeType) {
@@ -297,7 +297,7 @@ private fun SmartPlaylistOptionsColumnPreview(
 
 @Preview
 @Composable
-private fun SmartPlaylistSortOptionsColumnPreview(
+private fun SortOptionsColumnPreview(
     @PreviewParameter(ThemePreviewParameterProvider::class) themeType: ThemeType,
 ) {
     AppThemeWithBackground(themeType) {

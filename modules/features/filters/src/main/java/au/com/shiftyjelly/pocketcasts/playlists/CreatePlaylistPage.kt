@@ -170,7 +170,7 @@ private fun SmartPlaylistButton(
 
 @Preview(device = Devices.PORTRAIT_REGULAR)
 @Composable
-private fun NewPlaylistPagerPreview(
+private fun CreatePlaylistPagePreview(
     @PreviewParameter(ThemePreviewParameterProvider::class) themeType: ThemeType,
 ) {
     val titleState = rememberTextFieldState(initialText = "My Playlist")

@@ -136,7 +136,7 @@ private fun AutoDownloadEpisodeCountRow(
 
 @PreviewRegularDevice
 @Composable
-private fun SmartPlaylistSettingsPagePreview(
+private fun SettingsPagePreview(
     @PreviewParameter(ThemePreviewParameterProvider::class) themeType: ThemeType,
 ) {
     val state = rememberTextFieldState(initialText = "My Playlist")
