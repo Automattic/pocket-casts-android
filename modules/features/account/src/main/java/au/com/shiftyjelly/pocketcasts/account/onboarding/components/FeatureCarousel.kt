@@ -19,7 +19,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.State
-import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.produceState
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
@@ -30,25 +30,30 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import au.com.shiftyjelly.pocketcasts.compose.AppThemeWithBackground
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
+import kotlin.time.Duration
+import kotlin.time.Duration.Companion.milliseconds
+import kotlin.time.Duration.Companion.seconds
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
-import kotlin.math.max
-import kotlin.time.Duration
-import kotlin.time.Duration.Companion.seconds
+import kotlinx.coroutines.selects.onTimeout
+import kotlinx.coroutines.selects.select
 
 private const val CAROUSEL_ITEM_COUNT = 3
+private val DISAPPEAR_DELAY = 300.milliseconds
 
 @Composable
 fun FeatureCarousel(
     modifier: Modifier = Modifier,
 ) {
     val delayBetweenCycles = 4.seconds
-    val (activeItemIndex, sendEvent) = storyCoordinator(
+    val (activeItem, sendEvent) = carouselCoordinator(
         cycleRange = 0 until CAROUSEL_ITEM_COUNT,
         delayBetweenCycles = delayBetweenCycles,
         isPerpetual = false,
+        disappearDuration = DISAPPEAR_DELAY,
     )
 
     Column(
@@ -56,27 +61,30 @@ fun FeatureCarousel(
     ) {
         CarouselActiveItemIndicatorBar(
             itemCount = CAROUSEL_ITEM_COUNT,
-            activeItemIndex = activeItemIndex.value,
+            activeItemIndex = activeItem.value.selectedIndex,
         )
         Box {
             Crossfade(
-                targetState = activeItemIndex.value,
+                targetState = activeItem.value.selectedIndex,
                 modifier = Modifier.fillMaxSize(),
             ) { index ->
                 when (index) {
                     0 -> BestAppAnimation(
                         modifier = Modifier.padding(top = 64.dp),
-                        itemDisplayDuration = delayBetweenCycles,
+                        isAppearing = activeItem.value.isAppearing,
+                        disappearAnimDuration = DISAPPEAR_DELAY,
                     )
 
                     1 -> CustomizationIsInsaneAnimation(
                         modifier = Modifier.padding(top = 24.dp),
-                        itemDisplayDuration = delayBetweenCycles,
+                        isAppearing = activeItem.value.isAppearing,
+                        disappearAnimDuration = DISAPPEAR_DELAY,
                     )
 
                     2 -> OrganizingPodcastsAnimation(
                         modifier = Modifier.padding(top = 24.dp),
-                        itemDisplayDuration = delayBetweenCycles,
+                        isAppearing = activeItem.value.isAppearing,
+                        disappearAnimDuration = DISAPPEAR_DELAY,
                     )
                 }
             }
@@ -90,9 +98,9 @@ fun FeatureCarousel(
                         interactionSource = remember { MutableInteractionSource() },
                         role = Role.Button,
                         onClick = {
-                            sendEvent(CounterEvent.Decrement)
+                            sendEvent(CarouselEvent.Previous)
                         },
-                    )
+                    ),
             )
             Box(
                 modifier = Modifier
@@ -104,73 +112,96 @@ fun FeatureCarousel(
                         interactionSource = remember { MutableInteractionSource() },
                         role = Role.Button,
                         onClick = {
-                            sendEvent(CounterEvent.Increment)
+                            sendEvent(CarouselEvent.Next)
                         },
-                    )
+                    ),
             )
         }
     }
 }
 
-sealed interface CounterEvent {
-    data object Increment : CounterEvent
-    data object Decrement : CounterEvent
-    data object InternalTick: CounterEvent
+sealed interface CarouselEvent {
+    data object Next : CarouselEvent
+    data object Previous : CarouselEvent
 }
 
+data class CarouselState(
+    val selectedIndex: Int,
+    val isAppearing: Boolean,
+)
+
+@OptIn(ExperimentalCoroutinesApi::class)
 @Composable
-fun storyCoordinator(
+fun carouselCoordinator(
     cycleRange: IntRange,
+    disappearDuration: Duration,
     delayBetweenCycles: Duration = 3.seconds,
     isPerpetual: Boolean = true,
-): Pair<State<Int>, (CounterEvent) -> Unit> {
-    val index = remember { mutableIntStateOf(cycleRange.start) }
+): Pair<State<CarouselState>, (CarouselEvent) -> Unit> {
     val scope = rememberCoroutineScope()
-    val events = remember { Channel<CounterEvent>(Channel.BUFFERED) }
+    val events = remember { Channel<CarouselEvent>(Channel.BUFFERED) }
 
-    LaunchedEffect(cycleRange, delayBetweenCycles, isPerpetual) {
-        fun startTicker() = launch {
-            while (isActive) {
-                delay(delayBetweenCycles.inWholeMilliseconds)
-                events.send(CounterEvent.InternalTick)
-            }
-        }
+    val state = produceState(
+        initialValue = CarouselState(cycleRange.first, isAppearing = true),
+        cycleRange,
+        delayBetweenCycles,
+        isPerpetual,
+        disappearDuration,
+    ) {
+        var currentIndex = cycleRange.first
 
-        var ticker = startTicker()
-
-        for (event in events) {
-            val change = when (event) {
-                CounterEvent.InternalTick,
-                CounterEvent.Increment -> 1
-                CounterEvent.Decrement -> -1
-            }
-            val newValue = max(0, (index.intValue + change) % cycleRange.count())
-
-            val allowedValue = if (newValue == 0) {
-                if (isPerpetual || event is CounterEvent.Decrement) {
-                    ticker.cancel()
-                    0
-                } else {
-                    index.intValue
+        while (isActive) {
+            val event: CarouselEvent? = select {
+                onTimeout(delayBetweenCycles) { CarouselEvent.Next }
+                events.onReceive {
+                    it
                 }
-            } else {
-                newValue
             }
 
-             if (event !is CounterEvent.InternalTick) {
-                ticker.cancel()
-                ticker = startTicker()
+            val nextIndex = when (event) {
+                CarouselEvent.Next -> {
+                    val next = currentIndex + 1
+                    when {
+                        next > cycleRange.last -> {
+                            if (isPerpetual) {
+                                cycleRange.first
+                            } else {
+                                // stay at the last index — ignore timeout
+                                currentIndex
+                            }
+                        }
+
+                        else -> next
+                    }
+                }
+
+                CarouselEvent.Previous -> {
+                    val prev = currentIndex - 1
+                    if (prev < cycleRange.first) cycleRange.last else prev
+                }
+
+                null -> break
             }
 
-            index.intValue = allowedValue
+            if (
+                nextIndex == currentIndex && event is CarouselEvent.Next && !isPerpetual || // already at last index in finite mode
+                (currentIndex == cycleRange.first && event is CarouselEvent.Previous && !isPerpetual) // already at first index in finite mode
+            ) {
+                continue
+            }
+
+            value = CarouselState(currentIndex, isAppearing = false)
+            delay(disappearDuration.inWholeMilliseconds + 100)
+            currentIndex = nextIndex
+            value = CarouselState(currentIndex, isAppearing = true)
         }
     }
 
-    return index to {
-        scope.launch {
-            events.send(it)
-        }
+    val sendEvent: (CarouselEvent) -> Unit = { event ->
+        scope.launch { events.send(event) }
     }
+
+    return state to sendEvent
 }
 
 @Composable
