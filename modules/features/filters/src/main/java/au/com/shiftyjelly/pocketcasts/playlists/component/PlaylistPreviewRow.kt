@@ -1,4 +1,4 @@
-package au.com.shiftyjelly.pocketcasts.playlists
+package au.com.shiftyjelly.pocketcasts.playlists.component
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -67,7 +67,7 @@ import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 @Composable
-fun PlaylistPreviewRow(
+internal fun PlaylistPreviewRow(
     playlist: PlaylistPreview,
     showTooltip: Boolean,
     showDivider: Boolean,
@@ -197,7 +197,7 @@ fun PlaylistPreviewRow(
                         maxWidthFraction = 0.75f,
                         maxWidth = 400.dp,
                         elevation = 8.dp,
-                        anchorOffset = DpOffset(x = -8.dp, y = 4.dp),
+                        anchorOffset = DpOffset(x = (-8).dp, y = 4.dp),
                         onClick = onClickTooltip,
                     )
                 }
