@@ -1,4 +1,4 @@
-package au.com.shiftyjelly.pocketcasts.playlists.create
+package au.com.shiftyjelly.pocketcasts.playlists
 
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.Image
@@ -57,7 +57,7 @@ import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 @Composable
-fun NewPlaylistPage(
+fun CreatePlaylistPage(
     titleState: TextFieldState,
     onCreateManualPlaylist: () -> Unit,
     onContinueToSmartPlaylist: () -> Unit,
@@ -175,7 +175,7 @@ private fun NewPlaylistPagerPreview(
 ) {
     val titleState = rememberTextFieldState(initialText = "My Playlist")
     AppThemeWithBackground(themeType) {
-        NewPlaylistPage(
+        CreatePlaylistPage(
             titleState = titleState,
             onCreateManualPlaylist = {},
             onContinueToSmartPlaylist = {},

@@ -1,4 +1,4 @@
-package au.com.shiftyjelly.pocketcasts.compose.extensions
+package au.com.shiftyjelly.pocketcasts.compose.navigation
 
 import androidx.compose.animation.AnimatedContentTransitionScope
 import androidx.compose.animation.EnterTransition

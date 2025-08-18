@@ -1,4 +1,4 @@
-package au.com.shiftyjelly.pocketcasts.playlists
+package au.com.shiftyjelly.pocketcasts.playlists.smart
 
 import android.os.Bundle
 import android.os.Parcelable

@@ -57,7 +57,7 @@ fun PodcastsRulePage(
     useAllPodcasts: Boolean,
     selectedPodcastUuids: Set<String>,
     podcasts: List<Podcast>,
-    onToggleAllPodcasts: (Boolean) -> Unit,
+    onChangeUseAllPodcasts: (Boolean) -> Unit,
     onSelectPodcast: (String) -> Unit,
     onDeselectPodcast: (String) -> Unit,
     onSelectAllPodcasts: () -> Unit,
@@ -114,7 +114,7 @@ fun PodcastsRulePage(
         ) {
             AllPodcastsToggle(
                 useAllPodcasts = useAllPodcasts,
-                onToggleAllPodcasts = onToggleAllPodcasts,
+                onChangeUseAllPodcasts = onChangeUseAllPodcasts,
             )
             Spacer(
                 modifier = Modifier.height(12.dp),
@@ -135,7 +135,7 @@ fun PodcastsRulePage(
 @Composable
 private fun AllPodcastsToggle(
     useAllPodcasts: Boolean,
-    onToggleAllPodcasts: (Boolean) -> Unit,
+    onChangeUseAllPodcasts: (Boolean) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Row(
@@ -143,7 +143,7 @@ private fun AllPodcastsToggle(
             .toggleable(
                 role = Role.Switch,
                 value = useAllPodcasts,
-                onValueChange = onToggleAllPodcasts,
+                onValueChange = onChangeUseAllPodcasts,
             )
             .padding(horizontal = 16.dp),
     ) {
@@ -292,7 +292,7 @@ private fun PodcastsRulePreview(
             podcasts = List(10) { index ->
                 Podcast(uuid = "id-$index", title = "Title $index", author = "Author $index")
             },
-            onToggleAllPodcasts = { useAllPodcasts = it },
+            onChangeUseAllPodcasts = { useAllPodcasts = it },
             onSelectPodcast = { podcastUuids += it },
             onDeselectPodcast = { podcastUuids -= it },
             onSelectAllPodcasts = {},

@@ -26,8 +26,8 @@ import androidx.compose.ui.unit.dp
 import androidx.fragment.app.viewModels
 import androidx.fragment.compose.content
 import au.com.shiftyjelly.pocketcasts.compose.theme
-import au.com.shiftyjelly.pocketcasts.playlists.SmartPlaylistViewModel
-import au.com.shiftyjelly.pocketcasts.playlists.SmartPlaylistViewModel.Companion.DOWNLOAD_ALL_LIMIT
+import au.com.shiftyjelly.pocketcasts.playlists.smart.SmartPlaylistViewModel
+import au.com.shiftyjelly.pocketcasts.playlists.smart.SmartPlaylistViewModel.Companion.DOWNLOAD_ALL_LIMIT
 import au.com.shiftyjelly.pocketcasts.views.dialog.ConfirmationDialog
 import au.com.shiftyjelly.pocketcasts.views.dialog.ConfirmationDialog.ButtonType
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseDialogFragment

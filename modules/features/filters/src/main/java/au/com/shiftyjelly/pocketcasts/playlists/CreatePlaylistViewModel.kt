@@ -1,4 +1,4 @@
-package au.com.shiftyjelly.pocketcasts.playlists.create
+package au.com.shiftyjelly.pocketcasts.playlists
 
 import androidx.compose.foundation.text.input.TextFieldState
 import androidx.compose.ui.text.TextRange

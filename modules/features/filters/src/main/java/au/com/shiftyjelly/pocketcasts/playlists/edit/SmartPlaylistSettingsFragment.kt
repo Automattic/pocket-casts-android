@@ -16,7 +16,7 @@ import androidx.compose.ui.platform.LocalDensity
 import androidx.fragment.app.viewModels
 import au.com.shiftyjelly.pocketcasts.compose.AppThemeWithBackground
 import au.com.shiftyjelly.pocketcasts.compose.extensions.contentWithoutConsumedInsets
-import au.com.shiftyjelly.pocketcasts.playlists.SmartPlaylistViewModel
+import au.com.shiftyjelly.pocketcasts.playlists.smart.SmartPlaylistViewModel
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseFragment
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.FlowPreview

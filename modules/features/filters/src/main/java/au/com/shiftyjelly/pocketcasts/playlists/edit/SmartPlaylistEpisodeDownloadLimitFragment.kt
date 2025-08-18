@@ -10,7 +10,7 @@ import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.rememberNestedScrollInteropConnection
 import androidx.fragment.app.viewModels
 import androidx.fragment.compose.content
-import au.com.shiftyjelly.pocketcasts.playlists.SmartPlaylistViewModel
+import au.com.shiftyjelly.pocketcasts.playlists.smart.SmartPlaylistViewModel
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseDialogFragment
 import dagger.hilt.android.AndroidEntryPoint
 

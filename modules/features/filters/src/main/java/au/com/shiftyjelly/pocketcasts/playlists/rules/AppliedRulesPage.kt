@@ -55,7 +55,7 @@ import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 @Composable
 fun AppliedRulesPage(
-    playlistTitle: String,
+    playlistName: String,
     appliedRules: AppliedRules,
     availableEpisodes: List<PodcastEpisode>,
     totalEpisodeCount: Int,
@@ -120,7 +120,7 @@ fun AppliedRulesPage(
                         contentType = "playlist-header",
                     ) {
                         TextH20(
-                            text = stringResource(LR.string.preview_playlist, playlistTitle),
+                            text = stringResource(LR.string.preview_playlist, playlistName),
                             modifier = Modifier
                                 .padding(horizontal = 16.dp)
                                 .padding(top = 32.dp),
@@ -161,7 +161,7 @@ fun AppliedRulesPage(
                         contentType = "no-rules",
                     ) {
                         NoRulesContent(
-                            title = playlistTitle,
+                            title = playlistName,
                             onClickRule = onClickRule,
                         )
                     }
@@ -328,7 +328,7 @@ private fun AppliedRulesPageNoRulesPreview(
     var expanded by remember { mutableStateOf(false) }
     AppThemeWithBackground(themeType) {
         AppliedRulesPage(
-            playlistTitle = "Comedy",
+            playlistName = "Comedy",
             appliedRules = AppliedRules.Empty,
             availableEpisodes = emptyList(),
             totalEpisodeCount = 0,
@@ -351,7 +351,7 @@ private fun AppliedRulesPageEpisodesPreview(
     var expanded by remember { mutableStateOf(false) }
     AppThemeWithBackground(themeType) {
         AppliedRulesPage(
-            playlistTitle = "Comedy",
+            playlistName = "Comedy",
             appliedRules = AppliedRules.Empty.copy(
                 podcasts = PodcastsRule.Any,
             ),
@@ -383,7 +383,7 @@ private fun AppliedRulesPageNoEpisodesPreview(
     var expanded by remember { mutableStateOf(false) }
     AppThemeWithBackground(themeType) {
         AppliedRulesPage(
-            playlistTitle = "Comedy",
+            playlistName = "Comedy",
             appliedRules = AppliedRules.Empty.copy(
                 podcasts = PodcastsRule.Any,
             ),
