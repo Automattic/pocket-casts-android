@@ -1,4 +1,4 @@
-package au.com.shiftyjelly.pocketcasts.playlists
+package au.com.shiftyjelly.pocketcasts.playlists.component
 
 import android.os.Build
 import android.view.ViewGroup
@@ -17,12 +17,9 @@ import androidx.compose.ui.platform.ViewCompositionStrategy
 import androidx.recyclerview.widget.RecyclerView
 import au.com.shiftyjelly.pocketcasts.compose.AppTheme
 import au.com.shiftyjelly.pocketcasts.compose.theme
-import au.com.shiftyjelly.pocketcasts.playlists.component.PlaylistHeader
-import au.com.shiftyjelly.pocketcasts.playlists.component.PlaylistHeaderButtonData
-import au.com.shiftyjelly.pocketcasts.playlists.component.PlaylistHeaderData
+import au.com.shiftyjelly.pocketcasts.ui.R
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import kotlinx.coroutines.flow.MutableStateFlow
-import au.com.shiftyjelly.pocketcasts.ui.R as UR
 
 // This adapter uses an unconventional configuration: it has only a single view holder, and data is provided via a Flow.
 // Updating data through the regular adapter mechanisms causes the UI to flicker, because setContent() is called again,
@@ -56,7 +53,7 @@ internal class PlaylistHeaderAdapter(
         private val composeView: ComposeView,
     ) : RecyclerView.ViewHolder(composeView) {
         init {
-            composeView.setTag(UR.id.playlist_view_header_tag, true)
+            composeView.setTag(R.id.playlist_view_header_tag, true)
             composeView.setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnDetachedFromWindowOrReleasedFromPool)
         }
 
@@ -82,7 +79,7 @@ internal class PlaylistHeaderAdapter(
                                 keyboard?.show()
                             }
                         },
-                        modifier = Modifier.background(MaterialTheme.theme.colors.primaryUi02),
+                        modifier = Modifier.Companion.background(MaterialTheme.theme.colors.primaryUi02),
                     )
                 }
             }
