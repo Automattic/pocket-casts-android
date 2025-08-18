@@ -105,7 +105,10 @@ fun NewOnboardingGetStartedPage(
         Spacer(modifier = Modifier.height(36.dp))
         RowButton(
             text = stringResource(LR.string.onboarding_intro_get_started),
-            colors = ButtonDefaults.buttonColors(backgroundColor = MaterialTheme.theme.colors.primaryInteractive01, contentColor = MaterialTheme.theme.colors.primaryUi01),
+            colors = ButtonDefaults.buttonColors(
+                backgroundColor = MaterialTheme.theme.colors.primaryInteractive01,
+                contentColor = MaterialTheme.theme.colors.primaryUi01,
+            ),
             includePadding = false,
             onClick = onGetStartedClick,
             modifier = Modifier.padding(horizontal = 16.dp),
