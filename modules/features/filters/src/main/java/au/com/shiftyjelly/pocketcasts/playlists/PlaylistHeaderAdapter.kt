@@ -3,6 +3,7 @@ package au.com.shiftyjelly.pocketcasts.playlists
 import android.os.Build
 import android.view.ViewGroup
 import androidx.compose.foundation.background
+import androidx.compose.foundation.text.input.TextFieldState
 import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -16,6 +17,9 @@ import androidx.compose.ui.platform.ViewCompositionStrategy
 import androidx.recyclerview.widget.RecyclerView
 import au.com.shiftyjelly.pocketcasts.compose.AppTheme
 import au.com.shiftyjelly.pocketcasts.compose.theme
+import au.com.shiftyjelly.pocketcasts.playlists.component.PlaylistHeader
+import au.com.shiftyjelly.pocketcasts.playlists.component.PlaylistHeaderButtonData
+import au.com.shiftyjelly.pocketcasts.playlists.component.PlaylistHeaderData
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import kotlinx.coroutines.flow.MutableStateFlow
 import au.com.shiftyjelly.pocketcasts.ui.R as UR
@@ -26,6 +30,9 @@ import au.com.shiftyjelly.pocketcasts.ui.R as UR
 // data from an internally stored Flow.
 internal class PlaylistHeaderAdapter(
     private val themeType: Theme.ThemeType,
+    private val leftButton: PlaylistHeaderButtonData,
+    private val rightButton: PlaylistHeaderButtonData,
+    private val searchState: TextFieldState,
     private val onChangeSearchFocus: (Boolean, Float) -> Unit,
 ) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
     private val headerDataFlow = MutableStateFlow<PlaylistHeaderData?>(null)
@@ -62,6 +69,9 @@ internal class PlaylistHeaderAdapter(
                 AppTheme(themeType) {
                     PlaylistHeader(
                         data = headerData,
+                        leftButton = leftButton,
+                        rightButton = rightButton,
+                        searchState = searchState,
                         useBlurredArtwork = Build.VERSION.SDK_INT >= 31,
                         onMeasureSearchTopOffset = { topOffset -> searchTopOffset = topOffset },
                         onChangeSearchFocus = { focusState ->

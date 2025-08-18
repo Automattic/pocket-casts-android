@@ -1,4 +1,4 @@
-package au.com.shiftyjelly.pocketcasts.playlists
+package au.com.shiftyjelly.pocketcasts.playlists.component
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.Crossfade
@@ -114,20 +114,20 @@ internal data class PlaylistHeaderData(
     val displayedEpisodeCount: Int,
     val playbackDurationLeft: Duration,
     val artworkPodcasts: List<Podcast>,
-    val leftButton: ActionButton,
-    val rightButton: ActionButton,
-    val searchState: TextFieldState,
-) {
-    data class ActionButton(
-        val iconId: Int,
-        val label: String,
-        val onClick: () -> Unit,
-    )
-}
+)
+
+internal data class PlaylistHeaderButtonData(
+    val iconId: Int,
+    val label: String,
+    val onClick: () -> Unit,
+)
 
 @Composable
 internal fun PlaylistHeader(
     data: PlaylistHeaderData?,
+    leftButton: PlaylistHeaderButtonData,
+    rightButton: PlaylistHeaderButtonData,
+    searchState: TextFieldState,
     useBlurredArtwork: Boolean,
     onMeasureSearchTopOffset: (Float) -> Unit,
     onChangeSearchFocus: (FocusState) -> Unit,
@@ -183,15 +183,15 @@ internal fun PlaylistHeader(
             if (data != null) {
                 ActionButtons(
                     hasAnyEpisodes = data.displayedEpisodeCount > 0,
-                    leftButton = data.leftButton,
-                    rightButton = data.rightButton,
+                    leftButton = leftButton,
+                    rightButton = rightButton,
                 )
                 Spacer(
                     modifier = Modifier.height(24.dp),
                 )
                 if (data.totalEpisodeCount > 0) {
                     PlaylistSearchBar(
-                        data = data,
+                        searchState = searchState,
                         contentTopPadding = contentTopPadding,
                         onChangeSearchFocus = onChangeSearchFocus,
                         onMeasureSearchTopOffset = onMeasureSearchTopOffset,
@@ -395,8 +395,8 @@ private fun PlaylistInfoText(
 @Composable
 private fun ActionButtons(
     hasAnyEpisodes: Boolean,
-    leftButton: PlaylistHeaderData.ActionButton,
-    rightButton: PlaylistHeaderData.ActionButton,
+    leftButton: PlaylistHeaderButtonData,
+    rightButton: PlaylistHeaderButtonData,
     modifier: Modifier = Modifier,
 ) {
     val density = LocalDensity.current
@@ -448,7 +448,7 @@ private fun ActionButtons(
 
 @Composable
 private fun PlaylistSearchBar(
-    data: PlaylistHeaderData,
+    searchState: TextFieldState,
     contentTopPadding: Dp,
     onChangeSearchFocus: (FocusState) -> Unit,
     onMeasureSearchTopOffset: (Float) -> Unit,
@@ -456,7 +456,7 @@ private fun PlaylistSearchBar(
     val density = LocalDensity.current
     var isSearchPositionKnown by remember { mutableStateOf(false) }
     SearchBar(
-        state = data.searchState,
+        state = searchState,
         placeholder = stringResource(LR.string.search),
         modifier = Modifier
             .padding(horizontal = 16.dp)
@@ -502,7 +502,7 @@ private fun Modifier.blurOrScrim(useBlur: Boolean) = if (useBlur) {
 
 @Composable
 private fun ActionButton(
-    data: PlaylistHeaderData.ActionButton,
+    data: PlaylistHeaderButtonData,
     contentAlignment: Alignment,
     style: ActionButtonStyle,
     modifier: Modifier = Modifier,
@@ -636,18 +636,18 @@ private fun PlaylistHeaderNoEpisodesPreview() {
                     displayedEpisodeCount = episodeCount,
                     playbackDurationLeft = 0.seconds,
                     artworkPodcasts = emptyList(),
-                    leftButton = PlaylistHeaderData.ActionButton(
-                        iconId = IR.drawable.sleep_timer_cog,
-                        label = "Smart Rules",
-                        onClick = { episodeCount = 1 },
-                    ),
-                    rightButton = PlaylistHeaderData.ActionButton(
-                        iconId = IR.drawable.ic_filters_play,
-                        label = "Play All",
-                        onClick = { episodeCount = 0 },
-                    ),
-                    searchState = rememberTextFieldState(),
                 ),
+                leftButton = PlaylistHeaderButtonData(
+                    iconId = IR.drawable.sleep_timer_cog,
+                    label = "Smart Rules",
+                    onClick = { episodeCount = 1 },
+                ),
+                rightButton = PlaylistHeaderButtonData(
+                    iconId = IR.drawable.ic_filters_play,
+                    label = "Play All",
+                    onClick = { episodeCount = 0 },
+                ),
+                searchState = rememberTextFieldState(),
                 useBlurredArtwork = false,
                 onMeasureSearchTopOffset = {},
                 onChangeSearchFocus = {},
@@ -672,18 +672,18 @@ private fun PlaylistHeaderNoDisplayedEpisodesPreview() {
                     displayedEpisodeCount = 0,
                     playbackDurationLeft = 0.seconds,
                     artworkPodcasts = emptyList(),
-                    leftButton = PlaylistHeaderData.ActionButton(
-                        iconId = IR.drawable.sleep_timer_cog,
-                        label = "Smart Rules",
-                        onClick = {},
-                    ),
-                    rightButton = PlaylistHeaderData.ActionButton(
-                        iconId = IR.drawable.ic_filters_play,
-                        label = "Play All",
-                        onClick = {},
-                    ),
-                    searchState = rememberTextFieldState(),
                 ),
+                leftButton = PlaylistHeaderButtonData(
+                    iconId = IR.drawable.sleep_timer_cog,
+                    label = "Smart Rules",
+                    onClick = {},
+                ),
+                rightButton = PlaylistHeaderButtonData(
+                    iconId = IR.drawable.ic_filters_play,
+                    label = "Play All",
+                    onClick = {},
+                ),
+                searchState = rememberTextFieldState(),
                 useBlurredArtwork = false,
                 onMeasureSearchTopOffset = {},
                 onChangeSearchFocus = {},
@@ -708,18 +708,18 @@ private fun PlaylistHeaderSinglePodcastPreview() {
                     displayedEpisodeCount = 100,
                     playbackDurationLeft = 200.days + 12.hours,
                     artworkPodcasts = listOf(Podcast(uuid = "id-0")),
-                    leftButton = PlaylistHeaderData.ActionButton(
-                        iconId = IR.drawable.sleep_timer_cog,
-                        label = "Smart Rules",
-                        onClick = {},
-                    ),
-                    rightButton = PlaylistHeaderData.ActionButton(
-                        iconId = IR.drawable.ic_filters_play,
-                        label = "Play All",
-                        onClick = {},
-                    ),
-                    searchState = rememberTextFieldState(),
                 ),
+                leftButton = PlaylistHeaderButtonData(
+                    iconId = IR.drawable.sleep_timer_cog,
+                    label = "Smart Rules",
+                    onClick = {},
+                ),
+                rightButton = PlaylistHeaderButtonData(
+                    iconId = IR.drawable.ic_filters_play,
+                    label = "Play All",
+                    onClick = {},
+                ),
+                searchState = rememberTextFieldState(),
                 useBlurredArtwork = false,
                 onMeasureSearchTopOffset = {},
                 onChangeSearchFocus = {},
@@ -744,18 +744,18 @@ private fun PlaylistHeaderMultiPodcastPreview() {
                     displayedEpisodeCount = 5,
                     playbackDurationLeft = 1.hours + 15.minutes,
                     artworkPodcasts = List(4) { index -> Podcast(uuid = "id-$index") },
-                    leftButton = PlaylistHeaderData.ActionButton(
-                        iconId = IR.drawable.sleep_timer_cog,
-                        label = "Smart Rules",
-                        onClick = {},
-                    ),
-                    rightButton = PlaylistHeaderData.ActionButton(
-                        iconId = IR.drawable.ic_filters_play,
-                        label = "Play All",
-                        onClick = {},
-                    ),
-                    searchState = rememberTextFieldState(),
                 ),
+                leftButton = PlaylistHeaderButtonData(
+                    iconId = IR.drawable.sleep_timer_cog,
+                    label = "Smart Rules",
+                    onClick = {},
+                ),
+                rightButton = PlaylistHeaderButtonData(
+                    iconId = IR.drawable.ic_filters_play,
+                    label = "Play All",
+                    onClick = {},
+                ),
+                searchState = rememberTextFieldState(),
                 useBlurredArtwork = false,
                 onMeasureSearchTopOffset = {},
                 onChangeSearchFocus = {},
@@ -782,18 +782,18 @@ private fun PlaylistHeaderThemePreview(
                     displayedEpisodeCount = 5,
                     playbackDurationLeft = 1.hours + 15.minutes,
                     artworkPodcasts = List(4) { index -> Podcast(uuid = "id-$index") },
-                    leftButton = PlaylistHeaderData.ActionButton(
-                        iconId = IR.drawable.sleep_timer_cog,
-                        label = "Smart Rules",
-                        onClick = {},
-                    ),
-                    rightButton = PlaylistHeaderData.ActionButton(
-                        iconId = IR.drawable.ic_filters_play,
-                        label = "Play All",
-                        onClick = {},
-                    ),
-                    searchState = rememberTextFieldState(),
                 ),
+                leftButton = PlaylistHeaderButtonData(
+                    iconId = IR.drawable.sleep_timer_cog,
+                    label = "Smart Rules",
+                    onClick = {},
+                ),
+                rightButton = PlaylistHeaderButtonData(
+                    iconId = IR.drawable.ic_filters_play,
+                    label = "Play All",
+                    onClick = {},
+                ),
+                searchState = rememberTextFieldState(),
                 useBlurredArtwork = false,
                 onMeasureSearchTopOffset = {},
                 onChangeSearchFocus = {},

@@ -27,6 +27,8 @@ import au.com.shiftyjelly.pocketcasts.compose.AppTheme
 import au.com.shiftyjelly.pocketcasts.compose.extensions.setContentWithViewCompositionStrategy
 import au.com.shiftyjelly.pocketcasts.filters.R
 import au.com.shiftyjelly.pocketcasts.filters.databinding.SmartPlaylistFragmentBinding
+import au.com.shiftyjelly.pocketcasts.playlists.component.PlaylistHeaderButtonData
+import au.com.shiftyjelly.pocketcasts.playlists.component.PlaylistHeaderData
 import au.com.shiftyjelly.pocketcasts.playlists.component.PlaylistToolbar
 import au.com.shiftyjelly.pocketcasts.playlists.edit.SmartPlaylistSettingsFragment
 import au.com.shiftyjelly.pocketcasts.playlists.edit.SmartPlaylistsOptionsFragment
@@ -90,25 +92,25 @@ class SmartPlaylistFragment :
     }
 
     private fun SmartPlaylistFragmentBinding.setupContent() {
-        val leftButton = PlaylistHeaderData.ActionButton(
-            iconId = IR.drawable.ic_playlist_smart_rules,
-            label = getString(LR.string.smart_rules),
-            onClick = {
-                viewModel.trackEditRulesTapped()
-                openEditor()
-            },
-        )
-        val rightButton = PlaylistHeaderData.ActionButton(
-            iconId = IR.drawable.ic_playlist_play,
-            label = getString(LR.string.playlist_play_all),
-            onClick = {
-                viewModel.trackPlayAllTapped()
-                playAll()
-            },
-        )
-
         val headerAdapter = PlaylistHeaderAdapter(
             themeType = theme.activeTheme,
+            leftButton = PlaylistHeaderButtonData(
+                iconId = IR.drawable.ic_playlist_smart_rules,
+                label = getString(LR.string.smart_rules),
+                onClick = {
+                    viewModel.trackEditRulesTapped()
+                    openEditor()
+                },
+            ),
+            rightButton = PlaylistHeaderButtonData(
+                iconId = IR.drawable.ic_playlist_play,
+                label = getString(LR.string.playlist_play_all),
+                onClick = {
+                    viewModel.trackPlayAllTapped()
+                    playAll()
+                },
+            ),
+            searchState = viewModel.searchState,
             onChangeSearchFocus = { hasFocus, searchTopOffset ->
                 if (hasFocus) {
                     content.smoothScrollToTop(0, offset = -searchTopOffset.roundToInt())
@@ -136,9 +138,6 @@ class SmartPlaylistFragment :
                             displayedEpisodeCount = playlist.episodes.size,
                             playbackDurationLeft = playlist.playbackDurationLeft,
                             artworkPodcasts = playlist.artworkPodcasts,
-                            leftButton = leftButton,
-                            rightButton = rightButton,
-                            searchState = viewModel.searchState,
                         )
                     }
                     headerAdapter.submitHeader(playlistHeaderData)
