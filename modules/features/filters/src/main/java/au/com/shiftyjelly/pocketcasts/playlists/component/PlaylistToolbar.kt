@@ -1,4 +1,4 @@
-package au.com.shiftyjelly.pocketcasts.playlists
+package au.com.shiftyjelly.pocketcasts.playlists.component
 
 import androidx.annotation.DrawableRes
 import androidx.annotation.FloatRange

@@ -27,6 +27,7 @@ import au.com.shiftyjelly.pocketcasts.compose.AppTheme
 import au.com.shiftyjelly.pocketcasts.compose.extensions.setContentWithViewCompositionStrategy
 import au.com.shiftyjelly.pocketcasts.filters.R
 import au.com.shiftyjelly.pocketcasts.filters.databinding.SmartPlaylistFragmentBinding
+import au.com.shiftyjelly.pocketcasts.playlists.component.PlaylistToolbar
 import au.com.shiftyjelly.pocketcasts.playlists.edit.SmartPlaylistSettingsFragment
 import au.com.shiftyjelly.pocketcasts.playlists.edit.SmartPlaylistsOptionsFragment
 import au.com.shiftyjelly.pocketcasts.playlists.edit.SmartRulesEditFragment
