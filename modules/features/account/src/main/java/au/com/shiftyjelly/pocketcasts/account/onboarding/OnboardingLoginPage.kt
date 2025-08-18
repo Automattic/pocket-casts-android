@@ -2,11 +2,16 @@ package au.com.shiftyjelly.pocketcasts.account.onboarding
 
 import androidx.activity.SystemBarStyle
 import androidx.activity.compose.BackHandler
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.ime
@@ -29,6 +34,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import au.com.shiftyjelly.pocketcasts.account.onboarding.components.ContinueWithGoogleButton
 import au.com.shiftyjelly.pocketcasts.account.viewmodel.OnboardingLogInViewModel
 import au.com.shiftyjelly.pocketcasts.compose.AppThemeWithBackground
 import au.com.shiftyjelly.pocketcasts.compose.CallOnce
@@ -38,14 +44,139 @@ import au.com.shiftyjelly.pocketcasts.compose.bars.custom
 import au.com.shiftyjelly.pocketcasts.compose.bars.transparent
 import au.com.shiftyjelly.pocketcasts.compose.buttons.RowButton
 import au.com.shiftyjelly.pocketcasts.compose.components.EmailAndPasswordFields
+import au.com.shiftyjelly.pocketcasts.compose.components.TextC50
 import au.com.shiftyjelly.pocketcasts.compose.components.TextH40
 import au.com.shiftyjelly.pocketcasts.compose.components.TextP40
 import au.com.shiftyjelly.pocketcasts.compose.preview.ThemePreviewParameterProvider
 import au.com.shiftyjelly.pocketcasts.compose.theme
 import au.com.shiftyjelly.pocketcasts.models.type.Subscription
+import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingFlow
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.views.helper.UiUtil
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
+
+@Composable
+internal fun NewOnboardingLoginPage(
+    onBackPress: () -> Unit,
+    onLoginComplete: (Subscription?) -> Unit,
+    onForgotPasswordClick: () -> Unit,
+    onUpdateSystemBars: (SystemBarsStyles) -> Unit,
+    modifier: Modifier = Modifier,
+    viewModel: OnboardingLogInViewModel = hiltViewModel(),
+) {
+    val pocketCastsTheme = MaterialTheme.theme
+    val state by viewModel.state.collectAsState()
+
+    CallOnce {
+        viewModel.onShown()
+    }
+
+    LaunchedEffect(onUpdateSystemBars) {
+        // Use secondaryUI01 so the status bar matches the ThemedTopAppBar
+        val statusBar = SystemBarStyle.custom(pocketCastsTheme.colors.secondaryUi01, Theme.ThemeType.LIGHT.toolbarLightIcons)
+        val navigationBar = SystemBarStyle.transparent { Theme.ThemeType.LIGHT.darkTheme }
+        onUpdateSystemBars(SystemBarsStyles(statusBar, navigationBar))
+    }
+    BackHandler {
+        viewModel.onBackPressed()
+        onBackPress()
+    }
+
+    val view = LocalView.current
+
+    @Suppress("NAME_SHADOWING")
+    val onLoginComplete = { subscription: Subscription? ->
+        UiUtil.hideKeyboard(view)
+        onLoginComplete(subscription)
+    }
+
+    Column(
+        modifier = modifier
+            .windowInsetsPadding(WindowInsets.statusBars)
+            .windowInsetsPadding(WindowInsets.navigationBars)
+            .windowInsetsPadding(WindowInsets.ime),
+    ) {
+        ThemedTopAppBar(
+            title = stringResource(LR.string.onboarding_log_in),
+            onNavigationClick = {
+                viewModel.onBackPressed()
+                onBackPress()
+            },
+        )
+
+        Column(
+            Modifier
+                .fillMaxHeight()
+                .verticalScroll(rememberScrollState()),
+        ) {
+            EmailAndPasswordFields(
+                email = state.email,
+                password = state.password,
+                showEmailError = state.showEmailError,
+                showPasswordError = state.showPasswordError,
+                enabled = state.enableSubmissionFields,
+                onConfirm = { viewModel.logIn(onLoginComplete) },
+                onUpdateEmail = viewModel::updateEmail,
+                onUpdatePassword = viewModel::updatePassword,
+                isCreatingAccount = false,
+                modifier = Modifier.padding(16.dp),
+            )
+
+            state.errorMessage?.let { errorMessage ->
+                TextP40(
+                    text = errorMessage,
+                    color = MaterialTheme.theme.colors.support05,
+                    modifier = Modifier.padding(horizontal = 16.dp),
+                )
+            }
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            TextH40(
+                text = stringResource(LR.string.onboarding_login_forgot_password),
+                color = MaterialTheme.theme.colors.primaryText02,
+                modifier = Modifier
+                    .clickable { onForgotPasswordClick() },
+            )
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            RowButton(
+                text = stringResource(LR.string.onboarding_login_continue_with_email),
+                enabled = state.enableSubmissionFields,
+                onClick = { viewModel.logIn(onLoginComplete) },
+            )
+            Spacer(modifier = Modifier.height(16.dp))
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(15.dp)
+            ) {
+                Box(
+                    modifier = Modifier.weight(1f)
+                        .height(1.dp)
+                        .background(color = MaterialTheme.theme.colors.primaryText02),
+                )
+                TextC50(
+                    text = stringResource(LR.string.onboarding_login_or),
+                    color = MaterialTheme.theme.colors.primaryText01,
+                )
+                Box(
+                    modifier = Modifier.weight(1f)
+                        .height(1.dp)
+                        .background(color = MaterialTheme.theme.colors.primaryText02),
+                )
+            }
+            Spacer(modifier = Modifier.height(16.dp))
+//            if (showContinueWithGoogleButton) {
+                ContinueWithGoogleButton(
+                    flow = OnboardingFlow.Welcome, // TODO
+                    onComplete = { _, _ -> },
+                )
+//            }
+        }
+    }
+}
 
 @Composable
 internal fun OnboardingLoginPage(
