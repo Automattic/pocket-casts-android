@@ -1,8 +1,5 @@
 package au.com.shiftyjelly.pocketcasts.playlists
 
-import android.os.Bundle
-import android.view.LayoutInflater
-import android.view.ViewGroup
 import androidx.annotation.DrawableRes
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
@@ -24,7 +21,6 @@ import androidx.compose.material3.adaptive.currentWindowAdaptiveInfo
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -32,50 +28,20 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
-import androidx.fragment.compose.content
 import au.com.shiftyjelly.pocketcasts.compose.AppThemeWithBackground
-import au.com.shiftyjelly.pocketcasts.compose.CallOnce
 import au.com.shiftyjelly.pocketcasts.compose.adaptive.isAtMostMediumHeight
 import au.com.shiftyjelly.pocketcasts.compose.buttons.RowButton
 import au.com.shiftyjelly.pocketcasts.compose.components.PagerDotIndicator
 import au.com.shiftyjelly.pocketcasts.compose.components.TextH10
 import au.com.shiftyjelly.pocketcasts.compose.components.TextP40
-import au.com.shiftyjelly.pocketcasts.compose.components.rememberViewInteropNestedScrollConnection
 import au.com.shiftyjelly.pocketcasts.compose.preview.ThemePreviewParameterProvider
 import au.com.shiftyjelly.pocketcasts.compose.theme
-import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
-import au.com.shiftyjelly.pocketcasts.views.fragments.BaseDialogFragment
-import dagger.hilt.android.AndroidEntryPoint
-import javax.inject.Inject
 import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
-@AndroidEntryPoint
-class PlaylistsOnboardingFragment : BaseDialogFragment() {
-    @Inject
-    lateinit var settings: Settings
-
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?,
-    ) = content {
-        DialogBox {
-            OnboardingContent(
-                onGotItClick = ::dismiss,
-                modifier = Modifier.nestedScroll(rememberViewInteropNestedScrollConnection()),
-            )
-        }
-
-        CallOnce {
-            settings.showPlaylistsOnboarding.set(false, updateModifiedAt = false)
-        }
-    }
-}
-
 @Composable
-private fun OnboardingContent(
+internal fun OnboardingPage(
     onGotItClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -98,14 +64,14 @@ private fun OnboardingContent(
         ) { index ->
             val verticalArrangement = if (windowSizeClass.isAtMostMediumHeight()) Arrangement.Top else Arrangement.Center
             when (index) {
-                0 -> OnboardingPage(
+                0 -> OnboardingContent(
                     imageId = IR.drawable.playlists_onboarding_smart_playlists,
                     title = stringResource(LR.string.playlists_onboarding_smart_playlist_title),
                     description = stringResource(LR.string.playlists_onboarding_smart_playlist_description),
                     verticalArrangement = verticalArrangement,
                 )
 
-                1 -> OnboardingPage(
+                1 -> OnboardingContent(
                     imageId = IR.drawable.playlists_onboarding_playlists,
                     title = stringResource(LR.string.playlists_onboarding_playlist_title),
                     description = stringResource(LR.string.playlists_onboarding_playlist_description),
@@ -137,7 +103,7 @@ private fun OnboardingContent(
 }
 
 @Composable
-private fun OnboardingPage(
+private fun OnboardingContent(
     @DrawableRes imageId: Int,
     title: String,
     description: String,
@@ -183,11 +149,11 @@ private fun OnboardingPage(
 
 @Preview
 @Composable
-private fun OnboardingContentPreview(
+private fun OnboardingPagePreview(
     @PreviewParameter(ThemePreviewParameterProvider::class) themeType: Theme.ThemeType,
 ) {
     AppThemeWithBackground(themeType) {
-        OnboardingContent(
+        OnboardingPage(
             onGotItClick = {},
         )
     }
