@@ -1,4 +1,4 @@
-package au.com.shiftyjelly.pocketcasts.playlists
+package au.com.shiftyjelly.pocketcasts.playlists.component
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.fadeIn
@@ -26,7 +26,7 @@ import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 @Composable
-internal fun PlaylistNameField(
+internal fun PlaylistNameInputField(
     state: TextFieldState,
     onClickImeAction: () -> Unit,
     modifier: Modifier = Modifier,
@@ -61,12 +61,12 @@ private val ClearButtonEnterTransition = fadeIn()
 
 @Preview
 @Composable
-private fun PlaylistNameFieldPreview(
+private fun PlaylistNameInputFieldPreview(
     @PreviewParameter(ThemePreviewParameterProvider::class) themeType: ThemeType,
 ) {
     val state = rememberTextFieldState(initialText = "My Playlist")
     AppThemeWithBackground(themeType) {
-        PlaylistNameField(
+        PlaylistNameInputField(
             state = state,
             onClickImeAction = {},
             modifier = Modifier.padding(8.dp),
