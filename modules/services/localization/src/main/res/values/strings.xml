@@ -2585,4 +2585,9 @@
     <string name="onboarding_notification_popup_notifications">Receive Notifications</string>
     <string name="onboarding_notification_popup_notifications_message">Receive news, podcast suggestions and more</string>
     <string name="onboarding_notifications_popup_save">Save Preferences</string>
+    <string name="onboarding_intro_carousel_best_app_title">\"The best podcast app out there. By far\"</string>
+    <string name="onboarding_intro_carousel_customization_insane_title">\"The amount of customization is insane\"</string>
+    <string name="onboarding_intro_carousel_organizing_podcasts_title">\"Organizing my podcasts by folders is genius\"</string>
+    <string name="onboarding_intro_carousel_pc_user">Pocket Casts user</string>
+    <string name="onboarding_intro_get_started">Get Started</string>
 </resources>
