@@ -42,12 +42,12 @@ import au.com.shiftyjelly.pocketcasts.views.helper.HasBackstack
 import com.google.android.gms.cast.framework.CastButtonFactory
 import dagger.hilt.android.AndroidEntryPoint
 import dagger.hilt.android.lifecycle.withCreationCallback
-import javax.inject.Inject
-import kotlin.math.absoluteValue
-import kotlin.math.roundToInt
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import kotlinx.parcelize.Parcelize
+import javax.inject.Inject
+import kotlin.math.absoluteValue
+import kotlin.math.roundToInt
 import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 import au.com.shiftyjelly.pocketcasts.ui.R as UR
