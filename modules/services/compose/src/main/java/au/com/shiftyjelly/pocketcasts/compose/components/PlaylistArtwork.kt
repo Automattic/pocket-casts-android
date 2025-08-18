@@ -1,4 +1,4 @@
-package au.com.shiftyjelly.pocketcasts.playlists
+package au.com.shiftyjelly.pocketcasts.compose.components
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -18,6 +18,11 @@ import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.role
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.Dp
@@ -32,6 +37,7 @@ import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import coil.compose.rememberAsyncImagePainter
 import java.util.Date
 import au.com.shiftyjelly.pocketcasts.images.R as IR
+import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 @Composable
 fun PlaylistArtwork(
@@ -89,13 +95,16 @@ private fun NoImage(
                 },
             )
             .clip(RoundedCornerShape(cornerSize))
-            .background(MaterialTheme.theme.colors.primaryUi05),
+            .background(MaterialTheme.theme.colors.primaryUi05)
+            .semantics(mergeDescendants = true) {
+                role = Role.Image
+            },
     ) {
         Image(
             painter = painterResource(IR.drawable.ic_playlists),
             contentScale = ContentScale.Crop,
             alignment = Alignment.BottomCenter,
-            contentDescription = null,
+            contentDescription = stringResource(LR.string.playlist_artwork_description),
             colorFilter = ColorFilter.tint(MaterialTheme.theme.colors.primaryIcon03),
             modifier = Modifier.size(artworkSize * 0.43f),
         )
@@ -118,7 +127,7 @@ private fun SingleImage(
         painter = rememberAsyncImagePainter(imageRequest, contentScale = ContentScale.Crop),
         contentScale = ContentScale.Crop,
         alignment = Alignment.BottomCenter,
-        contentDescription = null,
+        contentDescription = stringResource(LR.string.playlist_artwork_description),
         modifier = modifier
             .size(artworkSize)
             .then(
@@ -157,6 +166,7 @@ private fun QuadImage(
     val imageRequest4 = remember(podcast4.uuid) {
         requestFactory.create(podcast4)
     }
+    val artworkDescription = stringResource(LR.string.playlist_artwork_description)
     Row(
         modifier = modifier
             .size(artworkSize)
@@ -166,7 +176,11 @@ private fun QuadImage(
                 } else {
                     Modifier
                 },
-            ),
+            )
+            .semantics(mergeDescendants = true) {
+                role = Role.Image
+                contentDescription = artworkDescription
+            },
     ) {
         Column {
             Image(

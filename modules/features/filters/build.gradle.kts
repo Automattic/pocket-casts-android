@@ -43,7 +43,6 @@ dependencies {
     implementation(libs.androidx.constraintlayout)
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.preference.ktx)
-    implementation(libs.coil.compose)
     implementation(libs.compose.material)
     implementation(libs.compose.material3.adaptive)
     implementation(libs.navigation.compose)

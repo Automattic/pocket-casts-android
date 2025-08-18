@@ -7,7 +7,6 @@ import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -24,7 +23,6 @@ import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
-import timber.log.Timber
 
 @AndroidEntryPoint
 class PlaylistsFragment :
@@ -93,7 +91,7 @@ class PlaylistsFragment :
     private fun ShowOnboardingEffect(show: Boolean) {
         if (show) {
             LaunchedEffect(show) {
-                PlaylistsOnboardingFragment().show(childFragmentManager, "playlists_onboarding")
+                OnboardingFragment().show(childFragmentManager, "playlists_onboarding")
             }
         }
     }
