@@ -1,4 +1,4 @@
-package au.com.shiftyjelly.pocketcasts.playlists.rules
+package au.com.shiftyjelly.pocketcasts.playlists.smart.rules
 
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.layout.Column
@@ -35,8 +35,6 @@ import au.com.shiftyjelly.pocketcasts.compose.preview.ThemePreviewParameterProvi
 import au.com.shiftyjelly.pocketcasts.compose.theme
 import au.com.shiftyjelly.pocketcasts.images.R
 import au.com.shiftyjelly.pocketcasts.localization.helper.TimeHelper
-import au.com.shiftyjelly.pocketcasts.models.type.SmartRules
-import au.com.shiftyjelly.pocketcasts.models.type.SmartRules.MediaTypeRule
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme.ThemeType
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.minutes

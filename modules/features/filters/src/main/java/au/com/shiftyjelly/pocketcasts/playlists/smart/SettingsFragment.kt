@@ -1,4 +1,4 @@
-package au.com.shiftyjelly.pocketcasts.playlists.edit
+package au.com.shiftyjelly.pocketcasts.playlists.smart
 
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -16,7 +16,6 @@ import androidx.compose.ui.platform.LocalDensity
 import androidx.fragment.app.viewModels
 import au.com.shiftyjelly.pocketcasts.compose.AppThemeWithBackground
 import au.com.shiftyjelly.pocketcasts.compose.extensions.contentWithoutConsumedInsets
-import au.com.shiftyjelly.pocketcasts.playlists.smart.SmartPlaylistViewModel
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseFragment
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.FlowPreview
@@ -25,8 +24,8 @@ import kotlinx.coroutines.flow.drop
 
 @OptIn(FlowPreview::class)
 @AndroidEntryPoint
-class SmartPlaylistSettingsFragment : BaseFragment() {
-    private val viewModel by viewModels<SmartPlaylistViewModel>({ requireParentFragment() })
+class SettingsFragment : BaseFragment() {
+    private val viewModel by viewModels<PlaylistViewModel>({ requireParentFragment() })
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -42,7 +41,7 @@ class SmartPlaylistSettingsFragment : BaseFragment() {
                 val nameState = rememberTextFieldState(initialText = playlist.title)
                 UpdateNameEffect(nameState)
 
-                SmartPlaylistSettingsPage(
+                SettingsPage(
                     state = nameState,
                     isAutoDownloadEnabled = playlist.isAutoDownloadEnabled,
                     autoDownloadEpisodeLimit = playlist.autoDownloadLimit,
@@ -83,6 +82,6 @@ class SmartPlaylistSettingsFragment : BaseFragment() {
         if (parentFragmentManager.findFragmentByTag("auto_download_limit") != null) {
             return
         }
-        SmartPlaylistEpisodeDownloadLimitFragment().show(parentFragmentManager, "auto_download_limit")
+        DownloadLimitFragment().show(parentFragmentManager, "auto_download_limit")
     }
 }

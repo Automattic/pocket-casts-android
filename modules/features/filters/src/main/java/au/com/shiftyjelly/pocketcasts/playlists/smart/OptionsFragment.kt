@@ -1,9 +1,8 @@
-package au.com.shiftyjelly.pocketcasts.playlists.edit
+package au.com.shiftyjelly.pocketcasts.playlists.smart
 
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.ViewGroup
-import androidx.compose.animation.AnimatedContent
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -15,9 +14,6 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
@@ -26,8 +22,7 @@ import androidx.compose.ui.unit.dp
 import androidx.fragment.app.viewModels
 import androidx.fragment.compose.content
 import au.com.shiftyjelly.pocketcasts.compose.theme
-import au.com.shiftyjelly.pocketcasts.playlists.smart.SmartPlaylistViewModel
-import au.com.shiftyjelly.pocketcasts.playlists.smart.SmartPlaylistViewModel.Companion.DOWNLOAD_ALL_LIMIT
+import au.com.shiftyjelly.pocketcasts.playlists.smart.PlaylistViewModel.Companion.DOWNLOAD_ALL_LIMIT
 import au.com.shiftyjelly.pocketcasts.views.dialog.ConfirmationDialog
 import au.com.shiftyjelly.pocketcasts.views.dialog.ConfirmationDialog.ButtonType
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseDialogFragment
@@ -36,16 +31,14 @@ import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 @AndroidEntryPoint
-class SmartPlaylistsOptionsFragment : BaseDialogFragment() {
-    private val viewModel by viewModels<SmartPlaylistViewModel>({ requireParentFragment() })
+class OptionsFragment : BaseDialogFragment() {
+    private val viewModel by viewModels<PlaylistViewModel>({ requireParentFragment() })
 
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?,
     ) = content {
-        var isSelectingSortType by rememberSaveable { mutableStateOf(false) }
-
         val uiState by viewModel.uiState.collectAsState()
         val playlist = uiState.smartPlaylist
 
@@ -64,48 +57,36 @@ class SmartPlaylistsOptionsFragment : BaseDialogFragment() {
                         .size(56.dp, 4.dp),
                 )
                 if (playlist != null) {
-                    AnimatedContent(
-                        targetState = isSelectingSortType,
-                    ) { isSorting ->
-                        if (isSorting) {
-                            SmartPlaylistSortOptionsColumn(
-                                selectedSortType = playlist.episodeSortType,
-                                onSelectSortType = { type ->
-                                    viewModel.updateSortType(type)
-                                    dismiss()
-                                },
-                            )
-                        } else {
-                            SmartPlaylistOptionsColumn(
-                                sortType = playlist.episodeSortType,
-                                hasEpisodes = playlist.totalEpisodeCount > 0,
-                                onClickSelectAll = {
-                                    viewModel.trackSelectEpisodesTapped()
-                                    viewModel.startMultiSelecting()
-                                    dismiss()
-                                },
-                                onClickSortBy = {
-                                    viewModel.trackSortByTapped()
-                                    isSelectingSortType = true
-                                },
-                                onClickDownloadAll = {
-                                    viewModel.trackDownloadAllTapped()
-                                    downloadAll(playlist.totalEpisodeCount)
-                                    dismiss()
-                                },
-                                onClickChromecast = {
-                                    viewModel.trackChromeCastTapped()
-                                    viewModel.startChromeCast()
-                                    dismiss()
-                                },
-                                onClickOpenSettings = {
-                                    viewModel.trackFilterOptionsTapped()
-                                    viewModel.showSettings()
-                                    dismiss()
-                                },
-                            )
-                        }
-                    }
+                    OptionsPage(
+                        playlist = playlist,
+                        onSelectSortType = { type ->
+                            viewModel.updateSortType(type)
+                            dismiss()
+                        },
+                        onClickSelectAll = {
+                            viewModel.trackSelectEpisodesTapped()
+                            viewModel.startMultiSelecting()
+                            dismiss()
+                        },
+                        onClickSortBy = {
+                            viewModel.trackSortByTapped()
+                        },
+                        onClickDownloadAll = {
+                            viewModel.trackDownloadAllTapped()
+                            downloadAll(playlist.totalEpisodeCount)
+                            dismiss()
+                        },
+                        onClickChromeCast = {
+                            viewModel.trackChromeCastTapped()
+                            viewModel.startChromeCast()
+                            dismiss()
+                        },
+                        onClickOpenSettings = {
+                            viewModel.trackFilterOptionsTapped()
+                            viewModel.showSettings()
+                            dismiss()
+                        },
+                    )
                 }
             }
         }

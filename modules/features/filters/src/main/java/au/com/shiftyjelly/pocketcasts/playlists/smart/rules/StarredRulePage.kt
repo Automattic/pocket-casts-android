@@ -1,4 +1,4 @@
-package au.com.shiftyjelly.pocketcasts.playlists.rules
+package au.com.shiftyjelly.pocketcasts.playlists.smart.rules
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.animateContentSize
@@ -153,7 +153,7 @@ private fun EpisodesColumn(
         modifier = modifier,
     ) {
         items(episodes) { episode ->
-            EpisodeRow(
+            SmartEpisodeRow(
                 episode = episode,
                 useEpisodeArtwork = useEpisodeArtwork,
             )

@@ -1,4 +1,4 @@
-package au.com.shiftyjelly.pocketcasts.playlists.rules
+package au.com.shiftyjelly.pocketcasts.playlists.smart.rules
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.animateFloatAsState
@@ -132,7 +132,7 @@ fun AppliedRulesPage(
                             key = { episode -> episode.uuid },
                             contentType = { "episode" },
                         ) { episode ->
-                            EpisodeRow(
+                            SmartEpisodeRow(
                                 episode = episode,
                                 useEpisodeArtwork = useEpisodeArtwork,
                             )
@@ -329,7 +329,7 @@ private fun AppliedRulesPageNoRulesPreview(
     AppThemeWithBackground(themeType) {
         AppliedRulesPage(
             playlistName = "Comedy",
-            appliedRules = AppliedRules.Empty,
+            appliedRules = AppliedRules.Companion.Empty,
             availableEpisodes = emptyList(),
             totalEpisodeCount = 0,
             useEpisodeArtwork = false,
@@ -352,7 +352,7 @@ private fun AppliedRulesPageEpisodesPreview(
     AppThemeWithBackground(themeType) {
         AppliedRulesPage(
             playlistName = "Comedy",
-            appliedRules = AppliedRules.Empty.copy(
+            appliedRules = AppliedRules.Companion.Empty.copy(
                 podcasts = PodcastsRule.Any,
             ),
             availableEpisodes = List(10) { index ->
@@ -384,7 +384,7 @@ private fun AppliedRulesPageNoEpisodesPreview(
     AppThemeWithBackground(themeType) {
         AppliedRulesPage(
             playlistName = "Comedy",
-            appliedRules = AppliedRules.Empty.copy(
+            appliedRules = AppliedRules.Companion.Empty.copy(
                 podcasts = PodcastsRule.Any,
             ),
             availableEpisodes = emptyList(),

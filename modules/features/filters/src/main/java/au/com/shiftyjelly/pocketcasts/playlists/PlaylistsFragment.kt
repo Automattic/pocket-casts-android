@@ -13,7 +13,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import au.com.shiftyjelly.pocketcasts.compose.AppThemeWithBackground
 import au.com.shiftyjelly.pocketcasts.compose.extensions.contentWithoutConsumedInsets
-import au.com.shiftyjelly.pocketcasts.playlists.smart.SmartPlaylistFragment
+import au.com.shiftyjelly.pocketcasts.playlists.smart.PlaylistFragment
 import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingFlow
 import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingLauncher
 import au.com.shiftyjelly.pocketcasts.ui.helper.FragmentHostListener
@@ -56,7 +56,7 @@ class PlaylistsFragment :
                 },
                 onDeletePlaylist = { playlist -> viewModel.deletePlaylist(playlist.uuid) },
                 onOpenPlaylist = { playlist ->
-                    val fragment = SmartPlaylistFragment.newInstance(playlist.uuid)
+                    val fragment = PlaylistFragment.newInstance(playlist.uuid)
                     (requireActivity() as FragmentHostListener).addFragment(fragment)
                 },
                 onReorderPlaylists = viewModel::updatePlaylistsOrder,

@@ -31,9 +31,7 @@ import au.com.shiftyjelly.pocketcasts.playlists.component.PlaylistHeaderAdapter
 import au.com.shiftyjelly.pocketcasts.playlists.component.PlaylistHeaderButtonData
 import au.com.shiftyjelly.pocketcasts.playlists.component.PlaylistHeaderData
 import au.com.shiftyjelly.pocketcasts.playlists.component.PlaylistToolbar
-import au.com.shiftyjelly.pocketcasts.playlists.edit.SmartPlaylistSettingsFragment
-import au.com.shiftyjelly.pocketcasts.playlists.edit.SmartPlaylistsOptionsFragment
-import au.com.shiftyjelly.pocketcasts.playlists.edit.SmartRulesEditFragment
+import au.com.shiftyjelly.pocketcasts.playlists.smart.rules.EditRulesFragment
 import au.com.shiftyjelly.pocketcasts.utils.extensions.dpToPx
 import au.com.shiftyjelly.pocketcasts.views.dialog.ConfirmationDialog
 import au.com.shiftyjelly.pocketcasts.views.extensions.hideKeyboardOnScroll
@@ -55,7 +53,7 @@ import au.com.shiftyjelly.pocketcasts.localization.R as LR
 import au.com.shiftyjelly.pocketcasts.ui.R as UR
 
 @AndroidEntryPoint
-class SmartPlaylistFragment :
+class PlaylistFragment :
     BaseFragment(),
     HasBackstack {
 
@@ -64,9 +62,9 @@ class SmartPlaylistFragment :
 
     private val args get() = requireNotNull(arguments?.let { BundleCompat.getParcelable(it, NEW_INSTANCE_ARGS, Args::class.java) })
 
-    private val viewModel by viewModels<SmartPlaylistViewModel>(
+    private val viewModel by viewModels<PlaylistViewModel>(
         extrasProducer = {
-            defaultViewModelCreationExtras.withCreationCallback<SmartPlaylistViewModel.Factory> { factory ->
+            defaultViewModelCreationExtras.withCreationCallback<PlaylistViewModel.Factory> { factory ->
                 factory.create(playlistUuid = args.playlistUuid)
             }
         },
@@ -266,14 +264,14 @@ class SmartPlaylistFragment :
         if (parentFragmentManager.findFragmentByTag("playlist_rules_editor") != null) {
             return
         }
-        SmartRulesEditFragment.newInstance(args.playlistUuid).show(parentFragmentManager, "playlist_rules_editor")
+        EditRulesFragment.newInstance(args.playlistUuid).show(parentFragmentManager, "playlist_rules_editor")
     }
 
     private fun openOptionsSheet() {
         if (childFragmentManager.findFragmentByTag("playlist_options_sheet") != null) {
             return
         }
-        SmartPlaylistsOptionsFragment().show(childFragmentManager, "playlist_options_sheet")
+        OptionsFragment().show(childFragmentManager, "playlist_options_sheet")
     }
 
     private fun openSettings() {
@@ -282,7 +280,7 @@ class SmartPlaylistFragment :
         }
         childFragmentManager.commit {
             addToBackStack("playlist_settings")
-            add(R.id.playlistFragmentContainer, SmartPlaylistSettingsFragment(), "playlist_settings")
+            add(R.id.playlistFragmentContainer, SettingsFragment(), "playlist_settings")
         }
     }
 
@@ -306,7 +304,7 @@ class SmartPlaylistFragment :
     companion object {
         private const val NEW_INSTANCE_ARGS = "SmartPlaylistsFragmentArgs"
 
-        fun newInstance(playlistUuid: String) = SmartPlaylistFragment().apply {
+        fun newInstance(playlistUuid: String) = PlaylistFragment().apply {
             arguments = bundleOf(NEW_INSTANCE_ARGS to Args(playlistUuid))
         }
     }

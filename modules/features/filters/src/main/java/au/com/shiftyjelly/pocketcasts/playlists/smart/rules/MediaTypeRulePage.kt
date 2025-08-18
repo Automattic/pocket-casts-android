@@ -1,4 +1,4 @@
-package au.com.shiftyjelly.pocketcasts.playlists.rules
+package au.com.shiftyjelly.pocketcasts.playlists.smart.rules
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.padding
@@ -17,24 +17,21 @@ import au.com.shiftyjelly.pocketcasts.compose.AppThemeWithBackground
 import au.com.shiftyjelly.pocketcasts.compose.PreviewRegularDevice
 import au.com.shiftyjelly.pocketcasts.compose.preview.ThemePreviewParameterProvider
 import au.com.shiftyjelly.pocketcasts.models.type.SmartRules
-import au.com.shiftyjelly.pocketcasts.models.type.SmartRules.EpisodeStatusRule
+import au.com.shiftyjelly.pocketcasts.models.type.SmartRules.MediaTypeRule
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme.ThemeType
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 @Composable
-fun EpisodeStatusRulePage(
-    rule: EpisodeStatusRule,
-    onChangeUnplayedStatus: (Boolean) -> Unit,
-    onChangeInProgressStatus: (Boolean) -> Unit,
-    onChangeCompletedStatus: (Boolean) -> Unit,
+fun MediaTypeRulePage(
+    selectedRule: MediaTypeRule,
+    onSelectMediaType: (MediaTypeRule) -> Unit,
     onSaveRule: () -> Unit,
     onClickBack: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     RulePage(
-        title = stringResource(LR.string.filters_chip_episode_status),
+        title = stringResource(LR.string.filters_chip_media_type),
         onSaveRule = onSaveRule,
-        isSaveEnabled = rule.unplayed || rule.inProgress || rule.completed,
         onClickBack = onClickBack,
         modifier = modifier,
     ) { bottomPadding ->
@@ -43,38 +40,34 @@ fun EpisodeStatusRulePage(
                 .verticalScroll(rememberScrollState())
                 .padding(top = 12.dp, bottom = bottomPadding),
         ) {
-            RuleCheckboxRow(
-                title = stringResource(LR.string.unplayed),
-                isChecked = rule.unplayed,
-                onCheckedChange = onChangeUnplayedStatus,
-            )
-            RuleCheckboxRow(
-                title = stringResource(LR.string.in_progress_uppercase),
-                isChecked = rule.inProgress,
-                onCheckedChange = onChangeInProgressStatus,
-            )
-            RuleCheckboxRow(
-                title = stringResource(LR.string.played),
-                isChecked = rule.completed,
-                onCheckedChange = onChangeCompletedStatus,
-            )
+            MediaTypeRule.entries.forEach { rule ->
+                RuleRadioRow(
+                    title = stringResource(rule.displayLabelId),
+                    isSelected = rule == selectedRule,
+                    onSelect = { onSelectMediaType(rule) },
+                )
+            }
         }
     }
 }
 
+private val MediaTypeRule.displayLabelId get() = when (this) {
+    MediaTypeRule.Any -> LR.string.all
+    MediaTypeRule.Audio -> LR.string.audio
+    MediaTypeRule.Video -> LR.string.video
+}
+
 @Composable
 @PreviewRegularDevice
-private fun EpisodeStatusRulePreview(
+private fun MediaTypeRulePreview(
     @PreviewParameter(ThemePreviewParameterProvider::class) themeType: ThemeType,
 ) {
-    var rule by remember { mutableStateOf(SmartRules.Default.episodeStatus) }
+    var rule by remember { mutableStateOf(SmartRules.Default.mediaType) }
 
     AppThemeWithBackground(themeType) {
-        EpisodeStatusRulePage(
-            rule = rule,
-            onChangeUnplayedStatus = { rule.copy(unplayed = it) },
-            onChangeInProgressStatus = { rule.copy(inProgress = it) },
-            onChangeCompletedStatus = { rule.copy(completed = it) },
+        MediaTypeRulePage(
+            selectedRule = rule,
+            onSelectMediaType = { rule = it },
             onSaveRule = {},
             onClickBack = {},
         )

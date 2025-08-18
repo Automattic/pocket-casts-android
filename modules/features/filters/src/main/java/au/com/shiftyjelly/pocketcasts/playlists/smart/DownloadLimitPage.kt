@@ -1,4 +1,4 @@
-package au.com.shiftyjelly.pocketcasts.playlists.edit
+package au.com.shiftyjelly.pocketcasts.playlists.smart
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -36,7 +36,7 @@ import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 @Composable
-internal fun SmartPlaylistEpisodeDownloadLimitPage(
+internal fun DownloadLimitPage(
     episodeLimit: Int,
     onSelectEpisodeLimit: (Int) -> Unit,
     modifier: Modifier = Modifier,
@@ -128,11 +128,11 @@ private val AvailableLimits = listOf(3, 5, 10, 20, 40, 100)
 
 @Preview
 @Composable
-private fun SmartPlaylistEpisodeDownloadLimitPagePreview(
+private fun DownloadLimitPagePreview(
     @PreviewParameter(ThemePreviewParameterProvider::class) themeType: Theme.ThemeType,
 ) {
     AppThemeWithBackground(themeType) {
-        SmartPlaylistEpisodeDownloadLimitPage(
+        DownloadLimitPage(
             episodeLimit = 20,
             onSelectEpisodeLimit = {},
         )

@@ -1,4 +1,4 @@
-package au.com.shiftyjelly.pocketcasts.playlists.edit
+package au.com.shiftyjelly.pocketcasts.playlists.smart
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.clickable
@@ -41,7 +41,7 @@ import au.com.shiftyjelly.pocketcasts.ui.theme.Theme.ThemeType
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 @Composable
-fun SmartPlaylistSettingsPage(
+fun SettingsPage(
     state: TextFieldState,
     isAutoDownloadEnabled: Boolean,
     autoDownloadEpisodeLimit: Int,
@@ -143,7 +143,7 @@ private fun SmartPlaylistSettingsPagePreview(
     var isAutoDownloadEnabled by remember { mutableStateOf(true) }
 
     AppThemeWithBackground(themeType) {
-        SmartPlaylistSettingsPage(
+        SettingsPage(
             state = state,
             isAutoDownloadEnabled = isAutoDownloadEnabled,
             autoDownloadEpisodeLimit = 10,

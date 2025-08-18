@@ -1,4 +1,4 @@
-package au.com.shiftyjelly.pocketcasts.playlists.edit
+package au.com.shiftyjelly.pocketcasts.playlists.smart.rules
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -9,9 +9,6 @@ import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.models.type.SmartRules.DownloadStatusRule
 import au.com.shiftyjelly.pocketcasts.models.type.SmartRules.MediaTypeRule
 import au.com.shiftyjelly.pocketcasts.models.type.SmartRules.ReleaseDateRule
-import au.com.shiftyjelly.pocketcasts.playlists.rules.AppliedRules
-import au.com.shiftyjelly.pocketcasts.playlists.rules.RuleType
-import au.com.shiftyjelly.pocketcasts.playlists.rules.RulesBuilder
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.preferences.model.ArtworkConfiguration.Element
 import au.com.shiftyjelly.pocketcasts.repositories.playlist.PlaylistManager
@@ -30,8 +27,8 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 
-@HiltViewModel(assistedFactory = SmartRulesEditViewModel.Factory::class)
-class SmartRulesEditViewModel @AssistedInject constructor(
+@HiltViewModel(assistedFactory = EditRulesViewModel.Factory::class)
+class EditRulesViewModel @AssistedInject constructor(
     private val playlistManager: PlaylistManager,
     rulesEditorFactory: SmartRulesEditor.Factory,
     settings: Settings,
@@ -191,6 +188,6 @@ class SmartRulesEditViewModel @AssistedInject constructor(
 
     @AssistedFactory
     interface Factory {
-        fun create(playlistUuid: String): SmartRulesEditViewModel
+        fun create(playlistUuid: String): EditRulesViewModel
     }
 }

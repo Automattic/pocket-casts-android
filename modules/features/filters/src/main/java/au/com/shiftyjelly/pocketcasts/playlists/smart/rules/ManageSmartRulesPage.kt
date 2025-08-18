@@ -1,6 +1,10 @@
-package au.com.shiftyjelly.pocketcasts.playlists.smart
+package au.com.shiftyjelly.pocketcasts.playlists.smart.rules
 
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavHostController
@@ -16,17 +20,6 @@ import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.models.type.SmartRules.DownloadStatusRule
 import au.com.shiftyjelly.pocketcasts.models.type.SmartRules.MediaTypeRule
 import au.com.shiftyjelly.pocketcasts.models.type.SmartRules.ReleaseDateRule
-import au.com.shiftyjelly.pocketcasts.playlists.rules.AppliedRules
-import au.com.shiftyjelly.pocketcasts.playlists.rules.AppliedRulesPage
-import au.com.shiftyjelly.pocketcasts.playlists.rules.DownloadStatusRulePage
-import au.com.shiftyjelly.pocketcasts.playlists.rules.EpisodeDurationRulePage
-import au.com.shiftyjelly.pocketcasts.playlists.rules.EpisodeStatusRulePage
-import au.com.shiftyjelly.pocketcasts.playlists.rules.MediaTypeRulePage
-import au.com.shiftyjelly.pocketcasts.playlists.rules.PodcastsRulePage
-import au.com.shiftyjelly.pocketcasts.playlists.rules.ReleaseDateRulePage
-import au.com.shiftyjelly.pocketcasts.playlists.rules.RuleType
-import au.com.shiftyjelly.pocketcasts.playlists.rules.RulesBuilder
-import au.com.shiftyjelly.pocketcasts.playlists.rules.StarredRulePage
 
 @Composable
 internal fun ManageSmartRulesPage(
@@ -38,13 +31,14 @@ internal fun ManageSmartRulesPage(
     followedPodcasts: List<Podcast>,
     totalEpisodeCount: Int,
     useEpisodeArtwork: Boolean,
-    areOtherOptionsExpanded: Boolean,
     navController: NavHostController,
     listener: ManageSmartRulesListener,
     modifier: Modifier = Modifier,
     startDestination: String = ManageSmartRulesRoutes.SMART_PLAYLIST_PREVIEW,
     builder: NavGraphBuilder.() -> Unit = {},
 ) {
+    var areOtherOptionsExpanded by remember { mutableStateOf(false) }
+
     fun goBackToPreview() {
         navController.popBackStack(ManageSmartRulesRoutes.SMART_PLAYLIST_PREVIEW, inclusive = false)
     }
@@ -69,7 +63,7 @@ internal fun ManageSmartRulesPage(
                 areOtherOptionsExpanded = areOtherOptionsExpanded,
                 onCreatePlaylist = listener::onCreatePlaylist,
                 onClickRule = { rule -> navController.navigateOnce(rule.toNavigationRoute()) },
-                toggleOtherOptions = listener::onToggleOtherOptions,
+                toggleOtherOptions = { areOtherOptionsExpanded = !areOtherOptionsExpanded },
                 onClickClose = listener::onClose,
             )
         }
@@ -207,8 +201,6 @@ internal interface ManageSmartRulesListener {
     fun onApplyRule(rule: RuleType)
 
     fun onCreatePlaylist()
-
-    fun onToggleOtherOptions()
 
     fun onClose()
 }

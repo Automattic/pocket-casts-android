@@ -1,4 +1,4 @@
-package au.com.shiftyjelly.pocketcasts.playlists.rules
+package au.com.shiftyjelly.pocketcasts.playlists.smart.rules
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box

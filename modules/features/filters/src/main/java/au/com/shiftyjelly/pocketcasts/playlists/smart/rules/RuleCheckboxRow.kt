@@ -1,9 +1,9 @@
-package au.com.shiftyjelly.pocketcasts.playlists.rules
+package au.com.shiftyjelly.pocketcasts.playlists.smart.rules
 
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material.RadioButton
+import androidx.compose.foundation.selection.toggleable
+import androidx.compose.material.Checkbox
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -12,19 +12,19 @@ import androidx.compose.ui.unit.dp
 import au.com.shiftyjelly.pocketcasts.compose.components.TextH30
 
 @Composable
-fun RuleRadioRow(
+fun RuleCheckboxRow(
     title: String,
-    isSelected: Boolean,
-    onSelect: () -> Unit,
+    isChecked: Boolean,
+    onCheckedChange: (Boolean) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Row(
         verticalAlignment = Alignment.CenterVertically,
         modifier = modifier
-            .clickable(
-                enabled = !isSelected,
-                role = Role.RadioButton,
-                onClick = onSelect,
+            .toggleable(
+                value = isChecked,
+                role = Role.Checkbox,
+                onValueChange = onCheckedChange,
             )
             .padding(vertical = 12.dp, horizontal = 16.dp),
     ) {
@@ -32,9 +32,9 @@ fun RuleRadioRow(
             text = title,
             modifier = Modifier.weight(1f),
         )
-        RadioButton(
-            selected = isSelected,
-            onClick = null,
+        Checkbox(
+            checked = isChecked,
+            onCheckedChange = null,
         )
     }
 }

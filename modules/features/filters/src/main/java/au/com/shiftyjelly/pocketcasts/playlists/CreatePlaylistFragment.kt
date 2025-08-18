@@ -27,11 +27,11 @@ import au.com.shiftyjelly.pocketcasts.compose.navigation.navigateOnce
 import au.com.shiftyjelly.pocketcasts.models.type.SmartRules.DownloadStatusRule
 import au.com.shiftyjelly.pocketcasts.models.type.SmartRules.MediaTypeRule
 import au.com.shiftyjelly.pocketcasts.models.type.SmartRules.ReleaseDateRule
-import au.com.shiftyjelly.pocketcasts.playlists.rules.RuleType
-import au.com.shiftyjelly.pocketcasts.playlists.smart.ManageSmartRulesListener
-import au.com.shiftyjelly.pocketcasts.playlists.smart.ManageSmartRulesPage
-import au.com.shiftyjelly.pocketcasts.playlists.smart.ManageSmartRulesRoutes
-import au.com.shiftyjelly.pocketcasts.playlists.smart.SmartPlaylistFragment
+import au.com.shiftyjelly.pocketcasts.playlists.smart.PlaylistFragment
+import au.com.shiftyjelly.pocketcasts.playlists.smart.rules.ManageSmartRulesListener
+import au.com.shiftyjelly.pocketcasts.playlists.smart.rules.ManageSmartRulesPage
+import au.com.shiftyjelly.pocketcasts.playlists.smart.rules.ManageSmartRulesRoutes
+import au.com.shiftyjelly.pocketcasts.playlists.smart.rules.RuleType
 import au.com.shiftyjelly.pocketcasts.ui.helper.FragmentHostListener
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseDialogFragment
 import dagger.hilt.android.AndroidEntryPoint
@@ -57,15 +57,12 @@ class CreatePlaylistFragment : BaseDialogFragment() {
         savedInstanceState: Bundle?,
     ) = content {
         val uiState by viewModel.uiState.collectAsState()
-        var areOtherOptionsExpanded by remember { mutableStateOf(false) }
 
         OpenCreatedPlaylistEffect()
 
         DialogBox {
             val navController = rememberNavController()
-            val listener = rememberNavigationListener(
-                onToggleOtherOptions = { areOtherOptionsExpanded = !areOtherOptionsExpanded },
-            )
+            val listener = rememberNavigationListener()
 
             ClearTransientRulesStateEffect(navController)
 
@@ -78,7 +75,6 @@ class CreatePlaylistFragment : BaseDialogFragment() {
                 followedPodcasts = uiState.followedPodcasts,
                 totalEpisodeCount = uiState.totalEpisodeCount,
                 useEpisodeArtwork = uiState.useEpisodeArtwork,
-                areOtherOptionsExpanded = areOtherOptionsExpanded,
                 navController = navController,
                 listener = listener,
                 startDestination = NavigationRoutes.NEW_PLAYLIST,
@@ -112,9 +108,7 @@ class CreatePlaylistFragment : BaseDialogFragment() {
     }
 
     @Composable
-    private fun rememberNavigationListener(
-        onToggleOtherOptions: () -> Unit,
-    ) = remember(onToggleOtherOptions) {
+    private fun rememberNavigationListener() = remember {
         object : ManageSmartRulesListener {
             override fun onChangeUseAllPodcasts(shouldUse: Boolean) = viewModel.useAllPodcasts(shouldUse)
 
@@ -154,8 +148,6 @@ class CreatePlaylistFragment : BaseDialogFragment() {
 
             override fun onCreatePlaylist() = viewModel.createSmartPlaylist()
 
-            override fun onToggleOtherOptions() = onToggleOtherOptions()
-
             override fun onClose() = dismiss()
         }
     }
@@ -166,7 +158,7 @@ class CreatePlaylistFragment : BaseDialogFragment() {
             val uuid = viewModel.createdSmartPlaylistUuid.await()
             isPlaylistCreated = true
             dismiss()
-            val fragment = SmartPlaylistFragment.newInstance(uuid)
+            val fragment = PlaylistFragment.newInstance(uuid)
             (requireActivity() as FragmentHostListener).addFragment(fragment)
         }
     }

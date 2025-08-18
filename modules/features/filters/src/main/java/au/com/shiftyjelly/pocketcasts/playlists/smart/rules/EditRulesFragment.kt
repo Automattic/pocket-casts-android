@@ -1,4 +1,4 @@
-package au.com.shiftyjelly.pocketcasts.playlists.edit
+package au.com.shiftyjelly.pocketcasts.playlists.smart.rules
 
 import android.os.Bundle
 import android.os.Parcelable
@@ -28,21 +28,18 @@ import au.com.shiftyjelly.pocketcasts.compose.components.AnimatedNonNullVisibili
 import au.com.shiftyjelly.pocketcasts.models.type.SmartRules.DownloadStatusRule
 import au.com.shiftyjelly.pocketcasts.models.type.SmartRules.MediaTypeRule
 import au.com.shiftyjelly.pocketcasts.models.type.SmartRules.ReleaseDateRule
-import au.com.shiftyjelly.pocketcasts.playlists.rules.RuleType
-import au.com.shiftyjelly.pocketcasts.playlists.smart.ManageSmartRulesListener
-import au.com.shiftyjelly.pocketcasts.playlists.smart.ManageSmartRulesPage
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseDialogFragment
 import dagger.hilt.android.AndroidEntryPoint
 import dagger.hilt.android.lifecycle.withCreationCallback
 import kotlinx.parcelize.Parcelize
 
 @AndroidEntryPoint
-class SmartRulesEditFragment : BaseDialogFragment() {
+class EditRulesFragment : BaseDialogFragment() {
     private val args get() = requireNotNull(arguments?.let { BundleCompat.getParcelable(it, NEW_INSTANCE_ARGS, Args::class.java) })
 
-    private val viewModel by viewModels<SmartRulesEditViewModel>(
+    private val viewModel by viewModels<EditRulesViewModel>(
         extrasProducer = {
-            defaultViewModelCreationExtras.withCreationCallback<SmartRulesEditViewModel.Factory> { factory ->
+            defaultViewModelCreationExtras.withCreationCallback<EditRulesViewModel.Factory> { factory ->
                 factory.create(playlistUuid = args.playlistUuid)
             }
         },
@@ -73,7 +70,6 @@ class SmartRulesEditFragment : BaseDialogFragment() {
                     followedPodcasts = uiState.followedPodcasts,
                     totalEpisodeCount = uiState.totalEpisodeCount,
                     useEpisodeArtwork = uiState.useEpisodeArtwork,
-                    areOtherOptionsExpanded = false,
                     navController = navController,
                     listener = listener,
                     modifier = Modifier
@@ -125,8 +121,6 @@ class SmartRulesEditFragment : BaseDialogFragment() {
 
             override fun onCreatePlaylist() = Unit
 
-            override fun onToggleOtherOptions() = Unit
-
             override fun onClose() = dismiss()
         }
     }
@@ -153,7 +147,7 @@ class SmartRulesEditFragment : BaseDialogFragment() {
     companion object {
         private const val NEW_INSTANCE_ARGS = "SmartRulesEditFragmentArgs"
 
-        fun newInstance(playlistUuid: String) = SmartRulesEditFragment().apply {
+        fun newInstance(playlistUuid: String) = EditRulesFragment().apply {
             arguments = bundleOf(NEW_INSTANCE_ARGS to Args(playlistUuid))
         }
     }

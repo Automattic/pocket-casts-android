@@ -12,10 +12,10 @@ import au.com.shiftyjelly.pocketcasts.models.type.SmartRules
 import au.com.shiftyjelly.pocketcasts.models.type.SmartRules.DownloadStatusRule
 import au.com.shiftyjelly.pocketcasts.models.type.SmartRules.MediaTypeRule
 import au.com.shiftyjelly.pocketcasts.models.type.SmartRules.ReleaseDateRule
-import au.com.shiftyjelly.pocketcasts.playlists.edit.SmartRulesEditor
-import au.com.shiftyjelly.pocketcasts.playlists.rules.AppliedRules
-import au.com.shiftyjelly.pocketcasts.playlists.rules.RuleType
-import au.com.shiftyjelly.pocketcasts.playlists.rules.RulesBuilder
+import au.com.shiftyjelly.pocketcasts.playlists.smart.rules.AppliedRules
+import au.com.shiftyjelly.pocketcasts.playlists.smart.rules.RuleType
+import au.com.shiftyjelly.pocketcasts.playlists.smart.rules.RulesBuilder
+import au.com.shiftyjelly.pocketcasts.playlists.smart.rules.SmartRulesEditor
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.preferences.model.ArtworkConfiguration.Element
 import au.com.shiftyjelly.pocketcasts.repositories.playlist.PlaylistManager

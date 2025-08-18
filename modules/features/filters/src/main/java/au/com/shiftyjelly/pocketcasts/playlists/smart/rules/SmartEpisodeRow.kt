@@ -1,4 +1,4 @@
-package au.com.shiftyjelly.pocketcasts.playlists.rules
+package au.com.shiftyjelly.pocketcasts.playlists.smart.rules
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -37,7 +37,7 @@ import au.com.shiftyjelly.pocketcasts.ui.extensions.getThemeColor
 import au.com.shiftyjelly.pocketcasts.ui.R as UR
 
 @Composable
-internal fun EpisodeRow(
+internal fun SmartEpisodeRow(
     episode: PodcastEpisode,
     useEpisodeArtwork: Boolean,
     modifier: Modifier = Modifier,

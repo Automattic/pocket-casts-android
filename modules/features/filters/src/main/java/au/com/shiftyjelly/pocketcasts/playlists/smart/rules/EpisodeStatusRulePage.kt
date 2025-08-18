@@ -1,4 +1,4 @@
-package au.com.shiftyjelly.pocketcasts.playlists.rules
+package au.com.shiftyjelly.pocketcasts.playlists.smart.rules
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.padding
@@ -17,21 +17,24 @@ import au.com.shiftyjelly.pocketcasts.compose.AppThemeWithBackground
 import au.com.shiftyjelly.pocketcasts.compose.PreviewRegularDevice
 import au.com.shiftyjelly.pocketcasts.compose.preview.ThemePreviewParameterProvider
 import au.com.shiftyjelly.pocketcasts.models.type.SmartRules
-import au.com.shiftyjelly.pocketcasts.models.type.SmartRules.DownloadStatusRule
+import au.com.shiftyjelly.pocketcasts.models.type.SmartRules.EpisodeStatusRule
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme.ThemeType
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 @Composable
-fun DownloadStatusRulePage(
-    selectedRule: DownloadStatusRule,
-    onSelectDownloadStatus: (DownloadStatusRule) -> Unit,
+fun EpisodeStatusRulePage(
+    rule: EpisodeStatusRule,
+    onChangeUnplayedStatus: (Boolean) -> Unit,
+    onChangeInProgressStatus: (Boolean) -> Unit,
+    onChangeCompletedStatus: (Boolean) -> Unit,
     onSaveRule: () -> Unit,
     onClickBack: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     RulePage(
-        title = stringResource(LR.string.filters_chip_download_status),
+        title = stringResource(LR.string.filters_chip_episode_status),
         onSaveRule = onSaveRule,
+        isSaveEnabled = rule.unplayed || rule.inProgress || rule.completed,
         onClickBack = onClickBack,
         modifier = modifier,
     ) { bottomPadding ->
@@ -40,34 +43,38 @@ fun DownloadStatusRulePage(
                 .verticalScroll(rememberScrollState())
                 .padding(top = 12.dp, bottom = bottomPadding),
         ) {
-            DownloadStatusRule.entries.forEach { rule ->
-                RuleRadioRow(
-                    title = stringResource(rule.displayLabelId),
-                    isSelected = rule == selectedRule,
-                    onSelect = { onSelectDownloadStatus(rule) },
-                )
-            }
+            RuleCheckboxRow(
+                title = stringResource(LR.string.unplayed),
+                isChecked = rule.unplayed,
+                onCheckedChange = onChangeUnplayedStatus,
+            )
+            RuleCheckboxRow(
+                title = stringResource(LR.string.in_progress_uppercase),
+                isChecked = rule.inProgress,
+                onCheckedChange = onChangeInProgressStatus,
+            )
+            RuleCheckboxRow(
+                title = stringResource(LR.string.played),
+                isChecked = rule.completed,
+                onCheckedChange = onChangeCompletedStatus,
+            )
         }
     }
 }
 
-private val DownloadStatusRule.displayLabelId get() = when (this) {
-    DownloadStatusRule.Any -> LR.string.all
-    DownloadStatusRule.Downloaded -> LR.string.downloaded
-    DownloadStatusRule.NotDownloaded -> LR.string.not_downloaded
-}
-
 @Composable
 @PreviewRegularDevice
-private fun DownloadStatusRulePreview(
+private fun EpisodeStatusRulePreview(
     @PreviewParameter(ThemePreviewParameterProvider::class) themeType: ThemeType,
 ) {
-    var rule by remember { mutableStateOf(SmartRules.Default.downloadStatus) }
+    var rule by remember { mutableStateOf(SmartRules.Default.episodeStatus) }
 
     AppThemeWithBackground(themeType) {
-        DownloadStatusRulePage(
-            selectedRule = rule,
-            onSelectDownloadStatus = { rule = it },
+        EpisodeStatusRulePage(
+            rule = rule,
+            onChangeUnplayedStatus = { rule.copy(unplayed = it) },
+            onChangeInProgressStatus = { rule.copy(inProgress = it) },
+            onChangeCompletedStatus = { rule.copy(completed = it) },
             onSaveRule = {},
             onClickBack = {},
         )

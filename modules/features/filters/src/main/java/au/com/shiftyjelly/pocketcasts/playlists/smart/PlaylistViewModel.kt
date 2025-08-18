@@ -34,8 +34,8 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 
 @OptIn(FlowPreview::class, ExperimentalCoroutinesApi::class)
-@HiltViewModel(assistedFactory = SmartPlaylistViewModel.Factory::class)
-class SmartPlaylistViewModel @AssistedInject constructor(
+@HiltViewModel(assistedFactory = PlaylistViewModel.Factory::class)
+class PlaylistViewModel @AssistedInject constructor(
     @Assisted private val playlistUuid: String,
     private val playlistManager: PlaylistManager,
     private val playbackManager: PlaybackManager,
@@ -227,7 +227,7 @@ class SmartPlaylistViewModel @AssistedInject constructor(
 
     @AssistedFactory
     interface Factory {
-        fun create(playlistUuid: String): SmartPlaylistViewModel
+        fun create(playlistUuid: String): PlaylistViewModel
     }
 
     companion object {
