@@ -36,6 +36,7 @@ import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import au.com.shiftyjelly.pocketcasts.account.onboarding.components.ContinueWithGoogleButton
+import au.com.shiftyjelly.pocketcasts.account.viewmodel.GoogleSignInState
 import au.com.shiftyjelly.pocketcasts.account.viewmodel.OnboardingLogInViewModel
 import au.com.shiftyjelly.pocketcasts.compose.AppThemeWithBackground
 import au.com.shiftyjelly.pocketcasts.compose.CallOnce
@@ -58,10 +59,13 @@ import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 @Composable
 internal fun NewOnboardingLoginPage(
+    theme: Theme.ThemeType,
+    flow: OnboardingFlow,
     onBackPress: () -> Unit,
     onLoginComplete: (Subscription?) -> Unit,
     onForgotPasswordClick: () -> Unit,
     onUpdateSystemBars: (SystemBarsStyles) -> Unit,
+    onContinueWithGoogleComplete: (GoogleSignInState, Subscription?) -> Unit,
     modifier: Modifier = Modifier,
     viewModel: OnboardingLogInViewModel = hiltViewModel(),
 ) {
@@ -74,8 +78,8 @@ internal fun NewOnboardingLoginPage(
 
     LaunchedEffect(onUpdateSystemBars) {
         // Use secondaryUI01 so the status bar matches the ThemedTopAppBar
-        val statusBar = SystemBarStyle.custom(pocketCastsTheme.colors.secondaryUi01, Theme.ThemeType.LIGHT.toolbarLightIcons)
-        val navigationBar = SystemBarStyle.transparent { Theme.ThemeType.LIGHT.darkTheme }
+        val statusBar = SystemBarStyle.custom(pocketCastsTheme.colors.secondaryUi01, theme.toolbarLightIcons)
+        val navigationBar = SystemBarStyle.transparent { theme.darkTheme }
         onUpdateSystemBars(SystemBarsStyles(statusBar, navigationBar))
     }
     BackHandler {
@@ -157,28 +161,28 @@ internal fun NewOnboardingLoginPage(
                     modifier = Modifier
                         .weight(1f)
                         .height(.5.dp)
-                        .background(color = MaterialTheme.theme.colors.primaryText02),
+                        .background(color = MaterialTheme.theme.colors.primaryUi05),
                 )
                 TextC50(
                     text = stringResource(LR.string.onboarding_login_or),
                     color = MaterialTheme.theme.colors.primaryText01,
-                    fontWeight = FontWeight.W500,
+                    fontWeight = FontWeight.W400,
                 )
                 Box(
                     modifier = Modifier
                         .weight(1f)
                         .height(.5.dp)
-                        .background(color = MaterialTheme.theme.colors.primaryText02),
+                        .background(color = MaterialTheme.theme.colors.primaryUi05),
                 )
             }
             Spacer(modifier = Modifier.height(16.dp))
-//            if (showContinueWithGoogleButton) {
-            ContinueWithGoogleButton(
-                includePadding = false,
-                flow = OnboardingFlow.Welcome, // TODO
-                onComplete = { _, _ -> },
-            )
-//            }
+            if (viewModel.showContinueWithGoogleButton) {
+                ContinueWithGoogleButton(
+                    includePadding = false,
+                    flow = flow,
+                    onComplete = onContinueWithGoogleComplete,
+                )
+            }
         }
     }
 }
