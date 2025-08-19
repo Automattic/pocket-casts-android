@@ -32,8 +32,9 @@ fun ContinueWithGoogleButton(
     flow: OnboardingFlow?,
     fontSize: TextUnit? = null,
     includePadding: Boolean = true,
-    viewModel: GoogleSignInButtonViewModel = hiltViewModel(),
     onComplete: (GoogleSignInState, Subscription?) -> Unit,
+    viewModel: GoogleSignInButtonViewModel = hiltViewModel(),
+    label: String = stringResource(LR.string.onboarding_continue_with_google)
 ) {
     val context = LocalContext.current
 
@@ -87,7 +88,7 @@ fun ContinueWithGoogleButton(
     }
 
     RowOutlinedButton(
-        text = stringResource(LR.string.onboarding_continue_with_google),
+        text = label,
         leadingIcon = painterResource(IR.drawable.google_g),
         tintIcon = false,
         border = BorderStroke(2.dp, MaterialTheme.theme.colors.primaryInteractive03),
