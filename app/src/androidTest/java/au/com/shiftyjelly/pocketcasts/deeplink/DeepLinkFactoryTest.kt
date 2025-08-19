@@ -255,7 +255,7 @@ class DeepLinkFactoryTest {
 
         val deepLink = factory.create(intent)
 
-        assertEquals(ShowFilterDeepLink(filterId = 10), deepLink)
+        assertEquals(ShowPlaylistDeepLink(filterId = 10), deepLink)
     }
 
     @Test

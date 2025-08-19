@@ -13,9 +13,9 @@ import au.com.shiftyjelly.pocketcasts.deeplink.DeepLink.Companion.ACTION_OPEN_PO
 import au.com.shiftyjelly.pocketcasts.deeplink.DeepLink.Companion.EXTRA_AUTO_PLAY
 import au.com.shiftyjelly.pocketcasts.deeplink.DeepLink.Companion.EXTRA_BOOKMARK_UUID
 import au.com.shiftyjelly.pocketcasts.deeplink.DeepLink.Companion.EXTRA_EPISODE_UUID
-import au.com.shiftyjelly.pocketcasts.deeplink.DeepLink.Companion.EXTRA_FILTER_ID
 import au.com.shiftyjelly.pocketcasts.deeplink.DeepLink.Companion.EXTRA_NOTIFICATION_TAG
 import au.com.shiftyjelly.pocketcasts.deeplink.DeepLink.Companion.EXTRA_PAGE
+import au.com.shiftyjelly.pocketcasts.deeplink.DeepLink.Companion.EXTRA_PLAYLIST_UUID
 import au.com.shiftyjelly.pocketcasts.deeplink.DeepLink.Companion.EXTRA_PODCAST_UUID
 import au.com.shiftyjelly.pocketcasts.deeplink.DeepLink.Companion.EXTRA_SOURCE_VIEW
 import kotlin.time.Duration
@@ -37,7 +37,7 @@ sealed interface DeepLink {
         const val EXTRA_SOURCE_VIEW = "source_view"
         const val EXTRA_NOTIFICATION_TAG = "NOTIFICATION_TAG"
         const val EXTRA_PAGE = "launch-page"
-        const val EXTRA_FILTER_ID = "playlist-id"
+        const val EXTRA_PLAYLIST_UUID = "playlist_uuid"
     }
 }
 
@@ -167,13 +167,13 @@ data object ShowUpNextModalDeepLink : ShowPageDeepLink {
     override val pageId = "upnext"
 }
 
-data class ShowFilterDeepLink(
-    val filterId: Long,
+data class ShowPlaylistDeepLink(
+    val playlistUuid: String,
 ) : ShowPageDeepLink {
     override val pageId = "playlist"
 
     override fun toIntent(context: Context) = super.toIntent(context)
-        .putExtra(EXTRA_FILTER_ID, filterId)
+        .putExtra(EXTRA_PLAYLIST_UUID, playlistUuid)
 }
 
 data object ShowFiltersDeepLink : IntentableDeepLink {

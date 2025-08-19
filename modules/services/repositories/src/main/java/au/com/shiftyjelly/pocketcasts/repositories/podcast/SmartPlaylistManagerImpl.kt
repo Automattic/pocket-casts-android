@@ -1,7 +1,6 @@
 package au.com.shiftyjelly.pocketcasts.repositories.podcast
 
 import android.content.Context
-import android.os.Build
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.models.db.AppDatabase
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
@@ -16,8 +15,6 @@ import au.com.shiftyjelly.pocketcasts.repositories.notification.NotificationMana
 import au.com.shiftyjelly.pocketcasts.repositories.notification.OnboardingNotificationType
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.repositories.playlist.DefaultPlaylistsInitializater
-import au.com.shiftyjelly.pocketcasts.repositories.playlist.PlaylistManager
-import au.com.shiftyjelly.pocketcasts.repositories.shortcuts.PocketCastsShortcuts
 import au.com.shiftyjelly.pocketcasts.repositories.sync.SyncManager
 import dagger.hilt.android.qualifiers.ApplicationContext
 import io.reactivex.Completable
@@ -132,16 +129,7 @@ class SmartPlaylistManagerImpl @Inject constructor(
     }
 
     override suspend fun create(smartPlaylist: SmartPlaylist): Long {
-        val id = playlistDao.insert(smartPlaylist)
-        if (countPlaylists() == 1 && Build.VERSION.SDK_INT >= Build.VERSION_CODES.N_MR1) {
-            PocketCastsShortcuts.update(
-                smartPlaylistManager = this,
-                force = true,
-                context = context,
-                source = PocketCastsShortcuts.Source.CREATE_PLAYLIST,
-            )
-        }
-        return id
+        return playlistDao.insert(smartPlaylist)
     }
 
     /**

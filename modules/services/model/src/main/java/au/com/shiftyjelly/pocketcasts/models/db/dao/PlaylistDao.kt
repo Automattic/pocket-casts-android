@@ -10,6 +10,7 @@ import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.SmartPlaylist
 import au.com.shiftyjelly.pocketcasts.models.entity.SmartPlaylist.Companion.SYNC_STATUS_NOT_SYNCED
 import au.com.shiftyjelly.pocketcasts.models.to.PlaylistEpisodeMetadata
+import au.com.shiftyjelly.pocketcasts.models.to.PlaylistShortcut
 import au.com.shiftyjelly.pocketcasts.models.type.PlaylistEpisodeSortType
 import au.com.shiftyjelly.pocketcasts.models.type.PlaylistEpisodeSortType.LongestToShortest
 import au.com.shiftyjelly.pocketcasts.models.type.PlaylistEpisodeSortType.NewestToOldest
@@ -39,6 +40,17 @@ abstract class PlaylistDao {
 
     @Query("SELECT * FROM smart_playlists WHERE manual = 0 AND deleted = 0 AND draft = 0 ORDER BY sortPosition ASC")
     abstract suspend fun getSmartPlaylists(): List<SmartPlaylist>
+
+    @Query(
+        """
+        SELECT playlist.uuid, playlist.title, playlist.iconId
+        FROM smart_playlists AS playlist
+        WHERE manual = 0 AND deleted = 0 AND draft = 0
+        ORDER BY sortPosition ASC 
+        LIMIT 1
+    """,
+    )
+    abstract fun observerPlaylistShortcut(): Flow<PlaylistShortcut?>
 
     @Query("UPDATE smart_playlists SET sortPosition = :position, syncStatus = $SYNC_STATUS_NOT_SYNCED WHERE uuid = :uuid")
     abstract suspend fun updateSortPosition(uuid: String, position: Int)

@@ -37,7 +37,7 @@ class ShowPageDeepLinkTest {
 
     @Test
     fun createShowFilterIntent() {
-        val intent = ShowFilterDeepLink(filterId = 15L).toIntent(context)
+        val intent = ShowPlaylistDeepLink(filterId = 15L).toIntent(context)
 
         assertEquals(ACTION_VIEW, intent.action)
         assertEquals("playlist", intent.getStringExtra("launch-page"))

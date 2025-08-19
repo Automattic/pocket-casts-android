@@ -22,8 +22,8 @@ import au.com.shiftyjelly.pocketcasts.deeplink.DeepLink.Companion.ACTION_OPEN_PO
 import au.com.shiftyjelly.pocketcasts.deeplink.DeepLink.Companion.EXTRA_AUTO_PLAY
 import au.com.shiftyjelly.pocketcasts.deeplink.DeepLink.Companion.EXTRA_BOOKMARK_UUID
 import au.com.shiftyjelly.pocketcasts.deeplink.DeepLink.Companion.EXTRA_EPISODE_UUID
-import au.com.shiftyjelly.pocketcasts.deeplink.DeepLink.Companion.EXTRA_FILTER_ID
 import au.com.shiftyjelly.pocketcasts.deeplink.DeepLink.Companion.EXTRA_PAGE
+import au.com.shiftyjelly.pocketcasts.deeplink.DeepLink.Companion.EXTRA_PLAYLIST_UUID
 import au.com.shiftyjelly.pocketcasts.deeplink.DeepLink.Companion.EXTRA_PODCAST_UUID
 import au.com.shiftyjelly.pocketcasts.deeplink.DeepLink.Companion.EXTRA_SOURCE_VIEW
 import timber.log.Timber
@@ -192,7 +192,7 @@ private class ShowPageAdapter : DeepLinkAdapter {
             "podcasts" -> ShowPodcastsDeepLink
             "search" -> ShowDiscoverDeepLink
             "upnext" -> ShowUpNextModalDeepLink
-            "playlist" -> ShowFilterDeepLink(filterId = intent.getLongExtra(EXTRA_FILTER_ID, -1))
+            "playlist" -> intent.getStringExtra(EXTRA_PLAYLIST_UUID)?.let(::ShowPlaylistDeepLink)
             else -> null
         }
     } else {
