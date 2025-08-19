@@ -30,6 +30,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
@@ -106,6 +107,7 @@ internal fun NewOnboardingLoginPage(
 
         Column(
             Modifier
+                .padding(horizontal = 16.dp)
                 .fillMaxHeight()
                 .verticalScroll(rememberScrollState()),
         ) {
@@ -119,22 +121,20 @@ internal fun NewOnboardingLoginPage(
                 onUpdateEmail = viewModel::updateEmail,
                 onUpdatePassword = viewModel::updatePassword,
                 isCreatingAccount = false,
-                modifier = Modifier.padding(16.dp),
+                modifier = Modifier.padding(vertical = 16.dp),
             )
 
             state.errorMessage?.let { errorMessage ->
                 TextP40(
                     text = errorMessage,
                     color = MaterialTheme.theme.colors.support05,
-                    modifier = Modifier.padding(horizontal = 16.dp),
                 )
             }
 
-            Spacer(modifier = Modifier.height(16.dp))
-
             TextH40(
                 text = stringResource(LR.string.onboarding_login_forgot_password),
-                color = MaterialTheme.theme.colors.primaryText02,
+                color = MaterialTheme.theme.colors.primaryInteractive01,
+                fontWeight = FontWeight.W500,
                 modifier = Modifier
                     .clickable { onForgotPasswordClick() },
             )
@@ -145,34 +145,39 @@ internal fun NewOnboardingLoginPage(
                 text = stringResource(LR.string.onboarding_login_continue_with_email),
                 enabled = state.enableSubmissionFields,
                 onClick = { viewModel.logIn(onLoginComplete) },
+                includePadding = false,
             )
             Spacer(modifier = Modifier.height(16.dp))
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.spacedBy(15.dp)
+                horizontalArrangement = Arrangement.spacedBy(15.dp),
             ) {
                 Box(
-                    modifier = Modifier.weight(1f)
-                        .height(1.dp)
+                    modifier = Modifier
+                        .weight(1f)
+                        .height(.5.dp)
                         .background(color = MaterialTheme.theme.colors.primaryText02),
                 )
                 TextC50(
                     text = stringResource(LR.string.onboarding_login_or),
                     color = MaterialTheme.theme.colors.primaryText01,
+                    fontWeight = FontWeight.W500,
                 )
                 Box(
-                    modifier = Modifier.weight(1f)
-                        .height(1.dp)
+                    modifier = Modifier
+                        .weight(1f)
+                        .height(.5.dp)
                         .background(color = MaterialTheme.theme.colors.primaryText02),
                 )
             }
             Spacer(modifier = Modifier.height(16.dp))
 //            if (showContinueWithGoogleButton) {
-                ContinueWithGoogleButton(
-                    flow = OnboardingFlow.Welcome, // TODO
-                    onComplete = { _, _ -> },
-                )
+            ContinueWithGoogleButton(
+                includePadding = false,
+                flow = OnboardingFlow.Welcome, // TODO
+                onComplete = { _, _ -> },
+            )
 //            }
         }
     }

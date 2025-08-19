@@ -464,6 +464,7 @@ fun TextC50(
     maxLines: Int = Int.MAX_VALUE,
     disableAutoScale: Boolean = false,
     fontScale: Float = 1f,
+    fontWeight: FontWeight = FontWeight.W700,
 ) {
     Text(
         text = text.uppercase(Locale.getDefault()),
@@ -472,7 +473,7 @@ fun TextC50(
         fontSize = 13.sp.scaled(disableAutoScale, fontScale),
         lineHeight = 19.sp.scaled(disableAutoScale, fontScale),
         letterSpacing = 0.6.sp.scaled(disableAutoScale, fontScale),
-        fontWeight = FontWeight.W700,
+        fontWeight = fontWeight,
         maxLines = maxLines,
         overflow = TextOverflow.Ellipsis,
         modifier = modifier,
