@@ -49,6 +49,7 @@ import au.com.shiftyjelly.pocketcasts.compose.components.EmailAndPasswordFields
 import au.com.shiftyjelly.pocketcasts.compose.components.TextC50
 import au.com.shiftyjelly.pocketcasts.compose.components.TextH40
 import au.com.shiftyjelly.pocketcasts.compose.components.TextP40
+import au.com.shiftyjelly.pocketcasts.compose.components.TextP50
 import au.com.shiftyjelly.pocketcasts.compose.preview.ThemePreviewParameterProvider
 import au.com.shiftyjelly.pocketcasts.compose.theme
 import au.com.shiftyjelly.pocketcasts.models.type.Subscription
@@ -126,6 +127,7 @@ internal fun NewOnboardingLoginPage(
                 onUpdatePassword = viewModel::updatePassword,
                 isCreatingAccount = false,
                 modifier = Modifier.padding(vertical = 16.dp),
+                focusEnabled = false,
             )
 
             state.errorMessage?.let { errorMessage ->
@@ -135,10 +137,10 @@ internal fun NewOnboardingLoginPage(
                 )
             }
 
-            TextH40(
+            TextP50(
                 text = stringResource(LR.string.onboarding_login_forgot_password),
                 color = MaterialTheme.theme.colors.primaryInteractive01,
-                fontWeight = FontWeight.W500,
+                fontWeight = FontWeight.W400,
                 modifier = Modifier
                     .clickable { onForgotPasswordClick() },
             )
