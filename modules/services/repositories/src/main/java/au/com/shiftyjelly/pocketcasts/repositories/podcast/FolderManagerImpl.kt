@@ -150,6 +150,10 @@ class FolderManagerImpl @Inject constructor(
         return folderDao.findNotSyncedBlocking()
     }
 
+    override suspend fun findFoldersToSync(): List<Folder> {
+        return folderDao.findNotSynced()
+    }
+
     override suspend fun markAllSynced() {
         folderDao.updateAllSynced()
     }
@@ -208,4 +212,16 @@ class FolderManagerImpl @Inject constructor(
     }
 
     override suspend fun countFolders() = folderDao.count()
+
+    override suspend fun deleteAll(uuids: Collection<String>) {
+        folderDao.deleteAll(uuids)
+    }
+
+    override suspend fun getAll(): List<Folder> {
+        return folderDao.findFolders()
+    }
+
+    override suspend fun upsertAll(folders: Collection<Folder>) {
+        folderDao.upsertAll(folders)
+    }
 }

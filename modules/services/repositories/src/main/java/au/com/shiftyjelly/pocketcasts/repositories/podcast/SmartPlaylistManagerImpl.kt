@@ -253,11 +253,11 @@ class SmartPlaylistManagerImpl @Inject constructor(
         }
     }
 
-    override fun removePodcastFromPlaylistsBlocking(podcastUuid: String) {
+    override suspend fun removePodcastFromPlaylists(podcastUuid: String) {
         if (podcastUuid.isBlank()) {
             return
         }
-        val playlists = findAllBlocking()
+        val playlists = findAll()
         for (playlist in playlists) {
             val podcastUuids = playlist.podcastUuidList.toMutableList()
             if (playlist.allPodcasts || podcastUuids.isEmpty()) {
@@ -269,7 +269,7 @@ class SmartPlaylistManagerImpl @Inject constructor(
 
                 playlist.syncStatus = SmartPlaylist.SYNC_STATUS_NOT_SYNCED
                 playlist.podcastUuidList = podcastUuids
-                playlistDao.updateBlocking(playlist)
+                playlistDao.update(playlist)
             }
         }
     }

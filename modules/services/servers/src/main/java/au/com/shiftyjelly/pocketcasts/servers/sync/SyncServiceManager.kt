@@ -51,6 +51,8 @@ import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.RequestBody.Companion.asRequestBody
 import retrofit2.Response
 import retrofit2.Retrofit
+import com.pocketcasts.service.api.SyncUpdateRequest as SyncUpdateProtoRequest
+import com.pocketcasts.service.api.SyncUpdateResponse as SyncUpdateProtoResponse
 
 /**
  * The only class outside of the server module that should use this class is the
@@ -145,10 +147,16 @@ open class SyncServiceManager @Inject constructor(
         return service.syncUpdate(fields)
     }
 
+    suspend fun syncUpdateOrThrow(token: AccessToken, request: SyncUpdateProtoRequest): SyncUpdateProtoResponse {
+        return service.syncUpdate(token.value, request)
+    }
+
     suspend fun upNextSync(request: UpNextSyncRequest, token: AccessToken): UpNextSyncResponse = service.upNextSync(addBearer(token), request)
 
-    fun getLastSyncAt(token: AccessToken): Single<String> = service.getLastSyncAt(addBearer(token), buildBasicRequest())
+    fun getLastSyncAtRx(token: AccessToken): Single<String> = service.getLastSyncAtRx(addBearer(token), buildBasicRequest())
         .map { response -> response.lastSyncAt ?: "" }
+
+    suspend fun getLastSyncAtOrThrow(token: AccessToken): String = service.getLastSyncAt(addBearer(token), buildBasicRequest()).lastSyncAt ?: ""
 
     suspend fun getHomeFolder(token: AccessToken): UserPodcastListResponse = service.getPodcastList(addBearer(token), userPodcastListRequest)
 

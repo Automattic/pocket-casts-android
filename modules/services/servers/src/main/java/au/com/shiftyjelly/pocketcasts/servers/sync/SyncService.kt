@@ -2,6 +2,7 @@ package au.com.shiftyjelly.pocketcasts.servers.sync
 
 import au.com.shiftyjelly.pocketcasts.models.to.HistorySyncRequest
 import au.com.shiftyjelly.pocketcasts.models.to.HistorySyncResponse
+import au.com.shiftyjelly.pocketcasts.preferences.AccessToken
 import au.com.shiftyjelly.pocketcasts.servers.sync.forgotpassword.ForgotPasswordRequest
 import au.com.shiftyjelly.pocketcasts.servers.sync.forgotpassword.ForgotPasswordResponse
 import au.com.shiftyjelly.pocketcasts.servers.sync.history.HistoryYearResponse
@@ -43,6 +44,8 @@ import retrofit2.http.PUT
 import retrofit2.http.Path
 import retrofit2.http.Query
 import retrofit2.http.Url
+import com.pocketcasts.service.api.SyncUpdateRequest as SyncUpdateProtoRequest
+import com.pocketcasts.service.api.SyncUpdateResponse as SyncUpdateProtoResponse
 
 interface SyncService {
     @POST("/user/login_pocket_casts")
@@ -79,11 +82,18 @@ interface SyncService {
     @POST("/sync/update")
     suspend fun syncUpdate(@FieldMap fields: Map<String, String>): au.com.shiftyjelly.pocketcasts.servers.sync.update.SyncUpdateResponse
 
+    @Headers("Content-Type: application/octet-stream")
+    @POST("/sync/update")
+    suspend fun syncUpdate(@Header("Authorization") authorization: String, request: SyncUpdateProtoRequest): SyncUpdateProtoResponse
+
     @POST("/up_next/sync")
     suspend fun upNextSync(@Header("Authorization") authorization: String, @Body request: UpNextSyncRequest): UpNextSyncResponse
 
     @POST("/user/last_sync_at")
-    fun getLastSyncAt(@Header("Authorization") authorization: String, @Body request: BasicRequest): Single<LastSyncAtResponse>
+    fun getLastSyncAtRx(@Header("Authorization") authorization: String, @Body request: BasicRequest): Single<LastSyncAtResponse>
+
+    @POST("/user/last_sync_at")
+    suspend fun getLastSyncAt(@Header("Authorization") authorization: String, @Body request: BasicRequest): LastSyncAtResponse
 
     @POST("/user/podcast/episodes")
     fun getPodcastEpisodes(@Header("Authorization") authorization: String, @Body request: PodcastEpisodesRequest): Single<PodcastEpisodesResponse>

@@ -776,11 +776,9 @@ class EpisodeManagerImpl @Inject constructor(
         episodeDao.deleteAll()
     }
 
-    override fun deleteEpisodes(episodes: List<PodcastEpisode>, playbackManager: PlaybackManager) {
+    override suspend fun deleteEpisodes(episodes: List<PodcastEpisode>, playbackManager: PlaybackManager) {
         val episodesCopy = episodes.toList()
-        launch {
-            deleteEpisodeFiles(episodesCopy, playbackManager)
-        }
+        deleteEpisodeFiles(episodesCopy, playbackManager)
     }
 
     override suspend fun deleteEpisodeFiles(episodes: List<PodcastEpisode>, playbackManager: PlaybackManager, removeFromUpNext: Boolean) = withContext(Dispatchers.IO) {
