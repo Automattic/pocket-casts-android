@@ -83,8 +83,8 @@ interface SyncService {
     suspend fun syncUpdate(@FieldMap fields: Map<String, String>): au.com.shiftyjelly.pocketcasts.servers.sync.update.SyncUpdateResponse
 
     @Headers("Content-Type: application/octet-stream")
-    @POST("/sync/update")
-    suspend fun syncUpdate(@Header("Authorization") authorization: String, request: SyncUpdateProtoRequest): SyncUpdateProtoResponse
+    @POST("/user/sync/update")
+    suspend fun syncUpdate(@Header("Authorization") authorization: String, @Body request: SyncUpdateProtoRequest): SyncUpdateProtoResponse
 
     @POST("/up_next/sync")
     suspend fun upNextSync(@Header("Authorization") authorization: String, @Body request: UpNextSyncRequest): UpNextSyncResponse

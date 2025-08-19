@@ -3,6 +3,7 @@ package au.com.shiftyjelly.pocketcasts.repositories.sync.data
 import au.com.shiftyjelly.pocketcasts.models.entity.Folder
 import au.com.shiftyjelly.pocketcasts.models.type.PodcastsSortType
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.FolderManager
+import au.com.shiftyjelly.pocketcasts.repositories.sync.SyncManager
 import au.com.shiftyjelly.pocketcasts.servers.extensions.toDate
 import au.com.shiftyjelly.pocketcasts.servers.extensions.toTimestamp
 import com.pocketcasts.service.api.PodcastFolder
@@ -13,6 +14,7 @@ import com.pocketcasts.service.api.record
 import com.pocketcasts.service.api.syncUserFolder
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import timber.log.Timber
 
 internal class FoldersSync(
     private val folderManager: FolderManager,

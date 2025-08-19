@@ -148,7 +148,7 @@ open class SyncServiceManager @Inject constructor(
     }
 
     suspend fun syncUpdateOrThrow(token: AccessToken, request: SyncUpdateProtoRequest): SyncUpdateProtoResponse {
-        return service.syncUpdate(token.value, request)
+        return service.syncUpdate(addBearer(token), request)
     }
 
     suspend fun upNextSync(request: UpNextSyncRequest, token: AccessToken): UpNextSyncResponse = service.upNextSync(addBearer(token), request)

@@ -5,6 +5,7 @@ import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.FolderManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
 import au.com.shiftyjelly.pocketcasts.repositories.sync.SyncManager
+import au.com.shiftyjelly.pocketcasts.servers.sync.SyncSettingsTask
 import com.pocketcasts.service.api.Record
 import com.pocketcasts.service.api.folderOrNull
 import com.pocketcasts.service.api.podcastOrNull
@@ -25,37 +26,37 @@ class DataSyncProcess(
     private val podcastSync = PodcastSync(podcastManager, playbackManager)
     private val folderSync = FoldersSync(folderManager)
 
-    suspend fun sync() {
-        runCatching {
-            if (!syncManager.isLoggedIn()) {
-                Timber.d("Delete marked playlists")
-                return
-            }
+    suspend fun sync(): Result<Unit> {
+        if (!syncManager.isLoggedIn()) {
+            Timber.d("Delete marked playlists")
+            return Result.success(Unit)
+        }
 
+        return runCatching {
             val lastSyncTime = getLastSyncTime()
-            syncData(lastSyncTime)
-            Timber.d("Sync settings")
+            val newSyncTime = syncData(lastSyncTime)
+            syncSettings(lastSyncTime)
             Timber.d("Sync cloud files")
             Timber.d("Sync broken files")
             Timber.d("Sync playback history")
             Timber.d("Sync podcast ratings")
+            settings.setLastModified(newSyncTime.toString())
         }
     }
 
-    private suspend fun syncData(lastSyncTime: Instant) {
+    private suspend fun syncData(lastSyncTime: Instant): Instant {
         val isInitialSync = lastSyncTime == Instant.EPOCH
-        if (isInitialSync) {
+        return if (isInitialSync) {
             syncFullData()
-        } else if (settings.getHomeGridNeedsRefresh()) {
-            Timber.d("Sync home grid")
-        }
-        Timber.d("Sync up next")
-        if (!isInitialSync) {
+        } else {
+            if (settings.getHomeGridNeedsRefresh()) {
+                Timber.d("Sync home grid")
+            }
             syncIncrementalData(lastSyncTime)
         }
     }
 
-    private suspend fun syncFullData() {
+    private suspend fun syncFullData(): Instant {
         val lastSyncAt = syncManager.getLastSyncAtOrThrow()
 
         Timber.d("Sync stats")
@@ -65,10 +66,10 @@ class DataSyncProcess(
         Timber.d("Sync playlists")
         Timber.d("Sync bookmarks")
 
-        settings.setLastModified(lastSyncAt)
+        return runCatching { Instant.parse(lastSyncAt) }.getOrDefault(Instant.now())
     }
 
-    private suspend fun syncIncrementalData(lastSyncTime: Instant) {
+    private suspend fun syncIncrementalData(lastSyncTime: Instant): Instant {
         val request = coroutineScope {
             syncUpdateRequest {
                 deviceUtcTimeMs = System.currentTimeMillis()
@@ -86,6 +87,11 @@ class DataSyncProcess(
         val records = response.recordsList
         podcastSync.processIncrementalResponse(records.mapNotNull(Record::podcastOrNull))
         folderSync.processIncrementalResponse(records.mapNotNull(Record::folderOrNull))
+        return Instant.ofEpochMilli(response.lastModified)
+    }
+
+    private suspend fun syncSettings(lastSyncTime: Instant) {
+        SyncSettingsTask.run(settings, lastSyncTime, syncManager)
     }
 
     private fun getLastSyncTime() = runCatching {
