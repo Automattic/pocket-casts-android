@@ -2,11 +2,13 @@ package au.com.shiftyjelly.pocketcasts.repositories.sync.data
 
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
+import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.FolderManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
 import au.com.shiftyjelly.pocketcasts.repositories.sync.SyncManager
 import au.com.shiftyjelly.pocketcasts.servers.sync.SyncSettingsTask
 import com.pocketcasts.service.api.Record
+import com.pocketcasts.service.api.episodeOrNull
 import com.pocketcasts.service.api.folderOrNull
 import com.pocketcasts.service.api.podcastOrNull
 import com.pocketcasts.service.api.syncUpdateRequest
@@ -21,11 +23,13 @@ class DataSyncProcess(
     private val syncManager: SyncManager,
     private val podcastManager: PodcastManager,
     private val folderManager: FolderManager,
+    private val episodeManager: EpisodeManager,
     private val playbackManager: PlaybackManager,
     private val settings: Settings,
 ) {
     private val podcastSync = PodcastSync(podcastManager, playbackManager, missingPodcastsSemaphore = Semaphore(permits = 10))
     private val folderSync = FoldersSync(folderManager)
+    private val episodeSync = EpisodeSync(episodeManager, podcastManager, playbackManager, settings)
 
     suspend fun sync(): Result<Unit> {
         if (!syncManager.isLoggedIn()) {
@@ -80,12 +84,14 @@ class DataSyncProcess(
                     listOf(
                         async { podcastSync.incrementalData() },
                         async { folderSync.incrementalData() },
+                        async { episodeSync.incrementalData() },
                     ).awaitAll().flatten(),
                 )
             }
         }
         val response = syncManager.syncUpdateOrThrow(request)
         val records = response.recordsList
+        episodeSync.processIncrementalResponse(records.mapNotNull(Record::episodeOrNull))
         podcastSync.processIncrementalResponse(records.mapNotNull(Record::podcastOrNull))
         folderSync.processIncrementalResponse(records.mapNotNull(Record::folderOrNull))
         return Instant.ofEpochMilli(response.lastModified)
