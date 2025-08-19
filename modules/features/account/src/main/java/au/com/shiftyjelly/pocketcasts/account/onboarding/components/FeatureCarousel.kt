@@ -95,7 +95,7 @@ fun FeatureCarousel(
             }
             Box(
                 modifier = Modifier
-                    .fillMaxWidth(.2f)
+                    .fillMaxWidth(.5f)
                     .fillMaxHeight()
                     .align(Alignment.CenterStart)
                     .clickable(
@@ -109,7 +109,7 @@ fun FeatureCarousel(
             )
             Box(
                 modifier = Modifier
-                    .fillMaxWidth(.2f)
+                    .fillMaxWidth(.5f)
                     .fillMaxHeight()
                     .align(Alignment.CenterEnd)
                     .clickable(
