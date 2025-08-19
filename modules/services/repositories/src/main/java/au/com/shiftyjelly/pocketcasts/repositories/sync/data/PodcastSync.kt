@@ -24,39 +24,45 @@ import com.pocketcasts.service.api.subscribedOrNull
 import com.pocketcasts.service.api.syncUserPodcast
 import java.util.Date
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.async
-import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.sync.Semaphore
+import kotlinx.coroutines.sync.withPermit
 import kotlinx.coroutines.withContext
 
 internal class PodcastSync(
     private val podcastManager: PodcastManager,
     private val playbackManager: PlaybackManager,
 ) {
+    private val semaphore = Semaphore(permits = 10)
+
     suspend fun fullSync(serverPodcasts: List<UserPodcastResponse>) {
+        val localPodcasts = podcastManager.findSubscribedNoOrder()
+        val serverPodcastMap = serverPodcasts.associateBy(UserPodcastResponse::getUuid)
+        val localPodcastMap = localPodcasts.associateBy(Podcast::uuid)
+
+        val serverMissingUuids = localPodcastMap.keys - serverPodcastMap.keys
+        podcastManager.markAllPodcastsUnsynced(serverMissingUuids)
+
+        val localMissingUuids = serverPodcastMap.keys - localPodcastMap.keys
+
         coroutineScope {
-            val localPodcasts = podcastManager.findSubscribedNoOrder()
-            val serverPodcastMap = serverPodcasts.associateBy(UserPodcastResponse::getUuid)
-            val localPodcastMap = localPodcasts.associateBy(Podcast::uuid)
-
-            val serverMissingUuids = localPodcastMap.keys - serverPodcastMap.keys
-            podcastManager.markAllPodcastsUnsynced(serverMissingUuids)
-
-            val localMissingUuids = serverPodcastMap.keys - localPodcastMap.keys
-            localMissingUuids
-                .mapNotNull(serverPodcastMap::get)
-                .map { serverPodcasts -> async { syncPodcast(serverPodcasts) } }
-                .awaitAll()
-
-            val existingUuids = localPodcastMap.keys.intersect(serverPodcastMap.keys)
-            existingUuids.forEach { uuid ->
-                val localPodcast = localPodcastMap[uuid]
-                val serverPodcast = serverPodcastMap[uuid]
-                if (serverPodcast != null && localPodcast != null) {
-                    localPodcast.applyServerPodcast(serverPodcast)
-                    podcastManager.updatePodcast(localPodcast)
+            localMissingUuids.mapNotNull(serverPodcastMap::get).forEach { serverPodcast ->
+                launch {
+                    semaphore.withPermit {
+                        syncPodcast(serverPodcast)
+                    }
                 }
+            }
+        }
+
+        val existingUuids = localPodcastMap.keys.intersect(serverPodcastMap.keys)
+        existingUuids.forEach { uuid ->
+            val localPodcast = localPodcastMap[uuid]
+            val serverPodcast = serverPodcastMap[uuid]
+            if (serverPodcast != null && localPodcast != null) {
+                localPodcast.applyServerPodcast(serverPodcast)
+                podcastManager.updatePodcast(localPodcast)
             }
         }
     }
