@@ -2,10 +2,14 @@ package au.com.shiftyjelly.pocketcasts.account.onboarding
 
 import androidx.activity.SystemBarStyle
 import androidx.activity.compose.BackHandler
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.ime
 import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.padding
@@ -18,13 +22,20 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalView
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
+import au.com.shiftyjelly.pocketcasts.account.onboarding.components.ContinueWithGoogleButton
+import au.com.shiftyjelly.pocketcasts.account.viewmodel.GoogleSignInState
 import au.com.shiftyjelly.pocketcasts.account.viewmodel.OnboardingCreateAccountViewModel
 import au.com.shiftyjelly.pocketcasts.compose.AppThemeWithBackground
 import au.com.shiftyjelly.pocketcasts.compose.CallOnce
@@ -34,12 +45,105 @@ import au.com.shiftyjelly.pocketcasts.compose.bars.custom
 import au.com.shiftyjelly.pocketcasts.compose.bars.transparent
 import au.com.shiftyjelly.pocketcasts.compose.buttons.RowButton
 import au.com.shiftyjelly.pocketcasts.compose.components.EmailAndPasswordFields
+import au.com.shiftyjelly.pocketcasts.compose.components.TextH10
 import au.com.shiftyjelly.pocketcasts.compose.components.TextP40
+import au.com.shiftyjelly.pocketcasts.compose.components.TextP50
 import au.com.shiftyjelly.pocketcasts.compose.preview.ThemePreviewParameterProvider
 import au.com.shiftyjelly.pocketcasts.compose.theme
+import au.com.shiftyjelly.pocketcasts.models.type.Subscription
+import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingFlow
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.views.helper.UiUtil
+import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
+
+@Composable
+internal fun NewOnboardingCreateAccountPage(
+    theme: Theme.ThemeType,
+    flow: OnboardingFlow,
+    onBackPress: () -> Unit,
+    onSkip: () -> Unit,
+    onCreateAccount: () -> Unit,
+    onUpdateSystemBars: (SystemBarsStyles) -> Unit,
+    onContinueWithGoogleComplete: (GoogleSignInState, Subscription?) -> Unit,
+    modifier: Modifier = Modifier,
+    viewModel: OnboardingCreateAccountViewModel = hiltViewModel(),
+) {
+    val state by viewModel.stateFlow.collectAsState()
+
+    val pocketCastsTheme = MaterialTheme.theme
+
+    CallOnce {
+        viewModel.onShown()
+    }
+
+    LaunchedEffect(onUpdateSystemBars) {
+        // Use secondaryUI01 so the status bar matches the ThemedTopAppBar
+        val statusBar = SystemBarStyle.custom(pocketCastsTheme.colors.secondaryUi01, theme.toolbarLightIcons)
+        val navigationBar = SystemBarStyle.transparent { theme.darkTheme }
+        onUpdateSystemBars(SystemBarsStyles(statusBar, navigationBar))
+    }
+
+    BackHandler {
+        viewModel.onBackPressed()
+        onBackPress()
+    }
+
+    Column(
+        modifier = modifier
+            .windowInsetsPadding(WindowInsets.statusBars)
+            .windowInsetsPadding(WindowInsets.navigationBars)
+            .windowInsetsPadding(WindowInsets.ime)
+            .padding(vertical = 16.dp)
+            .fillMaxHeight()
+            .verticalScroll(rememberScrollState()),
+    ) {
+        TextP40(
+            fontSize = 17.sp,
+            modifier = Modifier
+                .align(Alignment.End)
+                .padding(horizontal = 24.dp)
+                .clickable(onClick = onSkip),
+            text = stringResource(LR.string.not_now),
+            color = MaterialTheme.theme.colors.primaryInteractive01,
+        )
+        Spacer(modifier = Modifier.height(8.dp))
+        TextH10(
+            modifier = Modifier.padding(horizontal = 24.dp),
+            text = stringResource(LR.string.onboarding_create_account_title),
+            color = MaterialTheme.theme.colors.primaryText01,
+            textAlign = TextAlign.Center,
+        )
+        Spacer(modifier = Modifier.height(12.dp))
+        TextP50(
+            modifier = Modifier.padding(horizontal = 24.dp),
+            text = stringResource(LR.string.onboarding_create_account_message),
+            color = MaterialTheme.theme.colors.primaryText02,
+            textAlign = TextAlign.Center,
+        )
+        Spacer(modifier = Modifier.weight(1f))
+        Image(
+            contentDescription = null,
+            painter = painterResource(IR.drawable.artwork_create_account),
+            modifier = Modifier.fillMaxWidth(),
+            contentScale = ContentScale.FillWidth,
+        )
+        Spacer(modifier = Modifier.weight(2f))
+        if (viewModel.showGoogleSignUp) {
+            ContinueWithGoogleButton(
+                flow = flow,
+                onComplete = onContinueWithGoogleComplete,
+            )
+        }
+        RowButton(
+            text = stringResource(LR.string.onboarding_create_account_sign_up_email),
+            enabled = state.enableSubmissionFields,
+            onClick = onCreateAccount,
+            includePadding = false,
+            modifier = Modifier.padding(horizontal = 16.dp),
+        )
+    }
+}
 
 @Composable
 internal fun OnboardingCreateAccountPage(

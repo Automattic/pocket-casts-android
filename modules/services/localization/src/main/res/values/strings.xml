@@ -2594,4 +2594,8 @@
     <string name="onboarding_login_forgot_password">I forgot my password</string>
     <string name="onboarding_login_continue_with_email">Continue with email</string>
     <string name="onboarding_login_or">OR</string>
+    <string name="onboarding_create_account_title">Create your Pocket\u00A0Casts account</string>
+    <string name="onboarding_create_account_message">Your podcasts, always in sync. Keep your library safe, and enjoy Pocket\u00A0Casts on web and desktop.</string>
+    <string name="onboarding_create_account_sign_up_email">Sign up with email</string>
+    <string name="onboarding_create_account_sign_up_google">Sign up with Google</string>
 </resources>
