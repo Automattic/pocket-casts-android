@@ -11,11 +11,12 @@ import au.com.shiftyjelly.pocketcasts.models.type.SmartRules.MediaTypeRule
 import au.com.shiftyjelly.pocketcasts.models.type.SmartRules.PodcastsRule
 import au.com.shiftyjelly.pocketcasts.models.type.SmartRules.ReleaseDateRule
 import au.com.shiftyjelly.pocketcasts.models.type.SmartRules.StarredRule
-import au.com.shiftyjelly.pocketcasts.playlists.create.CreatePlaylistViewModel.UiState
-import au.com.shiftyjelly.pocketcasts.playlists.edit.SmartRulesEditor
-import au.com.shiftyjelly.pocketcasts.playlists.rules.AppliedRules
-import au.com.shiftyjelly.pocketcasts.playlists.rules.RuleType
-import au.com.shiftyjelly.pocketcasts.playlists.rules.RulesBuilder
+import au.com.shiftyjelly.pocketcasts.playlists.CreatePlaylistViewModel
+import au.com.shiftyjelly.pocketcasts.playlists.CreatePlaylistViewModel.UiState
+import au.com.shiftyjelly.pocketcasts.playlists.smart.rules.AppliedRules
+import au.com.shiftyjelly.pocketcasts.playlists.smart.rules.RuleType
+import au.com.shiftyjelly.pocketcasts.playlists.smart.rules.RulesBuilder
+import au.com.shiftyjelly.pocketcasts.playlists.smart.rules.SmartRulesEditor
 import au.com.shiftyjelly.pocketcasts.preferences.UserSetting
 import au.com.shiftyjelly.pocketcasts.preferences.model.ArtworkConfiguration
 import au.com.shiftyjelly.pocketcasts.repositories.playlist.SmartPlaylistDraft

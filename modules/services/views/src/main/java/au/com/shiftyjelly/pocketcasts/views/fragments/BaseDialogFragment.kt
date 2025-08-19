@@ -32,14 +32,17 @@ import au.com.shiftyjelly.pocketcasts.ui.helper.FragmentHostListener
 import au.com.shiftyjelly.pocketcasts.ui.helper.NavigationBarColor
 import au.com.shiftyjelly.pocketcasts.ui.helper.StatusBarIconColor
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
+import au.com.shiftyjelly.pocketcasts.utils.extensions.pxToDp
 import au.com.shiftyjelly.pocketcasts.views.R
 import au.com.shiftyjelly.pocketcasts.views.extensions.setSystemWindowInsetToPadding
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
+import com.google.android.material.bottomsheet.ViewPager2AwareBottomSheetBehavior
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 import kotlin.coroutines.CoroutineContext
+import kotlin.math.roundToInt
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 
@@ -168,6 +171,29 @@ open class BaseDialogFragment :
         @ColorInt color: Int,
     ) {
         bottomSheetView()?.backgroundTintList = ColorStateList.valueOf(color)
+    }
+
+    protected fun setPreFlingThreshold(thresholdDp: Int) {
+        bottomSheetView()
+            ?.let { BottomSheetBehavior.from(it) as? ViewPager2AwareBottomSheetBehavior }
+            ?.let { behavior ->
+                behavior.setPreFlingInterceptor(
+                    object : ViewPager2AwareBottomSheetBehavior.PreFlingInterceptor {
+                        override fun shouldInterceptFlingGesture(velocityX: Float, velocityY: Float): Boolean {
+                            val view = view ?: return false
+                            val offsetPx = (view.height * (1f - behavior.calculateSlideOffset())).roundToInt()
+                            val offsetDp = offsetPx.pxToDp(requireContext())
+                            return offsetDp < thresholdDp
+                        }
+
+                        override fun onFlingIntercepted(velocityX: Float, velocityY: Float) {
+                            view?.post {
+                                behavior.state = BottomSheetBehavior.STATE_EXPANDED
+                            }
+                        }
+                    },
+                )
+            }
     }
 
     @Suppress("ktlint:compose:modifier-not-used-at-root")
