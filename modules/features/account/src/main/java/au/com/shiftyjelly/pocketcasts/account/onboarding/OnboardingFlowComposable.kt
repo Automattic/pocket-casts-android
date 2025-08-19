@@ -92,7 +92,7 @@ private fun Content(
         is OnboardingFlow.InitialOnboarding,
         is OnboardingFlow.EngageSdk,
         is OnboardingFlow.ReferralLoginOrSignUp,
-            -> OnboardingNavRoute.LOG_IN_OR_SIGN_UP
+        -> OnboardingNavRoute.LOG_IN_OR_SIGN_UP
 
         // Cannot use OnboardingNavRoute.PlusUpgrade.routeWithSource here, it is set as a defaultValue in the PlusUpgrade composable,
         // see https://stackoverflow.com/a/70410872/1910286
@@ -101,7 +101,7 @@ private fun Content(
         is OnboardingFlow.Upsell,
         is OnboardingFlow.UpsellSuggestedFolder,
         is OnboardingFlow.NewOnboardingAccountUpgrade,
-            -> OnboardingNavRoute.PlusUpgrade.ROUTE
+        -> OnboardingNavRoute.PlusUpgrade.ROUTE
 
         is OnboardingFlow.Welcome -> OnboardingNavRoute.WELCOME
 
@@ -214,14 +214,13 @@ private fun Content(
 
         composable(OnboardingNavRoute.LOG_IN_OR_SIGN_UP) {
             if (FeatureFlag.isEnabled(Feature.NEW_ONBOARDING_ACCOUNT_CREATION)) {
-                AppThemeWithBackground(Theme.ThemeType.LIGHT) {
-                    NewOnboardingGetStartedPage(
-                        flow = flow,
-                        onGetStartedClick = { navController.navigate(OnboardingNavRoute.CREATE_FREE_ACCOUNT) },
-                        onLoginClick = { navController.navigate(OnboardingNavRoute.LOG_IN) },
-                        onUpdateSystemBars = onUpdateSystemBars,
-                    )
-                }
+                NewOnboardingGetStartedPage(
+                    displayTheme = theme,
+                    flow = flow,
+                    onGetStartedClick = { navController.navigate(OnboardingNavRoute.CREATE_FREE_ACCOUNT) },
+                    onLoginClick = { navController.navigate(OnboardingNavRoute.LOG_IN) },
+                    onUpdateSystemBars = onUpdateSystemBars,
+                )
             } else {
                 OnboardingLoginOrSignUpPage(
                     theme = theme,
@@ -232,14 +231,14 @@ private fun Content(
                             is OnboardingFlow.PlusAccountUpgrade,
                             is OnboardingFlow.PatronAccountUpgrade,
                             is OnboardingFlow.Welcome,
-                                -> error("Account upgrade flow tried to present LoginOrSignupPage")
+                            -> error("Account upgrade flow tried to present LoginOrSignupPage")
 
                             is OnboardingFlow.AccountEncouragement,
                             is OnboardingFlow.PlusAccountUpgradeNeedsLogin,
                             is OnboardingFlow.Upsell,
                             is OnboardingFlow.UpsellSuggestedFolder,
                             is OnboardingFlow.NewOnboardingAccountUpgrade,
-                                -> {
+                            -> {
                                 val popped = navController.popBackStack()
                                 if (!popped) {
                                     exitOnboarding(OnboardingExitInfo.Simple)
@@ -250,7 +249,7 @@ private fun Content(
                             is OnboardingFlow.LoggedOut,
                             is OnboardingFlow.EngageSdk,
                             is OnboardingFlow.ReferralLoginOrSignUp,
-                                -> exitOnboarding(OnboardingExitInfo.Simple)
+                            -> exitOnboarding(OnboardingExitInfo.Simple)
                         }
                     },
                     onSignUpClick = { navController.navigate(OnboardingNavRoute.CREATE_FREE_ACCOUNT) },
@@ -278,16 +277,23 @@ private fun Content(
 
         composable(OnboardingNavRoute.LOG_IN) {
             if (FeatureFlag.isEnabled(Feature.NEW_ONBOARDING_ACCOUNT_CREATION)) {
-                AppThemeWithBackground(Theme.ThemeType.LIGHT) {
-                    NewOnboardingLoginPage(
-                        onBackPress = { navController.popBackStack() },
-                        onLoginComplete = { subscription ->
+                NewOnboardingLoginPage(
+                    theme = theme,
+                    flow = flow,
+                    onBackPress = { navController.popBackStack() },
+                    onLoginComplete = { subscription ->
+                        onLoginToExistingAccount(flow, subscription, exitOnboarding, navController)
+                    },
+                    onForgotPasswordClick = { navController.navigate(OnboardingNavRoute.FORGOT_PASSWORD) },
+                    onUpdateSystemBars = onUpdateSystemBars,
+                    onContinueWithGoogleComplete = { state, subscription ->
+                        if (state.isNewAccount) {
+                            onAccountCreated()
+                        } else {
                             onLoginToExistingAccount(flow, subscription, exitOnboarding, navController)
-                        },
-                        onForgotPasswordClick = { navController.navigate(OnboardingNavRoute.FORGOT_PASSWORD) },
-                        onUpdateSystemBars = onUpdateSystemBars,
-                    )
-                }
+                        }
+                    },
+                )
             } else {
                 OnboardingLoginPage(
                     theme = theme,
@@ -322,7 +328,7 @@ private fun Content(
                         is OnboardingFlow.Upsell,
                         is OnboardingFlow.UpsellSuggestedFolder,
                         is OnboardingFlow.NewOnboardingAccountUpgrade,
-                            -> {
+                        -> {
                             defaultValue = flow.source
                         }
 
@@ -334,7 +340,7 @@ private fun Content(
                         is OnboardingFlow.PlusAccountUpgradeNeedsLogin,
                         is OnboardingFlow.ReferralLoginOrSignUp,
                         is OnboardingFlow.Welcome,
-                            -> Unit
+                        -> Unit
                     }
                 },
                 navArgument(OnboardingNavRoute.PlusUpgrade.FORCE_PURCHASE_ARGUMENT_KEY) {
@@ -377,7 +383,7 @@ private fun Content(
                 OnboardingUpgradeSource.GENERATED_TRANSCRIPTS,
                 OnboardingUpgradeSource.DEEP_LINK,
                 OnboardingUpgradeSource.UNKNOWN,
-                    -> false
+                -> false
 
                 OnboardingUpgradeSource.RECOMMENDATIONS -> true
             }
@@ -443,7 +449,7 @@ private fun onLoginToExistingAccount(
         is OnboardingFlow.InitialOnboarding,
         is OnboardingFlow.LoggedOut,
         is OnboardingFlow.EngageSdk,
-            -> exitOnboarding(OnboardingExitInfo.ShowPlusPromotion)
+        -> exitOnboarding(OnboardingExitInfo.ShowPlusPromotion)
 
         is OnboardingFlow.ReferralLoginOrSignUp -> exitOnboarding(OnboardingExitInfo.Simple)
 
@@ -456,7 +462,7 @@ private fun onLoginToExistingAccount(
         is OnboardingFlow.Upsell,
         is OnboardingFlow.UpsellSuggestedFolder,
         is OnboardingFlow.NewOnboardingAccountUpgrade,
-            -> {
+        -> {
             if (subscription == null) {
                 navController.navigate(OnboardingNavRoute.PlusUpgrade.routeWithSource(OnboardingUpgradeSource.LOGIN)) {
                     // clear backstack after successful login
