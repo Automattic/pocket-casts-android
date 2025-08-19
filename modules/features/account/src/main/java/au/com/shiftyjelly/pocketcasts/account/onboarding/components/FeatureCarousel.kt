@@ -47,15 +47,15 @@ import kotlinx.coroutines.selects.select
 
 private const val CAROUSEL_ITEM_COUNT = 3
 private val DISAPPEAR_DELAY = 300.milliseconds
+private val ITEM_SHOW_DURATION = 7.seconds
 
 @Composable
 fun FeatureCarousel(
     modifier: Modifier = Modifier,
 ) {
-    val delayBetweenCycles = 4.seconds
     val (activeItem, sendEvent) = carouselCoordinator(
         cycleRange = 0 until CAROUSEL_ITEM_COUNT,
-        delayBetweenCycles = delayBetweenCycles,
+        timeBetweenCycles = ITEM_SHOW_DURATION,
         isPerpetual = false,
         disappearDuration = DISAPPEAR_DELAY,
     )
@@ -66,7 +66,7 @@ fun FeatureCarousel(
         CarouselActiveItemIndicatorBar(
             itemCount = CAROUSEL_ITEM_COUNT,
             activeItemIndex = activeItem.value.selectedIndex,
-            pageDuration = delayBetweenCycles,
+            pageShowDuration = ITEM_SHOW_DURATION,
         )
         Box {
             Crossfade(
@@ -140,7 +140,7 @@ data class CarouselState(
 fun carouselCoordinator(
     cycleRange: IntRange,
     disappearDuration: Duration,
-    delayBetweenCycles: Duration = 3.seconds,
+    timeBetweenCycles: Duration = 3.seconds,
     isPerpetual: Boolean = true,
 ): Pair<State<CarouselState>, (CarouselEvent) -> Unit> {
     val scope = rememberCoroutineScope()
@@ -149,7 +149,7 @@ fun carouselCoordinator(
     val state = produceState(
         initialValue = CarouselState(cycleRange.first, isAppearing = true),
         cycleRange,
-        delayBetweenCycles,
+        timeBetweenCycles,
         isPerpetual,
         disappearDuration,
     ) {
@@ -157,7 +157,7 @@ fun carouselCoordinator(
 
         while (isActive) {
             val event: CarouselEvent? = select {
-                onTimeout(delayBetweenCycles) { CarouselEvent.Next }
+                onTimeout(timeBetweenCycles) { CarouselEvent.Next }
                 events.onReceive {
                     it
                 }
@@ -213,17 +213,17 @@ fun carouselCoordinator(
 private fun CarouselActiveItemIndicatorBar(
     itemCount: Int,
     activeItemIndex: Int,
-    pageDuration: Duration,
+    pageShowDuration: Duration,
     modifier: Modifier = Modifier,
 ) {
     var progressPercentAnim by remember(activeItemIndex) { mutableStateOf(Animatable(0f)) }
 
-    LaunchedEffect(progressPercentAnim, pageDuration) {
+    LaunchedEffect(progressPercentAnim, pageShowDuration) {
         progressPercentAnim.animateTo(
             targetValue = 1f,
             animationSpec = tween(
                 easing = LinearEasing,
-                durationMillis = pageDuration.inWholeMilliseconds.toInt(),
+                durationMillis = pageShowDuration.inWholeMilliseconds.toInt(),
             ),
         )
     }
