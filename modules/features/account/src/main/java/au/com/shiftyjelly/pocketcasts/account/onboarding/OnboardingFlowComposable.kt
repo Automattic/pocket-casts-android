@@ -136,12 +136,20 @@ private fun Content(
                 if (flow.source in forcedPurchaseSources) {
                     goToUpsell()
                 } else {
-                    goBack()
+                    if (FeatureFlag.isEnabled(Feature.NEW_ONBOARDING_ACCOUNT_CREATION)) {
+                        exitOnboarding(OnboardingExitInfo.ShowPlusPromotion)
+                    } else {
+                        goBack()
+                    }
                 }
             }
 
             else -> {
-                goBack()
+                if (FeatureFlag.isEnabled(Feature.NEW_ONBOARDING_ACCOUNT_CREATION)) {
+                    exitOnboarding(OnboardingExitInfo.ShowPlusPromotion)
+                } else {
+                    goBack()
+                }
             }
         }
     }
@@ -163,13 +171,17 @@ private fun Content(
             flow = flow,
             onBackPress = { exitOnboarding(OnboardingExitInfo.Simple) },
             onComplete = {
-                navController.navigate(
-                    if (signInState.isSignedInAsPlusOrPatron) {
-                        OnboardingNavRoute.WELCOME
-                    } else {
-                        OnboardingNavRoute.PlusUpgrade.routeWithSource(OnboardingUpgradeSource.RECOMMENDATIONS)
-                    },
-                )
+                if (FeatureFlag.isEnabled(Feature.NEW_ONBOARDING_ACCOUNT_CREATION)) {
+                    navController.navigate(OnboardingNavRoute.SIGN_UP)
+                } else {
+                    navController.navigate(
+                        if (signInState.isSignedInAsPlusOrPatron) {
+                            OnboardingNavRoute.WELCOME
+                        } else {
+                            OnboardingNavRoute.PlusUpgrade.routeWithSource(OnboardingUpgradeSource.RECOMMENDATIONS)
+                        },
+                    )
+                }
             },
             navController = navController,
             onUpdateSystemBars = onUpdateSystemBars,
@@ -212,12 +224,30 @@ private fun Content(
             }
         }
 
+        composable(OnboardingNavRoute.SIGN_UP) {
+            NewOnboardingCreateAccountPage(
+                theme = theme,
+                flow = flow,
+                onBackPress = { navController.popBackStack() },
+                onSkip = ::finishOnboardingFlow,
+                onCreateAccount = { navController.navigate(OnboardingNavRoute.CREATE_FREE_ACCOUNT) },
+                onUpdateSystemBars = onUpdateSystemBars,
+                onContinueWithGoogleComplete = { state, subscription ->
+                    if (state.isNewAccount) {
+                        onAccountCreated()
+                    } else {
+                        onLoginToExistingAccount(flow, subscription, exitOnboarding, navController)
+                    }
+                },
+            )
+        }
+
         composable(OnboardingNavRoute.LOG_IN_OR_SIGN_UP) {
             if (FeatureFlag.isEnabled(Feature.NEW_ONBOARDING_ACCOUNT_CREATION)) {
                 NewOnboardingGetStartedPage(
                     displayTheme = theme,
                     flow = flow,
-                    onGetStartedClick = { navController.navigate(OnboardingNavRoute.CREATE_FREE_ACCOUNT) },
+                    onGetStartedClick = { navController.navigate(OnboardingRecommendationsFlow.ROUTE) },
                     onLoginClick = { navController.navigate(OnboardingNavRoute.LOG_IN) },
                     onUpdateSystemBars = onUpdateSystemBars,
                 )
@@ -489,6 +519,7 @@ object OnboardingNavRoute {
     const val LOG_IN = "log_in"
     const val LOG_IN_OR_SIGN_UP = "log_in_or_sign_up"
     const val WELCOME = "welcome"
+    const val SIGN_UP = "sign_up"
 
     object PlusUpgrade {
         private const val ROUTE_BASE = "plus_upgrade"
