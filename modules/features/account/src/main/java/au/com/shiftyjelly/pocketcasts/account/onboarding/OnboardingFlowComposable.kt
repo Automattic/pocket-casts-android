@@ -247,7 +247,13 @@ private fun Content(
                 NewOnboardingGetStartedPage(
                     displayTheme = theme,
                     flow = flow,
-                    onGetStartedClick = { navController.navigate(OnboardingRecommendationsFlow.ROUTE) },
+                    onGetStartedClick = {
+                        if (flow is OnboardingFlow.Upsell || flow is OnboardingFlow.LoggedOut) {
+                            navController.navigate(OnboardingNavRoute.SIGN_UP)
+                        } else {
+                            navController.navigate(OnboardingRecommendationsFlow.ROUTE)
+                        }
+                    },
                     onLoginClick = { navController.navigate(OnboardingNavRoute.LOG_IN) },
                     onUpdateSystemBars = onUpdateSystemBars,
                 )
