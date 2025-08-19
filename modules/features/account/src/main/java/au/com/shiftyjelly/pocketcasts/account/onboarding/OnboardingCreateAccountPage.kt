@@ -133,7 +133,7 @@ internal fun NewOnboardingCreateAccountPage(
             ContinueWithGoogleButton(
                 flow = flow,
                 onComplete = onContinueWithGoogleComplete,
-                label = stringResource(LR.string.onboarding_create_account_sign_up_google)
+                label = stringResource(LR.string.onboarding_create_account_sign_up_google),
             )
         }
         RowButton(

@@ -30,11 +30,11 @@ import au.com.shiftyjelly.pocketcasts.localization.R as LR
 @Composable
 fun ContinueWithGoogleButton(
     flow: OnboardingFlow?,
+    onComplete: (GoogleSignInState, Subscription?) -> Unit,
     fontSize: TextUnit? = null,
     includePadding: Boolean = true,
-    onComplete: (GoogleSignInState, Subscription?) -> Unit,
     viewModel: GoogleSignInButtonViewModel = hiltViewModel(),
-    label: String = stringResource(LR.string.onboarding_continue_with_google)
+    label: String = stringResource(LR.string.onboarding_continue_with_google),
 ) {
     val context = LocalContext.current
 
