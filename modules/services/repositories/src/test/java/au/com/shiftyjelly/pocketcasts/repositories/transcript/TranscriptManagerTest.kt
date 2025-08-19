@@ -372,7 +372,7 @@ private class TestParser(
 private class TestTranscriptService : TranscriptService {
     var shouldThrow = false
 
-    override suspend fun getTranscriptOrThrow(url: String, cacheControl: CacheControl): ResponseBody {
+    override suspend fun getTranscriptOrThrow(url: String, cacheControl: CacheControl?): ResponseBody {
         return if (shouldThrow) {
             error("Test exception")
         } else {
