@@ -16,6 +16,7 @@ import com.pocketcasts.service.api.UserPodcastResponse
 import com.pocketcasts.service.api.autoSkipLastOrNull
 import com.pocketcasts.service.api.autoStartFromOrNull
 import com.pocketcasts.service.api.dateAddedOrNull
+import com.pocketcasts.service.api.episodesSortOrderOrNull
 import com.pocketcasts.service.api.folderUuidOrNull
 import com.pocketcasts.service.api.record
 import com.pocketcasts.service.api.sortPositionOrNull
@@ -89,6 +90,9 @@ internal class PodcastSync(
                         sortPosition = int32Value {
                             value = localPodcast.sortPosition
                         }
+                        episodesSortOrder = int32Value {
+                            value = localPodcast.episodesSortType.serverId
+                        }
                         localPodcast.addedDate?.toTimestamp()?.let { timestamp ->
                             dateAdded = timestamp
                         }
@@ -156,7 +160,7 @@ private fun Podcast.applyServerPodcast(serverPodcast: SyncUserPodcast) = apply {
     serverPodcast.sortPositionOrNull?.value?.let { value ->
         sortPosition = value
     }
-    serverPodcast.episodesSortOrder?.value?.let(EpisodesSortType::fromServerId)?.let { value ->
+    serverPodcast.episodesSortOrderOrNull?.value?.let(EpisodesSortType::fromServerId)?.let { value ->
         episodesSortType = value
     }
     serverPodcast.autoStartFromOrNull?.value?.let { value ->
