@@ -94,7 +94,7 @@ class TranscriptManagerImpl @Inject constructor(
         val (parser, transcript) = parserWithTranscript
         val podcastUuid = episodeManager.findByUuid(transcript.episodeUuid)?.podcastUuid
 
-        return runCatching { transcriptService.getTranscriptOrThrow(transcript.url, CacheControl.FORCE_NETWORK) }
+        return runCatching { transcriptService.getTranscriptOrThrow(transcript.url) }
             .recoverCatching { transcriptService.getTranscriptOrThrow(transcript.url, CacheControl.FORCE_CACHE) }
             .mapCatching { body ->
                 val transcriptEntries = withContext(Dispatchers.Default) {

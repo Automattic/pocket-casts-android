@@ -440,11 +440,14 @@ data class SharingRequest internal constructor(
             .addAnalyticsProperty("year", year.value)
 
         fun transcript(
+            podcastUuid: String?,
             episodeUuid: String,
             episodeTitle: String,
             transcript: String,
         ) = Builder(Data.Transcript(episodeUuid, episodeTitle, transcript))
             .setAnalyticsEvent(AnalyticsEvent.TRANSCRIPT_SHARED)
+            .addAnalyticsProperty("podcast_uuid", podcastUuid.orEmpty())
+            .addAnalyticsProperty("episode_uuid", episodeUuid)
     }
 
     class Builder internal constructor(
