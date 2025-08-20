@@ -10,6 +10,6 @@ interface TranscriptService {
     @GET
     suspend fun getTranscriptOrThrow(
         @Url url: String,
-        @Header("Cache-Control") cacheControl: CacheControl,
+        @Header("Cache-Control") cacheControl: CacheControl? = null,
     ): ResponseBody
 }
