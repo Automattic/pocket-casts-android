@@ -164,6 +164,7 @@ abstract class AppDatabase : RoomDatabase() {
     }
 
     companion object {
+        // https://sqlite.org/limits.html
         const val SQLITE_BIND_ARG_LIMIT = 999
 
         val MIGRATION_45_46 = addMigration(45, 46) { database ->
