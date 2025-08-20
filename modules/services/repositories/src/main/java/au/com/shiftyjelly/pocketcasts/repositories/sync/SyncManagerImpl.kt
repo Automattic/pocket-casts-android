@@ -53,6 +53,7 @@ import com.pocketcasts.service.api.ReferralCodeResponse
 import com.pocketcasts.service.api.ReferralRedemptionResponse
 import com.pocketcasts.service.api.ReferralValidationResponse
 import com.pocketcasts.service.api.SyncUpdateRequest
+import com.pocketcasts.service.api.UserPlaylistListResponse
 import com.pocketcasts.service.api.UserPodcastListResponse
 import com.pocketcasts.service.api.WinbackResponse
 import com.squareup.moshi.Moshi
@@ -363,6 +364,10 @@ class SyncManagerImpl @Inject constructor(
 
     override suspend fun getHomeFolderOrThrow(): UserPodcastListResponse = getCacheTokenOrLogin { token ->
         syncServiceManager.getHomeFolder(token)
+    }
+
+    override suspend fun getPlaylistsOrThrow(): UserPlaylistListResponse = getCacheTokenOrLogin { token ->
+        syncServiceManager.getPlaylists(token)
     }
 
     override fun getPodcastEpisodesRxSingle(podcastUuid: String): Single<PodcastEpisodesResponse> = getCacheTokenOrLoginRxSingle { token ->

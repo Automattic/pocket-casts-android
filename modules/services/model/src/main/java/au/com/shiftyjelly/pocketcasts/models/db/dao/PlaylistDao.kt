@@ -4,7 +4,9 @@ import androidx.room.Dao
 import androidx.room.Query
 import androidx.room.RawQuery
 import androidx.room.RoomRawQuery
+import androidx.room.Transaction
 import androidx.room.Upsert
+import au.com.shiftyjelly.pocketcasts.models.db.AppDatabase
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.SmartPlaylist
@@ -24,10 +26,10 @@ import kotlinx.coroutines.flow.Flow
 @Dao
 abstract class PlaylistDao {
     @Upsert
-    abstract suspend fun upsertSmartPlaylist(playlist: SmartPlaylist)
+    abstract suspend fun upsertPlaylist(playlist: SmartPlaylist)
 
     @Upsert
-    abstract suspend fun upsertSmartPlaylists(playlists: List<SmartPlaylist>)
+    abstract suspend fun upsertAllPlaylists(playlists: List<SmartPlaylist>)
 
     @Query("SELECT uuid FROM smart_playlists ORDER BY sortPosition ASC")
     abstract suspend fun getAllPlaylistUuids(): List<String>
@@ -52,6 +54,19 @@ abstract class PlaylistDao {
     )
     abstract fun observerPlaylistShortcut(): Flow<PlaylistShortcut?>
 
+    @Query("SELECT * FROM smart_playlists WHERE uuid IN (:uuids)")
+    protected abstract suspend fun getAllPlaylistsUnsafe(uuids: Collection<String>): List<SmartPlaylist>
+
+    @Transaction
+    open suspend fun getAllPlaylists(uuids: Collection<String>): List<SmartPlaylist> {
+        return uuids.chunked(AppDatabase.SQLITE_BIND_ARG_LIMIT).flatMap { chunk ->
+            getAllPlaylistsUnsafe(chunk)
+        }
+    }
+
+    @Query("SELECT * FROM smart_playlists WHERE draft = 0 AND manual = 0 AND syncStatus = $SYNC_STATUS_NOT_SYNCED")
+    abstract suspend fun getAllUnsynced(): List<SmartPlaylist>
+
     @Query("UPDATE smart_playlists SET sortPosition = :position, syncStatus = $SYNC_STATUS_NOT_SYNCED WHERE uuid = :uuid")
     abstract suspend fun updateSortPosition(uuid: String, position: Int)
 
@@ -70,10 +85,23 @@ abstract class PlaylistDao {
     @Query("UPDATE smart_playlists SET deleted = 1, syncStatus = $SYNC_STATUS_NOT_SYNCED WHERE uuid = :uuid")
     abstract suspend fun markPlaylistAsDeleted(uuid: String)
 
-    @RawQuery(observedEntities = [Podcast::class, PodcastEpisode::class])
-    protected abstract fun observeEpisodeMetadata(query: RoomRawQuery): Flow<PlaylistEpisodeMetadata>
+    @Query("DELETE FROM smart_playlists WHERE deleted = 1")
+    abstract suspend fun deleteMarkedPlaylists()
 
-    fun observeEpisodeMetadata(
+    @Query("DELETE FROM smart_playlists WHERE uuid IN (:uuids)")
+    protected abstract suspend fun deleteAllUnsafe(uuids: Collection<String>)
+
+    @Transaction
+    open suspend fun deleteAll(uuids: Collection<String>) {
+        uuids.chunked(AppDatabase.SQLITE_BIND_ARG_LIMIT).forEach { chunk ->
+            deleteAllUnsafe(chunk)
+        }
+    }
+
+    @RawQuery(observedEntities = [Podcast::class, PodcastEpisode::class])
+    protected abstract fun observeSmartEpisodeMetadata(query: RoomRawQuery): Flow<PlaylistEpisodeMetadata>
+
+    fun observeSmartEpisodeMetadata(
         clock: Clock,
         smartRules: SmartRules,
     ): Flow<PlaylistEpisodeMetadata> {
@@ -83,7 +111,7 @@ abstract class PlaylistDao {
             orderByClause = null,
             limit = null,
         )
-        return observeEpisodeMetadata(RoomRawQuery(query))
+        return observeSmartEpisodeMetadata(RoomRawQuery(query))
     }
 
     @RawQuery(observedEntities = [Podcast::class, PodcastEpisode::class])

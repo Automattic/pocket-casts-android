@@ -19,6 +19,7 @@ import androidx.work.ListenableWorker
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.deeplink.ShowEpisodeDeepLink
 import au.com.shiftyjelly.pocketcasts.localization.BuildConfig
+import au.com.shiftyjelly.pocketcasts.models.db.AppDatabase
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast.AutoAddUpNext
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
@@ -103,6 +104,7 @@ class RefreshPodcastsThread(
         fun ratingsManager(): RatingsManager
         fun crashLogging(): CrashLogging
         fun analyticsTracker(): AnalyticsTracker
+        fun appDatabase(): AppDatabase
     }
 
     @Volatile
@@ -258,6 +260,7 @@ class RefreshPodcastsThread(
                 episodeManager = entryPoint.episodeManager(),
                 folderManager = entryPoint.folderManager(),
                 playbackManager = entryPoint.playbackManager(),
+                appDatabase = entryPoint.appDatabase(),
                 settings = entryPoint.settings(),
             )
             val result = runBlocking {

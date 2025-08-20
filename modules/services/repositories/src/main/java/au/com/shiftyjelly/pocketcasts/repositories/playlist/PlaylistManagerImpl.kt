@@ -77,7 +77,7 @@ class PlaylistManagerImpl @Inject constructor(
                         limit = PLAYLIST_ARTWORK_EPISODE_LIMIT,
                     )
                     val episodesFlow = observeSmartEpisodes(smartRules, playlist.sortType, episodeSearchTerm)
-                    val metadataFlow = playlistDao.observeEpisodeMetadata(
+                    val metadataFlow = playlistDao.observeSmartEpisodeMetadata(
                         clock = clock,
                         smartRules = smartRules,
                     )
@@ -115,7 +115,7 @@ class PlaylistManagerImpl @Inject constructor(
     }
 
     override fun observeEpisodeMetadata(rules: SmartRules): Flow<PlaylistEpisodeMetadata> {
-        return playlistDao.observeEpisodeMetadata(clock, rules)
+        return playlistDao.observeSmartEpisodeMetadata(clock, rules)
     }
 
     override suspend fun updateSmartRules(uuid: String, rules: SmartRules) {
@@ -126,7 +126,7 @@ class PlaylistManagerImpl @Inject constructor(
                 ?.applySmartRules(rules)
                 ?.copy(syncStatus = SYNC_STATUS_NOT_SYNCED)
             if (playlist != null) {
-                playlistDao.upsertSmartPlaylist(playlist)
+                playlistDao.upsertPlaylist(playlist)
             }
         }
     }
@@ -162,7 +162,7 @@ class PlaylistManagerImpl @Inject constructor(
                 generateUniqueUuid(uuids)
             }
             val playlist = draft.toSmartPlaylist(uuid, sortPosition = 1)
-            playlistDao.upsertSmartPlaylist(playlist)
+            playlistDao.upsertPlaylist(playlist)
             uuids.forEachIndexed { index, uuid ->
                 playlistDao.updateSortPosition(uuid, index + 2)
             }
@@ -187,7 +187,7 @@ class PlaylistManagerImpl @Inject constructor(
             sortType = playlist.sortType,
             limit = PLAYLIST_ARTWORK_EPISODE_LIMIT,
         )
-        val episodeCountFlow = playlistDao.observeEpisodeMetadata(
+        val episodeCountFlow = playlistDao.observeSmartEpisodeMetadata(
             clock = clock,
             smartRules = playlist.smartRules,
         )

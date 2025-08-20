@@ -33,9 +33,12 @@ import com.pocketcasts.service.api.ReferralRedemptionRequest
 import com.pocketcasts.service.api.ReferralRedemptionResponse
 import com.pocketcasts.service.api.ReferralValidationResponse
 import com.pocketcasts.service.api.SupportFeedbackRequest
+import com.pocketcasts.service.api.UserPlaylistListRequest
+import com.pocketcasts.service.api.UserPlaylistListResponse
 import com.pocketcasts.service.api.UserPodcastListResponse
 import com.pocketcasts.service.api.WinbackResponse
 import com.pocketcasts.service.api.bookmarkRequest
+import com.pocketcasts.service.api.userPlaylistListRequest
 import com.pocketcasts.service.api.userPodcastListRequest
 import io.reactivex.BackpressureStrategy
 import io.reactivex.Completable
@@ -69,6 +72,11 @@ open class SyncServiceManager @Inject constructor(
         const val SCOPE_MOBILE = "mobile"
 
         private val userPodcastListRequest = userPodcastListRequest {
+            v = Settings.SYNC_API_VERSION.toString()
+            m = Settings.SYNC_API_MODEL
+        }
+
+        private val userPlaylistListRequest = userPlaylistListRequest {
             v = Settings.SYNC_API_VERSION.toString()
             m = Settings.SYNC_API_MODEL
         }
@@ -168,6 +176,10 @@ open class SyncServiceManager @Inject constructor(
     suspend fun getFilters(token: AccessToken): List<SmartPlaylist> {
         val response = service.getFilterList(addBearer(token), buildBasicRequest())
         return response.filters?.mapNotNull { it.toFilter() } ?: emptyList()
+    }
+
+    suspend fun getPlaylists(token: AccessToken): UserPlaylistListResponse {
+        return service.getPlaylists(addBearer(token), userPlaylistListRequest)
     }
 
     suspend fun getBookmarks(token: AccessToken): List<Bookmark> {
