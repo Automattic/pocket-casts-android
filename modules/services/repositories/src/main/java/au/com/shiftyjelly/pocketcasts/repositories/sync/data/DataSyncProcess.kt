@@ -1,5 +1,8 @@
 package au.com.shiftyjelly.pocketcasts.repositories.sync.data
 
+import android.content.Context
+import androidx.work.WorkInfo
+import androidx.work.WorkManager
 import au.com.shiftyjelly.pocketcasts.models.db.AppDatabase
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
@@ -7,6 +10,7 @@ import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.FolderManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
 import au.com.shiftyjelly.pocketcasts.repositories.sync.SyncManager
+import au.com.shiftyjelly.pocketcasts.repositories.sync.UpNextSyncWorker
 import au.com.shiftyjelly.pocketcasts.repositories.user.StatsManager
 import au.com.shiftyjelly.pocketcasts.servers.sync.SyncSettingsTask
 import com.pocketcasts.service.api.Record
@@ -17,10 +21,14 @@ import com.pocketcasts.service.api.playlistOrNull
 import com.pocketcasts.service.api.podcastOrNull
 import com.pocketcasts.service.api.syncUpdateRequest
 import java.time.Instant
+import kotlin.time.Duration.Companion.minutes
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.flow.filterNotNull
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.sync.Semaphore
+import kotlinx.coroutines.withTimeoutOrNull
 import timber.log.Timber
 
 class DataSyncProcess(
@@ -32,6 +40,7 @@ class DataSyncProcess(
     private val statsManager: StatsManager,
     private val appDatabase: AppDatabase,
     private val settings: Settings,
+    private val context: Context,
 ) {
     private val podcastSync = PodcastSync(podcastManager, playbackManager, missingPodcastsSemaphore = Semaphore(permits = 10))
     private val folderSync = FoldersSync(folderManager)
@@ -61,11 +70,14 @@ class DataSyncProcess(
     private suspend fun syncData(lastSyncTime: Instant): Instant {
         val isInitialSync = lastSyncTime == Instant.EPOCH
         return if (isInitialSync) {
-            syncFullData()
+            val syncTime = syncFullData()
+            syncUpNext()
+            syncTime
         } else {
             if (settings.getHomeGridNeedsRefresh()) {
                 Timber.d("Sync home grid")
             }
+            syncUpNext()
             syncIncrementalData(lastSyncTime)
         }
     }
@@ -114,6 +126,25 @@ class DataSyncProcess(
 
     private suspend fun syncSettings(lastSyncTime: Instant) {
         SyncSettingsTask.run(settings, lastSyncTime, syncManager)
+    }
+
+    private suspend fun syncUpNext() {
+        val workId = UpNextSyncWorker.enqueue(syncManager, context)
+        if (workId != null) {
+            val workInfo = withTimeoutOrNull(5.minutes) {
+                WorkManager.getInstance(context)
+                    .getWorkInfoByIdFlow(workId)
+                    .filterNotNull()
+                    .first { workInfo -> workInfo.state.isFinished }
+            }
+            when (val workState = workInfo?.state) {
+                WorkInfo.State.SUCCEEDED -> Unit
+                WorkInfo.State.FAILED -> error("Up next sync failed")
+                WorkInfo.State.CANCELLED -> error("Up Next sync was cancelled")
+                WorkInfo.State.ENQUEUED, WorkInfo.State.RUNNING, WorkInfo.State.BLOCKED -> error("Unexpected state: $workState")
+                null -> error("Up Next didn't sync in time")
+            }
+        }
     }
 
     private fun getLastSyncTime() = runCatching {
