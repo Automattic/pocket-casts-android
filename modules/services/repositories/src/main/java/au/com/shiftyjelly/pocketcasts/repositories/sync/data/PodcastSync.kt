@@ -33,8 +33,8 @@ import kotlinx.coroutines.withContext
 internal class PodcastSync(
     private val podcastManager: PodcastManager,
     private val playbackManager: PlaybackManager,
+    private val missingPodcastsSemaphore: Semaphore,
 ) {
-    private val semaphore = Semaphore(permits = 10)
 
     suspend fun fullSync(serverPodcasts: List<UserPodcastResponse>) {
         val localPodcasts = podcastManager.findSubscribedNoOrder()
@@ -49,7 +49,7 @@ internal class PodcastSync(
         coroutineScope {
             localMissingUuids.mapNotNull(serverPodcastMap::get).forEach { serverPodcast ->
                 launch {
-                    semaphore.withPermit {
+                    missingPodcastsSemaphore.withPermit {
                         syncPodcast(serverPodcast)
                     }
                 }

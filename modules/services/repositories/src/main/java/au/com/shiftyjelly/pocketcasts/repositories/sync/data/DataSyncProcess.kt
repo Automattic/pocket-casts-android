@@ -14,6 +14,7 @@ import java.time.Instant
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.sync.Semaphore
 import timber.log.Timber
 
 class DataSyncProcess(
@@ -23,7 +24,7 @@ class DataSyncProcess(
     private val playbackManager: PlaybackManager,
     private val settings: Settings,
 ) {
-    private val podcastSync = PodcastSync(podcastManager, playbackManager)
+    private val podcastSync = PodcastSync(podcastManager, playbackManager, missingPodcastsSemaphore = Semaphore(permits = 10))
     private val folderSync = FoldersSync(folderManager)
 
     suspend fun sync(): Result<Unit> {
