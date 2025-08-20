@@ -4,7 +4,9 @@ import android.content.Context
 import android.os.SystemClock
 import androidx.annotation.VisibleForTesting
 import androidx.lifecycle.ProcessLifecycleOwner
+import androidx.lifecycle.asFlow
 import androidx.lifecycle.lifecycleScope
+import androidx.work.Operation
 import androidx.work.WorkManager
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
@@ -58,6 +60,7 @@ import kotlin.coroutines.CoroutineContext
 import kotlin.math.roundToInt
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
@@ -308,13 +311,19 @@ class PodcastSyncProcess(
 
     private fun syncUpNext() = Completable.create { emitter ->
         val startTime = SystemClock.elapsedRealtime()
-        val workRequestId = UpNextSyncWorker.enqueue(syncManager, context)
-        if (workRequestId == null) {
+        val operation = UpNextSyncWorker.enqueue(syncManager, context)
+        if (operation == null) {
             logTime("Refresh - sync up next, work request id is null", startTime)
             emitter.onComplete()
         } else {
             ProcessLifecycleOwner.get().lifecycleScope.launch {
-                WorkManager.getInstance(context).getWorkInfoByIdFlow(workRequestId).firstOrNull { it?.state?.isFinished ?: true }
+                operation.state.asFlow().first { state ->
+                    when (state) {
+                        is Operation.State.SUCCESS -> true
+                        is Operation.State.FAILURE -> true
+                        else -> false
+                    }
+                }
                 logTime("Refresh - sync up next", startTime)
                 emitter.onComplete()
             }

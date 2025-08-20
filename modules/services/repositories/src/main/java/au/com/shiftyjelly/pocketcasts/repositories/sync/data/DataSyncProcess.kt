@@ -1,8 +1,8 @@
 package au.com.shiftyjelly.pocketcasts.repositories.sync.data
 
 import android.content.Context
-import androidx.work.WorkInfo
-import androidx.work.WorkManager
+import androidx.lifecycle.asFlow
+import androidx.work.Operation
 import au.com.shiftyjelly.pocketcasts.models.db.AppDatabase
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
@@ -30,7 +30,6 @@ import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.coroutineScope
-import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.sync.Semaphore
 import kotlinx.coroutines.withTimeoutOrNull
@@ -153,20 +152,22 @@ class DataSyncProcess(
 
     private suspend fun syncUpNext() {
         logProcess("up-next") {
-            val workId = UpNextSyncWorker.enqueue(syncManager, context)
-            if (workId != null) {
-                val workInfo = withTimeoutOrNull(5.minutes) {
-                    WorkManager.getInstance(context)
-                        .getWorkInfoByIdFlow(workId)
-                        .filterNotNull()
-                        .first { workInfo -> workInfo.state.isFinished }
+            val operation = UpNextSyncWorker.enqueue(syncManager, context)
+            if (operation != null) {
+                val state = withTimeoutOrNull(1.minutes) {
+                    operation.state.asFlow().first { state ->
+                        when (state) {
+                            is Operation.State.SUCCESS -> true
+                            is Operation.State.FAILURE -> true
+                            else -> false
+                        }
+                    }
                 }
-                when (val workState = workInfo?.state) {
-                    WorkInfo.State.SUCCEEDED -> Unit
-                    WorkInfo.State.FAILED -> error("Up next sync failed")
-                    WorkInfo.State.CANCELLED -> error("Up Next sync was cancelled")
-                    WorkInfo.State.ENQUEUED, WorkInfo.State.RUNNING, WorkInfo.State.BLOCKED -> error("Unexpected state: $workState")
-                    null -> error("Up Next didn't sync in time")
+                when (state) {
+                    is Operation.State.SUCCESS -> Unit
+                    is Operation.State.FAILURE -> logError("Up Next failed to sync", state.throwable)
+                    null -> logInfo("Up Next didn't sync in time (it still runs in the background)")
+                    else -> logInfo("Unexpected Up Next sync state: $state")
                 }
             }
         }
