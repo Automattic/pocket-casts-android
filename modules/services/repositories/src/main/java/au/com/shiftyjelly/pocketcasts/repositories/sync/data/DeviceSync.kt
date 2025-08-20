@@ -34,7 +34,7 @@ internal class DeviceSync(
                         timeListened = int64Value { value = statsManager.totalListeningTimeSecs }
                         timesStartedAt = int64Value { value = statsManager.statsStartTimeSecs }
                     }
-                }
+                },
             )
         }
     }
