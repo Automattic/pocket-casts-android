@@ -2,6 +2,7 @@ package au.com.shiftyjelly.pocketcasts.player.view
 
 import android.content.Context
 import android.content.res.ColorStateList
+import android.os.Build
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -44,6 +45,7 @@ import au.com.shiftyjelly.pocketcasts.ui.theme.ThemeColor
 import au.com.shiftyjelly.pocketcasts.utils.Debouncer
 import au.com.shiftyjelly.pocketcasts.utils.extensions.dpToPx
 import au.com.shiftyjelly.pocketcasts.utils.extensions.roundedSpeed
+import au.com.shiftyjelly.pocketcasts.views.extensions.announceAccessibility
 import au.com.shiftyjelly.pocketcasts.views.extensions.updateTint
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseDialogFragment
 import com.google.android.material.button.MaterialButtonToggleGroup
@@ -175,7 +177,7 @@ class EffectsFragment :
         binding.lblSpeed.text = String.format("%.1fx", effects.playbackSpeed)
         viewModel.saveEffects(effects, podcast)
 
-        binding.btnSpeedUp.announceForAccessibility("Playback speed ${binding.lblSpeed.text}")
+        binding.btnSpeedUp.announceAccessibility("Playback speed ${binding.lblSpeed.text}")
         launch {
             playbackSpeedTrackingDebouncer.debounce {
                 viewModel.effectsLive.value?.effects?.playbackSpeed?.roundedSpeed()?.let { currentSpeed ->

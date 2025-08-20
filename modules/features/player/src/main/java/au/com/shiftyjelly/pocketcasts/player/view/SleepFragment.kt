@@ -24,6 +24,7 @@ import au.com.shiftyjelly.pocketcasts.ui.helper.StatusBarIconColor
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.utils.combineLatest
 import au.com.shiftyjelly.pocketcasts.utils.minutes
+import au.com.shiftyjelly.pocketcasts.views.extensions.announceAccessibility
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseDialogFragment
 import com.airbnb.lottie.LottieProperty
 import com.airbnb.lottie.model.KeyPath
@@ -228,7 +229,7 @@ class SleepFragment : BaseDialogFragment() {
         viewModel.sleepTimerAddExtraMins(mins = 5)
         analyticsTracker.track(AnalyticsEvent.PLAYER_SLEEP_TIMER_EXTENDED, mapOf(AMOUNT_KEY to TimeUnit.MILLISECONDS.toSeconds(5.minutes())))
         viewModel.timeLeftInSeconds()?.let { timeLeft ->
-            binding?.root?.announceForAccessibility("5 minutes added to sleep timer. ${timeLeft / 60} minutes ${timeLeft % 60} seconds remaining")
+            binding?.root?.announceAccessibility("5 minutes added to sleep timer. ${timeLeft / 60} minutes ${timeLeft % 60} seconds remaining")
         }
     }
 
@@ -236,13 +237,13 @@ class SleepFragment : BaseDialogFragment() {
         viewModel.sleepTimerAddExtraMins(mins = 1)
         analyticsTracker.track(AnalyticsEvent.PLAYER_SLEEP_TIMER_EXTENDED, mapOf(AMOUNT_KEY to TimeUnit.MILLISECONDS.toSeconds(1.minutes())))
         viewModel.timeLeftInSeconds()?.let { timeLeft ->
-            binding?.root?.announceForAccessibility("1 minute added to sleep timer. ${timeLeft / 60} minutes ${timeLeft % 60} seconds remaining")
+            binding?.root?.announceAccessibility("1 minute added to sleep timer. ${timeLeft / 60} minutes ${timeLeft % 60} seconds remaining")
         }
     }
 
     private fun startCustomTimer() {
         viewModel.sleepTimerAfter(mins = viewModel.sleepCustomTimeInMinutes)
-        binding?.root?.announceForAccessibility("Sleep timer set for ${viewModel.sleepCustomTimeInMinutes} minutes")
+        binding?.root?.announceAccessibility("Sleep timer set for ${viewModel.sleepCustomTimeInMinutes} minutes")
         analyticsTracker.track(AnalyticsEvent.PLAYER_SLEEP_TIMER_ENABLED, mapOf(TIME_KEY to TimeUnit.MILLISECONDS.toSeconds(viewModel.sleepCustomTimeInMinutes.minutes())))
         close()
     }
@@ -253,17 +254,17 @@ class SleepFragment : BaseDialogFragment() {
         } else {
             viewModel.sleepCustomTimeInMinutes += 5
         }
-        binding?.root?.announceForAccessibility("Custom sleep time ${viewModel.sleepCustomTimeInMinutes}")
+        binding?.root?.announceAccessibility("Custom sleep time ${viewModel.sleepCustomTimeInMinutes}")
     }
 
     private fun plusEndOfEpisodeButtonClicked() {
         viewModel.setSleepEndOfEpisodes(viewModel.getSleepEndOfEpisodes() + 1)
-        binding?.root?.announceForAccessibility("Sleep time end of episode ${viewModel.getSleepEndOfEpisodes()}")
+        binding?.root?.announceAccessibility("Sleep time end of episode ${viewModel.getSleepEndOfEpisodes()}")
     }
 
     private fun plusEndOfChapterButtonClicked() {
         viewModel.setSleepEndOfChapters(viewModel.getSleepEndOfChapters() + 1)
-        binding?.root?.announceForAccessibility("Sleep time chapter ${viewModel.getSleepEndOfChapters()}")
+        binding?.root?.announceAccessibility("Sleep time chapter ${viewModel.getSleepEndOfChapters()}")
     }
 
     private fun minusButtonClicked() {
@@ -272,7 +273,7 @@ class SleepFragment : BaseDialogFragment() {
         } else {
             viewModel.sleepCustomTimeInMinutes -= 5
         }
-        binding?.root?.announceForAccessibility("Custom sleep time ${viewModel.sleepCustomTimeInMinutes}")
+        binding?.root?.announceAccessibility("Custom sleep time ${viewModel.sleepCustomTimeInMinutes}")
     }
 
     private fun minusEndOfEpisodeButtonClicked() {
@@ -280,7 +281,7 @@ class SleepFragment : BaseDialogFragment() {
         if (endOfEpisodes > 1) {
             viewModel.setSleepEndOfEpisodes(endOfEpisodes - 1)
         }
-        binding?.root?.announceForAccessibility("Sleep time end of episode ${viewModel.getSleepEndOfEpisodes() }")
+        binding?.root?.announceAccessibility("Sleep time end of episode ${viewModel.getSleepEndOfEpisodes() }")
     }
 
     private fun minusEndOfChapterButtonClicked() {
@@ -288,31 +289,31 @@ class SleepFragment : BaseDialogFragment() {
         if (endOfChapters > 1) {
             viewModel.setSleepEndOfChapters(endOfChapters - 1)
         }
-        binding?.root?.announceForAccessibility("Sleep time end of chapter ${viewModel.getSleepEndOfChapters() }")
+        binding?.root?.announceAccessibility("Sleep time end of chapter ${viewModel.getSleepEndOfChapters() }")
     }
 
     private fun startTimerEndOfEpisode(episodes: Int) {
         viewModel.sleepTimerAfterEpisode(episodes)
-        binding?.root?.announceForAccessibility("Sleep timer set for end of episode")
+        binding?.root?.announceAccessibility("Sleep timer set for end of episode")
         close()
     }
 
     private fun startTimerEndOfChapter(chapters: Int) {
         viewModel.sleepTimerAfterChapter(chapters)
-        binding?.root?.announceForAccessibility("Sleep timer set for end of chapter")
+        binding?.root?.announceAccessibility("Sleep timer set for end of chapter")
         close()
     }
 
     private fun startTimer(mins: Int) {
         viewModel.sleepTimerAfter(mins = mins)
-        binding?.root?.announceForAccessibility("Sleep timer set for $mins minutes")
+        binding?.root?.announceAccessibility("Sleep timer set for $mins minutes")
         analyticsTracker.track(AnalyticsEvent.PLAYER_SLEEP_TIMER_ENABLED, mapOf(TIME_KEY to TimeUnit.MILLISECONDS.toSeconds(mins.minutes())))
         close()
     }
 
     private fun cancelTimer() {
         viewModel.cancelSleepTimer()
-        binding?.root?.announceForAccessibility("Sleep timer cancelled")
+        binding?.root?.announceAccessibility("Sleep timer cancelled")
         analyticsTracker.track(AnalyticsEvent.PLAYER_SLEEP_TIMER_CANCELLED)
         close()
     }

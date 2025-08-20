@@ -1,5 +1,6 @@
 package au.com.shiftyjelly.pocketcasts.views.extensions
 
+import android.os.Build
 import android.util.TypedValue
 import android.view.View
 import androidx.appcompat.widget.Toolbar
@@ -103,5 +104,14 @@ fun View.setSystemWindowInsetToHeight(
         } else {
             windowInsets
         }
+    }
+}
+
+fun View.announceAccessibility(message: CharSequence) {
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+        stateDescription = message
+    } else {
+        @Suppress("DEPRECATION")
+        announceForAccessibility(message)
     }
 }
