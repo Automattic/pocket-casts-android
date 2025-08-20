@@ -34,7 +34,6 @@ import au.com.shiftyjelly.pocketcasts.compose.components.TextH30
 import au.com.shiftyjelly.pocketcasts.compose.extensions.nonScaledSp
 import au.com.shiftyjelly.pocketcasts.images.R
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
-import com.airbnb.android.showkase.annotation.ShowkaseComposable
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 private val outlinedBorder: BorderStroke
@@ -115,7 +114,6 @@ private fun RowOutlinedImage(image: Painter?, colors: ButtonColors, tintIcon: Bo
     )
 }
 
-@ShowkaseComposable(name = "RowOutlinedButton", group = "Button", styleName = "Light", defaultStyle = true)
 @Preview(name = "Light")
 @Composable
 private fun RowOutlinedButtonLightPreview() {
@@ -128,7 +126,6 @@ private fun RowOutlinedButtonLightPreview() {
     }
 }
 
-@ShowkaseComposable(name = "RowOutlinedButton", group = "Button", styleName = "Dark")
 @Preview(name = "Dark")
 @Composable
 private fun RowOutlinedButtonDarkPreview() {
@@ -141,7 +138,6 @@ private fun RowOutlinedButtonDarkPreview() {
     }
 }
 
-@ShowkaseComposable(name = "RowOutlinedButton", group = "Button", styleName = "Leading icon")
 @Preview(name = "Leading icon")
 @Composable
 private fun RowOutlinedButtonLeadingIconPreview() {

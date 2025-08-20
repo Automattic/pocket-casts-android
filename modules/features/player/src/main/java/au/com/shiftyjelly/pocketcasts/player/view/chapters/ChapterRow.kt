@@ -42,7 +42,6 @@ import au.com.shiftyjelly.pocketcasts.localization.helper.TimeHelper
 import au.com.shiftyjelly.pocketcasts.models.to.Chapter
 import au.com.shiftyjelly.pocketcasts.player.R
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
-import com.airbnb.android.showkase.annotation.ShowkaseComposable
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
 import okhttp3.HttpUrl.Companion.toHttpUrlOrNull
@@ -189,52 +188,42 @@ private fun getTextColor(
     }
 }
 
-@ShowkaseComposable(name = "ChapterRow", group = "Chapter", styleName = "Light")
 @Preview(name = "Light")
 @Composable
 private fun ChapterRowLightPreview() = ChapterRowPreview(Theme.ThemeType.LIGHT)
 
-@ShowkaseComposable(name = "ChapterRow", group = "Chapter", styleName = "Dark")
 @Preview(name = "Dark")
 @Composable
 private fun ChapterRowDarkPreview() = ChapterRowPreview(Theme.ThemeType.DARK)
 
-@ShowkaseComposable(name = "ChapterRow", group = "Chapter", styleName = "Rose")
 @Preview(name = "Rose")
 @Composable
 private fun ChapterRowRosePreview() = ChapterRowPreview(Theme.ThemeType.ROSE)
 
-@ShowkaseComposable(name = "ChapterRow", group = "Chapter", styleName = "Indigo")
 @Preview(name = "Indigo")
 @Composable
 private fun ChapterRowIndigoPreview() = ChapterRowPreview(Theme.ThemeType.INDIGO)
 
-@ShowkaseComposable(name = "ChapterRow", group = "Chapter", styleName = "ExtraDark")
 @Preview(name = "ExtraDark")
 @Composable
 private fun ChapterRowExtraDarkPreview() = ChapterRowPreview(Theme.ThemeType.EXTRA_DARK)
 
-@ShowkaseComposable(name = "ChapterRow", group = "Chapter", styleName = "DarkContrast")
 @Preview(name = "DarkContrast")
 @Composable
 private fun ChapterRowDarkContrastPreview() = ChapterRowPreview(Theme.ThemeType.DARK_CONTRAST)
 
-@ShowkaseComposable(name = "ChapterRow", group = "Chapter", styleName = "LightContrast")
 @Preview(name = "LightContrast")
 @Composable
 private fun ChapterRowLightContrastPreview() = ChapterRowPreview(Theme.ThemeType.LIGHT_CONTRAST)
 
-@ShowkaseComposable(name = "ChapterRow", group = "Chapter", styleName = "Electric")
 @Preview(name = "Electric")
 @Composable
 private fun ChapterRowElectricPreview() = ChapterRowPreview(Theme.ThemeType.ELECTRIC)
 
-@ShowkaseComposable(name = "ChapterRow", group = "Chapter", styleName = "Classic")
 @Preview(name = "Classic")
 @Composable
 private fun ChapterRowClassicPreview() = ChapterRowPreview(Theme.ThemeType.CLASSIC_LIGHT)
 
-@ShowkaseComposable(name = "ChapterRow", group = "Chapter", styleName = "Radioactive")
 @Preview(name = "Radioactive")
 @Composable
 private fun ChapterRowRadioactivePreview() = ChapterRowPreview(Theme.ThemeType.RADIOACTIVE)

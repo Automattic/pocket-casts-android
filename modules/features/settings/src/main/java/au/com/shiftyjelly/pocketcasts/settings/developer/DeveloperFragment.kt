@@ -16,7 +16,6 @@ import au.com.shiftyjelly.pocketcasts.settings.whatsnew.WhatsNewFragment
 import au.com.shiftyjelly.pocketcasts.ui.helper.FragmentHostListener
 import au.com.shiftyjelly.pocketcasts.utils.extensions.pxToDp
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseFragment
-import com.airbnb.android.showkase.ui.ShowkaseBrowserActivity
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
@@ -36,7 +35,6 @@ class DeveloperFragment : BaseFragment() {
             val bottomInset = settings.bottomInset.collectAsStateWithLifecycle(0)
             DeveloperPage(
                 onBackPress = ::onBackPress,
-                onShowkaseClick = ::onShowkaseClick,
                 onForceRefreshClick = viewModel::forceRefresh,
                 onTriggerNotificationClick = viewModel::triggerNotification,
                 onDeleteFirstEpisodeClick = viewModel::deleteFirstEpisode,
@@ -56,13 +54,6 @@ class DeveloperFragment : BaseFragment() {
     @Suppress("DEPRECATION")
     private fun onBackPress() {
         activity?.onBackPressed()
-    }
-
-    private fun onShowkaseClick() {
-        val intent = Intent(context, ShowkaseBrowserActivity::class.java).apply {
-            putExtra("SHOWKASE_ROOT_MODULE", "au.com.shiftyjelly.pocketcasts.showkase.AppShowkaseRootModule")
-        }
-        startActivity(intent)
     }
 
     private fun onShowWhatsNewClick() {

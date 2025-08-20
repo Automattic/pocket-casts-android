@@ -27,7 +27,6 @@ import au.com.shiftyjelly.pocketcasts.compose.preview.ThemePreviewParameterProvi
 import au.com.shiftyjelly.pocketcasts.compose.theme
 import au.com.shiftyjelly.pocketcasts.images.R
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
-import com.airbnb.android.showkase.annotation.ShowkaseComposable
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 @Composable
@@ -90,7 +89,6 @@ fun ListPodcastSubscribeRow(
 }
 
 @Preview
-@ShowkaseComposable(name = "PodcastSubscribeRow", group = "Row")
 @Composable
 private fun ListPodcastSubscribeRowPreview(
     @PreviewParameter(ThemePreviewParameterProvider::class) theme: Theme.ThemeType,

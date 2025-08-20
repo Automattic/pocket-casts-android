@@ -21,7 +21,6 @@ import au.com.shiftyjelly.pocketcasts.compose.plusGradientBrush
 import au.com.shiftyjelly.pocketcasts.compose.theme
 import au.com.shiftyjelly.pocketcasts.images.R
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
-import com.airbnb.android.showkase.annotation.ShowkaseComposable
 import au.com.shiftyjelly.pocketcasts.images.R as IR
 
 @Composable
@@ -92,7 +91,6 @@ private fun GradientIconWithBrushPreview() {
     }
 }
 
-@ShowkaseComposable(name = "GradientIcon", group = "Images", styleName = "Light", defaultStyle = true)
 @Preview(name = "Light")
 @Composable
 private fun GradientIconLightPreview() {
@@ -101,7 +99,6 @@ private fun GradientIconLightPreview() {
     }
 }
 
-@ShowkaseComposable(name = "GradientIcon", group = "Images", styleName = "Dark")
 @Preview(name = "Dark")
 @Composable
 private fun GradientIconDarkPreview() {

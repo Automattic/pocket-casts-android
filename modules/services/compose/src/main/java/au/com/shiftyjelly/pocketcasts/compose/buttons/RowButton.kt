@@ -22,7 +22,6 @@ import androidx.compose.ui.unit.sp
 import au.com.shiftyjelly.pocketcasts.compose.AppThemeWithBackground
 import au.com.shiftyjelly.pocketcasts.compose.theme
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
-import com.airbnb.android.showkase.annotation.ShowkaseComposable
 import au.com.shiftyjelly.pocketcasts.images.R as IR
 
 @Composable
@@ -78,7 +77,6 @@ fun RowButton(
     )
 }
 
-@ShowkaseComposable(name = "RowButton", group = "Button", styleName = "Light", defaultStyle = true)
 @Preview(name = "Light")
 @Composable
 private fun RowButtonLightPreview() {
@@ -87,7 +85,6 @@ private fun RowButtonLightPreview() {
     }
 }
 
-@ShowkaseComposable(name = "RowButton", group = "Button", styleName = "Dark")
 @Preview(name = "Dark")
 @Composable
 private fun RowButtonDarkPreview() {
@@ -96,7 +93,6 @@ private fun RowButtonDarkPreview() {
     }
 }
 
-@ShowkaseComposable(name = "RowButton", group = "Button", styleName = "Disabled")
 @Preview(name = "Disabled")
 @Composable
 private fun RowButtonDisabledPreview() {
@@ -105,7 +101,6 @@ private fun RowButtonDisabledPreview() {
     }
 }
 
-@ShowkaseComposable(name = "RowButton", group = "Button", styleName = "No padding")
 @Preview(name = "No padding")
 @Composable
 private fun RowButtonNoPaddingPreview() {
@@ -114,7 +109,6 @@ private fun RowButtonNoPaddingPreview() {
     }
 }
 
-@ShowkaseComposable(name = "RowButton", group = "Button", styleName = "Text icon")
 @Preview(name = "Text icon")
 @Composable
 private fun RowButtonTextIconPreview() {
