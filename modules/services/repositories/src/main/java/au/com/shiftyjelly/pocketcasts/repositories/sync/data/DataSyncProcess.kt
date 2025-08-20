@@ -7,6 +7,7 @@ import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.FolderManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
 import au.com.shiftyjelly.pocketcasts.repositories.sync.SyncManager
+import au.com.shiftyjelly.pocketcasts.repositories.user.StatsManager
 import au.com.shiftyjelly.pocketcasts.servers.sync.SyncSettingsTask
 import com.pocketcasts.service.api.Record
 import com.pocketcasts.service.api.bookmarkOrNull
@@ -28,6 +29,7 @@ class DataSyncProcess(
     private val folderManager: FolderManager,
     private val episodeManager: EpisodeManager,
     private val playbackManager: PlaybackManager,
+    private val statsManager: StatsManager,
     private val appDatabase: AppDatabase,
     private val settings: Settings,
 ) {
@@ -36,6 +38,7 @@ class DataSyncProcess(
     private val episodeSync = EpisodeSync(episodeManager, podcastManager, playbackManager, settings)
     private val playlistSync = PlaylistSync(syncManager, appDatabase)
     private val bookmarkSync = BookmarkSync(syncManager, appDatabase)
+    private val deviceSync = DeviceSync(statsManager, settings)
 
     suspend fun sync(): Result<Unit> {
         if (!syncManager.isLoggedIn()) {
@@ -70,7 +73,7 @@ class DataSyncProcess(
     private suspend fun syncFullData(): Instant {
         val lastSyncAt = syncManager.getLastSyncAtOrThrow()
 
-        Timber.d("Sync stats")
+        deviceSync.syncStats()
         val homePageData = syncManager.getHomeFolderOrThrow()
         podcastSync.fullSync(homePageData.podcastsList)
         folderSync.fullSync(homePageData.foldersList)
@@ -93,6 +96,7 @@ class DataSyncProcess(
                         async { episodeSync.incrementalData() },
                         async { playlistSync.incrementalData() },
                         async { bookmarkSync.incrementalData() },
+                        async { deviceSync.incrementalData() },
                     ).awaitAll().flatten(),
                 )
             }
@@ -104,6 +108,7 @@ class DataSyncProcess(
         folderSync.processIncrementalResponse(records.mapNotNull(Record::folderOrNull))
         playlistSync.processIncrementalResponse(records.mapNotNull(Record::playlistOrNull))
         bookmarkSync.processIncrementalResponse(records.mapNotNull(Record::bookmarkOrNull))
+        deviceSync.syncStats()
         return Instant.ofEpochMilli(response.lastModified)
     }
 
