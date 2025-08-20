@@ -85,7 +85,7 @@ class PodcastManagerImpl @Inject constructor(
         try {
             val podcast = podcastDao.findPodcastByUuid(podcastUuid) ?: return
             val episodes = episodeManager.findEpisodesByPodcastOrderedSuspend(podcast)
-            episodeManager.deleteEpisodes(episodes, playbackManager)
+            episodeManager.deleteEpisodesAsync(episodes, playbackManager)
 
             if (syncManager.isLoggedIn()) {
                 podcast.isSubscribed = false
@@ -98,7 +98,7 @@ class PodcastManagerImpl @Inject constructor(
                 podcast.autoArchiveEpisodeLimit = null
                 podcast.overrideGlobalArchive = false
                 podcast.folderUuid = null
-                podcastDao.updateBlocking(podcast)
+                podcastDao.updateSuspend(podcast)
             } else {
                 // if they aren't signed in, just blow it all away
                 podcastDao.delete(podcast)
