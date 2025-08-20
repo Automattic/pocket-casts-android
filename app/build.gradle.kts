@@ -14,6 +14,7 @@ android {
 
     defaultConfig {
         applicationId = project.property("applicationId").toString()
+        targetSdk = project.property("targetSdkVersionMobile") as Int
         multiDexEnabled = true
     }
 
