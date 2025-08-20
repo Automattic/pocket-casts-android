@@ -25,7 +25,6 @@ import au.com.shiftyjelly.pocketcasts.compose.extensions.onTabMoveFocus
 import au.com.shiftyjelly.pocketcasts.compose.theme
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.utils.extensions.removeNewLines
-import com.airbnb.android.showkase.annotation.ShowkaseComposable
 
 @Composable
 fun FormField(
@@ -113,7 +112,6 @@ fun FormField(
     )
 }
 
-@ShowkaseComposable(name = "FormField", group = "Form", styleName = "Light", defaultStyle = true)
 @Preview(name = "Light")
 @Composable
 private fun FormFieldLightPreview() {
@@ -122,7 +120,6 @@ private fun FormFieldLightPreview() {
     }
 }
 
-@ShowkaseComposable(name = "FormField", group = "Form", styleName = "Dark")
 @Preview(name = "Dark")
 @Composable
 private fun FormFieldDarkPreview() {

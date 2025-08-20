@@ -86,7 +86,6 @@ import au.com.shiftyjelly.pocketcasts.reimagine.clip.ShareClipPageListener
 import au.com.shiftyjelly.pocketcasts.sharing.Clip
 import au.com.shiftyjelly.pocketcasts.utils.extensions.ceilDiv
 import au.com.shiftyjelly.pocketcasts.utils.toHhMmSs
-import com.airbnb.android.showkase.annotation.ShowkaseComposable
 import kotlin.math.absoluteValue
 import kotlin.math.roundToInt
 import kotlin.time.Duration
@@ -758,7 +757,6 @@ private class HHMmSsVisualTransformation(
     }
 }
 
-@ShowkaseComposable(name = "Clip selector", group = "Sharing")
 @Preview(name = "Paused", device = Devices.PORTRAIT_REGULAR)
 @Composable
 private fun ClipSelectorPausedPreview() = ClipSelectorPreview()

@@ -26,7 +26,6 @@ import au.com.shiftyjelly.pocketcasts.compose.components.TextH70
 import au.com.shiftyjelly.pocketcasts.compose.theme
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.utils.extensions.dpToPx
-import com.airbnb.android.showkase.annotation.ShowkaseComposable
 
 @Composable
 fun CountBadge(
@@ -144,7 +143,6 @@ sealed class CountBadgeStyle {
     }
 }
 
-@ShowkaseComposable(name = "CountBadge", group = "Images", styleName = "Small")
 @Preview(name = "Small")
 @Composable
 private fun CountBadgeSmallPreview() {
@@ -153,7 +151,6 @@ private fun CountBadgeSmallPreview() {
     )
 }
 
-@ShowkaseComposable(name = "CountBadge", group = "Images", styleName = "Medium")
 @Preview(name = "Medium")
 @Composable
 private fun CountBadgeMediumPreview() {
@@ -162,7 +159,6 @@ private fun CountBadgeMediumPreview() {
     )
 }
 
-@ShowkaseComposable(name = "CountBadge", group = "Images", styleName = "Big")
 @Preview(name = "Big")
 @Composable
 private fun CountBadgeBigPreview() {
@@ -171,7 +167,6 @@ private fun CountBadgeBigPreview() {
     )
 }
 
-@ShowkaseComposable(name = "CountBadge", group = "Images", styleName = "Custom")
 @Preview(name = "Custom")
 @Composable
 private fun CountBadgeCustomPreview() {

@@ -29,7 +29,6 @@ import androidx.compose.ui.unit.sp
 import au.com.shiftyjelly.pocketcasts.compose.AppThemeWithBackground
 import au.com.shiftyjelly.pocketcasts.compose.theme
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
-import com.airbnb.android.showkase.annotation.ShowkaseComposable
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 private val ButtonHorizontalPadding = 12.dp
@@ -105,14 +104,12 @@ fun ButtonTabs(
     }
 }
 
-@ShowkaseComposable(name = "ButtonTabs", group = "Button", styleName = "Light", defaultStyle = true)
 @Preview(name = "Light")
 @Composable
 private fun ButtonTabsLightPreview() {
     ButtonTabsPreview(Theme.ThemeType.LIGHT)
 }
 
-@ShowkaseComposable(name = "ButtonTabs", group = "Button", styleName = "Dark")
 @Preview(name = "Dark")
 @Composable
 private fun ButtonTabsDarkPreview() {

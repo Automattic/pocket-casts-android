@@ -22,7 +22,6 @@ import au.com.shiftyjelly.pocketcasts.compose.components.AutoResizeText
 import au.com.shiftyjelly.pocketcasts.compose.components.TextP60
 import au.com.shiftyjelly.pocketcasts.compose.plusGoldDark
 import au.com.shiftyjelly.pocketcasts.compose.plusGoldLight
-import com.airbnb.android.showkase.annotation.ShowkaseComposable
 
 private val plusBackgroundBrush = Brush.horizontalGradient(
     0f to Color.plusGoldLight,
@@ -72,7 +71,6 @@ fun GradientRowButton(
     }
 }
 
-@ShowkaseComposable(name = "GradientRowButton", group = "Button")
 @Preview
 @Composable
 private fun GradientRowButtonPreview() {

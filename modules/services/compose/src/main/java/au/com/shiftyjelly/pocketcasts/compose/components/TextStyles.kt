@@ -23,7 +23,6 @@ import au.com.shiftyjelly.pocketcasts.compose.AppThemeWithBackground
 import au.com.shiftyjelly.pocketcasts.compose.extensions.nonScaledSp
 import au.com.shiftyjelly.pocketcasts.compose.theme
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
-import com.airbnb.android.showkase.annotation.ShowkaseComposable
 import java.util.Locale
 
 @Composable
@@ -531,7 +530,6 @@ fun TextC70(
 @Composable
 private fun TextUnit.scaled(disabled: Boolean, fontScale: Float) = (if (disabled) value.nonScaledSp else this) * fontScale
 
-@ShowkaseComposable(name = "Text", group = "Text", styleName = "Light", defaultStyle = true)
 @Preview(name = "Light")
 @Composable
 private fun TextStylesLightPreview() {
@@ -540,7 +538,6 @@ private fun TextStylesLightPreview() {
     }
 }
 
-@ShowkaseComposable(name = "Text", group = "Text", styleName = "Dark")
 @Preview(name = "Dark")
 @Composable
 private fun TextStylesDarkPreview() {
