@@ -1,8 +1,8 @@
 package au.com.shiftyjelly.pocketcasts.account.onboarding.components
 
-import androidx.compose.animation.Animatable
 import androidx.compose.animation.Crossfade
-import androidx.compose.animation.core.FastOutLinearInEasing
+import androidx.compose.animation.core.Animatable
+import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -19,11 +19,15 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.State
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.produceState
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.tooling.preview.Preview
@@ -43,15 +47,15 @@ import kotlinx.coroutines.selects.select
 
 private const val CAROUSEL_ITEM_COUNT = 3
 private val DISAPPEAR_DELAY = 300.milliseconds
+private val ITEM_SHOW_DURATION = 7.seconds
 
 @Composable
 fun FeatureCarousel(
     modifier: Modifier = Modifier,
 ) {
-    val delayBetweenCycles = 4.seconds
     val (activeItem, sendEvent) = carouselCoordinator(
         cycleRange = 0 until CAROUSEL_ITEM_COUNT,
-        delayBetweenCycles = delayBetweenCycles,
+        timeBetweenCycles = ITEM_SHOW_DURATION,
         isPerpetual = false,
         disappearDuration = DISAPPEAR_DELAY,
     )
@@ -60,8 +64,11 @@ fun FeatureCarousel(
         modifier = modifier.padding(top = 11.dp),
     ) {
         CarouselActiveItemIndicatorBar(
+            modifier = Modifier.fillMaxWidth()
+                .padding(horizontal = 12.dp),
             itemCount = CAROUSEL_ITEM_COUNT,
             activeItemIndex = activeItem.value.selectedIndex,
+            pageShowDuration = ITEM_SHOW_DURATION,
         )
         Box {
             Crossfade(
@@ -90,7 +97,7 @@ fun FeatureCarousel(
             }
             Box(
                 modifier = Modifier
-                    .fillMaxWidth(.2f)
+                    .fillMaxWidth(.5f)
                     .fillMaxHeight()
                     .align(Alignment.CenterStart)
                     .clickable(
@@ -104,7 +111,7 @@ fun FeatureCarousel(
             )
             Box(
                 modifier = Modifier
-                    .fillMaxWidth(.2f)
+                    .fillMaxWidth(.5f)
                     .fillMaxHeight()
                     .align(Alignment.CenterEnd)
                     .clickable(
@@ -135,7 +142,7 @@ data class CarouselState(
 fun carouselCoordinator(
     cycleRange: IntRange,
     disappearDuration: Duration,
-    delayBetweenCycles: Duration = 3.seconds,
+    timeBetweenCycles: Duration = 3.seconds,
     isPerpetual: Boolean = true,
 ): Pair<State<CarouselState>, (CarouselEvent) -> Unit> {
     val scope = rememberCoroutineScope()
@@ -144,7 +151,7 @@ fun carouselCoordinator(
     val state = produceState(
         initialValue = CarouselState(cycleRange.first, isAppearing = true),
         cycleRange,
-        delayBetweenCycles,
+        timeBetweenCycles,
         isPerpetual,
         disappearDuration,
     ) {
@@ -152,7 +159,7 @@ fun carouselCoordinator(
 
         while (isActive) {
             val event: CarouselEvent? = select {
-                onTimeout(delayBetweenCycles) { CarouselEvent.Next }
+                onTimeout(timeBetweenCycles) { CarouselEvent.Next }
                 events.onReceive {
                     it
                 }
@@ -208,16 +215,36 @@ fun carouselCoordinator(
 private fun CarouselActiveItemIndicatorBar(
     itemCount: Int,
     activeItemIndex: Int,
+    pageShowDuration: Duration,
     modifier: Modifier = Modifier,
 ) {
+    var progressPercentAnim by remember(activeItemIndex) { mutableStateOf(Animatable(0f)) }
+
+    LaunchedEffect(progressPercentAnim, pageShowDuration) {
+        progressPercentAnim.animateTo(
+            targetValue = 1f,
+            animationSpec = tween(
+                easing = LinearEasing,
+                durationMillis = pageShowDuration.inWholeMilliseconds.toInt(),
+            ),
+        )
+    }
+
     Row(
         modifier = modifier,
         horizontalArrangement = Arrangement.spacedBy(4.dp),
     ) {
         (0 until itemCount).forEach { index ->
             CarouselActiveItemIndicator(
+                index = index,
                 modifier = Modifier.weight(1f),
-                isActive = activeItemIndex == index,
+                progressPercent = if (index < activeItemIndex) {
+                    1f
+                } else if (index == activeItemIndex) {
+                    progressPercentAnim.value
+                } else {
+                    0f
+                },
             )
         }
     }
@@ -225,23 +252,24 @@ private fun CarouselActiveItemIndicatorBar(
 
 @Composable
 private fun CarouselActiveItemIndicator(
-    isActive: Boolean,
+    progressPercent: Float,
+    index: Int,
     modifier: Modifier = Modifier,
     activeColor: Color = Color(0xff5B5B5B),
     inactiveColor: Color = Color(0xffD9D9D9),
 ) {
-    val colorAnim = remember { Animatable(if (isActive) activeColor else inactiveColor) }
-    LaunchedEffect(isActive) {
-        colorAnim.animateTo(
-            targetValue = if (isActive) activeColor else inactiveColor,
-            animationSpec = tween(durationMillis = 200, easing = FastOutLinearInEasing),
-        )
-    }
-
+    val normalizedProgress = progressPercent.coerceIn(0f, 1f)
     Box(
         modifier = modifier
             .height(4.dp)
-            .background(color = colorAnim.value),
+            .background(
+                brush = Brush.horizontalGradient(
+                    0f to activeColor,
+                    normalizedProgress to activeColor,
+                    normalizedProgress to inactiveColor,
+                    1f to inactiveColor,
+                ),
+            ),
     )
 }
 
