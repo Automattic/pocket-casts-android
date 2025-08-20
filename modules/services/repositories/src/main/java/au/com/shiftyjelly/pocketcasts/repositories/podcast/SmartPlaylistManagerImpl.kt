@@ -10,13 +10,13 @@ import au.com.shiftyjelly.pocketcasts.models.type.EpisodePlayingStatus
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodeStatusEnum
 import au.com.shiftyjelly.pocketcasts.models.type.PlaylistEpisodeSortType
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
+import au.com.shiftyjelly.pocketcasts.repositories.di.ApplicationScope
 import au.com.shiftyjelly.pocketcasts.repositories.download.DownloadHelper
 import au.com.shiftyjelly.pocketcasts.repositories.download.DownloadManager
 import au.com.shiftyjelly.pocketcasts.repositories.notification.NotificationManager
 import au.com.shiftyjelly.pocketcasts.repositories.notification.OnboardingNotificationType
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.repositories.playlist.DefaultPlaylistsInitializater
-import au.com.shiftyjelly.pocketcasts.repositories.playlist.PlaylistManager
 import au.com.shiftyjelly.pocketcasts.repositories.shortcuts.PocketCastsShortcuts
 import au.com.shiftyjelly.pocketcasts.repositories.sync.SyncManager
 import dagger.hilt.android.qualifiers.ApplicationContext
@@ -26,9 +26,7 @@ import io.reactivex.Maybe
 import java.util.Calendar
 import java.util.UUID
 import javax.inject.Inject
-import kotlin.coroutines.CoroutineContext
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.launch
 import timber.log.Timber
@@ -42,13 +40,10 @@ class SmartPlaylistManagerImpl @Inject constructor(
     @ApplicationContext private val context: Context,
     appDatabase: AppDatabase,
     private val playlistsInitializater: DefaultPlaylistsInitializater,
-) : SmartPlaylistManager,
-    CoroutineScope {
+    @ApplicationScope private val scope: CoroutineScope,
+) : SmartPlaylistManager {
 
     private val playlistDao = appDatabase.smartPlaylistDao()
-
-    override val coroutineContext: CoroutineContext
-        get() = Dispatchers.Default
 
     override fun findAllBlocking(): List<SmartPlaylist> {
         return playlistDao.findAllBlocking()
@@ -153,7 +148,7 @@ class SmartPlaylistManagerImpl @Inject constructor(
         isCreatingFilter: Boolean,
     ) {
         if (isCreatingFilter) {
-            launch(Dispatchers.IO) {
+            scope.launch {
                 notificationManager.updateUserFeatureInteraction(OnboardingNotificationType.Filters)
             }
         }
