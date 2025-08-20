@@ -64,6 +64,8 @@ fun FeatureCarousel(
         modifier = modifier.padding(top = 11.dp),
     ) {
         CarouselActiveItemIndicatorBar(
+            modifier = Modifier.fillMaxWidth()
+                .padding(horizontal = 12.dp),
             itemCount = CAROUSEL_ITEM_COUNT,
             activeItemIndex = activeItem.value.selectedIndex,
             pageShowDuration = ITEM_SHOW_DURATION,
