@@ -20,7 +20,7 @@ import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 
 @OptIn(ExperimentalCoroutinesApi::class)
-class SmartPlaylistEpisodeSortTypeManagerImplTest {
+class SmartPlaylistManagerImplTest {
 
     private val settings: Settings = mock()
     private val downloadManager: DownloadManager = mock()
