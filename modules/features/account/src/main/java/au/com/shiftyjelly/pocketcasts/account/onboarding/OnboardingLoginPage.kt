@@ -138,7 +138,7 @@ internal fun NewOnboardingLoginPage(
             }
 
             TextP50(
-                text = stringResource(LR.string.onboarding_login_forgot_password),
+                text = stringResource(LR.string.profile_forgot_your_password),
                 color = MaterialTheme.theme.colors.primaryInteractive01,
                 fontWeight = FontWeight.W400,
                 modifier = Modifier
@@ -153,32 +153,32 @@ internal fun NewOnboardingLoginPage(
                 onClick = { viewModel.logIn(onLoginComplete) },
                 includePadding = false,
             )
-            Spacer(modifier = Modifier.height(16.dp))
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.spacedBy(15.dp),
-            ) {
-                Box(
-                    modifier = Modifier
-                        .weight(1f)
-                        .height(.5.dp)
-                        .background(color = MaterialTheme.theme.colors.primaryUi05),
-                )
-                TextC50(
-                    text = stringResource(LR.string.onboarding_login_or),
-                    color = MaterialTheme.theme.colors.primaryText01,
-                    fontWeight = FontWeight.W400,
-                )
-                Box(
-                    modifier = Modifier
-                        .weight(1f)
-                        .height(.5.dp)
-                        .background(color = MaterialTheme.theme.colors.primaryUi05),
-                )
-            }
-            Spacer(modifier = Modifier.height(16.dp))
             if (viewModel.showContinueWithGoogleButton) {
+                Spacer(modifier = Modifier.height(16.dp))
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(15.dp),
+                ) {
+                    Box(
+                        modifier = Modifier
+                            .weight(1f)
+                            .height(.5.dp)
+                            .background(color = MaterialTheme.theme.colors.primaryUi05),
+                    )
+                    TextC50(
+                        text = stringResource(LR.string.onboarding_login_or),
+                        color = MaterialTheme.theme.colors.primaryText01,
+                        fontWeight = FontWeight.W400,
+                    )
+                    Box(
+                        modifier = Modifier
+                            .weight(1f)
+                            .height(.5.dp)
+                            .background(color = MaterialTheme.theme.colors.primaryUi05),
+                    )
+                }
+                Spacer(modifier = Modifier.height(16.dp))
                 ContinueWithGoogleButton(
                     includePadding = false,
                     flow = flow,
