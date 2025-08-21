@@ -260,6 +260,7 @@ class RefreshPodcastsThread(
                 episodeManager = entryPoint.episodeManager(),
                 folderManager = entryPoint.folderManager(),
                 playbackManager = entryPoint.playbackManager(),
+                statsManager = entryPoint.statsManager(),
                 appDatabase = entryPoint.appDatabase(),
                 settings = entryPoint.settings(),
             )
