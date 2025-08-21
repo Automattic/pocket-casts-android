@@ -9,6 +9,8 @@ import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.FolderManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
+import au.com.shiftyjelly.pocketcasts.repositories.podcast.UserEpisodeManager
+import au.com.shiftyjelly.pocketcasts.repositories.subscription.SubscriptionManager
 import au.com.shiftyjelly.pocketcasts.repositories.sync.SyncManager
 import au.com.shiftyjelly.pocketcasts.repositories.sync.UpNextSyncWorker
 import au.com.shiftyjelly.pocketcasts.repositories.user.StatsManager
@@ -40,8 +42,10 @@ class DataSyncProcess(
     private val podcastManager: PodcastManager,
     private val folderManager: FolderManager,
     private val episodeManager: EpisodeManager,
+    private val userEpisodeManager: UserEpisodeManager,
     private val playbackManager: PlaybackManager,
     private val statsManager: StatsManager,
+    private val subscriptionManager: SubscriptionManager,
     private val appDatabase: AppDatabase,
     private val settings: Settings,
     private val context: Context,
@@ -64,7 +68,7 @@ class DataSyncProcess(
                     val newSyncTime = syncData(lastSyncTime)
                     settings.setLastModified(newSyncTime.toString())
                     syncSettings(lastSyncTime)
-                    Timber.d("Sync cloud files")
+                    syncCloudFiles()
                     Timber.d("Sync broken files")
                     Timber.d("Sync playback history")
                     Timber.d("Sync podcast ratings")
@@ -170,6 +174,15 @@ class DataSyncProcess(
     private suspend fun syncSettings(lastSyncTime: Instant) {
         logProcess("settings") {
             SyncSettingsTask.run(settings, lastSyncTime, syncManager).getOrThrow()
+        }
+    }
+
+    private suspend fun syncCloudFiles() {
+        logProcess("cloud-files") {
+            val subscription = subscriptionManager.fetchFreshSubscription()
+            if (subscription != null) {
+                userEpisodeManager.syncFiles(playbackManager)
+            }
         }
     }
 
