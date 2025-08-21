@@ -1,6 +1,5 @@
 package au.com.shiftyjelly.pocketcasts.podcasts.view.folders
 
-import android.app.Dialog
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.ViewGroup
@@ -110,9 +109,5 @@ class FolderChooserFragment : BaseDialogFragment() {
                 }
             }
         }
-    }
-
-    override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
-        return addNavControllerToBackStack(loadNavController = { navHostController }, initialRoute = NavRoutes.FOLDERS)
     }
 }
