@@ -111,13 +111,13 @@ internal class EpisodeSync(
             deselectedChaptersModified = null
         }
         serverEpisode.isDeletedOrNull?.value
+            ?.also { archivedModified = null }
             ?.takeIf { it != isArchived }
             ?.let { value ->
                 if (isEpisodePlaying) {
                     // If we're playing this episode, marked the archive status as unsynced because the server might have a different one to us now
                     archivedModified = System.currentTimeMillis()
                 } else {
-                    archivedModified = null
                     if (value) {
                         onShouldBeArchived()
                     } else {
@@ -127,6 +127,7 @@ internal class EpisodeSync(
                 }
             }
         serverEpisode.playingStatusOrNull?.value
+            ?.also { playingStatusModified = null }
             ?.let(EpisodePlayingStatus::fromInt)
             ?.takeIf { it != playingStatus }
             ?.let { value ->
@@ -134,18 +135,17 @@ internal class EpisodeSync(
                     playingStatusModified = System.currentTimeMillis()
                 } else {
                     playingStatus = value
-                    playingStatusModified = null
                     if (isFinished) {
                         onShouldBeFinished()
                     }
                 }
             }
         serverEpisode.playedUpToOrNull?.value
+            ?.also { playedUpToModified = null }
             ?.toDouble()
             ?.takeIf { !isEpisodePlaying && it >= 0 && it !in (playedUpTo - seekThresholdSecs)..(playedUpTo + 2) }
             ?.let { value ->
                 playedUpTo = value
-                playedUpToModified = null
             }
     }
 }
