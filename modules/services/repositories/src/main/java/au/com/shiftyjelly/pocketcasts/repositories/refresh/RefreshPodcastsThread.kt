@@ -258,11 +258,15 @@ class RefreshPodcastsThread(
                 syncManager = entryPoint.syncManager(),
                 podcastManager = entryPoint.podcastManager(),
                 episodeManager = entryPoint.episodeManager(),
+                userEpisodeManager = entryPoint.userEpisodeManager(),
                 folderManager = entryPoint.folderManager(),
                 playbackManager = entryPoint.playbackManager(),
                 statsManager = entryPoint.statsManager(),
+                subscriptionManager = entryPoint.subscriptionManager(),
+                ratingsManager = entryPoint.ratingsManager(),
                 appDatabase = entryPoint.appDatabase(),
                 settings = entryPoint.settings(),
+                fileStorage = entryPoint.fileStorage(),
                 context = context,
             )
             val result = runBlocking {
