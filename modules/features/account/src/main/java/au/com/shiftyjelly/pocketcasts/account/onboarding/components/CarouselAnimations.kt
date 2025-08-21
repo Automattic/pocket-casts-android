@@ -92,6 +92,7 @@ fun CustomizationIsInsaneAnimation(
         title = stringResource(LR.string.onboarding_intro_carousel_customization_insane_title),
         content = {
             Spacer(modifier = Modifier.weight(1f))
+            val backgroundColor = MaterialTheme.colors.background
             Image(
                 modifier = Modifier
                     .fillMaxWidth(.6f)
@@ -101,8 +102,8 @@ fun CustomizationIsInsaneAnimation(
                         drawRect(
                             brush = Brush.verticalGradient(
                                 colors = listOf(
-                                    Color.White,
-                                    Color.White.copy(alpha = .5f),
+                                    backgroundColor,
+                                    backgroundColor.copy(alpha = .5f),
                                     Color.Transparent,
                                 ),
                                 startY = 0f,
