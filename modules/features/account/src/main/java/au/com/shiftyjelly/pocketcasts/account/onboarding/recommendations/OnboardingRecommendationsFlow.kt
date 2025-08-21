@@ -12,12 +12,15 @@ import au.com.shiftyjelly.pocketcasts.compose.bars.SystemBarsStyles
 import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingFlow
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.utils.Network
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 object OnboardingRecommendationsFlow {
     const val ROUTE = "onboardingRecommendationsFlow"
 
-    private const val START = "start"
+    private const val INTERESTS = "interests"
+    private const val RECOMMENDATIONS = "recommendations"
     private const val SEARCH = "search"
 
     fun NavGraphBuilder.onboardingRecommendationsFlowGraph(
@@ -28,13 +31,27 @@ object OnboardingRecommendationsFlow {
         navController: NavController,
         onUpdateSystemBars: (SystemBarsStyles) -> Unit,
     ) {
+        val root = if (FeatureFlag.isEnabled(Feature.NEW_ONBOARDING_RECOMMENDATIONS)) {
+            INTERESTS
+        } else {
+            RECOMMENDATIONS
+        }
         navigation(
             route = this@OnboardingRecommendationsFlow.ROUTE,
-            startDestination = START,
+            startDestination = root,
         ) {
             importFlowGraph(theme, navController, flow, onUpdateSystemBars)
 
-            composable(START) {
+            composable(INTERESTS) {
+                OnboardingInterestsPage(
+                    theme = theme,
+                    onBackPress = { navController.popBackStack() },
+                    onShowRecommendations = { navController.navigate(RECOMMENDATIONS) },
+                    onUpdateSystemBars = onUpdateSystemBars,
+                )
+            }
+
+            composable(RECOMMENDATIONS) {
                 OnboardingRecommendationsStartPage(
                     theme,
                     onImportClick = { navController.navigate(OnboardingImportFlow.ROUTE) },
