@@ -12,10 +12,12 @@ import au.com.shiftyjelly.pocketcasts.repositories.podcast.FolderManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.UserEpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.subscription.SubscriptionManager
+import au.com.shiftyjelly.pocketcasts.repositories.sync.SyncHistoryTask
 import au.com.shiftyjelly.pocketcasts.repositories.sync.SyncManager
 import au.com.shiftyjelly.pocketcasts.repositories.sync.UpNextSyncWorker
 import au.com.shiftyjelly.pocketcasts.repositories.user.StatsManager
 import au.com.shiftyjelly.pocketcasts.servers.sync.SyncSettingsTask
+import au.com.shiftyjelly.pocketcasts.utils.Util
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import com.pocketcasts.service.api.Record
 import com.pocketcasts.service.api.SyncUpdateRequest
@@ -27,6 +29,7 @@ import com.pocketcasts.service.api.podcastOrNull
 import com.pocketcasts.service.api.syncUpdateRequest
 import java.time.Instant
 import java.util.UUID
+import kotlin.time.Duration
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.measureTimedValue
 import kotlinx.coroutines.CancellationException
@@ -72,7 +75,7 @@ class DataSyncProcess(
                     syncSettings(lastSyncTime)
                     syncCloudFiles()
                     syncBrokenFiles()
-                    Timber.d("Sync playback history")
+                    syncPlaybackHistory()
                     Timber.d("Sync podcast ratings")
                 }
             }
@@ -153,23 +156,7 @@ class DataSyncProcess(
     private suspend fun syncUpNext() {
         logProcess("up-next") {
             val operation = UpNextSyncWorker.enqueue(syncManager, context)
-            if (operation != null) {
-                val state = withTimeoutOrNull(1.minutes) {
-                    operation.state.asFlow().first { state ->
-                        when (state) {
-                            is Operation.State.SUCCESS -> true
-                            is Operation.State.FAILURE -> true
-                            else -> false
-                        }
-                    }
-                }
-                when (state) {
-                    is Operation.State.SUCCESS -> Unit
-                    is Operation.State.FAILURE -> logError("Up Next failed to sync", state.throwable)
-                    null -> logInfo("Up Next didn't sync in time (it still runs in the background)")
-                    else -> logInfo("Unexpected Up Next sync state: $state")
-                }
-            }
+            operation?.awaitOperation("Up Next", timeoutDuration = 1.minutes)
         }
     }
 
@@ -198,6 +185,16 @@ class DataSyncProcess(
         }
     }
 
+    private suspend fun syncPlaybackHistory() {
+        // We don't use playback history on Wear OS
+        if (!Util.isWearOs(context)) {
+            logProcess("playback-history") {
+                val operation = SyncHistoryTask.scheduleToRun(context)
+                operation.awaitOperation("Playback History", timeoutDuration = 5.minutes)
+            }
+        }
+    }
+
     private suspend fun createIncrementalRequest(lastSyncTime: Instant): SyncUpdateRequest = coroutineScope {
         syncUpdateRequest {
             deviceUtcTimeMs = System.currentTimeMillis()
@@ -222,6 +219,27 @@ class DataSyncProcess(
 
     private inline fun <T> logProcess(name: String, process: DataSyncLogger.() -> T): T {
         return logger.logProcess(name) { logger.process() }
+    }
+
+    private suspend fun Operation.awaitOperation(
+        operationName: String,
+        timeoutDuration: Duration,
+    ) {
+        val state = withTimeoutOrNull(timeoutDuration) {
+            state.asFlow().first { state ->
+                when (state) {
+                    is Operation.State.SUCCESS -> true
+                    is Operation.State.FAILURE -> true
+                    else -> false
+                }
+            }
+        }
+        when (state) {
+            is Operation.State.SUCCESS -> Unit
+            is Operation.State.FAILURE -> logger.logError("$operationName failed to sync", state.throwable)
+            null -> logger.logInfo("$operationName didn't sync in time (it still runs in the background)")
+            else -> logger.logInfo("Unexpected $operationName sync state: $state")
+        }
     }
 }
 
