@@ -9,7 +9,9 @@ import au.com.shiftyjelly.pocketcasts.repositories.download.DownloadManager
 import au.com.shiftyjelly.pocketcasts.repositories.notification.NotificationManager
 import au.com.shiftyjelly.pocketcasts.repositories.notification.OnboardingNotificationType
 import au.com.shiftyjelly.pocketcasts.repositories.sync.SyncManager
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
 import org.junit.Test
@@ -20,7 +22,8 @@ import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 
 @OptIn(ExperimentalCoroutinesApi::class)
-class SmartPlaylistEpisodeSortTypeManagerImplTest {
+class SmartPlaylistManagerImplTest {
+    private val dispatcher = StandardTestDispatcher()
 
     private val settings: Settings = mock()
     private val downloadManager: DownloadManager = mock()
@@ -32,8 +35,8 @@ class SmartPlaylistEpisodeSortTypeManagerImplTest {
     private val smartPlaylistDao: SmartPlaylistDao = mock()
 
     @Test
-    fun `should mark the user as having interacted with the feature when creating a filter`() = runTest {
-        val playlistManager = initViewModel()
+    fun `should mark the user as having interacted with the feature when creating a filter`() = runTest(dispatcher) {
+        val playlistManager = initManager()
 
         playlistManager.updateBlocking(
             smartPlaylist = SmartPlaylist(),
@@ -47,8 +50,8 @@ class SmartPlaylistEpisodeSortTypeManagerImplTest {
     }
 
     @Test
-    fun `should not mark the user as having interacted with the feature when a filter is not being created`() = runTest {
-        val playlistManager = initViewModel()
+    fun `should not mark the user as having interacted with the feature when a filter is not being created`() = runTest(dispatcher) {
+        val playlistManager = initManager()
 
         playlistManager.updateBlocking(
             smartPlaylist = SmartPlaylist(),
@@ -61,7 +64,7 @@ class SmartPlaylistEpisodeSortTypeManagerImplTest {
         verify(notificationManager, never()).updateUserFeatureInteraction(OnboardingNotificationType.Filters)
     }
 
-    private fun initViewModel(): SmartPlaylistManagerImpl {
+    private fun initManager(): SmartPlaylistManagerImpl {
         whenever(appDatabase.smartPlaylistDao()).thenReturn(smartPlaylistDao)
         whenever(smartPlaylistDao.updateBlocking(any())).then { }
         whenever(playlistUpdateAnalytics.update(any(), any(), any())).then { }
@@ -75,6 +78,7 @@ class SmartPlaylistEpisodeSortTypeManagerImplTest {
             context = context,
             appDatabase = appDatabase,
             playlistsInitializater = mock(),
+            scope = CoroutineScope(dispatcher),
         )
     }
 }
