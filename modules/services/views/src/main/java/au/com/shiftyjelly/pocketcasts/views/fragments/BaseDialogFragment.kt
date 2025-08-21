@@ -39,15 +39,10 @@ import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.google.android.material.bottomsheet.ViewPager2AwareBottomSheetBehavior
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
-import kotlin.coroutines.CoroutineContext
 import kotlin.math.roundToInt
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
 
 @AndroidEntryPoint
-open class BaseDialogFragment :
-    BottomSheetDialogFragment(),
-    CoroutineScope {
+open class BaseDialogFragment : BottomSheetDialogFragment() {
 
     open val statusBarIconColor: StatusBarIconColor = StatusBarIconColor.Theme
     open val navigationBarColor: NavigationBarColor = NavigationBarColor.Theme
@@ -63,9 +58,6 @@ open class BaseDialogFragment :
     }
 
     @Inject lateinit var theme: Theme
-
-    override val coroutineContext: CoroutineContext
-        get() = Dispatchers.Main
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
