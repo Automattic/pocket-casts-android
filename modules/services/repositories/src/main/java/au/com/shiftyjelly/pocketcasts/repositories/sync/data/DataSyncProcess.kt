@@ -5,6 +5,7 @@ import androidx.lifecycle.asFlow
 import androidx.work.Operation
 import au.com.shiftyjelly.pocketcasts.models.db.AppDatabase
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
+import au.com.shiftyjelly.pocketcasts.repositories.file.FileStorage
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.FolderManager
@@ -48,6 +49,7 @@ class DataSyncProcess(
     private val subscriptionManager: SubscriptionManager,
     private val appDatabase: AppDatabase,
     private val settings: Settings,
+    private val fileStorage: FileStorage,
     private val context: Context,
 ) {
     private val logger = DataSyncLogger()
@@ -69,7 +71,7 @@ class DataSyncProcess(
                     settings.setLastModified(newSyncTime.toString())
                     syncSettings(lastSyncTime)
                     syncCloudFiles()
-                    Timber.d("Sync broken files")
+                    syncBrokenFiles()
                     Timber.d("Sync playback history")
                     Timber.d("Sync podcast ratings")
                 }
@@ -182,6 +184,16 @@ class DataSyncProcess(
             val subscription = subscriptionManager.fetchFreshSubscription()
             if (subscription != null) {
                 userEpisodeManager.syncFiles(playbackManager)
+            }
+        }
+    }
+
+    private suspend fun syncBrokenFiles() {
+        val firstSync = settings.isFirstSyncRun()
+        if (firstSync) {
+            logProcess("broken-files") {
+                fileStorage.fixBrokenFiles(episodeManager)
+                settings.setFirstSyncRun(false)
             }
         }
     }
