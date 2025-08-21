@@ -9,6 +9,7 @@ import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
 import au.com.shiftyjelly.pocketcasts.repositories.sync.SyncManager
 import au.com.shiftyjelly.pocketcasts.servers.sync.SyncSettingsTask
 import com.pocketcasts.service.api.Record
+import com.pocketcasts.service.api.bookmarkOrNull
 import com.pocketcasts.service.api.episodeOrNull
 import com.pocketcasts.service.api.folderOrNull
 import com.pocketcasts.service.api.playlistOrNull
@@ -34,6 +35,7 @@ class DataSyncProcess(
     private val folderSync = FoldersSync(folderManager)
     private val episodeSync = EpisodeSync(episodeManager, podcastManager, playbackManager, settings)
     private val playlistSync = PlaylistSync(syncManager, appDatabase)
+    private val bookmarkSync = BookmarkSync(syncManager, appDatabase)
 
     suspend fun sync(): Result<Unit> {
         if (!syncManager.isLoggedIn()) {
@@ -73,7 +75,7 @@ class DataSyncProcess(
         podcastSync.fullSync(homePageData.podcastsList)
         folderSync.fullSync(homePageData.foldersList)
         playlistSync.fullSync()
-        Timber.d("Sync bookmarks")
+        bookmarkSync.fullSync()
 
         return runCatching { Instant.parse(lastSyncAt) }.getOrDefault(Instant.now())
     }
@@ -90,6 +92,7 @@ class DataSyncProcess(
                         async { folderSync.incrementalData() },
                         async { episodeSync.incrementalData() },
                         async { playlistSync.incrementalData() },
+                        async { bookmarkSync.incrementalData() },
                     ).awaitAll().flatten(),
                 )
             }
@@ -100,6 +103,7 @@ class DataSyncProcess(
         podcastSync.processIncrementalResponse(records.mapNotNull(Record::podcastOrNull))
         folderSync.processIncrementalResponse(records.mapNotNull(Record::folderOrNull))
         playlistSync.processIncrementalResponse(records.mapNotNull(Record::playlistOrNull))
+        bookmarkSync.processIncrementalResponse(records.mapNotNull(Record::bookmarkOrNull))
         return Instant.ofEpochMilli(response.lastModified)
     }
 

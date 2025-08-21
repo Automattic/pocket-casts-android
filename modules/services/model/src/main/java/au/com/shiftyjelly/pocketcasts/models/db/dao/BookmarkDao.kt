@@ -4,6 +4,9 @@ import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
+import androidx.room.Transaction
+import androidx.room.Upsert
+import au.com.shiftyjelly.pocketcasts.models.db.AppDatabase
 import au.com.shiftyjelly.pocketcasts.models.db.helper.PodcastBookmark
 import au.com.shiftyjelly.pocketcasts.models.db.helper.ProfileBookmark
 import au.com.shiftyjelly.pocketcasts.models.entity.Bookmark
@@ -16,8 +19,21 @@ abstract class BookmarkDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     abstract suspend fun insert(bookmark: Bookmark)
 
+    @Upsert
+    abstract suspend fun upsertAll(bookmarks: Collection<Bookmark>)
+
     @Query("DELETE FROM bookmarks WHERE uuid = :uuid")
     abstract suspend fun deleteByUuid(uuid: String)
+
+    @Query("DELETE FROM bookmarks WHERE uuid IN (:uuids)")
+    protected abstract suspend fun deleteAllUnsafe(uuids: Collection<String>)
+
+    @Transaction
+    open suspend fun deleteAll(uuids: Collection<String>) {
+        uuids.chunked(AppDatabase.SQLITE_BIND_ARG_LIMIT).forEach { chunk ->
+            deleteAllUnsafe(uuids)
+        }
+    }
 
     @Query("SELECT * FROM bookmarks WHERE uuid = :uuid AND deleted = :deleted")
     abstract suspend fun findByUuid(
@@ -182,6 +198,19 @@ abstract class BookmarkDao {
 
     @Query("SELECT * FROM bookmarks WHERE sync_status = :syncStatus")
     abstract fun findNotSyncedBlocking(syncStatus: SyncStatus = SyncStatus.NOT_SYNCED): List<Bookmark>
+
+    @Query("SELECT * FROM bookmarks WHERE sync_status = 0")
+    abstract suspend fun getAllUnsynced(): List<Bookmark>
+
+    @Query("SELECT * FROM bookmarks WHERE uuid IN (:uuids)")
+    protected abstract suspend fun getAllUnsafe(uuids: Collection<String>): List<Bookmark>
+
+    @Transaction
+    open suspend fun getAll(uuids: Collection<String>): List<Bookmark> {
+        return uuids.chunked(999).flatMap { chunk ->
+            getAllUnsafe(uuids)
+        }
+    }
 
     @Query(
         """SELECT bookmarks.*

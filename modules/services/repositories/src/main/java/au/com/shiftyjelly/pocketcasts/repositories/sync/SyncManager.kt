@@ -28,6 +28,7 @@ import au.com.shiftyjelly.pocketcasts.servers.sync.login.ExchangeSonosResponse
 import au.com.shiftyjelly.pocketcasts.servers.sync.update.SyncUpdateResponse
 import au.com.shiftyjelly.pocketcasts.utils.Optional
 import com.jakewharton.rxrelay2.BehaviorRelay
+import com.pocketcasts.service.api.BookmarksResponse
 import com.pocketcasts.service.api.PodcastRatingResponse
 import com.pocketcasts.service.api.PodcastRatingsResponse
 import com.pocketcasts.service.api.ReferralCodeResponse
@@ -97,6 +98,7 @@ interface SyncManager : NamedSettingsCaller {
     suspend fun getLastSyncAtOrThrow(): String
     suspend fun getHomeFolderOrThrow(): UserPodcastListResponse
     suspend fun getPlaylistsOrThrow(): UserPlaylistListResponse
+    suspend fun getBookmarksOrThrow(): BookmarksResponse
     fun getPodcastEpisodesRxSingle(podcastUuid: String): Single<PodcastEpisodesResponse>
 
     suspend fun syncUpdate(data: String, lastSyncTime: Instant): SyncUpdateResponse
