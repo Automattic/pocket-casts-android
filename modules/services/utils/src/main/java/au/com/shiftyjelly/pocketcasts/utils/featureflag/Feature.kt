@@ -173,9 +173,9 @@ enum class Feature(
     PROTO_DATA_SYNC(
         key = "proto_data_sync",
         title = "Sync data using Protobuf",
-        defaultValue = false,
+        defaultValue = BuildConfig.DEBUG,
         tier = FeatureTier.Free,
-        hasFirebaseRemoteFlag = false,
+        hasFirebaseRemoteFlag = true,
         hasDevToggle = true,
     ),
 
