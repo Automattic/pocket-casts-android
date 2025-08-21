@@ -4,6 +4,7 @@ import android.content.Context
 import androidx.lifecycle.asFlow
 import androidx.work.Operation
 import au.com.shiftyjelly.pocketcasts.models.db.AppDatabase
+import au.com.shiftyjelly.pocketcasts.models.entity.UserPodcastRating
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.file.FileStorage
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
@@ -11,12 +12,15 @@ import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.FolderManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.UserEpisodeManager
+import au.com.shiftyjelly.pocketcasts.repositories.ratings.RatingsManager
 import au.com.shiftyjelly.pocketcasts.repositories.subscription.SubscriptionManager
 import au.com.shiftyjelly.pocketcasts.repositories.sync.SyncHistoryTask
 import au.com.shiftyjelly.pocketcasts.repositories.sync.SyncManager
 import au.com.shiftyjelly.pocketcasts.repositories.sync.UpNextSyncWorker
 import au.com.shiftyjelly.pocketcasts.repositories.user.StatsManager
+import au.com.shiftyjelly.pocketcasts.servers.extensions.toDate
 import au.com.shiftyjelly.pocketcasts.servers.sync.SyncSettingsTask
+import au.com.shiftyjelly.pocketcasts.utils.AppPlatform
 import au.com.shiftyjelly.pocketcasts.utils.Util
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import com.pocketcasts.service.api.Record
@@ -24,6 +28,7 @@ import com.pocketcasts.service.api.SyncUpdateRequest
 import com.pocketcasts.service.api.bookmarkOrNull
 import com.pocketcasts.service.api.episodeOrNull
 import com.pocketcasts.service.api.folderOrNull
+import com.pocketcasts.service.api.modifiedAtOrNull
 import com.pocketcasts.service.api.playlistOrNull
 import com.pocketcasts.service.api.podcastOrNull
 import com.pocketcasts.service.api.syncUpdateRequest
@@ -50,6 +55,7 @@ class DataSyncProcess(
     private val playbackManager: PlaybackManager,
     private val statsManager: StatsManager,
     private val subscriptionManager: SubscriptionManager,
+    private val ratingsManager: RatingsManager,
     private val appDatabase: AppDatabase,
     private val settings: Settings,
     private val fileStorage: FileStorage,
@@ -76,7 +82,7 @@ class DataSyncProcess(
                     syncCloudFiles()
                     syncBrokenFiles()
                     syncPlaybackHistory()
-                    Timber.d("Sync podcast ratings")
+                    syncPodcastRatings()
                 }
             }
         }
@@ -191,6 +197,27 @@ class DataSyncProcess(
             logProcess("playback-history") {
                 val operation = SyncHistoryTask.scheduleToRun(context)
                 operation.awaitOperation("Playback History", timeoutDuration = 5.minutes)
+            }
+        }
+    }
+
+    private suspend fun syncPodcastRatings() {
+        // Rating are available only on the Phone platform
+        if (Util.getAppPlatform(context) == AppPlatform.Phone) {
+            logProcess("ratings") {
+                val ratings = syncManager.getPodcastRatings()?.podcastRatingsList
+                    ?.mapNotNull { serverRating ->
+                        serverRating.modifiedAtOrNull?.toDate()?.let { modifiedAt ->
+                            UserPodcastRating(
+                                podcastUuid = serverRating.podcastUuid,
+                                rating = serverRating.podcastRating,
+                                modifiedAt = modifiedAt,
+                            )
+                        }
+                    }
+                if (ratings != null) {
+                    ratingsManager.updateUserRatings(ratings)
+                }
             }
         }
     }
