@@ -144,12 +144,6 @@ class DataSyncProcess(
         }
     }
 
-    private suspend fun syncSettings(lastSyncTime: Instant) {
-        logProcess("settings") {
-            SyncSettingsTask.run(settings, lastSyncTime, syncManager).getOrThrow()
-        }
-    }
-
     private suspend fun syncUpNext() {
         logProcess("up-next") {
             val operation = UpNextSyncWorker.enqueue(syncManager, context)
@@ -170,6 +164,12 @@ class DataSyncProcess(
                     else -> logInfo("Unexpected Up Next sync state: $state")
                 }
             }
+        }
+    }
+
+    private suspend fun syncSettings(lastSyncTime: Instant) {
+        logProcess("settings") {
+            SyncSettingsTask.run(settings, lastSyncTime, syncManager).getOrThrow()
         }
     }
 
