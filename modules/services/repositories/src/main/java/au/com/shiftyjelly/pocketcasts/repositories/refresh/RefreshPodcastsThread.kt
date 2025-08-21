@@ -255,6 +255,7 @@ class RefreshPodcastsThread(
             val process = DataSyncProcess(
                 syncManager = entryPoint.syncManager(),
                 podcastManager = entryPoint.podcastManager(),
+                episodeManager = entryPoint.episodeManager(),
                 folderManager = entryPoint.folderManager(),
                 playbackManager = entryPoint.playbackManager(),
                 settings = entryPoint.settings(),

@@ -49,9 +49,11 @@ internal class PodcastSync(
         coroutineScope {
             localMissingUuids.mapNotNull(serverPodcastMap::get).forEach { serverPodcast ->
                 launch {
-                    missingPodcastsSemaphore.withPermit {
-                        syncPodcast(serverPodcast)
-                    }
+                    subscribeToPodcast(
+                        serverPodcast = serverPodcast,
+                        getUuid = UserPodcastResponse::getUuid,
+                        applyServerPodcast = { localPodcast, serverPodcast -> localPodcast.applyServerPodcast(serverPodcast) },
+                    )
                 }
             }
         }
@@ -67,13 +69,6 @@ internal class PodcastSync(
         }
     }
 
-    private suspend fun syncPodcast(serverPodcast: UserPodcastResponse) {
-        val localPodcast = podcastManager.subscribeToPodcastOrThrow(serverPodcast.uuid, sync = false, shouldAutoDownload = false)
-        localPodcast.isHeaderExpanded = false
-        localPodcast.applyServerPodcast(serverPodcast)
-        podcastManager.updatePodcast(localPodcast)
-    }
-
     suspend fun incrementalData(): List<Record> {
         val podcasts = podcastManager.findPodcastsToSync()
         return withContext(Dispatchers.Default) {
@@ -86,6 +81,9 @@ internal class PodcastSync(
                         }
                         isDeleted = boolValue {
                             value = !localPodcast.isSubscribed
+                        }
+                        subscribed = boolValue {
+                            value = localPodcast.isSubscribed
                         }
                         autoStartFrom = int32Value {
                             value = localPodcast.startFromSecs
@@ -125,10 +123,11 @@ internal class PodcastSync(
 
     private suspend fun syncPodcast(serverPodcast: SyncUserPodcast) {
         if (serverPodcast.subscribedOrNull?.value == true) {
-            val localPodcast = podcastManager.subscribeToPodcastOrThrow(serverPodcast.uuid, sync = false, shouldAutoDownload = false)
-            localPodcast.isHeaderExpanded = false
-            localPodcast.applyServerPodcast(serverPodcast)
-            podcastManager.updatePodcast(localPodcast)
+            subscribeToPodcast(
+                serverPodcast = serverPodcast,
+                getUuid = SyncUserPodcast::getUuid,
+                applyServerPodcast = { localPodcast, serverPodcast -> localPodcast.applyServerPodcast(serverPodcast) },
+            )
         }
     }
 
@@ -141,6 +140,18 @@ internal class PodcastSync(
         } else if (localPodcast.isSubscribed) {
             podcastManager.unsubscribe(localPodcast.uuid, playbackManager)
         }
+    }
+
+    private suspend fun <T> subscribeToPodcast(
+        serverPodcast: T,
+        getUuid: (T) -> String,
+        applyServerPodcast: (Podcast, T) -> Podcast,
+    ) = missingPodcastsSemaphore.withPermit {
+        val localPodcast = podcastManager.subscribeToPodcastOrThrow(getUuid(serverPodcast), sync = false, shouldAutoDownload = false).apply {
+            isHeaderExpanded = false
+            applyServerPodcast(this, serverPodcast)
+        }
+        podcastManager.updatePodcast(localPodcast)
     }
 }
 
