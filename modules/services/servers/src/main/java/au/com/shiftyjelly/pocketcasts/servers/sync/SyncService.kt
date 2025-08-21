@@ -24,6 +24,8 @@ import com.pocketcasts.service.api.ReferralRedemptionRequest
 import com.pocketcasts.service.api.ReferralRedemptionResponse
 import com.pocketcasts.service.api.ReferralValidationResponse
 import com.pocketcasts.service.api.SupportFeedbackRequest
+import com.pocketcasts.service.api.UserPlaylistListRequest
+import com.pocketcasts.service.api.UserPlaylistListResponse
 import com.pocketcasts.service.api.UserPodcastListRequest
 import com.pocketcasts.service.api.UserPodcastListResponse
 import com.pocketcasts.service.api.WinbackResponse
@@ -104,6 +106,10 @@ interface SyncService {
 
     @POST("/user/playlist/list")
     suspend fun getFilterList(@Header("Authorization") authorization: String, @Body request: BasicRequest): FilterListResponse
+
+    @Headers("Content-Type: application/octet-stream")
+    @POST("/user/playlist/list")
+    suspend fun getPlaylists(@Header("Authorization") authorization: String, @Body request: UserPlaylistListRequest): UserPlaylistListResponse
 
     @POST("/history/sync")
     fun historySync(@Header("Authorization") authorization: String, @Body request: HistorySyncRequest): Single<HistorySyncResponse>

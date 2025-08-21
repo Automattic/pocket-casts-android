@@ -33,6 +33,7 @@ import com.pocketcasts.service.api.PodcastRatingsResponse
 import com.pocketcasts.service.api.ReferralCodeResponse
 import com.pocketcasts.service.api.ReferralRedemptionResponse
 import com.pocketcasts.service.api.ReferralValidationResponse
+import com.pocketcasts.service.api.UserPlaylistListResponse
 import com.pocketcasts.service.api.UserPodcastListResponse
 import com.pocketcasts.service.api.WinbackResponse
 import io.reactivex.Completable
@@ -95,6 +96,7 @@ interface SyncManager : NamedSettingsCaller {
     fun getLastSyncAtRxSingle(): Single<String>
     suspend fun getLastSyncAtOrThrow(): String
     suspend fun getHomeFolderOrThrow(): UserPodcastListResponse
+    suspend fun getPlaylistsOrThrow(): UserPlaylistListResponse
     fun getPodcastEpisodesRxSingle(podcastUuid: String): Single<PodcastEpisodesResponse>
 
     suspend fun syncUpdate(data: String, lastSyncTime: Instant): SyncUpdateResponse

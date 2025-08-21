@@ -1,5 +1,6 @@
 package au.com.shiftyjelly.pocketcasts.repositories.sync.data
 
+import au.com.shiftyjelly.pocketcasts.models.db.AppDatabase
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
@@ -10,6 +11,7 @@ import au.com.shiftyjelly.pocketcasts.servers.sync.SyncSettingsTask
 import com.pocketcasts.service.api.Record
 import com.pocketcasts.service.api.episodeOrNull
 import com.pocketcasts.service.api.folderOrNull
+import com.pocketcasts.service.api.playlistOrNull
 import com.pocketcasts.service.api.podcastOrNull
 import com.pocketcasts.service.api.syncUpdateRequest
 import java.time.Instant
@@ -25,15 +27,17 @@ class DataSyncProcess(
     private val folderManager: FolderManager,
     private val episodeManager: EpisodeManager,
     private val playbackManager: PlaybackManager,
+    private val appDatabase: AppDatabase,
     private val settings: Settings,
 ) {
     private val podcastSync = PodcastSync(podcastManager, playbackManager, missingPodcastsSemaphore = Semaphore(permits = 10))
     private val folderSync = FoldersSync(folderManager)
     private val episodeSync = EpisodeSync(episodeManager, podcastManager, playbackManager, settings)
+    private val playlistSync = PlaylistSync(syncManager, appDatabase)
 
     suspend fun sync(): Result<Unit> {
         if (!syncManager.isLoggedIn()) {
-            Timber.d("Delete marked playlists")
+            appDatabase.playlistDao().deleteMarkedPlaylists()
             return Result.success(Unit)
         }
 
@@ -68,7 +72,7 @@ class DataSyncProcess(
         val homePageData = syncManager.getHomeFolderOrThrow()
         podcastSync.fullSync(homePageData.podcastsList)
         folderSync.fullSync(homePageData.foldersList)
-        Timber.d("Sync playlists")
+        playlistSync.fullSync()
         Timber.d("Sync bookmarks")
 
         return runCatching { Instant.parse(lastSyncAt) }.getOrDefault(Instant.now())
@@ -85,6 +89,7 @@ class DataSyncProcess(
                         async { podcastSync.incrementalData() },
                         async { folderSync.incrementalData() },
                         async { episodeSync.incrementalData() },
+                        async { playlistSync.incrementalData() },
                     ).awaitAll().flatten(),
                 )
             }
@@ -94,6 +99,7 @@ class DataSyncProcess(
         episodeSync.processIncrementalResponse(records.mapNotNull(Record::episodeOrNull))
         podcastSync.processIncrementalResponse(records.mapNotNull(Record::podcastOrNull))
         folderSync.processIncrementalResponse(records.mapNotNull(Record::folderOrNull))
+        playlistSync.processIncrementalResponse(records.mapNotNull(Record::playlistOrNull))
         return Instant.ofEpochMilli(response.lastModified)
     }
 

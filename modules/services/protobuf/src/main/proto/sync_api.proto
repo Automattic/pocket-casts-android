@@ -183,6 +183,42 @@ message PodcastFolder {
   google.protobuf.Timestamp date_added = 6;
 }
 
+message UserPlaylistListRequest {
+  string v = 1;
+  string m = 2;
+  reserved 3; // bool exclude_deleted
+}
+
+message UserPlaylistListResponse {
+  repeated PlaylistSyncResponse playlists = 1;
+}
+
+message PlaylistSyncResponse {
+  string uuid = 1;
+  google.protobuf.BoolValue is_deleted = 2;
+  string title = 3;
+  google.protobuf.Int32Value audio_video = 4;
+  google.protobuf.BoolValue not_downloaded = 5;
+  google.protobuf.BoolValue downloaded = 6;
+  reserved 7; // google.protobuf.BoolValue downloading
+  google.protobuf.BoolValue finished = 8;
+  google.protobuf.BoolValue partially_played = 9;
+  google.protobuf.BoolValue unplayed = 10;
+  google.protobuf.BoolValue starred = 11;
+  google.protobuf.BoolValue manual = 12;
+  google.protobuf.Int32Value sort_position = 13;
+  google.protobuf.Int32Value sort_type = 14;
+  google.protobuf.Int32Value icon_id = 15;
+  google.protobuf.BoolValue all_podcasts = 16;
+  google.protobuf.Int32Value filter_hours = 17;
+  string podcast_uuids = 18;
+  reserved 19; // string episode_uuids
+  string original_uuid = 20;
+  google.protobuf.BoolValue filter_duration = 21;
+  google.protobuf.Int32Value longer_than = 22;
+  google.protobuf.Int32Value shorter_than = 23;
+}
+
 message PodcastRatingResponse {
     string podcast_uuid = 1;
     google.protobuf.Timestamp modified_at = 3;
