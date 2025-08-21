@@ -1,5 +1,6 @@
 package au.com.shiftyjelly.pocketcasts.account.onboarding.upgrade
 
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavType
@@ -11,6 +12,9 @@ import au.com.shiftyjelly.pocketcasts.account.onboarding.NewOnboardingLoginPage
 import au.com.shiftyjelly.pocketcasts.account.onboarding.OnboardingCreateAccountPage
 import au.com.shiftyjelly.pocketcasts.account.onboarding.OnboardingForgotPasswordPage
 import au.com.shiftyjelly.pocketcasts.account.onboarding.recommendations.OnboardingRecommendationsFlow
+import au.com.shiftyjelly.pocketcasts.account.viewmodel.OnboardingCreateAccountViewModel
+import au.com.shiftyjelly.pocketcasts.account.viewmodel.OnboardingLogInViewModel
+import au.com.shiftyjelly.pocketcasts.account.viewmodel.OnboardingLoginOrSignUpViewModel
 import au.com.shiftyjelly.pocketcasts.account.viewmodel.OnboardingUpgradeFeaturesState
 import au.com.shiftyjelly.pocketcasts.account.viewmodel.OnboardingUpgradeFeaturesViewModel
 import au.com.shiftyjelly.pocketcasts.compose.bars.SystemBarsStyles
@@ -62,28 +66,41 @@ object NewOnboardingFlow {
         onLoginToExistingAccount: (OnboardingFlow, Subscription?, (OnboardingExitInfo) -> Unit) -> Unit,
     ) {
         composable(ROUTE_INTRO_CAROUSEL) {
+            val viewModel: OnboardingLoginOrSignUpViewModel = hiltViewModel()
             NewOnboardingGetStartedPage(
+                viewModel = viewModel,
                 displayTheme = theme,
                 flow = flow,
                 onGetStartedClick = {
+                    viewModel.onGetStartedClicked(flow)
                     if (flow is OnboardingFlow.Upsell || flow is OnboardingFlow.LoggedOut) {
                         navController.navigate(ROUTE_SIGN_UP)
                     } else {
                         navController.navigate(OnboardingRecommendationsFlow.ROUTE)
                     }
                 },
-                onLoginClick = { navController.navigate(ROUTE_LOG_IN) },
+                onLoginClick = {
+                    viewModel.onLoginClicked(flow)
+                    navController.navigate(ROUTE_LOG_IN)
+                },
                 onUpdateSystemBars = onUpdateSystemBars,
             )
         }
 
         composable(ROUTE_SIGN_UP) {
+            val viewModel: OnboardingCreateAccountViewModel = hiltViewModel()
             NewOnboardingCreateAccountPage(
+                viewModel = viewModel,
                 theme = theme,
                 flow = flow,
-                onBackPress = { navController.popBackStack() },
+                onBackPress = {
+                    navController.popBackStack()
+                },
                 onSkip = finishOnboardingFlow,
-                onCreateAccount = { navController.navigate(OldOnboardingFlow.CREATE_FREE_ACCOUNT) },
+                onCreateAccount = {
+                    viewModel.onSignUpEmailPressed(flow)
+                    navController.navigate(OldOnboardingFlow.CREATE_FREE_ACCOUNT)
+                },
                 onUpdateSystemBars = onUpdateSystemBars,
                 onContinueWithGoogleComplete = { state, subscription ->
                     if (state.isNewAccount) {
@@ -105,10 +122,14 @@ object NewOnboardingFlow {
         }
 
         composable(ROUTE_LOG_IN) {
+            val viewModel: OnboardingLogInViewModel = hiltViewModel()
             NewOnboardingLoginPage(
+                viewModel = viewModel,
                 theme = theme,
                 flow = flow,
-                onBackPress = { navController.popBackStack() },
+                onBackPress = {
+                    navController.popBackStack()
+                },
                 onLoginComplete = { subscription ->
                     onLoginToExistingAccount(flow, subscription, exitOnboarding)
                 },

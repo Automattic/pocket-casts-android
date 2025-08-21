@@ -54,12 +54,13 @@ class GoogleSignInButtonViewModel @Inject constructor(
         flow: OnboardingFlow?,
         onSuccess: (IntentSenderRequest) -> Unit,
         onError: suspend () -> Unit,
+        event: AnalyticsEvent = AnalyticsEvent.SETUP_ACCOUNT_BUTTON_TAPPED,
     ) {
         if (flow != null) {
             analyticsTracker.track(AnalyticsEvent.SSO_STARTED, mapOf("source" to "google"))
 
             analyticsTracker.track(
-                AnalyticsEvent.SETUP_ACCOUNT_BUTTON_TAPPED,
+                event,
                 mapOf(
                     OnboardingLoginOrSignUpViewModel.Companion.AnalyticsProp.flow(flow),
                     OnboardingLoginOrSignUpViewModel.Companion.AnalyticsProp.ButtonTapped.continueWithGoogle,

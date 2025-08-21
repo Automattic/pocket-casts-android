@@ -4,6 +4,7 @@ import android.app.Application
 import android.content.Context
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
+import au.com.shiftyjelly.pocketcasts.account.viewmodel.OnboardingLoginOrSignUpViewModel.Companion.AnalyticsProp
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.analytics.experiments.ExperimentProvider
@@ -14,6 +15,7 @@ import au.com.shiftyjelly.pocketcasts.repositories.subscription.SubscriptionMana
 import au.com.shiftyjelly.pocketcasts.repositories.sync.LoginResult
 import au.com.shiftyjelly.pocketcasts.repositories.sync.SignInSource
 import au.com.shiftyjelly.pocketcasts.repositories.sync.SyncManager
+import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingFlow
 import au.com.shiftyjelly.pocketcasts.utils.Network
 import au.com.shiftyjelly.pocketcasts.utils.extensions.isGooglePlayServicesAvailableSuccess
 import com.google.android.gms.common.GoogleApiAvailability
@@ -60,6 +62,20 @@ class OnboardingLogInViewModel @Inject constructor(
 
     fun updatePassword(password: String) {
         _state.update { it.copy(password = password) }
+    }
+
+    fun onSignInButtonTapped(flow: OnboardingFlow) {
+        analyticsTracker.track(
+            AnalyticsEvent.SIGNIN_BUTTON_TAPPED,
+            mapOf(AnalyticsProp.flow(flow), AnalyticsProp.ButtonTapped.signIn),
+        )
+    }
+
+    fun onForgotPasswordTapped(flow: OnboardingFlow) {
+        analyticsTracker.track(
+            AnalyticsEvent.SIGNIN_FORGOT_PASSWORD_TAPPED,
+            mapOf(AnalyticsProp.flow(flow)),
+        )
     }
 
     fun logIn(onSuccessfulLogin: (Subscription?) -> Unit) {

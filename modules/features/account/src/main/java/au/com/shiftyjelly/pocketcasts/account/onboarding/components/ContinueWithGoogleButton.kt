@@ -15,6 +15,7 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import au.com.shiftyjelly.pocketcasts.account.viewmodel.GoogleSignInButtonViewModel
 import au.com.shiftyjelly.pocketcasts.account.viewmodel.GoogleSignInState
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.compose.buttons.RowOutlinedButton
 import au.com.shiftyjelly.pocketcasts.compose.theme
 import au.com.shiftyjelly.pocketcasts.models.type.Subscription
@@ -34,6 +35,7 @@ fun ContinueWithGoogleButton(
     fontSize: TextUnit? = null,
     includePadding: Boolean = true,
     viewModel: GoogleSignInButtonViewModel = hiltViewModel(),
+    event: AnalyticsEvent = AnalyticsEvent.SETUP_ACCOUNT_BUTTON_TAPPED,
     label: String = stringResource(LR.string.onboarding_continue_with_google),
 ) {
     val context = LocalContext.current
@@ -84,6 +86,7 @@ fun ContinueWithGoogleButton(
                     onError = showError,
                 )
             },
+            event = event,
         )
     }
 

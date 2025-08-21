@@ -38,6 +38,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import au.com.shiftyjelly.pocketcasts.account.onboarding.components.ContinueWithGoogleButton
 import au.com.shiftyjelly.pocketcasts.account.viewmodel.GoogleSignInState
 import au.com.shiftyjelly.pocketcasts.account.viewmodel.OnboardingLogInViewModel
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.compose.AppThemeWithBackground
 import au.com.shiftyjelly.pocketcasts.compose.CallOnce
 import au.com.shiftyjelly.pocketcasts.compose.bars.SystemBarsStyles
@@ -142,7 +143,10 @@ internal fun NewOnboardingLoginPage(
                 color = MaterialTheme.theme.colors.primaryInteractive01,
                 fontWeight = FontWeight.W400,
                 modifier = Modifier
-                    .clickable { onForgotPasswordClick() },
+                    .clickable {
+                        viewModel.onForgotPasswordTapped(flow)
+                        onForgotPasswordClick()
+                    },
             )
 
             Spacer(modifier = Modifier.height(16.dp))
@@ -150,7 +154,10 @@ internal fun NewOnboardingLoginPage(
             RowButton(
                 text = stringResource(LR.string.onboarding_login_continue_with_email),
                 enabled = state.enableSubmissionFields,
-                onClick = { viewModel.logIn(onLoginComplete) },
+                onClick = {
+                    viewModel.onSignInButtonTapped(flow)
+                    viewModel.logIn(onLoginComplete)
+                },
                 includePadding = false,
             )
             if (viewModel.showContinueWithGoogleButton) {
@@ -183,6 +190,7 @@ internal fun NewOnboardingLoginPage(
                     includePadding = false,
                     flow = flow,
                     onComplete = onContinueWithGoogleComplete,
+                    event = AnalyticsEvent.SIGNIN_BUTTON_TAPPED,
                 )
             }
         }
