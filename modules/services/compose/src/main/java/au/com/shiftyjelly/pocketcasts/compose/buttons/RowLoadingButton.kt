@@ -15,7 +15,6 @@ import androidx.compose.ui.unit.dp
 import au.com.shiftyjelly.pocketcasts.compose.AppThemeWithBackground
 import au.com.shiftyjelly.pocketcasts.compose.theme
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
-import com.airbnb.android.showkase.annotation.ShowkaseComposable
 
 @Composable
 fun RowLoadingButton(
@@ -58,7 +57,6 @@ fun RowLoadingButton(
     )
 }
 
-@ShowkaseComposable(name = "RowLoadingButton", group = "Button", styleName = "Light", defaultStyle = true)
 @Preview(name = "Light")
 @Composable
 private fun RowLoadingButtonLightPreview() {
@@ -71,7 +69,6 @@ private fun RowLoadingButtonLightPreview() {
     }
 }
 
-@ShowkaseComposable(name = "RowLoadingButton", group = "Button", styleName = "Dark")
 @Preview(name = "Dark")
 @Composable
 private fun RowLoadingButtonDarkPreview() {
@@ -84,7 +81,6 @@ private fun RowLoadingButtonDarkPreview() {
     }
 }
 
-@ShowkaseComposable(name = "RowLoadingButton", group = "Button", styleName = "Disabled")
 @Preview(name = "Disabled")
 @Composable
 private fun RowLoadingButtonDisabledPreview() {
@@ -98,7 +94,6 @@ private fun RowLoadingButtonDisabledPreview() {
     }
 }
 
-@ShowkaseComposable(name = "RowLoadingButton", group = "Button", styleName = "No padding")
 @Preview(name = "No padding")
 @Composable
 private fun RowLoadingButtonNoPaddingPreview() {
@@ -112,7 +107,6 @@ private fun RowLoadingButtonNoPaddingPreview() {
     }
 }
 
-@ShowkaseComposable(name = "RowLoadingButton", group = "Button", styleName = "Text icon")
 @Preview(name = "Text icon")
 @Composable
 private fun RowLoadingButtonTextIconPreview() {

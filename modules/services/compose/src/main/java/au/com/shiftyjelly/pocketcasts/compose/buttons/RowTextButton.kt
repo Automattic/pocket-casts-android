@@ -9,7 +9,6 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.TextUnit
 import au.com.shiftyjelly.pocketcasts.compose.AppThemeWithBackground
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
-import com.airbnb.android.showkase.annotation.ShowkaseComposable
 
 @Composable
 fun RowTextButton(
@@ -37,7 +36,6 @@ fun RowTextButton(
     )
 }
 
-@ShowkaseComposable(name = "RowTextButton", group = "Button", styleName = "Light", defaultStyle = true)
 @Preview(name = "Light")
 @Composable
 private fun RowTextButtonLightPreview() {
@@ -46,7 +44,6 @@ private fun RowTextButtonLightPreview() {
     }
 }
 
-@ShowkaseComposable(name = "RowTextButton", group = "Button", styleName = "Dark")
 @Preview(name = "Dark")
 @Composable
 private fun RowTextButtonDarkPreview() {

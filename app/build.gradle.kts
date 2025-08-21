@@ -55,7 +55,6 @@ android {
 dependencies {
     ksp(libs.dagger.hilt.compiler)
     ksp(libs.hilt.compiler)
-    ksp(libs.showkase.processor)
 
     implementation(platform(libs.compose.bom))
     implementation(platform(libs.firebase.bom))

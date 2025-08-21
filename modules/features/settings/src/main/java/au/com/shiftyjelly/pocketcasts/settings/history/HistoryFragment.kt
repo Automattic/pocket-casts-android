@@ -16,10 +16,10 @@ import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import au.com.shiftyjelly.pocketcasts.compose.AppThemeWithBackground
 import au.com.shiftyjelly.pocketcasts.compose.extensions.contentWithoutConsumedInsets
-import au.com.shiftyjelly.pocketcasts.compose.extensions.slideInToEnd
-import au.com.shiftyjelly.pocketcasts.compose.extensions.slideInToStart
-import au.com.shiftyjelly.pocketcasts.compose.extensions.slideOutToEnd
-import au.com.shiftyjelly.pocketcasts.compose.extensions.slideOutToStart
+import au.com.shiftyjelly.pocketcasts.compose.navigation.slideInToEnd
+import au.com.shiftyjelly.pocketcasts.compose.navigation.slideInToStart
+import au.com.shiftyjelly.pocketcasts.compose.navigation.slideOutToEnd
+import au.com.shiftyjelly.pocketcasts.compose.navigation.slideOutToStart
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.settings.history.upnext.UpNextHistoryDetailsPage
 import au.com.shiftyjelly.pocketcasts.settings.history.upnext.UpNextHistoryDetailsViewModel.UiState

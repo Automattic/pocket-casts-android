@@ -52,7 +52,6 @@ import au.com.shiftyjelly.pocketcasts.localization.R as LR
 fun DeveloperPage(
     bottomInset: Dp,
     onBackPress: () -> Unit,
-    onShowkaseClick: () -> Unit,
     onForceRefreshClick: () -> Unit,
     onTriggerNotificationClick: () -> Unit,
     onDeleteFirstEpisodeClick: () -> Unit,
@@ -78,9 +77,6 @@ fun DeveloperPage(
                 title = stringResource(LR.string.settings_developer),
                 onNavigationClick = onBackPress,
             )
-        }
-        item {
-            ShowkaseSetting(onClick = onShowkaseClick)
         }
         item {
             ForceRefreshSetting(onClick = onForceRefreshClick)
@@ -132,19 +128,6 @@ fun DeveloperPage(
             }
         }
     }
-}
-
-@Composable
-private fun ShowkaseSetting(
-    onClick: () -> Unit,
-    modifier: Modifier = Modifier,
-) {
-    SettingRow(
-        primaryText = "Showkase",
-        secondaryText = "Compose components",
-        icon = rememberVectorPainter(Icons.Outlined.HomeRepairService),
-        modifier = modifier.clickable { onClick() },
-    )
 }
 
 @Composable
@@ -370,7 +353,6 @@ private fun DeveloperPageDarkPreview() {
 private fun DeveloperPagePreview() {
     DeveloperPage(
         onBackPress = {},
-        onShowkaseClick = {},
         onForceRefreshClick = {},
         onTriggerNotificationClick = {},
         onDeleteFirstEpisodeClick = {},

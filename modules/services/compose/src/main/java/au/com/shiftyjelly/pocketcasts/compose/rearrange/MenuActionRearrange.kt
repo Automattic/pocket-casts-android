@@ -41,7 +41,6 @@ import au.com.shiftyjelly.pocketcasts.compose.components.TextH10
 import au.com.shiftyjelly.pocketcasts.compose.components.TextH40
 import au.com.shiftyjelly.pocketcasts.compose.theme
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
-import com.airbnb.android.showkase.annotation.ShowkaseComposable
 import sh.calvin.reorderable.ReorderableItem
 import sh.calvin.reorderable.rememberReorderableLazyListState
 import au.com.shiftyjelly.pocketcasts.images.R as IR
@@ -210,7 +209,6 @@ data class MenuAction(
     @DrawableRes val icon: Int,
 )
 
-@ShowkaseComposable(name = "MenuActionRearrange", group = "Rearrange")
 @Preview
 @Composable
 private fun MenuActionRearrangePreview() {
