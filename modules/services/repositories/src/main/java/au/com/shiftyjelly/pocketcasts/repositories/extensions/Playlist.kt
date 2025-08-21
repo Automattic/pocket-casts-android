@@ -1,6 +1,7 @@
 package au.com.shiftyjelly.pocketcasts.repositories.extensions
 
 import au.com.shiftyjelly.pocketcasts.models.entity.SmartPlaylist
+import au.com.shiftyjelly.pocketcasts.models.to.PlaylistShortcut
 import au.com.shiftyjelly.pocketcasts.images.R as IR
 
 private const val FILTER_COLOR_SIZE = 5
@@ -52,7 +53,13 @@ private val AUTOMOTIVE_DRAWABLES = arrayOf(
 val SmartPlaylist.drawableIndex: Int
     get() = iconId / FILTER_COLOR_SIZE % ICON_DRAWABLES.size
 
+val PlaylistShortcut.drawableIndex: Int
+    get() = iconId / FILTER_COLOR_SIZE % ICON_DRAWABLES.size
+
 val SmartPlaylist.shortcutDrawableId: Int
+    get() = SHORTCUT_DRAWABLES.getOrNull(drawableIndex) ?: SHORTCUT_DRAWABLES.first()
+
+val PlaylistShortcut.shortcutDrawableId: Int
     get() = SHORTCUT_DRAWABLES.getOrNull(drawableIndex) ?: SHORTCUT_DRAWABLES.first()
 
 val SmartPlaylist.drawableId: Int

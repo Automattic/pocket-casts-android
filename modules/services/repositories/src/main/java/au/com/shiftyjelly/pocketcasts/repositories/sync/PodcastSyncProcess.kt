@@ -1,7 +1,6 @@
 package au.com.shiftyjelly.pocketcasts.repositories.sync
 
 import android.content.Context
-import android.os.Build
 import android.os.SystemClock
 import androidx.annotation.VisibleForTesting
 import androidx.lifecycle.ProcessLifecycleOwner
@@ -31,7 +30,6 @@ import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.SmartPlaylistManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.UserEpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.ratings.RatingsManager
-import au.com.shiftyjelly.pocketcasts.repositories.shortcuts.PocketCastsShortcuts
 import au.com.shiftyjelly.pocketcasts.repositories.subscription.SubscriptionManager
 import au.com.shiftyjelly.pocketcasts.repositories.user.StatsManager
 import au.com.shiftyjelly.pocketcasts.servers.extensions.toDate
@@ -633,7 +631,6 @@ class PodcastSyncProcess(
             .andThen(importFolders(response.folders))
             .andThen(rxCompletable { importBookmarks(response.bookmarks) })
             .andThen(updateSettings(response))
-            .andThen(rxCompletable { updateShortcuts(response.smartPlaylists) })
             .andThen(rxCompletable { cacheStats() })
             .toSingle { response.lastModified }
     }
@@ -661,18 +658,6 @@ class PodcastSyncProcess(
     private fun updateSettings(response: SyncUpdateResponse): Completable {
         return Completable.fromAction {
             settings.setLastModified(response.lastModified)
-        }
-    }
-
-    private suspend fun updateShortcuts(smartPlaylists: List<SmartPlaylist>) {
-        // if any playlists have changed update the launcher shortcuts
-        if (smartPlaylists.isNotEmpty() && Build.VERSION.SDK_INT >= Build.VERSION_CODES.N_MR1) {
-            PocketCastsShortcuts.update(
-                smartPlaylistManager = smartPlaylistManager,
-                force = true,
-                context = context,
-                source = PocketCastsShortcuts.Source.UPDATE_SHORTCUTS,
-            )
         }
     }
 
