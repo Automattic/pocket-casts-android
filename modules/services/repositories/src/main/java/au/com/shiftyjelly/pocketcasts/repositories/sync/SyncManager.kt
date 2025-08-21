@@ -43,6 +43,8 @@ import java.io.File
 import java.time.Instant
 import kotlinx.coroutines.flow.Flow
 import retrofit2.Response
+import com.pocketcasts.service.api.SyncUpdateRequest as SyncUpdateProtoRequest
+import com.pocketcasts.service.api.SyncUpdateResponse as SyncUpdateProtoResponse
 
 interface SyncManager : NamedSettingsCaller {
 
@@ -91,10 +93,12 @@ interface SyncManager : NamedSettingsCaller {
 
     // Sync
     fun getLastSyncAtRxSingle(): Single<String>
-    suspend fun getHomeFolder(): UserPodcastListResponse
+    suspend fun getLastSyncAtOrThrow(): String
+    suspend fun getHomeFolderOrThrow(): UserPodcastListResponse
     fun getPodcastEpisodesRxSingle(podcastUuid: String): Single<PodcastEpisodesResponse>
 
     suspend fun syncUpdate(data: String, lastSyncTime: Instant): SyncUpdateResponse
+    suspend fun syncUpdateOrThrow(request: SyncUpdateProtoRequest): SyncUpdateProtoResponse
 
     fun episodeSyncRxCompletable(request: EpisodeSyncRequest): Completable
 

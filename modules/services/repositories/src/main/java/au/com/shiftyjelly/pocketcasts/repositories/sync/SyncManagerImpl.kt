@@ -52,6 +52,7 @@ import com.pocketcasts.service.api.PodcastRatingsResponse
 import com.pocketcasts.service.api.ReferralCodeResponse
 import com.pocketcasts.service.api.ReferralRedemptionResponse
 import com.pocketcasts.service.api.ReferralValidationResponse
+import com.pocketcasts.service.api.SyncUpdateRequest
 import com.pocketcasts.service.api.UserPodcastListResponse
 import com.pocketcasts.service.api.WinbackResponse
 import com.squareup.moshi.Moshi
@@ -71,6 +72,8 @@ import retrofit2.HttpException
 import retrofit2.Response
 import timber.log.Timber
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
+import com.pocketcasts.service.api.SyncUpdateRequest as SyncUpdateProtoRequest
+import com.pocketcasts.service.api.SyncUpdateResponse as SyncUpdateProtoResponse
 
 @Singleton
 class SyncManagerImpl @Inject constructor(
@@ -346,11 +349,19 @@ class SyncManagerImpl @Inject constructor(
         }
     } ?: throw Exception("Not logged in")
 
-    override fun getLastSyncAtRxSingle(): Single<String> = getCacheTokenOrLoginRxSingle { token ->
-        syncServiceManager.getLastSyncAt(token)
+    override suspend fun syncUpdateOrThrow(request: SyncUpdateProtoRequest): SyncUpdateProtoResponse = getCacheTokenOrLogin { token ->
+        syncServiceManager.syncUpdateOrThrow(token, request)
     }
 
-    override suspend fun getHomeFolder(): UserPodcastListResponse = getCacheTokenOrLogin { token ->
+    override fun getLastSyncAtRxSingle(): Single<String> = getCacheTokenOrLoginRxSingle { token ->
+        syncServiceManager.getLastSyncAtRx(token)
+    }
+
+    override suspend fun getLastSyncAtOrThrow(): String = getCacheTokenOrLogin { token ->
+        syncServiceManager.getLastSyncAtOrThrow(token)
+    }
+
+    override suspend fun getHomeFolderOrThrow(): UserPodcastListResponse = getCacheTokenOrLogin { token ->
         syncServiceManager.getHomeFolder(token)
     }
 

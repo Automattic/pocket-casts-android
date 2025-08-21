@@ -315,9 +315,6 @@ abstract class EpisodeDao {
     abstract fun deleteBlocking(episode: PodcastEpisode)
 
     @Delete
-    abstract fun deleteAllBlocking(episode: List<PodcastEpisode>)
-
-    @Delete
     abstract suspend fun deleteAll(episode: List<PodcastEpisode>)
 
     @Query("DELETE FROM podcast_episodes")

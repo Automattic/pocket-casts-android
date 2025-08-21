@@ -176,7 +176,7 @@ class PodcastSyncProcess(
         val localPodcasts = podcastManager.findSubscribedRxSingle()
         val localFolderUuids = folderManager.findFoldersSingle().map { it.map { folder -> folder.uuid } }
         // get all the users podcast uuids from the server
-        val serverHomeFolder = rxSingle { syncManager.getHomeFolder() }
+        val serverHomeFolder = rxSingle { syncManager.getHomeFolderOrThrow() }
         return Singles.zip(serverHomeFolder, localPodcasts, localFolderUuids)
             .flatMapCompletable { (serverHomeFolder, localPodcasts, localFolderUuids) ->
                 importPodcastsFullSync(serverPodcasts = serverHomeFolder.podcastsList, localPodcasts = localPodcasts)

@@ -51,6 +51,7 @@ interface PodcastManager {
     fun subscribedRxFlowable(): Flowable<List<Podcast>>
     suspend fun findPodcastsOrderByTitle(): List<Podcast>
     fun findPodcastsToSyncBlocking(): List<Podcast>
+    suspend fun findPodcastsToSync(): List<Podcast>
     suspend fun findPodcastsOrderByLatestEpisode(orderAsc: Boolean): List<Podcast>
     suspend fun findFolderPodcastsOrderByLatestEpisode(folderUuid: String): List<Podcast>
     suspend fun findPodcastsOrderByRecentlyPlayedEpisode(): List<Podcast>
@@ -64,6 +65,7 @@ interface PodcastManager {
     fun subscribeToPodcast(podcastUuid: String, sync: Boolean, shouldAutoDownload: Boolean = true)
 
     fun subscribeToPodcastRxSingle(podcastUuid: String, sync: Boolean = false, shouldAutoDownload: Boolean = true): Single<Podcast>
+    suspend fun subscribeToPodcastOrThrow(podcastUuid: String, sync: Boolean = false, shouldAutoDownload: Boolean = true): Podcast
     fun findOrDownloadPodcastRxSingle(podcastUuid: String, waitForSubscribe: Boolean = false): Single<Podcast>
     fun isSubscribingToPodcasts(): Boolean
     fun getSubscribedPodcastUuidsRxSingle(): Single<List<String>>
@@ -74,6 +76,7 @@ interface PodcastManager {
 
     /** Update methods  */
     fun updatePodcastBlocking(podcast: Podcast)
+    suspend fun updatePodcast(podcast: Podcast)
 
     suspend fun updateAllAutoDownloadStatus(autoDownloadStatus: Int)
     suspend fun updateAllShowNotifications(showNotifications: Boolean)
@@ -103,6 +106,7 @@ interface PodcastManager {
     fun markPodcastUuidAsNotSyncedBlocking(podcastUuid: String)
     suspend fun markAllPodcastsSynced()
     suspend fun markAllPodcastsUnsynced()
+    suspend fun markAllPodcastsUnsynced(uuids: Collection<String>)
 
     fun clearAllDownloadErrorsBlocking()
 
@@ -110,6 +114,7 @@ interface PodcastManager {
     fun checkForUnusedPodcastsBlocking(playbackManager: PlaybackManager)
     fun deletePodcastIfUnusedBlocking(podcast: Podcast, playbackManager: PlaybackManager): Boolean
     suspend fun deleteAllPodcasts()
+    suspend fun unsubscribe(podcastUuid: String, playbackManager: PlaybackManager)
     fun unsubscribeBlocking(podcastUuid: String, playbackManager: PlaybackManager)
     fun unsubscribeAsync(podcastUuid: String, playbackManager: PlaybackManager)
 

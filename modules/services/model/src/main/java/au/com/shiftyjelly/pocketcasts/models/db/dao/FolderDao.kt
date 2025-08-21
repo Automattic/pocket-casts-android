@@ -5,6 +5,8 @@ import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Transaction
+import androidx.room.Upsert
+import au.com.shiftyjelly.pocketcasts.models.db.AppDatabase
 import au.com.shiftyjelly.pocketcasts.models.entity.Folder
 import au.com.shiftyjelly.pocketcasts.models.type.PodcastsSortType
 import io.reactivex.Flowable
@@ -47,6 +49,9 @@ abstract class FolderDao {
     @Query("SELECT * FROM folders WHERE sync_modified != 0")
     abstract fun findNotSyncedBlocking(): List<Folder>
 
+    @Query("SELECT * FROM folders WHERE sync_modified != 0")
+    abstract suspend fun findNotSynced(): List<Folder>
+
     @Query("UPDATE folders SET color = :color, sync_modified = :syncModified WHERE uuid = :uuid")
     abstract suspend fun updateFolderColor(uuid: String, color: Int, syncModified: Long)
 
@@ -83,4 +88,17 @@ abstract class FolderDao {
 
     @Query("SELECT COUNT(*) FROM folders WHERE deleted = 0")
     abstract suspend fun count(): Int
+
+    @Query("DELETE FROM folders WHERE uuid IN (:uuids)")
+    protected abstract suspend fun deleteAllUnsafe(uuids: Collection<String>)
+
+    @Transaction
+    open suspend fun deleteAll(uuids: Collection<String>) {
+        uuids.chunked(AppDatabase.SQLITE_BIND_ARG_LIMIT).forEach { chunk ->
+            deleteAllUnsafe(chunk)
+        }
+    }
+
+    @Upsert
+    abstract suspend fun upsertAll(folders: Collection<Folder>)
 }

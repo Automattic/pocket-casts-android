@@ -46,7 +46,7 @@ interface SmartPlaylistManager {
 
     fun checkForEpisodesToDownloadBlocking(episodeManager: EpisodeManager, playbackManager: PlaybackManager)
 
-    fun removePodcastFromPlaylistsBlocking(podcastUuid: String)
+    suspend fun removePodcastFromPlaylists(podcastUuid: String)
 
     suspend fun markAllSynced()
 
