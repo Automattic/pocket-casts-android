@@ -46,18 +46,18 @@ import au.com.shiftyjelly.pocketcasts.compose.theme
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.milliseconds
-import kotlin.time.Duration.Companion.seconds
-import kotlinx.coroutines.delay
 import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 @Composable
 fun BestAppAnimation(
-    itemDisplayDuration: Duration,
+    isAppearing: Boolean,
+    disappearAnimDuration: Duration,
     modifier: Modifier = Modifier,
 ) {
     AnimatedCarouselItemContainer(
-        itemDisplayDuration = itemDisplayDuration,
+        isAppearing = isAppearing,
+        disappearAnimDuration = disappearAnimDuration,
         modifier = modifier,
         title = stringResource(LR.string.onboarding_intro_carousel_best_app_title),
         content = {
@@ -81,11 +81,13 @@ fun BestAppAnimation(
 
 @Composable
 fun CustomizationIsInsaneAnimation(
-    itemDisplayDuration: Duration,
+    isAppearing: Boolean,
+    disappearAnimDuration: Duration,
     modifier: Modifier = Modifier,
 ) {
     AnimatedCarouselItemContainer(
-        itemDisplayDuration = itemDisplayDuration,
+        isAppearing = isAppearing,
+        disappearAnimDuration = disappearAnimDuration,
         modifier = modifier,
         title = stringResource(LR.string.onboarding_intro_carousel_customization_insane_title),
         content = {
@@ -119,11 +121,13 @@ fun CustomizationIsInsaneAnimation(
 
 @Composable
 fun OrganizingPodcastsAnimation(
-    itemDisplayDuration: Duration,
+    isAppearing: Boolean,
+    disappearAnimDuration: Duration,
     modifier: Modifier = Modifier,
 ) {
     AnimatedCarouselItemContainer(
-        itemDisplayDuration = itemDisplayDuration,
+        isAppearing = isAppearing,
+        disappearAnimDuration = disappearAnimDuration,
         modifier = modifier,
         title = stringResource(LR.string.onboarding_intro_carousel_organizing_podcasts_title),
         content = {
@@ -140,40 +144,36 @@ fun OrganizingPodcastsAnimation(
     )
 }
 
-private enum class AnimationState {
-    Invisible,
-    Appearing,
-    Disappearing,
-}
-
 @Composable
 private fun AnimatedCarouselItemContainer(
-    itemDisplayDuration: Duration,
     title: String,
+    isAppearing: Boolean,
     modifier: Modifier = Modifier,
     disappearAnimDuration: Duration = 300.milliseconds,
     appearAnimDuration: Duration = 600.milliseconds,
     subTitle: String = stringResource(LR.string.onboarding_intro_carousel_pc_user),
     content: @Composable ColumnScope.() -> Unit,
 ) {
-    var animationState by remember { mutableStateOf(AnimationState.Invisible) }
-
-    LaunchedEffect(itemDisplayDuration, disappearAnimDuration) {
-        animationState = AnimationState.Appearing
-        delay(itemDisplayDuration.inWholeMilliseconds - disappearAnimDuration.inWholeMilliseconds)
-        animationState = AnimationState.Disappearing
+    var isVisible by remember {
+        mutableStateOf(
+            !isAppearing,
+        )
     }
 
-    val transition = updateTransition(animationState)
+    LaunchedEffect(isVisible, isAppearing) {
+        isVisible = isAppearing
+    }
+
+    val transition = updateTransition(isVisible)
     val contentAlpha by transition.animateFloat(
         label = "contentAlpha",
         transitionSpec = {
             tween(
-                durationMillis = animationState.durationMillis(
+                durationMillis = isVisible.durationMillis(
                     appearAnimDuration = appearAnimDuration,
                     disappearAnimDuration = disappearAnimDuration,
                 ),
-                easing = animationState.easing,
+                easing = isVisible.easing,
             )
         },
     ) {
@@ -183,11 +183,11 @@ private fun AnimatedCarouselItemContainer(
         label = "contentYOffset",
         transitionSpec = {
             tween(
-                durationMillis = animationState.durationMillis(
+                durationMillis = isVisible.durationMillis(
                     appearAnimDuration = appearAnimDuration,
                     disappearAnimDuration = disappearAnimDuration,
                 ),
-                easing = animationState.easing,
+                easing = isVisible.easing,
             )
         },
     ) {
@@ -197,12 +197,12 @@ private fun AnimatedCarouselItemContainer(
         label = "mainTextAlpha",
         transitionSpec = {
             tween(
-                durationMillis = animationState.durationMillis(
+                durationMillis = isVisible.durationMillis(
                     appearAnimDuration = appearAnimDuration,
                     disappearAnimDuration = disappearAnimDuration,
                 ),
-                delayMillis = animationState.textAnimDelay(300.milliseconds),
-                easing = animationState.easing,
+                delayMillis = isVisible.textAnimDelay(300.milliseconds),
+                easing = isVisible.easing,
             )
         },
     ) {
@@ -212,12 +212,12 @@ private fun AnimatedCarouselItemContainer(
         label = "mainTextYOffset",
         transitionSpec = {
             tween(
-                durationMillis = animationState.durationMillis(
+                durationMillis = isVisible.durationMillis(
                     appearAnimDuration = appearAnimDuration,
                     disappearAnimDuration = disappearAnimDuration,
                 ),
-                delayMillis = animationState.textAnimDelay(300.milliseconds),
-                easing = animationState.easing,
+                delayMillis = isVisible.textAnimDelay(300.milliseconds),
+                easing = isVisible.easing,
             )
         },
     ) {
@@ -227,12 +227,12 @@ private fun AnimatedCarouselItemContainer(
         label = "secondaryTextAlpha",
         transitionSpec = {
             tween(
-                durationMillis = animationState.durationMillis(
+                durationMillis = isVisible.durationMillis(
                     appearAnimDuration = appearAnimDuration,
                     disappearAnimDuration = disappearAnimDuration,
                 ),
-                delayMillis = animationState.textAnimDelay(600.milliseconds),
-                easing = animationState.easing,
+                delayMillis = isVisible.textAnimDelay(600.milliseconds),
+                easing = isVisible.easing,
             )
         },
     ) {
@@ -242,12 +242,12 @@ private fun AnimatedCarouselItemContainer(
         label = "secondaryTextYOffset",
         transitionSpec = {
             tween(
-                durationMillis = animationState.durationMillis(
+                durationMillis = isVisible.durationMillis(
                     appearAnimDuration = appearAnimDuration,
                     disappearAnimDuration = disappearAnimDuration,
                 ),
-                delayMillis = animationState.textAnimDelay(600.milliseconds),
-                easing = animationState.easing,
+                delayMillis = isVisible.textAnimDelay(600.milliseconds),
+                easing = isVisible.easing,
             )
         },
     ) {
@@ -308,68 +308,39 @@ private fun AnimatedCarouselItemContainer(
     }
 }
 
-private val AnimationState.alpha
-    get() = when (this) {
-        AnimationState.Appearing -> 1f
-        AnimationState.Invisible,
-        AnimationState.Disappearing,
-        -> 0f
-    }
+private val Boolean.alpha
+    get() = if (this) 1f else 0f
 
-private val AnimationState.textOffsetY
-    get() = when (this) {
-        AnimationState.Appearing -> (-6).dp
-        AnimationState.Invisible,
-        AnimationState.Disappearing,
-        -> 6.dp
-    }
+private val Boolean.textOffsetY
+    get() = if (this) (-6).dp else 6.dp
 
-private val AnimationState.contentOffsetY
-    get() = when (this) {
-        AnimationState.Appearing -> (-16).dp
-        AnimationState.Invisible,
-        AnimationState.Disappearing,
-        -> 16.dp
-    }
+private val Boolean.contentOffsetY
+    get() = if (this) (-16).dp else 16.dp
 
-private val AnimationState.easing
-    get() = when (this) {
-        AnimationState.Appearing -> FastOutSlowInEasing
-        AnimationState.Invisible,
-        AnimationState.Disappearing,
-        -> FastOutLinearInEasing
-    }
+private val Boolean.easing
+    get() = if (this) FastOutSlowInEasing else FastOutLinearInEasing
 
-private fun AnimationState.durationMillis(
+private fun Boolean.durationMillis(
     appearAnimDuration: Duration,
     disappearAnimDuration: Duration,
-) = when (this) {
-    AnimationState.Invisible -> 0
-    AnimationState.Appearing -> appearAnimDuration.inWholeMilliseconds.toInt()
-    AnimationState.Disappearing -> disappearAnimDuration.inWholeMilliseconds.toInt()
-}
+) = if (this) appearAnimDuration.inWholeMilliseconds.toInt() else disappearAnimDuration.inWholeMilliseconds.toInt()
 
-private fun AnimationState.textAnimDelay(additionalDelay: Duration) = when (this) {
-    AnimationState.Appearing -> additionalDelay.inWholeMilliseconds.toInt()
-    AnimationState.Invisible,
-    AnimationState.Disappearing,
-    -> 0
-}
+private fun Boolean.textAnimDelay(additionalDelay: Duration) = if (this) additionalDelay.inWholeMilliseconds.toInt() else 0
 
 @Preview
 @Composable
 private fun PreviewBestAppAnim() = AppThemeWithBackground(Theme.ThemeType.LIGHT) {
-    BestAppAnimation(modifier = Modifier.fillMaxWidth(), itemDisplayDuration = 5.seconds)
+    BestAppAnimation(modifier = Modifier.fillMaxWidth(), isAppearing = false, disappearAnimDuration = 300.milliseconds)
 }
 
 @Preview
 @Composable
 private fun PreviewCustomizationAppAnim() = AppThemeWithBackground(Theme.ThemeType.LIGHT) {
-    CustomizationIsInsaneAnimation(modifier = Modifier.fillMaxWidth(), itemDisplayDuration = 5.seconds)
+    CustomizationIsInsaneAnimation(modifier = Modifier.fillMaxWidth(), isAppearing = false, disappearAnimDuration = 300.milliseconds)
 }
 
 @Preview
 @Composable
 private fun PreviewOrganizingAppAnim() = AppThemeWithBackground(Theme.ThemeType.LIGHT) {
-    OrganizingPodcastsAnimation(modifier = Modifier.fillMaxWidth(), itemDisplayDuration = 5.seconds)
+    OrganizingPodcastsAnimation(modifier = Modifier.fillMaxWidth(), isAppearing = false, disappearAnimDuration = 300.milliseconds)
 }
