@@ -263,6 +263,7 @@ class RefreshPodcastsThread(
                 statsManager = entryPoint.statsManager(),
                 appDatabase = entryPoint.appDatabase(),
                 settings = entryPoint.settings(),
+                context = context,
             )
             val result = runBlocking {
                 process.sync()

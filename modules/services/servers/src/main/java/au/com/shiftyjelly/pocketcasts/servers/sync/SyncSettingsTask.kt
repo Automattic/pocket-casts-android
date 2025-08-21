@@ -8,6 +8,7 @@ import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import java.time.Instant
 import timber.log.Timber
+import kotlin.Result as KotlinResult
 
 class SyncSettingsTask(context: Context, parameters: WorkerParameters) : CoroutineWorker(context, parameters) {
     companion object {
@@ -15,15 +16,9 @@ class SyncSettingsTask(context: Context, parameters: WorkerParameters) : Corouti
             settings: Settings,
             lastSyncTime: Instant,
             namedSettingsCall: NamedSettingsCaller,
-        ): Result {
-            try {
-                syncSettings(settings, lastSyncTime, namedSettingsCall)
-            } catch (e: Exception) {
-                LogBuffer.e(LogBuffer.TAG_BACKGROUND_TASKS, e, "Sync settings failed")
-                return Result.failure()
-            }
-
-            return Result.success()
+        ): KotlinResult<Unit> {
+            return runCatching { syncSettings(settings, lastSyncTime, namedSettingsCall) }
+                .onFailure { e -> LogBuffer.e(LogBuffer.TAG_BACKGROUND_TASKS, e, "Sync settings failed") }
         }
 
         private suspend fun syncSettings(
@@ -77,5 +72,7 @@ class SyncSettingsTask(context: Context, parameters: WorkerParameters) : Corouti
             .onFailure { Timber.e(it, "Could not convert lastModified String to Long: $lastSyncTimeString") }
             .getOrDefault(Instant.EPOCH)
         return run(settings, lastSyncTime, namedSettingsCaller)
+            .map { Result.success() }
+            .getOrElse { Result.failure() }
     }
 }

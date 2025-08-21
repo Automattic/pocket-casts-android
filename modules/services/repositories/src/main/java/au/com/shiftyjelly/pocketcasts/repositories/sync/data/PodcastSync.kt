@@ -35,7 +35,6 @@ internal class PodcastSync(
     private val playbackManager: PlaybackManager,
     private val missingPodcastsSemaphore: Semaphore,
 ) {
-
     suspend fun fullSync(serverPodcasts: List<UserPodcastResponse>) {
         val localPodcasts = podcastManager.findSubscribedNoOrder()
         val serverPodcastMap = serverPodcasts.associateBy(UserPodcastResponse::getUuid)
