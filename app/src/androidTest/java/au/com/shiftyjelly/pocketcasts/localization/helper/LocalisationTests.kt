@@ -13,18 +13,18 @@ import org.junit.runner.RunWith
 class LocalisationTests {
 
     private val locales = listOf(
-        Locale("en", "EN"),
-        Locale("de", "DE"),
-        Locale("es", "ES"),
-        Locale("fr", "FR"),
-        Locale("it", "IT"),
-        Locale("ja", "JP"),
-        Locale("nl", "NL"),
-        Locale("pt", "BR"),
-        Locale("ru", "RU"),
-        Locale("sv", "SV"),
-        Locale("zh", "TW"),
-        Locale("zh", "CN"),
+        Locale.of("en", "EN"),
+        Locale.of("de", "DE"),
+        Locale.of("es", "ES"),
+        Locale.of("fr", "FR"),
+        Locale.of("it", "IT"),
+        Locale.of("ja", "JP"),
+        Locale.of("nl", "NL"),
+        Locale.of("pt", "BR"),
+        Locale.of("ru", "RU"),
+        Locale.of("sv", "SV"),
+        Locale.of("zh", "TW"),
+        Locale.of("zh", "CN"),
     )
 
     private val strings = listOf(
