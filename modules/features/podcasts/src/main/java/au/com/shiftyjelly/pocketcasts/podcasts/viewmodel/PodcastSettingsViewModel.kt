@@ -9,7 +9,7 @@ import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
-import au.com.shiftyjelly.pocketcasts.models.entity.SmartPlaylist
+import au.com.shiftyjelly.pocketcasts.models.entity.PlaylistEntity
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PlaylistProperty
@@ -41,8 +41,8 @@ class PodcastSettingsViewModel @Inject constructor(
 
     var podcastUuid: String? = null
     lateinit var podcast: LiveData<Podcast>
-    lateinit var includedFilters: LiveData<List<SmartPlaylist>>
-    lateinit var availableFilters: LiveData<List<SmartPlaylist>>
+    lateinit var includedFilters: LiveData<List<PlaylistEntity>>
+    lateinit var availableFilters: LiveData<List<PlaylistEntity>>
 
     val globalSettings = settings.autoAddUpNextLimit.flow
         .combine(settings.autoAddUpNextLimitBehaviour.flow, ::Pair)
@@ -146,7 +146,7 @@ class PodcastSettingsViewModel @Inject constructor(
 
                     if (isUpdated) {
                         playlist.podcastUuidList = currentSelection
-                        playlist.syncStatus = SmartPlaylist.SYNC_STATUS_NOT_SYNCED
+                        playlist.syncStatus = PlaylistEntity.SYNC_STATUS_NOT_SYNCED
                         val userPlaylistUpdate = UserPlaylistUpdate(
                             listOf(PlaylistProperty.Podcasts),
                             PlaylistUpdateSource.PODCAST_SETTINGS,

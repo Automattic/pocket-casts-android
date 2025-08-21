@@ -64,7 +64,7 @@ import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastRatings
 import au.com.shiftyjelly.pocketcasts.models.entity.SearchHistoryItem
-import au.com.shiftyjelly.pocketcasts.models.entity.SmartPlaylist
+import au.com.shiftyjelly.pocketcasts.models.entity.PlaylistEntity
 import au.com.shiftyjelly.pocketcasts.models.entity.SuggestedFolder
 import au.com.shiftyjelly.pocketcasts.models.entity.Transcript
 import au.com.shiftyjelly.pocketcasts.models.entity.UpNextChange
@@ -87,7 +87,7 @@ import au.com.shiftyjelly.pocketcasts.localization.R as LR
         PodcastEpisode::class,
         Folder::class,
         SuggestedFolder::class,
-        SmartPlaylist::class,
+        PlaylistEntity::class,
         PlaylistEpisode::class,
         Podcast::class,
         SearchHistoryItem::class,

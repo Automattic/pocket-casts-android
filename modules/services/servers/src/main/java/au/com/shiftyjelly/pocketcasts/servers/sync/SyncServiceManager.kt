@@ -1,8 +1,7 @@
 package au.com.shiftyjelly.pocketcasts.servers.sync
 
 import android.os.Build
-import au.com.shiftyjelly.pocketcasts.models.entity.Bookmark
-import au.com.shiftyjelly.pocketcasts.models.entity.SmartPlaylist
+import au.com.shiftyjelly.pocketcasts.models.entity.PlaylistEntity
 import au.com.shiftyjelly.pocketcasts.models.entity.UserEpisode
 import au.com.shiftyjelly.pocketcasts.models.to.HistorySyncRequest
 import au.com.shiftyjelly.pocketcasts.models.to.HistorySyncResponse
@@ -12,7 +11,6 @@ import au.com.shiftyjelly.pocketcasts.preferences.RefreshToken
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.servers.di.Cached
 import au.com.shiftyjelly.pocketcasts.servers.di.SyncServiceRetrofit
-import au.com.shiftyjelly.pocketcasts.servers.sync.bookmark.toBookmark
 import au.com.shiftyjelly.pocketcasts.servers.sync.forgotpassword.ForgotPasswordRequest
 import au.com.shiftyjelly.pocketcasts.servers.sync.forgotpassword.ForgotPasswordResponse
 import au.com.shiftyjelly.pocketcasts.servers.sync.history.HistoryYearResponse
@@ -34,7 +32,6 @@ import com.pocketcasts.service.api.ReferralRedemptionRequest
 import com.pocketcasts.service.api.ReferralRedemptionResponse
 import com.pocketcasts.service.api.ReferralValidationResponse
 import com.pocketcasts.service.api.SupportFeedbackRequest
-import com.pocketcasts.service.api.UserPlaylistListRequest
 import com.pocketcasts.service.api.UserPlaylistListResponse
 import com.pocketcasts.service.api.UserPodcastListResponse
 import com.pocketcasts.service.api.WinbackResponse
@@ -174,7 +171,7 @@ open class SyncServiceManager @Inject constructor(
         return service.getPodcastEpisodes(addBearer(token), request)
     }
 
-    suspend fun getFilters(token: AccessToken): List<SmartPlaylist> {
+    suspend fun getFilters(token: AccessToken): List<PlaylistEntity> {
         val response = service.getFilterList(addBearer(token), buildBasicRequest())
         return response.filters?.mapNotNull { it.toFilter() } ?: emptyList()
     }

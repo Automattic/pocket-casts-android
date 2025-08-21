@@ -6,7 +6,7 @@ import androidx.lifecycle.toLiveData
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
-import au.com.shiftyjelly.pocketcasts.models.entity.SmartPlaylist
+import au.com.shiftyjelly.pocketcasts.models.entity.PlaylistEntity
 import au.com.shiftyjelly.pocketcasts.repositories.extensions.calculateCombinedIconId
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
@@ -54,10 +54,10 @@ class CreateFilterViewModel @Inject constructor(
     private val _lockedToFirstPage = MutableStateFlow(true)
     val lockedToFirstPage get() = _lockedToFirstPage.asStateFlow()
 
-    var smartPlaylist: LiveData<SmartPlaylist>? = null
+    var playlist: LiveData<PlaylistEntity>? = null
 
     suspend fun createFilter(name: String, iconId: Int, colorId: Int) = withContext(Dispatchers.IO) {
-        smartPlaylistManager.createPlaylistBlocking(name, SmartPlaylist.calculateCombinedIconId(colorId, iconId), draft = true)
+        smartPlaylistManager.createPlaylistBlocking(name, PlaylistEntity.calculateCombinedIconId(colorId, iconId), draft = true)
     }
 
     val filterName = MutableStateFlow("")
@@ -89,11 +89,11 @@ class CreateFilterViewModel @Inject constructor(
         colorIndex: Int,
         isCreatingNewFilter: Boolean,
     ) = withContext(Dispatchers.Default) {
-        val playlist = smartPlaylist?.value ?: return@withContext
+        val playlist = playlist?.value ?: return@withContext
         playlist.title = filterName.value
-        playlist.iconId = SmartPlaylist.calculateCombinedIconId(colorIndex, iconIndex)
+        playlist.iconId = PlaylistEntity.calculateCombinedIconId(colorIndex, iconIndex)
         playlist.draft = false
-        playlist.syncStatus = SmartPlaylist.SYNC_STATUS_NOT_SYNCED
+        playlist.syncStatus = PlaylistEntity.SYNC_STATUS_NOT_SYNCED
 
         // If in filter creation flow a filter is not being updated by the user,
         // there are no user updated playlist properties
@@ -123,7 +123,7 @@ class CreateFilterViewModel @Inject constructor(
 
     fun updateAutoDownload(autoDownload: Boolean) {
         launch {
-            smartPlaylist?.value?.let { playlist ->
+            playlist?.value?.let { playlist ->
                 playlist.autoDownload = autoDownload
 
                 val userPlaylistUpdate = if (isAutoDownloadSwitchInitialized) {
@@ -145,7 +145,7 @@ class CreateFilterViewModel @Inject constructor(
             return
         }
 
-        smartPlaylist = if (playlistUUID != null) {
+        playlist = if (playlistUUID != null) {
             smartPlaylistManager.findByUuidRxMaybe(playlistUUID)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
@@ -158,14 +158,14 @@ class CreateFilterViewModel @Inject constructor(
         hasBeenInitialised = true
     }
 
-    fun observeFilter(filter: SmartPlaylist): LiveData<List<PodcastEpisode>> = smartPlaylistManager
+    fun observeFilter(filter: PlaylistEntity): LiveData<List<PodcastEpisode>> = smartPlaylistManager
         .observeEpisodesPreviewBlocking(filter, episodeManager, playbackManager)
         .toLiveData()
 
     fun updateDownloadLimit(limit: Int) {
         userChangedAutoDownloadEpisodeCount.recordUserChange()
         launch {
-            val playlist = smartPlaylist?.value ?: return@launch
+            val playlist = playlist?.value ?: return@launch
             playlist.autodownloadLimit = limit
 
             val userPlaylistUpdate = UserPlaylistUpdate(
@@ -187,7 +187,7 @@ class CreateFilterViewModel @Inject constructor(
     fun clearNewFilter() {
         reset()
         launch(Dispatchers.Default) {
-            val playlist = smartPlaylist?.value ?: return@launch
+            val playlist = playlist?.value ?: return@launch
             smartPlaylistManager.deleteBlocking(playlist)
         }
     }
@@ -195,7 +195,7 @@ class CreateFilterViewModel @Inject constructor(
     fun starredChipTapped(isCreatingFilter: Boolean) {
         _lockedToFirstPage.value = false
         launch {
-            smartPlaylist?.value?.let { playlist ->
+            playlist?.value?.let { playlist ->
                 playlist.starred = !playlist.starred
 
                 // Only indicate user is updating the starred property if this is not

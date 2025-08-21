@@ -8,7 +8,7 @@ import androidx.core.view.updatePadding
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
-import au.com.shiftyjelly.pocketcasts.models.entity.SmartPlaylist
+import au.com.shiftyjelly.pocketcasts.models.entity.PlaylistEntity
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.SmartPlaylistManager
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
@@ -37,7 +37,7 @@ class AutoDownloadFiltersFragment :
 
     @Inject lateinit var settings: Settings
 
-    private val filters = mutableListOf<SmartPlaylist>()
+    private val filters = mutableListOf<PlaylistEntity>()
     private val adapter = FilterAutoDownloadAdapter(filters, this, theme.isDarkTheme)
     private val disposables = CompositeDisposable()
 
@@ -77,8 +77,8 @@ class AutoDownloadFiltersFragment :
             .firstOrError()
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
-            .subscribeWith(object : DisposableSingleObserver<List<SmartPlaylist>>() {
-                override fun onSuccess(list: List<SmartPlaylist>) {
+            .subscribeWith(object : DisposableSingleObserver<List<PlaylistEntity>>() {
+                override fun onSuccess(list: List<PlaylistEntity>) {
                     filters.clear()
                     filters.addAll(list)
                     adapter.notifyDataSetChanged()
@@ -90,7 +90,7 @@ class AutoDownloadFiltersFragment :
             }).addTo(disposables)
     }
 
-    override fun onAutoDownloadChanged(filter: SmartPlaylist, on: Boolean) {
+    override fun onAutoDownloadChanged(filter: PlaylistEntity, on: Boolean) {
         smartPlaylistManager.updateAutoDownloadStatusRxCompletable(filter, on)
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())

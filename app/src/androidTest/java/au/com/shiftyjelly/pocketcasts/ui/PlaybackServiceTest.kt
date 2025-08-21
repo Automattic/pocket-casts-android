@@ -10,7 +10,7 @@ import androidx.test.rule.ServiceTestRule
 import au.com.shiftyjelly.pocketcasts.PocketCastsApplication
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
-import au.com.shiftyjelly.pocketcasts.models.entity.SmartPlaylist
+import au.com.shiftyjelly.pocketcasts.models.entity.PlaylistEntity
 import au.com.shiftyjelly.pocketcasts.preferences.Settings.NotificationId
 import au.com.shiftyjelly.pocketcasts.repositories.notification.NotificationHelper
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackService
@@ -74,7 +74,7 @@ class PlaybackServiceTest {
             PodcastEpisode(uuid = UUID.randomUUID().toString(), podcastUuid = podcastTwo.uuid, publishedDate = Date(), title = "Episode 2"),
             PodcastEpisode(uuid = UUID.randomUUID().toString(), podcastUuid = podcastOne.uuid, publishedDate = Date(), title = "Episode 3"),
         )
-        val filter = SmartPlaylist(uuid = UUID.randomUUID().toString(), title = "New Releases")
+        val filter = PlaylistEntity(uuid = UUID.randomUUID().toString(), title = "New Releases")
         val filters = listOf(filter)
         val filterEpisodes = listOf(
             PodcastEpisode(uuid = UUID.randomUUID().toString(), podcastUuid = podcastOne.uuid, publishedDate = Date(), title = "Episode 4"),
@@ -101,7 +101,7 @@ class PlaybackServiceTest {
         val smartPlaylistManager = mock<SmartPlaylistManager> {
             onBlocking { findAll() }.doReturn(filters)
             onBlocking { findByUuid(filter.uuid) }.doReturn(filter)
-            on { findEpisodesBlocking(smartPlaylist = filters.first(), episodeManager = episodeManager, playbackManager = service.playbackManager) }.doReturn(filterEpisodes)
+            on { findEpisodesBlocking(playlist = filters.first(), episodeManager = episodeManager, playbackManager = service.playbackManager) }.doReturn(filterEpisodes)
         }
         service.smartPlaylistManager = smartPlaylistManager
 

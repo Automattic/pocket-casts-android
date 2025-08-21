@@ -1,6 +1,6 @@
 package au.com.shiftyjelly.pocketcasts.servers.sync
 
-import au.com.shiftyjelly.pocketcasts.models.entity.SmartPlaylist
+import au.com.shiftyjelly.pocketcasts.models.entity.PlaylistEntity
 import au.com.shiftyjelly.pocketcasts.models.type.PlaylistEpisodeSortType
 import com.squareup.moshi.Json
 import com.squareup.moshi.JsonClass
@@ -36,11 +36,11 @@ data class FilterResponse(
     @Json(name = "shorterThan") val shorterThan: Int?,
 ) {
 
-    fun toFilter(): SmartPlaylist? {
+    fun toFilter(): PlaylistEntity? {
         if (uuid == null) {
             return null
         }
-        val filter = SmartPlaylist(uuid = uuid)
+        val filter = PlaylistEntity(uuid = uuid)
         title?.let { filter.title = it }
         sortPosition?.let { filter.sortPosition = it }
         manual?.let { filter.manual = it }

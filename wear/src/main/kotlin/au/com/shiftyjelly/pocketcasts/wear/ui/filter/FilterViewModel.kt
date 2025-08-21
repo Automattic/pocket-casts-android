@@ -4,7 +4,7 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
-import au.com.shiftyjelly.pocketcasts.models.entity.SmartPlaylist
+import au.com.shiftyjelly.pocketcasts.models.entity.PlaylistEntity
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
@@ -32,10 +32,10 @@ class FilterViewModel @Inject constructor(
     sealed class UiState {
         object Loading : UiState()
         data class Empty(
-            val filter: SmartPlaylist? = null,
+            val filter: PlaylistEntity? = null,
         ) : UiState()
         data class Loaded(
-            val filter: SmartPlaylist,
+            val filter: PlaylistEntity,
             val episodes: List<PodcastEpisode>,
         ) : UiState()
     }

@@ -9,8 +9,8 @@ import androidx.room.Upsert
 import au.com.shiftyjelly.pocketcasts.models.db.AppDatabase
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
-import au.com.shiftyjelly.pocketcasts.models.entity.SmartPlaylist
-import au.com.shiftyjelly.pocketcasts.models.entity.SmartPlaylist.Companion.SYNC_STATUS_NOT_SYNCED
+import au.com.shiftyjelly.pocketcasts.models.entity.PlaylistEntity
+import au.com.shiftyjelly.pocketcasts.models.entity.PlaylistEntity.Companion.SYNC_STATUS_NOT_SYNCED
 import au.com.shiftyjelly.pocketcasts.models.to.PlaylistEpisodeMetadata
 import au.com.shiftyjelly.pocketcasts.models.to.PlaylistShortcut
 import au.com.shiftyjelly.pocketcasts.models.type.PlaylistEpisodeSortType
@@ -26,22 +26,22 @@ import kotlinx.coroutines.flow.Flow
 @Dao
 abstract class PlaylistDao {
     @Upsert
-    abstract suspend fun upsertPlaylist(playlist: SmartPlaylist)
+    abstract suspend fun upsertPlaylist(playlist: PlaylistEntity)
 
     @Upsert
-    abstract suspend fun upsertAllPlaylists(playlists: List<SmartPlaylist>)
+    abstract suspend fun upsertAllPlaylists(playlists: List<PlaylistEntity>)
 
     @Query("SELECT uuid FROM playlists ORDER BY sortPosition ASC")
     abstract suspend fun getAllPlaylistUuids(): List<String>
 
     @Query("SELECT * FROM playlists WHERE manual = 0 AND deleted = 0 AND draft = 0 AND uuid = :uuid")
-    abstract fun observeSmartPlaylist(uuid: String): Flow<SmartPlaylist?>
+    abstract fun observeSmartPlaylist(uuid: String): Flow<PlaylistEntity?>
 
     @Query("SELECT * FROM playlists WHERE manual = 0 AND deleted = 0 AND draft = 0 ORDER BY sortPosition ASC")
-    abstract fun observeSmartPlaylists(): Flow<List<SmartPlaylist>>
+    abstract fun observeSmartPlaylists(): Flow<List<PlaylistEntity>>
 
     @Query("SELECT * FROM playlists WHERE manual = 0 AND deleted = 0 AND draft = 0 ORDER BY sortPosition ASC")
-    abstract suspend fun getSmartPlaylists(): List<SmartPlaylist>
+    abstract suspend fun getSmartPlaylists(): List<PlaylistEntity>
 
     @Query(
         """
@@ -55,17 +55,17 @@ abstract class PlaylistDao {
     abstract fun observerPlaylistShortcut(): Flow<PlaylistShortcut?>
 
     @Query("SELECT * FROM playlists WHERE uuid IN (:uuids)")
-    protected abstract suspend fun getAllPlaylistsUnsafe(uuids: Collection<String>): List<SmartPlaylist>
+    protected abstract suspend fun getAllPlaylistsUnsafe(uuids: Collection<String>): List<PlaylistEntity>
 
     @Transaction
-    open suspend fun getAllPlaylists(uuids: Collection<String>): List<SmartPlaylist> {
+    open suspend fun getAllPlaylists(uuids: Collection<String>): List<PlaylistEntity> {
         return uuids.chunked(AppDatabase.SQLITE_BIND_ARG_LIMIT).flatMap { chunk ->
             getAllPlaylistsUnsafe(chunk)
         }
     }
 
     @Query("SELECT * FROM playlists WHERE draft = 0 AND manual = 0 AND syncStatus = $SYNC_STATUS_NOT_SYNCED")
-    abstract suspend fun getAllUnsynced(): List<SmartPlaylist>
+    abstract suspend fun getAllUnsynced(): List<PlaylistEntity>
 
     @Query("UPDATE playlists SET sortPosition = :position, syncStatus = $SYNC_STATUS_NOT_SYNCED WHERE uuid = :uuid")
     abstract suspend fun updateSortPosition(uuid: String, position: Int)

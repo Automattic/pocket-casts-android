@@ -15,7 +15,7 @@ import androidx.lifecycle.repeatOnLifecycle
 import androidx.viewpager2.adapter.FragmentStateAdapter
 import androidx.viewpager2.widget.ViewPager2
 import au.com.shiftyjelly.pocketcasts.filters.databinding.FragmentCreateContainerBinding
-import au.com.shiftyjelly.pocketcasts.models.entity.SmartPlaylist
+import au.com.shiftyjelly.pocketcasts.models.entity.PlaylistEntity
 import au.com.shiftyjelly.pocketcasts.ui.extensions.getThemeColor
 import au.com.shiftyjelly.pocketcasts.ui.extensions.getTintedDrawable
 import au.com.shiftyjelly.pocketcasts.ui.extensions.setupKeyboardModePan
@@ -105,7 +105,7 @@ class CreateFilterContainerFragment : BaseFragment() {
     }
 
     private fun updateToolbarColors() {
-        val colorResId = SmartPlaylist.themeColors.getOrNull(viewModel.colorIndex.value) ?: UR.attr.filter_01
+        val colorResId = PlaylistEntity.themeColors.getOrNull(viewModel.colorIndex.value) ?: UR.attr.filter_01
         val tintColor = view?.context?.getThemeColor(colorResId) ?: return
         val iconRes = if (binding.viewPager.currentItem == 0) IR.drawable.ic_close else IR.drawable.ic_arrow_back
         val backIcon = context?.getTintedDrawable(iconRes, ThemeColor.filterIcon01(theme.activeTheme, tintColor))
@@ -129,7 +129,7 @@ class CreateFilterContainerFragment : BaseFragment() {
     }
 
     private fun observePlaylist(adapter: CreatePagerAdapter) {
-        viewModel.smartPlaylist?.observe(viewLifecycleOwner) {
+        viewModel.playlist?.observe(viewLifecycleOwner) {
             binding.btnCreate.isEnabled = !adapter.lockedToFirstPage
         }
     }
@@ -150,7 +150,7 @@ class CreateFilterContainerFragment : BaseFragment() {
         lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
                 viewModel.colorIndex.collect {
-                    val colorResId = SmartPlaylist.themeColors.getOrNull(it) ?: UR.attr.filter_01
+                    val colorResId = PlaylistEntity.themeColors.getOrNull(it) ?: UR.attr.filter_01
                     val tintColor = requireContext().getThemeColor(colorResId)
                     val stateList = ColorStateList(
                         arrayOf(

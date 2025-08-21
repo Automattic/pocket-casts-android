@@ -3,7 +3,7 @@ package au.com.shiftyjelly.pocketcasts.repositories.podcast
 import android.content.Context
 import au.com.shiftyjelly.pocketcasts.models.db.AppDatabase
 import au.com.shiftyjelly.pocketcasts.models.db.dao.SmartPlaylistDao
-import au.com.shiftyjelly.pocketcasts.models.entity.SmartPlaylist
+import au.com.shiftyjelly.pocketcasts.models.entity.PlaylistEntity
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.download.DownloadManager
 import au.com.shiftyjelly.pocketcasts.repositories.notification.NotificationManager
@@ -39,7 +39,7 @@ class SmartPlaylistManagerImplTest {
         val playlistManager = initManager()
 
         playlistManager.updateBlocking(
-            smartPlaylist = SmartPlaylist(),
+            playlist = PlaylistEntity(),
             userPlaylistUpdate = UserPlaylistUpdate(listOf(PlaylistProperty.Color), PlaylistUpdateSource.AUTO_DOWNLOAD_SETTINGS),
             isCreatingFilter = true,
         )
@@ -54,7 +54,7 @@ class SmartPlaylistManagerImplTest {
         val playlistManager = initManager()
 
         playlistManager.updateBlocking(
-            smartPlaylist = SmartPlaylist(),
+            playlist = PlaylistEntity(),
             userPlaylistUpdate = UserPlaylistUpdate(listOf(PlaylistProperty.Color), PlaylistUpdateSource.AUTO_DOWNLOAD_SETTINGS),
             isCreatingFilter = false,
         )

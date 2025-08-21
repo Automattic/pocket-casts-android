@@ -6,11 +6,11 @@ import android.view.ViewGroup
 import android.widget.CheckBox
 import android.widget.ImageView
 import android.widget.TextView
-import au.com.shiftyjelly.pocketcasts.models.entity.SmartPlaylist
+import au.com.shiftyjelly.pocketcasts.models.entity.PlaylistEntity
 import au.com.shiftyjelly.pocketcasts.views.R
 import au.com.shiftyjelly.pocketcasts.views.helper.PlaylistHelper
 
-class FilterAutoDownloadAdapter(private val filters: List<SmartPlaylist>, private val clickListener: ClickListener, val isDarkTheme: Boolean) : androidx.recyclerview.widget.RecyclerView.Adapter<FilterAutoDownloadAdapter.ViewHolder>() {
+class FilterAutoDownloadAdapter(private val filters: List<PlaylistEntity>, private val clickListener: ClickListener, val isDarkTheme: Boolean) : androidx.recyclerview.widget.RecyclerView.Adapter<FilterAutoDownloadAdapter.ViewHolder>() {
 
     init {
         setHasStableIds(true)
@@ -40,13 +40,13 @@ class FilterAutoDownloadAdapter(private val filters: List<SmartPlaylist>, privat
         return filters[position].id ?: androidx.recyclerview.widget.RecyclerView.NO_ID
     }
 
-    private fun addTalkBack(filter: SmartPlaylist, view: View) {
+    private fun addTalkBack(filter: PlaylistEntity, view: View) {
         val status = if (filter.autoDownload) "on" else "off"
         view.contentDescription = "${filter.title} auto downloads $status."
     }
 
     interface ClickListener {
-        fun onAutoDownloadChanged(filter: SmartPlaylist, on: Boolean)
+        fun onAutoDownloadChanged(filter: PlaylistEntity, on: Boolean)
     }
 
     inner class ViewHolder(view: View) :

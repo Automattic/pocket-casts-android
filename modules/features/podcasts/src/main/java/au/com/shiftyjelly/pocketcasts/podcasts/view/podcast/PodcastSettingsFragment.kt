@@ -17,7 +17,7 @@ import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.localization.extensions.getStringPluralSeconds
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
-import au.com.shiftyjelly.pocketcasts.models.entity.SmartPlaylist
+import au.com.shiftyjelly.pocketcasts.models.entity.PlaylistEntity
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodeStatusEnum
 import au.com.shiftyjelly.pocketcasts.podcasts.R
 import au.com.shiftyjelly.pocketcasts.podcasts.viewmodel.PodcastSettingsViewModel
@@ -497,7 +497,7 @@ class PodcastSettingsFragment :
         preferenceSkipLast?.icon = context.getTintedDrawable(R.drawable.ic_skip_outro, tintColor)
     }
 
-    private fun updateFiltersSummary(includedFilters: List<SmartPlaylist>, availableFilters: List<SmartPlaylist>) {
+    private fun updateFiltersSummary(includedFilters: List<PlaylistEntity>, availableFilters: List<PlaylistEntity>) {
         val filterTitles = includedFilters.map { it.title }
         if (filterTitles.isEmpty()) {
             preferenceFilters?.summary = getString(LR.string.podcast_not_in_filters)

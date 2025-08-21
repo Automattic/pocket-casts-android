@@ -1,6 +1,6 @@
 package au.com.shiftyjelly.pocketcasts.filters
 
-import au.com.shiftyjelly.pocketcasts.models.entity.SmartPlaylist
+import au.com.shiftyjelly.pocketcasts.models.entity.PlaylistEntity
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.preferences.UserSetting
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
@@ -27,8 +27,8 @@ class FiltersFragmentViewModelTest {
     val coroutineRule = MainCoroutineRule()
 
     private val defaultFilters = listOf(
-        SmartPlaylist(id = 1, uuid = Playlist.NEW_RELEASES_UUID),
-        SmartPlaylist(id = 2, uuid = Playlist.IN_PROGRESS_UUID),
+        PlaylistEntity(id = 1, uuid = Playlist.NEW_RELEASES_UUID),
+        PlaylistEntity(id = 2, uuid = Playlist.IN_PROGRESS_UUID),
     )
 
     @Before
@@ -59,7 +59,7 @@ class FiltersFragmentViewModelTest {
     @Test
     fun `should not show tooltip if created custom filter`() = runTest {
         var showTooltip = false
-        viewModel.shouldShowTooltip(defaultFilters + listOf(SmartPlaylist(id = 3, uuid = "custom"))) {
+        viewModel.shouldShowTooltip(defaultFilters + listOf(PlaylistEntity(id = 3, uuid = "custom"))) {
             showTooltip = true
         }
 

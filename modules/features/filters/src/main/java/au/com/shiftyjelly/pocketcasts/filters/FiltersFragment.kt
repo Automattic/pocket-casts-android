@@ -46,7 +46,7 @@ import au.com.shiftyjelly.pocketcasts.compose.components.TipPosition
 import au.com.shiftyjelly.pocketcasts.compose.components.Tooltip
 import au.com.shiftyjelly.pocketcasts.compose.extensions.setContentWithViewCompositionStrategy
 import au.com.shiftyjelly.pocketcasts.filters.databinding.FragmentFiltersBinding
-import au.com.shiftyjelly.pocketcasts.models.entity.SmartPlaylist
+import au.com.shiftyjelly.pocketcasts.models.entity.PlaylistEntity
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.chromecast.CastManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.SmartPlaylistManager
@@ -83,7 +83,7 @@ class FiltersFragment :
     private var trackFilterListShown = false
     var filterCount: Int? = null
     var lastFilterUuidShown: String? = null
-    var previousLastFilter: SmartPlaylist? = null
+    var previousLastFilter: PlaylistEntity? = null
 
     private var binding: FragmentFiltersBinding? = null
 
@@ -242,13 +242,13 @@ class FiltersFragment :
         (activity as FragmentHostListener).showModal(fragment)
     }
 
-    fun openPlaylist(smartPlaylist: SmartPlaylist, isNewFilter: Boolean = false) {
+    fun openPlaylist(playlist: PlaylistEntity, isNewFilter: Boolean = false) {
         val context = context ?: return
 
-        lastFilterUuidShown = smartPlaylist.uuid
-        settings.setSelectedFilter(smartPlaylist.uuid)
+        lastFilterUuidShown = playlist.uuid
+        settings.setSelectedFilter(playlist.uuid)
 
-        val playlistFragment = FilterEpisodeListFragment.newInstance(smartPlaylist, isNewFilter, context)
+        val playlistFragment = FilterEpisodeListFragment.newInstance(playlist, isNewFilter, context)
         (activity as? FragmentHostListener)?.addFragment(playlistFragment)
 
         playlistFragment.view?.requestFocus() // Jump to new page for talk back
