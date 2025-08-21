@@ -330,7 +330,7 @@ class PlaylistManagerImpl @Inject constructor(
 
     private companion object {
         const val PLAYLIST_ARTWORK_EPISODE_LIMIT = 4
-        const val SMART_PLAYLIST_EPISODE_LIMIT = 500
+        const val SMART_PLAYLIST_EPISODE_LIMIT = 1000
     }
 }
 

@@ -88,7 +88,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import au.com.shiftyjelly.pocketcasts.compose.AppTheme
 import au.com.shiftyjelly.pocketcasts.compose.PreviewRegularDevice
-import au.com.shiftyjelly.pocketcasts.compose.components.HorizontalDivider
 import au.com.shiftyjelly.pocketcasts.compose.components.NoContentBanner
 import au.com.shiftyjelly.pocketcasts.compose.components.PlaylistArtwork
 import au.com.shiftyjelly.pocketcasts.compose.components.SearchBar
@@ -199,7 +198,6 @@ internal fun PlaylistHeader(
                     Spacer(
                         modifier = Modifier.height(16.dp),
                     )
-                    HorizontalDivider()
                 }
                 AnimatedVisibility(
                     visible = data.totalEpisodeCount == 0,

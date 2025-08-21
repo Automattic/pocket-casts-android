@@ -219,7 +219,7 @@ abstract class RepositoryModule {
     abstract fun provideTranscriptManager(transcriptsManagerImpl: TranscriptManagerImpl): TranscriptManager
 
     @Binds
-    abstract fun providePlalistManager(playlistManagerImpl: PlaylistManagerImpl): PlaylistManager
+    abstract fun providePlaylistManager(playlistManagerImpl: PlaylistManagerImpl): PlaylistManager
 
     companion object {
         @Provides

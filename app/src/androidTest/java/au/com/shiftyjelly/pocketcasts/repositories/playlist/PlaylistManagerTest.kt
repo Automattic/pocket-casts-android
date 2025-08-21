@@ -956,7 +956,7 @@ class PlaylistManagerTest {
         manager.observeSmartPlaylist("playlist-id").test {
             val playlist = awaitItem()
             assertEquals(2000, playlist?.totalEpisodeCount)
-            assertEquals(500, playlist?.episodes?.size)
+            assertEquals(1000, playlist?.episodes?.size)
         }
     }
 
@@ -1054,7 +1054,7 @@ class PlaylistManagerTest {
         podcastDao.insertSuspend(Podcast(uuid = "podcast-id-1", title = "Podcast Title 1", isSubscribed = true))
         podcastDao.insertSuspend(Podcast(uuid = "podcast-id-2", title = "Podcast Title 2", isSubscribed = true))
 
-        val episodes = List(1000) { index ->
+        val episodes = List(2000) { index ->
             PodcastEpisode(
                 uuid = "id-$index",
                 title = "Episode Title $index",
@@ -1076,13 +1076,13 @@ class PlaylistManagerTest {
 
         assertEquals(
             "null search term",
-            episodes.take(500),
+            episodes.take(1000),
             getSmartEpisodes(searchTerm = null),
         )
 
         assertEquals(
             "blank search term",
-            episodes.take(500),
+            episodes.take(1000),
             getSmartEpisodes(searchTerm = " "),
         )
 
@@ -1095,25 +1095,25 @@ class PlaylistManagerTest {
         assertEquals(
             "episode title search",
             listOf(
-                episodes[10],
-                episodes[100],
-                episodes[101],
-                episodes[102],
-                episodes[103],
-                episodes[104],
-                episodes[105],
-                episodes[106],
-                episodes[107],
-                episodes[108],
-                episodes[109],
+                episodes[77],
+                episodes[770],
+                episodes[771],
+                episodes[772],
+                episodes[773],
+                episodes[774],
+                episodes[775],
+                episodes[776],
+                episodes[777],
+                episodes[778],
+                episodes[779],
             ),
-            getSmartEpisodes(searchTerm = "title 10"),
+            getSmartEpisodes(searchTerm = "title 77"),
         )
 
         assertEquals(
             "search above episode limit",
-            listOf(episodes[515]),
-            getSmartEpisodes(searchTerm = "episode title 515"),
+            listOf(episodes[1515]),
+            getSmartEpisodes(searchTerm = "episode title 1515"),
         )
 
         assertEquals(
