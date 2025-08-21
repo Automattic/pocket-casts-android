@@ -6,6 +6,7 @@ import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Transaction
 import androidx.room.Upsert
+import au.com.shiftyjelly.pocketcasts.models.db.AppDatabase
 import au.com.shiftyjelly.pocketcasts.models.db.helper.PodcastBookmark
 import au.com.shiftyjelly.pocketcasts.models.db.helper.ProfileBookmark
 import au.com.shiftyjelly.pocketcasts.models.entity.Bookmark
@@ -29,7 +30,7 @@ abstract class BookmarkDao {
 
     @Transaction
     open suspend fun deleteAll(uuids: Collection<String>) {
-        uuids.chunked(999).forEach { chunk ->
+        uuids.chunked(AppDatabase.SQLITE_BIND_ARG_LIMIT).forEach { chunk ->
             deleteAllUnsafe(uuids)
         }
     }
