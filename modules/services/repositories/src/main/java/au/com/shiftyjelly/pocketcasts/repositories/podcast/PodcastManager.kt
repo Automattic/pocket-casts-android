@@ -132,7 +132,6 @@ interface PodcastManager {
     fun refreshPodcasts(fromLog: String)
     suspend fun refreshPodcastsAfterSignIn()
     suspend fun refreshPodcast(existingPodcast: Podcast, playbackManager: PlaybackManager)
-    fun reloadFoldersFromServer()
 
     fun checkForEpisodesToDownloadBlocking(episodeUuidsAdded: List<String>, downloadManager: DownloadManager)
 

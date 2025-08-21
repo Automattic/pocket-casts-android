@@ -256,11 +256,6 @@ class PodcastManagerImpl @Inject constructor(
         podcastRefresher.refreshPodcast(existingPodcast, playbackManager)
     }
 
-    override fun reloadFoldersFromServer() {
-        settings.setHomeGridNeedsRefresh(true)
-        refreshPodcasts("reload folders")
-    }
-
     override fun checkForUnusedPodcastsBlocking(playbackManager: PlaybackManager) {
         podcastDao.findUnsubscribedBlocking().forEach { podcast ->
             deletePodcastIfUnusedBlocking(podcast, playbackManager)

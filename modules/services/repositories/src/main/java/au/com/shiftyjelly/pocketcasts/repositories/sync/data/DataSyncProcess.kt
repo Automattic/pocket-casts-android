@@ -44,7 +44,6 @@ import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.sync.Semaphore
 import kotlinx.coroutines.withTimeoutOrNull
-import timber.log.Timber
 
 class DataSyncProcess(
     private val syncManager: SyncManager,
@@ -95,9 +94,6 @@ class DataSyncProcess(
             syncUpNext()
             syncTime
         } else {
-            if (settings.getHomeGridNeedsRefresh()) {
-                Timber.d("Sync home grid")
-            }
             syncUpNext()
             syncIncrementalData(lastSyncTime)
         }

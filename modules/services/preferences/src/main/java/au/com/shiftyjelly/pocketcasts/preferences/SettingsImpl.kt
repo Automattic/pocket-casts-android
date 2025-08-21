@@ -1303,14 +1303,6 @@ class SettingsImpl @Inject constructor(
         return deviceId
     }
 
-    override fun setHomeGridNeedsRefresh(value: Boolean) {
-        setBoolean("home_grid_needs_refresh", value)
-    }
-
-    override fun getHomeGridNeedsRefresh(): Boolean {
-        return getBoolean("home_grid_needs_refresh", false)
-    }
-
     override fun setTimesToShowBatteryWarning(value: Int) {
         setInt(SHOWN_BATTERY_WARNING_KEY, max(0, value))
     }

@@ -7,7 +7,6 @@ import androidx.lifecycle.ProcessLifecycleOwner
 import androidx.lifecycle.asFlow
 import androidx.lifecycle.lifecycleScope
 import androidx.work.Operation
-import androidx.work.WorkManager
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.models.entity.Bookmark
@@ -61,7 +60,6 @@ import kotlin.math.roundToInt
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.rx2.rxCompletable
@@ -110,15 +108,7 @@ class PodcastSyncProcess(
         val downloadObservable = if (lastSyncTime == Instant.EPOCH) {
             performFullSync().andThen(syncUpNext())
         } else {
-            if (settings.getHomeGridNeedsRefresh()) {
-                Timber.i("SyncProcess: Refreshing home grid")
-                performHomeGridRefresh()
-                    .andThen(syncUpNext())
-                    .andThen(performIncrementalSync(lastSyncTime))
-            } else {
-                syncUpNext()
-                    .andThen(performIncrementalSync(lastSyncTime))
-            }
+            syncUpNext().andThen(performIncrementalSync(lastSyncTime))
         }
         val syncUpNextObservable = downloadObservable
             .andThen(rxCompletable { syncSettings(lastSyncTime) })
@@ -185,17 +175,6 @@ class PodcastSyncProcess(
                 importPodcastsFullSync(serverPodcasts = serverHomeFolder.podcastsList, localPodcasts = localPodcasts)
                     .andThen(importFoldersFullSync(serverFolders = serverHomeFolder.foldersList, localFolderUuids = localFolderUuids))
             }
-    }
-
-    private fun performHomeGridRefresh(): Completable {
-        return downloadAndImportHomeFolder()
-            .andThen(markAllPodcastsUnsynced())
-    }
-
-    private fun markAllPodcastsUnsynced(): Completable {
-        return rxCompletable {
-            podcastManager.markAllPodcastsUnsynced()
-        }
     }
 
     private fun importPodcastsFullSync(serverPodcasts: List<UserPodcastResponse>, localPodcasts: List<Podcast>): Completable {
