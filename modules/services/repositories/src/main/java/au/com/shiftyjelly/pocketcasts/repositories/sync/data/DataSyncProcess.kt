@@ -62,12 +62,12 @@ class DataSyncProcess(
                 } else {
                     val lastSyncTime = getLastSyncTime()
                     val newSyncTime = syncData(lastSyncTime)
+                    settings.setLastModified(newSyncTime.toString())
                     syncSettings(lastSyncTime)
                     Timber.d("Sync cloud files")
                     Timber.d("Sync broken files")
                     Timber.d("Sync playback history")
                     Timber.d("Sync podcast ratings")
-                    settings.setLastModified(newSyncTime.toString())
                 }
             }
         }
@@ -146,7 +146,7 @@ class DataSyncProcess(
 
     private suspend fun syncSettings(lastSyncTime: Instant) {
         logProcess("settings") {
-            SyncSettingsTask.run(settings, lastSyncTime, syncManager)
+            SyncSettingsTask.run(settings, lastSyncTime, syncManager).getOrThrow()
         }
     }
 
