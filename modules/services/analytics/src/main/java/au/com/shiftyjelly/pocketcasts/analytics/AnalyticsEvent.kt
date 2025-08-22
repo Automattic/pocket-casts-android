@@ -66,6 +66,8 @@ enum class AnalyticsEvent(val key: String) {
     /* Sign in */
     SIGNIN_SHOWN("signin_shown"),
     SIGNIN_DISMISSED("signin_dismissed"),
+    SIGNIN_BUTTON_TAPPED("signin_button_tapped"),
+    SIGNIN_FORGOT_PASSWORD_TAPPED("signin_forgot_password_tapped"),
 
     /* Create Account */
     CREATE_ACCOUNT_SHOWN("create_account_shown"),

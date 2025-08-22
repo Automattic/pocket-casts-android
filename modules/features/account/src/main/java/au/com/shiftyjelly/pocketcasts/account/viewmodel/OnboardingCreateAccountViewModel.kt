@@ -4,6 +4,7 @@ import android.app.Application
 import android.content.Context
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
+import au.com.shiftyjelly.pocketcasts.account.viewmodel.OnboardingLoginOrSignUpViewModel.Companion.AnalyticsProp
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.analytics.experiments.ExperimentProvider
@@ -12,6 +13,7 @@ import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
 import au.com.shiftyjelly.pocketcasts.repositories.subscription.SubscriptionManager
 import au.com.shiftyjelly.pocketcasts.repositories.sync.LoginResult
 import au.com.shiftyjelly.pocketcasts.repositories.sync.SyncManager
+import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingFlow
 import au.com.shiftyjelly.pocketcasts.utils.Network
 import au.com.shiftyjelly.pocketcasts.utils.extensions.isGooglePlayServicesAvailableSuccess
 import com.google.android.gms.common.GoogleApiAvailability
@@ -57,6 +59,13 @@ class OnboardingCreateAccountViewModel @Inject constructor(
 
     fun onBackPressed() {
         analyticsTracker.track(AnalyticsEvent.CREATE_ACCOUNT_DISMISSED)
+    }
+
+    fun onSignUpEmailPressed(flow: OnboardingFlow) {
+        analyticsTracker.track(
+            AnalyticsEvent.SETUP_ACCOUNT_BUTTON_TAPPED,
+            mapOf(AnalyticsProp.flow(flow), AnalyticsProp.ButtonTapped.createAccount),
+        )
     }
 
     fun updateEmail(email: String) {
