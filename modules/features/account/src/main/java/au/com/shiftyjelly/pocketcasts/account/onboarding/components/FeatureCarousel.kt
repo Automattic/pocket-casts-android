@@ -16,6 +16,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.State
@@ -33,6 +34,7 @@ import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import au.com.shiftyjelly.pocketcasts.compose.AppThemeWithBackground
+import au.com.shiftyjelly.pocketcasts.compose.theme
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.milliseconds
@@ -236,7 +238,6 @@ private fun CarouselActiveItemIndicatorBar(
     ) {
         (0 until itemCount).forEach { index ->
             CarouselActiveItemIndicator(
-                index = index,
                 modifier = Modifier.weight(1f),
                 progressPercent = if (index < activeItemIndex) {
                     1f
@@ -253,10 +254,9 @@ private fun CarouselActiveItemIndicatorBar(
 @Composable
 private fun CarouselActiveItemIndicator(
     progressPercent: Float,
-    index: Int,
     modifier: Modifier = Modifier,
-    activeColor: Color = Color(0xff5B5B5B),
-    inactiveColor: Color = Color(0xffD9D9D9),
+    activeColor: Color = MaterialTheme.theme.colors.primaryText01,
+    inactiveColor: Color = MaterialTheme.theme.colors.primaryField03,
 ) {
     val normalizedProgress = progressPercent.coerceIn(0f, 1f)
     Box(
