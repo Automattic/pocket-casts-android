@@ -32,8 +32,8 @@ interface SmartPlaylistManager {
     suspend fun update(smartPlaylist: SmartPlaylist, userPlaylistUpdate: UserPlaylistUpdate?, isCreatingFilter: Boolean = false)
     fun updateBlocking(smartPlaylist: SmartPlaylist, userPlaylistUpdate: UserPlaylistUpdate?, isCreatingFilter: Boolean = false)
 
-    fun updateAutoDownloadStatus(smartPlaylist: SmartPlaylist, autoDownloadEnabled: Boolean, unmeteredOnly: Boolean, powerOnly: Boolean)
-    fun updateAutoDownloadStatusRxCompletable(smartPlaylist: SmartPlaylist, autoDownloadEnabled: Boolean, unmeteredOnly: Boolean, powerOnly: Boolean): Completable
+    fun updateAutoDownloadStatus(smartPlaylist: SmartPlaylist, autoDownloadEnabled: Boolean)
+    fun updateAutoDownloadStatusRxCompletable(smartPlaylist: SmartPlaylist, autoDownloadEnabled: Boolean): Completable
 
     fun deleteBlocking(smartPlaylist: SmartPlaylist)
     suspend fun resetDb()

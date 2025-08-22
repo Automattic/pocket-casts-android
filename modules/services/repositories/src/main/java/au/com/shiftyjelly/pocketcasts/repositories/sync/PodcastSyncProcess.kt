@@ -408,7 +408,6 @@ class PodcastSyncProcess(
                     fields.put("audio_video", playlist.audioVideo)
                     fields.put("not_downloaded", if (playlist.notDownloaded) "1" else "0")
                     fields.put("downloaded", if (playlist.downloaded) "1" else "0")
-                    fields.put("downloading", if (playlist.downloading) "1" else "0")
                     fields.put("finished", if (playlist.finished) "1" else "0")
                     fields.put("partially_played", if (playlist.partiallyPlayed) "1" else "0")
                     fields.put("unplayed", if (playlist.unplayed) "1" else "0")
@@ -720,7 +719,6 @@ class PodcastSyncProcess(
             audioVideo = sync.audioVideo
             notDownloaded = sync.notDownloaded
             downloaded = sync.downloaded
-            downloading = sync.downloading
             finished = sync.finished
             partiallyPlayed = sync.partiallyPlayed
             unplayed = sync.unplayed

@@ -98,6 +98,7 @@ data class Podcast(
     @ColumnInfo(name = "is_private") var isPrivate: Boolean = false,
     @ColumnInfo(name = "is_header_expanded", defaultValue = "1") var isHeaderExpanded: Boolean = true,
     @ColumnInfo(name = "funding_url") var fundingUrl: String? = null,
+    @ColumnInfo(name = "slug") var slug: String = "",
     @Embedded(prefix = "bundle") var singleBundle: Bundle? = null,
     @Ignore val episodes: MutableList<PodcastEpisode> = mutableListOf(),
 ) : Serializable {

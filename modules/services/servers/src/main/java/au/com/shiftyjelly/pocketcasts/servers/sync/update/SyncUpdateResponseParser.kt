@@ -172,13 +172,11 @@ class SyncUpdateResponseParser : JsonAdapter<SyncUpdateResponse>() {
                 "audio_video" -> smartPlaylist.audioVideo = reader.nextIntOrDefault(0)
                 "not_downloaded" -> smartPlaylist.notDownloaded = reader.nextBooleanOrDefault(false)
                 "downloaded" -> smartPlaylist.downloaded = reader.nextBooleanOrDefault(false)
-                "downloading" -> smartPlaylist.downloading = reader.nextBooleanOrDefault(false)
                 "finished" -> smartPlaylist.finished = reader.nextBooleanOrDefault(false)
                 "partially_played" -> smartPlaylist.partiallyPlayed = reader.nextBooleanOrDefault(false)
                 "unplayed" -> smartPlaylist.unplayed = reader.nextBooleanOrDefault(false)
                 "starred" -> smartPlaylist.starred = reader.nextBooleanOrDefault(false)
                 "manual" -> smartPlaylist.manual = reader.nextBooleanOrDefault(false)
-                "episode_uuids" -> smartPlaylist.episodeUuids = reader.nextStringOrNull()
                 "sort_position" -> smartPlaylist.sortPosition = reader.nextIntOrDefault(0)
                 "sort_type" -> smartPlaylist.sortType = reader.nextIntOrNull()?.let(PlaylistEpisodeSortType::fromServerId) ?: PlaylistEpisodeSortType.NewestToOldest
                 "icon_id" -> smartPlaylist.iconId = reader.nextIntOrDefault(0)

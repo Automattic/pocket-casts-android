@@ -51,7 +51,6 @@ data class FilterResponse(
         allPodcasts?.let { filter.allPodcasts = it }
         podcastUuids?.let { filter.podcastUuids = it }
         downloaded?.let { filter.downloaded = it }
-        downloading?.let { filter.downloading = it }
         notDownloaded?.let { filter.notDownloaded = it }
         sortType?.let(PlaylistEpisodeSortType::fromServerId)?.let { filter.sortType = it }
         iconId?.let { filter.iconId = it }

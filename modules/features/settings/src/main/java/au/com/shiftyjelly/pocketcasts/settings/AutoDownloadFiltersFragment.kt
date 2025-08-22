@@ -91,7 +91,7 @@ class AutoDownloadFiltersFragment :
     }
 
     override fun onAutoDownloadChanged(filter: SmartPlaylist, on: Boolean) {
-        smartPlaylistManager.updateAutoDownloadStatusRxCompletable(filter, on, true, false)
+        smartPlaylistManager.updateAutoDownloadStatusRxCompletable(filter, on)
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
             .subscribeWith(object : DisposableCompletableObserver() {
@@ -104,12 +104,5 @@ class AutoDownloadFiltersFragment :
                 }
             })
             .addTo(disposables)
-    }
-
-    override fun onSettingsClicked(filter: SmartPlaylist) {
-//        val intent = Intent(activity, PlaylistEditActivity::class.java)
-//        intent.putExtra(PlaylistEditActivity.EXTRA_PLAYLIST_ID, filter.id)
-//        intent.putExtra(PlaylistEditActivity.EXTRA_PLAYLIST_TITLE, filter.title)
-//        activity?.startActivity(intent)
     }
 }

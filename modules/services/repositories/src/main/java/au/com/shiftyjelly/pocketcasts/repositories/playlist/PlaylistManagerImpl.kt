@@ -279,7 +279,6 @@ class PlaylistManagerImpl @Inject constructor(
         finished = rules.episodeStatus.completed,
         downloaded = rules.downloadStatus in listOf(DownloadStatusRule.Downloaded, DownloadStatusRule.Any),
         notDownloaded = rules.downloadStatus in listOf(DownloadStatusRule.NotDownloaded, DownloadStatusRule.Any),
-        downloading = rules.downloadStatus in listOf(DownloadStatusRule.NotDownloaded, DownloadStatusRule.Any),
         audioVideo = when (rules.mediaType) {
             MediaTypeRule.Any -> AUDIO_VIDEO_FILTER_ALL
             MediaTypeRule.Audio -> AUDIO_VIDEO_FILTER_AUDIO_ONLY

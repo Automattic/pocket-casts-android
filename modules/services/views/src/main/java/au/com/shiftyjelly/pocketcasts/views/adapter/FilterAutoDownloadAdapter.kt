@@ -47,7 +47,6 @@ class FilterAutoDownloadAdapter(private val filters: List<SmartPlaylist>, privat
 
     interface ClickListener {
         fun onAutoDownloadChanged(filter: SmartPlaylist, on: Boolean)
-        fun onSettingsClicked(filter: SmartPlaylist)
     }
 
     inner class ViewHolder(view: View) :
@@ -72,8 +71,6 @@ class FilterAutoDownloadAdapter(private val filters: List<SmartPlaylist>, privat
             }
             if (view.id == R.id.checkbox || view.id == R.id.row_button) {
                 clickListener.onAutoDownloadChanged(filter, checkBox.isChecked)
-            } else if (view.id == R.id.settings_button) {
-                clickListener.onSettingsClicked(filter)
             }
         }
     }

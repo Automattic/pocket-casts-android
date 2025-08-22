@@ -103,7 +103,7 @@ import au.com.shiftyjelly.pocketcasts.localization.R as LR
         UserNotifications::class,
         UserCategoryVisits::class,
     ],
-    version = 117,
+    version = 118,
     exportSchema = true,
     autoMigrations = [
         AutoMigration(from = 81, to = 82, spec = AppDatabase.Companion.DeleteSilenceRemovedMigration::class),
@@ -1063,6 +1063,146 @@ abstract class AppDatabase : RoomDatabase() {
             }
         }
 
+        val MIGRATION_117_118 = addMigration(117, 118) { database ->
+            with(database) {
+                beginTransaction()
+                try {
+                    // Delete any potentially lingering manual playlists
+                    execSQL("DELETE FROM smart_playlists WHERE manual IS 1")
+
+                    // Delete potentially lingering legacy playlists table
+                    execSQL("DROP TABLE IF EXISTS playlists")
+
+                    // Create new playlists table
+                    execSQL(
+                        """
+                        CREATE TABLE playlists(
+                            _id INTEGER PRIMARY KEY,
+                            uuid TEXT NOT NULL,
+                            title TEXT NOT NULL,
+                            iconId INTEGER NOT NULL,
+                            sortPosition INTEGER,
+                            sortId INTEGER NOT NULL,
+                            manual INTEGER NOT NULL,
+                            draft INTEGER NOT NULL,
+                            deleted INTEGER NOT NULL,
+                            syncStatus INTEGER NOT NULL,
+                            autoDownload INTEGER NOT NULL,
+                            autoDownloadLimit INTEGER NOT NULL,
+                            unplayed INTEGER NOT NULL,
+                            partiallyPlayed INTEGER NOT NULL,
+                            finished INTEGER NOT NULL,
+                            downloaded INTEGER NOT NULL,
+                            notDownloaded INTEGER NOT NULL,
+                            audioVideo INTEGER NOT NULL,
+                            filterHours INTEGER NOT NULL,
+                            starred INTEGER NOT NULL,
+                            allPodcasts INTEGER NOT NULL,
+                            podcastUuids TEXT,
+                            filterDuration INTEGER NOT NULL,
+                            longerThan INTEGER NOT NULL,
+                            shorterThan INTEGER NOT NULL
+                        )
+                        """.trimIndent(),
+                    )
+                    execSQL("CREATE INDEX playlists_uuid ON playlists(uuid)")
+
+                    // Copy data from smart_playlists to playlists
+                    execSQL(
+                        """
+                        INSERT INTO playlists(
+                            _id,
+                            uuid,
+                            title,
+                            iconId,
+                            sortPosition,
+                            sortId,
+                            draft,
+                            manual,
+                            deleted,
+                            syncStatus,
+                            autoDownload,
+                            autoDownloadLimit,
+                            unplayed,
+                            partiallyPlayed,
+                            finished,
+                            downloaded,
+                            notDownloaded,
+                            audioVideo,
+                            filterHours,
+                            starred,
+                            allPodcasts,
+                            podcastUuids,
+                            filterDuration,
+                            longerThan,
+                            shorterThan
+                        )
+                        SELECT
+                            _id,
+                            uuid,
+                            title,
+                            iconId,
+                            sortPosition,
+                            sortId,
+                            manual,
+                            draft,
+                            deleted,
+                            syncStatus,
+                            autoDownload,
+                            autoDownloadLimit,
+                            unplayed,
+                            partiallyPlayed,
+                            finished,
+                            downloaded,
+                            notDownloaded,
+                            audioVideo,
+                            filterHours,
+                            starred,
+                            allPodcasts,
+                            podcastUuids,
+                            filterDuration,
+                            longerThan,
+                            shorterThan
+                        FROM smart_playlists
+                        """.trimIndent(),
+                    )
+                    execSQL("DROP TABLE smart_playlists")
+
+                    // Create new manual playlist episodes table
+                    execSQL(
+                        """
+                        CREATE TABLE manual_playlist_episodes(
+                            playlist_uuid TEXT NOT NULL,
+                            episode_uuid TEXT NOT NULL,
+                            podcast_uuid TEXT NOT NULL,
+                            title TEXT NOT NULL,
+                            added_at INTEGER NOT NULL,
+                            published_at INTEGER NOT NULL,
+                            download_url TEXT,
+                            episode_slug TEXT NOT NULL,
+                            podcast_slug TEXT NOT NULL,
+                            sort_position TEXT NOT NULL,
+                            is_synced TEXT NOT NULL,
+                            PRIMARY KEY (playlist_uuid, episode_uuid)
+                        )
+                        """.trimIndent(),
+                    )
+                    execSQL("CREATE INDEX manual_playlist_episodes_playlist_uuid_index ON manual_playlist_episodes(playlist_uuid)")
+                    execSQL("CREATE INDEX manual_playlist_episodes_episode_uuid_index ON manual_playlist_episodes(episode_uuid)")
+                    execSQL("CREATE INDEX manual_playlist_episodes_podcast_uuid_index ON manual_playlist_episodes(podcast_uuid)")
+                    execSQL("CREATE INDEX manual_playlist_episodes_playlist_uuid_is_synced_index ON manual_playlist_episodes(podcast_uuid, is_synced)")
+
+                    // Add slug columns to podcasts and episodes
+                    database.execSQL("ALTER TABLE podcasts ADD COLUMN slug TEXT NOT NULL DEFAULT ''")
+                    database.execSQL("ALTER TABLE podcast_episodes ADD COLUMN slug TEXT NOT NULL DEFAULT ''")
+
+                    setTransactionSuccessful()
+                } finally {
+                    endTransaction()
+                }
+            }
+        }
+
         fun addMigrations(databaseBuilder: Builder<AppDatabase>, context: Context) {
             databaseBuilder.addMigrations(
                 addMigration(1, 2) { },
@@ -1470,6 +1610,7 @@ abstract class AppDatabase : RoomDatabase() {
                 MIGRATION_114_115,
                 MIGRATION_115_116,
                 MIGRATION_116_117,
+                MIGRATION_117_118,
             )
         }
 

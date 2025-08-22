@@ -158,19 +158,12 @@ class SmartPlaylistManagerImpl @Inject constructor(
         playlistDao.updateAllBlocking(smartPlaylists)
     }
 
-    override fun updateAutoDownloadStatus(smartPlaylist: SmartPlaylist, autoDownloadEnabled: Boolean, unmeteredOnly: Boolean, powerOnly: Boolean) {
+    override fun updateAutoDownloadStatus(smartPlaylist: SmartPlaylist, autoDownloadEnabled: Boolean) {
         smartPlaylist.autoDownload = autoDownloadEnabled
-        smartPlaylist.autoDownloadUnmeteredOnly = unmeteredOnly
-        smartPlaylist.autoDownloadPowerOnly = powerOnly
-        val attrs = HashMap<String, Any>()
-        attrs["autoDownload"] = autoDownloadEnabled
-        attrs["autoDownloadWifiOnly"] = unmeteredOnly
-        attrs["autoDownloadPowerOnly"] = powerOnly
-        attrs["syncStatus"] = SmartPlaylist.SYNC_STATUS_NOT_SYNCED
     }
 
-    override fun updateAutoDownloadStatusRxCompletable(smartPlaylist: SmartPlaylist, autoDownloadEnabled: Boolean, unmeteredOnly: Boolean, powerOnly: Boolean): Completable {
-        return Completable.fromAction { updateAutoDownloadStatus(smartPlaylist, autoDownloadEnabled, unmeteredOnly, powerOnly) }
+    override fun updateAutoDownloadStatusRxCompletable(smartPlaylist: SmartPlaylist, autoDownloadEnabled: Boolean): Completable {
+        return Completable.fromAction { updateAutoDownloadStatus(smartPlaylist, autoDownloadEnabled) }
     }
 
     override fun createPlaylistBlocking(name: String, iconId: Int, draft: Boolean): SmartPlaylist {
