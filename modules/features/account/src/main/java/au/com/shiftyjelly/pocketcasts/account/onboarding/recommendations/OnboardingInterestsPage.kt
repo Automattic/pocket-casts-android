@@ -2,6 +2,7 @@ package au.com.shiftyjelly.pocketcasts.account.onboarding.recommendations
 
 import androidx.activity.SystemBarStyle
 import androidx.activity.compose.BackHandler
+import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -131,6 +132,7 @@ private fun Content(
         Spacer(modifier = Modifier.height(24.dp))
 
         FlowRow(
+            modifier = Modifier.animateContentSize(),
             horizontalArrangement = Arrangement.Center,
             verticalArrangement = Arrangement.spacedBy(8.dp),
             maxItemsInEachRow = 3,
