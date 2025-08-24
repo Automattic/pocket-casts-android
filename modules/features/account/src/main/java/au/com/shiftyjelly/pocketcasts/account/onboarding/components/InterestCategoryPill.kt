@@ -1,0 +1,124 @@
+package au.com.shiftyjelly.pocketcasts.account.onboarding.components
+
+import androidx.compose.foundation.background
+import androidx.compose.foundation.border
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.selection.toggleable
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.MaterialTheme
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.tooling.preview.PreviewParameter
+import androidx.compose.ui.unit.dp
+import au.com.shiftyjelly.pocketcasts.compose.AppThemeWithBackground
+import au.com.shiftyjelly.pocketcasts.compose.components.TextP30
+import au.com.shiftyjelly.pocketcasts.compose.preview.ThemePreviewParameterProvider
+import au.com.shiftyjelly.pocketcasts.compose.theme
+import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
+
+@Composable
+fun InterestCategoryPill(
+    category: String,
+    isSelected: Boolean,
+    index: Int,
+    onSelectedChange: (Boolean) -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    val colorConfig = colors[index % colors.size]
+    SelectablePillContainer(
+        isSelected = isSelected,
+        onSelectedChange = onSelectedChange,
+        selectedGradient = colorConfig.gradient.toList(),
+        modifier = modifier,
+    ) {
+        TextP30(
+            text = category,
+            color = if (isSelected) {
+                colorConfig.selectedTextColor ?: MaterialTheme.theme.colors.primaryUi01Active
+            } else {
+                MaterialTheme.theme.colors.secondaryText02
+            },
+        )
+    }
+}
+
+private data class ColorConfig(
+    val gradient: Pair<Color, Color>,
+    val selectedTextColor: Color? = null
+)
+
+private val colors = listOf(
+    ColorConfig(
+        gradient = Color(0xFFF43769) to Color(0xFFFB5246),
+    ),
+    ColorConfig(
+        gradient = Color(0xFFFED745) to Color(0xFFFEB525),
+        selectedTextColor = Color(0xFFA85605),
+    ),
+    ColorConfig(
+        gradient = Color(0xFF6046E9) to Color(0xFFE74B8A),
+    ),
+    ColorConfig(
+        gradient = Color(0xFF03A9F4) to Color(0xFF50D0F1),
+    ),
+    ColorConfig(
+        Color(0xFF78D549) to Color(0xFF9BE45E),
+        selectedTextColor = Color(0xFF1E4316),
+    ),
+)
+
+@Composable
+private fun SelectablePillContainer(
+    isSelected: Boolean,
+    onSelectedChange: (Boolean) -> Unit,
+    selectedGradient: List<Color>,
+    modifier: Modifier = Modifier,
+    content: @Composable () -> Unit,
+) {
+    Box(
+        modifier = modifier
+            .height(48.dp)
+            .clip(RoundedCornerShape(percent = 100))
+            .then(
+                if (isSelected) {
+                    Modifier.background(brush = Brush.horizontalGradient(selectedGradient))
+                } else {
+                    Modifier.border(
+                        width = 2.dp,
+                        color = MaterialTheme.theme.colors.primaryUi05,
+                        shape = RoundedCornerShape(percent = 100)
+                    )
+                }
+                    .toggleable(value = isSelected, onValueChange = onSelectedChange)
+                    .padding(horizontal = 16.dp, vertical = 12.dp),
+            ),
+        contentAlignment = Alignment.Center,
+    ) {
+        content()
+    }
+}
+
+@Preview
+@Composable
+private fun PreviewCategoryPill(
+    @PreviewParameter(ThemePreviewParameterProvider::class) themeType: Theme.ThemeType,
+) = AppThemeWithBackground(themeType) {
+    Column(modifier = Modifier.padding(32.dp)) {
+        List(10) {
+            InterestCategoryPill(
+                category = "Category $it",
+                isSelected = it / colors.size == 0,
+                onSelectedChange = {},
+                index = it
+            )
+        }
+    }
+}
