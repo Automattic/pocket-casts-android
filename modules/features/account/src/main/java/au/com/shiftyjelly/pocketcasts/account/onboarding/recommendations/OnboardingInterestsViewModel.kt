@@ -21,7 +21,7 @@ class OnboardingInterestsViewModel @Inject constructor(
         State(
             allCategories = emptyList(),
             displayedCategories = emptyList(),
-        )
+        ),
     )
     val state = _state.asStateFlow()
 
@@ -47,7 +47,7 @@ class OnboardingInterestsViewModel @Inject constructor(
     fun showMore() {
         _state.update {
             it.copy(
-                displayedCategories = it.allCategories
+                displayedCategories = it.allCategories,
             )
         }
     }
@@ -61,7 +61,7 @@ class OnboardingInterestsViewModel @Inject constructor(
                 _state.update {
                     it.copy(
                         allCategories = categState.allCategories,
-                        displayedCategories = categState.allCategories.take(10)
+                        displayedCategories = categState.allCategories.take(10),
                     )
                 }
             }

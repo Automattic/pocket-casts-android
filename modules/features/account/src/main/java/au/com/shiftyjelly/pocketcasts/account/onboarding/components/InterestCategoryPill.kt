@@ -18,8 +18,12 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.drawWithCache
+import androidx.compose.ui.graphics.BlendMode
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.CompositingStrategy
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalInspectionMode
@@ -53,13 +57,13 @@ fun InterestCategoryPill(
     ) {
         Row(
             verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy(8.dp)
+            horizontalArrangement = Arrangement.spacedBy(8.dp),
         ) {
             GradientImage(
                 colorConfig = colorConfig,
                 isSelected = isSelected,
                 url = category.icon,
-                modifier = Modifier.size(21.dp)
+                modifier = Modifier.size(21.dp),
             )
             TextP30(
                 text = category.name,
@@ -75,7 +79,7 @@ fun InterestCategoryPill(
 
 private data class ColorConfig(
     val gradient: Pair<Color, Color>,
-    val selectedTextColor: Color? = null
+    val selectedTextColor: Color? = null,
 )
 
 private val colors = listOf(
@@ -121,13 +125,29 @@ private fun GradientImage(
         )
     }
 
+    val fallback = MaterialTheme.theme.colors.primaryUi01Active
+
     Image(
         painter = rememberAsyncImagePainter(
             model = imageRequest,
             contentScale = ContentScale.Fit,
         ),
         contentDescription = null,
-        modifier = modifier,
+        modifier = modifier
+            .graphicsLayer {
+                compositingStrategy = CompositingStrategy.Offscreen
+            }
+            .drawWithCache {
+                val brush = if (!isSelected) {
+                    Brush.horizontalGradient(colorConfig.gradient.toList())
+                } else {
+                    Brush.horizontalGradient((0..1).map { colorConfig.selectedTextColor ?: fallback })
+                }
+                onDrawWithContent {
+                    drawContent()
+                    drawRect(brush = brush, blendMode = BlendMode.SrcIn)
+                }
+            },
     )
 }
 
@@ -150,7 +170,7 @@ private fun SelectablePillContainer(
                     Modifier.border(
                         width = 2.dp,
                         color = MaterialTheme.theme.colors.primaryUi05,
-                        shape = RoundedCornerShape(percent = 100)
+                        shape = RoundedCornerShape(percent = 100),
                     )
                 }
                     .toggleable(value = isSelected, onValueChange = onSelectedChange)
@@ -182,7 +202,7 @@ private fun PreviewCategoryPill(
                 category = category,
                 isSelected = index / colors.size == 0,
                 onSelectedChange = {},
-                index = index
+                index = index,
             )
         }
     }

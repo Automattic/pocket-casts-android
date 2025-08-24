@@ -163,7 +163,6 @@ private fun Content(
     }
 }
 
-
 @Preview
 @Composable
 private fun PreviewInterestsScreen(
