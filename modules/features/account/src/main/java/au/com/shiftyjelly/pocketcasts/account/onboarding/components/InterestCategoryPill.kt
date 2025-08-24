@@ -1,20 +1,28 @@
 package au.com.shiftyjelly.pocketcasts.account.onboarding.components
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.selection.toggleable
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalInspectionMode
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
@@ -22,11 +30,15 @@ import au.com.shiftyjelly.pocketcasts.compose.AppThemeWithBackground
 import au.com.shiftyjelly.pocketcasts.compose.components.TextP30
 import au.com.shiftyjelly.pocketcasts.compose.preview.ThemePreviewParameterProvider
 import au.com.shiftyjelly.pocketcasts.compose.theme
+import au.com.shiftyjelly.pocketcasts.repositories.images.PocketCastsImageRequestFactory
+import au.com.shiftyjelly.pocketcasts.servers.model.DiscoverCategory
+import au.com.shiftyjelly.pocketcasts.ui.extensions.themed
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
+import coil.compose.rememberAsyncImagePainter
 
 @Composable
 fun InterestCategoryPill(
-    category: String,
+    category: DiscoverCategory,
     isSelected: Boolean,
     index: Int,
     onSelectedChange: (Boolean) -> Unit,
@@ -39,14 +51,25 @@ fun InterestCategoryPill(
         selectedGradient = colorConfig.gradient.toList(),
         modifier = modifier,
     ) {
-        TextP30(
-            text = category,
-            color = if (isSelected) {
-                colorConfig.selectedTextColor ?: MaterialTheme.theme.colors.primaryUi01Active
-            } else {
-                MaterialTheme.theme.colors.secondaryText02
-            },
-        )
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(8.dp)
+        ) {
+            GradientImage(
+                colorConfig = colorConfig,
+                isSelected = isSelected,
+                url = category.icon,
+                modifier = Modifier.size(21.dp)
+            )
+            TextP30(
+                text = category.name,
+                color = if (isSelected) {
+                    colorConfig.selectedTextColor ?: MaterialTheme.theme.colors.primaryUi01Active
+                } else {
+                    MaterialTheme.theme.colors.secondaryText02
+                },
+            )
+        }
     }
 }
 
@@ -74,6 +97,39 @@ private val colors = listOf(
         selectedTextColor = Color(0xFF1E4316),
     ),
 )
+
+@Composable
+private fun GradientImage(
+    colorConfig: ColorConfig,
+    isSelected: Boolean,
+    url: String,
+    modifier: Modifier = Modifier,
+) {
+    val context = LocalContext.current
+    val isPreview = LocalInspectionMode.current
+    val factory = remember(context) {
+        val placeholderType = if (isPreview) {
+            PocketCastsImageRequestFactory.PlaceholderType.Small
+        } else {
+            PocketCastsImageRequestFactory.PlaceholderType.None
+        }
+        PocketCastsImageRequestFactory(context, placeholderType = placeholderType).themed()
+    }
+    val imageRequest = remember(colorConfig, isSelected, url, factory) {
+        factory.createForFileOrUrl(
+            filePathOrUrl = url,
+        )
+    }
+
+    Image(
+        painter = rememberAsyncImagePainter(
+            model = imageRequest,
+            contentScale = ContentScale.Fit,
+        ),
+        contentDescription = null,
+        modifier = modifier,
+    )
+}
 
 @Composable
 private fun SelectablePillContainer(
@@ -106,18 +162,27 @@ private fun SelectablePillContainer(
     }
 }
 
+private val demoCategories = List(10) {
+    DiscoverCategory(
+        id = it,
+        name = "Category $it",
+        icon = "",
+        source = "",
+    )
+}
+
 @Preview
 @Composable
 private fun PreviewCategoryPill(
     @PreviewParameter(ThemePreviewParameterProvider::class) themeType: Theme.ThemeType,
 ) = AppThemeWithBackground(themeType) {
     Column(modifier = Modifier.padding(32.dp)) {
-        List(10) {
+        demoCategories.forEachIndexed { index, category ->
             InterestCategoryPill(
-                category = "Category $it",
-                isSelected = it / colors.size == 0,
+                category = category,
+                isSelected = index / colors.size == 0,
                 onSelectedChange = {},
-                index = it
+                index = index
             )
         }
     }

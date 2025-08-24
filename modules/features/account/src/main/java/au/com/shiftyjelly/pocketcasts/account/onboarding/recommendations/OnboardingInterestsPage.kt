@@ -38,6 +38,7 @@ import au.com.shiftyjelly.pocketcasts.compose.components.TextH10
 import au.com.shiftyjelly.pocketcasts.compose.components.TextP40
 import au.com.shiftyjelly.pocketcasts.compose.preview.ThemePreviewParameterProvider
 import au.com.shiftyjelly.pocketcasts.compose.theme
+import au.com.shiftyjelly.pocketcasts.servers.model.DiscoverCategory
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
@@ -83,7 +84,7 @@ fun OnboardingInterestsPage(
 @Composable
 private fun Content(
     state: OnboardingInterestsViewModel.State,
-    onCategorySelectionChange: (String, Boolean) -> Unit,
+    onCategorySelectionChange: (DiscoverCategory, Boolean) -> Unit,
     onNotNowPress: () -> Unit,
     onContinuePress: () -> Unit,
     onShowMoreCategories: () -> Unit,
@@ -170,7 +171,7 @@ private fun PreviewInterestsScreen(
 ) = AppThemeWithBackground(themeType) {
     Content(
         modifier = Modifier.padding(32.dp),
-        state = OnboardingInterestsViewModel.State(availableCategories = List(4) { "Category $it" }, isShowingAllCategories = false),
+        state = OnboardingInterestsViewModel.State(allCategories = emptyList(), displayedCategories = emptyList()),
         onContinuePress = {},
         onNotNowPress = {},
         onShowMoreCategories = {},
