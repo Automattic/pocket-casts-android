@@ -5,11 +5,11 @@ import androidx.lifecycle.viewModelScope
 import au.com.shiftyjelly.pocketcasts.repositories.categories.CategoriesManager
 import au.com.shiftyjelly.pocketcasts.servers.model.DiscoverCategory
 import dagger.hilt.android.lifecycle.HiltViewModel
+import javax.inject.Inject
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import javax.inject.Inject
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 @HiltViewModel
@@ -31,6 +31,7 @@ class OnboardingInterestsViewModel @Inject constructor(
 
     fun skipSelection(doWhenFinished: () -> Unit) {
         viewModelScope.launch {
+            categoriesManager.setInterestCategories(emptySet())
             doWhenFinished()
         }
     }
