@@ -2597,4 +2597,8 @@
     <string name="onboarding_create_account_message">Your podcasts, always in sync. Keep your library safe, and enjoy Pocket\u00A0Casts on web and desktop.</string>
     <string name="onboarding_create_account_sign_up_email">Sign up with email</string>
     <string name="onboarding_create_account_sign_up_google">Sign up with Google</string>
+    <string name="onboarding_interests_title">Tell us about your favourite topics</string>
+    <string name="onboarding_interests_description">Great podcasts, handpicked by real people, are coming your way!</string>
+    <string name="onboarding_interests_show_more">Show more categories</string>
+    <string name="onboarding_interests_select_at_least_label">Select at least 3</string>
 </resources>
