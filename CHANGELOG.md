@@ -5,7 +5,7 @@
         ([#4405](https://github.com/Automattic/pocket-casts-android/pull/4405))
 * Bug Fixes
     *   Fix File Settings bottom content being obstructed by the Mini Player.
-        ([#4262](https://github.com/Automattic/pocket-casts-android/pull/4262))
+        ([#4414](https://github.com/Automattic/pocket-casts-android/pull/4414))
 
 7.96
 -----
