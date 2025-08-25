@@ -207,7 +207,7 @@ private fun SelectablePillContainer(
                     Modifier.border(
                         width = 1.dp,
                         color = MaterialTheme.theme.colors.primaryText02,
-                        shape = RoundedCornerShape(percent = 100)
+                        shape = RoundedCornerShape(percent = 100),
                     )
                 }
                     .toggleable(value = isSelected, onValueChange = onSelectedChange)
