@@ -8,7 +8,10 @@ import android.view.ViewGroup
 import androidx.appcompat.content.res.AppCompatResources
 import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
+import androidx.core.view.updatePadding
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.flowWithLifecycle
+import androidx.lifecycle.lifecycleScope
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.profile.R
@@ -21,6 +24,7 @@ import au.com.shiftyjelly.pocketcasts.views.fragments.BaseFragment
 import au.com.shiftyjelly.pocketcasts.views.helper.NavigationIcon.BackArrow
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
+import kotlinx.coroutines.launch
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 import au.com.shiftyjelly.pocketcasts.ui.R as UR
 
@@ -137,6 +141,14 @@ class CloudSettingsFragment : BaseFragment() {
             binding.lblFindMore,
         ).forEach {
             it.setOnClickListener { openUpgradeSheet() }
+        }
+
+        val scrollContainer = binding.scrollContainer
+        val initialPadding = scrollContainer.paddingBottom
+        viewLifecycleOwner.lifecycleScope.launch {
+            settings.bottomInset
+                .flowWithLifecycle(viewLifecycleOwner.lifecycle)
+                .collect { inset -> scrollContainer.updatePadding(bottom = initialPadding + inset) }
         }
     }
 
