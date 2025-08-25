@@ -14,6 +14,8 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentWidth
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -99,10 +101,12 @@ private fun Content(
         TextP40(
             modifier = Modifier
                 .align(Alignment.End)
-                .padding(top = 12.dp, end = 4.dp)
-                .clickable(onClick = onNotNowPress),
+                .padding(top = 10.dp)
+                .clickable(onClick = onNotNowPress)
+                .padding(horizontal = 4.dp, vertical = 2.dp),
             text = stringResource(LR.string.not_now),
             color = MaterialTheme.theme.colors.primaryInteractive01,
+            fontWeight = FontWeight.W500,
         )
         Spacer(modifier = Modifier.height(24.dp))
         TextH10(
@@ -126,10 +130,20 @@ private fun Content(
         Spacer(modifier = Modifier.height(24.dp))
 
         FlowRow(
-            modifier = Modifier.animateContentSize(),
-            horizontalArrangement = Arrangement.Center,
+            modifier = Modifier
+                .then(
+                    if (state.isShowingAllCategories) {
+                        Modifier
+                            .weight(1f)
+                            .verticalScroll(rememberScrollState())
+                    } else {
+                        Modifier
+                    },
+                )
+                .animateContentSize(),
+            horizontalArrangement = Arrangement.spacedBy(8.dp, alignment = Alignment.CenterHorizontally),
             verticalArrangement = Arrangement.spacedBy(8.dp),
-            maxItemsInEachRow = 3,
+            maxItemsInEachRow = 2,
         ) {
             state.displayedCategories.forEachIndexed { index, item ->
                 InterestCategoryPill(
@@ -139,22 +153,23 @@ private fun Content(
                     onSelectedChange = { isSelected -> onCategorySelectionChange(item, isSelected) },
                     index = index,
                 )
-                if (index % 2 == 0) {
-                    Spacer(modifier = Modifier.width(8.dp))
-                }
             }
         }
 
+        Spacer(modifier = Modifier.height(32.dp))
+
         if (!state.isShowingAllCategories) {
-            Spacer(modifier = Modifier.height(24.dp))
             TextP40(
                 text = stringResource(LR.string.onboarding_interests_show_more),
                 color = MaterialTheme.theme.colors.primaryInteractive01,
-                modifier = Modifier.clickable(onClick = onShowMoreCategories),
+                modifier = Modifier
+                    .clickable(onClick = onShowMoreCategories)
+                    .padding(horizontal = 4.dp, vertical = 2.dp),
+                fontWeight = FontWeight.W500,
             )
+            Spacer(modifier = Modifier.weight(1f))
         }
 
-        Spacer(modifier = Modifier.weight(1f))
         RowButton(
             text = stringResource(state.ctaLabelResId),
             enabled = state.isCtaEnabled,
