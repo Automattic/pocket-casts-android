@@ -481,8 +481,6 @@ interface Settings {
     val autoAddUpNextLimitBehaviour: UserSetting<AutoAddUpNextLimitBehaviour>
     fun getMaxUpNextEpisodes(): Int
     fun getUniqueDeviceId(): String
-    fun setHomeGridNeedsRefresh(value: Boolean)
-    fun getHomeGridNeedsRefresh(): Boolean
 
     fun setTimesToShowBatteryWarning(value: Int)
     fun getTimesToShowBatteryWarning(): Int

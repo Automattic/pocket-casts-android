@@ -251,9 +251,7 @@ class PocketCastsApplication :
                 }
 
                 VersionMigrationsWorker.performMigrations(
-                    podcastManager = podcastManager,
                     settings = settings,
-                    syncManager = syncManager,
                     context = this@PocketCastsApplication,
                 )
 
