@@ -72,12 +72,14 @@ fun OnboardingInterestsPage(
         state = state,
         onCategorySelectionChange = viewModel::updateSelectedCategory,
         onContinuePress = {
-            viewModel.saveInterests()
-            onShowRecommendations()
+            viewModel.saveInterests {
+                onShowRecommendations()
+            }
         },
         onNotNowPress = {
-            viewModel.skipSelection()
-            onShowRecommendations()
+            viewModel.skipSelection {
+                onShowRecommendations()
+            }
         },
         onShowMoreCategories = viewModel::showMore,
     )

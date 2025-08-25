@@ -7,13 +7,17 @@ import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.localization.helper.tryToLocalise
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
+import au.com.shiftyjelly.pocketcasts.repositories.categories.CategoriesManager
 import au.com.shiftyjelly.pocketcasts.repositories.lists.ListRepository
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
+import au.com.shiftyjelly.pocketcasts.servers.model.DiscoverCategory
 import au.com.shiftyjelly.pocketcasts.servers.model.DiscoverPodcast
 import au.com.shiftyjelly.pocketcasts.servers.model.DiscoverRow
 import au.com.shiftyjelly.pocketcasts.servers.model.ListType
 import au.com.shiftyjelly.pocketcasts.servers.model.transformWithRegion
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import dagger.hilt.android.lifecycle.HiltViewModel
 import java.util.Locale
 import javax.inject.Inject
@@ -36,6 +40,7 @@ class OnboardingRecommendationsStartPageViewModel @Inject constructor(
     private val repository: ListRepository,
     private val settings: Settings,
     app: Application,
+    categoriesManager: CategoriesManager,
 ) : AndroidViewModel(app) {
 
     data class State(
@@ -106,7 +111,7 @@ class OnboardingRecommendationsStartPageViewModel @Inject constructor(
                         val podcasts = section.podcasts.map { podcast ->
                             Podcast(
                                 uuid = podcast.uuid,
-                                title = podcast.title ?: "",
+                                title = podcast.title.orEmpty(),
                                 isSubscribed = podcast.uuid in subscriptions,
                             )
                         }
@@ -153,8 +158,24 @@ class OnboardingRecommendationsStartPageViewModel @Inject constructor(
             updateFlowWith("trending", sectionsFlow, updatedList)
             updateFlowWithCategories(sectionsFlow, updatedList, replacements)
 
+            if (FeatureFlag.isEnabled(Feature.NEW_ONBOARDING_RECOMMENDATIONS)) {
+                reorderFlowToAlignWithInterests(
+                    sectionsFlow = sectionsFlow,
+                    interests = categoriesManager.interestCategories.value
+                )
+            }
+
             _state.update { it.copy(showLoadingSpinner = false) }
         }
+    }
+
+    private suspend fun reorderFlowToAlignWithInterests(
+        sectionsFlow: MutableStateFlow<List<SectionInternal>>,
+        interests: Set<DiscoverCategory>,
+    ) {
+        val namesAsHashSet = interests.map { it.name }.toHashSet()
+        val reorderedCategories = sectionsFlow.value.sortedWith(compareByDescending { it.sectionId.value in namesAsHashSet })
+        sectionsFlow.emit(reorderedCategories)
     }
 
     private fun onShowMore(section: Section) {

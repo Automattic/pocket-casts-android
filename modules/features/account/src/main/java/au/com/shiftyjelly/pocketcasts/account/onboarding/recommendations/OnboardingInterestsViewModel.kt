@@ -5,11 +5,11 @@ import androidx.lifecycle.viewModelScope
 import au.com.shiftyjelly.pocketcasts.repositories.categories.CategoriesManager
 import au.com.shiftyjelly.pocketcasts.servers.model.DiscoverCategory
 import dagger.hilt.android.lifecycle.HiltViewModel
-import javax.inject.Inject
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 @HiltViewModel
@@ -29,7 +29,10 @@ class OnboardingInterestsViewModel @Inject constructor(
         fetchCategories()
     }
 
-    fun skipSelection() {
+    fun skipSelection(doWhenFinished: () -> Unit) {
+        viewModelScope.launch {
+            doWhenFinished()
+        }
     }
 
     fun updateSelectedCategory(category: DiscoverCategory, isSelected: Boolean) {
@@ -52,16 +55,21 @@ class OnboardingInterestsViewModel @Inject constructor(
         }
     }
 
-    fun saveInterests() {
+    fun saveInterests(doWhenFinished: () -> Unit) {
+        viewModelScope.launch {
+            categoriesManager.setInterestCategories(_state.value.selectedCategories)
+            doWhenFinished()
+        }
     }
 
     private fun fetchCategories() {
         viewModelScope.launch {
-            categoriesManager.state.collect { categState ->
+            categoriesManager.state.collect { categoryState ->
                 _state.update {
                     it.copy(
-                        allCategories = categState.allCategories,
-                        displayedCategories = categState.allCategories.take(10),
+                        // TODO sort categories by their popularity, as soon as we've introduced the new field to backend.
+                        allCategories = categoryState.allCategories,
+                        displayedCategories = categoryState.allCategories.take(10),
                     )
                 }
             }
