@@ -8,15 +8,14 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.systemBarsPadding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentWidth
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.LazyRow
-import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.selection.toggleable
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.MaterialTheme
@@ -131,22 +130,20 @@ private fun Content(
         )
         Spacer(modifier = Modifier.height(24.dp))
 
-        LazyColumn(
+        FlowRow(
+            horizontalArrangement = Arrangement.Center,
             verticalArrangement = Arrangement.spacedBy(8.dp),
-            horizontalAlignment = Alignment.CenterHorizontally,
+            maxItemsInEachRow = 3,
         ) {
-            items(state.availableCategories.chunked(2)) { row ->
-                LazyRow(
-                    horizontalArrangement = Arrangement.spacedBy(8.dp),
-                ) {
-                    items(row) {
-                        CategoryPill(
-                            modifier = Modifier.wrapContentWidth(),
-                            category = it,
-                            isSelected = state.selectedCategories.contains(it),
-                            onSelectedChange = { isSelected -> onCategorySelectionChange(it, isSelected) },
-                        )
-                    }
+            state.availableCategories.forEachIndexed { index, item ->
+                CategoryPill(
+                    modifier = Modifier.wrapContentWidth(),
+                    category = item,
+                    isSelected = state.selectedCategories.contains(item),
+                    onSelectedChange = { isSelected -> onCategorySelectionChange(item, isSelected) },
+                )
+                if (index % 2 == 0) {
+                    Spacer(modifier = Modifier.width(8.dp))
                 }
             }
         }
@@ -207,7 +204,11 @@ private fun SelectablePillContainer(
                 if (isSelected) {
                     Modifier.background(color = Color.Green.copy(alpha = .3f))
                 } else {
-                    Modifier.border(width = 1.dp, color = MaterialTheme.theme.colors.primaryText02, shape = RoundedCornerShape(percent = 100))
+                    Modifier.border(
+                        width = 1.dp,
+                        color = MaterialTheme.theme.colors.primaryText02,
+                        shape = RoundedCornerShape(percent = 100)
+                    )
                 }
                     .toggleable(value = isSelected, onValueChange = onSelectedChange)
                     .padding(horizontal = 16.dp),
