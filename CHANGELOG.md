@@ -3,6 +3,9 @@
 *   New Features
     *   Onboarding Account Creation Improvements
         ([#4405](https://github.com/Automattic/pocket-casts-android/pull/4405))
+* Bug Fixes
+    *   Fix File Settings bottom content being obstructed by the Mini Player.
+        ([#4262](https://github.com/Automattic/pocket-casts-android/pull/4262))
 
 7.96
 -----
