@@ -25,6 +25,7 @@
     </com.google.android.material.appbar.AppBarLayout>
 
     <ScrollView
+        android:id="@+id/scrollContainer"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
