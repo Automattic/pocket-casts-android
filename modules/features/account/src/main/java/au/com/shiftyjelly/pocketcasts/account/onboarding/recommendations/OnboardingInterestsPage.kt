@@ -131,7 +131,7 @@ private fun Content(
             verticalArrangement = Arrangement.spacedBy(8.dp),
             maxItemsInEachRow = 3,
         ) {
-            state.availableCategories.forEachIndexed { index, item ->
+            state.displayedCategories.forEachIndexed { index, item ->
                 InterestCategoryPill(
                     modifier = Modifier.wrapContentWidth(),
                     category = item,
