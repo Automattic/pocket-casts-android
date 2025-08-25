@@ -47,6 +47,7 @@ dependencies {
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.preference.ktx)
     implementation(libs.coil)
+    implementation(libs.coil.compose)
     implementation(libs.compose.activity)
     implementation(libs.compose.animation)
     implementation(libs.compose.constraintlayout)

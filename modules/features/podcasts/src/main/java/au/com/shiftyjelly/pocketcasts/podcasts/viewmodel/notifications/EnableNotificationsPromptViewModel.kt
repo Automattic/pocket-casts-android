@@ -48,7 +48,7 @@ class EnableNotificationsPromptViewModel @Inject constructor(
     }
 
     fun handleCtaClick() {
-        analyticsTracker.track(AnalyticsEvent.NOTIFICATIONS_PERMISSIONS_ALLOW_TAPPED) // TODO discuss analytics with the team
+        analyticsTracker.track(AnalyticsEvent.NOTIFICATIONS_PERMISSIONS_ALLOW_TAPPED)
         when (val state = stateFlow.value) {
             is UiState.PreNewOnboarding -> {
                 viewModelScope.launch {
