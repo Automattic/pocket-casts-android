@@ -46,6 +46,7 @@ data class PodcastInfo(
     @Json(name = "episodes") val episodes: List<EpisodeInfo>?,
     @Json(name = "is_private") val isPrivate: Boolean?,
     @Json(name = "fundings") val fundings: List<Funding>?,
+    @Json(name = "slug") val slug: String?,
 ) {
 
     fun toPodcast(): Podcast {
@@ -63,6 +64,7 @@ data class PodcastInfo(
         }
         podcast.isPrivate = isPrivate ?: false
         podcast.fundingUrl = fundings?.firstOrNull()?.url
+        podcast.slug = slug.orEmpty()
         return podcast
     }
 }
@@ -85,6 +87,7 @@ data class EpisodeInfo(
     @Json(name = "file_size") val fileSize: Long?,
     @Json(name = "duration") val duration: Double?,
     @Json(name = "published") val published: String,
+    @Json(name = "slug") val slug: String?,
 ) {
 
     fun toEpisode(podcastUuid: String): PodcastEpisode? {
@@ -103,6 +106,7 @@ data class EpisodeInfo(
             season = season,
             number = number,
             type = type,
+            slug = slug.orEmpty(),
         )
     }
 }
