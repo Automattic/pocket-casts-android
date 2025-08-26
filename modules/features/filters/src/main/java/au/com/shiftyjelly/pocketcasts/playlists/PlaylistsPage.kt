@@ -415,7 +415,7 @@ private fun PlaylistPagePreview(
                             uuid = "uuid-$index",
                             title = "Playlist $index",
                             episodeCount = index,
-                            podcasts = emptyList(),
+                            artworkPodcastUuids = emptyList(),
                         )
                     },
                 ),

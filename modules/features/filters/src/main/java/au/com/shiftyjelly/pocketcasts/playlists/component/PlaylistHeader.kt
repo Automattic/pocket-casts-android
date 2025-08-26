@@ -97,7 +97,6 @@ import au.com.shiftyjelly.pocketcasts.compose.components.TextP60
 import au.com.shiftyjelly.pocketcasts.compose.preview.ThemePreviewParameterProvider
 import au.com.shiftyjelly.pocketcasts.compose.theme
 import au.com.shiftyjelly.pocketcasts.localization.helper.toFriendlyString
-import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme.ThemeType
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.days
@@ -112,7 +111,7 @@ internal data class PlaylistHeaderData(
     val totalEpisodeCount: Int,
     val displayedEpisodeCount: Int,
     val playbackDurationLeft: Duration,
-    val artworkPodcasts: List<Podcast>,
+    val artworkPodcastUuids: List<String>,
 )
 
 internal data class PlaylistHeaderButtonData(
@@ -135,7 +134,7 @@ internal fun PlaylistHeader(
     BoxWithConstraints(
         modifier = modifier,
     ) {
-        val podcasts = data?.artworkPodcasts
+        val podcastUuids = data?.artworkPodcastUuids
         val contentTopPadding = AppBarDefaults.topAppBarWindowInsets
             .asPaddingValues()
             .calculateTopPadding()
@@ -143,7 +142,7 @@ internal fun PlaylistHeader(
         val artworkSize = minOf(maxWidth * 0.48f, 192.dp)
 
         PlaylistBackgroundArtwork(
-            podcasts = podcasts,
+            podcastUuids = podcastUuids,
             useBlurredArtwork = useBlurredArtwork,
             maxWidth = maxWidth,
             bottomAnchor = contentTopPadding + artworkSize * 0.75f,
@@ -158,7 +157,7 @@ internal fun PlaylistHeader(
             )
             PlaylistForegroundArtwork(
                 artworkSize = artworkSize,
-                podcasts = podcasts,
+                podcastUuids = podcastUuids,
             )
             Spacer(
                 modifier = Modifier.height(20.dp),
@@ -231,10 +230,10 @@ internal fun PlaylistHeader(
 @Composable
 private fun PlaylistForegroundArtwork(
     artworkSize: Dp,
-    podcasts: List<Podcast>?,
+    podcastUuids: List<String>?,
     modifier: Modifier = Modifier,
 ) {
-    val showShadow by rememberUpdatedState(podcasts != null)
+    val showShadow by rememberUpdatedState(podcastUuids != null)
     val shadowBoxSize by animateDpAsState(
         targetValue = if (showShadow) artworkSize else 0.dp,
         animationSpec = artworkShadowSpec,
@@ -254,12 +253,12 @@ private fun PlaylistForegroundArtwork(
                 .size(shadowBoxSize),
         )
         Crossfade(
-            targetState = podcasts,
-            animationSpec = if (podcasts.isNullOrEmpty()) artworkCrossfadeFastSpec else artworkCrossfadeSpec,
-        ) { podcasts ->
-            if (podcasts != null) {
+            targetState = podcastUuids,
+            animationSpec = if (podcastUuids.isNullOrEmpty()) artworkCrossfadeFastSpec else artworkCrossfadeSpec,
+        ) { uuid ->
+            if (uuid != null) {
                 PlaylistArtwork(
-                    podcasts = podcasts,
+                    podcastUuids = uuid,
                     artworkSize = artworkSize,
                     elevation = 0.dp,
                 )
@@ -274,7 +273,7 @@ private fun PlaylistForegroundArtwork(
 
 @Composable
 private fun PlaylistBackgroundArtwork(
-    podcasts: List<Podcast>?,
+    podcastUuids: List<String>?,
     useBlurredArtwork: Boolean,
     maxWidth: Dp,
     bottomAnchor: Dp,
@@ -287,8 +286,8 @@ private fun PlaylistBackgroundArtwork(
     val artworkBottomOffsetPx = LocalDensity.current.run { artworkBottomOffset.roundToPx() }
 
     Crossfade(
-        targetState = podcasts?.takeIf { it.isNotEmpty() },
-        animationSpec = if (podcasts.isNullOrEmpty()) artworkCrossfadeFastSpec else artworkCrossfadeSpec,
+        targetState = podcastUuids?.takeIf { it.isNotEmpty() },
+        animationSpec = if (podcastUuids.isNullOrEmpty()) artworkCrossfadeFastSpec else artworkCrossfadeSpec,
         modifier = modifier
             .layout { measurable, constraints ->
                 val artworkHeightPx = if (useBlurredArtwork) {
@@ -317,7 +316,7 @@ private fun PlaylistBackgroundArtwork(
     ) { podcasts ->
         if (podcasts != null) {
             ArtworkOrPreview(
-                podcasts = podcasts,
+                uuids = podcasts,
                 artworkSize = artworkSize,
             )
         }
@@ -326,13 +325,13 @@ private fun PlaylistBackgroundArtwork(
 
 @Composable
 private fun ArtworkOrPreview(
-    podcasts: List<Podcast>,
+    uuids: List<String>,
     artworkSize: Dp,
     modifier: Modifier = Modifier,
 ) {
     if (!LocalInspectionMode.current) {
         PlaylistArtwork(
-            podcasts = podcasts,
+            podcastUuids = uuids,
             artworkSize = artworkSize,
             cornerSize = 0.dp,
             elevation = 0.dp,
@@ -633,7 +632,7 @@ private fun PlaylistHeaderNoEpisodesPreview() {
                     totalEpisodeCount = episodeCount,
                     displayedEpisodeCount = episodeCount,
                     playbackDurationLeft = 0.seconds,
-                    artworkPodcasts = emptyList(),
+                    artworkPodcastUuids = emptyList(),
                 ),
                 leftButton = PlaylistHeaderButtonData(
                     iconId = IR.drawable.sleep_timer_cog,
@@ -669,7 +668,7 @@ private fun PlaylistHeaderNoDisplayedEpisodesPreview() {
                     totalEpisodeCount = 20,
                     displayedEpisodeCount = 0,
                     playbackDurationLeft = 0.seconds,
-                    artworkPodcasts = emptyList(),
+                    artworkPodcastUuids = emptyList(),
                 ),
                 leftButton = PlaylistHeaderButtonData(
                     iconId = IR.drawable.sleep_timer_cog,
@@ -705,7 +704,7 @@ private fun PlaylistHeaderSinglePodcastPreview() {
                     totalEpisodeCount = 100,
                     displayedEpisodeCount = 100,
                     playbackDurationLeft = 200.days + 12.hours,
-                    artworkPodcasts = listOf(Podcast(uuid = "id-0")),
+                    artworkPodcastUuids = listOf("podcast-uuid"),
                 ),
                 leftButton = PlaylistHeaderButtonData(
                     iconId = IR.drawable.sleep_timer_cog,
@@ -741,7 +740,7 @@ private fun PlaylistHeaderMultiPodcastPreview() {
                     totalEpisodeCount = 5,
                     displayedEpisodeCount = 5,
                     playbackDurationLeft = 1.hours + 15.minutes,
-                    artworkPodcasts = List(4) { index -> Podcast(uuid = "id-$index") },
+                    artworkPodcastUuids = List(4) { "podcast-uuid-$it" },
                 ),
                 leftButton = PlaylistHeaderButtonData(
                     iconId = IR.drawable.sleep_timer_cog,
@@ -779,7 +778,7 @@ private fun PlaylistHeaderThemePreview(
                     totalEpisodeCount = 5,
                     displayedEpisodeCount = 5,
                     playbackDurationLeft = 1.hours + 15.minutes,
-                    artworkPodcasts = List(4) { index -> Podcast(uuid = "id-$index") },
+                    artworkPodcastUuids = List(4) { "podcast-uuid-$it" },
                 ),
                 leftButton = PlaylistHeaderButtonData(
                     iconId = IR.drawable.sleep_timer_cog,

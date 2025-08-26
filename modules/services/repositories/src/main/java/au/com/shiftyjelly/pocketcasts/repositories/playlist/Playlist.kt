@@ -1,6 +1,5 @@
 package au.com.shiftyjelly.pocketcasts.repositories.playlist
 
-import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.models.type.PlaylistEpisodeSortType
 import au.com.shiftyjelly.pocketcasts.models.type.SmartRules
@@ -23,5 +22,5 @@ data class SmartPlaylist(
     val autoDownloadLimit: Int,
     val totalEpisodeCount: Int,
     val playbackDurationLeft: Duration,
-    val artworkPodcasts: List<Podcast>,
+    val artworkPodcastUuids: List<String>,
 ) : Playlist

@@ -92,7 +92,7 @@ class PlaylistManagerImpl @Inject constructor(
                             autoDownloadLimit = playlist.autodownloadLimit,
                             totalEpisodeCount = metadata.episodeCount,
                             playbackDurationLeft = metadata.timeLeftSeconds.seconds,
-                            artworkPodcasts = podcasts,
+                            artworkPodcastUuids = podcasts,
                         )
                     }.keepPodcastEpisodesSynced()
                 }
@@ -195,7 +195,7 @@ class PlaylistManagerImpl @Inject constructor(
             PlaylistPreview(
                 uuid = playlist.uuid,
                 title = playlist.title,
-                podcasts = podcasts,
+                artworkPodcastUuids = podcasts,
                 episodeCount = metadata.episodeCount,
             )
         }.distinctUntilChanged()
