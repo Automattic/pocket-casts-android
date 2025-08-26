@@ -7,10 +7,10 @@ import androidx.room.RoomRawQuery
 import androidx.room.Transaction
 import androidx.room.Upsert
 import au.com.shiftyjelly.pocketcasts.models.db.AppDatabase
+import au.com.shiftyjelly.pocketcasts.models.entity.PlaylistEntity
+import au.com.shiftyjelly.pocketcasts.models.entity.PlaylistEntity.Companion.SYNC_STATUS_NOT_SYNCED
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
-import au.com.shiftyjelly.pocketcasts.models.entity.SmartPlaylist
-import au.com.shiftyjelly.pocketcasts.models.entity.SmartPlaylist.Companion.SYNC_STATUS_NOT_SYNCED
 import au.com.shiftyjelly.pocketcasts.models.to.PlaylistEpisodeMetadata
 import au.com.shiftyjelly.pocketcasts.models.to.PlaylistShortcut
 import au.com.shiftyjelly.pocketcasts.models.type.PlaylistEpisodeSortType
@@ -26,27 +26,27 @@ import kotlinx.coroutines.flow.Flow
 @Dao
 abstract class PlaylistDao {
     @Upsert
-    abstract suspend fun upsertPlaylist(playlist: SmartPlaylist)
+    abstract suspend fun upsertPlaylist(playlist: PlaylistEntity)
 
     @Upsert
-    abstract suspend fun upsertAllPlaylists(playlists: List<SmartPlaylist>)
+    abstract suspend fun upsertAllPlaylists(playlists: List<PlaylistEntity>)
 
-    @Query("SELECT uuid FROM smart_playlists ORDER BY sortPosition ASC")
+    @Query("SELECT uuid FROM playlists ORDER BY sortPosition ASC")
     abstract suspend fun getAllPlaylistUuids(): List<String>
 
-    @Query("SELECT * FROM smart_playlists WHERE manual = 0 AND deleted = 0 AND draft = 0 AND uuid = :uuid")
-    abstract fun observeSmartPlaylist(uuid: String): Flow<SmartPlaylist?>
+    @Query("SELECT * FROM playlists WHERE manual = 0 AND deleted = 0 AND draft = 0 AND uuid = :uuid")
+    abstract fun observeSmartPlaylist(uuid: String): Flow<PlaylistEntity?>
 
-    @Query("SELECT * FROM smart_playlists WHERE manual = 0 AND deleted = 0 AND draft = 0 ORDER BY sortPosition ASC")
-    abstract fun observeSmartPlaylists(): Flow<List<SmartPlaylist>>
+    @Query("SELECT * FROM playlists WHERE manual = 0 AND deleted = 0 AND draft = 0 ORDER BY sortPosition ASC")
+    abstract fun observeSmartPlaylists(): Flow<List<PlaylistEntity>>
 
-    @Query("SELECT * FROM smart_playlists WHERE manual = 0 AND deleted = 0 AND draft = 0 ORDER BY sortPosition ASC")
-    abstract suspend fun getSmartPlaylists(): List<SmartPlaylist>
+    @Query("SELECT * FROM playlists WHERE manual = 0 AND deleted = 0 AND draft = 0 ORDER BY sortPosition ASC")
+    abstract suspend fun getSmartPlaylists(): List<PlaylistEntity>
 
     @Query(
         """
         SELECT playlist.uuid, playlist.title, playlist.iconId
-        FROM smart_playlists AS playlist
+        FROM playlists AS playlist
         WHERE manual = 0 AND deleted = 0 AND draft = 0
         ORDER BY sortPosition ASC 
         LIMIT 1
@@ -54,41 +54,41 @@ abstract class PlaylistDao {
     )
     abstract fun observerPlaylistShortcut(): Flow<PlaylistShortcut?>
 
-    @Query("SELECT * FROM smart_playlists WHERE uuid IN (:uuids)")
-    protected abstract suspend fun getAllPlaylistsUnsafe(uuids: Collection<String>): List<SmartPlaylist>
+    @Query("SELECT * FROM playlists WHERE uuid IN (:uuids)")
+    protected abstract suspend fun getAllPlaylistsUnsafe(uuids: Collection<String>): List<PlaylistEntity>
 
     @Transaction
-    open suspend fun getAllPlaylists(uuids: Collection<String>): List<SmartPlaylist> {
+    open suspend fun getAllPlaylists(uuids: Collection<String>): List<PlaylistEntity> {
         return uuids.chunked(AppDatabase.SQLITE_BIND_ARG_LIMIT).flatMap { chunk ->
             getAllPlaylistsUnsafe(chunk)
         }
     }
 
-    @Query("SELECT * FROM smart_playlists WHERE draft = 0 AND manual = 0 AND syncStatus = $SYNC_STATUS_NOT_SYNCED")
-    abstract suspend fun getAllUnsynced(): List<SmartPlaylist>
+    @Query("SELECT * FROM playlists WHERE draft = 0 AND manual = 0 AND syncStatus = $SYNC_STATUS_NOT_SYNCED")
+    abstract suspend fun getAllUnsynced(): List<PlaylistEntity>
 
-    @Query("UPDATE smart_playlists SET sortPosition = :position, syncStatus = $SYNC_STATUS_NOT_SYNCED WHERE uuid = :uuid")
+    @Query("UPDATE playlists SET sortPosition = :position, syncStatus = $SYNC_STATUS_NOT_SYNCED WHERE uuid = :uuid")
     abstract suspend fun updateSortPosition(uuid: String, position: Int)
 
-    @Query("UPDATE smart_playlists SET sortId = :sortType, syncStatus = $SYNC_STATUS_NOT_SYNCED WHERE uuid = :uuid")
+    @Query("UPDATE playlists SET sortId = :sortType, syncStatus = $SYNC_STATUS_NOT_SYNCED WHERE uuid = :uuid")
     abstract suspend fun updateSortType(uuid: String, sortType: PlaylistEpisodeSortType)
 
-    @Query("UPDATE smart_playlists SET autoDownload = :isEnabled, syncStatus = $SYNC_STATUS_NOT_SYNCED WHERE uuid = :uuid")
+    @Query("UPDATE playlists SET autoDownload = :isEnabled, syncStatus = $SYNC_STATUS_NOT_SYNCED WHERE uuid = :uuid")
     abstract suspend fun updateAutoDownload(uuid: String, isEnabled: Boolean)
 
-    @Query("UPDATE smart_playlists SET autoDownloadLimit = :limit, syncStatus = $SYNC_STATUS_NOT_SYNCED WHERE uuid = :uuid")
+    @Query("UPDATE playlists SET autoDownloadLimit = :limit, syncStatus = $SYNC_STATUS_NOT_SYNCED WHERE uuid = :uuid")
     abstract suspend fun updateAutoDownloadLimit(uuid: String, limit: Int)
 
-    @Query("UPDATE smart_playlists SET title = :name, syncStatus = $SYNC_STATUS_NOT_SYNCED WHERE uuid = :uuid")
+    @Query("UPDATE playlists SET title = :name, syncStatus = $SYNC_STATUS_NOT_SYNCED WHERE uuid = :uuid")
     abstract suspend fun updateName(uuid: String, name: String)
 
-    @Query("UPDATE smart_playlists SET deleted = 1, syncStatus = $SYNC_STATUS_NOT_SYNCED WHERE uuid = :uuid")
+    @Query("UPDATE playlists SET deleted = 1, syncStatus = $SYNC_STATUS_NOT_SYNCED WHERE uuid = :uuid")
     abstract suspend fun markPlaylistAsDeleted(uuid: String)
 
-    @Query("DELETE FROM smart_playlists WHERE deleted = 1")
+    @Query("DELETE FROM playlists WHERE deleted = 1")
     abstract suspend fun deleteMarkedPlaylists()
 
-    @Query("DELETE FROM smart_playlists WHERE uuid IN (:uuids)")
+    @Query("DELETE FROM playlists WHERE uuid IN (:uuids)")
     protected abstract suspend fun deleteAllUnsafe(uuids: Collection<String>)
 
     @Transaction

@@ -12,9 +12,9 @@ import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.models.entity.Bookmark
 import au.com.shiftyjelly.pocketcasts.models.entity.ChapterIndices
 import au.com.shiftyjelly.pocketcasts.models.entity.Folder
+import au.com.shiftyjelly.pocketcasts.models.entity.PlaylistEntity
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
-import au.com.shiftyjelly.pocketcasts.models.entity.SmartPlaylist
 import au.com.shiftyjelly.pocketcasts.models.entity.UserPodcastRating
 import au.com.shiftyjelly.pocketcasts.models.to.StatsBundle
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodePlayingStatus
@@ -408,7 +408,6 @@ class PodcastSyncProcess(
                     fields.put("audio_video", playlist.audioVideo)
                     fields.put("not_downloaded", if (playlist.notDownloaded) "1" else "0")
                     fields.put("downloaded", if (playlist.downloaded) "1" else "0")
-                    fields.put("downloading", if (playlist.downloading) "1" else "0")
                     fields.put("finished", if (playlist.finished) "1" else "0")
                     fields.put("partially_played", if (playlist.partiallyPlayed) "1" else "0")
                     fields.put("unplayed", if (playlist.unplayed) "1" else "0")
@@ -615,7 +614,7 @@ class PodcastSyncProcess(
         return rxCompletable { markAllLocalItemsSynced(episodes) }
             .andThen(importEpisodes(response.episodes))
             .andThen(importPodcasts(response.podcasts))
-            .andThen(rxCompletable { importFilters(response.smartPlaylists) })
+            .andThen(rxCompletable { importFilters(response.playlists) })
             .andThen(importFolders(response.folders))
             .andThen(rxCompletable { importBookmarks(response.bookmarks) })
             .andThen(updateSettings(response))
@@ -668,8 +667,8 @@ class PodcastSyncProcess(
             .ignoreElements()
     }
 
-    private suspend fun importFilters(smartPlaylists: List<SmartPlaylist>) {
-        for (playlist in smartPlaylists) {
+    private suspend fun importFilters(playlists: List<PlaylistEntity>) {
+        for (playlist in playlists) {
             importPlaylist(playlist)
         }
     }
@@ -695,7 +694,7 @@ class PodcastSyncProcess(
         }
     }
 
-    private suspend fun importPlaylist(sync: SmartPlaylist): SmartPlaylist? {
+    private suspend fun importPlaylist(sync: PlaylistEntity): PlaylistEntity? {
         val uuid = sync.uuid
         if (uuid.isBlank()) {
             return null
@@ -712,7 +711,7 @@ class PodcastSyncProcess(
         }
 
         if (playlist == null) {
-            playlist = SmartPlaylist(uuid = sync.uuid)
+            playlist = PlaylistEntity(uuid = sync.uuid)
         }
 
         with(playlist) {
@@ -720,7 +719,6 @@ class PodcastSyncProcess(
             audioVideo = sync.audioVideo
             notDownloaded = sync.notDownloaded
             downloaded = sync.downloaded
-            downloading = sync.downloading
             finished = sync.finished
             partiallyPlayed = sync.partiallyPlayed
             unplayed = sync.unplayed
@@ -732,7 +730,7 @@ class PodcastSyncProcess(
             allPodcasts = sync.allPodcasts
             podcastUuids = sync.podcastUuids
             filterHours = sync.filterHours
-            syncStatus = SmartPlaylist.SYNC_STATUS_SYNCED
+            syncStatus = PlaylistEntity.SYNC_STATUS_SYNCED
             filterDuration = sync.filterDuration
             longerThan = sync.longerThan
             shorterThan = sync.shorterThan

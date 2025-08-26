@@ -9,8 +9,7 @@ class InputQueryFilters
 private const val OUTPUT_PREFIX = "filter_"
 
 @TaskerOutputObject
-class OutputQueryFilters constructor(
+class OutputQueryFilters(
     @get:TaskerOutputVariable("${OUTPUT_PREFIX}uuid", labelResIdName = "filter_id", htmlLabelResIdName = "filter_id_description") var id: String?,
     @get:TaskerOutputVariable("${OUTPUT_PREFIX}title", labelResIdName = "filter_title") var title: String?,
-    @get:TaskerOutputVariable("${OUTPUT_PREFIX}episode_count", labelResIdName = "episode_count") var episodeCount: Int?,
 )

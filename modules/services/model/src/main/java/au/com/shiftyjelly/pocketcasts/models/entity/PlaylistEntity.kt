@@ -2,7 +2,6 @@ package au.com.shiftyjelly.pocketcasts.models.entity
 
 import androidx.room.ColumnInfo
 import androidx.room.Entity
-import androidx.room.Ignore
 import androidx.room.Index
 import androidx.room.PrimaryKey
 import au.com.shiftyjelly.pocketcasts.models.type.PlaylistEpisodeSortType
@@ -11,12 +10,12 @@ import java.io.Serializable
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 @Entity(
-    tableName = "smart_playlists",
+    tableName = "playlists",
     indices = [
-        Index(name = "smart_playlists_uuid", value = arrayOf("uuid")),
+        Index(name = "playlists_uuid", value = arrayOf("uuid")),
     ],
 )
-data class SmartPlaylist(
+data class PlaylistEntity(
     @PrimaryKey @ColumnInfo(name = "_id") var id: Long? = null,
     @ColumnInfo(name = "uuid") var uuid: String = "",
     @ColumnInfo(name = "title") var title: String = "",
@@ -29,16 +28,13 @@ data class SmartPlaylist(
     @ColumnInfo(name = "syncStatus") var syncStatus: Int = SYNC_STATUS_SYNCED,
     // Auto download configuration
     @ColumnInfo(name = "autoDownload") var autoDownload: Boolean = false,
-    @ColumnInfo(name = "autoDownloadWifiOnly") var autoDownloadUnmeteredOnly: Boolean = false,
-    @ColumnInfo(name = "autoDownloadPowerOnly") var autoDownloadPowerOnly: Boolean = false,
     @ColumnInfo(name = "autoDownloadLimit") var autodownloadLimit: Int = 10,
-    // Filter rules
+    // Smart playlist configuration
     @ColumnInfo(name = "unplayed") var unplayed: Boolean = true,
     @ColumnInfo(name = "partiallyPlayed") var partiallyPlayed: Boolean = true,
     @ColumnInfo(name = "finished") var finished: Boolean = true,
     @ColumnInfo(name = "downloaded") var downloaded: Boolean = true,
     @ColumnInfo(name = "notDownloaded") var notDownloaded: Boolean = true,
-    @ColumnInfo(name = "downloading") var downloading: Boolean = true, // Legacy field
     @ColumnInfo(name = "audioVideo") var audioVideo: Int = AUDIO_VIDEO_FILTER_ALL,
     @ColumnInfo(name = "filterHours") var filterHours: Int = 0,
     @ColumnInfo(name = "starred") var starred: Boolean = false,
@@ -63,12 +59,6 @@ data class SmartPlaylist(
         const val LAST_2_WEEKS = 14 * 24
         const val LAST_MONTH = 31 * 24
     }
-
-    @Ignore
-    var episodeUuids: String? = null
-
-    @Ignore
-    var episodeCount: Int = 0
 
     val isAudioOnly: Boolean
         get() = audioVideo == AUDIO_VIDEO_FILTER_AUDIO_ONLY

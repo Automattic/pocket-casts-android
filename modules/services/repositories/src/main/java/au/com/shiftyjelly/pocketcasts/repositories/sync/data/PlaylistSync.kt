@@ -2,7 +2,7 @@ package au.com.shiftyjelly.pocketcasts.repositories.sync.data
 
 import androidx.room.withTransaction
 import au.com.shiftyjelly.pocketcasts.models.db.AppDatabase
-import au.com.shiftyjelly.pocketcasts.models.entity.SmartPlaylist
+import au.com.shiftyjelly.pocketcasts.models.entity.PlaylistEntity
 import au.com.shiftyjelly.pocketcasts.models.type.PlaylistEpisodeSortType
 import au.com.shiftyjelly.pocketcasts.repositories.sync.SyncManager
 import com.google.protobuf.boolValue
@@ -66,7 +66,7 @@ internal class PlaylistSync(
         getUuid: (T) -> String,
         isDeleted: (T) -> Boolean,
         isManual: (T) -> Boolean,
-        applyServerPlaylist: (SmartPlaylist, T) -> SmartPlaylist,
+        applyServerPlaylist: (PlaylistEntity, T) -> PlaylistEntity,
     ) {
         val deletedPlaylists = serverPlaylists.filter(isDeleted)
         val remainingPlaylist = serverPlaylists - deletedPlaylists
@@ -78,14 +78,14 @@ internal class PlaylistSync(
             playlistDao.deleteAll(deletedPlaylists.map(getUuid))
 
             val existingPlaylists = playlistDao.getAllPlaylists(smartPlaylists.map(getUuid))
-            val existingPlaylistUuids = existingPlaylists.map(SmartPlaylist::uuid)
+            val existingPlaylistUuids = existingPlaylists.map(PlaylistEntity::uuid)
             existingPlaylists.forEach { playlist ->
                 val serverPlaylist = remainingPlaylistsMap[playlist.uuid] ?: return@forEach
                 applyServerPlaylist(playlist, serverPlaylist)
             }
             val newPlaylists = smartPlaylists.mapNotNull { serverPlaylist ->
                 if (getUuid(serverPlaylist) !in existingPlaylistUuids) {
-                    applyServerPlaylist(SmartPlaylist(), serverPlaylist)
+                    applyServerPlaylist(PlaylistEntity(), serverPlaylist)
                 } else {
                     null
                 }
@@ -168,8 +168,8 @@ internal class PlaylistSync(
     }
 }
 
-private fun SmartPlaylist.applyServerPlaylist(serverPlaylist: PlaylistSyncResponse) = apply {
-    syncStatus = SmartPlaylist.SYNC_STATUS_SYNCED
+private fun PlaylistEntity.applyServerPlaylist(serverPlaylist: PlaylistSyncResponse) = apply {
+    syncStatus = PlaylistEntity.SYNC_STATUS_SYNCED
     uuid = serverPlaylist.uuid
     title = serverPlaylist.title
     serverPlaylist.manualOrNull?.value?.let { value ->
@@ -223,8 +223,8 @@ private fun SmartPlaylist.applyServerPlaylist(serverPlaylist: PlaylistSyncRespon
     }
 }
 
-private fun SmartPlaylist.applyServerPlaylist(serverPlaylist: SyncUserPlaylist) = apply {
-    syncStatus = SmartPlaylist.SYNC_STATUS_SYNCED
+private fun PlaylistEntity.applyServerPlaylist(serverPlaylist: SyncUserPlaylist) = apply {
+    syncStatus = PlaylistEntity.SYNC_STATUS_SYNCED
     uuid = serverPlaylist.uuid
     serverPlaylist.titleOrNull?.value?.let { value ->
         title = value

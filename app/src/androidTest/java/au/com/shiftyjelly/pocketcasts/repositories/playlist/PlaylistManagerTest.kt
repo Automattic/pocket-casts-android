@@ -9,19 +9,19 @@ import au.com.shiftyjelly.pocketcasts.models.db.dao.PlaylistDao
 import au.com.shiftyjelly.pocketcasts.models.db.dao.PodcastDao
 import au.com.shiftyjelly.pocketcasts.models.di.ModelModule
 import au.com.shiftyjelly.pocketcasts.models.di.addTypeConverters
+import au.com.shiftyjelly.pocketcasts.models.entity.PlaylistEntity.Companion.ANYTIME
+import au.com.shiftyjelly.pocketcasts.models.entity.PlaylistEntity.Companion.AUDIO_VIDEO_FILTER_ALL
+import au.com.shiftyjelly.pocketcasts.models.entity.PlaylistEntity.Companion.AUDIO_VIDEO_FILTER_AUDIO_ONLY
+import au.com.shiftyjelly.pocketcasts.models.entity.PlaylistEntity.Companion.AUDIO_VIDEO_FILTER_VIDEO_ONLY
+import au.com.shiftyjelly.pocketcasts.models.entity.PlaylistEntity.Companion.LAST_24_HOURS
+import au.com.shiftyjelly.pocketcasts.models.entity.PlaylistEntity.Companion.LAST_2_WEEKS
+import au.com.shiftyjelly.pocketcasts.models.entity.PlaylistEntity.Companion.LAST_3_DAYS
+import au.com.shiftyjelly.pocketcasts.models.entity.PlaylistEntity.Companion.LAST_MONTH
+import au.com.shiftyjelly.pocketcasts.models.entity.PlaylistEntity.Companion.LAST_WEEK
+import au.com.shiftyjelly.pocketcasts.models.entity.PlaylistEntity.Companion.SYNC_STATUS_NOT_SYNCED
+import au.com.shiftyjelly.pocketcasts.models.entity.PlaylistEntity.Companion.SYNC_STATUS_SYNCED
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
-import au.com.shiftyjelly.pocketcasts.models.entity.SmartPlaylist.Companion.ANYTIME
-import au.com.shiftyjelly.pocketcasts.models.entity.SmartPlaylist.Companion.AUDIO_VIDEO_FILTER_ALL
-import au.com.shiftyjelly.pocketcasts.models.entity.SmartPlaylist.Companion.AUDIO_VIDEO_FILTER_AUDIO_ONLY
-import au.com.shiftyjelly.pocketcasts.models.entity.SmartPlaylist.Companion.AUDIO_VIDEO_FILTER_VIDEO_ONLY
-import au.com.shiftyjelly.pocketcasts.models.entity.SmartPlaylist.Companion.LAST_24_HOURS
-import au.com.shiftyjelly.pocketcasts.models.entity.SmartPlaylist.Companion.LAST_2_WEEKS
-import au.com.shiftyjelly.pocketcasts.models.entity.SmartPlaylist.Companion.LAST_3_DAYS
-import au.com.shiftyjelly.pocketcasts.models.entity.SmartPlaylist.Companion.LAST_MONTH
-import au.com.shiftyjelly.pocketcasts.models.entity.SmartPlaylist.Companion.LAST_WEEK
-import au.com.shiftyjelly.pocketcasts.models.entity.SmartPlaylist.Companion.SYNC_STATUS_NOT_SYNCED
-import au.com.shiftyjelly.pocketcasts.models.entity.SmartPlaylist.Companion.SYNC_STATUS_SYNCED
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodePlayingStatus
 import au.com.shiftyjelly.pocketcasts.models.type.PlaylistEpisodeSortType
 import au.com.shiftyjelly.pocketcasts.models.type.SmartRules
@@ -47,7 +47,7 @@ import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
-import au.com.shiftyjelly.pocketcasts.models.entity.SmartPlaylist as DbPlaylist
+import au.com.shiftyjelly.pocketcasts.models.entity.PlaylistEntity as DbPlaylist
 
 class PlaylistManagerTest {
     private val testDispatcher = StandardTestDispatcher()
@@ -630,15 +630,12 @@ class PlaylistManagerTest {
             deleted = false,
             syncStatus = SYNC_STATUS_NOT_SYNCED,
             autoDownload = false,
-            autoDownloadUnmeteredOnly = false,
-            autoDownloadPowerOnly = false,
             autodownloadLimit = 10,
             unplayed = true,
             partiallyPlayed = true,
             finished = true,
             downloaded = true,
             notDownloaded = true,
-            downloading = true,
             audioVideo = AUDIO_VIDEO_FILTER_ALL,
             filterHours = ANYTIME,
             starred = false,
@@ -663,9 +660,9 @@ class PlaylistManagerTest {
         assertPlaylist(index = 20, "Unplayed") { it.copy(unplayed = true, partiallyPlayed = false, finished = false) }
         assertPlaylist(index = 19, "In progress") { it.copy(unplayed = false, partiallyPlayed = true, finished = false) }
         assertPlaylist(index = 18, "Played") { it.copy(unplayed = false, partiallyPlayed = false, finished = true) }
-        assertPlaylist(index = 17, "Any downloaded status") { it.copy(downloaded = true, notDownloaded = true, downloading = true) }
-        assertPlaylist(index = 16, "Downloaded") { it.copy(downloaded = true, notDownloaded = false, downloading = false) }
-        assertPlaylist(index = 15, "Not downloaded") { it.copy(downloaded = false, notDownloaded = true, downloading = true) }
+        assertPlaylist(index = 17, "Any downloaded status") { it.copy(downloaded = true, notDownloaded = true) }
+        assertPlaylist(index = 16, "Downloaded") { it.copy(downloaded = true, notDownloaded = false) }
+        assertPlaylist(index = 15, "Not downloaded") { it.copy(downloaded = false, notDownloaded = true) }
         assertPlaylist(index = 14, "Audio / Video") { it.copy(audioVideo = AUDIO_VIDEO_FILTER_ALL) }
         assertPlaylist(index = 13, "Audio") { it.copy(audioVideo = AUDIO_VIDEO_FILTER_AUDIO_ONLY) }
         assertPlaylist(index = 12, "Video") { it.copy(audioVideo = AUDIO_VIDEO_FILTER_VIDEO_ONLY) }
@@ -701,15 +698,12 @@ class PlaylistManagerTest {
                 deleted = false,
                 syncStatus = SYNC_STATUS_SYNCED,
                 autoDownload = false,
-                autoDownloadUnmeteredOnly = false,
-                autoDownloadPowerOnly = false,
                 autodownloadLimit = 10,
                 unplayed = true,
                 partiallyPlayed = true,
                 finished = true,
                 downloaded = true,
                 notDownloaded = true,
-                downloading = true,
                 audioVideo = AUDIO_VIDEO_FILTER_ALL,
                 filterHours = LAST_2_WEEKS,
                 starred = false,
@@ -741,15 +735,12 @@ class PlaylistManagerTest {
                 deleted = false,
                 syncStatus = SYNC_STATUS_SYNCED,
                 autoDownload = false,
-                autoDownloadUnmeteredOnly = false,
-                autoDownloadPowerOnly = false,
                 autodownloadLimit = 10,
                 unplayed = false,
                 partiallyPlayed = true,
                 finished = false,
                 downloaded = true,
                 notDownloaded = true,
-                downloading = true,
                 audioVideo = AUDIO_VIDEO_FILTER_ALL,
                 filterHours = LAST_MONTH,
                 starred = false,

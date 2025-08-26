@@ -12,7 +12,7 @@ import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.filters.databinding.PodcastOptionsFragmentBinding
-import au.com.shiftyjelly.pocketcasts.models.entity.SmartPlaylist
+import au.com.shiftyjelly.pocketcasts.models.entity.PlaylistEntity
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PlaylistProperty
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PlaylistUpdateSource
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
@@ -44,9 +44,9 @@ class PodcastOptionsFragment :
     PodcastSelectFragment.Listener,
     CoroutineScope {
     companion object {
-        fun newInstance(smartPlaylist: SmartPlaylist): PodcastOptionsFragment {
+        fun newInstance(playlist: PlaylistEntity): PodcastOptionsFragment {
             val bundle = Bundle()
-            bundle.putString(ARG_PLAYLIST_UUID, smartPlaylist.uuid)
+            bundle.putString(ARG_PLAYLIST_UUID, playlist.uuid)
             val fragment = PodcastOptionsFragment()
             fragment.arguments = bundle
             return fragment
@@ -63,7 +63,7 @@ class PodcastOptionsFragment :
     @Inject lateinit var analyticsTracker: AnalyticsTracker
 
     var podcastSelection: List<String> = listOf()
-    var smartPlaylist: SmartPlaylist? = null
+    var playlist: PlaylistEntity? = null
     private var binding: PodcastOptionsFragmentBinding? = null
     private var userChanged = false
 
@@ -90,7 +90,7 @@ class PodcastOptionsFragment :
             val subscribedPodcasts = withContext(Dispatchers.Default) { podcastManager.findSubscribedBlocking() }.map { it.uuid }
             val playlistUuid = requireArguments().getString(ARG_PLAYLIST_UUID) ?: return@launch
             val playlist = smartPlaylistManager.findByUuid(playlistUuid) ?: return@launch
-            this@PodcastOptionsFragment.smartPlaylist = playlist
+            this@PodcastOptionsFragment.playlist = playlist
 
             val color = playlist.getColor(context)
 
@@ -130,11 +130,11 @@ class PodcastOptionsFragment :
         }
 
         btnSave.setOnClickListener {
-            smartPlaylist?.let { playlist ->
+            playlist?.let { playlist ->
                 playlist.podcastUuidList = podcastSelection
                 playlist.allPodcasts = switchAllPodcasts.isChecked || podcastSelection.isEmpty()
                 launch(Dispatchers.Default) {
-                    playlist.syncStatus = SmartPlaylist.SYNC_STATUS_NOT_SYNCED
+                    playlist.syncStatus = PlaylistEntity.SYNC_STATUS_NOT_SYNCED
 
                     val podcastSelectFragment = childFragmentManager.findFragmentById(R.id.podcastSelectFrame) as? PodcastSelectFragment
                     if (podcastSelectFragment == null) {

@@ -412,7 +412,7 @@ class Support @Inject constructor(
                     val playlists = smartPlaylistManager.findAllBlocking()
                     for (playlist in playlists) {
                         output.append(playlist.title).append(eol)
-                        output.append("Auto Download? ").append(playlist.autoDownload).append(" Unmetered only? ").append(playlist.autoDownloadUnmeteredOnly).append(" Power only? ").append(playlist.autoDownloadPowerOnly).append(eol)
+                        output.append("Auto Download? ").append(playlist.autoDownload).append(eol)
                         output.append(eol)
                     }
                 } catch (e: Exception) {

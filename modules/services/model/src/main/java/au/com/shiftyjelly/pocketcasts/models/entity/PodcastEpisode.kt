@@ -61,6 +61,7 @@ data class PodcastEpisode(
     @ColumnInfo(name = "image_url") var imageUrl: String? = null,
     @ColumnInfo(name = "deselected_chapters") override var deselectedChapters: ChapterIndices = ChapterIndices(),
     @ColumnInfo(name = "deselected_chapters_modified") override var deselectedChaptersModified: Date? = null,
+    @ColumnInfo(name = "slug") var slug: String = "",
 ) : BaseEpisode,
     Serializable {
 
