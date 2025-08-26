@@ -2,6 +2,7 @@ package au.com.shiftyjelly.pocketcasts.repositories.playlist
 
 import androidx.room.withTransaction
 import au.com.shiftyjelly.pocketcasts.models.db.AppDatabase
+import au.com.shiftyjelly.pocketcasts.models.entity.PlaylistEntity
 import au.com.shiftyjelly.pocketcasts.models.entity.PlaylistEntity.Companion.ANYTIME
 import au.com.shiftyjelly.pocketcasts.models.entity.PlaylistEntity.Companion.AUDIO_VIDEO_FILTER_ALL
 import au.com.shiftyjelly.pocketcasts.models.entity.PlaylistEntity.Companion.AUDIO_VIDEO_FILTER_AUDIO_ONLY
@@ -34,12 +35,9 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.distinctUntilChanged
-import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flowOf
-import kotlinx.coroutines.flow.map
-import au.com.shiftyjelly.pocketcasts.models.entity.PlaylistEntity as DbPlaylist
 
 @OptIn(ExperimentalCoroutinesApi::class, FlowPreview::class)
 class PlaylistManagerImpl @Inject constructor(
@@ -153,22 +151,36 @@ class PlaylistManagerImpl @Inject constructor(
         playlistDao.markPlaylistAsDeleted(uuid)
     }
 
-    override suspend fun insertSmartPlaylist(draft: SmartPlaylistDraft): String {
-        return appDatabase.withTransaction {
-            val uuids = playlistDao.getAllPlaylistUuids()
-            val uuid = if (draft === SmartPlaylistDraft.NewReleases) {
+    override suspend fun createSmartPlaylist(draft: SmartPlaylistDraft): String {
+        return createPlaylist(
+            entity = draft.toPlaylistEntity(),
+            uuid = if (draft === SmartPlaylistDraft.NewReleases) {
                 Playlist.NEW_RELEASES_UUID
             } else if (draft === SmartPlaylistDraft.InProgress) {
                 Playlist.IN_PROGRESS_UUID
             } else {
-                generateUniqueUuid(uuids)
-            }
-            val playlist = draft.toSmartPlaylist(uuid, sortPosition = 1)
-            playlistDao.upsertPlaylist(playlist)
+                null
+            },
+        )
+    }
+
+    override suspend fun createManualPlaylist(name: String): String {
+        return createPlaylist(
+            entity = PlaylistEntity(title = name, manual = true),
+        )
+    }
+
+    private suspend fun createPlaylist(entity: PlaylistEntity, uuid: String? = null): String {
+        return appDatabase.withTransaction {
+            val uuids = playlistDao.getAllPlaylistUuids()
+            val finalUuid = uuid?.takeIf { it !in uuids } ?: generateUniqueUuid(uuids)
+            val finalEntity = entity.copy(uuid = finalUuid, sortPosition = 1)
+
+            playlistDao.upsertPlaylist(finalEntity)
             uuids.forEachIndexed { index, uuid ->
                 playlistDao.updateSortPosition(uuid, index + 2)
             }
-            uuid
+            finalUuid
         }
     }
 
@@ -182,7 +194,7 @@ class PlaylistManagerImpl @Inject constructor(
         }
     }
 
-    private fun List<DbPlaylist>.toPreviewFlows() = map { playlist ->
+    private fun List<PlaylistEntity>.toPreviewFlows() = map { playlist ->
         val type = if (playlist.manual) {
             PlaylistPreview.Type.Manual
         } else {
@@ -220,7 +232,7 @@ class PlaylistManagerImpl @Inject constructor(
         }.distinctUntilChanged()
     }
 
-    private val DbPlaylist.smartRules
+    private val PlaylistEntity.smartRules
         get() = SmartRules(
             episodeStatus = SmartRules.EpisodeStatusRule(
                 unplayed = unplayed,
@@ -266,11 +278,8 @@ class PlaylistManagerImpl @Inject constructor(
             },
         )
 
-    private fun SmartPlaylistDraft.toSmartPlaylist(
-        uuid: String,
-        sortPosition: Int,
-    ) = DbPlaylist(
-        uuid = uuid,
+    private fun SmartPlaylistDraft.toPlaylistEntity() = PlaylistEntity(
+        uuid = "",
         title = title,
         // We use referential equality so only predefined playlists use preset icons
         iconId = if (this === SmartPlaylistDraft.NewReleases) {
@@ -280,7 +289,7 @@ class PlaylistManagerImpl @Inject constructor(
         } else {
             0
         },
-        sortPosition = sortPosition,
+        sortPosition = 1,
         manual = false,
         draft = false,
         deleted = false,
@@ -292,7 +301,7 @@ class PlaylistManagerImpl @Inject constructor(
         },
     ).applySmartRules(rules)
 
-    private fun DbPlaylist.applySmartRules(rules: SmartRules) = copy(
+    private fun PlaylistEntity.applySmartRules(rules: SmartRules) = copy(
         unplayed = rules.episodeStatus.unplayed,
         partiallyPlayed = rules.episodeStatus.inProgress,
         finished = rules.episodeStatus.completed,

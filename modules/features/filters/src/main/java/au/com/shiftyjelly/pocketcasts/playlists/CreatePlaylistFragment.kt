@@ -27,17 +27,18 @@ import au.com.shiftyjelly.pocketcasts.compose.navigation.navigateOnce
 import au.com.shiftyjelly.pocketcasts.models.type.SmartRules.DownloadStatusRule
 import au.com.shiftyjelly.pocketcasts.models.type.SmartRules.MediaTypeRule
 import au.com.shiftyjelly.pocketcasts.models.type.SmartRules.ReleaseDateRule
-import au.com.shiftyjelly.pocketcasts.playlists.smart.PlaylistFragment
 import au.com.shiftyjelly.pocketcasts.playlists.smart.rules.ManageSmartRulesListener
 import au.com.shiftyjelly.pocketcasts.playlists.smart.rules.ManageSmartRulesPage
 import au.com.shiftyjelly.pocketcasts.playlists.smart.rules.ManageSmartRulesRoutes
 import au.com.shiftyjelly.pocketcasts.playlists.smart.rules.RuleType
+import au.com.shiftyjelly.pocketcasts.repositories.playlist.PlaylistPreview
 import au.com.shiftyjelly.pocketcasts.ui.helper.FragmentHostListener
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseDialogFragment
 import dagger.hilt.android.AndroidEntryPoint
 import dagger.hilt.android.lifecycle.withCreationCallback
-import timber.log.Timber
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
+import au.com.shiftyjelly.pocketcasts.playlists.manual.PlaylistFragment as ManualPlaylistFragment
+import au.com.shiftyjelly.pocketcasts.playlists.smart.PlaylistFragment as SmartPlaylistFragment
 
 @AndroidEntryPoint
 class CreatePlaylistFragment : BaseDialogFragment() {
@@ -90,7 +91,7 @@ class CreatePlaylistFragment : BaseDialogFragment() {
                         titleState = viewModel.playlistNameState,
                         onCreateManualPlaylist = {
                             viewModel.trackCreateManualPlaylist()
-                            Timber.i("Create Manual Playlist")
+                            viewModel.createManualPlaylist()
                         },
                         onContinueToSmartPlaylist = {
                             viewModel.trackCreateSmartPlaylist()
@@ -155,10 +156,13 @@ class CreatePlaylistFragment : BaseDialogFragment() {
     @Composable
     private fun OpenCreatedPlaylistEffect() {
         LaunchedEffect(Unit) {
-            val uuid = viewModel.createdSmartPlaylistUuid.await()
+            val createdPlaylist = viewModel.createdPlaylist.await()
             isPlaylistCreated = true
             dismiss()
-            val fragment = PlaylistFragment.newInstance(uuid)
+            val fragment = when (createdPlaylist.type) {
+                PlaylistPreview.Type.Manual -> ManualPlaylistFragment.newInstance(createdPlaylist.uuid)
+                PlaylistPreview.Type.Smart -> SmartPlaylistFragment.newInstance(createdPlaylist.uuid)
+            }
             (requireActivity() as FragmentHostListener).addFragment(fragment)
         }
     }

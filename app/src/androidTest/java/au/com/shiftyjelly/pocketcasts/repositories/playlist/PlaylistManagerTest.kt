@@ -502,7 +502,7 @@ class PlaylistManagerTest {
     }
 
     @Test
-    fun createPlaylists() = runTest(testDispatcher) {
+    fun createSmartPlaylist() = runTest(testDispatcher) {
         val drafts = listOf(
             SmartPlaylistDraft(
                 title = "Title",
@@ -647,7 +647,7 @@ class PlaylistManagerTest {
                 ),
             ),
         )
-        drafts.forEach { draft -> manager.insertSmartPlaylist(draft) }
+        drafts.forEach { draft -> manager.createSmartPlaylist(draft) }
         val playlists = playlistDao.observePlaylists().first()
 
         // Check that UUIDs are unique
@@ -717,7 +717,7 @@ class PlaylistManagerTest {
 
     @Test
     fun createDefaultNewReleasesPlaylist() = runTest(testDispatcher) {
-        manager.insertSmartPlaylist(SmartPlaylistDraft.NewReleases)
+        manager.createSmartPlaylist(SmartPlaylistDraft.NewReleases)
         val playlists = playlistDao.observePlaylists().first()
 
         assertEquals(
@@ -754,7 +754,7 @@ class PlaylistManagerTest {
 
     @Test
     fun createDefaultInProgressPlaylist() = runTest(testDispatcher) {
-        manager.insertSmartPlaylist(SmartPlaylistDraft.InProgress)
+        manager.createSmartPlaylist(SmartPlaylistDraft.InProgress)
         val playlists = playlistDao.observePlaylists().first()
 
         assertEquals(
@@ -787,6 +787,15 @@ class PlaylistManagerTest {
             ),
             playlists[0],
         )
+    }
+
+    @Test
+    fun createManualPlaylist() = runTest(testDispatcher) {
+        manager.createManualPlaylist("Playlist name")
+        val playlist = playlistDao.observePlaylists().first().first()
+
+        assertEquals("Playlist name", playlist.title)
+        assertTrue(playlist.manual)
     }
 
     @Test

@@ -19,6 +19,7 @@ import au.com.shiftyjelly.pocketcasts.playlists.smart.rules.SmartRulesEditor
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.preferences.model.ArtworkConfiguration.Element
 import au.com.shiftyjelly.pocketcasts.repositories.playlist.PlaylistManager
+import au.com.shiftyjelly.pocketcasts.repositories.playlist.PlaylistPreview
 import au.com.shiftyjelly.pocketcasts.repositories.playlist.SmartPlaylistDraft
 import au.com.shiftyjelly.pocketcasts.utils.extensions.combine
 import dagger.assisted.Assisted
@@ -41,9 +42,9 @@ class CreatePlaylistViewModel @AssistedInject constructor(
     private val analyticsTracker: AnalyticsTracker,
     @Assisted initialPlaylistTitle: String,
 ) : ViewModel() {
-    private val _createdSmartPlaylistUuid = CompletableDeferred<String>(viewModelScope.coroutineContext[Job])
+    private val _createdPlaylist = CompletableDeferred<PlaylistCreated>(viewModelScope.coroutineContext[Job])
 
-    val createdSmartPlaylistUuid: Deferred<String> = _createdSmartPlaylistUuid
+    val createdPlaylist: Deferred<PlaylistCreated> get() = _createdPlaylist
 
     val playlistNameState = TextFieldState(
         initialText = initialPlaylistTitle,
@@ -158,9 +159,21 @@ class CreatePlaylistViewModel @AssistedInject constructor(
             rules = rules,
         )
         viewModelScope.launch {
-            val playlistUuid = playlistManager.insertSmartPlaylist(draft)
+            val playlistUuid = playlistManager.createSmartPlaylist(draft)
             trackPlaylistCreated(rules)
-            _createdSmartPlaylistUuid.complete(playlistUuid)
+            _createdPlaylist.complete(PlaylistCreated(playlistUuid, PlaylistPreview.Type.Smart))
+        }
+    }
+
+    fun createManualPlaylist() {
+        val sanitizedName = playlistNameState.text.toString().trim()
+        if (isCreationTriggered || sanitizedName.isEmpty()) {
+            return
+        }
+        isCreationTriggered = true
+        viewModelScope.launch {
+            val playlistUuid = playlistManager.createManualPlaylist(sanitizedName)
+            _createdPlaylist.complete(PlaylistCreated(playlistUuid, PlaylistPreview.Type.Manual))
         }
     }
 
@@ -205,6 +218,11 @@ class CreatePlaylistViewModel @AssistedInject constructor(
             )
         }
     }
+
+    data class PlaylistCreated(
+        val uuid: String,
+        val type: PlaylistPreview.Type,
+    )
 
     @AssistedFactory
     interface Factory {
