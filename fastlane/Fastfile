@@ -494,6 +494,8 @@ platform :android do
     version = version_name_current
     build_code = build_code_current
     is_beta = beta_version?(version)
+    is_first_beta = version.end_with?('-rc-1')
+
     unless skip_prechecks
       # Match branch names that begin with `release/`
       # Skip this check on CI because that action relies on CI env vars, but when this lane is called as part of `code_freeze` the branch changed since the CI build started, so that wouldn't work
@@ -535,7 +537,10 @@ platform :android do
       release_assets << signed_apk_artifact_path
     end
 
-    create_gh_release(version: version, prerelease: is_beta, release_assets: release_assets.compact) if create_gh_release
+    # - If this is the first beta release, keep the GitHub release as draft so the release manager has time to smoke-test it before publishing it.
+    # - For any subsequent intermediate beta, we can publish it immediately though
+    # - For the final release, also create the GitHub Release as a draft so that we only publish it after Google has approved it and the release is live
+    create_gh_release(version: version, prerelease: is_beta, is_draft: is_first_beta || !is_beta, release_assets: release_assets.compact) if create_gh_release
   end
 
   # Builds and bundles the given app
@@ -673,14 +678,18 @@ platform :android do
   #
   # @param version [Hash<String>] The version to create. Expects keys "name" and "code"
   # @param prerelease [Bool] If true, the GitHub Release will have the prerelease flag
+  # @param is_draft [Bool|nil] If true, the GitHub Release will be created as a draft.
+  #        If nil, the GitHub Release will be published immediately if `prerelease` is true (beta version),
+  #        and created as a draft if `prerelease` is false (final version).
+  # @param release_assets [Array<String>] The assets to attach to the GitHub Release
   #
-  private_lane :create_gh_release do |version:, prerelease: false, release_assets: []|
+  private_lane :create_gh_release do |version:, prerelease: false, is_draft: nil, release_assets: []|
     create_github_release(
       repository: GITHUB_REPO,
       version: version,
       release_notes_file_path: EXTRACTED_RELEASE_NOTES_PATH,
       prerelease: prerelease,
-      is_draft: !prerelease,
+      is_draft: is_draft || !prerelease,
       release_assets: release_assets.join(',')
     )
   end
