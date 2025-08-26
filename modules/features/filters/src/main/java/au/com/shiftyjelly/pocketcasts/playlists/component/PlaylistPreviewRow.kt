@@ -188,17 +188,18 @@ internal fun PlaylistPreviewRow(
                         podcastUuids = playlist.artworkPodcastUuids,
                         artworkSize = 56.dp,
                     )
-                    TooltipPopup(
-                        show = showTooltip,
-                        title = stringResource(LR.string.premade_playlists_tooltip_title),
-                        body = stringResource(LR.string.premade_playlists_tooltip_body),
-                        tipPosition = TipPosition.TopStart,
-                        maxWidthFraction = 0.75f,
-                        maxWidth = 400.dp,
-                        elevation = 8.dp,
-                        anchorOffset = DpOffset(x = (-8).dp, y = 4.dp),
-                        onClick = onClickTooltip,
-                    )
+                    if (showTooltip) {
+                        TooltipPopup(
+                            title = stringResource(LR.string.premade_playlists_tooltip_title),
+                            body = stringResource(LR.string.premade_playlists_tooltip_body),
+                            tipPosition = TipPosition.TopStart,
+                            maxWidthFraction = 0.75f,
+                            maxWidth = 400.dp,
+                            elevation = 8.dp,
+                            anchorOffset = DpOffset(x = (-8).dp, y = 4.dp),
+                            onClick = onClickTooltip,
+                        )
+                    }
                 }
                 Spacer(
                     modifier = Modifier.width(16.dp),
@@ -207,10 +208,12 @@ internal fun PlaylistPreviewRow(
                     TextH40(
                         text = playlist.title,
                     )
-                    TextP50(
-                        text = stringResource(LR.string.smart_playlist),
-                        color = MaterialTheme.theme.colors.primaryText02,
-                    )
+                    if (playlist.type == PlaylistPreview.Type.Smart) {
+                        TextP50(
+                            text = stringResource(LR.string.smart_playlist),
+                            color = MaterialTheme.theme.colors.primaryText02,
+                        )
+                    }
                 }
                 Spacer(
                     modifier = Modifier.width(16.dp),
@@ -267,6 +270,7 @@ private fun PlaylistPreviewRowPreview(
                     title = "New Releases",
                     episodeCount = 0,
                     artworkPodcastUuids = emptyList(),
+                    type = PlaylistPreview.Type.Smart,
                 ),
                 showTooltip = false,
                 showDivider = true,
@@ -281,6 +285,7 @@ private fun PlaylistPreviewRowPreview(
                     title = "In progress",
                     episodeCount = 1,
                     artworkPodcastUuids = List(1) { "podcast-uuid-$it" },
+                    type = PlaylistPreview.Type.Manual,
                 ),
                 showTooltip = false,
                 showDivider = true,
@@ -295,6 +300,7 @@ private fun PlaylistPreviewRowPreview(
                     title = "Starred",
                     episodeCount = 328,
                     artworkPodcastUuids = List(4) { "podcast-uuid-$it" },
+                    type = PlaylistPreview.Type.Smart,
                 ),
                 showTooltip = false,
                 showDivider = false,

@@ -59,6 +59,7 @@ import au.com.shiftyjelly.pocketcasts.models.entity.Bookmark
 import au.com.shiftyjelly.pocketcasts.models.entity.ChapterIndices
 import au.com.shiftyjelly.pocketcasts.models.entity.CuratedPodcast
 import au.com.shiftyjelly.pocketcasts.models.entity.Folder
+import au.com.shiftyjelly.pocketcasts.models.entity.ManualPlaylistEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.PlaylistEntity
 import au.com.shiftyjelly.pocketcasts.models.entity.PlaylistEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
@@ -102,6 +103,7 @@ import au.com.shiftyjelly.pocketcasts.localization.R as LR
         UpNextHistory::class,
         UserNotifications::class,
         UserCategoryVisits::class,
+        ManualPlaylistEpisode::class,
     ],
     version = 118,
     exportSchema = true,

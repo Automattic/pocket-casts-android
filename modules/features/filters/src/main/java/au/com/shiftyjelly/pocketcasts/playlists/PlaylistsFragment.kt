@@ -14,6 +14,7 @@ import androidx.lifecycle.lifecycleScope
 import au.com.shiftyjelly.pocketcasts.compose.AppThemeWithBackground
 import au.com.shiftyjelly.pocketcasts.compose.extensions.contentWithoutConsumedInsets
 import au.com.shiftyjelly.pocketcasts.playlists.smart.PlaylistFragment
+import au.com.shiftyjelly.pocketcasts.repositories.playlist.PlaylistPreview
 import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingFlow
 import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingLauncher
 import au.com.shiftyjelly.pocketcasts.ui.helper.FragmentHostListener
@@ -23,6 +24,7 @@ import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
+import timber.log.Timber
 
 @AndroidEntryPoint
 class PlaylistsFragment :
@@ -56,8 +58,15 @@ class PlaylistsFragment :
                 },
                 onDeletePlaylist = { playlist -> viewModel.deletePlaylist(playlist.uuid) },
                 onOpenPlaylist = { playlist ->
-                    val fragment = PlaylistFragment.newInstance(playlist.uuid)
-                    (requireActivity() as FragmentHostListener).addFragment(fragment)
+                    when (playlist.type) {
+                        PlaylistPreview.Type.Manual -> {
+                            Timber.i("Open manual playlist")
+                        }
+                        PlaylistPreview.Type.Smart -> {
+                            val fragment = PlaylistFragment.newInstance(playlist.uuid)
+                            (requireActivity() as FragmentHostListener).addFragment(fragment)
+                        }
+                    }
                 },
                 onReorderPlaylists = viewModel::updatePlaylistsOrder,
                 onShowPlaylists = { playlists -> viewModel.trackPlaylistsShown(playlists.size) },

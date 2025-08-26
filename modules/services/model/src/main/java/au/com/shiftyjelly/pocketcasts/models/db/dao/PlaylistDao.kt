@@ -7,6 +7,7 @@ import androidx.room.RoomRawQuery
 import androidx.room.Transaction
 import androidx.room.Upsert
 import au.com.shiftyjelly.pocketcasts.models.db.AppDatabase
+import au.com.shiftyjelly.pocketcasts.models.entity.ManualPlaylistEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.PlaylistEntity
 import au.com.shiftyjelly.pocketcasts.models.entity.PlaylistEntity.Companion.SYNC_STATUS_NOT_SYNCED
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
@@ -29,7 +30,13 @@ abstract class PlaylistDao {
     abstract suspend fun upsertPlaylist(playlist: PlaylistEntity)
 
     @Upsert
-    abstract suspend fun upsertAllPlaylists(playlists: List<PlaylistEntity>)
+    abstract suspend fun upsertAllPlaylists(playlists: Collection<PlaylistEntity>)
+
+    @Upsert
+    abstract suspend fun upsertManualEpisode(episode: ManualPlaylistEpisode)
+
+    @Upsert
+    abstract suspend fun upsertManualEpisodes(episode: Collection<ManualPlaylistEpisode>)
 
     @Query("SELECT uuid FROM playlists ORDER BY sortPosition ASC")
     abstract suspend fun getAllPlaylistUuids(): List<String>
@@ -37,8 +44,8 @@ abstract class PlaylistDao {
     @Query("SELECT * FROM playlists WHERE manual = 0 AND deleted = 0 AND draft = 0 AND uuid = :uuid")
     abstract fun observeSmartPlaylist(uuid: String): Flow<PlaylistEntity?>
 
-    @Query("SELECT * FROM playlists WHERE manual = 0 AND deleted = 0 AND draft = 0 ORDER BY sortPosition ASC")
-    abstract fun observeSmartPlaylists(): Flow<List<PlaylistEntity>>
+    @Query("SELECT * FROM playlists WHERE deleted = 0 AND draft = 0 ORDER BY sortPosition ASC")
+    abstract fun observePlaylists(): Flow<List<PlaylistEntity>>
 
     @Query("SELECT * FROM playlists WHERE manual = 0 AND deleted = 0 AND draft = 0 ORDER BY sortPosition ASC")
     abstract suspend fun getSmartPlaylists(): List<PlaylistEntity>
@@ -98,6 +105,21 @@ abstract class PlaylistDao {
         }
     }
 
+    @Query(
+        """
+        SELECT
+          COUNT(*) AS episode_count,
+          SUM(MAX(0, IFNULL(podcastEpisode.duration, 0) - IFNULL(podcastEpisode.duration, 0))) AS time_left
+        FROM playlists AS playlist
+        JOIN manual_playlist_episodes AS playlistEpisode ON playlistEpisode.playlist_uuid IS playlist.uuid
+        LEFT JOIN podcast_episodes AS podcastEpisode ON podcastEpisode.uuid IS playlistEpisode.episode_uuid
+        WHERE
+          playlist.uuid IS :playlistId
+          AND IFNULL(podcastEpisode.archived, 0) IS 0
+    """,
+    )
+    abstract fun observeManualEpisodeMetadata(playlistId: String): Flow<PlaylistEpisodeMetadata>
+
     @RawQuery(observedEntities = [Podcast::class, PodcastEpisode::class])
     protected abstract fun observeSmartEpisodeMetadata(query: RoomRawQuery): Flow<PlaylistEpisodeMetadata>
 
@@ -113,6 +135,34 @@ abstract class PlaylistDao {
         )
         return observeSmartEpisodeMetadata(RoomRawQuery(query))
     }
+
+    @Query(
+        """
+        SELECT DISTINCT podcast.uuid
+        FROM playlists AS playlist
+        JOIN manual_playlist_episodes AS playlistEpisode ON playlistEpisode.playlist_uuid IS playlist.uuid
+        JOIN podcast_episodes AS podcastEpisode ON podcastEpisode.uuid IS playlistEpisode.episode_uuid
+        JOIN podcasts AS podcast ON podcast.uuid IS playlistEpisode.podcast_uuid
+        WHERE
+          playlist.uuid IS :playlistId
+          AND podcastEpisode.archived IS 0
+        ORDER BY
+          -- newest to oldest
+          CASE WHEN playlist.sortId IS 0 THEN podcastEpisode.published_date END DESC,
+          CASE WHEN playlist.sortId IS 0 THEN podcastEpisode.added_date END DESC,
+          -- oldest to newest
+          CASE WHEN playlist.sortId IS 1 THEN podcastEpisode.published_date END ASC,
+          CASE WHEN playlist.sortId IS 1 THEN podcastEpisode.added_date END ASC,
+          -- shortest to longest
+          CASE WHEN playlist.sortId IS 2 THEN podcastEpisode.duration END ASC,
+          CASE WHEN playlist.sortId IS 2 THEN podcastEpisode.added_date END DESC,
+          -- longest to shortest
+          CASE WHEN playlist.sortId IS 3 THEN podcastEpisode.duration END DESC,
+          CASE WHEN playlist.sortId IS 4 THEN podcastEpisode.added_date END DESC
+        LIMIT 4
+    """,
+    )
+    abstract fun observeManualPlaylistPodcasts(playlistId: String): Flow<List<String>>
 
     @RawQuery(observedEntities = [Podcast::class, PodcastEpisode::class])
     protected abstract fun observeSmartPlaylistPodcasts(query: RoomRawQuery): Flow<List<String>>
