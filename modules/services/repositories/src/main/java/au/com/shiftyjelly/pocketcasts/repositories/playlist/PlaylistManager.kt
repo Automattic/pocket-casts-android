@@ -34,7 +34,9 @@ interface PlaylistManager {
 
     suspend fun deletePlaylist(uuid: String)
 
-    suspend fun insertSmartPlaylist(draft: SmartPlaylistDraft): String
+    suspend fun createSmartPlaylist(draft: SmartPlaylistDraft): String
+
+    suspend fun createManualPlaylist(name: String): String
 
     suspend fun updatePlaylistsOrder(sortedUuids: List<String>)
 }
