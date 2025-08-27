@@ -1,10 +1,6 @@
 package au.com.shiftyjelly.pocketcasts.compose.components
 
-import android.icu.text.ListFormatter.Width
 import androidx.annotation.FloatRange
-import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.fadeIn
-import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
@@ -38,7 +34,6 @@ import androidx.compose.ui.unit.IntRect
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.max
 import androidx.compose.ui.window.Popup
 import androidx.compose.ui.window.PopupPositionProvider
 import androidx.compose.ui.window.PopupProperties
@@ -49,7 +44,6 @@ import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 
 @Composable
 fun TooltipPopup(
-    show: Boolean,
     title: String,
     tipPosition: TipPosition,
     body: String? = null,
@@ -69,10 +63,7 @@ fun TooltipPopup(
         properties = properties,
         onDismissRequest = onClickOutside,
     ) {
-        AnimatedVisibility(
-            visible = show,
-            enter = fadeIn(),
-            exit = fadeOut(),
+        Box(
             modifier = Modifier.padding(elevationPadding),
         ) {
             Tooltip(

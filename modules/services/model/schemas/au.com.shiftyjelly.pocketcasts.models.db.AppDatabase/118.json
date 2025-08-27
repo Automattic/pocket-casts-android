@@ -2,7 +2,7 @@
   "formatVersion": 1,
   "database": {
     "version": 118,
-    "identityHash": "49d05d7d0fb9ebc814308b894bad9900",
+    "identityHash": "c4c18ea275279a868fab5496462fa977",
     "entities": [
       {
         "tableName": "bump_stats",
@@ -1885,11 +1885,128 @@
             "category_id"
           ]
         }
+      },
+      {
+        "tableName": "manual_playlist_episodes",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`playlist_uuid` TEXT NOT NULL, `episode_uuid` TEXT NOT NULL, `podcast_uuid` TEXT NOT NULL, `title` TEXT NOT NULL, `added_at` INTEGER NOT NULL, `published_at` INTEGER NOT NULL, `download_url` TEXT, `episode_slug` TEXT NOT NULL, `podcast_slug` TEXT NOT NULL, `sort_position` INTEGER NOT NULL, `is_synced` INTEGER NOT NULL, PRIMARY KEY(`playlist_uuid`, `episode_uuid`))",
+        "fields": [
+          {
+            "fieldPath": "playlistUuid",
+            "columnName": "playlist_uuid",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "episodeUuid",
+            "columnName": "episode_uuid",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "podcastUuid",
+            "columnName": "podcast_uuid",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "title",
+            "columnName": "title",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "addedAt",
+            "columnName": "added_at",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "publishedAt",
+            "columnName": "published_at",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "downloadUrl",
+            "columnName": "download_url",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "episodeSlug",
+            "columnName": "episode_slug",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "podcastSlug",
+            "columnName": "podcast_slug",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "sortPosition",
+            "columnName": "sort_position",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "isSynced",
+            "columnName": "is_synced",
+            "affinity": "INTEGER",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": [
+            "playlist_uuid",
+            "episode_uuid"
+          ]
+        },
+        "indices": [
+          {
+            "name": "manual_playlist_episodes_playlist_uuid_index",
+            "unique": false,
+            "columnNames": [
+              "playlist_uuid"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `manual_playlist_episodes_playlist_uuid_index` ON `${TABLE_NAME}` (`playlist_uuid`)"
+          },
+          {
+            "name": "manual_playlist_episodes_episode_uuid_index",
+            "unique": false,
+            "columnNames": [
+              "episode_uuid"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `manual_playlist_episodes_episode_uuid_index` ON `${TABLE_NAME}` (`episode_uuid`)"
+          },
+          {
+            "name": "manual_playlist_episodes_podcast_uuid_index",
+            "unique": false,
+            "columnNames": [
+              "podcast_uuid"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `manual_playlist_episodes_podcast_uuid_index` ON `${TABLE_NAME}` (`podcast_uuid`)"
+          },
+          {
+            "name": "manual_playlist_episodes_playlist_uuid_is_synced_index",
+            "unique": false,
+            "columnNames": [
+              "playlist_uuid",
+              "is_synced"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `manual_playlist_episodes_playlist_uuid_is_synced_index` ON `${TABLE_NAME}` (`playlist_uuid`, `is_synced`)"
+          }
+        ]
       }
     ],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '49d05d7d0fb9ebc814308b894bad9900')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'c4c18ea275279a868fab5496462fa977')"
     ]
   }
 }

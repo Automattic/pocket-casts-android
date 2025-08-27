@@ -34,9 +34,11 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.flow.map
 import au.com.shiftyjelly.pocketcasts.models.entity.PlaylistEntity as DbPlaylist
 
 @OptIn(ExperimentalCoroutinesApi::class, FlowPreview::class)
@@ -48,7 +50,7 @@ class PlaylistManagerImpl @Inject constructor(
 
     override fun observePlaylistsPreview(): Flow<List<PlaylistPreview>> {
         return playlistDao
-            .observeSmartPlaylists()
+            .observePlaylists()
             .flatMapLatest { playlists ->
                 if (playlists.isEmpty()) {
                     flowOf(emptyList())
@@ -181,22 +183,39 @@ class PlaylistManagerImpl @Inject constructor(
     }
 
     private fun List<DbPlaylist>.toPreviewFlows() = map { playlist ->
-        val podcastsFlow = playlistDao.observeSmartPlaylistPodcasts(
-            clock = clock,
-            smartRules = playlist.smartRules,
-            sortType = playlist.sortType,
-            limit = PLAYLIST_ARTWORK_EPISODE_LIMIT,
-        )
-        val episodeCountFlow = playlistDao.observeSmartEpisodeMetadata(
-            clock = clock,
-            smartRules = playlist.smartRules,
-        )
-        combine(podcastsFlow, episodeCountFlow) { podcasts, metadata ->
+        val type = if (playlist.manual) {
+            PlaylistPreview.Type.Manual
+        } else {
+            PlaylistPreview.Type.Smart
+        }
+        val (podcastsFlow, episodeMetadataFlow) = when (type) {
+            PlaylistPreview.Type.Manual -> {
+                val podcastsFlow = playlistDao.observeManualPlaylistPodcasts(playlist.uuid)
+                val episodeMetadataFlow = playlistDao.observeManualEpisodeMetadata(playlist.uuid)
+                podcastsFlow to episodeMetadataFlow
+            }
+            PlaylistPreview.Type.Smart -> {
+                val podcastsFlow = playlistDao.observeSmartPlaylistPodcasts(
+                    clock = clock,
+                    smartRules = playlist.smartRules,
+                    sortType = playlist.sortType,
+                    limit = PLAYLIST_ARTWORK_EPISODE_LIMIT,
+                )
+                val episodeMetadataFlow = playlistDao.observeSmartEpisodeMetadata(
+                    clock = clock,
+                    smartRules = playlist.smartRules,
+                )
+                podcastsFlow to episodeMetadataFlow
+            }
+        }
+
+        combine(podcastsFlow, episodeMetadataFlow) { podcasts, metadata ->
             PlaylistPreview(
                 uuid = playlist.uuid,
                 title = playlist.title,
                 artworkPodcastUuids = podcasts,
                 episodeCount = metadata.episodeCount,
+                type = type,
             )
         }.distinctUntilChanged()
     }

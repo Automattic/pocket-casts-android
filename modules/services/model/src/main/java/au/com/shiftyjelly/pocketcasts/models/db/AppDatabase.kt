@@ -59,6 +59,7 @@ import au.com.shiftyjelly.pocketcasts.models.entity.Bookmark
 import au.com.shiftyjelly.pocketcasts.models.entity.ChapterIndices
 import au.com.shiftyjelly.pocketcasts.models.entity.CuratedPodcast
 import au.com.shiftyjelly.pocketcasts.models.entity.Folder
+import au.com.shiftyjelly.pocketcasts.models.entity.ManualPlaylistEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.PlaylistEntity
 import au.com.shiftyjelly.pocketcasts.models.entity.PlaylistEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
@@ -102,6 +103,7 @@ import au.com.shiftyjelly.pocketcasts.localization.R as LR
         UpNextHistory::class,
         UserNotifications::class,
         UserCategoryVisits::class,
+        ManualPlaylistEpisode::class,
     ],
     version = 118,
     exportSchema = true,
@@ -1181,8 +1183,8 @@ abstract class AppDatabase : RoomDatabase() {
                             download_url TEXT,
                             episode_slug TEXT NOT NULL,
                             podcast_slug TEXT NOT NULL,
-                            sort_position TEXT NOT NULL,
-                            is_synced TEXT NOT NULL,
+                            sort_position INTEGER NOT NULL,
+                            is_synced INTEGER NOT NULL,
                             PRIMARY KEY (playlist_uuid, episode_uuid)
                         )
                         """.trimIndent(),
@@ -1190,7 +1192,7 @@ abstract class AppDatabase : RoomDatabase() {
                     execSQL("CREATE INDEX manual_playlist_episodes_playlist_uuid_index ON manual_playlist_episodes(playlist_uuid)")
                     execSQL("CREATE INDEX manual_playlist_episodes_episode_uuid_index ON manual_playlist_episodes(episode_uuid)")
                     execSQL("CREATE INDEX manual_playlist_episodes_podcast_uuid_index ON manual_playlist_episodes(podcast_uuid)")
-                    execSQL("CREATE INDEX manual_playlist_episodes_playlist_uuid_is_synced_index ON manual_playlist_episodes(podcast_uuid, is_synced)")
+                    execSQL("CREATE INDEX manual_playlist_episodes_playlist_uuid_is_synced_index ON manual_playlist_episodes(playlist_uuid, is_synced)")
 
                     // Add slug columns to podcasts and episodes
                     database.execSQL("ALTER TABLE podcasts ADD COLUMN slug TEXT NOT NULL DEFAULT ''")
