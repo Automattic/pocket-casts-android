@@ -40,7 +40,7 @@ class PlaylistFragment : BaseFragment() {
             defaultViewModelCreationExtras.withCreationCallback<PlaylistViewModel.Factory> { factory ->
                 factory.create(playlistUuid = args.playlistUuid)
             }
-        }
+        },
     )
 
     override fun onCreateView(
@@ -59,15 +59,15 @@ class PlaylistFragment : BaseFragment() {
             leftButton = PlaylistHeaderButtonData(
                 iconId = IR.drawable.ic_playlist_add_episodes,
                 label = getString(LR.string.add_episodes),
-                onClick = { Timber.i("Add episodes") }
+                onClick = { Timber.i("Add episodes") },
             ),
             rightButton = PlaylistHeaderButtonData(
                 iconId = IR.drawable.ic_playlist_play,
                 label = getString(LR.string.playlist_play_all),
-                onClick = { Timber.i("Play all") }
+                onClick = { Timber.i("Play all") },
             ),
             searchState = TextFieldState(),
-            onChangeSearchFocus = { _, _ -> Timber.i("Scroll to content") }
+            onChangeSearchFocus = { _, _ -> Timber.i("Scroll to content") },
         )
         headerAdapter.submitHeader(
             PlaylistHeaderData(
@@ -76,7 +76,7 @@ class PlaylistFragment : BaseFragment() {
                 displayedEpisodeCount = 0,
                 playbackDurationLeft = Duration.ZERO,
                 artworkPodcastUuids = emptyList(),
-            )
+            ),
         )
         content.adapter = headerAdapter
 

@@ -992,7 +992,7 @@ class PlaylistManagerTest {
                     duration = 100.0,
                     playedUpTo = 90.0,
                     publishedDate = Date(0),
-                )
+                ),
             )
             assertEquals(
                 ManualPlaylist(

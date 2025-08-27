@@ -30,7 +30,7 @@ class PlaylistViewModel @AssistedInject constructor(
     ) {
         companion object {
             val Empty = UiState(
-                manualPlaylist = null
+                manualPlaylist = null,
             )
         }
     }

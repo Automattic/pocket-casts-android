@@ -16,7 +16,7 @@ interface PlaylistManager {
 
     fun observeManualPlaylist(
         uuid: String,
-    ) : Flow<ManualPlaylist?>
+    ): Flow<ManualPlaylist?>
 
     fun observeSmartEpisodes(
         rules: SmartRules,
