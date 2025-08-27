@@ -144,6 +144,7 @@ private fun Content(
                         Modifier
                     },
                 )
+                .fillMaxWidth()
                 .animateContentSize(),
             horizontalArrangement = Arrangement.spacedBy(8.dp, alignment = Alignment.CenterHorizontally),
             verticalArrangement = Arrangement.spacedBy(8.dp),
@@ -157,7 +158,14 @@ private fun Content(
                     }
                 }
                 InterestCategoryPill(
-                    modifier = Modifier.wrapContentWidth(),
+                    modifier = Modifier.wrapContentWidth()
+                        .then(
+                            if (index % 2 == 0) {
+                                Modifier.padding(start = 12.dp)
+                            } else {
+                                Modifier.padding(end = 12.dp)
+                            },
+                        ),
                     category = item,
                     isSelected = state.selectedCategories.contains(item),
                     onSelectedChange = { isSelected -> onCategorySelectionChange(item, isSelected) },
