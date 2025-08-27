@@ -25,21 +25,21 @@ class OnboardingInterestsViewModelTest {
 
     private val categoriesManager = mock<CategoriesManager>()
     private val tracker = mock<AnalyticsTracker>()
-    val stateFlow = MutableStateFlow(CategoriesManager.State.Idle(featuredCategories = emptyList(), allCategories = emptyList(), areAllCategoriesShown = true))
+    val stateFlow = MutableStateFlow(emptyList<DiscoverCategory>())
 
     @Before
     fun setup() {
-        whenever(categoriesManager.state).thenReturn(stateFlow)
+        whenever(categoriesManager.availableInterestCategories).thenReturn(stateFlow)
     }
 
     @Test
     fun `should fetch categories on init`() = runTest {
-        stateFlow.value = CategoriesManager.State.Idle(allCategories = demoCategories, featuredCategories = emptyList(), areAllCategoriesShown = true)
+        stateFlow.value = demoCategories
         val viewModel = OnboardingInterestsViewModel(categoriesManager, tracker)
 
         viewModel.state.test {
             val item = awaitItem()
-            assert(item.displayedCategories.size == 10)
+            assert(item.displayedCategories.size == 12)
             assert(item.allCategories.size == demoCategories.size)
             assert(item.selectedCategories.isEmpty())
         }
@@ -47,7 +47,7 @@ class OnboardingInterestsViewModelTest {
 
     @Test
     fun `should update categories on more selected`() = runTest {
-        stateFlow.value = CategoriesManager.State.Idle(allCategories = demoCategories, featuredCategories = emptyList(), areAllCategoriesShown = true)
+        stateFlow.value = demoCategories
         val viewModel = OnboardingInterestsViewModel(categoriesManager, tracker)
 
         viewModel.state.test {
@@ -63,7 +63,7 @@ class OnboardingInterestsViewModelTest {
 
     @Test
     fun `should update selected categories on selecting some`() = runTest {
-        stateFlow.value = CategoriesManager.State.Idle(allCategories = demoCategories, featuredCategories = emptyList(), areAllCategoriesShown = true)
+        stateFlow.value = demoCategories
         val viewModel = OnboardingInterestsViewModel(categoriesManager, tracker)
 
         viewModel.state.test {

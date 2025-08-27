@@ -82,12 +82,11 @@ class OnboardingInterestsViewModel @Inject constructor(
 
     private fun fetchCategories() {
         viewModelScope.launch {
-            categoriesManager.state.collect { categoryState ->
+            categoriesManager.availableInterestCategories.collect { categories ->
                 _state.update {
                     it.copy(
-                        // TODO sort categories by their popularity, as soon as we've introduced the new field to backend.
-                        allCategories = categoryState.allCategories,
-                        displayedCategories = categoryState.allCategories.take(10),
+                        allCategories = categories,
+                        displayedCategories = categories.take(12),
                     )
                 }
             }
