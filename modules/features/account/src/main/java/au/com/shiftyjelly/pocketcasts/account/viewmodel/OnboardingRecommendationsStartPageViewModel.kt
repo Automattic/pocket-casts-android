@@ -48,12 +48,12 @@ class OnboardingRecommendationsStartPageViewModel @Inject constructor(
     ) {
         private val anySubscribed: Boolean = sections.any { it.anySubscribed }
 
-        val buttonRes = if (anySubscribed) {
+        val buttonRes = if (anySubscribed || FeatureFlag.isEnabled(Feature.NEW_ONBOARDING_RECOMMENDATIONS)) {
             LR.string.navigation_continue
         } else {
             LR.string.not_now
         }
-
+            
         companion object {
             val EMPTY = State(
                 sections = emptyList(),

@@ -28,6 +28,7 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
@@ -103,9 +104,11 @@ internal fun NewOnboardingCreateAccountPage(
             modifier = Modifier
                 .align(Alignment.End)
                 .padding(horizontal = 24.dp)
-                .clickable(onClick = onSkip),
+                .clickable(onClick = onSkip)
+                .padding(horizontal = 4.dp, vertical = 2.dp),
             text = stringResource(LR.string.not_now),
             color = MaterialTheme.theme.colors.primaryInteractive01,
+            fontWeight = FontWeight.W500,
         )
         Spacer(modifier = Modifier.height(8.dp))
         TextH10(
