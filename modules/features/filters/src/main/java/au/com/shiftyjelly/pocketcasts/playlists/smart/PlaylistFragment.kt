@@ -136,7 +136,7 @@ class PlaylistFragment :
                             totalEpisodeCount = playlist.totalEpisodeCount,
                             displayedEpisodeCount = playlist.episodes.size,
                             playbackDurationLeft = playlist.playbackDurationLeft,
-                            artworkPodcasts = playlist.artworkPodcasts,
+                            artworkPodcastUuids = playlist.artworkPodcastUuids,
                         )
                     }
                     headerAdapter.submitHeader(playlistHeaderData)

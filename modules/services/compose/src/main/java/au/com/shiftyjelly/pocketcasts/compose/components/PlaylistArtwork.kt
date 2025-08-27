@@ -41,13 +41,13 @@ import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 @Composable
 fun PlaylistArtwork(
-    podcasts: List<Podcast>,
+    podcastUuids: List<String>,
     artworkSize: Dp,
     modifier: Modifier = Modifier,
     cornerSize: Dp = artworkSize / 14,
     elevation: Dp = 2.dp,
 ) {
-    when (podcasts.size) {
+    when (podcastUuids.size) {
         0 -> NoImage(
             artworkSize = artworkSize,
             cornerSize = cornerSize,
@@ -56,7 +56,7 @@ fun PlaylistArtwork(
         )
 
         in 1..3 -> SingleImage(
-            podcast = podcasts[0],
+            podcastUuid = podcastUuids[0],
             artworkSize = artworkSize,
             cornerSize = cornerSize,
             elevation = elevation,
@@ -64,10 +64,10 @@ fun PlaylistArtwork(
         )
 
         else -> QuadImage(
-            podcast1 = podcasts[0],
-            podcast2 = podcasts[1],
-            podcast3 = podcasts[2],
-            podcast4 = podcasts[3],
+            podcastUuid1 = podcastUuids[0],
+            podcastUuid2 = podcastUuids[1],
+            podcastUuid3 = podcastUuids[2],
+            podcastUuid4 = podcastUuids[3],
             artworkSize = artworkSize,
             cornerSize = cornerSize,
             elevation = elevation,
@@ -113,15 +113,15 @@ private fun NoImage(
 
 @Composable
 private fun SingleImage(
-    podcast: Podcast,
+    podcastUuid: String,
     artworkSize: Dp,
     cornerSize: Dp,
     elevation: Dp,
     modifier: Modifier = Modifier,
 ) {
     val context = LocalContext.current
-    val imageRequest = remember(podcast.uuid) {
-        PocketCastsImageRequestFactory(context).themed().create(podcast)
+    val imageRequest = remember(podcastUuid) {
+        PocketCastsImageRequestFactory(context).themed().createForPodcast(podcastUuid)
     }
     Image(
         painter = rememberAsyncImagePainter(imageRequest, contentScale = ContentScale.Crop),
@@ -143,10 +143,10 @@ private fun SingleImage(
 
 @Composable
 private fun QuadImage(
-    podcast1: Podcast,
-    podcast2: Podcast,
-    podcast3: Podcast,
-    podcast4: Podcast,
+    podcastUuid1: String,
+    podcastUuid2: String,
+    podcastUuid3: String,
+    podcastUuid4: String,
     artworkSize: Dp,
     cornerSize: Dp,
     elevation: Dp,
@@ -154,17 +154,17 @@ private fun QuadImage(
 ) {
     val context = LocalContext.current
     val requestFactory = remember { PocketCastsImageRequestFactory(context).themed() }
-    val imageRequest1 = remember(podcast1.uuid) {
-        requestFactory.create(podcast1)
+    val imageRequest1 = remember(podcastUuid1) {
+        requestFactory.createForPodcast(podcastUuid1)
     }
-    val imageRequest2 = remember(podcast2.uuid) {
-        requestFactory.create(podcast2)
+    val imageRequest2 = remember(podcastUuid2) {
+        requestFactory.createForPodcast(podcastUuid2)
     }
-    val imageRequest3 = remember(podcast3.uuid) {
-        requestFactory.create(podcast3)
+    val imageRequest3 = remember(podcastUuid3) {
+        requestFactory.createForPodcast(podcastUuid3)
     }
-    val imageRequest4 = remember(podcast4.uuid) {
-        requestFactory.create(podcast4)
+    val imageRequest4 = remember(podcastUuid4) {
+        requestFactory.createForPodcast(podcastUuid4)
     }
     val artworkDescription = stringResource(LR.string.playlist_artwork_description)
     Row(
@@ -232,7 +232,7 @@ private fun PlaylistArtworkNoEpisodePreview(
 ) {
     AppTheme(themeType) {
         PlaylistArtwork(
-            podcasts = emptyList(),
+            podcastUuids = emptyList(),
             artworkSize = 80.dp,
         )
     }
@@ -242,7 +242,7 @@ private fun PlaylistArtworkNoEpisodePreview(
 @Composable
 private fun PlaylistArtworkSingleEpisodePreview() {
     PlaylistArtwork(
-        podcasts = List(1) { Podcast(uuid = "$it") },
+        podcastUuids = listOf("podcast-uuid"),
         artworkSize = 80.dp,
     )
 }
@@ -251,7 +251,7 @@ private fun PlaylistArtworkSingleEpisodePreview() {
 @Composable
 private fun PlaylistArtworkQuadEpisodePreview() {
     PlaylistArtwork(
-        podcasts = List(4) { Podcast(uuid = "$it", Date()) },
+        podcastUuids = List(4) { "podcat-uuid-$it" },
         artworkSize = 80.dp,
     )
 }

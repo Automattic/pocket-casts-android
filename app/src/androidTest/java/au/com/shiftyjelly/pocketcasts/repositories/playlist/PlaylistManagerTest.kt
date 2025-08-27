@@ -87,8 +87,8 @@ class PlaylistManagerTest {
             playlistDao.upsertAllPlaylists(listOf(playlist1, playlist2))
             assertEquals(
                 listOf(
-                    PlaylistPreview(uuid = "id-1", title = "Title 1", episodeCount = 0, podcasts = emptyList()),
-                    PlaylistPreview(uuid = "id-2", title = "Title 2", episodeCount = 0, podcasts = emptyList()),
+                    PlaylistPreview(uuid = "id-1", title = "Title 1", episodeCount = 0, artworkPodcastUuids = emptyList()),
+                    PlaylistPreview(uuid = "id-2", title = "Title 2", episodeCount = 0, artworkPodcastUuids = emptyList()),
                 ),
                 awaitItem(),
             )
@@ -107,7 +107,7 @@ class PlaylistManagerTest {
         manager.observePlaylistsPreview().test {
             assertEquals(
                 listOf(
-                    PlaylistPreview(podcasts = listOf(podcast1), episodeCount = 1, uuid = "", title = ""),
+                    PlaylistPreview(artworkPodcastUuids = listOf(podcast1.uuid), episodeCount = 1, uuid = "", title = ""),
                 ),
                 awaitItem(),
             )
@@ -116,7 +116,7 @@ class PlaylistManagerTest {
             episodeDao.insert(episode2)
             assertEquals(
                 listOf(
-                    PlaylistPreview(podcasts = listOf(podcast1, podcast2), episodeCount = 2, uuid = "", title = ""),
+                    PlaylistPreview(artworkPodcastUuids = listOf(podcast1.uuid, podcast2.uuid), episodeCount = 2, uuid = "", title = ""),
                 ),
                 awaitItem(),
             )
@@ -175,7 +175,7 @@ class PlaylistManagerTest {
         val playlist = manager.observePlaylistsPreview().first().single()
 
         assertEquals(0, playlist.episodeCount)
-        assertTrue(playlist.podcasts.isEmpty())
+        assertTrue(playlist.artworkPodcastUuids.isEmpty())
     }
 
     @Test
@@ -231,7 +231,7 @@ class PlaylistManagerTest {
         val playlist = manager.observePlaylistsPreview().first().single()
 
         assertEquals(2, playlist.episodeCount)
-        assertEquals(listOf(podcasts[0], podcasts[1]), playlist.podcasts)
+        assertEquals(listOf(podcasts[0], podcasts[1]).map(Podcast::uuid), playlist.artworkPodcastUuids)
     }
 
     @Test
@@ -274,7 +274,7 @@ class PlaylistManagerTest {
         val playlist = manager.observePlaylistsPreview().first().single()
 
         assertEquals(4, playlist.episodeCount)
-        assertEquals(podcasts.reversed(), playlist.podcasts)
+        assertEquals(podcasts.reversed().map(Podcast::uuid), playlist.artworkPodcastUuids)
     }
 
     @Test
@@ -317,7 +317,7 @@ class PlaylistManagerTest {
         val playlist = manager.observePlaylistsPreview().first().single()
 
         assertEquals(4, playlist.episodeCount)
-        assertEquals(podcasts.reversed(), playlist.podcasts)
+        assertEquals(podcasts.reversed().map(Podcast::uuid), playlist.artworkPodcastUuids)
     }
 
     @Test
@@ -364,7 +364,7 @@ class PlaylistManagerTest {
         val playlist = manager.observePlaylistsPreview().first().single()
 
         assertEquals(4, playlist.episodeCount)
-        assertEquals(podcasts.reversed(), playlist.podcasts)
+        assertEquals(podcasts.reversed().map(Podcast::uuid), playlist.artworkPodcastUuids)
     }
 
     @Test
@@ -411,7 +411,7 @@ class PlaylistManagerTest {
         val playlist = manager.observePlaylistsPreview().first().single()
 
         assertEquals(4, playlist.episodeCount)
-        assertEquals(podcasts.reversed(), playlist.podcasts)
+        assertEquals(podcasts.reversed().map(Podcast::uuid), playlist.artworkPodcastUuids)
     }
 
     @Test
@@ -463,7 +463,7 @@ class PlaylistManagerTest {
         val playlist = manager.observePlaylistsPreview().first().single()
 
         assertEquals(6, playlist.episodeCount)
-        assertEquals(podcasts.take(4), playlist.podcasts)
+        assertEquals(podcasts.take(4).map(Podcast::uuid), playlist.artworkPodcastUuids)
     }
 
     @Test
@@ -882,7 +882,7 @@ class PlaylistManagerTest {
                     autoDownloadLimit = 10,
                     totalEpisodeCount = 0,
                     playbackDurationLeft = Duration.ZERO,
-                    artworkPodcasts = emptyList(),
+                    artworkPodcastUuids = emptyList(),
                 ),
                 awaitItem(),
             )
@@ -895,7 +895,7 @@ class PlaylistManagerTest {
             episodeDao.insertAll(episodes)
             var playlist = awaitItem()
             assertEquals(episodes, playlist?.episodes)
-            assertEquals(podcasts, playlist?.artworkPodcasts)
+            assertEquals(podcasts.map(Podcast::uuid), playlist?.artworkPodcastUuids)
 
             playlistDao.observeSmartPlaylist("playlist-id").first()!!.let {
                 playlistDao.upsertPlaylist(it.copy(allPodcasts = false, podcastUuids = "podcast-id-2"))
@@ -903,7 +903,7 @@ class PlaylistManagerTest {
             playlist = awaitItem()
             assertEquals(PodcastsRule.Selected(listOf("podcast-id-2")), playlist?.smartRules?.podcasts)
             assertEquals(listOf(episodes[2]), playlist?.episodes)
-            assertEquals(listOf(podcasts[1]), playlist?.artworkPodcasts)
+            assertEquals(listOf(podcasts[1]).map(Podcast::uuid), playlist?.artworkPodcastUuids)
         }
     }
 
@@ -930,7 +930,7 @@ class PlaylistManagerTest {
         manager.observeSmartPlaylist("playlist-id").test {
             val playlist = awaitItem()
             assertEquals(episodes, playlist?.episodes)
-            assertEquals(podcasts.take(4), playlist?.artworkPodcasts)
+            assertEquals(podcasts.take(4).map(Podcast::uuid), playlist?.artworkPodcastUuids)
         }
     }
 

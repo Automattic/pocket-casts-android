@@ -57,7 +57,6 @@ import au.com.shiftyjelly.pocketcasts.compose.components.TipPosition
 import au.com.shiftyjelly.pocketcasts.compose.components.TooltipPopup
 import au.com.shiftyjelly.pocketcasts.compose.preview.ThemePreviewParameterProvider
 import au.com.shiftyjelly.pocketcasts.compose.theme
-import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.repositories.playlist.PlaylistPreview
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import kotlin.math.absoluteValue
@@ -186,7 +185,7 @@ internal fun PlaylistPreviewRow(
             ) {
                 Box {
                     PlaylistArtwork(
-                        podcasts = playlist.podcasts,
+                        podcastUuids = playlist.artworkPodcastUuids,
                         artworkSize = 56.dp,
                     )
                     TooltipPopup(
@@ -267,7 +266,7 @@ private fun PlaylistPreviewRowPreview(
                     uuid = "",
                     title = "New Releases",
                     episodeCount = 0,
-                    podcasts = emptyList(),
+                    artworkPodcastUuids = emptyList(),
                 ),
                 showTooltip = false,
                 showDivider = true,
@@ -281,7 +280,7 @@ private fun PlaylistPreviewRowPreview(
                     uuid = "",
                     title = "In progress",
                     episodeCount = 1,
-                    podcasts = List(1) { Podcast(uuid = "$it") },
+                    artworkPodcastUuids = List(1) { "podcast-uuid-$it" },
                 ),
                 showTooltip = false,
                 showDivider = true,
@@ -295,7 +294,7 @@ private fun PlaylistPreviewRowPreview(
                     uuid = "",
                     title = "Starred",
                     episodeCount = 328,
-                    podcasts = List(4) { Podcast(uuid = "$it") },
+                    artworkPodcastUuids = List(4) { "podcast-uuid-$it" },
                 ),
                 showTooltip = false,
                 showDivider = false,
