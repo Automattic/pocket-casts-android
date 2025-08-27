@@ -12,7 +12,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.systemBarsPadding
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
@@ -127,7 +126,7 @@ private fun Content(
                 .padding(horizontal = 38.dp),
             fontWeight = FontWeight.W500,
         )
-        Spacer(modifier = Modifier.height(24.dp))
+        Spacer(modifier = Modifier.height(16.dp))
 
         FlowRow(
             modifier = Modifier
@@ -146,6 +145,12 @@ private fun Content(
             maxItemsInEachRow = 2,
         ) {
             state.displayedCategories.forEachIndexed { index, item ->
+                // add internal padding to prevent children being clipped during select animation
+                if (index == state.displayedCategories.indices.first) {
+                    repeat(2) {
+                        Spacer(modifier = Modifier.height(8.dp))
+                    }
+                }
                 InterestCategoryPill(
                     modifier = Modifier.wrapContentWidth(),
                     category = item,
@@ -153,10 +158,16 @@ private fun Content(
                     onSelectedChange = { isSelected -> onCategorySelectionChange(item, isSelected) },
                     index = index,
                 )
+                // add internal padding ot prevent children being clipped during select animation
+                if (index == state.displayedCategories.indices.last) {
+                    repeat(2) {
+                        Spacer(modifier = Modifier.height(8.dp))
+                    }
+                }
             }
         }
 
-        Spacer(modifier = Modifier.height(32.dp))
+        Spacer(modifier = Modifier.height(24.dp))
 
         if (!state.isShowingAllCategories) {
             TextP40(

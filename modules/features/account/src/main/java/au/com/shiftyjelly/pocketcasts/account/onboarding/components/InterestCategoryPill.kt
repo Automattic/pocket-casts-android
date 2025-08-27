@@ -1,8 +1,12 @@
 package au.com.shiftyjelly.pocketcasts.account.onboarding.components
 
+import androidx.compose.animation.core.Animatable
+import androidx.compose.animation.core.Spring
+import androidx.compose.animation.core.spring
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -14,7 +18,12 @@ import androidx.compose.foundation.selection.toggleable
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -23,6 +32,7 @@ import androidx.compose.ui.graphics.BlendMode
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.CompositingStrategy
+import androidx.compose.ui.graphics.TransformOrigin
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
@@ -39,6 +49,7 @@ import au.com.shiftyjelly.pocketcasts.servers.model.DiscoverCategory
 import au.com.shiftyjelly.pocketcasts.ui.extensions.themed
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import coil.compose.rememberAsyncImagePainter
+import kotlinx.coroutines.launch
 
 @Composable
 fun InterestCategoryPill(
@@ -48,12 +59,64 @@ fun InterestCategoryPill(
     onSelectedChange: (Boolean) -> Unit,
     modifier: Modifier = Modifier,
 ) {
+    var animateState by remember { mutableStateOf(false) }
+    val scope = rememberCoroutineScope()
+    val scaleAnim = remember { Animatable(1f) }
+    val rotationAnim = remember { Animatable(0f) }
+
+    LaunchedEffect(animateState) {
+        if (animateState) {
+            scope.launch {
+                scaleAnim.animateTo(
+                    targetValue = 1.15f,
+                    animationSpec = spring(
+                        dampingRatio = Spring.DampingRatioLowBouncy,
+                        stiffness = Spring.StiffnessMedium,
+                    ),
+                )
+                scaleAnim.animateTo(
+                    targetValue = 1f,
+                    animationSpec = spring(
+                        dampingRatio = Spring.DampingRatioMediumBouncy,
+                        stiffness = Spring.StiffnessHigh,
+                    ),
+                )
+            }
+            scope.launch {
+                rotationAnim.animateTo(
+                    targetValue = -5f,
+                    animationSpec = spring(
+                        dampingRatio = Spring.DampingRatioLowBouncy,
+                        stiffness = Spring.StiffnessHigh,
+                    ),
+                )
+                rotationAnim.animateTo(
+                    targetValue = 0f,
+                    animationSpec = spring(
+                        dampingRatio = Spring.DampingRatioMediumBouncy,
+                        stiffness = Spring.StiffnessMedium,
+                    ),
+                )
+            }
+        }
+    }
+
     val colorConfig = colors[index % colors.size]
     SelectablePillContainer(
         isSelected = isSelected,
-        onSelectedChange = onSelectedChange,
+        onSelectedChange = {
+            animateState = it
+            onSelectedChange(it)
+        },
         selectedGradient = colorConfig.gradient.toList(),
-        modifier = modifier,
+        modifier = modifier
+            .graphicsLayer {
+                scaleY = scaleAnim.value
+                scaleX = scaleAnim.value
+
+                transformOrigin = TransformOrigin(0.5f, 1f)
+                rotationZ = rotationAnim.value
+            },
     ) {
         Row(
             verticalAlignment = Alignment.CenterVertically,
@@ -173,7 +236,12 @@ private fun SelectablePillContainer(
                         shape = RoundedCornerShape(percent = 100),
                     )
                 }
-                    .toggleable(value = isSelected, onValueChange = onSelectedChange)
+                    .toggleable(
+                        value = isSelected,
+                        onValueChange = onSelectedChange,
+                        indication = null,
+                        interactionSource = remember { MutableInteractionSource() },
+                    )
                     .padding(horizontal = 16.dp, vertical = 12.dp),
             ),
         contentAlignment = Alignment.Center,
