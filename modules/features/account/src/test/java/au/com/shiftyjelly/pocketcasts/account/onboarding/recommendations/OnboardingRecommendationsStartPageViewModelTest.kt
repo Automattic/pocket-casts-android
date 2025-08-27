@@ -73,7 +73,6 @@ class OnboardingRecommendationsStartPageViewModelTest {
 
         val viewModel = createViewModel()
         val state = viewModel.state.value
-        // assert(state.sections.take(3).map { it.title }.all { it in mockCategories.takeLast(3).map { it.title } })
         viewModel.state.test {
             val item = awaitItem()
             assert(item.sections.take(3).map { it.title }.all { it in mockCategories.takeLast(3).map { it.title } })

@@ -29,11 +29,8 @@ class OnboardingInterestsViewModel @Inject constructor(
         fetchCategories()
     }
 
-    fun skipSelection(doWhenFinished: () -> Unit) {
-        viewModelScope.launch {
-            categoriesManager.setInterestCategories(emptySet())
-            doWhenFinished()
-        }
+    fun skipSelection() {
+        categoriesManager.setInterestCategories(emptySet())
     }
 
     fun updateSelectedCategory(category: DiscoverCategory, isSelected: Boolean) {
@@ -56,11 +53,8 @@ class OnboardingInterestsViewModel @Inject constructor(
         }
     }
 
-    fun saveInterests(doWhenFinished: () -> Unit) {
-        viewModelScope.launch {
-            categoriesManager.setInterestCategories(_state.value.selectedCategories)
-            doWhenFinished()
-        }
+    fun saveInterests() {
+        categoriesManager.setInterestCategories(_state.value.selectedCategories)
     }
 
     private fun fetchCategories() {
