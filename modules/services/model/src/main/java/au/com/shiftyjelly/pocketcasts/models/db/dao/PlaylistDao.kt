@@ -109,7 +109,7 @@ abstract class PlaylistDao {
         """
         SELECT
           COUNT(*) AS episode_count,
-          SUM(MAX(0, IFNULL(podcastEpisode.duration, 0) - IFNULL(podcastEpisode.duration, 0))) AS time_left
+          SUM(MAX(0, IFNULL(podcastEpisode.duration, 0) - IFNULL(podcastEpisode.played_up_to, 0))) AS time_left
         FROM playlists AS playlist
         JOIN manual_playlist_episodes AS playlistEpisode ON playlistEpisode.playlist_uuid IS playlist.uuid
         LEFT JOIN podcast_episodes AS podcastEpisode ON podcastEpisode.uuid IS playlistEpisode.episode_uuid
