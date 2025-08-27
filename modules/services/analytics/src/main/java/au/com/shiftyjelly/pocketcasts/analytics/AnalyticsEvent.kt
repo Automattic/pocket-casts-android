@@ -461,6 +461,13 @@ enum class AnalyticsEvent(val key: String) {
     RECOMMENDATIONS_MORE_TAPPED("recommendations_more_tapped"),
     RECOMMENDATIONS_CONTINUE_TAPPED("recommendations_continue_tapped"),
 
+    /* Interests */
+    INTERESTS_SHOWN("onboarding_interests_shown"),
+    INTERESTS_NOT_NOW_TAPPED("onboarding_interests_not_now_tapped"),
+    INTERESTS_CATEGORY_SELECTED("onboarding_interests_category_selected"),
+    INTERESTS_SHOW_MORE_TAPPED("onboarding_interests_show_more_tapped"),
+    INTERESTS_CONTINUE_TAPPED("onboarding_interests_continue_tapped"),
+
     /* Podcast List Share */
     SHARE_PODCASTS_SHOWN("share_podcasts_shown"),
     SHARE_PODCASTS_PODCASTS_SELECTED("share_podcasts_podcasts_selected"),
