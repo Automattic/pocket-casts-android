@@ -1,5 +1,6 @@
 package au.com.shiftyjelly.pocketcasts.repositories.playlist
 
+import au.com.shiftyjelly.pocketcasts.models.entity.ManualPlaylistEpisodeSource
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.models.to.PlaylistEpisodeMetadata
 import au.com.shiftyjelly.pocketcasts.models.type.PlaylistEpisodeSortType
@@ -43,4 +44,6 @@ interface PlaylistManager {
     suspend fun createManualPlaylist(name: String): String
 
     suspend fun updatePlaylistsOrder(sortedUuids: List<String>)
+
+    suspend fun getManualPlaylistEpisodeSources(): List<ManualPlaylistEpisodeSource>
 }

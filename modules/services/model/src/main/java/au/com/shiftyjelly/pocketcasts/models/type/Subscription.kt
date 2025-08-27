@@ -5,6 +5,7 @@ import au.com.shiftyjelly.pocketcasts.payment.SubscriptionTier
 import com.squareup.moshi.JsonClass
 import java.time.Instant
 import java.time.temporal.ChronoUnit
+import java.util.Date
 
 @JsonClass(generateAdapter = true)
 data class Subscription(
@@ -27,7 +28,7 @@ data class Subscription(
                 tier = SubscriptionTier.Plus,
                 billingCycle = BillingCycle.Monthly,
                 platform = SubscriptionPlatform.Android,
-                expiryDate = Instant.MAX,
+                expiryDate = Instant.EPOCH,
                 isAutoRenewing = true,
                 giftDays = 0,
             )
@@ -37,7 +38,7 @@ data class Subscription(
                 tier = SubscriptionTier.Patron,
                 billingCycle = BillingCycle.Monthly,
                 platform = SubscriptionPlatform.Android,
-                expiryDate = Instant.MAX,
+                expiryDate = Instant.EPOCH,
                 isAutoRenewing = true,
                 giftDays = 0,
             )

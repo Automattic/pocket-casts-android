@@ -1,6 +1,7 @@
 package au.com.shiftyjelly.pocketcasts.playlists.create
 
 import app.cash.turbine.Turbine
+import au.com.shiftyjelly.pocketcasts.models.entity.ManualPlaylistEpisodeSource
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.models.to.PlaylistEpisodeMetadata
 import au.com.shiftyjelly.pocketcasts.models.type.PlaylistEpisodeSortType
@@ -56,4 +57,6 @@ class FakePlaylistManager : PlaylistManager {
     }
 
     override suspend fun updatePlaylistsOrder(sortedUuids: List<String>) = Unit
+
+    override suspend fun getManualPlaylistEpisodeSources(): List<ManualPlaylistEpisodeSource> = emptyList()
 }
