@@ -44,6 +44,9 @@ abstract class PlaylistDao {
     @Query("SELECT * FROM playlists WHERE manual = 0 AND deleted = 0 AND draft = 0 AND uuid = :uuid")
     abstract fun observeSmartPlaylist(uuid: String): Flow<PlaylistEntity?>
 
+    @Query("SELECT * FROM playlists WHERE manual != 0 AND deleted = 0 AND draft = 0 AND uuid = :uuid")
+    abstract fun observeManualPlaylist(uuid: String): Flow<PlaylistEntity?>
+
     @Query("SELECT * FROM playlists WHERE deleted = 0 AND draft = 0 ORDER BY sortPosition ASC")
     abstract fun observePlaylists(): Flow<List<PlaylistEntity>>
 

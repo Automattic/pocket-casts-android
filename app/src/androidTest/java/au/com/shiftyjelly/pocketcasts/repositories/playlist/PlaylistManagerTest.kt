@@ -952,9 +952,65 @@ class PlaylistManagerTest {
     }
 
     @Test
+    fun observeManualPlaylist() = runTest(testDispatcher) {
+        val podcasts = listOf(Podcast(uuid = "podcast-id-1"), Podcast(uuid = "podcast-id-2"))
+        podcasts.forEach { podcast -> podcastDao.insertSuspend(podcast) }
+
+        manager.observeManualPlaylist("playlist-id").test {
+            assertNull(awaitItem())
+
+            playlistDao.upsertPlaylist(DbPlaylist(uuid = "playlist-id", title = "Title 1", manual = true))
+            assertEquals(
+                ManualPlaylist(
+                    uuid = "playlist-id",
+                    title = "Title 1",
+                    totalEpisodeCount = 0,
+                    playbackDurationLeft = Duration.ZERO,
+                    artworkPodcastUuids = emptyList(),
+                ),
+                awaitItem(),
+            )
+
+            playlistDao.upsertManualEpisode(
+                ManualPlaylistEpisode(playlistUuid = "playlist-id", episodeUuid = "episode-id-1", podcastUuid = "podcast-id-1"),
+            )
+            assertEquals(
+                ManualPlaylist(
+                    uuid = "playlist-id",
+                    title = "Title 1",
+                    totalEpisodeCount = 1,
+                    playbackDurationLeft = Duration.ZERO,
+                    artworkPodcastUuids = emptyList(),
+                ),
+                awaitItem(),
+            )
+
+            episodeDao.insert(
+                PodcastEpisode(
+                    uuid = "episode-id-1",
+                    podcastUuid = "podcast-id-1",
+                    duration = 100.0,
+                    playedUpTo = 90.0,
+                    publishedDate = Date(0),
+                )
+            )
+            assertEquals(
+                ManualPlaylist(
+                    uuid = "playlist-id",
+                    title = "Title 1",
+                    totalEpisodeCount = 1,
+                    playbackDurationLeft = 10.seconds,
+                    artworkPodcastUuids = listOf("podcast-id-1"),
+                ),
+                awaitItem(),
+            )
+        }
+    }
+
+    @Test
     fun limitArtworkPodcastsSize() = runTest(testDispatcher) {
         val podcasts = listOf(
-            Podcast(uuid = "podcast-id-1", isSubscribed = true),
+            Podcast(uuid = "podcast-id-1"),
             Podcast(uuid = "podcast-id-2", isSubscribed = true),
             Podcast(uuid = "podcast-id-3", isSubscribed = true),
             Podcast(uuid = "podcast-id-4", isSubscribed = true),

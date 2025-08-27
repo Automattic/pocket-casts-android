@@ -8,13 +8,24 @@ import android.view.ViewGroup
 import androidx.compose.foundation.text.input.TextFieldState
 import androidx.core.os.BundleCompat
 import androidx.core.os.bundleOf
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowInsetsCompat
+import androidx.core.view.updatePadding
+import androidx.fragment.app.viewModels
+import androidx.lifecycle.flowWithLifecycle
+import androidx.lifecycle.lifecycleScope
 import au.com.shiftyjelly.pocketcasts.filters.databinding.PlaylistFragmentBinding
 import au.com.shiftyjelly.pocketcasts.playlists.component.PlaylistHeaderAdapter
 import au.com.shiftyjelly.pocketcasts.playlists.component.PlaylistHeaderButtonData
 import au.com.shiftyjelly.pocketcasts.playlists.component.PlaylistHeaderData
+import au.com.shiftyjelly.pocketcasts.views.extensions.hideKeyboardOnScroll
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseFragment
 import dagger.hilt.android.AndroidEntryPoint
+import dagger.hilt.android.lifecycle.withCreationCallback
+import javax.inject.Inject
+import kotlin.collections.orEmpty
 import kotlin.time.Duration
+import kotlinx.coroutines.launch
 import kotlinx.parcelize.Parcelize
 import timber.log.Timber
 import au.com.shiftyjelly.pocketcasts.images.R as IR
@@ -23,6 +34,14 @@ import au.com.shiftyjelly.pocketcasts.localization.R as LR
 @AndroidEntryPoint
 class PlaylistFragment : BaseFragment() {
     private val args get() = requireNotNull(arguments?.let { BundleCompat.getParcelable(it, NEW_INSTANCE_ARGS, Args::class.java) })
+
+    private val viewModel by viewModels<PlaylistViewModel>(
+        extrasProducer = {
+            defaultViewModelCreationExtras.withCreationCallback<PlaylistViewModel.Factory> { factory ->
+                factory.create(playlistUuid = args.playlistUuid)
+            }
+        }
+    )
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -60,6 +79,44 @@ class PlaylistFragment : BaseFragment() {
             )
         )
         content.adapter = headerAdapter
+
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewModel.uiState
+                .flowWithLifecycle(viewLifecycleOwner.lifecycle)
+                .collect { uiState ->
+
+                    val playlistHeaderData = uiState.manualPlaylist?.let { playlist ->
+                        PlaylistHeaderData(
+                            title = playlist.title,
+                            totalEpisodeCount = playlist.totalEpisodeCount,
+                            // TODO: Change displayed episode count to exclude archived episodes
+                            displayedEpisodeCount = playlist.totalEpisodeCount,
+                            playbackDurationLeft = playlist.playbackDurationLeft,
+                            artworkPodcastUuids = playlist.artworkPodcastUuids,
+                        )
+                    }
+                    headerAdapter.submitHeader(playlistHeaderData)
+                }
+        }
+
+        val initialPadding = content.paddingBottom
+        var miniPlayerInset = 0
+        var keyboardInset = 0
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewModel.bottomInset
+                .flowWithLifecycle(viewLifecycleOwner.lifecycle)
+                .collect { inset ->
+                    miniPlayerInset = inset
+                    content.updatePadding(bottom = initialPadding + miniPlayerInset + keyboardInset)
+                }
+        }
+        ViewCompat.setOnApplyWindowInsetsListener(content) { _, windowInsets ->
+            val insets = windowInsets.getInsets(WindowInsetsCompat.Type.ime())
+            keyboardInset = insets.bottom
+            content.updatePadding(bottom = initialPadding + miniPlayerInset + keyboardInset)
+            windowInsets
+        }
+        content.hideKeyboardOnScroll()
     }
 
     @Parcelize
