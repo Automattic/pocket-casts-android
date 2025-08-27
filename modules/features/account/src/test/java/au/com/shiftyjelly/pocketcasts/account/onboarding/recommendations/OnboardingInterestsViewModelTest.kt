@@ -1,6 +1,7 @@
 package au.com.shiftyjelly.pocketcasts.account.onboarding.recommendations
 
 import app.cash.turbine.test
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.repositories.categories.CategoriesManager
 import au.com.shiftyjelly.pocketcasts.servers.model.DiscoverCategory
 import au.com.shiftyjelly.pocketcasts.sharedtest.MainCoroutineRule
@@ -23,6 +24,7 @@ class OnboardingInterestsViewModelTest {
     val coroutineRule = MainCoroutineRule()
 
     private val categoriesManager = mock<CategoriesManager>()
+    private val tracker = mock<AnalyticsTracker>()
     val stateFlow = MutableStateFlow(CategoriesManager.State.Idle(featuredCategories = emptyList(), allCategories = emptyList(), areAllCategoriesShown = true))
 
     @Before
@@ -33,7 +35,7 @@ class OnboardingInterestsViewModelTest {
     @Test
     fun `should fetch categories on init`() = runTest {
         stateFlow.value = CategoriesManager.State.Idle(allCategories = demoCategories, featuredCategories = emptyList(), areAllCategoriesShown = true)
-        val viewModel = OnboardingInterestsViewModel(categoriesManager)
+        val viewModel = OnboardingInterestsViewModel(categoriesManager, tracker)
 
         viewModel.state.test {
             val item = awaitItem()
@@ -46,7 +48,7 @@ class OnboardingInterestsViewModelTest {
     @Test
     fun `should update categories on more selected`() = runTest {
         stateFlow.value = CategoriesManager.State.Idle(allCategories = demoCategories, featuredCategories = emptyList(), areAllCategoriesShown = true)
-        val viewModel = OnboardingInterestsViewModel(categoriesManager)
+        val viewModel = OnboardingInterestsViewModel(categoriesManager, tracker)
 
         viewModel.state.test {
             val item = awaitItem()
@@ -62,7 +64,7 @@ class OnboardingInterestsViewModelTest {
     @Test
     fun `should update selected categories on selecting some`() = runTest {
         stateFlow.value = CategoriesManager.State.Idle(allCategories = demoCategories, featuredCategories = emptyList(), areAllCategoriesShown = true)
-        val viewModel = OnboardingInterestsViewModel(categoriesManager)
+        val viewModel = OnboardingInterestsViewModel(categoriesManager, tracker)
 
         viewModel.state.test {
             val item = awaitItem()
