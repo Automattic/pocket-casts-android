@@ -55,7 +55,7 @@ class OnboardingRecommendationsStartPageViewModel @Inject constructor(
         } else {
             LR.string.not_now
         }
-            
+
         companion object {
             val EMPTY = State(
                 sections = emptyList(),
