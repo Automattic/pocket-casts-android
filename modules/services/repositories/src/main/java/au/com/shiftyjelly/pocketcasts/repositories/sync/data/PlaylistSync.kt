@@ -44,7 +44,7 @@ internal class PlaylistSync(
     suspend fun fullSync() {
         processServerPlaylists(
             serverPlaylists = syncManager.getPlaylistsOrThrow().playlistsList,
-            getUuid = { playlist -> playlist.uuid },
+            getUuid = { playlist -> playlist.originalUuid },
             isDeleted = { playlist -> playlist.isDeletedOrNull?.value == true },
             isManual = { playlist -> playlist.manualOrNull?.value == true },
             applyServerPlaylist = { localPlaylist, serverPlaylist -> localPlaylist.applyServerPlaylist(serverPlaylist) },
@@ -54,7 +54,7 @@ internal class PlaylistSync(
     suspend fun processIncrementalResponse(serverPlaylists: List<SyncUserPlaylist>) {
         processServerPlaylists(
             serverPlaylists = serverPlaylists,
-            getUuid = { playlist -> playlist.uuid },
+            getUuid = { playlist -> playlist.originalUuid },
             isDeleted = { playlist -> playlist.isDeletedOrNull?.value == true },
             isManual = { playlist -> playlist.manualOrNull?.value == true },
             applyServerPlaylist = { localPlaylist, serverPlaylist -> localPlaylist.applyServerPlaylist(serverPlaylist) },
@@ -100,8 +100,10 @@ internal class PlaylistSync(
             playlists.map { localPlaylist ->
                 record {
                     playlist = syncUserPlaylist {
+                        // Set both UUIDs as it is important server side due to case sensitivity
                         uuid = localPlaylist.uuid
                         originalUuid = localPlaylist.uuid
+
                         isDeleted = boolValue {
                             value = localPlaylist.deleted
                         }
@@ -170,7 +172,7 @@ internal class PlaylistSync(
 
 private fun PlaylistEntity.applyServerPlaylist(serverPlaylist: PlaylistSyncResponse) = apply {
     syncStatus = PlaylistEntity.SYNC_STATUS_SYNCED
-    uuid = serverPlaylist.uuid
+    uuid = serverPlaylist.originalUuid
     title = serverPlaylist.title
     serverPlaylist.manualOrNull?.value?.let { value ->
         manual = value
@@ -225,7 +227,7 @@ private fun PlaylistEntity.applyServerPlaylist(serverPlaylist: PlaylistSyncRespo
 
 private fun PlaylistEntity.applyServerPlaylist(serverPlaylist: SyncUserPlaylist) = apply {
     syncStatus = PlaylistEntity.SYNC_STATUS_SYNCED
-    uuid = serverPlaylist.uuid
+    uuid = serverPlaylist.originalUuid
     serverPlaylist.titleOrNull?.value?.let { value ->
         title = value
     }
