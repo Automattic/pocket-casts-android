@@ -1010,7 +1010,7 @@ class PlaylistManagerTest {
     @Test
     fun limitArtworkPodcastsSize() = runTest(testDispatcher) {
         val podcasts = listOf(
-            Podcast(uuid = "podcast-id-1"),
+            Podcast(uuid = "podcast-id-1", isSubscribed = true),
             Podcast(uuid = "podcast-id-2", isSubscribed = true),
             Podcast(uuid = "podcast-id-3", isSubscribed = true),
             Podcast(uuid = "podcast-id-4", isSubscribed = true),
