@@ -35,12 +35,14 @@ object NewOnboardingFlow {
     fun startDestination(flow: OnboardingFlow) = when (flow) {
         is OnboardingFlow.Welcome,
         is OnboardingFlow.AccountEncouragement,
-        is OnboardingFlow.LoggedOut,
         is OnboardingFlow.PlusAccountUpgradeNeedsLogin,
         is OnboardingFlow.InitialOnboarding,
         is OnboardingFlow.EngageSdk,
         is OnboardingFlow.ReferralLoginOrSignUp,
         -> ROUTE_INTRO_CAROUSEL
+
+        is OnboardingFlow.LoggedOut,
+        -> ROUTE_SIGN_UP
 
         // Cannot use OnboardingNavRoute.PlusUpgrade.routeWithSource here, it is set as a defaultValue in the PlusUpgrade composable,
         // see https://stackoverflow.com/a/70410872/1910286
@@ -108,6 +110,9 @@ object NewOnboardingFlow {
                     } else {
                         onLoginToExistingAccount(flow, subscription, exitOnboarding)
                     }
+                },
+                onClickLogin = {
+                    navController.navigate(ROUTE_LOG_IN)
                 },
             )
         }
@@ -240,7 +245,7 @@ object NewOnboardingFlow {
                         exitOnboarding(OnboardingExitInfo.Simple)
                     }
                 },
-                onNeedLogin = { navController.navigate(ROUTE_INTRO_CAROUSEL) },
+                onNeedLogin = { navController.navigate(ROUTE_SIGN_UP) },
                 onProceed = { finishOnboardingFlow() },
                 onUpdateSystemBars = onUpdateSystemBars,
             )

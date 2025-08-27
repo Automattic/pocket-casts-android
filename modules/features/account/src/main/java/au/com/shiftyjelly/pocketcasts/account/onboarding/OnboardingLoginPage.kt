@@ -160,7 +160,7 @@ internal fun NewOnboardingLoginPage(
                 },
                 includePadding = false,
             )
-            if (viewModel.showContinueWithGoogleButton) {
+            if (viewModel.showContinueWithGoogleButton && !(flow is OnboardingFlow.Upsell || flow is OnboardingFlow.UpsellSuggestedFolder)) {
                 Spacer(modifier = Modifier.height(16.dp))
                 Row(
                     modifier = Modifier.fillMaxWidth(),
