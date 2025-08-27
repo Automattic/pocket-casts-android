@@ -7,6 +7,7 @@ import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.localization.helper.tryToLocalise
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
+import au.com.shiftyjelly.pocketcasts.repositories.categories.CategoriesManager
 import au.com.shiftyjelly.pocketcasts.repositories.lists.ListRepository
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
@@ -14,6 +15,8 @@ import au.com.shiftyjelly.pocketcasts.servers.model.DiscoverPodcast
 import au.com.shiftyjelly.pocketcasts.servers.model.DiscoverRow
 import au.com.shiftyjelly.pocketcasts.servers.model.ListType
 import au.com.shiftyjelly.pocketcasts.servers.model.transformWithRegion
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import dagger.hilt.android.lifecycle.HiltViewModel
 import java.util.Locale
 import javax.inject.Inject
@@ -36,6 +39,7 @@ class OnboardingRecommendationsStartPageViewModel @Inject constructor(
     private val repository: ListRepository,
     private val settings: Settings,
     app: Application,
+    categoriesManager: CategoriesManager,
 ) : AndroidViewModel(app) {
 
     data class State(
@@ -106,7 +110,7 @@ class OnboardingRecommendationsStartPageViewModel @Inject constructor(
                         val podcasts = section.podcasts.map { podcast ->
                             Podcast(
                                 uuid = podcast.uuid,
-                                title = podcast.title ?: "",
+                                title = podcast.title.orEmpty(),
                                 isSubscribed = podcast.uuid in subscriptions,
                             )
                         }
@@ -114,7 +118,8 @@ class OnboardingRecommendationsStartPageViewModel @Inject constructor(
                         _state.value.sections
                             .find { it.sectionId == section.sectionId }
                             ?.copy(podcasts = podcasts) // update previous section if it exists
-                            ?: Section( // otherwise create a new section
+                            ?: Section(
+                                // otherwise create a new section
                                 title = section.title,
                                 sectionId = section.sectionId,
                                 podcasts = podcasts,
@@ -149,9 +154,16 @@ class OnboardingRecommendationsStartPageViewModel @Inject constructor(
             )
             val updatedList = feed.layout.transformWithRegion(region, replacements, getApplication<Application>().resources)
 
-            updateFlowWith("featured", sectionsFlow, updatedList)
-            updateFlowWith("trending", sectionsFlow, updatedList)
-            updateFlowWithCategories(sectionsFlow, updatedList, replacements)
+            val interestNames = categoriesManager.interestCategories.value.map { it.name }.toHashSet()
+            if (FeatureFlag.isEnabled(Feature.NEW_ONBOARDING_RECOMMENDATIONS) && interestNames.isNotEmpty()) {
+                updateFlowWithCategories(sectionsFlow, updatedList, replacements, interestNames)
+                updateFlowWith("featured", sectionsFlow, updatedList, interestNames.size)
+                updateFlowWith("trending", sectionsFlow, updatedList, interestNames.size + 1)
+            } else {
+                updateFlowWith("featured", sectionsFlow, updatedList)
+                updateFlowWith("trending", sectionsFlow, updatedList)
+                updateFlowWithCategories(sectionsFlow, updatedList, replacements)
+            }
 
             _state.update { it.copy(showLoadingSpinner = false) }
         }
@@ -242,6 +254,7 @@ class OnboardingRecommendationsStartPageViewModel @Inject constructor(
         id: String,
         sectionsFlow: MutableStateFlow<List<SectionInternal>>,
         updatedList: List<DiscoverRow>,
+        insertToPosition: Int? = null,
     ) {
         val listItem = updatedList.find { it.id == id }
         if (listItem == null) {
@@ -260,13 +273,19 @@ class OnboardingRecommendationsStartPageViewModel @Inject constructor(
         if (podcasts.isNullOrEmpty()) return
 
         val title = listItem.title.tryToLocalise(getApplication<Application>().resources)
+        val sectionToAdd = SectionInternal(
+            title = title,
+            sectionId = SectionId(id),
+            podcasts = podcasts,
+        )
+        val updatedList = sectionsFlow.value.toMutableList().apply {
+            insertToPosition?.let {
+                add(it, sectionToAdd)
+            } ?: add(sectionToAdd)
+        }.toList()
 
         sectionsFlow.emit(
-            sectionsFlow.value + SectionInternal(
-                title = title,
-                sectionId = SectionId(id),
-                podcasts = podcasts,
-            ),
+            updatedList,
         )
     }
 
@@ -274,6 +293,7 @@ class OnboardingRecommendationsStartPageViewModel @Inject constructor(
         sectionsFlow: MutableStateFlow<List<SectionInternal>>,
         updatedList: List<DiscoverRow>,
         replacements: Map<String, String>,
+        interestCategoryNames: Set<String> = emptySet(),
     ) {
         val categories = updatedList
             .find { it.type is ListType.Categories }
@@ -295,29 +315,32 @@ class OnboardingRecommendationsStartPageViewModel @Inject constructor(
 
         // Make network calls one at a time so the UI can load the initial sections as quickly
         // as possible, and to maintain the order of the sections
-        categories.forEach { category ->
-            runCatching {
-                repository.getListFeed(category.source)
+        categories
+            .sortedWith(compareByDescending { it.title in interestCategoryNames })
+            .forEach { category ->
+                runCatching {
+                    repository.getListFeed(category.source)
+                }
+                    .onFailure { exception ->
+                        Timber.e(exception, "Error getting list feed for category ${category.source}")
+                    }
+                    .getOrNull()
+                    ?.podcasts
+                    ?.let { podcasts ->
+                        sectionsFlow.emit(
+                            sectionsFlow.value + SectionInternal(
+                                title = category.title.tryToLocalise(getApplication<Application>().resources),
+                                sectionId = SectionId(category.title),
+                                podcasts = podcasts,
+                            ),
+                        )
+                    }
             }
-                .onFailure { exception ->
-                    Timber.e(exception, "Error getting list feed for category ${category.source}")
-                }
-                .getOrNull()
-                ?.podcasts
-                ?.let { podcasts ->
-                    sectionsFlow.emit(
-                        sectionsFlow.value + SectionInternal(
-                            title = category.title.tryToLocalise(getApplication<Application>().resources),
-                            sectionId = SectionId(category.title),
-                            podcasts = podcasts,
-                        ),
-                    )
-                }
-        }
     }
 
     companion object {
         private const val ONBOARDING_RECOMMENDATIONS = "onboarding_recommendations"
+
         private object AnalyticsProp {
             const val SUBSCRIPTIONS = "subscriptions"
             const val UUID = "uuid"

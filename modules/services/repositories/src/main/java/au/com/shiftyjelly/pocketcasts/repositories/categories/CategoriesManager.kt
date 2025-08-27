@@ -14,6 +14,8 @@ import kotlin.time.TimeSource
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
@@ -31,6 +33,8 @@ class CategoriesManager @Inject constructor(
     private val discoverRowInfo = MutableStateFlow(DiscoverRowInfo())
     private val selectedId = MutableStateFlow<Int?>(null)
     private val areAllCategoriesShown = MutableStateFlow(false)
+    private val _interestCategories = MutableStateFlow<Set<DiscoverCategory>>(emptySet())
+    val interestCategories = _interestCategories.asStateFlow()
 
     private var lastUpdate: TimeSource.Monotonic.ValueTimeMark? = null
 
@@ -127,6 +131,10 @@ class CategoriesManager @Inject constructor(
 
     fun setAllCategoriesShown(areShown: Boolean) {
         areAllCategoriesShown.value = areShown
+    }
+
+    fun setInterestCategories(categories: Set<DiscoverCategory>) {
+        _interestCategories.value = categories
     }
 
     private fun areCategoriesStale() = (lastUpdate?.elapsedNow() ?: Duration.INFINITE) > 1.days

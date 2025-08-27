@@ -30,6 +30,7 @@ class OnboardingInterestsViewModel @Inject constructor(
     }
 
     fun skipSelection() {
+        categoriesManager.setInterestCategories(emptySet())
     }
 
     fun updateSelectedCategory(category: DiscoverCategory, isSelected: Boolean) {
@@ -53,15 +54,17 @@ class OnboardingInterestsViewModel @Inject constructor(
     }
 
     fun saveInterests() {
+        categoriesManager.setInterestCategories(_state.value.selectedCategories)
     }
 
     private fun fetchCategories() {
         viewModelScope.launch {
-            categoriesManager.state.collect { categState ->
+            categoriesManager.state.collect { categoryState ->
                 _state.update {
                     it.copy(
-                        allCategories = categState.allCategories,
-                        displayedCategories = categState.allCategories.take(10),
+                        // TODO sort categories by their popularity, as soon as we've introduced the new field to backend.
+                        allCategories = categoryState.allCategories,
+                        displayedCategories = categoryState.allCategories.take(10),
                     )
                 }
             }
