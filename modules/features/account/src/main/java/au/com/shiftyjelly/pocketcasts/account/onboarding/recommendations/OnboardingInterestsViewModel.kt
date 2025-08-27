@@ -71,7 +71,12 @@ class OnboardingInterestsViewModel @Inject constructor(
     }
 
     fun saveInterests() {
-        analyticsTracker.track(AnalyticsEvent.INTERESTS_CONTINUE_TAPPED)
+        analyticsTracker.track(
+            AnalyticsEvent.INTERESTS_CONTINUE_TAPPED,
+            mapOf(
+                "categories" to _state.value.selectedCategories.map { it.id }.joinToString(", "),
+            ),
+        )
         categoriesManager.setInterestCategories(_state.value.selectedCategories)
     }
 
