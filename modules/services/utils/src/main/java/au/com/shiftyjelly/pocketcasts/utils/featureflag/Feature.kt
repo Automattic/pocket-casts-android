@@ -159,7 +159,7 @@ enum class Feature(
         title = "New Onboarding Recommendation Changes",
         defaultValue = BuildConfig.DEBUG,
         tier = FeatureTier.Free,
-        hasFirebaseRemoteFlag = false,
+        hasFirebaseRemoteFlag = true,
         hasDevToggle = true,
     ),
     PLAYLISTS_REBRANDING(
