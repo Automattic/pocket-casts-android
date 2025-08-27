@@ -19,6 +19,11 @@ steps:
 
       echo '--- 🚀 Update Rollouts'
       bundle exec fastlane update_rollouts track:"$TRACK" percent:"$ROLLOUT_PERCENT"
+
+      if [[ "${PUBLISH_DRAFT_GITHUB_RELEASE:-false}" == "true" ]]; then
+        echo '--- 🚀 Publish Draft GitHub Release'
+        bundle exec fastlane publish_github_release skip_confirm:true track:"$TRACK"
+      fi
     plugins: [$CI_TOOLKIT]
     agents:
       queue: "tumblr-metal"
