@@ -6,6 +6,7 @@ import androidx.compose.animation.core.spring
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -235,7 +236,12 @@ private fun SelectablePillContainer(
                         shape = RoundedCornerShape(percent = 100),
                     )
                 }
-                    .toggleable(value = isSelected, onValueChange = onSelectedChange)
+                    .toggleable(
+                        value = isSelected,
+                        onValueChange = onSelectedChange,
+                        indication = null,
+                        interactionSource = remember { MutableInteractionSource() },
+                    )
                     .padding(horizontal = 16.dp, vertical = 12.dp),
             ),
         contentAlignment = Alignment.Center,
