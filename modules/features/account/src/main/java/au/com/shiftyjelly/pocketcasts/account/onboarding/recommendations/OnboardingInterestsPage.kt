@@ -15,6 +15,7 @@ import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.ButtonDefaults
 import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -195,9 +196,14 @@ private fun Content(
         }
 
         RowButton(
+            modifier = Modifier.padding(bottom = 16.dp),
             text = stringResource(state.ctaLabelResId),
             enabled = state.isCtaEnabled,
             onClick = onContinuePress,
+            includePadding = false,
+            colors = ButtonDefaults.buttonColors(
+                disabledBackgroundColor = MaterialTheme.theme.colors.primaryInteractive01.copy(alpha = .5f)
+            )
         )
     }
 }
