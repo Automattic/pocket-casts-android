@@ -40,7 +40,7 @@ import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import au.com.shiftyjelly.pocketcasts.compose.Devices
-import au.com.shiftyjelly.pocketcasts.compose.components.PodcastImage
+import au.com.shiftyjelly.pocketcasts.compose.components.PodcastImageDeprecated
 import au.com.shiftyjelly.pocketcasts.compose.components.TextH10
 import au.com.shiftyjelly.pocketcasts.compose.components.TextP40
 import au.com.shiftyjelly.pocketcasts.endofyear.StoryCaptureController
@@ -209,7 +209,7 @@ private fun PodcastCover(
     modifier: Modifier = Modifier,
 ) {
     if (!LocalInspectionMode.current) {
-        PodcastImage(
+        PodcastImageDeprecated(
             uuid = episode.podcastId,
             elevation = 0.dp,
             cornerSize = 8.dp,

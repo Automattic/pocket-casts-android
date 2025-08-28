@@ -33,7 +33,7 @@ import au.com.shiftyjelly.pocketcasts.compose.bars.NavigationButton
 import au.com.shiftyjelly.pocketcasts.compose.bars.ThemedTopAppBar
 import au.com.shiftyjelly.pocketcasts.compose.components.FormField
 import au.com.shiftyjelly.pocketcasts.compose.components.FormFieldDefaults
-import au.com.shiftyjelly.pocketcasts.compose.components.PodcastImage
+import au.com.shiftyjelly.pocketcasts.compose.components.PodcastImageDeprecated
 import au.com.shiftyjelly.pocketcasts.compose.extensions.header
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
@@ -124,7 +124,7 @@ private fun ShareListCreateTitleContent(
                 }
             }
             items(items = podcasts) { podcast ->
-                PodcastImage(
+                PodcastImageDeprecated(
                     uuid = podcast.uuid,
                     title = podcast.title,
                     showTitle = true,

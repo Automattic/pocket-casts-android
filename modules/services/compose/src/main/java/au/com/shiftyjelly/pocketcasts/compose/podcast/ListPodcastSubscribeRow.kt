@@ -20,7 +20,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
 import au.com.shiftyjelly.pocketcasts.compose.AppThemeWithBackground
-import au.com.shiftyjelly.pocketcasts.compose.components.PodcastImage
+import au.com.shiftyjelly.pocketcasts.compose.components.PodcastImageDeprecated
 import au.com.shiftyjelly.pocketcasts.compose.components.TextP40
 import au.com.shiftyjelly.pocketcasts.compose.components.TextP50
 import au.com.shiftyjelly.pocketcasts.compose.preview.ThemePreviewParameterProvider
@@ -43,7 +43,7 @@ fun ListPodcastSubscribeRow(
         verticalAlignment = Alignment.CenterVertically,
         modifier = modifier.clickable { onRowClick() },
     ) {
-        PodcastImage(
+        PodcastImageDeprecated(
             uuid = uuid,
             modifier = Modifier
                 .padding(horizontal = 16.dp, vertical = 8.dp)

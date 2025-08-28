@@ -30,7 +30,7 @@ fun podcastImageCornerSize(width: Dp): Dp {
 }
 
 @Composable
-fun PodcastImage(
+fun PodcastImageDeprecated(
     uuid: String,
     modifier: Modifier = Modifier,
     title: String = "", // also used as the image's content description

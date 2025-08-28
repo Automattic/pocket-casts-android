@@ -27,7 +27,7 @@ import androidx.compose.ui.unit.dp
 import au.com.shiftyjelly.pocketcasts.compose.AppThemeWithBackground
 import au.com.shiftyjelly.pocketcasts.compose.bars.NavigationButton
 import au.com.shiftyjelly.pocketcasts.compose.bars.ThemedTopAppBar
-import au.com.shiftyjelly.pocketcasts.compose.components.PodcastImage
+import au.com.shiftyjelly.pocketcasts.compose.components.PodcastImageDeprecated
 import au.com.shiftyjelly.pocketcasts.compose.components.TextH30
 import au.com.shiftyjelly.pocketcasts.compose.preview.ThemePreviewParameterProvider
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
@@ -96,7 +96,7 @@ private fun CreateBuildingContent(
 
 @Composable
 private fun SharePodcastImage(podcast: Podcast, modifier: Modifier = Modifier) {
-    PodcastImage(uuid = podcast.uuid, modifier = modifier.size(100.dp))
+    PodcastImageDeprecated(uuid = podcast.uuid, modifier = modifier.size(100.dp))
 }
 
 @Preview(showBackground = true)

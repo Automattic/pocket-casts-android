@@ -13,7 +13,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import au.com.shiftyjelly.pocketcasts.compose.components.HorizontalDivider
-import au.com.shiftyjelly.pocketcasts.compose.components.PodcastImage
+import au.com.shiftyjelly.pocketcasts.compose.components.PodcastImageDeprecated
 import au.com.shiftyjelly.pocketcasts.compose.components.TextC50
 import au.com.shiftyjelly.pocketcasts.compose.components.TextH40
 import au.com.shiftyjelly.pocketcasts.compose.components.TextH60
@@ -43,7 +43,7 @@ fun SearchEpisodeItem(
                 .clickable { onClick(episode) }
                 .padding(16.dp),
         ) {
-            PodcastImage(
+            PodcastImageDeprecated(
                 uuid = episode.podcastUuid,
                 modifier = Modifier.size(IconSize),
             )

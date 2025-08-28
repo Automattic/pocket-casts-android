@@ -33,7 +33,7 @@ import androidx.compose.ui.unit.dp
 import au.com.shiftyjelly.pocketcasts.compose.AppTheme
 import au.com.shiftyjelly.pocketcasts.compose.bars.NavigationButton
 import au.com.shiftyjelly.pocketcasts.compose.components.HorizontalDivider
-import au.com.shiftyjelly.pocketcasts.compose.components.PodcastImage
+import au.com.shiftyjelly.pocketcasts.compose.components.PodcastImageDeprecated
 import au.com.shiftyjelly.pocketcasts.compose.components.TextH20
 import au.com.shiftyjelly.pocketcasts.compose.components.TextH40
 import au.com.shiftyjelly.pocketcasts.compose.components.TextH50
@@ -211,7 +211,7 @@ fun SearchHistoryEpisodeView(
                 .fillMaxWidth()
                 .padding(start = 16.dp, top = 12.dp, bottom = 12.dp),
         ) {
-            PodcastImage(
+            PodcastImageDeprecated(
                 uuid = entry.podcastUuid,
                 modifier = Modifier.size(IconSize),
             )
@@ -308,7 +308,7 @@ fun SearchHistoryPodcastView(
                 .fillMaxWidth()
                 .padding(start = 16.dp, top = 12.dp, bottom = 12.dp),
         ) {
-            PodcastImage(
+            PodcastImageDeprecated(
                 uuid = entry.uuid,
                 modifier = Modifier
                     .size(IconSize),

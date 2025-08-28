@@ -26,7 +26,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import au.com.shiftyjelly.pocketcasts.compose.Devices
 import au.com.shiftyjelly.pocketcasts.compose.components.HorizontalDirection
-import au.com.shiftyjelly.pocketcasts.compose.components.PodcastImage
+import au.com.shiftyjelly.pocketcasts.compose.components.PodcastImageDeprecated
 import au.com.shiftyjelly.pocketcasts.compose.components.ScrollSpeed
 import au.com.shiftyjelly.pocketcasts.compose.components.ScrollingRow
 import au.com.shiftyjelly.pocketcasts.compose.components.TextH10
@@ -140,7 +140,7 @@ private fun PodcastCoverCarousel(
         horizontalArrangement = Arrangement.spacedBy(spacingSize),
         modifier = modifier,
     ) { podcastId ->
-        PodcastImage(
+        PodcastImageDeprecated(
             uuid = podcastId,
             elevation = coverElevation,
             cornerSize = 4.dp,

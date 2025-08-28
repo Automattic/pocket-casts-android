@@ -99,7 +99,7 @@ import androidx.compose.ui.unit.sp
 import au.com.shiftyjelly.pocketcasts.compose.AppThemeWithBackground
 import au.com.shiftyjelly.pocketcasts.compose.Devices
 import au.com.shiftyjelly.pocketcasts.compose.components.ExpandableText
-import au.com.shiftyjelly.pocketcasts.compose.components.PodcastImage
+import au.com.shiftyjelly.pocketcasts.compose.components.PodcastImageDeprecated
 import au.com.shiftyjelly.pocketcasts.compose.components.TextH20
 import au.com.shiftyjelly.pocketcasts.compose.components.TextH40
 import au.com.shiftyjelly.pocketcasts.compose.components.TextP60
@@ -174,7 +174,7 @@ internal fun PodcastHeader(
                 .fillMaxWidth()
                 .padding(contentPadding),
         ) {
-            PodcastImage(
+            PodcastImageDeprecated(
                 uuid = uuid,
                 cornerSize = 8.dp,
                 elevation = 16.dp,

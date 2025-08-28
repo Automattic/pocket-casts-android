@@ -28,7 +28,7 @@ import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import au.com.shiftyjelly.pocketcasts.compose.AppTheme
-import au.com.shiftyjelly.pocketcasts.compose.components.PodcastImage
+import au.com.shiftyjelly.pocketcasts.compose.components.PodcastImageDeprecated
 import au.com.shiftyjelly.pocketcasts.compose.components.podcastImageCornerSize
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
@@ -52,7 +52,7 @@ fun PodcastSelectImage(
             .semantics(mergeDescendants = true) {},
         contentAlignment = Alignment.Center,
     ) {
-        PodcastImage(
+        PodcastImageDeprecated(
             uuid = podcast.uuid,
             title = podcast.title,
             showTitle = true,
