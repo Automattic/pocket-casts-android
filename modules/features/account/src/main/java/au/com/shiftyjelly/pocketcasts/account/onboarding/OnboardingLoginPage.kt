@@ -141,7 +141,7 @@ internal fun NewOnboardingLoginPage(
             TextP50(
                 text = stringResource(LR.string.profile_forgot_your_password),
                 color = MaterialTheme.theme.colors.primaryInteractive01,
-                fontWeight = FontWeight.W400,
+                fontWeight = FontWeight.W500,
                 modifier = Modifier
                     .clickable {
                         viewModel.onForgotPasswordTapped(flow)
