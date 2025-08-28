@@ -1,9 +1,11 @@
 package au.com.shiftyjelly.pocketcasts.servers.cdn
 
+import au.com.shiftyjelly.pocketcasts.models.entity.BlazeAd
 import au.com.shiftyjelly.pocketcasts.utils.Optional
 import io.reactivex.Single
 
 interface StaticServiceManager {
     fun getColorsSingle(podcastUuid: String): Single<Optional<ArtworkColors>>
     suspend fun getColors(podcastUuid: String): ArtworkColors?
+    suspend fun getBlazeAds(): List<BlazeAd>
 }

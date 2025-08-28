@@ -18,6 +18,7 @@ import androidx.sqlite.db.SupportSQLiteDatabase
 import au.com.shiftyjelly.pocketcasts.models.converter.AutoArchiveAfterPlayingTypeConverter
 import au.com.shiftyjelly.pocketcasts.models.converter.AutoArchiveInactiveTypeConverter
 import au.com.shiftyjelly.pocketcasts.models.converter.AutoArchiveLimitTypeConverter
+import au.com.shiftyjelly.pocketcasts.models.converter.BlazeAdLocationConverter
 import au.com.shiftyjelly.pocketcasts.models.converter.BundlePaidTypeConverter
 import au.com.shiftyjelly.pocketcasts.models.converter.ChapterIndicesConverter
 import au.com.shiftyjelly.pocketcasts.models.converter.DateTypeConverter
@@ -34,6 +35,7 @@ import au.com.shiftyjelly.pocketcasts.models.converter.SafeDateTypeConverter
 import au.com.shiftyjelly.pocketcasts.models.converter.SyncStatusConverter
 import au.com.shiftyjelly.pocketcasts.models.converter.TrimModeTypeConverter
 import au.com.shiftyjelly.pocketcasts.models.converter.UserEpisodeServerStatusConverter
+import au.com.shiftyjelly.pocketcasts.models.db.dao.BlazeAdDao
 import au.com.shiftyjelly.pocketcasts.models.db.dao.BookmarkDao
 import au.com.shiftyjelly.pocketcasts.models.db.dao.BumpStatsDao
 import au.com.shiftyjelly.pocketcasts.models.db.dao.ChapterDao
@@ -55,6 +57,7 @@ import au.com.shiftyjelly.pocketcasts.models.db.dao.UserCategoryVisitsDao
 import au.com.shiftyjelly.pocketcasts.models.db.dao.UserEpisodeDao
 import au.com.shiftyjelly.pocketcasts.models.db.dao.UserNotificationsDao
 import au.com.shiftyjelly.pocketcasts.models.entity.AnonymousBumpStat
+import au.com.shiftyjelly.pocketcasts.models.entity.BlazeAd
 import au.com.shiftyjelly.pocketcasts.models.entity.Bookmark
 import au.com.shiftyjelly.pocketcasts.models.entity.ChapterIndices
 import au.com.shiftyjelly.pocketcasts.models.entity.CuratedPodcast
@@ -104,8 +107,9 @@ import au.com.shiftyjelly.pocketcasts.localization.R as LR
         UserNotifications::class,
         UserCategoryVisits::class,
         ManualPlaylistEpisode::class,
+        BlazeAd::class,
     ],
-    version = 118,
+    version = 119,
     exportSchema = true,
     autoMigrations = [
         AutoMigration(from = 81, to = 82, spec = AppDatabase.Companion.DeleteSilenceRemovedMigration::class),
@@ -134,6 +138,7 @@ import au.com.shiftyjelly.pocketcasts.localization.R as LR
     ChapterIndicesConverter::class,
     PlaylistEpisodeSortTypeConverter::class,
     InstantConverter::class,
+    BlazeAdLocationConverter::class,
 )
 abstract class AppDatabase : RoomDatabase() {
     abstract fun podcastDao(): PodcastDao
@@ -156,6 +161,7 @@ abstract class AppDatabase : RoomDatabase() {
     abstract fun upNextHistoryDao(): UpNextHistoryDao
     abstract fun userNotificationsDao(): UserNotificationsDao
     abstract fun userCategoryVisitsDao(): UserCategoryVisitsDao
+    abstract fun blazeAdDao(): BlazeAdDao
 
     fun databaseFiles() = openHelper.readableDatabase.path?.let {
         listOf(
@@ -1205,6 +1211,22 @@ abstract class AppDatabase : RoomDatabase() {
             }
         }
 
+        val MIGRATION_118_119 = addMigration(118, 119) { database ->
+            database.execSQL(
+                """
+                    CREATE TABLE IF NOT EXISTS `blaze_ads` (
+                        `id` TEXT NOT NULL,
+                        `text` TEXT NOT NULL,
+                        `image_url` TEXT NOT NULL,
+                        `url_title` TEXT NOT NULL,
+                        `url` TEXT NOT NULL,
+                        `location` TEXT NOT NULL,
+                         PRIMARY KEY (`id`)
+                        );
+                """.trimIndent(),
+            )
+        }
+
         fun addMigrations(databaseBuilder: Builder<AppDatabase>, context: Context) {
             databaseBuilder.addMigrations(
                 addMigration(1, 2) { },
@@ -1613,6 +1635,7 @@ abstract class AppDatabase : RoomDatabase() {
                 MIGRATION_115_116,
                 MIGRATION_116_117,
                 MIGRATION_117_118,
+                MIGRATION_118_119,
             )
         }
 

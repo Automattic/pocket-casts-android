@@ -32,7 +32,9 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalInspectionMode
 import androidx.compose.ui.platform.LocalLayoutDirection
@@ -57,6 +59,8 @@ import au.com.shiftyjelly.pocketcasts.compose.components.CoilImage
 import au.com.shiftyjelly.pocketcasts.compose.extensions.fractionedSp
 import au.com.shiftyjelly.pocketcasts.compose.preview.ThemePreviewParameterProvider
 import au.com.shiftyjelly.pocketcasts.compose.theme
+import au.com.shiftyjelly.pocketcasts.models.entity.BlazeAd
+import au.com.shiftyjelly.pocketcasts.models.type.BlazeAdLocation
 import au.com.shiftyjelly.pocketcasts.repositories.images.PocketCastsImageRequestFactory
 import au.com.shiftyjelly.pocketcasts.repositories.images.PocketCastsImageRequestFactory.PlaceholderType
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme.ThemeType
@@ -79,7 +83,7 @@ fun AdBanner(
             modifier = modifier.widthIn(max = maxWidth),
         ) {
             val interactionSource = remember { MutableInteractionSource() }
-            val contentDescription = stringResource(LR.string.go_to_ad, ad.ctaText)
+            val contentDescription = stringResource(LR.string.go_to_ad, ad.text)
 
             Row(
                 modifier = Modifier
@@ -121,7 +125,7 @@ fun AdBanner(
                         .padding(vertical = 4.dp),
                 ) {
                     Text(
-                        text = ad.ctaText,
+                        text = ad.text,
                         color = colors.ctaLabel,
                         fontSize = 14f.fractionedSp(fraction = 0.4f),
                         lineHeight = 18f.fractionedSp(fraction = 0.4f),
@@ -185,7 +189,7 @@ private fun AdTitle(
         )
 
         Text(
-            text = ad.title,
+            text = ad.urlTitle,
             color = colors.titleLabel,
             fontSize = 12f.fractionedSp(fraction = 0.4f),
             lineHeight = 12f.fractionedSp(fraction = 0.4f),
@@ -295,8 +299,9 @@ private fun AdBannerFontSizePreview() {
 
 private val BlazeAdPreview = BlazeAd(
     id = "",
-    title = "pocketcasts.com",
-    ctaText = "Empower People to Discover, Share and Grow their Passion for Podcasts.",
-    ctaUrl = "",
+    text = "Empower People to Discover, Share and Grow their Passion for Podcasts.",
     imageUrl = "",
+    urlTitle = "pocketcasts.com",
+    url = "https://pocketcasts.com",
+    location = BlazeAdLocation.PodcastList,
 )
