@@ -157,7 +157,7 @@ abstract class PlaylistDao {
 
     @Query(
         """
-        SELECT folder.uuid, folder.name 
+        SELECT folder.uuid, folder.name, folder.color 
         FROM folders AS folder
         WHERE 
           folder.deleted IS 0
@@ -181,6 +181,7 @@ abstract class PlaylistDao {
                     ManualPlaylistFolderSource(
                         uuid = partialSource.uuid,
                         title = partialSource.title,
+                        color = partialSource.color,
                         podcastSources = getPodcastPlaylistSourcesForFolder(partialSource.uuid),
                     )
                 } else {

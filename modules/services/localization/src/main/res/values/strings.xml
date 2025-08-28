@@ -228,6 +228,7 @@
     <string name="ad_report_confirmation">You reported this ad.</string>
     <string name="other_options">Other Options</string>
     <string name="add_episodes">Add Episodes</string>
+    <string name="your_podcasts">Your Podcasts</string>
 
     <string name="multiselect_actions_shown">Shortcut in toolbar</string>
     <string name="multiselect_actions_hidden">In overflow</string>
@@ -585,6 +586,10 @@
     <plurals name="podcast">
         <item quantity="one">Podcast</item>
         <item quantity="other">Podcasts</item>
+    </plurals>
+    <plurals name="podcasts_count">
+        <item quantity="one">%d podcast</item>
+        <item quantity="other">%d podcasts</item>
     </plurals>
     <string name="podcast_archive_all">Archive all</string>
     <string name="podcast_archive_all_played">Archive all played</string>

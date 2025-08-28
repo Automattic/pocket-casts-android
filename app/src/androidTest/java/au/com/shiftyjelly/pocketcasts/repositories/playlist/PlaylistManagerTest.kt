@@ -1316,6 +1316,7 @@ class PlaylistManagerTest {
                 ManualPlaylistFolderSource(
                     uuid = "folder-id-1",
                     title = "Folder Name 1",
+                    color = 0,
                     podcastSources = listOf(
                         ManualPlaylistPodcastSource(
                             uuid = "podcast-id-2",

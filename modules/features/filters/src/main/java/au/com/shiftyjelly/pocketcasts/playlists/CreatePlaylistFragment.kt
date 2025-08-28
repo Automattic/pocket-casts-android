@@ -61,7 +61,9 @@ class CreatePlaylistFragment : BaseDialogFragment() {
 
         OpenCreatedPlaylistEffect()
 
-        DialogBox {
+        DialogBox(
+            modifier = Modifier.nestedScroll(rememberNestedScrollInteropConnection()),
+        ) {
             val navController = rememberNavController()
             val listener = rememberNavigationListener()
 
@@ -79,9 +81,7 @@ class CreatePlaylistFragment : BaseDialogFragment() {
                 navController = navController,
                 listener = listener,
                 startDestination = NavigationRoutes.NEW_PLAYLIST,
-                modifier = Modifier
-                    .fillMaxSize()
-                    .nestedScroll(rememberNestedScrollInteropConnection()),
+                modifier = Modifier.fillMaxSize(),
             ) {
                 composable(NavigationRoutes.NEW_PLAYLIST) {
                     CallOnce {
