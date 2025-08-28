@@ -130,7 +130,7 @@ private fun FolderPreview(layout: PodcastGridLayoutType, name: String, colorId: 
                 name = name,
                 podcastUuids = podcastUuids,
                 onClick = null,
-                modifier = modifier.padding(vertical = 8.dp),
+                modifier = modifier.padding(vertical = 8.dp, horizontal = 16.dp),
             )
         }
         else -> {

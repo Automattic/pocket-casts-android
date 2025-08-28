@@ -30,7 +30,6 @@ import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 private val FolderImageSize = 156.dp
-private val PodcastImageSize = 68.dp
 private val SubscribeIconSize = 32.dp
 
 @Composable
@@ -54,8 +53,7 @@ fun SearchFolderItem(
             FolderImageSmall(
                 color = color,
                 podcastUuids = podcasts.map { it.uuid },
-                folderImageSize = FolderImageSize,
-                podcastImageSize = PodcastImageSize,
+                size = FolderImageSize,
             )
 
             val buttonBackgroundColor = Color.Black.copy(alpha = 0.4f)

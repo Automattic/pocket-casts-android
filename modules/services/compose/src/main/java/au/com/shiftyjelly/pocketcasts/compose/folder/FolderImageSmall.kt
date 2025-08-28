@@ -1,135 +1,149 @@
 package au.com.shiftyjelly.pocketcasts.compose.folder
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.FlowRow
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.Card
+import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Alignment
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.alpha
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Shape
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import au.com.shiftyjelly.pocketcasts.compose.components.PodcastImage
-
-private val gradientTop = Color(0x00000000)
-private val gradientBottom = Color(0xFF000000)
-private val topPodcastImageGradient = listOf(Color(0x00000000), Color(0x16000000))
-private val bottomPodcastImageGradient = listOf(Color(0x16000000), Color(0x33000000))
-
-private val FolderImageSize = 56.dp
-private val PodcastImageSize = 23.dp
+import au.com.shiftyjelly.pocketcasts.compose.theme
+import au.com.shiftyjelly.pocketcasts.repositories.images.PocketCastsImageRequestFactory
+import au.com.shiftyjelly.pocketcasts.ui.extensions.themed
+import coil.compose.rememberAsyncImagePainter
 
 @Composable
 fun FolderImageSmall(
     color: Color,
     podcastUuids: List<String>,
     modifier: Modifier = Modifier,
-    folderImageSize: Dp = FolderImageSize,
-    podcastImageSize: Dp = PodcastImageSize,
+    size: Dp = 56.dp,
+    elevation: Dp? = 2.dp,
 ) {
-    Card(
-        elevation = 2.dp,
-        shape = RoundedCornerShape(4.dp),
-        backgroundColor = color,
-        modifier = modifier.size(folderImageSize),
+    val shape = RoundedCornerShape(size / 14)
+    val estimatedPadding = size / 12f
+    val artworkSize = (size - estimatedPadding * 3) / 2
+    FlowRow(
+        verticalArrangement = Arrangement.SpaceEvenly,
+        horizontalArrangement = Arrangement.SpaceEvenly,
+        maxItemsInEachRow = 2,
+        modifier = modifier
+            .size(size)
+            .then(
+                if (elevation != null) {
+                    Modifier.shadow(elevation, shape)
+                } else {
+                    Modifier
+                },
+            )
+            .background(color, shape)
+            .background(BackgroundGradient),
     ) {
-        Box(
-            contentAlignment = Alignment.Center,
-        ) {
-            Box(
-                modifier = Modifier
-                    .alpha(0.2f)
-                    .background(
-                        brush = Brush.verticalGradient(
-                            colors = listOf(
-                                gradientTop,
-                                gradientBottom,
-                            ),
-                        ),
-                    )
-                    .size(folderImageSize),
-            ) {}
-            Row(horizontalArrangement = Arrangement.Center) {
-                val imagePadding = 2.dp
-                Column(horizontalAlignment = Alignment.End) {
-                    FolderPodcastImage(
-                        uuid = podcastUuids.getOrNull(0),
-                        color = color,
-                        gradientColor = topPodcastImageGradient,
-                        modifier = Modifier.size(podcastImageSize),
-                    )
-                    Spacer(modifier = Modifier.height(imagePadding))
-                    FolderPodcastImage(
-                        uuid = podcastUuids.getOrNull(2),
-                        color = color,
-                        gradientColor = bottomPodcastImageGradient,
-                        modifier = Modifier.size(podcastImageSize),
-                    )
-                }
-                Spacer(modifier = Modifier.width(imagePadding))
-                Column(horizontalAlignment = Alignment.Start) {
-                    FolderPodcastImage(
-                        uuid = podcastUuids.getOrNull(1),
-                        color = color,
-                        gradientColor = topPodcastImageGradient,
-                        modifier = Modifier.size(podcastImageSize),
-                    )
-                    Spacer(modifier = Modifier.height(imagePadding))
-                    FolderPodcastImage(
-                        uuid = podcastUuids.getOrNull(3),
-                        color = color,
-                        gradientColor = bottomPodcastImageGradient,
-                        modifier = Modifier.size(podcastImageSize),
-                    )
-                }
-            }
-        }
+        PodcastOrPlaceHolder(
+            podcastUuid = podcastUuids.getOrNull(0),
+            shape = shape,
+            placeholderBrush = TopPlaceholderGradient,
+            modifier = Modifier.size(artworkSize),
+        )
+        PodcastOrPlaceHolder(
+            podcastUuid = podcastUuids.getOrNull(1),
+            shape = shape,
+            placeholderBrush = TopPlaceholderGradient,
+            modifier = Modifier.size(artworkSize),
+        )
+        PodcastOrPlaceHolder(
+            podcastUuid = podcastUuids.getOrNull(2),
+            shape = shape,
+            placeholderBrush = BottomPlaceholderGradient,
+            modifier = Modifier.size(artworkSize),
+        )
+        PodcastOrPlaceHolder(
+            podcastUuid = podcastUuids.getOrNull(3),
+            shape = shape,
+            placeholderBrush = BottomPlaceholderGradient,
+            modifier = Modifier.size(artworkSize),
+        )
     }
 }
 
 @Composable
-private fun FolderPodcastImage(
-    uuid: String?,
-    color: Color,
-    gradientColor: List<Color>,
+private fun PodcastOrPlaceHolder(
+    podcastUuid: String?,
+    shape: Shape,
+    placeholderBrush: Brush,
     modifier: Modifier = Modifier,
 ) {
-    if (uuid == null) {
-        BoxWithConstraints(modifier) {
-            Card(
-                elevation = 1.dp,
-                shape = RoundedCornerShape(3.dp),
-                backgroundColor = color,
-                modifier = Modifier.fillMaxSize(),
-            ) {
-                Box(
-                    modifier = Modifier
-                        .size(maxWidth)
-                        .background(brush = Brush.verticalGradient(colors = gradientColor)),
-                ) {}
-                Box(
-                    modifier = Modifier
-                        .size(maxWidth)
-                        .background(color = Color(0x19000000)),
-                ) {}
-            }
+    if (podcastUuid != null) {
+        val context = LocalContext.current
+        val imageRequest = remember(podcastUuid) {
+            PocketCastsImageRequestFactory(context).themed().createForPodcast(podcastUuid)
         }
+        Image(
+            painter = rememberAsyncImagePainter(imageRequest, contentScale = ContentScale.Crop),
+            contentScale = ContentScale.Crop,
+            contentDescription = null,
+            modifier = modifier.clip(shape),
+        )
     } else {
-        PodcastImage(
-            uuid = uuid,
-            modifier = modifier,
+        Box(
+            modifier = modifier.background(placeholderBrush, shape),
+        )
+    }
+}
+
+private val BackgroundGradient = Brush.verticalGradient(colors = listOf(Color(0x00000000), Color(0x33000000)))
+private val TopPlaceholderGradient = Brush.verticalGradient(colors = listOf(Color(0x08000000), Color(0x16000000)))
+private val BottomPlaceholderGradient = Brush.verticalGradient(colors = listOf(Color(0x16000000), Color(0x32000000)))
+
+@Preview
+@Composable
+private fun FolderImageSmallPreview() {
+    Column(
+        verticalArrangement = Arrangement.spacedBy(16.dp),
+        modifier = Modifier
+            .background(Color.White)
+            .padding(16.dp),
+    ) {
+        FolderImageSmall(
+            color = MaterialTheme.theme.colors.getFolderColor(0),
+            podcastUuids = emptyList(),
+        )
+        FolderImageSmall(
+            color = MaterialTheme.theme.colors.getFolderColor(1),
+            podcastUuids = List(1) { "$it" },
+        )
+        FolderImageSmall(
+            color = MaterialTheme.theme.colors.getFolderColor(2),
+            podcastUuids = List(2) { "$it" },
+        )
+        FolderImageSmall(
+            color = MaterialTheme.theme.colors.getFolderColor(3),
+            podcastUuids = List(3) { "$it" },
+        )
+        FolderImageSmall(
+            color = MaterialTheme.theme.colors.getFolderColor(4),
+            podcastUuids = List(4) { "$it" },
+        )
+        FolderImageSmall(
+            color = MaterialTheme.theme.colors.getFolderColor(5),
+            podcastUuids = List(4) { "$it" },
+            size = 120.dp,
         )
     }
 }
