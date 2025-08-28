@@ -53,7 +53,7 @@ fun FolderImageSmall(
                 },
             )
             .background(color, shape)
-            .background(BackgroundGradient),
+            .background(BackgroundGradient, shape),
     ) {
         PodcastOrPlaceHolder(
             podcastUuid = podcastUuids.getOrNull(0),
