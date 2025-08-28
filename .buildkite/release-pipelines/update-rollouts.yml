@@ -19,11 +19,28 @@ steps:
 
       echo '--- 🚀 Update Rollouts'
       bundle exec fastlane update_rollouts track:"$TRACK" percent:"$ROLLOUT_PERCENT"
+    plugins: [$CI_TOOLKIT]
+    agents:
+      queue: "tumblr-metal"
+    retry:
+      manual:
+        allowed: false
+        reason: "Always prefer re-triggering a new build from ReleaseV2 rather than retrying the individual job from Buildkite"
 
-      if [[ "${PUBLISH_DRAFT_GITHUB_RELEASE:-false}" == "true" ]]; then
-        echo '--- 🚀 Publish Draft GitHub Release'
-        bundle exec fastlane publish_github_release skip_confirm:true track:"$TRACK"
-      fi
+  - label: ":github: Publish Draft GitHub Release"
+    if: build.env("PUBLISH_DRAFT_GITHUB_RELEASE") == "true"
+    command: |
+      echo '--- 🤖 Use bot for Git operations'
+      source use-bot-for-git
+
+      echo '--- :ruby: Setup Ruby Tools'
+      install_gems
+
+      echo '--- 🔐 Access Secrets'
+      bundle exec fastlane run configure_apply
+
+      echo '--- 🚀 Publish Draft GitHub Release'
+      bundle exec fastlane publish_github_release skip_confirm:true track:"$TRACK"
     plugins: [$CI_TOOLKIT]
     agents:
       queue: "tumblr-metal"
