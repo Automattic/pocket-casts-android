@@ -22,21 +22,28 @@ import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyGridScope
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
+import androidx.compose.foundation.lazy.grid.rememberLazyGridState
 import androidx.compose.foundation.progressSemantics
 import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.drawWithContent
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.geometry.Size
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.CompositingStrategy
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.clearAndSetSemantics
 import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
@@ -160,12 +167,38 @@ private fun Content(
             else -> numToShowDefault / 2
         }
 
+        val size = with(LocalDensity.current) {
+            64.dp.toPx()
+        }
+        val gridState = rememberLazyGridState()
+        val backgroundColor = MaterialTheme.colors.background
         LazyVerticalGrid(
+            state = gridState,
             columns = GridCells.Fixed(numColumns),
             contentPadding = PaddingValues(horizontal = 24.dp),
             verticalArrangement = Arrangement.spacedBy(16.dp),
             horizontalArrangement = Arrangement.spacedBy(9.dp),
-            modifier = Modifier.weight(1f),
+            modifier = Modifier
+                .weight(1f)
+                .graphicsLayer {
+                    compositingStrategy = CompositingStrategy.Offscreen
+                }
+                .drawWithContent {
+                    drawContent()
+                    val height = gridState.layoutInfo.viewportSize.height
+                    val endOffset = height - size
+                    drawRect(
+                        brush = Brush.verticalGradient(
+                            0f to Color.Transparent,
+                            0.15f to Color.Transparent,
+                            1f to backgroundColor,
+                            startY = endOffset,
+                            endY = Float.POSITIVE_INFINITY,
+                        ),
+                        size = Size(height = size, width = gridState.layoutInfo.viewportSize.width.toFloat()),
+                        topLeft = Offset(x = 0f, y = endOffset),
+                    )
+                },
         ) {
             header {
                 Column {
@@ -189,11 +222,14 @@ private fun Content(
                     TextH10(
                         text = title,
                         modifier = Modifier.padding(bottom = 16.dp),
+                        textAlign = if (FeatureFlag.isEnabled(Feature.NEW_ONBOARDING_RECOMMENDATIONS)) TextAlign.Center else null,
                     )
 
                     TextP40(
                         text = message,
                         modifier = Modifier.padding(bottom = 16.dp),
+                        textAlign = if (FeatureFlag.isEnabled(Feature.NEW_ONBOARDING_RECOMMENDATIONS)) TextAlign.Center else null,
+                        color = if (FeatureFlag.isEnabled(Feature.NEW_ONBOARDING_RECOMMENDATIONS)) MaterialTheme.theme.colors.primaryText02 else MaterialTheme.theme.colors.primaryText01,
                     )
 
                     SearchBarButton(
@@ -225,13 +261,15 @@ private fun Content(
             }
         }
 
-        Surface(elevation = 8.dp) {
-            RowButton(
-                text = stringResource(buttonRes),
-                onClick = onComplete,
-                modifier = Modifier.windowInsetsPadding(WindowInsets.navigationBars),
-            )
-        }
+        RowButton(
+            text = stringResource(buttonRes),
+            onClick = onComplete,
+            includePadding = false,
+            modifier = Modifier
+                .windowInsetsPadding(WindowInsets.navigationBars)
+                .padding(horizontal = 16.dp)
+                .padding(bottom = 16.dp),
+        )
     }
 }
 

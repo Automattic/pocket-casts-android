@@ -202,8 +202,8 @@ private fun Content(
             onClick = onContinuePress,
             includePadding = false,
             colors = ButtonDefaults.buttonColors(
-                disabledBackgroundColor = MaterialTheme.theme.colors.primaryInteractive01.copy(alpha = .5f)
-            )
+                disabledBackgroundColor = MaterialTheme.theme.colors.primaryInteractive01.copy(alpha = .5f),
+            ),
         )
     }
 }
