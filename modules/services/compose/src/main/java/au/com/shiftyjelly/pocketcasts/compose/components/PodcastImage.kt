@@ -8,7 +8,6 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Card
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
@@ -62,7 +61,6 @@ fun PodcastImage(
     Image(
         painter = rememberAsyncImagePainter(imageRequest, contentScale = ContentScale.Crop),
         contentScale = ContentScale.Crop,
-        alignment = Alignment.BottomCenter,
         contentDescription = stringResource(LR.string.podcast_artwork_description),
         modifier = modifier
             .size(imageSize)
