@@ -13,7 +13,7 @@ data class ManualPlaylistPodcastSource(
 data class ManualPlaylistFolderSource(
     val uuid: String,
     val title: String,
-    val podcastUuids: List<String>,
+    val podcastSources: List<ManualPlaylistPodcastSource>,
 ) : ManualPlaylistEpisodeSource
 
 internal data class ManualPlaylistPartialFolderSource(

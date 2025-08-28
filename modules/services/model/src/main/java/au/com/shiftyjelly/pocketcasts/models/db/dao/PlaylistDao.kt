@@ -141,7 +141,19 @@ abstract class PlaylistDao {
         ORDER BY podcast.title ASC
     """,
     )
-    internal abstract suspend fun getPodcastPlaylistSources(includeInFolders: Boolean): List<ManualPlaylistPodcastSource>
+    internal abstract suspend fun getAllPodcastPlaylistSources(includeInFolders: Boolean): List<ManualPlaylistPodcastSource>
+
+    @Query(
+        """
+        SELECT podcast.uuid, podcast.title, podcast.author
+        FROM podcasts AS podcast
+        WHERE
+          podcast.subscribed IS NOT 0
+          AND podcast.folder_uuid IS (:folderUuid)
+        ORDER BY podcast.title ASC
+    """,
+    )
+    internal abstract suspend fun getPodcastPlaylistSourcesForFolder(folderUuid: String): List<ManualPlaylistPodcastSource>
 
     @Query(
         """
@@ -159,19 +171,21 @@ abstract class PlaylistDao {
     )
     internal abstract suspend fun getFolderPartialPlaylistSources(): List<ManualPlaylistPartialFolderSource>
 
-    @Query("SELECT uuid FROM podcasts WHERE subscribed IS NOT 0 AND folder_uuid IS :folderUuid")
-    internal abstract suspend fun getFolderPodcastUuids(folderUuid: String): List<String>
-
     @Transaction
     open suspend fun getManualPlaylistEpisodeSources(useFolders: Boolean): List<ManualPlaylistEpisodeSource> {
-        val podcasts = getPodcastPlaylistSources(includeInFolders = !useFolders)
+        val podcasts = getAllPodcastPlaylistSources(includeInFolders = !useFolders)
         val folders = if (useFolders) {
-            getFolderPartialPlaylistSources().map { partialSource ->
-                ManualPlaylistFolderSource(
-                    uuid = partialSource.uuid,
-                    title = partialSource.title,
-                    podcastUuids = getFolderPodcastUuids(partialSource.uuid),
-                )
+            getFolderPartialPlaylistSources().mapNotNull { partialSource ->
+                val podcastSources = getPodcastPlaylistSourcesForFolder(partialSource.uuid)
+                if (podcastSources.isNotEmpty()) {
+                    ManualPlaylistFolderSource(
+                        uuid = partialSource.uuid,
+                        title = partialSource.title,
+                        podcastSources = getPodcastPlaylistSourcesForFolder(partialSource.uuid),
+                    )
+                } else {
+                    null
+                }
             }
         } else {
             emptyList()

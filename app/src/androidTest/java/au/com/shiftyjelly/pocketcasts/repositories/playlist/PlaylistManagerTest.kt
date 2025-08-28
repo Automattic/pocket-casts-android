@@ -1276,7 +1276,8 @@ class PlaylistManagerTest {
             syncModified = 0L,
         )
         folderDao.insert(baseFolder.copy(uuid = "folder-id-1", name = "Folder Name 1"))
-        folderDao.insert(baseFolder.copy(uuid = "folder-id-2", name = "Folder Name 2", deleted = true))
+        folderDao.insert(baseFolder.copy(uuid = "folder-id-2", name = "Folder Name 2"))
+        folderDao.insert(baseFolder.copy(uuid = "folder-id-3", name = "Folder Name 3", deleted = true))
 
         assertEquals(
             listOf(
@@ -1315,7 +1316,13 @@ class PlaylistManagerTest {
                 ManualPlaylistFolderSource(
                     uuid = "folder-id-1",
                     title = "Folder Name 1",
-                    podcastUuids = listOf("podcast-id-2"),
+                    podcastSources = listOf(
+                        ManualPlaylistPodcastSource(
+                            uuid = "podcast-id-3",
+                            title = "Podcast Title 3",
+                            author = "Podcast Author 3",
+                        ),
+                    ),
                 ),
             ),
             manager.getManualPlaylistEpisodeSources(),
