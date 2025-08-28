@@ -1,15 +1,22 @@
 package au.com.shiftyjelly.pocketcasts.compose.components
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Card
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.role
@@ -19,6 +26,7 @@ import androidx.compose.ui.unit.dp
 import au.com.shiftyjelly.pocketcasts.repositories.images.PocketCastsImageRequestFactory
 import au.com.shiftyjelly.pocketcasts.repositories.images.PocketCastsImageRequestFactory.PlaceholderType
 import au.com.shiftyjelly.pocketcasts.ui.extensions.themed
+import coil.compose.rememberAsyncImagePainter
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 fun podcastImageCornerSize(width: Dp): Dp {
@@ -29,7 +37,47 @@ fun podcastImageCornerSize(width: Dp): Dp {
     }
 }
 
-@Deprecated(message = "Don't use this component in new UI")
+@Composable
+fun PodcastImage(
+    uuid: String,
+    modifier: Modifier = Modifier,
+    imageSize: Dp = 56.dp,
+    cornerSize: Dp? = imageSize / 14,
+    elevation: Dp? = 2.dp,
+    placeholderType: PlaceholderType = if (imageSize > 200.dp) {
+        PlaceholderType.Large
+    } else {
+        PlaceholderType.Small
+    },
+) {
+    val context = LocalContext.current
+    val imageRequest = remember(uuid, placeholderType) {
+        PocketCastsImageRequestFactory(context, placeholderType = placeholderType).themed().createForPodcast(uuid)
+    }
+    val shape = if (cornerSize != null) {
+        RoundedCornerShape(cornerSize)
+    } else {
+        RectangleShape
+    }
+    Image(
+        painter = rememberAsyncImagePainter(imageRequest, contentScale = ContentScale.Crop),
+        contentScale = ContentScale.Crop,
+        alignment = Alignment.BottomCenter,
+        contentDescription = stringResource(LR.string.podcast_artwork_description),
+        modifier = modifier
+            .size(imageSize)
+            .then(
+                if (elevation != null) {
+                    Modifier.shadow(elevation, shape)
+                } else {
+                    Modifier
+                },
+            )
+            .clip(shape),
+    )
+}
+
+@Deprecated(message = "This component is fundamentally broken. Please use PodcastImage in new UI instead.")
 @Composable
 fun PodcastImageDeprecated(
     uuid: String,
