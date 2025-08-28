@@ -272,9 +272,6 @@ class PlayerViewModelTest {
         val useRealTimeForPlaybackRemainingTimeMock = mock<UserSetting<Boolean>>()
         whenever(useRealTimeForPlaybackRemainingTimeMock.flow).thenReturn(MutableStateFlow(false))
         whenever(settings.useRealTimeForPlaybackRemaingTime).thenReturn(useRealTimeForPlaybackRemainingTimeMock)
-        val cachedSubscriptionMock = mock<UserSetting<Subscription?>>()
-        whenever(cachedSubscriptionMock.flow).thenReturn(MutableStateFlow(null))
-        whenever(settings.cachedSubscription).thenReturn(cachedSubscriptionMock)
 
         val blazeAdsManager = object : BlazeAdsManager {
             override suspend fun updateAds() {}
