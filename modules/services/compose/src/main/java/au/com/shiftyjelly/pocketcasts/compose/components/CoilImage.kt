@@ -26,6 +26,7 @@ internal fun CoilImage(
     modifier: Modifier = Modifier,
     contentScale: ContentScale = ContentScale.Crop,
     corners: Dp? = null,
+    expandContentSize: Boolean = false,
 ) {
     val painter = rememberAsyncImagePainter(
         model = imageRequest,
@@ -39,7 +40,8 @@ internal fun CoilImage(
         Image(
             painter = painter,
             contentDescription = title,
-            modifier = Modifier.fillMaxSize()
+            modifier = Modifier
+                .then(if (expandContentSize) Modifier.fillMaxSize() else Modifier)
                 .clip(if (corners == null) RectangleShape else RoundedCornerShape(corners)),
         )
         val state = painter.state

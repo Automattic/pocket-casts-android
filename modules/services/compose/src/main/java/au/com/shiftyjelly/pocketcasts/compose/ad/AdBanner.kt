@@ -111,6 +111,7 @@ fun AdBanner(
                     showTitle = false,
                     corners = 4.dp,
                     modifier = Modifier.size(86.dp),
+                    expandContentSize = true,
                 )
 
                 Spacer(
