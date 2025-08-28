@@ -115,6 +115,9 @@ class PlayerViewModelTest {
     private lateinit var podcast: Podcast
 
     @Mock
+    private lateinit var blazeAdsManager: BlazeAdsManager
+
+    @Mock
     private lateinit var userSettingsGlobalEffects: UserSetting<PlaybackEffects>
 
     private val podcastUuid = "podcastUuid"
@@ -272,12 +275,7 @@ class PlayerViewModelTest {
         val useRealTimeForPlaybackRemainingTimeMock = mock<UserSetting<Boolean>>()
         whenever(useRealTimeForPlaybackRemainingTimeMock.flow).thenReturn(MutableStateFlow(false))
         whenever(settings.useRealTimeForPlaybackRemaingTime).thenReturn(useRealTimeForPlaybackRemainingTimeMock)
-
-        val blazeAdsManager = object : BlazeAdsManager {
-            override suspend fun updateAds() {}
-            override fun findPodcastListAd() = flowOf(null)
-            override fun findPlayerAd() = flowOf(null)
-        }
+        whenever(blazeAdsManager.findPlayerAd()).thenReturn(flowOf(null))
 
         viewModel = PlayerViewModel(
             playbackManager = playbackManager,

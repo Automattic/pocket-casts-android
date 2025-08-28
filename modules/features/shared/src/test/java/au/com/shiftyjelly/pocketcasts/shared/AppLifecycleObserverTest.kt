@@ -82,6 +82,8 @@ class AppLifecycleObserverTest {
 
     @Mock private lateinit var notificationScheduler: NotificationScheduler
 
+    @Mock private lateinit var blazeAdsManager: BlazeAdsManager
+
     private var coroutineScope = CoroutineScope(UnconfinedTestDispatcher())
 
     lateinit var appLifecycleObserver: AppLifecycleObserver
@@ -100,12 +102,6 @@ class AppLifecycleObserverTest {
         whenever(settings.showFreeAccountEncouragement).thenReturn(showAccountEncouragementSetting)
 
         whenever(appLifecycleOwner.lifecycle).thenReturn(appLifecycle)
-
-        val blazeAdsManager = object : BlazeAdsManager {
-            override suspend fun updateAds() {}
-            override fun findPodcastListAd() = flowOf(null)
-            override fun findPlayerAd() = flowOf(null)
-        }
 
         appLifecycleObserver = AppLifecycleObserver(
             appContext = context,
