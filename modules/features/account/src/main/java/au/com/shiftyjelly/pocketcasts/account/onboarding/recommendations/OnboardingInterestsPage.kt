@@ -31,6 +31,7 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import au.com.shiftyjelly.pocketcasts.account.onboarding.components.InterestCategoryPill
 import au.com.shiftyjelly.pocketcasts.compose.AppThemeWithBackground
+import au.com.shiftyjelly.pocketcasts.compose.CallOnce
 import au.com.shiftyjelly.pocketcasts.compose.bars.SystemBarsStyles
 import au.com.shiftyjelly.pocketcasts.compose.bars.singleAuto
 import au.com.shiftyjelly.pocketcasts.compose.bars.transparent
@@ -60,6 +61,10 @@ fun OnboardingInterestsPage(
         val statusBar = SystemBarStyle.singleAuto(pocketCastsTheme.colors.primaryUi01.copy(alpha = 0.9f)) { theme.darkTheme }
         val navigationBar = SystemBarStyle.transparent { theme.darkTheme }
         onUpdateSystemBars(SystemBarsStyles(statusBar, navigationBar))
+    }
+
+    CallOnce {
+        viewModel.onShow()
     }
 
     BackHandler {

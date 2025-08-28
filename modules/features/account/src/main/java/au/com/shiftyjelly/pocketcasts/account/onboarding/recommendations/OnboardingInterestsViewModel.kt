@@ -2,6 +2,8 @@ package au.com.shiftyjelly.pocketcasts.account.onboarding.recommendations
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.repositories.categories.CategoriesManager
 import au.com.shiftyjelly.pocketcasts.servers.model.DiscoverCategory
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -15,6 +17,7 @@ import au.com.shiftyjelly.pocketcasts.localization.R as LR
 @HiltViewModel
 class OnboardingInterestsViewModel @Inject constructor(
     private val categoriesManager: CategoriesManager,
+    private val analyticsTracker: AnalyticsTracker,
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(
@@ -29,11 +32,24 @@ class OnboardingInterestsViewModel @Inject constructor(
         fetchCategories()
     }
 
+    fun onShow() {
+        analyticsTracker.track(AnalyticsEvent.INTERESTS_SHOWN)
+    }
+
     fun skipSelection() {
+        analyticsTracker.track(AnalyticsEvent.INTERESTS_NOT_NOW_TAPPED)
         categoriesManager.setInterestCategories(emptySet())
     }
 
     fun updateSelectedCategory(category: DiscoverCategory, isSelected: Boolean) {
+        analyticsTracker.track(
+            AnalyticsEvent.INTERESTS_CATEGORY_SELECTED,
+            mapOf(
+                "categoryId" to category.id,
+                "name" to category.name,
+                "isSelected" to isSelected,
+            ),
+        )
         _state.update {
             it.copy(
                 selectedCategories = if (isSelected) {
@@ -46,6 +62,7 @@ class OnboardingInterestsViewModel @Inject constructor(
     }
 
     fun showMore() {
+        analyticsTracker.track(AnalyticsEvent.INTERESTS_SHOW_MORE_TAPPED)
         _state.update {
             it.copy(
                 displayedCategories = it.allCategories,
@@ -54,6 +71,12 @@ class OnboardingInterestsViewModel @Inject constructor(
     }
 
     fun saveInterests() {
+        analyticsTracker.track(
+            AnalyticsEvent.INTERESTS_CONTINUE_TAPPED,
+            mapOf(
+                "categories" to _state.value.selectedCategories.map { it.id }.joinToString(", "),
+            ),
+        )
         categoriesManager.setInterestCategories(_state.value.selectedCategories)
     }
 
