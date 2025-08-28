@@ -40,7 +40,7 @@ steps:
       bundle exec fastlane run configure_apply
 
       echo '--- 🚀 Publish Draft GitHub Release'
-      bundle exec fastlane publish_github_release skip_confirm:true track:"$TRACK"
+      bundle exec fastlane publish_gh_release skip_confirm:true track:"$TRACK"
     plugins: [$CI_TOOLKIT]
     agents:
       queue: "tumblr-metal"

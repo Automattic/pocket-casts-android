@@ -427,7 +427,7 @@ platform :android do
   #        If 'production': The GitHub Release will be expected to have a title like `X.Y`, and this lane will also delete the release branch after publishing the GitHub Release.
   #        If 'beta': The draft GitHub Release will be expected to have a title like `X.Y-rc-N`. The release branch will NOT be deleted for those.
   #
-  lane :publish_github_release do |skip_confirm: false, track: 'production'|
+  lane :publish_gh_release do |skip_confirm: false, track: 'production'|
     ensure_git_status_clean
     ensure_git_branch(branch: '^release/')
 
