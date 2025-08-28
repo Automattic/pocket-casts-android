@@ -10,7 +10,7 @@
     *   Fix File Settings bottom content being obstructed by the Mini Player.
         ([#4414](https://github.com/Automattic/pocket-casts-android/pull/4414))
     *   Fix podcast image shadow animation.
-        ([#4414](https://github.com/Automattic/pocket-casts-android/pull/4414))
+        ([#4429](https://github.com/Automattic/pocket-casts-android/pull/4429))
 
 7.96
 -----
