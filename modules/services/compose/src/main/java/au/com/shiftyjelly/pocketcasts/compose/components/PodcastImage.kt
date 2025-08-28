@@ -29,6 +29,7 @@ fun podcastImageCornerSize(width: Dp): Dp {
     }
 }
 
+@Deprecated(message = "Don't use this component in new UI")
 @Composable
 fun PodcastImageDeprecated(
     uuid: String,

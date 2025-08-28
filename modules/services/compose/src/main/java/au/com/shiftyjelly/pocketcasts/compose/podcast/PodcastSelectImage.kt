@@ -52,6 +52,7 @@ fun PodcastSelectImage(
             .semantics(mergeDescendants = true) {},
         contentAlignment = Alignment.Center,
     ) {
+        @Suppress("DEPRECATION")
         PodcastImageDeprecated(
             uuid = podcast.uuid,
             title = podcast.title,

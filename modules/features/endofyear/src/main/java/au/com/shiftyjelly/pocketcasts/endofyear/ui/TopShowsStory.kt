@@ -191,6 +191,7 @@ private fun PodcastItem(
                 painter = painterResource(stickers[index % stickers.size]),
                 contentDescription = null,
             )
+            @Suppress("DEPRECATION")
             PodcastImageDeprecated(
                 uuid = podcast.uuid,
                 elevation = 0.dp,

@@ -87,6 +87,7 @@ private fun Content(
         ) {
             item { Spacer(Modifier.height(4.dp)) }
             item {
+                @Suppress("DEPRECATION")
                 PodcastImageDeprecated(
                     uuid = podcast.uuid,
                     modifier = Modifier.size(PodcastScreen.podcastImageSize),

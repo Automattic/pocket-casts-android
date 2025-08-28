@@ -105,6 +105,7 @@ private fun ColumnScope.TopShowCover(
             .weight(1f)
             .background(story.backgroundColor),
     ) {
+        @Suppress("DEPRECATION")
         PodcastImageDeprecated(
             uuid = story.show.uuid,
             elevation = 0.dp,

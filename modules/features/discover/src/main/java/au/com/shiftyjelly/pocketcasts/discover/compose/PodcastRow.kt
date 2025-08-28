@@ -55,6 +55,7 @@ internal fun PodcastRow(
             horizontalArrangement = Arrangement.spacedBy(8.dp),
             modifier = Modifier.padding(contentPadding),
         ) {
+            @Suppress("DEPRECATION")
             PodcastImageDeprecated(
                 uuid = podcast.uuid,
                 cornerSize = 4.dp,

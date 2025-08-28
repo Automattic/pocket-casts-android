@@ -124,6 +124,7 @@ private fun ShareListCreateTitleContent(
                 }
             }
             items(items = podcasts) { podcast ->
+                @Suppress("DEPRECATION")
                 PodcastImageDeprecated(
                     uuid = podcast.uuid,
                     title = podcast.title,

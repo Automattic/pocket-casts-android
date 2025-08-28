@@ -91,6 +91,7 @@ fun SuggestedFolderPodcastsPage(
                     .padding(horizontal = 16.dp),
             ) {
                 items(folder.podcastIds) { podcastId ->
+                    @Suppress("DEPRECATION")
                     PodcastImageDeprecated(podcastId)
                 }
             }

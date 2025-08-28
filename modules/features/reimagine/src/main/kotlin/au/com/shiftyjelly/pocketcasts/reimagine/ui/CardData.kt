@@ -45,6 +45,7 @@ internal data class PodcastCardData(
     ).joinToString(" · ")
 
     @Composable
+    @Suppress("DEPRECATION")
     override fun Image(modifier: Modifier) = PodcastImageDeprecated(
         uuid = podcast.uuid,
         title = stringResource(LR.string.podcast_cover_description, podcast.title),

@@ -64,6 +64,7 @@ fun PodcastSubscribeImage(
         modifier = rootModifier,
         contentAlignment = Alignment.Center,
     ) {
+        @Suppress("DEPRECATION")
         PodcastImageDeprecated(
             uuid = podcastUuid,
             title = podcastTitle,

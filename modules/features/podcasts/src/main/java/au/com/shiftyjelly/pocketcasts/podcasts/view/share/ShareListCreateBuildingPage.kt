@@ -96,6 +96,7 @@ private fun CreateBuildingContent(
 
 @Composable
 private fun SharePodcastImage(podcast: Podcast, modifier: Modifier = Modifier) {
+    @Suppress("DEPRECATION")
     PodcastImageDeprecated(uuid = podcast.uuid, modifier = modifier.size(100.dp))
 }
 

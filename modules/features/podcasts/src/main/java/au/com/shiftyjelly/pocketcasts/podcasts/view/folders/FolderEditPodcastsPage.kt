@@ -192,6 +192,7 @@ private fun PodcastSelectRow(
         Box(
             modifier = Modifier.padding(start = 16.dp, end = 8.dp, top = 8.dp, bottom = 8.dp),
         ) {
+            @Suppress("DEPRECATION")
             PodcastImageDeprecated(
                 uuid = podcast.uuid,
                 modifier = Modifier.size(56.dp),

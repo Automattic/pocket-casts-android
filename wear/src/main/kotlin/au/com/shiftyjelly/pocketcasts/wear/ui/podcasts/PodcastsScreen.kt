@@ -156,6 +156,7 @@ private fun PodcastChip(
             ChipText(podcast.title)
         },
         icon = {
+            @Suppress("DEPRECATION")
             PodcastImageDeprecated(
                 uuid = podcast.uuid,
                 dropShadow = false,

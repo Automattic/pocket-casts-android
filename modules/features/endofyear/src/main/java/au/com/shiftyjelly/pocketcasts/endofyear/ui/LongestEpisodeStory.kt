@@ -209,6 +209,7 @@ private fun PodcastCover(
     modifier: Modifier = Modifier,
 ) {
     if (!LocalInspectionMode.current) {
+        @Suppress("DEPRECATION")
         PodcastImageDeprecated(
             uuid = episode.podcastId,
             elevation = 0.dp,

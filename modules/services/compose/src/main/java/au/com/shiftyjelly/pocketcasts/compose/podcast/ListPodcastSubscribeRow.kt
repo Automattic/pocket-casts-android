@@ -43,6 +43,7 @@ fun ListPodcastSubscribeRow(
         verticalAlignment = Alignment.CenterVertically,
         modifier = modifier.clickable { onRowClick() },
     ) {
+        @Suppress("DEPRECATION")
         PodcastImageDeprecated(
             uuid = uuid,
             modifier = Modifier

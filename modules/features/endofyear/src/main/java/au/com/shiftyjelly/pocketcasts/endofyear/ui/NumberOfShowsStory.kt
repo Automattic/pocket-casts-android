@@ -140,6 +140,7 @@ private fun PodcastCoverCarousel(
         horizontalArrangement = Arrangement.spacedBy(spacingSize),
         modifier = modifier,
     ) { podcastId ->
+        @Suppress("DEPRECATION")
         PodcastImageDeprecated(
             uuid = podcastId,
             elevation = coverElevation,

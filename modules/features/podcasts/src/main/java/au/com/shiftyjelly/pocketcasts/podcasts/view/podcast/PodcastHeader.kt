@@ -174,6 +174,7 @@ internal fun PodcastHeader(
                 .fillMaxWidth()
                 .padding(contentPadding),
         ) {
+            @Suppress("DEPRECATION")
             PodcastImageDeprecated(
                 uuid = uuid,
                 cornerSize = 8.dp,

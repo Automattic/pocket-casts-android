@@ -43,6 +43,7 @@ fun SearchEpisodeItem(
                 .clickable { onClick(episode) }
                 .padding(16.dp),
         ) {
+            @Suppress("DEPRECATION")
             PodcastImageDeprecated(
                 uuid = episode.podcastUuid,
                 modifier = Modifier.size(IconSize),

@@ -239,6 +239,7 @@ private fun PodcastRow(
             )
             .padding(horizontal = 16.dp, vertical = 12.dp),
     ) {
+        @Suppress("DEPRECATION")
         PodcastImageDeprecated(
             uuid = uuid,
             cornerSize = 4.dp,

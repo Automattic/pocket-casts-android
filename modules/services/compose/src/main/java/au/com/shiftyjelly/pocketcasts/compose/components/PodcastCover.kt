@@ -24,6 +24,7 @@ fun PodcastCover(
     cornerRadius: Dp? = null,
 ) {
     val cornerRadiusSize = cornerRadius ?: if (coverSize == CoverSize.SMALL) 4.dp else 8.dp
+    @Suppress("DEPRECATION")
     PodcastImageDeprecated(
         uuid = uuid,
         elevation = if (coverSize == CoverSize.SMALL) 4.dp else 8.dp,

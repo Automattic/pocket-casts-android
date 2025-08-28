@@ -204,6 +204,7 @@ private fun FolderPodcastImage(
             }
         }
     } else {
+        @Suppress("DEPRECATION")
         PodcastImageDeprecated(
             uuid = uuid,
             modifier = modifier,

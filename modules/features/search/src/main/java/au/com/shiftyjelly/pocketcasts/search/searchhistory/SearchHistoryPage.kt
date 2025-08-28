@@ -211,6 +211,7 @@ fun SearchHistoryEpisodeView(
                 .fillMaxWidth()
                 .padding(start = 16.dp, top = 12.dp, bottom = 12.dp),
         ) {
+            @Suppress("DEPRECATION")
             PodcastImageDeprecated(
                 uuid = entry.podcastUuid,
                 modifier = Modifier.size(IconSize),
@@ -308,6 +309,7 @@ fun SearchHistoryPodcastView(
                 .fillMaxWidth()
                 .padding(start = 16.dp, top = 12.dp, bottom = 12.dp),
         ) {
+            @Suppress("DEPRECATION")
             PodcastImageDeprecated(
                 uuid = entry.uuid,
                 modifier = Modifier
