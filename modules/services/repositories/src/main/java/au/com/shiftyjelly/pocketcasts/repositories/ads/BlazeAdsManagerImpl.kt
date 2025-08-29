@@ -7,7 +7,6 @@ import au.com.shiftyjelly.pocketcasts.models.type.BlazeAdLocation
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.servers.cdn.StaticServiceManager
 import au.com.shiftyjelly.pocketcasts.utils.Util
-import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import com.automattic.android.tracks.crashlogging.CrashLogging
 import dagger.hilt.android.qualifiers.ApplicationContext
@@ -56,9 +55,13 @@ class BlazeAdsManagerImpl @Inject constructor(
 
     @OptIn(ExperimentalCoroutinesApi::class)
     private fun findBlazeAdByLocation(location: BlazeAdLocation): Flow<BlazeAd?> {
+        val featureFlag = location.feature
+        if (location == BlazeAdLocation.Unknown || featureFlag == null) {
+            return flowOf(null)
+        }
         return combine(
             settings.cachedSubscription.flow,
-            FeatureFlag.isEnabledFlow(Feature.BANNER_ADS),
+            FeatureFlag.isEnabledFlow(featureFlag),
             ::Pair,
         ).flatMapLatest { (subscription, isEnabled) ->
             if (isEnabled && subscription == null) {
