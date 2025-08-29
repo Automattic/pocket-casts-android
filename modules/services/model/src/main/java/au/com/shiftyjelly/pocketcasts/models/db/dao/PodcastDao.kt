@@ -7,6 +7,7 @@ import androidx.room.OnConflictStrategy.Companion.REPLACE
 import androidx.room.Query
 import androidx.room.Transaction
 import androidx.room.Update
+import au.com.shiftyjelly.pocketcasts.models.db.AppDatabase
 import au.com.shiftyjelly.pocketcasts.models.entity.CuratedPodcast
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.to.AutoArchiveAfterPlaying
@@ -245,6 +246,16 @@ abstract class PodcastDao {
     @Query("UPDATE podcasts SET sync_status = :syncStatus WHERE subscribed = 1")
     abstract suspend fun updateAllSubscribedSyncStatus(syncStatus: Int)
 
+    @Query("UPDATE podcasts SET sync_status = :syncStatus WHERE uuid IN (:uuids)")
+    protected abstract suspend fun updateAllSyncStatusUnsafe(syncStatus: Int, uuids: Collection<String>)
+
+    @Transaction
+    open suspend fun updateAllSyncStatus(syncStatus: Int, uuids: Collection<String>) {
+        uuids.chunked(AppDatabase.SQLITE_BIND_ARG_LIMIT - 1).forEach { chunk ->
+            updateAllSyncStatusUnsafe(syncStatus, chunk)
+        }
+    }
+
     @Query("UPDATE podcasts SET sort_order = :sortPosition, sync_status = :syncStatus WHERE uuid = :uuid")
     abstract suspend fun updateSortPosition(sortPosition: Int, uuid: String, syncStatus: Int = Podcast.SYNC_STATUS_NOT_SYNCED)
 
@@ -270,6 +281,9 @@ abstract class PodcastDao {
 
     @Delete
     abstract fun deleteBlocking(podcast: Podcast)
+
+    @Delete
+    abstract suspend fun delete(podcast: Podcast)
 
     @Query("DELETE FROM podcasts")
     abstract suspend fun deleteAll()
@@ -423,6 +437,9 @@ abstract class PodcastDao {
 
     @Query("SELECT * FROM podcasts WHERE sync_status = " + Podcast.SYNC_STATUS_NOT_SYNCED + " AND uuid IS NOT NULL")
     abstract fun findNotSyncedBlocking(): List<Podcast>
+
+    @Query("SELECT * FROM podcasts WHERE sync_status = " + Podcast.SYNC_STATUS_NOT_SYNCED + " AND uuid IS NOT NULL")
+    abstract suspend fun findNotSynced(): List<Podcast>
 
     @Query("SELECT COUNT(*) FROM podcast_episodes WHERE podcast_id = :podcastUuid AND episode_status = :episodeStatus")
     abstract fun countEpisodesInPodcastWithStatusBlocking(podcastUuid: String, episodeStatus: EpisodeStatusEnum): Int

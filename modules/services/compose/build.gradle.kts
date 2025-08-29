@@ -15,9 +15,7 @@ android {
 }
 
 dependencies {
-    ksp(libs.showkase.processor)
 
-    api(libs.showkase)
     api(libs.compose.material3.adaptive)
 
     api(projects.modules.services.model)

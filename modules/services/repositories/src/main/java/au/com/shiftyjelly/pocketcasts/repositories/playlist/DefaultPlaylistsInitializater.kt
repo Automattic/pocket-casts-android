@@ -15,8 +15,8 @@ class DefaultPlaylistsInitializater @Inject constructor(
 
     suspend fun initialize(force: Boolean = false) = mutex.withLock {
         if (force || !settings.getBooleanForKey(CREATED_DEFAULT_PLAYLISTS_KEY, false)) {
-            playlistManager.insertSmartPlaylist(SmartPlaylistDraft.InProgress)
-            playlistManager.insertSmartPlaylist(SmartPlaylistDraft.NewReleases)
+            playlistManager.createSmartPlaylist(SmartPlaylistDraft.InProgress)
+            playlistManager.createSmartPlaylist(SmartPlaylistDraft.NewReleases)
             settings.setBooleanForKey(CREATED_DEFAULT_PLAYLISTS_KEY, true)
         }
     }

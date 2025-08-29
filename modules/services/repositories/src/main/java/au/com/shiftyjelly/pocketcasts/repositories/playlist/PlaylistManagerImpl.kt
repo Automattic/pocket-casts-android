@@ -2,18 +2,19 @@ package au.com.shiftyjelly.pocketcasts.repositories.playlist
 
 import androidx.room.withTransaction
 import au.com.shiftyjelly.pocketcasts.models.db.AppDatabase
+import au.com.shiftyjelly.pocketcasts.models.entity.PlaylistEntity
+import au.com.shiftyjelly.pocketcasts.models.entity.PlaylistEntity.Companion.ANYTIME
+import au.com.shiftyjelly.pocketcasts.models.entity.PlaylistEntity.Companion.AUDIO_VIDEO_FILTER_ALL
+import au.com.shiftyjelly.pocketcasts.models.entity.PlaylistEntity.Companion.AUDIO_VIDEO_FILTER_AUDIO_ONLY
+import au.com.shiftyjelly.pocketcasts.models.entity.PlaylistEntity.Companion.AUDIO_VIDEO_FILTER_VIDEO_ONLY
+import au.com.shiftyjelly.pocketcasts.models.entity.PlaylistEntity.Companion.LAST_24_HOURS
+import au.com.shiftyjelly.pocketcasts.models.entity.PlaylistEntity.Companion.LAST_2_WEEKS
+import au.com.shiftyjelly.pocketcasts.models.entity.PlaylistEntity.Companion.LAST_3_DAYS
+import au.com.shiftyjelly.pocketcasts.models.entity.PlaylistEntity.Companion.LAST_MONTH
+import au.com.shiftyjelly.pocketcasts.models.entity.PlaylistEntity.Companion.LAST_WEEK
+import au.com.shiftyjelly.pocketcasts.models.entity.PlaylistEntity.Companion.SYNC_STATUS_NOT_SYNCED
+import au.com.shiftyjelly.pocketcasts.models.entity.PlaylistEntity.Companion.SYNC_STATUS_SYNCED
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
-import au.com.shiftyjelly.pocketcasts.models.entity.SmartPlaylist.Companion.ANYTIME
-import au.com.shiftyjelly.pocketcasts.models.entity.SmartPlaylist.Companion.AUDIO_VIDEO_FILTER_ALL
-import au.com.shiftyjelly.pocketcasts.models.entity.SmartPlaylist.Companion.AUDIO_VIDEO_FILTER_AUDIO_ONLY
-import au.com.shiftyjelly.pocketcasts.models.entity.SmartPlaylist.Companion.AUDIO_VIDEO_FILTER_VIDEO_ONLY
-import au.com.shiftyjelly.pocketcasts.models.entity.SmartPlaylist.Companion.LAST_24_HOURS
-import au.com.shiftyjelly.pocketcasts.models.entity.SmartPlaylist.Companion.LAST_2_WEEKS
-import au.com.shiftyjelly.pocketcasts.models.entity.SmartPlaylist.Companion.LAST_3_DAYS
-import au.com.shiftyjelly.pocketcasts.models.entity.SmartPlaylist.Companion.LAST_MONTH
-import au.com.shiftyjelly.pocketcasts.models.entity.SmartPlaylist.Companion.LAST_WEEK
-import au.com.shiftyjelly.pocketcasts.models.entity.SmartPlaylist.Companion.SYNC_STATUS_NOT_SYNCED
-import au.com.shiftyjelly.pocketcasts.models.entity.SmartPlaylist.Companion.SYNC_STATUS_SYNCED
 import au.com.shiftyjelly.pocketcasts.models.to.PlaylistEpisodeMetadata
 import au.com.shiftyjelly.pocketcasts.models.type.PlaylistEpisodeSortType
 import au.com.shiftyjelly.pocketcasts.models.type.SmartRules
@@ -37,7 +38,6 @@ import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flowOf
-import au.com.shiftyjelly.pocketcasts.models.entity.SmartPlaylist as DbPlaylist
 
 @OptIn(ExperimentalCoroutinesApi::class, FlowPreview::class)
 class PlaylistManagerImpl @Inject constructor(
@@ -48,7 +48,7 @@ class PlaylistManagerImpl @Inject constructor(
 
     override fun observePlaylistsPreview(): Flow<List<PlaylistPreview>> {
         return playlistDao
-            .observeSmartPlaylists()
+            .observePlaylists()
             .flatMapLatest { playlists ->
                 if (playlists.isEmpty()) {
                     flowOf(emptyList())
@@ -77,7 +77,7 @@ class PlaylistManagerImpl @Inject constructor(
                         limit = PLAYLIST_ARTWORK_EPISODE_LIMIT,
                     )
                     val episodesFlow = observeSmartEpisodes(smartRules, playlist.sortType, episodeSearchTerm)
-                    val metadataFlow = playlistDao.observeEpisodeMetadata(
+                    val metadataFlow = playlistDao.observeSmartEpisodeMetadata(
                         clock = clock,
                         smartRules = smartRules,
                     )
@@ -92,7 +92,7 @@ class PlaylistManagerImpl @Inject constructor(
                             autoDownloadLimit = playlist.autodownloadLimit,
                             totalEpisodeCount = metadata.episodeCount,
                             playbackDurationLeft = metadata.timeLeftSeconds.seconds,
-                            artworkPodcasts = podcasts,
+                            artworkPodcastUuids = podcasts,
                         )
                     }.keepPodcastEpisodesSynced()
                 }
@@ -115,7 +115,7 @@ class PlaylistManagerImpl @Inject constructor(
     }
 
     override fun observeEpisodeMetadata(rules: SmartRules): Flow<PlaylistEpisodeMetadata> {
-        return playlistDao.observeEpisodeMetadata(clock, rules)
+        return playlistDao.observeSmartEpisodeMetadata(clock, rules)
     }
 
     override suspend fun updateSmartRules(uuid: String, rules: SmartRules) {
@@ -126,7 +126,7 @@ class PlaylistManagerImpl @Inject constructor(
                 ?.applySmartRules(rules)
                 ?.copy(syncStatus = SYNC_STATUS_NOT_SYNCED)
             if (playlist != null) {
-                playlistDao.upsertSmartPlaylist(playlist)
+                playlistDao.upsertPlaylist(playlist)
             }
         }
     }
@@ -151,22 +151,36 @@ class PlaylistManagerImpl @Inject constructor(
         playlistDao.markPlaylistAsDeleted(uuid)
     }
 
-    override suspend fun insertSmartPlaylist(draft: SmartPlaylistDraft): String {
-        return appDatabase.withTransaction {
-            val uuids = playlistDao.getAllPlaylistUuids()
-            val uuid = if (draft === SmartPlaylistDraft.NewReleases) {
+    override suspend fun createSmartPlaylist(draft: SmartPlaylistDraft): String {
+        return createPlaylist(
+            entity = draft.toPlaylistEntity(),
+            uuid = if (draft === SmartPlaylistDraft.NewReleases) {
                 Playlist.NEW_RELEASES_UUID
             } else if (draft === SmartPlaylistDraft.InProgress) {
                 Playlist.IN_PROGRESS_UUID
             } else {
-                generateUniqueUuid(uuids)
-            }
-            val playlist = draft.toSmartPlaylist(uuid, sortPosition = 1)
-            playlistDao.upsertSmartPlaylist(playlist)
+                null
+            },
+        )
+    }
+
+    override suspend fun createManualPlaylist(name: String): String {
+        return createPlaylist(
+            entity = PlaylistEntity(title = name, manual = true),
+        )
+    }
+
+    private suspend fun createPlaylist(entity: PlaylistEntity, uuid: String? = null): String {
+        return appDatabase.withTransaction {
+            val uuids = playlistDao.getAllPlaylistUuids()
+            val finalUuid = uuid?.takeIf { it !in uuids } ?: generateUniqueUuid(uuids)
+            val finalEntity = entity.copy(uuid = finalUuid, sortPosition = 1)
+
+            playlistDao.upsertPlaylist(finalEntity)
             uuids.forEachIndexed { index, uuid ->
                 playlistDao.updateSortPosition(uuid, index + 2)
             }
-            uuid
+            finalUuid
         }
     }
 
@@ -180,28 +194,45 @@ class PlaylistManagerImpl @Inject constructor(
         }
     }
 
-    private fun List<DbPlaylist>.toPreviewFlows() = map { playlist ->
-        val podcastsFlow = playlistDao.observeSmartPlaylistPodcasts(
-            clock = clock,
-            smartRules = playlist.smartRules,
-            sortType = playlist.sortType,
-            limit = PLAYLIST_ARTWORK_EPISODE_LIMIT,
-        )
-        val episodeCountFlow = playlistDao.observeEpisodeMetadata(
-            clock = clock,
-            smartRules = playlist.smartRules,
-        )
-        combine(podcastsFlow, episodeCountFlow) { podcasts, metadata ->
+    private fun List<PlaylistEntity>.toPreviewFlows() = map { playlist ->
+        val type = if (playlist.manual) {
+            PlaylistPreview.Type.Manual
+        } else {
+            PlaylistPreview.Type.Smart
+        }
+        val (podcastsFlow, episodeMetadataFlow) = when (type) {
+            PlaylistPreview.Type.Manual -> {
+                val podcastsFlow = playlistDao.observeManualPlaylistPodcasts(playlist.uuid)
+                val episodeMetadataFlow = playlistDao.observeManualEpisodeMetadata(playlist.uuid)
+                podcastsFlow to episodeMetadataFlow
+            }
+            PlaylistPreview.Type.Smart -> {
+                val podcastsFlow = playlistDao.observeSmartPlaylistPodcasts(
+                    clock = clock,
+                    smartRules = playlist.smartRules,
+                    sortType = playlist.sortType,
+                    limit = PLAYLIST_ARTWORK_EPISODE_LIMIT,
+                )
+                val episodeMetadataFlow = playlistDao.observeSmartEpisodeMetadata(
+                    clock = clock,
+                    smartRules = playlist.smartRules,
+                )
+                podcastsFlow to episodeMetadataFlow
+            }
+        }
+
+        combine(podcastsFlow, episodeMetadataFlow) { podcasts, metadata ->
             PlaylistPreview(
                 uuid = playlist.uuid,
                 title = playlist.title,
-                podcasts = podcasts,
+                artworkPodcastUuids = podcasts,
                 episodeCount = metadata.episodeCount,
+                type = type,
             )
         }.distinctUntilChanged()
     }
 
-    private val DbPlaylist.smartRules
+    private val PlaylistEntity.smartRules
         get() = SmartRules(
             episodeStatus = SmartRules.EpisodeStatusRule(
                 unplayed = unplayed,
@@ -247,11 +278,8 @@ class PlaylistManagerImpl @Inject constructor(
             },
         )
 
-    private fun SmartPlaylistDraft.toSmartPlaylist(
-        uuid: String,
-        sortPosition: Int,
-    ) = DbPlaylist(
-        uuid = uuid,
+    private fun SmartPlaylistDraft.toPlaylistEntity() = PlaylistEntity(
+        uuid = "",
         title = title,
         // We use referential equality so only predefined playlists use preset icons
         iconId = if (this === SmartPlaylistDraft.NewReleases) {
@@ -261,7 +289,7 @@ class PlaylistManagerImpl @Inject constructor(
         } else {
             0
         },
-        sortPosition = sortPosition,
+        sortPosition = 1,
         manual = false,
         draft = false,
         deleted = false,
@@ -273,13 +301,12 @@ class PlaylistManagerImpl @Inject constructor(
         },
     ).applySmartRules(rules)
 
-    private fun DbPlaylist.applySmartRules(rules: SmartRules) = copy(
+    private fun PlaylistEntity.applySmartRules(rules: SmartRules) = copy(
         unplayed = rules.episodeStatus.unplayed,
         partiallyPlayed = rules.episodeStatus.inProgress,
         finished = rules.episodeStatus.completed,
         downloaded = rules.downloadStatus in listOf(DownloadStatusRule.Downloaded, DownloadStatusRule.Any),
         notDownloaded = rules.downloadStatus in listOf(DownloadStatusRule.NotDownloaded, DownloadStatusRule.Any),
-        downloading = rules.downloadStatus in listOf(DownloadStatusRule.NotDownloaded, DownloadStatusRule.Any),
         audioVideo = when (rules.mediaType) {
             MediaTypeRule.Any -> AUDIO_VIDEO_FILTER_ALL
             MediaTypeRule.Audio -> AUDIO_VIDEO_FILTER_AUDIO_ONLY
@@ -330,7 +357,7 @@ class PlaylistManagerImpl @Inject constructor(
 
     private companion object {
         const val PLAYLIST_ARTWORK_EPISODE_LIMIT = 4
-        const val SMART_PLAYLIST_EPISODE_LIMIT = 500
+        const val SMART_PLAYLIST_EPISODE_LIMIT = 1000
     }
 }
 

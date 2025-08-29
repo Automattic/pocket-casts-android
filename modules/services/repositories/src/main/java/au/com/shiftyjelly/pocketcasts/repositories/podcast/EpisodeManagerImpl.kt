@@ -94,7 +94,7 @@ class EpisodeManagerImpl @Inject constructor(
 
     override suspend fun findByUuid(uuid: String): PodcastEpisode? = episodeDao.findByUuid(uuid)
 
-    private suspend fun findByUuids(episodeUuids: List<String>): List<PodcastEpisode> = episodeDao.findByUuids(episodeUuids)
+    override suspend fun findByUuids(uuids: Collection<String>): List<PodcastEpisode> = episodeDao.findByUuids(uuids)
 
     @Deprecated("Use findByUuid suspended method instead")
     override fun findByUuidRxMaybe(uuid: String): Maybe<PodcastEpisode> = episodeDao.findByUuidRxMaybe(uuid)
@@ -602,6 +602,10 @@ class EpisodeManagerImpl @Inject constructor(
         episodeDao.update(episode)
     }
 
+    override suspend fun updateAll(episodes: Collection<PodcastEpisode>) {
+        episodeDao.updateAll(episodes)
+    }
+
     override fun setDownloadFailedBlocking(episode: BaseEpisode, errorMessage: String) {
         if (episode is PodcastEpisode) {
             episodeDao.updateDownloadErrorBlocking(episode.uuid, errorMessage, EpisodeStatusEnum.DOWNLOAD_FAILED)
@@ -776,7 +780,7 @@ class EpisodeManagerImpl @Inject constructor(
         episodeDao.deleteAll()
     }
 
-    override fun deleteEpisodes(episodes: List<PodcastEpisode>, playbackManager: PlaybackManager) {
+    override fun deleteEpisodesAsync(episodes: List<PodcastEpisode>, playbackManager: PlaybackManager) {
         val episodesCopy = episodes.toList()
         launch {
             deleteEpisodeFiles(episodesCopy, playbackManager)
@@ -873,6 +877,10 @@ class EpisodeManagerImpl @Inject constructor(
 
     override fun findEpisodesToSyncBlocking(): List<PodcastEpisode> {
         return episodeDao.findEpisodesToSyncBlocking()
+    }
+
+    override suspend fun findEpisodesToSync(): List<PodcastEpisode> {
+        return episodeDao.findEpisodesToSync()
     }
 
     override fun findEpisodesForHistorySyncBlocking(): List<PodcastEpisode> {

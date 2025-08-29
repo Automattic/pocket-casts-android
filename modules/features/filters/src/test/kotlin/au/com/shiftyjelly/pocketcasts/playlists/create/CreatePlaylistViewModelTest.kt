@@ -1,5 +1,6 @@
 package au.com.shiftyjelly.pocketcasts.playlists.create
 
+import androidx.compose.foundation.text.input.setTextAndSelectAll
 import androidx.compose.ui.text.TextRange
 import app.cash.turbine.test
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
@@ -11,13 +12,15 @@ import au.com.shiftyjelly.pocketcasts.models.type.SmartRules.MediaTypeRule
 import au.com.shiftyjelly.pocketcasts.models.type.SmartRules.PodcastsRule
 import au.com.shiftyjelly.pocketcasts.models.type.SmartRules.ReleaseDateRule
 import au.com.shiftyjelly.pocketcasts.models.type.SmartRules.StarredRule
-import au.com.shiftyjelly.pocketcasts.playlists.create.CreatePlaylistViewModel.UiState
-import au.com.shiftyjelly.pocketcasts.playlists.edit.SmartRulesEditor
-import au.com.shiftyjelly.pocketcasts.playlists.rules.AppliedRules
-import au.com.shiftyjelly.pocketcasts.playlists.rules.RuleType
-import au.com.shiftyjelly.pocketcasts.playlists.rules.RulesBuilder
+import au.com.shiftyjelly.pocketcasts.playlists.CreatePlaylistViewModel
+import au.com.shiftyjelly.pocketcasts.playlists.CreatePlaylistViewModel.UiState
+import au.com.shiftyjelly.pocketcasts.playlists.smart.rules.AppliedRules
+import au.com.shiftyjelly.pocketcasts.playlists.smart.rules.RuleType
+import au.com.shiftyjelly.pocketcasts.playlists.smart.rules.RulesBuilder
+import au.com.shiftyjelly.pocketcasts.playlists.smart.rules.SmartRulesEditor
 import au.com.shiftyjelly.pocketcasts.preferences.UserSetting
 import au.com.shiftyjelly.pocketcasts.preferences.model.ArtworkConfiguration
+import au.com.shiftyjelly.pocketcasts.repositories.playlist.PlaylistPreview
 import au.com.shiftyjelly.pocketcasts.repositories.playlist.SmartPlaylistDraft
 import au.com.shiftyjelly.pocketcasts.sharedtest.MainCoroutineRule
 import kotlin.time.Duration.Companion.minutes
@@ -372,7 +375,7 @@ class CreatePlaylistViewModelTest {
                 skipItems(1)
             }
 
-            assertFalse(viewModel.createdSmartPlaylistUuid.isCompleted)
+            assertFalse(viewModel.createdPlaylist.isCompleted)
 
             viewModel.createSmartPlaylist()
             assertEquals(
@@ -380,22 +383,49 @@ class CreatePlaylistViewModelTest {
                     title = "Playlist name",
                     rules = viewModel.uiState.value.appliedRules.toSmartRules()!!,
                 ),
-                playlistManager.upsertSmartPlaylistTurbine.awaitItem(),
+                playlistManager.createSmartPlaylistTurbine.awaitItem(),
             )
-            viewModel.createdSmartPlaylistUuid.await()
+            assertEquals(
+                PlaylistPreview.Type.Smart,
+                viewModel.createdPlaylist.await().type,
+            )
         }
     }
 
     @Test
-    fun `do not create more than a single smart playlist`() = runTest {
+    fun `crate manual playlist`() = runTest {
+        viewModel.playlistNameState.setTextAndSelectAll("My playlist")
+
+        viewModel.uiState.test {
+            skipItems(1)
+
+            assertFalse(viewModel.createdPlaylist.isCompleted)
+
+            viewModel.createManualPlaylist()
+
+            assertEquals(
+                "My playlist",
+                playlistManager.createManualPlaylistTurbine.awaitItem(),
+            )
+            assertEquals(
+                PlaylistPreview.Type.Manual,
+                viewModel.createdPlaylist.await().type,
+            )
+        }
+    }
+
+    @Test
+    fun `do not create more than a single playlist`() = runTest {
         viewModel.uiState.test {
             skipItems(1)
 
             viewModel.createSmartPlaylist()
-            playlistManager.upsertSmartPlaylistTurbine.skipItems(1)
+            playlistManager.createSmartPlaylistTurbine.skipItems(1)
 
             viewModel.createSmartPlaylist()
-            playlistManager.upsertSmartPlaylistTurbine.expectNoEvents()
+            viewModel.createManualPlaylist()
+            playlistManager.createSmartPlaylistTurbine.expectNoEvents()
+            playlistManager.createManualPlaylistTurbine.expectNoEvents()
         }
     }
 

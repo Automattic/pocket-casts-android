@@ -41,7 +41,6 @@ import au.com.shiftyjelly.pocketcasts.compose.images.CountBadge
 import au.com.shiftyjelly.pocketcasts.compose.images.CountBadgeStyle
 import au.com.shiftyjelly.pocketcasts.preferences.model.BadgeType
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
-import com.airbnb.android.showkase.annotation.ShowkaseComposable
 
 private val gradientTop = Color(0x00000000)
 private val gradientBottom = Color(0x33000000)
@@ -212,7 +211,6 @@ private fun FolderPodcastImage(
     }
 }
 
-@ShowkaseComposable(name = "FolderImage", group = "Folder", styleName = "Light", defaultStyle = true)
 @Preview(name = "Light")
 @Composable
 private fun FolderImageLightPreview() {
@@ -221,7 +219,6 @@ private fun FolderImageLightPreview() {
     }
 }
 
-@ShowkaseComposable(name = "FolderImage", group = "Folder", styleName = "Dark")
 @Preview(name = "Dark")
 @Composable
 private fun FolderImageDarkPreview() {

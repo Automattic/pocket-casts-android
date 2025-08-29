@@ -19,6 +19,7 @@ import androidx.work.ListenableWorker
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.deeplink.ShowEpisodeDeepLink
 import au.com.shiftyjelly.pocketcasts.localization.BuildConfig
+import au.com.shiftyjelly.pocketcasts.models.db.AppDatabase
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast.AutoAddUpNext
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
@@ -44,6 +45,7 @@ import au.com.shiftyjelly.pocketcasts.repositories.subscription.SubscriptionMana
 import au.com.shiftyjelly.pocketcasts.repositories.sync.NotificationBroadcastReceiver
 import au.com.shiftyjelly.pocketcasts.repositories.sync.PodcastSyncProcess
 import au.com.shiftyjelly.pocketcasts.repositories.sync.SyncManager
+import au.com.shiftyjelly.pocketcasts.repositories.sync.data.DataSyncProcess
 import au.com.shiftyjelly.pocketcasts.repositories.user.StatsManager
 import au.com.shiftyjelly.pocketcasts.repositories.user.UserManager
 import au.com.shiftyjelly.pocketcasts.servers.RefreshResponse
@@ -54,6 +56,8 @@ import au.com.shiftyjelly.pocketcasts.servers.sync.exception.RefreshTokenExpired
 import au.com.shiftyjelly.pocketcasts.utils.AppPlatform
 import au.com.shiftyjelly.pocketcasts.utils.Network
 import au.com.shiftyjelly.pocketcasts.utils.Util
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import coil.executeBlocking
 import coil.imageLoader
@@ -100,6 +104,7 @@ class RefreshPodcastsThread(
         fun ratingsManager(): RatingsManager
         fun crashLogging(): CrashLogging
         fun analyticsTracker(): AnalyticsTracker
+        fun appDatabase(): AppDatabase
     }
 
     @Volatile
@@ -248,41 +253,72 @@ class RefreshPodcastsThread(
         val userManager = entryPoint.userManager()
         val playbackManager = entryPoint.playbackManager()
 
-        val sync = PodcastSyncProcess(
-            context = context,
-            applicationScope = applicationScope,
-            settings = entryPoint.settings(),
-            episodeManager = entryPoint.episodeManager(),
-            podcastManager = entryPoint.podcastManager(),
-            smartPlaylistManager = entryPoint.smartPlaylistManager(),
-            bookmarkManager = entryPoint.bookmarkManager(),
-            statsManager = entryPoint.statsManager(),
-            fileStorage = entryPoint.fileStorage(),
-            playbackManager = playbackManager,
-            podcastCacheServiceManager = entryPoint.podcastCacheServiceManager(),
-            userEpisodeManager = entryPoint.userEpisodeManager(),
-            subscriptionManager = entryPoint.subscriptionManager(),
-            folderManager = entryPoint.folderManager(),
-            syncManager = entryPoint.syncManager(),
-            ratingsManager = entryPoint.ratingsManager(),
-            crashLogging = entryPoint.crashLogging(),
-            analyticsTracker = entryPoint.analyticsTracker(),
-        )
-        val startTime = SystemClock.elapsedRealtime()
-        val syncCompletable = sync.run()
-        LogBuffer.i(LogBuffer.TAG_BACKGROUND_TASKS, "Refresh - sync complete - ${String.format("%d ms", SystemClock.elapsedRealtime() - startTime)}")
-        val throwable = syncCompletable.blockingGet()
-        if (throwable != null) {
-            LogBuffer.e(LogBuffer.TAG_BACKGROUND_TASKS, throwable, "SyncProcess: Sync failed")
-
-            if (throwable is RefreshTokenExpiredException) {
-                LogBuffer.e(LogBuffer.TAG_BACKGROUND_TASKS, "Signing out user because server post failed to log in")
-                userManager.signOut(playbackManager, wasInitiatedByUser = false)
-            } else {
-                return RefreshState.Failed("Sync threw an error: ${throwable.message}")
+        if (FeatureFlag.isEnabled(Feature.PROTO_DATA_SYNC)) {
+            val process = DataSyncProcess(
+                syncManager = entryPoint.syncManager(),
+                podcastManager = entryPoint.podcastManager(),
+                episodeManager = entryPoint.episodeManager(),
+                userEpisodeManager = entryPoint.userEpisodeManager(),
+                folderManager = entryPoint.folderManager(),
+                playbackManager = entryPoint.playbackManager(),
+                statsManager = entryPoint.statsManager(),
+                subscriptionManager = entryPoint.subscriptionManager(),
+                ratingsManager = entryPoint.ratingsManager(),
+                appDatabase = entryPoint.appDatabase(),
+                settings = entryPoint.settings(),
+                fileStorage = entryPoint.fileStorage(),
+                context = context,
+            )
+            val result = runBlocking {
+                process.sync()
             }
+            return result
+                .onFailure { error ->
+                    if (error is RefreshTokenExpiredException) {
+                        userManager.signOut(playbackManager, wasInitiatedByUser = false)
+                    }
+                }
+                .map { RefreshState.Success(Date()) }
+                .getOrElse { error ->
+                    RefreshState.Failed("Sync threw an error: ${error.message}")
+                }
+        } else {
+            val sync = PodcastSyncProcess(
+                context = context,
+                applicationScope = applicationScope,
+                settings = entryPoint.settings(),
+                episodeManager = entryPoint.episodeManager(),
+                podcastManager = entryPoint.podcastManager(),
+                smartPlaylistManager = entryPoint.smartPlaylistManager(),
+                bookmarkManager = entryPoint.bookmarkManager(),
+                statsManager = entryPoint.statsManager(),
+                fileStorage = entryPoint.fileStorage(),
+                playbackManager = playbackManager,
+                podcastCacheServiceManager = entryPoint.podcastCacheServiceManager(),
+                userEpisodeManager = entryPoint.userEpisodeManager(),
+                subscriptionManager = entryPoint.subscriptionManager(),
+                folderManager = entryPoint.folderManager(),
+                syncManager = entryPoint.syncManager(),
+                ratingsManager = entryPoint.ratingsManager(),
+                crashLogging = entryPoint.crashLogging(),
+                analyticsTracker = entryPoint.analyticsTracker(),
+            )
+            val startTime = SystemClock.elapsedRealtime()
+            val syncCompletable = sync.run()
+            LogBuffer.i(LogBuffer.TAG_BACKGROUND_TASKS, "Refresh - sync complete - ${String.format("%d ms", SystemClock.elapsedRealtime() - startTime)}")
+            val throwable = syncCompletable.blockingGet()
+            if (throwable != null) {
+                LogBuffer.e(LogBuffer.TAG_BACKGROUND_TASKS, throwable, "SyncProcess: Sync failed")
+
+                if (throwable is RefreshTokenExpiredException) {
+                    LogBuffer.e(LogBuffer.TAG_BACKGROUND_TASKS, "Signing out user because server post failed to log in")
+                    userManager.signOut(playbackManager, wasInitiatedByUser = false)
+                } else {
+                    return RefreshState.Failed("Sync threw an error: ${throwable.message}")
+                }
+            }
+            return RefreshState.Success(Date(System.currentTimeMillis()))
         }
-        return RefreshState.Success(Date(System.currentTimeMillis()))
     }
 
     private fun refreshFailedOrCancelled(message: String) {

@@ -13,8 +13,8 @@ import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.analytics.EpisodeAnalytics
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.compose.PodcastColors
-import au.com.shiftyjelly.pocketcasts.compose.ad.BlazeAd
 import au.com.shiftyjelly.pocketcasts.models.entity.BaseEpisode
+import au.com.shiftyjelly.pocketcasts.models.entity.BlazeAd
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.UserEpisode
@@ -29,6 +29,7 @@ import au.com.shiftyjelly.pocketcasts.player.view.bookmark.BookmarkArguments
 import au.com.shiftyjelly.pocketcasts.player.view.dialog.ClearUpNextDialog
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.preferences.model.ArtworkConfiguration
+import au.com.shiftyjelly.pocketcasts.repositories.ads.BlazeAdsManager
 import au.com.shiftyjelly.pocketcasts.repositories.bookmark.BookmarkManager
 import au.com.shiftyjelly.pocketcasts.repositories.di.IoDispatcher
 import au.com.shiftyjelly.pocketcasts.repositories.download.DownloadHelper
@@ -43,8 +44,6 @@ import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.utils.Util
-import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
-import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import com.jakewharton.rxrelay2.BehaviorRelay
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -71,9 +70,6 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.flow.flatMapLatest
-import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.rx2.asObservable
@@ -94,6 +90,7 @@ class PlayerViewModel @Inject constructor(
     private val theme: Theme,
     private val analyticsTracker: AnalyticsTracker,
     private val episodeAnalytics: EpisodeAnalytics,
+    blazeAdsManager: BlazeAdsManager,
     @ApplicationContext private val context: Context,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
 ) : ViewModel(),
@@ -313,26 +310,9 @@ class PlayerViewModel @Inject constructor(
     val playerFlow = playbackManager.playerFlow
 
     @OptIn(ExperimentalCoroutinesApi::class)
-    val activeAd = combine(
-        settings.cachedSubscription.flow,
-        FeatureFlag.isEnabledFlow(Feature.BANNER_ADS),
-        ::Pair,
-    ).flatMapLatest { (subscription, isEnabled) ->
-        flow<BlazeAd?> {
-            val ad = if (isEnabled && subscription == null) {
-                BlazeAd(
-                    id = "ad-id",
-                    title = "wordpress.com",
-                    ctaText = "Democratize publishing and eCommerce one website at a time.",
-                    ctaUrl = "https://wordpress.com/",
-                    imageUrl = "https://s.w.org/style/images/about/WordPress-logotype-wmark-white.png",
-                )
-            } else {
-                null
-            }
-            emit(ad)
-        }
-    }.stateIn(viewModelScope, started = SharingStarted.Eagerly, initialValue = null)
+    val activeAd = blazeAdsManager
+        .findPlayerAd()
+        .stateIn(viewModelScope, started = SharingStarted.Eagerly, initialValue = null)
 
     fun setSleepEndOfChapters(chapters: Int = 1, shouldCallUpdateTimer: Boolean = true) {
         val newValue = chapters.coerceIn(1, 240)

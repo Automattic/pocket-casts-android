@@ -5,7 +5,6 @@ import android.os.Bundle
 import android.os.Parcelable
 import android.view.LayoutInflater
 import android.view.ViewGroup
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -26,10 +25,10 @@ import androidx.navigation.navArgument
 import au.com.shiftyjelly.pocketcasts.account.onboarding.OnboardingActivityContract
 import au.com.shiftyjelly.pocketcasts.account.onboarding.OnboardingActivityContract.OnboardingFinish
 import au.com.shiftyjelly.pocketcasts.compose.CallOnce
-import au.com.shiftyjelly.pocketcasts.compose.extensions.slideInToEnd
-import au.com.shiftyjelly.pocketcasts.compose.extensions.slideInToStart
-import au.com.shiftyjelly.pocketcasts.compose.extensions.slideOutToEnd
-import au.com.shiftyjelly.pocketcasts.compose.extensions.slideOutToStart
+import au.com.shiftyjelly.pocketcasts.compose.navigation.slideInToEnd
+import au.com.shiftyjelly.pocketcasts.compose.navigation.slideInToStart
+import au.com.shiftyjelly.pocketcasts.compose.navigation.slideOutToEnd
+import au.com.shiftyjelly.pocketcasts.compose.navigation.slideOutToStart
 import au.com.shiftyjelly.pocketcasts.podcasts.view.folders.SuggestedFoldersViewModel.UseFoldersState.Applied
 import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingFlow
 import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingLauncher

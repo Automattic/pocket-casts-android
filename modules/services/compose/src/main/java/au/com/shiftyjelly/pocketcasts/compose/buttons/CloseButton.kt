@@ -10,7 +10,6 @@ import androidx.compose.ui.tooling.preview.Preview
 import au.com.shiftyjelly.pocketcasts.compose.AppThemeWithBackground
 import au.com.shiftyjelly.pocketcasts.compose.bars.NavigationButton
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
-import com.airbnb.android.showkase.annotation.ShowkaseComposable
 
 @Composable
 fun CloseButton(
@@ -29,7 +28,6 @@ fun CloseButton(
     )
 }
 
-@ShowkaseComposable(name = "CloseButton", group = "Button", styleName = "Light")
 @Preview(name = "Light")
 @Composable
 private fun CloseButtonLightPreview() {
@@ -40,7 +38,6 @@ private fun CloseButtonLightPreview() {
     }
 }
 
-@ShowkaseComposable(name = "CloseButton", group = "Button", styleName = "Dark")
 @Preview(name = "Dark")
 @Composable
 private fun CloseButtonDarkPreview() {

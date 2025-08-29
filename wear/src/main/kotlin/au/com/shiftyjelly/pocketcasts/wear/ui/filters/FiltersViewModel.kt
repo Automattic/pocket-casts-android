@@ -2,7 +2,7 @@ package au.com.shiftyjelly.pocketcasts.wear.ui.filters
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import au.com.shiftyjelly.pocketcasts.models.entity.SmartPlaylist
+import au.com.shiftyjelly.pocketcasts.models.entity.PlaylistEntity
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.SmartPlaylistManager
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
@@ -17,7 +17,7 @@ class FiltersViewModel @Inject constructor(
 
     sealed class UiState {
         object Loading : UiState()
-        data class Loaded(val filters: List<SmartPlaylist>) : UiState()
+        data class Loaded(val filters: List<PlaylistEntity>) : UiState()
     }
 
     val uiState = smartPlaylistManager.findAllFlow()

@@ -27,6 +27,7 @@ import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.SmartPlaylistManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.UserEpisodeManager
+import au.com.shiftyjelly.pocketcasts.repositories.shortcuts.DynamicShortcutsSynchronizer
 import au.com.shiftyjelly.pocketcasts.repositories.support.DatabaseExportHelper
 import au.com.shiftyjelly.pocketcasts.repositories.sync.SyncManager
 import au.com.shiftyjelly.pocketcasts.repositories.user.StatsManager
@@ -125,6 +126,8 @@ class PocketCastsApplication :
     @Inject lateinit var endOfYearSync: EndOfYearSync
 
     @Inject lateinit var notificationManager: NotificationManager
+
+    @Inject lateinit var shortcutsSynchronizer: DynamicShortcutsSynchronizer
 
     override fun onCreate() {
         if (BuildConfig.DEBUG) {
@@ -248,9 +251,7 @@ class PocketCastsApplication :
                 }
 
                 VersionMigrationsWorker.performMigrations(
-                    podcastManager = podcastManager,
                     settings = settings,
-                    syncManager = syncManager,
                     context = this@PocketCastsApplication,
                 )
 
@@ -271,6 +272,7 @@ class PocketCastsApplication :
         userManager.beginMonitoringAccountManager(playbackManager)
         CuratedPodcastsSyncWorker.enqueuePeriodicWork(this)
         engageSdkBridge.registerIntegration()
+        shortcutsSynchronizer.keepShortcutsInSync()
 
         keepPlayerWidgetsUpdated()
 

@@ -1,20 +1,20 @@
 package au.com.shiftyjelly.pocketcasts.repositories.sync
 
 import android.content.Context
-import android.os.Build
 import android.os.SystemClock
 import androidx.annotation.VisibleForTesting
 import androidx.lifecycle.ProcessLifecycleOwner
+import androidx.lifecycle.asFlow
 import androidx.lifecycle.lifecycleScope
-import androidx.work.WorkManager
+import androidx.work.Operation
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.models.entity.Bookmark
 import au.com.shiftyjelly.pocketcasts.models.entity.ChapterIndices
 import au.com.shiftyjelly.pocketcasts.models.entity.Folder
+import au.com.shiftyjelly.pocketcasts.models.entity.PlaylistEntity
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
-import au.com.shiftyjelly.pocketcasts.models.entity.SmartPlaylist
 import au.com.shiftyjelly.pocketcasts.models.entity.UserPodcastRating
 import au.com.shiftyjelly.pocketcasts.models.to.StatsBundle
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodePlayingStatus
@@ -31,7 +31,6 @@ import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.SmartPlaylistManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.UserEpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.ratings.RatingsManager
-import au.com.shiftyjelly.pocketcasts.repositories.shortcuts.PocketCastsShortcuts
 import au.com.shiftyjelly.pocketcasts.repositories.subscription.SubscriptionManager
 import au.com.shiftyjelly.pocketcasts.repositories.user.StatsManager
 import au.com.shiftyjelly.pocketcasts.servers.extensions.toDate
@@ -60,7 +59,7 @@ import kotlin.coroutines.CoroutineContext
 import kotlin.math.roundToInt
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.firstOrNull
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.rx2.rxCompletable
@@ -109,15 +108,7 @@ class PodcastSyncProcess(
         val downloadObservable = if (lastSyncTime == Instant.EPOCH) {
             performFullSync().andThen(syncUpNext())
         } else {
-            if (settings.getHomeGridNeedsRefresh()) {
-                Timber.i("SyncProcess: Refreshing home grid")
-                performHomeGridRefresh()
-                    .andThen(syncUpNext())
-                    .andThen(performIncrementalSync(lastSyncTime))
-            } else {
-                syncUpNext()
-                    .andThen(performIncrementalSync(lastSyncTime))
-            }
+            syncUpNext().andThen(performIncrementalSync(lastSyncTime))
         }
         val syncUpNextObservable = downloadObservable
             .andThen(rxCompletable { syncSettings(lastSyncTime) })
@@ -178,23 +169,12 @@ class PodcastSyncProcess(
         val localPodcasts = podcastManager.findSubscribedRxSingle()
         val localFolderUuids = folderManager.findFoldersSingle().map { it.map { folder -> folder.uuid } }
         // get all the users podcast uuids from the server
-        val serverHomeFolder = rxSingle { syncManager.getHomeFolder() }
+        val serverHomeFolder = rxSingle { syncManager.getHomeFolderOrThrow() }
         return Singles.zip(serverHomeFolder, localPodcasts, localFolderUuids)
             .flatMapCompletable { (serverHomeFolder, localPodcasts, localFolderUuids) ->
                 importPodcastsFullSync(serverPodcasts = serverHomeFolder.podcastsList, localPodcasts = localPodcasts)
                     .andThen(importFoldersFullSync(serverFolders = serverHomeFolder.foldersList, localFolderUuids = localFolderUuids))
             }
-    }
-
-    private fun performHomeGridRefresh(): Completable {
-        return downloadAndImportHomeFolder()
-            .andThen(markAllPodcastsUnsynced())
-    }
-
-    private fun markAllPodcastsUnsynced(): Completable {
-        return rxCompletable {
-            podcastManager.markAllPodcastsUnsynced()
-        }
     }
 
     private fun importPodcastsFullSync(serverPodcasts: List<UserPodcastResponse>, localPodcasts: List<Podcast>): Completable {
@@ -310,13 +290,19 @@ class PodcastSyncProcess(
 
     private fun syncUpNext() = Completable.create { emitter ->
         val startTime = SystemClock.elapsedRealtime()
-        val workRequestId = UpNextSyncWorker.enqueue(syncManager, context)
-        if (workRequestId == null) {
+        val operation = UpNextSyncWorker.enqueue(syncManager, context)
+        if (operation == null) {
             logTime("Refresh - sync up next, work request id is null", startTime)
             emitter.onComplete()
         } else {
             ProcessLifecycleOwner.get().lifecycleScope.launch {
-                WorkManager.getInstance(context).getWorkInfoByIdFlow(workRequestId).firstOrNull { it?.state?.isFinished ?: true }
+                operation.state.asFlow().first { state ->
+                    when (state) {
+                        is Operation.State.SUCCESS -> true
+                        is Operation.State.FAILURE -> true
+                        else -> false
+                    }
+                }
                 logTime("Refresh - sync up next", startTime)
                 emitter.onComplete()
             }
@@ -422,7 +408,6 @@ class PodcastSyncProcess(
                     fields.put("audio_video", playlist.audioVideo)
                     fields.put("not_downloaded", if (playlist.notDownloaded) "1" else "0")
                     fields.put("downloaded", if (playlist.downloaded) "1" else "0")
-                    fields.put("downloading", if (playlist.downloading) "1" else "0")
                     fields.put("finished", if (playlist.finished) "1" else "0")
                     fields.put("partially_played", if (playlist.partiallyPlayed) "1" else "0")
                     fields.put("unplayed", if (playlist.unplayed) "1" else "0")
@@ -629,11 +614,10 @@ class PodcastSyncProcess(
         return rxCompletable { markAllLocalItemsSynced(episodes) }
             .andThen(importEpisodes(response.episodes))
             .andThen(importPodcasts(response.podcasts))
-            .andThen(rxCompletable { importFilters(response.smartPlaylists) })
+            .andThen(rxCompletable { importFilters(response.playlists) })
             .andThen(importFolders(response.folders))
             .andThen(rxCompletable { importBookmarks(response.bookmarks) })
             .andThen(updateSettings(response))
-            .andThen(rxCompletable { updateShortcuts(response.smartPlaylists) })
             .andThen(rxCompletable { cacheStats() })
             .toSingle { response.lastModified }
     }
@@ -664,18 +648,6 @@ class PodcastSyncProcess(
         }
     }
 
-    private suspend fun updateShortcuts(smartPlaylists: List<SmartPlaylist>) {
-        // if any playlists have changed update the launcher shortcuts
-        if (smartPlaylists.isNotEmpty() && Build.VERSION.SDK_INT >= Build.VERSION_CODES.N_MR1) {
-            PocketCastsShortcuts.update(
-                smartPlaylistManager = smartPlaylistManager,
-                force = true,
-                context = context,
-                source = PocketCastsShortcuts.Source.UPDATE_SHORTCUTS,
-            )
-        }
-    }
-
     private fun importPodcasts(podcasts: List<SyncUpdateResponse.PodcastSync>): Completable {
         return Observable.fromIterable(podcasts)
             .flatMap(
@@ -695,8 +667,8 @@ class PodcastSyncProcess(
             .ignoreElements()
     }
 
-    private suspend fun importFilters(smartPlaylists: List<SmartPlaylist>) {
-        for (playlist in smartPlaylists) {
+    private suspend fun importFilters(playlists: List<PlaylistEntity>) {
+        for (playlist in playlists) {
             importPlaylist(playlist)
         }
     }
@@ -722,7 +694,7 @@ class PodcastSyncProcess(
         }
     }
 
-    private suspend fun importPlaylist(sync: SmartPlaylist): SmartPlaylist? {
+    private suspend fun importPlaylist(sync: PlaylistEntity): PlaylistEntity? {
         val uuid = sync.uuid
         if (uuid.isBlank()) {
             return null
@@ -739,7 +711,7 @@ class PodcastSyncProcess(
         }
 
         if (playlist == null) {
-            playlist = SmartPlaylist(uuid = sync.uuid)
+            playlist = PlaylistEntity(uuid = sync.uuid)
         }
 
         with(playlist) {
@@ -747,7 +719,6 @@ class PodcastSyncProcess(
             audioVideo = sync.audioVideo
             notDownloaded = sync.notDownloaded
             downloaded = sync.downloaded
-            downloading = sync.downloading
             finished = sync.finished
             partiallyPlayed = sync.partiallyPlayed
             unplayed = sync.unplayed
@@ -759,7 +730,7 @@ class PodcastSyncProcess(
             allPodcasts = sync.allPodcasts
             podcastUuids = sync.podcastUuids
             filterHours = sync.filterHours
-            syncStatus = SmartPlaylist.SYNC_STATUS_SYNCED
+            syncStatus = PlaylistEntity.SYNC_STATUS_SYNCED
             filterDuration = sync.filterDuration
             longerThan = sync.longerThan
             shorterThan = sync.shorterThan

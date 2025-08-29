@@ -66,6 +66,8 @@ enum class AnalyticsEvent(val key: String) {
     /* Sign in */
     SIGNIN_SHOWN("signin_shown"),
     SIGNIN_DISMISSED("signin_dismissed"),
+    SIGNIN_BUTTON_TAPPED("signin_button_tapped"),
+    SIGNIN_FORGOT_PASSWORD_TAPPED("signin_forgot_password_tapped"),
 
     /* Create Account */
     CREATE_ACCOUNT_SHOWN("create_account_shown"),
@@ -458,6 +460,13 @@ enum class AnalyticsEvent(val key: String) {
     RECOMMENDATIONS_IMPORT_TAPPED("recommendations_import_tapped"),
     RECOMMENDATIONS_MORE_TAPPED("recommendations_more_tapped"),
     RECOMMENDATIONS_CONTINUE_TAPPED("recommendations_continue_tapped"),
+
+    /* Interests */
+    INTERESTS_SHOWN("onboarding_interests_shown"),
+    INTERESTS_NOT_NOW_TAPPED("onboarding_interests_not_now_tapped"),
+    INTERESTS_CATEGORY_SELECTED("onboarding_interests_category_selected"),
+    INTERESTS_SHOW_MORE_TAPPED("onboarding_interests_show_more_tapped"),
+    INTERESTS_CONTINUE_TAPPED("onboarding_interests_continue_tapped"),
 
     /* Podcast List Share */
     SHARE_PODCASTS_SHOWN("share_podcasts_shown"),

@@ -6,7 +6,7 @@ import androidx.lifecycle.toLiveData
 import androidx.lifecycle.viewModelScope
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
-import au.com.shiftyjelly.pocketcasts.models.entity.SmartPlaylist
+import au.com.shiftyjelly.pocketcasts.models.entity.PlaylistEntity
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.repositories.playlist.Playlist
@@ -51,14 +51,14 @@ class FiltersFragmentViewModel @Inject constructor(
     override val coroutineContext: CoroutineContext
         get() = Dispatchers.Default
 
-    val filters: LiveData<List<SmartPlaylist>> = smartPlaylistManager.findAllRxFlowable().toLiveData()
+    val filters: LiveData<List<PlaylistEntity>> = smartPlaylistManager.findAllRxFlowable().toLiveData()
 
-    val countGenerator = { smartPlaylist: SmartPlaylist ->
-        smartPlaylistManager.countEpisodesRxFlowable(smartPlaylist, episodeManager, playbackManager).onErrorReturn { 0 }
+    val countGenerator = { playlist: PlaylistEntity ->
+        smartPlaylistManager.countEpisodesRxFlowable(playlist, episodeManager, playbackManager).onErrorReturn { 0 }
     }
 
-    var adapterState: MutableList<SmartPlaylist> = mutableListOf()
-    fun movePlaylist(fromPosition: Int, toPosition: Int): List<SmartPlaylist> {
+    var adapterState: MutableList<PlaylistEntity> = mutableListOf()
+    fun movePlaylist(fromPosition: Int, toPosition: Int): List<PlaylistEntity> {
         if (fromPosition < toPosition) {
             for (index in fromPosition until toPosition) {
                 Collections.swap(adapterState, index, index + 1)
@@ -76,7 +76,7 @@ class FiltersFragmentViewModel @Inject constructor(
 
         playlists.forEachIndexed { index, playlist ->
             playlist.sortPosition = index
-            playlist.syncStatus = SmartPlaylist.SYNC_STATUS_NOT_SYNCED
+            playlist.syncStatus = PlaylistEntity.SYNC_STATUS_NOT_SYNCED
         }
 
         runBlocking(Dispatchers.Default) {
@@ -96,7 +96,7 @@ class FiltersFragmentViewModel @Inject constructor(
         analyticsTracker.track(AnalyticsEvent.FILTER_LIST_SHOWN, properties)
     }
 
-    fun findPlaylistByUuid(playlistUuid: String, onSuccess: (SmartPlaylist) -> Unit) {
+    fun findPlaylistByUuid(playlistUuid: String, onSuccess: (PlaylistEntity) -> Unit) {
         viewModelScope.launch {
             val playlist = smartPlaylistManager.findByUuid(playlistUuid) ?: return@launch
             onSuccess(playlist)
@@ -111,13 +111,13 @@ class FiltersFragmentViewModel @Inject constructor(
         analyticsTracker.track(AnalyticsEvent.FILTER_TOOLTIP_SHOWN)
     }
 
-    fun shouldShowTooltip(filters: List<SmartPlaylist>, onShowTooltip: () -> Unit) {
+    fun shouldShowTooltip(filters: List<PlaylistEntity>, onShowTooltip: () -> Unit) {
         viewModelScope.launch {
             shouldShowTooltipSuspend(filters, onShowTooltip)
         }
     }
 
-    suspend fun shouldShowTooltipSuspend(filters: List<SmartPlaylist>, onShowTooltip: () -> Unit) {
+    suspend fun shouldShowTooltipSuspend(filters: List<PlaylistEntity>, onShowTooltip: () -> Unit) {
         if (!settings.showEmptyFiltersListTooltip.value) return
         if (filters.size > 2) return
 

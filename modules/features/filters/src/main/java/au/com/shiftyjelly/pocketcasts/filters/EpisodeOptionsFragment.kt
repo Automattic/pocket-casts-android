@@ -8,7 +8,7 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import au.com.shiftyjelly.pocketcasts.filters.databinding.FilterOptionsFragmentBinding
-import au.com.shiftyjelly.pocketcasts.models.entity.SmartPlaylist
+import au.com.shiftyjelly.pocketcasts.models.entity.PlaylistEntity
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PlaylistProperty
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PlaylistUpdateSource
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.SmartPlaylistManager
@@ -33,9 +33,9 @@ class EpisodeOptionsFragment :
     BaseFragment(),
     CoroutineScope {
     companion object {
-        fun newInstance(smartPlaylist: SmartPlaylist): EpisodeOptionsFragment {
+        fun newInstance(playlist: PlaylistEntity): EpisodeOptionsFragment {
             val bundle = Bundle()
-            bundle.putString(ARG_PLAYLIST_UUID, smartPlaylist.uuid)
+            bundle.putString(ARG_PLAYLIST_UUID, playlist.uuid)
             val fragment = EpisodeOptionsFragment()
             fragment.arguments = bundle
             return fragment
@@ -47,7 +47,7 @@ class EpisodeOptionsFragment :
 
     @Inject lateinit var smartPlaylistManager: SmartPlaylistManager
 
-    var smartPlaylist: SmartPlaylist? = null
+    var playlist: PlaylistEntity? = null
     private var binding: FilterOptionsFragmentBinding? = null
     private var userChanged = false
 
@@ -76,7 +76,7 @@ class EpisodeOptionsFragment :
             val uuid = requireArguments().getString(ARG_PLAYLIST_UUID)!!
             Timber.d("Loading playlist $uuid")
             val playlist = smartPlaylistManager.findByUuid(uuid) ?: return@launch
-            this@EpisodeOptionsFragment.smartPlaylist = playlist
+            this@EpisodeOptionsFragment.playlist = playlist
 
             val unplayedOption = FilterOption(LR.string.unplayed, playlist.unplayed, { v, _ ->
                 playlist.unplayed = v
@@ -106,9 +106,9 @@ class EpisodeOptionsFragment :
         }
 
         btnSave.setOnClickListener {
-            smartPlaylist?.let { playlist ->
+            playlist?.let { playlist ->
                 launch(Dispatchers.Default) {
-                    playlist.syncStatus = SmartPlaylist.SYNC_STATUS_NOT_SYNCED
+                    playlist.syncStatus = PlaylistEntity.SYNC_STATUS_NOT_SYNCED
 
                     val userPlaylistUpdate = if (userChanged) {
                         UserPlaylistUpdate(

@@ -52,34 +52,16 @@ class VersionMigrationsWorker @AssistedInject constructor(
 
     companion object {
         private const val VERSION_MIGRATIONS_WORKER_NAME = "version_migrations_worker"
-        fun performMigrations(podcastManager: PodcastManager, settings: Settings, syncManager: SyncManager, context: Context) {
-            performMigrationsSync(podcastManager, settings, syncManager)
+        fun performMigrations(settings: Settings, context: Context) {
+            performMigrationsSync(settings)
             enqueueAsyncMigrations(settings, context)
         }
 
         /**
          * Perform short migrations straight away.
          */
-        private fun performMigrationsSync(podcastManager: PodcastManager, settings: Settings, syncManager: SyncManager) {
-            performUpdateIfRequired(updateKey = "run_v7_20", settings = settings) {
-                // Upgrading to version 7.20.0 requires the folders from the servers to be added to the existing podcasts. In case the user doesn't have internet this is done as part of the regular sync process.
-                if (syncManager.isLoggedIn()) {
-                    podcastManager.reloadFoldersFromServer()
-                }
-            }
+        private fun performMigrationsSync(settings: Settings) {
             migrateSubsriptionStatusToSubscription(settings)
-        }
-
-        private fun performUpdateIfRequired(updateKey: String, settings: Settings, update: () -> Unit) {
-            if (settings.getBooleanForKey(key = updateKey, defaultValue = false)) {
-                // already performed this update
-                return
-            }
-
-            update()
-            Timber.i("Successfully completed update $updateKey")
-
-            settings.setBooleanForKey(key = updateKey, value = true)
         }
 
         private fun migrateSubsriptionStatusToSubscription(settings: Settings) {

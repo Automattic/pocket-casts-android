@@ -9,7 +9,7 @@ import androidx.annotation.StringRes
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import au.com.shiftyjelly.pocketcasts.filters.databinding.FilterOptionsFragmentBinding
-import au.com.shiftyjelly.pocketcasts.models.entity.SmartPlaylist
+import au.com.shiftyjelly.pocketcasts.models.entity.PlaylistEntity
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PlaylistProperty
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PlaylistUpdateSource
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.SmartPlaylistManager
@@ -40,9 +40,9 @@ class TimeOptionsFragment :
     }
 
     companion object {
-        fun newInstance(smartPlaylist: SmartPlaylist, options: OptionsType): TimeOptionsFragment {
+        fun newInstance(playlist: PlaylistEntity, options: OptionsType): TimeOptionsFragment {
             val bundle = Bundle()
-            bundle.putString(ARG_PLAYLIST_UUID, smartPlaylist.uuid)
+            bundle.putString(ARG_PLAYLIST_UUID, playlist.uuid)
             bundle.putString(ARG_OPTIONS_TYPE, options.type)
             val fragment = TimeOptionsFragment()
             fragment.arguments = bundle
@@ -70,7 +70,7 @@ class TimeOptionsFragment :
     private lateinit var options: List<FilterOption>
     private var binding: FilterOptionsFragmentBinding? = null
 
-    var smartPlaylist: SmartPlaylist? = null
+    var playlist: PlaylistEntity? = null
     var adapter: FilterOptionsAdapter? = null
     var selectedPosition: Int = 0
 
@@ -95,19 +95,19 @@ class TimeOptionsFragment :
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        val anytime = filterOptionForTitle(LR.string.filters_time_anytime, SmartPlaylist.ANYTIME)
-        val last24Hours = filterOptionForTitle(LR.string.filters_time_24_hours, SmartPlaylist.LAST_24_HOURS)
-        val last3Days = filterOptionForTitle(LR.string.filters_time_3_days, SmartPlaylist.LAST_3_DAYS)
-        val lastWeek = filterOptionForTitle(LR.string.filters_time_week, SmartPlaylist.LAST_WEEK)
-        val last2Weeks = filterOptionForTitle(LR.string.filters_time_2_weeks, SmartPlaylist.LAST_2_WEEKS)
-        val lastMonth = filterOptionForTitle(LR.string.filters_time_month, SmartPlaylist.LAST_MONTH)
+        val anytime = filterOptionForTitle(LR.string.filters_time_anytime, PlaylistEntity.ANYTIME)
+        val last24Hours = filterOptionForTitle(LR.string.filters_time_24_hours, PlaylistEntity.LAST_24_HOURS)
+        val last3Days = filterOptionForTitle(LR.string.filters_time_3_days, PlaylistEntity.LAST_3_DAYS)
+        val lastWeek = filterOptionForTitle(LR.string.filters_time_week, PlaylistEntity.LAST_WEEK)
+        val last2Weeks = filterOptionForTitle(LR.string.filters_time_2_weeks, PlaylistEntity.LAST_2_WEEKS)
+        val lastMonth = filterOptionForTitle(LR.string.filters_time_month, PlaylistEntity.LAST_MONTH)
 
         val downloadAll = FilterOption(
             LR.string.all,
             false,
             { v, position ->
-                smartPlaylist?.downloaded = true
-                smartPlaylist?.notDownloaded = true
+                playlist?.downloaded = true
+                playlist?.notDownloaded = true
                 onCheckedChanged(v, position)
             },
         )
@@ -116,8 +116,8 @@ class TimeOptionsFragment :
             LR.string.downloaded,
             false,
             { v, position ->
-                smartPlaylist?.downloaded = true
-                smartPlaylist?.notDownloaded = false
+                playlist?.downloaded = true
+                playlist?.notDownloaded = false
                 onCheckedChanged(v, position)
             },
         )
@@ -125,8 +125,8 @@ class TimeOptionsFragment :
             LR.string.not_downloaded,
             false,
             { v, position ->
-                smartPlaylist?.downloaded = false
-                smartPlaylist?.notDownloaded = true
+                playlist?.downloaded = false
+                playlist?.notDownloaded = true
                 onCheckedChanged(v, position)
             },
         )
@@ -136,7 +136,7 @@ class TimeOptionsFragment :
             false,
             { v, position ->
                 if (v) {
-                    smartPlaylist?.audioVideo = SmartPlaylist.AUDIO_VIDEO_FILTER_ALL
+                    playlist?.audioVideo = PlaylistEntity.AUDIO_VIDEO_FILTER_ALL
                     onCheckedChanged(v, position)
                 }
             },
@@ -146,7 +146,7 @@ class TimeOptionsFragment :
             false,
             { v, position ->
                 if (v) {
-                    smartPlaylist?.audioVideo = SmartPlaylist.AUDIO_VIDEO_FILTER_AUDIO_ONLY
+                    playlist?.audioVideo = PlaylistEntity.AUDIO_VIDEO_FILTER_AUDIO_ONLY
                     onCheckedChanged(v, position)
                 }
             },
@@ -156,7 +156,7 @@ class TimeOptionsFragment :
             false,
             { v, position ->
                 if (v) {
-                    smartPlaylist?.audioVideo = SmartPlaylist.AUDIO_VIDEO_FILTER_VIDEO_ONLY
+                    playlist?.audioVideo = PlaylistEntity.AUDIO_VIDEO_FILTER_VIDEO_ONLY
                     onCheckedChanged(v, position)
                 }
             },
@@ -183,7 +183,7 @@ class TimeOptionsFragment :
 
         launch {
             val playlist = smartPlaylistManager.findByUuid(requireArguments().getString(ARG_PLAYLIST_UUID)!!) ?: return@launch
-            this@TimeOptionsFragment.smartPlaylist = playlist
+            this@TimeOptionsFragment.playlist = playlist
 
             selectedPosition = when (optionType) {
                 OptionsType.Time -> options.indexOfFirst { it.playlistValue!! >= playlist.filterHours }
@@ -194,9 +194,9 @@ class TimeOptionsFragment :
                 } else {
                     2
                 }
-                OptionsType.AudioVideo -> if (playlist.audioVideo == SmartPlaylist.AUDIO_VIDEO_FILTER_ALL) {
+                OptionsType.AudioVideo -> if (playlist.audioVideo == PlaylistEntity.AUDIO_VIDEO_FILTER_ALL) {
                     0
-                } else if (playlist.audioVideo == SmartPlaylist.AUDIO_VIDEO_FILTER_AUDIO_ONLY) {
+                } else if (playlist.audioVideo == PlaylistEntity.AUDIO_VIDEO_FILTER_AUDIO_ONLY) {
                     1
                 } else {
                     2
@@ -219,7 +219,7 @@ class TimeOptionsFragment :
         }
 
         btnSave.setOnClickListener {
-            smartPlaylist?.let { playlist ->
+            playlist?.let { playlist ->
                 when (optionType) {
                     OptionsType.Time -> {
                         playlist.filterHours = options[selectedPosition].playlistValue ?: 0
@@ -243,14 +243,14 @@ class TimeOptionsFragment :
                     }
 
                     OptionsType.AudioVideo -> when (selectedPosition) {
-                        0 -> playlist.audioVideo = SmartPlaylist.AUDIO_VIDEO_FILTER_ALL
-                        1 -> playlist.audioVideo = SmartPlaylist.AUDIO_VIDEO_FILTER_AUDIO_ONLY
-                        2 -> playlist.audioVideo = SmartPlaylist.AUDIO_VIDEO_FILTER_VIDEO_ONLY
+                        0 -> playlist.audioVideo = PlaylistEntity.AUDIO_VIDEO_FILTER_ALL
+                        1 -> playlist.audioVideo = PlaylistEntity.AUDIO_VIDEO_FILTER_AUDIO_ONLY
+                        2 -> playlist.audioVideo = PlaylistEntity.AUDIO_VIDEO_FILTER_VIDEO_ONLY
                     }
                 }
 
                 launch(Dispatchers.Default) {
-                    playlist.syncStatus = SmartPlaylist.SYNC_STATUS_NOT_SYNCED
+                    playlist.syncStatus = PlaylistEntity.SYNC_STATUS_NOT_SYNCED
 
                     val playlistProperty = when (optionType) {
                         OptionsType.AudioVideo -> PlaylistProperty.MediaType

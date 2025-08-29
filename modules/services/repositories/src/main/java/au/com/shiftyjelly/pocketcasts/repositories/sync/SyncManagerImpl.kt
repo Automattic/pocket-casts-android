@@ -6,7 +6,7 @@ import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.analytics.TracksAnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.models.entity.Bookmark
-import au.com.shiftyjelly.pocketcasts.models.entity.SmartPlaylist
+import au.com.shiftyjelly.pocketcasts.models.entity.PlaylistEntity
 import au.com.shiftyjelly.pocketcasts.models.entity.UserEpisode
 import au.com.shiftyjelly.pocketcasts.models.to.HistorySyncRequest
 import au.com.shiftyjelly.pocketcasts.models.to.HistorySyncResponse
@@ -38,6 +38,7 @@ import au.com.shiftyjelly.pocketcasts.servers.sync.SyncServiceManager
 import au.com.shiftyjelly.pocketcasts.servers.sync.UpNextSyncRequest
 import au.com.shiftyjelly.pocketcasts.servers.sync.UpNextSyncResponse
 import au.com.shiftyjelly.pocketcasts.servers.sync.UserChangeResponse
+import au.com.shiftyjelly.pocketcasts.servers.sync.bookmark.toBookmark
 import au.com.shiftyjelly.pocketcasts.servers.sync.exception.RefreshTokenExpiredException
 import au.com.shiftyjelly.pocketcasts.servers.sync.history.HistoryYearResponse
 import au.com.shiftyjelly.pocketcasts.servers.sync.login.ExchangeSonosResponse
@@ -47,11 +48,13 @@ import au.com.shiftyjelly.pocketcasts.servers.sync.update.SyncUpdateResponse
 import au.com.shiftyjelly.pocketcasts.utils.Optional
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import com.jakewharton.rxrelay2.BehaviorRelay
+import com.pocketcasts.service.api.BookmarksResponse
 import com.pocketcasts.service.api.PodcastRatingResponse
 import com.pocketcasts.service.api.PodcastRatingsResponse
 import com.pocketcasts.service.api.ReferralCodeResponse
 import com.pocketcasts.service.api.ReferralRedemptionResponse
 import com.pocketcasts.service.api.ReferralValidationResponse
+import com.pocketcasts.service.api.UserPlaylistListResponse
 import com.pocketcasts.service.api.UserPodcastListResponse
 import com.pocketcasts.service.api.WinbackResponse
 import com.squareup.moshi.Moshi
@@ -71,6 +74,8 @@ import retrofit2.HttpException
 import retrofit2.Response
 import timber.log.Timber
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
+import com.pocketcasts.service.api.SyncUpdateRequest as SyncUpdateProtoRequest
+import com.pocketcasts.service.api.SyncUpdateResponse as SyncUpdateProtoResponse
 
 @Singleton
 class SyncManagerImpl @Inject constructor(
@@ -346,12 +351,28 @@ class SyncManagerImpl @Inject constructor(
         }
     } ?: throw Exception("Not logged in")
 
-    override fun getLastSyncAtRxSingle(): Single<String> = getCacheTokenOrLoginRxSingle { token ->
-        syncServiceManager.getLastSyncAt(token)
+    override suspend fun syncUpdateOrThrow(request: SyncUpdateProtoRequest): SyncUpdateProtoResponse = getCacheTokenOrLogin { token ->
+        syncServiceManager.syncUpdateOrThrow(token, request)
     }
 
-    override suspend fun getHomeFolder(): UserPodcastListResponse = getCacheTokenOrLogin { token ->
+    override fun getLastSyncAtRxSingle(): Single<String> = getCacheTokenOrLoginRxSingle { token ->
+        syncServiceManager.getLastSyncAtRx(token)
+    }
+
+    override suspend fun getLastSyncAtOrThrow(): String = getCacheTokenOrLogin { token ->
+        syncServiceManager.getLastSyncAtOrThrow(token)
+    }
+
+    override suspend fun getHomeFolderOrThrow(): UserPodcastListResponse = getCacheTokenOrLogin { token ->
         syncServiceManager.getHomeFolder(token)
+    }
+
+    override suspend fun getPlaylistsOrThrow(): UserPlaylistListResponse = getCacheTokenOrLogin { token ->
+        syncServiceManager.getPlaylists(token)
+    }
+
+    override suspend fun getBookmarksOrThrow(): BookmarksResponse = getCacheTokenOrLogin { token ->
+        syncServiceManager.getBookmarks(token)
     }
 
     override fun getPodcastEpisodesRxSingle(podcastUuid: String): Single<PodcastEpisodesResponse> = getCacheTokenOrLoginRxSingle { token ->
@@ -382,13 +403,13 @@ class SyncManagerImpl @Inject constructor(
         syncServiceManager.exchangeSonos(token)
     }
 
-    override suspend fun getFilters(): List<SmartPlaylist> = getCacheTokenOrLogin { token ->
+    override suspend fun getFilters(): List<PlaylistEntity> = getCacheTokenOrLogin { token ->
         syncServiceManager.getFilters(token)
     }
 
     override suspend fun getBookmarks(): List<Bookmark> {
         return getCacheTokenOrLogin { token ->
-            syncServiceManager.getBookmarks(token)
+            syncServiceManager.getBookmarks(token).bookmarksList.map { it.toBookmark() }
         }
     }
 
@@ -487,6 +508,7 @@ class SyncManagerImpl @Inject constructor(
                     }
                 }
             }
+
             is LoginResult.Failed -> {
                 val errorCodeValue = loginResult.messageId ?: TracksAnalyticsTracker.INVALID_OR_NULL_VALUE
                 when (signInSource) {
@@ -521,6 +543,7 @@ class SyncManagerImpl @Inject constructor(
                 )
                 notificationManager.updateUserFeatureInteraction(OnboardingNotificationType.Sync)
             }
+
             is LoginResult.Failed -> {
                 val errorCodeValue = loginResult.messageId ?: TracksAnalyticsTracker.INVALID_OR_NULL_VALUE
                 analyticsTracker.track(

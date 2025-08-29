@@ -19,7 +19,6 @@ android {
 dependencies {
     ksp(libs.dagger.hilt.compiler)
     ksp(libs.hilt.compiler)
-    ksp(libs.showkase.processor)
 
     api(libs.androidx.appcompat)
     api(libs.androidx.cardview)
@@ -34,7 +33,6 @@ dependencies {
     api(libs.media3.ui)
     api(libs.okhttp)
     api(libs.rx2.java)
-    api(libs.showkase)
 
     api(projects.modules.features.settings)
     api(projects.modules.features.transcripts)

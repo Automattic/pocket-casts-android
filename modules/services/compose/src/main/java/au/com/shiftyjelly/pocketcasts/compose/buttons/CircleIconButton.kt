@@ -15,7 +15,6 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import au.com.shiftyjelly.pocketcasts.compose.AppTheme
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
-import com.airbnb.android.showkase.annotation.ShowkaseComposable
 
 @Composable
 fun CircleIconButton(
@@ -68,7 +67,6 @@ fun CircleIconButton(
     }
 }
 
-@ShowkaseComposable(name = "CircleIconButton", group = "Button", styleName = "Light", defaultStyle = true)
 @Preview(name = "Light")
 @Composable
 private fun CircleIconButtonLightPreview() {
@@ -77,7 +75,6 @@ private fun CircleIconButtonLightPreview() {
     }
 }
 
-@ShowkaseComposable(name = "CircleIconButton", group = "Button", styleName = "Dark")
 @Preview(name = "Dark")
 @Composable
 private fun CircleIconButtonDarkPreview() {

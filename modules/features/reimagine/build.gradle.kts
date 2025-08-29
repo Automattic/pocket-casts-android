@@ -20,10 +20,8 @@ dependencies {
     ksp(libs.dagger.hilt.compiler)
     ksp(libs.hilt.compiler)
     ksp(libs.moshi.kotlin.codegen)
-    ksp(libs.showkase.processor)
 
     api(libs.dagger.hilt.android)
-    api(libs.showkase)
 
     api(projects.modules.services.analytics)
     api(projects.modules.services.model)

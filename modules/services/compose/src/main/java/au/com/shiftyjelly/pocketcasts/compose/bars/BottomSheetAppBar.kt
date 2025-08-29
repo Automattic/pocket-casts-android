@@ -12,7 +12,6 @@ import androidx.compose.ui.tooling.preview.Preview
 import au.com.shiftyjelly.pocketcasts.compose.AppThemeWithBackground
 import au.com.shiftyjelly.pocketcasts.compose.theme
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
-import com.airbnb.android.showkase.annotation.ShowkaseComposable
 
 /**
  * A styled App Bar that works in a Bottom Sheet component. It keeps the page background one color.
@@ -37,7 +36,6 @@ fun BottomSheetAppBar(
     )
 }
 
-@ShowkaseComposable(name = "BottomSheetAppBar", group = "Bottom sheet", styleName = "Light", defaultStyle = true)
 @Preview(name = "Light")
 @Composable
 private fun BottomSheetAppBarLightPreview() {
@@ -46,7 +44,6 @@ private fun BottomSheetAppBarLightPreview() {
     }
 }
 
-@ShowkaseComposable(name = "BottomSheetAppBar", group = "Bottom sheet", styleName = "Back")
 @Preview(name = "Back")
 @Composable
 private fun BottomSheetAppBarBackPreview() {
@@ -55,7 +52,6 @@ private fun BottomSheetAppBarBackPreview() {
     }
 }
 
-@ShowkaseComposable(name = "BottomSheetAppBar", group = "Bottom sheet", styleName = "Dark")
 @Preview(name = "Dark")
 @Composable
 private fun BottomSheetAppBarDarkPreview() {

@@ -20,6 +20,7 @@ import au.com.shiftyjelly.pocketcasts.player.viewmodel.PlayerViewModel.SnackbarM
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.preferences.UserSetting
 import au.com.shiftyjelly.pocketcasts.preferences.model.ArtworkConfiguration
+import au.com.shiftyjelly.pocketcasts.repositories.ads.BlazeAdsManager
 import au.com.shiftyjelly.pocketcasts.repositories.bookmark.BookmarkManager
 import au.com.shiftyjelly.pocketcasts.repositories.download.DownloadManager
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
@@ -37,6 +38,7 @@ import io.reactivex.Flowable
 import io.reactivex.Observable
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertFalse
@@ -111,6 +113,9 @@ class PlayerViewModelTest {
 
     @Mock
     private lateinit var podcast: Podcast
+
+    @Mock
+    private lateinit var blazeAdsManager: BlazeAdsManager
 
     @Mock
     private lateinit var userSettingsGlobalEffects: UserSetting<PlaybackEffects>
@@ -270,9 +275,7 @@ class PlayerViewModelTest {
         val useRealTimeForPlaybackRemainingTimeMock = mock<UserSetting<Boolean>>()
         whenever(useRealTimeForPlaybackRemainingTimeMock.flow).thenReturn(MutableStateFlow(false))
         whenever(settings.useRealTimeForPlaybackRemaingTime).thenReturn(useRealTimeForPlaybackRemainingTimeMock)
-        val cachedSubscriptionMock = mock<UserSetting<Subscription?>>()
-        whenever(cachedSubscriptionMock.flow).thenReturn(MutableStateFlow(null))
-        whenever(settings.cachedSubscription).thenReturn(cachedSubscriptionMock)
+        whenever(blazeAdsManager.findPlayerAd()).thenReturn(flowOf(null))
 
         viewModel = PlayerViewModel(
             playbackManager = playbackManager,
@@ -287,6 +290,7 @@ class PlayerViewModelTest {
             episodeAnalytics = episodeAnalytics,
             context = context,
             ioDispatcher = UnconfinedTestDispatcher(),
+            blazeAdsManager = blazeAdsManager,
         )
     }
 }

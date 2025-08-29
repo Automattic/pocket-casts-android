@@ -4,7 +4,6 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
-import au.com.shiftyjelly.pocketcasts.compose.ad.BlazeAd
 import au.com.shiftyjelly.pocketcasts.models.entity.Folder
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.to.FolderItem
@@ -13,6 +12,7 @@ import au.com.shiftyjelly.pocketcasts.models.type.SignInState
 import au.com.shiftyjelly.pocketcasts.podcasts.view.folders.SuggestedFoldersPopupPolicy
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.preferences.model.BadgeType
+import au.com.shiftyjelly.pocketcasts.repositories.ads.BlazeAdsManager
 import au.com.shiftyjelly.pocketcasts.repositories.notification.NotificationHelper
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.FolderManager
@@ -36,7 +36,6 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.flatMapLatest
-import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
@@ -58,6 +57,7 @@ class PodcastsViewModel @AssistedInject constructor(
     private val suggestedFoldersPopupPolicy: SuggestedFoldersPopupPolicy,
     private val userManager: UserManager,
     private val notificationHelper: NotificationHelper,
+    blazeAdsManager: BlazeAdsManager,
     @Assisted private val folderUuid: String?,
 ) : ViewModel() {
     private val _uiState = MutableStateFlow(UiState(isLoadingItems = true))
@@ -79,26 +79,7 @@ class PodcastsViewModel @AssistedInject constructor(
     }
 
     val activeAd = if (folderUuid == null) {
-        combine(
-            userManager.getSignInState().asFlow(),
-            FeatureFlag.isEnabledFlow(Feature.BANNER_ADS),
-            ::Pair,
-        ).flatMapLatest { (signInState, isEnabled) ->
-            flow<BlazeAd?> {
-                val ad = if (isEnabled && signInState.isNoAccountOrFree) {
-                    BlazeAd(
-                        id = "ad-id",
-                        title = "wordpress.com",
-                        ctaText = "Democratize publishing and eCommerce one website at a time.",
-                        ctaUrl = "https://wordpress.com/",
-                        imageUrl = "https://s.w.org/style/images/about/WordPress-logotype-simplified.png",
-                    )
-                } else {
-                    null
-                }
-                emit(ad)
-            }
-        }
+        blazeAdsManager.findPodcastListAd()
     } else {
         flowOf(null)
     }.stateIn(viewModelScope, started = SharingStarted.Eagerly, initialValue = null)

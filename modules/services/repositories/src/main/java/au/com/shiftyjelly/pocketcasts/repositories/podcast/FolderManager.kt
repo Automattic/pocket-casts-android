@@ -27,6 +27,10 @@ interface FolderManager {
     suspend fun updatePositions(folders: List<Folder>)
     suspend fun updateSortPosition(folderItems: List<FolderItem>)
     fun findFoldersToSyncBlocking(): List<Folder>
+    suspend fun findFoldersToSync(): List<Folder>
     suspend fun markAllSynced()
     suspend fun countFolders(): Int
+    suspend fun getAll(): List<Folder>
+    suspend fun deleteAll(uuids: Collection<String>)
+    suspend fun upsertAll(folders: Collection<Folder>)
 }

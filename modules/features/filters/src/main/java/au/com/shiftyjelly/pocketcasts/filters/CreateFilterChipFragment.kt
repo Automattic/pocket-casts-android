@@ -105,7 +105,7 @@ class CreateFilterChipFragment :
     }
 
     private fun observePlaylist() {
-        viewModel.smartPlaylist?.observe(viewLifecycleOwner) { playlist ->
+        viewModel.playlist?.observe(viewLifecycleOwner) { playlist ->
             val color = playlist.getColor(context)
 
             val chipPodcasts = binding.chipPodcasts

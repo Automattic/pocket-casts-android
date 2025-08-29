@@ -75,6 +75,13 @@ class OnboardingLoginOrSignUpViewModel @Inject constructor(
         )
     }
 
+    fun onGetStartedClicked(flow: OnboardingFlow) {
+        analyticsTracker.track(
+            AnalyticsEvent.SETUP_ACCOUNT_BUTTON_TAPPED,
+            mapOf(AnalyticsProp.flow(flow), AnalyticsProp.ButtonTapped.getStarted),
+        )
+    }
+
     fun onLoginClicked(flow: OnboardingFlow) {
         analyticsTracker.track(
             AnalyticsEvent.SETUP_ACCOUNT_BUTTON_TAPPED,
@@ -98,6 +105,7 @@ class OnboardingLoginOrSignUpViewModel @Inject constructor(
                 val signIn = BUTTON to "sign_in"
                 val createAccount = BUTTON to "create_account"
                 val continueWithGoogle = BUTTON to "continue_with_google"
+                val getStarted = BUTTON to "get_started"
             }
         }
     }

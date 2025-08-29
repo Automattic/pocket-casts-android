@@ -49,7 +49,6 @@ import au.com.shiftyjelly.pocketcasts.compose.components.SettingsSection.vertica
 import au.com.shiftyjelly.pocketcasts.compose.preview.ThemePreviewParameterProvider
 import au.com.shiftyjelly.pocketcasts.compose.theme
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
-import com.airbnb.android.showkase.annotation.ShowkaseComposable
 import kotlin.time.Duration
 import kotlinx.coroutines.delay
 import au.com.shiftyjelly.pocketcasts.images.R as IR
@@ -357,7 +356,6 @@ private fun SettingSectionPreview(
     }
 }
 
-@ShowkaseComposable(name = "SettingRow", group = "Setting", styleName = "Light", defaultStyle = true)
 @Preview(name = "Light")
 @Composable
 private fun SettingRowLightPreview() {
@@ -369,7 +367,6 @@ private fun SettingRowLightPreview() {
     }
 }
 
-@ShowkaseComposable(name = "SettingRow", group = "Setting", styleName = "Dark")
 @Preview(name = "Dark")
 @Composable
 private fun SettingRowDarkPreview() {
@@ -381,7 +378,6 @@ private fun SettingRowDarkPreview() {
     }
 }
 
-@ShowkaseComposable(name = "SettingRow", group = "Setting", styleName = "Icon (Project)")
 @Preview(name = "Icon (Project)")
 @Composable
 private fun SettingRowIconProjectPreview() {
@@ -393,7 +389,6 @@ private fun SettingRowIconProjectPreview() {
     }
 }
 
-@ShowkaseComposable(name = "SettingRow", group = "Setting", styleName = "Icon (Material)")
 @Preview(name = "Icon (Material)")
 @Composable
 private fun SettingRowIconMaterialPreview() {
@@ -405,7 +400,6 @@ private fun SettingRowIconMaterialPreview() {
     }
 }
 
-@ShowkaseComposable(name = "SettingRow", group = "Setting", styleName = "Icon (Gradient)")
 @Preview(name = "Icon (Gradient)")
 @Composable
 private fun SettingRowIconGradientPreview() {
@@ -418,7 +412,6 @@ private fun SettingRowIconGradientPreview() {
     }
 }
 
-@ShowkaseComposable(name = "SettingRow", group = "Setting", styleName = "Switch")
 @Preview(name = "Switch")
 @Composable
 private fun SettingRowSwitchPreview() {
@@ -430,7 +423,6 @@ private fun SettingRowSwitchPreview() {
     }
 }
 
-@ShowkaseComposable(name = "SettingRow", group = "Setting", styleName = "Checkbox")
 @Preview(name = "Checkbox")
 @Composable
 private fun SettingRowCheckboxPreview() {
@@ -442,7 +434,6 @@ private fun SettingRowCheckboxPreview() {
     }
 }
 
-@ShowkaseComposable(name = "SettingSection", group = "Setting", styleName = "Light", defaultStyle = true)
 @Preview(name = "Light")
 @Composable
 private fun SettingSectionLightPreview() {
@@ -453,7 +444,6 @@ private fun SettingSectionLightPreview() {
     }
 }
 
-@ShowkaseComposable(name = "SettingSection", group = "Setting", styleName = "Dark")
 @Preview(name = "Dark")
 @Composable
 private fun SettingSectionDarkPreview() {
@@ -464,7 +454,6 @@ private fun SettingSectionDarkPreview() {
     }
 }
 
-@ShowkaseComposable(name = "SettingInfoRow", group = "Setting")
 @Preview(name = "Info")
 @Composable
 private fun SettingInfoRowPreview() {

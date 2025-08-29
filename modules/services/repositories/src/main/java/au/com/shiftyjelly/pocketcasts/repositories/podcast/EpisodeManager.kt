@@ -21,6 +21,7 @@ interface EpisodeManager {
     /** Find methods  */
 
     suspend fun findByUuid(uuid: String): PodcastEpisode?
+    suspend fun findByUuids(uuids: Collection<String>): List<PodcastEpisode>
 
     @Deprecated("Use findByUuid suspended function instead")
     fun findByUuidRxMaybe(uuid: String): Maybe<PodcastEpisode>
@@ -42,6 +43,7 @@ interface EpisodeManager {
     fun findEpisodesWhereRxFlowable(queryAfterWhere: String): Flowable<List<PodcastEpisode>>
 
     fun findEpisodesToSyncBlocking(): List<PodcastEpisode>
+    suspend fun findEpisodesToSync(): List<PodcastEpisode>
     fun findEpisodesForHistorySyncBlocking(): List<PodcastEpisode>
     suspend fun markAllEpisodesSynced(episodes: List<PodcastEpisode>)
 
@@ -62,6 +64,7 @@ interface EpisodeManager {
     /** Update methods  */
     fun updateBlocking(episode: PodcastEpisode?)
     suspend fun update(episode: PodcastEpisode?)
+    suspend fun updateAll(episodes: Collection<PodcastEpisode>)
 
     fun updatePlayedUpToBlocking(episode: BaseEpisode?, playedUpTo: Double, forceUpdate: Boolean)
     fun updateDurationBlocking(episode: BaseEpisode?, durationInSecs: Double, syncChanges: Boolean)
@@ -116,7 +119,7 @@ interface EpisodeManager {
     fun countEpisodesWhereBlocking(queryAfterWhere: String): Int
     fun downloadMissingEpisodeRxMaybe(episodeUuid: String, podcastUuid: String, skeletonEpisode: PodcastEpisode, podcastManager: PodcastManager, downloadMetaData: Boolean, source: SourceView): Maybe<BaseEpisode>
 
-    fun deleteEpisodes(episodes: List<PodcastEpisode>, playbackManager: PlaybackManager)
+    fun deleteEpisodesAsync(episodes: List<PodcastEpisode>, playbackManager: PlaybackManager)
     fun unarchiveAllInListBlocking(episodes: List<PodcastEpisode>)
     fun findPlaybackHistoryEpisodesRxFlowable(): Flowable<List<PodcastEpisode>>
     fun filteredPlaybackHistoryEpisodesFlow(query: String): Flow<List<PodcastEpisode>>

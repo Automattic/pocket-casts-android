@@ -7,6 +7,7 @@ import androidx.work.CoroutineWorker
 import androidx.work.ExistingWorkPolicy
 import androidx.work.NetworkType
 import androidx.work.OneTimeWorkRequestBuilder
+import androidx.work.Operation
 import androidx.work.WorkManager
 import androidx.work.WorkerParameters
 import au.com.shiftyjelly.pocketcasts.models.to.HistorySyncChange
@@ -35,7 +36,7 @@ class SyncHistoryTask @AssistedInject constructor(
 ) : CoroutineWorker(context, params) {
 
     companion object {
-        fun scheduleToRun(context: Context) {
+        fun scheduleToRun(context: Context): Operation {
             val constraints = Constraints.Builder()
                 .setRequiredNetworkType(NetworkType.CONNECTED)
                 .build()
@@ -44,9 +45,9 @@ class SyncHistoryTask @AssistedInject constructor(
                 .setConstraints(constraints)
                 .build()
 
-            WorkManager.getInstance(context)
-                .enqueueUniqueWork(TAG, ExistingWorkPolicy.REPLACE, workRequest)
+            val operation = WorkManager.getInstance(context).enqueueUniqueWork(TAG, ExistingWorkPolicy.REPLACE, workRequest)
             LogBuffer.i(TAG, "Sync history task scheduled")
+            return operation
         }
     }
 

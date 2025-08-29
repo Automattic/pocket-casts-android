@@ -1,5 +1,6 @@
 package au.com.shiftyjelly.pocketcasts.servers.cdn
 
+import au.com.shiftyjelly.pocketcasts.models.entity.BlazeAd
 import au.com.shiftyjelly.pocketcasts.servers.di.StaticServiceRetrofit
 import au.com.shiftyjelly.pocketcasts.utils.Optional
 import io.reactivex.Single
@@ -8,7 +9,7 @@ import retrofit2.Retrofit
 
 class StaticServiceManagerImpl @Inject constructor(@StaticServiceRetrofit retrofit: Retrofit) : StaticServiceManager {
 
-    val server = retrofit.create(StaticService::class.java)
+    val server: StaticService = retrofit.create(StaticService::class.java)
 
     override fun getColorsSingle(podcastUuid: String): Single<Optional<ArtworkColors>> {
         return server.getColorsMaybe(podcastUuid)
@@ -22,5 +23,9 @@ class StaticServiceManagerImpl @Inject constructor(@StaticServiceRetrofit retrof
 
     override suspend fun getColors(podcastUuid: String): ArtworkColors? {
         return server.getColors(podcastUuid)?.toArtworkColors()
+    }
+
+    override suspend fun getBlazeAds(): List<BlazeAd> {
+        return server.getBlazePromotions().toBlazeAds()
     }
 }

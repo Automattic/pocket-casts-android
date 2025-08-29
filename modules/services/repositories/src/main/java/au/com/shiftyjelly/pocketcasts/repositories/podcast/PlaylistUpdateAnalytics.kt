@@ -2,7 +2,7 @@ package au.com.shiftyjelly.pocketcasts.repositories.podcast
 
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
-import au.com.shiftyjelly.pocketcasts.models.entity.SmartPlaylist
+import au.com.shiftyjelly.pocketcasts.models.entity.PlaylistEntity
 import au.com.shiftyjelly.pocketcasts.models.type.PlaylistEpisodeSortType
 import au.com.shiftyjelly.pocketcasts.repositories.extensions.colorIndex
 import au.com.shiftyjelly.pocketcasts.repositories.extensions.drawableId
@@ -15,43 +15,43 @@ class PlaylistUpdateAnalytics @Inject constructor(
 ) {
 
     fun update(
-        smartPlaylist: SmartPlaylist,
+        playlist: PlaylistEntity,
         userPlaylistUpdate: UserPlaylistUpdate?,
         isCreatingFilter: Boolean,
     ) {
         when {
-            isCreatingFilter -> sendPlaylistCreatedEvent(smartPlaylist)
+            isCreatingFilter -> sendPlaylistCreatedEvent(playlist)
 
             // If the playlist is a draft, then we are in the middle of the filter creation flow and
             // we don't want to send update events
-            !smartPlaylist.draft -> sendPlaylistUpdateEvent(userPlaylistUpdate)
+            !playlist.draft -> sendPlaylistUpdateEvent(userPlaylistUpdate)
         }
     }
 
-    private fun sendPlaylistCreatedEvent(smartPlaylist: SmartPlaylist) {
+    private fun sendPlaylistCreatedEvent(playlist: PlaylistEntity) {
         val properties = buildMap<String, Any> {
-            put(Key.ALL_PODCASTS, smartPlaylist.allPodcasts)
-            colorAnalyticsValue(smartPlaylist)?.let {
+            put(Key.ALL_PODCASTS, playlist.allPodcasts)
+            colorAnalyticsValue(playlist)?.let {
                 put(Key.COLOR, it)
             }
-            put(Key.DOWNLOADED, smartPlaylist.downloaded)
-            put(Key.NOT_DOWNLOADED, smartPlaylist.notDownloaded)
-            put(Key.DURATION, smartPlaylist.filterDuration)
-            if (smartPlaylist.filterDuration) {
-                put(Key.DURATION_LONGER_THAN, smartPlaylist.longerThan)
-                put(Key.DURATION_SHORTER_THAN, smartPlaylist.shorterThan)
+            put(Key.DOWNLOADED, playlist.downloaded)
+            put(Key.NOT_DOWNLOADED, playlist.notDownloaded)
+            put(Key.DURATION, playlist.filterDuration)
+            if (playlist.filterDuration) {
+                put(Key.DURATION_LONGER_THAN, playlist.longerThan)
+                put(Key.DURATION_SHORTER_THAN, playlist.shorterThan)
             }
-            put(Key.EPISODE_STATUS_IN_PROGRESS, smartPlaylist.partiallyPlayed)
-            put(Key.EPISODE_STATUS_PLAYED, smartPlaylist.finished)
-            put(Key.EPISODE_STATUS_UNPLAYED, smartPlaylist.unplayed)
-            iconAnalyticsValue(smartPlaylist)?.let {
+            put(Key.EPISODE_STATUS_IN_PROGRESS, playlist.partiallyPlayed)
+            put(Key.EPISODE_STATUS_PLAYED, playlist.finished)
+            put(Key.EPISODE_STATUS_UNPLAYED, playlist.unplayed)
+            iconAnalyticsValue(playlist)?.let {
                 put(Key.ICON_NAME, it)
             }
-            mediaTypeAnalyticsValue(smartPlaylist)?.let {
+            mediaTypeAnalyticsValue(playlist)?.let {
                 put(Key.MEDIA_TYPE, it)
             }
-            put(Key.STARRED, smartPlaylist.starred)
-            releaseDateAnalyticsValue(smartPlaylist)?.let {
+            put(Key.STARRED, playlist.starred)
+            releaseDateAnalyticsValue(playlist)?.let {
                 put(Key.RELEASE_DATE, it)
             }
         }
@@ -59,7 +59,7 @@ class PlaylistUpdateAnalytics @Inject constructor(
         analyticsTracker.track(AnalyticsEvent.FILTER_CREATED, properties)
     }
 
-    private fun iconAnalyticsValue(smartPlaylist: SmartPlaylist) = when (smartPlaylist.drawableId) {
+    private fun iconAnalyticsValue(playlist: PlaylistEntity) = when (playlist.drawableId) {
         IR.drawable.ic_filters_list -> Value.IconName.LIST
         IR.drawable.ic_filters_headphones -> Value.IconName.HEADPHONES
         IR.drawable.ic_filters_clock -> Value.IconName.CLOCK
@@ -74,30 +74,30 @@ class PlaylistUpdateAnalytics @Inject constructor(
         }
     }
 
-    private fun mediaTypeAnalyticsValue(smartPlaylist: SmartPlaylist) = when (smartPlaylist.audioVideo) {
-        SmartPlaylist.AUDIO_VIDEO_FILTER_ALL -> Value.MediaType.ALL
-        SmartPlaylist.AUDIO_VIDEO_FILTER_AUDIO_ONLY -> Value.MediaType.AUDIO
-        SmartPlaylist.AUDIO_VIDEO_FILTER_VIDEO_ONLY -> Value.MediaType.VIDEO
+    private fun mediaTypeAnalyticsValue(playlist: PlaylistEntity) = when (playlist.audioVideo) {
+        PlaylistEntity.AUDIO_VIDEO_FILTER_ALL -> Value.MediaType.ALL
+        PlaylistEntity.AUDIO_VIDEO_FILTER_AUDIO_ONLY -> Value.MediaType.AUDIO
+        PlaylistEntity.AUDIO_VIDEO_FILTER_VIDEO_ONLY -> Value.MediaType.VIDEO
         else -> {
             Timber.e("No match found for audioVideo Int")
             null
         }
     }
 
-    private fun releaseDateAnalyticsValue(smartPlaylist: SmartPlaylist) = when (smartPlaylist.filterHours) {
-        SmartPlaylist.ANYTIME -> Value.ReleaseDate.ANYTIME
-        SmartPlaylist.LAST_24_HOURS -> Value.ReleaseDate.TWENTY_FOUR_HOURS
-        SmartPlaylist.LAST_3_DAYS -> Value.ReleaseDate.THREE_DAYS
-        SmartPlaylist.LAST_WEEK -> Value.ReleaseDate.WEEK
-        SmartPlaylist.LAST_2_WEEKS -> Value.ReleaseDate.TWO_WEEKS
-        SmartPlaylist.LAST_MONTH -> Value.ReleaseDate.MONTH
+    private fun releaseDateAnalyticsValue(playlist: PlaylistEntity) = when (playlist.filterHours) {
+        PlaylistEntity.ANYTIME -> Value.ReleaseDate.ANYTIME
+        PlaylistEntity.LAST_24_HOURS -> Value.ReleaseDate.TWENTY_FOUR_HOURS
+        PlaylistEntity.LAST_3_DAYS -> Value.ReleaseDate.THREE_DAYS
+        PlaylistEntity.LAST_WEEK -> Value.ReleaseDate.WEEK
+        PlaylistEntity.LAST_2_WEEKS -> Value.ReleaseDate.TWO_WEEKS
+        PlaylistEntity.LAST_MONTH -> Value.ReleaseDate.MONTH
         else -> {
             Timber.e("Unexpected filter hours value")
             null
         }
     }
 
-    private fun colorAnalyticsValue(smartPlaylist: SmartPlaylist) = when (smartPlaylist.colorIndex) {
+    private fun colorAnalyticsValue(playlist: PlaylistEntity) = when (playlist.colorIndex) {
         0 -> Value.Color.RED
         1 -> Value.Color.BLUE
         2 -> Value.Color.GREEN

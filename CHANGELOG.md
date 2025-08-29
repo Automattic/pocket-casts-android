@@ -1,6 +1,14 @@
 7.97
 -----
-
+*   New Features
+    *   Onboarding Account Creation Improvements
+        ([#4405](https://github.com/Automattic/pocket-casts-android/pull/4405))
+*   Updates
+    *   Improved notification permission experience
+        ([#4408](https://github.com/Automattic/pocket-casts-android/pull/4408))
+* Bug Fixes
+    *   Fix File Settings bottom content being obstructed by the Mini Player.
+        ([#4414](https://github.com/Automattic/pocket-casts-android/pull/4414))
 
 7.96
 -----

@@ -2,7 +2,7 @@ package au.com.shiftyjelly.pocketcasts.repositories.sync
 
 import android.accounts.Account
 import au.com.shiftyjelly.pocketcasts.models.entity.Bookmark
-import au.com.shiftyjelly.pocketcasts.models.entity.SmartPlaylist
+import au.com.shiftyjelly.pocketcasts.models.entity.PlaylistEntity
 import au.com.shiftyjelly.pocketcasts.models.entity.UserEpisode
 import au.com.shiftyjelly.pocketcasts.models.to.HistorySyncRequest
 import au.com.shiftyjelly.pocketcasts.models.to.HistorySyncResponse
@@ -28,11 +28,13 @@ import au.com.shiftyjelly.pocketcasts.servers.sync.login.ExchangeSonosResponse
 import au.com.shiftyjelly.pocketcasts.servers.sync.update.SyncUpdateResponse
 import au.com.shiftyjelly.pocketcasts.utils.Optional
 import com.jakewharton.rxrelay2.BehaviorRelay
+import com.pocketcasts.service.api.BookmarksResponse
 import com.pocketcasts.service.api.PodcastRatingResponse
 import com.pocketcasts.service.api.PodcastRatingsResponse
 import com.pocketcasts.service.api.ReferralCodeResponse
 import com.pocketcasts.service.api.ReferralRedemptionResponse
 import com.pocketcasts.service.api.ReferralValidationResponse
+import com.pocketcasts.service.api.UserPlaylistListResponse
 import com.pocketcasts.service.api.UserPodcastListResponse
 import com.pocketcasts.service.api.WinbackResponse
 import io.reactivex.Completable
@@ -43,6 +45,8 @@ import java.io.File
 import java.time.Instant
 import kotlinx.coroutines.flow.Flow
 import retrofit2.Response
+import com.pocketcasts.service.api.SyncUpdateRequest as SyncUpdateProtoRequest
+import com.pocketcasts.service.api.SyncUpdateResponse as SyncUpdateProtoResponse
 
 interface SyncManager : NamedSettingsCaller {
 
@@ -91,10 +95,14 @@ interface SyncManager : NamedSettingsCaller {
 
     // Sync
     fun getLastSyncAtRxSingle(): Single<String>
-    suspend fun getHomeFolder(): UserPodcastListResponse
+    suspend fun getLastSyncAtOrThrow(): String
+    suspend fun getHomeFolderOrThrow(): UserPodcastListResponse
+    suspend fun getPlaylistsOrThrow(): UserPlaylistListResponse
+    suspend fun getBookmarksOrThrow(): BookmarksResponse
     fun getPodcastEpisodesRxSingle(podcastUuid: String): Single<PodcastEpisodesResponse>
 
     suspend fun syncUpdate(data: String, lastSyncTime: Instant): SyncUpdateResponse
+    suspend fun syncUpdateOrThrow(request: SyncUpdateProtoRequest): SyncUpdateProtoResponse
 
     fun episodeSyncRxCompletable(request: EpisodeSyncRequest): Completable
 
@@ -105,7 +113,7 @@ interface SyncManager : NamedSettingsCaller {
 
     // Other
     suspend fun exchangeSonos(): ExchangeSonosResponse
-    suspend fun getFilters(): List<SmartPlaylist>
+    suspend fun getFilters(): List<PlaylistEntity>
     suspend fun loadStats(): StatsBundle
     suspend fun upNextSync(request: UpNextSyncRequest): UpNextSyncResponse
     suspend fun getBookmarks(): List<Bookmark>

@@ -37,7 +37,6 @@ import au.com.shiftyjelly.pocketcasts.compose.plusGoldLight
 import au.com.shiftyjelly.pocketcasts.compose.theme
 import au.com.shiftyjelly.pocketcasts.payment.SubscriptionTier
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
-import com.airbnb.android.showkase.annotation.ShowkaseComposable
 import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
@@ -266,7 +265,6 @@ enum class SubscriptionBadgeDisplayMode {
     ColoredWithBlackForeground,
 }
 
-@ShowkaseComposable(name = "SubscriptionBadge", group = "Images", styleName = "Plus - Colored on light theme", defaultStyle = true)
 @Preview(name = "Colored")
 @Composable
 private fun SubscriptionBadgePlusColoredLightThemePreview() {
@@ -278,7 +276,6 @@ private fun SubscriptionBadgePlusColoredLightThemePreview() {
     }
 }
 
-@ShowkaseComposable(name = "SubscriptionBadge", group = "Images", styleName = "Plus - Colored on dark theme")
 @Preview(name = "Colored")
 @Composable
 private fun SubscriptionBadgePlusColoredDarkThemePreview() {
@@ -290,7 +287,6 @@ private fun SubscriptionBadgePlusColoredDarkThemePreview() {
     }
 }
 
-@ShowkaseComposable(name = "SubscriptionBadge", group = "Images", styleName = "Plus - Colored Dark on light theme")
 @Preview(name = "Colored")
 @Composable
 private fun SubscriptionBadgePlusColoredDarkLightThemePreview() {
@@ -302,7 +298,6 @@ private fun SubscriptionBadgePlusColoredDarkLightThemePreview() {
     }
 }
 
-@ShowkaseComposable(name = "SubscriptionBadge", group = "Images", styleName = "Plus - Colored Dark on dark theme")
 @Preview(name = "ColoredDark")
 @Composable
 private fun SubscriptionBadgePlusColoredDarkDarkThemePreview() {
@@ -314,7 +309,6 @@ private fun SubscriptionBadgePlusColoredDarkDarkThemePreview() {
     }
 }
 
-@ShowkaseComposable(name = "SubscriptionBadge", group = "Images", styleName = "Plus - Colored with white foreground")
 @Preview(name = "ColoredWithWhiteForeground")
 @Composable
 private fun SubscriptionBadgePlusColoredWhiteForegroundPreview() {
@@ -324,7 +318,6 @@ private fun SubscriptionBadgePlusColoredWhiteForegroundPreview() {
     )
 }
 
-@ShowkaseComposable(name = "SubscriptionBadge", group = "Images", styleName = "Plus - Black")
 @Preview(name = "Black")
 @Composable
 private fun SubscriptionBadgePlusBlackPreview() {
@@ -334,7 +327,6 @@ private fun SubscriptionBadgePlusBlackPreview() {
     )
 }
 
-@ShowkaseComposable(name = "SubscriptionBadge", group = "Images", styleName = "Plus - Colored with black foreground")
 @Preview(name = "ColoredWithBlackForeground")
 @Composable
 private fun SubscriptionBadgePlusColoredWithBlackForegroundPreview() {
@@ -344,7 +336,6 @@ private fun SubscriptionBadgePlusColoredWithBlackForegroundPreview() {
     )
 }
 
-@ShowkaseComposable(name = "SubscriptionBadge", group = "Images", styleName = "Patron - Colored on light theme")
 @Preview(name = "Colored")
 @Composable
 private fun SubscriptionBadgePatronColoredLightThemePreview() {
@@ -356,7 +347,6 @@ private fun SubscriptionBadgePatronColoredLightThemePreview() {
     }
 }
 
-@ShowkaseComposable(name = "SubscriptionBadge", group = "Images", styleName = "Patron - Colored on dark theme")
 @Preview(name = "Colored")
 @Composable
 private fun SubscriptionBadgePatronColoredDarkThemePreview() {
@@ -368,7 +358,6 @@ private fun SubscriptionBadgePatronColoredDarkThemePreview() {
     }
 }
 
-@ShowkaseComposable(name = "SubscriptionBadge", group = "Images", styleName = "Patron - Colored Dark on light theme")
 @Preview(name = "ColoredDark")
 @Composable
 private fun SubscriptionBadgePatronColoredDarkLightThemePreview() {
@@ -380,7 +369,6 @@ private fun SubscriptionBadgePatronColoredDarkLightThemePreview() {
     }
 }
 
-@ShowkaseComposable(name = "SubscriptionBadge", group = "Images", styleName = "Patron - Colored Dark on dark theme")
 @Preview(name = "ColoredDark")
 @Composable
 private fun SubscriptionBadgePatronColoredDarkDarkThemePreview() {
@@ -392,7 +380,6 @@ private fun SubscriptionBadgePatronColoredDarkDarkThemePreview() {
     }
 }
 
-@ShowkaseComposable(name = "SubscriptionBadge", group = "Images", styleName = "Patron - Colored with white foreground")
 @Preview(name = "ColoredWithWhiteForeground")
 @Composable
 private fun SubscriptionBadgePatronColoredWhiteForegroundPreview() {
@@ -402,7 +389,6 @@ private fun SubscriptionBadgePatronColoredWhiteForegroundPreview() {
     )
 }
 
-@ShowkaseComposable(name = "SubscriptionBadge", group = "Images", styleName = "Patron - Black")
 @Preview(name = "Black")
 @Composable
 private fun SubscriptionBadgePatronBlackPreview() {
@@ -412,7 +398,6 @@ private fun SubscriptionBadgePatronBlackPreview() {
     )
 }
 
-@ShowkaseComposable(name = "SubscriptionBadge", group = "Images", styleName = "Patron - Colored with black foreground")
 @Preview(name = "ColoredWithBlackForeground")
 @Composable
 private fun SubscriptionBadgePatronColoredWithBlackForegroundPreview() {
@@ -422,7 +407,6 @@ private fun SubscriptionBadgePatronColoredWithBlackForegroundPreview() {
     )
 }
 
-@ShowkaseComposable(name = "SubscriptionBadge", group = "Images", styleName = "Plus - Colored with gradient background")
 @Preview(name = "ColoredWithBlackForegroundAndGradientBackground")
 @Composable
 private fun SubscriptionBadgePlusWithGradientBackgroundPreview() {

@@ -86,6 +86,8 @@ fun NewOnboardingGetStartedPage(
 ) {
     val pocketCastsTheme = MaterialTheme.theme
 
+    val trackingConsentRequired by viewModel.isTrackingConsentRequired.collectAsState(initial = false)
+
     CallOnce {
         viewModel.onShown(flow)
     }
@@ -114,6 +116,20 @@ fun NewOnboardingGetStartedPage(
             modifier = Modifier.padding(horizontal = 16.dp),
         )
         LogInButton(onClick = onLoginClick)
+
+        if (trackingConsentRequired &&
+            flow == OnboardingFlow.InitialOnboarding &&
+            FeatureFlag.isEnabled(Feature.APPSFLYER_ANALYTICS)
+        ) {
+            TrackingConsentDialog(
+                onAllow = {
+                    viewModel.updateTrackingConsent(true)
+                },
+                onAskAppNotToTrack = {
+                    viewModel.updateTrackingConsent(false)
+                },
+            )
+        }
     }
 }
 

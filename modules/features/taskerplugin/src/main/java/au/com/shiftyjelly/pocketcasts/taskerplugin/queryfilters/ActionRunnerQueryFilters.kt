@@ -12,7 +12,7 @@ class ActionRunnerQueryFilters : TaskerPluginRunnerAction<InputQueryFilters, Arr
     override fun run(context: Context, input: TaskerInput<InputQueryFilters>): TaskerPluginResult<Array<OutputQueryFilters>> {
         val playlistManager = context.smartPlaylistManager
         val output = playlistManager.findAllBlocking().map {
-            OutputQueryFilters(it.uuid, it.title, it.episodeCount)
+            OutputQueryFilters(it.uuid, it.title)
         }.toTypedArray()
         return TaskerPluginResultSucess(output)
     }

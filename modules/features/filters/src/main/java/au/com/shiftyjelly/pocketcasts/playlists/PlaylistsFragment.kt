@@ -7,14 +7,13 @@ import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import au.com.shiftyjelly.pocketcasts.compose.AppThemeWithBackground
 import au.com.shiftyjelly.pocketcasts.compose.extensions.contentWithoutConsumedInsets
-import au.com.shiftyjelly.pocketcasts.playlists.create.CreatePlaylistFragment
+import au.com.shiftyjelly.pocketcasts.repositories.playlist.PlaylistPreview
 import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingFlow
 import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingLauncher
 import au.com.shiftyjelly.pocketcasts.ui.helper.FragmentHostListener
@@ -24,7 +23,8 @@ import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
-import timber.log.Timber
+import au.com.shiftyjelly.pocketcasts.playlists.manual.PlaylistFragment as ManualPlaylistFragment
+import au.com.shiftyjelly.pocketcasts.playlists.smart.PlaylistFragment as SmartPlaylistFragment
 
 @AndroidEntryPoint
 class PlaylistsFragment :
@@ -58,7 +58,10 @@ class PlaylistsFragment :
                 },
                 onDeletePlaylist = { playlist -> viewModel.deletePlaylist(playlist.uuid) },
                 onOpenPlaylist = { playlist ->
-                    val fragment = SmartPlaylistFragment.newInstance(playlist.uuid)
+                    val fragment = when (playlist.type) {
+                        PlaylistPreview.Type.Manual -> ManualPlaylistFragment.newInstance(playlist.uuid)
+                        PlaylistPreview.Type.Smart -> SmartPlaylistFragment.newInstance(playlist.uuid)
+                    }
                     (requireActivity() as FragmentHostListener).addFragment(fragment)
                 },
                 onReorderPlaylists = viewModel::updatePlaylistsOrder,
@@ -93,7 +96,7 @@ class PlaylistsFragment :
     private fun ShowOnboardingEffect(show: Boolean) {
         if (show) {
             LaunchedEffect(show) {
-                PlaylistsOnboardingFragment().show(childFragmentManager, "playlists_onboarding")
+                OnboardingFragment().show(childFragmentManager, "playlists_onboarding")
             }
         }
     }

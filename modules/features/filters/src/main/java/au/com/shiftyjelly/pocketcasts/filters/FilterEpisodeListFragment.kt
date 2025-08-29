@@ -25,8 +25,8 @@ import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.filters.databinding.FragmentFilterBinding
 import au.com.shiftyjelly.pocketcasts.localization.extensions.getStringPluralPodcasts
 import au.com.shiftyjelly.pocketcasts.models.entity.BaseEpisode
+import au.com.shiftyjelly.pocketcasts.models.entity.PlaylistEntity
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
-import au.com.shiftyjelly.pocketcasts.models.entity.SmartPlaylist
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodeViewSource
 import au.com.shiftyjelly.pocketcasts.models.type.PlaylistEpisodeSortType
 import au.com.shiftyjelly.pocketcasts.podcasts.view.components.PlayButton
@@ -76,13 +76,13 @@ private const val STATE_LAYOUT_MANAGER = "layout_manager"
 @AndroidEntryPoint
 class FilterEpisodeListFragment : BaseFragment() {
     companion object {
-        fun newInstance(smartPlaylist: SmartPlaylist, isNewFilter: Boolean, context: Context): FilterEpisodeListFragment {
+        fun newInstance(playlist: PlaylistEntity, isNewFilter: Boolean, context: Context): FilterEpisodeListFragment {
             val fragment = FilterEpisodeListFragment()
             val bundle = Bundle()
-            bundle.putString(ARG_PLAYLIST_UUID, smartPlaylist.uuid)
-            bundle.putString(ARG_PLAYLIST_TITLE, smartPlaylist.title)
+            bundle.putString(ARG_PLAYLIST_UUID, playlist.uuid)
+            bundle.putString(ARG_PLAYLIST_TITLE, playlist.title)
             bundle.putBoolean(ARG_FILTER_IS_NEW, isNewFilter)
-            bundle.putInt(ARG_COLOR, smartPlaylist.getColor(context))
+            bundle.putInt(ARG_COLOR, playlist.getColor(context))
             fragment.arguments = bundle
             return fragment
         }
@@ -313,7 +313,7 @@ class FilterEpisodeListFragment : BaseFragment() {
             updateUIColors(color)
         }
 
-        viewModel.smartPlaylist.observe(viewLifecycleOwner) { playlist ->
+        viewModel.playlist.observe(viewLifecycleOwner) { playlist ->
             toolbar.title = playlist.title
 
             val color = playlist.getColor(context)
@@ -583,7 +583,7 @@ class FilterEpisodeListFragment : BaseFragment() {
     }
 
     fun showSortOptions() {
-        viewModel.smartPlaylist.value?.let {
+        viewModel.playlist.value?.let {
             val dialog = OptionsDialog()
                 .setTitle(getString(LR.string.sort_by))
                 .addCheckedOption(
@@ -611,7 +611,7 @@ class FilterEpisodeListFragment : BaseFragment() {
     }
 
     fun showFilterSettings() {
-        viewModel.smartPlaylist.value?.let {
+        viewModel.playlist.value?.let {
             val fragment = CreateFilterFragment.newInstance(CreateFilterFragment.Mode.Edit(it))
             (activity as? FragmentHostListener)?.addFragment(fragment)
         }
@@ -689,7 +689,7 @@ class FilterEpisodeListFragment : BaseFragment() {
 
     private fun clearSelectedFilter() {
         // Only clear the selected filter if the currently displayed filter is the selected filter
-        if (settings.selectedFilter() == viewModel.smartPlaylist.value?.uuid) {
+        if (settings.selectedFilter() == viewModel.playlist.value?.uuid) {
             settings.setSelectedFilter(null)
         }
     }

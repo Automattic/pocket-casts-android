@@ -40,7 +40,14 @@ abstract class EpisodeDao {
     abstract suspend fun findByUuid(uuid: String): PodcastEpisode?
 
     @Query("SELECT * FROM podcast_episodes WHERE uuid IN (:episodeUuids)")
-    abstract suspend fun findByUuids(episodeUuids: List<String>): List<PodcastEpisode>
+    protected abstract suspend fun findByUuidsUnsafe(episodeUuids: Collection<String>): List<PodcastEpisode>
+
+    @Transaction
+    open suspend fun findByUuids(episodeUuids: Collection<String>): List<PodcastEpisode> {
+        return episodeUuids.chunked(AppDatabase.SQLITE_BIND_ARG_LIMIT).flatMap { chunk ->
+            findByUuidsUnsafe(chunk)
+        }
+    }
 
     @Query("SELECT count(*) FROM podcast_episodes WHERE podcast_id = :podcastUuid AND played_up_to > (duration / 2)")
     abstract suspend fun countPlayedEpisodes(podcastUuid: String): Int
@@ -311,11 +318,11 @@ abstract class EpisodeDao {
     @Update
     abstract suspend fun update(episode: PodcastEpisode)
 
-    @Delete
-    abstract fun deleteBlocking(episode: PodcastEpisode)
+    @Update
+    abstract suspend fun updateAll(episodes: Collection<PodcastEpisode>)
 
     @Delete
-    abstract fun deleteAllBlocking(episode: List<PodcastEpisode>)
+    abstract fun deleteBlocking(episode: PodcastEpisode)
 
     @Delete
     abstract suspend fun deleteAll(episode: List<PodcastEpisode>)
@@ -456,6 +463,10 @@ abstract class EpisodeDao {
     @Transaction
     @Query("SELECT * FROM podcast_episodes WHERE (playing_status_modified IS NOT NULL OR played_up_to_modified IS NOT NULL OR duration_modified IS NOT NULL OR archived_modified IS NOT NULL OR starred_modified IS NOT NULL OR deselected_chapters_modified IS NOT NULL) AND uuid IS NOT NULL LIMIT 2000")
     abstract fun findEpisodesToSyncBlocking(): List<PodcastEpisode>
+
+    @Transaction
+    @Query("SELECT * FROM podcast_episodes WHERE (playing_status_modified IS NOT NULL OR played_up_to_modified IS NOT NULL OR duration_modified IS NOT NULL OR archived_modified IS NOT NULL OR starred_modified IS NOT NULL OR deselected_chapters_modified IS NOT NULL) AND uuid IS NOT NULL LIMIT 2000")
+    abstract suspend fun findEpisodesToSync(): List<PodcastEpisode>
 
     @Query("SELECT podcast_episodes.* FROM podcasts, podcast_episodes WHERE podcast_episodes.podcast_id = podcasts.uuid AND podcast_episodes.podcast_id = :podcastUuid AND podcasts.subscribed = 1 AND podcast_episodes.archived = 0 AND (podcast_episodes.added_date < :inactiveTime AND (CASE WHEN podcast_episodes.last_playback_interaction_date IS NULL THEN 0 ELSE podcast_episodes.last_playback_interaction_date END) < :inactiveTime AND (CASE WHEN podcast_episodes.last_download_attempt_date IS NULL THEN 0 ELSE podcast_episodes.last_download_attempt_date END) < :inactiveDate AND (CASE WHEN podcast_episodes.last_archive_interaction_date IS NULL THEN 0 ELSE podcast_episodes.last_archive_interaction_date END) < :inactiveTime )")
     abstract fun findInactiveEpisodesBlocking(podcastUuid: String, inactiveDate: Date, inactiveTime: Long = inactiveDate.time): List<PodcastEpisode>
