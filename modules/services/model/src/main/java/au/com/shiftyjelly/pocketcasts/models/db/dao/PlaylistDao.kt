@@ -8,6 +8,10 @@ import androidx.room.Transaction
 import androidx.room.Upsert
 import au.com.shiftyjelly.pocketcasts.models.db.AppDatabase
 import au.com.shiftyjelly.pocketcasts.models.entity.ManualPlaylistEpisode
+import au.com.shiftyjelly.pocketcasts.models.entity.ManualPlaylistEpisodeSource
+import au.com.shiftyjelly.pocketcasts.models.entity.ManualPlaylistFolderSource
+import au.com.shiftyjelly.pocketcasts.models.entity.ManualPlaylistPartialFolderSource
+import au.com.shiftyjelly.pocketcasts.models.entity.ManualPlaylistPodcastSource
 import au.com.shiftyjelly.pocketcasts.models.entity.PlaylistEntity
 import au.com.shiftyjelly.pocketcasts.models.entity.PlaylistEntity.Companion.SYNC_STATUS_NOT_SYNCED
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
@@ -122,6 +126,72 @@ abstract class PlaylistDao {
     """,
     )
     abstract fun observeManualEpisodeMetadata(playlistId: String): Flow<PlaylistEpisodeMetadata>
+
+    @Query(
+        """
+        SELECT podcast.uuid, podcast.title, podcast.author
+        FROM podcasts AS podcast
+        LEFT JOIN folders AS folder ON folder.uuid IS podcast.folder_uuid
+        WHERE
+          podcast.subscribed IS NOT 0
+          AND (CASE 
+            WHEN :includeInFolders IS NOT 0 THEN 1 
+            ELSE folder.deleted IS NOT 0
+          END)
+        ORDER BY podcast.title ASC
+    """,
+    )
+    internal abstract suspend fun getAllPodcastPlaylistSources(includeInFolders: Boolean): List<ManualPlaylistPodcastSource>
+
+    @Query(
+        """
+        SELECT podcast.uuid, podcast.title, podcast.author
+        FROM podcasts AS podcast
+        WHERE
+          podcast.subscribed IS NOT 0
+          AND podcast.folder_uuid IS (:folderUuid)
+        ORDER BY podcast.title ASC
+    """,
+    )
+    internal abstract suspend fun getPodcastPlaylistSourcesForFolder(folderUuid: String): List<ManualPlaylistPodcastSource>
+
+    @Query(
+        """
+        SELECT folder.uuid, folder.name 
+        FROM folders AS folder
+        WHERE 
+          folder.deleted IS 0
+          AND (
+            SELECT COUNT(*) 
+            FROM podcasts AS podcast 
+            WHERE podcast.subscribed IS NOT 0 AND podcast.folder_uuid IS folder.uuid 
+          ) > 0
+        ORDER BY folder.name ASC
+    """,
+    )
+    internal abstract suspend fun getFolderPartialPlaylistSources(): List<ManualPlaylistPartialFolderSource>
+
+    @Transaction
+    open suspend fun getManualPlaylistEpisodeSources(useFolders: Boolean): List<ManualPlaylistEpisodeSource> {
+        val podcasts = getAllPodcastPlaylistSources(includeInFolders = !useFolders)
+        val folders = if (useFolders) {
+            getFolderPartialPlaylistSources().mapNotNull { partialSource ->
+                val podcastSources = getPodcastPlaylistSourcesForFolder(partialSource.uuid)
+                if (podcastSources.isNotEmpty()) {
+                    ManualPlaylistFolderSource(
+                        uuid = partialSource.uuid,
+                        title = partialSource.title,
+                        podcastSources = getPodcastPlaylistSourcesForFolder(partialSource.uuid),
+                    )
+                } else {
+                    null
+                }
+            }
+        } else {
+            emptyList()
+        }
+        return podcasts + folders
+    }
 
     @RawQuery(observedEntities = [Podcast::class, PodcastEpisode::class])
     protected abstract fun observeSmartEpisodeMetadata(query: RoomRawQuery): Flow<PlaylistEpisodeMetadata>

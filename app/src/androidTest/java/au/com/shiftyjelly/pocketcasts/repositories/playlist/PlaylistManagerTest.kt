@@ -1,15 +1,21 @@
 package au.com.shiftyjelly.pocketcasts.repositories.playlist
 
+import android.content.Context
 import androidx.room.Room
 import androidx.test.platform.app.InstrumentationRegistry
 import app.cash.turbine.test
 import au.com.shiftyjelly.pocketcasts.models.db.AppDatabase
 import au.com.shiftyjelly.pocketcasts.models.db.dao.EpisodeDao
+import au.com.shiftyjelly.pocketcasts.models.db.dao.FolderDao
 import au.com.shiftyjelly.pocketcasts.models.db.dao.PlaylistDao
 import au.com.shiftyjelly.pocketcasts.models.db.dao.PodcastDao
 import au.com.shiftyjelly.pocketcasts.models.di.ModelModule
 import au.com.shiftyjelly.pocketcasts.models.di.addTypeConverters
+import au.com.shiftyjelly.pocketcasts.models.entity.Folder
 import au.com.shiftyjelly.pocketcasts.models.entity.ManualPlaylistEpisode
+import au.com.shiftyjelly.pocketcasts.models.entity.ManualPlaylistEpisodeSource
+import au.com.shiftyjelly.pocketcasts.models.entity.ManualPlaylistFolderSource
+import au.com.shiftyjelly.pocketcasts.models.entity.ManualPlaylistPodcastSource
 import au.com.shiftyjelly.pocketcasts.models.entity.PlaylistEntity.Companion.ANYTIME
 import au.com.shiftyjelly.pocketcasts.models.entity.PlaylistEntity.Companion.AUDIO_VIDEO_FILTER_ALL
 import au.com.shiftyjelly.pocketcasts.models.entity.PlaylistEntity.Companion.AUDIO_VIDEO_FILTER_AUDIO_ONLY
@@ -25,6 +31,7 @@ import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodePlayingStatus
 import au.com.shiftyjelly.pocketcasts.models.type.PlaylistEpisodeSortType
+import au.com.shiftyjelly.pocketcasts.models.type.PodcastsSortType
 import au.com.shiftyjelly.pocketcasts.models.type.SmartRules
 import au.com.shiftyjelly.pocketcasts.models.type.SmartRules.DownloadStatusRule
 import au.com.shiftyjelly.pocketcasts.models.type.SmartRules.EpisodeDurationRule
@@ -33,8 +40,12 @@ import au.com.shiftyjelly.pocketcasts.models.type.SmartRules.MediaTypeRule
 import au.com.shiftyjelly.pocketcasts.models.type.SmartRules.PodcastsRule
 import au.com.shiftyjelly.pocketcasts.models.type.SmartRules.ReleaseDateRule
 import au.com.shiftyjelly.pocketcasts.models.type.SmartRules.StarredRule
+import au.com.shiftyjelly.pocketcasts.models.type.Subscription
+import au.com.shiftyjelly.pocketcasts.preferences.Settings
+import au.com.shiftyjelly.pocketcasts.preferences.SettingsImpl
+import au.com.shiftyjelly.pocketcasts.servers.di.ServersModule
 import au.com.shiftyjelly.pocketcasts.sharedtest.MutableClock
-import com.squareup.moshi.Moshi
+import com.google.firebase.remoteconfig.FirebaseRemoteConfig
 import java.util.Date
 import java.util.UUID
 import kotlin.time.Duration
@@ -57,13 +68,15 @@ class PlaylistManagerTest {
     private lateinit var podcastDao: PodcastDao
     private lateinit var episodeDao: EpisodeDao
     private lateinit var playlistDao: PlaylistDao
+    private lateinit var folderDao: FolderDao
+    private lateinit var settings: Settings
 
     private lateinit var manager: PlaylistManager
 
     @Before
     fun setup() {
         val context = InstrumentationRegistry.getInstrumentation().targetContext
-        val moshi = Moshi.Builder().build()
+        val moshi = ServersModule().provideMoshi()
         val appDatabase = Room.inMemoryDatabaseBuilder(context, AppDatabase::class.java)
             .addTypeConverters(ModelModule.provideRoomConverters(moshi))
             .setQueryCoroutineContext(testDispatcher)
@@ -71,8 +84,22 @@ class PlaylistManagerTest {
         podcastDao = appDatabase.podcastDao()
         episodeDao = appDatabase.episodeDao()
         playlistDao = appDatabase.playlistDao()
+        folderDao = appDatabase.folderDao()
+
+        val sharedPreferences = context.getSharedPreferences("test_prefst", Context.MODE_PRIVATE)
+        sharedPreferences.edit().clear().commit()
+        val firebaseRemoteConfig = FirebaseRemoteConfig.getInstance()
+        settings = SettingsImpl(
+            sharedPreferences = sharedPreferences,
+            privatePreferences = sharedPreferences,
+            context = context,
+            firebaseRemoteConfig = firebaseRemoteConfig,
+            moshi = moshi,
+        )
+
         manager = PlaylistManagerImpl(
             appDatabase = appDatabase,
+            settings = settings,
             clock = clock,
         )
     }
@@ -1223,6 +1250,82 @@ class PlaylistManagerTest {
             "backslash character",
             listOf(backslashEpisode),
             getSmartEpisodes(searchTerm = "\\"),
+        )
+    }
+
+    @Test
+    fun getManualPlaylistEpisodeSource() = runTest(testDispatcher) {
+        assertEquals(
+            emptyList<ManualPlaylistEpisodeSource>(),
+            manager.getManualPlaylistEpisodeSources(),
+        )
+
+        podcastDao.insertSuspend(Podcast("podcast-id-0", title = "Podcast Title 0", author = "Podcast Author 0", isSubscribed = false))
+        podcastDao.insertSuspend(Podcast("podcast-id-1", title = "Podcast Title 1", author = "Podcast Author 1", isSubscribed = true))
+        podcastDao.insertSuspend(Podcast("podcast-id-2", title = "Podcast Title 2", author = "Podcast Author 2", rawFolderUuid = "folder-id-1", isSubscribed = true))
+        podcastDao.insertSuspend(Podcast("podcast-id-3", title = "Podcast Title 3", author = "Podcast Author 3", isSubscribed = true))
+        podcastDao.insertSuspend(Podcast("podcast-id-4", title = "Podcast Title 4", author = "Podcast Author 4", rawFolderUuid = "folder-id-1", isSubscribed = false))
+        val baseFolder = Folder(
+            uuid = "folder-id-0",
+            name = "Folder Name 0",
+            color = 0,
+            addedDate = Date(0),
+            sortPosition = 0,
+            podcastsSortType = PodcastsSortType.RECENTLY_PLAYED,
+            deleted = false,
+            syncModified = 0L,
+        )
+        folderDao.insert(baseFolder.copy(uuid = "folder-id-1", name = "Folder Name 1"))
+        folderDao.insert(baseFolder.copy(uuid = "folder-id-2", name = "Folder Name 2"))
+        folderDao.insert(baseFolder.copy(uuid = "folder-id-3", name = "Folder Name 3", deleted = true))
+
+        assertEquals(
+            listOf(
+                ManualPlaylistPodcastSource(
+                    uuid = "podcast-id-1",
+                    title = "Podcast Title 1",
+                    author = "Podcast Author 1",
+                ),
+                ManualPlaylistPodcastSource(
+                    uuid = "podcast-id-2",
+                    title = "Podcast Title 2",
+                    author = "Podcast Author 2",
+                ),
+                ManualPlaylistPodcastSource(
+                    uuid = "podcast-id-3",
+                    title = "Podcast Title 3",
+                    author = "Podcast Author 3",
+                ),
+            ),
+            manager.getManualPlaylistEpisodeSources(),
+        )
+
+        settings.cachedSubscription.set(Subscription.PlusPreview, updateModifiedAt = false)
+        assertEquals(
+            listOf(
+                ManualPlaylistPodcastSource(
+                    uuid = "podcast-id-1",
+                    title = "Podcast Title 1",
+                    author = "Podcast Author 1",
+                ),
+                ManualPlaylistPodcastSource(
+                    uuid = "podcast-id-3",
+                    title = "Podcast Title 3",
+                    author = "Podcast Author 3",
+                ),
+                ManualPlaylistFolderSource(
+                    uuid = "folder-id-1",
+                    title = "Folder Name 1",
+                    podcastSources = listOf(
+                        ManualPlaylistPodcastSource(
+                            uuid = "podcast-id-2",
+                            title = "Podcast Title 2",
+                            author = "Podcast Author 2",
+                        ),
+                    ),
+                ),
+            ),
+            manager.getManualPlaylistEpisodeSources(),
         )
     }
 }

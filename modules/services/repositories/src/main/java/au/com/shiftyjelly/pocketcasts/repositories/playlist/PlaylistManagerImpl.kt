@@ -2,6 +2,7 @@ package au.com.shiftyjelly.pocketcasts.repositories.playlist
 
 import androidx.room.withTransaction
 import au.com.shiftyjelly.pocketcasts.models.db.AppDatabase
+import au.com.shiftyjelly.pocketcasts.models.entity.ManualPlaylistEpisodeSource
 import au.com.shiftyjelly.pocketcasts.models.entity.PlaylistEntity
 import au.com.shiftyjelly.pocketcasts.models.entity.PlaylistEntity.Companion.ANYTIME
 import au.com.shiftyjelly.pocketcasts.models.entity.PlaylistEntity.Companion.AUDIO_VIDEO_FILTER_ALL
@@ -24,6 +25,7 @@ import au.com.shiftyjelly.pocketcasts.models.type.SmartRules.MediaTypeRule
 import au.com.shiftyjelly.pocketcasts.models.type.SmartRules.PodcastsRule
 import au.com.shiftyjelly.pocketcasts.models.type.SmartRules.ReleaseDateRule
 import au.com.shiftyjelly.pocketcasts.models.type.SmartRules.StarredRule
+import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import java.time.Clock
 import java.util.UUID
 import javax.inject.Inject
@@ -42,6 +44,7 @@ import kotlinx.coroutines.flow.flowOf
 @OptIn(ExperimentalCoroutinesApi::class, FlowPreview::class)
 class PlaylistManagerImpl @Inject constructor(
     private val appDatabase: AppDatabase,
+    private val settings: Settings,
     private val clock: Clock,
 ) : PlaylistManager {
     private val playlistDao = appDatabase.playlistDao()
@@ -216,6 +219,11 @@ class PlaylistManagerImpl @Inject constructor(
                 playlistDao.updateSortPosition(playlist.uuid, position)
             }
         }
+    }
+
+    override suspend fun getManualPlaylistEpisodeSources(): List<ManualPlaylistEpisodeSource> {
+        val isSubscriber = settings.cachedSubscription.value != null
+        return playlistDao.getManualPlaylistEpisodeSources(useFolders = isSubscriber)
     }
 
     private fun List<PlaylistEntity>.toPreviewFlows() = map { playlist ->
