@@ -24,7 +24,7 @@ import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import au.com.shiftyjelly.pocketcasts.compose.AppThemeWithBackground
-import au.com.shiftyjelly.pocketcasts.compose.components.PodcastImage
+import au.com.shiftyjelly.pocketcasts.compose.components.PodcastImageDeprecated
 import au.com.shiftyjelly.pocketcasts.compose.preview.ThemePreviewParameterProvider
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.images.R as IR
@@ -64,7 +64,8 @@ fun PodcastSubscribeImage(
         modifier = rootModifier,
         contentAlignment = Alignment.Center,
     ) {
-        PodcastImage(
+        @Suppress("DEPRECATION")
+        PodcastImageDeprecated(
             uuid = podcastUuid,
             title = podcastTitle,
             showTitle = true,

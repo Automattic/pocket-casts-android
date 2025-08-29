@@ -100,6 +100,7 @@ import au.com.shiftyjelly.pocketcasts.compose.AppThemeWithBackground
 import au.com.shiftyjelly.pocketcasts.compose.Devices
 import au.com.shiftyjelly.pocketcasts.compose.components.ExpandableText
 import au.com.shiftyjelly.pocketcasts.compose.components.PodcastImage
+import au.com.shiftyjelly.pocketcasts.compose.components.PodcastImageDeprecated
 import au.com.shiftyjelly.pocketcasts.compose.components.TextH20
 import au.com.shiftyjelly.pocketcasts.compose.components.TextH40
 import au.com.shiftyjelly.pocketcasts.compose.components.TextP60
@@ -176,10 +177,9 @@ internal fun PodcastHeader(
         ) {
             PodcastImage(
                 uuid = uuid,
-                cornerSize = 8.dp,
+                imageSize = coverSize,
                 elevation = 16.dp,
                 modifier = Modifier
-                    .size(coverSize)
                     .combinedClickable(
                         indication = null,
                         interactionSource = null,

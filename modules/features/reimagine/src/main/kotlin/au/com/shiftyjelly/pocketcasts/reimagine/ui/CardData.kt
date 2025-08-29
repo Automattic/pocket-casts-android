@@ -7,7 +7,7 @@ import androidx.compose.ui.platform.LocalInspectionMode
 import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import au.com.shiftyjelly.pocketcasts.compose.components.EpisodeImage
-import au.com.shiftyjelly.pocketcasts.compose.components.PodcastImage
+import au.com.shiftyjelly.pocketcasts.compose.components.PodcastImageDeprecated
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.repositories.images.PocketCastsImageRequestFactory.PlaceholderType
@@ -45,7 +45,8 @@ internal data class PodcastCardData(
     ).joinToString(" · ")
 
     @Composable
-    override fun Image(modifier: Modifier) = PodcastImage(
+    @Suppress("DEPRECATION")
+    override fun Image(modifier: Modifier) = PodcastImageDeprecated(
         uuid = podcast.uuid,
         title = stringResource(LR.string.podcast_cover_description, podcast.title),
         placeholderType = if (LocalInspectionMode.current) PlaceholderType.Large else PlaceholderType.None,

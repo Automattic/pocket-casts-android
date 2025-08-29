@@ -25,7 +25,7 @@ import androidx.wear.compose.material.Chip
 import androidx.wear.compose.material.ChipDefaults
 import androidx.wear.compose.material.MaterialTheme
 import androidx.wear.compose.material.Text
-import au.com.shiftyjelly.pocketcasts.compose.components.PodcastImage
+import au.com.shiftyjelly.pocketcasts.compose.components.PodcastImageDeprecated
 import au.com.shiftyjelly.pocketcasts.compose.extensions.darker
 import au.com.shiftyjelly.pocketcasts.models.to.FolderItem
 import au.com.shiftyjelly.pocketcasts.wear.theme.WearColors
@@ -156,7 +156,8 @@ private fun PodcastChip(
             ChipText(podcast.title)
         },
         icon = {
-            PodcastImage(
+            @Suppress("DEPRECATION")
+            PodcastImageDeprecated(
                 uuid = podcast.uuid,
                 dropShadow = false,
                 modifier = Modifier.size(32.dp),

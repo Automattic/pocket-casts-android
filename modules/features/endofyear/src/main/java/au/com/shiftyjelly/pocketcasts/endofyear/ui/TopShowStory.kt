@@ -40,7 +40,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import au.com.shiftyjelly.pocketcasts.compose.Devices
-import au.com.shiftyjelly.pocketcasts.compose.components.PodcastImage
+import au.com.shiftyjelly.pocketcasts.compose.components.PodcastImageDeprecated
 import au.com.shiftyjelly.pocketcasts.compose.components.TextH10
 import au.com.shiftyjelly.pocketcasts.compose.components.TextP40
 import au.com.shiftyjelly.pocketcasts.endofyear.StoryCaptureController
@@ -105,7 +105,8 @@ private fun ColumnScope.TopShowCover(
             .weight(1f)
             .background(story.backgroundColor),
     ) {
-        PodcastImage(
+        @Suppress("DEPRECATION")
+        PodcastImageDeprecated(
             uuid = story.show.uuid,
             elevation = 0.dp,
             roundCorners = false,

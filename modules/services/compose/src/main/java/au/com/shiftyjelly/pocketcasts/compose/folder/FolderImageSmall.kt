@@ -1,6 +1,5 @@
 package au.com.shiftyjelly.pocketcasts.compose.folder
 
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -11,22 +10,15 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.Shape
-import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import au.com.shiftyjelly.pocketcasts.compose.components.PodcastImage
 import au.com.shiftyjelly.pocketcasts.compose.theme
-import au.com.shiftyjelly.pocketcasts.repositories.images.PocketCastsImageRequestFactory
-import au.com.shiftyjelly.pocketcasts.ui.extensions.themed
-import coil.compose.rememberAsyncImagePainter
 
 @Composable
 fun FolderImageSmall(
@@ -36,7 +28,8 @@ fun FolderImageSmall(
     size: Dp = 56.dp,
     elevation: Dp? = 2.dp,
 ) {
-    val shape = RoundedCornerShape(size / 14)
+    val cornerSize = size / 14
+    val shape = RoundedCornerShape(cornerSize)
     val estimatedPadding = size / 12f
     val artworkSize = (size - estimatedPadding * 3) / 2
     FlowRow(
@@ -57,27 +50,27 @@ fun FolderImageSmall(
     ) {
         PodcastOrPlaceHolder(
             podcastUuid = podcastUuids.getOrNull(0),
-            shape = shape,
+            size = artworkSize,
+            cornerSize = cornerSize,
             placeholderBrush = TopPlaceholderGradient,
-            modifier = Modifier.size(artworkSize),
         )
         PodcastOrPlaceHolder(
             podcastUuid = podcastUuids.getOrNull(1),
-            shape = shape,
+            size = artworkSize,
+            cornerSize = cornerSize,
             placeholderBrush = TopPlaceholderGradient,
-            modifier = Modifier.size(artworkSize),
         )
         PodcastOrPlaceHolder(
             podcastUuid = podcastUuids.getOrNull(2),
-            shape = shape,
+            size = artworkSize,
+            cornerSize = cornerSize,
             placeholderBrush = BottomPlaceholderGradient,
-            modifier = Modifier.size(artworkSize),
         )
         PodcastOrPlaceHolder(
             podcastUuid = podcastUuids.getOrNull(3),
-            shape = shape,
+            size = artworkSize,
+            cornerSize = cornerSize,
             placeholderBrush = BottomPlaceholderGradient,
-            modifier = Modifier.size(artworkSize),
         )
     }
 }
@@ -85,24 +78,22 @@ fun FolderImageSmall(
 @Composable
 private fun PodcastOrPlaceHolder(
     podcastUuid: String?,
-    shape: Shape,
+    size: Dp,
+    cornerSize: Dp,
     placeholderBrush: Brush,
-    modifier: Modifier = Modifier,
 ) {
     if (podcastUuid != null) {
-        val context = LocalContext.current
-        val imageRequest = remember(podcastUuid) {
-            PocketCastsImageRequestFactory(context).themed().createForPodcast(podcastUuid)
-        }
-        Image(
-            painter = rememberAsyncImagePainter(imageRequest, contentScale = ContentScale.Crop),
-            contentScale = ContentScale.Crop,
-            contentDescription = null,
-            modifier = modifier.clip(shape),
+        PodcastImage(
+            uuid = podcastUuid,
+            imageSize = size,
+            cornerSize = cornerSize,
+            elevation = null,
         )
     } else {
         Box(
-            modifier = modifier.background(placeholderBrush, shape),
+            modifier = Modifier
+                .size(size)
+                .background(placeholderBrush, RoundedCornerShape(cornerSize)),
         )
     }
 }

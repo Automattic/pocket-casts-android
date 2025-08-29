@@ -41,7 +41,7 @@ import androidx.compose.ui.unit.sp
 import au.com.shiftyjelly.pocketcasts.compose.AppThemeWithBackground
 import au.com.shiftyjelly.pocketcasts.compose.PreviewRegularDevice
 import au.com.shiftyjelly.pocketcasts.compose.components.FadedLazyColumn
-import au.com.shiftyjelly.pocketcasts.compose.components.PodcastImage
+import au.com.shiftyjelly.pocketcasts.compose.components.PodcastImageDeprecated
 import au.com.shiftyjelly.pocketcasts.compose.components.TextH30
 import au.com.shiftyjelly.pocketcasts.compose.components.TextH40
 import au.com.shiftyjelly.pocketcasts.compose.components.TextH60
@@ -239,7 +239,8 @@ private fun PodcastRow(
             )
             .padding(horizontal = 16.dp, vertical = 12.dp),
     ) {
-        PodcastImage(
+        @Suppress("DEPRECATION")
+        PodcastImageDeprecated(
             uuid = uuid,
             cornerSize = 4.dp,
             elevation = 2.dp,

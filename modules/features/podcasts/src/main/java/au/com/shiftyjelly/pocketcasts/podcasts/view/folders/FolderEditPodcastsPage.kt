@@ -36,7 +36,7 @@ import au.com.shiftyjelly.pocketcasts.compose.bars.BottomSheetAppBar
 import au.com.shiftyjelly.pocketcasts.compose.bars.NavigationButton
 import au.com.shiftyjelly.pocketcasts.compose.buttons.RowButton
 import au.com.shiftyjelly.pocketcasts.compose.components.HorizontalDivider
-import au.com.shiftyjelly.pocketcasts.compose.components.PodcastImage
+import au.com.shiftyjelly.pocketcasts.compose.components.PodcastImageDeprecated
 import au.com.shiftyjelly.pocketcasts.compose.components.PodcastSelectedText
 import au.com.shiftyjelly.pocketcasts.compose.components.SearchBar
 import au.com.shiftyjelly.pocketcasts.compose.components.TextP40
@@ -192,7 +192,8 @@ private fun PodcastSelectRow(
         Box(
             modifier = Modifier.padding(start = 16.dp, end = 8.dp, top = 8.dp, bottom = 8.dp),
         ) {
-            PodcastImage(
+            @Suppress("DEPRECATION")
+            PodcastImageDeprecated(
                 uuid = podcast.uuid,
                 modifier = Modifier.size(56.dp),
             )

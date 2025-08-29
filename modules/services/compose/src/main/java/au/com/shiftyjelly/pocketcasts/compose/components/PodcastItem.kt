@@ -45,7 +45,8 @@ fun PodcastItem(
                 .then(if (onClick == null) Modifier else Modifier.clickable { onClick() })
                 .padding(horizontal = 16.dp, vertical = 8.dp),
         ) {
-            PodcastImage(
+            @Suppress("DEPRECATION")
+            PodcastImageDeprecated(
                 uuid = podcast.uuid,
                 modifier = Modifier.size(iconSize),
             )
