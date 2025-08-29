@@ -1263,7 +1263,7 @@ class PlaylistManagerTest {
         podcastDao.insertSuspend(Podcast("podcast-id-0", title = "Podcast Title 0", author = "Podcast Author 0", isSubscribed = false))
         podcastDao.insertSuspend(Podcast("podcast-id-1", title = "Podcast Title 1", author = "Podcast Author 1", isSubscribed = true))
         podcastDao.insertSuspend(Podcast("podcast-id-2", title = "Podcast Title 2", author = "Podcast Author 2", rawFolderUuid = "folder-id-1", isSubscribed = true))
-        podcastDao.insertSuspend(Podcast("podcast-id-3", title = "Podcast Title 3", author = "Podcast Author 3", rawFolderUuid = "folder-id-2", isSubscribed = true))
+        podcastDao.insertSuspend(Podcast("podcast-id-3", title = "Podcast Title 3", author = "Podcast Author 3", isSubscribed = true))
         podcastDao.insertSuspend(Podcast("podcast-id-4", title = "Podcast Title 4", author = "Podcast Author 4", rawFolderUuid = "folder-id-1", isSubscribed = false))
         val baseFolder = Folder(
             uuid = "folder-id-0",
@@ -1318,9 +1318,9 @@ class PlaylistManagerTest {
                     title = "Folder Name 1",
                     podcastSources = listOf(
                         ManualPlaylistPodcastSource(
-                            uuid = "podcast-id-3",
-                            title = "Podcast Title 3",
-                            author = "Podcast Author 3",
+                            uuid = "podcast-id-2",
+                            title = "Podcast Title 2",
+                            author = "Podcast Author 2",
                         ),
                     ),
                 ),
