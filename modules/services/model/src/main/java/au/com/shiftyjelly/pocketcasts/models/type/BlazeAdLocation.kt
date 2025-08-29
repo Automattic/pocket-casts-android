@@ -5,17 +5,20 @@ import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.JsonReader
 import com.squareup.moshi.JsonWriter
 
-enum class BlazeAdLocation(val value: String, val feature: Feature?) {
+enum class BlazeAdLocation(val value: String, val analyticsName: String, val feature: Feature?) {
     PodcastList(
         value = "podcastList",
+        analyticsName = "podcasts_list",
         feature = Feature.BANNER_ADS_PODCASTS,
     ),
     Player(
         value = "player",
+        analyticsName = "player",
         feature = Feature.BANNER_ADS_PLAYER,
     ),
     Unknown(
         value = "",
+        analyticsName = "unknown",
         feature = null,
     ),
     ;
