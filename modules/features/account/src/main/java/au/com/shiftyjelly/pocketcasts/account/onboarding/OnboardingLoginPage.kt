@@ -170,7 +170,7 @@ internal fun NewOnboardingLoginPage(
                     Box(
                         modifier = Modifier
                             .weight(1f)
-                            .height(.5.dp)
+                            .height(.75.dp)
                             .background(color = MaterialTheme.theme.colors.primaryUi05),
                     )
                     TextC50(
@@ -181,7 +181,7 @@ internal fun NewOnboardingLoginPage(
                     Box(
                         modifier = Modifier
                             .weight(1f)
-                            .height(.5.dp)
+                            .height(.75.dp)
                             .background(color = MaterialTheme.theme.colors.primaryUi05),
                     )
                 }
