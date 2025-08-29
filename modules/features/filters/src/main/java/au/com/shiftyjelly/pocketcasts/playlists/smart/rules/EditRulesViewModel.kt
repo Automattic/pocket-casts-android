@@ -55,8 +55,9 @@ class EditRulesViewModel @AssistedInject constructor(
                 ),
             )
             rulesEditor = editor
+
             // Add a small delay to prevent rendering all data while the bottom sheet is still animating in
-            delay(300)
+            delay(350)
             emitAll(
                 combine(
                     editor.rulesFlow,

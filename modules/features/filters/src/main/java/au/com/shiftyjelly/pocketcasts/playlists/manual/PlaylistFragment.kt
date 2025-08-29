@@ -18,12 +18,11 @@ import au.com.shiftyjelly.pocketcasts.filters.databinding.PlaylistFragmentBindin
 import au.com.shiftyjelly.pocketcasts.playlists.component.PlaylistHeaderAdapter
 import au.com.shiftyjelly.pocketcasts.playlists.component.PlaylistHeaderButtonData
 import au.com.shiftyjelly.pocketcasts.playlists.component.PlaylistHeaderData
+import au.com.shiftyjelly.pocketcasts.playlists.manual.episode.AddEpisodesFragment
 import au.com.shiftyjelly.pocketcasts.views.extensions.hideKeyboardOnScroll
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseFragment
 import dagger.hilt.android.AndroidEntryPoint
 import dagger.hilt.android.lifecycle.withCreationCallback
-import javax.inject.Inject
-import kotlin.collections.orEmpty
 import kotlin.time.Duration
 import kotlinx.coroutines.launch
 import kotlinx.parcelize.Parcelize
@@ -59,7 +58,7 @@ class PlaylistFragment : BaseFragment() {
             leftButton = PlaylistHeaderButtonData(
                 iconId = IR.drawable.ic_playlist_add_episodes,
                 label = getString(LR.string.add_episodes),
-                onClick = { Timber.i("Add episodes") },
+                onClick = { openEditor() },
             ),
             rightButton = PlaylistHeaderButtonData(
                 iconId = IR.drawable.ic_playlist_play,
@@ -117,6 +116,13 @@ class PlaylistFragment : BaseFragment() {
             windowInsets
         }
         content.hideKeyboardOnScroll()
+    }
+
+    private fun openEditor() {
+        if (parentFragmentManager.findFragmentByTag("playlist_episode_editor") != null) {
+            return
+        }
+        AddEpisodesFragment.newInstance(args.playlistUuid).show(parentFragmentManager, "playlist_episode_editor")
     }
 
     @Parcelize

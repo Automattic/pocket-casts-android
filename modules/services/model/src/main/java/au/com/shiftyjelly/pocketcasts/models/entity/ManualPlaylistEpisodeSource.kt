@@ -13,10 +13,12 @@ data class ManualPlaylistPodcastSource(
 data class ManualPlaylistFolderSource(
     val uuid: String,
     val title: String,
+    val color: Int,
     val podcastSources: List<ManualPlaylistPodcastSource>,
 ) : ManualPlaylistEpisodeSource
 
 internal data class ManualPlaylistPartialFolderSource(
     @ColumnInfo(name = "uuid") val uuid: String,
     @ColumnInfo(name = "name") val title: String,
+    @ColumnInfo(name = "color") val color: Int,
 )

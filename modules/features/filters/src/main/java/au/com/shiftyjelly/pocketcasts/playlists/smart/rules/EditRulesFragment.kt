@@ -50,7 +50,9 @@ class EditRulesFragment : BaseDialogFragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?,
     ) = content {
-        DialogBox {
+        DialogBox(
+            modifier = Modifier.nestedScroll(rememberNestedScrollInteropConnection()),
+        ) {
             val navController = rememberNavController()
             val listener = rememberNavigationListener()
 
@@ -72,9 +74,7 @@ class EditRulesFragment : BaseDialogFragment() {
                     useEpisodeArtwork = uiState.useEpisodeArtwork,
                     navController = navController,
                     listener = listener,
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .nestedScroll(rememberNestedScrollInteropConnection()),
+                    modifier = Modifier.fillMaxSize(),
                 )
             }
         }
