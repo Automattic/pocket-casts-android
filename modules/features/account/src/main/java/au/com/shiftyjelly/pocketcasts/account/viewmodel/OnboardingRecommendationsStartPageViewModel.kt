@@ -11,9 +11,11 @@ import au.com.shiftyjelly.pocketcasts.repositories.categories.CategoriesManager
 import au.com.shiftyjelly.pocketcasts.repositories.lists.ListRepository
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
+import au.com.shiftyjelly.pocketcasts.servers.model.DiscoverCategory
 import au.com.shiftyjelly.pocketcasts.servers.model.DiscoverPodcast
 import au.com.shiftyjelly.pocketcasts.servers.model.DiscoverRow
 import au.com.shiftyjelly.pocketcasts.servers.model.ListType
+import au.com.shiftyjelly.pocketcasts.servers.model.NetworkLoadableList
 import au.com.shiftyjelly.pocketcasts.servers.model.transformWithRegion
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
@@ -48,7 +50,7 @@ class OnboardingRecommendationsStartPageViewModel @Inject constructor(
     ) {
         private val anySubscribed: Boolean = sections.any { it.anySubscribed }
 
-        val buttonRes = if (anySubscribed) {
+        val buttonRes = if (anySubscribed || FeatureFlag.isEnabled(Feature.NEW_ONBOARDING_RECOMMENDATIONS)) {
             LR.string.navigation_continue
         } else {
             LR.string.not_now
@@ -154,7 +156,7 @@ class OnboardingRecommendationsStartPageViewModel @Inject constructor(
             )
             val updatedList = feed.layout.transformWithRegion(region, replacements, getApplication<Application>().resources)
 
-            val interestNames = categoriesManager.interestCategories.value.map { it.name }.toHashSet()
+            val interestNames = categoriesManager.interestCategories.value.map { it.name }.toSet()
             if (FeatureFlag.isEnabled(Feature.NEW_ONBOARDING_RECOMMENDATIONS) && interestNames.isNotEmpty()) {
                 updateFlowWithCategories(sectionsFlow, updatedList, replacements, interestNames)
                 updateFlowWith("featured", sectionsFlow, updatedList, interestNames.size)
@@ -316,7 +318,21 @@ class OnboardingRecommendationsStartPageViewModel @Inject constructor(
         // Make network calls one at a time so the UI can load the initial sections as quickly
         // as possible, and to maintain the order of the sections
         categories
-            .sortedWith(compareByDescending { it.title in interestCategoryNames })
+            .filter { !FeatureFlag.isEnabled(Feature.NEW_ONBOARDING_RECOMMENDATIONS) || (it as? DiscoverCategory)?.popularity != null }
+            .sortedWith(
+                compareByDescending<NetworkLoadableList> { it.title in interestCategoryNames }.thenBy {
+                    if (FeatureFlag.isEnabled(Feature.NEW_ONBOARDING_RECOMMENDATIONS)) {
+                        val index = interestCategoryNames.indexOf(it.title)
+                        if (index != -1) {
+                            index.toString()
+                        } else {
+                            (it as? DiscoverCategory)?.popularity?.toString() ?: it.title
+                        }
+                    } else {
+                        it.title
+                    }
+                },
+            )
             .forEach { category ->
                 runCatching {
                     repository.getListFeed(category.source)

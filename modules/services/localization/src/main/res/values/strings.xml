@@ -2601,4 +2601,6 @@
     <string name="onboarding_interests_description">Great podcasts, handpicked by real people, are coming your way!</string>
     <string name="onboarding_interests_show_more">Show more categories</string>
     <string name="onboarding_interests_select_at_least_label">Select at least 3</string>
+    <string name="onboarding_recommendations_title">We hope you love these suggestions!</string>
+    <string name="onboarding_recommendations_message">Here are some great shows to start with. Tap to follow, search, or import from other apps.</string>
 </resources>

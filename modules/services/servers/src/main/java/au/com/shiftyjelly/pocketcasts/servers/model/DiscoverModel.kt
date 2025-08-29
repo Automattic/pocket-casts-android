@@ -260,6 +260,7 @@ data class DiscoverCategory(
     @Json(name = "id") val id: Int,
     @Json(name = "name") val name: String,
     @Json(name = "icon") val icon: String,
+    @Json(name = "popularity") val popularity: Int? = null,
     @Json(name = "source") override val source: String,
     override val curated: Boolean = false,
     val totalVisits: Int = 0,

@@ -14,7 +14,6 @@ import kotlin.time.TimeSource
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
-import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
@@ -92,6 +91,12 @@ class CategoriesManager @Inject constructor(
             is State.Idle -> null
         }
     }.distinctUntilChanged()
+
+    val availableInterestCategories = discoverCategories
+        .map { categories ->
+            categories.filter { it.popularity != null }
+                .sortedBy { it.popularity }
+        }
 
     fun loadCategories(url: String) {
         if (discoverCategories.value.isEmpty() || areCategoriesStale()) {
