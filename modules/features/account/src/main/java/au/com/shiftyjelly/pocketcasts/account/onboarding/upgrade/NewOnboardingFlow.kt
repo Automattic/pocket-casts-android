@@ -96,7 +96,10 @@ object NewOnboardingFlow {
                 theme = theme,
                 flow = flow,
                 onBackPress = {
-                    navController.popBackStack()
+                    val hasPopped = navController.popBackStack()
+                    if (!hasPopped) {
+                        finishOnboardingFlow()
+                    }
                 },
                 onSkip = finishOnboardingFlow,
                 onCreateAccount = {
