@@ -157,7 +157,7 @@ class OnboardingFlowComposableTest {
     fun startDestination_newOnboarding_LoggedOut() {
         FeatureFlag.setEnabled(Feature.NEW_ONBOARDING_ACCOUNT_CREATION, true)
         assertStartDestinationForFlow(
-            startDestination = NewOnboardingFlow.ROUTE_INTRO_CAROUSEL,
+            startDestination = NewOnboardingFlow.ROUTE_SIGN_UP,
             flow = OnboardingFlow.LoggedOut,
         )
     }
