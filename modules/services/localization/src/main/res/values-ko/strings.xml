@@ -1,11 +1,37 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2025-08-13 09:54:14+0000
+Translation-Revision-Date: 2025-08-26 09:54:03+0000
 Plural-Forms: nplurals=1; plural=0;
 Generator: GlotPress/2.4.0-alpha
 Language: ko_KR
 -->
 <resources>
+    <string name="onboarding_create_account_sign_up_google">Google로 등록</string>
+    <string name="onboarding_create_account_sign_up_email">이메일로 등록</string>
+    <string name="onboarding_create_account_message">팟캐스트가 항상 동기화됩니다. 라이브러리를 안전하게 유지하고 웹과 데스크톱에서 Pocket\u00A0Casts를 즐기세요.</string>
+    <string name="onboarding_create_account_title">Pocket\u00A0Casts 계정 생성</string>
+    <string name="onboarding_login_or">또는</string>
+    <string name="onboarding_login_continue_with_email">이메일로 계속</string>
+    <string name="playlist_artwork_description">실행 목록의 아트워크</string>
+    <string name="onboarding_intro_get_started">시작하기</string>
+    <string name="onboarding_intro_carousel_pc_user">Pocket Casts 사용자</string>
+    <string name="onboarding_intro_carousel_organizing_podcasts_title">\"내 팟캐스트를 폴더로 정리하는 것은 천재적입니다.\"</string>
+    <string name="onboarding_intro_carousel_customization_insane_title">\"사용자 정의 양이 엄청납니다.\"</string>
+    <string name="onboarding_intro_carousel_best_app_title">\"지금까지 현존 최고의  팟캐스트 앱입니다.\"</string>
+    <string name="transcript_share">대본 공유</string>
+    <string name="onboarding_notifications_popup_save">기본 설정</string>
+    <string name="onboarding_notification_popup_notifications_message">뉴스, 팟캐스트 제안 등을 받으세요</string>
+    <string name="onboarding_notification_popup_notifications">알림 받기</string>
+    <string name="onboarding_notification_popup_newsletter_message">달마다 에피소드 하나씩, 모든 팟캐스트를 들어보세요</string>
+    <string name="onboarding_notification_popup_newsletter">뉴스레터를 구독하세요</string>
+    <string name="playlist_setting_auto_download_description">활성화하여 이 재생목록의 에피소드를 자동 다운로드하세요.</string>
+    <string name="smart_rule_starred_label">에피소드 별 표시</string>
+    <string name="smart_rule_starred_description_disabled">별 표시 에피소드가 다른 규칙과 일치하는 경우에도 표시합니다.</string>
+    <string name="smart_rule_starred_description">다른 규칙과 일치하는 별 표시 에피소드만 포함합니다.</string>
+    <string name="playlist_sort_by">정렬 기준</string>
+    <string name="playlist_select_episodes">에피소드 선택</string>
+    <string name="playlist_options">재생목록 옵션</string>
+    <string name="playlist_download_all">모두 다운로드</string>
     <string name="smart_playlist_no_content_body">목록을 완료한 것을 축하하거나 조금 더 가져오기 위해 규칙을 편집할 시간입니다.</string>
     <string name="smart_playlist_no_content_title">에피소드 없음</string>
     <string name="playlist_play_all">모두 재생</string>
@@ -42,6 +68,7 @@ Language: ko_KR
     <string name="create_playlist">재생목록 만들기</string>
     <string name="new_smart_playlist_banner_body">규칙에 따라 에피소드 자동 추가</string>
     <string name="new_smart_playlist_banner_title">스마트 재생목록으로 만들기</string>
+    <string name="new_playlists_title_placeholder">재생목록 이름</string>
     <string name="onboarding_folders_title_3">스포츠</string>
     <string name="onboarding_folders_title_2">즐겨찾기</string>
     <string name="onboarding_folders_title_1">책</string>

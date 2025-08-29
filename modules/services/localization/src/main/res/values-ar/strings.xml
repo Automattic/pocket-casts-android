@@ -1,11 +1,37 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2025-08-11 15:54:03+0000
+Translation-Revision-Date: 2025-08-25 14:54:03+0000
 Plural-Forms: nplurals=6; plural=n==0 ? 0 : n==1 ? 1 : n==2 ? 2 : n%100>=3 && n%100<=10 ? 3 : n%100>=11 && n%100<=99 ? 4 : 5;
 Generator: GlotPress/2.4.0-alpha
 Language: ar
 -->
 <resources>
+    <string name="onboarding_create_account_sign_up_google">تسجيل الدخول باستخدام Google</string>
+    <string name="onboarding_create_account_sign_up_email">تسجيل الدخول باستخدام البريد الإلكتروني</string>
+    <string name="onboarding_create_account_message">حلقات البودكاست الخاصة بك، متزامنة دومًا. حافظ على أمان مكتبتك، واستمتع بـ Pocket\u00A0Casts على الويب وسطح المكتب.</string>
+    <string name="onboarding_create_account_title">إنشاء حسابك على Pocket\u00A0Casts</string>
+    <string name="onboarding_login_or">أو</string>
+    <string name="onboarding_login_continue_with_email">المتابعة باستخدام البريد الإلكتروني</string>
+    <string name="playlist_artwork_description">أعمال قائمة التشغيل الفنية</string>
+    <string name="onboarding_intro_get_started">ابدأ</string>
+    <string name="onboarding_intro_carousel_pc_user">مستخدم Pocket Casts</string>
+    <string name="onboarding_intro_carousel_organizing_podcasts_title">\"تنظيم حلقات البودكاست الخاصة بي بواسطة المجلدات أمر عبقري\"</string>
+    <string name="onboarding_intro_carousel_customization_insane_title">\"إمكانيات التخصيص مذهلة\"</string>
+    <string name="onboarding_intro_carousel_best_app_title">\"أفضل تطبيق بودكاست على الإطلاق. بلا منازع\"</string>
+    <string name="transcript_share">مشاركة النص</string>
+    <string name="onboarding_notification_popup_newsletter">الاشتراك في نشرتنا الإخبارية</string>
+    <string name="onboarding_notifications_popup_save">حفظ التفضيلات</string>
+    <string name="onboarding_notification_popup_notifications_message">تلقي الأخبار، واقتراحات البث الصوتي والمزيد</string>
+    <string name="onboarding_notification_popup_notifications">تلقي التنبيهات</string>
+    <string name="onboarding_notification_popup_newsletter_message">مرة واحدة شهريًا، ستجد كل ما هو رائع في البث الصوتي</string>
+    <string name="playlist_setting_auto_download_description">تفعيل التنزيل التلقائي للحلقات في قائمة التشغيل هذه.</string>
+    <string name="playlist_sort_by">فرز حسب</string>
+    <string name="playlist_options">خيارات قائمة التشغيل</string>
+    <string name="playlist_download_all">تنزيل الكل</string>
+    <string name="smart_rule_starred_label">الحلقات المميزة بنجمة</string>
+    <string name="smart_rule_starred_description_disabled">لا تزال الحلقات المميزة بنجمة يمكن أن تظهر إذا كانت تطابق قواعدك الأخرى.</string>
+    <string name="smart_rule_starred_description">تضمّن فقط الحلقات المميزة بنجمة التي تطابق قواعدك الأخرى.</string>
+    <string name="playlist_select_episodes">تحديد الحلقات</string>
     <string name="smart_playlist_no_content_body">إمّا أن الوقت قد حان للاحتفال بإكمال هذه القائمة، أو تحرير القواعد للحصول على المزيد.</string>
     <string name="smart_playlist_no_content_title">لا توجد حلقات</string>
     <string name="playlist_play_all">تشغيل الكل</string>
@@ -42,6 +68,7 @@ Language: ar
     <string name="create_playlist">إنشاء قائمة تشغيل</string>
     <string name="new_smart_playlist_banner_body">إضافة الحلقات تلقائيًا حسب قواعد</string>
     <string name="new_smart_playlist_banner_title">تحويل إلى قائمة تشغيل ذكية</string>
+    <string name="new_playlists_title_placeholder">اسم قائمة التشغيل</string>
     <string name="onboarding_folders_title_3">رياضة</string>
     <string name="onboarding_folders_title_2">المفضلات</string>
     <string name="onboarding_folders_title_1">كتب</string>

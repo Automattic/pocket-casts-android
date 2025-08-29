@@ -1,11 +1,37 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2025-08-14 09:54:03+0000
+Translation-Revision-Date: 2025-08-26 09:54:03+0000
 Plural-Forms: nplurals=1; plural=0;
 Generator: GlotPress/2.4.0-alpha
 Language: zh_CN
 -->
 <resources>
+    <string name="onboarding_create_account_sign_up_google">使用 Google 账户注册</string>
+    <string name="onboarding_create_account_sign_up_email">使用电子邮件地址注册</string>
+    <string name="onboarding_create_account_message">您的播客，始终保持同步。 保护您的媒体库安全，并在网页和桌面端畅享 Pocket Casts。</string>
+    <string name="onboarding_create_account_title">创建您的 Pocket Casts 账户</string>
+    <string name="onboarding_login_or">或</string>
+    <string name="onboarding_login_continue_with_email">使用电子邮件地址继续</string>
+    <string name="playlist_artwork_description">播放列表的插图</string>
+    <string name="onboarding_intro_get_started">开始</string>
+    <string name="onboarding_intro_carousel_pc_user">Pocket Casts 用户</string>
+    <string name="onboarding_intro_carousel_organizing_podcasts_title">“用文件夹整理播客节目真是天才设计”</string>
+    <string name="onboarding_intro_carousel_customization_insane_title">“自定义程度高到惊人”</string>
+    <string name="onboarding_intro_carousel_best_app_title">“目前最好用的播客应用程序。 没有之一”</string>
+    <string name="transcript_share">共享文字转录稿</string>
+    <string name="onboarding_notifications_popup_save">保存首选项</string>
+    <string name="onboarding_notification_popup_notifications">接收通知</string>
+    <string name="onboarding_notification_popup_newsletter">订阅我们的电子报</string>
+    <string name="onboarding_notification_popup_notifications_message">接收新闻、播客建议等更多内容</string>
+    <string name="onboarding_notification_popup_newsletter_message">每月一次，尽享播客精彩</string>
+    <string name="playlist_setting_auto_download_description">为此播放列表中的剧集启用自动下载。</string>
+    <string name="smart_rule_starred_label">星标剧集</string>
+    <string name="smart_rule_starred_description">仅包括符合您的其他规则的星标剧集。</string>
+    <string name="playlist_sort_by">排序方式</string>
+    <string name="playlist_select_episodes">选择剧集</string>
+    <string name="playlist_options">播放列表选项</string>
+    <string name="playlist_download_all">下载全部</string>
+    <string name="smart_rule_starred_description_disabled">如果符合您的其他规则，星标剧集仍会显示。</string>
     <string name="smart_playlist_no_content_body">您已完成此列表，但还可以编辑规则以获取更多内容。</string>
     <string name="smart_playlist_no_content_title">无剧集</string>
     <string name="smart_rules">智能规则</string>
@@ -42,6 +68,7 @@ Language: zh_CN
     <string name="create_playlist">创建播放列表</string>
     <string name="new_smart_playlist_banner_body">根据规则自动添加剧集</string>
     <string name="new_smart_playlist_banner_title">生成智能播放列表</string>
+    <string name="new_playlists_title_placeholder">播放列表的名称</string>
     <string name="onboarding_folders_title_3">运动</string>
     <string name="onboarding_folders_title_2">最爱</string>
     <string name="onboarding_folders_title_1">书籍</string>

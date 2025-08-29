@@ -1,11 +1,37 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2025-08-13 12:54:04+0000
+Translation-Revision-Date: 2025-08-26 11:54:04+0000
 Plural-Forms: nplurals=2; plural=n != 1;
 Generator: GlotPress/2.4.0-alpha
 Language: sv_SE
 -->
 <resources>
+    <string name="onboarding_create_account_sign_up_google">Registrera dig med Google</string>
+    <string name="onboarding_create_account_sign_up_email">Registrera dig med e-post</string>
+    <string name="onboarding_create_account_message">Dina podcasts, alltid synkroniserade. Håll ditt bibliotek säkert och njut av Pocket Casts på webben och via skrivbordet.</string>
+    <string name="onboarding_create_account_title">Skapa ditt Pocket Casts-konto</string>
+    <string name="onboarding_login_or">ELLER</string>
+    <string name="onboarding_login_continue_with_email">Fortsätt med e-post</string>
+    <string name="playlist_artwork_description">Spellistans omslag</string>
+    <string name="onboarding_intro_get_started">Kom igång</string>
+    <string name="onboarding_intro_carousel_pc_user">Pocket Casts-användare</string>
+    <string name="onboarding_intro_carousel_organizing_podcasts_title">”Att organisera mina podcasts i mappar är genialt”</string>
+    <string name="onboarding_intro_carousel_customization_insane_title">”Mängden anpassning är vansinnig”</string>
+    <string name="onboarding_intro_carousel_best_app_title">\"Bästa podcast-appen som finns. Utan tvekan\"</string>
+    <string name="transcript_share">Dela transkription</string>
+    <string name="onboarding_notifications_popup_save">Spara alternativ</string>
+    <string name="onboarding_notification_popup_notifications_message">Få nyheter, podcastförslag och annat</string>
+    <string name="onboarding_notification_popup_notifications">Få aviseringar</string>
+    <string name="onboarding_notification_popup_newsletter_message">En gång i månaden, podcasts i mängder</string>
+    <string name="onboarding_notification_popup_newsletter">Prenumerera på vårt nyhetsbrev</string>
+    <string name="playlist_setting_auto_download_description">Aktivera automatisk nedladdning av avsnitt i den här spellistan.</string>
+    <string name="smart_rule_starred_description_disabled">Stjärnmärkta avsnitt kan fortfarande visas om de matchar dina andra regler.</string>
+    <string name="smart_rule_starred_description">Inkludera endast stjärnmärkta avsnitt som matchar dina andra regler.</string>
+    <string name="playlist_sort_by">Sortera efter</string>
+    <string name="playlist_select_episodes">Välj avsnitt</string>
+    <string name="playlist_options">Spellistealternativ</string>
+    <string name="playlist_download_all">Ladda ner alla</string>
+    <string name="smart_rule_starred_label">Stjärnmärkta avsnitt</string>
     <string name="smart_playlist_no_content_body">Det är antingen dags att fira att den här listan är slutförd eller att redigera dina regler för att hitta mer.</string>
     <string name="smart_playlist_no_content_title">Inga avsnitt</string>
     <string name="playlist_play_all">Spela upp alla</string>
@@ -42,6 +68,7 @@ Language: sv_SE
     <string name="create_playlist">Skapa spellista</string>
     <string name="new_smart_playlist_banner_body">Lägg automatiskt till avsnitt baserat på regler</string>
     <string name="new_smart_playlist_banner_title">Gör till smart spellista</string>
+    <string name="new_playlists_title_placeholder">Spellistans namn</string>
     <string name="onboarding_folders_title_3">Sport</string>
     <string name="onboarding_folders_title_2">Favoriter</string>
     <string name="onboarding_folders_title_1">Böcker</string>
