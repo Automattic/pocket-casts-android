@@ -27,6 +27,10 @@ steps:
   - label: ":github: Publish Draft GitHub Release"
     if: build.env("PUBLISH_DRAFT_GITHUB_RELEASE") == "true"
     command: |
+      echo '--- 🤖 Use bot for Git operations'
+      # Needed because if `track:production` then the publish_gh_release lane will also delete the release branch
+      source use-bot-for-git
+
       echo '--- :ruby: Setup Ruby Tools'
       install_gems
 
