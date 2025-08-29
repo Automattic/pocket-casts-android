@@ -3,6 +3,8 @@ package au.com.shiftyjelly.pocketcasts.servers.di
 import android.accounts.AccountManager
 import android.content.Context
 import au.com.shiftyjelly.pocketcasts.models.entity.AnonymousBumpStat
+import au.com.shiftyjelly.pocketcasts.models.type.BlazeAdLocation
+import au.com.shiftyjelly.pocketcasts.models.type.BlazeAdLocationMoshiAdapter
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodePlayingStatus
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodePlayingStatusMoshiAdapter
 import au.com.shiftyjelly.pocketcasts.models.type.PodcastsSortType
@@ -75,6 +77,7 @@ class ServersModule {
             .add(PodcastsSortType::class.java, PodcastsSortTypeMoshiAdapter())
             .add(AccessToken::class.java, AccessToken.Adapter)
             .add(RefreshToken::class.java, RefreshToken.Adapter)
+            .add(BlazeAdLocation::class.java, BlazeAdLocationMoshiAdapter())
             .add(AnonymousBumpStat.Adapter)
             .add(LoginIdentity.Adapter)
             .add(ListTypeMoshiAdapter())

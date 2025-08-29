@@ -62,12 +62,12 @@ import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.compose.AppTheme
 import au.com.shiftyjelly.pocketcasts.compose.CallOnce
 import au.com.shiftyjelly.pocketcasts.compose.ad.AdBanner
-import au.com.shiftyjelly.pocketcasts.compose.ad.BlazeAd
 import au.com.shiftyjelly.pocketcasts.compose.ad.rememberAdColors
 import au.com.shiftyjelly.pocketcasts.compose.components.NoContentBanner
 import au.com.shiftyjelly.pocketcasts.compose.components.TipPosition
 import au.com.shiftyjelly.pocketcasts.compose.components.Tooltip
 import au.com.shiftyjelly.pocketcasts.compose.extensions.setContentWithViewCompositionStrategy
+import au.com.shiftyjelly.pocketcasts.models.entity.BlazeAd
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.to.RefreshState
 import au.com.shiftyjelly.pocketcasts.models.type.PodcastsSortType
@@ -703,7 +703,7 @@ class PodcastsFragment :
     private fun openAd(ad: BlazeAd) {
         trackAdTapped(ad)
         runCatching {
-            val intent = Intent(Intent.ACTION_VIEW, ad.ctaUrl.toUri())
+            val intent = Intent(Intent.ACTION_VIEW, ad.url.toUri())
             startActivity(intent)
         }.onFailure { LogBuffer.e("Ads", it, "Failed to open an ad: ${ad.id}") }
     }

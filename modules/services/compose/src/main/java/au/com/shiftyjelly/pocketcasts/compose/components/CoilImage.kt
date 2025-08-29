@@ -2,6 +2,7 @@ package au.com.shiftyjelly.pocketcasts.compose.components
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.runtime.Composable
@@ -25,6 +26,7 @@ internal fun CoilImage(
     modifier: Modifier = Modifier,
     contentScale: ContentScale = ContentScale.Crop,
     corners: Dp? = null,
+    expandContentSize: Boolean = false,
 ) {
     val painter = rememberAsyncImagePainter(
         model = imageRequest,
@@ -38,7 +40,9 @@ internal fun CoilImage(
         Image(
             painter = painter,
             contentDescription = title,
-            modifier = Modifier.clip(if (corners == null) RectangleShape else RoundedCornerShape(corners)),
+            modifier = Modifier
+                .then(if (expandContentSize) Modifier.fillMaxSize() else Modifier)
+                .clip(if (corners == null) RectangleShape else RoundedCornerShape(corners)),
         )
         val state = painter.state
         if (showTitle && state is AsyncImagePainter.State.Error) {

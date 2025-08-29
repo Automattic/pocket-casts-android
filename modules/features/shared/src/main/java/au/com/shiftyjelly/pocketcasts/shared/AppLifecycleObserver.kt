@@ -7,6 +7,7 @@ import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.ProcessLifecycleOwner
 import au.com.shiftyjelly.pocketcasts.analytics.AppLifecycleAnalytics
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
+import au.com.shiftyjelly.pocketcasts.repositories.ads.BlazeAdsManager
 import au.com.shiftyjelly.pocketcasts.repositories.di.ApplicationScope
 import au.com.shiftyjelly.pocketcasts.repositories.notification.NotificationScheduler
 import au.com.shiftyjelly.pocketcasts.utils.AppPlatform
@@ -27,6 +28,7 @@ class AppLifecycleObserver(
     private val appLifecycleAnalytics: AppLifecycleAnalytics,
     private val appLifecycleOwner: LifecycleOwner = ProcessLifecycleOwner.get(),
     private val applicationScope: CoroutineScope,
+    private val blazeAdsManager: BlazeAdsManager,
     private val defaultReleaseFeatureProvider: DefaultReleaseFeatureProvider,
     private val firebaseRemoteFeatureProvider: FirebaseRemoteFeatureProvider,
     private val networkConnectionWatcher: NetworkConnectionWatcherImpl,
@@ -41,6 +43,7 @@ class AppLifecycleObserver(
         @ApplicationContext appContext: Context,
         @ApplicationScope applicationScope: CoroutineScope,
         appLifecycleAnalytics: AppLifecycleAnalytics,
+        blazeAdsManager: BlazeAdsManager,
         defaultReleaseFeatureProvider: DefaultReleaseFeatureProvider,
         networkConnectionWatcher: NetworkConnectionWatcherImpl,
         firebaseRemoteFeatureProvider: FirebaseRemoteFeatureProvider,
@@ -52,6 +55,7 @@ class AppLifecycleObserver(
         applicationScope = applicationScope,
         appLifecycleAnalytics = appLifecycleAnalytics,
         appLifecycleOwner = ProcessLifecycleOwner.get(),
+        blazeAdsManager = blazeAdsManager,
         defaultReleaseFeatureProvider = defaultReleaseFeatureProvider,
         firebaseRemoteFeatureProvider = firebaseRemoteFeatureProvider,
         networkConnectionWatcher = networkConnectionWatcher,
@@ -69,6 +73,13 @@ class AppLifecycleObserver(
         applicationScope.launch {
             notificationScheduler.setupReEngagementNotification()
             notificationScheduler.setupTrendingAndRecommendationsNotifications()
+        }
+    }
+
+    override fun onStart(owner: LifecycleOwner) {
+        super.onStart(owner)
+        applicationScope.launch {
+            blazeAdsManager.updateAds()
         }
     }
 
