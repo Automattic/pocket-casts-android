@@ -100,6 +100,30 @@ class PlaylistManagerImpl @Inject constructor(
             .distinctUntilChanged()
     }
 
+    override fun observeManualPlaylist(
+        uuid: String,
+    ): Flow<ManualPlaylist?> {
+        return playlistDao.observeManualPlaylist(uuid)
+            .flatMapLatest { playlist ->
+                if (playlist == null) {
+                    flowOf(null)
+                } else {
+                    val podcastsFlow = playlistDao.observeManualPlaylistPodcasts(playlist.uuid)
+                    val metadataFlow = playlistDao.observeManualEpisodeMetadata(playlist.uuid)
+                    combine(podcastsFlow, metadataFlow) { podcasts, metadata ->
+                        ManualPlaylist(
+                            uuid = playlist.uuid,
+                            title = playlist.title,
+                            totalEpisodeCount = metadata.episodeCount,
+                            playbackDurationLeft = metadata.timeLeftSeconds.seconds,
+                            artworkPodcastUuids = podcasts,
+                        )
+                    }.keepPodcastEpisodesSynced()
+                }
+            }
+            .distinctUntilChanged()
+    }
+
     override fun observeSmartEpisodes(
         rules: SmartRules,
         sortType: PlaylistEpisodeSortType,
@@ -206,6 +230,7 @@ class PlaylistManagerImpl @Inject constructor(
                 val episodeMetadataFlow = playlistDao.observeManualEpisodeMetadata(playlist.uuid)
                 podcastsFlow to episodeMetadataFlow
             }
+
             PlaylistPreview.Type.Smart -> {
                 val podcastsFlow = playlistDao.observeSmartPlaylistPodcasts(
                     clock = clock,

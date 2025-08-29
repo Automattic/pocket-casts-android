@@ -24,3 +24,11 @@ data class SmartPlaylist(
     val playbackDurationLeft: Duration,
     val artworkPodcastUuids: List<String>,
 ) : Playlist
+
+data class ManualPlaylist(
+    val uuid: String,
+    val title: String,
+    val totalEpisodeCount: Int,
+    val playbackDurationLeft: Duration,
+    val artworkPodcastUuids: List<String>,
+) : Playlist

@@ -26,7 +26,7 @@ import au.com.shiftyjelly.pocketcasts.PlaylistEpisodesAdapterFactory
 import au.com.shiftyjelly.pocketcasts.compose.AppTheme
 import au.com.shiftyjelly.pocketcasts.compose.extensions.setContentWithViewCompositionStrategy
 import au.com.shiftyjelly.pocketcasts.filters.R
-import au.com.shiftyjelly.pocketcasts.filters.databinding.SmartPlaylistFragmentBinding
+import au.com.shiftyjelly.pocketcasts.filters.databinding.PlaylistFragmentBinding
 import au.com.shiftyjelly.pocketcasts.playlists.component.PlaylistHeaderAdapter
 import au.com.shiftyjelly.pocketcasts.playlists.component.PlaylistHeaderButtonData
 import au.com.shiftyjelly.pocketcasts.playlists.component.PlaylistHeaderData
@@ -82,7 +82,7 @@ class PlaylistFragment :
         container: ViewGroup?,
         savedInstanceState: Bundle?,
     ): View {
-        val binding = SmartPlaylistFragmentBinding.inflate(inflater, container, false)
+        val binding = PlaylistFragmentBinding.inflate(inflater, container, false)
         binding.setupContent()
         binding.setupToolbar()
         binding.setupChromeCast()
@@ -90,7 +90,7 @@ class PlaylistFragment :
         return binding.root
     }
 
-    private fun SmartPlaylistFragmentBinding.setupContent() {
+    private fun PlaylistFragmentBinding.setupContent() {
         val headerAdapter = PlaylistHeaderAdapter(
             themeType = theme.activeTheme,
             leftButton = PlaylistHeaderButtonData(
@@ -171,7 +171,7 @@ class PlaylistFragment :
         content.hideKeyboardOnScroll()
     }
 
-    private fun SmartPlaylistFragmentBinding.setupToolbar() {
+    private fun PlaylistFragmentBinding.setupToolbar() {
         val toolbarAlpha = mutableFloatStateOf(0f)
         val transparencyThreshold = 40.dpToPx(requireContext())
         val maxProgressDistance = 100.dpToPx(requireContext())
@@ -218,7 +218,7 @@ class PlaylistFragment :
         }
     }
 
-    private fun SmartPlaylistFragmentBinding.setupChromeCast() {
+    private fun PlaylistFragmentBinding.setupChromeCast() {
         CastButtonFactory.setUpMediaRouteButton(requireContext(), chromeCastButton)
         viewLifecycleOwner.lifecycleScope.launch {
             viewModel.chromeCastSignal
@@ -229,7 +229,7 @@ class PlaylistFragment :
         }
     }
 
-    private fun SmartPlaylistFragmentBinding.setupSettings() {
+    private fun PlaylistFragmentBinding.setupSettings() {
         CastButtonFactory.setUpMediaRouteButton(requireContext(), chromeCastButton)
         viewLifecycleOwner.lifecycleScope.launch {
             viewModel.showSettingsSignal
