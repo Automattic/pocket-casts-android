@@ -8,9 +8,6 @@
 steps:
   - label: "🚂 Update Rollouts"
     command: |
-      echo '--- 🤖 Use bot for Git operations'
-      source use-bot-for-git
-
       echo '--- :ruby: Setup Ruby Tools'
       install_gems
 
@@ -19,6 +16,26 @@ steps:
 
       echo '--- 🚀 Update Rollouts'
       bundle exec fastlane update_rollouts track:"$TRACK" percent:"$ROLLOUT_PERCENT"
+    plugins: [$CI_TOOLKIT]
+    agents:
+      queue: "tumblr-metal"
+    retry:
+      manual:
+        allowed: false
+        reason: "Always prefer re-triggering a new build from ReleaseV2 rather than retrying the individual job from Buildkite"
+
+  - label: ":github: Publish Draft GitHub Release"
+    if: build.env("PUBLISH_DRAFT_GITHUB_RELEASE") == "true"
+    command: |
+      echo '--- 🤖 Use bot for Git operations'
+      # Needed because if `track:production` then the publish_gh_release lane will also delete the release branch
+      source use-bot-for-git
+
+      echo '--- :ruby: Setup Ruby Tools'
+      install_gems
+
+      echo '--- 🚀 Publish Draft GitHub Release'
+      bundle exec fastlane publish_gh_release skip_confirm:true track:"$TRACK"
     plugins: [$CI_TOOLKIT]
     agents:
       queue: "tumblr-metal"

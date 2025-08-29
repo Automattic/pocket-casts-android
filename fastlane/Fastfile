@@ -420,27 +420,29 @@ platform :android do
     create_backmerge_pr
   end
 
-  # This lane publishes a release on GitHub and creates a PR to backmerge the current release branch into the next release/ branch
+  # This lane publishes a release on GitHub. If `track` is `production`, it will also delete the release branch.
   #
   # @param [Boolean] skip_confirm (default: false) If set, will skip the confirmation prompt before running the rest of the lane
+  # @param [String] track (default: 'production') The Google Play track the release was published to in Google Play Console. Must be either `beta` or `production`.
+  #        If 'production': The GitHub Release will be expected to have a title like `X.Y`, and this lane will also delete the release branch after publishing the GitHub Release.
+  #        If 'beta': The draft GitHub Release will be expected to have a title like `X.Y-rc-N`. The release branch will NOT be deleted for those.
   #
-  lane :publish_release do |skip_confirm: false|
+  lane :publish_gh_release do |skip_confirm: false, track: 'production'|
     ensure_git_status_clean
     ensure_git_branch(branch: '^release/')
 
-    version_number = release_version_current
+    is_final_release = track.to_s.downcase == 'production'
+    version_number = is_final_release ? release_version_current : version_name_current
 
     current_branch = "release/#{version_number}"
-    next_release_branch = "release/#{release_version_next}"
 
-    UI.important <<~PROMPT
-      Publish the #{version_number} release. This will:
-      - Publish the existing draft `#{version_number}` release on GitHub
-      - Which will also have GitHub create the associated git tag, pointing to the tip of the branch
-      - If the release branch for the next version `#{next_release_branch}` already exists, backmerge `#{current_branch}` into it
-      - If needed, backmerge `#{current_branch}` back into `#{DEFAULT_BRANCH}`
-      - Delete the `#{current_branch}` branch
+    prompt = <<~PROMPT
+      Publish the #{version_number} GitHub release. This will:
+       - Publish the existing draft `#{version_number}` release on GitHub
+       - Which will also have GitHub create the associated git tag, pointing to the tip of the branch
     PROMPT
+    prompt += " - Delete the `#{current_branch}` branch" if is_final_release
+    UI.important(prompt)
     UI.user_error!("Terminating as requested. Don't forget to run the remainder of this automation manually.") unless skip_confirm || UI.confirm('Do you want to continue?')
 
     UI.important "Publishing release #{version_number} on GitHub"
@@ -449,6 +451,8 @@ platform :android do
       repository: GITHUB_REPO,
       name: version_number
     )
+
+    next unless is_final_release
 
     # At this point, an intermediate branch has been created by creating a backmerge PR to a hotfix or the next version release branch.
     # This allows us to safely delete the `release/*` remote branch.
@@ -494,6 +498,7 @@ platform :android do
     version = version_name_current
     build_code = build_code_current
     is_beta = beta_version?(version)
+
     unless skip_prechecks
       # Match branch names that begin with `release/`
       # Skip this check on CI because that action relies on CI env vars, but when this lane is called as part of `code_freeze` the branch changed since the CI build started, so that wouldn't work
@@ -673,6 +678,7 @@ platform :android do
   #
   # @param version [Hash<String>] The version to create. Expects keys "name" and "code"
   # @param prerelease [Bool] If true, the GitHub Release will have the prerelease flag
+  # @param release_assets [Array<String>] The assets to attach to the GitHub Release
   #
   private_lane :create_gh_release do |version:, prerelease: false, release_assets: []|
     create_github_release(
@@ -680,7 +686,7 @@ platform :android do
       version: version,
       release_notes_file_path: EXTRACTED_RELEASE_NOTES_PATH,
       prerelease: prerelease,
-      is_draft: !prerelease,
+      is_draft: true,
       release_assets: release_assets.join(',')
     )
   end
