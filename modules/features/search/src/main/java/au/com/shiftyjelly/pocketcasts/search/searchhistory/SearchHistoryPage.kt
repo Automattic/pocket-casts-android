@@ -262,8 +262,7 @@ fun SearchHistoryFolderView(
             FolderImageSmall(
                 color = color,
                 podcastUuids = entry.podcastIds,
-                folderImageSize = IconSize,
-                podcastImageSize = 20.dp,
+                size = IconSize,
             )
             Column(
                 modifier = Modifier
