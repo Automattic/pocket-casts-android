@@ -822,4 +822,5 @@ enum class AnalyticsEvent(val key: String) {
     /* Banner Ads */
     BANNER_AD_IMPRESSION("banner_ad_impression"),
     BANNER_AD_TAPPED("banner_ad_tapped"),
+    BANNER_AD_REPORT("banner_ad_report"),
 }

@@ -12,12 +12,15 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
 import androidx.core.os.BundleCompat
 import androidx.core.os.bundleOf
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.compose.LocalPodcastColors
 import au.com.shiftyjelly.pocketcasts.compose.PodcastColors
 import au.com.shiftyjelly.pocketcasts.compose.ad.AdReportContent
 import au.com.shiftyjelly.pocketcasts.compose.ad.rememberAdColors
 import au.com.shiftyjelly.pocketcasts.compose.extensions.contentWithoutConsumedInsets
 import au.com.shiftyjelly.pocketcasts.models.entity.BlazeAd
+import au.com.shiftyjelly.pocketcasts.models.type.AdReportReason
 import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingFlow
 import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingLauncher
 import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingUpgradeSource
@@ -25,6 +28,7 @@ import au.com.shiftyjelly.pocketcasts.ui.helper.FragmentHostListener
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseDialogFragment
 import com.google.android.material.snackbar.Snackbar
 import dagger.hilt.android.AndroidEntryPoint
+import javax.inject.Inject
 import kotlinx.parcelize.Parcelize
 import timber.log.Timber
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
@@ -32,6 +36,10 @@ import com.google.android.material.R as MR
 
 @AndroidEntryPoint
 class AdReportFragment : BaseDialogFragment() {
+
+    @Inject
+    internal lateinit var analyticsTracker: AnalyticsTracker
+
     companion object {
         const val NEW_INSTANCE_KEY = "new_instance_key"
 
@@ -65,12 +73,7 @@ class AdReportFragment : BaseDialogFragment() {
                         OnboardingLauncher.openOnboardingFlow(requireActivity(), OnboardingFlow.Upsell(OnboardingUpgradeSource.BANNER_AD))
                         dismiss()
                     },
-                    onReportAd = { reason ->
-                        Timber.i("Report ad: $reason, ${args.ad.id}")
-                        val snackbarView = (requireActivity() as FragmentHostListener).snackBarView()
-                        Snackbar.make(snackbarView, getString(LR.string.ad_report_confirmation), Snackbar.LENGTH_LONG).show()
-                        dismiss()
-                    },
+                    onReportAd = ::reportAd,
                 )
 
                 val surfaceColor = sheetColors.surface
@@ -79,6 +82,21 @@ class AdReportFragment : BaseDialogFragment() {
                 }
             }
         }
+    }
+
+    private fun reportAd(reason: AdReportReason) {
+        analyticsTracker.track(
+            AnalyticsEvent.BANNER_AD_REPORT,
+            mapOf(
+                "ad_id" to args.ad.id,
+                "reason" to reason.analyticsName,
+                "source" to args.ad.location.analyticsName,
+            ),
+        )
+
+        val snackbarView = (requireActivity() as FragmentHostListener).snackBarView()
+        Snackbar.make(snackbarView, getString(LR.string.ad_report_confirmation), Snackbar.LENGTH_LONG).show()
+        dismiss()
     }
 
     private fun refreshSystemColors(color: Color) {
