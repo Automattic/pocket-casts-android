@@ -1,13 +1,16 @@
 package au.com.shiftyjelly.pocketcasts.repositories.ads
 
+import android.content.Context
 import au.com.shiftyjelly.pocketcasts.models.db.AppDatabase
 import au.com.shiftyjelly.pocketcasts.models.entity.BlazeAd
 import au.com.shiftyjelly.pocketcasts.models.type.BlazeAdLocation
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.servers.cdn.StaticServiceManager
+import au.com.shiftyjelly.pocketcasts.utils.Util
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import com.automattic.android.tracks.crashlogging.CrashLogging
+import dagger.hilt.android.qualifiers.ApplicationContext
 import javax.inject.Inject
 import javax.inject.Singleton
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -24,13 +27,14 @@ class BlazeAdsManagerImpl @Inject constructor(
     private val staticServiceManager: StaticServiceManager,
     private val crashLogging: CrashLogging,
     appDatabase: AppDatabase,
+    @ApplicationContext private val context: Context,
 ) : BlazeAdsManager {
 
     private val blazeAdDao = appDatabase.blazeAdDao()
 
     override suspend fun updateAds() {
-        if (settings.cachedSubscription.value != null) {
-            // subscription found, so no need to fetch the ads
+        if (settings.cachedSubscription.value != null || Util.isAutomotive(context) || Util.isWearOs(context)) {
+            // don't fetch the ads if the user has a subscription, or on Automotive or Wear OS
             return
         }
         try {

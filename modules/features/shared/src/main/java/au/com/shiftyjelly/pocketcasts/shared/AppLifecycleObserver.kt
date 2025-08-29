@@ -73,6 +73,12 @@ class AppLifecycleObserver(
         applicationScope.launch {
             notificationScheduler.setupReEngagementNotification()
             notificationScheduler.setupTrendingAndRecommendationsNotifications()
+        }
+    }
+
+    override fun onStart(owner: LifecycleOwner) {
+        super.onStart(owner)
+        applicationScope.launch {
             blazeAdsManager.updateAds()
         }
     }
