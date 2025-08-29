@@ -122,12 +122,20 @@ enum class Feature(
         hasFirebaseRemoteFlag = true,
         hasDevToggle = true,
     ),
-    BANNER_ADS(
-        key = "banner_ads",
-        title = "Banner Ads",
+    BANNER_ADS_PLAYER(
+        key = "banner_ad_player",
+        title = "Banner Ads Player",
         defaultValue = BuildConfig.DEBUG,
         tier = FeatureTier.Free,
-        hasFirebaseRemoteFlag = false,
+        hasFirebaseRemoteFlag = true,
+        hasDevToggle = true,
+    ),
+    BANNER_ADS_PODCASTS(
+        key = "banner_ad_podcasts",
+        title = "Banner Ads Podcasts",
+        defaultValue = BuildConfig.DEBUG,
+        tier = FeatureTier.Free,
+        hasFirebaseRemoteFlag = true,
         hasDevToggle = true,
     ),
     SMART_CATEGORIES(
