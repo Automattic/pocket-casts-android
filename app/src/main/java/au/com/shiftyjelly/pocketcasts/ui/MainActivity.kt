@@ -22,6 +22,7 @@ import androidx.appcompat.widget.Toolbar
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.platform.ComposeView
+import androidx.core.app.ActivityOptionsCompat
 import androidx.core.content.ContextCompat
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowCompat
@@ -609,7 +610,10 @@ class MainActivity :
     }
 
     override fun openOnboardingFlow(onboardingFlow: OnboardingFlow) {
-        onboardingLauncher.launch(launchIntent(onboardingFlow))
+        onboardingLauncher.launch(
+            launchIntent(onboardingFlow), ActivityOptionsCompat
+                .makeCustomAnimation(this, R.anim.onboarding_enter, R.anim.onboarding_disappear)
+        )
     }
 
     override fun onStart() {
