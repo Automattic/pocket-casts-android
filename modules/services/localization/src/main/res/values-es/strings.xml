@@ -1,11 +1,37 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2025-08-12 14:54:03+0000
+Translation-Revision-Date: 2025-08-27 09:54:03+0000
 Plural-Forms: nplurals=2; plural=n != 1;
 Generator: GlotPress/2.4.0-alpha
 Language: es
 -->
 <resources>
+    <string name="onboarding_create_account_sign_up_google">Registrarse con Google</string>
+    <string name="onboarding_create_account_sign_up_email">Registrarse con correo electrónico</string>
+    <string name="onboarding_login_or">O</string>
+    <string name="onboarding_login_continue_with_email">Continuar con correo electrónico</string>
+    <string name="onboarding_create_account_message">Tus podcasts, siempre sincronizados. Protege tu biblioteca y disfruta de Pocket\u00A0Casts en la web y en el ordenador.</string>
+    <string name="onboarding_create_account_title">Crear tu cuenta de Pocket\u00A0Casts</string>
+    <string name="playlist_artwork_description">Portada de la lista de reproducción</string>
+    <string name="onboarding_intro_get_started">Empezar</string>
+    <string name="onboarding_intro_carousel_pc_user">Usuario de Pocket Casts</string>
+    <string name="onboarding_intro_carousel_organizing_podcasts_title">«Organizar mis podcasts por carpetas es lo mejor»</string>
+    <string name="onboarding_intro_carousel_customization_insane_title">«Es increíble todo lo que la puedes personalizar»</string>
+    <string name="onboarding_intro_carousel_best_app_title">«La mejor aplicación de podcasts, con diferencia»</string>
+    <string name="transcript_share">Compartir transcripción</string>
+    <string name="onboarding_notifications_popup_save">Guardar preferencias</string>
+    <string name="onboarding_notification_popup_notifications_message">Recibe novedades, sugerencias de podcasts y mucho más</string>
+    <string name="onboarding_notification_popup_notifications">Recibir notificaciones</string>
+    <string name="onboarding_notification_popup_newsletter_message">Lo mejor de los podcasts, una vez al mes</string>
+    <string name="onboarding_notification_popup_newsletter">Suscribirse a nuestra newsletter</string>
+    <string name="playlist_setting_auto_download_description">Habilita la descarga automática de episodios en esta lista de reproducción.</string>
+    <string name="smart_rule_starred_label">Episodios destacados</string>
+    <string name="smart_rule_starred_description_disabled">Los episodios destacados pueden seguir apareciendo si coinciden con tus otras reglas.</string>
+    <string name="smart_rule_starred_description">Solo incluye episodios destacados que coincidan con tus otras reglas.</string>
+    <string name="playlist_sort_by">Ordenar por</string>
+    <string name="playlist_select_episodes">Seleccionar episodios</string>
+    <string name="playlist_options">Opciones de la lista de reproducción</string>
+    <string name="playlist_download_all">Descargar todo</string>
     <string name="smart_playlist_no_content_body">Llegados aquí, puedes celebrar que la lista está terminada o modificar las reglas para encontrar más episodios.</string>
     <string name="smart_playlist_no_content_title">No hay episodios</string>
     <string name="playlist_play_all">Reproducir todo</string>
@@ -42,6 +68,7 @@ Language: es
     <string name="create_playlist">Crear lista de reproducción</string>
     <string name="new_smart_playlist_banner_body">Añade automáticamente episodios según las reglas</string>
     <string name="new_smart_playlist_banner_title">Convertir en lista de reproducción inteligente</string>
+    <string name="new_playlists_title_placeholder">Nombre de la lista de reproducción</string>
     <string name="onboarding_folders_title_3">Deportes</string>
     <string name="onboarding_folders_title_2">Favoritos</string>
     <string name="onboarding_folders_title_1">Libros</string>

@@ -36,7 +36,7 @@ fun TranscriptPage(
     onHideSearchBar: () -> Unit,
     onClickSubscribe: () -> Unit,
     onShowTranscript: (Transcript) -> Unit,
-    onShowTransciptPaywall: (Transcript) -> Unit,
+    onShowTranscriptPaywall: (Transcript) -> Unit,
     modifier: Modifier = Modifier,
     toolbarPadding: PaddingValues = PaddingValues(0.dp),
     transcriptPadding: PaddingValues = PaddingValues(0.dp),
@@ -100,7 +100,7 @@ fun TranscriptPage(
     ShowTranscriptEffect(
         uiState = uiState,
         onShowTranscript = onShowTranscript,
-        onShowTransciptPaywall = onShowTransciptPaywall,
+        onShowTranscriptPaywall = onShowTranscriptPaywall,
     )
 }
 
@@ -178,12 +178,12 @@ private fun ScrollToItemEffect(
 private fun ShowTranscriptEffect(
     uiState: UiState,
     onShowTranscript: (Transcript) -> Unit,
-    onShowTransciptPaywall: (Transcript) -> Unit,
+    onShowTranscriptPaywall: (Transcript) -> Unit,
 ) {
     val transcript = (uiState.transcriptState as? TranscriptState.Loaded)?.transcript
     if (transcript != null) {
         val isPaywallVisible = uiState.isPaywallVisible
-        LaunchedEffect(transcript, isPaywallVisible, onShowTranscript, onShowTransciptPaywall) {
+        LaunchedEffect(transcript, isPaywallVisible, onShowTranscript, onShowTranscriptPaywall) {
             // This delay is necessary due to how transcript loading works in the player.
             //
             // We trigger the page open animation and transcript loading at the same time.
@@ -201,7 +201,7 @@ private fun ShowTranscriptEffect(
             delay(100)
 
             if (isPaywallVisible) {
-                onShowTransciptPaywall(transcript)
+                onShowTranscriptPaywall(transcript)
             } else {
                 onShowTranscript(transcript)
             }

@@ -1044,6 +1044,7 @@ class SharingClientTest {
     fun shareTranscript() = runTest {
         val transcriptText = "This is a sample transcript content for testing purposes."
         val request = SharingRequest.transcript(
+            podcastUuid = "podcast-uuid",
             episodeUuid = "episode-uuid",
             episodeTitle = "Episode Title",
             transcript = transcriptText,

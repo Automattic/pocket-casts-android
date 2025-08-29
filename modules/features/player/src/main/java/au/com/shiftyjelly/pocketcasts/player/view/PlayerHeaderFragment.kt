@@ -930,7 +930,7 @@ class PlayerHeaderFragment :
                     )
                     transcriptViewModel.track(AnalyticsEvent.TRANSCRIPT_SHOWN, properties)
                 },
-                onShowTransciptPaywall = {
+                onShowTranscriptPaywall = {
                     transcriptViewModel.track(AnalyticsEvent.TRANSCRIPT_GENERATED_PAYWALL_SHOWN)
                 },
                 toolbarTrailingContent = { toolbarColors ->
