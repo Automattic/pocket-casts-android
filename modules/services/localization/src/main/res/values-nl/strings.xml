@@ -1,11 +1,37 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2025-08-13 15:54:04+0000
+Translation-Revision-Date: 2025-08-27 09:54:03+0000
 Plural-Forms: nplurals=2; plural=n != 1;
 Generator: GlotPress/2.4.0-alpha
 Language: nl
 -->
 <resources>
+    <string name="onboarding_create_account_sign_up_google">Registreren via Google</string>
+    <string name="onboarding_create_account_message">Je podcasts, altijd gesynchroniseerd. Houd je bibliotheek veilig en geniet van Pocket\u00A0Casts op internet en desktop.</string>
+    <string name="onboarding_create_account_title">Maak je Pocket\u00A0Casts-account aan</string>
+    <string name="onboarding_login_or">OF</string>
+    <string name="onboarding_login_continue_with_email">Ga door met e-mail</string>
+    <string name="onboarding_create_account_sign_up_email">Registreren via e-mail</string>
+    <string name="playlist_artwork_description">Artwork van afspeellijst</string>
+    <string name="onboarding_intro_get_started">Aan de slag</string>
+    <string name="onboarding_intro_carousel_pc_user">Pocket Casts-gebruiker</string>
+    <string name="onboarding_intro_carousel_organizing_podcasts_title">\"Mijn podcasts organiseren op basis van mappen is geniaal\"</string>
+    <string name="onboarding_intro_carousel_customization_insane_title">\"De hoeveelheid aanpassingsmogelijkheden is waanzinnig\"</string>
+    <string name="onboarding_intro_carousel_best_app_title">\"Beste podcastapp die er met afstand bestaat\"</string>
+    <string name="transcript_share">Transcriptie delen</string>
+    <string name="onboarding_notifications_popup_save">Voorkeuren opslaan</string>
+    <string name="onboarding_notification_popup_notifications_message">Ontvang nieuws, podcastsuggesties en meer</string>
+    <string name="onboarding_notification_popup_notifications">Ontvang e-mailmeldingen</string>
+    <string name="onboarding_notification_popup_newsletter_message">Een keer per maand al het goeds uit je podcasts</string>
+    <string name="onboarding_notification_popup_newsletter">Meld je aan voor onze nieuwsbrief</string>
+    <string name="playlist_setting_auto_download_description">Schakel het automatisch downloaden van afleveringen in deze afspeellijst in.</string>
+    <string name="smart_rule_starred_label">Favoriete afleveringen</string>
+    <string name="smart_rule_starred_description_disabled">Favoriete afleveringen kunnen nog steeds verschijnen als ze overeenkomen met je andere regels.</string>
+    <string name="smart_rule_starred_description">Neem alleen favoriete afleveringen op die overeenkomen met je andere regels.</string>
+    <string name="playlist_sort_by">Sorteren op</string>
+    <string name="playlist_select_episodes">Afleveringen selecteren</string>
+    <string name="playlist_options">Afspeellijstopties</string>
+    <string name="playlist_download_all">Alles downloaden</string>
     <string name="smart_playlist_no_content_body">Het wordt ofwel tijd om te vieren dat je deze lijst hebt afgerond of om je regels te bewerken om er meer te krijgen.</string>
     <string name="smart_playlist_no_content_title">Geen afleveringen</string>
     <string name="playlist_play_all">Alles afspelen</string>
@@ -42,6 +68,7 @@ Language: nl
     <string name="create_playlist">Afspeellijst aanmaken</string>
     <string name="new_smart_playlist_banner_body">Afleveringen automatisch toevoegen op basis van regels</string>
     <string name="new_smart_playlist_banner_title">Maak een slimme afspeellijst</string>
+    <string name="new_playlists_title_placeholder">Naam van afspeellijst</string>
     <string name="onboarding_folders_title_3">Sport</string>
     <string name="onboarding_folders_title_2">Favorieten</string>
     <string name="onboarding_folders_title_1">Boeken</string>

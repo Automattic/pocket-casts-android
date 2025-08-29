@@ -1,11 +1,37 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2025-08-12 09:54:04+0000
+Translation-Revision-Date: 2025-08-26 09:54:03+0000
 Plural-Forms: nplurals=1; plural=0;
 Generator: GlotPress/2.4.0-alpha
 Language: ja_JP
 -->
 <resources>
+    <string name="onboarding_create_account_sign_up_google">Google で登録</string>
+    <string name="onboarding_create_account_sign_up_email">メールアドレスで登録</string>
+    <string name="onboarding_create_account_message">ポッドキャストは常に同期されます。 ライブラリを安全に保ち、ウェブとデスクトップで Pocket\u00A0Casts をお楽しみください。</string>
+    <string name="onboarding_create_account_title">Pocket\u00A0Casts アカウントを作成</string>
+    <string name="onboarding_login_or">または</string>
+    <string name="onboarding_login_continue_with_email">メールで続ける</string>
+    <string name="playlist_artwork_description">プレイリストのアートワーク</string>
+    <string name="onboarding_intro_get_started">開始する</string>
+    <string name="onboarding_intro_carousel_pc_user">Pocket Casts ユーザー</string>
+    <string name="onboarding_intro_carousel_organizing_podcasts_title">「ポッドキャストをフォルダー別に整理できるのがすばらしい」</string>
+    <string name="onboarding_intro_carousel_customization_insane_title">「カスタマイズの幅は驚くほどです」</string>
+    <string name="onboarding_intro_carousel_best_app_title">「これまでで最高の ポッドキャストアプリ」</string>
+    <string name="transcript_share">トランスクリプトを共有</string>
+    <string name="onboarding_notifications_popup_save">設定を保存</string>
+    <string name="onboarding_notification_popup_notifications_message">ニュースやポッドキャストの提案などを受け取る</string>
+    <string name="onboarding_notification_popup_notifications">通知を受け取る</string>
+    <string name="onboarding_notification_popup_newsletter_message">月に1回、良質なポッドキャストをお届け</string>
+    <string name="onboarding_notification_popup_newsletter">ニュースレターを購読</string>
+    <string name="playlist_setting_auto_download_description">有効化すると、このプレイリストのエピソードを自動ダウンロードできます。</string>
+    <string name="smart_rule_starred_label">星付きエピソード</string>
+    <string name="smart_rule_starred_description_disabled">星付きエピソードは、他のルールと一致する場合にも引き続き表示できます。</string>
+    <string name="smart_rule_starred_description">他のルールに一致する星付きエピソードのみを含めます。</string>
+    <string name="playlist_sort_by">並べ替え基準</string>
+    <string name="playlist_select_episodes">エピソードを選択</string>
+    <string name="playlist_options">プレイリストのオプション</string>
+    <string name="playlist_download_all">すべてをダウンロード</string>
     <string name="smart_playlist_no_content_body">リストにあるすべてのエピソードを再生しました。ルールを編集してさらに追加しますか ?</string>
     <string name="smart_playlist_no_content_title">エピソードなし</string>
     <string name="playlist_play_all">すべてを再生</string>
@@ -42,6 +68,7 @@ Language: ja_JP
     <string name="create_playlist">プレイリストを作成</string>
     <string name="new_smart_playlist_banner_body">ルールに基づいてエピソードを自動追加</string>
     <string name="new_smart_playlist_banner_title">スマートプレイリストを作成</string>
+    <string name="new_playlists_title_placeholder">プレイリストの名前</string>
     <string name="onboarding_folders_title_3">スポーツ</string>
     <string name="onboarding_folders_title_2">お気に入り</string>
     <string name="onboarding_folders_title_1">書籍</string>

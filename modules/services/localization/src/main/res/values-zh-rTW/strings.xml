@@ -1,11 +1,37 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2025-08-14 09:54:03+0000
+Translation-Revision-Date: 2025-08-26 13:54:06+0000
 Plural-Forms: nplurals=1; plural=0;
 Generator: GlotPress/2.4.0-alpha
 Language: zh_TW
 -->
 <resources>
+    <string name="onboarding_login_or">或者</string>
+    <string name="onboarding_create_account_sign_up_google">使用 Google 帳號註冊</string>
+    <string name="onboarding_create_account_sign_up_email">使用電子郵件地址註冊</string>
+    <string name="onboarding_create_account_message">讓 Podcast 永遠保持同步。 保護你的媒體庫，在網頁和桌上型電腦安全收聽 Pocket\u00A0Casts。</string>
+    <string name="onboarding_create_account_title">建立自己的 Pocket\u00A0Casts 帳號</string>
+    <string name="onboarding_login_continue_with_email">繼續使用電子郵件地址登入</string>
+    <string name="playlist_artwork_description">播放清單的封面圖片</string>
+    <string name="onboarding_intro_get_started">開始使用</string>
+    <string name="onboarding_intro_carousel_pc_user">Pocket Casts 使用者</string>
+    <string name="onboarding_intro_carousel_organizing_podcasts_title">「採用資料夾整理 Podcast 根本是天才的發想」</string>
+    <string name="onboarding_intro_carousel_customization_insane_title">「可自訂的數量爆炸多」</string>
+    <string name="onboarding_intro_carousel_best_app_title">「當前市面上最棒的 Podcast 應用程式 」</string>
+    <string name="transcript_share">分享逐字稿</string>
+    <string name="onboarding_notifications_popup_save">儲存喜好設定</string>
+    <string name="onboarding_notification_popup_notifications_message">接收新聞、Podcast 建議等內容</string>
+    <string name="onboarding_notification_popup_notifications">接收通知</string>
+    <string name="onboarding_notification_popup_newsletter_message">每個月一次，獲得所有 Podcast 好康</string>
+    <string name="onboarding_notification_popup_newsletter">訂閱電子報</string>
+    <string name="playlist_setting_auto_download_description">啟用即可自動下載此播放清單中的單集。</string>
+    <string name="smart_rule_starred_label">標星號的單集</string>
+    <string name="smart_rule_starred_description_disabled">如果標星號的單集符合其他規則，仍會顯示出來。</string>
+    <string name="smart_rule_starred_description">只包含符合其他規則的標星號單集。</string>
+    <string name="playlist_sort_by">排序依據</string>
+    <string name="playlist_select_episodes">選取單集</string>
+    <string name="playlist_options">播放清單選項</string>
+    <string name="playlist_download_all">全部下載</string>
     <string name="smart_playlist_no_content_body">恭喜你聽完這份清單了，或者你可以編輯篩選規則以獲得更多內容。</string>
     <string name="smart_playlist_no_content_title">沒有單集</string>
     <string name="playlist_play_all">全部播放</string>
@@ -42,6 +68,7 @@ Language: zh_TW
     <string name="create_playlist">建立播放清單</string>
     <string name="new_smart_playlist_banner_body">根據規則自動新增單集</string>
     <string name="new_smart_playlist_banner_title">彙整成智慧播放清單</string>
+    <string name="new_playlists_title_placeholder">播放清單名稱</string>
     <string name="onboarding_folders_title_3">運動</string>
     <string name="onboarding_folders_title_2">我的最愛</string>
     <string name="onboarding_folders_title_1">書籍</string>
