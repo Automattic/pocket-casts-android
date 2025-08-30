@@ -7,6 +7,7 @@ import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
 import au.com.shiftyjelly.pocketcasts.servers.extensions.toDate
 import au.com.shiftyjelly.pocketcasts.servers.extensions.toTimestamp
+import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import com.google.protobuf.boolValue
 import com.google.protobuf.int32Value
 import com.google.protobuf.stringValue
@@ -146,11 +147,13 @@ internal class PodcastSync(
         getUuid: (T) -> String,
         applyServerPodcast: (Podcast, T) -> Podcast,
     ) = missingPodcastsSemaphore.withPermit {
-        val localPodcast = podcastManager.subscribeToPodcastOrThrow(getUuid(serverPodcast), sync = false, shouldAutoDownload = false).apply {
-            isHeaderExpanded = false
-            applyServerPodcast(this, serverPodcast)
-        }
-        podcastManager.updatePodcast(localPodcast)
+        runCatching {
+            val localPodcast = podcastManager.subscribeToPodcastOrThrow(getUuid(serverPodcast), sync = false, shouldAutoDownload = false).apply {
+                isHeaderExpanded = false
+                applyServerPodcast(this, serverPodcast)
+            }
+            podcastManager.updatePodcast(localPodcast)
+        }.onFailure { failure -> LogBuffer.w("DataSync", "Failed to subscribe to podcast: ${getUuid(serverPodcast)}") }
     }
 }
 
