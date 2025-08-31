@@ -23,18 +23,20 @@ import androidx.compose.foundation.layout.statusBars
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.layout.wrapContentWidth
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.itemsIndexed
-import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.relocation.BringIntoViewRequester
 import androidx.compose.foundation.relocation.bringIntoViewRequester
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
 import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.scale
@@ -45,7 +47,9 @@ import androidx.compose.ui.focus.FocusRequester.Companion.FocusRequesterFactory.
 import androidx.compose.ui.focus.focusProperties
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.focus.onFocusChanged
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
@@ -66,7 +70,6 @@ import au.com.shiftyjelly.pocketcasts.account.onboarding.upgrade.contextual.Pres
 import au.com.shiftyjelly.pocketcasts.account.onboarding.upgrade.contextual.ShuffleAnimation
 import au.com.shiftyjelly.pocketcasts.account.viewmodel.OnboardingUpgradeFeaturesState
 import au.com.shiftyjelly.pocketcasts.compose.AppThemeWithBackground
-import au.com.shiftyjelly.pocketcasts.compose.components.FadedLazyColumn
 import au.com.shiftyjelly.pocketcasts.compose.components.TextH10
 import au.com.shiftyjelly.pocketcasts.compose.components.TextP40
 import au.com.shiftyjelly.pocketcasts.compose.images.SubscriptionBadge
@@ -150,7 +153,7 @@ private fun CompactHeightUpscaledFontUpgradeScreen(
         plan = state.selectedBasePlan,
         source = source,
     )
-    val listState = rememberLazyListState()
+    val listState = rememberScrollState()
 
     Column(
         modifier = modifier,
@@ -163,24 +166,30 @@ private fun CompactHeightUpscaledFontUpgradeScreen(
             source = source,
             onClosePress = onClosePress,
         )
-        Spacer(modifier = Modifier.height(12.dp))
-        LazyColumn(
-            state = listState,
-        ) {
-            contentPages.forEachIndexed { index, content ->
-                item {
+        Box {
+            Column(
+                modifier = Modifier
+                    .verticalScroll(listState),
+            ) {
+                contentPages.forEachIndexed { index, content ->
+                    var contentSize by remember { mutableIntStateOf(0) }
                     val scrollToNext: () -> Unit = {
                         coroutineScope.launch {
-                            listState.animateScrollToItem((index + 1) % contentPages.size)
+                            listState.animateScrollTo(((index + 1) % contentPages.size) * contentSize)
                         }
                     }
-                    content.toComponent(index = index, scrollToNext = scrollToNext, modifier = Modifier.height(IntrinsicSize.Min))()
+                    content.toComponent(
+                        index = index,
+                        scrollToNext = scrollToNext,
+                        modifier = Modifier
+                            .height(IntrinsicSize.Min)
+                            .padding(top = if (index == 0) 32.dp else 0.dp)
+                            .onSizeChanged {
+                                contentSize = it.height
+                            },
+                    )()
                 }
-            }
-            item {
                 Spacer(modifier = Modifier.height(24.dp))
-            }
-            item {
                 UpgradeFooter(
                     modifier = Modifier
                         .padding(
@@ -199,6 +208,18 @@ private fun CompactHeightUpscaledFontUpgradeScreen(
                     upFocusRequester = FocusRequester.Default,
                 )
             }
+            Box(
+                modifier = Modifier
+                    .height(42.dp)
+                    .fillMaxWidth()
+                    .background(
+                        brush = Brush.verticalGradient(
+                            0f to MaterialTheme.colors.background,
+                            .15f to MaterialTheme.colors.background,
+                            1f to Color.Transparent,
+                        ),
+                    ),
+            )
         }
     }
 }
@@ -227,7 +248,6 @@ private fun RegularUpgradeScreen(
             source = source,
             onClosePress = onClosePress,
         )
-        Spacer(modifier = Modifier.height(12.dp))
         UpgradeContent(
             modifier = Modifier.weight(weight = 1f),
             pages = state.onboardingVariant.toContentPages(
@@ -526,13 +546,15 @@ private fun UpgradeContent(
     modifier: Modifier = Modifier,
 ) {
     val coroutineScope = rememberCoroutineScope()
-    val listState = rememberLazyListState()
+    val scrollState = rememberScrollState()
+    var contentHeight by remember { mutableIntStateOf(0) }
+    val backgroundColor = MaterialTheme.colors.background
 
     BoxWithConstraints(
         modifier = modifier,
     ) {
         val itemHeight = this@BoxWithConstraints.maxHeight
-        FadedLazyColumn(
+        Column(
             modifier = Modifier
                 .fillMaxSize()
                 .focusRequester(selfFocusRequester)
@@ -542,10 +564,13 @@ private fun UpgradeContent(
                             downFocusRequester.requestFocus()
                         }
                     }
+                }
+                .verticalScroll(scrollState)
+                .onSizeChanged {
+                    contentHeight = it.height
                 },
-            state = listState,
         ) {
-            itemsIndexed(pages) { index, page ->
+            pages.forEachIndexed { index, content ->
                 val bringIntoViewRequester = remember { BringIntoViewRequester() }
 
                 val baseModifier = Modifier
@@ -556,14 +581,46 @@ private fun UpgradeContent(
                             coroutineScope.launch { bringIntoViewRequester.bringIntoView() }
                         }
                     }
+                    .padding(
+                        top = if (index == 0) {
+                            36.dp
+                        } else {
+                            0.dp
+                        },
+                    )
                 val scrollToNext: () -> Unit = {
                     coroutineScope.launch {
-                        listState.animateScrollToItem((index + 1) % pages.size)
+                        scrollState.animateScrollTo(((index + 1) % pages.size) * contentHeight)
                     }
                 }
-                page.toComponent(index = index, scrollToNext = scrollToNext, modifier = baseModifier)()
+                content.toComponent(index = index, scrollToNext = scrollToNext, modifier = baseModifier)()
             }
         }
+        Box(
+            modifier = Modifier
+                .height(42.dp)
+                .fillMaxWidth()
+                .background(
+                    brush = Brush.verticalGradient(
+                        0f to backgroundColor,
+                        .15f to backgroundColor,
+                        1f to Color.Transparent,
+                    ),
+                ),
+        )
+        Box(
+            modifier = Modifier
+                .height(42.dp)
+                .fillMaxWidth()
+                .align(Alignment.BottomCenter)
+                .background(
+                    brush = Brush.verticalGradient(
+                        0f to Color.Transparent,
+                        .15f to Color.Transparent,
+                        1f to backgroundColor,
+                    ),
+                ),
+        )
     }
 }
 
@@ -699,7 +756,8 @@ private fun FoldersUpgradeContent(
         }
 
         Box(
-            modifier = Modifier.fillMaxWidth()
+            modifier = Modifier
+                .fillMaxWidth()
                 .weight(1f)
                 .padding(bottom = 32.dp),
             contentAlignment = Alignment.Center,
