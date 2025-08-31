@@ -334,11 +334,16 @@ class OnboardingRecommendationsStartPageViewModel @Inject constructor(
                 },
             )
             .forEach { category ->
+                val source = if (FeatureFlag.isEnabled(Feature.NEW_ONBOARDING_RECOMMENDATIONS)) {
+                    (category as? DiscoverCategory)?.onboardingRecommendationsSource ?: category.source
+                } else {
+                    category.source
+                }
                 runCatching {
-                    repository.getListFeed(category.source)
+                    repository.getListFeed(source)
                 }
                     .onFailure { exception ->
-                        Timber.e(exception, "Error getting list feed for category ${category.source}")
+                        Timber.e(exception, "Error getting list feed for category ${source}")
                     }
                     .getOrNull()
                     ?.podcasts
