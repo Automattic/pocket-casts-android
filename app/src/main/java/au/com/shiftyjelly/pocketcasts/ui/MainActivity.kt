@@ -611,8 +611,9 @@ class MainActivity :
 
     override fun openOnboardingFlow(onboardingFlow: OnboardingFlow) {
         onboardingLauncher.launch(
-            launchIntent(onboardingFlow), ActivityOptionsCompat
-                .makeCustomAnimation(this, R.anim.onboarding_enter, R.anim.onboarding_disappear)
+            launchIntent(onboardingFlow),
+            ActivityOptionsCompat
+                .makeCustomAnimation(this, R.anim.onboarding_enter, R.anim.onboarding_disappear),
         )
     }
 
