@@ -109,9 +109,9 @@ internal fun NewOnboardingCreateAccountPage(
                 modifier = Modifier
                     .align(Alignment.End)
                     .padding(horizontal = 8.dp),
-                iconColor = MaterialTheme.theme.colors.primaryInteractive01,
+                tint = MaterialTheme.theme.colors.primaryInteractive01,
                 navigationButton = NavigationButton.Close,
-                onNavigationClick = onSkip,
+                onClick = onSkip,
             )
         } else {
             TextP40(
