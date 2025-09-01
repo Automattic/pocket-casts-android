@@ -68,7 +68,7 @@ fun InterestCategoryPill(
         if (animateState) {
             scope.launch {
                 scaleAnim.animateTo(
-                    targetValue = 1.15f,
+                    targetValue = 1.1f,
                     animationSpec = spring(
                         dampingRatio = Spring.DampingRatioLowBouncy,
                         stiffness = Spring.StiffnessMedium,
@@ -84,7 +84,7 @@ fun InterestCategoryPill(
             }
             scope.launch {
                 rotationAnim.animateTo(
-                    targetValue = -5f,
+                    targetValue = -3f,
                     animationSpec = spring(
                         dampingRatio = Spring.DampingRatioLowBouncy,
                         stiffness = Spring.StiffnessHigh,
