@@ -230,7 +230,7 @@ private fun Content(
                         modifier = Modifier.padding(bottom = 16.dp),
                         textAlign = if (FeatureFlag.isEnabled(Feature.NEW_ONBOARDING_RECOMMENDATIONS)) TextAlign.Center else null,
                         color = if (FeatureFlag.isEnabled(Feature.NEW_ONBOARDING_RECOMMENDATIONS)) MaterialTheme.theme.colors.primaryText02 else MaterialTheme.theme.colors.primaryText01,
-                        fontWeight = if (FeatureFlag.isEnabled(Feature.NEW_ONBOARDING_RECOMMENDATIONS)) FontWeight.W500 else null
+                        fontWeight = if (FeatureFlag.isEnabled(Feature.NEW_ONBOARDING_RECOMMENDATIONS)) FontWeight.W500 else null,
                     )
 
                     SearchBarButton(

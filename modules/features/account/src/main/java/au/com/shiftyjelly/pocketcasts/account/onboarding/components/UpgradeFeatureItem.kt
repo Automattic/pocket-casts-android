@@ -27,7 +27,7 @@ fun UpgradeFeatureItem(
     iconColor: Color = Color.Black,
     textColor: Color = Color.Black,
     iconSize: Dp = 20.dp,
-    spacing: Dp = 16.dp
+    spacing: Dp = 16.dp,
 ) {
     Row(
         modifier = modifier
