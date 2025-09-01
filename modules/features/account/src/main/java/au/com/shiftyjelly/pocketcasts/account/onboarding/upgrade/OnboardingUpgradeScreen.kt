@@ -60,6 +60,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.tooling.preview.PreviewParameterProvider
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import au.com.shiftyjelly.pocketcasts.account.onboarding.components.UpgradeFeatureItem
 import au.com.shiftyjelly.pocketcasts.account.onboarding.components.UpgradePlanRow
 import au.com.shiftyjelly.pocketcasts.account.onboarding.upgrade.OnboardingUpgradeHelper.PrivacyPolicy
@@ -263,7 +264,7 @@ private fun RegularUpgradeScreen(
         UpgradeFooter(
             modifier = Modifier
                 .padding(
-                    horizontal = 24.dp,
+                    horizontal = 16.dp,
                 )
                 .fillMaxWidth(),
             plans = state.availableBasePlans,
@@ -334,6 +335,9 @@ private fun UpgradeFooter(
             textAlign = TextAlign.Center,
             onPrivacyPolicyClick = onPrivacyPolicyClick,
             onTermsAndConditionsClick = onTermsAndConditionsClick,
+            fontSize = 11.sp,
+            lineHeight = 12.sp,
+            fontWeight = FontWeight.W600,
         )
     }
 }
@@ -692,6 +696,8 @@ private fun FeaturesContent(
                 item = item,
                 iconColor = MaterialTheme.theme.colors.primaryText01,
                 textColor = MaterialTheme.theme.colors.secondaryText02,
+                iconSize = 18.dp,
+                spacing = 12.dp,
             )
         }
         if (features.showCta) {
