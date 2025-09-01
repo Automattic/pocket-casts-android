@@ -16,7 +16,7 @@ import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.statusBars
+import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyGridScope
@@ -30,6 +30,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.drawWithContent
 import androidx.compose.ui.geometry.Offset
@@ -43,6 +44,7 @@ import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.clearAndSetSemantics
 import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
@@ -62,7 +64,6 @@ import au.com.shiftyjelly.pocketcasts.compose.buttons.RowOutlinedButton
 import au.com.shiftyjelly.pocketcasts.compose.components.SearchBarButton
 import au.com.shiftyjelly.pocketcasts.compose.components.TextH10
 import au.com.shiftyjelly.pocketcasts.compose.components.TextH20
-import au.com.shiftyjelly.pocketcasts.compose.components.TextH30
 import au.com.shiftyjelly.pocketcasts.compose.components.TextH60
 import au.com.shiftyjelly.pocketcasts.compose.components.TextP40
 import au.com.shiftyjelly.pocketcasts.compose.components.textH60FontSize
@@ -179,6 +180,7 @@ private fun Content(
             verticalArrangement = Arrangement.spacedBy(16.dp),
             horizontalArrangement = Arrangement.spacedBy(9.dp),
             modifier = Modifier
+                .systemBarsPadding()
                 .weight(1f)
                 .graphicsLayer {
                     compositingStrategy = CompositingStrategy.Offscreen
@@ -202,22 +204,20 @@ private fun Content(
         ) {
             header {
                 Column {
-                    Spacer(Modifier.windowInsetsPadding(WindowInsets.statusBars))
-                    Row(
-                        horizontalArrangement = Arrangement.End,
+                    TextP40(
+                        text = stringResource(LR.string.onboarding_recommendations_import),
+                        color = importColor,
+                        fontWeight = FontWeight.W500,
                         modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(bottom = 18.dp),
+                            .align(alignment = Alignment.End)
+                            .padding(
+                                top = 11.dp,
+                            )
+                            .clickable { onImportClick() }
+                            .padding(horizontal = 8.dp, vertical = 4.dp),
+                    )
 
-                    ) {
-                        TextH30(
-                            text = stringResource(LR.string.onboarding_recommendations_import),
-                            color = importColor,
-                            modifier = Modifier
-                                .clickable { onImportClick() }
-                                .padding(horizontal = 16.dp, vertical = 9.dp),
-                        )
-                    }
+                    Spacer(modifier = Modifier.height(24.dp))
 
                     TextH10(
                         text = title,
@@ -230,6 +230,7 @@ private fun Content(
                         modifier = Modifier.padding(bottom = 16.dp),
                         textAlign = if (FeatureFlag.isEnabled(Feature.NEW_ONBOARDING_RECOMMENDATIONS)) TextAlign.Center else null,
                         color = if (FeatureFlag.isEnabled(Feature.NEW_ONBOARDING_RECOMMENDATIONS)) MaterialTheme.theme.colors.primaryText02 else MaterialTheme.theme.colors.primaryText01,
+                        fontWeight = if (FeatureFlag.isEnabled(Feature.NEW_ONBOARDING_RECOMMENDATIONS)) FontWeight.W500 else null
                     )
 
                     SearchBarButton(

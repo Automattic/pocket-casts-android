@@ -52,7 +52,6 @@ import au.com.shiftyjelly.pocketcasts.compose.buttons.RowTextButton
 import au.com.shiftyjelly.pocketcasts.compose.components.EmailAndPasswordFields
 import au.com.shiftyjelly.pocketcasts.compose.components.TextH10
 import au.com.shiftyjelly.pocketcasts.compose.components.TextP40
-import au.com.shiftyjelly.pocketcasts.compose.components.TextP50
 import au.com.shiftyjelly.pocketcasts.compose.preview.ThemePreviewParameterProvider
 import au.com.shiftyjelly.pocketcasts.compose.theme
 import au.com.shiftyjelly.pocketcasts.models.type.Subscription
@@ -100,7 +99,7 @@ internal fun NewOnboardingCreateAccountPage(
             .windowInsetsPadding(WindowInsets.statusBars)
             .windowInsetsPadding(WindowInsets.navigationBars)
             .windowInsetsPadding(WindowInsets.ime)
-            .padding(vertical = 16.dp)
+            .padding(bottom = 16.dp)
             .fillMaxHeight()
             .verticalScroll(rememberScrollState()),
     ) {
@@ -108,25 +107,24 @@ internal fun NewOnboardingCreateAccountPage(
             NavigationIconButton(
                 modifier = Modifier
                     .align(Alignment.End)
-                    .padding(horizontal = 8.dp),
+                    .padding(horizontal = 8.dp, vertical = 16.dp),
                 iconColor = MaterialTheme.theme.colors.primaryInteractive01,
                 navigationButton = NavigationButton.Close,
                 onNavigationClick = onSkip,
             )
         } else {
             TextP40(
-                fontSize = 17.sp,
                 modifier = Modifier
                     .align(Alignment.End)
-                    .padding(horizontal = 24.dp)
+                    .padding(end = 16.dp, top = 11.dp)
                     .clickable(onClick = onSkip)
-                    .padding(horizontal = 4.dp, vertical = 2.dp),
+                    .padding(horizontal = 8.dp, vertical = 4.dp),
                 text = stringResource(LR.string.not_now),
                 color = MaterialTheme.theme.colors.primaryInteractive01,
                 fontWeight = FontWeight.W500,
             )
         }
-        Spacer(modifier = Modifier.height(8.dp))
+        Spacer(modifier = Modifier.height(24.dp))
         TextH10(
             modifier = Modifier.padding(horizontal = 24.dp),
             text = stringResource(LR.string.onboarding_create_account_title),
@@ -134,11 +132,12 @@ internal fun NewOnboardingCreateAccountPage(
             textAlign = TextAlign.Center,
         )
         Spacer(modifier = Modifier.height(12.dp))
-        TextP50(
+        TextP40(
             modifier = Modifier.padding(horizontal = 24.dp),
             text = stringResource(LR.string.onboarding_create_account_message),
             color = MaterialTheme.theme.colors.primaryText02,
             textAlign = TextAlign.Center,
+            fontWeight = FontWeight.W500,
         )
         Spacer(modifier = Modifier.weight(1f))
         Image(

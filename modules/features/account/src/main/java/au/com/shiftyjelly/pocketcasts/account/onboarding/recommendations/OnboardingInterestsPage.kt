@@ -108,9 +108,9 @@ private fun Content(
         TextP40(
             modifier = Modifier
                 .align(Alignment.End)
-                .padding(top = 10.dp)
+                .padding(top = 11.dp)
                 .clickable(onClick = onNotNowPress)
-                .padding(horizontal = 4.dp, vertical = 2.dp),
+                .padding(horizontal = 8.dp, vertical = 4.dp),
             text = stringResource(LR.string.not_now),
             color = MaterialTheme.theme.colors.primaryInteractive01,
             fontWeight = FontWeight.W500,
