@@ -15,6 +15,7 @@ import java.util.UUID
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.flowOf
 
 class FakePlaylistManager : PlaylistManager {
     val playlistPreviews = MutableStateFlow(emptyList<PlaylistPreview>())
@@ -59,4 +60,6 @@ class FakePlaylistManager : PlaylistManager {
     override suspend fun updatePlaylistsOrder(sortedUuids: List<String>) = Unit
 
     override suspend fun getManualPlaylistEpisodeSources(): List<ManualPlaylistEpisodeSource> = emptyList()
+
+    override fun observeManualPlaylistAvailableEpisodes(playlistUuid: String, podcastUuid: String): Flow<List<PodcastEpisode>> = flowOf(emptyList())
 }

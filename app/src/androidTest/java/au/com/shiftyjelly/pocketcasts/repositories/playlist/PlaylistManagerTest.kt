@@ -1329,4 +1329,48 @@ class PlaylistManagerTest {
             manager.getManualPlaylistEpisodeSources(),
         )
     }
+
+    @Test
+    fun observeManualPlaylistAvailableEpisodes() = runTest(testDispatcher) {
+        val playlistUuid = manager.createManualPlaylist("Manual Playlist")
+
+        manager.observeManualPlaylistAvailableEpisodes(playlistUuid, "podcast-uuid-1").test {
+            assertEquals(emptyList<PodcastEpisode>(), awaitItem())
+
+            val episode1 = PodcastEpisode(
+                uuid = "episode-uuid-1",
+                podcastUuid = "podcast-uuid-1",
+                publishedDate = Date(0),
+            )
+            episodeDao.insert(episode1)
+            assertEquals(listOf(episode1), awaitItem())
+
+            val episode2 = PodcastEpisode(
+                uuid = "episode-uuid-2",
+                podcastUuid = "podcast-uuid-1",
+                publishedDate = Date(1),
+            )
+            episodeDao.insert(episode2)
+            assertEquals(listOf(episode2, episode1), awaitItem())
+
+            episodeDao.insert(
+                PodcastEpisode(
+                    uuid = "episode-uuid-3",
+                    podcastUuid = "podcast-uuid-2",
+                    publishedDate = Date(),
+                ),
+            )
+            expectNoEvents()
+
+            playlistDao.upsertManualEpisode(
+                ManualPlaylistEpisode(playlistUuid = playlistUuid, episodeUuid = "episode-uuid-2", podcastUuid = "podcast-uuid-3"),
+            )
+            expectNoEvents()
+
+            playlistDao.upsertManualEpisode(
+                ManualPlaylistEpisode(playlistUuid = playlistUuid, episodeUuid = "episode-uuid-2", podcastUuid = "podcast-uuid-1"),
+            )
+            assertEquals(listOf(episode1), awaitItem())
+        }
+    }
 }

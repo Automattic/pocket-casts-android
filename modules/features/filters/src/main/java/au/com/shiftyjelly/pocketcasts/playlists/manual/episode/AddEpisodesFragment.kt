@@ -49,6 +49,8 @@ class AddEpisodesFragment : BaseDialogFragment() {
                 AddEpisodesPage(
                     playlistTitle = uiState.playlist.title,
                     episodeSources = uiState.sources,
+                    episodesFlow = viewModel::getEpisodesFlow,
+                    useEpisodeArtwork = uiState.useEpisodeArtwork,
                     onClose = ::dismiss,
                     modifier = Modifier.fillMaxSize(),
                 )

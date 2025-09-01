@@ -12,6 +12,7 @@ import androidx.compose.foundation.text.input.rememberTextFieldState
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
@@ -40,6 +41,8 @@ import au.com.shiftyjelly.pocketcasts.compose.theme
 import au.com.shiftyjelly.pocketcasts.models.entity.ManualPlaylistEpisodeSource
 import au.com.shiftyjelly.pocketcasts.models.entity.ManualPlaylistFolderSource
 import au.com.shiftyjelly.pocketcasts.models.entity.ManualPlaylistPodcastSource
+import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
+import kotlinx.coroutines.flow.StateFlow
 import timber.log.Timber
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
@@ -47,6 +50,8 @@ import au.com.shiftyjelly.pocketcasts.localization.R as LR
 internal fun AddEpisodesPage(
     playlistTitle: String,
     episodeSources: List<ManualPlaylistEpisodeSource>,
+    episodesFlow: (String) -> StateFlow<List<PodcastEpisode>>,
+    useEpisodeArtwork: Boolean,
     onClose: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -116,15 +121,11 @@ internal fun AddEpisodesPage(
             modifier = Modifier.weight(1f),
         ) {
             val navigateToSource = { source: ManualPlaylistEpisodeSource ->
-                when (source) {
-                    is ManualPlaylistFolderSource -> {
-                        navController.navigateOnce(AddEpisodesRoutes.folderRoute(source.uuid))
-                    }
-
-                    is ManualPlaylistPodcastSource -> {
-                        Timber.i("Go to podcast: ${source.title}")
-                    }
+                val route = when (source) {
+                    is ManualPlaylistFolderSource -> AddEpisodesRoutes.folderRoute(source.uuid)
+                    is ManualPlaylistPodcastSource -> AddEpisodesRoutes.podcastRoute(source.uuid)
                 }
+                navController.navigateOnce(route)
             }
 
             composable(AddEpisodesRoutes.HOME) {
@@ -150,6 +151,23 @@ internal fun AddEpisodesPage(
                     modifier = Modifier.fillMaxSize(),
                 )
             }
+
+            composable(
+                AddEpisodesRoutes.PODCAST,
+                listOf(navArgument(AddEpisodesRoutes.PODCAST_UUID_ARG) { type = NavType.StringType }),
+            ) { backStackEntry ->
+                val arguments = requireNotNull(backStackEntry.arguments) { "Missing back stack entry arguments" }
+                val podcastUuid = requireNotNull(arguments.getString(AddEpisodesRoutes.PODCAST_UUID_ARG)) { "Missing podcast uuid argument" }
+                val episodes by episodesFlow(podcastUuid).collectAsState()
+                EpisodesColumn(
+                    episodes = episodes,
+                    useEpisodeArtwork = useEpisodeArtwork,
+                    onAddEpisode = { episode ->
+                        Timber.tag("Add episode: ${episode.title}")
+                    },
+                    modifier = Modifier.fillMaxSize(),
+                )
+            }
         }
     }
 }
@@ -161,5 +179,11 @@ private object AddEpisodesRoutes {
     const val FOLDER_UUID_ARG = "uuid"
     const val FOLDER = "$FOLDER_BASE/{$FOLDER_UUID_ARG}"
 
+    const val PODCAST_BASE = "podcast"
+    const val PODCAST_UUID_ARG = "uuid"
+    const val PODCAST = "$PODCAST_BASE/{$PODCAST_UUID_ARG}"
+
     fun folderRoute(uuid: String) = "$FOLDER_BASE/$uuid"
+
+    fun podcastRoute(uuid: String) = "$PODCAST_BASE/$uuid"
 }
