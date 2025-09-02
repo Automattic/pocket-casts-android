@@ -14,6 +14,7 @@ import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -25,21 +26,28 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.emitAll
+import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
-@OptIn(FlowPreview::class)
+@OptIn(FlowPreview::class, ExperimentalCoroutinesApi::class)
 @HiltViewModel(assistedFactory = AddEpisodesViewModel.Factory::class)
 class AddEpisodesViewModel @AssistedInject constructor(
     @Assisted private val playlistUuid: String,
     private val playlistManager: PlaylistManager,
     private val settings: Settings,
 ) : ViewModel() {
-    val searchState = TextFieldState()
-    private val searchFlow = snapshotFlow { searchState.text }
+    val podcastSearchState = TextFieldState()
+    private val podcastSearchFlow = snapshotFlow { podcastSearchState.text }
+        .map { it.toString().trim() }
+        .debounce { searchTerm -> if (searchTerm.isEmpty()) 0 else 300 }
+        .distinctUntilChanged()
+
+    val episodeSearchState = TextFieldState()
+    private val episodeSearchFlow = snapshotFlow { episodeSearchState.text }
         .map { it.toString().trim() }
         .debounce { searchTerm -> if (searchTerm.isEmpty()) 0 else 300 }
         .distinctUntilChanged()
@@ -54,7 +62,7 @@ class AddEpisodesViewModel @AssistedInject constructor(
 
         val uiStates = combine(
             playlistFlow,
-            searchFlow,
+            podcastSearchFlow,
             settings.artworkConfiguration.flow,
             addedEpisodeUuids,
         ) { playlist, searchTerm, artworkConfig, addedEpisodes ->
@@ -79,7 +87,9 @@ class AddEpisodesViewModel @AssistedInject constructor(
 
     fun getEpisodesFlow(podcastUuid: String): StateFlow<List<PodcastEpisode>> {
         return episodeFlowsCache.getOrPut(podcastUuid) {
-            val flow = playlistManager.observeManualPlaylistAvailableEpisodes(playlistUuid, podcastUuid)
+            val flow = episodeSearchFlow.flatMapLatest { searchTerm ->
+                playlistManager.observeManualPlaylistAvailableEpisodes(playlistUuid, podcastUuid, searchTerm)
+            }
             flow.stateIn(viewModelScope, SharingStarted.WhileSubscribed(stopTimeoutMillis = 300), initialValue = emptyList())
         }
     }

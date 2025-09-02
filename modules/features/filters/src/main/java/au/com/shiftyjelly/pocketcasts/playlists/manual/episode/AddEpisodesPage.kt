@@ -22,6 +22,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavHostController
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -54,12 +55,12 @@ internal fun AddEpisodesPage(
     episodeSources: List<ManualPlaylistEpisodeSource>,
     episodesFlow: (String) -> StateFlow<List<PodcastEpisode>>,
     useEpisodeArtwork: Boolean,
-    searchState: TextFieldState,
     onAddEpisode: (String) -> Unit,
-    onClose: () -> Unit,
+    onNavigationClick: () -> Unit,
     modifier: Modifier = Modifier,
+    navController: NavHostController = rememberNavController(),
+    searchState: TextFieldState = rememberTextFieldState(),
 ) {
-    val navController = rememberNavController()
     val backStackEntry by navController.currentBackStackEntryAsState()
     val isTopPageDisplayed = backStackEntry == null || backStackEntry?.destination?.route == AddEpisodesRoutes.HOME
 
@@ -95,7 +96,7 @@ internal fun AddEpisodesPage(
                         .clickable(
                             indication = null,
                             interactionSource = null,
-                            onClick = onClose,
+                            onClick = onNavigationClick,
                         )
                         .padding(end = 16.dp),
                 )
@@ -103,11 +104,7 @@ internal fun AddEpisodesPage(
             style = ThemedTopAppBar.Style.Immersive,
             iconColor = MaterialTheme.theme.colors.primaryIcon02,
             windowInsets = WindowInsets(0),
-            onNavigationClick = {
-                if (!navController.popBackStack()) {
-                    onClose()
-                }
-            },
+            onNavigationClick = onNavigationClick,
         )
 
         SearchBar(
@@ -182,7 +179,7 @@ internal fun AddEpisodesPage(
     }
 }
 
-private object AddEpisodesRoutes {
+internal object AddEpisodesRoutes {
     const val HOME = "home"
 
     private const val FOLDER_BASE = "folder"

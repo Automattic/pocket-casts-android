@@ -7,11 +7,15 @@ import android.view.ViewGroup
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.text.input.TextFieldState
+import androidx.compose.foundation.text.input.clearText
 import androidx.compose.material.SnackbarHostState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
@@ -20,6 +24,10 @@ import androidx.core.os.BundleCompat
 import androidx.core.os.bundleOf
 import androidx.fragment.app.viewModels
 import androidx.fragment.compose.content
+import androidx.navigation.NavController
+import androidx.navigation.NavHostController
+import androidx.navigation.compose.currentBackStackEntryAsState
+import androidx.navigation.compose.rememberNavController
 import au.com.shiftyjelly.pocketcasts.compose.components.AnimatedNonNullVisibility
 import au.com.shiftyjelly.pocketcasts.compose.components.ThemedSnackbarHost
 import au.com.shiftyjelly.pocketcasts.playlists.manual.episode.AddEpisodesViewModel.Message
@@ -27,6 +35,7 @@ import au.com.shiftyjelly.pocketcasts.views.fragments.BaseDialogFragment
 import dagger.hilt.android.AndroidEntryPoint
 import dagger.hilt.android.lifecycle.withCreationCallback
 import kotlinx.parcelize.Parcelize
+import timber.log.Timber
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 @AndroidEntryPoint
@@ -49,6 +58,10 @@ class AddEpisodesFragment : BaseDialogFragment() {
         val snackbarHostState = remember { SnackbarHostState() }
         DispatchMessageEffect(snackbarHostState)
 
+        val navController = rememberNavController()
+        val searchState = rememberSearchState(navController)
+        ClearEpisodeSearchEffect(navController)
+
         DialogBox(
             modifier = Modifier.nestedScroll(rememberNestedScrollInteropConnection()),
         ) {
@@ -58,14 +71,19 @@ class AddEpisodesFragment : BaseDialogFragment() {
                 exit = fadeOut,
             ) { uiState ->
                 AddEpisodesPage(
+                    navController = navController,
+                    searchState = searchState,
                     playlistTitle = uiState.playlist.title,
                     addedEpisodesCount = uiState.addedEpisodeUuids.size,
                     episodeSources = uiState.sources,
                     episodesFlow = viewModel::getEpisodesFlow,
                     useEpisodeArtwork = uiState.useEpisodeArtwork,
-                    searchState = viewModel.searchState,
                     onAddEpisode = viewModel::addEpisode,
-                    onClose = ::dismiss,
+                    onNavigationClick = {
+                        if (!navController.popBackStack()) {
+                            dismiss()
+                        }
+                    },
                     modifier = Modifier.fillMaxSize(),
                 )
             }
@@ -78,6 +96,17 @@ class AddEpisodesFragment : BaseDialogFragment() {
     }
 
     @Composable
+    private fun rememberSearchState(navController: NavController): TextFieldState {
+        val backStackEntry by navController.currentBackStackEntryAsState()
+        return remember(backStackEntry) {
+            when (backStackEntry?.destination?.route) {
+                AddEpisodesRoutes.PODCAST -> viewModel.episodeSearchState
+                else -> viewModel.podcastSearchState
+            }
+        }
+    }
+
+    @Composable
     private fun DispatchMessageEffect(snackbarState: SnackbarHostState) {
         LaunchedEffect(snackbarState) {
             viewModel.messageQueue.collect { message ->
@@ -85,6 +114,17 @@ class AddEpisodesFragment : BaseDialogFragment() {
                     Message.FailedToAddEpisode -> getString(LR.string.add_to_playlist_failure_message)
                 }
                 snackbarState.showSnackbar(text)
+            }
+        }
+    }
+
+    @Composable
+    private fun ClearEpisodeSearchEffect(navController: NavHostController) {
+        LaunchedEffect(navController) {
+            navController.currentBackStackEntryFlow.collect { entry ->
+                if (entry.destination.route != AddEpisodesRoutes.PODCAST) {
+                    viewModel.episodeSearchState.clearText()
+                }
             }
         }
     }
