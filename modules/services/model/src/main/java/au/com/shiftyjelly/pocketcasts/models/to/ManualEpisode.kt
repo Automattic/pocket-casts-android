@@ -16,7 +16,7 @@ sealed interface ManualEpisode {
     }
 }
 
-internal class RawManualEpisode(
+internal data class RawManualEpisode(
     @Embedded(prefix = "m_") val manualEpisode: ManualPlaylistEpisode,
     @Embedded(prefix = "p_") val podcastEpisode: PodcastEpisode?,
 ) {
