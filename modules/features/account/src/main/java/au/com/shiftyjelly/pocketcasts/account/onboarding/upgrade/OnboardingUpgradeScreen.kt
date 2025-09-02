@@ -86,6 +86,8 @@ import au.com.shiftyjelly.pocketcasts.payment.SubscriptionTier
 import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingUpgradeSource
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme.ThemeType
 import au.com.shiftyjelly.pocketcasts.utils.Util
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import java.time.ZonedDateTime
 import java.time.format.DateTimeFormatter
 import java.time.format.FormatStyle
@@ -150,7 +152,7 @@ private fun CompactHeightUpscaledFontUpgradeScreen(
     val coroutineScope = rememberCoroutineScope()
     val contentPages = state.onboardingVariant.toContentPages(
         currentPlan = state.selectedPlan,
-        isEligibleForTrial = state.selectedBasePlan.offer == SubscriptionOffer.Trial,
+        isEligibleForTrial = state.selectedBasePlan.offer == SubscriptionOffer.Trial && FeatureFlag.isEnabled(Feature.NEW_ONBOARDING_UPGRADE_TRIAL_TIMELINE),
         plan = state.selectedBasePlan,
         source = source,
     )
@@ -253,7 +255,7 @@ private fun RegularUpgradeScreen(
             modifier = Modifier.weight(weight = 1f),
             pages = state.onboardingVariant.toContentPages(
                 currentPlan = state.selectedPlan,
-                isEligibleForTrial = state.selectedBasePlan.offer == SubscriptionOffer.Trial,
+                isEligibleForTrial = state.selectedBasePlan.offer == SubscriptionOffer.Trial && FeatureFlag.isEnabled(Feature.NEW_ONBOARDING_UPGRADE_TRIAL_TIMELINE),
                 plan = state.selectedBasePlan,
                 source = source,
             ),
