@@ -262,7 +262,7 @@ abstract class PlaylistDao {
     @Query(
         """
         SELECT
-            -- plaulist episode columns
+            -- playlist episode columns
             manual_episode.playlist_uuid AS m_playlist_uuid,
             manual_episode.episode_uuid AS m_episode_uuid,
             manual_episode.podcast_uuid AS m_podcast_uuid,
