@@ -15,7 +15,6 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
@@ -35,7 +34,6 @@ import au.com.shiftyjelly.pocketcasts.views.fragments.BaseDialogFragment
 import dagger.hilt.android.AndroidEntryPoint
 import dagger.hilt.android.lifecycle.withCreationCallback
 import kotlinx.parcelize.Parcelize
-import timber.log.Timber
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 @AndroidEntryPoint
@@ -76,6 +74,7 @@ class AddEpisodesFragment : BaseDialogFragment() {
                     playlistTitle = uiState.playlist.title,
                     addedEpisodesCount = uiState.addedEpisodeUuids.size,
                     episodeSources = uiState.sources,
+                    folderPodcastsFlow = viewModel::getFolderPodcastsFlow,
                     episodesFlow = viewModel::getEpisodesFlow,
                     useEpisodeArtwork = uiState.useEpisodeArtwork,
                     onAddEpisode = viewModel::addEpisode,

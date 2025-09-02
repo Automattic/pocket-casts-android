@@ -15,7 +15,6 @@ import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
@@ -53,6 +52,7 @@ internal fun AddEpisodesPage(
     playlistTitle: String,
     addedEpisodesCount: Int,
     episodeSources: List<ManualPlaylistEpisodeSource>,
+    folderPodcastsFlow: (String) -> StateFlow<List<ManualPlaylistPodcastSource>>,
     episodesFlow: (String) -> StateFlow<List<PodcastEpisode>>,
     useEpisodeArtwork: Boolean,
     onAddEpisode: (String) -> Unit,
@@ -151,9 +151,7 @@ internal fun AddEpisodesPage(
             ) { backStackEntry ->
                 val arguments = requireNotNull(backStackEntry.arguments) { "Missing back stack entry arguments" }
                 val folderUuid = requireNotNull(arguments.getString(AddEpisodesRoutes.FOLDER_UUID_ARG)) { "Missing folder uuid argument" }
-                val podcasts = remember(folderUuid) {
-                    episodeSources.filterIsInstance<ManualPlaylistFolderSource>().find { it.uuid == folderUuid }?.podcastSources.orEmpty()
-                }
+                val podcasts by folderPodcastsFlow(folderUuid).collectAsState()
                 EpisodeSourcesColumn(
                     sources = podcasts,
                     onClickSource = navigateToSource,
