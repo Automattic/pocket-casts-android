@@ -57,6 +57,7 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Before
@@ -1579,5 +1580,134 @@ class PlaylistManagerTest {
             listOf("episode-uuid-2", "episode-uuid-3", "episode-uuid-1"),
             episodeUuids,
         )
+    }
+
+    @Test
+    fun addManualPlaylistEpisodes() = runTest(testDispatcher) {
+        val playlistUuid = manager.createManualPlaylist("Playlist")
+        podcastDao.insertSuspend(Podcast(uuid = "podcast-uuid", slug = "podcast-slug"))
+        episodeDao.insertAll(
+            listOf(
+                PodcastEpisode(
+                    uuid = "episode-uuid-1",
+                    podcastUuid = "podcast-uuid",
+                    title = "Episode title 1",
+                    publishedDate = Date(100),
+                    downloadUrl = "download-url-1",
+                    slug = "episode-slug-1",
+                ),
+                PodcastEpisode(
+                    uuid = "episode-uuid-2",
+                    podcastUuid = "podcast-uuid",
+                    title = "Episode title 2",
+                    publishedDate = Date(200),
+                    slug = "episode-slug-2",
+                ),
+            ),
+        )
+
+        val isAdded = manager.addManualPlaylistEpisode(playlistUuid, "episode-uuid-1")
+        assertTrue(isAdded)
+
+        assertEquals(
+            listOf(
+                ManualPlaylistEpisode(
+                    playlistUuid = playlistUuid,
+                    episodeUuid = "episode-uuid-1",
+                    podcastUuid = "podcast-uuid",
+                    title = "Episode title 1",
+                    addedAt = clock.instant(),
+                    publishedAt = Instant.ofEpochMilli(100),
+                    downloadUrl = "download-url-1",
+                    episodeSlug = "episode-slug-1",
+                    podcastSlug = "podcast-slug",
+                    sortPosition = 0,
+                    isSynced = false,
+                ),
+            ),
+            playlistDao.getManualPlaylistEpisodes(playlistUuid),
+        )
+
+        manager.addManualPlaylistEpisode(playlistUuid, "episode-uuid-2")
+        assertTrue(isAdded)
+
+        playlistDao.getManualPlaylistEpisodes(playlistUuid)
+        assertEquals(
+            listOf(
+                ManualPlaylistEpisode(
+                    playlistUuid = playlistUuid,
+                    episodeUuid = "episode-uuid-1",
+                    podcastUuid = "podcast-uuid",
+                    title = "Episode title 1",
+                    addedAt = clock.instant(),
+                    publishedAt = Instant.ofEpochMilli(100),
+                    downloadUrl = "download-url-1",
+                    episodeSlug = "episode-slug-1",
+                    podcastSlug = "podcast-slug",
+                    sortPosition = 0,
+                    isSynced = false,
+                ),
+                ManualPlaylistEpisode(
+                    playlistUuid = playlistUuid,
+                    episodeUuid = "episode-uuid-2",
+                    podcastUuid = "podcast-uuid",
+                    title = "Episode title 2",
+                    addedAt = clock.instant(),
+                    publishedAt = Instant.ofEpochMilli(200),
+                    downloadUrl = null,
+                    episodeSlug = "episode-slug-2",
+                    podcastSlug = "podcast-slug",
+                    sortPosition = 1,
+                    isSynced = false,
+                ),
+            ),
+            playlistDao.getManualPlaylistEpisodes(playlistUuid),
+        )
+    }
+
+    @Test
+    fun doNotAddNonExistingManualPlaylistEpisode() = runTest(testDispatcher) {
+        val playlistUuid = manager.createManualPlaylist("Playlist")
+
+        val isAdded = manager.addManualPlaylistEpisode(playlistUuid, "episode-uuid")
+        assertFalse(isAdded)
+
+        assertEquals(
+            emptyList<ManualPlaylistEpisode>(),
+            playlistDao.getManualPlaylistEpisodes(playlistUuid),
+        )
+    }
+
+    @Test
+    fun doNotAddManualEpisodesAboveLimit() = runTest(testDispatcher) {
+        val playlistUuid = manager.createManualPlaylist("Playlist")
+        episodeDao.insertAll(
+            List(1001) { index ->
+                PodcastEpisode(uuid = "episode-uuid-$index", publishedDate = Date())
+            },
+        )
+        playlistDao.upsertManualEpisodes(
+            List(1000) { index ->
+                ManualPlaylistEpisode.test(playlistUuid, "episode-uuid-$index", "podcast-uuid")
+            },
+        )
+
+        val isAdded = manager.addManualPlaylistEpisode(playlistUuid, "episode-uuid-1000")
+        assertFalse(isAdded)
+
+        assertEquals(
+            1000,
+            playlistDao.getManualPlaylistEpisodes(playlistUuid).size,
+        )
+    }
+
+    @Test
+    fun doNotFailToAddManualEpisodeThatIsAlreadyAdded() = runTest(testDispatcher) {
+        val playlistUuid = manager.createManualPlaylist("Playlist")
+        episodeDao.insert(PodcastEpisode(uuid = "episode-uuid", publishedDate = Date()))
+        playlistDao.upsertManualEpisode(ManualPlaylistEpisode.test(playlistUuid, "episode-uuid", "podcast-uuid"))
+
+        val isAdded = manager.addManualPlaylistEpisode(playlistUuid, "episode-uuid")
+        assertTrue(isAdded)
     }
 }

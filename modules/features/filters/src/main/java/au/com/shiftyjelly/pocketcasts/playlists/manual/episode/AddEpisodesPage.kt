@@ -16,6 +16,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -43,15 +44,16 @@ import au.com.shiftyjelly.pocketcasts.models.entity.ManualPlaylistFolderSource
 import au.com.shiftyjelly.pocketcasts.models.entity.ManualPlaylistPodcastSource
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import kotlinx.coroutines.flow.StateFlow
-import timber.log.Timber
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 @Composable
 internal fun AddEpisodesPage(
     playlistTitle: String,
+    addedEpisodesCount: Int,
     episodeSources: List<ManualPlaylistEpisodeSource>,
     episodesFlow: (String) -> StateFlow<List<PodcastEpisode>>,
     useEpisodeArtwork: Boolean,
+    onAddEpisode: (String) -> Unit,
     onClose: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -66,7 +68,15 @@ internal fun AddEpisodesPage(
             navigationButton = NavigationButton.CloseBack(isClose = isTopPageDisplayed),
             title = {
                 TextH40(
-                    text = stringResource(LR.string.add_to_playlist, playlistTitle),
+                    text = if (addedEpisodesCount == 0) {
+                        stringResource(LR.string.add_to_playlist, playlistTitle)
+                    } else {
+                        stringResource(
+                            LR.string.added_to_playlist,
+                            pluralStringResource(LR.plurals.episode_count, addedEpisodesCount, addedEpisodesCount),
+                            playlistTitle,
+                        )
+                    },
                     textAlign = TextAlign.Center,
                     color = MaterialTheme.theme.colors.primaryText01,
                     maxLines = 2,
@@ -162,9 +172,7 @@ internal fun AddEpisodesPage(
                 EpisodesColumn(
                     episodes = episodes,
                     useEpisodeArtwork = useEpisodeArtwork,
-                    onAddEpisode = { episode ->
-                        Timber.tag("Add episode: ${episode.title}")
-                    },
+                    onAddEpisode = { episode -> onAddEpisode(episode.uuid) },
                     modifier = Modifier.fillMaxSize(),
                 )
             }

@@ -69,6 +69,7 @@ internal fun EpisodesColumn(
                 episode = episode,
                 onClickAdd = { onAddEpisode(episode) },
                 useEpisodeArtwork = useEpisodeArtwork,
+                modifier = Modifier.animateItem(),
             )
         }
     }

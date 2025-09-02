@@ -2,6 +2,7 @@ package au.com.shiftyjelly.pocketcasts.repositories.playlist
 
 import androidx.room.withTransaction
 import au.com.shiftyjelly.pocketcasts.models.db.AppDatabase
+import au.com.shiftyjelly.pocketcasts.models.entity.ManualPlaylistEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.ManualPlaylistEpisodeSource
 import au.com.shiftyjelly.pocketcasts.models.entity.PlaylistEntity
 import au.com.shiftyjelly.pocketcasts.models.entity.PlaylistEntity.Companion.ANYTIME
@@ -26,6 +27,9 @@ import au.com.shiftyjelly.pocketcasts.models.type.SmartRules.PodcastsRule
 import au.com.shiftyjelly.pocketcasts.models.type.SmartRules.ReleaseDateRule
 import au.com.shiftyjelly.pocketcasts.models.type.SmartRules.StarredRule
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
+import au.com.shiftyjelly.pocketcasts.repositories.playlist.PlaylistManager.Companion.MANUAL_PLAYLIST_EPISODE_LIMIT
+import au.com.shiftyjelly.pocketcasts.repositories.playlist.PlaylistManager.Companion.PLAYLIST_ARTWORK_EPISODE_LIMIT
+import au.com.shiftyjelly.pocketcasts.repositories.playlist.PlaylistManager.Companion.SMART_PLAYLIST_EPISODE_LIMIT
 import java.time.Clock
 import java.util.UUID
 import javax.inject.Inject
@@ -48,6 +52,8 @@ class PlaylistManagerImpl @Inject constructor(
     private val clock: Clock,
 ) : PlaylistManager {
     private val playlistDao = appDatabase.playlistDao()
+    private val episodeDao = appDatabase.episodeDao()
+    private val podcastDao = appDatabase.podcastDao()
 
     override fun observePlaylistsPreview(): Flow<List<PlaylistPreview>> {
         return playlistDao
@@ -232,6 +238,42 @@ class PlaylistManagerImpl @Inject constructor(
             .distinctUntilChanged()
     }
 
+    override suspend fun addManualPlaylistEpisode(playlistUuid: String, episodeUuid: String): Boolean {
+        return appDatabase.withTransaction {
+            val episodeUuids = playlistDao.getManualPlaylistEpisodeUuids(playlistUuid)
+            if (episodeUuid in episodeUuids) {
+                return@withTransaction true
+            }
+
+            if (episodeUuids.size >= MANUAL_PLAYLIST_EPISODE_LIMIT) {
+                return@withTransaction false
+            }
+
+            val podcastEpisode = episodeDao.findByUuid(episodeUuid)
+            if (podcastEpisode == null) {
+                return@withTransaction false
+            }
+
+            val podcast = podcastDao.findPodcastByUuid(podcastEpisode.podcastUuid)
+            playlistDao.upsertManualEpisode(
+                ManualPlaylistEpisode(
+                    playlistUuid = playlistUuid,
+                    episodeUuid = episodeUuid,
+                    podcastUuid = podcastEpisode.podcastUuid,
+                    title = podcastEpisode.title,
+                    addedAt = clock.instant(),
+                    publishedAt = podcastEpisode.publishedDate.toInstant(),
+                    downloadUrl = podcastEpisode.downloadUrl,
+                    episodeSlug = podcastEpisode.slug,
+                    podcastSlug = podcast?.slug.orEmpty(),
+                    sortPosition = episodeUuids.size,
+                    isSynced = false,
+                ),
+            )
+            true
+        }
+    }
+
     private fun List<PlaylistEntity>.toPreviewFlows() = map { playlist ->
         val type = if (playlist.manual) {
             PlaylistPreview.Type.Manual
@@ -392,11 +434,6 @@ class PlaylistManagerImpl @Inject constructor(
         } else {
             generateUniqueUuid(uuids)
         }
-    }
-
-    private companion object {
-        const val PLAYLIST_ARTWORK_EPISODE_LIMIT = 4
-        const val SMART_PLAYLIST_EPISODE_LIMIT = 1000
     }
 }
 
