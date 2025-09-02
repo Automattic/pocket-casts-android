@@ -23,6 +23,7 @@ import androidx.core.view.updatePadding
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.asFlow
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.lifecycleScope
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.compose.components.SegmentedTabBar
 import au.com.shiftyjelly.pocketcasts.compose.components.SegmentedTabBarDefaults
@@ -175,8 +176,7 @@ class EffectsFragment :
         binding.lblSpeed.text = String.format("%.1fx", effects.playbackSpeed)
         viewModel.saveEffects(effects, podcast)
 
-        binding.btnSpeedUp.announceForAccessibility("Playback speed ${binding.lblSpeed.text}")
-        launch {
+        viewLifecycleOwner.lifecycleScope.launch {
             playbackSpeedTrackingDebouncer.debounce {
                 viewModel.effectsLive.value?.effects?.playbackSpeed?.roundedSpeed()?.let { currentSpeed ->
                     trackPlaybackEffectsEvent(

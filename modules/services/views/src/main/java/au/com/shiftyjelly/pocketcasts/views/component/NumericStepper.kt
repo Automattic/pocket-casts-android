@@ -38,8 +38,6 @@ class NumericStepper @JvmOverloads constructor(
             lblValue.text = formatter(field)
             lblValue.contentDescription = voiceOverFormatter(field)
             onValueChanged?.invoke(field)
-
-            lblValue.announceForAccessibility(lblValue.contentDescription)
         }
 
     var onValueChanged: ((Int) -> Unit)? = null
@@ -77,7 +75,7 @@ class NumericStepper @JvmOverloads constructor(
 
     init {
         orientation = HORIZONTAL
-        View.inflate(context, R.layout.layout_numeric_stepper, this)
+        inflate(context, R.layout.layout_numeric_stepper, this)
 
         btnMinus = findViewById(R.id.btnMinus)
         btnPlus = findViewById(R.id.btnPlus)
@@ -141,6 +139,7 @@ class NumericStepper @JvmOverloads constructor(
                 holdTimer?.cancel()
                 holdTimer = null
             }
+
             MotionEvent.ACTION_DOWN -> {
                 view.isPressed = true // This makes sure the ripple effect still works
                 value = nextValue

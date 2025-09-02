@@ -107,8 +107,4 @@ class FolderCreateFragment : BaseDialogFragment() {
             }
         }
     }
-
-    override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
-        return addNavControllerToBackStack(loadNavController = { navHostController }, initialRoute = NavRoutes.PODCASTS)
-    }
 }
