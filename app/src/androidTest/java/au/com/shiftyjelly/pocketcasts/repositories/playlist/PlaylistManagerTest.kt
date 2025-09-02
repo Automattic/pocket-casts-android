@@ -29,6 +29,7 @@ import au.com.shiftyjelly.pocketcasts.models.entity.PlaylistEntity.Companion.SYN
 import au.com.shiftyjelly.pocketcasts.models.entity.PlaylistEntity.Companion.SYNC_STATUS_SYNCED
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
+import au.com.shiftyjelly.pocketcasts.models.to.ManualEpisode
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodePlayingStatus
 import au.com.shiftyjelly.pocketcasts.models.type.PlaylistEpisodeSortType
 import au.com.shiftyjelly.pocketcasts.models.type.PodcastsSortType
@@ -46,6 +47,7 @@ import au.com.shiftyjelly.pocketcasts.preferences.SettingsImpl
 import au.com.shiftyjelly.pocketcasts.servers.di.ServersModule
 import au.com.shiftyjelly.pocketcasts.sharedtest.MutableClock
 import com.google.firebase.remoteconfig.FirebaseRemoteConfig
+import java.time.Instant
 import java.util.Date
 import java.util.UUID
 import kotlin.time.Duration
@@ -1372,5 +1374,210 @@ class PlaylistManagerTest {
             )
             assertEquals(listOf(episode1), awaitItem())
         }
+    }
+
+    @Test
+    fun observeUnavailableManualEpisodes() = runTest(testDispatcher) {
+        val playlistUuid = manager.createManualPlaylist("Playlist")
+        manager.updateSortType(playlistUuid, PlaylistEpisodeSortType.OldestToNewest)
+
+        playlistDao.observeManualPlaylistEpisodes(playlistUuid).test {
+            assertEquals(
+                emptyList<ManualEpisode>(),
+                awaitItem(),
+            )
+
+            val manualEpisode1 = ManualPlaylistEpisode
+                .test(playlistUuid = playlistUuid, episodeUuid = "episode-uuid-1", podcastUuid = "podcast-uuid")
+                .copy(publishedAt = Instant.ofEpochMilli(0))
+            playlistDao.upsertManualEpisode(manualEpisode1)
+            assertEquals(
+                listOf(
+                    ManualEpisode.Unavailable(manualEpisode1),
+                ),
+                awaitItem(),
+            )
+
+            val manualEpisode2 = ManualPlaylistEpisode
+                .test(playlistUuid = playlistUuid, episodeUuid = "episode-uuid-2", podcastUuid = "podcast-uuid")
+                .copy(publishedAt = Instant.ofEpochMilli(1))
+            playlistDao.upsertManualEpisode(manualEpisode2)
+            assertEquals(
+                listOf(
+                    ManualEpisode.Unavailable(manualEpisode1),
+                    ManualEpisode.Unavailable(manualEpisode2),
+                ),
+                awaitItem(),
+            )
+        }
+    }
+
+    @Test
+    fun observeAvailableManualEpisodes() = runTest(testDispatcher) {
+        val playlistUuid = manager.createManualPlaylist("Playlist")
+        manager.updateSortType(playlistUuid, PlaylistEpisodeSortType.OldestToNewest)
+
+        val manualEpisode1 = ManualPlaylistEpisode
+            .test(playlistUuid = playlistUuid, episodeUuid = "episode-uuid-1", podcastUuid = "podcast-uuid")
+            .copy(publishedAt = Instant.ofEpochMilli(0))
+        val manualEpisode2 = ManualPlaylistEpisode
+            .test(playlistUuid = playlistUuid, episodeUuid = "episode-uuid-2", podcastUuid = "podcast-uuid")
+            .copy(publishedAt = Instant.ofEpochMilli(1))
+        val manualEpisode3 = ManualPlaylistEpisode
+            .test(playlistUuid = playlistUuid, episodeUuid = "episode-uuid-3", podcastUuid = "podcast-uuid")
+            .copy(publishedAt = Instant.ofEpochMilli(2))
+        playlistDao.upsertManualEpisodes(listOf(manualEpisode1, manualEpisode2, manualEpisode3))
+
+        playlistDao.observeManualPlaylistEpisodes(playlistUuid).test {
+            skipItems(1)
+
+            val podcastEpisode3 = PodcastEpisode(
+                uuid = "episode-uuid-3",
+                publishedDate = Date(2),
+            )
+            episodeDao.insert(podcastEpisode3)
+            assertEquals(
+                listOf(
+                    ManualEpisode.Unavailable(manualEpisode1),
+                    ManualEpisode.Unavailable(manualEpisode2),
+                    ManualEpisode.Available(podcastEpisode3),
+                ),
+                awaitItem(),
+            )
+
+            val podcastEpisode1 = PodcastEpisode(
+                uuid = "episode-uuid-1",
+                publishedDate = Date(0),
+            )
+            episodeDao.insert(podcastEpisode1)
+            assertEquals(
+                listOf(
+                    ManualEpisode.Available(podcastEpisode1),
+                    ManualEpisode.Unavailable(manualEpisode2),
+                    ManualEpisode.Available(podcastEpisode3),
+                ),
+                awaitItem(),
+            )
+        }
+    }
+
+    @Test
+    fun sortManualEpisodesFromNewestToOldest() = runTest(testDispatcher) {
+        val playlistUuid = manager.createManualPlaylist("Playlist")
+        manager.updateSortType(playlistUuid, PlaylistEpisodeSortType.NewestToOldest)
+
+        playlistDao.upsertManualEpisodes(
+            listOf(
+                ManualPlaylistEpisode
+                    .test(playlistUuid = playlistUuid, episodeUuid = "episode-uuid-1", podcastUuid = "podcast-uuid")
+                    .copy(publishedAt = Instant.ofEpochMilli(1000)),
+                ManualPlaylistEpisode
+                    .test(playlistUuid = playlistUuid, episodeUuid = "episode-uuid-2", podcastUuid = "podcast-uuid")
+                    .copy(publishedAt = Instant.ofEpochMilli(2000)),
+                ManualPlaylistEpisode
+                    .test(playlistUuid = playlistUuid, episodeUuid = "episode-uuid-3", podcastUuid = "podcast-uuid")
+                    .copy(publishedAt = Instant.ofEpochMilli(3000)),
+            ),
+        )
+        episodeDao.insert(
+            PodcastEpisode(
+                uuid = "episode-uuid-1",
+                publishedDate = Date(2500),
+            ),
+        )
+
+        val episodeUuids = playlistDao.observeManualPlaylistEpisodes(playlistUuid).first().map(ManualEpisode::uuid)
+
+        assertEquals(
+            listOf("episode-uuid-3", "episode-uuid-1", "episode-uuid-2"),
+            episodeUuids,
+        )
+    }
+
+    @Test
+    fun sortManualEpisodesFromOldestToNewest() = runTest(testDispatcher) {
+        val playlistUuid = manager.createManualPlaylist("Playlist")
+        manager.updateSortType(playlistUuid, PlaylistEpisodeSortType.OldestToNewest)
+
+        playlistDao.upsertManualEpisodes(
+            listOf(
+                ManualPlaylistEpisode
+                    .test(playlistUuid = playlistUuid, episodeUuid = "episode-uuid-1", podcastUuid = "podcast-uuid")
+                    .copy(publishedAt = Instant.ofEpochMilli(3000)),
+                ManualPlaylistEpisode
+                    .test(playlistUuid = playlistUuid, episodeUuid = "episode-uuid-2", podcastUuid = "podcast-uuid")
+                    .copy(publishedAt = Instant.ofEpochMilli(2000)),
+                ManualPlaylistEpisode
+                    .test(playlistUuid = playlistUuid, episodeUuid = "episode-uuid-3", podcastUuid = "podcast-uuid")
+                    .copy(publishedAt = Instant.ofEpochMilli(1000)),
+            ),
+        )
+        episodeDao.insert(
+            PodcastEpisode(
+                uuid = "episode-uuid-1",
+                publishedDate = Date(1500),
+            ),
+        )
+
+        val episodeUuids = playlistDao.observeManualPlaylistEpisodes(playlistUuid).first().map(ManualEpisode::uuid)
+
+        assertEquals(
+            listOf("episode-uuid-3", "episode-uuid-1", "episode-uuid-2"),
+            episodeUuids,
+        )
+    }
+
+    @Test
+    fun sortManualEpisodesFromShortestToLongest() = runTest(testDispatcher) {
+        val playlistUuid = manager.createManualPlaylist("Playlist")
+        manager.updateSortType(playlistUuid, PlaylistEpisodeSortType.ShortestToLongest)
+
+        playlistDao.upsertManualEpisodes(
+            listOf(
+                ManualPlaylistEpisode.test(playlistUuid = playlistUuid, episodeUuid = "episode-uuid-1", podcastUuid = "podcast-uuid"),
+                ManualPlaylistEpisode.test(playlistUuid = playlistUuid, episodeUuid = "episode-uuid-2", podcastUuid = "podcast-uuid"),
+                ManualPlaylistEpisode.test(playlistUuid = playlistUuid, episodeUuid = "episode-uuid-3", podcastUuid = "podcast-uuid"),
+            ),
+        )
+        episodeDao.insertAll(
+            listOf(
+                PodcastEpisode(uuid = "episode-uuid-3", duration = 20.0, publishedDate = Date()),
+                PodcastEpisode(uuid = "episode-uuid-2", duration = 10.0, publishedDate = Date()),
+            ),
+        )
+
+        val episodeUuids = playlistDao.observeManualPlaylistEpisodes(playlistUuid).first().map(ManualEpisode::uuid)
+
+        assertEquals(
+            listOf("episode-uuid-2", "episode-uuid-3", "episode-uuid-1"),
+            episodeUuids,
+        )
+    }
+
+    @Test
+    fun sortManualEpisodesFromLongestToShortest() = runTest(testDispatcher) {
+        val playlistUuid = manager.createManualPlaylist("Playlist")
+        manager.updateSortType(playlistUuid, PlaylistEpisodeSortType.LongestToShortest)
+
+        playlistDao.upsertManualEpisodes(
+            listOf(
+                ManualPlaylistEpisode.test(playlistUuid = playlistUuid, episodeUuid = "episode-uuid-1", podcastUuid = "podcast-uuid"),
+                ManualPlaylistEpisode.test(playlistUuid = playlistUuid, episodeUuid = "episode-uuid-2", podcastUuid = "podcast-uuid"),
+                ManualPlaylistEpisode.test(playlistUuid = playlistUuid, episodeUuid = "episode-uuid-3", podcastUuid = "podcast-uuid"),
+            ),
+        )
+        episodeDao.insertAll(
+            listOf(
+                PodcastEpisode(uuid = "episode-uuid-3", duration = 20.0, publishedDate = Date()),
+                PodcastEpisode(uuid = "episode-uuid-2", duration = 60.0, publishedDate = Date()),
+            ),
+        )
+
+        val episodeUuids = playlistDao.observeManualPlaylistEpisodes(playlistUuid).first().map(ManualEpisode::uuid)
+
+        assertEquals(
+            listOf("episode-uuid-2", "episode-uuid-3", "episode-uuid-1"),
+            episodeUuids,
+        )
     }
 }
