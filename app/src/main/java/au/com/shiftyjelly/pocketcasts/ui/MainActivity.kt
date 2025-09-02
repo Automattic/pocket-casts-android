@@ -717,6 +717,7 @@ class MainActivity :
         mediaRouter?.removeCallback(mediaRouterCallback)
     }
 
+    @SuppressLint("GestureBackNavigation")
     @Deprecated("Deprecated in Java")
     @Suppress("DEPRECATION")
     override fun onBackPressed() {
