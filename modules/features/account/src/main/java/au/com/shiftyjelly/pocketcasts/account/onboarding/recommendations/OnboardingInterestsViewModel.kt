@@ -45,9 +45,9 @@ class OnboardingInterestsViewModel @Inject constructor(
         analyticsTracker.track(
             AnalyticsEvent.INTERESTS_CATEGORY_SELECTED,
             mapOf(
-                "categoryId" to category.id,
+                "category_id" to category.id,
                 "name" to category.name,
-                "isSelected" to isSelected,
+                "is_selected" to isSelected,
             ),
         )
         _state.update {
