@@ -146,10 +146,14 @@ abstract class PlaylistDao {
             WHEN :includeInFolders IS NOT 0 THEN 1 
             ELSE folder.deleted IS NOT 0
           END)
+          AND podcast.title LIKE '%' || :searchTerm || '%' ESCAPE '\' COLLATE NOCASE
         ORDER BY podcast.title ASC
     """,
     )
-    internal abstract suspend fun getAllPodcastPlaylistSources(includeInFolders: Boolean): List<ManualPlaylistPodcastSource>
+    internal abstract suspend fun getAllPodcastPlaylistSources(
+        includeInFolders: Boolean,
+        searchTerm: String,
+    ): List<ManualPlaylistPodcastSource>
 
     @Query(
         """
@@ -158,39 +162,68 @@ abstract class PlaylistDao {
         WHERE
           podcast.subscribed IS NOT 0
           AND podcast.folder_uuid IS (:folderUuid)
+          AND podcast.title LIKE '%' || :searchTerm || '%' ESCAPE '\' COLLATE NOCASE
         ORDER BY podcast.title ASC
     """,
     )
-    internal abstract suspend fun getPodcastPlaylistSourcesForFolder(folderUuid: String): List<ManualPlaylistPodcastSource>
+    internal abstract suspend fun getPodcastPlaylistSourcesForFolder(
+        folderUuid: String,
+        searchTerm: String,
+    ): List<ManualPlaylistPodcastSource>
 
     @Query(
         """
-        SELECT folder.uuid, folder.name, folder.color 
-        FROM folders AS folder
+        SELECT 
+          folder.uuid, 
+          folder.name, 
+          folder.color 
+        FROM 
+          folders AS folder 
         WHERE 
-          folder.deleted IS 0
+          folder.deleted IS 0 
           AND (
-            SELECT COUNT(*) 
-            FROM podcasts AS podcast 
-            WHERE podcast.subscribed IS NOT 0 AND podcast.folder_uuid IS folder.uuid 
-          ) > 0
-        ORDER BY folder.name ASC
+            SELECT 
+              COUNT(*) 
+            FROM 
+              podcasts AS podcast 
+            WHERE 
+              podcast.subscribed IS NOT 0 
+              AND podcast.folder_uuid IS folder.uuid
+          ) > 0 
+          AND (
+            folder.name LIKE '%' || :searchTerm || '%' ESCAPE '\' COLLATE NOCASE 
+            OR (
+              SELECT 
+                COUNT(*) 
+              FROM 
+                podcasts AS podcast 
+              WHERE 
+                podcast.subscribed IS NOT 0 
+                AND podcast.folder_uuid IS folder.uuid 
+                AND podcast.title LIKE '%' || :searchTerm || '%' ESCAPE '\' COLLATE NOCASE
+            )
+          ) 
+        ORDER BY 
+          folder.name ASC
     """,
     )
-    internal abstract suspend fun getFolderPartialPlaylistSources(): List<ManualPlaylistPartialFolderSource>
+    internal abstract suspend fun getFolderPartialPlaylistSources(
+        searchTerm: String,
+    ): List<ManualPlaylistPartialFolderSource>
 
     @Transaction
-    open suspend fun getManualPlaylistEpisodeSources(useFolders: Boolean): List<ManualPlaylistEpisodeSource> {
-        val podcasts = getAllPodcastPlaylistSources(includeInFolders = !useFolders)
+    open suspend fun getManualPlaylistEpisodeSources(useFolders: Boolean, searchTerm: String?): List<ManualPlaylistEpisodeSource> {
+        val searchTerm = searchTerm?.escapeLike('\\').orEmpty()
+        val podcasts = getAllPodcastPlaylistSources(includeInFolders = !useFolders, searchTerm)
         val folders = if (useFolders) {
-            getFolderPartialPlaylistSources().mapNotNull { partialSource ->
-                val podcastSources = getPodcastPlaylistSourcesForFolder(partialSource.uuid)
+            getFolderPartialPlaylistSources(searchTerm).mapNotNull { partialSource ->
+                val podcastSources = getPodcastPlaylistSourcesForFolder(partialSource.uuid, searchTerm)
                 if (podcastSources.isNotEmpty()) {
                     ManualPlaylistFolderSource(
                         uuid = partialSource.uuid,
                         title = partialSource.title,
                         color = partialSource.color,
-                        podcastSources = getPodcastPlaylistSourcesForFolder(partialSource.uuid),
+                        podcastSources = getPodcastPlaylistSourcesForFolder(partialSource.uuid, searchTerm),
                     )
                 } else {
                     null

@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.text.input.TextFieldState
 import androidx.compose.foundation.text.input.rememberTextFieldState
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
@@ -53,6 +54,7 @@ internal fun AddEpisodesPage(
     episodeSources: List<ManualPlaylistEpisodeSource>,
     episodesFlow: (String) -> StateFlow<List<PodcastEpisode>>,
     useEpisodeArtwork: Boolean,
+    searchState: TextFieldState,
     onAddEpisode: (String) -> Unit,
     onClose: () -> Unit,
     modifier: Modifier = Modifier,
@@ -109,7 +111,7 @@ internal fun AddEpisodesPage(
         )
 
         SearchBar(
-            state = rememberTextFieldState(),
+            state = searchState,
             placeholder = stringResource(LR.string.search),
             style = SearchBarStyle.Small,
             modifier = Modifier

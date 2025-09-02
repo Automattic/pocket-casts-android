@@ -227,9 +227,9 @@ class PlaylistManagerImpl @Inject constructor(
         }
     }
 
-    override suspend fun getManualPlaylistEpisodeSources(): List<ManualPlaylistEpisodeSource> {
+    override suspend fun getManualPlaylistEpisodeSources(searchTerm: String?): List<ManualPlaylistEpisodeSource> {
         val isSubscriber = settings.cachedSubscription.value != null
-        return playlistDao.getManualPlaylistEpisodeSources(useFolders = isSubscriber)
+        return playlistDao.getManualPlaylistEpisodeSources(useFolders = isSubscriber, searchTerm = searchTerm)
     }
 
     override fun observeManualPlaylistAvailableEpisodes(playlistUuid: String, podcastUuid: String): Flow<List<PodcastEpisode>> {

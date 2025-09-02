@@ -1334,6 +1334,74 @@ class PlaylistManagerTest {
     }
 
     @Test
+    fun filterManualPlaylistEpisodeSource() = runTest(testDispatcher) {
+        settings.cachedSubscription.set(Subscription.PlusPreview, updateModifiedAt = false)
+
+        val baseFolder = Folder(
+            uuid = "folder-id-0",
+            name = "Folder Name 0",
+            color = 0,
+            addedDate = Date(0),
+            sortPosition = 0,
+            podcastsSortType = PodcastsSortType.RECENTLY_PLAYED,
+            deleted = false,
+            syncModified = 0L,
+        )
+        folderDao.insert(baseFolder.copy(uuid = "folder-uuid-1", name = "Folder ABC 1"))
+
+        podcastDao.insertSuspend(Podcast(uuid = "podcast-uuid-1", title = "Podcast ABC 1", rawFolderUuid = "folder-uuid-1", isSubscribed = true))
+        podcastDao.insertSuspend(Podcast(uuid = "podcast-uuid-2", title = "Podcast ABC 2", isSubscribed = true))
+        podcastDao.insertSuspend(Podcast(uuid = "podcast-uuid-3", title = "Podcast DEF 3", rawFolderUuid = "folder-uuid-1", isSubscribed = true))
+        podcastDao.insertSuspend(Podcast(uuid = "podcast-uuid-4", title = "Podcast DEF 4", isSubscribed = true))
+
+        assertEquals(
+            listOf(
+                ManualPlaylistPodcastSource(
+                    uuid = "podcast-uuid-2",
+                    title = "Podcast ABC 2",
+                    author = "",
+                ),
+                ManualPlaylistFolderSource(
+                    uuid = "folder-uuid-1",
+                    title = "Folder ABC 1",
+                    color = 0,
+                    podcastSources = listOf(
+                        ManualPlaylistPodcastSource(
+                            uuid = "podcast-uuid-1",
+                            title = "Podcast ABC 1",
+                            author = "",
+                        ),
+                    ),
+                ),
+            ),
+            manager.getManualPlaylistEpisodeSources(searchTerm = "ABC"),
+        )
+
+        assertEquals(
+            listOf(
+                ManualPlaylistPodcastSource(
+                    uuid = "podcast-uuid-4",
+                    title = "Podcast DEF 4",
+                    author = "",
+                ),
+                ManualPlaylistFolderSource(
+                    uuid = "folder-uuid-1",
+                    title = "Folder ABC 1",
+                    color = 0,
+                    podcastSources = listOf(
+                        ManualPlaylistPodcastSource(
+                            uuid = "podcast-uuid-3",
+                            title = "Podcast DEF 3",
+                            author = "",
+                        ),
+                    ),
+                ),
+            ),
+            manager.getManualPlaylistEpisodeSources(searchTerm = "DEF"),
+        )
+    }
+
+    @Test
     fun observeManualPlaylistAvailableEpisodes() = runTest(testDispatcher) {
         val playlistUuid = manager.createManualPlaylist("Manual Playlist")
 

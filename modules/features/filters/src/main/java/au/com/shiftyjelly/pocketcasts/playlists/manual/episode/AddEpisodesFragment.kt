@@ -63,6 +63,7 @@ class AddEpisodesFragment : BaseDialogFragment() {
                     episodeSources = uiState.sources,
                     episodesFlow = viewModel::getEpisodesFlow,
                     useEpisodeArtwork = uiState.useEpisodeArtwork,
+                    searchState = viewModel.searchState,
                     onAddEpisode = viewModel::addEpisode,
                     onClose = ::dismiss,
                     modifier = Modifier.fillMaxSize(),

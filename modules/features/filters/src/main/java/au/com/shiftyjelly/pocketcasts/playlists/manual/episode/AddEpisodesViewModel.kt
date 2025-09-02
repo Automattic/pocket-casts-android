@@ -1,5 +1,7 @@
 package au.com.shiftyjelly.pocketcasts.playlists.manual.episode
 
+import androidx.compose.foundation.text.input.TextFieldState
+import androidx.compose.runtime.snapshotFlow
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import au.com.shiftyjelly.pocketcasts.models.entity.ManualPlaylistEpisodeSource
@@ -12,6 +14,7 @@ import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -19,18 +22,28 @@ import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.debounce
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.emitAll
 import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
+@OptIn(FlowPreview::class)
 @HiltViewModel(assistedFactory = AddEpisodesViewModel.Factory::class)
 class AddEpisodesViewModel @AssistedInject constructor(
     @Assisted private val playlistUuid: String,
     private val playlistManager: PlaylistManager,
     private val settings: Settings,
 ) : ViewModel() {
+    val searchState = TextFieldState()
+    private val searchFlow = snapshotFlow { searchState.text }
+        .map { it.toString().trim() }
+        .debounce { searchTerm -> if (searchTerm.isEmpty()) 0 else 300 }
+        .distinctUntilChanged()
+
     private val _messageQueue = MutableSharedFlow<Message>()
     val messageQueue = _messageQueue.asSharedFlow()
 
@@ -41,13 +54,14 @@ class AddEpisodesViewModel @AssistedInject constructor(
 
         val uiStates = combine(
             playlistFlow,
+            searchFlow,
             settings.artworkConfiguration.flow,
             addedEpisodeUuids,
-        ) { playlist, artworkConfig, addedEpisodes ->
+        ) { playlist, searchTerm, artworkConfig, addedEpisodes ->
             if (playlist != null) {
                 UiState(
                     playlist = playlist,
-                    sources = playlistManager.getManualPlaylistEpisodeSources(),
+                    sources = playlistManager.getManualPlaylistEpisodeSources(searchTerm),
                     useEpisodeArtwork = artworkConfig.useEpisodeArtwork(ArtworkConfiguration.Element.Filters),
                     addedEpisodeUuids = addedEpisodes,
                 )
