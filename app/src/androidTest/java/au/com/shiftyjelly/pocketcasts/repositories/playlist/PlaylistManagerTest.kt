@@ -168,7 +168,7 @@ class PlaylistManagerTest {
             )
 
             playlistDao.upsertManualEpisode(
-                ManualPlaylistEpisode(playlistUuid = "playlist-id", episodeUuid = "episode-id-1", podcastUuid = "podcast-id-1"),
+                ManualPlaylistEpisode.test(playlistUuid = "playlist-id", episodeUuid = "episode-id-1", podcastUuid = "podcast-id-1"),
             )
             assertEquals(
                 listOf("podcast-id-1"),
@@ -177,7 +177,7 @@ class PlaylistManagerTest {
 
             // Unknown episode
             playlistDao.upsertManualEpisode(
-                ManualPlaylistEpisode(playlistUuid = "playlist-id", episodeUuid = "episode-id-3", podcastUuid = "podcast-id-3"),
+                ManualPlaylistEpisode.test(playlistUuid = "playlist-id", episodeUuid = "episode-id-3", podcastUuid = "podcast-id-3"),
             )
             assertEquals(
                 listOf("podcast-id-1"),
@@ -185,7 +185,7 @@ class PlaylistManagerTest {
             )
 
             playlistDao.upsertManualEpisode(
-                ManualPlaylistEpisode(playlistUuid = "playlist-id", episodeUuid = "episode-id-2", podcastUuid = "podcast-id-2"),
+                ManualPlaylistEpisode.test(playlistUuid = "playlist-id", episodeUuid = "episode-id-2", podcastUuid = "podcast-id-2"),
             )
             assertEquals(
                 listOf("podcast-id-1", "podcast-id-2"),
@@ -999,7 +999,7 @@ class PlaylistManagerTest {
             )
 
             playlistDao.upsertManualEpisode(
-                ManualPlaylistEpisode(playlistUuid = "playlist-id", episodeUuid = "episode-id-1", podcastUuid = "podcast-id-1"),
+                ManualPlaylistEpisode.test(playlistUuid = "playlist-id", episodeUuid = "episode-id-1", podcastUuid = "podcast-id-1"),
             )
             assertEquals(
                 ManualPlaylist(
@@ -1363,12 +1363,12 @@ class PlaylistManagerTest {
             expectNoEvents()
 
             playlistDao.upsertManualEpisode(
-                ManualPlaylistEpisode(playlistUuid = playlistUuid, episodeUuid = "episode-uuid-2", podcastUuid = "podcast-uuid-3"),
+                ManualPlaylistEpisode.test(playlistUuid = playlistUuid, episodeUuid = "episode-uuid-2", podcastUuid = "podcast-uuid-3"),
             )
             expectNoEvents()
 
             playlistDao.upsertManualEpisode(
-                ManualPlaylistEpisode(playlistUuid = playlistUuid, episodeUuid = "episode-uuid-2", podcastUuid = "podcast-uuid-1"),
+                ManualPlaylistEpisode.test(playlistUuid = playlistUuid, episodeUuid = "episode-uuid-2", podcastUuid = "podcast-uuid-1"),
             )
             assertEquals(listOf(episode1), awaitItem())
         }

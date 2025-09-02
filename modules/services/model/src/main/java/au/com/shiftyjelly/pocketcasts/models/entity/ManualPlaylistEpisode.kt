@@ -19,12 +19,32 @@ data class ManualPlaylistEpisode(
     @ColumnInfo(name = "playlist_uuid") val playlistUuid: String,
     @ColumnInfo(name = "episode_uuid") val episodeUuid: String,
     @ColumnInfo(name = "podcast_uuid") val podcastUuid: String,
-    @ColumnInfo(name = "title") val title: String = "",
-    @ColumnInfo(name = "added_at") val addedAt: Instant = Instant.now(),
-    @ColumnInfo(name = "published_at") val publishedAt: Instant = Instant.EPOCH,
-    @ColumnInfo(name = "download_url") val downloadUrl: String? = null,
-    @ColumnInfo(name = "episode_slug") val episodeSlug: String = "",
-    @ColumnInfo(name = "podcast_slug") val podcastSlug: String = "",
-    @ColumnInfo(name = "sort_position") val sortPosition: Int = 0,
-    @ColumnInfo(name = "is_synced") val isSynced: Boolean = true,
-)
+    @ColumnInfo(name = "title") val title: String,
+    @ColumnInfo(name = "added_at") val addedAt: Instant,
+    @ColumnInfo(name = "published_at") val publishedAt: Instant,
+    @ColumnInfo(name = "download_url") val downloadUrl: String?,
+    @ColumnInfo(name = "episode_slug") val episodeSlug: String,
+    @ColumnInfo(name = "podcast_slug") val podcastSlug: String,
+    @ColumnInfo(name = "sort_position") val sortPosition: Int,
+    @ColumnInfo(name = "is_synced") val isSynced: Boolean,
+) {
+    companion object {
+        fun test(
+            playlistUuid: String,
+            episodeUuid: String,
+            podcastUuid: String,
+        ) = ManualPlaylistEpisode(
+            playlistUuid = playlistUuid,
+            episodeUuid = episodeUuid,
+            podcastUuid = podcastUuid,
+            title = "",
+            addedAt = Instant.now(),
+            publishedAt = Instant.EPOCH,
+            downloadUrl = null,
+            episodeSlug = "",
+            podcastSlug = "",
+            sortPosition = 0,
+            isSynced = true,
+        )
+    }
+}
