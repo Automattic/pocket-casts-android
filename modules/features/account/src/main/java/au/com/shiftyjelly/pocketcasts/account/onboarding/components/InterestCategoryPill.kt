@@ -73,7 +73,7 @@ fun InterestCategoryPill(
                     targetValue = 1.1f,
                     animationSpec = tween(
                         durationMillis = 300,
-                        easing = FastOutSlowInEasing
+                        easing = FastOutSlowInEasing,
                     ),
                 )
                 scaleAnim.animateTo(
@@ -89,7 +89,7 @@ fun InterestCategoryPill(
                     targetValue = -3f,
                     animationSpec = tween(
                         durationMillis = 300,
-                        easing = FastOutSlowInEasing
+                        easing = FastOutSlowInEasing,
                     ),
                 )
                 rotationAnim.animateTo(
