@@ -932,6 +932,8 @@
 
     <!-- Playlists -->
 
+    <!-- %1$s is a playlist title  -->
+    <string name="add_to_playlist">Add to “%1$s”</string>
     <string name="create_playlist">Create Playlist</string>
     <string name="create_smart_playlist">Create Smart Playlist</string>
     <string name="decrement_longer_than_duration">Decrement \"longer than\" duration</string>

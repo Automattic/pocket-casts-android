@@ -85,6 +85,56 @@ object ThemedTopAppBar {
 @Composable
 fun ThemedTopAppBar(
     modifier: Modifier = Modifier,
+    title: @Composable () -> Unit = {},
+    navigationButton: NavigationButton? = NavigationButton.Back,
+    onNavigationClick: (() -> Unit)? = null,
+    style: ThemedTopAppBar.Style = ThemedTopAppBar.Style.Solid,
+    iconColor: Color = when (style) {
+        ThemedTopAppBar.Style.Solid -> MaterialTheme.theme.colors.secondaryIcon01
+        ThemedTopAppBar.Style.Immersive -> MaterialTheme.theme.colors.primaryIcon01
+    },
+    backgroundColor: Color = when (style) {
+        ThemedTopAppBar.Style.Solid -> MaterialTheme.theme.colors.secondaryUi01
+        ThemedTopAppBar.Style.Immersive -> MaterialTheme.theme.colors.primaryUi01
+    },
+    bottomShadow: Boolean = false,
+    windowInsets: WindowInsets = AppBarDefaults.topAppBarWindowInsets,
+    actions: @Composable RowScope.(Color) -> Unit = {},
+) {
+    CompositionLocalProvider(
+        LocalRippleConfiguration provides RippleConfiguration(color = iconColor),
+    ) {
+        TopAppBar(
+            navigationIcon = if (navigationButton != null) {
+                {
+                    NavigationIconButton(
+                        onClick = onNavigationClick ?: {},
+                        navigationButton = navigationButton,
+                        tint = iconColor,
+                    )
+                }
+            } else {
+                null
+            },
+            title = title,
+            actions = { actions(iconColor) },
+            backgroundColor = backgroundColor,
+            elevation = 0.dp,
+            windowInsets = windowInsets,
+            modifier = if (bottomShadow) {
+                modifier
+                    .zIndex(1f)
+                    .shadow(4.dp)
+            } else {
+                modifier
+            },
+        )
+    }
+}
+
+@Composable
+fun ThemedTopAppBar(
+    modifier: Modifier = Modifier,
     title: String? = null,
     navigationButton: NavigationButton? = NavigationButton.Back,
     onNavigationClick: (() -> Unit)? = null,
@@ -106,43 +156,26 @@ fun ThemedTopAppBar(
     windowInsets: WindowInsets = AppBarDefaults.topAppBarWindowInsets,
     actions: @Composable RowScope.(Color) -> Unit = {},
 ) {
-    CompositionLocalProvider(
-        LocalRippleConfiguration provides RippleConfiguration(color = iconColor),
-    ) {
-        TopAppBar(
-            navigationIcon = if (navigationButton != null) {
-                {
-                    NavigationIconButton(
-                        onClick = onNavigationClick ?: {},
-                        navigationButton = navigationButton,
-                        tint = iconColor,
-                    )
-                }
-            } else {
-                null
-            },
-            title = {
-                if (title != null) {
-                    Text(
-                        text = title,
-                        color = textColor,
-                        overflow = titleOverflow,
-                    )
-                }
-            },
-            actions = { actions(iconColor) },
-            backgroundColor = backgroundColor,
-            elevation = 0.dp,
-            windowInsets = windowInsets,
-            modifier = if (bottomShadow) {
-                modifier
-                    .zIndex(1f)
-                    .shadow(4.dp)
-            } else {
-                modifier
-            },
-        )
-    }
+    ThemedTopAppBar(
+        title = {
+            if (title != null) {
+                Text(
+                    text = title,
+                    color = textColor,
+                    overflow = titleOverflow,
+                )
+            }
+        },
+        navigationButton = navigationButton,
+        onNavigationClick = onNavigationClick,
+        style = style,
+        iconColor = iconColor,
+        backgroundColor = backgroundColor,
+        bottomShadow = bottomShadow,
+        windowInsets = windowInsets,
+        actions = actions,
+        modifier = modifier,
+    )
 }
 
 @Composable
