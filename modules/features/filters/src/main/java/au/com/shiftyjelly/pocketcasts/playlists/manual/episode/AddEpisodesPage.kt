@@ -89,7 +89,7 @@ internal fun AddEpisodesPage(
                 )
             },
             style = ThemedTopAppBar.Style.Immersive,
-            iconColor = MaterialTheme.theme.colors.primaryIcon01,
+            iconColor = MaterialTheme.theme.colors.primaryIcon02,
             windowInsets = WindowInsets(0),
             onNavigationClick = {
                 if (!navController.popBackStack()) {
