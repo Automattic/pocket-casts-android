@@ -38,7 +38,6 @@ import au.com.shiftyjelly.pocketcasts.compose.AppThemeWithBackground
 import au.com.shiftyjelly.pocketcasts.compose.buttons.RowButton
 import au.com.shiftyjelly.pocketcasts.compose.components.TextH10
 import au.com.shiftyjelly.pocketcasts.compose.components.TextH40
-import au.com.shiftyjelly.pocketcasts.compose.components.TextP40
 import au.com.shiftyjelly.pocketcasts.compose.components.TextP60
 import au.com.shiftyjelly.pocketcasts.compose.preview.ThemePreviewParameterProvider
 import au.com.shiftyjelly.pocketcasts.compose.theme
@@ -139,13 +138,13 @@ private fun EnableNotificationsPromptScreenV2(
                         textAlign = TextAlign.Center,
                     )
                     Spacer(modifier = Modifier.height(16.dp))
-                    TextP40(
-                        modifier = Modifier.padding(horizontal = 32.dp),
+                    TextP60(
+                        modifier = Modifier.padding(horizontal = 18.dp),
                         text = stringResource(LR.string.notification_prompt_message),
                         color = MaterialTheme.theme.colors.primaryText02,
                         textAlign = TextAlign.Center,
                         fontWeight = FontWeight.W500,
-                        fontSize = 15.sp,
+                        fontSize = 14.5.sp,
                     )
                     Spacer(modifier = Modifier.weight(1f))
 
@@ -207,13 +206,13 @@ private fun EnableNotificationsPromptScreenV2(
                 color = MaterialTheme.theme.colors.primaryText01,
             )
             Spacer(modifier = Modifier.height(16.dp))
-            TextP40(
-                modifier = Modifier.padding(horizontal = 32.dp),
+            TextP60(
+                modifier = Modifier.padding(horizontal = 18.dp),
                 text = stringResource(LR.string.notification_prompt_message),
                 color = MaterialTheme.theme.colors.primaryText02,
                 textAlign = TextAlign.Center,
-                fontSize = 15.sp,
-                fontWeight = FontWeight.W500,
+                fontSize = 14.5.sp,
+                lineHeight = 18.sp,
             )
             Spacer(modifier = Modifier.weight(1f))
             if (isAccountCreationFlagEnabled) {
