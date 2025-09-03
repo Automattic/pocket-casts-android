@@ -7,6 +7,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.FlowRow
+import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -143,11 +144,10 @@ private fun Content(
         }
         FlowRow(
             modifier = Modifier
-                .weight(1f)
+                .height(IntrinsicSize.Min)
                 .verticalScroll(rememberScrollState())
                 .fillMaxWidth()
-                .animateContentSize()
-                .padding(horizontal = 8.dp),
+                .animateContentSize(),
             horizontalArrangement = Arrangement.spacedBy(8.dp, alignment = Alignment.CenterHorizontally),
             verticalArrangement = Arrangement.spacedBy(8.dp),
             maxItemsInEachRow = columnCount,
@@ -175,9 +175,8 @@ private fun Content(
             }
         }
 
-        Spacer(modifier = Modifier.height(24.dp))
-
         if (!state.isShowingAllCategories) {
+            Spacer(modifier = Modifier.height(24.dp))
             TextP40(
                 text = stringResource(LR.string.onboarding_interests_show_more),
                 color = MaterialTheme.theme.colors.primaryInteractive01,
@@ -190,7 +189,7 @@ private fun Content(
         }
 
         RowButton(
-            modifier = Modifier.padding(bottom = 16.dp),
+            modifier = Modifier.padding(bottom = 16.dp, top = 24.dp),
             text = stringResource(state.ctaLabelResId),
             enabled = state.isCtaEnabled,
             onClick = onContinuePress,
