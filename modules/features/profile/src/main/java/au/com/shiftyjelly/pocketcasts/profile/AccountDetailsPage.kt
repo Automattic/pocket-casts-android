@@ -231,7 +231,7 @@ private fun NewUpgradeAccountCard(
 ) {
     Card(
         modifier = modifier,
-        shape = RoundedCornerShape(8.dp),
+        shape = RoundedCornerShape(12.dp),
         backgroundColor = MaterialTheme.theme.colors.primaryUi01,
     ) {
         Column(
