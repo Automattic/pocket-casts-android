@@ -48,7 +48,7 @@ class AddEpisodesViewModel @AssistedInject constructor(
     private val addedEpisodeUuids = MutableStateFlow(emptySet<String>())
 
     val uiState = flow {
-        val playlistFlow = playlistManager.observeManualPlaylist(playlistUuid)
+        val playlistFlow = playlistManager.manualPlaylistFlow(playlistUuid)
 
         val uiStates = combine(
             playlistFlow,
@@ -59,7 +59,7 @@ class AddEpisodesViewModel @AssistedInject constructor(
             if (playlist != null) {
                 UiState(
                     playlist = playlist,
-                    sources = playlistManager.getManualPlaylistEpisodeSources(searchTerm),
+                    sources = playlistManager.getManualEpisodeSources(searchTerm),
                     useEpisodeArtwork = artworkConfig.useEpisodeArtwork(ArtworkConfiguration.Element.Filters),
                     addedEpisodeUuids = addedEpisodes,
                 )
@@ -75,7 +75,7 @@ class AddEpisodesViewModel @AssistedInject constructor(
 
     fun addEpisode(episodeUuid: String) {
         viewModelScope.launch {
-            val isAdded = playlistManager.addManualPlaylistEpisode(playlistUuid, episodeUuid)
+            val isAdded = playlistManager.addManualEpisode(playlistUuid, episodeUuid)
             if (isAdded) {
                 addedEpisodeUuids.update { value -> value + episodeUuid }
             } else {
@@ -104,7 +104,7 @@ class AddEpisodesViewModel @AssistedInject constructor(
     fun getEpisodesFlow(podcastUuid: String): StateFlow<List<PodcastEpisode>> {
         return episodeFlowsCache.getOrPut(podcastUuid) {
             val flow = episodeSearchState.textFlow.flatMapLatest { searchTerm ->
-                playlistManager.observeManualPlaylistAvailableEpisodes(playlistUuid, podcastUuid, searchTerm)
+                playlistManager.notAddedManualEpisodesFlow(playlistUuid, podcastUuid, searchTerm)
             }
             flow.stateIn(viewModelScope, SharingStarted.WhileSubscribed(stopTimeoutMillis = 300, replayExpirationMillis = 300), initialValue = emptyList())
         }

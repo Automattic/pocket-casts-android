@@ -108,12 +108,12 @@ class PlaylistManagerTest {
     }
 
     @Test
-    fun observePlaylistPreviews() = runTest(testDispatcher) {
+    fun playlistPreviewsFlow() = runTest(testDispatcher) {
         val playlist1 = DbPlaylist(uuid = "id-1", title = "Title 1")
         val playlist2 = DbPlaylist(uuid = "id-2", title = "Title 2")
         val playlist3 = DbPlaylist(uuid = "id-3", title = "Title 3", manual = true)
 
-        manager.observePlaylistsPreview().test {
+        manager.playlistPreviewsFlow().test {
             assertTrue(awaitItem().isEmpty())
 
             playlistDao.upsertAllPlaylists(listOf(playlist1, playlist2, playlist3))
@@ -137,7 +137,7 @@ class PlaylistManagerTest {
         podcastDao.insertSuspend(podcast2)
         episodeDao.insert(PodcastEpisode(uuid = "episode-id-1", podcastUuid = "podcast-id-1", publishedDate = Date(1)))
 
-        manager.observePlaylistsPreview().test {
+        manager.playlistPreviewsFlow().test {
             assertEquals(
                 listOf(podcast1.uuid),
                 awaitItem().single().artworkPodcastUuids,
@@ -164,7 +164,7 @@ class PlaylistManagerTest {
             ),
         )
 
-        manager.observePlaylistsPreview().test {
+        manager.playlistPreviewsFlow().test {
             assertEquals(
                 emptyList<String>(),
                 awaitItem().single().artworkPodcastUuids,
@@ -201,7 +201,7 @@ class PlaylistManagerTest {
     fun doNotObserveDeletedPlaylistPreviews() = runTest(testDispatcher) {
         playlistDao.upsertPlaylist(DbPlaylist(deleted = true))
 
-        val playlists = manager.observePlaylistsPreview().first()
+        val playlists = manager.playlistPreviewsFlow().first()
 
         assertTrue(playlists.isEmpty())
     }
@@ -210,7 +210,7 @@ class PlaylistManagerTest {
     fun doNotObserveDraftPlaylistPreviews() = runTest(testDispatcher) {
         playlistDao.upsertPlaylist(DbPlaylist(draft = true))
 
-        val playlists = manager.observePlaylistsPreview().first()
+        val playlists = manager.playlistPreviewsFlow().first()
 
         assertTrue(playlists.isEmpty())
     }
@@ -225,7 +225,7 @@ class PlaylistManagerTest {
             ),
         )
 
-        val playlistUuids = manager.observePlaylistsPreview().first().map(PlaylistPreview::uuid)
+        val playlistUuids = manager.playlistPreviewsFlow().first().map(PlaylistPreview::uuid)
 
         assertEquals(listOf("id-3", "id-2", "id-1"), playlistUuids)
     }
@@ -237,7 +237,7 @@ class PlaylistManagerTest {
         episodeDao.insert(PodcastEpisode(uuid = "episode-id-1", podcastUuid = "podcast-id-1", publishedDate = Date()))
         episodeDao.insert(PodcastEpisode(uuid = "episode-id-2", podcastUuid = "podcast-id-2", publishedDate = Date()))
 
-        val playlist = manager.observePlaylistsPreview().first().single()
+        val playlist = manager.playlistPreviewsFlow().first().single()
 
         assertEquals(0, playlist.episodeCount)
         assertTrue(playlist.artworkPodcastUuids.isEmpty())
@@ -293,7 +293,7 @@ class PlaylistManagerTest {
             ),
         )
 
-        val playlist = manager.observePlaylistsPreview().first().single()
+        val playlist = manager.playlistPreviewsFlow().first().single()
 
         assertEquals(2, playlist.episodeCount)
         assertEquals(listOf(podcasts[0], podcasts[1]).map(Podcast::uuid), playlist.artworkPodcastUuids)
@@ -336,7 +336,7 @@ class PlaylistManagerTest {
             ),
         )
 
-        val playlist = manager.observePlaylistsPreview().first().single()
+        val playlist = manager.playlistPreviewsFlow().first().single()
 
         assertEquals(4, playlist.episodeCount)
         assertEquals(podcasts.reversed().map(Podcast::uuid), playlist.artworkPodcastUuids)
@@ -379,7 +379,7 @@ class PlaylistManagerTest {
             ),
         )
 
-        val playlist = manager.observePlaylistsPreview().first().single()
+        val playlist = manager.playlistPreviewsFlow().first().single()
 
         assertEquals(4, playlist.episodeCount)
         assertEquals(podcasts.reversed().map(Podcast::uuid), playlist.artworkPodcastUuids)
@@ -426,7 +426,7 @@ class PlaylistManagerTest {
             ),
         )
 
-        val playlist = manager.observePlaylistsPreview().first().single()
+        val playlist = manager.playlistPreviewsFlow().first().single()
 
         assertEquals(4, playlist.episodeCount)
         assertEquals(podcasts.reversed().map(Podcast::uuid), playlist.artworkPodcastUuids)
@@ -473,7 +473,7 @@ class PlaylistManagerTest {
             ),
         )
 
-        val playlist = manager.observePlaylistsPreview().first().single()
+        val playlist = manager.playlistPreviewsFlow().first().single()
 
         assertEquals(4, playlist.episodeCount)
         assertEquals(podcasts.reversed().map(Podcast::uuid), playlist.artworkPodcastUuids)
@@ -525,7 +525,7 @@ class PlaylistManagerTest {
             ),
         )
 
-        val playlist = manager.observePlaylistsPreview().first().single()
+        val playlist = manager.playlistPreviewsFlow().first().single()
 
         assertEquals(6, playlist.episodeCount)
         assertEquals(podcasts.take(4).map(Podcast::uuid), playlist.artworkPodcastUuids)
@@ -678,7 +678,7 @@ class PlaylistManagerTest {
             ),
         )
         drafts.forEach { draft -> manager.createSmartPlaylist(draft) }
-        val playlists = playlistDao.observePlaylists().first()
+        val playlists = playlistDao.allPlaylistsFlow().first()
 
         // Check that UUIDs are unique
         assertEquals(playlists, playlists.distinctBy { it.uuid })
@@ -748,7 +748,7 @@ class PlaylistManagerTest {
     @Test
     fun createDefaultNewReleasesPlaylist() = runTest(testDispatcher) {
         manager.createSmartPlaylist(SmartPlaylistDraft.NewReleases)
-        val playlists = playlistDao.observePlaylists().first()
+        val playlists = playlistDao.allPlaylistsFlow().first()
 
         assertEquals(
             DbPlaylist(
@@ -785,7 +785,7 @@ class PlaylistManagerTest {
     @Test
     fun createDefaultInProgressPlaylist() = runTest(testDispatcher) {
         manager.createSmartPlaylist(SmartPlaylistDraft.InProgress)
-        val playlists = playlistDao.observePlaylists().first()
+        val playlists = playlistDao.allPlaylistsFlow().first()
 
         assertEquals(
             DbPlaylist(
@@ -822,7 +822,7 @@ class PlaylistManagerTest {
     @Test
     fun createManualPlaylist() = runTest(testDispatcher) {
         manager.createManualPlaylist("Playlist name")
-        val playlist = playlistDao.observePlaylists().first().first()
+        val playlist = playlistDao.allPlaylistsFlow().first().first()
 
         assertEquals("Playlist name", playlist.title)
         assertTrue(playlist.manual)
@@ -836,7 +836,7 @@ class PlaylistManagerTest {
         playlistDao.upsertAllPlaylists(playlists)
 
         val reorderedPlaylistsUuids = playlists.shuffled().map(DbPlaylist::uuid)
-        manager.updatePlaylistsOrder(reorderedPlaylistsUuids)
+        manager.sortPlaylists(reorderedPlaylistsUuids)
 
         val reorderedPlaylists = playlistDao.getAllPlaylists()
         assertEquals(reorderedPlaylistsUuids, reorderedPlaylists.map(DbPlaylist::uuid))
@@ -859,7 +859,7 @@ class PlaylistManagerTest {
             playlists[1].uuid,
             playlists[3].uuid,
         )
-        manager.updatePlaylistsOrder(reorderedPlaylistsUuids)
+        manager.sortPlaylists(reorderedPlaylistsUuids)
 
         val reorderedPlaylists = playlistDao.getAllPlaylistUuids()
         assertEquals(
@@ -875,7 +875,7 @@ class PlaylistManagerTest {
     }
 
     @Test
-    fun observeSmartEpisodes() = runTest(testDispatcher) {
+    fun smartEpisodesFlow() = runTest(testDispatcher) {
         podcastDao.insertSuspend(Podcast(uuid = "podcast-id", isSubscribed = true))
 
         val smartRules = SmartRules.Default.copy(
@@ -888,7 +888,7 @@ class PlaylistManagerTest {
             episodeDuration = EpisodeDurationRule.Constrained(longerThan = 10.minutes, shorterThan = 35.minutes),
         )
 
-        manager.observeSmartEpisodes(smartRules).test {
+        manager.smartEpisodesFlow(smartRules).test {
             assertEquals(emptyList<PodcastEpisode>(), awaitItem())
 
             val episode1 = PodcastEpisode(
@@ -934,14 +934,14 @@ class PlaylistManagerTest {
     }
 
     @Test
-    fun observeSmartPlaylist() = runTest(testDispatcher) {
+    fun smartPlaylistFlow() = runTest(testDispatcher) {
         val podcasts = listOf(
             Podcast(uuid = "podcast-id-1", isSubscribed = true),
             Podcast(uuid = "podcast-id-2", isSubscribed = true),
         )
         podcasts.forEach { podcast -> podcastDao.insertSuspend(podcast) }
 
-        manager.observeSmartPlaylist("playlist-id").test {
+        manager.smartPlaylistFlow("playlist-id").test {
             assertNull(awaitItem())
 
             playlistDao.upsertPlaylist(DbPlaylist(uuid = "playlist-id", title = "Title 1"))
@@ -971,7 +971,7 @@ class PlaylistManagerTest {
             assertEquals(episodes, playlist?.episodes)
             assertEquals(podcasts.map(Podcast::uuid), playlist?.artworkPodcastUuids)
 
-            playlistDao.observeSmartPlaylist("playlist-id").first()!!.let {
+            playlistDao.smartPlaylistFlow("playlist-id").first()!!.let {
                 playlistDao.upsertPlaylist(it.copy(allPodcasts = false, podcastUuids = "podcast-id-2"))
             }
             playlist = awaitItem()
@@ -982,11 +982,11 @@ class PlaylistManagerTest {
     }
 
     @Test
-    fun observeManualPlaylist() = runTest(testDispatcher) {
+    fun manualPlaylistFlow() = runTest(testDispatcher) {
         val podcasts = listOf(Podcast(uuid = "podcast-id-1"), Podcast(uuid = "podcast-id-2"))
         podcasts.forEach { podcast -> podcastDao.insertSuspend(podcast) }
 
-        manager.observeManualPlaylist("playlist-id").test {
+        manager.manualPlaylistFlow("playlist-id").test {
             assertNull(awaitItem())
 
             playlistDao.upsertPlaylist(DbPlaylist(uuid = "playlist-id", title = "Title 1", manual = true))
@@ -1057,7 +1057,7 @@ class PlaylistManagerTest {
         episodeDao.insertAll(episodes)
         playlistDao.upsertPlaylist(DbPlaylist(uuid = "playlist-id", title = "Title 1"))
 
-        manager.observeSmartPlaylist("playlist-id").test {
+        manager.smartPlaylistFlow("playlist-id").test {
             val playlist = awaitItem()
             assertEquals(episodes, playlist?.episodes)
             assertEquals(podcasts.take(4).map(Podcast::uuid), playlist?.artworkPodcastUuids)
@@ -1074,7 +1074,7 @@ class PlaylistManagerTest {
         )
         playlistDao.upsertPlaylist(DbPlaylist(uuid = "playlist-id", title = "Title 1"))
 
-        manager.observeSmartPlaylist("playlist-id").test {
+        manager.smartPlaylistFlow("playlist-id").test {
             val playlist = awaitItem()
             assertEquals(2000, playlist?.totalEpisodeCount)
             assertEquals(1000, playlist?.episodes?.size)
@@ -1087,7 +1087,7 @@ class PlaylistManagerTest {
         playlistDao.upsertPlaylist(DbPlaylist(uuid = "playlist-id", title = "Title 1"))
 
         val baseEpisode = PodcastEpisode(uuid = "", podcastUuid = "podcast-id", publishedDate = Date())
-        manager.observeSmartPlaylist("playlist-id").test {
+        manager.smartPlaylistFlow("playlist-id").test {
             var playlist = awaitItem()
             assertEquals(Duration.ZERO, playlist?.playbackDurationLeft)
 
@@ -1118,7 +1118,7 @@ class PlaylistManagerTest {
     fun updateSortType() = runTest(testDispatcher) {
         playlistDao.upsertPlaylist(DbPlaylist(uuid = "playlist-id", title = "Title 1"))
 
-        manager.observeSmartPlaylist("playlist-id").test {
+        manager.smartPlaylistFlow("playlist-id").test {
             var playlist = awaitItem()
             assertEquals(PlaylistEpisodeSortType.NewestToOldest, playlist?.episodeSortType)
 
@@ -1132,7 +1132,7 @@ class PlaylistManagerTest {
     fun updateAutoDownload() = runTest(testDispatcher) {
         playlistDao.upsertPlaylist(DbPlaylist(uuid = "playlist-id", title = "Title 1"))
 
-        manager.observeSmartPlaylist("playlist-id").test {
+        manager.smartPlaylistFlow("playlist-id").test {
             var playlist = awaitItem()
             assertEquals(false, playlist?.isAutoDownloadEnabled)
 
@@ -1146,7 +1146,7 @@ class PlaylistManagerTest {
     fun updateAutoDownloadLimit() = runTest(testDispatcher) {
         playlistDao.upsertPlaylist(DbPlaylist(uuid = "playlist-id", title = "Title 1"))
 
-        manager.observeSmartPlaylist("playlist-id").test {
+        manager.smartPlaylistFlow("playlist-id").test {
             var playlist = awaitItem()
             assertEquals(10, playlist?.autoDownloadLimit)
 
@@ -1160,7 +1160,7 @@ class PlaylistManagerTest {
     fun updateName() = runTest(testDispatcher) {
         playlistDao.upsertPlaylist(DbPlaylist(uuid = "playlist-id", title = "Title 1"))
 
-        manager.observeSmartPlaylist("playlist-id").test {
+        manager.smartPlaylistFlow("playlist-id").test {
             var playlist = awaitItem()
             assertEquals("Title 1", playlist?.title)
 
@@ -1192,7 +1192,7 @@ class PlaylistManagerTest {
         episodeDao.insert(backslashEpisode)
 
         suspend fun getSmartEpisodes(searchTerm: String?): List<PodcastEpisode> {
-            return manager.observeSmartEpisodes(SmartRules.Default, searchTerm = searchTerm).first()
+            return manager.smartEpisodesFlow(SmartRules.Default, searchTerm = searchTerm).first()
         }
 
         assertEquals(
@@ -1260,7 +1260,7 @@ class PlaylistManagerTest {
     fun getManualPlaylistEpisodeSource() = runTest(testDispatcher) {
         assertEquals(
             emptyList<ManualPlaylistEpisodeSource>(),
-            manager.getManualPlaylistEpisodeSources(),
+            manager.getManualEpisodeSources(),
         )
 
         podcastDao.insertSuspend(Podcast("podcast-id-0", title = "Podcast Title 0", author = "Podcast Author 0", isSubscribed = false))
@@ -1300,7 +1300,7 @@ class PlaylistManagerTest {
                     author = "Podcast Author 3",
                 ),
             ),
-            manager.getManualPlaylistEpisodeSources(),
+            manager.getManualEpisodeSources(),
         )
 
         settings.cachedSubscription.set(Subscription.PlusPreview, updateModifiedAt = false)
@@ -1329,7 +1329,7 @@ class PlaylistManagerTest {
                     ),
                 ),
             ),
-            manager.getManualPlaylistEpisodeSources(),
+            manager.getManualEpisodeSources(),
         )
     }
 
@@ -1374,7 +1374,7 @@ class PlaylistManagerTest {
                     ),
                 ),
             ),
-            manager.getManualPlaylistEpisodeSources(searchTerm = "ABC"),
+            manager.getManualEpisodeSources(searchTerm = "ABC"),
         )
 
         assertEquals(
@@ -1397,15 +1397,15 @@ class PlaylistManagerTest {
                     ),
                 ),
             ),
-            manager.getManualPlaylistEpisodeSources(searchTerm = "DEF"),
+            manager.getManualEpisodeSources(searchTerm = "DEF"),
         )
     }
 
     @Test
-    fun observeManualPlaylistAvailableEpisodes() = runTest(testDispatcher) {
+    fun manualPlaylistFlowAvailableEpisodes() = runTest(testDispatcher) {
         val playlistUuid = manager.createManualPlaylist("Manual Playlist")
 
-        manager.observeManualPlaylistAvailableEpisodes(playlistUuid, "podcast-uuid-1").test {
+        manager.notAddedManualEpisodesFlow(playlistUuid, "podcast-uuid-1").test {
             assertEquals(emptyList<PodcastEpisode>(), awaitItem())
 
             val episode1 = PodcastEpisode(
@@ -1449,7 +1449,7 @@ class PlaylistManagerTest {
     fun filterManualPlaylistAvailableEpisodes() = runTest(testDispatcher) {
         val playlistUuid = manager.createManualPlaylist("Manual Playlist")
 
-        manager.observeManualPlaylistAvailableEpisodes(playlistUuid, "podcast-uuid-1", "ABC").test {
+        manager.notAddedManualEpisodesFlow(playlistUuid, "podcast-uuid-1", "ABC").test {
             skipItems(1)
 
             val episode1 = PodcastEpisode(
@@ -1487,7 +1487,7 @@ class PlaylistManagerTest {
         val playlistUuid = manager.createManualPlaylist("Playlist")
         manager.updateSortType(playlistUuid, PlaylistEpisodeSortType.OldestToNewest)
 
-        playlistDao.observeManualPlaylistEpisodes(playlistUuid).test {
+        playlistDao.manualEpisodesFlow(playlistUuid).test {
             assertEquals(
                 emptyList<ManualEpisode>(),
                 awaitItem(),
@@ -1534,7 +1534,7 @@ class PlaylistManagerTest {
             .copy(publishedAt = Instant.ofEpochMilli(2))
         playlistDao.upsertManualEpisodes(listOf(manualEpisode1, manualEpisode2, manualEpisode3))
 
-        playlistDao.observeManualPlaylistEpisodes(playlistUuid).test {
+        playlistDao.manualEpisodesFlow(playlistUuid).test {
             skipItems(1)
 
             val podcastEpisode3 = PodcastEpisode(
@@ -1592,7 +1592,7 @@ class PlaylistManagerTest {
             ),
         )
 
-        val episodeUuids = playlistDao.observeManualPlaylistEpisodes(playlistUuid).first().map(ManualEpisode::uuid)
+        val episodeUuids = playlistDao.manualEpisodesFlow(playlistUuid).first().map(ManualEpisode::uuid)
 
         assertEquals(
             listOf("episode-uuid-3", "episode-uuid-1", "episode-uuid-2"),
@@ -1625,7 +1625,7 @@ class PlaylistManagerTest {
             ),
         )
 
-        val episodeUuids = playlistDao.observeManualPlaylistEpisodes(playlistUuid).first().map(ManualEpisode::uuid)
+        val episodeUuids = playlistDao.manualEpisodesFlow(playlistUuid).first().map(ManualEpisode::uuid)
 
         assertEquals(
             listOf("episode-uuid-3", "episode-uuid-1", "episode-uuid-2"),
@@ -1652,7 +1652,7 @@ class PlaylistManagerTest {
             ),
         )
 
-        val episodeUuids = playlistDao.observeManualPlaylistEpisodes(playlistUuid).first().map(ManualEpisode::uuid)
+        val episodeUuids = playlistDao.manualEpisodesFlow(playlistUuid).first().map(ManualEpisode::uuid)
 
         assertEquals(
             listOf("episode-uuid-2", "episode-uuid-3", "episode-uuid-1"),
@@ -1679,7 +1679,7 @@ class PlaylistManagerTest {
             ),
         )
 
-        val episodeUuids = playlistDao.observeManualPlaylistEpisodes(playlistUuid).first().map(ManualEpisode::uuid)
+        val episodeUuids = playlistDao.manualEpisodesFlow(playlistUuid).first().map(ManualEpisode::uuid)
 
         assertEquals(
             listOf("episode-uuid-2", "episode-uuid-3", "episode-uuid-1"),
@@ -1688,7 +1688,7 @@ class PlaylistManagerTest {
     }
 
     @Test
-    fun addManualPlaylistEpisodes() = runTest(testDispatcher) {
+    fun addManualEpisodes() = runTest(testDispatcher) {
         val playlistUuid = manager.createManualPlaylist("Playlist")
         podcastDao.insertSuspend(Podcast(uuid = "podcast-uuid", slug = "podcast-slug"))
         episodeDao.insertAll(
@@ -1711,7 +1711,7 @@ class PlaylistManagerTest {
             ),
         )
 
-        val isAdded = manager.addManualPlaylistEpisode(playlistUuid, "episode-uuid-1")
+        val isAdded = manager.addManualEpisode(playlistUuid, "episode-uuid-1")
         assertTrue(isAdded)
 
         assertEquals(
@@ -1733,7 +1733,7 @@ class PlaylistManagerTest {
             playlistDao.getManualPlaylistEpisodes(playlistUuid),
         )
 
-        manager.addManualPlaylistEpisode(playlistUuid, "episode-uuid-2")
+        manager.addManualEpisode(playlistUuid, "episode-uuid-2")
         assertTrue(isAdded)
 
         playlistDao.getManualPlaylistEpisodes(playlistUuid)
@@ -1774,7 +1774,7 @@ class PlaylistManagerTest {
     fun doNotAddNonExistingManualPlaylistEpisode() = runTest(testDispatcher) {
         val playlistUuid = manager.createManualPlaylist("Playlist")
 
-        val isAdded = manager.addManualPlaylistEpisode(playlistUuid, "episode-uuid")
+        val isAdded = manager.addManualEpisode(playlistUuid, "episode-uuid")
         assertFalse(isAdded)
 
         assertEquals(
@@ -1797,7 +1797,7 @@ class PlaylistManagerTest {
             },
         )
 
-        val isAdded = manager.addManualPlaylistEpisode(playlistUuid, "episode-uuid-1000")
+        val isAdded = manager.addManualEpisode(playlistUuid, "episode-uuid-1000")
         assertFalse(isAdded)
 
         assertEquals(
@@ -1812,7 +1812,7 @@ class PlaylistManagerTest {
         episodeDao.insert(PodcastEpisode(uuid = "episode-uuid", publishedDate = Date()))
         playlistDao.upsertManualEpisode(ManualPlaylistEpisode.test(playlistUuid, "episode-uuid", "podcast-uuid"))
 
-        val isAdded = manager.addManualPlaylistEpisode(playlistUuid, "episode-uuid")
+        val isAdded = manager.addManualEpisode(playlistUuid, "episode-uuid")
         assertTrue(isAdded)
     }
 }

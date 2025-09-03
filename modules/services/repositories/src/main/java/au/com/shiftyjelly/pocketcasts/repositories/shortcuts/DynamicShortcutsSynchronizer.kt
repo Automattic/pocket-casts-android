@@ -33,7 +33,7 @@ class DynamicShortcutsSynchronizer @Inject constructor(
         if (!isMonitoring.getAndSet(true) && Build.VERSION.SDK_INT >= Build.VERSION_CODES.N_MR1) {
             scope.launch {
                 playlistDao
-                    .observerPlaylistShortcut()
+                    .playlistShortcutFlow()
                     .distinctUntilChanged()
                     .collect { playlist -> setDynamicShortcuts(shortcutManager, playlist) }
             }

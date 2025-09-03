@@ -44,47 +44,42 @@ abstract class PlaylistDao {
     @Upsert
     abstract suspend fun upsertManualEpisodes(episode: Collection<ManualPlaylistEpisode>)
 
-    @Query("SELECT uuid FROM playlists ORDER BY sortPosition ASC")
-    abstract suspend fun getAllPlaylistUuids(): List<String>
-
-    @Query("SELECT * FROM playlists ORDER BY sortPosition ASC")
+    @Query("SELECT * FROM playlists WHERE deleted = 0 AND draft = 0 ORDER BY sortPosition ASC")
     abstract suspend fun getAllPlaylists(): List<PlaylistEntity>
 
-    @Query("SELECT * FROM playlists WHERE manual = 0 AND deleted = 0 AND draft = 0 AND uuid = :uuid")
-    abstract fun observeSmartPlaylist(uuid: String): Flow<PlaylistEntity?>
-
-    @Query("SELECT * FROM playlists WHERE manual != 0 AND deleted = 0 AND draft = 0 AND uuid = :uuid")
-    abstract fun observeManualPlaylist(uuid: String): Flow<PlaylistEntity?>
-
     @Query("SELECT * FROM playlists WHERE deleted = 0 AND draft = 0 ORDER BY sortPosition ASC")
-    abstract fun observePlaylists(): Flow<List<PlaylistEntity>>
-
-    @Query(
-        """
-        SELECT playlist.uuid, playlist.title, playlist.iconId
-        FROM playlists AS playlist
-        WHERE manual = 0 AND deleted = 0 AND draft = 0
-        ORDER BY sortPosition ASC 
-        LIMIT 1
-    """,
-    )
-    abstract fun observerPlaylistShortcut(): Flow<PlaylistShortcut?>
+    abstract fun allPlaylistsFlow(): Flow<List<PlaylistEntity>>
 
     @Query("SELECT * FROM playlists WHERE uuid IN (:uuids)")
-    protected abstract suspend fun getAllPlaylistsUnsafe(uuids: Collection<String>): List<PlaylistEntity>
+    protected abstract suspend fun getAllPlaylistsInUnsafe(uuids: Collection<String>): List<PlaylistEntity>
 
     @Transaction
-    open suspend fun getAllPlaylists(uuids: Collection<String>): List<PlaylistEntity> {
+    open suspend fun getAllPlaylistsIn(uuids: Collection<String>): List<PlaylistEntity> {
         return uuids.chunked(AppDatabase.SQLITE_BIND_ARG_LIMIT).flatMap { chunk ->
-            getAllPlaylistsUnsafe(chunk)
+            getAllPlaylistsInUnsafe(chunk)
         }
     }
 
     @Query("SELECT * FROM playlists WHERE draft = 0 AND manual = 0 AND syncStatus = $SYNC_STATUS_NOT_SYNCED")
-    abstract suspend fun getAllUnsynced(): List<PlaylistEntity>
+    abstract suspend fun getAllUnsyncedPlaylists(): List<PlaylistEntity>
+
+    @Query("SELECT uuid FROM playlists ORDER BY sortPosition ASC")
+    abstract suspend fun getAllPlaylistUuids(): List<String>
+
+    @Query("SELECT * FROM playlists WHERE manual = 0 AND deleted = 0 AND draft = 0 AND uuid = :uuid")
+    abstract suspend fun getSmartPlaylistFlow(uuid: String): PlaylistEntity?
+
+    @Query("SELECT * FROM playlists WHERE manual = 0 AND deleted = 0 AND draft = 0 AND uuid = :uuid")
+    abstract fun smartPlaylistFlow(uuid: String): Flow<PlaylistEntity?>
+
+    @Query("SELECT * FROM playlists WHERE manual != 0 AND deleted = 0 AND draft = 0 AND uuid = :uuid")
+    abstract fun manualPlaylistFlow(uuid: String): Flow<PlaylistEntity?>
 
     @Query("UPDATE playlists SET sortPosition = :position, syncStatus = $SYNC_STATUS_NOT_SYNCED WHERE uuid = :uuid")
     abstract suspend fun updateSortPosition(uuid: String, position: Int)
+
+    @Query("UPDATE playlists SET title = :name, syncStatus = $SYNC_STATUS_NOT_SYNCED WHERE uuid = :uuid")
+    abstract suspend fun updateName(uuid: String, name: String)
 
     @Query("UPDATE playlists SET sortId = :sortType, syncStatus = $SYNC_STATUS_NOT_SYNCED WHERE uuid = :uuid")
     abstract suspend fun updateSortType(uuid: String, sortType: PlaylistEpisodeSortType)
@@ -95,9 +90,6 @@ abstract class PlaylistDao {
     @Query("UPDATE playlists SET autoDownloadLimit = :limit, syncStatus = $SYNC_STATUS_NOT_SYNCED WHERE uuid = :uuid")
     abstract suspend fun updateAutoDownloadLimit(uuid: String, limit: Int)
 
-    @Query("UPDATE playlists SET title = :name, syncStatus = $SYNC_STATUS_NOT_SYNCED WHERE uuid = :uuid")
-    abstract suspend fun updateName(uuid: String, name: String)
-
     @Query("UPDATE playlists SET deleted = 1, syncStatus = $SYNC_STATUS_NOT_SYNCED WHERE uuid = :uuid")
     abstract suspend fun markPlaylistAsDeleted(uuid: String)
 
@@ -105,12 +97,12 @@ abstract class PlaylistDao {
     abstract suspend fun deleteMarkedPlaylists()
 
     @Query("DELETE FROM playlists WHERE uuid IN (:uuids)")
-    protected abstract suspend fun deleteAllUnsafe(uuids: Collection<String>)
+    protected abstract suspend fun deleteAllPlaylistsInUnsafe(uuids: Collection<String>)
 
     @Transaction
-    open suspend fun deleteAll(uuids: Collection<String>) {
+    open suspend fun deleteAllPlaylistsIn(uuids: Collection<String>) {
         uuids.chunked(AppDatabase.SQLITE_BIND_ARG_LIMIT).forEach { chunk ->
-            deleteAllUnsafe(chunk)
+            deleteAllPlaylistsInUnsafe(chunk)
         }
     }
 
@@ -127,7 +119,7 @@ abstract class PlaylistDao {
           AND IFNULL(podcastEpisode.archived, 0) IS 0
     """,
     )
-    abstract fun observeManualEpisodeMetadata(playlistUuid: String): Flow<PlaylistEpisodeMetadata>
+    abstract fun manualPlaylistMetadataFlow(playlistUuid: String): Flow<PlaylistEpisodeMetadata>
 
     @Query("SELECT episode_uuid FROM manual_playlist_episodes WHERE playlist_uuid IS :playlistUuid")
     abstract suspend fun getManualPlaylistEpisodeUuids(playlistUuid: String): List<String>
@@ -213,16 +205,17 @@ abstract class PlaylistDao {
 
     @Transaction
     open suspend fun getManualPlaylistEpisodeSources(useFolders: Boolean, searchTerm: String): List<ManualPlaylistEpisodeSource> {
-        val podcasts = getAllPodcastPlaylistSources(includeInFolders = !useFolders, searchTerm)
+        val escapedTerm = searchTerm.escapeLike('\\')
+        val podcasts = getAllPodcastPlaylistSources(includeInFolders = !useFolders, escapedTerm)
         val folders = if (useFolders) {
-            getFolderPartialPlaylistSources(searchTerm).mapNotNull { partialSource ->
-                val podcastSources = getPodcastPlaylistSourcesForFolder(partialSource.uuid, searchTerm)
+            getFolderPartialPlaylistSources(escapedTerm).mapNotNull { partialSource ->
+                val podcastSources = getPodcastPlaylistSourcesForFolder(partialSource.uuid, escapedTerm)
                 if (podcastSources.isNotEmpty()) {
                     ManualPlaylistFolderSource(
                         uuid = partialSource.uuid,
                         title = partialSource.title,
                         color = partialSource.color,
-                        podcastSources = getPodcastPlaylistSourcesForFolder(partialSource.uuid, searchTerm),
+                        podcastSources = getPodcastPlaylistSourcesForFolder(partialSource.uuid, escapedTerm),
                     )
                 } else {
                     null
@@ -252,16 +245,25 @@ abstract class PlaylistDao {
           episode.title ASC
     """,
     )
-    abstract fun observeManualPlaylistAvailableEpisodes(
+    protected abstract fun notAddedManualEpisodesFlowUnsafe(
         playlistUuid: String,
         podcastUuid: String,
         searchTerm: String,
     ): Flow<List<PodcastEpisode>>
 
-    @RawQuery(observedEntities = [Podcast::class, PodcastEpisode::class])
-    protected abstract fun observeSmartEpisodeMetadata(query: RoomRawQuery): Flow<PlaylistEpisodeMetadata>
+    fun notAddedManualEpisodesFlow(
+        playlistUuid: String,
+        podcastUuid: String,
+        searchTerm: String,
+    ): Flow<List<PodcastEpisode>> {
+        val escapedTerm = searchTerm.escapeLike('\\')
+        return notAddedManualEpisodesFlowUnsafe(playlistUuid, podcastUuid, escapedTerm)
+    }
 
-    fun observeSmartEpisodeMetadata(
+    @RawQuery(observedEntities = [Podcast::class, PodcastEpisode::class])
+    protected abstract fun smartPlaylistMetadataFlow(query: RoomRawQuery): Flow<PlaylistEpisodeMetadata>
+
+    fun smartPlaylistMetadataFlow(
         clock: Clock,
         smartRules: SmartRules,
     ): Flow<PlaylistEpisodeMetadata> {
@@ -271,7 +273,7 @@ abstract class PlaylistDao {
             orderByClause = null,
             limit = null,
         )
-        return observeSmartEpisodeMetadata(RoomRawQuery(query))
+        return smartPlaylistMetadataFlow(RoomRawQuery(query))
     }
 
     @Query(
@@ -298,63 +300,63 @@ abstract class PlaylistDao {
           CASE WHEN playlist.sortId IS 4 THEN podcastEpisode.added_date END DESC
     """,
     )
-    abstract fun observeManualPlaylistPodcasts(playlistUuid: String): Flow<List<String>>
+    abstract fun manualPlaylistArtworkPodcastsFlow(playlistUuid: String): Flow<List<String>>
 
     @Query(
         """
         SELECT
-            -- playlist episode columns
-            manual_episode.playlist_uuid AS m_playlist_uuid,
-            manual_episode.episode_uuid AS m_episode_uuid,
-            manual_episode.podcast_uuid AS m_podcast_uuid,
-            manual_episode.title AS m_title,
-            manual_episode.added_at AS m_added_at,
-            manual_episode.published_at AS m_published_at,
-            manual_episode.download_url AS m_download_url,
-            manual_episode.episode_slug AS m_episode_slug,
-            manual_episode.podcast_slug AS m_podcast_slug,
-            manual_episode.sort_position AS m_sort_position,
-            manual_episode.is_synced AS m_is_synced,
-            -- podcast episode columns
-            podcast_episode.uuid AS p_uuid,
-            podcast_episode.episode_description AS p_episode_description,
-            podcast_episode.published_date AS p_published_date,
-            podcast_episode.title AS p_title,
-            podcast_episode.size_in_bytes AS p_size_in_bytes,
-            podcast_episode.episode_status AS p_episode_status,
-            podcast_episode.file_type AS p_file_type,
-            podcast_episode.duration AS p_duration,
-            podcast_episode.download_url AS p_download_url,
-            podcast_episode.downloaded_file_path AS p_downloaded_file_path,
-            podcast_episode.downloaded_error_details AS p_downloaded_error_details,
-            podcast_episode.play_error_details AS p_play_error_details,
-            podcast_episode.played_up_to AS p_played_up_to,
-            podcast_episode.playing_status AS p_playing_status,
-            podcast_episode.podcast_id AS p_podcast_id,
-            podcast_episode.added_date AS p_added_date,
-            podcast_episode.auto_download_status AS p_auto_download_status,
-            podcast_episode.starred AS p_starred,
-            podcast_episode.thumbnail_status AS p_thumbnail_status,
-            podcast_episode.last_download_attempt_date AS p_last_download_attempt_date,
-            podcast_episode.playing_status_modified AS p_playing_status_modified,
-            podcast_episode.played_up_to_modified AS p_played_up_to_modified,
-            podcast_episode.duration_modified AS p_duration_modified,
-            podcast_episode.starred_modified AS p_starred_modified,
-            podcast_episode.archived AS p_archived,
-            podcast_episode.archived_modified AS p_archived_modified,
-            podcast_episode.season AS p_season,
-            podcast_episode.number AS p_number,
-            podcast_episode.type AS p_type,
-            podcast_episode.cleanTitle AS p_cleanTitle,
-            podcast_episode.last_playback_interaction_date AS p_last_playback_interaction_date,
-            podcast_episode.last_playback_interaction_sync_status AS p_last_playback_interaction_sync_status,
-            podcast_episode.exclude_from_episode_limit AS p_exclude_from_episode_limit,
-            podcast_episode.download_task_id AS p_download_task_id,
-            podcast_episode.last_archive_interaction_date AS p_last_archive_interaction_date,
-            podcast_episode.image_url AS p_image_url,
-            podcast_episode.deselected_chapters AS p_deselected_chapters,
-            podcast_episode.deselected_chapters_modified AS p_deselected_chapters_modified,
-            podcast_episode.slug AS p_slug
+          -- playlist episode columns
+          manual_episode.playlist_uuid AS m_playlist_uuid,
+          manual_episode.episode_uuid AS m_episode_uuid,
+          manual_episode.podcast_uuid AS m_podcast_uuid,
+          manual_episode.title AS m_title,
+          manual_episode.added_at AS m_added_at,
+          manual_episode.published_at AS m_published_at,
+          manual_episode.download_url AS m_download_url,
+          manual_episode.episode_slug AS m_episode_slug,
+          manual_episode.podcast_slug AS m_podcast_slug,
+          manual_episode.sort_position AS m_sort_position,
+          manual_episode.is_synced AS m_is_synced,
+          -- podcast episode columns
+          podcast_episode.uuid AS p_uuid,
+          podcast_episode.episode_description AS p_episode_description,
+          podcast_episode.published_date AS p_published_date,
+          podcast_episode.title AS p_title,
+          podcast_episode.size_in_bytes AS p_size_in_bytes,
+          podcast_episode.episode_status AS p_episode_status,
+          podcast_episode.file_type AS p_file_type,
+          podcast_episode.duration AS p_duration,
+          podcast_episode.download_url AS p_download_url,
+          podcast_episode.downloaded_file_path AS p_downloaded_file_path,
+          podcast_episode.downloaded_error_details AS p_downloaded_error_details,
+          podcast_episode.play_error_details AS p_play_error_details,
+          podcast_episode.played_up_to AS p_played_up_to,
+          podcast_episode.playing_status AS p_playing_status,
+          podcast_episode.podcast_id AS p_podcast_id,
+          podcast_episode.added_date AS p_added_date,
+          podcast_episode.auto_download_status AS p_auto_download_status,
+          podcast_episode.starred AS p_starred,
+          podcast_episode.thumbnail_status AS p_thumbnail_status,
+          podcast_episode.last_download_attempt_date AS p_last_download_attempt_date,
+          podcast_episode.playing_status_modified AS p_playing_status_modified,
+          podcast_episode.played_up_to_modified AS p_played_up_to_modified,
+          podcast_episode.duration_modified AS p_duration_modified,
+          podcast_episode.starred_modified AS p_starred_modified,
+          podcast_episode.archived AS p_archived,
+          podcast_episode.archived_modified AS p_archived_modified,
+          podcast_episode.season AS p_season,
+          podcast_episode.number AS p_number,
+          podcast_episode.type AS p_type,
+          podcast_episode.cleanTitle AS p_cleanTitle,
+          podcast_episode.last_playback_interaction_date AS p_last_playback_interaction_date,
+          podcast_episode.last_playback_interaction_sync_status AS p_last_playback_interaction_sync_status,
+          podcast_episode.exclude_from_episode_limit AS p_exclude_from_episode_limit,
+          podcast_episode.download_task_id AS p_download_task_id,
+          podcast_episode.last_archive_interaction_date AS p_last_archive_interaction_date,
+          podcast_episode.image_url AS p_image_url,
+          podcast_episode.deselected_chapters AS p_deselected_chapters,
+          podcast_episode.deselected_chapters_modified AS p_deselected_chapters_modified,
+          podcast_episode.slug AS p_slug
         FROM manual_playlist_episodes AS manual_episode
         LEFT JOIN podcast_episodes AS podcast_episode ON podcast_episode.uuid IS manual_episode.episode_uuid
         JOIN playlists AS playlist ON playlist.uuid IS :playlistUuid
@@ -374,16 +376,16 @@ abstract class PlaylistDao {
           CASE WHEN playlist.sortId IS 4 THEN IFNULL(podcast_episode.added_date, manual_episode.added_at) END DESC
     """,
     )
-    internal abstract fun observeRawManualPlaylistEpisodes(playlistUuid: String): Flow<List<RawManualEpisode>>
+    internal abstract fun manualEpisodesRawFlow(playlistUuid: String): Flow<List<RawManualEpisode>>
 
-    fun observeManualPlaylistEpisodes(playlistUuid: String) = observeRawManualPlaylistEpisodes(playlistUuid).map { rawEpisodes ->
+    fun manualEpisodesFlow(playlistUuid: String) = manualEpisodesRawFlow(playlistUuid).map { rawEpisodes ->
         rawEpisodes.map(RawManualEpisode::toEpisode)
     }
 
     @RawQuery(observedEntities = [Podcast::class, PodcastEpisode::class])
-    protected abstract fun observeSmartPlaylistPodcasts(query: RoomRawQuery): Flow<List<String>>
+    protected abstract fun smartPlaylistArtworkPodcastsFlow(query: RoomRawQuery): Flow<List<String>>
 
-    fun observeSmartPlaylistPodcasts(
+    fun smartPlaylistArtworkPodcastsFlow(
         clock: Clock,
         smartRules: SmartRules,
         sortType: PlaylistEpisodeSortType,
@@ -395,13 +397,13 @@ abstract class PlaylistDao {
             orderByClause = sortType.toOrderByClause(),
             limit = limit,
         )
-        return observeSmartPlaylistPodcasts(RoomRawQuery(query))
+        return smartPlaylistArtworkPodcastsFlow(RoomRawQuery(query))
     }
 
     @RawQuery(observedEntities = [Podcast::class, PodcastEpisode::class])
-    protected abstract fun observeSmartPlaylistEpisodes(query: RoomRawQuery): Flow<List<PodcastEpisode>>
+    protected abstract fun smartEpisodesFlow(query: RoomRawQuery): Flow<List<PodcastEpisode>>
 
-    fun observeSmartPlaylistEpisodes(
+    fun smartEpisodesFlow(
         clock: Clock,
         smartRules: SmartRules,
         sortType: PlaylistEpisodeSortType,
@@ -424,7 +426,7 @@ abstract class PlaylistDao {
             orderByClause = sortType.toOrderByClause(),
             limit = limit,
         )
-        return observeSmartPlaylistEpisodes(RoomRawQuery(query))
+        return smartEpisodesFlow(RoomRawQuery(query))
     }
 
     private fun createSmartPlaylistEpisodeQuery(
@@ -451,4 +453,15 @@ abstract class PlaylistDao {
         ShortestToLongest -> "episode.duration ASC, episode.added_date DESC"
         LongestToShortest -> "episode.duration DESC, episode.added_date DESC"
     }
+
+    @Query(
+        """
+        SELECT playlist.uuid, playlist.title, playlist.iconId
+        FROM playlists AS playlist
+        WHERE manual = 0 AND deleted = 0 AND draft = 0
+        ORDER BY sortPosition ASC 
+        LIMIT 1
+    """,
+    )
+    abstract fun playlistShortcutFlow(): Flow<PlaylistShortcut?>
 }
