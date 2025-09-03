@@ -226,6 +226,12 @@ class PlaylistManagerImpl @Inject constructor(
         return playlistDao.getManualPlaylistEpisodeSources(useFolders = isSubscriber)
     }
 
+    override fun observeManualPlaylistAvailableEpisodes(playlistUuid: String, podcastUuid: String): Flow<List<PodcastEpisode>> {
+        return playlistDao
+            .observeManualPlaylistAvailableEpisodes(playlistUuid, podcastUuid)
+            .distinctUntilChanged()
+    }
+
     private fun List<PlaylistEntity>.toPreviewFlows() = map { playlist ->
         val type = if (playlist.manual) {
             PlaylistPreview.Type.Manual

@@ -194,6 +194,25 @@ abstract class PlaylistDao {
         return podcasts + folders
     }
 
+    @Query(
+        """
+        SELECT episode.*
+        FROM podcast_episodes AS episode
+        WHERE
+          episode.podcast_id IS :podcastUuid 
+          AND episode.uuid NOT IN (
+            SELECT manual_episode.episode_uuid
+            FROM manual_playlist_episodes AS manual_episode
+            WHERE manual_episode.playlist_uuid IS :playlistUuid AND manual_episode.podcast_uuid IS :podcastUuid
+          )
+        ORDER BY
+          episode.published_date DESC,
+          episode.added_date DESC,
+          episode.title ASC
+    """,
+    )
+    abstract fun observeManualPlaylistAvailableEpisodes(playlistUuid: String, podcastUuid: String): Flow<List<PodcastEpisode>>
+
     @RawQuery(observedEntities = [Podcast::class, PodcastEpisode::class])
     protected abstract fun observeSmartEpisodeMetadata(query: RoomRawQuery): Flow<PlaylistEpisodeMetadata>
 

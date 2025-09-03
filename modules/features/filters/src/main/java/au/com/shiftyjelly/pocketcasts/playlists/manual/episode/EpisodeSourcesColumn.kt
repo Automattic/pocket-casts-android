@@ -164,7 +164,7 @@ private fun BaseSourceRow(
 
 @Preview
 @Composable
-private fun EpisodesSourcesColumnPreview(
+private fun EpisodeSourcesColumnPreview(
     @PreviewParameter(ThemePreviewParameterProvider::class) themeType: Theme.ThemeType,
 ) {
     AppThemeWithBackground(themeType) {
