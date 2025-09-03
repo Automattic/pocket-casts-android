@@ -143,18 +143,11 @@ private fun Content(
         }
         FlowRow(
             modifier = Modifier
-                .then(
-                    if (state.isShowingAllCategories) {
-                        Modifier
-                            .weight(1f)
-                            .verticalScroll(rememberScrollState())
-                    } else {
-                        Modifier
-                    },
-                )
+                .weight(1f)
+                .verticalScroll(rememberScrollState())
                 .fillMaxWidth()
                 .animateContentSize()
-                .padding(horizontal = 16.dp),
+                .padding(horizontal = 8.dp),
             horizontalArrangement = Arrangement.spacedBy(8.dp, alignment = Alignment.CenterHorizontally),
             verticalArrangement = Arrangement.spacedBy(8.dp),
             maxItemsInEachRow = columnCount,
