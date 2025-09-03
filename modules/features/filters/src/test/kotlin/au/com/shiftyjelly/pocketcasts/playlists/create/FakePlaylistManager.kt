@@ -59,9 +59,9 @@ class FakePlaylistManager : PlaylistManager {
 
     override suspend fun updatePlaylistsOrder(sortedUuids: List<String>) = Unit
 
-    override suspend fun getManualPlaylistEpisodeSources(): List<ManualPlaylistEpisodeSource> = emptyList()
+    override suspend fun getManualPlaylistEpisodeSources(searchTerm: String?): List<ManualPlaylistEpisodeSource> = emptyList()
 
-    override fun observeManualPlaylistAvailableEpisodes(playlistUuid: String, podcastUuid: String): Flow<List<PodcastEpisode>> = flowOf(emptyList())
+    override fun observeManualPlaylistAvailableEpisodes(playlistUuid: String, podcastUuid: String, searchTerm: String?): Flow<List<PodcastEpisode>> = flowOf(emptyList())
 
     override suspend fun addManualPlaylistEpisode(playlistUuid: String, episodeUuid: String): Boolean = true
 }
