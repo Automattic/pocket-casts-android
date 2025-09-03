@@ -152,6 +152,7 @@ internal fun AddEpisodesPage(
                 val arguments = requireNotNull(backStackEntry.arguments) { "Missing back stack entry arguments" }
                 val folderUuid = requireNotNull(arguments.getString(AddEpisodesRoutes.FOLDER_UUID_ARG)) { "Missing folder uuid argument" }
                 val podcasts by folderPodcastsFlow(folderUuid).collectAsState()
+
                 EpisodeSourcesColumn(
                     sources = podcasts,
                     onClickSource = navigateToSource,
@@ -166,6 +167,7 @@ internal fun AddEpisodesPage(
                 val arguments = requireNotNull(backStackEntry.arguments) { "Missing back stack entry arguments" }
                 val podcastUuid = requireNotNull(arguments.getString(AddEpisodesRoutes.PODCAST_UUID_ARG)) { "Missing podcast uuid argument" }
                 val episodes by episodesFlow(podcastUuid).collectAsState()
+
                 EpisodesColumn(
                     episodes = episodes,
                     useEpisodeArtwork = useEpisodeArtwork,

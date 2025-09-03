@@ -99,8 +99,8 @@ class AddEpisodesFragment : BaseDialogFragment() {
         val backStackEntry by navController.currentBackStackEntryAsState()
         return remember(backStackEntry) {
             when (backStackEntry?.destination?.route) {
-                AddEpisodesRoutes.PODCAST -> viewModel.episodeSearchState
-                else -> viewModel.podcastSearchState
+                AddEpisodesRoutes.PODCAST -> viewModel.episodeSearchState.textState
+                else -> viewModel.podcastSearchState.textState
             }
         }
     }
@@ -122,7 +122,7 @@ class AddEpisodesFragment : BaseDialogFragment() {
         LaunchedEffect(navController) {
             navController.currentBackStackEntryFlow.collect { entry ->
                 if (entry.destination.route != AddEpisodesRoutes.PODCAST) {
-                    viewModel.episodeSearchState.clearText()
+                    viewModel.episodeSearchState.textState.clearText()
                 }
             }
         }
