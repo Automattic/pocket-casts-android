@@ -265,9 +265,6 @@ private fun RegularUpgradeScreen(
         Spacer(modifier = Modifier.height(24.dp))
         UpgradeFooter(
             modifier = Modifier
-                .padding(
-                    horizontal = 16.dp,
-                )
                 .fillMaxWidth(),
             plans = state.availableBasePlans,
             selectedOnboardingPlan = state.selectedPlan,
@@ -308,6 +305,7 @@ private fun UpgradeFooter(
     ) {
         plans.forEachIndexed { index, item ->
             UpgradePlanRow(
+                modifier = Modifier.padding(horizontal = 16.dp),
                 plan = item,
                 isSelected = selectedOnboardingPlan.key == item.key,
                 onClick = { onSelectedChange(item) },
@@ -326,12 +324,14 @@ private fun UpgradeFooter(
             onClick = onClickSubscribe,
             modifier = Modifier
                 .fillMaxWidth()
+                .padding(horizontal = 16.dp)
                 .heightIn(min = 48.dp),
         )
         Spacer(modifier = Modifier.height(12.dp))
         PrivacyPolicy(
             modifier = Modifier
                 .fillMaxWidth()
+                .padding(horizontal = 8.dp)
                 .padding(bottom = 12.dp),
             color = MaterialTheme.theme.colors.secondaryText02,
             textAlign = TextAlign.Center,
@@ -589,7 +589,7 @@ private fun UpgradeContent(
                     }
                     .padding(
                         top = if (index == 0) {
-                            36.dp
+                            18.dp
                         } else {
                             0.dp
                         },
@@ -604,25 +604,25 @@ private fun UpgradeContent(
         }
         Box(
             modifier = Modifier
-                .height(42.dp)
+                .height(24.dp)
                 .fillMaxWidth()
                 .background(
                     brush = Brush.verticalGradient(
                         0f to backgroundColor,
-                        .15f to backgroundColor,
+                        .3f to backgroundColor,
                         1f to Color.Transparent,
                     ),
                 ),
         )
         Box(
             modifier = Modifier
-                .height(42.dp)
+                .height(24.dp)
                 .fillMaxWidth()
                 .align(Alignment.BottomCenter)
                 .background(
                     brush = Brush.verticalGradient(
                         0f to Color.Transparent,
-                        .15f to Color.Transparent,
+                        .3f to Color.Transparent,
                         1f to backgroundColor,
                     ),
                 ),
@@ -636,7 +636,7 @@ private fun UpgradePagerContent.toComponent(
     scrollToNext: () -> Unit,
     modifier: Modifier = Modifier,
 ): @Composable () -> Unit {
-    val topPaddingForGenericContent = if (index != 0) 32.dp else 0.dp
+    val topPaddingForGenericContent = if (index != 0) 16.dp else 0.dp
     return {
         when (this) {
             is UpgradePagerContent.Features -> FeaturesContent(
