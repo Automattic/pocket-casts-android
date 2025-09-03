@@ -71,7 +71,7 @@ class AddEpisodesFragment : BaseDialogFragment() {
 
             ThemedSnackbarHost(
                 hostState = snackbarHostState,
-                modifier = Modifier.align(Alignment.BottomCenter)
+                modifier = Modifier.align(Alignment.BottomCenter),
             )
         }
     }
