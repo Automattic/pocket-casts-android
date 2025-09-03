@@ -316,7 +316,7 @@ abstract class PlaylistDao {
             podcast_episode.slug AS p_slug
         FROM manual_playlist_episodes AS manual_episode
         LEFT JOIN podcast_episodes AS podcast_episode ON podcast_episode.uuid IS manual_episode.episode_uuid
-        JOIN playlists AS playlist ON playlist_uuid IS :playlistUuid
+        JOIN playlists AS playlist ON playlist.uuid IS :playlistUuid
         WHERE playlist_uuid IS :playlistUuid
         ORDER BY
           -- newest to oldest
