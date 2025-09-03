@@ -47,6 +47,9 @@ abstract class PlaylistDao {
     @Query("SELECT uuid FROM playlists ORDER BY sortPosition ASC")
     abstract suspend fun getAllPlaylistUuids(): List<String>
 
+    @Query("SELECT * FROM playlists ORDER BY sortPosition ASC")
+    abstract suspend fun getAllPlaylists(): List<PlaylistEntity>
+
     @Query("SELECT * FROM playlists WHERE manual = 0 AND deleted = 0 AND draft = 0 AND uuid = :uuid")
     abstract fun observeSmartPlaylist(uuid: String): Flow<PlaylistEntity?>
 
@@ -55,9 +58,6 @@ abstract class PlaylistDao {
 
     @Query("SELECT * FROM playlists WHERE deleted = 0 AND draft = 0 ORDER BY sortPosition ASC")
     abstract fun observePlaylists(): Flow<List<PlaylistEntity>>
-
-    @Query("SELECT * FROM playlists WHERE manual = 0 AND deleted = 0 AND draft = 0 ORDER BY sortPosition ASC")
-    abstract suspend fun getSmartPlaylists(): List<PlaylistEntity>
 
     @Query(
         """
@@ -276,11 +276,10 @@ abstract class PlaylistDao {
 
     @Query(
         """
-        SELECT DISTINCT podcast.uuid
+        SELECT playlistEpisode.podcast_uuid
         FROM playlists AS playlist
         JOIN manual_playlist_episodes AS playlistEpisode ON playlistEpisode.playlist_uuid IS playlist.uuid
         JOIN podcast_episodes AS podcastEpisode ON podcastEpisode.uuid IS playlistEpisode.episode_uuid
-        JOIN podcasts AS podcast ON podcast.uuid IS playlistEpisode.podcast_uuid
         WHERE
           playlist.uuid IS :playlistUuid
           AND podcastEpisode.archived IS 0
@@ -297,7 +296,6 @@ abstract class PlaylistDao {
           -- longest to shortest
           CASE WHEN playlist.sortId IS 3 THEN podcastEpisode.duration END DESC,
           CASE WHEN playlist.sortId IS 4 THEN podcastEpisode.added_date END DESC
-        LIMIT 4
     """,
     )
     abstract fun observeManualPlaylistPodcasts(playlistUuid: String): Flow<List<String>>
@@ -392,7 +390,7 @@ abstract class PlaylistDao {
         limit: Int,
     ): Flow<List<String>> {
         val query = createSmartPlaylistEpisodeQuery(
-            selectClause = "DISTINCT podcast.uuid",
+            selectClause = "podcast.uuid",
             whereClause = smartRules.toSqlWhereClause(clock),
             orderByClause = sortType.toOrderByClause(),
             limit = limit,

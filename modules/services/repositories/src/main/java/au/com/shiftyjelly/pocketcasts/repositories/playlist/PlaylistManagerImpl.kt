@@ -34,7 +34,6 @@ import au.com.shiftyjelly.pocketcasts.utils.extensions.escapeLike
 import java.time.Clock
 import java.util.UUID
 import javax.inject.Inject
-import kotlin.text.orEmpty
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -46,6 +45,7 @@ import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.flow.map
 
 @OptIn(ExperimentalCoroutinesApi::class, FlowPreview::class)
 class PlaylistManagerImpl @Inject constructor(
@@ -81,12 +81,7 @@ class PlaylistManagerImpl @Inject constructor(
                     flowOf(null)
                 } else {
                     val smartRules = playlist.smartRules
-                    val podcastsFlow = playlistDao.observeSmartPlaylistPodcasts(
-                        clock = clock,
-                        smartRules = smartRules,
-                        sortType = playlist.sortType,
-                        limit = PLAYLIST_ARTWORK_EPISODE_LIMIT,
-                    )
+                    val podcastsFlow = observeSmartPlaylistArtworkPodcasts(playlist)
                     val episodesFlow = observeSmartEpisodes(smartRules, playlist.sortType, episodeSearchTerm)
                     val metadataFlow = playlistDao.observeSmartEpisodeMetadata(
                         clock = clock,
@@ -119,7 +114,7 @@ class PlaylistManagerImpl @Inject constructor(
                 if (playlist == null) {
                     flowOf(null)
                 } else {
-                    val podcastsFlow = playlistDao.observeManualPlaylistPodcasts(playlist.uuid)
+                    val podcastsFlow = observeManualPlaylistArtworkPodcasts(playlist)
                     val metadataFlow = playlistDao.observeManualEpisodeMetadata(playlist.uuid)
                     combine(podcastsFlow, metadataFlow) { podcasts, metadata ->
                         ManualPlaylist(
@@ -209,11 +204,11 @@ class PlaylistManagerImpl @Inject constructor(
         return appDatabase.withTransaction {
             val uuids = playlistDao.getAllPlaylistUuids()
             val finalUuid = uuid?.takeIf { it !in uuids } ?: generateUniqueUuid(uuids)
-            val finalEntity = entity.copy(uuid = finalUuid, sortPosition = 1)
+            val finalEntity = entity.copy(uuid = finalUuid, sortPosition = 0)
 
             playlistDao.upsertPlaylist(finalEntity)
             uuids.forEachIndexed { index, uuid ->
-                playlistDao.updateSortPosition(uuid, index + 2)
+                playlistDao.updateSortPosition(uuid, index + 1)
             }
             finalUuid
         }
@@ -222,9 +217,9 @@ class PlaylistManagerImpl @Inject constructor(
     override suspend fun updatePlaylistsOrder(sortedUuids: List<String>) {
         appDatabase.withTransaction {
             var missingPlaylistIndex = sortedUuids.size
-            playlistDao.getSmartPlaylists().forEach { playlist ->
-                val position = sortedUuids.indexOf(playlist.uuid).takeIf { it != -1 } ?: missingPlaylistIndex++
-                playlistDao.updateSortPosition(playlist.uuid, position)
+            playlistDao.getAllPlaylistUuids().forEach { playlistUuid ->
+                val position = sortedUuids.indexOf(playlistUuid).takeIf { it != -1 } ?: missingPlaylistIndex++
+                playlistDao.updateSortPosition(playlistUuid, position)
             }
         }
     }
@@ -295,18 +290,13 @@ class PlaylistManagerImpl @Inject constructor(
         }
         val (podcastsFlow, episodeMetadataFlow) = when (type) {
             PlaylistPreview.Type.Manual -> {
-                val podcastsFlow = playlistDao.observeManualPlaylistPodcasts(playlist.uuid)
+                val podcastsFlow = observeManualPlaylistArtworkPodcasts(playlist)
                 val episodeMetadataFlow = playlistDao.observeManualEpisodeMetadata(playlist.uuid)
                 podcastsFlow to episodeMetadataFlow
             }
 
             PlaylistPreview.Type.Smart -> {
-                val podcastsFlow = playlistDao.observeSmartPlaylistPodcasts(
-                    clock = clock,
-                    smartRules = playlist.smartRules,
-                    sortType = playlist.sortType,
-                    limit = PLAYLIST_ARTWORK_EPISODE_LIMIT,
-                )
+                val podcastsFlow = observeSmartPlaylistArtworkPodcasts(playlist)
                 val episodeMetadataFlow = playlistDao.observeSmartEpisodeMetadata(
                     clock = clock,
                     smartRules = playlist.smartRules,
@@ -326,127 +316,155 @@ class PlaylistManagerImpl @Inject constructor(
         }.distinctUntilChanged()
     }
 
-    private val PlaylistEntity.smartRules
-        get() = SmartRules(
-            episodeStatus = SmartRules.EpisodeStatusRule(
-                unplayed = unplayed,
-                inProgress = partiallyPlayed,
-                completed = finished,
-            ),
-            downloadStatus = when {
-                downloaded && notDownloaded -> DownloadStatusRule.Any
-                downloaded -> DownloadStatusRule.Downloaded
-                notDownloaded -> DownloadStatusRule.NotDownloaded
-                else -> DownloadStatusRule.Any
-            },
-            mediaType = when (audioVideo) {
-                AUDIO_VIDEO_FILTER_AUDIO_ONLY -> MediaTypeRule.Audio
-                AUDIO_VIDEO_FILTER_VIDEO_ONLY -> MediaTypeRule.Video
-                else -> MediaTypeRule.Any
-            },
-            releaseDate = when (filterHours) {
-                LAST_24_HOURS -> ReleaseDateRule.Last24Hours
-                LAST_3_DAYS -> ReleaseDateRule.Last3Days
-                LAST_WEEK -> ReleaseDateRule.LastWeek
-                LAST_2_WEEKS -> ReleaseDateRule.Last2Weeks
-                LAST_MONTH -> ReleaseDateRule.LastMonth
-                else -> ReleaseDateRule.AnyTime
-            },
-            starred = if (starred) {
-                StarredRule.Starred
-            } else {
-                StarredRule.Any
-            },
-            podcasts = if (podcastUuidList.isEmpty()) {
-                PodcastsRule.Any
-            } else {
-                PodcastsRule.Selected(podcastUuidList)
-            },
-            episodeDuration = if (filterDuration) {
-                EpisodeDurationRule.Constrained(
-                    longerThan = longerThan.minutes,
-                    shorterThan = shorterThan.minutes + 59.seconds,
-                )
-            } else {
-                EpisodeDurationRule.Any
-            },
+    private fun observeManualPlaylistArtworkPodcasts(playlist: PlaylistEntity) = playlistDao
+        .observeManualPlaylistPodcasts(playlist.uuid)
+        .map { uuids -> uuids.toArtworkUuids() }
+
+    private fun observeSmartPlaylistArtworkPodcasts(playlist: PlaylistEntity) = playlistDao
+        .observeSmartPlaylistPodcasts(
+            clock = clock,
+            smartRules = playlist.smartRules,
+            sortType = playlist.sortType,
+            limit = SMART_PLAYLIST_EPISODE_LIMIT,
         )
+        .map { uuids -> uuids.toArtworkUuids() }
+}
 
-    private fun SmartPlaylistDraft.toPlaylistEntity() = PlaylistEntity(
-        uuid = "",
-        title = title,
-        // We use referential equality so only predefined playlists use preset icons
-        iconId = if (this === SmartPlaylistDraft.NewReleases) {
-            10 // Red clock
-        } else if (this === SmartPlaylistDraft.InProgress) {
-            23 // Purple play
+private val PlaylistEntity.smartRules
+    get() = SmartRules(
+        episodeStatus = SmartRules.EpisodeStatusRule(
+            unplayed = unplayed,
+            inProgress = partiallyPlayed,
+            completed = finished,
+        ),
+        downloadStatus = when {
+            downloaded && notDownloaded -> DownloadStatusRule.Any
+            downloaded -> DownloadStatusRule.Downloaded
+            notDownloaded -> DownloadStatusRule.NotDownloaded
+            else -> DownloadStatusRule.Any
+        },
+        mediaType = when (audioVideo) {
+            AUDIO_VIDEO_FILTER_AUDIO_ONLY -> MediaTypeRule.Audio
+            AUDIO_VIDEO_FILTER_VIDEO_ONLY -> MediaTypeRule.Video
+            else -> MediaTypeRule.Any
+        },
+        releaseDate = when (filterHours) {
+            LAST_24_HOURS -> ReleaseDateRule.Last24Hours
+            LAST_3_DAYS -> ReleaseDateRule.Last3Days
+            LAST_WEEK -> ReleaseDateRule.LastWeek
+            LAST_2_WEEKS -> ReleaseDateRule.Last2Weeks
+            LAST_MONTH -> ReleaseDateRule.LastMonth
+            else -> ReleaseDateRule.AnyTime
+        },
+        starred = if (starred) {
+            StarredRule.Starred
         } else {
-            0
+            StarredRule.Any
         },
-        sortPosition = 1,
-        manual = false,
-        draft = false,
-        deleted = false,
-        // We use referential equality so only predefined playlists are synced by default
-        syncStatus = if (this === SmartPlaylistDraft.NewReleases || this === SmartPlaylistDraft.InProgress) {
-            SYNC_STATUS_SYNCED
+        podcasts = if (podcastUuidList.isEmpty()) {
+            PodcastsRule.Any
         } else {
-            SYNC_STATUS_NOT_SYNCED
+            PodcastsRule.Selected(podcastUuidList)
         },
-    ).applySmartRules(rules)
-
-    private fun PlaylistEntity.applySmartRules(rules: SmartRules) = copy(
-        unplayed = rules.episodeStatus.unplayed,
-        partiallyPlayed = rules.episodeStatus.inProgress,
-        finished = rules.episodeStatus.completed,
-        downloaded = rules.downloadStatus in listOf(DownloadStatusRule.Downloaded, DownloadStatusRule.Any),
-        notDownloaded = rules.downloadStatus in listOf(DownloadStatusRule.NotDownloaded, DownloadStatusRule.Any),
-        audioVideo = when (rules.mediaType) {
-            MediaTypeRule.Any -> AUDIO_VIDEO_FILTER_ALL
-            MediaTypeRule.Audio -> AUDIO_VIDEO_FILTER_AUDIO_ONLY
-            MediaTypeRule.Video -> AUDIO_VIDEO_FILTER_VIDEO_ONLY
-        },
-        filterHours = when (rules.releaseDate) {
-            ReleaseDateRule.AnyTime -> ANYTIME
-            ReleaseDateRule.Last24Hours -> LAST_24_HOURS
-            ReleaseDateRule.Last3Days -> LAST_3_DAYS
-            ReleaseDateRule.LastWeek -> LAST_WEEK
-            ReleaseDateRule.Last2Weeks -> LAST_2_WEEKS
-            ReleaseDateRule.LastMonth -> LAST_MONTH
-        },
-        starred = when (rules.starred) {
-            StarredRule.Any -> false
-            StarredRule.Starred -> true
-        },
-        allPodcasts = when (rules.podcasts) {
-            is PodcastsRule.Any -> true
-            is PodcastsRule.Selected -> false
-        },
-        podcastUuids = when (val rule = rules.podcasts) {
-            is PodcastsRule.Any -> null
-            is PodcastsRule.Selected -> rule.uuids.joinToString(separator = ",")
-        },
-        filterDuration = when (rules.episodeDuration) {
-            is EpisodeDurationRule.Any -> false
-            is EpisodeDurationRule.Constrained -> true
-        },
-        longerThan = when (val rule = rules.episodeDuration) {
-            is EpisodeDurationRule.Any -> 20
-            is EpisodeDurationRule.Constrained -> rule.longerThan.inWholeMinutes.toInt()
-        },
-        shorterThan = when (val rule = rules.episodeDuration) {
-            is EpisodeDurationRule.Any -> 40
-            is EpisodeDurationRule.Constrained -> rule.shorterThan.inWholeMinutes.toInt()
+        episodeDuration = if (filterDuration) {
+            EpisodeDurationRule.Constrained(
+                longerThan = longerThan.minutes,
+                shorterThan = shorterThan.minutes + 59.seconds,
+            )
+        } else {
+            EpisodeDurationRule.Any
         },
     )
 
-    private tailrec fun generateUniqueUuid(uuids: List<String>): String {
-        val uuid = UUID.randomUUID().toString()
-        return if (uuids.none { it.equals(uuid, ignoreCase = true) }) {
-            uuid
-        } else {
-            generateUniqueUuid(uuids)
+private fun SmartPlaylistDraft.toPlaylistEntity() = PlaylistEntity(
+    uuid = "",
+    title = title,
+    // We use referential equality so only predefined playlists use preset icons
+    iconId = if (this === SmartPlaylistDraft.NewReleases) {
+        10 // Red clock
+    } else if (this === SmartPlaylistDraft.InProgress) {
+        23 // Purple play
+    } else {
+        0
+    },
+    sortPosition = 1,
+    manual = false,
+    draft = false,
+    deleted = false,
+    // We use referential equality so only predefined playlists are synced by default
+    syncStatus = if (this === SmartPlaylistDraft.NewReleases || this === SmartPlaylistDraft.InProgress) {
+        SYNC_STATUS_SYNCED
+    } else {
+        SYNC_STATUS_NOT_SYNCED
+    },
+).applySmartRules(rules)
+
+private fun PlaylistEntity.applySmartRules(rules: SmartRules) = copy(
+    unplayed = rules.episodeStatus.unplayed,
+    partiallyPlayed = rules.episodeStatus.inProgress,
+    finished = rules.episodeStatus.completed,
+    downloaded = rules.downloadStatus in listOf(DownloadStatusRule.Downloaded, DownloadStatusRule.Any),
+    notDownloaded = rules.downloadStatus in listOf(DownloadStatusRule.NotDownloaded, DownloadStatusRule.Any),
+    audioVideo = when (rules.mediaType) {
+        MediaTypeRule.Any -> AUDIO_VIDEO_FILTER_ALL
+        MediaTypeRule.Audio -> AUDIO_VIDEO_FILTER_AUDIO_ONLY
+        MediaTypeRule.Video -> AUDIO_VIDEO_FILTER_VIDEO_ONLY
+    },
+    filterHours = when (rules.releaseDate) {
+        ReleaseDateRule.AnyTime -> ANYTIME
+        ReleaseDateRule.Last24Hours -> LAST_24_HOURS
+        ReleaseDateRule.Last3Days -> LAST_3_DAYS
+        ReleaseDateRule.LastWeek -> LAST_WEEK
+        ReleaseDateRule.Last2Weeks -> LAST_2_WEEKS
+        ReleaseDateRule.LastMonth -> LAST_MONTH
+    },
+    starred = when (rules.starred) {
+        StarredRule.Any -> false
+        StarredRule.Starred -> true
+    },
+    allPodcasts = when (rules.podcasts) {
+        is PodcastsRule.Any -> true
+        is PodcastsRule.Selected -> false
+    },
+    podcastUuids = when (val rule = rules.podcasts) {
+        is PodcastsRule.Any -> null
+        is PodcastsRule.Selected -> rule.uuids.joinToString(separator = ",")
+    },
+    filterDuration = when (rules.episodeDuration) {
+        is EpisodeDurationRule.Any -> false
+        is EpisodeDurationRule.Constrained -> true
+    },
+    longerThan = when (val rule = rules.episodeDuration) {
+        is EpisodeDurationRule.Any -> 20
+        is EpisodeDurationRule.Constrained -> rule.longerThan.inWholeMinutes.toInt()
+    },
+    shorterThan = when (val rule = rules.episodeDuration) {
+        is EpisodeDurationRule.Any -> 40
+        is EpisodeDurationRule.Constrained -> rule.shorterThan.inWholeMinutes.toInt()
+    },
+)
+
+private tailrec fun generateUniqueUuid(uuids: List<String>): String {
+    val uuid = UUID.randomUUID().toString()
+    return if (uuids.none { it.equals(uuid, ignoreCase = true) }) {
+        uuid
+    } else {
+        generateUniqueUuid(uuids)
+    }
+}
+
+private fun List<String>.toArtworkUuids(): List<String> {
+    return if (!isEmpty()) {
+        val distinctUuids = LinkedHashSet<String>(PLAYLIST_ARTWORK_EPISODE_LIMIT)
+        for (uuid in this) {
+            distinctUuids += uuid
+            if (distinctUuids.size == PLAYLIST_ARTWORK_EPISODE_LIMIT) {
+                break
+            }
         }
+        return distinctUuids.toList()
+    } else {
+        this
     }
 }
 

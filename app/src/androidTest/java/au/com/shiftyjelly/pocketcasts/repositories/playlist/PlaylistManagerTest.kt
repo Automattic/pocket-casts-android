@@ -89,7 +89,7 @@ class PlaylistManagerTest {
         playlistDao = appDatabase.playlistDao()
         folderDao = appDatabase.folderDao()
 
-        val sharedPreferences = context.getSharedPreferences("test_prefst", Context.MODE_PRIVATE)
+        val sharedPreferences = context.getSharedPreferences("test_prefs", Context.MODE_PRIVATE)
         sharedPreferences.edit().clear().commit()
         val firebaseRemoteConfig = FirebaseRemoteConfig.getInstance()
         settings = SettingsImpl(
@@ -756,7 +756,7 @@ class PlaylistManagerTest {
                 uuid = Playlist.NEW_RELEASES_UUID,
                 title = "New Releases",
                 iconId = 10,
-                sortPosition = 1,
+                sortPosition = 0,
                 sortType = PlaylistEpisodeSortType.NewestToOldest,
                 manual = false,
                 draft = false,
@@ -793,7 +793,7 @@ class PlaylistManagerTest {
                 uuid = Playlist.IN_PROGRESS_UUID,
                 title = "In Progress",
                 iconId = 23,
-                sortPosition = 1,
+                sortPosition = 0,
                 sortType = PlaylistEpisodeSortType.NewestToOldest,
                 manual = false,
                 draft = false,
@@ -831,14 +831,14 @@ class PlaylistManagerTest {
     @Test
     fun orderPlaylists() = runTest(testDispatcher) {
         val playlists = List(100) { index ->
-            DbPlaylist(uuid = UUID.randomUUID().toString(), sortPosition = index)
+            DbPlaylist(uuid = UUID.randomUUID().toString(), sortPosition = index, manual = index % 2 == 0)
         }
         playlistDao.upsertAllPlaylists(playlists)
 
         val reorderedPlaylistsUuids = playlists.shuffled().map(DbPlaylist::uuid)
         manager.updatePlaylistsOrder(reorderedPlaylistsUuids)
 
-        val reorderedPlaylists = playlistDao.getSmartPlaylists()
+        val reorderedPlaylists = playlistDao.getAllPlaylists()
         assertEquals(reorderedPlaylistsUuids, reorderedPlaylists.map(DbPlaylist::uuid))
         assertTrue(reorderedPlaylists.all { it.syncStatus == SYNC_STATUS_NOT_SYNCED })
     }
@@ -847,9 +847,9 @@ class PlaylistManagerTest {
     fun moveUnspecifiedPlaylistsToTheBottom() = runTest(testDispatcher) {
         val playlists = listOf(
             DbPlaylist(uuid = UUID.randomUUID().toString(), sortPosition = 0),
-            DbPlaylist(uuid = UUID.randomUUID().toString(), sortPosition = 1),
+            DbPlaylist(uuid = UUID.randomUUID().toString(), sortPosition = 1, manual = true),
             DbPlaylist(uuid = UUID.randomUUID().toString(), sortPosition = 2),
-            DbPlaylist(uuid = UUID.randomUUID().toString(), sortPosition = 3),
+            DbPlaylist(uuid = UUID.randomUUID().toString(), sortPosition = 3, manual = true),
             DbPlaylist(uuid = UUID.randomUUID().toString(), sortPosition = 4),
         )
         playlistDao.upsertAllPlaylists(playlists)
@@ -861,7 +861,7 @@ class PlaylistManagerTest {
         )
         manager.updatePlaylistsOrder(reorderedPlaylistsUuids)
 
-        val reorderedPlaylists = playlistDao.getSmartPlaylists()
+        val reorderedPlaylists = playlistDao.getAllPlaylistUuids()
         assertEquals(
             listOf(
                 playlists[4].uuid,
@@ -870,7 +870,7 @@ class PlaylistManagerTest {
                 playlists[0].uuid,
                 playlists[2].uuid,
             ),
-            reorderedPlaylists.map(DbPlaylist::uuid),
+            reorderedPlaylists,
         )
     }
 
