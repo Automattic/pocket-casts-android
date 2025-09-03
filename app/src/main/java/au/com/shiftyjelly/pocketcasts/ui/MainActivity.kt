@@ -335,6 +335,9 @@ class MainActivity :
         when (result) {
             is OnboardingFinish.Done -> {
                 settings.setHasDoneInitialOnboarding()
+                val podcastCount = runBlocking(Dispatchers.Default) { podcastManager.countSubscribed() }
+                val landingTab = if (podcastCount == 0) VR.id.navigation_discover else VR.id.navigation_podcasts
+                openTab(landingTab)
             }
 
             is OnboardingFinish.DoneGoToDiscover -> {
