@@ -72,6 +72,7 @@ class DeepLinkFactory(
         AppOpenAdapter(),
         CreateAccountAdapter(),
         DeveloperOptionsAdapter(),
+        BetaSettingsAdapter(),
     )
 
     fun create(intent: Intent): DeepLink? {
@@ -483,6 +484,7 @@ private class ShareLinkNativeAdapter : DeepLinkAdapter {
             "discover",
             "features",
             "developer_options",
+            "beta_settings",
         )
     }
 }
@@ -611,6 +613,7 @@ private class OpmlAdapter(
             "signup",
             "features",
             "developer_options",
+            "beta_settings",
         )
     }
 }
@@ -768,6 +771,20 @@ private class DeveloperOptionsAdapter : DeepLinkAdapter {
 
         return if (intent.action == ACTION_VIEW && scheme == "pktc" && host == "developer_options") {
             DeveloperOptionsDeeplink
+        } else {
+            null
+        }
+    }
+}
+
+private class BetaSettingsAdapter : DeepLinkAdapter {
+    override fun create(intent: Intent): DeepLink? {
+        val uriData = intent.data ?: return null
+        val scheme = uriData.scheme
+        val host = uriData.host
+
+        return if (intent.action == ACTION_VIEW && scheme == "pktc" && host == "beta_settings") {
+            BetaSettingsDeeplink
         } else {
             null
         }

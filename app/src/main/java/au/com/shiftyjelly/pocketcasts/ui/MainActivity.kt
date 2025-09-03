@@ -59,6 +59,7 @@ import au.com.shiftyjelly.pocketcasts.databinding.ActivityMainBinding
 import au.com.shiftyjelly.pocketcasts.deeplink.AddBookmarkDeepLink
 import au.com.shiftyjelly.pocketcasts.deeplink.AppOpenDeepLink
 import au.com.shiftyjelly.pocketcasts.deeplink.AssistantDeepLink
+import au.com.shiftyjelly.pocketcasts.deeplink.BetaSettingsDeeplink
 import au.com.shiftyjelly.pocketcasts.deeplink.ChangeBookmarkTitleDeepLink
 import au.com.shiftyjelly.pocketcasts.deeplink.CloudFilesDeepLink
 import au.com.shiftyjelly.pocketcasts.deeplink.CreateAccountDeepLink
@@ -159,6 +160,7 @@ import au.com.shiftyjelly.pocketcasts.servers.ServiceManager
 import au.com.shiftyjelly.pocketcasts.servers.discover.PodcastSearch
 import au.com.shiftyjelly.pocketcasts.servers.model.NetworkLoadableList.Companion.TRENDING
 import au.com.shiftyjelly.pocketcasts.settings.AppearanceSettingsFragment
+import au.com.shiftyjelly.pocketcasts.settings.BetaFeaturesFragment
 import au.com.shiftyjelly.pocketcasts.settings.ExportSettingsFragment
 import au.com.shiftyjelly.pocketcasts.settings.SettingsFragment
 import au.com.shiftyjelly.pocketcasts.settings.developer.DeveloperFragment
@@ -1577,6 +1579,10 @@ class MainActivity :
                     addFragment(DeveloperFragment())
                 }
 
+                is BetaSettingsDeeplink -> {
+                    closePlayer()
+                    addFragment(BetaFeaturesFragment())
+                }
                 null -> {
                     LogBuffer.i("DeepLink", "Did not find any matching deep link for: $intent")
                 }

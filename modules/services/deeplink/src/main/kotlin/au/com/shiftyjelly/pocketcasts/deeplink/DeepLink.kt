@@ -322,6 +322,11 @@ data object DeveloperOptionsDeeplink : IntentableDeepLink {
         .setData(Uri.parse("pktc://developer_options"))
 }
 
+data object BetaSettingsDeeplink : IntentableDeepLink {
+    override fun toIntent(context: Context) = Intent(ACTION_VIEW)
+        .setData(Uri.parse("pktc://beta_settings"))
+}
+
 private val Context.launcherIntent get() = requireNotNull(packageManager.getLaunchIntentForPackage(packageName)) {
     "Missing launcher intent for $packageName"
 }

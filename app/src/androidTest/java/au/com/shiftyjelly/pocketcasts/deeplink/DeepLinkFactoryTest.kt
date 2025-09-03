@@ -1166,4 +1166,14 @@ class DeepLinkFactoryTest {
 
         assertEquals(DeveloperOptionsDeeplink, deeplink)
     }
+
+    @Test
+    fun betaSettings() {
+        val intent = Intent(ACTION_VIEW)
+            .setData(Uri.parse("pktc://beta_settings"))
+
+        val deeplink = factory.create(intent)
+
+        assertEquals(BetaSettingsDeeplink, deeplink)
+    }
 }
