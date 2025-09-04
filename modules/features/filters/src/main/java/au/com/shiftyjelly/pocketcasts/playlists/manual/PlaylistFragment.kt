@@ -126,7 +126,7 @@ class PlaylistFragment :
                             // TODO: Change displayed episode count to exclude archived episodes
                             displayedEpisodeCount = playlist.totalEpisodeCount,
                             playbackDurationLeft = playlist.playbackDurationLeft,
-                            artworkPodcastUuids = playlist.artworkPodcastUuids.also { Timber.tag("LOG_TAG").i("uuids: $it") },
+                            artworkPodcastUuids = playlist.artworkPodcastUuids,
                         )
                     }
                     headerAdapter.submitHeader(playlistHeaderData)
