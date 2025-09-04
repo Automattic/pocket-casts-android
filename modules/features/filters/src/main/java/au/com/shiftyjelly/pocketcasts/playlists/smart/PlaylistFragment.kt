@@ -109,7 +109,7 @@ class PlaylistFragment :
                     playAll()
                 },
             ),
-            searchState = viewModel.searchState,
+            searchState = viewModel.searchState.textState,
             onChangeSearchFocus = { hasFocus, searchTopOffset ->
                 if (hasFocus) {
                     content.smoothScrollToTop(0, offset = -searchTopOffset.roundToInt())

@@ -1334,6 +1334,74 @@ class PlaylistManagerTest {
     }
 
     @Test
+    fun filterManualPlaylistEpisodeSource() = runTest(testDispatcher) {
+        settings.cachedSubscription.set(Subscription.PlusPreview, updateModifiedAt = false)
+
+        val baseFolder = Folder(
+            uuid = "folder-id-0",
+            name = "Folder Name 0",
+            color = 0,
+            addedDate = Date(0),
+            sortPosition = 0,
+            podcastsSortType = PodcastsSortType.RECENTLY_PLAYED,
+            deleted = false,
+            syncModified = 0L,
+        )
+        folderDao.insert(baseFolder.copy(uuid = "folder-uuid-1", name = "Folder AbC 1"))
+
+        podcastDao.insertSuspend(Podcast(uuid = "podcast-uuid-1", title = "Podcast ABC 1", rawFolderUuid = "folder-uuid-1", isSubscribed = true))
+        podcastDao.insertSuspend(Podcast(uuid = "podcast-uuid-2", title = "Podcast abc 2", isSubscribed = true))
+        podcastDao.insertSuspend(Podcast(uuid = "podcast-uuid-3", title = "Podcast DEF 3", rawFolderUuid = "folder-uuid-1", isSubscribed = true))
+        podcastDao.insertSuspend(Podcast(uuid = "podcast-uuid-4", title = "Podcast def 4", isSubscribed = true))
+
+        assertEquals(
+            listOf(
+                ManualPlaylistPodcastSource(
+                    uuid = "podcast-uuid-2",
+                    title = "Podcast abc 2",
+                    author = "",
+                ),
+                ManualPlaylistFolderSource(
+                    uuid = "folder-uuid-1",
+                    title = "Folder AbC 1",
+                    color = 0,
+                    podcastSources = listOf(
+                        ManualPlaylistPodcastSource(
+                            uuid = "podcast-uuid-1",
+                            title = "Podcast ABC 1",
+                            author = "",
+                        ),
+                    ),
+                ),
+            ),
+            manager.getManualPlaylistEpisodeSources(searchTerm = "ABC"),
+        )
+
+        assertEquals(
+            listOf(
+                ManualPlaylistPodcastSource(
+                    uuid = "podcast-uuid-4",
+                    title = "Podcast def 4",
+                    author = "",
+                ),
+                ManualPlaylistFolderSource(
+                    uuid = "folder-uuid-1",
+                    title = "Folder AbC 1",
+                    color = 0,
+                    podcastSources = listOf(
+                        ManualPlaylistPodcastSource(
+                            uuid = "podcast-uuid-3",
+                            title = "Podcast DEF 3",
+                            author = "",
+                        ),
+                    ),
+                ),
+            ),
+            manager.getManualPlaylistEpisodeSources(searchTerm = "DEF"),
+        )
+    }
+
+    @Test
     fun observeManualPlaylistAvailableEpisodes() = runTest(testDispatcher) {
         val playlistUuid = manager.createManualPlaylist("Manual Playlist")
 
@@ -1374,6 +1442,43 @@ class PlaylistManagerTest {
                 ManualPlaylistEpisode.test(playlistUuid = playlistUuid, episodeUuid = "episode-uuid-2", podcastUuid = "podcast-uuid-1"),
             )
             assertEquals(listOf(episode1), awaitItem())
+        }
+    }
+
+    @Test
+    fun filterManualPlaylistAvailableEpisodes() = runTest(testDispatcher) {
+        val playlistUuid = manager.createManualPlaylist("Manual Playlist")
+
+        manager.observeManualPlaylistAvailableEpisodes(playlistUuid, "podcast-uuid-1", "ABC").test {
+            skipItems(1)
+
+            val episode1 = PodcastEpisode(
+                uuid = "episode-uuid-1",
+                podcastUuid = "podcast-uuid-1",
+                title = "episode abc 1",
+                publishedDate = Date(0),
+            )
+            episodeDao.insert(episode1)
+            assertEquals(listOf(episode1), awaitItem())
+
+            val episode2 = PodcastEpisode(
+                uuid = "episode-uuid-2",
+                podcastUuid = "podcast-uuid-1",
+                title = "ABC episode 2",
+                publishedDate = Date(1),
+            )
+            episodeDao.insert(episode2)
+            assertEquals(listOf(episode2, episode1), awaitItem())
+
+            episodeDao.insert(
+                PodcastEpisode(
+                    uuid = "episode-uuid-3",
+                    podcastUuid = "podcast-uuid-2",
+                    title = "AB episode 3",
+                    publishedDate = Date(),
+                ),
+            )
+            expectNoEvents()
         }
     }
 

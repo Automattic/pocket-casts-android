@@ -30,9 +30,11 @@ import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.playlist.PlaylistManager.Companion.MANUAL_PLAYLIST_EPISODE_LIMIT
 import au.com.shiftyjelly.pocketcasts.repositories.playlist.PlaylistManager.Companion.PLAYLIST_ARTWORK_EPISODE_LIMIT
 import au.com.shiftyjelly.pocketcasts.repositories.playlist.PlaylistManager.Companion.SMART_PLAYLIST_EPISODE_LIMIT
+import au.com.shiftyjelly.pocketcasts.utils.extensions.escapeLike
 import java.time.Clock
 import java.util.UUID
 import javax.inject.Inject
+import kotlin.text.orEmpty
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -227,14 +229,25 @@ class PlaylistManagerImpl @Inject constructor(
         }
     }
 
-    override suspend fun getManualPlaylistEpisodeSources(): List<ManualPlaylistEpisodeSource> {
+    override suspend fun getManualPlaylistEpisodeSources(searchTerm: String?): List<ManualPlaylistEpisodeSource> {
         val isSubscriber = settings.cachedSubscription.value != null
-        return playlistDao.getManualPlaylistEpisodeSources(useFolders = isSubscriber)
+        return playlistDao.getManualPlaylistEpisodeSources(
+            useFolders = isSubscriber,
+            searchTerm = searchTerm?.escapeLike('\\').orEmpty(),
+        )
     }
 
-    override fun observeManualPlaylistAvailableEpisodes(playlistUuid: String, podcastUuid: String): Flow<List<PodcastEpisode>> {
+    override fun observeManualPlaylistAvailableEpisodes(
+        playlistUuid: String,
+        podcastUuid: String,
+        searchTerm: String?,
+    ): Flow<List<PodcastEpisode>> {
         return playlistDao
-            .observeManualPlaylistAvailableEpisodes(playlistUuid, podcastUuid)
+            .observeManualPlaylistAvailableEpisodes(
+                playlistUuid = playlistUuid,
+                podcastUuid = podcastUuid,
+                searchTerm = searchTerm?.escapeLike('\\').orEmpty(),
+            )
             .distinctUntilChanged()
     }
 

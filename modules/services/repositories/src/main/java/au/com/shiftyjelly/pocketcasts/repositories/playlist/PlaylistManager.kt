@@ -45,9 +45,9 @@ interface PlaylistManager {
 
     suspend fun updatePlaylistsOrder(sortedUuids: List<String>)
 
-    suspend fun getManualPlaylistEpisodeSources(): List<ManualPlaylistEpisodeSource>
+    suspend fun getManualPlaylistEpisodeSources(searchTerm: String? = null): List<ManualPlaylistEpisodeSource>
 
-    fun observeManualPlaylistAvailableEpisodes(playlistUuid: String, podcastUuid: String): Flow<List<PodcastEpisode>>
+    fun observeManualPlaylistAvailableEpisodes(playlistUuid: String, podcastUuid: String, searchTerm: String? = null): Flow<List<PodcastEpisode>>
 
     suspend fun addManualPlaylistEpisode(playlistUuid: String, episodeUuid: String): Boolean
 

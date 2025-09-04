@@ -1,12 +1,11 @@
 package au.com.shiftyjelly.pocketcasts.playlists.smart
 
-import androidx.compose.foundation.text.input.TextFieldState
-import androidx.compose.runtime.snapshotFlow
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
+import au.com.shiftyjelly.pocketcasts.compose.text.SearchFieldState
 import au.com.shiftyjelly.pocketcasts.models.type.PlaylistEpisodeSortType
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.download.DownloadManager
@@ -25,8 +24,6 @@ import kotlinx.coroutines.NonCancellable
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.asSharedFlow
-import kotlinx.coroutines.flow.debounce
-import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
@@ -57,12 +54,9 @@ class PlaylistViewModel @AssistedInject constructor(
     private val _showSettingsSignal = MutableSharedFlow<Unit>()
     val showSettingsSignal = _showSettingsSignal.asSharedFlow()
 
-    val searchState = TextFieldState()
+    val searchState = SearchFieldState()
 
-    val uiState = snapshotFlow { searchState.text }
-        .map { it.toString().trim() }
-        .debounce { searchTerm -> if (searchTerm.isEmpty()) 0 else 300 }
-        .distinctUntilChanged()
+    val uiState = searchState.textFlow
         .flatMapLatest { searchTerm -> playlistManager.observeSmartPlaylist(playlistUuid, searchTerm) }
         .map { UiState(it) }
         .stateIn(viewModelScope, SharingStarted.Lazily, initialValue = UiState.Empty)

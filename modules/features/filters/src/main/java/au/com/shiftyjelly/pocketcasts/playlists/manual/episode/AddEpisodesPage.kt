@@ -8,19 +8,20 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.text.input.TextFieldState
 import androidx.compose.foundation.text.input.rememberTextFieldState
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavHostController
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -51,13 +52,15 @@ internal fun AddEpisodesPage(
     playlistTitle: String,
     addedEpisodesCount: Int,
     episodeSources: List<ManualPlaylistEpisodeSource>,
+    folderPodcastsFlow: (String) -> StateFlow<List<ManualPlaylistPodcastSource>>,
     episodesFlow: (String) -> StateFlow<List<PodcastEpisode>>,
     useEpisodeArtwork: Boolean,
     onAddEpisode: (String) -> Unit,
-    onClose: () -> Unit,
+    onNavigationClick: () -> Unit,
     modifier: Modifier = Modifier,
+    navController: NavHostController = rememberNavController(),
+    searchState: TextFieldState = rememberTextFieldState(),
 ) {
-    val navController = rememberNavController()
     val backStackEntry by navController.currentBackStackEntryAsState()
     val isTopPageDisplayed = backStackEntry == null || backStackEntry?.destination?.route == AddEpisodesRoutes.HOME
 
@@ -93,7 +96,7 @@ internal fun AddEpisodesPage(
                         .clickable(
                             indication = null,
                             interactionSource = null,
-                            onClick = onClose,
+                            onClick = onNavigationClick,
                         )
                         .padding(end = 16.dp),
                 )
@@ -101,15 +104,11 @@ internal fun AddEpisodesPage(
             style = ThemedTopAppBar.Style.Immersive,
             iconColor = MaterialTheme.theme.colors.primaryIcon02,
             windowInsets = WindowInsets(0),
-            onNavigationClick = {
-                if (!navController.popBackStack()) {
-                    onClose()
-                }
-            },
+            onNavigationClick = onNavigationClick,
         )
 
         SearchBar(
-            state = rememberTextFieldState(),
+            state = searchState,
             placeholder = stringResource(LR.string.search),
             style = SearchBarStyle.Small,
             modifier = Modifier
@@ -152,9 +151,8 @@ internal fun AddEpisodesPage(
             ) { backStackEntry ->
                 val arguments = requireNotNull(backStackEntry.arguments) { "Missing back stack entry arguments" }
                 val folderUuid = requireNotNull(arguments.getString(AddEpisodesRoutes.FOLDER_UUID_ARG)) { "Missing folder uuid argument" }
-                val podcasts = remember(folderUuid) {
-                    episodeSources.filterIsInstance<ManualPlaylistFolderSource>().find { it.uuid == folderUuid }?.podcastSources.orEmpty()
-                }
+                val podcasts by folderPodcastsFlow(folderUuid).collectAsState()
+
                 EpisodeSourcesColumn(
                     sources = podcasts,
                     onClickSource = navigateToSource,
@@ -169,6 +167,7 @@ internal fun AddEpisodesPage(
                 val arguments = requireNotNull(backStackEntry.arguments) { "Missing back stack entry arguments" }
                 val podcastUuid = requireNotNull(arguments.getString(AddEpisodesRoutes.PODCAST_UUID_ARG)) { "Missing podcast uuid argument" }
                 val episodes by episodesFlow(podcastUuid).collectAsState()
+
                 EpisodesColumn(
                     episodes = episodes,
                     useEpisodeArtwork = useEpisodeArtwork,
@@ -180,7 +179,7 @@ internal fun AddEpisodesPage(
     }
 }
 
-private object AddEpisodesRoutes {
+internal object AddEpisodesRoutes {
     const val HOME = "home"
 
     private const val FOLDER_BASE = "folder"
