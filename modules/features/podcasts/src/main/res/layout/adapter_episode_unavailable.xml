@@ -73,7 +73,7 @@
             android:layout_marginBottom="12dp"
             android:ellipsize="end"
             android:maxLines="1"
-            android:text="Unavailable"
+            android:text="@string/unavailable"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="@+id/dateLabel"
             app:layout_constraintStart_toStartOf="@id/dateLabel"
