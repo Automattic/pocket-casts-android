@@ -78,11 +78,12 @@ class AddEpisodesFragment : BaseDialogFragment() {
                     episodesFlow = viewModel::getEpisodesFlow,
                     useEpisodeArtwork = uiState.useEpisodeArtwork,
                     onAddEpisode = viewModel::addEpisode,
-                    onNavigationClick = {
+                    onClickNavigationButton = {
                         if (!navController.popBackStack()) {
                             dismiss()
                         }
                     },
+                    onClickDone = ::dismiss,
                     modifier = Modifier.fillMaxSize(),
                 )
             }
