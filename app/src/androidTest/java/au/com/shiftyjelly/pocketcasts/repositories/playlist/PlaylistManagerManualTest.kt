@@ -1,0 +1,295 @@
+package au.com.shiftyjelly.pocketcasts.repositories.playlist
+
+import app.cash.turbine.test
+import au.com.shiftyjelly.pocketcasts.models.entity.PlaylistEntity.Companion.SYNC_STATUS_NOT_SYNCED
+import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
+import org.junit.Assert.assertEquals
+import org.junit.Assert.assertNull
+import org.junit.Rule
+import org.junit.Test
+
+class PlaylistManagerManualTest {
+    @get:Rule
+    val dsl = PlaylistManagerDsl()
+
+    @Test
+    fun createPlaylist() = dsl.test {
+        val playlistUuid = manager.createManualPlaylist("Playlist name")
+
+        expectPlaylist(
+            manualPlaylistEntity(index = 0) {
+                it.copy(
+                    uuid = playlistUuid,
+                    title = "Playlist name",
+                    sortPosition = 0,
+                    syncStatus = SYNC_STATUS_NOT_SYNCED,
+                )
+            },
+        )
+    }
+
+    @Test
+    fun observePlaylist() = dsl.test {
+        manager.manualPlaylistFlow("playlist-id-0").test {
+            assertNull(awaitItem())
+
+            insertManualPlaylist(index = 0)
+            assertEquals(manualPlaylist(index = 0), awaitItem())
+
+            insertManualEpisode(index = 0, podcastIndex = 0, playlistIndex = 0)
+            assertEquals(
+                manualPlaylist(index = 0) {
+                    it.copy(totalEpisodeCount = 1)
+                },
+                awaitItem(),
+            )
+
+            insertManualEpisode(index = 1, podcastIndex = 1, playlistIndex = 0)
+            assertEquals(
+                manualPlaylist(index = 0) {
+                    it.copy(totalEpisodeCount = 2)
+                },
+                awaitItem(),
+            )
+
+            insertPodcastEpisode(index = 1, podcastIndex = 1)
+
+            assertEquals(
+                manualPlaylist(index = 0) {
+                    it.copy(
+                        totalEpisodeCount = 2,
+                        artworkPodcastUuids = listOf("podcast-id-1"),
+                    )
+                },
+                awaitItem(),
+            )
+        }
+    }
+
+    @Test
+    fun getEpisodeSources() = dsl.test {
+        insertFolder(index = 0)
+        insertFolder(index = 1)
+        insertFolder(index = 2) { it.copy(deleted = true) }
+        insertPodcast(index = 0)
+        insertPodcast(index = 1)
+        insertPodcast(index = 2) { it.copy(isSubscribed = false) }
+        insertPodcast(index = 3, folderIndex = 0)
+        insertPodcast(index = 4, folderIndex = 2)
+        insertPodcast(index = 5, folderIndex = 0) { it.copy(isSubscribed = false) }
+
+        setNoSubscription()
+        assertEquals(
+            listOf(
+                podcastEpisodeSource(index = 0),
+                podcastEpisodeSource(index = 1),
+                podcastEpisodeSource(index = 3),
+                podcastEpisodeSource(index = 4),
+            ),
+            manager.getManualEpisodeSources(),
+        )
+
+        setPlusSubscription()
+        assertEquals(
+            listOf(
+                podcastEpisodeSource(index = 0),
+                podcastEpisodeSource(index = 1),
+                podcastEpisodeSource(index = 4),
+                folderEpisodeSource(index = 0, podcastIndices = listOf(3)),
+            ),
+            manager.getManualEpisodeSources(),
+        )
+    }
+
+    @Test
+    fun searchEpisodeSources() = dsl.test {
+        setPlusSubscription()
+
+        insertFolder(index = 0) { it.copy(name = "Folder AbC 0") }
+        insertPodcast(index = 0, folderIndex = 0) { it.copy(title = "Podcast ABC 0") }
+        insertPodcast(index = 1) { it.copy(title = "Podcast abc 1") }
+        insertPodcast(index = 2, folderIndex = 0) { it.copy(title = "Podcast DEF 2") }
+        insertPodcast(index = 3) { it.copy(title = "Podcast def 3") }
+
+        assertEquals(
+            listOf(
+                podcastEpisodeSource(index = 1) { it.copy(title = "Podcast abc 1") },
+                folderEpisodeSource(index = 0, podcastIndices = listOf(0, 2)) { folderSource ->
+                    folderSource.copy(title = "Folder AbC 0")
+                },
+            ),
+            manager.getManualEpisodeSources(searchTerm = "ABC"),
+        )
+
+        assertEquals(
+            listOf(
+                podcastEpisodeSource(index = 3) { it.copy(title = "Podcast def 3") },
+                folderEpisodeSource(index = 0, podcastIndices = listOf(0, 2)) { folderSource ->
+                    folderSource.copy(title = "Folder AbC 0")
+                },
+            ),
+            manager.getManualEpisodeSources(searchTerm = "def"),
+        )
+
+        insertFolder(index = 1) { it.copy(name = "fol % der") }
+        insertPodcast(index = 4, folderIndex = 1)
+        insertPodcast(index = 5) { it.copy(title = "pod % cast") }
+
+        assertEquals(
+            listOf(
+                podcastEpisodeSource(index = 5) { it.copy(title = "pod % cast") },
+                folderEpisodeSource(index = 1, podcastIndices = listOf(4)) { folderSource ->
+                    folderSource.copy(title = "fol % der")
+                },
+            ),
+            manager.getManualEpisodeSources(searchTerm = "%"),
+        )
+
+        insertFolder(index = 2) { it.copy(name = "fol _ der") }
+        insertPodcast(index = 6, folderIndex = 2)
+        insertPodcast(index = 7) { it.copy(title = "pod _ cast") }
+
+        assertEquals(
+            listOf(
+                podcastEpisodeSource(index = 7) { it.copy(title = "pod _ cast") },
+                folderEpisodeSource(index = 2, podcastIndices = listOf(6)) { folderSource ->
+                    folderSource.copy(title = "fol _ der")
+                },
+            ),
+            manager.getManualEpisodeSources(searchTerm = "_"),
+        )
+
+        insertFolder(index = 3) { it.copy(name = "fol \\ der") }
+        insertPodcast(index = 8, folderIndex = 3)
+        insertPodcast(index = 9) { it.copy(title = "pod \\ cast") }
+
+        assertEquals(
+            listOf(
+                podcastEpisodeSource(index = 9) { it.copy(title = "pod \\ cast") },
+                folderEpisodeSource(index = 3, podcastIndices = listOf(8)) { folderSource ->
+                    folderSource.copy(title = "fol \\ der")
+                },
+            ),
+            manager.getManualEpisodeSources(searchTerm = "\\"),
+        )
+    }
+
+    @Test
+    fun getEpisodeSourcesForFolder() = dsl.test {
+        insertFolder(index = 0)
+        insertFolder(index = 1)
+        insertPodcast(index = 0, folderIndex = 0)
+        insertPodcast(index = 1, folderIndex = 0)
+        insertPodcast(index = 2, folderIndex = 1)
+
+        assertEquals(
+            listOf(
+                podcastEpisodeSource(index = 0),
+                podcastEpisodeSource(index = 1),
+            ),
+            manager.getManualEpisodeSourcesForFolder("folder-id-0"),
+        )
+    }
+
+    @Test
+    fun searchEpisodeSourcesForFolder() = dsl.test {
+        insertFolder(index = 0)
+        insertPodcast(index = 0, folderIndex = 0) { it.copy(title = "Podcast abc 0") }
+        insertPodcast(index = 1, folderIndex = 0) { it.copy(title = "pod % cast") }
+        insertPodcast(index = 2, folderIndex = 0) { it.copy(title = "pod _ cast") }
+        insertPodcast(index = 3, folderIndex = 0) { it.copy(title = "pod \\ cast") }
+
+        assertEquals(
+            listOf(
+                podcastEpisodeSource(index = 0) { it.copy(title = "Podcast abc 0") },
+            ),
+            manager.getManualEpisodeSourcesForFolder("folder-id-0", "ABC"),
+        )
+
+        assertEquals(
+            listOf(
+                podcastEpisodeSource(index = 1) { it.copy(title = "pod % cast") },
+            ),
+            manager.getManualEpisodeSourcesForFolder("folder-id-0", "%"),
+        )
+
+        assertEquals(
+            listOf(
+                podcastEpisodeSource(index = 2) { it.copy(title = "pod _ cast") },
+            ),
+            manager.getManualEpisodeSourcesForFolder("folder-id-0", "_"),
+        )
+
+        assertEquals(
+            listOf(
+                podcastEpisodeSource(index = 3) { it.copy(title = "pod \\ cast") },
+            ),
+            manager.getManualEpisodeSourcesForFolder("folder-id-0", "\\"),
+        )
+    }
+
+    @Test
+    fun observeNotAddedEpisodes() = dsl.test {
+        insertManualPlaylist(index = 0)
+
+        manager.notAddedManualEpisodesFlow("playlist-id-0", "podcast-id-0").test {
+            assertEquals(emptyList<PodcastEpisode>(), awaitItem())
+
+            val episode1 = insertPodcastEpisode(index = 0, podcastIndex = 0)
+            assertEquals(listOf(episode1), awaitItem())
+
+            val episode2 = insertPodcastEpisode(index = 1, podcastIndex = 0)
+            assertEquals(listOf(episode1, episode2), awaitItem())
+
+            insertPodcastEpisode(index = 2, podcastIndex = 1)
+            expectNoEvents()
+
+            insertManualEpisode(index = 1, podcastIndex = 1, playlistIndex = 0)
+            expectNoEvents()
+
+            insertManualEpisode(index = 1, podcastIndex = 0, playlistIndex = 0)
+            assertEquals(listOf(episode1), awaitItem())
+        }
+    }
+
+    @Test
+    fun searchNotAddedEpisodes() = dsl.test {
+        insertManualPlaylist(index = 0)
+        manager.notAddedManualEpisodesFlow("playlist-id-0", "podcast-id-0", searchTerm = "abc").test {
+            skipItems(1)
+
+            val episode1 = insertPodcastEpisode(index = 0, podcastIndex = 0) { it.copy(title = "episode abc 0") }
+            assertEquals(listOf(episode1), awaitItem())
+
+            val episode2 = insertPodcastEpisode(index = 1, podcastIndex = 0) { it.copy(title = "ABC episode 1") }
+            assertEquals(listOf(episode1, episode2), awaitItem())
+
+            insertPodcastEpisode(index = 2, podcastIndex = 0) { it.copy(title = "AB episode 2") }
+            expectNoEvents()
+        }
+
+        insertManualPlaylist(index = 1)
+        manager.notAddedManualEpisodesFlow("playlist-id-1", "podcast-id-0", searchTerm = "%").test {
+            skipItems(1)
+
+            val episode1 = insertPodcastEpisode(index = 3, podcastIndex = 0) { it.copy(title = "ti % tle") }
+            assertEquals(listOf(episode1), awaitItem())
+        }
+
+        insertManualPlaylist(index = 2)
+        manager.notAddedManualEpisodesFlow("playlist-id-2", "podcast-id-0", searchTerm = "_").test {
+            skipItems(1)
+
+            val episode1 = insertPodcastEpisode(index = 4, podcastIndex = 0) { it.copy(title = "ti _ tle") }
+            assertEquals(listOf(episode1), awaitItem())
+        }
+
+        insertManualPlaylist(index = 3)
+        manager.notAddedManualEpisodesFlow("playlist-id-3", "podcast-id-0", searchTerm = "\\").test {
+            skipItems(1)
+
+            val episode1 = insertPodcastEpisode(index = 5, podcastIndex = 0) { it.copy(title = "ti \\ tle") }
+            assertEquals(listOf(episode1), awaitItem())
+        }
+    }
+}
