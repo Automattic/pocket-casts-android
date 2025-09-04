@@ -720,7 +720,7 @@ class PodcastsFragment :
         analyticsTracker.track(
             AnalyticsEvent.BANNER_AD_IMPRESSION,
             mapOf(
-                "promotion" to "podcast_list",
+                "location" to "podcast_list",
                 "id" to ad.id,
             ),
         )
@@ -730,7 +730,7 @@ class PodcastsFragment :
         analyticsTracker.track(
             AnalyticsEvent.BANNER_AD_TAPPED,
             mapOf(
-                "promotion" to "podcast_list",
+                "location" to "podcast_list",
                 "id" to ad.id,
             ),
         )

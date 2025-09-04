@@ -764,7 +764,7 @@ class PlayerViewModel @Inject constructor(
         analyticsTracker.track(
             AnalyticsEvent.BANNER_AD_IMPRESSION,
             mapOf(
-                "promotion" to "player",
+                "location" to "player",
                 "id" to ad.id,
             ),
         )
@@ -774,7 +774,7 @@ class PlayerViewModel @Inject constructor(
         analyticsTracker.track(
             AnalyticsEvent.BANNER_AD_TAPPED,
             mapOf(
-                "promotion" to "player",
+                "location" to "player",
                 "id" to ad.id,
             ),
         )
