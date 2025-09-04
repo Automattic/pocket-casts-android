@@ -1,5 +1,6 @@
 package au.com.shiftyjelly.pocketcasts
 
+import android.annotation.SuppressLint
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.fragment.app.FragmentManager
@@ -154,6 +155,7 @@ class ManualPlaylistEpisodeAdapter(
 private object ManualEpisodeDiffCallback : DiffUtil.ItemCallback<ManualEpisode>() {
     override fun areItemsTheSame(oldItem: ManualEpisode, newItem: ManualEpisode) = oldItem.uuid == newItem.uuid
 
+    @SuppressLint("DiffUtilEquals")
     override fun areContentsTheSame(oldItem: ManualEpisode, newItem: ManualEpisode): Boolean {
         return oldItem == newItem
     }
