@@ -78,7 +78,6 @@
             app:layout_constraintEnd_toEndOf="@+id/dateLabel"
             app:layout_constraintStart_toStartOf="@id/dateLabel"
             app:layout_constraintTop_toBottomOf="@id/titleLabel" />
-        <!-- TODO: Translate Unavailable -->
 
         <View
             android:layout_width="match_parent"
