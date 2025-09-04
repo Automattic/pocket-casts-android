@@ -66,7 +66,7 @@ class FakePlaylistManager : PlaylistManager {
     }
 
     val manualPlaylist = MutableStateFlow<ManualPlaylist?>(null)
-    override fun manualPlaylistFlow(uuid: String): Flow<ManualPlaylist?> {
+    override fun manualPlaylistFlow(uuid: String, searchTerm: String?): Flow<ManualPlaylist?> {
         return manualPlaylist
     }
 

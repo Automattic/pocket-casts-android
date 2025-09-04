@@ -5,7 +5,13 @@ import android.os.Parcelable
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.compose.foundation.text.input.TextFieldState
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableFloatStateOf
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.util.lerp
 import androidx.core.os.BundleCompat
 import androidx.core.os.bundleOf
 import androidx.core.view.ViewCompat
@@ -14,27 +20,48 @@ import androidx.core.view.updatePadding
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
+import androidx.recyclerview.widget.ConcatAdapter
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
+import au.com.shiftyjelly.pocketcasts.PlaylistEpisodesAdapterFactory
+import au.com.shiftyjelly.pocketcasts.compose.AppTheme
+import au.com.shiftyjelly.pocketcasts.compose.extensions.setContentWithViewCompositionStrategy
 import au.com.shiftyjelly.pocketcasts.filters.databinding.PlaylistFragmentBinding
 import au.com.shiftyjelly.pocketcasts.playlists.component.PlaylistHeaderAdapter
 import au.com.shiftyjelly.pocketcasts.playlists.component.PlaylistHeaderButtonData
 import au.com.shiftyjelly.pocketcasts.playlists.component.PlaylistHeaderData
+import au.com.shiftyjelly.pocketcasts.playlists.component.PlaylistToolbar
 import au.com.shiftyjelly.pocketcasts.playlists.manual.episode.AddEpisodesFragment
 import au.com.shiftyjelly.pocketcasts.repositories.playlist.PlaylistManager
 import au.com.shiftyjelly.pocketcasts.ui.helper.FragmentHostListener
+import au.com.shiftyjelly.pocketcasts.utils.extensions.dpToPx
 import au.com.shiftyjelly.pocketcasts.views.extensions.hideKeyboardOnScroll
+import au.com.shiftyjelly.pocketcasts.views.extensions.smoothScrollToTop
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseFragment
+import au.com.shiftyjelly.pocketcasts.views.helper.EpisodeItemTouchHelper
+import au.com.shiftyjelly.pocketcasts.views.helper.HasBackstack
 import com.google.android.material.snackbar.Snackbar
 import dagger.hilt.android.AndroidEntryPoint
 import dagger.hilt.android.lifecycle.withCreationCallback
-import kotlin.time.Duration
+import javax.inject.Inject
+import kotlin.math.absoluteValue
+import kotlin.math.roundToInt
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import kotlinx.parcelize.Parcelize
 import timber.log.Timber
 import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
+import au.com.shiftyjelly.pocketcasts.ui.R as UR
 
 @AndroidEntryPoint
-class PlaylistFragment : BaseFragment() {
+class PlaylistFragment :
+    BaseFragment(),
+    HasBackstack {
+
+    @Inject
+    lateinit var adapterFactory: PlaylistEpisodesAdapterFactory
+
     private val args get() = requireNotNull(arguments?.let { BundleCompat.getParcelable(it, NEW_INSTANCE_ARGS, Args::class.java) })
 
     private val viewModel by viewModels<PlaylistViewModel>(
@@ -45,6 +72,8 @@ class PlaylistFragment : BaseFragment() {
         },
     )
 
+    private var isKeyboardOpen by mutableStateOf(false)
+
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -52,6 +81,7 @@ class PlaylistFragment : BaseFragment() {
     ): View {
         val binding = PlaylistFragmentBinding.inflate(inflater, container, false)
         binding.setupContent()
+        binding.setupToolbar()
         return binding.root
     }
 
@@ -68,24 +98,26 @@ class PlaylistFragment : BaseFragment() {
                 label = getString(LR.string.playlist_play_all),
                 onClick = { Timber.i("Play all") },
             ),
-            searchState = TextFieldState(),
-            onChangeSearchFocus = { _, _ -> Timber.i("Scroll to content") },
+            searchState = viewModel.searchState.textState,
+            onChangeSearchFocus = { hasFocus, searchTopOffset ->
+                if (hasFocus) {
+                    content.smoothScrollToTop(0, offset = -searchTopOffset.roundToInt())
+                }
+            },
         )
-        headerAdapter.submitHeader(
-            PlaylistHeaderData(
-                title = "Playlist title",
-                totalEpisodeCount = 0,
-                displayedEpisodeCount = 0,
-                playbackDurationLeft = Duration.ZERO,
-                artworkPodcastUuids = emptyList(),
-            ),
+        val episodesAdapter = adapterFactory.createForManualPlaylist(
+            multiSelectToolbar = multiSelectToolbar,
+            getEpisodes = { viewModel.uiState.value.manualPlaylist?.episodes.orEmpty() },
         )
-        content.adapter = headerAdapter
+        content.adapter = ConcatAdapter(headerAdapter, episodesAdapter)
+        EpisodeItemTouchHelper().attachToRecyclerView(content)
 
         viewLifecycleOwner.lifecycleScope.launch {
             viewModel.uiState
                 .flowWithLifecycle(viewLifecycleOwner.lifecycle)
                 .collect { uiState ->
+                    val episodes = uiState.manualPlaylist?.episodes.orEmpty()
+                    episodesAdapter.submitList(episodes)
 
                     val playlistHeaderData = uiState.manualPlaylist?.let { playlist ->
                         PlaylistHeaderData(
@@ -94,7 +126,7 @@ class PlaylistFragment : BaseFragment() {
                             // TODO: Change displayed episode count to exclude archived episodes
                             displayedEpisodeCount = playlist.totalEpisodeCount,
                             playbackDurationLeft = playlist.playbackDurationLeft,
-                            artworkPodcastUuids = playlist.artworkPodcastUuids,
+                            artworkPodcastUuids = playlist.artworkPodcastUuids.also { Timber.tag("LOG_TAG").i("uuids: $it") },
                         )
                     }
                     headerAdapter.submitHeader(playlistHeaderData)
@@ -115,10 +147,60 @@ class PlaylistFragment : BaseFragment() {
         ViewCompat.setOnApplyWindowInsetsListener(content) { _, windowInsets ->
             val insets = windowInsets.getInsets(WindowInsetsCompat.Type.ime())
             keyboardInset = insets.bottom
+            isKeyboardOpen = keyboardInset != 0
             content.updatePadding(bottom = initialPadding + miniPlayerInset + keyboardInset)
             windowInsets
         }
         content.hideKeyboardOnScroll()
+    }
+
+    private fun PlaylistFragmentBinding.setupToolbar() {
+        var toolbarAlpha by mutableFloatStateOf(0f)
+        val transparencyThreshold = 40.dpToPx(requireContext())
+        val maxProgressDistance = 100.dpToPx(requireContext())
+
+        fun updateToolbarAlpha() {
+            val layoutManager = (content.layoutManager as? LinearLayoutManager) ?: return
+            val headerViewOffset = layoutManager
+                .findViewByPosition(layoutManager.findFirstVisibleItemPosition())
+                ?.takeIf { it.getTag(UR.id.playlist_view_header_tag) == true }
+                ?.top?.absoluteValue
+                ?: Int.MAX_VALUE
+            toolbarAlpha = if (headerViewOffset > transparencyThreshold) {
+                val scrollFraction = (headerViewOffset - transparencyThreshold).toFloat() / (maxProgressDistance)
+                lerp(0f, 1f, scrollFraction).coerceIn(0f, 1f)
+            } else {
+                0f
+            }
+        }
+        content.addOnScrollListener(object : RecyclerView.OnScrollListener() {
+            override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
+                updateToolbarAlpha()
+            }
+        })
+        content.addOnLayoutChangeListener { _, _, _, _, _, _, _, _, _ ->
+            updateToolbarAlpha()
+        }
+
+        playlistToolbar.setContentWithViewCompositionStrategy {
+            val title by remember {
+                viewModel.uiState.map { it.manualPlaylist?.title.orEmpty() }
+            }.collectAsState("")
+
+            AppTheme(theme.activeTheme) {
+                PlaylistToolbar(
+                    title = title,
+                    backgroundAlpha = if (isKeyboardOpen) 1f else toolbarAlpha,
+                    onClickBack = {
+                        @Suppress("DEPRECATION")
+                        requireActivity().onBackPressed()
+                    },
+                    onClickOptions = {
+                        Timber.i("Open options")
+                    },
+                )
+            }
+        }
     }
 
     private fun openEditor() {
@@ -132,6 +214,18 @@ class PlaylistFragment : BaseFragment() {
             return
         }
         AddEpisodesFragment.newInstance(args.playlistUuid).show(parentFragmentManager, "playlist_episode_editor")
+    }
+
+    override fun onBackPressed(): Boolean {
+        return if (adapterFactory.onBackPressed()) {
+            true
+        } else {
+            super.onBackPressed()
+        }
+    }
+
+    override fun getBackstackCount(): Int {
+        return adapterFactory.getBackstackCount() + super.getBackstackCount()
     }
 
     @Parcelize
