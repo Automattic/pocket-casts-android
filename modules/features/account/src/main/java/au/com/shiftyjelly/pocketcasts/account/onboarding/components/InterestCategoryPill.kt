@@ -1,8 +1,10 @@
 package au.com.shiftyjelly.pocketcasts.account.onboarding.components
 
 import androidx.compose.animation.core.Animatable
+import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.spring
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -68,32 +70,32 @@ fun InterestCategoryPill(
         if (animateState) {
             scope.launch {
                 scaleAnim.animateTo(
-                    targetValue = 1.15f,
-                    animationSpec = spring(
-                        dampingRatio = Spring.DampingRatioLowBouncy,
-                        stiffness = Spring.StiffnessMedium,
+                    targetValue = 1.1f,
+                    animationSpec = tween(
+                        durationMillis = 150,
+                        easing = FastOutSlowInEasing,
                     ),
                 )
                 scaleAnim.animateTo(
                     targetValue = 1f,
                     animationSpec = spring(
-                        dampingRatio = Spring.DampingRatioMediumBouncy,
-                        stiffness = Spring.StiffnessHigh,
+                        dampingRatio = Spring.DampingRatioHighBouncy,
+                        stiffness = Spring.StiffnessMedium,
                     ),
                 )
             }
             scope.launch {
                 rotationAnim.animateTo(
-                    targetValue = -5f,
-                    animationSpec = spring(
-                        dampingRatio = Spring.DampingRatioLowBouncy,
-                        stiffness = Spring.StiffnessHigh,
+                    targetValue = -3f,
+                    animationSpec = tween(
+                        durationMillis = 150,
+                        easing = FastOutSlowInEasing,
                     ),
                 )
                 rotationAnim.animateTo(
                     targetValue = 0f,
                     animationSpec = spring(
-                        dampingRatio = Spring.DampingRatioMediumBouncy,
+                        dampingRatio = Spring.DampingRatioHighBouncy,
                         stiffness = Spring.StiffnessMedium,
                     ),
                 )
@@ -114,7 +116,7 @@ fun InterestCategoryPill(
                 scaleY = scaleAnim.value
                 scaleX = scaleAnim.value
 
-                transformOrigin = TransformOrigin(0.5f, 1f)
+                transformOrigin = TransformOrigin(0.5f, 0.5f)
                 rotationZ = rotationAnim.value
             },
     ) {

@@ -383,6 +383,8 @@ object OnboardingUpgradeHelper {
         textAlign: TextAlign,
         modifier: Modifier = Modifier,
         lineHeight: TextUnit = 16.sp,
+        fontSize: TextUnit = 14.sp,
+        fontWeight: FontWeight = FontWeight.Normal,
         onPrivacyPolicyClick: () -> Unit = {},
         onTermsAndConditionsClick: () -> Unit = {},
     ) {
@@ -411,6 +413,8 @@ object OnboardingUpgradeHelper {
             color = color,
             lineHeight = lineHeight,
             textAlign = textAlign,
+            fontSize = fontSize,
+            fontWeight = fontWeight,
             clickables = listOf(
                 Clickable(
                     text = privacyPolicyText,

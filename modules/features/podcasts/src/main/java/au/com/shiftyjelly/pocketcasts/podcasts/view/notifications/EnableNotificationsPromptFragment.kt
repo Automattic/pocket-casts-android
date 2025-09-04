@@ -76,7 +76,6 @@ internal class EnableNotificationsPromptFragment : BaseDialogFragment() {
                             .fillMaxSize()
                             .padding(22.dp),
                         onCtaClick = viewModel::handleCtaClick,
-                        onDismissClick = ::finalizeAndDismiss,
                         showNewsletterSection = state.showNewsletterOptIn,
                         isNewsletterSelected = state.subscribedToNewsletter,
                         isNotificationSelected = state.notificationsEnabled,

@@ -23,18 +23,20 @@ import androidx.compose.foundation.layout.statusBars
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.layout.wrapContentWidth
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.itemsIndexed
-import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.relocation.BringIntoViewRequester
 import androidx.compose.foundation.relocation.bringIntoViewRequester
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
 import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.scale
@@ -45,7 +47,9 @@ import androidx.compose.ui.focus.FocusRequester.Companion.FocusRequesterFactory.
 import androidx.compose.ui.focus.focusProperties
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.focus.onFocusChanged
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
@@ -56,6 +60,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.tooling.preview.PreviewParameterProvider
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import au.com.shiftyjelly.pocketcasts.account.onboarding.components.UpgradeFeatureItem
 import au.com.shiftyjelly.pocketcasts.account.onboarding.components.UpgradePlanRow
 import au.com.shiftyjelly.pocketcasts.account.onboarding.upgrade.OnboardingUpgradeHelper.PrivacyPolicy
@@ -66,7 +71,6 @@ import au.com.shiftyjelly.pocketcasts.account.onboarding.upgrade.contextual.Pres
 import au.com.shiftyjelly.pocketcasts.account.onboarding.upgrade.contextual.ShuffleAnimation
 import au.com.shiftyjelly.pocketcasts.account.viewmodel.OnboardingUpgradeFeaturesState
 import au.com.shiftyjelly.pocketcasts.compose.AppThemeWithBackground
-import au.com.shiftyjelly.pocketcasts.compose.components.FadedLazyColumn
 import au.com.shiftyjelly.pocketcasts.compose.components.TextH10
 import au.com.shiftyjelly.pocketcasts.compose.components.TextP40
 import au.com.shiftyjelly.pocketcasts.compose.images.SubscriptionBadge
@@ -82,6 +86,8 @@ import au.com.shiftyjelly.pocketcasts.payment.SubscriptionTier
 import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingUpgradeSource
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme.ThemeType
 import au.com.shiftyjelly.pocketcasts.utils.Util
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import java.time.ZonedDateTime
 import java.time.format.DateTimeFormatter
 import java.time.format.FormatStyle
@@ -146,11 +152,11 @@ private fun CompactHeightUpscaledFontUpgradeScreen(
     val coroutineScope = rememberCoroutineScope()
     val contentPages = state.onboardingVariant.toContentPages(
         currentPlan = state.selectedPlan,
-        isEligibleForTrial = state.selectedBasePlan.offer == SubscriptionOffer.Trial,
+        isEligibleForTrial = state.selectedBasePlan.offer == SubscriptionOffer.Trial && FeatureFlag.isEnabled(Feature.NEW_ONBOARDING_UPGRADE_TRIAL_TIMELINE),
         plan = state.selectedBasePlan,
         source = source,
     )
-    val listState = rememberLazyListState()
+    val listState = rememberScrollState()
 
     Column(
         modifier = modifier,
@@ -163,24 +169,30 @@ private fun CompactHeightUpscaledFontUpgradeScreen(
             source = source,
             onClosePress = onClosePress,
         )
-        Spacer(modifier = Modifier.height(12.dp))
-        LazyColumn(
-            state = listState,
-        ) {
-            contentPages.forEachIndexed { index, content ->
-                item {
+        Box {
+            Column(
+                modifier = Modifier
+                    .verticalScroll(listState),
+            ) {
+                contentPages.forEachIndexed { index, content ->
+                    var contentSize by remember { mutableIntStateOf(0) }
                     val scrollToNext: () -> Unit = {
                         coroutineScope.launch {
-                            listState.animateScrollToItem((index + 1) % contentPages.size)
+                            listState.animateScrollTo(((index + 1) % contentPages.size) * contentSize)
                         }
                     }
-                    content.toComponent(index = index, scrollToNext = scrollToNext, modifier = Modifier.height(IntrinsicSize.Min))()
+                    content.toComponent(
+                        index = index,
+                        scrollToNext = scrollToNext,
+                        modifier = Modifier
+                            .height(IntrinsicSize.Min)
+                            .padding(top = if (index == 0) 32.dp else 0.dp)
+                            .onSizeChanged {
+                                contentSize = it.height
+                            },
+                    )()
                 }
-            }
-            item {
                 Spacer(modifier = Modifier.height(24.dp))
-            }
-            item {
                 UpgradeFooter(
                     modifier = Modifier
                         .padding(
@@ -199,6 +211,18 @@ private fun CompactHeightUpscaledFontUpgradeScreen(
                     upFocusRequester = FocusRequester.Default,
                 )
             }
+            Box(
+                modifier = Modifier
+                    .height(42.dp)
+                    .fillMaxWidth()
+                    .background(
+                        brush = Brush.verticalGradient(
+                            0f to MaterialTheme.colors.background,
+                            .15f to MaterialTheme.colors.background,
+                            1f to Color.Transparent,
+                        ),
+                    ),
+            )
         }
     }
 }
@@ -227,12 +251,11 @@ private fun RegularUpgradeScreen(
             source = source,
             onClosePress = onClosePress,
         )
-        Spacer(modifier = Modifier.height(12.dp))
         UpgradeContent(
             modifier = Modifier.weight(weight = 1f),
             pages = state.onboardingVariant.toContentPages(
                 currentPlan = state.selectedPlan,
-                isEligibleForTrial = state.selectedBasePlan.offer == SubscriptionOffer.Trial,
+                isEligibleForTrial = state.selectedBasePlan.offer == SubscriptionOffer.Trial && FeatureFlag.isEnabled(Feature.NEW_ONBOARDING_UPGRADE_TRIAL_TIMELINE),
                 plan = state.selectedBasePlan,
                 source = source,
             ),
@@ -242,9 +265,6 @@ private fun RegularUpgradeScreen(
         Spacer(modifier = Modifier.height(24.dp))
         UpgradeFooter(
             modifier = Modifier
-                .padding(
-                    horizontal = 24.dp,
-                )
                 .fillMaxWidth(),
             plans = state.availableBasePlans,
             selectedOnboardingPlan = state.selectedPlan,
@@ -285,6 +305,7 @@ private fun UpgradeFooter(
     ) {
         plans.forEachIndexed { index, item ->
             UpgradePlanRow(
+                modifier = Modifier.padding(horizontal = 16.dp),
                 plan = item,
                 isSelected = selectedOnboardingPlan.key == item.key,
                 onClick = { onSelectedChange(item) },
@@ -303,17 +324,22 @@ private fun UpgradeFooter(
             onClick = onClickSubscribe,
             modifier = Modifier
                 .fillMaxWidth()
+                .padding(horizontal = 16.dp)
                 .heightIn(min = 48.dp),
         )
         Spacer(modifier = Modifier.height(12.dp))
         PrivacyPolicy(
             modifier = Modifier
                 .fillMaxWidth()
+                .padding(horizontal = 8.dp)
                 .padding(bottom = 12.dp),
             color = MaterialTheme.theme.colors.secondaryText02,
             textAlign = TextAlign.Center,
             onPrivacyPolicyClick = onPrivacyPolicyClick,
             onTermsAndConditionsClick = onTermsAndConditionsClick,
+            fontSize = 11.sp,
+            lineHeight = 12.sp,
+            fontWeight = FontWeight.W600,
         )
     }
 }
@@ -526,13 +552,15 @@ private fun UpgradeContent(
     modifier: Modifier = Modifier,
 ) {
     val coroutineScope = rememberCoroutineScope()
-    val listState = rememberLazyListState()
+    val scrollState = rememberScrollState()
+    var contentHeight by remember { mutableIntStateOf(0) }
+    val backgroundColor = MaterialTheme.colors.background
 
     BoxWithConstraints(
         modifier = modifier,
     ) {
         val itemHeight = this@BoxWithConstraints.maxHeight
-        FadedLazyColumn(
+        Column(
             modifier = Modifier
                 .fillMaxSize()
                 .focusRequester(selfFocusRequester)
@@ -542,10 +570,13 @@ private fun UpgradeContent(
                             downFocusRequester.requestFocus()
                         }
                     }
+                }
+                .verticalScroll(scrollState)
+                .onSizeChanged {
+                    contentHeight = it.height
                 },
-            state = listState,
         ) {
-            itemsIndexed(pages) { index, page ->
+            pages.forEachIndexed { index, content ->
                 val bringIntoViewRequester = remember { BringIntoViewRequester() }
 
                 val baseModifier = Modifier
@@ -556,14 +587,46 @@ private fun UpgradeContent(
                             coroutineScope.launch { bringIntoViewRequester.bringIntoView() }
                         }
                     }
+                    .padding(
+                        top = if (index == 0) {
+                            18.dp
+                        } else {
+                            0.dp
+                        },
+                    )
                 val scrollToNext: () -> Unit = {
                     coroutineScope.launch {
-                        listState.animateScrollToItem((index + 1) % pages.size)
+                        scrollState.animateScrollTo(((index + 1) % pages.size) * contentHeight)
                     }
                 }
-                page.toComponent(index = index, scrollToNext = scrollToNext, modifier = baseModifier)()
+                content.toComponent(index = index, scrollToNext = scrollToNext, modifier = baseModifier)()
             }
         }
+        Box(
+            modifier = Modifier
+                .height(24.dp)
+                .fillMaxWidth()
+                .background(
+                    brush = Brush.verticalGradient(
+                        0f to backgroundColor,
+                        .3f to backgroundColor,
+                        1f to Color.Transparent,
+                    ),
+                ),
+        )
+        Box(
+            modifier = Modifier
+                .height(24.dp)
+                .fillMaxWidth()
+                .align(Alignment.BottomCenter)
+                .background(
+                    brush = Brush.verticalGradient(
+                        0f to Color.Transparent,
+                        .3f to Color.Transparent,
+                        1f to backgroundColor,
+                    ),
+                ),
+        )
     }
 }
 
@@ -573,7 +636,7 @@ private fun UpgradePagerContent.toComponent(
     scrollToNext: () -> Unit,
     modifier: Modifier = Modifier,
 ): @Composable () -> Unit {
-    val topPaddingForGenericContent = if (index != 0) 32.dp else 0.dp
+    val topPaddingForGenericContent = if (index != 0) 16.dp else 0.dp
     return {
         when (this) {
             is UpgradePagerContent.Features -> FeaturesContent(
@@ -635,6 +698,8 @@ private fun FeaturesContent(
                 item = item,
                 iconColor = MaterialTheme.theme.colors.primaryText01,
                 textColor = MaterialTheme.theme.colors.secondaryText02,
+                iconSize = 18.dp,
+                spacing = 12.dp,
             )
         }
         if (features.showCta) {
@@ -699,7 +764,8 @@ private fun FoldersUpgradeContent(
         }
 
         Box(
-            modifier = Modifier.fillMaxWidth()
+            modifier = Modifier
+                .fillMaxWidth()
                 .weight(1f)
                 .padding(bottom = 32.dp),
             contentAlignment = Alignment.Center,

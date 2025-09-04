@@ -7,6 +7,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.FlowRow
+import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -15,6 +16,7 @@ import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.ButtonDefaults
 import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -22,6 +24,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -42,6 +45,7 @@ import au.com.shiftyjelly.pocketcasts.compose.preview.ThemePreviewParameterProvi
 import au.com.shiftyjelly.pocketcasts.compose.theme
 import au.com.shiftyjelly.pocketcasts.servers.model.DiscoverCategory
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
+import au.com.shiftyjelly.pocketcasts.utils.Util
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 @Composable
@@ -105,9 +109,9 @@ private fun Content(
         TextP40(
             modifier = Modifier
                 .align(Alignment.End)
-                .padding(top = 10.dp)
+                .padding(top = 11.dp)
                 .clickable(onClick = onNotNowPress)
-                .padding(horizontal = 4.dp, vertical = 2.dp),
+                .padding(horizontal = 8.dp, vertical = 4.dp),
             text = stringResource(LR.string.not_now),
             color = MaterialTheme.theme.colors.primaryInteractive01,
             fontWeight = FontWeight.W500,
@@ -133,39 +137,30 @@ private fun Content(
         )
         Spacer(modifier = Modifier.height(16.dp))
 
+        val columnCount = if (Util.isTablet(LocalContext.current)) {
+            3
+        } else {
+            2
+        }
         FlowRow(
             modifier = Modifier
-                .then(
-                    if (state.isShowingAllCategories) {
-                        Modifier
-                            .weight(1f)
-                            .verticalScroll(rememberScrollState())
-                    } else {
-                        Modifier
-                    },
-                )
+                .height(IntrinsicSize.Min)
+                .verticalScroll(rememberScrollState())
                 .fillMaxWidth()
                 .animateContentSize(),
             horizontalArrangement = Arrangement.spacedBy(8.dp, alignment = Alignment.CenterHorizontally),
             verticalArrangement = Arrangement.spacedBy(8.dp),
-            maxItemsInEachRow = 2,
+            maxItemsInEachRow = columnCount,
         ) {
             state.displayedCategories.forEachIndexed { index, item ->
                 // add internal padding to prevent children being clipped during select animation
                 if (index == state.displayedCategories.indices.first) {
-                    repeat(2) {
+                    repeat(columnCount) {
                         Spacer(modifier = Modifier.height(8.dp))
                     }
                 }
                 InterestCategoryPill(
-                    modifier = Modifier.wrapContentWidth()
-                        .then(
-                            if (index % 2 == 0) {
-                                Modifier.padding(start = 12.dp)
-                            } else {
-                                Modifier.padding(end = 12.dp)
-                            },
-                        ),
+                    modifier = Modifier.wrapContentWidth(),
                     category = item,
                     isSelected = state.selectedCategories.contains(item),
                     onSelectedChange = { isSelected -> onCategorySelectionChange(item, isSelected) },
@@ -173,16 +168,15 @@ private fun Content(
                 )
                 // add internal padding ot prevent children being clipped during select animation
                 if (index == state.displayedCategories.indices.last) {
-                    repeat(2) {
+                    repeat(columnCount) {
                         Spacer(modifier = Modifier.height(8.dp))
                     }
                 }
             }
         }
 
-        Spacer(modifier = Modifier.height(24.dp))
-
         if (!state.isShowingAllCategories) {
+            Spacer(modifier = Modifier.height(24.dp))
             TextP40(
                 text = stringResource(LR.string.onboarding_interests_show_more),
                 color = MaterialTheme.theme.colors.primaryInteractive01,
@@ -195,9 +189,14 @@ private fun Content(
         }
 
         RowButton(
+            modifier = Modifier.padding(bottom = 16.dp, top = 24.dp),
             text = stringResource(state.ctaLabelResId),
             enabled = state.isCtaEnabled,
             onClick = onContinuePress,
+            includePadding = false,
+            colors = ButtonDefaults.buttonColors(
+                disabledBackgroundColor = MaterialTheme.theme.colors.primaryInteractive01.copy(alpha = .5f),
+            ),
         )
     }
 }

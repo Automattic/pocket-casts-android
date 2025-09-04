@@ -7,6 +7,8 @@
 *   New Features
     *   Onboarding Account Creation Improvements
         ([#4405](https://github.com/Automattic/pocket-casts-android/pull/4405))
+    *   Onboarding Recommendation Changes
+        ([#4431](https://github.com/Automattic/pocket-casts-android/pull/4431))
 *   Updates
     *   Improved notification permission experience
         ([#4408](https://github.com/Automattic/pocket-casts-android/pull/4408))

@@ -38,7 +38,6 @@ import au.com.shiftyjelly.pocketcasts.compose.AppThemeWithBackground
 import au.com.shiftyjelly.pocketcasts.compose.buttons.RowButton
 import au.com.shiftyjelly.pocketcasts.compose.components.TextH10
 import au.com.shiftyjelly.pocketcasts.compose.components.TextH40
-import au.com.shiftyjelly.pocketcasts.compose.components.TextP40
 import au.com.shiftyjelly.pocketcasts.compose.components.TextP60
 import au.com.shiftyjelly.pocketcasts.compose.preview.ThemePreviewParameterProvider
 import au.com.shiftyjelly.pocketcasts.compose.theme
@@ -54,8 +53,8 @@ internal fun EnableNotificationsPromptScreen(
 ) {
     EnableNotificationsPromptScreenV2(
         onCtaClick = onCtaClick,
-        onDismissClick = onDismissClick,
         modifier = modifier,
+        onDismissClick = onDismissClick,
         isAccountCreationFlagEnabled = false,
         isNotificationSelected = false,
         isNewsletterSelected = false,
@@ -68,7 +67,6 @@ internal fun EnableNotificationsPromptScreen(
 @Composable
 internal fun EnableNotificationsPromptScreenNewOnboarding(
     onCtaClick: () -> Unit,
-    onDismissClick: () -> Unit,
     showNewsletterSection: Boolean,
     isNewsletterSelected: Boolean,
     onNewsletterChange: (Boolean) -> Unit,
@@ -78,7 +76,6 @@ internal fun EnableNotificationsPromptScreenNewOnboarding(
 ) {
     EnableNotificationsPromptScreenV2(
         onCtaClick = onCtaClick,
-        onDismissClick = onDismissClick,
         modifier = modifier,
         isAccountCreationFlagEnabled = true,
         isNotificationSelected = isNotificationSelected,
@@ -92,7 +89,6 @@ internal fun EnableNotificationsPromptScreenNewOnboarding(
 @Composable
 private fun EnableNotificationsPromptScreenV2(
     onCtaClick: () -> Unit,
-    onDismissClick: () -> Unit,
     isAccountCreationFlagEnabled: Boolean,
     showNewsletterSection: Boolean,
     isNewsletterSelected: Boolean,
@@ -100,6 +96,7 @@ private fun EnableNotificationsPromptScreenV2(
     isNotificationSelected: Boolean,
     onNotificationChange: (Boolean) -> Unit,
     modifier: Modifier = Modifier,
+    onDismissClick: (() -> Unit)? = null,
 ) {
     val configuration = LocalConfiguration.current
     val isLandscape = configuration.orientation == Configuration.ORIENTATION_LANDSCAPE
@@ -108,17 +105,19 @@ private fun EnableNotificationsPromptScreenV2(
         modifier = modifier,
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
-        IconButton(
-            onClick = onDismissClick,
-            modifier = Modifier.align(Alignment.End),
-        ) {
-            Icon(
-                painter = painterResource(IR.drawable.ic_close),
-                contentDescription = stringResource(LR.string.close),
-                tint = MaterialTheme.theme.colors.primaryText01,
-            )
-        }
-        Spacer(modifier = Modifier.height(42.dp))
+        onDismissClick?.let {
+            IconButton(
+                onClick = it,
+                modifier = Modifier.align(Alignment.End),
+            ) {
+                Icon(
+                    painter = painterResource(IR.drawable.ic_close),
+                    contentDescription = stringResource(LR.string.close),
+                    tint = MaterialTheme.theme.colors.primaryText01,
+                )
+            }
+            Spacer(modifier = Modifier.height(42.dp))
+        } ?: Spacer(modifier = Modifier.height(84.dp))
 
         if (isLandscape) {
             Row(
@@ -139,11 +138,13 @@ private fun EnableNotificationsPromptScreenV2(
                         textAlign = TextAlign.Center,
                     )
                     Spacer(modifier = Modifier.height(16.dp))
-                    TextP40(
-                        modifier = Modifier.padding(horizontal = 32.dp),
+                    TextP60(
+                        modifier = Modifier.padding(horizontal = 18.dp),
                         text = stringResource(LR.string.notification_prompt_message),
                         color = MaterialTheme.theme.colors.primaryText02,
                         textAlign = TextAlign.Center,
+                        fontWeight = FontWeight.W500,
+                        fontSize = 14.5.sp,
                     )
                     Spacer(modifier = Modifier.weight(1f))
 
@@ -205,11 +206,13 @@ private fun EnableNotificationsPromptScreenV2(
                 color = MaterialTheme.theme.colors.primaryText01,
             )
             Spacer(modifier = Modifier.height(16.dp))
-            TextP40(
-                modifier = Modifier.padding(horizontal = 32.dp),
+            TextP60(
+                modifier = Modifier.padding(horizontal = 18.dp),
                 text = stringResource(LR.string.notification_prompt_message),
                 color = MaterialTheme.theme.colors.primaryText02,
                 textAlign = TextAlign.Center,
+                fontSize = 14.5.sp,
+                lineHeight = 18.sp,
             )
             Spacer(modifier = Modifier.weight(1f))
             if (isAccountCreationFlagEnabled) {
@@ -343,7 +346,6 @@ private fun EnableNotificationsPromptScreenV2Preview(
     @PreviewParameter(ThemePreviewParameterProvider::class) themeType: Theme.ThemeType,
 ) = AppThemeWithBackground(themeType) {
     EnableNotificationsPromptScreenNewOnboarding(
-        onDismissClick = {},
         onCtaClick = {},
         isNewsletterSelected = true,
         isNotificationSelected = false,
