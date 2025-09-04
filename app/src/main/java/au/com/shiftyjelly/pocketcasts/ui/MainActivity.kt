@@ -334,10 +334,12 @@ class MainActivity :
     private val onboardingLauncher: ActivityResultLauncher<Intent> = registerForActivityResult(OnboardingActivityContract()) { result ->
         when (result) {
             is OnboardingFinish.Done -> {
+                if (!settings.hasCompletedOnboarding()) {
+                    val podcastCount = runBlocking(Dispatchers.Default) { podcastManager.countSubscribed() }
+                    val landingTab = if (podcastCount == 0) VR.id.navigation_discover else VR.id.navigation_podcasts
+                    openTab(landingTab)
+                }
                 settings.setHasDoneInitialOnboarding()
-                val podcastCount = runBlocking(Dispatchers.Default) { podcastManager.countSubscribed() }
-                val landingTab = if (podcastCount == 0) VR.id.navigation_discover else VR.id.navigation_podcasts
-                openTab(landingTab)
             }
 
             is OnboardingFinish.DoneGoToDiscover -> {
