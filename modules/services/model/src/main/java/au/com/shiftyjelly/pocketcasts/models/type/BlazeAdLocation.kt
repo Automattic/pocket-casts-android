@@ -8,7 +8,7 @@ import com.squareup.moshi.JsonWriter
 enum class BlazeAdLocation(val value: String, val analyticsName: String, val feature: Feature?) {
     PodcastList(
         value = "podcastList",
-        analyticsName = "podcasts_list",
+        analyticsName = "podcast_list",
         feature = Feature.BANNER_ADS_PODCASTS,
     ),
     Player(
