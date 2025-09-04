@@ -57,7 +57,7 @@ class PlaylistViewModel @AssistedInject constructor(
     val searchState = SearchFieldState()
 
     val uiState = searchState.textFlow
-        .flatMapLatest { searchTerm -> playlistManager.observeSmartPlaylist(playlistUuid, searchTerm) }
+        .flatMapLatest { searchTerm -> playlistManager.smartPlaylistFlow(playlistUuid, searchTerm) }
         .map { UiState(it) }
         .stateIn(viewModelScope, SharingStarted.Lazily, initialValue = UiState.Empty)
 

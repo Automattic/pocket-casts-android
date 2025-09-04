@@ -38,7 +38,7 @@ class EditRulesViewModel @AssistedInject constructor(
     private var rulesEditor: SmartRulesEditor? = null
 
     val uiState = flow {
-        val playlist = playlistManager.observeSmartPlaylist(playlistUuid).first()
+        val playlist = playlistManager.smartPlaylistFlow(playlistUuid).first()
         if (playlist != null) {
             val smartRules = playlist.smartRules
             val editor = rulesEditorFactory.create(

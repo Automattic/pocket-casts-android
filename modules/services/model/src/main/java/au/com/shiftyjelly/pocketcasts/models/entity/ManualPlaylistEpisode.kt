@@ -27,24 +27,4 @@ data class ManualPlaylistEpisode(
     @ColumnInfo(name = "podcast_slug") val podcastSlug: String,
     @ColumnInfo(name = "sort_position") val sortPosition: Int,
     @ColumnInfo(name = "is_synced") val isSynced: Boolean,
-) {
-    companion object {
-        fun test(
-            playlistUuid: String,
-            episodeUuid: String,
-            podcastUuid: String,
-        ) = ManualPlaylistEpisode(
-            playlistUuid = playlistUuid,
-            episodeUuid = episodeUuid,
-            podcastUuid = podcastUuid,
-            title = "",
-            addedAt = Instant.now(),
-            publishedAt = Instant.EPOCH,
-            downloadUrl = null,
-            episodeSlug = "",
-            podcastSlug = "",
-            sortPosition = 0,
-            isSynced = true,
-        )
-    }
-}
+)

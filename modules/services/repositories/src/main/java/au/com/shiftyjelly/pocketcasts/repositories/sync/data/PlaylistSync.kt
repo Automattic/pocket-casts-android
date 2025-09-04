@@ -75,9 +75,9 @@ internal class PlaylistSync(
         val (_, smartPlaylists) = remainingPlaylist.partition(isManual)
 
         appDatabase.withTransaction {
-            playlistDao.deleteAll(deletedPlaylists.map(getUuid))
+            playlistDao.deleteAllPlaylistsIn(deletedPlaylists.map(getUuid))
 
-            val existingPlaylists = playlistDao.getAllPlaylists(smartPlaylists.map(getUuid))
+            val existingPlaylists = playlistDao.getAllPlaylistsIn(smartPlaylists.map(getUuid))
             val existingPlaylistUuids = existingPlaylists.map(PlaylistEntity::uuid)
             existingPlaylists.forEach { playlist ->
                 val serverPlaylist = remainingPlaylistsMap[playlist.uuid] ?: return@forEach
@@ -95,7 +95,7 @@ internal class PlaylistSync(
     }
 
     suspend fun incrementalData(): List<Record> {
-        val playlists = playlistDao.getAllUnsynced()
+        val playlists = playlistDao.getAllUnsyncedPlaylists()
         return withContext(Dispatchers.Default) {
             playlists.map { localPlaylist ->
                 record {
