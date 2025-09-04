@@ -8,10 +8,12 @@ import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.pluralStringResource
@@ -39,8 +41,14 @@ internal fun EpisodeSourcesColumn(
     sources: List<ManualPlaylistEpisodeSource>,
     onClickSource: (ManualPlaylistEpisodeSource) -> Unit,
     modifier: Modifier = Modifier,
+    listState: LazyListState = rememberLazyListState(),
 ) {
+    LaunchedEffect(sources) {
+        listState.scrollToItem(0)
+    }
+
     FadedLazyColumn(
+        state = listState,
         modifier = modifier,
     ) {
         item(key = "header", contentType = "header") {
@@ -120,13 +128,9 @@ private fun FolderSourceRow(
         description = pluralStringResource(LR.plurals.podcasts_count, podcastCount, podcastCount),
         modifier = modifier,
     ) {
-        val topPodcasts = source.podcastSources.take(4)
-        val podcastUuids = remember(topPodcasts) {
-            topPodcasts.map(ManualPlaylistPodcastSource::uuid)
-        }
         FolderImageSmall(
             color = MaterialTheme.theme.colors.getFolderColor(source.color),
-            podcastUuids = podcastUuids,
+            podcastUuids = source.podcastSources.take(4),
         )
     }
 }
@@ -164,7 +168,7 @@ private fun BaseSourceRow(
 
 @Preview
 @Composable
-private fun EpisodesSourcesColumnPreview(
+private fun EpisodeSourcesColumnPreview(
     @PreviewParameter(ThemePreviewParameterProvider::class) themeType: Theme.ThemeType,
 ) {
     AppThemeWithBackground(themeType) {
@@ -189,25 +193,13 @@ private fun EpisodesSourcesColumnPreview(
                     uuid = "id-1",
                     title = "Folder Title 1",
                     color = 0,
-                    podcastSources = List(10) { index ->
-                        ManualPlaylistPodcastSource(
-                            uuid = "id-${index + 100}",
-                            title = "Podcast Title ${index + 100}",
-                            author = "Podcast Author ${index + 100}",
-                        )
-                    },
+                    podcastSources = List(10) { index -> "id-${index + 100}" },
                 ),
                 ManualPlaylistFolderSource(
                     uuid = "id-2",
                     title = "Folder Title 2",
                     color = 1,
-                    podcastSources = List(2) { index ->
-                        ManualPlaylistPodcastSource(
-                            uuid = "id-${index + 200}",
-                            title = "Podcast Title ${index + 200}",
-                            author = "Podcast Author ${index + 200}",
-                        )
-                    },
+                    podcastSources = List(2) { index -> "id-${index + 200}" },
                 ),
             ),
             onClickSource = {},

@@ -113,9 +113,9 @@ fun GiveRatingScreen(
         }
 
         NavigationIconButton(
-            iconColor = MaterialTheme.theme.colors.primaryText01,
+            tint = MaterialTheme.theme.colors.primaryText01,
             navigationButton = NavigationButton.Close,
-            onNavigationClick = onDismiss,
+            onClick = onDismiss,
             modifier = Modifier
                 .align(Alignment.TopStart)
                 .padding(16.dp),

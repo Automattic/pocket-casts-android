@@ -21,7 +21,7 @@ class PlaylistViewModel @AssistedInject constructor(
 ) : ViewModel() {
     val bottomInset = settings.bottomInset
 
-    val uiState = playlistManager.observeManualPlaylist(playlistUuid)
+    val uiState = playlistManager.manualPlaylistFlow(playlistUuid)
         .map { UiState(it) }
         .stateIn(viewModelScope, SharingStarted.Lazily, initialValue = UiState.Empty)
 

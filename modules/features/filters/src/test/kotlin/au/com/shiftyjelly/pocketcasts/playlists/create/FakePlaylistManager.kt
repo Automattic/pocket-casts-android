@@ -2,6 +2,7 @@ package au.com.shiftyjelly.pocketcasts.playlists.create
 
 import app.cash.turbine.Turbine
 import au.com.shiftyjelly.pocketcasts.models.entity.ManualPlaylistEpisodeSource
+import au.com.shiftyjelly.pocketcasts.models.entity.ManualPlaylistPodcastSource
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.models.to.PlaylistEpisodeMetadata
 import au.com.shiftyjelly.pocketcasts.models.type.PlaylistEpisodeSortType
@@ -15,32 +16,23 @@ import java.util.UUID
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.flowOf
 
 class FakePlaylistManager : PlaylistManager {
     val playlistPreviews = MutableStateFlow(emptyList<PlaylistPreview>())
-    override fun observePlaylistsPreview() = playlistPreviews.asStateFlow()
+    override fun playlistPreviewsFlow(): Flow<List<PlaylistPreview>> {
+        return playlistPreviews.asStateFlow()
+    }
 
-    val smartPlaylist = MutableStateFlow<SmartPlaylist?>(null)
-    override fun observeSmartPlaylist(uuid: String, episodeSearchTerm: String?): Flow<SmartPlaylist?> = smartPlaylist
+    override suspend fun sortPlaylists(sortedUuids: List<String>) = Unit
 
-    val manualPlaylist = MutableStateFlow<ManualPlaylist?>(null)
-    override fun observeManualPlaylist(uuid: String): Flow<ManualPlaylist?> = manualPlaylist
+    override suspend fun updateName(uuid: String, name: String) = Unit
 
-    val smartEpisodes = MutableStateFlow(emptyList<PodcastEpisode>())
-    override fun observeSmartEpisodes(rules: SmartRules, sortType: PlaylistEpisodeSortType, searchTerm: String?) = smartEpisodes.asStateFlow()
-
-    val episodeMetadata = MutableStateFlow(PlaylistEpisodeMetadata.Empty)
-    override fun observeEpisodeMetadata(rules: SmartRules) = episodeMetadata.asStateFlow()
-
-    override suspend fun updateSmartRules(uuid: String, rules: SmartRules) = Unit
-
-    override suspend fun updateSortType(uuid: String, sortType: PlaylistEpisodeSortType) = Unit
+    override suspend fun updateSortType(uuid: String, type: PlaylistEpisodeSortType) = Unit
 
     override suspend fun updateAutoDownload(uuid: String, isEnabled: Boolean) = Unit
 
     override suspend fun updateAutoDownloadLimit(uuid: String, limit: Int) = Unit
-
-    override suspend fun updateName(uuid: String, name: String) = Unit
 
     override suspend fun deletePlaylist(uuid: String) = Unit
 
@@ -50,13 +42,47 @@ class FakePlaylistManager : PlaylistManager {
         return UUID.randomUUID().toString()
     }
 
+    val smartPlaylist = MutableStateFlow<SmartPlaylist?>(null)
+    override fun smartPlaylistFlow(uuid: String, searchTerm: String?): Flow<SmartPlaylist?> {
+        return smartPlaylist
+    }
+
+    val smartEpisodes = MutableStateFlow(emptyList<PodcastEpisode>())
+    override fun smartEpisodesFlow(rules: SmartRules, sortType: PlaylistEpisodeSortType, searchTerm: String?): Flow<List<PodcastEpisode>> {
+        return smartEpisodes
+    }
+
+    val smartEpisodesMetadata = MutableStateFlow(PlaylistEpisodeMetadata.Empty)
+    override fun smartEpisodesMetadataFlow(rules: SmartRules): Flow<PlaylistEpisodeMetadata> {
+        return smartEpisodesMetadata
+    }
+
+    override suspend fun updateSmartRules(uuid: String, rules: SmartRules) = Unit
+
     val createManualPlaylistTurbine = Turbine<String>(name = "createManualPlaylistTurbine")
     override suspend fun createManualPlaylist(name: String): String {
         createManualPlaylistTurbine.add(name)
         return UUID.randomUUID().toString()
     }
 
-    override suspend fun updatePlaylistsOrder(sortedUuids: List<String>) = Unit
+    val manualPlaylist = MutableStateFlow<ManualPlaylist?>(null)
+    override fun manualPlaylistFlow(uuid: String): Flow<ManualPlaylist?> {
+        return manualPlaylist
+    }
 
-    override suspend fun getManualPlaylistEpisodeSources(): List<ManualPlaylistEpisodeSource> = emptyList()
+    override suspend fun getManualEpisodeSources(searchTerm: String?): List<ManualPlaylistEpisodeSource> {
+        return emptyList()
+    }
+
+    override suspend fun getManualEpisodeSourcesForFolder(folderUuid: String, searchTerm: String?): List<ManualPlaylistPodcastSource> {
+        return emptyList()
+    }
+
+    override fun notAddedManualEpisodesFlow(playlistUuid: String, podcastUuid: String, searchTerm: String?): Flow<List<PodcastEpisode>> {
+        return flowOf(emptyList())
+    }
+
+    override suspend fun addManualEpisode(playlistUuid: String, episodeUuid: String): Boolean {
+        return true
+    }
 }
