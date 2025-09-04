@@ -12,6 +12,7 @@ import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.children
 import au.com.shiftyjelly.pocketcasts.views.R
+import au.com.shiftyjelly.pocketcasts.views.extensions.announceAccessibility
 import dagger.hilt.android.internal.managers.FragmentComponentManager
 import java.util.Timer
 import java.util.TimerTask
@@ -39,7 +40,7 @@ class NumericStepper @JvmOverloads constructor(
             lblValue.contentDescription = voiceOverFormatter(field)
             onValueChanged?.invoke(field)
 
-            lblValue.announceForAccessibility(lblValue.contentDescription)
+            lblValue.announceAccessibility(lblValue.contentDescription)
         }
 
     var onValueChanged: ((Int) -> Unit)? = null
@@ -77,7 +78,7 @@ class NumericStepper @JvmOverloads constructor(
 
     init {
         orientation = HORIZONTAL
-        View.inflate(context, R.layout.layout_numeric_stepper, this)
+        inflate(context, R.layout.layout_numeric_stepper, this)
 
         btnMinus = findViewById(R.id.btnMinus)
         btnPlus = findViewById(R.id.btnPlus)
@@ -141,6 +142,7 @@ class NumericStepper @JvmOverloads constructor(
                 holdTimer?.cancel()
                 holdTimer = null
             }
+
             MotionEvent.ACTION_DOWN -> {
                 view.isPressed = true // This makes sure the ripple effect still works
                 value = nextValue

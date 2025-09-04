@@ -12,6 +12,7 @@ import org.junit.runner.RunWith
 @RunWith(AndroidJUnit4ClassRunner::class)
 class LocalisationTests {
 
+    @Suppress("DEPRECATION")
     private val locales = listOf(
         Locale("en", "EN"),
         Locale("de", "DE"),
