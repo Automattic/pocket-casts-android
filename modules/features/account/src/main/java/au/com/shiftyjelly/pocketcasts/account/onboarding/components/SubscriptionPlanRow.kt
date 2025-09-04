@@ -34,6 +34,7 @@ import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import au.com.shiftyjelly.pocketcasts.compose.AppThemeWithBackground
@@ -121,22 +122,25 @@ private data class RowConfig(
     val verticalPadding: Dp,
     val labelSpacing: Dp,
     val pricePerPeriod: PricePerPeriod,
+    val mainTextSize: TextUnit,
 ) {
     companion object {
         fun availablePlansConfig() = RowConfig(
             badgeText = BadgeText.StaticTextResource(LR.string.best_value),
             badgePosition = BadgePosition.RIGHT,
-            verticalPadding = 0.dp,
-            labelSpacing = 0.dp,
+            verticalPadding = 12.dp,
+            labelSpacing = 2.dp,
             pricePerPeriod = PricePerPeriod.PRICE_PER_MONTH,
+            mainTextSize = 18.sp,
         )
 
         fun upgradePlansConfig(calculatedSavingPercent: Int?) = RowConfig(
             badgeText = BadgeText.CalculatedText { calculatedSavingPercent?.let { stringResource(LR.string.onboarding_upgrade_save_percent, calculatedSavingPercent) }.orEmpty() },
             badgePosition = BadgePosition.CENTER,
-            verticalPadding = 4.dp,
+            verticalPadding = 18.dp,
             labelSpacing = 4.dp,
             pricePerPeriod = PricePerPeriod.PRICE_PER_WEEK,
+            mainTextSize = 15.sp,
         )
     }
 }
@@ -174,8 +178,7 @@ private fun SubscriptionPlanRow(
                     indication = ripple(color = MaterialTheme.theme.colors.primaryIcon01),
                     interactionSource = null,
                 )
-                .padding(vertical = rowConfig.verticalPadding)
-                .padding(16.dp),
+                .padding(vertical = rowConfig.verticalPadding, horizontal = 16.dp),
         ) {
             CheckMark(
                 isSelected = isSelected,
@@ -192,12 +195,13 @@ private fun SubscriptionPlanRow(
             ) {
                 TextH30(
                     text = plan.name,
+                    fontSize = rowConfig.mainTextSize,
                 )
                 TextP40(
                     text = plan.price(),
+                    lineHeight = 16.sp,
                     color = MaterialTheme.theme.colors.primaryText02,
                     fontSize = 15.sp,
-                    lineHeight = 21.sp,
                 )
             }
             plan.pricePerPeriod(rowConfig)?.let {
@@ -205,7 +209,6 @@ private fun SubscriptionPlanRow(
                     text = it,
                     color = MaterialTheme.theme.colors.primaryText02,
                     fontSize = 15.sp,
-                    lineHeight = 21.sp,
                     modifier = Modifier.align(Alignment.CenterVertically),
                 )
             }

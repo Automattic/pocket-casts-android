@@ -16,27 +16,36 @@ import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.statusBars
+import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyGridScope
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
+import androidx.compose.foundation.lazy.grid.rememberLazyGridState
 import androidx.compose.foundation.progressSemantics
 import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.drawWithContent
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.geometry.Size
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.CompositingStrategy
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.clearAndSetSemantics
 import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
@@ -55,7 +64,6 @@ import au.com.shiftyjelly.pocketcasts.compose.buttons.RowOutlinedButton
 import au.com.shiftyjelly.pocketcasts.compose.components.SearchBarButton
 import au.com.shiftyjelly.pocketcasts.compose.components.TextH10
 import au.com.shiftyjelly.pocketcasts.compose.components.TextH20
-import au.com.shiftyjelly.pocketcasts.compose.components.TextH30
 import au.com.shiftyjelly.pocketcasts.compose.components.TextH60
 import au.com.shiftyjelly.pocketcasts.compose.components.TextP40
 import au.com.shiftyjelly.pocketcasts.compose.components.textH60FontSize
@@ -160,40 +168,69 @@ private fun Content(
             else -> numToShowDefault / 2
         }
 
+        val size = with(LocalDensity.current) {
+            64.dp.toPx()
+        }
+        val gridState = rememberLazyGridState()
+        val backgroundColor = MaterialTheme.colors.background
         LazyVerticalGrid(
+            state = gridState,
             columns = GridCells.Fixed(numColumns),
             contentPadding = PaddingValues(horizontal = 24.dp),
             verticalArrangement = Arrangement.spacedBy(16.dp),
             horizontalArrangement = Arrangement.spacedBy(9.dp),
-            modifier = Modifier.weight(1f),
+            modifier = Modifier
+                .systemBarsPadding()
+                .weight(1f)
+                .graphicsLayer {
+                    compositingStrategy = CompositingStrategy.Offscreen
+                }
+                .drawWithContent {
+                    drawContent()
+                    val height = gridState.layoutInfo.viewportSize.height
+                    val endOffset = height - size
+                    drawRect(
+                        brush = Brush.verticalGradient(
+                            0f to Color.Transparent,
+                            0.15f to Color.Transparent,
+                            1f to backgroundColor,
+                            startY = endOffset,
+                            endY = Float.POSITIVE_INFINITY,
+                        ),
+                        size = Size(height = size, width = gridState.layoutInfo.viewportSize.width.toFloat()),
+                        topLeft = Offset(x = 0f, y = endOffset),
+                    )
+                },
         ) {
             header {
                 Column {
-                    Spacer(Modifier.windowInsetsPadding(WindowInsets.statusBars))
-                    Row(
-                        horizontalArrangement = Arrangement.End,
+                    TextP40(
+                        text = stringResource(LR.string.onboarding_recommendations_import),
+                        color = importColor,
+                        fontWeight = FontWeight.W500,
                         modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(bottom = 18.dp),
+                            .align(alignment = Alignment.End)
+                            .padding(
+                                top = 11.dp,
+                            )
+                            .clickable { onImportClick() }
+                            .padding(horizontal = 8.dp, vertical = 4.dp),
+                    )
 
-                    ) {
-                        TextH30(
-                            text = stringResource(LR.string.onboarding_recommendations_import),
-                            color = importColor,
-                            modifier = Modifier
-                                .clickable { onImportClick() }
-                                .padding(horizontal = 16.dp, vertical = 9.dp),
-                        )
-                    }
+                    Spacer(modifier = Modifier.height(24.dp))
 
                     TextH10(
                         text = title,
                         modifier = Modifier.padding(bottom = 16.dp),
+                        textAlign = if (FeatureFlag.isEnabled(Feature.NEW_ONBOARDING_RECOMMENDATIONS)) TextAlign.Center else null,
                     )
 
                     TextP40(
                         text = message,
                         modifier = Modifier.padding(bottom = 16.dp),
+                        textAlign = if (FeatureFlag.isEnabled(Feature.NEW_ONBOARDING_RECOMMENDATIONS)) TextAlign.Center else null,
+                        color = if (FeatureFlag.isEnabled(Feature.NEW_ONBOARDING_RECOMMENDATIONS)) MaterialTheme.theme.colors.primaryText02 else MaterialTheme.theme.colors.primaryText01,
+                        fontWeight = if (FeatureFlag.isEnabled(Feature.NEW_ONBOARDING_RECOMMENDATIONS)) FontWeight.W500 else null,
                     )
 
                     SearchBarButton(
@@ -225,13 +262,15 @@ private fun Content(
             }
         }
 
-        Surface(elevation = 8.dp) {
-            RowButton(
-                text = stringResource(buttonRes),
-                onClick = onComplete,
-                modifier = Modifier.windowInsetsPadding(WindowInsets.navigationBars),
-            )
-        }
+        RowButton(
+            text = stringResource(buttonRes),
+            onClick = onComplete,
+            includePadding = false,
+            modifier = Modifier
+                .windowInsetsPadding(WindowInsets.navigationBars)
+                .padding(horizontal = 16.dp)
+                .padding(bottom = 16.dp),
+        )
     }
 }
 

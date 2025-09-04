@@ -141,7 +141,7 @@ internal fun NewOnboardingLoginPage(
             TextP50(
                 text = stringResource(LR.string.profile_forgot_your_password),
                 color = MaterialTheme.theme.colors.primaryInteractive01,
-                fontWeight = FontWeight.W400,
+                fontWeight = FontWeight.W500,
                 modifier = Modifier
                     .clickable {
                         viewModel.onForgotPasswordTapped(flow)
@@ -170,7 +170,7 @@ internal fun NewOnboardingLoginPage(
                     Box(
                         modifier = Modifier
                             .weight(1f)
-                            .height(.5.dp)
+                            .height(.75.dp)
                             .background(color = MaterialTheme.theme.colors.primaryUi05),
                     )
                     TextC50(
@@ -181,7 +181,7 @@ internal fun NewOnboardingLoginPage(
                     Box(
                         modifier = Modifier
                             .weight(1f)
-                            .height(.5.dp)
+                            .height(.75.dp)
                             .background(color = MaterialTheme.theme.colors.primaryUi05),
                     )
                 }

@@ -278,7 +278,7 @@ private fun AnimatedCarouselItemContainer(
         TextH10(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(horizontal = 36.dp)
+                .padding(horizontal = 12.dp)
                 .offset {
                     IntOffset(x = 0, y = mainTextYOffset.roundToPx())
                 }

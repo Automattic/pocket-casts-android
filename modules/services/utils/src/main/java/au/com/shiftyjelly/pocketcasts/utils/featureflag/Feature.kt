@@ -170,6 +170,14 @@ enum class Feature(
         hasFirebaseRemoteFlag = true,
         hasDevToggle = true,
     ),
+    NEW_ONBOARDING_UPGRADE_TRIAL_TIMELINE(
+        key = "new_onboarding_upgrade_trial_timeline",
+        title = "New Onboarding Upgrade Trial Timeline",
+        defaultValue = BuildConfig.DEBUG,
+        tier = FeatureTier.Free,
+        hasFirebaseRemoteFlag = true,
+        hasDevToggle = true,
+    ),
     PLAYLISTS_REBRANDING(
         key = "playlists_rebranding",
         title = "Playlists",

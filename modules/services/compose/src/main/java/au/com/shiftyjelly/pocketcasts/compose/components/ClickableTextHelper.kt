@@ -36,6 +36,8 @@ fun ClickableTextHelper(
     modifier: Modifier = Modifier,
     textAlign: TextAlign = TextAlign.Start,
     color: Color = MaterialTheme.theme.colors.primaryText01,
+    fontSize: TextUnit = 14.sp,
+    fontWeight: FontWeight = FontWeight.Normal,
 ) {
     data class TextData(
         val text: String,
@@ -111,8 +113,8 @@ fun ClickableTextHelper(
         style = TextStyle(
             color = color,
             lineHeight = lineHeight,
-            fontSize = 14.sp,
-            fontWeight = FontWeight.Normal,
+            fontSize = fontSize,
+            fontWeight = fontWeight,
             textAlign = textAlign,
         ),
         modifier = modifier,

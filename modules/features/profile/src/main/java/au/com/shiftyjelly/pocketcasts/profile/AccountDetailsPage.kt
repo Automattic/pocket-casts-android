@@ -8,16 +8,19 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.ButtonDefaults
 import androidx.compose.material.Card
 import androidx.compose.material.Divider
+import androidx.compose.material.LocalRippleConfiguration
 import androidx.compose.material.MaterialTheme
+import androidx.compose.material.RippleConfiguration
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -31,14 +34,15 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import au.com.shiftyjelly.pocketcasts.account.onboarding.upgrade.OnboardingSubscriptionPlan
-import au.com.shiftyjelly.pocketcasts.account.onboarding.upgrade.OnboardingUpgradeHelper.UpgradeRowButton
 import au.com.shiftyjelly.pocketcasts.account.onboarding.upgrade.ProfileUpgradeBanner
 import au.com.shiftyjelly.pocketcasts.account.onboarding.upgrade.ProfileUpgradeBannerState
 import au.com.shiftyjelly.pocketcasts.compose.AppTheme
 import au.com.shiftyjelly.pocketcasts.compose.PreviewAutomotive
 import au.com.shiftyjelly.pocketcasts.compose.PreviewOrientation
 import au.com.shiftyjelly.pocketcasts.compose.bars.ThemedTopAppBar
+import au.com.shiftyjelly.pocketcasts.compose.buttons.RowButton
 import au.com.shiftyjelly.pocketcasts.compose.components.AnimatedNonNullVisibility
+import au.com.shiftyjelly.pocketcasts.compose.components.NoContentBannerColors
 import au.com.shiftyjelly.pocketcasts.compose.components.TextP30
 import au.com.shiftyjelly.pocketcasts.compose.components.TextP60
 import au.com.shiftyjelly.pocketcasts.compose.components.UserAvatarConfig
@@ -231,7 +235,7 @@ private fun NewUpgradeAccountCard(
 ) {
     Card(
         modifier = modifier,
-        shape = RoundedCornerShape(8.dp),
+        shape = RoundedCornerShape(12.dp),
         backgroundColor = MaterialTheme.theme.colors.primaryUi01,
     ) {
         Column(
@@ -264,16 +268,19 @@ private fun NewUpgradeAccountCard(
                 textAlign = TextAlign.Center,
             )
             Spacer(modifier = Modifier.height(12.dp))
-            UpgradeRowButton(
-                primaryText = recommendedPlan.ctaButtonText(isRenewingSubscription = false),
-                backgroundColor = MaterialTheme.theme.colors.primaryInteractive01,
-                textColor = MaterialTheme.theme.colors.primaryInteractive02,
-                fontWeight = FontWeight.W500,
-                onClick = onClickSubscribe,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .heightIn(min = 48.dp),
-            )
+            CompositionLocalProvider(
+                LocalRippleConfiguration provides RippleConfiguration(NoContentBannerColors.default(MaterialTheme.theme.colors).buttonRipple),
+            ) {
+                RowButton(
+                    text = recommendedPlan.ctaButtonText(isRenewingSubscription = false),
+                    colors = ButtonDefaults.buttonColors(
+                        backgroundColor = MaterialTheme.theme.colors.primaryInteractive01,
+                    ),
+                    includePadding = false,
+                    textColor = MaterialTheme.theme.colors.primaryInteractive02,
+                    onClick = onClickSubscribe,
+                )
+            }
         }
     }
 }

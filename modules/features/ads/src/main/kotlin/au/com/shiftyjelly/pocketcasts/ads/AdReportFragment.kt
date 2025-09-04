@@ -88,9 +88,9 @@ class AdReportFragment : BaseDialogFragment() {
         analyticsTracker.track(
             AnalyticsEvent.BANNER_AD_REPORT,
             mapOf(
-                "ad_id" to args.ad.id,
+                "id" to args.ad.id,
                 "reason" to reason.analyticsName,
-                "source" to args.ad.location.analyticsName,
+                "location" to args.ad.location.analyticsName,
             ),
         )
 

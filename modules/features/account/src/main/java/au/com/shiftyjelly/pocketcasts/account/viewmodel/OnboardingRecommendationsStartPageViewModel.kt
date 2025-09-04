@@ -22,6 +22,7 @@ import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import dagger.hilt.android.lifecycle.HiltViewModel
 import java.util.Locale
 import javax.inject.Inject
+import kotlin.math.min
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -282,7 +283,7 @@ class OnboardingRecommendationsStartPageViewModel @Inject constructor(
         )
         val updatedList = sectionsFlow.value.toMutableList().apply {
             insertToPosition?.let {
-                add(it, sectionToAdd)
+                add(min(it, this.size), sectionToAdd)
             } ?: add(sectionToAdd)
         }.toList()
 
@@ -334,11 +335,16 @@ class OnboardingRecommendationsStartPageViewModel @Inject constructor(
                 },
             )
             .forEach { category ->
+                val source = if (FeatureFlag.isEnabled(Feature.NEW_ONBOARDING_RECOMMENDATIONS)) {
+                    (category as? DiscoverCategory)?.onboardingRecommendationsSource ?: category.source
+                } else {
+                    category.source
+                }
                 runCatching {
-                    repository.getListFeed(category.source)
+                    repository.getListFeed(source)
                 }
                     .onFailure { exception ->
-                        Timber.e(exception, "Error getting list feed for category ${category.source}")
+                        Timber.e(exception, "Error getting list feed for category $source")
                     }
                     .getOrNull()
                     ?.podcasts

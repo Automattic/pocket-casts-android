@@ -22,6 +22,7 @@ import androidx.appcompat.widget.Toolbar
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.platform.ComposeView
+import androidx.core.app.ActivityOptionsCompat
 import androidx.core.content.ContextCompat
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowCompat
@@ -333,6 +334,11 @@ class MainActivity :
     private val onboardingLauncher: ActivityResultLauncher<Intent> = registerForActivityResult(OnboardingActivityContract()) { result ->
         when (result) {
             is OnboardingFinish.Done -> {
+                if (!settings.hasCompletedOnboarding()) {
+                    val podcastCount = runBlocking(Dispatchers.Default) { podcastManager.countSubscribed() }
+                    val landingTab = if (podcastCount == 0) VR.id.navigation_discover else VR.id.navigation_podcasts
+                    openTab(landingTab)
+                }
                 settings.setHasDoneInitialOnboarding()
             }
 
@@ -609,7 +615,11 @@ class MainActivity :
     }
 
     override fun openOnboardingFlow(onboardingFlow: OnboardingFlow) {
-        onboardingLauncher.launch(launchIntent(onboardingFlow))
+        onboardingLauncher.launch(
+            launchIntent(onboardingFlow),
+            ActivityOptionsCompat
+                .makeCustomAnimation(this, R.anim.onboarding_enter, R.anim.onboarding_disappear),
+        )
     }
 
     override fun onStart() {

@@ -262,6 +262,7 @@ data class DiscoverCategory(
     @Json(name = "icon") val icon: String,
     @Json(name = "popularity") val popularity: Int? = null,
     @Json(name = "source") override val source: String,
+    @Json(name = "source_onboarding") val onboardingRecommendationsSource: String? = null,
     override val curated: Boolean = false,
     val totalVisits: Int = 0,
     val isSponsored: Boolean? = null,
