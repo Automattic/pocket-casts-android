@@ -72,7 +72,7 @@ fun InterestCategoryPill(
                 scaleAnim.animateTo(
                     targetValue = 1.1f,
                     animationSpec = tween(
-                        durationMillis = 300,
+                        durationMillis = 150,
                         easing = FastOutSlowInEasing,
                     ),
                 )
@@ -80,7 +80,7 @@ fun InterestCategoryPill(
                     targetValue = 1f,
                     animationSpec = spring(
                         dampingRatio = Spring.DampingRatioHighBouncy,
-                        stiffness = Spring.StiffnessMediumLow,
+                        stiffness = Spring.StiffnessMedium,
                     ),
                 )
             }
@@ -88,7 +88,7 @@ fun InterestCategoryPill(
                 rotationAnim.animateTo(
                     targetValue = -3f,
                     animationSpec = tween(
-                        durationMillis = 300,
+                        durationMillis = 150,
                         easing = FastOutSlowInEasing,
                     ),
                 )
@@ -96,7 +96,7 @@ fun InterestCategoryPill(
                     targetValue = 0f,
                     animationSpec = spring(
                         dampingRatio = Spring.DampingRatioHighBouncy,
-                        stiffness = Spring.StiffnessMediumLow,
+                        stiffness = Spring.StiffnessMedium,
                     ),
                 )
             }
