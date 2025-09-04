@@ -123,11 +123,17 @@ abstract class PlaylistDao {
         JOIN manual_playlist_episodes AS playlistEpisode ON playlistEpisode.playlist_uuid IS playlist.uuid
         LEFT JOIN podcast_episodes AS podcastEpisode ON podcastEpisode.uuid IS playlistEpisode.episode_uuid
         WHERE
-          playlist.uuid IS :playlistId
+          playlist.uuid IS :playlistUuid
           AND IFNULL(podcastEpisode.archived, 0) IS 0
     """,
     )
-    abstract fun observeManualEpisodeMetadata(playlistId: String): Flow<PlaylistEpisodeMetadata>
+    abstract fun observeManualEpisodeMetadata(playlistUuid: String): Flow<PlaylistEpisodeMetadata>
+
+    @Query("SELECT episode_uuid FROM manual_playlist_episodes WHERE playlist_uuid IS :playlistUuid")
+    abstract suspend fun getManualPlaylistEpisodeUuids(playlistUuid: String): List<String>
+
+    @Query("SELECT * FROM manual_playlist_episodes WHERE playlist_uuid IS :playlistUuid")
+    abstract suspend fun getManualPlaylistEpisodes(playlistUuid: String): List<ManualPlaylistEpisode>
 
     @Query(
         """
@@ -239,7 +245,7 @@ abstract class PlaylistDao {
         JOIN podcast_episodes AS podcastEpisode ON podcastEpisode.uuid IS playlistEpisode.episode_uuid
         JOIN podcasts AS podcast ON podcast.uuid IS playlistEpisode.podcast_uuid
         WHERE
-          playlist.uuid IS :playlistId
+          playlist.uuid IS :playlistUuid
           AND podcastEpisode.archived IS 0
         ORDER BY
           -- newest to oldest
@@ -257,7 +263,7 @@ abstract class PlaylistDao {
         LIMIT 4
     """,
     )
-    abstract fun observeManualPlaylistPodcasts(playlistId: String): Flow<List<String>>
+    abstract fun observeManualPlaylistPodcasts(playlistUuid: String): Flow<List<String>>
 
     @Query(
         """

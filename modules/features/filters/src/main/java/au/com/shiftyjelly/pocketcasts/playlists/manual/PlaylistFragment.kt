@@ -19,8 +19,11 @@ import au.com.shiftyjelly.pocketcasts.playlists.component.PlaylistHeaderAdapter
 import au.com.shiftyjelly.pocketcasts.playlists.component.PlaylistHeaderButtonData
 import au.com.shiftyjelly.pocketcasts.playlists.component.PlaylistHeaderData
 import au.com.shiftyjelly.pocketcasts.playlists.manual.episode.AddEpisodesFragment
+import au.com.shiftyjelly.pocketcasts.repositories.playlist.PlaylistManager
+import au.com.shiftyjelly.pocketcasts.ui.helper.FragmentHostListener
 import au.com.shiftyjelly.pocketcasts.views.extensions.hideKeyboardOnScroll
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseFragment
+import com.google.android.material.snackbar.Snackbar
 import dagger.hilt.android.AndroidEntryPoint
 import dagger.hilt.android.lifecycle.withCreationCallback
 import kotlin.time.Duration
@@ -119,6 +122,12 @@ class PlaylistFragment : BaseFragment() {
     }
 
     private fun openEditor() {
+        val episodeCount = viewModel.uiState.value.manualPlaylist?.totalEpisodeCount ?: Int.MAX_VALUE
+        if (episodeCount >= PlaylistManager.MANUAL_PLAYLIST_EPISODE_LIMIT) {
+            val snackbarView = (requireActivity() as FragmentHostListener).snackBarView()
+            Snackbar.make(snackbarView, getString(LR.string.add_to_playlist_failure_message), Snackbar.LENGTH_LONG).show()
+            return
+        }
         if (parentFragmentManager.findFragmentByTag("playlist_episode_editor") != null) {
             return
         }

@@ -48,4 +48,12 @@ interface PlaylistManager {
     suspend fun getManualPlaylistEpisodeSources(): List<ManualPlaylistEpisodeSource>
 
     fun observeManualPlaylistAvailableEpisodes(playlistUuid: String, podcastUuid: String): Flow<List<PodcastEpisode>>
+
+    suspend fun addManualPlaylistEpisode(playlistUuid: String, episodeUuid: String): Boolean
+
+    companion object {
+        const val PLAYLIST_ARTWORK_EPISODE_LIMIT = 4
+        const val SMART_PLAYLIST_EPISODE_LIMIT = 1000
+        const val MANUAL_PLAYLIST_EPISODE_LIMIT = 1000
+    }
 }

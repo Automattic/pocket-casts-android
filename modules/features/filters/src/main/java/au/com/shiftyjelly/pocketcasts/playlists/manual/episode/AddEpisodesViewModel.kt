@@ -13,13 +13,17 @@ import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.emitAll
 import kotlinx.coroutines.flow.flow
-import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.launch
 
 @HiltViewModel(assistedFactory = AddEpisodesViewModel.Factory::class)
 class AddEpisodesViewModel @AssistedInject constructor(
@@ -27,18 +31,25 @@ class AddEpisodesViewModel @AssistedInject constructor(
     private val playlistManager: PlaylistManager,
     private val settings: Settings,
 ) : ViewModel() {
+    private val _messageQueue = MutableSharedFlow<Message>()
+    val messageQueue = _messageQueue.asSharedFlow()
+
+    private val addedEpisodeUuids = MutableStateFlow(emptySet<String>())
+
     val uiState = flow {
         val playlistFlow = playlistManager.observeManualPlaylist(playlistUuid)
 
         val uiStates = combine(
             playlistFlow,
             settings.artworkConfiguration.flow,
-        ) { playlist, artworkConfig ->
+            addedEpisodeUuids,
+        ) { playlist, artworkConfig, addedEpisodes ->
             if (playlist != null) {
                 UiState(
                     playlist = playlist,
                     sources = playlistManager.getManualPlaylistEpisodeSources(),
                     useEpisodeArtwork = artworkConfig.useEpisodeArtwork(ArtworkConfiguration.Element.Filters),
+                    addedEpisodeUuids = addedEpisodes,
                 )
             } else {
                 null
@@ -59,11 +70,27 @@ class AddEpisodesViewModel @AssistedInject constructor(
         }
     }
 
+    fun addEpisode(episodeUuid: String) {
+        viewModelScope.launch {
+            val isAdded = playlistManager.addManualPlaylistEpisode(playlistUuid, episodeUuid)
+            if (isAdded) {
+                addedEpisodeUuids.update { value -> value + episodeUuid }
+            } else {
+                _messageQueue.emit(Message.FailedToAddEpisode)
+            }
+        }
+    }
+
     data class UiState(
         val playlist: ManualPlaylist,
         val sources: List<ManualPlaylistEpisodeSource>,
         val useEpisodeArtwork: Boolean,
+        val addedEpisodeUuids: Set<String>,
     )
+
+    sealed interface Message {
+        data object FailedToAddEpisode : Message
+    }
 
     @AssistedFactory
     interface Factory {
