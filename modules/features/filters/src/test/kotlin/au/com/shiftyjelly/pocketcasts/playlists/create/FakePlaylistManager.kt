@@ -2,6 +2,7 @@ package au.com.shiftyjelly.pocketcasts.playlists.create
 
 import app.cash.turbine.Turbine
 import au.com.shiftyjelly.pocketcasts.models.entity.ManualPlaylistEpisodeSource
+import au.com.shiftyjelly.pocketcasts.models.entity.ManualPlaylistPodcastSource
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.models.to.PlaylistEpisodeMetadata
 import au.com.shiftyjelly.pocketcasts.models.type.PlaylistEpisodeSortType
@@ -70,6 +71,10 @@ class FakePlaylistManager : PlaylistManager {
     }
 
     override suspend fun getManualEpisodeSources(searchTerm: String?): List<ManualPlaylistEpisodeSource> {
+        return emptyList()
+    }
+
+    override suspend fun getManualEpisodeSourcesForFolder(folderUuid: String, searchTerm: String?): List<ManualPlaylistPodcastSource> {
         return emptyList()
     }
 

@@ -58,7 +58,7 @@ class AddEpisodesFragment : BaseDialogFragment() {
 
         val navController = rememberNavController()
         val searchState = rememberSearchState(navController)
-        ClearEpisodeSearchEffect(navController)
+        ClearSearchStateEffect(navController)
 
         DialogBox(
             modifier = Modifier.nestedScroll(rememberNestedScrollInteropConnection()),
@@ -74,8 +74,8 @@ class AddEpisodesFragment : BaseDialogFragment() {
                     playlistTitle = uiState.playlist.title,
                     addedEpisodesCount = uiState.addedEpisodeUuids.size,
                     episodeSources = uiState.sources,
-                    folderPodcastsFlow = viewModel::getFolderPodcastsFlow,
-                    episodesFlow = viewModel::getEpisodesFlow,
+                    folderPodcastsFlow = viewModel::getFolderSourcesFlow,
+                    episodesFlow = viewModel::getPodcastEpisodesFlow,
                     useEpisodeArtwork = uiState.useEpisodeArtwork,
                     onAddEpisode = viewModel::addEpisode,
                     onClickNavigationButton = {
@@ -100,8 +100,9 @@ class AddEpisodesFragment : BaseDialogFragment() {
         val backStackEntry by navController.currentBackStackEntryAsState()
         return remember(backStackEntry) {
             when (backStackEntry?.destination?.route) {
-                AddEpisodesRoutes.PODCAST -> viewModel.episodeSearchState.textState
-                else -> viewModel.podcastSearchState.textState
+                AddEpisodesRoutes.PODCAST -> viewModel.podcastSearchState.textState
+                AddEpisodesRoutes.FOLDER -> viewModel.folderSearchState.textState
+                else -> viewModel.homeSearchState.textState
             }
         }
     }
@@ -119,11 +120,15 @@ class AddEpisodesFragment : BaseDialogFragment() {
     }
 
     @Composable
-    private fun ClearEpisodeSearchEffect(navController: NavHostController) {
+    private fun ClearSearchStateEffect(navController: NavHostController) {
         LaunchedEffect(navController) {
             navController.currentBackStackEntryFlow.collect { entry ->
                 if (entry.destination.route != AddEpisodesRoutes.PODCAST) {
-                    viewModel.episodeSearchState.textState.clearText()
+                    viewModel.podcastSearchState.textState.clearText()
+
+                    if (entry.destination.route != AddEpisodesRoutes.FOLDER) {
+                        viewModel.folderSearchState.textState.clearText()
+                    }
                 }
             }
         }

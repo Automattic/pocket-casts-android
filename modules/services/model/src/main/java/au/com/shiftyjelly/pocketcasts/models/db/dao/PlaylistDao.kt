@@ -158,10 +158,18 @@ abstract class PlaylistDao {
         ORDER BY podcast.title ASC
     """,
     )
-    internal abstract suspend fun getPodcastPlaylistSourcesForFolder(
+    protected abstract suspend fun getPodcastPlaylistSourcesForFolderUnsafe(
         folderUuid: String,
         searchTerm: String,
     ): List<ManualPlaylistPodcastSource>
+
+    suspend fun getPodcastPlaylistSourcesForFolder(
+        folderUuid: String,
+        searchTerm: String,
+    ): List<ManualPlaylistPodcastSource> {
+        val escapedTerm = searchTerm.escapeLike('\\')
+        return getPodcastPlaylistSourcesForFolderUnsafe(folderUuid, escapedTerm)
+    }
 
     @Query(
         """
@@ -208,18 +216,16 @@ abstract class PlaylistDao {
         val escapedTerm = searchTerm.escapeLike('\\')
         val podcasts = getAllPodcastPlaylistSources(includeInFolders = !useFolders, escapedTerm)
         val folders = if (useFolders) {
-            getFolderPartialPlaylistSources(escapedTerm).mapNotNull { partialSource ->
-                val podcastSources = getPodcastPlaylistSourcesForFolder(partialSource.uuid, escapedTerm)
-                if (podcastSources.isNotEmpty()) {
-                    ManualPlaylistFolderSource(
-                        uuid = partialSource.uuid,
-                        title = partialSource.title,
-                        color = partialSource.color,
-                        podcastSources = getPodcastPlaylistSourcesForFolder(partialSource.uuid, escapedTerm),
-                    )
-                } else {
-                    null
-                }
+            getFolderPartialPlaylistSources(escapedTerm).map { partialSource ->
+                ManualPlaylistFolderSource(
+                    uuid = partialSource.uuid,
+                    title = partialSource.title,
+                    color = partialSource.color,
+                    podcastSources = getPodcastPlaylistSourcesForFolder(
+                        folderUuid = partialSource.uuid,
+                        searchTerm = "",
+                    ).map(ManualPlaylistPodcastSource::uuid),
+                )
             }
         } else {
             emptyList()

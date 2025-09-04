@@ -4,6 +4,7 @@ import androidx.room.withTransaction
 import au.com.shiftyjelly.pocketcasts.models.db.AppDatabase
 import au.com.shiftyjelly.pocketcasts.models.entity.ManualPlaylistEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.ManualPlaylistEpisodeSource
+import au.com.shiftyjelly.pocketcasts.models.entity.ManualPlaylistPodcastSource
 import au.com.shiftyjelly.pocketcasts.models.entity.PlaylistEntity
 import au.com.shiftyjelly.pocketcasts.models.entity.PlaylistEntity.Companion.ANYTIME
 import au.com.shiftyjelly.pocketcasts.models.entity.PlaylistEntity.Companion.AUDIO_VIDEO_FILTER_ALL
@@ -41,7 +42,6 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.distinctUntilChanged
-import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
@@ -174,7 +174,7 @@ class PlaylistManagerImpl @Inject constructor(
 
     override suspend fun createManualPlaylist(name: String): String {
         return createPlaylist(
-            entity = PlaylistEntity(title = name, manual = true),
+            entity = PlaylistEntity(title = name, manual = true, syncStatus = SYNC_STATUS_NOT_SYNCED),
         )
     }
 
@@ -206,6 +206,13 @@ class PlaylistManagerImpl @Inject constructor(
         val isSubscriber = settings.cachedSubscription.value != null
         return playlistDao.getManualPlaylistEpisodeSources(
             useFolders = isSubscriber,
+            searchTerm = searchTerm.orEmpty(),
+        )
+    }
+
+    override suspend fun getManualEpisodeSourcesForFolder(folderUuid: String, searchTerm: String?): List<ManualPlaylistPodcastSource> {
+        return playlistDao.getPodcastPlaylistSourcesForFolder(
+            folderUuid = folderUuid,
             searchTerm = searchTerm.orEmpty(),
         )
     }

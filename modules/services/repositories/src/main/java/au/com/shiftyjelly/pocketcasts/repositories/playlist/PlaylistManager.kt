@@ -1,6 +1,7 @@
 package au.com.shiftyjelly.pocketcasts.repositories.playlist
 
 import au.com.shiftyjelly.pocketcasts.models.entity.ManualPlaylistEpisodeSource
+import au.com.shiftyjelly.pocketcasts.models.entity.ManualPlaylistPodcastSource
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.models.to.PlaylistEpisodeMetadata
 import au.com.shiftyjelly.pocketcasts.models.type.SmartRules
@@ -42,6 +43,8 @@ interface PlaylistManager {
     fun manualPlaylistFlow(uuid: String): Flow<ManualPlaylist?>
 
     suspend fun getManualEpisodeSources(searchTerm: String? = null): List<ManualPlaylistEpisodeSource>
+
+    suspend fun getManualEpisodeSourcesForFolder(folderUuid: String, searchTerm: String? = null): List<ManualPlaylistPodcastSource>
 
     fun notAddedManualEpisodesFlow(playlistUuid: String, podcastUuid: String, searchTerm: String? = null): Flow<List<PodcastEpisode>>
 
