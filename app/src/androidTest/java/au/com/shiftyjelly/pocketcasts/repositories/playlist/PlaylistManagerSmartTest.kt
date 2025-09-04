@@ -328,7 +328,7 @@ class PlaylistManagerSmartTest {
     fun searchEpisodes() = dsl.test {
         insertPodcast(index = 0)
         insertPodcast(index = 1)
-        val episodes = List(2000) { index ->
+        val episodes = List(episodeLimit * 2) { index ->
             insertPodcastEpisode(
                 index = index,
                 podcastIndex = index % 2,
@@ -347,7 +347,7 @@ class PlaylistManagerSmartTest {
         manager.smartEpisodesFlow(smartRules(), searchTerm = null).test {
             assertEquals(
                 "null search term",
-                episodes.take(1000),
+                episodes.take(episodeLimit),
                 awaitItem(),
             )
         }
@@ -355,7 +355,7 @@ class PlaylistManagerSmartTest {
         manager.smartEpisodesFlow(smartRules(), searchTerm = " ").test {
             assertEquals(
                 "blank search term",
-                episodes.take(1000),
+                episodes.take(episodeLimit),
                 awaitItem(),
             )
         }
@@ -368,30 +368,18 @@ class PlaylistManagerSmartTest {
             )
         }
 
-        manager.smartEpisodesFlow(smartRules(), searchTerm = "title 77").test {
+        manager.smartEpisodesFlow(smartRules(), searchTerm = "title 7").test {
             assertEquals(
                 "episode title search",
-                listOf(
-                    episodes[77],
-                    episodes[770],
-                    episodes[771],
-                    episodes[772],
-                    episodes[773],
-                    episodes[774],
-                    episodes[775],
-                    episodes[776],
-                    episodes[777],
-                    episodes[778],
-                    episodes[779],
-                ),
+                listOf(episodes[7]),
                 awaitItem(),
             )
         }
 
-        manager.smartEpisodesFlow(smartRules(), searchTerm = "title 1515").test {
+        manager.smartEpisodesFlow(smartRules(), searchTerm = "title 14").test {
             assertEquals(
                 "search above episode limit",
-                listOf(episodes[1515]),
+                listOf(episodes[14]),
                 awaitItem(),
             )
         }
@@ -484,7 +472,7 @@ class PlaylistManagerSmartTest {
         insertSmartPlaylist(index = 0)
         insertPodcast(index = 0)
         insertPodcast(index = 1)
-        val episodes = List(2000) { index ->
+        val episodes = List(episodeLimit * 2) { index ->
             insertPodcastEpisode(
                 index = index,
                 podcastIndex = index % 2,
@@ -503,7 +491,7 @@ class PlaylistManagerSmartTest {
         manager.smartPlaylistFlow("playlist-id-0", searchTerm = null).test {
             assertEquals(
                 "null search term",
-                episodes.take(1000),
+                episodes.take(episodeLimit),
                 awaitItem()?.episodes,
             )
         }
@@ -511,7 +499,7 @@ class PlaylistManagerSmartTest {
         manager.smartPlaylistFlow("playlist-id-0", searchTerm = " ").test {
             assertEquals(
                 "blank search term",
-                episodes.take(1000),
+                episodes.take(episodeLimit),
                 awaitItem()?.episodes,
             )
         }
@@ -524,30 +512,18 @@ class PlaylistManagerSmartTest {
             )
         }
 
-        manager.smartPlaylistFlow("playlist-id-0", searchTerm = "title 77").test {
+        manager.smartPlaylistFlow("playlist-id-0", searchTerm = "title 7").test {
             assertEquals(
                 "episode title search",
-                listOf(
-                    episodes[77],
-                    episodes[770],
-                    episodes[771],
-                    episodes[772],
-                    episodes[773],
-                    episodes[774],
-                    episodes[775],
-                    episodes[776],
-                    episodes[777],
-                    episodes[778],
-                    episodes[779],
-                ),
+                listOf(episodes[7]),
                 awaitItem()?.episodes,
             )
         }
 
-        manager.smartPlaylistFlow("playlist-id-0", searchTerm = "title 1515").test {
+        manager.smartPlaylistFlow("playlist-id-0", searchTerm = "title 17").test {
             assertEquals(
                 "search above episode limit",
-                listOf(episodes[1515]),
+                listOf(episodes[17]),
                 awaitItem()?.episodes,
             )
         }
@@ -581,7 +557,7 @@ class PlaylistManagerSmartTest {
     fun showFullEpisodeMetadata() = dsl.test {
         insertSmartPlaylist(index = 0)
         insertPodcast(index = 0)
-        repeat(2000) { index ->
+        repeat(episodeLimit * 2) { index ->
             insertPodcastEpisode(index = index, podcastIndex = 0) {
                 it.copy(duration = 1.0)
             }
@@ -589,9 +565,9 @@ class PlaylistManagerSmartTest {
 
         manager.smartPlaylistFlow("playlist-id-0").test {
             val playlist = awaitItem()
-            assertEquals(2000, playlist?.totalEpisodeCount)
-            assertEquals(1000, playlist?.episodes?.size)
-            assertEquals(2000.seconds, playlist?.playbackDurationLeft)
+            assertEquals(episodeLimit * 2, playlist?.totalEpisodeCount)
+            assertEquals(episodeLimit, playlist?.episodes?.size)
+            assertEquals((episodeLimit * 2).seconds, playlist?.playbackDurationLeft)
         }
     }
 

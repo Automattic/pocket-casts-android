@@ -1,6 +1,7 @@
 package au.com.shiftyjelly.pocketcasts.repositories.playlist
 
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
+import au.com.shiftyjelly.pocketcasts.models.to.ManualEpisode
 import au.com.shiftyjelly.pocketcasts.models.type.PlaylistEpisodeSortType
 import au.com.shiftyjelly.pocketcasts.models.type.SmartRules
 import kotlin.time.Duration
@@ -28,6 +29,7 @@ data class SmartPlaylist(
 data class ManualPlaylist(
     val uuid: String,
     val title: String,
+    val episodes: List<ManualEpisode>,
     val totalEpisodeCount: Int,
     val playbackDurationLeft: Duration,
     val artworkPodcastUuids: List<String>,

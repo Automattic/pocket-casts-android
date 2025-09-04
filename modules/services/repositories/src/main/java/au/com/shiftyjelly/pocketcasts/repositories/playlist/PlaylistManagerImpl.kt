@@ -47,11 +47,26 @@ import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
 
 @OptIn(ExperimentalCoroutinesApi::class, FlowPreview::class)
-class PlaylistManagerImpl @Inject constructor(
+class PlaylistManagerImpl(
     private val appDatabase: AppDatabase,
     private val settings: Settings,
     private val clock: Clock,
+    private val smartEpisodeLimit: Int,
+    private val manualEpisodeLimit: Int,
 ) : PlaylistManager {
+    @Inject
+    constructor(
+        appDatabase: AppDatabase,
+        settings: Settings,
+        clock: Clock,
+    ) : this(
+        appDatabase = appDatabase,
+        settings = settings,
+        clock = clock,
+        smartEpisodeLimit = SMART_PLAYLIST_EPISODE_LIMIT,
+        manualEpisodeLimit = MANUAL_PLAYLIST_EPISODE_LIMIT,
+    )
+
     private val playlistDao = appDatabase.playlistDao()
     private val episodeDao = appDatabase.episodeDao()
     private val podcastDao = appDatabase.podcastDao()
@@ -150,7 +165,7 @@ class PlaylistManagerImpl @Inject constructor(
                 clock = clock,
                 smartRules = rules,
                 sortType = sortType,
-                limit = SMART_PLAYLIST_EPISODE_LIMIT,
+                limit = smartEpisodeLimit,
                 searchTerm = searchTerm,
             )
             .distinctUntilChanged()
@@ -185,12 +200,14 @@ class PlaylistManagerImpl @Inject constructor(
                     flowOf(null)
                 } else {
                     val podcastsFlow = manualPlaylistArtworkPodcastsFlow(playlist)
+                    val episodesFlow = playlistDao.manualEpisodesFlow(playlist.uuid)
                     val metadataFlow = playlistDao.manualPlaylistMetadataFlow(playlist.uuid)
 
-                    combine(podcastsFlow, metadataFlow) { podcasts, metadata ->
+                    combine(podcastsFlow, episodesFlow, metadataFlow) { podcasts, episodes, metadata ->
                         ManualPlaylist(
                             uuid = playlist.uuid,
                             title = playlist.title,
+                            episodes = episodes,
                             totalEpisodeCount = metadata.episodeCount,
                             playbackDurationLeft = metadata.timeLeftSeconds.seconds,
                             artworkPodcastUuids = podcasts,
@@ -234,7 +251,7 @@ class PlaylistManagerImpl @Inject constructor(
                 return@withTransaction true
             }
 
-            if (episodeUuids.size >= MANUAL_PLAYLIST_EPISODE_LIMIT) {
+            if (episodeUuids.size >= manualEpisodeLimit) {
                 return@withTransaction false
             }
 
@@ -311,7 +328,7 @@ class PlaylistManagerImpl @Inject constructor(
             clock = clock,
             smartRules = playlist.smartRules,
             sortType = playlist.sortType,
-            limit = SMART_PLAYLIST_EPISODE_LIMIT,
+            limit = smartEpisodeLimit,
         )
         .map { uuids -> uuids.toArtworkUuids() }
 

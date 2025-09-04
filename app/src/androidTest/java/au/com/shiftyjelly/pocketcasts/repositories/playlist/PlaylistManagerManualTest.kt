@@ -3,8 +3,12 @@ package au.com.shiftyjelly.pocketcasts.repositories.playlist
 import app.cash.turbine.test
 import au.com.shiftyjelly.pocketcasts.models.entity.PlaylistEntity.Companion.SYNC_STATUS_NOT_SYNCED
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
+import au.com.shiftyjelly.pocketcasts.models.to.ManualEpisode
+import au.com.shiftyjelly.pocketcasts.models.type.PlaylistEpisodeSortType
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNull
+import org.junit.Assert.assertTrue
 import org.junit.Rule
 import org.junit.Test
 
@@ -39,7 +43,12 @@ class PlaylistManagerManualTest {
             insertManualEpisode(index = 0, podcastIndex = 0, playlistIndex = 0)
             assertEquals(
                 manualPlaylist(index = 0) {
-                    it.copy(totalEpisodeCount = 1)
+                    it.copy(
+                        totalEpisodeCount = 1,
+                        episodes = listOf(
+                            unavailableManualEpisode(index = 0, podcastIndex = 0, playlistIndex = 0),
+                        ),
+                    )
                 },
                 awaitItem(),
             )
@@ -47,21 +56,90 @@ class PlaylistManagerManualTest {
             insertManualEpisode(index = 1, podcastIndex = 1, playlistIndex = 0)
             assertEquals(
                 manualPlaylist(index = 0) {
-                    it.copy(totalEpisodeCount = 2)
+                    it.copy(
+                        totalEpisodeCount = 2,
+                        episodes = listOf(
+                            unavailableManualEpisode(index = 0, podcastIndex = 0, playlistIndex = 0),
+                            unavailableManualEpisode(index = 1, podcastIndex = 1, playlistIndex = 0),
+                        ),
+                    )
                 },
                 awaitItem(),
             )
 
             insertPodcastEpisode(index = 1, podcastIndex = 1)
-
             assertEquals(
                 manualPlaylist(index = 0) {
                     it.copy(
                         totalEpisodeCount = 2,
+                        episodes = listOf(
+                            unavailableManualEpisode(index = 0, podcastIndex = 0, playlistIndex = 0),
+                            availableManualEpisode(index = 1, podcastIndex = 1),
+                        ),
                         artworkPodcastUuids = listOf("podcast-id-1"),
                     )
                 },
                 awaitItem(),
+            )
+        }
+    }
+
+    @Test
+    fun sortPlaylistEpisodes() = dsl.test {
+        insertManualPlaylist(index = 0)
+
+        insertManualEpisode(index = 0, podcastIndex = 0, playlistIndex = 0)
+        insertManualEpisode(index = 1, podcastIndex = 0, playlistIndex = 0)
+        insertManualEpisode(index = 2, podcastIndex = 0, playlistIndex = 0)
+        insertManualEpisode(index = 3, podcastIndex = 0, playlistIndex = 0)
+        insertPodcastEpisode(index = 0, podcastIndex = 0) { it.copy(duration = 10.0) }
+        insertPodcastEpisode(index = 2, podcastIndex = 0) { it.copy(duration = 60.0) }
+
+        manager.manualPlaylistFlow("playlist-id-0").test {
+            skipItems(1)
+
+            manager.updateSortType("playlist-id-0", PlaylistEpisodeSortType.OldestToNewest)
+            assertEquals(
+                listOf(
+                    unavailableManualEpisode(index = 3, podcastIndex = 0, playlistIndex = 0),
+                    availableManualEpisode(index = 2, podcastIndex = 0) { it.copy(duration = 60.0) },
+                    unavailableManualEpisode(index = 1, podcastIndex = 0, playlistIndex = 0),
+                    availableManualEpisode(index = 0, podcastIndex = 0) { it.copy(duration = 10.0) },
+                ),
+                awaitItem()?.episodes,
+            )
+
+            manager.updateSortType("playlist-id-0", PlaylistEpisodeSortType.NewestToOldest)
+            assertEquals(
+                listOf(
+                    availableManualEpisode(index = 0, podcastIndex = 0) { it.copy(duration = 10.0) },
+                    unavailableManualEpisode(index = 1, podcastIndex = 0, playlistIndex = 0),
+                    availableManualEpisode(index = 2, podcastIndex = 0) { it.copy(duration = 60.0) },
+                    unavailableManualEpisode(index = 3, podcastIndex = 0, playlistIndex = 0),
+                ),
+                awaitItem()?.episodes,
+            )
+
+            manager.updateSortType("playlist-id-0", PlaylistEpisodeSortType.ShortestToLongest)
+            assertEquals(
+                listOf(
+                    availableManualEpisode(index = 0, podcastIndex = 0) { it.copy(duration = 10.0) },
+                    availableManualEpisode(index = 2, podcastIndex = 0) { it.copy(duration = 60.0) },
+                    unavailableManualEpisode(index = 1, podcastIndex = 0, playlistIndex = 0),
+                    unavailableManualEpisode(index = 3, podcastIndex = 0, playlistIndex = 0),
+                ),
+                awaitItem()?.episodes,
+            )
+
+            manager.updateSortType("playlist-id-0", PlaylistEpisodeSortType.LongestToShortest)
+            assertEquals(
+                listOf(
+                    availableManualEpisode(index = 2, podcastIndex = 0) { it.copy(duration = 60.0) },
+                    availableManualEpisode(index = 0, podcastIndex = 0) { it.copy(duration = 10.0) },
+                    unavailableManualEpisode(index = 1, podcastIndex = 0, playlistIndex = 0),
+                    unavailableManualEpisode(index = 3, podcastIndex = 0, playlistIndex = 0),
+                ),
+                awaitItem()?.episodes,
             )
         }
     }
@@ -291,5 +369,82 @@ class PlaylistManagerManualTest {
             val episode1 = insertPodcastEpisode(index = 5, podcastIndex = 0) { it.copy(title = "ti \\ tle") }
             assertEquals(listOf(episode1), awaitItem())
         }
+    }
+
+    @Test
+    fun addEpisodes() = dsl.test {
+        insertManualPlaylist(index = 0)
+        insertPodcast(index = 0)
+        insertPodcastEpisode(index = 0, podcastIndex = 0)
+        insertPodcastEpisode(index = 1, podcastIndex = 1)
+
+        val isAdded = manager.addManualEpisode("playlist-id-0", "episode-id-0")
+        assertTrue(isAdded)
+
+        expectManualEpisodes(
+            playlistIndex = 0,
+            manualPlaylistEpisode(index = 0, podcastIndex = 0, playlistIndex = 0) {
+                it.copy(
+                    episodeSlug = "episode-slug-0",
+                    podcastSlug = "podcast-slug-0",
+                    isSynced = false,
+                )
+            },
+        )
+
+        manager.addManualEpisode("playlist-id-0", "episode-id-1")
+        expectManualEpisodes(
+            playlistIndex = 0,
+            manualPlaylistEpisode(index = 0, podcastIndex = 0, playlistIndex = 0) {
+                it.copy(
+                    episodeSlug = "episode-slug-0",
+                    podcastSlug = "podcast-slug-0",
+                    isSynced = false,
+                )
+            },
+            manualPlaylistEpisode(index = 1, podcastIndex = 1, playlistIndex = 0) {
+                it.copy(
+                    episodeSlug = "episode-slug-1",
+                    podcastSlug = "",
+                    isSynced = false,
+                )
+            },
+        )
+    }
+
+    @Test
+    fun doNotAddUnavailableEpisodes() = dsl.test {
+        insertManualPlaylist(index = 0)
+        insertPodcast(index = 0)
+
+        val isAdded = manager.addManualEpisode("playlist-id-0", "episode-id-0")
+        assertFalse(isAdded)
+
+        expectNoManualEpisodes(playlistIndex = 0)
+    }
+
+    @Test
+    fun doNotAddEpisodesAboveLimit() = dsl.test {
+        insertManualPlaylist(index = 0)
+        repeat(episodeLimit) { index ->
+            insertManualEpisode(index = index, podcastIndex = 0, playlistIndex = 0)
+            insertPodcastEpisode(index = index, podcastIndex = 0)
+        }
+        insertPodcastEpisode(index = episodeLimit + 1, podcastIndex = 0)
+
+        val isAdded = manager.addManualEpisode("playlist-id-0", "episode-id-${episodeLimit + 1}")
+        assertFalse(isAdded)
+
+        expectNoManualEpisodesCount(playlistIndex = 0, count = episodeLimit)
+    }
+
+    @Test
+    fun doNotFailToAddEpisodeThatIsAlreadyAdded() = dsl.test {
+        insertManualPlaylist(index = 0)
+        insertPodcastEpisode(index = 0, podcastIndex = 0)
+        insertManualEpisode(index = 0, podcastIndex = 0, playlistIndex = 0)
+
+        val isAdded = manager.addManualEpisode("playlist-id-0", "episode-id-0")
+        assertTrue(isAdded)
     }
 }

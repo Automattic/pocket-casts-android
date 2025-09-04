@@ -57,7 +57,7 @@ internal fun AddEpisodesPage(
     useEpisodeArtwork: Boolean,
     onAddEpisode: (String) -> Unit,
     onClickNavigationButton: () -> Unit,
-    onClickDone: () -> Unit,
+    onClickDoneButton: () -> Unit,
     modifier: Modifier = Modifier,
     navController: NavHostController = rememberNavController(),
     searchState: TextFieldState = rememberTextFieldState(),
@@ -97,7 +97,7 @@ internal fun AddEpisodesPage(
                         .clickable(
                             indication = null,
                             interactionSource = null,
-                            onClick = onClickNavigationButton,
+                            onClick = onClickDoneButton,
                         )
                         .padding(end = 16.dp),
                 )
@@ -105,7 +105,7 @@ internal fun AddEpisodesPage(
             style = ThemedTopAppBar.Style.Immersive,
             iconColor = MaterialTheme.theme.colors.primaryIcon02,
             windowInsets = WindowInsets(0),
-            onNavigationClick = onClickDone,
+            onNavigationClick = onClickNavigationButton,
         )
 
         SearchBar(

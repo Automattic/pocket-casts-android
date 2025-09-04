@@ -83,7 +83,7 @@ class AddEpisodesFragment : BaseDialogFragment() {
                             dismiss()
                         }
                     },
-                    onClickDone = ::dismiss,
+                    onClickDoneButton = ::dismiss,
                     modifier = Modifier.fillMaxSize(),
                 )
             }

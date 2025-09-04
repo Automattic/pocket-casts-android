@@ -16,6 +16,7 @@ import au.com.shiftyjelly.pocketcasts.models.entity.ManualPlaylistPodcastSource
 import au.com.shiftyjelly.pocketcasts.models.entity.PlaylistEntity
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
+import au.com.shiftyjelly.pocketcasts.models.to.ManualEpisode
 import au.com.shiftyjelly.pocketcasts.models.type.PlaylistEpisodeSortType
 import au.com.shiftyjelly.pocketcasts.models.type.PodcastsSortType
 import au.com.shiftyjelly.pocketcasts.models.type.SmartRules
@@ -25,6 +26,7 @@ import au.com.shiftyjelly.pocketcasts.preferences.SettingsImpl
 import au.com.shiftyjelly.pocketcasts.servers.di.ServersModule
 import au.com.shiftyjelly.pocketcasts.sharedtest.MutableClock
 import com.google.firebase.remoteconfig.FirebaseRemoteConfig
+import java.time.Instant
 import java.util.Date
 import kotlin.time.Duration.Companion.seconds
 import kotlinx.coroutines.flow.first
@@ -38,6 +40,8 @@ import org.junit.runner.Description
 class PlaylistManagerDsl : TestWatcher() {
     private val testDispatcher = StandardTestDispatcher()
     private val clock = MutableClock()
+
+    val episodeLimit = 10
 
     private lateinit var database: AppDatabase
     private val podcastDao get() = database.podcastDao()
@@ -72,6 +76,8 @@ class PlaylistManagerDsl : TestWatcher() {
             appDatabase = database,
             settings = settings,
             clock = clock,
+            smartEpisodeLimit = episodeLimit,
+            manualEpisodeLimit = episodeLimit,
         )
     }
 
@@ -225,6 +231,22 @@ class PlaylistManagerDsl : TestWatcher() {
         assertEquals(playlist, actual)
     }
 
+    suspend fun expectManualEpisodes(playlistIndex: Int, episode: ManualPlaylistEpisode, vararg episodes: ManualPlaylistEpisode) {
+        val actual = playlistDao.getManualPlaylistEpisodes("playlist-id-$playlistIndex")
+        val expected = listOf(episode) + episodes
+        assertEquals(expected, actual)
+    }
+
+    suspend fun expectNoManualEpisodes(playlistIndex: Int) {
+        val actual = playlistDao.getManualPlaylistEpisodes("playlist-id-$playlistIndex")
+        assertTrue(actual.isEmpty())
+    }
+
+    suspend fun expectNoManualEpisodesCount(playlistIndex: Int, count: Int) {
+        val actual = playlistDao.getManualPlaylistEpisodes("playlist-id-$playlistIndex")
+        assertEquals(count, actual.size)
+    }
+
     // Creators
     fun smartPlaylistEntity(index: Int, builder: (PlaylistEntity) -> PlaylistEntity = { it }): PlaylistEntity {
         val id = "playlist-id-$index"
@@ -280,6 +302,7 @@ class PlaylistManagerDsl : TestWatcher() {
                 uuid = "podcast-id-$index",
                 title = "Podcast title $index",
                 author = "Podcast author $index",
+                slug = "podcast-slug-$index",
                 isSubscribed = true,
             ),
         )
@@ -292,16 +315,26 @@ class PlaylistManagerDsl : TestWatcher() {
                 title = "Episode title $index",
                 podcastUuid = "podcast-id-$podcastIndex",
                 publishedDate = Date(Long.MAX_VALUE - index),
+                slug = "episode-slug-$index",
+                addedDate = Date.from(clock.instant()),
             ),
         )
     }
 
     fun manualPlaylistEpisode(index: Int, podcastIndex: Int, playlistIndex: Int, builder: (ManualPlaylistEpisode) -> ManualPlaylistEpisode = { it }): ManualPlaylistEpisode {
         return builder(
-            ManualPlaylistEpisode.test(
+            ManualPlaylistEpisode(
                 episodeUuid = "episode-id-$index",
                 podcastUuid = "podcast-id-$podcastIndex",
                 playlistUuid = "playlist-id-$playlistIndex",
+                title = "Episode title $index",
+                addedAt = clock.instant(),
+                publishedAt = Date(Long.MAX_VALUE - index).toInstant(),
+                downloadUrl = null,
+                episodeSlug = "episode-slug-$index",
+                podcastSlug = "podcast-slug-$podcastIndex",
+                sortPosition = index,
+                isSynced = true,
             ),
         )
     }
@@ -339,6 +372,7 @@ class PlaylistManagerDsl : TestWatcher() {
             ManualPlaylist(
                 uuid = "playlist-id-$index",
                 title = "Playlist title $index",
+                episodes = emptyList(),
                 totalEpisodeCount = 0,
                 playbackDurationLeft = 0.seconds,
                 artworkPodcastUuids = emptyList(),
@@ -380,5 +414,13 @@ class PlaylistManagerDsl : TestWatcher() {
                 podcastSources = podcastIndices.map { podcastIndex -> "podcast-id-$podcastIndex" },
             ),
         )
+    }
+
+    fun availableManualEpisode(index: Int, podcastIndex: Int, builder: (PodcastEpisode) -> PodcastEpisode = { it }): ManualEpisode.Available {
+        return ManualEpisode.Available(podcastEpisode(index, podcastIndex, builder))
+    }
+
+    fun unavailableManualEpisode(index: Int, podcastIndex: Int, playlistIndex: Int, builder: (ManualPlaylistEpisode) -> ManualPlaylistEpisode = { it }): ManualEpisode.Unavailable {
+        return ManualEpisode.Unavailable(manualPlaylistEpisode(index, podcastIndex, playlistIndex, builder))
     }
 }

@@ -384,9 +384,8 @@ abstract class PlaylistDao {
     )
     internal abstract fun manualEpisodesRawFlow(playlistUuid: String): Flow<List<RawManualEpisode>>
 
-    fun manualEpisodesFlow(playlistUuid: String) = manualEpisodesRawFlow(playlistUuid).map { rawEpisodes ->
-        rawEpisodes.map(RawManualEpisode::toEpisode)
-    }
+    fun manualEpisodesFlow(playlistUuid: String) = manualEpisodesRawFlow(playlistUuid)
+        .map { rawEpisodes -> rawEpisodes.map(RawManualEpisode::toEpisode) }
 
     @RawQuery(observedEntities = [Podcast::class, PodcastEpisode::class])
     protected abstract fun smartPlaylistArtworkPodcastsFlow(query: RoomRawQuery): Flow<List<String>>
