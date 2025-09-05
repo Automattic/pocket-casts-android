@@ -1,6 +1,7 @@
 package au.com.shiftyjelly.pocketcasts.playlists.manual.episode
 
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
@@ -36,6 +37,7 @@ import au.com.shiftyjelly.pocketcasts.compose.AppThemeWithBackground
 import au.com.shiftyjelly.pocketcasts.compose.components.EpisodeImage
 import au.com.shiftyjelly.pocketcasts.compose.components.FadedLazyColumn
 import au.com.shiftyjelly.pocketcasts.compose.components.HorizontalDivider
+import au.com.shiftyjelly.pocketcasts.compose.components.NoContentBanner
 import au.com.shiftyjelly.pocketcasts.compose.components.TextC70
 import au.com.shiftyjelly.pocketcasts.compose.components.TextH40
 import au.com.shiftyjelly.pocketcasts.compose.components.TextH60
@@ -45,10 +47,11 @@ import au.com.shiftyjelly.pocketcasts.compose.theme
 import au.com.shiftyjelly.pocketcasts.localization.helper.RelativeDateFormatter
 import au.com.shiftyjelly.pocketcasts.localization.helper.TimeHelper
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
+import au.com.shiftyjelly.pocketcasts.playlists.manual.episode.AddEpisodesViewModel.PodcastEpisodesUiState
 import au.com.shiftyjelly.pocketcasts.repositories.extensions.getSummaryText
 import au.com.shiftyjelly.pocketcasts.repositories.images.PocketCastsImageRequestFactory.PlaceholderType
 import au.com.shiftyjelly.pocketcasts.ui.extensions.getThemeColor
-import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
+import au.com.shiftyjelly.pocketcasts.ui.theme.Theme.ThemeType
 import java.util.Date
 import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
@@ -56,30 +59,57 @@ import au.com.shiftyjelly.pocketcasts.ui.R as UR
 
 @Composable
 internal fun EpisodesColumn(
-    episodes: List<PodcastEpisode>,
+    uiState: PodcastEpisodesUiState?,
     useEpisodeArtwork: Boolean,
     onAddEpisode: (PodcastEpisode) -> Unit,
     modifier: Modifier = Modifier,
     listState: LazyListState = rememberLazyListState(),
 ) {
-    LaunchedEffect(episodes) {
+    LaunchedEffect(uiState?.episodes) {
         listState.scrollToItem(0)
     }
 
     FadedLazyColumn(
-        modifier = modifier,
         state = listState,
+        modifier = modifier,
     ) {
-        items(
-            items = episodes,
-            key = { episode -> episode.uuid },
-        ) { episode ->
-            EpisodeRow(
-                episode = episode,
-                onClickAdd = { onAddEpisode(episode) },
-                useEpisodeArtwork = useEpisodeArtwork,
-                modifier = Modifier.animateItem(),
-            )
+        if (!uiState?.episodes.isNullOrEmpty()) {
+            items(
+                items = uiState.episodes,
+                key = { episode -> episode.uuid },
+                contentType = { _ -> "episode" },
+            ) { episode ->
+                EpisodeRow(
+                    episode = episode,
+                    onClickAdd = { onAddEpisode(episode) },
+                    useEpisodeArtwork = useEpisodeArtwork,
+                    modifier = Modifier.animateItem(),
+                )
+            }
+        }
+        if (uiState?.episodes?.isEmpty() == true) {
+            item(key = "no-content", contentType = "no-content") {
+                Box(
+                    contentAlignment = Alignment.Center,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(top = 48.dp),
+                ) {
+                    NoContentBanner(
+                        title = if (uiState.unfilteredEpisodeCount == 0) {
+                            stringResource(LR.string.manual_playlist_no_available_episode_title)
+                        } else {
+                            stringResource(LR.string.manual_playlist_search_no_episode_title)
+                        },
+                        body = if (uiState.unfilteredEpisodeCount == 0) {
+                            stringResource(LR.string.manual_playlist_no_available_episode_body)
+                        } else {
+                            stringResource(LR.string.manual_playlist_search_no_episode_body)
+                        },
+                        iconResourceId = IR.drawable.ic_exclamation_circle,
+                    )
+                }
+            }
         }
     }
 }
@@ -172,19 +202,52 @@ private fun PodcastEpisode.rememberTimeLeftText(): String {
 
 @Preview
 @Composable
+private fun EpisodesColumnNoAvailablePreview() {
+    AppThemeWithBackground(ThemeType.LIGHT) {
+        EpisodesColumn(
+            uiState = PodcastEpisodesUiState(
+                unfilteredEpisodeCount = 0,
+                episodes = emptyList(),
+            ),
+            useEpisodeArtwork = false,
+            onAddEpisode = {},
+        )
+    }
+}
+
+@Preview
+@Composable
+private fun EpisodesColumnNoFoundPreview() {
+    AppThemeWithBackground(ThemeType.LIGHT) {
+        EpisodesColumn(
+            uiState = PodcastEpisodesUiState(
+                unfilteredEpisodeCount = 3,
+                episodes = emptyList(),
+            ),
+            useEpisodeArtwork = false,
+            onAddEpisode = {},
+        )
+    }
+}
+
+@Preview
+@Composable
 private fun EpisodesColumnPreview(
-    @PreviewParameter(ThemePreviewParameterProvider::class) themeType: Theme.ThemeType,
+    @PreviewParameter(ThemePreviewParameterProvider::class) themeType: ThemeType,
 ) {
     AppThemeWithBackground(themeType) {
         EpisodesColumn(
-            episodes = List(3) { index ->
-                PodcastEpisode(
-                    uuid = "uuid-$index",
-                    title = "Episode $index",
-                    duration = 1200.0,
-                    publishedDate = Date(0),
-                )
-            },
+            uiState = PodcastEpisodesUiState(
+                unfilteredEpisodeCount = 3,
+                episodes = List(3) { index ->
+                    PodcastEpisode(
+                        uuid = "uuid-$index",
+                        title = "Episode $index",
+                        duration = 1200.0,
+                        publishedDate = Date(0),
+                    )
+                },
+            ),
             useEpisodeArtwork = false,
             onAddEpisode = {},
         )

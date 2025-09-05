@@ -1,6 +1,7 @@
 package au.com.shiftyjelly.pocketcasts.playlists.manual.episode
 
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -23,6 +24,8 @@ import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
 import au.com.shiftyjelly.pocketcasts.compose.AppThemeWithBackground
 import au.com.shiftyjelly.pocketcasts.compose.components.FadedLazyColumn
+import au.com.shiftyjelly.pocketcasts.compose.components.NoContentBanner
+import au.com.shiftyjelly.pocketcasts.compose.components.NoContentData
 import au.com.shiftyjelly.pocketcasts.compose.components.PodcastImage
 import au.com.shiftyjelly.pocketcasts.compose.components.TextH30
 import au.com.shiftyjelly.pocketcasts.compose.components.TextH40
@@ -33,12 +36,14 @@ import au.com.shiftyjelly.pocketcasts.compose.theme
 import au.com.shiftyjelly.pocketcasts.models.entity.ManualPlaylistEpisodeSource
 import au.com.shiftyjelly.pocketcasts.models.entity.ManualPlaylistFolderSource
 import au.com.shiftyjelly.pocketcasts.models.entity.ManualPlaylistPodcastSource
-import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
+import au.com.shiftyjelly.pocketcasts.ui.theme.Theme.ThemeType
+import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 @Composable
 internal fun EpisodeSourcesColumn(
-    sources: List<ManualPlaylistEpisodeSource>,
+    sources: List<ManualPlaylistEpisodeSource>?,
+    noContentData: NoContentData,
     onClickSource: (ManualPlaylistEpisodeSource) -> Unit,
     modifier: Modifier = Modifier,
     listState: LazyListState = rememberLazyListState(),
@@ -51,34 +56,50 @@ internal fun EpisodeSourcesColumn(
         state = listState,
         modifier = modifier,
     ) {
-        item(key = "header", contentType = "header") {
-            TextH30(
-                text = stringResource(LR.string.your_podcasts),
-                modifier = Modifier.padding(start = 16.dp, bottom = 8.dp),
-            )
+        if (!sources.isNullOrEmpty()) {
+            item(key = "header", contentType = "header") {
+                TextH30(
+                    text = stringResource(LR.string.your_podcasts),
+                    modifier = Modifier.padding(start = 16.dp, bottom = 8.dp),
+                )
+            }
+            items(
+                items = sources,
+                key = { item ->
+                    when (item) {
+                        is ManualPlaylistFolderSource -> "folder:${item.uuid}"
+                        is ManualPlaylistPodcastSource -> "podcast:${item.uuid}"
+                    }
+                },
+                contentType = { item ->
+                    when (item) {
+                        is ManualPlaylistFolderSource -> "folder"
+                        is ManualPlaylistPodcastSource -> "podcast"
+                    }
+                },
+            ) { item ->
+                EpisodeSourceRow(
+                    source = item,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .clickable(onClick = { onClickSource(item) })
+                        .padding(vertical = 4.dp, horizontal = 16.dp),
+                )
+            }
         }
-        items(
-            items = sources,
-            key = { item ->
-                when (item) {
-                    is ManualPlaylistFolderSource -> "folder:${item.uuid}"
-                    is ManualPlaylistPodcastSource -> "podcast:${item.uuid}"
+        if (sources?.isEmpty() == true) {
+            item(key = "no-content", contentType = "no-content") {
+                Box(
+                    contentAlignment = Alignment.Center,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(top = 48.dp),
+                ) {
+                    NoContentBanner(
+                        data = noContentData,
+                    )
                 }
-            },
-            contentType = { item ->
-                when (item) {
-                    is ManualPlaylistFolderSource -> "folder"
-                    is ManualPlaylistPodcastSource -> "podcast"
-                }
-            },
-        ) { item ->
-            EpisodeSourceRow(
-                source = item,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .clickable(onClick = { onClickSource(item) })
-                    .padding(vertical = 4.dp, horizontal = 16.dp),
-            )
+            }
         }
     }
 }
@@ -168,8 +189,25 @@ private fun BaseSourceRow(
 
 @Preview
 @Composable
+private fun EpisodeSourcesEmptyPreview() {
+    AppThemeWithBackground(ThemeType.LIGHT) {
+        EpisodeSourcesColumn(
+            sources = emptyList(),
+            NoContentData(
+                title = "No podcasts found",
+                body = "We couldn’t find any podcast for that search. Try another keyword.",
+                iconId = IR.drawable.ic_exclamation_circle,
+            ),
+            onClickSource = {},
+            modifier = Modifier.fillMaxHeight(),
+        )
+    }
+}
+
+@Preview
+@Composable
 private fun EpisodeSourcesColumnPreview(
-    @PreviewParameter(ThemePreviewParameterProvider::class) themeType: Theme.ThemeType,
+    @PreviewParameter(ThemePreviewParameterProvider::class) themeType: ThemeType,
 ) {
     AppThemeWithBackground(themeType) {
         EpisodeSourcesColumn(
@@ -201,6 +239,11 @@ private fun EpisodeSourcesColumnPreview(
                     color = 1,
                     podcastSources = List(2) { index -> "id-${index + 200}" },
                 ),
+            ),
+            noContentData = NoContentData(
+                title = "",
+                body = "",
+                iconId = IR.drawable.ic_exclamation_circle,
             ),
             onClickSource = {},
             modifier = Modifier.fillMaxHeight(),
