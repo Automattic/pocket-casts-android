@@ -5,12 +5,22 @@ import android.os.Parcelable
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.updateTransition
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.util.lerp
 import androidx.core.os.BundleCompat
 import androidx.core.os.bundleOf
@@ -26,7 +36,10 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import au.com.shiftyjelly.pocketcasts.PlaylistEpisodesAdapterFactory
 import au.com.shiftyjelly.pocketcasts.compose.AppTheme
+import au.com.shiftyjelly.pocketcasts.compose.components.NoContentBanner
+import au.com.shiftyjelly.pocketcasts.compose.components.NoContentData
 import au.com.shiftyjelly.pocketcasts.compose.extensions.setContentWithViewCompositionStrategy
+import au.com.shiftyjelly.pocketcasts.compose.theme
 import au.com.shiftyjelly.pocketcasts.filters.R
 import au.com.shiftyjelly.pocketcasts.filters.databinding.PlaylistFragmentBinding
 import au.com.shiftyjelly.pocketcasts.playlists.component.PlaylistHeaderAdapter
@@ -73,6 +86,7 @@ class PlaylistFragment :
     )
 
     private var isKeyboardOpen by mutableStateOf(false)
+    private var contentState by mutableStateOf(ContentState.Uninitialized)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -88,6 +102,7 @@ class PlaylistFragment :
     ): View {
         val binding = PlaylistFragmentBinding.inflate(inflater, container, false)
         binding.setupContent()
+        binding.setupNoContent()
         binding.setupToolbar()
         binding.setupChromeCast()
         binding.setupSettings()
@@ -131,8 +146,11 @@ class PlaylistFragment :
             viewModel.uiState
                 .flowWithLifecycle(viewLifecycleOwner.lifecycle)
                 .collect { uiState ->
-                    val episodes = uiState.smartPlaylist?.episodes.orEmpty()
-                    episodesAdapter.submitList(episodes)
+                    contentState = when (uiState.smartPlaylist?.episodes?.size) {
+                        null -> ContentState.Uninitialized
+                        0 -> ContentState.HasNoEpisodes
+                        else -> ContentState.HasEpisode
+                    }
 
                     val playlistHeaderData = uiState.smartPlaylist?.let { playlist ->
                         PlaylistHeaderData(
@@ -144,6 +162,9 @@ class PlaylistFragment :
                         )
                     }
                     headerAdapter.submitHeader(playlistHeaderData)
+
+                    val episodes = uiState.smartPlaylist?.episodes.orEmpty()
+                    episodesAdapter.submitList(episodes)
                 }
         }
 
@@ -174,6 +195,54 @@ class PlaylistFragment :
             windowInsets
         }
         content.hideKeyboardOnScroll()
+    }
+
+    private fun PlaylistFragmentBinding.setupNoContent() {
+        val noContentData = NoContentData(
+            title = getString(LR.string.smart_playlist_no_content_title),
+            body = getString(LR.string.smart_playlist_no_content_body),
+            iconId = IR.drawable.ic_info,
+            primaryButton = NoContentData.Button(
+                text = getString(LR.string.smart_rules),
+                onClick = {
+                    viewModel.trackEditRulesTapped()
+                    openEditor()
+                },
+            ),
+        )
+
+        noContentBox.setContentWithViewCompositionStrategy {
+            val transition = updateTransition(contentState)
+
+            AppTheme(theme.activeTheme) {
+                Box {
+                    if (transition.currentState == ContentState.Uninitialized) {
+                        Box(
+                            modifier = Modifier
+                                .fillMaxSize()
+                                .background(MaterialTheme.theme.colors.primaryUi02),
+                        )
+                    }
+                    transition.AnimatedVisibility(
+                        visible = { it == ContentState.HasNoEpisodes },
+                        enter = fadeIn(),
+                        exit = fadeOut(),
+                    ) {
+                        Box(
+                            contentAlignment = Alignment.Center,
+                            modifier = Modifier
+                                .fillMaxSize()
+                                .background(MaterialTheme.theme.colors.primaryUi02),
+                        ) {
+                            NoContentBanner(
+                                data = noContentData,
+                            )
+                        }
+                    }
+                }
+
+            }
+        }
     }
 
     private fun PlaylistFragmentBinding.setupToolbar() {
@@ -313,4 +382,10 @@ class PlaylistFragment :
             arguments = bundleOf(NEW_INSTANCE_ARGS to Args(playlistUuid))
         }
     }
+}
+
+private enum class ContentState {
+    Uninitialized,
+    HasNoEpisodes,
+    HasEpisode,
 }
