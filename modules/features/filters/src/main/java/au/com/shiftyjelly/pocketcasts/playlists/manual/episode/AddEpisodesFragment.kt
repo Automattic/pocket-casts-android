@@ -76,6 +76,7 @@ class AddEpisodesFragment : BaseDialogFragment() {
                     episodeSources = uiState.sources,
                     folderPodcastsFlow = viewModel::getFolderSourcesFlow,
                     episodesFlow = viewModel::getPodcastEpisodesFlow,
+                    hasAnyFolders = uiState.hasAnyFolders,
                     useEpisodeArtwork = uiState.useEpisodeArtwork,
                     onAddEpisode = viewModel::addEpisode,
                     onClickNavigationButton = {

@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import au.com.shiftyjelly.pocketcasts.compose.text.SearchFieldState
 import au.com.shiftyjelly.pocketcasts.models.entity.ManualPlaylistEpisodeSource
+import au.com.shiftyjelly.pocketcasts.models.entity.ManualPlaylistFolderSource
 import au.com.shiftyjelly.pocketcasts.models.entity.ManualPlaylistPodcastSource
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
@@ -60,6 +61,7 @@ class AddEpisodesViewModel @AssistedInject constructor(
                 UiState(
                     playlist = playlist,
                     sources = playlistManager.getManualEpisodeSources(searchTerm),
+                    hasAnyFolders = playlistManager.getManualEpisodeSources().any { it is ManualPlaylistFolderSource },
                     useEpisodeArtwork = artworkConfig.useEpisodeArtwork(ArtworkConfiguration.Element.Filters),
                     addedEpisodeUuids = addedEpisodes,
                 )
@@ -84,33 +86,47 @@ class AddEpisodesViewModel @AssistedInject constructor(
         }
     }
 
-    private val folderSourcesFlowCache = mutableMapOf<String, StateFlow<List<ManualPlaylistPodcastSource>>>()
+    private val folderSourcesFlowCache = mutableMapOf<String, StateFlow<List<ManualPlaylistPodcastSource>?>>()
 
-    fun getFolderSourcesFlow(folderUuid: String): StateFlow<List<ManualPlaylistPodcastSource>> {
+    fun getFolderSourcesFlow(folderUuid: String): StateFlow<List<ManualPlaylistPodcastSource>?> {
         return folderSourcesFlowCache.getOrPut(folderUuid) {
             val flow = folderSearchState.textFlow.map { searchTerm ->
                 playlistManager.getManualEpisodeSourcesForFolder(folderUuid, searchTerm)
             }
-            flow.stateIn(viewModelScope, SharingStarted.WhileSubscribed(stopTimeoutMillis = 300, replayExpirationMillis = 300), initialValue = emptyList())
+            flow.stateIn(viewModelScope, SharingStarted.WhileSubscribed(stopTimeoutMillis = 300, replayExpirationMillis = 300), initialValue = null)
         }
     }
 
-    private val podcastEpisodesFlowCache = mutableMapOf<String, StateFlow<List<PodcastEpisode>>>()
+    private val podcastEpisodesFlowCache = mutableMapOf<String, StateFlow<PodcastEpisodesUiState?>>()
 
-    fun getPodcastEpisodesFlow(podcastUuid: String): StateFlow<List<PodcastEpisode>> {
+    fun getPodcastEpisodesFlow(podcastUuid: String): StateFlow<PodcastEpisodesUiState?> {
         return podcastEpisodesFlowCache.getOrPut(podcastUuid) {
             val flow = podcastSearchState.textFlow.flatMapLatest { searchTerm ->
-                playlistManager.notAddedManualEpisodesFlow(playlistUuid, podcastUuid, searchTerm)
+                combine(
+                    playlistManager.notAddedManualEpisodesFlow(playlistUuid, podcastUuid, searchTerm),
+                    playlistManager.notAddedManualEpisodesFlow(playlistUuid, podcastUuid),
+                ) { filteredEpisodes, unfilteredEpisodes ->
+                    PodcastEpisodesUiState(
+                        episodes = filteredEpisodes,
+                        unfilteredEpisodeCount = unfilteredEpisodes.size,
+                    )
+                }
             }
-            flow.stateIn(viewModelScope, SharingStarted.WhileSubscribed(stopTimeoutMillis = 300, replayExpirationMillis = 300), initialValue = emptyList())
+            flow.stateIn(viewModelScope, SharingStarted.WhileSubscribed(stopTimeoutMillis = 300, replayExpirationMillis = 300), initialValue = null)
         }
     }
 
     data class UiState(
         val playlist: ManualPlaylist,
         val sources: List<ManualPlaylistEpisodeSource>,
+        val hasAnyFolders: Boolean,
         val useEpisodeArtwork: Boolean,
         val addedEpisodeUuids: Set<String>,
+    )
+
+    data class PodcastEpisodesUiState(
+        val unfilteredEpisodeCount: Int,
+        val episodes: List<PodcastEpisode>,
     )
 
     sealed interface Message {
