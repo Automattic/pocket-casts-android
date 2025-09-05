@@ -178,17 +178,15 @@ internal fun PlaylistHeader(
                 Spacer(
                     modifier = Modifier.height(24.dp),
                 )
-                if (data.totalEpisodeCount > 0) {
-                    PlaylistSearchBar(
-                        searchState = searchState,
-                        contentTopPadding = contentTopPadding,
-                        onChangeSearchFocus = onChangeSearchFocus,
-                        onMeasureSearchTopOffset = onMeasureSearchTopOffset,
-                    )
-                    Spacer(
-                        modifier = Modifier.height(16.dp),
-                    )
-                }
+                PlaylistSearchBar(
+                    searchState = searchState,
+                    contentTopPadding = contentTopPadding,
+                    onChangeSearchFocus = onChangeSearchFocus,
+                    onMeasureSearchTopOffset = onMeasureSearchTopOffset,
+                )
+                Spacer(
+                    modifier = Modifier.height(16.dp),
+                )
                 AnimatedVisibility(
                     visible = data.totalEpisodeCount != 0 && data.displayedEpisodeCount == 0,
                     enter = noContentEnterTransition,
