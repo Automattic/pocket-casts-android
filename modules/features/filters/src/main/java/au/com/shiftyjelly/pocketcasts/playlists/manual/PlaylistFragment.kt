@@ -31,6 +31,7 @@ import au.com.shiftyjelly.pocketcasts.playlists.component.PlaylistHeaderAdapter
 import au.com.shiftyjelly.pocketcasts.playlists.component.PlaylistHeaderButtonData
 import au.com.shiftyjelly.pocketcasts.playlists.component.PlaylistHeaderData
 import au.com.shiftyjelly.pocketcasts.playlists.component.PlaylistToolbar
+import au.com.shiftyjelly.pocketcasts.playlists.component.ToolbarConfig
 import au.com.shiftyjelly.pocketcasts.playlists.manual.episode.AddEpisodesFragment
 import au.com.shiftyjelly.pocketcasts.repositories.playlist.PlaylistManager
 import au.com.shiftyjelly.pocketcasts.ui.helper.FragmentHostListener
@@ -190,7 +191,7 @@ class PlaylistFragment :
             AppTheme(theme.activeTheme) {
                 PlaylistToolbar(
                     title = title,
-                    backgroundAlpha = if (isKeyboardOpen) 1f else toolbarAlpha,
+                    config = ToolbarConfig.ForAlpha(if (isKeyboardOpen) 1f else toolbarAlpha),
                     onClickBack = {
                         @Suppress("DEPRECATION")
                         requireActivity().onBackPressed()
@@ -217,11 +218,7 @@ class PlaylistFragment :
     }
 
     override fun onBackPressed(): Boolean {
-        return if (adapterFactory.onBackPressed()) {
-            true
-        } else {
-            super.onBackPressed()
-        }
+        return adapterFactory.onBackPressed() || super.onBackPressed()
     }
 
     override fun getBackstackCount(): Int {

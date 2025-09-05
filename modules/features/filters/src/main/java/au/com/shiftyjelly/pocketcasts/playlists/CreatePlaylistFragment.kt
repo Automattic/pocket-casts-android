@@ -147,7 +147,7 @@ class CreatePlaylistFragment : BaseDialogFragment() {
 
             override fun onApplyRule(rule: RuleType) = viewModel.applyRule(rule)
 
-            override fun onCreatePlaylist() = viewModel.createSmartPlaylist()
+            override fun createPlaylistCallback() = { viewModel.createSmartPlaylist() }
 
             override fun onClose() = dismiss()
         }

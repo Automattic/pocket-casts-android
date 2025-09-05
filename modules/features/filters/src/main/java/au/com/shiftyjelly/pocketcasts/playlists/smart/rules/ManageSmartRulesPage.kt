@@ -61,7 +61,7 @@ internal fun ManageSmartRulesPage(
                 totalEpisodeCount = totalEpisodeCount,
                 useEpisodeArtwork = useEpisodeArtwork,
                 areOtherOptionsExpanded = areOtherOptionsExpanded,
-                onCreatePlaylist = listener::onCreatePlaylist,
+                onCreatePlaylist = listener.createPlaylistCallback(),
                 onClickRule = { rule -> navController.navigateOnce(rule.toNavigationRoute()) },
                 toggleOtherOptions = { areOtherOptionsExpanded = !areOtherOptionsExpanded },
                 onClickClose = listener::onClose,
@@ -200,7 +200,7 @@ internal interface ManageSmartRulesListener {
 
     fun onApplyRule(rule: RuleType)
 
-    fun onCreatePlaylist()
+    fun createPlaylistCallback(): (() -> Unit)?
 
     fun onClose()
 }

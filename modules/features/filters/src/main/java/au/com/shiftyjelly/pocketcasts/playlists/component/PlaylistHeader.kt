@@ -4,11 +4,8 @@ import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.Crossfade
 import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.animateDpAsState
-import androidx.compose.animation.core.animateFloat
-import androidx.compose.animation.core.animateIntOffset
 import androidx.compose.animation.core.spring
 import androidx.compose.animation.core.tween
-import androidx.compose.animation.core.updateTransition
 import androidx.compose.animation.expandVertically
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
@@ -29,7 +26,6 @@ import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -45,7 +41,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.ReadOnlyComposable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberUpdatedState
@@ -53,7 +48,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.BlurredEdgeTreatment
-import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.blur
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.drawWithContent
@@ -72,7 +66,6 @@ import androidx.compose.ui.layout.positionInParent
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalInspectionMode
-import androidx.compose.ui.platform.LocalWindowInfo
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
@@ -81,7 +74,6 @@ import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.Dp
-import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.constrainHeight
 import androidx.compose.ui.unit.constrainWidth
 import androidx.compose.ui.unit.dp
@@ -180,36 +172,21 @@ internal fun PlaylistHeader(
             )
             if (data != null) {
                 ActionButtons(
-                    hasAnyEpisodes = data.displayedEpisodeCount > 0,
                     leftButton = leftButton,
                     rightButton = rightButton,
                 )
                 Spacer(
                     modifier = Modifier.height(24.dp),
                 )
-                if (data.totalEpisodeCount > 0) {
-                    PlaylistSearchBar(
-                        searchState = searchState,
-                        contentTopPadding = contentTopPadding,
-                        onChangeSearchFocus = onChangeSearchFocus,
-                        onMeasureSearchTopOffset = onMeasureSearchTopOffset,
-                    )
-                    Spacer(
-                        modifier = Modifier.height(16.dp),
-                    )
-                }
-                AnimatedVisibility(
-                    visible = data.totalEpisodeCount == 0,
-                    enter = noContentEnterTransition,
-                    exit = noContentExitTransition,
-                ) {
-                    NoContentBanner(
-                        title = stringResource(LR.string.smart_playlist_no_content_title),
-                        body = stringResource(LR.string.smart_playlist_no_content_body),
-                        iconResourceId = IR.drawable.ic_info,
-                        modifier = Modifier.padding(top = 60.dp, bottom = 24.dp),
-                    )
-                }
+                PlaylistSearchBar(
+                    searchState = searchState,
+                    contentTopPadding = contentTopPadding,
+                    onChangeSearchFocus = onChangeSearchFocus,
+                    onMeasureSearchTopOffset = onMeasureSearchTopOffset,
+                )
+                Spacer(
+                    modifier = Modifier.height(16.dp),
+                )
                 AnimatedVisibility(
                     visible = data.totalEpisodeCount != 0 && data.displayedEpisodeCount == 0,
                     enter = noContentEnterTransition,
@@ -391,34 +368,16 @@ private fun PlaylistInfoText(
 
 @Composable
 private fun ActionButtons(
-    hasAnyEpisodes: Boolean,
     leftButton: PlaylistHeaderButtonData,
     rightButton: PlaylistHeaderButtonData,
     modifier: Modifier = Modifier,
 ) {
-    val density = LocalDensity.current
-    val windowWidth = density.run { LocalWindowInfo.current.containerSize.width.toDp() }
-    val buttonWidth = minOf((windowWidth - actionButtonsOuterPadding * 2) / 2, actionButtonMaxWidth)
-    val targetOffset = buttonWidth / 2 + actionButtonsInnerPadding / 2
-    val targetOffsetPx = density.run { targetOffset.roundToPx() }
-
-    val transition = updateTransition(hasAnyEpisodes)
-    val offset by transition.animateIntOffset(
-        transitionSpec = { actionButtonsOffsetSpec },
-        targetValueByState = { hasEpisodes -> if (hasEpisodes) IntOffset.Zero else IntOffset(targetOffsetPx, 0) },
-    )
-    val alpha by transition.animateFloat(
-        transitionSpec = { actionButtonsAlphaSpec },
-        targetValueByState = { hasEpisodes -> if (hasEpisodes) 1f else 0f },
-    )
-
     Row(
         horizontalArrangement = Arrangement.spacedBy(
             space = actionButtonsInnerPadding,
             alignment = Alignment.CenterHorizontally,
         ),
         modifier = modifier
-            .offset { offset }
             .height(IntrinsicSize.Max)
             .padding(horizontal = actionButtonsOuterPadding),
     ) {
@@ -434,11 +393,9 @@ private fun ActionButtons(
             data = rightButton,
             style = ActionButtonStyle.Solid,
             contentAlignment = Alignment.TopStart,
-            isEnabled = hasAnyEpisodes,
             modifier = Modifier
                 .weight(1f)
-                .fillMaxHeight()
-                .alpha(alpha),
+                .fillMaxHeight(),
         )
     }
 }
@@ -503,7 +460,6 @@ private fun ActionButton(
     contentAlignment: Alignment,
     style: ActionButtonStyle,
     modifier: Modifier = Modifier,
-    isEnabled: Boolean = true,
 ) {
     CompositionLocalProvider(LocalRippleConfiguration provides style.rememberRippleConfiguration()) {
         Box(
@@ -520,7 +476,6 @@ private fun ActionButton(
                     .background(style.backgroundColor(), actionButtonShape)
                     .border(2.dp, style.borderColor(), actionButtonShape)
                     .clickable(
-                        enabled = isEnabled,
                         role = Role.Button,
                         onClick = data.onClick,
                     )
@@ -592,8 +547,6 @@ private val actionButtonShape = RoundedCornerShape(8.dp)
 private val actionButtonMaxWidth = 200.dp
 private val actionButtonsInnerPadding = 8.dp
 private val actionButtonsOuterPadding = 32.dp
-private val actionButtonsOffsetSpec = spring<IntOffset>(stiffness = Spring.StiffnessLow)
-private val actionButtonsAlphaSpec = spring<Float>(stiffness = Spring.StiffnessLow)
 
 private val noContentEnterTransition =
     fadeIn(spring(stiffness = Spring.StiffnessLow)) + expandVertically(spring(stiffness = Spring.StiffnessLow))
@@ -614,44 +567,6 @@ private val previewColors = listOf(
     Color(0xFFFEB144),
     Color(0xFFFF6663),
 )
-
-@PreviewRegularDevice
-@Composable
-private fun PlaylistHeaderNoEpisodesPreview() {
-    var episodeCount by remember { mutableIntStateOf(0) }
-
-    AppTheme(ThemeType.LIGHT) {
-        Box(
-            modifier = Modifier
-                .background(MaterialTheme.theme.colors.primaryUi02)
-                .fillMaxSize(),
-        ) {
-            PlaylistHeader(
-                data = PlaylistHeaderData(
-                    title = "My Playlist",
-                    totalEpisodeCount = episodeCount,
-                    displayedEpisodeCount = episodeCount,
-                    playbackDurationLeft = 0.seconds,
-                    artworkPodcastUuids = emptyList(),
-                ),
-                leftButton = PlaylistHeaderButtonData(
-                    iconId = IR.drawable.sleep_timer_cog,
-                    label = "Smart Rules",
-                    onClick = { episodeCount = 1 },
-                ),
-                rightButton = PlaylistHeaderButtonData(
-                    iconId = IR.drawable.ic_filters_play,
-                    label = "Play All",
-                    onClick = { episodeCount = 0 },
-                ),
-                searchState = rememberTextFieldState(),
-                useBlurredArtwork = false,
-                onMeasureSearchTopOffset = {},
-                onChangeSearchFocus = {},
-            )
-        }
-    }
-}
 
 @PreviewRegularDevice
 @Composable
