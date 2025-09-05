@@ -205,10 +205,7 @@ class PlaylistFragment :
             iconId = IR.drawable.ic_info,
             primaryButton = NoContentData.Button(
                 text = getString(LR.string.smart_rules),
-                onClick = {
-                    viewModel.trackEditRulesTapped()
-                    openEditor()
-                },
+                onClick = ::openEditor,
             ),
         )
 
