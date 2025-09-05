@@ -317,7 +317,7 @@ abstract class PodcastDao {
     abstract fun countSubscribedRxSingle(): Single<Int>
 
     @Query("SELECT COUNT(*) FROM podcasts WHERE subscribed = 1")
-    abstract fun countSubscribedRxFlowable(): Flowable<Int>
+    abstract fun countSubscribedFlow(): Flow<Int>
 
     @Query("SELECT COUNT(*) FROM podcasts WHERE subscribed = 1 AND show_notifications = 1")
     abstract fun countNotificationsOnBlocking(): Int

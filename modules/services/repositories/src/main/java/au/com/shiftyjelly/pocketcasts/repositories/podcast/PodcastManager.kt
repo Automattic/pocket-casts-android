@@ -122,7 +122,7 @@ interface PodcastManager {
     fun countPodcastsBlocking(): Int
     suspend fun countSubscribed(): Int
     fun countSubscribedRxSingle(): Single<Int>
-    fun countSubscribedRxFlowable(): Flowable<Int>
+    fun countSubscribedFlow(): Flow<Int>
     fun countDownloadStatusBlocking(downloadStatus: Int): Int
     suspend fun hasEpisodesWithAutoDownloadStatus(downloadStatus: Int): Boolean
     fun countDownloadStatusRxSingle(downloadStatus: Int): Single<Int>

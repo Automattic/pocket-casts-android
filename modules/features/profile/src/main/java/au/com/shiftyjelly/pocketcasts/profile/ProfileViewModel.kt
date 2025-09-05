@@ -29,7 +29,6 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.reactive.asFlow
-import kotlinx.coroutines.rx2.asFlow
 
 @HiltViewModel
 class ProfileViewModel @Inject constructor(
@@ -79,7 +78,7 @@ class ProfileViewModel @Inject constructor(
 
     internal val profileStatsState = combine(
         refreshStatsTrigger.onStart { emit(Unit) },
-        podcastManager.countSubscribedRxFlowable().asFlow(),
+        podcastManager.countSubscribedFlow(),
     ) { _, count ->
         ProfileStatsState(
             podcastsCount = count,

@@ -115,9 +115,7 @@ abstract class PlaylistDao {
         FROM playlists AS playlist
         JOIN manual_playlist_episodes AS playlistEpisode ON playlistEpisode.playlist_uuid IS playlist.uuid
         LEFT JOIN podcast_episodes AS podcastEpisode ON podcastEpisode.uuid IS playlistEpisode.episode_uuid
-        WHERE
-          playlist.uuid IS :playlistUuid
-          AND IFNULL(podcastEpisode.archived, 0) IS 0
+        WHERE playlist.uuid IS :playlistUuid
     """,
     )
     abstract fun manualPlaylistMetadataFlow(playlistUuid: String): Flow<PlaylistEpisodeMetadata>

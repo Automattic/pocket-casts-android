@@ -230,6 +230,7 @@
     <string name="add_episodes">Add Episodes</string>
     <string name="your_podcasts">Your Podcasts</string>
     <string name="unavailable">Unavailable</string>
+    <string name="browse_shows">Browse Shows</string>
 
     <string name="multiselect_actions_shown">Shortcut in toolbar</string>
     <string name="multiselect_actions_hidden">In overflow</string>
@@ -949,6 +950,9 @@
     <string name="episode_status_rule_description">%1$s + %2$d</string>
     <string name="increment_longer_than_duration">Increment \"longer than\" duration</string>
     <string name="increment_shorter_than_duration">Increment \"shorter than\" duration</string>
+    <string name="manual_playlist_no_content_body">Swipe left on an episode to add it to your playlist.</string>
+    <string name="manual_playlist_no_content_title">Add episodes to your playlist</string>
+    <string name="manual_playlist_no_content_title_alternative">Start building your playlist</string>
     <string name="new_playlist">New Playlist</string>
     <string name="new_playlists_title_placeholder">Playlist’s name</string>
     <string name="new_smart_playlist_banner_body">Automatically add episodes based on rules</string>
