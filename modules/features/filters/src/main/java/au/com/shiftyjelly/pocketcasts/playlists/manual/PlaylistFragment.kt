@@ -218,11 +218,7 @@ class PlaylistFragment :
     }
 
     override fun onBackPressed(): Boolean {
-        return if (adapterFactory.onBackPressed()) {
-            true
-        } else {
-            super.onBackPressed()
-        }
+        return adapterFactory.onBackPressed() || super.onBackPressed()
     }
 
     override fun getBackstackCount(): Int {
