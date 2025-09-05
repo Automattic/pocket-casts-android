@@ -230,7 +230,7 @@ private fun PodcastToolbarPreview(
             )
             PlaylistToolbar(
                 title = "Semi Transparent",
-                config = ToolbarConfig.ForAlpha(5f),
+                config = ToolbarConfig.ForAlpha(0.5f),
                 onClickBack = {},
                 onClickOptions = {},
             )
