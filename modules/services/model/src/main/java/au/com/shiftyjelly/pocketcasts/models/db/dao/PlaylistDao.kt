@@ -28,6 +28,7 @@ import au.com.shiftyjelly.pocketcasts.models.type.SmartRules
 import au.com.shiftyjelly.pocketcasts.utils.extensions.escapeLike
 import java.time.Clock
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
 
 @Dao
@@ -365,8 +366,16 @@ abstract class PlaylistDao {
           podcast_episode.slug AS p_slug
         FROM manual_playlist_episodes AS manual_episode
         LEFT JOIN podcast_episodes AS podcast_episode ON podcast_episode.uuid IS manual_episode.episode_uuid
+        LEFT JOIN podcasts AS podcast ON podcast.uuid IS manual_episode.podcast_uuid
         JOIN playlists AS playlist ON playlist.uuid IS :playlistUuid
-        WHERE playlist_uuid IS :playlistUuid
+        WHERE
+          manual_episode.playlist_uuid IS :playlistUuid
+          AND (
+            -- trim isn't really needed becasue we trim in the application logic but it helps with tests
+            TRIM(:searchTerm) IS '' 
+            OR podcast.title LIKE '%' || :searchTerm || '%' ESCAPE '\' COLLATE NOCASE
+            OR podcast_episode.title LIKE '%' || :searchTerm || '%' ESCAPE '\' COLLATE NOCASE
+          )
         ORDER BY
           -- newest to oldest
           CASE WHEN playlist.sortId IS 0 THEN IFNULL(podcast_episode.published_date, manual_episode.published_at) END DESC,
@@ -382,10 +391,17 @@ abstract class PlaylistDao {
           CASE WHEN playlist.sortId IS 4 THEN IFNULL(podcast_episode.added_date, manual_episode.added_at) END DESC
     """,
     )
-    internal abstract fun manualEpisodesRawFlow(playlistUuid: String): Flow<List<RawManualEpisode>>
+    internal abstract fun manualEpisodesRawFlow(
+        playlistUuid: String,
+        searchTerm: String,
+    ): Flow<List<RawManualEpisode>>
 
-    fun manualEpisodesFlow(playlistUuid: String) = manualEpisodesRawFlow(playlistUuid)
-        .map { rawEpisodes -> rawEpisodes.map(RawManualEpisode::toEpisode) }
+    fun manualEpisodesFlow(
+        playlistUuid: String,
+        searchTerm: String,
+    ) = manualEpisodesRawFlow(playlistUuid, searchTerm.escapeLike('\\')).map { rawEpisodes ->
+        rawEpisodes.map(RawManualEpisode::toEpisode)
+    }
 
     @RawQuery(observedEntities = [Podcast::class, PodcastEpisode::class])
     protected abstract fun smartPlaylistArtworkPodcastsFlow(query: RoomRawQuery): Flow<List<String>>

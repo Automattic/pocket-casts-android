@@ -8,7 +8,9 @@ import android.view.ViewGroup
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.util.lerp
 import androidx.core.os.BundleCompat
 import androidx.core.os.bundleOf
@@ -70,6 +72,8 @@ class PlaylistFragment :
         },
     )
 
+    private var isKeyboardOpen by mutableStateOf(false)
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         if (savedInstanceState == null) {
@@ -116,7 +120,7 @@ class PlaylistFragment :
                 }
             },
         )
-        val episodesAdapter = adapterFactory.create(
+        val episodesAdapter = adapterFactory.createForSmartPlaylist(
             multiSelectToolbar = multiSelectToolbar,
             getEpisodes = { viewModel.uiState.value.smartPlaylist?.episodes.orEmpty() },
         )
@@ -165,6 +169,7 @@ class PlaylistFragment :
         ViewCompat.setOnApplyWindowInsetsListener(content) { _, windowInsets ->
             val insets = windowInsets.getInsets(WindowInsetsCompat.Type.ime())
             keyboardInset = insets.bottom
+            isKeyboardOpen = keyboardInset != 0
             content.updatePadding(bottom = initialPadding + miniPlayerInset + keyboardInset)
             windowInsets
         }
@@ -172,7 +177,7 @@ class PlaylistFragment :
     }
 
     private fun PlaylistFragmentBinding.setupToolbar() {
-        val toolbarAlpha = mutableFloatStateOf(0f)
+        var toolbarAlpha by mutableFloatStateOf(0f)
         val transparencyThreshold = 40.dpToPx(requireContext())
         val maxProgressDistance = 100.dpToPx(requireContext())
 
@@ -183,7 +188,7 @@ class PlaylistFragment :
                 ?.takeIf { it.getTag(UR.id.playlist_view_header_tag) == true }
                 ?.top?.absoluteValue
                 ?: Int.MAX_VALUE
-            toolbarAlpha.floatValue = if (headerViewOffset > transparencyThreshold) {
+            toolbarAlpha = if (headerViewOffset > transparencyThreshold) {
                 val scrollFraction = (headerViewOffset - transparencyThreshold).toFloat() / (maxProgressDistance)
                 lerp(0f, 1f, scrollFraction).coerceIn(0f, 1f)
             } else {
@@ -207,7 +212,7 @@ class PlaylistFragment :
             AppTheme(theme.activeTheme) {
                 PlaylistToolbar(
                     title = title,
-                    backgroundAlpha = toolbarAlpha.floatValue,
+                    backgroundAlpha = if (isKeyboardOpen) 1f else toolbarAlpha,
                     onClickBack = {
                         @Suppress("DEPRECATION")
                         requireActivity().onBackPressed()

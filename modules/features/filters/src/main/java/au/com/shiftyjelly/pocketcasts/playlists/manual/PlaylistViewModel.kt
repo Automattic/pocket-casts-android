@@ -2,6 +2,7 @@ package au.com.shiftyjelly.pocketcasts.playlists.manual
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import au.com.shiftyjelly.pocketcasts.compose.text.SearchFieldState
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.playlist.ManualPlaylist
 import au.com.shiftyjelly.pocketcasts.repositories.playlist.PlaylistManager
@@ -9,7 +10,9 @@ import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 
@@ -21,7 +24,11 @@ class PlaylistViewModel @AssistedInject constructor(
 ) : ViewModel() {
     val bottomInset = settings.bottomInset
 
-    val uiState = playlistManager.manualPlaylistFlow(playlistUuid)
+    val searchState = SearchFieldState()
+
+    @OptIn(ExperimentalCoroutinesApi::class)
+    val uiState = searchState.textFlow
+        .flatMapLatest { searchTerm -> playlistManager.manualPlaylistFlow(playlistUuid, searchTerm) }
         .map { UiState(it) }
         .stateIn(viewModelScope, SharingStarted.Lazily, initialValue = UiState.Empty)
 

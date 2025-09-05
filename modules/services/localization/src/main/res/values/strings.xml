@@ -229,6 +229,7 @@
     <string name="other_options">Other Options</string>
     <string name="add_episodes">Add Episodes</string>
     <string name="your_podcasts">Your Podcasts</string>
+    <string name="unavailable">Unavailable</string>
 
     <string name="multiselect_actions_shown">Shortcut in toolbar</string>
     <string name="multiselect_actions_hidden">In overflow</string>

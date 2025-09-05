@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/episodeRow"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:alpha="0.4"
+        android:background="?attr/primary_ui_02"
+        android:clickable="true"
+        android:focusable="true"
+        android:foreground="?android:selectableItemBackground"
+        android:gravity="center_vertical">
+
+        <androidx.cardview.widget.CardView
+            android:id="@+id/artworkBox"
+            android:layout_width="56dp"
+            android:layout_height="56dp"
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="12dp"
+            android:layout_marginBottom="12dp"
+            android:importantForAccessibility="noHideDescendants"
+            app:cardCornerRadius="4dp"
+            app:cardElevation="2dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
+
+            <ImageView
+                android:id="@+id/artworkImage"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:importantForAccessibility="no" />
+
+        </androidx.cardview.widget.CardView>
+
+        <TextView
+            android:id="@+id/dateLabel"
+            style="?attr/textOverline"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="16dp"
+            android:layout_marginTop="12dp"
+            android:layout_weight="1"
+            android:textAllCaps="true"
+            app:layout_constraintBottom_toTopOf="@+id/titleLabel"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@+id/artworkBox"
+            app:layout_constraintTop_toTopOf="parent"
+            tools:text="10 April 2025" />
+
+        <TextView
+            android:id="@+id/titleLabel"
+            style="?attr/textSubtitle1"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:ellipsize="end"
+            android:maxLines="2"
+            app:layout_constraintBottom_toTopOf="@+id/unavailableLabel"
+            app:layout_constraintEnd_toEndOf="@+id/dateLabel"
+            app:layout_constraintStart_toStartOf="@id/dateLabel"
+            app:layout_constraintTop_toBottomOf="@id/dateLabel"
+            tools:text="Episode title" />
+
+        <TextView
+            android:id="@+id/unavailableLabel"
+            style="?attr/textCaption"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="12dp"
+            android:ellipsize="end"
+            android:maxLines="1"
+            android:text="@string/unavailable"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="@+id/dateLabel"
+            app:layout_constraintStart_toStartOf="@id/dateLabel"
+            app:layout_constraintTop_toBottomOf="@id/titleLabel" />
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/divider_height"
+            android:layout_marginStart="16dp"
+            android:background="?attr/primary_ui_05"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</FrameLayout>
