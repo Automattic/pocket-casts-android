@@ -492,8 +492,8 @@ class PodcastManagerImpl @Inject constructor(
         return podcastDao.countSubscribedRxSingle()
     }
 
-    override fun countSubscribedRxFlowable(): Flowable<Int> {
-        return podcastDao.countSubscribedRxFlowable()
+    override fun countSubscribedFlow(): Flow<Int> {
+        return podcastDao.countSubscribedFlow()
     }
 
     override fun countDownloadStatusBlocking(downloadStatus: Int): Int {
