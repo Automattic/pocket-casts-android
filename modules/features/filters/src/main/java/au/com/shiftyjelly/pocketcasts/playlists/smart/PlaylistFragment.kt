@@ -241,7 +241,6 @@ class PlaylistFragment :
                         }
                     }
                 }
-
             }
         }
     }

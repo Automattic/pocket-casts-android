@@ -172,7 +172,6 @@ private fun rememberToolbarColors(config: ToolbarConfig): PlaylistToolbarColors 
                 buttonIconColor = Color.White,
             )
 
-
             is ToolbarConfig.ForAlpha -> PlaylistToolbarColors(
                 backgroundColor = backgroundColor.copy(alpha = config.alpha),
                 titleColor = Color(

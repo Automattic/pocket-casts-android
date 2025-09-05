@@ -395,7 +395,7 @@ private fun ActionButtons(
             contentAlignment = Alignment.TopStart,
             modifier = Modifier
                 .weight(1f)
-                .fillMaxHeight()
+                .fillMaxHeight(),
         )
     }
 }
