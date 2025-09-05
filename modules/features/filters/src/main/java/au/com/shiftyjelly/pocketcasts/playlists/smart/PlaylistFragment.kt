@@ -46,6 +46,7 @@ import au.com.shiftyjelly.pocketcasts.playlists.component.PlaylistHeaderAdapter
 import au.com.shiftyjelly.pocketcasts.playlists.component.PlaylistHeaderButtonData
 import au.com.shiftyjelly.pocketcasts.playlists.component.PlaylistHeaderData
 import au.com.shiftyjelly.pocketcasts.playlists.component.PlaylistToolbar
+import au.com.shiftyjelly.pocketcasts.playlists.component.ToolbarConfig
 import au.com.shiftyjelly.pocketcasts.playlists.smart.rules.EditRulesFragment
 import au.com.shiftyjelly.pocketcasts.utils.extensions.dpToPx
 import au.com.shiftyjelly.pocketcasts.views.dialog.ConfirmationDialog
@@ -281,7 +282,11 @@ class PlaylistFragment :
             AppTheme(theme.activeTheme) {
                 PlaylistToolbar(
                     title = title,
-                    backgroundAlpha = if (isKeyboardOpen) 1f else toolbarAlpha,
+                    config = when (contentState) {
+                        ContentState.Uninitialized -> ToolbarConfig.WithoutTitle
+                        ContentState.HasNoEpisodes -> ToolbarConfig.WithTitle
+                        ContentState.HasEpisode -> ToolbarConfig.ForAlpha(if (isKeyboardOpen) 1f else toolbarAlpha)
+                    },
                     onClickBack = {
                         @Suppress("DEPRECATION")
                         requireActivity().onBackPressed()
