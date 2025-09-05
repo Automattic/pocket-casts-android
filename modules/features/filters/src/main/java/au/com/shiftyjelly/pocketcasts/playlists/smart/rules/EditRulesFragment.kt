@@ -119,7 +119,7 @@ class EditRulesFragment : BaseDialogFragment() {
 
             override fun onApplyRule(rule: RuleType) = viewModel.applyRule(rule)
 
-            override fun onCreatePlaylist() = Unit
+            override fun createPlaylistCallback() = null
 
             override fun onClose() = dismiss()
         }
