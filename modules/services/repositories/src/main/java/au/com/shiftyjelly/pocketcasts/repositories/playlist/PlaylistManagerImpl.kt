@@ -18,7 +18,7 @@ import au.com.shiftyjelly.pocketcasts.models.entity.PlaylistEntity.Companion.LAS
 import au.com.shiftyjelly.pocketcasts.models.entity.PlaylistEntity.Companion.SYNC_STATUS_NOT_SYNCED
 import au.com.shiftyjelly.pocketcasts.models.entity.PlaylistEntity.Companion.SYNC_STATUS_SYNCED
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
-import au.com.shiftyjelly.pocketcasts.models.to.ManualEpisode
+import au.com.shiftyjelly.pocketcasts.models.to.PlaylistEpisode
 import au.com.shiftyjelly.pocketcasts.models.to.PlaylistEpisodeMetadata
 import au.com.shiftyjelly.pocketcasts.models.type.PlaylistEpisodeSortType
 import au.com.shiftyjelly.pocketcasts.models.type.SmartRules
@@ -225,7 +225,7 @@ class PlaylistManagerImpl(
                                 artworkUuids = podcasts,
                                 totalEpisodeCount = metadata.episodeCount,
                                 displayedEpisodeCount = episodes.size,
-                                displayedAvailableEpisodeCount = episodes.count { it is ManualEpisode.Available },
+                                displayedAvailableEpisodeCount = episodes.count { it is PlaylistEpisode.Available },
                             ),
                             episodes = episodes,
                         )

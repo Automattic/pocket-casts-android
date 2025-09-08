@@ -12,7 +12,7 @@ import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.models.entity.BaseEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.UserEpisode
-import au.com.shiftyjelly.pocketcasts.models.to.ManualEpisode
+import au.com.shiftyjelly.pocketcasts.models.to.PlaylistEpisode
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodeViewSource
 import au.com.shiftyjelly.pocketcasts.podcasts.view.components.PlayButton
 import au.com.shiftyjelly.pocketcasts.podcasts.view.episode.EpisodeContainerFragment
@@ -109,13 +109,13 @@ class PlaylistEpisodesAdapterFactory @Inject constructor(
 
     fun createForManualPlaylist(
         multiSelectToolbar: MultiSelectToolbar,
-        getEpisodes: () -> List<ManualEpisode>,
+        getEpisodes: () -> List<PlaylistEpisode>,
     ): ManualPlaylistEpisodeAdapter {
         lateinit var adapter: ManualPlaylistEpisodeAdapter
         configureDependencies(
             getAdapter = { adapter },
             multiSelectToolbar = multiSelectToolbar,
-            getEpisodes = { getEpisodes().map(ManualEpisode::toMultiselectEpisode) },
+            getEpisodes = { getEpisodes().map(PlaylistEpisode::toMultiselectEpisode) },
         )
         val parentFragmentManager = fragment.parentFragmentManager
         val childFragmentManager = fragment.childFragmentManager
@@ -129,14 +129,14 @@ class PlaylistEpisodesAdapterFactory @Inject constructor(
             settings = settings,
             onRowClick = { episodeWrapper ->
                 when (episodeWrapper) {
-                    is ManualEpisode.Available -> if (parentFragmentManager.findFragmentByTag("episode_card") == null) {
+                    is PlaylistEpisode.Available -> if (parentFragmentManager.findFragmentByTag("episode_card") == null) {
                         EpisodeContainerFragment.newInstance(
                             episode = episodeWrapper.episode,
                             source = EpisodeViewSource.FILTERS,
                         ).show(parentFragmentManager, "episode_card")
                     }
 
-                    is ManualEpisode.Unavailable -> {
+                    is PlaylistEpisode.Unavailable -> {
                         Timber.i("Show sheet for unavailable $episodeWrapper")
                     }
                 }
@@ -269,9 +269,9 @@ class PlaylistEpisodesAdapterFactory @Inject constructor(
     }
 }
 
-private fun ManualEpisode.toMultiselectEpisode() = when (this) {
-    is ManualEpisode.Available -> episode
-    is ManualEpisode.Unavailable -> unavailableMultiselectPlaceholder
+private fun PlaylistEpisode.toMultiselectEpisode() = when (this) {
+    is PlaylistEpisode.Available -> episode
+    is PlaylistEpisode.Unavailable -> unavailableMultiselectPlaceholder
 }
 
 private val unavailableMultiselectPlaceholder = PodcastEpisode(uuid = "unavailable", publishedDate = Date(0))

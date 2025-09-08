@@ -49,7 +49,7 @@ class PlaylistManagerManualTest {
                             displayedAvailableEpisodeCount = 0,
                         ),
                         episodes = listOf(
-                            unavailableManualEpisode(index = 0, podcastIndex = 0, playlistIndex = 0),
+                            unavailablePlaylistEpisode(index = 0, podcastIndex = 0, playlistIndex = 0),
                         ),
                     )
                 },
@@ -66,8 +66,8 @@ class PlaylistManagerManualTest {
                             displayedAvailableEpisodeCount = 0,
                         ),
                         episodes = listOf(
-                            unavailableManualEpisode(index = 0, podcastIndex = 0, playlistIndex = 0),
-                            unavailableManualEpisode(index = 1, podcastIndex = 1, playlistIndex = 0),
+                            unavailablePlaylistEpisode(index = 0, podcastIndex = 0, playlistIndex = 0),
+                            unavailablePlaylistEpisode(index = 1, podcastIndex = 1, playlistIndex = 0),
                         ),
                     )
                 },
@@ -85,8 +85,8 @@ class PlaylistManagerManualTest {
                             artworkUuids = listOf("podcast-id-1"),
                         ),
                         episodes = listOf(
-                            unavailableManualEpisode(index = 0, podcastIndex = 0, playlistIndex = 0),
-                            availableManualEpisode(index = 1, podcastIndex = 1),
+                            unavailablePlaylistEpisode(index = 0, podcastIndex = 0, playlistIndex = 0),
+                            availablePlaylistEpisode(index = 1, podcastIndex = 1),
                         ),
                     )
                 },
@@ -112,10 +112,10 @@ class PlaylistManagerManualTest {
             manager.updateSortType("playlist-id-0", PlaylistEpisodeSortType.OldestToNewest)
             assertEquals(
                 listOf(
-                    unavailableManualEpisode(index = 3, podcastIndex = 0, playlistIndex = 0),
-                    availableManualEpisode(index = 2, podcastIndex = 0) { it.copy(duration = 60.0) },
-                    unavailableManualEpisode(index = 1, podcastIndex = 0, playlistIndex = 0),
-                    availableManualEpisode(index = 0, podcastIndex = 0) { it.copy(duration = 10.0) },
+                    unavailablePlaylistEpisode(index = 3, podcastIndex = 0, playlistIndex = 0),
+                    availablePlaylistEpisode(index = 2, podcastIndex = 0) { it.copy(duration = 60.0) },
+                    unavailablePlaylistEpisode(index = 1, podcastIndex = 0, playlistIndex = 0),
+                    availablePlaylistEpisode(index = 0, podcastIndex = 0) { it.copy(duration = 10.0) },
                 ),
                 awaitItem()?.episodes,
             )
@@ -123,10 +123,10 @@ class PlaylistManagerManualTest {
             manager.updateSortType("playlist-id-0", PlaylistEpisodeSortType.NewestToOldest)
             assertEquals(
                 listOf(
-                    availableManualEpisode(index = 0, podcastIndex = 0) { it.copy(duration = 10.0) },
-                    unavailableManualEpisode(index = 1, podcastIndex = 0, playlistIndex = 0),
-                    availableManualEpisode(index = 2, podcastIndex = 0) { it.copy(duration = 60.0) },
-                    unavailableManualEpisode(index = 3, podcastIndex = 0, playlistIndex = 0),
+                    availablePlaylistEpisode(index = 0, podcastIndex = 0) { it.copy(duration = 10.0) },
+                    unavailablePlaylistEpisode(index = 1, podcastIndex = 0, playlistIndex = 0),
+                    availablePlaylistEpisode(index = 2, podcastIndex = 0) { it.copy(duration = 60.0) },
+                    unavailablePlaylistEpisode(index = 3, podcastIndex = 0, playlistIndex = 0),
                 ),
                 awaitItem()?.episodes,
             )
@@ -134,10 +134,10 @@ class PlaylistManagerManualTest {
             manager.updateSortType("playlist-id-0", PlaylistEpisodeSortType.ShortestToLongest)
             assertEquals(
                 listOf(
-                    availableManualEpisode(index = 0, podcastIndex = 0) { it.copy(duration = 10.0) },
-                    availableManualEpisode(index = 2, podcastIndex = 0) { it.copy(duration = 60.0) },
-                    unavailableManualEpisode(index = 1, podcastIndex = 0, playlistIndex = 0),
-                    unavailableManualEpisode(index = 3, podcastIndex = 0, playlistIndex = 0),
+                    availablePlaylistEpisode(index = 0, podcastIndex = 0) { it.copy(duration = 10.0) },
+                    availablePlaylistEpisode(index = 2, podcastIndex = 0) { it.copy(duration = 60.0) },
+                    unavailablePlaylistEpisode(index = 1, podcastIndex = 0, playlistIndex = 0),
+                    unavailablePlaylistEpisode(index = 3, podcastIndex = 0, playlistIndex = 0),
                 ),
                 awaitItem()?.episodes,
             )
@@ -145,10 +145,10 @@ class PlaylistManagerManualTest {
             manager.updateSortType("playlist-id-0", PlaylistEpisodeSortType.LongestToShortest)
             assertEquals(
                 listOf(
-                    availableManualEpisode(index = 2, podcastIndex = 0) { it.copy(duration = 60.0) },
-                    availableManualEpisode(index = 0, podcastIndex = 0) { it.copy(duration = 10.0) },
-                    unavailableManualEpisode(index = 1, podcastIndex = 0, playlistIndex = 0),
-                    unavailableManualEpisode(index = 3, podcastIndex = 0, playlistIndex = 0),
+                    availablePlaylistEpisode(index = 2, podcastIndex = 0) { it.copy(duration = 60.0) },
+                    availablePlaylistEpisode(index = 0, podcastIndex = 0) { it.copy(duration = 10.0) },
+                    unavailablePlaylistEpisode(index = 1, podcastIndex = 0, playlistIndex = 0),
+                    unavailablePlaylistEpisode(index = 3, podcastIndex = 0, playlistIndex = 0),
                 ),
                 awaitItem()?.episodes,
             )
@@ -176,12 +176,12 @@ class PlaylistManagerManualTest {
             assertEquals(
                 "null search term",
                 listOf(
-                    availableManualEpisode(index = 0, podcastIndex = 0) { it.copy(title = "Episode ABC") },
-                    availableManualEpisode(index = 1, podcastIndex = 0) { it.copy(title = "Episode def") },
-                    availableManualEpisode(index = 2, podcastIndex = 1) { it.copy(title = "epi % sode") },
-                    availableManualEpisode(index = 3, podcastIndex = 1) { it.copy(title = "epi _ sode") },
-                    availableManualEpisode(index = 4, podcastIndex = 1) { it.copy(title = "epi \\ sode") },
-                    unavailableManualEpisode(index = 5, podcastIndex = 0, playlistIndex = 0),
+                    availablePlaylistEpisode(index = 0, podcastIndex = 0) { it.copy(title = "Episode ABC") },
+                    availablePlaylistEpisode(index = 1, podcastIndex = 0) { it.copy(title = "Episode def") },
+                    availablePlaylistEpisode(index = 2, podcastIndex = 1) { it.copy(title = "epi % sode") },
+                    availablePlaylistEpisode(index = 3, podcastIndex = 1) { it.copy(title = "epi _ sode") },
+                    availablePlaylistEpisode(index = 4, podcastIndex = 1) { it.copy(title = "epi \\ sode") },
+                    unavailablePlaylistEpisode(index = 5, podcastIndex = 0, playlistIndex = 0),
                 ),
                 awaitItem()?.episodes,
             )
@@ -191,12 +191,12 @@ class PlaylistManagerManualTest {
             assertEquals(
                 "blank term",
                 listOf(
-                    availableManualEpisode(index = 0, podcastIndex = 0) { it.copy(title = "Episode ABC") },
-                    availableManualEpisode(index = 1, podcastIndex = 0) { it.copy(title = "Episode def") },
-                    availableManualEpisode(index = 2, podcastIndex = 1) { it.copy(title = "epi % sode") },
-                    availableManualEpisode(index = 3, podcastIndex = 1) { it.copy(title = "epi _ sode") },
-                    availableManualEpisode(index = 4, podcastIndex = 1) { it.copy(title = "epi \\ sode") },
-                    unavailableManualEpisode(index = 5, podcastIndex = 0, playlistIndex = 0),
+                    availablePlaylistEpisode(index = 0, podcastIndex = 0) { it.copy(title = "Episode ABC") },
+                    availablePlaylistEpisode(index = 1, podcastIndex = 0) { it.copy(title = "Episode def") },
+                    availablePlaylistEpisode(index = 2, podcastIndex = 1) { it.copy(title = "epi % sode") },
+                    availablePlaylistEpisode(index = 3, podcastIndex = 1) { it.copy(title = "epi _ sode") },
+                    availablePlaylistEpisode(index = 4, podcastIndex = 1) { it.copy(title = "epi \\ sode") },
+                    unavailablePlaylistEpisode(index = 5, podcastIndex = 0, playlistIndex = 0),
                 ),
                 awaitItem()?.episodes,
             )
@@ -206,9 +206,9 @@ class PlaylistManagerManualTest {
             assertEquals(
                 "podcast search",
                 listOf(
-                    availableManualEpisode(index = 0, podcastIndex = 0) { it.copy(title = "Episode ABC") },
-                    availableManualEpisode(index = 1, podcastIndex = 0) { it.copy(title = "Episode def") },
-                    unavailableManualEpisode(index = 5, podcastIndex = 0, playlistIndex = 0),
+                    availablePlaylistEpisode(index = 0, podcastIndex = 0) { it.copy(title = "Episode ABC") },
+                    availablePlaylistEpisode(index = 1, podcastIndex = 0) { it.copy(title = "Episode def") },
+                    unavailablePlaylistEpisode(index = 5, podcastIndex = 0, playlistIndex = 0),
                 ),
                 awaitItem()?.episodes,
             )
@@ -218,7 +218,7 @@ class PlaylistManagerManualTest {
             assertEquals(
                 "episode search",
                 listOf(
-                    availableManualEpisode(index = 0, podcastIndex = 0) { it.copy(title = "Episode ABC") },
+                    availablePlaylistEpisode(index = 0, podcastIndex = 0) { it.copy(title = "Episode ABC") },
                 ),
                 awaitItem()?.episodes,
             )
@@ -228,7 +228,7 @@ class PlaylistManagerManualTest {
             assertEquals(
                 "percent character",
                 listOf(
-                    availableManualEpisode(index = 2, podcastIndex = 1) { it.copy(title = "epi % sode") },
+                    availablePlaylistEpisode(index = 2, podcastIndex = 1) { it.copy(title = "epi % sode") },
                 ),
                 awaitItem()?.episodes,
             )
@@ -238,7 +238,7 @@ class PlaylistManagerManualTest {
             assertEquals(
                 "underscore character",
                 listOf(
-                    availableManualEpisode(index = 3, podcastIndex = 1) { it.copy(title = "epi _ sode") },
+                    availablePlaylistEpisode(index = 3, podcastIndex = 1) { it.copy(title = "epi _ sode") },
                 ),
                 awaitItem()?.episodes,
             )
@@ -248,7 +248,7 @@ class PlaylistManagerManualTest {
             assertEquals(
                 "backslash character",
                 listOf(
-                    availableManualEpisode(index = 4, podcastIndex = 1) { it.copy(title = "epi \\ sode") },
+                    availablePlaylistEpisode(index = 4, podcastIndex = 1) { it.copy(title = "epi \\ sode") },
                 ),
                 awaitItem()?.episodes,
             )

@@ -16,7 +16,7 @@ import au.com.shiftyjelly.pocketcasts.models.entity.ManualPlaylistPodcastSource
 import au.com.shiftyjelly.pocketcasts.models.entity.PlaylistEntity
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
-import au.com.shiftyjelly.pocketcasts.models.to.ManualEpisode
+import au.com.shiftyjelly.pocketcasts.models.to.PlaylistEpisode
 import au.com.shiftyjelly.pocketcasts.models.type.PlaylistEpisodeSortType
 import au.com.shiftyjelly.pocketcasts.models.type.PodcastsSortType
 import au.com.shiftyjelly.pocketcasts.models.type.SmartRules
@@ -431,11 +431,11 @@ class PlaylistManagerDsl : TestWatcher() {
         )
     }
 
-    fun availableManualEpisode(index: Int, podcastIndex: Int, builder: (PodcastEpisode) -> PodcastEpisode = { it }): ManualEpisode.Available {
-        return ManualEpisode.Available(podcastEpisode(index, podcastIndex, builder))
+    fun availablePlaylistEpisode(index: Int, podcastIndex: Int, builder: (PodcastEpisode) -> PodcastEpisode = { it }): PlaylistEpisode.Available {
+        return PlaylistEpisode.Available(podcastEpisode(index, podcastIndex, builder))
     }
 
-    fun unavailableManualEpisode(index: Int, podcastIndex: Int, playlistIndex: Int, builder: (ManualPlaylistEpisode) -> ManualPlaylistEpisode = { it }): ManualEpisode.Unavailable {
-        return ManualEpisode.Unavailable(manualPlaylistEpisode(index, podcastIndex, playlistIndex, builder))
+    fun unavailablePlaylistEpisode(index: Int, podcastIndex: Int, playlistIndex: Int, builder: (ManualPlaylistEpisode) -> ManualPlaylistEpisode = { it }): PlaylistEpisode.Unavailable {
+        return PlaylistEpisode.Unavailable(manualPlaylistEpisode(index, podcastIndex, playlistIndex, builder))
     }
 }

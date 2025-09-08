@@ -1,7 +1,7 @@
 package au.com.shiftyjelly.pocketcasts.repositories.playlist
 
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
-import au.com.shiftyjelly.pocketcasts.models.to.ManualEpisode
+import au.com.shiftyjelly.pocketcasts.models.to.PlaylistEpisode
 import au.com.shiftyjelly.pocketcasts.models.type.PlaylistEpisodeSortType
 import au.com.shiftyjelly.pocketcasts.models.type.SmartRules
 import kotlin.time.Duration
@@ -51,5 +51,5 @@ data class ManualPlaylist(
     override val title: String,
     override val settings: Playlist.Settings,
     override val metadata: Playlist.Metadata,
-    val episodes: List<ManualEpisode>,
+    val episodes: List<PlaylistEpisode>,
 ) : Playlist
