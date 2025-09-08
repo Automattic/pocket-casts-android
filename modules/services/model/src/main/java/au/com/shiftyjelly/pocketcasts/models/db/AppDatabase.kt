@@ -1226,17 +1226,7 @@ abstract class AppDatabase : RoomDatabase() {
         }
 
         val MIGRATION_119_120 = addMigration(119, 120) { database ->
-            with(database) {
-                beginTransaction()
-                try {
-                    database.execSQL("DROP TABLE IF EXISTS filter_episodes")
-                    database.execSQL("DROP INDEX filters_uuid")
-                    database.execSQL("CREATE INDEX smart_playlists_uuid ON smart_playlists(uuid)")
-                    setTransactionSuccessful()
-                } finally {
-                    endTransaction()
-                }
-            }
+            database.execSQL("DROP TABLE IF EXISTS filter_episodes")
         }
 
         fun addMigrations(databaseBuilder: Builder<AppDatabase>, context: Context) {
