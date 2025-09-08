@@ -1,4 +1,4 @@
-package au.com.shiftyjelly.pocketcasts.playlists.smart
+package au.com.shiftyjelly.pocketcasts.playlists
 
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -14,7 +14,7 @@ import au.com.shiftyjelly.pocketcasts.views.fragments.BaseDialogFragment
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
-class DownloadLimitFragment : BaseDialogFragment() {
+internal class DownloadLimitFragment : BaseDialogFragment() {
     private val viewModel by viewModels<PlaylistViewModel>({ requireParentFragment() })
 
     override fun onCreateView(

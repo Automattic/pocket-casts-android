@@ -15,6 +15,7 @@ import au.com.shiftyjelly.pocketcasts.deeplink.DeepLink.Companion.EXTRA_BOOKMARK
 import au.com.shiftyjelly.pocketcasts.deeplink.DeepLink.Companion.EXTRA_EPISODE_UUID
 import au.com.shiftyjelly.pocketcasts.deeplink.DeepLink.Companion.EXTRA_NOTIFICATION_TAG
 import au.com.shiftyjelly.pocketcasts.deeplink.DeepLink.Companion.EXTRA_PAGE
+import au.com.shiftyjelly.pocketcasts.deeplink.DeepLink.Companion.EXTRA_PLAYLIST_TYPE
 import au.com.shiftyjelly.pocketcasts.deeplink.DeepLink.Companion.EXTRA_PLAYLIST_UUID
 import au.com.shiftyjelly.pocketcasts.deeplink.DeepLink.Companion.EXTRA_PODCAST_UUID
 import au.com.shiftyjelly.pocketcasts.deeplink.DeepLink.Companion.EXTRA_SOURCE_VIEW
@@ -38,6 +39,7 @@ sealed interface DeepLink {
         const val EXTRA_NOTIFICATION_TAG = "NOTIFICATION_TAG"
         const val EXTRA_PAGE = "launch-page"
         const val EXTRA_PLAYLIST_UUID = "playlist_uuid"
+        const val EXTRA_PLAYLIST_TYPE = "playlist_type"
     }
 }
 
@@ -169,11 +171,13 @@ data object ShowUpNextModalDeepLink : ShowPageDeepLink {
 
 data class ShowPlaylistDeepLink(
     val playlistUuid: String,
+    val playlistType: String,
 ) : ShowPageDeepLink {
     override val pageId = "playlist"
 
     override fun toIntent(context: Context) = super.toIntent(context)
         .putExtra(EXTRA_PLAYLIST_UUID, playlistUuid)
+        .putExtra(EXTRA_PLAYLIST_TYPE, playlistType)
 }
 
 data object ShowFiltersDeepLink : IntentableDeepLink {

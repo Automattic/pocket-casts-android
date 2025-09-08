@@ -1,4 +1,4 @@
-package au.com.shiftyjelly.pocketcasts.playlists.smart
+package au.com.shiftyjelly.pocketcasts.playlists
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -11,8 +11,9 @@ import au.com.shiftyjelly.pocketcasts.models.type.PlaylistEpisodeSortType
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.download.DownloadManager
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
+import au.com.shiftyjelly.pocketcasts.repositories.playlist.Playlist
 import au.com.shiftyjelly.pocketcasts.repositories.playlist.PlaylistManager
-import au.com.shiftyjelly.pocketcasts.repositories.playlist.SmartPlaylist
+import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
@@ -25,8 +26,8 @@ import kotlinx.coroutines.NonCancellable
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.asSharedFlow
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.flatMapLatest
-import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 
@@ -34,7 +35,9 @@ import kotlinx.coroutines.launch
 @HiltViewModel(assistedFactory = PlaylistViewModel.Factory::class)
 class PlaylistViewModel @AssistedInject constructor(
     @Assisted private val playlistUuid: String,
+    @Assisted private val playlistType: Playlist.Type,
     private val playlistManager: PlaylistManager,
+    private val podcastManager: PodcastManager,
     private val playbackManager: PlaybackManager,
     private val downloadManager: DownloadManager,
     private val settings: Settings,
@@ -57,10 +60,22 @@ class PlaylistViewModel @AssistedInject constructor(
 
     val searchState = SearchFieldState()
 
-    val uiState = searchState.textFlow
-        .flatMapLatest { searchTerm -> playlistManager.smartPlaylistFlow(playlistUuid, searchTerm) }
-        .map { UiState(it) }
-        .stateIn(viewModelScope, SharingStarted.Lazily, initialValue = UiState.Empty)
+    private val playlistFlow = searchState.textFlow.flatMapLatest { searchTerm ->
+        when (playlistType) {
+            Playlist.Type.Manual -> playlistManager.manualPlaylistFlow(playlistUuid, searchTerm)
+            Playlist.Type.Smart -> playlistManager.smartPlaylistFlow(playlistUuid, searchTerm)
+        }
+    }
+
+    val uiState = combine(
+        playlistFlow,
+        podcastManager.countSubscribedFlow(),
+    ) { playlist, followedCount ->
+        UiState(
+            playlist = playlist,
+            isAnyPodcastFollowed = followedCount > 0,
+        )
+    }.stateIn(viewModelScope, SharingStarted.Lazily, initialValue = UiState.Empty)
 
     fun shouldShowPlayAllWarning(): Boolean {
         val queueEpisodes = playbackManager.upNextQueue.allEpisodes
@@ -153,6 +168,10 @@ class PlaylistViewModel @AssistedInject constructor(
         analyticsTracker.track(AnalyticsEvent.FILTER_SHOWN)
     }
 
+    fun trackAddEpisodesTapped() {
+        analyticsTracker.track(AnalyticsEvent.FILTER_EDIT_RULES_TAPPED)
+    }
+
     fun trackEditRulesTapped() {
         analyticsTracker.track(AnalyticsEvent.FILTER_EDIT_RULES_TAPPED)
     }
@@ -217,18 +236,23 @@ class PlaylistViewModel @AssistedInject constructor(
     }
 
     data class UiState(
-        val playlist: SmartPlaylist?,
+        val playlist: Playlist?,
+        val isAnyPodcastFollowed: Boolean,
     ) {
         companion object {
             val Empty = UiState(
                 playlist = null,
+                isAnyPodcastFollowed = false,
             )
         }
     }
 
     @AssistedFactory
     interface Factory {
-        fun create(playlistUuid: String): PlaylistViewModel
+        fun create(
+            playlistUuid: String,
+            playlistType: Playlist.Type,
+        ): PlaylistViewModel
     }
 
     companion object {

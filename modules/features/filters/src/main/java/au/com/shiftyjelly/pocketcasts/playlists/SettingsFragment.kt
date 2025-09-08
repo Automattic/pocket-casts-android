@@ -1,4 +1,4 @@
-package au.com.shiftyjelly.pocketcasts.playlists.smart
+package au.com.shiftyjelly.pocketcasts.playlists
 
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -24,7 +24,7 @@ import kotlinx.coroutines.flow.drop
 
 @OptIn(FlowPreview::class)
 @AndroidEntryPoint
-class SettingsFragment : BaseFragment() {
+internal class SettingsFragment : BaseFragment() {
     private val viewModel by viewModels<PlaylistViewModel>({ requireParentFragment() })
 
     override fun onCreateView(

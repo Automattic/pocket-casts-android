@@ -1,4 +1,4 @@
-package au.com.shiftyjelly.pocketcasts.playlists.smart
+package au.com.shiftyjelly.pocketcasts.playlists
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.clickable
@@ -41,7 +41,7 @@ import au.com.shiftyjelly.pocketcasts.ui.theme.Theme.ThemeType
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 @Composable
-fun SettingsPage(
+internal fun SettingsPage(
     state: TextFieldState,
     isAutoDownloadEnabled: Boolean,
     autoDownloadEpisodeLimit: Int,

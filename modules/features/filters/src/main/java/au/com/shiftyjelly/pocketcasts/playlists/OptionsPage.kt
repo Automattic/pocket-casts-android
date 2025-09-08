@@ -1,4 +1,4 @@
-package au.com.shiftyjelly.pocketcasts.playlists.smart
+package au.com.shiftyjelly.pocketcasts.playlists
 
 import androidx.annotation.DrawableRes
 import androidx.compose.animation.AnimatedContent
@@ -36,14 +36,14 @@ import au.com.shiftyjelly.pocketcasts.compose.components.TextH50
 import au.com.shiftyjelly.pocketcasts.compose.preview.ThemePreviewParameterProvider
 import au.com.shiftyjelly.pocketcasts.compose.theme
 import au.com.shiftyjelly.pocketcasts.models.type.PlaylistEpisodeSortType
-import au.com.shiftyjelly.pocketcasts.repositories.playlist.SmartPlaylist
+import au.com.shiftyjelly.pocketcasts.repositories.playlist.Playlist
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme.ThemeType
 import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 @Composable
-fun OptionsPage(
-    playlist: SmartPlaylist,
+internal fun OptionsPage(
+    playlist: Playlist,
     onSelectSortType: (PlaylistEpisodeSortType) -> Unit,
     onClickSelectAll: () -> Unit,
     onClickSortBy: () -> Unit,

@@ -13,8 +13,6 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import au.com.shiftyjelly.pocketcasts.compose.AppThemeWithBackground
 import au.com.shiftyjelly.pocketcasts.compose.extensions.contentWithoutConsumedInsets
-import au.com.shiftyjelly.pocketcasts.repositories.playlist.Playlist
-import au.com.shiftyjelly.pocketcasts.repositories.playlist.Playlist.Type
 import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingFlow
 import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingLauncher
 import au.com.shiftyjelly.pocketcasts.ui.helper.FragmentHostListener
@@ -24,8 +22,6 @@ import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
-import au.com.shiftyjelly.pocketcasts.playlists.manual.PlaylistFragment as ManualPlaylistFragment
-import au.com.shiftyjelly.pocketcasts.playlists.smart.PlaylistFragment as SmartPlaylistFragment
 
 @AndroidEntryPoint
 class PlaylistsFragment :
@@ -59,10 +55,7 @@ class PlaylistsFragment :
                 },
                 onDeletePlaylist = { playlist -> viewModel.deletePlaylist(playlist.uuid) },
                 onOpenPlaylist = { playlist ->
-                    val fragment = when (playlist.type) {
-                        Type.Manual -> ManualPlaylistFragment.newInstance(playlist.uuid)
-                        Type.Smart -> SmartPlaylistFragment.newInstance(playlist.uuid)
-                    }
+                    val fragment = PlaylistFragment.newInstance(playlist.uuid, playlist.type)
                     (requireActivity() as FragmentHostListener).addFragment(fragment)
                 },
                 onReorderPlaylists = viewModel::updatePlaylistsOrder,

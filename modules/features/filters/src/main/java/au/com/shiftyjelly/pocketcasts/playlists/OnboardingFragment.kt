@@ -14,7 +14,7 @@ import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
 @AndroidEntryPoint
-class OnboardingFragment : BaseDialogFragment() {
+internal class OnboardingFragment : BaseDialogFragment() {
     @Inject
     lateinit var settings: Settings
 

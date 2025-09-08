@@ -26,9 +26,20 @@ sealed interface Playlist {
         val displayedAvailableEpisodeCount: Int,
     )
 
-    enum class Type {
-        Manual,
-        Smart,
+    enum class Type(
+        val analyticsValue: String,
+    ) {
+        Manual(
+            analyticsValue = "manual",
+        ),
+        Smart(
+            analyticsValue = "smart",
+        ),
+        ;
+
+        companion object {
+            fun fromValue(value: String) = entries.firstOrNull { it.analyticsValue == value }
+        }
     }
 
     companion object {
