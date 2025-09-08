@@ -37,6 +37,7 @@ import au.com.shiftyjelly.pocketcasts.compose.components.TextP50
 import au.com.shiftyjelly.pocketcasts.compose.preview.ThemePreviewParameterProvider
 import au.com.shiftyjelly.pocketcasts.compose.theme
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
+import au.com.shiftyjelly.pocketcasts.models.to.PlaylistEpisode
 import au.com.shiftyjelly.pocketcasts.models.type.SmartRules.StarredRule
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme.ThemeType
 import java.util.Date
@@ -45,7 +46,7 @@ import au.com.shiftyjelly.pocketcasts.localization.R as LR
 @Composable
 fun StarredRulePage(
     selectedRule: StarredRule,
-    starredEpisodes: List<PodcastEpisode>,
+    starredEpisodes: List<PlaylistEpisode.Available>,
     useEpisodeArtwork: Boolean,
     onChangeUseStarredEpisodes: (Boolean) -> Unit,
     onSaveRule: () -> Unit,
@@ -143,7 +144,7 @@ private fun StarredSwitchRow(
 
 @Composable
 private fun EpisodesColumn(
-    episodes: List<PodcastEpisode>,
+    episodes: List<PlaylistEpisode.Available>,
     useEpisodeArtwork: Boolean,
     bottomPadding: Dp,
     modifier: Modifier = Modifier,
@@ -152,9 +153,9 @@ private fun EpisodesColumn(
         contentPadding = PaddingValues(bottom = bottomPadding),
         modifier = modifier,
     ) {
-        items(episodes) { episode ->
+        items(episodes) { episodeWrapper ->
             SmartEpisodeRow(
-                episode = episode,
+                episode = episodeWrapper.episode,
                 useEpisodeArtwork = useEpisodeArtwork,
             )
         }
@@ -170,21 +171,20 @@ private fun StarredRulePreview(
     @PreviewParameter(ThemePreviewParameterProvider::class) themeType: ThemeType,
 ) {
     var rule by remember { mutableStateOf(StarredRule.Starred) }
-    val episodes = remember {
-        List(10) { index ->
-            PodcastEpisode(
-                uuid = "uuid-$index",
-                title = "Episode $index",
-                duration = 6000.0,
-                publishedDate = Date(0),
-            )
-        }
-    }
 
     AppThemeWithBackground(themeType) {
         StarredRulePage(
             selectedRule = rule,
-            starredEpisodes = episodes,
+            starredEpisodes = List(10) { index ->
+                PlaylistEpisode.Available(
+                    PodcastEpisode(
+                        uuid = "uuid-$index",
+                        title = "Episode $index",
+                        duration = 6000.0,
+                        publishedDate = Date(0),
+                    ),
+                )
+            },
             useEpisodeArtwork = false,
             onChangeUseStarredEpisodes = { useStarred ->
                 rule = if (useStarred) StarredRule.Starred else StarredRule.Any

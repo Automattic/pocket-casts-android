@@ -30,7 +30,7 @@ import java.util.UUID
 import kotlinx.coroutines.rx2.asObservable
 import au.com.shiftyjelly.pocketcasts.ui.R as UR
 
-class ManualPlaylistEpisodeAdapter(
+class PlaylistEpisodeAdapter(
     private val bookmarkManager: BookmarkManager,
     private val downloadManager: DownloadManager,
     private val playbackManager: PlaybackManager,
@@ -43,7 +43,7 @@ class ManualPlaylistEpisodeAdapter(
     private val fragmentManager: FragmentManager,
     private val swipeButtonLayoutFactory: SwipeButtonLayoutFactory,
     private val artworkContext: ArtworkConfiguration.Element,
-) : ListAdapter<PlaylistEpisode, RecyclerView.ViewHolder>(ManualEpisodeDiffCallback) {
+) : ListAdapter<PlaylistEpisode, RecyclerView.ViewHolder>(PlaylistEpisodeDiffCallback) {
     private val disposables = CompositeDisposable()
 
     init {
@@ -152,7 +152,7 @@ class ManualPlaylistEpisodeAdapter(
     }
 }
 
-private object ManualEpisodeDiffCallback : DiffUtil.ItemCallback<PlaylistEpisode>() {
+private object PlaylistEpisodeDiffCallback : DiffUtil.ItemCallback<PlaylistEpisode>() {
     override fun areItemsTheSame(oldItem: PlaylistEpisode, newItem: PlaylistEpisode) = oldItem.uuid == newItem.uuid
 
     @SuppressLint("DiffUtilEquals")

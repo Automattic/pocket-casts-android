@@ -14,6 +14,7 @@ import au.com.shiftyjelly.pocketcasts.models.entity.PlaylistEntity.Companion.LAS
 import au.com.shiftyjelly.pocketcasts.models.entity.PlaylistEntity.Companion.SYNC_STATUS_NOT_SYNCED
 import au.com.shiftyjelly.pocketcasts.models.entity.PlaylistEntity.Companion.SYNC_STATUS_SYNCED
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
+import au.com.shiftyjelly.pocketcasts.models.to.PlaylistEpisode
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodePlayingStatus
 import au.com.shiftyjelly.pocketcasts.models.type.PlaylistEpisodeSortType
 import au.com.shiftyjelly.pocketcasts.models.type.SmartRules.DownloadStatusRule
@@ -242,7 +243,7 @@ class PlaylistManagerSmartTest {
         insertPodcast(index = 0)
 
         manager.smartEpisodesFlow(rules).test {
-            assertEquals(emptyList<PodcastEpisode>(), awaitItem())
+            assertEquals(emptyList<PlaylistEpisode.Available>(), awaitItem())
 
             val episode1 = insertPodcastEpisode(index = 0, podcastIndex = 0) {
                 it.copy(
@@ -251,7 +252,7 @@ class PlaylistManagerSmartTest {
                     duration = 15.minutes.inWholeSeconds.toDouble(),
                 )
             }
-            assertEquals(listOf(episode1), awaitItem())
+            assertEquals(listOf(episode1).map(PlaylistEpisode::Available), awaitItem())
 
             val episode2 = insertPodcastEpisode(index = 1, podcastIndex = 0) {
                 it.copy(
@@ -260,7 +261,7 @@ class PlaylistManagerSmartTest {
                     duration = 30.minutes.inWholeSeconds.toDouble(),
                 )
             }
-            assertEquals(listOf(episode1, episode2), awaitItem())
+            assertEquals(listOf(episode1, episode2).map(PlaylistEpisode::Available), awaitItem())
 
             insertPodcastEpisode(index = 2, podcastIndex = 0) {
                 it.copy(
@@ -272,10 +273,10 @@ class PlaylistManagerSmartTest {
             expectNoEvents()
 
             updatePodcastEpisode(episode1.copy(fileType = "video/mov"))
-            assertEquals(listOf(episode2), awaitItem())
+            assertEquals(listOf(episode2).map(PlaylistEpisode::Available), awaitItem())
 
             updatePodcastEpisode(episode2.copy(duration = 0.0))
-            assertEquals(emptyList<PodcastEpisode>(), awaitItem())
+            assertEquals(emptyList<PlaylistEpisode.Available>(), awaitItem())
         }
     }
 
@@ -297,28 +298,28 @@ class PlaylistManagerSmartTest {
 
         manager.smartEpisodesFlow(smartRules(), sortType = PlaylistEpisodeSortType.NewestToOldest).test {
             assertEquals(
-                listOf(episodes4, episodes3, episodes2, episodes1),
+                listOf(episodes4, episodes3, episodes2, episodes1).map(PlaylistEpisode::Available),
                 awaitItem(),
             )
         }
 
         manager.smartEpisodesFlow(smartRules(), sortType = PlaylistEpisodeSortType.OldestToNewest).test {
             assertEquals(
-                listOf(episodes1, episodes2, episodes3, episodes4),
+                listOf(episodes1, episodes2, episodes3, episodes4).map(PlaylistEpisode::Available),
                 awaitItem(),
             )
         }
 
         manager.smartEpisodesFlow(smartRules(), sortType = PlaylistEpisodeSortType.ShortestToLongest).test {
             assertEquals(
-                listOf(episodes1, episodes3, episodes2, episodes4),
+                listOf(episodes1, episodes3, episodes2, episodes4).map(PlaylistEpisode::Available),
                 awaitItem(),
             )
         }
 
         manager.smartEpisodesFlow(smartRules(), sortType = PlaylistEpisodeSortType.LongestToShortest).test {
             assertEquals(
-                listOf(episodes4, episodes2, episodes3, episodes1),
+                listOf(episodes4, episodes2, episodes3, episodes1).map(PlaylistEpisode::Available),
                 awaitItem(),
             )
         }
@@ -347,7 +348,7 @@ class PlaylistManagerSmartTest {
         manager.smartEpisodesFlow(smartRules(), searchTerm = null).test {
             assertEquals(
                 "null search term",
-                episodes.take(episodeLimit),
+                episodes.take(episodeLimit).map(PlaylistEpisode::Available),
                 awaitItem(),
             )
         }
@@ -355,7 +356,7 @@ class PlaylistManagerSmartTest {
         manager.smartEpisodesFlow(smartRules(), searchTerm = " ").test {
             assertEquals(
                 "blank search term",
-                episodes.take(episodeLimit),
+                episodes.take(episodeLimit).map(PlaylistEpisode::Available),
                 awaitItem(),
             )
         }
@@ -363,7 +364,7 @@ class PlaylistManagerSmartTest {
         manager.smartEpisodesFlow(smartRules(), searchTerm = "podcast title 0").test {
             assertEquals(
                 "podcast title search",
-                episodes.filterIndexed { index, _ -> index % 2 == 0 },
+                episodes.filterIndexed { index, _ -> index % 2 == 0 }.map(PlaylistEpisode::Available),
                 awaitItem(),
             )
         }
@@ -371,7 +372,7 @@ class PlaylistManagerSmartTest {
         manager.smartEpisodesFlow(smartRules(), searchTerm = "title 7").test {
             assertEquals(
                 "episode title search",
-                listOf(episodes[7]),
+                listOf(episodes[7]).map(PlaylistEpisode::Available),
                 awaitItem(),
             )
         }
@@ -379,7 +380,7 @@ class PlaylistManagerSmartTest {
         manager.smartEpisodesFlow(smartRules(), searchTerm = "title 14").test {
             assertEquals(
                 "search above episode limit",
-                listOf(episodes[14]),
+                listOf(episodes[14]).map(PlaylistEpisode::Available),
                 awaitItem(),
             )
         }
@@ -387,7 +388,7 @@ class PlaylistManagerSmartTest {
         manager.smartEpisodesFlow(smartRules(), searchTerm = "%").test {
             assertEquals(
                 "percent character",
-                listOf(percentEpisode),
+                listOf(percentEpisode).map(PlaylistEpisode::Available),
                 awaitItem(),
             )
         }
@@ -395,7 +396,7 @@ class PlaylistManagerSmartTest {
         manager.smartEpisodesFlow(smartRules(), searchTerm = "_").test {
             assertEquals(
                 "underscore character",
-                listOf(underscoreEpisode),
+                listOf(underscoreEpisode).map(PlaylistEpisode::Available),
                 awaitItem(),
             )
         }
@@ -403,7 +404,7 @@ class PlaylistManagerSmartTest {
         manager.smartEpisodesFlow(smartRules(), searchTerm = "\\").test {
             assertEquals(
                 "backslash character",
-                listOf(backslashEpisode),
+                listOf(backslashEpisode).map(PlaylistEpisode::Available),
                 awaitItem(),
             )
         }
@@ -435,7 +436,7 @@ class PlaylistManagerSmartTest {
             }
             assertEquals(
                 basePlaylist.copy(
-                    episodes = episodes.take(3),
+                    episodes = episodes.take(3).map(PlaylistEpisode::Available),
                     metadata = basePlaylist.metadata.copy(
                         totalEpisodeCount = 3,
                         displayedEpisodeCount = 3,
@@ -449,7 +450,7 @@ class PlaylistManagerSmartTest {
             manager.updateSmartRules("playlist-id-0", smartRules())
             assertEquals(
                 basePlaylist.copy(
-                    episodes = episodes,
+                    episodes = episodes.map(PlaylistEpisode::Available),
                     smartRules = smartRules(),
                     metadata = basePlaylist.metadata.copy(
                         totalEpisodeCount = 4,
@@ -464,7 +465,7 @@ class PlaylistManagerSmartTest {
             manager.updateSortType("playlist-id-0", PlaylistEpisodeSortType.OldestToNewest)
             assertEquals(
                 basePlaylist.copy(
-                    episodes = episodes.reversed(),
+                    episodes = episodes.reversed().map(PlaylistEpisode::Available),
                     smartRules = smartRules(),
                     settings = basePlaylist.settings.copy(
                         sortType = PlaylistEpisodeSortType.OldestToNewest,
@@ -505,7 +506,7 @@ class PlaylistManagerSmartTest {
         manager.smartPlaylistFlow("playlist-id-0", searchTerm = null).test {
             assertEquals(
                 "null search term",
-                episodes.take(episodeLimit),
+                episodes.take(episodeLimit).map(PlaylistEpisode::Available),
                 awaitItem()?.episodes,
             )
         }
@@ -513,7 +514,7 @@ class PlaylistManagerSmartTest {
         manager.smartPlaylistFlow("playlist-id-0", searchTerm = " ").test {
             assertEquals(
                 "blank search term",
-                episodes.take(episodeLimit),
+                episodes.take(episodeLimit).map(PlaylistEpisode::Available),
                 awaitItem()?.episodes,
             )
         }
@@ -521,7 +522,7 @@ class PlaylistManagerSmartTest {
         manager.smartPlaylistFlow("playlist-id-0", searchTerm = "podcast title 0").test {
             assertEquals(
                 "podcast title search",
-                episodes.filterIndexed { index, _ -> index % 2 == 0 },
+                episodes.filterIndexed { index, _ -> index % 2 == 0 }.map(PlaylistEpisode::Available),
                 awaitItem()?.episodes,
             )
         }
@@ -529,7 +530,7 @@ class PlaylistManagerSmartTest {
         manager.smartPlaylistFlow("playlist-id-0", searchTerm = "title 7").test {
             assertEquals(
                 "episode title search",
-                listOf(episodes[7]),
+                listOf(episodes[7]).map(PlaylistEpisode::Available),
                 awaitItem()?.episodes,
             )
         }
@@ -537,7 +538,7 @@ class PlaylistManagerSmartTest {
         manager.smartPlaylistFlow("playlist-id-0", searchTerm = "title 17").test {
             assertEquals(
                 "search above episode limit",
-                listOf(episodes[17]),
+                listOf(episodes[17]).map(PlaylistEpisode::Available),
                 awaitItem()?.episodes,
             )
         }
@@ -545,7 +546,7 @@ class PlaylistManagerSmartTest {
         manager.smartPlaylistFlow("playlist-id-0", searchTerm = "%").test {
             assertEquals(
                 "percent character",
-                listOf(percentEpisode),
+                listOf(percentEpisode).map(PlaylistEpisode::Available),
                 awaitItem()?.episodes,
             )
         }
@@ -553,7 +554,7 @@ class PlaylistManagerSmartTest {
         manager.smartPlaylistFlow("playlist-id-0", searchTerm = "_").test {
             assertEquals(
                 "underscore character",
-                listOf(underscoreEpisode),
+                listOf(underscoreEpisode).map(PlaylistEpisode::Available),
                 awaitItem()?.episodes,
             )
         }
@@ -561,7 +562,7 @@ class PlaylistManagerSmartTest {
         manager.smartPlaylistFlow("playlist-id-0", searchTerm = "\\").test {
             assertEquals(
                 "backslash character",
-                listOf(backslashEpisode),
+                listOf(backslashEpisode).map(PlaylistEpisode::Available),
                 awaitItem()?.episodes,
             )
         }

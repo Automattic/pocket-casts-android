@@ -33,7 +33,7 @@ class SettingsFragment : BaseFragment() {
         savedInstanceState: Bundle?,
     ) = contentWithoutConsumedInsets {
         val uiState by viewModel.uiState.collectAsState()
-        val playlist = uiState.smartPlaylist
+        val playlist = uiState.playlist
         val bottomPadding by viewModel.bottomInset.collectAsState(0)
 
         AppThemeWithBackground(theme.activeTheme) {

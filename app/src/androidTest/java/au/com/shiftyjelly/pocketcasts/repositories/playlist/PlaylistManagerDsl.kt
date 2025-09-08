@@ -435,7 +435,7 @@ class PlaylistManagerDsl : TestWatcher() {
         return PlaylistEpisode.Available(podcastEpisode(index, podcastIndex, builder))
     }
 
-    fun unavailablePlaylistEpisode(index: Int, podcastIndex: Int, playlistIndex: Int, builder: (ManualPlaylistEpisode) -> ManualPlaylistEpisode = { it }): PlaylistEpisode.Unavailable {
+    fun unavailableManualEpisode(index: Int, podcastIndex: Int, playlistIndex: Int, builder: (ManualPlaylistEpisode) -> ManualPlaylistEpisode = { it }): PlaylistEpisode.Unavailable {
         return PlaylistEpisode.Unavailable(manualPlaylistEpisode(index, podcastIndex, playlistIndex, builder))
     }
 }

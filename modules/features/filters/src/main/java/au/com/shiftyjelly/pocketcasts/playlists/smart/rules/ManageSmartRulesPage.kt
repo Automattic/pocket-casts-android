@@ -17,6 +17,7 @@ import au.com.shiftyjelly.pocketcasts.compose.navigation.slideOutToEnd
 import au.com.shiftyjelly.pocketcasts.compose.navigation.slideOutToStart
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
+import au.com.shiftyjelly.pocketcasts.models.to.PlaylistEpisode
 import au.com.shiftyjelly.pocketcasts.models.type.SmartRules.DownloadStatusRule
 import au.com.shiftyjelly.pocketcasts.models.type.SmartRules.MediaTypeRule
 import au.com.shiftyjelly.pocketcasts.models.type.SmartRules.ReleaseDateRule
@@ -26,8 +27,8 @@ internal fun ManageSmartRulesPage(
     playlistName: String,
     appliedRules: AppliedRules,
     rulesBuilder: RulesBuilder,
-    smartEpisodes: List<PodcastEpisode>,
-    smartStarredEpisodes: List<PodcastEpisode>,
+    smartEpisodes: List<PlaylistEpisode.Available>,
+    smartStarredEpisodes: List<PlaylistEpisode.Available>,
     followedPodcasts: List<Podcast>,
     totalEpisodeCount: Int,
     useEpisodeArtwork: Boolean,

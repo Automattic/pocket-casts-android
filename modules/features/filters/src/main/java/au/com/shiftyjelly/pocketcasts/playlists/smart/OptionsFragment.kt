@@ -40,7 +40,7 @@ class OptionsFragment : BaseDialogFragment() {
         savedInstanceState: Bundle?,
     ) = content {
         val uiState by viewModel.uiState.collectAsState()
-        val playlist = uiState.smartPlaylist
+        val playlist = uiState.playlist
 
         DialogBox(
             fillMaxHeight = false,

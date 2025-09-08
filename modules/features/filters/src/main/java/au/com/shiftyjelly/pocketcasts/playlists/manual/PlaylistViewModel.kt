@@ -38,18 +38,18 @@ class PlaylistViewModel @AssistedInject constructor(
         podcastManager.countSubscribedFlow(),
     ) { playlist, followedCount ->
         UiState(
-            manualPlaylist = playlist,
+            playlist = playlist,
             isAnyPodcastFollowed = followedCount > 0,
         )
     }.stateIn(viewModelScope, SharingStarted.Lazily, initialValue = UiState.Empty)
 
     data class UiState(
-        val manualPlaylist: ManualPlaylist?,
+        val playlist: ManualPlaylist?,
         val isAnyPodcastFollowed: Boolean,
     ) {
         companion object {
             val Empty = UiState(
-                manualPlaylist = null,
+                playlist = null,
                 isAnyPodcastFollowed = false,
             )
         }

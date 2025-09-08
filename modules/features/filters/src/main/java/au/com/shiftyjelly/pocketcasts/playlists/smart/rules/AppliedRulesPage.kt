@@ -47,6 +47,7 @@ import au.com.shiftyjelly.pocketcasts.compose.components.TextP50
 import au.com.shiftyjelly.pocketcasts.compose.preview.ThemePreviewParameterProvider
 import au.com.shiftyjelly.pocketcasts.compose.theme
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
+import au.com.shiftyjelly.pocketcasts.models.to.PlaylistEpisode
 import au.com.shiftyjelly.pocketcasts.models.type.SmartRules.PodcastsRule
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme.ThemeType
 import java.util.Date
@@ -57,7 +58,7 @@ import au.com.shiftyjelly.pocketcasts.localization.R as LR
 fun AppliedRulesPage(
     playlistName: String,
     appliedRules: AppliedRules,
-    availableEpisodes: List<PodcastEpisode>,
+    availableEpisodes: List<PlaylistEpisode.Available>,
     totalEpisodeCount: Int,
     useEpisodeArtwork: Boolean,
     onClickRule: (RuleType) -> Unit,
@@ -131,9 +132,9 @@ fun AppliedRulesPage(
                             items = availableEpisodes,
                             key = { episode -> episode.uuid },
                             contentType = { "episode" },
-                        ) { episode ->
+                        ) { episodeWrapper ->
                             SmartEpisodeRow(
-                                episode = episode,
+                                episode = episodeWrapper.episode,
                                 useEpisodeArtwork = useEpisodeArtwork,
                             )
                         }
@@ -356,11 +357,13 @@ private fun AppliedRulesPageEpisodesPreview(
                 podcasts = PodcastsRule.Any,
             ),
             availableEpisodes = List(10) { index ->
-                PodcastEpisode(
-                    uuid = "uuid-$index",
-                    title = "Episode $index",
-                    duration = 6000.0,
-                    publishedDate = Date(0),
+                PlaylistEpisode.Available(
+                    PodcastEpisode(
+                        uuid = "uuid-$index",
+                        title = "Episode $index",
+                        duration = 6000.0,
+                        publishedDate = Date(0),
+                    ),
                 )
             },
             totalEpisodeCount = 10,

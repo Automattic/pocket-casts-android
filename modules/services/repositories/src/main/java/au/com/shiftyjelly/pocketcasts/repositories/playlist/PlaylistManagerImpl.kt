@@ -145,6 +145,8 @@ class PlaylistManagerImpl(
                         SmartPlaylist(
                             uuid = playlist.uuid,
                             title = playlist.title,
+                            smartRules = smartRules,
+                            episodes = episodes,
                             settings = Playlist.Settings(
                                 sortType = playlist.sortType,
                                 isAutoDownloadEnabled = playlist.autoDownload,
@@ -157,8 +159,6 @@ class PlaylistManagerImpl(
                                 displayedEpisodeCount = episodes.size,
                                 displayedAvailableEpisodeCount = episodes.size,
                             ),
-                            smartRules = smartRules,
-                            episodes = episodes,
                         )
                     }
                 }
@@ -167,7 +167,7 @@ class PlaylistManagerImpl(
             .distinctUntilChanged()
     }
 
-    override fun smartEpisodesFlow(rules: SmartRules, sortType: PlaylistEpisodeSortType, searchTerm: String?): Flow<List<PodcastEpisode>> {
+    override fun smartEpisodesFlow(rules: SmartRules, sortType: PlaylistEpisodeSortType, searchTerm: String?): Flow<List<PlaylistEpisode.Available>> {
         return playlistDao
             .smartEpisodesFlow(
                 clock = clock,
@@ -215,6 +215,7 @@ class PlaylistManagerImpl(
                         ManualPlaylist(
                             uuid = playlist.uuid,
                             title = playlist.title,
+                            episodes = episodes,
                             settings = Playlist.Settings(
                                 sortType = playlist.sortType,
                                 isAutoDownloadEnabled = playlist.autoDownload,
@@ -227,7 +228,6 @@ class PlaylistManagerImpl(
                                 displayedEpisodeCount = episodes.size,
                                 displayedAvailableEpisodeCount = episodes.count { it is PlaylistEpisode.Available },
                             ),
-                            episodes = episodes,
                         )
                     }
                 }

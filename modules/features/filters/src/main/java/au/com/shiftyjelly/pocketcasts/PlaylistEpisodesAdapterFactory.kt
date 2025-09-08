@@ -11,12 +11,10 @@ import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.models.entity.BaseEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
-import au.com.shiftyjelly.pocketcasts.models.entity.UserEpisode
 import au.com.shiftyjelly.pocketcasts.models.to.PlaylistEpisode
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodeViewSource
 import au.com.shiftyjelly.pocketcasts.podcasts.view.components.PlayButton
 import au.com.shiftyjelly.pocketcasts.podcasts.view.episode.EpisodeContainerFragment
-import au.com.shiftyjelly.pocketcasts.podcasts.view.podcast.EpisodeListAdapter
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.preferences.model.ArtworkConfiguration.Element
 import au.com.shiftyjelly.pocketcasts.repositories.bookmark.BookmarkManager
@@ -61,57 +59,11 @@ class PlaylistEpisodesAdapterFactory @Inject constructor(
         return if (multiSelectHelper.isMultiSelecting) 1 else 0
     }
 
-    fun createForSmartPlaylist(
-        multiSelectToolbar: MultiSelectToolbar,
-        getEpisodes: () -> List<BaseEpisode>,
-    ): EpisodeListAdapter {
-        lateinit var adapter: EpisodeListAdapter
-        configureDependencies(
-            getAdapter = { adapter },
-            multiSelectToolbar = multiSelectToolbar,
-            getEpisodes = getEpisodes,
-        )
-        val parentFragmentManager = fragment.parentFragmentManager
-        val childFragmentManager = fragment.childFragmentManager
-        val swipeButtonViewModel by fragment.viewModels<SwipeButtonLayoutViewModel>()
-
-        adapter = EpisodeListAdapter(
-            bookmarkManager = bookmarkManager,
-            downloadManager = downloadManager,
-            playbackManager = playbackManager,
-            upNextQueue = upNextQueue,
-            settings = settings,
-            onRowClick = { episode ->
-                when (episode) {
-                    is PodcastEpisode -> if (parentFragmentManager.findFragmentByTag("episode_card") == null) {
-                        EpisodeContainerFragment.newInstance(episode, EpisodeViewSource.FILTERS).show(parentFragmentManager, "episode_card")
-                    }
-
-                    is UserEpisode -> Unit
-                }
-            },
-            playButtonListener = playButtonListener,
-            imageRequestFactory = PocketCastsImageRequestFactory(fragment.requireContext()).themed().smallSize(),
-            multiSelectHelper = multiSelectHelper,
-            fragmentManager = childFragmentManager,
-            swipeButtonLayoutFactory = SwipeButtonLayoutFactory(
-                swipeButtonLayoutViewModel = swipeButtonViewModel,
-                onItemUpdated = { _, index -> adapter.notifyItemChanged(index) },
-                defaultUpNextSwipeAction = { settings.upNextSwipe.value },
-                fragmentManager = parentFragmentManager,
-                swipeSource = EpisodeItemTouchHelper.SwipeSource.FILTERS,
-            ),
-            artworkContext = Element.Filters,
-        )
-
-        return adapter
-    }
-
-    fun createForManualPlaylist(
+    fun create(
         multiSelectToolbar: MultiSelectToolbar,
         getEpisodes: () -> List<PlaylistEpisode>,
-    ): ManualPlaylistEpisodeAdapter {
-        lateinit var adapter: ManualPlaylistEpisodeAdapter
+    ): PlaylistEpisodeAdapter {
+        lateinit var adapter: PlaylistEpisodeAdapter
         configureDependencies(
             getAdapter = { adapter },
             multiSelectToolbar = multiSelectToolbar,
@@ -121,7 +73,7 @@ class PlaylistEpisodesAdapterFactory @Inject constructor(
         val childFragmentManager = fragment.childFragmentManager
         val swipeButtonViewModel by fragment.viewModels<SwipeButtonLayoutViewModel>()
 
-        adapter = ManualPlaylistEpisodeAdapter(
+        adapter = PlaylistEpisodeAdapter(
             bookmarkManager = bookmarkManager,
             downloadManager = downloadManager,
             playbackManager = playbackManager,

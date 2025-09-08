@@ -8,6 +8,7 @@ import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
+import au.com.shiftyjelly.pocketcasts.models.to.PlaylistEpisode
 import au.com.shiftyjelly.pocketcasts.models.type.SmartRules
 import au.com.shiftyjelly.pocketcasts.models.type.SmartRules.DownloadStatusRule
 import au.com.shiftyjelly.pocketcasts.models.type.SmartRules.MediaTypeRule
@@ -202,9 +203,9 @@ class CreatePlaylistViewModel @AssistedInject constructor(
         val appliedRules: AppliedRules,
         val rulesBuilder: RulesBuilder,
         val followedPodcasts: List<Podcast>,
-        val smartEpisodes: List<PodcastEpisode>,
+        val smartEpisodes: List<PlaylistEpisode.Available>,
         val totalEpisodeCount: Int,
-        val smartStarredEpisodes: List<PodcastEpisode>,
+        val smartStarredEpisodes: List<PlaylistEpisode.Available>,
         val useEpisodeArtwork: Boolean,
     ) {
         companion object {

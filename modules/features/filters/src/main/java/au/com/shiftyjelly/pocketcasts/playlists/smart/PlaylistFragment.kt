@@ -136,9 +136,9 @@ class PlaylistFragment :
                 }
             },
         )
-        val episodesAdapter = adapterFactory.createForSmartPlaylist(
+        val episodesAdapter = adapterFactory.create(
             multiSelectToolbar = multiSelectToolbar,
-            getEpisodes = { viewModel.uiState.value.smartPlaylist?.episodes.orEmpty() },
+            getEpisodes = { viewModel.uiState.value.playlist?.episodes.orEmpty() },
         )
         content.adapter = ConcatAdapter(headerAdapter, episodesAdapter)
         EpisodeItemTouchHelper().attachToRecyclerView(content)
@@ -147,13 +147,13 @@ class PlaylistFragment :
             viewModel.uiState
                 .flowWithLifecycle(viewLifecycleOwner.lifecycle)
                 .collect { uiState ->
-                    contentState = when (uiState.smartPlaylist?.episodes?.size) {
+                    contentState = when (uiState.playlist?.episodes?.size) {
                         null -> ContentState.Uninitialized
                         0 -> ContentState.HasNoEpisodes
                         else -> ContentState.HasEpisode
                     }
 
-                    val playlistHeaderData = uiState.smartPlaylist?.let { playlist ->
+                    val playlistHeaderData = uiState.playlist?.let { playlist ->
                         PlaylistHeaderData(
                             title = playlist.title,
                             metadata = playlist.metadata,
@@ -161,7 +161,7 @@ class PlaylistFragment :
                     }
                     headerAdapter.submitHeader(playlistHeaderData)
 
-                    val episodes = uiState.smartPlaylist?.episodes.orEmpty()
+                    val episodes = uiState.playlist?.episodes.orEmpty()
                     episodesAdapter.submitList(episodes)
                 }
         }
@@ -269,7 +269,7 @@ class PlaylistFragment :
 
         playlistToolbar.setContentWithViewCompositionStrategy {
             val title by remember {
-                viewModel.uiState.map { it.smartPlaylist?.title.orEmpty() }
+                viewModel.uiState.map { it.playlist?.title.orEmpty() }
             }.collectAsState("")
 
             AppTheme(theme.activeTheme) {
@@ -317,7 +317,7 @@ class PlaylistFragment :
             return
         }
         if (viewModel.shouldShowPlayAllWarning()) {
-            val episodeCount = viewModel.uiState.value.smartPlaylist?.episodes.orEmpty().size
+            val episodeCount = viewModel.uiState.value.playlist?.episodes.orEmpty().size
             val buttonString = getString(LR.string.filters_play_episodes, episodeCount)
 
             val dialog = ConfirmationDialog()
