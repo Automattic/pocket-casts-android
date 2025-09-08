@@ -53,6 +53,8 @@ interface PlaylistManager {
     fun notAddedManualEpisodesFlow(playlistUuid: String, podcastUuid: String, searchTerm: String? = null): Flow<List<PodcastEpisode>>
 
     suspend fun addManualEpisode(playlistUuid: String, episodeUuid: String): Boolean
+
+    suspend fun deleteManualEpisodes(playlistUuid: String, episodeUuids: Collection<String>)
     // </editor-fold>
 
     companion object {
