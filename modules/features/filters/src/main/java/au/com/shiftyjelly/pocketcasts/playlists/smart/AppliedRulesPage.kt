@@ -1,4 +1,4 @@
-package au.com.shiftyjelly.pocketcasts.playlists.smart.rules
+package au.com.shiftyjelly.pocketcasts.playlists.smart
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.animateFloatAsState
@@ -55,7 +55,7 @@ import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 @Composable
-fun AppliedRulesPage(
+internal fun AppliedRulesPage(
     playlistName: String,
     appliedRules: AppliedRules,
     availableEpisodes: List<PlaylistEpisode.Available>,

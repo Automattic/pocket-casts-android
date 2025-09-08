@@ -1,4 +1,4 @@
-package au.com.shiftyjelly.pocketcasts.playlists.smart.rules
+package au.com.shiftyjelly.pocketcasts.playlists.smart
 
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.padding
@@ -12,7 +12,7 @@ import androidx.compose.ui.unit.dp
 import au.com.shiftyjelly.pocketcasts.compose.components.TextH30
 
 @Composable
-fun RuleCheckboxRow(
+internal fun RuleCheckboxRow(
     title: String,
     isChecked: Boolean,
     onCheckedChange: (Boolean) -> Unit,

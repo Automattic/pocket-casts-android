@@ -1,4 +1,4 @@
-package au.com.shiftyjelly.pocketcasts.playlists.smart.rules
+package au.com.shiftyjelly.pocketcasts.playlists.smart
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.padding
@@ -17,20 +17,20 @@ import au.com.shiftyjelly.pocketcasts.compose.AppThemeWithBackground
 import au.com.shiftyjelly.pocketcasts.compose.PreviewRegularDevice
 import au.com.shiftyjelly.pocketcasts.compose.preview.ThemePreviewParameterProvider
 import au.com.shiftyjelly.pocketcasts.models.type.SmartRules
-import au.com.shiftyjelly.pocketcasts.models.type.SmartRules.MediaTypeRule
+import au.com.shiftyjelly.pocketcasts.models.type.SmartRules.ReleaseDateRule
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme.ThemeType
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 @Composable
-fun MediaTypeRulePage(
-    selectedRule: MediaTypeRule,
-    onSelectMediaType: (MediaTypeRule) -> Unit,
+internal fun ReleaseDateRulePage(
+    selectedRule: ReleaseDateRule,
+    onSelectReleaseDate: (ReleaseDateRule) -> Unit,
     onSaveRule: () -> Unit,
     onClickBack: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     RulePage(
-        title = stringResource(LR.string.filters_chip_media_type),
+        title = stringResource(LR.string.filters_release_date),
         onSaveRule = onSaveRule,
         onClickBack = onClickBack,
         modifier = modifier,
@@ -40,34 +40,37 @@ fun MediaTypeRulePage(
                 .verticalScroll(rememberScrollState())
                 .padding(top = 12.dp, bottom = bottomPadding),
         ) {
-            MediaTypeRule.entries.forEach { rule ->
+            ReleaseDateRule.entries.forEach { rule ->
                 RuleRadioRow(
                     title = stringResource(rule.displayLabelId),
                     isSelected = rule == selectedRule,
-                    onSelect = { onSelectMediaType(rule) },
+                    onSelect = { onSelectReleaseDate(rule) },
                 )
             }
         }
     }
 }
 
-private val MediaTypeRule.displayLabelId get() = when (this) {
-    MediaTypeRule.Any -> LR.string.all
-    MediaTypeRule.Audio -> LR.string.audio
-    MediaTypeRule.Video -> LR.string.video
+private val ReleaseDateRule.displayLabelId get() = when (this) {
+    ReleaseDateRule.AnyTime -> LR.string.filters_time_anytime
+    ReleaseDateRule.Last24Hours -> LR.string.filters_time_24_hours
+    ReleaseDateRule.Last3Days -> LR.string.filters_time_3_days
+    ReleaseDateRule.LastWeek -> LR.string.filters_time_week
+    ReleaseDateRule.Last2Weeks -> LR.string.filters_time_2_weeks
+    ReleaseDateRule.LastMonth -> LR.string.filters_time_month
 }
 
 @Composable
 @PreviewRegularDevice
-private fun MediaTypeRulePreview(
+private fun ReleaseDateRulePreview(
     @PreviewParameter(ThemePreviewParameterProvider::class) themeType: ThemeType,
 ) {
-    var rule by remember { mutableStateOf(SmartRules.Default.mediaType) }
+    var rule by remember { mutableStateOf(SmartRules.Default.releaseDate) }
 
     AppThemeWithBackground(themeType) {
-        MediaTypeRulePage(
+        ReleaseDateRulePage(
             selectedRule = rule,
-            onSelectMediaType = { rule = it },
+            onSelectReleaseDate = { rule = it },
             onSaveRule = {},
             onClickBack = {},
         )

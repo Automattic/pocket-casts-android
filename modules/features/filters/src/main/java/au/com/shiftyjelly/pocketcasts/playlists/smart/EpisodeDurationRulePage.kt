@@ -1,4 +1,4 @@
-package au.com.shiftyjelly.pocketcasts.playlists.smart.rules
+package au.com.shiftyjelly.pocketcasts.playlists.smart
 
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.layout.Column
@@ -41,7 +41,7 @@ import kotlin.time.Duration.Companion.minutes
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 @Composable
-fun EpisodeDurationRulePage(
+internal fun EpisodeDurationRulePage(
     isDurationConstrained: Boolean,
     minDuration: Duration,
     maxDuration: Duration,

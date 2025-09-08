@@ -1,4 +1,4 @@
-package au.com.shiftyjelly.pocketcasts.playlists.smart.rules
+package au.com.shiftyjelly.pocketcasts.playlists.smart
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -16,7 +16,6 @@ import au.com.shiftyjelly.pocketcasts.compose.navigation.slideInToStart
 import au.com.shiftyjelly.pocketcasts.compose.navigation.slideOutToEnd
 import au.com.shiftyjelly.pocketcasts.compose.navigation.slideOutToStart
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
-import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.models.to.PlaylistEpisode
 import au.com.shiftyjelly.pocketcasts.models.type.SmartRules.DownloadStatusRule
 import au.com.shiftyjelly.pocketcasts.models.type.SmartRules.MediaTypeRule

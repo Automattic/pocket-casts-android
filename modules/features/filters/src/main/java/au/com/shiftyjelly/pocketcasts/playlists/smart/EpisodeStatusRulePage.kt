@@ -1,4 +1,4 @@
-package au.com.shiftyjelly.pocketcasts.playlists.smart.rules
+package au.com.shiftyjelly.pocketcasts.playlists.smart
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.padding
@@ -22,7 +22,7 @@ import au.com.shiftyjelly.pocketcasts.ui.theme.Theme.ThemeType
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 @Composable
-fun EpisodeStatusRulePage(
+internal fun EpisodeStatusRulePage(
     rule: EpisodeStatusRule,
     onChangeUnplayedStatus: (Boolean) -> Unit,
     onChangeInProgressStatus: (Boolean) -> Unit,

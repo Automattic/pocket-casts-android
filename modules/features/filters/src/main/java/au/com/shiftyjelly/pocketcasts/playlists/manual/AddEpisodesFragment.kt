@@ -1,4 +1,4 @@
-package au.com.shiftyjelly.pocketcasts.playlists.manual.episode
+package au.com.shiftyjelly.pocketcasts.playlists.manual
 
 import android.os.Bundle
 import android.os.Parcelable
@@ -29,15 +29,14 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import au.com.shiftyjelly.pocketcasts.compose.components.AnimatedNonNullVisibility
 import au.com.shiftyjelly.pocketcasts.compose.components.ThemedSnackbarHost
-import au.com.shiftyjelly.pocketcasts.playlists.manual.episode.AddEpisodesViewModel.Message
+import au.com.shiftyjelly.pocketcasts.localization.R
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseDialogFragment
 import dagger.hilt.android.AndroidEntryPoint
 import dagger.hilt.android.lifecycle.withCreationCallback
 import kotlinx.parcelize.Parcelize
-import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 @AndroidEntryPoint
-class AddEpisodesFragment : BaseDialogFragment() {
+internal class AddEpisodesFragment : BaseDialogFragment() {
     private val args get() = requireNotNull(arguments?.let { BundleCompat.getParcelable(it, NEW_INSTANCE_ARGS, Args::class.java) })
 
     private val viewModel by viewModels<AddEpisodesViewModel>(
@@ -61,7 +60,7 @@ class AddEpisodesFragment : BaseDialogFragment() {
         ClearSearchStateEffect(navController)
 
         DialogBox(
-            modifier = Modifier.nestedScroll(rememberNestedScrollInteropConnection()),
+            modifier = Modifier.Companion.nestedScroll(rememberNestedScrollInteropConnection()),
         ) {
             AnimatedNonNullVisibility(
                 item = viewModel.uiState.collectAsState().value,
@@ -85,13 +84,13 @@ class AddEpisodesFragment : BaseDialogFragment() {
                         }
                     },
                     onClickDoneButton = ::dismiss,
-                    modifier = Modifier.fillMaxSize(),
+                    modifier = Modifier.Companion.fillMaxSize(),
                 )
             }
 
             ThemedSnackbarHost(
                 hostState = snackbarHostState,
-                modifier = Modifier.align(Alignment.BottomCenter),
+                modifier = Modifier.Companion.align(Alignment.Companion.BottomCenter),
             )
         }
     }
@@ -113,7 +112,7 @@ class AddEpisodesFragment : BaseDialogFragment() {
         LaunchedEffect(snackbarState) {
             viewModel.messageQueue.collect { message ->
                 val text = when (message) {
-                    Message.FailedToAddEpisode -> getString(LR.string.add_to_playlist_failure_message)
+                    AddEpisodesViewModel.Message.FailedToAddEpisode -> getString(R.string.add_to_playlist_failure_message)
                 }
                 snackbarState.showSnackbar(text)
             }

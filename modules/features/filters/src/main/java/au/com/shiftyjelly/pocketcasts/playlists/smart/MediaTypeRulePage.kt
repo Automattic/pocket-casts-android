@@ -1,4 +1,4 @@
-package au.com.shiftyjelly.pocketcasts.playlists.smart.rules
+package au.com.shiftyjelly.pocketcasts.playlists.smart
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.padding
@@ -17,20 +17,20 @@ import au.com.shiftyjelly.pocketcasts.compose.AppThemeWithBackground
 import au.com.shiftyjelly.pocketcasts.compose.PreviewRegularDevice
 import au.com.shiftyjelly.pocketcasts.compose.preview.ThemePreviewParameterProvider
 import au.com.shiftyjelly.pocketcasts.models.type.SmartRules
-import au.com.shiftyjelly.pocketcasts.models.type.SmartRules.DownloadStatusRule
+import au.com.shiftyjelly.pocketcasts.models.type.SmartRules.MediaTypeRule
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme.ThemeType
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 @Composable
-fun DownloadStatusRulePage(
-    selectedRule: DownloadStatusRule,
-    onSelectDownloadStatus: (DownloadStatusRule) -> Unit,
+internal fun MediaTypeRulePage(
+    selectedRule: MediaTypeRule,
+    onSelectMediaType: (MediaTypeRule) -> Unit,
     onSaveRule: () -> Unit,
     onClickBack: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     RulePage(
-        title = stringResource(LR.string.filters_chip_download_status),
+        title = stringResource(LR.string.filters_chip_media_type),
         onSaveRule = onSaveRule,
         onClickBack = onClickBack,
         modifier = modifier,
@@ -40,34 +40,34 @@ fun DownloadStatusRulePage(
                 .verticalScroll(rememberScrollState())
                 .padding(top = 12.dp, bottom = bottomPadding),
         ) {
-            DownloadStatusRule.entries.forEach { rule ->
+            MediaTypeRule.entries.forEach { rule ->
                 RuleRadioRow(
                     title = stringResource(rule.displayLabelId),
                     isSelected = rule == selectedRule,
-                    onSelect = { onSelectDownloadStatus(rule) },
+                    onSelect = { onSelectMediaType(rule) },
                 )
             }
         }
     }
 }
 
-private val DownloadStatusRule.displayLabelId get() = when (this) {
-    DownloadStatusRule.Any -> LR.string.all
-    DownloadStatusRule.Downloaded -> LR.string.downloaded
-    DownloadStatusRule.NotDownloaded -> LR.string.not_downloaded
+private val MediaTypeRule.displayLabelId get() = when (this) {
+    MediaTypeRule.Any -> LR.string.all
+    MediaTypeRule.Audio -> LR.string.audio
+    MediaTypeRule.Video -> LR.string.video
 }
 
 @Composable
 @PreviewRegularDevice
-private fun DownloadStatusRulePreview(
+private fun MediaTypeRulePreview(
     @PreviewParameter(ThemePreviewParameterProvider::class) themeType: ThemeType,
 ) {
-    var rule by remember { mutableStateOf(SmartRules.Default.downloadStatus) }
+    var rule by remember { mutableStateOf(SmartRules.Default.mediaType) }
 
     AppThemeWithBackground(themeType) {
-        DownloadStatusRulePage(
+        MediaTypeRulePage(
             selectedRule = rule,
-            onSelectDownloadStatus = { rule = it },
+            onSelectMediaType = { rule = it },
             onSaveRule = {},
             onClickBack = {},
         )

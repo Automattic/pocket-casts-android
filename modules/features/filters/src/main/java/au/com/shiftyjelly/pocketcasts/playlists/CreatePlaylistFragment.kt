@@ -27,10 +27,10 @@ import au.com.shiftyjelly.pocketcasts.compose.navigation.navigateOnce
 import au.com.shiftyjelly.pocketcasts.models.type.SmartRules.DownloadStatusRule
 import au.com.shiftyjelly.pocketcasts.models.type.SmartRules.MediaTypeRule
 import au.com.shiftyjelly.pocketcasts.models.type.SmartRules.ReleaseDateRule
-import au.com.shiftyjelly.pocketcasts.playlists.smart.rules.ManageSmartRulesListener
-import au.com.shiftyjelly.pocketcasts.playlists.smart.rules.ManageSmartRulesPage
-import au.com.shiftyjelly.pocketcasts.playlists.smart.rules.ManageSmartRulesRoutes
-import au.com.shiftyjelly.pocketcasts.playlists.smart.rules.RuleType
+import au.com.shiftyjelly.pocketcasts.playlists.smart.ManageSmartRulesListener
+import au.com.shiftyjelly.pocketcasts.playlists.smart.ManageSmartRulesPage
+import au.com.shiftyjelly.pocketcasts.playlists.smart.ManageSmartRulesRoutes
+import au.com.shiftyjelly.pocketcasts.playlists.smart.RuleType
 import au.com.shiftyjelly.pocketcasts.ui.helper.FragmentHostListener
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseDialogFragment
 import dagger.hilt.android.AndroidEntryPoint

@@ -1,4 +1,4 @@
-package au.com.shiftyjelly.pocketcasts.playlists.smart.rules
+package au.com.shiftyjelly.pocketcasts.playlists.smart
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.animateContentSize
@@ -53,7 +53,7 @@ import au.com.shiftyjelly.pocketcasts.ui.theme.Theme.ThemeType
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 @Composable
-fun PodcastsRulePage(
+internal fun PodcastsRulePage(
     useAllPodcasts: Boolean,
     selectedPodcastUuids: Set<String>,
     podcasts: List<Podcast>,

@@ -1,4 +1,4 @@
-package au.com.shiftyjelly.pocketcasts.playlists.smart.rules
+package au.com.shiftyjelly.pocketcasts.playlists.smart
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.padding
@@ -17,20 +17,20 @@ import au.com.shiftyjelly.pocketcasts.compose.AppThemeWithBackground
 import au.com.shiftyjelly.pocketcasts.compose.PreviewRegularDevice
 import au.com.shiftyjelly.pocketcasts.compose.preview.ThemePreviewParameterProvider
 import au.com.shiftyjelly.pocketcasts.models.type.SmartRules
-import au.com.shiftyjelly.pocketcasts.models.type.SmartRules.ReleaseDateRule
+import au.com.shiftyjelly.pocketcasts.models.type.SmartRules.DownloadStatusRule
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme.ThemeType
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 @Composable
-fun ReleaseDateRulePage(
-    selectedRule: ReleaseDateRule,
-    onSelectReleaseDate: (ReleaseDateRule) -> Unit,
+internal fun DownloadStatusRulePage(
+    selectedRule: DownloadStatusRule,
+    onSelectDownloadStatus: (DownloadStatusRule) -> Unit,
     onSaveRule: () -> Unit,
     onClickBack: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     RulePage(
-        title = stringResource(LR.string.filters_release_date),
+        title = stringResource(LR.string.filters_chip_download_status),
         onSaveRule = onSaveRule,
         onClickBack = onClickBack,
         modifier = modifier,
@@ -40,37 +40,34 @@ fun ReleaseDateRulePage(
                 .verticalScroll(rememberScrollState())
                 .padding(top = 12.dp, bottom = bottomPadding),
         ) {
-            ReleaseDateRule.entries.forEach { rule ->
+            DownloadStatusRule.entries.forEach { rule ->
                 RuleRadioRow(
                     title = stringResource(rule.displayLabelId),
                     isSelected = rule == selectedRule,
-                    onSelect = { onSelectReleaseDate(rule) },
+                    onSelect = { onSelectDownloadStatus(rule) },
                 )
             }
         }
     }
 }
 
-private val ReleaseDateRule.displayLabelId get() = when (this) {
-    ReleaseDateRule.AnyTime -> LR.string.filters_time_anytime
-    ReleaseDateRule.Last24Hours -> LR.string.filters_time_24_hours
-    ReleaseDateRule.Last3Days -> LR.string.filters_time_3_days
-    ReleaseDateRule.LastWeek -> LR.string.filters_time_week
-    ReleaseDateRule.Last2Weeks -> LR.string.filters_time_2_weeks
-    ReleaseDateRule.LastMonth -> LR.string.filters_time_month
+private val DownloadStatusRule.displayLabelId get() = when (this) {
+    DownloadStatusRule.Any -> LR.string.all
+    DownloadStatusRule.Downloaded -> LR.string.downloaded
+    DownloadStatusRule.NotDownloaded -> LR.string.not_downloaded
 }
 
 @Composable
 @PreviewRegularDevice
-private fun ReleaseDateRulePreview(
+private fun DownloadStatusRulePreview(
     @PreviewParameter(ThemePreviewParameterProvider::class) themeType: ThemeType,
 ) {
-    var rule by remember { mutableStateOf(SmartRules.Default.releaseDate) }
+    var rule by remember { mutableStateOf(SmartRules.Default.downloadStatus) }
 
     AppThemeWithBackground(themeType) {
-        ReleaseDateRulePage(
+        DownloadStatusRulePage(
             selectedRule = rule,
-            onSelectReleaseDate = { rule = it },
+            onSelectDownloadStatus = { rule = it },
             onSaveRule = {},
             onClickBack = {},
         )

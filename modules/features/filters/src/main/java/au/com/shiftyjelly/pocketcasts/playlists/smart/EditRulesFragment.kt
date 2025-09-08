@@ -1,4 +1,4 @@
-package au.com.shiftyjelly.pocketcasts.playlists.smart.rules
+package au.com.shiftyjelly.pocketcasts.playlists.smart
 
 import android.os.Bundle
 import android.os.Parcelable
@@ -34,7 +34,7 @@ import dagger.hilt.android.lifecycle.withCreationCallback
 import kotlinx.parcelize.Parcelize
 
 @AndroidEntryPoint
-class EditRulesFragment : BaseDialogFragment() {
+internal class EditRulesFragment : BaseDialogFragment() {
     private val args get() = requireNotNull(arguments?.let { BundleCompat.getParcelable(it, NEW_INSTANCE_ARGS, Args::class.java) })
 
     private val viewModel by viewModels<EditRulesViewModel>(

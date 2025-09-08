@@ -1,4 +1,4 @@
-package au.com.shiftyjelly.pocketcasts.playlists.smart.rules
+package au.com.shiftyjelly.pocketcasts.playlists.smart
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -50,7 +50,7 @@ import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 @Composable
-fun AppliedRulesColumn(
+internal fun AppliedRulesColumn(
     rules: List<RuleType>,
     appliedRules: AppliedRules,
     episodeCount: Int,
@@ -66,7 +66,7 @@ fun AppliedRulesColumn(
 }
 
 @Composable
-fun RulesColumn(
+internal fun RulesColumn(
     rules: List<RuleType>,
     onClickRule: (RuleType) -> Unit,
     modifier: Modifier = Modifier,

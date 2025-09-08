@@ -50,8 +50,8 @@ import au.com.shiftyjelly.pocketcasts.playlists.component.PlaylistHeaderButtonDa
 import au.com.shiftyjelly.pocketcasts.playlists.component.PlaylistHeaderData
 import au.com.shiftyjelly.pocketcasts.playlists.component.PlaylistToolbar
 import au.com.shiftyjelly.pocketcasts.playlists.component.ToolbarConfig
-import au.com.shiftyjelly.pocketcasts.playlists.manual.episode.AddEpisodesFragment
-import au.com.shiftyjelly.pocketcasts.playlists.smart.rules.EditRulesFragment
+import au.com.shiftyjelly.pocketcasts.playlists.manual.AddEpisodesFragment
+import au.com.shiftyjelly.pocketcasts.playlists.smart.EditRulesFragment
 import au.com.shiftyjelly.pocketcasts.repositories.playlist.Playlist
 import au.com.shiftyjelly.pocketcasts.repositories.playlist.PlaylistManager
 import au.com.shiftyjelly.pocketcasts.ui.helper.FragmentHostListener
@@ -66,12 +66,12 @@ import com.google.android.gms.cast.framework.CastButtonFactory
 import com.google.android.material.snackbar.Snackbar
 import dagger.hilt.android.AndroidEntryPoint
 import dagger.hilt.android.lifecycle.withCreationCallback
-import javax.inject.Inject
-import kotlin.math.absoluteValue
-import kotlin.math.roundToInt
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import kotlinx.parcelize.Parcelize
+import javax.inject.Inject
+import kotlin.math.absoluteValue
+import kotlin.math.roundToInt
 import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 import au.com.shiftyjelly.pocketcasts.ui.R as UR

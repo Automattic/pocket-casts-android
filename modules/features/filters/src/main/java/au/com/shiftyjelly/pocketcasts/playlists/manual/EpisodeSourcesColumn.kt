@@ -1,4 +1,4 @@
-package au.com.shiftyjelly.pocketcasts.playlists.manual.episode
+package au.com.shiftyjelly.pocketcasts.playlists.manual
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box

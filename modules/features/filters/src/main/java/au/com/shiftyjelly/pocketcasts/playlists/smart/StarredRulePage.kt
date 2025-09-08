@@ -1,4 +1,4 @@
-package au.com.shiftyjelly.pocketcasts.playlists.smart.rules
+package au.com.shiftyjelly.pocketcasts.playlists.smart
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.animateContentSize
@@ -44,7 +44,7 @@ import java.util.Date
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 @Composable
-fun StarredRulePage(
+internal fun StarredRulePage(
     selectedRule: StarredRule,
     starredEpisodes: List<PlaylistEpisode.Available>,
     useEpisodeArtwork: Boolean,
