@@ -18,6 +18,7 @@ import au.com.shiftyjelly.pocketcasts.models.entity.PlaylistEntity.Companion.LAS
 import au.com.shiftyjelly.pocketcasts.models.entity.PlaylistEntity.Companion.SYNC_STATUS_NOT_SYNCED
 import au.com.shiftyjelly.pocketcasts.models.entity.PlaylistEntity.Companion.SYNC_STATUS_SYNCED
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
+import au.com.shiftyjelly.pocketcasts.models.to.ManualEpisode
 import au.com.shiftyjelly.pocketcasts.models.to.PlaylistEpisodeMetadata
 import au.com.shiftyjelly.pocketcasts.models.type.PlaylistEpisodeSortType
 import au.com.shiftyjelly.pocketcasts.models.type.SmartRules
@@ -143,14 +144,20 @@ class PlaylistManagerImpl(
                         SmartPlaylist(
                             uuid = playlist.uuid,
                             title = playlist.title,
+                            settings = Playlist.Settings(
+                                sortType = playlist.sortType,
+                                isAutoDownloadEnabled = playlist.autoDownload,
+                                autoDownloadLimit = playlist.autodownloadLimit,
+                            ),
+                            metadata = Playlist.Metadata(
+                                playbackDurationLeft = metadata.timeLeftSeconds.seconds,
+                                artworkUuids = podcasts,
+                                totalEpisodeCount = metadata.episodeCount,
+                                displayedEpisodeCount = episodes.size,
+                                displayedAvailableEpisodeCount = episodes.size,
+                            ),
                             smartRules = smartRules,
                             episodes = episodes,
-                            episodeSortType = playlist.sortType,
-                            isAutoDownloadEnabled = playlist.autoDownload,
-                            autoDownloadLimit = playlist.autodownloadLimit,
-                            totalEpisodeCount = metadata.episodeCount,
-                            playbackDurationLeft = metadata.timeLeftSeconds.seconds,
-                            artworkPodcastUuids = podcasts,
                         )
                     }
                 }
@@ -207,10 +214,19 @@ class PlaylistManagerImpl(
                         ManualPlaylist(
                             uuid = playlist.uuid,
                             title = playlist.title,
+                            settings = Playlist.Settings(
+                                sortType = playlist.sortType,
+                                isAutoDownloadEnabled = playlist.autoDownload,
+                                autoDownloadLimit = playlist.autodownloadLimit,
+                            ),
+                            metadata = Playlist.Metadata(
+                                playbackDurationLeft = metadata.timeLeftSeconds.seconds,
+                                artworkUuids = podcasts,
+                                totalEpisodeCount = metadata.episodeCount,
+                                displayedEpisodeCount = episodes.size,
+                                displayedAvailableEpisodeCount = episodes.count { it is ManualEpisode.Available },
+                            ),
                             episodes = episodes,
-                            totalEpisodeCount = metadata.episodeCount,
-                            playbackDurationLeft = metadata.timeLeftSeconds.seconds,
-                            artworkPodcastUuids = podcasts,
                         )
                     }
                 }

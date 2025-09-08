@@ -31,7 +31,7 @@ class DownloadLimitFragment : BaseDialogFragment() {
         ) {
             if (playlist != null) {
                 DownloadLimitPage(
-                    episodeLimit = playlist.autoDownloadLimit,
+                    episodeLimit = playlist.settings.autoDownloadLimit,
                     onSelectEpisodeLimit = { limit ->
                         viewModel.updateAutoDownloadLimit(limit)
                         dismiss()

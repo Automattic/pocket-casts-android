@@ -26,9 +26,8 @@ import au.com.shiftyjelly.pocketcasts.preferences.SettingsImpl
 import au.com.shiftyjelly.pocketcasts.servers.di.ServersModule
 import au.com.shiftyjelly.pocketcasts.sharedtest.MutableClock
 import com.google.firebase.remoteconfig.FirebaseRemoteConfig
-import java.time.Instant
 import java.util.Date
-import kotlin.time.Duration.Companion.seconds
+import kotlin.time.Duration
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.runTest
@@ -357,12 +356,18 @@ class PlaylistManagerDsl : TestWatcher() {
                 title = "Playlist title $index",
                 smartRules = SmartRules.Default,
                 episodes = emptyList(),
-                episodeSortType = PlaylistEpisodeSortType.NewestToOldest,
-                isAutoDownloadEnabled = false,
-                autoDownloadLimit = 10,
-                totalEpisodeCount = 0,
-                playbackDurationLeft = 0.seconds,
-                artworkPodcastUuids = emptyList(),
+                settings = Playlist.Settings(
+                    sortType = PlaylistEpisodeSortType.NewestToOldest,
+                    isAutoDownloadEnabled = false,
+                    autoDownloadLimit = 10,
+                ),
+                metadata = Playlist.Metadata(
+                    playbackDurationLeft = Duration.ZERO,
+                    artworkUuids = emptyList(),
+                    totalEpisodeCount = 0,
+                    displayedEpisodeCount = 0,
+                    displayedAvailableEpisodeCount = 0,
+                ),
             ),
         )
     }
@@ -373,9 +378,18 @@ class PlaylistManagerDsl : TestWatcher() {
                 uuid = "playlist-id-$index",
                 title = "Playlist title $index",
                 episodes = emptyList(),
-                totalEpisodeCount = 0,
-                playbackDurationLeft = 0.seconds,
-                artworkPodcastUuids = emptyList(),
+                settings = Playlist.Settings(
+                    sortType = PlaylistEpisodeSortType.NewestToOldest,
+                    isAutoDownloadEnabled = false,
+                    autoDownloadLimit = 10,
+                ),
+                metadata = Playlist.Metadata(
+                    playbackDurationLeft = Duration.ZERO,
+                    artworkUuids = emptyList(),
+                    totalEpisodeCount = 0,
+                    displayedEpisodeCount = 0,
+                    displayedAvailableEpisodeCount = 0,
+                ),
             ),
         )
     }

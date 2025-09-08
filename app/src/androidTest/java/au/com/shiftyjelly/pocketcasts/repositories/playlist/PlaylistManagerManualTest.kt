@@ -3,7 +3,6 @@ package au.com.shiftyjelly.pocketcasts.repositories.playlist
 import app.cash.turbine.test
 import au.com.shiftyjelly.pocketcasts.models.entity.PlaylistEntity.Companion.SYNC_STATUS_NOT_SYNCED
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
-import au.com.shiftyjelly.pocketcasts.models.to.ManualEpisode
 import au.com.shiftyjelly.pocketcasts.models.type.PlaylistEpisodeSortType
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
@@ -44,7 +43,11 @@ class PlaylistManagerManualTest {
             assertEquals(
                 manualPlaylist(index = 0) {
                     it.copy(
-                        totalEpisodeCount = 1,
+                        metadata = it.metadata.copy(
+                            totalEpisodeCount = 1,
+                            displayedEpisodeCount = 1,
+                            displayedAvailableEpisodeCount = 0,
+                        ),
                         episodes = listOf(
                             unavailableManualEpisode(index = 0, podcastIndex = 0, playlistIndex = 0),
                         ),
@@ -57,7 +60,11 @@ class PlaylistManagerManualTest {
             assertEquals(
                 manualPlaylist(index = 0) {
                     it.copy(
-                        totalEpisodeCount = 2,
+                        metadata = it.metadata.copy(
+                            totalEpisodeCount = 2,
+                            displayedEpisodeCount = 2,
+                            displayedAvailableEpisodeCount = 0,
+                        ),
                         episodes = listOf(
                             unavailableManualEpisode(index = 0, podcastIndex = 0, playlistIndex = 0),
                             unavailableManualEpisode(index = 1, podcastIndex = 1, playlistIndex = 0),
@@ -71,12 +78,16 @@ class PlaylistManagerManualTest {
             assertEquals(
                 manualPlaylist(index = 0) {
                     it.copy(
-                        totalEpisodeCount = 2,
+                        metadata = it.metadata.copy(
+                            totalEpisodeCount = 2,
+                            displayedEpisodeCount = 2,
+                            displayedAvailableEpisodeCount = 1,
+                            artworkUuids = listOf("podcast-id-1"),
+                        ),
                         episodes = listOf(
                             unavailableManualEpisode(index = 0, podcastIndex = 0, playlistIndex = 0),
                             availableManualEpisode(index = 1, podcastIndex = 1),
                         ),
-                        artworkPodcastUuids = listOf("podcast-id-1"),
                     )
                 },
                 awaitItem(),

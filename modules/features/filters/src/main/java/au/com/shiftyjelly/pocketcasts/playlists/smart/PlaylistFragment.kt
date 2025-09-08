@@ -156,10 +156,7 @@ class PlaylistFragment :
                     val playlistHeaderData = uiState.smartPlaylist?.let { playlist ->
                         PlaylistHeaderData(
                             title = playlist.title,
-                            totalEpisodeCount = playlist.totalEpisodeCount,
-                            displayedEpisodeCount = playlist.episodes.size,
-                            playbackDurationLeft = playlist.playbackDurationLeft,
-                            artworkPodcastUuids = playlist.artworkPodcastUuids,
+                            metadata = playlist.metadata,
                         )
                     }
                     headerAdapter.submitHeader(playlistHeaderData)

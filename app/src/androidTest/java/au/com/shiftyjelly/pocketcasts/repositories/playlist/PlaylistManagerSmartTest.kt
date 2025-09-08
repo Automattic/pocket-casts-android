@@ -436,8 +436,12 @@ class PlaylistManagerSmartTest {
             assertEquals(
                 basePlaylist.copy(
                     episodes = episodes.take(3),
-                    totalEpisodeCount = 3,
-                    artworkPodcastUuids = listOf("podcast-id-0", "podcast-id-1"),
+                    metadata = basePlaylist.metadata.copy(
+                        totalEpisodeCount = 3,
+                        displayedEpisodeCount = 3,
+                        displayedAvailableEpisodeCount = 3,
+                        artworkUuids = listOf("podcast-id-0", "podcast-id-1"),
+                    ),
                 ),
                 awaitItem(),
             )
@@ -447,8 +451,12 @@ class PlaylistManagerSmartTest {
                 basePlaylist.copy(
                     episodes = episodes,
                     smartRules = smartRules(),
-                    totalEpisodeCount = 4,
-                    artworkPodcastUuids = listOf("podcast-id-0", "podcast-id-1"),
+                    metadata = basePlaylist.metadata.copy(
+                        totalEpisodeCount = 4,
+                        displayedEpisodeCount = 4,
+                        displayedAvailableEpisodeCount = 4,
+                        artworkUuids = listOf("podcast-id-0", "podcast-id-1"),
+                    ),
                 ),
                 awaitItem(),
             )
@@ -458,9 +466,15 @@ class PlaylistManagerSmartTest {
                 basePlaylist.copy(
                     episodes = episodes.reversed(),
                     smartRules = smartRules(),
-                    totalEpisodeCount = 4,
-                    episodeSortType = PlaylistEpisodeSortType.OldestToNewest,
-                    artworkPodcastUuids = listOf("podcast-id-1", "podcast-id-0"),
+                    settings = basePlaylist.settings.copy(
+                        sortType = PlaylistEpisodeSortType.OldestToNewest,
+                    ),
+                    metadata = basePlaylist.metadata.copy(
+                        totalEpisodeCount = 4,
+                        displayedEpisodeCount = 4,
+                        displayedAvailableEpisodeCount = 4,
+                        artworkUuids = listOf("podcast-id-1", "podcast-id-0"),
+                    ),
                 ),
                 awaitItem(),
             )
@@ -565,9 +579,9 @@ class PlaylistManagerSmartTest {
 
         manager.smartPlaylistFlow("playlist-id-0").test {
             val playlist = awaitItem()
-            assertEquals(episodeLimit * 2, playlist?.totalEpisodeCount)
+            assertEquals(episodeLimit * 2, playlist?.metadata?.totalEpisodeCount)
             assertEquals(episodeLimit, playlist?.episodes?.size)
-            assertEquals((episodeLimit * 2).seconds, playlist?.playbackDurationLeft)
+            assertEquals((episodeLimit * 2).seconds, playlist?.metadata?.playbackDurationLeft)
         }
     }
 
@@ -577,33 +591,33 @@ class PlaylistManagerSmartTest {
         insertPodcast(index = 0)
 
         manager.smartPlaylistFlow("playlist-id-0").test {
-            assertEquals(0.seconds, awaitItem()?.playbackDurationLeft)
+            assertEquals(0.seconds, awaitItem()?.metadata?.playbackDurationLeft)
 
             insertPodcastEpisode(index = 0, podcastIndex = 0) {
                 it.copy(duration = 0.0)
             }
-            assertEquals(0.seconds, awaitItem()?.playbackDurationLeft)
+            assertEquals(0.seconds, awaitItem()?.metadata?.playbackDurationLeft)
 
             insertPodcastEpisode(index = 1, podcastIndex = 0) {
                 it.copy(duration = 20.0)
             }
-            assertEquals(20.seconds, awaitItem()?.playbackDurationLeft)
+            assertEquals(20.seconds, awaitItem()?.metadata?.playbackDurationLeft)
 
             insertPodcastEpisode(index = 2, podcastIndex = 0) {
                 it.copy(duration = 15.0)
             }
-            assertEquals(35.seconds, awaitItem()?.playbackDurationLeft)
+            assertEquals(35.seconds, awaitItem()?.metadata?.playbackDurationLeft)
 
             insertPodcastEpisode(index = 3, podcastIndex = 0) {
                 it.copy(duration = 15.0, playedUpTo = 10.0)
             }
-            assertEquals(40.seconds, awaitItem()?.playbackDurationLeft)
+            assertEquals(40.seconds, awaitItem()?.metadata?.playbackDurationLeft)
 
             // Check when the duration is unknown and playedUpTo can get above it
             insertPodcastEpisode(index = 4, podcastIndex = 0) {
                 it.copy(duration = 0.0, playedUpTo = 10.0)
             }
-            assertEquals(40.seconds, awaitItem()?.playbackDurationLeft)
+            assertEquals(40.seconds, awaitItem()?.metadata?.playbackDurationLeft)
         }
     }
 }
