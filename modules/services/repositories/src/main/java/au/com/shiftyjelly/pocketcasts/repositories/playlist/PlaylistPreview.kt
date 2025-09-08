@@ -5,10 +5,5 @@ data class PlaylistPreview(
     val title: String,
     val episodeCount: Int,
     val artworkPodcastUuids: List<String>,
-    val type: Type,
-) {
-    enum class Type {
-        Manual,
-        Smart,
-    }
-}
+    val type: Playlist.Type,
+)

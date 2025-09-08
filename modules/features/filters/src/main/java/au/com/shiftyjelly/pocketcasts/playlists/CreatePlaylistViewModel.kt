@@ -18,8 +18,9 @@ import au.com.shiftyjelly.pocketcasts.playlists.smart.rules.RulesBuilder
 import au.com.shiftyjelly.pocketcasts.playlists.smart.rules.SmartRulesEditor
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.preferences.model.ArtworkConfiguration.Element
+import au.com.shiftyjelly.pocketcasts.repositories.playlist.Playlist
+import au.com.shiftyjelly.pocketcasts.repositories.playlist.Playlist.Type
 import au.com.shiftyjelly.pocketcasts.repositories.playlist.PlaylistManager
-import au.com.shiftyjelly.pocketcasts.repositories.playlist.PlaylistPreview
 import au.com.shiftyjelly.pocketcasts.repositories.playlist.SmartPlaylistDraft
 import au.com.shiftyjelly.pocketcasts.utils.extensions.combine
 import dagger.assisted.Assisted
@@ -161,7 +162,7 @@ class CreatePlaylistViewModel @AssistedInject constructor(
         viewModelScope.launch {
             val playlistUuid = playlistManager.createSmartPlaylist(draft)
             trackPlaylistCreated(rules)
-            _createdPlaylist.complete(PlaylistCreated(playlistUuid, PlaylistPreview.Type.Smart))
+            _createdPlaylist.complete(PlaylistCreated(playlistUuid, Type.Smart))
         }
     }
 
@@ -173,7 +174,7 @@ class CreatePlaylistViewModel @AssistedInject constructor(
         isCreationTriggered = true
         viewModelScope.launch {
             val playlistUuid = playlistManager.createManualPlaylist(sanitizedName)
-            _createdPlaylist.complete(PlaylistCreated(playlistUuid, PlaylistPreview.Type.Manual))
+            _createdPlaylist.complete(PlaylistCreated(playlistUuid, Type.Manual))
         }
     }
 
@@ -221,7 +222,7 @@ class CreatePlaylistViewModel @AssistedInject constructor(
 
     data class PlaylistCreated(
         val uuid: String,
-        val type: PlaylistPreview.Type,
+        val type: Type,
     )
 
     @AssistedFactory

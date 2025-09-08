@@ -20,7 +20,8 @@ import au.com.shiftyjelly.pocketcasts.playlists.smart.rules.RulesBuilder
 import au.com.shiftyjelly.pocketcasts.playlists.smart.rules.SmartRulesEditor
 import au.com.shiftyjelly.pocketcasts.preferences.UserSetting
 import au.com.shiftyjelly.pocketcasts.preferences.model.ArtworkConfiguration
-import au.com.shiftyjelly.pocketcasts.repositories.playlist.PlaylistPreview
+import au.com.shiftyjelly.pocketcasts.repositories.playlist.Playlist
+import au.com.shiftyjelly.pocketcasts.repositories.playlist.Playlist.Type
 import au.com.shiftyjelly.pocketcasts.repositories.playlist.SmartPlaylistDraft
 import au.com.shiftyjelly.pocketcasts.sharedtest.MainCoroutineRule
 import kotlin.time.Duration.Companion.minutes
@@ -386,7 +387,7 @@ class CreatePlaylistViewModelTest {
                 playlistManager.createSmartPlaylistTurbine.awaitItem(),
             )
             assertEquals(
-                PlaylistPreview.Type.Smart,
+                Type.Smart,
                 viewModel.createdPlaylist.await().type,
             )
         }
@@ -408,7 +409,7 @@ class CreatePlaylistViewModelTest {
                 playlistManager.createManualPlaylistTurbine.awaitItem(),
             )
             assertEquals(
-                PlaylistPreview.Type.Manual,
+                Type.Manual,
                 viewModel.createdPlaylist.await().type,
             )
         }

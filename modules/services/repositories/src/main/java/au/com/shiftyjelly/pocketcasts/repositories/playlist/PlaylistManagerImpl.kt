@@ -29,6 +29,7 @@ import au.com.shiftyjelly.pocketcasts.models.type.SmartRules.PodcastsRule
 import au.com.shiftyjelly.pocketcasts.models.type.SmartRules.ReleaseDateRule
 import au.com.shiftyjelly.pocketcasts.models.type.SmartRules.StarredRule
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
+import au.com.shiftyjelly.pocketcasts.repositories.playlist.Playlist.Type
 import au.com.shiftyjelly.pocketcasts.repositories.playlist.PlaylistManager.Companion.MANUAL_PLAYLIST_EPISODE_LIMIT
 import au.com.shiftyjelly.pocketcasts.repositories.playlist.PlaylistManager.Companion.PLAYLIST_ARTWORK_EPISODE_LIMIT
 import au.com.shiftyjelly.pocketcasts.repositories.playlist.PlaylistManager.Companion.SMART_PLAYLIST_EPISODE_LIMIT
@@ -316,7 +317,7 @@ class PlaylistManagerImpl(
                 title = playlist.title,
                 artworkPodcastUuids = podcasts,
                 episodeCount = metadata.episodeCount,
-                type = PlaylistPreview.Type.Manual,
+                type = Type.Manual,
             )
         }
     }
@@ -330,7 +331,7 @@ class PlaylistManagerImpl(
                 title = playlist.title,
                 artworkPodcastUuids = podcasts,
                 episodeCount = metadata.episodeCount,
-                type = PlaylistPreview.Type.Smart,
+                type = Type.Smart,
             )
         }
     }

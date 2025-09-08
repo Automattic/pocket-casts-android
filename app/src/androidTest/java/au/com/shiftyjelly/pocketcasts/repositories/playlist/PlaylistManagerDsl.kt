@@ -23,6 +23,7 @@ import au.com.shiftyjelly.pocketcasts.models.type.SmartRules
 import au.com.shiftyjelly.pocketcasts.models.type.Subscription
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.preferences.SettingsImpl
+import au.com.shiftyjelly.pocketcasts.repositories.playlist.Playlist.Type
 import au.com.shiftyjelly.pocketcasts.servers.di.ServersModule
 import au.com.shiftyjelly.pocketcasts.sharedtest.MutableClock
 import com.google.firebase.remoteconfig.FirebaseRemoteConfig
@@ -276,9 +277,9 @@ class PlaylistManagerDsl : TestWatcher() {
                 title = "Playlist title $index",
                 episodeCount = 0,
                 artworkPodcastUuids = emptyList(),
-                type = PlaylistPreview.Type.Smart,
+                type = Type.Smart,
             ),
-        ).copy(type = PlaylistPreview.Type.Smart)
+        ).copy(type = Type.Smart)
         return preview
     }
 
@@ -289,9 +290,9 @@ class PlaylistManagerDsl : TestWatcher() {
                 title = "Playlist title $index",
                 episodeCount = 0,
                 artworkPodcastUuids = emptyList(),
-                type = PlaylistPreview.Type.Manual,
+                type = Type.Manual,
             ),
-        ).copy(type = PlaylistPreview.Type.Manual)
+        ).copy(type = Type.Manual)
         return preview
     }
 

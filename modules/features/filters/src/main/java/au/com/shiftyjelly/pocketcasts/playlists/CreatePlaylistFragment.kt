@@ -31,7 +31,8 @@ import au.com.shiftyjelly.pocketcasts.playlists.smart.rules.ManageSmartRulesList
 import au.com.shiftyjelly.pocketcasts.playlists.smart.rules.ManageSmartRulesPage
 import au.com.shiftyjelly.pocketcasts.playlists.smart.rules.ManageSmartRulesRoutes
 import au.com.shiftyjelly.pocketcasts.playlists.smart.rules.RuleType
-import au.com.shiftyjelly.pocketcasts.repositories.playlist.PlaylistPreview
+import au.com.shiftyjelly.pocketcasts.repositories.playlist.Playlist
+import au.com.shiftyjelly.pocketcasts.repositories.playlist.Playlist.Type
 import au.com.shiftyjelly.pocketcasts.ui.helper.FragmentHostListener
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseDialogFragment
 import dagger.hilt.android.AndroidEntryPoint
@@ -160,8 +161,8 @@ class CreatePlaylistFragment : BaseDialogFragment() {
             isPlaylistCreated = true
             dismiss()
             val fragment = when (createdPlaylist.type) {
-                PlaylistPreview.Type.Manual -> ManualPlaylistFragment.newInstance(createdPlaylist.uuid)
-                PlaylistPreview.Type.Smart -> SmartPlaylistFragment.newInstance(createdPlaylist.uuid)
+                Type.Manual -> ManualPlaylistFragment.newInstance(createdPlaylist.uuid)
+                Type.Smart -> SmartPlaylistFragment.newInstance(createdPlaylist.uuid)
             }
             (requireActivity() as FragmentHostListener).addFragment(fragment)
         }

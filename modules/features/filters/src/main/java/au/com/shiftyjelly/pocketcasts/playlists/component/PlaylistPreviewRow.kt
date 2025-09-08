@@ -57,6 +57,8 @@ import au.com.shiftyjelly.pocketcasts.compose.components.TipPosition
 import au.com.shiftyjelly.pocketcasts.compose.components.TooltipPopup
 import au.com.shiftyjelly.pocketcasts.compose.preview.ThemePreviewParameterProvider
 import au.com.shiftyjelly.pocketcasts.compose.theme
+import au.com.shiftyjelly.pocketcasts.repositories.playlist.Playlist
+import au.com.shiftyjelly.pocketcasts.repositories.playlist.Playlist.Type
 import au.com.shiftyjelly.pocketcasts.repositories.playlist.PlaylistPreview
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import kotlin.math.absoluteValue
@@ -208,7 +210,7 @@ internal fun PlaylistPreviewRow(
                     TextH40(
                         text = playlist.title,
                     )
-                    if (playlist.type == PlaylistPreview.Type.Smart) {
+                    if (playlist.type == Type.Smart) {
                         TextP50(
                             text = stringResource(LR.string.smart_playlist),
                             color = MaterialTheme.theme.colors.primaryText02,
@@ -270,7 +272,7 @@ private fun PlaylistPreviewRowPreview(
                     title = "New Releases",
                     episodeCount = 0,
                     artworkPodcastUuids = emptyList(),
-                    type = PlaylistPreview.Type.Smart,
+                    type = Type.Smart,
                 ),
                 showTooltip = false,
                 showDivider = true,
@@ -285,7 +287,7 @@ private fun PlaylistPreviewRowPreview(
                     title = "In progress",
                     episodeCount = 1,
                     artworkPodcastUuids = List(1) { "podcast-uuid-$it" },
-                    type = PlaylistPreview.Type.Manual,
+                    type = Type.Manual,
                 ),
                 showTooltip = false,
                 showDivider = true,
@@ -300,7 +302,7 @@ private fun PlaylistPreviewRowPreview(
                     title = "Starred",
                     episodeCount = 328,
                     artworkPodcastUuids = List(4) { "podcast-uuid-$it" },
-                    type = PlaylistPreview.Type.Smart,
+                    type = Type.Smart,
                 ),
                 showTooltip = false,
                 showDivider = false,
