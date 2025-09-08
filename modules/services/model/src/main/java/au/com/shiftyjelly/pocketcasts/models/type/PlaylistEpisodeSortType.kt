@@ -20,6 +20,10 @@ enum class PlaylistEpisodeSortType(
         serverId = 3,
         analyticsValue = "longest_to_shortest",
     ),
+    DragAndDrop(
+        serverId = 4,
+        analyticsValue = "drag_and_drop",
+    ),
     ;
 
     companion object {

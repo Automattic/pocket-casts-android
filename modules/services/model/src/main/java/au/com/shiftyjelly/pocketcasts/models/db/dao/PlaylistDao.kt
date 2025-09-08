@@ -21,6 +21,7 @@ import au.com.shiftyjelly.pocketcasts.models.to.PlaylistEpisodeMetadata
 import au.com.shiftyjelly.pocketcasts.models.to.PlaylistShortcut
 import au.com.shiftyjelly.pocketcasts.models.to.RawManualEpisode
 import au.com.shiftyjelly.pocketcasts.models.type.PlaylistEpisodeSortType
+import au.com.shiftyjelly.pocketcasts.models.type.PlaylistEpisodeSortType.DragAndDrop
 import au.com.shiftyjelly.pocketcasts.models.type.PlaylistEpisodeSortType.LongestToShortest
 import au.com.shiftyjelly.pocketcasts.models.type.PlaylistEpisodeSortType.NewestToOldest
 import au.com.shiftyjelly.pocketcasts.models.type.PlaylistEpisodeSortType.OldestToNewest
@@ -112,6 +113,7 @@ abstract class PlaylistDao {
         """
         SELECT
           COUNT(*) AS episode_count,
+          SUM(IFNULL(podcastEpisode.archived, 0)) AS archived_episode_count,
           SUM(MAX(0, IFNULL(podcastEpisode.duration, 0) - IFNULL(podcastEpisode.played_up_to, 0))) AS time_left
         FROM playlists AS playlist
         JOIN manual_playlist_episodes AS playlistEpisode ON playlistEpisode.playlist_uuid IS playlist.uuid
@@ -274,7 +276,11 @@ abstract class PlaylistDao {
         smartRules: SmartRules,
     ): Flow<PlaylistEpisodeMetadata> {
         val query = createSmartPlaylistEpisodeQuery(
-            selectClause = "COUNT(*) AS episode_count, SUM(MAX(episode.duration - episode.played_up_to, 0)) AS time_left",
+            selectClause = """
+                COUNT(*) AS episode_count, 
+                0 AS archived_episode_count,
+                SUM(MAX(episode.duration - episode.played_up_to, 0)) AS time_left
+            """.trimIndent(),
             whereClause = smartRules.toSqlWhereClause(clock),
             orderByClause = null,
             limit = null,
@@ -303,6 +309,9 @@ abstract class PlaylistDao {
           CASE WHEN playlist.sortId IS 2 THEN podcastEpisode.added_date END DESC,
           -- longest to shortest
           CASE WHEN playlist.sortId IS 3 THEN podcastEpisode.duration END DESC,
+          CASE WHEN playlist.sortId IS 3 THEN podcastEpisode.added_date END DESC,
+          -- drag and drop: TODO: PCDROID-118
+          CASE WHEN playlist.sortId IS 4 THEN podcastEpisode.published_date END DESC,
           CASE WHEN playlist.sortId IS 4 THEN podcastEpisode.added_date END DESC
     """,
     )
@@ -387,6 +396,9 @@ abstract class PlaylistDao {
           CASE WHEN playlist.sortId IS 2 THEN IFNULL(podcast_episode.added_date, manual_episode.added_at) END DESC,
           -- longest to shortest
           CASE WHEN playlist.sortId IS 3 THEN IFNULL(podcast_episode.duration, -9223372036854775808) END DESC,
+          CASE WHEN playlist.sortId IS 3 THEN IFNULL(podcast_episode.added_date, manual_episode.added_at) END DESC,
+          -- drag and drop: TODO: PCDROID-118
+          CASE WHEN playlist.sortId IS 4 THEN IFNULL(podcast_episode.published_date, manual_episode.published_at) END DESC,
           CASE WHEN playlist.sortId IS 4 THEN IFNULL(podcast_episode.added_date, manual_episode.added_at) END DESC
     """,
     )
@@ -468,7 +480,9 @@ abstract class PlaylistDao {
     }
 
     private fun PlaylistEpisodeSortType.toOrderByClause() = when (this) {
-        NewestToOldest -> "episode.published_date DESC, episode.added_date DESC"
+        // Drag & drop is not supported for smart playlists.
+        // Fall back to newest to oldest instead.
+        NewestToOldest, DragAndDrop -> "episode.published_date DESC, episode.added_date DESC"
         OldestToNewest -> "episode.published_date ASC, episode.added_date ASC"
         ShortestToLongest -> "episode.duration ASC, episode.added_date DESC"
         LongestToShortest -> "episode.duration DESC, episode.added_date DESC"
