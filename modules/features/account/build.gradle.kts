@@ -41,6 +41,9 @@ dependencies {
     api(projects.modules.services.servers)
     api(projects.modules.services.ui)
     api(projects.modules.services.views)
+    implementation(libs.credentials)
+    implementation(libs.credentials.google)
+    implementation(libs.horologist.auth.data)
 
     implementation(platform(libs.compose.bom))
 
