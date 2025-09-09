@@ -9,8 +9,10 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.foundation.layout.wrapContentWidth
@@ -76,7 +78,7 @@ fun OnboardingInterestsPage(
     }
 
     Content(
-        modifier = modifier,
+        modifier = modifier.fillMaxSize(),
         state = state,
         onCategorySelectionChange = viewModel::updateSelectedCategory,
         onContinuePress = {
@@ -145,9 +147,9 @@ private fun Content(
         FlowRow(
             modifier = Modifier
                 .height(IntrinsicSize.Min)
+                .weight(3f, fill = false)
                 .verticalScroll(rememberScrollState())
                 .fillMaxWidth()
-                .weight(1.0f)
                 .animateContentSize(),
             horizontalArrangement = Arrangement.spacedBy(8.dp, alignment = Alignment.CenterHorizontally),
             verticalArrangement = Arrangement.spacedBy(8.dp),
@@ -186,7 +188,9 @@ private fun Content(
                     .padding(horizontal = 4.dp, vertical = 2.dp),
                 fontWeight = FontWeight.W500,
             )
-            Spacer(modifier = Modifier.height(24.dp))
+            Spacer(
+                modifier = Modifier.weight(1f)
+            )
         }
 
         RowButton(
