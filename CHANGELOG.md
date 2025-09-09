@@ -3,6 +3,8 @@
 *   Bug Fixes
     *   Fix Download notifications no longer open app
         ([#4449](https://github.com/Automattic/pocket-casts-android/pull/4449))
+    *   Fix layout spacing in onboarding interests page
+        ([#4471](https://github.com/Automattic/pocket-casts-android/pull/4471))
 
 7.97
 -----
