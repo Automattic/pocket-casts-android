@@ -168,7 +168,7 @@ class PlaylistFragment :
             themeType = theme.activeTheme,
             leftButton = when (args.type) {
                 Playlist.Type.Manual -> PlaylistHeaderButtonData(
-                    iconId = IR.drawable.ic_playlist_add_episodes,
+                    iconId = IR.drawable.ic_playlist_add_episode,
                     label = getString(LR.string.add_episodes),
                     onClick = {
                         viewModel.trackAddEpisodesTapped()
