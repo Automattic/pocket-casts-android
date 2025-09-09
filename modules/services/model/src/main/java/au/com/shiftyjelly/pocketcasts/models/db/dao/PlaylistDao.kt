@@ -476,12 +476,22 @@ abstract class PlaylistDao {
 
     @Query(
         """
-        SELECT playlist.uuid, playlist.title, playlist.iconId
+        SELECT
+          playlist.uuid,
+          playlist.title,
+          playlist.manual,
+          playlist.iconId
         FROM playlists AS playlist
-        WHERE manual = 0 AND deleted = 0 AND draft = 0
-        ORDER BY sortPosition ASC 
+        WHERE 
+          playlist.deleted = 0 
+          AND playlist.draft = 0
+          AND (CASE 
+            WHEN :allowManual IS NOT 0 THEN 1 
+            ELSE playlist.manual = 0
+          END)
+        ORDER BY playlist.sortPosition ASC 
         LIMIT 1
     """,
     )
-    abstract fun playlistShortcutFlow(): Flow<PlaylistShortcut?>
+    abstract fun playlistShortcutFlow(allowManual: Boolean): Flow<PlaylistShortcut?>
 }

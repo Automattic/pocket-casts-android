@@ -13,6 +13,9 @@ import au.com.shiftyjelly.pocketcasts.models.db.dao.PlaylistDao
 import au.com.shiftyjelly.pocketcasts.models.to.PlaylistShortcut
 import au.com.shiftyjelly.pocketcasts.repositories.di.ApplicationScope
 import au.com.shiftyjelly.pocketcasts.repositories.extensions.shortcutDrawableId
+import au.com.shiftyjelly.pocketcasts.repositories.playlist.Playlist
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import dagger.hilt.android.qualifiers.ApplicationContext
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -33,7 +36,7 @@ class DynamicShortcutsSynchronizer @Inject constructor(
         if (!isMonitoring.getAndSet(true) && Build.VERSION.SDK_INT >= Build.VERSION_CODES.N_MR1) {
             scope.launch {
                 playlistDao
-                    .playlistShortcutFlow()
+                    .playlistShortcutFlow(allowManual = FeatureFlag.isEnabled(Feature.PLAYLISTS_REBRANDING, immutable = true))
                     .distinctUntilChanged()
                     .collect { playlist -> setDynamicShortcuts(shortcutManager, playlist) }
             }
@@ -51,11 +54,16 @@ class DynamicShortcutsSynchronizer @Inject constructor(
         }
 
         val title = playlist.title.ifBlank { "Top filter" }
+        val type = if (playlist.isManual) Playlist.Type.Manual else Playlist.Type.Smart
+        val deepLink = ShowPlaylistDeepLink(
+            playlistUuid = playlist.uuid,
+            playlistType = type.analyticsValue,
+        )
         val shortcut = ShortcutInfo.Builder(context, TOP_FILTER_SHORTCUT_ID)
             .setShortLabel(title)
             .setLongLabel(title)
             .setIcon(Icon.createWithResource(context, playlist.shortcutDrawableId))
-            .setIntent(ShowPlaylistDeepLink(playlist.uuid).toIntent(context))
+            .setIntent(deepLink.toIntent(context))
             .build()
 
         val shortcuts = listOf(shortcut)

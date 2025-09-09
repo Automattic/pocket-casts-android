@@ -1,10 +1,11 @@
-package au.com.shiftyjelly.pocketcasts.playlists
+package au.com.shiftyjelly.pocketcasts.playlists.smart
 
-import android.content.DialogInterface
 import android.os.Bundle
+import android.os.Parcelable
 import android.view.LayoutInflater
-import android.view.View
 import android.view.ViewGroup
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -17,34 +18,29 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.rememberNestedScrollInteropConnection
+import androidx.core.os.BundleCompat
+import androidx.core.os.bundleOf
 import androidx.fragment.app.viewModels
 import androidx.fragment.compose.content
 import androidx.navigation.NavController
-import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import au.com.shiftyjelly.pocketcasts.compose.CallOnce
-import au.com.shiftyjelly.pocketcasts.compose.navigation.navigateOnce
+import au.com.shiftyjelly.pocketcasts.compose.components.AnimatedNonNullVisibility
 import au.com.shiftyjelly.pocketcasts.models.type.SmartRules.DownloadStatusRule
 import au.com.shiftyjelly.pocketcasts.models.type.SmartRules.MediaTypeRule
 import au.com.shiftyjelly.pocketcasts.models.type.SmartRules.ReleaseDateRule
-import au.com.shiftyjelly.pocketcasts.playlists.smart.ManageSmartRulesListener
-import au.com.shiftyjelly.pocketcasts.playlists.smart.ManageSmartRulesPage
-import au.com.shiftyjelly.pocketcasts.playlists.smart.ManageSmartRulesRoutes
-import au.com.shiftyjelly.pocketcasts.playlists.smart.RuleType
-import au.com.shiftyjelly.pocketcasts.ui.helper.FragmentHostListener
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseDialogFragment
 import dagger.hilt.android.AndroidEntryPoint
 import dagger.hilt.android.lifecycle.withCreationCallback
-import au.com.shiftyjelly.pocketcasts.localization.R as LR
+import kotlinx.parcelize.Parcelize
 
 @AndroidEntryPoint
-internal class CreatePlaylistFragment : BaseDialogFragment() {
-    private var isPlaylistCreated = false
+internal class EditRulesFragment : BaseDialogFragment() {
+    private val args get() = requireNotNull(arguments?.let { BundleCompat.getParcelable(it, NEW_INSTANCE_ARGS, Args::class.java) })
 
-    private val viewModel by viewModels<CreatePlaylistViewModel>(
+    private val viewModel by viewModels<EditRulesViewModel>(
         extrasProducer = {
-            defaultViewModelCreationExtras.withCreationCallback<CreatePlaylistViewModel.Factory> { factory ->
-                factory.create(initialPlaylistName = getString(LR.string.new_playlist))
+            defaultViewModelCreationExtras.withCreationCallback<EditRulesViewModel.Factory> { factory ->
+                factory.create(playlistUuid = args.playlistUuid)
             }
         },
     )
@@ -54,10 +50,6 @@ internal class CreatePlaylistFragment : BaseDialogFragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?,
     ) = content {
-        val uiState by viewModel.uiState.collectAsState()
-
-        OpenCreatedPlaylistEffect()
-
         DialogBox(
             modifier = Modifier.nestedScroll(rememberNestedScrollInteropConnection()),
         ) {
@@ -66,41 +58,24 @@ internal class CreatePlaylistFragment : BaseDialogFragment() {
 
             ClearTransientRulesStateEffect(navController)
 
-            ManageSmartRulesPage(
-                playlistName = viewModel.playlistNameState.text.toString(),
-                appliedRules = uiState.appliedRules,
-                rulesBuilder = uiState.rulesBuilder,
-                smartEpisodes = uiState.smartEpisodes,
-                smartStarredEpisodes = uiState.smartStarredEpisodes,
-                followedPodcasts = uiState.followedPodcasts,
-                totalEpisodeCount = uiState.totalEpisodeCount,
-                useEpisodeArtwork = uiState.useEpisodeArtwork,
-                navController = navController,
-                listener = listener,
-                startDestination = NavigationRoutes.NEW_PLAYLIST,
-                modifier = Modifier.fillMaxSize(),
-            ) {
-                composable(NavigationRoutes.NEW_PLAYLIST) {
-                    CallOnce {
-                        viewModel.trackCreatePlaylistShown()
-                    }
-                    CreatePlaylistPage(
-                        titleState = viewModel.playlistNameState,
-                        onCreateManualPlaylist = {
-                            viewModel.trackCreateManualPlaylist()
-                            viewModel.createManualPlaylist()
-                        },
-                        onContinueToSmartPlaylist = {
-                            viewModel.trackCreateSmartPlaylist()
-                            navController.navigateOnce(ManageSmartRulesRoutes.SMART_PLAYLIST_PREVIEW) {
-                                popUpTo(NavigationRoutes.NEW_PLAYLIST) {
-                                    inclusive = true
-                                }
-                            }
-                        },
-                        onClickClose = ::dismiss,
-                    )
-                }
+            AnimatedNonNullVisibility(
+                item = viewModel.uiState.collectAsState().value,
+                enter = fadeIn,
+                exit = fadeOut,
+            ) { uiState ->
+                ManageSmartRulesPage(
+                    playlistName = uiState.playlistTitle,
+                    appliedRules = uiState.appliedRules,
+                    rulesBuilder = uiState.rulesBuilder,
+                    smartEpisodes = uiState.smartEpisodes,
+                    smartStarredEpisodes = uiState.smartStarredEpisodes,
+                    followedPodcasts = uiState.followedPodcasts,
+                    totalEpisodeCount = uiState.totalEpisodeCount,
+                    useEpisodeArtwork = uiState.useEpisodeArtwork,
+                    navController = navController,
+                    listener = listener,
+                    modifier = Modifier.fillMaxSize(),
+                )
             }
         }
     }
@@ -144,20 +119,9 @@ internal class CreatePlaylistFragment : BaseDialogFragment() {
 
             override fun onApplyRule(rule: RuleType) = viewModel.applyRule(rule)
 
-            override fun createPlaylistCallback() = { viewModel.createSmartPlaylist() }
+            override fun createPlaylistCallback() = null
 
             override fun onClose() = dismiss()
-        }
-    }
-
-    @Composable
-    private fun OpenCreatedPlaylistEffect() {
-        LaunchedEffect(Unit) {
-            val createdPlaylist = viewModel.createdPlaylist.await()
-            isPlaylistCreated = true
-            dismiss()
-            val fragment = PlaylistFragment.newInstance(createdPlaylist.uuid, createdPlaylist.type)
-            (requireActivity() as FragmentHostListener).addFragment(fragment)
         }
     }
 
@@ -175,19 +139,19 @@ internal class CreatePlaylistFragment : BaseDialogFragment() {
         }
     }
 
-    override fun onDismiss(dialog: DialogInterface) {
-        super.onDismiss(dialog)
-        if (!requireActivity().isChangingConfigurations && !isPlaylistCreated) {
-            viewModel.trackCreatePlaylistCancelled()
+    @Parcelize
+    private class Args(
+        val playlistUuid: String,
+    ) : Parcelable
+
+    companion object {
+        private const val NEW_INSTANCE_ARGS = "SmartRulesEditFragmentArgs"
+
+        fun newInstance(playlistUuid: String) = EditRulesFragment().apply {
+            arguments = bundleOf(NEW_INSTANCE_ARGS to Args(playlistUuid))
         }
     }
-
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
-        setPreFlingThreshold(thresholdDp = 150)
-    }
 }
 
-private object NavigationRoutes {
-    const val NEW_PLAYLIST = "new_playlist"
-}
+private val fadeIn = fadeIn()
+private val fadeOut = fadeOut()
