@@ -1,5 +1,6 @@
 package au.com.shiftyjelly.pocketcasts.playlists.component
 
+import android.annotation.SuppressLint
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.Crossfade
 import androidx.compose.animation.core.Spring
@@ -89,6 +90,7 @@ import au.com.shiftyjelly.pocketcasts.compose.components.TextP60
 import au.com.shiftyjelly.pocketcasts.compose.preview.ThemePreviewParameterProvider
 import au.com.shiftyjelly.pocketcasts.compose.theme
 import au.com.shiftyjelly.pocketcasts.localization.helper.toFriendlyString
+import au.com.shiftyjelly.pocketcasts.repositories.playlist.Playlist
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme.ThemeType
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.days
@@ -100,10 +102,7 @@ import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 internal data class PlaylistHeaderData(
     val title: String,
-    val totalEpisodeCount: Int,
-    val displayedEpisodeCount: Int,
-    val playbackDurationLeft: Duration,
-    val artworkPodcastUuids: List<String>,
+    val metadata: Playlist.Metadata,
 )
 
 internal data class PlaylistHeaderButtonData(
@@ -112,6 +111,7 @@ internal data class PlaylistHeaderButtonData(
     val onClick: () -> Unit,
 )
 
+@SuppressLint("UnusedBoxWithConstraintsScope")
 @Composable
 internal fun PlaylistHeader(
     data: PlaylistHeaderData?,
@@ -126,7 +126,7 @@ internal fun PlaylistHeader(
     BoxWithConstraints(
         modifier = modifier,
     ) {
-        val podcastUuids = data?.artworkPodcastUuids
+        val podcastUuids = data?.metadata?.artworkUuids
         val contentTopPadding = AppBarDefaults.topAppBarWindowInsets
             .asPaddingValues()
             .calculateTopPadding()
@@ -164,8 +164,8 @@ internal fun PlaylistHeader(
                 modifier = Modifier.height(8.dp),
             )
             PlaylistInfoText(
-                episodeCount = data?.totalEpisodeCount,
-                playbackDurationLeft = data?.playbackDurationLeft,
+                episodeCount = data?.metadata?.totalEpisodeCount,
+                playbackDurationLeft = data?.metadata?.playbackDurationLeft,
             )
             Spacer(
                 modifier = Modifier.height(16.dp),
@@ -188,7 +188,7 @@ internal fun PlaylistHeader(
                     modifier = Modifier.height(16.dp),
                 )
                 AnimatedVisibility(
-                    visible = data.totalEpisodeCount != 0 && data.displayedEpisodeCount == 0,
+                    visible = data.metadata.totalEpisodeCount != 0 && data.metadata.displayedEpisodeCount == 0,
                     enter = noContentEnterTransition,
                     exit = noContentExitTransition,
                 ) {
@@ -580,10 +580,13 @@ private fun PlaylistHeaderNoDisplayedEpisodesPreview() {
             PlaylistHeader(
                 data = PlaylistHeaderData(
                     title = "My Playlist",
-                    totalEpisodeCount = 20,
-                    displayedEpisodeCount = 0,
-                    playbackDurationLeft = 0.seconds,
-                    artworkPodcastUuids = emptyList(),
+                    metadata = Playlist.Metadata(
+                        playbackDurationLeft = 0.seconds,
+                        artworkUuids = emptyList(),
+                        totalEpisodeCount = 20,
+                        displayedEpisodeCount = 0,
+                        displayedAvailableEpisodeCount = 0,
+                    ),
                 ),
                 leftButton = PlaylistHeaderButtonData(
                     iconId = IR.drawable.sleep_timer_cog,
@@ -616,10 +619,13 @@ private fun PlaylistHeaderSinglePodcastPreview() {
             PlaylistHeader(
                 data = PlaylistHeaderData(
                     title = "My Playlist",
-                    totalEpisodeCount = 100,
-                    displayedEpisodeCount = 100,
-                    playbackDurationLeft = 200.days + 12.hours,
-                    artworkPodcastUuids = listOf("podcast-uuid"),
+                    metadata = Playlist.Metadata(
+                        playbackDurationLeft = 200.days + 12.hours,
+                        artworkUuids = listOf("podcast-uuid"),
+                        totalEpisodeCount = 100,
+                        displayedEpisodeCount = 100,
+                        displayedAvailableEpisodeCount = 100,
+                    ),
                 ),
                 leftButton = PlaylistHeaderButtonData(
                     iconId = IR.drawable.sleep_timer_cog,
@@ -652,10 +658,13 @@ private fun PlaylistHeaderMultiPodcastPreview() {
             PlaylistHeader(
                 data = PlaylistHeaderData(
                     title = "My Playlist",
-                    totalEpisodeCount = 5,
-                    displayedEpisodeCount = 5,
-                    playbackDurationLeft = 1.hours + 15.minutes,
-                    artworkPodcastUuids = List(4) { "podcast-uuid-$it" },
+                    metadata = Playlist.Metadata(
+                        playbackDurationLeft = 1.hours + 15.minutes,
+                        artworkUuids = List(4) { "podcast-uuid-$it" },
+                        totalEpisodeCount = 5,
+                        displayedEpisodeCount = 5,
+                        displayedAvailableEpisodeCount = 5,
+                    ),
                 ),
                 leftButton = PlaylistHeaderButtonData(
                     iconId = IR.drawable.sleep_timer_cog,
@@ -690,10 +699,13 @@ private fun PlaylistHeaderThemePreview(
             PlaylistHeader(
                 data = PlaylistHeaderData(
                     title = "My Playlist",
-                    totalEpisodeCount = 5,
-                    displayedEpisodeCount = 5,
-                    playbackDurationLeft = 1.hours + 15.minutes,
-                    artworkPodcastUuids = List(4) { "podcast-uuid-$it" },
+                    metadata = Playlist.Metadata(
+                        playbackDurationLeft = 1.hours + 15.minutes,
+                        artworkUuids = List(4) { "podcast-uuid-$it" },
+                        totalEpisodeCount = 5,
+                        displayedEpisodeCount = 5,
+                        displayedAvailableEpisodeCount = 5,
+                    ),
                 ),
                 leftButton = PlaylistHeaderButtonData(
                     iconId = IR.drawable.sleep_timer_cog,

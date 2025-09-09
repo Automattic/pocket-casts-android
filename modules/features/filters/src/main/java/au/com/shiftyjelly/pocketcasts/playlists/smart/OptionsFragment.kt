@@ -73,7 +73,7 @@ class OptionsFragment : BaseDialogFragment() {
                         },
                         onClickDownloadAll = {
                             viewModel.trackDownloadAllTapped()
-                            downloadAll(playlist.totalEpisodeCount)
+                            downloadAll(playlist.metadata.displayedAvailableEpisodeCount)
                             dismiss()
                         },
                         onClickChromeCast = {

@@ -59,13 +59,13 @@ fun OptionsPage(
     ) { isSorting ->
         if (isSorting) {
             SmartPlaylistSortOptionsColumn(
-                selectedSortType = playlist.episodeSortType,
+                selectedSortType = playlist.settings.sortType,
                 onSelectSortType = onSelectSortType,
             )
         } else {
             SmartPlaylistOptionsColumn(
-                sortType = playlist.episodeSortType,
-                hasEpisodes = playlist.totalEpisodeCount > 0,
+                sortType = playlist.settings.sortType,
+                hasEpisodes = playlist.metadata.displayedAvailableEpisodeCount > 0,
                 onClickSelectAll = onClickSelectAll,
                 onClickSortBy = {
                     isSelectingSortType = true

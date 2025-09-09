@@ -43,8 +43,8 @@ class SettingsFragment : BaseFragment() {
 
                 SettingsPage(
                     state = nameState,
-                    isAutoDownloadEnabled = playlist.isAutoDownloadEnabled,
-                    autoDownloadEpisodeLimit = playlist.autoDownloadLimit,
+                    isAutoDownloadEnabled = playlist.settings.isAutoDownloadEnabled,
+                    autoDownloadEpisodeLimit = playlist.settings.autoDownloadLimit,
                     onChangeAutoDownloadValue = viewModel::updateAutoDownload,
                     onClickEpisodeLimit = ::openDownloadLimit,
                     onClickBack = {
