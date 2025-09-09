@@ -147,6 +147,7 @@ private fun Content(
                 .height(IntrinsicSize.Min)
                 .verticalScroll(rememberScrollState())
                 .fillMaxWidth()
+                .weight(1.0f)
                 .animateContentSize(),
             horizontalArrangement = Arrangement.spacedBy(8.dp, alignment = Alignment.CenterHorizontally),
             verticalArrangement = Arrangement.spacedBy(8.dp),
@@ -185,7 +186,7 @@ private fun Content(
                     .padding(horizontal = 4.dp, vertical = 2.dp),
                 fontWeight = FontWeight.W500,
             )
-            Spacer(modifier = Modifier.weight(1f))
+            Spacer(modifier = Modifier.height(24.dp))
         }
 
         RowButton(
