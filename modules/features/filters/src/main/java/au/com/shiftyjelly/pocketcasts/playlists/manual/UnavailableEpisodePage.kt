@@ -13,6 +13,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
@@ -25,6 +26,7 @@ import au.com.shiftyjelly.pocketcasts.compose.preview.ThemePreviewParameterProvi
 import au.com.shiftyjelly.pocketcasts.compose.theme
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme.ThemeType
 import au.com.shiftyjelly.pocketcasts.images.R as IR
+import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 @Composable
 internal fun UnavailableEpisodePage(
@@ -45,21 +47,22 @@ internal fun UnavailableEpisodePage(
             modifier = Modifier.height(24.dp),
         )
         TextH20(
-            text = "Episode unavailable",
+            text = stringResource(LR.string.playlist_episode_unavailable_title),
         )
         Spacer(
             modifier = Modifier.height(8.dp),
         )
         TextP40(
-            text = "The podcast creator deleted this episode. It will stay in your playlist until you remove it.",
+            text = stringResource(LR.string.playlist_episode_unavailable_description),
             textAlign = TextAlign.Center,
             color = MaterialTheme.theme.colors.primaryText02,
+            modifier = Modifier.padding(horizontal = 20.dp),
         )
         Spacer(
-            modifier = Modifier.height(40.dp),
+            modifier = Modifier.height(48.dp),
         )
         RowButton(
-            text = "Remove from playlist",
+            text = stringResource(LR.string.playlist_episode_unavailable_cta),
             onClick = onClickRemove,
             includePadding = false,
         )

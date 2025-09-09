@@ -58,12 +58,13 @@ class UnavailableEpisodeFragment : BaseDialogFragment() {
                 UnavailableEpisodePage(
                     onClickRemove = {
                         viewModel.deleteEpisode(args.episodeUuid)
+                        dismiss()
                     },
                     modifier = Modifier.padding(
                         top = 24.dp,
                         bottom = 16.dp,
-                        start = 16.dp,
-                        end = 16.dp,
+                        start = 20.dp,
+                        end = 20.dp,
                     ),
                 )
             }
@@ -79,9 +80,9 @@ class UnavailableEpisodeFragment : BaseDialogFragment() {
         private const val NEW_INSTANCE_ARGS = "UnavailableEpisodeFragmentArgs"
 
         fun newInstance(
-            uuid: String,
+            episodeUuid: String,
         ) = UnavailableEpisodeFragment().apply {
-            arguments = bundleOf(NEW_INSTANCE_ARGS to Args(uuid))
+            arguments = bundleOf(NEW_INSTANCE_ARGS to Args(episodeUuid))
         }
     }
 }
