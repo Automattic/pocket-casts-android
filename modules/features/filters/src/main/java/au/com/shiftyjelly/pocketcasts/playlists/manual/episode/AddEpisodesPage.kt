@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.text.input.TextFieldState
 import androidx.compose.foundation.text.input.rememberTextFieldState
@@ -15,7 +16,9 @@ import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -30,6 +33,7 @@ import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import au.com.shiftyjelly.pocketcasts.compose.bars.NavigationButton
 import au.com.shiftyjelly.pocketcasts.compose.bars.ThemedTopAppBar
+import au.com.shiftyjelly.pocketcasts.compose.components.NoContentData
 import au.com.shiftyjelly.pocketcasts.compose.components.SearchBar
 import au.com.shiftyjelly.pocketcasts.compose.components.SearchBarStyle
 import au.com.shiftyjelly.pocketcasts.compose.components.TextH40
@@ -43,8 +47,9 @@ import au.com.shiftyjelly.pocketcasts.compose.theme
 import au.com.shiftyjelly.pocketcasts.models.entity.ManualPlaylistEpisodeSource
 import au.com.shiftyjelly.pocketcasts.models.entity.ManualPlaylistFolderSource
 import au.com.shiftyjelly.pocketcasts.models.entity.ManualPlaylistPodcastSource
-import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
+import au.com.shiftyjelly.pocketcasts.playlists.manual.episode.AddEpisodesViewModel.PodcastEpisodesUiState
 import kotlinx.coroutines.flow.StateFlow
+import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 @Composable
@@ -52,8 +57,9 @@ internal fun AddEpisodesPage(
     playlistTitle: String,
     addedEpisodesCount: Int,
     episodeSources: List<ManualPlaylistEpisodeSource>,
-    folderPodcastsFlow: (String) -> StateFlow<List<ManualPlaylistPodcastSource>>,
-    episodesFlow: (String) -> StateFlow<List<PodcastEpisode>>,
+    folderPodcastsFlow: (String) -> StateFlow<List<ManualPlaylistPodcastSource>?>,
+    episodesFlow: (String) -> StateFlow<PodcastEpisodesUiState?>,
+    hasAnyFolders: Boolean,
     useEpisodeArtwork: Boolean,
     onAddEpisode: (String) -> Unit,
     onClickNavigationButton: () -> Unit,
@@ -141,8 +147,23 @@ internal fun AddEpisodesPage(
             composable(AddEpisodesRoutes.HOME) {
                 EpisodeSourcesColumn(
                     sources = episodeSources,
+                    noContentData = NoContentData(
+                        title = if (hasAnyFolders) {
+                            stringResource(LR.string.manual_playlist_search_no_podcast_or_folder_title)
+                        } else {
+                            stringResource(LR.string.manual_playlist_search_no_podcast_title)
+                        },
+                        body = if (hasAnyFolders) {
+                            stringResource(LR.string.manual_playlist_search_no_podcast_or_folder_body)
+                        } else {
+                            stringResource(LR.string.manual_playlist_search_no_podcast_body)
+                        },
+                        iconId = IR.drawable.ic_exclamation_circle,
+                    ),
                     onClickSource = navigateToSource,
-                    modifier = Modifier.fillMaxSize(),
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .imePadding(),
                 )
             }
 
@@ -156,8 +177,15 @@ internal fun AddEpisodesPage(
 
                 EpisodeSourcesColumn(
                     sources = podcasts,
+                    noContentData = NoContentData(
+                        title = stringResource(LR.string.manual_playlist_search_no_podcast_title),
+                        body = stringResource(LR.string.manual_playlist_search_no_podcast_body),
+                        iconId = IR.drawable.ic_exclamation_circle,
+                    ),
                     onClickSource = navigateToSource,
-                    modifier = Modifier.fillMaxSize(),
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .imePadding(),
                 )
             }
 
@@ -167,13 +195,15 @@ internal fun AddEpisodesPage(
             ) { backStackEntry ->
                 val arguments = requireNotNull(backStackEntry.arguments) { "Missing back stack entry arguments" }
                 val podcastUuid = requireNotNull(arguments.getString(AddEpisodesRoutes.PODCAST_UUID_ARG)) { "Missing podcast uuid argument" }
-                val episodes by episodesFlow(podcastUuid).collectAsState()
+                val uiState by episodesFlow(podcastUuid).collectAsState()
 
                 EpisodesColumn(
-                    episodes = episodes,
+                    uiState = uiState,
                     useEpisodeArtwork = useEpisodeArtwork,
                     onAddEpisode = { episode -> onAddEpisode(episode.uuid) },
-                    modifier = Modifier.fillMaxSize(),
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .imePadding(),
                 )
             }
         }
