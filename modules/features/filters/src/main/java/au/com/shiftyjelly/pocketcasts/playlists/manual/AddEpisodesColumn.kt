@@ -58,7 +58,7 @@ import au.com.shiftyjelly.pocketcasts.localization.R as LR
 import au.com.shiftyjelly.pocketcasts.ui.R as UR
 
 @Composable
-internal fun EpisodesColumn(
+internal fun AddEpisodesColumn(
     uiState: PodcastEpisodesUiState?,
     useEpisodeArtwork: Boolean,
     onAddEpisode: (PodcastEpisode) -> Unit,
@@ -204,7 +204,7 @@ private fun PodcastEpisode.rememberTimeLeftText(): String {
 @Composable
 private fun EpisodesColumnNoAvailablePreview() {
     AppThemeWithBackground(ThemeType.LIGHT) {
-        EpisodesColumn(
+        AddEpisodesColumn(
             uiState = PodcastEpisodesUiState(
                 unfilteredEpisodeCount = 0,
                 episodes = emptyList(),
@@ -219,7 +219,7 @@ private fun EpisodesColumnNoAvailablePreview() {
 @Composable
 private fun EpisodesColumnNoFoundPreview() {
     AppThemeWithBackground(ThemeType.LIGHT) {
-        EpisodesColumn(
+        AddEpisodesColumn(
             uiState = PodcastEpisodesUiState(
                 unfilteredEpisodeCount = 3,
                 episodes = emptyList(),
@@ -236,7 +236,7 @@ private fun EpisodesColumnPreview(
     @PreviewParameter(ThemePreviewParameterProvider::class) themeType: ThemeType,
 ) {
     AppThemeWithBackground(themeType) {
-        EpisodesColumn(
+        AddEpisodesColumn(
             uiState = PodcastEpisodesUiState(
                 unfilteredEpisodeCount = 3,
                 episodes = List(3) { index ->

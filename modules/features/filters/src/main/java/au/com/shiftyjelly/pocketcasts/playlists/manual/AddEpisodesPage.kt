@@ -143,7 +143,7 @@ internal fun AddEpisodesPage(
             }
 
             composable(AddEpisodesRoutes.HOME) {
-                EpisodeSourcesColumn(
+                AddEpisodeSourcesColumn(
                     sources = episodeSources,
                     noContentData = NoContentData(
                         title = if (hasAnyFolders) {
@@ -173,7 +173,7 @@ internal fun AddEpisodesPage(
                 val folderUuid = requireNotNull(arguments.getString(AddEpisodesRoutes.FOLDER_UUID_ARG)) { "Missing folder uuid argument" }
                 val podcasts by folderPodcastsFlow(folderUuid).collectAsState()
 
-                EpisodeSourcesColumn(
+                AddEpisodeSourcesColumn(
                     sources = podcasts,
                     noContentData = NoContentData(
                         title = stringResource(LR.string.manual_playlist_search_no_podcast_title),
@@ -195,7 +195,7 @@ internal fun AddEpisodesPage(
                 val podcastUuid = requireNotNull(arguments.getString(AddEpisodesRoutes.PODCAST_UUID_ARG)) { "Missing podcast uuid argument" }
                 val uiState by episodesFlow(podcastUuid).collectAsState()
 
-                EpisodesColumn(
+                AddEpisodesColumn(
                     uiState = uiState,
                     useEpisodeArtwork = useEpisodeArtwork,
                     onAddEpisode = { episode -> onAddEpisode(episode.uuid) },

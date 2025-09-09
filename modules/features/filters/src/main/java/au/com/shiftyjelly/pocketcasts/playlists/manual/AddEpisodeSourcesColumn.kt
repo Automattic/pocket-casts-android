@@ -41,7 +41,7 @@ import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 @Composable
-internal fun EpisodeSourcesColumn(
+internal fun AddEpisodeSourcesColumn(
     sources: List<ManualPlaylistEpisodeSource>?,
     noContentData: NoContentData,
     onClickSource: (ManualPlaylistEpisodeSource) -> Unit,
@@ -191,7 +191,7 @@ private fun BaseSourceRow(
 @Composable
 private fun EpisodeSourcesEmptyPreview() {
     AppThemeWithBackground(ThemeType.LIGHT) {
-        EpisodeSourcesColumn(
+        AddEpisodeSourcesColumn(
             sources = emptyList(),
             NoContentData(
                 title = "No podcasts found",
@@ -210,7 +210,7 @@ private fun EpisodeSourcesColumnPreview(
     @PreviewParameter(ThemePreviewParameterProvider::class) themeType: ThemeType,
 ) {
     AppThemeWithBackground(themeType) {
-        EpisodeSourcesColumn(
+        AddEpisodeSourcesColumn(
             sources = listOf(
                 ManualPlaylistPodcastSource(
                     uuid = "id-1",
