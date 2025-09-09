@@ -129,8 +129,8 @@ fun NoContentBanner(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.spacedBy(itemSpaceHeight),
         modifier = modifier
-            .padding(horizontal = 32.dp)
-            .widthIn(max = if (isTablet || isLandscape) 450.dp else 330.dp),
+            .padding(horizontal = 16.dp)
+            .widthIn(max = if (isTablet || isLandscape) 450.dp else 360.dp),
     ) {
         if (isPortraitOrTablet) {
             Image(
