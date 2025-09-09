@@ -1,5 +1,7 @@
 package au.com.shiftyjelly.pocketcasts.playlists.manual
 
+import androidx.compose.animation.animateColorAsState
+import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -7,17 +9,20 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.WindowInsetsSides
+import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.only
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.AppBarDefaults
 import androidx.compose.material.Icon
@@ -34,7 +39,10 @@ import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
+import androidx.compose.ui.graphics.compositeOver
+import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.AnnotatedString
@@ -65,6 +73,8 @@ import au.com.shiftyjelly.pocketcasts.repositories.images.PocketCastsImageReques
 import au.com.shiftyjelly.pocketcasts.ui.extensions.getThemeColor
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme.ThemeType
 import java.util.Date
+import sh.calvin.reorderable.ReorderableItem
+import sh.calvin.reorderable.rememberReorderableLazyListState
 import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 import au.com.shiftyjelly.pocketcasts.ui.R as UR
@@ -73,7 +83,9 @@ import au.com.shiftyjelly.pocketcasts.ui.R as UR
 internal fun EditPlaylistPage(
     episodes: List<PlaylistEpisode>,
     useEpisodeArtwork: Boolean,
-    onUpdateEpisodes: (List<PlaylistEpisode>) -> Unit,
+    onReorderEpisodes: (List<PlaylistEpisode>) -> Unit,
+    onDeleteEpisode: (PlaylistEpisode) -> Unit,
+    onClickBack: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val context = LocalContext.current
@@ -86,25 +98,62 @@ internal fun EditPlaylistPage(
     ) {
         ThemedTopAppBar(
             modifier = Modifier.fillMaxWidth(),
-            title = "Edit playlist",
+            title = stringResource(LR.string.playlist_edit_title),
             navigationButton = NavigationButton.Back,
             style = ThemedTopAppBar.Style.Immersive,
             backgroundColor = Color.Transparent,
             windowInsets = AppBarDefaults.topAppBarWindowInsets.only(WindowInsetsSides.Vertical),
+            onNavigationClick = onClickBack,
         )
+
+        val hapticFeedback = LocalHapticFeedback.current
+        val listState = rememberLazyListState()
+        val reorderableListState = rememberReorderableLazyListState(listState) { from, to ->
+            val newEpisodes = episodes.toMutableList().apply {
+                add(to.index, removeAt(from.index))
+            }
+            onReorderEpisodes(newEpisodes)
+            hapticFeedback.performHapticFeedback(HapticFeedbackType.SegmentFrequentTick)
+        }
+        val baseColor = MaterialTheme.theme.colors.primaryUi02
+        val highlightColor = MaterialTheme.theme.colors.primaryIcon01
+        val draggedColor = remember(highlightColor, baseColor) {
+            highlightColor.copy(alpha = 0.15f).compositeOver(baseColor.copy(alpha = 1f))
+        }
+
         FadedLazyColumn(
             modifier = Modifier.weight(1f),
+            state = listState,
+            contentPadding = WindowInsets.navigationBars.asPaddingValues(),
         ) {
             itemsIndexed(
                 items = episodes,
                 key = { _, episode -> episode.uuid },
             ) { index, episode ->
-                EpisodeRow(
-                    episodeWrapper = episode,
-                    useEpisodeArtwork = useEpisodeArtwork,
-                    showDivider = index != episodes.lastIndex,
-                    dateFormatter = dateFormatter,
-                )
+                ReorderableItem(reorderableListState, key = episode.uuid) { isDragging ->
+                    val elevation by animateDpAsState(if (isDragging) 4.dp else 0.dp)
+                    val backgroundColor by animateColorAsState(if (isDragging) draggedColor else baseColor)
+
+                    EpisodeRow(
+                        episodeWrapper = episode,
+                        useEpisodeArtwork = useEpisodeArtwork,
+                        showDivider = index != episodes.lastIndex,
+                        dateFormatter = dateFormatter,
+                        onClickDelete = { onDeleteEpisode(episode) },
+                        modifier = Modifier
+                            .shadow(elevation)
+                            .background(backgroundColor)
+                            .longPressDraggableHandle(
+                                onDragStarted = {
+                                    hapticFeedback.performHapticFeedback(HapticFeedbackType.LongPress)
+                                },
+                                onDragStopped = {
+                                    hapticFeedback.performHapticFeedback(HapticFeedbackType.GestureEnd)
+                                },
+                            )
+                            .animateItem(),
+                    )
+                }
             }
         }
     }
@@ -116,6 +165,7 @@ private fun EpisodeRow(
     useEpisodeArtwork: Boolean,
     showDivider: Boolean,
     dateFormatter: RelativeDateFormatter,
+    onClickDelete: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Column(
@@ -129,7 +179,7 @@ private fun EpisodeRow(
                 .padding(top = 12.dp, bottom = 12.dp, start = 4.dp, end = 16.dp),
         ) {
             IconButton(
-                onClick = {},
+                onClick = onClickDelete,
             ) {
                 Icon(
                     painter = painterResource(IR.drawable.ic_playlist_remove_episode),
@@ -160,9 +210,8 @@ private fun EpisodeRow(
                     lineHeight = 15.sp,
                     maxLines = 2,
                 )
-                TextH60(
-                    text = episodeWrapper.rememberFooterText(),
-                    color = MaterialTheme.theme.colors.primaryText02,
+                Footer(
+                    episodeWrapper = episodeWrapper,
                 )
             }
             Spacer(
@@ -196,7 +245,7 @@ private fun PlaylistEpisodeImage(
                 corners = 4.dp,
                 modifier = modifier
                     .size(56.dp)
-                    .shadow(2.dp, RoundedCornerShape(4.dp)),
+                    .shadow(1.dp, RoundedCornerShape(4.dp)),
             )
         }
 
@@ -205,11 +254,44 @@ private fun PlaylistEpisodeImage(
                 uuid = episodeWrapper.episode.podcastUuid,
                 placeholderType = PlaceholderType.Small,
                 cornerSize = 4.dp,
-                modifier = modifier
-                    .size(56.dp)
-                    .shadow(2.dp, RoundedCornerShape(4.dp)),
+                elevation = 1.dp,
+                imageSize = 56.dp,
+                modifier = modifier,
             )
         }
+    }
+}
+
+@Composable
+private fun Footer(
+    episodeWrapper: PlaylistEpisode,
+    modifier: Modifier = Modifier,
+) {
+    Row(
+        verticalAlignment = Alignment.Bottom,
+        modifier = modifier,
+    ) {
+        val isArchived = episodeWrapper is PlaylistEpisode.Available && episodeWrapper.episode.isArchived
+        if (isArchived) {
+            Image(
+                painter = painterResource(IR.drawable.ic_archive),
+                contentDescription = null,
+                colorFilter = ColorFilter.tint(MaterialTheme.theme.colors.primaryText02),
+                modifier = Modifier
+                    .padding(end = 4.dp)
+                    .size(14.dp),
+            )
+        }
+        TextH60(
+            text = buildString {
+                if (isArchived) {
+                    append(stringResource(LR.string.archived))
+                    append(" • ")
+                }
+                append(episodeWrapper.rememberFooterText())
+            },
+            color = MaterialTheme.theme.colors.primaryText02,
+        )
     }
 }
 
@@ -248,7 +330,7 @@ private fun PlaylistEpisode.rememberFooterText(): String {
 }
 
 private fun Modifier.alphaIfUnavailable(episodeWrapper: PlaylistEpisode) = when (episodeWrapper) {
-    is PlaylistEpisode.Available -> this
+    is PlaylistEpisode.Available -> if (episodeWrapper.episode.isArchived) alpha(0.4f) else this
     is PlaylistEpisode.Unavailable -> alpha(0.4f)
 }
 
@@ -259,25 +341,31 @@ private fun EditPlaylistPagePreview(
 ) {
     var episodes by remember {
         mutableStateOf(
-            List(8) { index ->
-                if (index % 3 != 0) {
-                    PlaylistEpisode.Available(
-                        PodcastEpisode(
-                            uuid = "episode-id-$index",
-                            title = "Episode $index",
-                            publishedDate = Date(0),
-                            duration = 1234.0 * index,
-                        ),
-                    )
-                } else {
-                    PlaylistEpisode.Unavailable(
-                        ManualPlaylistEpisode.test(
-                            episodeUuid = "episode-id-$index",
-                            title = "Episode $index",
-                        ),
-                    )
-                }
-            },
+            listOf(
+                PlaylistEpisode.Available(
+                    PodcastEpisode(
+                        uuid = "episode-id-0",
+                        title = "Episode 0",
+                        publishedDate = Date(0),
+                        duration = 10000.0,
+                    ),
+                ),
+                PlaylistEpisode.Available(
+                    PodcastEpisode(
+                        uuid = "episode-id-1",
+                        title = "Episode 1",
+                        publishedDate = Date(1700000000000),
+                        duration = 10000.0,
+                        isArchived = true,
+                    ),
+                ),
+                PlaylistEpisode.Unavailable(
+                    ManualPlaylistEpisode.test(
+                        episodeUuid = "episode-id-2",
+                        title = "Episode 2",
+                    ),
+                ),
+            ),
         )
     }
 
@@ -285,7 +373,9 @@ private fun EditPlaylistPagePreview(
         EditPlaylistPage(
             episodes = episodes,
             useEpisodeArtwork = false,
-            onUpdateEpisodes = { episodes = it },
+            onReorderEpisodes = { episodes = it },
+            onDeleteEpisode = { episodes -= it },
+            onClickBack = {},
         )
     }
 }

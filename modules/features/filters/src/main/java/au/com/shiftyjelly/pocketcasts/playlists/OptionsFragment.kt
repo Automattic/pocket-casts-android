@@ -142,9 +142,9 @@ class OptionsFragment : BaseDialogFragment() {
                             title = getString(LR.string.edit),
                             iconId = IR.drawable.ic_playlist_edit,
                             onClick = {
-                                val fragment = EditPlaylistFragment()
-                                (requireActivity() as FragmentHostListener).showBottomSheet(fragment)
                                 dismiss()
+                                val fragment = EditPlaylistFragment.newInstance(playlist.uuid)
+                                (requireActivity() as FragmentHostListener).showModal(fragment)
                             },
                         ),
                     )

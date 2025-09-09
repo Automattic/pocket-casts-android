@@ -99,10 +99,10 @@ class PlaylistManagerManualTest {
     fun sortPlaylistEpisodes() = dsl.test {
         insertManualPlaylist(index = 0)
 
-        insertManualEpisode(index = 0, podcastIndex = 0, playlistIndex = 0)
-        insertManualEpisode(index = 1, podcastIndex = 0, playlistIndex = 0)
-        insertManualEpisode(index = 2, podcastIndex = 0, playlistIndex = 0)
-        insertManualEpisode(index = 3, podcastIndex = 0, playlistIndex = 0)
+        insertManualEpisode(index = 0, podcastIndex = 0, playlistIndex = 0) { it.copy(sortPosition = 2) }
+        insertManualEpisode(index = 1, podcastIndex = 0, playlistIndex = 0) { it.copy(sortPosition = 3) }
+        insertManualEpisode(index = 2, podcastIndex = 0, playlistIndex = 0) { it.copy(sortPosition = 1) }
+        insertManualEpisode(index = 3, podcastIndex = 0, playlistIndex = 0) { it.copy(sortPosition = 0) }
         insertPodcastEpisode(index = 0, podcastIndex = 0) { it.copy(duration = 10.0) }
         insertPodcastEpisode(index = 2, podcastIndex = 0) { it.copy(duration = 60.0) }
 
@@ -112,9 +112,9 @@ class PlaylistManagerManualTest {
             manager.updateSortType("playlist-id-0", PlaylistEpisodeSortType.OldestToNewest)
             assertEquals(
                 listOf(
-                    unavailableManualEpisode(index = 3, podcastIndex = 0, playlistIndex = 0),
+                    unavailableManualEpisode(index = 3, podcastIndex = 0, playlistIndex = 0) { it.copy(sortPosition = 0) },
                     availablePlaylistEpisode(index = 2, podcastIndex = 0) { it.copy(duration = 60.0) },
-                    unavailableManualEpisode(index = 1, podcastIndex = 0, playlistIndex = 0),
+                    unavailableManualEpisode(index = 1, podcastIndex = 0, playlistIndex = 0) { it.copy(sortPosition = 3) },
                     availablePlaylistEpisode(index = 0, podcastIndex = 0) { it.copy(duration = 10.0) },
                 ),
                 awaitItem()?.episodes,
@@ -124,9 +124,9 @@ class PlaylistManagerManualTest {
             assertEquals(
                 listOf(
                     availablePlaylistEpisode(index = 0, podcastIndex = 0) { it.copy(duration = 10.0) },
-                    unavailableManualEpisode(index = 1, podcastIndex = 0, playlistIndex = 0),
+                    unavailableManualEpisode(index = 1, podcastIndex = 0, playlistIndex = 0) { it.copy(sortPosition = 3) },
                     availablePlaylistEpisode(index = 2, podcastIndex = 0) { it.copy(duration = 60.0) },
-                    unavailableManualEpisode(index = 3, podcastIndex = 0, playlistIndex = 0),
+                    unavailableManualEpisode(index = 3, podcastIndex = 0, playlistIndex = 0) { it.copy(sortPosition = 0) },
                 ),
                 awaitItem()?.episodes,
             )
@@ -136,8 +136,8 @@ class PlaylistManagerManualTest {
                 listOf(
                     availablePlaylistEpisode(index = 0, podcastIndex = 0) { it.copy(duration = 10.0) },
                     availablePlaylistEpisode(index = 2, podcastIndex = 0) { it.copy(duration = 60.0) },
-                    unavailableManualEpisode(index = 1, podcastIndex = 0, playlistIndex = 0),
-                    unavailableManualEpisode(index = 3, podcastIndex = 0, playlistIndex = 0),
+                    unavailableManualEpisode(index = 1, podcastIndex = 0, playlistIndex = 0) { it.copy(sortPosition = 3) },
+                    unavailableManualEpisode(index = 3, podcastIndex = 0, playlistIndex = 0) { it.copy(sortPosition = 0) },
                 ),
                 awaitItem()?.episodes,
             )
@@ -147,8 +147,19 @@ class PlaylistManagerManualTest {
                 listOf(
                     availablePlaylistEpisode(index = 2, podcastIndex = 0) { it.copy(duration = 60.0) },
                     availablePlaylistEpisode(index = 0, podcastIndex = 0) { it.copy(duration = 10.0) },
-                    unavailableManualEpisode(index = 1, podcastIndex = 0, playlistIndex = 0),
-                    unavailableManualEpisode(index = 3, podcastIndex = 0, playlistIndex = 0),
+                    unavailableManualEpisode(index = 1, podcastIndex = 0, playlistIndex = 0) { it.copy(sortPosition = 3) },
+                    unavailableManualEpisode(index = 3, podcastIndex = 0, playlistIndex = 0) { it.copy(sortPosition = 0) },
+                ),
+                awaitItem()?.episodes,
+            )
+
+            manager.updateSortType("playlist-id-0", PlaylistEpisodeSortType.DragAndDrop)
+            assertEquals(
+                listOf(
+                    unavailableManualEpisode(index = 3, podcastIndex = 0, playlistIndex = 0) { it.copy(sortPosition = 0) },
+                    availablePlaylistEpisode(index = 2, podcastIndex = 0) { it.copy(duration = 60.0) },
+                    availablePlaylistEpisode(index = 0, podcastIndex = 0) { it.copy(duration = 10.0) },
+                    unavailableManualEpisode(index = 1, podcastIndex = 0, playlistIndex = 0) { it.copy(sortPosition = 3) },
                 ),
                 awaitItem()?.episodes,
             )
@@ -560,7 +571,7 @@ class PlaylistManagerManualTest {
     }
 
     @Test
-    fun deleteManualEpisodes() = dsl.test {
+    fun deleteEpisodes() = dsl.test {
         insertManualPlaylist(index = 0)
         insertManualEpisode(index = 0, podcastIndex = 0, playlistIndex = 0)
         insertManualEpisode(index = 1, podcastIndex = 0, playlistIndex = 0)
@@ -575,6 +586,52 @@ class PlaylistManagerManualTest {
             playlistIndex = 0,
             manualPlaylistEpisode(index = 2, podcastIndex = 0, playlistIndex = 0),
             manualPlaylistEpisode(index = 3, podcastIndex = 0, playlistIndex = 0),
+        )
+    }
+
+    @Test
+    fun reorderEpisodes() = dsl.test {
+        insertManualPlaylist(0) { it.copy(sortType = PlaylistEpisodeSortType.NewestToOldest) }
+        insertManualEpisode(index = 0, podcastIndex = 0, playlistIndex = 0)
+        insertManualEpisode(index = 1, podcastIndex = 0, playlistIndex = 0)
+        insertManualEpisode(index = 2, podcastIndex = 0, playlistIndex = 0)
+        insertManualEpisode(index = 3, podcastIndex = 0, playlistIndex = 0)
+
+        manager.sortManualEpisodes(
+            "playlist-id-0",
+            listOf("episode-id-3", "episode-id-1", "episode-id-2", "episode-id-0"),
+        )
+
+        expectSortType(playlistIndex = 0, PlaylistEpisodeSortType.DragAndDrop)
+        expectManualEpisodes(
+            playlistIndex = 0,
+            manualPlaylistEpisode(index = 3, podcastIndex = 0, playlistIndex = 0) { it.copy(sortPosition = 0) },
+            manualPlaylistEpisode(index = 1, podcastIndex = 0, playlistIndex = 0) { it.copy(sortPosition = 1) },
+            manualPlaylistEpisode(index = 2, podcastIndex = 0, playlistIndex = 0) { it.copy(sortPosition = 2) },
+            manualPlaylistEpisode(index = 0, podcastIndex = 0, playlistIndex = 0) { it.copy(sortPosition = 3) },
+        )
+    }
+
+    @Test
+    fun reorderUnspecifiedEpisodesToBottom() = dsl.test {
+        insertManualPlaylist(0) { it.copy(sortType = PlaylistEpisodeSortType.NewestToOldest) }
+        insertManualEpisode(index = 0, podcastIndex = 0, playlistIndex = 0)
+        insertManualEpisode(index = 1, podcastIndex = 0, playlistIndex = 0)
+        insertManualEpisode(index = 2, podcastIndex = 0, playlistIndex = 0)
+        insertManualEpisode(index = 3, podcastIndex = 0, playlistIndex = 0)
+
+        manager.sortManualEpisodes(
+            "playlist-id-0",
+            listOf("episode-id-3", "episode-id-1"),
+        )
+
+        expectSortType(playlistIndex = 0, PlaylistEpisodeSortType.DragAndDrop)
+        expectManualEpisodes(
+            playlistIndex = 0,
+            manualPlaylistEpisode(index = 3, podcastIndex = 0, playlistIndex = 0) { it.copy(sortPosition = 0) },
+            manualPlaylistEpisode(index = 1, podcastIndex = 0, playlistIndex = 0) { it.copy(sortPosition = 1) },
+            manualPlaylistEpisode(index = 0, podcastIndex = 0, playlistIndex = 0) { it.copy(sortPosition = 2) },
+            manualPlaylistEpisode(index = 2, podcastIndex = 0, playlistIndex = 0) { it.copy(sortPosition = 3) },
         )
     }
 }

@@ -87,5 +87,7 @@ class FakePlaylistManager : PlaylistManager {
         return true
     }
 
+    override suspend fun sortManualEpisodes(playlistUuid: String, episodeUuids: List<String>) = Unit
+
     override suspend fun deleteManualEpisodes(playlistUuid: String, episodeUuids: Collection<String>) = Unit
 }

@@ -134,7 +134,31 @@ abstract class PlaylistDao {
     @Query("SELECT episode_uuid FROM manual_playlist_episodes WHERE playlist_uuid IS :playlistUuid")
     abstract suspend fun getManualPlaylistEpisodeUuids(playlistUuid: String): List<String>
 
-    @Query("SELECT * FROM manual_playlist_episodes WHERE playlist_uuid IS :playlistUuid")
+    @Query(
+        """
+        SELECT manual_episode.*
+        FROM playlists AS playlist
+        JOIN manual_playlist_episodes AS manual_episode ON manual_episode.playlist_uuid IS playlist.uuid
+        LEFT JOIN podcast_episodes AS podcast_episode ON podcast_episode.uuid IS manual_episode.episode_uuid
+        WHERE playlist.uuid IS :playlistUuid
+        ORDER BY
+          -- newest to oldest
+          CASE WHEN playlist.sortId IS 0 THEN IFNULL(podcast_episode.published_date, manual_episode.published_at) END DESC,
+          CASE WHEN playlist.sortId IS 0 THEN IFNULL(podcast_episode.added_date, manual_episode.added_at) END DESC,
+          -- oldest to newest
+          CASE WHEN playlist.sortId IS 1 THEN IFNULL(podcast_episode.published_date, manual_episode.published_at) END ASC,
+          CASE WHEN playlist.sortId IS 1 THEN IFNULL(podcast_episode.added_date, manual_episode.added_at) END ASC,
+          -- shortest to longest
+          CASE WHEN playlist.sortId IS 2 THEN IFNULL(podcast_episode.duration, 9223372036854775807) END ASC,
+          CASE WHEN playlist.sortId IS 2 THEN IFNULL(podcast_episode.added_date, manual_episode.added_at) END DESC,
+          -- longest to shortest
+          CASE WHEN playlist.sortId IS 3 THEN IFNULL(podcast_episode.duration, -9223372036854775808) END DESC,
+          CASE WHEN playlist.sortId IS 3 THEN IFNULL(podcast_episode.added_date, manual_episode.added_at) END DESC,
+          -- drag and drop
+          CASE WHEN playlist.sortId IS 4 THEN manual_episode.sort_position END ASC,
+          CASE WHEN playlist.sortId IS 4 THEN IFNULL(podcast_episode.added_date, manual_episode.added_at) END DESC
+    """,
+    )
     abstract suspend fun getManualPlaylistEpisodes(playlistUuid: String): List<ManualPlaylistEpisode>
 
     @Query(
@@ -318,8 +342,8 @@ abstract class PlaylistDao {
           -- longest to shortest
           CASE WHEN playlist.sortId IS 3 THEN podcastEpisode.duration END DESC,
           CASE WHEN playlist.sortId IS 3 THEN podcastEpisode.added_date END DESC,
-          -- drag and drop: TODO: PCDROID-118
-          CASE WHEN playlist.sortId IS 4 THEN podcastEpisode.published_date END DESC,
+          -- drag and drop
+          CASE WHEN playlist.sortId IS 4 THEN playlistEpisode.sort_position END ASC,
           CASE WHEN playlist.sortId IS 4 THEN podcastEpisode.added_date END DESC
     """,
     )
@@ -405,8 +429,8 @@ abstract class PlaylistDao {
           -- longest to shortest
           CASE WHEN playlist.sortId IS 3 THEN IFNULL(podcast_episode.duration, -9223372036854775808) END DESC,
           CASE WHEN playlist.sortId IS 3 THEN IFNULL(podcast_episode.added_date, manual_episode.added_at) END DESC,
-          -- drag and drop: TODO: PCDROID-118
-          CASE WHEN playlist.sortId IS 4 THEN IFNULL(podcast_episode.published_date, manual_episode.published_at) END DESC,
+          -- drag and drop
+          CASE WHEN playlist.sortId IS 4 THEN manual_episode.sort_position END ASC,
           CASE WHEN playlist.sortId IS 4 THEN IFNULL(podcast_episode.added_date, manual_episode.added_at) END DESC
     """,
     )

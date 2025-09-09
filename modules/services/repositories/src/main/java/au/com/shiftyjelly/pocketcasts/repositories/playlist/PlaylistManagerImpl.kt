@@ -198,7 +198,12 @@ class PlaylistManagerImpl(
 
     override suspend fun createManualPlaylist(name: String): String {
         return createPlaylist(
-            entity = PlaylistEntity(title = name, manual = true, syncStatus = SYNC_STATUS_NOT_SYNCED),
+            entity = PlaylistEntity(
+                title = name,
+                manual = true,
+                sortType = PlaylistEpisodeSortType.DragAndDrop,
+                syncStatus = SYNC_STATUS_NOT_SYNCED,
+            ),
         )
     }
 
@@ -296,6 +301,18 @@ class PlaylistManagerImpl(
                 ),
             )
             true
+        }
+    }
+
+    override suspend fun sortManualEpisodes(playlistUuid: String, episodeUuids: List<String>) {
+        appDatabase.withTransaction {
+            var missingEpisodeIndex = episodeUuids.size
+            val episodes = playlistDao.getManualPlaylistEpisodes(playlistUuid).map { episode ->
+                val newPosition = episodeUuids.indexOf(episode.episodeUuid).takeIf { it != -1 } ?: missingEpisodeIndex++
+                episode.copy(sortPosition = newPosition)
+            }
+            playlistDao.upsertManualEpisodes(episodes)
+            playlistDao.updateSortType(playlistUuid, PlaylistEpisodeSortType.DragAndDrop)
         }
     }
 

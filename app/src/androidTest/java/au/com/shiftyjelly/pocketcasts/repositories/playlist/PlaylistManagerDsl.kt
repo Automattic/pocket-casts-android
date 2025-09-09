@@ -266,6 +266,7 @@ class PlaylistManagerDsl : TestWatcher() {
                 id = index.toLong() + 1,
                 uuid = id,
                 title = "Playlist title $index",
+                sortType = PlaylistEpisodeSortType.DragAndDrop,
             ),
         ).copy(manual = true)
     }
@@ -381,7 +382,7 @@ class PlaylistManagerDsl : TestWatcher() {
                 title = "Playlist title $index",
                 episodes = emptyList(),
                 settings = Playlist.Settings(
-                    sortType = PlaylistEpisodeSortType.NewestToOldest,
+                    sortType = PlaylistEpisodeSortType.DragAndDrop,
                     isAutoDownloadEnabled = false,
                     autoDownloadLimit = 10,
                 ),
