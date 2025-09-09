@@ -485,7 +485,7 @@ class PlaylistFragment :
     ) : Parcelable
 
     companion object {
-        private const val NEW_INSTANCE_ARGS = "SmartPlaylistsFragmentArgs"
+        private const val NEW_INSTANCE_ARGS = "PlaylistsFragmentArgs"
 
         fun newInstance(
             uuid: String,

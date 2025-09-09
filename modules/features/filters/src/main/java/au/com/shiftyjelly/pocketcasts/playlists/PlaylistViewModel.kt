@@ -109,15 +109,21 @@ class PlaylistViewModel @AssistedInject constructor(
         }
     }
 
+    fun deleteEpisode(episodeUuid: String) {
+        viewModelScope.launch {
+            playlistManager.deleteManualEpisode(playlistUuid, episodeUuid)
+        }
+    }
+
     fun updateSortType(type: PlaylistEpisodeSortType) {
-        viewModelScope.launch(NonCancellable) {
+        viewModelScope.launch {
             playlistManager.updateSortType(playlistUuid, type)
             trackSortByChanged(type)
         }
     }
 
     fun updateAutoDownload(isEnabled: Boolean) {
-        viewModelScope.launch(NonCancellable) {
+        viewModelScope.launch {
             playlistManager.updateAutoDownload(playlistUuid, isEnabled)
             isAutoDownloadChanged = true
             trackAutoDownloadChanged(isEnabled)
@@ -125,7 +131,7 @@ class PlaylistViewModel @AssistedInject constructor(
     }
 
     fun updateAutoDownloadLimit(limit: Int) {
-        viewModelScope.launch(NonCancellable) {
+        viewModelScope.launch {
             playlistManager.updateAutoDownloadLimit(playlistUuid, limit)
             isAutoDownloadLimitChanged = true
             trackAutoDownloadLimitChanged(limit)
@@ -137,7 +143,7 @@ class PlaylistViewModel @AssistedInject constructor(
         if (sanitizedName.isEmpty()) {
             return
         }
-        viewModelScope.launch(NonCancellable) {
+        viewModelScope.launch {
             isNameChanged = true
             playlistManager.updateName(playlistUuid, sanitizedName)
         }
