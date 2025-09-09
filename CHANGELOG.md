@@ -3,6 +3,8 @@
 *   Bug Fixes
     *   Fix Download notifications no longer open app
         ([#4449](https://github.com/Automattic/pocket-casts-android/pull/4449))
+    *   Don't show notification to create free account when the user is already signed in
+        ([#4468](https://github.com/Automattic/pocket-casts-android/pull/4468))
 
 7.97
 -----
