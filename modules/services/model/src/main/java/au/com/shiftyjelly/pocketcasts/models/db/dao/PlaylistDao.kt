@@ -16,6 +16,7 @@ import au.com.shiftyjelly.pocketcasts.models.entity.PlaylistEntity
 import au.com.shiftyjelly.pocketcasts.models.entity.PlaylistEntity.Companion.SYNC_STATUS_NOT_SYNCED
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
+import au.com.shiftyjelly.pocketcasts.models.to.PlaylistEpisode
 import au.com.shiftyjelly.pocketcasts.models.to.PlaylistEpisodeMetadata
 import au.com.shiftyjelly.pocketcasts.models.to.PlaylistShortcut
 import au.com.shiftyjelly.pocketcasts.models.to.RawManualEpisode
@@ -428,7 +429,7 @@ abstract class PlaylistDao {
         sortType: PlaylistEpisodeSortType,
         limit: Int,
         searchTerm: String? = null,
-    ): Flow<List<PodcastEpisode>> {
+    ): Flow<List<PlaylistEpisode.Available>> {
         val escapedTerm = searchTerm?.takeIf(String::isNotBlank)?.escapeLike('\\')
         val query = createSmartPlaylistEpisodeQuery(
             selectClause = "episode.*",
@@ -445,7 +446,7 @@ abstract class PlaylistDao {
             orderByClause = sortType.toOrderByClause(),
             limit = limit,
         )
-        return smartEpisodesFlow(RoomRawQuery(query))
+        return smartEpisodesFlow(RoomRawQuery(query)).map { episodes -> episodes.map(PlaylistEpisode::Available) }
     }
 
     private fun createSmartPlaylistEpisodeQuery(

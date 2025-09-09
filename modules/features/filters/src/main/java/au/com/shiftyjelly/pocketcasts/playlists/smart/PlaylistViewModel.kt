@@ -6,6 +6,7 @@ import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.compose.text.SearchFieldState
+import au.com.shiftyjelly.pocketcasts.models.to.toPodcastEpisodes
 import au.com.shiftyjelly.pocketcasts.models.type.PlaylistEpisodeSortType
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.download.DownloadManager
@@ -73,14 +74,21 @@ class PlaylistViewModel @AssistedInject constructor(
             return
         }
         playAllJob = viewModelScope.launch(Dispatchers.Default) {
-            val episodes = uiState.value.smartPlaylist?.episodes?.takeIf { it.isNotEmpty() } ?: return@launch
+            val episodes = uiState.value.playlist
+                ?.episodes
+                ?.takeIf { it.isNotEmpty() }
+                ?.toPodcastEpisodes()
+                ?: return@launch
             playbackManager.upNextQueue.removeAll()
             playbackManager.playEpisodes(episodes, SourceView.FILTERS)
         }
     }
 
     fun downloadAll() {
-        val episodes = uiState.value.smartPlaylist?.episodes?.take(DOWNLOAD_ALL_LIMIT)
+        val episodes = uiState.value.playlist
+            ?.episodes
+            ?.take(DOWNLOAD_ALL_LIMIT)
+            ?.toPodcastEpisodes()
         episodes?.forEach { episode ->
             downloadManager.addEpisodeToQueue(episode, "filter download all", fireEvent = false, source = SourceView.FILTERS)
         }
@@ -209,11 +217,11 @@ class PlaylistViewModel @AssistedInject constructor(
     }
 
     data class UiState(
-        val smartPlaylist: SmartPlaylist?,
+        val playlist: SmartPlaylist?,
     ) {
         companion object {
             val Empty = UiState(
-                smartPlaylist = null,
+                playlist = null,
             )
         }
     }

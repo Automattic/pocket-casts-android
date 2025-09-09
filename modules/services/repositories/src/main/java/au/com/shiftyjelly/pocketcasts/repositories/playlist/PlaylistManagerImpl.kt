@@ -18,7 +18,7 @@ import au.com.shiftyjelly.pocketcasts.models.entity.PlaylistEntity.Companion.LAS
 import au.com.shiftyjelly.pocketcasts.models.entity.PlaylistEntity.Companion.SYNC_STATUS_NOT_SYNCED
 import au.com.shiftyjelly.pocketcasts.models.entity.PlaylistEntity.Companion.SYNC_STATUS_SYNCED
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
-import au.com.shiftyjelly.pocketcasts.models.to.ManualEpisode
+import au.com.shiftyjelly.pocketcasts.models.to.PlaylistEpisode
 import au.com.shiftyjelly.pocketcasts.models.to.PlaylistEpisodeMetadata
 import au.com.shiftyjelly.pocketcasts.models.type.PlaylistEpisodeSortType
 import au.com.shiftyjelly.pocketcasts.models.type.SmartRules
@@ -145,6 +145,8 @@ class PlaylistManagerImpl(
                         SmartPlaylist(
                             uuid = playlist.uuid,
                             title = playlist.title,
+                            smartRules = smartRules,
+                            episodes = episodes,
                             settings = Playlist.Settings(
                                 sortType = playlist.sortType,
                                 isAutoDownloadEnabled = playlist.autoDownload,
@@ -157,8 +159,6 @@ class PlaylistManagerImpl(
                                 displayedEpisodeCount = episodes.size,
                                 displayedAvailableEpisodeCount = episodes.size,
                             ),
-                            smartRules = smartRules,
-                            episodes = episodes,
                         )
                     }
                 }
@@ -167,7 +167,7 @@ class PlaylistManagerImpl(
             .distinctUntilChanged()
     }
 
-    override fun smartEpisodesFlow(rules: SmartRules, sortType: PlaylistEpisodeSortType, searchTerm: String?): Flow<List<PodcastEpisode>> {
+    override fun smartEpisodesFlow(rules: SmartRules, sortType: PlaylistEpisodeSortType, searchTerm: String?): Flow<List<PlaylistEpisode.Available>> {
         return playlistDao
             .smartEpisodesFlow(
                 clock = clock,
@@ -215,6 +215,7 @@ class PlaylistManagerImpl(
                         ManualPlaylist(
                             uuid = playlist.uuid,
                             title = playlist.title,
+                            episodes = episodes,
                             settings = Playlist.Settings(
                                 sortType = playlist.sortType,
                                 isAutoDownloadEnabled = playlist.autoDownload,
@@ -225,9 +226,8 @@ class PlaylistManagerImpl(
                                 artworkUuids = podcasts,
                                 totalEpisodeCount = metadata.episodeCount,
                                 displayedEpisodeCount = episodes.size,
-                                displayedAvailableEpisodeCount = episodes.count { it is ManualEpisode.Available },
+                                displayedAvailableEpisodeCount = episodes.count { it is PlaylistEpisode.Available },
                             ),
-                            episodes = episodes,
                         )
                     }
                 }

@@ -1,7 +1,6 @@
 package au.com.shiftyjelly.pocketcasts.repositories.playlist
 
-import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
-import au.com.shiftyjelly.pocketcasts.models.to.ManualEpisode
+import au.com.shiftyjelly.pocketcasts.models.to.PlaylistEpisode
 import au.com.shiftyjelly.pocketcasts.models.type.PlaylistEpisodeSortType
 import au.com.shiftyjelly.pocketcasts.models.type.SmartRules
 import kotlin.time.Duration
@@ -9,6 +8,7 @@ import kotlin.time.Duration
 sealed interface Playlist {
     val uuid: String
     val title: String
+    val episodes: List<PlaylistEpisode>
     val settings: Settings
     val metadata: Metadata
 
@@ -40,16 +40,16 @@ sealed interface Playlist {
 data class SmartPlaylist(
     override val uuid: String,
     override val title: String,
+    val smartRules: SmartRules,
+    override val episodes: List<PlaylistEpisode.Available>,
     override val settings: Playlist.Settings,
     override val metadata: Playlist.Metadata,
-    val smartRules: SmartRules,
-    val episodes: List<PodcastEpisode>,
 ) : Playlist
 
 data class ManualPlaylist(
     override val uuid: String,
     override val title: String,
+    override val episodes: List<PlaylistEpisode>,
     override val settings: Playlist.Settings,
     override val metadata: Playlist.Metadata,
-    val episodes: List<ManualEpisode>,
 ) : Playlist

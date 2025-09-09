@@ -7,7 +7,7 @@ import androidx.fragment.app.FragmentManager
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
-import au.com.shiftyjelly.pocketcasts.models.to.ManualEpisode
+import au.com.shiftyjelly.pocketcasts.models.to.PlaylistEpisode
 import au.com.shiftyjelly.pocketcasts.podcasts.R
 import au.com.shiftyjelly.pocketcasts.podcasts.databinding.AdapterEpisodeBinding
 import au.com.shiftyjelly.pocketcasts.podcasts.databinding.AdapterEpisodeUnavailableBinding
@@ -30,20 +30,20 @@ import java.util.UUID
 import kotlinx.coroutines.rx2.asObservable
 import au.com.shiftyjelly.pocketcasts.ui.R as UR
 
-class ManualPlaylistEpisodeAdapter(
+class PlaylistEpisodeAdapter(
     private val bookmarkManager: BookmarkManager,
     private val downloadManager: DownloadManager,
     private val playbackManager: PlaybackManager,
     private val upNextQueue: UpNextQueue,
     private val settings: Settings,
-    private val onRowClick: (ManualEpisode) -> Unit,
+    private val onRowClick: (PlaylistEpisode) -> Unit,
     private val playButtonListener: PlayButton.OnClickListener,
     private val imageRequestFactory: PocketCastsImageRequestFactory,
     private val multiSelectHelper: MultiSelectEpisodesHelper,
     private val fragmentManager: FragmentManager,
     private val swipeButtonLayoutFactory: SwipeButtonLayoutFactory,
     private val artworkContext: ArtworkConfiguration.Element,
-) : ListAdapter<ManualEpisode, RecyclerView.ViewHolder>(ManualEpisodeDiffCallback) {
+) : ListAdapter<PlaylistEpisode, RecyclerView.ViewHolder>(PlaylistEpisodeDiffCallback) {
     private val disposables = CompositeDisposable()
 
     init {
@@ -81,12 +81,12 @@ class ManualPlaylistEpisodeAdapter(
 
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
         when (val item = getItem(position)) {
-            is ManualEpisode.Available -> bindEpisodeViewHolder(holder as EpisodeViewHolder, item)
-            is ManualEpisode.Unavailable -> bindUnavailableEpisodeViewHolder(holder as EpisodeUnavailableViewHolder, item)
+            is PlaylistEpisode.Available -> bindEpisodeViewHolder(holder as EpisodeViewHolder, item)
+            is PlaylistEpisode.Unavailable -> bindUnavailableEpisodeViewHolder(holder as EpisodeUnavailableViewHolder, item)
         }
     }
 
-    private fun bindEpisodeViewHolder(holder: EpisodeViewHolder, item: ManualEpisode.Available) {
+    private fun bindEpisodeViewHolder(holder: EpisodeViewHolder, item: PlaylistEpisode.Available) {
         val episode = item.episode
         holder.setup(
             episode = episode,
@@ -117,7 +117,7 @@ class ManualPlaylistEpisodeAdapter(
         }
     }
 
-    private fun bindUnavailableEpisodeViewHolder(holder: EpisodeUnavailableViewHolder, item: ManualEpisode.Unavailable) {
+    private fun bindUnavailableEpisodeViewHolder(holder: EpisodeUnavailableViewHolder, item: PlaylistEpisode.Unavailable) {
         val episode = item.episode
         holder.bind(
             episodeUuid = episode.episodeUuid,
@@ -146,20 +146,20 @@ class ManualPlaylistEpisodeAdapter(
     override fun getItemViewType(position: Int): Int {
         val item = getItem(position)
         return when (item) {
-            is ManualEpisode.Available -> R.layout.adapter_episode
-            is ManualEpisode.Unavailable -> R.layout.adapter_episode_unavailable
+            is PlaylistEpisode.Available -> R.layout.adapter_episode
+            is PlaylistEpisode.Unavailable -> R.layout.adapter_episode_unavailable
         }
     }
 }
 
-private object ManualEpisodeDiffCallback : DiffUtil.ItemCallback<ManualEpisode>() {
-    override fun areItemsTheSame(oldItem: ManualEpisode, newItem: ManualEpisode) = oldItem.uuid == newItem.uuid
+private object PlaylistEpisodeDiffCallback : DiffUtil.ItemCallback<PlaylistEpisode>() {
+    override fun areItemsTheSame(oldItem: PlaylistEpisode, newItem: PlaylistEpisode) = oldItem.uuid == newItem.uuid
 
     @SuppressLint("DiffUtilEquals")
-    override fun areContentsTheSame(oldItem: ManualEpisode, newItem: ManualEpisode): Boolean {
+    override fun areContentsTheSame(oldItem: PlaylistEpisode, newItem: PlaylistEpisode): Boolean {
         return oldItem == newItem
     }
 
     // Return Unit to avoid flashing animation
-    override fun getChangePayload(oldItem: ManualEpisode, newItem: ManualEpisode) = Unit
+    override fun getChangePayload(oldItem: PlaylistEpisode, newItem: PlaylistEpisode) = Unit
 }

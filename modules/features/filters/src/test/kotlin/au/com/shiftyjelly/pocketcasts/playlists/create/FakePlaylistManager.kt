@@ -4,6 +4,7 @@ import app.cash.turbine.Turbine
 import au.com.shiftyjelly.pocketcasts.models.entity.ManualPlaylistEpisodeSource
 import au.com.shiftyjelly.pocketcasts.models.entity.ManualPlaylistPodcastSource
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
+import au.com.shiftyjelly.pocketcasts.models.to.PlaylistEpisode
 import au.com.shiftyjelly.pocketcasts.models.to.PlaylistEpisodeMetadata
 import au.com.shiftyjelly.pocketcasts.models.type.PlaylistEpisodeSortType
 import au.com.shiftyjelly.pocketcasts.models.type.SmartRules
@@ -47,8 +48,8 @@ class FakePlaylistManager : PlaylistManager {
         return smartPlaylist
     }
 
-    val smartEpisodes = MutableStateFlow(emptyList<PodcastEpisode>())
-    override fun smartEpisodesFlow(rules: SmartRules, sortType: PlaylistEpisodeSortType, searchTerm: String?): Flow<List<PodcastEpisode>> {
+    val smartEpisodes = MutableStateFlow(emptyList<PlaylistEpisode.Available>())
+    override fun smartEpisodesFlow(rules: SmartRules, sortType: PlaylistEpisodeSortType, searchTerm: String?): Flow<List<PlaylistEpisode.Available>> {
         return smartEpisodes
     }
 

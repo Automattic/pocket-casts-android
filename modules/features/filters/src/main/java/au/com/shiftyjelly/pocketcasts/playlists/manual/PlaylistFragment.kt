@@ -123,9 +123,9 @@ class PlaylistFragment :
                 }
             },
         )
-        val episodesAdapter = adapterFactory.createForManualPlaylist(
+        val episodesAdapter = adapterFactory.create(
             multiSelectToolbar = multiSelectToolbar,
-            getEpisodes = { viewModel.uiState.value.manualPlaylist?.episodes.orEmpty() },
+            getEpisodes = { viewModel.uiState.value.playlist?.episodes.orEmpty() },
         )
         content.adapter = ConcatAdapter(headerAdapter, episodesAdapter)
         EpisodeItemTouchHelper().attachToRecyclerView(content)
@@ -134,14 +134,14 @@ class PlaylistFragment :
             viewModel.uiState
                 .flowWithLifecycle(viewLifecycleOwner.lifecycle)
                 .collect { uiState ->
-                    contentState = when (uiState.manualPlaylist?.episodes?.size) {
+                    contentState = when (uiState.playlist?.episodes?.size) {
                         null -> ContentState.Uninitialized
                         0 -> ContentState.HasNoEpisodes
                         else -> ContentState.HasEpisode
                     }
                     isAnyPodcastFollowed = uiState.isAnyPodcastFollowed
 
-                    val playlistHeaderData = uiState.manualPlaylist?.let { playlist ->
+                    val playlistHeaderData = uiState.playlist?.let { playlist ->
                         PlaylistHeaderData(
                             title = playlist.title,
                             metadata = playlist.metadata,
@@ -149,7 +149,7 @@ class PlaylistFragment :
                     }
                     headerAdapter.submitHeader(playlistHeaderData)
 
-                    val episodes = uiState.manualPlaylist?.episodes.orEmpty()
+                    val episodes = uiState.playlist?.episodes.orEmpty()
                     episodesAdapter.submitList(episodes)
                 }
         }
@@ -266,7 +266,7 @@ class PlaylistFragment :
 
         playlistToolbar.setContentWithViewCompositionStrategy {
             val title by remember {
-                viewModel.uiState.map { it.manualPlaylist?.title.orEmpty() }
+                viewModel.uiState.map { it.playlist?.title.orEmpty() }
             }.collectAsState("")
 
             AppTheme(theme.activeTheme) {
@@ -290,7 +290,7 @@ class PlaylistFragment :
     }
 
     private fun openEditor() {
-        val episodeCount = viewModel.uiState.value.manualPlaylist?.metadata?.totalEpisodeCount ?: Int.MAX_VALUE
+        val episodeCount = viewModel.uiState.value.playlist?.metadata?.totalEpisodeCount ?: Int.MAX_VALUE
         if (episodeCount >= PlaylistManager.MANUAL_PLAYLIST_EPISODE_LIMIT) {
             val snackbarView = (requireActivity() as FragmentHostListener).snackBarView()
             Snackbar.make(snackbarView, getString(LR.string.add_to_playlist_failure_message), Snackbar.LENGTH_LONG).show()

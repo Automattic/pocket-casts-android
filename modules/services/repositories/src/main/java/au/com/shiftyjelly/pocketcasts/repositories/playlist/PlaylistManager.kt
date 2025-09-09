@@ -3,6 +3,7 @@ package au.com.shiftyjelly.pocketcasts.repositories.playlist
 import au.com.shiftyjelly.pocketcasts.models.entity.ManualPlaylistEpisodeSource
 import au.com.shiftyjelly.pocketcasts.models.entity.ManualPlaylistPodcastSource
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
+import au.com.shiftyjelly.pocketcasts.models.to.PlaylistEpisode
 import au.com.shiftyjelly.pocketcasts.models.to.PlaylistEpisodeMetadata
 import au.com.shiftyjelly.pocketcasts.models.type.SmartRules
 import kotlinx.coroutines.flow.Flow
@@ -30,7 +31,7 @@ interface PlaylistManager {
 
     fun smartPlaylistFlow(uuid: String, searchTerm: String? = null): Flow<SmartPlaylist?>
 
-    fun smartEpisodesFlow(rules: SmartRules, sortType: SortType = SortType.NewestToOldest, searchTerm: String? = null): Flow<List<PodcastEpisode>>
+    fun smartEpisodesFlow(rules: SmartRules, sortType: SortType = SortType.NewestToOldest, searchTerm: String? = null): Flow<List<PlaylistEpisode.Available>>
 
     fun smartEpisodesMetadataFlow(rules: SmartRules): Flow<PlaylistEpisodeMetadata>
 
