@@ -13,6 +13,7 @@ import au.com.shiftyjelly.pocketcasts.repositories.download.DownloadManager
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.repositories.playlist.Playlist
 import au.com.shiftyjelly.pocketcasts.repositories.playlist.PlaylistManager
+import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
@@ -30,6 +31,7 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 @OptIn(FlowPreview::class, ExperimentalCoroutinesApi::class)
 @HiltViewModel(assistedFactory = PlaylistViewModel.Factory::class)
@@ -38,6 +40,7 @@ class PlaylistViewModel @AssistedInject constructor(
     @Assisted private val playlistType: Playlist.Type,
     private val playlistManager: PlaylistManager,
     private val podcastManager: PodcastManager,
+    private val episodeManager: EpisodeManager,
     private val playbackManager: PlaybackManager,
     private val downloadManager: DownloadManager,
     private val settings: Settings,
@@ -158,6 +161,32 @@ class PlaylistViewModel @AssistedInject constructor(
     fun startChromeCast() {
         viewModelScope.launch {
             _chromeCastSignal.emit(Unit)
+        }
+    }
+
+    fun archiveAllEpisodes() {
+        viewModelScope.launch(Dispatchers.Default) {
+            val episodes = uiState.value.playlist
+                ?.episodes
+                ?.toPodcastEpisodes()
+                .orEmpty()
+
+            if (episodes.isNotEmpty()) {
+                episodeManager.archiveAllInList(episodes, playbackManager)
+            }
+        }
+    }
+
+    fun unarchiveAllEpisodes() {
+        viewModelScope.launch(Dispatchers.Default) {
+            val episodes = uiState.value.playlist
+                ?.episodes
+                ?.toPodcastEpisodes()
+                .orEmpty()
+
+            if (episodes.isNotEmpty()) {
+                episodeManager.unarchiveAllInListBlocking(episodes)
+            }
         }
     }
 
