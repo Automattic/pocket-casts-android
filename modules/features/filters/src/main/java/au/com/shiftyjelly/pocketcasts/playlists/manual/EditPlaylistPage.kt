@@ -5,6 +5,7 @@ import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
@@ -28,6 +29,7 @@ import androidx.compose.material.AppBarDefaults
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
 import androidx.compose.material.MaterialTheme
+import androidx.compose.material.minimumInteractiveComponentSize
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -152,6 +154,15 @@ internal fun EditPlaylistPage(
                                 },
                             )
                             .animateItem(),
+                        dragHandleModifier = Modifier
+                            .draggableHandle(
+                                onDragStarted = {
+                                    hapticFeedback.performHapticFeedback(HapticFeedbackType.LongPress)
+                                },
+                                onDragStopped = {
+                                    hapticFeedback.performHapticFeedback(HapticFeedbackType.GestureEnd)
+                                },
+                            ),
                     )
                 }
             }
@@ -167,6 +178,7 @@ private fun EpisodeRow(
     dateFormatter: RelativeDateFormatter,
     onClickDelete: () -> Unit,
     modifier: Modifier = Modifier,
+    dragHandleModifier: Modifier = Modifier,
 ) {
     Column(
         modifier = modifier,
@@ -176,7 +188,7 @@ private fun EpisodeRow(
             modifier = Modifier
                 .fillMaxWidth()
                 .height(IntrinsicSize.Min)
-                .padding(top = 12.dp, bottom = 12.dp, start = 4.dp, end = 16.dp),
+                .padding(vertical = 12.dp, horizontal = 4.dp),
         ) {
             IconButton(
                 onClick = onClickDelete,
@@ -217,12 +229,17 @@ private fun EpisodeRow(
             Spacer(
                 modifier = Modifier.width(12.dp),
             )
-            Image(
-                painter = painterResource(IR.drawable.ic_playlist_edit),
-                contentDescription = null,
-                colorFilter = ColorFilter.tint(MaterialTheme.theme.colors.primaryIcon02),
-                modifier = Modifier.size(24.dp),
-            )
+            Box(
+                modifier = Modifier
+                    .minimumInteractiveComponentSize()
+                    .then(dragHandleModifier),
+            ) {
+                Icon(
+                    painter = painterResource(IR.drawable.ic_playlist_edit),
+                    contentDescription = null,
+                    tint = MaterialTheme.theme.colors.primaryIcon02,
+                )
+            }
         }
         if (showDivider) {
             HorizontalDivider(startIndent = 16.dp)
