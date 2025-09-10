@@ -7,6 +7,7 @@ import androidx.compose.animation.AnimatedContent
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
@@ -63,7 +64,9 @@ class OptionsFragment : BaseDialogFragment() {
         ) {
             Column(
                 horizontalAlignment = Alignment.CenterHorizontally,
-                modifier = Modifier.verticalScroll(rememberScrollState()),
+                modifier = Modifier
+                    .verticalScroll(rememberScrollState())
+                    .navigationBarsPadding(),
             ) {
                 Box(
                     modifier = Modifier
@@ -139,7 +142,7 @@ class OptionsFragment : BaseDialogFragment() {
                 if (hasEpisodes && playlistType == Playlist.Type.Manual) {
                     add(
                         PlaylistOption(
-                            title = getString(LR.string.edit),
+                            title = getString(LR.string.playlist_edit_episodes),
                             iconId = IR.drawable.ic_playlist_edit,
                             onClick = {
                                 dismiss()
