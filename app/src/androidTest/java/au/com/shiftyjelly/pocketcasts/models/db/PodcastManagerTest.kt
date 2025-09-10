@@ -137,7 +137,7 @@ class PodcastManagerTest {
         podcastDao.insertBlocking(Podcast(uuid, isSubscribed = true))
         podcastManagerSignedOut.unsubscribeBlocking(uuid, playbackManager)
         val daoPodcast = podcastDao.findByUuidBlocking(uuid)
-        assertTrue("Podcast should be null", daoPodcast == null)
+        assertTrue("Podcast should be unsubscribed", daoPodcast?.isSubscribed == false)
     }
 
     @Test
