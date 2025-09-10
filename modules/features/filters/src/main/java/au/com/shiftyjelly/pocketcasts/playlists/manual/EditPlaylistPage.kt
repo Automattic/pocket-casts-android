@@ -74,9 +74,9 @@ import au.com.shiftyjelly.pocketcasts.repositories.extensions.getSummaryText
 import au.com.shiftyjelly.pocketcasts.repositories.images.PocketCastsImageRequestFactory.PlaceholderType
 import au.com.shiftyjelly.pocketcasts.ui.extensions.getThemeColor
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme.ThemeType
-import java.util.Date
 import sh.calvin.reorderable.ReorderableItem
 import sh.calvin.reorderable.rememberReorderableLazyListState
+import java.util.Date
 import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 import au.com.shiftyjelly.pocketcasts.ui.R as UR
@@ -226,9 +226,6 @@ private fun EpisodeRow(
                     episodeWrapper = episodeWrapper,
                 )
             }
-            Spacer(
-                modifier = Modifier.width(12.dp),
-            )
             Box(
                 modifier = Modifier
                     .minimumInteractiveComponentSize()
