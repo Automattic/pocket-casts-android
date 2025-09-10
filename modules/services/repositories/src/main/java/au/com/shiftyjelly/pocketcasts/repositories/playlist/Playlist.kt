@@ -11,6 +11,7 @@ sealed interface Playlist {
     val episodes: List<PlaylistEpisode>
     val settings: Settings
     val metadata: Metadata
+    val type: Type
 
     data class Settings(
         val sortType: PlaylistEpisodeSortType,
@@ -24,6 +25,7 @@ sealed interface Playlist {
         val totalEpisodeCount: Int,
         val displayedEpisodeCount: Int,
         val displayedAvailableEpisodeCount: Int,
+        val archivedEpisodeCount: Int,
     )
 
     enum class Type(
@@ -55,7 +57,9 @@ data class SmartPlaylist(
     override val episodes: List<PlaylistEpisode.Available>,
     override val settings: Playlist.Settings,
     override val metadata: Playlist.Metadata,
-) : Playlist
+) : Playlist {
+    override val type get() = Playlist.Type.Smart
+}
 
 data class ManualPlaylist(
     override val uuid: String,
@@ -63,4 +67,6 @@ data class ManualPlaylist(
     override val episodes: List<PlaylistEpisode>,
     override val settings: Playlist.Settings,
     override val metadata: Playlist.Metadata,
-) : Playlist
+) : Playlist {
+    override val type get() = Playlist.Type.Manual
+}

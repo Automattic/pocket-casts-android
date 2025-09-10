@@ -807,6 +807,7 @@
     <string name="episode_row_uploading">Uploading&#x2026; (%d%%)</string>
     <string name="episode_row_waiting_for_power">Waiting for power</string>
     <string name="episode_row_waiting_for_wifi">Waiting for WiFi</string>
+    <string name="episode_sort_custom_order">Custom order</string>
     <string name="episode_sort_long_to_short">Longest to shortest</string>
     <string name="episode_sort_title_a_z">Title (A–Z)</string>
     <string name="episode_sort_title_z_a">Title (Z–A)</string>
@@ -965,13 +966,16 @@
     <string name="new_playlists_title_placeholder">Playlist’s name</string>
     <string name="new_smart_playlist_banner_body">Automatically add episodes based on rules</string>
     <string name="new_smart_playlist_banner_title">Make into Smart Playlist</string>
+    <string name="playlist_archive_all">Archive All</string>
     <string name="playlist_artwork_description">Playlist’s artwork</string>
     <string name="playlist_download_all">Download All</string>
+    <string name="playlist_edit" translatable="false">@string/edit</string>
     <string name="playlist_options">Playlist Options</string>
     <string name="playlist_play_all">Play All</string>
     <string name="playlist_select_episodes">Select Episodes</string>
     <string name="playlist_setting_auto_download_description">Enable to auto download episodes in this playlist.</string>
     <string name="playlist_sort_by">Sort By</string>
+    <string name="playlist_unarchive_all">Unarchive All</string>
     <string name="playlists">Playlists</string>
     <string name="playlists_empty_state_body">Playlists let you organize episodes manually or automatically with Smart Rules.</string>
     <string name="playlists_empty_state_title">Organize episodes your way</string>
