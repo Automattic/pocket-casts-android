@@ -136,6 +136,26 @@ abstract class PlaylistDao {
 
     @Query(
         """
+        SELECT DISTINCT episode.podcast_uuid
+        FROM playlists AS playlist
+        JOIN manual_playlist_episodes AS episode ON episode.playlist_uuid IS playlist.uuid
+        WHERE playlist.deleted IS 0 AND playlist.manual IS NOT 0
+    """,
+    )
+    abstract suspend fun getPodcastsAddedToManualPlaylists(): List<String>
+
+    @Query(
+        """
+        SELECT DISTINCT episode.episode_uuid
+        FROM playlists AS playlist
+        JOIN manual_playlist_episodes AS episode ON episode.playlist_uuid IS playlist.uuid
+        WHERE playlist.deleted IS 0 AND playlist.manual IS NOT 0
+    """,
+    )
+    abstract suspend fun getEpisodesAddedToManualPlaylists(): List<String>
+
+    @Query(
+        """
         SELECT manual_episode.*
         FROM playlists AS playlist
         JOIN manual_playlist_episodes AS manual_episode ON manual_episode.playlist_uuid IS playlist.uuid

@@ -123,7 +123,6 @@ class ManualCleanupViewModel
                 episodeManager.deleteEpisodeFiles(
                     episodes = episodesToDelete,
                     playbackManager = playbackManager,
-                    removeFromUpNext = false,
                 )
                 _snackbarMessage.emit(LR.string.settings_manage_downloads_deleting)
             }

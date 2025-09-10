@@ -10,6 +10,8 @@ import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
 import au.com.shiftyjelly.pocketcasts.servers.podcast.PodcastCacheServiceManager
 import au.com.shiftyjelly.pocketcasts.utils.DateUtil
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import com.automattic.android.tracks.crashlogging.CrashLogging
 import java.util.Calendar
@@ -23,6 +25,8 @@ class PodcastRefresherImpl @Inject constructor(
     private val cacheServiceManager: PodcastCacheServiceManager,
     private val crashLogging: CrashLogging,
 ) : PodcastRefresher {
+    private val playlistDao = appDatabase.playlistDao()
+
     override suspend fun refreshPodcast(existingPodcast: Podcast, playbackManager: PlaybackManager) {
         try {
             val podcastResponse = cacheServiceManager.getPodcastResponse(existingPodcast.uuid)
@@ -100,16 +104,22 @@ class PodcastRefresherImpl @Inject constructor(
                     downloadMetaData = false,
                 )
             }
-            val episodeUuidsToDelete = existingEpisodes.map { it.uuid }
-                .subtract(updatedPodcast.episodes.map { it.uuid }.toSet())
-            val calendar = Calendar.getInstance()
-            calendar.add(Calendar.DAY_OF_MONTH, -14)
-            val twoWeeksAgo = calendar.time
-            val episodesToDelete =
-                episodeUuidsToDelete.mapNotNull { uuid -> existingEpisodes.find { it.uuid == uuid } }
-                    .filter {
-                        it.addedDate.before(twoWeeksAgo) && episodeManager.episodeCanBeCleanedUp(it, playbackManager)
-                    }
+
+            val twoWeeksAgo = Calendar.getInstance()
+                .apply { add(Calendar.DAY_OF_MONTH, -14) }
+                .time
+            val episodesInPlaylists = if (FeatureFlag.isEnabled(Feature.PLAYLISTS_REBRANDING, immutable = true)) {
+                playlistDao.getEpisodesAddedToManualPlaylists()
+            } else {
+                emptyList()
+            }
+            val episodesToDelete = existingEpisodes
+                .map(PodcastEpisode::uuid)
+                .subtract(updatedPodcast.episodes.mapTo(mutableSetOf(), PodcastEpisode::uuid))
+                .mapNotNull { uuid -> existingEpisodes.find { it.uuid == uuid } }
+                .filter {
+                    it.addedDate.before(twoWeeksAgo) && episodeManager.episodeCanBeCleanedUp(it, playbackManager) && it.uuid !in episodesInPlaylists
+                }
             if (episodesToDelete.isNotEmpty()) {
                 episodeManager.deleteEpisodesWithoutSync(episodesToDelete, playbackManager)
             }
