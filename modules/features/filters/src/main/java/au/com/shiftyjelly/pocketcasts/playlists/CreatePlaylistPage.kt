@@ -57,7 +57,7 @@ import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 @Composable
-fun CreatePlaylistPage(
+internal fun CreatePlaylistPage(
     titleState: TextFieldState,
     onCreateManualPlaylist: () -> Unit,
     onContinueToSmartPlaylist: () -> Unit,

@@ -6,15 +6,16 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.DefaultLifecycleObserver
 import androidx.lifecycle.LifecycleOwner
+import androidx.recyclerview.widget.RecyclerView
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.models.entity.BaseEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
-import au.com.shiftyjelly.pocketcasts.models.entity.UserEpisode
+import au.com.shiftyjelly.pocketcasts.models.to.PlaylistEpisode
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodeViewSource
+import au.com.shiftyjelly.pocketcasts.playlists.manual.UnavailableEpisodeFragment
 import au.com.shiftyjelly.pocketcasts.podcasts.view.components.PlayButton
 import au.com.shiftyjelly.pocketcasts.podcasts.view.episode.EpisodeContainerFragment
-import au.com.shiftyjelly.pocketcasts.podcasts.view.podcast.EpisodeListAdapter
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.preferences.model.ArtworkConfiguration.Element
 import au.com.shiftyjelly.pocketcasts.repositories.bookmark.BookmarkManager
@@ -31,7 +32,9 @@ import au.com.shiftyjelly.pocketcasts.views.multiselect.MultiSelectEpisodesHelpe
 import au.com.shiftyjelly.pocketcasts.views.multiselect.MultiSelectHelper
 import au.com.shiftyjelly.pocketcasts.views.multiselect.MultiSelectToolbar
 import dagger.hilt.android.scopes.FragmentScoped
+import java.util.Date
 import javax.inject.Inject
+import timber.log.Timber
 
 @FragmentScoped
 class PlaylistEpisodesAdapterFactory @Inject constructor(
@@ -59,31 +62,38 @@ class PlaylistEpisodesAdapterFactory @Inject constructor(
 
     fun create(
         multiSelectToolbar: MultiSelectToolbar,
-        getEpisodes: () -> List<BaseEpisode>,
-    ): EpisodeListAdapter {
-        lateinit var adapter: EpisodeListAdapter
+        getEpisodes: () -> List<PlaylistEpisode>,
+    ): PlaylistEpisodeAdapter {
+        lateinit var adapter: PlaylistEpisodeAdapter
         configureDependencies(
             getAdapter = { adapter },
             multiSelectToolbar = multiSelectToolbar,
-            getEpisodes = getEpisodes,
+            getEpisodes = { getEpisodes().map(PlaylistEpisode::toMultiselectEpisode) },
         )
         val parentFragmentManager = fragment.parentFragmentManager
         val childFragmentManager = fragment.childFragmentManager
         val swipeButtonViewModel by fragment.viewModels<SwipeButtonLayoutViewModel>()
 
-        adapter = EpisodeListAdapter(
+        adapter = PlaylistEpisodeAdapter(
             bookmarkManager = bookmarkManager,
             downloadManager = downloadManager,
             playbackManager = playbackManager,
             upNextQueue = upNextQueue,
             settings = settings,
-            onRowClick = { episode ->
-                when (episode) {
-                    is PodcastEpisode -> if (parentFragmentManager.findFragmentByTag("episode_card") == null) {
-                        EpisodeContainerFragment.newInstance(episode, EpisodeViewSource.FILTERS).show(parentFragmentManager, "episode_card")
+            onRowClick = { episodeWrapper ->
+                when (episodeWrapper) {
+                    is PlaylistEpisode.Available -> if (parentFragmentManager.findFragmentByTag("episode_card") == null) {
+                        EpisodeContainerFragment.newInstance(
+                            episode = episodeWrapper.episode,
+                            source = EpisodeViewSource.FILTERS,
+                        ).show(parentFragmentManager, "episode_card")
                     }
 
-                    is UserEpisode -> Unit
+                    is PlaylistEpisode.Unavailable -> if (childFragmentManager.findFragmentByTag("unavailable_episode_sheet") == null) {
+                        UnavailableEpisodeFragment.newInstance(
+                            episodeUuid = episodeWrapper.uuid,
+                        ).show(childFragmentManager, "unavailable_episode_sheet")
+                    }
                 }
             },
             playButtonListener = playButtonListener,
@@ -108,7 +118,7 @@ class PlaylistEpisodesAdapterFactory @Inject constructor(
     }
 
     private fun configureDependencies(
-        getAdapter: () -> EpisodeListAdapter,
+        getAdapter: () -> RecyclerView.Adapter<*>,
         multiSelectToolbar: MultiSelectToolbar,
         getEpisodes: () -> List<BaseEpisode>,
     ) {
@@ -213,3 +223,10 @@ class PlaylistEpisodesAdapterFactory @Inject constructor(
         }
     }
 }
+
+private fun PlaylistEpisode.toMultiselectEpisode() = when (this) {
+    is PlaylistEpisode.Available -> episode
+    is PlaylistEpisode.Unavailable -> unavailableMultiselectPlaceholder
+}
+
+private val unavailableMultiselectPlaceholder = PodcastEpisode(uuid = "unavailable", publishedDate = Date(0))

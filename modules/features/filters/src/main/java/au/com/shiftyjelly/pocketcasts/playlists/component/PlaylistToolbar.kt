@@ -2,6 +2,9 @@ package au.com.shiftyjelly.pocketcasts.playlists.component
 
 import androidx.annotation.DrawableRes
 import androidx.annotation.FloatRange
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -42,15 +45,33 @@ import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
+internal sealed interface ToolbarConfig {
+    val showTitle: Boolean
+
+    data object WithoutTitle : ToolbarConfig {
+        override val showTitle = false
+    }
+
+    data object WithTitle : ToolbarConfig {
+        override val showTitle = true
+    }
+
+    data class ForAlpha(
+        @FloatRange(0.0, 1.0) val alpha: Float,
+    ) : ToolbarConfig {
+        override val showTitle = true
+    }
+}
+
 @Composable
 internal fun PlaylistToolbar(
     title: String,
-    @FloatRange(0.0, 1.0) backgroundAlpha: Float,
+    config: ToolbarConfig,
     onClickBack: () -> Unit,
     onClickOptions: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    val colors = rememberToolbarColors(backgroundAlpha)
+    val colors = rememberToolbarColors(config)
     TopAppBar(
         navigationIcon = {
             ToolbarButton(
@@ -63,18 +84,24 @@ internal fun PlaylistToolbar(
             )
         },
         title = {
-            val textStyle = LocalTextStyle.current
-            val nonScaledTextStyle = textStyle.merge(
-                fontSize = textStyle.fontSize.value.nonScaledSp,
-                lineHeight = textStyle.lineHeight.value.nonScaledSp,
-            )
-            Text(
-                text = title,
-                style = nonScaledTextStyle,
-                color = colors.titleColor,
-                maxLines = 1,
-                overflow = TextOverflow.Ellipsis,
-            )
+            AnimatedVisibility(
+                visible = config.showTitle,
+                enter = fadeIn(),
+                exit = fadeOut(),
+            ) {
+                val textStyle = LocalTextStyle.current
+                val nonScaledTextStyle = textStyle.merge(
+                    fontSize = textStyle.fontSize.value.nonScaledSp,
+                    lineHeight = textStyle.lineHeight.value.nonScaledSp,
+                )
+                Text(
+                    text = title,
+                    style = nonScaledTextStyle,
+                    color = colors.titleColor,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
+                )
+            }
         },
         actions = {
             ToolbarButton(
@@ -131,36 +158,45 @@ private data class PlaylistToolbarColors(
 )
 
 @Composable
-private fun rememberToolbarColors(alpha: Float): PlaylistToolbarColors {
+private fun rememberToolbarColors(config: ToolbarConfig): PlaylistToolbarColors {
     val backgroundColor = MaterialTheme.theme.colors.secondaryUi01
     val buttonIconColor = MaterialTheme.theme.colors.secondaryIcon01
     val titleColor = MaterialTheme.theme.colors.secondaryText01
 
-    return remember(alpha) {
-        PlaylistToolbarColors(
-            backgroundColor = backgroundColor.copy(alpha = alpha),
-            titleColor = Color(
-                ColorUtils.blendARGB(
-                    titleColor.toArgb(),
-                    Color.Transparent.toArgb(),
-                    1f - alpha,
+    return remember(config) {
+        when (config) {
+            is ToolbarConfig.WithTitle, is ToolbarConfig.WithoutTitle -> PlaylistToolbarColors(
+                backgroundColor = Color.Transparent,
+                titleColor = titleColor,
+                buttonBackgroundColor = Color.Black.copy(alpha = 0.32f),
+                buttonIconColor = Color.White,
+            )
+
+            is ToolbarConfig.ForAlpha -> PlaylistToolbarColors(
+                backgroundColor = backgroundColor.copy(alpha = config.alpha),
+                titleColor = Color(
+                    ColorUtils.blendARGB(
+                        titleColor.toArgb(),
+                        Color.Transparent.toArgb(),
+                        1f - config.alpha,
+                    ),
                 ),
-            ),
-            buttonBackgroundColor = Color(
-                ColorUtils.blendARGB(
-                    Color.Transparent.toArgb(),
-                    Color.Black.copy(alpha = 0.32f).toArgb(),
-                    1f - alpha,
+                buttonBackgroundColor = Color(
+                    ColorUtils.blendARGB(
+                        Color.Transparent.toArgb(),
+                        Color.Black.copy(alpha = 0.32f).toArgb(),
+                        1f - config.alpha,
+                    ),
                 ),
-            ),
-            buttonIconColor = Color(
-                ColorUtils.blendARGB(
-                    buttonIconColor.toArgb(),
-                    Color.White.toArgb(),
-                    1f - alpha,
+                buttonIconColor = Color(
+                    ColorUtils.blendARGB(
+                        buttonIconColor.toArgb(),
+                        Color.White.toArgb(),
+                        1f - config.alpha,
+                    ),
                 ),
-            ),
-        )
+            )
+        }
     }
 }
 
@@ -174,20 +210,32 @@ private fun PodcastToolbarPreview(
     ) {
         Column {
             PlaylistToolbar(
+                title = "Without title",
+                config = ToolbarConfig.WithoutTitle,
+                onClickBack = {},
+                onClickOptions = {},
+            )
+            PlaylistToolbar(
+                title = "With title",
+                config = ToolbarConfig.WithTitle,
+                onClickBack = {},
+                onClickOptions = {},
+            )
+            PlaylistToolbar(
                 title = "Transparent",
-                backgroundAlpha = 0f,
+                config = ToolbarConfig.ForAlpha(0f),
                 onClickBack = {},
                 onClickOptions = {},
             )
             PlaylistToolbar(
                 title = "Semi Transparent",
-                backgroundAlpha = 0.5f,
+                config = ToolbarConfig.ForAlpha(0.5f),
                 onClickBack = {},
                 onClickOptions = {},
             )
             PlaylistToolbar(
                 title = "Opaque",
-                backgroundAlpha = 1f,
+                config = ToolbarConfig.ForAlpha(1f),
                 onClickBack = {},
                 onClickOptions = {},
             )

@@ -123,8 +123,8 @@ import au.com.shiftyjelly.pocketcasts.player.view.bookmark.BookmarkActivityContr
 import au.com.shiftyjelly.pocketcasts.player.view.bookmark.BookmarksContainerFragment
 import au.com.shiftyjelly.pocketcasts.player.view.dialog.MiniPlayerDialog
 import au.com.shiftyjelly.pocketcasts.player.view.video.VideoActivity
+import au.com.shiftyjelly.pocketcasts.playlists.PlaylistFragment
 import au.com.shiftyjelly.pocketcasts.playlists.PlaylistsFragment
-import au.com.shiftyjelly.pocketcasts.playlists.smart.PlaylistFragment
 import au.com.shiftyjelly.pocketcasts.podcasts.view.ProfileEpisodeListFragment
 import au.com.shiftyjelly.pocketcasts.podcasts.view.episode.EpisodeContainerFragment
 import au.com.shiftyjelly.pocketcasts.podcasts.view.folders.SuggestedFoldersFragment
@@ -148,6 +148,7 @@ import au.com.shiftyjelly.pocketcasts.repositories.opml.OpmlImportTask
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackState
 import au.com.shiftyjelly.pocketcasts.repositories.playback.UpNextSource
+import au.com.shiftyjelly.pocketcasts.repositories.playlist.Playlist
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.SmartPlaylistManager
@@ -1450,9 +1451,10 @@ class MainActivity :
 
                 is ShowPlaylistDeepLink -> {
                     if (FeatureFlag.isEnabled(Feature.PLAYLISTS_REBRANDING, immutable = true)) {
+                        val type = Playlist.Type.fromValue(deepLink.playlistType) ?: return
                         closePlayer()
                         openTab(VR.id.navigation_filters)
-                        addFragment(PlaylistFragment.newInstance(deepLink.playlistUuid))
+                        addFragment(PlaylistFragment.newInstance(deepLink.playlistUuid, type))
                     } else {
                         launch(Dispatchers.Default) {
                             smartPlaylistManager.findByUuid(deepLink.playlistUuid)?.let {

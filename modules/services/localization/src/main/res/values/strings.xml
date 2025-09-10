@@ -229,6 +229,8 @@
     <string name="other_options">Other Options</string>
     <string name="add_episodes">Add Episodes</string>
     <string name="your_podcasts">Your Podcasts</string>
+    <string name="unavailable">Unavailable</string>
+    <string name="browse_shows">Browse Shows</string>
 
     <string name="multiselect_actions_shown">Shortcut in toolbar</string>
     <string name="multiselect_actions_hidden">In overflow</string>
@@ -805,6 +807,7 @@
     <string name="episode_row_uploading">Uploading&#x2026; (%d%%)</string>
     <string name="episode_row_waiting_for_power">Waiting for power</string>
     <string name="episode_row_waiting_for_wifi">Waiting for WiFi</string>
+    <string name="episode_sort_custom_order">Custom order</string>
     <string name="episode_sort_long_to_short">Longest to shortest</string>
     <string name="episode_sort_title_a_z">Title (A–Z)</string>
     <string name="episode_sort_title_z_a">Title (Z–A)</string>
@@ -932,6 +935,13 @@
 
     <!-- Playlists -->
 
+    <!-- %1$s is a playlist title  -->
+    <string name="add_to_playlist">Add to “%1$s”</string>
+    <!-- %1$s is episode count like "1 episode", "7 episodes". %2$s is a playlist title  -->
+    <string name="added_to_playlist">%1$s added to “%2$s”</string>
+    <!-- Accessibility description. %1$s is an episode title-->
+    <string name="add_to_playlist_episode_desc">Add %1$s to playlist</string>
+    <string name="add_to_playlist_failure_message">This playlist is full. Remove a few episodes or start a new one.</string>
     <string name="create_playlist">Create Playlist</string>
     <string name="create_smart_playlist">Create Smart Playlist</string>
     <string name="decrement_longer_than_duration">Decrement \"longer than\" duration</string>
@@ -941,17 +951,35 @@
     <string name="episode_status_rule_description">%1$s + %2$d</string>
     <string name="increment_longer_than_duration">Increment \"longer than\" duration</string>
     <string name="increment_shorter_than_duration">Increment \"shorter than\" duration</string>
+    <string name="manual_playlist_no_content_body">Swipe left on an episode to add it to your playlist.</string>
+    <string name="manual_playlist_no_content_title">Add episodes to your playlist</string>
+    <string name="manual_playlist_no_content_title_alternative">Start building your playlist</string>
+    <string name="manual_playlist_no_available_episode_body">Looks like you’ve added all episodes from this show.</string>
+    <string name="manual_playlist_no_available_episode_title">No available episodes</string>
+    <string name="manual_playlist_search_no_episode_body" translatable="false">@string/podcast_no_episodes_matching</string>
+    <string name="manual_playlist_search_no_episode_title" translatable="false">@string/podcast_no_episodes_found</string>
+    <string name="manual_playlist_search_no_podcast_body">We couldn’t find any podcast for that search. Try another keyword.</string>
+    <string name="manual_playlist_search_no_podcast_title">No podcast found</string>
+    <string name="manual_playlist_search_no_podcast_or_folder_body">We couldn’t find any podcast or folder for that search. Try another keyword.</string>
+    <string name="manual_playlist_search_no_podcast_or_folder_title" translatable="false">@string/manual_playlist_search_no_podcast_title</string>
     <string name="new_playlist">New Playlist</string>
     <string name="new_playlists_title_placeholder">Playlist’s name</string>
     <string name="new_smart_playlist_banner_body">Automatically add episodes based on rules</string>
     <string name="new_smart_playlist_banner_title">Make into Smart Playlist</string>
+    <string name="playlist_archive_all">Archive All</string>
     <string name="playlist_artwork_description">Playlist’s artwork</string>
     <string name="playlist_download_all">Download All</string>
+    <string name="playlist_edit" translatable="false">@string/edit</string>
+    <string name="playlist_edit_title">Edit playlist</string>
+    <string name="playlist_episode_unavailable_title">Episode unavailable</string>
+    <string name="playlist_episode_unavailable_description">The podcast creator deleted this episode. It will stay in your playlist until you remove it.</string>
+    <string name="playlist_episode_unavailable_cta">Remove from playlist</string>
     <string name="playlist_options">Playlist Options</string>
     <string name="playlist_play_all">Play All</string>
     <string name="playlist_select_episodes">Select Episodes</string>
     <string name="playlist_setting_auto_download_description">Enable to auto download episodes in this playlist.</string>
     <string name="playlist_sort_by">Sort By</string>
+    <string name="playlist_unarchive_all">Unarchive All</string>
     <string name="playlists">Playlists</string>
     <string name="playlists_empty_state_body">Playlists let you organize episodes manually or automatically with Smart Rules.</string>
     <string name="playlists_empty_state_title">Organize episodes your way</string>

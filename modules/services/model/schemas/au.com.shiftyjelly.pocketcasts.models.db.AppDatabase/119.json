@@ -2,7 +2,7 @@
   "formatVersion": 1,
   "database": {
     "version": 119,
-    "identityHash": "d5613acacaaa790ace7e69faf1c8df95",
+    "identityHash": "3345d8d99489867b900f02adf0bbef07",
     "entities": [
       {
         "tableName": "bump_stats",
@@ -624,52 +624,6 @@
             ],
             "orders": [],
             "createSql": "CREATE INDEX IF NOT EXISTS `playlists_uuid` ON `${TABLE_NAME}` (`uuid`)"
-          }
-        ]
-      },
-      {
-        "tableName": "filter_episodes",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`_id` INTEGER PRIMARY KEY AUTOINCREMENT, `playlistId` INTEGER NOT NULL, `episodeUuid` TEXT NOT NULL, `position` INTEGER NOT NULL)",
-        "fields": [
-          {
-            "fieldPath": "id",
-            "columnName": "_id",
-            "affinity": "INTEGER"
-          },
-          {
-            "fieldPath": "playlistId",
-            "columnName": "playlistId",
-            "affinity": "INTEGER",
-            "notNull": true
-          },
-          {
-            "fieldPath": "episodeUuid",
-            "columnName": "episodeUuid",
-            "affinity": "TEXT",
-            "notNull": true
-          },
-          {
-            "fieldPath": "position",
-            "columnName": "position",
-            "affinity": "INTEGER",
-            "notNull": true
-          }
-        ],
-        "primaryKey": {
-          "autoGenerate": true,
-          "columnNames": [
-            "_id"
-          ]
-        },
-        "indices": [
-          {
-            "name": "filter_episodes_playlist_id",
-            "unique": false,
-            "columnNames": [
-              "playlistId"
-            ],
-            "orders": [],
-            "createSql": "CREATE INDEX IF NOT EXISTS `filter_episodes_playlist_id` ON `${TABLE_NAME}` (`playlistId`)"
           }
         ]
       },
@@ -2054,7 +2008,7 @@
     ],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'd5613acacaaa790ace7e69faf1c8df95')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '3345d8d99489867b900f02adf0bbef07')"
     ]
   }
 }

@@ -219,9 +219,9 @@ private fun Content(
             ) {
                 Box(Modifier.weight(1f)) {
                     NavigationIconButton(
-                        iconColor = MaterialTheme.theme.colors.primaryText01,
+                        tint = MaterialTheme.theme.colors.primaryText01,
                         navigationButton = NavigationButton.Close,
-                        onNavigationClick = onNavigationClick,
+                        onClick = onNavigationClick,
                     )
                 }
 

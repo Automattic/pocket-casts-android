@@ -76,6 +76,38 @@ data class NoContentBannerColors(
     }
 }
 
+data class NoContentData(
+    val title: String,
+    val body: String,
+    @DrawableRes val iconId: Int,
+    val primaryButton: Button? = null,
+    val secondaryButton: Button? = null,
+) {
+    data class Button(
+        val text: String,
+        val onClick: () -> Unit,
+    )
+}
+
+@Composable
+fun NoContentBanner(
+    data: NoContentData,
+    modifier: Modifier = Modifier,
+    colors: NoContentBannerColors = NoContentBannerColors.default(MaterialTheme.theme.colors),
+) {
+    NoContentBanner(
+        title = data.title,
+        body = data.body,
+        iconResourceId = data.iconId,
+        primaryButtonText = data.primaryButton?.text,
+        onPrimaryButtonClick = data.primaryButton?.onClick,
+        secondaryButtonText = data.secondaryButton?.text,
+        onSecondaryButtonClick = data.secondaryButton?.onClick,
+        colors = colors,
+        modifier = modifier,
+    )
+}
+
 @Composable
 fun NoContentBanner(
     title: String,
@@ -97,8 +129,8 @@ fun NoContentBanner(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.spacedBy(itemSpaceHeight),
         modifier = modifier
-            .padding(horizontal = 32.dp)
-            .widthIn(max = if (isTablet || isLandscape) 450.dp else 330.dp),
+            .padding(horizontal = 16.dp)
+            .widthIn(max = if (isTablet || isLandscape) 450.dp else 360.dp),
     ) {
         if (isPortraitOrTablet) {
             Image(

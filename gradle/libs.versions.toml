@@ -17,12 +17,12 @@
 
 [versions]
 aboutlibraries = "12.2.0"
-android-gradle-plugin = "8.12.1"
+android-gradle-plugin = "8.13.0"
 billing = "8.0.0"
 coil = "2.7.0"
 compose = "2025.05.01" # https://developer.android.com/jetpack/compose/bom/bom-mapping
 datastore = "1.1.7"
-dependency-analysis = "3.0.0"
+dependency-analysis = "3.0.1"
 firebase = "34.1.0"
 fragment = "1.8.9"
 glance = "1.1.1"
@@ -36,7 +36,7 @@ kotlin-coroutines = "1.10.2"
 ksp = "2.2.10-2.0.2"
 ktlint = "1.7.1"
 ktlint-compose-rules = "0.4.27"
-lifecycle = "2.9.2"
+lifecycle = "2.9.3"
 lottie = "6.6.7"
 measure-builds = "3.2.1"
 media3 = "1.8.0"
@@ -75,6 +75,7 @@ coil-compose = { module = "io.coil-kt:coil-compose", version.ref = "coil" }
 # Compose
 compose-activity = "androidx.activity:activity-compose:1.9.3"
 compose-animation = { module = "androidx.compose.animation:animation" }
+compose-animation-graphics = { module = "androidx.compose.animation:animation-graphics" }
 compose-bom = { module = "androidx.compose:compose-bom", version.ref = "compose" }
 compose-constraintlayout = "androidx.constraintlayout:constraintlayout-compose:1.0.1"
 compose-foundation = { module = "androidx.compose.foundation:foundation" }
@@ -234,7 +235,7 @@ automattic-tracks = { module = "com.automattic:Automattic-Tracks-Android", versi
 automattic-explat = { module = "com.automattic.tracks:experimentation", version.ref = "tracks" }
 
 # Wear
-wear-input = "androidx.wear:wear-input:1.2.0-beta01"
+wear-input = "androidx.wear:wear-input:1.2.0-rc01"
 wear-remote-interactions = "androidx.wear:wear-remote-interactions:1.1.0"
 wear-tooling-preview = "androidx.wear:wear-tooling-preview:1.0.0"
 
@@ -279,7 +280,7 @@ installreferrer = "com.android.installreferrer:installreferrer:2.2"
 jsonassert = "org.skyscreamer:jsonassert:1.5.3"
 junit = "junit:junit:4.13.2"
 leakcanary = "com.squareup.leakcanary:leakcanary-android:2.14"
-material = "com.google.android.material:material:1.12.0"
+material = "com.google.android.material:material:1.13.0"
 material-dialogs = "com.afollestad.material-dialogs:core:3.3.0"
 material-progressbar = "me.zhanghai.android.materialprogressbar:library:1.6.1"
 play-auth = "com.google.android.gms:play-services-auth:20.4.0"
@@ -287,7 +288,7 @@ play-cast = "com.google.android.gms:play-services-cast-framework:22.1.0"
 play-review = "com.google.android.play:review-ktx:2.0.2"
 play-wearable = "com.google.android.gms:play-services-wearable:19.0.0"
 reorderable = "sh.calvin.reorderable:reorderable:3.0.0"
-robolectric = "org.robolectric:robolectric:4.15.1"
+robolectric = "org.robolectric:robolectric:4.16"
 timber = "com.jakewharton.timber:timber:5.0.1"
 turbine = "app.cash.turbine:turbine:1.2.1"
 zxing = "com.google.zxing:core:3.5.3"

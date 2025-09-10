@@ -1,7 +1,6 @@
 package au.com.shiftyjelly.pocketcasts.account.onboarding.upgrade
 
 import androidx.activity.SystemBarStyle
-import androidx.compose.animation.ExperimentalSharedTransitionApi
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Image
@@ -225,8 +224,8 @@ private fun UpgradeLayout(
                         verticalAlignment = Alignment.CenterVertically,
                     ) {
                         NavigationIconButton(
-                            onNavigationClick = onBackPress,
-                            iconColor = Color.White,
+                            onClick = onBackPress,
+                            tint = Color.White,
                             modifier = Modifier
                                 .height(48.dp)
                                 .width(48.dp),
@@ -587,8 +586,8 @@ private fun NoSubscriptionsLayout(
             verticalAlignment = Alignment.CenterVertically,
         ) {
             NavigationIconButton(
-                onNavigationClick = onBackPress,
-                iconColor = MaterialTheme.theme.colors.primaryText01,
+                onClick = onBackPress,
+                tint = MaterialTheme.theme.colors.primaryText01,
                 modifier = Modifier
                     .height(48.dp)
                     .width(48.dp),
