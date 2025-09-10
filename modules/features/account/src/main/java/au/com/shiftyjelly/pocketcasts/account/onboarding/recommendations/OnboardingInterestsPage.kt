@@ -189,7 +189,7 @@ private fun Content(
                 fontWeight = FontWeight.W500,
             )
             Spacer(
-                modifier = Modifier.weight(1f)
+                modifier = Modifier.weight(1f),
             )
         }
 
