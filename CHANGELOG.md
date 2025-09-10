@@ -21,6 +21,9 @@
         ([#4414](https://github.com/Automattic/pocket-casts-android/pull/4414))
     *   Fix podcast image shadow animation.
         ([#4429](https://github.com/Automattic/pocket-casts-android/pull/4429))
+    *   Fix layout spacing in onboarding interests page
+        ([#4471](https://github.com/Automattic/pocket-casts-android/pull/4471))
+        
 
 7.96
 -----
