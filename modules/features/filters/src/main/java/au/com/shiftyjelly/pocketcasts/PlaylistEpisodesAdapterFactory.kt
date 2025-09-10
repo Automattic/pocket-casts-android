@@ -13,6 +13,7 @@ import au.com.shiftyjelly.pocketcasts.models.entity.BaseEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.models.to.PlaylistEpisode
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodeViewSource
+import au.com.shiftyjelly.pocketcasts.playlists.manual.UnavailableEpisodeFragment
 import au.com.shiftyjelly.pocketcasts.podcasts.view.components.PlayButton
 import au.com.shiftyjelly.pocketcasts.podcasts.view.episode.EpisodeContainerFragment
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
@@ -88,8 +89,10 @@ class PlaylistEpisodesAdapterFactory @Inject constructor(
                         ).show(parentFragmentManager, "episode_card")
                     }
 
-                    is PlaylistEpisode.Unavailable -> {
-                        Timber.i("Show sheet for unavailable $episodeWrapper")
+                    is PlaylistEpisode.Unavailable -> if (childFragmentManager.findFragmentByTag("unavailable_episode_sheet") == null) {
+                        UnavailableEpisodeFragment.newInstance(
+                            episodeUuid = episodeWrapper.uuid,
+                        ).show(childFragmentManager, "unavailable_episode_sheet")
                     }
                 }
             },

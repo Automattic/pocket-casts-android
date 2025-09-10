@@ -86,4 +86,6 @@ class FakePlaylistManager : PlaylistManager {
     override suspend fun addManualEpisode(playlistUuid: String, episodeUuid: String): Boolean {
         return true
     }
+
+    override suspend fun deleteManualEpisodes(playlistUuid: String, episodeUuids: Collection<String>) = Unit
 }

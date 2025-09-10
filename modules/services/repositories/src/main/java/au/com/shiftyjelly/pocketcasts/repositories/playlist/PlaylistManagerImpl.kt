@@ -299,6 +299,10 @@ class PlaylistManagerImpl(
         }
     }
 
+    override suspend fun deleteManualEpisodes(playlistUuid: String, episodeUuids: Collection<String>) {
+        playlistDao.deleteAllManualEpisodesIn(playlistUuid, episodeUuids)
+    }
+
     private fun createPreviewsFlow(playlists: List<PlaylistEntity>) = combine(
         playlists.map { playlist ->
             val flow = if (playlist.manual) {

@@ -558,4 +558,23 @@ class PlaylistManagerManualTest {
         val isAdded = manager.addManualEpisode("playlist-id-0", "episode-id-0")
         assertTrue(isAdded)
     }
+
+    @Test
+    fun deleteManualEpisodes() = dsl.test {
+        insertManualPlaylist(index = 0)
+        insertManualEpisode(index = 0, podcastIndex = 0, playlistIndex = 0)
+        insertManualEpisode(index = 1, podcastIndex = 0, playlistIndex = 0)
+        insertManualEpisode(index = 2, podcastIndex = 0, playlistIndex = 0)
+        insertManualEpisode(index = 3, podcastIndex = 0, playlistIndex = 0)
+        insertPodcastEpisode(index = 1, podcastIndex = 0)
+        insertPodcastEpisode(index = 3, podcastIndex = 0)
+
+        manager.deleteManualEpisodes("playlist-id-0", setOf("episode-id-0", "episode-id-1"))
+
+        expectManualEpisodes(
+            playlistIndex = 0,
+            manualPlaylistEpisode(index = 2, podcastIndex = 0, playlistIndex = 0),
+            manualPlaylistEpisode(index = 3, podcastIndex = 0, playlistIndex = 0),
+        )
+    }
 }

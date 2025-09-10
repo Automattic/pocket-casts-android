@@ -30,7 +30,6 @@ import au.com.shiftyjelly.pocketcasts.models.type.SmartRules
 import au.com.shiftyjelly.pocketcasts.utils.extensions.escapeLike
 import java.time.Clock
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
 
 @Dao
@@ -106,6 +105,15 @@ abstract class PlaylistDao {
     open suspend fun deleteAllPlaylistsIn(uuids: Collection<String>) {
         uuids.chunked(AppDatabase.SQLITE_BIND_ARG_LIMIT).forEach { chunk ->
             deleteAllPlaylistsInUnsafe(chunk)
+        }
+    }
+
+    @Query("DELETE FROM manual_playlist_episodes WHERE playlist_uuid IS :playlistUuid AND episode_uuid IN (:episodeUuids)")
+    protected abstract suspend fun deleteAllManualEpisodesInUnsafe(playlistUuid: String, episodeUuids: Collection<String>)
+
+    open suspend fun deleteAllManualEpisodesIn(playlistUuid: String, episodeUuids: Collection<String>) {
+        episodeUuids.chunked(AppDatabase.SQLITE_BIND_ARG_LIMIT - 1).forEach { chunk ->
+            deleteAllManualEpisodesInUnsafe(playlistUuid, chunk)
         }
     }
 
