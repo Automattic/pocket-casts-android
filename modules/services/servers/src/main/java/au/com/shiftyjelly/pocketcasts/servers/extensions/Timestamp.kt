@@ -6,19 +6,26 @@ import java.time.Instant
 import java.util.Date
 import timber.log.Timber
 
-fun Timestamp.toDate(): Date? {
+fun Timestamp.toInstant(): Instant? {
     return try {
-        Date.from(Instant.ofEpochSecond(seconds, nanos.toLong()))
+        Instant.ofEpochSecond(seconds, nanos.toLong())
     } catch (e: Exception) {
         Timber.e(e)
         null
     }
 }
 
-fun Date.toTimestamp(): Timestamp {
-    val instant = toInstant()
+fun Timestamp.toDate(): Date? {
+    return Date.from(toInstant())
+}
+
+fun Instant.toTimestamp(): Timestamp {
     return timestamp {
-        seconds = instant.epochSecond
-        nanos = instant.nano
+        seconds = epochSecond
+        nanos = nano
     }
+}
+
+fun Date.toTimestamp(): Timestamp {
+    return toInstant().toTimestamp()
 }

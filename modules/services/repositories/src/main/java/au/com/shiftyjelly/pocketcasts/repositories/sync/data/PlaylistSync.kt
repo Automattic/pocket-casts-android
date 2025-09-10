@@ -2,18 +2,26 @@ package au.com.shiftyjelly.pocketcasts.repositories.sync.data
 
 import androidx.room.withTransaction
 import au.com.shiftyjelly.pocketcasts.models.db.AppDatabase
+import au.com.shiftyjelly.pocketcasts.models.entity.ManualPlaylistEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.PlaylistEntity
 import au.com.shiftyjelly.pocketcasts.models.type.PlaylistEpisodeSortType
 import au.com.shiftyjelly.pocketcasts.repositories.sync.SyncManager
+import au.com.shiftyjelly.pocketcasts.servers.extensions.toInstant
+import au.com.shiftyjelly.pocketcasts.servers.extensions.toTimestamp
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import com.google.protobuf.boolValue
 import com.google.protobuf.int32Value
+import com.google.protobuf.int64Value
 import com.google.protobuf.stringValue
 import com.pocketcasts.service.api.PlaylistSyncResponse
 import com.pocketcasts.service.api.Record
 import com.pocketcasts.service.api.SyncUserPlaylist
+import com.pocketcasts.service.api.addedOrNull
 import com.pocketcasts.service.api.allPodcastsOrNull
 import com.pocketcasts.service.api.audioVideoOrNull
 import com.pocketcasts.service.api.downloadedOrNull
+import com.pocketcasts.service.api.episodeSlugOrNull
 import com.pocketcasts.service.api.filterDurationOrNull
 import com.pocketcasts.service.api.filterHoursOrNull
 import com.pocketcasts.service.api.finishedOrNull
@@ -23,15 +31,20 @@ import com.pocketcasts.service.api.longerThanOrNull
 import com.pocketcasts.service.api.manualOrNull
 import com.pocketcasts.service.api.notDownloadedOrNull
 import com.pocketcasts.service.api.partiallyPlayedOrNull
+import com.pocketcasts.service.api.podcastSlugOrNull
 import com.pocketcasts.service.api.podcastUuidsOrNull
+import com.pocketcasts.service.api.publishedOrNull
 import com.pocketcasts.service.api.record
 import com.pocketcasts.service.api.shorterThanOrNull
 import com.pocketcasts.service.api.sortPositionOrNull
 import com.pocketcasts.service.api.sortTypeOrNull
 import com.pocketcasts.service.api.starredOrNull
+import com.pocketcasts.service.api.syncPlaylistEpisode
 import com.pocketcasts.service.api.syncUserPlaylist
 import com.pocketcasts.service.api.titleOrNull
 import com.pocketcasts.service.api.unplayedOrNull
+import com.pocketcasts.service.api.urlOrNull
+import java.time.Instant
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
@@ -40,6 +53,7 @@ internal class PlaylistSync(
     private val appDatabase: AppDatabase,
 ) {
     private val playlistDao = appDatabase.playlistDao()
+    private val useManualPlaylists get() = FeatureFlag.isEnabled(Feature.PLAYLISTS_REBRANDING, immutable = true)
 
     suspend fun fullSync() {
         processServerPlaylists(
@@ -48,6 +62,7 @@ internal class PlaylistSync(
             isDeleted = { playlist -> playlist.isDeletedOrNull?.value == true },
             isManual = { playlist -> playlist.manualOrNull?.value == true },
             applyServerPlaylist = { localPlaylist, serverPlaylist -> localPlaylist.applyServerPlaylist(serverPlaylist) },
+            getManualEpisodes = { serverPlaylist -> toManualEpisodes(serverPlaylist) },
         )
     }
 
@@ -58,6 +73,7 @@ internal class PlaylistSync(
             isDeleted = { playlist -> playlist.isDeletedOrNull?.value == true },
             isManual = { playlist -> playlist.manualOrNull?.value == true },
             applyServerPlaylist = { localPlaylist, serverPlaylist -> localPlaylist.applyServerPlaylist(serverPlaylist) },
+            getManualEpisodes = { serverPlaylist -> toManualEpisodes(serverPlaylist) },
         )
     }
 
@@ -67,35 +83,57 @@ internal class PlaylistSync(
         isDeleted: (T) -> Boolean,
         isManual: (T) -> Boolean,
         applyServerPlaylist: (PlaylistEntity, T) -> PlaylistEntity,
+        getManualEpisodes: (T) -> List<ManualPlaylistEpisode>,
     ) {
         val deletedPlaylists = serverPlaylists.filter(isDeleted)
         val remainingPlaylist = serverPlaylists - deletedPlaylists
         val remainingPlaylistsMap = remainingPlaylist.associateBy(getUuid)
-        // Manual playlists are not supported at the moment
-        val (_, smartPlaylists) = remainingPlaylist.partition(isManual)
 
         appDatabase.withTransaction {
             playlistDao.deleteAllPlaylistsIn(deletedPlaylists.map(getUuid))
 
-            val existingPlaylists = playlistDao.getAllPlaylistsIn(smartPlaylists.map(getUuid))
+            val existingPlaylists = playlistDao.getAllPlaylistsIn(remainingPlaylist.map(getUuid))
             val existingPlaylistUuids = existingPlaylists.map(PlaylistEntity::uuid)
             existingPlaylists.forEach { playlist ->
                 val serverPlaylist = remainingPlaylistsMap[playlist.uuid] ?: return@forEach
                 applyServerPlaylist(playlist, serverPlaylist)
             }
-            val newPlaylists = smartPlaylists.mapNotNull { serverPlaylist ->
-                if (getUuid(serverPlaylist) !in existingPlaylistUuids) {
-                    applyServerPlaylist(PlaylistEntity(), serverPlaylist)
-                } else {
-                    null
+            val newPlaylists = remainingPlaylist
+                .filter { playlist ->
+                    if (useManualPlaylists) {
+                        true
+                    } else {
+                        !isManual(playlist)
+                    }
+                }
+                .mapNotNull { serverPlaylist ->
+                    if (getUuid(serverPlaylist) !in existingPlaylistUuids) {
+                        applyServerPlaylist(PlaylistEntity(), serverPlaylist)
+                    } else {
+                        null
+                    }
+                }
+            playlistDao.upsertAllPlaylists(existingPlaylists + newPlaylists)
+
+            if (useManualPlaylists) {
+                remainingPlaylist.forEach { playlist ->
+                    playlistDao.deleteAllManualEpisodes(getUuid(playlist))
+                    playlistDao.upsertManualEpisodes(getManualEpisodes(playlist))
                 }
             }
-            playlistDao.upsertAllPlaylists(existingPlaylists + newPlaylists)
         }
     }
 
     suspend fun incrementalData(): List<Record> {
-        val playlists = playlistDao.getAllUnsyncedPlaylists()
+        val playlists = playlistDao
+            .getAllUnsyncedPlaylists()
+            .filter { playlist ->
+                if (useManualPlaylists) {
+                    true
+                } else {
+                    !playlist.manual
+                }
+            }
         return withContext(Dispatchers.Default) {
             playlists.map { localPlaylist ->
                 record {
@@ -162,6 +200,11 @@ internal class PlaylistSync(
                         }
                         shorterThan = int32Value {
                             value = localPlaylist.shorterThan
+                        }
+                        if (localPlaylist.manual) {
+                            val localEpisodes = playlistDao.getManualPlaylistEpisodesForSync(localPlaylist.uuid)
+                            episodeOrder.addAll(localEpisodes.map(ManualPlaylistEpisode::episodeUuid))
+                            episodes.addAll(localEpisodes.filterNot(ManualPlaylistEpisode::isSynced).map(::toServerEpisode))
                         }
                     }
                 }
@@ -279,5 +322,64 @@ private fun PlaylistEntity.applyServerPlaylist(serverPlaylist: SyncUserPlaylist)
     }
     serverPlaylist.shorterThanOrNull?.value?.let { value ->
         shorterThan = value
+    }
+}
+
+private fun toServerEpisode(localEpisode: ManualPlaylistEpisode) = syncPlaylistEpisode {
+    episode = localEpisode.episodeUuid
+    podcast = localEpisode.podcastUuid
+    added = int64Value {
+        value = localEpisode.addedAt.toEpochMilli()
+    }
+    published = localEpisode.publishedAt.toTimestamp()
+    title = stringValue {
+        value = localEpisode.title
+    }
+    localEpisode.downloadUrl?.let { localUrl ->
+        url = stringValue {
+            value = localUrl
+        }
+    }
+    podcastSlug = stringValue {
+        value = localEpisode.podcastSlug
+    }
+    episodeSlug = stringValue {
+        value = localEpisode.episodeSlug
+    }
+}
+
+private fun toManualEpisodes(serverPlaylist: PlaylistSyncResponse): List<ManualPlaylistEpisode> {
+    return serverPlaylist.episodesList.map { episode ->
+        ManualPlaylistEpisode(
+            playlistUuid = serverPlaylist.originalUuid,
+            episodeUuid = episode.episode,
+            podcastUuid = episode.podcast,
+            title = episode.titleOrNull?.value.orEmpty(),
+            addedAt = episode.addedOrNull?.value?.let(Instant::ofEpochMilli) ?: Instant.now(),
+            publishedAt = episode.publishedOrNull?.toInstant() ?: Instant.ofEpochMilli(0),
+            downloadUrl = episode.urlOrNull?.value,
+            episodeSlug = episode.episodeSlugOrNull?.value.orEmpty(),
+            podcastSlug = episode.podcastSlugOrNull?.value.orEmpty(),
+            sortPosition = serverPlaylist.episodeOrderList.indexOf(episode.episode).takeIf { it != -1 } ?: Int.MAX_VALUE,
+            isSynced = true,
+        )
+    }
+}
+
+private fun toManualEpisodes(serverPlaylist: SyncUserPlaylist): List<ManualPlaylistEpisode> {
+    return serverPlaylist.episodesList.map { episode ->
+        ManualPlaylistEpisode(
+            playlistUuid = serverPlaylist.originalUuid,
+            episodeUuid = episode.episode,
+            podcastUuid = episode.podcast,
+            title = episode.titleOrNull?.value.orEmpty(),
+            addedAt = episode.addedOrNull?.value?.let(Instant::ofEpochMilli) ?: Instant.now(),
+            publishedAt = episode.publishedOrNull?.toInstant() ?: Instant.ofEpochMilli(0),
+            downloadUrl = episode.urlOrNull?.value,
+            episodeSlug = episode.episodeSlugOrNull?.value.orEmpty(),
+            podcastSlug = episode.podcastSlugOrNull?.value.orEmpty(),
+            sortPosition = serverPlaylist.episodeOrderList.indexOf(episode.episode).takeIf { it != -1 } ?: Int.MAX_VALUE,
+            isSynced = true,
+        )
     }
 }
