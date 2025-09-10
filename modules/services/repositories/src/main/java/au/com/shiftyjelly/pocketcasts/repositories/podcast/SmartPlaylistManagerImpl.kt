@@ -1,7 +1,6 @@
 package au.com.shiftyjelly.pocketcasts.repositories.podcast
 
 import android.content.Context
-import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.models.db.AppDatabase
 import au.com.shiftyjelly.pocketcasts.models.entity.PlaylistEntity
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
@@ -10,7 +9,6 @@ import au.com.shiftyjelly.pocketcasts.models.type.EpisodeStatusEnum
 import au.com.shiftyjelly.pocketcasts.models.type.PlaylistEpisodeSortType
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.di.ApplicationScope
-import au.com.shiftyjelly.pocketcasts.repositories.download.DownloadHelper
 import au.com.shiftyjelly.pocketcasts.repositories.download.DownloadManager
 import au.com.shiftyjelly.pocketcasts.repositories.notification.NotificationManager
 import au.com.shiftyjelly.pocketcasts.repositories.notification.OnboardingNotificationType
@@ -228,23 +226,6 @@ class SmartPlaylistManagerImpl @Inject constructor(
         val playlist = findByIdBlocking(id) ?: return 0
         val where = buildPlaylistWhere(playlist, playbackManager)
         return episodeManager.countEpisodesWhereBlocking(where)
-    }
-
-    override fun checkForEpisodesToDownloadBlocking(episodeManager: EpisodeManager, playbackManager: PlaybackManager) {
-        val allPlaylists = findAllBlocking()
-        if (allPlaylists.isEmpty()) return
-
-        for (playlist in allPlaylists) {
-            if (!playlist.autoDownload) continue
-
-            findEpisodesBlocking(playlist, episodeManager, playbackManager).take(playlist.autodownloadLimit).forEach { episode ->
-                if (episode.isQueued || episode.isDownloaded || episode.isDownloading || episode.isExemptFromAutoDownload) {
-                    return@forEach
-                }
-
-                DownloadHelper.addAutoDownloadedEpisodeToQueue(episode, "playlist " + playlist.title, downloadManager, episodeManager, source = SourceView.PODCAST_LIST)
-            }
-        }
     }
 
     override suspend fun removePodcastFromPlaylists(podcastUuid: String) {

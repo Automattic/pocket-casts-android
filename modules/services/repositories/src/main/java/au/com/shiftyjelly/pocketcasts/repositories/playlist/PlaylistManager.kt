@@ -13,6 +13,8 @@ interface PlaylistManager {
     // <editor-fold desc="Generic playlists">
     fun playlistPreviewsFlow(): Flow<List<PlaylistPreview>>
 
+    suspend fun getAutoDownloadEpisodes(): List<PodcastEpisode>
+
     suspend fun sortPlaylists(sortedUuids: List<String>)
 
     suspend fun updateName(uuid: String, name: String)

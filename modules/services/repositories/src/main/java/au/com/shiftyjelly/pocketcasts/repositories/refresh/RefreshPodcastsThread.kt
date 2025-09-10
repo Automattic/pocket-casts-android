@@ -17,6 +17,7 @@ import androidx.core.graphics.drawable.toBitmap
 import androidx.core.text.HtmlCompat
 import androidx.work.ListenableWorker
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
+import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.deeplink.ShowEpisodeDeepLink
 import au.com.shiftyjelly.pocketcasts.localization.BuildConfig
 import au.com.shiftyjelly.pocketcasts.models.db.AppDatabase
@@ -29,12 +30,14 @@ import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.preferences.model.NewEpisodeNotificationAction
 import au.com.shiftyjelly.pocketcasts.repositories.R
 import au.com.shiftyjelly.pocketcasts.repositories.bookmark.BookmarkManager
+import au.com.shiftyjelly.pocketcasts.repositories.download.DownloadHelper
 import au.com.shiftyjelly.pocketcasts.repositories.download.DownloadManager
 import au.com.shiftyjelly.pocketcasts.repositories.file.FileStorage
 import au.com.shiftyjelly.pocketcasts.repositories.images.PocketCastsImageRequestFactory
 import au.com.shiftyjelly.pocketcasts.repositories.notification.NotificationHelper
 import au.com.shiftyjelly.pocketcasts.repositories.notification.NotificationOpenReceiverActivity
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
+import au.com.shiftyjelly.pocketcasts.repositories.playlist.PlaylistManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.FolderManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
@@ -86,6 +89,7 @@ class RefreshPodcastsThread(
     interface RefreshPodcastsThreadEntryPoint {
         fun serviceManager(): ServiceManager
         fun podcastManager(): PodcastManager
+        fun playlistManager(): PlaylistManager
         fun smartPlaylistManager(): SmartPlaylistManager
         fun bookmarkManager(): BookmarkManager
         fun statsManager(): StatsManager
@@ -210,7 +214,7 @@ class RefreshPodcastsThread(
         val podcastManager = entryPoint.podcastManager()
         val playbackManager = entryPoint.playbackManager()
         val episodeManager = entryPoint.episodeManager()
-        val playlistManager = entryPoint.smartPlaylistManager()
+        val playlistManager = entryPoint.playlistManager()
         val downloadManager = entryPoint.downloadManager()
         val settings = entryPoint.settings()
         val notificationHelper = entryPoint.notificationHelper()
@@ -231,7 +235,7 @@ class RefreshPodcastsThread(
             podcastManager.checkForUnusedPodcastsBlocking(playbackManager)
             LogBuffer.i(LogBuffer.TAG_BACKGROUND_TASKS, "Refresh - checkForUnusedPodcasts - ${String.format("%d ms", SystemClock.elapsedRealtime() - startTime)}")
             startTime = SystemClock.elapsedRealtime()
-            playlistManager.checkForEpisodesToDownloadBlocking(episodeManager, playbackManager)
+            checkForEpisodesToDownloadBlocking(playlistManager, downloadManager, episodeManager)
             LogBuffer.i(LogBuffer.TAG_BACKGROUND_TASKS, "Refresh - playlist checkForEpisodesToDownload - ${String.format("%d ms", SystemClock.elapsedRealtime() - startTime)}")
             startTime = SystemClock.elapsedRealtime()
             podcastManager.checkForEpisodesToDownloadBlocking(addedEpisodes.episodeUuidsAdded, downloadManager)
@@ -747,6 +751,23 @@ class RefreshPodcastsThread(
                     if (episodeName == null) "" else TextUtils.htmlEncode(episodeName),
                 ),
                 HtmlCompat.FROM_HTML_MODE_COMPACT,
+            )
+        }
+    }
+
+    private fun checkForEpisodesToDownloadBlocking(
+        playlistManager: PlaylistManager,
+        downloadManager: DownloadManager,
+        episodeManager: EpisodeManager,
+    ) {
+        val autoDownloadEpisodes = runBlocking { playlistManager.getAutoDownloadEpisodes() }
+        for (episode in autoDownloadEpisodes) {
+            DownloadHelper.addAutoDownloadedEpisodeToQueue(
+                episode = episode,
+                from = "playlist",
+                downloadManager = downloadManager,
+                episodeManager = episodeManager,
+                source = SourceView.FILTERS,
             )
         }
     }

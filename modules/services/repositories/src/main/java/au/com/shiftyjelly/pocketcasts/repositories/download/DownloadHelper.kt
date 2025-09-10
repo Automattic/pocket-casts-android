@@ -30,7 +30,7 @@ object DownloadHelper {
     }
 
     fun addAutoDownloadedEpisodeToQueue(episode: BaseEpisode, from: String, downloadManager: DownloadManager, episodeManager: EpisodeManager, source: SourceView) {
-        if (episode.isDownloaded || episode.episodeStatus == EpisodeStatusEnum.DOWNLOAD_FAILED) {
+        if (episode.isQueued || episode.isDownloaded || episode.isDownloading || episode.isExemptFromAutoDownload || episode.episodeStatus == EpisodeStatusEnum.DOWNLOAD_FAILED) {
             if (episode.episodeStatus == EpisodeStatusEnum.DOWNLOAD_FAILED) {
                 LogBuffer.i(LogBuffer.TAG_BACKGROUND_TASKS, "Not autodownloading ${episode.title} from $from because it has already failed.")
             }
