@@ -220,6 +220,19 @@ abstract class PlaylistDao {
 
     @Query(
         """
+        SELECT *
+        FROM manual_playlist_episodes AS manual_episode
+        WHERE NOT EXISTS(
+          SELECT 1 
+          FROM podcast_episodes AS podcast_episode 
+          WHERE podcast_episode.uuid IS manual_episode.episode_uuid
+        )
+    """,
+    )
+    abstract suspend fun getAllMissingManualEpisodes(): List<ManualPlaylistEpisode>
+
+    @Query(
+        """
         SELECT podcast.uuid, podcast.title, podcast.author
         FROM podcasts AS podcast
         LEFT JOIN folders AS folder ON folder.uuid IS podcast.folder_uuid

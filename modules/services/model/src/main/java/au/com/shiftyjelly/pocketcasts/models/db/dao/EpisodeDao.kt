@@ -340,7 +340,7 @@ abstract class EpisodeDao {
     abstract fun insertAllBlocking(episodes: List<PodcastEpisode>)
 
     @Insert(onConflict = OnConflictStrategy.IGNORE)
-    abstract suspend fun insertAll(episodes: List<PodcastEpisode>)
+    abstract suspend fun insertAllOrIgnore(episodes: List<PodcastEpisode>)
 
     @Query("UPDATE podcast_episodes SET file_type = :fileType WHERE uuid = :uuid")
     abstract fun updateFileTypeBlocking(fileType: String, uuid: String)
