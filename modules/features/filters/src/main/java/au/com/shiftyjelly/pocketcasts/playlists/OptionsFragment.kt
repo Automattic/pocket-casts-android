@@ -34,7 +34,9 @@ import au.com.shiftyjelly.pocketcasts.playlists.component.PlaylistOption
 import au.com.shiftyjelly.pocketcasts.playlists.component.PlaylistOptionsColumn
 import au.com.shiftyjelly.pocketcasts.playlists.component.PlaylistSortOptionsColumn
 import au.com.shiftyjelly.pocketcasts.playlists.component.displayLabel
+import au.com.shiftyjelly.pocketcasts.playlists.manual.EditPlaylistFragment
 import au.com.shiftyjelly.pocketcasts.repositories.playlist.Playlist
+import au.com.shiftyjelly.pocketcasts.ui.helper.FragmentHostListener
 import au.com.shiftyjelly.pocketcasts.views.dialog.ConfirmationDialog
 import au.com.shiftyjelly.pocketcasts.views.dialog.ConfirmationDialog.ButtonType
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseDialogFragment
@@ -140,8 +142,9 @@ class OptionsFragment : BaseDialogFragment() {
                             title = getString(LR.string.edit),
                             iconId = IR.drawable.ic_playlist_edit,
                             onClick = {
-                                Timber.i("Edit episodes")
                                 dismiss()
+                                val fragment = EditPlaylistFragment.newInstance(playlist.uuid)
+                                (requireActivity() as FragmentHostListener).showModal(fragment)
                             },
                         ),
                     )

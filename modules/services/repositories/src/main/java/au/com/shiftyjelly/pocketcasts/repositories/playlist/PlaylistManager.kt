@@ -54,6 +54,8 @@ interface PlaylistManager {
 
     suspend fun addManualEpisode(playlistUuid: String, episodeUuid: String): Boolean
 
+    suspend fun sortManualEpisodes(playlistUuid: String, episodeUuids: List<String>)
+
     suspend fun deleteManualEpisodes(playlistUuid: String, episodeUuids: Collection<String>)
 
     suspend fun deleteManualEpisode(playlistUuid: String, episodeUuid: String) = deleteManualEpisodes(playlistUuid, listOf(episodeUuid))
