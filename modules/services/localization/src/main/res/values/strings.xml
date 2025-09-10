@@ -969,8 +969,8 @@
     <string name="playlist_archive_all">Archive All</string>
     <string name="playlist_artwork_description">Playlist’s artwork</string>
     <string name="playlist_download_all">Download All</string>
-    <string name="playlist_edit" translatable="false">@string/edit</string>
-    <string name="playlist_edit_title">Edit playlist</string>
+    <string name="playlist_edit_episodes">Rearrange Episodes</string>
+    <string name="playlist_edit_episodes_title">Edit playlist</string>
     <string name="playlist_episode_unavailable_title">Episode unavailable</string>
     <string name="playlist_episode_unavailable_description">The podcast creator deleted this episode. It will stay in your playlist until you remove it.</string>
     <string name="playlist_episode_unavailable_cta">Remove from playlist</string>

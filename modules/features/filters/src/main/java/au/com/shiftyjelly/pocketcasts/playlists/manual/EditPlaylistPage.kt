@@ -100,7 +100,7 @@ internal fun EditPlaylistPage(
     ) {
         ThemedTopAppBar(
             modifier = Modifier.fillMaxWidth(),
-            title = stringResource(LR.string.playlist_edit_title),
+            title = stringResource(LR.string.playlist_edit_episodes_title),
             navigationButton = NavigationButton.Back,
             style = ThemedTopAppBar.Style.Immersive,
             backgroundColor = Color.Transparent,
