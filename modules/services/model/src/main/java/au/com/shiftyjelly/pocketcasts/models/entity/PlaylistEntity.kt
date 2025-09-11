@@ -43,6 +43,8 @@ data class PlaylistEntity(
     @ColumnInfo(name = "filterDuration") var filterDuration: Boolean = false,
     @ColumnInfo(name = "longerThan") var longerThan: Int = 20,
     @ColumnInfo(name = "shorterThan") var shorterThan: Int = 40,
+    // Manual playlist configuration
+    @ColumnInfo(name = "isShowingArchived") var isShowingArchived: Boolean = false,
 ) : Serializable {
     companion object {
         const val AUDIO_VIDEO_FILTER_ALL = 0
