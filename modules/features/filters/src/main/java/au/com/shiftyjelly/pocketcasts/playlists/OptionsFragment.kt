@@ -183,7 +183,7 @@ class OptionsFragment : BaseDialogFragment() {
                                 title = getString(LR.string.playlist_archive_all),
                                 iconId = IR.drawable.ic_playlist_archive_all,
                                 onClick = {
-                                    Timber.i("Archive all episodes")
+                                    viewModel.archiveAllEpisodes()
                                     dismiss()
                                 },
                             )
@@ -192,7 +192,7 @@ class OptionsFragment : BaseDialogFragment() {
                                 title = getString(LR.string.playlist_unarchive_all),
                                 iconId = IR.drawable.ic_unarchive,
                                 onClick = {
-                                    Timber.i("Unarchive all episodes")
+                                    viewModel.unarchiveAllEpisodes()
                                     dismiss()
                                 },
                             )
