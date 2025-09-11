@@ -112,6 +112,10 @@ class PlaylistManagerImpl(
         playlistDao.updateAutoDownloadLimit(uuid, limit)
     }
 
+    override suspend fun toggleShowArchived(uuid: String) {
+        playlistDao.toggleIsShowingArchived(uuid)
+    }
+
     override suspend fun deletePlaylist(uuid: String) {
         playlistDao.markPlaylistAsDeleted(uuid)
     }
@@ -155,6 +159,7 @@ class PlaylistManagerImpl(
                             metadata = Playlist.Metadata(
                                 playbackDurationLeft = metadata.timeLeftSeconds.seconds,
                                 artworkUuids = podcasts,
+                                isShowingArchived = false,
                                 totalEpisodeCount = metadata.episodeCount,
                                 archivedEpisodeCount = metadata.archivedEpisodeCount,
                                 displayedEpisodeCount = episodes.size,
@@ -230,6 +235,7 @@ class PlaylistManagerImpl(
                             metadata = Playlist.Metadata(
                                 playbackDurationLeft = metadata.timeLeftSeconds.seconds,
                                 artworkUuids = podcasts,
+                                isShowingArchived = playlist.isShowingArchived,
                                 totalEpisodeCount = metadata.episodeCount,
                                 archivedEpisodeCount = metadata.archivedEpisodeCount,
                                 displayedEpisodeCount = episodes.size,

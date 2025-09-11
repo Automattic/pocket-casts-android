@@ -99,6 +99,7 @@ class PlaylistViewModel @AssistedInject constructor(
                 ?: return@launch
             playbackManager.upNextQueue.removeAll()
             playbackManager.playEpisodes(episodes, SourceView.FILTERS)
+            episodeManager.unarchiveAllInListBlocking(episodes)
         }
     }
 
@@ -196,6 +197,12 @@ class PlaylistViewModel @AssistedInject constructor(
             isAutoDownloadChanged = false
             isAutoDownloadLimitChanged = false
             _showSettingsSignal.emit(Unit)
+        }
+    }
+
+    fun toggleShowArchived() {
+        viewModelScope.launch {
+            playlistManager.toggleShowArchived(playlistUuid)
         }
     }
 

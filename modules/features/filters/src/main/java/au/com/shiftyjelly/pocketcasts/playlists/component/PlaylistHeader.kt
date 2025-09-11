@@ -64,14 +64,15 @@ import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.layout
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.layout.positionInParent
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalInspectionMode
+import androidx.compose.ui.platform.LocalResources
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.Dp
@@ -81,11 +82,15 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import au.com.shiftyjelly.pocketcasts.compose.AppTheme
 import au.com.shiftyjelly.pocketcasts.compose.PreviewRegularDevice
+import au.com.shiftyjelly.pocketcasts.compose.components.AnimatedNonNullVisibility
+import au.com.shiftyjelly.pocketcasts.compose.components.HorizontalDivider
 import au.com.shiftyjelly.pocketcasts.compose.components.NoContentBanner
+import au.com.shiftyjelly.pocketcasts.compose.components.NoContentData
 import au.com.shiftyjelly.pocketcasts.compose.components.PlaylistArtwork
 import au.com.shiftyjelly.pocketcasts.compose.components.SearchBar
 import au.com.shiftyjelly.pocketcasts.compose.components.TextH20
 import au.com.shiftyjelly.pocketcasts.compose.components.TextH40
+import au.com.shiftyjelly.pocketcasts.compose.components.TextP50
 import au.com.shiftyjelly.pocketcasts.compose.components.TextP60
 import au.com.shiftyjelly.pocketcasts.compose.preview.ThemePreviewParameterProvider
 import au.com.shiftyjelly.pocketcasts.compose.theme
@@ -103,7 +108,14 @@ import au.com.shiftyjelly.pocketcasts.localization.R as LR
 internal data class PlaylistHeaderData(
     val title: String,
     val metadata: Playlist.Metadata,
-)
+) {
+    val isNoEpisodeShown = metadata.totalEpisodeCount != 0 && metadata.displayedEpisodeCount == 0
+
+    val isNoArchivedEpisodeShown = metadata.archivedEpisodeCount > 0 &&
+        metadata.displayedEpisodeCount == 0 &&
+        !metadata.isShowingArchived &&
+        metadata.totalEpisodeCount == metadata.archivedEpisodeCount
+}
 
 internal data class PlaylistHeaderButtonData(
     val iconId: Int,
@@ -119,6 +131,7 @@ internal fun PlaylistHeader(
     rightButton: PlaylistHeaderButtonData,
     searchState: TextFieldState,
     useBlurredArtwork: Boolean,
+    onShowArchivedToggle: () -> Unit,
     onMeasureSearchTopOffset: (Float) -> Unit,
     onChangeSearchFocus: (FocusState) -> Unit,
     modifier: Modifier = Modifier,
@@ -188,14 +201,58 @@ internal fun PlaylistHeader(
                     modifier = Modifier.height(16.dp),
                 )
                 AnimatedVisibility(
-                    visible = data.metadata.totalEpisodeCount != 0 && data.metadata.displayedEpisodeCount == 0,
+                    visible = data.metadata.archivedEpisodeCount > 0,
+                    enter = archivedBarEnterTransition,
+                    exit = archivedBarExitTransition,
+                ) {
+                    Column {
+                        ArchivedBar(
+                            episodeCount = data.metadata.archivedEpisodeCount,
+                            buttonLabel = if (data.metadata.isShowingArchived) {
+                                stringResource(LR.string.playlist_episodes_hide_archived)
+                            } else {
+                                stringResource(LR.string.playlist_episodes_show_archived)
+                            },
+                            onClickButton = onShowArchivedToggle,
+                        )
+                        Spacer(
+                            modifier = Modifier.height(16.dp),
+                        )
+                    }
+                }
+                val resources = LocalResources.current
+                val noContentData = remember(data.isNoEpisodeShown, data.isNoArchivedEpisodeShown, resources) {
+                    if (data.isNoArchivedEpisodeShown) {
+                        NoContentData(
+                            title = resources.getString(LR.string.playlist_episodes_archived_title),
+                            body = resources.getQuantityString(
+                                LR.plurals.playlist_episodes_archived_description,
+                                data.metadata.archivedEpisodeCount,
+                                data.metadata.archivedEpisodeCount,
+                            ),
+                            iconId = IR.drawable.ic_exclamation_circle,
+                            primaryButton = NoContentData.Button(
+                                text = resources.getString(LR.string.playlist_episodes_show_archived),
+                                onClick = onShowArchivedToggle,
+                            ),
+                        )
+                    } else if (data.isNoEpisodeShown) {
+                        NoContentData(
+                            title = resources.getString(LR.string.search_episodes_not_found_title),
+                            body = resources.getString(LR.string.search_episodes_not_found_summary),
+                            iconId = IR.drawable.ic_exclamation_circle,
+                        )
+                    } else {
+                        null
+                    }
+                }
+                AnimatedNonNullVisibility(
+                    item = noContentData,
                     enter = noContentEnterTransition,
                     exit = noContentExitTransition,
-                ) {
+                ) { item ->
                     NoContentBanner(
-                        title = stringResource(LR.string.search_episodes_not_found_title),
-                        body = stringResource(LR.string.search_episodes_not_found_summary),
-                        iconResourceId = IR.drawable.ic_exclamation_circle,
+                        data = item,
                         modifier = Modifier.padding(top = 24.dp, bottom = 24.dp),
                     )
                 }
@@ -336,16 +393,16 @@ private fun PlaylistInfoText(
     playbackDurationLeft: Duration?,
     modifier: Modifier = Modifier,
 ) {
-    val context = LocalContext.current
+    val resources = LocalResources.current
     val episodeCountText = if (episodeCount != null) {
         pluralStringResource(LR.plurals.episode_count, episodeCount, episodeCount)
     } else {
         null
     }
-    val durationLeftText = remember(context, playbackDurationLeft, episodeCount) {
+    val durationLeftText = remember(resources, playbackDurationLeft, episodeCount) {
         playbackDurationLeft
             ?.takeIf { episodeCount != null && episodeCount > 0 }
-            ?.toFriendlyString(context.resources, pluralResourceId = { unit -> unit.shortResourceId })
+            ?.toFriendlyString(resources, pluralResourceId = { unit -> unit.shortResourceId })
     }
     val playlistInfoText = remember(episodeCountText, durationLeftText) {
         buildString {
@@ -432,25 +489,43 @@ private fun PlaylistSearchBar(
     )
 }
 
-private fun Modifier.blurOrScrim(useBlur: Boolean) = if (useBlur) {
-    blur(80.dp, BlurredEdgeTreatment.Unbounded)
-} else {
-    graphicsLayer(
-        compositingStrategy = CompositingStrategy.Offscreen,
-    ).drawWithContent {
-        drawContent()
-        drawRect(
-            brush = Brush.verticalGradient(
-                colorStops = arrayOf(
-                    0f to Color.Transparent,
-                    0.65f to Color.Black.copy(alpha = 0.5f),
-                    1f to Color.Transparent,
+@Composable
+fun ArchivedBar(
+    episodeCount: Int,
+    buttonLabel: String,
+    onClickButton: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    Column(
+        modifier = modifier,
+    ) {
+        HorizontalDivider()
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(vertical = 12.dp, horizontal = 16.dp),
+        ) {
+            TextP50(
+                text = stringResource(LR.string.playlist_episodes_archived_count, episodeCount),
+                color = MaterialTheme.theme.colors.primaryText02,
+                modifier = Modifier.weight(1f),
+            )
+            Spacer(
+                modifier = Modifier.width(12.dp),
+            )
+            TextP50(
+                text = buttonLabel,
+                fontWeight = FontWeight.Medium,
+                color = MaterialTheme.theme.colors.primaryIcon01,
+                modifier = Modifier.clickable(
+                    indication = null,
+                    interactionSource = null,
+                    onClick = onClickButton,
                 ),
-                startY = 0f,
-                endY = Float.POSITIVE_INFINITY,
-            ),
-            blendMode = BlendMode.DstIn,
-        )
+            )
+        }
+        HorizontalDivider()
     }
 }
 
@@ -498,6 +573,28 @@ private fun ActionButton(
                 )
             }
         }
+    }
+}
+
+private fun Modifier.blurOrScrim(useBlur: Boolean) = if (useBlur) {
+    blur(80.dp, BlurredEdgeTreatment.Unbounded)
+} else {
+    graphicsLayer(
+        compositingStrategy = CompositingStrategy.Offscreen,
+    ).drawWithContent {
+        drawContent()
+        drawRect(
+            brush = Brush.verticalGradient(
+                colorStops = arrayOf(
+                    0f to Color.Transparent,
+                    0.65f to Color.Black.copy(alpha = 0.5f),
+                    1f to Color.Transparent,
+                ),
+                startY = 0f,
+                endY = Float.POSITIVE_INFINITY,
+            ),
+            blendMode = BlendMode.DstIn,
+        )
     }
 }
 
@@ -553,6 +650,11 @@ private val noContentEnterTransition =
 private val noContentExitTransition =
     fadeOut(spring(stiffness = Spring.StiffnessLow)) + shrinkVertically(spring(stiffness = Spring.StiffnessLow))
 
+private val archivedBarEnterTransition =
+    fadeIn(spring(stiffness = Spring.StiffnessLow)) + expandVertically(spring(stiffness = Spring.StiffnessLow))
+private val archivedBarExitTransition =
+    fadeOut(spring(stiffness = Spring.StiffnessLow)) + shrinkVertically(spring(stiffness = Spring.StiffnessLow))
+
 private val previewColors = listOf(
     Color(0xFFCC99C9),
     Color(0xFF9EC1CF),
@@ -579,10 +681,11 @@ private fun PlaylistHeaderNoDisplayedEpisodesPreview() {
         ) {
             PlaylistHeader(
                 data = PlaylistHeaderData(
-                    title = "My Playlist",
+                    title = "No Episodes Found",
                     metadata = Playlist.Metadata(
                         playbackDurationLeft = 0.seconds,
                         artworkUuids = emptyList(),
+                        isShowingArchived = false,
                         totalEpisodeCount = 20,
                         archivedEpisodeCount = 0,
                         displayedEpisodeCount = 0,
@@ -601,6 +704,91 @@ private fun PlaylistHeaderNoDisplayedEpisodesPreview() {
                 ),
                 searchState = rememberTextFieldState(),
                 useBlurredArtwork = false,
+                onShowArchivedToggle = {},
+                onMeasureSearchTopOffset = {},
+                onChangeSearchFocus = {},
+            )
+        }
+    }
+}
+
+@PreviewRegularDevice
+@Composable
+private fun PlaylistHeaderAllArchivedEpisodesPreview() {
+    AppTheme(ThemeType.LIGHT) {
+        Box(
+            modifier = Modifier
+                .background(MaterialTheme.theme.colors.primaryUi02)
+                .fillMaxSize(),
+        ) {
+            PlaylistHeader(
+                data = PlaylistHeaderData(
+                    title = "All Episodes Archived",
+                    metadata = Playlist.Metadata(
+                        playbackDurationLeft = 0.seconds,
+                        artworkUuids = emptyList(),
+                        isShowingArchived = false,
+                        totalEpisodeCount = 20,
+                        archivedEpisodeCount = 20,
+                        displayedEpisodeCount = 0,
+                        displayedAvailableEpisodeCount = 0,
+                    ),
+                ),
+                leftButton = PlaylistHeaderButtonData(
+                    iconId = IR.drawable.sleep_timer_cog,
+                    label = "Smart Rules",
+                    onClick = {},
+                ),
+                rightButton = PlaylistHeaderButtonData(
+                    iconId = IR.drawable.ic_filters_play,
+                    label = "Play All",
+                    onClick = {},
+                ),
+                searchState = rememberTextFieldState(),
+                useBlurredArtwork = false,
+                onShowArchivedToggle = {},
+                onMeasureSearchTopOffset = {},
+                onChangeSearchFocus = {},
+            )
+        }
+    }
+}
+
+@PreviewRegularDevice
+@Composable
+private fun PlaylistHeaderSomeArchivedEpisodesPreview() {
+    AppTheme(ThemeType.LIGHT) {
+        Box(
+            modifier = Modifier
+                .background(MaterialTheme.theme.colors.primaryUi02)
+                .fillMaxSize(),
+        ) {
+            PlaylistHeader(
+                data = PlaylistHeaderData(
+                    title = "Some Episodes Archived",
+                    metadata = Playlist.Metadata(
+                        playbackDurationLeft = 0.seconds,
+                        artworkUuids = emptyList(),
+                        isShowingArchived = true,
+                        totalEpisodeCount = 20,
+                        archivedEpisodeCount = 15,
+                        displayedEpisodeCount = 5,
+                        displayedAvailableEpisodeCount = 0,
+                    ),
+                ),
+                leftButton = PlaylistHeaderButtonData(
+                    iconId = IR.drawable.sleep_timer_cog,
+                    label = "Smart Rules",
+                    onClick = {},
+                ),
+                rightButton = PlaylistHeaderButtonData(
+                    iconId = IR.drawable.ic_filters_play,
+                    label = "Play All",
+                    onClick = {},
+                ),
+                searchState = rememberTextFieldState(),
+                useBlurredArtwork = false,
+                onShowArchivedToggle = {},
                 onMeasureSearchTopOffset = {},
                 onChangeSearchFocus = {},
             )
@@ -619,10 +807,11 @@ private fun PlaylistHeaderSinglePodcastPreview() {
         ) {
             PlaylistHeader(
                 data = PlaylistHeaderData(
-                    title = "My Playlist",
+                    title = "Single Podcast",
                     metadata = Playlist.Metadata(
                         playbackDurationLeft = 200.days + 12.hours,
                         artworkUuids = listOf("podcast-uuid"),
+                        isShowingArchived = false,
                         totalEpisodeCount = 100,
                         archivedEpisodeCount = 0,
                         displayedEpisodeCount = 100,
@@ -641,6 +830,7 @@ private fun PlaylistHeaderSinglePodcastPreview() {
                 ),
                 searchState = rememberTextFieldState(),
                 useBlurredArtwork = false,
+                onShowArchivedToggle = {},
                 onMeasureSearchTopOffset = {},
                 onChangeSearchFocus = {},
             )
@@ -659,10 +849,11 @@ private fun PlaylistHeaderMultiPodcastPreview() {
         ) {
             PlaylistHeader(
                 data = PlaylistHeaderData(
-                    title = "My Playlist",
+                    title = "Multiple Podcasts",
                     metadata = Playlist.Metadata(
                         playbackDurationLeft = 1.hours + 15.minutes,
                         artworkUuids = List(4) { "podcast-uuid-$it" },
+                        isShowingArchived = false,
                         totalEpisodeCount = 5,
                         archivedEpisodeCount = 0,
                         displayedEpisodeCount = 5,
@@ -681,6 +872,7 @@ private fun PlaylistHeaderMultiPodcastPreview() {
                 ),
                 searchState = rememberTextFieldState(),
                 useBlurredArtwork = false,
+                onShowArchivedToggle = {},
                 onMeasureSearchTopOffset = {},
                 onChangeSearchFocus = {},
             )
@@ -705,6 +897,7 @@ private fun PlaylistHeaderThemePreview(
                     metadata = Playlist.Metadata(
                         playbackDurationLeft = 1.hours + 15.minutes,
                         artworkUuids = List(4) { "podcast-uuid-$it" },
+                        isShowingArchived = false,
                         totalEpisodeCount = 5,
                         archivedEpisodeCount = 0,
                         displayedEpisodeCount = 5,
@@ -723,6 +916,7 @@ private fun PlaylistHeaderThemePreview(
                 ),
                 searchState = rememberTextFieldState(),
                 useBlurredArtwork = false,
+                onShowArchivedToggle = {},
                 onMeasureSearchTopOffset = {},
                 onChangeSearchFocus = {},
             )

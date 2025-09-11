@@ -18,6 +18,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -194,6 +195,7 @@ class PlaylistFragment :
                 },
             ),
             searchState = viewModel.searchState.textState,
+            onShowArchivedToggle = viewModel::toggleShowArchived,
             onChangeSearchFocus = { hasFocus, searchTopOffset ->
                 if (hasFocus) {
                     binding.content.smoothScrollToTop(0, offset = -searchTopOffset.roundToInt())
@@ -219,7 +221,13 @@ class PlaylistFragment :
                 .collect { uiState ->
                     contentState = when (uiState.playlist?.episodes?.size) {
                         null -> ContentState.Uninitialized
-                        0 -> ContentState.HasNoEpisodes
+
+                        0 -> if (uiState.playlist.metadata.archivedEpisodeCount == 0) {
+                            ContentState.HasNoEpisodes
+                        } else {
+                            ContentState.HasEpisode
+                        }
+
                         else -> ContentState.HasEpisode
                     }
                     isAnyPodcastFollowed = uiState.isAnyPodcastFollowed

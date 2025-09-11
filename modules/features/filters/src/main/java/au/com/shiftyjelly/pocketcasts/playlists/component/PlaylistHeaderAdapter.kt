@@ -28,6 +28,7 @@ internal class PlaylistHeaderAdapter(
     private val leftButton: PlaylistHeaderButtonData,
     private val rightButton: PlaylistHeaderButtonData,
     private val searchState: TextFieldState,
+    private val onShowArchivedToggle: () -> Unit,
     private val onChangeSearchFocus: (Boolean, Float) -> Unit,
 ) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
     private var headerData by mutableStateOf<PlaylistHeaderData?>(null)
@@ -67,6 +68,7 @@ internal class PlaylistHeaderAdapter(
                         rightButton = rightButton,
                         searchState = searchState,
                         useBlurredArtwork = Build.VERSION.SDK_INT >= 31,
+                        onShowArchivedToggle = onShowArchivedToggle,
                         onMeasureSearchTopOffset = { topOffset -> searchTopOffset = topOffset },
                         onChangeSearchFocus = { focusState ->
                             val hasFocus = focusState.hasFocus
@@ -76,7 +78,7 @@ internal class PlaylistHeaderAdapter(
                                 keyboard?.show()
                             }
                         },
-                        modifier = Modifier.Companion.background(MaterialTheme.theme.colors.primaryUi02),
+                        modifier = Modifier.background(MaterialTheme.theme.colors.primaryUi02),
                     )
                 }
             }

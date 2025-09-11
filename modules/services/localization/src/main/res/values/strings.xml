@@ -974,6 +974,14 @@
     <string name="playlist_episode_unavailable_title">Episode unavailable</string>
     <string name="playlist_episode_unavailable_description">The podcast creator deleted this episode. It will stay in your playlist until you remove it.</string>
     <string name="playlist_episode_unavailable_cta">Remove from playlist</string>
+    <string name="playlist_episodes_archived_count">%1$d archived</string>
+    <string name="playlist_episodes_archived_title">No Episodes</string>
+    <plurals name="playlist_episodes_archived_description">
+        <item quantity="one">Your episode in this playlist has been archived</item>
+        <item quantity="other">All %1$d episodes of this playlist have been archived</item>
+    </plurals>
+    <string name="playlist_episodes_hide_archived">Hide Archived</string>
+    <string name="playlist_episodes_show_archived">Show Archived</string>
     <string name="playlist_options">Playlist Options</string>
     <string name="playlist_play_all">Play All</string>
     <string name="playlist_select_episodes">Select Episodes</string>

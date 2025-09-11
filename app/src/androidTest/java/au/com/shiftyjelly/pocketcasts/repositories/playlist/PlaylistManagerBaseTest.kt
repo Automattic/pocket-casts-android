@@ -365,4 +365,17 @@ class PlaylistManagerBaseTest {
         manager.updateName("playlist-id-1", "New name 2")
         expectName(playlistIndex = 1, name = "New name 2")
     }
+
+    @Test
+    fun toggleShowingArchivedEpisodes() = dsl.test {
+        insertSmartPlaylist(index = 0)
+
+        expectNotShowArchived(playlistIndex = 0)
+
+        manager.toggleShowArchived("playlist-id-0")
+        expectShowArchived(playlistIndex = 0)
+
+        manager.toggleShowArchived("playlist-id-0")
+        expectNotShowArchived(playlistIndex = 0)
+    }
 }
