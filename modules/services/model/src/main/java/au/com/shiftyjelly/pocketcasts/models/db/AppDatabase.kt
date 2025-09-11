@@ -1230,7 +1230,7 @@ abstract class AppDatabase : RoomDatabase() {
         }
 
         val MIGRATION_120_121 = addMigration(120, 121) { database ->
-            database.execSQL("ALTER TABLE playlists ADD COLUMN isShowingArchived INTEGER NOT NULL DEFAULT 0")
+            database.execSQL("ALTER TABLE playlists ADD COLUMN showArchivedEpisodes INTEGER NOT NULL DEFAULT 0")
         }
 
         fun addMigrations(databaseBuilder: Builder<AppDatabase>, context: Context) {

@@ -95,8 +95,8 @@ abstract class PlaylistDao {
     @Query(
         """
         UPDATE playlists
-        SET isShowingArchived = (CASE 
-            WHEN isShowingArchived IS 0 THEN 1 
+        SET showArchivedEpisodes = (CASE 
+            WHEN showArchivedEpisodes IS 0 THEN 1 
             ELSE 0
         END)
         WHERE uuid = :uuid    
@@ -423,7 +423,7 @@ abstract class PlaylistDao {
         WHERE
           manual_episode.playlist_uuid IS :playlistUuid
           AND (CASE 
-            WHEN playlist.isShowingArchived IS NOT 0 THEN 1 
+            WHEN playlist.showArchivedEpisodes IS NOT 0 THEN 1 
             ELSE IFNULL(podcast_episode.archived, 0) IS 0
           END)
           AND (

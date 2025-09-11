@@ -229,13 +229,13 @@ class PlaylistManagerDsl : TestWatcher() {
     suspend fun expectShowArchived(playlistIndex: Int) {
         val playlistId = "playlist-id-$playlistIndex"
         val playlist = playlistDao.getAllPlaylistsIn(listOf(playlistId)).singleOrNull()
-        assertEquals(true, playlist?.isShowingArchived)
+        assertEquals(true, playlist?.showArchivedEpisodes)
     }
 
     suspend fun expectNotShowArchived(playlistIndex: Int) {
         val playlistId = "playlist-id-$playlistIndex"
         val playlist = playlistDao.getAllPlaylistsIn(listOf(playlistId)).singleOrNull()
-        assertEquals(false, playlist?.isShowingArchived)
+        assertEquals(false, playlist?.showArchivedEpisodes)
     }
 
     suspend fun expectPlaylist(playlist: PlaylistEntity) {

@@ -2,7 +2,7 @@
   "formatVersion": 1,
   "database": {
     "version": 121,
-    "identityHash": "c2711512fd34f230e8e4e5cc1f09828c",
+    "identityHash": "403d274080b25f2a4975a864536a1634",
     "entities": [
       {
         "tableName": "bump_stats",
@@ -459,7 +459,7 @@
       },
       {
         "tableName": "playlists",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`_id` INTEGER, `uuid` TEXT NOT NULL, `title` TEXT NOT NULL, `iconId` INTEGER NOT NULL, `sortPosition` INTEGER, `sortId` INTEGER NOT NULL, `manual` INTEGER NOT NULL, `draft` INTEGER NOT NULL, `deleted` INTEGER NOT NULL, `isShowingArchived` INTEGER NOT NULL, `syncStatus` INTEGER NOT NULL, `autoDownload` INTEGER NOT NULL, `autoDownloadLimit` INTEGER NOT NULL, `unplayed` INTEGER NOT NULL, `partiallyPlayed` INTEGER NOT NULL, `finished` INTEGER NOT NULL, `downloaded` INTEGER NOT NULL, `notDownloaded` INTEGER NOT NULL, `audioVideo` INTEGER NOT NULL, `filterHours` INTEGER NOT NULL, `starred` INTEGER NOT NULL, `allPodcasts` INTEGER NOT NULL, `podcastUuids` TEXT, `filterDuration` INTEGER NOT NULL, `longerThan` INTEGER NOT NULL, `shorterThan` INTEGER NOT NULL, PRIMARY KEY(`_id`))",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`_id` INTEGER, `uuid` TEXT NOT NULL, `title` TEXT NOT NULL, `iconId` INTEGER NOT NULL, `sortPosition` INTEGER, `sortId` INTEGER NOT NULL, `manual` INTEGER NOT NULL, `draft` INTEGER NOT NULL, `deleted` INTEGER NOT NULL, `syncStatus` INTEGER NOT NULL, `autoDownload` INTEGER NOT NULL, `autoDownloadLimit` INTEGER NOT NULL, `unplayed` INTEGER NOT NULL, `partiallyPlayed` INTEGER NOT NULL, `finished` INTEGER NOT NULL, `downloaded` INTEGER NOT NULL, `notDownloaded` INTEGER NOT NULL, `audioVideo` INTEGER NOT NULL, `filterHours` INTEGER NOT NULL, `starred` INTEGER NOT NULL, `allPodcasts` INTEGER NOT NULL, `podcastUuids` TEXT, `filterDuration` INTEGER NOT NULL, `longerThan` INTEGER NOT NULL, `shorterThan` INTEGER NOT NULL, `showArchivedEpisodes` INTEGER NOT NULL, PRIMARY KEY(`_id`))",
         "fields": [
           {
             "fieldPath": "id",
@@ -510,12 +510,6 @@
           {
             "fieldPath": "deleted",
             "columnName": "deleted",
-            "affinity": "INTEGER",
-            "notNull": true
-          },
-          {
-            "fieldPath": "isShowingArchived",
-            "columnName": "isShowingArchived",
             "affinity": "INTEGER",
             "notNull": true
           },
@@ -611,6 +605,12 @@
           {
             "fieldPath": "shorterThan",
             "columnName": "shorterThan",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "showArchivedEpisodes",
+            "columnName": "showArchivedEpisodes",
             "affinity": "INTEGER",
             "notNull": true
           }
@@ -2014,7 +2014,7 @@
     ],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'c2711512fd34f230e8e4e5cc1f09828c')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '403d274080b25f2a4975a864536a1634')"
     ]
   }
 }

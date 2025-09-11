@@ -235,7 +235,7 @@ class PlaylistManagerImpl(
                             metadata = Playlist.Metadata(
                                 playbackDurationLeft = metadata.timeLeftSeconds.seconds,
                                 artworkUuids = podcasts,
-                                isShowingArchived = playlist.isShowingArchived,
+                                isShowingArchived = playlist.showArchivedEpisodes,
                                 totalEpisodeCount = metadata.episodeCount,
                                 archivedEpisodeCount = metadata.archivedEpisodeCount,
                                 displayedEpisodeCount = episodes.size,
