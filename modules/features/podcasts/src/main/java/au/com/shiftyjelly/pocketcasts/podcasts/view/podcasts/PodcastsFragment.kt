@@ -717,23 +717,11 @@ class PodcastsFragment :
     }
 
     private fun trackAdImpression(ad: BlazeAd) {
-        analyticsTracker.track(
-            AnalyticsEvent.BANNER_AD_IMPRESSION,
-            mapOf(
-                "location" to "podcast_list",
-                "id" to ad.id,
-            ),
-        )
+        analyticsTracker.trackBannerAdImpression(id = ad.id, location = ad.location.value)
     }
 
     fun trackAdTapped(ad: BlazeAd) {
-        analyticsTracker.track(
-            AnalyticsEvent.BANNER_AD_TAPPED,
-            mapOf(
-                "location" to "podcast_list",
-                "id" to ad.id,
-            ),
-        )
+        analyticsTracker.trackBannerAdTapped(id = ad.id, location = ad.location.value)
     }
 
     inner class SpaceItemDecoration : RecyclerView.ItemDecoration() {

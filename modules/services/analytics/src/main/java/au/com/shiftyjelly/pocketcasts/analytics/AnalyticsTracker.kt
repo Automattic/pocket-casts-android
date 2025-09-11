@@ -21,6 +21,37 @@ open class AnalyticsTracker(
         }
     }
 
+    fun trackBannerAdImpression(id: String, location: String) {
+        track(
+            AnalyticsEvent.BANNER_AD_IMPRESSION,
+            mapOf(
+                "id" to id,
+                "location" to location,
+            ),
+        )
+    }
+
+    fun trackBannerAdTapped(id: String, location: String) {
+        track(
+            AnalyticsEvent.BANNER_AD_TAPPED,
+            mapOf(
+                "id" to id,
+                "location" to location,
+            ),
+        )
+    }
+
+    fun trackBannerAdReport(id: String, reason: String, location: String) {
+        track(
+            AnalyticsEvent.BANNER_AD_REPORT,
+            mapOf(
+                "id" to id,
+                "reason" to reason,
+                "location" to location,
+            ),
+        )
+    }
+
     fun refreshMetadata() {
         trackers.forEach(Tracker::refreshMetadata)
     }
