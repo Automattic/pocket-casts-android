@@ -1,11 +1,24 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2025-08-26 13:54:06+0000
+Translation-Revision-Date: 2025-09-11 09:54:08+0000
 Plural-Forms: nplurals=2; plural=n != 1;
 Generator: GlotPress/2.4.0-alpha
 Language: de
 -->
 <resources>
+    <string name="unavailable">Nicht verfügbar</string>
+    <string name="added_to_playlist">%1$s zu „%2$s“ hinzugefügt</string>
+    <string name="add_to_playlist_failure_message">Diese Wiedergabeliste ist voll. Entferne einige Folgen oder beginne eine neue.</string>
+    <string name="add_to_playlist_episode_desc">%1$s zur Wiedergabeliste hinzufügen</string>
+    <string name="add_to_playlist">Zu „%1$s“ hinzufügen </string>
+    <string name="your_podcasts">Deine Podcasts</string>
+    <string name="onboarding_recommendations_message">Hier sind einige großartige Shows, mit denen du beginnen kannst. Tippe, wenn du Podcasts abonnieren, eine Suche durchführen oder Inhalte aus anderen Apps importieren möchtest.</string>
+    <string name="onboarding_recommendations_title">Wir hoffen, dass dir diese Vorschläge gefallen!</string>
+    <string name="add_episodes">Folgen hinzufügen</string>
+    <string name="onboarding_interests_select_at_least_label">Wähle mindestens 3 aus</string>
+    <string name="onboarding_interests_show_more">Weitere Kategorien anzeigen</string>
+    <string name="onboarding_interests_description">Tolle Podcasts, handverlesen von echten Menschen – nur für dich!</string>
+    <string name="onboarding_interests_title">Erzähle uns von deinen Lieblingsthemen</string>
     <string name="onboarding_create_account_sign_up_google">Mit Google registrieren</string>
     <string name="onboarding_create_account_sign_up_email">Mit E-Mail-Adresse registrieren</string>
     <string name="onboarding_create_account_title">Pocket\u00A0Casts-Konto erstellen</string>
@@ -260,7 +273,7 @@ Language: de
     <string name="profile_empty_history">Viel Spaß beim Hören!</string>
     <string name="profile_empty_downloaded_summary">Speichere Folgen, um sie offline anzuhören, und verpasse keinen Moment.</string>
     <string name="profile_empty_downloaded">Inhalte offline genießen</string>
-    <string name="go_to_discover">„Entdecken“ aufrufen</string>
+    <string name="go_to_discover">“Entdecken“ öffnen</string>
     <string name="large_player_widget_label">Podcast-Steuerung und Warteschlange</string>
     <string name="medium_player_widget_description">Folge abspielen, pausieren oder überspringen</string>
     <string name="small_player_widget_label">Button „Podcast abspielen“</string>
@@ -2170,6 +2183,10 @@ Language: de
     <plurals name="podcast_share_start_handle_description">
         <item quantity="one">Handle für Clip-Anfang: %d Sekunde</item>
         <item quantity="other">Handle für Clip-Anfang: %d Sekunden</item>
+    </plurals>
+    <plurals name="podcasts_count">
+        <item quantity="one">%d Podcast</item>
+        <item quantity="other">%d Podcasts</item>
     </plurals>
     <plurals name="profile_stats_day_listened">
         <item quantity="one">Tag angehört</item>

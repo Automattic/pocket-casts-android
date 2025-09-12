@@ -1,11 +1,24 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2025-08-26 09:54:03+0000
+Translation-Revision-Date: 2025-09-09 15:54:03+0000
 Plural-Forms: nplurals=1; plural=0;
 Generator: GlotPress/2.4.0-alpha
 Language: zh_CN
 -->
 <resources>
+    <string name="unavailable">不可用</string>
+    <string name="add_to_playlist_failure_message">此播放列表已满。 删减几集或开始新的一集。</string>
+    <string name="added_to_playlist">%1$s 已添加至“%2$s”</string>
+    <string name="add_to_playlist_episode_desc">将 %1$s 添加至播放列表</string>
+    <string name="add_to_playlist">添加至“%1$s”</string>
+    <string name="your_podcasts">您的播客</string>
+    <string name="onboarding_recommendations_message">以下是一些值得一听的精彩节目。 轻点以关注、搜索或从其他应用程序导入。</string>
+    <string name="onboarding_recommendations_title">希望您喜欢这些建议！</string>
+    <string name="add_episodes">添加剧集</string>
+    <string name="onboarding_interests_select_at_least_label">至少选择 3 项</string>
+    <string name="onboarding_interests_show_more">显示更多分类</string>
+    <string name="onboarding_interests_description">优质播客即将上线，真人严选，声声入耳！</string>
+    <string name="onboarding_interests_title">告诉我们您感兴趣的话题</string>
     <string name="onboarding_create_account_sign_up_google">使用 Google 账户注册</string>
     <string name="onboarding_create_account_sign_up_email">使用电子邮件地址注册</string>
     <string name="onboarding_create_account_message">您的播客，始终保持同步。 保护您的媒体库安全，并在网页和桌面端畅享 Pocket Casts。</string>
@@ -2158,6 +2171,9 @@ Language: zh_CN
     </plurals>
     <plurals name="podcast_share_start_handle_description">
         <item quantity="other">开头片段控标：%d 秒</item>
+    </plurals>
+    <plurals name="podcasts_count">
+        <item quantity="other">%d 个播客</item>
     </plurals>
     <plurals name="profile_stats_day_listened">
         <item quantity="other">已收听的天数</item>

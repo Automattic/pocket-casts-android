@@ -1,11 +1,67 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2025-08-14 22:47:45+0000
+Translation-Revision-Date: 2025-09-11 17:26:40+0000
 Plural-Forms: nplurals=2; plural=n != 1;
 Generator: GlotPress/2.4.0-alpha
 Language: ca
 -->
 <resources>
+    <string name="playlist_edit_episodes_title">Editar la llista</string>
+    <string name="playlist_edit_episodes">Reorganitzar els episodis</string>
+    <string name="playlist_unarchive_all">Desarxiva-ho tot</string>
+    <string name="playlist_episode_unavailable_cta">Esborrar de la llista de reproducció</string>
+    <string name="playlist_episode_unavailable_description">L\'autor del pòdcast ha eliminat aquest episodi. Es quedarà a la teva llista de reproducció fins que l\'esborris.</string>
+    <string name="playlist_episode_unavailable_title">Episodi no disponible. </string>
+    <string name="playlist_archive_all">Arxivar-ho tot</string>
+    <string name="episode_sort_custom_order">Ordre personalitzat</string>
+    <string name="manual_playlist_search_no_podcast_or_folder_body">No hem pogut trobar cap episodi per a aquesta cerca. Prova amb una altra paraula clau.</string>
+    <string name="manual_playlist_search_no_podcast_title">No s\'han trobat pòdcasts</string>
+    <string name="manual_playlist_search_no_podcast_body">No hem pogut trobar cap pòdcast amb aquesta cerca. Prova amb una altra paraula clau.</string>
+    <string name="manual_playlist_no_available_episode_title">No hi ha episodis disponibles</string>
+    <string name="manual_playlist_no_available_episode_body">Sembla que has afegit tots els episodis d\'aquest pòdcast.</string>
+    <string name="manual_playlist_no_content_title_alternative">Comença a crear la teva llista de reproducció</string>
+    <string name="manual_playlist_no_content_title">Afegeix episodis a la teva llista de reproducció</string>
+    <string name="manual_playlist_no_content_body">Llisca cap a l\'esquerra en un episodi per afegir-lo a la teva llista de reproducció.</string>
+    <string name="browse_shows">Navega pels pòdcasts</string>
+    <string name="unavailable">No disponible</string>
+    <string name="add_to_playlist_failure_message">Aquesta llista de reproducció és plena. Elimina alguns episodis o comença’n una de nova.</string>
+    <string name="added_to_playlist">%1$s afegit a “%2$s”</string>
+    <string name="add_to_playlist_episode_desc">Afegeix %1$s a la llista de reproducció</string>
+    <string name="add_to_playlist">Afegeix a “%1$s”</string>
+    <string name="your_podcasts">Els teus pòdcasts</string>
+    <string name="onboarding_recommendations_message">Aquí tens alguns pòdcasts fantàstics per començar. Toca per seguir-los, cercar-ne més o importar-ne des d’altres aplicacions.</string>
+    <string name="onboarding_recommendations_title">Esperem que t\'agradin aquestes suggeriments!</string>
+    <string name="add_episodes">Afegir episodis</string>
+    <string name="onboarding_interests_select_at_least_label">Selecciona’n almenys 3.</string>
+    <string name="onboarding_interests_show_more">Mostra més categories</string>
+    <string name="onboarding_interests_description">Arriben grans pòdcasts, triats a mà per persones reals!</string>
+    <string name="onboarding_interests_title">Explica’ns quins són els teus temes preferits</string>
+    <string name="onboarding_create_account_sign_up_google">Registra\'t amb Google</string>
+    <string name="onboarding_create_account_sign_up_email">Registra\'t amb un correu electrònic</string>
+    <string name="onboarding_create_account_message">Els teus pòdcasts, sempre sincronitzats. Mantingues la teva biblioteca segura i gaudeix de Pocket\u00A0Casts a la web i a l\'escriptori.</string>
+    <string name="onboarding_create_account_title">Crear el teu compte de Pocket\u00A0Casts</string>
+    <string name="onboarding_login_or">O</string>
+    <string name="onboarding_login_continue_with_email">Continua amb el correu electrònic</string>
+    <string name="playlist_artwork_description">Caràtula de la llista de reproducció</string>
+    <string name="onboarding_intro_get_started">Començar</string>
+    <string name="onboarding_intro_carousel_pc_user">Usuari de Pocket Casts</string>
+    <string name="onboarding_intro_carousel_organizing_podcasts_title">«Organitzar els meus pòdcasts per carpetes és genial»</string>
+    <string name="onboarding_intro_carousel_customization_insane_title">«La quantitat d’opcions de personalització és brutal»</string>
+    <string name="onboarding_intro_carousel_best_app_title">«La millor aplicació de pòdcasts. Amb diferència»</string>
+    <string name="transcript_share">Comparteix la transcripció</string>
+    <string name="onboarding_notifications_popup_save">Desar les preferències</string>
+    <string name="onboarding_notification_popup_notifications_message">Rep notícies, suggeriments de pòdcasts i més</string>
+    <string name="onboarding_notification_popup_notifications">Rebre notificacions</string>
+    <string name="onboarding_notification_popup_newsletter_message">Un cop al mes, tot el bo i millor dels pòdcasts</string>
+    <string name="onboarding_notification_popup_newsletter">Subscriu-te a la nostra newsletter</string>
+    <string name="playlist_setting_auto_download_description">Habilita la descàrrega automàtica dels episodis d’aquesta llista de reproducció.</string>
+    <string name="smart_rule_starred_label">Episodis destacats</string>
+    <string name="smart_rule_starred_description_disabled">Els episodis destacats encara poden aparèixer si coincideixen amb les teves altres regles.</string>
+    <string name="smart_rule_starred_description">Només inclou episodis destacats que coincideixin amb les teves altres regles.</string>
+    <string name="playlist_sort_by">Ordenar per</string>
+    <string name="playlist_select_episodes">Seleccionar episodis</string>
+    <string name="playlist_options">Opcions de la llista de reproducció</string>
+    <string name="playlist_download_all">Descarregar-ho tot</string>
     <string name="smart_playlist_no_content_body">Arribats aquí, pots celebrar que la llista s\'ha acabat o modificar la configuració dels filtres per trobar més episodis.</string>
     <string name="smart_playlist_no_content_title">No hi ha episodis</string>
     <string name="playlist_play_all">Reprodueix-ho tot</string>
@@ -518,10 +574,10 @@ Language: ca
     <string name="player_sleep_time_fired_end_of_chapter">El temporitzador de son s\'ha aturat al final del capítol.</string>
     <string name="player_sleep_in_chapters">En suspensió en %d capítols</string>
     <string name="player_sleep_in_one_chapter">En suspensió en 1 capítol</string>
-    <string name="player_sleep_timer_in_chapter_plural">En %d capítols</string>
-    <string name="player_sleep_timer_in_chapter">En 1 capítol</string>
-    <string name="player_sleep_timer_in_episode">d\'aquí a 1 episodi</string>
-    <string name="player_sleep_timer_in_episode_plural">d\'aquí a %d episodis</string>
+    <string name="player_sleep_timer_in_episode">En acabar 1 episodi</string>
+    <string name="player_sleep_timer_in_episode_plural">En acabar %d episodis</string>
+    <string name="player_sleep_timer_in_chapter_plural">En acabar %d capítols</string>
+    <string name="player_sleep_timer_in_chapter">En acabar 1 capítol</string>
     <string name="settings_use_episode_artwork_customization_description">Tria si vols veure la caràtula de l\'episodi a aquestes seccions de l\'aplicació</string>
     <string name="settings_use_episode_artwork_customization_section">Personalització</string>
     <string name="settings_use_episode_artwork_title">Caràtula de l\'episodi</string>
@@ -2148,6 +2204,10 @@ Language: ca
     <plurals name="podcast_share_start_handle_description">
         <item quantity="one">Control del clip inicial: %d segon</item>
         <item quantity="other">Control del clip inicial: %d segons</item>
+    </plurals>
+    <plurals name="podcasts_count">
+        <item quantity="one">%d pòdcast</item>
+        <item quantity="other">%d pòdcasts</item>
     </plurals>
     <plurals name="profile_stats_day_listened">
         <item quantity="one">Dia escoltat</item>

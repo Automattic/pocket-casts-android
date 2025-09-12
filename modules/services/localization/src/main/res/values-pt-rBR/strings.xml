@@ -1,11 +1,24 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2025-08-25 14:54:03+0000
+Translation-Revision-Date: 2025-09-11 09:54:06+0000
 Plural-Forms: nplurals=2; plural=(n > 1);
 Generator: GlotPress/2.4.0-alpha
 Language: pt_BR
 -->
 <resources>
+    <string name="unavailable">Indisponível</string>
+    <string name="added_to_playlist">%1$s adicionado a “%2$s”</string>
+    <string name="add_to_playlist_failure_message">Esta playlist está cheia. Remova alguns episódios ou comece uma nova.</string>
+    <string name="add_to_playlist">Adicionar à \"%1$s\"</string>
+    <string name="add_to_playlist_episode_desc">Adicionar %1$s à lista de reprodução</string>
+    <string name="your_podcasts">Seus podcasts</string>
+    <string name="onboarding_recommendations_message">Aqui estão alguns ótimos programas por onde começar. Toque para seguir, pesquisar ou importar de outros aplicativos.</string>
+    <string name="onboarding_recommendations_title">Esperamos que você goste destas sugestões!</string>
+    <string name="add_episodes">Adicionar episódios</string>
+    <string name="onboarding_interests_select_at_least_label">Selecione pelo menos 3</string>
+    <string name="onboarding_interests_show_more">Mostrar mais categorias</string>
+    <string name="onboarding_interests_description">Em breve: ótimos podcasts escolhidos a dedo por pessoas reais!</string>
+    <string name="onboarding_interests_title">Conte quais são seus tópicos favoritos</string>
     <string name="onboarding_create_account_sign_up_google">Inscreva-se com o Google</string>
     <string name="onboarding_create_account_sign_up_email">Inscreva-se com e-mail</string>
     <string name="onboarding_create_account_message">Seus podcasts sempre sincronizados. Mantenha sua biblioteca segura e aproveite o Pocket\u00A0Casts na Web e no aplicativo para computador.</string>
@@ -2174,6 +2187,10 @@ Language: pt_BR
     <plurals name="podcast_share_start_handle_description">
         <item quantity="one">Controle de início do clipe: %d segundo</item>
         <item quantity="other">Controle de início do clipe: %d segundos</item>
+    </plurals>
+    <plurals name="podcasts_count">
+        <item quantity="one">%d podcast</item>
+        <item quantity="other">%d podcasts</item>
     </plurals>
     <plurals name="profile_stats_day_listened">
         <item quantity="one">dia ouvido</item>

@@ -1,11 +1,24 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2025-08-26 09:54:03+0000
+Translation-Revision-Date: 2025-09-10 09:54:05+0000
 Plural-Forms: nplurals=1; plural=0;
 Generator: GlotPress/2.4.0-alpha
 Language: ja_JP
 -->
 <resources>
+    <string name="unavailable">利用できません</string>
+    <string name="add_to_playlist_failure_message">このプレイリストはいっぱいです。 エピソードをいくつか削除するか、新しいエピソードを開始します。</string>
+    <string name="added_to_playlist">%1$s を「%2$s」に追加しました</string>
+    <string name="add_to_playlist_episode_desc">%1$sをプレイリストに追加</string>
+    <string name="add_to_playlist">「%1$s」に追加</string>
+    <string name="your_podcasts">あなたのポッドキャスト</string>
+    <string name="onboarding_recommendations_message">初めてのご利用にぴったりの番組を紹介します。 タップしてフォロー、検索、他のアプリからインポートします。</string>
+    <string name="onboarding_recommendations_title">おすすめの番組をぜひお楽しみください。</string>
+    <string name="add_episodes">すべてのエピソード</string>
+    <string name="onboarding_interests_select_at_least_label">3つ以上選択</string>
+    <string name="onboarding_interests_show_more">カテゴリーをさらに表示</string>
+    <string name="onboarding_interests_description">人間が選んだ素晴らしいポッドキャストをお届けします !</string>
+    <string name="onboarding_interests_title">お気に入りのトピックについて教えてください</string>
     <string name="onboarding_create_account_sign_up_google">Google で登録</string>
     <string name="onboarding_create_account_sign_up_email">メールアドレスで登録</string>
     <string name="onboarding_create_account_message">ポッドキャストは常に同期されます。 ライブラリを安全に保ち、ウェブとデスクトップで Pocket\u00A0Casts をお楽しみください。</string>
@@ -2158,6 +2171,9 @@ Language: ja_JP
     </plurals>
     <plurals name="podcast_share_start_handle_description">
         <item quantity="other">クリップハンドルを開始: %d秒</item>
+    </plurals>
+    <plurals name="podcasts_count">
+        <item quantity="other">%d件のポッドキャスト</item>
     </plurals>
     <plurals name="profile_stats_day_listened">
         <item quantity="other">聴取日数</item>

@@ -761,23 +761,11 @@ class PlayerViewModel @Inject constructor(
     }
 
     fun trackAdImpression(ad: BlazeAd) {
-        analyticsTracker.track(
-            AnalyticsEvent.BANNER_AD_IMPRESSION,
-            mapOf(
-                "location" to "player",
-                "id" to ad.id,
-            ),
-        )
+        analyticsTracker.trackBannerAdImpression(id = ad.id, location = ad.location.value)
     }
 
     fun trackAdTapped(ad: BlazeAd) {
-        analyticsTracker.track(
-            AnalyticsEvent.BANNER_AD_TAPPED,
-            mapOf(
-                "location" to "player",
-                "id" to ad.id,
-            ),
-        )
+        analyticsTracker.trackBannerAdTapped(id = ad.id, location = ad.location.value)
     }
 
     sealed interface NavigationState {
