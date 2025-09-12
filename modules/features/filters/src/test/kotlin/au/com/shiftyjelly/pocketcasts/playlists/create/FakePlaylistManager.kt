@@ -35,6 +35,8 @@ class FakePlaylistManager : PlaylistManager {
 
     override suspend fun updateAutoDownloadLimit(uuid: String, limit: Int) = Unit
 
+    override suspend fun toggleShowArchived(uuid: String) = Unit
+
     override suspend fun deletePlaylist(uuid: String) = Unit
 
     val createSmartPlaylistTurbine = Turbine<SmartPlaylistDraft>(name = "createSmartPlaylistTurbine")

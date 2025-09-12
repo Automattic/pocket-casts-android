@@ -4,6 +4,7 @@ import app.cash.turbine.test
 import au.com.shiftyjelly.pocketcasts.models.entity.PlaylistEntity.Companion.SYNC_STATUS_NOT_SYNCED
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.models.type.PlaylistEpisodeSortType
+import kotlin.time.Duration
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNull
@@ -633,5 +634,61 @@ class PlaylistManagerManualTest {
             manualPlaylistEpisode(index = 0, podcastIndex = 0, playlistIndex = 0) { it.copy(sortPosition = 2) },
             manualPlaylistEpisode(index = 2, podcastIndex = 0, playlistIndex = 0) { it.copy(sortPosition = 3) },
         )
+    }
+
+    @Test
+    fun observeArchivedEpisodes() = dsl.test {
+        insertManualPlaylist(0)
+        insertManualEpisode(index = 0, podcastIndex = 1, playlistIndex = 0)
+        insertManualEpisode(index = 1, podcastIndex = 0, playlistIndex = 0)
+        insertManualEpisode(index = 2, podcastIndex = 0, playlistIndex = 0)
+        insertPodcastEpisode(index = 0, podcastIndex = 1) { it.copy(isArchived = true) }
+        insertPodcastEpisode(index = 1, podcastIndex = 0)
+
+        manager.manualPlaylistFlow("playlist-id-0").test {
+            var playlist = awaitItem()!!
+            assertEquals(
+                listOf(
+                    availablePlaylistEpisode(index = 1, podcastIndex = 0),
+                    unavailableManualEpisode(index = 2, podcastIndex = 0, playlistIndex = 0),
+                ),
+                playlist.episodes,
+            )
+            assertEquals(
+                Playlist.Metadata(
+                    playbackDurationLeft = Duration.ZERO,
+                    artworkUuids = listOf("podcast-id-0"),
+                    isShowingArchived = false,
+                    totalEpisodeCount = 3,
+                    displayedEpisodeCount = 2,
+                    displayedAvailableEpisodeCount = 1,
+                    archivedEpisodeCount = 1,
+                ),
+                playlist.metadata,
+            )
+
+            manager.toggleShowArchived("playlist-id-0")
+            playlist = awaitItem()!!
+            assertEquals(
+                listOf(
+                    availablePlaylistEpisode(index = 0, podcastIndex = 1) { it.copy(isArchived = true) },
+                    availablePlaylistEpisode(index = 1, podcastIndex = 0),
+                    unavailableManualEpisode(index = 2, podcastIndex = 0, playlistIndex = 0),
+                ),
+                playlist.episodes,
+            )
+            assertEquals(
+                Playlist.Metadata(
+                    playbackDurationLeft = Duration.ZERO,
+                    artworkUuids = listOf("podcast-id-0"),
+                    isShowingArchived = true,
+                    totalEpisodeCount = 3,
+                    displayedEpisodeCount = 3,
+                    displayedAvailableEpisodeCount = 2,
+                    archivedEpisodeCount = 1,
+                ),
+                playlist.metadata,
+            )
+        }
     }
 }

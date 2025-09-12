@@ -92,6 +92,18 @@ abstract class PlaylistDao {
     @Query("UPDATE playlists SET autoDownloadLimit = :limit, syncStatus = $SYNC_STATUS_NOT_SYNCED WHERE uuid = :uuid")
     abstract suspend fun updateAutoDownloadLimit(uuid: String, limit: Int)
 
+    @Query(
+        """
+        UPDATE playlists
+        SET showArchivedEpisodes = (CASE 
+            WHEN showArchivedEpisodes IS 0 THEN 1 
+            ELSE 0
+        END)
+        WHERE uuid = :uuid    
+    """,
+    )
+    abstract suspend fun toggleIsShowingArchived(uuid: String)
+
     @Query("UPDATE playlists SET deleted = 1, syncStatus = $SYNC_STATUS_NOT_SYNCED WHERE uuid = :uuid")
     abstract suspend fun markPlaylistAsDeleted(uuid: String)
 
@@ -410,6 +422,10 @@ abstract class PlaylistDao {
         JOIN playlists AS playlist ON playlist.uuid IS :playlistUuid
         WHERE
           manual_episode.playlist_uuid IS :playlistUuid
+          AND (CASE 
+            WHEN playlist.showArchivedEpisodes IS NOT 0 THEN 1 
+            ELSE IFNULL(podcast_episode.archived, 0) IS 0
+          END)
           AND (
             -- trim isn't really needed becasue we trim in the application logic but it helps with tests
             TRIM(:searchTerm) IS '' 

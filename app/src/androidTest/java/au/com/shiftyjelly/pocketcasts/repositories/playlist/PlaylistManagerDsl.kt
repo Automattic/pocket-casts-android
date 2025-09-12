@@ -226,6 +226,18 @@ class PlaylistManagerDsl : TestWatcher() {
         assertEquals(name, playlist?.title)
     }
 
+    suspend fun expectShowArchived(playlistIndex: Int) {
+        val playlistId = "playlist-id-$playlistIndex"
+        val playlist = playlistDao.getAllPlaylistsIn(listOf(playlistId)).singleOrNull()
+        assertEquals(true, playlist?.showArchivedEpisodes)
+    }
+
+    suspend fun expectNotShowArchived(playlistIndex: Int) {
+        val playlistId = "playlist-id-$playlistIndex"
+        val playlist = playlistDao.getAllPlaylistsIn(listOf(playlistId)).singleOrNull()
+        assertEquals(false, playlist?.showArchivedEpisodes)
+    }
+
     suspend fun expectPlaylist(playlist: PlaylistEntity) {
         val actual = playlistDao.getAllPlaylistsIn(listOf(playlist.uuid)).singleOrNull()
         assertEquals(playlist, actual)
@@ -366,6 +378,7 @@ class PlaylistManagerDsl : TestWatcher() {
                 metadata = Playlist.Metadata(
                     playbackDurationLeft = Duration.ZERO,
                     artworkUuids = emptyList(),
+                    isShowingArchived = false,
                     totalEpisodeCount = 0,
                     archivedEpisodeCount = 0,
                     displayedEpisodeCount = 0,
@@ -389,6 +402,7 @@ class PlaylistManagerDsl : TestWatcher() {
                 metadata = Playlist.Metadata(
                     playbackDurationLeft = Duration.ZERO,
                     artworkUuids = emptyList(),
+                    isShowingArchived = false,
                     totalEpisodeCount = 0,
                     archivedEpisodeCount = 0,
                     displayedEpisodeCount = 0,

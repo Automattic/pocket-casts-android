@@ -22,6 +22,7 @@ sealed interface Playlist {
     data class Metadata(
         val playbackDurationLeft: Duration,
         val artworkUuids: List<String>,
+        val isShowingArchived: Boolean,
         val totalEpisodeCount: Int,
         val displayedEpisodeCount: Int,
         val displayedAvailableEpisodeCount: Int,

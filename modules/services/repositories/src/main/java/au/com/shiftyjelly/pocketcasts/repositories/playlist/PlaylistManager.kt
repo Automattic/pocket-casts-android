@@ -23,6 +23,8 @@ interface PlaylistManager {
 
     suspend fun updateAutoDownloadLimit(uuid: String, limit: Int)
 
+    suspend fun toggleShowArchived(uuid: String)
+
     suspend fun deletePlaylist(uuid: String)
     // </editor-fold>
 
