@@ -71,7 +71,7 @@ abstract class PlaylistDao {
         }
     }
 
-    @Query("SELECT * FROM playlists WHERE draft = 0 AND manual = 0 AND syncStatus = $SYNC_STATUS_NOT_SYNCED")
+    @Query("SELECT * FROM playlists WHERE draft = 0 AND syncStatus = $SYNC_STATUS_NOT_SYNCED")
     abstract suspend fun getAllUnsyncedPlaylists(): List<PlaylistEntity>
 
     @Query("SELECT uuid FROM playlists ORDER BY sortPosition ASC")
@@ -101,6 +101,9 @@ abstract class PlaylistDao {
     @Query("UPDATE playlists SET autoDownloadLimit = :limit, syncStatus = $SYNC_STATUS_NOT_SYNCED WHERE uuid = :uuid")
     abstract suspend fun updateAutoDownloadLimit(uuid: String, limit: Int)
 
+    @Query("UPDATE playlists SET syncStatus = $SYNC_STATUS_NOT_SYNCED WHERE uuid = :uuid")
+    abstract suspend fun markPlaylistAsNotSynced(uuid: String)
+
     @Query(
         """
         UPDATE playlists
@@ -128,6 +131,9 @@ abstract class PlaylistDao {
             deleteAllPlaylistsInUnsafe(chunk)
         }
     }
+
+    @Query("DELETE FROM manual_playlist_episodes WHERE playlist_uuid IS :playlistUuid")
+    abstract suspend fun deleteAllManualEpisodes(playlistUuid: String)
 
     @Query("DELETE FROM manual_playlist_episodes WHERE playlist_uuid IS :playlistUuid AND episode_uuid IN (:episodeUuids)")
     protected abstract suspend fun deleteAllManualEpisodesInUnsafe(playlistUuid: String, episodeUuids: Collection<String>)
@@ -201,6 +207,29 @@ abstract class PlaylistDao {
     """,
     )
     abstract suspend fun getManualPlaylistEpisodes(playlistUuid: String): List<ManualPlaylistEpisode>
+
+    @Query(
+        """
+        SELECT *
+        FROM manual_playlist_episodes
+        WHERE manual_playlist_episodes.playlist_uuid IS :playlistUuid
+        ORDER BY sort_position ASC
+    """,
+    )
+    abstract suspend fun getManualPlaylistEpisodesForSync(playlistUuid: String): List<ManualPlaylistEpisode>
+
+    @Query(
+        """
+        SELECT *
+        FROM manual_playlist_episodes AS manual_episode
+        WHERE NOT EXISTS(
+          SELECT 1 
+          FROM podcast_episodes AS podcast_episode 
+          WHERE podcast_episode.uuid IS manual_episode.episode_uuid
+        )
+    """,
+    )
+    abstract suspend fun getAllMissingManualEpisodes(): List<ManualPlaylistEpisode>
 
     @Query(
         """

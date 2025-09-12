@@ -67,6 +67,7 @@ class DataSyncProcess(
     private val playlistSync = PlaylistSync(syncManager, appDatabase)
     private val bookmarkSync = BookmarkSync(syncManager, appDatabase)
     private val deviceSync = DeviceSync(statsManager, settings)
+    private val missingEpisodesSync = MissingEpisodesSync(syncManager, appDatabase)
 
     suspend fun sync(): Result<Unit> {
         return logProcess("data") {
@@ -92,10 +93,13 @@ class DataSyncProcess(
         return if (isInitialSync) {
             val syncTime = syncFullData()
             syncUpNext()
+            syncMissingEpisodes()
             syncTime
         } else {
             syncUpNext()
-            syncIncrementalData(lastSyncTime)
+            val syncTime = syncIncrementalData(lastSyncTime)
+            syncMissingEpisodes()
+            syncTime
         }
     }
 
@@ -159,6 +163,12 @@ class DataSyncProcess(
         logProcess("up-next") {
             val operation = UpNextSyncWorker.enqueue(syncManager, context)
             operation?.awaitOperation("Up Next", timeoutDuration = 1.minutes)
+        }
+    }
+
+    private suspend fun syncMissingEpisodes() {
+        logProcess("missing-episodes") {
+            missingEpisodesSync.sync()
         }
     }
 

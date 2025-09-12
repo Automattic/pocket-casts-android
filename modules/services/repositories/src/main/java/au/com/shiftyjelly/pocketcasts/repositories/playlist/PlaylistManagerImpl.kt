@@ -342,6 +342,7 @@ class PlaylistManagerImpl(
                     isSynced = false,
                 ),
             )
+            playlistDao.markPlaylistAsNotSynced(playlistUuid)
             true
         }
     }
@@ -355,11 +356,15 @@ class PlaylistManagerImpl(
             }
             playlistDao.upsertManualEpisodes(episodes)
             playlistDao.updateSortType(playlistUuid, PlaylistEpisodeSortType.DragAndDrop)
+            playlistDao.markPlaylistAsNotSynced(playlistUuid)
         }
     }
 
     override suspend fun deleteManualEpisodes(playlistUuid: String, episodeUuids: Collection<String>) {
-        playlistDao.deleteAllManualEpisodesIn(playlistUuid, episodeUuids)
+        appDatabase.withTransaction {
+            playlistDao.deleteAllManualEpisodesIn(playlistUuid, episodeUuids)
+            playlistDao.markPlaylistAsNotSynced(playlistUuid)
+        }
     }
 
     private fun createPreviewsFlow(playlists: List<PlaylistEntity>) = combine(

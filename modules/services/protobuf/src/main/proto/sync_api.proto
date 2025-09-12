@@ -97,6 +97,19 @@ message SyncUserPlaylist {
   google.protobuf.BoolValue filter_duration = 21;
   google.protobuf.Int32Value longer_than = 22;
   google.protobuf.Int32Value shorter_than = 23;
+  repeated string episode_order = 24;
+  repeated SyncPlaylistEpisode episodes = 25;
+}
+
+message SyncPlaylistEpisode {
+  string episode = 1;
+  string podcast = 2;
+  google.protobuf.Int64Value added = 3;
+  google.protobuf.Timestamp published = 4;
+  google.protobuf.StringValue title = 5;
+  google.protobuf.StringValue url = 6;
+  google.protobuf.StringValue podcast_slug = 7;
+  google.protobuf.StringValue episode_slug = 8;
 }
 
 message SyncUserFolder {
@@ -217,21 +230,23 @@ message PlaylistSyncResponse {
   google.protobuf.BoolValue filter_duration = 21;
   google.protobuf.Int32Value longer_than = 22;
   google.protobuf.Int32Value shorter_than = 23;
+  repeated string episode_order = 24;
+  repeated SyncPlaylistEpisode episodes = 25;
 }
 
 message PodcastRatingResponse {
-    string podcast_uuid = 1;
-    google.protobuf.Timestamp modified_at = 3;
-    uint32 podcast_rating = 4;
+  string podcast_uuid = 1;
+  google.protobuf.Timestamp modified_at = 3;
+  uint32 podcast_rating = 4;
 }
 
 message PodcastRatingAddRequest {
-    string podcast_uuid = 1;
-    uint32 podcast_rating = 2;
+  string podcast_uuid = 1;
+  uint32 podcast_rating = 2;
 }
 
 message PodcastRatingShowRequest {
-    string podcast_uuid = 1;
+  string podcast_uuid = 1;
 }
 
 message PodcastRatingsResponse {
@@ -246,30 +261,30 @@ message PodcastRating {
 }
 
 message SupportFeedbackRequest {
-    string message = 1;
-    string email = 2;
-    string subject = 3;
-    string debug = 4;
-    string inbox = 5;
+  string message = 1;
+  string email = 2;
+  string subject = 3;
+  string debug = 4;
+  string inbox = 5;
 }
 
 message ReferralCodeResponse {
-    string code = 1;
-    string url = 2;
+  string code = 1;
+  string url = 2;
 }
 
 message ReferralValidationResponse {
-    string offer = 1;
-    int32 platform = 2;
-    string details = 3;
+  string offer = 1;
+  int32 platform = 2;
+  string details = 3;
 }
 
 message ReferralRedemptionRequest {
-    string code = 1;
+  string code = 1;
 }
 
 message ReferralRedemptionResponse {
-    string code = 1;
+  string code = 1;
 }
 
 message WinbackResponse {
@@ -277,4 +292,37 @@ message WinbackResponse {
   string platform = 2;
   string details = 3;
   string code = 4;
+}
+
+message PodcastsEpisodesRequest {
+  repeated string podcast_uuids = 1;
+  repeated string episode_uuids = 2;
+}
+
+message EpisodesResponse {
+  int32 total = 1;
+  repeated EpisodeResponse episodes = 2;
+}
+
+message EpisodeResponse {
+  string uuid = 1;
+  string url = 2;
+  google.protobuf.Timestamp published = 3;
+  int32 duration = 4;
+  string file_type = 5;
+  string title = 6;
+  int64 size = 7;
+  int32 playing_status = 8;
+  int32 played_up_to = 9;
+  bool starred = 10;
+  string podcast_uuid = 11;
+  string podcast_title = 12;
+  string episode_type = 13;
+  int32 episode_season = 14;
+  int32 episode_number = 15;
+  bool is_deleted = 16;
+  string author = 17;
+  reserved 18; // BookmarkResponse bookmarks
+  string podcast_slug = 19;
+  string slug = 20;
 }

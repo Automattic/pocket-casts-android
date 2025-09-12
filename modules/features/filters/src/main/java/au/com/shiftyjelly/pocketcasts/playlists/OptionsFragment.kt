@@ -107,12 +107,14 @@ class OptionsFragment : BaseDialogFragment() {
         onClickChangeSortType: () -> Unit,
     ): List<PlaylistOption> {
         val playlistType = playlist.type
-        val episodeCount = playlist.metadata.displayedAvailableEpisodeCount
-        val archivedEpisodeCount = playlist.metadata.archivedEpisodeCount
         val sortType = playlist.settings.sortType
         val sortTypeLabel = sortType.displayLabel()
 
-        return remember(episodeCount, archivedEpisodeCount, sortType, playlistType) {
+        val episodeCount = playlist.metadata.displayedAvailableEpisodeCount
+        val archivedEpisodeCount = playlist.metadata.archivedEpisodeCount
+        val isShowingArchived = playlist.metadata.isShowingArchived
+
+        return remember(playlistType, sortType, playlist.metadata) {
             val hasEpisodes = episodeCount > 0
             buildList {
                 if (hasEpisodes) {
@@ -178,16 +180,7 @@ class OptionsFragment : BaseDialogFragment() {
                 )
                 if (hasEpisodes && playlistType == Playlist.Type.Manual) {
                     add(
-                        if (archivedEpisodeCount != episodeCount) {
-                            PlaylistOption(
-                                title = getString(LR.string.playlist_archive_all),
-                                iconId = IR.drawable.ic_playlist_archive_all,
-                                onClick = {
-                                    viewModel.archiveAllEpisodes()
-                                    dismiss()
-                                },
-                            )
-                        } else {
+                        if (isShowingArchived && archivedEpisodeCount == episodeCount) {
                             PlaylistOption(
                                 title = getString(LR.string.playlist_unarchive_all),
                                 iconId = IR.drawable.ic_unarchive,
@@ -196,8 +189,16 @@ class OptionsFragment : BaseDialogFragment() {
                                     dismiss()
                                 },
                             )
+                        } else {
+                            PlaylistOption(
+                                title = getString(LR.string.playlist_archive_all),
+                                iconId = IR.drawable.ic_playlist_archive_all,
+                                onClick = {
+                                    viewModel.archiveAllEpisodes()
+                                    dismiss()
+                                },
+                            )
                         },
-
                     )
                 }
                 add(

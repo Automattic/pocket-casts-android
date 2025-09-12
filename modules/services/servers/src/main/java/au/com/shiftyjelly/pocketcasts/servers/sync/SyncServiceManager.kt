@@ -23,10 +23,12 @@ import au.com.shiftyjelly.pocketcasts.servers.sync.login.LoginTokenResponse
 import au.com.shiftyjelly.pocketcasts.servers.sync.register.RegisterRequest
 import au.com.shiftyjelly.pocketcasts.utils.extensions.parseIsoDate
 import com.pocketcasts.service.api.BookmarksResponse
+import com.pocketcasts.service.api.EpisodesResponse
 import com.pocketcasts.service.api.PodcastRatingAddRequest
 import com.pocketcasts.service.api.PodcastRatingResponse
 import com.pocketcasts.service.api.PodcastRatingShowRequest
 import com.pocketcasts.service.api.PodcastRatingsResponse
+import com.pocketcasts.service.api.PodcastsEpisodesRequest
 import com.pocketcasts.service.api.ReferralCodeResponse
 import com.pocketcasts.service.api.ReferralRedemptionRequest
 import com.pocketcasts.service.api.ReferralRedemptionResponse
@@ -182,6 +184,10 @@ open class SyncServiceManager @Inject constructor(
 
     suspend fun getBookmarks(token: AccessToken): BookmarksResponse {
         return service.getBookmarkList(addBearer(token), bookmarkRequest {})
+    }
+
+    suspend fun getEpisodes(request: PodcastsEpisodesRequest, token: AccessToken): EpisodesResponse {
+        return service.getEpisodes(addBearer(token), request)
     }
 
     fun historySync(request: HistorySyncRequest, token: AccessToken): Single<HistorySyncResponse> = service.historySync(addBearer(token), request)

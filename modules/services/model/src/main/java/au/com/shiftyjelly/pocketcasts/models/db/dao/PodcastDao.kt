@@ -3,6 +3,7 @@ package au.com.shiftyjelly.pocketcasts.models.db.dao
 import androidx.room.Dao
 import androidx.room.Delete
 import androidx.room.Insert
+import androidx.room.OnConflictStrategy.Companion.IGNORE
 import androidx.room.OnConflictStrategy.Companion.REPLACE
 import androidx.room.Query
 import androidx.room.Transaction
@@ -293,6 +294,9 @@ abstract class PodcastDao {
 
     @Insert(onConflict = REPLACE)
     abstract suspend fun insertSuspend(podcast: Podcast): Long
+
+    @Insert(onConflict = IGNORE)
+    abstract suspend fun insertAllOrIgnore(podcasts: Collection<Podcast>)
 
     fun insertRxSingle(podcast: Podcast): Single<Podcast> {
         return Single.fromCallable {
