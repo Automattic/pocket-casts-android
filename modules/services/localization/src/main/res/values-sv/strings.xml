@@ -1,11 +1,24 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2025-08-26 11:54:04+0000
+Translation-Revision-Date: 2025-09-09 15:54:03+0000
 Plural-Forms: nplurals=2; plural=n != 1;
 Generator: GlotPress/2.4.0-alpha
 Language: sv_SE
 -->
 <resources>
+    <string name="unavailable">Inte tillgängligt</string>
+    <string name="add_to_playlist_failure_message">Den här spellistan är full. Ta bort några avsnitt eller starta en ny.</string>
+    <string name="added_to_playlist">%1$s har lagts till i “%2$s”</string>
+    <string name="add_to_playlist_episode_desc">Lägg till %1$s i spellista</string>
+    <string name="add_to_playlist">Lägg till i “%1$s”</string>
+    <string name="your_podcasts">Dina podcasts</string>
+    <string name="onboarding_recommendations_message">Här är några bra shower att börja med. Tryck för att följa, söka eller importera från andra appar.</string>
+    <string name="onboarding_recommendations_title">Vi hoppas att du kommer att älska dessa förslag!</string>
+    <string name="add_episodes">Lägg till avsnitt</string>
+    <string name="onboarding_interests_select_at_least_label">Välj minst 3</string>
+    <string name="onboarding_interests_show_more">Visa fler kategorier</string>
+    <string name="onboarding_interests_description">Bra podcasts, utvalda av riktiga människor, är på väg!</string>
+    <string name="onboarding_interests_title">Berätta för oss om dina favoritämnen</string>
     <string name="onboarding_create_account_sign_up_google">Registrera dig med Google</string>
     <string name="onboarding_create_account_sign_up_email">Registrera dig med e-post</string>
     <string name="onboarding_create_account_message">Dina podcasts, alltid synkroniserade. Håll ditt bibliotek säkert och njut av Pocket Casts på webben och via skrivbordet.</string>
@@ -2174,6 +2187,10 @@ Language: sv_SE
     <plurals name="podcast_share_start_handle_description">
         <item quantity="one">Handtag för startklipp: %d sekund</item>
         <item quantity="other">Handtag för startklipp: %d sekunder</item>
+    </plurals>
+    <plurals name="podcasts_count">
+        <item quantity="one">%d podcast</item>
+        <item quantity="other">%d podcasts</item>
     </plurals>
     <plurals name="profile_stats_day_listened">
         <item quantity="one">Lyssnad dag</item>

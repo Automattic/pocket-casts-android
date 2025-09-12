@@ -1,11 +1,24 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2025-08-26 13:54:04+0000
+Translation-Revision-Date: 2025-09-10 09:54:04+0000
 Plural-Forms: nplurals=2; plural=n != 1;
 Generator: GlotPress/2.4.0-alpha
 Language: it
 -->
 <resources>
+    <string name="unavailable">Non disponibile</string>
+    <string name="add_to_playlist_failure_message">Questa playlist è piena. Rimuovi alcuni episodi o creane una nuova.</string>
+    <string name="added_to_playlist">%1$s aggiunto a \"%2$s\"</string>
+    <string name="add_to_playlist_episode_desc">Aggiungi %1$s alla playlist</string>
+    <string name="add_to_playlist">Aggiungi a \"%1$s\"</string>
+    <string name="your_podcasts">I tuoi podcast</string>
+    <string name="onboarding_recommendations_message">Ecco alcuni fantastici show con cui iniziare. Tocca per seguire, cercare o importare da altre app.</string>
+    <string name="onboarding_recommendations_title">Ci auguriamo che questi suggerimenti siano di tuo gradimento.</string>
+    <string name="add_episodes">Aggiungi episodi</string>
+    <string name="onboarding_interests_select_at_least_label">Selezionane almeno 3</string>
+    <string name="onboarding_interests_show_more">Mostra più categorie</string>
+    <string name="onboarding_interests_description">In arrivo fantastici podcast scelti con cura da persone reali.</string>
+    <string name="onboarding_interests_title">Parlaci dei tuoi argomenti preferiti</string>
     <string name="onboarding_create_account_sign_up_google">Iscriviti con Google</string>
     <string name="onboarding_create_account_sign_up_email">Iscriviti con l\'e-mail</string>
     <string name="onboarding_create_account_message">I tuoi podcast, sempre sincronizzati. Tieni la libreria al sicuro e goditi Pocket\u00A0Casts su web e desktop.</string>
@@ -2173,6 +2186,10 @@ Language: it
     <plurals name="podcast_share_start_handle_description">
         <item quantity="one">Inizio maniglia della clip: %d secondo</item>
         <item quantity="other">Inizio maniglia della clip: %d secondi</item>
+    </plurals>
+    <plurals name="podcasts_count">
+        <item quantity="one">%d podcast</item>
+        <item quantity="other">%d podcast</item>
     </plurals>
     <plurals name="profile_stats_day_listened">
         <item quantity="one">Giorno di ascolto</item>

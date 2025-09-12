@@ -1,11 +1,24 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2025-08-26 13:54:06+0000
+Translation-Revision-Date: 2025-09-09 09:54:04+0000
 Plural-Forms: nplurals=1; plural=0;
 Generator: GlotPress/2.4.0-alpha
 Language: zh_TW
 -->
 <resources>
+    <string name="unavailable">無法使用</string>
+    <string name="add_to_playlist_failure_message">此播放清單已滿。 請刪除幾集，或另開一個新的清單。</string>
+    <string name="added_to_playlist">已將「%1$s」新增至「%2$s」</string>
+    <string name="add_to_playlist_episode_desc">將「%1$s」新增至播放清單</string>
+    <string name="add_to_playlist">新增至「%1$s」</string>
+    <string name="your_podcasts">你的 Podcast</string>
+    <string name="onboarding_recommendations_message">以下提供一些精彩節目，展開你的旅程。 點選即可追蹤、搜尋，或從其他應用程式匯入。</string>
+    <string name="onboarding_recommendations_title">希望你喜歡我們推薦的節目！</string>
+    <string name="add_episodes">新增單集</string>
+    <string name="onboarding_interests_select_at_least_label">選取至少 3 個</string>
+    <string name="onboarding_interests_show_more">顯示更多分類</string>
+    <string name="onboarding_interests_description">即將獻上精彩的編輯精選 Podcast！</string>
+    <string name="onboarding_interests_title">與我們分享你最愛的主題</string>
     <string name="onboarding_login_or">或者</string>
     <string name="onboarding_create_account_sign_up_google">使用 Google 帳號註冊</string>
     <string name="onboarding_create_account_sign_up_email">使用電子郵件地址註冊</string>
@@ -2158,6 +2171,9 @@ Language: zh_TW
     </plurals>
     <plurals name="podcast_share_start_handle_description">
         <item quantity="other">開頭片段控點：%d 秒</item>
+    </plurals>
+    <plurals name="podcasts_count">
+        <item quantity="other">%d 個 Podcast</item>
     </plurals>
     <plurals name="profile_stats_day_listened">
         <item quantity="other">天 (收聽時間)</item>
