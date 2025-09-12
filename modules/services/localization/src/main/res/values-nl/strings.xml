@@ -1,11 +1,24 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2025-08-27 09:54:03+0000
+Translation-Revision-Date: 2025-09-11 09:54:05+0000
 Plural-Forms: nplurals=2; plural=n != 1;
 Generator: GlotPress/2.4.0-alpha
 Language: nl
 -->
 <resources>
+    <string name="unavailable">Niet beschikbaar</string>
+    <string name="add_to_playlist_failure_message">Deze afspeellijst is vol. Verwijder een paar afleveringen of begin een nieuwe.</string>
+    <string name="added_to_playlist">%1$s toegevoegd aan \'%2$s\'</string>
+    <string name="add_to_playlist_episode_desc">%1$s toevoegen aan afspeellijst</string>
+    <string name="add_to_playlist">Toevoegen aan \'%1$s\'</string>
+    <string name="your_podcasts">Jouw podcasts</string>
+    <string name="onboarding_recommendations_message">Hier zijn een aantal geweldige shows om mee te beginnen. Tik om te volgen, te zoeken of te importeren vanuit andere apps.</string>
+    <string name="onboarding_recommendations_title">We hopen dat je deze goede suggesties vindt!</string>
+    <string name="add_episodes">Afleveringen toevoegen</string>
+    <string name="onboarding_interests_select_at_least_label">Selecteer er minimaal 3</string>
+    <string name="onboarding_interests_show_more">Meer categorieën weergeven</string>
+    <string name="onboarding_interests_description">Geweldige podcasts, zorgvuldig geselecteerd door echte mensen, komen jouw kant op!</string>
+    <string name="onboarding_interests_title">Vertel ons over jouw favoriete onderwerpen</string>
     <string name="onboarding_create_account_sign_up_google">Registreren via Google</string>
     <string name="onboarding_create_account_message">Je podcasts, altijd gesynchroniseerd. Houd je bibliotheek veilig en geniet van Pocket\u00A0Casts op internet en desktop.</string>
     <string name="onboarding_create_account_title">Maak je Pocket\u00A0Casts-account aan</string>
@@ -2173,6 +2186,10 @@ Language: nl
     <plurals name="podcast_share_start_handle_description">
         <item quantity="one">Handle begin clip: %d seconde</item>
         <item quantity="other">Handle begin clip: %d seconden</item>
+    </plurals>
+    <plurals name="podcasts_count">
+        <item quantity="one">%d podcast</item>
+        <item quantity="other">%d podcasts</item>
     </plurals>
     <plurals name="profile_stats_day_listened">
         <item quantity="one">Dag geluisterd</item>

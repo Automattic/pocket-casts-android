@@ -1,11 +1,24 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2025-08-25 14:54:03+0000
+Translation-Revision-Date: 2025-09-09 11:54:05+0000
 Plural-Forms: nplurals=6; plural=n==0 ? 0 : n==1 ? 1 : n==2 ? 2 : n%100>=3 && n%100<=10 ? 3 : n%100>=11 && n%100<=99 ? 4 : 5;
 Generator: GlotPress/2.4.0-alpha
 Language: ar
 -->
 <resources>
+    <string name="unavailable">غير متاح</string>
+    <string name="add_to_playlist_failure_message">قائمة التشغيل هذه ممتلئة. إزالة بعض الحلقات أو بدء حلقة جديدة.</string>
+    <string name="added_to_playlist"> تمت إضافة ⁦%1$s⁩ إلى “⁦%2$s⁩”</string>
+    <string name="add_to_playlist_episode_desc">إضافة ⁦%1$s⁩ إلى قائمة تشغيل</string>
+    <string name="add_to_playlist">إضافة إلى \"⁦%1$s⁩\"</string>
+    <string name="your_podcasts">حلقات بثك الصوتي</string>
+    <string name="onboarding_recommendations_message">إليك بعض البرامج الرائعة لتبدأ بها. انقر للمتابعة، أو البحث، أو الاستيراد من تطبيقات أخرى.</string>
+    <string name="onboarding_recommendations_title">نأمل أن تعجبك هذه الاقتراحات!</string>
+    <string name="add_episodes">أضف حلقات</string>
+    <string name="onboarding_interests_select_at_least_label">حدد 3 على الأقل</string>
+    <string name="onboarding_interests_show_more">عرض المزيد من تصنيفات المقالة</string>
+    <string name="onboarding_interests_description">ثمة حلقات بث صوتي رائعة، منتقاة بعناية من قِبل أشخاص حقيقيين، قادمة إليك!</string>
+    <string name="onboarding_interests_title">أخبرنا عن موضوعاتك المفضلة</string>
     <string name="onboarding_create_account_sign_up_google">تسجيل الدخول باستخدام Google</string>
     <string name="onboarding_create_account_sign_up_email">تسجيل الدخول باستخدام البريد الإلكتروني</string>
     <string name="onboarding_create_account_message">حلقات البودكاست الخاصة بك، متزامنة دومًا. حافظ على أمان مكتبتك، واستمتع بـ Pocket\u00A0Casts على الويب وسطح المكتب.</string>
@@ -2238,6 +2251,14 @@ Language: ar
         <item quantity="few">بدء مقبض المقطع: %d من الثواني</item>
         <item quantity="many">بدء مقبض المقطع: %d من الثواني</item>
         <item quantity="other">بدء مقبض المقطع: %d من الثواني</item>
+    </plurals>
+    <plurals name="podcasts_count">
+        <item quantity="zero">%d البث الصوتي</item>
+        <item quantity="one">%d البث الصوتي</item>
+        <item quantity="two">%d حلقات البث الصوتي</item>
+        <item quantity="few">%d حلقات البث الصوتي</item>
+        <item quantity="many">%d حلقات البث الصوتي</item>
+        <item quantity="other">%d حلقات البث الصوتي</item>
     </plurals>
     <plurals name="profile_stats_day_listened">
         <item quantity="zero">اليوم الذي تم الاستماع فيه</item>

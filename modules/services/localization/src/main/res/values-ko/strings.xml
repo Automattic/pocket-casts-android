@@ -1,11 +1,24 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2025-08-26 09:54:03+0000
+Translation-Revision-Date: 2025-09-09 09:54:04+0000
 Plural-Forms: nplurals=1; plural=0;
 Generator: GlotPress/2.4.0-alpha
 Language: ko_KR
 -->
 <resources>
+    <string name="unavailable">사용할 수 없음</string>
+    <string name="add_to_playlist_failure_message">이 재생 목록은 가득 찼습니다. 몇몇 에피소드를 삭제하거나 새로운 에피소드를 시작하세요.</string>
+    <string name="added_to_playlist">“%2$s”에 %1$s 추가됨</string>
+    <string name="add_to_playlist_episode_desc">비디오 실행 목록에 %1$s 추가</string>
+    <string name="add_to_playlist">“%1$s”에 추가</string>
+    <string name="your_podcasts">내 팟캐스트</string>
+    <string name="onboarding_recommendations_message">몇 가지 멋진 쇼를 보면서 시작하세요. 눌러서 팔로우하고, 검색하고, 다른 앱에서 가져오기.</string>
+    <string name="onboarding_recommendations_title">이러한 제안이 마음에 드시기를 바랍니다!</string>
+    <string name="add_episodes">에피소드 추가</string>
+    <string name="onboarding_interests_select_at_least_label">3개 이상 선택</string>
+    <string name="onboarding_interests_show_more">카테고리 더 보기</string>
+    <string name="onboarding_interests_description">실제 사용자들이 엄선한 훌륭한 팟캐스트를 만나 보세요!</string>
+    <string name="onboarding_interests_title">좋아하는 주제를 알려주세요</string>
     <string name="onboarding_create_account_sign_up_google">Google로 등록</string>
     <string name="onboarding_create_account_sign_up_email">이메일로 등록</string>
     <string name="onboarding_create_account_message">팟캐스트가 항상 동기화됩니다. 라이브러리를 안전하게 유지하고 웹과 데스크톱에서 Pocket\u00A0Casts를 즐기세요.</string>
@@ -2158,6 +2171,9 @@ Language: ko_KR
     </plurals>
     <plurals name="podcast_share_start_handle_description">
         <item quantity="other">시작 클립 핸들: %d초</item>
+    </plurals>
+    <plurals name="podcasts_count">
+        <item quantity="other">팟캐스트 %d개</item>
     </plurals>
     <plurals name="profile_stats_day_listened">
         <item quantity="other">청취한 시간(일)</item>
