@@ -38,6 +38,7 @@ import androidx.compose.material.AppBarDefaults
 import androidx.compose.material.LocalRippleConfiguration
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.RippleConfiguration
+import androidx.compose.material.ripple
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.ReadOnlyComposable
@@ -112,9 +113,9 @@ internal data class PlaylistHeaderData(
     val isNoEpisodeShown = metadata.totalEpisodeCount != 0 && metadata.displayedEpisodeCount == 0
 
     val isNoArchivedEpisodeShown = metadata.archivedEpisodeCount > 0 &&
-        metadata.displayedEpisodeCount == 0 &&
-        !metadata.isShowingArchived &&
-        metadata.totalEpisodeCount == metadata.archivedEpisodeCount
+            metadata.displayedEpisodeCount == 0 &&
+            !metadata.isShowingArchived &&
+            metadata.totalEpisodeCount == metadata.archivedEpisodeCount
 }
 
 internal data class PlaylistHeaderButtonData(
@@ -496,36 +497,39 @@ fun ArchivedBar(
     onClickButton: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    Column(
-        modifier = modifier,
+    CompositionLocalProvider(
+        LocalRippleConfiguration provides RippleConfiguration(color = MaterialTheme.theme.colors.primaryIcon01),
     ) {
-        HorizontalDivider()
-        Row(
-            verticalAlignment = Alignment.CenterVertically,
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(vertical = 12.dp, horizontal = 16.dp),
+        Column(
+            modifier = modifier,
         ) {
-            TextP50(
-                text = stringResource(LR.string.playlist_episodes_archived_count, episodeCount),
-                color = MaterialTheme.theme.colors.primaryText02,
-                modifier = Modifier.weight(1f),
-            )
-            Spacer(
-                modifier = Modifier.width(12.dp),
-            )
-            TextP50(
-                text = buttonLabel,
-                fontWeight = FontWeight.Medium,
-                color = MaterialTheme.theme.colors.primaryIcon01,
-                modifier = Modifier.clickable(
-                    indication = null,
-                    interactionSource = null,
-                    onClick = onClickButton,
-                ),
-            )
+            HorizontalDivider()
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(start = 16.dp, end = 8.dp, top = 4.dp, bottom = 4.dp),
+            ) {
+                TextP50(
+                    text = stringResource(LR.string.playlist_episodes_archived_count, episodeCount),
+                    color = MaterialTheme.theme.colors.primaryText02,
+                    modifier = Modifier.weight(1f),
+                )
+                Spacer(
+                    modifier = Modifier.width(12.dp),
+                )
+                TextP50(
+                    text = buttonLabel,
+                    fontWeight = FontWeight.Medium,
+                    color = MaterialTheme.theme.colors.primaryIcon01,
+                    modifier = Modifier
+                        .clip(RoundedCornerShape(4.dp))
+                        .clickable(onClick = onClickButton)
+                        .padding(8.dp),
+                )
+            }
+            HorizontalDivider()
         }
-        HorizontalDivider()
     }
 }
 
