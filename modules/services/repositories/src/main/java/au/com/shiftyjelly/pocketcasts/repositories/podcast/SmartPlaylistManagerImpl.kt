@@ -107,12 +107,13 @@ class SmartPlaylistManagerImpl @Inject constructor(
 
     private fun getPlaylistOrderByString(playlist: PlaylistEntity): String? = when (val sortType = playlist.sortType) {
         PlaylistEpisodeSortType.NewestToOldest,
+        PlaylistEpisodeSortType.DragAndDrop,
         PlaylistEpisodeSortType.OldestToNewest,
         -> {
             "published_date " +
-                (if (sortType == PlaylistEpisodeSortType.NewestToOldest) "DESC" else "ASC") +
+                (if (sortType == PlaylistEpisodeSortType.NewestToOldest || sortType == PlaylistEpisodeSortType.DragAndDrop) "DESC" else "ASC") +
                 ", added_date " +
-                if (sortType == PlaylistEpisodeSortType.NewestToOldest) "DESC" else "ASC"
+                if (sortType == PlaylistEpisodeSortType.NewestToOldest || sortType == PlaylistEpisodeSortType.DragAndDrop) "DESC" else "ASC"
         }
 
         PlaylistEpisodeSortType.ShortestToLongest,

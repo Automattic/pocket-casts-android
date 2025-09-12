@@ -27,21 +27,18 @@ import au.com.shiftyjelly.pocketcasts.compose.navigation.navigateOnce
 import au.com.shiftyjelly.pocketcasts.models.type.SmartRules.DownloadStatusRule
 import au.com.shiftyjelly.pocketcasts.models.type.SmartRules.MediaTypeRule
 import au.com.shiftyjelly.pocketcasts.models.type.SmartRules.ReleaseDateRule
-import au.com.shiftyjelly.pocketcasts.playlists.smart.rules.ManageSmartRulesListener
-import au.com.shiftyjelly.pocketcasts.playlists.smart.rules.ManageSmartRulesPage
-import au.com.shiftyjelly.pocketcasts.playlists.smart.rules.ManageSmartRulesRoutes
-import au.com.shiftyjelly.pocketcasts.playlists.smart.rules.RuleType
-import au.com.shiftyjelly.pocketcasts.repositories.playlist.PlaylistPreview
+import au.com.shiftyjelly.pocketcasts.playlists.smart.ManageSmartRulesListener
+import au.com.shiftyjelly.pocketcasts.playlists.smart.ManageSmartRulesPage
+import au.com.shiftyjelly.pocketcasts.playlists.smart.ManageSmartRulesRoutes
+import au.com.shiftyjelly.pocketcasts.playlists.smart.RuleType
 import au.com.shiftyjelly.pocketcasts.ui.helper.FragmentHostListener
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseDialogFragment
 import dagger.hilt.android.AndroidEntryPoint
 import dagger.hilt.android.lifecycle.withCreationCallback
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
-import au.com.shiftyjelly.pocketcasts.playlists.manual.PlaylistFragment as ManualPlaylistFragment
-import au.com.shiftyjelly.pocketcasts.playlists.smart.PlaylistFragment as SmartPlaylistFragment
 
 @AndroidEntryPoint
-class CreatePlaylistFragment : BaseDialogFragment() {
+internal class CreatePlaylistFragment : BaseDialogFragment() {
     private var isPlaylistCreated = false
 
     private val viewModel by viewModels<CreatePlaylistViewModel>(
@@ -147,7 +144,7 @@ class CreatePlaylistFragment : BaseDialogFragment() {
 
             override fun onApplyRule(rule: RuleType) = viewModel.applyRule(rule)
 
-            override fun onCreatePlaylist() = viewModel.createSmartPlaylist()
+            override fun createPlaylistCallback() = { viewModel.createSmartPlaylist() }
 
             override fun onClose() = dismiss()
         }
@@ -159,10 +156,7 @@ class CreatePlaylistFragment : BaseDialogFragment() {
             val createdPlaylist = viewModel.createdPlaylist.await()
             isPlaylistCreated = true
             dismiss()
-            val fragment = when (createdPlaylist.type) {
-                PlaylistPreview.Type.Manual -> ManualPlaylistFragment.newInstance(createdPlaylist.uuid)
-                PlaylistPreview.Type.Smart -> SmartPlaylistFragment.newInstance(createdPlaylist.uuid)
-            }
+            val fragment = PlaylistFragment.newInstance(createdPlaylist.uuid, createdPlaylist.type)
             (requireActivity() as FragmentHostListener).addFragment(fragment)
         }
     }

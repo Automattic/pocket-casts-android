@@ -29,6 +29,7 @@ dependencies {
     implementation(libs.coil.compose)
     implementation(libs.compose.activity)
     implementation(libs.compose.animation)
+    implementation(libs.compose.animation.graphics)
     implementation(libs.compose.material)
     implementation(libs.compose.material.icons.extended)
     implementation(libs.compose.ui)

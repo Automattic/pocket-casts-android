@@ -64,7 +64,6 @@ import au.com.shiftyjelly.pocketcasts.models.entity.CuratedPodcast
 import au.com.shiftyjelly.pocketcasts.models.entity.Folder
 import au.com.shiftyjelly.pocketcasts.models.entity.ManualPlaylistEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.PlaylistEntity
-import au.com.shiftyjelly.pocketcasts.models.entity.PlaylistEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastRatings
@@ -92,7 +91,6 @@ import au.com.shiftyjelly.pocketcasts.localization.R as LR
         Folder::class,
         SuggestedFolder::class,
         PlaylistEntity::class,
-        PlaylistEpisode::class,
         Podcast::class,
         SearchHistoryItem::class,
         UpNextChange::class,
@@ -109,7 +107,7 @@ import au.com.shiftyjelly.pocketcasts.localization.R as LR
         ManualPlaylistEpisode::class,
         BlazeAd::class,
     ],
-    version = 119,
+    version = 121,
     exportSchema = true,
     autoMigrations = [
         AutoMigration(from = 81, to = 82, spec = AppDatabase.Companion.DeleteSilenceRemovedMigration::class),
@@ -1227,6 +1225,14 @@ abstract class AppDatabase : RoomDatabase() {
             )
         }
 
+        val MIGRATION_119_120 = addMigration(119, 120) { database ->
+            database.execSQL("DROP TABLE IF EXISTS filter_episodes")
+        }
+
+        val MIGRATION_120_121 = addMigration(120, 121) { database ->
+            database.execSQL("ALTER TABLE playlists ADD COLUMN showArchivedEpisodes INTEGER NOT NULL DEFAULT 0")
+        }
+
         fun addMigrations(databaseBuilder: Builder<AppDatabase>, context: Context) {
             databaseBuilder.addMigrations(
                 addMigration(1, 2) { },
@@ -1636,6 +1642,8 @@ abstract class AppDatabase : RoomDatabase() {
                 MIGRATION_116_117,
                 MIGRATION_117_118,
                 MIGRATION_118_119,
+                MIGRATION_119_120,
+                MIGRATION_120_121,
             )
         }
 

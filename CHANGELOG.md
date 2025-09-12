@@ -1,6 +1,10 @@
 7.98
 -----
-
+*   Bug Fixes
+    *   Fix Download notifications no longer open app
+        ([#4449](https://github.com/Automattic/pocket-casts-android/pull/4449))
+    *   Don't show notification to create free account when the user is already signed in
+        ([#4468](https://github.com/Automattic/pocket-casts-android/pull/4468))
 
 7.97
 -----
@@ -12,7 +16,7 @@
 *   Updates
     *   Improved notification permission experience
         ([#4408](https://github.com/Automattic/pocket-casts-android/pull/4408))
-* Bug Fixes
+*   Bug Fixes
     *   Fix File Settings bottom content being obstructed by the Mini Player.
         ([#4414](https://github.com/Automattic/pocket-casts-android/pull/4414))
     *   Fix podcast image shadow animation.

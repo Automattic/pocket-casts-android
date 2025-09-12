@@ -252,10 +252,11 @@ class DeepLinkFactoryTest {
             .setAction(ACTION_VIEW)
             .putExtra("launch-page", "playlist")
             .putExtra("playlist_uuid", "id")
+            .putExtra("playlist_type", "manual")
 
         val deepLink = factory.create(intent)
 
-        assertEquals(ShowPlaylistDeepLink(playlistUuid = "id"), deepLink)
+        assertEquals(ShowPlaylistDeepLink(playlistUuid = "id", playlistType = "manual"), deepLink)
     }
 
     @Test

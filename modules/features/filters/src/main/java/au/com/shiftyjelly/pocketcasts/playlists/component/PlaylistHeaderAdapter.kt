@@ -5,7 +5,6 @@ import android.view.ViewGroup
 import androidx.compose.foundation.background
 import androidx.compose.foundation.text.input.TextFieldState
 import androidx.compose.material.MaterialTheme
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -19,7 +18,6 @@ import au.com.shiftyjelly.pocketcasts.compose.AppTheme
 import au.com.shiftyjelly.pocketcasts.compose.theme
 import au.com.shiftyjelly.pocketcasts.ui.R
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
-import kotlinx.coroutines.flow.MutableStateFlow
 
 // This adapter uses an unconventional configuration: it has only a single view holder, and data is provided via a Flow.
 // Updating data through the regular adapter mechanisms causes the UI to flicker, because setContent() is called again,
@@ -30,13 +28,14 @@ internal class PlaylistHeaderAdapter(
     private val leftButton: PlaylistHeaderButtonData,
     private val rightButton: PlaylistHeaderButtonData,
     private val searchState: TextFieldState,
+    private val onShowArchivedToggle: () -> Unit,
     private val onChangeSearchFocus: (Boolean, Float) -> Unit,
 ) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
-    private val headerDataFlow = MutableStateFlow<PlaylistHeaderData?>(null)
+    private var headerData by mutableStateOf<PlaylistHeaderData?>(null)
     private var searchTopOffset = 0f
 
     fun submitHeader(data: PlaylistHeaderData?) {
-        headerDataFlow.value = data
+        headerData = data
     }
 
     override fun getItemCount() = 1
@@ -59,7 +58,6 @@ internal class PlaylistHeaderAdapter(
 
         fun bind() {
             composeView.setContent {
-                val headerData by headerDataFlow.collectAsState()
                 var isFocused by remember { mutableStateOf<Boolean?>(null) }
                 val keyboard = LocalSoftwareKeyboardController.current
 
@@ -70,6 +68,7 @@ internal class PlaylistHeaderAdapter(
                         rightButton = rightButton,
                         searchState = searchState,
                         useBlurredArtwork = Build.VERSION.SDK_INT >= 31,
+                        onShowArchivedToggle = onShowArchivedToggle,
                         onMeasureSearchTopOffset = { topOffset -> searchTopOffset = topOffset },
                         onChangeSearchFocus = { focusState ->
                             val hasFocus = focusState.hasFocus
@@ -79,7 +78,7 @@ internal class PlaylistHeaderAdapter(
                                 keyboard?.show()
                             }
                         },
-                        modifier = Modifier.Companion.background(MaterialTheme.theme.colors.primaryUi02),
+                        modifier = Modifier.background(MaterialTheme.theme.colors.primaryUi02),
                     )
                 }
             }

@@ -66,6 +66,9 @@ class NotificationWorker @AssistedInject constructor(
 
     private suspend fun shouldSchedule(type: NotificationType): Boolean {
         return when (type) {
+            is OnboardingNotificationType.Sync -> {
+                userManager.getSignInState().awaitFirstOrNull()?.isSignedIn != true
+            }
             is TrendingAndRecommendationsNotificationType.Recommendations -> {
                 userManager.getSignInState().awaitFirstOrNull()?.isSignedIn == true
             }
