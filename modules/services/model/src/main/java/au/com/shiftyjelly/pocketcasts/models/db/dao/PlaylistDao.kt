@@ -49,6 +49,15 @@ abstract class PlaylistDao {
     @Query("SELECT * FROM playlists WHERE deleted = 0 AND draft = 0 ORDER BY sortPosition ASC")
     abstract suspend fun getAllPlaylists(): List<PlaylistEntity>
 
+    @Query(
+        """
+        SELECT * 
+        FROM playlists
+        WHERE deleted IS 0 AND draft IS 0 AND autoDownload IS NOT 0
+    """,
+    )
+    abstract suspend fun getAllAutoDownloadPlaylists(): List<PlaylistEntity>
+
     @Query("SELECT * FROM playlists WHERE deleted = 0 AND draft = 0 ORDER BY sortPosition ASC")
     abstract fun allPlaylistsFlow(): Flow<List<PlaylistEntity>>
 

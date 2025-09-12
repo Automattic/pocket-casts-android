@@ -20,6 +20,7 @@ import au.com.shiftyjelly.pocketcasts.models.entity.PlaylistEntity.Companion.SYN
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.models.to.PlaylistEpisode
 import au.com.shiftyjelly.pocketcasts.models.to.PlaylistEpisodeMetadata
+import au.com.shiftyjelly.pocketcasts.models.to.toPodcastEpisodes
 import au.com.shiftyjelly.pocketcasts.models.type.PlaylistEpisodeSortType
 import au.com.shiftyjelly.pocketcasts.models.type.SmartRules
 import au.com.shiftyjelly.pocketcasts.models.type.SmartRules.DownloadStatusRule
@@ -33,20 +34,25 @@ import au.com.shiftyjelly.pocketcasts.repositories.playlist.Playlist.Type
 import au.com.shiftyjelly.pocketcasts.repositories.playlist.PlaylistManager.Companion.MANUAL_PLAYLIST_EPISODE_LIMIT
 import au.com.shiftyjelly.pocketcasts.repositories.playlist.PlaylistManager.Companion.PLAYLIST_ARTWORK_EPISODE_LIMIT
 import au.com.shiftyjelly.pocketcasts.repositories.playlist.PlaylistManager.Companion.SMART_PLAYLIST_EPISODE_LIMIT
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import java.time.Clock
 import java.util.UUID
 import javax.inject.Inject
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.withContext
 
 @OptIn(ExperimentalCoroutinesApi::class, FlowPreview::class)
 class PlaylistManagerImpl(
@@ -84,6 +90,36 @@ class PlaylistManagerImpl(
                 }
             }
             .keepPodcastEpisodesSynced()
+    }
+
+    override suspend fun getAutoDownloadEpisodes(): List<PodcastEpisode> {
+        return appDatabase.withTransaction {
+            val playlists = playlistDao.getAllAutoDownloadPlaylists()
+            withContext(Dispatchers.Default) {
+                val useManual = FeatureFlag.isEnabled(Feature.PLAYLISTS_REBRANDING, immutable = true)
+                playlists
+                    .let { playlists ->
+                        if (useManual) {
+                            playlists
+                        } else {
+                            playlists.filterNot(PlaylistEntity::manual)
+                        }
+                    }
+                    .flatMap { playlist ->
+                        val playlistFlow = if (playlist.manual) {
+                            manualPlaylistFlow(playlist.uuid)
+                        } else {
+                            smartPlaylistFlow(playlist.uuid)
+                        }
+                        playlistFlow.first()
+                            ?.episodes
+                            ?.toPodcastEpisodes()
+                            ?.take(playlist.autodownloadLimit)
+                            .orEmpty()
+                    }
+                    .distinctBy(PodcastEpisode::uuid)
+            }
+        }
     }
 
     override suspend fun sortPlaylists(sortedUuids: List<String>) {

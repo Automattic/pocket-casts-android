@@ -4,13 +4,18 @@ import au.com.shiftyjelly.pocketcasts.models.entity.PlaylistEntity.Companion.AUD
 import au.com.shiftyjelly.pocketcasts.models.entity.PlaylistEntity.Companion.SYNC_STATUS_NOT_SYNCED
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodePlayingStatus
 import au.com.shiftyjelly.pocketcasts.models.type.PlaylistEpisodeSortType
+import au.com.shiftyjelly.pocketcasts.sharedtest.InMemoryFeatureFlagRule
 import java.util.Date
+import org.junit.Assert.assertEquals
 import org.junit.Rule
 import org.junit.Test
 
 class PlaylistManagerBaseTest {
     @get:Rule
     val dsl = PlaylistManagerDsl()
+
+    @get:Rule
+    val featureFlagRule = InMemoryFeatureFlagRule()
 
     @Test
     fun getPlaylistPreviews() = dsl.test {
@@ -364,6 +369,77 @@ class PlaylistManagerBaseTest {
 
         manager.updateName("playlist-id-1", "New name 2")
         expectName(playlistIndex = 1, name = "New name 2")
+    }
+
+    @Test
+    fun getSmartPlaylistAutoDownloadEpisodes() = dsl.test {
+        insertSmartPlaylist(index = 0) { it.copy(autoDownload = true, autodownloadLimit = 3) }
+        insertSmartPlaylist(index = 1) { it.copy(autoDownload = false, autodownloadLimit = 100) }
+        insertPodcast(index = 0)
+        insertPodcast(index = 1) { it.copy(isSubscribed = false) }
+        repeat(10) { index ->
+            insertPodcastEpisode(index = index, podcastIndex = index % 2)
+        }
+
+        val episodes = manager.getAutoDownloadEpisodes()
+        assertEquals(
+            listOf(
+                podcastEpisode(index = 0, podcastIndex = 0),
+                podcastEpisode(index = 2, podcastIndex = 0),
+                podcastEpisode(index = 4, podcastIndex = 0),
+            ),
+            episodes,
+        )
+    }
+
+    @Test
+    fun getManualPlaylistAutoDownloadEpisodes() = dsl.test {
+        insertManualPlaylist(index = 0) { it.copy(autoDownload = true, autodownloadLimit = 3) }
+        insertManualPlaylist(index = 1) { it.copy(autoDownload = false, autodownloadLimit = 100) }
+        repeat(10) { index ->
+            if (index % 2 == 0) {
+                insertPodcastEpisode(index = index, podcastIndex = 0)
+            }
+            insertManualEpisode(index = index, podcastIndex = 0, playlistIndex = 0)
+            insertManualEpisode(index = index, podcastIndex = 0, playlistIndex = 1)
+        }
+
+        val episodes = manager.getAutoDownloadEpisodes()
+        assertEquals(
+            listOf(
+                podcastEpisode(index = 0, podcastIndex = 0),
+                podcastEpisode(index = 2, podcastIndex = 0),
+                podcastEpisode(index = 4, podcastIndex = 0),
+            ),
+            episodes,
+        )
+    }
+
+    @Test
+    fun getDistinctAutoDownloadEpisodes() = dsl.test {
+        insertManualPlaylist(index = 0) { it.copy(autoDownload = true, autodownloadLimit = 4) }
+        insertManualPlaylist(index = 1) { it.copy(autoDownload = true, autodownloadLimit = 5) }
+        repeat(10) { index ->
+            insertPodcastEpisode(index = index, podcastIndex = 0)
+            insertManualEpisode(index = index, podcastIndex = 0, playlistIndex = 0)
+            if (index >= 2) {
+                insertManualEpisode(index = index, podcastIndex = 0, playlistIndex = 1)
+            }
+        }
+
+        val episodes = manager.getAutoDownloadEpisodes()
+        assertEquals(
+            listOf(
+                podcastEpisode(index = 0, podcastIndex = 0),
+                podcastEpisode(index = 1, podcastIndex = 0),
+                podcastEpisode(index = 2, podcastIndex = 0),
+                podcastEpisode(index = 3, podcastIndex = 0),
+                podcastEpisode(index = 4, podcastIndex = 0),
+                podcastEpisode(index = 5, podcastIndex = 0),
+                podcastEpisode(index = 6, podcastIndex = 0),
+            ),
+            episodes,
+        )
     }
 
     @Test

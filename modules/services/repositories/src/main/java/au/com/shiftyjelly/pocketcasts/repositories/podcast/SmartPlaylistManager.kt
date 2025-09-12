@@ -44,8 +44,6 @@ interface SmartPlaylistManager {
     fun countEpisodesBlocking(id: Long?, episodeManager: EpisodeManager, playbackManager: PlaybackManager): Int
     fun countEpisodesRxFlowable(playlist: PlaylistEntity, episodeManager: EpisodeManager, playbackManager: PlaybackManager): Flowable<Int>
 
-    fun checkForEpisodesToDownloadBlocking(episodeManager: EpisodeManager, playbackManager: PlaybackManager)
-
     suspend fun removePodcastFromPlaylists(podcastUuid: String)
 
     suspend fun markAllSynced()
