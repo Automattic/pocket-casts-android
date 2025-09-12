@@ -113,9 +113,9 @@ internal data class PlaylistHeaderData(
     val isNoEpisodeShown = metadata.totalEpisodeCount != 0 && metadata.displayedEpisodeCount == 0
 
     val isNoArchivedEpisodeShown = metadata.archivedEpisodeCount > 0 &&
-            metadata.displayedEpisodeCount == 0 &&
-            !metadata.isShowingArchived &&
-            metadata.totalEpisodeCount == metadata.archivedEpisodeCount
+        metadata.displayedEpisodeCount == 0 &&
+        !metadata.isShowingArchived &&
+        metadata.totalEpisodeCount == metadata.archivedEpisodeCount
 }
 
 internal data class PlaylistHeaderButtonData(
