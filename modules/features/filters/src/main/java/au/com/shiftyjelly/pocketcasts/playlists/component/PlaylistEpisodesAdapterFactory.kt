@@ -1,9 +1,8 @@
-package au.com.shiftyjelly.pocketcasts
+package au.com.shiftyjelly.pocketcasts.playlists.component
 
 import android.annotation.SuppressLint
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.viewModels
 import androidx.lifecycle.DefaultLifecycleObserver
 import androidx.lifecycle.LifecycleOwner
 import androidx.recyclerview.widget.RecyclerView
@@ -17,24 +16,19 @@ import au.com.shiftyjelly.pocketcasts.playlists.manual.UnavailableEpisodeFragmen
 import au.com.shiftyjelly.pocketcasts.podcasts.view.components.PlayButton
 import au.com.shiftyjelly.pocketcasts.podcasts.view.episode.EpisodeContainerFragment
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
-import au.com.shiftyjelly.pocketcasts.preferences.model.ArtworkConfiguration.Element
 import au.com.shiftyjelly.pocketcasts.repositories.bookmark.BookmarkManager
 import au.com.shiftyjelly.pocketcasts.repositories.download.DownloadManager
 import au.com.shiftyjelly.pocketcasts.repositories.images.PocketCastsImageRequestFactory
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.repositories.playback.UpNextQueue
 import au.com.shiftyjelly.pocketcasts.ui.extensions.themed
-import au.com.shiftyjelly.pocketcasts.views.helper.EpisodeItemTouchHelper
 import au.com.shiftyjelly.pocketcasts.views.helper.HasBackstack
-import au.com.shiftyjelly.pocketcasts.views.helper.SwipeButtonLayoutFactory
-import au.com.shiftyjelly.pocketcasts.views.helper.SwipeButtonLayoutViewModel
 import au.com.shiftyjelly.pocketcasts.views.multiselect.MultiSelectEpisodesHelper
 import au.com.shiftyjelly.pocketcasts.views.multiselect.MultiSelectHelper
 import au.com.shiftyjelly.pocketcasts.views.multiselect.MultiSelectToolbar
 import dagger.hilt.android.scopes.FragmentScoped
 import java.util.Date
 import javax.inject.Inject
-import timber.log.Timber
 
 @FragmentScoped
 class PlaylistEpisodesAdapterFactory @Inject constructor(
@@ -72,7 +66,6 @@ class PlaylistEpisodesAdapterFactory @Inject constructor(
         )
         val parentFragmentManager = fragment.parentFragmentManager
         val childFragmentManager = fragment.childFragmentManager
-        val swipeButtonViewModel by fragment.viewModels<SwipeButtonLayoutViewModel>()
 
         adapter = PlaylistEpisodeAdapter(
             bookmarkManager = bookmarkManager,
@@ -100,14 +93,6 @@ class PlaylistEpisodesAdapterFactory @Inject constructor(
             imageRequestFactory = PocketCastsImageRequestFactory(fragment.requireContext()).themed().smallSize(),
             multiSelectHelper = multiSelectHelper,
             fragmentManager = childFragmentManager,
-            swipeButtonLayoutFactory = SwipeButtonLayoutFactory(
-                swipeButtonLayoutViewModel = swipeButtonViewModel,
-                onItemUpdated = { _, index -> adapter.notifyItemChanged(index) },
-                defaultUpNextSwipeAction = { settings.upNextSwipe.value },
-                fragmentManager = parentFragmentManager,
-                swipeSource = EpisodeItemTouchHelper.SwipeSource.FILTERS,
-            ),
-            artworkContext = Element.Filters,
         )
 
         return adapter

@@ -37,8 +37,6 @@ import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.ConcatAdapter
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import au.com.shiftyjelly.pocketcasts.PlaylistEpisodeAdapter
-import au.com.shiftyjelly.pocketcasts.PlaylistEpisodesAdapterFactory
 import au.com.shiftyjelly.pocketcasts.compose.AppTheme
 import au.com.shiftyjelly.pocketcasts.compose.components.NoContentBanner
 import au.com.shiftyjelly.pocketcasts.compose.components.NoContentData
@@ -46,6 +44,8 @@ import au.com.shiftyjelly.pocketcasts.compose.extensions.setContentWithViewCompo
 import au.com.shiftyjelly.pocketcasts.compose.theme
 import au.com.shiftyjelly.pocketcasts.filters.R
 import au.com.shiftyjelly.pocketcasts.filters.databinding.PlaylistFragmentBinding
+import au.com.shiftyjelly.pocketcasts.playlists.component.PlaylistEpisodeAdapter
+import au.com.shiftyjelly.pocketcasts.playlists.component.PlaylistEpisodesAdapterFactory
 import au.com.shiftyjelly.pocketcasts.playlists.component.PlaylistHeaderAdapter
 import au.com.shiftyjelly.pocketcasts.playlists.component.PlaylistHeaderButtonData
 import au.com.shiftyjelly.pocketcasts.playlists.component.PlaylistHeaderData
@@ -61,7 +61,6 @@ import au.com.shiftyjelly.pocketcasts.views.dialog.ConfirmationDialog
 import au.com.shiftyjelly.pocketcasts.views.extensions.hideKeyboardOnScroll
 import au.com.shiftyjelly.pocketcasts.views.extensions.smoothScrollToTop
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseFragment
-import au.com.shiftyjelly.pocketcasts.views.helper.EpisodeItemTouchHelper
 import au.com.shiftyjelly.pocketcasts.views.helper.HasBackstack
 import com.google.android.gms.cast.framework.CastButtonFactory
 import com.google.android.material.snackbar.Snackbar
@@ -127,7 +126,6 @@ class PlaylistFragment :
 
         content.adapter = ConcatAdapter(headerAdapter, episodesAdapter)
         content.hideKeyboardOnScroll()
-        EpisodeItemTouchHelper().attachToRecyclerView(content)
 
         observeUiState(headerAdapter, episodesAdapter)
         observeMultiSelectSignal()
