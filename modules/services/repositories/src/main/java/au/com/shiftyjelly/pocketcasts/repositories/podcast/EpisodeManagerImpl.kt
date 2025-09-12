@@ -527,7 +527,7 @@ class EpisodeManagerImpl @Inject constructor(
         episode ?: return
 
         runBlocking {
-            deleteEpisodeFile(episode, playbackManager, false, false)
+            deleteEpisodeFile(episode, playbackManager, disableAutoDownload = false, updateDatabase = false)
         }
 
         episodeDao.deleteBlocking(episode)
@@ -780,16 +780,15 @@ class EpisodeManagerImpl @Inject constructor(
         episodeDao.deleteAll()
     }
 
-    override fun deleteEpisodesAsync(episodes: List<PodcastEpisode>, playbackManager: PlaybackManager) {
-        val episodesCopy = episodes.toList()
+    override fun deleteEpisodeFilesAsync(episodes: List<PodcastEpisode>, playbackManager: PlaybackManager) {
         launch {
-            deleteEpisodeFiles(episodesCopy, playbackManager)
+            deleteEpisodeFiles(episodes, playbackManager)
         }
     }
 
-    override suspend fun deleteEpisodeFiles(episodes: List<PodcastEpisode>, playbackManager: PlaybackManager, removeFromUpNext: Boolean) = withContext(Dispatchers.IO) {
+    override suspend fun deleteEpisodeFiles(episodes: List<PodcastEpisode>, playbackManager: PlaybackManager) = withContext(Dispatchers.IO) {
         episodes.toList().forEach {
-            deleteEpisodeFile(it, playbackManager, removeFromUpNext = removeFromUpNext, disableAutoDownload = false)
+            deleteEpisodeFile(it, playbackManager, removeFromUpNext = false, disableAutoDownload = false)
         }
     }
 
