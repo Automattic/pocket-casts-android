@@ -1,6 +1,5 @@
 package au.com.shiftyjelly.pocketcasts.views.fragments
 
-import android.app.Dialog
 import android.content.DialogInterface
 import android.content.res.ColorStateList
 import android.os.Bundle
@@ -25,7 +24,6 @@ import androidx.core.content.ContextCompat
 import androidx.core.graphics.ColorUtils
 import androidx.core.view.WindowInsetsControllerCompat
 import androidx.core.view.doOnLayout
-import androidx.navigation.NavHostController
 import au.com.shiftyjelly.pocketcasts.compose.AppTheme
 import au.com.shiftyjelly.pocketcasts.compose.AppThemeWithBackground
 import au.com.shiftyjelly.pocketcasts.ui.helper.FragmentHostListener
@@ -41,15 +39,10 @@ import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.google.android.material.bottomsheet.ViewPager2AwareBottomSheetBehavior
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
-import kotlin.coroutines.CoroutineContext
 import kotlin.math.roundToInt
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
 
 @AndroidEntryPoint
-open class BaseDialogFragment :
-    BottomSheetDialogFragment(),
-    CoroutineScope {
+open class BaseDialogFragment : BottomSheetDialogFragment() {
 
     open val statusBarIconColor: StatusBarIconColor = StatusBarIconColor.Theme
     open val navigationBarColor: NavigationBarColor = NavigationBarColor.Theme
@@ -64,10 +57,8 @@ open class BaseDialogFragment :
         }
     }
 
-    @Inject lateinit var theme: Theme
-
-    override val coroutineContext: CoroutineContext
-        get() = Dispatchers.Main
+    @Inject
+    lateinit var theme: Theme
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -127,21 +118,6 @@ open class BaseDialogFragment :
     }
 
     protected fun bottomSheetView() = dialog?.findViewById<View>(com.google.android.material.R.id.design_bottom_sheet)
-
-    protected fun addNavControllerToBackStack(loadNavController: () -> NavHostController?, initialRoute: String): Dialog {
-        return object : BottomSheetDialog(requireContext(), getTheme()) {
-            @Deprecated("Deprecated in Java")
-            override fun onBackPressed() {
-                val navController = loadNavController()
-                if (navController == null || navController.currentDestination?.route == initialRoute) {
-                    @Suppress("DEPRECATION")
-                    super.onBackPressed()
-                } else {
-                    navController.popBackStack()
-                }
-            }
-        }
-    }
 
     protected fun setDialogTint(
         @ColorInt color: Int,
