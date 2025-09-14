@@ -35,11 +35,19 @@ class EpisodeUnavailableViewHolder(
 
     fun bind(
         episodeWrapper: PlaylistEpisode.Unavailable,
+        isMultiSelectEnabled: Boolean,
     ) {
         if (episodeWrapper.uuid != this.episodeWrapper?.uuid) {
             swipeLayout.clearTranslation()
         }
         this.episodeWrapper = episodeWrapper
+
+        if (isMultiSelectEnabled) {
+            swipeLayout.clearTranslation()
+            swipeLayout.lock()
+        } else {
+            swipeLayout.unlock()
+        }
 
         binding.titleLabel.text = episodeWrapper.episode.title
         binding.dateLabel.text = dateFormatter.format(Date.from(episodeWrapper.episode.publishedAt))

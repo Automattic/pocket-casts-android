@@ -105,7 +105,10 @@ class PlaylistEpisodeAdapter(
     }
 
     private fun bindUnavailableEpisodeViewHolder(holder: EpisodeUnavailableViewHolder, item: PlaylistEpisode.Unavailable) {
-        holder.bind(episodeWrapper = item)
+        holder.bind(
+            episodeWrapper = item,
+            isMultiSelectEnabled = multiSelectHelper.isMultiSelecting,
+        )
     }
 
     override fun onViewRecycled(holder: RecyclerView.ViewHolder) {
