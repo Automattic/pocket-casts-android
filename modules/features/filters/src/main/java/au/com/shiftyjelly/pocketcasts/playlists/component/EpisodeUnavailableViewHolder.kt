@@ -9,7 +9,6 @@ import au.com.shiftyjelly.pocketcasts.repositories.images.PocketCastsImageReques
 import au.com.shiftyjelly.pocketcasts.repositories.images.loadInto
 import au.com.shiftyjelly.pocketcasts.views.component.SwipeRowLayout
 import java.sql.Date
-import timber.log.Timber
 
 class EpisodeUnavailableViewHolder(
     val binding: AdapterEpisodeUnavailableBinding,

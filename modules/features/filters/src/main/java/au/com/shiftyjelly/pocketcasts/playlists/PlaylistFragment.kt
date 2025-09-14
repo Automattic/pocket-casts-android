@@ -218,7 +218,7 @@ class PlaylistFragment :
                     SwipeAction.Unarchive -> Timber.i("Handle $action")
                     SwipeAction.Remove -> viewModel.deleteEpisode(episode.uuid)
                 }
-            }
+            },
         )
     }
 
