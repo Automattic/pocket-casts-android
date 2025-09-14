@@ -33,7 +33,6 @@ import kotlin.math.absoluteValue
 import kotlin.math.roundToInt
 import kotlin.math.sign
 import kotlin.time.Duration.Companion.milliseconds
-import timber.log.Timber
 
 class SwipeRowLayout<T : SwipeButton.UiState> @JvmOverloads constructor(
     context: Context,

@@ -73,6 +73,7 @@ import kotlin.math.roundToInt
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import kotlinx.parcelize.Parcelize
+import timber.log.Timber
 import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 import au.com.shiftyjelly.pocketcasts.ui.R as UR
@@ -207,6 +208,17 @@ class PlaylistFragment :
         return adapterFactory.create(
             multiSelectToolbar = binding.multiSelectToolbar,
             getEpisodes = { viewModel.uiState.value.playlist?.episodes.orEmpty() },
+            onSwipeAction = { episode, action ->
+                when (action) {
+                    SwipeAction.AddToUpNextTop -> Timber.i("Handle $action")
+                    SwipeAction.AddToUpNextBottom -> Timber.i("Handle $action")
+                    SwipeAction.RemoveFromUpNext -> Timber.i("Handle $action")
+                    SwipeAction.Share -> Timber.i("Handle $action")
+                    SwipeAction.Archive -> Timber.i("Handle $action")
+                    SwipeAction.Unarchive -> Timber.i("Handle $action")
+                    SwipeAction.Remove -> viewModel.deleteEpisode(episode.uuid)
+                }
+            }
         )
     }
 

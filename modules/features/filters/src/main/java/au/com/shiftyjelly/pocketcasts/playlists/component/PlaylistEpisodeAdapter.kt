@@ -11,6 +11,7 @@ import au.com.shiftyjelly.pocketcasts.filters.R
 import au.com.shiftyjelly.pocketcasts.filters.databinding.AdapterEpisodeAvailableBinding
 import au.com.shiftyjelly.pocketcasts.filters.databinding.AdapterEpisodeUnavailableBinding
 import au.com.shiftyjelly.pocketcasts.models.to.PlaylistEpisode
+import au.com.shiftyjelly.pocketcasts.playlists.SwipeAction
 import au.com.shiftyjelly.pocketcasts.podcasts.view.components.PlayButton
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.preferences.model.ArtworkConfiguration
@@ -31,6 +32,7 @@ class PlaylistEpisodeAdapter(
     private val upNextQueue: UpNextQueue,
     private val settings: Settings,
     private val onRowClick: (PlaylistEpisode) -> Unit,
+    private val onSwipeAction: (PlaylistEpisode, SwipeAction) -> Unit,
     private val playButtonListener: PlayButton.OnClickListener,
     private val imageRequestFactory: PocketCastsImageRequestFactory,
     private val multiSelectHelper: MultiSelectEpisodesHelper,
@@ -78,6 +80,7 @@ class PlaylistEpisodeAdapter(
                 binding = AdapterEpisodeUnavailableBinding.inflate(inflater, parent, false),
                 imageRequestFactory = imageRequestFactory,
                 onRowClick = onRowClick,
+                onSwipeAction = onSwipeAction,
             )
 
             else -> throw IllegalStateException("Unknown playable type")

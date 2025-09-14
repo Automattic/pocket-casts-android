@@ -15,6 +15,7 @@ class EpisodeUnavailableViewHolder(
     val binding: AdapterEpisodeUnavailableBinding,
     private val imageRequestFactory: PocketCastsImageRequestFactory,
     private val onRowClick: (PlaylistEpisode.Unavailable) -> Unit,
+    private val onSwipeAction: (PlaylistEpisode.Unavailable, SwipeAction) -> Unit,
 ) : RecyclerView.ViewHolder(binding.root) {
     private inline val context get() = binding.root.context
 
@@ -30,9 +31,7 @@ class EpisodeUnavailableViewHolder(
             onRowClick(requireNotNull(episodeWrapper))
         }
         swipeLayout.setRtl1State(SwipeAction.Remove)
-        swipeLayout.addOnSwipeActionListener {
-            Timber.tag("LOG_TAG").i("Action $it")
-        }
+        swipeLayout.addOnSwipeActionListener { action -> onSwipeAction(requireNotNull(episodeWrapper), action) }
     }
 
     fun bind(

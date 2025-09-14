@@ -8,7 +8,7 @@ import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 import au.com.shiftyjelly.pocketcasts.ui.R as UR
 
-internal enum class SwipeAction : SwipeButton.UiState {
+enum class SwipeAction : SwipeButton.UiState {
     AddToUpNextTop,
     AddToUpNextBottom,
     RemoveFromUpNext,

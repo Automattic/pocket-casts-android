@@ -12,6 +12,7 @@ import au.com.shiftyjelly.pocketcasts.models.entity.BaseEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.models.to.PlaylistEpisode
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodeViewSource
+import au.com.shiftyjelly.pocketcasts.playlists.SwipeAction
 import au.com.shiftyjelly.pocketcasts.playlists.manual.UnavailableEpisodeFragment
 import au.com.shiftyjelly.pocketcasts.podcasts.view.components.PlayButton
 import au.com.shiftyjelly.pocketcasts.podcasts.view.episode.EpisodeContainerFragment
@@ -57,6 +58,7 @@ class PlaylistEpisodesAdapterFactory @Inject constructor(
     fun create(
         multiSelectToolbar: MultiSelectToolbar,
         getEpisodes: () -> List<PlaylistEpisode>,
+        onSwipeAction: (PlaylistEpisode, SwipeAction) -> Unit,
     ): PlaylistEpisodeAdapter {
         lateinit var adapter: PlaylistEpisodeAdapter
         configureDependencies(
@@ -89,6 +91,7 @@ class PlaylistEpisodesAdapterFactory @Inject constructor(
                     }
                 }
             },
+            onSwipeAction = onSwipeAction,
             playButtonListener = playButtonListener,
             imageRequestFactory = PocketCastsImageRequestFactory(fragment.requireContext()).themed().smallSize(),
             multiSelectHelper = multiSelectHelper,
