@@ -12,6 +12,7 @@ import android.widget.FrameLayout
 import androidx.annotation.ColorInt
 import androidx.annotation.DrawableRes
 import androidx.appcompat.content.res.AppCompatResources
+import androidx.core.view.isVisible
 import androidx.core.view.updateLayoutParams
 import androidx.core.widget.ImageViewCompat
 import au.com.shiftyjelly.pocketcasts.ui.helper.ColorUtils
@@ -97,6 +98,7 @@ class SwipeButton<T : SwipeButton.UiState> @JvmOverloads constructor(
     }
 
     private fun applyUiState() {
+        isVisible = uiState != null
         applyContentDescription()
         applyBackgroundTint()
         applyImageDrawableId()

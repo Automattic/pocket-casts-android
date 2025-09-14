@@ -13,8 +13,6 @@ import android.view.ViewGroup
 import android.widget.FrameLayout
 import android.widget.OverScroller
 import androidx.core.view.doOnLayout
-import androidx.core.view.isGone
-import androidx.core.view.isVisible
 import androidx.dynamicanimation.animation.DynamicAnimation
 import androidx.dynamicanimation.animation.SpringForce
 import au.com.shiftyjelly.pocketcasts.utils.extensions.dpToPx
@@ -32,7 +30,6 @@ import kotlin.math.abs
 import kotlin.math.absoluteValue
 import kotlin.math.roundToInt
 import kotlin.math.sign
-import kotlin.text.toFloat
 import kotlin.time.Duration.Companion.milliseconds
 
 class SwipeRowLayout<T : SwipeButton.UiState> @JvmOverloads constructor(
@@ -101,32 +98,27 @@ class SwipeRowLayout<T : SwipeButton.UiState> @JvmOverloads constructor(
     }
 
     fun setLtr1State(state: T?) {
-        swipeButtons.ltrSection.button1.setButtonState(state)
+        swipeButtons.ltrSection.button1.setUiState(state)
     }
 
     fun setLtr2State(state: T?) {
-        swipeButtons.ltrSection.button2.setButtonState(state)
+        swipeButtons.ltrSection.button2.setUiState(state)
     }
 
     fun setLtr3State(state: T?) {
-        swipeButtons.ltrSection.button3.setButtonState(state)
+        swipeButtons.ltrSection.button3.setUiState(state)
     }
 
     fun setRtl1State(state: T?) {
-        swipeButtons.rtlSection.button1.setButtonState(state)
+        swipeButtons.rtlSection.button1.setUiState(state)
     }
 
     fun setRtl2State(state: T?) {
-        swipeButtons.rtlSection.button2.setButtonState(state)
+        swipeButtons.rtlSection.button2.setUiState(state)
     }
 
     fun setRtl3State(state: T?) {
-        swipeButtons.rtlSection.button3.setButtonState(state)
-    }
-
-    private fun SwipeButton<T>.setButtonState(state: T?) {
-        setUiState(state)
-        isVisible = isVisible && uiState != null
+        swipeButtons.rtlSection.button3.setUiState(state)
     }
 
     fun addOnSwipeActionListener(listener: (T) -> Unit) {
