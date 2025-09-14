@@ -204,18 +204,11 @@ class PlaylistFragment :
 
     private fun createEpisodesAdapter(binding: PlaylistFragmentBinding): PlaylistEpisodeAdapter {
         return adapterFactory.create(
+            playlistType = args.type,
             multiSelectToolbar = binding.multiSelectToolbar,
             getEpisodes = { viewModel.uiState.value.playlist?.episodes.orEmpty() },
             onSwipeAction = { episode, action ->
-                when (action) {
-                    SwipeAction.AddToUpNextTop -> Timber.i("Handle $action")
-                    SwipeAction.AddToUpNextBottom -> Timber.i("Handle $action")
-                    SwipeAction.RemoveFromUpNext -> Timber.i("Handle $action")
-                    SwipeAction.Share -> Timber.i("Handle $action")
-                    SwipeAction.Archive -> Timber.i("Handle $action")
-                    SwipeAction.Unarchive -> Timber.i("Handle $action")
-                    SwipeAction.Remove -> viewModel.deleteEpisode(episode.uuid)
-                }
+                Timber.i("Handle $action")
             },
         )
     }

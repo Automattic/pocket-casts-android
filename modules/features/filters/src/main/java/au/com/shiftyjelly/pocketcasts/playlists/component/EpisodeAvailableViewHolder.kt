@@ -19,7 +19,9 @@ import au.com.shiftyjelly.pocketcasts.models.entity.Bookmark
 import au.com.shiftyjelly.pocketcasts.models.to.PlaylistEpisode
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodePlayingStatus
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodeStatusEnum
+import au.com.shiftyjelly.pocketcasts.playlists.SwipeAction
 import au.com.shiftyjelly.pocketcasts.podcasts.view.components.PlayButton
+import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.download.DownloadProgressUpdate
 import au.com.shiftyjelly.pocketcasts.repositories.extensions.getSummaryText
 import au.com.shiftyjelly.pocketcasts.repositories.images.PocketCastsImageRequestFactory
@@ -27,9 +29,11 @@ import au.com.shiftyjelly.pocketcasts.repositories.images.loadInto
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackState
 import au.com.shiftyjelly.pocketcasts.repositories.playback.UpNextQueue
 import au.com.shiftyjelly.pocketcasts.repositories.playback.containsUuid
+import au.com.shiftyjelly.pocketcasts.repositories.playlist.Playlist
 import au.com.shiftyjelly.pocketcasts.ui.extensions.getThemeColor
 import au.com.shiftyjelly.pocketcasts.ui.helper.ColorUtils
 import au.com.shiftyjelly.pocketcasts.utils.extensions.dpToPx
+import au.com.shiftyjelly.pocketcasts.views.component.SwipeRowLayout
 import io.reactivex.Observable
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
@@ -45,6 +49,7 @@ import au.com.shiftyjelly.pocketcasts.ui.R as UR
 
 class EpisodeAvailableViewHolder(
     private val binding: AdapterEpisodeAvailableBinding,
+    private val playlistType: Playlist.Type,
     private val imageRequestFactory: PocketCastsImageRequestFactory,
     private val downloadProgressUpdates: Observable<DownloadProgressUpdate>,
     private val playbackStateUpdates: Observable<PlaybackState>,
@@ -53,8 +58,12 @@ class EpisodeAvailableViewHolder(
     private val playButtonListener: PlayButton.OnClickListener,
     private val onRowClick: (PlaylistEpisode.Available) -> Unit,
     private val onRowLongClick: (PlaylistEpisode.Available) -> Unit,
+    private val onSwipeAction: (PlaylistEpisode.Available, SwipeAction) -> Unit,
 ) : RecyclerView.ViewHolder(binding.root) {
     private inline val context get() = itemView.context
+
+    @Suppress("UNCHECKED_CAST")
+    private val swipeLayout = binding.root as SwipeRowLayout<SwipeAction>
 
     private val primaryText01Tint = context.getThemeColor(UR.attr.primary_text_01)
     private val primaryText01TintAlpha = ColorUtils.colorWithAlpha(primaryText01Tint, alpha = 128)
@@ -70,10 +79,11 @@ class EpisodeAvailableViewHolder(
 
     private val disposable: CompositeDisposable = CompositeDisposable()
 
-    private lateinit var episodeWrapper: PlaylistEpisode.Available
-    private val episode get() = episodeWrapper.episode
+    private var episodeWrapper: PlaylistEpisode.Available? = null
+    private val episode get() = requireNotNull(episodeWrapper).episode
     private var isMultiSelectEnabled = false
     private var streamByDefault = false
+    private var upNextAction = Settings.UpNextAction.PLAY_NEXT
 
     init {
         binding.progressCircle.setColor(primaryText02Tint)
@@ -81,10 +91,12 @@ class EpisodeAvailableViewHolder(
         binding.imgBookmark.imageTintList = ColorStateList.valueOf(primaryIcon01Tint)
 
         binding.episodeRow.setOnClickListener {
-            onRowClick(episodeWrapper)
+            onRowClick(requireNotNull(episodeWrapper))
+            swipeLayout.settle()
         }
         binding.episodeRow.setOnLongClickListener {
-            onRowLongClick(episodeWrapper)
+            onRowLongClick(requireNotNull(episodeWrapper))
+            swipeLayout.settle()
             true
         }
         binding.playButton.listener = playButtonListener
@@ -94,6 +106,7 @@ class EpisodeAvailableViewHolder(
         binding.checkbox.setOnCheckedChangeListener { _, isChecked ->
             bindBackgroundColor(isChecked)
         }
+        swipeLayout.addOnSwipeActionListener { action -> onSwipeAction(requireNotNull(episodeWrapper), action) }
     }
 
     fun bind(
@@ -102,10 +115,22 @@ class EpisodeAvailableViewHolder(
         isSelected: Boolean,
         useEpisodeArtwork: Boolean,
         streamByDefault: Boolean,
+        upNextAction: Settings.UpNextAction,
     ) {
+        if (episodeWrapper.uuid != this.episodeWrapper?.uuid) {
+            swipeLayout.clearTranslation()
+        }
         this.episodeWrapper = episodeWrapper
         this.isMultiSelectEnabled = isMultiSelectEnabled
         this.streamByDefault = streamByDefault
+        this.upNextAction = upNextAction
+
+        if (isMultiSelectEnabled) {
+            swipeLayout.clearTranslation()
+            swipeLayout.lock()
+        } else {
+            swipeLayout.unlock()
+        }
 
         disposable.clear()
         disposable += createObservableData().subscribeBy(onNext = ::bindObservableData)
@@ -115,6 +140,7 @@ class EpisodeAvailableViewHolder(
         bindDate()
         bindStatus(downloadProgress = 0)
         bindContentDescription(isInUpNext = false)
+        bindSwipeActions(isInUpNext = false)
         bindGreyedOutColors()
         bindBackgroundColor(isSelected)
         bindAutoTransition(isSelected)
@@ -252,6 +278,7 @@ class EpisodeAvailableViewHolder(
         binding.title.setTextColor(if (isGreyedOut) primaryText01TintAlpha else primaryText01Tint)
         binding.date.setTextColor(if (isGreyedOut) primaryText02TintAlpha else primaryText02Tint)
         binding.lblStatus.setTextColor(if (isGreyedOut) primaryText02TintAlpha else primaryText02Tint)
+        binding.artworkBox.elevation = if (isGreyedOut) 0f else 2.dpToPx(context).toFloat()
         binding.imgArtwork.alpha = if (isGreyedOut) 0.5f else 1f
         binding.imgBookmark.alpha = if (isGreyedOut) 0.5f else 1f
         binding.imgIcon.alpha = if (isGreyedOut) 0.5f else 1f
@@ -289,7 +316,32 @@ class EpisodeAvailableViewHolder(
         } else {
             bindStatus(downloadProgress = data.downloadProgress)
         }
+        bindSwipeActions(isInUpNext = data.isInUpNext)
         bindContentDescription(isInUpNext = data.isInUpNext)
+    }
+
+    private fun bindSwipeActions(isInUpNext: Boolean) {
+        if (playlistType == Playlist.Type.Manual) {
+            swipeLayout.setRtl1State(SwipeAction.Remove)
+            swipeLayout.setRtl2State(if (episode.isArchived) SwipeAction.Unarchive else SwipeAction.Archive)
+            swipeLayout.setRtl3State(SwipeAction.Share)
+        } else {
+            swipeLayout.setRtl1State(if (episode.isArchived) SwipeAction.Unarchive else SwipeAction.Archive)
+            swipeLayout.setRtl2State(SwipeAction.Share)
+            swipeLayout.setRtl3State(null)
+        }
+
+        if (isInUpNext) {
+            swipeLayout.setLtr1State(SwipeAction.RemoveFromUpNext)
+            swipeLayout.setLtr2State(null)
+        } else {
+            val (upNext1, upNext2) = when (upNextAction) {
+                Settings.UpNextAction.PLAY_NEXT -> SwipeAction.AddToUpNextTop to SwipeAction.AddToUpNextBottom
+                Settings.UpNextAction.PLAY_LAST -> SwipeAction.AddToUpNextBottom to SwipeAction.AddToUpNextTop
+            }
+            swipeLayout.setLtr1State(upNext1)
+            swipeLayout.setLtr2State(upNext2)
+        }
     }
 
     private fun createObservableData(): Observable<ObservableData> {
@@ -325,14 +377,14 @@ class EpisodeAvailableViewHolder(
 
     private fun createIsInUpNextObservable(): Observable<Boolean> {
         return upNextChangesObservable
-            .containsUuid(episodeWrapper.uuid)
+            .containsUuid(episode.uuid)
             .startWith(false)
             .distinctUntilChanged()
     }
 
     private fun createBookmarksObservable(): Observable<Boolean> {
         return bookmarksObservable
-            .map { bookmarks -> bookmarks.any { it.episodeUuid == episodeWrapper.uuid } }
+            .map { bookmarks -> bookmarks.any { it.episodeUuid == episode.uuid } }
             .startWith(false)
             .distinctUntilChanged()
     }

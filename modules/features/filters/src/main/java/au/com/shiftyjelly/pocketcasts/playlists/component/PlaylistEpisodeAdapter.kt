@@ -21,11 +21,13 @@ import au.com.shiftyjelly.pocketcasts.repositories.download.DownloadManager
 import au.com.shiftyjelly.pocketcasts.repositories.images.PocketCastsImageRequestFactory
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.repositories.playback.UpNextQueue
+import au.com.shiftyjelly.pocketcasts.repositories.playlist.Playlist
 import au.com.shiftyjelly.pocketcasts.views.multiselect.MultiSelectEpisodesHelper
 import java.util.UUID
 import kotlinx.coroutines.rx2.asObservable
 
 class PlaylistEpisodeAdapter(
+    private val playlistType: Playlist.Type,
     private val bookmarkManager: BookmarkManager,
     private val downloadManager: DownloadManager,
     private val playbackManager: PlaybackManager,
@@ -54,6 +56,7 @@ class PlaylistEpisodeAdapter(
                 val binding = AdapterEpisodeAvailableBinding.inflate(inflater, parent, false)
                 EpisodeAvailableViewHolder(
                     binding = binding,
+                    playlistType = playlistType,
                     imageRequestFactory = imageRequestFactory,
                     downloadProgressUpdates = downloadManager.progressUpdateRelay,
                     playbackStateUpdates = playbackManager.playbackStateRelay,
@@ -73,6 +76,7 @@ class PlaylistEpisodeAdapter(
                         @SuppressLint("NotifyDataSetChanged")
                         notifyDataSetChanged()
                     },
+                    onSwipeAction = onSwipeAction,
                 )
             }
 
@@ -101,6 +105,7 @@ class PlaylistEpisodeAdapter(
             isSelected = multiSelectHelper.isSelected(item.episode),
             useEpisodeArtwork = settings.artworkConfiguration.value.useEpisodeArtwork(ArtworkConfiguration.Element.Filters),
             streamByDefault = settings.streamingMode.value,
+            upNextAction = settings.upNextSwipe.value,
         )
     }
 

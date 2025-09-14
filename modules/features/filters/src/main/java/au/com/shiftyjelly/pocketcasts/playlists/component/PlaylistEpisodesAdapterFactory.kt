@@ -22,6 +22,7 @@ import au.com.shiftyjelly.pocketcasts.repositories.download.DownloadManager
 import au.com.shiftyjelly.pocketcasts.repositories.images.PocketCastsImageRequestFactory
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.repositories.playback.UpNextQueue
+import au.com.shiftyjelly.pocketcasts.repositories.playlist.Playlist
 import au.com.shiftyjelly.pocketcasts.ui.extensions.themed
 import au.com.shiftyjelly.pocketcasts.views.helper.HasBackstack
 import au.com.shiftyjelly.pocketcasts.views.multiselect.MultiSelectEpisodesHelper
@@ -56,6 +57,7 @@ class PlaylistEpisodesAdapterFactory @Inject constructor(
     }
 
     fun create(
+        playlistType: Playlist.Type,
         multiSelectToolbar: MultiSelectToolbar,
         getEpisodes: () -> List<PlaylistEpisode>,
         onSwipeAction: (PlaylistEpisode, SwipeAction) -> Unit,
@@ -70,6 +72,7 @@ class PlaylistEpisodesAdapterFactory @Inject constructor(
         val childFragmentManager = fragment.childFragmentManager
 
         adapter = PlaylistEpisodeAdapter(
+            playlistType = playlistType,
             bookmarkManager = bookmarkManager,
             downloadManager = downloadManager,
             playbackManager = playbackManager,
