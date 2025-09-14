@@ -1,5 +1,6 @@
 package au.com.shiftyjelly.pocketcasts.playlists
 
+import android.content.Context
 import android.os.Bundle
 import android.os.Parcelable
 import android.view.LayoutInflater
@@ -506,4 +507,15 @@ private enum class ContentState {
     Uninitialized,
     HasNoEpisodes,
     HasEpisode,
+}
+
+class LockableLinearLayoutManager(
+    context: Context,
+    @RecyclerView.Orientation orientation: Int = RecyclerView.VERTICAL,
+    reverseLayout: Boolean = false,
+) : LinearLayoutManager(context, orientation, reverseLayout) {
+    var isScrollEnabled = true
+    override fun canScrollVertically(): Boolean {
+        return isScrollEnabled && super.canScrollVertically()
+    }
 }

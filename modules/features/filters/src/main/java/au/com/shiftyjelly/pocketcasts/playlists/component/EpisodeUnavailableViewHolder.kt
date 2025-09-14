@@ -4,9 +4,12 @@ import androidx.recyclerview.widget.RecyclerView
 import au.com.shiftyjelly.pocketcasts.filters.databinding.AdapterEpisodeUnavailableBinding
 import au.com.shiftyjelly.pocketcasts.localization.helper.RelativeDateFormatter
 import au.com.shiftyjelly.pocketcasts.models.to.PlaylistEpisode
+import au.com.shiftyjelly.pocketcasts.playlists.SwipeAction
 import au.com.shiftyjelly.pocketcasts.repositories.images.PocketCastsImageRequestFactory
 import au.com.shiftyjelly.pocketcasts.repositories.images.loadInto
+import au.com.shiftyjelly.pocketcasts.views.component.SwipeRowLayout
 import java.sql.Date
+import timber.log.Timber
 
 class EpisodeUnavailableViewHolder(
     val binding: AdapterEpisodeUnavailableBinding,
@@ -14,19 +17,30 @@ class EpisodeUnavailableViewHolder(
     private val onRowClick: (PlaylistEpisode.Unavailable) -> Unit,
 ) : RecyclerView.ViewHolder(binding.root) {
     private inline val context get() = binding.root.context
+
+    @Suppress("UNCHECKED_CAST")
+    private val swipeLayout = binding.root as SwipeRowLayout<SwipeAction>
+
     private val dateFormatter = RelativeDateFormatter(context)
 
-    private lateinit var episodeWrapper: PlaylistEpisode.Unavailable
+    private var episodeWrapper: PlaylistEpisode.Unavailable? = null
 
     init {
         binding.episodeRow.setOnClickListener {
-            onRowClick(episodeWrapper)
+            onRowClick(requireNotNull(episodeWrapper))
+        }
+        swipeLayout.setRtl1State(SwipeAction.Remove)
+        swipeLayout.addOnSwipeActionListener {
+            Timber.tag("LOG_TAG").i("Action $it")
         }
     }
 
     fun bind(
         episodeWrapper: PlaylistEpisode.Unavailable,
     ) {
+        if (episodeWrapper.uuid != this.episodeWrapper?.uuid) {
+            swipeLayout.clearTranslation()
+        }
         this.episodeWrapper = episodeWrapper
 
         binding.titleLabel.text = episodeWrapper.episode.title
