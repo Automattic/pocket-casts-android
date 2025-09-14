@@ -2,6 +2,7 @@ package au.com.shiftyjelly.pocketcasts.views.extensions
 
 import android.view.View
 import androidx.annotation.IdRes
+import androidx.dynamicanimation.animation.DynamicAnimation
 import androidx.dynamicanimation.animation.DynamicAnimation.ViewProperty
 import androidx.dynamicanimation.animation.SpringAnimation
 import androidx.dynamicanimation.animation.SpringForce
@@ -24,6 +25,33 @@ fun View.spring(
         setTag(tagId, animation)
     }
     return animation
+}
+
+fun View.cancelSpring(property: ViewProperty) {
+    val tagId = getTagId(property)
+    (getTag(tagId) as? SpringAnimation?)?.cancel()
+}
+
+fun SpringAnimation.doOnUpdate(
+    action: (animation: DynamicAnimation<*>, value: Float, velocity: Float) -> Unit,
+): SpringAnimation {
+    val listener = DynamicAnimation.OnAnimationUpdateListener { animation, value, velocity ->
+        action(animation, value, velocity)
+    }
+    return addUpdateListener(listener)
+        .doOnEnd { animation, _, _, _ -> animation.removeUpdateListener(listener) }
+}
+
+fun SpringAnimation.doOnEnd(
+    action: (animation: DynamicAnimation<*>, cancelled: Boolean, value: Float, velocity: Float) -> Unit,
+): SpringAnimation {
+    val listener = object : DynamicAnimation.OnAnimationEndListener {
+        override fun onAnimationEnd(animation: DynamicAnimation<*>, canceled: Boolean, value: Float, velocity: Float) {
+            animation.removeEndListener(this)
+            action(animation, canceled, value, velocity)
+        }
+    }
+    return addEndListener(listener)
 }
 
 @IdRes
