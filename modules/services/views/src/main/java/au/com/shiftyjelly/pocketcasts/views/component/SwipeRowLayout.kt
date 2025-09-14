@@ -32,6 +32,7 @@ import kotlin.math.abs
 import kotlin.math.absoluteValue
 import kotlin.math.roundToInt
 import kotlin.math.sign
+import kotlin.text.toFloat
 import kotlin.time.Duration.Companion.milliseconds
 
 class SwipeRowLayout<T : SwipeButton.UiState> @JvmOverloads constructor(
@@ -71,7 +72,7 @@ class SwipeRowLayout<T : SwipeButton.UiState> @JvmOverloads constructor(
 
     private var isSwipedThresholdReached = false
 
-    private val swipedThresholdMargin = 64.dpToPx(context).toFloat()
+    private val swipedThresholdMargin = 24.dpToPx(context).toFloat()
 
     private val minSwipedThreshold = 240.dpToPx(context).toFloat()
 
@@ -100,27 +101,27 @@ class SwipeRowLayout<T : SwipeButton.UiState> @JvmOverloads constructor(
     }
 
     fun setLtr1State(state: T?) {
-        swipeButtons.ltr1.setButtonState(state)
+        swipeButtons.ltrSection.button1.setButtonState(state)
     }
 
     fun setLtr2State(state: T?) {
-        swipeButtons.ltr2.setButtonState(state)
+        swipeButtons.ltrSection.button2.setButtonState(state)
     }
 
     fun setLtr3State(state: T?) {
-        swipeButtons.ltr3.setButtonState(state)
+        swipeButtons.ltrSection.button3.setButtonState(state)
     }
 
     fun setRtl1State(state: T?) {
-        swipeButtons.rtl1.setButtonState(state)
+        swipeButtons.rtlSection.button1.setButtonState(state)
     }
 
     fun setRtl2State(state: T?) {
-        swipeButtons.rtl2.setButtonState(state)
+        swipeButtons.rtlSection.button2.setButtonState(state)
     }
 
     fun setRtl3State(state: T?) {
-        swipeButtons.rtl3.setButtonState(state)
+        swipeButtons.rtlSection.button3.setButtonState(state)
     }
 
     private fun SwipeButton<T>.setButtonState(state: T?) {
@@ -136,13 +137,21 @@ class SwipeRowLayout<T : SwipeButton.UiState> @JvmOverloads constructor(
         swipeButtons.forEach { it.removeOnSwipeActionListener(listener) }
     }
 
+    fun settle() {
+        swipeHandler.smoothScrollTo(0)
+    }
+
     fun clearTranslation() {
         swipeHandler.clear()
         swipedAction?.cancel()
         swipedAction = null
-        swipeButtons.ltr1.cancelSpring(DynamicAnimation.ALPHA)
-        swipeButtons.rtl1.cancelSpring(DynamicAnimation.ALPHA)
+
         swipeableView.cancelSpring(DynamicAnimation.TRANSLATION_X)
+        swipeButtons.ltrSection.button1.cancelSpring(DynamicAnimation.ALPHA)
+        swipeButtons.rtlSection.button1.cancelSpring(DynamicAnimation.ALPHA)
+        swipeButtons.ltrSection.button1.innerContainer.cancelSpring(DynamicAnimation.TRANSLATION_X)
+        swipeButtons.rtlSection.button1.innerContainer.cancelSpring(DynamicAnimation.TRANSLATION_X)
+
         isSwipedThresholdReached = false
         isLocked = false
         setTranslation(0f, useHapticFeedback = false)
@@ -184,58 +193,44 @@ class SwipeRowLayout<T : SwipeButton.UiState> @JvmOverloads constructor(
         }
         swipeableView.translationX = value.coerceIn(minTranslationValue(), maxTranslationValue())
         swipeHandler.refreshTargetPosition()
-        resolveButtonTranslations()
         resolveSwipedThreshold(useHapticFeedback)
+        resolveButtonTranslations()
         resolveSwipedState()
     }
 
     private fun resolveButtonTranslations() {
-        val baseTranslation = width.toFloat()
+        val baseOffset = width.toFloat()
+        resolveButtonTranslations(swipeButtons.rtlSection, baseOffset)
+        resolveButtonTranslations(swipeButtons.ltrSection, -baseOffset)
+    }
+
+    private fun resolveButtonTranslations(
+        section: SwipeButtons.Section<T>,
+        baseOffset: Float,
+    ) {
         val translation = swipeableView.translationX
-        val rtlCoefficient = if (swipeButtons.rtl3Active == null) 0.5f else (2f / 3)
-        val ltrCoefficient = if (swipeButtons.ltr3Active == null) 0.5f else (2f / 3)
+        val coefficient = when (section.allActive.size) {
+            3 -> 2f / 3
+            2 -> 1f
+            else -> 2f
+        }
+        section.button1.outerContainer.translationX = baseOffset + translation * coefficient / 2
+        section.button2.translationX = baseOffset + translation * coefficient
+        section.button3.translationX = baseOffset + translation
 
-        if (swipeButtons.rtl1Active == null) {
-            swipeButtons.rtl1.translationX = baseTranslation
+        val thresholdPosition = if (isSwipedThresholdReached) {
+            translation - translation * coefficient / 2
         } else {
-            swipeButtons.rtl1Active?.translationX = baseTranslation + translation
+            0f
         }
-        if (swipeButtons.rtl2Active == null) {
-            swipeButtons.rtl2.translationX = baseTranslation
-        } else {
-            swipeButtons.rtl2Active?.translationX = baseTranslation + translation * rtlCoefficient
-        }
-        if (swipeButtons.rtl3Active == null) {
-            swipeButtons.rtl3.translationX = baseTranslation
-        } else {
-            swipeButtons.rtl3Active?.translationX = baseTranslation + translation * rtlCoefficient / 2
-        }
-
-        if (swipeButtons.ltr1Active == null) {
-            swipeButtons.ltr1.translationX = -baseTranslation
-        } else {
-            swipeButtons.ltr1Active?.translationX = -baseTranslation + translation
-        }
-        if (swipeButtons.ltr2Active == null) {
-            swipeButtons.ltr2.translationX = -baseTranslation
-        } else {
-            swipeButtons.ltr2Active?.translationX = -baseTranslation + translation * ltrCoefficient
-        }
-        if (swipeButtons.ltr3Active == null) {
-            swipeButtons.ltr3.translationX = -baseTranslation
-        } else {
-            swipeButtons.ltr3Active?.translationX = -baseTranslation + translation * ltrCoefficient / 2
-        }
+        section.button1.innerContainer
+            .spring(DynamicAnimation.TRANSLATION_X, stiffness = SpringForce.STIFFNESS_MEDIUM)
+            .animateToFinalPosition(thresholdPosition)
     }
 
     private fun resolveSwipedThreshold(useHapticFeedback: Boolean) {
         val translation = swipeableView.translationX.absoluteValue
         val isSwipedThresholdReached = translation >= swipedThreshold(settledButtonsWidth())
-
-        swipeButtons.rtl2Active?.isGone = isSwipedThresholdReached
-        swipeButtons.rtl3Active?.isGone = isSwipedThresholdReached
-        swipeButtons.ltr2Active?.isGone = isSwipedThresholdReached
-        swipeButtons.ltr3Active?.isGone = isSwipedThresholdReached
 
         if (this.isSwipedThresholdReached != isSwipedThresholdReached) {
             this.isSwipedThresholdReached = isSwipedThresholdReached
@@ -250,24 +245,27 @@ class SwipeRowLayout<T : SwipeButton.UiState> @JvmOverloads constructor(
         if (!isLocked && translation.absoluteValue >= width) {
             isLocked = true
 
-            val button = when {
-                translation > 0 -> swipeButtons.ltr1
-                translation < 0 -> swipeButtons.rtl1
+            val section = when {
+                translation > 0 -> swipeButtons.ltrSection
+                translation < 0 -> swipeButtons.rtlSection
                 else -> null
             }
 
-            if (button != null) {
-                button.callOnSwipeActionListeners()
+            if (section != null) {
+                val primaryButton = section.button1
+                primaryButton.callOnSwipeActionListeners()
                 swipedAction?.cancel()
-                swipedAction = runDelayedAction(300.milliseconds) {
-                    button.elevation = 1f
+                swipedAction = runDelayedAction(350.milliseconds) {
+                    primaryButton.elevation = 1f
                     swipeableView.translationX = 0f
+                    section.button2.translationX = width.toFloat()
+                    section.button3.translationX = width.toFloat()
 
-                    button
+                    primaryButton
                         .spring(DynamicAnimation.ALPHA)
                         .doOnEnd { _, isCancelled, _, _ ->
-                            button.elevation = 0f
-                            button.alpha = 1f
+                            primaryButton.elevation = 0f
+                            primaryButton.alpha = 1f
                             if (!isCancelled) {
                                 isLocked = false
                                 setTranslation(0f, useHapticFeedback = false)
@@ -319,15 +317,15 @@ class SwipeRowLayout<T : SwipeButton.UiState> @JvmOverloads constructor(
 
     private fun settledButtonsWidth(): Float {
         val buttons = when (swipeHandler.targetPosition) {
-            LeftToRight -> swipeButtons.activeLtrs
-            RightToLeft -> swipeButtons.activeRtls
+            LeftToRight -> swipeButtons.ltrSection.allActive
+            RightToLeft -> swipeButtons.rtlSection.allActive
             None -> emptyList()
         }
-        return buttons.sumOf(SwipeButton<T>::settledItemWidth).toFloat()
+        return buttons.sumOf(SwipeButton<T>::settledWidth).toFloat()
     }
 
     private fun minTranslationValue(): Float {
-        return if (swipeButtons.activeRtls.isNotEmpty()) {
+        return if (swipeButtons.rtlSection.allActive.isNotEmpty()) {
             -width.toFloat()
         } else {
             0f
@@ -335,7 +333,7 @@ class SwipeRowLayout<T : SwipeButton.UiState> @JvmOverloads constructor(
     }
 
     private fun maxTranslationValue(): Float {
-        return if (swipeButtons.activeLtrs.isNotEmpty()) {
+        return if (swipeButtons.ltrSection.allActive.isNotEmpty()) {
             width.toFloat()
         } else {
             0f
@@ -352,42 +350,45 @@ private enum class SwipeDirection {
 private class SwipeButtons<T : SwipeButton.UiState>(
     private val binding: SwipeRowLayoutBinding,
 ) : Iterable<SwipeButton<T>> {
-    val ltr1 get() = binding.leftToRightButton1.typed()
-    val ltr1Active get() = ltr1.active()
+    val ltrSection = Section(
+        button1 = binding.leftToRightButton1.typed(),
+        button2 = binding.leftToRightButton2.typed(),
+        button3 = binding.leftToRightButton3.typed(),
+    )
 
-    val ltr2 get() = binding.leftToRightButton2.typed()
-    val ltr2Active get() = ltr2.active()
-
-    val ltr3 get() = binding.leftToRightButton3.typed()
-    val ltr3Active get() = ltr3.active()
-
-    val rtl1 get() = binding.rightToLeftButton1.typed()
-    val rtl1Active get() = rtl1.active()
-
-    val rtl2 get() = binding.rightToLeftButton2.typed()
-    val rtl2Active get() = rtl2.active()
-
-    val rtl3 get() = binding.rightToLeftButton3.typed()
-    val rtl3Active get() = rtl3.active()
-
-    val activeLtrs get() = listOfNotNull(ltr1Active, ltr2Active, ltr3Active)
-    val activeRtls get() = listOfNotNull(rtl1Active, rtl2Active, rtl3Active)
+    val rtlSection = Section(
+        button1 = binding.rightToLeftButton1.typed(),
+        button2 = binding.rightToLeftButton2.typed(),
+        button3 = binding.rightToLeftButton3.typed(),
+    )
 
     override fun iterator(): Iterator<SwipeButton<T>> {
         return iterator {
-            yield(ltr1)
-            yield(ltr2)
-            yield(ltr3)
-            yield(rtl1)
-            yield(rtl2)
-            yield(rtl3)
+            yieldAll(ltrSection)
+            yieldAll(rtlSection)
         }
     }
 
     @Suppress("UNCHECKED_CAST")
     private fun SwipeButton<*>.typed() = this as SwipeButton<T>
 
-    private fun SwipeButton<T>.active() = takeIf { it.uiState != null }
+    class Section<T : SwipeButton.UiState>(
+        val button1: SwipeButton<T>,
+        val button2: SwipeButton<T>,
+        val button3: SwipeButton<T>,
+    ) : Iterable<SwipeButton<T>> {
+        val allActive get() = listOfNotNull(button1.active(), button2.active(), button3.active())
+
+        override fun iterator(): Iterator<SwipeButton<T>> {
+            return iterator {
+                yield(button1)
+                yield(button2)
+                yield(button3)
+            }
+        }
+
+        private fun SwipeButton<T>.active() = takeIf { it.uiState != null }
+    }
 }
 
 private class SwipeGestureHandler(

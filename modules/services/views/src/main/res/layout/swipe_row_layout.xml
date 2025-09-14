@@ -1,11 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <merge xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
-    tools:parentTag="android.widget.FrameLayout">
+    xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <au.com.shiftyjelly.pocketcasts.views.component.SwipeButton
-        android:id="@+id/leftToRightButton1"
+        android:id="@+id/leftToRightButton3"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         app:imageGravity="right" />
@@ -17,13 +15,13 @@
         app:imageGravity="right" />
 
     <au.com.shiftyjelly.pocketcasts.views.component.SwipeButton
-        android:id="@+id/leftToRightButton3"
+        android:id="@+id/leftToRightButton1"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         app:imageGravity="right" />
 
     <au.com.shiftyjelly.pocketcasts.views.component.SwipeButton
-        android:id="@+id/rightToLeftButton1"
+        android:id="@+id/rightToLeftButton3"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         app:imageGravity="left" />
@@ -35,7 +33,7 @@
         app:imageGravity="left" />
 
     <au.com.shiftyjelly.pocketcasts.views.component.SwipeButton
-        android:id="@+id/rightToLeftButton3"
+        android:id="@+id/rightToLeftButton1"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         app:imageGravity="left" />

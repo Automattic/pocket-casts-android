@@ -28,6 +28,7 @@ class EpisodeUnavailableViewHolder(
     init {
         binding.episodeRow.setOnClickListener {
             onRowClick(requireNotNull(episodeWrapper))
+            swipeLayout.settle()
         }
         swipeLayout.setRtl1State(SwipeAction.Remove)
         swipeLayout.addOnSwipeActionListener { action -> onSwipeAction(requireNotNull(episodeWrapper), action) }

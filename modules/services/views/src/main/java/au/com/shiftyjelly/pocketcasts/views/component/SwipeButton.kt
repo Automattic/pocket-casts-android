@@ -25,6 +25,10 @@ class SwipeButton<T : SwipeButton.UiState> @JvmOverloads constructor(
 ) : FrameLayout(context, attrs) {
     private val binding = SwipeButtonBinding.inflate(LayoutInflater.from(context), this)
 
+    internal val outerContainer = binding.outerContainer
+
+    internal val innerContainer = binding.innerContainer
+
     /**
      * This state prevents the UI from updating while a button action is being executed.
      * When an action is triggered, it may result in data change and swap to a different action.
@@ -49,11 +53,12 @@ class SwipeButton<T : SwipeButton.UiState> @JvmOverloads constructor(
 
     val uiState: T? get() = if (isLocked) lockedUiState else currentUiState
 
-    val settledItemWidth get() = binding.swipeImage.width
+    val settledWidth get() = binding.swipeImage.width
 
     private val onSwipeActionListeners = mutableSetOf<(T) -> Unit>()
 
     init {
+        clipChildren = false
         val imageGravity = context.theme
             .obtainStyledAttributes(attrs, R.styleable.SwipeButton, 0, 0)
             .use { array ->
@@ -66,7 +71,7 @@ class SwipeButton<T : SwipeButton.UiState> @JvmOverloads constructor(
         binding.swipeImage.updateLayoutParams<LayoutParams> {
             gravity = gravity or imageGravity.androidValue
         }
-        setOnClickListener { callOnSwipeActionListeners() }
+        binding.innerContainer.setOnClickListener { callOnSwipeActionListeners() }
     }
 
     fun setUiState(uiState: T?) {
@@ -101,15 +106,15 @@ class SwipeButton<T : SwipeButton.UiState> @JvmOverloads constructor(
     private fun applyBackgroundTint() {
         val tint = uiState?.backgroundTint(context)
         if (tint != null) {
-            setBackgroundColor(tint)
+            innerContainer.setBackgroundColor(tint)
         } else {
-            background = null
+            innerContainer.background = null
         }
     }
 
     private fun applyContentDescription() {
         val text = uiState?.contentDescription(context)
-        contentDescription = text
+        innerContainer.contentDescription = text
     }
 
     private var appliedImageDrawableId: Int? = null
@@ -136,7 +141,7 @@ class SwipeButton<T : SwipeButton.UiState> @JvmOverloads constructor(
         val iconTintList = tint?.let(ColorStateList::valueOf)
         ImageViewCompat.setImageTintList(binding.swipeImage, iconTintList)
 
-        foreground = if (tint != null) {
+        innerContainer.foreground = if (tint != null) {
             val typedValue = TypedValue().apply {
                 context.theme.resolveAttribute(AndroidR.attr.selectableItemBackground, this, true)
             }
