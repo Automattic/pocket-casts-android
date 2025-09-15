@@ -71,7 +71,6 @@ import kotlin.math.roundToInt
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import kotlinx.parcelize.Parcelize
-import timber.log.Timber
 import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 import au.com.shiftyjelly.pocketcasts.ui.R as UR
@@ -205,11 +204,9 @@ class PlaylistFragment :
     private fun createEpisodesAdapter(binding: PlaylistFragmentBinding): PlaylistEpisodeAdapter {
         return adapterFactory.create(
             playlistType = args.type,
+            playlistUuid = args.uuid,
             multiSelectToolbar = binding.multiSelectToolbar,
             getEpisodes = { viewModel.uiState.value.playlist?.episodes.orEmpty() },
-            onSwipeAction = { episode, action ->
-                Timber.i("Handle $action")
-            },
         )
     }
 

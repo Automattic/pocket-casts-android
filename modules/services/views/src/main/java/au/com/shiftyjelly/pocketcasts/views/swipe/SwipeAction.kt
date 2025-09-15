@@ -2,19 +2,22 @@ package au.com.shiftyjelly.pocketcasts.views.swipe
 
 import android.content.Context
 import android.graphics.Color
+import au.com.shiftyjelly.pocketcasts.models.to.PlaylistEpisode
 import au.com.shiftyjelly.pocketcasts.ui.extensions.getThemeColor
 import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 import au.com.shiftyjelly.pocketcasts.ui.R as UR
 
-enum class SwipeAction : SwipeButton.UiState {
-    AddToUpNextTop,
-    AddToUpNextBottom,
-    RemoveFromUpNext,
-    Share,
-    Archive,
-    Unarchive,
-    RemoveFromPlaylist,
+enum class SwipeAction(
+    val analyticsValue: String,
+) : SwipeButton.UiState {
+    AddToUpNextTop("up_next_add_top"),
+    AddToUpNextBottom("up_next_add_bottom"),
+    RemoveFromUpNext("up_next_remove"),
+    Share("share"),
+    Archive("archive"),
+    Unarchive("unarchive"),
+    RemoveFromPlaylist("playlist_remove"),
     ;
 
     override fun contentDescription(context: Context) = when (this) {

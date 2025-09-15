@@ -3,8 +3,10 @@ package au.com.shiftyjelly.pocketcasts.playlists.component
 import android.annotation.SuppressLint
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.viewModels
 import androidx.lifecycle.DefaultLifecycleObserver
 import androidx.lifecycle.LifecycleOwner
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.RecyclerView
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
@@ -12,6 +14,7 @@ import au.com.shiftyjelly.pocketcasts.models.entity.BaseEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.models.to.PlaylistEpisode
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodeViewSource
+import au.com.shiftyjelly.pocketcasts.playlists.PlaylistViewModel
 import au.com.shiftyjelly.pocketcasts.playlists.manual.UnavailableEpisodeFragment
 import au.com.shiftyjelly.pocketcasts.podcasts.view.components.PlayButton
 import au.com.shiftyjelly.pocketcasts.podcasts.view.episode.EpisodeContainerFragment
@@ -28,10 +31,15 @@ import au.com.shiftyjelly.pocketcasts.views.multiselect.MultiSelectEpisodesHelpe
 import au.com.shiftyjelly.pocketcasts.views.multiselect.MultiSelectHelper
 import au.com.shiftyjelly.pocketcasts.views.multiselect.MultiSelectToolbar
 import au.com.shiftyjelly.pocketcasts.views.swipe.SwipeAction
+import au.com.shiftyjelly.pocketcasts.views.swipe.SwipeActionViewModel
 import au.com.shiftyjelly.pocketcasts.views.swipe.SwipeRowActions
+import au.com.shiftyjelly.pocketcasts.views.swipe.SwipeSource
+import au.com.shiftyjelly.pocketcasts.views.swipe.handleAction
+import dagger.hilt.android.lifecycle.withCreationCallback
 import dagger.hilt.android.scopes.FragmentScoped
 import java.util.Date
 import javax.inject.Inject
+import kotlinx.coroutines.launch
 
 @FragmentScoped
 class PlaylistEpisodesAdapterFactory @Inject constructor(
@@ -60,9 +68,9 @@ class PlaylistEpisodesAdapterFactory @Inject constructor(
 
     fun create(
         playlistType: Playlist.Type,
+        playlistUuid: String,
         multiSelectToolbar: MultiSelectToolbar,
         getEpisodes: () -> List<PlaylistEpisode>,
-        onSwipeAction: (PlaylistEpisode, SwipeAction) -> Unit,
     ): PlaylistEpisodeAdapter {
         lateinit var adapter: PlaylistEpisodeAdapter
         configureDependencies(
@@ -72,6 +80,14 @@ class PlaylistEpisodesAdapterFactory @Inject constructor(
         )
         val parentFragmentManager = fragment.parentFragmentManager
         val childFragmentManager = fragment.childFragmentManager
+
+        val swipeActionViewModel by fragment.viewModels<SwipeActionViewModel>(
+            extrasProducer = {
+                fragment.defaultViewModelCreationExtras.withCreationCallback<SwipeActionViewModel.Factory> { factory ->
+                    factory.create(SwipeSource.Filters, playlistUuid)
+                }
+            },
+        )
 
         adapter = PlaylistEpisodeAdapter(
             playlistType = playlistType,
@@ -96,7 +112,11 @@ class PlaylistEpisodesAdapterFactory @Inject constructor(
                     }
                 }
             },
-            onSwipeAction = onSwipeAction,
+            onSwipeAction = { episode, action ->
+                fragment.viewLifecycleOwner.lifecycleScope.launch {
+                    swipeActionViewModel.handleAction(action, episode.uuid, childFragmentManager)
+                }
+            },
             playButtonListener = playButtonListener,
             imageRequestFactory = PocketCastsImageRequestFactory(fragment.requireContext()).themed().smallSize(),
             multiSelectHelper = multiSelectHelper,

@@ -36,6 +36,8 @@ class EpisodeUnavailableViewHolder(
         swipeLayout.addOnSwipeActionListener { action -> onSwipeAction(requireNotNull(episodeWrapper), action) }
     }
 
+    private var isMultiSelectEnabled = false
+
     fun bind(
         episodeWrapper: PlaylistEpisode.Unavailable,
         isMultiSelectEnabled: Boolean,
@@ -45,11 +47,14 @@ class EpisodeUnavailableViewHolder(
         }
         this.episodeWrapper = episodeWrapper
 
-        if (isMultiSelectEnabled) {
-            swipeLayout.clearTranslation()
-            swipeLayout.lock()
-        } else {
-            swipeLayout.unlock()
+        if (this.isMultiSelectEnabled != isMultiSelectEnabled) {
+            this.isMultiSelectEnabled = isMultiSelectEnabled
+            if (isMultiSelectEnabled) {
+                swipeLayout.clearTranslation()
+                swipeLayout.lock()
+            } else {
+                swipeLayout.unlock()
+            }
         }
 
         binding.titleLabel.text = episodeWrapper.episode.title
