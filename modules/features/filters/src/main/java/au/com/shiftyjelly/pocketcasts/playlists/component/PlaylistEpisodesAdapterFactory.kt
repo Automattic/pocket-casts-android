@@ -28,6 +28,7 @@ import au.com.shiftyjelly.pocketcasts.views.multiselect.MultiSelectEpisodesHelpe
 import au.com.shiftyjelly.pocketcasts.views.multiselect.MultiSelectHelper
 import au.com.shiftyjelly.pocketcasts.views.multiselect.MultiSelectToolbar
 import au.com.shiftyjelly.pocketcasts.views.swipe.SwipeAction
+import au.com.shiftyjelly.pocketcasts.views.swipe.SwipeRowActions
 import dagger.hilt.android.scopes.FragmentScoped
 import java.util.Date
 import javax.inject.Inject
@@ -42,6 +43,7 @@ class PlaylistEpisodesAdapterFactory @Inject constructor(
     private val settings: Settings,
     private val playButtonListener: PlayButton.OnClickListener,
     private val multiSelectHelper: MultiSelectEpisodesHelper,
+    private val swipeRowActionsFactory: SwipeRowActions.Factory,
 ) : HasBackstack {
     override fun onBackPressed(): Boolean {
         return if (multiSelectHelper.isMultiSelecting) {
@@ -98,6 +100,7 @@ class PlaylistEpisodesAdapterFactory @Inject constructor(
             playButtonListener = playButtonListener,
             imageRequestFactory = PocketCastsImageRequestFactory(fragment.requireContext()).themed().smallSize(),
             multiSelectHelper = multiSelectHelper,
+            swipeRowActionsFactory = swipeRowActionsFactory,
             fragmentManager = childFragmentManager,
         )
 

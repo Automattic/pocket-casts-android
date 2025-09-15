@@ -23,6 +23,7 @@ import au.com.shiftyjelly.pocketcasts.repositories.playback.UpNextQueue
 import au.com.shiftyjelly.pocketcasts.repositories.playlist.Playlist
 import au.com.shiftyjelly.pocketcasts.views.multiselect.MultiSelectEpisodesHelper
 import au.com.shiftyjelly.pocketcasts.views.swipe.SwipeAction
+import au.com.shiftyjelly.pocketcasts.views.swipe.SwipeRowActions
 import java.util.UUID
 import kotlinx.coroutines.rx2.asObservable
 
@@ -38,6 +39,7 @@ class PlaylistEpisodeAdapter(
     private val playButtonListener: PlayButton.OnClickListener,
     private val imageRequestFactory: PocketCastsImageRequestFactory,
     private val multiSelectHelper: MultiSelectEpisodesHelper,
+    private val swipeRowActionsFactory: SwipeRowActions.Factory,
     private val fragmentManager: FragmentManager,
 ) : ListAdapter<PlaylistEpisode, RecyclerView.ViewHolder>(PlaylistEpisodeDiffCallback) {
     init {
@@ -58,6 +60,7 @@ class PlaylistEpisodeAdapter(
                     binding = binding,
                     playlistType = playlistType,
                     imageRequestFactory = imageRequestFactory,
+                    swipeRowActionsFactory = swipeRowActionsFactory,
                     downloadProgressUpdates = downloadManager.progressUpdateRelay,
                     playbackStateUpdates = playbackManager.playbackStateRelay,
                     upNextChangesObservable = upNextQueue.changesObservable,
@@ -83,6 +86,7 @@ class PlaylistEpisodeAdapter(
             R.layout.adapter_episode_unavailable -> EpisodeUnavailableViewHolder(
                 binding = AdapterEpisodeUnavailableBinding.inflate(inflater, parent, false),
                 imageRequestFactory = imageRequestFactory,
+                swipeRowActionsFactory = swipeRowActionsFactory,
                 onRowClick = onRowClick,
                 onSwipeAction = onSwipeAction,
             )
@@ -105,7 +109,6 @@ class PlaylistEpisodeAdapter(
             isSelected = multiSelectHelper.isSelected(item.episode),
             useEpisodeArtwork = settings.artworkConfiguration.value.useEpisodeArtwork(ArtworkConfiguration.Element.Filters),
             streamByDefault = settings.streamingMode.value,
-            upNextAction = settings.upNextSwipe.value,
         )
     }
 

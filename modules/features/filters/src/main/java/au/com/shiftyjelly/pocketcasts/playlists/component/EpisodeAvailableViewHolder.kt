@@ -19,7 +19,6 @@ import au.com.shiftyjelly.pocketcasts.models.to.PlaylistEpisode
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodePlayingStatus
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodeStatusEnum
 import au.com.shiftyjelly.pocketcasts.podcasts.view.components.PlayButton
-import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.download.DownloadProgressUpdate
 import au.com.shiftyjelly.pocketcasts.repositories.extensions.getSummaryText
 import au.com.shiftyjelly.pocketcasts.repositories.images.PocketCastsImageRequestFactory
@@ -32,6 +31,7 @@ import au.com.shiftyjelly.pocketcasts.ui.extensions.getThemeColor
 import au.com.shiftyjelly.pocketcasts.ui.helper.ColorUtils
 import au.com.shiftyjelly.pocketcasts.utils.extensions.dpToPx
 import au.com.shiftyjelly.pocketcasts.views.swipe.SwipeAction
+import au.com.shiftyjelly.pocketcasts.views.swipe.SwipeRowActions
 import au.com.shiftyjelly.pocketcasts.views.swipe.SwipeRowLayout
 import io.reactivex.Observable
 import io.reactivex.android.schedulers.AndroidSchedulers
@@ -50,6 +50,7 @@ class EpisodeAvailableViewHolder(
     private val binding: AdapterEpisodeAvailableBinding,
     private val playlistType: Playlist.Type,
     private val imageRequestFactory: PocketCastsImageRequestFactory,
+    private val swipeRowActionsFactory: SwipeRowActions.Factory,
     private val downloadProgressUpdates: Observable<DownloadProgressUpdate>,
     private val playbackStateUpdates: Observable<PlaybackState>,
     private val upNextChangesObservable: Observable<UpNextQueue.State>,
@@ -82,7 +83,6 @@ class EpisodeAvailableViewHolder(
     private val episode get() = requireNotNull(episodeWrapper).episode
     private var isMultiSelectEnabled = false
     private var streamByDefault = false
-    private var upNextAction = Settings.UpNextAction.PLAY_NEXT
 
     init {
         binding.progressCircle.setColor(primaryText02Tint)
@@ -114,7 +114,6 @@ class EpisodeAvailableViewHolder(
         isSelected: Boolean,
         useEpisodeArtwork: Boolean,
         streamByDefault: Boolean,
-        upNextAction: Settings.UpNextAction,
     ) {
         if (episodeWrapper.uuid != this.episodeWrapper?.uuid) {
             swipeLayout.clearTranslation()
@@ -122,7 +121,6 @@ class EpisodeAvailableViewHolder(
         this.episodeWrapper = episodeWrapper
         this.isMultiSelectEnabled = isMultiSelectEnabled
         this.streamByDefault = streamByDefault
-        this.upNextAction = upNextAction
 
         if (isMultiSelectEnabled) {
             swipeLayout.clearTranslation()
@@ -139,7 +137,7 @@ class EpisodeAvailableViewHolder(
         bindDate()
         bindStatus(downloadProgress = 0)
         bindContentDescription(isInUpNext = false)
-        bindSwipeActions(isInUpNext = false)
+        bindSwipeActions()
         bindGreyedOutColors()
         bindBackgroundColor(isSelected)
         bindAutoTransition(isSelected)
@@ -315,32 +313,14 @@ class EpisodeAvailableViewHolder(
         } else {
             bindStatus(downloadProgress = data.downloadProgress)
         }
-        bindSwipeActions(isInUpNext = data.isInUpNext)
+        bindSwipeActions()
         bindContentDescription(isInUpNext = data.isInUpNext)
     }
 
-    private fun bindSwipeActions(isInUpNext: Boolean) {
-        if (playlistType == Playlist.Type.Manual) {
-            swipeLayout.setRtl1State(SwipeAction.RemoveFromPlaylist)
-            swipeLayout.setRtl2State(if (episode.isArchived) SwipeAction.Unarchive else SwipeAction.Archive)
-            swipeLayout.setRtl3State(SwipeAction.Share)
-        } else {
-            swipeLayout.setRtl1State(if (episode.isArchived) SwipeAction.Unarchive else SwipeAction.Archive)
-            swipeLayout.setRtl2State(SwipeAction.Share)
-            swipeLayout.setRtl3State(null)
-        }
-
-        if (isInUpNext) {
-            swipeLayout.setLtr1State(SwipeAction.RemoveFromUpNext)
-            swipeLayout.setLtr2State(null)
-        } else {
-            val (upNext1, upNext2) = when (upNextAction) {
-                Settings.UpNextAction.PLAY_NEXT -> SwipeAction.AddToUpNextTop to SwipeAction.AddToUpNextBottom
-                Settings.UpNextAction.PLAY_LAST -> SwipeAction.AddToUpNextBottom to SwipeAction.AddToUpNextTop
-            }
-            swipeLayout.setLtr1State(upNext1)
-            swipeLayout.setLtr2State(upNext2)
-        }
+    private fun bindSwipeActions() {
+        swipeRowActionsFactory
+            .availablePlaylistEpisode(playlistType, episode)
+            .applyTo(swipeLayout)
     }
 
     private fun createObservableData(): Observable<ObservableData> {
