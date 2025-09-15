@@ -8,10 +8,14 @@ class DelayedAction(
     private val view: View,
     private val delay: Duration,
     private val action: Runnable,
+    private val onDetach: () -> Unit,
 ) {
     fun run() {
         view.postDelayed(action, delay.inWholeMilliseconds)
-        view.doOnDetach { view.removeCallbacks(action) }
+        view.doOnDetach {
+            cancel()
+            onDetach()
+        }
     }
 
     fun cancel() {
@@ -19,6 +23,10 @@ class DelayedAction(
     }
 }
 
-fun View.runDelayedAction(delay: Duration, action: Runnable): DelayedAction {
-    return DelayedAction(this, delay, action).also(DelayedAction::run)
+fun View.runDelayedAction(
+    delay: Duration,
+    onDetach: () -> Unit = {},
+    action: Runnable,
+): DelayedAction {
+    return DelayedAction(this, delay, action, onDetach).also(DelayedAction::run)
 }

@@ -241,24 +241,34 @@ class SwipeRowLayout<T : SwipeButton.UiState> @JvmOverloads constructor(
                 val primaryButton = section.button1
                 primaryButton.callOnSwipeActionListeners()
                 swipedAction?.cancel()
-                swipedAction = runDelayedAction(350.milliseconds) {
-                    primaryButton.elevation = 1f
-                    swipeableView.translationX = 0f
-                    section.button2.translationX = width.toFloat()
-                    section.button3.translationX = width.toFloat()
+                swipedAction = runDelayedAction(
+                    0.milliseconds,
+                    action = {
+                        primaryButton.elevation = 1f
+                        swipeableView.translationX = 0f
+                        section.button2.translationX = width.toFloat()
+                        section.button3.translationX = width.toFloat()
 
-                    primaryButton
-                        .spring(DynamicAnimation.ALPHA)
-                        .doOnEnd { _, isCancelled, _, _ ->
-                            primaryButton.elevation = 0f
-                            primaryButton.alpha = 1f
-                            if (!isCancelled) {
-                                isLocked = false
-                                setTranslation(0f, useHapticFeedback = false)
+                        primaryButton
+                            .spring(DynamicAnimation.ALPHA)
+                            .doOnEnd { _, isCancelled, _, _ ->
+                                primaryButton.elevation = 0f
+                                primaryButton.alpha = 1f
+                                if (!isCancelled) {
+                                    isLocked = false
+                                    setTranslation(0f, useHapticFeedback = false)
+                                }
                             }
+                            .animateToFinalPosition(0f)
+                    },
+                    onDetach = {
+                        primaryButton.elevation = 0f
+                        swipeableView.translationX = 0f
+                        section.forEach { button ->
+                            button.translationX = width.toFloat()
                         }
-                        .animateToFinalPosition(0f)
-                }
+                    },
+                )
             } else {
                 isLocked = false
             }
