@@ -321,7 +321,7 @@ class EpisodeAvailableViewHolder(
 
     private fun bindSwipeActions(isInUpNext: Boolean) {
         if (playlistType == Playlist.Type.Manual) {
-            swipeLayout.setRtl1State(SwipeAction.Remove)
+            swipeLayout.setRtl1State(SwipeAction.RemoveFromPlaylist)
             swipeLayout.setRtl2State(if (episode.isArchived) SwipeAction.Unarchive else SwipeAction.Archive)
             swipeLayout.setRtl3State(SwipeAction.Share)
         } else {

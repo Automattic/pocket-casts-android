@@ -14,7 +14,7 @@ enum class SwipeAction : SwipeButton.UiState {
     Share,
     Archive,
     Unarchive,
-    Remove,
+    RemoveFromPlaylist,
     ;
 
     override fun contentDescription(context: Context) = when (this) {
@@ -24,7 +24,7 @@ enum class SwipeAction : SwipeButton.UiState {
         Share -> context.getString(LR.string.share)
         Archive -> context.getString(LR.string.archive)
         Unarchive -> context.getString(LR.string.unarchive)
-        Remove -> context.getString(LR.string.remove_from_playlist)
+        RemoveFromPlaylist -> context.getString(LR.string.remove_from_playlist)
     }
 
     override fun backgroundTint(context: Context): Int {
@@ -35,7 +35,7 @@ enum class SwipeAction : SwipeButton.UiState {
             Share -> UR.attr.support_01
             Archive -> UR.attr.support_06
             Unarchive -> UR.attr.support_06
-            Remove -> UR.attr.support_05
+            RemoveFromPlaylist -> UR.attr.support_05
         }
         return context.getThemeColor(id)
     }
@@ -49,6 +49,6 @@ enum class SwipeAction : SwipeButton.UiState {
         Share -> IR.drawable.ic_share
         Archive -> IR.drawable.ic_archive
         Unarchive -> IR.drawable.ic_unarchive
-        Remove -> IR.drawable.ic_delete
+        RemoveFromPlaylist -> IR.drawable.ic_delete
     }
 }

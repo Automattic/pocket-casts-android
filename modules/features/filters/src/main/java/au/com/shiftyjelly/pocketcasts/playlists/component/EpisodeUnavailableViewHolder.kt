@@ -30,7 +30,7 @@ class EpisodeUnavailableViewHolder(
             onRowClick(requireNotNull(episodeWrapper))
             swipeLayout.settle()
         }
-        swipeLayout.setRtl1State(SwipeAction.Remove)
+        swipeLayout.setRtl1State(SwipeAction.RemoveFromPlaylist)
         swipeLayout.addOnSwipeActionListener { action -> onSwipeAction(requireNotNull(episodeWrapper), action) }
     }
 
