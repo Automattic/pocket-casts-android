@@ -263,10 +263,7 @@ class SwipeRowLayout<T : SwipeButton.UiState> @JvmOverloads constructor(
                     },
                     onDetach = {
                         primaryButton.elevation = 0f
-                        swipeableView.translationX = 0f
-                        section.forEach { button ->
-                            button.translationX = width.toFloat()
-                        }
+                        clearTranslation()
                     },
                 )
             } else {
