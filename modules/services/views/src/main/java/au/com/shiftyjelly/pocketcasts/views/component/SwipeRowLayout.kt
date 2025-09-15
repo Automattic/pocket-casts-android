@@ -137,13 +137,7 @@ class SwipeRowLayout<T : SwipeButton.UiState> @JvmOverloads constructor(
         swipeHandler.clear()
         swipedAction?.cancel()
         swipedAction = null
-
-        swipeableView.cancelSpring(DynamicAnimation.TRANSLATION_X)
-        swipeButtons.ltrSection.button1.cancelSpring(DynamicAnimation.ALPHA)
-        swipeButtons.rtlSection.button1.cancelSpring(DynamicAnimation.ALPHA)
-        swipeButtons.ltrSection.button1.innerContainer.cancelSpring(DynamicAnimation.TRANSLATION_X)
-        swipeButtons.rtlSection.button1.innerContainer.cancelSpring(DynamicAnimation.TRANSLATION_X)
-
+        cancelSprings()
         isSwipedThresholdReached = false
         isLocked = false
         setTranslation(0f, useHapticFeedback = false)
@@ -331,6 +325,14 @@ class SwipeRowLayout<T : SwipeButton.UiState> @JvmOverloads constructor(
             0f
         }
     }
+
+    private fun cancelSprings() {
+        swipeableView.cancelSpring(DynamicAnimation.TRANSLATION_X)
+        swipeButtons.forEach { button ->
+            button.cancelSpring(DynamicAnimation.ALPHA)
+            button.innerContainer.cancelSpring(DynamicAnimation.TRANSLATION_X)
+        }
+    }
 }
 
 private enum class SwipeDirection {
@@ -340,7 +342,7 @@ private enum class SwipeDirection {
 }
 
 private class SwipeButtons<T : SwipeButton.UiState>(
-    private val binding: SwipeRowLayoutBinding,
+    binding: SwipeRowLayoutBinding,
 ) : Iterable<SwipeButton<T>> {
     val ltrSection = Section(
         button1 = binding.leftToRightButton1.typed(),
