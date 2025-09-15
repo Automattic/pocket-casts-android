@@ -71,7 +71,7 @@ class SwipeRowLayout<T : SwipeButton.UiState> @JvmOverloads constructor(
 
     private val swipedThresholdMargin = 24.dpToPx(context).toFloat()
 
-    private val minSwipedThreshold = 180.dpToPx(context).toFloat()
+    private val minSwipedThreshold = 200.dpToPx(context).toFloat()
 
     private var swipedAction: DelayedAction? = null
 
