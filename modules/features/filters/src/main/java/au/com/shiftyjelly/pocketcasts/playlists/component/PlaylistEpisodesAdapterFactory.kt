@@ -21,11 +21,13 @@ import au.com.shiftyjelly.pocketcasts.repositories.download.DownloadManager
 import au.com.shiftyjelly.pocketcasts.repositories.images.PocketCastsImageRequestFactory
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.repositories.playback.UpNextQueue
+import au.com.shiftyjelly.pocketcasts.repositories.playlist.Playlist
 import au.com.shiftyjelly.pocketcasts.ui.extensions.themed
 import au.com.shiftyjelly.pocketcasts.views.helper.HasBackstack
 import au.com.shiftyjelly.pocketcasts.views.multiselect.MultiSelectEpisodesHelper
 import au.com.shiftyjelly.pocketcasts.views.multiselect.MultiSelectHelper
 import au.com.shiftyjelly.pocketcasts.views.multiselect.MultiSelectToolbar
+import au.com.shiftyjelly.pocketcasts.views.swipe.SwipeAction
 import dagger.hilt.android.scopes.FragmentScoped
 import java.util.Date
 import javax.inject.Inject
@@ -55,8 +57,10 @@ class PlaylistEpisodesAdapterFactory @Inject constructor(
     }
 
     fun create(
+        playlistType: Playlist.Type,
         multiSelectToolbar: MultiSelectToolbar,
         getEpisodes: () -> List<PlaylistEpisode>,
+        onSwipeAction: (PlaylistEpisode, SwipeAction) -> Unit,
     ): PlaylistEpisodeAdapter {
         lateinit var adapter: PlaylistEpisodeAdapter
         configureDependencies(
@@ -68,6 +72,7 @@ class PlaylistEpisodesAdapterFactory @Inject constructor(
         val childFragmentManager = fragment.childFragmentManager
 
         adapter = PlaylistEpisodeAdapter(
+            playlistType = playlistType,
             bookmarkManager = bookmarkManager,
             downloadManager = downloadManager,
             playbackManager = playbackManager,
@@ -89,6 +94,7 @@ class PlaylistEpisodesAdapterFactory @Inject constructor(
                     }
                 }
             },
+            onSwipeAction = onSwipeAction,
             playButtonListener = playButtonListener,
             imageRequestFactory = PocketCastsImageRequestFactory(fragment.requireContext()).themed().smallSize(),
             multiSelectHelper = multiSelectHelper,

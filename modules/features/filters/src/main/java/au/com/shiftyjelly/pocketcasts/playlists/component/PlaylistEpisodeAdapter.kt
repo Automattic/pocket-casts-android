@@ -12,7 +12,6 @@ import au.com.shiftyjelly.pocketcasts.filters.databinding.AdapterEpisodeAvailabl
 import au.com.shiftyjelly.pocketcasts.filters.databinding.AdapterEpisodeUnavailableBinding
 import au.com.shiftyjelly.pocketcasts.models.to.PlaylistEpisode
 import au.com.shiftyjelly.pocketcasts.podcasts.view.components.PlayButton
-import au.com.shiftyjelly.pocketcasts.podcasts.view.podcast.EpisodeViewHolder
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.preferences.model.ArtworkConfiguration
 import au.com.shiftyjelly.pocketcasts.preferences.model.BookmarksSortTypeForProfile
@@ -21,17 +20,21 @@ import au.com.shiftyjelly.pocketcasts.repositories.download.DownloadManager
 import au.com.shiftyjelly.pocketcasts.repositories.images.PocketCastsImageRequestFactory
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.repositories.playback.UpNextQueue
+import au.com.shiftyjelly.pocketcasts.repositories.playlist.Playlist
 import au.com.shiftyjelly.pocketcasts.views.multiselect.MultiSelectEpisodesHelper
+import au.com.shiftyjelly.pocketcasts.views.swipe.SwipeAction
 import java.util.UUID
 import kotlinx.coroutines.rx2.asObservable
 
 class PlaylistEpisodeAdapter(
+    private val playlistType: Playlist.Type,
     private val bookmarkManager: BookmarkManager,
     private val downloadManager: DownloadManager,
     private val playbackManager: PlaybackManager,
     private val upNextQueue: UpNextQueue,
     private val settings: Settings,
     private val onRowClick: (PlaylistEpisode) -> Unit,
+    private val onSwipeAction: (PlaylistEpisode, SwipeAction) -> Unit,
     private val playButtonListener: PlayButton.OnClickListener,
     private val imageRequestFactory: PocketCastsImageRequestFactory,
     private val multiSelectHelper: MultiSelectEpisodesHelper,
@@ -53,6 +56,7 @@ class PlaylistEpisodeAdapter(
                 val binding = AdapterEpisodeAvailableBinding.inflate(inflater, parent, false)
                 EpisodeAvailableViewHolder(
                     binding = binding,
+                    playlistType = playlistType,
                     imageRequestFactory = imageRequestFactory,
                     downloadProgressUpdates = downloadManager.progressUpdateRelay,
                     playbackStateUpdates = playbackManager.playbackStateRelay,
@@ -72,6 +76,7 @@ class PlaylistEpisodeAdapter(
                         @SuppressLint("NotifyDataSetChanged")
                         notifyDataSetChanged()
                     },
+                    onSwipeAction = onSwipeAction,
                 )
             }
 
@@ -79,6 +84,7 @@ class PlaylistEpisodeAdapter(
                 binding = AdapterEpisodeUnavailableBinding.inflate(inflater, parent, false),
                 imageRequestFactory = imageRequestFactory,
                 onRowClick = onRowClick,
+                onSwipeAction = onSwipeAction,
             )
 
             else -> throw IllegalStateException("Unknown playable type")
@@ -99,11 +105,15 @@ class PlaylistEpisodeAdapter(
             isSelected = multiSelectHelper.isSelected(item.episode),
             useEpisodeArtwork = settings.artworkConfiguration.value.useEpisodeArtwork(ArtworkConfiguration.Element.Filters),
             streamByDefault = settings.streamingMode.value,
+            upNextAction = settings.upNextSwipe.value,
         )
     }
 
     private fun bindUnavailableEpisodeViewHolder(holder: EpisodeUnavailableViewHolder, item: PlaylistEpisode.Unavailable) {
-        holder.bind(episodeWrapper = item)
+        holder.bind(
+            episodeWrapper = item,
+            isMultiSelectEnabled = multiSelectHelper.isMultiSelecting,
+        )
     }
 
     override fun onViewRecycled(holder: RecyclerView.ViewHolder) {

@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<au.com.shiftyjelly.pocketcasts.views.swipe.SwipeRowLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
@@ -9,7 +9,6 @@
         android:id="@+id/episodeRow"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:alpha="0.4"
         android:background="?attr/primary_ui_02"
         android:clickable="true"
         android:focusable="true"
@@ -23,9 +22,10 @@
             android:layout_marginStart="16dp"
             android:layout_marginTop="12dp"
             android:layout_marginBottom="12dp"
+            android:alpha="0.4"
             android:importantForAccessibility="noHideDescendants"
             app:cardCornerRadius="4dp"
-            app:cardElevation="2dp"
+            app:cardElevation="0dp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent">
@@ -46,6 +46,7 @@
             android:layout_marginHorizontal="16dp"
             android:layout_marginTop="12dp"
             android:layout_weight="1"
+            android:alpha="0.4"
             android:textAllCaps="true"
             app:layout_constraintBottom_toTopOf="@+id/titleLabel"
             app:layout_constraintEnd_toEndOf="parent"
@@ -58,6 +59,7 @@
             style="?attr/textSubtitle1"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
+            android:alpha="0.4"
             android:ellipsize="end"
             android:maxLines="2"
             app:layout_constraintBottom_toTopOf="@+id/unavailableLabel"
@@ -72,6 +74,7 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginBottom="12dp"
+            android:alpha="0.4"
             android:ellipsize="end"
             android:maxLines="1"
             android:text="@string/unavailable"
@@ -90,4 +93,4 @@
             app:layout_constraintStart_toStartOf="parent" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
-</FrameLayout>
+</au.com.shiftyjelly.pocketcasts.views.swipe.SwipeRowLayout>

@@ -21,6 +21,8 @@
     <string name="playing_bookmark">Playing \"%s\"</string>
     <string name="skipping_to">Skipping to %s</string>
     <string name="add_to_up_next">Add to Up Next</string>
+    <string name="add_to_up_next_top">Add to Up Next top</string>
+    <string name="add_to_up_next_bottom">Add to Up Next bottom</string>
     <string name="add_to_up_next_question">Add to up next?</string>
     <string name="archive">Archive</string>
     <string name="unarchive">Unarchive</string>
@@ -83,6 +85,7 @@
     <string name="played">Played</string>
     <string name="podcast_and_episode">Podcast &amp; Episode</string>
     <string name="remove_from_up_next">Remove from Up Next</string>
+    <string name="remove_from_playlist">Remove from playlist</string>
     <string name="renew_your_subscription">Renew your Subscription</string>
     <string name="removed">Removed</string>
     <string name="restore">Restore</string>

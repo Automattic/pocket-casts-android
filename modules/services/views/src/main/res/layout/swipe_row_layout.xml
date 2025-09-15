@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<merge xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <au.com.shiftyjelly.pocketcasts.views.swipe.SwipeButton
+        android:id="@+id/leftToRightButton3"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        app:imageGravity="right" />
+
+    <au.com.shiftyjelly.pocketcasts.views.swipe.SwipeButton
+        android:id="@+id/leftToRightButton2"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        app:imageGravity="right" />
+
+    <au.com.shiftyjelly.pocketcasts.views.swipe.SwipeButton
+        android:id="@+id/leftToRightButton1"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        app:imageGravity="right" />
+
+    <au.com.shiftyjelly.pocketcasts.views.swipe.SwipeButton
+        android:id="@+id/rightToLeftButton3"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        app:imageGravity="left" />
+
+    <au.com.shiftyjelly.pocketcasts.views.swipe.SwipeButton
+        android:id="@+id/rightToLeftButton2"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        app:imageGravity="left" />
+
+    <au.com.shiftyjelly.pocketcasts.views.swipe.SwipeButton
+        android:id="@+id/rightToLeftButton1"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        app:imageGravity="left" />
+
+</merge>
