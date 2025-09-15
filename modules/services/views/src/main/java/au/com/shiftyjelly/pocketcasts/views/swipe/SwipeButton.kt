@@ -1,4 +1,4 @@
-package au.com.shiftyjelly.pocketcasts.views.component
+package au.com.shiftyjelly.pocketcasts.views.swipe
 
 import android.annotation.SuppressLint
 import android.content.Context

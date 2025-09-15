@@ -1,4 +1,4 @@
-package au.com.shiftyjelly.pocketcasts.views.component
+package au.com.shiftyjelly.pocketcasts.views.swipe
 
 import android.annotation.SuppressLint
 import android.content.Context
@@ -16,9 +16,6 @@ import androidx.core.view.doOnLayout
 import androidx.dynamicanimation.animation.DynamicAnimation
 import androidx.dynamicanimation.animation.SpringForce
 import au.com.shiftyjelly.pocketcasts.utils.extensions.dpToPx
-import au.com.shiftyjelly.pocketcasts.views.component.SwipeDirection.LeftToRight
-import au.com.shiftyjelly.pocketcasts.views.component.SwipeDirection.None
-import au.com.shiftyjelly.pocketcasts.views.component.SwipeDirection.RightToLeft
 import au.com.shiftyjelly.pocketcasts.views.databinding.SwipeRowLayoutBinding
 import au.com.shiftyjelly.pocketcasts.views.extensions.cancelSpring
 import au.com.shiftyjelly.pocketcasts.views.extensions.doOnEnd
@@ -26,6 +23,9 @@ import au.com.shiftyjelly.pocketcasts.views.extensions.doOnUpdate
 import au.com.shiftyjelly.pocketcasts.views.extensions.spring
 import au.com.shiftyjelly.pocketcasts.views.helper.DelayedAction
 import au.com.shiftyjelly.pocketcasts.views.helper.runDelayedAction
+import au.com.shiftyjelly.pocketcasts.views.swipe.SwipeDirection.LeftToRight
+import au.com.shiftyjelly.pocketcasts.views.swipe.SwipeDirection.None
+import au.com.shiftyjelly.pocketcasts.views.swipe.SwipeDirection.RightToLeft
 import kotlin.math.abs
 import kotlin.math.absoluteValue
 import kotlin.math.roundToInt
