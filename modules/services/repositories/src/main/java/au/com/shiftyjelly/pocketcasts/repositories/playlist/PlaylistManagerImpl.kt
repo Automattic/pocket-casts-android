@@ -312,7 +312,8 @@ class PlaylistManagerImpl(
 
     override suspend fun addManualEpisode(playlistUuid: String, episodeUuid: String): Boolean {
         return appDatabase.withTransaction {
-            val episodeUuids = playlistDao.getManualPlaylistEpisodeUuids(playlistUuid)
+            val episodes = playlistDao.getManualPlaylistEpisodes(playlistUuid)
+            val episodeUuids = episodes.map(ManualPlaylistEpisode::episodeUuid)
             if (episodeUuid in episodeUuids) {
                 return@withTransaction true
             }
@@ -327,21 +328,20 @@ class PlaylistManagerImpl(
             }
 
             val podcast = podcastDao.findPodcastByUuid(podcastEpisode.podcastUuid)
-            playlistDao.upsertManualEpisode(
-                ManualPlaylistEpisode(
-                    playlistUuid = playlistUuid,
-                    episodeUuid = episodeUuid,
-                    podcastUuid = podcastEpisode.podcastUuid,
-                    title = podcastEpisode.title,
-                    addedAt = clock.instant(),
-                    publishedAt = podcastEpisode.publishedDate.toInstant(),
-                    downloadUrl = podcastEpisode.downloadUrl,
-                    episodeSlug = podcastEpisode.slug,
-                    podcastSlug = podcast?.slug.orEmpty(),
-                    sortPosition = episodeUuids.size,
-                    isSynced = false,
-                ),
+            val newEpisode = ManualPlaylistEpisode(
+                playlistUuid = playlistUuid,
+                episodeUuid = episodeUuid,
+                podcastUuid = podcastEpisode.podcastUuid,
+                title = podcastEpisode.title,
+                addedAt = clock.instant(),
+                publishedAt = podcastEpisode.publishedDate.toInstant(),
+                downloadUrl = podcastEpisode.downloadUrl,
+                episodeSlug = podcastEpisode.slug,
+                podcastSlug = podcast?.slug.orEmpty(),
+                sortPosition = episodes.lastOrNull()?.sortPosition?.plus(1) ?: 0,
+                isSynced = false,
             )
+            playlistDao.upsertManualEpisode(newEpisode)
             playlistDao.markPlaylistAsNotSynced(playlistUuid)
             true
         }

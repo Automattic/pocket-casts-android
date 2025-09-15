@@ -536,6 +536,44 @@ class PlaylistManagerManualTest {
     }
 
     @Test
+    fun fixSortOrderWhenAddingEpisodes() = dsl.test {
+        insertManualPlaylist(index = 0)
+        insertPodcast(index = 0)
+        repeat(4) { index ->
+            insertPodcastEpisode(index = index, podcastIndex = 0)
+            insertPodcastEpisode(index = index, podcastIndex = 1)
+        }
+
+        manager.addManualEpisode("playlist-id-0", "episode-id-0")
+        manager.addManualEpisode("playlist-id-0", "episode-id-1")
+        manager.addManualEpisode("playlist-id-0", "episode-id-2")
+        manager.deleteManualEpisode("playlist-id-0", "episode-id-1")
+
+        manager.addManualEpisode("playlist-id-0", "episode-id-3")
+        expectManualEpisodes(
+            playlistIndex = 0,
+            manualPlaylistEpisode(index = 0, podcastIndex = 0, playlistIndex = 0) {
+                it.copy(
+                    sortPosition = 0,
+                    isSynced = false,
+                )
+            },
+            manualPlaylistEpisode(index = 2, podcastIndex = 0, playlistIndex = 0) {
+                it.copy(
+                    sortPosition = 2,
+                    isSynced = false,
+                )
+            },
+            manualPlaylistEpisode(index = 3, podcastIndex = 0, playlistIndex = 0) {
+                it.copy(
+                    sortPosition = 3,
+                    isSynced = false,
+                )
+            },
+        )
+    }
+
+    @Test
     fun doNotAddUnavailableEpisodes() = dsl.test {
         insertManualPlaylist(index = 0)
         insertPodcast(index = 0)
