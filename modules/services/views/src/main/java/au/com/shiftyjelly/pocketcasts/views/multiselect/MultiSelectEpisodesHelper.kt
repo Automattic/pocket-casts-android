@@ -504,4 +504,8 @@ class MultiSelectEpisodesHelper @Inject constructor(
         playbackManager.playEpisodesLast(episodes = list, source = source)
         closeMultiSelect()
     }
+
+    companion object {
+        const val MULTI_SELECT_TOGGLE_PAYLOAD = "multi-select-toggle"
+    }
 }

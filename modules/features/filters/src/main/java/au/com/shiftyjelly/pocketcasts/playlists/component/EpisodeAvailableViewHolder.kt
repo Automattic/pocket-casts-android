@@ -3,12 +3,10 @@ package au.com.shiftyjelly.pocketcasts.playlists.component
 import android.content.res.ColorStateList
 import android.transition.AutoTransition
 import android.transition.TransitionManager
+import android.view.View
 import androidx.annotation.DrawableRes
-import androidx.constraintlayout.widget.ConstraintLayout
-import androidx.core.view.isInvisible
+import androidx.constraintlayout.widget.ConstraintSet
 import androidx.core.view.isVisible
-import androidx.core.view.marginLeft
-import androidx.core.view.updateLayoutParams
 import androidx.core.widget.ImageViewCompat
 import androidx.recyclerview.widget.RecyclerView
 import au.com.shiftyjelly.pocketcasts.filters.databinding.AdapterEpisodeAvailableBinding
@@ -103,7 +101,7 @@ class EpisodeAvailableViewHolder(
             binding.episodeRow.performClick()
         }
         binding.checkbox.setOnCheckedChangeListener { _, isChecked ->
-            bindBackgroundColor(isChecked)
+            bindSelectedRow(isChecked)
         }
         swipeLayout.addOnSwipeActionListener { action -> onSwipeAction(requireNotNull(episodeWrapper), action) }
     }
@@ -114,6 +112,7 @@ class EpisodeAvailableViewHolder(
         isSelected: Boolean,
         useEpisodeArtwork: Boolean,
         streamByDefault: Boolean,
+        animateMultiSelection: Boolean,
     ) {
         if (episodeWrapper.uuid != this.episodeWrapper?.uuid) {
             swipeLayout.clearTranslation()
@@ -141,12 +140,13 @@ class EpisodeAvailableViewHolder(
         bindContentDescription(isInUpNext = false)
         bindSwipeActions()
         bindGreyedOutColors()
-        bindBackgroundColor(isSelected)
-        bindAutoTransition(isSelected)
+        bindSelectedRow(isSelected)
+        bindMultiSelection(animateMultiSelection)
     }
 
     fun unbind() {
         disposable.clear()
+        binding.episodeRow.handler?.removeCallbacksAndMessages(null)
     }
 
     private fun bindPlaybackButton(streamByDefault: Boolean) {
@@ -267,8 +267,9 @@ class EpisodeAvailableViewHolder(
         }.joinToString(separator = ". ", postfix = ".")
     }
 
-    private fun bindBackgroundColor(isChecked: Boolean) {
-        binding.episodeRow.setBackgroundColor(if (isMultiSelectEnabled && isChecked) primaryUi02SelectedTint else primaryUi02Tint)
+    private fun bindSelectedRow(isSelected: Boolean) {
+        binding.checkbox.isChecked = isSelected
+        binding.episodeRow.setBackgroundColor(if (isMultiSelectEnabled && isSelected) primaryUi02SelectedTint else primaryUi02Tint)
     }
 
     private fun bindGreyedOutColors() {
@@ -283,21 +284,24 @@ class EpisodeAvailableViewHolder(
         binding.imgIcon.alpha = if (isGreyedOut) 0.5f else 1f
     }
 
-    private fun bindAutoTransition(isSelected: Boolean) {
-        val transition = AutoTransition()
-        transition.duration = 100
-        TransitionManager.beginDelayedTransition(binding.episodeRow, transition)
-        binding.episodeRow
-        binding.checkbox.isVisible = isMultiSelectEnabled
-        binding.checkbox.isChecked = isSelected
+    private fun bindMultiSelection(shouldAnimate: Boolean) {
+        if (binding.checkbox.isVisible != isMultiSelectEnabled) {
+            val constraintSet = ConstraintSet()
+            constraintSet.clone(binding.episodeRow)
+            constraintSet.setVisibility(binding.checkbox.id, if (isMultiSelectEnabled) View.VISIBLE else View.GONE)
+            constraintSet.setVisibility(binding.playButton.id, if (isMultiSelectEnabled) View.GONE else View.VISIBLE)
 
-        binding.playButton.isInvisible = isMultiSelectEnabled
-        binding.playButton.updateLayoutParams<ConstraintLayout.LayoutParams> {
-            rightMargin = if (isMultiSelectEnabled) -binding.checkbox.marginLeft else 0.dpToPx(context)
-            width = if (isMultiSelectEnabled) 16.dpToPx(context) else 52.dpToPx(context)
+            if (shouldAnimate) {
+                binding.episodeRow.post {
+                    val transition = AutoTransition().setDuration(100)
+                    TransitionManager.beginDelayedTransition(binding.episodeRow, transition)
+                    constraintSet.applyTo(binding.episodeRow)
+                }
+            } else {
+                TransitionManager.endTransitions(binding.episodeRow)
+                constraintSet.applyTo(binding.episodeRow)
+            }
         }
-
-        TransitionManager.endTransitions(binding.episodeRow)
     }
 
     private fun bindObservableData(data: ObservableData) {

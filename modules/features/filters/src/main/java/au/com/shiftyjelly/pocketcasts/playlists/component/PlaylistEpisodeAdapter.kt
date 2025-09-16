@@ -22,10 +22,12 @@ import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.repositories.playback.UpNextQueue
 import au.com.shiftyjelly.pocketcasts.repositories.playlist.Playlist
 import au.com.shiftyjelly.pocketcasts.views.multiselect.MultiSelectEpisodesHelper
+import au.com.shiftyjelly.pocketcasts.views.multiselect.MultiSelectEpisodesHelper.Companion.MULTI_SELECT_TOGGLE_PAYLOAD
 import au.com.shiftyjelly.pocketcasts.views.swipe.SwipeAction
 import au.com.shiftyjelly.pocketcasts.views.swipe.SwipeRowActions
 import java.util.UUID
 import kotlinx.coroutines.rx2.asObservable
+import timber.log.Timber
 
 class PlaylistEpisodeAdapter(
     private val playlistType: Playlist.Type,
@@ -76,8 +78,6 @@ class PlaylistEpisodeAdapter(
                     },
                     onRowLongClick = { episodeWrapper ->
                         multiSelectHelper.defaultLongPress(episodeWrapper.episode, fragmentManager)
-                        @SuppressLint("NotifyDataSetChanged")
-                        notifyDataSetChanged()
                     },
                     onSwipeAction = onSwipeAction,
                 )
@@ -97,18 +97,44 @@ class PlaylistEpisodeAdapter(
 
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
         when (val item = getItem(position)) {
-            is PlaylistEpisode.Available -> bindEpisodeViewHolder(holder as EpisodeAvailableViewHolder, item)
-            is PlaylistEpisode.Unavailable -> bindUnavailableEpisodeViewHolder(holder as EpisodeUnavailableViewHolder, item)
+            is PlaylistEpisode.Available -> {
+                val episodeHolder = holder as EpisodeAvailableViewHolder
+                bindEpisodeViewHolder(episodeHolder, item, animateMultiSelection = false)
+            }
+
+            is PlaylistEpisode.Unavailable -> {
+                val episodeHolder = holder as EpisodeUnavailableViewHolder
+                bindUnavailableEpisodeViewHolder(episodeHolder, item)
+            }
         }
     }
 
-    private fun bindEpisodeViewHolder(holder: EpisodeAvailableViewHolder, item: PlaylistEpisode.Available) {
+    override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int, payloads: List<Any?>) {
+        when (val item = getItem(position)) {
+            is PlaylistEpisode.Available -> {
+                val episodeHolder = holder as EpisodeAvailableViewHolder
+                bindEpisodeViewHolder(episodeHolder, item, animateMultiSelection = MULTI_SELECT_TOGGLE_PAYLOAD in payloads)
+            }
+
+            is PlaylistEpisode.Unavailable -> {
+                val episodeHolder = holder as EpisodeUnavailableViewHolder
+                bindUnavailableEpisodeViewHolder(episodeHolder, item)
+            }
+        }
+    }
+
+    private fun bindEpisodeViewHolder(
+        holder: EpisodeAvailableViewHolder,
+        item: PlaylistEpisode.Available,
+        animateMultiSelection: Boolean,
+    ) {
         holder.bind(
             episodeWrapper = item,
             isMultiSelectEnabled = multiSelectHelper.isMultiSelecting,
             isSelected = multiSelectHelper.isSelected(item.episode),
             useEpisodeArtwork = settings.artworkConfiguration.value.useEpisodeArtwork(ArtworkConfiguration.Element.Filters),
             streamByDefault = settings.streamingMode.value,
+            animateMultiSelection = animateMultiSelection,
         )
     }
 
