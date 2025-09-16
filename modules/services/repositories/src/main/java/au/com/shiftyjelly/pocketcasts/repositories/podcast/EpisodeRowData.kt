@@ -69,7 +69,7 @@ class EpisodeRowDataProvider @Inject constructor(
             is PodcastEpisode -> Observable.just(0)
             is UserEpisode -> {
                 val relay = BehaviorRelay.create<Float>()
-                return relay
+                relay
                     .doOnSubscribe { UploadProgressManager.observeUploadProgress(episode.uuid, relay) }
                     .doOnDispose { UploadProgressManager.stopObservingUpload(episode.uuid, relay) }
                     .map { (it * 100).roundToInt() }
