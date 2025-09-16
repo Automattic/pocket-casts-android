@@ -113,6 +113,7 @@ abstract class BaseEpisodeViewHolder<T : Any>(
 
         observeRowData()
         bindArtwork(useEpisodeArtwork)
+        bindPlaybackButton()
         bindTitle()
         bindDate()
         bindStatus(downloadProgress = 0)
@@ -154,7 +155,7 @@ abstract class BaseEpisodeViewHolder<T : Any>(
         disposable.clear()
         disposable += rowDataProvider.episodeRowDataObservable(episode.uuid).subscribeBy(onNext = { data ->
             episode.playing = data.playbackState.isPlaying && data.playbackState.episodeUuid == episode.uuid
-            bindPlaybackButton(streamByDefault)
+            bindPlaybackButton()
 
             binding.imgUpNext.isVisible = data.isInUpNext
             binding.imgBookmark.isVisible = data.hasBookmarks
@@ -296,7 +297,7 @@ abstract class BaseEpisodeViewHolder<T : Any>(
         actions.applyTo(swipeLayout)
     }
 
-    private fun bindPlaybackButton(streamByDefault: Boolean) {
+    private fun bindPlaybackButton() {
         val buttonType = PlayButton.calculateButtonType(episode, streamByDefault)
         binding.playButton.setButtonType(episode, buttonType, tint, fromListUuid = fromListUuid)
     }
