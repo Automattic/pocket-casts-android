@@ -119,14 +119,16 @@ class EpisodeAvailableViewHolder(
             swipeLayout.clearTranslation()
         }
         this.episodeWrapper = episodeWrapper
-        this.isMultiSelectEnabled = isMultiSelectEnabled
         this.streamByDefault = streamByDefault
 
-        if (isMultiSelectEnabled) {
-            swipeLayout.clearTranslation()
-            swipeLayout.lock()
-        } else {
-            swipeLayout.unlock()
+        if (this.isMultiSelectEnabled != isMultiSelectEnabled) {
+            this.isMultiSelectEnabled = isMultiSelectEnabled
+            if (isMultiSelectEnabled) {
+                swipeLayout.clearTranslation()
+                swipeLayout.lock()
+            } else {
+                swipeLayout.unlock()
+            }
         }
 
         disposable.clear()
