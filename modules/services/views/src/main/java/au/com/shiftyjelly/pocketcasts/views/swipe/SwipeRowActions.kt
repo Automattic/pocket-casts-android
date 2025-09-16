@@ -23,6 +23,10 @@ data class SwipeRowActions(
         swipeLayout.setRtl3State(rtl3)
     }
 
+    companion object {
+        val Empty = SwipeRowActions()
+    }
+
     class Factory @Inject constructor(
         private val settings: Settings,
         private val queue: UpNextQueue,
@@ -57,6 +61,23 @@ data class SwipeRowActions(
                     rtl2 = SwipeAction.Share
                 }
             }
+        }
+
+        fun podcastEpisode(
+            episode: PodcastEpisode,
+        ) = buildSwipeRowActions {
+            val isInUpNext = queue.contains(episode.uuid)
+
+            if (isInUpNext) {
+                ltr1 = SwipeAction.RemoveFromUpNext
+            } else {
+                val (upNext1, upNext2) = settings.upNextSwipe.value.toSwipeActions()
+                ltr1 = upNext1
+                ltr2 = upNext2
+            }
+
+            rtl1 = episode.archiveSwipeAction()
+            rtl2 = SwipeAction.Share
         }
     }
 }

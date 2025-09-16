@@ -211,4 +211,84 @@ class SwipeRowActionsFactoryTest {
             factory.availablePlaylistEpisode(Playlist.Type.Manual, unarchivedEpisode),
         )
     }
+
+    @Test
+    fun `podcast episode`() {
+        val archivedEpisode = PodcastEpisode(
+            isArchived = true,
+            uuid = "",
+            publishedDate = Date(),
+        )
+        val unarchivedEpisode = PodcastEpisode(
+            isArchived = false,
+            uuid = "",
+            publishedDate = Date(),
+        )
+
+        isEpisodeInUpNext = false
+        upNextAction = Settings.UpNextAction.PLAY_NEXT
+        assertEquals(
+            "archived, play next",
+            SwipeRowActions(
+                ltr1 = SwipeAction.AddToUpNextTop,
+                ltr2 = SwipeAction.AddToUpNextBottom,
+                rtl1 = SwipeAction.Unarchive,
+                rtl2 = SwipeAction.Share,
+            ),
+            factory.podcastEpisode(archivedEpisode),
+        )
+        assertEquals(
+            "unarchived, play next",
+            SwipeRowActions(
+                ltr1 = SwipeAction.AddToUpNextTop,
+                ltr2 = SwipeAction.AddToUpNextBottom,
+                rtl1 = SwipeAction.Archive,
+                rtl2 = SwipeAction.Share,
+            ),
+            factory.podcastEpisode(unarchivedEpisode),
+        )
+
+        isEpisodeInUpNext = false
+        upNextAction = Settings.UpNextAction.PLAY_LAST
+        assertEquals(
+            "archived, play last",
+            SwipeRowActions(
+                ltr1 = SwipeAction.AddToUpNextBottom,
+                ltr2 = SwipeAction.AddToUpNextTop,
+                rtl1 = SwipeAction.Unarchive,
+                rtl2 = SwipeAction.Share,
+            ),
+            factory.podcastEpisode(archivedEpisode),
+        )
+        assertEquals(
+            "unarchived, play last",
+            SwipeRowActions(
+                ltr1 = SwipeAction.AddToUpNextBottom,
+                ltr2 = SwipeAction.AddToUpNextTop,
+                rtl1 = SwipeAction.Archive,
+                rtl2 = SwipeAction.Share,
+            ),
+            factory.podcastEpisode(unarchivedEpisode),
+        )
+
+        isEpisodeInUpNext = true
+        assertEquals(
+            "archived, in queue",
+            SwipeRowActions(
+                ltr1 = SwipeAction.RemoveFromUpNext,
+                rtl1 = SwipeAction.Unarchive,
+                rtl2 = SwipeAction.Share,
+            ),
+            factory.podcastEpisode(archivedEpisode),
+        )
+        assertEquals(
+            "unarchived, in queue",
+            SwipeRowActions(
+                ltr1 = SwipeAction.RemoveFromUpNext,
+                rtl1 = SwipeAction.Archive,
+                rtl2 = SwipeAction.Share,
+            ),
+            factory.podcastEpisode(unarchivedEpisode),
+        )
+    }
 }
