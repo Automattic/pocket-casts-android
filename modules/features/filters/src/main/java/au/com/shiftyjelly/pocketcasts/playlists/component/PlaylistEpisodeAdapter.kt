@@ -104,10 +104,7 @@ class PlaylistEpisodeAdapter(
                 bindEpisodeViewHolder(episodeHolder, item, animateMultiSelection = MULTI_SELECT_TOGGLE_PAYLOAD in payloads)
             }
 
-            is PlaylistEpisode.Unavailable -> {
-                val episodeHolder = holder as EpisodeUnavailableViewHolder
-                bindUnavailableEpisodeViewHolder(episodeHolder, item)
-            }
+            else -> super.onBindViewHolder(holder, position, payloads)
         }
     }
 

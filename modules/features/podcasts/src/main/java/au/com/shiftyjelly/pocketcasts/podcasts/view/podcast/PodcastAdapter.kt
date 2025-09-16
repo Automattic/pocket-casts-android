@@ -55,18 +55,17 @@ import au.com.shiftyjelly.pocketcasts.podcasts.viewmodel.PodcastViewModel.Podcas
 import au.com.shiftyjelly.pocketcasts.podcasts.viewmodel.podcast.RecommendationsResult
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.preferences.model.ArtworkConfiguration.Element
-import au.com.shiftyjelly.pocketcasts.repositories.download.DownloadManager
 import au.com.shiftyjelly.pocketcasts.repositories.images.PocketCastsImageRequestFactory
-import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
-import au.com.shiftyjelly.pocketcasts.repositories.playback.UpNextQueue
+import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeRowDataProvider
 import au.com.shiftyjelly.pocketcasts.servers.model.DiscoverPodcast
 import au.com.shiftyjelly.pocketcasts.ui.extensions.themed
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.ui.theme.ThemeColor
-import au.com.shiftyjelly.pocketcasts.views.helper.SwipeButtonLayoutFactory
 import au.com.shiftyjelly.pocketcasts.views.multiselect.MultiSelectBookmarksHelper
 import au.com.shiftyjelly.pocketcasts.views.multiselect.MultiSelectEpisodesHelper
-import io.reactivex.Observable
+import au.com.shiftyjelly.pocketcasts.views.multiselect.MultiSelectEpisodesHelper.Companion.MULTI_SELECT_TOGGLE_PAYLOAD
+import au.com.shiftyjelly.pocketcasts.views.swipe.SwipeAction
+import au.com.shiftyjelly.pocketcasts.views.swipe.SwipeRowActions
 import io.reactivex.disposables.CompositeDisposable
 import java.util.Date
 import au.com.shiftyjelly.pocketcasts.images.R as IR
@@ -112,12 +111,10 @@ class PodcastAdapter(
     var fromListUuid: String?,
     private val headerType: HeaderType,
     private val context: Context,
-    private val downloadManager: DownloadManager,
-    private val playbackManager: PlaybackManager,
-    private val upNextQueue: UpNextQueue,
+    private val rowDataProvider: EpisodeRowDataProvider,
     private val settings: Settings,
+    private val swipeRowActionsFactory: SwipeRowActions.Factory,
     private val theme: Theme,
-    private val podcastBookmarksObservable: Observable<List<Bookmark>>,
     private val onHeaderSummaryToggled: (Boolean, Boolean) -> Unit,
     private val onSubscribeClicked: () -> Unit,
     private val onUnsubscribeClicked: (successCallback: () -> Unit) -> Unit,
@@ -126,7 +123,6 @@ class PodcastAdapter(
     private val onEpisodeRowLongPress: (PodcastEpisode) -> Unit,
     private val onBookmarkRowLongPress: (Bookmark) -> Unit,
     private val onFoldersClicked: () -> Unit,
-    private val onPodcastDescriptionClicked: () -> Unit,
     private val onNotificationsClicked: (Podcast, Boolean) -> Unit,
     private val onDonateClicked: (Uri?) -> Unit,
     private val onSettingsClicked: () -> Unit,
@@ -139,7 +135,6 @@ class PodcastAdapter(
     private val multiSelectBookmarksHelper: MultiSelectBookmarksHelper,
     private val onArtworkLongClicked: (successCallback: () -> Unit) -> Unit,
     private val ratingsViewModel: PodcastRatingsViewModel,
-    private val swipeButtonLayoutFactory: SwipeButtonLayoutFactory,
     private val onTabClicked: (PodcastTab) -> Unit,
     private val onBookmarkPlayClicked: (Bookmark) -> Unit,
     private val onHeadsetSettingsClicked: () -> Unit,
@@ -155,6 +150,7 @@ class PodcastAdapter(
     private val onPodrollHeaderClicked: () -> Unit,
     private val onPodrollPodcastClicked: (String) -> Unit,
     private val onPodrollPodcastSubscribeClicked: (String) -> Unit,
+    private val onSwipeAction: (PodcastEpisode, SwipeAction) -> Unit,
 ) : LargeListAdapter<Any, RecyclerView.ViewHolder>(1500, differ) {
 
     data class EpisodeLimitRow(val episodeLimit: Int)
@@ -199,9 +195,11 @@ class PodcastAdapter(
         val title: String,
         val onClick: (() -> Unit)? = null,
     )
+
     data class PaddingRow(
         val padding: Dp,
     )
+
     object LoadingRow
 
     data class RecommendedPodcast(
@@ -297,21 +295,27 @@ class PodcastAdapter(
             VIEW_TYPE_DIVIDER_SUBTITLE -> DividerSubTitleViewHolder(ComposeView(parent.context), theme)
             VIEW_TYPE_PADDING_ROW -> PaddingViewHolder(ComposeView(parent.context))
             VIEW_TYPE_LOADING_ROW -> LoadingViewHolder(ComposeView(parent.context), theme)
-            else -> EpisodeViewHolder(
-                binding = AdapterEpisodeBinding.inflate(inflater, parent, false),
-                viewMode = if (settings.artworkConfiguration.value.useEpisodeArtwork(Element.Podcasts)) {
-                    EpisodeViewHolder.ViewMode.Artwork
-                } else {
-                    EpisodeViewHolder.ViewMode.NoArtwork
-                },
-                downloadProgressUpdates = downloadManager.progressUpdateRelay,
-                playbackStateUpdates = playbackManager.playbackStateRelay,
-                upNextChangesObservable = upNextQueue.changesObservable,
-                imageRequestFactory = imageRequestFactory.smallSize(),
-                settings = settings,
-                swipeButtonLayoutFactory = swipeButtonLayoutFactory,
-                artworkContext = Element.Podcasts,
-            )
+            else -> {
+                val binding = AdapterEpisodeBinding.inflate(inflater, parent, false)
+                EpisodeViewHolder(
+                    binding = binding,
+                    showArtwork = settings.artworkConfiguration.value.useEpisodeArtwork(Element.Podcasts),
+                    fromListUuid = null,
+                    imageRequestFactory = imageRequestFactory,
+                    swipeRowActionsFactory = swipeRowActionsFactory,
+                    rowDataProvider = rowDataProvider,
+                    playButtonListener = playButtonListener,
+                    onRowClick = { episode ->
+                        if (multiSelectEpisodesHelper.isMultiSelecting) {
+                            binding.checkbox.isChecked = multiSelectEpisodesHelper.toggle(episode)
+                        } else {
+                            onRowClicked(episode)
+                        }
+                    },
+                    onRowLongClick = onEpisodeRowLongPress,
+                    onSwipeAction = onSwipeAction,
+                )
+            }
         }
     }
 
@@ -325,7 +329,7 @@ class PodcastAdapter(
                 signInState,
             )
 
-            is EpisodeViewHolder -> bindEpisodeViewHolder(holder, position, fromListUuid)
+            is EpisodeViewHolder -> bindEpisodeViewHolder(holder, position, animateMultiSelection = false)
             is TabsViewHolder -> holder.bind(getItem(position) as TabsHeader)
             is EpisodeHeaderViewHolder -> bindingEpisodeHeaderViewHolder(holder, position)
             is EpisodeLimitViewHolder -> bindEpisodeLimitRow(holder, position)
@@ -338,6 +342,13 @@ class PodcastAdapter(
             is DividerSubTitleViewHolder -> holder.bind(getItem(position) as DividerSubTitleRow)
             is PaddingViewHolder -> holder.bind(getItem(position) as PaddingRow)
             is LoadingViewHolder -> holder.bind()
+        }
+    }
+
+    override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int, payloads: List<Any?>) {
+        when (holder) {
+            is EpisodeViewHolder -> bindEpisodeViewHolder(holder, position, animateMultiSelection = MULTI_SELECT_TOGGLE_PAYLOAD in payloads)
+            else -> super.onBindViewHolder(holder, position, payloads)
         }
     }
 
@@ -375,32 +386,20 @@ class PodcastAdapter(
         holder.binding.btnArchived.setOnClickListener { onShowArchivedClicked() }
     }
 
-    private fun bindEpisodeViewHolder(holder: EpisodeViewHolder, position: Int, fromListUuid: String?) {
+    private fun bindEpisodeViewHolder(
+        holder: EpisodeViewHolder,
+        position: Int,
+        animateMultiSelection: Boolean,
+    ) {
         val episode = getItem(position) as? PodcastEpisode ?: return
-        holder.setup(
-            episode = episode,
-            fromListUuid = fromListUuid,
-            tintColor = ThemeColor.podcastIcon02(theme.activeTheme, tintColor),
-            playButtonListener = playButtonListener,
-            streamByDefault = settings.streamingMode.value || castConnected,
-            upNextAction = settings.upNextSwipe.value,
-            multiSelectEnabled = multiSelectEpisodesHelper.isMultiSelecting,
+        holder.bind(
+            item = episode,
+            isMultiSelectEnabled = multiSelectEpisodesHelper.isMultiSelecting,
             isSelected = multiSelectEpisodesHelper.isSelected(episode),
-            disposables = disposables,
-            bookmarksObservable = podcastBookmarksObservable,
-            bookmarksAvailable = bookmarksAvailable,
+            useEpisodeArtwork = settings.artworkConfiguration.value.useEpisodeArtwork(Element.Podcasts),
+            streamByDefault = settings.streamingMode.value,
+            animateMultiSelection = animateMultiSelection,
         )
-        holder.episodeRow.setOnClickListener {
-            if (multiSelectEpisodesHelper.isMultiSelecting) {
-                holder.binding.checkbox.isChecked = multiSelectEpisodesHelper.toggle(episode)
-            } else {
-                onRowClicked(episode)
-            }
-        }
-        holder.episodeRow.setOnLongClickListener {
-            onEpisodeRowLongPress(episode)
-            true
-        }
     }
 
     private fun bindEpisodeLimitRow(holder: EpisodeLimitViewHolder, position: Int) {
@@ -617,6 +616,7 @@ class PodcastAdapter(
                     add(LoadingRow)
                     add(PaddingRow(12.dp))
                 }
+
                 is RecommendationsResult.Empty -> {
                     val resources = context.resources
                     add(
@@ -628,6 +628,7 @@ class PodcastAdapter(
                         ),
                     )
                 }
+
                 is RecommendationsResult.Success -> {
                     val resources = context.resources
                     val list = result.listFeed
@@ -732,7 +733,7 @@ class PodcastAdapter(
     override fun onViewRecycled(holder: RecyclerView.ViewHolder) {
         super.onViewRecycled(holder)
         if (holder is EpisodeViewHolder) {
-            holder.clearObservers()
+            holder.unbind()
         }
     }
 

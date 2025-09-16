@@ -37,11 +37,11 @@ import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.preferences.model.ArtworkConfiguration.Element
 import au.com.shiftyjelly.pocketcasts.preferences.model.AutoPlaySource
 import au.com.shiftyjelly.pocketcasts.repositories.bookmark.BookmarkManager
-import au.com.shiftyjelly.pocketcasts.repositories.chromecast.CastManager
 import au.com.shiftyjelly.pocketcasts.repositories.download.DownloadManager
 import au.com.shiftyjelly.pocketcasts.repositories.images.PocketCastsImageRequestFactory
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.repositories.playback.UpNextQueue
+import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeRowDataProvider
 import au.com.shiftyjelly.pocketcasts.ui.extensions.getColor
 import au.com.shiftyjelly.pocketcasts.ui.extensions.getStringForDuration
 import au.com.shiftyjelly.pocketcasts.ui.extensions.themed
@@ -60,8 +60,13 @@ import au.com.shiftyjelly.pocketcasts.views.helper.SwipeButtonLayoutViewModel
 import au.com.shiftyjelly.pocketcasts.views.helper.ToolbarColors
 import au.com.shiftyjelly.pocketcasts.views.multiselect.MultiSelectEpisodesHelper
 import au.com.shiftyjelly.pocketcasts.views.multiselect.MultiSelectHelper
+import au.com.shiftyjelly.pocketcasts.views.swipe.SwipeActionViewModel
+import au.com.shiftyjelly.pocketcasts.views.swipe.SwipeRowActions
+import au.com.shiftyjelly.pocketcasts.views.swipe.SwipeSource
+import au.com.shiftyjelly.pocketcasts.views.swipe.handleAction
 import com.google.android.material.chip.Chip
 import dagger.hilt.android.AndroidEntryPoint
+import dagger.hilt.android.lifecycle.withCreationCallback
 import javax.inject.Inject
 import kotlinx.coroutines.launch
 import au.com.shiftyjelly.pocketcasts.images.R as IR
@@ -91,6 +96,13 @@ class FilterEpisodeListFragment : BaseFragment() {
     private val viewModel by viewModels<FilterEpisodeListViewModel>()
     private val episodeListBookmarkViewModel by viewModels<EpisodeListBookmarkViewModel>()
     private val swipeButtonLayoutViewModel: SwipeButtonLayoutViewModel by viewModels()
+    private val swipeActionViewModel by viewModels<SwipeActionViewModel>(
+        extrasProducer = {
+            defaultViewModelCreationExtras.withCreationCallback<SwipeActionViewModel.Factory> { factory ->
+                factory.create(SwipeSource.Filters, playlistUuid = null)
+            }
+        },
+    )
 
     @Inject lateinit var downloadManager: DownloadManager
 
@@ -100,8 +112,6 @@ class FilterEpisodeListFragment : BaseFragment() {
 
     @Inject lateinit var settings: Settings
 
-    @Inject lateinit var castManager: CastManager
-
     @Inject lateinit var upNextQueue: UpNextQueue
 
     @Inject lateinit var multiSelectHelper: MultiSelectEpisodesHelper
@@ -109,10 +119,16 @@ class FilterEpisodeListFragment : BaseFragment() {
     @Inject lateinit var analyticsTracker: AnalyticsTracker
 
     @Inject lateinit var bookmarkManager: BookmarkManager
+
+    @Inject lateinit var swipeRowActionsFactory: SwipeRowActions.Factory
+
+    @Inject lateinit var rowDataProvider: EpisodeRowDataProvider
+
     private lateinit var imageRequestFactory: PocketCastsImageRequestFactory
 
     private val adapter: EpisodeListAdapter by lazy {
         EpisodeListAdapter(
+            rowDataProvider = rowDataProvider,
             bookmarkManager = bookmarkManager,
             downloadManager = downloadManager,
             playbackManager = playbackManager,
@@ -121,6 +137,7 @@ class FilterEpisodeListFragment : BaseFragment() {
             onRowClick = this::onRowClick,
             playButtonListener = playButtonListener,
             imageRequestFactory = imageRequestFactory,
+            swipeRowActionsFactory = swipeRowActionsFactory,
             multiSelectHelper = multiSelectHelper,
             fragmentManager = childFragmentManager,
             swipeButtonLayoutFactory = SwipeButtonLayoutFactory(
@@ -131,6 +148,11 @@ class FilterEpisodeListFragment : BaseFragment() {
                 swipeSource = EpisodeItemTouchHelper.SwipeSource.FILTERS,
             ),
             artworkContext = Element.Filters,
+            onSwipeAction = { episode, swipeAction ->
+                viewLifecycleOwner.lifecycleScope.launch {
+                    swipeActionViewModel.handleAction(swipeAction, episode.uuid, childFragmentManager)
+                }
+            },
         )
     }
 
