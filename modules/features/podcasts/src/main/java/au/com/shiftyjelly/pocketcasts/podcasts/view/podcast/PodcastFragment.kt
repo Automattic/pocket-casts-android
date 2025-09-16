@@ -42,7 +42,6 @@ import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.analytics.discoverListPodcastSubscribed
 import au.com.shiftyjelly.pocketcasts.compose.AppTheme
 import au.com.shiftyjelly.pocketcasts.localization.extensions.getStringPlural
-import au.com.shiftyjelly.pocketcasts.models.entity.BaseEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.Bookmark
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
@@ -87,8 +86,6 @@ import au.com.shiftyjelly.pocketcasts.views.dialog.ConfirmationDialog
 import au.com.shiftyjelly.pocketcasts.views.dialog.OptionsDialog
 import au.com.shiftyjelly.pocketcasts.views.extensions.smoothScrollToTop
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseFragment
-import au.com.shiftyjelly.pocketcasts.views.helper.EpisodeItemSwipeState
-import au.com.shiftyjelly.pocketcasts.views.helper.EpisodeItemTouchHelper
 import au.com.shiftyjelly.pocketcasts.views.helper.UiUtil
 import au.com.shiftyjelly.pocketcasts.views.multiselect.MultiSelectBookmarksHelper.NavigationState
 import au.com.shiftyjelly.pocketcasts.views.multiselect.MultiSelectEpisodesHelper.Companion.MULTI_SELECT_TOGGLE_PAYLOAD
@@ -198,7 +195,6 @@ class PodcastFragment : BaseFragment() {
         HeaderType.Scrim
     }
 
-    private var itemTouchHelper: EpisodeItemTouchHelper? = null
     private var adapter: PodcastAdapter? = null
 
     private var currentSnackBar: Snackbar? = null
@@ -820,17 +816,6 @@ class PodcastFragment : BaseFragment() {
             it.addOnScrollListener(onScrollListener)
         }
 
-        itemTouchHelper = EpisodeItemTouchHelper(
-            onSwipeStateChanged = { state ->
-                when (state) {
-                    EpisodeItemSwipeState.SWIPING -> binding.swipeRefreshLayout.isEnabled = false
-                    EpisodeItemSwipeState.IDLE -> binding.swipeRefreshLayout.isEnabled = true
-                }
-            },
-        ).apply {
-            attachToRecyclerView(binding.episodesRecyclerView)
-        }
-
         binding.btnRetry.setOnClickListener {
             loadData()
         }
@@ -999,19 +984,6 @@ class PodcastFragment : BaseFragment() {
         }
     }
 
-    private fun notifyItemChanged(
-        @Suppress("UNUSED_PARAMETER") episode: BaseEpisode,
-        index: Int,
-    ) {
-        binding?.episodesRecyclerView?.let { recyclerView ->
-            recyclerView.findViewHolderForAdapterPosition(index)?.let {
-                itemTouchHelper?.clearView(recyclerView, it)
-            }
-        }
-
-        adapter?.notifyItemChanged(index)
-    }
-
     private fun loadData() {
         LogBuffer.i(LogBuffer.TAG_BACKGROUND_TASKS, "Loading podcast page for $podcastUuid")
         viewModel.loadPodcast(podcastUuid, resources)
@@ -1170,7 +1142,6 @@ class PodcastFragment : BaseFragment() {
 
     override fun onDestroyView() {
         binding?.episodesRecyclerView?.adapter = null
-        itemTouchHelper = null
 
         viewModel.multiSelectEpisodesHelper.cleanup()
         viewModel.multiSelectBookmarksHelper.cleanup()
