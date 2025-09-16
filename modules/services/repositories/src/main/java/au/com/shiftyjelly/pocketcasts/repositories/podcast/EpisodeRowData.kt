@@ -1,6 +1,8 @@
 package au.com.shiftyjelly.pocketcasts.repositories.podcast
 
 import au.com.shiftyjelly.pocketcasts.models.entity.BaseEpisode
+import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
+import au.com.shiftyjelly.pocketcasts.models.entity.UserEpisode
 import au.com.shiftyjelly.pocketcasts.models.type.Subscription
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.bookmark.BookmarkManager
@@ -63,14 +65,19 @@ class EpisodeRowDataProvider @Inject constructor(
     }
 
     private fun uploadProgressObservable(episode: BaseEpisode): Observable<Int> {
-        val relay = BehaviorRelay.create<Float>()
-        return relay
-            .doOnSubscribe { UploadProgressManager.observeUploadProgress(episode.uuid, relay) }
-            .doOnDispose { UploadProgressManager.stopObservingUpload(episode.uuid, relay) }
-            .map { (it * 100).roundToInt() }
-            .throttleLatest(1, TimeUnit.SECONDS)
-            .startWith(0)
-            .distinctUntilChanged()
+        return when (episode) {
+            is PodcastEpisode -> Observable.just(0)
+            is UserEpisode -> {
+                val relay = BehaviorRelay.create<Float>()
+                return relay
+                    .doOnSubscribe { UploadProgressManager.observeUploadProgress(episode.uuid, relay) }
+                    .doOnDispose { UploadProgressManager.stopObservingUpload(episode.uuid, relay) }
+                    .map { (it * 100).roundToInt() }
+                    .throttleLatest(1, TimeUnit.SECONDS)
+                    .startWith(0)
+                    .distinctUntilChanged()
+            }
+        }
     }
 
     private fun playbackStatusObservable(episode: BaseEpisode): Observable<PlaybackState> {
