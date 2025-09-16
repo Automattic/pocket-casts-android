@@ -32,15 +32,10 @@ import au.com.shiftyjelly.pocketcasts.models.type.PlaylistEpisodeSortType
 import au.com.shiftyjelly.pocketcasts.podcasts.view.components.PlayButton
 import au.com.shiftyjelly.pocketcasts.podcasts.view.episode.EpisodeContainerFragment
 import au.com.shiftyjelly.pocketcasts.podcasts.view.podcast.EpisodeListAdapter
-import au.com.shiftyjelly.pocketcasts.podcasts.viewmodel.EpisodeListBookmarkViewModel
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.preferences.model.ArtworkConfiguration.Element
 import au.com.shiftyjelly.pocketcasts.preferences.model.AutoPlaySource
-import au.com.shiftyjelly.pocketcasts.repositories.bookmark.BookmarkManager
-import au.com.shiftyjelly.pocketcasts.repositories.download.DownloadManager
 import au.com.shiftyjelly.pocketcasts.repositories.images.PocketCastsImageRequestFactory
-import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
-import au.com.shiftyjelly.pocketcasts.repositories.playback.UpNextQueue
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeRowDataProvider
 import au.com.shiftyjelly.pocketcasts.ui.extensions.getColor
 import au.com.shiftyjelly.pocketcasts.ui.extensions.getStringForDuration
@@ -55,8 +50,6 @@ import au.com.shiftyjelly.pocketcasts.views.fragments.BaseFragment
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseFragmentToolbar.ChromeCastButton.Shown
 import au.com.shiftyjelly.pocketcasts.views.helper.EpisodeItemTouchHelper
 import au.com.shiftyjelly.pocketcasts.views.helper.NavigationIcon.BackArrow
-import au.com.shiftyjelly.pocketcasts.views.helper.SwipeButtonLayoutFactory
-import au.com.shiftyjelly.pocketcasts.views.helper.SwipeButtonLayoutViewModel
 import au.com.shiftyjelly.pocketcasts.views.helper.ToolbarColors
 import au.com.shiftyjelly.pocketcasts.views.multiselect.MultiSelectEpisodesHelper
 import au.com.shiftyjelly.pocketcasts.views.multiselect.MultiSelectEpisodesHelper.Companion.MULTI_SELECT_TOGGLE_PAYLOAD
@@ -95,8 +88,6 @@ class FilterEpisodeListFragment : BaseFragment() {
     }
 
     private val viewModel by viewModels<FilterEpisodeListViewModel>()
-    private val episodeListBookmarkViewModel by viewModels<EpisodeListBookmarkViewModel>()
-    private val swipeButtonLayoutViewModel: SwipeButtonLayoutViewModel by viewModels()
     private val swipeActionViewModel by viewModels<SwipeActionViewModel>(
         extrasProducer = {
             defaultViewModelCreationExtras.withCreationCallback<SwipeActionViewModel.Factory> { factory ->
@@ -105,21 +96,13 @@ class FilterEpisodeListFragment : BaseFragment() {
         },
     )
 
-    @Inject lateinit var downloadManager: DownloadManager
-
-    @Inject lateinit var playbackManager: PlaybackManager
-
     @Inject lateinit var playButtonListener: PlayButton.OnClickListener
 
     @Inject lateinit var settings: Settings
 
-    @Inject lateinit var upNextQueue: UpNextQueue
-
     @Inject lateinit var multiSelectHelper: MultiSelectEpisodesHelper
 
     @Inject lateinit var analyticsTracker: AnalyticsTracker
-
-    @Inject lateinit var bookmarkManager: BookmarkManager
 
     @Inject lateinit var swipeRowActionsFactory: SwipeRowActions.Factory
 
@@ -130,10 +113,6 @@ class FilterEpisodeListFragment : BaseFragment() {
     private val adapter: EpisodeListAdapter by lazy {
         EpisodeListAdapter(
             rowDataProvider = rowDataProvider,
-            bookmarkManager = bookmarkManager,
-            downloadManager = downloadManager,
-            playbackManager = playbackManager,
-            upNextQueue = upNextQueue,
             settings = settings,
             onRowClick = this::onRowClick,
             playButtonListener = playButtonListener,
@@ -141,13 +120,6 @@ class FilterEpisodeListFragment : BaseFragment() {
             swipeRowActionsFactory = swipeRowActionsFactory,
             multiSelectHelper = multiSelectHelper,
             fragmentManager = childFragmentManager,
-            swipeButtonLayoutFactory = SwipeButtonLayoutFactory(
-                swipeButtonLayoutViewModel = swipeButtonLayoutViewModel,
-                onItemUpdated = this::lazyNotifyAdapterChanged,
-                defaultUpNextSwipeAction = { settings.upNextSwipe.value },
-                fragmentManager = parentFragmentManager,
-                swipeSource = EpisodeItemTouchHelper.SwipeSource.FILTERS,
-            ),
             artworkContext = Element.Filters,
             onSwipeAction = { episode, swipeAction ->
                 viewLifecycleOwner.lifecycleScope.launch {
@@ -176,15 +148,6 @@ class FilterEpisodeListFragment : BaseFragment() {
         imageRequestFactory = PocketCastsImageRequestFactory(context).themed().smallSize()
 
         playButtonListener.source = SourceView.FILTERS
-    }
-
-    // Cannot call notify.notifyItemChanged directly because the compiler gets confused
-    // when the adapter's constructor includes references to the adapter
-    private fun lazyNotifyAdapterChanged(
-        @Suppress("UNUSED_PARAMETER") episode: BaseEpisode,
-        index: Int,
-    ) {
-        adapter.notifyItemChanged(index)
     }
 
     override fun onSaveInstanceState(outState: Bundle) {
@@ -310,15 +273,6 @@ class FilterEpisodeListFragment : BaseFragment() {
                 clearSelectedFilter()
                 @Suppress("DEPRECATION")
                 activity?.onBackPressed()
-            }
-        }
-
-        viewLifecycleOwner.lifecycleScope.launch {
-            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
-                episodeListBookmarkViewModel.stateFlow.collect {
-                    adapter.setBookmarksAvailable(it.isBookmarkFeatureAvailable)
-                    adapter.notifyDataSetChanged()
-                }
             }
         }
 

@@ -45,16 +45,20 @@ import au.com.shiftyjelly.pocketcasts.utils.Util
 import au.com.shiftyjelly.pocketcasts.utils.combineLatest
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import dagger.hilt.android.qualifiers.ApplicationContext
-import io.reactivex.subjects.ReplaySubject
-import io.reactivex.subjects.Subject
 import java.util.UUID
-import java.util.concurrent.TimeUnit
 import javax.inject.Inject
+import javax.inject.Singleton
 import kotlin.coroutines.CoroutineContext
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.mapNotNull
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.sync.Mutex
@@ -63,6 +67,7 @@ import kotlinx.coroutines.withContext
 import timber.log.Timber
 import au.com.shiftyjelly.pocketcasts.images.R as IR
 
+@Singleton
 class DownloadManagerImpl @Inject constructor(
     private val fileStorage: FileStorage,
     private val settings: Settings,
@@ -91,8 +96,19 @@ class DownloadManagerImpl @Inject constructor(
     private val downloadingQueue = ArrayList<DownloadingInfo>()
     private val downloadsCoroutineContext = Dispatchers.Default
 
-    override val progressUpdates: MutableMap<String, DownloadProgressUpdate> = mutableMapOf()
-    override val progressUpdateRelay: Subject<DownloadProgressUpdate> = ReplaySubject.createWithSize(20)
+    private val downloadProgress = MutableStateFlow(mapOf<String, DownloadProgressUpdate>())
+
+    override fun updateEpisodeDownloadProgress(episodeUuid: String, progress: DownloadProgressUpdate) {
+        downloadProgress.update { it + (episodeUuid to progress) }
+    }
+
+    override fun episodeDownloadProgressFlow(episodeUuid: String): Flow<DownloadProgressUpdate> {
+        return downloadProgress.mapNotNull { it[episodeUuid] }
+    }
+
+    fun removeEpisodeDownloadProgress(episodeUuid: String) {
+        downloadProgress.update { it - episodeUuid }
+    }
 
     private var workManagerListener: LiveData<Pair<List<WorkInfo>, Map<String?, String>>>? = null
 
@@ -104,16 +120,17 @@ class DownloadManagerImpl @Inject constructor(
         this.smartPlaylistManager = smartPlaylistManager
         this.playbackManager = playbackManager
 
-        progressUpdateRelay
-            .sample(MIN_TIME_BETWEEN_UPDATE_REPORTS, TimeUnit.MILLISECONDS)
-            .doOnNext { updateNotification() }
-            .subscribe()
+        launch {
+            while (true) {
+                delay(MIN_TIME_BETWEEN_UPDATE_REPORTS)
+                updateNotification()
+            }
+        }
     }
 
     private fun updateProgress(downloadProgressUpdate: DownloadProgressUpdate) {
         launch(Dispatchers.Main) {
-            progressUpdates[downloadProgressUpdate.episodeUuid] = downloadProgressUpdate
-            progressUpdateRelay.toSerialized().onNext(downloadProgressUpdate)
+            updateEpisodeDownloadProgress(downloadProgressUpdate.episodeUuid, downloadProgressUpdate)
         }
     }
 
@@ -451,7 +468,7 @@ class DownloadManagerImpl @Inject constructor(
     private fun stopDownloadingJob(info: DownloadingInfo) {
         WorkManager.getInstance(context).cancelWorkById(info.jobId)
         WorkManager.getInstance(context).cancelAllWorkByTag(info.episodeUUID)
-        progressUpdates.remove(info.episodeUUID)
+        removeEpisodeDownloadProgress(info.episodeUUID)
     }
 
     private suspend fun episodeDidDownload(result: DownloadResult) = withContext(downloadsCoroutineContext) {
@@ -459,7 +476,7 @@ class DownloadManagerImpl @Inject constructor(
 
         try {
             pendingQueue.remove(result.episodeUuid)
-            progressUpdates.remove(result.episodeUuid)
+            removeEpisodeDownloadProgress(result.episodeUuid)
             if (episode == null) {
                 removeDownloadingEpisode(result.episodeUuid)
                 return@withContext
@@ -522,7 +539,7 @@ class DownloadManagerImpl @Inject constructor(
                 }
             }
 
-            progressUpdates.remove(episodeUuid)
+            removeEpisodeDownloadProgress(episodeUuid)
         }
     }
 
@@ -566,7 +583,7 @@ class DownloadManagerImpl @Inject constructor(
                 }
 
                 for (task in downloadingQueue) {
-                    progressUpdates[task.episodeUUID]?.let { downloadProgress ->
+                    downloadProgress.value[task.episodeUUID]?.let { downloadProgress ->
                         val (_, _, _, _, downloadedSoFar, totalToDownload) = downloadProgress
                         progress += downloadedSoFar.toDouble()
                         max += totalToDownload.toDouble()

@@ -1,276 +1,217 @@
 package au.com.shiftyjelly.pocketcasts.podcasts.view.podcast
 
-import android.content.Context
 import android.transition.AutoTransition
 import android.transition.TransitionManager
 import android.view.View
-import android.view.ViewGroup
-import android.widget.ImageView
-import androidx.constraintlayout.widget.ConstraintLayout
-import androidx.core.transition.doOnEnd
+import androidx.annotation.ColorInt
+import androidx.constraintlayout.widget.ConstraintSet
 import androidx.core.view.isVisible
-import androidx.core.view.marginLeft
-import androidx.core.view.updateLayoutParams
 import androidx.recyclerview.widget.RecyclerView
 import au.com.shiftyjelly.pocketcasts.localization.helper.RelativeDateFormatter
-import au.com.shiftyjelly.pocketcasts.models.entity.BaseEpisode
-import au.com.shiftyjelly.pocketcasts.models.entity.Bookmark
 import au.com.shiftyjelly.pocketcasts.models.entity.UserEpisode
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodePlayingStatus
 import au.com.shiftyjelly.pocketcasts.podcasts.databinding.AdapterUserEpisodeBinding
 import au.com.shiftyjelly.pocketcasts.podcasts.view.components.PlayButton
-import au.com.shiftyjelly.pocketcasts.preferences.Settings
-import au.com.shiftyjelly.pocketcasts.preferences.model.ArtworkConfiguration
-import au.com.shiftyjelly.pocketcasts.repositories.download.DownloadProgressUpdate
 import au.com.shiftyjelly.pocketcasts.repositories.extensions.getSummaryText
 import au.com.shiftyjelly.pocketcasts.repositories.images.PocketCastsImageRequestFactory
 import au.com.shiftyjelly.pocketcasts.repositories.images.loadInto
-import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackState
-import au.com.shiftyjelly.pocketcasts.repositories.playback.UpNextQueue
-import au.com.shiftyjelly.pocketcasts.repositories.playback.containsUuid
-import au.com.shiftyjelly.pocketcasts.repositories.podcast.UploadProgressManager
+import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeRowDataProvider
 import au.com.shiftyjelly.pocketcasts.ui.extensions.getThemeColor
 import au.com.shiftyjelly.pocketcasts.ui.helper.ColorUtils
 import au.com.shiftyjelly.pocketcasts.utils.extensions.dpToPx
-import au.com.shiftyjelly.pocketcasts.views.helper.EpisodeItemTouchHelper
-import au.com.shiftyjelly.pocketcasts.views.helper.RowSwipeable
-import au.com.shiftyjelly.pocketcasts.views.helper.SwipeButtonLayout
-import au.com.shiftyjelly.pocketcasts.views.helper.SwipeButtonLayoutFactory
-import com.jakewharton.rxrelay2.BehaviorRelay
-import io.reactivex.BackpressureStrategy
-import io.reactivex.Observable
-import io.reactivex.android.schedulers.AndroidSchedulers
+import au.com.shiftyjelly.pocketcasts.views.swipe.SwipeAction
+import au.com.shiftyjelly.pocketcasts.views.swipe.SwipeRowActions
+import au.com.shiftyjelly.pocketcasts.views.swipe.SwipeRowLayout
 import io.reactivex.disposables.CompositeDisposable
-import io.reactivex.rxkotlin.Observables
-import io.reactivex.rxkotlin.addTo
-import io.reactivex.schedulers.Schedulers
-import java.util.concurrent.TimeUnit
-import au.com.shiftyjelly.pocketcasts.images.R as IR
+import io.reactivex.rxkotlin.plusAssign
+import io.reactivex.rxkotlin.subscribeBy
+import timber.log.Timber
 import au.com.shiftyjelly.pocketcasts.ui.R as UR
-import au.com.shiftyjelly.pocketcasts.views.R as VR
 
 class UserEpisodeViewHolder(
-    val binding: AdapterUserEpisodeBinding,
-    val settings: Settings,
-    val downloadProgressUpdates: Observable<DownloadProgressUpdate>,
-    val playbackStateUpdates: Observable<PlaybackState>,
-    val upNextChangesObservable: Observable<UpNextQueue.State>,
-    val imageRequestFactory: PocketCastsImageRequestFactory,
-    private val swipeButtonLayoutFactory: SwipeButtonLayoutFactory,
-    private val userBookmarksObservable: Observable<List<Bookmark>>,
-    private val artworkContext: ArtworkConfiguration.Element,
-) : RecyclerView.ViewHolder(binding.root),
-    RowSwipeable {
+    private val binding: AdapterUserEpisodeBinding,
+    private val imageRequestFactory: PocketCastsImageRequestFactory,
+    private val swipeRowActionsFactory: SwipeRowActions.Factory,
+    private val rowDataProvider: EpisodeRowDataProvider,
+    private val playButtonListener: PlayButton.OnClickListener,
+    private val onRowClick: (UserEpisode) -> Unit,
+    private val onRowLongClick: (UserEpisode) -> Unit,
+    private val onSwipeAction: (UserEpisode, SwipeAction) -> Unit,
+) : RecyclerView.ViewHolder(binding.root) {
+    private inline val context get() = itemView.context
 
-    private var episodeInstance: BaseEpisode? = null
-    private var isUpNext: Boolean? = null
+    @Suppress("UNCHECKED_CAST")
+    private val swipeLayout = binding.root as SwipeRowLayout<SwipeAction>
 
-    override val episodeRow: ViewGroup
-        get() = binding.episodeRow
-    override val leftRightIcon1: ImageView
-        get() = binding.leftRightIcon1
-    override val leftRightIcon2: ImageView
-        get() = binding.leftRightIcon2
-    override val rightLeftIcon1: ImageView
-        get() = binding.rightLeftIcon1
-    override val rightLeftIcon2: ImageView
-        get() = binding.rightLeftIcon2
-    override val episode: BaseEpisode?
-        get() = episodeInstance
-    override val positionAdapter: Int
-        get() = bindingAdapterPosition
-    override val rightToLeftSwipeLayout: ViewGroup
-        get() = binding.rightToLeftSwipeLayout
-    override val leftToRightSwipeLayout: ViewGroup
-        get() = binding.leftToRightSwipeLayout
+    private val primaryText01Tint = context.getThemeColor(UR.attr.primary_text_01)
+    private val primaryText01TintAlpha = ColorUtils.colorWithAlpha(primaryText01Tint, alpha = 128)
+    private val primaryText02Tint = context.getThemeColor(UR.attr.primary_text_02)
+    private val primaryText02TintAlpha = ColorUtils.colorWithAlpha(primaryText02Tint, alpha = 128)
+    private val primaryUi02Tint = context.getThemeColor(UR.attr.primary_ui_02)
+    private val primaryUi02SelectedTint = context.getThemeColor(UR.attr.primary_ui_02_selected)
+    private var tint = context.getThemeColor(UR.attr.primary_icon_01)
 
-    override lateinit var swipeButtonLayout: SwipeButtonLayout
+    private val dateFormatter = RelativeDateFormatter(context)
 
-    val dateFormatter = RelativeDateFormatter(context)
-    val context: Context
-        get() = binding.root.context
-    private val disposables = CompositeDisposable()
-    override var upNextAction = Settings.UpNextAction.PLAY_NEXT
-    override var isMultiSelecting: Boolean = false
-    var uploadConsumer = BehaviorRelay.create<Float>()
+    private val disposable: CompositeDisposable = CompositeDisposable()
 
-    override val leftIconDrawablesRes: List<EpisodeItemTouchHelper.IconWithBackground>
-        get() {
-            return if (isUpNext == true) {
-                listOf(EpisodeItemTouchHelper.IconWithBackground(IR.drawable.ic_upnext_remove, binding.episodeRow.context.getThemeColor(UR.attr.support_05)))
+    private var boundEpisode: UserEpisode? = null
+    private val episode get() = requireNotNull(boundEpisode)
+    private var isMultiSelectEnabled = false
+    private var streamByDefault = false
+
+    init {
+        binding.episodeRow.setOnClickListener {
+            onRowClick(episode)
+            swipeLayout.settle()
+        }
+        binding.episodeRow.setOnLongClickListener {
+            onRowLongClick(episode)
+            swipeLayout.settle()
+            true
+        }
+        binding.playButton.listener = playButtonListener
+        binding.checkbox.setOnClickListener {
+            binding.episodeRow.performClick()
+        }
+        binding.checkbox.setOnCheckedChangeListener { _, isChecked ->
+            bindSelectedRow(isChecked)
+        }
+        swipeLayout.addOnSwipeActionListener { action -> onSwipeAction(episode, action) }
+    }
+
+    fun bind(
+        episode: UserEpisode,
+        @ColorInt tint: Int,
+        isMultiSelectEnabled: Boolean,
+        isSelected: Boolean,
+        useEpisodeArtwork: Boolean,
+        streamByDefault: Boolean,
+        animateMultiSelection: Boolean,
+    ) {
+        val wasMultiSelecting = this.isMultiSelectEnabled
+        val previousUuid = boundEpisode?.uuid
+        setupInitialState(episode, tint, isMultiSelectEnabled, streamByDefault)
+
+        if (previousUuid != episode.uuid) {
+            observeRowData()
+            observeFileStatus()
+        }
+        bindArtwork(useEpisodeArtwork)
+        bindPlaybackButton()
+        bindTitle()
+        bindDate()
+        bindContentDescription()
+        bindColors()
+        bindSwipeActions()
+        bindSelectedRow(isSelected)
+        if (wasMultiSelecting != isMultiSelectEnabled) {
+            bindMultiSelection(animateMultiSelection)
+        }
+    }
+
+    private fun setupInitialState(episode: UserEpisode, tint: Int?, isMultiSelectEnabled: Boolean, streamByDefault: Boolean) {
+        if (episode.uuid != this.boundEpisode?.uuid) {
+            swipeLayout.clearTranslation()
+        }
+        this.boundEpisode = episode
+        this.streamByDefault = streamByDefault
+        if (tint != null) {
+            this.tint = tint
+        }
+
+        if (this.isMultiSelectEnabled != isMultiSelectEnabled) {
+            this.isMultiSelectEnabled = isMultiSelectEnabled
+            if (isMultiSelectEnabled) {
+                swipeLayout.clearTranslation()
+                swipeLayout.lock()
             } else {
-                val addToUpNextIcon = when (upNextAction) {
-                    Settings.UpNextAction.PLAY_NEXT -> IR.drawable.ic_upnext_playnext
-                    Settings.UpNextAction.PLAY_LAST -> IR.drawable.ic_upnext_playlast
-                }
-                val secondaryUpNextIcon = when (upNextAction) {
-                    Settings.UpNextAction.PLAY_NEXT -> IR.drawable.ic_upnext_playlast
-                    Settings.UpNextAction.PLAY_LAST -> IR.drawable.ic_upnext_playnext
-                }
-
-                listOf(
-                    EpisodeItemTouchHelper.IconWithBackground(addToUpNextIcon, binding.episodeRow.context.getThemeColor(UR.attr.support_04)),
-                    EpisodeItemTouchHelper.IconWithBackground(secondaryUpNextIcon, binding.episodeRow.context.getThemeColor(UR.attr.support_03)),
-                )
+                swipeLayout.unlock()
             }
         }
-    override val rightIconDrawablesRes: List<EpisodeItemTouchHelper.IconWithBackground> =
-        listOf(
-            EpisodeItemTouchHelper.IconWithBackground(
-                iconRes = VR.drawable.ic_delete,
-                backgroundColor = binding.episodeRow.context.getThemeColor(UR.attr.support_05),
-            ),
-        )
+    }
 
-    fun setup(
-        episode: UserEpisode,
-        tintColor: Int,
-        playButtonListener: PlayButton.OnClickListener,
-        streamByDefault: Boolean,
-        upNextAction: Settings.UpNextAction,
-        multiSelectEnabled: Boolean = false,
-        isSelected: Boolean = false,
-        bookmarksAvailable: Boolean = false,
-    ) {
-        episodeInstance = episode
-        this.upNextAction = upNextAction
-        this.isMultiSelecting = multiSelectEnabled
+    fun unbind() {
+        disposable.clear()
+        binding.fileStatusIconsView.clearObservers()
+        binding.episodeRow.handler?.removeCallbacksAndMessages(null)
+    }
 
-        swipeButtonLayout = swipeButtonLayoutFactory.forEpisode(episode)
+    private fun observeRowData() {
+        disposable.clear()
+        disposable += rowDataProvider.episodeRowDataObservable(episode.uuid).subscribeBy(onNext = { data ->
+            bindPlaybackButton()
+            bindDate()
+            bindSwipeActions()
+            bindContentDescription()
+        })
+    }
 
-        val playButtonType = PlayButton.calculateButtonType(episode, streamByDefault)
+    private fun observeFileStatus() {
         binding.video.isVisible = episode.isVideo
-        binding.date.text = dateFormatter.format(episode.publishedDate)
-        binding.playButton.setButtonType(episode, playButtonType, tintColor, fromListUuid = null)
-        binding.playButton.listener = playButtonListener
-
-        val captionColor = context.getThemeColor(UR.attr.primary_text_02)
-        val captionWithAlpha = ColorUtils.colorWithAlpha(captionColor, 128)
-
+        binding.fileStatusIconsView.clearObservers()
         binding.fileStatusIconsView.setup(
             episode = episode,
-            downloadProgressUpdates = downloadProgressUpdates,
-            playbackStateUpdates = playbackStateUpdates,
-            upNextChangesObservable = upNextChangesObservable,
-            userBookmarksObservable = userBookmarksObservable,
-            bookmarksAvailable = bookmarksAvailable,
-            tintColor = tintColor,
+            tintColor = tint,
+            rowDataObservable = rowDataProvider.episodeRowDataObservable(episode.uuid),
         )
-
-        val downloadUpdates = downloadProgressUpdates
-            .filter { it.episodeUuid == episode.uuid }
-            .map { it.downloadProgress }
-            .startWith(0f)
-
-        UploadProgressManager.observeUploadProgress(episode.uuid, uploadConsumer)
-        val uploadUpdates = uploadConsumer.sample(1, TimeUnit.SECONDS).startWith(0f).doOnDispose { UploadProgressManager.stopObservingUpload(episode.uuid, uploadConsumer) }
-        val combinedProgress = Observables.combineLatest(downloadUpdates, uploadUpdates) { first, second ->
-            EpisodeStreamProgress(first, second)
-        }
-
-        val isInUpNextObservable = upNextChangesObservable.containsUuid(episode.uuid)
-
-        val playbackStateForThisEpisode = playbackStateUpdates
-            .startWith(PlaybackState(episodeUuid = episode.uuid)) // Pre load with a blank state so it doesn't wait for the first update
-            .filter { it.episodeUuid == episode.uuid } // We only care about playback for this row
-
-        val dateTextView = binding.date
-        val titleTextView = binding.title
-        val artworkImageView = binding.imgArtwork
-
-        disposables.clear()
-        Observables.combineLatest(combinedProgress, playbackStateForThisEpisode, isInUpNextObservable)
-            .distinctUntilChanged()
-            .toFlowable(BackpressureStrategy.LATEST)
-            .subscribeOn(Schedulers.io())
-            .observeOn(AndroidSchedulers.mainThread())
-            .doOnTerminate { UploadProgressManager.stopObservingUpload(episode.uuid, uploadConsumer) }
-            .doOnNext { (_, playbackState, isInUpNext) ->
-                episode.playing = playbackState.isPlaying && playbackState.episodeUuid == episode.uuid && !episode.isFinished
-                val observedPlayButtonType = PlayButton.calculateButtonType(episode, streamByDefault)
-                binding.playButton.setButtonType(episode, observedPlayButtonType, tintColor, fromListUuid = null)
-
-                this.isUpNext = isInUpNext
-
-                val episodeGreyedOut = episode.playingStatus == EpisodePlayingStatus.COMPLETED || episode.isArchived
-
-                val dateTintColor = if (episodeGreyedOut) captionWithAlpha else tintColor
-                val dateTextColor = if (episodeGreyedOut) captionWithAlpha else context.getThemeColor(UR.attr.primary_text_02)
-                dateTextView.text = episode.getSummaryText(dateFormatter = dateFormatter, tintColor = dateTintColor, showDuration = false, context = dateTextView.context)
-                dateTextView.setTextColor(dateTextColor)
-
-                val textColor = if (episodeGreyedOut) captionWithAlpha else context.getThemeColor(UR.attr.primary_text_01)
-                titleTextView.setTextColor(textColor)
-
-                val status = binding.fileStatusIconsView.statusText
-                episodeRow.contentDescription = "${titleTextView.text} ${dateTextView.text} $status"
-
-                artworkImageView.alpha = if (episodeGreyedOut) 0.5f else 1f
-            }
-            .subscribe()
-            .addTo(disposables)
-
-        val episodeGreyedOut = episode.playingStatus == EpisodePlayingStatus.COMPLETED || episode.isArchived
-        val dateTintColor = if (episodeGreyedOut) captionWithAlpha else tintColor
-        val dateTextColor = if (episodeGreyedOut) captionWithAlpha else context.getThemeColor(UR.attr.primary_text_02)
-        dateTextView.text = episode.getSummaryText(dateFormatter = dateFormatter, tintColor = dateTintColor, showDuration = false, context = dateTextView.context)
-        dateTextView.setTextColor(dateTextColor)
-
-        val textColor = if (episodeGreyedOut) captionWithAlpha else context.getThemeColor(UR.attr.primary_text_01)
-        titleTextView.setTextColor(textColor)
-
-        titleTextView.text = episode.title
-
-        imageRequestFactory.create(episode, settings.artworkConfiguration.value.useEpisodeArtwork(artworkContext)).loadInto(artworkImageView)
-
-        val checkbox = binding.checkbox
-        if (checkbox.isVisible != multiSelectEnabled) {
-            val transition = AutoTransition()
-            transition.duration = 100
-
-            if (!multiSelectEnabled) {
-                transition.doOnEnd {
-                    binding.playButton.visibility = View.VISIBLE
-                    binding.playButton.updateLayoutParams<ConstraintLayout.LayoutParams> {
-                        // Adjust the spacing of the play button to avoid line wrapping when turning on multiselect
-                        rightMargin = if (multiSelectEnabled) -checkbox.marginLeft else 0.dpToPx(context)
-                        width = 52.dpToPx(context)
-                    }
-                }
-                TransitionManager.beginDelayedTransition(episodeRow, transition) // Have to call this after the listener is set
-            } else {
-                TransitionManager.beginDelayedTransition(episodeRow, transition)
-                binding.playButton.visibility = View.INVISIBLE
-                binding.playButton.updateLayoutParams<ConstraintLayout.LayoutParams> {
-                    // Adjust the spacing of the play button to avoid line wrapping when turning on multiselect
-                    rightMargin = if (multiSelectEnabled) -checkbox.marginLeft else 0.dpToPx(context)
-                    width = 16.dpToPx(context)
-                }
-            }
-
-            checkbox.isVisible = multiSelectEnabled
-            checkbox.setOnClickListener { episodeRow.performClick() }
-        }
-
-        val selectedColor = context.getThemeColor(UR.attr.primary_ui_02_selected)
-        val unselectedColor = context.getThemeColor(UR.attr.primary_ui_02)
-        checkbox.setOnCheckedChangeListener { _, isChecked ->
-            binding.episodeRow.setBackgroundColor(if (isMultiSelecting && isChecked) selectedColor else unselectedColor)
-        }
-        binding.episodeRow.setBackgroundColor(if (isMultiSelecting && isSelected) selectedColor else unselectedColor)
-        checkbox.isChecked = isSelected
     }
 
-    fun clearObservers() {
-        binding.fileStatusIconsView.clearObservers()
+    private fun bindArtwork(useEpisodeArtwork: Boolean) {
+        imageRequestFactory.create(episode, useEpisodeArtwork).loadInto(binding.imgArtwork)
+    }
 
-        disposables.clear()
-        binding.playButton.listener = null
-        uploadConsumer.accept(0.0f)
+    private fun bindTitle() {
+        binding.title.text = episode.title
+    }
+
+    private fun bindDate() {
+        binding.date.text = episode.getSummaryText(dateFormatter, tint, showDuration = false, context)
+    }
+
+    private fun bindColors() {
+        val isGreyedOut = episode.playingStatus == EpisodePlayingStatus.COMPLETED || episode.isArchived
+
+        binding.title.setTextColor(if (isGreyedOut) primaryText01TintAlpha else primaryText01Tint)
+        binding.date.setTextColor(if (isGreyedOut) primaryText02TintAlpha else primaryText02Tint)
+        binding.artworkBox.elevation = if (isGreyedOut) 0f else 2.dpToPx(context).toFloat()
+        binding.imgArtwork.alpha = if (isGreyedOut) 0.5f else 1f
+    }
+
+    private fun bindPlaybackButton() {
+        val buttonType = PlayButton.calculateButtonType(episode, streamByDefault)
+        binding.playButton.setButtonType(episode, buttonType, tint, fromListUuid = null)
+    }
+
+    private fun bindContentDescription() {
+        val status = binding.fileStatusIconsView.statusText
+        binding.episodeRow.contentDescription = "${binding.title.text} ${binding.date.text} $status"
+    }
+
+    private fun bindSelectedRow(isSelected: Boolean) {
+        binding.checkbox.isChecked = isSelected
+        binding.episodeRow.setBackgroundColor(if (isMultiSelectEnabled && isSelected) primaryUi02SelectedTint else primaryUi02Tint)
+    }
+
+    private fun bindMultiSelection(shouldAnimate: Boolean) {
+        val constraintSet = ConstraintSet()
+        constraintSet.clone(binding.episodeRow)
+        constraintSet.setVisibility(binding.checkbox.id, if (isMultiSelectEnabled) View.VISIBLE else View.GONE)
+        constraintSet.setVisibility(binding.playButton.id, if (isMultiSelectEnabled) View.GONE else View.VISIBLE)
+
+        if (shouldAnimate) {
+            binding.episodeRow.post {
+                val transition = AutoTransition().setDuration(100)
+                TransitionManager.beginDelayedTransition(binding.episodeRow, transition)
+                constraintSet.applyTo(binding.episodeRow)
+            }
+        } else {
+            TransitionManager.endTransitions(binding.episodeRow)
+            constraintSet.applyTo(binding.episodeRow)
+        }
+    }
+
+    private fun bindSwipeActions() {
+        swipeRowActionsFactory.userEpisode(episode).applyTo(swipeLayout)
     }
 }
-
-private data class EpisodeStreamProgress(
-    val downloadProgress: Float,
-    val uploadProgress: Float,
-)

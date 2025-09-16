@@ -37,7 +37,6 @@ import io.reactivex.Flowable
 import io.reactivex.Maybe
 import io.reactivex.Single
 import io.reactivex.android.schedulers.AndroidSchedulers
-import io.reactivex.functions.Consumer
 import io.reactivex.rxkotlin.subscribeBy
 import io.reactivex.schedulers.Schedulers
 import java.io.File
@@ -51,6 +50,10 @@ import kotlin.math.roundToInt
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.mapNotNull
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.rx2.await
 import kotlinx.coroutines.rx2.awaitSingleOrNull
@@ -104,17 +107,18 @@ interface UserEpisodeManager {
 }
 
 object UploadProgressManager {
-    internal val uploadObservers = mutableMapOf<String, MutableList<Consumer<Float>>>()
+    private val uploadProgress = MutableStateFlow(mapOf<String, Float>())
 
-    fun observeUploadProgress(uuid: String, consumer: Consumer<Float>) {
-        if (!uploadObservers.containsKey(uuid)) {
-            uploadObservers[uuid] = mutableListOf()
-        }
-        uploadObservers[uuid]?.add(consumer)
+    internal fun pushProgress(episodeUuid: String, progress: Float) {
+        uploadProgress.update { it + (episodeUuid to progress) }
     }
 
-    fun stopObservingUpload(uuid: String, consumer: Consumer<Float>) {
-        uploadObservers[uuid]?.remove(consumer)
+    fun progressFlow(episodeUuid: String): Flow<Float> {
+        return uploadProgress.mapNotNull { it[episodeUuid] }
+    }
+
+    fun clearProgress(episodeUuid: String) {
+        uploadProgress.update { it - episodeUuid }
     }
 }
 
@@ -146,22 +150,27 @@ class UserEpisodeManagerImpl @Inject constructor(
                                 WorkInfo.State.BLOCKED -> {
                                     userEpisodeDao.updateServerStatus(userEpisode.uuid, UserEpisodeServerStatus.WAITING_FOR_WIFI)
                                 }
+
                                 WorkInfo.State.SUCCEEDED -> {
                                     userEpisodeDao.updateServerStatus(userEpisode.uuid, UserEpisodeServerStatus.UPLOADED)
                                     userEpisodeDao.updateUploadTaskId(userEpisode.uuid, null)
                                 }
+
                                 WorkInfo.State.FAILED -> {
                                     userEpisodeDao.updateServerStatus(userEpisode.uuid, UserEpisodeServerStatus.LOCAL)
                                     userEpisodeDao.updateUploadError(userEpisode.uuid, task.outputData.getString(UploadEpisodeTask.OUTPUT_ERROR_MESSAGE))
                                     userEpisodeDao.updateUploadTaskId(userEpisode.uuid, null)
                                 }
+
                                 WorkInfo.State.RUNNING -> {
                                     userEpisodeDao.updateServerStatus(userEpisode.uuid, UserEpisodeServerStatus.UPLOADING)
                                 }
+
                                 WorkInfo.State.CANCELLED -> {
                                     userEpisodeDao.updateServerStatus(userEpisode.uuid, UserEpisodeServerStatus.LOCAL)
                                     userEpisodeDao.updateUploadTaskId(userEpisode.uuid, null)
                                 }
+
                                 WorkInfo.State.ENQUEUED -> {
                                     userEpisodeDao.updateServerStatus(userEpisode.uuid, UserEpisodeServerStatus.QUEUED)
                                 }
@@ -497,6 +506,7 @@ class UserEpisodeManagerImpl @Inject constructor(
 
     override fun removeFromCloud(userEpisode: UserEpisode) {
         syncManager.deleteFromServerRxSingle(userEpisode)
+            .doOnSubscribe { UploadProgressManager.clearProgress(userEpisode.uuid) }
             .flatMapCompletable { userEpisodeDao.updateServerStatusRxCompletable(userEpisode.uuid, UserEpisodeServerStatus.LOCAL) }
             .andThen(syncManager.getFileUsageRxSingle().doOnSuccess { usageRelay.accept(Optional.of(it)) }.ignoreElement())
             .subscribeOn(Schedulers.io())

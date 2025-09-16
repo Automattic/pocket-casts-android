@@ -48,7 +48,6 @@ import kotlinx.coroutines.NonCancellable
 import kotlinx.coroutines.cancelAndJoin
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.rx2.asFlowable
 
@@ -99,11 +98,11 @@ class EpisodeFragmentViewModel @Inject constructor(
         startPlaybackTimestamp = timestamp
         autoDispatchPlay = autoPlay
         val isDarkTheme = forceDark || theme.isDarkTheme
-        val progressUpdatesObservable = downloadManager.progressUpdateRelay
-            .filter { it.episodeUuid == episodeUuid }
+        val progressUpdatesObservable = downloadManager
+            .episodeDownloadProgressFlow(episodeUuid)
+            .asFlowable()
             .map { it.downloadProgress }
             .startWith(0f)
-            .toFlowable(BackpressureStrategy.LATEST)
 
         // If we can't find it in the database and we know the podcast uuid we can try load it
         // from the server

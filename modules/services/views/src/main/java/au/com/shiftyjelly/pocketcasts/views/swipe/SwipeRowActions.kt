@@ -1,6 +1,7 @@
 package au.com.shiftyjelly.pocketcasts.views.swipe
 
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
+import au.com.shiftyjelly.pocketcasts.models.entity.UserEpisode
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.playback.UpNextQueue
 import au.com.shiftyjelly.pocketcasts.repositories.playlist.Playlist
@@ -78,6 +79,22 @@ data class SwipeRowActions(
 
             rtl1 = episode.archiveSwipeAction()
             rtl2 = SwipeAction.Share
+        }
+
+        fun userEpisode(
+            episode: UserEpisode,
+        ) = buildSwipeRowActions {
+            val isInUpNext = queue.contains(episode.uuid)
+
+            if (isInUpNext) {
+                ltr1 = SwipeAction.RemoveFromUpNext
+            } else {
+                val (upNext1, upNext2) = settings.upNextSwipe.value.toSwipeActions()
+                ltr1 = upNext1
+                ltr2 = upNext2
+            }
+
+            rtl1 = SwipeAction.DeleteUserEpisode
         }
     }
 }

@@ -11,7 +11,6 @@ import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackState
 import au.com.shiftyjelly.pocketcasts.repositories.playback.UpNextQueue
 import au.com.shiftyjelly.pocketcasts.repositories.playback.containsUuid
-import com.jakewharton.rxrelay2.BehaviorRelay
 import io.reactivex.Observable
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.rxkotlin.Observables
@@ -56,8 +55,8 @@ class EpisodeRowDataProvider @Inject constructor(
     }
 
     private fun downloadProgressObservable(episode: BaseEpisode): Observable<Int> {
-        return downloadManager.progressUpdateRelay
-            .filter { it.episodeUuid == episode.uuid }
+        return downloadManager.episodeDownloadProgressFlow(episode.uuid)
+            .asObservable()
             .map { (it.downloadProgress * 100).roundToInt() }
             .throttleLatest(1, TimeUnit.SECONDS)
             .startWith(0)
@@ -68,10 +67,8 @@ class EpisodeRowDataProvider @Inject constructor(
         return when (episode) {
             is PodcastEpisode -> Observable.just(0)
             is UserEpisode -> {
-                val relay = BehaviorRelay.create<Float>()
-                relay
-                    .doOnSubscribe { UploadProgressManager.observeUploadProgress(episode.uuid, relay) }
-                    .doOnDispose { UploadProgressManager.stopObservingUpload(episode.uuid, relay) }
+                UploadProgressManager.progressFlow(episode.uuid)
+                    .asObservable()
                     .map { (it * 100).roundToInt() }
                     .throttleLatest(1, TimeUnit.SECONDS)
                     .startWith(0)

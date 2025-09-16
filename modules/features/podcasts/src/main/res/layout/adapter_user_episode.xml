@@ -1,101 +1,29 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<au.com.shiftyjelly.pocketcasts.views.swipe.SwipeRowLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content">
-    <FrameLayout
-        android:id="@+id/rightToLeftSwipeLayout"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:background="?attr/support_05"
-        android:importantForAccessibility="noHideDescendants">
-
-        <FrameLayout
-            android:id="@id/rightLeftItem2"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:background="?attr/support_03">
-            <ImageView
-                android:id="@+id/rightLeftIcon2"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:padding="23dp"
-                android:layout_gravity="center_vertical|left"
-                app:tint="@android:color/white"/>
-        </FrameLayout>
-        <FrameLayout
-            android:id="@id/rightLeftItem1"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:background="?attr/support_04"
-            android:importantForAccessibility="noHideDescendants">
-            <ImageView
-                android:id="@+id/rightLeftIcon1"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:padding="23dp"
-                android:layout_gravity="center_vertical|left"
-                app:tint="@android:color/white"/>
-        </FrameLayout>
-    </FrameLayout>
-
-    <FrameLayout
-        android:id="@+id/leftToRightSwipeLayout"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:importantForAccessibility="noHideDescendants">
-        <FrameLayout
-            android:id="@+id/leftRightItem2"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:background="@color/cellPlayLast">
-            <ImageView
-                android:id="@+id/leftRightIcon2"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:padding="23dp"
-                android:layout_gravity="center_vertical|right"
-                android:src="@drawable/ic_upnext_playlast"
-                app:tint="@android:color/white"/>
-        </FrameLayout>
-        <FrameLayout
-            android:id="@+id/leftRightItem1"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:background="@color/cellPlayNext"
-            android:importantForAccessibility="noHideDescendants">
-            <ImageView
-                android:id="@+id/leftRightIcon1"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:padding="23dp"
-                android:layout_gravity="center_vertical|right"
-                android:src="@drawable/ic_upnext_playnext"
-                app:tint="@android:color/white"/>
-        </FrameLayout>
-    </FrameLayout>
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/episodeRow"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:background="?attr/primary_ui_02"
         android:clickable="true"
         android:focusable="true"
-        android:gravity="center_vertical"
-        android:background="?attr/primary_ui_02"
-        android:foreground="?android:selectableItemBackground">
+        android:foreground="?android:selectableItemBackground"
+        android:gravity="center_vertical">
 
         <CheckBox
             android:id="@+id/checkbox"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            app:layout_constraintLeft_toLeftOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintBottom_toBottomOf="parent"
             android:layout_marginStart="12dp"
-            android:visibility="gone"/>
-
+            android:visibility="gone"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
 
         <androidx.cardview.widget.CardView
             android:id="@+id/artworkBox"
@@ -105,7 +33,6 @@
             android:layout_marginTop="12dp"
             android:layout_marginBottom="12dp"
             android:importantForAccessibility="noHideDescendants"
-            android:src="@drawable/ic_uploadedfile"
             app:cardCornerRadius="4dp"
             app:cardElevation="2dp"
             app:layout_constraintBottom_toBottomOf="parent"
@@ -115,7 +42,8 @@
             <ImageView
                 android:id="@+id/imgArtwork"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent" />
+                android:layout_height="match_parent"
+                android:src="@drawable/ic_uploadedfile" />
 
         </androidx.cardview.widget.CardView>
 
@@ -124,49 +52,54 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
-            app:layout_constraintTop_toBottomOf="@+id/headerLayout"
             app:layout_constraintLeft_toLeftOf="@+id/headerLayout"
-            app:layout_constraintRight_toRightOf="@+id/headerLayout">
+            app:layout_constraintRight_toRightOf="@+id/headerLayout"
+            app:layout_constraintTop_toBottomOf="@+id/headerLayout"
+            tools:ignore="UseCompoundDrawables">
+
             <TextView
                 android:id="@+id/title"
+                style="?attr/textSubtitle1"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                style="?attr/textSubtitle1"
+                android:accessibilityHeading="true"
+                android:accessibilityTraversalBefore="@id/date"
                 android:ellipsize="end"
                 android:maxLines="2"
-                tools:text="Episode title"
-                android:accessibilityHeading="true"
-                android:accessibilityTraversalBefore="@id/date"/>
+                tools:text="Episode title" />
         </LinearLayout>
 
         <LinearLayout
             android:id="@+id/headerLayout"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:orientation="horizontal"
             android:layout_marginStart="16dp"
-            android:layout_marginEnd="8dp"
             android:layout_marginTop="12dp"
-            app:layout_constraintTop_toTopOf="parent"
+            android:layout_marginEnd="8dp"
+            android:accessibilityTraversalAfter="@+id/lblTitle"
+            android:orientation="horizontal"
             app:layout_constraintLeft_toRightOf="@+id/artworkBox"
             app:layout_constraintRight_toLeftOf="@+id/playButton"
-            android:accessibilityTraversalAfter="@+id/lblTitle">
+            app:layout_constraintTop_toTopOf="parent"
+            tools:ignore="UseCompoundDrawables">
+
             <ImageView
                 android:id="@+id/video"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:src="@drawable/ic_video_small_fill"
-                android:paddingEnd="4dp"
                 android:layout_gravity="center"
+                android:paddingEnd="4dp"
+                android:src="@drawable/ic_video_small_fill"
                 app:tint="?attr/support_01" />
+
             <TextView
                 android:id="@+id/date"
-                android:layout_width="0dp"
-                android:layout_weight="1"
-                android:layout_height="wrap_content"
-                android:textAllCaps="true"
                 style="?attr/textOverline"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:textAllCaps="true"
                 tools:text="TODAY" />
         </LinearLayout>
 
@@ -175,26 +108,27 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:paddingBottom="12dp"
-            app:layout_constraintTop_toBottomOf="@+id/titleLayout"
             app:layout_constraintLeft_toLeftOf="@+id/headerLayout"
             app:layout_constraintRight_toRightOf="@+id/headerLayout"
-            />
+            app:layout_constraintTop_toBottomOf="@+id/titleLayout" />
 
         <au.com.shiftyjelly.pocketcasts.podcasts.view.components.PlayButton
             android:id="@+id/playButton"
             android:layout_width="52dp"
             android:layout_height="0dp"
             android:layout_gravity="center_vertical|end"
+            android:layout_marginEnd="0dp"
             android:background="?android:attr/selectableItemBackgroundBorderless"
             android:clickable="true"
             android:focusable="true"
+            android:importantForAccessibility="yes"
             android:paddingTop="1dp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintRight_toRightOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            android:importantForAccessibility="yes"/>
+            app:layout_constraintTop_toTopOf="parent" />
 
         <View
+            android:id="@+id/divider"
             android:layout_width="match_parent"
             android:layout_height="@dimen/divider_height"
             android:layout_marginStart="16dp"
@@ -204,4 +138,4 @@
             app:layout_constraintStart_toStartOf="parent" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
-</FrameLayout>
+</au.com.shiftyjelly.pocketcasts.views.swipe.SwipeRowLayout>
