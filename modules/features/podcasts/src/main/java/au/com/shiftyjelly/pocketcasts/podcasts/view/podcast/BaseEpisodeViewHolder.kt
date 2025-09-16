@@ -108,7 +108,9 @@ abstract class BaseEpisodeViewHolder<T : Any>(
         tint: Int? = null,
         animateMultiSelection: Boolean = false,
     ) {
+        val wasMultiSelecting = this.isMultiSelectEnabled
         setupInitialState(item, tint, isMultiSelectEnabled, streamByDefault)
+
         observeRowData()
         bindArtwork(useEpisodeArtwork)
         bindTitle()
@@ -118,7 +120,9 @@ abstract class BaseEpisodeViewHolder<T : Any>(
         bindColors()
         bindSwipeActions()
         bindSelectedRow(isSelected)
-        bindMultiSelection(animateMultiSelection)
+        if (wasMultiSelecting != isMultiSelectEnabled) {
+            bindMultiSelection(animateMultiSelection)
+        }
     }
 
     private fun setupInitialState(item: T, tint: Int?, isMultiSelectEnabled: Boolean, streamByDefault: Boolean) {
@@ -315,22 +319,20 @@ abstract class BaseEpisodeViewHolder<T : Any>(
     }
 
     private fun bindMultiSelection(shouldAnimate: Boolean) {
-        if (binding.checkbox.isVisible != isMultiSelectEnabled) {
-            val constraintSet = ConstraintSet()
-            constraintSet.clone(binding.episodeRow)
-            constraintSet.setVisibility(binding.checkbox.id, if (isMultiSelectEnabled) View.VISIBLE else View.GONE)
-            constraintSet.setVisibility(binding.playButton.id, if (isMultiSelectEnabled) View.GONE else View.VISIBLE)
+        val constraintSet = ConstraintSet()
+        constraintSet.clone(binding.episodeRow)
+        constraintSet.setVisibility(binding.checkbox.id, if (isMultiSelectEnabled) View.VISIBLE else View.GONE)
+        constraintSet.setVisibility(binding.playButton.id, if (isMultiSelectEnabled) View.GONE else View.VISIBLE)
 
-            if (shouldAnimate) {
-                binding.episodeRow.post {
-                    val transition = AutoTransition().setDuration(100)
-                    TransitionManager.beginDelayedTransition(binding.episodeRow, transition)
-                    constraintSet.applyTo(binding.episodeRow)
-                }
-            } else {
-                TransitionManager.endTransitions(binding.episodeRow)
+        if (shouldAnimate) {
+            binding.episodeRow.post {
+                val transition = AutoTransition().setDuration(100)
+                TransitionManager.beginDelayedTransition(binding.episodeRow, transition)
                 constraintSet.applyTo(binding.episodeRow)
             }
+        } else {
+            TransitionManager.endTransitions(binding.episodeRow)
+            constraintSet.applyTo(binding.episodeRow)
         }
     }
 }
