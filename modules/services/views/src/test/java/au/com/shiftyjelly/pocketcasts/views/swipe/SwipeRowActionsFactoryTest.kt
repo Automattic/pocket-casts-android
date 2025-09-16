@@ -303,7 +303,7 @@ class SwipeRowActionsFactoryTest {
         isEpisodeInUpNext = false
         upNextAction = Settings.UpNextAction.PLAY_NEXT
         assertEquals(
-            "archived, play next",
+            "play next",
             SwipeRowActions(
                 ltr1 = SwipeAction.AddToUpNextTop,
                 ltr2 = SwipeAction.AddToUpNextBottom,
@@ -315,7 +315,7 @@ class SwipeRowActionsFactoryTest {
         isEpisodeInUpNext = false
         upNextAction = Settings.UpNextAction.PLAY_LAST
         assertEquals(
-            "archived, play last",
+            "play last",
             SwipeRowActions(
                 ltr1 = SwipeAction.AddToUpNextBottom,
                 ltr2 = SwipeAction.AddToUpNextTop,
@@ -326,12 +326,25 @@ class SwipeRowActionsFactoryTest {
 
         isEpisodeInUpNext = true
         assertEquals(
-            "archived, in queue",
+            "in queue",
             SwipeRowActions(
                 ltr1 = SwipeAction.RemoveFromUpNext,
                 rtl1 = SwipeAction.DeleteUserEpisode,
             ),
             factory.userEpisode(userEpisode),
+        )
+    }
+
+    @Test
+    fun `up next episode`() {
+        upNextAction = Settings.UpNextAction.PLAY_NEXT
+        assertEquals(
+            SwipeRowActions(
+                ltr1 = SwipeAction.AddToUpNextTop,
+                ltr2 = SwipeAction.AddToUpNextBottom,
+                rtl1 = SwipeAction.RemoveFromUpNext,
+            ),
+            factory.upNextEpisode(),
         )
     }
 }

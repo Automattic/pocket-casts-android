@@ -96,6 +96,12 @@ data class SwipeRowActions(
 
             rtl1 = SwipeAction.DeleteUserEpisode
         }
+
+        fun upNextEpisode() = buildSwipeRowActions {
+            ltr1 = SwipeAction.AddToUpNextTop
+            ltr2 = SwipeAction.AddToUpNextBottom
+            rtl1 = SwipeAction.RemoveFromUpNext
+        }
     }
 }
 

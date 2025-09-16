@@ -47,9 +47,11 @@ import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.ui.theme.ThemeColor
 import au.com.shiftyjelly.pocketcasts.utils.extensions.dpToPx
 import au.com.shiftyjelly.pocketcasts.utils.extensions.getActivity
-import au.com.shiftyjelly.pocketcasts.views.helper.SwipeButtonLayoutFactory
 import au.com.shiftyjelly.pocketcasts.views.helper.setEpisodeTimeLeft
 import au.com.shiftyjelly.pocketcasts.views.multiselect.MultiSelectEpisodesHelper
+import au.com.shiftyjelly.pocketcasts.views.multiselect.MultiSelectEpisodesHelper.Companion.MULTI_SELECT_TOGGLE_PAYLOAD
+import au.com.shiftyjelly.pocketcasts.views.swipe.SwipeAction
+import au.com.shiftyjelly.pocketcasts.views.swipe.SwipeRowActions
 import com.airbnb.lottie.LottieAnimationView
 import com.airbnb.lottie.LottieProperty
 import com.airbnb.lottie.SimpleColorFilter
@@ -69,10 +71,12 @@ class UpNextAdapter(
     private val analyticsTracker: AnalyticsTracker,
     private val upNextSource: UpNextSource,
     private val settings: Settings,
-    private val swipeButtonLayoutFactory: SwipeButtonLayoutFactory,
     private val playbackManager: PlaybackManager,
+    private val swipeRowActionsFactory: SwipeRowActions.Factory,
+    private val onSwipeAction: (BaseEpisode, SwipeAction) -> Unit,
 ) : ListAdapter<Any, RecyclerView.ViewHolder>(UPNEXT_ADAPTER_DIFF) {
     private val dateFormatter = RelativeDateFormatter(context)
+
     private val imageRequestFactory = PocketCastsImageRequestFactory(
         context,
         cornerRadius = 4,
@@ -96,15 +100,38 @@ class UpNextAdapter(
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
         val inflater = LayoutInflater.from(parent.context)
         return when (viewType) {
-            R.layout.adapter_up_next -> UpNextEpisodeViewHolder(
-                binding = AdapterUpNextBinding.inflate(inflater, parent, false),
-                listener = listener,
-                dateFormatter = dateFormatter,
-                imageRequestFactory = imageRequestFactory,
-                episodeManager = episodeManager,
-                swipeButtonLayoutFactory = swipeButtonLayoutFactory,
-                settings = settings,
-            )
+            R.layout.adapter_up_next -> {
+                val binding = AdapterUpNextBinding.inflate(inflater, parent, false)
+                UpNextEpisodeViewHolder(
+                    binding = binding,
+                    episodeManager = episodeManager,
+                    imageRequestFactory = imageRequestFactory,
+                    swipeRowActionsFactory = swipeRowActionsFactory,
+                    listener = listener,
+                    onRowClick = { episode ->
+                        if (multiSelectHelper.isMultiSelecting) {
+                            binding.checkbox.isChecked = multiSelectHelper.toggle(episode)
+                        } else {
+                            val podcastUuid = (episode as? PodcastEpisode)?.podcastUuid
+                            val playOnTap = settings.tapOnUpNextShouldPlay.value
+                            trackUpNextEvent(AnalyticsEvent.UP_NEXT_QUEUE_EPISODE_TAPPED, mapOf(WILL_PLAY_KEY to playOnTap))
+                            listener.onEpisodeActionsClick(episodeUuid = episode.uuid, podcastUuid = podcastUuid)
+                        }
+                    },
+                    onRowLongClick = { episode ->
+                        if (multiSelectHelper.isMultiSelecting) {
+                            multiSelectHelper.defaultLongPress(multiSelectable = episode, fragmentManager = fragmentManager)
+                        } else {
+                            val podcastUuid = (episode as? PodcastEpisode)?.podcastUuid
+                            val playOnLongPress = !settings.tapOnUpNextShouldPlay.value
+                            trackUpNextEvent(AnalyticsEvent.UP_NEXT_QUEUE_EPISODE_LONG_PRESSED, mapOf(WILL_PLAY_KEY to playOnLongPress))
+                            listener.onEpisodeActionsLongPress(episodeUuid = episode.uuid, podcastUuid = podcastUuid)
+                        }
+                    },
+                    onSwipeAction = onSwipeAction,
+                )
+            }
+
             R.layout.adapter_up_next_footer -> HeaderViewHolder(AdapterUpNextFooterBinding.inflate(inflater, parent, false))
             R.layout.adapter_up_next_playing -> PlayingViewHolder(AdapterUpNextPlayingBinding.inflate(inflater, parent, false))
             else -> throw IllegalStateException("Unknown view type in up next")
@@ -113,9 +140,16 @@ class UpNextAdapter(
 
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
         when (val item = getItem(position)) {
-            is BaseEpisode -> bindEpisodeRow(holder as UpNextEpisodeViewHolder, item)
+            is BaseEpisode -> bindEpisodeRow(holder as UpNextEpisodeViewHolder, item, animateMultiSelection = false)
             is PlayerViewModel.UpNextSummary -> (holder as HeaderViewHolder).bind(item)
             is UpNextPlaying -> (holder as PlayingViewHolder).bind(item)
+        }
+    }
+
+    override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int, payloads: List<Any?>) {
+        when (val item = getItem(position)) {
+            is BaseEpisode -> bindEpisodeRow(holder as UpNextEpisodeViewHolder, item, animateMultiSelection = MULTI_SELECT_TOGGLE_PAYLOAD in payloads)
+            else -> super.onBindViewHolder(holder, position, payloads)
         }
     }
 
@@ -129,44 +163,28 @@ class UpNextAdapter(
         }
     }
 
-    private fun bindEpisodeRow(holder: UpNextEpisodeViewHolder, episode: BaseEpisode) {
+    private fun bindEpisodeRow(
+        holder: UpNextEpisodeViewHolder,
+        episode: BaseEpisode,
+        animateMultiSelection: Boolean,
+    ) {
         holder.bind(
             episode = episode,
-            isMultiSelecting = multiSelectHelper.isMultiSelecting,
+            isMultiSelectEnabled = multiSelectHelper.isMultiSelecting,
             isSelected = multiSelectHelper.isSelected(episode),
+            useEpisodeArtwork = settings.artworkConfiguration.value.useEpisodeArtwork(Element.UpNext),
+            animateMultiSelection = animateMultiSelection,
         )
-
-        holder.binding.itemContainer.setOnClickListener {
-            if (multiSelectHelper.isMultiSelecting) {
-                holder.binding.checkbox.isChecked = multiSelectHelper.toggle(episode)
-            } else {
-                val podcastUuid = (episode as? PodcastEpisode)?.podcastUuid
-                val playOnTap = settings.tapOnUpNextShouldPlay.value
-                trackUpNextEvent(AnalyticsEvent.UP_NEXT_QUEUE_EPISODE_TAPPED, mapOf(WILL_PLAY_KEY to playOnTap))
-                listener.onEpisodeActionsClick(episodeUuid = episode.uuid, podcastUuid = podcastUuid)
-            }
-        }
-        holder.binding.itemContainer.setOnLongClickListener {
-            if (multiSelectHelper.isMultiSelecting) {
-                multiSelectHelper.defaultLongPress(multiSelectable = episode, fragmentManager = fragmentManager)
-            } else {
-                val podcastUuid = (episode as? PodcastEpisode)?.podcastUuid
-                val playOnLongPress = !settings.tapOnUpNextShouldPlay.value
-                trackUpNextEvent(AnalyticsEvent.UP_NEXT_QUEUE_EPISODE_LONG_PRESSED, mapOf(WILL_PLAY_KEY to playOnLongPress))
-                listener.onEpisodeActionsLongPress(episodeUuid = episode.uuid, podcastUuid = podcastUuid)
-            }
-            true
-        }
     }
 
     override fun onViewRecycled(holder: RecyclerView.ViewHolder) {
         super.onViewRecycled(holder)
-        (holder as? UpNextEpisodeViewHolder)?.clearDisposable()
+        (holder as? UpNextEpisodeViewHolder)?.unbind()
     }
 
     override fun onViewDetachedFromWindow(holder: RecyclerView.ViewHolder) {
         super.onViewDetachedFromWindow(holder)
-        (holder as? UpNextEpisodeViewHolder)?.clearDisposable()
+        (holder as? UpNextEpisodeViewHolder)?.unbind()
     }
 
     fun updateUserSignInState(isSignedInAsPaidUser: Boolean) {
