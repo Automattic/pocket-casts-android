@@ -59,6 +59,7 @@ import au.com.shiftyjelly.pocketcasts.views.helper.SwipeButtonLayoutFactory
 import au.com.shiftyjelly.pocketcasts.views.helper.SwipeButtonLayoutViewModel
 import au.com.shiftyjelly.pocketcasts.views.helper.ToolbarColors
 import au.com.shiftyjelly.pocketcasts.views.multiselect.MultiSelectEpisodesHelper
+import au.com.shiftyjelly.pocketcasts.views.multiselect.MultiSelectEpisodesHelper.Companion.MULTI_SELECT_TOGGLE_PAYLOAD
 import au.com.shiftyjelly.pocketcasts.views.multiselect.MultiSelectHelper
 import au.com.shiftyjelly.pocketcasts.views.swipe.SwipeActionViewModel
 import au.com.shiftyjelly.pocketcasts.views.swipe.SwipeRowActions
@@ -483,28 +484,28 @@ class FilterEpisodeListFragment : BaseFragment() {
                 multiSelectLoaded = true
                 return@observe // Skip the initial value or else it will always hide the filter controls on load
             }
-
             val wasMultiSelecting = multiSelectToolbar.isVisible
-            if (wasMultiSelecting != isMultiSelecting) {
-                analyticsTracker.track(
-                    if (isMultiSelecting) {
-                        AnalyticsEvent.FILTER_MULTI_SELECT_ENTERED
-                    } else {
-                        AnalyticsEvent.FILTER_MULTI_SELECT_EXITED
-                    },
-                )
+            if (wasMultiSelecting == isMultiSelecting) {
+                return@observe
             }
+            multiSelectToolbar.isVisible = isMultiSelecting
 
+            analyticsTracker.track(
+                if (isMultiSelecting) {
+                    AnalyticsEvent.FILTER_MULTI_SELECT_ENTERED
+                } else {
+                    AnalyticsEvent.FILTER_MULTI_SELECT_EXITED
+                },
+            )
             if (isMultiSelecting) {
                 showingFilterOptionsBeforeMultiSelect = layoutFilterOptions.isVisible
                 setShowFilterOptions(false)
             } else {
                 setShowFilterOptions(showingFilterOptionsBeforeMultiSelect)
             }
-            multiSelectToolbar.isVisible = isMultiSelecting
             toolbar.isVisible = !isMultiSelecting
 
-            adapter.notifyDataSetChanged()
+            adapter.notifyItemRangeChanged(0, adapter.itemCount, MULTI_SELECT_TOGGLE_PAYLOAD)
         }
         multiSelectHelper.coordinatorLayout = (activity as FragmentHostListener).snackBarView()
         multiSelectHelper.listener = object : MultiSelectHelper.Listener<BaseEpisode> {

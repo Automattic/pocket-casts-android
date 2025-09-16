@@ -97,6 +97,7 @@ import au.com.shiftyjelly.pocketcasts.views.helper.EpisodeItemSwipeState
 import au.com.shiftyjelly.pocketcasts.views.helper.EpisodeItemTouchHelper
 import au.com.shiftyjelly.pocketcasts.views.helper.UiUtil
 import au.com.shiftyjelly.pocketcasts.views.multiselect.MultiSelectBookmarksHelper.NavigationState
+import au.com.shiftyjelly.pocketcasts.views.multiselect.MultiSelectEpisodesHelper.Companion.MULTI_SELECT_TOGGLE_PAYLOAD
 import au.com.shiftyjelly.pocketcasts.views.multiselect.MultiSelectHelper
 import au.com.shiftyjelly.pocketcasts.views.multiselect.MultiSelectToolbar
 import au.com.shiftyjelly.pocketcasts.views.swipe.SwipeActionViewModel
@@ -958,9 +959,14 @@ class PodcastFragment : BaseFragment() {
         isMultiSelectingLive.observe(viewLifecycleOwner) {
             val episodeContainerFragment = parentFragmentManager.findFragmentByTag(EPISODE_CARD)
             if (episodeContainerFragment != null) return@observe
+
+            val wasMultiSelecting = multiSelectToolbar.isVisible
+            if (wasMultiSelecting == isMultiSelecting) {
+                return@observe
+            }
             multiSelectToolbar.isVisible = it
             binding?.toolbar?.isInvisible = it
-            adapter?.notifyDataSetChanged()
+            adapter?.notifyItemRangeChanged(0, adapter?.itemCount ?: 0, MULTI_SELECT_TOGGLE_PAYLOAD)
         }
         coordinatorLayout = (activity as FragmentHostListener).snackBarView()
         context = requireActivity()

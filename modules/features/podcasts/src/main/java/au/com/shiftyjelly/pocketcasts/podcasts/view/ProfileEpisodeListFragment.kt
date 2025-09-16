@@ -78,6 +78,7 @@ import au.com.shiftyjelly.pocketcasts.views.helper.NavigationIcon.BackArrow
 import au.com.shiftyjelly.pocketcasts.views.helper.SwipeButtonLayoutFactory
 import au.com.shiftyjelly.pocketcasts.views.helper.SwipeButtonLayoutViewModel
 import au.com.shiftyjelly.pocketcasts.views.multiselect.MultiSelectEpisodesHelper
+import au.com.shiftyjelly.pocketcasts.views.multiselect.MultiSelectEpisodesHelper.Companion.MULTI_SELECT_TOGGLE_PAYLOAD
 import au.com.shiftyjelly.pocketcasts.views.multiselect.MultiSelectHelper
 import au.com.shiftyjelly.pocketcasts.views.swipe.SwipeActionViewModel
 import au.com.shiftyjelly.pocketcasts.views.swipe.SwipeRowActions
@@ -399,19 +400,23 @@ class ProfileEpisodeListFragment :
 
         multiSelectHelper.isMultiSelectingLive.observe(viewLifecycleOwner) { isMultiSelecting ->
             val wasMultiSelecting = binding?.multiSelectToolbar?.isVisible == true
+            if (wasMultiSelecting == isMultiSelecting) {
+                return@observe
+            }
             binding?.multiSelectToolbar?.isVisible = isMultiSelecting
+
             binding?.toolbar?.isVisible = !isMultiSelecting
             binding?.multiSelectToolbar?.setNavigationIcon(R.drawable.ic_arrow_back)
 
             if ((activity as? FragmentHostListener)?.isUpNextShowing() == false) {
                 if (isMultiSelecting) {
                     trackMultiSelectEntered()
-                } else if (wasMultiSelecting) {
+                } else {
                     trackMultiSelectExited()
                 }
             }
 
-            adapter.notifyDataSetChanged()
+            adapter.notifyItemRangeChanged(0, adapter.itemCount, MULTI_SELECT_TOGGLE_PAYLOAD)
         }
         multiSelectHelper.listener = object : MultiSelectHelper.Listener<BaseEpisode> {
             override fun multiSelectSelectAll() {
