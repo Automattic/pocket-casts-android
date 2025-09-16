@@ -242,7 +242,7 @@ class SwipeRowLayout<T : SwipeButton.UiState> @JvmOverloads constructor(
                 primaryButton.callOnSwipeActionListeners()
                 swipedAction?.cancel()
                 swipedAction = runDelayedAction(
-                    0.milliseconds,
+                    350.milliseconds,
                     action = {
                         primaryButton.elevation = 1f
                         swipeableView.translationX = 0f
@@ -263,10 +263,7 @@ class SwipeRowLayout<T : SwipeButton.UiState> @JvmOverloads constructor(
                     },
                     onDetach = {
                         primaryButton.elevation = 0f
-                        swipeableView.translationX = 0f
-                        section.forEach { button ->
-                            button.translationX = width.toFloat()
-                        }
+                        clearTranslation()
                     },
                 )
             } else {

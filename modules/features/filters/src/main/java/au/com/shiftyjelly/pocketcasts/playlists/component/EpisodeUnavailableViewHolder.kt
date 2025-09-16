@@ -7,12 +7,14 @@ import au.com.shiftyjelly.pocketcasts.models.to.PlaylistEpisode
 import au.com.shiftyjelly.pocketcasts.repositories.images.PocketCastsImageRequestFactory
 import au.com.shiftyjelly.pocketcasts.repositories.images.loadInto
 import au.com.shiftyjelly.pocketcasts.views.swipe.SwipeAction
+import au.com.shiftyjelly.pocketcasts.views.swipe.SwipeRowActions
 import au.com.shiftyjelly.pocketcasts.views.swipe.SwipeRowLayout
 import java.sql.Date
 
 class EpisodeUnavailableViewHolder(
-    val binding: AdapterEpisodeUnavailableBinding,
+    private val binding: AdapterEpisodeUnavailableBinding,
     private val imageRequestFactory: PocketCastsImageRequestFactory,
+    private val swipeRowActionsFactory: SwipeRowActions.Factory,
     private val onRowClick: (PlaylistEpisode.Unavailable) -> Unit,
     private val onSwipeAction: (PlaylistEpisode.Unavailable, SwipeAction) -> Unit,
 ) : RecyclerView.ViewHolder(binding.root) {
@@ -30,7 +32,7 @@ class EpisodeUnavailableViewHolder(
             onRowClick(requireNotNull(episodeWrapper))
             swipeLayout.settle()
         }
-        swipeLayout.setRtl1State(SwipeAction.Remove)
+        swipeRowActionsFactory.unavailablePlaylistEpisode().applyTo(swipeLayout)
         swipeLayout.addOnSwipeActionListener { action -> onSwipeAction(requireNotNull(episodeWrapper), action) }
     }
 
