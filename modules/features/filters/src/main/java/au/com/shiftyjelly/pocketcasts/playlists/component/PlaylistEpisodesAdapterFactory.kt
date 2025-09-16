@@ -18,12 +18,9 @@ import au.com.shiftyjelly.pocketcasts.playlists.manual.UnavailableEpisodeFragmen
 import au.com.shiftyjelly.pocketcasts.podcasts.view.components.PlayButton
 import au.com.shiftyjelly.pocketcasts.podcasts.view.episode.EpisodeContainerFragment
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
-import au.com.shiftyjelly.pocketcasts.repositories.bookmark.BookmarkManager
-import au.com.shiftyjelly.pocketcasts.repositories.download.DownloadManager
 import au.com.shiftyjelly.pocketcasts.repositories.images.PocketCastsImageRequestFactory
-import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
-import au.com.shiftyjelly.pocketcasts.repositories.playback.UpNextQueue
 import au.com.shiftyjelly.pocketcasts.repositories.playlist.Playlist
+import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeRowDataProvider
 import au.com.shiftyjelly.pocketcasts.ui.extensions.themed
 import au.com.shiftyjelly.pocketcasts.views.helper.HasBackstack
 import au.com.shiftyjelly.pocketcasts.views.multiselect.MultiSelectEpisodesHelper
@@ -43,10 +40,7 @@ import kotlinx.coroutines.launch
 @FragmentScoped
 class PlaylistEpisodesAdapterFactory @Inject constructor(
     private val fragment: Fragment,
-    private val bookmarkManager: BookmarkManager,
-    private val downloadManager: DownloadManager,
-    private val playbackManager: PlaybackManager,
-    private val upNextQueue: UpNextQueue,
+    private val rowDataProvider: EpisodeRowDataProvider,
     private val settings: Settings,
     private val playButtonListener: PlayButton.OnClickListener,
     private val multiSelectHelper: MultiSelectEpisodesHelper,
@@ -90,10 +84,7 @@ class PlaylistEpisodesAdapterFactory @Inject constructor(
 
         adapter = PlaylistEpisodeAdapter(
             playlistType = playlistType,
-            bookmarkManager = bookmarkManager,
-            downloadManager = downloadManager,
-            playbackManager = playbackManager,
-            upNextQueue = upNextQueue,
+            rowDataProvider = rowDataProvider,
             settings = settings,
             onRowClick = { episodeWrapper ->
                 when (episodeWrapper) {

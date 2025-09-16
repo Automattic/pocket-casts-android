@@ -8,33 +8,25 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import au.com.shiftyjelly.pocketcasts.filters.R
-import au.com.shiftyjelly.pocketcasts.filters.databinding.AdapterEpisodeAvailableBinding
 import au.com.shiftyjelly.pocketcasts.filters.databinding.AdapterEpisodeUnavailableBinding
 import au.com.shiftyjelly.pocketcasts.models.to.PlaylistEpisode
+import au.com.shiftyjelly.pocketcasts.podcasts.databinding.AdapterEpisodeBinding
 import au.com.shiftyjelly.pocketcasts.podcasts.view.components.PlayButton
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.preferences.model.ArtworkConfiguration
-import au.com.shiftyjelly.pocketcasts.preferences.model.BookmarksSortTypeForProfile
-import au.com.shiftyjelly.pocketcasts.repositories.bookmark.BookmarkManager
-import au.com.shiftyjelly.pocketcasts.repositories.download.DownloadManager
 import au.com.shiftyjelly.pocketcasts.repositories.images.PocketCastsImageRequestFactory
-import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
-import au.com.shiftyjelly.pocketcasts.repositories.playback.UpNextQueue
 import au.com.shiftyjelly.pocketcasts.repositories.playlist.Playlist
+import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeRowDataProvider
 import au.com.shiftyjelly.pocketcasts.views.multiselect.MultiSelectEpisodesHelper
 import au.com.shiftyjelly.pocketcasts.views.multiselect.MultiSelectEpisodesHelper.Companion.MULTI_SELECT_TOGGLE_PAYLOAD
 import au.com.shiftyjelly.pocketcasts.views.swipe.SwipeAction
 import au.com.shiftyjelly.pocketcasts.views.swipe.SwipeRowActions
 import java.util.UUID
-import kotlinx.coroutines.rx2.asObservable
-import timber.log.Timber
+import au.com.shiftyjelly.pocketcasts.podcasts.R as PodcastR
 
 class PlaylistEpisodeAdapter(
     private val playlistType: Playlist.Type,
-    private val bookmarkManager: BookmarkManager,
-    private val downloadManager: DownloadManager,
-    private val playbackManager: PlaybackManager,
-    private val upNextQueue: UpNextQueue,
+    private val rowDataProvider: EpisodeRowDataProvider,
     private val settings: Settings,
     private val onRowClick: (PlaylistEpisode) -> Unit,
     private val onSwipeAction: (PlaylistEpisode, SwipeAction) -> Unit,
@@ -56,18 +48,14 @@ class PlaylistEpisodeAdapter(
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
         val inflater = LayoutInflater.from(parent.context)
         return when (viewType) {
-            R.layout.adapter_episode_available -> {
-                val binding = AdapterEpisodeAvailableBinding.inflate(inflater, parent, false)
+            PodcastR.layout.adapter_episode -> {
+                val binding = AdapterEpisodeBinding.inflate(inflater, parent, false)
                 EpisodeAvailableViewHolder(
                     binding = binding,
                     playlistType = playlistType,
                     imageRequestFactory = imageRequestFactory,
                     swipeRowActionsFactory = swipeRowActionsFactory,
-                    downloadProgressUpdates = downloadManager.progressUpdateRelay,
-                    playbackStateUpdates = playbackManager.playbackStateRelay,
-                    upNextChangesObservable = upNextQueue.changesObservable,
-                    bookmarksObservable = bookmarkManager.findBookmarksFlow(BookmarksSortTypeForProfile.DATE_ADDED_NEWEST_TO_OLDEST)
-                        .asObservable(),
+                    rowDataProvider = rowDataProvider,
                     playButtonListener = playButtonListener,
                     onRowClick = { episodeWrapper ->
                         if (multiSelectHelper.isMultiSelecting) {
@@ -129,7 +117,7 @@ class PlaylistEpisodeAdapter(
         animateMultiSelection: Boolean,
     ) {
         holder.bind(
-            episodeWrapper = item,
+            item = item,
             isMultiSelectEnabled = multiSelectHelper.isMultiSelecting,
             isSelected = multiSelectHelper.isSelected(item.episode),
             useEpisodeArtwork = settings.artworkConfiguration.value.useEpisodeArtwork(ArtworkConfiguration.Element.Filters),
@@ -155,7 +143,7 @@ class PlaylistEpisodeAdapter(
     override fun getItemViewType(position: Int): Int {
         val item = getItem(position)
         return when (item) {
-            is PlaylistEpisode.Available -> R.layout.adapter_episode_available
+            is PlaylistEpisode.Available -> PodcastR.layout.adapter_episode
             is PlaylistEpisode.Unavailable -> R.layout.adapter_episode_unavailable
         }
     }

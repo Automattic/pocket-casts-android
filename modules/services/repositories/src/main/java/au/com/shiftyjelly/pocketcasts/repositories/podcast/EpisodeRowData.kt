@@ -15,6 +15,7 @@ import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.rxkotlin.Observables
 import io.reactivex.schedulers.Schedulers
 import java.util.concurrent.TimeUnit
+import javax.inject.Inject
 import kotlin.math.roundToInt
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.rx2.asObservable
@@ -27,7 +28,7 @@ data class EpisodeRowData(
     val hasBookmarks: Boolean,
 )
 
-class EpisodeRowDataProvider(
+class EpisodeRowDataProvider @Inject constructor(
     private val episodeManager: EpisodeManager,
     private val downloadManager: DownloadManager,
     private val playbackManager: PlaybackManager,
