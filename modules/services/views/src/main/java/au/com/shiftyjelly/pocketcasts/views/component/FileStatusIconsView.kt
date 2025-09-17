@@ -55,7 +55,6 @@ class FileStatusIconsView @JvmOverloads constructor(
         imgBookmark = findViewById(R.id.imgBookmark)
         lblStatus = findViewById(R.id.lblStatus)
         imgCloud = findViewById(R.id.imgCloud)
-        ViewGroup.LayoutParams(WRAP_CONTENT, WRAP_CONTENT)
         setPadding(0, 0, 0, 12.dpToPx(context))
     }
 
