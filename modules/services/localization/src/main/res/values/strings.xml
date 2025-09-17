@@ -941,6 +941,9 @@
     <!-- %1$s is a playlist title  -->
     <string name="add_to_playlist">Add to “%1$s”</string>
     <string name="add_to_playlist_description">Add to playlist</string>
+    <string name="add_to_playlist_find_playlist">Find playlist</string>
+    <string name="add_to_playlist_no_playlist_found_body">We couldn’t find any playlist for that search. Create a new playlist or try another keyword.</string>
+    <string name="add_to_playlist_no_playlist_found_title">Add to playlist</string>
     <!-- %1$s is episode count like "1 episode", "7 episodes". %2$s is a playlist title  -->
     <string name="added_to_playlist">%1$s added to “%2$s”</string>
     <!-- Accessibility description. %1$s is an episode title-->
@@ -986,6 +989,7 @@
     </plurals>
     <string name="playlist_episodes_hide_archived" translatable="false">@string/podcast_hide_archived</string>
     <string name="playlist_episodes_show_archived" translatable="false">@string/show_archived</string>
+    <string name="playlist_is_full_description">Playlist is full. Try creating a new one.</string>
     <string name="playlist_options">Playlist Options</string>
     <string name="playlist_play_all">Play All</string>
     <string name="playlist_select_episodes">Select Episodes</string>

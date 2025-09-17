@@ -729,4 +729,150 @@ class PlaylistManagerManualTest {
             )
         }
     }
+
+    @Test
+    fun observePlaylistPreviewsForEpisodes() = dsl.test {
+        insertManualPlaylist(0)
+        insertManualPlaylist(1)
+        insertManualPlaylist(2)
+        insertManualEpisode(index = 0, podcastIndex = 0, playlistIndex = 0)
+        insertManualEpisode(index = 1, podcastIndex = 0, playlistIndex = 1)
+        insertManualEpisode(index = 2, podcastIndex = 1, playlistIndex = 1)
+
+        manager.playlistPreviewsForEpisodeFlow("episode-id-0").test {
+            assertEquals(
+                listOf(
+                    playlistPreviewForEpisode(index = 0) {
+                        it.copy(episodeCount = 1, hasEpisode = true)
+                    },
+                    playlistPreviewForEpisode(index = 1) {
+                        it.copy(episodeCount = 2, hasEpisode = false)
+                    },
+                    playlistPreviewForEpisode(index = 2),
+                ),
+                awaitItem(),
+            )
+
+            insertManualEpisode(index = 0, podcastIndex = 0, playlistIndex = 1)
+            assertEquals(
+                listOf(
+                    playlistPreviewForEpisode(index = 0) {
+                        it.copy(episodeCount = 1, hasEpisode = true)
+                    },
+                    playlistPreviewForEpisode(index = 1) {
+                        it.copy(episodeCount = 3, hasEpisode = true)
+                    },
+                    playlistPreviewForEpisode(index = 2),
+                ),
+                awaitItem(),
+            )
+
+            deleteManualEpisode(index = 0, playlistIndex = 0)
+            assertEquals(
+                listOf(
+                    playlistPreviewForEpisode(index = 0) {
+                        it.copy(episodeCount = 0, hasEpisode = false)
+                    },
+                    playlistPreviewForEpisode(index = 1) {
+                        it.copy(episodeCount = 3, hasEpisode = true)
+                    },
+                    playlistPreviewForEpisode(index = 2),
+                ),
+                awaitItem(),
+            )
+
+            insertPodcast(index = 1)
+            insertPodcastEpisode(index = 2, podcastIndex = 1)
+            assertEquals(
+                listOf(
+                    playlistPreviewForEpisode(index = 0) {
+                        it.copy(episodeCount = 0, hasEpisode = false)
+                    },
+                    playlistPreviewForEpisode(index = 1) {
+                        it.copy(episodeCount = 3, hasEpisode = true, artworkPodcastUuids = listOf("podcast-id-1"))
+                    },
+                    playlistPreviewForEpisode(index = 2),
+                ),
+                awaitItem(),
+            )
+        }
+    }
+
+    @Test
+    fun searchPlaylistPreviewsForEpisodes() = dsl.test {
+        insertManualPlaylist(0) { it.copy(title = "abc") }
+        insertManualPlaylist(1) { it.copy(title = "DeF") }
+        insertManualPlaylist(2) { it.copy(title = "play % list") }
+        insertManualPlaylist(3) { it.copy(title = "play _ list") }
+        insertManualPlaylist(4) { it.copy(title = "play \\ list") }
+
+        manager.playlistPreviewsForEpisodeFlow("episode-id-0", searchTerm = null).test {
+            assertEquals(
+                "null search term",
+                listOf(
+                    playlistPreviewForEpisode(index = 0) { it.copy(title = "abc") },
+                    playlistPreviewForEpisode(index = 1) { it.copy(title = "DeF") },
+                    playlistPreviewForEpisode(index = 2) { it.copy(title = "play % list") },
+                    playlistPreviewForEpisode(index = 3) { it.copy(title = "play _ list") },
+                    playlistPreviewForEpisode(index = 4) { it.copy(title = "play \\ list") },
+                ),
+                awaitItem(),
+            )
+        }
+
+        manager.playlistPreviewsForEpisodeFlow("episode-id-0", searchTerm = " ").test {
+            assertEquals(
+                "blank term",
+                listOf(
+                    playlistPreviewForEpisode(index = 0) { it.copy(title = "abc") },
+                    playlistPreviewForEpisode(index = 1) { it.copy(title = "DeF") },
+                    playlistPreviewForEpisode(index = 2) { it.copy(title = "play % list") },
+                    playlistPreviewForEpisode(index = 3) { it.copy(title = "play _ list") },
+                    playlistPreviewForEpisode(index = 4) { it.copy(title = "play \\ list") },
+                ),
+                awaitItem(),
+            )
+        }
+
+        manager.playlistPreviewsForEpisodeFlow("episode-id-0", searchTerm = "aBc").test {
+            assertEquals(
+                "playlist search",
+                listOf(
+                    playlistPreviewForEpisode(index = 0) { it.copy(title = "abc") },
+                ),
+                awaitItem(),
+            )
+        }
+
+        manager.playlistPreviewsForEpisodeFlow("episode-id-0", searchTerm = "%").test {
+            assertEquals(
+                "percent character",
+                listOf(
+                    playlistPreviewForEpisode(index = 2) { it.copy(title = "play % list") },
+                ),
+                awaitItem(),
+            )
+        }
+
+        manager.playlistPreviewsForEpisodeFlow("episode-id-0", searchTerm = "_").test {
+            assertEquals(
+                "underscore character",
+                listOf(
+                    playlistPreviewForEpisode(index = 3) { it.copy(title = "play _ list") },
+                ),
+                awaitItem(),
+            )
+        }
+
+        manager.playlistPreviewsForEpisodeFlow("episode-id-0", searchTerm = "\\").test {
+            assertEquals(
+                "backslash character",
+
+                listOf(
+                    playlistPreviewForEpisode(index = 4) { it.copy(title = "play \\ list") },
+                ),
+                awaitItem(),
+            )
+        }
+    }
 }

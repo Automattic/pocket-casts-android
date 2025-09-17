@@ -20,6 +20,7 @@ import au.com.shiftyjelly.pocketcasts.models.entity.PlaylistEntity.Companion.SYN
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.models.to.PlaylistEpisode
 import au.com.shiftyjelly.pocketcasts.models.to.PlaylistEpisodeMetadata
+import au.com.shiftyjelly.pocketcasts.models.to.PlaylistPreviewForEpisodeEntity
 import au.com.shiftyjelly.pocketcasts.models.to.toPodcastEpisodes
 import au.com.shiftyjelly.pocketcasts.models.type.PlaylistEpisodeSortType
 import au.com.shiftyjelly.pocketcasts.models.type.SmartRules
@@ -253,7 +254,7 @@ class PlaylistManagerImpl(
                 if (playlist == null) {
                     flowOf(null)
                 } else {
-                    val podcastsFlow = manualPlaylistArtworkPodcastsFlow(playlist)
+                    val podcastsFlow = manualPlaylistArtworkPodcastsFlow(playlist.uuid)
                     val episodesFlow = playlistDao.manualEpisodesFlow(playlist.uuid, searchTerm.orEmpty())
                     val metadataFlow = playlistDao.manualPlaylistMetadataFlow(playlist.uuid)
 
@@ -282,6 +283,19 @@ class PlaylistManagerImpl(
             }
             .keepPodcastEpisodesSynced()
             .distinctUntilChanged()
+    }
+
+    override fun playlistPreviewsForEpisodeFlow(episodeUuid: String, searchTerm: String?): Flow<List<PlaylistPreviewForEpisode>> {
+        return playlistDao
+            .playlistPreviewsForEpisodeFlow(episodeUuid, searchTerm.orEmpty())
+            .flatMapLatest { playlists ->
+                if (playlists.isEmpty()) {
+                    flowOf(emptyList())
+                } else {
+                    createPreviewsForEpisode(playlists)
+                }
+            }
+            .keepPodcastEpisodesSynced()
     }
 
     override suspend fun getManualEpisodeSources(searchTerm: String?): List<ManualPlaylistEpisodeSource> {
@@ -377,8 +391,25 @@ class PlaylistManagerImpl(
         },
     ) { array -> array.toList() }
 
+    private fun createPreviewsForEpisode(playlists: List<PlaylistPreviewForEpisodeEntity>) = combine(
+        playlists.map { playlist ->
+            manualPlaylistArtworkPodcastsFlow(playlist.uuid)
+                .map { podcasts ->
+                    PlaylistPreviewForEpisode(
+                        uuid = playlist.uuid,
+                        title = playlist.title,
+                        episodeCount = playlist.episodeCount,
+                        artworkPodcastUuids = podcasts,
+                        hasEpisode = playlist.hasEpisode,
+                        episodeLimit = manualEpisodeLimit,
+                    )
+                }
+                .distinctUntilChanged()
+        },
+    ) { array -> array.toList() }
+
     private fun manualPlaylistPreviewsFlow(playlist: PlaylistEntity): Flow<PlaylistPreview> {
-        val podcastsFlow = manualPlaylistArtworkPodcastsFlow(playlist)
+        val podcastsFlow = manualPlaylistArtworkPodcastsFlow(playlist.uuid)
         val episodeMetadataFlow = playlistDao.manualPlaylistMetadataFlow(playlist.uuid)
         return combine(podcastsFlow, episodeMetadataFlow) { podcasts, metadata ->
             ManualPlaylistPreview(
@@ -415,8 +446,8 @@ class PlaylistManagerImpl(
         }
     }
 
-    private fun manualPlaylistArtworkPodcastsFlow(playlist: PlaylistEntity) = playlistDao
-        .manualPlaylistArtworkPodcastsFlow(playlist.uuid)
+    private fun manualPlaylistArtworkPodcastsFlow(playlistUuid: String) = playlistDao
+        .manualPlaylistArtworkPodcastsFlow(playlistUuid)
         .map { uuids -> uuids.toArtworkUuids() }
 
     private fun smartPlaylistArtworkPodcastsFlow(playlist: PlaylistEntity) = playlistDao
