@@ -12,6 +12,7 @@ import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.rememberNestedScrollInteropConnection
 import androidx.core.os.BundleCompat
 import androidx.core.os.bundleOf
+import androidx.core.view.postDelayed
 import androidx.fragment.app.viewModels
 import androidx.fragment.compose.content
 import androidx.navigation.compose.rememberNavController
@@ -24,7 +25,6 @@ import dagger.hilt.android.AndroidEntryPoint
 import dagger.hilt.android.lifecycle.withCreationCallback
 import kotlinx.parcelize.Parcelize
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
-import au.com.shiftyjelly.pocketcasts.views.R as VR
 
 @AndroidEntryPoint
 internal class AddToPlaylistFragment : BaseDialogFragment() {
@@ -69,13 +69,14 @@ internal class AddToPlaylistFragment : BaseDialogFragment() {
     @Composable
     private fun OpenCreatedPlaylistEffect() {
         LaunchedEffect(Unit) {
-            val createdPlaylistUuid = viewModel.createdPlaylist.await()
-            val hostListener = requireActivity() as FragmentHostListener
-            val fragment = PlaylistFragment.newInstance(createdPlaylistUuid, Playlist.Type.Manual)
-            hostListener.openTab(VR.id.navigation_filters)
-            hostListener.addFragment(fragment)
-            hostListener.closePlayer()
+            val playlistUuid = viewModel.createdPlaylist.await()
+
             dismiss()
+            val hostListener = requireActivity() as FragmentHostListener
+            hostListener.closeFiltersToRoot()
+            hostListener.addFragment(PlaylistFragment.newInstance(playlistUuid, Playlist.Type.Manual))
+            hostListener.closeBottomSheet()
+            hostListener.closePlayer()
         }
     }
 

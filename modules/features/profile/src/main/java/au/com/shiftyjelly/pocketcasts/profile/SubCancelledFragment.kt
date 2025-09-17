@@ -65,7 +65,7 @@ class SubCancelledFragment : BaseFragment() {
         }
 
         binding?.btnDone?.setOnClickListener {
-            (activity as? FragmentHostListener)?.bottomSheetClosePressed(this)
+            (activity as? FragmentHostListener)?.closeBottomSheet()
         }
 
         settings.setCancelledAcknowledged(true)
