@@ -37,7 +37,7 @@ class SwipeActionViewModel @AssistedInject constructor(
     private val playlistManager: PlaylistManager,
     private val userEpisodeManager: UserEpisodeManager,
     private val shareDialogFactory: ShareDialogFactory,
-    private val addToPlaylistHandler: AddToPlaylistHandler,
+    private val addToPlaylistFragmentFactory: AddToPlaylistFragmentFactory,
     private val tracker: AnalyticsTracker,
     private val episodeAnalytics: EpisodeAnalytics,
     @ApplicationContext private val context: Context,
@@ -164,7 +164,11 @@ class SwipeActionViewModel @AssistedInject constructor(
 
     fun addToPlaylist(episodeUuid: String, fragmentManager: FragmentManager) {
         trackAction(SwipeAction.AddToPlaylist)
-        addToPlaylistHandler.handle(episodeUuid, fragmentManager)
+
+        val fragment = addToPlaylistFragmentFactory.create(episodeUuid)
+        if (fragmentManager.findFragmentByTag("add-to-playlist") == null) {
+            fragment.show(fragmentManager, "add-to-playlist")
+        }
     }
 
     private fun trackAction(action: SwipeAction) {
