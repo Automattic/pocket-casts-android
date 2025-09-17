@@ -940,6 +940,7 @@
 
     <!-- %1$s is a playlist title  -->
     <string name="add_to_playlist">Add to “%1$s”</string>
+    <string name="add_to_playlist_description">Add to playlist</string>
     <!-- %1$s is episode count like "1 episode", "7 episodes". %2$s is a playlist title  -->
     <string name="added_to_playlist">%1$s added to “%2$s”</string>
     <!-- Accessibility description. %1$s is an episode title-->

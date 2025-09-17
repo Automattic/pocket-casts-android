@@ -35,10 +35,11 @@ class SwipeActionViewModel @AssistedInject constructor(
     private val podcastManager: PodcastManager,
     private val episodeManager: EpisodeManager,
     private val playlistManager: PlaylistManager,
+    private val userEpisodeManager: UserEpisodeManager,
     private val shareDialogFactory: ShareDialogFactory,
+    private val addToPlaylistHandler: AddToPlaylistHandler,
     private val tracker: AnalyticsTracker,
     private val episodeAnalytics: EpisodeAnalytics,
-    private val userEpisodeManager: UserEpisodeManager,
     @ApplicationContext private val context: Context,
     @ApplicationScope private val applicationScope: CoroutineScope,
     @Assisted private val swipeSource: SwipeSource,
@@ -161,6 +162,11 @@ class SwipeActionViewModel @AssistedInject constructor(
         ).show(fragmentManager, "delete_confirm")
     }
 
+    fun addToPlaylist(episodeUuid: String, fragmentManager: FragmentManager) {
+        trackAction(SwipeAction.AddToPlaylist)
+        addToPlaylistHandler.handle(episodeUuid, fragmentManager)
+    }
+
     private fun trackAction(action: SwipeAction) {
         tracker.track(
             AnalyticsEvent.EPISODE_SWIPE_ACTION_PERFORMED,
@@ -193,6 +199,7 @@ suspend fun SwipeActionViewModel.handleAction(
     SwipeAction.Unarchive -> unarchive(episodeUuid)
     SwipeAction.RemoveFromPlaylist -> removeFromPlaylist(episodeUuid)
     SwipeAction.DeleteUserEpisode -> deleteUserEpisode(episodeUuid, fragmentManager)
+    SwipeAction.AddToPlaylist -> addToPlaylist(episodeUuid, fragmentManager)
 }
 
 private fun SwipeSource.toSourceView() = when (this) {
