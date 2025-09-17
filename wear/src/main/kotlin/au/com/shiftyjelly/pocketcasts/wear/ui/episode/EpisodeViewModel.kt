@@ -171,7 +171,7 @@ class EpisodeViewModel @Inject constructor(
             podcastFlow.onStart { emit(null) },
             isPlayingEpisodeFlow.onStart { emit(false) },
             inUpNextFlow,
-            downloadProgressFlow.onStart<Float> { emit(0f) },
+            downloadProgressFlow.onStart { emit(0f) },
             showNotesFlow,
         ) { episode, podcast, isPlayingEpisode, upNext, downloadProgress, showNotesState ->
 
@@ -228,9 +228,9 @@ class EpisodeViewModel @Inject constructor(
         upNext: UpNextQueue.State?,
         episode: BaseEpisode,
     ) = (upNext is UpNextQueue.State.Loaded) &&
-        (upNext.queue + upNext.episode)
-            .map { it.uuid }
-            .contains(episode.uuid)
+            (upNext.queue + upNext.episode)
+                .map { it.uuid }
+                .contains(episode.uuid)
 
     private suspend fun getTintColor(
         episode: BaseEpisode,
@@ -242,6 +242,7 @@ class EpisodeViewModel @Inject constructor(
                 val tint = ThemeColor.podcastIcon02(theme.activeTheme, podcastTint)
                 Color(tint)
             }
+
         is UserEpisode ->
             // First check if the user has set a custom color for this episode
             AddFileActivity.darkThemeColors().find {
@@ -261,6 +262,7 @@ class EpisodeViewModel @Inject constructor(
                     is PodcastEpisode -> {
                         episodeManager.stopDownloadAndCleanUp(episode, fromString)
                     }
+
                     is UserEpisode -> {
                         downloadManager.removeEpisodeFromQueue(episode, fromString)
                     }
@@ -306,6 +308,7 @@ class EpisodeViewModel @Inject constructor(
                         removeFromUpNext = true,
                     )
                 }
+
                 is UserEpisode -> {
                     CloudDeleteHelper.deleteEpisode(
                         episode = episode,
