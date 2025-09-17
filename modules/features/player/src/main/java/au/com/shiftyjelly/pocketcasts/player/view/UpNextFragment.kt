@@ -56,7 +56,6 @@ import au.com.shiftyjelly.pocketcasts.views.extensions.tintIcons
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseFragment
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseFragmentToolbar.ChromeCastButton
 import au.com.shiftyjelly.pocketcasts.views.fragments.TopScrollable
-import au.com.shiftyjelly.pocketcasts.views.helper.EpisodeItemTouchHelper
 import au.com.shiftyjelly.pocketcasts.views.helper.NavigationIcon
 import au.com.shiftyjelly.pocketcasts.views.multiselect.MultiSelectEpisodesHelper
 import au.com.shiftyjelly.pocketcasts.views.multiselect.MultiSelectEpisodesHelper.Companion.MULTI_SELECT_TOGGLE_PAYLOAD
@@ -140,7 +139,6 @@ class UpNextFragment :
     private var realBinding: FragmentUpnextBinding? = null
     private val binding: FragmentUpnextBinding get() = realBinding ?: throw IllegalStateException("Trying to access the binding outside of the view lifecycle.")
 
-    private var episodeItemTouchHelper: EpisodeItemTouchHelper? = null
     private var itemTouchHelper: ItemTouchHelper? = null
 
     private var upNextItems: List<Any> = emptyList()
@@ -247,7 +245,6 @@ class UpNextFragment :
     }
 
     override fun onDestroyView() {
-        episodeItemTouchHelper = null
         itemTouchHelper = null
         binding.recyclerView.adapter = null
         super.onDestroyView()
@@ -364,10 +361,6 @@ class UpNextFragment :
             attachToRecyclerView(recyclerView)
         }
 
-        episodeItemTouchHelper = EpisodeItemTouchHelper().apply {
-            attachToRecyclerView(recyclerView)
-        }
-
         (recyclerView.itemAnimator as? SimpleItemAnimator)?.supportsChangeAnimations = false
         (recyclerView.itemAnimator as? SimpleItemAnimator)?.changeDuration = 0
 
@@ -450,19 +443,10 @@ class UpNextFragment :
     }
 
     override fun onUpNextEpisodeStartDrag(viewHolder: RecyclerView.ViewHolder) {
-        val recyclerView = realBinding?.recyclerView ?: return
         val itemTouchHelper = itemTouchHelper ?: return
-
         itemTouchHelper.startDrag(viewHolder)
         viewHolder.setIsRecyclable(false)
         userDraggingStart = viewHolder.bindingAdapterPosition
-
-        // Clear out any open swipes on drag
-        val firstPosition = (recyclerView.layoutManager as LinearLayoutManager).findFirstVisibleItemPosition()
-        val lastPosition = (recyclerView.layoutManager as LinearLayoutManager).findLastVisibleItemPosition()
-
-        (firstPosition..lastPosition).map { recyclerView.findViewHolderForAdapterPosition(it) }
-            .forEach { episodeItemTouchHelper?.clearView(recyclerView, it) }
     }
 
     override fun onEpisodeActionsClick(episodeUuid: String, podcastUuid: String?) {

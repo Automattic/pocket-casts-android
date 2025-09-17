@@ -53,7 +53,6 @@ import au.com.shiftyjelly.pocketcasts.views.dialog.OptionsDialog
 import au.com.shiftyjelly.pocketcasts.views.extensions.setup
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseFragment
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseFragmentToolbar.ChromeCastButton.Shown
-import au.com.shiftyjelly.pocketcasts.views.helper.EpisodeItemTouchHelper
 import au.com.shiftyjelly.pocketcasts.views.helper.NavigationIcon.BackArrow
 import au.com.shiftyjelly.pocketcasts.views.multiselect.MultiSelectEpisodesHelper
 import au.com.shiftyjelly.pocketcasts.views.multiselect.MultiSelectEpisodesHelper.Companion.MULTI_SELECT_TOGGLE_PAYLOAD
@@ -87,7 +86,6 @@ class CloudFilesFragment :
     @Inject lateinit var rowDataProvider: EpisodeRowDataProvider
 
     private lateinit var imageRequestFactory: PocketCastsImageRequestFactory
-    lateinit var itemTouchHelper: EpisodeItemTouchHelper
 
     private val viewModel: CloudFilesViewModel by viewModels()
     private val swipeActionViewModel by viewModels<SwipeActionViewModel>(
@@ -192,8 +190,6 @@ class CloudFilesFragment :
             it.layoutManager = LinearLayoutManager(it.context, RecyclerView.VERTICAL, false)
             it.adapter = adapter
             (it.itemAnimator as SimpleItemAnimator).changeDuration = 0
-            itemTouchHelper = EpisodeItemTouchHelper()
-            itemTouchHelper.attachToRecyclerView(it)
         }
 
         viewModel.uiState.observe(viewLifecycleOwner) {
