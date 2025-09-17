@@ -51,7 +51,7 @@ enum class ShelfItem(
         id = "add_to_playlist",
         titleId = { LR.string.add_to_playlist_description },
         showIf = { it is PodcastEpisode && FeatureFlag.isEnabled(Feature.PLAYLISTS_REBRANDING, immutable = true) },
-        iconId = { IR.drawable.ic_playlist_add_episode },
+        iconId = { IR.drawable.ic_add_to_playlist_action },
         analyticsValue = "add_to_playlist",
     ),
     Download(

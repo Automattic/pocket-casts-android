@@ -407,7 +407,7 @@ private fun AddToPlaylistButton(
 ) {
     IconButton(onClick = onClick) {
         Icon(
-            painterResource(id = IR.drawable.ic_playlist_add_episode),
+            painterResource(id = IR.drawable.ic_add_to_playlist_action),
             contentDescription = stringResource(LR.string.add_to_playlist_description),
             tint = playerColors.contrast03,
         )
