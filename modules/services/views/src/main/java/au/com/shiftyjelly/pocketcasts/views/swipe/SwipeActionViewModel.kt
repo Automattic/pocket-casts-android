@@ -165,8 +165,8 @@ class SwipeActionViewModel @AssistedInject constructor(
     fun addToPlaylist(episodeUuid: String, fragmentManager: FragmentManager) {
         trackAction(SwipeAction.AddToPlaylist)
 
-        val fragment = addToPlaylistFragmentFactory.create(episodeUuid)
         if (fragmentManager.findFragmentByTag("add-to-playlist") == null) {
+            val fragment = addToPlaylistFragmentFactory.create(episodeUuid)
             fragment.show(fragmentManager, "add-to-playlist")
         }
     }
