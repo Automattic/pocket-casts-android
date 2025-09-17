@@ -14,23 +14,19 @@ import au.com.shiftyjelly.pocketcasts.models.entity.BaseEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.models.to.PlaylistEpisode
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodeViewSource
-import au.com.shiftyjelly.pocketcasts.playlists.PlaylistViewModel
 import au.com.shiftyjelly.pocketcasts.playlists.manual.UnavailableEpisodeFragment
 import au.com.shiftyjelly.pocketcasts.podcasts.view.components.PlayButton
 import au.com.shiftyjelly.pocketcasts.podcasts.view.episode.EpisodeContainerFragment
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
-import au.com.shiftyjelly.pocketcasts.repositories.bookmark.BookmarkManager
-import au.com.shiftyjelly.pocketcasts.repositories.download.DownloadManager
 import au.com.shiftyjelly.pocketcasts.repositories.images.PocketCastsImageRequestFactory
-import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
-import au.com.shiftyjelly.pocketcasts.repositories.playback.UpNextQueue
 import au.com.shiftyjelly.pocketcasts.repositories.playlist.Playlist
+import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeRowDataProvider
 import au.com.shiftyjelly.pocketcasts.ui.extensions.themed
 import au.com.shiftyjelly.pocketcasts.views.helper.HasBackstack
 import au.com.shiftyjelly.pocketcasts.views.multiselect.MultiSelectEpisodesHelper
+import au.com.shiftyjelly.pocketcasts.views.multiselect.MultiSelectEpisodesHelper.Companion.MULTI_SELECT_TOGGLE_PAYLOAD
 import au.com.shiftyjelly.pocketcasts.views.multiselect.MultiSelectHelper
 import au.com.shiftyjelly.pocketcasts.views.multiselect.MultiSelectToolbar
-import au.com.shiftyjelly.pocketcasts.views.swipe.SwipeAction
 import au.com.shiftyjelly.pocketcasts.views.swipe.SwipeActionViewModel
 import au.com.shiftyjelly.pocketcasts.views.swipe.SwipeRowActions
 import au.com.shiftyjelly.pocketcasts.views.swipe.SwipeSource
@@ -44,10 +40,7 @@ import kotlinx.coroutines.launch
 @FragmentScoped
 class PlaylistEpisodesAdapterFactory @Inject constructor(
     private val fragment: Fragment,
-    private val bookmarkManager: BookmarkManager,
-    private val downloadManager: DownloadManager,
-    private val playbackManager: PlaybackManager,
-    private val upNextQueue: UpNextQueue,
+    private val rowDataProvider: EpisodeRowDataProvider,
     private val settings: Settings,
     private val playButtonListener: PlayButton.OnClickListener,
     private val multiSelectHelper: MultiSelectEpisodesHelper,
@@ -91,10 +84,7 @@ class PlaylistEpisodesAdapterFactory @Inject constructor(
 
         adapter = PlaylistEpisodeAdapter(
             playlistType = playlistType,
-            bookmarkManager = bookmarkManager,
-            downloadManager = downloadManager,
-            playbackManager = playbackManager,
-            upNextQueue = upNextQueue,
+            rowDataProvider = rowDataProvider,
             settings = settings,
             onRowClick = { episodeWrapper ->
                 when (episodeWrapper) {
@@ -171,8 +161,7 @@ class PlaylistEpisodesAdapterFactory @Inject constructor(
                     AnalyticsEvent.FILTER_MULTI_SELECT_EXITED
                 }
                 analyticsTracker.track(event)
-                @SuppressLint("NotifyDataSetChanged")
-                getAdapter().notifyDataSetChanged()
+                getAdapter().notifyItemRangeChanged(0, getEpisodes().size, MULTI_SELECT_TOGGLE_PAYLOAD)
             }
             listener = object : MultiSelectHelper.Listener<BaseEpisode> {
                 override fun multiSelectSelectAll() {

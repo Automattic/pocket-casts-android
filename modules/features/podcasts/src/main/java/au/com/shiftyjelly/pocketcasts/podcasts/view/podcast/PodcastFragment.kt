@@ -75,6 +75,7 @@ import au.com.shiftyjelly.pocketcasts.repositories.images.PodcastImageColorAnaly
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.repositories.playback.UpNextQueue
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
+import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeRowDataProvider
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
 import au.com.shiftyjelly.pocketcasts.settings.HeadphoneControlsSettingsFragment
 import au.com.shiftyjelly.pocketcasts.settings.SettingsFragment
@@ -94,20 +95,23 @@ import au.com.shiftyjelly.pocketcasts.views.extensions.smoothScrollToTop
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseFragment
 import au.com.shiftyjelly.pocketcasts.views.helper.EpisodeItemSwipeState
 import au.com.shiftyjelly.pocketcasts.views.helper.EpisodeItemTouchHelper
-import au.com.shiftyjelly.pocketcasts.views.helper.SwipeButtonLayoutFactory
-import au.com.shiftyjelly.pocketcasts.views.helper.SwipeButtonLayoutViewModel
 import au.com.shiftyjelly.pocketcasts.views.helper.UiUtil
 import au.com.shiftyjelly.pocketcasts.views.multiselect.MultiSelectBookmarksHelper.NavigationState
+import au.com.shiftyjelly.pocketcasts.views.multiselect.MultiSelectEpisodesHelper.Companion.MULTI_SELECT_TOGGLE_PAYLOAD
 import au.com.shiftyjelly.pocketcasts.views.multiselect.MultiSelectHelper
 import au.com.shiftyjelly.pocketcasts.views.multiselect.MultiSelectToolbar
+import au.com.shiftyjelly.pocketcasts.views.swipe.SwipeActionViewModel
+import au.com.shiftyjelly.pocketcasts.views.swipe.SwipeRowActions
+import au.com.shiftyjelly.pocketcasts.views.swipe.SwipeSource
+import au.com.shiftyjelly.pocketcasts.views.swipe.handleAction
 import com.google.android.material.snackbar.Snackbar
 import dagger.hilt.android.AndroidEntryPoint
+import dagger.hilt.android.lifecycle.withCreationCallback
 import javax.inject.Inject
 import kotlin.math.absoluteValue
 import kotlin.time.Duration.Companion.seconds
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.rx2.asObservable
 import kotlinx.coroutines.withContext
 import kotlinx.parcelize.Parcelize
 import timber.log.Timber
@@ -162,22 +166,7 @@ class PodcastFragment : BaseFragment() {
     lateinit var podcastManager: PodcastManager
 
     @Inject
-    lateinit var episodeManager: EpisodeManager
-
-    @Inject
-    lateinit var playbackManager: PlaybackManager
-
-    @Inject
-    lateinit var downloadManager: DownloadManager
-
-    @Inject
     lateinit var playButtonListener: PlayButton.OnClickListener
-
-    @Inject
-    lateinit var upNextQueue: UpNextQueue
-
-    @Inject
-    lateinit var bookmarkManager: BookmarkManager
 
     @Inject
     lateinit var coilManager: CoilManager
@@ -191,10 +180,22 @@ class PodcastFragment : BaseFragment() {
     @Inject
     lateinit var categoriesManager: CategoriesManager
 
+    @Inject
+    lateinit var swipeRowActionsFactory: SwipeRowActions.Factory
+
+    @Inject
+    lateinit var rowDataProvider: EpisodeRowDataProvider
+
     private val viewModel: PodcastViewModel by viewModels()
     private val ratingsViewModel: PodcastRatingsViewModel by viewModels()
     private val episodeListBookmarkViewModel: EpisodeListBookmarkViewModel by viewModels()
-    private val swipeButtonLayoutViewModel: SwipeButtonLayoutViewModel by viewModels()
+    private val swipeActionViewModel by viewModels<SwipeActionViewModel>(
+        extrasProducer = {
+            defaultViewModelCreationExtras.withCreationCallback<SwipeActionViewModel.Factory> { factory ->
+                factory.create(SwipeSource.PodcastDetails, playlistUuid = null)
+            }
+        },
+    )
 
     private var binding: FragmentPodcastBinding? = null
     private var toolbarController = ToolbarController()
@@ -338,7 +339,6 @@ class PodcastFragment : BaseFragment() {
                     .defaultLongPress(multiSelectable = it, fragmentManager = childFragmentManager)
             }
         }
-        adapter?.notifyDataSetChanged()
     }
 
     private val onArchiveAllClicked: () -> Unit = {
@@ -710,10 +710,9 @@ class PodcastFragment : BaseFragment() {
         adapter = PodcastAdapter(
             context = requireContext(),
             headerType = headerType,
-            downloadManager = downloadManager,
-            playbackManager = playbackManager,
-            upNextQueue = upNextQueue,
+            rowDataProvider = rowDataProvider,
             settings = settings,
+            swipeRowActionsFactory = swipeRowActionsFactory,
             theme = theme,
             fromListUuid = fromListUuid,
             onHeaderSummaryToggled = onHeaderSummaryToggled,
@@ -738,22 +737,8 @@ class PodcastFragment : BaseFragment() {
             onTabClicked = onTabClicked,
             onBookmarkPlayClicked = onBookmarkPlayClicked,
             ratingsViewModel = ratingsViewModel,
-            swipeButtonLayoutFactory = SwipeButtonLayoutFactory(
-                swipeButtonLayoutViewModel = swipeButtonLayoutViewModel,
-                onItemUpdated = ::notifyItemChanged,
-                defaultUpNextSwipeAction = { settings.upNextSwipe.value },
-                fragmentManager = parentFragmentManager,
-                swipeSource = EpisodeItemTouchHelper.SwipeSource.PODCAST_DETAILS,
-            ),
             onHeadsetSettingsClicked = ::onHeadsetSettingsClicked,
             onGetBookmarksClicked = ::onGetBookmarksClicked,
-            podcastBookmarksObservable = bookmarkManager.findPodcastBookmarksFlow(
-                podcastUuid = podcastUuid,
-                sortType = settings.podcastBookmarksSortType.flow.value,
-            ).asObservable(),
-            onPodcastDescriptionClicked = {
-                analyticsTracker.track(AnalyticsEvent.PODCAST_SCREEN_PODCAST_DESCRIPTION_TAPPED)
-            },
             onChangeHeaderExpanded = { uuid, isExpanded ->
                 viewModel.updateIsHeaderExpanded(uuid, isExpanded)
             },
@@ -823,6 +808,11 @@ class PodcastFragment : BaseFragment() {
             },
             onRecommendedRetryClicked = {
                 viewModel.onRecommendedRetryClicked()
+            },
+            onSwipeAction = { episode, swipeAction ->
+                viewLifecycleOwner.lifecycleScope.launch {
+                    swipeActionViewModel.handleAction(swipeAction, episode.uuid, childFragmentManager)
+                }
             },
         ).apply {
             stateRestorationPolicy = StateRestorationPolicy.PREVENT_WHEN_EMPTY
@@ -969,9 +959,14 @@ class PodcastFragment : BaseFragment() {
         isMultiSelectingLive.observe(viewLifecycleOwner) {
             val episodeContainerFragment = parentFragmentManager.findFragmentByTag(EPISODE_CARD)
             if (episodeContainerFragment != null) return@observe
+
+            val wasMultiSelecting = multiSelectToolbar.isVisible
+            if (wasMultiSelecting == isMultiSelecting) {
+                return@observe
+            }
             multiSelectToolbar.isVisible = it
             binding?.toolbar?.isInvisible = it
-            adapter?.notifyDataSetChanged()
+            adapter?.notifyItemRangeChanged(0, adapter?.itemCount ?: 0, MULTI_SELECT_TOGGLE_PAYLOAD)
         }
         coordinatorLayout = (activity as FragmentHostListener).snackBarView()
         context = requireActivity()

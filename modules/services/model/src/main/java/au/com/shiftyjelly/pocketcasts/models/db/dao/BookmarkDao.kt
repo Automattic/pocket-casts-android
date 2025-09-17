@@ -219,4 +219,7 @@ abstract class BookmarkDao {
             AND deleted = :deleted""",
     )
     abstract fun findUserEpisodesBookmarksFlow(deleted: Boolean = false): Flow<List<Bookmark>>
+
+    @Query("SELECT EXISTS(SELECT 1 FROM bookmarks WHERE episode_uuid IS :episodeUuid)")
+    abstract fun hasBookmarksFlow(episodeUuid: String): Flow<Boolean>
 }

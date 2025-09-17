@@ -59,6 +59,7 @@ import au.com.shiftyjelly.pocketcasts.repositories.images.PocketCastsImageReques
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.repositories.playback.UpNextQueue
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
+import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeRowDataProvider
 import au.com.shiftyjelly.pocketcasts.settings.AutoDownloadSettingsFragment
 import au.com.shiftyjelly.pocketcasts.settings.ManualCleanupFragment
 import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingFlow
@@ -77,8 +78,14 @@ import au.com.shiftyjelly.pocketcasts.views.helper.NavigationIcon.BackArrow
 import au.com.shiftyjelly.pocketcasts.views.helper.SwipeButtonLayoutFactory
 import au.com.shiftyjelly.pocketcasts.views.helper.SwipeButtonLayoutViewModel
 import au.com.shiftyjelly.pocketcasts.views.multiselect.MultiSelectEpisodesHelper
+import au.com.shiftyjelly.pocketcasts.views.multiselect.MultiSelectEpisodesHelper.Companion.MULTI_SELECT_TOGGLE_PAYLOAD
 import au.com.shiftyjelly.pocketcasts.views.multiselect.MultiSelectHelper
+import au.com.shiftyjelly.pocketcasts.views.swipe.SwipeActionViewModel
+import au.com.shiftyjelly.pocketcasts.views.swipe.SwipeRowActions
+import au.com.shiftyjelly.pocketcasts.views.swipe.SwipeSource
+import au.com.shiftyjelly.pocketcasts.views.swipe.handleAction
 import dagger.hilt.android.AndroidEntryPoint
+import dagger.hilt.android.lifecycle.withCreationCallback
 import javax.inject.Inject
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.filterIsInstance
@@ -150,11 +157,31 @@ class ProfileEpisodeListFragment :
     @Inject
     lateinit var bookmarkManager: BookmarkManager
 
+    @Inject
+    lateinit var swipeRowActionsFactory: SwipeRowActions.Factory
+
+    @Inject
+    lateinit var rowDataProvider: EpisodeRowDataProvider
+
     private val viewModel: ProfileEpisodeListViewModel by viewModels()
     private val cleanUpViewModel: ManualCleanupViewModel by viewModels()
     private val episodeListBookmarkViewModel: EpisodeListBookmarkViewModel by viewModels()
     private val swipeButtonLayoutViewModel: SwipeButtonLayoutViewModel by viewModels()
+    private val swipeActionViewModel by viewModels<SwipeActionViewModel>(
+        extrasProducer = {
+            defaultViewModelCreationExtras.withCreationCallback<SwipeActionViewModel.Factory> { factory ->
+                val swipeSource = when (mode) {
+                    Mode.Downloaded -> SwipeSource.Downloads
+                    Mode.History -> SwipeSource.ListeningHistory
+                    Mode.Starred -> SwipeSource.Starred
+                }
+                factory.create(swipeSource, playlistUuid = null)
+            }
+        },
+    )
+
     private lateinit var imageRequestFactory: PocketCastsImageRequestFactory
+
     private var binding: FragmentProfileEpisodeListBinding? = null
 
     val mode: Mode
@@ -179,6 +206,7 @@ class ProfileEpisodeListFragment :
 
     val adapter by lazy {
         EpisodeListAdapter(
+            rowDataProvider = rowDataProvider,
             bookmarkManager = bookmarkManager,
             downloadManager = downloadManager,
             playbackManager = playbackManager,
@@ -187,6 +215,7 @@ class ProfileEpisodeListFragment :
             onRowClick = onRowClick,
             playButtonListener = playButtonListener,
             imageRequestFactory = imageRequestFactory,
+            swipeRowActionsFactory = swipeRowActionsFactory,
             multiSelectHelper = multiSelectHelper,
             fragmentManager = childFragmentManager,
             swipeButtonLayoutFactory = SwipeButtonLayoutFactory(
@@ -204,6 +233,11 @@ class ProfileEpisodeListFragment :
                 Mode.Downloaded -> Element.Downloads
                 Mode.History -> Element.ListeningHistory
                 Mode.Starred -> Element.Starred
+            },
+            onSwipeAction = { episode, swipeAction ->
+                viewLifecycleOwner.lifecycleScope.launch {
+                    swipeActionViewModel.handleAction(swipeAction, episode.uuid, childFragmentManager)
+                }
             },
         )
     }
@@ -366,19 +400,23 @@ class ProfileEpisodeListFragment :
 
         multiSelectHelper.isMultiSelectingLive.observe(viewLifecycleOwner) { isMultiSelecting ->
             val wasMultiSelecting = binding?.multiSelectToolbar?.isVisible == true
+            if (wasMultiSelecting == isMultiSelecting) {
+                return@observe
+            }
             binding?.multiSelectToolbar?.isVisible = isMultiSelecting
+
             binding?.toolbar?.isVisible = !isMultiSelecting
             binding?.multiSelectToolbar?.setNavigationIcon(R.drawable.ic_arrow_back)
 
             if ((activity as? FragmentHostListener)?.isUpNextShowing() == false) {
                 if (isMultiSelecting) {
                     trackMultiSelectEntered()
-                } else if (wasMultiSelecting) {
+                } else {
                     trackMultiSelectExited()
                 }
             }
 
-            adapter.notifyDataSetChanged()
+            adapter.notifyItemRangeChanged(0, adapter.itemCount, MULTI_SELECT_TOGGLE_PAYLOAD)
         }
         multiSelectHelper.listener = object : MultiSelectHelper.Listener<BaseEpisode> {
             override fun multiSelectSelectAll() {

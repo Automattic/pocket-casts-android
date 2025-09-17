@@ -45,11 +45,11 @@ import au.com.shiftyjelly.pocketcasts.preferences.model.AutoPlaySource
 import au.com.shiftyjelly.pocketcasts.profile.R
 import au.com.shiftyjelly.pocketcasts.profile.databinding.FragmentCloudFilesBinding
 import au.com.shiftyjelly.pocketcasts.repositories.bookmark.BookmarkManager
-import au.com.shiftyjelly.pocketcasts.repositories.chromecast.CastManager
 import au.com.shiftyjelly.pocketcasts.repositories.download.DownloadManager
 import au.com.shiftyjelly.pocketcasts.repositories.images.PocketCastsImageRequestFactory
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.repositories.playback.UpNextQueue
+import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeRowDataProvider
 import au.com.shiftyjelly.pocketcasts.ui.extensions.themed
 import au.com.shiftyjelly.pocketcasts.ui.helper.FragmentHostListener
 import au.com.shiftyjelly.pocketcasts.ui.theme.ThemeColor
@@ -64,7 +64,12 @@ import au.com.shiftyjelly.pocketcasts.views.helper.SwipeButtonLayoutFactory
 import au.com.shiftyjelly.pocketcasts.views.helper.SwipeButtonLayoutViewModel
 import au.com.shiftyjelly.pocketcasts.views.multiselect.MultiSelectEpisodesHelper
 import au.com.shiftyjelly.pocketcasts.views.multiselect.MultiSelectHelper
+import au.com.shiftyjelly.pocketcasts.views.swipe.SwipeActionViewModel
+import au.com.shiftyjelly.pocketcasts.views.swipe.SwipeRowActions
+import au.com.shiftyjelly.pocketcasts.views.swipe.SwipeSource
+import au.com.shiftyjelly.pocketcasts.views.swipe.handleAction
 import dagger.hilt.android.AndroidEntryPoint
+import dagger.hilt.android.lifecycle.withCreationCallback
 import javax.inject.Inject
 import kotlin.math.roundToInt
 import kotlinx.coroutines.launch
@@ -87,11 +92,13 @@ class CloudFilesFragment :
 
     @Inject lateinit var multiSelectHelper: MultiSelectEpisodesHelper
 
-    @Inject lateinit var castManager: CastManager
-
     @Inject lateinit var analyticsTracker: AnalyticsTracker
 
     @Inject lateinit var bookmarkManager: BookmarkManager
+
+    @Inject lateinit var swipeRowActionsFactory: SwipeRowActions.Factory
+
+    @Inject lateinit var rowDataProvider: EpisodeRowDataProvider
 
     private lateinit var imageRequestFactory: PocketCastsImageRequestFactory
     lateinit var itemTouchHelper: EpisodeItemTouchHelper
@@ -99,10 +106,19 @@ class CloudFilesFragment :
     private val viewModel: CloudFilesViewModel by viewModels()
     private val episodeListBookmarkViewModel: EpisodeListBookmarkViewModel by viewModels()
     private val swipeButtonLayoutViewModel: SwipeButtonLayoutViewModel by viewModels()
+    private val swipeActionViewModel by viewModels<SwipeActionViewModel>(
+        extrasProducer = {
+            defaultViewModelCreationExtras.withCreationCallback<SwipeActionViewModel.Factory> { factory ->
+                factory.create(SwipeSource.Files, playlistUuid = null)
+            }
+        },
+    )
+
     private var binding: FragmentCloudFilesBinding? = null
 
     val adapter by lazy {
         EpisodeListAdapter(
+            rowDataProvider = rowDataProvider,
             bookmarkManager = bookmarkManager,
             downloadManager = downloadManager,
             playbackManager = playbackManager,
@@ -111,6 +127,7 @@ class CloudFilesFragment :
             onRowClick = onRowClick,
             playButtonListener = playButtonListener,
             imageRequestFactory = imageRequestFactory,
+            swipeRowActionsFactory = swipeRowActionsFactory,
             multiSelectHelper = multiSelectHelper,
             fragmentManager = childFragmentManager,
             swipeButtonLayoutFactory = SwipeButtonLayoutFactory(
@@ -121,6 +138,11 @@ class CloudFilesFragment :
                 swipeSource = EpisodeItemTouchHelper.SwipeSource.FILES,
             ),
             artworkContext = Element.Files,
+            onSwipeAction = { episode, swipeAction ->
+                viewLifecycleOwner.lifecycleScope.launch {
+                    swipeActionViewModel.handleAction(swipeAction, episode.uuid, childFragmentManager)
+                }
+            },
         )
     }
 
