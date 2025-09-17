@@ -34,6 +34,8 @@ class SwipeActionViewModel @AssistedInject constructor(
     fun addToUpNextTop(episodeUuid: String) {
         trackAction(SwipeAction.AddToUpNextTop)
 
+        // Using dispatcher because playback manager has some broken internal logic
+        // and runs blocking code on the main thread.
         viewModelScope.launch {
             val episode = episodeManager.findEpisodeByUuid(episodeUuid) ?: return@launch
             playbackManager.playNext(episode, swipeSource.toSourceView())
@@ -43,7 +45,9 @@ class SwipeActionViewModel @AssistedInject constructor(
     fun addToUpNextBottom(episodeUuid: String) {
         trackAction(SwipeAction.AddToUpNextBottom)
 
-        viewModelScope.launch {
+        // Using dispatcher because playback manager has some broken internal logic
+        // and runs blocking code on the main thread.
+        viewModelScope.launch(Dispatchers.IO) {
             val episode = episodeManager.findEpisodeByUuid(episodeUuid) ?: return@launch
             playbackManager.playLast(episode, swipeSource.toSourceView())
         }
@@ -52,6 +56,8 @@ class SwipeActionViewModel @AssistedInject constructor(
     fun removeFromUpNext(episodeUuid: String) {
         trackAction(SwipeAction.RemoveFromPlaylist)
 
+        // Using dispatcher because playback manager has some broken internal logic
+        // and runs blocking code on the main thread.
         viewModelScope.launch {
             val episode = episodeManager.findEpisodeByUuid(episodeUuid) ?: return@launch
             playbackManager.removeEpisode(episode, swipeSource.toSourceView())
