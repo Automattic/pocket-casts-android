@@ -130,6 +130,7 @@ import au.com.shiftyjelly.pocketcasts.views.fragments.BaseFragment
 import au.com.shiftyjelly.pocketcasts.views.helper.CloudDeleteHelper
 import au.com.shiftyjelly.pocketcasts.views.helper.UiUtil
 import au.com.shiftyjelly.pocketcasts.views.helper.WarningsHelper
+import au.com.shiftyjelly.pocketcasts.views.swipe.AddToPlaylistFragmentFactory
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.snackbar.Snackbar
 import dagger.hilt.android.AndroidEntryPoint
@@ -159,6 +160,9 @@ class PlayerHeaderFragment :
 
     @Inject
     lateinit var warningsHelper: WarningsHelper
+
+    @Inject
+    lateinit var addToPlaylistFragmentFactory: AddToPlaylistFragmentFactory
 
     private val viewModel: PlayerViewModel by activityViewModels()
     private val shelfSharedViewModel: ShelfSharedViewModel by activityViewModels()
@@ -389,6 +393,16 @@ class PlayerHeaderFragment :
                         }
 
                         is NavigationState.StartUpsellFlow -> startUpsellFlow(navigationState.source)
+
+                        is NavigationState.AddEpisodeToPlaylist -> {
+                            if (parentFragmentManager.findFragmentByTag("add-to-playlist") == null) {
+                                val fragment = addToPlaylistFragmentFactory.create(
+                                    episodeUuid = navigationState.episodeUuid,
+                                    customTheme = Theme.ThemeType.DARK,
+                                )
+                                fragment.show(parentFragmentManager, "add-to-playlist")
+                            }
+                        }
                     }
                 }
             }

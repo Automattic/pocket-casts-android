@@ -202,6 +202,7 @@ open class BaseDialogFragment :
         modifier: Modifier = Modifier,
         useThemeBackground: Boolean = true,
         fillMaxHeight: Boolean = true,
+        themeType: Theme.ThemeType = theme.activeTheme,
         content: @Composable BoxScope.() -> Unit,
     ) {
         Box(
@@ -209,7 +210,7 @@ open class BaseDialogFragment :
                 .then(if (fillMaxHeight) Modifier.fillMaxHeight(0.93f) else Modifier)
                 .clip(RoundedCornerShape(topStart = 16.dp, topEnd = 16.dp)),
         ) {
-            Background(useThemeBackground) {
+            Background(themeType, useThemeBackground) {
                 DialogContent(modifier, content)
             }
         }
@@ -232,13 +233,14 @@ open class BaseDialogFragment :
 
     @Composable
     private fun Background(
+        themeType: Theme.ThemeType,
         useThemeBackground: Boolean,
         content: @Composable () -> Unit,
     ) {
         if (useThemeBackground) {
-            AppThemeWithBackground(theme.activeTheme, content)
+            AppThemeWithBackground(themeType, content)
         } else {
-            AppTheme(theme.activeTheme, content)
+            AppTheme(themeType, content)
         }
     }
 }
