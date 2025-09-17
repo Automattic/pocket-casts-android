@@ -109,9 +109,12 @@ abstract class BaseEpisodeViewHolder<T : Any>(
         animateMultiSelection: Boolean = false,
     ) {
         val wasMultiSelecting = this.isMultiSelectEnabled
+        val previousUuid = boundItem?.let(::toPodcastEpisode)?.uuid
         setupInitialState(item, tint, isMultiSelectEnabled, streamByDefault)
 
-        observeRowData()
+        if (previousUuid != episode.uuid) {
+            observeRowData()
+        }
         bindArtwork(useEpisodeArtwork)
         bindPlaybackButton()
         bindTitle()

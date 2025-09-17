@@ -17,20 +17,14 @@ import au.com.shiftyjelly.pocketcasts.podcasts.databinding.AdapterUserEpisodeBin
 import au.com.shiftyjelly.pocketcasts.podcasts.view.components.PlayButton
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.preferences.model.ArtworkConfiguration.Element
-import au.com.shiftyjelly.pocketcasts.repositories.bookmark.BookmarkManager
-import au.com.shiftyjelly.pocketcasts.repositories.download.DownloadManager
 import au.com.shiftyjelly.pocketcasts.repositories.images.PocketCastsImageRequestFactory
-import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
-import au.com.shiftyjelly.pocketcasts.repositories.playback.UpNextQueue
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeRowDataProvider
 import au.com.shiftyjelly.pocketcasts.ui.extensions.getThemeColor
-import au.com.shiftyjelly.pocketcasts.views.helper.SwipeButtonLayoutFactory
 import au.com.shiftyjelly.pocketcasts.views.multiselect.MultiSelectEpisodesHelper
 import au.com.shiftyjelly.pocketcasts.views.multiselect.MultiSelectEpisodesHelper.Companion.MULTI_SELECT_TOGGLE_PAYLOAD
 import au.com.shiftyjelly.pocketcasts.views.swipe.SwipeAction
 import au.com.shiftyjelly.pocketcasts.views.swipe.SwipeRowActions
 import io.reactivex.disposables.CompositeDisposable
-import kotlinx.coroutines.rx2.asObservable
 import au.com.shiftyjelly.pocketcasts.ui.R as UR
 
 val PLAYBACK_DIFF: DiffUtil.ItemCallback<BaseEpisode> = object : DiffUtil.ItemCallback<BaseEpisode>() {
@@ -49,10 +43,6 @@ val PLAYBACK_DIFF: DiffUtil.ItemCallback<BaseEpisode> = object : DiffUtil.ItemCa
 
 class EpisodeListAdapter(
     private val rowDataProvider: EpisodeRowDataProvider,
-    private val bookmarkManager: BookmarkManager,
-    private val downloadManager: DownloadManager,
-    private val playbackManager: PlaybackManager,
-    private val upNextQueue: UpNextQueue,
     private val settings: Settings,
     private val artworkContext: Element,
     private val onRowClick: (BaseEpisode) -> Unit,
@@ -62,12 +52,8 @@ class EpisodeListAdapter(
     private val swipeRowActionsFactory: SwipeRowActions.Factory,
     private val multiSelectHelper: MultiSelectEpisodesHelper,
     private val fragmentManager: FragmentManager,
-    private val swipeButtonLayoutFactory: SwipeButtonLayoutFactory,
 ) : ListAdapter<BaseEpisode, RecyclerView.ViewHolder>(PLAYBACK_DIFF) {
-
     val disposables = CompositeDisposable()
-
-    private var bookmarksAvailable: Boolean = false
 
     init {
         setHasStableIds(true)
@@ -107,17 +93,27 @@ class EpisodeListAdapter(
                 )
             }
 
-            R.layout.adapter_user_episode -> UserEpisodeViewHolder(
-                binding = AdapterUserEpisodeBinding.inflate(inflater, parent, false),
-                settings = settings,
-                downloadProgressUpdates = downloadManager.progressUpdateRelay,
-                playbackStateUpdates = playbackManager.playbackStateRelay,
-                upNextChangesObservable = upNextQueue.changesObservable,
-                imageRequestFactory = imageRequestFactory,
-                swipeButtonLayoutFactory = swipeButtonLayoutFactory,
-                userBookmarksObservable = bookmarkManager.findUserEpisodesBookmarksFlow().asObservable(),
-                artworkContext = artworkContext,
-            )
+            R.layout.adapter_user_episode -> {
+                val binding = AdapterUserEpisodeBinding.inflate(inflater, parent, false)
+                UserEpisodeViewHolder(
+                    binding = binding,
+                    imageRequestFactory = imageRequestFactory,
+                    swipeRowActionsFactory = swipeRowActionsFactory,
+                    rowDataProvider = rowDataProvider,
+                    playButtonListener = playButtonListener,
+                    onRowClick = { episode ->
+                        if (multiSelectHelper.isMultiSelecting) {
+                            binding.checkbox.isChecked = multiSelectHelper.toggle(episode)
+                        } else {
+                            onRowClick(episode)
+                        }
+                    },
+                    onRowLongClick = { episode ->
+                        multiSelectHelper.defaultLongPress(multiSelectable = episode, fragmentManager = fragmentManager)
+                    },
+                    onSwipeAction = onSwipeAction,
+                )
+            }
 
             else -> throw IllegalStateException("Unknown playable type")
         }
@@ -132,19 +128,23 @@ class EpisodeListAdapter(
 
             is UserEpisode -> {
                 val episodeHolder = holder as UserEpisodeViewHolder
-                bindUserEpisodeViewHolder(episodeHolder, item)
+                bindUserEpisodeViewHolder(episodeHolder, item, animateMultiSelection = false)
             }
         }
     }
 
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int, payloads: List<Any?>) {
+        val animateMultiSelection = MULTI_SELECT_TOGGLE_PAYLOAD in payloads
         when (val item = getItem(position)) {
             is PodcastEpisode -> {
                 val episodeHolder = holder as EpisodeViewHolder
-                bindEpisodeViewHolder(episodeHolder, item, animateMultiSelection = MULTI_SELECT_TOGGLE_PAYLOAD in payloads)
+                bindEpisodeViewHolder(episodeHolder, item, animateMultiSelection = animateMultiSelection)
             }
 
-            else -> super.onBindViewHolder(holder, position, payloads)
+            is UserEpisode -> {
+                val episodeHolder = holder as UserEpisodeViewHolder
+                bindUserEpisodeViewHolder(episodeHolder, item, animateMultiSelection = animateMultiSelection)
+            }
         }
     }
 
@@ -163,29 +163,20 @@ class EpisodeListAdapter(
         )
     }
 
-    private fun bindUserEpisodeViewHolder(holder: UserEpisodeViewHolder, episode: UserEpisode) {
-        val tintColor = this.tintColor ?: holder.itemView.context.getThemeColor(UR.attr.primary_icon_01)
-        holder.setup(
+    private fun bindUserEpisodeViewHolder(
+        holder: UserEpisodeViewHolder,
+        episode: UserEpisode,
+        animateMultiSelection: Boolean,
+    ) {
+        holder.bind(
             episode = episode,
-            tintColor = tintColor,
-            playButtonListener = playButtonListener,
-            streamByDefault = settings.streamingMode.value,
-            upNextAction = settings.upNextSwipe.value,
-            multiSelectEnabled = multiSelectHelper.isMultiSelecting,
+            tint = tintColor ?: holder.itemView.context.getThemeColor(UR.attr.primary_icon_01),
+            isMultiSelectEnabled = multiSelectHelper.isMultiSelecting,
             isSelected = multiSelectHelper.isSelected(episode),
-            bookmarksAvailable = bookmarksAvailable,
+            useEpisodeArtwork = settings.artworkConfiguration.value.useEpisodeArtwork(Element.Files),
+            streamByDefault = settings.streamingMode.value,
+            animateMultiSelection = animateMultiSelection,
         )
-        holder.episodeRow.setOnClickListener {
-            if (multiSelectHelper.isMultiSelecting) {
-                holder.binding.checkbox.isChecked = multiSelectHelper.toggle(episode)
-            } else {
-                onRowClick(episode)
-            }
-        }
-        holder.episodeRow.setOnLongClickListener {
-            multiSelectHelper.defaultLongPress(multiSelectable = episode, fragmentManager = fragmentManager)
-            true
-        }
     }
 
     override fun onDetachedFromRecyclerView(recyclerView: RecyclerView) {
@@ -199,7 +190,7 @@ class EpisodeListAdapter(
         if (holder is EpisodeViewHolder) {
             holder.unbind()
         } else if (holder is UserEpisodeViewHolder) {
-            holder.clearObservers()
+            holder.unbind()
         }
     }
 
@@ -215,9 +206,5 @@ class EpisodeListAdapter(
             is UserEpisode -> R.layout.adapter_user_episode
             else -> throw IllegalStateException("Unknown playable type")
         }
-    }
-
-    fun setBookmarksAvailable(bookmarksAvailable: Boolean) {
-        this.bookmarksAvailable = bookmarksAvailable
     }
 }

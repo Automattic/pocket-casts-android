@@ -60,7 +60,6 @@ import au.com.shiftyjelly.pocketcasts.podcasts.view.episode.EpisodeContainerFrag
 import au.com.shiftyjelly.pocketcasts.podcasts.view.folders.FolderChooserFragment
 import au.com.shiftyjelly.pocketcasts.podcasts.view.podcast.PodcastAdapter.HeaderType
 import au.com.shiftyjelly.pocketcasts.podcasts.view.podcasts.PodcastsFragment
-import au.com.shiftyjelly.pocketcasts.podcasts.viewmodel.EpisodeListBookmarkViewModel
 import au.com.shiftyjelly.pocketcasts.podcasts.viewmodel.PodcastRatingsViewModel
 import au.com.shiftyjelly.pocketcasts.podcasts.viewmodel.PodcastViewModel
 import au.com.shiftyjelly.pocketcasts.podcasts.viewmodel.PodcastViewModel.PodcastTab
@@ -68,13 +67,8 @@ import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.preferences.model.AutoPlaySource
 import au.com.shiftyjelly.pocketcasts.reimagine.podcast.SharePodcastFragment
 import au.com.shiftyjelly.pocketcasts.reimagine.timestamp.ShareEpisodeTimestampFragment
-import au.com.shiftyjelly.pocketcasts.repositories.bookmark.BookmarkManager
 import au.com.shiftyjelly.pocketcasts.repositories.categories.CategoriesManager
-import au.com.shiftyjelly.pocketcasts.repositories.download.DownloadManager
 import au.com.shiftyjelly.pocketcasts.repositories.images.PodcastImageColorAnalyzer
-import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
-import au.com.shiftyjelly.pocketcasts.repositories.playback.UpNextQueue
-import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeRowDataProvider
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
 import au.com.shiftyjelly.pocketcasts.settings.HeadphoneControlsSettingsFragment
@@ -188,7 +182,6 @@ class PodcastFragment : BaseFragment() {
 
     private val viewModel: PodcastViewModel by viewModels()
     private val ratingsViewModel: PodcastRatingsViewModel by viewModels()
-    private val episodeListBookmarkViewModel: EpisodeListBookmarkViewModel by viewModels()
     private val swipeActionViewModel by viewModels<SwipeActionViewModel>(
         extrasProducer = {
             defaultViewModelCreationExtras.withCreationCallback<SwipeActionViewModel.Factory> { factory ->
@@ -906,6 +899,7 @@ class PodcastFragment : BaseFragment() {
                                 viewModel.onOpenNotificationSettingsClicked(requireActivity())
                             },
                         )
+
                         is PodcastViewModel.SnackBarMessage.ShowNotifyOnNewEpisodesMessage -> showSnackBar(
                             message = message.message.asString(requireContext()),
                             duration = 3000,
@@ -1028,9 +1022,8 @@ class PodcastFragment : BaseFragment() {
 
         viewLifecycleOwner.lifecycleScope.launch {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
-                episodeListBookmarkViewModel.stateFlow.collect {
-                    adapter?.setBookmarksAvailable(it.isBookmarkFeatureAvailable)
-                    adapter?.notifyDataSetChanged()
+                settings.cachedSubscription.flow.collect { subscription ->
+                    adapter?.setBookmarksAvailable(subscription != null)
                 }
             }
         }

@@ -1,6 +1,7 @@
 package au.com.shiftyjelly.pocketcasts.views.swipe
 
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
+import au.com.shiftyjelly.pocketcasts.models.entity.UserEpisode
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.preferences.UserSetting
 import au.com.shiftyjelly.pocketcasts.repositories.playback.UpNextQueue
@@ -289,6 +290,48 @@ class SwipeRowActionsFactoryTest {
                 rtl2 = SwipeAction.Share,
             ),
             factory.podcastEpisode(unarchivedEpisode),
+        )
+    }
+
+    @Test
+    fun `user episode`() {
+        val userEpisode = UserEpisode(
+            uuid = "",
+            publishedDate = Date(),
+        )
+
+        isEpisodeInUpNext = false
+        upNextAction = Settings.UpNextAction.PLAY_NEXT
+        assertEquals(
+            "archived, play next",
+            SwipeRowActions(
+                ltr1 = SwipeAction.AddToUpNextTop,
+                ltr2 = SwipeAction.AddToUpNextBottom,
+                rtl1 = SwipeAction.DeleteUserEpisode,
+            ),
+            factory.userEpisode(userEpisode),
+        )
+
+        isEpisodeInUpNext = false
+        upNextAction = Settings.UpNextAction.PLAY_LAST
+        assertEquals(
+            "archived, play last",
+            SwipeRowActions(
+                ltr1 = SwipeAction.AddToUpNextBottom,
+                ltr2 = SwipeAction.AddToUpNextTop,
+                rtl1 = SwipeAction.DeleteUserEpisode,
+            ),
+            factory.userEpisode(userEpisode),
+        )
+
+        isEpisodeInUpNext = true
+        assertEquals(
+            "archived, in queue",
+            SwipeRowActions(
+                ltr1 = SwipeAction.RemoveFromUpNext,
+                rtl1 = SwipeAction.DeleteUserEpisode,
+            ),
+            factory.userEpisode(userEpisode),
         )
     }
 }

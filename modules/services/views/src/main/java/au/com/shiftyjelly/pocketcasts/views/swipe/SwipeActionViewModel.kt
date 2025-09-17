@@ -1,21 +1,30 @@
 package au.com.shiftyjelly.pocketcasts.views.swipe
 
+import android.content.Context
 import androidx.fragment.app.FragmentManager
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
+import au.com.shiftyjelly.pocketcasts.analytics.EpisodeAnalytics
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
+import au.com.shiftyjelly.pocketcasts.models.entity.UserEpisode
+import au.com.shiftyjelly.pocketcasts.repositories.di.ApplicationScope
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.repositories.playlist.PlaylistManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
+import au.com.shiftyjelly.pocketcasts.repositories.podcast.UserEpisodeManager
 import au.com.shiftyjelly.pocketcasts.views.dialog.ShareDialogFactory
+import au.com.shiftyjelly.pocketcasts.views.helper.CloudDeleteHelper
+import au.com.shiftyjelly.pocketcasts.views.helper.DeleteState
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
 import dagger.hilt.android.lifecycle.HiltViewModel
+import dagger.hilt.android.qualifiers.ApplicationContext
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -28,6 +37,10 @@ class SwipeActionViewModel @AssistedInject constructor(
     private val playlistManager: PlaylistManager,
     private val shareDialogFactory: ShareDialogFactory,
     private val tracker: AnalyticsTracker,
+    private val episodeAnalytics: EpisodeAnalytics,
+    private val userEpisodeManager: UserEpisodeManager,
+    @ApplicationContext private val context: Context,
+    @ApplicationScope private val applicationScope: CoroutineScope,
     @Assisted private val swipeSource: SwipeSource,
     @Assisted private val playlistUuid: String?,
 ) : ViewModel() {
@@ -98,8 +111,7 @@ class SwipeActionViewModel @AssistedInject constructor(
         }
     }
 
-    // Unlike other functions this one is suspending because it needs FragmentManager
-    // to share an episode.
+    // This function is suspending because it needs FragmentManager.
     //
     // If it was executed in view model's scope it could memory leaks if the manager was
     // retained in memory the underlying fragment gets destroyed.
@@ -112,6 +124,41 @@ class SwipeActionViewModel @AssistedInject constructor(
         shareDialogFactory
             .shareEpisode(podcast, episode, SourceView.EPISODE_SWIPE_ACTION)
             .show(fragmentManager, "share_dialog")
+    }
+
+    // This function is suspending because it needs FragmentManager.
+    //
+    // If it was executed in view model's scope it could memory leaks if the manager was
+    // retained in memory the underlying fragment gets destroyed.
+    suspend fun deleteUserEpisode(episodeUuid: String, fragmentManager: FragmentManager) {
+        trackAction(SwipeAction.DeleteUserEpisode)
+
+        val episode = episodeManager.findEpisodeByUuid(episodeUuid) as? UserEpisode ?: return
+
+        CloudDeleteHelper.getDeleteDialog(
+            episode = episode,
+            deleteState = CloudDeleteHelper.getDeleteState(episode),
+            deleteFunction = { userEpisode, deleteState ->
+                CloudDeleteHelper.deleteEpisode(
+                    episode = userEpisode,
+                    deleteState = deleteState,
+                    playbackManager = playbackManager,
+                    episodeManager = episodeManager,
+                    userEpisodeManager = userEpisodeManager,
+                    applicationScope = applicationScope,
+                )
+                episodeAnalytics.trackEvent(
+                    event = if (deleteState == DeleteState.Cloud && !episode.isDownloaded) {
+                        AnalyticsEvent.EPISODE_DELETED_FROM_CLOUD
+                    } else {
+                        AnalyticsEvent.EPISODE_DOWNLOAD_DELETED
+                    },
+                    source = SourceView.FILES,
+                    uuid = episode.uuid,
+                )
+            },
+            resources = context.resources,
+        ).show(fragmentManager, "delete_confirm")
     }
 
     private fun trackAction(action: SwipeAction) {
@@ -145,6 +192,7 @@ suspend fun SwipeActionViewModel.handleAction(
     SwipeAction.Archive -> archive(episodeUuid)
     SwipeAction.Unarchive -> unarchive(episodeUuid)
     SwipeAction.RemoveFromPlaylist -> removeFromPlaylist(episodeUuid)
+    SwipeAction.DeleteUserEpisode -> deleteUserEpisode(episodeUuid, fragmentManager)
 }
 
 private fun SwipeSource.toSourceView() = when (this) {

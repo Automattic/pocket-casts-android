@@ -3,6 +3,8 @@
 *   Updates
     *   Improve episode rows swipe and multi-select animations.
         ([#4500](https://github.com/Automattic/pocket-casts-android/pull/4500))
+    *   Improve user episode rows swipe and multi-select animations.
+        ([#4501](https://github.com/Automattic/pocket-casts-android/pull/4501))
 
 7.98
 -----

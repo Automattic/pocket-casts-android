@@ -77,6 +77,11 @@ class PlaylistsFragment :
         ShowOnboardingEffect(uiState.showOnboarding)
     }
 
+    override fun onDestroyView() {
+        getCanScrollBackward = { false }
+        super.onDestroyView()
+    }
+
     @Composable
     private fun ScrollToTopEffect(listState: LazyListState) {
         LaunchedEffect(listState) {
@@ -97,9 +102,10 @@ class PlaylistsFragment :
 
     override fun scrollToTop(): Boolean {
         val canScroll = getCanScrollBackward()
-
-        lifecycleScope.launch {
-            scrollToTopSignal.emit(Unit)
+        if (canScroll) {
+            lifecycleScope.launch {
+                scrollToTopSignal.emit(Unit)
+            }
         }
 
         return canScroll
