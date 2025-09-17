@@ -60,6 +60,6 @@ enum class SwipeAction(
         Unarchive -> IR.drawable.ic_unarchive
         RemoveFromPlaylist -> IR.drawable.ic_delete
         DeleteUserEpisode -> IR.drawable.ic_delete
-        AddToPlaylist -> IR.drawable.ic_effects_plus
+        AddToPlaylist -> IR.drawable.ic_playlist_add_episode
     }
 }
