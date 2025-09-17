@@ -228,9 +228,9 @@ class EpisodeViewModel @Inject constructor(
         upNext: UpNextQueue.State?,
         episode: BaseEpisode,
     ) = (upNext is UpNextQueue.State.Loaded) &&
-            (upNext.queue + upNext.episode)
-                .map { it.uuid }
-                .contains(episode.uuid)
+        (upNext.queue + upNext.episode)
+            .map { it.uuid }
+            .contains(episode.uuid)
 
     private suspend fun getTintColor(
         episode: BaseEpisode,
