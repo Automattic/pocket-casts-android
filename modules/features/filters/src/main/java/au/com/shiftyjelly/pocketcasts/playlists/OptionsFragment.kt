@@ -42,7 +42,6 @@ import au.com.shiftyjelly.pocketcasts.views.dialog.ConfirmationDialog
 import au.com.shiftyjelly.pocketcasts.views.dialog.ConfirmationDialog.ButtonType
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseDialogFragment
 import dagger.hilt.android.AndroidEntryPoint
-import timber.log.Timber
 import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
@@ -147,6 +146,7 @@ class OptionsFragment : BaseDialogFragment() {
                             title = getString(LR.string.playlist_edit_episodes),
                             iconId = IR.drawable.ic_playlist_edit,
                             onClick = {
+                                viewModel.trackRearrangeEpisodesTapped()
                                 dismiss()
                                 val fragment = EditPlaylistFragment.newInstance(playlist.uuid)
                                 (requireActivity() as FragmentHostListener).showModal(fragment)
@@ -185,6 +185,7 @@ class OptionsFragment : BaseDialogFragment() {
                                 title = getString(LR.string.playlist_unarchive_all),
                                 iconId = IR.drawable.ic_unarchive,
                                 onClick = {
+                                    viewModel.trackUnarchiveAllTapped()
                                     viewModel.unarchiveAllEpisodes()
                                     dismiss()
                                 },
@@ -194,6 +195,7 @@ class OptionsFragment : BaseDialogFragment() {
                                 title = getString(LR.string.playlist_archive_all),
                                 iconId = IR.drawable.ic_playlist_archive_all,
                                 onClick = {
+                                    viewModel.trackArchiveAllTapped()
                                     viewModel.archiveAllEpisodes()
                                     dismiss()
                                 },

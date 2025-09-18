@@ -192,7 +192,10 @@ class PlaylistFragment :
                 },
             ),
             searchState = viewModel.searchState.textState,
-            onShowArchivedToggle = viewModel::toggleShowArchived,
+            onShowArchivedToggle = {
+                viewModel.trackToggleShowArchived()
+                viewModel.toggleShowArchived()
+            },
             onChangeSearchFocus = { hasFocus, searchTopOffset ->
                 if (hasFocus) {
                     binding.content.smoothScrollToTop(0, offset = -searchTopOffset.roundToInt())
