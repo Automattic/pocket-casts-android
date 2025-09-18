@@ -310,6 +310,22 @@ class PlaylistViewModel @AssistedInject constructor(
         analyticsTracker.track(AnalyticsEvent.FILTER_HIDE_ARCHIVED_TAPPED)
     }
 
+    fun trackAddEpisodeCtaTapped() {
+        analyticsTracker.track(AnalyticsEvent.FILTER_ADD_EPISODES_CTA_EMPTY_TAPPED)
+    }
+
+    fun trackBrowseShowsCtaTapped() {
+        analyticsTracker.track(AnalyticsEvent.FILTER_BROWSE_SHOWS_CTA_EMPTY_TAPPED)
+    }
+
+    fun trackEditRulesCtaTapped() {
+        analyticsTracker.track(AnalyticsEvent.FILTER_EDIT_RULES_CTA_EMPTY_TAPPED)
+    }
+
+    fun trackShowArchivedCtaTapped() {
+        analyticsTracker.track(AnalyticsEvent.FILTER_SHOW_ARCHIVED_CTA_EMPTY_TAPPED)
+    }
+
     data class UiState(
         val playlist: Playlist?,
         val isAnyPodcastFollowed: Boolean,
