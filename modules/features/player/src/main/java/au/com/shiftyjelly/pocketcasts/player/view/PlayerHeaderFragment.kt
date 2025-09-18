@@ -397,6 +397,7 @@ class PlayerHeaderFragment :
                         is NavigationState.AddEpisodeToPlaylist -> {
                             if (parentFragmentManager.findFragmentByTag("add-to-playlist") == null) {
                                 val fragment = addToPlaylistFragmentFactory.create(
+                                    source = AddToPlaylistFragmentFactory.Source.Shelf,
                                     episodeUuid = navigationState.episodeUuid,
                                     customTheme = Theme.ThemeType.DARK,
                                 )

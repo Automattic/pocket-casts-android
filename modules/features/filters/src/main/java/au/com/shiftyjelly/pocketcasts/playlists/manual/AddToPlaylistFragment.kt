@@ -30,6 +30,8 @@ import au.com.shiftyjelly.pocketcasts.repositories.playlist.Playlist
 import au.com.shiftyjelly.pocketcasts.ui.helper.FragmentHostListener
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseDialogFragment
+import au.com.shiftyjelly.pocketcasts.views.swipe.AddToPlaylistFragmentFactory
+import au.com.shiftyjelly.pocketcasts.views.swipe.AddToPlaylistFragmentFactory.Source
 import dagger.hilt.android.AndroidEntryPoint
 import dagger.hilt.android.lifecycle.withCreationCallback
 import kotlinx.coroutines.launch
@@ -43,7 +45,11 @@ internal class AddToPlaylistFragment : BaseDialogFragment() {
     private val viewModel by viewModels<AddToPlaylistViewModel>(
         extrasProducer = {
             defaultViewModelCreationExtras.withCreationCallback<AddToPlaylistViewModel.Factory> { factory ->
-                factory.create(args.episodeUuid, initialPlaylistTitle = getString(LR.string.new_playlist))
+                factory.create(
+                    source = args.source,
+                    episodeUuid = args.episodeUuid,
+                    initialPlaylistTitle = getString(LR.string.new_playlist),
+                )
             }
         },
     )
@@ -125,6 +131,7 @@ internal class AddToPlaylistFragment : BaseDialogFragment() {
 
     @Parcelize
     private class Args(
+        val source: Source,
         val episodeUuid: String,
         val customTheme: Theme.ThemeType?,
     ) : Parcelable
@@ -133,10 +140,11 @@ internal class AddToPlaylistFragment : BaseDialogFragment() {
         private const val NEW_INSTANCE_ARGS = "AddToPlaylistFragmentArgs"
 
         fun newInstance(
+            source: Source,
             episodeUuid: String,
             customTheme: Theme.ThemeType? = null,
         ) = AddToPlaylistFragment().apply {
-            arguments = bundleOf(NEW_INSTANCE_ARGS to Args(episodeUuid, customTheme))
+            arguments = bundleOf(NEW_INSTANCE_ARGS to Args(source, episodeUuid, customTheme))
         }
     }
 }

@@ -7,6 +7,8 @@ import androidx.lifecycle.viewModelScope
 import au.com.shiftyjelly.pocketcasts.compose.text.SearchFieldState
 import au.com.shiftyjelly.pocketcasts.repositories.playlist.PlaylistManager
 import au.com.shiftyjelly.pocketcasts.repositories.playlist.PlaylistPreviewForEpisode
+import au.com.shiftyjelly.pocketcasts.views.swipe.AddToPlaylistFragmentFactory
+import au.com.shiftyjelly.pocketcasts.views.swipe.AddToPlaylistFragmentFactory.Source
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
@@ -29,6 +31,7 @@ import kotlinx.coroutines.launch
 @HiltViewModel(assistedFactory = AddToPlaylistViewModel.Factory::class)
 class AddToPlaylistViewModel @AssistedInject constructor(
     private val playlistManager: PlaylistManager,
+    @Assisted source: Source,
     @Assisted("id") private val episodeUuid: String,
     @Assisted("title") initialPlaylistTitle: String,
 ) : ViewModel() {
@@ -95,6 +98,7 @@ class AddToPlaylistViewModel @AssistedInject constructor(
     @AssistedFactory
     interface Factory {
         fun create(
+            source: Source,
             @Assisted("id") episodeUuid: String,
             @Assisted("title") initialPlaylistTitle: String,
         ): AddToPlaylistViewModel
