@@ -119,6 +119,10 @@ class AddEpisodesViewModel @AssistedInject constructor(
         }
     }
 
+    fun trackScreenShown() {
+        tracker.track(AnalyticsEvent.FILTER_ADD_EPISODES_SHOWN)
+    }
+
     fun trackFolderTapped() {
         tracker.track(AnalyticsEvent.FILTER_ADD_EPISODES_FOLDER_TAPPED)
     }

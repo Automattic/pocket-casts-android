@@ -317,6 +317,7 @@ enum class AnalyticsEvent(val key: String) {
     FILTER_TOOLTIP_SHOWN("filter_tooltip_shown"),
     FILTER_TOOLTIP_CLOSED("filter_tooltip_closed"),
     FILTER_ADD_EPISODES_TAPPED("filter_add_episodes_tapped"),
+    FILTER_ADD_EPISODES_SHOWN("filter_add_episodes_shown"),
     FILTER_ADD_EPISODES_FOLDER_TAPPED("filter_add_episodes_folder_tapped"),
     FILTER_ADD_EPISODES_PODCAST_TAPPED("filter_add_episodes_podcast_tapped"),
     FILTER_ADD_EPISODES_EPISODE_TAPPED("filter_add_episodes_episode_tapped"),
