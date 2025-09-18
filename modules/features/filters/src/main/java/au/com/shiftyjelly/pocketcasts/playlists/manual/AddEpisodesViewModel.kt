@@ -135,7 +135,7 @@ class AddEpisodesViewModel @AssistedInject constructor(
         val episodeCount = uiState.value?.playlist?.metadata?.totalEpisodeCount ?: Int.MAX_VALUE
         tracker.track(
             AnalyticsEvent.FILTER_ADD_EPISODES_EPISODE_TAPPED,
-            mapOf("is_playlist_full" to (episodeCount > PlaylistManager.MANUAL_PLAYLIST_EPISODE_LIMIT)),
+            mapOf("is_playlist_full" to (episodeCount >= PlaylistManager.MANUAL_PLAYLIST_EPISODE_LIMIT)),
         )
     }
 
