@@ -211,7 +211,11 @@ class PlaylistViewModel @AssistedInject constructor(
     }
 
     fun trackAddEpisodesTapped() {
-        analyticsTracker.track(AnalyticsEvent.FILTER_EDIT_RULES_TAPPED)
+        val episodeCount = uiState.value.playlist?.metadata?.totalEpisodeCount ?: Int.MAX_VALUE
+        analyticsTracker.track(
+            AnalyticsEvent.FILTER_ADD_EPISODES_TAPPED,
+            mapOf("is_playlist_full" to (episodeCount >= PlaylistManager.MANUAL_PLAYLIST_EPISODE_LIMIT))
+        )
     }
 
     fun trackEditRulesTapped() {

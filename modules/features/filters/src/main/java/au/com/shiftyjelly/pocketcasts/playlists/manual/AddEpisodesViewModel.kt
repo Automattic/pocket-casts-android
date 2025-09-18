@@ -2,6 +2,8 @@ package au.com.shiftyjelly.pocketcasts.playlists.manual
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.compose.text.SearchFieldState
 import au.com.shiftyjelly.pocketcasts.models.entity.ManualPlaylistEpisodeSource
 import au.com.shiftyjelly.pocketcasts.models.entity.ManualPlaylistFolderSource
@@ -35,9 +37,10 @@ import kotlinx.coroutines.launch
 @OptIn(FlowPreview::class, ExperimentalCoroutinesApi::class)
 @HiltViewModel(assistedFactory = AddEpisodesViewModel.Factory::class)
 class AddEpisodesViewModel @AssistedInject constructor(
-    @Assisted private val playlistUuid: String,
     private val playlistManager: PlaylistManager,
     private val settings: Settings,
+    private val tracker: AnalyticsTracker,
+    @Assisted private val playlistUuid: String,
 ) : ViewModel() {
     val homeSearchState = SearchFieldState()
     val folderSearchState = SearchFieldState()
@@ -114,6 +117,22 @@ class AddEpisodesViewModel @AssistedInject constructor(
             }
             flow.stateIn(viewModelScope, SharingStarted.WhileSubscribed(stopTimeoutMillis = 300, replayExpirationMillis = 300), initialValue = null)
         }
+    }
+
+    fun trackFolderTapped() {
+        tracker.track(AnalyticsEvent.FILTER_ADD_EPISODES_FOLDER_TAPPED)
+    }
+
+    fun trackPodcastTapped() {
+        tracker.track(AnalyticsEvent.FILTER_ADD_EPISODES_PODCAST_TAPPED)
+    }
+
+    fun trackEpisodeTapped() {
+        val episodeCount = uiState.value?.playlist?.metadata?.totalEpisodeCount ?: Int.MAX_VALUE
+        tracker.track(
+            AnalyticsEvent.FILTER_ADD_EPISODES_EPISODE_TAPPED,
+            mapOf("is_playlist_full" to (episodeCount > PlaylistManager.MANUAL_PLAYLIST_EPISODE_LIMIT))
+        )
     }
 
     data class UiState(

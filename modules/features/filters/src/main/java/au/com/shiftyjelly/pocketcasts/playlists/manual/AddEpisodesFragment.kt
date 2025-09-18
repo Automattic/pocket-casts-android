@@ -77,7 +77,16 @@ internal class AddEpisodesFragment : BaseDialogFragment() {
                     episodesFlow = viewModel::getPodcastEpisodesFlow,
                     hasAnyFolders = uiState.hasAnyFolders,
                     useEpisodeArtwork = uiState.useEpisodeArtwork,
-                    onAddEpisode = viewModel::addEpisode,
+                    onOpenPodcast = {
+                        viewModel.trackPodcastTapped()
+                    },
+                    onOpenFolder = {
+                        viewModel.trackFolderTapped()
+                    },
+                    onAddEpisode = { episodeUuid ->
+                        viewModel.trackEpisodeTapped()
+                        viewModel.addEpisode(episodeUuid)
+                    },
                     onClickNavigationButton = {
                         if (!navController.popBackStack()) {
                             dismiss()
