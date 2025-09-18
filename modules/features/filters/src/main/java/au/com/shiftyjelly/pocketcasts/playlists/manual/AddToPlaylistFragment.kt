@@ -23,6 +23,7 @@ import androidx.core.os.bundleOf
 import androidx.fragment.app.viewModels
 import androidx.fragment.compose.content
 import androidx.navigation.compose.rememberNavController
+import au.com.shiftyjelly.pocketcasts.compose.CallOnce
 import au.com.shiftyjelly.pocketcasts.compose.components.AnimatedNonNullVisibility
 import au.com.shiftyjelly.pocketcasts.compose.components.ThemedSnackbarHost
 import au.com.shiftyjelly.pocketcasts.playlists.PlaylistFragment
@@ -59,6 +60,10 @@ internal class AddToPlaylistFragment : BaseDialogFragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?,
     ) = content {
+        CallOnce {
+            viewModel.trackScreenShown()
+        }
+
         val coroutineScope = rememberCoroutineScope()
         val snackbarHostState = remember { SnackbarHostState() }
         val navController = rememberNavController()
@@ -80,21 +85,30 @@ internal class AddToPlaylistFragment : BaseDialogFragment() {
                     navController = navController,
                     searchFieldState = viewModel.searchFieldState.textState,
                     newPlaylistNameState = viewModel.newPlaylistNameState,
-                    onClickCreatePlaylist = viewModel::createPlaylist,
+                    onClickCreatePlaylist = {
+                        viewModel.trackCreateNewPlaylistTapped()
+                        viewModel.createPlaylist()
+                    },
                     onChangeEpisodeInPlaylist = { playlist ->
                         if (playlist.canAddOrRemoveEpisode) {
                             if (playlist.hasEpisode) {
+                                viewModel.trackEpisodeRemoveTapped()
                                 viewModel.removeFromPlaylist(playlist.uuid)
                             } else {
+                                viewModel.trackEpisodeAddTapped(isPlaylistFull = false)
                                 viewModel.addToPlaylist(playlist.uuid)
                             }
                         } else {
+                            viewModel.trackEpisodeAddTapped(isPlaylistFull = true)
                             if (snackbarHostState.currentSnackbarData == null) {
                                 coroutineScope.launch {
                                     snackbarHostState.showSnackbar(getString(LR.string.playlist_is_full_description))
                                 }
                             }
                         }
+                    },
+                    onClickContinueWithNewPlaylist = {
+                        viewModel.trackNewPlaylistTapped()
                     },
                     onClickDoneButton = ::dismiss,
                     onClickNavigationButton = {

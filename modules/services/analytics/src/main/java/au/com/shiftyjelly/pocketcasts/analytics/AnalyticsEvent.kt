@@ -324,6 +324,11 @@ enum class AnalyticsEvent(val key: String) {
     FILTER_DOWNLOAD_ALL_TAPPED("filter_download_all_tapped"),
     FILTER_CHROME_CAST_TAPPED("filter_chrome_cast_tapped"),
     FILTER_OPTIONS_TAPPED("filter_options_tapped"),
+    ADD_TO_PLAYLISTS_SHOWN("add_to_playlists_shown"),
+    ADD_TO_PLAYLISTS_EPISODE_ADD_TAPPED("add_to_playlists_episode_add_tapped"),
+    ADD_TO_PLAYLISTS_EPISODE_REMOVE_TAPPED("add_to_playlists_episode_remove_tapped"),
+    ADD_TO_PLAYLISTS_NEW_PLAYLIST_TAPPED("add_to_playlists_new_playlist_tapped"),
+    ADD_TO_PLAYLISTS_CREATE_NEW_PLAYLIST_TAPPED("add_to_playlists_create_new_playlist_tapped"),
 
     /* Discover */
     DISCOVER_SHOWN("discover_shown"),

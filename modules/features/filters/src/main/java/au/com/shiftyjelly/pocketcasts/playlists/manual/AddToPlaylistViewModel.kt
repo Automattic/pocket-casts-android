@@ -4,6 +4,8 @@ import androidx.compose.foundation.text.input.TextFieldState
 import androidx.compose.ui.text.TextRange
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.compose.text.SearchFieldState
 import au.com.shiftyjelly.pocketcasts.repositories.playlist.PlaylistManager
 import au.com.shiftyjelly.pocketcasts.repositories.playlist.PlaylistPreviewForEpisode
@@ -31,7 +33,8 @@ import kotlinx.coroutines.launch
 @HiltViewModel(assistedFactory = AddToPlaylistViewModel.Factory::class)
 class AddToPlaylistViewModel @AssistedInject constructor(
     private val playlistManager: PlaylistManager,
-    @Assisted source: Source,
+    private val tracker: AnalyticsTracker,
+    @Assisted private val source: Source,
     @Assisted("id") private val episodeUuid: String,
     @Assisted("title") initialPlaylistTitle: String,
 ) : ViewModel() {
@@ -88,6 +91,44 @@ class AddToPlaylistViewModel @AssistedInject constructor(
         viewModelScope.launch {
             playlistManager.deleteManualEpisode(playlistUuid, episodeUuid)
         }
+    }
+
+    fun trackScreenShown() {
+        tracker.track(
+            AnalyticsEvent.ADD_TO_PLAYLISTS_SHOWN,
+            mapOf("source" to source.analyticsValue),
+        )
+    }
+
+    fun trackEpisodeAddTapped(isPlaylistFull: Boolean) {
+        tracker.track(
+            AnalyticsEvent.ADD_TO_PLAYLISTS_EPISODE_ADD_TAPPED,
+            mapOf(
+                "source" to source.analyticsValue,
+                "is_playlist_full" to isPlaylistFull,
+            ),
+        )
+    }
+
+    fun trackEpisodeRemoveTapped() {
+        tracker.track(
+            AnalyticsEvent.ADD_TO_PLAYLISTS_EPISODE_REMOVE_TAPPED,
+            mapOf("source" to source.analyticsValue),
+        )
+    }
+
+    fun trackNewPlaylistTapped() {
+        tracker.track(
+            AnalyticsEvent.ADD_TO_PLAYLISTS_NEW_PLAYLIST_TAPPED,
+            mapOf("source" to source.analyticsValue),
+        )
+    }
+
+    fun trackCreateNewPlaylistTapped() {
+        tracker.track(
+            AnalyticsEvent.ADD_TO_PLAYLISTS_CREATE_NEW_PLAYLIST_TAPPED,
+            mapOf("source" to source.analyticsValue),
+        )
     }
 
     data class UiState(
