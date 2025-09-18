@@ -17,7 +17,7 @@ enum class SwipeAction(
     Share("share"),
     Archive("archive"),
     Unarchive("unarchive"),
-    RemoveFromPlaylist("playlist_remove"),
+    RemoveFromPlaylist("remove_from_playlist"),
     DeleteUserEpisode("delete"),
     AddToPlaylist("add_to_playlist"),
     ;
