@@ -79,7 +79,8 @@ fun ContinueWithGoogleButton(
     val onSignInClick = {
         viewModel.startGoogleOneTapSignIn(
             flow = flow,
-            onSuccess = { request -> googleOneTapSignInLauncher.launch(request) },
+//            onSuccess = { request -> googleOneTapSignInLauncher.launch(request) },
+            onSuccess = onComplete,
             onError = {
                 viewModel.startGoogleLegacySignIn(
                     onSuccess = { request -> googleLegacySignInLauncher.launch(request) },

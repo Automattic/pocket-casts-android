@@ -58,6 +58,8 @@ wear-compose = "1.4.1"
 webkit = "1.14.0"
 wordpress-lint = "2.2.0"
 work = "2.10.0"
+credentials = "1.5.0"
+google-id = "1.1.1"
 
 [libraries]
 # About Libraries
@@ -251,6 +253,11 @@ androidx-webkit = { group = "androidx.webkit", name = "webkit", version.ref = "w
 work-runtime = { module = "androidx.work:work-runtime-ktx", version.ref = "work" }
 work-rx2 = { module = "androidx.work:work-rxjava2", version.ref = "work" }
 work-test = { module = "androidx.work:work-testing", version.ref = "work" }
+
+# Credentials
+credentials = { module = "androidx.credentials:credentials", version.ref = "credentials" }
+credentials-google-play = { module = "androidx.credentials:credentials-play-services-auth", version.ref = "credentials" }
+google-identity = { module = "com.google.android.libraries.identity.googleid:googleid", version.ref = "google-id"}
 
 # Other dependencies
 androidx-annotation = "androidx.annotation:annotation:1.9.1"
