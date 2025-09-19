@@ -46,8 +46,8 @@ internal fun AddEpisodeSourcesColumn(
     noContentData: NoContentData,
     onClickSource: (ManualPlaylistEpisodeSource) -> Unit,
     modifier: Modifier = Modifier,
-    listState: LazyListState = rememberLazyListState(),
 ) {
+    val listState = rememberLazyListState()
     LaunchedEffect(sources) {
         listState.scrollToItem(0)
     }

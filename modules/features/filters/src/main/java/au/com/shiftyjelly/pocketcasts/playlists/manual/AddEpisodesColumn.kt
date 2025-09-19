@@ -12,7 +12,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -63,10 +62,13 @@ internal fun AddEpisodesColumn(
     useEpisodeArtwork: Boolean,
     onAddEpisode: (PodcastEpisode) -> Unit,
     modifier: Modifier = Modifier,
-    listState: LazyListState = rememberLazyListState(),
 ) {
-    LaunchedEffect(uiState?.episodes) {
-        listState.scrollToItem(0)
+    val listState = rememberLazyListState()
+    val topItem = remember(uiState?.episodes) { uiState?.episodes?.firstOrNull()?.uuid }
+    LaunchedEffect(topItem) {
+        if (topItem != null && listState.firstVisibleItemIndex != 0) {
+            listState.scrollToItem(0)
+        }
     }
 
     FadedLazyColumn(
