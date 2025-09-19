@@ -30,7 +30,6 @@ import au.com.shiftyjelly.pocketcasts.models.type.SmartRules.PodcastsRule
 import au.com.shiftyjelly.pocketcasts.models.type.SmartRules.ReleaseDateRule
 import au.com.shiftyjelly.pocketcasts.models.type.SmartRules.StarredRule
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
-import au.com.shiftyjelly.pocketcasts.repositories.playlist.Playlist.Type
 import au.com.shiftyjelly.pocketcasts.repositories.playlist.PlaylistManager.Companion.MANUAL_PLAYLIST_EPISODE_LIMIT
 import au.com.shiftyjelly.pocketcasts.repositories.playlist.PlaylistManager.Companion.PLAYLIST_ARTWORK_EPISODE_LIMIT
 import au.com.shiftyjelly.pocketcasts.repositories.playlist.PlaylistManager.Companion.SMART_PLAYLIST_EPISODE_LIMIT
@@ -382,12 +381,16 @@ class PlaylistManagerImpl(
         val podcastsFlow = manualPlaylistArtworkPodcastsFlow(playlist)
         val episodeMetadataFlow = playlistDao.manualPlaylistMetadataFlow(playlist.uuid)
         return combine(podcastsFlow, episodeMetadataFlow) { podcasts, metadata ->
-            PlaylistPreview(
+            ManualPlaylistPreview(
                 uuid = playlist.uuid,
                 title = playlist.title,
                 artworkPodcastUuids = podcasts,
                 episodeCount = metadata.episodeCount,
-                type = Type.Manual,
+                settings = Playlist.Settings(
+                    sortType = playlist.sortType,
+                    isAutoDownloadEnabled = playlist.autoDownload,
+                    autoDownloadLimit = playlist.autodownloadLimit,
+                ),
             )
         }
     }
@@ -395,13 +398,19 @@ class PlaylistManagerImpl(
     private fun smartPlaylistPreviewsFlow(playlist: PlaylistEntity): Flow<PlaylistPreview> {
         val podcastsFlow = smartPlaylistArtworkPodcastsFlow(playlist)
         val episodeMetadataFlow = playlistDao.smartPlaylistMetadataFlow(clock, playlist.smartRules)
+        val smartRules = playlist.smartRules
         return combine(podcastsFlow, episodeMetadataFlow) { podcasts, metadata ->
-            PlaylistPreview(
+            SmartPlaylistPreview(
                 uuid = playlist.uuid,
                 title = playlist.title,
                 artworkPodcastUuids = podcasts,
                 episodeCount = metadata.episodeCount,
-                type = Type.Smart,
+                settings = Playlist.Settings(
+                    sortType = playlist.sortType,
+                    isAutoDownloadEnabled = playlist.autoDownload,
+                    autoDownloadLimit = playlist.autodownloadLimit,
+                ),
+                smartRules = smartRules,
             )
         }
     }

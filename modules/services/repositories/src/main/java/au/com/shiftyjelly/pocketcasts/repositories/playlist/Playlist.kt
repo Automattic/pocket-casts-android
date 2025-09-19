@@ -17,7 +17,15 @@ sealed interface Playlist {
         val sortType: PlaylistEpisodeSortType,
         val isAutoDownloadEnabled: Boolean,
         val autoDownloadLimit: Int,
-    )
+    ) {
+        companion object {
+            val ForPreview = Settings(
+                sortType = PlaylistEpisodeSortType.DragAndDrop,
+                isAutoDownloadEnabled = false,
+                autoDownloadLimit = 10,
+            )
+        }
+    }
 
     data class Metadata(
         val playbackDurationLeft: Duration,
