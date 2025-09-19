@@ -16,10 +16,12 @@ import androidx.compose.foundation.layout.only
 import androidx.compose.foundation.layout.safeDrawing
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat
 import androidx.core.graphics.ColorUtils
@@ -28,6 +30,7 @@ import androidx.core.view.doOnLayout
 import androidx.navigation.NavHostController
 import au.com.shiftyjelly.pocketcasts.compose.AppTheme
 import au.com.shiftyjelly.pocketcasts.compose.AppThemeWithBackground
+import au.com.shiftyjelly.pocketcasts.compose.theme
 import au.com.shiftyjelly.pocketcasts.ui.helper.FragmentHostListener
 import au.com.shiftyjelly.pocketcasts.ui.helper.NavigationBarColor
 import au.com.shiftyjelly.pocketcasts.ui.helper.StatusBarIconColor
@@ -202,6 +205,7 @@ open class BaseDialogFragment :
         modifier: Modifier = Modifier,
         useThemeBackground: Boolean = true,
         fillMaxHeight: Boolean = true,
+        themeType: Theme.ThemeType = theme.activeTheme,
         content: @Composable BoxScope.() -> Unit,
     ) {
         Box(
@@ -209,7 +213,11 @@ open class BaseDialogFragment :
                 .then(if (fillMaxHeight) Modifier.fillMaxHeight(0.93f) else Modifier)
                 .clip(RoundedCornerShape(topStart = 16.dp, topEnd = 16.dp)),
         ) {
-            Background(useThemeBackground) {
+            Background(themeType, useThemeBackground) {
+                val color = MaterialTheme.theme.colors.primaryUi01
+                LaunchedEffect(color) {
+                    setDialogTint(color.toArgb())
+                }
                 DialogContent(modifier, content)
             }
         }
@@ -232,13 +240,14 @@ open class BaseDialogFragment :
 
     @Composable
     private fun Background(
+        themeType: Theme.ThemeType,
         useThemeBackground: Boolean,
         content: @Composable () -> Unit,
     ) {
         if (useThemeBackground) {
-            AppThemeWithBackground(theme.activeTheme, content)
+            AppThemeWithBackground(themeType, content)
         } else {
-            AppTheme(theme.activeTheme, content)
+            AppTheme(themeType, content)
         }
     }
 }

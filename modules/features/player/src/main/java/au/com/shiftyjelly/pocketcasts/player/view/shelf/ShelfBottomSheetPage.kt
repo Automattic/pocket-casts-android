@@ -126,6 +126,13 @@ fun ShelfBottomSheetPage(
                             onDeleteStart = { shelfSharedViewModel.onEpisodeRemoveClick(ShelfItemSource.OverflowMenu) },
                         )
                     }
+                    ShelfItem.AddToPlaylist -> {
+                        val episodeUuid = playerViewModel.episode?.uuid ?: return@MenuShelfItems
+                        shelfSharedViewModel.onAddToPlaylistClick(
+                            episodeUuid = episodeUuid,
+                            source = ShelfItemSource.OverflowMenu,
+                        )
+                    }
                 }
                 if (item != ShelfItem.Cast) onDismiss()
             },
