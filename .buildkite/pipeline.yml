@@ -94,3 +94,17 @@ steps:
     plugins: [ $CI_TOOLKIT ]
     artifact_paths:
       - "**/build/outputs/apk/**/*"
+
+  - input: ":rocket: Deploy Prototype Builds (FAD)"
+    if: "build.branch == 'ci/add-fad-prototype-builds-for-main-branch'" # TODO: Change branch: 'main'
+    prompt: Share Prototype Builds via Firebase App Distribution (FAD)?
+    key: prototype_builds_fad_triggered
+
+  - label: "Prototype Builds (FAD)"
+    if: "build.branch == 'ci/add-fad-prototype-builds-for-main-branch'" # TODO: Change branch: 'main'
+    depends_on: prototype_builds_fad_triggered
+    command: |
+      ".buildkite/commands/prototype-build-fad.sh"
+    plugins: [$CI_TOOLKIT]
+    artifact_paths:
+      - "**/build/outputs/apk/**/*"
