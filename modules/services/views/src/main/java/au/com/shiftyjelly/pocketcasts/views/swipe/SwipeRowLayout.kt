@@ -51,6 +51,7 @@ class SwipeRowLayout<T : SwipeButton.UiState> @JvmOverloads constructor(
             parent = this,
             child = swipeableView,
             setTranslation = ::setTranslation,
+            getSwipedThreshold = { swipedThreshold(settledButtonsWidth()) },
             settleSwipePosition = ::settleSwipePosition,
         )
     }
@@ -396,6 +397,7 @@ private class SwipeGestureHandler(
     private val parent: ViewGroup,
     private val child: View,
     private val setTranslation: (Float) -> Unit,
+    private val getSwipedThreshold: () -> Float,
     private val settleSwipePosition: () -> Unit,
 ) {
     private val touchSlop = ViewConfiguration.get(child.context).scaledTouchSlop
@@ -444,13 +446,29 @@ private class SwipeGestureHandler(
 
             override fun onFling(e1: MotionEvent?, e2: MotionEvent, velocityX: Float, velocityY: Float): Boolean {
                 updateSwipeDirection(velocityX)
+                val swipedThreshold = getSwipedThreshold()
+                val (minX, maxX) = when (swipeDirection) {
+                    LeftToRight -> -child.width to if (child.translationX >= swipedThreshold) {
+                        child.width
+                    } else {
+                        swipedThreshold.roundToInt() - 1
+                    }
+
+                    RightToLeft -> if (child.translationX.absoluteValue >= swipedThreshold) {
+                        -child.width
+                    } else {
+                        -swipedThreshold.roundToInt() + 1
+                    } to child.width
+
+                    None -> -child.width to child.width
+                }
                 scroller.fling(
                     child.translationX.toInt(),
                     0,
                     velocityX.roundToInt(),
                     0,
-                    -child.width,
-                    child.width,
+                    minX,
+                    maxX,
                     0,
                     0,
                 )
