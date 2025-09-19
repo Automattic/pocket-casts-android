@@ -91,7 +91,7 @@ internal fun AddToPlaylistPage(
     searchFieldState: TextFieldState = rememberTextFieldState(),
 ) {
     val backStackEntry by navController.currentBackStackEntryAsState()
-    val isTopPageDisplayed = backStackEntry == null || backStackEntry?.destination?.route == AddEpisodesRoutes.HOME
+    val isTopPageDisplayed = backStackEntry == null || backStackEntry?.destination?.route == AddToPlaylistRoutes.HOME
 
     Column(
         modifier = modifier,
