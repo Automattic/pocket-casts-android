@@ -4,18 +4,27 @@ import android.os.Bundle
 import android.os.Parcelable
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.navigationBarsPadding
+import androidx.compose.material.SnackbarHostState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.rememberNestedScrollInteropConnection
 import androidx.core.os.BundleCompat
 import androidx.core.os.bundleOf
-import androidx.core.view.postDelayed
 import androidx.fragment.app.viewModels
 import androidx.fragment.compose.content
 import androidx.navigation.compose.rememberNavController
+import au.com.shiftyjelly.pocketcasts.compose.components.AnimatedNonNullVisibility
+import au.com.shiftyjelly.pocketcasts.compose.components.ThemedSnackbarHost
 import au.com.shiftyjelly.pocketcasts.playlists.PlaylistFragment
 import au.com.shiftyjelly.pocketcasts.repositories.playlist.Playlist
 import au.com.shiftyjelly.pocketcasts.ui.helper.FragmentHostListener
@@ -23,6 +32,7 @@ import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseDialogFragment
 import dagger.hilt.android.AndroidEntryPoint
 import dagger.hilt.android.lifecycle.withCreationCallback
+import kotlinx.coroutines.launch
 import kotlinx.parcelize.Parcelize
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
@@ -43,6 +53,8 @@ internal class AddToPlaylistFragment : BaseDialogFragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?,
     ) = content {
+        val coroutineScope = rememberCoroutineScope()
+        val snackbarHostState = remember { SnackbarHostState() }
         val navController = rememberNavController()
 
         OpenCreatedPlaylistEffect()
@@ -51,17 +63,48 @@ internal class AddToPlaylistFragment : BaseDialogFragment() {
             themeType = args.customTheme ?: theme.activeTheme,
             modifier = Modifier.nestedScroll(rememberNestedScrollInteropConnection()),
         ) {
-            AddToPlaylistPage(
-                navController = navController,
-                newPlaylistNameState = viewModel.newPlaylistNameState,
-                onClickDoneButton = ::dismiss,
-                onClickCreatePlaylist = viewModel::createPlaylist,
-                onClickNavigationButton = {
-                    if (!navController.popBackStack()) {
-                        dismiss()
-                    }
-                },
-                modifier = Modifier.fillMaxSize(),
+            AnimatedNonNullVisibility(
+                item = viewModel.uiState.collectAsState().value,
+                enter = fadeIn,
+                exit = fadeOut,
+            ) { uiState ->
+                AddToPlaylistPage(
+                    playlistPreviews = uiState.playlistPreviews,
+                    unfilteredPlaylistsCount = uiState.unfilteredPlaylistsCount,
+                    navController = navController,
+                    searchFieldState = viewModel.searchFieldState.textState,
+                    newPlaylistNameState = viewModel.newPlaylistNameState,
+                    onClickCreatePlaylist = viewModel::createPlaylist,
+                    onChangeEpisodeInPlaylist = { playlist ->
+                        if (playlist.canAddOrRemoveEpisode) {
+                            if (playlist.hasEpisode) {
+                                viewModel.removeFromPlaylist(playlist.uuid)
+                            } else {
+                                viewModel.addToPlaylist(playlist.uuid)
+                            }
+                        } else {
+                            if (snackbarHostState.currentSnackbarData == null) {
+                                coroutineScope.launch {
+                                    snackbarHostState.showSnackbar(getString(LR.string.playlist_is_full_description))
+                                }
+                            }
+                        }
+                    },
+                    onClickDoneButton = ::dismiss,
+                    onClickNavigationButton = {
+                        if (!navController.popBackStack()) {
+                            dismiss()
+                        }
+                    },
+                    modifier = Modifier.fillMaxSize(),
+                )
+            }
+
+            ThemedSnackbarHost(
+                hostState = snackbarHostState,
+                modifier = Modifier
+                    .align(Alignment.BottomCenter)
+                    .navigationBarsPadding(),
             )
         }
     }
@@ -97,3 +140,6 @@ internal class AddToPlaylistFragment : BaseDialogFragment() {
         }
     }
 }
+
+private val fadeIn = fadeIn()
+private val fadeOut = fadeOut()

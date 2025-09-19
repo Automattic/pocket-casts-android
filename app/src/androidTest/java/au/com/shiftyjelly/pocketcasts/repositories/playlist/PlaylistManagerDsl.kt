@@ -131,6 +131,10 @@ class PlaylistManagerDsl : TestWatcher() {
         return playlistDao.getManualPlaylistEpisodes(episode.playlistUuid).single { it.episodeUuid == episode.episodeUuid }
     }
 
+    suspend fun deleteManualEpisode(index: Int, playlistIndex: Int) {
+        playlistDao.deleteAllManualEpisodesIn("playlist-id-$playlistIndex", listOf("episode-id-$index"))
+    }
+
     suspend fun updateSortType(playlistIndex: Int, type: PlaylistEpisodeSortType) {
         playlistDao.updateSortType("playlist-id-$playlistIndex", type)
     }
@@ -462,5 +466,18 @@ class PlaylistManagerDsl : TestWatcher() {
 
     fun unavailableManualEpisode(index: Int, podcastIndex: Int, playlistIndex: Int, builder: (ManualPlaylistEpisode) -> ManualPlaylistEpisode = { it }): PlaylistEpisode.Unavailable {
         return PlaylistEpisode.Unavailable(manualPlaylistEpisode(index, podcastIndex, playlistIndex, builder))
+    }
+
+    fun playlistPreviewForEpisode(index: Int, builder: (PlaylistPreviewForEpisode) -> PlaylistPreviewForEpisode = { it }): PlaylistPreviewForEpisode {
+        return builder(
+            PlaylistPreviewForEpisode(
+                uuid = "playlist-id-$index",
+                title = "Playlist title $index",
+                episodeCount = 0,
+                artworkPodcastUuids = emptyList(),
+                hasEpisode = false,
+                episodeLimit = episodeLimit,
+            ),
+        )
     }
 }

@@ -31,3 +31,14 @@ data class ManualPlaylistPreview(
 ) : PlaylistPreview {
     override val type get() = Playlist.Type.Manual
 }
+
+data class PlaylistPreviewForEpisode(
+    val uuid: String,
+    val title: String,
+    val episodeCount: Int,
+    val artworkPodcastUuids: List<String>,
+    val hasEpisode: Boolean,
+    val episodeLimit: Int,
+) {
+    val canAddOrRemoveEpisode get() = hasEpisode || episodeCount < episodeLimit
+}
