@@ -1,6 +1,7 @@
 package au.com.shiftyjelly.pocketcasts.di
 
 import au.com.shiftyjelly.pocketcasts.servers.di.Downloads
+import au.com.shiftyjelly.pocketcasts.views.swipe.AddToPlaylistFragmentFactory
 import dagger.Binds
 import dagger.Module
 import dagger.Provides
@@ -18,6 +19,9 @@ abstract class AutomotiveAppModule {
         @Provides
         @Downloads
         fun downloadRequestBuilder(): Request.Builder = Request.Builder()
+
+        @Provides
+        fun provideShareDialogFactory(): AddToPlaylistFragmentFactory = AddToPlaylistFragmentFactory.Stub
     }
 
     @Binds

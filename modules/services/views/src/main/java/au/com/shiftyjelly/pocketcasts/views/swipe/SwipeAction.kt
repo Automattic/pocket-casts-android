@@ -19,6 +19,7 @@ enum class SwipeAction(
     Unarchive("unarchive"),
     RemoveFromPlaylist("playlist_remove"),
     DeleteUserEpisode("delete"),
+    AddToPlaylist("add_to_playlist"),
     ;
 
     override fun contentDescription(context: Context) = when (this) {
@@ -30,6 +31,7 @@ enum class SwipeAction(
         Unarchive -> context.getString(LR.string.unarchive)
         RemoveFromPlaylist -> context.getString(LR.string.remove_from_playlist)
         DeleteUserEpisode -> context.getString(LR.string.delete)
+        AddToPlaylist -> context.getString(LR.string.add_to_playlist_description)
     }
 
     override fun backgroundTint(context: Context): Int {
@@ -42,6 +44,7 @@ enum class SwipeAction(
             Unarchive -> UR.attr.support_06
             RemoveFromPlaylist -> UR.attr.support_05
             DeleteUserEpisode -> UR.attr.support_05
+            AddToPlaylist -> UR.attr.support_02
         }
         return context.getThemeColor(id)
     }
@@ -57,5 +60,6 @@ enum class SwipeAction(
         Unarchive -> IR.drawable.ic_unarchive
         RemoveFromPlaylist -> IR.drawable.ic_delete
         DeleteUserEpisode -> IR.drawable.ic_delete
+        AddToPlaylist -> IR.drawable.ic_playlist_add_episode
     }
 }

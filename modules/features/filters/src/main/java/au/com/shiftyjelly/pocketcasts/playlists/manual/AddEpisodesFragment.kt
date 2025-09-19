@@ -60,7 +60,7 @@ internal class AddEpisodesFragment : BaseDialogFragment() {
         ClearSearchStateEffect(navController)
 
         DialogBox(
-            modifier = Modifier.Companion.nestedScroll(rememberNestedScrollInteropConnection()),
+            modifier = Modifier.nestedScroll(rememberNestedScrollInteropConnection()),
         ) {
             AnimatedNonNullVisibility(
                 item = viewModel.uiState.collectAsState().value,
@@ -140,7 +140,7 @@ internal class AddEpisodesFragment : BaseDialogFragment() {
     ) : Parcelable
 
     companion object {
-        private const val NEW_INSTANCE_ARGS = "SmartRulesEditFragmentArgs"
+        private const val NEW_INSTANCE_ARGS = "AddEpisodesFragmentArgs"
 
         fun newInstance(playlistUuid: String) = AddEpisodesFragment().apply {
             arguments = bundleOf(NEW_INSTANCE_ARGS to Args(playlistUuid))

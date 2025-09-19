@@ -92,12 +92,11 @@ class UpNextEpisodeViewHolder(
         @SuppressLint("ClickableViewAccessibility")
         binding.reorder.setOnTouchListener { _, event ->
             if (event.actionMasked == MotionEvent.ACTION_DOWN) {
-                listener?.onUpNextEpisodeStartDrag(this)
+                listener.onUpNextEpisodeStartDrag(this)
             }
             false
         }
 
-        swipeRowActionsFactory.upNextEpisode().applyTo(swipeLayout)
         swipeLayout.addOnSwipeActionListener { action -> onSwipeAction(episode, action) }
     }
 
@@ -118,6 +117,7 @@ class UpNextEpisodeViewHolder(
         bindArtwork(useEpisodeArtwork)
         bindEpisode(episode)
         bindDate()
+        bindSwipeActions()
         bindSelectedRow(isSelected)
         if (wasMultiSelecting != isMultiSelectEnabled) {
             bindMultiSelection(animateMultiSelection)
@@ -149,7 +149,10 @@ class UpNextEpisodeViewHolder(
         disposable += episodeManager
             .findEpisodeByUuidRxFlowable(episode.uuid)
             .observeOn(AndroidSchedulers.mainThread())
-            .subscribeBy(onNext = ::bindEpisode)
+            .subscribeBy(onNext = { episode ->
+                bindEpisode(episode)
+                bindSwipeActions()
+            })
     }
 
     private fun bindEpisode(episode: BaseEpisode) {
@@ -164,6 +167,10 @@ class UpNextEpisodeViewHolder(
 
     private fun bindDate() {
         binding.date.text = episode.getSummaryText(dateFormatter = dateFormatter, tintColor = tint, showDuration = false, context = context)
+    }
+
+    private fun bindSwipeActions() {
+        swipeRowActionsFactory.upNextEpisode(episode).applyTo(swipeLayout)
     }
 
     private fun bindSelectedRow(isSelected: Boolean) {
