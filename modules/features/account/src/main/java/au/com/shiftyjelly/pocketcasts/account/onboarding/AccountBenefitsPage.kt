@@ -28,6 +28,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.layout.SubcomposeLayout
 import androidx.compose.ui.res.painterResource
@@ -63,6 +64,8 @@ internal fun AccountBenefitsPage(
     onClose: () -> Unit,
     onShowBenefit: (AccountBenefit) -> Unit,
     modifier: Modifier = Modifier,
+    mainCtaLabel: String = stringResource(LR.string.onboarding_get_started),
+    mainCtaColor: Color = MaterialTheme.theme.colors.primaryText01,
 ) {
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
@@ -80,6 +83,8 @@ internal fun AccountBenefitsPage(
         )
 
         ActionButtons(
+            mainCtaColor = mainCtaColor,
+            mainCtaLabel = mainCtaLabel,
             onGetStartedClick = onGetStartedClick,
             onLogIn = onLogIn,
             modifier = Modifier.padding(
@@ -150,6 +155,8 @@ private fun HeaderText(
 
 @Composable
 private fun ActionButtons(
+    mainCtaColor: Color,
+    mainCtaLabel: String,
     onGetStartedClick: () -> Unit,
     onLogIn: () -> Unit,
     modifier: Modifier = Modifier,
@@ -158,9 +165,9 @@ private fun ActionButtons(
         modifier = modifier,
     ) {
         RowTextButton(
-            text = stringResource(LR.string.onboarding_get_started),
+            text = mainCtaLabel,
             colors = ButtonDefaults.buttonColors(
-                backgroundColor = MaterialTheme.theme.colors.primaryText01,
+                backgroundColor = mainCtaColor,
                 contentColor = MaterialTheme.theme.colors.primaryUi01,
             ),
             includePadding = false,
