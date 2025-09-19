@@ -107,8 +107,8 @@ dagger-hilt-android = { module = "com.google.dagger:hilt-android", version.ref =
 dagger-hilt-compiler = { module = "com.google.dagger:hilt-compiler", version.ref = "hilt" }
 dagger-hilt-core = { module = "com.google.dagger:hilt-core", version.ref = "hilt" }
 hilt-compiler = { module = "androidx.hilt:hilt-compiler", version.ref = "hilt-compiler" }
-hilt-navigation-compose = "androidx.hilt:hilt-navigation-compose:1.2.0"
-hilt-work = "androidx.hilt:hilt-work:1.2.0"
+hilt-navigation-compose = "androidx.hilt:hilt-navigation-compose:1.3.0"
+hilt-work = "androidx.hilt:hilt-work:1.3.0"
 
 # Datastore
 datastore = { module = "androidx.datastore:datastore", version.ref = "datastore" }
