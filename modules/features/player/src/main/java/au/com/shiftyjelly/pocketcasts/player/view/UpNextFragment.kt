@@ -26,7 +26,6 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.recyclerview.widget.ItemTouchHelper
-import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.SimpleItemAnimator
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
@@ -418,7 +417,7 @@ class UpNextFragment :
 
     private fun close() {
         if (!isEmbedded) {
-            (activity as? FragmentHostListener)?.bottomSheetClosePressed(this)
+            (activity as? FragmentHostListener)?.closeBottomSheet()
         } else {
             (parentFragment as? PlayerContainerFragment)?.upNextBottomSheetBehavior?.state = BottomSheetBehavior.STATE_COLLAPSED
         }

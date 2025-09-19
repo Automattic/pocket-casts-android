@@ -1198,7 +1198,7 @@ class MainActivity :
         binding.frameBottomSheet.importantForAccessibility = View.IMPORTANT_FOR_ACCESSIBILITY_YES
     }
 
-    override fun bottomSheetClosePressed(fragment: Fragment) {
+    override fun closeBottomSheet() {
         frameBottomSheetBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
         binding.frameBottomSheet.importantForAccessibility = View.IMPORTANT_FOR_ACCESSIBILITY_NO
     }
@@ -1293,6 +1293,10 @@ class MainActivity :
 
     override fun closePodcastsToRoot() {
         navigator.reset(tab = VR.id.navigation_podcasts, resetRootFragment = true)
+    }
+
+    override fun closeFiltersToRoot() {
+        navigator.reset(tab = VR.id.navigation_filters, resetRootFragment = true)
     }
 
     override fun setSupportActionBar(toolbar: Toolbar?) {

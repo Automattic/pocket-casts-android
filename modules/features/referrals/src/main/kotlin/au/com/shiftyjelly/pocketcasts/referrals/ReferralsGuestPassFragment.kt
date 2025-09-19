@@ -45,7 +45,7 @@ class ReferralsGuestPassFragment : BaseFragment() {
         setBackgroundColor(view, ComposeColor.Transparent.toArgb())
 
         val onDismiss = {
-            (activity as? FragmentHostListener)?.bottomSheetClosePressed(this)
+            (activity as? FragmentHostListener)?.closeBottomSheet()
         }
 
         when (pageType) {
