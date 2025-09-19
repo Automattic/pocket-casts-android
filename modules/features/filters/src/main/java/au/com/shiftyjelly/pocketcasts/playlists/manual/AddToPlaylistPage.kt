@@ -250,7 +250,7 @@ private fun PlaylistPreviewsColumn(
         LocalRippleConfiguration provides RippleConfiguration(color = MaterialTheme.theme.colors.primaryIcon01),
     ) {
         val listState = rememberLazyListState()
-        LaunchedEffect(playlistPreviews) {
+        LaunchedEffect(playlistPreviews.map { it.uuid }) {
             listState.scrollToItem(0)
         }
 
