@@ -192,7 +192,14 @@ class PlaylistFragment :
                 },
             ),
             searchState = viewModel.searchState.textState,
-            onShowArchivedToggle = viewModel::toggleShowArchived,
+            onShowArchivedToggle = {
+                viewModel.trackToggleShowArchived()
+                viewModel.toggleShowArchived()
+            },
+            onClickShowArchivedCta = {
+                viewModel.trackShowArchivedCtaTapped()
+                viewModel.toggleShowArchived()
+            },
             onChangeSearchFocus = { hasFocus, searchTopOffset ->
                 if (hasFocus) {
                     binding.content.smoothScrollToTop(0, offset = -searchTopOffset.roundToInt())
@@ -316,7 +323,10 @@ class PlaylistFragment :
                 iconId = IR.drawable.ic_info,
                 primaryButton = NoContentData.Button(
                     text = getString(LR.string.smart_rules),
-                    onClick = ::openEditor,
+                    onClick = {
+                        viewModel.trackEditRulesCtaTapped()
+                        openEditor()
+                    },
                 ),
             )
 
@@ -328,7 +338,10 @@ class PlaylistFragment :
                         iconId = IR.drawable.ic_playlists,
                         primaryButton = NoContentData.Button(
                             text = getString(LR.string.add_episodes),
-                            onClick = ::openEditor,
+                            onClick = {
+                                viewModel.trackAddEpisodeCtaTapped()
+                                openEditor()
+                            },
                         ),
                     )
                 } else {
@@ -339,6 +352,7 @@ class PlaylistFragment :
                         primaryButton = NoContentData.Button(
                             text = getString(LR.string.browse_shows),
                             onClick = {
+                                viewModel.trackBrowseShowsCtaTapped()
                                 val hostListener = (requireActivity() as FragmentHostListener)
                                 hostListener.closeToRoot()
                                 hostListener.openTab(VR.id.navigation_discover)

@@ -59,6 +59,8 @@ internal fun AddEpisodesPage(
     episodesFlow: (String) -> StateFlow<PodcastEpisodesUiState?>,
     hasAnyFolders: Boolean,
     useEpisodeArtwork: Boolean,
+    onOpenPodcast: () -> Unit,
+    onOpenFolder: () -> Unit,
     onAddEpisode: (String) -> Unit,
     onClickNavigationButton: () -> Unit,
     onClickDoneButton: () -> Unit,
@@ -136,8 +138,14 @@ internal fun AddEpisodesPage(
         ) {
             val navigateToSource = { source: ManualPlaylistEpisodeSource ->
                 val route = when (source) {
-                    is ManualPlaylistFolderSource -> AddEpisodesRoutes.folderRoute(source.uuid)
-                    is ManualPlaylistPodcastSource -> AddEpisodesRoutes.podcastRoute(source.uuid)
+                    is ManualPlaylistFolderSource -> {
+                        onOpenFolder()
+                        AddEpisodesRoutes.folderRoute(source.uuid)
+                    }
+                    is ManualPlaylistPodcastSource -> {
+                        onOpenPodcast()
+                        AddEpisodesRoutes.podcastRoute(source.uuid)
+                    }
                 }
                 navController.navigateOnce(route)
             }

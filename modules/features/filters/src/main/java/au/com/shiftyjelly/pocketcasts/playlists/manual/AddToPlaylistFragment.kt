@@ -23,6 +23,7 @@ import androidx.core.os.bundleOf
 import androidx.fragment.app.viewModels
 import androidx.fragment.compose.content
 import androidx.navigation.compose.rememberNavController
+import au.com.shiftyjelly.pocketcasts.compose.CallOnce
 import au.com.shiftyjelly.pocketcasts.compose.components.AnimatedNonNullVisibility
 import au.com.shiftyjelly.pocketcasts.compose.components.ThemedSnackbarHost
 import au.com.shiftyjelly.pocketcasts.playlists.PlaylistFragment
@@ -30,6 +31,8 @@ import au.com.shiftyjelly.pocketcasts.repositories.playlist.Playlist
 import au.com.shiftyjelly.pocketcasts.ui.helper.FragmentHostListener
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseDialogFragment
+import au.com.shiftyjelly.pocketcasts.views.swipe.AddToPlaylistFragmentFactory
+import au.com.shiftyjelly.pocketcasts.views.swipe.AddToPlaylistFragmentFactory.Source
 import dagger.hilt.android.AndroidEntryPoint
 import dagger.hilt.android.lifecycle.withCreationCallback
 import kotlinx.coroutines.launch
@@ -43,7 +46,11 @@ internal class AddToPlaylistFragment : BaseDialogFragment() {
     private val viewModel by viewModels<AddToPlaylistViewModel>(
         extrasProducer = {
             defaultViewModelCreationExtras.withCreationCallback<AddToPlaylistViewModel.Factory> { factory ->
-                factory.create(args.episodeUuid, initialPlaylistTitle = getString(LR.string.new_playlist))
+                factory.create(
+                    source = args.source,
+                    episodeUuid = args.episodeUuid,
+                    initialPlaylistTitle = getString(LR.string.new_playlist),
+                )
             }
         },
     )
@@ -53,6 +60,10 @@ internal class AddToPlaylistFragment : BaseDialogFragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?,
     ) = content {
+        CallOnce {
+            viewModel.trackScreenShown()
+        }
+
         val coroutineScope = rememberCoroutineScope()
         val snackbarHostState = remember { SnackbarHostState() }
         val navController = rememberNavController()
@@ -74,21 +85,30 @@ internal class AddToPlaylistFragment : BaseDialogFragment() {
                     navController = navController,
                     searchFieldState = viewModel.searchFieldState.textState,
                     newPlaylistNameState = viewModel.newPlaylistNameState,
-                    onClickCreatePlaylist = viewModel::createPlaylist,
+                    onClickCreatePlaylist = {
+                        viewModel.trackCreateNewPlaylistTapped()
+                        viewModel.createPlaylist()
+                    },
                     onChangeEpisodeInPlaylist = { playlist ->
                         if (playlist.canAddOrRemoveEpisode) {
                             if (playlist.hasEpisode) {
+                                viewModel.trackEpisodeRemoveTapped()
                                 viewModel.removeFromPlaylist(playlist.uuid)
                             } else {
+                                viewModel.trackEpisodeAddTapped(isPlaylistFull = false)
                                 viewModel.addToPlaylist(playlist.uuid)
                             }
                         } else {
+                            viewModel.trackEpisodeAddTapped(isPlaylistFull = true)
                             if (snackbarHostState.currentSnackbarData == null) {
                                 coroutineScope.launch {
                                     snackbarHostState.showSnackbar(getString(LR.string.playlist_is_full_description))
                                 }
                             }
                         }
+                    },
+                    onClickContinueWithNewPlaylist = {
+                        viewModel.trackNewPlaylistTapped()
                     },
                     onClickDoneButton = ::dismiss,
                     onClickNavigationButton = {
@@ -125,6 +145,7 @@ internal class AddToPlaylistFragment : BaseDialogFragment() {
 
     @Parcelize
     private class Args(
+        val source: Source,
         val episodeUuid: String,
         val customTheme: Theme.ThemeType?,
     ) : Parcelable
@@ -133,10 +154,11 @@ internal class AddToPlaylistFragment : BaseDialogFragment() {
         private const val NEW_INSTANCE_ARGS = "AddToPlaylistFragmentArgs"
 
         fun newInstance(
+            source: Source,
             episodeUuid: String,
             customTheme: Theme.ThemeType? = null,
         ) = AddToPlaylistFragment().apply {
-            arguments = bundleOf(NEW_INSTANCE_ARGS to Args(episodeUuid, customTheme))
+            arguments = bundleOf(NEW_INSTANCE_ARGS to Args(source, episodeUuid, customTheme))
         }
     }
 }

@@ -83,6 +83,7 @@ internal fun AddToPlaylistPage(
     unfilteredPlaylistsCount: Int,
     onClickCreatePlaylist: () -> Unit,
     onChangeEpisodeInPlaylist: (PlaylistPreviewForEpisode) -> Unit,
+    onClickContinueWithNewPlaylist: () -> Unit,
     onClickDoneButton: () -> Unit,
     onClickNavigationButton: () -> Unit,
     modifier: Modifier = Modifier,
@@ -126,7 +127,10 @@ internal fun AddToPlaylistPage(
                     playlistPreviews = playlistPreviews,
                     unfilteredPlaylistsCount = unfilteredPlaylistsCount,
                     searchState = searchFieldState,
-                    onCreatePlaylist = { navController.navigateOnce(AddToPlaylistRoutes.NEW_PLAYLIST) },
+                    onCreatePlaylist = {
+                        onClickContinueWithNewPlaylist()
+                        navController.navigateOnce(AddToPlaylistRoutes.NEW_PLAYLIST)
+                    },
                     onChangeEpisodeInPlaylist = onChangeEpisodeInPlaylist,
                     onClickDoneButton = onClickDoneButton,
                 )
@@ -421,6 +425,7 @@ private fun AddToPlaylistPageEmptyStatePreview() {
             unfilteredPlaylistsCount = 0,
             onClickCreatePlaylist = {},
             onChangeEpisodeInPlaylist = {},
+            onClickContinueWithNewPlaylist = {},
             onClickDoneButton = {},
             onClickNavigationButton = {},
             modifier = Modifier.fillMaxSize(),
@@ -437,6 +442,7 @@ private fun AddToPlaylistPageNoSearchPreview() {
             unfilteredPlaylistsCount = 1,
             onClickCreatePlaylist = {},
             onChangeEpisodeInPlaylist = {},
+            onClickContinueWithNewPlaylist = {},
             onClickDoneButton = {},
             onClickNavigationButton = {},
             modifier = Modifier.fillMaxSize(),
@@ -491,6 +497,7 @@ private fun AddToPlaylistPagePreview(
             navController = navController,
             onClickCreatePlaylist = {},
             onChangeEpisodeInPlaylist = {},
+            onClickContinueWithNewPlaylist = {},
             onClickDoneButton = {},
             onClickNavigationButton = navController::popBackStack,
             modifier = Modifier.fillMaxSize(),

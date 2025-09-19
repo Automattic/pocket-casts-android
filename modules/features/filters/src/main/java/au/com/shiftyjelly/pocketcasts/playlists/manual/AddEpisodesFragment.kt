@@ -27,6 +27,7 @@ import androidx.navigation.NavController
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import au.com.shiftyjelly.pocketcasts.compose.CallOnce
 import au.com.shiftyjelly.pocketcasts.compose.components.AnimatedNonNullVisibility
 import au.com.shiftyjelly.pocketcasts.compose.components.ThemedSnackbarHost
 import au.com.shiftyjelly.pocketcasts.localization.R
@@ -52,6 +53,10 @@ internal class AddEpisodesFragment : BaseDialogFragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?,
     ) = content {
+        CallOnce {
+            viewModel.trackScreenShown()
+        }
+
         val snackbarHostState = remember { SnackbarHostState() }
         DispatchMessageEffect(snackbarHostState)
 
@@ -77,7 +82,16 @@ internal class AddEpisodesFragment : BaseDialogFragment() {
                     episodesFlow = viewModel::getPodcastEpisodesFlow,
                     hasAnyFolders = uiState.hasAnyFolders,
                     useEpisodeArtwork = uiState.useEpisodeArtwork,
-                    onAddEpisode = viewModel::addEpisode,
+                    onOpenPodcast = {
+                        viewModel.trackPodcastTapped()
+                    },
+                    onOpenFolder = {
+                        viewModel.trackFolderTapped()
+                    },
+                    onAddEpisode = { episodeUuid ->
+                        viewModel.trackEpisodeTapped()
+                        viewModel.addEpisode(episodeUuid)
+                    },
                     onClickNavigationButton = {
                         if (!navController.popBackStack()) {
                             dismiss()
