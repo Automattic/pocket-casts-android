@@ -237,7 +237,6 @@ subprojects {
 
             defaultConfig {
                 minSdk = project.property("minSdkVersion") as Int
-                targetSdk = project.property("targetSdkVersion") as Int
                 versionCode = project.property("versionCode") as Int
                 versionName = project.property("versionName") as String
 
