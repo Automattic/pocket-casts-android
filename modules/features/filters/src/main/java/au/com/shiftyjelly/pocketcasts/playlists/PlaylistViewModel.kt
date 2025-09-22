@@ -211,7 +211,11 @@ class PlaylistViewModel @AssistedInject constructor(
     }
 
     fun trackAddEpisodesTapped() {
-        analyticsTracker.track(AnalyticsEvent.FILTER_EDIT_RULES_TAPPED)
+        val episodeCount = uiState.value.playlist?.metadata?.totalEpisodeCount ?: Int.MAX_VALUE
+        analyticsTracker.track(
+            AnalyticsEvent.FILTER_ADD_EPISODES_TAPPED,
+            mapOf("is_playlist_full" to (episodeCount >= PlaylistManager.MANUAL_PLAYLIST_EPISODE_LIMIT)),
+        )
     }
 
     fun trackEditRulesTapped() {
@@ -275,6 +279,51 @@ class PlaylistViewModel @AssistedInject constructor(
                 "did_change_episode_count" to isAutoDownloadLimitChanged,
             ),
         )
+    }
+
+    fun trackArchiveAllTapped() {
+        analyticsTracker.track(AnalyticsEvent.FILTER_ARCHIVE_ALL_TAPPED)
+    }
+
+    fun trackUnarchiveAllTapped() {
+        analyticsTracker.track(AnalyticsEvent.FILTER_UNARCHIVE_ALL_TAPPED)
+    }
+
+    fun trackRearrangeEpisodesTapped() {
+        analyticsTracker.track(AnalyticsEvent.FILTER_REARRANGE_EPISODES_TAPPED)
+    }
+
+    fun trackToggleShowArchived() {
+        val isShowingArchived = uiState.value.playlist?.metadata?.isShowingArchived == true
+        if (isShowingArchived) {
+            trackHideArchivedTapped()
+        } else {
+            trackShowArchivedTapped()
+        }
+    }
+
+    fun trackShowArchivedTapped() {
+        analyticsTracker.track(AnalyticsEvent.FILTER_SHOW_ARCHIVED_TAPPED)
+    }
+
+    fun trackHideArchivedTapped() {
+        analyticsTracker.track(AnalyticsEvent.FILTER_HIDE_ARCHIVED_TAPPED)
+    }
+
+    fun trackAddEpisodeCtaTapped() {
+        analyticsTracker.track(AnalyticsEvent.FILTER_ADD_EPISODES_CTA_EMPTY_TAPPED)
+    }
+
+    fun trackBrowseShowsCtaTapped() {
+        analyticsTracker.track(AnalyticsEvent.FILTER_BROWSE_SHOWS_CTA_EMPTY_TAPPED)
+    }
+
+    fun trackEditRulesCtaTapped() {
+        analyticsTracker.track(AnalyticsEvent.FILTER_EDIT_RULES_CTA_EMPTY_TAPPED)
+    }
+
+    fun trackShowArchivedCtaTapped() {
+        analyticsTracker.track(AnalyticsEvent.FILTER_SHOW_ARCHIVED_CTA_EMPTY_TAPPED)
     }
 
     data class UiState(

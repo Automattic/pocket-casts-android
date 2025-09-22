@@ -57,8 +57,12 @@ import au.com.shiftyjelly.pocketcasts.compose.components.TipPosition
 import au.com.shiftyjelly.pocketcasts.compose.components.TooltipPopup
 import au.com.shiftyjelly.pocketcasts.compose.preview.ThemePreviewParameterProvider
 import au.com.shiftyjelly.pocketcasts.compose.theme
+import au.com.shiftyjelly.pocketcasts.models.type.SmartRules
+import au.com.shiftyjelly.pocketcasts.repositories.playlist.ManualPlaylistPreview
+import au.com.shiftyjelly.pocketcasts.repositories.playlist.Playlist
 import au.com.shiftyjelly.pocketcasts.repositories.playlist.Playlist.Type
 import au.com.shiftyjelly.pocketcasts.repositories.playlist.PlaylistPreview
+import au.com.shiftyjelly.pocketcasts.repositories.playlist.SmartPlaylistPreview
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import kotlin.math.absoluteValue
 import kotlin.math.roundToInt
@@ -266,12 +270,13 @@ private fun PlaylistPreviewRowPreview(
     AppThemeWithBackground(themeType) {
         Column {
             PlaylistPreviewRow(
-                playlist = PlaylistPreview(
+                playlist = SmartPlaylistPreview(
                     uuid = "",
                     title = "New Releases",
                     episodeCount = 0,
                     artworkPodcastUuids = emptyList(),
-                    type = Type.Smart,
+                    settings = Playlist.Settings.ForPreview,
+                    smartRules = SmartRules.Default,
                 ),
                 showTooltip = false,
                 showDivider = true,
@@ -281,12 +286,12 @@ private fun PlaylistPreviewRowPreview(
                 modifier = Modifier.fillMaxWidth(),
             )
             PlaylistPreviewRow(
-                playlist = PlaylistPreview(
+                playlist = ManualPlaylistPreview(
                     uuid = "",
                     title = "In progress",
                     episodeCount = 1,
                     artworkPodcastUuids = List(1) { "podcast-uuid-$it" },
-                    type = Type.Manual,
+                    settings = Playlist.Settings.ForPreview,
                 ),
                 showTooltip = false,
                 showDivider = true,
@@ -296,12 +301,13 @@ private fun PlaylistPreviewRowPreview(
                 modifier = Modifier.fillMaxWidth(),
             )
             PlaylistPreviewRow(
-                playlist = PlaylistPreview(
+                playlist = SmartPlaylistPreview(
                     uuid = "",
                     title = "Starred",
                     episodeCount = 328,
                     artworkPodcastUuids = List(4) { "podcast-uuid-$it" },
-                    type = Type.Smart,
+                    settings = Playlist.Settings.ForPreview,
+                    smartRules = SmartRules.Default,
                 ),
                 showTooltip = false,
                 showDivider = false,

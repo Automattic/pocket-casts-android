@@ -1,6 +1,12 @@
 7.99
 -----
-
+*   Updates
+    *   Improve episode rows swipe and multi-select animations.
+        ([#4500](https://github.com/Automattic/pocket-casts-android/pull/4500))
+    *   Improve user episode rows swipe and multi-select animations.
+        ([#4501](https://github.com/Automattic/pocket-casts-android/pull/4501))
+    *   Improve up next episode rows swipe and multi-select animations.
+        ([#4502](https://github.com/Automattic/pocket-casts-android/pull/4502))
 
 7.98
 -----

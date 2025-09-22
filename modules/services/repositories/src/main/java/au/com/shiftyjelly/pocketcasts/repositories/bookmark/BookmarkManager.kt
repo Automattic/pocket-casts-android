@@ -38,6 +38,7 @@ interface BookmarkManager {
     fun findBookmarksFlow(
         sortType: BookmarksSortTypeForProfile,
     ): Flow<List<Bookmark>>
+    fun hasBookmarksFlow(episodeUuid: String): Flow<Boolean>
 
     var sourceView: SourceView
 

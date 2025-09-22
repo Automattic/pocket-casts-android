@@ -1,9 +1,13 @@
 package au.com.shiftyjelly.pocketcasts.views.swipe
 
+import au.com.shiftyjelly.pocketcasts.models.entity.BaseEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
+import au.com.shiftyjelly.pocketcasts.models.entity.UserEpisode
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.playback.UpNextQueue
 import au.com.shiftyjelly.pocketcasts.repositories.playlist.Playlist
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import javax.inject.Inject
 
 data class SwipeRowActions(
@@ -23,10 +27,32 @@ data class SwipeRowActions(
         swipeLayout.setRtl3State(rtl3)
     }
 
-    class Factory @Inject constructor(
+    internal operator fun contains(action: SwipeAction): Boolean {
+        return ltr1 == action ||
+            ltr2 == action ||
+            ltr3 == action ||
+            rtl1 == action ||
+            rtl2 == action ||
+            rtl3 == action
+    }
+
+    companion object {
+        val Empty = SwipeRowActions()
+    }
+
+    class Factory internal constructor(
         private val settings: Settings,
         private val queue: UpNextQueue,
+        private val makeFlagImmutable: Boolean,
     ) {
+        @Inject
+        constructor(
+            settings: Settings,
+            queue: UpNextQueue,
+        ) : this(settings, queue, makeFlagImmutable = true)
+
+        private val arePlaylistsAvailable get() = FeatureFlag.isEnabled(Feature.PLAYLISTS_REBRANDING, immutable = makeFlagImmutable)
+
         fun unavailablePlaylistEpisode() = buildSwipeRowActions {
             rtl1 = SwipeAction.RemoveFromPlaylist
         }
@@ -55,7 +81,57 @@ data class SwipeRowActions(
                 Playlist.Type.Smart -> {
                     rtl1 = episode.archiveSwipeAction()
                     rtl2 = SwipeAction.Share
+                    if (arePlaylistsAvailable) {
+                        rtl3 = SwipeAction.AddToPlaylist
+                    }
                 }
+            }
+        }
+
+        fun podcastEpisode(
+            episode: PodcastEpisode,
+        ) = buildSwipeRowActions {
+            val isInUpNext = queue.contains(episode.uuid)
+
+            if (isInUpNext) {
+                ltr1 = SwipeAction.RemoveFromUpNext
+            } else {
+                val (upNext1, upNext2) = settings.upNextSwipe.value.toSwipeActions()
+                ltr1 = upNext1
+                ltr2 = upNext2
+            }
+
+            rtl1 = episode.archiveSwipeAction()
+            rtl2 = SwipeAction.Share
+            if (arePlaylistsAvailable) {
+                rtl3 = SwipeAction.AddToPlaylist
+            }
+        }
+
+        fun userEpisode(
+            episode: UserEpisode,
+        ) = buildSwipeRowActions {
+            val isInUpNext = queue.contains(episode.uuid)
+
+            if (isInUpNext) {
+                ltr1 = SwipeAction.RemoveFromUpNext
+            } else {
+                val (upNext1, upNext2) = settings.upNextSwipe.value.toSwipeActions()
+                ltr1 = upNext1
+                ltr2 = upNext2
+            }
+
+            rtl1 = SwipeAction.DeleteUserEpisode
+        }
+
+        fun upNextEpisode(
+            episode: BaseEpisode,
+        ) = buildSwipeRowActions {
+            ltr1 = SwipeAction.AddToUpNextTop
+            ltr2 = SwipeAction.AddToUpNextBottom
+            rtl1 = SwipeAction.RemoveFromUpNext
+            if (arePlaylistsAvailable && episode is PodcastEpisode) {
+                rtl2 = SwipeAction.AddToPlaylist
             }
         }
     }

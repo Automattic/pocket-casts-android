@@ -81,7 +81,7 @@ class AutomotiveSettingsActivity :
         addFragment(fragment)
     }
 
-    override fun bottomSheetClosePressed(fragment: Fragment) {
+    override fun closeBottomSheet() {
         handleBackPressed()
     }
 
@@ -106,6 +106,9 @@ class AutomotiveSettingsActivity :
     }
 
     override fun closePodcastsToRoot() {
+    }
+
+    override fun closeFiltersToRoot() {
     }
 
     override fun openPodcastPage(uuid: String, sourceView: String?) {

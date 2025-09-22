@@ -220,4 +220,8 @@ class BookmarkManagerImpl @Inject constructor(
     }
 
     override fun findUserEpisodesBookmarksFlow() = bookmarkDao.findUserEpisodesBookmarksFlow()
+
+    override fun hasBookmarksFlow(episodeUuid: String): Flow<Boolean> {
+        return bookmarkDao.hasBookmarksFlow(episodeUuid)
+    }
 }

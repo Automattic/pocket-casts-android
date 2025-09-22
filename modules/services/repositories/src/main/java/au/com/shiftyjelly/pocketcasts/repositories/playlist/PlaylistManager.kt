@@ -50,6 +50,8 @@ interface PlaylistManager {
         searchTerm: String? = null,
     ): Flow<ManualPlaylist?>
 
+    fun playlistPreviewsForEpisodeFlow(episodeUuid: String, searchTerm: String? = null): Flow<List<PlaylistPreviewForEpisode>>
+
     suspend fun getManualEpisodeSources(searchTerm: String? = null): List<ManualPlaylistEpisodeSource>
 
     suspend fun getManualEpisodeSourcesForFolder(folderUuid: String, searchTerm: String? = null): List<ManualPlaylistPodcastSource>
