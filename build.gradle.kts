@@ -14,6 +14,7 @@ import com.google.devtools.ksp.gradle.KspGradleSubplugin
 import io.sentry.android.gradle.extensions.InstrumentationFeature
 import io.sentry.android.gradle.extensions.SentryPluginExtension
 import java.util.EnumSet
+import kotlin.collections.addAll
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import org.jetbrains.kotlin.gradle.dsl.KotlinJvmCompilerOptions
 import org.jetbrains.kotlin.gradle.plugin.KotlinBasePlugin
@@ -389,15 +390,27 @@ subprojects {
                     applicationIdSuffix = ".debug"
                 }
 
+                maybeCreate("prototype").apply {
+                    isMinifyEnabled = true
+                    isShrinkResources = true
+                    proguardFiles.addAll(
+                        listOf(
+                            getDefaultProguardFile("proguard-android-optimize.txt"),
+                            rootProject.file("proguard-rules.pro"),
+                            rootProject.file("proguard-rules-no-obfuscate.pro"),
+                        ),
+                    )
+                }
+
                 named("release") {
                     isMinifyEnabled = true
+                    isShrinkResources = true
                     proguardFiles.addAll(
                         listOf(
                             getDefaultProguardFile("proguard-android-optimize.txt"),
                             rootProject.file("proguard-rules.pro"),
                         ),
                     )
-                    isShrinkResources = true
                 }
             }
         }
