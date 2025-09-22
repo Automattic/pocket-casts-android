@@ -148,7 +148,7 @@ class PodcastSettingsViewModel @AssistedInject constructor(
         changePlaybackSpeed(podcast, change = -0.1)
     }
 
-    fun incrementPLaybackSpeed() {
+    fun incrementPlaybackSpeed() {
         val podcast = uiState.value?.podcast ?: return
         changePlaybackSpeed(podcast, change = 0.1)
     }

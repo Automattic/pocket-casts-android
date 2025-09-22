@@ -88,7 +88,7 @@ class PodcastSettingsFragment :
                 },
                 onChangePlaybackEffects = viewModel::changePlaybackEffects,
                 onDecrementPlaybackSpeed = viewModel::decrementPlaybackSpeed,
-                onIncrementPlaybackSpeed = viewModel::incrementPLaybackSpeed,
+                onIncrementPlaybackSpeed = viewModel::incrementPlaybackSpeed,
                 onChangeTrimSilenceMode = viewModel::changeTrimSilenceMode,
                 onChangeVolumeBoost = viewModel::changeVolumeBoost,
                 onDecrementSkipFirst = viewModel::decrementSkipFirst,
