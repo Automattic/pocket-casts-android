@@ -1,11 +1,14 @@
 package au.com.shiftyjelly.pocketcasts.wear
 
+import android.content.Context
 import android.os.Bundle
+import android.util.Log
 import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -64,11 +67,14 @@ class MainActivity : ComponentActivity() {
             WearAppTheme {
                 val state by viewModel.state.collectAsState()
 
+                Log.i("===", "state = $state")
+
                 WearApp(
                     signInState = state.signInState,
                     showLoggingInScreen = state.showLoggingInScreen,
                     onShowLoginScreen = viewModel::onSignInConfirmationActionHandled,
                     signOut = viewModel::signOut,
+                    requestLogin = viewModel::tryCredentialsManager
                 )
             }
         }
@@ -86,17 +92,26 @@ private fun WearApp(
     showLoggingInScreen: Boolean,
     onShowLoginScreen: () -> Unit,
     signOut: () -> Unit,
+    requestLogin: (Context) -> Unit,
 ) {
     val navController = rememberSwipeDismissableNavController()
     val swipeToDismissState = rememberSwipeToDismissBoxState()
     val navState = rememberSwipeDismissableNavHostState(swipeToDismissState)
+    val context = LocalContext.current
 
     if (showLoggingInScreen) {
         navController.navigate(LoggingInScreen.ROUTE_WITH_DELAY)
         onShowLoginScreen()
     }
 
-    val userCanAccessWatch = signInState.isSignedInAsPlusOrPatron == true
+    val userCanAccessWatch = signInState.isSignedInAsPlusOrPatron
+
+    LaunchedEffect(signInState, context) {
+        Log.i("====", "launchedEffect, sst=$signInState, ctxt=$context")
+        if (signInState == SignInState.SignedOut) {
+            requestLogin(context)
+        }
+    }
 
     val waitingForSignIn = remember { mutableStateOf(false) }
     if (!userCanAccessWatch) {
@@ -401,5 +416,6 @@ private fun DefaultPreview() {
         showLoggingInScreen = false,
         onShowLoginScreen = {},
         signOut = {},
+        requestLogin = {}
     )
 }
