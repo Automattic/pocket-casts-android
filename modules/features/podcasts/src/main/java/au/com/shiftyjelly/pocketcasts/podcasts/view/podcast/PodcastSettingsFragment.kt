@@ -26,7 +26,6 @@ import au.com.shiftyjelly.pocketcasts.utils.extensions.pxToDp
 import au.com.shiftyjelly.pocketcasts.views.dialog.ConfirmationDialog
 import au.com.shiftyjelly.pocketcasts.views.dialog.OptionsDialog
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseFragment
-import au.com.shiftyjelly.pocketcasts.views.fragments.FilterSelectFragment
 import au.com.shiftyjelly.pocketcasts.views.helper.ToolbarColors
 import dagger.hilt.android.AndroidEntryPoint
 import dagger.hilt.android.lifecycle.withCreationCallback
@@ -37,9 +36,7 @@ import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 @AndroidEntryPoint
-class PodcastSettingsFragment :
-    BaseFragment(),
-    FilterSelectFragment.Listener {
+class PodcastSettingsFragment : BaseFragment() {
     private val args get() = requireNotNull(arguments?.let { BundleCompat.getParcelable(it, NEW_INSTANCE_ARGS, Args::class.java) })
 
     private val viewModel by viewModels<PodcastSettingsViewModel>(
@@ -155,15 +152,6 @@ class PodcastSettingsFragment :
                 }
                 .show(parentFragmentManager, "podcast-unfollow")
         }
-    }
-
-    override fun filterSelectFragmentSelectionChanged(newSelection: List<String>) {
-        // TODO: Remove once fragment is migrated
-    }
-
-    override fun filterSelectFragmentGetCurrentSelection(): List<String> {
-        // TODO: Remove once fragment is migrated
-        return viewModel.uiState.value?.playlists?.map { it.uuid }.orEmpty()
     }
 
     @Parcelize
