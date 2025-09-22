@@ -442,6 +442,7 @@ class PlaylistManagerImpl(
                     autoDownloadLimit = playlist.autodownloadLimit,
                 ),
                 smartRules = smartRules,
+                iconId = playlist.iconId,
             )
         }
     }

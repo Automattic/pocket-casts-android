@@ -299,6 +299,7 @@ class PlaylistManagerDsl : TestWatcher() {
                     autoDownloadLimit = 10,
                 ),
                 smartRules = SmartRules.Default,
+                iconId = 0,
             ),
         )
         return preview

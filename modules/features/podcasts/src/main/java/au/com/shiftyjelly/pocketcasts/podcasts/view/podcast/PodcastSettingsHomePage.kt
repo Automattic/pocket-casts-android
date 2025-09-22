@@ -340,6 +340,7 @@ private fun PodcastSettingsHomePagePreview(
                         smartRules = SmartRules.Default.copy(
                             podcasts = PodcastsRule.Selected(uuids = setOf("podcast-uuid")),
                         ),
+                        iconId = 0,
                     )
                 },
                 globalUpNextLimit = 100,
