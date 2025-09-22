@@ -2,6 +2,8 @@ package au.com.shiftyjelly.pocketcasts.utils.featureflag
 
 import au.com.shiftyjelly.pocketcasts.helper.BuildConfig
 
+private val isDebugOrPrototypeBuild = BuildConfig.DEBUG || BuildConfig.IS_PROTOTYPE
+
 enum class Feature(
     val key: String,
     val title: String,
@@ -37,7 +39,7 @@ enum class Feature(
     SLUMBER_STUDIOS_YEARLY_PROMO(
         key = "slumber_studios_yearly_promo_code",
         title = "Slumber Studios Yearly Promo",
-        defaultValue = BuildConfig.DEBUG,
+        defaultValue = isDebugOrPrototypeBuild,
         tier = FeatureTier.Plus(null),
         hasFirebaseRemoteFlag = true,
         hasDevToggle = true,
@@ -45,7 +47,7 @@ enum class Feature(
     NOVA_LAUNCHER(
         key = "nova_launcher",
         title = "Integrate Pocket Casts with Nova Launcher",
-        defaultValue = BuildConfig.DEBUG,
+        defaultValue = isDebugOrPrototypeBuild,
         tier = FeatureTier.Free,
         hasFirebaseRemoteFlag = false,
         hasDevToggle = true,
@@ -53,7 +55,7 @@ enum class Feature(
     EXPLAT_EXPERIMENT(
         key = "explat_experiment",
         title = "ExPlat Experiment",
-        defaultValue = BuildConfig.DEBUG,
+        defaultValue = isDebugOrPrototypeBuild,
         tier = FeatureTier.Free,
         hasFirebaseRemoteFlag = true,
         hasDevToggle = true,
@@ -93,7 +95,7 @@ enum class Feature(
     LIBRO_FM(
         key = "libro_fm",
         title = "Libro FM in Upsell",
-        defaultValue = BuildConfig.DEBUG,
+        defaultValue = isDebugOrPrototypeBuild,
         tier = FeatureTier.Plus(),
         hasFirebaseRemoteFlag = true,
         hasDevToggle = true,
@@ -101,7 +103,7 @@ enum class Feature(
     ENCOURAGE_ACCOUNT_CREATION(
         key = "encourage_account_creation",
         title = "Account creation encouragement",
-        defaultValue = BuildConfig.DEBUG,
+        defaultValue = isDebugOrPrototypeBuild,
         tier = FeatureTier.Free,
         hasFirebaseRemoteFlag = true,
         hasDevToggle = true,
@@ -109,7 +111,7 @@ enum class Feature(
     RECOMMENDATIONS(
         key = "recommendations",
         title = "Recommendations",
-        defaultValue = BuildConfig.DEBUG,
+        defaultValue = isDebugOrPrototypeBuild,
         tier = FeatureTier.Free,
         hasFirebaseRemoteFlag = true,
         hasDevToggle = true,
@@ -117,7 +119,7 @@ enum class Feature(
     NOTIFICATIONS_REVAMP(
         key = "notifications_revamp",
         title = "Notifications Revamp",
-        defaultValue = BuildConfig.DEBUG,
+        defaultValue = isDebugOrPrototypeBuild,
         tier = FeatureTier.Free,
         hasFirebaseRemoteFlag = true,
         hasDevToggle = true,
@@ -125,7 +127,7 @@ enum class Feature(
     BANNER_ADS_PLAYER(
         key = "banner_ad_player",
         title = "Banner Ads Player",
-        defaultValue = BuildConfig.DEBUG,
+        defaultValue = isDebugOrPrototypeBuild,
         tier = FeatureTier.Free,
         hasFirebaseRemoteFlag = true,
         hasDevToggle = true,
@@ -133,7 +135,7 @@ enum class Feature(
     BANNER_ADS_PODCASTS(
         key = "banner_ad_podcasts",
         title = "Banner Ads Podcasts",
-        defaultValue = BuildConfig.DEBUG,
+        defaultValue = isDebugOrPrototypeBuild,
         tier = FeatureTier.Free,
         hasFirebaseRemoteFlag = true,
         hasDevToggle = true,
@@ -141,7 +143,7 @@ enum class Feature(
     SMART_CATEGORIES(
         key = "smart_categories",
         title = "Smart Categories",
-        defaultValue = BuildConfig.DEBUG,
+        defaultValue = isDebugOrPrototypeBuild,
         tier = FeatureTier.Free,
         hasFirebaseRemoteFlag = true,
         hasDevToggle = true,
@@ -149,7 +151,7 @@ enum class Feature(
     NEW_ONBOARDING_UPGRADE(
         key = "new_onboarding_upgrade",
         title = "New Onboarding Upgrade",
-        defaultValue = BuildConfig.DEBUG,
+        defaultValue = isDebugOrPrototypeBuild,
         tier = FeatureTier.Free,
         hasFirebaseRemoteFlag = true,
         hasDevToggle = true,
@@ -157,7 +159,7 @@ enum class Feature(
     NEW_ONBOARDING_ACCOUNT_CREATION(
         key = "new_onboarding_account_creation",
         title = "New Onboarding Account Creation",
-        defaultValue = BuildConfig.DEBUG,
+        defaultValue = isDebugOrPrototypeBuild,
         tier = FeatureTier.Free,
         hasFirebaseRemoteFlag = true,
         hasDevToggle = true,
@@ -165,7 +167,7 @@ enum class Feature(
     NEW_ONBOARDING_RECOMMENDATIONS(
         key = "new_onboarding_recommendations_changes",
         title = "New Onboarding Recommendation Changes",
-        defaultValue = BuildConfig.DEBUG,
+        defaultValue = isDebugOrPrototypeBuild,
         tier = FeatureTier.Free,
         hasFirebaseRemoteFlag = true,
         hasDevToggle = true,
@@ -173,7 +175,7 @@ enum class Feature(
     NEW_ONBOARDING_UPGRADE_TRIAL_TIMELINE(
         key = "new_onboarding_upgrade_trial_timeline",
         title = "New Onboarding Upgrade Trial Timeline",
-        defaultValue = BuildConfig.DEBUG,
+        defaultValue = isDebugOrPrototypeBuild,
         tier = FeatureTier.Free,
         hasFirebaseRemoteFlag = true,
         hasDevToggle = true,
@@ -181,7 +183,7 @@ enum class Feature(
     PLAYLISTS_REBRANDING(
         key = "playlists_rebranding",
         title = "Playlists",
-        defaultValue = BuildConfig.DEBUG,
+        defaultValue = isDebugOrPrototypeBuild,
         tier = FeatureTier.Free,
         hasFirebaseRemoteFlag = false,
         hasDevToggle = true,
@@ -197,7 +199,7 @@ enum class Feature(
     PROTO_DATA_SYNC(
         key = "proto_data_sync",
         title = "Sync data using Protobuf",
-        defaultValue = BuildConfig.DEBUG,
+        defaultValue = isDebugOrPrototypeBuild,
         tier = FeatureTier.Free,
         hasFirebaseRemoteFlag = true,
         hasDevToggle = true,

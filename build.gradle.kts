@@ -241,6 +241,8 @@ subprojects {
                 versionCode = project.property("versionCode") as Int
                 versionName = project.property("versionName") as String
 
+                buildConfigField("boolean", "IS_PROTOTYPE", "false")
+
                 buildConfigField("int", "VERSION_CODE", "${project.property("versionCode")}")
                 buildConfigField("String", "VERSION_NAME", "\"${project.property("versionName")}\"")
                 buildConfigField("String", "SETTINGS_ENCRYPT_SECRET", "\"${project.property("settingsEncryptSecret")}\"")
@@ -252,6 +254,19 @@ subprojects {
                 buildConfigField("String", "APP_SECRET", "\"${project.property("appSecret")}\"")
                 buildConfigField("String", "META_APP_ID", "\"${project.property("metaAppId")}\"")
                 buildConfigField("String", "APPS_FLYER_KEY", "\"${project.property("appsFlyerKey")}\"")
+
+                buildConfigField("String", "SERVER_MAIN_URL", serverMainUrlProd)
+                buildConfigField("String", "SERVER_API_URL", serverApiUrlProd)
+                buildConfigField("String", "SERVER_CACHE_URL", serverCacheUrlProd)
+                buildConfigField("String", "SERVER_CACHE_HOST", serverCacheHostProd)
+                buildConfigField("String", "SERVER_STATIC_URL", serverStaticUrlProd)
+                buildConfigField("String", "SERVER_SHARING_URL", serverSharingUrlProd)
+                buildConfigField("String", "SERVER_SHORT_URL", serverShortUrlProd)
+                buildConfigField("String", "SERVER_SHORT_HOST", serverShortHostProd)
+                buildConfigField("String", "SERVER_WEB_PLAYER_HOST", serverWebPlayerHostProd)
+                buildConfigField("String", "WEB_BASE_HOST", webBaseHostProd)
+                buildConfigField("String", "SERVER_LIST_URL", serverListUrlProd)
+                buildConfigField("String", "SERVER_LIST_HOST", serverListHostProd)
 
                 testInstrumentationRunner = project.property("testInstrumentationRunner") as String
                 testApplicationId = "au.com.shiftyjelly.pocketcasts.test${project.name.replace("-", "_")}"
@@ -321,37 +336,20 @@ subprojects {
                     enableAndroidTestCoverage = false
                     ext.set("alwaysUpdateBuildId", false)
 
-                    buildConfigField("String", "SERVER_MAIN_URL", serverMainUrlProd)
-                    buildConfigField("String", "SERVER_API_URL", serverApiUrlProd)
-                    buildConfigField("String", "SERVER_CACHE_URL", serverCacheUrlProd)
-                    buildConfigField("String", "SERVER_CACHE_HOST", serverCacheHostProd)
-                    buildConfigField("String", "SERVER_STATIC_URL", serverStaticUrlProd)
-                    buildConfigField("String", "SERVER_SHARING_URL", serverSharingUrlProd)
-                    buildConfigField("String", "SERVER_SHORT_URL", serverShortUrlProd)
-                    buildConfigField("String", "SERVER_SHORT_HOST", serverShortHostProd)
-                    buildConfigField("String", "SERVER_WEB_PLAYER_HOST", serverWebPlayerHostProd)
-                    buildConfigField("String", "WEB_BASE_HOST", webBaseHostProd)
-                    buildConfigField("String", "SERVER_LIST_URL", serverListUrlProd)
-                    buildConfigField("String", "SERVER_LIST_HOST", serverListHostProd)
-
                     signingConfig = signingConfigs.getByName("debug")
                 }
 
+                maybeCreate("prototype").apply {
+                    isDebuggable = false
+
+                    buildConfigField("boolean", "IS_PROTOTYPE", "true")
+
+                    if (canSignRelease) {
+                        signingConfig = signingConfigs.getByName("release")
+                    }
+                }
+
                 named("release") {
-
-                    buildConfigField("String", "SERVER_MAIN_URL", serverMainUrlProd)
-                    buildConfigField("String", "SERVER_API_URL", serverApiUrlProd)
-                    buildConfigField("String", "SERVER_CACHE_URL", serverCacheUrlProd)
-                    buildConfigField("String", "SERVER_CACHE_HOST", serverCacheHostProd)
-                    buildConfigField("String", "SERVER_STATIC_URL", serverStaticUrlProd)
-                    buildConfigField("String", "SERVER_SHARING_URL", serverSharingUrlProd)
-                    buildConfigField("String", "SERVER_SHORT_URL", serverShortUrlProd)
-                    buildConfigField("String", "SERVER_SHORT_HOST", serverShortHostProd)
-                    buildConfigField("String", "SERVER_WEB_PLAYER_HOST", serverWebPlayerHostProd)
-                    buildConfigField("String", "WEB_BASE_HOST", webBaseHostProd)
-                    buildConfigField("String", "SERVER_LIST_URL", serverListUrlProd)
-                    buildConfigField("String", "SERVER_LIST_HOST", serverListHostProd)
-
                     if (canSignRelease) {
                         signingConfig = signingConfigs.getByName("release")
                     }

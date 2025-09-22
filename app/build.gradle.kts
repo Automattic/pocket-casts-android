@@ -38,6 +38,20 @@ android {
             manifestPlaceholders["appIcon"] = "@mipmap/ic_launcher_3"
         }
 
+        maybeCreate("prototype").apply {
+            manifestPlaceholders["appIcon"] = "@mipmap/ic_launcher_prototype"
+
+            isMinifyEnabled = true
+            isShrinkResources = true
+            proguardFiles.addAll(
+                listOf(
+                    getDefaultProguardFile("proguard-android-optimize.txt"),
+                    rootProject.file("proguard-rules.pro"),
+                    rootProject.file("proguard-rules-no-obfuscate.pro"),
+                ),
+            )
+        }
+
         named("release") {
             manifestPlaceholders["appIcon"] = "@mipmap/ic_launcher"
 
