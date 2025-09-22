@@ -7,6 +7,8 @@
         ([#4501](https://github.com/Automattic/pocket-casts-android/pull/4501))
     *   Improve up next episode rows swipe and multi-select animations.
         ([#4502](https://github.com/Automattic/pocket-casts-android/pull/4502))
+    *   Migrate from old Google login method to CredentialManager APIs
+        ([#4523](https://github.com/Automattic/pocket-casts-android/pull/4523))
 
 7.98
 -----
