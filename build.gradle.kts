@@ -213,19 +213,6 @@ subprojects {
         checkReleaseBuilds = false
     }
 
-    val serverMainUrlProd = "\"https://refresh.pocketcasts.com\""
-    val serverApiUrlProd = "\"https://api.pocketcasts.com\""
-    val serverCacheUrlProd = "\"https://cache.pocketcasts.com\""
-    val serverCacheHostProd = "\"cache.pocketcasts.com\""
-    val serverStaticUrlProd = "\"https://static.pocketcasts.com\""
-    val serverSharingUrlProd = "\"https://sharing.pocketcasts.com\""
-    val serverListUrlProd = "\"https://lists.pocketcasts.com\""
-    val serverListHostProd = "\"lists.pocketcasts.com\""
-    val serverShortUrlProd = "\"https://pca.st\""
-    val serverShortHostProd = "\"pca.st\""
-    val serverWebPlayerHostProd = "\"play.pocketcasts.com\""
-    val webBaseHostProd = "\"pocketcasts.com\""
-
     plugins.withType<BasePlugin>().configureEach {
         configure<BaseExtension> {
             compileOptions {
@@ -256,18 +243,18 @@ subprojects {
                 buildConfigField("String", "META_APP_ID", "\"${project.property("metaAppId")}\"")
                 buildConfigField("String", "APPS_FLYER_KEY", "\"${project.property("appsFlyerKey")}\"")
 
-                buildConfigField("String", "SERVER_MAIN_URL", serverMainUrlProd)
-                buildConfigField("String", "SERVER_API_URL", serverApiUrlProd)
-                buildConfigField("String", "SERVER_CACHE_URL", serverCacheUrlProd)
-                buildConfigField("String", "SERVER_CACHE_HOST", serverCacheHostProd)
-                buildConfigField("String", "SERVER_STATIC_URL", serverStaticUrlProd)
-                buildConfigField("String", "SERVER_SHARING_URL", serverSharingUrlProd)
-                buildConfigField("String", "SERVER_SHORT_URL", serverShortUrlProd)
-                buildConfigField("String", "SERVER_SHORT_HOST", serverShortHostProd)
-                buildConfigField("String", "SERVER_WEB_PLAYER_HOST", serverWebPlayerHostProd)
-                buildConfigField("String", "WEB_BASE_HOST", webBaseHostProd)
-                buildConfigField("String", "SERVER_LIST_URL", serverListUrlProd)
-                buildConfigField("String", "SERVER_LIST_HOST", serverListHostProd)
+                buildConfigField("String", "SERVER_MAIN_URL", "\"https://refresh.pocketcasts.com\"")
+                buildConfigField("String", "SERVER_API_URL", "\"https://api.pocketcasts.com\"")
+                buildConfigField("String", "SERVER_CACHE_URL", "\"https://cache.pocketcasts.com\"")
+                buildConfigField("String", "SERVER_CACHE_HOST", "\"cache.pocketcasts.com\"")
+                buildConfigField("String", "SERVER_STATIC_URL", "\"https://static.pocketcasts.com\"")
+                buildConfigField("String", "SERVER_SHARING_URL", "\"https://sharing.pocketcasts.com\"")
+                buildConfigField("String", "SERVER_SHORT_URL", "\"https://pca.st\"")
+                buildConfigField("String", "SERVER_SHORT_HOST", "\"pca.st\"")
+                buildConfigField("String", "SERVER_WEB_PLAYER_HOST", "\"play.pocketcasts.com\"")
+                buildConfigField("String", "WEB_BASE_HOST", "\"pocketcasts.com\"")
+                buildConfigField("String", "SERVER_LIST_URL", "\"https://lists.pocketcasts.com\"")
+                buildConfigField("String", "SERVER_LIST_HOST", "\"lists.pocketcasts.com\"")
 
                 testInstrumentationRunner = project.property("testInstrumentationRunner") as String
                 testApplicationId = "au.com.shiftyjelly.pocketcasts.test${project.name.replace("-", "_")}"
