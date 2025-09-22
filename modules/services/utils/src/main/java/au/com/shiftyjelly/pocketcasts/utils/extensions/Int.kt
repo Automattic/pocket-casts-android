@@ -40,3 +40,19 @@ val Int.abbreviated: String
 private fun scaleDown(value: Double, by: Double): Double {
     return round((value / by) * 10) / 10
 }
+
+fun Int.decrementByOrRound(value: Int): Int {
+    return if (this % value == 0) {
+        this - value
+    } else {
+        this - (this % value)
+    }
+}
+
+fun Int.incrementByOrRound(value: Int): Int {
+    return if (this % value == 0) {
+        this + value
+    } else {
+        this + (value - this % value)
+    }
+}

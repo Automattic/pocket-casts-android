@@ -95,7 +95,7 @@ class PlaylistManagerSmartTest {
                 it.copy(podcasts = PodcastsRule.Any)
             },
             playlistDraft(index = 19) {
-                it.copy(podcasts = PodcastsRule.Selected(uuids = listOf("id-1", "id-2")))
+                it.copy(podcasts = PodcastsRule.Selected(uuids = setOf("id-1", "id-2")))
             },
             playlistDraft(index = 20) {
                 it.copy(episodeDuration = EpisodeDurationRule.Any)

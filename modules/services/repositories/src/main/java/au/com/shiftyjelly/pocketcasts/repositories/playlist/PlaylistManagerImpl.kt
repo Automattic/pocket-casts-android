@@ -517,7 +517,7 @@ private val PlaylistEntity.smartRules
         podcasts = if (podcastUuidList.isEmpty()) {
             PodcastsRule.Any
         } else {
-            PodcastsRule.Selected(podcastUuidList)
+            PodcastsRule.Selected(podcastUuidList.toSet())
         },
         episodeDuration = if (filterDuration) {
             EpisodeDurationRule.Constrained(

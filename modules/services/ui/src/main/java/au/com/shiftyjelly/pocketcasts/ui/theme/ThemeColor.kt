@@ -721,7 +721,7 @@ object ThemeColor {
     }
 
     @ColorInt fun podcastIcon01Indigo(@ColorInt podcastColor: Int): Int {
-        return ColorUtils.calculateCombinedColor(Color.parseColor("#F3F1E4"), ColorUtils.colorWithAlpha(podcastColor, 38))
+        return ColorUtils.calculateCombinedColor(Color.parseColor("#F3F1E4"), ColorUtils.colorWithAlpha(podcastColor, 138))
     }
 
     @ColorInt fun podcastIcon01Radioactive(@ColorInt podcastColor: Int): Int {

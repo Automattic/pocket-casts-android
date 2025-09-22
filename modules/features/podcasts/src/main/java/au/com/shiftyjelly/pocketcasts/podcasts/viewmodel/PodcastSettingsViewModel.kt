@@ -1,166 +1,283 @@
 package au.com.shiftyjelly.pocketcasts.podcasts.viewmodel
 
-import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.asLiveData
-import androidx.lifecycle.toLiveData
 import androidx.lifecycle.viewModelScope
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
-import au.com.shiftyjelly.pocketcasts.models.entity.PlaylistEntity
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
+import au.com.shiftyjelly.pocketcasts.models.to.AutoArchiveAfterPlaying
+import au.com.shiftyjelly.pocketcasts.models.to.AutoArchiveInactive
+import au.com.shiftyjelly.pocketcasts.models.to.AutoArchiveLimit
+import au.com.shiftyjelly.pocketcasts.models.to.PlaybackEffects
+import au.com.shiftyjelly.pocketcasts.models.type.EpisodeStatusEnum
+import au.com.shiftyjelly.pocketcasts.models.type.SmartRules
+import au.com.shiftyjelly.pocketcasts.models.type.TrimMode
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
-import au.com.shiftyjelly.pocketcasts.repositories.podcast.PlaylistProperty
-import au.com.shiftyjelly.pocketcasts.repositories.podcast.PlaylistUpdateSource
+import au.com.shiftyjelly.pocketcasts.repositories.playlist.PlaylistManager
+import au.com.shiftyjelly.pocketcasts.repositories.playlist.SmartPlaylistPreview
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
-import au.com.shiftyjelly.pocketcasts.repositories.podcast.SmartPlaylistManager
-import au.com.shiftyjelly.pocketcasts.repositories.podcast.UserPlaylistUpdate
+import au.com.shiftyjelly.pocketcasts.utils.extensions.decrementByOrRound
+import au.com.shiftyjelly.pocketcasts.utils.extensions.incrementByOrRound
+import au.com.shiftyjelly.pocketcasts.utils.extensions.roundedSpeed
+import dagger.assisted.Assisted
+import dagger.assisted.AssistedFactory
+import dagger.assisted.AssistedInject
 import dagger.hilt.android.lifecycle.HiltViewModel
-import io.reactivex.schedulers.Schedulers
-import javax.inject.Inject
-import kotlin.coroutines.CoroutineContext
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.NonCancellable
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
-@HiltViewModel
-class PodcastSettingsViewModel @Inject constructor(
+@HiltViewModel(assistedFactory = PodcastSettingsViewModel.Factory::class)
+class PodcastSettingsViewModel @AssistedInject constructor(
     private val podcastManager: PodcastManager,
+    private val playlistManager: PlaylistManager,
     private val playbackManager: PlaybackManager,
-    private val smartPlaylistManager: SmartPlaylistManager,
-    private val analyticsTracker: AnalyticsTracker,
-    settings: Settings,
-) : ViewModel(),
-    CoroutineScope {
-
-    override val coroutineContext: CoroutineContext
-        get() = Dispatchers.Default
-
-    var podcastUuid: String? = null
-    lateinit var podcast: LiveData<Podcast>
-    lateinit var includedFilters: LiveData<List<PlaylistEntity>>
-    lateinit var availableFilters: LiveData<List<PlaylistEntity>>
-
-    val globalSettings = settings.autoAddUpNextLimit.flow
-        .combine(settings.autoAddUpNextLimitBehaviour.flow, ::Pair)
-        .asLiveData(viewModelScope.coroutineContext)
-
-    fun loadPodcast(uuid: String) {
-        this.podcastUuid = uuid
-        podcast = podcastManager
-            .podcastByUuidRxFlowable(uuid)
-            .subscribeOn(Schedulers.io())
-            .toLiveData()
-
-        val filters = smartPlaylistManager.findAllRxFlowable().map {
-            it.filter { filter -> filter.podcastUuidList.contains(uuid) }
+    private val settings: Settings,
+    private val tracker: AnalyticsTracker,
+    @Assisted private val podcastUuid: String,
+) : ViewModel() {
+    private val playlistsWithSelectedPodcasts = playlistManager.playlistPreviewsFlow()
+        .map { playlists ->
+            playlists
+                .filterIsInstance<SmartPlaylistPreview>()
+                .filter { playlist ->
+                    when (playlist.smartRules.podcasts) {
+                        is SmartRules.PodcastsRule.Any -> false
+                        is SmartRules.PodcastsRule.Selected -> true
+                    }
+                }
         }
-        includedFilters = filters.toLiveData()
 
-        val availablePodcastFilters = smartPlaylistManager.findAllRxFlowable().map {
-            it.filter { filter -> !filter.allPodcasts }
-        }
-        availableFilters = availablePodcastFilters.toLiveData()
-    }
+    val uiState = combine(
+        podcastManager.podcastByUuidFlow(podcastUuid),
+        playlistsWithSelectedPodcasts,
+        settings.autoAddUpNextLimit.flow,
+        ::UiState,
+    ).stateIn(viewModelScope, started = SharingStarted.Eagerly, initialValue = null)
 
-    fun isAutoAddToUpNextOn(): Boolean {
-        return !(podcast.value?.isAutoAddToUpNextOff ?: true)
-    }
-
-    fun updateAutoAddToUpNext(isOn: Boolean) {
-        val podcast = this.podcast.value ?: return
-        val value = if (isOn) Podcast.AutoAddUpNext.PLAY_LAST else Podcast.AutoAddUpNext.OFF
-        launch {
-            podcastManager.updateAutoAddToUpNext(podcast, value)
+    fun changeNotifications(enable: Boolean) {
+        viewModelScope.launch {
+            tracker.track(
+                AnalyticsEvent.PODCAST_SETTINGS_NOTIFICATIONS_TOGGLED,
+                mapOf("enabled" to enable),
+            )
+            podcastManager.updateShowNotifications(podcastUuid, show = enable)
         }
     }
 
-    fun updateAutoAddToUpNextOrder(value: Podcast.AutoAddUpNext) {
-        val podcast = this.podcast.value ?: return
-        launch {
-            podcastManager.updateAutoAddToUpNext(podcast, value)
+    fun changeAutoDownload(enable: Boolean) {
+        viewModelScope.launch {
+            tracker.track(
+                AnalyticsEvent.PODCAST_SETTINGS_AUTO_DOWNLOAD_TOGGLED,
+                mapOf("enabled" to enable),
+            )
+            val status = if (enable) Podcast.AUTO_DOWNLOAD_NEW_EPISODES else Podcast.AUTO_DOWNLOAD_OFF
+            podcastManager.updateAllAutoDownloadStatus(status)
         }
     }
 
-    fun setAutoDownloadEpisodes(download: Boolean) {
-        val podcast = this.podcast.value ?: return
-        launch {
-            val autoDownloadStatus = if (download) Podcast.AUTO_DOWNLOAD_NEW_EPISODES else Podcast.AUTO_DOWNLOAD_OFF
-            podcastManager.updateAutoDownloadStatusBlocking(podcast, autoDownloadStatus)
+    fun changeAddToUpNext(enable: Boolean) {
+        val podcast = uiState.value?.podcast ?: return
+        val mode = if (enable) Podcast.AutoAddUpNext.PLAY_LAST else Podcast.AutoAddUpNext.OFF
+        viewModelScope.launch {
+            tracker.track(
+                AnalyticsEvent.PODCAST_SETTINGS_AUTO_ADD_UP_NEXT_TOGGLED,
+                mapOf("enabled" to enable),
+            )
+            podcastManager.updateAutoAddToUpNext(podcast, mode)
         }
     }
 
-    fun showNotifications(show: Boolean) {
-        val podcast = this.podcast.value ?: return
-        launch {
-            podcastManager.updateShowNotifications(podcast.uuid, show)
+    fun changeAddToUpNext(mode: Podcast.AutoAddUpNext) {
+        val podcast = uiState.value?.podcast ?: return
+        viewModelScope.launch {
+            tracker.track(
+                AnalyticsEvent.PODCAST_SETTINGS_AUTO_ADD_UP_NEXT_POSITION_OPTION_CHANGED,
+                mapOf("value" to mode.analyticsValue),
+            )
+            podcastManager.updateAutoAddToUpNext(podcast, mode)
         }
     }
 
-    fun updateStartFrom(secs: Int) {
-        val podcast = this.podcast.value ?: return
-        launch {
-            podcastManager.updateStartFromInSec(podcast, secs)
-        }
-    }
-
-    fun updateSkipLast(secs: Int) {
-        val podcast = this.podcast.value ?: return
-        launch {
-            podcastManager.updateSkipLastInSec(podcast, secs)
-            playbackManager.markPodcastNeedsUpdating(podcast.uuid)
-        }
-    }
-
-    fun unsubscribe() {
-        val podcast = this.podcast.value ?: return
-        launch {
-            podcastManager.unsubscribeBlocking(podcast.uuid, playbackManager)
-            analyticsTracker.track(
-                AnalyticsEvent.PODCAST_UNSUBSCRIBED,
-                AnalyticsProp.podcastUnsubscribed(SourceView.PODCAST_SETTINGS, podcast.uuid),
+    fun changeAutoArchive(enable: Boolean) {
+        viewModelScope.launch {
+            podcastManager.updateArchiveSettings(
+                uuid = podcastUuid,
+                enable = enable,
+                afterPlaying = settings.autoArchiveAfterPlaying.value,
+                inactive = settings.autoArchiveInactive.value,
             )
         }
     }
 
-    fun filterSelectionChanged(newSelection: List<String>) {
-        launch {
-            podcastUuid?.let { podcastUuid ->
-                smartPlaylistManager.findAllBlocking().forEach { playlist ->
-                    val currentSelection = playlist.podcastUuidList.toMutableList()
-                    val included = newSelection.contains(playlist.uuid)
-
-                    val isUpdated =
-                        if (included && !currentSelection.contains(podcastUuid)) {
-                            currentSelection.add(podcastUuid)
-                            true
-                        } else if (!included && currentSelection.contains(podcastUuid)) {
-                            currentSelection.remove(podcastUuid)
-                            true
-                        } else {
-                            false
-                        }
-
-                    if (isUpdated) {
-                        playlist.podcastUuidList = currentSelection
-                        playlist.syncStatus = PlaylistEntity.SYNC_STATUS_NOT_SYNCED
-                        val userPlaylistUpdate = UserPlaylistUpdate(
-                            listOf(PlaylistProperty.Podcasts),
-                            PlaylistUpdateSource.PODCAST_SETTINGS,
-                        )
-                        smartPlaylistManager.updateBlocking(playlist, userPlaylistUpdate)
-                    }
-                }
-            }
+    fun changeAutoArchiveAfterPlaying(mode: AutoArchiveAfterPlaying) {
+        viewModelScope.launch {
+            podcastManager.updateArchiveAfterPlaying(podcastUuid, mode)
         }
     }
 
-    private object AnalyticsProp {
-        private const val SOURCE_KEY = "source"
-        private const val UUID_KEY = "uuid"
-        fun podcastUnsubscribed(source: SourceView, uuid: String) = mapOf(SOURCE_KEY to source.analyticsValue, UUID_KEY to uuid)
+    fun changeAutoArchiveAfterInactive(mode: AutoArchiveInactive) {
+        viewModelScope.launch {
+            podcastManager.updateArchiveAfterInactive(podcastUuid, mode)
+        }
+    }
+
+    fun changeAutoArchiveLimit(limit: AutoArchiveLimit) {
+        viewModelScope.launch {
+            podcastManager.updateArchiveEpisodeLimit(podcastUuid, limit)
+        }
+    }
+
+    fun changePlaybackEffects(enable: Boolean) {
+        val podcast = uiState.value?.podcast ?: return
+        viewModelScope.launch(Dispatchers.IO) {
+            podcastManager.updateOverrideGlobalEffectsBlocking(podcast, enable)
+        }
+    }
+
+    fun decrementPlaybackSpeed() {
+        val podcast = uiState.value?.podcast ?: return
+        changePlaybackSpeed(podcast, change = -0.1)
+    }
+
+    fun incrementPLaybackSpeed() {
+        val podcast = uiState.value?.podcast ?: return
+        changePlaybackSpeed(podcast, change = 0.1)
+    }
+
+    private fun changePlaybackSpeed(podcast: Podcast, change: Double) {
+        val newPlaybackSpeed = (podcast.playbackSpeed + change).roundedSpeed()
+        viewModelScope.launch(Dispatchers.IO) {
+            podcastManager.updatePlaybackSpeedBlocking(podcast, newPlaybackSpeed)
+
+            val newEffects = podcast.playbackEffects.toData()
+                .copy(playbackSpeed = newPlaybackSpeed)
+                .toEffects()
+            updatePlayerEffects(newEffects)
+        }
+    }
+
+    fun changeTrimSilenceMode(mode: TrimMode) {
+        val podcast = uiState.value?.podcast ?: return
+        viewModelScope.launch(Dispatchers.IO) {
+            podcastManager.updateTrimModeBlocking(podcast, mode)
+
+            val newEffects = podcast.playbackEffects.toData()
+                .copy(trimMode = mode)
+                .toEffects()
+            updatePlayerEffects(newEffects)
+        }
+    }
+
+    fun changeVolumeBoost(enable: Boolean) {
+        val podcast = uiState.value?.podcast ?: return
+        viewModelScope.launch(Dispatchers.IO) {
+            podcastManager.updateVolumeBoostedBlocking(podcast, enable)
+
+            val newEffects = podcast.playbackEffects.toData()
+                .copy(isVolumeBoosted = enable)
+                .toEffects()
+            updatePlayerEffects(newEffects)
+        }
+    }
+
+    fun decrementSkipFirst() {
+        changeSkipFirst { value -> value.decrementByOrRound(5).coerceAtLeast(0) }
+    }
+
+    fun incrementSkipFirst() {
+        changeSkipFirst { value -> value.incrementByOrRound(5).coerceAtLeast(0) }
+    }
+
+    private fun changeSkipFirst(block: (Int) -> Int) {
+        val podcast = uiState.value?.podcast ?: return
+        viewModelScope.launch {
+            val newValue = block(podcast.startFromSecs)
+            tracker.track(
+                AnalyticsEvent.PODCAST_SETTINGS_SKIP_FIRST_CHANGED,
+                mapOf("value" to newValue),
+            )
+            podcastManager.updateStartFromInSec(podcast, newValue)
+        }
+    }
+
+    fun decrementSkipLast() {
+        changeSkipLast { value -> value.decrementByOrRound(5).coerceAtLeast(0) }
+    }
+
+    fun incrementSkipLast() {
+        changeSkipLast { value -> value.incrementByOrRound(5).coerceAtLeast(0) }
+    }
+
+    private fun changeSkipLast(block: (Int) -> Int) {
+        val podcast = uiState.value?.podcast ?: return
+        viewModelScope.launch {
+            val newValue = block(podcast.skipLastSecs)
+            tracker.track(
+                AnalyticsEvent.PODCAST_SETTINGS_SKIP_LAST_CHANGED,
+                mapOf("value" to newValue),
+            )
+            podcastManager.updateSkipLastInSec(podcast, newValue)
+        }
+    }
+
+    fun unfollow() {
+        viewModelScope.launch(NonCancellable) {
+            podcastManager.unsubscribe(podcastUuid, playbackManager)
+            tracker.track(
+                AnalyticsEvent.PODCAST_UNSUBSCRIBED,
+                mapOf(
+                    "source" to SourceView.PODCAST_SETTINGS.analyticsValue,
+                    "uuid" to podcastUuid,
+                ),
+            )
+        }
+    }
+
+    fun addPodcastToPlaylist(playlistUuid: String) {
+        changePodcastRule(playlistUuid) { rule -> rule.withPodcast(podcastUuid) }
+    }
+
+    fun removePodcastFromPlaylist(playlistUuid: String) {
+        changePodcastRule(playlistUuid) { rule -> rule.withoutPodcast(podcastUuid) }
+    }
+
+    suspend fun getDownloadedEpisodeCount() = withContext(Dispatchers.IO) {
+        podcastManager.countEpisodesInPodcastWithStatusBlocking(podcastUuid, EpisodeStatusEnum.DOWNLOADED)
+    }
+
+    private fun changePodcastRule(playlistUuid: String, block: (SmartRules.PodcastsRule.Selected) -> SmartRules.PodcastsRule.Selected) {
+        val currentRules = uiState.value?.playlists?.firstOrNull { it.uuid == playlistUuid }?.smartRules
+        val podcastsRule = (currentRules?.podcasts as? SmartRules.PodcastsRule.Selected) ?: return
+        val newRules = currentRules.copy(podcasts = block(podcastsRule))
+
+        viewModelScope.launch {
+            playlistManager.updateSmartRules(playlistUuid, newRules)
+        }
+    }
+
+    private fun updatePlayerEffects(effects: PlaybackEffects) {
+        val currentEpisode = playbackManager.upNextQueue.currentEpisode
+        if (currentEpisode?.podcastOrSubstituteUuid == podcastUuid) {
+            playbackManager.updatePlayerEffects(effects)
+        }
+    }
+
+    data class UiState(
+        val podcast: Podcast,
+        val playlists: List<SmartPlaylistPreview>,
+        val globalUpNextLimit: Int,
+    )
+
+    @AssistedFactory
+    interface Factory {
+        fun create(podcastUuid: String): PodcastSettingsViewModel
     }
 }
