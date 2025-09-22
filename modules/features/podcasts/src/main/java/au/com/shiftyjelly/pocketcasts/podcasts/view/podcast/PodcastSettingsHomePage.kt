@@ -91,7 +91,7 @@ internal fun PodcastSettingsHomePage(
             ),
             modifier = Modifier.toggleable(
                 value = podcast.isShowNotifications,
-                role = Role.Companion.Switch,
+                role = Role.Switch,
                 onValueChange = onChangeNotifications,
             ),
         )
@@ -106,7 +106,7 @@ internal fun PodcastSettingsHomePage(
             ),
             modifier = Modifier.toggleable(
                 value = podcast.isAutoDownloadNewEpisodes,
-                role = Role.Companion.Switch,
+                role = Role.Switch,
                 onValueChange = onChangeAutoDownload,
             ),
         )
@@ -121,7 +121,7 @@ internal fun PodcastSettingsHomePage(
             ),
             modifier = Modifier.toggleable(
                 value = podcast.autoAddToUpNext != Podcast.AutoAddUpNext.OFF,
-                role = Role.Companion.Switch,
+                role = Role.Switch,
                 onValueChange = onChangeAddToUpNext,
             ),
         )
@@ -137,7 +137,7 @@ internal fun PodcastSettingsHomePage(
                         Podcast.AutoAddUpNext.PLAY_NEXT -> stringResource(LR.string.play_next)
                     },
                     modifier = Modifier.clickable(
-                        role = Role.Companion.Button,
+                        role = Role.Button,
                         onClick = onChangeUpNextPosition,
                     ),
                 )
@@ -153,7 +153,7 @@ internal fun PodcastSettingsHomePage(
                         )
                     },
                     modifier = Modifier.clickable(
-                        role = Role.Companion.Button,
+                        role = Role.Button,
                         onClick = onChangeUpNextGlobalSettings,
                     ),
                 )
@@ -164,7 +164,7 @@ internal fun PodcastSettingsHomePage(
             icon = painterResource(IR.drawable.ic_archive),
             iconTint = toolbarColors.iconComposeColor,
             modifier = Modifier.clickable(
-                role = Role.Companion.Button,
+                role = Role.Button,
                 onClick = onChangeAutoArchiveSettings,
             ),
         )
@@ -200,7 +200,7 @@ internal fun PodcastSettingsHomePage(
             },
             iconTint = toolbarColors.iconComposeColor,
             modifier = Modifier.clickable(
-                role = Role.Companion.Button,
+                role = Role.Button,
                 onClick = onChangePlaybackEffectsSettings,
             ),
         )
@@ -268,7 +268,7 @@ internal fun PodcastSettingsHomePage(
                 icon = painterResource(IR.drawable.ic_filters),
                 iconTint = toolbarColors.iconComposeColor,
                 modifier = Modifier.clickable(
-                    role = Role.Companion.Button,
+                    role = Role.Button,
                     onClick = onChangePlaylistSettings,
                 ),
             )
@@ -286,7 +286,7 @@ internal fun PodcastSettingsHomePage(
                 .clickable(
                     indication = ripple(color = MaterialTheme.theme.colors.support05),
                     interactionSource = null,
-                    role = Role.Companion.Button,
+                    role = Role.Button,
                     onClick = onUnfollow,
                 ),
         ) {
