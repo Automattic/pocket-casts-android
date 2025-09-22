@@ -74,13 +74,14 @@ class PodcastSettingsViewModel @AssistedInject constructor(
     }
 
     fun changeAutoDownload(enable: Boolean) {
-        viewModelScope.launch {
+        val podcast = uiState.value?.podcast ?: return
+        viewModelScope.launch(Dispatchers.IO) {
             tracker.track(
                 AnalyticsEvent.PODCAST_SETTINGS_AUTO_DOWNLOAD_TOGGLED,
                 mapOf("enabled" to enable),
             )
             val status = if (enable) Podcast.AUTO_DOWNLOAD_NEW_EPISODES else Podcast.AUTO_DOWNLOAD_OFF
-            podcastManager.updateAllAutoDownloadStatus(status)
+            podcastManager.updateAutoDownloadStatusBlocking(podcast, status)
         }
     }
 
