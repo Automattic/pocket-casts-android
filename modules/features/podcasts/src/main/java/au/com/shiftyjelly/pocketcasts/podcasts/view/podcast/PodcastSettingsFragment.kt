@@ -15,9 +15,14 @@ import androidx.core.os.BundleCompat
 import androidx.core.os.bundleOf
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
+import androidx.navigation.NavHostController
+import androidx.navigation.compose.ComposeNavigator
+import androidx.navigation.compose.rememberNavController
+import androidx.navigation.get
 import au.com.shiftyjelly.pocketcasts.compose.AppTheme
 import au.com.shiftyjelly.pocketcasts.compose.extensions.contentWithoutConsumedInsets
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast.AutoAddUpNext
+import au.com.shiftyjelly.pocketcasts.models.type.TrimMode
 import au.com.shiftyjelly.pocketcasts.podcasts.viewmodel.PodcastSettingsViewModel
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.settings.AutoAddSettingsFragment
@@ -26,6 +31,7 @@ import au.com.shiftyjelly.pocketcasts.utils.extensions.pxToDp
 import au.com.shiftyjelly.pocketcasts.views.dialog.ConfirmationDialog
 import au.com.shiftyjelly.pocketcasts.views.dialog.OptionsDialog
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseFragment
+import au.com.shiftyjelly.pocketcasts.views.helper.HasBackstack
 import au.com.shiftyjelly.pocketcasts.views.helper.ToolbarColors
 import dagger.hilt.android.AndroidEntryPoint
 import dagger.hilt.android.lifecycle.withCreationCallback
@@ -36,7 +42,9 @@ import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 @AndroidEntryPoint
-class PodcastSettingsFragment : BaseFragment() {
+class PodcastSettingsFragment :
+    BaseFragment(),
+    HasBackstack {
     private val args get() = requireNotNull(arguments?.let { BundleCompat.getParcelable(it, NEW_INSTANCE_ARGS, Args::class.java) })
 
     private val viewModel by viewModels<PodcastSettingsViewModel>(
@@ -50,6 +58,8 @@ class PodcastSettingsFragment : BaseFragment() {
     @Inject
     lateinit var settings: Settings
 
+    private var navController: NavHostController? = null
+
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -61,11 +71,14 @@ class PodcastSettingsFragment : BaseFragment() {
             val toolbarColors = remember(theme.activeTheme) {
                 ToolbarColors.podcast(args.lightTint, args.darkTint, theme)
             }
+            val navController = rememberNavController()
+            this.navController = navController
 
             PodcastSettingsPage(
                 podcastTitle = args.title,
                 uiState = uiState,
                 toolbarColors = toolbarColors,
+                navController = navController,
                 onChangeNotifications = viewModel::changeNotifications,
                 onChangeAutoDownload = viewModel::changeAutoDownload,
                 onChangeAddToUpNext = viewModel::changeAddToUpNext,
@@ -79,14 +92,11 @@ class PodcastSettingsFragment : BaseFragment() {
                 onChangeAutoArchiveAfterPlaying = viewModel::changeAutoArchiveAfterPlaying,
                 onChangeAutoArchiveAfterInactive = viewModel::changeAutoArchiveAfterInactive,
                 onChangeAutoArchiveLimit = viewModel::changeAutoArchiveLimit,
-                onChangePlaybackEffectsSettings = {
-                    // TODO: Migrate to compose nav graph page and remove callback
-                    (requireActivity() as FragmentHostListener).addFragment(PodcastEffectsFragment.newInstance(args.uuid))
-                },
                 onChangePlaybackEffects = viewModel::changePlaybackEffects,
                 onDecrementPlaybackSpeed = viewModel::decrementPlaybackSpeed,
                 onIncrementPlaybackSpeed = viewModel::incrementPlaybackSpeed,
-                onChangeTrimSilenceMode = viewModel::changeTrimSilenceMode,
+                onChangeTrimMode = viewModel::changeTrimMode,
+                onChangeTrimModeSetting = ::showTrimModeDialog,
                 onChangeVolumeBoost = viewModel::changeVolumeBoost,
                 onDecrementSkipFirst = viewModel::decrementSkipFirst,
                 onIncrementSkipFirst = viewModel::incrementSkipFirst,
@@ -104,6 +114,11 @@ class PodcastSettingsFragment : BaseFragment() {
                 ),
             )
         }
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        this.navController = null
     }
 
     private fun showUpNextPositionDialog() {
@@ -124,6 +139,31 @@ class PodcastSettingsFragment : BaseFragment() {
                 click = { viewModel.changeAddToUpNext(AutoAddUpNext.PLAY_NEXT) },
             )
             .show(parentFragmentManager, "podcast-up-next")
+    }
+
+    private fun showTrimModeDialog() {
+        val currentMode = viewModel.uiState.value?.podcast?.trimMode
+        if (currentMode == null || parentFragmentManager.findFragmentByTag("podcast-trim-mode") != null) {
+            return
+        }
+        OptionsDialog()
+            .setTitle(getString(LR.string.player_effects_trim_level))
+            .addCheckedOption(
+                titleId = LR.string.player_effects_trim_mild,
+                checked = currentMode == TrimMode.LOW,
+                click = { viewModel.changeTrimMode(TrimMode.LOW) },
+            )
+            .addCheckedOption(
+                titleId = LR.string.player_effects_trim_medium,
+                checked = currentMode == TrimMode.MEDIUM,
+                click = { viewModel.changeTrimMode(TrimMode.MEDIUM) },
+            )
+            .addCheckedOption(
+                titleId = LR.string.player_effects_trim_mad_max,
+                checked = currentMode == TrimMode.HIGH,
+                click = { viewModel.changeTrimMode(TrimMode.HIGH) },
+            )
+            .show(parentFragmentManager, "podcast-trim-mode")
     }
 
     private fun goToAutoAddSettings() {
@@ -152,6 +192,16 @@ class PodcastSettingsFragment : BaseFragment() {
                 }
                 .show(parentFragmentManager, "podcast-unfollow")
         }
+    }
+
+    override fun getBackstackCount(): Int {
+        val composeNavigator = navController?.navigatorProvider?.get(ComposeNavigator::class)
+        val backStackSize = composeNavigator?.backStack?.value?.size?.minus(1) ?: 0
+        return backStackSize + super.getBackstackCount()
+    }
+
+    override fun onBackPressed(): Boolean {
+        return navController?.popBackStack() == true || super.onBackPressed()
     }
 
     @Parcelize
