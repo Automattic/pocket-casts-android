@@ -340,8 +340,6 @@ subprojects {
                 }
 
                 maybeCreate("prototype").apply {
-                    isDebuggable = false
-
                     buildConfigField("boolean", "IS_PROTOTYPE", "true")
 
                     if (canSignRelease) {
