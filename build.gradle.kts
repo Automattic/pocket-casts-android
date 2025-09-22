@@ -14,6 +14,7 @@ import com.google.devtools.ksp.gradle.KspGradleSubplugin
 import io.sentry.android.gradle.extensions.InstrumentationFeature
 import io.sentry.android.gradle.extensions.SentryPluginExtension
 import java.util.EnumSet
+import kotlin.collections.addAll
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import org.jetbrains.kotlin.gradle.dsl.KotlinJvmCompilerOptions
 import org.jetbrains.kotlin.gradle.plugin.KotlinBasePlugin
@@ -212,19 +213,6 @@ subprojects {
         checkReleaseBuilds = false
     }
 
-    val serverMainUrlProd = "\"https://refresh.pocketcasts.com\""
-    val serverApiUrlProd = "\"https://api.pocketcasts.com\""
-    val serverCacheUrlProd = "\"https://cache.pocketcasts.com\""
-    val serverCacheHostProd = "\"cache.pocketcasts.com\""
-    val serverStaticUrlProd = "\"https://static.pocketcasts.com\""
-    val serverSharingUrlProd = "\"https://sharing.pocketcasts.com\""
-    val serverListUrlProd = "\"https://lists.pocketcasts.com\""
-    val serverListHostProd = "\"lists.pocketcasts.com\""
-    val serverShortUrlProd = "\"https://pca.st\""
-    val serverShortHostProd = "\"pca.st\""
-    val serverWebPlayerHostProd = "\"play.pocketcasts.com\""
-    val webBaseHostProd = "\"pocketcasts.com\""
-
     plugins.withType<BasePlugin>().configureEach {
         configure<BaseExtension> {
             compileOptions {
@@ -241,6 +229,8 @@ subprojects {
                 versionCode = project.property("versionCode") as Int
                 versionName = project.property("versionName") as String
 
+                buildConfigField("boolean", "IS_PROTOTYPE", "false")
+
                 buildConfigField("int", "VERSION_CODE", "${project.property("versionCode")}")
                 buildConfigField("String", "VERSION_NAME", "\"${project.property("versionName")}\"")
                 buildConfigField("String", "SETTINGS_ENCRYPT_SECRET", "\"${project.property("settingsEncryptSecret")}\"")
@@ -252,6 +242,19 @@ subprojects {
                 buildConfigField("String", "APP_SECRET", "\"${project.property("appSecret")}\"")
                 buildConfigField("String", "META_APP_ID", "\"${project.property("metaAppId")}\"")
                 buildConfigField("String", "APPS_FLYER_KEY", "\"${project.property("appsFlyerKey")}\"")
+
+                buildConfigField("String", "SERVER_MAIN_URL", "\"https://refresh.pocketcasts.com\"")
+                buildConfigField("String", "SERVER_API_URL", "\"https://api.pocketcasts.com\"")
+                buildConfigField("String", "SERVER_CACHE_URL", "\"https://cache.pocketcasts.com\"")
+                buildConfigField("String", "SERVER_CACHE_HOST", "\"cache.pocketcasts.com\"")
+                buildConfigField("String", "SERVER_STATIC_URL", "\"https://static.pocketcasts.com\"")
+                buildConfigField("String", "SERVER_SHARING_URL", "\"https://sharing.pocketcasts.com\"")
+                buildConfigField("String", "SERVER_SHORT_URL", "\"https://pca.st\"")
+                buildConfigField("String", "SERVER_SHORT_HOST", "\"pca.st\"")
+                buildConfigField("String", "SERVER_WEB_PLAYER_HOST", "\"play.pocketcasts.com\"")
+                buildConfigField("String", "WEB_BASE_HOST", "\"pocketcasts.com\"")
+                buildConfigField("String", "SERVER_LIST_URL", "\"https://lists.pocketcasts.com\"")
+                buildConfigField("String", "SERVER_LIST_HOST", "\"lists.pocketcasts.com\"")
 
                 testInstrumentationRunner = project.property("testInstrumentationRunner") as String
                 testApplicationId = "au.com.shiftyjelly.pocketcasts.test${project.name.replace("-", "_")}"
@@ -321,37 +324,18 @@ subprojects {
                     enableAndroidTestCoverage = false
                     ext.set("alwaysUpdateBuildId", false)
 
-                    buildConfigField("String", "SERVER_MAIN_URL", serverMainUrlProd)
-                    buildConfigField("String", "SERVER_API_URL", serverApiUrlProd)
-                    buildConfigField("String", "SERVER_CACHE_URL", serverCacheUrlProd)
-                    buildConfigField("String", "SERVER_CACHE_HOST", serverCacheHostProd)
-                    buildConfigField("String", "SERVER_STATIC_URL", serverStaticUrlProd)
-                    buildConfigField("String", "SERVER_SHARING_URL", serverSharingUrlProd)
-                    buildConfigField("String", "SERVER_SHORT_URL", serverShortUrlProd)
-                    buildConfigField("String", "SERVER_SHORT_HOST", serverShortHostProd)
-                    buildConfigField("String", "SERVER_WEB_PLAYER_HOST", serverWebPlayerHostProd)
-                    buildConfigField("String", "WEB_BASE_HOST", webBaseHostProd)
-                    buildConfigField("String", "SERVER_LIST_URL", serverListUrlProd)
-                    buildConfigField("String", "SERVER_LIST_HOST", serverListHostProd)
-
                     signingConfig = signingConfigs.getByName("debug")
                 }
 
+                maybeCreate("prototype").apply {
+                    buildConfigField("boolean", "IS_PROTOTYPE", "true")
+
+                    if (canSignRelease) {
+                        signingConfig = signingConfigs.getByName("release")
+                    }
+                }
+
                 named("release") {
-
-                    buildConfigField("String", "SERVER_MAIN_URL", serverMainUrlProd)
-                    buildConfigField("String", "SERVER_API_URL", serverApiUrlProd)
-                    buildConfigField("String", "SERVER_CACHE_URL", serverCacheUrlProd)
-                    buildConfigField("String", "SERVER_CACHE_HOST", serverCacheHostProd)
-                    buildConfigField("String", "SERVER_STATIC_URL", serverStaticUrlProd)
-                    buildConfigField("String", "SERVER_SHARING_URL", serverSharingUrlProd)
-                    buildConfigField("String", "SERVER_SHORT_URL", serverShortUrlProd)
-                    buildConfigField("String", "SERVER_SHORT_HOST", serverShortHostProd)
-                    buildConfigField("String", "SERVER_WEB_PLAYER_HOST", serverWebPlayerHostProd)
-                    buildConfigField("String", "WEB_BASE_HOST", webBaseHostProd)
-                    buildConfigField("String", "SERVER_LIST_URL", serverListUrlProd)
-                    buildConfigField("String", "SERVER_LIST_HOST", serverListHostProd)
-
                     if (canSignRelease) {
                         signingConfig = signingConfigs.getByName("release")
                     }
@@ -393,15 +377,27 @@ subprojects {
                     applicationIdSuffix = ".debug"
                 }
 
+                maybeCreate("prototype").apply {
+                    isMinifyEnabled = true
+                    isShrinkResources = true
+                    proguardFiles.addAll(
+                        listOf(
+                            getDefaultProguardFile("proguard-android-optimize.txt"),
+                            rootProject.file("proguard-rules.pro"),
+                            rootProject.file("proguard-rules-no-obfuscate.pro"),
+                        ),
+                    )
+                }
+
                 named("release") {
                     isMinifyEnabled = true
+                    isShrinkResources = true
                     proguardFiles.addAll(
                         listOf(
                             getDefaultProguardFile("proguard-android-optimize.txt"),
                             rootProject.file("proguard-rules.pro"),
                         ),
                     )
-                    isShrinkResources = true
                 }
             }
         }

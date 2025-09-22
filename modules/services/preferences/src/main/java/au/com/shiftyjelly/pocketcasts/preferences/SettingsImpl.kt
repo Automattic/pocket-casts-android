@@ -1044,10 +1044,6 @@ class SettingsImpl @Inject constructor(
         return getRemoteConfigLong(FirebaseConfig.REFRESH_PODCASTS_BATCH_SIZE)
     }
 
-    override fun getExoPlayerCacheSizeInMB(): Long {
-        return firebaseRemoteConfig.getLong(FirebaseConfig.EXOPLAYER_CACHE_SIZE_IN_MB)
-    }
-
     override fun getExoPlayerCacheEntirePlayingEpisodeSizeInMB(): Long {
         return firebaseRemoteConfig.getLong(FirebaseConfig.EXOPLAYER_CACHE_ENTIRE_PLAYING_EPISODE_SIZE_IN_MB)
     }
