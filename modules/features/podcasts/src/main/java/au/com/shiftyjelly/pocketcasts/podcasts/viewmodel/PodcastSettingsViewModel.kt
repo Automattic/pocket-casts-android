@@ -111,6 +111,11 @@ class PodcastSettingsViewModel @AssistedInject constructor(
 
     fun changeAutoArchive(enable: Boolean) {
         viewModelScope.launch {
+            tracker.track(
+                AnalyticsEvent.PODCAST_SETTINGS_AUTO_ARCHIVE_TOGGLED,
+                mapOf("enabled" to enable),
+            )
+
             podcastManager.updateArchiveSettings(
                 uuid = podcastUuid,
                 enable = enable,
@@ -122,18 +127,30 @@ class PodcastSettingsViewModel @AssistedInject constructor(
 
     fun changeAutoArchiveAfterPlaying(mode: AutoArchiveAfterPlaying) {
         viewModelScope.launch {
+            tracker.track(
+                AnalyticsEvent.PODCAST_SETTINGS_AUTO_ARCHIVE_PLAYED_CHANGED,
+                mapOf("value" to mode.analyticsValue),
+            )
             podcastManager.updateArchiveAfterPlaying(podcastUuid, mode)
         }
     }
 
     fun changeAutoArchiveAfterInactive(mode: AutoArchiveInactive) {
         viewModelScope.launch {
+            tracker.track(
+                AnalyticsEvent.PODCAST_SETTINGS_AUTO_ARCHIVE_INACTIVE_CHANGED,
+                mapOf("value" to mode.analyticsValue),
+            )
             podcastManager.updateArchiveAfterInactive(podcastUuid, mode)
         }
     }
 
     fun changeAutoArchiveLimit(limit: AutoArchiveLimit) {
         viewModelScope.launch {
+            tracker.track(
+                AnalyticsEvent.PODCAST_SETTINGS_AUTO_ARCHIVE_EPISODE_LIMIT_CHANGED,
+                mapOf("value" to limit.analyticsValue),
+            )
             podcastManager.updateArchiveEpisodeLimit(podcastUuid, limit)
         }
     }
