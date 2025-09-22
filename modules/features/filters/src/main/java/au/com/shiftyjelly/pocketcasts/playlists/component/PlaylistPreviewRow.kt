@@ -209,7 +209,9 @@ internal fun PlaylistPreviewRow(
                 Spacer(
                     modifier = Modifier.width(16.dp),
                 )
-                Column {
+                Column(
+                    modifier = Modifier.weight(1f),
+                ) {
                     TextH40(
                         text = playlist.title,
                     )
@@ -222,9 +224,6 @@ internal fun PlaylistPreviewRow(
                 }
                 Spacer(
                     modifier = Modifier.width(16.dp),
-                )
-                Spacer(
-                    modifier = Modifier.weight(1f),
                 )
                 TextP50(
                     text = "${playlist.episodeCount}",

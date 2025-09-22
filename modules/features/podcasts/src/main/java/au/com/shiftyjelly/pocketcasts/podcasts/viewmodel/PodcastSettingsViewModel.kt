@@ -12,6 +12,7 @@ import au.com.shiftyjelly.pocketcasts.models.to.AutoArchiveLimit
 import au.com.shiftyjelly.pocketcasts.models.to.PlaybackEffects
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodeStatusEnum
 import au.com.shiftyjelly.pocketcasts.models.type.SmartRules
+import au.com.shiftyjelly.pocketcasts.models.type.SmartRules.PodcastsRule
 import au.com.shiftyjelly.pocketcasts.models.type.TrimMode
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
@@ -241,25 +242,38 @@ class PodcastSettingsViewModel @AssistedInject constructor(
         }
     }
 
-    fun addPodcastToPlaylist(playlistUuid: String) {
-        changePodcastRule(playlistUuid) { rule -> rule.withPodcast(podcastUuid) }
+    fun addPodcastToPlaylists(playlistUuids: List<String>) {
+        changePodcastRule(playlistUuids) { rule -> rule.withPodcast(podcastUuid) }
     }
 
-    fun removePodcastFromPlaylist(playlistUuid: String) {
-        changePodcastRule(playlistUuid) { rule -> rule.withoutPodcast(podcastUuid) }
+    fun removePodcastFromPlaylists(playlistUuids: List<String>) {
+        changePodcastRule(playlistUuids) { rule -> rule.withoutPodcast(podcastUuid) }
     }
 
     suspend fun getDownloadedEpisodeCount() = withContext(Dispatchers.IO) {
         podcastManager.countEpisodesInPodcastWithStatusBlocking(podcastUuid, EpisodeStatusEnum.DOWNLOADED)
     }
 
-    private fun changePodcastRule(playlistUuid: String, block: (SmartRules.PodcastsRule.Selected) -> SmartRules.PodcastsRule.Selected) {
-        val currentRules = uiState.value?.playlists?.firstOrNull { it.uuid == playlistUuid }?.smartRules
-        val podcastsRule = (currentRules?.podcasts as? SmartRules.PodcastsRule.Selected) ?: return
-        val newRules = currentRules.copy(podcasts = block(podcastsRule))
-
-        viewModelScope.launch {
-            playlistManager.updateSmartRules(playlistUuid, newRules)
+    private fun changePodcastRule(
+        playlistUuids: List<String>,
+        block: (PodcastsRule.Selected) -> PodcastsRule.Selected,
+    ) {
+        viewModelScope.launch(Dispatchers.Default) {
+            val playlistRules = uiState.value?.playlists
+                ?.filter { it.uuid in playlistUuids }
+                ?.associate { playlist ->
+                    val podcastsRule = playlist.smartRules.podcasts
+                    playlist.uuid to playlist.smartRules.copy(
+                        podcasts = when (podcastsRule) {
+                            is PodcastsRule.Any -> podcastsRule
+                            is PodcastsRule.Selected -> block(podcastsRule)
+                        },
+                    )
+                }
+                .orEmpty()
+            if (playlistRules.isNotEmpty()) {
+                playlistManager.updateSmartRules(playlistRules)
+            }
         }
     }
 
@@ -274,7 +288,15 @@ class PodcastSettingsViewModel @AssistedInject constructor(
         val podcast: Podcast,
         val playlists: List<SmartPlaylistPreview>,
         val globalUpNextLimit: Int,
-    )
+    ) {
+        val selectedPlaylists = playlists
+            .filter { playlist ->
+                when (val rule = playlist.smartRules.podcasts) {
+                    is PodcastsRule.Any -> true
+                    is PodcastsRule.Selected -> podcast.uuid in rule.uuids
+                }
+            }
+    }
 
     @AssistedFactory
     interface Factory {

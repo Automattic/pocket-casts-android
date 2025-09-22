@@ -39,7 +39,9 @@ interface PlaylistManager {
 
     fun smartEpisodesMetadataFlow(rules: SmartRules): Flow<PlaylistEpisodeMetadata>
 
-    suspend fun updateSmartRules(uuid: String, rules: SmartRules)
+    suspend fun updateSmartRules(uuidToRulesMap: Map<String, SmartRules>)
+
+    suspend fun updateSmartRules(uuid: String, rules: SmartRules) = updateSmartRules(mapOf(uuid to rules))
     // </editor-fold>
 
     // <editor-fold desc="Manual playlists">

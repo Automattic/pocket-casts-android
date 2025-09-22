@@ -35,7 +35,6 @@ import kotlinx.coroutines.launch
 import kotlinx.parcelize.Parcelize
 import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
-import au.com.shiftyjelly.pocketcasts.ui.R as UR
 
 @AndroidEntryPoint
 class PodcastSettingsFragment :
@@ -96,8 +95,8 @@ class PodcastSettingsFragment :
                 onIncrementSkipFirst = viewModel::incrementSkipFirst,
                 onDecrementSkipLast = viewModel::decrementSkipLast,
                 onIncrementSkipLast = viewModel::incrementSkipLast,
-                onAddPodcastToPlaylist = viewModel::addPodcastToPlaylist,
-                onRemovePodcastFromPlaylist = viewModel::removePodcastFromPlaylist,
+                onAddPodcastToPlaylists = viewModel::addPodcastToPlaylists,
+                onRemovePodcastFromPlaylists = viewModel::removePodcastFromPlaylists,
                 onUnfollow = ::showUnfollowDialog,
                 onDismiss = {
                     @Suppress("DEPRECATION")

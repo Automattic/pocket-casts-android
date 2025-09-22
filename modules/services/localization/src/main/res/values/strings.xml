@@ -1007,6 +1007,10 @@
     <string name="playlists_onboarding_playlist_title">Introducing Playlists</string>
     <string name="playlists_onboarding_smart_playlist_description">They still work exactly the same, using rules to auto-add your episodes. All your existing Filters are right here, nothing’s changed but the name.</string>
     <string name="playlists_onboarding_smart_playlist_title">Filters are now Smart Playlists</string>
+    <plurals name="playlists_selected_count">
+        <item quantity="one">%1$d playlist selected</item>
+        <item quantity="other">%1$d playlists selected</item>
+    </plurals>
     <string name="podcast_not_in_playlists">Not included in any Smart Playlists</string>
     <string name="premade_playlists_tooltip_body">We made these to help you get started.\nThey auto-update based on your listening.</string>
     <string name="premade_playlists_tooltip_title">Smart Playlists, ready to go</string>

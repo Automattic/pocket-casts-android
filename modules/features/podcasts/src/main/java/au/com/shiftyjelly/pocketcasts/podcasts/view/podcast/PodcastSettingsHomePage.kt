@@ -54,7 +54,7 @@ import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 @Composable
 internal fun PodcastSettingsHomePage(
-    uiState: PodcastSettingsViewModel.UiState?,
+    uiState: PodcastSettingsViewModel.UiState,
     toolbarColors: ToolbarColors,
     onChangeNotifications: (Boolean) -> Unit,
     onChangeAutoDownload: (Boolean) -> Unit,
@@ -71,9 +71,6 @@ internal fun PodcastSettingsHomePage(
     onUnfollow: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    if (uiState == null) {
-        return
-    }
     val podcast = uiState.podcast
     Column(
         modifier = modifier
@@ -247,13 +244,14 @@ internal fun PodcastSettingsHomePage(
         }
         if (uiState.playlists.isNotEmpty()) {
             val usePlaylists = FeatureFlag.isEnabled(Feature.PLAYLISTS_REBRANDING, immutable = true)
+
             SettingRow(
                 primaryText = if (usePlaylists) {
                     stringResource(LR.string.smart_playlists)
                 } else {
                     stringResource(LR.string.filters)
                 },
-                secondaryText = when (uiState.playlists.size) {
+                secondaryText = when (uiState.selectedPlaylists.size) {
                     0 -> if (usePlaylists) {
                         stringResource(LR.string.podcast_not_in_playlists)
                     } else {
@@ -261,15 +259,8 @@ internal fun PodcastSettingsHomePage(
                     }
 
                     else -> {
-                        val titles = remember(uiState.playlists) {
-                            uiState.playlists
-                                .filter { playlist ->
-                                    when (val rule = playlist.smartRules.podcasts) {
-                                        is PodcastsRule.Any -> true
-                                        is PodcastsRule.Selected -> podcast.uuid in rule.uuids
-                                    }
-                                }
-                                .joinToString(separator = ", ") { it.title }
+                        val titles = remember(uiState.selectedPlaylists) {
+                            uiState.selectedPlaylists.joinToString(separator = ", ") { it.title }
                         }
                         stringResource(LR.string.podcast_included_in_filters, titles)
                     }

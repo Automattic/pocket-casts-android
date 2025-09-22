@@ -9,11 +9,13 @@ import androidx.compose.foundation.layout.statusBars
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import au.com.shiftyjelly.pocketcasts.compose.bars.NavigationButton
 import au.com.shiftyjelly.pocketcasts.compose.bars.ThemedTopAppBar
@@ -58,14 +60,15 @@ internal fun PodcastSettingsPage(
     onIncrementSkipFirst: () -> Unit,
     onDecrementSkipLast: () -> Unit,
     onIncrementSkipLast: () -> Unit,
-    onAddPodcastToPlaylist: (String) -> Unit,
-    onRemovePodcastFromPlaylist: (String) -> Unit,
+    onAddPodcastToPlaylists: (List<String>) -> Unit,
+    onRemovePodcastFromPlaylists: (List<String>) -> Unit,
     onUnfollow: () -> Unit,
     onDismiss: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val navController = rememberNavController()
-    val toolbarTitle = when (navController.currentDestination?.route) {
+    val backStackEntry by navController.currentBackStackEntryAsState()
+    val toolbarTitle = when (backStackEntry?.destination?.route) {
         PodcastSettingsRoutes.HOME, null -> podcastTitle
         PodcastSettingsRoutes.ARCHIVE -> "TODO: Add support once page is in Compose"
         PodcastSettingsRoutes.EFFECTS -> "TODO: Add support once page is in Compose"
@@ -74,6 +77,7 @@ internal fun PodcastSettingsPage(
         } else {
             stringResource(LR.string.settings_select_filters)
         }
+
         else -> podcastTitle
     }
 
@@ -115,6 +119,9 @@ internal fun PodcastSettingsPage(
             modifier = Modifier.weight(1f),
         ) {
             composable(PodcastSettingsRoutes.HOME) {
+                if (uiState == null) {
+                    return@composable
+                }
                 PodcastSettingsHomePage(
                     uiState = uiState,
                     toolbarColors = toolbarColors,
@@ -137,6 +144,14 @@ internal fun PodcastSettingsPage(
             }
 
             composable(PodcastSettingsRoutes.PLAYLISTS) {
+                if (uiState == null) {
+                    return@composable
+                }
+                PodcastSettingsPlaylistsPage(
+                    uiState = uiState,
+                    onAddPodcastToPlaylists = onAddPodcastToPlaylists,
+                    onRemovePodcastFromPlaylists = onRemovePodcastFromPlaylists,
+                )
             }
         }
     }
