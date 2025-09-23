@@ -17,7 +17,6 @@ class PrivacySettingsViewModel @Inject constructor(
 
     data class State(
         val sendAnalytics: Boolean,
-        val sendAnalyticsThirdParty: Boolean,
         val sendCrashReports: Boolean,
         val linkCrashReportsToUser: Boolean,
     )
@@ -25,7 +24,6 @@ class PrivacySettingsViewModel @Inject constructor(
     private val _state = MutableStateFlow(
         State(
             sendAnalytics = settings.collectAnalytics.value,
-            sendAnalyticsThirdParty = settings.collectAnalyticsThirdParty.value,
             sendCrashReports = settings.sendCrashReports.value,
             linkCrashReportsToUser = settings.linkCrashReportsToUser.value,
         ),
@@ -35,11 +33,6 @@ class PrivacySettingsViewModel @Inject constructor(
     fun onAnalyticsChanged(enabled: Boolean) {
         userAnalyticsSettings.updateAnalyticsSetting(enabled)
         _state.update { it.copy(sendAnalytics = enabled) }
-    }
-
-    fun onAnalyticsThirdPartyChanged(enabled: Boolean) {
-        userAnalyticsSettings.updateAnalyticsThirdPartySetting(enabled)
-        _state.update { it.copy(sendAnalyticsThirdParty = enabled) }
     }
 
     fun onCrashReportingChanged(enabled: Boolean) {
