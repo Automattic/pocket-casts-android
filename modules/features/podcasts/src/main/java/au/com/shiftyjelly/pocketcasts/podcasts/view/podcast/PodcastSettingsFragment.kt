@@ -124,7 +124,7 @@ class PodcastSettingsFragment :
 
     private fun showTrimModeDialog() {
         val currentMode = viewModel.uiState.value?.podcast?.trimMode
-        if (currentMode == null || parentFragmentManager.findFragmentByTag("podcast-trim-mode") != null) {
+        if (currentMode == null || childFragmentManager.findFragmentByTag("podcast-trim-mode") != null) {
             return
         }
         TrimModeFragment().show(childFragmentManager, "podcast-trim-mode")
@@ -132,7 +132,7 @@ class PodcastSettingsFragment :
 
     private fun showAutoArchiveAfterPlayingDialog() {
         val currentValue = viewModel.uiState.value?.podcast?.autoArchiveAfterPlaying
-        if (currentValue == null || parentFragmentManager.findFragmentByTag("podcast-archive-after-playing") != null) {
+        if (currentValue == null || childFragmentManager.findFragmentByTag("podcast-archive-after-playing") != null) {
             return
         }
         ArchiveAfterPlayingFragment().show(childFragmentManager, "podcast-archive-after-playing")
@@ -140,7 +140,7 @@ class PodcastSettingsFragment :
 
     private fun showAutoArchiveAfterInactiveDialog() {
         val currentValue = viewModel.uiState.value?.podcast?.autoArchiveInactive
-        if (currentValue == null || parentFragmentManager.findFragmentByTag("podcast-archive-after-inactive") != null) {
+        if (currentValue == null || childFragmentManager.findFragmentByTag("podcast-archive-after-inactive") != null) {
             return
         }
         ArchiveAfterInactiveFragment().show(childFragmentManager, "podcast-archive-after-inactive")
@@ -148,7 +148,7 @@ class PodcastSettingsFragment :
 
     private fun showAutoArchiveLimitDialog() {
         val currentValue = viewModel.uiState.value?.podcast?.autoArchiveEpisodeLimit
-        if (currentValue == null || parentFragmentManager.findFragmentByTag("podcast-archive-limit") != null) {
+        if (currentValue == null || childFragmentManager.findFragmentByTag("podcast-archive-limit") != null) {
             return
         }
         ArchiveLimitFragment().show(childFragmentManager, "podcast-archive-limit")
