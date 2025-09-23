@@ -1,7 +1,6 @@
 package au.com.shiftyjelly.pocketcasts.compose.components
 
 import androidx.annotation.DrawableRes
-import androidx.compose.animation.Crossfade
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -175,6 +174,7 @@ fun SettingRow(
     modifier: Modifier = Modifier,
     secondaryText: String? = null,
     icon: Painter? = null,
+    iconTint: Color? = null,
     iconGradientColors: List<Color>? = null,
     @DrawableRes primaryTextEndDrawable: Int? = null,
     toggle: SettingRowToggle = SettingRowToggle.None,
@@ -233,7 +233,7 @@ fun SettingRow(
                     Icon(
                         painter = icon,
                         contentDescription = null,
-                        tint = MaterialTheme.theme.colors.primaryInteractive01,
+                        tint = iconTint ?: MaterialTheme.theme.colors.primaryInteractive01,
                         modifier = Modifier.size(24.dp),
                     )
                 }
@@ -262,13 +262,11 @@ fun SettingRow(
 
             if (secondaryText != null) {
                 Spacer(Modifier.height(4.dp))
-                Crossfade(targetState = secondaryText) { text ->
-                    TextP50(
-                        text = text,
-                        style = MaterialTheme.typography.body1,
-                        color = MaterialTheme.theme.colors.primaryText02,
-                    )
-                }
+                TextP50(
+                    text = secondaryText,
+                    style = MaterialTheme.typography.body1,
+                    color = MaterialTheme.theme.colors.primaryText02,
+                )
             }
             additionalContent()
         }

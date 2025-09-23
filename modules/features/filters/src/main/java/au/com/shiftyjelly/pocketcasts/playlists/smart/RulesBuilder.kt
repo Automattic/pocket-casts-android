@@ -27,7 +27,7 @@ data class RulesBuilder(
         get() = if (useAllPodcasts) {
             PodcastsRule.Any
         } else {
-            PodcastsRule.Selected(selectedPodcasts.toList())
+            PodcastsRule.Selected(selectedPodcasts)
         }
 
     val episodeDurationRule
@@ -91,7 +91,7 @@ data class RulesBuilder(
         },
         selectedPodcasts = when (val podcasts = rules.podcasts) {
             is PodcastsRule.Any -> selectedPodcasts
-            is PodcastsRule.Selected -> podcasts.uuids.toSet()
+            is PodcastsRule.Selected -> podcasts.uuids
         },
         episodeStatusRule = rules.episodeStatus,
         releaseDateRule = rules.releaseDate,

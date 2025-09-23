@@ -2,6 +2,7 @@ package au.com.shiftyjelly.pocketcasts.repositories.extensions
 
 import au.com.shiftyjelly.pocketcasts.models.entity.PlaylistEntity
 import au.com.shiftyjelly.pocketcasts.models.to.PlaylistShortcut
+import au.com.shiftyjelly.pocketcasts.repositories.playlist.SmartPlaylistPreview
 import au.com.shiftyjelly.pocketcasts.images.R as IR
 
 private const val FILTER_COLOR_SIZE = 5
@@ -56,6 +57,9 @@ val PlaylistEntity.drawableIndex: Int
 val PlaylistShortcut.drawableIndex: Int
     get() = iconId / FILTER_COLOR_SIZE % ICON_DRAWABLES.size
 
+val SmartPlaylistPreview.drawableIndex: Int
+    get() = iconId / FILTER_COLOR_SIZE % ICON_DRAWABLES.size
+
 val PlaylistEntity.shortcutDrawableId: Int
     get() = SHORTCUT_DRAWABLES.getOrNull(drawableIndex) ?: SHORTCUT_DRAWABLES.first()
 
@@ -65,6 +69,9 @@ val PlaylistShortcut.shortcutDrawableId: Int
 val PlaylistEntity.drawableId: Int
     get() = ICON_DRAWABLES.getOrNull(drawableIndex) ?: ICON_DRAWABLES.first()
 
+val SmartPlaylistPreview.drawableId: Int
+    get() = ICON_DRAWABLES.getOrNull(drawableIndex) ?: ICON_DRAWABLES.first()
+
 val PlaylistEntity.autoDrawableId: Int
     get() = AUTO_DRAWABLES.getOrNull(drawableIndex) ?: AUTO_DRAWABLES.first()
 
@@ -72,6 +79,9 @@ val PlaylistEntity.automotiveDrawableId: Int
     get() = AUTOMOTIVE_DRAWABLES.getOrNull(drawableIndex) ?: AUTOMOTIVE_DRAWABLES.first()
 
 val PlaylistEntity.colorIndex: Int
+    get() = iconId % FILTER_COLOR_SIZE
+
+val SmartPlaylistPreview.colorIndex: Int
     get() = iconId % FILTER_COLOR_SIZE
 
 val PlaylistEntity.Companion.iconDrawables: List<Int>

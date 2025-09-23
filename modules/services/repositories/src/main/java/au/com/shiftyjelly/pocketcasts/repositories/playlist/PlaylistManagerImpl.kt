@@ -225,14 +225,15 @@ class PlaylistManagerImpl(
         return playlistDao.smartPlaylistMetadataFlow(clock, rules)
     }
 
-    override suspend fun updateSmartRules(uuid: String, rules: SmartRules) {
+    override suspend fun updateSmartRules(uuidToRulesMap: Map<String, SmartRules>) {
         appDatabase.withTransaction {
-            val playlist = playlistDao
-                .getSmartPlaylistFlow(uuid)
-                ?.applySmartRules(rules)
-                ?.copy(syncStatus = SYNC_STATUS_NOT_SYNCED)
-            if (playlist != null) {
-                playlistDao.upsertPlaylist(playlist)
+            val playlists = playlistDao.getAllPlaylistsIn(uuidToRulesMap.keys)
+                .map { playlist ->
+                    val rules = uuidToRulesMap[playlist.uuid] ?: playlist.smartRules
+                    playlist.applySmartRules(rules).copy(syncStatus = SYNC_STATUS_NOT_SYNCED)
+                }
+            if (playlists.isNotEmpty()) {
+                playlistDao.upsertAllPlaylists(playlists)
             }
         }
     }
@@ -442,6 +443,7 @@ class PlaylistManagerImpl(
                     autoDownloadLimit = playlist.autodownloadLimit,
                 ),
                 smartRules = smartRules,
+                iconId = playlist.iconId,
             )
         }
     }
@@ -517,7 +519,7 @@ private val PlaylistEntity.smartRules
         podcasts = if (podcastUuidList.isEmpty()) {
             PodcastsRule.Any
         } else {
-            PodcastsRule.Selected(podcastUuidList)
+            PodcastsRule.Selected(podcastUuidList.toSet())
         },
         episodeDuration = if (filterDuration) {
             EpisodeDurationRule.Constrained(

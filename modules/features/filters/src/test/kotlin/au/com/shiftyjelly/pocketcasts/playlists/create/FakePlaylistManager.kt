@@ -65,7 +65,7 @@ class FakePlaylistManager : PlaylistManager {
         return smartEpisodesMetadata
     }
 
-    override suspend fun updateSmartRules(uuid: String, rules: SmartRules) = Unit
+    override suspend fun updateSmartRules(uuidToRulesMap: Map<String, SmartRules>) = Unit
 
     val createManualPlaylistTurbine = Turbine<String>(name = "createManualPlaylistTurbine")
     override suspend fun createManualPlaylist(name: String): String {

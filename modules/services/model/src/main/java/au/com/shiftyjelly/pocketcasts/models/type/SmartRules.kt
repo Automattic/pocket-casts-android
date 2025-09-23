@@ -188,8 +188,12 @@ data class SmartRules(
         }
 
         data class Selected(
-            val uuids: List<String>,
+            val uuids: Set<String>,
         ) : PodcastsRule {
+            fun withPodcast(podcastUuid: String) = copy(uuids + podcastUuid)
+
+            fun withoutPodcast(podcastUuid: String) = copy(uuids - podcastUuid)
+
             override fun toSqlWhereClause(clock: Clock) = buildString {
                 append("episode.podcast_id IN (")
                 append(uuids.joinToString(separator = ",") { uuid -> "'$uuid'" })

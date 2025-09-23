@@ -112,7 +112,7 @@ class CreatePlaylistViewModelTest {
 
             viewModel.applyRule(RuleType.Podcasts)
             state = awaitItem()
-            assertEquals(PodcastsRule.Selected(listOf("id-1", "id-2")), state.appliedRules.podcasts)
+            assertEquals(PodcastsRule.Selected(setOf("id-1", "id-2")), state.appliedRules.podcasts)
 
             followedPodcasts.value = List(4) { index -> Podcast(uuid = "id-$index") }
             skipItems(1)
