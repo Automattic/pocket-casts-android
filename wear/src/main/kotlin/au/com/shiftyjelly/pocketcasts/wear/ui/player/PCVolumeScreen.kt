@@ -2,7 +2,7 @@ package au.com.shiftyjelly.pocketcasts.wear.ui.player
 
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.google.android.horologist.audio.ui.VolumeScreen
 import com.google.android.horologist.compose.layout.ScreenScaffold
 
