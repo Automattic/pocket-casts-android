@@ -45,11 +45,10 @@ internal fun PodcastSettingsPage(
     onChangeAddToUpNext: (Boolean) -> Unit,
     onChangeUpNextPosition: () -> Unit,
     onChangeUpNextGlobalSettings: () -> Unit,
-    onChangeAutoArchiveSettings: () -> Unit,
     onChangeAutoArchive: (Boolean) -> Unit,
-    onChangeAutoArchiveAfterPlaying: (AutoArchiveAfterPlaying) -> Unit,
-    onChangeAutoArchiveAfterInactive: (AutoArchiveInactive) -> Unit,
-    onChangeAutoArchiveLimit: (AutoArchiveLimit) -> Unit,
+    onChangeAutoArchiveAfterPlayingSetting: () -> Unit,
+    onChangeAutoArchiveAfterInactiveSetting: () -> Unit,
+    onChangeAutoArchiveLimitSetting: () -> Unit,
     onChangePlaybackEffects: (Boolean) -> Unit,
     onDecrementPlaybackSpeed: () -> Unit,
     onIncrementPlaybackSpeed: () -> Unit,
@@ -70,7 +69,7 @@ internal fun PodcastSettingsPage(
     val backStackEntry by navController.currentBackStackEntryAsState()
     val toolbarTitle = when (backStackEntry?.destination?.route) {
         PodcastSettingsRoutes.HOME, null -> podcastTitle
-        PodcastSettingsRoutes.ARCHIVE -> "TODO: Add support once page is in Compose"
+        PodcastSettingsRoutes.ARCHIVE -> stringResource(LR.string.podcast_settings_auto_archive)
         PodcastSettingsRoutes.EFFECTS -> stringResource(LR.string.podcast_playback_effects)
         PodcastSettingsRoutes.PLAYLISTS -> if (FeatureFlag.isEnabled(Feature.PLAYLISTS_REBRANDING, immutable = true)) {
             stringResource(LR.string.select_smart_playlists)
@@ -130,7 +129,9 @@ internal fun PodcastSettingsPage(
                     onChangeAddToUpNext = onChangeAddToUpNext,
                     onChangeUpNextPosition = onChangeUpNextPosition,
                     onChangeUpNextGlobalSettings = onChangeUpNextGlobalSettings,
-                    onChangeAutoArchiveSettings = onChangeAutoArchiveSettings,
+                    onChangeAutoArchiveSettings = {
+                        navController.navigateOnce(PodcastSettingsRoutes.ARCHIVE)
+                    },
                     onChangePlaybackEffectsSettings = {
                         navController.navigateOnce(PodcastSettingsRoutes.EFFECTS)
                     },
@@ -142,6 +143,19 @@ internal fun PodcastSettingsPage(
                         navController.navigateOnce(PodcastSettingsRoutes.PLAYLISTS)
                     },
                     onUnfollow = onUnfollow,
+                )
+            }
+
+            composable(PodcastSettingsRoutes.ARCHIVE) {
+                if (uiState == null) {
+                    return@composable
+                }
+                PodcastSettingsArchivePage(
+                    podcast = uiState.podcast,
+                    onChangeAutoArchive = onChangeAutoArchive,
+                    onChangeAutoArchiveAfterPlayingSetting = onChangeAutoArchiveAfterPlayingSetting,
+                    onChangeAutoArchiveAfterInactiveSetting = onChangeAutoArchiveAfterInactiveSetting,
+                    onChangeAutoArchiveLimitSetting = onChangeAutoArchiveLimitSetting,
                 )
             }
 
