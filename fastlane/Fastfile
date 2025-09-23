@@ -83,7 +83,7 @@ UPLOAD_TO_PLAY_STORE_COMMON_OPTIONS = {
 ########################################################################
 # Firebase App Distribution (FAD)
 ########################################################################
-FIREBASE_APP_ID = '1:124902176124:android:183b1bd57d2c15051620f9' # App id for 'app' package name (module/apk).
+FIREBASE_APP_ID = '1:124902176124:android:ad0ff1c7193b55ee1620f9'
 FIREBASE_TESTERS_GROUP = 'pocketcasts-android---prototype-builds'
 
 before_all do |_lane|
@@ -663,21 +663,19 @@ platform :android do
       Commit: #{ENV.fetch('BUILDKITE_COMMIT', 'N/A')[0...7]}
     NOTES
 
-    prototype_build_type = 'debugProd'
+    app_module = 'app'
+    prototype_build_type = 'Prototype'
 
     gradle(
-      task: 'assemble',
-      build_type: prototype_build_type,
+      task: "#{app_module}:assemble#{prototype_build_type}", # results in app:assemblePrototype
       properties: {
         'skipSentryProguardMappingUpload' => true
       }
     )
 
-    # Although the Gradle command above is building all 3 variants (app, automotive, wear),
-    #  we are only uploading the 'app' variant to FAD.
     firebase_app_distribution(
       app: FIREBASE_APP_ID,
-      ipa_path: 'app/build/outputs/apk/debugProd/app-debugProd.apk', # Path for 'app' package name (module/apk).
+      ipa_path: 'app/build/outputs/apk/prototype/app-prototype.apk',
       service_credentials_json_data: ENV['FIREBASE_APP_DISTRIBUTION_ACCOUNT_KEY'],
       release_notes: release_notes,
       groups: FIREBASE_TESTERS_GROUP
