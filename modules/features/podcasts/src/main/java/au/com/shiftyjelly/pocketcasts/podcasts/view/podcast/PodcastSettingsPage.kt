@@ -13,6 +13,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
@@ -28,7 +29,6 @@ import au.com.shiftyjelly.pocketcasts.compose.theme
 import au.com.shiftyjelly.pocketcasts.models.to.AutoArchiveAfterPlaying
 import au.com.shiftyjelly.pocketcasts.models.to.AutoArchiveInactive
 import au.com.shiftyjelly.pocketcasts.models.to.AutoArchiveLimit
-import au.com.shiftyjelly.pocketcasts.models.type.TrimMode
 import au.com.shiftyjelly.pocketcasts.podcasts.viewmodel.PodcastSettingsViewModel
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
@@ -50,11 +50,11 @@ internal fun PodcastSettingsPage(
     onChangeAutoArchiveAfterPlaying: (AutoArchiveAfterPlaying) -> Unit,
     onChangeAutoArchiveAfterInactive: (AutoArchiveInactive) -> Unit,
     onChangeAutoArchiveLimit: (AutoArchiveLimit) -> Unit,
-    onChangePlaybackEffectsSettings: () -> Unit,
     onChangePlaybackEffects: (Boolean) -> Unit,
     onDecrementPlaybackSpeed: () -> Unit,
     onIncrementPlaybackSpeed: () -> Unit,
-    onChangeTrimSilenceMode: (TrimMode) -> Unit,
+    onChangeTrimMode: (Boolean) -> Unit,
+    onChangeTrimModeSetting: () -> Unit,
     onChangeVolumeBoost: (Boolean) -> Unit,
     onDecrementSkipFirst: () -> Unit,
     onIncrementSkipFirst: () -> Unit,
@@ -65,13 +65,13 @@ internal fun PodcastSettingsPage(
     onUnfollow: () -> Unit,
     onDismiss: () -> Unit,
     modifier: Modifier = Modifier,
+    navController: NavHostController = rememberNavController(),
 ) {
-    val navController = rememberNavController()
     val backStackEntry by navController.currentBackStackEntryAsState()
     val toolbarTitle = when (backStackEntry?.destination?.route) {
         PodcastSettingsRoutes.HOME, null -> podcastTitle
         PodcastSettingsRoutes.ARCHIVE -> "TODO: Add support once page is in Compose"
-        PodcastSettingsRoutes.EFFECTS -> "TODO: Add support once page is in Compose"
+        PodcastSettingsRoutes.EFFECTS -> stringResource(LR.string.podcast_playback_effects)
         PodcastSettingsRoutes.PLAYLISTS -> if (FeatureFlag.isEnabled(Feature.PLAYLISTS_REBRANDING, immutable = true)) {
             stringResource(LR.string.select_smart_playlists)
         } else {
@@ -131,7 +131,9 @@ internal fun PodcastSettingsPage(
                     onChangeUpNextPosition = onChangeUpNextPosition,
                     onChangeUpNextGlobalSettings = onChangeUpNextGlobalSettings,
                     onChangeAutoArchiveSettings = onChangeAutoArchiveSettings,
-                    onChangePlaybackEffectsSettings = onChangePlaybackEffectsSettings,
+                    onChangePlaybackEffectsSettings = {
+                        navController.navigateOnce(PodcastSettingsRoutes.EFFECTS)
+                    },
                     onDecrementSkipFirst = onDecrementSkipFirst,
                     onIncrementSkipFirst = onIncrementSkipFirst,
                     onDecrementSkipLast = onDecrementSkipLast,
@@ -140,6 +142,22 @@ internal fun PodcastSettingsPage(
                         navController.navigateOnce(PodcastSettingsRoutes.PLAYLISTS)
                     },
                     onUnfollow = onUnfollow,
+                )
+            }
+
+            composable(PodcastSettingsRoutes.EFFECTS) {
+                if (uiState == null) {
+                    return@composable
+                }
+                PodcastSettingsEffectsPage(
+                    podcast = uiState.podcast,
+                    toolbarColors = toolbarColors,
+                    onChangePlaybackEffects = onChangePlaybackEffects,
+                    onDecrementSpeed = onDecrementPlaybackSpeed,
+                    onIncrementSpeed = onIncrementPlaybackSpeed,
+                    onChangeTrimMode = onChangeTrimMode,
+                    onChangeTrimModeSetting = onChangeTrimModeSetting,
+                    onChangeVolumeBoost = onChangeVolumeBoost,
                 )
             }
 

@@ -51,8 +51,8 @@ class PodcastSettingsViewModel @AssistedInject constructor(
                 .filterIsInstance<SmartPlaylistPreview>()
                 .filter { playlist ->
                     when (playlist.smartRules.podcasts) {
-                        is SmartRules.PodcastsRule.Any -> false
-                        is SmartRules.PodcastsRule.Selected -> true
+                        is PodcastsRule.Any -> false
+                        is PodcastsRule.Selected -> true
                     }
                 }
         }
@@ -141,6 +141,13 @@ class PodcastSettingsViewModel @AssistedInject constructor(
     fun changePlaybackEffects(enable: Boolean) {
         val podcast = uiState.value?.podcast ?: return
         viewModelScope.launch(Dispatchers.IO) {
+            tracker.track(
+                AnalyticsEvent.PODCAST_SETTINGS_CUSTOM_PLAYBACK_EFFECTS_TOGGLED,
+                mapOf(
+                    "enabled" to enable,
+                    "settings" to "local",
+                ),
+            )
             podcastManager.updateOverrideGlobalEffectsBlocking(podcast, enable)
         }
     }
@@ -158,6 +165,14 @@ class PodcastSettingsViewModel @AssistedInject constructor(
     private fun changePlaybackSpeed(podcast: Podcast, change: Double) {
         val newPlaybackSpeed = (podcast.playbackSpeed + change).roundedSpeed()
         viewModelScope.launch(Dispatchers.IO) {
+            tracker.track(
+                AnalyticsEvent.PLAYBACK_EFFECT_SPEED_CHANGED,
+                mapOf(
+                    "speed" to newPlaybackSpeed,
+                    "settings" to "local",
+                ),
+            )
+
             podcastManager.updatePlaybackSpeedBlocking(podcast, newPlaybackSpeed)
 
             val newEffects = podcast.playbackEffects.toData()
@@ -167,9 +182,38 @@ class PodcastSettingsViewModel @AssistedInject constructor(
         }
     }
 
-    fun changeTrimSilenceMode(mode: TrimMode) {
+    fun changeTrimMode(enable: Boolean) {
+        val podcast = uiState.value?.podcast ?: return
+        val mode = if (enable) TrimMode.LOW else TrimMode.OFF
+        viewModelScope.launch(Dispatchers.IO) {
+            tracker.track(
+                AnalyticsEvent.PLAYBACK_EFFECT_TRIM_SILENCE_TOGGLED,
+                mapOf(
+                    "enabled" to enable,
+                    "settings" to "local",
+                ),
+            )
+
+            podcastManager.updateTrimModeBlocking(podcast, mode)
+
+            val newEffects = podcast.playbackEffects.toData()
+                .copy(trimMode = mode)
+                .toEffects()
+            updatePlayerEffects(newEffects)
+        }
+    }
+
+    fun changeTrimMode(mode: TrimMode) {
         val podcast = uiState.value?.podcast ?: return
         viewModelScope.launch(Dispatchers.IO) {
+            tracker.track(
+                AnalyticsEvent.PLAYBACK_EFFECT_TRIM_SILENCE_TOGGLED,
+                mapOf(
+                    "amount" to mode.analyticsVale,
+                    "settings" to "local",
+                ),
+            )
+
             podcastManager.updateTrimModeBlocking(podcast, mode)
 
             val newEffects = podcast.playbackEffects.toData()
@@ -182,6 +226,14 @@ class PodcastSettingsViewModel @AssistedInject constructor(
     fun changeVolumeBoost(enable: Boolean) {
         val podcast = uiState.value?.podcast ?: return
         viewModelScope.launch(Dispatchers.IO) {
+            tracker.track(
+                AnalyticsEvent.PLAYBACK_EFFECT_VOLUME_BOOST_TOGGLED,
+                mapOf(
+                    "enabled" to enable,
+                    "settings" to "local",
+                ),
+            )
+
             podcastManager.updateVolumeBoostedBlocking(podcast, enable)
 
             val newEffects = podcast.playbackEffects.toData()

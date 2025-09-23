@@ -1,6 +1,7 @@
 package au.com.shiftyjelly.pocketcasts.compose.components
 
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
@@ -25,6 +26,7 @@ fun NumberStepper(
     minusContentDescription: Int = LR.string.number_stepper_minus_content_description,
     plusContentDescription: Int = LR.string.number_stepper_plus_content_description,
     tint: Color = MaterialTheme.theme.colors.playerContrast01,
+    content: (@Composable RowScope.() -> Unit)? = null,
 ) {
     Row(
         modifier = modifier.padding(4.dp),
@@ -38,6 +40,10 @@ fun NumberStepper(
                 contentDescription = stringResource(minusContentDescription),
                 tint = tint,
             )
+        }
+
+        if (content != null) {
+            content()
         }
 
         IconButton(
