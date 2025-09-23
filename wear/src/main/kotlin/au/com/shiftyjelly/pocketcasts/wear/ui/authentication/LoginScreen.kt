@@ -1,7 +1,7 @@
 package au.com.shiftyjelly.pocketcasts.wear.ui.authentication
 
 import androidx.compose.runtime.Composable
-import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.wear.compose.material.ChipDefaults
 import au.com.shiftyjelly.pocketcasts.compose.BuildConfig
 import au.com.shiftyjelly.pocketcasts.compose.CallOnce
