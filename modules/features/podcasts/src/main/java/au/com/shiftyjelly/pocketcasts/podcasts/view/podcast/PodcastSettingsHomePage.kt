@@ -23,6 +23,8 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalResources
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
@@ -39,9 +41,11 @@ import au.com.shiftyjelly.pocketcasts.compose.components.TextH30
 import au.com.shiftyjelly.pocketcasts.compose.components.TextP50
 import au.com.shiftyjelly.pocketcasts.compose.preview.ThemePreviewParameterProvider
 import au.com.shiftyjelly.pocketcasts.compose.theme
+import au.com.shiftyjelly.pocketcasts.localization.helper.toFriendlyString
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.type.SmartRules
 import au.com.shiftyjelly.pocketcasts.models.type.SmartRules.PodcastsRule
+import au.com.shiftyjelly.pocketcasts.podcasts.R
 import au.com.shiftyjelly.pocketcasts.podcasts.viewmodel.PodcastSettingsViewModel
 import au.com.shiftyjelly.pocketcasts.repositories.playlist.Playlist
 import au.com.shiftyjelly.pocketcasts.repositories.playlist.SmartPlaylistPreview
@@ -49,6 +53,7 @@ import au.com.shiftyjelly.pocketcasts.ui.theme.Theme.ThemeType
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import au.com.shiftyjelly.pocketcasts.views.helper.ToolbarColors
+import kotlin.time.Duration.Companion.seconds
 import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
@@ -194,9 +199,9 @@ internal fun PodcastSettingsHomePage(
                 stringResource(LR.string.podcast_effects_summary_default)
             },
             icon = if (podcast.overrideGlobalEffects) {
-                painterResource(au.com.shiftyjelly.pocketcasts.podcasts.R.drawable.ic_effects_on)
+                painterResource(R.drawable.ic_effects_on)
             } else {
-                painterResource(au.com.shiftyjelly.pocketcasts.podcasts.R.drawable.ic_effects_off)
+                painterResource(R.drawable.ic_effects_off)
             },
             iconTint = toolbarColors.iconComposeColor,
             modifier = Modifier.clickable(
@@ -210,10 +215,18 @@ internal fun PodcastSettingsHomePage(
                 .fillMaxWidth()
                 .padding(end = 8.dp),
         ) {
+            val resources = LocalResources.current
+            val duration = remember(podcast.startFromSecs, resources) {
+                podcast.startFromSecs.seconds.toFriendlyString(
+                    resources = resources,
+                    maxPartCount = 2,
+                    pluralResourceId = { it.shortResourceId },
+                )
+            }
             SettingRow(
                 primaryText = stringResource(LR.string.podcast_settings_skip_first),
-                secondaryText = pluralStringResource(LR.plurals.second_with_count, podcast.startFromSecs, podcast.startFromSecs),
-                icon = painterResource(au.com.shiftyjelly.pocketcasts.podcasts.R.drawable.ic_skipintros),
+                secondaryText = duration,
+                icon = painterResource(R.drawable.ic_skipintros),
                 iconTint = toolbarColors.iconComposeColor,
                 modifier = Modifier.weight(1f),
             )
@@ -229,10 +242,18 @@ internal fun PodcastSettingsHomePage(
                 .fillMaxWidth()
                 .padding(end = 8.dp),
         ) {
+            val resources = LocalResources.current
+            val duration = remember(podcast.skipLastSecs, resources) {
+                podcast.skipLastSecs.seconds.toFriendlyString(
+                    resources = resources,
+                    maxPartCount = 2,
+                    pluralResourceId = { it.shortResourceId },
+                )
+            }
             SettingRow(
                 primaryText = stringResource(LR.string.podcast_settings_skip_last),
-                secondaryText = pluralStringResource(LR.plurals.second_with_count, podcast.skipLastSecs, podcast.skipLastSecs),
-                icon = painterResource(au.com.shiftyjelly.pocketcasts.podcasts.R.drawable.ic_skip_outro),
+                secondaryText = duration,
+                icon = painterResource(R.drawable.ic_skip_outro),
                 iconTint = toolbarColors.iconComposeColor,
                 modifier = Modifier.weight(1f),
             )
