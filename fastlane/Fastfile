@@ -656,7 +656,7 @@ platform :android do
     UI.user_error!("'FIREBASE_APP_DISTRIBUTION_ACCOUNT_KEY' must be defined as an environment variable.") unless ENV['FIREBASE_APP_DISTRIBUTION_ACCOUNT_KEY']
 
     # 'Pull Request' and 'Branch' is always going to point to 'N/A' and 'main' respectively.
-    # No matter, it better to have this setup ready for when and if we ever run this lane for PR builds as well.
+    # No matter, it's better to have this setup ready for when and if we ever run this lane for PR builds as well.
     release_notes = <<~NOTES
       Pull Request: ##{pull_request_number || 'N/A'}
       Branch: `#{ENV.fetch('BUILDKITE_BRANCH', 'N/A')}`
