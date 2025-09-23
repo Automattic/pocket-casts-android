@@ -3,7 +3,6 @@ package au.com.shiftyjelly.pocketcasts.podcasts.view.podcast
 import android.os.Bundle
 import android.os.Parcelable
 import android.view.LayoutInflater
-import android.view.View
 import android.view.ViewGroup
 import androidx.annotation.ColorInt
 import androidx.compose.foundation.layout.padding
@@ -22,18 +21,15 @@ import androidx.navigation.compose.rememberNavController
 import androidx.navigation.get
 import au.com.shiftyjelly.pocketcasts.compose.AppTheme
 import au.com.shiftyjelly.pocketcasts.compose.extensions.contentWithoutConsumedInsets
-import au.com.shiftyjelly.pocketcasts.models.to.AutoArchiveLimit
 import au.com.shiftyjelly.pocketcasts.podcasts.viewmodel.PodcastSettingsViewModel
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.settings.AutoAddSettingsFragment
 import au.com.shiftyjelly.pocketcasts.ui.helper.FragmentHostListener
 import au.com.shiftyjelly.pocketcasts.utils.extensions.pxToDp
 import au.com.shiftyjelly.pocketcasts.views.dialog.ConfirmationDialog
-import au.com.shiftyjelly.pocketcasts.views.dialog.OptionsDialog
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseFragment
 import au.com.shiftyjelly.pocketcasts.views.helper.HasBackstack
 import au.com.shiftyjelly.pocketcasts.views.helper.ToolbarColors
-import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import dagger.hilt.android.AndroidEntryPoint
 import dagger.hilt.android.lifecycle.withCreationCallback
 import javax.inject.Inject
@@ -113,19 +109,6 @@ class PodcastSettingsFragment :
         }
     }
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
-        val tags = listOf(
-            "podcast-archive-limit",
-        )
-        // Dismiss any open dialogs on config change because OptionsDialog
-        // isn't supposed to be used as a sticky dialog due to how it can't
-        // store set options.
-        for (tag in tags) {
-            (parentFragmentManager.findFragmentByTag(tag) as? BottomSheetDialogFragment)?.dismiss()
-        }
-    }
-
     override fun onDestroyView() {
         super.onDestroyView()
         this.navController = null
@@ -168,18 +151,7 @@ class PodcastSettingsFragment :
         if (currentValue == null || parentFragmentManager.findFragmentByTag("podcast-archive-limit") != null) {
             return
         }
-        OptionsDialog()
-            .setTitle(getString(LR.string.settings_auto_archive_episode_limit))
-            .let { dialog ->
-                AutoArchiveLimit.entries.fold(dialog) { dialog, value ->
-                    dialog.addCheckedOption(
-                        titleId = value.stringRes,
-                        checked = value == currentValue,
-                        click = { viewModel.changeAutoArchiveLimit(value) },
-                    )
-                }
-            }
-            .show(parentFragmentManager, "podcast-archive-limit")
+        ArchiveLimitFragment().show(childFragmentManager, "podcast-archive-limit")
     }
 
     private fun goToAutoAddSettings() {
