@@ -119,7 +119,6 @@ class PodcastSettingsFragment :
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         val tags = listOf(
-            "podcast-trim-mode",
             "podcast-archive-after-playing",
             "podcast-archive-after-inactive",
             "podcast-archive-limit",
@@ -150,24 +149,7 @@ class PodcastSettingsFragment :
         if (currentMode == null || parentFragmentManager.findFragmentByTag("podcast-trim-mode") != null) {
             return
         }
-        OptionsDialog()
-            .setTitle(getString(LR.string.player_effects_trim_level))
-            .addCheckedOption(
-                titleId = LR.string.player_effects_trim_mild,
-                checked = currentMode == TrimMode.LOW,
-                click = { viewModel.changeTrimMode(TrimMode.LOW) },
-            )
-            .addCheckedOption(
-                titleId = LR.string.player_effects_trim_medium,
-                checked = currentMode == TrimMode.MEDIUM,
-                click = { viewModel.changeTrimMode(TrimMode.MEDIUM) },
-            )
-            .addCheckedOption(
-                titleId = LR.string.player_effects_trim_mad_max,
-                checked = currentMode == TrimMode.HIGH,
-                click = { viewModel.changeTrimMode(TrimMode.HIGH) },
-            )
-            .show(parentFragmentManager, "podcast-trim-mode")
+        TrimModeFragment().show(childFragmentManager, "podcast-trim-mode")
     }
 
     private fun showAutoArchiveAfterPlayingDialog() {
