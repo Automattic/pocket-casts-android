@@ -676,7 +676,7 @@ platform :android do
     firebase_app_distribution(
       app: FIREBASE_APP_ID,
       ipa_path: 'app/build/outputs/apk/prototype/app-prototype.apk',
-      service_credentials_json_data: ENV['FIREBASE_APP_DISTRIBUTION_ACCOUNT_KEY'],
+      service_credentials_json_data: ENV.fetch('FIREBASE_APP_DISTRIBUTION_ACCOUNT_KEY', nil),
       release_notes: release_notes,
       groups: FIREBASE_TESTERS_GROUP
     )
