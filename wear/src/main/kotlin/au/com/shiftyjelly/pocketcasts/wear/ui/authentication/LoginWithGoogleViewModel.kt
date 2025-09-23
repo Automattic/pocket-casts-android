@@ -1,7 +1,6 @@
 package au.com.shiftyjelly.pocketcasts.wear.ui.authentication
 
 import android.content.Context
-import android.util.Log
 import androidx.credentials.CredentialManager
 import androidx.credentials.CustomCredential
 import androidx.credentials.GetCredentialRequest
@@ -36,7 +35,8 @@ class LoginWithGoogleViewModel @Inject constructor(
     sealed interface State {
         data object Idle : State
         data class SignedInWithGoogle(
-            val token: String,
+            val name: String,
+            val avatarUrl: String? = null,
         ) : State
         data object Failed : State
     }
@@ -72,16 +72,19 @@ class LoginWithGoogleViewModel @Inject constructor(
                         val googleIdTokenCredential = GoogleIdTokenCredential
                             .createFrom(credential.data)
 
+                        _state.value = State.SignedInWithGoogle(
+                            name = googleIdTokenCredential.givenName.orEmpty(),
+                            avatarUrl = googleIdTokenCredential.profilePictureUri?.toString(),
+                        )
+
                         signInWithGoogleToken(
                             idToken = googleIdTokenCredential.idToken,
                         )
                     } else {
-                        Log.w("====", "else")
                         LogBuffer.e(LogBuffer.TAG_INVALID_STATE, "Failed to sign in with Google One Tap")
                         _state.value = State.Failed
                     }
                 } catch (e: Exception) {
-                    Log.w("====", "error $e")
                     LogBuffer.e(LogBuffer.TAG_CRASH, e, "Unable to sign in with Google One Tap")
                     _state.value = State.Failed
                 }
@@ -94,21 +97,13 @@ class LoginWithGoogleViewModel @Inject constructor(
     private suspend fun signInWithGoogleToken(
         idToken: String,
     ) {
-        val authResult = syncManager.loginWithGoogle(idToken = idToken, signInSource = SignInSource.UserInitiated.Onboarding)
-        onLoginFromPhoneResult(authResult)
-    }
-
-    private fun onLoginFromPhoneResult(loginResult: LoginResult) {
+        val loginResult = syncManager.loginWithGoogle(idToken, SignInSource.UserInitiated.Watch)
         when (loginResult) {
             is LoginResult.Failed -> {
-                _state.value = State.Failed
+                LogBuffer.i(LogBuffer.TAG_BACKGROUND_TASKS, "Failed to login with Google: ${loginResult.message}")
             }
-
             is LoginResult.Success -> {
-                viewModelScope.launch {
-                    podcastManager.refreshPodcastsAfterSignIn()
-                }
-                _state.value = State.SignedInWithGoogle(token = loginResult.result.token.value)
+                podcastManager.refreshPodcastsAfterSignIn()
             }
         }
     }

@@ -7,7 +7,6 @@ import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.navigation
 import androidx.wear.compose.navigation.composable
-import com.google.android.gms.auth.api.signin.GoogleSignInAccount
 
 const val AUTHENTICATION_SUB_GRAPH = "authentication_graph"
 
@@ -19,10 +18,15 @@ private object AuthenticationNavRoutes {
     const val LOGIN_WITH_EMAIL = "login_with_email"
 }
 
+data class GoogleAccountData(
+    val name: String,
+    val avatarUrl: String? = null,
+)
+
 fun NavGraphBuilder.authenticationNavGraph(
     navController: NavController,
     onEmailSignInSuccess: () -> Unit,
-    googleSignInSuccessScreen: @Composable (GoogleSignInAccount?) -> Unit,
+    googleSignInSuccessScreen: @Composable (GoogleAccountData) -> Unit,
 ) {
     navigation(
         startDestination = AuthenticationNavRoutes.LOGIN_SCREEN,
@@ -64,13 +68,13 @@ fun NavGraphBuilder.authenticationNavGraph(
             route = AuthenticationNavRoutes.LOGIN_WITH_GOOGLE,
         ) {
             LoginWithGoogleScreen(
-                onSuccess = {
-                    navController.popBackStack()
+                successContent = {
+                    googleSignInSuccessScreen(GoogleAccountData(name = it.name, avatarUrl = it.avatarUrl))
                 },
                 onError = {
                     navController.popBackStack()
                     navController.navigate(AuthenticationNavRoutes.LOGIN_WITH_GOOGLE_LEGACY)
-                }
+                },
             )
         }
 
@@ -78,7 +82,9 @@ fun NavGraphBuilder.authenticationNavGraph(
             route = AuthenticationNavRoutes.LOGIN_WITH_GOOGLE_LEGACY,
         ) {
             LegacyLoginWithGoogleScreen(
-                signInSuccessScreen = googleSignInSuccessScreen,
+                signInSuccessScreen = {
+                    googleSignInSuccessScreen(GoogleAccountData(name = it?.givenName.orEmpty(), avatarUrl = it?.photoUrl.toString()))
+                },
                 onCancel = { navController.popBackStack() },
             )
         }
