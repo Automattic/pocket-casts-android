@@ -119,7 +119,6 @@ class PodcastSettingsFragment :
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         val tags = listOf(
-            "podcast-archive-after-playing",
             "podcast-archive-after-inactive",
             "podcast-archive-limit",
         )
@@ -157,18 +156,7 @@ class PodcastSettingsFragment :
         if (currentValue == null || parentFragmentManager.findFragmentByTag("podcast-archive-after-playing") != null) {
             return
         }
-        OptionsDialog()
-            .setTitle(getString(LR.string.settings_archive_played))
-            .let { dialog ->
-                AutoArchiveAfterPlaying.All.fold(dialog) { dialog, value ->
-                    dialog.addCheckedOption(
-                        titleId = value.stringRes,
-                        checked = value == currentValue,
-                        click = { viewModel.changeAutoArchiveAfterPlaying(value) },
-                    )
-                }
-            }
-            .show(parentFragmentManager, "podcast-archive-after-playing")
+        ArchiveAfterPlayingFragment().show(childFragmentManager, "podcast-archive-after-playing")
     }
 
     private fun showAutoArchiveAfterInactiveDialog() {
