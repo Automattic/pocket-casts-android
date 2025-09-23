@@ -14,6 +14,7 @@ const val AUTHENTICATION_SUB_GRAPH = "authentication_graph"
 private object AuthenticationNavRoutes {
     const val LOGIN_SCREEN = "login_screen"
     const val LOGIN_WITH_GOOGLE = "login_with_google"
+    const val LOGIN_WITH_GOOGLE_LEGACY = "login_with_google_legacy"
     const val LOGIN_WITH_PHONE = "login_with_phone"
     const val LOGIN_WITH_EMAIL = "login_with_email"
 }
@@ -63,6 +64,20 @@ fun NavGraphBuilder.authenticationNavGraph(
             route = AuthenticationNavRoutes.LOGIN_WITH_GOOGLE,
         ) {
             LoginWithGoogleScreen(
+                onSuccess = {
+                    navController.popBackStack()
+                },
+                onError = {
+                    navController.popBackStack()
+                    navController.navigate(AuthenticationNavRoutes.LOGIN_WITH_GOOGLE_LEGACY)
+                }
+            )
+        }
+
+        composable(
+            route = AuthenticationNavRoutes.LOGIN_WITH_GOOGLE_LEGACY,
+        ) {
+            LegacyLoginWithGoogleScreen(
                 signInSuccessScreen = googleSignInSuccessScreen,
                 onCancel = { navController.popBackStack() },
             )
