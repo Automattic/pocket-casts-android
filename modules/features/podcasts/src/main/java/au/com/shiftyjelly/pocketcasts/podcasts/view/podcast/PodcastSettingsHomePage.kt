@@ -265,7 +265,11 @@ internal fun PodcastSettingsHomePage(
                         stringResource(LR.string.podcast_included_in_filters, titles)
                     }
                 },
-                icon = painterResource(IR.drawable.ic_filters),
+                icon = if (usePlaylists) {
+                    painterResource(IR.drawable.ic_playlists)
+                } else {
+                    painterResource(IR.drawable.ic_filters)
+                },
                 iconTint = toolbarColors.iconComposeColor,
                 modifier = Modifier.clickable(
                     role = Role.Button,
