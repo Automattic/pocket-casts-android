@@ -18,6 +18,7 @@ data class SmartPlaylistPreview(
     override val artworkPodcastUuids: List<String>,
     override val settings: Playlist.Settings,
     val smartRules: SmartRules,
+    val iconId: Int,
 ) : PlaylistPreview {
     override val type get() = Playlist.Type.Smart
 }

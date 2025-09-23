@@ -586,9 +586,16 @@ class PodcastFragment : BaseFragment() {
         }
     }
 
-    private val onSettingsClicked: () -> Unit = {
+    private val onSettingsClicked: () -> Unit = callback@{
+        val podcast = viewModel.podcast.value ?: return@callback
         analyticsTracker.track(AnalyticsEvent.PODCAST_SCREEN_SETTINGS_TAPPED)
-        (activity as FragmentHostListener).addFragment(PodcastSettingsFragment.newInstance(viewModel.podcastUuid))
+        val fragment = PodcastSettingsFragment.newInstance(
+            uuid = podcast.uuid,
+            title = podcast.title,
+            darkTint = podcast.darkThemeTint(),
+            lightTint = podcast.lightThemeTint(),
+        )
+        (activity as FragmentHostListener).addFragment(fragment)
         viewModel.multiSelectEpisodesHelper.isMultiSelecting = false
         viewModel.multiSelectBookmarksHelper.isMultiSelecting = false
     }

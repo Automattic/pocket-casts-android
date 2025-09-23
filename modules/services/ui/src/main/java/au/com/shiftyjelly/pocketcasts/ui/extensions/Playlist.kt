@@ -5,6 +5,7 @@ import android.graphics.Color
 import au.com.shiftyjelly.pocketcasts.localization.helper.TimeHelper
 import au.com.shiftyjelly.pocketcasts.models.entity.PlaylistEntity
 import au.com.shiftyjelly.pocketcasts.repositories.extensions.colorIndex
+import au.com.shiftyjelly.pocketcasts.repositories.playlist.SmartPlaylistPreview
 import au.com.shiftyjelly.pocketcasts.ui.R
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
@@ -34,6 +35,11 @@ val PlaylistEntity.Companion.themeColors: List<Int>
 fun PlaylistEntity.getColor(context: Context?): Int {
     val themeColor = filterThemeColors.getOrNull(colorIndex) ?: return Color.WHITE
     return context?.getThemeColor(themeColor) ?: Color.WHITE
+}
+
+fun SmartPlaylistPreview.getColor(context: Context): Int {
+    val themeColor = filterThemeColors.getOrNull(colorIndex) ?: return Color.WHITE
+    return context.getThemeColor(themeColor)
 }
 
 fun PlaylistEntity.Companion.getColors(context: Context?): List<Int> {

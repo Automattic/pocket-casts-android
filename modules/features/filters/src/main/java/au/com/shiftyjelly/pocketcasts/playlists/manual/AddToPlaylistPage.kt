@@ -340,7 +340,9 @@ private fun PlaylistPreviewRow(
                 modifier = Modifier.width(16.dp),
             )
             Column(
-                modifier = Modifier.alpha(alpha),
+                modifier = Modifier
+                    .weight(1f)
+                    .alpha(alpha),
             ) {
                 TextH40(
                     text = playlist.title,
@@ -352,9 +354,6 @@ private fun PlaylistPreviewRow(
             }
             Spacer(
                 modifier = Modifier.width(16.dp),
-            )
-            Spacer(
-                modifier = Modifier.weight(1f),
             )
             Checkbox(
                 checked = playlist.hasEpisode,

@@ -45,7 +45,7 @@ fun PlaylistArtwork(
     artworkSize: Dp,
     modifier: Modifier = Modifier,
     cornerSize: Dp = artworkSize / 14,
-    elevation: Dp = 2.dp,
+    elevation: Dp = 1.dp,
 ) {
     when (podcastUuids.size) {
         0 -> NoImage(

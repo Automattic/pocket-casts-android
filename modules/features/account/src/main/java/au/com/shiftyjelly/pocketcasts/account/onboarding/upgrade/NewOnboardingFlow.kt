@@ -1,23 +1,34 @@
 package au.com.shiftyjelly.pocketcasts.account.onboarding.upgrade
 
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.material.MaterialTheme
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavType
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
+import au.com.shiftyjelly.pocketcasts.account.onboarding.AccountBenefitsPage
 import au.com.shiftyjelly.pocketcasts.account.onboarding.NewOnboardingCreateAccountPage
 import au.com.shiftyjelly.pocketcasts.account.onboarding.NewOnboardingGetStartedPage
 import au.com.shiftyjelly.pocketcasts.account.onboarding.NewOnboardingLoginPage
 import au.com.shiftyjelly.pocketcasts.account.onboarding.OnboardingCreateAccountPage
 import au.com.shiftyjelly.pocketcasts.account.onboarding.OnboardingForgotPasswordPage
 import au.com.shiftyjelly.pocketcasts.account.onboarding.recommendations.OnboardingRecommendationsFlow
+import au.com.shiftyjelly.pocketcasts.account.onboarding.upgrade.OldOnboardingFlow.ENCOURAGE_FREE_ACCOUNT
+import au.com.shiftyjelly.pocketcasts.account.onboarding.upgrade.OldOnboardingFlow.LOG_IN_OR_SIGN_UP
+import au.com.shiftyjelly.pocketcasts.account.viewmodel.OnboardingAccountBenefitsViewModel
 import au.com.shiftyjelly.pocketcasts.account.viewmodel.OnboardingCreateAccountViewModel
 import au.com.shiftyjelly.pocketcasts.account.viewmodel.OnboardingLogInViewModel
 import au.com.shiftyjelly.pocketcasts.account.viewmodel.OnboardingLoginOrSignUpViewModel
 import au.com.shiftyjelly.pocketcasts.account.viewmodel.OnboardingUpgradeFeaturesState
 import au.com.shiftyjelly.pocketcasts.account.viewmodel.OnboardingUpgradeFeaturesViewModel
+import au.com.shiftyjelly.pocketcasts.compose.AppTheme
+import au.com.shiftyjelly.pocketcasts.compose.CallOnce
 import au.com.shiftyjelly.pocketcasts.compose.bars.SystemBarsStyles
+import au.com.shiftyjelly.pocketcasts.compose.theme
 import au.com.shiftyjelly.pocketcasts.models.type.SignInState
 import au.com.shiftyjelly.pocketcasts.models.type.Subscription
 import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingExitInfo
@@ -25,6 +36,7 @@ import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingFlow
 import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingUpgradeSource
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.utils.extensions.getSerializableCompat
+import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 object NewOnboardingFlow {
 
@@ -34,12 +46,13 @@ object NewOnboardingFlow {
 
     fun startDestination(flow: OnboardingFlow) = when (flow) {
         is OnboardingFlow.Welcome,
-        is OnboardingFlow.AccountEncouragement,
         is OnboardingFlow.PlusAccountUpgradeNeedsLogin,
         is OnboardingFlow.InitialOnboarding,
         is OnboardingFlow.EngageSdk,
         is OnboardingFlow.ReferralLoginOrSignUp,
         -> ROUTE_INTRO_CAROUSEL
+
+        is OnboardingFlow.AccountEncouragement -> OldOnboardingFlow.ENCOURAGE_FREE_ACCOUNT
 
         is OnboardingFlow.LoggedOut,
         -> ROUTE_SIGN_UP
@@ -160,6 +173,37 @@ object NewOnboardingFlow {
                 onComplete = { exitOnboarding(OnboardingExitInfo.Simple) },
                 onUpdateSystemBars = onUpdateSystemBars,
             )
+        }
+
+        composable(OldOnboardingFlow.ENCOURAGE_FREE_ACCOUNT) {
+            val viewModel = hiltViewModel<OnboardingAccountBenefitsViewModel>()
+
+            CallOnce {
+                viewModel.onScreenShown()
+            }
+
+            AppTheme(theme) {
+                AccountBenefitsPage(
+                    mainCtaColor = MaterialTheme.theme.colors.primaryInteractive01,
+                    mainCtaLabel = stringResource(LR.string.onboarding_create_account),
+                    onGetStartedClick = {
+                        viewModel.onGetStartedClick()
+                        navController.navigate(ROUTE_SIGN_UP)
+                    },
+                    onLogIn = {
+                        viewModel.onLogInClick()
+                        navController.navigate(ROUTE_LOG_IN)
+                    },
+                    onClose = {
+                        viewModel.onDismissClick()
+                        exitOnboarding(OnboardingExitInfo.Simple)
+                    },
+                    onShowBenefit = { benefit ->
+                        viewModel.onBenefitShown(benefit.analyticsValue)
+                    },
+                    modifier = Modifier.fillMaxSize(),
+                )
+            }
         }
 
         composable(

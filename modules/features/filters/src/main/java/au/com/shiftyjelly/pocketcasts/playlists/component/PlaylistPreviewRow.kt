@@ -209,7 +209,9 @@ internal fun PlaylistPreviewRow(
                 Spacer(
                     modifier = Modifier.width(16.dp),
                 )
-                Column {
+                Column(
+                    modifier = Modifier.weight(1f),
+                ) {
                     TextH40(
                         text = playlist.title,
                     )
@@ -222,9 +224,6 @@ internal fun PlaylistPreviewRow(
                 }
                 Spacer(
                     modifier = Modifier.width(16.dp),
-                )
-                Spacer(
-                    modifier = Modifier.weight(1f),
                 )
                 TextP50(
                     text = "${playlist.episodeCount}",
@@ -277,6 +276,7 @@ private fun PlaylistPreviewRowPreview(
                     artworkPodcastUuids = emptyList(),
                     settings = Playlist.Settings.ForPreview,
                     smartRules = SmartRules.Default,
+                    iconId = 0,
                 ),
                 showTooltip = false,
                 showDivider = true,
@@ -308,6 +308,7 @@ private fun PlaylistPreviewRowPreview(
                     artworkPodcastUuids = List(4) { "podcast-uuid-$it" },
                     settings = Playlist.Settings.ForPreview,
                     smartRules = SmartRules.Default,
+                    iconId = 0,
                 ),
                 showTooltip = false,
                 showDivider = false,

@@ -100,7 +100,7 @@ class AppLifecycleObserver(
     }
 
     private fun setupFeatureFlags() {
-        val providers = if (BuildConfig.DEBUG) {
+        val providers = if (BuildConfig.DEBUG || BuildConfig.IS_PROTOTYPE) {
             listOf(preferencesFeatureProvider)
         } else {
             listOf(

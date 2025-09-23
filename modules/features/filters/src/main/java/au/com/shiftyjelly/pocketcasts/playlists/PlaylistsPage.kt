@@ -430,6 +430,7 @@ private fun PlaylistPagePreview(
                             artworkPodcastUuids = emptyList(),
                             settings = Playlist.Settings.ForPreview,
                             smartRules = SmartRules.Default,
+                            iconId = 0,
                         ),
                     ),
                 ),

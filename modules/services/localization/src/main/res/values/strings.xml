@@ -782,6 +782,10 @@
         <item quantity="one">%1$d day</item>
         <item quantity="other">%1$d days</item>
     </plurals>
+    <plurals name="second_with_count">
+        <item quantity="one">%1$d second</item>
+        <item quantity="other">%1$d seconds</item>
+    </plurals>
 
     <!-- Recommendations -->
     <string name="you_might_like_empty_title">Couldn\'t load recommendations</string>
@@ -1003,12 +1007,19 @@
     <string name="playlists_onboarding_playlist_title">Introducing Playlists</string>
     <string name="playlists_onboarding_smart_playlist_description">They still work exactly the same, using rules to auto-add your episodes. All your existing Filters are right here, nothing’s changed but the name.</string>
     <string name="playlists_onboarding_smart_playlist_title">Filters are now Smart Playlists</string>
+    <plurals name="playlists_selected_count">
+        <item quantity="one">%1$d playlist selected</item>
+        <item quantity="other">%1$d playlists selected</item>
+    </plurals>
+    <string name="podcast_not_in_playlists">Not included in any Smart Playlists</string>
     <string name="premade_playlists_tooltip_body">We made these to help you get started.\nThey auto-update based on your listening.</string>
     <string name="premade_playlists_tooltip_title">Smart Playlists, ready to go</string>
     <!-- %1$s is playlist's title -->
     <string name="preview_playlist">Preview %1$s</string>
     <string name="save_smart_rule">Save Smart Rule</string>
+    <string name="select_smart_playlists">Select Smart Playlists</string>
     <string name="smart_playlist">Smart Playlist</string>
+    <string name="smart_playlists">Smart Playlists</string>
     <string name="smart_playlist_create_no_content_body">None of the episodes in your podcasts match these rules.\n\nTry adjusting the rules, or save this playlist for future episodes that might fit.</string>
     <string name="smart_playlist_create_no_content_title">No matching episodes</string>
     <string name="smart_playlist_no_content_body">Either it’s time to celebrate completing this list, or edit your rules to get some more.</string>

@@ -7,7 +7,7 @@
             android:name="com.google.android.engage.service.ENV"
             android:value="PRODUCTION" />
 
-        <!-- ignore exported receiver warning beacuse there is no recommendation from Google about app ID -->
+        <!-- ignore exported receiver warning because there is no recommendation from Google about app ID -->
         <receiver
             android:name=".EngageSdkBroadcastReceiver"
             android:enabled="true"
