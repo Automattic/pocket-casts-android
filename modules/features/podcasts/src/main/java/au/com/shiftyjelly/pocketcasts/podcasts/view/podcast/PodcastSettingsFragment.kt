@@ -22,10 +22,7 @@ import androidx.navigation.compose.rememberNavController
 import androidx.navigation.get
 import au.com.shiftyjelly.pocketcasts.compose.AppTheme
 import au.com.shiftyjelly.pocketcasts.compose.extensions.contentWithoutConsumedInsets
-import au.com.shiftyjelly.pocketcasts.models.to.AutoArchiveAfterPlaying
-import au.com.shiftyjelly.pocketcasts.models.to.AutoArchiveInactive
 import au.com.shiftyjelly.pocketcasts.models.to.AutoArchiveLimit
-import au.com.shiftyjelly.pocketcasts.models.type.TrimMode
 import au.com.shiftyjelly.pocketcasts.podcasts.viewmodel.PodcastSettingsViewModel
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.settings.AutoAddSettingsFragment
@@ -119,7 +116,6 @@ class PodcastSettingsFragment :
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         val tags = listOf(
-            "podcast-archive-after-inactive",
             "podcast-archive-limit",
         )
         // Dismiss any open dialogs on config change because OptionsDialog
@@ -164,18 +160,7 @@ class PodcastSettingsFragment :
         if (currentValue == null || parentFragmentManager.findFragmentByTag("podcast-archive-after-inactive") != null) {
             return
         }
-        OptionsDialog()
-            .setTitle(getString(LR.string.settings_auto_archive_inactive))
-            .let { dialog ->
-                AutoArchiveInactive.All.fold(dialog) { dialog, value ->
-                    dialog.addCheckedOption(
-                        titleId = value.stringRes,
-                        checked = value == currentValue,
-                        click = { viewModel.changeAutoArchiveAfterInactive(value) },
-                    )
-                }
-            }
-            .show(parentFragmentManager, "podcast-archive-after-inactive")
+        ArchiveAfterInactiveFragment().show(childFragmentManager, "podcast-archive-after-inactive")
     }
 
     private fun showAutoArchiveLimitDialog() {
