@@ -22,7 +22,6 @@ import androidx.navigation.compose.rememberNavController
 import androidx.navigation.get
 import au.com.shiftyjelly.pocketcasts.compose.AppTheme
 import au.com.shiftyjelly.pocketcasts.compose.extensions.contentWithoutConsumedInsets
-import au.com.shiftyjelly.pocketcasts.models.entity.Podcast.AutoAddUpNext
 import au.com.shiftyjelly.pocketcasts.models.to.AutoArchiveAfterPlaying
 import au.com.shiftyjelly.pocketcasts.models.to.AutoArchiveInactive
 import au.com.shiftyjelly.pocketcasts.models.to.AutoArchiveLimit
@@ -120,7 +119,6 @@ class PodcastSettingsFragment :
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         val tags = listOf(
-            "podcast-up-next",
             "podcast-trim-mode",
             "podcast-archive-after-playing",
             "podcast-archive-after-inactive",
@@ -141,22 +139,10 @@ class PodcastSettingsFragment :
 
     private fun showUpNextPositionDialog() {
         val currentPosition = viewModel.uiState.value?.podcast?.autoAddToUpNext
-        if (currentPosition == null || parentFragmentManager.findFragmentByTag("podcast-up-next") != null) {
+        if (currentPosition == null || childFragmentManager.findFragmentByTag("podcast-up-next") != null) {
             return
         }
-        OptionsDialog()
-            .setTitle(getString(LR.string.podcast_settings_position))
-            .addCheckedOption(
-                titleId = LR.string.play_last,
-                checked = currentPosition == AutoAddUpNext.PLAY_LAST,
-                click = { viewModel.changeAddToUpNext(AutoAddUpNext.PLAY_LAST) },
-            )
-            .addCheckedOption(
-                titleId = LR.string.play_next,
-                checked = currentPosition == AutoAddUpNext.PLAY_NEXT,
-                click = { viewModel.changeAddToUpNext(AutoAddUpNext.PLAY_NEXT) },
-            )
-            .show(parentFragmentManager, "podcast-up-next")
+        UpNextPositionFragment().show(childFragmentManager, "podcast-up-next")
     }
 
     private fun showTrimModeDialog() {
