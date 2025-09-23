@@ -87,8 +87,14 @@ steps:
         artifact_paths:
           - "**/build/outputs/apk/**/*"
 
+  - input: ":rocket: Deploy Prototype Builds"
+    if: "build.pull_request.id != null"
+    prompt: Share Prototype Builds?
+    key: prototype_builds_triggered
+
   - label: "Prototype Builds"
     if: "build.pull_request.id != null"
+    depends_on: prototype_builds_triggered
     command: |
       ".buildkite/commands/prototype-build.sh"
     plugins: [ $CI_TOOLKIT ]
