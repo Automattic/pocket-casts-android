@@ -16,7 +16,7 @@
             android:exported="false"
             tools:node="merge">
             <meta-data
-                android:name="au.com.shiftyjelly.pocketcasts.repositories.playlist.DefaultPlaylistsStartupInitializater"
+                android:name="au.com.shiftyjelly.pocketcasts.repositories.playlist.DefaultPlaylistsStartupInitializer"
                 android:value="androidx.startup" />
         </provider>
 
