@@ -8,6 +8,8 @@ import androidx.lifecycle.viewModelScope
 import au.com.shiftyjelly.pocketcasts.repositories.support.Support
 import au.com.shiftyjelly.pocketcasts.settings.status.ServiceStatusChecker.Check.Internet
 import au.com.shiftyjelly.pocketcasts.settings.status.ServiceStatusChecker.Check.Urls
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import au.com.shiftyjelly.pocketcasts.views.helper.UiUtil
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -48,7 +50,11 @@ class StatusViewModel @Inject constructor(
         ),
         Service(
             title = LR.string.settings_status_service_account,
-            summary = LR.string.settings_status_service_account_summary,
+            summary = if (FeatureFlag.isEnabled(Feature.PLAYLISTS_REBRANDING, immutable = true)) {
+                LR.string.settings_status_service_account_summary_2
+            } else {
+                LR.string.settings_status_service_account_summary
+            },
             help = LR.string.settings_status_service_ad_blocker_help_singular,
             helpArgs = listOf("api.pocketcasts.com"),
             check = Urls(listOf("https://api.pocketcasts.com/health")),

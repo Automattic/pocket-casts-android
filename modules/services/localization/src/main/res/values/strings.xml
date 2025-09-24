@@ -1789,6 +1789,7 @@
     <string name="settings_status_service_refresh_summary">The service used to find new episodes.</string>
     <string name="settings_status_service_account">Account Service</string>
     <string name="settings_status_service_account_summary">The service used to store episode progress, podcasts you follow, filters, etc.</string>
+    <string name="settings_status_service_account_summary_2">The service used to store episode progress, podcasts you follow, playlists, etc.</string>
     <string name="settings_status_service_discover"><![CDATA[Discover & Search]]></string>
     <string name="settings_status_service_discover_summary">The discover section of the app, including podcast search.</string>
     <string name="settings_status_service_ad_blocker_help_singular">The most common cause is that you have an ad-blocker configured on your phone or network. You’ll need to unblock the domain %s</string>
@@ -2577,6 +2578,7 @@
     <string name="notification_up_next_message">Build a playback queue and say goodbye to jumping around between episodes.</string>
     <string name="notification_filters_title">Organize your episodes</string>
     <string name="notification_filters_message">Create smart filters to organize your episodes.</string>
+    <string name="notification_filters_message_2">Create playlists to organize your episodes.</string>
     <string name="notification_themes_title">Time for a new look</string>
     <string name="notification_themes_message">Browse our themes and find the one that suits your style.</string>
     <string name="notification_staff_picks_title">Explore our Staff Picks</string>
