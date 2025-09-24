@@ -683,8 +683,6 @@
         <!-- Disable Sentry exception tracking so we can turn it on based on the user preference -->
         <meta-data android:name="io.sentry.auto-init" android:value="false" />
 
-        <!-- AppsFlyer -->
-        <meta-data android:name="com.appsflyer.FacebookApplicationId" android:value="584627164037183" />
     </application>
 
 </manifest>

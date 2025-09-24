@@ -25,14 +25,10 @@ dependencies {
 
     implementation(platform(libs.firebase.bom))
 
-    implementation(libs.appsflyer) {
-        exclude(group = "com.google.android.play", module = "integrity")
-    }
     implementation(libs.automattic.explat)
     implementation(libs.automattic.tracks)
     implementation(libs.firebase.analytics)
     implementation(libs.firebase.config)
-    implementation(libs.installreferrer)
 
     debugImplementation(libs.compose.ui.tooling)
 
