@@ -439,6 +439,16 @@ abstract class PodcastDao {
     @Query("UPDATE podcasts SET auto_download_status = :autoDownloadStatus WHERE uuid = :uuid")
     abstract fun updateAutoDownloadStatusBlocking(autoDownloadStatus: Int, uuid: String)
 
+    @Query("UPDATE podcasts SET auto_download_status = :autoDownloadStatus WHERE uuid IN (:uuids)")
+    protected abstract suspend fun updateAutoDownloadStatusUnsafe(uuids: Collection<String>, autoDownloadStatus: Int)
+
+    @Transaction
+    open suspend fun updateAutoDownloadStatus(uuids: Collection<String>, autoDownloadStatus: Int) {
+        uuids.chunked(AppDatabase.SQLITE_BIND_ARG_LIMIT - 1).forEach { chunk ->
+            updateAutoDownloadStatusUnsafe(chunk, autoDownloadStatus)
+        }
+    }
+
     @Query("SELECT * FROM podcasts WHERE sync_status = " + Podcast.SYNC_STATUS_NOT_SYNCED + " AND uuid IS NOT NULL")
     abstract fun findNotSyncedBlocking(): List<Podcast>
 

@@ -140,8 +140,8 @@ class PlaylistManagerImpl(
         playlistDao.updateSortType(uuid, type)
     }
 
-    override suspend fun updateAutoDownload(uuid: String, isEnabled: Boolean) {
-        playlistDao.updateAutoDownload(uuid, isEnabled)
+    override suspend fun updateAutoDownload(uuids: Collection<String>, isEnabled: Boolean) {
+        playlistDao.updateAutoDownload(uuids, isEnabled)
     }
 
     override suspend fun updateAutoDownloadLimit(uuid: String, limit: Int) {
