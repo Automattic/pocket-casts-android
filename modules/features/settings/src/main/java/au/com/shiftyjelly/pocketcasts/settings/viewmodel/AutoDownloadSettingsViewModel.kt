@@ -8,9 +8,9 @@ import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.type.AutoDownloadLimitSetting
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.download.DownloadManager
-import au.com.shiftyjelly.pocketcasts.repositories.playlist.ManualPlaylistPreview
 import au.com.shiftyjelly.pocketcasts.repositories.playlist.PlaylistManager
 import au.com.shiftyjelly.pocketcasts.repositories.playlist.PlaylistPreview
+import au.com.shiftyjelly.pocketcasts.repositories.playlist.SmartPlaylistPreview
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
 import au.com.shiftyjelly.pocketcasts.settings.AutoDownloadSettingsRoute
 import au.com.shiftyjelly.pocketcasts.utils.extensions.combine
@@ -44,7 +44,7 @@ class AutoDownloadSettingsViewModel @Inject constructor(
         if (FeatureFlag.isEnabled(Feature.PLAYLISTS_REBRANDING, immutable = true)) {
             playlistManager.playlistPreviewsFlow()
         } else {
-            playlistManager.playlistPreviewsFlow().map { playlists -> playlists.filterIsInstance<ManualPlaylistPreview>() }
+            playlistManager.playlistPreviewsFlow().map { playlists -> playlists.filterIsInstance<SmartPlaylistPreview>() }
         },
         ::UiState,
     ).stateIn(viewModelScope, started = SharingStarted.Eagerly, initialValue = null)
