@@ -663,11 +663,11 @@ platform :android do
       Commit: #{ENV.fetch('BUILDKITE_COMMIT', 'N/A')[0...7]}
     NOTES
 
-    app_module = 'app'
-    prototype_build_type = 'Prototype'
+    prototype_build_type = 'prototype'
 
     gradle(
-      task: "#{app_module}:assemble#{prototype_build_type}",
+      task: 'app:assemble',
+      build_type: prototype_build_type,
       properties: {
         'skipSentryProguardMappingUpload' => true
       }
