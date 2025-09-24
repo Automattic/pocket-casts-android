@@ -9,6 +9,8 @@
         ([#4502](https://github.com/Automattic/pocket-casts-android/pull/4502))
     *   Migrate from old Google login method to CredentialManager APIs
         ([#4523](https://github.com/Automattic/pocket-casts-android/pull/4523))
+    *   Use CredentialManager on WearOS for Google login
+        ([#4528](https://github.com/Automattic/pocket-casts-android/pull/4528))
 
 7.98
 -----
