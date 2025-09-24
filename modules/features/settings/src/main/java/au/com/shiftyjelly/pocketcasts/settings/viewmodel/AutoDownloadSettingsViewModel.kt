@@ -7,6 +7,7 @@ import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.type.AutoDownloadLimitSetting
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.download.DownloadManager
+import au.com.shiftyjelly.pocketcasts.repositories.playlist.PlaylistPreview
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
 import dagger.hilt.android.lifecycle.HiltViewModel
 import io.reactivex.Single
@@ -78,7 +79,7 @@ class AutoDownloadSettingsViewModel @Inject constructor(
 
         analyticsTracker.track(
             AnalyticsEvent.SETTINGS_AUTO_DOWNLOAD_LIMIT_DOWNLOADS_CHANGED,
-            mapOf("value" to AutoDownloadLimitSetting.getNumberOfEpisodes(value)),
+            mapOf("value" to value.episodeCount),
         )
     }
 
@@ -124,6 +125,17 @@ class AutoDownloadSettingsViewModel @Inject constructor(
     fun countPodcasts(): Single<Int> = podcastManager.countSubscribedRxSingle()
         .observeOn(AndroidSchedulers.mainThread())
         .subscribeOn(Schedulers.io())
+
+    data class UiState(
+        val isUpNextDownloadEnabled: Boolean,
+        val isNewEpisodesDownloadEnabled: Boolean,
+        val isOnFollowDownloadEnabled: Boolean,
+        val autoDownloadLimit: AutoDownloadLimitSetting,
+        val isOnUnmeteredDownloadEnabled: Boolean,
+        val isOnlyWhenChargingDownloadEnabled: Boolean,
+        val podcasts: List<Podcast>,
+        val playlists: List<PlaylistPreview>,
+    )
 }
 
 fun Boolean.toAutoDownloadStatus(): Int = when (this) {
