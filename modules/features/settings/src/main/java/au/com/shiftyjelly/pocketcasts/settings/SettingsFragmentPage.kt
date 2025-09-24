@@ -111,7 +111,7 @@ fun SettingsFragmentPage(
                 AutoArchiveRow(onClick = { openFragment(AutoArchiveFragment()) })
             }
             item {
-                AutoDownloadRow(onClick = { openFragment(AutoDownloadSettingsFragment.newInstance()) })
+                AutoDownloadRow(onClick = { openFragment(AutoDownloadSettingsFragment()) })
             }
             item {
                 AutoAddToUpNextRow(onClick = { openFragment(AutoAddSettingsFragment()) })
