@@ -116,6 +116,10 @@ class AutoDownloadSettingsFragment :
     }
 
     private fun showEpisodeLimitDialog() {
+        if (childFragmentManager.findFragmentByTag("auto-download-episode-limit") != null) {
+            return
+        }
+        AutoDownloadLimitFragment().show(childFragmentManager, "auto-download-episode-limit")
     }
 
     override fun getBackstackCount(): Int {
