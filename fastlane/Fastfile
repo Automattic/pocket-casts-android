@@ -667,7 +667,7 @@ platform :android do
     prototype_build_type = 'Prototype'
 
     gradle(
-      task: "#{app_module}:assemble#{prototype_build_type}", # results in app:assemblePrototype
+      task: "#{app_module}:assemble#{prototype_build_type}",
       properties: {
         'skipSentryProguardMappingUpload' => true
       }
