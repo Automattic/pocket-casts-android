@@ -108,7 +108,7 @@ steps:
     # Optional Prototype Builds for main branch, distributed via FAD
     ##########
   - group: Prototype Builds (FAD)
-    if: "build.branch == 'ci/add-fad-prototype-builds-for-main-branch'" # TODO: Change branch: 'main'
+    if: "build.branch == 'main'"
     steps:
       - input: ":rocket: Generate Prototype Builds (FAD)?"
         prompt: Generate Prototype Builds via Firebase App Distribution (FAD)?
