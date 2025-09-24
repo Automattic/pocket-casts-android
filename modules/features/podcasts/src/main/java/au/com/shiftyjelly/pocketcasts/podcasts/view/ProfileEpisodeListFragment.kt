@@ -562,7 +562,7 @@ class ProfileEpisodeListFragment :
     }
 
     private fun showAutodownloadSettings() {
-        val fragment = AutoDownloadSettingsFragment.newInstance(showToolbar = true)
+        val fragment = AutoDownloadSettingsFragment()
         showFragment(fragment)
         analyticsTracker.track(AnalyticsEvent.DOWNLOADS_OPTIONS_MODAL_OPTION_TAPPED, mapOf(OPTION_KEY to AUTO_DOWNLOAD_SETTINGS))
         (activity as AppCompatActivity).supportActionBar?.setTitle(LR.string.profile_auto_download_settings)

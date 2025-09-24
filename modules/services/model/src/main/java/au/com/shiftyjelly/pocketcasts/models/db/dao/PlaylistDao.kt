@@ -143,8 +143,15 @@ abstract class PlaylistDao {
     @Query("UPDATE playlists SET sortId = :sortType, syncStatus = $SYNC_STATUS_NOT_SYNCED WHERE uuid = :uuid")
     abstract suspend fun updateSortType(uuid: String, sortType: PlaylistEpisodeSortType)
 
-    @Query("UPDATE playlists SET autoDownload = :isEnabled, syncStatus = $SYNC_STATUS_NOT_SYNCED WHERE uuid = :uuid")
-    abstract suspend fun updateAutoDownload(uuid: String, isEnabled: Boolean)
+    @Query("UPDATE playlists SET autoDownload = :isEnabled WHERE uuid IN (:uuids)")
+    protected abstract suspend fun updateAutoDownloadUnsafe(uuids: Collection<String>, isEnabled: Boolean)
+
+    @Transaction
+    open suspend fun updateAutoDownload(uuids: Collection<String>, isEnabled: Boolean) {
+        uuids.chunked(AppDatabase.SQLITE_BIND_ARG_LIMIT - 1).forEach { chunk ->
+            updateAutoDownloadUnsafe(chunk, isEnabled)
+        }
+    }
 
     @Query("UPDATE playlists SET autoDownloadLimit = :limit, syncStatus = $SYNC_STATUS_NOT_SYNCED WHERE uuid = :uuid")
     abstract suspend fun updateAutoDownloadLimit(uuid: String, limit: Int)

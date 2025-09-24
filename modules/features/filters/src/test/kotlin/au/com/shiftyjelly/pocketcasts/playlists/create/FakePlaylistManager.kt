@@ -36,7 +36,7 @@ class FakePlaylistManager : PlaylistManager {
 
     override suspend fun updateSortType(uuid: String, type: PlaylistEpisodeSortType) = Unit
 
-    override suspend fun updateAutoDownload(uuid: String, isEnabled: Boolean) = Unit
+    override suspend fun updateAutoDownload(uuids: Collection<String>, isEnabled: Boolean) = Unit
 
     override suspend fun updateAutoDownloadLimit(uuid: String, limit: Int) = Unit
 

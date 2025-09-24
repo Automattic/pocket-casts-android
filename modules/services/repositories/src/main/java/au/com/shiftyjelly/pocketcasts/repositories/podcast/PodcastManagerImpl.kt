@@ -13,7 +13,6 @@ import au.com.shiftyjelly.pocketcasts.models.to.AutoArchiveInactive
 import au.com.shiftyjelly.pocketcasts.models.to.AutoArchiveLimit
 import au.com.shiftyjelly.pocketcasts.models.to.PlaybackEffects
 import au.com.shiftyjelly.pocketcasts.models.to.PodcastGrouping
-import au.com.shiftyjelly.pocketcasts.models.type.AutoDownloadLimitSetting
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodeStatusEnum
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodesSortType
 import au.com.shiftyjelly.pocketcasts.models.type.PodcastsSortType
@@ -533,6 +532,11 @@ class PodcastManagerImpl @Inject constructor(
 
     override suspend fun updateAllAutoDownloadStatus(autoDownloadStatus: Int) {
         podcastDao.updateAllAutoDownloadStatus(autoDownloadStatus)
+    }
+
+    override suspend fun updateAutoDownload(podcastUuids: Collection<String>, isEnabled: Boolean) {
+        val status = if (isEnabled) Podcast.AUTO_DOWNLOAD_NEW_EPISODES else Podcast.AUTO_DOWNLOAD_OFF
+        podcastDao.updateAutoDownloadStatus(podcastUuids, status)
     }
 
     override suspend fun updateAllShowNotifications(showNotifications: Boolean) {

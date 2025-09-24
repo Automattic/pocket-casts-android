@@ -1,7 +1,6 @@
 package au.com.shiftyjelly.pocketcasts.settings
 
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -45,6 +44,7 @@ import au.com.shiftyjelly.pocketcasts.models.to.PlaylistIcon
 import au.com.shiftyjelly.pocketcasts.models.type.SmartRules
 import au.com.shiftyjelly.pocketcasts.models.type.SmartRules.PodcastsRule
 import au.com.shiftyjelly.pocketcasts.repositories.extensions.drawableId
+import au.com.shiftyjelly.pocketcasts.repositories.playlist.ManualPlaylistPreview
 import au.com.shiftyjelly.pocketcasts.repositories.playlist.Playlist
 import au.com.shiftyjelly.pocketcasts.repositories.playlist.PlaylistPreview
 import au.com.shiftyjelly.pocketcasts.repositories.playlist.SmartPlaylistPreview
@@ -169,10 +169,12 @@ private fun PlaylistRow(
                     TextH40(
                         text = playlist.title,
                     )
-                    TextP50(
-                        text = stringResource(LR.string.smart_playlist),
-                        color = MaterialTheme.theme.colors.primaryText02,
-                    )
+                    if (playlist.type == Playlist.Type.Smart) {
+                        TextP50(
+                            text = stringResource(LR.string.smart_playlist),
+                            color = MaterialTheme.theme.colors.primaryText02,
+                        )
+                    }
                 }
                 Spacer(
                     modifier = Modifier.width(16.dp),
@@ -224,21 +226,47 @@ private fun AutoDownloadSettingsPlaylistsPagePreview(
 ) {
     AppThemeWithBackground(themeType) {
         AutoDownloadSettingsPlaylistsPage(
-            playlists = List(3) { index ->
+            playlists = listOf(
                 SmartPlaylistPreview(
-                    uuid = "playlist-uuid-$index",
-                    title = "Playlist $index",
+                    uuid = "playlist-uuid-0",
+                    title = "Smart Playlist 0",
                     episodeCount = 0,
                     artworkPodcastUuids = emptyList(),
                     settings = Playlist.Settings.ForPreview.copy(
-                        isAutoDownloadEnabled = index % 2 == 0,
+                        isAutoDownloadEnabled = true,
                     ),
-                    smartRules = SmartRules.Default.copy(
-                        podcasts = PodcastsRule.Selected(uuids = setOf("podcast-uuid-$index")),
+                    smartRules = SmartRules.Default,
+                    icon = PlaylistIcon(0),
+                ),
+                SmartPlaylistPreview(
+                    uuid = "playlist-uuid-1",
+                    title = "Smart Playlist 1",
+                    episodeCount = 0,
+                    artworkPodcastUuids = emptyList(),
+                    settings = Playlist.Settings.ForPreview,
+                    smartRules = SmartRules.Default,
+                    icon = PlaylistIcon(0),
+                ),
+                ManualPlaylistPreview(
+                    uuid = "playlist-uuid-2",
+                    title = "Manual Playlist 2",
+                    episodeCount = 0,
+                    artworkPodcastUuids = emptyList(),
+                    settings = Playlist.Settings.ForPreview,
+                    icon = PlaylistIcon(0),
+                ),
+                ManualPlaylistPreview(
+                    uuid = "playlist-uuid-3",
+                    title = "Manual Playlist 3",
+                    episodeCount = 0,
+                    artworkPodcastUuids = emptyList(),
+                    settings = Playlist.Settings.ForPreview.copy(
+                        isAutoDownloadEnabled = true,
                     ),
                     icon = PlaylistIcon(0),
-                )
-            },
+                ),
+
+            ),
             onChangePlaylist = { _, _ -> },
             onChangeAllPlaylists = {},
         )
