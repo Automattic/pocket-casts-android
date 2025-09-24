@@ -2,11 +2,14 @@
 
 package au.com.shiftyjelly.pocketcasts.wear.ui.authentication
 
+import android.widget.Toast
+import androidx.activity.compose.LocalActivity
 import androidx.compose.runtime.Composable
 import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.navigation
 import androidx.wear.compose.navigation.composable
+import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 const val AUTHENTICATION_SUB_GRAPH = "authentication_graph"
 
@@ -67,6 +70,7 @@ fun NavGraphBuilder.authenticationNavGraph(
         composable(
             route = AuthenticationNavRoutes.LOGIN_WITH_GOOGLE,
         ) {
+            val activity = LocalActivity.current
             LoginWithGoogleScreen(
                 successContent = {
                     googleSignInSuccessScreen(GoogleAccountData(name = it.name, avatarUrl = it.avatarUrl))
@@ -74,6 +78,10 @@ fun NavGraphBuilder.authenticationNavGraph(
                 onError = {
                     navController.popBackStack()
                     navController.navigate(AuthenticationNavRoutes.LOGIN_WITH_GOOGLE_LEGACY)
+                },
+                onGoogleNotAvailable = {
+                    Toast.makeText(activity, LR.string.onboarding_continue_with_google_error, Toast.LENGTH_SHORT).show()
+                    navController.popBackStack()
                 },
             )
         }
@@ -83,7 +91,7 @@ fun NavGraphBuilder.authenticationNavGraph(
         ) {
             LegacyLoginWithGoogleScreen(
                 signInSuccessScreen = {
-                    googleSignInSuccessScreen(GoogleAccountData(name = it?.givenName.orEmpty(), avatarUrl = it?.photoUrl.toString()))
+                    googleSignInSuccessScreen(GoogleAccountData(name = it?.givenName.orEmpty(), avatarUrl = it?.photoUrl?.toString()))
                 },
                 onCancel = { navController.popBackStack() },
             )

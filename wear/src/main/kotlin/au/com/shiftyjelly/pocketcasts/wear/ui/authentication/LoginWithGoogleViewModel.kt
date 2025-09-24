@@ -1,9 +1,11 @@
 package au.com.shiftyjelly.pocketcasts.wear.ui.authentication
 
+import android.app.Activity
 import android.content.Context
 import androidx.credentials.CredentialManager
 import androidx.credentials.CustomCredential
 import androidx.credentials.GetCredentialRequest
+import androidx.credentials.exceptions.NoCredentialException
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
@@ -17,13 +19,12 @@ import com.google.android.gms.common.GoogleApiAvailability
 import com.google.android.libraries.identity.googleid.GetSignInWithGoogleOption
 import com.google.android.libraries.identity.googleid.GoogleIdTokenCredential
 import dagger.hilt.android.lifecycle.HiltViewModel
-import dagger.hilt.android.qualifiers.ActivityContext
 import dagger.hilt.android.qualifiers.ApplicationContext
-import java.util.UUID
-import javax.inject.Inject
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import java.util.UUID
+import javax.inject.Inject
 
 @HiltViewModel
 class LoginWithGoogleViewModel @Inject constructor(
@@ -38,7 +39,11 @@ class LoginWithGoogleViewModel @Inject constructor(
             val name: String,
             val avatarUrl: String? = null,
         ) : State
-        data object Failed : State
+
+        sealed interface Failed : State {
+            data object GoogleLoginUnavailable : Failed
+            data object Other : Failed
+        }
     }
 
     private val credentialManager: CredentialManager by lazy { CredentialManager.create(context) }
@@ -47,14 +52,14 @@ class LoginWithGoogleViewModel @Inject constructor(
     val state = _state.asStateFlow()
 
     fun tryCredentialsManager(
-        @ActivityContext context: Context,
+        activity: Activity,
     ) {
         val isGoogleSignInAvailable = Settings.GOOGLE_SIGN_IN_SERVER_CLIENT_ID.isNotEmpty() &&
-            GoogleApiAvailability.getInstance().isGooglePlayServicesAvailableSuccess(context)
+            GoogleApiAvailability.getInstance().isGooglePlayServicesAvailableSuccess(activity)
 
         if (isGoogleSignInAvailable) {
             viewModelScope.launch {
-                try {
+                runCatching {
                     val googleIdOption: GetSignInWithGoogleOption = GetSignInWithGoogleOption.Builder(
                         serverClientId = Settings.GOOGLE_SIGN_IN_SERVER_CLIENT_ID,
                     ).setNonce(UUID.randomUUID().toString()).build()
@@ -65,7 +70,7 @@ class LoginWithGoogleViewModel @Inject constructor(
 
                     val result = credentialManager.getCredential(
                         request = request,
-                        context = context,
+                        context = activity,
                     )
                     val credential = result.credential as CustomCredential
                     if (credential.type == GoogleIdTokenCredential.TYPE_GOOGLE_ID_TOKEN_CREDENTIAL) {
@@ -82,15 +87,19 @@ class LoginWithGoogleViewModel @Inject constructor(
                         )
                     } else {
                         LogBuffer.e(LogBuffer.TAG_INVALID_STATE, "Failed to sign in with Google One Tap")
-                        _state.value = State.Failed
+                        _state.value = State.Failed.Other
                     }
-                } catch (e: Exception) {
-                    LogBuffer.e(LogBuffer.TAG_CRASH, e, "Unable to sign in with Google One Tap")
-                    _state.value = State.Failed
+                }.onFailure {
+                    LogBuffer.e(LogBuffer.TAG_CRASH, it, "Unable to sign in with Google One Tap")
+                    _state.value = if (it is NoCredentialException) {
+                        State.Failed.GoogleLoginUnavailable
+                    } else {
+                        State.Failed.Other
+                    }
                 }
             }
         } else {
-            _state.value = State.Failed
+            _state.value = State.Failed.GoogleLoginUnavailable
         }
     }
 
@@ -102,6 +111,7 @@ class LoginWithGoogleViewModel @Inject constructor(
             is LoginResult.Failed -> {
                 LogBuffer.i(LogBuffer.TAG_BACKGROUND_TASKS, "Failed to login with Google: ${loginResult.message}")
             }
+
             is LoginResult.Success -> {
                 podcastManager.refreshPodcastsAfterSignIn()
             }
