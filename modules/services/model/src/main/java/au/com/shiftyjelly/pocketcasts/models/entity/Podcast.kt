@@ -106,10 +106,26 @@ data class Podcast(
 
     constructor() : this(uuid = "")
 
-    enum class AutoAddUpNext(val databaseInt: Int, val analyticsValue: String) {
-        OFF(0, "off"),
-        PLAY_LAST(1, "add_last"),
-        PLAY_NEXT(2, "add_first"),
+    enum class AutoAddUpNext(
+        val databaseInt: Int,
+        val analyticsValue: String,
+        val labelId: Int,
+    ) {
+        OFF(
+            databaseInt = 0,
+            analyticsValue = "off",
+            labelId = LR.string.off,
+        ),
+        PLAY_LAST(
+            databaseInt = 1,
+            analyticsValue = "add_last",
+            labelId = LR.string.play_last,
+        ),
+        PLAY_NEXT(
+            databaseInt = 2,
+            analyticsValue = "add_first",
+            labelId = LR.string.play_next,
+        ),
         ;
 
         companion object {
