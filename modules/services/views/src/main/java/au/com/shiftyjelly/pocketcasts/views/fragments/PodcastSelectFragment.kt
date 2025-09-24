@@ -267,7 +267,6 @@ private data class PodcastSelectFragmentArgs(
 
 enum class PodcastSelectFragmentSource(val analyticsValue: String) {
     AUTO_ADD("auto_add"),
-    DOWNLOADS("downloads"),
     NOTIFICATIONS("notifications"),
     FILTERS("filters"),
 }
