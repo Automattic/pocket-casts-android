@@ -58,6 +58,8 @@ wear-compose = "1.4.1"
 webkit = "1.14.0"
 wordpress-lint = "2.2.0"
 work = "2.10.0"
+credentials = "1.5.0"
+google-id = "1.1.1"
 
 [libraries]
 # About Libraries
@@ -252,6 +254,11 @@ work-runtime = { module = "androidx.work:work-runtime-ktx", version.ref = "work"
 work-rx2 = { module = "androidx.work:work-rxjava2", version.ref = "work" }
 work-test = { module = "androidx.work:work-testing", version.ref = "work" }
 
+# Credentials
+credentials = { module = "androidx.credentials:credentials", version.ref = "credentials" }
+credentials-google-play = { module = "androidx.credentials:credentials-play-services-auth", version.ref = "credentials" }
+google-identity = { module = "com.google.android.libraries.identity.googleid:googleid", version.ref = "google-id"}
+
 # Other dependencies
 androidx-annotation = "androidx.annotation:annotation:1.9.1"
 androidx-appcompat = "androidx.appcompat:appcompat:1.7.1"
@@ -267,7 +274,6 @@ androidx-recyclerview = "androidx.recyclerview:recyclerview:1.4.0"
 androidx-swiperefreshlayout = "androidx.swiperefreshlayout:swiperefreshlayout:1.1.0"
 androidx-uiautomator = "androidx.test.uiautomator:uiautomator:2.3.0"
 androidx-viewpager = "androidx.viewpager2:viewpager2:1.1.0"
-appsflyer = "com.appsflyer:af-android-sdk:6.17.3"
 capturable = "dev.shreyaspatil:capturable:3.0.1"
 compose-webview = "io.github.kevinnzou:compose-webview:0.33.6"
 desugar-jdk = "com.android.tools:desugar_jdk_libs:2.1.5"
@@ -276,7 +282,6 @@ encryptedlogging = "com.automattic:encryptedlogging:1.0.0"
 engage = "com.google.android.engage:engage-core:1.5.9"
 flexbox = "com.google.android.flexbox:flexbox:3.0.0"
 guava = "com.google.guava:guava:33.4.8-android" # Required to fix conflict between versions in exoplayer and workmanager
-installreferrer = "com.android.installreferrer:installreferrer:2.2"
 jsonassert = "org.skyscreamer:jsonassert:1.5.3"
 junit = "junit:junit:4.13.2"
 leakcanary = "com.squareup.leakcanary:leakcanary-android:2.14"

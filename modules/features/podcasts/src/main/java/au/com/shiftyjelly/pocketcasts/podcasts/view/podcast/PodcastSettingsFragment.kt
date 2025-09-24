@@ -3,7 +3,6 @@ package au.com.shiftyjelly.pocketcasts.podcasts.view.podcast
 import android.os.Bundle
 import android.os.Parcelable
 import android.view.LayoutInflater
-import android.view.View
 import android.view.ViewGroup
 import androidx.annotation.ColorInt
 import androidx.compose.foundation.layout.padding
@@ -22,22 +21,15 @@ import androidx.navigation.compose.rememberNavController
 import androidx.navigation.get
 import au.com.shiftyjelly.pocketcasts.compose.AppTheme
 import au.com.shiftyjelly.pocketcasts.compose.extensions.contentWithoutConsumedInsets
-import au.com.shiftyjelly.pocketcasts.models.entity.Podcast.AutoAddUpNext
-import au.com.shiftyjelly.pocketcasts.models.to.AutoArchiveAfterPlaying
-import au.com.shiftyjelly.pocketcasts.models.to.AutoArchiveInactive
-import au.com.shiftyjelly.pocketcasts.models.to.AutoArchiveLimit
-import au.com.shiftyjelly.pocketcasts.models.type.TrimMode
 import au.com.shiftyjelly.pocketcasts.podcasts.viewmodel.PodcastSettingsViewModel
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.settings.AutoAddSettingsFragment
 import au.com.shiftyjelly.pocketcasts.ui.helper.FragmentHostListener
 import au.com.shiftyjelly.pocketcasts.utils.extensions.pxToDp
 import au.com.shiftyjelly.pocketcasts.views.dialog.ConfirmationDialog
-import au.com.shiftyjelly.pocketcasts.views.dialog.OptionsDialog
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseFragment
 import au.com.shiftyjelly.pocketcasts.views.helper.HasBackstack
 import au.com.shiftyjelly.pocketcasts.views.helper.ToolbarColors
-import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import dagger.hilt.android.AndroidEntryPoint
 import dagger.hilt.android.lifecycle.withCreationCallback
 import javax.inject.Inject
@@ -117,23 +109,6 @@ class PodcastSettingsFragment :
         }
     }
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
-        val tags = listOf(
-            "podcast-up-next",
-            "podcast-trim-mode",
-            "podcast-archive-after-playing",
-            "podcast-archive-after-inactive",
-            "podcast-archive-limit",
-        )
-        // Dismiss any open dialogs on config change because OptionsDialog
-        // isn't supposed to be used as a sticky dialog due to how it can't
-        // store set options.
-        for (tag in tags) {
-            (parentFragmentManager.findFragmentByTag(tag) as? BottomSheetDialogFragment)?.dismiss()
-        }
-    }
-
     override fun onDestroyView() {
         super.onDestroyView()
         this.navController = null
@@ -141,104 +116,42 @@ class PodcastSettingsFragment :
 
     private fun showUpNextPositionDialog() {
         val currentPosition = viewModel.uiState.value?.podcast?.autoAddToUpNext
-        if (currentPosition == null || parentFragmentManager.findFragmentByTag("podcast-up-next") != null) {
+        if (currentPosition == null || childFragmentManager.findFragmentByTag("podcast-up-next") != null) {
             return
         }
-        OptionsDialog()
-            .setTitle(getString(LR.string.podcast_settings_position))
-            .addCheckedOption(
-                titleId = LR.string.play_last,
-                checked = currentPosition == AutoAddUpNext.PLAY_LAST,
-                click = { viewModel.changeAddToUpNext(AutoAddUpNext.PLAY_LAST) },
-            )
-            .addCheckedOption(
-                titleId = LR.string.play_next,
-                checked = currentPosition == AutoAddUpNext.PLAY_NEXT,
-                click = { viewModel.changeAddToUpNext(AutoAddUpNext.PLAY_NEXT) },
-            )
-            .show(parentFragmentManager, "podcast-up-next")
+        UpNextPositionFragment().show(childFragmentManager, "podcast-up-next")
     }
 
     private fun showTrimModeDialog() {
         val currentMode = viewModel.uiState.value?.podcast?.trimMode
-        if (currentMode == null || parentFragmentManager.findFragmentByTag("podcast-trim-mode") != null) {
+        if (currentMode == null || childFragmentManager.findFragmentByTag("podcast-trim-mode") != null) {
             return
         }
-        OptionsDialog()
-            .setTitle(getString(LR.string.player_effects_trim_level))
-            .addCheckedOption(
-                titleId = LR.string.player_effects_trim_mild,
-                checked = currentMode == TrimMode.LOW,
-                click = { viewModel.changeTrimMode(TrimMode.LOW) },
-            )
-            .addCheckedOption(
-                titleId = LR.string.player_effects_trim_medium,
-                checked = currentMode == TrimMode.MEDIUM,
-                click = { viewModel.changeTrimMode(TrimMode.MEDIUM) },
-            )
-            .addCheckedOption(
-                titleId = LR.string.player_effects_trim_mad_max,
-                checked = currentMode == TrimMode.HIGH,
-                click = { viewModel.changeTrimMode(TrimMode.HIGH) },
-            )
-            .show(parentFragmentManager, "podcast-trim-mode")
+        TrimModeFragment().show(childFragmentManager, "podcast-trim-mode")
     }
 
     private fun showAutoArchiveAfterPlayingDialog() {
         val currentValue = viewModel.uiState.value?.podcast?.autoArchiveAfterPlaying
-        if (currentValue == null || parentFragmentManager.findFragmentByTag("podcast-archive-after-playing") != null) {
+        if (currentValue == null || childFragmentManager.findFragmentByTag("podcast-archive-after-playing") != null) {
             return
         }
-        OptionsDialog()
-            .setTitle(getString(LR.string.settings_archive_played))
-            .let { dialog ->
-                AutoArchiveAfterPlaying.All.fold(dialog) { dialog, value ->
-                    dialog.addCheckedOption(
-                        titleId = value.stringRes,
-                        checked = value == currentValue,
-                        click = { viewModel.changeAutoArchiveAfterPlaying(value) },
-                    )
-                }
-            }
-            .show(parentFragmentManager, "podcast-archive-after-playing")
+        ArchiveAfterPlayingFragment().show(childFragmentManager, "podcast-archive-after-playing")
     }
 
     private fun showAutoArchiveAfterInactiveDialog() {
         val currentValue = viewModel.uiState.value?.podcast?.autoArchiveInactive
-        if (currentValue == null || parentFragmentManager.findFragmentByTag("podcast-archive-after-inactive") != null) {
+        if (currentValue == null || childFragmentManager.findFragmentByTag("podcast-archive-after-inactive") != null) {
             return
         }
-        OptionsDialog()
-            .setTitle(getString(LR.string.settings_auto_archive_inactive))
-            .let { dialog ->
-                AutoArchiveInactive.All.fold(dialog) { dialog, value ->
-                    dialog.addCheckedOption(
-                        titleId = value.stringRes,
-                        checked = value == currentValue,
-                        click = { viewModel.changeAutoArchiveAfterInactive(value) },
-                    )
-                }
-            }
-            .show(parentFragmentManager, "podcast-archive-after-inactive")
+        ArchiveAfterInactiveFragment().show(childFragmentManager, "podcast-archive-after-inactive")
     }
 
     private fun showAutoArchiveLimitDialog() {
         val currentValue = viewModel.uiState.value?.podcast?.autoArchiveEpisodeLimit
-        if (currentValue == null || parentFragmentManager.findFragmentByTag("podcast-archive-limit") != null) {
+        if (currentValue == null || childFragmentManager.findFragmentByTag("podcast-archive-limit") != null) {
             return
         }
-        OptionsDialog()
-            .setTitle(getString(LR.string.settings_auto_archive_episode_limit))
-            .let { dialog ->
-                AutoArchiveLimit.entries.fold(dialog) { dialog, value ->
-                    dialog.addCheckedOption(
-                        titleId = value.stringRes,
-                        checked = value == currentValue,
-                        click = { viewModel.changeAutoArchiveLimit(value) },
-                    )
-                }
-            }
-            .show(parentFragmentManager, "podcast-archive-limit")
+        ArchiveLimitFragment().show(childFragmentManager, "podcast-archive-limit")
     }
 
     private fun goToAutoAddSettings() {
