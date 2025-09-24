@@ -13,4 +13,4 @@ interface InitializerEntryPoint {
     fun inject(initializer: DefaultPlaylistsStartupInitializer)
 }
 
-internal fun Context.initialzierEntryPoint() = EntryPointAccessors.fromApplication<InitializerEntryPoint>(this)
+internal fun Context.initializerEntryPoint() = EntryPointAccessors.fromApplication<InitializerEntryPoint>(this)
