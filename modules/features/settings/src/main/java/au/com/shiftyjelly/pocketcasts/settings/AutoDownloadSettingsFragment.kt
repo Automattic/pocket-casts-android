@@ -67,7 +67,11 @@ class AutoDownloadSettingsFragment :
                 }
             }
 
-            Box {
+            Box(
+                modifier = Modifier.padding(
+                    bottom = miniPlayerInset.pxToDp(requireContext()).dp,
+                ),
+            ) {
                 AutoDownloadSettingsPage(
                     uiState = uiState,
                     navController = navController,
@@ -97,9 +101,6 @@ class AutoDownloadSettingsFragment :
                         @Suppress("DEPRECATION")
                         requireActivity().onBackPressed()
                     },
-                    modifier = Modifier.padding(
-                        bottom = miniPlayerInset.pxToDp(requireContext()).dp,
-                    ),
                 )
 
                 ThemedSnackbarHost(
