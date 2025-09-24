@@ -596,6 +596,11 @@
         <item quantity="one">%d podcast</item>
         <item quantity="other">%d podcasts</item>
     </plurals>
+    <string name="podcasts_selected_all">All podcasts selected</string>
+    <plurals name="podcasts_selected_count">
+        <item quantity="one">%1$d podcast selected</item>
+        <item quantity="other">%1$d podcasts selected</item>
+    </plurals>
     <string name="podcast_archive_all">Archive all</string>
     <string name="podcast_archive_all_played">Archive all played</string>
     <string name="podcast_archive_played">You should only do this if you don\'t want to see them anymore.</string>
@@ -1007,6 +1012,7 @@
     <string name="playlists_onboarding_playlist_title">Introducing Playlists</string>
     <string name="playlists_onboarding_smart_playlist_description">They still work exactly the same, using rules to auto-add your episodes. All your existing Filters are right here, nothing’s changed but the name.</string>
     <string name="playlists_onboarding_smart_playlist_title">Filters are now Smart Playlists</string>
+    <string name="playlists_selected_all">All playlists selected</string>
     <plurals name="playlists_selected_count">
         <item quantity="one">%1$d playlist selected</item>
         <item quantity="other">%1$d playlists selected</item>
@@ -1420,6 +1426,7 @@
     <string name="settings_auto_download_charging">Only when charging</string>
     <string name="settings_auto_download_clear_errors">Clear all download errors</string>
     <string name="settings_auto_download_clearing_errors">Clearing all download errors</string>
+    <string name="settings_auto_download_playlists">Auto download playlists</string>
     <string name="settings_auto_download_filters">Auto download filters</string>
     <string name="settings_auto_download_filters_episodes">All filter episodes</string>
     <string name="settings_auto_download_new_episodes">New episodes</string>
@@ -1430,6 +1437,7 @@
         <item quantity="other">Automatically download the latest %s episodes from new shows you follow.</item>
     </plurals>
 
+    <string name="number_one">one</string>
     <string name="number_two">two</string>
     <string name="number_three">three</string>
     <string name="number_five">five</string>
@@ -1463,6 +1471,7 @@
     <string name="settings_battery_learn_more_url" translatable="false">https://support.pocketcasts.com/article/playback-pausing-randomly-or-when-screen-is-locked/</string>
     <string name="settings_select_filters">Select filters</string>
     <string name="settings_choose_podcasts">Choose podcasts</string>
+    <string name="settings_choose_playlists">Choose playlists</string>
     <string name="settings_close_upgrade_offer">close upgrade offer</string>
     <string name="settings_customize_buttons_displayed_in_android_13_notification_and_android_auto">Customize the buttons displayed in Android 13+ playback notifications and Android Auto.</string>
     <string name="settings_developer">Developer</string>
