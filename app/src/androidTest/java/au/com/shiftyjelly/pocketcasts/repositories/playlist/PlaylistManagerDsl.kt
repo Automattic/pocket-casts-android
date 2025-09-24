@@ -17,7 +17,6 @@ import au.com.shiftyjelly.pocketcasts.models.entity.PlaylistEntity
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.models.to.PlaylistEpisode
-import au.com.shiftyjelly.pocketcasts.models.type.Membership
 import au.com.shiftyjelly.pocketcasts.models.type.PlaylistEpisodeSortType
 import au.com.shiftyjelly.pocketcasts.models.type.PodcastsSortType
 import au.com.shiftyjelly.pocketcasts.models.type.SmartRules
@@ -303,7 +302,7 @@ class PlaylistManagerDsl : TestWatcher() {
                     autoDownloadLimit = 10,
                 ),
                 smartRules = SmartRules.Default,
-                iconId = 0,
+                icon = PlaylistIcon(0),
             ),
         )
         return preview
@@ -321,6 +320,7 @@ class PlaylistManagerDsl : TestWatcher() {
                     isAutoDownloadEnabled = false,
                     autoDownloadLimit = 10,
                 ),
+                icon = PlaylistIcon(0),
             ),
         )
         return preview

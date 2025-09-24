@@ -1,7 +1,6 @@
 package au.com.shiftyjelly.pocketcasts.filters
 
 import android.content.res.ColorStateList
-import android.graphics.Color
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -136,9 +135,9 @@ class CreateFilterFragment :
             runBlocking { viewModel.setup(playlistUUID) }
         }
 
-        val colors = PlaylistEntity.getColors(context)
+        val colors = PlaylistEntity.getColors(requireContext())
         colorAdapter = ColorAdapter(colors.toIntArray(), false) { index, fromUserInteraction ->
-            tintColor = context?.getThemeColor(PlaylistEntity.themeColors[index]) ?: Color.WHITE
+            tintColor = requireContext().getThemeColor(PlaylistEntity.themeColors[index])
             viewModel.colorIndex.value = index
             if (fromUserInteraction) {
                 viewModel.userChangedColor()
@@ -292,13 +291,13 @@ class CreateFilterFragment :
             }
             txtNameInitialized = true
 
-            colorAdapter.setSelectedIndex(filter.colorIndex, fromUserInteraction = false)
+            colorAdapter.setSelectedIndex(filter.icon.colorIndex, fromUserInteraction = false)
 
             selectedIconIndexInitialized = false
-            selectedIconIndex = filter.drawableIndex
+            selectedIconIndex = filter.icon.drawableIndex
             selectedIconIndexInitialized = true
 
-            tintColor = filter.getColor(context)
+            tintColor = filter.icon.getColor(requireContext())
             updateIconViews()
 
             binding!!.switchAutoDownload.isChecked = filter.autoDownload

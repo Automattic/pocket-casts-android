@@ -15,5 +15,5 @@ object WearColors {
     val downloadedIcon = Color(0xFF54C483)
 
     fun getFolderColor(id: Int): Color = ThemeExtraDarkColors.getFolderColor(id)
-    fun getFilterColor(playlist: PlaylistEntity): Color = ThemeExtraDarkColors.getFilterColor(playlist.colorIndex)
+    fun getFilterColor(playlist: PlaylistEntity): Color = ThemeExtraDarkColors.getFilterColor(playlist.icon.colorIndex)
 }

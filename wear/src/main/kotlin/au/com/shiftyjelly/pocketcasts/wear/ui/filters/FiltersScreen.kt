@@ -66,7 +66,7 @@ private fun Content(
                 onClick = { onFilterTap(filter.uuid) },
                 icon = {
                     Icon(
-                        painter = painterResource(filter.drawableId),
+                        painter = painterResource(filter.icon.drawableId),
                         contentDescription = null,
                         tint = WearColors.getFilterColor(filter),
                         modifier = Modifier.padding(horizontal = 8.dp).size(24.dp),
