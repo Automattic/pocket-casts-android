@@ -93,8 +93,8 @@ steps:
   - group: Prototype Builds
     if: "build.pull_request.id != null"
     steps:
-      - input: ":rocket: Generate Prototype Builds"
-        prompt: Generate Prototype Builds?
+      - input: "🚀 Generate Prototype Builds?"
+        prompt: Generate Prototype Builds on the PR?
         key: prototype_builds_triggered
       - label: ":github: Prototype Builds"
         depends_on: prototype_builds_triggered
