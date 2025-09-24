@@ -612,7 +612,7 @@ platform :android do
       body: '🚧 Prototype builds will be available soon'
     )
 
-    prototype_build_type = 'debugProd'
+    prototype_build_type = 'DebugProd'
 
     gradle(
       task: 'assemble',
@@ -663,7 +663,7 @@ platform :android do
       Commit: #{ENV.fetch('BUILDKITE_COMMIT', 'N/A')[0...7]}
     NOTES
 
-    prototype_build_type = 'prototype'
+    prototype_build_type = 'Prototype'
 
     gradle(
       task: 'app:assemble',
