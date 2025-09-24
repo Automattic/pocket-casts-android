@@ -17,6 +17,8 @@ import au.com.shiftyjelly.pocketcasts.deeplink.TrendingDeepLink
 import au.com.shiftyjelly.pocketcasts.deeplink.UpsellDeepLink
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.preferences.Settings.NotificationId
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 sealed interface NotificationType {
@@ -62,9 +64,9 @@ sealed class OnboardingNotificationType(
     override val subcategory: String,
     override val analyticsType: String,
     @StringRes override val titleRes: Int,
-    @StringRes override val messageRes: Int,
     val dayOffset: Int,
 ) : NotificationType {
+    abstract override val messageRes: Int
 
     override fun isSettingsToggleOn(settings: Settings): Boolean {
         return settings.dailyRemindersNotification.value
@@ -76,10 +78,11 @@ sealed class OnboardingNotificationType(
         notificationId = NotificationId.ONBOARDING_SYNC.value,
         subcategory = SUBCATEGORY_SYNC,
         titleRes = LR.string.notification_sync_title,
-        messageRes = LR.string.notification_sync_message,
         dayOffset = 0,
         analyticsType = "onboardingSignUp",
     ) {
+        override val messageRes get() = LR.string.notification_sync_message
+
         override fun toIntent(context: Context) = CreateAccountDeepLink.toIntent(context)
     }
 
@@ -87,10 +90,11 @@ sealed class OnboardingNotificationType(
         notificationId = NotificationId.ONBOARDING_IMPORT.value,
         subcategory = SUBCATEGORY_IMPORT,
         titleRes = LR.string.notification_import_title,
-        messageRes = LR.string.notification_import_message,
         dayOffset = 1,
         analyticsType = "onboardingImport",
     ) {
+        override val messageRes get() = LR.string.notification_import_message
+
         override fun toIntent(context: Context) = ImportDeepLink.toIntent(context)
     }
 
@@ -98,10 +102,11 @@ sealed class OnboardingNotificationType(
         notificationId = NotificationId.ONBOARDING_UPNEXT.value,
         subcategory = SUBCATEGORY_UP_NEXT,
         titleRes = LR.string.notification_up_next_title,
-        messageRes = LR.string.notification_up_next_message,
         dayOffset = 2,
         analyticsType = "onboardingUpNext",
     ) {
+        override val messageRes get() = LR.string.notification_up_next_message
+
         override fun toIntent(context: Context) = ShowUpNextTabDeepLink.toIntent(context)
     }
 
@@ -109,10 +114,15 @@ sealed class OnboardingNotificationType(
         notificationId = NotificationId.ONBOARDING_FILTERS.value,
         subcategory = SUBCATEGORY_FILTERS,
         titleRes = LR.string.notification_filters_title,
-        messageRes = LR.string.notification_filters_message,
         dayOffset = 3,
         analyticsType = "onboardingFilters",
     ) {
+        override val messageRes get() = if (FeatureFlag.isEnabled(Feature.PLAYLISTS_REBRANDING, immutable = true)) {
+            LR.string.notification_filters_message_2
+        } else {
+            LR.string.notification_filters_message
+        }
+
         override fun toIntent(context: Context) = ShowFiltersDeepLink.toIntent(context)
     }
 
@@ -120,10 +130,11 @@ sealed class OnboardingNotificationType(
         notificationId = NotificationId.ONBOARDING_THEMES.value,
         subcategory = SUBCATEGORY_THEMES,
         titleRes = LR.string.notification_themes_title,
-        messageRes = LR.string.notification_themes_message,
         dayOffset = 4,
         analyticsType = "onboardingThemes",
     ) {
+        override val messageRes get() = LR.string.notification_themes_message
+
         override fun toIntent(context: Context) = ThemesDeepLink.toIntent(context)
     }
 
@@ -131,10 +142,11 @@ sealed class OnboardingNotificationType(
         notificationId = NotificationId.ONBOARDING_STAFF_PICKS.value,
         subcategory = SUBCATEGORY_STAFF_PICKS,
         titleRes = LR.string.notification_staff_picks_title,
-        messageRes = LR.string.notification_staff_picks_message,
         dayOffset = 5,
         analyticsType = "onboardingStaffPicks",
     ) {
+        override val messageRes get() = LR.string.notification_staff_picks_message
+
         override fun toIntent(context: Context) = StaffPicksDeepLink.toIntent(context)
     }
 
@@ -142,10 +154,11 @@ sealed class OnboardingNotificationType(
         notificationId = NotificationId.ONBOARDING_UPSELL.value,
         subcategory = SUBCATEGORY_PLUS_UP_SELL,
         titleRes = LR.string.notification_plus_upsell_title,
-        messageRes = LR.string.notification_plus_upsell_message,
         dayOffset = 6,
         analyticsType = "onboardingUpsell",
     ) {
+        override val messageRes get() = LR.string.notification_plus_upsell_message
+
         override fun toIntent(context: Context) = UpsellDeepLink.toIntent(context)
     }
 

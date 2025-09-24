@@ -7,7 +7,7 @@ import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 
 @Singleton
-class DefaultPlaylistsInitializater @Inject constructor(
+class DefaultPlaylistsInitializer @Inject constructor(
     private val settings: Settings,
     private val playlistManager: PlaylistManager,
 ) {

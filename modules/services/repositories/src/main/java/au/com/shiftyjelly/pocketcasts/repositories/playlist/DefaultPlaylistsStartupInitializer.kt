@@ -9,8 +9,8 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.NonCancellable
 import kotlinx.coroutines.launch
 
-class DefaultPlaylistsStartupInitializater : Initializer<Unit> {
-    @Inject lateinit var initializater: DefaultPlaylistsInitializater
+class DefaultPlaylistsStartupInitializer : Initializer<Unit> {
+    @Inject lateinit var initializer: DefaultPlaylistsInitializer
 
     @Inject @ApplicationScope
     lateinit var applicationScope: CoroutineScope
@@ -18,7 +18,7 @@ class DefaultPlaylistsStartupInitializater : Initializer<Unit> {
     override fun create(context: Context) {
         context.initialzierEntryPoint().inject(this)
         applicationScope.launch(NonCancellable) {
-            initializater.initialize()
+            initializer.initialize()
         }
     }
 

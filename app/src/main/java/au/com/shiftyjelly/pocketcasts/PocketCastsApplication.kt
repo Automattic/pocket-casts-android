@@ -23,6 +23,7 @@ import au.com.shiftyjelly.pocketcasts.repositories.notification.NotificationHelp
 import au.com.shiftyjelly.pocketcasts.repositories.notification.NotificationManager
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.repositories.playback.SleepTimerRestartWhenShakingDevice
+import au.com.shiftyjelly.pocketcasts.repositories.playlist.PlaylistInteractionNotifier
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.SmartPlaylistManager
@@ -131,6 +132,8 @@ class PocketCastsApplication :
     @Inject lateinit var notificationManager: NotificationManager
 
     @Inject lateinit var shortcutsSynchronizer: DynamicShortcutsSynchronizer
+
+    @Inject lateinit var playlistInteractionNotifier: PlaylistInteractionNotifier
 
     override fun onCreate() {
         if (BuildConfig.DEBUG) {
@@ -277,6 +280,7 @@ class PocketCastsApplication :
         CuratedPodcastsSyncWorker.enqueuePeriodicWork(this)
         engageSdkBridge.registerIntegration()
         shortcutsSynchronizer.keepShortcutsInSync()
+        playlistInteractionNotifier.monitorPlaylistsInteraction()
 
         keepPlayerWidgetsUpdated()
 
