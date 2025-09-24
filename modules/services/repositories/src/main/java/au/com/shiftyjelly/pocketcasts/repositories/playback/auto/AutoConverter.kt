@@ -192,9 +192,9 @@ object AutoConverter {
     fun getPlaylistBitmapUri(playlist: PlaylistEntity?, context: Context): Uri {
         val drawableId = if (Util.isAutomotive(context)) {
             // the Automotive UI displays the icon in a list that requires more padding around the icon
-            playlist?.automotiveDrawableId ?: IR.drawable.automotive_filter_play
+            playlist?.icon?.automotiveDrawableId ?: IR.drawable.automotive_filter_play
         } else {
-            playlist?.autoDrawableId ?: IR.drawable.auto_filter_play
+            playlist?.icon?.autoDrawableId ?: IR.drawable.auto_filter_play
         }
         return getBitmapUri(drawableId, context)
     }

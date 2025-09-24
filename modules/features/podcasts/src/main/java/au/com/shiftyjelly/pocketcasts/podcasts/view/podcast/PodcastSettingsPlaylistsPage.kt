@@ -40,6 +40,7 @@ import au.com.shiftyjelly.pocketcasts.compose.components.TextP50
 import au.com.shiftyjelly.pocketcasts.compose.preview.ThemePreviewParameterProvider
 import au.com.shiftyjelly.pocketcasts.compose.theme
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
+import au.com.shiftyjelly.pocketcasts.models.to.PlaylistIcon
 import au.com.shiftyjelly.pocketcasts.models.type.SmartRules
 import au.com.shiftyjelly.pocketcasts.models.type.SmartRules.PodcastsRule
 import au.com.shiftyjelly.pocketcasts.podcasts.viewmodel.PodcastSettingsViewModel.UiState
@@ -202,8 +203,8 @@ private fun PlaylistRow(
                 .padding(horizontal = 16.dp, vertical = 12.dp),
         ) {
             Image(
-                painter = painterResource(playlist.drawableId),
-                colorFilter = ColorFilter.tint(Color(playlist.getColor(LocalContext.current))),
+                painter = painterResource(playlist.icon.drawableId),
+                colorFilter = ColorFilter.tint(Color(playlist.icon.getColor(LocalContext.current))),
                 contentDescription = null,
                 modifier = Modifier.size(32.dp),
             )
@@ -253,7 +254,7 @@ private fun PodcastSettingsPlaylistsPagePreview(
                         smartRules = SmartRules.Default.copy(
                             podcasts = PodcastsRule.Selected(uuids = setOf("podcast-uuid-$index")),
                         ),
-                        iconId = 0,
+                        icon = PlaylistIcon(0),
                     )
                 },
                 globalUpNextLimit = 100,

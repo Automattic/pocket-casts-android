@@ -7,7 +7,7 @@ import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.models.entity.PlaylistEntity
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
-import au.com.shiftyjelly.pocketcasts.repositories.extensions.calculateCombinedIconId
+import au.com.shiftyjelly.pocketcasts.repositories.extensions.calculatePlaylistIcon
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PlaylistProperty
@@ -57,7 +57,7 @@ class CreateFilterViewModel @Inject constructor(
     var playlist: LiveData<PlaylistEntity>? = null
 
     suspend fun createFilter(name: String, iconId: Int, colorId: Int) = withContext(Dispatchers.IO) {
-        smartPlaylistManager.createPlaylistBlocking(name, PlaylistEntity.calculateCombinedIconId(colorId, iconId), draft = true)
+        smartPlaylistManager.createPlaylistBlocking(name, PlaylistEntity.calculatePlaylistIcon(colorId, iconId).id, draft = true)
     }
 
     val filterName = MutableStateFlow("")
@@ -91,7 +91,7 @@ class CreateFilterViewModel @Inject constructor(
     ) = withContext(Dispatchers.Default) {
         val playlist = playlist?.value ?: return@withContext
         playlist.title = filterName.value
-        playlist.iconId = PlaylistEntity.calculateCombinedIconId(colorIndex, iconIndex)
+        playlist.iconId = PlaylistEntity.calculatePlaylistIcon(colorIndex, iconIndex).id
         playlist.draft = false
         playlist.syncStatus = PlaylistEntity.SYNC_STATUS_NOT_SYNCED
 

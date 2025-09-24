@@ -13,7 +13,6 @@ import au.com.shiftyjelly.pocketcasts.models.entity.PlaylistEntity.Companion.LAS
 import au.com.shiftyjelly.pocketcasts.models.entity.PlaylistEntity.Companion.LAST_WEEK
 import au.com.shiftyjelly.pocketcasts.models.entity.PlaylistEntity.Companion.SYNC_STATUS_NOT_SYNCED
 import au.com.shiftyjelly.pocketcasts.models.entity.PlaylistEntity.Companion.SYNC_STATUS_SYNCED
-import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.models.to.PlaylistEpisode
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodePlayingStatus
 import au.com.shiftyjelly.pocketcasts.models.type.PlaylistEpisodeSortType

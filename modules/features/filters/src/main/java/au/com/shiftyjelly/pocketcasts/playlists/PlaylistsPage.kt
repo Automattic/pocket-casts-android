@@ -54,6 +54,7 @@ import au.com.shiftyjelly.pocketcasts.compose.components.NoContentBanner
 import au.com.shiftyjelly.pocketcasts.compose.preview.ThemePreviewParameterProvider
 import au.com.shiftyjelly.pocketcasts.compose.reorderable.rememberReorderableLazyListDataSource
 import au.com.shiftyjelly.pocketcasts.compose.theme
+import au.com.shiftyjelly.pocketcasts.models.to.PlaylistIcon
 import au.com.shiftyjelly.pocketcasts.models.type.SmartRules
 import au.com.shiftyjelly.pocketcasts.playlists.PlaylistsViewModel.PlaylistsState
 import au.com.shiftyjelly.pocketcasts.playlists.PlaylistsViewModel.UiState
@@ -422,6 +423,7 @@ private fun PlaylistPagePreview(
                             episodeCount = 0,
                             artworkPodcastUuids = emptyList(),
                             settings = Playlist.Settings.ForPreview,
+                            icon = PlaylistIcon(0),
                         ),
                         SmartPlaylistPreview(
                             uuid = "uuid-1",
@@ -430,7 +432,7 @@ private fun PlaylistPagePreview(
                             artworkPodcastUuids = emptyList(),
                             settings = Playlist.Settings.ForPreview,
                             smartRules = SmartRules.Default,
-                            iconId = 0,
+                            icon = PlaylistIcon(0),
                         ),
                     ),
                 ),
