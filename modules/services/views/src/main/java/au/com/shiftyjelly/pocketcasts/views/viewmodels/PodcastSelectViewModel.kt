@@ -70,10 +70,6 @@ class PodcastSelectViewModel @Inject constructor(
                 analyticsTracker.track(AnalyticsEvent.SETTINGS_NOTIFICATIONS_PODCASTS_CHANGED, props)
             }
 
-            PodcastSelectFragmentSource.DOWNLOADS -> {
-                analyticsTracker.track(AnalyticsEvent.SETTINGS_AUTO_DOWNLOAD_PODCASTS_CHANGED, props)
-            }
-
             PodcastSelectFragmentSource.FILTERS -> {
                 // Do not track because the filter_updated event was tracked when the change was persisted
             }
