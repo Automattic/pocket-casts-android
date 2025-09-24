@@ -23,6 +23,7 @@ import androidx.core.view.updatePadding
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.asFlow
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.lifecycleScope
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.compose.components.SegmentedTabBar
 import au.com.shiftyjelly.pocketcasts.compose.components.SegmentedTabBarDefaults
@@ -44,6 +45,7 @@ import au.com.shiftyjelly.pocketcasts.ui.theme.ThemeColor
 import au.com.shiftyjelly.pocketcasts.utils.Debouncer
 import au.com.shiftyjelly.pocketcasts.utils.extensions.dpToPx
 import au.com.shiftyjelly.pocketcasts.utils.extensions.roundedSpeed
+import au.com.shiftyjelly.pocketcasts.views.extensions.announceAccessibility
 import au.com.shiftyjelly.pocketcasts.views.extensions.updateTint
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseDialogFragment
 import com.google.android.material.button.MaterialButtonToggleGroup
@@ -175,8 +177,8 @@ class EffectsFragment :
         binding.lblSpeed.text = String.format("%.1fx", effects.playbackSpeed)
         viewModel.saveEffects(effects, podcast)
 
-        binding.btnSpeedUp.announceForAccessibility("Playback speed ${binding.lblSpeed.text}")
-        launch {
+        binding.btnSpeedUp.announceAccessibility("Playback speed ${binding.lblSpeed.text}")
+        viewLifecycleOwner.lifecycleScope.launch {
             playbackSpeedTrackingDebouncer.debounce {
                 viewModel.effectsLive.value?.effects?.playbackSpeed?.roundedSpeed()?.let { currentSpeed ->
                     trackPlaybackEffectsEvent(

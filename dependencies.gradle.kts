@@ -64,8 +64,10 @@ project.apply {
         set("minSdkVersion", 24)
         set("minSdkVersionWear", 26)
         set("minSdkVersionAutomotive", 28)
-        set("targetSdkVersion", 35)
-        set("compileSdkVersion", 35)
+        set("targetSdkVersion", 36)
+        set("targetSdkVersionWear", 36)
+        set("targetSdkVersionAutomotive", 35)
+        set("compileSdkVersion", 36)
         set("testInstrumentationRunner", "androidx.test.runner.AndroidJUnitRunner")
 
         // App Signing
