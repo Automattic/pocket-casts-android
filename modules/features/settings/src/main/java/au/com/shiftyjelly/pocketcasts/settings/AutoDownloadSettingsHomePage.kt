@@ -137,9 +137,9 @@ internal fun AutoDownloadSettingsHomePage(
         ) {
             SettingRow(
                 primaryText = if (usePlaylists) {
-                    stringResource(LR.string.settings_auto_download_filters_episodes)
-                } else {
                     stringResource(LR.string.settings_choose_playlists)
+                } else {
+                    stringResource(LR.string.settings_auto_download_filters_episodes)
                 },
                 secondaryText = if (usePlaylists) {
                     when (enabledPlaylistsCount) {

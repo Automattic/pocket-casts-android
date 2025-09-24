@@ -16,6 +16,8 @@ import au.com.shiftyjelly.pocketcasts.settings.AutoDownloadSettingsRoute
 import au.com.shiftyjelly.pocketcasts.utils.extensions.combine
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
+import dagger.hilt.android.lifecycle.HiltViewModel
+import javax.inject.Inject
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.map
@@ -23,7 +25,8 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
-class AutoDownloadSettingsViewModel(
+@HiltViewModel
+class AutoDownloadSettingsViewModel @Inject constructor(
     private val podcastManager: PodcastManager,
     private val playlistManager: PlaylistManager,
     private val downloadManager: DownloadManager,
