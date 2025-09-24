@@ -1,5 +1,9 @@
 package au.com.shiftyjelly.pocketcasts.settings
 
+import androidx.compose.animation.core.Spring
+import androidx.compose.animation.core.spring
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
@@ -14,9 +18,9 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
-import au.com.shiftyjelly.pocketcasts.compose.CallOnce
 import au.com.shiftyjelly.pocketcasts.compose.bars.NavigationButton
 import au.com.shiftyjelly.pocketcasts.compose.bars.ThemedTopAppBar
+import au.com.shiftyjelly.pocketcasts.compose.components.AnimatedNonNullVisibility
 import au.com.shiftyjelly.pocketcasts.compose.navigation.navigateOnce
 import au.com.shiftyjelly.pocketcasts.compose.navigation.slideInToEnd
 import au.com.shiftyjelly.pocketcasts.compose.navigation.slideInToStart
@@ -77,62 +81,63 @@ internal fun AutoDownloadSettingsPage(
             windowInsets = WindowInsets.statusBars,
         )
 
-        NavHost(
-            navController = navController,
-            startDestination = AutoDownloadSettingsRoute.Home.value,
-            enterTransition = { slideInToStart() },
-            exitTransition = { slideOutToStart() },
-            popEnterTransition = { slideInToEnd() },
-            popExitTransition = { slideOutToEnd() },
+        AnimatedNonNullVisibility(
+            item = uiState,
+            enter = fadeIn,
+            exit = fadeOut,
             modifier = Modifier.weight(1f),
-        ) {
-            composable(AutoDownloadSettingsRoute.Home.value) {
-                if (uiState == null) {
-                    return@composable
+        ) { state ->
+            NavHost(
+                navController = navController,
+                startDestination = AutoDownloadSettingsRoute.Home.value,
+                enterTransition = { slideInToStart() },
+                exitTransition = { slideOutToStart() },
+                popEnterTransition = { slideInToEnd() },
+                popExitTransition = { slideOutToEnd() },
+                modifier = Modifier.fillMaxSize(),
+            ) {
+                composable(AutoDownloadSettingsRoute.Home.value) {
+                    AutoDownloadSettingsHomePage(
+                        uiState = state,
+                        onChangeUpNextDownload = onChangeUpNextDownload,
+                        onChangeNewEpisodesDownload = onChangeNewEpisodesDownload,
+                        onChangePodcastsSetting = {
+                            navController.navigateOnce(AutoDownloadSettingsRoute.Podcasts.value)
+                        },
+                        onChangeOnFollowDownload = onChangeOnFollowDownload,
+                        onChangeAutoDownloadLimitSetting = onChangeAutoDownloadLimitSetting,
+                        onChangePlaylistsSetting = {
+                            navController.navigateOnce(AutoDownloadSettingsRoute.Playlists.value)
+                        },
+                        onChangeOnUnmeteredDownload = onChangeOnUnmeteredDownload,
+                        onChangeOnlyWhenChargingDownload = onChangeOnlyWhenChargingDownload,
+                        onStopAllDownloads = onStopAllDownloads,
+                        onClearDownloadErrors = onClearDownloadErrors,
+                    )
                 }
-                AutoDownloadSettingsHomePage(
-                    uiState = uiState,
-                    onChangeUpNextDownload = onChangeUpNextDownload,
-                    onChangeNewEpisodesDownload = onChangeNewEpisodesDownload,
-                    onChangePodcastsSetting = {
-                        navController.navigateOnce(AutoDownloadSettingsRoute.Podcasts.value)
-                    },
-                    onChangeOnFollowDownload = onChangeOnFollowDownload,
-                    onChangeAutoDownloadLimitSetting = onChangeAutoDownloadLimitSetting,
-                    onChangePlaylistsSetting = {
-                        navController.navigateOnce(AutoDownloadSettingsRoute.Playlists.value)
-                    },
-                    onChangeOnUnmeteredDownload = onChangeOnUnmeteredDownload,
-                    onChangeOnlyWhenChargingDownload = onChangeOnlyWhenChargingDownload,
-                    onStopAllDownloads = onStopAllDownloads,
-                    onClearDownloadErrors = onClearDownloadErrors,
-                )
-            }
 
-            composable(AutoDownloadSettingsRoute.Podcasts.value) {
-                if (uiState == null) {
-                    return@composable
+                composable(AutoDownloadSettingsRoute.Podcasts.value) {
+                    AutoDownloadSettingsPodcastsPage(
+                        podcasts = state.podcasts,
+                        onChangePodcast = onChangePodcast,
+                        onChangeAllPodcasts = onChangeAllPodcasts,
+                    )
                 }
-                AutoDownloadSettingsPodcastsPage(
-                    podcasts = uiState.podcasts,
-                    onChangePodcast = onChangePodcast,
-                    onChangeAllPodcasts = onChangeAllPodcasts,
-                )
-            }
 
-            composable(AutoDownloadSettingsRoute.Playlists.value) {
-                if (uiState == null) {
-                    return@composable
+                composable(AutoDownloadSettingsRoute.Playlists.value) {
+                    AutoDownloadSettingsPlaylistsPage(
+                        playlists = state.playlists,
+                        onChangePlaylist = onChangePlaylist,
+                        onChangeAllPlaylists = onChangeAllPlaylists,
+                    )
                 }
-                AutoDownloadSettingsPlaylistsPage(
-                    playlists = uiState.playlists,
-                    onChangePlaylist = onChangePlaylist,
-                    onChangeAllPlaylists = onChangeAllPlaylists,
-                )
             }
         }
     }
 }
+
+private val fadeIn = fadeIn()
+private val fadeOut = fadeOut()
 
 internal enum class AutoDownloadSettingsRoute(
     val value: String,
