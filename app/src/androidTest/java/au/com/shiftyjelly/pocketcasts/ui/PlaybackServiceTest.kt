@@ -8,21 +8,27 @@ import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.rule.ServiceTestRule
 import au.com.shiftyjelly.pocketcasts.PocketCastsApplication
-import au.com.shiftyjelly.pocketcasts.models.entity.PlaylistEntity
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
+import au.com.shiftyjelly.pocketcasts.models.to.PlaylistEpisode
+import au.com.shiftyjelly.pocketcasts.models.to.PlaylistIcon
 import au.com.shiftyjelly.pocketcasts.preferences.Settings.NotificationId
 import au.com.shiftyjelly.pocketcasts.repositories.notification.NotificationHelper
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackService
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlayerNotificationManager
 import au.com.shiftyjelly.pocketcasts.repositories.playback.UpNextQueue
+import au.com.shiftyjelly.pocketcasts.repositories.playlist.ManualPlaylist
+import au.com.shiftyjelly.pocketcasts.repositories.playlist.ManualPlaylistPreview
+import au.com.shiftyjelly.pocketcasts.repositories.playlist.Playlist
+import au.com.shiftyjelly.pocketcasts.repositories.playlist.PlaylistManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
-import au.com.shiftyjelly.pocketcasts.repositories.podcast.SmartPlaylistManager
 import au.com.shiftyjelly.pocketcasts.utils.SchedulerProvider
 import java.util.Date
 import java.util.UUID
 import java.util.concurrent.TimeoutException
+import kotlin.time.Duration.Companion.seconds
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
@@ -74,12 +80,34 @@ class PlaybackServiceTest {
             PodcastEpisode(uuid = UUID.randomUUID().toString(), podcastUuid = podcastTwo.uuid, publishedDate = Date(), title = "Episode 2"),
             PodcastEpisode(uuid = UUID.randomUUID().toString(), podcastUuid = podcastOne.uuid, publishedDate = Date(), title = "Episode 3"),
         )
-        val filter = PlaylistEntity(uuid = UUID.randomUUID().toString(), title = "New Releases")
-        val filters = listOf(filter)
-        val filterEpisodes = listOf(
-            PodcastEpisode(uuid = UUID.randomUUID().toString(), podcastUuid = podcastOne.uuid, publishedDate = Date(), title = "Episode 4"),
+        val playlistPreview = ManualPlaylistPreview(
+            uuid = UUID.randomUUID().toString(),
+            title = "Playlist title",
+            episodeCount = 0,
+            artworkPodcastUuids = emptyList(),
+            settings = Playlist.Settings.ForPreview,
+            icon = PlaylistIcon(0),
+        )
+        val playlistPreviews = listOf(playlistPreview)
+        val playlistEpisodes = listOf(
+            PlaylistEpisode.Available(PodcastEpisode(uuid = UUID.randomUUID().toString(), podcastUuid = podcastOne.uuid, publishedDate = Date(), title = "Episode 4")),
             // use the same episode in the filter so we can test duplicates aren't used
-            upNextEpisodes.last(),
+            PlaylistEpisode.Available(upNextEpisodes.last()),
+        )
+        val playlist = ManualPlaylist(
+            uuid = playlistPreview.uuid,
+            title = playlistPreview.title,
+            episodes = playlistEpisodes,
+            settings = playlistPreview.settings,
+            metadata = Playlist.Metadata(
+                playbackDurationLeft = 0.seconds,
+                artworkUuids = emptyList(),
+                isShowingArchived = true,
+                totalEpisodeCount = 0,
+                displayedEpisodeCount = 0,
+                displayedAvailableEpisodeCount = 0,
+                archivedEpisodeCount = 0,
+            ),
         )
         val latestEpisode = PodcastEpisode(uuid = UUID.randomUUID().toString(), podcastUuid = podcastTwo.uuid, publishedDate = Date(), title = "Episode 5")
 
@@ -94,16 +122,16 @@ class PlaybackServiceTest {
         }
         service.podcastManager = podcastManager
         val episodeManager = mock<EpisodeManager> {
-            on { findEpisodesWhereBlocking(any(), any()) }.doReturn(filterEpisodes)
+            on { findEpisodesWhereBlocking(any(), any()) }.doReturn(playlistEpisodes.mapNotNull(PlaylistEpisode::toPodcastEpisode))
             onBlocking { findLatestEpisodeToPlayBlocking() }.doReturn(latestEpisode)
         }
         service.episodeManager = episodeManager
-        val smartPlaylistManager = mock<SmartPlaylistManager> {
-            onBlocking { findAll() }.doReturn(filters)
-            onBlocking { findByUuid(filter.uuid) }.doReturn(filter)
-            on { findEpisodesBlocking(playlist = filters.first(), episodeManager = episodeManager, playbackManager = service.playbackManager) }.doReturn(filterEpisodes)
+        val smartPlaylistManager = mock<PlaylistManager> {
+            on { playlistPreviewsFlow() }.doReturn(flowOf(playlistPreviews))
+            on { smartPlaylistFlow(playlist.uuid, null) }.doReturn(flowOf(null))
+            on { manualPlaylistFlow(playlist.uuid, null) }.doReturn(flowOf(playlist))
         }
-        service.smartPlaylistManager = smartPlaylistManager
+        service.playlistManager = smartPlaylistManager
 
         runTest {
             val mediaItems = service.loadSuggestedChildren()
@@ -111,7 +139,7 @@ class PlaybackServiceTest {
             assertEquals("${podcastOne.uuid}#${upNextCurrentEpisode.uuid}", mediaItems[0].mediaId)
             assertEquals("${podcastTwo.uuid}#${upNextEpisodes[0].uuid}", mediaItems[1].mediaId)
             assertEquals("${podcastOne.uuid}#${upNextEpisodes[1].uuid}", mediaItems[2].mediaId)
-            assertEquals("${podcastOne.uuid}#${filterEpisodes[0].uuid}", mediaItems[3].mediaId)
+            assertEquals("${podcastOne.uuid}#${playlistEpisodes[0].uuid}", mediaItems[3].mediaId)
             assertEquals("${podcastTwo.uuid}#${latestEpisode.uuid}", mediaItems[4].mediaId)
 
             val recentMediaItems = service.loadRecentChildren()

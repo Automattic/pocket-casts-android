@@ -77,7 +77,7 @@ class AutoPlaybackServiceTest {
         runBlocking {
             val playlist = ManualPlaylistPreview(
                 uuid = "uuid",
-                title = "Playlsit title",
+                title = "Playlist title",
                 episodeCount = 0,
                 artworkPodcastUuids = emptyList(),
                 settings = Playlist.Settings.ForPreview,
