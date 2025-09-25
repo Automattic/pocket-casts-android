@@ -38,12 +38,12 @@ import au.com.shiftyjelly.pocketcasts.wear.ui.component.NowPlayingPager
 import au.com.shiftyjelly.pocketcasts.wear.ui.downloads.DownloadsScreen
 import au.com.shiftyjelly.pocketcasts.wear.ui.episode.EpisodeScreenFlow
 import au.com.shiftyjelly.pocketcasts.wear.ui.episode.EpisodeScreenFlow.episodeGraph
-import au.com.shiftyjelly.pocketcasts.wear.ui.filter.FilterScreen
-import au.com.shiftyjelly.pocketcasts.wear.ui.filters.FiltersScreen
 import au.com.shiftyjelly.pocketcasts.wear.ui.player.EffectsScreen
 import au.com.shiftyjelly.pocketcasts.wear.ui.player.NowPlayingScreen
 import au.com.shiftyjelly.pocketcasts.wear.ui.player.PCVolumeScreen
 import au.com.shiftyjelly.pocketcasts.wear.ui.player.StreamingConfirmationScreen
+import au.com.shiftyjelly.pocketcasts.wear.ui.playlist.PlaylistScreen
+import au.com.shiftyjelly.pocketcasts.wear.ui.playlists.PlaylistsScreen
 import au.com.shiftyjelly.pocketcasts.wear.ui.podcast.PodcastScreen
 import au.com.shiftyjelly.pocketcasts.wear.ui.podcasts.PodcastsScreen
 import au.com.shiftyjelly.pocketcasts.wear.ui.settings.settingsRoutes
@@ -212,14 +212,14 @@ private fun WearApp(
                 swipeToDismissState = swipeToDismissState,
             )
 
-            composable(FiltersScreen.ROUTE) {
+            composable(PlaylistsScreen.ROUTE) {
                 NowPlayingPager(
                     navController = navController,
                     swipeToDismissState = swipeToDismissState,
                 ) {
-                    FiltersScreen(
-                        onFilterTap = { filterUuid ->
-                            navController.navigate(FilterScreen.navigateRoute(filterUuid))
+                    PlaylistsScreen(
+                        onClickPlaylist = { playlist ->
+                            navController.navigate(PlaylistScreen.navigateRoute(playlist.uuid, playlist.type))
                         },
                         columnState = columnState,
                     )
@@ -227,9 +227,12 @@ private fun WearApp(
             }
 
             composable(
-                route = FilterScreen.ROUTE,
+                route = PlaylistScreen.ROUTE,
                 arguments = listOf(
-                    navArgument(FilterScreen.ARGUMENT_FILTER_UUID) {
+                    navArgument(PlaylistScreen.ARGUMENT_PLAYLIST_UUID) {
+                        type = NavType.StringType
+                    },
+                    navArgument(PlaylistScreen.ARGUMENT_PLAYLIST_TYPE) {
                         type = NavType.StringType
                     },
                 ),
@@ -238,7 +241,7 @@ private fun WearApp(
                     navController = navController,
                     swipeToDismissState = swipeToDismissState,
                 ) {
-                    FilterScreen(
+                    PlaylistScreen(
                         onEpisodeTap = { episode ->
                             navController.navigate(EpisodeScreenFlow.navigateRoute(episodeUuid = episode.uuid))
                         },

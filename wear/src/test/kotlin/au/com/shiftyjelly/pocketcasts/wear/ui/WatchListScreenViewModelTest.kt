@@ -58,8 +58,8 @@ class WatchListScreenViewModelTest {
     }
 
     @Test
-    fun `test onFiltersClicked tapped`() {
-        viewModel.onFiltersClicked()
+    fun `test onPlaylistsClicked tapped`() {
+        viewModel.onPlaylistsClicked()
         verify(analyticsTracker).track(AnalyticsEvent.WEAR_MAIN_LIST_FILTERS_TAPPED)
     }
 

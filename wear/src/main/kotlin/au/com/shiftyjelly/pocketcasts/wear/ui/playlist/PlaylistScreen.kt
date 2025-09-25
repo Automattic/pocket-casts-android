@@ -1,4 +1,4 @@
-package au.com.shiftyjelly.pocketcasts.wear.ui.filter
+package au.com.shiftyjelly.pocketcasts.wear.ui.playlist
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -18,27 +18,29 @@ import androidx.wear.compose.foundation.lazy.items
 import androidx.wear.compose.material.MaterialTheme
 import androidx.wear.compose.material.Text
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
+import au.com.shiftyjelly.pocketcasts.repositories.playlist.Playlist
 import au.com.shiftyjelly.pocketcasts.wear.ui.component.EpisodeChip
 import au.com.shiftyjelly.pocketcasts.wear.ui.component.LoadingScreen
 import au.com.shiftyjelly.pocketcasts.wear.ui.component.ScreenHeaderChip
-import au.com.shiftyjelly.pocketcasts.wear.ui.filter.FilterViewModel.UiState
+import au.com.shiftyjelly.pocketcasts.wear.ui.playlist.PlaylistViewModel.UiState
 import com.google.android.horologist.compose.layout.ScalingLazyColumn
 import com.google.android.horologist.compose.layout.ScalingLazyColumnState
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
-object FilterScreen {
-    const val ARGUMENT_FILTER_UUID = "filterUuid"
-    const val ROUTE = "filter/{$ARGUMENT_FILTER_UUID}"
+object PlaylistScreen {
+    const val ARGUMENT_PLAYLIST_UUID = "playlistUuid"
+    const val ARGUMENT_PLAYLIST_TYPE = "playlistType"
+    const val ROUTE = "playlist/{$ARGUMENT_PLAYLIST_UUID}/{$ARGUMENT_PLAYLIST_TYPE}"
 
-    fun navigateRoute(filterUuid: String) = "filter/$filterUuid"
+    fun navigateRoute(playlistUuid: String, playlistType: Playlist.Type) = "playlist/$playlistUuid/${playlistType.analyticsValue}"
 }
 
 @Composable
-fun FilterScreen(
+fun PlaylistScreen(
     columnState: ScalingLazyColumnState,
     onEpisodeTap: (PodcastEpisode) -> Unit,
     modifier: Modifier = Modifier,
-    viewModel: FilterViewModel = hiltViewModel(),
+    viewModel: PlaylistViewModel = hiltViewModel(),
 ) {
     val uiState by viewModel.uiState.collectAsState(UiState.Loading)
     val artworkConfiguration by viewModel.artworkConfiguration.collectAsState()
@@ -61,8 +63,8 @@ fun FilterScreen(
                 horizontalAlignment = Alignment.CenterHorizontally,
                 modifier = modifier.fillMaxSize(),
             ) {
-                state.filter?.let {
-                    ScreenHeaderChip(it.title)
+                state.playlistTitle?.let {
+                    ScreenHeaderChip(it)
                     Text(
                         text = stringResource(LR.string.filters_no_episodes),
                         modifier = Modifier.padding(16.dp),
@@ -72,7 +74,7 @@ fun FilterScreen(
                     )
                 } ?: run {
                     Text(
-                        text = stringResource(LR.string.filters_not_found),
+                        text = stringResource(LR.string.playlists_not_found),
                         modifier = Modifier.padding(16.dp),
                         textAlign = TextAlign.Center,
                         color = MaterialTheme.colors.onPrimary,
@@ -97,7 +99,7 @@ private fun Content(
         columnState = listState,
     ) {
         item {
-            ScreenHeaderChip(state.filter.title)
+            ScreenHeaderChip(state.playlistTitle)
         }
         items(items = state.episodes, key = { episode -> episode.uuid }) { episode ->
             EpisodeChip(
