@@ -2,7 +2,7 @@ package au.com.shiftyjelly.pocketcasts.wear.theme
 
 import androidx.compose.ui.graphics.Color
 import au.com.shiftyjelly.pocketcasts.compose.ThemeExtraDarkColors
-import au.com.shiftyjelly.pocketcasts.models.entity.PlaylistEntity
+import au.com.shiftyjelly.pocketcasts.models.to.PlaylistIcon
 import au.com.shiftyjelly.pocketcasts.repositories.extensions.colorIndex
 
 object WearColors {
@@ -15,5 +15,5 @@ object WearColors {
     val downloadedIcon = Color(0xFF54C483)
 
     fun getFolderColor(id: Int): Color = ThemeExtraDarkColors.getFolderColor(id)
-    fun getFilterColor(playlist: PlaylistEntity): Color = ThemeExtraDarkColors.getFilterColor(playlist.icon.colorIndex)
+    fun getFilterColor(icon: PlaylistIcon): Color = ThemeExtraDarkColors.getFilterColor(icon.colorIndex)
 }
