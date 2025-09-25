@@ -45,6 +45,7 @@ import au.com.shiftyjelly.pocketcasts.widget.PlayerWidgetManager
 import coil.Coil
 import coil.ImageLoader
 import com.google.firebase.FirebaseApp
+import com.squareup.moshi.Moshi
 import dagger.hilt.android.HiltAndroidApp
 import java.io.File
 import java.util.concurrent.Executors
@@ -71,6 +72,8 @@ class PocketCastsApplication :
     Configuration.Provider {
 
     @Inject lateinit var appLifecycleObserver: AppLifecycleObserver
+
+    @Inject lateinit var moshi: Moshi
 
     @Inject lateinit var statsManager: StatsManager
 
@@ -251,8 +254,9 @@ class PocketCastsApplication :
                 }
 
                 VersionMigrationsWorker.performMigrations(
-                    settings = settings,
                     context = this@PocketCastsApplication,
+                    settings = settings,
+                    moshi = moshi,
                 )
 
                 // check that we have .nomedia files in existing folders
