@@ -9,6 +9,7 @@ import au.com.shiftyjelly.pocketcasts.compose.text.SearchFieldState
 import au.com.shiftyjelly.pocketcasts.models.to.toPodcastEpisodes
 import au.com.shiftyjelly.pocketcasts.models.type.PlaylistEpisodeSortType
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
+import au.com.shiftyjelly.pocketcasts.preferences.model.AutoPlaySource
 import au.com.shiftyjelly.pocketcasts.repositories.download.DownloadManager
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.repositories.playlist.Playlist
@@ -324,6 +325,10 @@ class PlaylistViewModel @AssistedInject constructor(
 
     fun trackShowArchivedCtaTapped() {
         analyticsTracker.track(AnalyticsEvent.FILTER_SHOW_ARCHIVED_CTA_EMPTY_TAPPED)
+    }
+
+    fun updateAutoPlaySource() {
+        settings.trackingAutoPlaySource.set(AutoPlaySource.fromId(playlistUuid), updateModifiedAt = false)
     }
 
     data class UiState(
