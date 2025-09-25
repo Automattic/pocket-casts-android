@@ -41,6 +41,7 @@ data class SubscriptionResponse(
 @JsonClass(generateAdapter = true)
 data class SubscriptionFeatures(
     @Json(name = "removeBannerAds") val removeBannerAds: Boolean,
+    @Json(name = "removeDiscoverAds") val removeDiscoverAds: Boolean,
 )
 
 fun SubscriptionStatusResponse.toMembership(): Membership {
@@ -109,5 +110,8 @@ private val SubscriptionStatusResponse.fallbackSubscription
 private fun SubscriptionFeatures.toMembershipFeatures() = buildList {
     if (removeBannerAds) {
         add(MembershipFeature.NoBannerAds)
+    }
+    if (removeDiscoverAds) {
+        add(MembershipFeature.NoDiscoverAds)
     }
 }

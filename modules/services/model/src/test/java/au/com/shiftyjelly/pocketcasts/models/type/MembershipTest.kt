@@ -4,6 +4,7 @@ import au.com.shiftyjelly.pocketcasts.payment.BillingCycle
 import au.com.shiftyjelly.pocketcasts.payment.SubscriptionTier
 import java.time.Instant
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Test
 import org.junit.experimental.runners.Enclosed
@@ -22,6 +23,7 @@ class MembershipTest {
             )
 
             assertTrue(membership.hasFeature(MembershipFeature.NoBannerAds))
+            assertFalse(membership.hasFeature(MembershipFeature.NoDiscoverAds))
         }
     }
 
@@ -54,14 +56,17 @@ class MembershipTest {
             val expected = when (tier) {
                 SubscriptionTier.Plus -> when (feature) {
                     MembershipFeature.NoBannerAds -> true
+                    MembershipFeature.NoDiscoverAds -> true
                 }
 
                 SubscriptionTier.Patron -> when (feature) {
                     MembershipFeature.NoBannerAds -> true
+                    MembershipFeature.NoDiscoverAds -> true
                 }
 
                 null -> when (feature) {
                     MembershipFeature.NoBannerAds -> false
+                    MembershipFeature.NoDiscoverAds -> false
                 }
             }
 

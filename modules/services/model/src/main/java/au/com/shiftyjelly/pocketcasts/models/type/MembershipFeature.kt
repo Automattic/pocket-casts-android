@@ -27,14 +27,17 @@ data class Membership(
 @JsonClass(generateAdapter = false)
 enum class MembershipFeature {
     NoBannerAds,
+    NoDiscoverAds,
 }
 
 private fun SubscriptionTier.hasFeature(feature: MembershipFeature) = when (this) {
     SubscriptionTier.Plus -> when (feature) {
         MembershipFeature.NoBannerAds -> true
+        MembershipFeature.NoDiscoverAds -> true
     }
 
     SubscriptionTier.Patron -> when (feature) {
         MembershipFeature.NoBannerAds -> true
+        MembershipFeature.NoDiscoverAds -> true
     }
 }
