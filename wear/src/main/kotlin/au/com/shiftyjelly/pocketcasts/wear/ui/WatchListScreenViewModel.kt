@@ -64,7 +64,7 @@ class WatchListScreenViewModel @Inject constructor(
         analyticsTracker.track(AnalyticsEvent.WEAR_MAIN_LIST_DOWNLOADS_TAPPED)
     }
 
-    fun onFiltersClicked() {
+    fun onPlaylistsClicked() {
         analyticsTracker.track(AnalyticsEvent.WEAR_MAIN_LIST_FILTERS_TAPPED)
     }
 
