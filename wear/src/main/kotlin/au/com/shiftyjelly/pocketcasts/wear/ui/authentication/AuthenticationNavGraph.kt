@@ -5,6 +5,11 @@ package au.com.shiftyjelly.pocketcasts.wear.ui.authentication
 import android.widget.Toast
 import androidx.activity.compose.LocalActivity
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.navigation
@@ -71,6 +76,15 @@ fun NavGraphBuilder.authenticationNavGraph(
             route = AuthenticationNavRoutes.LOGIN_WITH_GOOGLE,
         ) {
             val activity = LocalActivity.current
+
+            var showErrorToast by remember { mutableStateOf(false) }
+
+            LaunchedEffect(activity, showErrorToast) {
+                if (showErrorToast) {
+                    Toast.makeText(activity, LR.string.onboarding_continue_with_google_error, Toast.LENGTH_SHORT).show()
+                }
+            }
+
             LoginWithGoogleScreen(
                 successContent = {
                     googleSignInSuccessScreen(GoogleAccountData(name = it.name, avatarUrl = it.avatarUrl))
@@ -80,7 +94,7 @@ fun NavGraphBuilder.authenticationNavGraph(
                     navController.navigate(AuthenticationNavRoutes.LOGIN_WITH_GOOGLE_LEGACY)
                 },
                 onGoogleNotAvailable = {
-                    Toast.makeText(activity, LR.string.onboarding_continue_with_google_error, Toast.LENGTH_SHORT).show()
+                    showErrorToast = true
                     navController.popBackStack()
                 },
             )
