@@ -119,6 +119,11 @@ class PlaylistFragment :
         return binding.root
     }
 
+    override fun onResume() {
+        super.onResume()
+        viewModel.updateAutoPlaySource()
+    }
+
     private fun PlaylistFragmentBinding.setupContent() {
         val headerAdapter = createHeaderAdapter(this)
         val episodesAdapter = createEpisodesAdapter(this)
