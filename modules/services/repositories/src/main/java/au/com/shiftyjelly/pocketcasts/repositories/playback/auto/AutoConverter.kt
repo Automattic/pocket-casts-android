@@ -24,7 +24,6 @@ import au.com.shiftyjelly.pocketcasts.localization.helper.RelativeDateFormatter
 import au.com.shiftyjelly.pocketcasts.localization.helper.tryToLocaliseFilters
 import au.com.shiftyjelly.pocketcasts.models.entity.BaseEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.Folder
-import au.com.shiftyjelly.pocketcasts.models.entity.PlaylistEntity
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.UserEpisode
@@ -37,7 +36,11 @@ import au.com.shiftyjelly.pocketcasts.repositories.images.PocketCastsImageReques
 import au.com.shiftyjelly.pocketcasts.repositories.playback.EXTRA_CONTENT_STYLE_GROUP_TITLE_HINT
 import au.com.shiftyjelly.pocketcasts.repositories.playback.EpisodeFileMetadata
 import au.com.shiftyjelly.pocketcasts.repositories.playback.FOLDER_ROOT_PREFIX
+import au.com.shiftyjelly.pocketcasts.repositories.playlist.Playlist
+import au.com.shiftyjelly.pocketcasts.repositories.playlist.PlaylistPreview
 import au.com.shiftyjelly.pocketcasts.utils.Util
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import coil.executeBlocking
 import coil.imageLoader
 import java.io.File
@@ -119,7 +122,7 @@ object AutoConverter {
         }
     }
 
-    fun convertPlaylistToMediaItem(context: Context, playlist: PlaylistEntity): MediaBrowserCompat.MediaItem {
+    fun convertPlaylistToMediaItem(context: Context, playlist: PlaylistPreview): MediaBrowserCompat.MediaItem {
         val mediaDescription = MediaDescriptionCompat.Builder()
             .setTitle(playlist.title.tryToLocaliseFilters(context.resources))
             .setMediaId(playlist.uuid)
@@ -189,12 +192,29 @@ object AutoConverter {
         return getBitmapUri(drawable = IR.drawable.auto_tab_podcasts, context = context)
     }
 
-    fun getPlaylistBitmapUri(playlist: PlaylistEntity?, context: Context): Uri {
-        val drawableId = if (Util.isAutomotive(context)) {
-            // the Automotive UI displays the icon in a list that requires more padding around the icon
-            playlist?.icon?.automotiveDrawableId ?: IR.drawable.automotive_filter_play
+    fun getPlaylistBitmapUri(playlist: PlaylistPreview, context: Context): Uri {
+        val icon = playlist.icon
+        val nonDefaultIcon = icon.takeIf { it.id != 0 }
+
+        val drawableId = if (FeatureFlag.isEnabled(Feature.PLAYLISTS_REBRANDING, immutable = true)) {
+            when (playlist.type) {
+                Playlist.Type.Manual -> if (Util.isAutomotive(context)) {
+                    IR.drawable.ic_automotive_playlist_manual
+                } else {
+                    IR.drawable.ic_auto_playlist_manual
+                }
+                Playlist.Type.Smart -> if (Util.isAutomotive(context)) {
+                    nonDefaultIcon?.automotiveDrawableId ?: IR.drawable.ic_automotive_playlist_smart
+                } else {
+                    nonDefaultIcon?.autoDrawableId ?: IR.drawable.ic_auto_playlist_smart
+                }
+            }
         } else {
-            playlist?.icon?.autoDrawableId ?: IR.drawable.auto_filter_play
+            if (Util.isAutomotive(context)) {
+                icon.automotiveDrawableId
+            } else {
+                icon.autoDrawableId
+            }
         }
         return getBitmapUri(drawableId, context)
     }
