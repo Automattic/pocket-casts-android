@@ -16,15 +16,16 @@ import au.com.shiftyjelly.pocketcasts.repositories.sync.SyncManager
 import au.com.shiftyjelly.pocketcasts.utils.extensions.isGooglePlayServicesAvailableSuccess
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import com.google.android.gms.common.GoogleApiAvailability
+import com.google.android.libraries.identity.googleid.GetGoogleIdOption
 import com.google.android.libraries.identity.googleid.GetSignInWithGoogleOption
 import com.google.android.libraries.identity.googleid.GoogleIdTokenCredential
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
+import java.util.UUID
+import javax.inject.Inject
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
-import java.util.UUID
-import javax.inject.Inject
 
 @HiltViewModel
 class LoginWithGoogleViewModel @Inject constructor(
@@ -60,9 +61,11 @@ class LoginWithGoogleViewModel @Inject constructor(
         if (isGoogleSignInAvailable) {
             viewModelScope.launch {
                 runCatching {
-                    val googleIdOption: GetSignInWithGoogleOption = GetSignInWithGoogleOption.Builder(
-                        serverClientId = Settings.GOOGLE_SIGN_IN_SERVER_CLIENT_ID,
-                    ).setNonce(UUID.randomUUID().toString()).build()
+                    val googleIdOption: GetGoogleIdOption = GetGoogleIdOption.Builder()
+                        .setFilterByAuthorizedAccounts(false)
+                        .setServerClientId(Settings.GOOGLE_SIGN_IN_SERVER_CLIENT_ID)
+                        .setNonce(UUID.randomUUID().toString())
+                        .build()
 
                     val request: GetCredentialRequest = GetCredentialRequest.Builder()
                         .addCredentialOption(googleIdOption)
