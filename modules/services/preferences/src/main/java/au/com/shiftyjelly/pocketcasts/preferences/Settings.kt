@@ -9,6 +9,7 @@ import au.com.shiftyjelly.pocketcasts.models.to.PlaybackEffects
 import au.com.shiftyjelly.pocketcasts.models.to.PodcastGrouping
 import au.com.shiftyjelly.pocketcasts.models.to.RefreshState
 import au.com.shiftyjelly.pocketcasts.models.type.AutoDownloadLimitSetting
+import au.com.shiftyjelly.pocketcasts.models.type.Membership
 import au.com.shiftyjelly.pocketcasts.models.type.PodcastsSortType
 import au.com.shiftyjelly.pocketcasts.models.type.Subscription
 import au.com.shiftyjelly.pocketcasts.preferences.model.AppIconSetting
@@ -445,7 +446,8 @@ interface Settings {
     val cloudAutoUpload: UserSetting<Boolean>
     val cloudAutoDownload: UserSetting<Boolean>
     val cloudDownloadOnlyOnWifi: UserSetting<Boolean>
-    val cachedSubscription: UserSetting<Subscription?>
+    val cachedMembership: UserSetting<Membership>
+    val cachedSubscription: ReadSetting<Subscription?>
 
     val upgradeProfileClosed: UserSetting<Boolean>
     fun getUpgradeClosedAddFile(): Boolean

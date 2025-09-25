@@ -27,6 +27,7 @@ import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import au.com.shiftyjelly.pocketcasts.utils.log.RxJavaUncaughtExceptionHandling
 import com.google.android.gms.common.ConnectionResult
 import com.google.android.gms.common.GoogleApiAvailability
+import com.squareup.moshi.Moshi
 import dagger.hilt.android.HiltAndroidApp
 import java.io.File
 import java.util.concurrent.Executors
@@ -42,6 +43,8 @@ import timber.log.Timber
 class AutomotiveApplication :
     Application(),
     Configuration.Provider {
+
+    @Inject lateinit var moshi: Moshi
 
     @Inject lateinit var podcastManager: PodcastManager
 
@@ -100,8 +103,9 @@ class AutomotiveApplication :
             }
 
             VersionMigrationsWorker.performMigrations(
-                settings = settings,
                 context = this@AutomotiveApplication,
+                settings = settings,
+                moshi = moshi,
             )
         }
 
