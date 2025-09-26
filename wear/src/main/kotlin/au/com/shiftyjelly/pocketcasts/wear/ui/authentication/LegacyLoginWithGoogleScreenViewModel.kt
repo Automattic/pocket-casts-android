@@ -19,7 +19,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 
 @HiltViewModel
-class LoginWithGoogleScreenViewModel @Inject constructor(
+class LegacyLoginWithGoogleScreenViewModel @Inject constructor(
     googleSignInClient: GoogleSignInClient,
     private val podcastManager: PodcastManager,
     private val syncManager: SyncManager,

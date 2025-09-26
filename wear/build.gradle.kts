@@ -128,6 +128,9 @@ dependencies {
     implementation(libs.wear.remote.interactions)
     implementation(libs.wear.tooling.preview)
     implementation(libs.work.runtime)
+    implementation(libs.credentials)
+    implementation(libs.credentials.google.play)
+    implementation(libs.google.identity)
 
     implementation(projects.modules.features.account)
     implementation(projects.modules.features.player)
