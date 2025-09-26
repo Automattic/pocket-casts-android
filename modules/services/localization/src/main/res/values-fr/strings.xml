@@ -1,11 +1,41 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2025-09-09 11:54:06+0000
+Translation-Revision-Date: 2025-09-25 09:54:04+0000
 Plural-Forms: nplurals=2; plural=n > 1;
 Generator: GlotPress/2.4.0-alpha
 Language: fr
 -->
 <resources>
+    <string name="smart_playlists">Listes de lecture intelligentes</string>
+    <string name="select_smart_playlists">Sélectionner des listes de lecture intelligentes</string>
+    <string name="podcast_not_in_playlists">Inclus dans aucune liste de lecture intelligente</string>
+    <string name="playlist_is_full_description">La liste de lecture est pleine. Essayez d’en créer une nouvelle.</string>
+    <string name="add_to_playlist_no_playlist_found_title">Ajouter à la liste de lecture</string>
+    <string name="add_to_playlist_no_playlist_found_body">Nous n’avons trouvé aucune liste de lecture correspondant à cette recherche. Créez une nouvelle liste de lecture ou essayez un autre mot clé.</string>
+    <string name="add_to_playlist_find_playlist">Trouver une liste de lecture</string>
+    <string name="add_to_playlist_description">Ajouter à la liste de lecture</string>
+    <string name="remove_from_playlist">Retirer de la liste de lecture</string>
+    <string name="add_to_up_next_bottom">Ajouter à la file d’attente en bas</string>
+    <string name="add_to_up_next_top">Ajouter à la file d’attente en haut</string>
+    <string name="playlist_episodes_archived_title">Aucun épisode</string>
+    <string name="playlist_episodes_archived_count">%1$d archivé(s)</string>
+    <string name="playlist_edit_episodes_title">Modifier la liste de lecture</string>
+    <string name="playlist_edit_episodes">Réorganiser les épisodes</string>
+    <string name="playlist_unarchive_all">Tout désarchiver</string>
+    <string name="playlist_episode_unavailable_cta">Retirer de la liste de lecture</string>
+    <string name="playlist_episode_unavailable_description">Le créateur du podcast a supprimé cet épisode. Il restera dans votre liste de lecture jusqu’à ce que vous le supprimiez.</string>
+    <string name="playlist_episode_unavailable_title">Épisode non disponible</string>
+    <string name="playlist_archive_all">Tout archiver</string>
+    <string name="episode_sort_custom_order">Ordre personnalisé</string>
+    <string name="manual_playlist_search_no_podcast_or_folder_body">Nous n’avons trouvé aucun podcast ou dossier correspondant à cette recherche. Essayez un autre mot clé.</string>
+    <string name="manual_playlist_search_no_podcast_title">Aucun podcast trouvé</string>
+    <string name="manual_playlist_search_no_podcast_body">Nous n’avons trouvé aucun podcast correspondant à cette recherche. Essayez un autre mot clé.</string>
+    <string name="manual_playlist_no_available_episode_title">Aucun épisode disponible</string>
+    <string name="manual_playlist_no_available_episode_body">Il semble que vous ayez ajouté tous les épisodes de cette émission.</string>
+    <string name="manual_playlist_no_content_title_alternative">Commencer à créer votre liste de lecture</string>
+    <string name="manual_playlist_no_content_title">Ajouter des épisodes à votre liste de lecture</string>
+    <string name="manual_playlist_no_content_body">Balayez un épisode vers la gauche pour l’ajouter à votre liste de lecture.</string>
+    <string name="browse_shows">Parcourir les émissions</string>
     <string name="unavailable">Indisponible</string>
     <string name="add_to_playlist_failure_message">Cette liste de lecture est pleine. Supprimez quelques épisodes ou commencez-en une nouvelle.</string>
     <string name="added_to_playlist">%1$s ajouté à « %2$s »</string>
@@ -2176,6 +2206,14 @@ Language: fr
         <item quantity="one" formatted="true">%1$d épisode - %2$s restant</item>
         <item quantity="other" formatted="true">%1$d épisodes - %2$s restant(s)</item>
     </plurals>
+    <plurals name="playlist_episodes_archived_description">
+        <item quantity="one">Votre épisode dans cette liste de lecture a été archivé</item>
+        <item quantity="other">Les %1$d épisodes de cette liste de lecture ont tous été archivés</item>
+    </plurals>
+    <plurals name="playlists_selected_count">
+        <item quantity="one">%1$d liste de lecture sélectionnée</item>
+        <item quantity="other">%1$d listes de lecture sélectionnées</item>
+    </plurals>
     <plurals name="podcast">
         <item quantity="one">Podcast</item>
         <item quantity="other">Podcasts</item>
@@ -2231,6 +2269,10 @@ Language: fr
     <plurals name="second_short">
         <item quantity="one">s</item>
         <item quantity="other">s</item>
+    </plurals>
+    <plurals name="second_with_count">
+        <item quantity="one">%1$d seconde</item>
+        <item quantity="other">%1$d secondes</item>
     </plurals>
     <plurals name="settings_auto_download_on_follow_podcast_description">
         <item quantity="one">Téléchargez automatiquement le dernier épisode des nouvelles émissions auxquelles vous vous abonnez.</item>
