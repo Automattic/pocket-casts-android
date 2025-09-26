@@ -1,11 +1,24 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2025-09-11 17:26:40+0000
+Translation-Revision-Date: 2025-09-24 10:18:05+0000
 Plural-Forms: nplurals=2; plural=n != 1;
 Generator: GlotPress/2.4.0-alpha
 Language: ca
 -->
 <resources>
+    <string name="smart_playlists">Llistes de reproducció intel·ligents</string>
+    <string name="select_smart_playlists">Selecciona llistes de reproducció intel·ligents</string>
+    <string name="podcast_not_in_playlists">No inclòs en cap llista de reproducció intel·ligent</string>
+    <string name="playlist_is_full_description">La llista de reproducció està plena. Prova a crear-ne una de nova.</string>
+    <string name="add_to_playlist_no_playlist_found_title">Afegeix a la llista de reproducció</string>
+    <string name="add_to_playlist_no_playlist_found_body">No hem pogut trobar cap llista de reproducció amb aquesta cerca. Crea’n una de nova o prova amb una altra paraula clau.</string>
+    <string name="add_to_playlist_find_playlist">Cercar una llista de reproducció</string>
+    <string name="add_to_playlist_description">Afegeix a la llista de reproducció</string>
+    <string name="remove_from_playlist">Esborrar de la llista de reproducció</string>
+    <string name="add_to_up_next_bottom">Afegir al final de la cua</string>
+    <string name="add_to_up_next_top">Afegir al principi de la cua</string>
+    <string name="playlist_episodes_archived_title">No hi ha episodis</string>
+    <string name="playlist_episodes_archived_count">%1$d arxivats</string>
     <string name="playlist_edit_episodes_title">Editar la llista</string>
     <string name="playlist_edit_episodes">Reorganitzar els episodis</string>
     <string name="playlist_unarchive_all">Desarxiva-ho tot</string>
@@ -2193,6 +2206,14 @@ Language: ca
         <item quantity="one" formatted="true">%1$d episodi - queden %2$s</item>
         <item quantity="other" formatted="true">%1$d episodis - queden %2$s</item>
     </plurals>
+    <plurals name="playlist_episodes_archived_description">
+        <item quantity="one">El teu episodi en aquesta llista de reproducció s’ha arxivat</item>
+        <item quantity="other">Tots els %1$d episodis d’aquesta llista de reproducció s’han arxivat</item>
+    </plurals>
+    <plurals name="playlists_selected_count">
+        <item quantity="one">%1$d llista de reproducció seleccionada</item>
+        <item quantity="other">%1$d llistes de reproducció seleccionades</item>
+    </plurals>
     <plurals name="podcast">
         <item quantity="one">Pòdcast</item>
         <item quantity="other">Pòdcasts</item>
@@ -2248,6 +2269,10 @@ Language: ca
     <plurals name="second_short">
         <item quantity="one">seg</item>
         <item quantity="other">segns</item>
+    </plurals>
+    <plurals name="second_with_count">
+        <item quantity="one">%1$d segon</item>
+        <item quantity="other">%1$d segons</item>
     </plurals>
     <plurals name="settings_auto_download_on_follow_podcast_description">
         <item quantity="one">Descarrega automàticament l\'últim episodi dels nous pòdcasts que segueixes.</item>

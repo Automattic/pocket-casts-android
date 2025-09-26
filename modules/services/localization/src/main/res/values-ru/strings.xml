@@ -1,11 +1,41 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2025-09-09 18:54:04+0000
+Translation-Revision-Date: 2025-09-25 15:54:03+0000
 Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);
 Generator: GlotPress/2.4.0-alpha
 Language: ru
 -->
 <resources>
+    <string name="smart_playlists">Умные плейлисты</string>
+    <string name="select_smart_playlists">Выбрать умные плейлисты</string>
+    <string name="podcast_not_in_playlists">Не включено ни в один умный плейлист</string>
+    <string name="playlist_is_full_description">Плейлист заполнен до отказа. Попробуйте создать новый.</string>
+    <string name="add_to_playlist_no_playlist_found_title">Добавить в плейлист</string>
+    <string name="add_to_playlist_no_playlist_found_body">Не удалось найти плейлисты по этому запросу. Создайте новый плейлист или попробуйте другое ключевое слово.</string>
+    <string name="add_to_playlist_find_playlist">Найти плейлист</string>
+    <string name="add_to_playlist_description">Добавить в плейлист</string>
+    <string name="remove_from_playlist">Удалить из плейлиста</string>
+    <string name="add_to_up_next_bottom">Добавить в конец списка «Следующие»</string>
+    <string name="add_to_up_next_top">Добавить в начало списка «Следующие»</string>
+    <string name="playlist_episodes_archived_title">Нет выпусков</string>
+    <string name="playlist_episodes_archived_count">Архивировано: %1$d</string>
+    <string name="playlist_edit_episodes_title">Редактировать плейлист</string>
+    <string name="playlist_edit_episodes">Изменить очерёдность выпусков</string>
+    <string name="playlist_unarchive_all">Разархивировать все</string>
+    <string name="playlist_episode_unavailable_cta">Удалить из плейлиста</string>
+    <string name="playlist_episode_unavailable_description">Автор подкаста удалил этот выпуск. Он останется в вашем плейлисте, пока вы его не удалите.</string>
+    <string name="playlist_episode_unavailable_title">Выпуск недоступен</string>
+    <string name="playlist_archive_all">Архивировать все</string>
+    <string name="episode_sort_custom_order">Произвольный порядок</string>
+    <string name="manual_playlist_search_no_podcast_or_folder_body">Не удалось найти выпуски и папки по этому запросу. Попробуйте поискать по другому ключевому слову.</string>
+    <string name="manual_playlist_search_no_podcast_title">Подкастов не найдено</string>
+    <string name="manual_playlist_search_no_podcast_body">Не удалось найти подкасты по этому запросу. Попробуйте поискать по другому ключевому слову.</string>
+    <string name="manual_playlist_no_available_episode_title">Нет доступных выпусков</string>
+    <string name="manual_playlist_no_available_episode_body">По-видимому, вы добавили все выпуски этого шоу.</string>
+    <string name="manual_playlist_no_content_title_alternative">Создать плейлист</string>
+    <string name="manual_playlist_no_content_title">Добавить выпуски в плейлист</string>
+    <string name="manual_playlist_no_content_body">Смахните выпуск влево, чтобы добавить его в плейлист.</string>
+    <string name="browse_shows">Просмотр шоу</string>
     <string name="unavailable">Недоступно</string>
     <string name="add_to_playlist_failure_message">Этот плейлист заполнен. Удалите несколько выпусков или создайте новый плейлист.</string>
     <string name="added_to_playlist">%1$s добавлен в «%2$s»</string>
@@ -2189,6 +2219,16 @@ Language: ru
         <item quantity="few">%1$d вып. — %2$s осталось</item>
         <item quantity="many">%1$d вып. — %2$s осталось</item>
     </plurals>
+    <plurals name="playlist_episodes_archived_description">
+        <item quantity="one">Ваш выпуск в этом плейлисте архивирован</item>
+        <item quantity="few">Все выпуски (%1$d) в этом плейлисте архивированы</item>
+        <item quantity="many">Все выпуски (%1$d) в этом плейлисте архивированы</item>
+    </plurals>
+    <plurals name="playlists_selected_count">
+        <item quantity="one">Выбрано плейлистов: %1$d</item>
+        <item quantity="few">Выбрано плейлистов: %1$d</item>
+        <item quantity="many">Выбрано плейлистов: %1$d</item>
+    </plurals>
     <plurals name="podcast">
         <item quantity="one">Подкаст</item>
         <item quantity="few">Подкасты</item>
@@ -2258,6 +2298,11 @@ Language: ru
         <item quantity="one">сек.</item>
         <item quantity="few">с.</item>
         <item quantity="many">с.</item>
+    </plurals>
+    <plurals name="second_with_count">
+        <item quantity="one">%1$d сек</item>
+        <item quantity="few">%1$d сек</item>
+        <item quantity="many">%1$d сек</item>
     </plurals>
     <plurals name="settings_auto_download_on_follow_podcast_description">
         <item quantity="one">Автоматически загружать свежие выпуски новых шоу, на которые вы подписаны.</item>

@@ -1,11 +1,41 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2025-09-09 09:54:04+0000
+Translation-Revision-Date: 2025-09-25 09:54:03+0000
 Plural-Forms: nplurals=1; plural=0;
 Generator: GlotPress/2.4.0-alpha
 Language: ko_KR
 -->
 <resources>
+    <string name="smart_playlists">스마트 재생목록</string>
+    <string name="select_smart_playlists">스마트 재생목록 선택</string>
+    <string name="podcast_not_in_playlists">어떤 스마트 재생목록에도 포함되지 않음</string>
+    <string name="playlist_is_full_description">재생목록이 가득 찼습니다. 새로운 재생목록을 만들어 보세요.</string>
+    <string name="add_to_playlist_no_playlist_found_title">재생목록에 추가</string>
+    <string name="add_to_playlist_no_playlist_found_body">해당 검색어와 일치하는 재생목록을 찾을 수 없습니다. 새 재생목록을 만들거나 다른 키워드로 검색해 보세요.</string>
+    <string name="add_to_playlist_find_playlist">재생목록 찾기</string>
+    <string name="add_to_playlist_description">재생목록에 추가</string>
+    <string name="remove_from_playlist">재생목록에서 제거</string>
+    <string name="add_to_up_next_bottom">다음 차례에 추가(맨 끝)</string>
+    <string name="add_to_up_next_top">다음 차례에 추가(맨 처음)</string>
+    <string name="playlist_episodes_archived_title">에피소드 없음</string>
+    <string name="playlist_episodes_archived_count">%1$d개 보관됨</string>
+    <string name="playlist_edit_episodes_title">재생목록 편집</string>
+    <string name="playlist_edit_episodes">에피소드 재정렬</string>
+    <string name="playlist_unarchive_all">모두 보관 해제</string>
+    <string name="playlist_episode_unavailable_cta">재생목록에서 제거</string>
+    <string name="playlist_episode_unavailable_description">팟캐스트 크리에이터가 이 에피소드를 삭제했습니다. 회원님이 제거할 때까지 회원님 재생목록에는 남아 있습니다.</string>
+    <string name="playlist_episode_unavailable_title">에피소드를 사용할 수 없음</string>
+    <string name="playlist_archive_all">모두 보관</string>
+    <string name="episode_sort_custom_order">사용자 정의 순서</string>
+    <string name="manual_playlist_search_no_podcast_or_folder_body">해당 검색어의 에피소드 또는 폴더를 찾을 수 없습니다. 다른 키워드를 사용해 보세요.</string>
+    <string name="manual_playlist_search_no_podcast_title">팟캐스트를 찾을 수 없음</string>
+    <string name="manual_playlist_search_no_podcast_body">해당 검색어의 에피소드를 찾을 수 없습니다. 다른 키워드를 사용해 보세요.</string>
+    <string name="manual_playlist_no_available_episode_title">사용 가능한 에피소드 없음</string>
+    <string name="manual_playlist_no_available_episode_body">이 프로그램의 모든 에피소드를 추가하신 것 같습니다.</string>
+    <string name="manual_playlist_no_content_title_alternative">회원님의 재생목록 만들기 시작</string>
+    <string name="manual_playlist_no_content_title">회원님의 재생목록에 에피소드 추가</string>
+    <string name="manual_playlist_no_content_body">에피소드를 왼쪽으로 살짝 밀어서 회원님의 재생목록에 추가하세요.</string>
+    <string name="browse_shows">프로그램 찾아보기</string>
     <string name="unavailable">사용할 수 없음</string>
     <string name="add_to_playlist_failure_message">이 재생 목록은 가득 찼습니다. 몇몇 에피소드를 삭제하거나 새로운 에피소드를 시작하세요.</string>
     <string name="added_to_playlist">“%2$s”에 %1$s 추가됨</string>
@@ -2163,6 +2193,12 @@ Language: ko_KR
     <plurals name="player_up_next_header_title">
         <item quantity="other" formatted="true">%1$d 에피소드 - %2$s 남음</item>
     </plurals>
+    <plurals name="playlist_episodes_archived_description">
+        <item quantity="other">이 재생목록의 에피소드 %1$d개가 모두 보관되었음</item>
+    </plurals>
+    <plurals name="playlists_selected_count">
+        <item quantity="other">재생목록 %1$d개 선택됨</item>
+    </plurals>
     <plurals name="podcast">
         <item quantity="other">팟캐스트</item>
     </plurals>
@@ -2204,6 +2240,9 @@ Language: ko_KR
     </plurals>
     <plurals name="second_short">
         <item quantity="other">초</item>
+    </plurals>
+    <plurals name="second_with_count">
+        <item quantity="other">%1$d초</item>
     </plurals>
     <plurals name="settings_auto_download_on_follow_podcast_description">
         <item quantity="other">팔로우하는 새 프로그램의 최신 에피소드 %s개를 자동으로 다운로드하세요.</item>
