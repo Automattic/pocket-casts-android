@@ -13,8 +13,8 @@ import au.com.shiftyjelly.pocketcasts.models.to.PlaybackEffects
 import au.com.shiftyjelly.pocketcasts.models.to.PodcastGrouping
 import au.com.shiftyjelly.pocketcasts.models.to.RefreshState
 import au.com.shiftyjelly.pocketcasts.models.type.AutoDownloadLimitSetting
+import au.com.shiftyjelly.pocketcasts.models.type.Membership
 import au.com.shiftyjelly.pocketcasts.models.type.PodcastsSortType
-import au.com.shiftyjelly.pocketcasts.models.type.Subscription
 import au.com.shiftyjelly.pocketcasts.models.type.TrimMode
 import au.com.shiftyjelly.pocketcasts.preferences.Settings.Companion.DEFAULT_MAX_AUTO_ADD_LIMIT
 import au.com.shiftyjelly.pocketcasts.preferences.Settings.Companion.GLOBAL_AUTO_DOWNLOAD_NONE
@@ -1071,24 +1071,26 @@ class SettingsImpl @Inject constructor(
         sharedPrefs = sharedPreferences,
     )
 
-    private val subscriptionAdapter = moshi.adapter(Subscription::class.java)
+    private val membershipAdapter = moshi.adapter(Membership::class.java)
 
-    override val cachedSubscription = UserSetting.PrefFromString<Subscription?>(
-        sharedPrefKey = "user_subscription",
-        defaultValue = null,
+    override val cachedMembership = UserSetting.PrefFromString(
+        sharedPrefKey = "user_membership",
+        defaultValue = Membership.Empty,
         sharedPrefs = privatePreferences,
         fromString = { value ->
             value
                 .takeIf(String::isNotEmpty)
                 ?.let(::decrypt)
-                ?.let { decryptedValue -> runCatching { subscriptionAdapter.fromJson(decryptedValue) }.getOrNull() }
+                ?.let { decryptedValue -> runCatching { membershipAdapter.fromJson(decryptedValue) } }
+                ?.getOrNull()
+                ?: Membership.Empty
         },
-        toString = { value ->
-            value
-                ?.let(subscriptionAdapter::toJson)
-                ?.let(::encrypt)
-                .orEmpty()
-        },
+        toString = { value -> encrypt(membershipAdapter.toJson(value)) },
+    )
+
+    override val cachedSubscription = DelegatedSetting(
+        delegate = cachedMembership,
+        mapper = { membership -> membership.subscription },
     )
 
     override val headphoneControlsNextAction = HeadphoneActionUserSetting(

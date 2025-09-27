@@ -1,11 +1,41 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2025-09-10 09:54:05+0000
+Translation-Revision-Date: 2025-09-25 09:54:04+0000
 Plural-Forms: nplurals=1; plural=0;
 Generator: GlotPress/2.4.0-alpha
 Language: ja_JP
 -->
 <resources>
+    <string name="smart_playlists">スマートプレイリスト</string>
+    <string name="select_smart_playlists">スマートプレイリストを選択</string>
+    <string name="podcast_not_in_playlists">どのスマートプレイリストにも含まれない</string>
+    <string name="playlist_is_full_description">プレイリストがいっぱいです。 新しいプレイリストの作成をお試しください。</string>
+    <string name="add_to_playlist_no_playlist_found_title">プレイリストに追加</string>
+    <string name="add_to_playlist_no_playlist_found_body">その検索に該当するプレイリストは見つかりませんでした。 新しいプレイリストを作成するか、別のキーワードをお試しください。</string>
+    <string name="add_to_playlist_find_playlist">プレイリストを検索</string>
+    <string name="add_to_playlist_description">プレイリストに追加</string>
+    <string name="remove_from_playlist">プレイリストから削除</string>
+    <string name="add_to_up_next_bottom">「次のエピソード待機リスト」の下部に追加</string>
+    <string name="add_to_up_next_top">「次のエピソード待機リスト」の上部に追加</string>
+    <string name="playlist_episodes_archived_title">エピソードなし</string>
+    <string name="playlist_episodes_archived_count">%1$d件をアーカイブ済み</string>
+    <string name="playlist_edit_episodes_title">プレイリストを編集</string>
+    <string name="playlist_edit_episodes">エピソードを並べ替え</string>
+    <string name="playlist_unarchive_all">すべてのアーカイブを解除</string>
+    <string name="playlist_episode_unavailable_cta">プレイリストから削除</string>
+    <string name="playlist_episode_unavailable_description">ポッドキャスト作成者がこのエピソードを削除しました。 あなたが削除するまでは、ご自身のプレイリストに残ります。</string>
+    <string name="playlist_episode_unavailable_title">エピソードが利用できません</string>
+    <string name="playlist_archive_all">すべてアーカイブ</string>
+    <string name="episode_sort_custom_order">カスタムオーダー</string>
+    <string name="manual_playlist_search_no_podcast_or_folder_body">その検索に該当するポッドキャストまたはフォルダーは見つかりませんでした。 別のキーワードを試してください。</string>
+    <string name="manual_playlist_search_no_podcast_title">ポッドキャストが見つかりません</string>
+    <string name="manual_playlist_search_no_podcast_body">その検索に該当するポッドキャストは見つかりませんでした。 別のキーワードを試してください。</string>
+    <string name="manual_playlist_no_available_episode_title">利用可能なエピソードはありません</string>
+    <string name="manual_playlist_no_available_episode_body">この番組のすべてのエピソードが追加されたようです。</string>
+    <string name="manual_playlist_no_content_title_alternative">プレイリストの構築を開始</string>
+    <string name="manual_playlist_no_content_title">プレイリストにエピソードを追加</string>
+    <string name="manual_playlist_no_content_body">エピソードを左にスワイプしてプレイリストに追加します。</string>
+    <string name="browse_shows">番組を表示</string>
     <string name="unavailable">利用できません</string>
     <string name="add_to_playlist_failure_message">このプレイリストはいっぱいです。 エピソードをいくつか削除するか、新しいエピソードを開始します。</string>
     <string name="added_to_playlist">%1$s を「%2$s」に追加しました</string>
@@ -2163,6 +2193,12 @@ Language: ja_JP
     <plurals name="player_up_next_header_title">
         <item quantity="other" formatted="true">%1$d件のエピソード - 残り%2$s</item>
     </plurals>
+    <plurals name="playlist_episodes_archived_description">
+        <item quantity="other">このプレイリストの%1$d件のエピソードがすべてアーカイブされました</item>
+    </plurals>
+    <plurals name="playlists_selected_count">
+        <item quantity="other">%1$d件のプレイリストを選択済み</item>
+    </plurals>
     <plurals name="podcast">
         <item quantity="other">ポッドキャスト</item>
     </plurals>
@@ -2204,6 +2240,9 @@ Language: ja_JP
     </plurals>
     <plurals name="second_short">
         <item quantity="other">秒</item>
+    </plurals>
+    <plurals name="second_with_count">
+        <item quantity="other">%1$d秒</item>
     </plurals>
     <plurals name="settings_auto_download_on_follow_podcast_description">
         <item quantity="other">フォローする新しい番組から最新エピソード%s件を自動でダウンロードします。</item>
