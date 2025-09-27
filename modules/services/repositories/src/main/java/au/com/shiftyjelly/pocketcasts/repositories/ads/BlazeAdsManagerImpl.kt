@@ -4,6 +4,7 @@ import android.content.Context
 import au.com.shiftyjelly.pocketcasts.models.db.AppDatabase
 import au.com.shiftyjelly.pocketcasts.models.entity.BlazeAd
 import au.com.shiftyjelly.pocketcasts.models.type.BlazeAdLocation
+import au.com.shiftyjelly.pocketcasts.models.type.MembershipFeature
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.servers.cdn.StaticServiceManager
 import au.com.shiftyjelly.pocketcasts.utils.Util
@@ -32,7 +33,7 @@ class BlazeAdsManagerImpl @Inject constructor(
     private val blazeAdDao = appDatabase.blazeAdDao()
 
     override suspend fun updateAds() {
-        if (settings.cachedSubscription.value != null || Util.isAutomotive(context) || Util.isWearOs(context)) {
+        if (settings.cachedMembership.value.hasFeature(MembershipFeature.NoBannerAds) || Util.isAutomotive(context) || Util.isWearOs(context)) {
             // don't fetch the ads if the user has a subscription, or on Automotive or Wear OS
             return
         }
@@ -60,11 +61,11 @@ class BlazeAdsManagerImpl @Inject constructor(
             return flowOf(null)
         }
         return combine(
-            settings.cachedSubscription.flow,
+            settings.cachedMembership.flow,
             FeatureFlag.isEnabledFlow(featureFlag),
             ::Pair,
-        ).flatMapLatest { (subscription, isEnabled) ->
-            if (isEnabled && subscription == null) {
+        ).flatMapLatest { (membership, isEnabled) ->
+            if (isEnabled && !membership.hasFeature(MembershipFeature.NoBannerAds)) {
                 blazeAdDao.findByLocationFlow(location)
                     .map { promotions -> promotions.firstOrNull() }
             } else {

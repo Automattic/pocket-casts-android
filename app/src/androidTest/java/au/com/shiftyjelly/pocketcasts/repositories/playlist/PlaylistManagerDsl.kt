@@ -17,6 +17,7 @@ import au.com.shiftyjelly.pocketcasts.models.entity.PlaylistEntity
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.models.to.PlaylistEpisode
+import au.com.shiftyjelly.pocketcasts.models.type.Membership
 import au.com.shiftyjelly.pocketcasts.models.type.PlaylistEpisodeSortType
 import au.com.shiftyjelly.pocketcasts.models.type.PodcastsSortType
 import au.com.shiftyjelly.pocketcasts.models.type.SmartRules
@@ -146,11 +147,14 @@ class PlaylistManagerDsl : TestWatcher() {
     }
 
     fun setNoSubscription() {
-        settings.cachedSubscription.set(null, updateModifiedAt = false)
+        settings.cachedMembership.set(Membership.Empty, updateModifiedAt = false)
     }
 
     fun setPlusSubscription() {
-        settings.cachedSubscription.set(Subscription.PlusPreview, updateModifiedAt = false)
+        settings.cachedMembership.set(
+            Membership.Empty.copy(subscription = Subscription.PlusPreview),
+            updateModifiedAt = false,
+        )
     }
 
     fun cleanData() {

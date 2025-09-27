@@ -24,6 +24,7 @@ import au.com.shiftyjelly.pocketcasts.utils.TimberDebugTree
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import au.com.shiftyjelly.pocketcasts.utils.log.RxJavaUncaughtExceptionHandling
 import com.google.firebase.FirebaseApp
+import com.squareup.moshi.Moshi
 import dagger.hilt.android.HiltAndroidApp
 import java.io.File
 import java.util.concurrent.Executors
@@ -37,6 +38,8 @@ import timber.log.Timber
 class PocketCastsWearApplication :
     Application(),
     Configuration.Provider {
+
+    @Inject lateinit var moshi: Moshi
 
     @Inject lateinit var appLifecycleObserver: AppLifecycleObserver
 
@@ -113,8 +116,9 @@ class PocketCastsWearApplication :
             }
 
             VersionMigrationsWorker.performMigrations(
-                settings = settings,
                 context = this@PocketCastsWearApplication,
+                settings = settings,
+                moshi = moshi,
             )
         }
 

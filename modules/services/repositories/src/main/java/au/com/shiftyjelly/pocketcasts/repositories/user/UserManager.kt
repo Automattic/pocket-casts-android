@@ -17,7 +17,6 @@ import au.com.shiftyjelly.pocketcasts.repositories.notification.NotificationSche
 import au.com.shiftyjelly.pocketcasts.repositories.notification.TrendingAndRecommendationsNotificationType
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.repositories.playback.UpNextQueue
-import au.com.shiftyjelly.pocketcasts.repositories.playlist.DefaultPlaylistsInitializater
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.FolderManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
@@ -132,7 +131,7 @@ class UserManagerImpl @Inject constructor(
     override fun signOut(playbackManager: PlaybackManager, wasInitiatedByUser: Boolean) {
         if (wasInitiatedByUser || !settings.getFullySignedOut()) {
             LogBuffer.i(LogBuffer.TAG_BACKGROUND_TASKS, "Signing out")
-            subscriptionManager.clearCachedSubscription()
+            subscriptionManager.clearCachedMembership()
             syncManager.signOut {
                 applicationScope.launch {
                     settings.clearPlusPreferences()

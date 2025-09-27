@@ -1,11 +1,41 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2025-09-09 15:54:03+0000
+Translation-Revision-Date: 2025-09-25 11:54:04+0000
 Plural-Forms: nplurals=2; plural=n != 1;
 Generator: GlotPress/2.4.0-alpha
 Language: sv_SE
 -->
 <resources>
+    <string name="smart_playlists">Smarta spellistor</string>
+    <string name="select_smart_playlists">Välj smarta spellistor</string>
+    <string name="podcast_not_in_playlists">Ingår inte i några smarta spellistor</string>
+    <string name="playlist_is_full_description">Spellistan är full. Prova att skapa en ny.</string>
+    <string name="add_to_playlist_no_playlist_found_title">Lägg till i spellista</string>
+    <string name="add_to_playlist_no_playlist_found_body">Vi kunde inte hitta någon spellista för denna sökning. Skapa en ny spellista eller prova ett annat nyckelord.</string>
+    <string name="add_to_playlist_find_playlist">Hitta spellista</string>
+    <string name="add_to_playlist_description">Lägg till i spellista</string>
+    <string name="remove_from_playlist">Ta bort från spellista</string>
+    <string name="add_to_up_next_bottom">Lägg till längst ner i Nästa</string>
+    <string name="add_to_up_next_top">Lägg till högst upp i Nästa</string>
+    <string name="playlist_episodes_archived_title">Inga avsnitt</string>
+    <string name="playlist_episodes_archived_count">%1$d arkiverade</string>
+    <string name="playlist_edit_episodes_title">Redigera spellista</string>
+    <string name="playlist_edit_episodes">Ordna om avsnitt</string>
+    <string name="playlist_unarchive_all">Avarkivera alla</string>
+    <string name="playlist_episode_unavailable_cta">Ta bort från spellista</string>
+    <string name="playlist_episode_unavailable_description">Podcastens skapare har tagit bort detta avsnitt. Det kommer att finnas kvar i din spellista tills du tar bort det.</string>
+    <string name="playlist_episode_unavailable_title">Avsnittet är inte tillgängligt</string>
+    <string name="playlist_archive_all">Arkivera alla</string>
+    <string name="episode_sort_custom_order">Anpassad ordning</string>
+    <string name="manual_playlist_search_no_podcast_or_folder_body">Vi kunde inte hitta någon podcast eller mapp för denna sökning. Prova med ett annat nyckelord.</string>
+    <string name="manual_playlist_search_no_podcast_title">Ingen podcast hittades</string>
+    <string name="manual_playlist_search_no_podcast_body">Vi kunde inte hitta någon podcast för denna sökning. Prova med ett annat nyckelord.</string>
+    <string name="manual_playlist_no_available_episode_title">Inga tillgängliga avsnitt</string>
+    <string name="manual_playlist_no_available_episode_body">Det verkar som att du har lagt till alla avsnitt från den här showen.</string>
+    <string name="manual_playlist_no_content_title_alternative">Börja bygga din spellista</string>
+    <string name="manual_playlist_no_content_title">Lägg till avsnitt i din spellista</string>
+    <string name="manual_playlist_no_content_body">Svep åt vänster på ett avsnitt för att lägga till det i din spellista.</string>
+    <string name="browse_shows">Bläddra bland shower</string>
     <string name="unavailable">Inte tillgängligt</string>
     <string name="add_to_playlist_failure_message">Den här spellistan är full. Ta bort några avsnitt eller starta en ny.</string>
     <string name="added_to_playlist">%1$s har lagts till i “%2$s”</string>
@@ -2176,6 +2206,14 @@ Language: sv_SE
         <item quantity="one" formatted="true">%1$d avsnitt - %2$s kvar</item>
         <item quantity="other" formatted="true">%1$d avsnitt - %2$s kvar</item>
     </plurals>
+    <plurals name="playlist_episodes_archived_description">
+        <item quantity="one">Ditt avsnitt i den här spellistan har arkiverats</item>
+        <item quantity="other">Alla %1$d-avsnitt i den här spellistan har arkiverats</item>
+    </plurals>
+    <plurals name="playlists_selected_count">
+        <item quantity="one">%1$d spellista vald</item>
+        <item quantity="other">%1$d spellistor valda</item>
+    </plurals>
     <plurals name="podcast">
         <item quantity="one">Podcast</item>
         <item quantity="other">Podcasts</item>
@@ -2231,6 +2269,10 @@ Language: sv_SE
     <plurals name="second_short">
         <item quantity="one">sekund</item>
         <item quantity="other">sekunder</item>
+    </plurals>
+    <plurals name="second_with_count">
+        <item quantity="one">%1$d sekund</item>
+        <item quantity="other">%1$d sekunder</item>
     </plurals>
     <plurals name="settings_auto_download_on_follow_podcast_description">
         <item quantity="one">Ladda automatiskt ner det senaste avsnittet från nya shower som du följer.</item>

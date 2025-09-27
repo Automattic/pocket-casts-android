@@ -13,6 +13,7 @@ import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.models.db.AppDatabase
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
+import au.com.shiftyjelly.pocketcasts.models.type.Membership
 import au.com.shiftyjelly.pocketcasts.models.type.Subscription
 import au.com.shiftyjelly.pocketcasts.models.type.SubscriptionPlatform
 import au.com.shiftyjelly.pocketcasts.models.type.TrimMode
@@ -24,12 +25,12 @@ import au.com.shiftyjelly.pocketcasts.repositories.file.FileStorage
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
-import au.com.shiftyjelly.pocketcasts.repositories.sync.SyncManager
 import au.com.shiftyjelly.pocketcasts.utils.FileUtil
 import au.com.shiftyjelly.pocketcasts.utils.Util
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
+import com.squareup.moshi.Moshi
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
 import java.time.Instant
@@ -52,24 +53,36 @@ class VersionMigrationsWorker @AssistedInject constructor(
 
     companion object {
         private const val VERSION_MIGRATIONS_WORKER_NAME = "version_migrations_worker"
-        fun performMigrations(settings: Settings, context: Context) {
-            performMigrationsSync(settings)
+        fun performMigrations(
+            context: Context,
+            settings: Settings,
+            moshi: Moshi,
+        ) {
+            performMigrationsSync(settings, moshi)
             enqueueAsyncMigrations(settings, context)
         }
 
         /**
          * Perform short migrations straight away.
          */
-        private fun performMigrationsSync(settings: Settings) {
-            migrateSubsriptionStatusToSubscription(settings)
+        private fun performMigrationsSync(settings: Settings, moshi: Moshi) {
+            migrateSubscriptionStatusToSubscription(settings)
+            migrateSubscriptionToMembership(settings, moshi)
         }
 
-        private fun migrateSubsriptionStatusToSubscription(settings: Settings) {
+        private fun migrateSubscriptionStatusToSubscription(settings: Settings) {
             if (settings.contains("accountstatus", isPrivate = true)) {
                 val rawStatus = settings.getStringForKey("accountstatus", isPrivate = true) ?: return
                 runCatching { mapToSubscriptionOrThrow(rawStatus) }
                     .onFailure { error -> LogBuffer.e(LogBuffer.TAG_SUBSCRIPTIONS, error, "Failed to migrate subscription") }
-                    .onSuccess { subscription -> settings.cachedSubscription.set(subscription, updateModifiedAt = false) }
+                    .onSuccess { subscription ->
+                        val membership = Membership(
+                            subscription = subscription,
+                            createdAt = null,
+                            features = emptyList(),
+                        )
+                        settings.cachedMembership.set(membership, updateModifiedAt = false)
+                    }
                 settings.deleteKey("accountstatus", isPrivate = true)
             }
         }
@@ -103,6 +116,24 @@ class VersionMigrationsWorker @AssistedInject constructor(
                     .getBoolean("autoRenewing"),
                 giftDays = jsonStatus.getInt("giftDays"),
             )
+        }
+
+        private fun migrateSubscriptionToMembership(settings: Settings, moshi: Moshi) {
+            if (settings.contains("user_subscription", isPrivate = true)) {
+                val rawSubscription = settings.getStringForKey("user_subscription", isPrivate = true) ?: return
+                val moshi = moshi.adapter(Subscription::class.java)
+                runCatching { requireNotNull(moshi.fromJson(rawSubscription)) { "Failed to decode subscription" } }
+                    .onFailure { error -> LogBuffer.e(LogBuffer.TAG_SUBSCRIPTIONS, error, "Failed to migrate subscription") }
+                    .onSuccess { subscription ->
+                        val membership = Membership(
+                            subscription = subscription,
+                            createdAt = null,
+                            features = emptyList(),
+                        )
+                        settings.cachedMembership.set(membership, updateModifiedAt = false)
+                    }
+                settings.deleteKey("user_subscription", isPrivate = true)
+            }
         }
 
         /**

@@ -93,7 +93,7 @@ class OnboardingLogInViewModel @Inject constructor(
             )
         }
 
-        subscriptionManager.clearCachedSubscription()
+        subscriptionManager.clearCachedMembership()
 
         viewModelScope.launch {
             val result = syncManager.loginWithEmailAndPassword(

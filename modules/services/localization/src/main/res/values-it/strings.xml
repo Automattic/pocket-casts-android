@@ -1,11 +1,41 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2025-09-10 09:54:04+0000
+Translation-Revision-Date: 2025-09-25 09:54:03+0000
 Plural-Forms: nplurals=2; plural=n != 1;
 Generator: GlotPress/2.4.0-alpha
 Language: it
 -->
 <resources>
+    <string name="smart_playlists">Playlist intelligenti</string>
+    <string name="select_smart_playlists">Seleziona Playlist intelligenti</string>
+    <string name="podcast_not_in_playlists">Non incluso in alcuna Playlist intelligente</string>
+    <string name="playlist_is_full_description">Playlist piena. Prova a crearne una nuova.</string>
+    <string name="add_to_playlist_no_playlist_found_title">Aggiungi alla playlist</string>
+    <string name="add_to_playlist_no_playlist_found_body">Non abbiamo trovato alcuna playlist per la ricerca. Crea una nuova playlist o prova un\'altra parola chiave.</string>
+    <string name="add_to_playlist_find_playlist">Cerca playlist</string>
+    <string name="add_to_playlist_description">Aggiungi alla playlist</string>
+    <string name="remove_from_playlist">Rimuovi dalla playlist</string>
+    <string name="add_to_up_next_bottom">Aggiungi a Successivo dalla fine</string>
+    <string name="add_to_up_next_top">Aggiungi a Successivo dall\'inizio </string>
+    <string name="playlist_episodes_archived_title">Nessun episodio</string>
+    <string name="playlist_episodes_archived_count">%1$d archiviato/i</string>
+    <string name="playlist_edit_episodes_title">Modifica playlist</string>
+    <string name="playlist_edit_episodes">Riorganizza episodi</string>
+    <string name="playlist_unarchive_all">Annulla archiviazione di tutti</string>
+    <string name="playlist_episode_unavailable_cta">Rimuovi dalla playlist</string>
+    <string name="playlist_episode_unavailable_description">Il creatore del podcast ha eliminato questo episodio. Rimarrà nella playlist finché non la rimuovi.</string>
+    <string name="playlist_episode_unavailable_title">Episodio non disponibile</string>
+    <string name="playlist_archive_all">Archivia tutti</string>
+    <string name="episode_sort_custom_order">Ordine personalizzato</string>
+    <string name="manual_playlist_search_no_podcast_or_folder_body">Non abbiamo trovato alcun podcast o cartella per la ricerca. Prova un\'altra parola chiave.</string>
+    <string name="manual_playlist_search_no_podcast_title">Nessun podcast trovato</string>
+    <string name="manual_playlist_search_no_podcast_body">Non abbiamo trovato alcun podcast per la ricerca. Prova un\'altra parola chiave.</string>
+    <string name="manual_playlist_no_available_episode_title">Nessun episodio disponibile</string>
+    <string name="manual_playlist_no_available_episode_body">Sembra che tu abbia aggiunto tutti gli episodi di questo show.</string>
+    <string name="manual_playlist_no_content_title_alternative">Comincia a creare la playlist</string>
+    <string name="manual_playlist_no_content_title">Aggiungi episodi alla playlist</string>
+    <string name="manual_playlist_no_content_body">Scorri verso sinistra su un episodio per aggiungerlo alla playlist.</string>
+    <string name="browse_shows">Esplora gli show</string>
     <string name="unavailable">Non disponibile</string>
     <string name="add_to_playlist_failure_message">Questa playlist è piena. Rimuovi alcuni episodi o creane una nuova.</string>
     <string name="added_to_playlist">%1$s aggiunto a \"%2$s\"</string>
@@ -2175,6 +2205,14 @@ Language: it
         <item quantity="one" formatted="true">%1$d episodio - %2$s rimanente</item>
         <item quantity="other" formatted="true">%1$d episodi - %2$s rimanenti</item>
     </plurals>
+    <plurals name="playlist_episodes_archived_description">
+        <item quantity="one">Il tuo episodio in questa playlist è stato archiviato</item>
+        <item quantity="other">Tutti i %1$d episodi di questa playlist sono stati archiviati</item>
+    </plurals>
+    <plurals name="playlists_selected_count">
+        <item quantity="one">%1$d playlist selezionata</item>
+        <item quantity="other">%1$d playlist selezionate</item>
+    </plurals>
     <plurals name="podcast">
         <item quantity="one">Podcast</item>
         <item quantity="other">Podcast</item>
@@ -2230,6 +2268,10 @@ Language: it
     <plurals name="second_short">
         <item quantity="one">s</item>
         <item quantity="other">secondi</item>
+    </plurals>
+    <plurals name="second_with_count">
+        <item quantity="one">%1$d secondo</item>
+        <item quantity="other">%1$d secondi</item>
     </plurals>
     <plurals name="settings_auto_download_on_follow_podcast_description">
         <item quantity="one">Scarica automaticamente l\'ultimo episodio dei nuovi programmi che segui.</item>

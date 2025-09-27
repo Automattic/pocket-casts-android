@@ -1,11 +1,41 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2025-09-09 11:54:05+0000
+Translation-Revision-Date: 2025-09-24 16:54:03+0000
 Plural-Forms: nplurals=6; plural=n==0 ? 0 : n==1 ? 1 : n==2 ? 2 : n%100>=3 && n%100<=10 ? 3 : n%100>=11 && n%100<=99 ? 4 : 5;
 Generator: GlotPress/2.4.0-alpha
 Language: ar
 -->
 <resources>
+    <string name="smart_playlists">قوائم تشغيل ذكية</string>
+    <string name="select_smart_playlists">تحديد قوائم تشغيل ذكية</string>
+    <string name="podcast_not_in_playlists">غير مدرج في أي قوائم تشغيل ذكية</string>
+    <string name="playlist_is_full_description">قائمة التشغيل ممتلئة. حاول إنشاء قائمة جديدة.</string>
+    <string name="add_to_playlist_no_playlist_found_title">إضافة إلى قائمة التشغيل</string>
+    <string name="add_to_playlist_no_playlist_found_body">لم نعثر على أي قائمة تشغيل تطابق هذا البحث. أنشئ قائمة تشغيل جديدة أو جرّب استخدام كلمة مفتاحية أخرى.</string>
+    <string name="add_to_playlist_find_playlist">بحث عن قائمة تشغيل</string>
+    <string name="add_to_playlist_description">يمكنك استخدام ذلك للإضافة إلى قائمة التشغيل</string>
+    <string name="remove_from_playlist">إزالة من قائمة التشغيل</string>
+    <string name="add_to_up_next_bottom">إضافة في نهاية قائمة التشغيل التالية</string>
+    <string name="add_to_up_next_top">إضافة في بداية قائمة التشغيل التالية</string>
+    <string name="playlist_episodes_archived_title">لا توجد حلقات</string>
+    <string name="playlist_episodes_archived_count">⁦%1$d⁩ مؤرشف</string>
+    <string name="playlist_edit_episodes_title">تحرير قائمة تشغيل</string>
+    <string name="playlist_edit_episodes">إعادة ترتيب الحلقات</string>
+    <string name="playlist_unarchive_all">إلغاء أرشفة الكل</string>
+    <string name="playlist_episode_unavailable_cta">إزالة من قائمة التشغيل</string>
+    <string name="playlist_episode_unavailable_description">حذف منشئ podcast هذه الحلقة. ستبقى في قائمة تشغيلك حتى تزيلها.</string>
+    <string name="playlist_episode_unavailable_title">الحلقة غير متوافرة</string>
+    <string name="playlist_archive_all">أرشفة الكل</string>
+    <string name="episode_sort_custom_order">ترتيب مخصص</string>
+    <string name="manual_playlist_search_no_podcast_or_folder_body">لم نتمكن من العثور على أي podcast أو مجلد لهذا البحث. جرِّب كلمة مفتاحية أخرى.</string>
+    <string name="manual_playlist_search_no_podcast_title">لم يتم العثور على podcast</string>
+    <string name="manual_playlist_search_no_podcast_body">لم نعثر على أي podcast لهذا البحث. جرّب كلمة مفتاحية أخرى.</string>
+    <string name="manual_playlist_no_available_episode_title">لا توجد حلقات متاحة</string>
+    <string name="manual_playlist_no_available_episode_body">يبدو أنك أضفت كل الحلقات من هذا العرض.</string>
+    <string name="manual_playlist_no_content_title_alternative">ابدأ بإنشاء قائمة التشغيل الخاصة بك</string>
+    <string name="manual_playlist_no_content_title">أضف حلقات إلى قائمة التشغيل الخاصة بك</string>
+    <string name="manual_playlist_no_content_body">اسحب لليسار على الحلقة لإضافتها إلى قائمة التشغيل الخاصة بك.</string>
+    <string name="browse_shows">تصفّح العروض</string>
     <string name="unavailable">غير متاح</string>
     <string name="add_to_playlist_failure_message">قائمة التشغيل هذه ممتلئة. إزالة بعض الحلقات أو بدء حلقة جديدة.</string>
     <string name="added_to_playlist"> تمت إضافة ⁦%1$s⁩ إلى “⁦%2$s⁩”</string>
@@ -2228,6 +2258,14 @@ Language: ar
         <item quantity="many">⁦%1$d⁩ من الحلقات - ⁦%2$s⁩ لليسار</item>
         <item quantity="other" formatted="true">⁦%1$d⁩ من الحلقات - ⁦%2$s⁩ لليسار</item>
     </plurals>
+    <plurals name="playlists_selected_count">
+        <item quantity="zero">تم تحديد ⁦%1$d⁩ من قوائم التشغيل</item>
+        <item quantity="one">تم تحديد ⁦%1$d⁩ من قوائم التشغيل</item>
+        <item quantity="two">تم تحديد ⁦%1$d⁩ من قوائم التشغيل</item>
+        <item quantity="few">تم تحديد ⁦%1$d⁩ من قوائم التشغيل</item>
+        <item quantity="many">تم تحديد ⁦%1$d⁩ من قوائم التشغيل</item>
+        <item quantity="other">تم تحديد ⁦%1$d⁩ من قوائم التشغيل</item>
+    </plurals>
     <plurals name="podcast">
         <item quantity="zero">البث الصوتي</item>
         <item quantity="one">البث الصوتي</item>
@@ -2339,6 +2377,14 @@ Language: ar
         <item quantity="few">ثوانٍ</item>
         <item quantity="many">ثوانٍ</item>
         <item quantity="other">ثوانٍ</item>
+    </plurals>
+    <plurals name="second_with_count">
+        <item quantity="zero">⁦%1$d⁩ من الثواني</item>
+        <item quantity="one">⁦%1$d⁩ من الثواني</item>
+        <item quantity="two">⁦%1$d⁩ من الثواني</item>
+        <item quantity="few">⁦%1$d⁩ من الثواني</item>
+        <item quantity="many">⁦%1$d⁩ من الثواني</item>
+        <item quantity="other">⁦%1$d⁩ من الثواني</item>
     </plurals>
     <plurals name="week_with_count">
         <item quantity="zero">⁦%1$d⁩ من الأسابيع</item>

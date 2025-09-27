@@ -1,11 +1,41 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2025-09-11 09:54:05+0000
+Translation-Revision-Date: 2025-09-25 11:54:04+0000
 Plural-Forms: nplurals=2; plural=n != 1;
 Generator: GlotPress/2.4.0-alpha
 Language: nl
 -->
 <resources>
+    <string name="smart_playlists">Slimme afspeellijsten</string>
+    <string name="select_smart_playlists">Slimme afspeellijsten selecteren</string>
+    <string name="podcast_not_in_playlists">Niet inbegrepen in slimme afspeellijsten</string>
+    <string name="playlist_is_full_description">Afspeellijst is vol. Probeer een nieuwe aan te maken.</string>
+    <string name="add_to_playlist_no_playlist_found_title">Toevoegen aan afspeellijst</string>
+    <string name="add_to_playlist_no_playlist_found_body">We kunnen geen afspeellijst vinden voor die zoekopdracht. Maak een nieuwe afspeellijst of gebruik een ander trefwoord.</string>
+    <string name="add_to_playlist_find_playlist">Afspeellijst zoeken</string>
+    <string name="add_to_playlist_description">Toevoegen aan afspeellijst</string>
+    <string name="remove_from_playlist">Verwijderen uit afspeellijst</string>
+    <string name="add_to_up_next_bottom">Onderaan Hierna toevoegen</string>
+    <string name="add_to_up_next_top">Bovenaan Hierna toevoegen</string>
+    <string name="playlist_episodes_archived_title">Geen afleveringen</string>
+    <string name="playlist_episodes_archived_count">%1$d gearchiveerd</string>
+    <string name="playlist_edit_episodes_title">Video-afspeellijst bewerken</string>
+    <string name="playlist_edit_episodes">Afleveringen herschikken</string>
+    <string name="playlist_unarchive_all">Alles dearchiveren</string>
+    <string name="playlist_episode_unavailable_cta">Verwijderen uit afspeellijst</string>
+    <string name="playlist_episode_unavailable_title">Aflevering niet beschikbaar</string>
+    <string name="playlist_archive_all">Alles archiveren</string>
+    <string name="episode_sort_custom_order">Aangepaste volgorde</string>
+    <string name="playlist_episode_unavailable_description">De maker van de podcast heeft deze aflevering verwijderd. De podcast blijft in je afspeellijst staan totdat je deze verwijdert.</string>
+    <string name="manual_playlist_search_no_podcast_or_folder_body">We kunnen geen aflevering vinden voor die zoekopdracht. Probeer een ander trefwoord.</string>
+    <string name="manual_playlist_search_no_podcast_title">Geen podcasts gevonden</string>
+    <string name="manual_playlist_search_no_podcast_body">We kunnen geen aflevering vinden voor die zoekopdracht. Probeer een ander trefwoord.</string>
+    <string name="manual_playlist_no_available_episode_title">Geen beschikbare afleveringen</string>
+    <string name="manual_playlist_no_available_episode_body">Het lijkt erop dat je alle afleveringen van deze show hebt toegevoegd.</string>
+    <string name="manual_playlist_no_content_title_alternative">Begin met het bouwen van je afspeellijst</string>
+    <string name="manual_playlist_no_content_title">Afleveringen aan je afspeellijst toevoegen</string>
+    <string name="manual_playlist_no_content_body">Veeg naar links bij een aflevering om deze aan je afspeellijst toe te voegen.</string>
+    <string name="browse_shows">Door shows bladeren</string>
     <string name="unavailable">Niet beschikbaar</string>
     <string name="add_to_playlist_failure_message">Deze afspeellijst is vol. Verwijder een paar afleveringen of begin een nieuwe.</string>
     <string name="added_to_playlist">%1$s toegevoegd aan \'%2$s\'</string>
@@ -2175,6 +2205,14 @@ Language: nl
         <item quantity="one" formatted="true">%1$d aflevering - nog %2$s</item>
         <item quantity="other" formatted="true">%1$d afleveringen - nog %2$s</item>
     </plurals>
+    <plurals name="playlist_episodes_archived_description">
+        <item quantity="one">Je aflevering in deze afspeellijst is gearchiveerd</item>
+        <item quantity="other">Alle %1$d afleveringen van deze podcast zijn gearchiveerd</item>
+    </plurals>
+    <plurals name="playlists_selected_count">
+        <item quantity="one">%1$d afspeellijst geselecteerd</item>
+        <item quantity="other">%1$d afspeellijsten geselecteerd</item>
+    </plurals>
     <plurals name="podcast">
         <item quantity="one">Podcast</item>
         <item quantity="other">Podcasts</item>
@@ -2230,6 +2268,10 @@ Language: nl
     <plurals name="second_short">
         <item quantity="one"> sec.</item>
         <item quantity="other"> sec.</item>
+    </plurals>
+    <plurals name="second_with_count">
+        <item quantity="one">%1$d seconde</item>
+        <item quantity="other">%1$d seconden</item>
     </plurals>
     <plurals name="settings_auto_download_on_follow_podcast_description">
         <item quantity="one">Download automatisch de nieuwste aflevering van nieuwe shows die je volgt.</item>

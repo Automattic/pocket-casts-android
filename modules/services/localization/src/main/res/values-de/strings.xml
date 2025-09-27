@@ -1,11 +1,41 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2025-09-11 09:54:08+0000
+Translation-Revision-Date: 2025-09-24 14:54:03+0000
 Plural-Forms: nplurals=2; plural=n != 1;
 Generator: GlotPress/2.4.0-alpha
 Language: de
 -->
 <resources>
+    <string name="smart_playlists">Intelligente Wiedergabelisten</string>
+    <string name="select_smart_playlists">Intelligente Wiedergabelisten auswählen</string>
+    <string name="podcast_not_in_playlists">Nicht in intelligenten Wiedergabelisten enthalten</string>
+    <string name="playlist_is_full_description">Wiedergabeliste ist voll. Erstelle eine neue.</string>
+    <string name="add_to_playlist_no_playlist_found_title">Zur Wiedergabeliste hinzufügen</string>
+    <string name="add_to_playlist_no_playlist_found_body">Wir konnten keine Wiedergabeliste für diese Suche finden. Erstelle eine neue Wiedergabeliste oder versuche es mit einem anderen Stichwort.</string>
+    <string name="add_to_playlist_find_playlist">Wiedergabeliste suchen</string>
+    <string name="add_to_playlist_description">Zur Wiedergabeliste hinzufügen</string>
+    <string name="remove_from_playlist">Aus Wiedergabeliste entfernen</string>
+    <string name="add_to_up_next_bottom">Zum Ende der Warteschlange hinzufügen</string>
+    <string name="add_to_up_next_top">Zum Anfang der Warteschlange hinzufügen</string>
+    <string name="playlist_episodes_archived_title">Keine Folgen</string>
+    <string name="playlist_episodes_archived_count">%1$d archiviert</string>
+    <string name="playlist_edit_episodes_title">Wiedergabeliste bearbeiten</string>
+    <string name="playlist_edit_episodes">Folgen neu anordnen</string>
+    <string name="playlist_unarchive_all">Alle aus dem Archiv holen</string>
+    <string name="playlist_episode_unavailable_cta">Aus Wiedergabeliste entfernen</string>
+    <string name="playlist_episode_unavailable_description">Der Podcast-Ersteller hat diese Folge gelöscht. Sie bleibt in deiner Wiedergabeliste, bis du sie entfernst.</string>
+    <string name="playlist_episode_unavailable_title">Folge nicht verfügbar</string>
+    <string name="playlist_archive_all">Alle archivieren</string>
+    <string name="episode_sort_custom_order">Individuelle Reihenfolge</string>
+    <string name="manual_playlist_search_no_podcast_or_folder_body">Wir konnten keinen Podcast oder Ordner für diese Suche finden. Versuche es mit einem anderen Stichwort.</string>
+    <string name="manual_playlist_search_no_podcast_title">Kein Podcast gefunden</string>
+    <string name="manual_playlist_search_no_podcast_body">Wir konnten keinen Podcast für diese Suche finden. Versuche es mit einem anderen Stichwort.</string>
+    <string name="manual_playlist_no_available_episode_title">Keine verfügbaren Folgen</string>
+    <string name="manual_playlist_no_available_episode_body">Anscheinend hast du alle Folgen aus dieser Show hinzugefügt.</string>
+    <string name="manual_playlist_no_content_title_alternative">Deine Wiedergabeliste erstellen</string>
+    <string name="manual_playlist_no_content_title">Folgen zu deiner Wiedergabeliste hinzufügen</string>
+    <string name="manual_playlist_no_content_body">Wische bei einer Folge nach links, um sie zu deiner Wiedergabeliste hinzuzufügen.</string>
+    <string name="browse_shows">Shows durchsuchen</string>
     <string name="unavailable">Nicht verfügbar</string>
     <string name="added_to_playlist">%1$s zu „%2$s“ hinzugefügt</string>
     <string name="add_to_playlist_failure_message">Diese Wiedergabeliste ist voll. Entferne einige Folgen oder beginne eine neue.</string>
@@ -2172,6 +2202,14 @@ Language: de
         <item quantity="one" formatted="true">%1$d Folge - %2$s verbleibend</item>
         <item quantity="other" formatted="true">%1$d Folgen - %2$s verbleibend</item>
     </plurals>
+    <plurals name="playlist_episodes_archived_description">
+        <item quantity="one">Deine Folge in dieser Wiedergabeliste wurde archiviert</item>
+        <item quantity="other">Alle %1$d Folgen dieser Wiedergabeliste wurden archiviert</item>
+    </plurals>
+    <plurals name="playlists_selected_count">
+        <item quantity="one">%1$d Wiedergabeliste ausgewählt</item>
+        <item quantity="other">%1$d Wiedergabelisten ausgewählt</item>
+    </plurals>
     <plurals name="podcast">
         <item quantity="one">Podcast</item>
         <item quantity="other">Podcasts</item>
@@ -2227,6 +2265,10 @@ Language: de
     <plurals name="second_short">
         <item quantity="one"> Sek.</item>
         <item quantity="other"> Sek.</item>
+    </plurals>
+    <plurals name="second_with_count">
+        <item quantity="one">%1$d Sekunde</item>
+        <item quantity="other">%1$d Sekunden</item>
     </plurals>
     <plurals name="settings_auto_download_on_follow_podcast_description">
         <item quantity="one">Lade automatisch die aktuellste Folge von Shows herunter, denen du seit Neuestem folgst.</item>

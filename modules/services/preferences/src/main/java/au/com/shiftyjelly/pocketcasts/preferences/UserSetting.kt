@@ -2,23 +2,41 @@ package au.com.shiftyjelly.pocketcasts.preferences
 
 import android.annotation.SuppressLint
 import android.content.SharedPreferences
+import au.com.shiftyjelly.pocketcasts.utils.extensions.mapState
 import java.time.Clock
 import java.time.Instant
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 
+interface ReadSetting<T> {
+    val value: T
+    val flow: StateFlow<T>
+}
+
+class DelegatedSetting<T, R>(
+    private val delegate: ReadSetting<T>,
+    private val mapper: (T) -> R,
+) : ReadSetting<R> {
+    override val value: R
+        get() = mapper(delegate.value)
+
+    override val flow: StateFlow<R>
+        get() = delegate.flow.mapState(mapper)
+}
+
 abstract class UserSetting<T>(
     val sharedPrefKey: String,
     protected val sharedPrefs: SharedPreferences,
-) {
+) : ReadSetting<T> {
 
     private val modifiedAtKey = "${sharedPrefKey}ModifiedAt"
 
     private fun getModifiedAtServerString(): String? = sharedPrefs.getString(modifiedAtKey, null)
 
-    val modifiedAt get(): Instant? = runCatching {
-        Instant.parse(getModifiedAtServerString())
-    }.getOrNull()
+    val modifiedAt
+        get(): Instant? = runCatching {
+            Instant.parse(getModifiedAtServerString())
+        }.getOrNull()
 
     // Returns the value to sync if sync is needed. Returns null if sync is not needed.
     fun getSyncValue(lastSyncTime: Instant): T? {
@@ -29,13 +47,13 @@ abstract class UserSetting<T>(
     // (2) we don't want to get the current value from SharedPreferences for every
     // setting immediately on app startup.
     protected val _flow by lazy { MutableStateFlow(get()) }
-    val flow: StateFlow<T> by lazy { _flow }
+    override val flow: StateFlow<T> by lazy { _flow }
 
     // External callers should use [value] to get the current value if they can't
     // listen to the flow for changes.
     protected abstract fun get(): T
 
-    val value: T
+    override val value: T
         get() = flow.value
 
     protected abstract fun persist(value: T, commit: Boolean)

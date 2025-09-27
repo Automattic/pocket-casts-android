@@ -1,11 +1,41 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2025-09-09 15:54:03+0000
+Translation-Revision-Date: 2025-09-25 11:54:04+0000
 Plural-Forms: nplurals=1; plural=0;
 Generator: GlotPress/2.4.0-alpha
 Language: zh_CN
 -->
 <resources>
+    <string name="smart_playlists">智能播放列表</string>
+    <string name="select_smart_playlists">选择智能播放列表</string>
+    <string name="podcast_not_in_playlists">未包含在任何智能播放列表中</string>
+    <string name="playlist_is_full_description">播放列表已满。 尝试创建新播放列表。</string>
+    <string name="add_to_playlist_no_playlist_found_title">添加至播放列表</string>
+    <string name="add_to_playlist_no_playlist_found_body">我们找不到任何符合该搜索条件的播放列表。 创建新播放列表或尝试使用其他关键字。</string>
+    <string name="add_to_playlist_find_playlist">查找播放列表</string>
+    <string name="add_to_playlist_description">添加至播放列表</string>
+    <string name="remove_from_playlist">从播放列表中移除</string>
+    <string name="add_to_up_next_bottom">添加到“接下来播放”底部</string>
+    <string name="add_to_up_next_top">添加到“接下来播放”顶部</string>
+    <string name="playlist_episodes_archived_title">无剧集</string>
+    <string name="playlist_episodes_archived_count">%1$d 已存档</string>
+    <string name="playlist_edit_episodes_title">编辑播放列表</string>
+    <string name="playlist_edit_episodes">重新排列剧集</string>
+    <string name="playlist_unarchive_all">全部取消存档</string>
+    <string name="playlist_episode_unavailable_cta">从播放列表中移除</string>
+    <string name="playlist_episode_unavailable_description">播客创作者删除了此剧集。 在您移除之前，它将保留在您的播放列表中。</string>
+    <string name="playlist_episode_unavailable_title">剧集无法播放</string>
+    <string name="playlist_archive_all">全部存档</string>
+    <string name="episode_sort_custom_order">自定义排序</string>
+    <string name="manual_playlist_search_no_podcast_or_folder_body">我们找不到任何符合该搜索条件的播客或文件夹。 请尝试使用其他关键字。</string>
+    <string name="manual_playlist_search_no_podcast_title">未找到播客</string>
+    <string name="manual_playlist_search_no_podcast_body">我们找不到任何符合该搜索条件的播客。 请尝试使用其他关键字。</string>
+    <string name="manual_playlist_no_available_episode_title">没有可播放的剧集</string>
+    <string name="manual_playlist_no_available_episode_body">您似乎已添加此节目中的所有剧集。</string>
+    <string name="manual_playlist_no_content_title_alternative">开始构建您的播放列表</string>
+    <string name="manual_playlist_no_content_title">将剧集添加到您的播放列表</string>
+    <string name="manual_playlist_no_content_body">向左滑动剧集即可将其添加到您的播放列表。</string>
+    <string name="browse_shows">浏览节目</string>
     <string name="unavailable">不可用</string>
     <string name="add_to_playlist_failure_message">此播放列表已满。 删减几集或开始新的一集。</string>
     <string name="added_to_playlist">%1$s 已添加至“%2$s”</string>
@@ -2163,6 +2193,12 @@ Language: zh_CN
     <plurals name="player_up_next_header_title">
         <item quantity="other" formatted="true">%1$d 集 — 剩余 %2$s</item>
     </plurals>
+    <plurals name="playlist_episodes_archived_description">
+        <item quantity="other">此播放列表的所有 %1$d 剧集都已存档</item>
+    </plurals>
+    <plurals name="playlists_selected_count">
+        <item quantity="other">已选择 %1$d 个播放列表</item>
+    </plurals>
     <plurals name="podcast">
         <item quantity="other">播客</item>
     </plurals>
@@ -2204,6 +2240,9 @@ Language: zh_CN
     </plurals>
     <plurals name="second_short">
         <item quantity="other">秒</item>
+    </plurals>
+    <plurals name="second_with_count">
+        <item quantity="other">%1$d 秒</item>
     </plurals>
     <plurals name="settings_auto_download_on_follow_podcast_description">
         <item quantity="other">自动下载所关注新节目的最新 %s 集。</item>

@@ -1074,6 +1074,8 @@ internal class DiscoverAdapter(
                             val collectionPodcasts: List<CollectionPodcast> = podcasts.map { podcast -> CollectionPodcast(podcast) }
 
                             holder.adapter.submitPodcastList(collectionPodcasts, collectionHeader) { onRestoreInstanceState(holder) }
+
+                            row.listUuid?.let { listUuid -> trackListImpression(listUuid) }
                         },
                     )
                 }
