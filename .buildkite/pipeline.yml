@@ -27,27 +27,27 @@ steps:
 
       - label: 'Lint'
         command: ".buildkite/commands/lint.sh"
-        plugins: [$CI_TOOLKIT]
+        plugins: [ $CI_TOOLKIT ]
         artifact_paths:
           - "**/build/reports/lint-results*.*"
 
   - label: 'Unit tests'
     command: ".buildkite/commands/run-unit-tests.sh"
-    plugins: [$CI_TOOLKIT]
+    plugins: [ $CI_TOOLKIT ]
 
   - group: "Diff Reports"
     steps:
       - label: 'Dependency diff'
         if: build.pull_request.id != null
         command: comment_with_dependency_diff 'app' 'releaseRuntimeClasspath'
-        plugins: [$CI_TOOLKIT]
+        plugins: [ $CI_TOOLKIT ]
         artifact_paths:
           - "**/build/reports/diff/*"
 
       - label: "Merged Manifest Diff"
         command: ".buildkite/commands/diff-merged-manifest.sh release"
         if: build.pull_request.id != null
-        plugins: [$CI_TOOLKIT]
+        plugins: [ $CI_TOOLKIT ]
         artifact_paths:
           - "**/build/reports/diff_manifest/**/**/*"
 
@@ -59,11 +59,11 @@ steps:
 
       echo "--- 🔎 Checking formatting with Spotless"
       ./gradlew spotlessCheck
-    plugins: [$CI_TOOLKIT]
+    plugins: [ $CI_TOOLKIT ]
 
   - label: "Instrumented tests"
     command: ".buildkite/commands/run-instrumented-tests.sh"
-    plugins: [$CI_TOOLKIT]
+    plugins: [ $CI_TOOLKIT ]
     artifact_paths:
       - "**/build/instrumented-tests/**/*"
 
@@ -87,10 +87,36 @@ steps:
         artifact_paths:
           - "**/build/outputs/apk/**/*"
 
-  - label: "Prototype Builds"
+    ##########
+    # Optional Prototype Builds for PR branches, distributed via S3
+    ##########
+  - group: Prototype Builds
     if: "build.pull_request.id != null"
-    command: |
-      ".buildkite/commands/prototype-build.sh"
-    plugins: [ $CI_TOOLKIT ]
-    artifact_paths:
-      - "**/build/outputs/apk/**/*"
+    steps:
+      - input: "🚀 Generate Prototype Builds?"
+        prompt: Generate Prototype Builds on the PR?
+        key: prototype_builds_triggered
+      - label: ":github: Prototype Builds"
+        depends_on: prototype_builds_triggered
+        command: |
+          ".buildkite/commands/prototype-build.sh"
+        plugins: [ $CI_TOOLKIT ]
+        artifact_paths:
+          - "**/build/outputs/apk/**/*"
+
+    ##########
+    # Optional Prototype Builds for main branch, distributed via FAD
+    ##########
+  - group: Prototype Builds (FAD)
+    if: "build.branch == 'main'"
+    steps:
+      - input: ":rocket: Generate Prototype Builds (FAD)?"
+        prompt: Generate Prototype Builds via Firebase App Distribution (FAD)?
+        key: prototype_builds_fad_triggered
+      - label: ":firebase: Prototype Builds (FAD)"
+        depends_on: prototype_builds_fad_triggered
+        command: |
+          ".buildkite/commands/prototype-build-fad.sh"
+        plugins: [ $CI_TOOLKIT ]
+        artifact_paths:
+          - "app/build/outputs/apk/**/*"

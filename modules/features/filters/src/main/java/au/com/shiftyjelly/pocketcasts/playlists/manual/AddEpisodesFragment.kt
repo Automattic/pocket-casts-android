@@ -27,6 +27,7 @@ import androidx.navigation.NavController
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import au.com.shiftyjelly.pocketcasts.compose.CallOnce
 import au.com.shiftyjelly.pocketcasts.compose.components.AnimatedNonNullVisibility
 import au.com.shiftyjelly.pocketcasts.compose.components.ThemedSnackbarHost
 import au.com.shiftyjelly.pocketcasts.localization.R
@@ -52,6 +53,10 @@ internal class AddEpisodesFragment : BaseDialogFragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?,
     ) = content {
+        CallOnce {
+            viewModel.trackScreenShown()
+        }
+
         val snackbarHostState = remember { SnackbarHostState() }
         DispatchMessageEffect(snackbarHostState)
 
@@ -60,7 +65,7 @@ internal class AddEpisodesFragment : BaseDialogFragment() {
         ClearSearchStateEffect(navController)
 
         DialogBox(
-            modifier = Modifier.Companion.nestedScroll(rememberNestedScrollInteropConnection()),
+            modifier = Modifier.nestedScroll(rememberNestedScrollInteropConnection()),
         ) {
             AnimatedNonNullVisibility(
                 item = viewModel.uiState.collectAsState().value,
@@ -77,7 +82,16 @@ internal class AddEpisodesFragment : BaseDialogFragment() {
                     episodesFlow = viewModel::getPodcastEpisodesFlow,
                     hasAnyFolders = uiState.hasAnyFolders,
                     useEpisodeArtwork = uiState.useEpisodeArtwork,
-                    onAddEpisode = viewModel::addEpisode,
+                    onOpenPodcast = {
+                        viewModel.trackPodcastTapped()
+                    },
+                    onOpenFolder = {
+                        viewModel.trackFolderTapped()
+                    },
+                    onAddEpisode = { episodeUuid ->
+                        viewModel.trackEpisodeTapped()
+                        viewModel.addEpisode(episodeUuid)
+                    },
                     onClickNavigationButton = {
                         if (!navController.popBackStack()) {
                             dismiss()
@@ -90,7 +104,7 @@ internal class AddEpisodesFragment : BaseDialogFragment() {
 
             ThemedSnackbarHost(
                 hostState = snackbarHostState,
-                modifier = Modifier.Companion.align(Alignment.Companion.BottomCenter),
+                modifier = Modifier.align(Alignment.BottomCenter),
             )
         }
     }
@@ -140,7 +154,7 @@ internal class AddEpisodesFragment : BaseDialogFragment() {
     ) : Parcelable
 
     companion object {
-        private const val NEW_INSTANCE_ARGS = "SmartRulesEditFragmentArgs"
+        private const val NEW_INSTANCE_ARGS = "AddEpisodesFragmentArgs"
 
         fun newInstance(playlistUuid: String) = AddEpisodesFragment().apply {
             arguments = bundleOf(NEW_INSTANCE_ARGS to Args(playlistUuid))

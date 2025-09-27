@@ -9,14 +9,16 @@ import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.SmartPlaylistManager
 import io.reactivex.subjects.Subject
+import kotlinx.coroutines.flow.Flow
 
 interface DownloadManager {
     companion object {
         const val WORK_MANAGER_DOWNLOAD_TAG = "downloadTask"
     }
 
-    val progressUpdates: Map<String, DownloadProgressUpdate>
-    val progressUpdateRelay: Subject<DownloadProgressUpdate>
+    fun updateEpisodeDownloadProgress(episodeUuid: String, progress: DownloadProgressUpdate)
+
+    fun episodeDownloadProgressFlow(episodeUuid: String): Flow<DownloadProgressUpdate>
 
     fun setup(episodeManager: EpisodeManager, podcastManager: PodcastManager, smartPlaylistManager: SmartPlaylistManager, playbackManager: PlaybackManager)
     fun beginMonitoringWorkManager(context: Context)

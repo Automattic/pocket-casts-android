@@ -20,7 +20,6 @@ class PrivacyViewModel @Inject constructor(
     sealed class UiState {
         data class Loaded(
             val analytics: Boolean,
-            val analyticsThirdParty: Boolean,
             val crashReports: Boolean,
             val linkAccount: Boolean,
             private val getUserEmail: () -> String?,
@@ -32,7 +31,6 @@ class PrivacyViewModel @Inject constructor(
     private val mutableUiState = MutableStateFlow<UiState>(
         UiState.Loaded(
             analytics = settings.collectAnalytics.value,
-            analyticsThirdParty = settings.collectAnalyticsThirdParty.value,
             crashReports = settings.sendCrashReports.value,
             linkAccount = settings.linkCrashReportsToUser.value,
             getUserEmail = { syncManager.getEmail() },
@@ -43,11 +41,6 @@ class PrivacyViewModel @Inject constructor(
     fun updateAnalyticsSetting(on: Boolean) {
         userAnalyticsSettings.updateAnalyticsSetting(on)
         mutableUiState.value = (mutableUiState.value as UiState.Loaded).copy(analytics = on)
-    }
-
-    fun updateAnalyticsThirdPartySetting(on: Boolean) {
-        userAnalyticsSettings.updateAnalyticsThirdPartySetting(on)
-        mutableUiState.value = (mutableUiState.value as UiState.Loaded).copy(analyticsThirdParty = on)
     }
 
     fun updateCrashReportsSetting(on: Boolean) {

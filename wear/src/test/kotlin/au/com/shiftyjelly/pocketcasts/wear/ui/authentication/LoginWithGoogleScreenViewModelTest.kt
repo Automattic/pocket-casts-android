@@ -34,12 +34,12 @@ class LoginWithGoogleScreenViewModelTest {
 
     @Mock
     private lateinit var syncManager: SyncManager
-    private lateinit var testSubject: LoginWithGoogleScreenViewModel
+    private lateinit var testSubject: LegacyLoginWithGoogleScreenViewModel
 
     @Before
     fun setup() {
         MockitoAnnotations.openMocks(this)
-        testSubject = LoginWithGoogleScreenViewModel(
+        testSubject = LegacyLoginWithGoogleScreenViewModel(
             googleSignInClient = googleSignInClient,
             podcastManager = podcastManager,
             syncManager = syncManager,

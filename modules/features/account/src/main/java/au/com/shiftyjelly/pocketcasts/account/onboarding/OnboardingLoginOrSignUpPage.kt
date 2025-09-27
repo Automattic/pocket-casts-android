@@ -66,12 +66,9 @@ import au.com.shiftyjelly.pocketcasts.compose.preview.ThemePreviewParameterProvi
 import au.com.shiftyjelly.pocketcasts.compose.theme
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.type.Subscription
-import au.com.shiftyjelly.pocketcasts.settings.consent.TrackingConsentDialog
 import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingFlow
 import au.com.shiftyjelly.pocketcasts.ui.extensions.inLandscape
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
-import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
-import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 @Composable
@@ -85,8 +82,6 @@ fun NewOnboardingGetStartedPage(
     viewModel: OnboardingLoginOrSignUpViewModel = hiltViewModel(),
 ) {
     val pocketCastsTheme = MaterialTheme.theme
-
-    val trackingConsentRequired by viewModel.isTrackingConsentRequired.collectAsState(initial = false)
 
     CallOnce {
         viewModel.onShown(flow)
@@ -116,20 +111,6 @@ fun NewOnboardingGetStartedPage(
             modifier = Modifier.padding(horizontal = 16.dp),
         )
         LogInButton(onClick = onLoginClick)
-
-        if (trackingConsentRequired &&
-            flow == OnboardingFlow.InitialOnboarding &&
-            FeatureFlag.isEnabled(Feature.APPSFLYER_ANALYTICS)
-        ) {
-            TrackingConsentDialog(
-                onAllow = {
-                    viewModel.updateTrackingConsent(true)
-                },
-                onAskAppNotToTrack = {
-                    viewModel.updateTrackingConsent(false)
-                },
-            )
-        }
     }
 }
 
@@ -167,11 +148,9 @@ internal fun OnboardingLoginOrSignUpPage(
     }
 
     val state by viewModel.uiState.collectAsStateWithLifecycle()
-    val trackingConsentRequired by viewModel.isTrackingConsentRequired.collectAsState(initial = false)
 
     Content(
         state = state,
-        trackingConsentRequired = trackingConsentRequired,
         flow = flow,
         showContinueWithGoogleButton = viewModel.showContinueWithGoogleButton,
         onSignUpClick = {
@@ -184,7 +163,6 @@ internal fun OnboardingLoginOrSignUpPage(
         },
         onContinueWithGoogleComplete = onContinueWithGoogleComplete,
         onNavigationClick = onNavigationClick,
-        onUpdateTrackingConsent = viewModel::updateTrackingConsent,
         modifier = modifier,
     )
 }
@@ -192,14 +170,12 @@ internal fun OnboardingLoginOrSignUpPage(
 @Composable
 private fun Content(
     state: UiState,
-    trackingConsentRequired: Boolean,
     flow: OnboardingFlow,
     showContinueWithGoogleButton: Boolean,
     onNavigationClick: () -> Unit,
     onSignUpClick: () -> Unit,
     onLoginClick: () -> Unit,
     onContinueWithGoogleComplete: (GoogleSignInState, Subscription?) -> Unit,
-    onUpdateTrackingConsent: (Boolean) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     BoxWithConstraints(modifier = modifier.fillMaxWidth()) {
@@ -283,20 +259,6 @@ private fun Content(
             SignUpButton(onClick = onSignUpClick)
             LogInButton(onClick = onLoginClick)
             Spacer(Modifier.windowInsetsPadding(WindowInsets.navigationBars))
-        }
-        // Only show the consent dialog to new users
-        if (trackingConsentRequired &&
-            flow == OnboardingFlow.InitialOnboarding &&
-            FeatureFlag.isEnabled(Feature.APPSFLYER_ANALYTICS)
-        ) {
-            TrackingConsentDialog(
-                onAllow = {
-                    onUpdateTrackingConsent(true)
-                },
-                onAskAppNotToTrack = {
-                    onUpdateTrackingConsent(false)
-                },
-            )
         }
     }
 }

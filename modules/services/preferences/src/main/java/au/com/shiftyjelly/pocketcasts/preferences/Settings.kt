@@ -429,7 +429,6 @@ interface Settings {
     fun getSlumberStudiosPromoCode(): String
     fun getSleepTimerDeviceShakeThreshold(): Long
     fun getRefreshPodcastsBatchSize(): Long
-    fun getExoPlayerCacheSizeInMB(): Long
     fun getExoPlayerCacheEntirePlayingEpisodeSizeInMB(): Long
     fun getPlaybackEpisodePositionChangedOnSyncThresholdSecs(): Long
 
@@ -490,7 +489,6 @@ interface Settings {
     // Only the AnalyticsTracker object should update SendUsageState directly. Everything else
     // should update this setting through the AnalyticsTracker.
     val collectAnalytics: UserSetting<Boolean>
-    val collectAnalyticsThirdParty: UserSetting<Boolean>
     val sendCrashReports: UserSetting<Boolean>
     val linkCrashReportsToUser: UserSetting<Boolean>
 
@@ -582,8 +580,6 @@ interface Settings {
     val suggestedFoldersDismissTimestamp: UserSetting<Instant?>
     val suggestedFoldersDismissCount: UserSetting<Int>
     val suggestedFoldersFollowedHash: UserSetting<String>
-
-    val isTrackingConsentRequired: UserSetting<Boolean>
 
     val isFreeAccountProfileBannerDismissed: UserSetting<Boolean>
     val isFreeAccountFiltersBannerDismissed: UserSetting<Boolean>

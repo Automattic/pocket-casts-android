@@ -260,6 +260,16 @@ class ShelfSharedViewModel @Inject constructor(
         }
     }
 
+    fun onAddToPlaylistClick(
+        episodeUuid: String,
+        source: ShelfItemSource,
+    ) {
+        trackShelfAction(ShelfItem.AddToPlaylist, source)
+        viewModelScope.launch {
+            _navigationState.emit(NavigationState.AddEpisodeToPlaylist(episodeUuid))
+        }
+    }
+
     fun onMoreClick() {
         track(AnalyticsEvent.PLAYER_SHELF_OVERFLOW_MENU_SHOWN)
         viewModelScope.launch {
@@ -343,6 +353,7 @@ class ShelfSharedViewModel @Inject constructor(
         data object ShowMoreActions : NavigationState
         data object ShowAddBookmark : NavigationState
         data class StartUpsellFlow(val source: OnboardingUpgradeSource) : NavigationState
+        data class AddEpisodeToPlaylist(val episodeUuid: String) : NavigationState
     }
 
     sealed interface SnackbarMessage {

@@ -24,7 +24,6 @@ import au.com.shiftyjelly.pocketcasts.models.type.SmartRules
 import au.com.shiftyjelly.pocketcasts.models.type.Subscription
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.preferences.SettingsImpl
-import au.com.shiftyjelly.pocketcasts.repositories.playlist.Playlist.Type
 import au.com.shiftyjelly.pocketcasts.servers.di.ServersModule
 import au.com.shiftyjelly.pocketcasts.sharedtest.MutableClock
 import com.google.firebase.remoteconfig.FirebaseRemoteConfig
@@ -131,6 +130,10 @@ class PlaylistManagerDsl : TestWatcher() {
         val episode = manualPlaylistEpisode(index, podcastIndex, playlistIndex, builder)
         playlistDao.upsertManualEpisode(episode)
         return playlistDao.getManualPlaylistEpisodes(episode.playlistUuid).single { it.episodeUuid == episode.episodeUuid }
+    }
+
+    suspend fun deleteManualEpisode(index: Int, playlistIndex: Int) {
+        playlistDao.deleteAllManualEpisodesIn("playlist-id-$playlistIndex", listOf("episode-id-$index"))
     }
 
     suspend fun updateSortType(playlistIndex: Int, type: PlaylistEpisodeSortType) {
@@ -287,29 +290,39 @@ class PlaylistManagerDsl : TestWatcher() {
         ).copy(manual = true)
     }
 
-    fun smartPreview(index: Int, builder: (PlaylistPreview) -> (PlaylistPreview) = { it }): PlaylistPreview {
+    fun smartPreview(index: Int, builder: (SmartPlaylistPreview) -> (SmartPlaylistPreview) = { it }): SmartPlaylistPreview {
         val preview = builder(
-            PlaylistPreview(
+            SmartPlaylistPreview(
                 uuid = "playlist-id-$index",
                 title = "Playlist title $index",
                 episodeCount = 0,
                 artworkPodcastUuids = emptyList(),
-                type = Type.Smart,
+                settings = Playlist.Settings(
+                    sortType = PlaylistEpisodeSortType.NewestToOldest,
+                    isAutoDownloadEnabled = false,
+                    autoDownloadLimit = 10,
+                ),
+                smartRules = SmartRules.Default,
+                iconId = 0,
             ),
-        ).copy(type = Type.Smart)
+        )
         return preview
     }
 
-    fun manualPreview(index: Int, builder: (PlaylistPreview) -> (PlaylistPreview) = { it }): PlaylistPreview {
+    fun manualPreview(index: Int, builder: (ManualPlaylistPreview) -> (ManualPlaylistPreview) = { it }): ManualPlaylistPreview {
         val preview = builder(
-            PlaylistPreview(
+            ManualPlaylistPreview(
                 uuid = "playlist-id-$index",
                 title = "Playlist title $index",
                 episodeCount = 0,
                 artworkPodcastUuids = emptyList(),
-                type = Type.Manual,
+                settings = Playlist.Settings(
+                    sortType = PlaylistEpisodeSortType.DragAndDrop,
+                    isAutoDownloadEnabled = false,
+                    autoDownloadLimit = 10,
+                ),
             ),
-        ).copy(type = Type.Manual)
+        )
         return preview
     }
 
@@ -458,5 +471,18 @@ class PlaylistManagerDsl : TestWatcher() {
 
     fun unavailableManualEpisode(index: Int, podcastIndex: Int, playlistIndex: Int, builder: (ManualPlaylistEpisode) -> ManualPlaylistEpisode = { it }): PlaylistEpisode.Unavailable {
         return PlaylistEpisode.Unavailable(manualPlaylistEpisode(index, podcastIndex, playlistIndex, builder))
+    }
+
+    fun playlistPreviewForEpisode(index: Int, builder: (PlaylistPreviewForEpisode) -> PlaylistPreviewForEpisode = { it }): PlaylistPreviewForEpisode {
+        return builder(
+            PlaylistPreviewForEpisode(
+                uuid = "playlist-id-$index",
+                title = "Playlist title $index",
+                episodeCount = 0,
+                artworkPodcastUuids = emptyList(),
+                hasEpisode = false,
+                episodeLimit = episodeLimit,
+            ),
+        )
     }
 }

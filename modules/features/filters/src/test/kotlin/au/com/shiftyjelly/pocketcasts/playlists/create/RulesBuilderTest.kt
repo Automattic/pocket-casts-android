@@ -158,7 +158,7 @@ class RulesBuilderTest {
     @Test
     fun `apply smart rules with overriding selectable content`() {
         val rules = SmartRules.Default.copy(
-            podcasts = PodcastsRule.Selected(listOf("id-1", "id-3")),
+            podcasts = PodcastsRule.Selected(setOf("id-1", "id-3")),
             episodeDuration = EpisodeDurationRule.Constrained(28.minutes, 30.minutes),
         )
 

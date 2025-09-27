@@ -67,7 +67,6 @@ dependencies {
     implementation(libs.navigation.compose)
     implementation(libs.navigation.fragment.ktx)
     implementation(libs.navigation.ui.ktx)
-    implementation(libs.play.auth)
     implementation(libs.play.cast)
     implementation(libs.retrofit)
     implementation(libs.rx2.android)
@@ -75,6 +74,9 @@ dependencies {
     implementation(libs.rx2.kotlin)
     implementation(libs.rx2.relay)
     implementation(libs.timber)
+    implementation(libs.credentials)
+    implementation(libs.credentials.google.play)
+    implementation(libs.google.identity)
 
     implementation(projects.modules.features.cartheme)
     implementation(projects.modules.services.images)

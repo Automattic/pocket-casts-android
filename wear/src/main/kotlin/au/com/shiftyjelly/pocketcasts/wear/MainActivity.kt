@@ -96,7 +96,7 @@ private fun WearApp(
         onShowLoginScreen()
     }
 
-    val userCanAccessWatch = signInState.isSignedInAsPlusOrPatron == true
+    val userCanAccessWatch = signInState.isSignedInAsPlusOrPatron
 
     val waitingForSignIn = remember { mutableStateOf(false) }
     if (!userCanAccessWatch) {
@@ -283,10 +283,10 @@ private fun WearApp(
                 onEmailSignInSuccess = {
                     navController.navigate(LoggingInScreen.ROUTE)
                 },
-                googleSignInSuccessScreen = { googleSignInAccount ->
+                googleSignInSuccessScreen = { googleAccount ->
                     LoggingInScreen(
-                        avatarUrl = googleSignInAccount?.photoUrl?.toString(),
-                        name = googleSignInAccount?.givenName,
+                        avatarUrl = googleAccount.avatarUrl,
+                        name = googleAccount.name,
                         onClose = {},
                     )
                 },

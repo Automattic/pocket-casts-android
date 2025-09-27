@@ -26,7 +26,6 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.recyclerview.widget.ItemTouchHelper
-import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.SimpleItemAnimator
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
@@ -56,16 +55,18 @@ import au.com.shiftyjelly.pocketcasts.views.extensions.tintIcons
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseFragment
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseFragmentToolbar.ChromeCastButton
 import au.com.shiftyjelly.pocketcasts.views.fragments.TopScrollable
-import au.com.shiftyjelly.pocketcasts.views.helper.EpisodeItemTouchHelper
-import au.com.shiftyjelly.pocketcasts.views.helper.EpisodeItemTouchHelper.SwipeSource
 import au.com.shiftyjelly.pocketcasts.views.helper.NavigationIcon
-import au.com.shiftyjelly.pocketcasts.views.helper.SwipeButtonLayoutFactory
-import au.com.shiftyjelly.pocketcasts.views.helper.SwipeButtonLayoutViewModel
 import au.com.shiftyjelly.pocketcasts.views.multiselect.MultiSelectEpisodesHelper
+import au.com.shiftyjelly.pocketcasts.views.multiselect.MultiSelectEpisodesHelper.Companion.MULTI_SELECT_TOGGLE_PAYLOAD
 import au.com.shiftyjelly.pocketcasts.views.multiselect.MultiSelectHelper
 import au.com.shiftyjelly.pocketcasts.views.multiselect.MultiSelectToolbar
+import au.com.shiftyjelly.pocketcasts.views.swipe.SwipeActionViewModel
+import au.com.shiftyjelly.pocketcasts.views.swipe.SwipeRowActions
+import au.com.shiftyjelly.pocketcasts.views.swipe.SwipeSource
+import au.com.shiftyjelly.pocketcasts.views.swipe.handleAction
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import dagger.hilt.android.AndroidEntryPoint
+import dagger.hilt.android.lifecycle.withCreationCallback
 import javax.inject.Inject
 import kotlin.math.abs
 import kotlinx.coroutines.launch
@@ -115,11 +116,21 @@ class UpNextFragment :
     @Inject
     lateinit var analyticsTracker: AnalyticsTracker
 
+    @Inject
+    lateinit var swipeRowActionsFactory: SwipeRowActions.Factory
+
     lateinit var adapter: UpNextAdapter
     private val sourceView = SourceView.UP_NEXT
-    private val playerViewModel: PlayerViewModel by activityViewModels()
-    private val upNextViewModel: UpNextViewModel by viewModels<UpNextViewModel>()
-    private val swipeButtonLayoutViewModel: SwipeButtonLayoutViewModel by activityViewModels()
+    private val playerViewModel by activityViewModels<PlayerViewModel>()
+    private val upNextViewModel by viewModels<UpNextViewModel>()
+    private val swipeActionViewModel by viewModels<SwipeActionViewModel>(
+        extrasProducer = {
+            defaultViewModelCreationExtras.withCreationCallback<SwipeActionViewModel.Factory> { factory ->
+                factory.create(SwipeSource.Files, playlistUuid = null)
+            }
+        },
+    )
+
     private var userRearrangingFrom: Int? = null
     private var userDraggingStart: Int? = null
     private var playingEpisodeAtStartOfDrag: String? = null
@@ -127,7 +138,6 @@ class UpNextFragment :
     private var realBinding: FragmentUpnextBinding? = null
     private val binding: FragmentUpnextBinding get() = realBinding ?: throw IllegalStateException("Trying to access the binding outside of the view lifecycle.")
 
-    private var episodeItemTouchHelper: EpisodeItemTouchHelper? = null
     private var itemTouchHelper: ItemTouchHelper? = null
 
     private var upNextItems: List<Any> = emptyList()
@@ -234,7 +244,6 @@ class UpNextFragment :
     }
 
     override fun onDestroyView() {
-        episodeItemTouchHelper = null
         itemTouchHelper = null
         binding.recyclerView.adapter = null
         super.onDestroyView()
@@ -255,14 +264,13 @@ class UpNextFragment :
             analyticsTracker = analyticsTracker,
             upNextSource = upNextSource,
             settings = settings,
-            swipeButtonLayoutFactory = SwipeButtonLayoutFactory(
-                swipeButtonLayoutViewModel = swipeButtonLayoutViewModel,
-                onItemUpdated = this::clearViewAtPosition,
-                defaultUpNextSwipeAction = { settings.upNextSwipe.value },
-                fragmentManager = parentFragmentManager,
-                swipeSource = SwipeSource.UP_NEXT,
-            ),
             playbackManager = playbackManager,
+            swipeRowActionsFactory = swipeRowActionsFactory,
+            onSwipeAction = { episode, swipeAction ->
+                viewLifecycleOwner.lifecycleScope.launch {
+                    swipeActionViewModel.handleAction(swipeAction, episode.uuid, childFragmentManager)
+                }
+            },
         )
         adapter.theme = overrideTheme
     }
@@ -271,16 +279,6 @@ class UpNextFragment :
         super.onResume()
         if (!isEmbedded) {
             updateStatusAndNavColors()
-        }
-    }
-
-    private fun clearViewAtPosition(
-        @Suppress("UNUSED_PARAMETER") episode: BaseEpisode,
-        position: Int,
-    ) {
-        val recyclerView = realBinding?.recyclerView ?: return
-        recyclerView.findViewHolderForAdapterPosition(position)?.let {
-            episodeItemTouchHelper?.clearView(recyclerView, it)
         }
     }
 
@@ -362,16 +360,16 @@ class UpNextFragment :
             attachToRecyclerView(recyclerView)
         }
 
-        episodeItemTouchHelper = EpisodeItemTouchHelper().apply {
-            attachToRecyclerView(recyclerView)
-        }
-
         (recyclerView.itemAnimator as? SimpleItemAnimator)?.supportsChangeAnimations = false
         (recyclerView.itemAnimator as? SimpleItemAnimator)?.changeDuration = 0
 
         val multiSelectToolbar = view.findViewById<MultiSelectToolbar>(R.id.multiSelectToolbar)
         multiSelectHelper.isMultiSelectingLive.observe(viewLifecycleOwner) { isMultiSelecting ->
             val wasMultiSelecting = multiSelectToolbar.isVisible
+            if (wasMultiSelecting == isMultiSelecting) {
+                return@observe
+            }
+
             multiSelectToolbar.isVisible = isMultiSelecting
             toolbar.isVisible = !isMultiSelecting
 
@@ -379,14 +377,14 @@ class UpNextFragment :
             if (!isEmbedded || isEmbeddedExpanded()) {
                 if (isMultiSelecting) {
                     trackUpNextEvent(AnalyticsEvent.UP_NEXT_MULTI_SELECT_ENTERED)
-                } else if (wasMultiSelecting) {
+                } else {
                     trackUpNextEvent(AnalyticsEvent.UP_NEXT_MULTI_SELECT_EXITED)
                 }
             }
 
             multiSelectToolbar.setNavigationIcon(IR.drawable.ic_arrow_back)
 
-            adapter.notifyDataSetChanged()
+            adapter.notifyItemRangeChanged(0, adapter.itemCount, MULTI_SELECT_TOGGLE_PAYLOAD)
         }
         multiSelectHelper.listener = multiSelectListener
 
@@ -419,7 +417,7 @@ class UpNextFragment :
 
     private fun close() {
         if (!isEmbedded) {
-            (activity as? FragmentHostListener)?.bottomSheetClosePressed(this)
+            (activity as? FragmentHostListener)?.closeBottomSheet()
         } else {
             (parentFragment as? PlayerContainerFragment)?.upNextBottomSheetBehavior?.state = BottomSheetBehavior.STATE_COLLAPSED
         }
@@ -444,19 +442,10 @@ class UpNextFragment :
     }
 
     override fun onUpNextEpisodeStartDrag(viewHolder: RecyclerView.ViewHolder) {
-        val recyclerView = realBinding?.recyclerView ?: return
         val itemTouchHelper = itemTouchHelper ?: return
-
         itemTouchHelper.startDrag(viewHolder)
         viewHolder.setIsRecyclable(false)
         userDraggingStart = viewHolder.bindingAdapterPosition
-
-        // Clear out any open swipes on drag
-        val firstPosition = (recyclerView.layoutManager as LinearLayoutManager).findFirstVisibleItemPosition()
-        val lastPosition = (recyclerView.layoutManager as LinearLayoutManager).findLastVisibleItemPosition()
-
-        (firstPosition..lastPosition).map { recyclerView.findViewHolderForAdapterPosition(it) }
-            .forEach { episodeItemTouchHelper?.clearView(recyclerView, it) }
     }
 
     override fun onEpisodeActionsClick(episodeUuid: String, podcastUuid: String?) {

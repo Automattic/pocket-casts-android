@@ -216,7 +216,7 @@ class SmartRulesTest {
     @Test
     fun `selected podcasts`() {
         val rule = SmartRules.PodcastsRule.Selected(
-            uuids = listOf("id-1", "id-2"),
+            uuids = setOf("id-1", "id-2"),
         )
 
         val clause = rule.toSqlWhereClause(clock)

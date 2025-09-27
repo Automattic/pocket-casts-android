@@ -1,6 +1,5 @@
 package au.com.shiftyjelly.pocketcasts.playlists.component
 
-import android.annotation.SuppressLint
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.Crossfade
 import androidx.compose.animation.core.Spring
@@ -38,7 +37,6 @@ import androidx.compose.material.AppBarDefaults
 import androidx.compose.material.LocalRippleConfiguration
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.RippleConfiguration
-import androidx.compose.material.ripple
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.ReadOnlyComposable
@@ -124,7 +122,6 @@ internal data class PlaylistHeaderButtonData(
     val onClick: () -> Unit,
 )
 
-@SuppressLint("UnusedBoxWithConstraintsScope")
 @Composable
 internal fun PlaylistHeader(
     data: PlaylistHeaderData?,
@@ -133,6 +130,7 @@ internal fun PlaylistHeader(
     searchState: TextFieldState,
     useBlurredArtwork: Boolean,
     onShowArchivedToggle: () -> Unit,
+    onClickShowArchivedCta: () -> Unit,
     onMeasureSearchTopOffset: (Float) -> Unit,
     onChangeSearchFocus: (FocusState) -> Unit,
     modifier: Modifier = Modifier,
@@ -234,7 +232,7 @@ internal fun PlaylistHeader(
                             iconId = IR.drawable.ic_exclamation_circle,
                             primaryButton = NoContentData.Button(
                                 text = resources.getString(LR.string.playlist_episodes_show_archived),
-                                onClick = onShowArchivedToggle,
+                                onClick = onClickShowArchivedCta,
                             ),
                         )
                     } else if (data.isNoEpisodeShown) {
@@ -709,6 +707,7 @@ private fun PlaylistHeaderNoDisplayedEpisodesPreview() {
                 searchState = rememberTextFieldState(),
                 useBlurredArtwork = false,
                 onShowArchivedToggle = {},
+                onClickShowArchivedCta = {},
                 onMeasureSearchTopOffset = {},
                 onChangeSearchFocus = {},
             )
@@ -751,6 +750,7 @@ private fun PlaylistHeaderAllArchivedEpisodesPreview() {
                 searchState = rememberTextFieldState(),
                 useBlurredArtwork = false,
                 onShowArchivedToggle = {},
+                onClickShowArchivedCta = {},
                 onMeasureSearchTopOffset = {},
                 onChangeSearchFocus = {},
             )
@@ -793,6 +793,7 @@ private fun PlaylistHeaderSomeArchivedEpisodesPreview() {
                 searchState = rememberTextFieldState(),
                 useBlurredArtwork = false,
                 onShowArchivedToggle = {},
+                onClickShowArchivedCta = {},
                 onMeasureSearchTopOffset = {},
                 onChangeSearchFocus = {},
             )
@@ -835,6 +836,7 @@ private fun PlaylistHeaderSinglePodcastPreview() {
                 searchState = rememberTextFieldState(),
                 useBlurredArtwork = false,
                 onShowArchivedToggle = {},
+                onClickShowArchivedCta = {},
                 onMeasureSearchTopOffset = {},
                 onChangeSearchFocus = {},
             )
@@ -877,6 +879,7 @@ private fun PlaylistHeaderMultiPodcastPreview() {
                 searchState = rememberTextFieldState(),
                 useBlurredArtwork = false,
                 onShowArchivedToggle = {},
+                onClickShowArchivedCta = {},
                 onMeasureSearchTopOffset = {},
                 onChangeSearchFocus = {},
             )
@@ -921,6 +924,7 @@ private fun PlaylistHeaderThemePreview(
                 searchState = rememberTextFieldState(),
                 useBlurredArtwork = false,
                 onShowArchivedToggle = {},
+                onClickShowArchivedCta = {},
                 onMeasureSearchTopOffset = {},
                 onChangeSearchFocus = {},
             )

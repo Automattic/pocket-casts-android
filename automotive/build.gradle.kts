@@ -41,6 +41,12 @@ android {
     }
 }
 
+androidComponents {
+    beforeVariants { builder ->
+        builder.enable = builder.buildType != "prototype"
+    }
+}
+
 dependencies {
     ksp(libs.dagger.hilt.compiler)
     ksp(libs.hilt.compiler)

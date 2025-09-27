@@ -543,7 +543,6 @@ class PodcastManagerImpl @Inject constructor(
     }
 
     override fun updateAutoDownloadStatusBlocking(podcast: Podcast, autoDownloadStatus: Int) {
-        podcast.autoDownloadStatus = autoDownloadStatus
         podcastDao.updateAutoDownloadStatusBlocking(autoDownloadStatus, podcast.uuid)
     }
 

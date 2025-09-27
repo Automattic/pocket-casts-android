@@ -52,7 +52,6 @@ import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asSharedFlow
-import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.filterIsInstance
 import kotlinx.coroutines.flow.flatMapLatest
@@ -149,16 +148,9 @@ class EpisodeViewModel @Inject constructor(
 
         val inUpNextFlow = playbackManager.upNextQueue.changesObservable.asFlow()
 
-        val downloadProgressFlow = combine(
-            episodeFlow,
-            downloadManager.progressUpdateRelay.asFlow(),
-        ) { episode, downloadProgressUpdate ->
-            (episode to downloadProgressUpdate)
-        }.filter { (episode, downloadProgressUpdate) ->
-            episode.uuid == downloadProgressUpdate.episodeUuid
-        }.map { (_, downloadProgressUpdate) ->
-            downloadProgressUpdate.downloadProgress
-        }
+        val downloadProgressFlow = downloadManager
+            .episodeDownloadProgressFlow(episodeUuid)
+            .map { it.downloadProgress }
 
         val showNotesFlow = episodeFlow
             .flatMapLatest {
@@ -179,7 +171,7 @@ class EpisodeViewModel @Inject constructor(
             podcastFlow.onStart { emit(null) },
             isPlayingEpisodeFlow.onStart { emit(false) },
             inUpNextFlow,
-            downloadProgressFlow.onStart<Float?> { emit(null) },
+            downloadProgressFlow.onStart { emit(0f) },
             showNotesFlow,
         ) { episode, podcast, isPlayingEpisode, upNext, downloadProgress, showNotesState ->
 
@@ -250,6 +242,7 @@ class EpisodeViewModel @Inject constructor(
                 val tint = ThemeColor.podcastIcon02(theme.activeTheme, podcastTint)
                 Color(tint)
             }
+
         is UserEpisode ->
             // First check if the user has set a custom color for this episode
             AddFileActivity.darkThemeColors().find {
@@ -269,6 +262,7 @@ class EpisodeViewModel @Inject constructor(
                     is PodcastEpisode -> {
                         episodeManager.stopDownloadAndCleanUp(episode, fromString)
                     }
+
                     is UserEpisode -> {
                         downloadManager.removeEpisodeFromQueue(episode, fromString)
                     }
@@ -314,6 +308,7 @@ class EpisodeViewModel @Inject constructor(
                         removeFromUpNext = true,
                     )
                 }
+
                 is UserEpisode -> {
                     CloudDeleteHelper.deleteEpisode(
                         episode = episode,

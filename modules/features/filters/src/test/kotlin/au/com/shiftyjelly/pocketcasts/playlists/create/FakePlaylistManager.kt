@@ -11,6 +11,7 @@ import au.com.shiftyjelly.pocketcasts.models.type.SmartRules
 import au.com.shiftyjelly.pocketcasts.repositories.playlist.ManualPlaylist
 import au.com.shiftyjelly.pocketcasts.repositories.playlist.PlaylistManager
 import au.com.shiftyjelly.pocketcasts.repositories.playlist.PlaylistPreview
+import au.com.shiftyjelly.pocketcasts.repositories.playlist.PlaylistPreviewForEpisode
 import au.com.shiftyjelly.pocketcasts.repositories.playlist.SmartPlaylist
 import au.com.shiftyjelly.pocketcasts.repositories.playlist.SmartPlaylistDraft
 import java.util.UUID
@@ -64,7 +65,7 @@ class FakePlaylistManager : PlaylistManager {
         return smartEpisodesMetadata
     }
 
-    override suspend fun updateSmartRules(uuid: String, rules: SmartRules) = Unit
+    override suspend fun updateSmartRules(uuidToRulesMap: Map<String, SmartRules>) = Unit
 
     val createManualPlaylistTurbine = Turbine<String>(name = "createManualPlaylistTurbine")
     override suspend fun createManualPlaylist(name: String): String {
@@ -75,6 +76,10 @@ class FakePlaylistManager : PlaylistManager {
     val manualPlaylist = MutableStateFlow<ManualPlaylist?>(null)
     override fun manualPlaylistFlow(uuid: String, searchTerm: String?): Flow<ManualPlaylist?> {
         return manualPlaylist
+    }
+
+    override fun playlistPreviewsForEpisodeFlow(episodeUuid: String, searchTerm: String?): Flow<List<PlaylistPreviewForEpisode>> {
+        return flowOf(emptyList())
     }
 
     override suspend fun getManualEpisodeSources(searchTerm: String?): List<ManualPlaylistEpisodeSource> {

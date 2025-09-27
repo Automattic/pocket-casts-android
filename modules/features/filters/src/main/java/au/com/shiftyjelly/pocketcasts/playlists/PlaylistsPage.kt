@@ -54,11 +54,15 @@ import au.com.shiftyjelly.pocketcasts.compose.components.NoContentBanner
 import au.com.shiftyjelly.pocketcasts.compose.preview.ThemePreviewParameterProvider
 import au.com.shiftyjelly.pocketcasts.compose.reorderable.rememberReorderableLazyListDataSource
 import au.com.shiftyjelly.pocketcasts.compose.theme
+import au.com.shiftyjelly.pocketcasts.models.type.SmartRules
 import au.com.shiftyjelly.pocketcasts.playlists.PlaylistsViewModel.PlaylistsState
 import au.com.shiftyjelly.pocketcasts.playlists.PlaylistsViewModel.UiState
 import au.com.shiftyjelly.pocketcasts.playlists.component.PlaylistPreviewRow
+import au.com.shiftyjelly.pocketcasts.repositories.playlist.ManualPlaylistPreview
+import au.com.shiftyjelly.pocketcasts.repositories.playlist.Playlist
 import au.com.shiftyjelly.pocketcasts.repositories.playlist.Playlist.Type
 import au.com.shiftyjelly.pocketcasts.repositories.playlist.PlaylistPreview
+import au.com.shiftyjelly.pocketcasts.repositories.playlist.SmartPlaylistPreview
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme.ThemeType
 import sh.calvin.reorderable.ReorderableItem
 import au.com.shiftyjelly.pocketcasts.images.R as IR
@@ -411,19 +415,24 @@ private fun PlaylistPagePreview(
         PlaylistsPage(
             uiState = UiState(
                 playlists = PlaylistsState.Loaded(
-                    value = List(3) { index ->
-                        PlaylistPreview(
-                            uuid = "uuid-$index",
-                            title = "Playlist $index",
-                            episodeCount = index,
+                    value = listOf(
+                        ManualPlaylistPreview(
+                            uuid = "uuid-0",
+                            title = "Playlist 0",
+                            episodeCount = 0,
                             artworkPodcastUuids = emptyList(),
-                            type = if (index % 2 == 0) {
-                                Type.Smart
-                            } else {
-                                Type.Manual
-                            },
-                        )
-                    },
+                            settings = Playlist.Settings.ForPreview,
+                        ),
+                        SmartPlaylistPreview(
+                            uuid = "uuid-1",
+                            title = "Playlist 1",
+                            episodeCount = 253,
+                            artworkPodcastUuids = emptyList(),
+                            settings = Playlist.Settings.ForPreview,
+                            smartRules = SmartRules.Default,
+                            iconId = 0,
+                        ),
+                    ),
                 ),
                 showOnboarding = false,
                 showFreeAccountBanner = true,

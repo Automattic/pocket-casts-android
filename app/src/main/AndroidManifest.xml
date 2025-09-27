@@ -48,6 +48,9 @@
         <meta-data android:name="com.google.android.wearable.media.theme"
                    android:resource="@style/WearMediaTheme"/>
 
+        <meta-data android:name="asset_statements"
+            android:resource="@string/asset_statements" />
+
         <!-- Main activity. Uses standard launch mode as if you go into a episode list and then exit the app, then open using recents the back button was broken. Also when on the updates tab if you click a notification and then you have to back twice. -->
         <activity
                 android:name=".ui.MainActivity"
@@ -680,8 +683,6 @@
         <!-- Disable Sentry exception tracking so we can turn it on based on the user preference -->
         <meta-data android:name="io.sentry.auto-init" android:value="false" />
 
-        <!-- AppsFlyer -->
-        <meta-data android:name="com.appsflyer.FacebookApplicationId" android:value="584627164037183" />
     </application>
 
 </manifest>

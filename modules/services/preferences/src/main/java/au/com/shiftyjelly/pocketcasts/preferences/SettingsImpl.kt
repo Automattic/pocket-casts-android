@@ -1044,10 +1044,6 @@ class SettingsImpl @Inject constructor(
         return getRemoteConfigLong(FirebaseConfig.REFRESH_PODCASTS_BATCH_SIZE)
     }
 
-    override fun getExoPlayerCacheSizeInMB(): Long {
-        return firebaseRemoteConfig.getLong(FirebaseConfig.EXOPLAYER_CACHE_SIZE_IN_MB)
-    }
-
     override fun getExoPlayerCacheEntirePlayingEpisodeSizeInMB(): Long {
         return firebaseRemoteConfig.getLong(FirebaseConfig.EXOPLAYER_CACHE_ENTIRE_PLAYING_EPISODE_SIZE_IN_MB)
     }
@@ -1317,12 +1313,6 @@ class SettingsImpl @Inject constructor(
         sharedPrefs = sharedPreferences,
     )
 
-    override val collectAnalyticsThirdParty = UserSetting.BoolPref(
-        sharedPrefKey = "SendUsageStatsThirdPartyKey",
-        defaultValue = false, // Ask for consent before sending third party analytics
-        sharedPrefs = sharedPreferences,
-    )
-
     override val sendCrashReports = UserSetting.BoolPref(
         sharedPrefKey = "SendCrashReportsKey",
         defaultValue = BuildConfig.DATA_COLLECTION_DEFAULT_VALUE ?: true,
@@ -1582,12 +1572,6 @@ class SettingsImpl @Inject constructor(
     override val suggestedFoldersFollowedHash = UserSetting.StringPref(
         sharedPrefKey = "suggested_folders_followed_hash",
         defaultValue = "",
-        sharedPrefs = sharedPreferences,
-    )
-
-    override val isTrackingConsentRequired = UserSetting.BoolPref(
-        sharedPrefKey = "tracking_consent_required",
-        defaultValue = true,
         sharedPrefs = sharedPreferences,
     )
 

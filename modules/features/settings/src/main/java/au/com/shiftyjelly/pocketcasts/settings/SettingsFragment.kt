@@ -69,7 +69,7 @@ class SettingsFragment : BaseFragment() {
                             @Suppress("DEPRECATION")
                             activity?.onBackPressed()
                         },
-                        isDebug = BuildConfig.DEBUG,
+                        isDebug = BuildConfig.DEBUG || BuildConfig.IS_PROTOTYPE,
                         isUnrestrictedBattery = isUnrestrictedBattery,
                         openFragment = { fragment ->
                             (activity as? FragmentHostListener)?.addFragment(fragment)

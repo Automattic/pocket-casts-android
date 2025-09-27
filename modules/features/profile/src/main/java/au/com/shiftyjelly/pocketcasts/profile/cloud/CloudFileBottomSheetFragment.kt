@@ -25,18 +25,14 @@ import au.com.shiftyjelly.pocketcasts.models.type.SignInState
 import au.com.shiftyjelly.pocketcasts.models.type.UserEpisodeServerStatus
 import au.com.shiftyjelly.pocketcasts.player.view.bookmark.BookmarksContainerFragment
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
-import au.com.shiftyjelly.pocketcasts.profile.R
 import au.com.shiftyjelly.pocketcasts.profile.cloud.CloudBottomSheetViewModel.Companion.DOWNLOAD
 import au.com.shiftyjelly.pocketcasts.profile.cloud.CloudBottomSheetViewModel.Companion.EDIT
 import au.com.shiftyjelly.pocketcasts.profile.cloud.CloudBottomSheetViewModel.Companion.UPLOAD
 import au.com.shiftyjelly.pocketcasts.profile.cloud.CloudBottomSheetViewModel.Companion.UPLOAD_UPGRADE_REQUIRED
 import au.com.shiftyjelly.pocketcasts.profile.databinding.BottomSheetCloudFileBinding
-import au.com.shiftyjelly.pocketcasts.repositories.bookmark.BookmarkManager
-import au.com.shiftyjelly.pocketcasts.repositories.download.DownloadManager
 import au.com.shiftyjelly.pocketcasts.repositories.images.PocketCastsImageRequestFactory
 import au.com.shiftyjelly.pocketcasts.repositories.images.loadInto
-import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
-import au.com.shiftyjelly.pocketcasts.repositories.playback.UpNextQueue
+import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeRowDataProvider
 import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingFlow
 import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingLauncher
 import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingUpgradeSource
@@ -54,7 +50,6 @@ import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
-import kotlinx.coroutines.rx2.asObservable
 import kotlinx.parcelize.Parcelize
 import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
@@ -82,21 +77,15 @@ class CloudFileBottomSheetFragment : BottomSheetDialogFragment() {
         val source: EpisodeViewSource,
     ) : Parcelable
 
-    @Inject lateinit var downloadManager: DownloadManager
-
-    @Inject lateinit var playbackManager: PlaybackManager
-
     @Inject lateinit var settings: Settings
 
     @Inject lateinit var theme: Theme
-
-    @Inject lateinit var upNextQueue: UpNextQueue
 
     @Inject lateinit var warningsHelper: WarningsHelper
 
     @Inject lateinit var analyticsTracker: AnalyticsTracker
 
-    @Inject lateinit var bookmarkManager: BookmarkManager
+    @Inject lateinit var rowDataProvider: EpisodeRowDataProvider
 
     private var pocketCastsImageRequestFactory: PocketCastsImageRequestFactory? = null
     private val viewModel: CloudBottomSheetViewModel by viewModels()
@@ -258,15 +247,11 @@ class CloudFileBottomSheetFragment : BottomSheetDialogFragment() {
                 } else {
                     errorLayout.visibility = View.GONE
                 }
-                val userBookmarksObservable = bookmarkManager.findUserEpisodesBookmarksFlow().asObservable()
                 binding.fileStatusIconsView.setup(
                     episode = episode,
-                    downloadProgressUpdates = downloadManager.progressUpdateRelay,
-                    playbackStateUpdates = playbackManager.playbackStateRelay,
-                    upNextChangesObservable = upNextQueue.changesObservable,
-                    userBookmarksObservable = userBookmarksObservable,
-                    hideErrorDetails = true,
                     tintColor = tintColor,
+                    hideErrorDetails = true,
+                    rowDataObservable = rowDataProvider.episodeRowDataObservable(episode.uuid),
                 )
 
                 binding.lblCloud.text = when (episode.serverStatus) {

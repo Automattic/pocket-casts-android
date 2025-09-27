@@ -149,6 +149,11 @@ class ProfileFragment :
         )
     }
 
+    override fun onDestroyView() {
+        getCanScrollBackward = { false }
+        super.onDestroyView()
+    }
+
     override fun onResume() {
         super.onResume()
         profileViewModel.clearFailedRefresh()
@@ -177,9 +182,10 @@ class ProfileFragment :
 
     override fun scrollToTop(): Boolean {
         val canScroll = getCanScrollBackward()
-
-        lifecycleScope.launch {
-            scrollToTopSignal.emit(Unit)
+        if (canScroll) {
+            lifecycleScope.launch {
+                scrollToTopSignal.emit(Unit)
+            }
         }
 
         return canScroll

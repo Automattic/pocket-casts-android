@@ -1,0 +1,36 @@
+package au.com.shiftyjelly.pocketcasts.views.swipe
+
+import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
+import au.com.shiftyjelly.pocketcasts.views.fragments.BaseDialogFragment
+
+interface AddToPlaylistFragmentFactory {
+    fun create(
+        source: Source,
+        episodeUuid: String,
+        customTheme: Theme.ThemeType? = null,
+    ): BaseDialogFragment
+
+    enum class Source(
+        val analyticsValue: String,
+    ) {
+        Swipe(
+            analyticsValue = "swipe",
+        ),
+        Shelf(
+            analyticsValue = "shelf",
+        ),
+    }
+
+    companion object {
+        // We support adding episodes only from phones but we need a stub to satisfy Dagger.
+        val Stub = object : AddToPlaylistFragmentFactory {
+            override fun create(
+                source: Source,
+                episodeUuid: String,
+                customTheme: Theme.ThemeType?,
+            ): BaseDialogFragment {
+                error("Adding episodes to playlist is not supported")
+            }
+        }
+    }
+}

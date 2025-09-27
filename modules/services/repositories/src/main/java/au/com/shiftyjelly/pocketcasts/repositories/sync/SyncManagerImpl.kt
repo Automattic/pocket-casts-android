@@ -274,14 +274,8 @@ class SyncManagerImpl @Inject constructor(
     override fun uploadFileToServerRxCompletable(episode: UserEpisode): Completable = getCacheTokenOrLoginRxSingle { token ->
         syncServiceManager.getFileUploadUrl(episode.toUploadData(), token)
     }.flatMapCompletable { url ->
-        Timber.d("Upload url $url")
         syncServiceManager.uploadToServer(episode, url)
-            .doOnNext { progress ->
-                Timber.d("Progress $progress")
-                UploadProgressManager.uploadObservers[episode.uuid]?.forEach { consumer ->
-                    consumer.accept(progress)
-                }
-            }
+            .doOnNext { progress -> UploadProgressManager.pushProgress(episode.uuid, progress) }
             .ignoreElements()
     }
 

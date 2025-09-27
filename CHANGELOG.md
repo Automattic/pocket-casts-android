@@ -1,6 +1,16 @@
 7.99
 -----
-
+*   Updates
+    *   Improve episode rows swipe and multi-select animations.
+        ([#4500](https://github.com/Automattic/pocket-casts-android/pull/4500))
+    *   Improve user episode rows swipe and multi-select animations.
+        ([#4501](https://github.com/Automattic/pocket-casts-android/pull/4501))
+    *   Improve up next episode rows swipe and multi-select animations.
+        ([#4502](https://github.com/Automattic/pocket-casts-android/pull/4502))
+    *   Migrate from old Google login method to CredentialManager APIs
+        ([#4523](https://github.com/Automattic/pocket-casts-android/pull/4523))
+    *   Use CredentialManager on WearOS for Google login
+        ([#4528](https://github.com/Automattic/pocket-casts-android/pull/4528))
 
 7.98
 -----

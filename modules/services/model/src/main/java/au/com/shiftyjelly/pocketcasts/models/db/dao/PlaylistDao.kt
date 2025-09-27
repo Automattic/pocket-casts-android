@@ -18,6 +18,7 @@ import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.models.to.PlaylistEpisode
 import au.com.shiftyjelly.pocketcasts.models.to.PlaylistEpisodeMetadata
+import au.com.shiftyjelly.pocketcasts.models.to.PlaylistPreviewForEpisodeEntity
 import au.com.shiftyjelly.pocketcasts.models.to.PlaylistShortcut
 import au.com.shiftyjelly.pocketcasts.models.to.RawManualEpisode
 import au.com.shiftyjelly.pocketcasts.models.type.PlaylistEpisodeSortType
@@ -60,6 +61,53 @@ abstract class PlaylistDao {
 
     @Query("SELECT * FROM playlists WHERE deleted = 0 AND draft = 0 ORDER BY sortPosition ASC")
     abstract fun allPlaylistsFlow(): Flow<List<PlaylistEntity>>
+
+    @Query(
+        """
+        SELECT
+          playlist.uuid AS uuid,
+          playlist.title AS title,
+          (
+            SELECT
+              COUNT(*)
+            FROM
+              manual_playlist_episodes AS episode
+            WHERE
+              episode.playlist_uuid IS playlist.uuid
+          ) AS episode_count,
+          (
+            SELECT
+              EXISTS(
+                SELECT
+                  *
+                FROM
+                  manual_playlist_episodes AS episode
+                WHERE
+                  episode.playlist_uuid IS playlist.uuid
+                  AND episode.episode_uuid IS :episodeUuid
+              )
+          ) AS has_episode
+        FROM
+          playlists AS playlist
+        WHERE
+          deleted IS 0
+          AND draft IS 0
+          AND playlist.manual IS NOT 0
+          AND (
+            -- trim isn't really needed because we trim in the application logic but it helps with tests
+            TRIM(:searchTerm) IS '' 
+            OR playlist.title LIKE '%' || :searchTerm || '%' ESCAPE '\' COLLATE NOCASE
+          )
+        ORDER BY
+          sortPosition ASC
+    """,
+    )
+    protected abstract fun playlistPreviewsForEpisodeFlowUnsafe(episodeUuid: String, searchTerm: String): Flow<List<PlaylistPreviewForEpisodeEntity>>
+
+    fun playlistPreviewsForEpisodeFlow(episodeUuid: String, searchTerm: String): Flow<List<PlaylistPreviewForEpisodeEntity>> {
+        val escapedTerm = searchTerm.escapeLike('\\')
+        return playlistPreviewsForEpisodeFlowUnsafe(episodeUuid, escapedTerm)
+    }
 
     @Query("SELECT * FROM playlists WHERE uuid IN (:uuids)")
     protected abstract suspend fun getAllPlaylistsInUnsafe(uuids: Collection<String>): List<PlaylistEntity>
@@ -485,7 +533,7 @@ abstract class PlaylistDao {
             ELSE IFNULL(podcast_episode.archived, 0) IS 0
           END)
           AND (
-            -- trim isn't really needed becasue we trim in the application logic but it helps with tests
+            -- trim isn't really needed because we trim in the application logic but it helps with tests
             TRIM(:searchTerm) IS '' 
             OR podcast.title LIKE '%' || :searchTerm || '%' ESCAPE '\' COLLATE NOCASE
             OR podcast_episode.title LIKE '%' || :searchTerm || '%' ESCAPE '\' COLLATE NOCASE

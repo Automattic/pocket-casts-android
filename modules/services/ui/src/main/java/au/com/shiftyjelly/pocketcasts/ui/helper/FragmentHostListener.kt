@@ -10,7 +10,7 @@ interface FragmentHostListener {
     fun addFragment(fragment: Fragment, onTop: Boolean = false)
     fun replaceFragment(fragment: Fragment)
     fun showBottomSheet(fragment: Fragment)
-    fun bottomSheetClosePressed(fragment: Fragment)
+    fun closeBottomSheet()
     fun openPlayer()
     fun closePlayer()
     fun showModal(fragment: Fragment)
@@ -18,6 +18,7 @@ interface FragmentHostListener {
     fun openTab(tabId: Int)
     fun closeToRoot()
     fun closePodcastsToRoot()
+    fun closeFiltersToRoot()
     fun openPodcastPage(uuid: String, sourceView: String? = null)
     fun openCloudFiles()
     fun snackBarView(): View

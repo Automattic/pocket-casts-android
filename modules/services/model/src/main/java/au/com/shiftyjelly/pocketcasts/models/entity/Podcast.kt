@@ -4,6 +4,7 @@ import android.content.Context
 import android.content.res.Resources
 import android.graphics.Color
 import android.text.format.DateUtils
+import androidx.core.graphics.toColorInt
 import androidx.room.ColumnInfo
 import androidx.room.Embedded
 import androidx.room.Entity
@@ -105,14 +106,30 @@ data class Podcast(
 
     constructor() : this(uuid = "")
 
-    enum class AutoAddUpNext(val databaseInt: Int, val analyticsValue: String) {
-        OFF(0, "off"),
-        PLAY_LAST(1, "add_last"),
-        PLAY_NEXT(2, "add_first"),
+    enum class AutoAddUpNext(
+        val databaseInt: Int,
+        val analyticsValue: String,
+        val labelId: Int,
+    ) {
+        OFF(
+            databaseInt = 0,
+            analyticsValue = "off",
+            labelId = LR.string.off,
+        ),
+        PLAY_LAST(
+            databaseInt = 1,
+            analyticsValue = "add_last",
+            labelId = LR.string.play_last,
+        ),
+        PLAY_NEXT(
+            databaseInt = 2,
+            analyticsValue = "add_first",
+            labelId = LR.string.play_next,
+        ),
         ;
 
         companion object {
-            fun fromDatabaseInt(int: Int?) = values().firstOrNull { it.databaseInt == int }
+            fun fromDatabaseInt(int: Int?) = entries.firstOrNull { it.databaseInt == int }
         }
     }
 
@@ -136,15 +153,6 @@ data class Podcast(
 
     val isAutoDownloadNewEpisodes: Boolean
         get() = autoDownloadStatus == AUTO_DOWNLOAD_NEW_EPISODES
-
-    val isAutoAddToUpNextOff: Boolean
-        get() = autoAddToUpNext == AutoAddUpNext.OFF
-
-    val isAutoAddToUpNextPlayLast: Boolean
-        get() = autoAddToUpNext == AutoAddUpNext.PLAY_LAST
-
-    val isAutoAddToUpNextPlayNext: Boolean
-        get() = autoAddToUpNext == AutoAddUpNext.PLAY_NEXT
 
     val adapterId: Long
         get() = UUID.nameUUIDFromBytes(uuid.toByteArray()).mostSignificantBits
@@ -237,7 +245,7 @@ data class Podcast(
             } else {
                 host
             }
-        } catch (e: MalformedURLException) {
+        } catch (_: MalformedURLException) {
             ""
         }
     }
@@ -316,10 +324,10 @@ data class Podcast(
     }
 }
 
-private val DEFAULT_SERVER_LIGHT_TINT_COLOR = Color.parseColor("#F44336")
-private val DEFAULT_SERVER_DARK_TINT_COLOR = Color.parseColor("#C62828")
-private val DEFAULT_LIGHT_TINT = Color.parseColor("#1E1F1E")
-private val DEFAULT_DARK_TINT = Color.parseColor("#FFFFFF")
+private val DEFAULT_SERVER_LIGHT_TINT_COLOR = "#F44336".toColorInt()
+private val DEFAULT_SERVER_DARK_TINT_COLOR = "#C62828".toColorInt()
+private val DEFAULT_LIGHT_TINT = "#1E1F1E".toColorInt()
+private val DEFAULT_DARK_TINT = "#FFFFFF".toColorInt()
 
 private val KnownCategoryIds = mapOf(
     "arts" to 1,
