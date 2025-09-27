@@ -57,6 +57,7 @@ import au.com.shiftyjelly.pocketcasts.compose.components.TipPosition
 import au.com.shiftyjelly.pocketcasts.compose.components.TooltipPopup
 import au.com.shiftyjelly.pocketcasts.compose.preview.ThemePreviewParameterProvider
 import au.com.shiftyjelly.pocketcasts.compose.theme
+import au.com.shiftyjelly.pocketcasts.models.to.PlaylistIcon
 import au.com.shiftyjelly.pocketcasts.models.type.SmartRules
 import au.com.shiftyjelly.pocketcasts.repositories.playlist.ManualPlaylistPreview
 import au.com.shiftyjelly.pocketcasts.repositories.playlist.Playlist
@@ -276,7 +277,7 @@ private fun PlaylistPreviewRowPreview(
                     artworkPodcastUuids = emptyList(),
                     settings = Playlist.Settings.ForPreview,
                     smartRules = SmartRules.Default,
-                    iconId = 0,
+                    icon = PlaylistIcon(0),
                 ),
                 showTooltip = false,
                 showDivider = true,
@@ -292,6 +293,7 @@ private fun PlaylistPreviewRowPreview(
                     episodeCount = 1,
                     artworkPodcastUuids = List(1) { "podcast-uuid-$it" },
                     settings = Playlist.Settings.ForPreview,
+                    icon = PlaylistIcon(0),
                 ),
                 showTooltip = false,
                 showDivider = true,
@@ -308,7 +310,7 @@ private fun PlaylistPreviewRowPreview(
                     artworkPodcastUuids = List(4) { "podcast-uuid-$it" },
                     settings = Playlist.Settings.ForPreview,
                     smartRules = SmartRules.Default,
-                    iconId = 0,
+                    icon = PlaylistIcon(0),
                 ),
                 showTooltip = false,
                 showDivider = false,

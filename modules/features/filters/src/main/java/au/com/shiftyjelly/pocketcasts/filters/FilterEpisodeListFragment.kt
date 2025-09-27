@@ -80,7 +80,7 @@ class FilterEpisodeListFragment : BaseFragment() {
             bundle.putString(ARG_PLAYLIST_UUID, playlist.uuid)
             bundle.putString(ARG_PLAYLIST_TITLE, playlist.title)
             bundle.putBoolean(ARG_FILTER_IS_NEW, isNewFilter)
-            bundle.putInt(ARG_COLOR, playlist.getColor(context))
+            bundle.putInt(ARG_COLOR, playlist.icon.getColor(context))
             fragment.arguments = bundle
             return fragment
         }
@@ -292,7 +292,7 @@ class FilterEpisodeListFragment : BaseFragment() {
         viewModel.playlist.observe(viewLifecycleOwner) { playlist ->
             toolbar.title = playlist.title
 
-            val color = playlist.getColor(context)
+            val color = playlist.icon.getColor(requireContext())
 
             adapter.tintColor = color
             updateUIColors(color)

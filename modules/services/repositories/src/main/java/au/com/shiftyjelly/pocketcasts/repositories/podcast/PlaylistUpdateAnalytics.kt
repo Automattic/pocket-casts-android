@@ -3,7 +3,6 @@ package au.com.shiftyjelly.pocketcasts.repositories.podcast
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.models.entity.PlaylistEntity
-import au.com.shiftyjelly.pocketcasts.models.type.PlaylistEpisodeSortType
 import au.com.shiftyjelly.pocketcasts.repositories.extensions.colorIndex
 import au.com.shiftyjelly.pocketcasts.repositories.extensions.drawableId
 import javax.inject.Inject
@@ -59,7 +58,7 @@ class PlaylistUpdateAnalytics @Inject constructor(
         analyticsTracker.track(AnalyticsEvent.FILTER_CREATED, properties)
     }
 
-    private fun iconAnalyticsValue(playlist: PlaylistEntity) = when (playlist.drawableId) {
+    private fun iconAnalyticsValue(playlist: PlaylistEntity) = when (playlist.icon.drawableId) {
         IR.drawable.ic_filters_list -> Value.IconName.LIST
         IR.drawable.ic_filters_headphones -> Value.IconName.HEADPHONES
         IR.drawable.ic_filters_clock -> Value.IconName.CLOCK
@@ -97,7 +96,7 @@ class PlaylistUpdateAnalytics @Inject constructor(
         }
     }
 
-    private fun colorAnalyticsValue(playlist: PlaylistEntity) = when (playlist.colorIndex) {
+    private fun colorAnalyticsValue(playlist: PlaylistEntity) = when (playlist.icon.colorIndex) {
         0 -> Value.Color.RED
         1 -> Value.Color.BLUE
         2 -> Value.Color.GREEN

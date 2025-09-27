@@ -423,6 +423,7 @@ class PlaylistManagerImpl(
                     isAutoDownloadEnabled = playlist.autoDownload,
                     autoDownloadLimit = playlist.autodownloadLimit,
                 ),
+                icon = playlist.icon,
             )
         }
     }
@@ -443,7 +444,7 @@ class PlaylistManagerImpl(
                     autoDownloadLimit = playlist.autodownloadLimit,
                 ),
                 smartRules = smartRules,
-                iconId = playlist.iconId,
+                icon = playlist.icon,
             )
         }
     }

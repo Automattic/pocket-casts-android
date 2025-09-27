@@ -92,7 +92,7 @@ class PodcastOptionsFragment :
             val playlist = smartPlaylistManager.findByUuid(playlistUuid) ?: return@launch
             this@PodcastOptionsFragment.playlist = playlist
 
-            val color = playlist.getColor(context)
+            val color = playlist.icon.getColor(requireContext())
 
             podcastSelection = if (playlist.podcastUuidList.isEmpty() || playlist.allPodcasts) subscribedPodcasts else playlist.podcastUuidList
             podcastSelectDisabled.isVisible = playlist.allPodcasts

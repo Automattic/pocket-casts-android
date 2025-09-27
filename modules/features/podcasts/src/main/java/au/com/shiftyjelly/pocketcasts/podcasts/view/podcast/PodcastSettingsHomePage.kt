@@ -43,6 +43,7 @@ import au.com.shiftyjelly.pocketcasts.compose.preview.ThemePreviewParameterProvi
 import au.com.shiftyjelly.pocketcasts.compose.theme
 import au.com.shiftyjelly.pocketcasts.localization.helper.toFriendlyString
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
+import au.com.shiftyjelly.pocketcasts.models.to.PlaylistIcon
 import au.com.shiftyjelly.pocketcasts.models.type.SmartRules
 import au.com.shiftyjelly.pocketcasts.models.type.SmartRules.PodcastsRule
 import au.com.shiftyjelly.pocketcasts.podcasts.R
@@ -357,7 +358,7 @@ private fun PodcastSettingsHomePagePreview(
                         smartRules = SmartRules.Default.copy(
                             podcasts = PodcastsRule.Selected(uuids = setOf("podcast-uuid")),
                         ),
-                        iconId = 0,
+                        icon = PlaylistIcon(0),
                     )
                 },
                 globalUpNextLimit = 100,

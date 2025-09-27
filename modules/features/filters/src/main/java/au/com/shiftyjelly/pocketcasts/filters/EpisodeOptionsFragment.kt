@@ -91,7 +91,7 @@ class EpisodeOptionsFragment :
                 userChanged = true
             })
 
-            val color = playlist.getColor(context)
+            val color = playlist.icon.getColor(requireContext())
             val filterTintColor = ThemeColor.filterInteractive01(theme.activeTheme, color)
             btnSave.setBackgroundColor(filterTintColor)
             btnSave.setTextColor(ThemeColor.filterInteractive02(theme.activeTheme, color))
