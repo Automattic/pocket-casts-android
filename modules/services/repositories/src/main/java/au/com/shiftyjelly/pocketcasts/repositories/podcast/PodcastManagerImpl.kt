@@ -666,7 +666,7 @@ class PodcastManagerImpl @Inject constructor(
             }
 
             val currentDownloadCount = podcastUuidToDownloadCount.getOrDefault(episode.podcastUuid, 0)
-            if (currentDownloadCount >= AutoDownloadLimitSetting.getNumberOfEpisodes(settings.autoDownloadLimit.value)) {
+            if (currentDownloadCount >= settings.autoDownloadLimit.value.episodeCount) {
                 continue // Skip to the next episode since it already downloaded the limit of episodes for this podcast
             }
 

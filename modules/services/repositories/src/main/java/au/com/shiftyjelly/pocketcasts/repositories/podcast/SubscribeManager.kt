@@ -112,7 +112,7 @@ class SubscribeManager @Inject constructor(
                 if (canDownloadEpisodesAfterFollowPodcast(subscribed, shouldAutoDownload)) {
                     podcastDao.findByUuidBlocking(podcastUuid)?.let { podcast ->
                         val episodes = episodeManager.findEpisodesByPodcastOrderedByPublishDateBlocking(podcast)
-                        val numberOfEpisodes = AutoDownloadLimitSetting.getNumberOfEpisodes(settings.autoDownloadLimit.value)
+                        val numberOfEpisodes = settings.autoDownloadLimit.value.episodeCount
 
                         episodes.take(numberOfEpisodes).forEach { episode ->
                             if (episode.isQueued || episode.isDownloaded || episode.isDownloading || episode.isExemptFromAutoDownload) {

@@ -456,7 +456,7 @@ class AutoDownloadSettingsFragment :
     }
 
     private fun updateOnFollowSummary() {
-        val limitDownloads = AutoDownloadLimitSetting.getNumberOfEpisodes(viewModel.getLimitDownload())
+        val limitDownloads = viewModel.getLimitDownload().episodeCount
 
         val localizedLimitDownloads = when (limitDownloads) {
             2 -> resources.getString(LR.string.number_two)
