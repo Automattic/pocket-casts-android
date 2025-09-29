@@ -8,16 +8,21 @@ import androidx.test.rule.ServiceTestRule
 import au.com.shiftyjelly.pocketcasts.models.entity.PlaylistEntity
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
+import au.com.shiftyjelly.pocketcasts.models.to.PlaylistIcon
 import au.com.shiftyjelly.pocketcasts.models.type.Subscription
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.preferences.UserSetting
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PODCASTS_ROOT
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackService
 import au.com.shiftyjelly.pocketcasts.repositories.playback.auto.AutoMediaId
+import au.com.shiftyjelly.pocketcasts.repositories.playlist.ManualPlaylistPreview
+import au.com.shiftyjelly.pocketcasts.repositories.playlist.Playlist
+import au.com.shiftyjelly.pocketcasts.repositories.playlist.PlaylistPreview
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
 import java.util.Date
 import java.util.UUID
 import java.util.concurrent.TimeoutException
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.runBlocking
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
@@ -70,8 +75,15 @@ class AutoPlaybackServiceTest {
     @Test
     fun testLoadFilters() {
         runBlocking {
-            val playlist = PlaylistEntity(uuid = UUID.randomUUID().toString(), title = "Test title", iconId = 0)
-            service.smartPlaylistManager = mock { on { findAllBlocking() }.doReturn(listOf(playlist)) }
+            val playlist = ManualPlaylistPreview(
+                uuid = "uuid",
+                title = "Playlist title",
+                episodeCount = 0,
+                artworkPodcastUuids = emptyList(),
+                settings = Playlist.Settings.ForPreview,
+                icon = PlaylistIcon(0),
+            )
+            service.playlistManager = mock { on { playlistPreviewsFlow() }.doReturn(flowOf(listOf(playlist))) }
 
             val filtersRoot = service.loadFiltersRoot()
             assertTrue("Filters should not be empty", filtersRoot.isNotEmpty())
@@ -108,7 +120,7 @@ class AutoPlaybackServiceTest {
             val podcast = Podcast(UUID.randomUUID().toString(), title = "Test podcast")
             val episode = PodcastEpisode(UUID.randomUUID().toString(), title = "Test episode", publishedDate = Date())
 
-            service.smartPlaylistManager = mock { on { findByUuidBlocking(any()) }.doReturn(null) }
+            service.playlistManager = mock { on { playlistPreviewsFlow() }.doReturn(flowOf(emptyList())) }
             service.podcastManager = mock { on { runBlocking { findPodcastByUuid(any()) } }.doReturn(podcast) }
             service.episodeManager = mock { on { findEpisodesByPodcastOrderedBlocking(any()) }.doReturn(listOf(episode)) }
 
