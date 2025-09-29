@@ -205,7 +205,7 @@ class TimeOptionsFragment :
 
             updatedSelected(0, selectedPosition)
 
-            val color = playlist.getColor(context)
+            val color = playlist.icon.getColor(requireContext())
             val filterTintColor = ThemeColor.filterInteractive01(theme.activeTheme, color)
             btnSave.backgroundTintList = ColorStateList.valueOf(filterTintColor)
             btnSave.setTextColor(ThemeColor.filterInteractive02(theme.activeTheme, color))

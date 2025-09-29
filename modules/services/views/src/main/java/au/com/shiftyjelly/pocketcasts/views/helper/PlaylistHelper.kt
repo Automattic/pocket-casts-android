@@ -12,8 +12,8 @@ object PlaylistHelper {
         if (imageView == null) {
             return
         }
-        imageView.setImageResource(playlist.drawableId)
-        val color = playlist.getColor(imageView.context)
+        imageView.setImageResource(playlist.icon.drawableId)
+        val color = playlist.icon.getColor(imageView.context)
         ImageViewCompat.setImageTintList(imageView, ColorStateList.valueOf(color))
     }
 }

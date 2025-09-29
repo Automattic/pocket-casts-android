@@ -120,7 +120,7 @@ class DurationOptionsFragment : BaseFragment() {
             stepperShorterThan.value = playlist.shorterThan
             stepperShorterThan.onValueChanged = onStepperValueChanged
 
-            val color = playlist.getColor(context)
+            val color = playlist.icon.getColor(requireContext())
             val filterTintColor = ThemeColor.filterInteractive01(theme.activeTheme, color)
             val filterTintList = ColorStateList.valueOf(filterTintColor)
             btnSave.setBackgroundColor(filterTintColor)

@@ -62,7 +62,7 @@ class DynamicShortcutsSynchronizer @Inject constructor(
         val shortcut = ShortcutInfo.Builder(context, TOP_FILTER_SHORTCUT_ID)
             .setShortLabel(title)
             .setLongLabel(title)
-            .setIcon(Icon.createWithResource(context, playlist.shortcutDrawableId))
+            .setIcon(Icon.createWithResource(context, playlist.icon.shortcutDrawableId))
             .setIntent(deepLink.toIntent(context))
             .build()
 
