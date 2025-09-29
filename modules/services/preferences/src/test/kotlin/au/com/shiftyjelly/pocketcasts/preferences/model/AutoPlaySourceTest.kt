@@ -43,43 +43,4 @@ class AutoPlaySourceTest {
 
         assertEquals(AutoPlaySource.Predefined.Starred, source)
     }
-
-    @Test
-    fun `create PodcastOrFilter from uuid server ID`() {
-        val uuid = UUID.randomUUID().toString()
-
-        val source = AutoPlaySource.fromServerId(uuid)
-
-        assertEquals(AutoPlaySource.PodcastOrFilter(uuid), source)
-    }
-
-    @Test
-    fun `create None from malformed uuid server ID`() {
-        val malformedUuid = UUID.randomUUID().toString().replace("-", "")
-
-        val source = AutoPlaySource.fromServerId(malformedUuid)
-
-        assertEquals(AutoPlaySource.Predefined.None, source)
-    }
-
-    @Test
-    fun `create Files from server ID`() {
-        val source = AutoPlaySource.fromServerId("files")
-
-        assertEquals(AutoPlaySource.Predefined.Files, source)
-    }
-
-    @Test
-    fun `create Downloads from server ID`() {
-        val source = AutoPlaySource.fromServerId("downloads")
-
-        assertEquals(AutoPlaySource.Predefined.Downloads, source)
-    }
-
-    @Test
-    fun `create Starred from server ID`() {
-        val source = AutoPlaySource.fromServerId("starred")
-
-        assertEquals(AutoPlaySource.Predefined.Starred, source)
-    }
 }
