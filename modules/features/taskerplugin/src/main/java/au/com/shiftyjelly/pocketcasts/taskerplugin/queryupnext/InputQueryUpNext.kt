@@ -1,4 +1,4 @@
-package au.com.shiftyjelly.pocketcasts.taskerplugin.queryUpNext
+package au.com.shiftyjelly.pocketcasts.taskerplugin.queryupnext
 
 import com.joaomgcd.taskerpluginlibrary.input.TaskerInputRoot
 

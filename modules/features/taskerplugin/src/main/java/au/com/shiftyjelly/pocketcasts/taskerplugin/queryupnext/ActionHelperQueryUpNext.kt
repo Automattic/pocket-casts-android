@@ -1,4 +1,4 @@
-package au.com.shiftyjelly.pocketcasts.taskerplugin.queryUpNext
+package au.com.shiftyjelly.pocketcasts.taskerplugin.queryupnext
 
 import au.com.shiftyjelly.pocketcasts.taskerplugin.base.OutputQueryEpisodes
 import com.joaomgcd.taskerpluginlibrary.config.TaskerPluginConfig

@@ -6,7 +6,7 @@ import androidx.annotation.StringRes
 import au.com.shiftyjelly.pocketcasts.localization.R
 import au.com.shiftyjelly.pocketcasts.taskerplugin.base.OutputQueryEpisodes
 import au.com.shiftyjelly.pocketcasts.taskerplugin.base.ViewModelBase
-import au.com.shiftyjelly.pocketcasts.taskerplugin.base.hilt.smartPlaylistManager
+import au.com.shiftyjelly.pocketcasts.taskerplugin.base.hilt.playlistManager
 import au.com.shiftyjelly.pocketcasts.taskerplugin.queryfilterepisodes.ActionHelperQueryFilterEpisodes
 import au.com.shiftyjelly.pocketcasts.taskerplugin.queryfilterepisodes.InputQueryFilterEpisodes
 import com.joaomgcd.taskerpluginlibrary.config.TaskerPluginConfig
@@ -26,7 +26,7 @@ class ViewModelConfigQueryFilterEpisodes @Inject constructor(
     private inner class InputField constructor(@StringRes labelResId: Int, @DrawableRes iconResId: Int, valueGetter: InputQueryFilterEpisodes.() -> String?, valueSetter: InputQueryFilterEpisodes.(String?) -> Unit) : InputFieldBase<String>(labelResId, iconResId, valueGetter, valueSetter) {
         override val askFor get() = true
         override fun getPossibleValues(): Flow<List<String>> {
-            return context.smartPlaylistManager.findAllFlow().map { podcast -> podcast.map { it.title } }
+            return context.playlistManager.playlistPreviewsFlow().map { playlist -> playlist.map { it.title } }
         }
     }
 
