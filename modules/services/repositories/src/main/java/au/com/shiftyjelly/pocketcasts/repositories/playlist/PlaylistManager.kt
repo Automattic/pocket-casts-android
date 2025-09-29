@@ -21,7 +21,9 @@ interface PlaylistManager {
 
     suspend fun updateSortType(uuid: String, type: SortType)
 
-    suspend fun updateAutoDownload(uuid: String, isEnabled: Boolean)
+    suspend fun updateAutoDownload(uuids: Collection<String>, isEnabled: Boolean)
+
+    suspend fun updateAutoDownload(uuid: String, isEnabled: Boolean) = updateAutoDownload(listOf(uuid), isEnabled)
 
     suspend fun updateAutoDownloadLimit(uuid: String, limit: Int)
 
