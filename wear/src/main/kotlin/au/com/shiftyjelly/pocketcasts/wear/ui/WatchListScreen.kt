@@ -12,10 +12,12 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.wear.tooling.preview.devices.WearDevices
 import au.com.shiftyjelly.pocketcasts.compose.CallOnce
 import au.com.shiftyjelly.pocketcasts.repositories.playback.UpNextQueue
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import au.com.shiftyjelly.pocketcasts.wear.theme.WearAppTheme
 import au.com.shiftyjelly.pocketcasts.wear.ui.component.WatchListChip
 import au.com.shiftyjelly.pocketcasts.wear.ui.downloads.DownloadsScreen
-import au.com.shiftyjelly.pocketcasts.wear.ui.filters.FiltersScreen
+import au.com.shiftyjelly.pocketcasts.wear.ui.playlists.PlaylistsScreen
 import au.com.shiftyjelly.pocketcasts.wear.ui.podcasts.PodcastsScreen
 import au.com.shiftyjelly.pocketcasts.wear.ui.settings.SettingsScreen
 import com.google.android.horologist.compose.layout.ScalingLazyColumn
@@ -83,12 +85,21 @@ fun WatchListScreen(
         }
 
         item {
+            val usePlaylists = FeatureFlag.isEnabled(Feature.PLAYLISTS_REBRANDING, immutable = true)
             WatchListChip(
-                title = stringResource(LR.string.filters),
-                iconRes = IR.drawable.ic_filters,
+                title = if (usePlaylists) {
+                    stringResource(LR.string.playlists)
+                } else {
+                    stringResource(LR.string.filters)
+                },
+                iconRes = if (usePlaylists) {
+                    IR.drawable.ic_playlists
+                } else {
+                    IR.drawable.ic_filters
+                },
                 onClick = {
-                    viewModel.onFiltersClicked()
-                    navigateToRoute(FiltersScreen.ROUTE)
+                    viewModel.onPlaylistsClicked()
+                    navigateToRoute(PlaylistsScreen.ROUTE)
                 },
             )
         }
