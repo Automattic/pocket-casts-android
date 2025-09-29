@@ -17,10 +17,8 @@ import au.com.shiftyjelly.pocketcasts.repositories.jobs.VersionMigrationsWorker
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
-import au.com.shiftyjelly.pocketcasts.repositories.podcast.SmartPlaylistManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.UserEpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.refresh.RefreshPodcastsTask
-import au.com.shiftyjelly.pocketcasts.repositories.sync.SyncManager
 import au.com.shiftyjelly.pocketcasts.repositories.user.UserManager
 import au.com.shiftyjelly.pocketcasts.utils.TimberDebugTree
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
@@ -50,8 +48,6 @@ class AutomotiveApplication :
 
     @Inject lateinit var episodeManager: EpisodeManager
 
-    @Inject lateinit var smartPlaylistManager: SmartPlaylistManager
-
     @Inject lateinit var playbackManager: PlaybackManager
 
     @Inject lateinit var downloadManager: DownloadManager
@@ -69,8 +65,6 @@ class AutomotiveApplication :
     @Inject lateinit var analyticsTracker: AnalyticsTracker
 
     @Inject lateinit var experimentProvider: ExperimentProvider
-
-    @Inject lateinit var syncManager: SyncManager
 
     @Inject @ApplicationScope
     lateinit var applicationScope: CoroutineScope
@@ -98,7 +92,7 @@ class AutomotiveApplication :
         runBlocking {
             withContext(Dispatchers.Default) {
                 playbackManager.setup()
-                downloadManager.setup(episodeManager, podcastManager, smartPlaylistManager, playbackManager)
+                downloadManager.setup(episodeManager, podcastManager, playbackManager)
                 RefreshPodcastsTask.runNow(this@AutomotiveApplication, applicationScope)
             }
 

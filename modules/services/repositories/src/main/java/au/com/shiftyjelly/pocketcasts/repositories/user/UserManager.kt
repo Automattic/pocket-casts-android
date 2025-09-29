@@ -8,6 +8,7 @@ import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.analytics.TracksAnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.analytics.experiments.ExperimentProvider
+import au.com.shiftyjelly.pocketcasts.models.db.dao.PlaylistDao
 import au.com.shiftyjelly.pocketcasts.models.type.SignInState
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.di.ApplicationScope
@@ -17,10 +18,10 @@ import au.com.shiftyjelly.pocketcasts.repositories.notification.NotificationSche
 import au.com.shiftyjelly.pocketcasts.repositories.notification.TrendingAndRecommendationsNotificationType
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.repositories.playback.UpNextQueue
+import au.com.shiftyjelly.pocketcasts.repositories.playlist.DefaultPlaylistsInitializer
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.FolderManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
-import au.com.shiftyjelly.pocketcasts.repositories.podcast.SmartPlaylistManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.UserEpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.searchhistory.SearchHistoryManager
 import au.com.shiftyjelly.pocketcasts.repositories.subscription.SubscriptionManager
@@ -48,7 +49,7 @@ interface UserManager {
     fun beginMonitoringAccountManager(playbackManager: PlaybackManager)
     fun getSignInState(): Flowable<SignInState>
     fun signOut(playbackManager: PlaybackManager, wasInitiatedByUser: Boolean)
-    fun signOutAndClearData(playbackManager: PlaybackManager, upNextQueue: UpNextQueue, smartPlaylistManager: SmartPlaylistManager, folderManager: FolderManager, searchHistoryManager: SearchHistoryManager, episodeManager: EpisodeManager, wasInitiatedByUser: Boolean)
+    fun signOutAndClearData(playbackManager: PlaybackManager, upNextQueue: UpNextQueue, folderManager: FolderManager, searchHistoryManager: SearchHistoryManager, episodeManager: EpisodeManager, wasInitiatedByUser: Boolean)
 }
 
 class UserManagerImpl @Inject constructor(
@@ -58,6 +59,8 @@ class UserManagerImpl @Inject constructor(
     val subscriptionManager: SubscriptionManager,
     val podcastManager: PodcastManager,
     val userEpisodeManager: UserEpisodeManager,
+    private val playlistDao: PlaylistDao,
+    private val playlistsInitializer: DefaultPlaylistsInitializer,
     private val analyticsTracker: AnalyticsTracker,
     private val tracker: TracksAnalyticsTracker,
     @ApplicationScope private val applicationScope: CoroutineScope,
@@ -162,7 +165,6 @@ class UserManagerImpl @Inject constructor(
     override fun signOutAndClearData(
         playbackManager: PlaybackManager,
         upNextQueue: UpNextQueue,
-        smartPlaylistManager: SmartPlaylistManager,
         folderManager: FolderManager,
         searchHistoryManager: SearchHistoryManager,
         episodeManager: EpisodeManager,
@@ -183,7 +185,8 @@ class UserManagerImpl @Inject constructor(
         runBlocking(Dispatchers.IO) {
             upNextQueue.removeAllIncludingChanges()
 
-            smartPlaylistManager.resetDb()
+            playlistDao.deleteAllPlaylists()
+            playlistsInitializer.initialize(force = true)
             folderManager.deleteAll()
             searchHistoryManager.clearAll()
 

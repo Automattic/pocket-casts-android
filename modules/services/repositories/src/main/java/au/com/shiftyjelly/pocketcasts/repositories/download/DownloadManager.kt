@@ -7,8 +7,6 @@ import au.com.shiftyjelly.pocketcasts.models.entity.BaseEpisode
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
-import au.com.shiftyjelly.pocketcasts.repositories.podcast.SmartPlaylistManager
-import io.reactivex.subjects.Subject
 import kotlinx.coroutines.flow.Flow
 
 interface DownloadManager {
@@ -20,7 +18,7 @@ interface DownloadManager {
 
     fun episodeDownloadProgressFlow(episodeUuid: String): Flow<DownloadProgressUpdate>
 
-    fun setup(episodeManager: EpisodeManager, podcastManager: PodcastManager, smartPlaylistManager: SmartPlaylistManager, playbackManager: PlaybackManager)
+    fun setup(episodeManager: EpisodeManager, podcastManager: PodcastManager, playbackManager: PlaybackManager)
     fun beginMonitoringWorkManager(context: Context)
     fun hasPendingOrRunningDownloads(): Boolean
     fun addEpisodeToQueue(episode: BaseEpisode, from: String, fireEvent: Boolean, source: SourceView)

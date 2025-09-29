@@ -936,7 +936,7 @@
     <string name="filters_time_anytime">Any time</string>
     <string name="filters_time_month">Last month</string>
     <string name="filters_time_week">Last week</string>
-    <string name="filters_title_in_progress" translatable="false">@string/in_progress</string>
+    <string name="filters_title_in_progress" translatable="false">@string/in_progress_uppercase</string>
     <string name="filters_title_new_releases">New Releases</string>
     <string name="filters_title_starred" translatable="false">@string/starred</string>
     <string name="filters_warning_delete_button" translatable="false">@string/filters_options_delete</string>
