@@ -20,6 +20,8 @@ import au.com.shiftyjelly.pocketcasts.servers.model.ExpandedStyleMoshiAdapter
 import au.com.shiftyjelly.pocketcasts.servers.model.ListTypeMoshiAdapter
 import au.com.shiftyjelly.pocketcasts.servers.podcast.PodcastCacheService
 import au.com.shiftyjelly.pocketcasts.servers.podcast.TranscriptService
+import au.com.shiftyjelly.pocketcasts.servers.search.AutoCompleteResult
+import au.com.shiftyjelly.pocketcasts.servers.search.SearchService
 import au.com.shiftyjelly.pocketcasts.servers.server.ListWebService
 import au.com.shiftyjelly.pocketcasts.servers.sync.LoginIdentity
 import au.com.shiftyjelly.pocketcasts.servers.sync.update.SyncUpdateResponse
@@ -78,6 +80,7 @@ class ServersModule {
             .add(AccessToken::class.java, AccessToken.Adapter)
             .add(RefreshToken::class.java, RefreshToken.Adapter)
             .add(BlazeAdLocation::class.java, BlazeAdLocationMoshiAdapter())
+            .add(AutoCompleteResult.jsonAdapter)
             .add(AnonymousBumpStat.Adapter)
             .add(LoginIdentity.Adapter)
             .add(ListTypeMoshiAdapter())
@@ -292,6 +295,21 @@ class ServersModule {
 
     @Provides
     @Singleton
+    @SearchRetrofit
+    internal fun provideSearchApiRetrofit(@Cached okHttpClient: OkHttpClient, moshi: Moshi): Retrofit {
+        return Retrofit.Builder()
+            .addConverterFactory(MoshiConverterFactory.create(moshi))
+            .baseUrl(Settings.SEARCH_API_URL)
+            .client(okHttpClient)
+            .build()
+    }
+
+    @Singleton
+    @Provides
+    internal fun provideSearchService(@SearchRetrofit retrofit: Retrofit): SearchService = retrofit.create(SearchService::class.java)
+
+    @Provides
+    @Singleton
     internal fun provideAccountManager(@ApplicationContext context: Context): AccountManager {
         return AccountManager.get(context)
     }
@@ -376,3 +394,7 @@ annotation class DiscoverServiceRetrofit
 @Qualifier
 @Retention(AnnotationRetention.BINARY)
 annotation class TranscriptRetrofit
+
+@Qualifier
+@Retention(AnnotationRetention.BINARY)
+annotation class SearchRetrofit

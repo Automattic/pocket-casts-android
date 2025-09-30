@@ -1,9 +1,18 @@
 package au.com.shiftyjelly.pocketcasts.servers.discover
 
 import au.com.shiftyjelly.pocketcasts.models.to.SearchAutoCompleteItem
+import java.io.Serializable
 
-data class AutoCompleteSearch(
-    val searchTerm: String = "",
-    val error: Throwable? = null,
-    val results: List<SearchAutoCompleteItem> = emptyList()
-)
+sealed interface AutoCompleteSearch : Serializable {
+    val searchTerm: String
+
+    data class Error(
+        override val searchTerm: String,
+        val error: Throwable,
+    ) : AutoCompleteSearch
+
+    data class Success(
+        override val searchTerm: String,
+        val results: List<SearchAutoCompleteItem>,
+    ) : AutoCompleteSearch
+}

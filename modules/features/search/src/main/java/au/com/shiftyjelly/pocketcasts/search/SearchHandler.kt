@@ -7,6 +7,7 @@ import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.to.FolderItem
+import au.com.shiftyjelly.pocketcasts.models.to.SearchAutoCompleteItem
 import au.com.shiftyjelly.pocketcasts.models.type.PodcastsSortType
 import au.com.shiftyjelly.pocketcasts.models.type.SignInState
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
@@ -27,6 +28,7 @@ import io.reactivex.rxkotlin.Observables
 import io.reactivex.schedulers.Schedulers
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
+import kotlinx.coroutines.rx2.rxObservable
 import timber.log.Timber
 
 class SearchHandler @Inject constructor(
@@ -104,23 +106,25 @@ class SearchHandler @Inject constructor(
         .toObservable()
         .map { podcasts -> podcasts.map(Podcast::uuid).toHashSet() }
 
-    private val autocompleteResults = searchQuery
+    private val autoCompleteResults = searchQuery
         .subscribeOn(Schedulers.io())
         .map { it.string.trim() }
+        .debounce(200L, TimeUnit.MILLISECONDS)
         .switchMap { query ->
             if (query.isEmpty()) {
-                Observable.just(AutoCompleteSearch(searchTerm = query))
+                Observable.just<AutoCompleteSearch>(AutoCompleteSearch.Success(searchTerm = query, results = emptyList()))
             } else {
-                autoCompleteManager.autoCompleteSearchRxObservable(term = query)
-                    .subscribeOn(Schedulers.io())
-                    .map {
-                        AutoCompleteSearch(
+                rxObservable<List<SearchAutoCompleteItem>> {
+                    autoCompleteManager.autoCompleteSearch(term = query)
+                }.subscribeOn(Schedulers.io())
+                    .map<AutoCompleteSearch> {
+                        AutoCompleteSearch.Success(
                             searchTerm = query,
-                            results = it
+                            results = it,
                         )
                     }
                     .onErrorReturn { exception ->
-                        AutoCompleteSearch(
+                        AutoCompleteSearch.Error(
                             searchTerm = query,
                             error = exception,
                         )
@@ -179,7 +183,7 @@ class SearchHandler @Inject constructor(
             }
         }
 
-    private val searchFlowable = Observables.combineLatest(searchQuery, subscribedPodcastUuids, localPodcastsResults, serverSearchResults, loadingObservable, autocompleteResults) { searchTerm, subscribedPodcastUuids, localPodcastsResult, serverSearchResults, loading, autoCompleteResult ->
+    private val searchFlowable = Observables.combineLatest(searchQuery, subscribedPodcastUuids, localPodcastsResults, serverSearchResults, loadingObservable, autoCompleteResults) { searchTerm, subscribedPodcastUuids, localPodcastsResult, serverSearchResults, loading, autoCompleteResult ->
         if (searchTerm.string.isBlank()) {
             SearchState.Results(searchTerm = searchTerm.string, podcasts = emptyList(), episodes = emptyList(), autoCompleteResults = emptyList(), loading = loading, error = null)
         } else {
@@ -207,7 +211,7 @@ class SearchHandler @Inject constructor(
                     searchTerm = searchTerm.string,
                     podcasts = searchPodcastsResult,
                     episodes = searchEpisodesResult,
-                    autoCompleteResults = autoCompleteResult.results,
+                    autoCompleteResults = (autoCompleteResult as? AutoCompleteSearch.Success)?.results ?: emptyList(),
                     loading = loading,
                     error = serverSearchResults.error,
                 )
@@ -220,7 +224,7 @@ class SearchHandler @Inject constructor(
         .onErrorReturn { exception ->
             analyticsTracker.track(AnalyticsEvent.SEARCH_FAILED, AnalyticsProp.sourceMap(source))
             SearchState.Results(
-                searchTerm = searchQuery.value?.string ?: "",
+                searchTerm = searchQuery.value?.string.orEmpty(),
                 podcasts = emptyList(),
                 episodes = emptyList(),
                 autoCompleteResults = emptyList(),
