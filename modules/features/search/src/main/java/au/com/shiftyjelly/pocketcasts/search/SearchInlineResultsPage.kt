@@ -344,6 +344,7 @@ private fun SearchResultsViewPreview(
                 error = null,
                 loading = false,
                 searchTerm = "",
+                autoCompleteResults = emptyList(),
             ),
             onEpisodeClick = {},
             onPodcastClick = {},

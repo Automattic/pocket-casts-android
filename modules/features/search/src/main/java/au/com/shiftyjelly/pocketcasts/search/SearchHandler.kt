@@ -7,13 +7,16 @@ import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.to.FolderItem
+import au.com.shiftyjelly.pocketcasts.models.to.SearchAutoCompleteItem
 import au.com.shiftyjelly.pocketcasts.models.type.PodcastsSortType
 import au.com.shiftyjelly.pocketcasts.models.type.SignInState
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.FolderManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
+import au.com.shiftyjelly.pocketcasts.repositories.search.SearchAutoCompleteManager
 import au.com.shiftyjelly.pocketcasts.repositories.user.UserManager
 import au.com.shiftyjelly.pocketcasts.servers.ServiceManager
+import au.com.shiftyjelly.pocketcasts.servers.discover.AutoCompleteSearch
 import au.com.shiftyjelly.pocketcasts.servers.discover.GlobalServerSearch
 import au.com.shiftyjelly.pocketcasts.servers.podcast.PodcastCacheServiceManager
 import com.jakewharton.rxrelay2.BehaviorRelay
@@ -25,11 +28,13 @@ import io.reactivex.rxkotlin.Observables
 import io.reactivex.schedulers.Schedulers
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
+import kotlinx.coroutines.rx2.rxObservable
 import timber.log.Timber
 
 class SearchHandler @Inject constructor(
     val serviceManager: ServiceManager,
     val podcastManager: PodcastManager,
+    val autoCompleteManager: SearchAutoCompleteManager,
     val userManager: UserManager,
     val settings: Settings,
     private val cacheServiceManager: PodcastCacheServiceManager,
@@ -101,6 +106,32 @@ class SearchHandler @Inject constructor(
         .toObservable()
         .map { podcasts -> podcasts.map(Podcast::uuid).toHashSet() }
 
+    private val autoCompleteResults = searchQuery
+        .subscribeOn(Schedulers.io())
+        .map { it.string.trim() }
+        .debounce(200L, TimeUnit.MILLISECONDS)
+        .switchMap { query ->
+            if (query.isEmpty()) {
+                Observable.just<AutoCompleteSearch>(AutoCompleteSearch.Success(searchTerm = query, results = emptyList()))
+            } else {
+                rxObservable<List<SearchAutoCompleteItem>> {
+                    autoCompleteManager.autoCompleteSearch(term = query)
+                }.subscribeOn(Schedulers.io())
+                    .map<AutoCompleteSearch> {
+                        AutoCompleteSearch.Success(
+                            searchTerm = query,
+                            results = it,
+                        )
+                    }
+                    .onErrorReturn { exception ->
+                        AutoCompleteSearch.Error(
+                            searchTerm = query,
+                            error = exception,
+                        )
+                    }
+            }
+        }
+
     private val serverSearchResults = searchQuery
         .subscribeOn(Schedulers.io())
         .map { it.copy(string = it.string.trim()) }
@@ -152,9 +183,9 @@ class SearchHandler @Inject constructor(
             }
         }
 
-    private val searchFlowable = Observables.combineLatest(searchQuery, subscribedPodcastUuids, localPodcastsResults, serverSearchResults, loadingObservable) { searchTerm, subscribedPodcastUuids, localPodcastsResult, serverSearchResults, loading ->
+    private val searchFlowable = Observables.combineLatest(searchQuery, subscribedPodcastUuids, localPodcastsResults, serverSearchResults, loadingObservable, autoCompleteResults) { searchTerm, subscribedPodcastUuids, localPodcastsResult, serverSearchResults, loading, autoCompleteResult ->
         if (searchTerm.string.isBlank()) {
-            SearchState.Results(searchTerm = searchTerm.string, podcasts = emptyList(), episodes = emptyList(), loading = loading, error = null)
+            SearchState.Results(searchTerm = searchTerm.string, podcasts = emptyList(), episodes = emptyList(), autoCompleteResults = emptyList(), loading = loading, error = null)
         } else {
             // set if the podcast is subscribed so we can show a tick
             val serverPodcastsResult = serverSearchResults.podcastSearch.searchResults.map { podcast -> FolderItem.Podcast(podcast) }
@@ -180,6 +211,7 @@ class SearchHandler @Inject constructor(
                     searchTerm = searchTerm.string,
                     podcasts = searchPodcastsResult,
                     episodes = searchEpisodesResult,
+                    autoCompleteResults = (autoCompleteResult as? AutoCompleteSearch.Success)?.results ?: emptyList(),
                     loading = loading,
                     error = serverSearchResults.error,
                 )
@@ -192,9 +224,10 @@ class SearchHandler @Inject constructor(
         .onErrorReturn { exception ->
             analyticsTracker.track(AnalyticsEvent.SEARCH_FAILED, AnalyticsProp.sourceMap(source))
             SearchState.Results(
-                searchTerm = searchQuery.value?.string ?: "",
+                searchTerm = searchQuery.value?.string.orEmpty(),
                 podcasts = emptyList(),
                 episodes = emptyList(),
+                autoCompleteResults = emptyList(),
                 loading = false,
                 error = exception,
             )

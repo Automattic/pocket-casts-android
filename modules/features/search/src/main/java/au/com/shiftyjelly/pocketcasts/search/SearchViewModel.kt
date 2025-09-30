@@ -10,6 +10,7 @@ import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.to.EpisodeItem
 import au.com.shiftyjelly.pocketcasts.models.to.FolderItem
+import au.com.shiftyjelly.pocketcasts.models.to.SearchAutoCompleteItem
 import au.com.shiftyjelly.pocketcasts.models.to.SearchHistoryEntry
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
 import au.com.shiftyjelly.pocketcasts.repositories.searchhistory.SearchHistoryManager
@@ -49,6 +50,7 @@ class SearchViewModel @Inject constructor(
             searchTerm = "",
             podcasts = emptyList(),
             episodes = emptyList(),
+            autoCompleteResults = emptyList(),
             error = null,
             loading = false,
         ),
@@ -192,6 +194,7 @@ sealed class SearchState {
     data class NoResults(override val searchTerm: String) : SearchState()
     data class Results(
         override val searchTerm: String,
+        val autoCompleteResults: List<SearchAutoCompleteItem>,
         val podcasts: List<FolderItem>,
         val episodes: List<EpisodeItem>,
         val loading: Boolean,
