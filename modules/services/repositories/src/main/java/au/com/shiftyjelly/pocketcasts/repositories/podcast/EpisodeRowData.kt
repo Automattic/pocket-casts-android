@@ -1,6 +1,5 @@
 package au.com.shiftyjelly.pocketcasts.repositories.podcast
 
-import au.com.shiftyjelly.pocketcasts.models.entity.BaseEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.UserEpisode
 import au.com.shiftyjelly.pocketcasts.models.type.Subscription
@@ -20,6 +19,7 @@ import javax.inject.Inject
 import kotlin.math.roundToInt
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.rx2.asObservable
+import kotlinx.coroutines.rx2.rxMaybe
 
 data class EpisodeRowData(
     val downloadProgress: Int,
@@ -38,15 +38,18 @@ class EpisodeRowDataProvider @Inject constructor(
     private val settings: Settings,
 ) {
     fun episodeRowDataObservable(episodeUuid: String): Observable<EpisodeRowData> {
-        return episodeManager.findEpisodeByUuidRxFlowable(episodeUuid)
+        return rxMaybe { episodeManager.findEpisodeByUuid(episodeUuid) }
             .toObservable()
             .flatMap { episode ->
                 Observables.combineLatest(
-                    downloadProgressObservable(episode),
-                    uploadProgressObservable(episode),
-                    playbackStatusObservable(episode),
-                    isInUpNextObservable(episode),
-                    hasBookmarksObservable(episode),
+                    downloadProgressObservable(episodeUuid),
+                    when (episode) {
+                        is PodcastEpisode -> Observable.just(0)
+                        is UserEpisode -> uploadProgressObservable(episodeUuid)
+                    },
+                    playbackStatusObservable(episodeUuid),
+                    isInUpNextObservable(episodeUuid),
+                    hasBookmarksObservable(episodeUuid),
                     ::EpisodeRowData,
                 )
             }
@@ -54,8 +57,8 @@ class EpisodeRowDataProvider @Inject constructor(
             .observeOn(AndroidSchedulers.mainThread())
     }
 
-    private fun downloadProgressObservable(episode: BaseEpisode): Observable<Int> {
-        return downloadManager.episodeDownloadProgressFlow(episode.uuid)
+    private fun downloadProgressObservable(episodeUuid: String): Observable<Int> {
+        return downloadManager.episodeDownloadProgressFlow(episodeUuid)
             .asObservable()
             .map { (it.downloadProgress * 100).roundToInt() }
             .throttleLatest(1, TimeUnit.SECONDS)
@@ -63,44 +66,39 @@ class EpisodeRowDataProvider @Inject constructor(
             .distinctUntilChanged()
     }
 
-    private fun uploadProgressObservable(episode: BaseEpisode): Observable<Int> {
-        return when (episode) {
-            is PodcastEpisode -> Observable.just(0)
-            is UserEpisode -> {
-                UploadProgressManager.progressFlow(episode.uuid)
-                    .asObservable()
-                    .map { (it * 100).roundToInt() }
-                    .throttleLatest(1, TimeUnit.SECONDS)
-                    .startWith(0)
-                    .distinctUntilChanged()
-            }
-        }
-    }
-
-    private fun playbackStatusObservable(episode: BaseEpisode): Observable<PlaybackState> {
-        val emptyState = PlaybackState(episodeUuid = episode.uuid)
-        return playbackManager.playbackStateRelay
-            .startWith(emptyState)
-            .map { if (it.episodeUuid == episode.uuid) it else emptyState }
+    private fun uploadProgressObservable(episodeUuid: String): Observable<Int> {
+        return UploadProgressManager.progressFlow(episodeUuid)
+            .asObservable()
+            .map { (it * 100).roundToInt() }
+            .throttleLatest(1, TimeUnit.SECONDS)
+            .startWith(0)
             .distinctUntilChanged()
     }
 
-    private fun isInUpNextObservable(episode: BaseEpisode): Observable<Boolean> {
+    private fun playbackStatusObservable(episodeUuid: String): Observable<PlaybackState> {
+        val emptyState = PlaybackState(episodeUuid = episodeUuid)
+        return playbackManager.playbackStateRelay
+            .startWith(emptyState)
+            .map { if (it.episodeUuid == episodeUuid) it else emptyState }
+            .distinctUntilChanged()
+    }
+
+    private fun isInUpNextObservable(episodeUuid: String): Observable<Boolean> {
         return upNextQueue
             .changesObservable
-            .containsUuid(episode.uuid)
+            .containsUuid(episodeUuid)
             .startWith(false)
             .distinctUntilChanged()
     }
 
-    private fun hasBookmarksObservable(episode: BaseEpisode): Observable<Boolean> {
+    private fun hasBookmarksObservable(episodeUuid: String): Observable<Boolean> {
         fun hasActiveBookmarks(subscription: Subscription?, hasBookmarks: Boolean): Boolean {
             return hasBookmarks && subscription != null
         }
 
         val combinedDataFlow = combine(
             settings.cachedSubscription.flow,
-            bookmarkManager.hasBookmarksFlow(episode.uuid),
+            bookmarkManager.hasBookmarksFlow(episodeUuid),
             ::hasActiveBookmarks,
         )
 
