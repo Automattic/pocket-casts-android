@@ -132,6 +132,7 @@ class LoginWithGoogleViewModel @Inject constructor(
             }
             is LoginResult.Failed -> {
                 LogBuffer.i(LogBuffer.TAG_BACKGROUND_TASKS, "Failed to login with Google: ${loginResult.message}")
+                _state.value = State.Failed.Other
             }
         }
     }
@@ -147,6 +148,7 @@ class LoginWithGoogleViewModel @Inject constructor(
             }
             is LoginResult.Failed -> {
                 LogBuffer.i(LogBuffer.TAG_BACKGROUND_TASKS, "Failed to login with email and password: ${loginResult.message}")
+                _state.value = State.Failed.Other
             }
         }
     }
