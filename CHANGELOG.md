@@ -11,7 +11,7 @@
         ([#4523](https://github.com/Automattic/pocket-casts-android/pull/4523))
     *   Use CredentialManager on WearOS for Google login
         ([#4528](https://github.com/Automattic/pocket-casts-android/pull/4528))
-    *   Do not remove episodes from Up Next when downloaded file is deleted.
+    *   Do not remove episodes from Up Next when downloaded files are deleted.
         ([#4549](https://github.com/Automattic/pocket-casts-android/pull/4549))
 
 7.98
