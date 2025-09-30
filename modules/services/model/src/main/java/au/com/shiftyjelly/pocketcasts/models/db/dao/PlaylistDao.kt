@@ -177,6 +177,9 @@ abstract class PlaylistDao {
     @Query("DELETE FROM playlists WHERE deleted = 1")
     abstract suspend fun deleteMarkedPlaylists()
 
+    @Query("DELETE FROM playlists")
+    abstract suspend fun deleteAllPlaylists()
+
     @Query("DELETE FROM playlists WHERE uuid IN (:uuids)")
     protected abstract suspend fun deleteAllPlaylistsInUnsafe(uuids: Collection<String>)
 

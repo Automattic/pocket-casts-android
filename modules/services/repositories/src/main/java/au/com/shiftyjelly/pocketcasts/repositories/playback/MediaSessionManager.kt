@@ -23,6 +23,7 @@ import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.models.entity.BaseEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
+import au.com.shiftyjelly.pocketcasts.models.to.PlaylistEpisode
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.preferences.Settings.MediaNotificationControls
 import au.com.shiftyjelly.pocketcasts.preferences.model.HeadphoneAction
@@ -30,9 +31,9 @@ import au.com.shiftyjelly.pocketcasts.repositories.bookmark.BookmarkHelper
 import au.com.shiftyjelly.pocketcasts.repositories.bookmark.BookmarkManager
 import au.com.shiftyjelly.pocketcasts.repositories.playback.auto.AutoConverter
 import au.com.shiftyjelly.pocketcasts.repositories.playback.auto.AutoMediaId
+import au.com.shiftyjelly.pocketcasts.repositories.playlist.PlaylistManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
-import au.com.shiftyjelly.pocketcasts.repositories.podcast.SmartPlaylistManager
 import au.com.shiftyjelly.pocketcasts.utils.Optional
 import au.com.shiftyjelly.pocketcasts.utils.Util
 import au.com.shiftyjelly.pocketcasts.utils.extensions.getLaunchActivityPendingIntent
@@ -57,9 +58,11 @@ import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
 import timber.log.Timber
 import au.com.shiftyjelly.pocketcasts.images.R as IR
@@ -68,7 +71,7 @@ class MediaSessionManager(
     val playbackManager: PlaybackManager,
     val podcastManager: PodcastManager,
     val episodeManager: EpisodeManager,
-    val smartPlaylistManager: SmartPlaylistManager,
+    val playlistManager: PlaylistManager,
     val settings: Settings,
     val context: Context,
     val episodeAnalytics: EpisodeAnalytics,
@@ -875,18 +878,18 @@ class MediaSessionManager(
             }
 
             for (option in options) {
-                val playlist = smartPlaylistManager.findFirstByTitleBlocking(option) ?: continue
+                val playlist = runBlocking {
+                    val playlistPreviews = playlistManager.playlistPreviewsFlow().first()
+                    val playlistPreview = playlistPreviews.find { it.title.equals(option, ignoreCase = true) } ?: return@runBlocking null
 
-                Timber.i("Playing matched playlist '$option'")
+                    playlistManager.smartPlaylistFlow(playlistPreview.uuid).first() ?: playlistManager.manualPlaylistFlow(playlistPreview.uuid).first()
+                } ?: continue
 
-                val episodeCount = smartPlaylistManager.countEpisodesBlocking(playlist.id, episodeManager, playbackManager)
-                if (episodeCount == 0) return@launch
-
-                val episodesToPlay = smartPlaylistManager.findEpisodesBlocking(playlist, episodeManager, playbackManager).take(5)
-                if (episodesToPlay.isEmpty()) return@launch
-
-                playEpisodes(episodesToPlay, sourceView)
-
+                val episodes = playlist.episodes.mapNotNull(PlaylistEpisode::toPodcastEpisode)
+                if (episodes.isEmpty()) {
+                    return@launch
+                }
+                playEpisodes(episodes, sourceView)
                 return@launch
             }
 

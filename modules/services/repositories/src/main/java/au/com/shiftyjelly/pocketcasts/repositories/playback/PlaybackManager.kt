@@ -48,10 +48,10 @@ import au.com.shiftyjelly.pocketcasts.repositories.notification.NotificationOpen
 import au.com.shiftyjelly.pocketcasts.repositories.notification.OnboardingNotificationType
 import au.com.shiftyjelly.pocketcasts.repositories.playback.LocalPlayer.Companion.VOLUME_DUCK
 import au.com.shiftyjelly.pocketcasts.repositories.playback.LocalPlayer.Companion.VOLUME_NORMAL
+import au.com.shiftyjelly.pocketcasts.repositories.playlist.PlaylistManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.ChapterManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
-import au.com.shiftyjelly.pocketcasts.repositories.podcast.SmartPlaylistManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.UserEpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.toServerPostFile
 import au.com.shiftyjelly.pocketcasts.repositories.shownotes.ShowNotesManager
@@ -121,7 +121,7 @@ open class PlaybackManager @Inject constructor(
     private val playerManager: PlayerFactory,
     private var castManager: CastManager,
     @ApplicationContext private val application: Context,
-    private val smartPlaylistManager: SmartPlaylistManager,
+    private val playlistManager: PlaylistManager,
     private val downloadManager: DownloadManager,
     val upNextQueue: UpNextQueue,
     private val notificationHelper: NotificationHelper,
@@ -213,7 +213,7 @@ open class PlaybackManager @Inject constructor(
         playbackManager = this,
         podcastManager = podcastManager,
         episodeManager = episodeManager,
-        smartPlaylistManager = smartPlaylistManager,
+        playlistManager = playlistManager,
         settings = settings,
         context = application,
         episodeAnalytics = episodeAnalytics,

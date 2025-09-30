@@ -26,7 +26,6 @@ import au.com.shiftyjelly.pocketcasts.repositories.playback.SleepTimerRestartWhe
 import au.com.shiftyjelly.pocketcasts.repositories.playlist.PlaylistInteractionNotifier
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
-import au.com.shiftyjelly.pocketcasts.repositories.podcast.SmartPlaylistManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.UserEpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.shortcuts.DynamicShortcutsSynchronizer
 import au.com.shiftyjelly.pocketcasts.repositories.support.DatabaseExportHelper
@@ -85,8 +84,6 @@ class PocketCastsApplication :
     @Inject lateinit var settings: Settings
 
     @Inject lateinit var fileStorage: FileStorage
-
-    @Inject lateinit var smartPlaylistManager: SmartPlaylistManager
 
     @Inject lateinit var playbackManager: PlaybackManager
 
@@ -206,7 +203,7 @@ class PocketCastsApplication :
 
             withContext(Dispatchers.Default) {
                 playbackManager.setup()
-                downloadManager.setup(episodeManager, podcastManager, smartPlaylistManager, playbackManager)
+                downloadManager.setup(episodeManager, podcastManager, playbackManager)
 
                 val isRestoreFromBackup = settings.isRestoreFromBackup()
                 // as this may be a different device clear the storage location on a restore

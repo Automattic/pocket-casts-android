@@ -36,7 +36,6 @@ import au.com.shiftyjelly.pocketcasts.repositories.notification.NotificationOpen
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
-import au.com.shiftyjelly.pocketcasts.repositories.podcast.SmartPlaylistManager
 import au.com.shiftyjelly.pocketcasts.repositories.refresh.RefreshPodcastsThread
 import au.com.shiftyjelly.pocketcasts.utils.AppPlatform
 import au.com.shiftyjelly.pocketcasts.utils.Network
@@ -56,7 +55,6 @@ import kotlinx.coroutines.async
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.mapNotNull
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -89,7 +87,6 @@ class DownloadManagerImpl @Inject constructor(
     private var notificationBuilder: NotificationCompat.Builder? = null
     private lateinit var podcastManager: PodcastManager
     private lateinit var episodeManager: EpisodeManager
-    private lateinit var smartPlaylistManager: SmartPlaylistManager
     private lateinit var playbackManager: PlaybackManager
 
     private val pendingQueue = HashMap<String, DownloadingInfo>()
@@ -114,10 +111,9 @@ class DownloadManagerImpl @Inject constructor(
 
     private var sourceView: SourceView = SourceView.UNKNOWN
 
-    override fun setup(episodeManager: EpisodeManager, podcastManager: PodcastManager, smartPlaylistManager: SmartPlaylistManager, playbackManager: PlaybackManager) {
+    override fun setup(episodeManager: EpisodeManager, podcastManager: PodcastManager, playbackManager: PlaybackManager) {
         this.episodeManager = episodeManager
         this.podcastManager = podcastManager
-        this.smartPlaylistManager = smartPlaylistManager
         this.playbackManager = playbackManager
 
         launch {

@@ -16,7 +16,6 @@ import au.com.shiftyjelly.pocketcasts.models.entity.PlaylistEntity.Companion.LAS
 import au.com.shiftyjelly.pocketcasts.models.entity.PlaylistEntity.Companion.LAST_MONTH
 import au.com.shiftyjelly.pocketcasts.models.entity.PlaylistEntity.Companion.LAST_WEEK
 import au.com.shiftyjelly.pocketcasts.models.entity.PlaylistEntity.Companion.SYNC_STATUS_NOT_SYNCED
-import au.com.shiftyjelly.pocketcasts.models.entity.PlaylistEntity.Companion.SYNC_STATUS_SYNCED
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.models.to.PlaylistEpisode
 import au.com.shiftyjelly.pocketcasts.models.to.PlaylistEpisodeMetadata
@@ -547,12 +546,7 @@ private fun SmartPlaylistDraft.toPlaylistEntity() = PlaylistEntity(
     manual = false,
     draft = false,
     deleted = false,
-    // We use referential equality so only predefined playlists are synced by default
-    syncStatus = if (this === SmartPlaylistDraft.NewReleases || this === SmartPlaylistDraft.InProgress) {
-        SYNC_STATUS_SYNCED
-    } else {
-        SYNC_STATUS_NOT_SYNCED
-    },
+    syncStatus = SYNC_STATUS_NOT_SYNCED,
 ).applySmartRules(rules)
 
 private fun PlaylistEntity.applySmartRules(rules: SmartRules) = copy(
