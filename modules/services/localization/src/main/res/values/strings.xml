@@ -892,7 +892,7 @@
     <string name="filters_create_filter_by">FILTER BY</string>
     <string name="filters_create_filter_details">Filter details</string>
     <string name="filters_create_name">NAME</string>
-    <string name="filters_filter_name">Filter Name</string>
+    <string name="filters_filter_name">Playlist Name</string>
     <string name="filters_create_options">Filter options</string>
     <string name="filters_create_save_filter">Save filter</string>
     <string name="filters_create_select_criteria">Select your filter criteria using these buttons to create an up to date smart playlist of episodes.</string>
@@ -2302,9 +2302,9 @@
 
     <!--    Tasker Plugin-->
 
-    <string name="must_provide_filter_name">Must provide filter name</string>
-    <string name="filter_x_not_found">Filter %1$s not found</string>
-    <string name="no_episodes_in_filter_x">No episodes in Filter %1$s</string>
+    <string name="must_provide_filter_name">Must provide playlist name</string>
+    <string name="filter_x_not_found">Playlist %1$s not found</string>
+    <string name="no_episodes_in_filter_x">No episodes in Playlist %1$s</string>
     <string name="must_provide_command_name">Must provide command name</string>
     <string name="command_x_not_valid">Command %1$s not valid</string>
     <string name="playback_command">Playback Command</string>
@@ -2321,13 +2321,13 @@
     <string name="time_to_skip_to_not_valid">Time to skip to %1$s not valid</string>
     <string name="time_to_skip_not_valid">Time to skip %1$s not valid</string>
     <string name="playback_speed_not_valid">Playback Speed %1$s not valid</string>
-    <string name="pocket_casts_play_filter">Pocket Casts Play Filter</string>
+    <string name="pocket_casts_play_filter">Pocket Casts Play Playlist</string>
     <string name="pocket_casts_control_playback">Pocket Casts Control Playback</string>
     <string name="pocket_casts_query_podcasts">Pocket Casts Query Podcasts</string>
     <string name="pocket_casts_query_podcast_episodes">Pocket Casts Query Podcast Episodes</string>
     <string name="pocket_casts_add_to_up_next">Pocket Casts Add To Up Next</string>
-    <string name="pocket_casts_query_filters">Pocket Casts Query Filters</string>
-    <string name="pocket_casts_query_filter_episodes">Pocket Casts Query Filter Episodes</string>
+    <string name="pocket_casts_query_filters">Pocket Casts Query Playlists</string>
+    <string name="pocket_casts_query_filter_episodes">Pocket Casts Query Playlist Episodes</string>
     <string name="pocket_casts_query_up_next_episodes">Pocket Casts Query Up Next Episodes</string>
     <string name="set_playback_speed">Set Playback Speed</string>
     <string name="playback_speed_between_values">Playback Speed (between 0.5 and 3)</string>
@@ -2368,10 +2368,10 @@
     <string name="no_episode_ids_provided">No episode IDs provided</string>
     <string name="no_episodes_found_for_episode_ids_x">No episodes found for episode IDs %1$s</string>
     <string name="episode_count">Episode Count</string>
-    <string name="filter_id">Filter ID</string>
-    <string name="filter_id_description">An unique ID that represents the filter. Can be used on the \'Query Filter Episodes\' action.</string>
-    <string name="filter_title">Filter Title</string>
-    <string name="filter_id_or_title">Filter ID or Title</string>
+    <string name="filter_id">Playlist ID</string>
+    <string name="filter_id_description">An unique ID that represents the playlist. Can be used on the \'Query Playlist Episodes\' action.</string>
+    <string name="filter_title">Playlist Title</string>
+    <string name="filter_id_or_title">Playlist ID or Title</string>
     <string name="error_opening_links_activity_not_found">Looks like you don\'t have an app capable of viewing this content.</string>
 
     <!-- Wear -->

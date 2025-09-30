@@ -4,10 +4,13 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.dp
+import au.com.shiftyjelly.pocketcasts.repositories.playlist.PlaylistManager
 import java.text.SimpleDateFormat
-import java.util.*
+import java.util.Date
+import kotlinx.coroutines.flow.first
 
 val String?.nullIfEmpty get() = if (isNullOrEmpty()) null else this
+
 fun <T> tryOrNull(handleError: ((Throwable) -> T?)? = null, block: () -> T?): T? = try {
     block()
 } catch (t: Throwable) {
@@ -25,4 +28,7 @@ val screenSize
     }
 
 val Date.formattedForTasker get() = SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(this)
+
 val String.formattedForTasker get() = replace(",", "")
+
+internal suspend fun PlaylistManager.findPlaylist(uuid: String) = smartPlaylistFlow(uuid).first() ?: manualPlaylistFlow(uuid).first()
