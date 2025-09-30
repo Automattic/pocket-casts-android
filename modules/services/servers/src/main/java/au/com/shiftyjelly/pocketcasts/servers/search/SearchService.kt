@@ -5,10 +5,10 @@ import retrofit2.http.Query
 
 interface SearchService {
     @GET("/autocomplete/search")
-    suspend fun autocompleteSearch(
+    suspend fun autoCompleteSearch(
         @Query("q") query: String,
-        @Query("termsLimit") limit: Int,
-        @Query("podcastsLimit") items: Int,
+        @Query("termsLimit") terms: Int,
+        @Query("podcastsLimit") podcasts: Int,
         @Query("language") language: String,
     ) : AutoCompleteResponse
 }
