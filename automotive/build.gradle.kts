@@ -13,6 +13,7 @@ android {
 
     defaultConfig {
         minSdk = project.property("minSdkVersionAutomotive") as Int
+        targetSdk = project.property("targetSdkVersionAutomotive") as Int
         applicationId = project.property("applicationId").toString()
     }
 
