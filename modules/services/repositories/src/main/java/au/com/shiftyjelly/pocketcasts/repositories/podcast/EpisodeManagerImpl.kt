@@ -533,18 +533,13 @@ class EpisodeManagerImpl @Inject constructor(
         episodeDao.deleteBlocking(episode)
     }
 
-    override suspend fun deleteEpisodeFile(episode: BaseEpisode?, playbackManager: PlaybackManager?, disableAutoDownload: Boolean, updateDatabase: Boolean, removeFromUpNext: Boolean, shouldShuffleUpNext: Boolean) {
+    override suspend fun deleteEpisodeFile(episode: BaseEpisode?, playbackManager: PlaybackManager?, disableAutoDownload: Boolean, updateDatabase: Boolean) {
         episode ?: return
 
         Timber.d("Deleting episode file ${episode.title}")
 
         // if the episode is currently downloading, kill the download
         downloadManager.removeEpisodeFromQueue(episode, "file deleted")
-
-        // if the episode is currently playing, then stop it. Note: it will not be stopped if coming from the player as it is controlling the playback logic.
-        if (removeFromUpNext) {
-            playbackManager?.removeEpisode(episode, source = SourceView.UNKNOWN, userInitiated = false, shouldShuffleUpNext = shouldShuffleUpNext)
-        }
 
         cleanUpDownloadFiles(episode)
 
@@ -683,14 +678,8 @@ class EpisodeManagerImpl @Inject constructor(
     @Suppress("NAME_SHADOWING")
     private suspend fun cleanUpEpisode(episode: BaseEpisode, playbackManager: PlaybackManager?, shouldShuffleUpNext: Boolean = false) {
         val playbackManager = playbackManager ?: return
-        if (episode.isDownloaded || episode.isDownloading || episode.downloadTaskId != null) {
-            // FIXME doesn't seem this is necessary since it is handled by deleteEpisodeFile
-            downloadManager.removeEpisodeFromQueue(episode, "episode manager")
-        }
-        deleteEpisodeFile(episode, playbackManager, disableAutoDownload = true, updateDatabase = true, removeFromUpNext = true, shouldShuffleUpNext = shouldShuffleUpNext)
-
-        // FIXME doesn't seem this is necessary since it is handled by deleteEpisodeFile
-        playbackManager.removeEpisode(episode, source = SourceView.UNKNOWN, userInitiated = false)
+        deleteEpisodeFile(episode, playbackManager, disableAutoDownload = true, updateDatabase = true)
+        playbackManager.removeEpisode(episode, source = SourceView.UNKNOWN, userInitiated = false, shouldShuffleUpNext = shouldShuffleUpNext)
     }
 
     override suspend fun findStaleDownloads(): List<PodcastEpisode> {
@@ -788,7 +777,7 @@ class EpisodeManagerImpl @Inject constructor(
 
     override suspend fun deleteEpisodeFiles(episodes: List<PodcastEpisode>, playbackManager: PlaybackManager) = withContext(Dispatchers.IO) {
         episodes.toList().forEach {
-            deleteEpisodeFile(it, playbackManager, removeFromUpNext = false, disableAutoDownload = false)
+            deleteEpisodeFile(it, playbackManager, disableAutoDownload = false)
         }
     }
 

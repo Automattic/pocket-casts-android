@@ -541,7 +541,7 @@ class PlayerViewModel @Inject constructor(
         if (episode.episodeStatus != EpisodeStatusEnum.NOT_DOWNLOADED) {
             onDeleteStart.invoke()
             launch {
-                episodeManager.deleteEpisodeFile(episode, playbackManager, disableAutoDownload = false, removeFromUpNext = episode.episodeStatus == EpisodeStatusEnum.DOWNLOADED)
+                episodeManager.deleteEpisodeFile(episode, playbackManager, disableAutoDownload = false)
             }
         } else {
             onDownloadStart.invoke()

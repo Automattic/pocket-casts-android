@@ -305,7 +305,6 @@ class EpisodeViewModel @Inject constructor(
                         episode,
                         playbackManager,
                         disableAutoDownload = true,
-                        removeFromUpNext = true,
                     )
                 }
 
