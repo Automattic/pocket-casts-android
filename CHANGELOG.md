@@ -3,6 +3,8 @@
 *   Bug Fixes
     *   Fix done button overlapping with navigation bars
         ([#4553](https://github.com/Automattic/pocket-casts-android/pull/4553))
+    *   Fix shared list under the mini player
+        ([#4560](https://github.com/Automattic/pocket-casts-android/pull/4560))
     *   Fix transcript button incorrectly disabled
         ([#4555](https://github.com/Automattic/pocket-casts-android/pull/4555))
 
