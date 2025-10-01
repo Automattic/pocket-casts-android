@@ -1,6 +1,8 @@
 7.100
 -----
-
+*   Bug Fixes
+    *   Fix done button overlapping with navigation bars
+        ([#4553](https://github.com/Automattic/pocket-casts-android/pull/4553))
 
 7.99
 -----
