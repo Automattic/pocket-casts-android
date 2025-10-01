@@ -131,7 +131,7 @@ private fun LoadedState(
                 text = stringResource(LR.string.winback_available_plans_title),
                 fontSize = 28.sp,
                 fontWeight = FontWeight.Bold,
-                lineHeight = 38.5.sp,
+                lineHeight = 33.5.sp,
                 color = MaterialTheme.theme.colors.primaryText01,
                 textAlign = TextAlign.Center,
             )
@@ -186,7 +186,7 @@ private fun TooManyPurchasesState(
             text = stringResource(LR.string.winback_too_many_subscritpions_title),
             fontSize = 28.sp,
             fontWeight = FontWeight.Bold,
-            lineHeight = 38.5.sp,
+            lineHeight = 33.5.sp,
             color = MaterialTheme.theme.colors.primaryText01,
             textAlign = TextAlign.Center,
         )

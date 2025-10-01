@@ -96,7 +96,7 @@ private fun Header(
             text = stringResource(LR.string.winback_cancel_subscription_header_title),
             fontWeight = FontWeight.Bold,
             fontSize = 28.sp,
-            lineHeight = 38.5.sp,
+            lineHeight = 33.5.sp,
             color = MaterialTheme.theme.colors.primaryText01,
             textAlign = TextAlign.Center,
         )

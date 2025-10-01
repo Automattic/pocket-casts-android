@@ -101,7 +101,7 @@ private fun CancelOfferHeader(
         text = stringResource(LR.string.winback_offer_header),
         fontWeight = FontWeight.Bold,
         fontSize = 28.sp,
-        lineHeight = 38.5.sp,
+        lineHeight = 33.5.sp,
         color = MaterialTheme.theme.colors.primaryText01,
         textAlign = TextAlign.Center,
         modifier = modifier,
