@@ -20,6 +20,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.input.nestedscroll.NestedScrollConnection
+import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
@@ -27,6 +29,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.Velocity
 import androidx.compose.ui.unit.dp
 import au.com.shiftyjelly.pocketcasts.compose.AppThemeWithBackground
 import au.com.shiftyjelly.pocketcasts.compose.components.EpisodeImage
@@ -48,16 +51,26 @@ import au.com.shiftyjelly.pocketcasts.images.R as IR
 fun SearchAutoCompleteResultsPage(
     searchTerm: String,
     results: List<SearchAutoCompleteItem>,
-    onTermClick: () -> Unit,
-    onPodcastClick: () -> Unit,
-    onPodcastFollow: () -> Unit,
-    onEpisodeClick: () -> Unit,
-    onEpisodePlay: () -> Unit,
+    onTermClick: (SearchAutoCompleteItem.Term) -> Unit,
+    onPodcastClick: (SearchAutoCompleteItem.Podcast) -> Unit,
+    onPodcastFollow: (SearchAutoCompleteItem.Podcast) -> Unit,
+    onEpisodeClick: (SearchAutoCompleteItem.Episode) -> Unit,
+    onEpisodePlay: (SearchAutoCompleteItem.Episode) -> Unit,
     bottomInset: Dp,
+    onScroll: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
+    val nestedScrollConnection = remember {
+        object : NestedScrollConnection {
+            override suspend fun onPostFling(consumed: Velocity, available: Velocity): Velocity {
+                onScroll()
+                return super.onPostFling(consumed, available)
+            }
+        }
+    }
+
     LazyColumn(
-        modifier = modifier,
+        modifier = modifier.nestedScroll(nestedScrollConnection),
         contentPadding = PaddingValues(bottom = bottomInset),
     ) {
         results.forEachIndexed { index, item ->
@@ -66,22 +79,23 @@ fun SearchAutoCompleteResultsPage(
                     is SearchAutoCompleteItem.Term -> SearchTermRow(
                         searchTerm = searchTerm,
                         item = item,
-                        onClick = onTermClick,
-                        modifier = Modifier.fillMaxWidth()
+                        onClick = { onTermClick(item) },
+                        modifier = Modifier
+                            .fillMaxWidth()
                             .height(40.dp),
                     )
 
                     is SearchAutoCompleteItem.Podcast -> PodcastRow(
                         item = item,
-                        onClick = onPodcastClick,
-                        onFollow = onPodcastFollow,
+                        onClick = { onPodcastClick(item) },
+                        onFollow = { onPodcastFollow(item) },
                         modifier = Modifier.fillMaxWidth(),
                     )
 
                     is SearchAutoCompleteItem.Episode -> EpisodeRow(
                         item = Any(),
-                        onClick = onEpisodeClick,
-                        onPlay = onEpisodePlay,
+                        onClick = { onEpisodeClick(item) },
+                        onPlay = { onEpisodePlay(item) },
                         modifier = Modifier.fillMaxWidth(),
                     )
                 }
@@ -138,7 +152,8 @@ private fun PodcastRow(
     modifier: Modifier = Modifier,
 ) {
     Row(
-        modifier = modifier.clickable(onClick = onClick)
+        modifier = modifier
+            .clickable(onClick = onClick)
             .padding(8.dp),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(12.dp),
@@ -241,6 +256,7 @@ private fun PreviewSearchAutoCompleteResultsPage(
             onEpisodeClick = {},
             onPodcastClick = {},
             onPodcastFollow = {},
+            onScroll = {},
             bottomInset = 0.dp,
         )
     }

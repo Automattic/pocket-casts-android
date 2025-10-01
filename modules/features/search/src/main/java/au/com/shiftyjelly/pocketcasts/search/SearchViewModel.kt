@@ -112,11 +112,23 @@ class SearchViewModel @Inject constructor(
 
     fun onSubscribeToPodcast(podcast: Podcast) {
         if (podcast.isSubscribed) return
-        podcastManager.subscribeToPodcast(podcastUuid = podcast.uuid, sync = true)
+        onSubscribeToPodcast(podcast.uuid)
+    }
+
+    fun onSubscribeToPodcast(uuid: String) {
+        podcastManager.subscribeToPodcast(podcastUuid = uuid, sync = true)
         analyticsTracker.track(
             AnalyticsEvent.PODCAST_SUBSCRIBED,
-            AnalyticsProp.podcastSubscribed(uuid = podcast.uuid, source = source),
+            AnalyticsProp.podcastSubscribed(uuid = uuid, source = source),
         )
+    }
+
+    @Suppress("UNCHECKED_CAST")
+    fun selectSuggestion(suggestion: String) {
+        saveSearchTerm(suggestion)
+        searchHandler.updateSearchQuery(suggestion, true)
+
+        _state.value = SearchUiState.Results(operation = SearchUiState.SearchOperation.Loading(suggestion) as SearchUiState.SearchOperation<SearchResults>)
     }
 
     fun onFragmentPause(isChangingConfigurations: Boolean?) {

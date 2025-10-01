@@ -264,15 +264,17 @@ class SearchFragment : BaseFragment() {
                 (state as? SearchUiState.Suggestions)?.let { suggestions ->
                     AppThemeWithBackground(theme.activeTheme) {
                         SearchAutoCompleteResultsPage(
-                            modifier = Modifier.fillMaxSize()
+                            modifier = Modifier
+                                .fillMaxSize()
                                 .padding(horizontal = 16.dp),
                             searchTerm = suggestions.operation.searchTerm,
                             results = (suggestions.operation as? SearchUiState.SearchOperation.Results)?.results ?: emptyList(),
-                            onTermClick = {},
-                            onPodcastClick = {},
-                            onPodcastFollow = {},
+                            onTermClick = { viewModel.selectSuggestion(it.term) },
+                            onPodcastClick = { onPodcastClick(SearchHistoryEntry.fromAutoCompletePodcast(it), it.isSubscribed) },
+                            onPodcastFollow = { viewModel.onSubscribeToPodcast(it.uuid) },
                             onEpisodeClick = {},
                             onEpisodePlay = {},
+                            onScroll = { UiUtil.hideKeyboard(searchView) },
                             bottomInset = bottomInset.pxToDp(LocalContext.current).dp,
                         )
                     }
@@ -292,7 +294,7 @@ class SearchFragment : BaseFragment() {
                             state = results,
                             loading = state.isLoading,
                             onEpisodeClick = ::onEpisodeClick,
-                            onPodcastClick = ::onPodcastClick,
+                            onPodcastClick = { onPodcastClick(SearchHistoryEntry.fromPodcast(it), it.isSubscribed) },
                             onFolderClick = ::onFolderClick,
                             onShowAllCLick = ::onShowAllClick,
                             onFollowPodcast = ::onSubscribeToPodcast,
@@ -323,17 +325,17 @@ class SearchFragment : BaseFragment() {
         binding?.searchView?.let { UiUtil.hideKeyboard(it) }
     }
 
-    private fun onPodcastClick(podcast: Podcast) {
+    private fun onPodcastClick(podcast: SearchHistoryEntry.Podcast, isSubscribed: Boolean) {
         viewModel.trackSearchResultTapped(
             source = source,
             uuid = podcast.uuid,
-            type = if (onlySearchRemote || !podcast.isSubscribed) {
+            type = if (onlySearchRemote || !isSubscribed) {
                 SearchResultType.PODCAST_REMOTE_RESULT
             } else {
                 SearchResultType.PODCAST_LOCAL_RESULT
             },
         )
-        searchHistoryViewModel.add(SearchHistoryEntry.fromPodcast(podcast))
+        searchHistoryViewModel.add(podcast)
         listener?.onSearchPodcastClick(podcast.uuid, SourceView.SEARCH)
         binding?.searchView?.let { UiUtil.hideKeyboard(it) }
     }

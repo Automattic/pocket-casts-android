@@ -103,6 +103,12 @@ sealed class SearchHistoryEntry(
             author = podcast.author,
         )
 
+        fun fromAutoCompletePodcast(podcast: SearchAutoCompleteItem.Podcast) = Podcast(
+            uuid = podcast.uuid,
+            title = podcast.title,
+            author = podcast.author
+        )
+
         fun fromSearchHistoryItem(item: SearchHistoryItem) = when {
             item.episode != null -> {
                 val episode = item.episode as SearchHistoryItem.Episode
