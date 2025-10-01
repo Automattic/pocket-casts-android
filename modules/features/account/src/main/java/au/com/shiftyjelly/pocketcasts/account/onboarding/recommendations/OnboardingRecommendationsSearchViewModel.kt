@@ -3,7 +3,6 @@ package au.com.shiftyjelly.pocketcasts.account.onboarding.recommendations
 import android.content.Context
 import android.widget.Toast
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.asFlow
 import androidx.lifecycle.viewModelScope
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
@@ -13,7 +12,7 @@ import au.com.shiftyjelly.pocketcasts.models.to.FolderItem
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
 import au.com.shiftyjelly.pocketcasts.search.SearchHandler
-import au.com.shiftyjelly.pocketcasts.search.SearchState
+import au.com.shiftyjelly.pocketcasts.search.SearchUiState
 import au.com.shiftyjelly.pocketcasts.utils.Network
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
@@ -25,6 +24,7 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.reactive.asFlow
+import kotlinx.coroutines.rx2.asFlow
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 @HiltViewModel
@@ -71,15 +71,12 @@ class OnboardingRecommendationsSearchViewModel @Inject constructor(
                 subscribedUuidFlow,
                 searchHandler.searchResults.asFlow(),
             ) { subscribedUuids, searchState ->
-
                 val podcasts = when (searchState) {
-                    is SearchState.NoResults -> emptyList()
-                    is SearchState.Results -> {
-
+                    is SearchUiState.SearchOperation.Results -> {
                         // TODO handle loading
                         // TODO handle error
 
-                        searchState.podcasts
+                        searchState.results.podcasts
                             .filterIsInstance<FolderItem.Podcast>()
                             .map {
                                 PodcastResult(
@@ -88,9 +85,10 @@ class OnboardingRecommendationsSearchViewModel @Inject constructor(
                                 )
                             }
                     }
+                    else -> emptyList()
                 }
 
-                val isLoading = (searchState as? SearchState.Results)?.loading == true
+                val isLoading = searchState is SearchUiState.SearchOperation.Loading
 
                 state.value.copy(
                     results = podcasts,

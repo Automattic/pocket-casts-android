@@ -1,7 +1,7 @@
 package au.com.shiftyjelly.pocketcasts.search
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.asFlow
 import androidx.lifecycle.map
 import androidx.lifecycle.viewModelScope
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
@@ -16,14 +16,13 @@ import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
 import au.com.shiftyjelly.pocketcasts.repositories.searchhistory.SearchHistoryManager
 import au.com.shiftyjelly.pocketcasts.search.SearchResultsFragment.Companion.ResultsType
 import dagger.hilt.android.lifecycle.HiltViewModel
+import io.reactivex.BackpressureStrategy
 import javax.inject.Inject
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.reactive.asFlow
+import kotlinx.coroutines.rx2.asObservable
 
 @HiltViewModel
 class SearchViewModel @Inject constructor(
@@ -34,67 +33,65 @@ class SearchViewModel @Inject constructor(
 ) : ViewModel() {
     var isFragmentChangingConfigurations: Boolean = false
     var showSearchHistory: Boolean = true
-    private val searchResults = searchHandler.searchResults.map { searchState ->
-        val isSearchStarted = (loading.value == true)
-        if (isSearchStarted) {
-            saveSearchTerm(searchState.searchTerm)
-            showSearchHistory = false
-        }
-        searchState
-    }
-    val loading = searchHandler.loading
+
     private var source: SourceView = SourceView.UNKNOWN
 
-    private val _state: MutableStateFlow<SearchState> = MutableStateFlow(
-        SearchState.Results(
-            searchTerm = "",
-            podcasts = emptyList(),
-            episodes = emptyList(),
-            autoCompleteResults = emptyList(),
-            error = null,
-            loading = false,
-        ),
+    private val _state: MutableStateFlow<SearchUiState> = MutableStateFlow(
+        SearchUiState.Idle,
     )
-    val state: StateFlow<SearchState> = _state
+    val state: StateFlow<SearchUiState> = _state
 
     init {
 
         viewModelScope.launch {
-            val subscribedUuidFlow = podcastManager
-                .subscribedRxFlowable()
-                .asFlow()
-                .map { ls ->
-                    ls.map { it.uuid }
+            searchHandler.searchSuggestions.collect {
+                Log.i("===", "VM.searchSuggestion = $it")
+                if (_state.value is SearchUiState.Idle || _state.value is SearchUiState.Suggestions) {
+                    _state.value = SearchUiState.Suggestions(operation = it)
                 }
+            }
 
-            combine(
-                subscribedUuidFlow,
-                searchResults.asFlow(),
-            ) { subscribedUuids, searchState ->
-                when (searchState) {
-                    is SearchState.NoResults -> searchState
-                    is SearchState.Results -> {
-                        searchState.copy(
-                            podcasts = searchState.podcasts
-                                .map { podcast ->
-                                    if (podcast is FolderItem.Podcast) {
-                                        podcast.copy(podcast.podcast.copy(isSubscribed = subscribedUuids.contains(podcast.podcast.uuid)))
-                                    } else {
-                                        podcast
-                                    }
-                                },
-                        )
-                    }
+            searchHandler.searchResults.subscribe {
+                if (_state.value is SearchUiState.Results) {
+                    _state.value = SearchUiState.Results(operation = it as SearchUiState.SearchOperation<SearchResults>)
                 }
-            }.stateIn(viewModelScope).collect {
-                _state.value = it
             }
         }
+
+//        viewModelScope.launch {
+//            val subscribedUuidFlow = podcastManager
+//                .subscribedRxFlowable()
+//                .asFlow()
+//                .map { ls ->
+//                    ls.map { it.uuid }
+//                }
+//            combine(
+//                subscribedUuidFlow,
+//                searchResults.asFlow(),
+//            ) { subscribedUuids, searchState ->
+//                if (searchState is SearchUiState.Success.SearchResults) {
+//                    searchState.copy(
+//                        podcasts = searchState.podcasts
+//                            .map { podcast ->
+//                                if (podcast is FolderItem.Podcast) {
+//                                    podcast.copy(podcast.podcast.copy(isSubscribed = subscribedUuids.contains(podcast.podcast.uuid)))
+//                                } else {
+//                                    podcast
+//                                }
+//                            },
+//                    )
+//                } else {
+//                    searchState
+//                }
+//            }.stateIn(viewModelScope).collect {
+//                _state.value = it
+//            }
+//        }
     }
 
     fun updateSearchQuery(query: String, immediate: Boolean = false) {
         // Prevent updating the search query when navigating back to the search results after tapping on a result.
-        if (_state.value.searchTerm == query) return
+//        if (_state.value.searchTerm == query) return
         searchHandler.updateSearchQuery(query, immediate)
     }
 
@@ -116,18 +113,6 @@ class SearchViewModel @Inject constructor(
     fun onSubscribeToPodcast(podcast: Podcast) {
         if (podcast.isSubscribed) return
         podcastManager.subscribeToPodcast(podcastUuid = podcast.uuid, sync = true)
-
-        // Optimistically update subscribe status
-        val results = _state.value as? SearchState.Results
-        results?.copy(
-            podcasts = results.podcasts.map {
-                if (it is FolderItem.Podcast && it.uuid == podcast.uuid) {
-                    it.copy(podcast = podcast.copy(isSubscribed = true))
-                } else {
-                    it
-                }
-            },
-        )?.let { _state.value = it }
         analyticsTracker.track(
             AnalyticsEvent.PODCAST_SUBSCRIBED,
             AnalyticsProp.podcastSubscribed(uuid = podcast.uuid, source = source),
@@ -189,15 +174,35 @@ class SearchViewModel @Inject constructor(
     }
 }
 
-sealed class SearchState {
-    abstract val searchTerm: String
-    data class NoResults(override val searchTerm: String) : SearchState()
-    data class Results(
-        override val searchTerm: String,
-        val autoCompleteResults: List<SearchAutoCompleteItem>,
-        val podcasts: List<FolderItem>,
-        val episodes: List<EpisodeItem>,
-        val loading: Boolean,
-        val error: Throwable?,
-    ) : SearchState()
+data class SearchResults(
+    val podcasts: List<FolderItem>,
+    val episodes: List<EpisodeItem>,
+) {
+    val isEmpty: Boolean get() = podcasts.isEmpty() && episodes.isEmpty()
+}
+
+sealed interface SearchUiState {
+
+    val searchTerm: String? get() = when (this) {
+        is Suggestions -> operation.searchTerm
+        is Results -> operation.searchTerm
+        else -> null
+    }
+
+    val isLoading: Boolean get() = when (this) {
+        is Suggestions -> operation is SearchOperation.Loading
+        is Results -> operation is SearchOperation.Loading
+        else -> false
+    }
+
+    sealed interface SearchOperation<T> {
+        val searchTerm: String
+        data class Loading(override val searchTerm: String) : SearchOperation<Nothing>
+        data class Error(override val searchTerm: String, val error: Throwable) : SearchOperation<Nothing>
+        data class Results<T>(override val searchTerm: String, val results: T) : SearchOperation<T>
+    }
+
+    data object Idle : SearchUiState
+    data class Suggestions(val operation: SearchOperation<List<SearchAutoCompleteItem>>) : SearchUiState
+    data class Results(val operation: SearchOperation<SearchResults>) : SearchUiState
 }

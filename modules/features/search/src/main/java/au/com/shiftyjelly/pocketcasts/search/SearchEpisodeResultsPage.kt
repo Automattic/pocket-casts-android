@@ -33,17 +33,19 @@ fun SearchEpisodeResultsPage(
             title = stringResource(LR.string.search_results_all_episodes),
             onNavigationClick = { onBackPress() },
         )
-        SearchEpisodeResultsView(
-            state = state as SearchState.Results,
-            onEpisodeClick = onEpisodeClick,
-            bottomInset = bottomInset,
-        )
+        ((state as? SearchUiState.Results)?.operation as? SearchUiState.SearchOperation.Results)?.let {
+            SearchEpisodeResultsView(
+                episodes = it.results.episodes,
+                onEpisodeClick = onEpisodeClick,
+                bottomInset = bottomInset,
+            )
+        }
     }
 }
 
 @Composable
 private fun SearchEpisodeResultsView(
-    state: SearchState.Results,
+    episodes: List<EpisodeItem>,
     onEpisodeClick: (EpisodeItem) -> Unit,
     bottomInset: Dp,
 ) {
@@ -51,7 +53,7 @@ private fun SearchEpisodeResultsView(
         contentPadding = PaddingValues(top = 16.dp, bottom = bottomInset + 16.dp),
     ) {
         items(
-            items = state.episodes,
+            items = episodes,
             key = { it.uuid },
         ) {
             SearchEpisodeItem(

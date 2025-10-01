@@ -4,6 +4,7 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -25,6 +26,7 @@ import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import au.com.shiftyjelly.pocketcasts.compose.AppThemeWithBackground
 import au.com.shiftyjelly.pocketcasts.compose.components.EpisodeImage
@@ -51,10 +53,12 @@ fun SearchAutoCompleteResultsPage(
     onPodcastFollow: () -> Unit,
     onEpisodeClick: () -> Unit,
     onEpisodePlay: () -> Unit,
-    modifier: Modifier = Modifier
+    bottomInset: Dp,
+    modifier: Modifier = Modifier,
 ) {
     LazyColumn(
-        modifier = modifier
+        modifier = modifier,
+        contentPadding = PaddingValues(bottom = bottomInset),
     ) {
         results.forEachIndexed { index, item ->
             item(key = item.hashCode(), contentType = "content-${item.javaClass}") {
@@ -64,31 +68,29 @@ fun SearchAutoCompleteResultsPage(
                         item = item,
                         onClick = onTermClick,
                         modifier = Modifier.fillMaxWidth()
-                            .height(40.dp)
+                            .height(40.dp),
                     )
 
                     is SearchAutoCompleteItem.Podcast -> PodcastRow(
                         item = item,
                         onClick = onPodcastClick,
                         onFollow = onPodcastFollow,
-                        modifier = Modifier.fillMaxWidth()
-                            .padding(vertical = 8.dp),
-                        isSubscribed = false
+                        modifier = Modifier.fillMaxWidth(),
                     )
 
                     is SearchAutoCompleteItem.Episode -> EpisodeRow(
                         item = Any(),
                         onClick = onEpisodeClick,
                         onPlay = onEpisodePlay,
-                        modifier = Modifier.fillMaxWidth()
+                        modifier = Modifier.fillMaxWidth(),
                     )
                 }
             }
             if (results.indices.last != index) {
-                item(key = "divider-${index}", contentType = "divider") {
+                item(key = "divider-$index", contentType = "divider") {
                     HorizontalDivider(
                         thickness = 0.5.dp,
-                        color = MaterialTheme.theme.colors.secondaryText02
+                        color = MaterialTheme.theme.colors.secondaryText02,
                     )
                 }
             }
@@ -101,7 +103,7 @@ private fun SearchTermRow(
     searchTerm: String,
     item: SearchAutoCompleteItem.Term,
     onClick: () -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
     val primaryColor = MaterialTheme.theme.colors.primaryText01
     val label = remember(searchTerm, item) {
@@ -110,7 +112,7 @@ private fun SearchTermRow(
             addStyle(
                 style = SpanStyle(color = primaryColor),
                 start = 0,
-                end = searchTerm.length
+                end = searchTerm.length,
             )
         }
     }
@@ -118,7 +120,7 @@ private fun SearchTermRow(
     Row(
         modifier = modifier.clickable(onClick = onClick),
         verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.spacedBy(8.dp)
+        horizontalArrangement = Arrangement.spacedBy(8.dp),
     ) {
         Icon(painterResource(IR.drawable.ic_search), contentDescription = null, tint = MaterialTheme.theme.colors.primaryText01)
         TextH40(
@@ -131,15 +133,15 @@ private fun SearchTermRow(
 @Composable
 private fun PodcastRow(
     item: SearchAutoCompleteItem.Podcast,
-    isSubscribed: Boolean,
     onClick: () -> Unit,
     onFollow: () -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
     Row(
-        modifier = modifier.clickable(onClick = onClick),
+        modifier = modifier.clickable(onClick = onClick)
+            .padding(8.dp),
         verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.spacedBy(12.dp)
+        horizontalArrangement = Arrangement.spacedBy(12.dp),
     ) {
         PodcastImage(
             uuid = item.uuid,
@@ -149,21 +151,21 @@ private fun PodcastRow(
         Column(modifier = Modifier.weight(1f)) {
             TextH40(
                 text = item.title,
-                color = MaterialTheme.theme.colors.primaryText01
+                color = MaterialTheme.theme.colors.primaryText01,
             )
             TextP50(
                 text = item.author,
-                color = MaterialTheme.theme.colors.primaryText02
+                color = MaterialTheme.theme.colors.primaryText02,
             )
         }
-        if (!isSubscribed) {
+        if (!item.isSubscribed) {
             Icon(
                 painter = painterResource(IR.drawable.ic_add_black_24dp),
                 contentDescription = null,
                 tint = MaterialTheme.theme.colors.secondaryText02,
                 modifier = Modifier
                     .padding(start = 8.dp)
-                    .clickable(onClick = onFollow)
+                    .clickable(onClick = onFollow),
             )
         }
     }
@@ -174,12 +176,12 @@ private fun EpisodeRow(
     item: Any,
     onClick: () -> Unit,
     onPlay: () -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
     Row(
         modifier = modifier.clickable(onClick = onClick),
         verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.spacedBy(8.dp)
+        horizontalArrangement = Arrangement.spacedBy(8.dp),
     ) {
         EpisodeImage(
             episode = PodcastEpisode(
@@ -188,10 +190,10 @@ private fun EpisodeRow(
             ),
             useEpisodeArtwork = false,
             corners = 4.dp,
-            modifier = Modifier.shadow(elevation = 6.dp)
+            modifier = Modifier.shadow(elevation = 6.dp),
         )
         Column(
-            modifier = Modifier.weight(1f)
+            modifier = Modifier.weight(1f),
         ) {
             TextC70(
                 text = "EPISODE DATE",
@@ -203,7 +205,7 @@ private fun EpisodeRow(
             TextH60(
                 text = "Duration",
                 color = MaterialTheme.theme.colors.secondaryText02,
-                fontWeight = FontWeight.W600
+                fontWeight = FontWeight.W600,
             )
         }
         Icon(
@@ -231,13 +233,15 @@ private fun PreviewSearchAutoCompleteResultsPage(
                 SearchAutoCompleteItem.Term("matching text"),
                 SearchAutoCompleteItem.Term("matching text longer"),
                 SearchAutoCompleteItem.Term("matching other text"),
-                SearchAutoCompleteItem.Podcast(uuid = "", title = "Matching podcast", author = "Author")
+                SearchAutoCompleteItem.Podcast(uuid = "", title = "Matching podcast", author = "Author", isSubscribed = false),
+                SearchAutoCompleteItem.Podcast(uuid = "", title = "Matching podcast subscribed", author = "Author2", isSubscribed = true),
             ),
             onTermClick = {},
             onEpisodePlay = {},
             onEpisodeClick = {},
             onPodcastClick = {},
-            onPodcastFollow = {}
+            onPodcastFollow = {},
+            bottomInset = 0.dp,
         )
     }
 }

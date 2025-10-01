@@ -10,14 +10,17 @@ import android.view.View
 import android.view.ViewGroup
 import android.view.inputmethod.EditorInfo
 import androidx.appcompat.widget.SearchView
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.ViewCompositionStrategy
 import androidx.compose.ui.unit.dp
+import androidx.core.view.isVisible
 import androidx.core.view.updatePadding
 import androidx.fragment.app.viewModels
-import androidx.lifecycle.asFlow
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
@@ -56,9 +59,11 @@ private const val SEARCH_RESULTS_TAG = "search_results"
 
 @AndroidEntryPoint
 class SearchFragment : BaseFragment() {
-    @Inject lateinit var analyticsTracker: AnalyticsTracker
+    @Inject
+    lateinit var analyticsTracker: AnalyticsTracker
 
-    @Inject lateinit var settings: Settings
+    @Inject
+    lateinit var settings: Settings
 
     interface Listener {
         fun onSearchEpisodeClick(episodeUuid: String, podcastUuid: String, source: EpisodeViewSource)
@@ -147,6 +152,7 @@ class SearchFragment : BaseFragment() {
                 podcastUuid = entry.podcastUuid,
                 source = EpisodeViewSource.SEARCH_HISTORY,
             )
+
             is SearchHistoryEntry.Folder -> listener?.onSearchFolderClick(entry.uuid)
             is SearchHistoryEntry.Podcast -> listener?.onSearchPodcastClick(entry.uuid, SourceView.SEARCH)
             is SearchHistoryEntry.SearchTerm -> {
@@ -190,7 +196,7 @@ class SearchFragment : BaseFragment() {
         searchView.imeOptions = searchView.imeOptions or EditorInfo.IME_ACTION_SEARCH or EditorInfo.IME_FLAG_NO_EXTRACT_UI or EditorInfo.IME_FLAG_NO_FULLSCREEN
         searchView.setIconifiedByDefault(false)
         // seems like a more reliable focus using a post
-        if (viewModel.state.value.searchTerm.isEmpty()) {
+        if (viewModel.state.value.searchTerm?.isEmpty() == true) {
             searchView.post {
                 searchView.showKeyboard()
             }
@@ -213,7 +219,8 @@ class SearchFragment : BaseFragment() {
                 val characterCount = query.length
                 val lowerCaseSearch = query.lowercase()
                 if ((characterCount == 1 && lowerCaseSearch.startsWith("h")) || (characterCount == 2 && lowerCaseSearch.startsWith("ht")) || (characterCount == 3 && lowerCaseSearch.startsWith("htt")) || lowerCaseSearch.startsWith("http")) {
-                    if ((viewModel.state.value as? SearchState.Results)?.podcasts?.isNotEmpty() == true) {
+                    // TODO check the same for suggestions
+                    if (((viewModel.state.value as? SearchUiState.Results)?.operation as? SearchUiState.SearchOperation.Results)?.results?.podcasts?.isNotEmpty() == true) {
                         binding.searchHistoryPanel.hide()
                     }
                     return true
@@ -248,26 +255,54 @@ class SearchFragment : BaseFragment() {
                 }
             }
         }
+
+        binding.searchSuggestions.apply {
+            ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed
+            setContent {
+                val bottomInset by settings.bottomInset.collectAsStateWithLifecycle(initialValue = 0)
+                val state by viewModel.state.collectAsState()
+                (state as? SearchUiState.Suggestions)?.let { suggestions ->
+                    AppThemeWithBackground(theme.activeTheme) {
+                        SearchAutoCompleteResultsPage(
+                            modifier = Modifier.fillMaxSize()
+                                .padding(horizontal = 16.dp),
+                            searchTerm = suggestions.operation.searchTerm,
+                            results = (suggestions.operation as? SearchUiState.SearchOperation.Results)?.results ?: emptyList(),
+                            onTermClick = {},
+                            onPodcastClick = {},
+                            onPodcastFollow = {},
+                            onEpisodeClick = {},
+                            onEpisodePlay = {},
+                            bottomInset = bottomInset.pxToDp(LocalContext.current).dp,
+                        )
+                    }
+                }
+                binding.searchSuggestions.isVisible = state is SearchUiState.Suggestions
+            }
+        }
+
         binding.searchInlineResults.apply {
             ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed
             setContent {
                 val bottomInset by settings.bottomInset.collectAsStateWithLifecycle(initialValue = 0)
                 val state by viewModel.state.collectAsState()
-                val loading by viewModel.loading.asFlow().collectAsState(false)
-                AppThemeWithBackground(theme.activeTheme) {
-                    SearchInlineResultsPage(
-                        state = state,
-                        loading = loading,
-                        onEpisodeClick = ::onEpisodeClick,
-                        onPodcastClick = ::onPodcastClick,
-                        onFolderClick = ::onFolderClick,
-                        onShowAllCLick = ::onShowAllClick,
-                        onFollowPodcast = ::onSubscribeToPodcast,
-                        onScroll = { UiUtil.hideKeyboard(searchView) },
-                        onlySearchRemote = onlySearchRemote,
-                        bottomInset = bottomInset.pxToDp(LocalContext.current).dp,
-                    )
+                (state as? SearchUiState.Results)?.let { results ->
+                    AppThemeWithBackground(theme.activeTheme) {
+                        SearchInlineResultsPage(
+                            state = results,
+                            loading = state.isLoading,
+                            onEpisodeClick = ::onEpisodeClick,
+                            onPodcastClick = ::onPodcastClick,
+                            onFolderClick = ::onFolderClick,
+                            onShowAllCLick = ::onShowAllClick,
+                            onFollowPodcast = ::onSubscribeToPodcast,
+                            onScroll = { UiUtil.hideKeyboard(searchView) },
+                            onlySearchRemote = onlySearchRemote,
+                            bottomInset = bottomInset.pxToDp(LocalContext.current).dp,
+                        )
+                    }
                 }
+                binding.searchInlineResults.isVisible = state is SearchUiState.Results
             }
         }
     }

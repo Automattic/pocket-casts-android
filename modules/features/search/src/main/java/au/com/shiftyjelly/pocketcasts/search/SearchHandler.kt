@@ -1,7 +1,6 @@
 package au.com.shiftyjelly.pocketcasts.search
 
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.toLiveData
+import android.util.Log
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
@@ -16,11 +15,9 @@ import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
 import au.com.shiftyjelly.pocketcasts.repositories.search.SearchAutoCompleteManager
 import au.com.shiftyjelly.pocketcasts.repositories.user.UserManager
 import au.com.shiftyjelly.pocketcasts.servers.ServiceManager
-import au.com.shiftyjelly.pocketcasts.servers.discover.AutoCompleteSearch
 import au.com.shiftyjelly.pocketcasts.servers.discover.GlobalServerSearch
 import au.com.shiftyjelly.pocketcasts.servers.podcast.PodcastCacheServiceManager
 import com.jakewharton.rxrelay2.BehaviorRelay
-import io.reactivex.BackpressureStrategy
 import io.reactivex.Observable
 import io.reactivex.Single
 import io.reactivex.android.schedulers.AndroidSchedulers
@@ -28,8 +25,17 @@ import io.reactivex.rxkotlin.Observables
 import io.reactivex.schedulers.Schedulers
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
-import kotlinx.coroutines.rx2.rxObservable
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.rx2.asFlow
 import timber.log.Timber
+
+typealias SuggestionsOperation = SearchUiState.SearchOperation<List<SearchAutoCompleteItem>>
 
 class SearchHandler @Inject constructor(
     val serviceManager: ServiceManager,
@@ -106,31 +112,67 @@ class SearchHandler @Inject constructor(
         .toObservable()
         .map { podcasts -> podcasts.map(Podcast::uuid).toHashSet() }
 
-    private val autoCompleteResults = searchQuery
-        .subscribeOn(Schedulers.io())
+    @OptIn(ExperimentalCoroutinesApi::class)
+    @Suppress("UNCHECKED_CAST")
+    private val autoCompleteResults = searchQuery.asFlow()
         .map { it.string.trim() }
-        .debounce(200L, TimeUnit.MILLISECONDS)
-        .switchMap { query ->
+        // .debounce(200L, TimeUnit.MILLISECONDS)
+        .flatMapLatest { query ->
+            Log.w("===", "query=$query")
             if (query.isEmpty()) {
-                Observable.just<AutoCompleteSearch>(AutoCompleteSearch.Success(searchTerm = query, results = emptyList()))
+                flow {
+                    emit(
+                        SearchUiState.SearchOperation.Results(
+                            searchTerm = query,
+                            results = emptyList(),
+                        ),
+                    )
+                }
             } else {
-                rxObservable<List<SearchAutoCompleteItem>> {
-                    autoCompleteManager.autoCompleteSearch(term = query)
-                }.subscribeOn(Schedulers.io())
-                    .map<AutoCompleteSearch> {
-                        AutoCompleteSearch.Success(
-                            searchTerm = query,
-                            results = it,
-                        )
-                    }
-                    .onErrorReturn { exception ->
-                        AutoCompleteSearch.Error(
-                            searchTerm = query,
-                            error = exception,
+                flow {
+                    emit(autoCompleteManager.autoCompleteSearch(term = query))
+                }.map<List<SearchAutoCompleteItem>, SearchUiState.SearchOperation<List<SearchAutoCompleteItem>>> {
+                    Log.wtf("===", "autocomplete result=$it")
+                    SearchUiState.SearchOperation.Results(
+                        searchTerm = query,
+                        results = it,
+                    )
+                }
+                    .catch {
+                        Log.wtf("===", "onErrorReturn")
+                        emit(
+                            SearchUiState.SearchOperation.Error(
+                                searchTerm = query,
+                                error = it,
+                            ) as SearchUiState.SearchOperation<List<SearchAutoCompleteItem>>,
                         )
                     }
             }
+        }.onEach { Log.wtf("====", "onNext suggestions: $it") }
+
+    val searchSuggestions = combine(
+        autoCompleteResults,
+        subscribedPodcastUuids.asFlow(),
+    ) { autoComplete, subscribedUuids ->
+        Log.w("===", "searchSuggestions subscribedUUids.size=${subscribedUuids.size}, autoComplete=$autoComplete")
+        when (autoComplete) {
+            is SearchUiState.SearchOperation.Results -> {
+                autoComplete.copy(
+                    results = autoComplete.results.map {
+                        when (it) {
+                            is SearchAutoCompleteItem.Podcast -> {
+                                it.copy(isSubscribed = subscribedUuids.contains(it.uuid))
+                            }
+
+                            else -> it
+                        }
+                    },
+                )
+            }
+
+            else -> autoComplete
         }
+    }
 
     private val serverSearchResults = searchQuery
         .subscribeOn(Schedulers.io())
@@ -183,9 +225,14 @@ class SearchHandler @Inject constructor(
             }
         }
 
-    private val searchFlowable = Observables.combineLatest(searchQuery, subscribedPodcastUuids, localPodcastsResults, serverSearchResults, loadingObservable, autoCompleteResults) { searchTerm, subscribedPodcastUuids, localPodcastsResult, serverSearchResults, loading, autoCompleteResult ->
-        if (searchTerm.string.isBlank()) {
-            SearchState.Results(searchTerm = searchTerm.string, podcasts = emptyList(), episodes = emptyList(), autoCompleteResults = emptyList(), loading = loading, error = null)
+    private val searchFlowable = Observables.combineLatest(searchQuery, subscribedPodcastUuids, localPodcastsResults, serverSearchResults, loadingObservable) { searchTerm, subscribedPodcastUuids, localPodcastsResult, serverSearchResults, loading ->
+        if (loading) {
+            SearchUiState.SearchOperation.Loading(searchTerm.string)
+        } else if (serverSearchResults.error != null) {
+            analyticsTracker.track(AnalyticsEvent.SEARCH_FAILED, AnalyticsProp.sourceMap(source))
+            SearchUiState.SearchOperation.Error(searchTerm = searchTerm.string, error = serverSearchResults.error!!)
+        } else if (searchTerm.string.isBlank()) {
+            SearchUiState.SearchOperation.Results(searchTerm = searchTerm.string, results = SearchResults(podcasts = emptyList(), episodes = emptyList()))
         } else {
             // set if the podcast is subscribed so we can show a tick
             val serverPodcastsResult = serverSearchResults.podcastSearch.searchResults.map { podcast -> FolderItem.Podcast(podcast) }
@@ -197,46 +244,26 @@ class SearchHandler @Inject constructor(
             val searchPodcastsResult = (localPodcastsResult + serverPodcastsResult).distinctBy { it.uuid }
             val searchEpisodesResult = serverSearchResults.episodeSearch.episodes
 
-            val hasResults =
-                serverSearchResults.searchTerm.isEmpty() ||
-                    // if the search term is empty, we don't have "no results"
-                    (searchPodcastsResult.isNotEmpty() || searchEpisodesResult.isNotEmpty()) ||
-                    // check if there are any results
-                    serverSearchResults.error != null // an error is a result
-            if (hasResults) {
-                serverSearchResults.error?.let {
-                    analyticsTracker.track(AnalyticsEvent.SEARCH_FAILED, AnalyticsProp.sourceMap(source))
-                }
-                SearchState.Results(
-                    searchTerm = searchTerm.string,
+            SearchUiState.SearchOperation.Results(
+                searchTerm = searchTerm.string,
+                results = SearchResults(
                     podcasts = searchPodcastsResult,
                     episodes = searchEpisodesResult,
-                    autoCompleteResults = (autoCompleteResult as? AutoCompleteSearch.Success)?.results ?: emptyList(),
-                    loading = loading,
-                    error = serverSearchResults.error,
-                )
-            } else {
-                SearchState.NoResults(searchTerm = searchTerm.string)
-            }
+                ),
+            )
         }
     }
         .doOnError { Timber.e(it) }
         .onErrorReturn { exception ->
             analyticsTracker.track(AnalyticsEvent.SEARCH_FAILED, AnalyticsProp.sourceMap(source))
-            SearchState.Results(
+            SearchUiState.SearchOperation.Error(
                 searchTerm = searchQuery.value?.string.orEmpty(),
-                podcasts = emptyList(),
-                episodes = emptyList(),
-                autoCompleteResults = emptyList(),
-                loading = false,
                 error = exception,
             )
         }
         .observeOn(AndroidSchedulers.mainThread())
-        .toFlowable(BackpressureStrategy.LATEST)
 
-    val searchResults: LiveData<SearchState> = searchFlowable.toLiveData()
-    val loading: LiveData<Boolean> = loadingObservable.toFlowable(BackpressureStrategy.LATEST).toLiveData()
+    val searchResults = searchFlowable
 
     fun updateSearchQuery(query: String, immediate: Boolean = false) {
         searchQuery.accept(Query(query, immediate))
