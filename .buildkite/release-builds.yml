@@ -24,5 +24,6 @@ steps:
     plugins: [$CI_TOOLKIT]
     artifact_paths:
       - "**/build/reports/lint-results*.*"
+      - "artifacts/**"
     notify:
       - slack: "#build-and-ship"
