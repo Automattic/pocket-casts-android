@@ -74,21 +74,18 @@ steps:
         plugins: [ $CI_TOOLKIT ]
         artifact_paths:
           - "**/build/outputs/apk/**/*"
-          - "artifacts/**/*"
 
       - label: "Assemble automotive release APK"
         command: ".buildkite/commands/assemble-release-apk.sh automotive"
         plugins: [ $CI_TOOLKIT ]
         artifact_paths:
           - "**/build/outputs/apk/**/*"
-          - "artifacts/**/*"
 
       - label: "Assemble wear release APK"
         command: ".buildkite/commands/assemble-release-apk.sh wear"
         plugins: [ $CI_TOOLKIT ]
         artifact_paths:
           - "**/build/outputs/apk/**/*"
-          - "artifacts/**/*"
 
     ##########
     # Optional Prototype Builds for PR branches, distributed via S3
