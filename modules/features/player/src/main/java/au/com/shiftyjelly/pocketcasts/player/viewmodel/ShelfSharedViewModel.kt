@@ -37,9 +37,11 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.mapNotNull
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.rx2.asFlow
+import timber.log.Timber
 
 @OptIn(ExperimentalCoroutinesApi::class)
 @HiltViewModel
@@ -62,10 +64,16 @@ class ShelfSharedViewModel @Inject constructor(
             .observeOn(Schedulers.io())
 
     private val shelfUpNextObservable = upNextStateObservable
-        .distinctUntilChanged { t1, t2 ->
-            val entry1 = t1 as? UpNextQueue.State.Loaded ?: return@distinctUntilChanged false
-            val entry2 = t2 as? UpNextQueue.State.Loaded ?: return@distinctUntilChanged false
-            return@distinctUntilChanged (entry1.episode as? PodcastEpisode)?.isStarred == (entry2.episode as? PodcastEpisode)?.isStarred && entry1.episode.episodeStatus == entry2.episode.episodeStatus && entry1.podcast?.isUsingEffects == entry2.podcast?.isUsingEffects
+        .distinctUntilChanged { oldState, newState ->
+            val oldLoaded = oldState as? UpNextQueue.State.Loaded ?: return@distinctUntilChanged false
+            val newLoaded = newState as? UpNextQueue.State.Loaded ?: return@distinctUntilChanged false
+            val oldPodcastEpisode = oldLoaded.episode as? PodcastEpisode
+            val newPodcastEpisode = newLoaded.episode as? PodcastEpisode
+
+            oldPodcastEpisode?.uuid == newPodcastEpisode?.uuid &&
+                oldPodcastEpisode?.isStarred == newPodcastEpisode?.isStarred &&
+                oldLoaded.episode.episodeStatus == newLoaded.episode.episodeStatus &&
+                oldLoaded.podcast?.isUsingEffects == newLoaded.podcast?.isUsingEffects
         }
 
     private val _navigationState: MutableSharedFlow<NavigationState> = MutableSharedFlow()
