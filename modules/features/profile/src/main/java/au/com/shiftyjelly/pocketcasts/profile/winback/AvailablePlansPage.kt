@@ -121,7 +121,7 @@ private fun LoadedState(
                 .verticalScroll(rememberScrollState()),
         ) {
             Spacer(
-                modifier = Modifier.height(64.dp),
+                modifier = Modifier.height(16.dp),
             )
             PocketCastsLogo()
             Spacer(
@@ -176,7 +176,7 @@ private fun TooManyPurchasesState(
             .verticalScroll(rememberScrollState()),
     ) {
         Spacer(
-            modifier = Modifier.height(64.dp),
+            modifier = Modifier.height(16.dp),
         )
         PocketCastsLogo()
         Spacer(
