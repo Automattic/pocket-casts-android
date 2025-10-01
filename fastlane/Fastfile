@@ -571,10 +571,12 @@ platform :android do
       }
     )
 
-    annotate_sentry_mapping_uuid(app: app)
+    aab_file = File.join(PROJECT_ROOT_FOLDER, bundle_output_path(app))
+    annotate_sentry_mapping_uuid(app: app, aab_file: aab_file)
 
     Dir.chdir('..') do
-      sh("mkdir -p #{build_dir} && cp -v #{bundle_output_path(app)} #{aab_artifact_path}")
+      FileUtils.mkdir_p(build_dir)
+      FileUtils.cp_r(aab_file, aab_artifact_path)
       UI.message("Bundle ready: #{aab_artifact_path}")
     end
   end
@@ -761,8 +763,7 @@ platform :android do
     File.join(app.to_s, 'build', 'outputs', 'bundle', 'release', "#{app}-release.aab")
   end
 
-  def annotate_sentry_mapping_uuid(app:)
-    aab_file = File.join(PROJECT_ROOT_FOLDER, bundle_output_path(app))
+  def annotate_sentry_mapping_uuid(app:, aab_file:)
     sentry_props = sh('unzip', '-p', aab_file, 'base/assets/sentry-debug-meta.properties', step_name: 'Extract sentry-debug-meta.properties') do |status, result, _|
       status.success? ? result : nil
     end
