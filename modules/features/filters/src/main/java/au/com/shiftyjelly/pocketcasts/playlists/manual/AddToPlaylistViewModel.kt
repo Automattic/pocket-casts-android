@@ -7,9 +7,9 @@ import androidx.lifecycle.viewModelScope
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.compose.text.SearchFieldState
+import au.com.shiftyjelly.pocketcasts.models.to.PlaylistPreviewForEpisode
 import au.com.shiftyjelly.pocketcasts.repositories.playlist.PlaylistManager
-import au.com.shiftyjelly.pocketcasts.repositories.playlist.PlaylistPreviewForEpisode
-import au.com.shiftyjelly.pocketcasts.views.swipe.AddToPlaylistFragmentFactory
+import au.com.shiftyjelly.pocketcasts.repositories.playlist.PlaylistPreview
 import au.com.shiftyjelly.pocketcasts.views.swipe.AddToPlaylistFragmentFactory.Source
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
@@ -17,17 +17,24 @@ import dagger.assisted.AssistedInject
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.Deferred
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.NonCancellable
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.emitAll
-import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flow
-import kotlinx.coroutines.flow.onStart
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 @OptIn(ExperimentalCoroutinesApi::class)
 @HiltViewModel(assistedFactory = AddToPlaylistViewModel.Factory::class)
@@ -38,8 +45,19 @@ class AddToPlaylistViewModel @AssistedInject constructor(
     @Assisted("id") private val episodeUuid: String,
     @Assisted("title") initialPlaylistTitle: String,
 ) : ViewModel() {
-    private val _createdPlaylist = CompletableDeferred<String>(viewModelScope.coroutineContext[Job])
+    private val previewsFlow = MutableStateFlow<List<PlaylistPreviewForEpisode>?>(null)
 
+    val searchFieldState = SearchFieldState()
+
+    init {
+        viewModelScope.launch {
+            searchFieldState.textFlow.collectLatest { searchTerm ->
+                previewsFlow.value = playlistManager.playlistPreviewsForEpisodeFlow(episodeUuid, searchTerm).first()
+            }
+        }
+    }
+
+    private val _createdPlaylist = CompletableDeferred<String>(viewModelScope.coroutineContext[Job])
     val createdPlaylist: Deferred<String> get() = _createdPlaylist
 
     val newPlaylistNameState = TextFieldState(
@@ -47,24 +65,34 @@ class AddToPlaylistViewModel @AssistedInject constructor(
         initialSelection = TextRange(0, initialPlaylistTitle.length),
     )
 
-    val searchFieldState = SearchFieldState()
-
     val uiState = flow {
-        val filteredPreviews = searchFieldState.textFlow.flatMapLatest { searchTerm ->
-            playlistManager.playlistPreviewsForEpisodeFlow(episodeUuid, searchTerm)
-        }
-        val unfilteredPreviews = playlistManager.playlistPreviewsForEpisodeFlow(episodeUuid)
-        val uiStates = combine(filteredPreviews, unfilteredPreviews) { filtered, unfiltered ->
-            UiState(
-                playlistPreviews = filtered,
-                unfilteredPlaylistsCount = unfiltered.size,
-            )
+        val unfilteredSize = playlistManager.playlistPreviewsForEpisodeFlow(episodeUuid).map { it.size }
+        val uiStates = combine(previewsFlow, unfilteredSize) { filtered, unfilteredSize ->
+            if (filtered != null) {
+                UiState(
+                    playlistPreviews = filtered,
+                    unfilteredPlaylistsCount = unfilteredSize,
+                    episodeLimit = PlaylistManager.MANUAL_PLAYLIST_EPISODE_LIMIT,
+                )
+            } else {
+                null
+            }
         }
 
         // Add a small delay to initial filtered playlists to avoid bottom sheet animation stutter
         delay(350)
         emitAll(uiStates)
     }.stateIn(viewModelScope, SharingStarted.Eagerly, initialValue = null)
+
+    fun getPreviewMetadataFlow(playlistUuid: String): StateFlow<PlaylistPreview.Metadata?> {
+        return playlistManager.getPreviewMetadataFlow(playlistUuid)
+    }
+
+    fun refreshPreviewMetadata(playlistUuid: String) {
+        viewModelScope.launch {
+            playlistManager.refreshPreviewMetadata(playlistUuid)
+        }
+    }
 
     private var isCreationTriggered = false
 
@@ -82,13 +110,31 @@ class AddToPlaylistViewModel @AssistedInject constructor(
     }
 
     fun addToPlaylist(playlistUuid: String) {
-        viewModelScope.launch {
+        viewModelScope.launch(Dispatchers.Default + NonCancellable) {
+            previewsFlow.update { previews ->
+                previews?.map { preview ->
+                    if (preview.uuid == playlistUuid) {
+                        preview.copy(hasEpisode = true, episodeCount = preview.episodeCount + 1)
+                    } else {
+                        preview
+                    }
+                }
+            }
             playlistManager.addManualEpisode(playlistUuid, episodeUuid)
         }
     }
 
     fun removeFromPlaylist(playlistUuid: String) {
-        viewModelScope.launch {
+        viewModelScope.launch(Dispatchers.Default + NonCancellable) {
+            previewsFlow.update { previews ->
+                previews?.map { preview ->
+                    if (preview.uuid == playlistUuid) {
+                        preview.copy(hasEpisode = false, episodeCount = preview.episodeCount - 1)
+                    } else {
+                        preview
+                    }
+                }
+            }
             playlistManager.deleteManualEpisode(playlistUuid, episodeUuid)
         }
     }
@@ -134,6 +180,7 @@ class AddToPlaylistViewModel @AssistedInject constructor(
     data class UiState(
         val playlistPreviews: List<PlaylistPreviewForEpisode>,
         val unfilteredPlaylistsCount: Int,
+        val episodeLimit: Int,
     )
 
     @AssistedFactory

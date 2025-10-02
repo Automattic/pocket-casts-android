@@ -18,6 +18,7 @@ import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.models.to.PlaylistEpisode
 import au.com.shiftyjelly.pocketcasts.models.to.PlaylistIcon
+import au.com.shiftyjelly.pocketcasts.models.to.PlaylistPreviewForEpisode
 import au.com.shiftyjelly.pocketcasts.models.type.Membership
 import au.com.shiftyjelly.pocketcasts.models.type.PlaylistEpisodeSortType
 import au.com.shiftyjelly.pocketcasts.models.type.PodcastsSortType
@@ -29,6 +30,7 @@ import au.com.shiftyjelly.pocketcasts.servers.di.ServersModule
 import au.com.shiftyjelly.pocketcasts.sharedtest.MutableClock
 import com.google.firebase.remoteconfig.FirebaseRemoteConfig
 import java.util.Date
+import kotlin.coroutines.EmptyCoroutineContext
 import kotlin.time.Duration
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.test.StandardTestDispatcher
@@ -75,6 +77,7 @@ class PlaylistManagerDsl : TestWatcher() {
 
         manager = PlaylistManagerImpl(
             appDatabase = database,
+            computationContext = EmptyCoroutineContext,
             settings = settings,
             clock = clock,
             smartEpisodeLimit = episodeLimit,
@@ -182,20 +185,20 @@ class PlaylistManagerDsl : TestWatcher() {
 
     suspend fun expectPreviewEpisodeCount(playlistIndex: Int, count: Int) {
         val playlistId = "playlist-id-$playlistIndex"
-        val playlist = manager.playlistPreviewsFlow().first().singleOrNull { it.uuid == playlistId }
-        assertEquals(count, playlist?.episodeCount)
+        val playlist = manager.smartPlaylistFlow(playlistId).first() ?: manager.manualPlaylistFlow(playlistId).first()
+        assertEquals(count, playlist?.metadata?.totalEpisodeCount)
     }
 
     suspend fun expectPreviewPodcasts(playlistIndex: Int, podcasts: List<String>) {
         val playlistId = "playlist-id-$playlistIndex"
-        val playlist = manager.playlistPreviewsFlow().first().singleOrNull { it.uuid == playlistId }
-        assertEquals(podcasts, playlist?.artworkPodcastUuids)
+        val playlist = manager.smartPlaylistFlow(playlistId).first() ?: manager.manualPlaylistFlow(playlistId).first()
+        assertEquals(podcasts, playlist?.metadata?.artworkUuids)
     }
 
     suspend fun expectPreviewNoPodcasts(playlistIndex: Int) {
         val playlistId = "playlist-id-$playlistIndex"
-        val playlist = manager.playlistPreviewsFlow().first().singleOrNull { it.uuid == playlistId }
-        assertEquals(true, playlist?.artworkPodcastUuids?.isEmpty())
+        val playlist = manager.smartPlaylistFlow(playlistId).first() ?: manager.manualPlaylistFlow(playlistId).first()
+        assertEquals(true, playlist?.metadata?.artworkUuids?.isEmpty())
     }
 
     suspend fun expectSyncStatus(playlistIndex: Int, syncStatus: Int) {
@@ -296,8 +299,6 @@ class PlaylistManagerDsl : TestWatcher() {
             SmartPlaylistPreview(
                 uuid = "playlist-id-$index",
                 title = "Playlist title $index",
-                episodeCount = 0,
-                artworkPodcastUuids = emptyList(),
                 settings = Playlist.Settings(
                     sortType = PlaylistEpisodeSortType.NewestToOldest,
                     isAutoDownloadEnabled = false,
@@ -315,8 +316,6 @@ class PlaylistManagerDsl : TestWatcher() {
             ManualPlaylistPreview(
                 uuid = "playlist-id-$index",
                 title = "Playlist title $index",
-                episodeCount = 0,
-                artworkPodcastUuids = emptyList(),
                 settings = Playlist.Settings(
                     sortType = PlaylistEpisodeSortType.DragAndDrop,
                     isAutoDownloadEnabled = false,
@@ -481,9 +480,7 @@ class PlaylistManagerDsl : TestWatcher() {
                 uuid = "playlist-id-$index",
                 title = "Playlist title $index",
                 episodeCount = 0,
-                artworkPodcastUuids = emptyList(),
                 hasEpisode = false,
-                episodeLimit = episodeLimit,
             ),
         )
     }

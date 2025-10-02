@@ -19,7 +19,7 @@ import au.com.shiftyjelly.pocketcasts.models.entity.PlaylistEntity.Companion.SYN
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.models.to.PlaylistEpisode
 import au.com.shiftyjelly.pocketcasts.models.to.PlaylistEpisodeMetadata
-import au.com.shiftyjelly.pocketcasts.models.to.PlaylistPreviewForEpisodeEntity
+import au.com.shiftyjelly.pocketcasts.models.to.PlaylistPreviewForEpisode
 import au.com.shiftyjelly.pocketcasts.models.to.toPodcastEpisodes
 import au.com.shiftyjelly.pocketcasts.models.type.PlaylistEpisodeSortType
 import au.com.shiftyjelly.pocketcasts.models.type.SmartRules
@@ -30,6 +30,7 @@ import au.com.shiftyjelly.pocketcasts.models.type.SmartRules.PodcastsRule
 import au.com.shiftyjelly.pocketcasts.models.type.SmartRules.ReleaseDateRule
 import au.com.shiftyjelly.pocketcasts.models.type.SmartRules.StarredRule
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
+import au.com.shiftyjelly.pocketcasts.repositories.di.DefaultDispatcher
 import au.com.shiftyjelly.pocketcasts.repositories.playlist.PlaylistManager.Companion.MANUAL_PLAYLIST_EPISODE_LIMIT
 import au.com.shiftyjelly.pocketcasts.repositories.playlist.PlaylistManager.Companion.PLAYLIST_ARTWORK_EPISODE_LIMIT
 import au.com.shiftyjelly.pocketcasts.repositories.playlist.PlaylistManager.Companion.SMART_PLAYLIST_EPISODE_LIMIT
@@ -42,9 +43,10 @@ import java.util.UUID
 import java.util.concurrent.ConcurrentHashMap
 import javax.inject.Inject
 import javax.inject.Singleton
+import kotlin.coroutines.CoroutineContext
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
-import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.async
@@ -65,6 +67,7 @@ import kotlinx.coroutines.withContext
 @Singleton
 class PlaylistManagerImpl(
     private val appDatabase: AppDatabase,
+    private val computationContext: CoroutineContext,
     private val settings: Settings,
     private val clock: Clock,
     private val smartEpisodeLimit: Int,
@@ -73,10 +76,12 @@ class PlaylistManagerImpl(
     @Inject
     constructor(
         appDatabase: AppDatabase,
+        @DefaultDispatcher computationDispatcher: CoroutineDispatcher,
         settings: Settings,
         clock: Clock,
     ) : this(
         appDatabase = appDatabase,
+        computationContext = computationDispatcher,
         settings = settings,
         clock = clock,
         smartEpisodeLimit = SMART_PLAYLIST_EPISODE_LIMIT,
@@ -89,7 +94,7 @@ class PlaylistManagerImpl(
 
     override fun playlistPreviewsFlow(): Flow<List<PlaylistPreview>> {
         return playlistDao.allPlaylistsFlow().map { playlists ->
-            withContext(Dispatchers.Default) {
+            withContext(computationContext) {
                 playlists.map { playlist ->
                     playlist.toPlaylistPreview()
                 }
@@ -149,7 +154,7 @@ class PlaylistManagerImpl(
     override suspend fun getAutoDownloadEpisodes(): List<PodcastEpisode> {
         return appDatabase.withTransaction {
             val playlists = playlistDao.getAllAutoDownloadPlaylists()
-            withContext(Dispatchers.Default) {
+            withContext(computationContext) {
                 val useManual = FeatureFlag.isEnabled(Feature.PLAYLISTS_REBRANDING, immutable = true)
                 playlists
                     .let { playlists ->
@@ -341,16 +346,7 @@ class PlaylistManagerImpl(
     }
 
     override fun playlistPreviewsForEpisodeFlow(episodeUuid: String, searchTerm: String?): Flow<List<PlaylistPreviewForEpisode>> {
-        return playlistDao
-            .playlistPreviewsForEpisodeFlow(episodeUuid, searchTerm.orEmpty())
-            .flatMapLatest { playlists ->
-                if (playlists.isEmpty()) {
-                    flowOf(emptyList())
-                } else {
-                    createPreviewsForEpisode(playlists)
-                }
-            }
-            .keepPodcastEpisodesSynced()
+        return playlistDao.playlistPreviewsForEpisodeFlow(episodeUuid, searchTerm.orEmpty())
     }
 
     override suspend fun getManualEpisodeSources(searchTerm: String?): List<ManualPlaylistEpisodeSource> {
@@ -435,27 +431,10 @@ class PlaylistManagerImpl(
         }
     }
 
-    private fun createPreviewsForEpisode(playlists: List<PlaylistPreviewForEpisodeEntity>) = combine(
-        playlists.map { playlist ->
-            manualPlaylistArtworkPodcastsFlow(playlist.uuid)
-                .map { podcasts ->
-                    PlaylistPreviewForEpisode(
-                        uuid = playlist.uuid,
-                        title = playlist.title,
-                        episodeCount = playlist.episodeCount,
-                        artworkPodcastUuids = podcasts,
-                        hasEpisode = playlist.hasEpisode,
-                        episodeLimit = manualEpisodeLimit,
-                    )
-                }
-                .distinctUntilChanged()
-        },
-    ) { array -> array.toList() }
-
     private fun manualPlaylistArtworkPodcastsFlow(playlistUuid: String) = playlistDao
         .manualPlaylistArtworkPodcastsFlow(playlistUuid)
         .map { uuids ->
-            withContext(Dispatchers.Default) {
+            withContext(computationContext) {
                 uuids.toArtworkUuids()
             }
         }
@@ -468,7 +447,7 @@ class PlaylistManagerImpl(
             limit = smartEpisodeLimit,
         )
         .map { uuids ->
-            withContext(Dispatchers.Default) {
+            withContext(computationContext) {
                 uuids.toArtworkUuids()
             }
         }
