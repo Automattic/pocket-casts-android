@@ -5,7 +5,9 @@ import androidx.room.Delete
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
+import androidx.room.Transaction
 import androidx.room.Update
+import au.com.shiftyjelly.pocketcasts.models.db.AppDatabase
 import au.com.shiftyjelly.pocketcasts.models.entity.UserEpisode
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodePlayingStatus
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodeStatusEnum
@@ -76,7 +78,14 @@ abstract class UserEpisodeDao {
     abstract suspend fun findEpisodeByUuid(uuid: String): UserEpisode?
 
     @Query("SELECT * FROM user_episodes WHERE uuid IN (:episodeUuids)")
-    abstract suspend fun findEpisodesByUuids(episodeUuids: List<String>): List<UserEpisode>
+    protected abstract suspend fun findEpisodesByUuidsUnsafe(episodeUuids: Collection<String>): List<UserEpisode>
+
+    @Transaction
+    open suspend fun findEpisodesByUuids(episodeUuids: List<String>): List<UserEpisode> {
+        return episodeUuids.chunked(AppDatabase.SQLITE_BIND_ARG_LIMIT).flatMap { chunk ->
+            findEpisodesByUuidsUnsafe(chunk)
+        }
+    }
 
     @Query("UPDATE user_episodes SET played_up_to = :playedUpTo, played_up_to_modified = :modified WHERE uuid = :uuid AND (played_up_to IS NULL OR played_up_to < :playedUpToMin OR played_up_to > :playedUpToMax)")
     abstract fun updatePlayedUpToIfChangedBlocking(playedUpTo: Double, playedUpToMin: Double, playedUpToMax: Double, modified: Long, uuid: String)

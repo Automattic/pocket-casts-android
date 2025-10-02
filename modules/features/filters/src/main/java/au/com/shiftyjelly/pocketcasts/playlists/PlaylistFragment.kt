@@ -233,7 +233,7 @@ class PlaylistFragment :
                     contentState = when (uiState.playlist?.episodes?.size) {
                         null -> ContentState.Uninitialized
 
-                        0 -> if (uiState.playlist.metadata.archivedEpisodeCount == 0) {
+                        0 -> if (uiState.playlist.metadata.totalEpisodeCount == 0) {
                             ContentState.HasNoEpisodes
                         } else {
                             ContentState.HasEpisode
