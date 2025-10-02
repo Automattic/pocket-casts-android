@@ -15,7 +15,14 @@
             android:id="@+id/sleepSetup"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            app:constraint_referenced_ids="sleepTitle,labelMins15,buttonMins15,separator1,labelMins30,buttonMins30,separator2,labelOneHour,buttonOneHour,separator3,labelCustom,buttonCustom,customStepperComposeView, separator5, labelEndOfEpisode, buttonEndOfEpisode, endOfEpisodeStepperComposeView, separator4, labelEndOfChapter, buttonEndOfChapter, endOfChapterStepperComposeView, sleepTimeSettings"
+            app:constraint_referenced_ids="sleepTitle,labelMins15,buttonMins15,separator1,labelMins30,buttonMins30,separator2,labelOneHour,buttonOneHour,separator3,labelCustom,buttonCustom,customStepperComposeView, labelEndOfEpisode, buttonEndOfEpisode, endOfEpisodeStepperComposeView, separator4, sleepTimeSettings"
+            tools:ignore="MissingConstraints" />
+
+        <androidx.constraintlayout.widget.Group
+            android:id="@+id/sleepSetupChapter"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:constraint_referenced_ids="labelEndOfChapter, buttonEndOfChapter, endOfChapterStepperComposeView, separator5"
             tools:ignore="MissingConstraints" />
 
         <androidx.constraintlayout.widget.Group
@@ -30,6 +37,13 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             app:constraint_referenced_ids="sleepTime,buttonAdd1Minute,buttonAdd5Minute,buttonEndOfEpisode2,buttonCancelTime"
+            tools:ignore="MissingConstraints" />
+
+        <androidx.constraintlayout.widget.Group
+            android:id="@+id/sleepRunningChapter"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:constraint_referenced_ids="buttonEndOfChapter2"
             tools:ignore="MissingConstraints" />
 
         <androidx.constraintlayout.widget.Group
@@ -371,6 +385,25 @@
             app:textAllCaps="false" />
 
         <com.google.android.material.button.MaterialButton
+            android:id="@+id/buttonEndOfChapter2"
+            style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+            android:layout_width="match_parent"
+            android:layout_height="56dp"
+            android:layout_gravity="center"
+            android:layout_marginStart="32dp"
+            android:layout_marginTop="8dp"
+            android:layout_marginEnd="32dp"
+            android:minWidth="172dp"
+            android:text="@string/player_sleep_timer_end_of_chapter"
+            android:textColor="?attr/player_contrast_01"
+            android:textSize="16sp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/buttonAdd5Minute"
+            app:strokeColor="?attr/player_contrast_01"
+            app:textAllCaps="false" />
+
+        <com.google.android.material.button.MaterialButton
             android:id="@+id/buttonEndOfEpisode2"
             style="@style/Widget.MaterialComponents.Button.OutlinedButton"
             android:layout_width="match_parent"
@@ -380,12 +413,12 @@
             android:layout_marginTop="8dp"
             android:layout_marginEnd="32dp"
             android:minWidth="172dp"
-            android:text="@string/player_sleep_end_of_episode"
+            android:text="@string/player_sleep_timer_end_of_episode"
             android:textColor="?attr/player_contrast_01"
             android:textSize="16sp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/buttonAdd5Minute"
+            app:layout_constraintTop_toBottomOf="@+id/buttonEndOfChapter2"
             app:strokeColor="?attr/player_contrast_01"
             app:textAllCaps="false" />
 

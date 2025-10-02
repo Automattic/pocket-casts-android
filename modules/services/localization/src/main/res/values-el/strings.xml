@@ -433,6 +433,7 @@ Language: el_GR
     <string name="player_sleep_in_one_chapter">Ύπνος σε 1 κεφάλαιο</string>
     <string name="player_sleep_timer_in_chapter_plural">Σε %d κεφάλαια</string>
     <string name="player_sleep_timer_in_chapter">Σε 1 κεφάλαιο</string>
+    <string name="player_sleep_timer_end_of_episode">Τέλος επεισοδίου</string>
     <string name="player_sleep_timer_in_episode_plural">Σε %d επεισόδια</string>
     <string name="player_sleep_timer_in_episode">Σε 1 επεισόδιο</string>
     <string name="settings_use_episode_artwork_customization_description">Επίλεξε αν θέλεις να δεις το εξώφυλλο των επεισοδίων σε αυτές τις ενότητες της εφαρμογής</string>
@@ -1856,7 +1857,6 @@ Language: el_GR
     <string name="player_time_saved_detail">Συνολικά έχεις εξοικονομήσει %s χρησιμοποιώντας αυτή τη λειτουργία.</string>
     <string name="player_sleep_timer">Χρονοδιακόπτης ύπνου</string>
     <string name="player_sleep_timer_title">Χρονοδιακόπτης Ύπνου</string>
-    <string name="player_sleep_end_of_episode">Τέλος επεισοδίου</string>
     <string name="player_sleep_cancel_timer">Ακύρωση χρονοδιακόπτη</string>
     <string name="player_sleep_60_minutes">60 λεπτά</string>
     <string name="player_sleep_30_minutes">30 λεπτά</string>
