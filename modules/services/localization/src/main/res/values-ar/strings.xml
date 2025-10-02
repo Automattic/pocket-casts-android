@@ -589,6 +589,7 @@ Language: ar
     <string name="player_sleep_in_one_chapter">السكون في الفصل الأول</string>
     <string name="player_sleep_timer_in_chapter_plural">في %d من الفصول</string>
     <string name="player_sleep_timer_in_chapter">في فصل واحد</string>
+    <string name="player_sleep_timer_end_of_episode">نهاية الحلقة</string>
     <string name="player_sleep_timer_in_episode_plural">في %d من الحلقات</string>
     <string name="player_sleep_timer_in_episode">في حلقة واحدة</string>
     <string name="settings_use_episode_artwork_customization_description">حدد ما إذا كنت تريد رؤية العمل الفني للحلقة في هذه الأقسام من التطبيق</string>
@@ -1988,7 +1989,6 @@ Language: ar
     <string name="player_tab_playing">تشغيل</string>
     <string name="player_sleep_timer">مؤقت الإيقاف</string>
     <string name="player_sleep_timer_title">مؤقت الإيقاف</string>
-    <string name="player_sleep_end_of_episode">نهاية الحلقة</string>
     <string name="player_sleep_cancel_timer">إلغاء المؤقت</string>
     <string name="player_sleep_add_5_minutes">أكثر من 5 دقائق</string>
     <string name="player_sleep_60_minutes">60 دقيقة</string>

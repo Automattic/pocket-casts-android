@@ -588,6 +588,7 @@ Language: es
     <string name="player_sleep_in_one_chapter">En suspensión dentro de 1 capítulo</string>
     <string name="player_sleep_timer_in_chapter_plural">Dentro de %d capítulos</string>
     <string name="player_sleep_timer_in_chapter">Dentro de 1 capítulo</string>
+    <string name="player_sleep_timer_end_of_episode">Fin del episodio</string>
     <string name="player_sleep_timer_in_episode_plural">Dentro de %d episodios</string>
     <string name="player_sleep_timer_in_episode">Dentro de 1 episodio</string>
     <string name="player_sleep_time_fired_end_of_chapter">El temporizador de suspensión se paró al final del capítulo.</string>
@@ -1993,7 +1994,6 @@ Language: es
     <string name="player_time_saved_no_hour">¡Enhorabuena! Estás ahorrando tiempo y terminando más podcasts.</string>
     <string name="player_time_saved_detail">En total, has ahorrado %s con esta función.</string>
     <string name="player_sleep_timer">Temporizador</string>
-    <string name="player_sleep_end_of_episode">Fin del episodio</string>
     <string name="player_sleep_cancel_timer">Cancelar temporizador</string>
     <string name="player_sleep_add_5_minutes">5 minutos más</string>
     <string name="player_sleep_60_minutes">60 minutos</string>

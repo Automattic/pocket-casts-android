@@ -326,8 +326,10 @@ class PlayerHeaderFragment :
                             EffectsFragment().show(parentFragmentManager, "effects")
                         }
 
-                        NavigationState.ShowSleepTimerOptions -> {
-                            SleepFragment().show(parentFragmentManager, "sleep_sheet")
+                        is NavigationState.ShowSleepTimerOptions -> {
+                            SleepFragment
+                                .newInstance(navigationState.hasChapters)
+                                .show(parentFragmentManager, "sleep_sheet")
                         }
 
                         is NavigationState.ShowShareDialog -> {

@@ -589,6 +589,7 @@ Language: zh_TW
     <string name="player_sleep_in_one_chapter">在 1 個章節後休眠</string>
     <string name="player_sleep_timer_in_chapter_plural">%d 個章節後</string>
     <string name="player_sleep_timer_in_chapter">1 個章節後</string>
+    <string name="player_sleep_timer_end_of_episode">單集結束</string>
     <string name="player_sleep_timer_in_episode_plural">%d 集後</string>
     <string name="player_sleep_timer_in_episode">1 集後</string>
     <string name="settings_use_episode_artwork_customization_description">若想在應用程式的這些區段中查看單集封面圖片，請選取</string>
@@ -1974,7 +1975,6 @@ Language: zh_TW
     <string name="player_time_saved_no_hour">恭喜！ 你已省下時間，並收聽更多 Podcast。</string>
     <string name="player_time_saved_detail">使用此功能總共為你省下 %s。</string>
     <string name="player_sleep_timer">睡眠計時器</string>
-    <string name="player_sleep_end_of_episode">單集結束</string>
     <string name="player_sleep_cancel_timer">取消計時器</string>
     <string name="player_sleep_add_5_minutes">+ 5 分鐘</string>
     <string name="player_sleep_60_minutes">60 分鐘</string>
