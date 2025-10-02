@@ -49,7 +49,7 @@ class SearchHandler @Inject constructor(
 ) {
     private var source: SourceView = SourceView.UNKNOWN
     private val searchQuery = BehaviorRelay.create<Query>().apply {
-        accept(Query(""))
+        accept(Query.SearchResults(""))
     }
 
     private val loadingObservable = BehaviorRelay.create<Boolean>().apply {
@@ -61,8 +61,8 @@ class SearchHandler @Inject constructor(
     private val signInStateObservable = userManager.getSignInState().startWith(SignInState.SignedOut).toObservable()
 
     private val localPodcastsResults = Observable
-        .combineLatest(searchQuery, onlySearchRemoteObservable, signInStateObservable) { searchQuery, onlySearchRemoteObservable, signInState ->
-            Pair(if (onlySearchRemoteObservable) "" else searchQuery.string, signInState)
+        .combineLatest(searchQuery.filter { it is Query.SearchResults }, onlySearchRemoteObservable, signInStateObservable) { searchQuery, onlySearchRemoteObservable, signInState ->
+            Pair(if (onlySearchRemoteObservable) "" else searchQuery.term, signInState)
         }
         .subscribeOn(Schedulers.io())
         .switchMap { (query, signInState) ->
@@ -114,9 +114,8 @@ class SearchHandler @Inject constructor(
 
     @OptIn(ExperimentalCoroutinesApi::class)
     @Suppress("UNCHECKED_CAST")
-    private val autoCompleteResults = searchQuery.asFlow()
-        .map { it.string.trim() }
-        // .debounce(200L, TimeUnit.MILLISECONDS)
+    private val autoCompleteResults = searchQuery.filter { it is Query.Suggestions }.asFlow()
+        .map { it.term.trim() }
         .flatMapLatest { query ->
             Log.w("===", "query=$query")
             if (query.isEmpty()) {
@@ -175,10 +174,11 @@ class SearchHandler @Inject constructor(
     }
 
     private val serverSearchResults = searchQuery
+        .filter { it is Query.SearchResults }
         .subscribeOn(Schedulers.io())
-        .map { it.copy(string = it.string.trim()) }
+        .map { (it as Query.SearchResults).copy(term = it.term.trim()) }
         .debounce {
-            val debounceQuery = it.string.isNotEmpty() && !it.immediate
+            val debounceQuery = it.term.isNotEmpty() && !it.immediate
             if (debounceQuery) {
                 val debounceMs = settings.getPodcastSearchDebounceMs()
                 Observable.timer(debounceMs, TimeUnit.MILLISECONDS)
@@ -186,7 +186,7 @@ class SearchHandler @Inject constructor(
                 Observable.empty()
             }
         }
-        .map { it.string }
+        .map { it.term }
         .switchMap {
             if (it.length <= 1) {
                 Observable.just(GlobalServerSearch())
@@ -225,14 +225,14 @@ class SearchHandler @Inject constructor(
             }
         }
 
-    private val searchFlowable = Observables.combineLatest(searchQuery, subscribedPodcastUuids, localPodcastsResults, serverSearchResults, loadingObservable) { searchTerm, subscribedPodcastUuids, localPodcastsResult, serverSearchResults, loading ->
+    private val searchFlowable = Observables.combineLatest(searchQuery.filter { it is Query.SearchResults }, subscribedPodcastUuids, localPodcastsResults, serverSearchResults, loadingObservable) { searchTerm, subscribedPodcastUuids, localPodcastsResult, serverSearchResults, loading ->
         if (loading) {
-            SearchUiState.SearchOperation.Loading(searchTerm.string)
+            SearchUiState.SearchOperation.Loading(searchTerm.term)
         } else if (serverSearchResults.error != null) {
             analyticsTracker.track(AnalyticsEvent.SEARCH_FAILED, AnalyticsProp.sourceMap(source))
-            SearchUiState.SearchOperation.Error(searchTerm = searchTerm.string, error = serverSearchResults.error!!)
-        } else if (searchTerm.string.isBlank()) {
-            SearchUiState.SearchOperation.Results(searchTerm = searchTerm.string, results = SearchResults(podcasts = emptyList(), episodes = emptyList()))
+            SearchUiState.SearchOperation.Error(searchTerm = searchTerm.term, error = serverSearchResults.error!!)
+        } else if (searchTerm.term.isBlank()) {
+            SearchUiState.SearchOperation.Results(searchTerm = searchTerm.term, results = SearchResults(podcasts = emptyList(), episodes = emptyList()))
         } else {
             // set if the podcast is subscribed so we can show a tick
             val serverPodcastsResult = serverSearchResults.podcastSearch.searchResults.map { podcast -> FolderItem.Podcast(podcast) }
@@ -245,7 +245,7 @@ class SearchHandler @Inject constructor(
             val searchEpisodesResult = serverSearchResults.episodeSearch.episodes
 
             SearchUiState.SearchOperation.Results(
-                searchTerm = searchTerm.string,
+                searchTerm = searchTerm.term,
                 results = SearchResults(
                     podcasts = searchPodcastsResult,
                     episodes = searchEpisodesResult,
@@ -257,7 +257,7 @@ class SearchHandler @Inject constructor(
         .onErrorReturn { exception ->
             analyticsTracker.track(AnalyticsEvent.SEARCH_FAILED, AnalyticsProp.sourceMap(source))
             SearchUiState.SearchOperation.Error(
-                searchTerm = searchQuery.value?.string.orEmpty(),
+                searchTerm = searchQuery.value?.term.orEmpty(),
                 error = exception,
             )
         }
@@ -265,8 +265,12 @@ class SearchHandler @Inject constructor(
 
     val searchResults = searchFlowable
 
+    fun updateAutCompleteQuery(query: String) {
+        searchQuery.accept(Query.Suggestions(query))
+    }
+
     fun updateSearchQuery(query: String, immediate: Boolean = false) {
-        searchQuery.accept(Query(query, immediate))
+        searchQuery.accept(Query.SearchResults(query, immediate))
     }
 
     fun setOnlySearchRemote(remote: Boolean) {
@@ -277,7 +281,11 @@ class SearchHandler @Inject constructor(
         this.source = source
     }
 
-    private data class Query(val string: String, val immediate: Boolean = false)
+    private sealed interface Query {
+        val term: String
+        data class Suggestions(override val term: String): Query
+        data class SearchResults(override val term: String, val immediate: Boolean = false) : Query
+    }
 
     private object AnalyticsProp {
         private const val SOURCE = "source"

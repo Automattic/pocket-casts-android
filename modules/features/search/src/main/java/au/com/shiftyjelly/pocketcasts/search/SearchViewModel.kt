@@ -2,7 +2,6 @@ package au.com.shiftyjelly.pocketcasts.search
 
 import android.util.Log
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.map
 import androidx.lifecycle.viewModelScope
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
@@ -16,13 +15,10 @@ import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
 import au.com.shiftyjelly.pocketcasts.repositories.searchhistory.SearchHistoryManager
 import au.com.shiftyjelly.pocketcasts.search.SearchResultsFragment.Companion.ResultsType
 import dagger.hilt.android.lifecycle.HiltViewModel
-import io.reactivex.BackpressureStrategy
 import javax.inject.Inject
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.rx2.asObservable
 
 @HiltViewModel
 class SearchViewModel @Inject constructor(
@@ -57,42 +53,17 @@ class SearchViewModel @Inject constructor(
                 }
             }
         }
-
-//        viewModelScope.launch {
-//            val subscribedUuidFlow = podcastManager
-//                .subscribedRxFlowable()
-//                .asFlow()
-//                .map { ls ->
-//                    ls.map { it.uuid }
-//                }
-//            combine(
-//                subscribedUuidFlow,
-//                searchResults.asFlow(),
-//            ) { subscribedUuids, searchState ->
-//                if (searchState is SearchUiState.Success.SearchResults) {
-//                    searchState.copy(
-//                        podcasts = searchState.podcasts
-//                            .map { podcast ->
-//                                if (podcast is FolderItem.Podcast) {
-//                                    podcast.copy(podcast.podcast.copy(isSubscribed = subscribedUuids.contains(podcast.podcast.uuid)))
-//                                } else {
-//                                    podcast
-//                                }
-//                            },
-//                    )
-//                } else {
-//                    searchState
-//                }
-//            }.stateIn(viewModelScope).collect {
-//                _state.value = it
-//            }
-//        }
     }
 
     fun updateSearchQuery(query: String, immediate: Boolean = false) {
         // Prevent updating the search query when navigating back to the search results after tapping on a result.
-//        if (_state.value.searchTerm == query) return
-        searchHandler.updateSearchQuery(query, immediate)
+        if (_state.value.searchTerm == query) return
+
+        when (_state.value) {
+            is SearchUiState.Idle,
+            is SearchUiState.Suggestions -> searchHandler.updateAutCompleteQuery(query)
+            is SearchUiState.Results -> searchHandler.updateSearchQuery(query, immediate)
+        }
     }
 
     fun setOnlySearchRemote(remote: Boolean) {
@@ -195,20 +166,23 @@ data class SearchResults(
 
 sealed interface SearchUiState {
 
-    val searchTerm: String? get() = when (this) {
-        is Suggestions -> operation.searchTerm
-        is Results -> operation.searchTerm
-        else -> null
-    }
+    val searchTerm: String?
+        get() = when (this) {
+            is Suggestions -> operation.searchTerm
+            is Results -> operation.searchTerm
+            else -> null
+        }
 
-    val isLoading: Boolean get() = when (this) {
-        is Suggestions -> operation is SearchOperation.Loading
-        is Results -> operation is SearchOperation.Loading
-        else -> false
-    }
+    val isLoading: Boolean
+        get() = when (this) {
+            is Suggestions -> operation is SearchOperation.Loading
+            is Results -> operation is SearchOperation.Loading
+            else -> false
+        }
 
     sealed interface SearchOperation<T> {
         val searchTerm: String
+
         data class Loading(override val searchTerm: String) : SearchOperation<Nothing>
         data class Error(override val searchTerm: String, val error: Throwable) : SearchOperation<Nothing>
         data class Results<T>(override val searchTerm: String, val results: T) : SearchOperation<T>
