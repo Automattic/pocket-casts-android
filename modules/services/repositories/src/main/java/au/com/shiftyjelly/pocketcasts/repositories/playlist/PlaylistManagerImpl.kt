@@ -119,7 +119,7 @@ class PlaylistManagerImpl(
 
     override suspend fun refreshPreviewMetadata(playlistUuid: String) {
         val cachedValue = getCachedMetadata(playlistUuid)
-        if (Duration.between(cachedValue.lastRefreshTime, clock.instant()).seconds > 30) {
+        if (Duration.between(cachedValue.lastRefreshTime, clock.instant()).seconds > CACHE_EVICTION_TIMEOUT.inWholeSeconds) {
             val preview = playlistDao.getAllPlaylistsIn(listOf(playlistUuid)).firstOrNull()?.toPlaylistPreview() ?: return
 
             val episodeCount: Int
@@ -637,3 +637,5 @@ private class CachedMetadata(
     val lastRefreshTime: Instant,
     val flow: MutableStateFlow<PlaylistPreview.Metadata?>,
 )
+
+private val CACHE_EVICTION_TIMEOUT = 30.seconds
