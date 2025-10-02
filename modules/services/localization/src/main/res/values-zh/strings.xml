@@ -589,6 +589,7 @@ Language: zh_CN
     <string name="player_sleep_in_one_chapter">1 个章节后进入睡眠状态</string>
     <string name="player_sleep_timer_in_chapter_plural">%d 个章节后</string>
     <string name="player_sleep_timer_in_chapter">1 个章节后</string>
+    <string name="player_sleep_timer_end_of_episode">剧集结束</string>
     <string name="player_sleep_timer_in_episode_plural">%d 集后</string>
     <string name="player_sleep_timer_in_episode">1 集后</string>
     <string name="settings_use_episode_artwork_customization_description">选择是否要在应用程序的这些部分查看剧集插图</string>
@@ -1995,7 +1996,6 @@ Language: zh_CN
     <string name="player_time_saved_no_hour">恭喜！ 您节省了时间，并浏览了更多播客。</string>
     <string name="player_time_saved_detail">您总共使用此功能节省了 %s。</string>
     <string name="player_sleep_timer">睡眠计时器</string>
-    <string name="player_sleep_end_of_episode">剧集结束</string>
     <string name="player_sleep_cancel_timer">取消计时器</string>
     <string name="player_sleep_add_5_minutes">+5 分钟</string>
     <string name="player_sleep_60_minutes">60 分钟</string>

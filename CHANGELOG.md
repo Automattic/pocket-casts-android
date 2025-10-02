@@ -1,5 +1,8 @@
 7.100
 -----
+*   Updates
+    *   Improve sleep timer terminology and chapter option visibility
+        ([#4564](https://github.com/Automattic/pocket-casts-android/pull/4564))
 *   Bug Fixes
     *   Fix done button overlapping with navigation bars
         ([#4553](https://github.com/Automattic/pocket-casts-android/pull/4553))
