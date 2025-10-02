@@ -31,11 +31,8 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.rx2.asFlow
 import timber.log.Timber
-
-typealias SuggestionsOperation = SearchUiState.SearchOperation<List<SearchAutoCompleteItem>>
 
 class SearchHandler @Inject constructor(
     val serviceManager: ServiceManager,
@@ -117,7 +114,6 @@ class SearchHandler @Inject constructor(
     private val autoCompleteResults = searchQuery.filter { it is Query.Suggestions }.asFlow()
         .map { it.term.trim() }
         .flatMapLatest { query ->
-            Log.w("===", "query=$query")
             if (query.isEmpty()) {
                 flow {
                     emit(
@@ -131,14 +127,11 @@ class SearchHandler @Inject constructor(
                 flow {
                     emit(autoCompleteManager.autoCompleteSearch(term = query))
                 }.map<List<SearchAutoCompleteItem>, SearchUiState.SearchOperation<List<SearchAutoCompleteItem>>> {
-                    Log.wtf("===", "autocomplete result=$it")
                     SearchUiState.SearchOperation.Results(
                         searchTerm = query,
                         results = it,
                     )
-                }
-                    .catch {
-                        Log.wtf("===", "onErrorReturn")
+                }.catch {
                         emit(
                             SearchUiState.SearchOperation.Error(
                                 searchTerm = query,
@@ -147,13 +140,12 @@ class SearchHandler @Inject constructor(
                         )
                     }
             }
-        }.onEach { Log.wtf("====", "onNext suggestions: $it") }
+        }
 
     val searchSuggestions = combine(
         autoCompleteResults,
         subscribedPodcastUuids.asFlow(),
     ) { autoComplete, subscribedUuids ->
-        Log.w("===", "searchSuggestions subscribedUUids.size=${subscribedUuids.size}, autoComplete=$autoComplete")
         when (autoComplete) {
             is SearchUiState.SearchOperation.Results -> {
                 autoComplete.copy(
@@ -174,6 +166,7 @@ class SearchHandler @Inject constructor(
     }
 
     private val serverSearchResults = searchQuery
+        .doOnNext { Log.wtf("===", "QQQuery= $it") }
         .filter { it is Query.SearchResults }
         .subscribeOn(Schedulers.io())
         .map { (it as Query.SearchResults).copy(term = it.term.trim()) }
@@ -188,6 +181,7 @@ class SearchHandler @Inject constructor(
         }
         .map { it.term }
         .switchMap {
+            Log.w("===", "serverSearchRes term=$it")
             if (it.length <= 1) {
                 Observable.just(GlobalServerSearch())
             } else {
@@ -226,6 +220,7 @@ class SearchHandler @Inject constructor(
         }
 
     private val searchFlowable = Observables.combineLatest(searchQuery.filter { it is Query.SearchResults }, subscribedPodcastUuids, localPodcastsResults, serverSearchResults, loadingObservable) { searchTerm, subscribedPodcastUuids, localPodcastsResult, serverSearchResults, loading ->
+        Log.w("===", "searchFlowable loading=$loading, serverSearchResults=$serverSearchResults, localSearchRes=$localPodcastsResult, subscribed=$subscribedPodcastUuids")
         if (loading) {
             SearchUiState.SearchOperation.Loading(searchTerm.term)
         } else if (serverSearchResults.error != null) {
@@ -263,7 +258,7 @@ class SearchHandler @Inject constructor(
         }
         .observeOn(AndroidSchedulers.mainThread())
 
-    val searchResults = searchFlowable
+    val searchResults = searchFlowable.asFlow()
 
     fun updateAutCompleteQuery(query: String) {
         searchQuery.accept(Query.Suggestions(query))

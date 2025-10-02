@@ -69,7 +69,7 @@ class OnboardingRecommendationsSearchViewModel @Inject constructor(
 
             combine(
                 subscribedUuidFlow,
-                searchHandler.searchResults.asFlow(),
+                searchHandler.searchResults,
             ) { subscribedUuids, searchState ->
                 val podcasts = when (searchState) {
                     is SearchUiState.SearchOperation.Results -> {

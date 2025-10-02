@@ -18,6 +18,7 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
 @HiltViewModel
@@ -38,16 +39,17 @@ class SearchViewModel @Inject constructor(
     val state: StateFlow<SearchUiState> = _state
 
     init {
-
         viewModelScope.launch {
             searchHandler.searchSuggestions.collect {
-                Log.i("===", "VM.searchSuggestion = $it")
                 if (_state.value is SearchUiState.Idle || _state.value is SearchUiState.Suggestions) {
                     _state.value = SearchUiState.Suggestions(operation = it)
                 }
             }
+        }
 
-            searchHandler.searchResults.subscribe {
+        viewModelScope.launch {
+            searchHandler.searchResults.collect {
+                Log.w("===", "results $it")
                 if (_state.value is SearchUiState.Results) {
                     _state.value = SearchUiState.Results(operation = it as SearchUiState.SearchOperation<SearchResults>)
                 }
@@ -58,10 +60,17 @@ class SearchViewModel @Inject constructor(
     fun updateSearchQuery(query: String, immediate: Boolean = false) {
         // Prevent updating the search query when navigating back to the search results after tapping on a result.
         if (_state.value.searchTerm == query) return
+        if (query.isEmpty()) {
+            searchHandler.updateAutCompleteQuery(query)
+            _state.update {
+                SearchUiState.Suggestions(operation = SearchUiState.SearchOperation.Results(searchTerm = query, results = emptyList()))
+            }
+        }
 
         when (_state.value) {
             is SearchUiState.Idle,
             is SearchUiState.Suggestions -> searchHandler.updateAutCompleteQuery(query)
+
             is SearchUiState.Results -> searchHandler.updateSearchQuery(query, immediate)
         }
     }
