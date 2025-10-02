@@ -7,12 +7,14 @@ import au.com.shiftyjelly.pocketcasts.repositories.playlist.PlaylistPreview
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.launch
 
 @HiltViewModel
 class PlaylistsViewModel @Inject constructor(
-    playlistManager: PlaylistManager,
+    private val playlistManager: PlaylistManager,
 ) : ViewModel() {
 
     sealed class UiState {
@@ -23,4 +25,14 @@ class PlaylistsViewModel @Inject constructor(
     val uiState = playlistManager.playlistPreviewsFlow()
         .map { UiState.Loaded(playlists = it) }
         .stateIn(viewModelScope, SharingStarted.Lazily, UiState.Loading)
+
+    fun getPreviewMetadataFlow(playlistUuid: String): StateFlow<PlaylistPreview.Metadata?> {
+        return playlistManager.getPreviewMetadataFlow(playlistUuid)
+    }
+
+    fun refreshPreviewMetadata(playlistUuid: String) {
+        viewModelScope.launch {
+            playlistManager.refreshPreviewMetadata(playlistUuid)
+        }
+    }
 }

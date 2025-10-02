@@ -352,8 +352,6 @@ private fun PodcastSettingsHomePagePreview(
                     SmartPlaylistPreview(
                         uuid = "playlist-uuid-$index",
                         title = "Playlist $index",
-                        episodeCount = 0,
-                        artworkPodcastUuids = emptyList(),
                         settings = Playlist.Settings.ForPreview,
                         smartRules = SmartRules.Default.copy(
                             podcasts = PodcastsRule.Selected(uuids = setOf("podcast-uuid")),

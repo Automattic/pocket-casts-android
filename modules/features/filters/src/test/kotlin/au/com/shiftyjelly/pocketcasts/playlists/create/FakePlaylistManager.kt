@@ -6,17 +6,18 @@ import au.com.shiftyjelly.pocketcasts.models.entity.ManualPlaylistPodcastSource
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.models.to.PlaylistEpisode
 import au.com.shiftyjelly.pocketcasts.models.to.PlaylistEpisodeMetadata
+import au.com.shiftyjelly.pocketcasts.models.to.PlaylistPreviewForEpisode
 import au.com.shiftyjelly.pocketcasts.models.type.PlaylistEpisodeSortType
 import au.com.shiftyjelly.pocketcasts.models.type.SmartRules
 import au.com.shiftyjelly.pocketcasts.repositories.playlist.ManualPlaylist
 import au.com.shiftyjelly.pocketcasts.repositories.playlist.PlaylistManager
 import au.com.shiftyjelly.pocketcasts.repositories.playlist.PlaylistPreview
-import au.com.shiftyjelly.pocketcasts.repositories.playlist.PlaylistPreviewForEpisode
 import au.com.shiftyjelly.pocketcasts.repositories.playlist.SmartPlaylist
 import au.com.shiftyjelly.pocketcasts.repositories.playlist.SmartPlaylistDraft
 import java.util.UUID
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.flowOf
 
@@ -25,6 +26,12 @@ class FakePlaylistManager : PlaylistManager {
     override fun playlistPreviewsFlow(): Flow<List<PlaylistPreview>> {
         return playlistPreviews.asStateFlow()
     }
+
+    override fun getPreviewMetadataFlow(playlistUuid: String): StateFlow<PlaylistPreview.Metadata?> {
+        return MutableStateFlow(null)
+    }
+
+    override suspend fun refreshPreviewMetadata(playlistUuid: String) = Unit
 
     override suspend fun getAutoDownloadEpisodes(): List<PodcastEpisode> {
         return emptyList()

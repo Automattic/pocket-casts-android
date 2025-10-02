@@ -30,9 +30,11 @@ import au.com.shiftyjelly.pocketcasts.models.to.AutoArchiveAfterPlaying
 import au.com.shiftyjelly.pocketcasts.models.to.AutoArchiveInactive
 import au.com.shiftyjelly.pocketcasts.models.to.AutoArchiveLimit
 import au.com.shiftyjelly.pocketcasts.podcasts.viewmodel.PodcastSettingsViewModel
+import au.com.shiftyjelly.pocketcasts.repositories.playlist.PlaylistPreview
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import au.com.shiftyjelly.pocketcasts.views.helper.ToolbarColors
+import kotlinx.coroutines.flow.StateFlow
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 @Composable
@@ -40,6 +42,8 @@ internal fun PodcastSettingsPage(
     podcastTitle: String,
     toolbarColors: ToolbarColors,
     uiState: PodcastSettingsViewModel.UiState?,
+    getPreviewMetadataFlow: (String) -> StateFlow<PlaylistPreview.Metadata?>,
+    refreshPreviewMetadata: (String) -> Unit,
     onChangeNotifications: (Boolean) -> Unit,
     onChangeAutoDownload: (Boolean) -> Unit,
     onChangeAddToUpNext: (Boolean) -> Unit,
@@ -181,6 +185,8 @@ internal fun PodcastSettingsPage(
                 }
                 PodcastSettingsPlaylistsPage(
                     uiState = uiState,
+                    getPreviewMetadataFlow = getPreviewMetadataFlow,
+                    refreshPreviewMetadata = refreshPreviewMetadata,
                     onAddPodcastToPlaylists = onAddPodcastToPlaylists,
                     onRemovePodcastFromPlaylists = onRemovePodcastFromPlaylists,
                 )

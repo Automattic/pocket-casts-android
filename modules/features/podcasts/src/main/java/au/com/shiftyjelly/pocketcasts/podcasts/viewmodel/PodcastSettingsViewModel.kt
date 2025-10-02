@@ -9,14 +9,13 @@ import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.to.AutoArchiveAfterPlaying
 import au.com.shiftyjelly.pocketcasts.models.to.AutoArchiveInactive
 import au.com.shiftyjelly.pocketcasts.models.to.AutoArchiveLimit
-import au.com.shiftyjelly.pocketcasts.models.to.PlaybackEffects
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodeStatusEnum
-import au.com.shiftyjelly.pocketcasts.models.type.SmartRules
 import au.com.shiftyjelly.pocketcasts.models.type.SmartRules.PodcastsRule
 import au.com.shiftyjelly.pocketcasts.models.type.TrimMode
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.repositories.playlist.PlaylistManager
+import au.com.shiftyjelly.pocketcasts.repositories.playlist.PlaylistPreview
 import au.com.shiftyjelly.pocketcasts.repositories.playlist.SmartPlaylistPreview
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
 import au.com.shiftyjelly.pocketcasts.utils.extensions.decrementByOrRound
@@ -28,13 +27,15 @@ import dagger.assisted.AssistedInject
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.NonCancellable
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import timber.log.Timber
 
 @HiltViewModel(assistedFactory = PodcastSettingsViewModel.Factory::class)
 class PodcastSettingsViewModel @AssistedInject constructor(
@@ -45,9 +46,16 @@ class PodcastSettingsViewModel @AssistedInject constructor(
     private val tracker: AnalyticsTracker,
     @Assisted private val podcastUuid: String,
 ) : ViewModel() {
-    private val playlistsWithSelectedPodcasts = playlistManager.playlistPreviewsFlow()
-        .map { playlists ->
-            playlists
+    private val podcastFlow = MutableStateFlow<Podcast?>(null)
+    private val playlistsFlow = MutableStateFlow<List<SmartPlaylistPreview>?>(null)
+
+    init {
+        viewModelScope.launch {
+            podcastFlow.value = podcastManager.findPodcastByUuid(podcastUuid)
+        }
+        viewModelScope.launch {
+            playlistsFlow.value = playlistManager.playlistPreviewsFlow()
+                .first()
                 .filterIsInstance<SmartPlaylistPreview>()
                 .filter { playlist ->
                     when (playlist.smartRules.podcasts) {
@@ -56,13 +64,25 @@ class PodcastSettingsViewModel @AssistedInject constructor(
                     }
                 }
         }
+    }
 
-    val uiState = combine(
-        podcastManager.podcastByUuidFlow(podcastUuid),
-        playlistsWithSelectedPodcasts,
-        settings.autoAddUpNextLimit.flow,
-        ::UiState,
-    ).stateIn(viewModelScope, started = SharingStarted.Eagerly, initialValue = null)
+    val uiState = combine(podcastFlow, playlistsFlow, settings.autoAddUpNextLimit.flow) { podcast, playlists, upNextLimit ->
+        if (podcast != null && playlists != null) {
+            UiState(podcast, playlists, upNextLimit)
+        } else {
+            null
+        }
+    }.stateIn(viewModelScope, started = SharingStarted.Eagerly, initialValue = null)
+
+    fun getPreviewMetadataFlow(playlistUuid: String): StateFlow<PlaylistPreview.Metadata?> {
+        return playlistManager.getPreviewMetadataFlow(playlistUuid)
+    }
+
+    fun refreshPreviewMetadata(playlistUuid: String) {
+        viewModelScope.launch {
+            playlistManager.refreshPreviewMetadata(playlistUuid)
+        }
+    }
 
     fun changeNotifications(enable: Boolean) {
         viewModelScope.launch {
@@ -70,41 +90,45 @@ class PodcastSettingsViewModel @AssistedInject constructor(
                 AnalyticsEvent.PODCAST_SETTINGS_NOTIFICATIONS_TOGGLED,
                 mapOf("enabled" to enable),
             )
+            podcastFlow.update { it?.copy(isShowNotifications = enable) }
             podcastManager.updateShowNotifications(podcastUuid, show = enable)
         }
     }
 
     fun changeAutoDownload(enable: Boolean) {
-        val podcast = uiState.value?.podcast ?: return
+        val podcast = podcastFlow.value ?: return
         viewModelScope.launch(Dispatchers.IO) {
             tracker.track(
                 AnalyticsEvent.PODCAST_SETTINGS_AUTO_DOWNLOAD_TOGGLED,
                 mapOf("enabled" to enable),
             )
             val status = if (enable) Podcast.AUTO_DOWNLOAD_NEW_EPISODES else Podcast.AUTO_DOWNLOAD_OFF
+            podcastFlow.update { it?.copy(autoDownloadStatus = status) }
             podcastManager.updateAutoDownloadStatusBlocking(podcast, status)
         }
     }
 
     fun changeAddToUpNext(enable: Boolean) {
-        val podcast = uiState.value?.podcast ?: return
+        val podcast = podcastFlow.value ?: return
         val mode = if (enable) Podcast.AutoAddUpNext.PLAY_LAST else Podcast.AutoAddUpNext.OFF
         viewModelScope.launch {
             tracker.track(
                 AnalyticsEvent.PODCAST_SETTINGS_AUTO_ADD_UP_NEXT_TOGGLED,
                 mapOf("enabled" to enable),
             )
+            podcastFlow.update { it?.copy(autoAddToUpNext = mode) }
             podcastManager.updateAutoAddToUpNext(podcast, mode)
         }
     }
 
     fun changeAddToUpNext(mode: Podcast.AutoAddUpNext) {
-        val podcast = uiState.value?.podcast ?: return
+        val podcast = podcastFlow.value ?: return
         viewModelScope.launch {
             tracker.track(
                 AnalyticsEvent.PODCAST_SETTINGS_AUTO_ADD_UP_NEXT_POSITION_OPTION_CHANGED,
                 mapOf("value" to mode.analyticsValue),
             )
+            podcastFlow.update { it?.copy(autoAddToUpNext = mode) }
             podcastManager.updateAutoAddToUpNext(podcast, mode)
         }
     }
@@ -116,6 +140,13 @@ class PodcastSettingsViewModel @AssistedInject constructor(
                 mapOf("enabled" to enable),
             )
 
+            podcastFlow.update {
+                it?.copy(
+                    overrideGlobalArchive = enable,
+                    rawAutoArchiveAfterPlaying = settings.autoArchiveAfterPlaying.value,
+                    rawAutoArchiveInactive = settings.autoArchiveInactive.value,
+                )
+            }
             podcastManager.updateArchiveSettings(
                 uuid = podcastUuid,
                 enable = enable,
@@ -131,6 +162,7 @@ class PodcastSettingsViewModel @AssistedInject constructor(
                 AnalyticsEvent.PODCAST_SETTINGS_AUTO_ARCHIVE_PLAYED_CHANGED,
                 mapOf("value" to mode.analyticsValue),
             )
+            podcastFlow.update { it?.copy(rawAutoArchiveAfterPlaying = mode) }
             podcastManager.updateArchiveAfterPlaying(podcastUuid, mode)
         }
     }
@@ -141,6 +173,7 @@ class PodcastSettingsViewModel @AssistedInject constructor(
                 AnalyticsEvent.PODCAST_SETTINGS_AUTO_ARCHIVE_INACTIVE_CHANGED,
                 mapOf("value" to mode.analyticsValue),
             )
+            podcastFlow.update { it?.copy(rawAutoArchiveInactive = mode) }
             podcastManager.updateArchiveAfterInactive(podcastUuid, mode)
         }
     }
@@ -151,12 +184,13 @@ class PodcastSettingsViewModel @AssistedInject constructor(
                 AnalyticsEvent.PODCAST_SETTINGS_AUTO_ARCHIVE_EPISODE_LIMIT_CHANGED,
                 mapOf("value" to limit.analyticsValue),
             )
+            podcastFlow.update { it?.copy(rawAutoArchiveEpisodeLimit = limit) }
             podcastManager.updateArchiveEpisodeLimit(podcastUuid, limit)
         }
     }
 
     fun changePlaybackEffects(enable: Boolean) {
-        val podcast = uiState.value?.podcast ?: return
+        val podcast = podcastFlow.value ?: return
         viewModelScope.launch(Dispatchers.IO) {
             tracker.track(
                 AnalyticsEvent.PODCAST_SETTINGS_CUSTOM_PLAYBACK_EFFECTS_TOGGLED,
@@ -165,17 +199,18 @@ class PodcastSettingsViewModel @AssistedInject constructor(
                     "settings" to "local",
                 ),
             )
+            podcastFlow.update { it?.copy(overrideGlobalEffects = enable) }
             podcastManager.updateOverrideGlobalEffectsBlocking(podcast, enable)
         }
     }
 
     fun decrementPlaybackSpeed() {
-        val podcast = uiState.value?.podcast ?: return
+        val podcast = podcastFlow.value ?: return
         changePlaybackSpeed(podcast, change = -0.1)
     }
 
     fun incrementPlaybackSpeed() {
-        val podcast = uiState.value?.podcast ?: return
+        val podcast = podcastFlow.value ?: return
         changePlaybackSpeed(podcast, change = 0.1)
     }
 
@@ -190,17 +225,14 @@ class PodcastSettingsViewModel @AssistedInject constructor(
                 ),
             )
 
+            podcastFlow.update { it?.copy(playbackSpeed = newPlaybackSpeed) }
+            updatePlayerEffects()
             podcastManager.updatePlaybackSpeedBlocking(podcast, newPlaybackSpeed)
-
-            val newEffects = podcast.playbackEffects.toData()
-                .copy(playbackSpeed = newPlaybackSpeed)
-                .toEffects()
-            updatePlayerEffects(newEffects)
         }
     }
 
     fun changeTrimMode(enable: Boolean) {
-        val podcast = uiState.value?.podcast ?: return
+        val podcast = podcastFlow.value ?: return
         val mode = if (enable) TrimMode.LOW else TrimMode.OFF
         viewModelScope.launch(Dispatchers.IO) {
             tracker.track(
@@ -211,17 +243,14 @@ class PodcastSettingsViewModel @AssistedInject constructor(
                 ),
             )
 
+            podcastFlow.update { it?.copy(trimMode = mode) }
+            updatePlayerEffects()
             podcastManager.updateTrimModeBlocking(podcast, mode)
-
-            val newEffects = podcast.playbackEffects.toData()
-                .copy(trimMode = mode)
-                .toEffects()
-            updatePlayerEffects(newEffects)
         }
     }
 
     fun changeTrimMode(mode: TrimMode) {
-        val podcast = uiState.value?.podcast ?: return
+        val podcast = podcastFlow.value ?: return
         viewModelScope.launch(Dispatchers.IO) {
             tracker.track(
                 AnalyticsEvent.PLAYBACK_EFFECT_TRIM_SILENCE_TOGGLED,
@@ -231,17 +260,14 @@ class PodcastSettingsViewModel @AssistedInject constructor(
                 ),
             )
 
+            podcastFlow.update { it?.copy(trimMode = mode) }
+            updatePlayerEffects()
             podcastManager.updateTrimModeBlocking(podcast, mode)
-
-            val newEffects = podcast.playbackEffects.toData()
-                .copy(trimMode = mode)
-                .toEffects()
-            updatePlayerEffects(newEffects)
         }
     }
 
     fun changeVolumeBoost(enable: Boolean) {
-        val podcast = uiState.value?.podcast ?: return
+        val podcast = podcastFlow.value ?: return
         viewModelScope.launch(Dispatchers.IO) {
             tracker.track(
                 AnalyticsEvent.PLAYBACK_EFFECT_VOLUME_BOOST_TOGGLED,
@@ -251,12 +277,9 @@ class PodcastSettingsViewModel @AssistedInject constructor(
                 ),
             )
 
+            podcastFlow.update { it?.copy(isVolumeBoosted = enable) }
+            updatePlayerEffects()
             podcastManager.updateVolumeBoostedBlocking(podcast, enable)
-
-            val newEffects = podcast.playbackEffects.toData()
-                .copy(isVolumeBoosted = enable)
-                .toEffects()
-            updatePlayerEffects(newEffects)
         }
     }
 
@@ -269,13 +292,15 @@ class PodcastSettingsViewModel @AssistedInject constructor(
     }
 
     private fun changeSkipFirst(block: (Int) -> Int) {
-        val podcast = uiState.value?.podcast ?: return
+        val podcast = podcastFlow.value ?: return
         viewModelScope.launch {
             val newValue = block(podcast.startFromSecs)
             tracker.track(
                 AnalyticsEvent.PODCAST_SETTINGS_SKIP_FIRST_CHANGED,
                 mapOf("value" to newValue),
             )
+
+            podcastFlow.update { it?.copy(startFromSecs = newValue) }
             podcastManager.updateStartFromInSec(podcast, newValue)
         }
     }
@@ -289,13 +314,15 @@ class PodcastSettingsViewModel @AssistedInject constructor(
     }
 
     private fun changeSkipLast(block: (Int) -> Int) {
-        val podcast = uiState.value?.podcast ?: return
+        val podcast = podcastFlow.value ?: return
         viewModelScope.launch {
             val newValue = block(podcast.skipLastSecs)
             tracker.track(
                 AnalyticsEvent.PODCAST_SETTINGS_SKIP_LAST_CHANGED,
                 mapOf("value" to newValue),
             )
+
+            podcastFlow.update { it?.copy(skipLastSecs = newValue) }
             podcastManager.updateSkipLastInSec(podcast, newValue)
         }
     }
@@ -329,10 +356,11 @@ class PodcastSettingsViewModel @AssistedInject constructor(
         playlistUuids: List<String>,
         block: (PodcastsRule.Selected) -> PodcastsRule.Selected,
     ) {
+        val playlists = playlistsFlow.value ?: return
         viewModelScope.launch(Dispatchers.Default) {
-            val playlistRules = uiState.value?.playlists
-                ?.filter { it.uuid in playlistUuids }
-                ?.associate { playlist ->
+            val playlistRules = playlists
+                .filter { it.uuid in playlistUuids }
+                .associate { playlist ->
                     val podcastsRule = playlist.smartRules.podcasts
                     playlist.uuid to playlist.smartRules.copy(
                         podcasts = when (podcastsRule) {
@@ -341,14 +369,24 @@ class PodcastSettingsViewModel @AssistedInject constructor(
                         },
                     )
                 }
-                .orEmpty()
             if (playlistRules.isNotEmpty()) {
+                playlistsFlow.update {
+                    it?.map { playlist ->
+                        val newRules = playlistRules[playlist.uuid] ?: playlist.smartRules
+                        playlist.copy(smartRules = newRules)
+                    }
+                }
                 playlistManager.updateSmartRules(playlistRules)
             }
         }
     }
 
-    private fun updatePlayerEffects(effects: PlaybackEffects) {
+    private fun updatePlayerEffects() {
+        val effects = podcastFlow.value?.playbackEffects
+        if (effects == null) {
+            return
+        }
+
         val currentEpisode = playbackManager.upNextQueue.currentEpisode
         if (currentEpisode?.podcastOrSubstituteUuid == podcastUuid) {
             playbackManager.updatePlayerEffects(effects)

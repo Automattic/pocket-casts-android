@@ -567,22 +567,18 @@ class PodcastManagerImpl @Inject constructor(
     }
 
     override fun updateOverrideGlobalEffectsBlocking(podcast: Podcast, override: Boolean) {
-        podcast.overrideGlobalEffects = override
         podcastDao.updateOverrideGlobalEffectsBlocking(override, podcast.uuid)
     }
 
     override suspend fun updateTrimModeBlocking(podcast: Podcast, trimMode: TrimMode) {
-        podcast.trimMode = trimMode
         podcastDao.updateTrimSilenceModeBlocking(trimMode, podcast.uuid)
     }
 
     override fun updateVolumeBoostedBlocking(podcast: Podcast, override: Boolean) {
-        podcast.isVolumeBoosted = override
         podcastDao.updateVolumeBoostedBlocking(override, podcast.uuid)
     }
 
     override fun updatePlaybackSpeedBlocking(podcast: Podcast, speed: Double) {
-        podcast.playbackSpeed = speed
         podcastDao.updatePlaybackSpeedBlocking(speed, podcast.uuid)
     }
 

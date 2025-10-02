@@ -1,7 +1,5 @@
 package au.com.shiftyjelly.pocketcasts.settings
 
-import androidx.compose.animation.core.Spring
-import androidx.compose.animation.core.spring
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.layout.Column
@@ -26,14 +24,18 @@ import au.com.shiftyjelly.pocketcasts.compose.navigation.slideInToEnd
 import au.com.shiftyjelly.pocketcasts.compose.navigation.slideInToStart
 import au.com.shiftyjelly.pocketcasts.compose.navigation.slideOutToEnd
 import au.com.shiftyjelly.pocketcasts.compose.navigation.slideOutToStart
+import au.com.shiftyjelly.pocketcasts.repositories.playlist.PlaylistPreview
 import au.com.shiftyjelly.pocketcasts.settings.viewmodel.AutoDownloadSettingsViewModel.UiState
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
+import kotlinx.coroutines.flow.StateFlow
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 @Composable
 internal fun AutoDownloadSettingsPage(
     uiState: UiState?,
+    getPreviewMetadataFlow: (String) -> StateFlow<PlaylistPreview.Metadata?>,
+    refreshPreviewMetadata: (String) -> Unit,
     onChangeUpNextDownload: (Boolean) -> Unit,
     onChangeNewEpisodesDownload: (Boolean) -> Unit,
     onChangeOnFollowDownload: (Boolean) -> Unit,
@@ -127,6 +129,8 @@ internal fun AutoDownloadSettingsPage(
                 composable(AutoDownloadSettingsRoute.Playlists.value) {
                     AutoDownloadSettingsPlaylistsPage(
                         playlists = state.playlists,
+                        getPreviewMetadataFlow = getPreviewMetadataFlow,
+                        refreshPreviewMetadata = refreshPreviewMetadata,
                         onChangePlaylist = onChangePlaylist,
                         onChangeAllPlaylists = onChangeAllPlaylists,
                     )

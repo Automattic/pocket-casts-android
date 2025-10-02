@@ -8,6 +8,7 @@ import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.type.AutoDownloadLimitSetting
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.download.DownloadManager
+import au.com.shiftyjelly.pocketcasts.repositories.playlist.ManualPlaylistPreview
 import au.com.shiftyjelly.pocketcasts.repositories.playlist.PlaylistManager
 import au.com.shiftyjelly.pocketcasts.repositories.playlist.PlaylistPreview
 import au.com.shiftyjelly.pocketcasts.repositories.playlist.SmartPlaylistPreview
@@ -19,9 +20,13 @@ import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
@@ -33,6 +38,22 @@ class AutoDownloadSettingsViewModel @Inject constructor(
     private val settings: Settings,
     private val tracker: AnalyticsTracker,
 ) : ViewModel() {
+    private val podcastsFlow = MutableStateFlow<List<Podcast>?>(null)
+    private val playlistsFlow = MutableStateFlow<List<PlaylistPreview>?>(null)
+
+    init {
+        viewModelScope.launch {
+            podcastsFlow.value = podcastManager.findSubscribedFlow().first()
+        }
+        viewModelScope.launch {
+            playlistsFlow.value = if (FeatureFlag.isEnabled(Feature.PLAYLISTS_REBRANDING, immutable = true)) {
+                playlistManager.playlistPreviewsFlow()
+            } else {
+                playlistManager.playlistPreviewsFlow().map { playlists -> playlists.filterIsInstance<SmartPlaylistPreview>() }
+            }.first()
+        }
+    }
+
     val uiState = combine(
         settings.autoDownloadUpNext.flow,
         settings.autoDownloadNewEpisodes.flow.map { setting -> setting == Podcast.AUTO_DOWNLOAD_NEW_EPISODES },
@@ -40,14 +61,35 @@ class AutoDownloadSettingsViewModel @Inject constructor(
         settings.autoDownloadLimit.flow,
         settings.autoDownloadUnmeteredOnly.flow,
         settings.autoDownloadOnlyWhenCharging.flow,
-        podcastManager.findSubscribedFlow(),
-        if (FeatureFlag.isEnabled(Feature.PLAYLISTS_REBRANDING, immutable = true)) {
-            playlistManager.playlistPreviewsFlow()
-        } else {
-            playlistManager.playlistPreviewsFlow().map { playlists -> playlists.filterIsInstance<SmartPlaylistPreview>() }
+        podcastsFlow,
+        playlistsFlow,
+        transform = { upNext, newEpisodes, onFollow, limit, unmetered, whenCharging, podcasts, playlists ->
+            if (podcasts != null && playlists != null) {
+                UiState(
+                    isUpNextDownloadEnabled = upNext,
+                    isNewEpisodesDownloadEnabled = newEpisodes,
+                    isOnFollowDownloadEnabled = onFollow,
+                    autoDownloadLimit = limit,
+                    isOnUnmeteredDownloadEnabled = unmetered,
+                    isOnlyWhenChargingDownloadEnabled = whenCharging,
+                    podcasts = podcasts,
+                    playlists = playlists,
+                )
+            } else {
+                null
+            }
         },
-        ::UiState,
     ).stateIn(viewModelScope, started = SharingStarted.Eagerly, initialValue = null)
+
+    fun getPreviewMetadataFlow(playlistUuid: String): StateFlow<PlaylistPreview.Metadata?> {
+        return playlistManager.getPreviewMetadataFlow(playlistUuid)
+    }
+
+    fun refreshPreviewMetadata(playlistUuid: String) {
+        viewModelScope.launch {
+            playlistManager.refreshPreviewMetadata(playlistUuid)
+        }
+    }
 
     fun changeUpNextDownload(enable: Boolean) {
         tracker.track(
@@ -119,6 +161,10 @@ class AutoDownloadSettingsViewModel @Inject constructor(
         )
 
         viewModelScope.launch {
+            withContext(Dispatchers.Default) {
+                updatePodcastAutoDownloadStatus(enable) { podcast -> podcast.uuid == podcastUuid }
+            }
+
             podcastManager.updateAutoDownload(listOf(podcastUuid), isEnabled = enable)
         }
     }
@@ -135,10 +181,27 @@ class AutoDownloadSettingsViewModel @Inject constructor(
 
         viewModelScope.launch {
             val podcastUuids = withContext(Dispatchers.Default) {
-                uiState.value?.podcasts?.map(Podcast::uuid)
+                updatePodcastAutoDownloadStatus(enable)
+                podcastsFlow.value?.map(Podcast::uuid)
             }
             if (podcastUuids != null) {
                 podcastManager.updateAutoDownload(podcastUuids, isEnabled = enable)
+            }
+        }
+    }
+
+    private fun updatePodcastAutoDownloadStatus(
+        enable: Boolean,
+        predicate: (Podcast) -> Boolean = { true },
+    ) {
+        val status = if (enable) Podcast.AUTO_DOWNLOAD_NEW_EPISODES else Podcast.AUTO_DOWNLOAD_OFF
+        podcastsFlow.update { podcasts ->
+            podcasts?.map { podcast ->
+                if (predicate(podcast)) {
+                    podcast.copy(autoDownloadStatus = status)
+                } else {
+                    podcast
+                }
             }
         }
     }
@@ -147,6 +210,10 @@ class AutoDownloadSettingsViewModel @Inject constructor(
         tracker.track(AnalyticsEvent.SETTINGS_AUTO_DOWNLOAD_FILTERS_CHANGED)
 
         viewModelScope.launch {
+            withContext(Dispatchers.Default) {
+                updatePlaylistsAutoDownloadUiState(enable) { playlist -> playlist.uuid == playlistUuid }
+            }
+
             playlistManager.updateAutoDownload(playlistUuid, isEnabled = enable)
         }
     }
@@ -154,10 +221,30 @@ class AutoDownloadSettingsViewModel @Inject constructor(
     fun changeAllPlaylistsAutoDownload(enable: Boolean) {
         viewModelScope.launch {
             val playlistUuids = withContext(Dispatchers.Default) {
-                uiState.value?.playlists?.map(PlaylistPreview::uuid)
+                updatePlaylistsAutoDownloadUiState(enable)
+                playlistsFlow.value?.map(PlaylistPreview::uuid)
             }
             if (playlistUuids != null) {
                 playlistManager.updateAutoDownload(playlistUuids, isEnabled = enable)
+            }
+        }
+    }
+
+    private fun updatePlaylistsAutoDownloadUiState(
+        enable: Boolean,
+        predicate: (PlaylistPreview) -> Boolean = { true },
+    ) {
+        playlistsFlow.update { playlists ->
+            playlists?.map { playlist ->
+                if (predicate(playlist)) {
+                    val newSettings = playlist.settings.copy(isAutoDownloadEnabled = enable)
+                    when (playlist) {
+                        is ManualPlaylistPreview -> playlist.copy(settings = newSettings)
+                        is SmartPlaylistPreview -> playlist.copy(settings = newSettings)
+                    }
+                } else {
+                    playlist
+                }
             }
         }
     }

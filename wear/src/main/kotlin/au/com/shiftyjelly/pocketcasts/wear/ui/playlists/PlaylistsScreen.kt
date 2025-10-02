@@ -5,8 +5,10 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.Icon
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
@@ -24,6 +26,7 @@ import au.com.shiftyjelly.pocketcasts.wear.ui.component.WatchListChip
 import au.com.shiftyjelly.pocketcasts.wear.ui.playlists.PlaylistsViewModel.UiState
 import com.google.android.horologist.compose.layout.ScalingLazyColumn
 import com.google.android.horologist.compose.layout.ScalingLazyColumnState
+import kotlinx.coroutines.flow.StateFlow
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 object PlaylistsScreen {
@@ -41,6 +44,8 @@ fun PlaylistsScreen(
     when (val state = uiState) { // the state needs to be immutable or the following error will happen 'Smart cast is impossible'
         is UiState.Loaded -> Content(
             playlists = state.playlists,
+            getPreviewMetadataFlow = viewModel::getPreviewMetadataFlow,
+            refreshPreviewMetadata = viewModel::refreshPreviewMetadata,
             onClickPlaylist = onClickPlaylist,
             modifier = modifier,
             columnState = columnState,
@@ -54,6 +59,8 @@ fun PlaylistsScreen(
 private fun Content(
     columnState: ScalingLazyColumnState,
     playlists: List<PlaylistPreview>,
+    getPreviewMetadataFlow: (String) -> StateFlow<PlaylistPreview.Metadata?>,
+    refreshPreviewMetadata: (String) -> Unit,
     onClickPlaylist: (PlaylistPreview) -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -74,8 +81,15 @@ private fun Content(
                 onClick = { onClickPlaylist(playlist) },
                 icon = {
                     if (usePlaylists) {
+                        val metadata by remember(playlist.uuid) {
+                            getPreviewMetadataFlow(playlist.uuid)
+                        }.collectAsState()
+
+                        LaunchedEffect(playlist.uuid, refreshPreviewMetadata) {
+                            refreshPreviewMetadata(playlist.uuid)
+                        }
                         PlaylistArtwork(
-                            podcastUuids = playlist.artworkPodcastUuids,
+                            podcastUuids = metadata?.artworkPodcastUuids.orEmpty(),
                             artworkSize = 32.dp,
                             elevation = 0.dp,
                             modifier = Modifier.padding(horizontal = 8.dp),

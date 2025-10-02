@@ -17,6 +17,9 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Checkbox
 import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -42,7 +45,6 @@ import au.com.shiftyjelly.pocketcasts.compose.preview.ThemePreviewParameterProvi
 import au.com.shiftyjelly.pocketcasts.compose.theme
 import au.com.shiftyjelly.pocketcasts.models.to.PlaylistIcon
 import au.com.shiftyjelly.pocketcasts.models.type.SmartRules
-import au.com.shiftyjelly.pocketcasts.models.type.SmartRules.PodcastsRule
 import au.com.shiftyjelly.pocketcasts.repositories.extensions.drawableId
 import au.com.shiftyjelly.pocketcasts.repositories.playlist.ManualPlaylistPreview
 import au.com.shiftyjelly.pocketcasts.repositories.playlist.Playlist
@@ -52,11 +54,15 @@ import au.com.shiftyjelly.pocketcasts.ui.extensions.getColor
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme.ThemeType
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 @Composable
 internal fun AutoDownloadSettingsPlaylistsPage(
     playlists: List<PlaylistPreview>,
+    getPreviewMetadataFlow: (String) -> StateFlow<PlaylistPreview.Metadata?>,
+    refreshPreviewMetadata: (String) -> Unit,
     onChangePlaylist: (String, Boolean) -> Unit,
     onChangeAllPlaylists: (Boolean) -> Unit,
     modifier: Modifier = Modifier,
@@ -127,6 +133,8 @@ internal fun AutoDownloadSettingsPlaylistsPage(
                     isSelected = playlist.settings.isAutoDownloadEnabled,
                     showDivider = index != playlists.lastIndex,
                     usePlaylists = usePlaylists,
+                    getPreviewMetadataFlow = getPreviewMetadataFlow,
+                    refreshPreviewMetadata = refreshPreviewMetadata,
                     modifier = Modifier.toggleable(
                         role = Role.Checkbox,
                         value = playlist.settings.isAutoDownloadEnabled,
@@ -144,9 +152,19 @@ private fun PlaylistRow(
     isSelected: Boolean,
     showDivider: Boolean,
     usePlaylists: Boolean,
+    getPreviewMetadataFlow: (String) -> StateFlow<PlaylistPreview.Metadata?>,
+    refreshPreviewMetadata: (String) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     if (usePlaylists) {
+        val metadata by remember(playlist.uuid) {
+            getPreviewMetadataFlow(playlist.uuid)
+        }.collectAsState()
+
+        LaunchedEffect(playlist.uuid, refreshPreviewMetadata) {
+            refreshPreviewMetadata(playlist.uuid)
+        }
+
         Column(
             modifier = modifier,
         ) {
@@ -157,7 +175,7 @@ private fun PlaylistRow(
                     .padding(horizontal = 16.dp, vertical = 12.dp),
             ) {
                 PlaylistArtwork(
-                    podcastUuids = playlist.artworkPodcastUuids,
+                    podcastUuids = metadata?.artworkPodcastUuids.orEmpty(),
                     artworkSize = 56.dp,
                 )
                 Spacer(
@@ -230,8 +248,6 @@ private fun AutoDownloadSettingsPlaylistsPagePreview(
                 SmartPlaylistPreview(
                     uuid = "playlist-uuid-0",
                     title = "Smart Playlist 0",
-                    episodeCount = 0,
-                    artworkPodcastUuids = emptyList(),
                     settings = Playlist.Settings.ForPreview.copy(
                         isAutoDownloadEnabled = true,
                     ),
@@ -241,8 +257,6 @@ private fun AutoDownloadSettingsPlaylistsPagePreview(
                 SmartPlaylistPreview(
                     uuid = "playlist-uuid-1",
                     title = "Smart Playlist 1",
-                    episodeCount = 0,
-                    artworkPodcastUuids = emptyList(),
                     settings = Playlist.Settings.ForPreview,
                     smartRules = SmartRules.Default,
                     icon = PlaylistIcon(0),
@@ -250,16 +264,12 @@ private fun AutoDownloadSettingsPlaylistsPagePreview(
                 ManualPlaylistPreview(
                     uuid = "playlist-uuid-2",
                     title = "Manual Playlist 2",
-                    episodeCount = 0,
-                    artworkPodcastUuids = emptyList(),
                     settings = Playlist.Settings.ForPreview,
                     icon = PlaylistIcon(0),
                 ),
                 ManualPlaylistPreview(
                     uuid = "playlist-uuid-3",
                     title = "Manual Playlist 3",
-                    episodeCount = 0,
-                    artworkPodcastUuids = emptyList(),
                     settings = Playlist.Settings.ForPreview.copy(
                         isAutoDownloadEnabled = true,
                     ),
@@ -267,6 +277,8 @@ private fun AutoDownloadSettingsPlaylistsPagePreview(
                 ),
 
             ),
+            getPreviewMetadataFlow = { MutableStateFlow(null) },
+            refreshPreviewMetadata = {},
             onChangePlaylist = { _, _ -> },
             onChangeAllPlaylists = {},
         )

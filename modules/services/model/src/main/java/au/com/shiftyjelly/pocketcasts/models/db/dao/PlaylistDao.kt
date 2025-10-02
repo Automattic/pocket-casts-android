@@ -18,7 +18,7 @@ import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.models.to.PlaylistEpisode
 import au.com.shiftyjelly.pocketcasts.models.to.PlaylistEpisodeMetadata
-import au.com.shiftyjelly.pocketcasts.models.to.PlaylistPreviewForEpisodeEntity
+import au.com.shiftyjelly.pocketcasts.models.to.PlaylistPreviewForEpisode
 import au.com.shiftyjelly.pocketcasts.models.to.PlaylistShortcut
 import au.com.shiftyjelly.pocketcasts.models.to.RawManualEpisode
 import au.com.shiftyjelly.pocketcasts.models.type.PlaylistEpisodeSortType
@@ -102,9 +102,9 @@ abstract class PlaylistDao {
           sortPosition ASC
     """,
     )
-    protected abstract fun playlistPreviewsForEpisodeFlowUnsafe(episodeUuid: String, searchTerm: String): Flow<List<PlaylistPreviewForEpisodeEntity>>
+    protected abstract fun playlistPreviewsForEpisodeFlowUnsafe(episodeUuid: String, searchTerm: String): Flow<List<PlaylistPreviewForEpisode>>
 
-    fun playlistPreviewsForEpisodeFlow(episodeUuid: String, searchTerm: String): Flow<List<PlaylistPreviewForEpisodeEntity>> {
+    fun playlistPreviewsForEpisodeFlow(episodeUuid: String, searchTerm: String): Flow<List<PlaylistPreviewForEpisode>> {
         val escapedTerm = searchTerm.escapeLike('\\')
         return playlistPreviewsForEpisodeFlowUnsafe(episodeUuid, escapedTerm)
     }
