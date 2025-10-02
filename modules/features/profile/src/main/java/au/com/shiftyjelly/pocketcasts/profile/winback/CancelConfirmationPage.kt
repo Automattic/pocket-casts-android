@@ -1,8 +1,7 @@
 package au.com.shiftyjelly.pocketcasts.profile.winback
 
-import androidx.compose.foundation.clickable
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
@@ -16,17 +15,15 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.Button
 import androidx.compose.material.Icon
 import androidx.compose.material.MaterialTheme
+import androidx.compose.material.OutlinedButton
 import androidx.compose.material.Text
-import androidx.compose.material.ripple
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
@@ -96,7 +93,7 @@ private fun Header(
             text = stringResource(LR.string.winback_cancel_subscription_header_title),
             fontWeight = FontWeight.Bold,
             fontSize = 28.sp,
-            lineHeight = 38.5.sp,
+            lineHeight = 33.5.sp,
             color = MaterialTheme.theme.colors.primaryText01,
             textAlign = TextAlign.Center,
         )
@@ -178,18 +175,13 @@ private fun Buttons(
                 modifier = Modifier.fillMaxWidth(),
             )
         }
-        Box(
-            contentAlignment = Alignment.Center,
+        OutlinedButton(
             modifier = Modifier
                 .fillMaxWidth()
-                .heightIn(min = 56.dp)
-                .clip(RoundedCornerShape(16.dp))
-                .clickable(
-                    indication = ripple(color = MaterialTheme.theme.colors.support05),
-                    interactionSource = null,
-                    role = Role.Button,
-                    onClick = onCancelSubscription,
-                ),
+                .heightIn(min = 56.dp),
+            border = BorderStroke(2.dp, MaterialTheme.theme.colors.support05),
+            shape = RoundedCornerShape(16.dp),
+            onClick = onCancelSubscription,
         ) {
             TextH30(
                 text = stringResource(LR.string.winback_cancel_subscription_cancel_button_label),

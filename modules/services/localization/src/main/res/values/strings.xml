@@ -2534,7 +2534,7 @@
     <string name="winback_cancel_subscription_perk_plus">Access to Pocket Casts Plus features will be locked after this date.</string>
     <string name="winback_cancel_subscription_perk_folders">Your folders will be removed and their contents will move back to the Podcasts screen.</string>
     <string name="winback_cancel_subscription_perk_files">All files uploaded to your Pocket Casts account will be deleted (but downloaded files on your mobile devices will remain).</string>
-    <string name="winback_cancel_subscription_stay_button_label">Actually, I want to stay</string>
+    <string name="winback_cancel_subscription_stay_button_label">Keep my subscription</string>
     <string name="winback_cancel_subscription_cancel_button_label">Yes, Cancel my Subscription</string>
     <string name="winback_cancel_subscription_accept_offer_button_label">Accept offer</string>
     <string name="winback_cancel_subscription_continue_cancel_button_label">Continue with cancellation</string>
