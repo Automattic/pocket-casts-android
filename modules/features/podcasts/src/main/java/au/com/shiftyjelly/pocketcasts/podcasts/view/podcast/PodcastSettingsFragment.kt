@@ -76,6 +76,8 @@ class PodcastSettingsFragment :
                 uiState = uiState,
                 toolbarColors = toolbarColors,
                 navController = navController,
+                getPreviewMetadataFlow = viewModel::getPreviewMetadataFlow,
+                refreshPreviewMetadata = viewModel::refreshPreviewMetadata,
                 onChangeNotifications = viewModel::changeNotifications,
                 onChangeAutoDownload = viewModel::changeAutoDownload,
                 onChangeAddToUpNext = viewModel::changeAddToUpNext,

@@ -36,14 +36,22 @@ import au.com.shiftyjelly.pocketcasts.repositories.playlist.PlaylistManager.Comp
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import java.time.Clock
+import java.time.Duration
+import java.time.Instant
 import java.util.UUID
+import java.util.concurrent.ConcurrentHashMap
 import javax.inject.Inject
+import javax.inject.Singleton
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
+import kotlinx.coroutines.async
+import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.distinctUntilChanged
@@ -54,6 +62,7 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.withContext
 
 @OptIn(ExperimentalCoroutinesApi::class, FlowPreview::class)
+@Singleton
 class PlaylistManagerImpl(
     private val appDatabase: AppDatabase,
     private val settings: Settings,
@@ -79,16 +88,62 @@ class PlaylistManagerImpl(
     private val podcastDao = appDatabase.podcastDao()
 
     override fun playlistPreviewsFlow(): Flow<List<PlaylistPreview>> {
-        return playlistDao
-            .allPlaylistsFlow()
-            .flatMapLatest { playlists ->
-                if (playlists.isEmpty()) {
-                    flowOf(emptyList())
-                } else {
-                    createPreviewsFlow(playlists)
+        return playlistDao.allPlaylistsFlow().map { playlists ->
+            withContext(Dispatchers.Default) {
+                playlists.map { playlist ->
+                    playlist.toPlaylistPreview()
                 }
             }
-            .keepPodcastEpisodesSynced()
+        }
+    }
+
+    private val previewMetadataCache = ConcurrentHashMap<String, CachedMetadata>()
+
+    override fun getPreviewMetadataFlow(playlistUuid: String): StateFlow<PlaylistPreview.Metadata?> {
+        return getCachedMetadata(playlistUuid).flow
+    }
+
+    private fun getCachedMetadata(playlistUuid: String): CachedMetadata {
+        return previewMetadataCache.computeIfAbsent(playlistUuid) {
+            CachedMetadata(
+                lastRefreshTime = Instant.MIN,
+                flow = MutableStateFlow(null),
+            )
+        }
+    }
+
+    override suspend fun refreshPreviewMetadata(playlistUuid: String) {
+        val cachedValue = getCachedMetadata(playlistUuid)
+        if (Duration.between(cachedValue.lastRefreshTime, clock.instant()).seconds > 30) {
+            val preview = playlistDao.getAllPlaylistsIn(listOf(playlistUuid)).firstOrNull()?.toPlaylistPreview() ?: return
+
+            val episodeCount: Int
+            val artworkUuids: List<String>
+            coroutineScope {
+                val count = async {
+                    when (preview) {
+                        is ManualPlaylistPreview -> playlistDao.manualPlaylistMetadataFlow(playlistUuid)
+                        is SmartPlaylistPreview -> playlistDao.smartPlaylistMetadataFlow(clock, preview.smartRules)
+                    }.first().episodeCount
+                }
+
+                val uuids = async {
+                    when (preview) {
+                        is ManualPlaylistPreview -> manualPlaylistArtworkPodcastsFlow(playlistUuid)
+                        is SmartPlaylistPreview -> smartPlaylistArtworkPodcastsFlow(preview.smartRules, preview.settings.sortType)
+                    }.first()
+                }
+
+                episodeCount = count.await()
+                artworkUuids = uuids.await()
+            }
+            cachedValue.flow.value = PlaylistPreview.Metadata(episodeCount, artworkUuids)
+
+            previewMetadataCache[playlistUuid] = CachedMetadata(
+                lastRefreshTime = clock.instant(),
+                flow = cachedValue.flow,
+            )
+        }
     }
 
     override suspend fun getAutoDownloadEpisodes(): List<PodcastEpisode> {
@@ -176,7 +231,7 @@ class PlaylistManagerImpl(
                     flowOf(null)
                 } else {
                     val smartRules = playlist.smartRules
-                    val podcastsFlow = smartPlaylistArtworkPodcastsFlow(playlist)
+                    val podcastsFlow = smartPlaylistArtworkPodcastsFlow(playlist.smartRules, playlist.sortType)
                     val episodesFlow = smartEpisodesFlow(smartRules, playlist.sortType, searchTerm)
                     val metadataFlow = playlistDao.smartPlaylistMetadataFlow(clock, smartRules)
 
@@ -380,17 +435,6 @@ class PlaylistManagerImpl(
         }
     }
 
-    private fun createPreviewsFlow(playlists: List<PlaylistEntity>) = combine(
-        playlists.map { playlist ->
-            val flow = if (playlist.manual) {
-                manualPlaylistPreviewsFlow(playlist)
-            } else {
-                smartPlaylistPreviewsFlow(playlist)
-            }
-            flow.distinctUntilChanged()
-        },
-    ) { array -> array.toList() }
-
     private fun createPreviewsForEpisode(playlists: List<PlaylistPreviewForEpisodeEntity>) = combine(
         playlists.map { playlist ->
             manualPlaylistArtworkPodcastsFlow(playlist.uuid)
@@ -408,58 +452,26 @@ class PlaylistManagerImpl(
         },
     ) { array -> array.toList() }
 
-    private fun manualPlaylistPreviewsFlow(playlist: PlaylistEntity): Flow<PlaylistPreview> {
-        val podcastsFlow = manualPlaylistArtworkPodcastsFlow(playlist.uuid)
-        val episodeMetadataFlow = playlistDao.manualPlaylistMetadataFlow(playlist.uuid)
-        return combine(podcastsFlow, episodeMetadataFlow) { podcasts, metadata ->
-            ManualPlaylistPreview(
-                uuid = playlist.uuid,
-                title = playlist.title,
-                artworkPodcastUuids = podcasts,
-                episodeCount = metadata.episodeCount,
-                settings = Playlist.Settings(
-                    sortType = playlist.sortType,
-                    isAutoDownloadEnabled = playlist.autoDownload,
-                    autoDownloadLimit = playlist.autodownloadLimit,
-                ),
-                icon = playlist.icon,
-            )
-        }
-    }
-
-    private fun smartPlaylistPreviewsFlow(playlist: PlaylistEntity): Flow<PlaylistPreview> {
-        val podcastsFlow = smartPlaylistArtworkPodcastsFlow(playlist)
-        val episodeMetadataFlow = playlistDao.smartPlaylistMetadataFlow(clock, playlist.smartRules)
-        val smartRules = playlist.smartRules
-        return combine(podcastsFlow, episodeMetadataFlow) { podcasts, metadata ->
-            SmartPlaylistPreview(
-                uuid = playlist.uuid,
-                title = playlist.title,
-                artworkPodcastUuids = podcasts,
-                episodeCount = metadata.episodeCount,
-                settings = Playlist.Settings(
-                    sortType = playlist.sortType,
-                    isAutoDownloadEnabled = playlist.autoDownload,
-                    autoDownloadLimit = playlist.autodownloadLimit,
-                ),
-                smartRules = smartRules,
-                icon = playlist.icon,
-            )
-        }
-    }
-
     private fun manualPlaylistArtworkPodcastsFlow(playlistUuid: String) = playlistDao
         .manualPlaylistArtworkPodcastsFlow(playlistUuid)
-        .map { uuids -> uuids.toArtworkUuids() }
+        .map { uuids ->
+            withContext(Dispatchers.Default) {
+                uuids.toArtworkUuids()
+            }
+        }
 
-    private fun smartPlaylistArtworkPodcastsFlow(playlist: PlaylistEntity) = playlistDao
+    private fun smartPlaylistArtworkPodcastsFlow(smartRules: SmartRules, sortType: PlaylistEpisodeSortType) = playlistDao
         .smartPlaylistArtworkPodcastsFlow(
             clock = clock,
-            smartRules = playlist.smartRules,
-            sortType = playlist.sortType,
+            smartRules = smartRules,
+            sortType = sortType,
             limit = smartEpisodeLimit,
         )
-        .map { uuids -> uuids.toArtworkUuids() }
+        .map { uuids ->
+            withContext(Dispatchers.Default) {
+                uuids.toArtworkUuids()
+            }
+        }
 
     private suspend fun createPlaylist(entity: PlaylistEntity, uuid: String? = null): String {
         return appDatabase.withTransaction {
@@ -594,6 +606,31 @@ private fun PlaylistEntity.applySmartRules(rules: SmartRules) = copy(
     },
 )
 
+private fun PlaylistEntity.toPlaylistPreview() = if (manual) {
+    ManualPlaylistPreview(
+        uuid = uuid,
+        title = title,
+        settings = Playlist.Settings(
+            sortType = sortType,
+            isAutoDownloadEnabled = autoDownload,
+            autoDownloadLimit = autodownloadLimit,
+        ),
+        icon = icon,
+    )
+} else {
+    SmartPlaylistPreview(
+        uuid = uuid,
+        title = title,
+        settings = Playlist.Settings(
+            sortType = sortType,
+            isAutoDownloadEnabled = autoDownload,
+            autoDownloadLimit = autodownloadLimit,
+        ),
+        icon = icon,
+        smartRules = smartRules,
+    )
+}
+
 private fun List<String>.toArtworkUuids(): List<String> {
     return if (!isEmpty()) {
         val distinctUuids = LinkedHashSet<String>(PLAYLIST_ARTWORK_EPISODE_LIMIT)
@@ -616,3 +653,8 @@ private fun List<String>.toArtworkUuids(): List<String> {
 // but adding a short debounce helps avoid these inconsistencies and prevents redundant downstream emissions.
 @OptIn(FlowPreview::class)
 private fun <T> Flow<T>.keepPodcastEpisodesSynced() = debounce(50)
+
+private class CachedMetadata(
+    val lastRefreshTime: Instant,
+    val flow: MutableStateFlow<PlaylistPreview.Metadata?>,
+)
