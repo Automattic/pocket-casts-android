@@ -1,6 +1,8 @@
 7.100
 -----
 *   Bug Fixes
+    *   Fix restoring large Up Next queues
+        ([#4562](https://github.com/Automattic/pocket-casts-android/pull/4562))
     *   Fix done button overlapping with navigation bars
         ([#4553](https://github.com/Automattic/pocket-casts-android/pull/4553))
     *   Fix shared list under the mini player
