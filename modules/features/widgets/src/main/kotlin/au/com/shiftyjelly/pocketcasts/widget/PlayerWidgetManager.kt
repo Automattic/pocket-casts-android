@@ -6,6 +6,7 @@ import androidx.glance.appwidget.GlanceAppWidgetManager
 import androidx.glance.appwidget.updateAll
 import au.com.shiftyjelly.pocketcasts.models.entity.BaseEpisode
 import au.com.shiftyjelly.pocketcasts.repositories.di.ApplicationScope
+import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import au.com.shiftyjelly.pocketcasts.widget.data.ClassicPlayerWidgetState
 import au.com.shiftyjelly.pocketcasts.widget.data.LargePlayerWidgetState
 import au.com.shiftyjelly.pocketcasts.widget.data.MediumPlayerWidgetState
@@ -64,34 +65,44 @@ class PlayerWidgetManager @Inject constructor(
     }
 
     private fun updateSmallWidgets(update: (SmallPlayerWidgetState) -> SmallPlayerWidgetState) {
-        scope.launch {
+        launchCatching {
             glanceIds<SmallPlayerWidget>().forEach { glanceId -> smallAdapter.updateState(glanceId, update) }
             SmallPlayerWidget().updateAll(context)
         }
     }
 
     private fun updateMediumWidgets(update: (MediumPlayerWidgetState) -> MediumPlayerWidgetState) {
-        scope.launch {
+        launchCatching {
             glanceIds<MediumPlayerWidget>().forEach { glanceId -> mediumAdapter.updateState(glanceId, update) }
             MediumPlayerWidget().updateAll(context)
         }
     }
 
     private fun updateLargeWidgets(update: (LargePlayerWidgetState) -> LargePlayerWidgetState) {
-        scope.launch {
+        launchCatching {
             glanceIds<LargePlayerWidget>().forEach { glanceId -> largeAdapter.updateState(glanceId, update) }
             LargePlayerWidget().updateAll(context)
         }
     }
 
     private fun updateClassicWidgets(update: (ClassicPlayerWidgetState) -> ClassicPlayerWidgetState) {
-        scope.launch {
+        launchCatching {
             glanceIds<ClassicPlayerWidget>().forEach { glanceId -> classicAdapter.updateState(glanceId, update) }
             ClassicPlayerWidget().updateAll(context)
         }
     }
 
     private suspend inline fun <reified T : GlanceAppWidget> glanceIds() = widgetManager.getGlanceIds(T::class.java)
+
+    private fun launchCatching(block: suspend () -> Unit) {
+        scope.launch {
+            runCatching {
+                block()
+            }.onFailure { ex ->
+                LogBuffer.e(LogBuffer.TAG_CRASH, ex, "Failed to update widgets")
+            }
+        }
+    }
 
     companion object {
         const val EPISODE_LIMIT = LargePlayerWidgetState.EPISODE_LIMIT
