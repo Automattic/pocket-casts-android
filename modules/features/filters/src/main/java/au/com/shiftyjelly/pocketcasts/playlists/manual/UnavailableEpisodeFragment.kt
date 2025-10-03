@@ -27,6 +27,7 @@ import androidx.fragment.app.viewModels
 import androidx.fragment.compose.content
 import au.com.shiftyjelly.pocketcasts.compose.theme
 import au.com.shiftyjelly.pocketcasts.playlists.PlaylistViewModel
+import au.com.shiftyjelly.pocketcasts.utils.extensions.requireParcelable
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseDialogFragment
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.parcelize.Parcelize
@@ -35,7 +36,7 @@ import kotlinx.parcelize.Parcelize
 class UnavailableEpisodeFragment : BaseDialogFragment() {
     private val viewModel by viewModels<PlaylistViewModel>({ requireParentFragment() })
 
-    private val args get() = requireNotNull(arguments?.let { BundleCompat.getParcelable(it, NEW_INSTANCE_ARGS, Args::class.java) })
+    private val args get() = requireArguments().requireParcelable<Args>(NEW_INSTANCE_ARGS)
 
     override fun onCreateView(
         inflater: LayoutInflater,

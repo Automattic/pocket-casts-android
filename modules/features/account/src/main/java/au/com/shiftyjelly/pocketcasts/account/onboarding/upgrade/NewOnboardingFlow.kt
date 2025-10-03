@@ -17,8 +17,6 @@ import au.com.shiftyjelly.pocketcasts.account.onboarding.NewOnboardingLoginPage
 import au.com.shiftyjelly.pocketcasts.account.onboarding.OnboardingCreateAccountPage
 import au.com.shiftyjelly.pocketcasts.account.onboarding.OnboardingForgotPasswordPage
 import au.com.shiftyjelly.pocketcasts.account.onboarding.recommendations.OnboardingRecommendationsFlow
-import au.com.shiftyjelly.pocketcasts.account.onboarding.upgrade.OldOnboardingFlow.ENCOURAGE_FREE_ACCOUNT
-import au.com.shiftyjelly.pocketcasts.account.onboarding.upgrade.OldOnboardingFlow.LOG_IN_OR_SIGN_UP
 import au.com.shiftyjelly.pocketcasts.account.viewmodel.OnboardingAccountBenefitsViewModel
 import au.com.shiftyjelly.pocketcasts.account.viewmodel.OnboardingCreateAccountViewModel
 import au.com.shiftyjelly.pocketcasts.account.viewmodel.OnboardingLogInViewModel
@@ -35,7 +33,8 @@ import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingExitInfo
 import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingFlow
 import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingUpgradeSource
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
-import au.com.shiftyjelly.pocketcasts.utils.extensions.getSerializableCompat
+import au.com.shiftyjelly.pocketcasts.utils.extensions.requireBoolean
+import au.com.shiftyjelly.pocketcasts.utils.extensions.requireSerializable
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 object NewOnboardingFlow {
@@ -239,13 +238,9 @@ object NewOnboardingFlow {
                 },
             ),
         ) { navBackStackEntry ->
-            val upgradeSource = navBackStackEntry.arguments
-                ?.getSerializableCompat(OldOnboardingFlow.PlusUpgrade.SOURCE_ARGUMENT_KEY, OnboardingUpgradeSource::class.java)
-                ?: throw IllegalStateException("Missing upgrade source argument")
-
-            val forcePurchase = navBackStackEntry.arguments
-                ?.getBoolean(OldOnboardingFlow.PlusUpgrade.FORCE_PURCHASE_ARGUMENT_KEY)
-                ?: throw IllegalStateException("Missing force purchase argument")
+            val arguments = requireNotNull(navBackStackEntry.arguments)
+            val upgradeSource = arguments.requireSerializable<OnboardingUpgradeSource>(OldOnboardingFlow.PlusUpgrade.SOURCE_ARGUMENT_KEY)
+            val forcePurchase = arguments.requireBoolean(OldOnboardingFlow.PlusUpgrade.FORCE_PURCHASE_ARGUMENT_KEY)
 
             val userCreatedNewAccount = when (upgradeSource) {
                 OnboardingUpgradeSource.ACCOUNT_DETAILS,

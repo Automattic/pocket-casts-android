@@ -29,7 +29,6 @@ import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.unit.dp
 import androidx.core.graphics.BlendModeColorFilterCompat
 import androidx.core.graphics.BlendModeCompat
-import androidx.core.os.BundleCompat
 import androidx.core.view.isInvisible
 import androidx.core.view.isVisible
 import androidx.core.widget.TextViewCompat
@@ -65,6 +64,7 @@ import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.ui.theme.ThemeColor
 import au.com.shiftyjelly.pocketcasts.utils.Network
 import au.com.shiftyjelly.pocketcasts.utils.Util
+import au.com.shiftyjelly.pocketcasts.utils.extensions.requireParcelable
 import au.com.shiftyjelly.pocketcasts.utils.extensions.toSecondsFromColonFormattedString
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import au.com.shiftyjelly.pocketcasts.utils.parceler.DurationParceler
@@ -128,8 +128,6 @@ class EpisodeFragment : BaseFragment() {
                 }
             }
         }
-
-        private fun extractArgs(bundle: Bundle?): EpisodeFragmentArgs? = bundle?.let { BundleCompat.getParcelable(it, NEW_INSTANCE_ARG, EpisodeFragmentArgs::class.java) }
     }
 
     override lateinit var statusBarIconColor: StatusBarIconColor
@@ -154,8 +152,7 @@ class EpisodeFragment : BaseFragment() {
     private var formattedNotes: String? = null
     private lateinit var showNotesFormatter: ShowNotesFormatter
 
-    private val args: EpisodeFragmentArgs
-        get() = extractArgs(arguments) ?: throw IllegalStateException("${this::class.java.simpleName} is missing arguments. It must be created with newInstance function")
+    private val args get() = requireArguments().requireParcelable<EpisodeFragmentArgs>(NEW_INSTANCE_ARG)
 
     private val episodeUUID: String
         get() = args.episodeUuid

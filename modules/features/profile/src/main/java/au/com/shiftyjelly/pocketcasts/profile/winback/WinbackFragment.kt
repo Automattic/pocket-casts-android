@@ -8,7 +8,6 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.compose.animation.AnimatedContentTransitionScope
 import androidx.compose.animation.core.tween
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.WindowInsetsSides
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.navigationBarsPadding
@@ -51,6 +50,8 @@ import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.settings.HelpPage
 import au.com.shiftyjelly.pocketcasts.settings.LogsPage
 import au.com.shiftyjelly.pocketcasts.settings.status.StatusPage
+import au.com.shiftyjelly.pocketcasts.utils.extensions.requireParcelable
+import au.com.shiftyjelly.pocketcasts.utils.extensions.requireSerializable
 import au.com.shiftyjelly.pocketcasts.views.activity.WebViewActivity
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseDialogFragment
 import dagger.hilt.android.AndroidEntryPoint
@@ -62,10 +63,7 @@ import au.com.shiftyjelly.pocketcasts.localization.R as LR
 class WinbackFragment : BaseDialogFragment() {
     private val viewModel by viewModels<WinbackViewModel>()
 
-    private val params
-        get() = requireNotNull(BundleCompat.getParcelable(requireArguments(), INPUT_ARGS, WinbackInitParams::class.java)) {
-            "Missing input parameters"
-        }
+    private val params get() = requireArguments().requireParcelable<WinbackInitParams>(INPUT_ARGS)
 
     private var currentScreenId: String? = null
 
@@ -133,9 +131,8 @@ class WinbackFragment : BaseDialogFragment() {
                     ),
                 ) { backStackEntry ->
                     val arguments = requireNotNull(backStackEntry.arguments) { "Missing back stack entry arguments" }
-                    val billingCycle = requireNotNull(BundleCompat.getSerializable(arguments, WinbackNavRoutes.OFER_CLAIMED_BILLING_CYCLE_ARGUMENT, BillingCycle::class.java)) {
-                        "Missing billing cycle argument"
-                    }
+                    val billingCycle = arguments.requireSerializable<BillingCycle>(WinbackNavRoutes.OFER_CLAIMED_BILLING_CYCLE_ARGUMENT)
+
                     OfferClaimedPage(
                         billingCycle = billingCycle,
                         onConfirm = {

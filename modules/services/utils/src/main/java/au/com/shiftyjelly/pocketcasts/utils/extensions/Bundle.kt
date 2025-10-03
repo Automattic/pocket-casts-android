@@ -1,25 +1,9 @@
 package au.com.shiftyjelly.pocketcasts.utils.extensions
 
-import android.os.Build
 import android.os.Bundle
 import android.os.Parcelable
 import androidx.core.os.BundleCompat
-import androidx.core.os.bundleOf
 import java.io.Serializable
-
-fun <T : Serializable> Bundle.getSerializableCompat(key: String, clazz: Class<T>): T? = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-    getSerializable(key, clazz)
-} else {
-    @Suppress("DEPRECATION")
-    getSerializable(key)?.let { result ->
-        if (clazz.isInstance(result)) {
-            @Suppress("UNCHECKED_CAST")
-            result as T
-        } else {
-            null
-        }
-    }
-}
 
 fun Bundle.findBoolean(key: String) = withKey(key) { getBoolean(key) }
 fun Bundle.requireBoolean(key: String) = requireKey(key, ::findBoolean)

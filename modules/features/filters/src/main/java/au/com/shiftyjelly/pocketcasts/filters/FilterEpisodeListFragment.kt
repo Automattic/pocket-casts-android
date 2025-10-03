@@ -9,7 +9,6 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.annotation.ColorInt
-import androidx.core.os.BundleCompat
 import androidx.core.view.isVisible
 import androidx.core.view.updatePadding
 import androidx.fragment.app.viewModels
@@ -44,6 +43,7 @@ import au.com.shiftyjelly.pocketcasts.ui.helper.FragmentHostListener
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.ui.theme.ThemeColor
 import au.com.shiftyjelly.pocketcasts.utils.extensions.dpToPx
+import au.com.shiftyjelly.pocketcasts.utils.extensions.findParcelable
 import au.com.shiftyjelly.pocketcasts.views.dialog.ConfirmationDialog
 import au.com.shiftyjelly.pocketcasts.views.dialog.OptionsDialog
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseFragment
@@ -137,7 +137,7 @@ class FilterEpisodeListFragment : BaseFragment() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        listSavedState = savedInstanceState?.let { BundleCompat.getParcelable(it, STATE_LAYOUT_MANAGER, Parcelable::class.java) }
+        listSavedState = savedInstanceState?.findParcelable<Parcelable>(STATE_LAYOUT_MANAGER)
         showingFilterOptionsBeforeModal = arguments?.getBoolean(ARG_FILTER_IS_NEW) ?: false
     }
 

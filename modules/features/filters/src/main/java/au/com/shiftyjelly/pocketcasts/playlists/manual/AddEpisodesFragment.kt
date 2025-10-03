@@ -31,6 +31,7 @@ import au.com.shiftyjelly.pocketcasts.compose.CallOnce
 import au.com.shiftyjelly.pocketcasts.compose.components.AnimatedNonNullVisibility
 import au.com.shiftyjelly.pocketcasts.compose.components.ThemedSnackbarHost
 import au.com.shiftyjelly.pocketcasts.localization.R
+import au.com.shiftyjelly.pocketcasts.utils.extensions.requireParcelable
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseDialogFragment
 import dagger.hilt.android.AndroidEntryPoint
 import dagger.hilt.android.lifecycle.withCreationCallback
@@ -38,7 +39,7 @@ import kotlinx.parcelize.Parcelize
 
 @AndroidEntryPoint
 internal class AddEpisodesFragment : BaseDialogFragment() {
-    private val args get() = requireNotNull(arguments?.let { BundleCompat.getParcelable(it, NEW_INSTANCE_ARGS, Args::class.java) })
+    private val args get() = requireArguments().requireParcelable<Args>(NEW_INSTANCE_ARGS)
 
     private val viewModel by viewModels<AddEpisodesViewModel>(
         extrasProducer = {

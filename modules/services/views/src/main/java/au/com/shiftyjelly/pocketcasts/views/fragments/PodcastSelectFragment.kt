@@ -9,7 +9,6 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.annotation.ColorInt
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.os.BundleCompat
 import androidx.core.view.isVisible
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
@@ -22,6 +21,7 @@ import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.repositories.images.PocketCastsImageRequestFactory
 import au.com.shiftyjelly.pocketcasts.repositories.images.loadInto
 import au.com.shiftyjelly.pocketcasts.ui.extensions.themed
+import au.com.shiftyjelly.pocketcasts.utils.extensions.requireParcelable
 import au.com.shiftyjelly.pocketcasts.views.databinding.SettingsFragmentPodcastSelectBinding
 import au.com.shiftyjelly.pocketcasts.views.databinding.SettingsRowPodcastBinding
 import au.com.shiftyjelly.pocketcasts.views.viewmodels.PodcastSelectViewModel
@@ -61,8 +61,6 @@ class PodcastSelectFragment : BaseFragment() {
                 source = source,
             )
         }
-
-        private fun extractArgs(bundle: Bundle?): PodcastSelectFragmentArgs? = bundle?.let { BundleCompat.getParcelable(it, NEW_INSTANCE_ARG, PodcastSelectFragmentArgs::class.java) }
     }
 
     interface Listener {
@@ -97,8 +95,7 @@ class PodcastSelectFragment : BaseFragment() {
 
         val layoutManager = LinearLayoutManager(context, RecyclerView.VERTICAL, false)
 
-        val args = extractArgs(arguments)
-            ?: throw IllegalStateException("${this::class.java.simpleName} is missing arguments. It must be created with newInstance function")
+        val args = requireArguments().requireParcelable<PodcastSelectFragmentArgs>(NEW_INSTANCE_ARG)
 
         source = args.source
 
