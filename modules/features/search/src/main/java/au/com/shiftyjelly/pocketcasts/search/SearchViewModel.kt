@@ -44,7 +44,8 @@ class SearchViewModel @Inject constructor(
                 .collect { operation ->
                 _state.update {
                     if (it is SearchUiState.Idle || it is SearchUiState.Suggestions) {
-                        if (((it as? SearchUiState.Suggestions)?.operation as? SearchUiState.SearchOperation.Results)?.results?.isNotEmpty() == true && operation is SearchUiState.SearchOperation.Loading) {
+                        // only show loading for the initial query when autocomplete results are empty
+                        if (((it as? SearchUiState.Suggestions)?.operation as? SearchUiState.SearchOperation.Success)?.results?.isNotEmpty() == true && operation is SearchUiState.SearchOperation.Loading) {
                             it
                         } else {
                             SearchUiState.Suggestions(operation = operation)
@@ -72,7 +73,7 @@ class SearchViewModel @Inject constructor(
         if (query.isEmpty()) {
             searchHandler.updateAutCompleteQuery(query)
             _state.update {
-                SearchUiState.Suggestions(operation = SearchUiState.SearchOperation.Results(searchTerm = query, results = emptyList()))
+                SearchUiState.Suggestions(operation = SearchUiState.SearchOperation.Success(searchTerm = query, results = emptyList()))
             }
         }
 
@@ -105,7 +106,6 @@ class SearchViewModel @Inject constructor(
     }
 
     fun onSubscribeToPodcast(uuid: String) {
-        Log.i("===", "onSubscribeTo $uuid")
         podcastManager.subscribeToPodcast(podcastUuid = uuid, sync = true)
         analyticsTracker.track(
             AnalyticsEvent.PODCAST_SUBSCRIBED,
@@ -204,7 +204,7 @@ sealed interface SearchUiState {
 
         data class Loading(override val searchTerm: String) : SearchOperation<Nothing>
         data class Error(override val searchTerm: String, val error: Throwable) : SearchOperation<Nothing>
-        data class Results<T>(override val searchTerm: String, val results: T) : SearchOperation<T>
+        data class Success<T>(override val searchTerm: String, val results: T) : SearchOperation<T>
     }
 
     data object Idle : SearchUiState

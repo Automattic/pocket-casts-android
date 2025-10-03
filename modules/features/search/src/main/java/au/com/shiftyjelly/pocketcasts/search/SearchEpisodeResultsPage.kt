@@ -13,7 +13,6 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import au.com.shiftyjelly.pocketcasts.compose.bars.ThemedTopAppBar
 import au.com.shiftyjelly.pocketcasts.models.to.EpisodeItem
-import au.com.shiftyjelly.pocketcasts.preferences.Settings.MediaNotificationControls.Companion.items
 import au.com.shiftyjelly.pocketcasts.search.component.SearchEpisodeItem
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
@@ -33,7 +32,7 @@ fun SearchEpisodeResultsPage(
             title = stringResource(LR.string.search_results_all_episodes),
             onNavigationClick = { onBackPress() },
         )
-        ((state as? SearchUiState.Results)?.operation as? SearchUiState.SearchOperation.Results)?.let {
+        ((state as? SearchUiState.Results)?.operation as? SearchUiState.SearchOperation.Success)?.let {
             SearchEpisodeResultsView(
                 episodes = it.results.episodes,
                 onEpisodeClick = onEpisodeClick,

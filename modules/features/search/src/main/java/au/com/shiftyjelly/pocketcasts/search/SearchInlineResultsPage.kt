@@ -79,7 +79,7 @@ fun SearchInlineResultsPage(
     ) {
         when (val operation = state.operation) {
             is SearchUiState.SearchOperation.Error -> SearchFailedView()
-            is SearchUiState.SearchOperation.Results -> {
+            is SearchUiState.SearchOperation.Success -> {
                 if (operation.results.isEmpty) {
                     NoResultsView()
                 } else {
@@ -116,7 +116,7 @@ fun SearchInlineResultsPage(
 
 @Composable
 private fun SearchResultsView(
-    state: SearchUiState.SearchOperation.Results<SearchResults>,
+    state: SearchUiState.SearchOperation.Success<SearchResults>,
     bottomInset: Dp,
     onEpisodeClick: (EpisodeItem) -> Unit,
     onPodcastClick: (Podcast) -> Unit,
@@ -310,7 +310,7 @@ private fun SearchResultsViewPreview(
 ) {
     AppThemeWithBackground(themeType) {
         SearchResultsView(
-            state = SearchUiState.SearchOperation.Results(
+            state = SearchUiState.SearchOperation.Success(
                 searchTerm = "",
                 results = SearchResults(
 

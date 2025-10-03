@@ -39,7 +39,7 @@ fun SearchPodcastResultsPage(
             title = stringResource(LR.string.search_results_all_podcasts),
             onNavigationClick = { onBackPress() },
         )
-        ((state as? SearchUiState.Results?)?.operation as? SearchUiState.SearchOperation.Results)?.let {
+        ((state as? SearchUiState.Results?)?.operation as? SearchUiState.SearchOperation.Success)?.let {
             SearchPodcastResultsView(
                 items = it.results.podcasts,
                 onFolderClick = onFolderClick,

@@ -220,7 +220,7 @@ class SearchFragment : BaseFragment() {
                 val lowerCaseSearch = query.lowercase()
                 if ((characterCount == 1 && lowerCaseSearch.startsWith("h")) || (characterCount == 2 && lowerCaseSearch.startsWith("ht")) || (characterCount == 3 && lowerCaseSearch.startsWith("htt")) || lowerCaseSearch.startsWith("http")) {
                     // TODO check the same for suggestions
-                    if (((viewModel.state.value as? SearchUiState.Results)?.operation as? SearchUiState.SearchOperation.Results)?.results?.podcasts?.isNotEmpty() == true) {
+                    if (((viewModel.state.value as? SearchUiState.Results)?.operation as? SearchUiState.SearchOperation.Success)?.results?.podcasts?.isNotEmpty() == true) {
                         binding.searchHistoryPanel.hide()
                     }
                     return true
@@ -268,7 +268,7 @@ class SearchFragment : BaseFragment() {
                                 .fillMaxSize()
                                 .padding(horizontal = 16.dp),
                             searchTerm = suggestions.operation.searchTerm,
-                            results = (suggestions.operation as? SearchUiState.SearchOperation.Results)?.results ?: emptyList(),
+                            results = (suggestions.operation as? SearchUiState.SearchOperation.Success)?.results ?: emptyList(),
                             onTermClick = { viewModel.selectSuggestion(it.term) },
                             onPodcastClick = { onPodcastClick(SearchHistoryEntry.fromAutoCompletePodcast(it), it.isSubscribed) },
                             onPodcastFollow = { viewModel.onSubscribeToPodcast(it.uuid) },

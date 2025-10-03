@@ -31,6 +31,7 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.rx2.asFlow
 import kotlinx.coroutines.rx2.asObservable
 import timber.log.Timber
@@ -60,6 +61,7 @@ class SearchHandler @Inject constructor(
 
     private val localPodcastsResults = Observable
         .combineLatest(searchQuery.filter { it is Query.SearchResults }, onlySearchRemoteObservable, signInStateObservable) { searchQuery, onlySearchRemoteObservable, signInState ->
+            Log.i("===", "localPodcastResults term=$searchQuery, onlyRemote=$onlySearchRemoteObservable, signInState=$signInState")
             Pair(if (onlySearchRemoteObservable) "" else searchQuery.term, signInState)
         }
         .subscribeOn(Schedulers.io())
@@ -88,6 +90,9 @@ class SearchHandler @Inject constructor(
                 // search podcasts
                 val podcastSearch = podcastManager.findSubscribedRxSingle()
                     .subscribeOn(Schedulers.io())
+                    .doOnSuccess {
+                        Log.w("===", "localPodcasts that are subscribed = ${it.joinToString { "${it.uuid}" }}")
+                    }
                     .flatMapObservable { Observable.fromIterable(it) }
                     .filter { it.title.contains(query, ignoreCase = true) || it.author.contains(query, ignoreCase = true) }
                     .map { podcast ->
@@ -109,6 +114,7 @@ class SearchHandler @Inject constructor(
         .asObservable()
         .subscribeOn(Schedulers.io())
         .map { podcasts -> podcasts.map(Podcast::uuid).toHashSet() }
+        .doOnNext { Log.w("===", "subscribedPodcastUuids ${it.joinToString()}") }
 
     @OptIn(ExperimentalCoroutinesApi::class)
     @Suppress("UNCHECKED_CAST")
@@ -118,7 +124,7 @@ class SearchHandler @Inject constructor(
             if (query.isEmpty()) {
                 flow {
                     emit(
-                        SearchUiState.SearchOperation.Results(
+                        SearchUiState.SearchOperation.Success(
                             searchTerm = query,
                             results = emptyList(),
                         ),
@@ -128,7 +134,7 @@ class SearchHandler @Inject constructor(
                 flow {
                     emit(autoCompleteManager.autoCompleteSearch(term = query))
                 }.map<List<SearchAutoCompleteItem>, SearchUiState.SearchOperation<List<SearchAutoCompleteItem>>> {
-                    SearchUiState.SearchOperation.Results(
+                    SearchUiState.SearchOperation.Success(
                         searchTerm = query,
                         results = it,
                     )
@@ -151,7 +157,7 @@ class SearchHandler @Inject constructor(
         subscribedPodcastUuids.asFlow(),
     ) { autoComplete, subscribedUuids ->
         when (autoComplete) {
-            is SearchUiState.SearchOperation.Results -> {
+            is SearchUiState.SearchOperation.Success -> {
                 autoComplete.copy(
                     results = autoComplete.results.map {
                         when (it) {
@@ -231,7 +237,7 @@ class SearchHandler @Inject constructor(
             analyticsTracker.track(AnalyticsEvent.SEARCH_FAILED, AnalyticsProp.sourceMap(source))
             SearchUiState.SearchOperation.Error(searchTerm = searchTerm.term, error = serverSearchResults.error!!)
         } else if (searchTerm.term.isBlank()) {
-            SearchUiState.SearchOperation.Results(searchTerm = searchTerm.term, results = SearchResults(podcasts = emptyList(), episodes = emptyList()))
+            SearchUiState.SearchOperation.Success(searchTerm = searchTerm.term, results = SearchResults(podcasts = emptyList(), episodes = emptyList()))
         } else {
             // set if the podcast is subscribed so we can show a tick
             val serverPodcastsResult = serverSearchResults.podcastSearch.searchResults.map { podcast -> FolderItem.Podcast(podcast) }
@@ -243,7 +249,7 @@ class SearchHandler @Inject constructor(
             val searchPodcastsResult = (localPodcastsResult + serverPodcastsResult).distinctBy { it.uuid }
             val searchEpisodesResult = serverSearchResults.episodeSearch.episodes
 
-            SearchUiState.SearchOperation.Results(
+            SearchUiState.SearchOperation.Success(
                 searchTerm = searchTerm.term,
                 results = SearchResults(
                     podcasts = searchPodcastsResult,

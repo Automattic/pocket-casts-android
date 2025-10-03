@@ -24,7 +24,6 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.reactive.asFlow
-import kotlinx.coroutines.rx2.asFlow
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 @HiltViewModel
@@ -72,7 +71,7 @@ class OnboardingRecommendationsSearchViewModel @Inject constructor(
                 searchHandler.searchResults,
             ) { subscribedUuids, searchState ->
                 val podcasts = when (searchState) {
-                    is SearchUiState.SearchOperation.Results -> {
+                    is SearchUiState.SearchOperation.Success -> {
                         // TODO handle loading
                         // TODO handle error
 
