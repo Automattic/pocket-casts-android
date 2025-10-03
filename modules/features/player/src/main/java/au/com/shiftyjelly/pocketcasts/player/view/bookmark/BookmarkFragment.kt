@@ -16,7 +16,6 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
-import androidx.core.os.BundleCompat
 import androidx.core.os.bundleOf
 import androidx.fragment.app.viewModels
 import au.com.shiftyjelly.pocketcasts.compose.AppThemeWithBackground
@@ -26,6 +25,7 @@ import au.com.shiftyjelly.pocketcasts.compose.extensions.contentWithoutConsumedI
 import au.com.shiftyjelly.pocketcasts.compose.theme
 import au.com.shiftyjelly.pocketcasts.models.entity.Bookmark
 import au.com.shiftyjelly.pocketcasts.ui.helper.StatusBarIconColor
+import au.com.shiftyjelly.pocketcasts.utils.extensions.requireParcelable
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseFragment
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -41,10 +41,7 @@ class BookmarkFragment : BaseFragment() {
 
     private val viewModel: BookmarkViewModel by viewModels()
 
-    private val args
-        get() = requireNotNull(BundleCompat.getParcelable(requireArguments(), NEW_INSTANCE_KEY, BookmarkArguments::class.java)) {
-            "Missing input parameters"
-        }
+    private val args get() = requireArguments().requireParcelable<BookmarkArguments>(NEW_INSTANCE_KEY)
 
     override var statusBarIconColor: StatusBarIconColor = StatusBarIconColor.Light
 

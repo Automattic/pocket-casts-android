@@ -27,7 +27,8 @@ import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingExitInfo
 import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingFlow
 import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingUpgradeSource
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
-import au.com.shiftyjelly.pocketcasts.utils.extensions.getSerializableCompat
+import au.com.shiftyjelly.pocketcasts.utils.extensions.requireBoolean
+import au.com.shiftyjelly.pocketcasts.utils.extensions.requireSerializable
 
 object OldOnboardingFlow {
     const val CREATE_FREE_ACCOUNT = "create_free_account"
@@ -236,13 +237,9 @@ object OldOnboardingFlow {
                 },
             ),
         ) { navBackStackEntry ->
-            val upgradeSource = navBackStackEntry.arguments
-                ?.getSerializableCompat(PlusUpgrade.SOURCE_ARGUMENT_KEY, OnboardingUpgradeSource::class.java)
-                ?: throw IllegalStateException("Missing upgrade source argument")
-
-            val forcePurchase = navBackStackEntry.arguments
-                ?.getBoolean(PlusUpgrade.FORCE_PURCHASE_ARGUMENT_KEY)
-                ?: throw IllegalStateException("Missing force purchase argument")
+            val arguments = requireNotNull(navBackStackEntry.arguments)
+            val upgradeSource = arguments.requireSerializable<OnboardingUpgradeSource>(PlusUpgrade.SOURCE_ARGUMENT_KEY)
+            val forcePurchase = arguments.requireBoolean(PlusUpgrade.FORCE_PURCHASE_ARGUMENT_KEY)
 
             val userCreatedNewAccount = when (upgradeSource) {
                 OnboardingUpgradeSource.ACCOUNT_DETAILS,

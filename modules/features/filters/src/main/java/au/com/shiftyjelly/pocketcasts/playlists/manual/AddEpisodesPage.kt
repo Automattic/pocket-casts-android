@@ -46,6 +46,7 @@ import au.com.shiftyjelly.pocketcasts.models.entity.ManualPlaylistEpisodeSource
 import au.com.shiftyjelly.pocketcasts.models.entity.ManualPlaylistFolderSource
 import au.com.shiftyjelly.pocketcasts.models.entity.ManualPlaylistPodcastSource
 import au.com.shiftyjelly.pocketcasts.playlists.manual.AddEpisodesViewModel.PodcastEpisodesUiState
+import au.com.shiftyjelly.pocketcasts.utils.extensions.requireString
 import kotlinx.coroutines.flow.StateFlow
 import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
@@ -178,7 +179,7 @@ internal fun AddEpisodesPage(
                 listOf(navArgument(AddEpisodesRoutes.FOLDER_UUID_ARG) { type = NavType.StringType }),
             ) { backStackEntry ->
                 val arguments = requireNotNull(backStackEntry.arguments) { "Missing back stack entry arguments" }
-                val folderUuid = requireNotNull(arguments.getString(AddEpisodesRoutes.FOLDER_UUID_ARG)) { "Missing folder uuid argument" }
+                val folderUuid = arguments.requireString(AddEpisodesRoutes.FOLDER_UUID_ARG)
                 val podcasts by folderPodcastsFlow(folderUuid).collectAsState()
 
                 AddEpisodeSourcesColumn(
@@ -200,7 +201,7 @@ internal fun AddEpisodesPage(
                 listOf(navArgument(AddEpisodesRoutes.PODCAST_UUID_ARG) { type = NavType.StringType }),
             ) { backStackEntry ->
                 val arguments = requireNotNull(backStackEntry.arguments) { "Missing back stack entry arguments" }
-                val podcastUuid = requireNotNull(arguments.getString(AddEpisodesRoutes.PODCAST_UUID_ARG)) { "Missing podcast uuid argument" }
+                val podcastUuid = arguments.requireString(AddEpisodesRoutes.PODCAST_UUID_ARG)
                 val uiState by episodesFlow(podcastUuid).collectAsState()
 
                 AddEpisodesColumn(

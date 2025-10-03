@@ -9,7 +9,6 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.activity.OnBackPressedCallback
 import androidx.annotation.StringRes
-import androidx.core.os.BundleCompat
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
@@ -32,6 +31,7 @@ import au.com.shiftyjelly.pocketcasts.podcasts.databinding.FragmentEpisodeContai
 import au.com.shiftyjelly.pocketcasts.podcasts.view.episode.EpisodeFragment.EpisodeFragmentArgs
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.ui.theme.ThemeColor
+import au.com.shiftyjelly.pocketcasts.utils.extensions.requireParcelable
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseDialogFragment
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialog
@@ -94,15 +94,13 @@ class EpisodeContainerFragment :
                 )
             }
         }
-        private fun extractArgs(bundle: Bundle?): EpisodeFragmentArgs? = bundle?.let { BundleCompat.getParcelable(it, NEW_INSTANCE_ARG, EpisodeFragmentArgs::class.java) }
     }
 
     override val includeNavigationBarPadding: Boolean = false
 
     var binding: FragmentEpisodeContainerBinding? = null
 
-    private val args: EpisodeFragmentArgs
-        get() = extractArgs(arguments) ?: throw IllegalStateException("${this::class.java.simpleName} is missing arguments. It must be created with newInstance function")
+    private val args get() = requireArguments().requireParcelable<EpisodeFragmentArgs>(NEW_INSTANCE_ARG)
 
     private val episodeUUID: String
         get() = args.episodeUuid

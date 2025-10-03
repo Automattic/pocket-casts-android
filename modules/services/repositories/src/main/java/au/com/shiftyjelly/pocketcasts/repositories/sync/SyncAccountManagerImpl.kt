@@ -7,7 +7,6 @@ import android.accounts.NetworkErrorException
 import android.accounts.OnAccountsUpdateListener
 import android.content.Intent
 import android.os.Bundle
-import androidx.core.os.BundleCompat
 import androidx.core.os.bundleOf
 import au.com.shiftyjelly.pocketcasts.preferences.AccessToken
 import au.com.shiftyjelly.pocketcasts.preferences.AccountConstants
@@ -16,6 +15,7 @@ import au.com.shiftyjelly.pocketcasts.servers.sync.LoginIdentity
 import au.com.shiftyjelly.pocketcasts.servers.sync.TokenHandler
 import au.com.shiftyjelly.pocketcasts.servers.sync.exception.RefreshTokenExpiredException
 import au.com.shiftyjelly.pocketcasts.utils.Optional
+import au.com.shiftyjelly.pocketcasts.utils.extensions.findParcelable
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import io.reactivex.BackpressureStrategy
 import io.reactivex.Flowable
@@ -110,7 +110,7 @@ open class SyncAccountManagerImpl @Inject constructor(
                 val token = bundle.getString(AccountManager.KEY_AUTHTOKEN)
                 // Token failed to refresh
                 if (token == null) {
-                    val intent = BundleCompat.getParcelable(bundle, AccountManager.KEY_INTENT, Intent::class.java)
+                    val intent = bundle.findParcelable<Intent>(AccountManager.KEY_INTENT)
                     if (intent == null) {
                         throw NetworkErrorException()
                     } else {

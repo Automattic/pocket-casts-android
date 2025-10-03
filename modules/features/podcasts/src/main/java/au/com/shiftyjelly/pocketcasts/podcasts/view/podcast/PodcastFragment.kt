@@ -21,7 +21,6 @@ import androidx.compose.ui.graphics.luminance
 import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.platform.ViewCompositionStrategy
 import androidx.compose.ui.util.lerp
-import androidx.core.os.BundleCompat
 import androidx.core.os.bundleOf
 import androidx.core.view.isInvisible
 import androidx.core.view.isVisible
@@ -81,6 +80,7 @@ import au.com.shiftyjelly.pocketcasts.ui.helper.StatusBarIconColor
 import au.com.shiftyjelly.pocketcasts.ui.images.CoilManager
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.utils.extensions.dpToPx
+import au.com.shiftyjelly.pocketcasts.utils.extensions.requireParcelable
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import au.com.shiftyjelly.pocketcasts.views.dialog.ConfirmationDialog
 import au.com.shiftyjelly.pocketcasts.views.dialog.OptionsDialog
@@ -143,10 +143,6 @@ class PodcastFragment : BaseFragment() {
                     featuredPodcast = featuredPodcast,
                 ),
             )
-        }
-
-        private fun extractArgs(bundle: Bundle?) = bundle?.let {
-            BundleCompat.getParcelable(it, NEW_INSTANCE_ARGS, PodcastFragmentArgs::class.java)
         }
     }
 
@@ -645,8 +641,7 @@ class PodcastFragment : BaseFragment() {
         viewModel.onGetBookmarksClicked()
     }
 
-    private val args: PodcastFragmentArgs
-        get() = extractArgs(arguments) ?: error("$NEW_INSTANCE_ARGS argument is missing. Fragment must be created using newInstance function")
+    private val args get() = requireArguments().requireParcelable<PodcastFragmentArgs>(NEW_INSTANCE_ARGS)
 
     val podcastUuid: String
         get() = args.podcastUuid
