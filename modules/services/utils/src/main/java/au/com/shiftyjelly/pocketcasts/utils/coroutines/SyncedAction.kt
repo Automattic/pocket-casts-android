@@ -7,14 +7,14 @@ import kotlinx.coroutines.async
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 
-class SyncedAction<InputT, OutputT>(
-    private val action: suspend (InputT) -> OutputT,
+class SyncedAction<InputType, OutputType>(
+    private val action: suspend (InputType) -> OutputType,
 ) {
     private val executeMutex = Mutex()
     private var executeCount = 0
-    private var inFlightResult: Deferred<OutputT>? = null
+    private var inFlightResult: Deferred<OutputType>? = null
 
-    suspend fun run(input: InputT, scope: CoroutineScope): OutputT {
+    suspend fun run(input: InputType, scope: CoroutineScope): OutputType {
         val deferred = executeMutex.withLock {
             val inFlight = inFlightResult ?: scope.async(start = CoroutineStart.LAZY) { action(input) }
             inFlightResult = inFlight
