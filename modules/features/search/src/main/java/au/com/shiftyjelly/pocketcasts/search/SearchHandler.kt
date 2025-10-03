@@ -32,6 +32,7 @@ import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.rx2.asFlow
+import kotlinx.coroutines.rx2.asObservable
 import timber.log.Timber
 
 class SearchHandler @Inject constructor(
@@ -104,9 +105,9 @@ class SearchHandler @Inject constructor(
         }
 
     private val subscribedPodcastUuids = podcastManager
-        .findSubscribedRxSingle()
+        .findSubscribedFlow()
+        .asObservable()
         .subscribeOn(Schedulers.io())
-        .toObservable()
         .map { podcasts -> podcasts.map(Podcast::uuid).toHashSet() }
 
     @OptIn(ExperimentalCoroutinesApi::class)
