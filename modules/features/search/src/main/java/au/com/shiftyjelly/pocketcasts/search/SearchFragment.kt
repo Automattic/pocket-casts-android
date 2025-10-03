@@ -259,6 +259,12 @@ class SearchFragment : BaseFragment() {
         binding.searchHistoryPanel.apply {
             ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed
             setContent {
+
+                val state = viewModel.state.collectAsState()
+                if (state.value is SearchUiState.Suggestions && state.value.searchTerm.isNullOrBlank()) {
+                    searchHistoryViewModel.start()
+                }
+
                 AppTheme(theme.activeTheme) {
                     SearchHistoryPage(
                         viewModel = searchHistoryViewModel,

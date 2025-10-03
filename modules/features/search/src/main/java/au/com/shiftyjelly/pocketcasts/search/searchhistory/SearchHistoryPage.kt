@@ -14,7 +14,6 @@ import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
 import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
@@ -31,6 +30,7 @@ import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.Velocity
 import androidx.compose.ui.unit.dp
 import au.com.shiftyjelly.pocketcasts.compose.AppTheme
+import au.com.shiftyjelly.pocketcasts.compose.CallOnce
 import au.com.shiftyjelly.pocketcasts.compose.bars.NavigationButton
 import au.com.shiftyjelly.pocketcasts.compose.components.HorizontalDivider
 import au.com.shiftyjelly.pocketcasts.compose.components.PodcastImageDeprecated
@@ -58,6 +58,10 @@ internal fun SearchHistoryPage(
     onShowClearAllConfirmation: () -> Unit,
     onScroll: () -> Unit,
 ) {
+    CallOnce {
+        viewModel.start()
+    }
+
     val state by viewModel.state.collectAsState()
     SearchHistoryView(
         state = state,
@@ -72,9 +76,6 @@ internal fun SearchHistoryPage(
         onRowClick = onClick,
         onScroll = onScroll,
     )
-    LaunchedEffect(Unit) {
-        viewModel.start()
-    }
 }
 
 @Composable
