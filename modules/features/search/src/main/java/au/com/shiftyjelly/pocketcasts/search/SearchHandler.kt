@@ -140,6 +140,9 @@ class SearchHandler @Inject constructor(
                             ) as SearchUiState.SearchOperation<List<SearchAutoCompleteItem>>,
                         )
                     }
+                    .onStart {
+                        emit(SearchUiState.SearchOperation.Loading(query) as SearchUiState.SearchOperation<List<SearchAutoCompleteItem>>)
+                    }
             }
         }
 

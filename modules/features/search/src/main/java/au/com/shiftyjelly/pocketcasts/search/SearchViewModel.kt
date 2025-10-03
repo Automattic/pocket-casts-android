@@ -40,9 +40,18 @@ class SearchViewModel @Inject constructor(
 
     init {
         viewModelScope.launch {
-            searchHandler.searchSuggestions.collect {
-                if (_state.value is SearchUiState.Idle || _state.value is SearchUiState.Suggestions) {
-                    _state.value = SearchUiState.Suggestions(operation = it)
+            searchHandler.searchSuggestions
+                .collect { operation ->
+                _state.update {
+                    if (it is SearchUiState.Idle || it is SearchUiState.Suggestions) {
+                        if (((it as? SearchUiState.Suggestions)?.operation as? SearchUiState.SearchOperation.Results)?.results?.isNotEmpty() == true && operation is SearchUiState.SearchOperation.Loading) {
+                            it
+                        } else {
+                            SearchUiState.Suggestions(operation = operation)
+                        }
+                    } else {
+                        it
+                    }
                 }
             }
         }
@@ -96,6 +105,7 @@ class SearchViewModel @Inject constructor(
     }
 
     fun onSubscribeToPodcast(uuid: String) {
+        Log.i("===", "onSubscribeTo $uuid")
         podcastManager.subscribeToPodcast(podcastUuid = uuid, sync = true)
         analyticsTracker.track(
             AnalyticsEvent.PODCAST_SUBSCRIBED,

@@ -1,8 +1,10 @@
 package au.com.shiftyjelly.pocketcasts.search
 
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
@@ -12,6 +14,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.Icon
 import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
@@ -50,6 +53,7 @@ import au.com.shiftyjelly.pocketcasts.images.R as IR
 @Composable
 fun SearchAutoCompleteResultsPage(
     searchTerm: String,
+    isLoading: Boolean,
     results: List<SearchAutoCompleteItem>,
     onTermClick: (SearchAutoCompleteItem.Term) -> Unit,
     onPodcastClick: (SearchAutoCompleteItem.Podcast) -> Unit,
@@ -69,43 +73,54 @@ fun SearchAutoCompleteResultsPage(
         }
     }
 
-    LazyColumn(
-        modifier = modifier.nestedScroll(nestedScrollConnection),
-        contentPadding = PaddingValues(bottom = bottomInset),
+    Box(
+        modifier = modifier,
     ) {
-        results.forEachIndexed { index, item ->
-            item(key = item.hashCode(), contentType = "content-${item.javaClass}") {
-                when (item) {
-                    is SearchAutoCompleteItem.Term -> SearchTermRow(
-                        searchTerm = searchTerm,
-                        item = item,
-                        onClick = { onTermClick(item) },
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .height(40.dp),
-                    )
+        AnimatedVisibility(
+            visible = isLoading, modifier = Modifier
+                .padding(vertical = 32.dp)
+                .align(Alignment.Center)
+        ) {
+            CircularProgressIndicator()
+        }
+        LazyColumn(
+            modifier = Modifier.nestedScroll(nestedScrollConnection),
+            contentPadding = PaddingValues(bottom = bottomInset),
+        ) {
+            results.forEachIndexed { index, item ->
+                item(key = item.hashCode(), contentType = "content-${item.javaClass}") {
+                    when (item) {
+                        is SearchAutoCompleteItem.Term -> SearchTermRow(
+                            searchTerm = searchTerm,
+                            item = item,
+                            onClick = { onTermClick(item) },
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .height(40.dp),
+                        )
 
-                    is SearchAutoCompleteItem.Podcast -> PodcastRow(
-                        item = item,
-                        onClick = { onPodcastClick(item) },
-                        onFollow = { onPodcastFollow(item) },
-                        modifier = Modifier.fillMaxWidth(),
-                    )
+                        is SearchAutoCompleteItem.Podcast -> PodcastRow(
+                            item = item,
+                            onClick = { onPodcastClick(item) },
+                            onFollow = { onPodcastFollow(item) },
+                            modifier = Modifier.fillMaxWidth(),
+                        )
 
-                    is SearchAutoCompleteItem.Episode -> EpisodeRow(
-                        item = Any(),
-                        onClick = { onEpisodeClick(item) },
-                        onPlay = { onEpisodePlay(item) },
-                        modifier = Modifier.fillMaxWidth(),
-                    )
+                        is SearchAutoCompleteItem.Episode -> EpisodeRow(
+                            item = Any(),
+                            onClick = { onEpisodeClick(item) },
+                            onPlay = { onEpisodePlay(item) },
+                            modifier = Modifier.fillMaxWidth(),
+                        )
+                    }
                 }
-            }
-            if (results.indices.last != index) {
-                item(key = "divider-$index", contentType = "divider") {
-                    HorizontalDivider(
-                        thickness = 0.5.dp,
-                        color = MaterialTheme.theme.colors.secondaryText02,
-                    )
+                if (results.indices.last != index) {
+                    item(key = "divider-$index", contentType = "divider") {
+                        HorizontalDivider(
+                            thickness = 0.5.dp,
+                            color = MaterialTheme.theme.colors.secondaryText02,
+                        )
+                    }
                 }
             }
         }
@@ -249,6 +264,7 @@ private fun PreviewSearchAutoCompleteResultsPage(
 ) {
     AppThemeWithBackground(themeType) {
         SearchAutoCompleteResultsPage(
+            isLoading = false,
             searchTerm = "matching",
             results = listOf(
                 SearchAutoCompleteItem.Term("matching text"),

@@ -276,6 +276,7 @@ class SearchFragment : BaseFragment() {
                             onEpisodePlay = {},
                             onScroll = { UiUtil.hideKeyboard(searchView) },
                             bottomInset = bottomInset.pxToDp(LocalContext.current).dp,
+                            isLoading = suggestions.operation is SearchUiState.SearchOperation.Loading
                         )
                     }
                 }
