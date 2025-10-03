@@ -28,7 +28,7 @@ class SyncedActionTest {
         advanceUntilIdle()
 
         assertEquals(List(10) { 0 }, results.awaitAll())
-        assertEquals(counter, 1)
+        assertEquals(1, counter)
     }
 
     @Test
