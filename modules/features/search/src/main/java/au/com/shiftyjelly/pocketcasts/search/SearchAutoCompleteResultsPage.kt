@@ -173,7 +173,13 @@ private fun PodcastRow(
                 color = MaterialTheme.theme.colors.primaryText02,
             )
         }
-        if (!item.isSubscribed) {
+        if (item.isSubscribed) {
+            Icon(
+                painter = painterResource(IR.drawable.ic_check),
+                contentDescription = null,
+                tint = MaterialTheme.theme.colors.support02,
+            )
+        } else {
             Icon(
                 painter = painterResource(IR.drawable.ic_add_black_24dp),
                 contentDescription = null,
