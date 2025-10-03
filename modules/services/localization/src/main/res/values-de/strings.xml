@@ -589,6 +589,7 @@ Language: de
     <string name="player_sleep_in_one_chapter">Schlummerfunktion wird nach 1 Kapitel aktiviert</string>
     <string name="player_sleep_timer_in_chapter_plural">Nach %d Kapiteln</string>
     <string name="player_sleep_timer_in_chapter">Nach 1 Kapitel</string>
+    <string name="player_sleep_timer_end_of_episode">Ende der Folge</string>
     <string name="player_sleep_timer_in_episode_plural">Nach %d Folgen</string>
     <string name="player_sleep_timer_in_episode">Nach 1 Folge</string>
     <string name="settings_use_episode_artwork_customization_description">Wähle aus, ob in diesen App-Bereichen das Cover der Folge angezeigt werden soll</string>
@@ -1948,7 +1949,6 @@ Language: de
     <string name="player_time_saved_no_hour">Glückwunsch! Du sparst Zeit und schaffst mehr Podcasts.</string>
     <string name="player_time_saved_detail">Insgesamt hast du mit dieser Funktion %s gespart.</string>
     <string name="player_sleep_timer">Schlummerfunktion</string>
-    <string name="player_sleep_end_of_episode">Ende der Folge</string>
     <string name="player_sleep_cancel_timer">Schlummerfunktion beenden</string>
     <string name="player_sleep_add_5_minutes">+ 5 Minuten</string>
     <string name="player_sleep_60_minutes">60 Minuten</string>

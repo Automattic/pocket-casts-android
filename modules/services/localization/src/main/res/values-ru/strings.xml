@@ -589,6 +589,7 @@ Language: ru
     <string name="player_sleep_timer_in_chapter_plural">Через %d гл.</string>
     <string name="player_sleep_in_one_chapter">Переход в спящий режим через 1 главу</string>
     <string name="player_sleep_timer_in_chapter">Через 1 главу</string>
+    <string name="player_sleep_timer_end_of_episode">Конец выпуска</string>
     <string name="player_sleep_timer_in_episode_plural">Через %d вып.</string>
     <string name="player_sleep_timer_in_episode">Через 1 выпуск</string>
     <string name="settings_use_episode_artwork_customization_description">Выберите, если хотите, чтобы в этом разделе приложения отображалось оформление выпуска</string>
@@ -1991,7 +1992,6 @@ Language: ru
     <string name="player_time_saved_no_hour">Поздравляем! Вы экономите время и успеваете прослушать больше подкастов.</string>
     <string name="player_time_saved_detail">С помощью этой функции вы сэкономили в целом %s.</string>
     <string name="player_sleep_timer">Таймер сна</string>
-    <string name="player_sleep_end_of_episode">Конец выпуска</string>
     <string name="player_sleep_cancel_timer">Отменить таймер</string>
     <string name="player_sleep_add_5_minutes">+ 5 минут</string>
     <string name="player_sleep_60_minutes">1 час</string>

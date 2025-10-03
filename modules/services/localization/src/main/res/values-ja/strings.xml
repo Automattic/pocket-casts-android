@@ -589,6 +589,7 @@ Language: ja_JP
     <string name="player_sleep_in_one_chapter">1個のチャプターでスリープ中</string>
     <string name="player_sleep_timer_in_chapter_plural">%d個のチャプター</string>
     <string name="player_sleep_timer_in_chapter">1個のチャプター</string>
+    <string name="player_sleep_timer_end_of_episode">エピソード終了時</string>
     <string name="player_sleep_timer_in_episode_plural">%d件のエピソード</string>
     <string name="player_sleep_timer_in_episode">1件のエピソード</string>
     <string name="settings_use_episode_artwork_customization_description">アプリのこれらのセクションでエピソードのアートワークを表示する場合に選択します</string>
@@ -1995,7 +1996,6 @@ Language: ja_JP
     <string name="player_time_saved_no_hour">おめでとうございます ! 時間を節約してより多くのポッドキャストを聴いています。</string>
     <string name="player_time_saved_detail">この機能を使用して合計%s 節約しました。</string>
     <string name="player_sleep_timer">スリープタイマー</string>
-    <string name="player_sleep_end_of_episode">エピソード終了時</string>
     <string name="player_sleep_cancel_timer">タイマーをキャンセル</string>
     <string name="player_sleep_add_5_minutes">+ 5分</string>
     <string name="player_sleep_60_minutes">60分</string>

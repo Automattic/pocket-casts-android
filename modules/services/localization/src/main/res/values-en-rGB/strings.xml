@@ -1306,7 +1306,6 @@ Language: en_GB
     <string name="player_tab_playing">Playing</string>
     <string name="player_sleep_timer">Sleep timer</string>
     <string name="player_sleep_timer_title">Sleep Timer</string>
-    <string name="player_sleep_end_of_episode">End of episode</string>
     <string name="player_sleep_cancel_timer">Cancel timer</string>
     <string name="player_sleep_add_5_minutes">+ 5 minutes</string>
     <string name="player_sleep_60_minutes">60 minutes</string>
@@ -1468,4 +1467,5 @@ Language: en_GB
     <string name="archive">Archive</string>
     <string name="add_to_up_next">Add to Up Next</string>
     <string name="in_progress">In progress</string>
+    <string name="player_sleep_timer_end_of_episode">End of episode</string>
 </resources>
