@@ -106,7 +106,7 @@ sealed class SearchHistoryEntry(
         fun fromAutoCompletePodcast(podcast: SearchAutoCompleteItem.Podcast) = Podcast(
             uuid = podcast.uuid,
             title = podcast.title,
-            author = podcast.author
+            author = podcast.author,
         )
 
         fun fromSearchHistoryItem(item: SearchHistoryItem) = when {

@@ -133,13 +133,13 @@ class SearchHandler @Inject constructor(
                         results = it,
                     )
                 }.catch {
-                        emit(
-                            SearchUiState.SearchOperation.Error(
-                                searchTerm = query,
-                                error = it,
-                            ) as SearchUiState.SearchOperation<List<SearchAutoCompleteItem>>,
-                        )
-                    }
+                    emit(
+                        SearchUiState.SearchOperation.Error(
+                            searchTerm = query,
+                            error = it,
+                        ) as SearchUiState.SearchOperation<List<SearchAutoCompleteItem>>,
+                    )
+                }
                     .onStart {
                         emit(SearchUiState.SearchOperation.Loading(query) as SearchUiState.SearchOperation<List<SearchAutoCompleteItem>>)
                     }
@@ -279,7 +279,7 @@ class SearchHandler @Inject constructor(
 
     private sealed interface Query {
         val term: String
-        data class Suggestions(override val term: String): Query
+        data class Suggestions(override val term: String) : Query
         data class SearchResults(override val term: String, val immediate: Boolean = false) : Query
     }
 

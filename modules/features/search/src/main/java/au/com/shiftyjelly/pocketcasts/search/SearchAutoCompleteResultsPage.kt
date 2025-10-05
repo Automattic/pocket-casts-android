@@ -77,9 +77,10 @@ fun SearchAutoCompleteResultsPage(
         modifier = modifier,
     ) {
         AnimatedVisibility(
-            visible = isLoading, modifier = Modifier
+            visible = isLoading,
+            modifier = Modifier
                 .padding(vertical = 32.dp)
-                .align(Alignment.Center)
+                .align(Alignment.Center),
         ) {
             CircularProgressIndicator()
         }

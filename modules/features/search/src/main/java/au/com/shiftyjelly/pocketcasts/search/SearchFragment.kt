@@ -259,7 +259,6 @@ class SearchFragment : BaseFragment() {
         binding.searchHistoryPanel.apply {
             ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed
             setContent {
-
                 val state = viewModel.state.collectAsState()
                 if ((state.value is SearchUiState.Suggestions || !FeatureFlag.isEnabled(Feature.IMPROVED_SEARCH_SUGGESTIONS)) && state.value.searchTerm.isNullOrBlank()) {
                     searchHistoryViewModel.start()
@@ -304,7 +303,7 @@ class SearchFragment : BaseFragment() {
                             onEpisodePlay = {},
                             onScroll = { UiUtil.hideKeyboard(searchView) },
                             bottomInset = bottomInset.pxToDp(LocalContext.current).dp,
-                            isLoading = suggestions.operation is SearchUiState.SearchOperation.Loading
+                            isLoading = suggestions.operation is SearchUiState.SearchOperation.Loading,
                         )
                     }
                 }
