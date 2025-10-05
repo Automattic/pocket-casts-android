@@ -9,6 +9,8 @@
         ([#4560](https://github.com/Automattic/pocket-casts-android/pull/4560))
     *   Fix transcript button incorrectly disabled
         ([#4555](https://github.com/Automattic/pocket-casts-android/pull/4555))
+    *   Fix archived episodes not being downloaded when added to queue
+        ([#4555](https://github.com/Automattic/pocket-casts-android/pull/4555))
 
 7.99
 -----
