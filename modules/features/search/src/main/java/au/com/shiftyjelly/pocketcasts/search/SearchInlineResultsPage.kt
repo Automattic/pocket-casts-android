@@ -64,7 +64,6 @@ private const val MAX_ITEM_COUNT = 20
 fun SearchInlineResultsPage(
     state: SearchUiState.Results,
     loading: Boolean,
-    onlySearchRemote: Boolean, // oh god wtf was this flag for?!
     bottomInset: Dp,
     onEpisodeClick: (EpisodeItem) -> Unit,
     onPodcastClick: (Podcast) -> Unit,

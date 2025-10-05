@@ -42,6 +42,8 @@ import au.com.shiftyjelly.pocketcasts.search.searchhistory.SearchHistoryPage
 import au.com.shiftyjelly.pocketcasts.search.searchhistory.SearchHistoryViewModel
 import au.com.shiftyjelly.pocketcasts.ui.extensions.getThemeColor
 import au.com.shiftyjelly.pocketcasts.utils.extensions.pxToDp
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import au.com.shiftyjelly.pocketcasts.views.extensions.hide
 import au.com.shiftyjelly.pocketcasts.views.extensions.show
 import au.com.shiftyjelly.pocketcasts.views.extensions.showKeyboard
@@ -259,7 +261,7 @@ class SearchFragment : BaseFragment() {
             setContent {
 
                 val state = viewModel.state.collectAsState()
-                if (state.value is SearchUiState.Suggestions && state.value.searchTerm.isNullOrBlank()) {
+                if ((state.value is SearchUiState.Suggestions || !FeatureFlag.isEnabled(Feature.IMPROVED_SEARCH_SUGGESTIONS)) && state.value.searchTerm.isNullOrBlank()) {
                     searchHistoryViewModel.start()
                 }
 
@@ -326,12 +328,11 @@ class SearchFragment : BaseFragment() {
                             onShowAllCLick = ::onShowAllClick,
                             onFollowPodcast = ::onSubscribeToPodcast,
                             onScroll = { UiUtil.hideKeyboard(searchView) },
-                            onlySearchRemote = onlySearchRemote,
                             bottomInset = bottomInset.pxToDp(LocalContext.current).dp,
                         )
                     }
                 }
-                binding.searchInlineResults.isVisible = state is SearchUiState.Results
+                binding.searchInlineResults.isVisible = state is SearchUiState.Results && !state.searchTerm.isNullOrBlank()
             }
         }
     }

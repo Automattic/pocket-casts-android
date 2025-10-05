@@ -1,6 +1,5 @@
 package au.com.shiftyjelly.pocketcasts.search
 
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
@@ -14,6 +13,8 @@ import au.com.shiftyjelly.pocketcasts.models.to.SearchHistoryEntry
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
 import au.com.shiftyjelly.pocketcasts.repositories.searchhistory.SearchHistoryManager
 import au.com.shiftyjelly.pocketcasts.search.SearchResultsFragment.Companion.ResultsType
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -39,29 +40,35 @@ class SearchViewModel @Inject constructor(
     val state: StateFlow<SearchUiState> = _state
 
     init {
-        viewModelScope.launch {
-            searchHandler.searchSuggestions
-                .collect { operation ->
-                    _state.update {
-                        if (it is SearchUiState.Idle || it is SearchUiState.Suggestions) {
-                            // only show loading for the initial query when autocomplete results are empty
-                            if (((it as? SearchUiState.Suggestions)?.operation as? SearchUiState.SearchOperation.Success)?.results?.isNotEmpty() == true && operation is SearchUiState.SearchOperation.Loading) {
-                                it
+        if (FeatureFlag.isEnabled(Feature.IMPROVED_SEARCH_SUGGESTIONS)) {
+            viewModelScope.launch {
+                searchHandler.searchSuggestions
+                    .collect { operation ->
+                        _state.update {
+                            if (it is SearchUiState.Idle || it is SearchUiState.Suggestions) {
+                                // only show loading for the initial query when autocomplete results are empty
+                                if (((it as? SearchUiState.Suggestions)?.operation as? SearchUiState.SearchOperation.Success)?.results?.isNotEmpty() == true && operation is SearchUiState.SearchOperation.Loading) {
+                                    it
+                                } else {
+                                    SearchUiState.Suggestions(operation = operation)
+                                }
                             } else {
-                                SearchUiState.Suggestions(operation = operation)
+                                it
                             }
-                        } else {
-                            it
                         }
                     }
-                }
+            }
         }
 
         viewModelScope.launch {
             searchHandler.searchResults.collect {
-                Log.w("===", "results $it")
-                if (_state.value is SearchUiState.Results) {
+                if (_state.value is SearchUiState.Results || !FeatureFlag.isEnabled(Feature.IMPROVED_SEARCH_SUGGESTIONS)) {
                     _state.value = SearchUiState.Results(operation = it as SearchUiState.SearchOperation<SearchResults>)
+                }
+
+                if (!FeatureFlag.isEnabled(Feature.IMPROVED_SEARCH_SUGGESTIONS) && it is SearchUiState.SearchOperation.Loading) {
+                    saveSearchTerm(it.searchTerm)
+                    showSearchHistory = false
                 }
             }
         }
@@ -71,9 +78,13 @@ class SearchViewModel @Inject constructor(
         // Prevent updating the search query when navigating back to the search results after tapping on a result.
         if (query == _state.value.searchTerm) return
 
-        searchHandler.updateAutCompleteQuery(query)
-        _state.update {
-            (it as? SearchUiState.Suggestions)?.copy(operation = SearchUiState.SearchOperation.Success(searchTerm = query, (it.operation as? SearchUiState.SearchOperation.Success)?.results ?: emptyList())) ?: SearchUiState.Suggestions(operation = SearchUiState.SearchOperation.Success(searchTerm = query, results = emptyList()))
+        if (FeatureFlag.isEnabled(Feature.IMPROVED_SEARCH_SUGGESTIONS) && source == SourceView.DISCOVER) {
+            searchHandler.updateAutCompleteQuery(query)
+            _state.update {
+                (it as? SearchUiState.Suggestions)?.copy(operation = SearchUiState.SearchOperation.Success(searchTerm = query, (it.operation as? SearchUiState.SearchOperation.Success)?.results ?: emptyList())) ?: SearchUiState.Suggestions(operation = SearchUiState.SearchOperation.Success(searchTerm = query, results = emptyList()))
+            }
+        } else {
+            searchHandler.updateSearchQuery(query, immediate)
         }
     }
 
