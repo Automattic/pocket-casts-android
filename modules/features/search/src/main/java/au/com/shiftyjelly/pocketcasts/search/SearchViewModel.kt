@@ -42,19 +42,19 @@ class SearchViewModel @Inject constructor(
         viewModelScope.launch {
             searchHandler.searchSuggestions
                 .collect { operation ->
-                _state.update {
-                    if (it is SearchUiState.Idle || it is SearchUiState.Suggestions) {
-                        // only show loading for the initial query when autocomplete results are empty
-                        if (((it as? SearchUiState.Suggestions)?.operation as? SearchUiState.SearchOperation.Success)?.results?.isNotEmpty() == true && operation is SearchUiState.SearchOperation.Loading) {
-                            it
+                    _state.update {
+                        if (it is SearchUiState.Idle || it is SearchUiState.Suggestions) {
+                            // only show loading for the initial query when autocomplete results are empty
+                            if (((it as? SearchUiState.Suggestions)?.operation as? SearchUiState.SearchOperation.Success)?.results?.isNotEmpty() == true && operation is SearchUiState.SearchOperation.Loading) {
+                                it
+                            } else {
+                                SearchUiState.Suggestions(operation = operation)
+                            }
                         } else {
-                            SearchUiState.Suggestions(operation = operation)
+                            it
                         }
-                    } else {
-                        it
                     }
                 }
-            }
         }
 
         viewModelScope.launch {
@@ -69,19 +69,11 @@ class SearchViewModel @Inject constructor(
 
     fun updateSearchQuery(query: String, immediate: Boolean = false) {
         // Prevent updating the search query when navigating back to the search results after tapping on a result.
-        if (_state.value.searchTerm == query) return
-        if (query.isEmpty()) {
-            searchHandler.updateAutCompleteQuery(query)
-            _state.update {
-                SearchUiState.Suggestions(operation = SearchUiState.SearchOperation.Success(searchTerm = query, results = emptyList()))
-            }
-        }
+        if (query == _state.value.searchTerm) return
 
-        when (_state.value) {
-            is SearchUiState.Idle,
-            is SearchUiState.Suggestions -> searchHandler.updateAutCompleteQuery(query)
-
-            is SearchUiState.Results -> searchHandler.updateSearchQuery(query, immediate)
+        searchHandler.updateAutCompleteQuery(query)
+        _state.update {
+            (it as? SearchUiState.Suggestions)?.copy(operation = SearchUiState.SearchOperation.Success(searchTerm = query, (it.operation as? SearchUiState.SearchOperation.Success)?.results ?: emptyList())) ?: SearchUiState.Suggestions(operation = SearchUiState.SearchOperation.Success(searchTerm = query, results = emptyList()))
         }
     }
 
