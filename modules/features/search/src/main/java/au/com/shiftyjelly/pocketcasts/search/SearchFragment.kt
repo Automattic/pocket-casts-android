@@ -165,6 +165,7 @@ class SearchFragment : BaseFragment() {
             is SearchHistoryEntry.Podcast -> listener?.onSearchPodcastClick(entry.uuid, SourceView.SEARCH)
             is SearchHistoryEntry.SearchTerm -> {
                 binding?.let {
+                    viewModel.selectSuggestion(entry.term)
                     it.searchView.setQuery(entry.term, true)
                     it.searchHistoryPanel.hide()
                     UiUtil.hideKeyboard(it.searchView)
