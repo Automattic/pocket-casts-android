@@ -1,6 +1,5 @@
 package au.com.shiftyjelly.pocketcasts.search
 
-import android.util.Log
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
@@ -61,7 +60,6 @@ class SearchHandler @Inject constructor(
 
     private val localPodcastsResults = Observable
         .combineLatest(searchQuery.filter { it is Query.SearchResults }, onlySearchRemoteObservable, signInStateObservable) { searchQuery, onlySearchRemoteObservable, signInState ->
-            Log.i("===", "localPodcastResults term=$searchQuery, onlyRemote=$onlySearchRemoteObservable, signInState=$signInState")
             Pair(if (onlySearchRemoteObservable) "" else searchQuery.term, signInState)
         }
         .subscribeOn(Schedulers.io())
@@ -90,9 +88,6 @@ class SearchHandler @Inject constructor(
                 // search podcasts
                 val podcastSearch = podcastManager.findSubscribedRxSingle()
                     .subscribeOn(Schedulers.io())
-                    .doOnSuccess {
-                        Log.w("===", "localPodcasts that are subscribed = ${it.joinToString { "${it.uuid}" }}")
-                    }
                     .flatMapObservable { Observable.fromIterable(it) }
                     .filter { it.title.contains(query, ignoreCase = true) || it.author.contains(query, ignoreCase = true) }
                     .map { podcast ->
@@ -114,7 +109,6 @@ class SearchHandler @Inject constructor(
         .asObservable()
         .subscribeOn(Schedulers.io())
         .map { podcasts -> podcasts.map(Podcast::uuid).toHashSet() }
-        .doOnNext { Log.w("===", "subscribedPodcastUuids ${it.joinToString()}") }
 
     @OptIn(ExperimentalCoroutinesApi::class)
     @Suppress("UNCHECKED_CAST")
@@ -176,7 +170,6 @@ class SearchHandler @Inject constructor(
     }
 
     private val serverSearchResults = searchQuery
-        .doOnNext { Log.wtf("===", "QQQuery= $it") }
         .filter { it is Query.SearchResults }
         .subscribeOn(Schedulers.io())
         .map { (it as Query.SearchResults).copy(term = it.term.trim()) }
@@ -191,7 +184,6 @@ class SearchHandler @Inject constructor(
         }
         .map { it.term }
         .switchMap {
-            Log.w("===", "serverSearchRes term=$it")
             if (it.length <= 1) {
                 Observable.just(GlobalServerSearch())
             } else {
@@ -230,7 +222,6 @@ class SearchHandler @Inject constructor(
         }
 
     private val searchFlowable = Observables.combineLatest(searchQuery.filter { it is Query.SearchResults }, subscribedPodcastUuids, localPodcastsResults, serverSearchResults, loadingObservable) { searchTerm, subscribedPodcastUuids, localPodcastsResult, serverSearchResults, loading ->
-        Log.w("===", "searchFlowable loading=$loading, serverSearchResults=$serverSearchResults, localSearchRes=$localPodcastsResult, subscribed=$subscribedPodcastUuids")
         if (loading) {
             SearchUiState.SearchOperation.Loading(searchTerm.term)
         } else if (serverSearchResults.error != null) {
