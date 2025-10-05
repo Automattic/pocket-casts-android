@@ -49,10 +49,8 @@ import au.com.shiftyjelly.pocketcasts.views.fragments.BaseFragment
 import au.com.shiftyjelly.pocketcasts.views.helper.UiUtil
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
-import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.drop
 import kotlinx.coroutines.flow.filter
-import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.mapNotNull
 import kotlinx.coroutines.flow.scan
 import kotlinx.coroutines.launch
@@ -205,7 +203,7 @@ class SearchFragment : BaseFragment() {
         searchView.imeOptions = searchView.imeOptions or EditorInfo.IME_ACTION_SEARCH or EditorInfo.IME_FLAG_NO_EXTRACT_UI or EditorInfo.IME_FLAG_NO_FULLSCREEN
         searchView.setIconifiedByDefault(false)
         // seems like a more reliable focus using a post
-        if (viewModel.state.value.searchTerm?.isEmpty() == true) {
+        if (viewModel.state.value.searchTerm.isNullOrBlank()) {
             searchView.post {
                 searchView.showKeyboard()
             }
@@ -242,7 +240,6 @@ class SearchFragment : BaseFragment() {
                 val characterCount = query.length
                 val lowerCaseSearch = query.lowercase()
                 if ((characterCount == 1 && lowerCaseSearch.startsWith("h")) || (characterCount == 2 && lowerCaseSearch.startsWith("ht")) || (characterCount == 3 && lowerCaseSearch.startsWith("htt")) || lowerCaseSearch.startsWith("http")) {
-                    // TODO check the same for suggestions
                     if (((viewModel.state.value as? SearchUiState.Results)?.operation as? SearchUiState.SearchOperation.Success)?.results?.podcasts?.isNotEmpty() == true) {
                         binding.searchHistoryPanel.hide()
                     }
