@@ -243,7 +243,7 @@ class SwipeRowLayout<T : SwipeButton.UiState> @JvmOverloads constructor(
                 primaryButton.callOnSwipeActionListeners()
                 swipedAction?.cancel()
                 swipedAction = runDelayedAction(
-                    350.milliseconds,
+                    100.milliseconds,
                     action = {
                         primaryButton.elevation = 1f
                         swipeableView.translationX = 0f
