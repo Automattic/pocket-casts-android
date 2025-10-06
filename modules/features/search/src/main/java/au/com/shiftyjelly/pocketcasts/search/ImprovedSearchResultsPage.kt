@@ -7,7 +7,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.MaterialTheme
@@ -23,10 +22,12 @@ import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.Velocity
 import androidx.compose.ui.unit.dp
+import au.com.shiftyjelly.pocketcasts.compose.components.HorizontalDivider
 import au.com.shiftyjelly.pocketcasts.compose.theme
 import au.com.shiftyjelly.pocketcasts.models.entity.Folder
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.to.EpisodeItem
+import au.com.shiftyjelly.pocketcasts.models.to.FolderItem
 import au.com.shiftyjelly.pocketcasts.search.component.ImprovedSearchEpisodeResultRow
 import au.com.shiftyjelly.pocketcasts.search.component.ImprovedSearchPodcastResultRow
 import au.com.shiftyjelly.pocketcasts.search.component.NoResultsView
@@ -112,7 +113,9 @@ private fun ImprovedSearchResultsView(
 
     LazyColumn(
         state = listState,
-        contentPadding = PaddingValues(bottom = bottomInset),
+        contentPadding = PaddingValues(
+            start = 16.dp, end = 16.dp, top = 16.dp, bottom = bottomInset
+        ),
         modifier = modifier
             .nestedScroll(nestedScrollConnection),
     ) {
@@ -125,19 +128,52 @@ private fun ImprovedSearchResultsView(
             )
         }
 
-        itemsIndexed(state.results.podcasts) { index, item ->
-            ImprovedSearchPodcastResultRow(
-                item = TODO(),
-                onClick = { },
-                onFollow = { },
-            )
+        state.results.podcasts.forEachIndexed { index, item ->
+            item {
+                ImprovedSearchPodcastResultRow(
+                    folderItem = item,
+                    onClick = {
+                        when (item) {
+                            is FolderItem.Folder -> onFolderClick(item.folder, item.podcasts)
+                            is FolderItem.Podcast -> onPodcastClick(item.podcast)
+                        }
+                    },
+                    onFollow = {
+                        if (item is FolderItem.Podcast) {
+                            onFollowPodcast(item.podcast)
+                        } else {
+                            null
+                        }
+                    },
+                )
+            }
+
+            if (index < state.results.podcasts.lastIndex) {
+                item {
+                    HorizontalDivider()
+                }
+            }
         }
-        itemsIndexed(state.results.episodes) { index, item ->
-            ImprovedSearchEpisodeResultRow(
-                item = TODO(),
-                onClick = {},
-                onPlay = {}
-            )
+
+        if (state.results.episodes.isNotEmpty()) {
+            item {
+                HorizontalDivider()
+            }
+        }
+
+       state.results.episodes.forEachIndexed { index, item ->
+           item {
+               ImprovedSearchEpisodeResultRow(
+                   episode = item,
+                   onClick = { onEpisodeClick(item) },
+                   onPlay = { onPlayEpisode(item) }
+               )
+           }
+           if (index < state.results.episodes.lastIndex) {
+               item {
+                   HorizontalDivider()
+               }
+           }
         }
     }
 }

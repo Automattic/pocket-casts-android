@@ -22,6 +22,7 @@ import au.com.shiftyjelly.pocketcasts.compose.components.TextH40
 import au.com.shiftyjelly.pocketcasts.compose.components.TextP50
 import au.com.shiftyjelly.pocketcasts.compose.preview.ThemePreviewParameterProvider
 import au.com.shiftyjelly.pocketcasts.compose.theme
+import au.com.shiftyjelly.pocketcasts.models.to.FolderItem
 import au.com.shiftyjelly.pocketcasts.models.to.SearchAutoCompleteItem
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.images.R as IR
@@ -29,6 +30,56 @@ import au.com.shiftyjelly.pocketcasts.images.R as IR
 @Composable
 fun ImprovedSearchPodcastResultRow(
     item: SearchAutoCompleteItem.Podcast,
+    onClick: () -> Unit,
+    onFollow: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    ImprovedSearchPodcastResultRow(
+        podcastUuid = item.uuid,
+        title = item.title,
+        author = item.author,
+        isSubscribed = item.isSubscribed,
+        onClick = onClick,
+        onFollow = onFollow,
+        modifier = modifier
+    )
+}
+
+@Composable
+fun ImprovedSearchPodcastResultRow(
+    folderItem: FolderItem,
+    onClick: () -> Unit,
+    onFollow: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    when (folderItem) {
+        is FolderItem.Podcast ->
+            ImprovedSearchPodcastResultRow(
+                podcastUuid = folderItem.podcast.uuid,
+                title = folderItem.podcast.title,
+                author = folderItem.podcast.author,
+                isSubscribed = folderItem.podcast.isSubscribed,
+                onClick = onClick,
+                onFollow = onFollow,
+                modifier = modifier
+            )
+
+        is FolderItem.Folder ->
+            SearchFolderRow(
+                folder = folderItem.folder,
+                podcasts = folderItem.podcasts,
+                onClick = onClick,
+                modifier = modifier,
+            )
+    }
+}
+
+@Composable
+private fun ImprovedSearchPodcastResultRow(
+    podcastUuid: String,
+    title: String,
+    author: String,
+    isSubscribed: Boolean,
     onClick: () -> Unit,
     onFollow: () -> Unit,
     modifier: Modifier = Modifier,
@@ -41,21 +92,21 @@ fun ImprovedSearchPodcastResultRow(
         horizontalArrangement = Arrangement.spacedBy(12.dp),
     ) {
         PodcastImage(
-            uuid = item.uuid,
+            uuid = podcastUuid,
             elevation = 6.dp,
             cornerSize = 4.dp,
         )
         Column(modifier = Modifier.weight(1f)) {
             TextH40(
-                text = item.title,
+                text = title,
                 color = MaterialTheme.theme.colors.primaryText01,
             )
             TextP50(
-                text = item.author,
+                text = author,
                 color = MaterialTheme.theme.colors.primaryText02,
             )
         }
-        if (item.isSubscribed) {
+        if (isSubscribed) {
             Icon(
                 modifier = Modifier
                     .minimumInteractiveComponentSize(),
@@ -82,12 +133,10 @@ private fun PreviewPodcastRow(
 ) {
     AppThemeWithBackground(themeType) {
         ImprovedSearchPodcastResultRow(
-            item = SearchAutoCompleteItem.Podcast(
-                uuid = "",
-                title = "Podcast title",
-                author = "Author name",
-                isSubscribed = false
-            ),
+            podcastUuid = "",
+            title = "Podcast title",
+            author = "Author name",
+            isSubscribed = false,
             onClick = {},
             onFollow = {},
         )

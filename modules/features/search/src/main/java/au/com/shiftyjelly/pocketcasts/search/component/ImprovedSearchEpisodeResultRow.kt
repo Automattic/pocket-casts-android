@@ -30,9 +30,10 @@ import au.com.shiftyjelly.pocketcasts.compose.preview.ThemePreviewParameterProvi
 import au.com.shiftyjelly.pocketcasts.compose.theme
 import au.com.shiftyjelly.pocketcasts.localization.helper.RelativeDateFormatter
 import au.com.shiftyjelly.pocketcasts.localization.helper.TimeHelper
-import au.com.shiftyjelly.pocketcasts.models.converter.SafeDate
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
+import au.com.shiftyjelly.pocketcasts.models.to.EpisodeItem
 import au.com.shiftyjelly.pocketcasts.models.to.SearchAutoCompleteItem
+import au.com.shiftyjelly.pocketcasts.repositories.images.PocketCastsImageRequestFactory
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import java.util.Date
 import au.com.shiftyjelly.pocketcasts.images.R as IR
@@ -44,6 +45,45 @@ fun ImprovedSearchEpisodeResultRow(
     onPlay: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
+    ImprovedSearchEpisodeResultRow(
+        episodeUuid = item.uuid,
+        title = item.title,
+        duration = item.duration,
+        publishedAt = item.publishedAt,
+        onClick = onClick,
+        onPlay = onPlay,
+        modifier = modifier
+    )
+}
+
+@Composable
+fun ImprovedSearchEpisodeResultRow(
+    episode: EpisodeItem,
+    onClick: () -> Unit,
+    onPlay: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    ImprovedSearchEpisodeResultRow(
+        episodeUuid = episode.uuid,
+        title = episode.title,
+        duration = episode.duration,
+        publishedAt = episode.publishedAt,
+        onClick = onClick,
+        onPlay = onPlay,
+        modifier = modifier
+    )
+}
+
+@Composable
+private fun ImprovedSearchEpisodeResultRow(
+    episodeUuid: String,
+    title: String,
+    duration: Double,
+    publishedAt: Date,
+    onClick: () -> Unit,
+    onPlay: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
     Row(
         modifier = modifier.clickable(onClick = onClick),
         verticalAlignment = Alignment.CenterVertically,
@@ -51,11 +91,12 @@ fun ImprovedSearchEpisodeResultRow(
     ) {
         EpisodeImage(
             episode = PodcastEpisode(
-                uuid = item.uuid,
-                title = item.title,
-                duration = item.duration,
-                publishedDate = SafeDate(0),
+                uuid = episodeUuid,
+                title = title,
+                duration = duration,
+                publishedDate = publishedAt,
             ),
+            placeholderType = PocketCastsImageRequestFactory.PlaceholderType.Small,
             useEpisodeArtwork = false,
             corners = 4.dp,
             modifier = Modifier.shadow(elevation = 6.dp),
@@ -65,15 +106,15 @@ fun ImprovedSearchEpisodeResultRow(
         ) {
 
             val context = LocalContext.current
-            val formattedDuration = remember(item.duration, context) { TimeHelper.getTimeDurationMediumString((item.duration * 1000).toInt(), context) }
+            val formattedDuration = remember(duration, context) { TimeHelper.getTimeDurationMediumString((duration * 1000).toInt(), context) }
             val dateFormatter = RelativeDateFormatter(context)
-            val formattedPublishDate = remember(item.publishedAt, dateFormatter) { dateFormatter.format(item.publishedAt) }
+            val formattedPublishDate = remember(publishedAt, dateFormatter) { dateFormatter.format(publishedAt) }
 
             TextC70(
                 text = formattedPublishDate,
             )
             TextH40(
-                text = item.title,
+                text = title,
                 color = MaterialTheme.theme.colors.primaryText01,
             )
             TextH60(
@@ -102,13 +143,10 @@ private fun PreviewEpisodeResultRow(
 ) {
     AppThemeWithBackground(themeType) {
         ImprovedSearchEpisodeResultRow(
-            item = SearchAutoCompleteItem.Episode(
-                uuid = "",
-                title = "Episode title",
-                duration = 320.0,
-                podcastUuid = "",
-                publishedAt = Date()
-            ),
+            episodeUuid = "",
+            title = "Episode title",
+            duration = 320.0,
+            publishedAt = Date(),
             onClick = {},
             onPlay = {}
         )
