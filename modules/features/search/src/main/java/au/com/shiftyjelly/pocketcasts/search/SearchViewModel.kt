@@ -114,6 +114,26 @@ class SearchViewModel @Inject constructor(
 
     fun onSubscribeToPodcast(uuid: String) {
         podcastManager.subscribeToPodcast(podcastUuid = uuid, sync = true)
+
+        // Optimistically update subscribe status
+        _state.update {
+            if (it is SearchUiState.Results) {
+                it.copy(
+                    operation = (it.operation as? SearchUiState.SearchOperation.Success)?.copy(
+                        results = it.operation.results.copy(
+                            podcasts = it.operation.results.podcasts.map { folderItem ->
+                                if (folderItem.uuid == uuid) {
+                                    (folderItem as? FolderItem.Podcast)?.copy(podcast = folderItem.podcast.copy(isSubscribed = true)) ?: folderItem
+                                } else folderItem
+                            }
+                        )
+                    ) ?: it.operation
+                )
+            } else {
+                it
+            }
+        }
+
         analyticsTracker.track(
             AnalyticsEvent.PODCAST_SUBSCRIBED,
             AnalyticsProp.podcastSubscribed(uuid = uuid, source = source),
