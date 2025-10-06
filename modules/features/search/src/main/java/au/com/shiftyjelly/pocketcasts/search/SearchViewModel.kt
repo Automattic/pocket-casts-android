@@ -81,7 +81,11 @@ class SearchViewModel @Inject constructor(
         if (FeatureFlag.isEnabled(Feature.IMPROVED_SEARCH_SUGGESTIONS) && source == SourceView.DISCOVER) {
             searchHandler.updateAutCompleteQuery(query)
             _state.update {
-                (it as? SearchUiState.Suggestions)?.copy(operation = SearchUiState.SearchOperation.Success(searchTerm = query, (it.operation as? SearchUiState.SearchOperation.Success)?.results ?: emptyList())) ?: SearchUiState.Suggestions(operation = SearchUiState.SearchOperation.Success(searchTerm = query, results = emptyList()))
+                if (it is SearchUiState.Results && it.searchTerm.orEmpty().length > query.length) {
+                    SearchUiState.Suggestions(operation = SearchUiState.SearchOperation.Success(searchTerm = query, results = emptyList()))
+                } else {
+                    it
+                }
             }
         } else {
             searchHandler.updateSearchQuery(query, immediate)
