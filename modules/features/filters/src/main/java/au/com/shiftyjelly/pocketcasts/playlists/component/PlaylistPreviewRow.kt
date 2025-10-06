@@ -28,6 +28,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.SideEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
@@ -67,6 +69,8 @@ import au.com.shiftyjelly.pocketcasts.repositories.playlist.SmartPlaylistPreview
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import kotlin.math.absoluteValue
 import kotlin.math.roundToInt
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.collectLatest
 import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
@@ -74,6 +78,8 @@ import au.com.shiftyjelly.pocketcasts.localization.R as LR
 @Composable
 internal fun PlaylistPreviewRow(
     playlist: PlaylistPreview,
+    getPreviewMetadataFlow: (String) -> StateFlow<PlaylistPreview.Metadata?>,
+    refreshPreviewMetadata: (String) -> Unit,
     showTooltip: Boolean,
     showDivider: Boolean,
     onClick: () -> Unit,
@@ -82,6 +88,14 @@ internal fun PlaylistPreviewRow(
     modifier: Modifier = Modifier,
     backgroundColor: Color = MaterialTheme.theme.colors.primaryUi01,
 ) {
+    val metadata by remember(playlist.uuid) {
+        getPreviewMetadataFlow(playlist.uuid)
+    }.collectAsState()
+
+    LaunchedEffect(playlist.uuid, refreshPreviewMetadata) {
+        refreshPreviewMetadata(playlist.uuid)
+    }
+
     Box(
         modifier = modifier.height(IntrinsicSize.Min),
     ) {
@@ -107,6 +121,7 @@ internal fun PlaylistPreviewRow(
                 SwipeToDeleteAnchor.Delete at -componentWidth * 2
             }
         }
+
         SideEffect {
             draggableState.updateAnchors(draggableAnchors)
         }
@@ -191,7 +206,7 @@ internal fun PlaylistPreviewRow(
             ) {
                 Box {
                     PlaylistArtwork(
-                        podcastUuids = playlist.artworkPodcastUuids,
+                        podcastUuids = metadata?.artworkPodcastUuids.orEmpty(),
                         artworkSize = 56.dp,
                     )
                     if (showTooltip) {
@@ -227,7 +242,7 @@ internal fun PlaylistPreviewRow(
                     modifier = Modifier.width(16.dp),
                 )
                 TextP50(
-                    text = "${playlist.episodeCount}",
+                    text = metadata?.episodeCount?.toString().orEmpty(),
                     color = MaterialTheme.theme.colors.primaryText02,
                 )
                 Image(
@@ -273,12 +288,12 @@ private fun PlaylistPreviewRowPreview(
                 playlist = SmartPlaylistPreview(
                     uuid = "",
                     title = "New Releases",
-                    episodeCount = 0,
-                    artworkPodcastUuids = emptyList(),
                     settings = Playlist.Settings.ForPreview,
                     smartRules = SmartRules.Default,
                     icon = PlaylistIcon(0),
                 ),
+                getPreviewMetadataFlow = { MutableStateFlow(null) },
+                refreshPreviewMetadata = {},
                 showTooltip = false,
                 showDivider = true,
                 onClick = {},
@@ -290,11 +305,18 @@ private fun PlaylistPreviewRowPreview(
                 playlist = ManualPlaylistPreview(
                     uuid = "",
                     title = "In progress",
-                    episodeCount = 1,
-                    artworkPodcastUuids = List(1) { "podcast-uuid-$it" },
                     settings = Playlist.Settings.ForPreview,
                     icon = PlaylistIcon(0),
                 ),
+                getPreviewMetadataFlow = {
+                    MutableStateFlow(
+                        PlaylistPreview.Metadata(
+                            episodeCount = 1,
+                            artworkPodcastUuids = listOf("podcast-uuid-1"),
+                        ),
+                    )
+                },
+                refreshPreviewMetadata = {},
                 showTooltip = false,
                 showDivider = true,
                 onClick = {},
@@ -306,12 +328,19 @@ private fun PlaylistPreviewRowPreview(
                 playlist = SmartPlaylistPreview(
                     uuid = "",
                     title = "Starred",
-                    episodeCount = 328,
-                    artworkPodcastUuids = List(4) { "podcast-uuid-$it" },
                     settings = Playlist.Settings.ForPreview,
                     smartRules = SmartRules.Default,
                     icon = PlaylistIcon(0),
                 ),
+                getPreviewMetadataFlow = {
+                    MutableStateFlow(
+                        PlaylistPreview.Metadata(
+                            episodeCount = 1,
+                            artworkPodcastUuids = List(4) { "podcast-uuid-$it" },
+                        ),
+                    )
+                },
+                refreshPreviewMetadata = {},
                 showTooltip = false,
                 showDivider = false,
                 onClick = {},
