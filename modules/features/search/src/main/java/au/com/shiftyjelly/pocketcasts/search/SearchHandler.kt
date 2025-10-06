@@ -111,7 +111,6 @@ class SearchHandler @Inject constructor(
         .map { podcasts -> podcasts.map(Podcast::uuid).toHashSet() }
 
     @OptIn(ExperimentalCoroutinesApi::class)
-    @Suppress("UNCHECKED_CAST")
     private val autoCompleteResults = searchQuery.filter { it is Query.Suggestions }.asFlow()
         .map { it.term.trim() }
         .flatMapLatest { query ->
@@ -137,11 +136,11 @@ class SearchHandler @Inject constructor(
                         SearchUiState.SearchOperation.Error(
                             searchTerm = query,
                             error = it,
-                        ) as SearchUiState.SearchOperation<List<SearchAutoCompleteItem>>,
+                        ),
                     )
                 }
                     .onStart {
-                        emit(SearchUiState.SearchOperation.Loading(query) as SearchUiState.SearchOperation<List<SearchAutoCompleteItem>>)
+                        emit(SearchUiState.SearchOperation.Loading(query))
                     }
             }
         }

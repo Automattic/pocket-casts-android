@@ -108,7 +108,7 @@ fun SearchAutoCompleteResultsPage(
                         )
 
                         is SearchAutoCompleteItem.Episode -> EpisodeRow(
-                            item = Any(),
+                            item = item,
                             onClick = { onEpisodeClick(item) },
                             onPlay = { onEpisodePlay(item) },
                             modifier = Modifier.fillMaxWidth(),

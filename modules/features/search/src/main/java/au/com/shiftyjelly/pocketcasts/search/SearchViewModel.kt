@@ -140,12 +140,11 @@ class SearchViewModel @Inject constructor(
         )
     }
 
-    @Suppress("UNCHECKED_CAST")
     fun selectSuggestion(suggestion: String) {
         saveSearchTerm(suggestion)
         searchHandler.updateSearchQuery(suggestion, true)
 
-        _state.value = SearchUiState.Results(operation = SearchUiState.SearchOperation.Loading(suggestion) as SearchUiState.SearchOperation<SearchResults>)
+        _state.value = SearchUiState.Results(operation = SearchUiState.SearchOperation.Loading(suggestion))
     }
 
     fun onFragmentPause(isChangingConfigurations: Boolean?) {
@@ -226,7 +225,7 @@ sealed interface SearchUiState {
             else -> false
         }
 
-    sealed interface SearchOperation<T> {
+    sealed interface SearchOperation<out T> {
         val searchTerm: String
 
         data class Loading(override val searchTerm: String) : SearchOperation<Nothing>
