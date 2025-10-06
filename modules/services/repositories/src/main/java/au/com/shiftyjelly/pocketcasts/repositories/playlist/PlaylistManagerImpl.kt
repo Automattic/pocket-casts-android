@@ -113,6 +113,7 @@ class PlaylistManagerImpl(
                         playlistFlow.first()
                             ?.episodes
                             ?.toPodcastEpisodes()
+                            ?.filterNot { it.isExemptFromAutoDownload }
                             ?.take(playlist.autodownloadLimit)
                             .orEmpty()
                     }
