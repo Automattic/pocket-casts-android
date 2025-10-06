@@ -1,5 +1,7 @@
 package au.com.shiftyjelly.pocketcasts.models.to
 
+import java.util.Date
+
 sealed class SearchAutoCompleteItem {
     data class Term(val term: String) : SearchAutoCompleteItem()
     data class Podcast(
@@ -8,5 +10,11 @@ sealed class SearchAutoCompleteItem {
         val author: String,
         val isSubscribed: Boolean = false,
     ) : SearchAutoCompleteItem()
-    data object Episode : SearchAutoCompleteItem()
+    data class Episode(
+        val uuid: String,
+        val title: String,
+        val duration: Double,
+        val publishedAt: Date,
+        val podcastUuid: String,
+    ) : SearchAutoCompleteItem()
 }
