@@ -124,10 +124,12 @@ class SearchViewModel @Inject constructor(
                             podcasts = it.operation.results.podcasts.map { folderItem ->
                                 if (folderItem.uuid == uuid) {
                                     (folderItem as? FolderItem.Podcast)?.copy(podcast = folderItem.podcast.copy(isSubscribed = true)) ?: folderItem
-                                } else folderItem
-                            }
-                        )
-                    ) ?: it.operation
+                                } else {
+                                    folderItem
+                                }
+                            },
+                        ),
+                    ) ?: it.operation,
                 )
             } else {
                 it
