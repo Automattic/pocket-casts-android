@@ -315,17 +315,31 @@ class SearchFragment : BaseFragment() {
                 val state by viewModel.state.collectAsState()
                 (state as? SearchUiState.Results)?.let { results ->
                     AppThemeWithBackground(theme.activeTheme) {
-                        SearchInlineResultsPage(
-                            state = results,
-                            loading = state.isLoading,
-                            onEpisodeClick = ::onEpisodeClick,
-                            onPodcastClick = { onPodcastClick(SearchHistoryEntry.fromPodcast(it), it.isSubscribed) },
-                            onFolderClick = ::onFolderClick,
-                            onShowAllCLick = ::onShowAllClick,
-                            onFollowPodcast = ::onSubscribeToPodcast,
-                            onScroll = { UiUtil.hideKeyboard(searchView) },
-                            bottomInset = bottomInset.pxToDp(LocalContext.current).dp,
-                        )
+                        if (FeatureFlag.isEnabled(Feature.IMPROVED_SEARCH_RESULTS)) {
+                            ImprovedSearchResultsPage(
+                                state = results,
+                                loading = state.isLoading,
+                                onEpisodeClick = ::onEpisodeClick,
+                                onPodcastClick = { onPodcastClick(SearchHistoryEntry.fromPodcast(it), it.isSubscribed) },
+                                onFolderClick = ::onFolderClick,
+                                onFollowPodcast = ::onSubscribeToPodcast,
+                                onPlayEpisode = {},
+                                onScroll = { UiUtil.hideKeyboard(searchView) },
+                                bottomInset = bottomInset.pxToDp(LocalContext.current).dp,
+                            )
+                        } else {
+                            SearchInlineResultsPage(
+                                state = results,
+                                loading = state.isLoading,
+                                onEpisodeClick = ::onEpisodeClick,
+                                onPodcastClick = { onPodcastClick(SearchHistoryEntry.fromPodcast(it), it.isSubscribed) },
+                                onFolderClick = ::onFolderClick,
+                                onShowAllCLick = ::onShowAllClick,
+                                onFollowPodcast = ::onSubscribeToPodcast,
+                                onScroll = { UiUtil.hideKeyboard(searchView) },
+                                bottomInset = bottomInset.pxToDp(LocalContext.current).dp,
+                            )
+                        }
                     }
                 }
                 binding.searchInlineResults.isVisible = state is SearchUiState.Results && !state.searchTerm.isNullOrBlank()
