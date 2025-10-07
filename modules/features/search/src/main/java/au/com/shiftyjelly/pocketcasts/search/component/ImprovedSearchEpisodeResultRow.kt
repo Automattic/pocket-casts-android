@@ -59,7 +59,7 @@ fun ImprovedSearchEpisodeResultRow(
         publishedAt = item.publishedAt,
         onClick = onClick,
         playButtonListener = playButtonListener,
-        modifier = modifier
+        modifier = modifier,
     )
 }
 
@@ -118,14 +118,13 @@ private fun ImprovedSearchEpisodeResultRow(
             placeholderType = PocketCastsImageRequestFactory.PlaceholderType.Small,
             useEpisodeArtwork = false,
             corners = 4.dp,
-            modifier = modifier
+            modifier = Modifier
                 .size(56.dp)
                 .shadow(1.dp, RoundedCornerShape(4.dp)),
         )
         Column(
             modifier = Modifier.weight(1f),
         ) {
-
             val context = LocalContext.current
             val formattedDuration =
                 remember(duration, context) { TimeHelper.getTimeDurationMediumString((duration * 1000).toInt(), context) }
@@ -158,11 +157,11 @@ private fun ImprovedSearchEpisodeResultRow(
                     PlayButton(it).apply {
                         listener = playButtonListener
                     }
-                }, update = { playButton ->
+                },
+                update = { playButton ->
                     playButton.setButtonType(episode, buttonType = PlayButtonType.PLAY, color = buttonColor, null)
-                }
+                },
             )
-
         }
     }
 }

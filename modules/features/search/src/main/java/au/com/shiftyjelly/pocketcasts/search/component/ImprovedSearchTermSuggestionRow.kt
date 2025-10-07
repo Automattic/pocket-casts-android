@@ -71,7 +71,7 @@ private fun PreviewSuggestionRow(
         ImprovedSearchTermSuggestionRow(
             searchTerm = "query",
             item = SearchAutoCompleteItem.Term(
-                term = "Query this"
+                term = "Query this",
             ),
             onClick = {},
         )

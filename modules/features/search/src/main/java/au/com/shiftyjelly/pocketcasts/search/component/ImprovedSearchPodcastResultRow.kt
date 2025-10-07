@@ -32,7 +32,7 @@ fun ImprovedSearchPodcastResultRow(
     item: SearchAutoCompleteItem.Podcast,
     onClick: () -> Unit,
     onFollow: () -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
     ImprovedSearchPodcastResultRow(
         podcastUuid = item.uuid,
@@ -41,7 +41,7 @@ fun ImprovedSearchPodcastResultRow(
         isSubscribed = item.isSubscribed,
         onClick = onClick,
         onFollow = onFollow,
-        modifier = modifier
+        modifier = modifier,
     )
 }
 
@@ -50,7 +50,7 @@ fun ImprovedSearchPodcastResultRow(
     folderItem: FolderItem,
     onClick: () -> Unit,
     onFollow: () -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
     when (folderItem) {
         is FolderItem.Podcast ->
@@ -61,7 +61,7 @@ fun ImprovedSearchPodcastResultRow(
                 isSubscribed = folderItem.podcast.isSubscribed,
                 onClick = onClick,
                 onFollow = onFollow,
-                modifier = modifier
+                modifier = modifier,
             )
 
         is FolderItem.Folder ->

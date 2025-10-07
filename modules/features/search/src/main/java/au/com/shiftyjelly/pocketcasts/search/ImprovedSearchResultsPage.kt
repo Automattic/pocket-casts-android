@@ -52,20 +52,22 @@ fun ImprovedSearchResultsPage(
     Column(
         modifier = modifier,
     ) {
-
         // we still need the server piece for this, so temporarily i'm filtering results locally here...
         val selectedFilter = state.filterOptions.toList()[state.selectedFilterIndex]
         val operation = (state.operation as? SearchUiState.SearchOperation.Success)?.copy(
             results = SearchResults(
                 podcasts = if (selectedFilter != ResultsFilters.EPISODES) {
                     state.operation.results.podcasts
-                } else emptyList(),
+                } else {
+                    emptyList()
+                },
                 episodes = if (selectedFilter != ResultsFilters.PODCASTS) {
                     state.operation.results.episodes
-                } else emptyList()
-            )
+                } else {
+                    emptyList()
+                },
+            ),
         ) ?: state.operation
-
 
         when (operation) {
             is SearchUiState.SearchOperation.Error -> SearchFailedView()
@@ -77,7 +79,7 @@ fun ImprovedSearchResultsPage(
                         modifier = Modifier.padding(bottom = 16.dp, start = 16.dp, end = 16.dp),
                         items = state.filterOptions.map { stringResource(it.resId) },
                         selectedIndex = state.selectedFilterIndex,
-                        onFilterSelected = { onFilterSelect(state.filterOptions.toList()[it]) }
+                        onFilterSelect = { onFilterSelect(state.filterOptions.toList()[it]) },
                     )
                     ImprovedSearchResultsView(
                         state = operation,
@@ -137,7 +139,8 @@ private fun ImprovedSearchResultsView(
     LazyColumn(
         state = listState,
         contentPadding = PaddingValues(
-            top = 16.dp, bottom = bottomInset
+            top = 16.dp,
+            bottom = bottomInset,
         ),
         modifier = modifier
             .nestedScroll(nestedScrollConnection),

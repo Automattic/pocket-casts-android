@@ -26,20 +26,20 @@ import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 fun SearchResultFilters(
     items: List<String>,
     selectedIndex: Int,
-    onFilterSelected: (Int) -> Unit,
+    onFilterSelect: (Int) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     LazyRow(
         modifier = modifier,
-        horizontalArrangement = Arrangement.spacedBy(8.dp)
+        horizontalArrangement = Arrangement.spacedBy(8.dp),
     ) {
         itemsIndexed(items) { index, item ->
             SearchFilterPill(
                 title = item,
                 isSelected = selectedIndex == index,
-                onSelected = {
-                    onFilterSelected(index)
-                }
+                onSelect = {
+                    onFilterSelect(index)
+                },
             )
         }
     }
@@ -49,8 +49,8 @@ fun SearchResultFilters(
 private fun SearchFilterPill(
     title: String,
     isSelected: Boolean,
-    onSelected: () -> Unit,
-    modifier: Modifier = Modifier
+    onSelect: () -> Unit,
+    modifier: Modifier = Modifier,
 ) {
     TextH40(
         text = title,
@@ -66,11 +66,11 @@ private fun SearchFilterPill(
                     Modifier.border(
                         width = 1.dp,
                         color = MaterialTheme.theme.colors.primaryField01Active,
-                        shape = RoundedCornerShape(100)
+                        shape = RoundedCornerShape(100),
                     )
-                }
+                },
             )
-            .clickable(onClick = onSelected)
+            .clickable(onClick = onSelect)
             .padding(horizontal = 20.dp, vertical = 8.dp),
         textAlign = TextAlign.Center,
         color = if (isSelected) MaterialTheme.theme.colors.primaryUi01 else MaterialTheme.theme.colors.primaryText01,
@@ -86,7 +86,7 @@ private fun PreviewSearchResultFilters(
         SearchResultFilters(
             items = listOf("Top Results", "Podcasts", "Episodes"),
             selectedIndex = 1,
-            onFilterSelected = {}
+            onFilterSelect = {},
         )
     }
 }

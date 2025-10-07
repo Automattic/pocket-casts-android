@@ -26,11 +26,11 @@ import au.com.shiftyjelly.pocketcasts.compose.components.HorizontalDivider
 import au.com.shiftyjelly.pocketcasts.compose.preview.ThemePreviewParameterProvider
 import au.com.shiftyjelly.pocketcasts.compose.theme
 import au.com.shiftyjelly.pocketcasts.models.to.SearchAutoCompleteItem
-import au.com.shiftyjelly.pocketcasts.views.buttons.PlayButton
 import au.com.shiftyjelly.pocketcasts.search.component.ImprovedSearchEpisodeResultRow
 import au.com.shiftyjelly.pocketcasts.search.component.ImprovedSearchPodcastResultRow
 import au.com.shiftyjelly.pocketcasts.search.component.ImprovedSearchTermSuggestionRow
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
+import au.com.shiftyjelly.pocketcasts.views.buttons.PlayButton
 
 @Composable
 fun SearchAutoCompleteResultsPage(
@@ -165,7 +165,6 @@ private fun PreviewSearchAutoCompleteResultsPage(
                 override fun onPlayedClicked(episodeUuid: String) {
                     TODO("Not yet implemented")
                 }
-
             },
             bottomInset = 0.dp,
         )
