@@ -117,8 +117,8 @@ class SearchViewModel @Inject constructor(
 
         // Optimistically update subscribe status
         _state.update {
-            if (it is SearchUiState.Results) {
-                it.copy(
+            when (it) {
+                is SearchUiState.Results -> it.copy(
                     operation = (it.operation as? SearchUiState.SearchOperation.Success)?.copy(
                         results = it.operation.results.copy(
                             podcasts = it.operation.results.podcasts.map { folderItem ->
@@ -131,8 +131,20 @@ class SearchViewModel @Inject constructor(
                         ),
                     ) ?: it.operation,
                 )
-            } else {
-                it
+
+                is SearchUiState.Suggestions -> it.copy(
+                    operation = (it.operation as? SearchUiState.SearchOperation.Success)?.copy(
+                        results = it.operation.results.map { autoCompleteItem ->
+                            if (autoCompleteItem is SearchAutoCompleteItem.Podcast && autoCompleteItem.uuid == uuid) {
+                                autoCompleteItem.copy(isSubscribed = true)
+                            } else {
+                                autoCompleteItem
+                            }
+                        },
+                    ) ?: it.operation,
+                )
+
+                else -> it
             }
         }
 

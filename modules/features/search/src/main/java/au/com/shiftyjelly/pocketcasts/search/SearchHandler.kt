@@ -29,6 +29,7 @@ import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.rx2.asFlow
@@ -115,30 +116,27 @@ class SearchHandler @Inject constructor(
         .map { it.term.trim() }
         .flatMapLatest { query ->
             if (query.isEmpty()) {
-                flow {
-                    emit(
-                        SearchUiState.SearchOperation.Success(
-                            searchTerm = query,
-                            results = emptyList(),
-                        ),
-                    )
-                }
-            } else {
-                flow {
-                    emit(autoCompleteManager.autoCompleteSearch(term = query))
-                }.map<List<SearchAutoCompleteItem>, SearchUiState.SearchOperation<List<SearchAutoCompleteItem>>> {
+                flowOf(
                     SearchUiState.SearchOperation.Success(
                         searchTerm = query,
-                        results = it,
-                    )
-                }.catch {
-                    emit(
-                        SearchUiState.SearchOperation.Error(
+                        results = emptyList(),
+                    ),
+                )
+            } else {
+                flowOf(autoCompleteManager.autoCompleteSearch(term = query))
+                    .map<List<SearchAutoCompleteItem>, SearchUiState.SearchOperation<List<SearchAutoCompleteItem>>> {
+                        SearchUiState.SearchOperation.Success(
                             searchTerm = query,
-                            error = it,
-                        ),
-                    )
-                }
+                            results = it,
+                        )
+                    }.catch {
+                        emit(
+                            SearchUiState.SearchOperation.Error(
+                                searchTerm = query,
+                                error = it,
+                            ),
+                        )
+                    }
                     .onStart {
                         emit(SearchUiState.SearchOperation.Loading(query))
                     }
@@ -278,6 +276,7 @@ class SearchHandler @Inject constructor(
 
     private sealed interface Query {
         val term: String
+
         data class Suggestions(override val term: String) : Query
         data class SearchResults(override val term: String, val immediate: Boolean = false) : Query
     }

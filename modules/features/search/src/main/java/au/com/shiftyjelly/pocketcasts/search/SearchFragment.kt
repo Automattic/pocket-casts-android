@@ -28,6 +28,7 @@ import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.compose.AppTheme
 import au.com.shiftyjelly.pocketcasts.compose.AppThemeWithBackground
+import au.com.shiftyjelly.pocketcasts.compose.extensions.setContentWithViewCompositionStrategy
 import au.com.shiftyjelly.pocketcasts.models.entity.Folder
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.to.EpisodeItem
@@ -257,8 +258,7 @@ class SearchFragment : BaseFragment() {
             }
         })
         binding.searchHistoryPanel.apply {
-            ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed
-            setContent {
+            setContentWithViewCompositionStrategy {
                 val state = viewModel.state.collectAsState()
                 if ((state.value is SearchUiState.Suggestions || !FeatureFlag.isEnabled(Feature.IMPROVED_SEARCH_SUGGESTIONS)) && state.value.searchTerm.isNullOrBlank()) {
                     searchHistoryViewModel.start()
@@ -284,16 +284,14 @@ class SearchFragment : BaseFragment() {
         }
 
         binding.searchSuggestions.apply {
-            ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed
-            setContent {
+            setContentWithViewCompositionStrategy {
                 val bottomInset by settings.bottomInset.collectAsStateWithLifecycle(initialValue = 0)
                 val state by viewModel.state.collectAsState()
                 (state as? SearchUiState.Suggestions)?.let { suggestions ->
                     AppThemeWithBackground(theme.activeTheme) {
                         SearchAutoCompleteResultsPage(
                             modifier = Modifier
-                                .fillMaxSize()
-                                .padding(horizontal = 16.dp),
+                                .fillMaxSize(),
                             searchTerm = suggestions.operation.searchTerm,
                             results = (suggestions.operation as? SearchUiState.SearchOperation.Success)?.results ?: emptyList(),
                             onTermClick = { viewModel.selectSuggestion(it.term) },
@@ -312,8 +310,7 @@ class SearchFragment : BaseFragment() {
         }
 
         binding.searchInlineResults.apply {
-            ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed
-            setContent {
+            setContentWithViewCompositionStrategy {
                 val bottomInset by settings.bottomInset.collectAsStateWithLifecycle(initialValue = 0)
                 val state by viewModel.state.collectAsState()
                 (state as? SearchUiState.Results)?.let { results ->

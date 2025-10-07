@@ -89,7 +89,7 @@ fun SearchAutoCompleteResultsPage(
             contentPadding = PaddingValues(bottom = bottomInset),
         ) {
             results.forEachIndexed { index, item ->
-                item(key = item.hashCode(), contentType = "content-${item.javaClass}") {
+                item(contentType = "content-${item.javaClass}") {
                     when (item) {
                         is SearchAutoCompleteItem.Term -> SearchTermRow(
                             searchTerm = searchTerm,
@@ -116,8 +116,9 @@ fun SearchAutoCompleteResultsPage(
                     }
                 }
                 if (results.indices.last != index) {
-                    item(key = "divider-$index", contentType = "divider") {
+                    item(contentType = "divider") {
                         HorizontalDivider(
+                            modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp),
                             thickness = 0.5.dp,
                             color = MaterialTheme.theme.colors.secondaryText02,
                         )
@@ -139,16 +140,21 @@ private fun SearchTermRow(
     val label = remember(searchTerm, item) {
         buildAnnotatedString {
             append(item.term)
-            addStyle(
-                style = SpanStyle(color = primaryColor),
-                start = 0,
-                end = searchTerm.length,
-            )
+            Regex(Regex.escape(searchTerm), RegexOption.IGNORE_CASE).findAll(item.term).forEach { result ->
+                if (result.range.start < result.range.endInclusive + 1) {
+                    addStyle(
+                        style = SpanStyle(color = primaryColor),
+                        start = result.range.first,
+                        end = result.range.endInclusive + 1,
+                    )
+                }
+            }
         }
     }
 
     Row(
-        modifier = modifier.clickable(onClick = onClick),
+        modifier = modifier.clickable(onClick = onClick)
+            .padding(horizontal = 16.dp),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(8.dp),
     ) {
@@ -170,7 +176,7 @@ private fun PodcastRow(
     Row(
         modifier = modifier
             .clickable(onClick = onClick)
-            .padding(8.dp),
+            .padding(horizontal = 16.dp, vertical = 8.dp),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(12.dp),
     ) {
@@ -191,6 +197,9 @@ private fun PodcastRow(
         }
         if (item.isSubscribed) {
             Icon(
+                modifier = Modifier
+                    .padding(start = 8.dp)
+                    .size(32.dp),
                 painter = painterResource(IR.drawable.ic_check),
                 contentDescription = null,
                 tint = MaterialTheme.theme.colors.support02,
@@ -202,6 +211,7 @@ private fun PodcastRow(
                 tint = MaterialTheme.theme.colors.secondaryText02,
                 modifier = Modifier
                     .padding(start = 8.dp)
+                    .size(32.dp)
                     .clickable(onClick = onFollow),
             )
         }
@@ -210,7 +220,7 @@ private fun PodcastRow(
 
 @Composable
 private fun EpisodeRow(
-    item: Any,
+    item: SearchAutoCompleteItem.Episode,
     onClick: () -> Unit,
     onPlay: () -> Unit,
     modifier: Modifier = Modifier,
@@ -270,7 +280,8 @@ private fun PreviewSearchAutoCompleteResultsPage(
             results = listOf(
                 SearchAutoCompleteItem.Term("matching text"),
                 SearchAutoCompleteItem.Term("matching text longer"),
-                SearchAutoCompleteItem.Term("matching other text"),
+                SearchAutoCompleteItem.Term("text only matching later"),
+                SearchAutoCompleteItem.Term("this doesn't match but why is it returned then?"),
                 SearchAutoCompleteItem.Podcast(uuid = "", title = "Matching podcast", author = "Author", isSubscribed = false),
                 SearchAutoCompleteItem.Podcast(uuid = "", title = "Matching podcast subscribed", author = "Author2", isSubscribed = true),
             ),
