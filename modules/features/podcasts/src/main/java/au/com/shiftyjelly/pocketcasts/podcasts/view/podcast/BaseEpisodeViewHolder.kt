@@ -236,7 +236,7 @@ abstract class BaseEpisodeViewHolder<T : Any>(
             val archivedString = context.getString(LR.string.archived)
             val timeLeft = TimeHelper.getTimeLeft(episode.playedUpToMs, episode.durationMs.toLong(), episode.isInProgress, context)
             bindStatus(
-                text = "$archivedString. ${timeLeft.text}",
+                text = "$archivedString · ${timeLeft.text}",
                 description = "$archivedString. ${timeLeft.description}",
                 iconId = IR.drawable.ic_archive,
                 iconTint = primaryIcon02Tint,
