@@ -5,6 +5,7 @@ import au.com.shiftyjelly.pocketcasts.crashlogging.fakes.FakeEncryptedLogging.Up
 import au.com.shiftyjelly.pocketcasts.crashlogging.fakes.FakeEncryptedLogging.UploadState.NOT_STARTED
 import com.automattic.encryptedlogging.EncryptedLogging
 import java.io.File
+import kotlinx.coroutines.flow.MutableStateFlow
 
 class FakeEncryptedLogging : EncryptedLogging {
 
@@ -30,6 +31,8 @@ class FakeEncryptedLogging : EncryptedLogging {
             it.first to NOT_STARTED
         }
     }
+
+    override fun observeEncryptedLogsUploadResult() = MutableStateFlow(null)
 
     override fun uploadEncryptedLogs() {
         uploaded += toUpload.map {
