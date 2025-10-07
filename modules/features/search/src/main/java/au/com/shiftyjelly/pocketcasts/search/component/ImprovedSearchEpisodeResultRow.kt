@@ -5,8 +5,10 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Icon
 import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
@@ -21,6 +23,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import au.com.shiftyjelly.pocketcasts.compose.AppThemeWithBackground
 import au.com.shiftyjelly.pocketcasts.compose.components.EpisodeImage
 import au.com.shiftyjelly.pocketcasts.compose.components.TextC70
@@ -47,6 +50,7 @@ fun ImprovedSearchEpisodeResultRow(
 ) {
     ImprovedSearchEpisodeResultRow(
         episodeUuid = item.uuid,
+        podcastUuid = item.podcastUuid,
         title = item.title,
         duration = item.duration,
         publishedAt = item.publishedAt,
@@ -65,6 +69,7 @@ fun ImprovedSearchEpisodeResultRow(
 ) {
     ImprovedSearchEpisodeResultRow(
         episodeUuid = episode.uuid,
+        podcastUuid = episode.podcastUuid,
         title = episode.title,
         duration = episode.duration,
         publishedAt = episode.publishedAt,
@@ -77,6 +82,7 @@ fun ImprovedSearchEpisodeResultRow(
 @Composable
 private fun ImprovedSearchEpisodeResultRow(
     episodeUuid: String,
+    podcastUuid: String,
     title: String,
     duration: Double,
     publishedAt: Date,
@@ -85,7 +91,9 @@ private fun ImprovedSearchEpisodeResultRow(
     modifier: Modifier = Modifier,
 ) {
     Row(
-        modifier = modifier.clickable(onClick = onClick),
+        modifier = modifier
+            .clickable(onClick = onClick)
+            .padding(horizontal = 16.dp, vertical = 8.dp),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(8.dp),
     ) {
@@ -95,32 +103,41 @@ private fun ImprovedSearchEpisodeResultRow(
                 title = title,
                 duration = duration,
                 publishedDate = publishedAt,
+                podcastUuid = podcastUuid,
             ),
             placeholderType = PocketCastsImageRequestFactory.PlaceholderType.Small,
             useEpisodeArtwork = false,
             corners = 4.dp,
-            modifier = Modifier.shadow(elevation = 6.dp),
+            modifier = modifier
+                .size(56.dp)
+                .shadow(1.dp, RoundedCornerShape(4.dp)),
         )
         Column(
             modifier = Modifier.weight(1f),
         ) {
 
             val context = LocalContext.current
-            val formattedDuration = remember(duration, context) { TimeHelper.getTimeDurationMediumString((duration * 1000).toInt(), context) }
+            val formattedDuration =
+                remember(duration, context) { TimeHelper.getTimeDurationMediumString((duration * 1000).toInt(), context) }
             val dateFormatter = RelativeDateFormatter(context)
             val formattedPublishDate = remember(publishedAt, dateFormatter) { dateFormatter.format(publishedAt) }
 
             TextC70(
+                fontSize = 11.sp,
                 text = formattedPublishDate,
+                maxLines = 1,
             )
             TextH40(
                 text = title,
                 color = MaterialTheme.theme.colors.primaryText01,
+                maxLines = 1,
             )
             TextH60(
+                fontSize = 12.sp,
                 text = formattedDuration,
                 color = MaterialTheme.theme.colors.secondaryText02,
                 fontWeight = FontWeight.W600,
+                maxLines = 1,
             )
         }
         Icon(
@@ -144,6 +161,7 @@ private fun PreviewEpisodeResultRow(
     AppThemeWithBackground(themeType) {
         ImprovedSearchEpisodeResultRow(
             episodeUuid = "",
+            podcastUuid = "",
             title = "Episode title",
             duration = 320.0,
             publishedAt = Date(),

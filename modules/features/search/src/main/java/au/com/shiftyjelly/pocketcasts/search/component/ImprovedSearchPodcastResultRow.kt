@@ -100,10 +100,12 @@ private fun ImprovedSearchPodcastResultRow(
             TextH40(
                 text = title,
                 color = MaterialTheme.theme.colors.primaryText01,
+                maxLines = 1,
             )
             TextP50(
                 text = author,
                 color = MaterialTheme.theme.colors.primaryText02,
+                maxLines = 1,
             )
         }
         if (isSubscribed) {

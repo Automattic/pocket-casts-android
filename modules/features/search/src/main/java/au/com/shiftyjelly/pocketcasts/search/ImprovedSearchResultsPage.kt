@@ -114,14 +114,16 @@ private fun ImprovedSearchResultsView(
     LazyColumn(
         state = listState,
         contentPadding = PaddingValues(
-            start = 16.dp, end = 16.dp, top = 16.dp, bottom = bottomInset
+            top = 16.dp, bottom = bottomInset
         ),
         modifier = modifier
             .nestedScroll(nestedScrollConnection),
     ) {
 
+        val dividerModifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp)
         item {
             SearchResultFilters(
+                modifier = Modifier.padding(bottom = 16.dp, start = 16.dp, end = 16.dp),
                 items = filters,
                 selectedIndex = selectedPillIndex,
                 onFilterSelected = { selectedPillIndex = filters.indexOf(it) }
@@ -150,30 +152,30 @@ private fun ImprovedSearchResultsView(
 
             if (index < state.results.podcasts.lastIndex) {
                 item {
-                    HorizontalDivider()
+                    HorizontalDivider(dividerModifier)
                 }
             }
         }
 
         if (state.results.episodes.isNotEmpty()) {
             item {
-                HorizontalDivider()
+                HorizontalDivider(dividerModifier)
             }
         }
 
-       state.results.episodes.forEachIndexed { index, item ->
-           item {
-               ImprovedSearchEpisodeResultRow(
-                   episode = item,
-                   onClick = { onEpisodeClick(item) },
-                   onPlay = { onPlayEpisode(item) }
-               )
-           }
-           if (index < state.results.episodes.lastIndex) {
-               item {
-                   HorizontalDivider()
-               }
-           }
+        state.results.episodes.forEachIndexed { index, item ->
+            item {
+                ImprovedSearchEpisodeResultRow(
+                    episode = item,
+                    onClick = { onEpisodeClick(item) },
+                    onPlay = { onPlayEpisode(item) }
+                )
+            }
+            if (index < state.results.episodes.lastIndex) {
+                item {
+                    HorizontalDivider(dividerModifier)
+                }
+            }
         }
     }
 }

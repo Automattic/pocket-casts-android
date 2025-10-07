@@ -11,6 +11,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
@@ -54,6 +55,7 @@ private fun SearchFilterPill(
     TextH40(
         text = title,
         modifier = modifier
+            .clip(RoundedCornerShape(100))
             .then(
                 if (isSelected) {
                     Modifier.background(
@@ -63,7 +65,7 @@ private fun SearchFilterPill(
                 } else {
                     Modifier.border(
                         width = 1.dp,
-                        color = MaterialTheme.theme.colors.primaryText02,
+                        color = MaterialTheme.theme.colors.primaryField01Active,
                         shape = RoundedCornerShape(100)
                     )
                 }
