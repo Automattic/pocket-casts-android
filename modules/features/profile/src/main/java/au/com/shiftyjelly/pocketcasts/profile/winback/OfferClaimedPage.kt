@@ -67,7 +67,7 @@ internal fun OfferClaimedPage(
             },
             fontWeight = FontWeight.Bold,
             fontSize = 28.sp,
-            lineHeight = 38.5.sp,
+            lineHeight = 33.5.sp,
             color = MaterialTheme.theme.colors.primaryText01,
             textAlign = TextAlign.Center,
             modifier = Modifier.padding(horizontal = 16.dp),

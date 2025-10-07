@@ -10,9 +10,7 @@ import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
-import androidx.core.os.BundleCompat
 import androidx.core.os.bundleOf
-import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.compose.LocalPodcastColors
 import au.com.shiftyjelly.pocketcasts.compose.PodcastColors
@@ -25,12 +23,12 @@ import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingFlow
 import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingLauncher
 import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingUpgradeSource
 import au.com.shiftyjelly.pocketcasts.ui.helper.FragmentHostListener
+import au.com.shiftyjelly.pocketcasts.utils.extensions.requireParcelable
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseDialogFragment
 import com.google.android.material.snackbar.Snackbar
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 import kotlinx.parcelize.Parcelize
-import timber.log.Timber
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 import com.google.android.material.R as MR
 
@@ -51,10 +49,7 @@ class AdReportFragment : BaseDialogFragment() {
         }
     }
 
-    private val args
-        get() = requireNotNull(BundleCompat.getParcelable(requireArguments(), NEW_INSTANCE_KEY, Args::class.java)) {
-            "Missing input parameters"
-        }
+    private val args get() = requireArguments().requireParcelable<Args>(NEW_INSTANCE_KEY)
 
     override fun onCreateView(
         inflater: LayoutInflater,

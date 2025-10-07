@@ -86,7 +86,7 @@ internal fun WinbackOfferPage(
             },
             fontWeight = FontWeight.Bold,
             fontSize = 28.sp,
-            lineHeight = 38.5.sp,
+            lineHeight = 33.5.sp,
             color = MaterialTheme.theme.colors.primaryText01,
             textAlign = TextAlign.Center,
             modifier = Modifier.padding(horizontal = 16.dp),
@@ -131,13 +131,13 @@ internal fun WinbackOfferPage(
                 .fillMaxWidth()
                 .heightIn(min = 56.dp)
                 .padding(horizontal = 16.dp),
-            border = BorderStroke(2.dp, MaterialTheme.colors.primary),
+            border = BorderStroke(2.dp, MaterialTheme.theme.colors.support05),
             shape = RoundedCornerShape(16.dp),
             onClick = onCancelSubscription,
         ) {
             TextH30(
                 text = stringResource(LR.string.winback_cancel_subscription_continue_cancel_button_label),
-                color = MaterialTheme.colors.primary,
+                color = MaterialTheme.theme.colors.support05,
                 textAlign = TextAlign.Center,
                 modifier = Modifier.fillMaxWidth(),
             )

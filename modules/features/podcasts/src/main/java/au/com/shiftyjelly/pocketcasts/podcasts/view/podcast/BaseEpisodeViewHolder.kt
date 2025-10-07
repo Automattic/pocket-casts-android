@@ -162,8 +162,6 @@ abstract class BaseEpisodeViewHolder<T : Any>(
 
             binding.imgUpNext.isVisible = data.isInUpNext
             binding.imgBookmark.isVisible = data.hasBookmarks
-            binding.progressBar.isVisible = false
-            binding.progressCircle.isVisible = false
 
             if (data.playbackState.episodeUuid == episode.uuid && data.playbackState.isBuffering) {
                 bindStatus(text = context.getString(LR.string.episode_row_buffering))
@@ -196,6 +194,9 @@ abstract class BaseEpisodeViewHolder<T : Any>(
     private fun bindStatus(downloadProgress: Int) {
         binding.star.isVisible = episode.isStarred
         binding.video.isVisible = episode.isVideo
+        binding.progressBar.isVisible = false
+        binding.progressCircle.isVisible = false
+
         if (episode.episodeStatus == EpisodeStatusEnum.DOWNLOADED) {
             bindTimeLeft(
                 iconId = IR.drawable.ic_downloaded,

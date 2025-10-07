@@ -554,7 +554,7 @@ platform :android do
   # @param version [String] The version to create
   # @param build_code [String] The build code to create
   # @param app [String] The Android app to build (i.e 'app', 'automotive', or 'wear')
-  lane :build_bundle do |version:, build_code:, app:|
+  lane :build_bundle do |app:, version: version_name_current, build_code: build_code_current|
     aab_artifact_path = aab_artifact_path(app, version)
     build_dir = 'artifacts/'
 
@@ -571,8 +571,12 @@ platform :android do
       }
     )
 
+    aab_file = File.join(PROJECT_ROOT_FOLDER, bundle_output_path(app))
+    annotate_sentry_mapping_uuid(app: app, aab_file: aab_file)
+
     Dir.chdir('..') do
-      sh("mkdir -p #{build_dir} && cp -v #{bundle_output_path(app)} #{aab_artifact_path}")
+      FileUtils.mkdir_p(build_dir)
+      FileUtils.cp_r(aab_file, aab_artifact_path)
       UI.message("Bundle ready: #{aab_artifact_path}")
     end
   end
@@ -756,7 +760,26 @@ platform :android do
   end
 
   def bundle_output_path(app)
-    "#{app}/build/outputs/bundle/release/#{app}-release.aab"
+    File.join(app.to_s, 'build', 'outputs', 'bundle', 'release', "#{app}-release.aab")
+  end
+
+  def annotate_sentry_mapping_uuid(app:, aab_file:)
+    sentry_props = sh('unzip', '-p', aab_file, 'base/assets/sentry-debug-meta.properties', step_name: 'Extract sentry-debug-meta.properties') do |status, result, _|
+      status.success? ? result : nil
+    end
+    if sentry_props.nil?
+      UI.important("Unable to extract Sentry properties file from #{aab_file}. Skipping annotating the build with the mapping UUID.")
+      return
+    end
+
+    line = sentry_props.split("\n").find { |l| l.start_with?('io.sentry.ProguardUuids=') }
+    if line.nil?
+      UI.error("`io.sentry.ProguardUuids` line not found in #{aab_file}'s `sentry-debug-meta.properties` file")
+      return
+    end
+
+    uuid = line.split('=', 2).last.strip
+    buildkite_annotate(style: 'info', context: "sentry-mapping-uuid-#{app}", message: "Sentry mapping UUID for #{app}: #{uuid}")
   end
 
   def firebase_secret(name:)

@@ -25,6 +25,7 @@ import au.com.shiftyjelly.pocketcasts.settings.history.upnext.UpNextHistoryDetai
 import au.com.shiftyjelly.pocketcasts.settings.history.upnext.UpNextHistoryDetailsViewModel.UiState
 import au.com.shiftyjelly.pocketcasts.settings.history.upnext.UpNextHistoryPage
 import au.com.shiftyjelly.pocketcasts.utils.extensions.pxToDp
+import au.com.shiftyjelly.pocketcasts.utils.extensions.requireLong
 import au.com.shiftyjelly.pocketcasts.views.dialog.ConfirmationDialog
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseFragment
 import au.com.shiftyjelly.pocketcasts.views.helper.HasBackstack
@@ -95,12 +96,9 @@ class HistoryFragment :
                         },
                     ),
                 ) { backStackEntry ->
-                    val arguments =
-                        requireNotNull(backStackEntry.arguments) { "Missing back stack entry arguments" }
-                    val date =
-                        requireNotNull(arguments.getLong(HistoryNavRoutes.UP_NEXT_HISTORY_DATE_ARGUMENT)) {
-                            "Missing date argument"
-                        }
+                    val arguments = requireNotNull(backStackEntry.arguments) { "Missing back stack entry arguments" }
+                    val date = arguments.requireLong(HistoryNavRoutes.UP_NEXT_HISTORY_DATE_ARGUMENT)
+
                     UpNextHistoryDetailsPage(
                         date = date,
                         onRestoreClick = ::onRestoreClick,
