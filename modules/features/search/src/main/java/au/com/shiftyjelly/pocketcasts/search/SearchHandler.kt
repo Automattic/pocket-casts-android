@@ -123,7 +123,7 @@ class SearchHandler @Inject constructor(
                     ),
                 )
             } else {
-                flowOf(autoCompleteManager.autoCompleteSearch(term = query))
+                flow { emit(autoCompleteManager.autoCompleteSearch(term = query)) }
                     .map<List<SearchAutoCompleteItem>, SearchUiState.SearchOperation<List<SearchAutoCompleteItem>>> {
                         SearchUiState.SearchOperation.Success(
                             searchTerm = query,

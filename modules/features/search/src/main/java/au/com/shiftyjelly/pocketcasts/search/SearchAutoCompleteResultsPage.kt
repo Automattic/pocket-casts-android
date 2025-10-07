@@ -16,7 +16,9 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.Icon
+import androidx.compose.material.IconButton
 import androidx.compose.material.MaterialTheme
+import androidx.compose.material.minimumInteractiveComponentSize
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -118,7 +120,9 @@ fun SearchAutoCompleteResultsPage(
                 if (results.indices.last != index) {
                     item(contentType = "divider") {
                         HorizontalDivider(
-                            modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp),
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(horizontal = 16.dp),
                             thickness = 0.5.dp,
                             color = MaterialTheme.theme.colors.secondaryText02,
                         )
@@ -153,7 +157,8 @@ private fun SearchTermRow(
     }
 
     Row(
-        modifier = modifier.clickable(onClick = onClick)
+        modifier = modifier
+            .clickable(onClick = onClick)
             .padding(horizontal = 16.dp),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(8.dp),
@@ -198,22 +203,19 @@ private fun PodcastRow(
         if (item.isSubscribed) {
             Icon(
                 modifier = Modifier
-                    .padding(start = 8.dp)
-                    .size(32.dp),
+                    .minimumInteractiveComponentSize(),
                 painter = painterResource(IR.drawable.ic_check),
                 contentDescription = null,
                 tint = MaterialTheme.theme.colors.support02,
             )
         } else {
-            Icon(
-                painter = painterResource(IR.drawable.ic_add_black_24dp),
-                contentDescription = null,
-                tint = MaterialTheme.theme.colors.secondaryText02,
-                modifier = Modifier
-                    .padding(start = 8.dp)
-                    .size(32.dp)
-                    .clickable(onClick = onFollow),
-            )
+            IconButton(onClick = onFollow) {
+                Icon(
+                    painter = painterResource(IR.drawable.ic_add_black_24dp),
+                    contentDescription = null,
+                    tint = MaterialTheme.theme.colors.secondaryText02,
+                )
+            }
         }
     }
 }
