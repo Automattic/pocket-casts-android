@@ -5,11 +5,13 @@ import androidx.lifecycle.viewModelScope
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
+import au.com.shiftyjelly.pocketcasts.models.entity.BaseEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.to.EpisodeItem
 import au.com.shiftyjelly.pocketcasts.models.to.FolderItem
 import au.com.shiftyjelly.pocketcasts.models.to.SearchAutoCompleteItem
 import au.com.shiftyjelly.pocketcasts.models.to.SearchHistoryEntry
+import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
 import au.com.shiftyjelly.pocketcasts.repositories.searchhistory.SearchHistoryManager
 import au.com.shiftyjelly.pocketcasts.search.SearchResultsFragment.Companion.ResultsType
@@ -19,8 +21,11 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.reactive.asFlow
+import kotlinx.coroutines.rx2.rxMaybe
 
 @HiltViewModel
 class SearchViewModel @Inject constructor(
@@ -28,6 +33,7 @@ class SearchViewModel @Inject constructor(
     private val searchHistoryManager: SearchHistoryManager,
     private val podcastManager: PodcastManager,
     private val analyticsTracker: AnalyticsTracker,
+    private val episodeManager: EpisodeManager,
 ) : ViewModel() {
     var isFragmentChangingConfigurations: Boolean = false
     var showSearchHistory: Boolean = true
@@ -110,6 +116,16 @@ class SearchViewModel @Inject constructor(
     fun onSubscribeToPodcast(podcast: Podcast) {
         if (podcast.isSubscribed) return
         onSubscribeToPodcast(podcast.uuid)
+    }
+
+    suspend fun fetchEpisode(episodeItem: EpisodeItem): BaseEpisode? {
+        return podcastManager.findOrDownloadPodcastRxSingle(episodeItem.podcastUuid)
+            .flatMapMaybe {
+                rxMaybe {
+                    episodeManager.findByUuid(episodeItem.uuid)
+                }
+            }
+            .toFlowable().asFlow().firstOrNull()
     }
 
     fun onSubscribeToPodcast(uuid: String) {

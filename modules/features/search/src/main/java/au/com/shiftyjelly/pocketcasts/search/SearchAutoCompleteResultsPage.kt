@@ -9,7 +9,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.MaterialTheme
-import androidx.compose.material.minimumInteractiveComponentSize
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -21,11 +20,13 @@ import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.Velocity
 import androidx.compose.ui.unit.dp
+import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.compose.AppThemeWithBackground
 import au.com.shiftyjelly.pocketcasts.compose.components.HorizontalDivider
 import au.com.shiftyjelly.pocketcasts.compose.preview.ThemePreviewParameterProvider
 import au.com.shiftyjelly.pocketcasts.compose.theme
 import au.com.shiftyjelly.pocketcasts.models.to.SearchAutoCompleteItem
+import au.com.shiftyjelly.pocketcasts.views.buttons.PlayButton
 import au.com.shiftyjelly.pocketcasts.search.component.ImprovedSearchEpisodeResultRow
 import au.com.shiftyjelly.pocketcasts.search.component.ImprovedSearchPodcastResultRow
 import au.com.shiftyjelly.pocketcasts.search.component.ImprovedSearchTermSuggestionRow
@@ -40,7 +41,7 @@ fun SearchAutoCompleteResultsPage(
     onPodcastClick: (SearchAutoCompleteItem.Podcast) -> Unit,
     onPodcastFollow: (SearchAutoCompleteItem.Podcast) -> Unit,
     onEpisodeClick: (SearchAutoCompleteItem.Episode) -> Unit,
-    onEpisodePlay: (SearchAutoCompleteItem.Episode) -> Unit,
+    playButtonListener: PlayButton.OnClickListener,
     bottomInset: Dp,
     onScroll: () -> Unit,
     modifier: Modifier = Modifier,
@@ -91,7 +92,7 @@ fun SearchAutoCompleteResultsPage(
                         is SearchAutoCompleteItem.Episode -> ImprovedSearchEpisodeResultRow(
                             item = item,
                             onClick = { onEpisodeClick(item) },
-                            onPlay = { onEpisodePlay(item) },
+                            playButtonListener = playButtonListener,
                             modifier = Modifier.fillMaxWidth(),
                         )
                     }
@@ -130,11 +131,42 @@ private fun PreviewSearchAutoCompleteResultsPage(
                 SearchAutoCompleteItem.Podcast(uuid = "", title = "Matching podcast subscribed", author = "Author2", isSubscribed = true),
             ),
             onTermClick = {},
-            onEpisodePlay = {},
             onEpisodeClick = {},
             onPodcastClick = {},
             onPodcastFollow = {},
             onScroll = {},
+            playButtonListener = object : PlayButton.OnClickListener {
+                override var source: SourceView = SourceView.SEARCH_RESULTS
+
+                override fun onPlayClicked(episodeUuid: String) {
+                    TODO("Not yet implemented")
+                }
+
+                override fun onPauseClicked() {
+                    TODO("Not yet implemented")
+                }
+
+                override fun onPlayNext(episodeUuid: String) {
+                    TODO("Not yet implemented")
+                }
+
+                override fun onPlayLast(episodeUuid: String) {
+                    TODO("Not yet implemented")
+                }
+
+                override fun onDownload(episodeUuid: String) {
+                    TODO("Not yet implemented")
+                }
+
+                override fun onStopDownloading(episodeUuid: String) {
+                    TODO("Not yet implemented")
+                }
+
+                override fun onPlayedClicked(episodeUuid: String) {
+                    TODO("Not yet implemented")
+                }
+
+            },
             bottomInset = 0.dp,
         )
     }

@@ -11,12 +11,10 @@ import android.view.ViewGroup
 import android.view.inputmethod.EditorInfo
 import androidx.appcompat.widget.SearchView
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.platform.ViewCompositionStrategy
 import androidx.compose.ui.unit.dp
 import androidx.core.view.isVisible
 import androidx.core.view.updatePadding
@@ -49,6 +47,7 @@ import au.com.shiftyjelly.pocketcasts.views.extensions.hide
 import au.com.shiftyjelly.pocketcasts.views.extensions.show
 import au.com.shiftyjelly.pocketcasts.views.extensions.showKeyboard
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseFragment
+import au.com.shiftyjelly.pocketcasts.views.helper.PlayButtonListener
 import au.com.shiftyjelly.pocketcasts.views.helper.UiUtil
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
@@ -73,6 +72,9 @@ class SearchFragment : BaseFragment() {
 
     @Inject
     lateinit var settings: Settings
+
+    @Inject
+    lateinit var playButtonListener: PlayButtonListener
 
     interface Listener {
         fun onSearchEpisodeClick(episodeUuid: String, podcastUuid: String, source: EpisodeViewSource)
@@ -298,7 +300,7 @@ class SearchFragment : BaseFragment() {
                             onPodcastClick = { onPodcastClick(SearchHistoryEntry.fromAutoCompletePodcast(it), it.isSubscribed) },
                             onPodcastFollow = { viewModel.onSubscribeToPodcast(it.uuid) },
                             onEpisodeClick = {},
-                            onEpisodePlay = {},
+                            playButtonListener = playButtonListener,
                             onScroll = { UiUtil.hideKeyboard(searchView) },
                             bottomInset = bottomInset.pxToDp(LocalContext.current).dp,
                             isLoading = suggestions.operation is SearchUiState.SearchOperation.Loading,
@@ -323,7 +325,8 @@ class SearchFragment : BaseFragment() {
                                 onPodcastClick = { onPodcastClick(SearchHistoryEntry.fromPodcast(it), it.isSubscribed) },
                                 onFolderClick = ::onFolderClick,
                                 onFollowPodcast = ::onSubscribeToPodcast,
-                                onPlayEpisode = {},
+                                playButtonListener = playButtonListener,
+                                fetchEpisode = viewModel::fetchEpisode,
                                 onScroll = { UiUtil.hideKeyboard(searchView) },
                                 bottomInset = bottomInset.pxToDp(LocalContext.current).dp,
                             )

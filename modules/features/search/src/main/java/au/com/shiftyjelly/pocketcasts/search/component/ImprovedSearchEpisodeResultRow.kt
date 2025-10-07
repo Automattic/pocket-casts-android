@@ -1,29 +1,29 @@
 package au.com.shiftyjelly.pocketcasts.search.component
 
-import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.Icon
 import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.produceState
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.viewinterop.AndroidView
+import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.compose.AppThemeWithBackground
 import au.com.shiftyjelly.pocketcasts.compose.components.EpisodeImage
 import au.com.shiftyjelly.pocketcasts.compose.components.TextC70
@@ -33,19 +33,22 @@ import au.com.shiftyjelly.pocketcasts.compose.preview.ThemePreviewParameterProvi
 import au.com.shiftyjelly.pocketcasts.compose.theme
 import au.com.shiftyjelly.pocketcasts.localization.helper.RelativeDateFormatter
 import au.com.shiftyjelly.pocketcasts.localization.helper.TimeHelper
+import au.com.shiftyjelly.pocketcasts.models.entity.BaseEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.models.to.EpisodeItem
 import au.com.shiftyjelly.pocketcasts.models.to.SearchAutoCompleteItem
 import au.com.shiftyjelly.pocketcasts.repositories.images.PocketCastsImageRequestFactory
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
+import au.com.shiftyjelly.pocketcasts.views.buttons.PlayButton
+import au.com.shiftyjelly.pocketcasts.views.buttons.PlayButtonType
+import au.com.shiftyjelly.pocketcasts.views.helper.PlayButtonListener
 import java.util.Date
-import au.com.shiftyjelly.pocketcasts.images.R as IR
 
 @Composable
 fun ImprovedSearchEpisodeResultRow(
     item: SearchAutoCompleteItem.Episode,
     onClick: () -> Unit,
-    onPlay: () -> Unit,
+    playButtonListener: PlayButton.OnClickListener,
     modifier: Modifier = Modifier,
 ) {
     ImprovedSearchEpisodeResultRow(
@@ -55,7 +58,7 @@ fun ImprovedSearchEpisodeResultRow(
         duration = item.duration,
         publishedAt = item.publishedAt,
         onClick = onClick,
-        onPlay = onPlay,
+        playButtonListener = playButtonListener,
         modifier = modifier
     )
 }
@@ -64,18 +67,24 @@ fun ImprovedSearchEpisodeResultRow(
 fun ImprovedSearchEpisodeResultRow(
     episode: EpisodeItem,
     onClick: () -> Unit,
-    onPlay: () -> Unit,
+    playButtonListener: PlayButtonListener,
     modifier: Modifier = Modifier,
+    fetchEpisode: (suspend (EpisodeItem) -> BaseEpisode?)? = null,
 ) {
+    val baseEpisode: BaseEpisode? by produceState(null) {
+        value = fetchEpisode?.invoke(episode)
+    }
+
     ImprovedSearchEpisodeResultRow(
         episodeUuid = episode.uuid,
         podcastUuid = episode.podcastUuid,
         title = episode.title,
         duration = episode.duration,
         publishedAt = episode.publishedAt,
+        playButtonListener = playButtonListener,
         onClick = onClick,
-        onPlay = onPlay,
-        modifier = modifier
+        modifier = modifier,
+        episode = baseEpisode,
     )
 }
 
@@ -87,8 +96,9 @@ private fun ImprovedSearchEpisodeResultRow(
     duration: Double,
     publishedAt: Date,
     onClick: () -> Unit,
-    onPlay: () -> Unit,
+    playButtonListener: PlayButton.OnClickListener,
     modifier: Modifier = Modifier,
+    episode: BaseEpisode? = null,
 ) {
     Row(
         modifier = modifier
@@ -140,16 +150,20 @@ private fun ImprovedSearchEpisodeResultRow(
                 maxLines = 1,
             )
         }
-        Icon(
-            painter = painterResource(IR.drawable.filter_play),
-            contentDescription = null,
-            modifier = Modifier
-                .size(16.dp)
-                .clip(CircleShape)
-                .border(1.dp, color = MaterialTheme.theme.colors.primaryInteractive01, shape = CircleShape)
-                .clickable(onClick = onPlay),
-            tint = MaterialTheme.theme.colors.primaryInteractive01,
-        )
+        episode?.let {
+            val buttonColor = MaterialTheme.theme.colors.primaryInteractive01.toArgb()
+            AndroidView(
+                modifier = Modifier.size(48.dp),
+                factory = {
+                    PlayButton(it).apply {
+                        listener = playButtonListener
+                    }
+                }, update = { playButton ->
+                    playButton.setButtonType(episode, buttonType = PlayButtonType.PLAY, color = buttonColor, null)
+                }
+            )
+
+        }
     }
 }
 
@@ -165,8 +179,38 @@ private fun PreviewEpisodeResultRow(
             title = "Episode title",
             duration = 320.0,
             publishedAt = Date(),
+            playButtonListener = object : PlayButton.OnClickListener {
+                override var source: SourceView = SourceView.SEARCH_RESULTS
+
+                override fun onPlayClicked(episodeUuid: String) {
+                    TODO("Not yet implemented")
+                }
+
+                override fun onPauseClicked() {
+                    TODO("Not yet implemented")
+                }
+
+                override fun onPlayNext(episodeUuid: String) {
+                    TODO("Not yet implemented")
+                }
+
+                override fun onPlayLast(episodeUuid: String) {
+                    TODO("Not yet implemented")
+                }
+
+                override fun onDownload(episodeUuid: String) {
+                    TODO("Not yet implemented")
+                }
+
+                override fun onStopDownloading(episodeUuid: String) {
+                    TODO("Not yet implemented")
+                }
+
+                override fun onPlayedClicked(episodeUuid: String) {
+                    TODO("Not yet implemented")
+                }
+            },
             onClick = {},
-            onPlay = {}
         )
     }
 }

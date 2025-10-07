@@ -12,6 +12,7 @@ import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.key
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -24,6 +25,7 @@ import androidx.compose.ui.unit.Velocity
 import androidx.compose.ui.unit.dp
 import au.com.shiftyjelly.pocketcasts.compose.components.HorizontalDivider
 import au.com.shiftyjelly.pocketcasts.compose.theme
+import au.com.shiftyjelly.pocketcasts.models.entity.BaseEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.Folder
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.to.EpisodeItem
@@ -33,6 +35,7 @@ import au.com.shiftyjelly.pocketcasts.search.component.ImprovedSearchPodcastResu
 import au.com.shiftyjelly.pocketcasts.search.component.NoResultsView
 import au.com.shiftyjelly.pocketcasts.search.component.SearchFailedView
 import au.com.shiftyjelly.pocketcasts.search.component.SearchResultFilters
+import au.com.shiftyjelly.pocketcasts.views.helper.PlayButtonListener
 
 @Composable
 fun ImprovedSearchResultsPage(
@@ -43,9 +46,10 @@ fun ImprovedSearchResultsPage(
     onPodcastClick: (Podcast) -> Unit,
     onFolderClick: (Folder, List<Podcast>) -> Unit,
     onFollowPodcast: (Podcast) -> Unit,
-    onPlayEpisode: (EpisodeItem) -> Unit,
+    playButtonListener: PlayButtonListener,
     onScroll: () -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    fetchEpisode: (suspend (EpisodeItem) -> BaseEpisode?)? = null,
 ) {
     Column(
         modifier = modifier,
@@ -63,8 +67,9 @@ fun ImprovedSearchResultsPage(
                         onPodcastClick = onPodcastClick,
                         onFolderClick = onFolderClick,
                         onFollowPodcast = onFollowPodcast,
-                        onPlayEpisode = onPlayEpisode,
+                        playButtonListener = playButtonListener,
                         onScroll = onScroll,
+                        fetchEpisode = fetchEpisode,
                     )
                 }
             }
@@ -95,9 +100,10 @@ private fun ImprovedSearchResultsView(
     onPodcastClick: (Podcast) -> Unit,
     onFolderClick: (Folder, List<Podcast>) -> Unit,
     onFollowPodcast: (Podcast) -> Unit,
-    onPlayEpisode: (EpisodeItem) -> Unit,
+    playButtonListener: PlayButtonListener,
     onScroll: () -> Unit,
     modifier: Modifier = Modifier,
+    fetchEpisode: (suspend (EpisodeItem) -> BaseEpisode?)? = null,
 ) {
     val nestedScrollConnection = remember {
         object : NestedScrollConnection {
@@ -131,7 +137,7 @@ private fun ImprovedSearchResultsView(
         }
 
         state.results.podcasts.forEachIndexed { index, item ->
-            item {
+            item(key = "podcast-${item.uuid}", contentType = "podcast") {
                 ImprovedSearchPodcastResultRow(
                     folderItem = item,
                     onClick = {
@@ -164,11 +170,12 @@ private fun ImprovedSearchResultsView(
         }
 
         state.results.episodes.forEachIndexed { index, item ->
-            item {
+            item(key = "episode-${item.uuid}" ,contentType = "episode") {
                 ImprovedSearchEpisodeResultRow(
                     episode = item,
                     onClick = { onEpisodeClick(item) },
-                    onPlay = { onPlayEpisode(item) }
+                    playButtonListener = playButtonListener,
+                    fetchEpisode = fetchEpisode,
                 )
             }
             if (index < state.results.episodes.lastIndex) {

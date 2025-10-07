@@ -1,4 +1,4 @@
-package au.com.shiftyjelly.pocketcasts.podcasts.helper
+package au.com.shiftyjelly.pocketcasts.views.helper
 
 import android.content.Context
 import androidx.appcompat.app.AppCompatActivity
@@ -7,20 +7,19 @@ import au.com.shiftyjelly.pocketcasts.analytics.EpisodeAnalytics
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.models.entity.BaseEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
-import au.com.shiftyjelly.pocketcasts.podcasts.view.components.PlayButton
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.download.DownloadManager
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
 import au.com.shiftyjelly.pocketcasts.utils.Network
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
-import au.com.shiftyjelly.pocketcasts.views.helper.WarningsHelper
+import au.com.shiftyjelly.pocketcasts.views.buttons.PlayButton
 import dagger.hilt.android.qualifiers.ActivityContext
-import javax.inject.Inject
-import kotlin.coroutines.CoroutineContext
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import javax.inject.Inject
+import kotlin.coroutines.CoroutineContext
 
 class PlayButtonListener @Inject constructor(
     val downloadManager: DownloadManager,
@@ -107,9 +106,9 @@ class PlayButtonListener @Inject constructor(
                     episodeManager.stopDownloadAndCleanUp(episodeUuid, "play button")
                 } else if (!it.isDownloaded) {
                     if (!waitForWifi) {
-                        it.autoDownloadStatus = PodcastEpisode.AUTO_DOWNLOAD_STATUS_MANUAL_OVERRIDE_WIFI
+                        it.autoDownloadStatus = PodcastEpisode.Companion.AUTO_DOWNLOAD_STATUS_MANUAL_OVERRIDE_WIFI
                     } else {
-                        it.autoDownloadStatus = PodcastEpisode.AUTO_DOWNLOAD_STATUS_MANUALLY_DOWNLOADED
+                        it.autoDownloadStatus = PodcastEpisode.Companion.AUTO_DOWNLOAD_STATUS_MANUALLY_DOWNLOADED
                     }
                     downloadManager.addEpisodeToQueue(it, "play button", fireEvent = true, source = source)
                     episodeAnalytics.trackEvent(
