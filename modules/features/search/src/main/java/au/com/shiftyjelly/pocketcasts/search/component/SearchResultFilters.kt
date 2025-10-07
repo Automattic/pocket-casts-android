@@ -26,7 +26,7 @@ import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 fun SearchResultFilters(
     items: List<String>,
     selectedIndex: Int,
-    onFilterSelected: (String) -> Unit,
+    onFilterSelected: (Int) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     LazyRow(
@@ -38,7 +38,7 @@ fun SearchResultFilters(
                 title = item,
                 isSelected = selectedIndex == index,
                 onSelected = {
-                    onFilterSelected(item)
+                    onFilterSelected(index)
                 }
             )
         }

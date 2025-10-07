@@ -26,6 +26,7 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.reactive.asFlow
 import kotlinx.coroutines.rx2.rxMaybe
+import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 @HiltViewModel
 class SearchViewModel @Inject constructor(
@@ -126,6 +127,16 @@ class SearchViewModel @Inject constructor(
                 }
             }
             .toFlowable().asFlow().firstOrNull()
+    }
+
+    fun selectFilter(filter: ResultsFilters) {
+        if (FeatureFlag.isEnabled(Feature.IMPROVED_SEARCH_RESULTS) && _state.value is SearchUiState.Results) {
+            _state.update {
+                (it as SearchUiState.Results).copy(
+                    selectedFilterIndex = ResultsFilters.entries.indexOf(filter),
+                )
+            }
+        }
     }
 
     fun onSubscribeToPodcast(uuid: String) {
@@ -239,6 +250,12 @@ data class SearchResults(
     val isEmpty: Boolean get() = podcasts.isEmpty() && episodes.isEmpty()
 }
 
+enum class ResultsFilters(val resId: Int) {
+    TOP_RESULTS(LR.string.search_filters_top_results),
+    PODCASTS(LR.string.search_filters_podcasts),
+    EPISODES(LR.string.search_filters_episodes),
+}
+
 sealed interface SearchUiState {
 
     val searchTerm: String?
@@ -265,5 +282,9 @@ sealed interface SearchUiState {
 
     data object Idle : SearchUiState
     data class Suggestions(val operation: SearchOperation<List<SearchAutoCompleteItem>>) : SearchUiState
-    data class Results(val operation: SearchOperation<SearchResults>) : SearchUiState
+    data class Results(
+        val operation: SearchOperation<SearchResults>,
+        val filterOptions: Set<ResultsFilters> = ResultsFilters.entries.toSet(),
+        val selectedFilterIndex: Int = 0,
+    ) : SearchUiState
 }

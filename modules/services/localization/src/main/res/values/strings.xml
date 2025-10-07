@@ -2676,4 +2676,7 @@
     <string name="onboarding_interests_select_at_least_label">Select at least 3</string>
     <string name="onboarding_recommendations_title">We hope you love these suggestions!</string>
     <string name="onboarding_recommendations_message">Here are some great shows to start with. Tap to follow, search, or import from other apps.</string>
+    <string name="search_filters_top_results">Top Results</string>
+    <string name="search_filters_podcasts">Podcasts</string>
+    <string name="search_filters_episodes">Episodes</string>
 </resources>

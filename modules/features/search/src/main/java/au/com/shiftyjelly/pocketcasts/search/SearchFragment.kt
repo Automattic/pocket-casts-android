@@ -329,6 +329,7 @@ class SearchFragment : BaseFragment() {
                                 fetchEpisode = viewModel::fetchEpisode,
                                 onScroll = { UiUtil.hideKeyboard(searchView) },
                                 bottomInset = bottomInset.pxToDp(LocalContext.current).dp,
+                                onFilterSelect = viewModel::selectFilter
                             )
                         } else {
                             SearchInlineResultsPage(

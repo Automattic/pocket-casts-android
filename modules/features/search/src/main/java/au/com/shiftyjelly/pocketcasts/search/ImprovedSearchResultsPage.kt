@@ -11,15 +11,12 @@ import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.key
-import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.NestedScrollConnection
 import androidx.compose.ui.input.nestedscroll.nestedScroll
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.Velocity
 import androidx.compose.ui.unit.dp
@@ -46,6 +43,7 @@ fun ImprovedSearchResultsPage(
     onPodcastClick: (Podcast) -> Unit,
     onFolderClick: (Folder, List<Podcast>) -> Unit,
     onFollowPodcast: (Podcast) -> Unit,
+    onFilterSelect: (ResultsFilters) -> Unit,
     playButtonListener: PlayButtonListener,
     onScroll: () -> Unit,
     modifier: Modifier = Modifier,
@@ -54,12 +52,33 @@ fun ImprovedSearchResultsPage(
     Column(
         modifier = modifier,
     ) {
-        when (val operation = state.operation) {
+
+        // we still need the server piece for this, so temporarily i'm filtering results locally here...
+        val selectedFilter = state.filterOptions.toList()[state.selectedFilterIndex]
+        val operation = (state.operation as? SearchUiState.SearchOperation.Success)?.copy(
+            results = SearchResults(
+                podcasts = if (selectedFilter != ResultsFilters.EPISODES) {
+                    state.operation.results.podcasts
+                } else emptyList(),
+                episodes = if (selectedFilter != ResultsFilters.PODCASTS) {
+                    state.operation.results.episodes
+                } else emptyList()
+            )
+        ) ?: state.operation
+
+
+        when (operation) {
             is SearchUiState.SearchOperation.Error -> SearchFailedView()
             is SearchUiState.SearchOperation.Success -> {
                 if (operation.results.isEmpty) {
                     NoResultsView()
                 } else {
+                    SearchResultFilters(
+                        modifier = Modifier.padding(bottom = 16.dp, start = 16.dp, end = 16.dp),
+                        items = state.filterOptions.map { stringResource(it.resId) },
+                        selectedIndex = state.selectedFilterIndex,
+                        onFilterSelected = { onFilterSelect(state.filterOptions.toList()[it]) }
+                    )
                     ImprovedSearchResultsView(
                         state = operation,
                         bottomInset = bottomInset,
@@ -114,8 +133,6 @@ private fun ImprovedSearchResultsView(
         }
     }
     val listState = rememberLazyListState()
-    var selectedPillIndex by remember { mutableIntStateOf(0) }
-    val filters = listOf("Top Results", "Podcasts", "Episodes")
 
     LazyColumn(
         state = listState,
@@ -125,17 +142,9 @@ private fun ImprovedSearchResultsView(
         modifier = modifier
             .nestedScroll(nestedScrollConnection),
     ) {
-
-        val dividerModifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp)
-        item {
-            SearchResultFilters(
-                modifier = Modifier.padding(bottom = 16.dp, start = 16.dp, end = 16.dp),
-                items = filters,
-                selectedIndex = selectedPillIndex,
-                onFilterSelected = { selectedPillIndex = filters.indexOf(it) }
-            )
-        }
-
+        val dividerModifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 16.dp)
         state.results.podcasts.forEachIndexed { index, item ->
             item(key = "podcast-${item.uuid}", contentType = "podcast") {
                 ImprovedSearchPodcastResultRow(
@@ -170,7 +179,7 @@ private fun ImprovedSearchResultsView(
         }
 
         state.results.episodes.forEachIndexed { index, item ->
-            item(key = "episode-${item.uuid}" ,contentType = "episode") {
+            item(key = "episode-${item.uuid}", contentType = "episode") {
                 ImprovedSearchEpisodeResultRow(
                     episode = item,
                     onClick = { onEpisodeClick(item) },
