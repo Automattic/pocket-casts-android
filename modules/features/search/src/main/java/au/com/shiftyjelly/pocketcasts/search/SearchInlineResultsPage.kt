@@ -62,9 +62,8 @@ private const val MAX_ITEM_COUNT = 20
 
 @Composable
 fun SearchInlineResultsPage(
-    state: SearchState,
+    state: SearchUiState.Results,
     loading: Boolean,
-    onlySearchRemote: Boolean,
     bottomInset: Dp,
     onEpisodeClick: (EpisodeItem) -> Unit,
     onPodcastClick: (Podcast) -> Unit,
@@ -77,12 +76,14 @@ fun SearchInlineResultsPage(
     Column(
         modifier = modifier,
     ) {
-        when (state) {
-            is SearchState.NoResults -> NoResultsView()
-            is SearchState.Results -> {
-                if (state.error == null || !onlySearchRemote || state.loading) {
+        when (val operation = state.operation) {
+            is SearchUiState.SearchOperation.Error -> SearchFailedView()
+            is SearchUiState.SearchOperation.Success -> {
+                if (operation.results.isEmpty) {
+                    NoResultsView()
+                } else {
                     SearchResultsView(
-                        state = state,
+                        state = operation,
                         onEpisodeClick = onEpisodeClick,
                         onPodcastClick = onPodcastClick,
                         onFolderClick = onFolderClick,
@@ -91,10 +92,10 @@ fun SearchInlineResultsPage(
                         onScroll = onScroll,
                         bottomInset = bottomInset,
                     )
-                } else {
-                    SearchFailedView()
                 }
             }
+
+            else -> Unit
         }
         if (loading) {
             Box(
@@ -114,7 +115,7 @@ fun SearchInlineResultsPage(
 
 @Composable
 private fun SearchResultsView(
-    state: SearchState.Results,
+    state: SearchUiState.SearchOperation.Success<SearchResults>,
     bottomInset: Dp,
     onEpisodeClick: (EpisodeItem) -> Unit,
     onPodcastClick: (Podcast) -> Unit,
@@ -134,16 +135,16 @@ private fun SearchResultsView(
     }
     val podcastsRowState = rememberLazyListState()
     val episodesRowState = rememberLazyListState()
-    val initialPodcasts by remember(state.searchTerm) { mutableStateOf(state.podcasts) }
+    val initialPodcasts by remember(state.searchTerm) { mutableStateOf(state.results.podcasts) }
     // Reset podcast list scroll position when podcast list changes
     // We use podcast UUIDs as the key to avoid unnecessary resets when only subscription properties change
-    LaunchedEffect(key1 = state.podcasts.map { it.uuid }) {
-        if (state.podcasts.isNotEmpty() && state.podcasts != initialPodcasts) {
+    LaunchedEffect(key1 = state.results.podcasts.map { it.uuid }) {
+        if (state.results.podcasts.isNotEmpty() && state.results.podcasts != initialPodcasts) {
             podcastsRowState.scrollToItem(0)
         }
     }
-    LaunchedEffect(key1 = state.episodes) {
-        if (state.episodes.isNotEmpty()) {
+    LaunchedEffect(key1 = state.results.episodes) {
+        if (state.results.episodes.isNotEmpty()) {
             episodesRowState.scrollToItem(0)
         }
     }
@@ -153,7 +154,7 @@ private fun SearchResultsView(
         modifier = modifier
             .nestedScroll(nestedScrollConnection),
     ) {
-        if (state.podcasts.isNotEmpty()) {
+        if (state.results.podcasts.isNotEmpty()) {
             item {
                 SearchResultsHeaderView(
                     title = stringResource(LR.string.podcasts),
@@ -167,7 +168,7 @@ private fun SearchResultsView(
                 contentPadding = PaddingValues(horizontal = 8.dp),
             ) {
                 items(
-                    items = state.podcasts.take(minOf(MAX_ITEM_COUNT, state.podcasts.size)),
+                    items = state.results.podcasts.take(minOf(MAX_ITEM_COUNT, state.results.podcasts.size)),
                     key = { it.uuid },
                 ) { folderItem ->
                     when (folderItem) {
@@ -194,7 +195,7 @@ private fun SearchResultsView(
                 }
             }
         }
-        if (state.podcasts.isNotEmpty() && state.episodes.isNotEmpty()) {
+        if (state.results.podcasts.isNotEmpty() && state.results.episodes.isNotEmpty()) {
             item {
                 HorizontalDivider(
                     startIndent = 16.dp,
@@ -202,7 +203,7 @@ private fun SearchResultsView(
                 )
             }
         }
-        if (state.episodes.isNotEmpty()) {
+        if (state.results.episodes.isNotEmpty()) {
             item {
                 SearchResultsHeaderView(
                     title = stringResource(LR.string.episodes),
@@ -211,7 +212,7 @@ private fun SearchResultsView(
             }
         }
         items(
-            items = state.episodes.take(minOf(MAX_ITEM_COUNT, state.episodes.size)),
+            items = state.results.episodes.take(minOf(MAX_ITEM_COUNT, state.results.episodes.size)),
             key = { it.uuid },
         ) {
             SearchEpisodeItem(
@@ -308,43 +309,43 @@ private fun SearchResultsViewPreview(
 ) {
     AppThemeWithBackground(themeType) {
         SearchResultsView(
-            state = SearchState.Results(
-                podcasts = listOf(
-                    FolderItem.Folder(
-                        folder = Folder(
-                            uuid = UUID.randomUUID().toString(),
-                            name = "Folder",
-                            color = 0,
-                            addedDate = Date(),
-                            podcastsSortType = PodcastsSortType.NAME_A_TO_Z,
-                            deleted = false,
-                            syncModified = 0L,
-                            sortPosition = 0,
-                        ),
-                        podcasts = listOf(Podcast(uuid = UUID.randomUUID().toString())),
-                    ),
-                    FolderItem.Podcast(
-                        podcast = Podcast(
-                            uuid = UUID.randomUUID().toString(),
-                            title = "Podcast",
-                            author = "Author",
-                        ),
-                    ),
-                ),
-                episodes = listOf(
-                    EpisodeItem(
-                        uuid = "6946de68-7fa7-48b0-9066-a7d6e1be2c07",
-                        title = "Society's Challenges",
-                        duration = 4004.0,
-                        publishedAt = "2022-10-28T03:00:00Z".parseIsoDate() ?: Date(),
-                        podcastUuid = "e7a6f7d0-02f2-0133-1c51-059c869cc4eb",
-                        podcastTitle = "Material",
-                    ),
-                ),
-                error = null,
-                loading = false,
+            state = SearchUiState.SearchOperation.Success(
                 searchTerm = "",
-                autoCompleteResults = emptyList(),
+                results = SearchResults(
+
+                    podcasts = listOf(
+                        FolderItem.Folder(
+                            folder = Folder(
+                                uuid = UUID.randomUUID().toString(),
+                                name = "Folder",
+                                color = 0,
+                                addedDate = Date(),
+                                podcastsSortType = PodcastsSortType.NAME_A_TO_Z,
+                                deleted = false,
+                                syncModified = 0L,
+                                sortPosition = 0,
+                            ),
+                            podcasts = listOf(Podcast(uuid = UUID.randomUUID().toString())),
+                        ),
+                        FolderItem.Podcast(
+                            podcast = Podcast(
+                                uuid = UUID.randomUUID().toString(),
+                                title = "Podcast",
+                                author = "Author",
+                            ),
+                        ),
+                    ),
+                    episodes = listOf(
+                        EpisodeItem(
+                            uuid = "6946de68-7fa7-48b0-9066-a7d6e1be2c07",
+                            title = "Society's Challenges",
+                            duration = 4004.0,
+                            publishedAt = "2022-10-28T03:00:00Z".parseIsoDate() ?: Date(),
+                            podcastUuid = "e7a6f7d0-02f2-0133-1c51-059c869cc4eb",
+                            podcastTitle = "Material",
+                        ),
+                    ),
+                ),
             ),
             onEpisodeClick = {},
             onPodcastClick = {},

@@ -38,7 +38,6 @@ class SearchViewModelTest {
     @Before
     fun setUp() {
         whenever(searchHandler.searchResults).thenReturn(mock())
-        whenever(searchHandler.loading).thenReturn(mock())
         viewModel =
             SearchViewModel(searchHandler, searchHistoryManager, podcastManager, AnalyticsTracker.test())
     }
