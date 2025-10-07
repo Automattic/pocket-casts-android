@@ -1,5 +1,10 @@
 7.100
 -----
+*   New Features
+    *   Implement search suggestions
+        ([#4571](https://github.com/Automattic/pocket-casts-android/pull/4571))
+    *   Update search results screen
+        ([#4583](https://github.com/Automattic/pocket-casts-android/pull/4583))
 *   Bug Fixes
     *   Fix restoring large Up Next queues
         ([#4562](https://github.com/Automattic/pocket-casts-android/pull/4562))
