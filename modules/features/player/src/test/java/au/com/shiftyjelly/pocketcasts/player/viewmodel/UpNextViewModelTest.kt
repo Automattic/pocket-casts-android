@@ -10,7 +10,6 @@ import io.reactivex.Flowable
 import java.time.Instant
 import junit.framework.TestCase.assertEquals
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
 import org.junit.Test
 import org.mockito.kotlin.mock
@@ -58,6 +57,6 @@ class UpNextViewModelTest {
                     ),
                 ),
             )
-        return UpNextViewModel(userManager, UnconfinedTestDispatcher())
+        return UpNextViewModel(userManager, mock())
     }
 }

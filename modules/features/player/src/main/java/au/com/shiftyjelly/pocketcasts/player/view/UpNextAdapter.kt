@@ -73,6 +73,7 @@ class UpNextAdapter(
     private val settings: Settings,
     private val playbackManager: PlaybackManager,
     private val swipeRowActionsFactory: SwipeRowActions.Factory,
+    private val onSortClick: () -> Unit,
     private val onSwipeAction: (BaseEpisode, SwipeAction) -> Unit,
 ) : ListAdapter<Any, RecyclerView.ViewHolder>(UPNEXT_ADAPTER_DIFF) {
     private val dateFormatter = RelativeDateFormatter(context)
@@ -132,7 +133,11 @@ class UpNextAdapter(
                 )
             }
 
-            R.layout.adapter_up_next_footer -> HeaderViewHolder(AdapterUpNextFooterBinding.inflate(inflater, parent, false))
+            R.layout.adapter_up_next_footer -> HeaderViewHolder(
+                binding = AdapterUpNextFooterBinding.inflate(inflater, parent, false),
+                onSortClick = onSortClick,
+            )
+
             R.layout.adapter_up_next_playing -> PlayingViewHolder(AdapterUpNextPlayingBinding.inflate(inflater, parent, false))
             else -> throw IllegalStateException("Unknown view type in up next")
         }
@@ -195,7 +200,14 @@ class UpNextAdapter(
         this.isUpNextNotEmpty = isUpNextNotEmpty
     }
 
-    inner class HeaderViewHolder(val binding: AdapterUpNextFooterBinding) : RecyclerView.ViewHolder(binding.root) {
+    inner class HeaderViewHolder(
+        val binding: AdapterUpNextFooterBinding,
+        val onSortClick: () -> Unit,
+    ) : RecyclerView.ViewHolder(binding.root) {
+
+        init {
+            binding.sort.setOnClickListener { onSortClick() }
+        }
 
         fun bind(header: PlayerViewModel.UpNextSummary) {
             with(binding) {
@@ -218,6 +230,7 @@ class UpNextAdapter(
                     root.resources.getQuantityString(LR.plurals.player_up_next_header_title, header.episodeCount, header.episodeCount, time)
                 }
 
+                sort.isVisible = isUpNextNotEmpty
                 shuffle.isVisible = isUpNextNotEmpty
                 shuffle.updateShuffleButton()
 
