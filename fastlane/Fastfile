@@ -100,14 +100,21 @@ end
 platform :android do
   # @param skip_confirm [Boolean] If true, avoids any interactive prompt
   #
-  lane :code_freeze do |skip_confirm: false|
+  lane :code_freeze do |version: nil, skip_confirm: false|
     ensure_git_status_clean
     Fastlane::Helper::GitHelper.checkout_and_pull(DEFAULT_BRANCH)
+
+    # Validate provided version matches the calculated version
+    expected_version = release_version_next
+    if version && version != expected_version
+      UI.user_error!("Version mismatch: Provided version '#{version}' does not match calculated version '#{expected_version}'. Please check the release scenario version matches the project version.")
+    end
+    UI.success("✓ Version validation passed: Version (#{version || expected_version}) matches calculated version") if version
 
     confirmation_message = <<-MESSAGE
 
       Code Freeze:
-      • New release branch from #{DEFAULT_BRANCH}: release/#{release_version_next}
+      • New release branch from #{DEFAULT_BRANCH}: release/#{expected_version}
       • Current release version and build code: #{release_version_current} (#{build_code_current}).
       • New release version and build code: #{beta_version_code_freeze} (#{build_code_next}).
 
