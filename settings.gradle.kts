@@ -21,8 +21,6 @@ plugins {
     id("com.gradle.common-custom-user-data-gradle-plugin").version("2.2.1")
 }
 
-apply(from = File("./config/gradle/gradle_build_scan.gradle"))
-
 dependencyResolutionManagement {
     repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
     repositories {
@@ -93,6 +91,13 @@ val developerProperties = loadPropertiesFromFile(File("${rootDir.path}/developer
 val secretsFile = File("${rootDir.path}/secret.properties")
 val secretProperties = loadPropertiesFromFile(secretsFile)
 val useRemoteBuildCacheLocally = "use_remote_build_cache_locally"
+
+
+gradle.extra["isCi"] = System.getenv("CI")?.toBoolean() ?: false
+gradle.extra["develocityToken"] = secretProperties.getProperty("develocityToken")
+gradle.extra["measureBuildsEnabled"] = secretProperties.getProperty("measureBuildsEnabled")
+
+apply(from = File("./config/gradle/gradle_build_scan.gradle"))
 
 buildCache {
     if (System.getenv("CI")?.toBoolean() == true) {
