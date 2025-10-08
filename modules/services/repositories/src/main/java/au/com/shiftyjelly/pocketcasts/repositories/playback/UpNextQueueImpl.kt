@@ -28,7 +28,6 @@ import io.reactivex.schedulers.Schedulers
 import java.util.Collections
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
-import javax.inject.Singleton
 import kotlin.coroutines.CoroutineContext
 import kotlin.random.Random
 import kotlinx.coroutines.CoroutineScope
@@ -37,7 +36,6 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import timber.log.Timber
 
-@Singleton
 class UpNextQueueImpl @Inject constructor(
     appDatabase: AppDatabase,
     private val settings: Settings,
