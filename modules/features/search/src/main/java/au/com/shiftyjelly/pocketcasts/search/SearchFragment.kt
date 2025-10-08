@@ -5,6 +5,7 @@ import android.app.SearchManager
 import android.content.Context
 import android.os.Bundle
 import android.util.TypedValue
+import android.view.KeyEvent
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -200,6 +201,14 @@ class SearchFragment : BaseFragment() {
             setTextColor(context.getThemeColor(UR.attr.secondary_text_01))
             val hintColor = UR.attr.secondary_text_02
             setHintTextColor(context.getThemeColor(hintColor))
+            setOnEditorActionListener { _, actionId, event ->
+                if (actionId == EditorInfo.IME_ACTION_SEARCH || actionId == EditorInfo.IME_ACTION_DONE || (event.action == KeyEvent.ACTION_DOWN && event.keyCode == KeyEvent.KEYCODE_ENTER)) {
+                    viewModel.selectSuggestion(searchView.query.toString())
+                    true
+                } else {
+                    false
+                }
+            }
         }
 
         val searchManager = view.context.getSystemService(Activity.SEARCH_SERVICE) as SearchManager
