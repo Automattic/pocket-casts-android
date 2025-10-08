@@ -44,14 +44,6 @@ enum class Feature(
         hasFirebaseRemoteFlag = true,
         hasDevToggle = true,
     ),
-    NOVA_LAUNCHER(
-        key = "nova_launcher",
-        title = "Integrate Pocket Casts with Nova Launcher",
-        defaultValue = isDebugOrPrototypeBuild,
-        tier = FeatureTier.Free,
-        hasFirebaseRemoteFlag = false,
-        hasDevToggle = true,
-    ),
     EXPLAT_EXPERIMENT(
         key = "explat_experiment",
         title = "ExPlat Experiment",
