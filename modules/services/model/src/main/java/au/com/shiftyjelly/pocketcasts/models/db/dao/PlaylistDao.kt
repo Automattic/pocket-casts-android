@@ -162,10 +162,12 @@ abstract class PlaylistDao {
     @Query(
         """
         UPDATE playlists
-        SET showArchivedEpisodes = (CASE 
+        SET 
+          showArchivedEpisodes = (CASE 
             WHEN showArchivedEpisodes IS 0 THEN 1 
             ELSE 0
-        END)
+          END),
+          syncStatus = $SYNC_STATUS_NOT_SYNCED
         WHERE uuid = :uuid    
     """,
     )

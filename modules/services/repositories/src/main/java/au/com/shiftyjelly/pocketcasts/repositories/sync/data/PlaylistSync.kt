@@ -14,6 +14,7 @@ import com.google.protobuf.boolValue
 import com.google.protobuf.int32Value
 import com.google.protobuf.int64Value
 import com.google.protobuf.stringValue
+import com.google.protobuf.value
 import com.pocketcasts.service.api.PlaylistSyncResponse
 import com.pocketcasts.service.api.Record
 import com.pocketcasts.service.api.SyncUserPlaylist
@@ -201,6 +202,9 @@ internal class PlaylistSync(
                         shorterThan = int32Value {
                             value = localPlaylist.shorterThan
                         }
+                        showArchived = boolValue {
+                            value = localPlaylist.showArchivedEpisodes
+                        }
                         if (localPlaylist.manual) {
                             val localEpisodes = playlistDao.getManualPlaylistEpisodesForSync(localPlaylist.uuid)
                             episodeOrder.addAll(localEpisodes.map(ManualPlaylistEpisode::episodeUuid))
@@ -266,6 +270,9 @@ private fun PlaylistEntity.applyServerPlaylist(serverPlaylist: PlaylistSyncRespo
     serverPlaylist.shorterThanOrNull?.value?.let { value ->
         shorterThan = value
     }
+    serverPlaylist.showArchived?.value?.let { value ->
+        showArchivedEpisodes = value
+    }
 }
 
 private fun PlaylistEntity.applyServerPlaylist(serverPlaylist: SyncUserPlaylist) = apply {
@@ -322,6 +329,9 @@ private fun PlaylistEntity.applyServerPlaylist(serverPlaylist: SyncUserPlaylist)
     }
     serverPlaylist.shorterThanOrNull?.value?.let { value ->
         shorterThan = value
+    }
+    serverPlaylist.showArchived?.value?.let { value ->
+        showArchivedEpisodes = value
     }
 }
 
