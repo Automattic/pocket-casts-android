@@ -14,19 +14,19 @@ import org.junit.Test
 class InternationalizationInterceptorTest {
     @get:Rule
     val server = MockWebServer()
+    private val url = server.url("/")
 
     private var locale = Locale.US
     private var region = "gb"
-
     private val client = OkHttpClient.Builder()
         .addInterceptor(
             InternationalizationInterceptor(
+                allowedHosts = listOf(url.host),
                 provideLocale = { locale },
                 provideRegion = { region },
             ),
         )
         .build()
-    private val url = server.url("/")
 
     @Test
     fun `add i18n headers`() {
@@ -66,6 +66,27 @@ class InternationalizationInterceptorTest {
     fun `do not add empty headers`() {
         locale = Locale.ROOT
         region = ""
+        val request = Request.Builder().url(url).build()
+
+        server.enqueue(MockResponse())
+        client.newCall(request).execute()
+
+        val serverRequest = server.takeRequest()
+        assertEquals(null, serverRequest.getHeader(APP_LANGUAGE_HEADER))
+        assertEquals(null, serverRequest.getHeader(USER_REGION_HEADER))
+    }
+
+    @Test
+    fun `do not add headers to unknown hosts`() {
+        val client = OkHttpClient.Builder()
+            .addInterceptor(
+                InternationalizationInterceptor(
+                    allowedHosts = listOf("allowed-host.com"),
+                    provideLocale = { locale },
+                    provideRegion = { region },
+                ),
+            )
+            .build()
         val request = Request.Builder().url(url).build()
 
         server.enqueue(MockResponse())

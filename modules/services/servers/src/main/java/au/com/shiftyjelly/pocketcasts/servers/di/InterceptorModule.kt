@@ -138,6 +138,7 @@ object InterceptorModule {
         settings: Settings,
     ): Interceptor {
         return InternationalizationInterceptor(
+            allowedHosts = listOf(BuildConfig.WEB_BASE_HOST, BuildConfig.SERVER_SHORT_HOST),
             provideLocale = { context.resources.configuration.locales[0] },
             provideRegion = { settings.discoverCountryCode.value },
         )
