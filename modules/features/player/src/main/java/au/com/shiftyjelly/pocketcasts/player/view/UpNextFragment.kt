@@ -271,6 +271,7 @@ class UpNextFragment :
                     swipeActionViewModel.handleAction(swipeAction, episode.uuid, childFragmentManager)
                 }
             },
+            onSortClick = ::showSortDialog,
         )
         adapter.theme = overrideTheme
     }
@@ -541,5 +542,12 @@ class UpNextFragment :
         val canScroll = binding.recyclerView.canScrollVertically(-1)
         binding.recyclerView.quickScrollToTop()
         return canScroll
+    }
+
+    private fun showSortDialog() {
+        if (childFragmentManager.findFragmentByTag("up-next-sort") != null) {
+            return
+        }
+        UpNextSortFragment().show(childFragmentManager, "up-next-sort")
     }
 }

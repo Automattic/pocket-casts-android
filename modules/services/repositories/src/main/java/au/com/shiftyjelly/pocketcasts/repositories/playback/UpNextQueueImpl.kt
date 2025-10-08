@@ -8,6 +8,7 @@ import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.UpNextChange
 import au.com.shiftyjelly.pocketcasts.models.entity.toUpNextEpisode
+import au.com.shiftyjelly.pocketcasts.models.type.UpNextSortType
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.preferences.model.AutoPlaySource
 import au.com.shiftyjelly.pocketcasts.repositories.download.DownloadHelper
@@ -31,6 +32,7 @@ import kotlin.coroutines.CoroutineContext
 import kotlin.random.Random
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import timber.log.Timber
 
@@ -309,6 +311,20 @@ class UpNextQueueImpl @Inject constructor(
             saveChangesBlocking(UpNextAction.Import(episodes))
 
             episodes.forEach { downloadIfPossible(it, downloadManager) }
+        }
+    }
+
+    override fun sortUpNext(sortType: UpNextSortType) {
+        launch {
+            val episodes = withContext(Dispatchers.Default) {
+                buildList {
+                    currentEpisode?.let(::add)
+                    addAll(queueEpisodes.sortedWith(sortType))
+                }
+            }
+            withContext(Dispatchers.IO) {
+                saveChangesBlocking(UpNextAction.Rearrange(episodes))
+            }
         }
     }
 

@@ -386,6 +386,7 @@ enum class AnalyticsEvent(val key: String) {
     UP_NEXT_DISMISSED("up_next_dismissed"),
     UP_NEXT_SHUFFLE_ENABLED("up_next_shuffle_enabled"),
     UP_NEXT_DISCOVER_BUTTON_TAPPED("up_next_discover_button_tapped"),
+    UP_NEXT_SORT("up_next_sort"),
 
     /* Player */
     PLAYER_SHOWN("player_shown"),
