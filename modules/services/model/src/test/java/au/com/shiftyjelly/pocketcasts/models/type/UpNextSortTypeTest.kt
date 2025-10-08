@@ -1,7 +1,7 @@
 package au.com.shiftyjelly.pocketcasts.models.type
 
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
-import java.sql.Date
+import java.util.Date
 import org.junit.Assert.assertEquals
 import org.junit.Test
 
