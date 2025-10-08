@@ -1,7 +1,7 @@
 develocity {
     buildScan {
         server = "https://develocity.a8c-ci.services/"
-        accessKey = gradle.ext.properties["develocityToken"]
+        accessKey = gradle.ext["develocityToken"]
 
         if (gradle.ext["isCi"]) {
             uploadInBackground = false
