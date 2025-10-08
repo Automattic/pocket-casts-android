@@ -106,9 +106,9 @@ class PlayButtonListener @Inject constructor(
                     episodeManager.stopDownloadAndCleanUp(episodeUuid, "play button")
                 } else if (!it.isDownloaded) {
                     if (!waitForWifi) {
-                        it.autoDownloadStatus = PodcastEpisode.Companion.AUTO_DOWNLOAD_STATUS_MANUAL_OVERRIDE_WIFI
+                        it.autoDownloadStatus = PodcastEpisode.AUTO_DOWNLOAD_STATUS_MANUAL_OVERRIDE_WIFI
                     } else {
-                        it.autoDownloadStatus = PodcastEpisode.Companion.AUTO_DOWNLOAD_STATUS_MANUALLY_DOWNLOADED
+                        it.autoDownloadStatus = PodcastEpisode.AUTO_DOWNLOAD_STATUS_MANUALLY_DOWNLOADED
                     }
                     downloadManager.addEpisodeToQueue(it, "play button", fireEvent = true, source = source)
                     episodeAnalytics.trackEvent(

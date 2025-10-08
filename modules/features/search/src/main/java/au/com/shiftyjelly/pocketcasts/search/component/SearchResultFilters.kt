@@ -65,7 +65,7 @@ private fun SearchFilterPill(
                 } else {
                     Modifier.border(
                         width = 1.dp,
-                        color = MaterialTheme.theme.colors.primaryField01Active,
+                        color = MaterialTheme.theme.colors.primaryIcon02,
                         shape = RoundedCornerShape(100),
                     )
                 },

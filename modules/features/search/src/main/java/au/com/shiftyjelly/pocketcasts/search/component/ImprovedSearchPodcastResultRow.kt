@@ -112,7 +112,7 @@ private fun ImprovedSearchPodcastResultRow(
             Icon(
                 modifier = Modifier
                     .minimumInteractiveComponentSize(),
-                painter = painterResource(IR.drawable.ic_check),
+                painter = painterResource(IR.drawable.ic_check_black_24dp),
                 contentDescription = null,
                 tint = MaterialTheme.theme.colors.support02,
             )

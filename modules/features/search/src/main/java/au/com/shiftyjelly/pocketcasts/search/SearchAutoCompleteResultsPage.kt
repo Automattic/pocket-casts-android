@@ -138,33 +138,19 @@ private fun PreviewSearchAutoCompleteResultsPage(
             playButtonListener = object : PlayButton.OnClickListener {
                 override var source: SourceView = SourceView.SEARCH_RESULTS
 
-                override fun onPlayClicked(episodeUuid: String) {
-                    TODO("Not yet implemented")
-                }
+                override fun onPlayClicked(episodeUuid: String) = Unit
 
-                override fun onPauseClicked() {
-                    TODO("Not yet implemented")
-                }
+                override fun onPauseClicked() = Unit
 
-                override fun onPlayNext(episodeUuid: String) {
-                    TODO("Not yet implemented")
-                }
+                override fun onPlayNext(episodeUuid: String) = Unit
 
-                override fun onPlayLast(episodeUuid: String) {
-                    TODO("Not yet implemented")
-                }
+                override fun onPlayLast(episodeUuid: String) = Unit
 
-                override fun onDownload(episodeUuid: String) {
-                    TODO("Not yet implemented")
-                }
+                override fun onDownload(episodeUuid: String) = Unit
 
-                override fun onStopDownloading(episodeUuid: String) {
-                    TODO("Not yet implemented")
-                }
+                override fun onStopDownloading(episodeUuid: String) = Unit
 
-                override fun onPlayedClicked(episodeUuid: String) {
-                    TODO("Not yet implemented")
-                }
+                override fun onPlayedClicked(episodeUuid: String) = Unit
             },
             bottomInset = 0.dp,
         )

@@ -162,7 +162,7 @@ private fun ImprovedSearchResultsView(
                         if (item is FolderItem.Podcast) {
                             onFollowPodcast(item.podcast)
                         } else {
-                            null
+                            Unit
                         }
                     },
                 )
