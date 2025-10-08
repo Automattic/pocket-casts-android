@@ -1,5 +1,6 @@
 package au.com.shiftyjelly.pocketcasts.player.viewmodel
 
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.models.type.SignInState
 import au.com.shiftyjelly.pocketcasts.models.type.Subscription
 import au.com.shiftyjelly.pocketcasts.models.type.SubscriptionPlatform
@@ -57,6 +58,6 @@ class UpNextViewModelTest {
                     ),
                 ),
             )
-        return UpNextViewModel(userManager, mock())
+        return UpNextViewModel(userManager, mock(), AnalyticsTracker.test())
     }
 }
