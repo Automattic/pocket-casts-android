@@ -36,6 +36,7 @@ import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.mapNotNull
 import kotlinx.coroutines.flow.stateIn
@@ -121,7 +122,7 @@ class ShelfSharedViewModel @Inject constructor(
     fun onSleepClick(source: ShelfItemSource, episode: PodcastEpisode) {
         trackShelfAction(ShelfItem.Sleep, source)
         viewModelScope.launch {
-            chapterManager.observerChaptersForEpisode(episode.uuid).collect { it ->
+            playbackManager.playbackStateFlow.firstOrNull()?.chapters?.let {
                 _navigationState.emit(NavigationState.ShowSleepTimerOptions(it.isNotEmpty()))
             }
         }

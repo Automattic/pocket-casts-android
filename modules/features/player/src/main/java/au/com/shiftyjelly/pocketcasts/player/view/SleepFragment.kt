@@ -6,7 +6,6 @@ import android.os.Parcelable
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.core.os.BundleCompat
 import androidx.core.os.bundleOf
 import androidx.core.view.isVisible
 import androidx.fragment.app.activityViewModels
@@ -25,6 +24,7 @@ import au.com.shiftyjelly.pocketcasts.ui.helper.FragmentHostListener
 import au.com.shiftyjelly.pocketcasts.ui.helper.StatusBarIconColor
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.utils.combineLatest
+import au.com.shiftyjelly.pocketcasts.utils.extensions.requireParcelable
 import au.com.shiftyjelly.pocketcasts.utils.minutes
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseDialogFragment
 import com.airbnb.lottie.LottieProperty
@@ -55,7 +55,7 @@ class SleepFragment : BaseDialogFragment() {
     private var binding: FragmentSleepBinding? = null
     private var disposable: Disposable? = null
 
-    private val args get() = requireNotNull(arguments?.let { BundleCompat.getParcelable(it, NEW_INSTANCE_ARG, Args::class.java) })
+    private val args get() = requireArguments().requireParcelable<Args>(NEW_INSTANCE_ARG)
 
     override fun onResume() {
         super.onResume()
@@ -194,11 +194,13 @@ class SleepFragment : BaseDialogFragment() {
             binding?.sleepingInText?.text = text
         }
 
-        viewModel.isSleepRunning.observe(viewLifecycleOwner) { isSleepRunning ->
+        viewModel.isSleepRunning.combineLatest(
+            viewModel.isSleepAtEndOfEpisodeOrChapter,
+        ).observe(viewLifecycleOwner) { (isSleepRunning, isSleepAtEndOfChapter) ->
             binding?.sleepSetup?.isVisible = !isSleepRunning
             binding?.sleepRunning?.isVisible = isSleepRunning
-            binding?.sleepSetupChapter?.isVisible = !isSleepRunning && args.hasChapters
-            binding?.sleepRunningChapter?.isVisible = isSleepRunning && args.hasChapters
+            binding?.sleepSetupChapter?.isVisible = !isSleepRunning && isSleepAtEndOfChapter
+            binding?.sleepRunningChapter?.isVisible = isSleepRunning && isSleepAtEndOfChapter
         }
 
         viewModel.isSleepRunning.combineLatest(viewModel.isSleepAtEndOfEpisodeOrChapter)
@@ -334,7 +336,7 @@ class SleepFragment : BaseDialogFragment() {
         private const val NEW_INSTANCE_ARG = "SleepFragmentArgs"
 
         fun newInstance(
-            hasChapters: Boolean
+            hasChapters: Boolean,
         ) = SleepFragment().apply {
             arguments = bundleOf(
                 NEW_INSTANCE_ARG to Args(
