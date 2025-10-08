@@ -92,7 +92,6 @@ val secretsFile = File("${rootDir.path}/secret.properties")
 val secretProperties = loadPropertiesFromFile(secretsFile)
 val useRemoteBuildCacheLocally = "use_remote_build_cache_locally"
 
-
 gradle.extra["isCi"] = System.getenv("CI")?.toBoolean() ?: false
 gradle.extra["develocityToken"] = secretProperties.getProperty("develocityToken")
 gradle.extra["measureBuildsEnabled"] = secretProperties.getProperty("measureBuildsEnabled")
