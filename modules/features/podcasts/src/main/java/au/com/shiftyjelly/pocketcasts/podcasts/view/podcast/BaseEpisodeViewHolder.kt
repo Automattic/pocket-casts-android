@@ -63,6 +63,8 @@ abstract class BaseEpisodeViewHolder<T : Any>(
 
     private var streamByDefault = false
 
+    private var isObservingRowData = false
+
     @Suppress("UNCHECKED_CAST")
     private val swipeLayout = binding.root as SwipeRowLayout<SwipeAction>
 
@@ -112,7 +114,7 @@ abstract class BaseEpisodeViewHolder<T : Any>(
         val previousUuid = boundItem?.let(::toPodcastEpisode)?.uuid
         setupInitialState(item, tint, isMultiSelectEnabled, streamByDefault)
 
-        if (previousUuid != episode.uuid) {
+        if (previousUuid != episode.uuid || !isObservingRowData) {
             observeRowData()
         }
         bindArtwork(useEpisodeArtwork)
@@ -156,22 +158,25 @@ abstract class BaseEpisodeViewHolder<T : Any>(
 
     private fun observeRowData() {
         disposable.clear()
-        disposable += rowDataProvider.episodeRowDataObservable(episode.uuid).subscribeBy(onNext = { data ->
-            episode.playing = data.playbackState.isPlaying && data.playbackState.episodeUuid == episode.uuid
-            bindPlaybackButton()
+        disposable += rowDataProvider.episodeRowDataObservable(episode.uuid)
+            .doOnSubscribe { isObservingRowData = true }
+            .doOnDispose { isObservingRowData = false }
+            .subscribeBy(onNext = { data ->
+                episode.playing = data.playbackState.isPlaying && data.playbackState.episodeUuid == episode.uuid
+                bindPlaybackButton()
 
-            binding.imgUpNext.isVisible = data.isInUpNext
-            binding.imgBookmark.isVisible = data.hasBookmarks
+                binding.imgUpNext.isVisible = data.isInUpNext
+                binding.imgBookmark.isVisible = data.hasBookmarks
 
-            if (data.playbackState.episodeUuid == episode.uuid && data.playbackState.isBuffering) {
-                bindStatus(text = context.getString(LR.string.episode_row_buffering))
-                binding.progressBar.isVisible = true
-            } else {
-                bindStatus(downloadProgress = data.downloadProgress)
-            }
-            bindSwipeActions()
-            bindContentDescription(isInUpNext = data.isInUpNext)
-        })
+                if (data.playbackState.episodeUuid == episode.uuid && data.playbackState.isBuffering) {
+                    bindStatus(text = context.getString(LR.string.episode_row_buffering))
+                    binding.progressBar.isVisible = true
+                } else {
+                    bindStatus(downloadProgress = data.downloadProgress)
+                }
+                bindSwipeActions()
+                bindContentDescription(isInUpNext = data.isInUpNext)
+            })
     }
 
     private fun bindArtwork(useEpisodeArtwork: Boolean) {
@@ -236,7 +241,7 @@ abstract class BaseEpisodeViewHolder<T : Any>(
             val archivedString = context.getString(LR.string.archived)
             val timeLeft = TimeHelper.getTimeLeft(episode.playedUpToMs, episode.durationMs.toLong(), episode.isInProgress, context)
             bindStatus(
-                text = "$archivedString. ${timeLeft.text}",
+                text = "$archivedString · ${timeLeft.text}",
                 description = "$archivedString. ${timeLeft.description}",
                 iconId = IR.drawable.ic_archive,
                 iconTint = primaryIcon02Tint,
