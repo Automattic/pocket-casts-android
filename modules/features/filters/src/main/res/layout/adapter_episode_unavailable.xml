@@ -62,26 +62,45 @@
             android:alpha="0.4"
             android:ellipsize="end"
             android:maxLines="2"
-            app:layout_constraintBottom_toTopOf="@+id/unavailableLabel"
+            app:layout_constraintBottom_toTopOf="@+id/unavailableStatusContainer"
             app:layout_constraintEnd_toEndOf="@+id/dateLabel"
             app:layout_constraintStart_toStartOf="@id/dateLabel"
             app:layout_constraintTop_toBottomOf="@id/dateLabel"
             tools:text="Episode title" />
 
-        <TextView
-            android:id="@+id/unavailableLabel"
-            style="?attr/textCaption"
+        <LinearLayout
+            android:id="@+id/unavailableStatusContainer"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginBottom="12dp"
             android:alpha="0.4"
-            android:ellipsize="end"
-            android:maxLines="1"
-            android:text="@string/unavailable"
+            android:orientation="horizontal"
             app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="@+id/dateLabel"
             app:layout_constraintStart_toStartOf="@id/dateLabel"
-            app:layout_constraintTop_toBottomOf="@id/titleLabel" />
+            app:layout_constraintTop_toBottomOf="@id/titleLabel"
+            tools:ignore="UseCompoundDrawables">
+
+            <ImageView
+                android:id="@+id/imgUnavailable"
+                android:layout_width="16dp"
+                android:layout_height="16dp"
+                android:layout_gravity="center"
+                android:layout_marginEnd="4dp"
+                android:importantForAccessibility="no"
+                android:src="@drawable/ic_episode_unavailable"
+                app:tint="?attr/primary_icon_02" />
+
+            <TextView
+                android:id="@+id/unavailableLabel"
+                style="?attr/textCaption"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_weight="1"
+                android:ellipsize="end"
+                android:maxLines="1"
+                android:text="@string/unavailable" />
+        </LinearLayout>
 
         <View
             android:layout_width="match_parent"

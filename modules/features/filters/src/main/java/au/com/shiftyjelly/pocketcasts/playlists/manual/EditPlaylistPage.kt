@@ -285,10 +285,17 @@ private fun Footer(
         verticalAlignment = Alignment.Bottom,
         modifier = modifier,
     ) {
-        val isArchived = episodeWrapper is PlaylistEpisode.Available && episodeWrapper.episode.isArchived
-        if (isArchived) {
+        val episodeIcon = when (episodeWrapper) {
+            is PlaylistEpisode.Available -> if (episodeWrapper.episode.isArchived) {
+                IR.drawable.ic_archive
+            } else {
+                null
+            }
+            is PlaylistEpisode.Unavailable -> IR.drawable.ic_episode_unavailable
+        }
+        if (episodeIcon != null) {
             Image(
-                painter = painterResource(IR.drawable.ic_archive),
+                painter = painterResource(episodeIcon),
                 contentDescription = null,
                 colorFilter = ColorFilter.tint(MaterialTheme.theme.colors.primaryText02),
                 modifier = Modifier
@@ -298,6 +305,7 @@ private fun Footer(
         }
         TextH60(
             text = buildString {
+                val isArchived = episodeWrapper is PlaylistEpisode.Available && episodeWrapper.episode.isArchived
                 if (isArchived) {
                     append(stringResource(LR.string.archived))
                     append(" • ")
