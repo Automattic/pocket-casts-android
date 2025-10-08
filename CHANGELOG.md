@@ -1,5 +1,8 @@
 7.100
 -----
+*   New Features
+    *   Add an option to sort Up Next by date
+        ([#4586](https://github.com/Automattic/pocket-casts-android/pull/4586))
 *   Bug Fixes
     *   Fix restoring large Up Next queues
         ([#4562](https://github.com/Automattic/pocket-casts-android/pull/4562))
