@@ -45,7 +45,7 @@ fun SearchAutoCompleteResultsPage(
     playButtonListener: PlayButton.OnClickListener,
     bottomInset: Dp,
     onScroll: () -> Unit,
-    onReportSuggestionsShown: () -> Unit,
+    onReportSuggestionsRender: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val nestedScrollConnection = remember {
@@ -58,7 +58,7 @@ fun SearchAutoCompleteResultsPage(
     }
 
     CallOnce {
-        onReportSuggestionsShown()
+        onReportSuggestionsRender()
     }
 
     Box(
@@ -141,7 +141,7 @@ private fun PreviewSearchAutoCompleteResultsPage(
             onPodcastClick = {},
             onPodcastFollow = {},
             onScroll = {},
-            onReportSuggestionsShown = {},
+            onReportSuggestionsRender = {},
             playButtonListener = object : PlayButton.OnClickListener {
                 override var source: SourceView = SourceView.SEARCH_RESULTS
 

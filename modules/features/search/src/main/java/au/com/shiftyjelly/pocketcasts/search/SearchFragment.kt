@@ -313,7 +313,7 @@ class SearchFragment : BaseFragment() {
                             onScroll = { UiUtil.hideKeyboard(searchView) },
                             bottomInset = bottomInset.pxToDp(LocalContext.current).dp,
                             isLoading = suggestions.operation is SearchUiState.SearchOperation.Loading,
-                            onReportSuggestionsShown = viewModel::trackSuggestionsShown
+                            onReportSuggestionsRender = viewModel::trackSuggestionsShown,
                         )
                     }
                 }

@@ -58,8 +58,8 @@ class SearchViewModel @Inject constructor(
                                         analyticsTracker.track(
                                             AnalyticsEvent.IMPROVED_SEARCH_SUGGESTIONS_FAILED,
                                             mapOf(
-                                                "source" to "discover"
-                                            )
+                                                "source" to "discover",
+                                            ),
                                         )
                                     }
                                     else -> Unit
@@ -147,8 +147,8 @@ class SearchViewModel @Inject constructor(
                 AnalyticsEvent.IMPROVED_SEARCH_FILTER_TAPPED,
                 mapOf(
                     "source" to "discover",
-                    "filter" to filter.name
-                )
+                    "filter" to filter.name,
+                ),
             )
             _state.update {
                 (it as SearchUiState.Results).copy(
@@ -208,8 +208,8 @@ class SearchViewModel @Inject constructor(
             AnalyticsEvent.IMPROVED_SEARCH_SUGGESTION_TERM_TAPPED,
             properties = mapOf(
                 "term" to suggestion,
-                "source" to "discover"
-            )
+                "source" to "discover",
+            ),
         )
 
         _state.value = SearchUiState.Results(operation = SearchUiState.SearchOperation.Loading(suggestion))
@@ -251,8 +251,8 @@ class SearchViewModel @Inject constructor(
         analyticsTracker.track(
             AnalyticsEvent.IMPROVED_SEARCH_SUGGESTIONS_SHOWN,
             mapOf(
-                "source" to "discover"
-            )
+                "source" to "discover",
+            ),
         )
     }
 
