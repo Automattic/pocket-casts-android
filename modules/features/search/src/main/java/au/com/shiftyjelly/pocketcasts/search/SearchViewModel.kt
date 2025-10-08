@@ -53,6 +53,18 @@ class SearchViewModel @Inject constructor(
                     .collect { operation ->
                         _state.update {
                             if (it is SearchUiState.Idle || it is SearchUiState.Suggestions) {
+                                when (operation) {
+                                    is SearchUiState.SearchOperation.Error -> {
+                                        analyticsTracker.track(
+                                            AnalyticsEvent.IMPROVED_SEARCH_SUGGESTIONS_FAILED,
+                                            mapOf(
+                                                "source" to "discover"
+                                            )
+                                        )
+                                    }
+                                    else -> Unit
+                                }
+
                                 // only show loading for the initial query when autocomplete results are empty
                                 if (((it as? SearchUiState.Suggestions)?.operation as? SearchUiState.SearchOperation.Success)?.results?.isNotEmpty() == true && operation is SearchUiState.SearchOperation.Loading) {
                                     it
@@ -131,6 +143,13 @@ class SearchViewModel @Inject constructor(
 
     fun selectFilter(filter: ResultsFilters) {
         if (FeatureFlag.isEnabled(Feature.IMPROVED_SEARCH_RESULTS) && _state.value is SearchUiState.Results) {
+            analyticsTracker.track(
+                AnalyticsEvent.IMPROVED_SEARCH_FILTER_TAPPED,
+                mapOf(
+                    "source" to "discover",
+                    "filter" to filter.name
+                )
+            )
             _state.update {
                 (it as SearchUiState.Results).copy(
                     selectedFilterIndex = ResultsFilters.entries.indexOf(filter),
@@ -185,6 +204,14 @@ class SearchViewModel @Inject constructor(
         saveSearchTerm(suggestion)
         searchHandler.updateSearchQuery(suggestion, true)
 
+        analyticsTracker.track(
+            AnalyticsEvent.IMPROVED_SEARCH_SUGGESTION_TERM_TAPPED,
+            properties = mapOf(
+                "term" to suggestion,
+                "source" to "discover"
+            )
+        )
+
         _state.value = SearchUiState.Results(operation = SearchUiState.SearchOperation.Loading(suggestion))
     }
 
@@ -217,6 +244,15 @@ class SearchViewModel @Inject constructor(
         analyticsTracker.track(
             AnalyticsEvent.SEARCH_LIST_SHOWN,
             AnalyticsProp.searchListShown(source = source, type = type),
+        )
+    }
+
+    fun trackSuggestionsShown() {
+        analyticsTracker.track(
+            AnalyticsEvent.IMPROVED_SEARCH_SUGGESTIONS_SHOWN,
+            mapOf(
+                "source" to "discover"
+            )
         )
     }
 
