@@ -587,25 +587,23 @@ class MainActivity :
     }
 
     private fun encourageAccountCreation() {
-        if (FeatureFlag.isEnabled(Feature.ENCOURAGE_ACCOUNT_CREATION)) {
-            lifecycleScope.launch {
-                repeatOnLifecycle(Lifecycle.State.STARTED) {
-                    val encourageAccountCreation = settings.showFreeAccountEncouragement.value
-                    if (!encourageAccountCreation) {
-                        return@repeatOnLifecycle
-                    }
-                    settings.showFreeAccountEncouragement.set(false, updateModifiedAt = true)
+        lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+                val encourageAccountCreation = settings.showFreeAccountEncouragement.value
+                if (!encourageAccountCreation) {
+                    return@repeatOnLifecycle
+                }
+                settings.showFreeAccountEncouragement.set(false, updateModifiedAt = true)
 
-                    val isSignedIn = viewModel.signInState.asFlow().first().isSignedIn
-                    if (isSignedIn) {
-                        return@repeatOnLifecycle
-                    }
+                val isSignedIn = viewModel.signInState.asFlow().first().isSignedIn
+                if (isSignedIn) {
+                    return@repeatOnLifecycle
+                }
 
-                    if (Util.isTablet(this@MainActivity)) {
-                        AccountBenefitsFragment().show(supportFragmentManager, "account_benefits_fragment")
-                    } else {
-                        openOnboardingFlow(OnboardingFlow.AccountEncouragement)
-                    }
+                if (Util.isTablet(this@MainActivity)) {
+                    AccountBenefitsFragment().show(supportFragmentManager, "account_benefits_fragment")
+                } else {
+                    openOnboardingFlow(OnboardingFlow.AccountEncouragement)
                 }
             }
         }

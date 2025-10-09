@@ -84,14 +84,6 @@ enum class Feature(
         hasFirebaseRemoteFlag = true,
         hasDevToggle = true,
     ),
-    ENCOURAGE_ACCOUNT_CREATION(
-        key = "encourage_account_creation",
-        title = "Account creation encouragement",
-        defaultValue = isDebugOrPrototypeBuild,
-        tier = FeatureTier.Free,
-        hasFirebaseRemoteFlag = true,
-        hasDevToggle = true,
-    ),
     RECOMMENDATIONS(
         key = "recommendations",
         title = "Recommendations",
