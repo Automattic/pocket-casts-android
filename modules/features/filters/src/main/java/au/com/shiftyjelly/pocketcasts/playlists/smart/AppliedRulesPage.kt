@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -44,6 +45,7 @@ import au.com.shiftyjelly.pocketcasts.compose.components.FadedLazyColumn
 import au.com.shiftyjelly.pocketcasts.compose.components.NoContentBanner
 import au.com.shiftyjelly.pocketcasts.compose.components.TextH20
 import au.com.shiftyjelly.pocketcasts.compose.components.TextP50
+import au.com.shiftyjelly.pocketcasts.compose.layout.verticalNavigationBars
 import au.com.shiftyjelly.pocketcasts.compose.preview.ThemePreviewParameterProvider
 import au.com.shiftyjelly.pocketcasts.compose.theme
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
@@ -87,7 +89,11 @@ internal fun AppliedRulesPage(
             val inactiveRules = rememberInactiveRules(activeRules)
 
             FadedLazyColumn(
-                contentPadding = PaddingValues(bottom = 24.dp),
+                contentPadding = if (onCreatePlaylist == null) {
+                    WindowInsets.verticalNavigationBars.asPaddingValues()
+                } else {
+                    PaddingValues(bottom = 24.dp)
+                },
                 modifier = Modifier.weight(1f),
             ) {
                 if (activeRules.isNotEmpty()) {
