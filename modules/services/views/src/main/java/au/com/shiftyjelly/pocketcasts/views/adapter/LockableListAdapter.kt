@@ -84,7 +84,7 @@ class LockingDragAndDropCallback<T>(
         if (draggedPosition == RecyclerView.NO_POSITION || targetPosition == RecyclerView.NO_POSITION) {
             return false
         }
-        
+
         if (lastDraggedPosition == draggedPosition && lastTargetPosition == targetPosition) {
             return false
         }
