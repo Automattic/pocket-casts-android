@@ -3,7 +3,7 @@ package au.com.shiftyjelly.pocketcasts.models.type
 import au.com.shiftyjelly.pocketcasts.localization.R
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.to.FolderItem
-import au.com.shiftyjelly.pocketcasts.models.type.PodcastsSortType.entries
+import au.com.shiftyjelly.pocketcasts.utils.extensions.removeAccents
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
@@ -12,9 +12,9 @@ import com.squareup.moshi.JsonReader
 import com.squareup.moshi.JsonWriter
 import java.util.Locale
 
-private val replaceTheRegex = "^the ".toRegex(RegexOption.IGNORE_CASE)
+private val replaceTheRegex = "^the ".toRegex()
 private fun cleanStringForSortInternal(value: String): String {
-    return value.lowercase(Locale.getDefault()).replaceFirst(replaceTheRegex, "")
+    return value.lowercase(Locale.getDefault()).replaceFirst(replaceTheRegex, "").removeAccents()
 }
 
 enum class PodcastsSortType(
