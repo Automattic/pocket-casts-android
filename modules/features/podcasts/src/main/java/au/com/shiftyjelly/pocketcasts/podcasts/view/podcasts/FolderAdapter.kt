@@ -235,7 +235,7 @@ class FolderAdapter(
             }
         }
 
-        override fun onStarDragging() = Unit
+        override fun onStartDragging() = Unit
 
         override fun onFinishDragging() = Unit
     }

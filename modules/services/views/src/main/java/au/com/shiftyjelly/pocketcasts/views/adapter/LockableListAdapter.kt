@@ -35,7 +35,7 @@ abstract class LockableListAdapter<T, VH : RecyclerView.ViewHolder>(
     }
 
     interface DraggableHolder {
-        fun onStarDragging()
+        fun onStartDragging()
         fun onFinishDragging()
     }
 }
@@ -65,7 +65,7 @@ class LockingDragAndDropCallback<T>(
             syncJob?.cancel()
             adapter.isLocked = true
             reorderableItems = adapter.currentList.toMutableList()
-            viewHolder.onStarDragging()
+            viewHolder.onStartDragging()
         }
     }
 

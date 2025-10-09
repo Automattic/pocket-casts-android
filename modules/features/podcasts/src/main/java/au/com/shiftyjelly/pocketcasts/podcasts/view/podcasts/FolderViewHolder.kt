@@ -85,7 +85,7 @@ class FolderViewHolder(
         }
     }
 
-    override fun onStarDragging() = Unit
+    override fun onStartDragging() = Unit
 
     override fun onFinishDragging() = Unit
 }
