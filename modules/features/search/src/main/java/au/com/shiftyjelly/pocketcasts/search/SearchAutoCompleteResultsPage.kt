@@ -22,6 +22,7 @@ import androidx.compose.ui.unit.Velocity
 import androidx.compose.ui.unit.dp
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.compose.AppThemeWithBackground
+import au.com.shiftyjelly.pocketcasts.compose.CallOnce
 import au.com.shiftyjelly.pocketcasts.compose.components.HorizontalDivider
 import au.com.shiftyjelly.pocketcasts.compose.preview.ThemePreviewParameterProvider
 import au.com.shiftyjelly.pocketcasts.compose.theme
@@ -44,6 +45,7 @@ fun SearchAutoCompleteResultsPage(
     playButtonListener: PlayButton.OnClickListener,
     bottomInset: Dp,
     onScroll: () -> Unit,
+    onReportSuggestionsRender: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val nestedScrollConnection = remember {
@@ -53,6 +55,10 @@ fun SearchAutoCompleteResultsPage(
                 return super.onPostFling(consumed, available)
             }
         }
+    }
+
+    CallOnce {
+        onReportSuggestionsRender()
     }
 
     Box(
@@ -135,6 +141,7 @@ private fun PreviewSearchAutoCompleteResultsPage(
             onPodcastClick = {},
             onPodcastFollow = {},
             onScroll = {},
+            onReportSuggestionsRender = {},
             playButtonListener = object : PlayButton.OnClickListener {
                 override var source: SourceView = SourceView.SEARCH_RESULTS
 
