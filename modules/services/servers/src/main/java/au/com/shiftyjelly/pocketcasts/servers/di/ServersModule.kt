@@ -21,6 +21,7 @@ import au.com.shiftyjelly.pocketcasts.servers.model.ListTypeMoshiAdapter
 import au.com.shiftyjelly.pocketcasts.servers.podcast.PodcastCacheService
 import au.com.shiftyjelly.pocketcasts.servers.podcast.TranscriptService
 import au.com.shiftyjelly.pocketcasts.servers.search.AutoCompleteResult
+import au.com.shiftyjelly.pocketcasts.servers.search.CombinedResult
 import au.com.shiftyjelly.pocketcasts.servers.search.SearchService
 import au.com.shiftyjelly.pocketcasts.servers.server.ListWebService
 import au.com.shiftyjelly.pocketcasts.servers.sync.LoginIdentity
@@ -81,6 +82,7 @@ class ServersModule {
             .add(RefreshToken::class.java, RefreshToken.Adapter)
             .add(BlazeAdLocation::class.java, BlazeAdLocationMoshiAdapter())
             .add(AutoCompleteResult.jsonAdapter)
+            .add(CombinedResult.jsonAdapter)
             .add(AnonymousBumpStat.Adapter)
             .add(LoginIdentity.Adapter)
             .add(ListTypeMoshiAdapter())
