@@ -1287,7 +1287,6 @@ Language: nb_NO
     <string name="player_tab_playing">Spiller av</string>
     <string name="player_sleep_timer">Tidtaker for dvalemodus</string>
     <string name="player_sleep_timer_title">Tidtaker for dvalemodus</string>
-    <string name="player_sleep_end_of_episode">Slutt på episode</string>
     <string name="player_sleep_cancel_timer">Avbryt tidtaker</string>
     <string name="player_sleep_add_5_minutes">+ 5 minutter</string>
     <string name="player_sleep_60_minutes">60 minutter</string>
@@ -1449,4 +1448,5 @@ Language: nb_NO
     <string name="archive">Arkiver</string>
     <string name="add_to_up_next">Legg til i Neste</string>
     <string name="in_progress">Pågår</string>
+    <string name="player_sleep_timer_end_of_episode">Slutt på episode</string>
 </resources>

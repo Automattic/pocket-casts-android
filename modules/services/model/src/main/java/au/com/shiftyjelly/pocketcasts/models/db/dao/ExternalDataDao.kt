@@ -7,54 +7,10 @@ import au.com.shiftyjelly.pocketcasts.models.entity.ExternalEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.ExternalPodcast
 import au.com.shiftyjelly.pocketcasts.models.entity.ExternalPodcastList
 import au.com.shiftyjelly.pocketcasts.models.entity.ExternalPodcastMap
-import au.com.shiftyjelly.pocketcasts.models.entity.ExternalPodcastOrUserEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.ExternalPodcastView
-import au.com.shiftyjelly.pocketcasts.models.type.PodcastsSortType
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.map
 
 @Dao
 abstract class ExternalDataDao {
-    @Query(
-        """
-        SELECT 
-          podcasts.uuid AS id, 
-          podcasts.title AS title, 
-          podcasts.podcast_description AS description,
-          podcasts.podcast_category AS podcast_category,
-          (SELECT COUNT(*) FROM podcast_episodes WHERE podcasts.uuid IS podcast_episodes.podcast_id) AS episode_count,
-          (SELECT MIN(podcast_episodes.published_date) FROM podcast_episodes WHERE podcasts.uuid IS podcast_episodes.podcast_id) AS initial_release_timestamp, 
-          (SELECT MAX(podcast_episodes.published_date) FROM podcast_episodes WHERE podcasts.uuid IS podcast_episodes.podcast_id) AS latest_release_timestamp,
-          (SELECT MAX(podcast_episodes.last_playback_interaction_date) FROM podcast_episodes WHERE podcasts.uuid IS podcast_episodes.podcast_id) AS last_used_timestamp
-        FROM 
-          podcasts 
-        WHERE 
-          podcasts.subscribed IS NOT 0
-        ORDER BY
-          -- Order by newest to oldest date added
-          CASE WHEN :sortOrder IS 0 THEN IFNULL(podcasts.added_date, 0) END DESC,
-          -- Order by A-Z podcast title
-          CASE WHEN :sortOrder IS 1 THEN (CASE
-            WHEN UPPER(podcasts.title) LIKE 'THE %' THEN SUBSTR(UPPER(podcasts.title), 5)
-            WHEN UPPER(podcasts.title) LIKE 'A %' THEN SUBSTR(UPPER(podcasts.title), 3)
-            WHEN UPPER(podcasts.title) LIKE 'AN %' THEN SUBSTR(UPPER(podcasts.title), 4)
-            ELSE UPPER(podcasts.title)
-          END) END ASC,
-          -- Order by newest to oldest episode
-          CASE WHEN :sortOrder IS 2 THEN (SELECT IFNULL(MAX(podcast_episodes.published_date), 0) FROM podcast_episodes WHERE podcasts.uuid IS podcast_episodes.podcast_id) END DESC,
-          -- Order by drag and drop position, '9223372036854775807' is the max possible value putting things at the bottom
-          CASE WHEN :sortOrder IS 3 THEN IFNULL(podcasts.sort_order, 9223372036854775807) END ASC,
-          -- Order by recently played episodes
-          CASE WHEN :sortOrder IS 4 THEN (SELECT IFNULL(MAX(podcast_episodes.last_playback_interaction_date), 0) FROM podcast_episodes WHERE podcasts.uuid IS podcast_episodes.podcast_id) END DESC
-        LIMIT
-          :limit
-        """,
-    )
-    abstract suspend fun getSubscribedPodcasts(
-        sortOrder: PodcastsSortType,
-        limit: Int,
-    ): List<ExternalPodcast>
-
     @Query(
         """
         SELECT 
@@ -183,70 +139,4 @@ abstract class ExternalDataDao {
         limit: Int,
         currentTime: Long = System.currentTimeMillis(),
     ): List<ExternalEpisode.Podcast>
-
-    @Query(
-        """
-        SELECT
-          episode.*
-        FROM 
-          up_next_episodes AS up_next 
-          LEFT JOIN (
-            SELECT
-              -- common properties
-              1 AS is_podcast_episode, 
-              episode.uuid AS id, 
-              episode.title AS title, 
-              episode.duration * 1000 AS duration, 
-              episode.played_up_to * 1000 AS current_position, 
-              episode.published_date AS release_timestamp,
-              (episode.episode_status IS 4) AS is_downloaded,
-              (episode.file_type LIKE 'video/%') AS is_video,
-              -- podcast episode properties
-              episode.podcast_id AS podcast_id,
-              podcast.title AS podcast_title,
-              episode.season AS season_number, 
-              episode.number AS episode_number, 
-              episode.last_playback_interaction_date AS last_used_timestamp,
-              -- user episode properties
-              NULL AS artwork_url, 
-              NULL AS tint_color_index
-            FROM 
-              podcast_episodes AS episode 
-              JOIN podcasts AS podcast ON podcast.uuid IS episode.podcast_id
-            UNION ALL 
-            SELECT
-              -- common properties
-              0 AS is_podcast_episode, 
-              episode.uuid AS id, 
-              episode.title AS title, 
-              episode.duration * 1000 AS duration, 
-              episode.played_up_to * 1000 AS current_position, 
-              episode.published_date AS release_timestamp,
-              (episode.episode_status IS 4) AS is_downloaded,
-              (episode.file_type LIKE 'video/%') AS is_video,
-              -- podcast episode properties
-              NULL AS podcast_id, 
-              NULL AS podcast_title,
-              NULL AS season_number, 
-              NULL AS episode_number, 
-              NULL AS last_used_timestamp,
-              -- user episode properties
-              episode.artwork_url AS artwork_url, 
-              episode.tint_color_index AS tint_color_index
-            FROM 
-              user_episodes AS episode
-          ) AS episode ON up_next.episodeUuid IS episode.id 
-        WHERE
-          episode.id IS NOT NULL
-        ORDER BY 
-          up_next.position ASC 
-        LIMIT 
-          :limit
-        """,
-    )
-    protected abstract fun observeRawUpNextQueue(limit: Int): Flow<List<ExternalPodcastOrUserEpisode>>
-
-    final fun observeUpNextQueue(limit: Int) = observeRawUpNextQueue(limit).map { queue ->
-        queue.mapNotNull { it.toExternalEpisode() }
-    }
 }

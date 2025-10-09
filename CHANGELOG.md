@@ -7,6 +7,9 @@
         ([#4571](https://github.com/Automattic/pocket-casts-android/pull/4571))
     *   Update search results screen
         ([#4583](https://github.com/Automattic/pocket-casts-android/pull/4583))
+*   Updates
+    *   Improve sleep timer terminology and chapter option visibility
+        ([#4564](https://github.com/Automattic/pocket-casts-android/pull/4564))
 *   Bug Fixes
     *   Fix restoring large Up Next queues
         ([#4562](https://github.com/Automattic/pocket-casts-android/pull/4562))
@@ -18,6 +21,8 @@
         ([#4555](https://github.com/Automattic/pocket-casts-android/pull/4555))
     *   Fix archived episodes not being downloaded when added to queue
         ([#4570](https://github.com/Automattic/pocket-casts-android/pull/4570))
+    *   Fix podcast title sort with accents   
+        ([#4594](https://github.com/Automattic/pocket-casts-android/pull/4594))
 
 7.99
 -----

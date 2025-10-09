@@ -588,6 +588,7 @@ Language: it
     <string name="player_sleep_in_one_chapter">Spegnimento tra 1 capitolo</string>
     <string name="player_sleep_timer_in_chapter_plural">Tra %d capitoli</string>
     <string name="player_sleep_timer_in_chapter">Tra 1 capitolo</string>
+    <string name="player_sleep_timer_end_of_episode">Fine dell\'episodio</string>
     <string name="player_sleep_timer_in_episode_plural">Tra %d episodi</string>
     <string name="player_sleep_timer_in_episode">Tra 1 episodio</string>
     <string name="settings_use_episode_artwork_customization_description">Seleziona se desideri vedere la grafica dell\'episodio in queste sezioni dell\'app</string>
@@ -1939,7 +1940,6 @@ Language: it
     <string name="player_up_next_move_to_bottom">Sposta in fondo</string>
     <string name="player_time_saved_no_hour">Congratulazioni! Stai risparmiando tempo e ascoltando più podcast.</string>
     <string name="player_time_saved_detail">In totale hai risparmiato %s utilizzando questa funzionalità.</string>
-    <string name="player_sleep_end_of_episode">Fine dell\'episodio</string>
     <string name="player_sleep_cancel_timer">Annulla timer</string>
     <string name="player_sleep_add_5_minutes">+ 5 minuti</string>
     <string name="player_sleep_60_minutes">60 minuti</string>

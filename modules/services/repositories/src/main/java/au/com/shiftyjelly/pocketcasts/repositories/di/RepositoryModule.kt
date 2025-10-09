@@ -20,6 +20,8 @@ import au.com.shiftyjelly.pocketcasts.repositories.endofyear.EndOfYearManager
 import au.com.shiftyjelly.pocketcasts.repositories.endofyear.EndOfYearManagerImpl
 import au.com.shiftyjelly.pocketcasts.repositories.endofyear.EndOfYearSync
 import au.com.shiftyjelly.pocketcasts.repositories.endofyear.EndOfYearSyncImpl
+import au.com.shiftyjelly.pocketcasts.repositories.external.ExternalDataManager
+import au.com.shiftyjelly.pocketcasts.repositories.external.ExternalDataManagerImpl
 import au.com.shiftyjelly.pocketcasts.repositories.history.upnext.UpNextHistoryManager
 import au.com.shiftyjelly.pocketcasts.repositories.history.upnext.UpNextHistoryManagerImpl
 import au.com.shiftyjelly.pocketcasts.repositories.notification.NotificationDrawer
@@ -30,8 +32,6 @@ import au.com.shiftyjelly.pocketcasts.repositories.notification.NotificationMana
 import au.com.shiftyjelly.pocketcasts.repositories.notification.NotificationManagerImpl
 import au.com.shiftyjelly.pocketcasts.repositories.notification.NotificationScheduler
 import au.com.shiftyjelly.pocketcasts.repositories.notification.NotificationSchedulerImpl
-import au.com.shiftyjelly.pocketcasts.repositories.nova.ExternalDataManager
-import au.com.shiftyjelly.pocketcasts.repositories.nova.ExternalDataManagerImpl
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlayerFactory
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlayerFactoryImpl
 import au.com.shiftyjelly.pocketcasts.repositories.playback.UpNextQueue

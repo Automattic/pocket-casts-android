@@ -114,19 +114,17 @@ fun DeveloperPage(
         item {
             ResetPlaylistsOnboarding(onClick = onResetPlaylistsOnboarding)
         }
+    }
 
-        if (openCrashMessageDialog) {
-            item {
-                CrashMessageDialog(
-                    initialMessage = crashMessage,
-                    onDismiss = { openCrashMessageDialog = false },
-                    onConfirm = { message ->
-                        openCrashMessageDialog = false
-                        crashMessage = message
-                    },
-                )
-            }
-        }
+    if (openCrashMessageDialog) {
+        CrashMessageDialog(
+            initialMessage = crashMessage,
+            onDismiss = { openCrashMessageDialog = false },
+            onConfirm = { message ->
+                openCrashMessageDialog = false
+                crashMessage = message
+            },
+        )
     }
 }
 
