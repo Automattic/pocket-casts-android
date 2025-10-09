@@ -350,7 +350,7 @@ private fun WearApp(
                 val email = if (signInState.email.length > 16) {
                     buildString {
                         append(signInState.email.substring(0, 6))
-                        append("...")
+                        append("…")
                         append(signInState.email.takeLast(6))
                     }
                 } else {
