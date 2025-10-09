@@ -54,8 +54,8 @@ import au.com.shiftyjelly.pocketcasts.repositories.ratings.RatingsManager
 import au.com.shiftyjelly.pocketcasts.repositories.ratings.RatingsManagerImpl
 import au.com.shiftyjelly.pocketcasts.repositories.referrals.ReferralManager
 import au.com.shiftyjelly.pocketcasts.repositories.referrals.ReferralManagerImpl
-import au.com.shiftyjelly.pocketcasts.repositories.search.SearchAutoCompleteManager
-import au.com.shiftyjelly.pocketcasts.repositories.search.SearchAutoCompleteManagerImpl
+import au.com.shiftyjelly.pocketcasts.repositories.search.ImprovedSearchManager
+import au.com.shiftyjelly.pocketcasts.repositories.search.ImprovedSearchManagerImpl
 import au.com.shiftyjelly.pocketcasts.repositories.searchhistory.SearchHistoryManager
 import au.com.shiftyjelly.pocketcasts.repositories.searchhistory.SearchHistoryManagerImpl
 import au.com.shiftyjelly.pocketcasts.repositories.subscription.ServerPurchaseApprover
@@ -108,7 +108,7 @@ abstract class RepositoryModule {
 
     @Binds
     @Singleton
-    abstract fun bindAutoCompleteSearchManager(impl: SearchAutoCompleteManagerImpl): SearchAutoCompleteManager
+    abstract fun bindAutoCompleteSearchManager(impl: ImprovedSearchManagerImpl): ImprovedSearchManager
 
     @Binds
     @Singleton

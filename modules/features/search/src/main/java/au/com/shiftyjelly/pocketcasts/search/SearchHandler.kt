@@ -11,7 +11,7 @@ import au.com.shiftyjelly.pocketcasts.models.type.SignInState
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.FolderManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
-import au.com.shiftyjelly.pocketcasts.repositories.search.SearchAutoCompleteManager
+import au.com.shiftyjelly.pocketcasts.repositories.search.ImprovedSearchManager
 import au.com.shiftyjelly.pocketcasts.repositories.user.UserManager
 import au.com.shiftyjelly.pocketcasts.servers.ServiceManager
 import au.com.shiftyjelly.pocketcasts.servers.discover.GlobalServerSearch
@@ -38,7 +38,7 @@ import timber.log.Timber
 class SearchHandler @Inject constructor(
     val serviceManager: ServiceManager,
     val podcastManager: PodcastManager,
-    val autoCompleteManager: SearchAutoCompleteManager,
+    val improvedSearchManager: ImprovedSearchManager,
     val userManager: UserManager,
     val settings: Settings,
     private val cacheServiceManager: PodcastCacheServiceManager,
@@ -122,7 +122,7 @@ class SearchHandler @Inject constructor(
                     ),
                 )
             } else {
-                flow { emit(autoCompleteManager.autoCompleteSearch(term = query)) }
+                flow { emit(improvedSearchManager.autoCompleteSearch(term = query)) }
                     .map<List<SearchAutoCompleteItem>, SearchUiState.SearchOperation<List<SearchAutoCompleteItem>>> {
                         SearchUiState.SearchOperation.Success(
                             searchTerm = query,
