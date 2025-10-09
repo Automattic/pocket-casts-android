@@ -6,7 +6,6 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.MaterialTheme
@@ -20,6 +19,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.Velocity
 import androidx.compose.ui.unit.dp
+import au.com.shiftyjelly.pocketcasts.compose.components.FadedLazyColumn
 import au.com.shiftyjelly.pocketcasts.compose.components.HorizontalDivider
 import au.com.shiftyjelly.pocketcasts.compose.theme
 import au.com.shiftyjelly.pocketcasts.models.entity.BaseEpisode
@@ -76,7 +76,7 @@ fun ImprovedSearchResultsPage(
                     NoResultsView()
                 } else {
                     SearchResultFilters(
-                        modifier = Modifier.padding(bottom = 16.dp, start = 16.dp, end = 16.dp),
+                        modifier = Modifier.padding(16.dp),
                         items = state.filterOptions.map { stringResource(it.resId) },
                         selectedIndex = state.selectedFilterIndex,
                         onFilterSelect = { onFilterSelect(state.filterOptions.toList()[it]) },
@@ -136,7 +136,7 @@ private fun ImprovedSearchResultsView(
     }
     val listState = rememberLazyListState()
 
-    LazyColumn(
+    FadedLazyColumn(
         state = listState,
         contentPadding = PaddingValues(
             top = 16.dp,
