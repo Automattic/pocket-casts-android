@@ -447,9 +447,11 @@ class PlaylistManagerBaseTest {
         insertSmartPlaylist(index = 0)
 
         expectNotShowArchived(playlistIndex = 0)
+        expectSynced(playlistIndex = 0)
 
         manager.toggleShowArchived("playlist-id-0")
         expectShowArchived(playlistIndex = 0)
+        expectNotSynced(playlistIndex = 0)
 
         manager.toggleShowArchived("playlist-id-0")
         expectNotShowArchived(playlistIndex = 0)
