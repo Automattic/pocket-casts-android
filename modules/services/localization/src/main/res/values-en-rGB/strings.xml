@@ -73,7 +73,7 @@ Language: en_GB
     <string name="settings_continuous_playback_summary">If your Up Next queue is empty, we\'ll play episodes from the same podcast or list you\'re currently listening to.</string>
     <string name="renew_your_subscription">Renew your Subscription</string>
     <string name="log_in_watch_from_phone_instructions_3">If you are having trouble, make sure your phone is running the same version of Pocket Casts as your watch (%s)</string>
-    <string name="log_in_free_acccount">%s is using a free account</string>
+    <string name="log_in_free_account">%s is using a free account</string>
     <string name="player_play_failed_check_internet">Could not load podcast. Please check your internet connection and try again.</string>
     <string name="empty_play_state">Pick an episode to begin</string>
     <string name="settings_beta_features">Beta features</string>

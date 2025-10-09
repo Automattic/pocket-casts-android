@@ -736,7 +736,7 @@ Language: ru
     <string name="settings_continuous_playback_summary">Если в очереди «Следующие» ничего нет, запустится другой выпуск из подкаста или списка, который вы слушаете.</string>
     <string name="renew_your_subscription">Продлить подписку</string>
     <string name="log_in_watch_from_phone_instructions_3">Если возникла проблема, убедитесь, что на телефоне запущена та же версия Pocket Casts, что и на часах (%s)</string>
-    <string name="log_in_free_acccount">%s использует бесплатную учетную запись</string>
+    <string name="log_in_free_account">%s использует бесплатную учетную запись</string>
     <string name="player_play_failed_check_internet">Не удалось загрузить подкаст. Проверьте подключение к Интернету и повторите попытку.</string>
     <string name="empty_play_state">Выберите, с какого выпуска начать</string>
     <string name="settings_beta_features">Функции в бета-режиме</string>

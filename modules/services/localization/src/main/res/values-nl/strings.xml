@@ -735,7 +735,7 @@ Language: nl
     <string name="settings_continuous_playback_summary">Als je wachtrij Hierna leeg is, zullen we afleveringen afspelen van dezelfde podcast of uit dezelfde lijst waar je op dat moment naar aan het luisteren bent.</string>
     <string name="renew_your_subscription">Verleng je abonnement</string>
     <string name="log_in_watch_from_phone_instructions_3">Als het niet lukt, controleer dan of je telefoon dezelfde versie van Pocket Casts heeft als je horloge (%s)</string>
-    <string name="log_in_free_acccount">%s gebruikt een gratis account</string>
+    <string name="log_in_free_account">%s gebruikt een gratis account</string>
     <string name="player_play_failed_check_internet">Kan podcast niet laden. Controleer je internetverbinding en probeer het opnieuw.</string>
     <string name="empty_play_state">Kies een aflevering om te beginnen</string>
     <string name="settings_beta_features">Bèta-functies</string>

@@ -736,7 +736,7 @@ Language: de
     <string name="settings_continuous_playback_summary">Wenn deine Warteschlange leer ist, spielen wir Folgen aus dem Podcast oder der Liste, die du dir gerade anhörst.</string>
     <string name="renew_your_subscription">Abonnement verlängern</string>
     <string name="log_in_watch_from_phone_instructions_3">Hast du Probleme? Stelle sicher, dass auf deinem Smartphone dieselbe Pocket Casts-Version installiert ist, wie auf deiner Uhr (%s)</string>
-    <string name="log_in_free_acccount">%s nutzt ein kostenloses Konto</string>
+    <string name="log_in_free_account">%s nutzt ein kostenloses Konto</string>
     <string name="player_play_failed_check_internet">Podcast konnte nicht geladen werden. Bitte überprüfe deine Internetverbindung und versuche es erneut.</string>
     <string name="empty_play_state">Wähle eine Folge aus, um loszulegen</string>
     <string name="settings_beta_features">Betafunktionen</string>

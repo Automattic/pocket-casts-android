@@ -735,7 +735,7 @@ Language: ar
     <string name="onboarding_plus_feature_extra_themes_icons_title">القوالب والأيقونات الإضافية</string>
     <string name="settings_continuous_playback_summary">في حال كانت قائمة انتظار العناصر التالية لديك فارغة، سنقوم بتشغيل حلقات من البودكاست أو القائمة نفسها التي تستمع إليه حاليًا.</string>
     <string name="renew_your_subscription">تجديد الاشتراك الخاص بك</string>
-    <string name="log_in_free_acccount">يستخدم %s حسابًا مجانيًا</string>
+    <string name="log_in_free_account">يستخدم %s حسابًا مجانيًا</string>
     <string name="log_in_watch_from_phone_instructions_3">إذا كنت تواجه مشكلة، فتأكد من أن الهاتف يقوم بتشغيل الإصدار نفسه من Pocket Casts مثلما هو الحال مع ساعتك (%s)</string>
     <string name="empty_play_state">اختيار حلقة للبدء</string>
     <string name="player_play_failed_check_internet">يتعذر تحميل البودكاست. يرجى التحقق من اتصالك بالإنترنت والمحاولة مرة أخرى.</string>
