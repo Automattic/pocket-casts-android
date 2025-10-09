@@ -98,7 +98,10 @@ before_all do |_lane|
 end
 
 platform :android do
-  # @param skip_confirm [Boolean] If true, avoids any interactive prompt
+  # Executes the code freeze steps, creating a new release branch and triggering the first beta build
+  #
+  # @param [String] version (optional) The version number for the release from the release tool. If not provided, uses the calculated version.
+  # @param [Boolean] skip_confirm If true, avoids any interactive prompt
   #
   lane :code_freeze do |version: nil, skip_confirm: false|
     ensure_git_status_clean
