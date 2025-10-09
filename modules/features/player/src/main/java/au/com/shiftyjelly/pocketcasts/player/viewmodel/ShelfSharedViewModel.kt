@@ -119,12 +119,11 @@ class ShelfSharedViewModel @Inject constructor(
         }
     }
 
-    fun onSleepClick(source: ShelfItemSource, episode: PodcastEpisode) {
+    fun onSleepClick(source: ShelfItemSource) {
         trackShelfAction(ShelfItem.Sleep, source)
         viewModelScope.launch {
-            playbackManager.playbackStateFlow.firstOrNull()?.chapters?.let {
-                _navigationState.emit(NavigationState.ShowSleepTimerOptions(it.isNotEmpty()))
-            }
+            val hasChapters = !playbackManager.playbackStateFlow.firstOrNull()?.chapters.isNullOrEmpty()
+            _navigationState.emit(NavigationState.ShowSleepTimerOptions(hasChapters))
         }
     }
 

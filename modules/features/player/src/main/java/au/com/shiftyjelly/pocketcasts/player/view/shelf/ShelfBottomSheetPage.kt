@@ -77,9 +77,7 @@ fun ShelfBottomSheetPage(
                 when (item) {
                     ShelfItem.Effects -> shelfSharedViewModel.onEffectsClick(ShelfItemSource.OverflowMenu)
                     ShelfItem.Sleep -> {
-                        val episode = playerViewModel.episode as? PodcastEpisode ?: return@MenuShelfItems
-
-                        shelfSharedViewModel.onSleepClick(ShelfItemSource.OverflowMenu, episode)
+                        shelfSharedViewModel.onSleepClick(ShelfItemSource.OverflowMenu)
                     }
                     ShelfItem.Star -> shelfSharedViewModel.onStarClick(ShelfItemSource.OverflowMenu)
                     ShelfItem.Transcript -> shelfSharedViewModel.onTranscriptClick(enabled, ShelfItemSource.OverflowMenu)

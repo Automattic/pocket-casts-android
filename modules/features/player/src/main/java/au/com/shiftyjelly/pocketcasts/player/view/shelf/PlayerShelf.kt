@@ -89,9 +89,7 @@ fun PlayerShelf(
             shelfSharedViewModel.onEffectsClick(ShelfItemSource.Shelf)
         },
         onSleepClick = {
-            val episode = playerViewModel.episode as? PodcastEpisode ?: return@PlayerShelfContent
-
-            shelfSharedViewModel.onSleepClick(ShelfItemSource.Shelf, episode)
+            shelfSharedViewModel.onSleepClick(ShelfItemSource.Shelf)
         },
         onStarClick = {
             shelfSharedViewModel.onStarClick(ShelfItemSource.Shelf)
