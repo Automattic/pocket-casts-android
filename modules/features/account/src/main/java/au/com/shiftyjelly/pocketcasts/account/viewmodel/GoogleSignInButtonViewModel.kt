@@ -4,6 +4,7 @@ import android.content.Context
 import androidx.credentials.CredentialManager
 import androidx.credentials.CustomCredential
 import androidx.credentials.GetCredentialRequest
+import androidx.credentials.exceptions.GetCredentialCancellationException
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
@@ -96,8 +97,10 @@ class GoogleSignInButtonViewModel @Inject constructor(
                     onError()
                 }
             } catch (e: Exception) {
-                LogBuffer.e(LogBuffer.TAG_CRASH, e, "Unable to sign in with Google One Tap")
-                onError()
+                if (e !is GetCredentialCancellationException) {
+                    LogBuffer.e(LogBuffer.TAG_CRASH, e, "Unable to sign in with Google One Tap")
+                    onError()
+                }
             }
         }
     }
