@@ -581,7 +581,7 @@ class PlayerViewModel @Inject constructor(
 
     private fun calcEndOfEpisodeText(): String {
         return if (getSleepEndOfEpisodes() == 1) {
-            context.resources.getString(LR.string.player_sleep_timer_in_episode)
+            context.resources.getString(LR.string.player_sleep_timer_end_of_episode)
         } else {
             context.resources.getString(LR.string.player_sleep_timer_in_episode_plural, getSleepEndOfEpisodes())
         }
@@ -589,7 +589,7 @@ class PlayerViewModel @Inject constructor(
 
     private fun calcEndOfChapterText(): String {
         return if (getSleepEndOfChapters() == 1) {
-            context.resources.getString(LR.string.player_sleep_timer_in_chapter)
+            context.resources.getString(LR.string.player_sleep_timer_end_of_chapter)
         } else {
             context.resources.getString(LR.string.player_sleep_timer_in_chapter_plural, getSleepEndOfChapters())
         }

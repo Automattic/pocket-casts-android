@@ -15,6 +15,7 @@ import au.com.shiftyjelly.pocketcasts.repositories.chromecast.ChromeCastAnalytic
 import au.com.shiftyjelly.pocketcasts.repositories.di.ApplicationScope
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.repositories.playback.UpNextQueue
+import au.com.shiftyjelly.pocketcasts.repositories.podcast.ChapterManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.UserEpisodeManager
@@ -35,6 +36,7 @@ import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.mapNotNull
 import kotlinx.coroutines.flow.stateIn
@@ -48,6 +50,7 @@ class ShelfSharedViewModel @Inject constructor(
     private val analyticsTracker: AnalyticsTracker,
     private val chromeCastAnalytics: ChromeCastAnalytics,
     private val episodeManager: EpisodeManager,
+    private val chapterManager: ChapterManager,
     private val playbackManager: PlaybackManager,
     podcastManager: PodcastManager,
     private val settings: Settings,
@@ -119,7 +122,8 @@ class ShelfSharedViewModel @Inject constructor(
     fun onSleepClick(source: ShelfItemSource) {
         trackShelfAction(ShelfItem.Sleep, source)
         viewModelScope.launch {
-            _navigationState.emit(NavigationState.ShowSleepTimerOptions)
+            val hasChapters = !playbackManager.playbackStateFlow.firstOrNull()?.chapters.isNullOrEmpty()
+            _navigationState.emit(NavigationState.ShowSleepTimerOptions(hasChapters))
         }
     }
 
@@ -335,7 +339,7 @@ class ShelfSharedViewModel @Inject constructor(
 
     sealed interface NavigationState {
         data object ShowEffectsOption : NavigationState
-        data object ShowSleepTimerOptions : NavigationState
+        data class ShowSleepTimerOptions(val hasChapters: Boolean) : NavigationState
         data class ShowShareDialog(val podcast: Podcast, val episode: PodcastEpisode) : NavigationState
 
         data class ShowPodcast(val podcast: Podcast) : NavigationState

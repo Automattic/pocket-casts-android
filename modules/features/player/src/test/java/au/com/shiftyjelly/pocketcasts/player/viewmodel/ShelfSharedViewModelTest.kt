@@ -7,6 +7,8 @@ import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.UserEpisode
+import au.com.shiftyjelly.pocketcasts.models.to.Chapter
+import au.com.shiftyjelly.pocketcasts.models.to.Chapters
 import au.com.shiftyjelly.pocketcasts.models.type.Subscription
 import au.com.shiftyjelly.pocketcasts.models.type.SubscriptionPlatform
 import au.com.shiftyjelly.pocketcasts.payment.BillingCycle
@@ -19,7 +21,9 @@ import au.com.shiftyjelly.pocketcasts.preferences.UserSetting
 import au.com.shiftyjelly.pocketcasts.preferences.model.ShelfItem
 import au.com.shiftyjelly.pocketcasts.repositories.chromecast.ChromeCastAnalytics
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
+import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackState
 import au.com.shiftyjelly.pocketcasts.repositories.playback.UpNextQueue
+import au.com.shiftyjelly.pocketcasts.repositories.podcast.ChapterManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.UserEpisodeManager
@@ -28,9 +32,11 @@ import au.com.shiftyjelly.pocketcasts.sharedtest.MainCoroutineRule
 import io.reactivex.Observable
 import java.time.Instant
 import java.util.Date
+import kotlin.time.Duration.Companion.seconds
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
@@ -80,6 +86,9 @@ class ShelfSharedViewModelTest {
     @Mock
     private lateinit var userEpisodeManager: UserEpisodeManager
 
+    @Mock
+    private lateinit var chapterManager: ChapterManager
+
     private lateinit var shelfSharedViewModel: ShelfSharedViewModel
 
     private val plusSubscription = Subscription(
@@ -105,9 +114,36 @@ class ShelfSharedViewModelTest {
     fun `when sleep button clicked, then sleep timer options are shown`() = runTest {
         initViewModel()
 
+        whenever(playbackManager.playbackStateFlow).thenReturn(
+            flowOf(
+                PlaybackState(
+                    state = PlaybackState.State.PLAYING,
+                    podcast = null,
+                    isPrepared = true,
+                    isBuffering = false,
+                    title = "",
+                    durationMs = 30,
+                    positionMs = 0,
+                    bufferedMs = 0,
+                    episodeUuid = "1234",
+                    chapters = Chapters(
+                        items = listOf(
+                            Chapter(
+                                title = "",
+                                startTime = 0.seconds,
+                                endTime = 10.seconds,
+                                index = 0,
+                                uiIndex = 1,
+                            ),
+                        ),
+                    ),
+                ),
+            ),
+        )
+
         shelfSharedViewModel.navigationState.test {
             shelfSharedViewModel.onSleepClick(ShelfItemSource.Shelf)
-            assertEquals(NavigationState.ShowSleepTimerOptions, awaitItem())
+            assertEquals(NavigationState.ShowSleepTimerOptions(true), awaitItem())
         }
     }
 
@@ -303,6 +339,7 @@ class ShelfSharedViewModelTest {
             settings = settings,
             userEpisodeManager = userEpisodeManager,
             transcriptManager = mock(),
+            chapterManager = chapterManager,
         )
     }
 }

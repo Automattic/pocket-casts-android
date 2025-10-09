@@ -2,6 +2,7 @@ package au.com.shiftyjelly.pocketcasts.player.view
 
 import android.content.res.ColorStateList
 import android.os.Bundle
+import android.os.Parcelable
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -23,6 +24,7 @@ import au.com.shiftyjelly.pocketcasts.ui.helper.FragmentHostListener
 import au.com.shiftyjelly.pocketcasts.ui.helper.StatusBarIconColor
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.utils.combineLatest
+import au.com.shiftyjelly.pocketcasts.utils.extensions.requireParcelable
 import au.com.shiftyjelly.pocketcasts.utils.minutes
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseDialogFragment
 import com.airbnb.lottie.LottieProperty
@@ -37,6 +39,7 @@ import io.reactivex.rxkotlin.subscribeBy
 import io.reactivex.schedulers.Schedulers
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
+import kotlinx.parcelize.Parcelize
 import timber.log.Timber
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 import au.com.shiftyjelly.pocketcasts.views.R as VR
@@ -51,6 +54,8 @@ class SleepFragment : BaseDialogFragment() {
     private val viewModel: PlayerViewModel by activityViewModels()
     private var binding: FragmentSleepBinding? = null
     private var disposable: Disposable? = null
+
+    private val args get() = requireArguments().requireParcelable<Args>(NEW_INSTANCE_ARG)
 
     override fun onResume() {
         super.onResume()
@@ -95,6 +100,11 @@ class SleepFragment : BaseDialogFragment() {
             val episodesAmountToExtend = 1
             analyticsTracker.track(AnalyticsEvent.PLAYER_SLEEP_TIMER_EXTENDED, mapOf(AMOUNT_KEY to END_OF_EPISODE, NUMBER_OF_EPISODES_KEY to episodesAmountToExtend))
             startTimerEndOfEpisode(episodes = episodesAmountToExtend)
+        }
+        binding.buttonEndOfChapter2.setOnClickListener {
+            val chaptersAmountToExtend = 1
+            analyticsTracker.track(AnalyticsEvent.PLAYER_SLEEP_TIMER_ENABLED, mapOf(TIME_KEY to END_OF_CHAPTER, NUMBER_OF_CHAPTERS_KEY to chaptersAmountToExtend))
+            startTimerEndOfChapter(chapters = chaptersAmountToExtend)
         }
         binding.buttonCancelTime.setOnClickListener { cancelTimer() }
         binding.buttonCancelEndOfEpisodeOrChapter.setOnClickListener { cancelTimer() }
@@ -184,14 +194,19 @@ class SleepFragment : BaseDialogFragment() {
             binding?.sleepingInText?.text = text
         }
 
-        viewModel.isSleepRunning.observe(viewLifecycleOwner) { isSleepRunning ->
+        viewModel.isSleepRunning.combineLatest(
+            viewModel.isSleepAtEndOfEpisodeOrChapter,
+        ).observe(viewLifecycleOwner) { (isSleepRunning, isSleepAtEndOfChapter) ->
             binding?.sleepSetup?.isVisible = !isSleepRunning
             binding?.sleepRunning?.isVisible = isSleepRunning
+            binding?.sleepSetupChapter?.isVisible = !isSleepRunning && isSleepAtEndOfChapter
+            binding?.sleepRunningChapter?.isVisible = isSleepRunning && isSleepAtEndOfChapter
         }
 
         viewModel.isSleepRunning.combineLatest(viewModel.isSleepAtEndOfEpisodeOrChapter)
             .observe(viewLifecycleOwner) { (isSleepRunning, isSleepAtEndOfEpisode) ->
                 binding?.sleepRunningTime?.isVisible = isSleepRunning && !isSleepAtEndOfEpisode
+                binding?.sleepRunningChapter?.isVisible = isSleepRunning && !isSleepAtEndOfEpisode && args.hasChapters
                 binding?.sleepRunningEndOfEpisodeOrChapter?.isVisible = isSleepRunning && isSleepAtEndOfEpisode
             }
 
@@ -211,6 +226,8 @@ class SleepFragment : BaseDialogFragment() {
                 binding.buttonCancelEndOfEpisodeOrChapter.setTextColor(tintColorStateList)
                 binding.buttonCancelTime.strokeColor = tintColorStateList
                 binding.buttonCancelTime.setTextColor(tintColorStateList)
+                binding.buttonEndOfChapter2.strokeColor = tintColorStateList
+                binding.buttonEndOfChapter2.setTextColor(tintColorStateList)
                 binding.buttonEndOfEpisode2.strokeColor = tintColorStateList
                 binding.buttonEndOfEpisode2.setTextColor(tintColorStateList)
 
@@ -304,6 +321,11 @@ class SleepFragment : BaseDialogFragment() {
         dismiss()
     }
 
+    @Parcelize
+    private class Args(
+        val hasChapters: Boolean,
+    ) : Parcelable
+
     companion object {
         private const val TIME_KEY = "time" // in seconds
         private const val AMOUNT_KEY = "amount"
@@ -311,5 +333,16 @@ class SleepFragment : BaseDialogFragment() {
         private const val END_OF_EPISODE = "end_of_episode"
         private const val NUMBER_OF_CHAPTERS_KEY = "number_of_chapters"
         private const val END_OF_CHAPTER = "end_of_chapter"
+        private const val NEW_INSTANCE_ARG = "SleepFragmentArgs"
+
+        fun newInstance(
+            hasChapters: Boolean,
+        ) = SleepFragment().apply {
+            arguments = bundleOf(
+                NEW_INSTANCE_ARG to Args(
+                    hasChapters = hasChapters,
+                ),
+            )
+        }
     }
 }

@@ -588,6 +588,7 @@ Language: nl
     <string name="player_sleep_in_one_chapter">Slaapstand over 1 hoofdstuk</string>
     <string name="player_sleep_timer_in_chapter_plural">Over %d hoofdstukken</string>
     <string name="player_sleep_timer_in_chapter">Over 1 hoofdstuk</string>
+    <string name="player_sleep_timer_end_of_episode">Einde van de aflevering</string>
     <string name="player_sleep_timer_in_episode_plural">Over %d afleveringen</string>
     <string name="player_sleep_timer_in_episode">Over 1 aflevering</string>
     <string name="settings_use_episode_artwork_customization_description">Selecteer of je het artwork van de aflevering wil weergeven in deze gedeelten van de app</string>
@@ -2041,7 +2042,6 @@ Language: nl
     <string name="podcast_effects_summary_trim_silence_off">stiltes wegfilteren uit</string>
     <string name="podcast_effects_summary_trim_silence_on">stiltes wegfilteren aan</string>
     <string name="player_effects_trim_silence">Stiltes wegfilteren</string>
-    <string name="player_sleep_end_of_episode">Einde van de aflevering</string>
     <string name="podcasts_chosen_singular">1 podcast geselecteerd</string>
     <string name="podcasts_chosen_plural">%d podcasts geselecteerd</string>
     <string name="sort_newest_to_oldest">Nieuwste naar oudste</string>

@@ -588,6 +588,7 @@ Language: ca
     <string name="player_sleep_in_chapters">En suspensió en %d capítols</string>
     <string name="player_sleep_in_one_chapter">En suspensió en 1 capítol</string>
     <string name="player_sleep_timer_in_episode">En acabar 1 episodi</string>
+    <string name="player_sleep_timer_end_of_episode">Final de l\'episodi</string>
     <string name="player_sleep_timer_in_episode_plural">En acabar %d episodis</string>
     <string name="player_sleep_timer_in_chapter_plural">En acabar %d capítols</string>
     <string name="player_sleep_timer_in_chapter">En acabar 1 capítol</string>
@@ -1996,7 +1997,6 @@ Language: ca
     <string name="player_up_next_clear_queue">Esborrar cua</string>
     <string name="player_time_saved_detail">En total has estalviat %s utilitzant aquesta funció.</string>
     <string name="player_sleep_timer">Temporitzador</string>
-    <string name="player_sleep_end_of_episode">Final de l\'episodi</string>
     <string name="player_sleep_cancel_timer">Cancel·lar el temporitzador</string>
     <string name="player_sleep_add_5_minutes">+ 5 minuts</string>
     <string name="player_sleep_60_minutes">60 minuts</string>
