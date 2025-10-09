@@ -9,6 +9,7 @@ import au.com.shiftyjelly.pocketcasts.models.entity.BaseEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.to.EpisodeItem
 import au.com.shiftyjelly.pocketcasts.models.to.FolderItem
+import au.com.shiftyjelly.pocketcasts.models.to.ImprovedSearchResultItem
 import au.com.shiftyjelly.pocketcasts.models.to.SearchAutoCompleteItem
 import au.com.shiftyjelly.pocketcasts.models.to.SearchHistoryEntry
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
@@ -62,6 +63,7 @@ class SearchViewModel @Inject constructor(
                                             ),
                                         )
                                     }
+
                                     else -> Unit
                                 }
 
@@ -80,14 +82,23 @@ class SearchViewModel @Inject constructor(
         }
 
         viewModelScope.launch {
-            searchHandler.searchResults.collect {
-                if (_state.value is SearchUiState.Results || !FeatureFlag.isEnabled(Feature.IMPROVED_SEARCH_SUGGESTIONS)) {
-                    _state.value = SearchUiState.Results(operation = it as SearchUiState.SearchOperation<SearchResults>)
+            if (FeatureFlag.isEnabled(Feature.IMPROVED_SEARCH_RESULTS)) {
+                searchHandler.improvedSearchResults.collect {
+                    _state.value = SearchUiState.ImprovedResults(operation = it)
+                    if (!FeatureFlag.isEnabled(Feature.IMPROVED_SEARCH_SUGGESTIONS) && it is SearchUiState.SearchOperation.Loading) {
+                        saveSearchTerm(it.searchTerm)
+                        showSearchHistory = false
+                    }
                 }
-
-                if (!FeatureFlag.isEnabled(Feature.IMPROVED_SEARCH_SUGGESTIONS) && it is SearchUiState.SearchOperation.Loading) {
-                    saveSearchTerm(it.searchTerm)
-                    showSearchHistory = false
+            } else {
+                searchHandler.searchResults.collect {
+                    if (_state.value is SearchUiState.OldResults || !FeatureFlag.isEnabled(Feature.IMPROVED_SEARCH_SUGGESTIONS)) {
+                        _state.value = SearchUiState.OldResults(operation = it as SearchUiState.SearchOperation<SearchResults.SegregatedResults>)
+                    }
+                    if (!FeatureFlag.isEnabled(Feature.IMPROVED_SEARCH_SUGGESTIONS) && it is SearchUiState.SearchOperation.Loading) {
+                        saveSearchTerm(it.searchTerm)
+                        showSearchHistory = false
+                    }
                 }
             }
         }
@@ -100,7 +111,7 @@ class SearchViewModel @Inject constructor(
         if (FeatureFlag.isEnabled(Feature.IMPROVED_SEARCH_SUGGESTIONS) && source == SourceView.DISCOVER) {
             searchHandler.updateAutCompleteQuery(query)
             _state.update {
-                if (it is SearchUiState.Results && it.searchTerm.orEmpty().length > query.length) {
+                if ((it is SearchUiState.OldResults || it is SearchUiState.ImprovedResults) && it.searchTerm.orEmpty().length > query.length) {
                     SearchUiState.Suggestions(operation = SearchUiState.SearchOperation.Success(searchTerm = query, results = emptyList()))
                 } else {
                     it
@@ -142,7 +153,7 @@ class SearchViewModel @Inject constructor(
     }
 
     fun selectFilter(filter: ResultsFilters) {
-        if (FeatureFlag.isEnabled(Feature.IMPROVED_SEARCH_RESULTS) && _state.value is SearchUiState.Results) {
+        if (FeatureFlag.isEnabled(Feature.IMPROVED_SEARCH_RESULTS) && _state.value is SearchUiState.ImprovedResults) {
             analyticsTracker.track(
                 AnalyticsEvent.IMPROVED_SEARCH_FILTER_TAPPED,
                 mapOf(
@@ -151,7 +162,7 @@ class SearchViewModel @Inject constructor(
                 ),
             )
             _state.update {
-                (it as SearchUiState.Results).copy(
+                (it as SearchUiState.ImprovedResults).copy(
                     selectedFilterIndex = ResultsFilters.entries.indexOf(filter),
                 )
             }
@@ -164,19 +175,18 @@ class SearchViewModel @Inject constructor(
         // Optimistically update subscribe status
         _state.update {
             when (it) {
-                is SearchUiState.Results -> it.copy(
-                    operation = (it.operation as? SearchUiState.SearchOperation.Success)?.copy(
-                        results = it.operation.results.copy(
-                            podcasts = it.operation.results.podcasts.map { folderItem ->
-                                if (folderItem.uuid == uuid) {
-                                    (folderItem as? FolderItem.Podcast)?.copy(podcast = folderItem.podcast.copy(isSubscribed = true)) ?: folderItem
-                                } else {
-                                    folderItem
-                                }
-                            },
-                        ),
-                    ) ?: it.operation,
-                )
+                is SearchUiState.OldResults ->
+                    it.copy(
+                        operation = (it.operation as? SearchUiState.SearchOperation.Success)?.copy(
+                            results = it.operation.results.subscribeToPodcast(uuid)
+                        ) ?: it.operation,
+                    )
+                is SearchUiState.ImprovedResults ->
+                    it.copy(
+                        operation = (it.operation as? SearchUiState.SearchOperation.Success)?.copy(
+                            results = it.operation.results.subscribeToPodcast(uuid)
+                        ) ?: it.operation,
+                    )
 
                 is SearchUiState.Suggestions -> it.copy(
                     operation = (it.operation as? SearchUiState.SearchOperation.Success)?.copy(
@@ -212,7 +222,11 @@ class SearchViewModel @Inject constructor(
             ),
         )
 
-        _state.value = SearchUiState.Results(operation = SearchUiState.SearchOperation.Loading(suggestion))
+        _state.value = if (FeatureFlag.isEnabled(Feature.IMPROVED_SEARCH_RESULTS)) {
+            SearchUiState.ImprovedResults(operation = SearchUiState.SearchOperation.Loading(suggestion))
+        } else {
+            SearchUiState.OldResults(operation = SearchUiState.SearchOperation.Loading(suggestion))
+        }
     }
 
     fun onFragmentPause(isChangingConfigurations: Boolean?) {
@@ -279,12 +293,37 @@ class SearchViewModel @Inject constructor(
     }
 }
 
-data class SearchResults(
-    val podcasts: List<FolderItem>,
-    val episodes: List<EpisodeItem>,
-) {
-    val isEmpty: Boolean get() = podcasts.isEmpty() && episodes.isEmpty()
+sealed interface SearchResults {
+    val isEmpty: Boolean
+
+    fun subscribeToPodcast(uuid: String): SearchResults
+
+    data class SegregatedResults(
+        val podcasts: List<FolderItem>,
+        val episodes: List<EpisodeItem>
+    ) : SearchResults {
+        override val isEmpty: Boolean get() = podcasts.isEmpty() && episodes.isEmpty()
+
+        override fun subscribeToPodcast(uuid: String) = copy(
+            podcasts = podcasts.map { folderItem ->
+                if (folderItem.uuid == uuid) {
+                    (folderItem as? FolderItem.Podcast)?.copy(podcast = folderItem.podcast.copy(isSubscribed = true)) ?: folderItem
+                } else {
+                    folderItem
+                }
+            }
+        )
+    }
+
+    data class ImprovedResults(
+        val results: List<ImprovedSearchResultItem>
+    ) : SearchResults {
+        override val isEmpty: Boolean get() = results.isEmpty()
+
+        override fun subscribeToPodcast(uuid: String) = copy(results = results.map { if (it is ImprovedSearchResultItem.PodcastItem && it.uuid == uuid) it.copy(isFollowed = true) else it })
+    }
 }
+
 
 enum class ResultsFilters(val resId: Int) {
     TOP_RESULTS(LR.string.search_filters_top_results),
@@ -297,14 +336,16 @@ sealed interface SearchUiState {
     val searchTerm: String?
         get() = when (this) {
             is Suggestions -> operation.searchTerm
-            is Results -> operation.searchTerm
+            is OldResults -> operation.searchTerm
+            is ImprovedResults -> operation.searchTerm
             else -> null
         }
 
     val isLoading: Boolean
         get() = when (this) {
             is Suggestions -> operation is SearchOperation.Loading
-            is Results -> operation is SearchOperation.Loading
+            is OldResults -> operation is SearchOperation.Loading
+            is ImprovedResults -> operation is SearchOperation.Loading
             else -> false
         }
 
@@ -318,9 +359,13 @@ sealed interface SearchUiState {
 
     data object Idle : SearchUiState
     data class Suggestions(val operation: SearchOperation<List<SearchAutoCompleteItem>>) : SearchUiState
-    data class Results(
-        val operation: SearchOperation<SearchResults>,
+    data class ImprovedResults(
+        val operation: SearchOperation<SearchResults.ImprovedResults>,
         val filterOptions: Set<ResultsFilters> = ResultsFilters.entries.toSet(),
         val selectedFilterIndex: Int = 0,
+    ) : SearchUiState
+
+    data class OldResults(
+        val operation: SearchOperation<SearchResults.SegregatedResults>,
     ) : SearchUiState
 }

@@ -1,10 +1,12 @@
 package au.com.shiftyjelly.pocketcasts.search
 
+import android.util.Log
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.to.FolderItem
+import au.com.shiftyjelly.pocketcasts.models.to.ImprovedSearchResultItem
 import au.com.shiftyjelly.pocketcasts.models.to.SearchAutoCompleteItem
 import au.com.shiftyjelly.pocketcasts.models.type.PodcastsSortType
 import au.com.shiftyjelly.pocketcasts.models.type.SignInState
@@ -16,6 +18,7 @@ import au.com.shiftyjelly.pocketcasts.repositories.user.UserManager
 import au.com.shiftyjelly.pocketcasts.servers.ServiceManager
 import au.com.shiftyjelly.pocketcasts.servers.discover.GlobalServerSearch
 import au.com.shiftyjelly.pocketcasts.servers.podcast.PodcastCacheServiceManager
+import au.com.shiftyjelly.pocketcasts.servers.search.CombinedResult
 import com.jakewharton.rxrelay2.BehaviorRelay
 import io.reactivex.Observable
 import io.reactivex.Single
@@ -25,6 +28,7 @@ import io.reactivex.schedulers.Schedulers
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.flatMapLatest
@@ -55,6 +59,9 @@ class SearchHandler @Inject constructor(
     }
     private val onlySearchRemoteObservable = BehaviorRelay.create<Boolean>().apply {
         accept(false)
+    }
+    private val resultsFilterObservable = BehaviorRelay.create<ResultsFilters>().apply {
+        accept(ResultsFilters.TOP_RESULTS)
     }
     private val signInStateObservable = userManager.getSignInState().startWith(SignInState.SignedOut).toObservable()
 
@@ -224,7 +231,7 @@ class SearchHandler @Inject constructor(
             analyticsTracker.track(AnalyticsEvent.SEARCH_FAILED, AnalyticsProp.sourceMap(source))
             SearchUiState.SearchOperation.Error(searchTerm = searchTerm.term, error = serverSearchResults.error!!)
         } else if (searchTerm.term.isBlank()) {
-            SearchUiState.SearchOperation.Success(searchTerm = searchTerm.term, results = SearchResults(podcasts = emptyList(), episodes = emptyList()))
+            SearchUiState.SearchOperation.Success(searchTerm = searchTerm.term, results = SearchResults.SegregatedResults(podcasts = emptyList(), episodes = emptyList()))
         } else {
             // set if the podcast is subscribed so we can show a tick
             val serverPodcastsResult = serverSearchResults.podcastSearch.searchResults.map { podcast -> FolderItem.Podcast(podcast) }
@@ -238,7 +245,7 @@ class SearchHandler @Inject constructor(
 
             SearchUiState.SearchOperation.Success(
                 searchTerm = searchTerm.term,
-                results = SearchResults(
+                results = SearchResults.SegregatedResults(
                     podcasts = searchPodcastsResult,
                     episodes = searchEpisodesResult,
                 ),
@@ -256,6 +263,38 @@ class SearchHandler @Inject constructor(
         .observeOn(AndroidSchedulers.mainThread())
 
     val searchResults = searchFlowable.asFlow()
+
+    val improvedSearchResults: Flow<SearchUiState.SearchOperation<SearchResults.ImprovedResults>> = combine(
+        searchQuery.filter { it is Query.SearchResults }.map { it.term.trim() }.asFlow(),
+        subscribedPodcastUuids.asFlow(),
+        localPodcastsResults.asFlow(),
+    ) { query, subscribedPodcastUuids, localPodcasts -> Triple(query, subscribedPodcastUuids, localPodcasts) }
+        .flatMapLatest { (query, subscribedUuids, localPodcasts) ->
+            if (query.isBlank()) {
+                flowOf(SearchUiState.SearchOperation.Success(searchTerm = query, results = SearchResults.ImprovedResults(emptyList())))
+            } else {
+                flow {
+                    emit(SearchUiState.SearchOperation.Loading(searchTerm = query))
+                    val apiResults = improvedSearchManager.combinedSearch(query).map {
+                        when (it) {
+                            is CombinedResult.PodcastResult -> ImprovedSearchResultItem.PodcastItem(uuid = it.uuid, isFollowed = subscribedUuids.contains(it.uuid))
+                            is CombinedResult.EpisodeResult -> ImprovedSearchResultItem.EpisodeItem(uuid = it.uuid)
+                        }
+                    }
+                    val localResults = localPodcasts.map {
+                        when (it) {
+                            is FolderItem.Folder -> ImprovedSearchResultItem.FolderItem(uuid = it.uuid)
+                            is FolderItem.Podcast -> ImprovedSearchResultItem.PodcastItem(uuid = it.uuid, isFollowed = subscribedUuids.contains(it.uuid))
+                        }
+                    }
+                    val combinedResults = apiResults + localResults
+                    emit(SearchUiState.SearchOperation.Success(searchTerm = query, results = SearchResults.ImprovedResults(combinedResults)))
+                }.catch {
+                    Log.d("===", "error $it")
+                    emit(SearchUiState.SearchOperation.Error(searchTerm = query, error = it) as SearchUiState.SearchOperation<SearchResults.ImprovedResults>)
+                }
+        }
+    }
 
     fun updateAutCompleteQuery(query: String) {
         searchQuery.accept(Query.Suggestions(query))

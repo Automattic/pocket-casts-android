@@ -27,6 +27,7 @@ import au.com.shiftyjelly.pocketcasts.models.entity.Folder
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.to.EpisodeItem
 import au.com.shiftyjelly.pocketcasts.models.to.FolderItem
+import au.com.shiftyjelly.pocketcasts.models.to.ImprovedSearchResultItem
 import au.com.shiftyjelly.pocketcasts.search.component.ImprovedSearchEpisodeResultRow
 import au.com.shiftyjelly.pocketcasts.search.component.ImprovedSearchPodcastResultRow
 import au.com.shiftyjelly.pocketcasts.search.component.NoResultsView
@@ -36,7 +37,7 @@ import au.com.shiftyjelly.pocketcasts.views.helper.PlayButtonListener
 
 @Composable
 fun ImprovedSearchResultsPage(
-    state: SearchUiState.Results,
+    state: SearchUiState.ImprovedResults,
     loading: Boolean,
     bottomInset: Dp,
     onEpisodeClick: (EpisodeItem) -> Unit,
@@ -52,22 +53,9 @@ fun ImprovedSearchResultsPage(
     Column(
         modifier = modifier,
     ) {
-        // we still need the server piece for this, so temporarily i'm filtering results locally here...
+        // TODO re-implement filtering
         val selectedFilter = state.filterOptions.toList()[state.selectedFilterIndex]
-        val operation = (state.operation as? SearchUiState.SearchOperation.Success)?.copy(
-            results = SearchResults(
-                podcasts = if (selectedFilter != ResultsFilters.EPISODES) {
-                    state.operation.results.podcasts
-                } else {
-                    emptyList()
-                },
-                episodes = if (selectedFilter != ResultsFilters.PODCASTS) {
-                    state.operation.results.episodes
-                } else {
-                    emptyList()
-                },
-            ),
-        ) ?: state.operation
+        val operation = (state.operation as? SearchUiState.SearchOperation.Success)?.copy() ?: state.operation
 
         when (operation) {
             is SearchUiState.SearchOperation.Error -> SearchFailedView()
@@ -115,7 +103,7 @@ fun ImprovedSearchResultsPage(
 
 @Composable
 private fun ImprovedSearchResultsView(
-    state: SearchUiState.SearchOperation.Success<SearchResults>,
+    state: SearchUiState.SearchOperation.Success<SearchResults.ImprovedResults>,
     bottomInset: Dp,
     onEpisodeClick: (EpisodeItem) -> Unit,
     onPodcastClick: (Podcast) -> Unit,
@@ -148,49 +136,46 @@ private fun ImprovedSearchResultsView(
         val dividerModifier = Modifier
             .fillMaxWidth()
             .padding(horizontal = 16.dp)
-        state.results.podcasts.forEachIndexed { index, item ->
-            item(key = "podcast-${item.uuid}", contentType = "podcast") {
-                ImprovedSearchPodcastResultRow(
-                    folderItem = item,
-                    onClick = {
-                        when (item) {
-                            is FolderItem.Folder -> onFolderClick(item.folder, item.podcasts)
-                            is FolderItem.Podcast -> onPodcastClick(item.podcast)
-                        }
-                    },
-                    onFollow = {
-                        if (item is FolderItem.Podcast) {
-                            onFollowPodcast(item.podcast)
-                        } else {
-                            Unit
-                        }
-                    },
-                )
-            }
-
-            if (index < state.results.podcasts.lastIndex) {
-                item {
-                    HorizontalDivider(dividerModifier)
+        state.results.results.forEachIndexed { index, item ->
+            when (item) {
+                is ImprovedSearchResultItem.FolderItem -> {}
+                is ImprovedSearchResultItem.PodcastItem -> {
+                    item(key = "podcast-${item.uuid}", contentType = "podcast") {
+                        ImprovedSearchPodcastResultRow(
+                            folderItem = item,
+                            onClick = {
+//                                when (item) {
+//                                    is FolderItem.Folder -> onFolderClick(item.folder, item.podcasts)
+//                                    is FolderItem.Podcast -> onPodcastClick(item.podcast)
+//                                }
+                            },
+                            onFollow = {
+//                                if (item is FolderItem.Podcast) {
+//                                    onFollowPodcast(item.podcast)
+//                                } else {
+//                                    Unit
+//                                }
+                            },
+                        )
+                    }
                 }
-            }
-        }
 
-        if (state.results.episodes.isNotEmpty()) {
-            item {
-                HorizontalDivider(dividerModifier)
-            }
-        }
+                is ImprovedSearchResultItem.EpisodeItem -> {
+                    item(key = "episode-${item.uuid}", contentType = "episode") {
+                        ImprovedSearchEpisodeResultRow(
+                            episode = item,
+                            onClick = {
+//                                onEpisodeClick(item)
+                            },
+                            playButtonListener = playButtonListener,
+                            fetchEpisode = fetchEpisode,
+                        )
+                    }
+                }
 
-        state.results.episodes.forEachIndexed { index, item ->
-            item(key = "episode-${item.uuid}", contentType = "episode") {
-                ImprovedSearchEpisodeResultRow(
-                    episode = item,
-                    onClick = { onEpisodeClick(item) },
-                    playButtonListener = playButtonListener,
-                    fetchEpisode = fetchEpisode,
-                )
             }
-            if (index < state.results.episodes.lastIndex) {
+
+            if (index < state.results.results.lastIndex) {
                 item {
                     HorizontalDivider(dividerModifier)
                 }

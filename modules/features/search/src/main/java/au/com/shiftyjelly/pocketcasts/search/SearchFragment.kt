@@ -11,7 +11,9 @@ import android.view.View
 import android.view.ViewGroup
 import android.view.inputmethod.EditorInfo
 import androidx.appcompat.widget.SearchView
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.size
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
@@ -232,7 +234,7 @@ class SearchFragment : BaseFragment() {
             viewModel.state
                 .scan<SearchUiState, Pair<SearchUiState?, SearchUiState?>>(null to null) { acc, value -> acc.second to value }
                 .drop(1)
-                .filter { (previous, next) -> previous is SearchUiState.Suggestions && next is SearchUiState.Results }
+                .filter { (previous, next) -> previous is SearchUiState.Suggestions && (next is SearchUiState.OldResults || next is SearchUiState.ImprovedResults) }
                 .mapNotNull { (_, next) -> next?.searchTerm }
                 .collect {
                     if (it != searchView.query) {
@@ -254,7 +256,8 @@ class SearchFragment : BaseFragment() {
                 val characterCount = query.length
                 val lowerCaseSearch = query.lowercase()
                 if ((characterCount == 1 && lowerCaseSearch.startsWith("h")) || (characterCount == 2 && lowerCaseSearch.startsWith("ht")) || (characterCount == 3 && lowerCaseSearch.startsWith("htt")) || lowerCaseSearch.startsWith("http")) {
-                    if (((viewModel.state.value as? SearchUiState.Results)?.operation as? SearchUiState.SearchOperation.Success)?.results?.podcasts?.isNotEmpty() == true) {
+                    if (((viewModel.state.value as? SearchUiState.OldResults)?.operation as? SearchUiState.SearchOperation.Success)?.results?.podcasts?.isNotEmpty() == true) {
+                        // TODO check this condition above
                         binding.searchHistoryPanel.hide()
                     }
                     return true
@@ -325,11 +328,11 @@ class SearchFragment : BaseFragment() {
             setContentWithViewCompositionStrategy {
                 val bottomInset by settings.bottomInset.collectAsStateWithLifecycle(initialValue = 0)
                 val state by viewModel.state.collectAsState()
-                (state as? SearchUiState.Results)?.let { results ->
-                    AppThemeWithBackground(theme.activeTheme) {
-                        if (FeatureFlag.isEnabled(Feature.IMPROVED_SEARCH_RESULTS)) {
+                AppThemeWithBackground(theme.activeTheme) {
+                    when (val state = state) {
+                        is SearchUiState.ImprovedResults ->
                             ImprovedSearchResultsPage(
-                                state = results,
+                                state = state,
                                 loading = state.isLoading,
                                 onEpisodeClick = ::onEpisodeClick,
                                 onPodcastClick = { onPodcastClick(SearchHistoryEntry.fromPodcast(it), it.isSubscribed) },
@@ -341,9 +344,10 @@ class SearchFragment : BaseFragment() {
                                 bottomInset = bottomInset.pxToDp(LocalContext.current).dp,
                                 onFilterSelect = viewModel::selectFilter,
                             )
-                        } else {
+
+                        is SearchUiState.OldResults ->
                             SearchInlineResultsPage(
-                                state = results,
+                                state = state,
                                 loading = state.isLoading,
                                 onEpisodeClick = ::onEpisodeClick,
                                 onPodcastClick = { onPodcastClick(SearchHistoryEntry.fromPodcast(it), it.isSubscribed) },
@@ -353,10 +357,11 @@ class SearchFragment : BaseFragment() {
                                 onScroll = { UiUtil.hideKeyboard(searchView) },
                                 bottomInset = bottomInset.pxToDp(LocalContext.current).dp,
                             )
-                        }
+
+                        else -> Spacer(modifier = Modifier.size(0.dp))
                     }
                 }
-                binding.searchInlineResults.isVisible = state is SearchUiState.Results && !state.searchTerm.isNullOrBlank()
+                binding.searchInlineResults.isVisible = (state is SearchUiState.OldResults || state is SearchUiState.ImprovedResults) && !state.searchTerm.isNullOrBlank()
             }
         }
     }
