@@ -736,7 +736,7 @@ Language: ko_KR
     <string name="settings_continuous_playback_summary">다음 큐가 비어 있으면 현재 듣고 있는 것과 동일한 팟캐스트 또는 목록의 에피소드를 재생합니다.</string>
     <string name="renew_your_subscription">구독 갱신</string>
     <string name="log_in_watch_from_phone_instructions_3">문제가 있는 경우 휴대폰에서 시계(%s)와 동일한 버전의 Pocket Casts를 실행하고 있는지 확인하세요.</string>
-    <string name="log_in_free_acccount">%s은(는) 무료 계정을 사용하고 있습니다.</string>
+    <string name="log_in_free_account">%s은(는) 무료 계정을 사용하고 있습니다.</string>
     <string name="player_play_failed_check_internet">팟캐스트를 로드할 수 없습니다. 인터넷 연결을 확인하고 다시 시도하세요.</string>
     <string name="empty_play_state">시작할 에피소드 선택</string>
     <string name="settings_beta_features">베타 기능</string>

@@ -736,7 +736,7 @@ Language: zh_CN
     <string name="settings_continuous_playback_summary">如果您的“接下来播放”队列中没有内容，我们会播放您目前正在收听的同一播客或列表中的剧集。</string>
     <string name="renew_your_subscription">续订您的订阅</string>
     <string name="log_in_watch_from_phone_instructions_3">如果您遇到问题，请确保您的手机运行的 Pocket Casts 版本与与手表相同 (%s)</string>
-    <string name="log_in_free_acccount">%s 正在使用免费账户</string>
+    <string name="log_in_free_account">%s 正在使用免费账户</string>
     <string name="player_play_failed_check_internet">无法加载播客。 请检查您的网络连接，然后重试。</string>
     <string name="empty_play_state">选择一集以开始</string>
     <string name="settings_beta_features">测试版功能</string>

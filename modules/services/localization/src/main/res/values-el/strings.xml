@@ -579,7 +579,7 @@ Language: el_GR
     <string name="onboarding_patron_feature_early_access_title">Πρώιμη πρόσβαση σε δυνατότητες</string>
     <string name="settings_continuous_playback_summary">Αν η ουρά Επόμενο είναι άδεια, θα παίξουμε επεισόδια από το ίδιο podcast ή λίστα που ακούς αυτή τη στιγμή.</string>
     <string name="renew_your_subscription">Ανανέωσε τη Συνδρομή σου</string>
-    <string name="log_in_free_acccount">%s χρησιμοποιεί δωρεάν λογαριασμό</string>
+    <string name="log_in_free_account">%s χρησιμοποιεί δωρεάν λογαριασμό</string>
     <string name="log_in_watch_from_phone_instructions_3">Αν έχεις πρόβλημα, βεβαιώσου ότι το τηλέφωνό σου τρέχει την ίδια έκδοση του Pocket Casts με το ρολόι σου (%s)</string>
     <string name="empty_play_state">Διάλεξε ένα επεισόδιο για να ξεκινήσεις</string>
     <string name="player_play_failed_check_internet">Αδυναμία φόρτωσης podcast. Παρακαλώ έλεγξε τη σύνδεση στο διαδίκτυο και δοκίμασε ξανά.</string>

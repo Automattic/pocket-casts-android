@@ -736,7 +736,7 @@ Language: ja_JP
     <string name="settings_continuous_playback_summary">「\"次のエピソード」が空の場合、現在視聴中のポッドキャストと同じものまたはリストからエピソードを再生します。</string>
     <string name="renew_your_subscription">サブスクリプションを更新</string>
     <string name="log_in_watch_from_phone_instructions_3">問題が発生した場合は、スマートフォンでウォッチと同じバージョンの Pocket Casts が実行されていることを確認します (%s)</string>
-    <string name="log_in_free_acccount">%s では無料アカウントを使用しています</string>
+    <string name="log_in_free_account">%s では無料アカウントを使用しています</string>
     <string name="player_play_failed_check_internet">ポッドキャストを読み込めませんでした。 ネットワーク接続を確認して、もう一度お試しください。</string>
     <string name="empty_play_state">開始するエピソードを選ぶ</string>
     <string name="settings_beta_features">ベータ版の機能</string>
