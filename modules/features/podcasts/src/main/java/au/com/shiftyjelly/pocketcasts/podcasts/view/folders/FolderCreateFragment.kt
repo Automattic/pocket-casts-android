@@ -4,7 +4,13 @@ import android.app.Dialog
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.WindowInsetsSides
+import androidx.compose.foundation.layout.only
+import androidx.compose.foundation.layout.safeDrawing
+import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.material.MaterialTheme
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.toArgb
 import androidx.core.os.bundleOf
 import androidx.fragment.app.activityViewModels
@@ -23,6 +29,7 @@ import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.ui.helper.ColorUtils
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseDialogFragment
 import dagger.hilt.android.AndroidEntryPoint
+import java.nio.file.WatchEvent
 import javax.inject.Inject
 
 @AndroidEntryPoint
@@ -66,7 +73,11 @@ class FolderCreateFragment : BaseDialogFragment() {
 
             navHostController = rememberNavController()
             val navController = navHostController ?: return@AppThemeWithBackground
-            NavHost(navController = navController, startDestination = NavRoutes.PODCASTS) {
+            NavHost(
+                navController = navController,
+                startDestination = NavRoutes.PODCASTS,
+                modifier = Modifier.windowInsetsPadding(WindowInsets.safeDrawing.only(WindowInsetsSides.Horizontal)),
+            ) {
                 composable(NavRoutes.PODCASTS) {
                     FolderEditPodcastsPage(
                         onCloseClick = { dismiss() },

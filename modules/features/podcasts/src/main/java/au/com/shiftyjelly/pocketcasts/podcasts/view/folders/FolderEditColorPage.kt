@@ -2,6 +2,9 @@ package au.com.shiftyjelly.pocketcasts.podcasts.view.folders
 
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
@@ -27,6 +30,7 @@ import au.com.shiftyjelly.pocketcasts.compose.components.HorizontalDivider
 import au.com.shiftyjelly.pocketcasts.compose.components.TextC70
 import au.com.shiftyjelly.pocketcasts.compose.components.TextP60
 import au.com.shiftyjelly.pocketcasts.compose.folder.FolderImage
+import au.com.shiftyjelly.pocketcasts.compose.layout.verticalNavigationBars
 import au.com.shiftyjelly.pocketcasts.compose.preview.ThemePreviewParameterProvider
 import au.com.shiftyjelly.pocketcasts.compose.theme
 import au.com.shiftyjelly.pocketcasts.podcasts.view.podcasts.FolderListRow
@@ -69,53 +73,51 @@ private fun FolderEditColorForm(
     onSaveClick: () -> Unit,
     onColorChange: (Int) -> Unit,
 ) {
-    BoxWithConstraints {
-        val maxHeight = this.maxHeight
-        Column {
-            BottomSheetAppBar(
-                title = stringResource(LR.string.folder_choose_a_color),
-                navigationButton = NavigationButton.Back,
-                onNavigationClick = { onBackPress() },
+    Column {
+        BottomSheetAppBar(
+            title = stringResource(LR.string.folder_choose_a_color),
+            navigationButton = NavigationButton.Back,
+            onNavigationClick = { onBackPress() },
+        )
+        Column(
+            modifier = Modifier
+                .verticalScroll(rememberScrollState())
+                .weight(1f),
+        ) {
+            TextC70(
+                text = stringResource(LR.string.color),
+                modifier = Modifier.padding(top = 16.dp, bottom = 8.dp, end = 16.dp, start = 16.dp),
             )
-            Column(
-                modifier = Modifier
-                    .verticalScroll(rememberScrollState())
-                    .weight(1f),
-            ) {
-                TextC70(
-                    text = stringResource(LR.string.color),
-                    modifier = Modifier.padding(top = 16.dp, bottom = 8.dp, end = 16.dp, start = 16.dp),
-                )
-                HorizontalDivider(Modifier.padding(horizontal = 16.dp))
-                FolderColorPicker(
-                    selectedId = colorId,
-                    onClick = { colorId -> onColorChange(colorId) },
-                )
-                TextP60(
-                    text = stringResource(LR.string.folder_background_color_summary),
-                    color = MaterialTheme.theme.colors.primaryText02,
-                    modifier = Modifier.padding(start = 16.dp, bottom = 16.dp),
-                )
-                TextC70(
-                    text = stringResource(LR.string.preview),
-                    modifier = Modifier.padding(top = 16.dp, end = 16.dp, start = 16.dp, bottom = 8.dp),
-                )
-                HorizontalDivider(Modifier.padding(horizontal = 16.dp))
-                FolderPreview(
-                    layout = state.layout,
-                    name = folderName.ifBlank { stringResource(LR.string.new_folder_title) },
-                    colorId = colorId,
-                    podcastUuids = state.selectedUuids.toList(),
-                    gridImageWidthDp = gridImageWidthDp,
-                )
-            }
-            // only elevate the bottom button if the content will go under it
-            Card(elevation = if (maxHeight > 600.dp) 0.dp else 6.dp) {
-                RowButton(
-                    text = stringResource(LR.string.save_folder),
-                    onClick = { onSaveClick() },
-                )
-            }
+            HorizontalDivider(Modifier.padding(horizontal = 16.dp))
+            FolderColorPicker(
+                selectedId = colorId,
+                onClick = { colorId -> onColorChange(colorId) },
+            )
+            TextP60(
+                text = stringResource(LR.string.folder_background_color_summary),
+                color = MaterialTheme.theme.colors.primaryText02,
+                modifier = Modifier.padding(start = 16.dp, bottom = 16.dp),
+            )
+            TextC70(
+                text = stringResource(LR.string.preview),
+                modifier = Modifier.padding(top = 16.dp, end = 16.dp, start = 16.dp, bottom = 8.dp),
+            )
+            HorizontalDivider(Modifier.padding(horizontal = 16.dp))
+            FolderPreview(
+                layout = state.layout,
+                name = folderName.ifBlank { stringResource(LR.string.new_folder_title) },
+                colorId = colorId,
+                podcastUuids = state.selectedUuids.toList(),
+                gridImageWidthDp = gridImageWidthDp,
+            )
+            Spacer(
+                modifier = Modifier.weight(1f),
+            )
+            RowButton(
+                text = stringResource(LR.string.save_folder),
+                onClick = { onSaveClick() },
+                modifier = Modifier.padding(WindowInsets.verticalNavigationBars.asPaddingValues()),
+            )
         }
     }
 }
@@ -133,6 +135,7 @@ private fun FolderPreview(layout: PodcastGridLayoutType, name: String, colorId: 
                 modifier = modifier.padding(vertical = 8.dp, horizontal = 16.dp),
             )
         }
+
         else -> {
             Card(
                 modifier = modifier.padding(all = 16.dp),
