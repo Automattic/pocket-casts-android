@@ -104,17 +104,21 @@ platform :android do
     ensure_git_status_clean
     Fastlane::Helper::GitHelper.checkout_and_pull(DEFAULT_BRANCH)
 
-    # Validate provided version matches the calculated version
-    expected_version = release_version_next
-    if version && version != expected_version
-      UI.user_error!("Version mismatch: Provided version '#{version}' does not match calculated version '#{expected_version}'. Please check the release scenario version matches the project version.")
+    # Use provided version from release tool, or fall back to calculated version
+    calculated_version = release_version_next
+    release_version = version || calculated_version
+
+    # Warn if provided version differs from calculated version
+    if version && version != calculated_version
+      warning_message = "⚠️ Version mismatch: Release tool version is '#{version}' but calculated version is '#{calculated_version}'. Using '#{version}' from release tool."
+      UI.important(warning_message)
+      buildkite_annotate(style: 'warning', context: 'code-freeze-version-mismatch', message: warning_message) if is_ci
     end
-    UI.success("✓ Version validation passed: Version (#{version || expected_version}) matches calculated version") if version
 
     confirmation_message = <<-MESSAGE
 
       Code Freeze:
-      • New release branch from #{DEFAULT_BRANCH}: release/#{expected_version}
+      • New release branch from #{DEFAULT_BRANCH}: release/#{release_version}
       • Current release version and build code: #{release_version_current} (#{build_code_current}).
       • New release version and build code: #{beta_version_code_freeze} (#{build_code_next}).
 
@@ -125,7 +129,7 @@ platform :android do
 
     # Create the release branch
     UI.message('Creating release branch...')
-    release_branch_name = "release/#{release_version_next}"
+    release_branch_name = "release/#{release_version}"
     Fastlane::Helper::GitHelper.create_branch(release_branch_name, from: DEFAULT_BRANCH)
     UI.success("Done! New release branch is: #{git_branch}")
 
