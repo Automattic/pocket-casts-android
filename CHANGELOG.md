@@ -14,6 +14,8 @@
         ([#4555](https://github.com/Automattic/pocket-casts-android/pull/4555))
     *   Fix archived episodes not being downloaded when added to queue
         ([#4570](https://github.com/Automattic/pocket-casts-android/pull/4570))
+    *   Fix podcast title sort with accents   
+        ([#4594](https://github.com/Automattic/pocket-casts-android/pull/4594))
 
 7.99
 -----
