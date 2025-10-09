@@ -3,16 +3,16 @@ package au.com.shiftyjelly.pocketcasts.podcasts.view.folders
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.material.Card
 import androidx.compose.material.Checkbox
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
@@ -42,6 +42,7 @@ import au.com.shiftyjelly.pocketcasts.compose.components.SearchBar
 import au.com.shiftyjelly.pocketcasts.compose.components.TextP40
 import au.com.shiftyjelly.pocketcasts.compose.components.TextP50
 import au.com.shiftyjelly.pocketcasts.compose.components.rememberViewInteropNestedScrollConnection
+import au.com.shiftyjelly.pocketcasts.compose.layout.verticalNavigationBars
 import au.com.shiftyjelly.pocketcasts.compose.theme
 import au.com.shiftyjelly.pocketcasts.models.entity.Folder
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
@@ -70,7 +71,6 @@ fun FolderEditPodcastsPage(
             )
             PageList(
                 state = state,
-                onNextClick = onNextClick,
                 onSortClick = {
                     SelectSortByDialog(settings, viewModel::changeSortOrder).show(context = context, fragmentManager = fragmentManager)
                 },
@@ -79,21 +79,31 @@ fun FolderEditPodcastsPage(
                 onRemovePodcast = viewModel::removePodcast,
                 modifier = Modifier.weight(1f),
             )
+            RowButton(
+                text = when {
+                    state.isEditFolder -> stringResource(LR.string.update)
+                    state.selectedCount == 1 -> stringResource(LR.string.add_podcasts_singular)
+                    else -> stringResource(LR.string.add_podcasts_plural, state.selectedCount)
+                },
+                onClick = { onNextClick() },
+                modifier = Modifier.padding(WindowInsets.verticalNavigationBars.asPaddingValues()),
+            )
         }
     }
 }
 
 @Composable
-private fun ColumnScope.PageList(
+private fun PageList(
     state: FolderEditViewModel.State,
-    onNextClick: () -> Unit,
     onSortClick: () -> Unit,
     onSearchPodcasts: (String) -> Unit,
     onAddPodcast: (String) -> Unit,
     onRemovePodcast: (String) -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    LazyColumn(modifier = modifier) {
+    LazyColumn(
+        modifier = modifier,
+    ) {
         item {
             Column {
                 LargePageTitle(text = stringResource(if (state.isCreateFolder) LR.string.create_folder else LR.string.filters_choose_podcasts))
@@ -126,14 +136,6 @@ private fun ColumnScope.PageList(
         item {
             Spacer(modifier = Modifier.height(7.dp))
         }
-    }
-    val buttonText = when {
-        state.isEditFolder -> stringResource(LR.string.update)
-        state.selectedCount == 1 -> stringResource(LR.string.add_podcasts_singular)
-        else -> stringResource(LR.string.add_podcasts_plural, state.selectedCount)
-    }
-    Card(elevation = 8.dp) {
-        RowButton(text = buttonText, onClick = { onNextClick() })
     }
 }
 
