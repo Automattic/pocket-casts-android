@@ -25,7 +25,7 @@ sealed interface CombinedResult {
         @Json(name ="published_date")
         val publishedDate: String,
         val url: String,
-        val duration: Long,
+        val duration: Long = 0L,
         @Json(name = "podcast_uuid")
         val podcastUuid: String,
         @Json(name = "podcast_title")

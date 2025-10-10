@@ -142,11 +142,11 @@ class SearchViewModel @Inject constructor(
         onSubscribeToPodcast(podcast.uuid)
     }
 
-    suspend fun fetchEpisode(episodeItem: EpisodeItem): BaseEpisode? {
-        return podcastManager.findOrDownloadPodcastRxSingle(episodeItem.podcastUuid)
+    suspend fun fetchEpisode(episode: ImprovedSearchResultItem.EpisodeItem): BaseEpisode? {
+        return podcastManager.findOrDownloadPodcastRxSingle(episode.podcastUuid)
             .flatMapMaybe {
                 rxMaybe {
-                    episodeManager.findByUuid(episodeItem.uuid)
+                    episodeManager.findByUuid(episode.uuid)
                 }
             }
             .toFlowable().asFlow().firstOrNull()

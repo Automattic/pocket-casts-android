@@ -18,7 +18,6 @@ import au.com.shiftyjelly.pocketcasts.repositories.user.UserManager
 import au.com.shiftyjelly.pocketcasts.servers.ServiceManager
 import au.com.shiftyjelly.pocketcasts.servers.discover.GlobalServerSearch
 import au.com.shiftyjelly.pocketcasts.servers.podcast.PodcastCacheServiceManager
-import au.com.shiftyjelly.pocketcasts.servers.search.CombinedResult
 import com.jakewharton.rxrelay2.BehaviorRelay
 import io.reactivex.Observable
 import io.reactivex.Single
@@ -264,6 +263,7 @@ class SearchHandler @Inject constructor(
 
     val searchResults = searchFlowable.asFlow()
 
+    @OptIn(ExperimentalCoroutinesApi::class)
     val improvedSearchResults: Flow<SearchUiState.SearchOperation<SearchResults.ImprovedResults>> = combine(
         searchQuery.filter { it is Query.SearchResults }.map { it.term.trim() }.asFlow(),
         subscribedPodcastUuids.asFlow(),
@@ -275,16 +275,11 @@ class SearchHandler @Inject constructor(
             } else {
                 flow {
                     emit(SearchUiState.SearchOperation.Loading(searchTerm = query))
-                    val apiResults = improvedSearchManager.combinedSearch(query).map {
-                        when (it) {
-                            is CombinedResult.PodcastResult -> ImprovedSearchResultItem.PodcastItem(uuid = it.uuid, isFollowed = subscribedUuids.contains(it.uuid))
-                            is CombinedResult.EpisodeResult -> ImprovedSearchResultItem.EpisodeItem(uuid = it.uuid)
-                        }
-                    }
+                    val apiResults = improvedSearchManager.combinedSearch(query)
                     val localResults = localPodcasts.map {
                         when (it) {
-                            is FolderItem.Folder -> ImprovedSearchResultItem.FolderItem(uuid = it.uuid)
-                            is FolderItem.Podcast -> ImprovedSearchResultItem.PodcastItem(uuid = it.uuid, isFollowed = subscribedUuids.contains(it.uuid))
+                            is FolderItem.Folder -> ImprovedSearchResultItem.FolderItem(folder = it.folder, podcasts = it.podcasts)
+                            is FolderItem.Podcast -> ImprovedSearchResultItem.PodcastItem(uuid = it.uuid, isFollowed = subscribedUuids.contains(it.uuid), title = it.podcast.title, author = it.podcast.author)
                         }
                     }
                     val combinedResults = apiResults + localResults
@@ -293,8 +288,8 @@ class SearchHandler @Inject constructor(
                     Log.d("===", "error $it")
                     emit(SearchUiState.SearchOperation.Error(searchTerm = query, error = it) as SearchUiState.SearchOperation<SearchResults.ImprovedResults>)
                 }
+            }
         }
-    }
 
     fun updateAutCompleteQuery(query: String) {
         searchQuery.accept(Query.Suggestions(query))

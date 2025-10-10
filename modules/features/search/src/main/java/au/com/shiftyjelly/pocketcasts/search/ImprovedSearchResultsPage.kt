@@ -25,10 +25,9 @@ import au.com.shiftyjelly.pocketcasts.compose.theme
 import au.com.shiftyjelly.pocketcasts.models.entity.BaseEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.Folder
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
-import au.com.shiftyjelly.pocketcasts.models.to.EpisodeItem
-import au.com.shiftyjelly.pocketcasts.models.to.FolderItem
 import au.com.shiftyjelly.pocketcasts.models.to.ImprovedSearchResultItem
 import au.com.shiftyjelly.pocketcasts.search.component.ImprovedSearchEpisodeResultRow
+import au.com.shiftyjelly.pocketcasts.search.component.ImprovedSearchFolderResultRow
 import au.com.shiftyjelly.pocketcasts.search.component.ImprovedSearchPodcastResultRow
 import au.com.shiftyjelly.pocketcasts.search.component.NoResultsView
 import au.com.shiftyjelly.pocketcasts.search.component.SearchFailedView
@@ -40,20 +39,21 @@ fun ImprovedSearchResultsPage(
     state: SearchUiState.ImprovedResults,
     loading: Boolean,
     bottomInset: Dp,
-    onEpisodeClick: (EpisodeItem) -> Unit,
-    onPodcastClick: (Podcast) -> Unit,
+    onEpisodeClick: (ImprovedSearchResultItem.EpisodeItem) -> Unit,
+    onPodcastClick: (ImprovedSearchResultItem.PodcastItem) -> Unit,
     onFolderClick: (Folder, List<Podcast>) -> Unit,
-    onFollowPodcast: (Podcast) -> Unit,
+    onFollowPodcast: (ImprovedSearchResultItem.PodcastItem) -> Unit,
     onFilterSelect: (ResultsFilters) -> Unit,
     playButtonListener: PlayButtonListener,
     onScroll: () -> Unit,
     modifier: Modifier = Modifier,
-    fetchEpisode: (suspend (EpisodeItem) -> BaseEpisode?)? = null,
+    fetchEpisode: (suspend (ImprovedSearchResultItem.EpisodeItem) -> BaseEpisode?)? = null,
 ) {
     Column(
         modifier = modifier,
     ) {
-        // TODO re-implement filtering
+        // TODO re-implement filtering in viewmodel
+
         val selectedFilter = state.filterOptions.toList()[state.selectedFilterIndex]
         val operation = (state.operation as? SearchUiState.SearchOperation.Success)?.copy() ?: state.operation
 
@@ -105,14 +105,14 @@ fun ImprovedSearchResultsPage(
 private fun ImprovedSearchResultsView(
     state: SearchUiState.SearchOperation.Success<SearchResults.ImprovedResults>,
     bottomInset: Dp,
-    onEpisodeClick: (EpisodeItem) -> Unit,
-    onPodcastClick: (Podcast) -> Unit,
+    onEpisodeClick: (ImprovedSearchResultItem.EpisodeItem) -> Unit,
+    onPodcastClick: (ImprovedSearchResultItem.PodcastItem) -> Unit,
     onFolderClick: (Folder, List<Podcast>) -> Unit,
-    onFollowPodcast: (Podcast) -> Unit,
+    onFollowPodcast: (ImprovedSearchResultItem.PodcastItem) -> Unit,
     playButtonListener: PlayButtonListener,
     onScroll: () -> Unit,
     modifier: Modifier = Modifier,
-    fetchEpisode: (suspend (EpisodeItem) -> BaseEpisode?)? = null,
+    fetchEpisode: (suspend (ImprovedSearchResultItem.EpisodeItem) -> BaseEpisode?)? = null,
 ) {
     val nestedScrollConnection = remember {
         object : NestedScrollConnection {
@@ -138,24 +138,20 @@ private fun ImprovedSearchResultsView(
             .padding(horizontal = 16.dp)
         state.results.results.forEachIndexed { index, item ->
             when (item) {
-                is ImprovedSearchResultItem.FolderItem -> {}
+                is ImprovedSearchResultItem.FolderItem -> {
+                    item(key = "folder-${item.uuid}", contentType = "folder") {
+                        ImprovedSearchFolderResultRow(
+                            folderItem = item,
+                            onClick = { onFolderClick(item.folder, item.podcasts) },
+                        )
+                    }
+                }
                 is ImprovedSearchResultItem.PodcastItem -> {
                     item(key = "podcast-${item.uuid}", contentType = "podcast") {
                         ImprovedSearchPodcastResultRow(
-                            folderItem = item,
-                            onClick = {
-//                                when (item) {
-//                                    is FolderItem.Folder -> onFolderClick(item.folder, item.podcasts)
-//                                    is FolderItem.Podcast -> onPodcastClick(item.podcast)
-//                                }
-                            },
-                            onFollow = {
-//                                if (item is FolderItem.Podcast) {
-//                                    onFollowPodcast(item.podcast)
-//                                } else {
-//                                    Unit
-//                                }
-                            },
+                            podcastItem = item,
+                            onClick = { onPodcastClick(item) },
+                            onFollow = { onFollowPodcast(item) },
                         )
                     }
                 }
@@ -164,9 +160,7 @@ private fun ImprovedSearchResultsView(
                     item(key = "episode-${item.uuid}", contentType = "episode") {
                         ImprovedSearchEpisodeResultRow(
                             episode = item,
-                            onClick = {
-//                                onEpisodeClick(item)
-                            },
+                            onClick = { onEpisodeClick(item) },
                             playButtonListener = playButtonListener,
                             fetchEpisode = fetchEpisode,
                         )

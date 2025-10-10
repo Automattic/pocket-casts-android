@@ -21,8 +21,8 @@ import au.com.shiftyjelly.pocketcasts.servers.model.ListTypeMoshiAdapter
 import au.com.shiftyjelly.pocketcasts.servers.podcast.PodcastCacheService
 import au.com.shiftyjelly.pocketcasts.servers.podcast.TranscriptService
 import au.com.shiftyjelly.pocketcasts.servers.search.AutoCompleteResult
+import au.com.shiftyjelly.pocketcasts.servers.search.AutoCompleteSearchService
 import au.com.shiftyjelly.pocketcasts.servers.search.CombinedResult
-import au.com.shiftyjelly.pocketcasts.servers.search.SearchService
 import au.com.shiftyjelly.pocketcasts.servers.server.ListWebService
 import au.com.shiftyjelly.pocketcasts.servers.sync.LoginIdentity
 import au.com.shiftyjelly.pocketcasts.servers.sync.update.SyncUpdateResponse
@@ -308,7 +308,7 @@ class ServersModule {
 
     @Singleton
     @Provides
-    internal fun provideSearchService(@SearchRetrofit retrofit: Retrofit): SearchService = retrofit.create(SearchService::class.java)
+    internal fun provideAutoCompleteSearchService(@SearchRetrofit retrofit: Retrofit): AutoCompleteSearchService = retrofit.create(AutoCompleteSearchService::class.java)
 
     @Provides
     @Singleton

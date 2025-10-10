@@ -35,7 +35,7 @@ import au.com.shiftyjelly.pocketcasts.localization.helper.RelativeDateFormatter
 import au.com.shiftyjelly.pocketcasts.localization.helper.TimeHelper
 import au.com.shiftyjelly.pocketcasts.models.entity.BaseEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
-import au.com.shiftyjelly.pocketcasts.models.to.EpisodeItem
+import au.com.shiftyjelly.pocketcasts.models.to.ImprovedSearchResultItem
 import au.com.shiftyjelly.pocketcasts.models.to.SearchAutoCompleteItem
 import au.com.shiftyjelly.pocketcasts.repositories.images.PocketCastsImageRequestFactory
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
@@ -43,6 +43,8 @@ import au.com.shiftyjelly.pocketcasts.views.buttons.PlayButton
 import au.com.shiftyjelly.pocketcasts.views.buttons.PlayButtonType
 import au.com.shiftyjelly.pocketcasts.views.helper.PlayButtonListener
 import java.util.Date
+import kotlin.time.Duration
+import kotlin.time.Duration.Companion.seconds
 
 @Composable
 fun ImprovedSearchEpisodeResultRow(
@@ -55,7 +57,7 @@ fun ImprovedSearchEpisodeResultRow(
         episodeUuid = item.uuid,
         podcastUuid = item.podcastUuid,
         title = item.title,
-        duration = item.duration,
+        duration = item.duration.seconds,
         publishedAt = item.publishedAt,
         onClick = onClick,
         playButtonListener = playButtonListener,
@@ -65,11 +67,11 @@ fun ImprovedSearchEpisodeResultRow(
 
 @Composable
 fun ImprovedSearchEpisodeResultRow(
-    episode: EpisodeItem,
+    episode: ImprovedSearchResultItem.EpisodeItem,
     onClick: () -> Unit,
     playButtonListener: PlayButtonListener,
     modifier: Modifier = Modifier,
-    fetchEpisode: (suspend (EpisodeItem) -> BaseEpisode?)? = null,
+    fetchEpisode: (suspend (ImprovedSearchResultItem.EpisodeItem) -> BaseEpisode?)? = null,
 ) {
     val baseEpisode: BaseEpisode? by produceState(null) {
         value = fetchEpisode?.invoke(episode)
@@ -80,7 +82,7 @@ fun ImprovedSearchEpisodeResultRow(
         podcastUuid = episode.podcastUuid,
         title = episode.title,
         duration = episode.duration,
-        publishedAt = episode.publishedAt,
+        publishedAt = episode.publishedDate,
         playButtonListener = playButtonListener,
         onClick = onClick,
         modifier = modifier,
@@ -93,7 +95,7 @@ private fun ImprovedSearchEpisodeResultRow(
     episodeUuid: String,
     podcastUuid: String,
     title: String,
-    duration: Double,
+    duration: Duration,
     publishedAt: Date,
     onClick: () -> Unit,
     playButtonListener: PlayButton.OnClickListener,
@@ -111,7 +113,7 @@ private fun ImprovedSearchEpisodeResultRow(
             episode = PodcastEpisode(
                 uuid = episodeUuid,
                 title = title,
-                duration = duration,
+                duration = duration.inWholeSeconds.toDouble(),
                 publishedDate = publishedAt,
                 podcastUuid = podcastUuid,
             ),
@@ -127,7 +129,7 @@ private fun ImprovedSearchEpisodeResultRow(
         ) {
             val context = LocalContext.current
             val formattedDuration =
-                remember(duration, context) { TimeHelper.getTimeDurationMediumString((duration * 1000).toInt(), context) }
+                remember(duration, context) { TimeHelper.getTimeDurationMediumString(duration.inWholeMilliseconds.toInt(), context) }
             val dateFormatter = RelativeDateFormatter(context)
             val formattedPublishDate = remember(publishedAt, dateFormatter) { dateFormatter.format(publishedAt) }
 
@@ -176,7 +178,7 @@ private fun PreviewEpisodeResultRow(
             episodeUuid = "",
             podcastUuid = "",
             title = "Episode title",
-            duration = 320.0,
+            duration = 340.seconds,
             publishedAt = Date(),
             playButtonListener = object : PlayButton.OnClickListener {
                 override var source: SourceView = SourceView.SEARCH_RESULTS

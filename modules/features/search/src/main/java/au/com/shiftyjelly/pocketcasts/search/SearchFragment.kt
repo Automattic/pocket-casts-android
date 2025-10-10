@@ -32,6 +32,7 @@ import au.com.shiftyjelly.pocketcasts.compose.AppThemeWithBackground
 import au.com.shiftyjelly.pocketcasts.compose.extensions.setContentWithViewCompositionStrategy
 import au.com.shiftyjelly.pocketcasts.models.entity.Folder
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
+import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.models.to.EpisodeItem
 import au.com.shiftyjelly.pocketcasts.models.to.SearchHistoryEntry
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodeViewSource
@@ -334,10 +335,14 @@ class SearchFragment : BaseFragment() {
                             ImprovedSearchResultsPage(
                                 state = state,
                                 loading = state.isLoading,
-                                onEpisodeClick = ::onEpisodeClick,
-                                onPodcastClick = { onPodcastClick(SearchHistoryEntry.fromPodcast(it), it.isSubscribed) },
+                                onEpisodeClick = {
+//                                    onEpisodeClick(podcastEpisode = null, podcastTitle = it.podcastUuid)
+                                                 }, //todo
+                                onPodcastClick = {
+//                                    onPodcastClick(SearchHistoryEntry.fromPodcast(it), it.isFollowed)
+                                                 },
                                 onFolderClick = ::onFolderClick,
-                                onFollowPodcast = ::onSubscribeToPodcast,
+                                onFollowPodcast = { viewModel.onSubscribeToPodcast(it.uuid) },
                                 playButtonListener = playButtonListener,
                                 fetchEpisode = viewModel::fetchEpisode,
                                 onScroll = { UiUtil.hideKeyboard(searchView) },
@@ -367,16 +372,19 @@ class SearchFragment : BaseFragment() {
     }
 
     private fun onEpisodeClick(episodeItem: EpisodeItem) {
+        onEpisodeClick(episodeItem.toEpisode(), episodeItem.podcastTitle)
+    }
+
+    private fun onEpisodeClick(podcastEpisode: PodcastEpisode, podcastTitle: String) {
         viewModel.trackSearchResultTapped(
             source = source,
-            uuid = episodeItem.uuid,
+            uuid = podcastEpisode.uuid,
             type = SearchResultType.EPISODE,
         )
-        val episode = episodeItem.toEpisode()
-        searchHistoryViewModel.add(SearchHistoryEntry.fromEpisode(episode, episodeItem.podcastTitle))
+        searchHistoryViewModel.add(SearchHistoryEntry.fromEpisode(podcastEpisode, podcastTitle))
         listener?.onSearchEpisodeClick(
-            episodeUuid = episode.uuid,
-            podcastUuid = episode.podcastUuid,
+            episodeUuid = podcastEpisode.uuid,
+            podcastUuid = podcastEpisode.podcastUuid,
             source = EpisodeViewSource.SEARCH,
         )
         binding?.searchView?.let { UiUtil.hideKeyboard(it) }
