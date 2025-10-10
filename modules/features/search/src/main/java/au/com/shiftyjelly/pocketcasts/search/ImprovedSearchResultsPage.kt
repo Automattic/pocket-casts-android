@@ -19,6 +19,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.Velocity
 import androidx.compose.ui.unit.dp
+import au.com.shiftyjelly.pocketcasts.compose.components.FadeConfig
 import au.com.shiftyjelly.pocketcasts.compose.components.FadedLazyColumn
 import au.com.shiftyjelly.pocketcasts.compose.components.HorizontalDivider
 import au.com.shiftyjelly.pocketcasts.compose.theme
@@ -120,6 +121,7 @@ private fun ImprovedSearchResultsView(
     val listState = rememberLazyListState()
 
     FadedLazyColumn(
+        fadeConfig = FadeConfig.Default.copy(showEndFade = false),
         state = listState,
         contentPadding = PaddingValues(
             top = 16.dp,
