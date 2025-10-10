@@ -37,8 +37,7 @@ import kotlin.math.abs
 @Composable
 fun FadedLazyColumn(
     modifier: Modifier = Modifier,
-    fadeThreshold: Dp = 32.dp,
-    fadeSize: FadeSize = FadeSize.Relative(0.125f),
+    fadeConfig: FadeConfig = FadeConfig.Default,
     state: LazyListState = rememberLazyListState(),
     contentPadding: PaddingValues = PaddingValues(0.dp),
     reverseLayout: Boolean = false,
@@ -49,10 +48,9 @@ fun FadedLazyColumn(
     content: LazyListScope.() -> Unit,
 ) {
     val density = LocalDensity.current
-    val edgeState = remember(fadeSize, fadeThreshold, state, density) {
+    val edgeState = remember(fadeConfig, state, density) {
         FadedEdgeState(
-            fadeSize = fadeSize,
-            fadeThreshold = fadeThreshold,
+            config = fadeConfig,
             listState = state,
             density = density,
         )
@@ -80,8 +78,7 @@ fun FadedLazyColumn(
 @Composable
 fun FadedLazyRow(
     modifier: Modifier = Modifier,
-    fadeThreshold: Dp = 32.dp,
-    fadeSize: FadeSize = FadeSize.Relative(0.125f),
+    fadeConfig: FadeConfig = FadeConfig.Default,
     state: LazyListState = rememberLazyListState(),
     contentPadding: PaddingValues = PaddingValues(0.dp),
     reverseLayout: Boolean = false,
@@ -92,10 +89,9 @@ fun FadedLazyRow(
     content: LazyListScope.() -> Unit,
 ) {
     val density = LocalDensity.current
-    val edgeState = remember(fadeSize, fadeThreshold, state, density) {
+    val edgeState = remember(fadeConfig, state, density) {
         FadedEdgeState(
-            fadeSize = fadeSize,
-            fadeThreshold = fadeThreshold,
+            config = fadeConfig,
             listState = state,
             density = density,
         )
@@ -118,6 +114,22 @@ fun FadedLazyRow(
                 with(edgeState) { drawEndRect() }
             },
     )
+}
+
+data class FadeConfig(
+    val threshold: Dp,
+    val size: FadeSize,
+    val showStartFade: Boolean,
+    val showEndFade: Boolean,
+) {
+    companion object {
+        val Default = FadeConfig(
+            threshold = 32.dp,
+            size = FadeSize.Relative(0.125f),
+            showStartFade = true,
+            showEndFade = true,
+        )
+    }
 }
 
 sealed interface FadeSize {
@@ -143,8 +155,7 @@ sealed interface FadeSize {
 }
 
 private class FadedEdgeState(
-    private val fadeSize: FadeSize,
-    private val fadeThreshold: Dp,
+    private val config: FadeConfig,
     private val listState: LazyListState,
     private val density: Density,
 ) {
@@ -154,13 +165,13 @@ private class FadedEdgeState(
         val viewportSize = layoutInfo.viewportSize.toSize()
         when (layoutInfo.orientation) {
             Orientation.Vertical -> viewportSize.copy(
-                height = when (fadeSize) {
+                height = when (val fadeSize = config.size) {
                     is FadeSize.Fixed -> density.run { fadeSize.value.toPx() }
                     is FadeSize.Relative -> viewportSize.height * fadeSize.value
                 },
             )
             Orientation.Horizontal -> viewportSize.copy(
-                width = when (fadeSize) {
+                width = when (val fadeSize = config.size) {
                     is FadeSize.Fixed -> density.run { fadeSize.value.toPx() }
                     is FadeSize.Relative -> viewportSize.width * fadeSize.value
                 },
@@ -184,7 +195,7 @@ private class FadedEdgeState(
 
         if (isFirstVisible) {
             val fadeThreshold = minOf(
-                density.run { fadeThreshold.toPx() },
+                density.run { config.threshold.toPx() },
                 firstItemInfo.size.toFloat(),
                 if (isLastClipped) clippingSize.toFloat() else Float.MAX_VALUE,
             )
@@ -215,7 +226,7 @@ private class FadedEdgeState(
 
         if (isLastVisible) {
             val fadeThreshold = minOf(
-                density.run { fadeThreshold.toPx() },
+                density.run { config.threshold.toPx() },
                 lastItemInfo.size.toFloat(),
                 if (isFirstClipped) clippingSize.toFloat() else Float.MAX_VALUE,
             )
@@ -232,35 +243,39 @@ private class FadedEdgeState(
     }
 
     fun ContentDrawScope.drawStartRect() {
-        drawRect(
-            brush = gradientBrush(
-                0f to Color.Black.copy(alpha = startAlpha),
-                0.15f to Color.Black.copy(alpha = startAlpha),
-                1f to Color.Transparent,
-                start = 0f,
-                end = boxSize.mainAxis,
-            ),
-            size = boxSize,
-            topLeft = Offset.Zero,
-            blendMode = BlendMode.DstOut,
-        )
+        if (config.showStartFade) {
+            drawRect(
+                brush = gradientBrush(
+                    0f to Color.Black.copy(alpha = startAlpha),
+                    0.15f to Color.Black.copy(alpha = startAlpha),
+                    1f to Color.Transparent,
+                    start = 0f,
+                    end = boxSize.mainAxis,
+                ),
+                size = boxSize,
+                topLeft = Offset.Zero,
+                blendMode = BlendMode.DstOut,
+            )
+        }
     }
 
     fun ContentDrawScope.drawEndRect() {
-        val viewportMainAxis = layoutInfo.viewportSize.mainAxis.toFloat()
-        val endOffset = viewportMainAxis - boxSize.mainAxis
-        drawRect(
-            brush = gradientBrush(
-                0f to Color.Black.copy(alpha = endAlpha),
-                0.15f to Color.Black.copy(alpha = endAlpha),
-                1f to Color.Transparent,
-                start = viewportMainAxis,
-                end = endOffset,
-            ),
-            size = boxSize,
-            topLeft = offset(mainAxis = endOffset),
-            blendMode = BlendMode.DstOut,
-        )
+        if (config.showEndFade) {
+            val viewportMainAxis = layoutInfo.viewportSize.mainAxis.toFloat()
+            val endOffset = viewportMainAxis - boxSize.mainAxis
+            drawRect(
+                brush = gradientBrush(
+                    0f to Color.Black.copy(alpha = endAlpha),
+                    0.15f to Color.Black.copy(alpha = endAlpha),
+                    1f to Color.Transparent,
+                    start = viewportMainAxis,
+                    end = endOffset,
+                ),
+                size = boxSize,
+                topLeft = offset(mainAxis = endOffset),
+                blendMode = BlendMode.DstOut,
+            )
+        }
     }
 
     private val Size.mainAxis get() = when (listState.layoutInfo.orientation) {
