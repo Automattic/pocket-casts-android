@@ -98,16 +98,35 @@ before_all do |_lane|
 end
 
 platform :android do
-  # @param skip_confirm [Boolean] If true, avoids any interactive prompt
+  # Executes the code freeze steps, creating a new release branch and triggering the first beta build
   #
-  lane :code_freeze do |skip_confirm: false|
+  # @param [String] version (optional) The version to use for the new release version to code freeze for.
+  #                 Typically auto-provided by ReleasesV2. If nil, computes the new version based on current one.
+  # @param [Boolean] skip_confirm If true, avoids any interactive prompt
+  #
+  lane :code_freeze do |version: nil, skip_confirm: false|
     ensure_git_status_clean
     Fastlane::Helper::GitHelper.checkout_and_pull(DEFAULT_BRANCH)
+
+    # Use provided version from release tool, or fall back to computed version
+    computed_version = release_version_next
+    new_version = version || computed_version
+
+    # Warn if provided version differs from computed version
+    if version && version != computed_version
+      warning_message = <<~WARNING
+        ⚠️ Version mismatch: The explicitly-provided version was '#{version}' while new computed version would have been '#{computed_version}'.
+        If this is unexpected, you might want to investigate the discrepency.
+        Continuing with the explicitly-provided verison '#{version}'.
+      WARNING
+      UI.important(warning_message)
+      buildkite_annotate(style: 'warning', context: 'code-freeze-version-mismatch', message: warning_message) if is_ci
+    end
 
     confirmation_message = <<-MESSAGE
 
       Code Freeze:
-      • New release branch from #{DEFAULT_BRANCH}: release/#{release_version_next}
+      • New release branch from #{DEFAULT_BRANCH}: release/#{new_version}
       • Current release version and build code: #{release_version_current} (#{build_code_current}).
       • New release version and build code: #{beta_version_code_freeze} (#{build_code_next}).
 
@@ -118,7 +137,7 @@ platform :android do
 
     # Create the release branch
     UI.message('Creating release branch...')
-    release_branch_name = "release/#{release_version_next}"
+    release_branch_name = "release/#{new_version}"
     Fastlane::Helper::GitHelper.create_branch(release_branch_name, from: DEFAULT_BRANCH)
     UI.success("Done! New release branch is: #{git_branch}")
 
@@ -130,8 +149,6 @@ platform :android do
     )
     commit_version_bump
     UI.success("Done! New Beta Version: #{beta_version_current}. New Build Code: #{build_code_current}")
-
-    new_version = release_version_current
 
     extract_release_notes_for_version(
       version: new_version,
