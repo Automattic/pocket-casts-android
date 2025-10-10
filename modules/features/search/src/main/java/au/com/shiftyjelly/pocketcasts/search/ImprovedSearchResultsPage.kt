@@ -52,12 +52,7 @@ fun ImprovedSearchResultsPage(
     Column(
         modifier = modifier,
     ) {
-        // TODO re-implement filtering in viewmodel
-
-        val selectedFilter = state.filterOptions.toList()[state.selectedFilterIndex]
-        val operation = (state.operation as? SearchUiState.SearchOperation.Success)?.copy() ?: state.operation
-
-        when (operation) {
+        when (val operation = state.operation) {
             is SearchUiState.SearchOperation.Error -> SearchFailedView()
             is SearchUiState.SearchOperation.Success -> {
                 if (operation.results.isEmpty) {
@@ -136,7 +131,7 @@ private fun ImprovedSearchResultsView(
         val dividerModifier = Modifier
             .fillMaxWidth()
             .padding(horizontal = 16.dp)
-        state.results.results.forEachIndexed { index, item ->
+        state.results.filteredResults.forEachIndexed { index, item ->
             when (item) {
                 is ImprovedSearchResultItem.FolderItem -> {
                     item(key = "folder-${item.uuid}", contentType = "folder") {

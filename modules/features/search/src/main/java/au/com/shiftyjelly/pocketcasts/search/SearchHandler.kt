@@ -271,7 +271,7 @@ class SearchHandler @Inject constructor(
     ) { query, subscribedPodcastUuids, localPodcasts -> Triple(query, subscribedPodcastUuids, localPodcasts) }
         .flatMapLatest { (query, subscribedUuids, localPodcasts) ->
             if (query.isBlank()) {
-                flowOf(SearchUiState.SearchOperation.Success(searchTerm = query, results = SearchResults.ImprovedResults(emptyList())))
+                flowOf(SearchUiState.SearchOperation.Success(searchTerm = query, results = SearchResults.ImprovedResults(results = emptyList(), filter = ResultsFilters.TOP_RESULTS)))
             } else {
                 flow {
                     emit(SearchUiState.SearchOperation.Loading(searchTerm = query))
@@ -283,7 +283,7 @@ class SearchHandler @Inject constructor(
                         }
                     }
                     val combinedResults = apiResults + localResults
-                    emit(SearchUiState.SearchOperation.Success(searchTerm = query, results = SearchResults.ImprovedResults(combinedResults)))
+                    emit(SearchUiState.SearchOperation.Success(searchTerm = query, results = SearchResults.ImprovedResults(results = combinedResults, filter = ResultsFilters.TOP_RESULTS)))
                 }.catch {
                     Log.d("===", "error $it")
                     emit(SearchUiState.SearchOperation.Error(searchTerm = query, error = it) as SearchUiState.SearchOperation<SearchResults.ImprovedResults>)

@@ -161,9 +161,14 @@ class SearchViewModel @Inject constructor(
                     "filter" to filter.name,
                 ),
             )
-            _state.update {
-                (it as SearchUiState.ImprovedResults).copy(
+            _state.update { state ->
+                (state as SearchUiState.ImprovedResults).copy(
                     selectedFilterIndex = ResultsFilters.entries.indexOf(filter),
+                    operation = (state.operation as? SearchUiState.SearchOperation.Success)?.let { success ->
+                        success.copy(
+                            results = success.results.copy(filter = filter)
+                        )
+                    } ?: state.operation
                 )
             }
         }
@@ -181,6 +186,7 @@ class SearchViewModel @Inject constructor(
                             results = it.operation.results.subscribeToPodcast(uuid)
                         ) ?: it.operation,
                     )
+
                 is SearchUiState.ImprovedResults ->
                     it.copy(
                         operation = (it.operation as? SearchUiState.SearchOperation.Success)?.copy(
@@ -316,9 +322,19 @@ sealed interface SearchResults {
     }
 
     data class ImprovedResults(
-        val results: List<ImprovedSearchResultItem>
+        val results: List<ImprovedSearchResultItem>,
+        val filter: ResultsFilters,
     ) : SearchResults {
-        override val isEmpty: Boolean get() = results.isEmpty()
+        val filteredResults: List<ImprovedSearchResultItem>
+            get() = results.filter { item ->
+                when (filter) {
+                    ResultsFilters.TOP_RESULTS -> true
+                    ResultsFilters.EPISODES -> item is ImprovedSearchResultItem.EpisodeItem
+                    ResultsFilters.PODCASTS -> item is ImprovedSearchResultItem.PodcastItem
+                }
+            }
+
+        override val isEmpty: Boolean get() = filteredResults.isEmpty()
 
         override fun subscribeToPodcast(uuid: String) = copy(results = results.map { if (it is ImprovedSearchResultItem.PodcastItem && it.uuid == uuid) it.copy(isFollowed = true) else it })
     }

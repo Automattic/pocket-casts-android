@@ -8,7 +8,6 @@ import au.com.shiftyjelly.pocketcasts.servers.search.AutoCompleteResult
 import au.com.shiftyjelly.pocketcasts.servers.search.AutoCompleteSearchService
 import au.com.shiftyjelly.pocketcasts.servers.search.CombinedResult
 import au.com.shiftyjelly.pocketcasts.servers.search.CombinedSearchRequest
-import java.util.Date
 import javax.inject.Inject
 import kotlin.time.Duration.Companion.seconds
 
