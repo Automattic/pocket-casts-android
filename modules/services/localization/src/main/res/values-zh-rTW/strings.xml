@@ -736,7 +736,7 @@ Language: zh_TW
     <string name="settings_continuous_playback_summary">如果「接下來播放」佇列是空的，我們會播放你正在聆聽的同一個 Podcast 或清單內的單集。</string>
     <string name="renew_your_subscription">續訂</string>
     <string name="log_in_watch_from_phone_instructions_3">如果遇到問題，請確認手機執行的 Pocket Casts 版本與手錶 (%s) 相同</string>
-    <string name="log_in_free_acccount">%s 正在使用免費帳號</string>
+    <string name="log_in_free_account">%s 正在使用免費帳號</string>
     <string name="player_play_failed_check_internet">無法載入 Podcast。 請檢查你的網際網路連線並再試一次。</string>
     <string name="empty_play_state">挑選單集以開始</string>
     <string name="settings_beta_features">Beta 功能</string>

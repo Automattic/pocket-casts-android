@@ -9,8 +9,6 @@ import au.com.shiftyjelly.pocketcasts.repositories.playlist.Playlist
 import au.com.shiftyjelly.pocketcasts.repositories.playlist.PlaylistManager
 import au.com.shiftyjelly.pocketcasts.repositories.playlist.PlaylistPreview
 import au.com.shiftyjelly.pocketcasts.repositories.user.UserManager
-import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
-import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 import kotlinx.coroutines.flow.SharingStarted
@@ -30,9 +28,8 @@ class PlaylistsViewModel @Inject constructor(
     private val showFreeAccountBanner = combine(
         settings.isFreeAccountFiltersBannerDismissed.flow,
         userManager.getSignInState().asFlow().map { it.isSignedOut },
-        FeatureFlag.isEnabledFlow(Feature.ENCOURAGE_ACCOUNT_CREATION),
-    ) { isBannerDismissed, isSignedOut, isFeatureEnabled ->
-        isSignedOut && !isBannerDismissed && isFeatureEnabled
+    ) { isBannerDismissed, isSignedOut ->
+        isSignedOut && !isBannerDismissed
     }
 
     internal val uiState = combine(

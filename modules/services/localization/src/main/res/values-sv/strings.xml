@@ -736,7 +736,7 @@ Language: sv_SE
     <string name="settings_continuous_playback_summary">Om din Nästa-kö är tom kommer vi att spela upp avsnitt från den podcast eller lista som du för närvarande lyssnar på.</string>
     <string name="renew_your_subscription">Förnya din prenumeration</string>
     <string name="log_in_watch_from_phone_instructions_3">Om du har problem, se till att din telefon kör samma version av Pocket Casts som din klocka (%s)</string>
-    <string name="log_in_free_acccount">%s använder ett gratiskonto</string>
+    <string name="log_in_free_account">%s använder ett gratiskonto</string>
     <string name="player_play_failed_check_internet">Det gick inte att ladda podcasten. Kontrollera din internetanslutning och försök igen.</string>
     <string name="empty_play_state">Välj ett avsnitt för att börja</string>
     <string name="settings_beta_features">Betafunktioner</string>

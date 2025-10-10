@@ -99,6 +99,7 @@ message SyncUserPlaylist {
   google.protobuf.Int32Value shorter_than = 23;
   repeated string episode_order = 24;
   repeated SyncPlaylistEpisode episodes = 25;
+  google.protobuf.BoolValue show_archived = 26;
 }
 
 message SyncPlaylistEpisode {
@@ -232,6 +233,7 @@ message PlaylistSyncResponse {
   google.protobuf.Int32Value shorter_than = 23;
   repeated string episode_order = 24;
   repeated SyncPlaylistEpisode episodes = 25;
+  google.protobuf.BoolValue show_archived = 26;
 }
 
 message PodcastRatingResponse {

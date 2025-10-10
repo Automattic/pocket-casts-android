@@ -12,8 +12,6 @@ import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.user.UserManager
-import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
-import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 import kotlin.coroutines.CoroutineContext
@@ -119,7 +117,7 @@ class ProfileEpisodeListViewModel @Inject constructor(
         userManager.getSignInState().asFlow().map { it.isSignedIn },
         settings.isFreeAccountHistoryBannerDismissed.flow,
     ) { isSignedIn, isBannerDismissed ->
-        !isSignedIn && !isBannerDismissed && FeatureFlag.isEnabled(Feature.ENCOURAGE_ACCOUNT_CREATION)
+        !isSignedIn && !isBannerDismissed
     }.stateIn(
         scope = viewModelScope,
         started = SharingStarted.Eagerly,

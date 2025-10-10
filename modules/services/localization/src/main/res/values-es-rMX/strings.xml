@@ -736,7 +736,7 @@ Language: es
     <string name="settings_continuous_playback_summary">Si no tienes ningún episodio en cola, reproduciremos los del pódcast o lista que estés escuchando en ese momento.</string>
     <string name="renew_your_subscription">Renovar la suscripción</string>
     <string name="log_in_watch_from_phone_instructions_3">Si estás experimentando problemas, asegúrate de que tengas instalada la misma versión de Pocket Casts en el móvil y en el reloj (%s)</string>
-    <string name="log_in_free_acccount">%s está usando una cuenta gratuita</string>
+    <string name="log_in_free_account">%s está usando una cuenta gratuita</string>
     <string name="player_play_failed_check_internet">No se ha podido cargar el pódcast. Revisa tu conexión a Internet e inténtalo de nuevo.</string>
     <string name="empty_play_state">Elige un episodio para empezar</string>
     <string name="settings_beta_features">Funciones beta</string>

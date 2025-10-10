@@ -736,7 +736,7 @@ Language: fr
     <string name="settings_continuous_playback_summary">Si votre file d’attente À écouter ensuite est vide, nous diffuserons les épisodes du même podcast ou de la même liste que ceux que vous écoutez actuellement.</string>
     <string name="renew_your_subscription">Renouveler votre abonnement</string>
     <string name="log_in_watch_from_phone_instructions_3">En cas de problème, assurez-vous que votre téléphone utilise la même version de Pocket Casts que votre montre (%s)</string>
-    <string name="log_in_free_acccount">%s utilise un compte gratuit</string>
+    <string name="log_in_free_account">%s utilise un compte gratuit</string>
     <string name="player_play_failed_check_internet">Impossible de charger le podcast. Veuillez vérifier votre connexion internet, puis réessayez.</string>
     <string name="empty_play_state">Choisissez un épisode pour commencer</string>
     <string name="settings_beta_features">Fonctionnalités bêta</string>

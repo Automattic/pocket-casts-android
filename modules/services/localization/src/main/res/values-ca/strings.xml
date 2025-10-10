@@ -736,7 +736,7 @@ Language: ca
     <string name="settings_continuous_playback_summary">Si no tens cap episodi a la cua, es reproduirà els del pòdcast o llista que estiguis escoltant en aquell moment.</string>
     <string name="renew_your_subscription">Renova la teva subscripció</string>
     <string name="log_in_watch_from_phone_instructions_3">Si tens problemes, assegura\'t que el teu telèfon estigui executant la mateixa versió de Pocket Casts que el teu rellotge (%s)</string>
-    <string name="log_in_free_acccount">%s està utilitzant un compte gratuït</string>
+    <string name="log_in_free_account">%s està utilitzant un compte gratuït</string>
     <string name="player_play_failed_check_internet">No s\'ha pogut carregar el pòdcast. Comprova la teva connexió a Internet i torna-ho a intentar.</string>
     <string name="empty_play_state">Tria un episodi per començar</string>
     <string name="settings_beta_features">Característiques beta</string>

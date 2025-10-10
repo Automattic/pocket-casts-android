@@ -69,6 +69,7 @@ import au.com.shiftyjelly.pocketcasts.compose.components.Tooltip
 import au.com.shiftyjelly.pocketcasts.compose.extensions.setContentWithViewCompositionStrategy
 import au.com.shiftyjelly.pocketcasts.models.entity.BlazeAd
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
+import au.com.shiftyjelly.pocketcasts.models.to.FolderItem
 import au.com.shiftyjelly.pocketcasts.models.to.RefreshState
 import au.com.shiftyjelly.pocketcasts.models.type.PodcastsSortType
 import au.com.shiftyjelly.pocketcasts.podcasts.R
@@ -93,7 +94,7 @@ import au.com.shiftyjelly.pocketcasts.utils.extensions.hideShadow
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
-import au.com.shiftyjelly.pocketcasts.views.adapter.PodcastTouchCallback
+import au.com.shiftyjelly.pocketcasts.views.adapter.LockingDragAndDropCallback
 import au.com.shiftyjelly.pocketcasts.views.extensions.quickScrollToTop
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseFragment
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseFragmentToolbar.ChromeCastButton.Shown
@@ -117,7 +118,6 @@ import au.com.shiftyjelly.pocketcasts.views.R as VR
 class PodcastsFragment :
     BaseFragment(),
     FolderAdapter.ClickListener,
-    PodcastTouchCallback.ItemTouchHelperAdapter,
     Toolbar.OnMenuItemClickListener,
     TopScrollable {
 
@@ -197,10 +197,15 @@ class PodcastsFragment :
 
         binding.appBarLayout.hideShadow()
 
+        val dragAndDropCallback = LockingDragAndDropCallback(
+            scope = viewLifecycleOwner.lifecycleScope,
+            adapter = folderAdapter,
+            commitItems = viewModel::reorderItems,
+        )
         binding.recyclerView.let {
             it.adapter = adapter
             it.addItemDecoration(SpaceItemDecoration())
-            ItemTouchHelper(PodcastTouchCallback(this, context)).attachToRecyclerView(it)
+            ItemTouchHelper(dragAndDropCallback).attachToRecyclerView(it)
         }
 
         if (savedInstanceState == null) {
@@ -613,16 +618,6 @@ class PodcastsFragment :
                 }
             }
         }
-    }
-
-    override fun onPodcastMove(fromPosition: Int, toPosition: Int) {
-        val newList = viewModel.moveFolderItem(fromPosition, toPosition)
-        folderAdapter?.submitList(newList)
-    }
-
-    override fun onPodcastMoveFinished() {
-        viewModel.commitMoves()
-        analyticsTracker.track(AnalyticsEvent.PODCASTS_LIST_REORDERED)
     }
 
     override fun onPodcastClick(podcast: Podcast, view: View) {
