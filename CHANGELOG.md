@@ -23,6 +23,8 @@
         ([#4570](https://github.com/Automattic/pocket-casts-android/pull/4570))
     *   Fix podcast title sort with accents   
         ([#4594](https://github.com/Automattic/pocket-casts-android/pull/4594))
+    *   Fix podcasts page drag & drop issues
+        ([#4596](https://github.com/Automattic/pocket-casts-android/pull/4596))
 
 7.99
 -----
