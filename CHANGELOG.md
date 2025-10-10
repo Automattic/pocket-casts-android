@@ -3,12 +3,6 @@
 *   New Features
     *   Add an option to sort Up Next by date
         ([#4586](https://github.com/Automattic/pocket-casts-android/pull/4586))
-    *   Implement search suggestions
-        ([#4571](https://github.com/Automattic/pocket-casts-android/pull/4571))
-    *   Update search results screen
-        ([#4583](https://github.com/Automattic/pocket-casts-android/pull/4583))
-    *   Integrate new combined search API
-        ([#4604](https://github.com/Automattic/pocket-casts-android/pull/4604))
 *   Updates
     *   Improve sleep timer terminology and chapter option visibility
         ([#4564](https://github.com/Automattic/pocket-casts-android/pull/4564))
