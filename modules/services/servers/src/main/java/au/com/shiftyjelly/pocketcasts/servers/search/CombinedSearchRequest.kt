@@ -4,5 +4,5 @@ import com.squareup.moshi.JsonClass
 
 @JsonClass(generateAdapter = true)
 data class CombinedSearchRequest(
-    val term: String
+    val term: String,
 )

@@ -7,7 +7,7 @@ import java.util.Date
 
 @JsonClass(generateAdapter = true)
 data class CombinedSearchResponse(
-    val results: List<CombinedResult>
+    val results: List<CombinedResult>,
 )
 
 sealed interface CombinedResult {
@@ -23,7 +23,7 @@ sealed interface CombinedResult {
     data class EpisodeResult(
         val uuid: String,
         val title: String,
-        @Json(name ="published_date")
+        @Json(name = "published_date")
         val publishedDate: Date = Date(),
         val url: String,
         val duration: Long = 0L,

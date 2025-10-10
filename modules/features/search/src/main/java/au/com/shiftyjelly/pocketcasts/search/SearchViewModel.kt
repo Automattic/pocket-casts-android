@@ -54,9 +54,14 @@ class SearchViewModel @Inject constructor(
 
     val episodePlaybackFlow: Flow<EpisodePlaybackData?>
         get() = playbackManager.playbackStateFlow.map {
-            if (it.state == PlaybackState.State.PLAYING) EpisodePlaybackData(
-                playingEpisodeUuid = it.episodeUuid, playbackPosition = it.positionMs
-            ) else null
+            if (it.state == PlaybackState.State.PLAYING) {
+                EpisodePlaybackData(
+                    playingEpisodeUuid = it.episodeUuid,
+                    playbackPosition = it.positionMs,
+                )
+            } else {
+                null
+            }
         }
 
     init {
@@ -178,9 +183,9 @@ class SearchViewModel @Inject constructor(
                     selectedFilterIndex = ResultsFilters.entries.indexOf(filter),
                     operation = (state.operation as? SearchUiState.SearchOperation.Success)?.let { success ->
                         success.copy(
-                            results = success.results.copy(filter = filter)
+                            results = success.results.copy(filter = filter),
                         )
-                    } ?: state.operation
+                    } ?: state.operation,
                 )
             }
         }
@@ -195,14 +200,14 @@ class SearchViewModel @Inject constructor(
                 is SearchUiState.OldResults ->
                     it.copy(
                         operation = (it.operation as? SearchUiState.SearchOperation.Success)?.copy(
-                            results = it.operation.results.subscribeToPodcast(uuid)
+                            results = it.operation.results.subscribeToPodcast(uuid),
                         ) ?: it.operation,
                     )
 
                 is SearchUiState.ImprovedResults ->
                     it.copy(
                         operation = (it.operation as? SearchUiState.SearchOperation.Success)?.copy(
-                            results = it.operation.results.subscribeToPodcast(uuid)
+                            results = it.operation.results.subscribeToPodcast(uuid),
                         ) ?: it.operation,
                     )
 
@@ -318,7 +323,7 @@ sealed interface SearchResults {
 
     data class SegregatedResults(
         val podcasts: List<FolderItem>,
-        val episodes: List<EpisodeItem>
+        val episodes: List<EpisodeItem>,
     ) : SearchResults {
         override val isEmpty: Boolean get() = podcasts.isEmpty() && episodes.isEmpty()
 
@@ -329,7 +334,7 @@ sealed interface SearchResults {
                 } else {
                     folderItem
                 }
-            }
+            },
         )
     }
 

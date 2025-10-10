@@ -136,7 +136,6 @@ private fun ImprovedSearchResultsView(
         modifier = modifier
             .nestedScroll(nestedScrollConnection),
     ) {
-
         stickyHeader {
             val backgroundColor = MaterialTheme.colors.background
             SearchResultFilters(
@@ -149,7 +148,7 @@ private fun ImprovedSearchResultsView(
                                 0.85f to backgroundColor.copy(alpha = .5f),
                                 1f to Color.Transparent,
                             ),
-                        )
+                        ),
                     )
                     .padding(16.dp),
                 items = filterOptions.map { stringResource(it.resId) },
@@ -189,11 +188,10 @@ private fun ImprovedSearchResultsView(
                             onClick = { onEpisodeClick(item) },
                             playButtonListener = playButtonListener,
                             fetchEpisode = fetchEpisode,
-                            episodePlaybackFlow = episodePlaybackFlow
+                            episodePlaybackFlow = episodePlaybackFlow,
                         )
                     }
                 }
-
             }
 
             if (index < state.results.results.lastIndex) {

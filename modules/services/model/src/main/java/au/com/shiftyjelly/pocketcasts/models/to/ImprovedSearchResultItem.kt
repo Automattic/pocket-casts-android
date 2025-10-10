@@ -11,7 +11,7 @@ sealed interface ImprovedSearchResultItem {
 
     data class FolderItem(
         val folder: Folder,
-        val podcasts: List<Podcast>
+        val podcasts: List<Podcast>,
     ) : ImprovedSearchResultItem {
         override val uuid: String get() = folder.uuid
         override val title: String get() = folder.name

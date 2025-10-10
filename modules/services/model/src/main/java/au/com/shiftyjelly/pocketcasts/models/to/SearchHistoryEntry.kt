@@ -114,7 +114,7 @@ sealed class SearchHistoryEntry(
             title = episode.title,
             duration = episode.duration.inWholeSeconds.toDouble(),
             podcastUuid = episode.podcastUuid,
-            podcastTitle = ""
+            podcastTitle = "",
         )
 
         fun fromImprovedPodcastResult(podcast: ImprovedSearchResultItem.PodcastItem) = Podcast(
