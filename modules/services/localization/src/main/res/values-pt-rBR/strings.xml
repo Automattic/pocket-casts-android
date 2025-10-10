@@ -599,6 +599,7 @@ Language: pt_BR
     <string name="player_sleep_in_chapters">Dormindo em %d capítulos</string>
     <string name="player_sleep_timer_in_chapter_plural">Em %d capítulos</string>
     <string name="player_sleep_timer_in_chapter">Em 1 capítulo</string>
+    <string name="player_sleep_timer_end_of_episode">Fim do episódio</string>
     <string name="player_sleep_timer_in_episode_plural">Em %d episódios</string>
     <string name="player_sleep_timer_in_episode">Em 1 episódio</string>
     <string name="settings_use_episode_artwork_customization_description">Selecione se deseja ver a arte do episódio nessas seções do aplicativo</string>

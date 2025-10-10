@@ -598,6 +598,7 @@ Language: es
     <string name="player_sleep_in_chapters">En suspensión dentro de %d capítulos</string>
     <string name="player_sleep_timer_in_chapter_plural">Dentro de %d capítulos</string>
     <string name="player_sleep_timer_in_chapter">Dentro de 1 capítulo</string>
+    <string name="player_sleep_timer_end_of_episode">Fin del episodio</string>
     <string name="player_sleep_timer_in_episode_plural">Dentro de %d episodios</string>
     <string name="player_sleep_timer_in_episode">Dentro de 1 episodio</string>
     <string name="player_sleep_time_fired_end_of_chapter">El temporizador de suspensión se paró al final del capítulo.</string>

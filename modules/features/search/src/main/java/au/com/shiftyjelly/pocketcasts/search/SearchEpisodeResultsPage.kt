@@ -13,7 +13,6 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import au.com.shiftyjelly.pocketcasts.compose.bars.ThemedTopAppBar
 import au.com.shiftyjelly.pocketcasts.models.to.EpisodeItem
-import au.com.shiftyjelly.pocketcasts.preferences.Settings.MediaNotificationControls.Companion.items
 import au.com.shiftyjelly.pocketcasts.search.component.SearchEpisodeItem
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
@@ -33,17 +32,19 @@ fun SearchEpisodeResultsPage(
             title = stringResource(LR.string.search_results_all_episodes),
             onNavigationClick = { onBackPress() },
         )
-        SearchEpisodeResultsView(
-            state = state as SearchState.Results,
-            onEpisodeClick = onEpisodeClick,
-            bottomInset = bottomInset,
-        )
+        ((state as? SearchUiState.Results)?.operation as? SearchUiState.SearchOperation.Success)?.let {
+            SearchEpisodeResultsView(
+                episodes = it.results.episodes,
+                onEpisodeClick = onEpisodeClick,
+                bottomInset = bottomInset,
+            )
+        }
     }
 }
 
 @Composable
 private fun SearchEpisodeResultsView(
-    state: SearchState.Results,
+    episodes: List<EpisodeItem>,
     onEpisodeClick: (EpisodeItem) -> Unit,
     bottomInset: Dp,
 ) {
@@ -51,7 +52,7 @@ private fun SearchEpisodeResultsView(
         contentPadding = PaddingValues(top = 16.dp, bottom = bottomInset + 16.dp),
     ) {
         items(
-            items = state.episodes,
+            items = episodes,
             key = { it.uuid },
         ) {
             SearchEpisodeItem(

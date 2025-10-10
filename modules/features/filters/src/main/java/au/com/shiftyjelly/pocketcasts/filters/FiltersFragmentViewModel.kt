@@ -13,8 +13,6 @@ import au.com.shiftyjelly.pocketcasts.repositories.playlist.Playlist
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.SmartPlaylistManager
 import au.com.shiftyjelly.pocketcasts.repositories.user.UserManager
-import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
-import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import dagger.hilt.android.lifecycle.HiltViewModel
 import java.util.Collections
 import javax.inject.Inject
@@ -148,7 +146,7 @@ class FiltersFragmentViewModel @Inject constructor(
         userManager.getSignInState().asFlow().map { it.isSignedIn },
         settings.isFreeAccountFiltersBannerDismissed.flow,
     ) { isSignedIn, isBannerDismissed ->
-        !isSignedIn && !isBannerDismissed && FeatureFlag.isEnabled(Feature.ENCOURAGE_ACCOUNT_CREATION)
+        !isSignedIn && !isBannerDismissed
     }.stateIn(
         scope = viewModelScope,
         started = SharingStarted.Eagerly,

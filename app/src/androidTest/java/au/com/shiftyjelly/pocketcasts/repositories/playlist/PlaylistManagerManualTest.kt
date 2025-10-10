@@ -5,6 +5,7 @@ import au.com.shiftyjelly.pocketcasts.models.entity.PlaylistEntity.Companion.SYN
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.models.type.PlaylistEpisodeSortType
 import kotlin.time.Duration
+import kotlin.time.Duration.Companion.seconds
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNull
@@ -858,6 +859,53 @@ class PlaylistManagerManualTest {
                 ),
                 awaitItem(),
             )
+        }
+    }
+
+    @Test
+    fun computeTotalPlaybackDurationLeft() = dsl.test {
+        insertManualPlaylist(index = 0)
+        insertPodcast(index = 0)
+        repeat(6) { index ->
+            insertManualEpisode(index = index, podcastIndex = 0, playlistIndex = 0)
+        }
+
+        manager.manualPlaylistFlow("playlist-id-0").test {
+            assertEquals(0.seconds, awaitItem()?.metadata?.playbackDurationLeft)
+
+            insertPodcastEpisode(index = 0, podcastIndex = 0) {
+                it.copy(duration = 0.0)
+            }
+            assertEquals(0.seconds, awaitItem()?.metadata?.playbackDurationLeft)
+
+            insertPodcastEpisode(index = 1, podcastIndex = 0) {
+                it.copy(duration = 20.0)
+            }
+            assertEquals(20.seconds, awaitItem()?.metadata?.playbackDurationLeft)
+
+            insertPodcastEpisode(index = 2, podcastIndex = 0) {
+                it.copy(duration = 15.0)
+            }
+            assertEquals(35.seconds, awaitItem()?.metadata?.playbackDurationLeft)
+
+            insertPodcastEpisode(index = 3, podcastIndex = 0) {
+                it.copy(duration = 15.0, playedUpTo = 10.0)
+            }
+            assertEquals(40.seconds, awaitItem()?.metadata?.playbackDurationLeft)
+
+            // Check when the duration is unknown and playedUpTo can get above it
+            insertPodcastEpisode(index = 4, podcastIndex = 0) {
+                it.copy(duration = 0.0, playedUpTo = 10.0)
+            }
+            assertEquals(40.seconds, awaitItem()?.metadata?.playbackDurationLeft)
+
+            insertPodcastEpisode(index = 5, podcastIndex = 0) {
+                it.copy(duration = 5.0, isArchived = true)
+            }
+            assertEquals(40.seconds, awaitItem()?.metadata?.playbackDurationLeft)
+
+            manager.toggleShowArchived("playlist-id-0")
+            assertEquals(45.seconds, awaitItem()?.metadata?.playbackDurationLeft)
         }
     }
 }

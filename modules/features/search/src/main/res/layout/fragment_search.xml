@@ -54,6 +54,11 @@
             android:layout_height="wrap_content" />
 
         <androidx.compose.ui.platform.ComposeView
+            android:id="@+id/searchSuggestions"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"/>
+
+        <androidx.compose.ui.platform.ComposeView
             android:id="@+id/searchInlineResults"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"/>

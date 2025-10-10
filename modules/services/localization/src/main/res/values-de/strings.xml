@@ -599,6 +599,7 @@ Language: de
     <string name="player_sleep_in_chapters">Schlummerfunktion wird nach %d Kapiteln aktiviert</string>
     <string name="player_sleep_timer_in_chapter_plural">Nach %d Kapiteln</string>
     <string name="player_sleep_timer_in_chapter">Nach 1 Kapitel</string>
+    <string name="player_sleep_timer_end_of_episode">Ende der Folge</string>
     <string name="player_sleep_timer_in_episode_plural">Nach %d Folgen</string>
     <string name="player_sleep_timer_in_episode">Nach 1 Folge</string>
     <string name="settings_use_episode_artwork_customization_description">Wähle aus, ob in diesen App-Bereichen das Cover der Folge angezeigt werden soll</string>

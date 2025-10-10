@@ -599,6 +599,7 @@ Language: fr
     <string name="player_sleep_in_chapters">Mise en veille dans %d chapitres</string>
     <string name="player_sleep_timer_in_chapter_plural">Dans %d chapitres</string>
     <string name="player_sleep_timer_in_chapter">Dans 1 chapitre</string>
+    <string name="player_sleep_timer_end_of_episode">Fin de l’épisode</string>
     <string name="player_sleep_timer_in_episode_plural">Dans %d épisodes</string>
     <string name="player_sleep_timer_in_episode">Dans 1 épisode</string>
     <string name="settings_use_episode_artwork_customization_description">Sélectionnez si vous désirez voir l’illustration de l’épisode dans ces sections de l’application</string>

@@ -599,6 +599,7 @@ Language: ca
     <string name="player_sleep_time_fired_end_of_chapter">El temporitzador de son s\'ha aturat al final del capítol.</string>
     <string name="player_sleep_in_chapters">En suspensió en %d capítols</string>
     <string name="player_sleep_timer_in_episode">En acabar 1 episodi</string>
+    <string name="player_sleep_timer_end_of_episode">Final de l\'episodi</string>
     <string name="player_sleep_timer_in_episode_plural">En acabar %d episodis</string>
     <string name="player_sleep_timer_in_chapter_plural">En acabar %d capítols</string>
     <string name="player_sleep_timer_in_chapter">En acabar 1 capítol</string>

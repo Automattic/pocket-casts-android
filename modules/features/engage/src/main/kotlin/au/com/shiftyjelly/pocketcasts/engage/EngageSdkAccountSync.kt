@@ -1,7 +1,7 @@
 package au.com.shiftyjelly.pocketcasts.engage
 
 import android.content.Context
-import au.com.shiftyjelly.pocketcasts.repositories.nova.ExternalDataManager
+import au.com.shiftyjelly.pocketcasts.repositories.external.ExternalDataManager
 import au.com.shiftyjelly.pocketcasts.repositories.sync.SyncManager
 import com.google.android.engage.service.AppEngagePublishClient
 import kotlinx.coroutines.CancellationException

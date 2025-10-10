@@ -1,19 +1,22 @@
 package au.com.shiftyjelly.pocketcasts.profile.winback
 
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.MaterialTheme
+import androidx.compose.material.OutlinedButton
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -25,8 +28,6 @@ import androidx.compose.ui.platform.rememberNestedScrollInteropConnection
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
-import androidx.compose.ui.semantics.role
-import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
@@ -101,7 +102,7 @@ private fun CancelOfferHeader(
         text = stringResource(LR.string.winback_offer_header),
         fontWeight = FontWeight.Bold,
         fontSize = 28.sp,
-        lineHeight = 38.5.sp,
+        lineHeight = 33.5.sp,
         color = MaterialTheme.theme.colors.primaryText01,
         textAlign = TextAlign.Center,
         modifier = modifier,
@@ -169,15 +170,18 @@ private fun ContinueToCancellation(
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    Box(
+    OutlinedButton(
         modifier = modifier
-            .clickable(onClick = onClick)
-            .semantics(mergeDescendants = true) { role = Role.Button },
+            .fillMaxWidth()
+            .heightIn(min = 56.dp)
+            .padding(horizontal = 16.dp),
+        border = BorderStroke(2.dp, MaterialTheme.theme.colors.primaryIcon01),
+        shape = RoundedCornerShape(16.dp),
+        onClick = onClick,
     ) {
         TextH30(
             text = stringResource(LR.string.winback_offer_cancel_continue_button_label),
-            textAlign = TextAlign.Center,
-            modifier = Modifier.padding(16.dp),
+            color = MaterialTheme.theme.colors.primaryIcon01,
         )
     }
 }

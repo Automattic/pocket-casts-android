@@ -599,6 +599,7 @@ Language: ar
     <string name="player_sleep_in_chapters">السكون في %d من الفصول</string>
     <string name="player_sleep_timer_in_chapter_plural">في %d من الفصول</string>
     <string name="player_sleep_timer_in_chapter">في فصل واحد</string>
+    <string name="player_sleep_timer_end_of_episode">نهاية الحلقة</string>
     <string name="player_sleep_timer_in_episode_plural">في %d من الحلقات</string>
     <string name="player_sleep_timer_in_episode">في حلقة واحدة</string>
     <string name="settings_use_episode_artwork_customization_description">حدد ما إذا كنت تريد رؤية العمل الفني للحلقة في هذه الأقسام من التطبيق</string>

@@ -598,6 +598,7 @@ Language: nl
     <string name="player_sleep_in_chapters">Slaapstand over %d hoofdstukken</string>
     <string name="player_sleep_timer_in_chapter_plural">Over %d hoofdstukken</string>
     <string name="player_sleep_timer_in_chapter">Over 1 hoofdstuk</string>
+    <string name="player_sleep_timer_end_of_episode">Einde van de aflevering</string>
     <string name="player_sleep_timer_in_episode_plural">Over %d afleveringen</string>
     <string name="player_sleep_timer_in_episode">Over 1 aflevering</string>
     <string name="settings_use_episode_artwork_customization_description">Selecteer of je het artwork van de aflevering wil weergeven in deze gedeelten van de app</string>

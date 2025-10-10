@@ -112,7 +112,7 @@
             app:layout_constraintRight_toRightOf="@+id/headerLayout"
             app:layout_constraintTop_toBottomOf="@+id/titleLayout" />
 
-        <au.com.shiftyjelly.pocketcasts.podcasts.view.components.PlayButton
+        <au.com.shiftyjelly.pocketcasts.views.buttons.PlayButton
             android:id="@+id/playButton"
             android:layout_width="52dp"
             android:layout_height="0dp"

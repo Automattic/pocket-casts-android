@@ -599,6 +599,7 @@ Language: ja_JP
     <string name="player_sleep_in_chapters">%d個のチャプターでスリープ中</string>
     <string name="player_sleep_timer_in_chapter_plural">%d個のチャプター</string>
     <string name="player_sleep_timer_in_chapter">1個のチャプター</string>
+    <string name="player_sleep_timer_end_of_episode">エピソード終了時</string>
     <string name="player_sleep_timer_in_episode_plural">%d件のエピソード</string>
     <string name="player_sleep_timer_in_episode">1件のエピソード</string>
     <string name="settings_use_episode_artwork_customization_description">アプリのこれらのセクションでエピソードのアートワークを表示する場合に選択します</string>

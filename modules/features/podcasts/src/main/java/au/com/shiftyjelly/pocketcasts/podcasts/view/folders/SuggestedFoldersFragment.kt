@@ -13,7 +13,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.rememberNestedScrollInteropConnection
-import androidx.core.os.BundleCompat
 import androidx.core.os.bundleOf
 import androidx.fragment.app.viewModels
 import androidx.fragment.compose.content
@@ -33,6 +32,8 @@ import au.com.shiftyjelly.pocketcasts.podcasts.view.folders.SuggestedFoldersView
 import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingFlow
 import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingLauncher
 import au.com.shiftyjelly.pocketcasts.settings.onboarding.SuggestedFoldersAction
+import au.com.shiftyjelly.pocketcasts.utils.extensions.requireParcelable
+import au.com.shiftyjelly.pocketcasts.utils.extensions.requireString
 import au.com.shiftyjelly.pocketcasts.views.dialog.ConfirmationDialog
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseDialogFragment
 import dagger.hilt.android.AndroidEntryPoint
@@ -60,10 +61,7 @@ class SuggestedFoldersFragment : BaseDialogFragment() {
         }
     }
 
-    private val args
-        get() = requireNotNull(BundleCompat.getParcelable(requireArguments(), ARGS_KEY, Args::class.java)) {
-            "Missing input parameters"
-        }
+    private val args get() = requireArguments().requireParcelable<Args>(ARGS_KEY)
 
     private val viewModel by viewModels<SuggestedFoldersViewModel>(
         extrasProducer = {
@@ -143,9 +141,8 @@ class SuggestedFoldersFragment : BaseDialogFragment() {
                     ),
                 ) { backStackEntry ->
                     val arguments = requireNotNull(backStackEntry.arguments) { "Missing back stack entry arguments" }
-                    val folderName = requireNotNull(arguments.getString(SuggestedFoldersNavRoutes.SUGGESTED_FOLDER_NAME_ARGUMENT)) {
-                        "Missing folder name period argument"
-                    }
+                    val folderName = arguments.requireString(SuggestedFoldersNavRoutes.SUGGESTED_FOLDER_NAME_ARGUMENT)
+
                     SuggestedFolderPodcastsPage(
                         folder = remember(folderName, state.suggestedFolders) {
                             state.suggestedFolders.find { it.name == folderName }

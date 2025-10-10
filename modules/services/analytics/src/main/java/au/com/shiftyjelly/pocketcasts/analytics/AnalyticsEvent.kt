@@ -386,6 +386,7 @@ enum class AnalyticsEvent(val key: String) {
     UP_NEXT_DISMISSED("up_next_dismissed"),
     UP_NEXT_SHUFFLE_ENABLED("up_next_shuffle_enabled"),
     UP_NEXT_DISCOVER_BUTTON_TAPPED("up_next_discover_button_tapped"),
+    UP_NEXT_SORT("up_next_sort"),
 
     /* Player */
     PLAYER_SHOWN("player_shown"),
@@ -840,4 +841,10 @@ enum class AnalyticsEvent(val key: String) {
     BANNER_AD_IMPRESSION("banner_ad_impression"),
     BANNER_AD_TAPPED("banner_ad_tapped"),
     BANNER_AD_REPORT("banner_ad_report"),
+
+    /* Improved Search */
+    IMPROVED_SEARCH_FILTER_TAPPED("search_filter_tapped"),
+    IMPROVED_SEARCH_SUGGESTIONS_SHOWN("search_predictive_shown"),
+    IMPROVED_SEARCH_SUGGESTIONS_FAILED("search_predictive_failed"),
+    IMPROVED_SEARCH_SUGGESTION_TERM_TAPPED("search_predictive_term_tapped"),
 }

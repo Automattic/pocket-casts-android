@@ -76,7 +76,9 @@ fun ShelfBottomSheetPage(
             onClick = { item, enabled ->
                 when (item) {
                     ShelfItem.Effects -> shelfSharedViewModel.onEffectsClick(ShelfItemSource.OverflowMenu)
-                    ShelfItem.Sleep -> shelfSharedViewModel.onSleepClick(ShelfItemSource.OverflowMenu)
+                    ShelfItem.Sleep -> {
+                        shelfSharedViewModel.onSleepClick(ShelfItemSource.OverflowMenu)
+                    }
                     ShelfItem.Star -> shelfSharedViewModel.onStarClick(ShelfItemSource.OverflowMenu)
                     ShelfItem.Transcript -> shelfSharedViewModel.onTranscriptClick(enabled, ShelfItemSource.OverflowMenu)
                     ShelfItem.Share -> {

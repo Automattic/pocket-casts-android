@@ -270,6 +270,18 @@ class PlaylistManagerDsl : TestWatcher() {
         assertEquals(count, actual.size)
     }
 
+    suspend fun expectSynced(playlistIndex: Int) {
+        val playlistId = "playlist-id-$playlistIndex"
+        val playlist = playlistDao.getAllPlaylistsIn(listOf(playlistId)).singleOrNull()
+        assertEquals(PlaylistEntity.SYNC_STATUS_SYNCED, playlist?.syncStatus)
+    }
+
+    suspend fun expectNotSynced(playlistIndex: Int) {
+        val playlistId = "playlist-id-$playlistIndex"
+        val playlist = playlistDao.getAllPlaylistsIn(listOf(playlistId)).singleOrNull()
+        assertEquals(PlaylistEntity.SYNC_STATUS_NOT_SYNCED, playlist?.syncStatus)
+    }
+
     // Creators
     fun smartPlaylistEntity(index: Int, builder: (PlaylistEntity) -> PlaylistEntity = { it }): PlaylistEntity {
         val id = "playlist-id-$index"

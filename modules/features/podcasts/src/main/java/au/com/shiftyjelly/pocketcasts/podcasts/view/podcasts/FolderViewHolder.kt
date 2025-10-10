@@ -19,7 +19,7 @@ import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.preferences.model.BadgeType
 import au.com.shiftyjelly.pocketcasts.preferences.model.PodcastGridLayoutType
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
-import au.com.shiftyjelly.pocketcasts.views.adapter.PodcastTouchCallback
+import au.com.shiftyjelly.pocketcasts.views.adapter.LockableListAdapter
 import kotlin.math.min
 
 class FolderViewHolder(
@@ -29,7 +29,7 @@ class FolderViewHolder(
     val onFolderClick: (Folder) -> Unit,
     val podcastGridLayout: PodcastGridLayoutType,
 ) : RecyclerView.ViewHolder(composeView),
-    PodcastTouchCallback.ItemTouchHelperViewHolder {
+    LockableListAdapter.DraggableHolder {
 
     init {
         /* Setting non-default view composition strategy to temporarily fix flickering in folders:
@@ -85,9 +85,9 @@ class FolderViewHolder(
         }
     }
 
-    override fun onItemDrag() = Unit
+    override fun onStartDragging() = Unit
 
-    override fun onItemClear() = Unit
+    override fun onFinishDragging() = Unit
 }
 
 @Composable

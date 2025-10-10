@@ -58,7 +58,7 @@
     <string name="log_out">Log out</string>
     <string name="log_in_watch_requires_plus">Log in with a Plus account to use this app or upgrade visiting</string>
     <string name="log_in_with_plus">Please log in with a Plus account</string>
-    <string name="log_in_free_acccount">%s is using a free account</string>
+    <string name="log_in_free_account">%s is using a free account</string>
     <string name="mark_as_played">Mark as played</string>
     <string name="mark_as_unplayed">Mark as unplayed</string>
     <string name="mark_played">Mark played</string>
@@ -399,18 +399,19 @@
     <string name="player_sleep_chapter_plus">Increase chapter count</string>
     <string name="player_sleep_episode_minus">Decrease episode count</string>
     <string name="player_sleep_episode_plus">Increase episode count</string>
-    <string name="player_sleep_end_of_episode">End of episode</string>
     <string name="player_sleep_timer_in_episode">In 1 episode</string>
+    <string name="player_sleep_timer_end_of_episode">End of episode</string>
     <string name="player_sleep_timer_in_episode_plural">In %d episodes</string>
     <string name="player_sleep_timer_in_chapter">In 1 chapter</string>
+    <string name="player_sleep_timer_end_of_chapter">End of chapter</string>
     <string name="player_sleep_timer_in_chapter_plural">In %d chapters</string>
     <string name="player_sleep_timer_title">Sleep Timer</string>
     <string name="player_sleep_timer">Sleep timer</string>
     <string name="player_sleep_timer_settings">Sleep timer Settings</string>
     <string name="player_sleep_timer_start_failed">Unable to start timer. Please allow \'Alarms &amp; reminders\' permission.</string>
-    <string name="player_sleep_in_one_episode">Sleeping in 1 episode</string>
+    <string name="player_sleep_in_one_episode">Sleeping at the end of the current episode</string>
     <string name="player_sleep_in_episodes">Sleeping in %d episodes</string>
-    <string name="player_sleep_in_one_chapter">Sleeping in 1 chapter</string>
+    <string name="player_sleep_in_one_chapter">Sleeping at the end of the current chapter</string>
     <string name="player_sleep_in_chapters">Sleeping in %d chapters</string>
     <string name="player_sleep_timer_restarted_after_device_shake">Sleep timer restarted after device shake</string>
     <string name="player_sleep_timer_stopped_your_podcast">Sleep timer stopped your podcast.</string>
@@ -439,8 +440,8 @@
     <string name="player_up_next_time_remaining">Total time remaining %s</string>
     <string name="player_up_next_time_left" translatable="false">@string/time_left</string>
     <plurals name="player_up_next_header_title">
-        <item quantity="one" formatted="true">%1$d episode - %2$s left</item>
-        <item quantity="other" formatted="true">%1$d episodes - %2$s left</item>
+        <item formatted="true" quantity="one">%1$d episode - %2$s left</item>
+        <item formatted="true" quantity="other">%1$d episodes - %2$s left</item>
     </plurals>
     <string name="player_open_url_failed">Could not find a browser to open %s.</string>
     <string name="player_archive_title" translatable="false">@string/archive</string>
@@ -462,6 +463,7 @@
     <string name="player_played_up_to">Played up to %s</string>
     <string name="player_time_remaining">Time remaining %s</string>
     <string name="drag_down_to_dismiss_content_description">Drag down to dismiss</string>
+    <string name="player_up_next_sort">Sort Up Next</string>
 
     <!-- Chapters -->
 
@@ -747,7 +749,7 @@
         <item quantity="one">second</item>
         <item quantity="other">seconds</item>
     </plurals>
-   <!-- A short form representing days. Some like 1 d, 2 d, etc. -->
+    <!-- A short form representing days. Some like 1 d, 2 d, etc. -->
     <plurals name="day_short">
         <item quantity="one">d</item>
         <item quantity="other">d</item>
@@ -1290,7 +1292,7 @@
     <string name="profile_stats_auto_skipping">Auto Skipping</string>
     <string name="profile_stats_listened_for">You\'ve listened for</string>
     <string name="profile_stats_trim_silence">Trim Silence</string>
-    <string name="profile_stats_share_to">Share to..</string>
+    <string name="profile_stats_share_to">Share to ...</string>
     <string name="profile_stats_since_listened_for">Since %s you\'ve listened for</string>
     <string name="profile_stats_skipping">Skipping</string>
     <string name="profile_stats_time_saved_by">Time Saved By</string>
@@ -2379,12 +2381,11 @@
     <string name="wear_hide_password">Hide password</string>
     <string name="wear_show_password">Show password</string>
 
-
     <!-- Nova Launcher -->
     <string name="nova_launcher_subscribed_podcasts">Subscribed Podcasts</string>
     <string name="nova_launcher_recently_played">Recently Played</string>
     <string name="nova_launcher_new_releases">New Releases</string>
-<string name="nova_launcher_trending" translatable="false">@string/discover_trending</string>
+    <string name="nova_launcher_trending" translatable="false">@string/discover_trending</string>
     <string name="nova_launcher_continue_listening">Continue listening</string>
     <string name="nova_launcher_up_next" translatable="false">@string/up_next</string>
 
@@ -2534,11 +2535,10 @@
     <string name="winback_cancel_subscription_perk_plus">Access to Pocket Casts Plus features will be locked after this date.</string>
     <string name="winback_cancel_subscription_perk_folders">Your folders will be removed and their contents will move back to the Podcasts screen.</string>
     <string name="winback_cancel_subscription_perk_files">All files uploaded to your Pocket Casts account will be deleted (but downloaded files on your mobile devices will remain).</string>
-    <string name="winback_cancel_subscription_stay_button_label">Actually, I want to stay</string>
+    <string name="winback_cancel_subscription_stay_button_label">Keep my subscription</string>
     <string name="winback_cancel_subscription_cancel_button_label">Yes, Cancel my Subscription</string>
     <string name="winback_cancel_subscription_accept_offer_button_label">Accept offer</string>
     <string name="winback_cancel_subscription_continue_cancel_button_label">Continue with cancellation</string>
-
 
     <!-- Suggested Folders -->
     <string name="suggested_folders_title">Smart folders</string>
@@ -2677,4 +2677,7 @@
     <string name="onboarding_interests_select_at_least_label">Select at least 3</string>
     <string name="onboarding_recommendations_title">We hope you love these suggestions!</string>
     <string name="onboarding_recommendations_message">Here are some great shows to start with. Tap to follow, search, or import from other apps.</string>
+    <string name="search_filters_top_results">Top Results</string>
+    <string name="search_filters_podcasts" translatable="false">@string/podcasts</string>
+    <string name="search_filters_episodes" translatable="false">@string/episodes</string>
 </resources>

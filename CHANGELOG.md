@@ -1,6 +1,34 @@
 7.100
 -----
-
+*   New Features
+    *   Add an option to sort Up Next by date
+        ([#4586](https://github.com/Automattic/pocket-casts-android/pull/4586))
+    *   Implement search suggestions
+        ([#4571](https://github.com/Automattic/pocket-casts-android/pull/4571))
+    *   Update search results screen
+        ([#4583](https://github.com/Automattic/pocket-casts-android/pull/4583))
+*   Updates
+    *   Improve sleep timer terminology and chapter option visibility
+        ([#4564](https://github.com/Automattic/pocket-casts-android/pull/4564))
+    *   Small tweaks for Google login on watch and phone
+        ([#4598](https://github.com/Automattic/pocket-casts-android/pull/4598))
+*   Bug Fixes
+    *   Fix restoring large Up Next queues
+        ([#4562](https://github.com/Automattic/pocket-casts-android/pull/4562))
+    *   Fix done button overlapping with navigation bars
+        ([#4553](https://github.com/Automattic/pocket-casts-android/pull/4553))
+    *   Fix folder flow buttons overlapping with navigation bars
+        ([#4597](https://github.com/Automattic/pocket-casts-android/pull/4597))
+    *   Fix shared list under the mini player
+        ([#4560](https://github.com/Automattic/pocket-casts-android/pull/4560))
+    *   Fix transcript button incorrectly disabled
+        ([#4555](https://github.com/Automattic/pocket-casts-android/pull/4555))
+    *   Fix archived episodes not being downloaded when added to queue
+        ([#4570](https://github.com/Automattic/pocket-casts-android/pull/4570))
+    *   Fix podcast title sort with accents   
+        ([#4594](https://github.com/Automattic/pocket-casts-android/pull/4594))
+    *   Fix podcasts page drag & drop issues
+        ([#4596](https://github.com/Automattic/pocket-casts-android/pull/4596))
 
 7.99
 -----

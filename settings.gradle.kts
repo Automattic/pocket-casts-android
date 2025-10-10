@@ -17,11 +17,9 @@ pluginManagement {
 }
 
 plugins {
-    id("com.gradle.develocity").version("3.19.2")
-    id("com.gradle.common-custom-user-data-gradle-plugin").version("2.2.1")
+    id("com.gradle.develocity").version("4.2.1")
+    id("com.gradle.common-custom-user-data-gradle-plugin").version("2.4.0")
 }
-
-apply(from = File("./config/gradle/gradle_build_scan.gradle"))
 
 dependencyResolutionManagement {
     repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
@@ -56,7 +54,6 @@ include(":modules:features:endofyear")
 include(":modules:features:engage")
 include(":modules:features:filters")
 include(":modules:features:navigation")
-include(":modules:features:nova")
 include(":modules:features:player")
 include(":modules:features:podcasts")
 include(":modules:features:profile")
@@ -93,6 +90,12 @@ val developerProperties = loadPropertiesFromFile(File("${rootDir.path}/developer
 val secretsFile = File("${rootDir.path}/secret.properties")
 val secretProperties = loadPropertiesFromFile(secretsFile)
 val useRemoteBuildCacheLocally = "use_remote_build_cache_locally"
+
+gradle.extra["isCi"] = System.getenv("CI")?.toBoolean() ?: false
+gradle.extra["develocityToken"] = secretProperties.getProperty("develocityToken")
+gradle.extra["measureBuildsEnabled"] = secretProperties.getProperty("measureBuildsEnabled")
+
+apply(from = File("./config/gradle/gradle_build_scan.gradle"))
 
 buildCache {
     if (System.getenv("CI")?.toBoolean() == true) {

@@ -598,6 +598,7 @@ Language: it
     <string name="player_sleep_in_chapters">Spegnimento tra %d capitoli</string>
     <string name="player_sleep_timer_in_chapter_plural">Tra %d capitoli</string>
     <string name="player_sleep_timer_in_chapter">Tra 1 capitolo</string>
+    <string name="player_sleep_timer_end_of_episode">Fine dell\'episodio</string>
     <string name="player_sleep_timer_in_episode_plural">Tra %d episodi</string>
     <string name="player_sleep_timer_in_episode">Tra 1 episodio</string>
     <string name="settings_use_episode_artwork_customization_description">Seleziona se desideri vedere la grafica dell\'episodio in queste sezioni dell\'app</string>

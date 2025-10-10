@@ -16,6 +16,7 @@ import au.com.shiftyjelly.pocketcasts.player.viewmodel.ShelfViewModel
 import au.com.shiftyjelly.pocketcasts.ui.helper.FragmentHostListener
 import au.com.shiftyjelly.pocketcasts.ui.helper.StatusBarIconColor
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
+import au.com.shiftyjelly.pocketcasts.utils.extensions.requireString
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseDialogFragment
 import dagger.hilt.android.AndroidEntryPoint
 import dagger.hilt.android.lifecycle.withCreationCallback
@@ -23,7 +24,7 @@ import dagger.hilt.android.lifecycle.withCreationCallback
 @AndroidEntryPoint
 class ShelfBottomSheet : BaseDialogFragment() {
     private val episodeId: String
-        get() = requireNotNull(arguments?.getString(ARG_EPISODE_ID))
+        get() = requireArguments().requireString(ARG_EPISODE_ID)
 
     override val statusBarIconColor: StatusBarIconColor = StatusBarIconColor.Light
 

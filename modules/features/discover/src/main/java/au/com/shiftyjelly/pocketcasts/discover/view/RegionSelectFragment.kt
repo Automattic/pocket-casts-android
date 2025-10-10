@@ -19,6 +19,7 @@ import au.com.shiftyjelly.pocketcasts.discover.databinding.RowRegionBinding
 import au.com.shiftyjelly.pocketcasts.localization.helper.tryToLocalise
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.servers.model.DiscoverRegion
+import au.com.shiftyjelly.pocketcasts.utils.extensions.findParcelableList
 import au.com.shiftyjelly.pocketcasts.views.extensions.setup
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseFragment
 import au.com.shiftyjelly.pocketcasts.views.helper.NavigationIcon.BackArrow
@@ -55,7 +56,7 @@ class RegionSelectFragment : BaseFragment() {
     }
 
     val regionList: ArrayList<DiscoverRegion>
-        get() = arguments?.let { BundleCompat.getParcelableArrayList(it, ARG_REGION_LIST, DiscoverRegion::class.java) } ?: ArrayList()
+        get() = arguments?.findParcelableList<DiscoverRegion>(ARG_REGION_LIST) ?: ArrayList()
 
     var listener: Listener? = null
 

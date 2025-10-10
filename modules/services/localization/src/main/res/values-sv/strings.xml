@@ -599,6 +599,7 @@ Language: sv_SE
     <string name="player_sleep_in_chapters">Viloläge efter %d kapitel</string>
     <string name="player_sleep_timer_in_chapter_plural">Efter %d kapitel</string>
     <string name="player_sleep_timer_in_chapter">Efter 1 kapitel</string>
+    <string name="player_sleep_timer_end_of_episode">Avsnittets slut</string>
     <string name="player_sleep_timer_in_episode_plural">Efter %d avsnitt</string>
     <string name="player_sleep_timer_in_episode">Efter 1 avsnitt</string>
     <string name="settings_use_episode_artwork_customization_description">Välj om du vill se avsnittsomslag i dessa sektioner av appen</string>

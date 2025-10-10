@@ -192,6 +192,31 @@ fun TextH40(
 }
 
 @Composable
+fun TextH40(
+    text: AnnotatedString,
+    modifier: Modifier = Modifier,
+    textAlign: TextAlign? = null,
+    color: Color = MaterialTheme.theme.colors.primaryText01,
+    maxLines: Int = Int.MAX_VALUE,
+    fontWeight: FontWeight = FontWeight.W500,
+    disableAutoScale: Boolean = false,
+    fontScale: Float = 1f,
+    lineHeight: TextUnit = 21.sp,
+) {
+    Text(
+        text = text,
+        color = color,
+        fontSize = 15.sp.scaled(disableAutoScale, fontScale),
+        lineHeight = lineHeight.scaled(disableAutoScale, fontScale),
+        fontWeight = fontWeight,
+        textAlign = textAlign,
+        maxLines = maxLines,
+        overflow = TextOverflow.Ellipsis,
+        modifier = modifier,
+    )
+}
+
+@Composable
 fun TextP40(
     text: String,
     modifier: Modifier = Modifier,

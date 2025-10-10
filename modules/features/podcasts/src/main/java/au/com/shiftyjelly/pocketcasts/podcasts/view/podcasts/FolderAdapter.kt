@@ -1,8 +1,5 @@
 package au.com.shiftyjelly.pocketcasts.podcasts.view.podcasts
 
-import android.animation.AnimatorSet
-import android.animation.ObjectAnimator
-import android.animation.PropertyValuesHolder
 import android.content.Context
 import android.view.View
 import android.view.ViewGroup
@@ -17,7 +14,6 @@ import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.platform.ViewCompositionStrategy
 import androidx.compose.ui.unit.dp
 import androidx.fragment.app.FragmentActivity
-import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import au.com.shiftyjelly.pocketcasts.compose.AppTheme
 import au.com.shiftyjelly.pocketcasts.compose.extensions.setContentWithViewCompositionStrategy
@@ -37,7 +33,7 @@ import au.com.shiftyjelly.pocketcasts.ui.extensions.themed
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.utils.extensions.dpToPx
 import au.com.shiftyjelly.pocketcasts.views.adapter.FolderItemDiffCallback
-import au.com.shiftyjelly.pocketcasts.views.adapter.PodcastTouchCallback
+import au.com.shiftyjelly.pocketcasts.views.adapter.LockableListAdapter
 import au.com.shiftyjelly.pocketcasts.views.extensions.hide
 import au.com.shiftyjelly.pocketcasts.views.extensions.inflate
 import au.com.shiftyjelly.pocketcasts.views.extensions.show
@@ -50,7 +46,7 @@ class FolderAdapter(
     val settings: Settings,
     val context: Context,
     val theme: Theme,
-) : ListAdapter<FolderItem, RecyclerView.ViewHolder>(FolderItemDiffCallback()) {
+) : LockableListAdapter<FolderItem, RecyclerView.ViewHolder>(FolderItemDiffCallback()) {
 
     var badgeType = BadgeType.OFF
 
@@ -169,7 +165,7 @@ class FolderAdapter(
         podcastGridLayout: PodcastGridLayoutType,
         val theme: Theme,
     ) : RecyclerView.ViewHolder(view),
-        PodcastTouchCallback.ItemTouchHelperViewHolder {
+        DraggableHolder {
 
         val button: View? = view.findViewById(R.id.button)
         val podcastThumbnail: ImageView = view.findViewById(R.id.podcast_artwork)
@@ -201,7 +197,7 @@ class FolderAdapter(
                 it.setBadgeContent(displayBadgeCount, badgeType)
                 it.showIf(displayBadgeCount > 0)
             }
-            podcastCardView?.elevation = cardElevation
+            podcastCardView?.cardElevation = cardElevation
             podcastCardView?.radius = cardCornerRadius
 
             val badgeCountMessage = if (badgeType == BadgeType.OFF) "" else "$unplayedEpisodeCount new episodes. "
@@ -239,22 +235,9 @@ class FolderAdapter(
             }
         }
 
-        override fun onItemDrag() {
-            AnimatorSet().apply {
-                val elevation = ObjectAnimator.ofPropertyValuesHolder(itemView, PropertyValuesHolder.ofFloat(View.TRANSLATION_Z, 16.dpToPx(itemView.resources.displayMetrics).toFloat()))
-                play(elevation)
-                start()
-            }
-        }
+        override fun onStartDragging() = Unit
 
-        override fun onItemClear() {
-            itemView.background = null
-            AnimatorSet().apply {
-                val elevation = ObjectAnimator.ofPropertyValuesHolder(itemView, PropertyValuesHolder.ofFloat(View.TRANSLATION_Z, 0.toFloat()))
-                play(elevation)
-                start()
-            }
-        }
+        override fun onFinishDragging() = Unit
     }
 
     interface ClickListener {

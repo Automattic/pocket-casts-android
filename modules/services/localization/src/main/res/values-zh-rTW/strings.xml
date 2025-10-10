@@ -599,6 +599,7 @@ Language: zh_TW
     <string name="player_sleep_in_chapters">在 %d 個章節後休眠</string>
     <string name="player_sleep_timer_in_chapter_plural">%d 個章節後</string>
     <string name="player_sleep_timer_in_chapter">1 個章節後</string>
+    <string name="player_sleep_timer_end_of_episode">單集結束</string>
     <string name="player_sleep_timer_in_episode_plural">%d 集後</string>
     <string name="player_sleep_timer_in_episode">1 集後</string>
     <string name="settings_use_episode_artwork_customization_description">若想在應用程式的這些區段中查看單集封面圖片，請選取</string>

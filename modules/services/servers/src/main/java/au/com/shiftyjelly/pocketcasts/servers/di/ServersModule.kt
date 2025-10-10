@@ -349,6 +349,10 @@ annotation class TokenInterceptor
 
 @Qualifier
 @Retention(AnnotationRetention.BINARY)
+annotation class I18nInterceptor
+
+@Qualifier
+@Retention(AnnotationRetention.BINARY)
 annotation class Transcripts
 
 @Qualifier

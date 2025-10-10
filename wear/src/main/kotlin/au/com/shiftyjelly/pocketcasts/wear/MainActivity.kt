@@ -347,7 +347,16 @@ private fun WearApp(
                 if (popped) {
                     ScrollToTop.initiate(navController)
                 }
-                val message = stringResource(LR.string.log_in_free_acccount, signInState.email)
+                val email = if (signInState.email.length > 16) {
+                    buildString {
+                        append(signInState.email.substring(0, 6))
+                        append("…")
+                        append(signInState.email.takeLast(6))
+                    }
+                } else {
+                    signInState.email
+                }
+                val message = stringResource(LR.string.log_in_free_account, email)
                 Toast.makeText(LocalContext.current, message, Toast.LENGTH_LONG).show()
             } else if (waitingForSignIn.value) {
                 navController.navigate(LoggingInScreen.ROUTE)
