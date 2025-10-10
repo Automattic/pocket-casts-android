@@ -2619,6 +2619,7 @@
     <string name="onboarding_upgrade_schedule_notify">We\'ll notify you about your trial ending.</string>
     <string name="onboarding_upgrade_schedule_billing">You\'ll be charged on %1$s. Cancel anytime before.</string>
     <string name="onboarding_upgrade_schedule_see_features">See all Plus features</string>
+    <string name="onboarding_upgrade_features_transcripts">Generated Transcripts</string>
     <string name="onboarding_upgrade_features_folders">Tidy your collection with Folders</string>
     <string name="onboarding_upgrade_features_shuffle">Shuffle your queue</string>
     <string name="onboarding_upgrade_features_bookmarks">Keep timestamps with Bookmarks</string>
