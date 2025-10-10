@@ -1,5 +1,6 @@
 package au.com.shiftyjelly.pocketcasts.search
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -13,6 +14,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.nestedscroll.NestedScrollConnection
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.res.stringResource
@@ -59,12 +62,6 @@ fun ImprovedSearchResultsPage(
                 if (operation.results.isEmpty) {
                     NoResultsView()
                 } else {
-                    SearchResultFilters(
-                        modifier = Modifier.padding(16.dp),
-                        items = state.filterOptions.map { stringResource(it.resId) },
-                        selectedIndex = state.selectedFilterIndex,
-                        onFilterSelect = { onFilterSelect(state.filterOptions.toList()[it]) },
-                    )
                     ImprovedSearchResultsView(
                         state = operation,
                         bottomInset = bottomInset,
@@ -75,6 +72,9 @@ fun ImprovedSearchResultsPage(
                         playButtonListener = playButtonListener,
                         onScroll = onScroll,
                         fetchEpisode = fetchEpisode,
+                        selectedFilterIndex = state.selectedFilterIndex,
+                        filterOptions = state.filterOptions.toList(),
+                        onFilterSelect = onFilterSelect,
                     )
                 }
             }
@@ -107,6 +107,9 @@ private fun ImprovedSearchResultsView(
     onFollowPodcast: (ImprovedSearchResultItem.PodcastItem) -> Unit,
     playButtonListener: PlayButtonListener,
     onScroll: () -> Unit,
+    filterOptions: List<ResultsFilters>,
+    selectedFilterIndex: Int,
+    onFilterSelect: (ResultsFilters) -> Unit,
     modifier: Modifier = Modifier,
     fetchEpisode: (suspend (ImprovedSearchResultItem.EpisodeItem) -> BaseEpisode?)? = null,
 ) {
@@ -124,12 +127,33 @@ private fun ImprovedSearchResultsView(
         fadeConfig = FadeConfig.Default.copy(showEndFade = false),
         state = listState,
         contentPadding = PaddingValues(
-            top = 16.dp,
             bottom = bottomInset,
         ),
         modifier = modifier
             .nestedScroll(nestedScrollConnection),
     ) {
+
+        stickyHeader {
+            val backgroundColor = MaterialTheme.colors.background
+            SearchResultFilters(
+                modifier = Modifier
+                    .background(
+                        brush = Brush.verticalGradient(
+                            colorStops = arrayOf(
+                                0f to backgroundColor,
+                                0.25f to backgroundColor,
+                                0.85f to backgroundColor.copy(alpha = .5f),
+                                1f to Color.Transparent,
+                            ),
+                        )
+                    )
+                    .padding(16.dp),
+                items = filterOptions.map { stringResource(it.resId) },
+                selectedIndex = selectedFilterIndex,
+                onFilterSelect = { onFilterSelect(filterOptions[it]) },
+            )
+        }
+
         val dividerModifier = Modifier
             .fillMaxWidth()
             .padding(horizontal = 16.dp)
@@ -143,6 +167,7 @@ private fun ImprovedSearchResultsView(
                         )
                     }
                 }
+
                 is ImprovedSearchResultItem.PodcastItem -> {
                     item(key = "podcast-${item.uuid}", contentType = "podcast") {
                         ImprovedSearchPodcastResultRow(
