@@ -3,6 +3,7 @@ package au.com.shiftyjelly.pocketcasts.servers.search
 import com.squareup.moshi.Json
 import com.squareup.moshi.JsonClass
 import com.squareup.moshi.adapters.PolymorphicJsonAdapterFactory
+import java.util.Date
 
 @JsonClass(generateAdapter = true)
 data class CombinedSearchResponse(
@@ -23,7 +24,7 @@ sealed interface CombinedResult {
         val uuid: String,
         val title: String,
         @Json(name ="published_date")
-        val publishedDate: String,
+        val publishedDate: Date = Date(),
         val url: String,
         val duration: Long = 0L,
         @Json(name = "podcast_uuid")

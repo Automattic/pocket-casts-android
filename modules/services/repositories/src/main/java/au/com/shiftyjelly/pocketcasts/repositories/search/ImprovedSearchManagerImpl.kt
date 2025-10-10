@@ -41,7 +41,7 @@ class ImprovedSearchManagerImpl @Inject constructor(
                     uuid = it.uuid,
                     title = it.title,
                     podcastUuid = it.podcastUuid,
-                    publishedDate = Date(), // TODO
+                    publishedDate = it.publishedDate,
                     duration = it.duration.seconds
                 )
             }
