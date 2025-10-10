@@ -7,6 +7,8 @@
         ([#4571](https://github.com/Automattic/pocket-casts-android/pull/4571))
     *   Update search results screen
         ([#4583](https://github.com/Automattic/pocket-casts-android/pull/4583))
+    *   Integrate new combined search API
+        ([#4604](https://github.com/Automattic/pocket-casts-android/pull/4604))
 *   Updates
     *   Improve sleep timer terminology and chapter option visibility
         ([#4564](https://github.com/Automattic/pocket-casts-android/pull/4564))
