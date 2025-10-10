@@ -1,11 +1,23 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2025-09-25 09:54:04+0000
+Translation-Revision-Date: 2025-10-09 09:54:04+0000
 Plural-Forms: nplurals=1; plural=0;
 Generator: GlotPress/2.4.0-alpha
 Language: ja_JP
 -->
 <resources>
+    <string name="winback_cancel_subscription_stay_button_label">サブスクリプションを継続</string>
+    <string name="filter_title">プレイリストのタイトル</string>
+    <string name="filter_id">プレイリスト ID</string>
+    <string name="filters_filter_name">プレイリスト名</string>
+    <string name="playlists_not_found">プレイリストが見つかりません</string>
+    <string name="notification_filters_message_2">プレイリストを作成してエピソードを整理します。</string>
+    <string name="settings_status_service_account_summary_2">エピソードの進捗、フォローするポッドキャスト、プレイリストなどを保存するために使用するサービスです。</string>
+    <string name="settings_choose_playlists">プレイリストを選択</string>
+    <string name="number_one">1</string>
+    <string name="settings_auto_download_playlists">プレイリストを自動ダウンロード</string>
+    <string name="playlists_selected_all">すべてのプレイリストを選択済み</string>
+    <string name="podcasts_selected_all">すべてのポッドキャストを選択済み</string>
     <string name="smart_playlists">スマートプレイリスト</string>
     <string name="select_smart_playlists">スマートプレイリストを選択</string>
     <string name="podcast_not_in_playlists">どのスマートプレイリストにも含まれない</string>
@@ -350,7 +362,6 @@ Language: ja_JP
     <string name="settings_pixel_watch_title">Pixel Watch スキップボタン</string>
     <string name="settings_pixel_watch_subtitle">標準の「次 / 前」トラックボタンをカスタムスキップボタンに置き換え、スキップボタンとして機能するようにすると、互換できる端末が増えます。</string>
     <string name="winback_cancel_subscription_cancel_button_label">はい、サブスクリプションをキャンセルします</string>
-    <string name="winback_cancel_subscription_stay_button_label">利用を続けます</string>
     <string name="winback_cancel_subscription_perk_files">Pocket Casts アカウントにアップロードされたファイルはすべて削除されます (ただし、モバイルデバイスにダウンロードされたファイルは残ります)。</string>
     <string name="winback_cancel_subscription_perk_folders">フォルダーは消去され、保存されているコンテンツは再びポッドキャスト画面に移動します。</string>
     <string name="winback_cancel_subscription_perk_active_without_date">現在のサブスクリプションは有効期限日まで有効です。</string>
@@ -586,7 +597,6 @@ Language: ja_JP
     <string name="hours_and_minutes">%d時間%d分</string>
     <string name="player_sleep_time_fired_end_of_chapter">スリープタイマーがチャプターの最後で停止しました。</string>
     <string name="player_sleep_in_chapters">%d個のチャプターでスリープ中</string>
-    <string name="player_sleep_in_one_chapter">1個のチャプターでスリープ中</string>
     <string name="player_sleep_timer_in_chapter_plural">%d個のチャプター</string>
     <string name="player_sleep_timer_in_chapter">1個のチャプター</string>
     <string name="player_sleep_timer_in_episode_plural">%d件のエピソード</string>
@@ -596,7 +606,6 @@ Language: ja_JP
     <string name="settings_use_episode_artwork_title">エピソードのアートワーク</string>
     <string name="settings_use_episode_artwork_advanced">エピソードのアートワークの詳細設定</string>
     <string name="player_sleep_in_episodes">%dエピソードでスリープ</string>
-    <string name="player_sleep_in_one_episode">1エピソードでスリープ</string>
     <string name="player_sleep_timer_stopped_your_podcast">スリープタイマーにより、ポッドキャストが停止しました。</string>
     <string name="player_sleep_timer_restarted_after_device_shake">端末を振った後、スリープタイマーが再開しました</string>
     <string name="widget_nothing_in_up_next">次のエピソードには何もありません</string>
@@ -735,7 +744,6 @@ Language: ja_JP
     <string name="settings_continuous_playback_summary">「\"次のエピソード」が空の場合、現在視聴中のポッドキャストと同じものまたはリストからエピソードを再生します。</string>
     <string name="renew_your_subscription">サブスクリプションを更新</string>
     <string name="log_in_watch_from_phone_instructions_3">問題が発生した場合は、スマートフォンでウォッチと同じバージョンの Pocket Casts が実行されていることを確認します (%s)</string>
-    <string name="log_in_free_acccount">%s では無料アカウントを使用しています</string>
     <string name="player_play_failed_check_internet">ポッドキャストを読み込めませんでした。 ネットワーク接続を確認して、もう一度お試しください。</string>
     <string name="empty_play_state">開始するエピソードを選ぶ</string>
     <string name="settings_beta_features">ベータ版の機能</string>
@@ -844,10 +852,6 @@ Language: ja_JP
     <string name="settings_media_actions_customise">メディアアクションをカスタマイズ</string>
     <string name="onboarding_recommendations_more">%sをもっと見る</string>
     <string name="clear_up_next">次のエピソードをクリア</string>
-    <string name="filter_id_or_title">フィルター ID またはタイトル</string>
-    <string name="filter_title">フィルタータイトル</string>
-    <string name="filter_id_description">フィルターを表す一意の ID。 「フィルターエピソードをクエリー」アクションで使用できます。</string>
-    <string name="filter_id">フィルター ID</string>
     <string name="episode_count">エピソード数</string>
     <string name="no_episodes_found_for_episode_ids_x">エピソード ID %1$s のエピソードが見つかりません</string>
     <string name="no_episode_ids_provided">エピソード ID が指定されていません</string>
@@ -878,12 +882,14 @@ Language: ja_JP
     <string name="podcast_id_description">ポッドキャストを表す一意の ID。 「ポッドキャストエピソードをクエリー」アクションで使用できます。</string>
     <string name="podcast_id">ポッドキャスト ID</string>
     <string name="pocket_casts_query_up_next_episodes">Pocket Casts 「次のエピソードをクエリー」</string>
-    <string name="pocket_casts_query_filter_episodes">Pocket Casts「フィルターエピソードをクエリー」</string>
-    <string name="pocket_casts_query_filters">Pocket Casts「クエリーフィルター」</string>
     <string name="pocket_casts_add_to_up_next">Pocket Casts「次のエピソードに追加」</string>
     <string name="pocket_casts_query_podcast_episodes">Pocket Casts「ポッドキャストエピソードをクエリー」</string>
     <string name="pocket_casts_query_podcasts">Pocket Casts「ポッドキャストをクエリー」</string>
     <string name="onboarding_plus_can_be_canceled_at_any_time">いつでもキャンセルできます。</string>
+    <string name="filter_id_or_title">プレイリストの ID またはタイトル</string>
+    <string name="filter_id_description">プレイリストを表す一意の ID。 「プレイリストエピソードをクエリー」アクションで使用できます。</string>
+    <string name="pocket_casts_query_filter_episodes">Pocket Casts プレイリストエピソードをクエリー</string>
+    <string name="pocket_casts_query_filters">Pocket Casts プレイリストをクエリー</string>
     <string name="profile_cancel_confirm_cancel_button_title">はい、サブスクリプションをキャンセルします</string>
     <string name="profile_cancel_confirm_stay_button_title">利用を続けます</string>
     <string name="profile_cancel_confirm_item_web_player">ウェブブラウザーやデスクトップコンピューターで Pocket Casts にアクセスできなくなります。</string>
@@ -980,9 +986,9 @@ Language: ja_JP
     <string name="playback_speed_not_valid">再生速度 %1$s は有効ではありません</string>
     <string name="profile_account_upgraded">アカウントはアップグレードされました</string>
     <string name="pocket_casts_control_playback">Pocket Casts プレイバックコントロール</string>
-    <string name="pocket_casts_play_filter">Pocket Casts 再生フィルター</string>
     <string name="time_to_skip_not_valid">スキップ先の時間%1$sが無効です</string>
     <string name="time_to_skip_seconds">スキップ先の時間 (秒)</string>
+    <string name="pocket_casts_play_filter">Pocket Casts プレイリストを再生</string>
     <string name="settings_select_filters">フィルターを選択する</string>
     <string name="settings_import_url_summary">URL を使用して OPML ファイルからポッドキャストをインポートします。</string>
     <string name="settings_import_url">URL を使用</string>
@@ -999,9 +1005,9 @@ Language: ja_JP
     <string name="playback_command">再生コマンド</string>
     <string name="command_x_not_valid">コマンド %1$s が無効です</string>
     <string name="must_provide_command_name">コマンド名を指定する必要があります</string>
-    <string name="no_episodes_in_filter_x">フィルター %1$s にエピソードはありません</string>
-    <string name="filter_x_not_found">フィルター %1$s は見つかりません</string>
-    <string name="must_provide_filter_name">フィルター名を指定する必要があります</string>
+    <string name="no_episodes_in_filter_x">プレイリスト %1$s にエピソードがありません</string>
+    <string name="filter_x_not_found">プレイリスト %1$s が見つかりません</string>
+    <string name="must_provide_filter_name">プレイリスト名を入力する必要があります</string>
     <string name="end_of_year_launch_modal_summary">人気のポッドキャスト、カテゴリー、視聴統計などを確認します。 友達と共有したり、お気に入りのクリエイターにエールを送ったりしましょう。</string>
     <string name="settings_app_icon_halloween">ハロウィーン</string>
     <string name="end_of_year_launch_modal_primary_button_title">マイプレイバック2024を表示</string>
@@ -1127,7 +1133,6 @@ Language: ja_JP
     <string name="off">オフ</string>
     <string name="discover_popular_in">%s で人気</string>
     <string name="discover_popular">人気</string>
-    <string name="filters_filter_name">フィルター名</string>
     <string name="episode_short_episode">E%d</string>
     <string name="episode_short_season">S%d</string>
     <string name="episode_short_season_episode">S%1$d E%2$d</string>
@@ -1631,7 +1636,6 @@ Language: ja_JP
     <string name="profile_status_error_internet">🤔\n\n統計 \n を読み込めませんインターネット接続を確認してください。</string>
     <string name="profile_stats_total">合計</string>
     <string name="profile_stats_since_listened_for">%s以降の聴取時間</string>
-    <string name="profile_stats_share_to">以下と共有..</string>
     <string name="profile_stats_listened_for">聴取時間</string>
     <string name="profile_stat_days_listened">聴取日数</string>
     <string name="profile_sonos_title">Pocket Casts と Sonos</string>
@@ -1995,7 +1999,6 @@ Language: ja_JP
     <string name="player_time_saved_no_hour">おめでとうございます ! 時間を節約してより多くのポッドキャストを聴いています。</string>
     <string name="player_time_saved_detail">この機能を使用して合計%s 節約しました。</string>
     <string name="player_sleep_timer">スリープタイマー</string>
-    <string name="player_sleep_end_of_episode">エピソード終了時</string>
     <string name="player_sleep_cancel_timer">タイマーをキャンセル</string>
     <string name="player_sleep_add_5_minutes">+ 5分</string>
     <string name="player_sleep_60_minutes">60分</string>
@@ -2210,6 +2213,9 @@ Language: ja_JP
     </plurals>
     <plurals name="podcasts_count">
         <item quantity="other">%d件のポッドキャスト</item>
+    </plurals>
+    <plurals name="podcasts_selected_count">
+        <item quantity="other">%1$d件のポッドキャストを選択済み</item>
     </plurals>
     <plurals name="profile_stats_day_listened">
         <item quantity="other">聴取日数</item>
