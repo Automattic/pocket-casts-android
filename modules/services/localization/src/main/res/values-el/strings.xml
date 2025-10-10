@@ -195,7 +195,6 @@ Language: el_GR
     <string name="settings_pixel_watch_subtitle">Αντικατέστησε τα προσαρμοσμένα κουμπιά επιλογής με τα τυπικά κουμπιά επόμενο/προηγούμενο κομμάτι που λειτουργούν ως κουμπιά παράλειψης, επιτρέποντας την συμβατότητα με περισσότερες συσκευές.</string>
     <string name="settings_pixel_watch_title">Κουμπιά παράλειψης Pixel Watch</string>
     <string name="winback_cancel_subscription_cancel_button_label">Ναι, Ακύρωσε τη Συνδρομή μου</string>
-    <string name="winback_cancel_subscription_stay_button_label">Βασικά, θέλω να μείνω</string>
     <string name="winback_cancel_subscription_perk_files">Όλα τα αρχεία που ανέβηκαν στον λογαριασμό Pocket Casts σου θα διαγραφούν (αλλά τα κατεβασμένα αρχεία στις συσκευές σου θα παραμείνουν).</string>
     <string name="winback_cancel_subscription_perk_folders">Οι φάκελοι σου θα διαγραφούν και το περιεχόμενο τους θα μετακινηθεί πίσω στην οθόνη Podcasts σου.</string>
     <string name="winback_cancel_subscription_perk_plus">Η πρόσβαση στα χαρακτηριστικά του Pocket Casts Plus θα κλειδωθούν μετά το πέρας της ημερομηνίας.</string>
@@ -430,7 +429,6 @@ Language: el_GR
     <string name="hour_and_minutes">1 ώρα και %d λεπτά</string>
     <string name="player_sleep_time_fired_end_of_chapter">Ο χρονοδιακόπτης ύπνου σταμάτησε στο τέλος του κεφαλαίου σου.</string>
     <string name="player_sleep_in_chapters">Ύπνος σε %d κεφάλαια</string>
-    <string name="player_sleep_in_one_chapter">Ύπνος σε 1 κεφάλαιο</string>
     <string name="player_sleep_timer_in_chapter_plural">Σε %d κεφάλαια</string>
     <string name="player_sleep_timer_in_chapter">Σε 1 κεφάλαιο</string>
     <string name="player_sleep_timer_in_episode_plural">Σε %d επεισόδια</string>
@@ -440,7 +438,6 @@ Language: el_GR
     <string name="settings_use_episode_artwork_customization_section">Παραμετροποίηση</string>
     <string name="settings_use_episode_artwork_advanced">Προηγμένες ρυθμίσεις για εξώφυλλο επεισοδίων</string>
     <string name="player_sleep_in_episodes">Ύπνος σε %d επεισόδια</string>
-    <string name="player_sleep_in_one_episode">Ύπνος σε 1 επεισόδιο</string>
     <string name="player_sleep_timer_stopped_your_podcast">Ο χρονοδιακόπτης ύπνου σταμάτησε το podcast σου.</string>
     <string name="player_sleep_timer_restarted_after_device_shake">Ο χρονοδιακόπτης ύπνου επανεκκινήθηκε μετά από κούνημα της συσκευής</string>
     <string name="widget_nothing_in_up_next">Τίποτα στο Επόμενο</string>
@@ -578,7 +575,6 @@ Language: el_GR
     <string name="onboarding_patron_feature_early_access_title">Πρώιμη πρόσβαση σε δυνατότητες</string>
     <string name="settings_continuous_playback_summary">Αν η ουρά Επόμενο είναι άδεια, θα παίξουμε επεισόδια από το ίδιο podcast ή λίστα που ακούς αυτή τη στιγμή.</string>
     <string name="renew_your_subscription">Ανανέωσε τη Συνδρομή σου</string>
-    <string name="log_in_free_acccount">%s χρησιμοποιεί δωρεάν λογαριασμό</string>
     <string name="log_in_watch_from_phone_instructions_3">Αν έχεις πρόβλημα, βεβαιώσου ότι το τηλέφωνό σου τρέχει την ίδια έκδοση του Pocket Casts με το ρολόι σου (%s)</string>
     <string name="empty_play_state">Διάλεξε ένα επεισόδιο για να ξεκινήσεις</string>
     <string name="player_play_failed_check_internet">Αδυναμία φόρτωσης podcast. Παρακαλώ έλεγξε τη σύνδεση στο διαδίκτυο και δοκίμασε ξανά.</string>
@@ -695,8 +691,6 @@ Language: el_GR
     <string name="playing_status">Κατάσταση Αναπαραγωγής</string>
     <string name="played_percentage">Ποσοστό Αναπαραγωγής</string>
     <string name="playing_status_explained">0 = Δεν παίχτηκε, 1 = Σε εξέλιξη, 2 = Ολοκληρώθηκε</string>
-    <string name="filter_id_or_title">ID Φίλτρου ή Τίτλος</string>
-    <string name="filter_title">Τίτλος Φίλτρου</string>
     <string name="author">Συντάκτης</string>
     <string name="current">Τρέχον</string>
     <string name="clear_all">Καθαρισμός Όλων</string>
@@ -707,10 +701,8 @@ Language: el_GR
     <string name="date_published">Ημερομηνία Δημοσίευσης</string>
     <string name="download_url">URL λήψης</string>
     <string name="last">Τελευταίο</string>
-    <string name="filter_id">ID φίλτρου</string>
     <string name="episode_count">Αριθμός Επεισοδίων</string>
     <string name="add_mode">Προσθήκη Λειτουργίας</string>
-    <string name="filter_id_description">Ένα μοναδικό ID που αντιπροσωπεύει το φίλτρο. Μπορεί να χρησιμοποιηθεί στην ενέργεια «Ερώτημα Φίλτρου Επεισοδίων».</string>
     <string name="no_episodes_found_for_episode_ids_x">Δεν βρέθηκαν επεισόδια για τα IDs επεισοδίων %1$s</string>
     <string name="no_episode_ids_provided">Δεν παρέχονται IDs επεισοδίων</string>
     <string name="latest_episode_date">Ημερομηνία Τελευταίου Επεισοδίου</string>
@@ -722,8 +714,6 @@ Language: el_GR
     <string name="episode_id_description">Ένα μοναδικό ID που αντιπροσωπεύει το επεισόδιο. Μπορεί να χρησιμοποιηθεί στην ενέργεια «Προσθήκη στο Επόμενο».</string>
     <string name="episode_id">ID επεισοδίου</string>
     <string name="pocket_casts_query_up_next_episodes">Pocket Casts Ουρά Επεισοδίων στο Επόμενο</string>
-    <string name="pocket_casts_query_filter_episodes">Pocket Casts Ερώτημα Φιλτράρισμα Επεισοδίων</string>
-    <string name="pocket_casts_query_filters">Φίλτρα Ερωτήσεων Pocket Casts</string>
     <string name="pocket_casts_query_podcast_episodes">Pocket Casts Ερώτημα Podcast Επεισόδια</string>
     <string name="pocket_casts_query_podcasts">Pocket Casts Ερώτημα Podcasts</string>
     <string name="clear_up_next">Εκκαθάριση Επόμενου</string>
@@ -824,7 +814,6 @@ Language: el_GR
     <string name="trim_silence_mode_not_valid">Η λειτουργία Περικοπή Σιωπής %1$s δεν είναι έγκυρη</string>
     <string name="profile_account_upgraded">Ο Λογαριασμός Αναβαθμίστηκε</string>
     <string name="pocket_casts_control_playback">Έλεγχος Αναπαραγωγής Pocket Casts</string>
-    <string name="pocket_casts_play_filter">Φίλτρο Αναπαραγωγής Pocket Casts</string>
     <string name="time_to_skip_not_valid">Ο χρόνος παράλειψης %1$s δεν είναι έγκυρος</string>
     <string name="time_to_skip_seconds">Χρόνος Παράλειψης (δευτερόλεπτα)</string>
     <string name="settings_select_filters">Επιλογή φίλτρων</string>
@@ -839,11 +828,8 @@ Language: el_GR
     <string name="skip_to_next_chapter">Μετάβαση στο Επόμενο Κεφάλαιο</string>
     <string name="time_to_skip_to_seconds">Χρόνος για Παράλειψη (Δευτερόλεπτα)</string>
     <string name="playback_command">Εντολή Αναπαραγωγής</string>
-    <string name="must_provide_filter_name">Πρέπει να παρέχεις το όνομα του φίλτρου</string>
     <string name="must_provide_command_name">Πρέπει να παρέχεις όνομα της εντολής</string>
     <string name="command_x_not_valid">Η εντολή %1$s δεν είναι έγκυρη</string>
-    <string name="no_episodes_in_filter_x">Δεν υπάρχουν επεισόδια στο Φίλτρο %1$s</string>
-    <string name="filter_x_not_found">Το φίλτρο %1$s δεν βρέθηκε</string>
     <string name="chapter_to_skip_to_not_valid">Το κεφάλαιο %1$s προς μετάβαση δεν είναι έγκυρο</string>
     <string name="chapter_to_skip_to">Παράλειψη σε Κεφάλαιο</string>
     <string name="end_of_year_launch_modal_summary">Δες τα κορυφαία σου podcasts, κατηγορίες, στατιστικά ακρόασης και άλλα. Μοιράσου με φίλους και πες για τους αγαπημένους σου δημιουργούς!</string>
@@ -973,7 +959,6 @@ Language: el_GR
     <string name="discover_popular">Δημοφιλές</string>
     <string name="discover_top">Κορυφαία</string>
     <string name="episode_bonus">Μπόνους</string>
-    <string name="filters_filter_name">Όνομα Φίλτρου</string>
     <string name="episode_short_episode">E%d</string>
     <string name="episode_short_season">Σ%d</string>
     <string name="episode_short_season_episode">Σ%1$d Ε%2$d</string>
@@ -1405,7 +1390,6 @@ Language: el_GR
     <string name="profile_promo_sign_in_or_create">Συνδέσου ή δημιούργησε έναν λογαριασμό</string>
     <string name="profile_sign_in_or_create_account">Συνδέσου ή δημιούργησε λογαριασμό</string>
     <string name="filters_duration_shorter_than">Μικρότερο από</string>
-    <string name="profile_stats_share_to">Μοιράσου σε..</string>
     <string name="profile_share_stats">Μοιράσου στατιστικά</string>
     <string name="profile_sonos_setup_account">Ρύθμιση Λογαριασμού</string>
     <string name="profile_set_up_account">Δημιουργία λογαριασμού</string>
@@ -1856,7 +1840,6 @@ Language: el_GR
     <string name="player_time_saved_detail">Συνολικά έχεις εξοικονομήσει %s χρησιμοποιώντας αυτή τη λειτουργία.</string>
     <string name="player_sleep_timer">Χρονοδιακόπτης ύπνου</string>
     <string name="player_sleep_timer_title">Χρονοδιακόπτης Ύπνου</string>
-    <string name="player_sleep_end_of_episode">Τέλος επεισοδίου</string>
     <string name="player_sleep_cancel_timer">Ακύρωση χρονοδιακόπτη</string>
     <string name="player_sleep_60_minutes">60 λεπτά</string>
     <string name="player_sleep_30_minutes">30 λεπτά</string>

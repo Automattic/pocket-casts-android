@@ -1,11 +1,23 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2025-09-25 11:54:04+0000
+Translation-Revision-Date: 2025-10-09 09:54:04+0000
 Plural-Forms: nplurals=1; plural=0;
 Generator: GlotPress/2.4.0-alpha
 Language: zh_CN
 -->
 <resources>
+    <string name="winback_cancel_subscription_stay_button_label">保留我的订阅</string>
+    <string name="filter_title">播放列表标题</string>
+    <string name="filter_id">播放列表 ID</string>
+    <string name="filters_filter_name">播放列表名称</string>
+    <string name="playlists_not_found">未找到播放列表</string>
+    <string name="notification_filters_message_2">创建播放列表来整理您的剧集。</string>
+    <string name="settings_status_service_account_summary_2">该服务用于存储剧集进度、您关注的播客、播放列表等。</string>
+    <string name="settings_choose_playlists">选择播放列表</string>
+    <string name="number_one">第一</string>
+    <string name="settings_auto_download_playlists">自动下载播放列表</string>
+    <string name="playlists_selected_all">已选择所有播放列表</string>
+    <string name="podcasts_selected_all">已选择所有播客</string>
     <string name="smart_playlists">智能播放列表</string>
     <string name="select_smart_playlists">选择智能播放列表</string>
     <string name="podcast_not_in_playlists">未包含在任何智能播放列表中</string>
@@ -350,7 +362,6 @@ Language: zh_CN
     <string name="settings_pixel_watch_subtitle">将自定义的跳过按钮替换为具备跳过功能的标准下一曲/上一曲按钮，从而实现与更多设备的兼容。</string>
     <string name="settings_pixel_watch_title">Pixel Watch 跳过按钮</string>
     <string name="winback_cancel_subscription_cancel_button_label">是，取消我的订阅</string>
-    <string name="winback_cancel_subscription_stay_button_label">实际上，我想留下来</string>
     <string name="winback_cancel_subscription_perk_files">上传至您的 Pocket Casts 账户的所有文件都将删除（但下载到您移动设备上的文件会保留）。</string>
     <string name="winback_cancel_subscription_perk_folders">您的文件夹将被删除，其中的内容将移回“播客”界面。</string>
     <string name="winback_cancel_subscription_perk_plus">在此日期后，您将无法再访问 Pocket Casts Plus 功能。</string>
@@ -586,7 +597,6 @@ Language: zh_CN
     <string name="hours_and_minutes">%d 小时 %d 分钟</string>
     <string name="player_sleep_time_fired_end_of_chapter">睡眠定时器在章节结束时停止。</string>
     <string name="player_sleep_in_chapters">%d 个章节后进入睡眠状态</string>
-    <string name="player_sleep_in_one_chapter">1 个章节后进入睡眠状态</string>
     <string name="player_sleep_timer_in_chapter_plural">%d 个章节后</string>
     <string name="player_sleep_timer_in_chapter">1 个章节后</string>
     <string name="player_sleep_timer_in_episode_plural">%d 集后</string>
@@ -596,7 +606,6 @@ Language: zh_CN
     <string name="settings_use_episode_artwork_title">剧集插图</string>
     <string name="settings_use_episode_artwork_advanced">高级剧集插图设置</string>
     <string name="player_sleep_in_episodes">%d 集后进入睡眠状态</string>
-    <string name="player_sleep_in_one_episode">1 集后进入睡眠状态</string>
     <string name="player_sleep_timer_stopped_your_podcast">睡眠计时器让您的播客停止了播放。</string>
     <string name="player_sleep_timer_restarted_after_device_shake">摇晃设备后睡眠计时器重新启动</string>
     <string name="widget_check_out_discover">查看“发现”，了解更多信息</string>
@@ -735,7 +744,6 @@ Language: zh_CN
     <string name="settings_continuous_playback_summary">如果您的“接下来播放”队列中没有内容，我们会播放您目前正在收听的同一播客或列表中的剧集。</string>
     <string name="renew_your_subscription">续订您的订阅</string>
     <string name="log_in_watch_from_phone_instructions_3">如果您遇到问题，请确保您的手机运行的 Pocket Casts 版本与与手表相同 (%s)</string>
-    <string name="log_in_free_acccount">%s 正在使用免费账户</string>
     <string name="player_play_failed_check_internet">无法加载播客。 请检查您的网络连接，然后重试。</string>
     <string name="empty_play_state">选择一集以开始</string>
     <string name="settings_beta_features">测试版功能</string>
@@ -844,9 +852,6 @@ Language: zh_CN
     <string name="settings_media_actions_customise">自定义媒体操作</string>
     <string name="onboarding_recommendations_more">更多 %s</string>
     <string name="clear_up_next">清除“接下来播放”</string>
-    <string name="filter_id_or_title">筛选 ID 或标题</string>
-    <string name="filter_title">筛选标题</string>
-    <string name="filter_id">筛选 ID</string>
     <string name="episode_count">剧集计数</string>
     <string name="no_episodes_found_for_episode_ids_x">未找到剧集 ID %1$s 的剧集</string>
     <string name="no_episode_ids_provided">未提供剧集 ID</string>
@@ -873,17 +878,18 @@ Language: zh_CN
     <string name="podcast_title">播客标题</string>
     <string name="podcast_id">播客 ID</string>
     <string name="pocket_casts_query_up_next_episodes">Pocket Casts 查询接下来播放剧集</string>
-    <string name="pocket_casts_query_filter_episodes">Pocket Casts 查询筛选剧集</string>
-    <string name="pocket_casts_query_filters">Pocket Casts 查询筛选</string>
     <string name="pocket_casts_add_to_up_next">Pocket Casts 添加到接下来播放</string>
     <string name="pocket_casts_query_podcast_episodes">Pocket Casts 查询播客剧集</string>
     <string name="pocket_casts_query_podcasts">Pocket Casts 查询播客</string>
     <string name="onboarding_plus_can_be_canceled_at_any_time">可随时取消。</string>
-    <string name="filter_id_description">代表该筛选的唯一 ID。 可用于“查询筛选剧集”操作。</string>
     <string name="category">分类</string>
     <string name="download_url">下载 URL</string>
     <string name="clear_before_adding">先清除，再添加</string>
     <string name="podcast_id_description">代表该播客的唯一 ID。 可用于“查询播客剧集”操作。</string>
+    <string name="filter_id_or_title">播放列表 ID 或标题</string>
+    <string name="pocket_casts_query_filter_episodes">Pocket Casts 查询播放列表剧集</string>
+    <string name="pocket_casts_query_filters">Pocket Casts 查询播放列表</string>
+    <string name="filter_id_description">代表该播放列表的唯一 ID。 可用于“查询播放列表剧集”操作。</string>
     <string name="profile_cancel_confirm_cancel_button_title">是的，取消我的订阅“</string>
     <string name="profile_cancel_confirm_stay_button_title">实际上，我想留下来”</string>
     <string name="profile_cancel_confirm_item_web_player">您将无法再使用 Web 浏览器或台式计算机访问 Pocket Casts。</string>
@@ -980,9 +986,9 @@ Language: zh_CN
     <string name="playback_speed_not_valid">播放速度 %1$s 无效</string>
     <string name="profile_account_upgraded">账户已升级</string>
     <string name="pocket_casts_control_playback">Pocket Casts 控制播放</string>
-    <string name="pocket_casts_play_filter">Pocket Casts 播放过滤器</string>
     <string name="time_to_skip_not_valid">时间跳至 %1$s 无效</string>
     <string name="time_to_skip_seconds">跳至的时间（秒）</string>
+    <string name="pocket_casts_play_filter">Pocket Casts 播放播放列表</string>
     <string name="settings_select_filters">选择过滤器</string>
     <string name="settings_import_url_summary">使用 URL 从 OPML 文件导入播客。</string>
     <string name="settings_import_url">通过 URL</string>
@@ -999,9 +1005,9 @@ Language: zh_CN
     <string name="playback_command">播放命令</string>
     <string name="command_x_not_valid">命令 %1$s 无效</string>
     <string name="must_provide_command_name">必须提供命令名称</string>
-    <string name="no_episodes_in_filter_x">过滤器 %1$s 中无剧集</string>
-    <string name="filter_x_not_found">未找到过滤器 %1$s</string>
-    <string name="must_provide_filter_name">必须提供过滤器名称</string>
+    <string name="no_episodes_in_filter_x">播放列表 %1$s 中没有剧集</string>
+    <string name="filter_x_not_found">未找到播放列表 %1$s</string>
+    <string name="must_provide_filter_name">必须提供播放列表名称</string>
     <string name="end_of_year_launch_modal_summary">查看您的热门播客、分类、收听统计数据等。 分享给朋友，告诉他们您最喜欢的创作者！</string>
     <string name="settings_app_icon_halloween">万圣节</string>
     <string name="end_of_year_launch_modal_primary_button_title">查看我的 2024 年播放记录</string>
@@ -1126,7 +1132,6 @@ Language: zh_CN
     <string name="settings_about_acknowledgements">致谢</string>
     <string name="off">关闭</string>
     <string name="discover_top">顶部</string>
-    <string name="filters_filter_name">过滤器名称</string>
     <string name="episode_short_season">第 %d 季</string>
     <string name="episode_season_trailer">第 %d 季预告片</string>
     <string name="episode_trailer">预告片</string>
@@ -1631,7 +1636,6 @@ Language: zh_CN
     <string name="profile_stats_total">总计</string>
     <string name="profile_stats_time_saved_by">节省的时间</string>
     <string name="profile_stats_since_listened_for">自从 %s，您已收听</string>
-    <string name="profile_stats_share_to">共享至..</string>
     <string name="profile_stats_listened_for">您已收听</string>
     <string name="profile_stat_days_listened">已收听的天数</string>
     <string name="profile_sonos_title">Pocket Casts 和 Sonos</string>
@@ -1995,7 +1999,6 @@ Language: zh_CN
     <string name="player_time_saved_no_hour">恭喜！ 您节省了时间，并浏览了更多播客。</string>
     <string name="player_time_saved_detail">您总共使用此功能节省了 %s。</string>
     <string name="player_sleep_timer">睡眠计时器</string>
-    <string name="player_sleep_end_of_episode">剧集结束</string>
     <string name="player_sleep_cancel_timer">取消计时器</string>
     <string name="player_sleep_add_5_minutes">+5 分钟</string>
     <string name="player_sleep_60_minutes">60 分钟</string>
@@ -2210,6 +2213,9 @@ Language: zh_CN
     </plurals>
     <plurals name="podcasts_count">
         <item quantity="other">%d 个播客</item>
+    </plurals>
+    <plurals name="podcasts_selected_count">
+        <item quantity="other">已选择 %1$d 个播客</item>
     </plurals>
     <plurals name="profile_stats_day_listened">
         <item quantity="other">已收听的天数</item>

@@ -1,11 +1,23 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2025-09-25 11:54:04+0000
+Translation-Revision-Date: 2025-10-09 15:54:03+0000
 Plural-Forms: nplurals=2; plural=n != 1;
 Generator: GlotPress/2.4.0-alpha
 Language: nl
 -->
 <resources>
+    <string name="winback_cancel_subscription_stay_button_label">Mijn abonnement behouden</string>
+    <string name="filter_title">Titel van afspeellijst</string>
+    <string name="filter_id">Afspeellijst-ID</string>
+    <string name="filters_filter_name">Naam afspeellijst</string>
+    <string name="playlists_not_found">Geen afspeellijsten gevonden</string>
+    <string name="notification_filters_message_2">Maak afspeellijsten aan om je afleveringen te organiseren.</string>
+    <string name="settings_status_service_account_summary_2">De service die wordt gebruikt om afleveringsvoortgang, abonnementen, afspeellijsten etc. op te slaan.</string>
+    <string name="settings_choose_playlists">Afspeellijsten kiezen</string>
+    <string name="number_one">één</string>
+    <string name="settings_auto_download_playlists">Afspeellijsten automatisch downloaden</string>
+    <string name="playlists_selected_all">Alle geselecteerde afspeellijsten</string>
+    <string name="podcasts_selected_all">Alle podcasts geselecteerd</string>
     <string name="smart_playlists">Slimme afspeellijsten</string>
     <string name="select_smart_playlists">Slimme afspeellijsten selecteren</string>
     <string name="podcast_not_in_playlists">Niet inbegrepen in slimme afspeellijsten</string>
@@ -355,7 +367,6 @@ Language: nl
     <string name="winback_cancel_subscription_perk_active_without_date">Je huidige abonnement blijft actief tot de vervaldatum.</string>
     <string name="winback_cancel_subscription_perk_active_with_date">Je huidige abonnement blijft actief tot %1$s.</string>
     <string name="winback_cancel_subscription_header_description">Hierdoor wordt je abonnement aangepast naar een gratis account.</string>
-    <string name="winback_cancel_subscription_stay_button_label">Ik wil toch blijven</string>
     <string name="winback_changing_plan">Abonnement wordt gewijzigd</string>
     <string name="winback_too_many_subscritpions_button_label">Abonnementen beheren in de Play Store</string>
     <string name="winback_too_many_subscritpions_title">Meerdere abonnementen gevonden</string>
@@ -585,7 +596,6 @@ Language: nl
     <string name="hours_and_minutes">%d uur %d minuten</string>
     <string name="player_sleep_time_fired_end_of_chapter">Slaaptimer is gestopt aan het einde van het hoofdstuk.</string>
     <string name="player_sleep_in_chapters">Slaapstand over %d hoofdstukken</string>
-    <string name="player_sleep_in_one_chapter">Slaapstand over 1 hoofdstuk</string>
     <string name="player_sleep_timer_in_chapter_plural">Over %d hoofdstukken</string>
     <string name="player_sleep_timer_in_chapter">Over 1 hoofdstuk</string>
     <string name="player_sleep_timer_in_episode_plural">Over %d afleveringen</string>
@@ -595,7 +605,6 @@ Language: nl
     <string name="settings_use_episode_artwork_title">Artwork van aflevering</string>
     <string name="settings_use_episode_artwork_advanced">Geavanceerde instellingen artwork aflevering</string>
     <string name="player_sleep_in_episodes">Slaapstand inschakelen na %d afleveringen</string>
-    <string name="player_sleep_in_one_episode">Slaapstand inschakelen na 1 aflevering</string>
     <string name="player_sleep_timer_stopped_your_podcast">De slaaptimer heeft je podcast gepauzeerd.</string>
     <string name="player_sleep_timer_restarted_after_device_shake">De slaaptimer is opnieuw gestart omdat er met het apparaat is geschud</string>
     <string name="widget_check_out_discover">Bekijk Ontdekken voor nog meer</string>
@@ -734,7 +743,6 @@ Language: nl
     <string name="settings_continuous_playback_summary">Als je wachtrij Hierna leeg is, zullen we afleveringen afspelen van dezelfde podcast of uit dezelfde lijst waar je op dat moment naar aan het luisteren bent.</string>
     <string name="renew_your_subscription">Verleng je abonnement</string>
     <string name="log_in_watch_from_phone_instructions_3">Als het niet lukt, controleer dan of je telefoon dezelfde versie van Pocket Casts heeft als je horloge (%s)</string>
-    <string name="log_in_free_acccount">%s gebruikt een gratis account</string>
     <string name="player_play_failed_check_internet">Kan podcast niet laden. Controleer je internetverbinding en probeer het opnieuw.</string>
     <string name="empty_play_state">Kies een aflevering om te beginnen</string>
     <string name="settings_beta_features">Bèta-functies</string>
@@ -843,10 +851,6 @@ Language: nl
     <string name="settings_media_actions_customise">Media-acties aanpassen</string>
     <string name="onboarding_recommendations_more">Meer %s</string>
     <string name="clear_up_next">Hierna wissen</string>
-    <string name="filter_id_or_title">Filter-ID of -titel</string>
-    <string name="filter_title">Filtertitel</string>
-    <string name="filter_id_description">Een uniek ID voor deze filter. Kan worden gebruikt bij de actie ‘Afleveringen filteren opvragen’.</string>
-    <string name="filter_id">Filter-ID</string>
     <string name="episode_count">Aantal afleveringen</string>
     <string name="no_episodes_found_for_episode_ids_x">Geen afleveringen gevonden voor de aflevering-ID’s %1$s</string>
     <string name="no_episode_ids_provided">Geen aflevering-ID’s opgegeven</string>
@@ -877,12 +881,14 @@ Language: nl
     <string name="podcast_id_description">Een uniek ID voor deze podcast. Kan worden gebruikt voor de actie \'Podcast-aflevering opvragen\'.</string>
     <string name="podcast_id">Podcast-ID</string>
     <string name="pocket_casts_query_up_next_episodes">Pocket Casts Afleveringen hierna opvragen</string>
-    <string name="pocket_casts_query_filter_episodes">Pocket Casts Afleveringen filteren opvragen</string>
-    <string name="pocket_casts_query_filters">Pocket Casts Filters opvragen</string>
     <string name="pocket_casts_add_to_up_next">Pocket Casts Toevoegen aan hierna</string>
     <string name="pocket_casts_query_podcast_episodes">Pocket Casts Podcast-afleveringen opvragen</string>
     <string name="pocket_casts_query_podcasts">Pocket Casts Podcasts opvragen</string>
     <string name="onboarding_plus_can_be_canceled_at_any_time">Kan op elk moment worden geannuleerd.</string>
+    <string name="filter_id_or_title">Titel of ID van afspeellijst</string>
+    <string name="filter_id_description">Een uniek ID voor deze afspeellijst. Kan worden gebruikt voor de actie \'Afspeellijst-aflevering opvragen\'.</string>
+    <string name="pocket_casts_query_filter_episodes">Pocket Casts Afspeellijst-afleveringen opvragen</string>
+    <string name="pocket_casts_query_filters">Pocket Casts Afspeellijsten opvragen</string>
     <string name="profile_cancel_confirm_cancel_button_title">Ja, annuleer mijn abonnement\'</string>
     <string name="profile_cancel_confirm_stay_button_title">Ik wil blijven\'</string>
     <string name="profile_cancel_confirm_item_folders">Je mappen worden verwijderd en hun inhoud wordt teruggezet naar het scherm Podcasts.</string>
@@ -979,9 +985,9 @@ Language: nl
     <string name="playback_speed_not_valid">Afspeelsnelheid %1$s niet geldig</string>
     <string name="profile_account_upgraded">Accountupgrade uitgevoerd</string>
     <string name="pocket_casts_control_playback">Bedieningselement voor afspelen Pocket Casts</string>
-    <string name="pocket_casts_play_filter">Filter afspelen Pocket Casts</string>
     <string name="time_to_skip_not_valid">Tijd om door te spoelen %1$s niet geldig</string>
     <string name="time_to_skip_seconds">Tijd om door te spoelen (seconden)</string>
+    <string name="pocket_casts_play_filter">Afspeellijst Pocket Casts afspelen</string>
     <string name="settings_select_filters">Filters selecteren</string>
     <string name="settings_import_url_summary">Importeer je podcasts vanuit een OPML-bestand met een URL.</string>
     <string name="settings_import_url">Op URL</string>
@@ -998,9 +1004,9 @@ Language: nl
     <string name="playback_command">Opdracht afspelen</string>
     <string name="command_x_not_valid">Opdracht %1$s niet geldig</string>
     <string name="must_provide_command_name">Je moet een opdrachtnaam opgeven</string>
-    <string name="no_episodes_in_filter_x">Geen afleveringen in filter %1$s</string>
-    <string name="filter_x_not_found">Filter %1$s niet gevonden</string>
-    <string name="must_provide_filter_name">Je moet een filternaam opgeven</string>
+    <string name="no_episodes_in_filter_x">Geen afleveringen in afspeellijst %1$s</string>
+    <string name="filter_x_not_found">Afspeellijst %1$s niet gevonden</string>
+    <string name="must_provide_filter_name">Moet naam van afspeellijst opgeven</string>
     <string name="end_of_year_launch_modal_summary">See your top podcasts, categories, listening stats and more. Share with friends and shout out your favorite creators!</string>
     <string name="settings_app_icon_halloween">Halloween</string>
     <string name="end_of_year_launch_modal_primary_button_title">Bekijk mijn Playback 2024</string>
@@ -1127,7 +1133,6 @@ Language: nl
     <string name="discover_popular_in">Populair in %s</string>
     <string name="discover_popular">Populair</string>
     <string name="discover_top">Boven</string>
-    <string name="filters_filter_name">Filter op naam</string>
     <string name="episode_short_episode">Afl.%d</string>
     <string name="episode_short_season">S%d</string>
     <string name="episode_short_season_episode">S%1$d Afl.%2$d</string>
@@ -1629,7 +1634,6 @@ Language: nl
     <string name="profile_stats_total">TOTAAL</string>
     <string name="profile_stats_time_saved_by">Tijd bespaard door</string>
     <string name="profile_stats_since_listened_for">Sinds %s heb je geluisterd gedurende</string>
-    <string name="profile_stats_share_to">Deel naar…</string>
     <string name="profile_stats_listened_for">Je hebt geluisterd gedurende</string>
     <string name="profile_stat_days_listened">Dagen geluisterd</string>
     <string name="profile_sonos_title">Pocket Casts en Sonos</string>
@@ -2041,7 +2045,6 @@ Language: nl
     <string name="podcast_effects_summary_trim_silence_off">stiltes wegfilteren uit</string>
     <string name="podcast_effects_summary_trim_silence_on">stiltes wegfilteren aan</string>
     <string name="player_effects_trim_silence">Stiltes wegfilteren</string>
-    <string name="player_sleep_end_of_episode">Einde van de aflevering</string>
     <string name="podcasts_chosen_singular">1 podcast geselecteerd</string>
     <string name="podcasts_chosen_plural">%d podcasts geselecteerd</string>
     <string name="sort_newest_to_oldest">Nieuwste naar oudste</string>
@@ -2228,6 +2231,10 @@ Language: nl
     <plurals name="podcasts_count">
         <item quantity="one">%d podcast</item>
         <item quantity="other">%d podcasts</item>
+    </plurals>
+    <plurals name="podcasts_selected_count">
+        <item quantity="one">%1$d podcast geselecteerd</item>
+        <item quantity="other">%1$d podcasts geselecteerd</item>
     </plurals>
     <plurals name="profile_stats_day_listened">
         <item quantity="one">Dag geluisterd</item>
