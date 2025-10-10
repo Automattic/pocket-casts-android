@@ -38,7 +38,6 @@ import au.com.shiftyjelly.pocketcasts.search.component.SearchFailedView
 import au.com.shiftyjelly.pocketcasts.search.component.SearchResultFilters
 import au.com.shiftyjelly.pocketcasts.views.helper.PlayButtonListener
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.emptyFlow
 
 @Composable
 fun ImprovedSearchResultsPage(

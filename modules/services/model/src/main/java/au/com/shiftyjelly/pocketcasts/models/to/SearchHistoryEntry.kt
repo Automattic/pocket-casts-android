@@ -109,6 +109,20 @@ sealed class SearchHistoryEntry(
             author = podcast.author,
         )
 
+        fun fromImprovedEpisodeResult(episode: ImprovedSearchResultItem.EpisodeItem) = Episode(
+            uuid = episode.uuid,
+            title = episode.title,
+            duration = episode.duration.inWholeSeconds.toDouble(),
+            podcastUuid = episode.podcastUuid,
+            podcastTitle = ""
+        )
+
+        fun fromImprovedPodcastResult(podcast: ImprovedSearchResultItem.PodcastItem) = Podcast(
+            uuid = podcast.uuid,
+            title = podcast.title,
+            author = podcast.author,
+        )
+
         fun fromSearchHistoryItem(item: SearchHistoryItem) = when {
             item.episode != null -> {
                 val episode = item.episode as SearchHistoryItem.Episode
