@@ -1,6 +1,5 @@
 package au.com.shiftyjelly.pocketcasts.search
 
-import android.util.Log
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
@@ -58,9 +57,6 @@ class SearchHandler @Inject constructor(
     }
     private val onlySearchRemoteObservable = BehaviorRelay.create<Boolean>().apply {
         accept(false)
-    }
-    private val resultsFilterObservable = BehaviorRelay.create<ResultsFilters>().apply {
-        accept(ResultsFilters.TOP_RESULTS)
     }
     private val signInStateObservable = userManager.getSignInState().startWith(SignInState.SignedOut).toObservable()
 
@@ -282,10 +278,9 @@ class SearchHandler @Inject constructor(
                             is FolderItem.Podcast -> ImprovedSearchResultItem.PodcastItem(uuid = it.uuid, isFollowed = subscribedUuids.contains(it.uuid), title = it.podcast.title, author = it.podcast.author)
                         }
                     }
-                    val combinedResults = apiResults + localResults
+                    val combinedResults = (localResults + apiResults).distinctBy { it.uuid }
                     emit(SearchUiState.SearchOperation.Success(searchTerm = query, results = SearchResults.ImprovedResults(results = combinedResults, filter = ResultsFilters.TOP_RESULTS)))
                 }.catch {
-                    Log.d("===", "error $it")
                     emit(SearchUiState.SearchOperation.Error(searchTerm = query, error = it) as SearchUiState.SearchOperation<SearchResults.ImprovedResults>)
                 }
             }
