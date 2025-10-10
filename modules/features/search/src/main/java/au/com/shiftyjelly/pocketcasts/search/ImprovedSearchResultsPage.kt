@@ -37,6 +37,8 @@ import au.com.shiftyjelly.pocketcasts.search.component.NoResultsView
 import au.com.shiftyjelly.pocketcasts.search.component.SearchFailedView
 import au.com.shiftyjelly.pocketcasts.search.component.SearchResultFilters
 import au.com.shiftyjelly.pocketcasts.views.helper.PlayButtonListener
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.emptyFlow
 
 @Composable
 fun ImprovedSearchResultsPage(
@@ -50,6 +52,7 @@ fun ImprovedSearchResultsPage(
     onFilterSelect: (ResultsFilters) -> Unit,
     playButtonListener: PlayButtonListener,
     onScroll: () -> Unit,
+    episodePlaybackFlow: Flow<EpisodePlaybackData?>,
     modifier: Modifier = Modifier,
     fetchEpisode: (suspend (ImprovedSearchResultItem.EpisodeItem) -> BaseEpisode?)? = null,
 ) {
@@ -75,6 +78,7 @@ fun ImprovedSearchResultsPage(
                         selectedFilterIndex = state.selectedFilterIndex,
                         filterOptions = state.filterOptions.toList(),
                         onFilterSelect = onFilterSelect,
+                        episodePlaybackFlow = episodePlaybackFlow,
                     )
                 }
             }
@@ -110,6 +114,7 @@ private fun ImprovedSearchResultsView(
     filterOptions: List<ResultsFilters>,
     selectedFilterIndex: Int,
     onFilterSelect: (ResultsFilters) -> Unit,
+    episodePlaybackFlow: Flow<EpisodePlaybackData?>,
     modifier: Modifier = Modifier,
     fetchEpisode: (suspend (ImprovedSearchResultItem.EpisodeItem) -> BaseEpisode?)? = null,
 ) {
@@ -185,6 +190,7 @@ private fun ImprovedSearchResultsView(
                             onClick = { onEpisodeClick(item) },
                             playButtonListener = playButtonListener,
                             fetchEpisode = fetchEpisode,
+                            episodePlaybackFlow = episodePlaybackFlow
                         )
                     }
                 }

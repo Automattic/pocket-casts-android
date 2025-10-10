@@ -348,6 +348,7 @@ class SearchFragment : BaseFragment() {
                                 onScroll = { UiUtil.hideKeyboard(searchView) },
                                 bottomInset = bottomInset.pxToDp(LocalContext.current).dp,
                                 onFilterSelect = viewModel::selectFilter,
+                                episodePlaybackFlow = viewModel.episodePlaybackFlow
                             )
 
                         is SearchUiState.OldResults ->

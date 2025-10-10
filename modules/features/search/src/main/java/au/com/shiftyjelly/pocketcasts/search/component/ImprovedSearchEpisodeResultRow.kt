@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.produceState
 import androidx.compose.runtime.remember
@@ -37,14 +38,17 @@ import au.com.shiftyjelly.pocketcasts.models.entity.BaseEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.models.to.ImprovedSearchResultItem
 import au.com.shiftyjelly.pocketcasts.models.to.SearchAutoCompleteItem
+import au.com.shiftyjelly.pocketcasts.models.type.EpisodePlayingStatus
 import au.com.shiftyjelly.pocketcasts.repositories.images.PocketCastsImageRequestFactory
+import au.com.shiftyjelly.pocketcasts.search.EpisodePlaybackData
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.views.buttons.PlayButton
-import au.com.shiftyjelly.pocketcasts.views.buttons.PlayButtonType
 import au.com.shiftyjelly.pocketcasts.views.helper.PlayButtonListener
 import java.util.Date
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.map
 
 @Composable
 fun ImprovedSearchEpisodeResultRow(
@@ -70,12 +74,15 @@ fun ImprovedSearchEpisodeResultRow(
     episode: ImprovedSearchResultItem.EpisodeItem,
     onClick: () -> Unit,
     playButtonListener: PlayButtonListener,
+    episodePlaybackFlow: Flow<EpisodePlaybackData?>,
     modifier: Modifier = Modifier,
     fetchEpisode: (suspend (ImprovedSearchResultItem.EpisodeItem) -> BaseEpisode?)? = null,
 ) {
     val baseEpisode: BaseEpisode? by produceState(null) {
         value = fetchEpisode?.invoke(episode)
     }
+    val playbackData by episodePlaybackFlow
+        .map { if (it?.playingEpisodeUuid == episode.uuid) it else null }.collectAsState(null)
 
     ImprovedSearchEpisodeResultRow(
         episodeUuid = episode.uuid,
@@ -87,6 +94,7 @@ fun ImprovedSearchEpisodeResultRow(
         onClick = onClick,
         modifier = modifier,
         episode = baseEpisode,
+        playbackData = playbackData,
     )
 }
 
@@ -101,6 +109,7 @@ private fun ImprovedSearchEpisodeResultRow(
     playButtonListener: PlayButton.OnClickListener,
     modifier: Modifier = Modifier,
     episode: BaseEpisode? = null,
+    playbackData: EpisodePlaybackData? = null,
 ) {
     Row(
         modifier = modifier
@@ -161,7 +170,18 @@ private fun ImprovedSearchEpisodeResultRow(
                     }
                 },
                 update = { playButton ->
-                    playButton.setButtonType(episode, buttonType = PlayButtonType.PLAY, color = buttonColor, null)
+                    val theEpisode = episode.apply {
+                        playing = playbackData != null
+                        playingStatus = if (playbackData != null) EpisodePlayingStatus.IN_PROGRESS else EpisodePlayingStatus.NOT_PLAYED
+                        playedUpToMs = playbackData?.playbackPosition ?: 0
+                    }
+                    val buttonType = PlayButton.calculateButtonType(theEpisode, true)
+                    playButton.setButtonType(
+                        episode = theEpisode,
+                        buttonType = buttonType,
+                        color = buttonColor,
+                        fromListUuid = null,
+                    )
                 },
             )
         }

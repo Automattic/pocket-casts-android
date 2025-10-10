@@ -12,6 +12,8 @@ import au.com.shiftyjelly.pocketcasts.models.to.FolderItem
 import au.com.shiftyjelly.pocketcasts.models.to.ImprovedSearchResultItem
 import au.com.shiftyjelly.pocketcasts.models.to.SearchAutoCompleteItem
 import au.com.shiftyjelly.pocketcasts.models.to.SearchHistoryEntry
+import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
+import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackState
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
 import au.com.shiftyjelly.pocketcasts.repositories.searchhistory.SearchHistoryManager
@@ -20,9 +22,11 @@ import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.firstOrNull
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.reactive.asFlow
@@ -36,6 +40,7 @@ class SearchViewModel @Inject constructor(
     private val podcastManager: PodcastManager,
     private val analyticsTracker: AnalyticsTracker,
     private val episodeManager: EpisodeManager,
+    private val playbackManager: PlaybackManager,
 ) : ViewModel() {
     var isFragmentChangingConfigurations: Boolean = false
     var showSearchHistory: Boolean = true
@@ -46,6 +51,13 @@ class SearchViewModel @Inject constructor(
         SearchUiState.Idle,
     )
     val state: StateFlow<SearchUiState> = _state
+
+    val episodePlaybackFlow: Flow<EpisodePlaybackData?>
+        get() = playbackManager.playbackStateFlow.map {
+            if (it.state == PlaybackState.State.PLAYING) EpisodePlaybackData(
+                playingEpisodeUuid = it.episodeUuid, playbackPosition = it.positionMs
+            ) else null
+        }
 
     init {
         if (FeatureFlag.isEnabled(Feature.IMPROVED_SEARCH_SUGGESTIONS)) {
@@ -340,6 +352,10 @@ sealed interface SearchResults {
     }
 }
 
+data class EpisodePlaybackData(
+    val playingEpisodeUuid: String,
+    val playbackPosition: Int,
+)
 
 enum class ResultsFilters(val resId: Int) {
     TOP_RESULTS(LR.string.search_filters_top_results),
