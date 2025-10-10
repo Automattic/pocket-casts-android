@@ -5,18 +5,17 @@ import android.app.SearchManager
 import android.content.Context
 import android.os.Bundle
 import android.util.TypedValue
+import android.view.KeyEvent
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.inputmethod.EditorInfo
 import androidx.appcompat.widget.SearchView
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.platform.ViewCompositionStrategy
 import androidx.compose.ui.unit.dp
 import androidx.core.view.isVisible
 import androidx.core.view.updatePadding
@@ -49,6 +48,7 @@ import au.com.shiftyjelly.pocketcasts.views.extensions.hide
 import au.com.shiftyjelly.pocketcasts.views.extensions.show
 import au.com.shiftyjelly.pocketcasts.views.extensions.showKeyboard
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseFragment
+import au.com.shiftyjelly.pocketcasts.views.helper.PlayButtonListener
 import au.com.shiftyjelly.pocketcasts.views.helper.UiUtil
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
@@ -73,6 +73,9 @@ class SearchFragment : BaseFragment() {
 
     @Inject
     lateinit var settings: Settings
+
+    @Inject
+    lateinit var playButtonListener: PlayButtonListener
 
     interface Listener {
         fun onSearchEpisodeClick(episodeUuid: String, podcastUuid: String, source: EpisodeViewSource)
@@ -198,6 +201,14 @@ class SearchFragment : BaseFragment() {
             setTextColor(context.getThemeColor(UR.attr.secondary_text_01))
             val hintColor = UR.attr.secondary_text_02
             setHintTextColor(context.getThemeColor(hintColor))
+            setOnEditorActionListener { _, actionId, event ->
+                if (actionId == EditorInfo.IME_ACTION_SEARCH || actionId == EditorInfo.IME_ACTION_DONE || (event.action == KeyEvent.ACTION_DOWN && event.keyCode == KeyEvent.KEYCODE_ENTER)) {
+                    viewModel.selectSuggestion(searchView.query.toString())
+                    true
+                } else {
+                    false
+                }
+            }
         }
 
         val searchManager = view.context.getSystemService(Activity.SEARCH_SERVICE) as SearchManager
@@ -298,10 +309,11 @@ class SearchFragment : BaseFragment() {
                             onPodcastClick = { onPodcastClick(SearchHistoryEntry.fromAutoCompletePodcast(it), it.isSubscribed) },
                             onPodcastFollow = { viewModel.onSubscribeToPodcast(it.uuid) },
                             onEpisodeClick = {},
-                            onEpisodePlay = {},
+                            playButtonListener = playButtonListener,
                             onScroll = { UiUtil.hideKeyboard(searchView) },
                             bottomInset = bottomInset.pxToDp(LocalContext.current).dp,
                             isLoading = suggestions.operation is SearchUiState.SearchOperation.Loading,
+                            onReportSuggestionsRender = viewModel::trackSuggestionsShown,
                         )
                     }
                 }
@@ -315,17 +327,33 @@ class SearchFragment : BaseFragment() {
                 val state by viewModel.state.collectAsState()
                 (state as? SearchUiState.Results)?.let { results ->
                     AppThemeWithBackground(theme.activeTheme) {
-                        SearchInlineResultsPage(
-                            state = results,
-                            loading = state.isLoading,
-                            onEpisodeClick = ::onEpisodeClick,
-                            onPodcastClick = { onPodcastClick(SearchHistoryEntry.fromPodcast(it), it.isSubscribed) },
-                            onFolderClick = ::onFolderClick,
-                            onShowAllCLick = ::onShowAllClick,
-                            onFollowPodcast = ::onSubscribeToPodcast,
-                            onScroll = { UiUtil.hideKeyboard(searchView) },
-                            bottomInset = bottomInset.pxToDp(LocalContext.current).dp,
-                        )
+                        if (FeatureFlag.isEnabled(Feature.IMPROVED_SEARCH_RESULTS)) {
+                            ImprovedSearchResultsPage(
+                                state = results,
+                                loading = state.isLoading,
+                                onEpisodeClick = ::onEpisodeClick,
+                                onPodcastClick = { onPodcastClick(SearchHistoryEntry.fromPodcast(it), it.isSubscribed) },
+                                onFolderClick = ::onFolderClick,
+                                onFollowPodcast = ::onSubscribeToPodcast,
+                                playButtonListener = playButtonListener,
+                                fetchEpisode = viewModel::fetchEpisode,
+                                onScroll = { UiUtil.hideKeyboard(searchView) },
+                                bottomInset = bottomInset.pxToDp(LocalContext.current).dp,
+                                onFilterSelect = viewModel::selectFilter,
+                            )
+                        } else {
+                            SearchInlineResultsPage(
+                                state = results,
+                                loading = state.isLoading,
+                                onEpisodeClick = ::onEpisodeClick,
+                                onPodcastClick = { onPodcastClick(SearchHistoryEntry.fromPodcast(it), it.isSubscribed) },
+                                onFolderClick = ::onFolderClick,
+                                onShowAllCLick = ::onShowAllClick,
+                                onFollowPodcast = ::onSubscribeToPodcast,
+                                onScroll = { UiUtil.hideKeyboard(searchView) },
+                                bottomInset = bottomInset.pxToDp(LocalContext.current).dp,
+                            )
+                        }
                     }
                 }
                 binding.searchInlineResults.isVisible = state is SearchUiState.Results && !state.searchTerm.isNullOrBlank()

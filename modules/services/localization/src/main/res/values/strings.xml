@@ -440,8 +440,8 @@
     <string name="player_up_next_time_remaining">Total time remaining %s</string>
     <string name="player_up_next_time_left" translatable="false">@string/time_left</string>
     <plurals name="player_up_next_header_title">
-        <item quantity="one" formatted="true">%1$d episode - %2$s left</item>
-        <item quantity="other" formatted="true">%1$d episodes - %2$s left</item>
+        <item formatted="true" quantity="one">%1$d episode - %2$s left</item>
+        <item formatted="true" quantity="other">%1$d episodes - %2$s left</item>
     </plurals>
     <string name="player_open_url_failed">Could not find a browser to open %s.</string>
     <string name="player_archive_title" translatable="false">@string/archive</string>
@@ -749,7 +749,7 @@
         <item quantity="one">second</item>
         <item quantity="other">seconds</item>
     </plurals>
-   <!-- A short form representing days. Some like 1 d, 2 d, etc. -->
+    <!-- A short form representing days. Some like 1 d, 2 d, etc. -->
     <plurals name="day_short">
         <item quantity="one">d</item>
         <item quantity="other">d</item>
@@ -2381,12 +2381,11 @@
     <string name="wear_hide_password">Hide password</string>
     <string name="wear_show_password">Show password</string>
 
-
     <!-- Nova Launcher -->
     <string name="nova_launcher_subscribed_podcasts">Subscribed Podcasts</string>
     <string name="nova_launcher_recently_played">Recently Played</string>
     <string name="nova_launcher_new_releases">New Releases</string>
-<string name="nova_launcher_trending" translatable="false">@string/discover_trending</string>
+    <string name="nova_launcher_trending" translatable="false">@string/discover_trending</string>
     <string name="nova_launcher_continue_listening">Continue listening</string>
     <string name="nova_launcher_up_next" translatable="false">@string/up_next</string>
 
@@ -2541,7 +2540,6 @@
     <string name="winback_cancel_subscription_accept_offer_button_label">Accept offer</string>
     <string name="winback_cancel_subscription_continue_cancel_button_label">Continue with cancellation</string>
 
-
     <!-- Suggested Folders -->
     <string name="suggested_folders_title">Smart folders</string>
     <string name="suggested_folders_use_subtitle">We\'ve organized your podcasts into folders. Save them now and customize later to fit your style.</string>
@@ -2678,4 +2676,7 @@
     <string name="onboarding_interests_select_at_least_label">Select at least 3</string>
     <string name="onboarding_recommendations_title">We hope you love these suggestions!</string>
     <string name="onboarding_recommendations_message">Here are some great shows to start with. Tap to follow, search, or import from other apps.</string>
+    <string name="search_filters_top_results">Top Results</string>
+    <string name="search_filters_podcasts" translatable="false">@string/podcasts</string>
+    <string name="search_filters_episodes" translatable="false">@string/episodes</string>
 </resources>

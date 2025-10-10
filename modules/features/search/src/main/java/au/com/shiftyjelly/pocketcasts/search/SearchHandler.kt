@@ -33,7 +33,6 @@ import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.rx2.asFlow
-import kotlinx.coroutines.rx2.asObservable
 import timber.log.Timber
 
 class SearchHandler @Inject constructor(
@@ -106,10 +105,10 @@ class SearchHandler @Inject constructor(
         }
 
     private val subscribedPodcastUuids = podcastManager
-        .findSubscribedFlow()
-        .asObservable()
+        .findSubscribedRxSingle()
         .subscribeOn(Schedulers.io())
         .map { podcasts -> podcasts.map(Podcast::uuid).toHashSet() }
+        .toObservable()
 
     @OptIn(ExperimentalCoroutinesApi::class)
     private val autoCompleteResults = searchQuery.filter { it is Query.Suggestions }.asFlow()

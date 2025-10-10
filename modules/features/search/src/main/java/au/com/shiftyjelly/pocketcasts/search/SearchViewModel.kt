@@ -5,11 +5,13 @@ import androidx.lifecycle.viewModelScope
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
+import au.com.shiftyjelly.pocketcasts.models.entity.BaseEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.to.EpisodeItem
 import au.com.shiftyjelly.pocketcasts.models.to.FolderItem
 import au.com.shiftyjelly.pocketcasts.models.to.SearchAutoCompleteItem
 import au.com.shiftyjelly.pocketcasts.models.to.SearchHistoryEntry
+import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
 import au.com.shiftyjelly.pocketcasts.repositories.searchhistory.SearchHistoryManager
 import au.com.shiftyjelly.pocketcasts.search.SearchResultsFragment.Companion.ResultsType
@@ -19,8 +21,12 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.reactive.asFlow
+import kotlinx.coroutines.rx2.rxMaybe
+import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 @HiltViewModel
 class SearchViewModel @Inject constructor(
@@ -28,6 +34,7 @@ class SearchViewModel @Inject constructor(
     private val searchHistoryManager: SearchHistoryManager,
     private val podcastManager: PodcastManager,
     private val analyticsTracker: AnalyticsTracker,
+    private val episodeManager: EpisodeManager,
 ) : ViewModel() {
     var isFragmentChangingConfigurations: Boolean = false
     var showSearchHistory: Boolean = true
@@ -46,6 +53,18 @@ class SearchViewModel @Inject constructor(
                     .collect { operation ->
                         _state.update {
                             if (it is SearchUiState.Idle || it is SearchUiState.Suggestions) {
+                                when (operation) {
+                                    is SearchUiState.SearchOperation.Error -> {
+                                        analyticsTracker.track(
+                                            AnalyticsEvent.IMPROVED_SEARCH_SUGGESTIONS_FAILED,
+                                            mapOf(
+                                                "source" to "discover",
+                                            ),
+                                        )
+                                    }
+                                    else -> Unit
+                                }
+
                                 // only show loading for the initial query when autocomplete results are empty
                                 if (((it as? SearchUiState.Suggestions)?.operation as? SearchUiState.SearchOperation.Success)?.results?.isNotEmpty() == true && operation is SearchUiState.SearchOperation.Loading) {
                                     it
@@ -112,6 +131,33 @@ class SearchViewModel @Inject constructor(
         onSubscribeToPodcast(podcast.uuid)
     }
 
+    suspend fun fetchEpisode(episodeItem: EpisodeItem): BaseEpisode? {
+        return podcastManager.findOrDownloadPodcastRxSingle(episodeItem.podcastUuid)
+            .flatMapMaybe {
+                rxMaybe {
+                    episodeManager.findByUuid(episodeItem.uuid)
+                }
+            }
+            .toFlowable().asFlow().firstOrNull()
+    }
+
+    fun selectFilter(filter: ResultsFilters) {
+        if (FeatureFlag.isEnabled(Feature.IMPROVED_SEARCH_RESULTS) && _state.value is SearchUiState.Results) {
+            analyticsTracker.track(
+                AnalyticsEvent.IMPROVED_SEARCH_FILTER_TAPPED,
+                mapOf(
+                    "source" to "discover",
+                    "filter" to filter.name,
+                ),
+            )
+            _state.update {
+                (it as SearchUiState.Results).copy(
+                    selectedFilterIndex = ResultsFilters.entries.indexOf(filter),
+                )
+            }
+        }
+    }
+
     fun onSubscribeToPodcast(uuid: String) {
         podcastManager.subscribeToPodcast(podcastUuid = uuid, sync = true)
 
@@ -158,6 +204,14 @@ class SearchViewModel @Inject constructor(
         saveSearchTerm(suggestion)
         searchHandler.updateSearchQuery(suggestion, true)
 
+        analyticsTracker.track(
+            AnalyticsEvent.IMPROVED_SEARCH_SUGGESTION_TERM_TAPPED,
+            properties = mapOf(
+                "term" to suggestion,
+                "source" to "discover",
+            ),
+        )
+
         _state.value = SearchUiState.Results(operation = SearchUiState.SearchOperation.Loading(suggestion))
     }
 
@@ -193,6 +247,15 @@ class SearchViewModel @Inject constructor(
         )
     }
 
+    fun trackSuggestionsShown() {
+        analyticsTracker.track(
+            AnalyticsEvent.IMPROVED_SEARCH_SUGGESTIONS_SHOWN,
+            mapOf(
+                "source" to "discover",
+            ),
+        )
+    }
+
     enum class SearchResultType(val value: String) {
         PODCAST_LOCAL_RESULT("podcast_local_result"),
         PODCAST_REMOTE_RESULT("podcast_remote_result"),
@@ -223,6 +286,12 @@ data class SearchResults(
     val isEmpty: Boolean get() = podcasts.isEmpty() && episodes.isEmpty()
 }
 
+enum class ResultsFilters(val resId: Int) {
+    TOP_RESULTS(LR.string.search_filters_top_results),
+    PODCASTS(LR.string.search_filters_podcasts),
+    EPISODES(LR.string.search_filters_episodes),
+}
+
 sealed interface SearchUiState {
 
     val searchTerm: String?
@@ -249,5 +318,9 @@ sealed interface SearchUiState {
 
     data object Idle : SearchUiState
     data class Suggestions(val operation: SearchOperation<List<SearchAutoCompleteItem>>) : SearchUiState
-    data class Results(val operation: SearchOperation<SearchResults>) : SearchUiState
+    data class Results(
+        val operation: SearchOperation<SearchResults>,
+        val filterOptions: Set<ResultsFilters> = ResultsFilters.entries.toSet(),
+        val selectedFilterIndex: Int = 0,
+    ) : SearchUiState
 }

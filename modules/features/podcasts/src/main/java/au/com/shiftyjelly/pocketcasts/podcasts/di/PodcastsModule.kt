@@ -1,7 +1,7 @@
 package au.com.shiftyjelly.pocketcasts.podcasts.di
 
-import au.com.shiftyjelly.pocketcasts.podcasts.helper.PlayButtonListener
-import au.com.shiftyjelly.pocketcasts.podcasts.view.components.PlayButton
+import au.com.shiftyjelly.pocketcasts.views.buttons.PlayButton
+import au.com.shiftyjelly.pocketcasts.views.helper.PlayButtonListener
 import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn

@@ -181,7 +181,7 @@
                 tools:text="16 mins" />
         </LinearLayout>
 
-        <au.com.shiftyjelly.pocketcasts.podcasts.view.components.PlayButton
+        <au.com.shiftyjelly.pocketcasts.views.buttons.PlayButton
             android:id="@+id/playButton"
             android:layout_width="52dp"
             android:layout_height="0dp"
