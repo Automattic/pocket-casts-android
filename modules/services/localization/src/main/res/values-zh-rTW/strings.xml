@@ -1,11 +1,23 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2025-09-25 13:54:03+0000
+Translation-Revision-Date: 2025-10-09 13:54:12+0000
 Plural-Forms: nplurals=1; plural=0;
 Generator: GlotPress/2.4.0-alpha
 Language: zh_TW
 -->
 <resources>
+    <string name="winback_cancel_subscription_stay_button_label">保留訂閱</string>
+    <string name="filter_title">播放清單標題</string>
+    <string name="filter_id">播放清單 ID</string>
+    <string name="filters_filter_name">播放清單名稱</string>
+    <string name="playlists_not_found">找不到播放清單</string>
+    <string name="notification_filters_message_2">建立用來整理單集的智慧播放清單。</string>
+    <string name="settings_status_service_account_summary_2">該服務可儲存單集進度、你追蹤的 Podcast、播放清單等。</string>
+    <string name="settings_choose_playlists">選擇播放清單</string>
+    <string name="number_one">1</string>
+    <string name="settings_auto_download_playlists">自動下載播放清單</string>
+    <string name="playlists_selected_all">已選取所有播放清單</string>
+    <string name="podcasts_selected_all">已選取所有 Podcast 節目。</string>
     <string name="smart_playlists">智慧播放清單</string>
     <string name="select_smart_playlists">選取智慧播放清單</string>
     <string name="podcast_not_in_playlists">未包含於任何智慧播放清單</string>
@@ -350,7 +362,6 @@ Language: zh_TW
     <string name="settings_pixel_watch_subtitle">將標準下一首/上一首按鈕作為略過按鈕，取代自訂略過按鈕，以便與更多裝置相容。</string>
     <string name="settings_pixel_watch_title">Pixel Watch 略過按鈕</string>
     <string name="winback_cancel_subscription_cancel_button_label">是，請取消我的訂閱</string>
-    <string name="winback_cancel_subscription_stay_button_label">我其實想繼續訂閱</string>
     <string name="winback_cancel_subscription_perk_files">系統會刪除上傳至你 Pocket Casts 帳號的所有檔案 (但會保留下載到你行動裝置的檔案)。</string>
     <string name="winback_cancel_subscription_perk_folders">你的資料夾將會移除，而資料夾內容會移回 Podcast 畫面中。</string>
     <string name="winback_cancel_subscription_perk_plus">在此日期之後，Pocket Casts Plus 功能使用權限將會鎖定。</string>
@@ -586,7 +597,6 @@ Language: zh_TW
     <string name="hours_and_minutes">%d 小時 %d 分鐘</string>
     <string name="player_sleep_time_fired_end_of_chapter">睡眠計時器於章節結尾停止。</string>
     <string name="player_sleep_in_chapters">在 %d 個章節後休眠</string>
-    <string name="player_sleep_in_one_chapter">在 1 個章節後休眠</string>
     <string name="player_sleep_timer_in_chapter_plural">%d 個章節後</string>
     <string name="player_sleep_timer_in_chapter">1 個章節後</string>
     <string name="player_sleep_timer_end_of_episode">單集結束</string>
@@ -597,7 +607,6 @@ Language: zh_TW
     <string name="settings_use_episode_artwork_title">單集封面圖片</string>
     <string name="settings_use_episode_artwork_advanced">進階單集封面圖片設定</string>
     <string name="player_sleep_in_episodes">在 %d 集後休眠</string>
-    <string name="player_sleep_in_one_episode">在 1 集後休眠</string>
     <string name="player_sleep_timer_stopped_your_podcast">睡眠計時器停止播放 Podcast。</string>
     <string name="player_sleep_timer_restarted_after_device_shake">裝置晃動後重新啟動睡眠計時器</string>
     <string name="widget_nothing_in_up_next">「接下來播放」沒有內容</string>
@@ -736,7 +745,6 @@ Language: zh_TW
     <string name="settings_continuous_playback_summary">如果「接下來播放」佇列是空的，我們會播放你正在聆聽的同一個 Podcast 或清單內的單集。</string>
     <string name="renew_your_subscription">續訂</string>
     <string name="log_in_watch_from_phone_instructions_3">如果遇到問題，請確認手機執行的 Pocket Casts 版本與手錶 (%s) 相同</string>
-    <string name="log_in_free_account">%s 正在使用免費帳號</string>
     <string name="player_play_failed_check_internet">無法載入 Podcast。 請檢查你的網際網路連線並再試一次。</string>
     <string name="empty_play_state">挑選單集以開始</string>
     <string name="settings_beta_features">Beta 功能</string>
@@ -845,10 +853,6 @@ Language: zh_TW
     <string name="settings_media_actions_customise">自訂媒體動作</string>
     <string name="onboarding_recommendations_more">更多 %s</string>
     <string name="clear_up_next">清除「接下來播放」</string>
-    <string name="filter_id_or_title">篩選 ID 或標題</string>
-    <string name="filter_title">篩選標題</string>
-    <string name="filter_id_description">代表篩選條件的唯一 ID。 可用於「查詢篩選單集」動作。</string>
-    <string name="filter_id">篩選 ID</string>
     <string name="episode_count">單集數</string>
     <string name="no_episodes_found_for_episode_ids_x">單集 ID %1$s 未找到單集</string>
     <string name="no_episode_ids_provided">未提供單集 ID</string>
@@ -879,12 +883,14 @@ Language: zh_TW
     <string name="podcast_id_description">代表 Podcast 的唯一 ID。 可用於「查詢 Podcast 單集」動作。</string>
     <string name="podcast_id">Podcast ID</string>
     <string name="pocket_casts_query_up_next_episodes">Pocket Casts 查詢接下來播放單集</string>
-    <string name="pocket_casts_query_filter_episodes">Pocket Casts 查詢篩選單集</string>
-    <string name="pocket_casts_query_filters">Pocket Casts 查詢篩選條件</string>
     <string name="pocket_casts_add_to_up_next">Pocket Casts 新增至接下來播放</string>
     <string name="pocket_casts_query_podcast_episodes">Pocket Casts 查詢 Podcast 單集</string>
     <string name="pocket_casts_query_podcasts">Pocket Casts 查詢 Podcast</string>
     <string name="onboarding_plus_can_be_canceled_at_any_time">可隨時取消。</string>
+    <string name="filter_id_or_title">播放清單 ID 或標題</string>
+    <string name="filter_id_description">代表該播放清單的唯一 ID。 可用於「查詢播放清單單集」動作。</string>
+    <string name="pocket_casts_query_filter_episodes">Pocket Casts 查詢播放清單單集</string>
+    <string name="pocket_casts_query_filters">Pocket Casts 查詢播放清單</string>
     <string name="profile_cancel_confirm_cancel_button_title">是，請取消我的訂閱」</string>
     <string name="profile_cancel_confirm_stay_button_title">實際上，我想繼續訂閱」</string>
     <string name="profile_cancel_confirm_item_uploads">系統會刪除上傳至你 Pocket Casts 帳號的所有檔案 (但會保留下載到行動裝置的檔案)。</string>
@@ -981,9 +987,9 @@ Language: zh_TW
     <string name="trim_silence_mode_not_valid">無聲修去模式 %1$s 無效</string>
     <string name="profile_account_upgraded">帳號已升級</string>
     <string name="pocket_casts_control_playback">Pocket Casts 控制播放</string>
-    <string name="pocket_casts_play_filter">Pocket Casts 播放篩選條件</string>
     <string name="time_to_skip_not_valid">跳過時間「%1$s」無效</string>
     <string name="time_to_skip_seconds">跳過時間 (秒)</string>
+    <string name="pocket_casts_play_filter">Pocket Casts 播放播放清單</string>
     <string name="settings_select_filters">選取篩選條件</string>
     <string name="settings_import_url_summary">使用 URL 從 OPML 檔案匯入你的 Podcast。</string>
     <string name="settings_import_url">依 URL</string>
@@ -1000,9 +1006,9 @@ Language: zh_TW
     <string name="playback_command">播放指令</string>
     <string name="command_x_not_valid">指令「%1$s」無效</string>
     <string name="must_provide_command_name">必須提供指令名稱</string>
-    <string name="filter_x_not_found">找不到篩選條件「%1$s」</string>
-    <string name="must_provide_filter_name">必須提供篩選條件名稱</string>
-    <string name="no_episodes_in_filter_x">找不到符合篩選條件「%1$s」的單集</string>
+    <string name="filter_x_not_found">找不到播放清單「%1$s」</string>
+    <string name="must_provide_filter_name">請提供播放清單名稱</string>
+    <string name="no_episodes_in_filter_x">播放清單「%1$s」中沒有單集</string>
     <string name="settings_app_icon_halloween">萬聖節</string>
     <string name="end_of_year_launch_modal_summary">查看你最熱門的 Podcast、分類、收聽統計等資料。和朋友分享這些資訊，並向你最喜愛的創作者表達敬意！</string>
     <string name="end_of_year_launch_modal_primary_button_title">檢視我的 2024 年度播放回顧</string>
@@ -1128,7 +1134,6 @@ Language: zh_TW
     <string name="off">關閉</string>
     <string name="discover_popular_in">在%s十分熱門</string>
     <string name="discover_popular">熱門</string>
-    <string name="filters_filter_name">篩選條件名稱</string>
     <string name="episode_short_episode">第 %d 集</string>
     <string name="episode_short_season">日%d</string>
     <string name="episode_short_season_episode">第 %1$d 季第 %2$d 集</string>
@@ -1631,7 +1636,6 @@ Language: zh_TW
     <string name="profile_stats_total">總計</string>
     <string name="profile_stats_time_saved_by">省下的時間</string>
     <string name="profile_stats_since_listened_for">自 %s 以來，你已收聽</string>
-    <string name="profile_stats_share_to">分享至…</string>
     <string name="profile_stats_listened_for">你已收聽</string>
     <string name="profile_stat_days_listened">已收聽的天數</string>
     <string name="profile_sonos_title">Pocket Casts 和 Sonos</string>
@@ -1680,8 +1684,8 @@ Language: zh_TW
     <string name="profile_last_refresh">上次重新整理：%s前</string>
     <string name="profile_joined">已加入：</string>
     <string name="profile_get_plus">取得 Pocket Casts Plus 即可解鎖此功能和其他功能！</string>
-    <string name="profile_license_agreement">Pocket Casts 重視你的隱私權。 本隱私權政策說明我們收集的資訊與原因、資訊用途以及處理方式。 本政策適用於 iOS 和 Android Pocket Casts 應用程式，以及與 macOS 和 Windows 應用程式關聯的 Pocket Casts 網頁服務 (共同或個別皆稱為「本服務」)。 使用本服務，即表示你同意本隱私權政策。 如果你開啟應用程式的推播通知，我們會儲存 Apple 提供的推播權杖，藉此將推播通知傳送到你的裝置。 若你購買 Web 應用程式，我們會儲存購買項目的交易 ID。 如果你選擇不建立帳號，並且不使用推播通知，我們的伺服器不會儲存你的任何資料。 Pocket Casts Web 服務也會使用 Cookie 和類似技術，讓你保持登入狀態。 如果你選擇從服務內部產生支援要求，我們可能會產生包含其他資料的附件以協助解決支援要求，你可以在提交要求前檢視這些資料。</string>
     <string name="profile_free_account">免費帳號</string>
+    <string name="profile_license_agreement">Pocket Casts 重視你的隱私權。 本隱私權政策說明我們收集的資訊與原因、資訊用途以及處理方式。 本政策適用於 iOS 和 Android Pocket Casts 應用程式，以及與 macOS 和 Windows 應用程式關聯的 Pocket Casts 網頁服務 (共同或個別皆稱為「本服務」)。 使用本服務，即表示你同意本隱私權政策。 如果你開啟應用程式的推播通知，我們會儲存 Apple 提供的推播權杖，藉此將推播通知傳送到你的裝置。 若你購買 Web 應用程式，我們會儲存購買項目的交易 ID。 如果你選擇不建立帳號，並且不使用推播通知，我們的伺服器不會儲存你的任何資料。 Pocket Casts Web 服務也會使用 Cookie 和類似技術，讓你保持登入狀態。 如果你選擇從服務內部產生支援要求，我們可能會產生包含其他資料的附件以協助解決支援要求，你可以在提交要求前檢視這些資料。</string>
     <string name="profile_files_remove_image">取代圖片</string>
     <string name="profile_files_empty_summary">想收聽自己的檔案嗎？\n點選 + 按鈕即可在 Pocket Casts 中開啟這些檔案，檔案會顯示於此處。</string>
     <string name="profile_files_add_filename">名稱</string>
@@ -2210,6 +2214,9 @@ Language: zh_TW
     </plurals>
     <plurals name="podcasts_count">
         <item quantity="other">%d 個 Podcast</item>
+    </plurals>
+    <plurals name="podcasts_selected_count">
+        <item quantity="other">已選取 %1$d 個 Podcast 節目</item>
     </plurals>
     <plurals name="profile_stats_day_listened">
         <item quantity="other">天 (收聽時間)</item>

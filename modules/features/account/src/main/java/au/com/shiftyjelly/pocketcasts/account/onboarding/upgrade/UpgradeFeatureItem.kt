@@ -29,6 +29,11 @@ enum class PlusUpgradeFeatureItem(
         override val isMonthlyFeature get() = FeatureFlag.isEnabled(Feature.BANNER_ADS_PLAYER) || FeatureFlag.isEnabled(Feature.BANNER_ADS_PODCASTS)
         override fun title() = LR.string.onboarding_plus_feature_no_banner_ads
     },
+    Transcripts(
+        image = IR.drawable.ic_transcript_24,
+    ) {
+        override fun title() = LR.string.onboarding_upgrade_features_transcripts
+    },
     Folders(
         image = IR.drawable.ic_plus_feature_folder,
     ) {

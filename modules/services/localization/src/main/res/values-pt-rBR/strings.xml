@@ -1,11 +1,23 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2025-09-25 15:54:03+0000
+Translation-Revision-Date: 2025-10-08 14:54:03+0000
 Plural-Forms: nplurals=2; plural=(n > 1);
 Generator: GlotPress/2.4.0-alpha
 Language: pt_BR
 -->
 <resources>
+    <string name="winback_cancel_subscription_stay_button_label">Manter minha assinatura</string>
+    <string name="filter_title">Título da lista de reprodução</string>
+    <string name="filter_id">ID da lista de reprodução</string>
+    <string name="filters_filter_name">Nome da lista de reprodução</string>
+    <string name="playlists_not_found">Nenhuma lista de reprodução encontrada</string>
+    <string name="notification_filters_message_2">Crie listas de reprodução para organizar seus episódios.</string>
+    <string name="settings_status_service_account_summary_2">O serviço usado para armazenar o progresso dos episódios, podcasts que você segue, listas de reprodução, etc.</string>
+    <string name="settings_choose_playlists">Escolher listas de reprodução</string>
+    <string name="number_one">um</string>
+    <string name="settings_auto_download_playlists">Download automático de listas de reprodução</string>
+    <string name="playlists_selected_all">Todas as listas de reprodução selecionadas</string>
+    <string name="podcasts_selected_all">Todos os podcasts selecionados</string>
     <string name="smart_playlists">Listas de reprodução inteligente</string>
     <string name="select_smart_playlists">Selecione listas de reprodução inteligente</string>
     <string name="podcast_not_in_playlists">Não está incluso em nenhuma das listas de reprodução inteligente</string>
@@ -355,7 +367,6 @@ Language: pt_BR
     <string name="winback_cancel_subscription_perk_plus">O acesso às funcionalidades do Pocket Casts Plus será bloqueado após esta data.</string>
     <string name="winback_cancel_subscription_perk_active_without_date">Sua assinatura atual permanecerá ativa até a data de expiração.</string>
     <string name="winback_cancel_subscription_perk_active_with_date">Sua assinatura atual permanecerá ativa até %1$s.</string>
-    <string name="winback_cancel_subscription_stay_button_label">Não, desejo manter a assinatura</string>
     <string name="winback_cancel_subscription_header_description">Isso mudará seu plano para uma conta gratuita.</string>
     <string name="winback_changing_plan">Alterar plano</string>
     <string name="winback_too_many_subscritpions_button_label">Gerenciar assinaturas na Play Store</string>
@@ -586,7 +597,6 @@ Language: pt_BR
     <string name="hours_and_minutes">%d horas e %d minutos</string>
     <string name="player_sleep_time_fired_end_of_chapter">O temporizador parou no fim do seu capítulo.</string>
     <string name="player_sleep_in_chapters">Dormindo em %d capítulos</string>
-    <string name="player_sleep_in_one_chapter">Dormindo em 1 capítulo</string>
     <string name="player_sleep_timer_in_chapter_plural">Em %d capítulos</string>
     <string name="player_sleep_timer_in_chapter">Em 1 capítulo</string>
     <string name="player_sleep_timer_end_of_episode">Fim do episódio</string>
@@ -597,7 +607,6 @@ Language: pt_BR
     <string name="settings_use_episode_artwork_title">Arte do episódio</string>
     <string name="settings_use_episode_artwork_advanced">Configurações avançadas de arte do episódio</string>
     <string name="player_sleep_in_episodes">Dormindo em %d episódios</string>
-    <string name="player_sleep_in_one_episode">Dormindo em 1 episódio</string>
     <string name="player_sleep_timer_stopped_your_podcast">O temporizador interrompeu o podcast.</string>
     <string name="player_sleep_timer_restarted_after_device_shake">O temporizador reiniciou com o sacudir do dispositivo.</string>
     <string name="widget_check_out_discover">Confira \"Explorar\" para ver mais</string>
@@ -736,7 +745,6 @@ Language: pt_BR
     <string name="settings_continuous_playback_summary">Se a fila de Próximos estiver vazia, vamos reproduzir os episódios do mesmo podcast ou da lista que você está ouvindo.</string>
     <string name="renew_your_subscription">Renove sua assinatura</string>
     <string name="log_in_watch_from_phone_instructions_3">Se estiver tendo problemas, confira se a versão do Pocket Casts no celular e no smartwatch são a mesma (%s)</string>
-    <string name="log_in_free_account">%s está usando uma conta gratuita</string>
     <string name="player_play_failed_check_internet">Não foi possível carregar o podcast. Verifique sua conexão com a Internet e tente novamente.</string>
     <string name="empty_play_state">Escolha um episódio para começar</string>
     <string name="settings_beta_features">Funcionalidades Beta</string>
@@ -845,8 +853,6 @@ Language: pt_BR
     <string name="settings_media_actions_customise">Personalizar ações de mídia</string>
     <string name="onboarding_recommendations_more">Mais %s</string>
     <string name="clear_up_next">Limpar Próximos</string>
-    <string name="filter_title">Título do filtro</string>
-    <string name="filter_id">ID do filtro</string>
     <string name="episode_count">Contagem de episódios</string>
     <string name="latest_episode_date">Data do último episódio</string>
     <string name="added_date">Data de adição</string>
@@ -868,8 +874,6 @@ Language: pt_BR
     <string name="episode_id">ID do episódio</string>
     <string name="podcast_title">Título do podcast</string>
     <string name="podcast_id">ID do podcast</string>
-    <string name="filter_id_or_title">Título ou ID do filtro</string>
-    <string name="filter_id_description">Uma ID exclusiva que representa o filtro. Pode ser usada na ação \"Consultar episódios filtrados\".</string>
     <string name="no_episodes_found_for_episode_ids_x">Nenhum episódio encontrado para as IDs %1$s</string>
     <string name="no_episode_ids_provided">Nenhuma ID de episódio fornecida</string>
     <string name="playing_status_explained">0 = Não reproduzido; 1 = Em andamento; 2 = Concluído</string>
@@ -879,12 +883,14 @@ Language: pt_BR
     <string name="episode_id_description">Uma ID exclusiva que representa o episódio. Pode ser usada na ação \"Adicionar aos Próximos\".</string>
     <string name="podcast_id_description">Uma ID exclusiva que representa o podcast. Pode ser usada na ação \"Consultar episódios de podcast\".</string>
     <string name="pocket_casts_query_up_next_episodes">Pocket Casts – Consultar episódios na lista Próximos</string>
-    <string name="pocket_casts_query_filter_episodes">Pocket Casts – Consultar episódios filtrados</string>
-    <string name="pocket_casts_query_filters">Pocket Casts – Consultar filtros</string>
     <string name="pocket_casts_add_to_up_next">Pocket Casts – Adicionar aos Próximos</string>
     <string name="pocket_casts_query_podcast_episodes">Pocket Casts – Consultar episódios de podcast</string>
     <string name="pocket_casts_query_podcasts">Pocket Casts – Consultar podcasts</string>
     <string name="onboarding_plus_can_be_canceled_at_any_time">É possível cancelar a qualquer momento.</string>
+    <string name="filter_id_or_title">Título ou ID da lista de reprodução</string>
+    <string name="filter_id_description">Uma ID exclusiva que representa a lista de reprodução. Pode ser usada na ação \"Consultar episódios da lista de reprodução\".</string>
+    <string name="pocket_casts_query_filter_episodes">Pocket Casts – Consultar episódios da lista de reprodução</string>
+    <string name="pocket_casts_query_filters">Pocket Casts – Consultar lista de reprodução</string>
     <string name="profile_cancel_confirm_cancel_button_title">Cancelar minha assinatura\"</string>
     <string name="profile_cancel_confirm_item_folders">Suas pastas serão removidas, e o conteúdo delas voltará para a tela Podcasts.</string>
     <string name="profile_cancel_confirm_stay_button_title">Permanecer com minha assinatura\"</string>
@@ -981,9 +987,9 @@ Language: pt_BR
     <string name="playback_speed_not_valid">Velocidade de reprodução %1$s inválida</string>
     <string name="profile_account_upgraded">Conta com upgrade</string>
     <string name="pocket_casts_control_playback">Controle de reprodução do Pocket Casts</string>
-    <string name="pocket_casts_play_filter">Filtro de reprodução do Pocket Casts</string>
     <string name="time_to_skip_not_valid">Não é válido pular para o tempo %1$s</string>
     <string name="time_to_skip_seconds">Tempo para o qual pular (segundos)</string>
+    <string name="pocket_casts_play_filter">Pocket Casts – Ouvir lista de reprodução</string>
     <string name="settings_select_filters">Selecionar filtros</string>
     <string name="settings_import_url_summary">Importe seus podcasts de um arquivo OPML usando uma URL.</string>
     <string name="settings_import_url">Por URL</string>
@@ -1000,9 +1006,9 @@ Language: pt_BR
     <string name="playback_command">Comando de reprodução</string>
     <string name="command_x_not_valid">Comando %1$s inválido</string>
     <string name="must_provide_command_name">É necessário fornecer o nome de comando</string>
-    <string name="no_episodes_in_filter_x">Nenhum episódio no filtro %1$s</string>
-    <string name="filter_x_not_found">Filtro %1$s não encontrado</string>
-    <string name="must_provide_filter_name">É necessário fornecer um nome de filtro</string>
+    <string name="no_episodes_in_filter_x">Nenhum episódio na lista de reprodução %1$s</string>
+    <string name="filter_x_not_found">Lista de reprodução %1$s não encontrada</string>
+    <string name="must_provide_filter_name">É necessário fornecer o nome da lista de reprodução</string>
     <string name="end_of_year_launch_modal_summary">Veja seus principais podcasts, categorias, estatísticas de reprodução e muito mais. Compartilhe com amigos e divulgue seus criadores favoritos!</string>
     <string name="settings_app_icon_halloween">Halloween</string>
     <string name="end_of_year_launch_modal_primary_button_title">Ver minha retrospectiva de 2024</string>
@@ -1129,7 +1135,6 @@ Language: pt_BR
     <string name="discover_popular_in">Populares em %s</string>
     <string name="discover_popular">Populares</string>
     <string name="discover_top">Principais</string>
-    <string name="filters_filter_name">Nome do filtro</string>
     <string name="episode_short_episode">E%d</string>
     <string name="episode_short_season">T%d</string>
     <string name="episode_short_season_episode">T%1$d E%2$d</string>
@@ -1633,7 +1638,6 @@ Language: pt_BR
     <string name="profile_stats_total">TOTAL</string>
     <string name="profile_stats_time_saved_by">Tempo economizado</string>
     <string name="profile_stats_since_listened_for">Desde %s, você ouviu podcasts por</string>
-    <string name="profile_stats_share_to">Compartilhar em…</string>
     <string name="profile_stats_listened_for">Você ouviu podcasts por</string>
     <string name="profile_stat_days_listened">Dias ouvidos</string>
     <string name="profile_sonos_title">Pocket Casts e Sonos</string>
@@ -2229,6 +2233,10 @@ Language: pt_BR
     <plurals name="podcasts_count">
         <item quantity="one">%d podcast</item>
         <item quantity="other">%d podcasts</item>
+    </plurals>
+    <plurals name="podcasts_selected_count">
+        <item quantity="one">%1$d podcast selecionado</item>
+        <item quantity="other">%1$d podcasts selecionados</item>
     </plurals>
     <plurals name="profile_stats_day_listened">
         <item quantity="one">dia ouvido</item>

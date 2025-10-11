@@ -11,7 +11,10 @@ import au.com.shiftyjelly.pocketcasts.repositories.playlist.PlaylistPreview
 import au.com.shiftyjelly.pocketcasts.repositories.user.UserManager
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
+import kotlin.time.Duration.Companion.milliseconds
 import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.WhileSubscribed
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
@@ -46,7 +49,17 @@ class PlaylistsViewModel @Inject constructor(
             showPremadePlaylistsTooltip = shouldShowPremadePlaylistsTooltip(showTooltip, playlists),
             miniPlayerInset = bottomInset,
         )
-    }.stateIn(viewModelScope, SharingStarted.Eagerly, UiState.Empty)
+    }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(stopTimeout = 300.milliseconds), UiState.Empty)
+
+    fun getPreviewMetadataFlow(playlistUuid: String): StateFlow<PlaylistPreview.Metadata?> {
+        return playlistManager.getPreviewMetadataFlow(playlistUuid)
+    }
+
+    fun refreshPreviewMetadata(playlistUuid: String) {
+        viewModelScope.launch {
+            playlistManager.refreshPreviewMetadata(playlistUuid)
+        }
+    }
 
     fun deletePlaylist(uuid: String) {
         viewModelScope.launch {
@@ -118,10 +131,11 @@ class PlaylistsViewModel @Inject constructor(
         val showPremadePlaylistsTooltip: Boolean,
         val miniPlayerInset: Int,
     ) {
-        val showEmptyState get() = when (playlists) {
-            is PlaylistsState.Loading -> false
-            is PlaylistsState.Loaded -> playlists.value.isEmpty()
-        }
+        val showEmptyState
+            get() = when (playlists) {
+                is PlaylistsState.Loading -> false
+                is PlaylistsState.Loaded -> playlists.value.isEmpty()
+            }
 
         companion object {
             val Empty = UiState(

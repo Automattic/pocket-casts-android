@@ -78,8 +78,6 @@ class AutoPlaybackServiceTest {
             val playlist = ManualPlaylistPreview(
                 uuid = "uuid",
                 title = "Playlist title",
-                episodeCount = 0,
-                artworkPodcastUuids = emptyList(),
                 settings = Playlist.Settings.ForPreview,
                 icon = PlaylistIcon(0),
             )

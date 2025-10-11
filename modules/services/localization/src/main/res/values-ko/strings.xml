@@ -350,7 +350,6 @@ Language: ko_KR
     <string name="settings_pixel_watch_subtitle">사용자 정의된 건너뛰기 버튼을 건너뛰기 버튼으로 작동하는 표준 다음/이전 트랙 버튼으로 교체하여 더 많은 기기와의 호환성을 확보하세요.</string>
     <string name="settings_pixel_watch_title">Pixel Watch 건너뛰기 버튼</string>
     <string name="winback_cancel_subscription_cancel_button_label">예, 구독을 취소합니다</string>
-    <string name="winback_cancel_subscription_stay_button_label">구독을 유지하고 싶습니다</string>
     <string name="winback_cancel_subscription_perk_files">Pocket Casts에 업로드된 모든 파일이 삭제됩니다(단, 모바일 장치에 다운로드한 파일은 유지).</string>
     <string name="winback_cancel_subscription_perk_folders">폴더가 제거되며 폴더에 있던 콘텐츠는 팟캐스트 화면으로 다시 이동합니다.</string>
     <string name="winback_cancel_subscription_perk_plus">이 날짜 이후로 Pocket Casts Plus 기능에 접근하는 기능이 잠깁니다.</string>
@@ -586,7 +585,6 @@ Language: ko_KR
     <string name="hours_and_minutes">%d시간 %d분</string>
     <string name="player_sleep_time_fired_end_of_chapter">챕터 종료 시 절전 타이머가 중지되었습니다.</string>
     <string name="player_sleep_in_chapters">%d개 챕터에서 중지됨</string>
-    <string name="player_sleep_in_one_chapter">1개 챕터에서 중지됨</string>
     <string name="player_sleep_timer_in_chapter_plural">%d개 챕터에서</string>
     <string name="player_sleep_timer_in_chapter">1개 챕터에서</string>
     <string name="player_sleep_timer_end_of_episode">에피소드 종료</string>
@@ -597,7 +595,6 @@ Language: ko_KR
     <string name="settings_use_episode_artwork_title">에피소드 아트워크</string>
     <string name="settings_use_episode_artwork_advanced">고급 에피소드 아트워크 설정</string>
     <string name="player_sleep_in_episodes">%d개 에피소드에서 절전</string>
-    <string name="player_sleep_in_one_episode">1개 에피소드에서 절전</string>
     <string name="player_sleep_timer_stopped_your_podcast">절전 타이머로 인해 팟캐스트가 중단되었습니다.</string>
     <string name="player_sleep_timer_restarted_after_device_shake">기기가 흔들려 절전 타이머가 재시작되었습니다</string>
     <string name="widget_check_out_discover">발견에서 자세히 알아보기</string>
@@ -736,7 +733,6 @@ Language: ko_KR
     <string name="settings_continuous_playback_summary">다음 큐가 비어 있으면 현재 듣고 있는 것과 동일한 팟캐스트 또는 목록의 에피소드를 재생합니다.</string>
     <string name="renew_your_subscription">구독 갱신</string>
     <string name="log_in_watch_from_phone_instructions_3">문제가 있는 경우 휴대폰에서 시계(%s)와 동일한 버전의 Pocket Casts를 실행하고 있는지 확인하세요.</string>
-    <string name="log_in_free_account">%s은(는) 무료 계정을 사용하고 있습니다.</string>
     <string name="player_play_failed_check_internet">팟캐스트를 로드할 수 없습니다. 인터넷 연결을 확인하고 다시 시도하세요.</string>
     <string name="empty_play_state">시작할 에피소드 선택</string>
     <string name="settings_beta_features">베타 기능</string>
@@ -844,10 +840,6 @@ Language: ko_KR
     <string name="settings_media_actions_prioritize_title">사용자 정의 미디어 작업 우선순위 지정</string>
     <string name="settings_media_actions_customise">미디어 작업 사용자 정의</string>
     <string name="onboarding_recommendations_more">%s 추가</string>
-    <string name="filter_id_or_title">필터 ID 또는 제목</string>
-    <string name="filter_title">필터 제목</string>
-    <string name="filter_id_description">필터를 나타내는 고유 ID입니다. \'쿼리 필터 에피소드\' 작업에 사용할 수 있습니다.</string>
-    <string name="filter_id">필터 ID</string>
     <string name="episode_count">에피소드 개수</string>
     <string name="no_episodes_found_for_episode_ids_x">에피소드 ID %1$s(으)로 찾은 에피소드 없음</string>
     <string name="no_episode_ids_provided">제공된 에피소드 ID 없음</string>
@@ -879,8 +871,6 @@ Language: ko_KR
     <string name="podcast_id_description">팟캐스트를 나타내는 고유 ID입니다. \'쿼리 팟캐스트 에피소드\' 작업에 사용할 수 있습니다.</string>
     <string name="podcast_id">팟캐스트 ID</string>
     <string name="pocket_casts_query_up_next_episodes">Pocket Casts 쿼리 다음 차례 에피소드</string>
-    <string name="pocket_casts_query_filter_episodes">Pocket Casts 쿼리 필터 에피소드</string>
-    <string name="pocket_casts_query_filters">Pocket Casts 쿼리 필터</string>
     <string name="pocket_casts_add_to_up_next">Pocket Casts 다음 차례에 추가</string>
     <string name="pocket_casts_query_podcast_episodes">Pocket Casts 쿼리 팟캐스트 에피소드</string>
     <string name="pocket_casts_query_podcasts">Pocket Casts 쿼리 팟캐스트</string>
@@ -981,7 +971,6 @@ Language: ko_KR
     <string name="playback_speed_not_valid">재생 속도 %1$s 유효하지 않음</string>
     <string name="profile_account_upgraded">계정 업그레이드됨</string>
     <string name="pocket_casts_control_playback">Pocket Casts 컨트롤 재생</string>
-    <string name="pocket_casts_play_filter">Pocket Casts 재생 필터</string>
     <string name="time_to_skip_not_valid">건너뛰기 시간 %1$s 유효하지 않음</string>
     <string name="time_to_skip_seconds">건너뛰기 시간(초)</string>
     <string name="settings_select_filters">필터 선택</string>
@@ -1000,9 +989,6 @@ Language: ko_KR
     <string name="playback_command">재생 명령</string>
     <string name="command_x_not_valid">명령 %1$s 유효하지 않음</string>
     <string name="must_provide_command_name">명령 이름을 제공해야 함</string>
-    <string name="no_episodes_in_filter_x">%1$s 필터에 에피소드 없음</string>
-    <string name="filter_x_not_found">%1$s 필터 찾을 수 없음</string>
-    <string name="must_provide_filter_name">필터 이름을 제공해야 함</string>
     <string name="end_of_year_launch_modal_summary">상위 팟캐스트, 카테고리, 청취 통계 등이 표시됩니다. 친구와 공유하고 즐겨 찾는 팟캐스트 창작자에게 감사 인사를 보냅니다!</string>
     <string name="settings_app_icon_halloween">핼러윈</string>
     <string name="end_of_year_launch_modal_primary_button_title">2024년에 청취한 목록 보기</string>
@@ -1128,7 +1114,6 @@ Language: ko_KR
     <string name="discover_popular_in">%s에서 유명</string>
     <string name="discover_popular">유명</string>
     <string name="discover_top">상위</string>
-    <string name="filters_filter_name">필터 이름</string>
     <string name="episode_short_episode">E%d</string>
     <string name="episode_short_season">S%d</string>
     <string name="episode_short_season_episode">S%1$d E%2$d</string>
@@ -1265,8 +1250,8 @@ Language: ko_KR
     <string name="error_webview_not_installed">설치된 시스템 WebView가 없어서 프로그램 메모를 로드할 수 없습니다.</string>
     <string name="settings_status_service_support_summary">후원 FAQ를 이용하여 문의하세요.</string>
     <string name="settings_status_service_support">후원</string>
-    <string name="settings_status_service_hosts_summary">팟캐스트 제작자는 Pocket Casts에서 관리하지 않는 다양한 호스팅 공급업체에서 에피소드 파일을 호스팅합니다.</string>
     <string name="settings_status_service_hosts_help">가장 일반적인 원인은 스마트폰 또는 네트워크에 광고 차단기가 구성되어 있기 때문입니다. 팟캐스트를 다운로드하려면 이 도메인을 차단 해제해야 합니다. Pocket Casts에서는 팟캐스트가 호스팅되는 위치를 호스팅하거나 선택하지 않습니다. 이는 프로그램 제작자 소관이며 당사와 무관합니다.</string>
+    <string name="settings_status_service_hosts_summary">팟캐스트 제작자는 Pocket Casts에서 관리하지 않는 다양한 호스팅 공급업체에서 에피소드 파일을 호스팅합니다.</string>
     <string name="settings_status_service_hosts">일반 팟캐스트 호스트</string>
     <string name="settings_status_service_ad_blocker_help_plural">가장 일반적인 원인은 스마트폰 또는 네트워크에 광고 차단기가 구성되어 있기 때문입니다. %s 도메인을 차단 해제해야 합니다.</string>
     <string name="settings_status_service_ad_blocker_help_singular">가장 일반적인 원인은 스마트폰 또는 네트워크에 광고 차단기가 구성되어 있기 때문입니다. %s 도메인을 차단 해제해야 합니다.</string>
@@ -1572,7 +1557,6 @@ Language: ko_KR
     <string name="profile_stats_time_saved_by">절약된 시간</string>
     <string name="profile_stats_skipping">건너뛰기</string>
     <string name="profile_stats_since_listened_for">%s부터 청취</string>
-    <string name="profile_stats_share_to">공유 대상…</string>
     <string name="profile_stats_trim_silence">Trim Silence</string>
     <string name="profile_stats_listened_for">청취한 기간</string>
     <string name="profile_stats_auto_skipping">자동 건너뛰기</string>

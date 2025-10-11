@@ -1,11 +1,24 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2025-09-24 10:18:05+0000
+Translation-Revision-Date: 2025-10-08 08:37:20+0000
 Plural-Forms: nplurals=2; plural=n != 1;
 Generator: GlotPress/2.4.0-alpha
 Language: ca
 -->
 <resources>
+    <string name="winback_cancel_subscription_stay_button_label">Mantenir la meva subscripció</string>
+    <string name="player_up_next_sort">Ordenar «Tot seguit».</string>
+    <string name="filter_title">Títol de la llista de reproducció</string>
+    <string name="filter_id">ID de la llista de reproducció</string>
+    <string name="filters_filter_name">Nom de la llista de reproducció</string>
+    <string name="playlists_not_found">No s\'han trobat llistes de reproducció</string>
+    <string name="notification_filters_message_2">Crea llistes de reproducció per a organitzar els teus episodis.</string>
+    <string name="settings_status_service_account_summary_2">El servei es fa servir per a emmagatzemar el progrés dels episodis, les subscripcions, els filtres, etc.</string>
+    <string name="settings_choose_playlists">Tria llistes de reproducció</string>
+    <string name="number_one">un</string>
+    <string name="settings_auto_download_playlists">Descarregar llistes de reproducció automàticament</string>
+    <string name="playlists_selected_all">Totes les llistes de reproducció seleccionades</string>
+    <string name="podcasts_selected_all">Tots els pòdcasts seleccionats</string>
     <string name="smart_playlists">Llistes de reproducció intel·ligents</string>
     <string name="select_smart_playlists">Selecciona llistes de reproducció intel·ligents</string>
     <string name="podcast_not_in_playlists">No inclòs en cap llista de reproducció intel·ligent</string>
@@ -350,7 +363,6 @@ Language: ca
     <string name="settings_pixel_watch_subtitle">Substitueix els botons de salt personalitzats per botons estàndard de següent/anterior que funcionin com a botons de salt, cosa que permet la compatibilitat amb més dispositius.</string>
     <string name="settings_pixel_watch_title">Botons de salt del Pixel Watch</string>
     <string name="winback_cancel_subscription_cancel_button_label">Sí, cancel·la la meva subscripció</string>
-    <string name="winback_cancel_subscription_stay_button_label">De fet, vull quedar-me</string>
     <string name="winback_cancel_subscription_perk_files">Tots els fitxers pujats al teu compte de Pocket Casts s’eliminaran (tanmateix, els fitxers que hagis descarregat als teus dispositius mòbils es mantindran).</string>
     <string name="winback_cancel_subscription_perk_folders">Les carpetes s\'eliminaran i els seus continguts es traslladaran a la pantalla de pòdcasts.</string>
     <string name="winback_cancel_subscription_perk_plus">L\'accés a les funcions de Pocket Casts Plus estarà bloquejat després d\'aquesta data.</string>
@@ -586,7 +598,6 @@ Language: ca
     <string name="hours_and_minutes">%d hores i %d minuts</string>
     <string name="player_sleep_time_fired_end_of_chapter">El temporitzador de son s\'ha aturat al final del capítol.</string>
     <string name="player_sleep_in_chapters">En suspensió en %d capítols</string>
-    <string name="player_sleep_in_one_chapter">En suspensió en 1 capítol</string>
     <string name="player_sleep_timer_in_episode">En acabar 1 episodi</string>
     <string name="player_sleep_timer_end_of_episode">Final de l\'episodi</string>
     <string name="player_sleep_timer_in_episode_plural">En acabar %d episodis</string>
@@ -597,7 +608,6 @@ Language: ca
     <string name="settings_use_episode_artwork_title">Caràtula de l\'episodi</string>
     <string name="settings_use_episode_artwork_advanced">Configuració avançada de les caràtules dels episodis</string>
     <string name="player_sleep_in_episodes">En suspensió d\'aquí a %d episodis</string>
-    <string name="player_sleep_in_one_episode">En suspensió d\'aquí a 1 episodi</string>
     <string name="player_sleep_timer_stopped_your_podcast">El temporitzador ha aturat el teu pòdcast.</string>
     <string name="player_sleep_timer_restarted_after_device_shake">El temporitzador s\'ha reiniciat després de sacsejar el dispositiu</string>
     <string name="widget_check_out_discover">Mira a Descobrir per a veure\'n més</string>
@@ -736,7 +746,6 @@ Language: ca
     <string name="settings_continuous_playback_summary">Si no tens cap episodi a la cua, es reproduirà els del pòdcast o llista que estiguis escoltant en aquell moment.</string>
     <string name="renew_your_subscription">Renova la teva subscripció</string>
     <string name="log_in_watch_from_phone_instructions_3">Si tens problemes, assegura\'t que el teu telèfon estigui executant la mateixa versió de Pocket Casts que el teu rellotge (%s)</string>
-    <string name="log_in_free_account">%s està utilitzant un compte gratuït</string>
     <string name="player_play_failed_check_internet">No s\'ha pogut carregar el pòdcast. Comprova la teva connexió a Internet i torna-ho a intentar.</string>
     <string name="empty_play_state">Tria un episodi per començar</string>
     <string name="settings_beta_features">Característiques beta</string>
@@ -872,19 +881,17 @@ Language: ca
     <string name="podcast_id_description">Un ID únic que representa el pòdcast. Es pot utilitzar en l\'acció \'Consulta episodis del pòdcast\'.</string>
     <string name="podcast_id">ID del pòdcast</string>
     <string name="pocket_casts_query_up_next_episodes">Consultar episodis afegits a \'Tot seguit\' a Pocket Casts</string>
-    <string name="filter_id_or_title">Títol o ID del filtre</string>
-    <string name="filter_title">Títol del filtre</string>
-    <string name="filter_id_description">Un ID únic que representa el filtre. Es pot utilitzar en l\'acció \'Consultar episodis filtrats\'.</string>
-    <string name="filter_id">ID del filtre</string>
     <string name="episode_count">Nombre d\'episodis</string>
     <string name="no_episodes_found_for_episode_ids_x">No s\'han trobat episodis amb els IDs d\'episodi %1$s</string>
     <string name="no_episode_ids_provided">No s\'ha introduït cap ID d\'episodi</string>
-    <string name="pocket_casts_query_filter_episodes">Consultar episodis filtrats a Pocket Casts</string>
-    <string name="pocket_casts_query_filters">Consultar filtres a Pocket Casts</string>
     <string name="pocket_casts_add_to_up_next">Opció \'Afegir a Tot seguit\' de Pocket Casts</string>
     <string name="pocket_casts_query_podcast_episodes">Consultar episodios de pòdcast a Pocket Casts</string>
     <string name="pocket_casts_query_podcasts">Consultar pòdcasts a Pocket Casts</string>
     <string name="onboarding_plus_can_be_canceled_at_any_time">Es pot cancel·lar en qualsevol moment.</string>
+    <string name="filter_id_or_title">Títol o ID de la llista de reproducció</string>
+    <string name="filter_id_description">Un ID únic que representa la llista de reproducció. Es pot utilitzar en l\'acció \'Consultar episodis de la llista de reproducció\'.</string>
+    <string name="pocket_casts_query_filter_episodes">Consultar episodis de la llista de reproducció de Pocket Casts</string>
+    <string name="pocket_casts_query_filters">Consultar llistes de reproducció de Pocket Casts</string>
     <string name="profile_cancel_confirm_item_folders">Les carpetes s\'eliminaran i els seus continguts es traslladaran a la pantalla Podcast.</string>
     <string name="profile_cancel_confirm_cancel_button_title">Sí, cancel·la la meva subscripció</string>
     <string name="profile_cancel_confirm_stay_button_title">De fet, vull quedar-me</string>
@@ -981,9 +988,9 @@ Language: ca
     <string name="playback_speed_not_valid">Velocitat de reproducció %1$s no vàlida</string>
     <string name="profile_account_upgraded">Compte actualitzat</string>
     <string name="pocket_casts_control_playback">Control de reproducció de Pocket Casts</string>
-    <string name="pocket_casts_play_filter">Filtre de reproducció de Pocket Casts</string>
     <string name="time_to_skip_not_valid">Temps de salt %1$s no vàlid</string>
     <string name="time_to_skip_seconds">Temps a saltar (segons)</string>
+    <string name="pocket_casts_play_filter">Reproduir llista de reproducció de Pocket Casts</string>
     <string name="settings_select_filters">Seleccionar filtres</string>
     <string name="settings_import_url">Per URL</string>
     <string name="settings_import_url_summary">Importa els teus pòdcasts des d\'un arxiu OMPL emprant una URL.</string>
@@ -1000,9 +1007,9 @@ Language: ca
     <string name="playback_command">Comandament de reproducció</string>
     <string name="command_x_not_valid">Comandament %1$s no vàlid</string>
     <string name="must_provide_command_name">Introdueix un nom de comanda</string>
-    <string name="no_episodes_in_filter_x">No hi ha episodis al filtre %1$s</string>
-    <string name="filter_x_not_found">No s\'ha trobat el filtre %1$s</string>
-    <string name="must_provide_filter_name">Introdueix un nom de filtre</string>
+    <string name="no_episodes_in_filter_x">No hi ha episodis a la llista de reproducció %1$s</string>
+    <string name="filter_x_not_found">No s’ha trobat la llista de reproducció %1$s</string>
+    <string name="must_provide_filter_name">Introdueix un nom de la llista de reproducció</string>
     <string name="settings_app_icon_halloween">Halloween</string>
     <string name="end_of_year_launch_modal_summary">Consulta quins han estat els pòdcasts i les categories que més has escoltat, les estadístiques d\'escolta i molt més. Comparteix-ho amb els teus amics i fes que tothom sàpiga quins són els teus creadors favorits!</string>
     <string name="end_of_year_launch_modal_primary_button_title">Veure el meu 2024</string>
@@ -1135,7 +1142,6 @@ Language: ca
     <string name="episode_season_trailer">Tràiler de la temporada %d</string>
     <string name="on">Activat</string>
     <string name="discover_popular_in">Popular a %s</string>
-    <string name="filters_filter_name">Nom del filtre</string>
     <string name="episode_short_episode">E%d</string>
     <string name="podcast_notifications_off">Notificacions desactivades</string>
     <string name="podcast_notifications_on">Notificacions activades</string>
@@ -1635,7 +1641,6 @@ Language: ca
     <string name="profile_status_error_internet">🤔↵\n↵\nNo es poden carregar les estadístiques,\ncomprova la teva connexió a Internet.</string>
     <string name="profile_stats_total">TOTAL</string>
     <string name="profile_stats_time_saved_by">Temps estalviat per</string>
-    <string name="profile_stats_share_to">Compartir amb…</string>
     <string name="profile_stats_listened_for">Has escoltat durant</string>
     <string name="profile_sonos_title">Pocket Casts i Sonos</string>
     <string name="profile_sonos_setup_account">Configurar el compte</string>
@@ -2229,6 +2234,10 @@ Language: ca
     <plurals name="podcasts_count">
         <item quantity="one">%d pòdcast</item>
         <item quantity="other">%d pòdcasts</item>
+    </plurals>
+    <plurals name="podcasts_selected_count">
+        <item quantity="one">%1$d pòdcast seleccionat</item>
+        <item quantity="other">%1$d pòdcast seleccionats</item>
     </plurals>
     <plurals name="profile_stats_day_listened">
         <item quantity="one">Dia escoltat</item>

@@ -46,6 +46,8 @@ class PlaylistsFragment :
             PlaylistsPage(
                 uiState = uiState,
                 listState = listState,
+                getPreviewMetadataFlow = viewModel::getPreviewMetadataFlow,
+                refreshPreviewMetadata = viewModel::refreshPreviewMetadata,
                 onCreatePlaylist = {
                     viewModel.trackCreatePlaylistClicked()
                     val fragment = childFragmentManager.findFragmentByTag("create_playlist")

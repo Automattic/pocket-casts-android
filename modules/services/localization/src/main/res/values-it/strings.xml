@@ -1,11 +1,23 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2025-09-25 09:54:03+0000
+Translation-Revision-Date: 2025-10-09 09:54:04+0000
 Plural-Forms: nplurals=2; plural=n != 1;
 Generator: GlotPress/2.4.0-alpha
 Language: it
 -->
 <resources>
+    <string name="winback_cancel_subscription_stay_button_label">Rinnova l\'abbonamento</string>
+    <string name="filter_title">Titolo della playlist</string>
+    <string name="filter_id">ID playlist</string>
+    <string name="filters_filter_name">Nome playlist</string>
+    <string name="playlists_not_found">Nessuna playlist trovata</string>
+    <string name="notification_filters_message_2">Crea filtri intelligenti per organizzare gli episodi.</string>
+    <string name="settings_status_service_account_summary_2">Il servizio usato per archiviare l\'avanzamento dell\'episodio, i podcast che segui, i filtri ecc.</string>
+    <string name="settings_choose_playlists">Scegli playlist</string>
+    <string name="number_one">una</string>
+    <string name="settings_auto_download_playlists">Scarica automaticamente le playlist</string>
+    <string name="playlists_selected_all">Tutte le playlist selezionate</string>
+    <string name="podcasts_selected_all">Tutti i podcast selezionati.</string>
     <string name="smart_playlists">Playlist intelligenti</string>
     <string name="select_smart_playlists">Seleziona Playlist intelligenti</string>
     <string name="podcast_not_in_playlists">Non incluso in alcuna Playlist intelligente</string>
@@ -349,7 +361,6 @@ Language: it
     <string name="settings_pixel_watch_subtitle">Sostituisci i pulsanti Skip personalizzati con i pulsanti standard traccia precedente/traccia successiva che funzionano come i pulsanti Skip e garantiscono la compatibilità con più dispositivi.</string>
     <string name="settings_pixel_watch_title">Pulsanti Skip di Piwel Watch</string>
     <string name="winback_cancel_subscription_cancel_button_label">Sì, cancella il mio abbonamento</string>
-    <string name="winback_cancel_subscription_stay_button_label">Anzi, voglio restare</string>
     <string name="winback_cancel_subscription_perk_files">Tutti i file caricati sul tuo account Pocket Casts verranno eliminati (ma i file scaricati sui tuoi dispositivi mobili rimarranno).</string>
     <string name="winback_cancel_subscription_perk_folders">Le tue cartelle verranno rimosse e i loro contenuti verranno spostati indietro alla schermata Podcast.</string>
     <string name="winback_cancel_subscription_perk_plus">L\'accesso alle funzionalità di Pocket Casts Plus verrà bloccato dopo tale data.</string>
@@ -585,7 +596,6 @@ Language: it
     <string name="hours_and_minutes">%d ore e %d minuti</string>
     <string name="player_sleep_time_fired_end_of_chapter">Timer di sospensione interrotto alla fine del capitolo.</string>
     <string name="player_sleep_in_chapters">Spegnimento tra %d capitoli</string>
-    <string name="player_sleep_in_one_chapter">Spegnimento tra 1 capitolo</string>
     <string name="player_sleep_timer_in_chapter_plural">Tra %d capitoli</string>
     <string name="player_sleep_timer_in_chapter">Tra 1 capitolo</string>
     <string name="player_sleep_timer_end_of_episode">Fine dell\'episodio</string>
@@ -596,7 +606,6 @@ Language: it
     <string name="settings_use_episode_artwork_title">Grafica dell\'episodio</string>
     <string name="settings_use_episode_artwork_advanced">Impostazioni avanzate grafica dell\'episodio</string>
     <string name="player_sleep_in_episodes">In sospensione in %d episodi</string>
-    <string name="player_sleep_in_one_episode">In sospensione in 1 episodio</string>
     <string name="player_sleep_timer_stopped_your_podcast">L\'autospegnimento ha interrotto il tuo podcast.</string>
     <string name="player_sleep_timer_restarted_after_device_shake">Autospegnimento riavviato dopo un movimento del dispositivo</string>
     <string name="widget_check_out_discover">Visita Scopri per altro</string>
@@ -735,7 +744,6 @@ Language: it
     <string name="settings_continuous_playback_summary">Se la coda Successivo è vuota, riprodurremo gli episodi dello stesso podcast o l\'elenco che stai ascoltando.</string>
     <string name="renew_your_subscription">Rinnova il tuo abbonamento</string>
     <string name="log_in_watch_from_phone_instructions_3">In caso di problemi, assicurati che sul tuo telefono sia in esecuzione la stessa versione di Pocket Casts del tuo orologio (%s)</string>
-    <string name="log_in_free_account">%s sta usando un account gratuito</string>
     <string name="player_play_failed_check_internet">Impossibile caricare il podcast. Controlla la connessione a Internet e riprova.</string>
     <string name="empty_play_state">Scegli un episodio per iniziare</string>
     <string name="settings_beta_features">Funzionalità beta</string>
@@ -844,10 +852,6 @@ Language: it
     <string name="settings_media_actions_customise">Personalizza le azioni degli elementi multimediali</string>
     <string name="onboarding_recommendations_more">Ulteriori informazioni %s</string>
     <string name="clear_up_next">Cancella Successivo</string>
-    <string name="filter_id_or_title">ID filtro o titolo</string>
-    <string name="filter_title">Titolo filtro</string>
-    <string name="filter_id_description">Un ID univoco che rappresenta il filtro. Può essere utilizzato nell\'azione \"Episodi filtro query\"</string>
-    <string name="filter_id">ID filtro</string>
     <string name="episode_count">Conteggio episodio</string>
     <string name="no_episodes_found_for_episode_ids_x">Nessun episodio trovato per gli ID episodio %1$s</string>
     <string name="no_episode_ids_provided">Nessun ID episodio fornito</string>
@@ -878,12 +882,14 @@ Language: it
     <string name="podcast_id_description">Un ID univoco che rappresenta il podcast. Può essere utilizzato nell\'azione \"Episodi podcast query\"</string>
     <string name="podcast_id">ID podcast</string>
     <string name="pocket_casts_query_up_next_episodes">Pocket Casts query fino ai prossimi episodi</string>
-    <string name="pocket_casts_query_filter_episodes">Pocket Casts query filtro episodi</string>
-    <string name="pocket_casts_query_filters">Pocket Casts filtri query</string>
     <string name="pocket_casts_add_to_up_next">Pocket Casts Aggiungi fino al prossimo</string>
     <string name="pocket_casts_query_podcast_episodes">Pocket Casts query podcast episodi</string>
     <string name="pocket_casts_query_podcasts">Pocket Casts Query podcast</string>
     <string name="onboarding_plus_can_be_canceled_at_any_time">Può essere annullato in qualsiasi momento.</string>
+    <string name="filter_id_or_title">Titolo della playlist</string>
+    <string name="filter_id_description">Un ID univoco che rappresenta il podcast. Può essere utilizzato nell\'azione \"Episodi podcast query\"</string>
+    <string name="pocket_casts_query_filter_episodes">Pocket Casts query podcast episodi</string>
+    <string name="pocket_casts_query_filters">Pocket Casts Query podcast</string>
     <string name="profile_cancel_confirm_cancel_button_title">Sì, cancella il mio abbonamento\"</string>
     <string name="profile_cancel_confirm_stay_button_title">Anzi, voglio restare\"</string>
     <string name="profile_cancel_confirm_item_web_player">Non sarai più in grado di accedere a Pocket Casts utilizzando il tuo browser web o il tuo computer desktop.</string>
@@ -980,9 +986,9 @@ Language: it
     <string name="playback_speed_not_valid">Velocità di riproduzione %1$s non valida</string>
     <string name="profile_account_upgraded">Account aggiornato</string>
     <string name="pocket_casts_control_playback">Riproduzione comando Pocket Casts</string>
-    <string name="pocket_casts_play_filter">Filtro riproduzione Pocket Casts</string>
     <string name="time_to_skip_not_valid">Momento a cui passare %1$s non valido</string>
     <string name="time_to_skip_seconds">Momento a cui passare (secondi)</string>
+    <string name="pocket_casts_play_filter">Playlist di Pocket Casts</string>
     <string name="settings_select_filters">Seleziona filtri</string>
     <string name="settings_import_url_summary">Importa i podcast da un file OPML usando un URL.</string>
     <string name="settings_import_url">Tramite URL</string>
@@ -999,9 +1005,9 @@ Language: it
     <string name="playback_command">Comando riproduzione</string>
     <string name="command_x_not_valid">Comando %1$s non valido</string>
     <string name="must_provide_command_name">Devi fornire un nome del comando</string>
-    <string name="no_episodes_in_filter_x">Nessun episodio nel filtro %1$s</string>
-    <string name="filter_x_not_found">Filtro %1$s non trovato</string>
-    <string name="must_provide_filter_name">Devi fornire un nome del filtro</string>
+    <string name="no_episodes_in_filter_x">Nessun episodio nella playlist %1$s</string>
+    <string name="filter_x_not_found">Playlist %1$s non trovata</string>
+    <string name="must_provide_filter_name">Devi fornire il nome della playlist</string>
     <string name="end_of_year_launch_modal_summary">Visualizza i tuoi podcast principali, le categorie, le statistiche di ascolto e molto altro ancora. Condividi con gli amici e ringrazia pubblicamente i tuoi creatori preferiti!</string>
     <string name="settings_app_icon_halloween">Halloween</string>
     <string name="end_of_year_launch_modal_primary_button_title">Visualizza Le mie riproduzioni 2024</string>
@@ -1128,7 +1134,6 @@ Language: it
     <string name="discover_popular_in">Popolare: %s</string>
     <string name="discover_popular">Popolare</string>
     <string name="discover_top">In alto</string>
-    <string name="filters_filter_name">Nome del filtro</string>
     <string name="episode_short_episode">E %d</string>
     <string name="episode_short_season">S %d</string>
     <string name="episode_short_season_episode">S %1$d E %2$d</string>
@@ -1614,7 +1619,6 @@ Language: it
     <string name="profile_sub_android_goto">Per annullare l\'abbonamento, dovrai farlo tramite Google Play Store.</string>
     <string name="profile_status_error_internet">🤔\n\nImpossibile caricare le statistiche,\ncontrolla la connessione Internet.</string>
     <string name="profile_stats_total">TOTALE</string>
-    <string name="profile_stats_share_to">Condividi con…</string>
     <string name="profile_stat_days_listened">Giorni di ascolto</string>
     <string name="profile_sonos_title">Pocket Cast e Sonos</string>
     <string name="profile_sonos_setup_account">Configura account</string>
@@ -1660,8 +1664,8 @@ Language: it
     <string name="profile_files_remove_image">Sostituisci Immagine</string>
     <string name="profile_files_add_filename">Nome</string>
     <string name="profile_file_locked">bloccato</string>
-    <string name="profile_license_agreement">Pocket Casts tiene alla tua privacy. Questa Politica sulla privacy spiega quali informazioni raccogliamo su di te e quali sono le motivazioni per cui lo facciamo, cosa possiamo fare con tali informazioni e come le gestiamo. Quanto detto si applica alle app Pocket Casts per iOS e Android e al servizio web di Pocket Casts con le app per macOS e Windows associate (obbligato in solido, il Servizio) Usando il Servizio, accetti la presente Politica sulla privacy. Se attivi le notifiche push nell\'app, archiviamo il token push che Apple ci fornisce per inviare tali notifiche push al tuo dispositivo. Se acquisti l\'app web, archiviamo un ID transazione per il tuo acquisto. Se scegli di non creare un account e non usi le notifiche push, non viene archiviato alcun dato su di te sui nostri server. Anche il servizio web di Pocket Casts usa cookie e tecnologie simili per mantenere l\'accesso. Se scegli di generare una richiesta di supporto dall\'interno del Servizio, possiamo generare un allegato contenente dati aggiuntivi per assisterti durante l\'indirizzamento della tua richiesta di supporto, che sei libero di visualizzare prima dell\'invio.</string>
     <string name="profile_file">File</string>
+    <string name="profile_license_agreement">Pocket Casts tiene alla tua privacy. Questa Politica sulla privacy spiega quali informazioni raccogliamo su di te e quali sono le motivazioni per cui lo facciamo, cosa possiamo fare con tali informazioni e come le gestiamo. Quanto detto si applica alle app Pocket Casts per iOS e Android e al servizio web di Pocket Casts con le app per macOS e Windows associate (obbligato in solido, il Servizio) Usando il Servizio, accetti la presente Politica sulla privacy. Se attivi le notifiche push nell\'app, archiviamo il token push che Apple ci fornisce per inviare tali notifiche push al tuo dispositivo. Se acquisti l\'app web, archiviamo un ID transazione per il tuo acquisto. Se scegli di non creare un account e non usi le notifiche push, non viene archiviato alcun dato su di te sui nostri server. Anche il servizio web di Pocket Casts usa cookie e tecnologie simili per mantenere l\'accesso. Se scegli di generare una richiesta di supporto dall\'interno del Servizio, possiamo generare un allegato contenente dati aggiuntivi per assisterti durante l\'indirizzamento della tua richiesta di supporto, che sei libero di visualizzare prima dell\'invio.</string>
     <string name="profile_feature_requires">La funzionalità richiede\nPocket Casts Plus</string>
     <string name="profile_ends">Termina %s</string>
     <string name="profile_ended">Terminato il %s</string>

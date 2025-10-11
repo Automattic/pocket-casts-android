@@ -83,8 +83,6 @@ class PlaybackServiceTest {
         val playlistPreview = ManualPlaylistPreview(
             uuid = UUID.randomUUID().toString(),
             title = "Playlist title",
-            episodeCount = 0,
-            artworkPodcastUuids = emptyList(),
             settings = Playlist.Settings.ForPreview,
             icon = PlaylistIcon(0),
         )

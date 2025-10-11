@@ -5,13 +5,20 @@ import au.com.shiftyjelly.pocketcasts.models.entity.ManualPlaylistPodcastSource
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.models.to.PlaylistEpisode
 import au.com.shiftyjelly.pocketcasts.models.to.PlaylistEpisodeMetadata
+import au.com.shiftyjelly.pocketcasts.models.to.PlaylistPreviewForEpisode
 import au.com.shiftyjelly.pocketcasts.models.type.SmartRules
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import au.com.shiftyjelly.pocketcasts.models.type.PlaylistEpisodeSortType as SortType
 
 interface PlaylistManager {
     // <editor-fold desc="Generic playlists">
     fun playlistPreviewsFlow(): Flow<List<PlaylistPreview>>
+
+    fun getPreviewMetadataFlow(playlistUuid: String): StateFlow<PlaylistPreview.Metadata?>
+
+    suspend fun refreshPreviewMetadata(playlistUuid: String)
 
     suspend fun getAutoDownloadEpisodes(): List<PodcastEpisode>
 

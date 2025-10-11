@@ -83,15 +83,18 @@ internal class AddToPlaylistFragment : BaseDialogFragment() {
                 AddToPlaylistPage(
                     playlistPreviews = uiState.playlistPreviews,
                     unfilteredPlaylistsCount = uiState.unfilteredPlaylistsCount,
+                    episodeLimit = uiState.episodeLimit,
                     navController = navController,
                     searchFieldState = viewModel.searchFieldState.textState,
                     newPlaylistNameState = viewModel.newPlaylistNameState,
+                    getPreviewMetadataFlow = viewModel::getPreviewMetadataFlow,
+                    refreshPreviewMetadata = viewModel::refreshPreviewMetadata,
                     onClickCreatePlaylist = {
                         viewModel.trackCreateNewPlaylistTapped()
                         viewModel.createPlaylist()
                     },
                     onChangeEpisodeInPlaylist = { playlist ->
-                        if (playlist.canAddOrRemoveEpisode) {
+                        if (playlist.canAddOrRemoveEpisode(uiState.episodeLimit)) {
                             if (playlist.hasEpisode) {
                                 viewModel.trackEpisodeRemoveTapped()
                                 viewModel.removeFromPlaylist(playlist.uuid)
