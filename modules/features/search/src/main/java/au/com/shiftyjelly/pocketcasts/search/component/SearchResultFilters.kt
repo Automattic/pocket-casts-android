@@ -67,6 +67,9 @@ private fun SearchFilterPill(
                         width = 1.dp,
                         color = MaterialTheme.theme.colors.primaryIcon02,
                         shape = RoundedCornerShape(100),
+                    ).background(
+                        color = MaterialTheme.colors.background,
+                        shape = RoundedCornerShape(100),
                     )
                 },
             )

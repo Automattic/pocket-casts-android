@@ -37,6 +37,7 @@ class PlayButton @JvmOverloads constructor(
     private var podcastUuid: String? = null
     private var buttonColor: Int? = null
     private var fromListUuid: String? = null
+    private var playedUpToMs: Int? = null
     private var episodeStatus: EpisodeStatusEnum = EpisodeStatusEnum.NOT_DOWNLOADED
     private val progressCircle: ProgressCircleView
     private val buttonImage: ImageView
@@ -125,12 +126,13 @@ class PlayButton @JvmOverloads constructor(
     }
 
     fun setButtonType(episode: BaseEpisode, buttonType: PlayButtonType, @ColorInt color: Int, fromListUuid: String?) {
-        if (buttonType == this.buttonType && episode.uuid == this.episodeUuid && this.buttonColor == color) {
+        if (buttonType == this.buttonType && episode.uuid == this.episodeUuid && this.buttonColor == color && episode.playedUpToMs == this.playedUpToMs) {
             return
         }
 
         this.buttonType = buttonType
         this.episodeUuid = episode.uuid
+        this.playedUpToMs = episode.playedUpToMs
         if (episode is PodcastEpisode) {
             this.podcastUuid = episode.podcastUuid
             this.fromListUuid = fromListUuid
