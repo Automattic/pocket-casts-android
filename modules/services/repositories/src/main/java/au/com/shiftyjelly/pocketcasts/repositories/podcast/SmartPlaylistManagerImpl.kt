@@ -11,16 +11,13 @@ import au.com.shiftyjelly.pocketcasts.repositories.di.ApplicationScope
 import au.com.shiftyjelly.pocketcasts.repositories.notification.NotificationManager
 import au.com.shiftyjelly.pocketcasts.repositories.notification.OnboardingNotificationType
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
-import au.com.shiftyjelly.pocketcasts.repositories.playlist.DefaultPlaylistsInitializer
 import au.com.shiftyjelly.pocketcasts.repositories.sync.SyncManager
-import io.reactivex.Completable
 import io.reactivex.Flowable
 import io.reactivex.Maybe
 import java.util.Calendar
 import java.util.UUID
 import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.launch
 import timber.log.Timber
 
@@ -30,30 +27,17 @@ class SmartPlaylistManagerImpl @Inject constructor(
     private val syncManager: SyncManager,
     private val notificationManager: NotificationManager,
     appDatabase: AppDatabase,
-    private val playlistsInitializer: DefaultPlaylistsInitializer,
     @ApplicationScope private val scope: CoroutineScope,
 ) : SmartPlaylistManager {
 
     private val playlistDao = appDatabase.smartPlaylistDao()
 
-    override fun findAllBlocking(): List<PlaylistEntity> {
-        return playlistDao.findAllBlocking()
-    }
-
     override suspend fun findAll(): List<PlaylistEntity> {
         return playlistDao.findAll()
     }
 
-    override fun findAllFlow(): Flow<List<PlaylistEntity>> {
-        return playlistDao.findAllFlow()
-    }
-
     override fun findAllRxFlowable(): Flowable<List<PlaylistEntity>> {
         return playlistDao.findAllRxFlowable()
-    }
-
-    override fun findByUuidBlocking(playlistUuid: String): PlaylistEntity? {
-        return playlistDao.findByUuidBlocking(playlistUuid)
     }
 
     override suspend fun findByUuid(playlistUuid: String): PlaylistEntity? {
@@ -74,12 +58,6 @@ class SmartPlaylistManagerImpl @Inject constructor(
 
     override fun findByIdBlocking(id: Long): PlaylistEntity? {
         return playlistDao.findByIdBlocking(id)
-    }
-
-    override fun findEpisodesBlocking(playlist: PlaylistEntity, episodeManager: EpisodeManager, playbackManager: PlaybackManager): List<PodcastEpisode> {
-        val where = buildPlaylistWhere(playlist, playbackManager)
-        val orderBy = getPlaylistOrderByString(playlist)
-        return episodeManager.findEpisodesWhereBlocking("$where ORDER BY $orderBy LIMIT 500")
     }
 
     private fun getPlaylistQuery(playlist: PlaylistEntity, limit: Int?, playbackManager: PlaybackManager): String {
@@ -118,10 +96,6 @@ class SmartPlaylistManagerImpl @Inject constructor(
         }
     }
 
-    override suspend fun create(playlist: PlaylistEntity): Long {
-        return playlistDao.insert(playlist)
-    }
-
     /**
      * A null userPlayListUpdate parameter indicates that  the user did not initiate this update
      */
@@ -139,21 +113,8 @@ class SmartPlaylistManagerImpl @Inject constructor(
         playlistUpdateAnalytics.update(playlist, userPlaylistUpdate, isCreatingFilter)
     }
 
-    override suspend fun update(
-        playlist: PlaylistEntity,
-        userPlaylistUpdate: UserPlaylistUpdate?,
-        isCreatingFilter: Boolean,
-    ) {
-        playlistDao.update(playlist)
-        playlistUpdateAnalytics.update(playlist, userPlaylistUpdate, isCreatingFilter)
-    }
-
     override fun updateAllBlocking(playlists: List<PlaylistEntity>) {
         playlistDao.updateAllBlocking(playlists)
-    }
-
-    override fun updateAutoDownloadStatus(playlist: PlaylistEntity, autoDownloadEnabled: Boolean) {
-        playlist.autoDownload = autoDownloadEnabled
     }
 
     override fun createPlaylistBlocking(name: String, iconId: Int, draft: Boolean): PlaylistEntity {
@@ -186,19 +147,6 @@ class SmartPlaylistManagerImpl @Inject constructor(
         if (!loggedIn) {
             deleteSyncedBlocking(playlist)
         }
-    }
-
-    override fun deleteSyncedBlocking() {
-        playlistDao.deleteDeletedBlocking()
-    }
-
-    override suspend fun resetDb() {
-        playlistDao.deleteAll()
-        playlistsInitializer.initialize(force = true)
-    }
-
-    override suspend fun deleteSynced(playlist: PlaylistEntity) {
-        playlistDao.delete(playlist)
     }
 
     override fun deleteSyncedBlocking(playlist: PlaylistEntity) {
@@ -238,14 +186,6 @@ class SmartPlaylistManagerImpl @Inject constructor(
                 playlistDao.update(playlist)
             }
         }
-    }
-
-    override fun findFirstByTitleBlocking(title: String): PlaylistEntity? {
-        return playlistDao.searchByTitleBlocking(title)
-    }
-
-    override fun findPlaylistsToSyncBlocking(): List<PlaylistEntity> {
-        return playlistDao.findNotSyncedBlocking()
     }
 
     /**
@@ -399,15 +339,7 @@ class SmartPlaylistManagerImpl @Inject constructor(
         playlistDao.updateSyncStatusBlocking(PlaylistEntity.SYNC_STATUS_NOT_SYNCED, playlist.uuid)
     }
 
-    fun countPlaylists(): Int {
-        return playlistDao.countBlocking()
-    }
-
     fun countPlaylistsBlocking(): Int {
         return playlistDao.countBlocking()
-    }
-
-    override suspend fun markAllSynced() {
-        playlistDao.updateAllSyncStatus(PlaylistEntity.SYNC_STATUS_SYNCED)
     }
 }

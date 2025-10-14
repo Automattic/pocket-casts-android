@@ -25,7 +25,6 @@ import au.com.shiftyjelly.pocketcasts.servers.sync.UpNextSyncResponse
 import au.com.shiftyjelly.pocketcasts.servers.sync.UserChangeResponse
 import au.com.shiftyjelly.pocketcasts.servers.sync.history.HistoryYearResponse
 import au.com.shiftyjelly.pocketcasts.servers.sync.login.ExchangeSonosResponse
-import au.com.shiftyjelly.pocketcasts.servers.sync.update.SyncUpdateResponse
 import au.com.shiftyjelly.pocketcasts.utils.Optional
 import com.jakewharton.rxrelay2.BehaviorRelay
 import com.pocketcasts.service.api.BookmarksResponse
@@ -36,6 +35,8 @@ import com.pocketcasts.service.api.PodcastsEpisodesRequest
 import com.pocketcasts.service.api.ReferralCodeResponse
 import com.pocketcasts.service.api.ReferralRedemptionResponse
 import com.pocketcasts.service.api.ReferralValidationResponse
+import com.pocketcasts.service.api.SyncUpdateRequest
+import com.pocketcasts.service.api.SyncUpdateResponse
 import com.pocketcasts.service.api.UserPlaylistListResponse
 import com.pocketcasts.service.api.UserPodcastListResponse
 import com.pocketcasts.service.api.WinbackResponse
@@ -44,11 +45,8 @@ import io.reactivex.Flowable
 import io.reactivex.Maybe
 import io.reactivex.Single
 import java.io.File
-import java.time.Instant
 import kotlinx.coroutines.flow.Flow
 import retrofit2.Response
-import com.pocketcasts.service.api.SyncUpdateRequest as SyncUpdateProtoRequest
-import com.pocketcasts.service.api.SyncUpdateResponse as SyncUpdateProtoResponse
 
 interface SyncManager : NamedSettingsCaller {
 
@@ -104,8 +102,7 @@ interface SyncManager : NamedSettingsCaller {
     suspend fun getEpisodesOrThrow(request: PodcastsEpisodesRequest): EpisodesResponse
     fun getPodcastEpisodesRxSingle(podcastUuid: String): Single<PodcastEpisodesResponse>
 
-    suspend fun syncUpdate(data: String, lastSyncTime: Instant): SyncUpdateResponse
-    suspend fun syncUpdateOrThrow(request: SyncUpdateProtoRequest): SyncUpdateProtoResponse
+    suspend fun syncUpdateOrThrow(request: SyncUpdateRequest): SyncUpdateResponse
 
     fun episodeSyncRxCompletable(request: EpisodeSyncRequest): Completable
 
