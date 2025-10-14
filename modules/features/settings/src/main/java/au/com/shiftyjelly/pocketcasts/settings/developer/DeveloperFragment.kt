@@ -35,6 +35,7 @@ class DeveloperFragment : BaseFragment() {
             val bottomInset = settings.bottomInset.collectAsStateWithLifecycle(0)
             DeveloperPage(
                 onBackPress = ::onBackPress,
+                onChatWithUsClick = ::onChatWithUsClick,
                 onForceRefreshClick = viewModel::forceRefresh,
                 onTriggerNotificationClick = viewModel::triggerNotification,
                 onDeleteFirstEpisodeClick = viewModel::deleteFirstEpisode,
@@ -62,5 +63,9 @@ class DeveloperFragment : BaseFragment() {
 
     private fun onShowNotificationsTestingClick() {
         (activity as? FragmentHostListener)?.showBottomSheet(fragment = NotificationsTestingFragment())
+    }
+
+    private fun onChatWithUsClick() {
+        (activity as? FragmentHostListener)?.addFragment(ChatBotFragment())
     }
 }

@@ -18,13 +18,13 @@ import androidx.compose.material.Text
 import androidx.compose.material.TextButton
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.PlaylistPlay
+import androidx.compose.material.icons.filled.ChatBubbleOutline
 import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material.icons.outlined.BugReport
 import androidx.compose.material.icons.outlined.Delete
 import androidx.compose.material.icons.outlined.Downloading
 import androidx.compose.material.icons.outlined.EditCalendar
 import androidx.compose.material.icons.outlined.Folder
-import androidx.compose.material.icons.outlined.HomeRepairService
 import androidx.compose.material.icons.outlined.NewReleases
 import androidx.compose.material.icons.outlined.Notifications
 import androidx.compose.runtime.Composable
@@ -52,6 +52,7 @@ import au.com.shiftyjelly.pocketcasts.localization.R as LR
 fun DeveloperPage(
     bottomInset: Dp,
     onBackPress: () -> Unit,
+    onChatWithUsClick: () -> Unit,
     onForceRefreshClick: () -> Unit,
     onTriggerNotificationClick: () -> Unit,
     onDeleteFirstEpisodeClick: () -> Unit,
@@ -77,6 +78,9 @@ fun DeveloperPage(
                 title = stringResource(LR.string.settings_developer),
                 onNavigationClick = onBackPress,
             )
+        }
+        item {
+            ChatWithUs(onClick = onChatWithUsClick)
         }
         item {
             ForceRefreshSetting(onClick = onForceRefreshClick)
@@ -126,6 +130,19 @@ fun DeveloperPage(
             },
         )
     }
+}
+
+@Composable
+fun ChatWithUs(
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    SettingRow(
+        primaryText = "Chat with us",
+        secondaryText = "Try the new chat bot",
+        icon = rememberVectorPainter(Icons.Default.ChatBubbleOutline),
+        modifier = modifier.clickable { onClick() },
+    )
 }
 
 @Composable
@@ -351,6 +368,7 @@ private fun DeveloperPageDarkPreview() {
 private fun DeveloperPagePreview() {
     DeveloperPage(
         onBackPress = {},
+        onChatWithUsClick = {},
         onForceRefreshClick = {},
         onTriggerNotificationClick = {},
         onDeleteFirstEpisodeClick = {},

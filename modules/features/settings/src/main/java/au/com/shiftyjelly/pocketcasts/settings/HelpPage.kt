@@ -91,6 +91,7 @@ fun HelpPage(
     onShowStatusPage: () -> Unit,
     onGoBack: () -> Unit,
     modifier: Modifier = Modifier,
+    url: String = Settings.INFO_FAQ_URL,
     appBarInsets: WindowInsets = AppBarDefaults.topAppBarWindowInsets,
     viewModel: HelpViewModel = hiltViewModel(),
     onWebViewCreate: (WebView) -> Unit = {},
@@ -103,6 +104,7 @@ fun HelpPage(
         modifier = modifier,
     ) {
         HelpPage(
+            url = url,
             appBarInsets = appBarInsets,
             onSendFeedbackEmail = {
                 scope.launch {
@@ -165,6 +167,7 @@ fun HelpPage(
 
 @Composable
 private fun HelpPage(
+    url: String,
     appBarInsets: WindowInsets,
     onSendFeedbackEmail: () -> Unit,
     onContactSupport: () -> Unit,
@@ -193,6 +196,7 @@ private fun HelpPage(
                     .zIndex(2f),
             )
             HelpWebViewContainer(
+                url = url,
                 onSendFeedbackEmail = onSendFeedbackEmail,
                 onContactSupport = onContactSupport,
                 onTapUri = onTapUri,
@@ -342,6 +346,7 @@ private fun ActionRow(
 
 @Composable
 private fun HelpWebViewContainer(
+    url: String,
     onSendFeedbackEmail: () -> Unit,
     onContactSupport: () -> Unit,
     onTapUri: (Uri) -> Unit,
@@ -352,7 +357,7 @@ private fun HelpWebViewContainer(
     Box(
         modifier = modifier,
     ) {
-        var initialUrl by rememberSaveable { mutableStateOf(Settings.INFO_FAQ_URL) }
+        var initialUrl by rememberSaveable { mutableStateOf(url) }
         val webViewState = rememberWebViewState(url = initialUrl)
         var containerState by remember { mutableStateOf(ContainerState.Initalizing) }
         LaunchedEffect(webViewState) {
