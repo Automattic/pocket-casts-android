@@ -24,8 +24,6 @@ import au.com.shiftyjelly.pocketcasts.servers.search.AutoCompleteResult
 import au.com.shiftyjelly.pocketcasts.servers.search.SearchService
 import au.com.shiftyjelly.pocketcasts.servers.server.ListWebService
 import au.com.shiftyjelly.pocketcasts.servers.sync.LoginIdentity
-import au.com.shiftyjelly.pocketcasts.servers.sync.update.SyncUpdateResponse
-import au.com.shiftyjelly.pocketcasts.servers.sync.update.SyncUpdateResponseParser
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.adapters.Rfc3339DateJsonAdapter
 import dagger.Module
@@ -74,7 +72,6 @@ class ServersModule {
         return Moshi.Builder()
             .add(InstantAdapter())
             .add(Date::class.java, Rfc3339DateJsonAdapter().nullSafe())
-            .add(SyncUpdateResponse::class.java, SyncUpdateResponseParser())
             .add(EpisodePlayingStatus::class.java, EpisodePlayingStatusMoshiAdapter())
             .add(PodcastsSortType::class.java, PodcastsSortTypeMoshiAdapter())
             .add(AccessToken::class.java, AccessToken.Adapter)

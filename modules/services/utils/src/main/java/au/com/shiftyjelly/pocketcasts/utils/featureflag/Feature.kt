@@ -172,14 +172,6 @@ enum class Feature(
         hasFirebaseRemoteFlag = true,
         hasDevToggle = true,
     ),
-    PROTO_DATA_SYNC(
-        key = "proto_data_sync",
-        title = "Sync data using Protobuf",
-        defaultValue = isDebugOrPrototypeBuild,
-        tier = FeatureTier.Free,
-        hasFirebaseRemoteFlag = true,
-        hasDevToggle = true,
-    ),
     IMPROVED_SEARCH_SUGGESTIONS(
         key = "search_predictive",
         title = "Predictive search suggestions",
