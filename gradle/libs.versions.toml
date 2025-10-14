@@ -16,7 +16,7 @@
 #    horologist = Horologist Version
 
 [versions]
-aboutlibraries = "12.2.0"
+aboutlibraries = "13.0.0"
 android-gradle-plugin = "8.13.0"
 billing = "8.0.0"
 coil = "2.7.0"
@@ -300,6 +300,7 @@ zxing = "com.google.zxing:core:3.5.3"
 
 [plugins]
 aboutlibraries = { id = "com.mikepenz.aboutlibraries.plugin", version.ref = "aboutlibraries" }
+aboutlibraries-android = { id = "com.mikepenz.aboutlibraries.plugin.android" }
 android-application = { id = "com.android.application", version.ref = "android-gradle-plugin" }
 android-library = { id = "com.android.library", version.ref = "android-gradle-plugin" }
 dependency-analysis = { id = "com.autonomousapps.dependency-analysis", version.ref = "dependency-analysis" }

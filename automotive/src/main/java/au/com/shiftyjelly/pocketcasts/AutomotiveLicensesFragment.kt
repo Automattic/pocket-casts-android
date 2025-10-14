@@ -18,7 +18,7 @@ import com.mikepenz.aboutlibraries.Libs
 import com.mikepenz.aboutlibraries.entity.Library
 import com.mikepenz.aboutlibraries.ui.compose.LibrariesContainer
 import com.mikepenz.aboutlibraries.ui.compose.LibraryDefaults
-import com.mikepenz.aboutlibraries.ui.compose.android.rememberLibraries
+import com.mikepenz.aboutlibraries.ui.compose.android.produceLibraries
 import com.mikepenz.aboutlibraries.ui.compose.libraryColors
 import com.mikepenz.aboutlibraries.ui.compose.util.author
 import com.mikepenz.aboutlibraries.util.withContext
@@ -43,10 +43,10 @@ class AutomotiveLicensesFragment : Fragment() {
             showVersion = false,
             showLicenseBadges = false,
             colors = LibraryDefaults.libraryColors(
-                contentColor = MaterialTheme.theme.colors.primaryText01,
+                libraryContentColor = MaterialTheme.theme.colors.primaryText01,
             ),
-            libraries = rememberLibraries {
-                val libs = Libs.Builder().withContext(requireContext()).build()
+            libraries = produceLibraries { context ->
+                val libs = Libs.Builder().withContext(context).build()
                 // without displaying the artifact id the libraries seem to appear twice
                 libs.copy(
                     libs.libraries.distinctBy { "${it.name}##${it.author}" }.toImmutableList(),
