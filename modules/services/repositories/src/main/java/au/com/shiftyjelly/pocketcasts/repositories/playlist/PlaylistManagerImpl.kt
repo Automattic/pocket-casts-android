@@ -37,8 +37,6 @@ import au.com.shiftyjelly.pocketcasts.repositories.playlist.PlaylistManager.Comp
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import java.time.Clock
-import java.time.Duration
-import java.time.Instant
 import java.util.UUID
 import java.util.concurrent.ConcurrentHashMap
 import javax.inject.Inject
@@ -53,7 +51,6 @@ import kotlinx.coroutines.async
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.distinctUntilChanged
@@ -102,53 +99,37 @@ class PlaylistManagerImpl(
         }
     }
 
-    private val previewMetadataCache = ConcurrentHashMap<String, CachedMetadata>()
+    private val previewMetadataCache = ConcurrentHashMap<String, MutableStateFlow<PlaylistPreview.Metadata?>>()
 
-    override fun getPreviewMetadataFlow(playlistUuid: String): StateFlow<PlaylistPreview.Metadata?> {
-        return getCachedMetadata(playlistUuid).flow
-    }
-
-    private fun getCachedMetadata(playlistUuid: String): CachedMetadata {
-        return previewMetadataCache.computeIfAbsent(playlistUuid) {
-            CachedMetadata(
-                lastRefreshTime = Instant.MIN,
-                flow = MutableStateFlow(null),
-            )
-        }
+    override fun getPreviewMetadataFlow(playlistUuid: String): MutableStateFlow<PlaylistPreview.Metadata?> {
+        return previewMetadataCache.computeIfAbsent(playlistUuid) { MutableStateFlow(null) }
     }
 
     override suspend fun refreshPreviewMetadata(playlistUuid: String) {
-        val cachedValue = getCachedMetadata(playlistUuid)
-        if (Duration.between(cachedValue.lastRefreshTime, clock.instant()).seconds > CACHE_EVICTION_TIMEOUT.inWholeSeconds) {
-            val preview = playlistDao.getAllPlaylistsIn(listOf(playlistUuid)).firstOrNull()?.toPlaylistPreview() ?: return
+        val cachedFlow = getPreviewMetadataFlow(playlistUuid)
+        val preview = playlistDao.getAllPlaylistsIn(listOf(playlistUuid)).firstOrNull()?.toPlaylistPreview() ?: return
 
-            val episodeCount: Int
-            val artworkUuids: List<String>
-            coroutineScope {
-                val count = async {
-                    when (preview) {
-                        is ManualPlaylistPreview -> playlistDao.manualPlaylistMetadataFlow(playlistUuid)
-                        is SmartPlaylistPreview -> playlistDao.smartPlaylistMetadataFlow(clock, preview.smartRules)
-                    }.first().episodeCount
-                }
-
-                val uuids = async {
-                    when (preview) {
-                        is ManualPlaylistPreview -> manualPlaylistArtworkPodcastsFlow(playlistUuid)
-                        is SmartPlaylistPreview -> smartPlaylistArtworkPodcastsFlow(preview.smartRules, preview.settings.sortType)
-                    }.first()
-                }
-
-                episodeCount = count.await()
-                artworkUuids = uuids.await()
+        val episodeCount: Int
+        val artworkUuids: List<String>
+        coroutineScope {
+            val count = async {
+                when (preview) {
+                    is ManualPlaylistPreview -> playlistDao.manualPlaylistMetadataFlow(playlistUuid)
+                    is SmartPlaylistPreview -> playlistDao.smartPlaylistMetadataFlow(clock, preview.smartRules)
+                }.first().episodeCount
             }
-            cachedValue.flow.value = PlaylistPreview.Metadata(episodeCount, artworkUuids)
 
-            previewMetadataCache[playlistUuid] = CachedMetadata(
-                lastRefreshTime = clock.instant(),
-                flow = cachedValue.flow,
-            )
+            val uuids = async {
+                when (preview) {
+                    is ManualPlaylistPreview -> manualPlaylistArtworkPodcastsFlow(playlistUuid)
+                    is SmartPlaylistPreview -> smartPlaylistArtworkPodcastsFlow(preview.smartRules, preview.settings.sortType)
+                }.first()
+            }
+
+            episodeCount = count.await()
+            artworkUuids = uuids.await()
         }
+        cachedFlow.value = PlaylistPreview.Metadata(episodeCount, artworkUuids)
     }
 
     override suspend fun getAutoDownloadEpisodes(): List<PodcastEpisode> {
@@ -633,10 +614,3 @@ private fun List<String>.toArtworkUuids(): List<String> {
 // but adding a short debounce helps avoid these inconsistencies and prevents redundant downstream emissions.
 @OptIn(FlowPreview::class)
 private fun <T> Flow<T>.keepPodcastEpisodesSynced() = debounce(50)
-
-private class CachedMetadata(
-    val lastRefreshTime: Instant,
-    val flow: MutableStateFlow<PlaylistPreview.Metadata?>,
-)
-
-private val CACHE_EVICTION_TIMEOUT = 30.seconds
