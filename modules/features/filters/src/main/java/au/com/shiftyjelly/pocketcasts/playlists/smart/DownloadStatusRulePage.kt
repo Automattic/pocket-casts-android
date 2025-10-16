@@ -26,13 +26,11 @@ internal fun DownloadStatusRulePage(
     selectedRule: DownloadStatusRule,
     onSelectDownloadStatus: (DownloadStatusRule) -> Unit,
     onSaveRule: () -> Unit,
-    onClickBack: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     RulePage(
         title = stringResource(LR.string.filters_chip_download_status),
         onSaveRule = onSaveRule,
-        onClickBack = onClickBack,
         modifier = modifier,
     ) { bottomPadding ->
         Column(
@@ -51,11 +49,12 @@ internal fun DownloadStatusRulePage(
     }
 }
 
-private val DownloadStatusRule.displayLabelId get() = when (this) {
-    DownloadStatusRule.Any -> LR.string.all
-    DownloadStatusRule.Downloaded -> LR.string.downloaded
-    DownloadStatusRule.NotDownloaded -> LR.string.not_downloaded
-}
+private val DownloadStatusRule.displayLabelId
+    get() = when (this) {
+        DownloadStatusRule.Any -> LR.string.all
+        DownloadStatusRule.Downloaded -> LR.string.downloaded
+        DownloadStatusRule.NotDownloaded -> LR.string.not_downloaded
+    }
 
 @Composable
 @PreviewRegularDevice
@@ -69,7 +68,6 @@ private fun DownloadStatusRulePreview(
             selectedRule = rule,
             onSelectDownloadStatus = { rule = it },
             onSaveRule = {},
-            onClickBack = {},
         )
     }
 }

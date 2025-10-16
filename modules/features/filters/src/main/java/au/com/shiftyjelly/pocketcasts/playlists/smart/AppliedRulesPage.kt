@@ -38,8 +38,6 @@ import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
 import au.com.shiftyjelly.pocketcasts.compose.AppThemeWithBackground
 import au.com.shiftyjelly.pocketcasts.compose.Devices
-import au.com.shiftyjelly.pocketcasts.compose.bars.NavigationButton
-import au.com.shiftyjelly.pocketcasts.compose.bars.ThemedTopAppBar
 import au.com.shiftyjelly.pocketcasts.compose.buttons.RowButton
 import au.com.shiftyjelly.pocketcasts.compose.components.FadedLazyColumn
 import au.com.shiftyjelly.pocketcasts.compose.components.NoContentBanner
@@ -64,7 +62,6 @@ internal fun AppliedRulesPage(
     totalEpisodeCount: Int,
     useEpisodeArtwork: Boolean,
     onClickRule: (RuleType) -> Unit,
-    onClickClose: () -> Unit,
     modifier: Modifier = Modifier,
     areOtherOptionsExpanded: Boolean = false,
     toggleOtherOptions: (() -> Unit)? = null,
@@ -75,116 +72,105 @@ internal fun AppliedRulesPage(
             .fillMaxSize()
             .verticalScroll(rememberScrollState()),
     ) {
-        ThemedTopAppBar(
-            navigationButton = NavigationButton.Close,
-            style = ThemedTopAppBar.Style.Immersive,
-            iconColor = MaterialTheme.theme.colors.primaryIcon03,
-            windowInsets = WindowInsets(0),
-            onNavigationClick = onClickClose,
-        )
-        Column(
+        val activeRules = rememberActiveRules(appliedRules)
+        val inactiveRules = rememberInactiveRules(activeRules)
+
+        FadedLazyColumn(
+            contentPadding = if (onCreatePlaylist == null) {
+                WindowInsets.verticalNavigationBars.asPaddingValues()
+            } else {
+                PaddingValues(bottom = 24.dp)
+            },
             modifier = Modifier.weight(1f),
         ) {
-            val activeRules = rememberActiveRules(appliedRules)
-            val inactiveRules = rememberInactiveRules(activeRules)
-
-            FadedLazyColumn(
-                contentPadding = if (onCreatePlaylist == null) {
-                    WindowInsets.verticalNavigationBars.asPaddingValues()
-                } else {
-                    PaddingValues(bottom = 24.dp)
-                },
-                modifier = Modifier.weight(1f),
-            ) {
-                if (activeRules.isNotEmpty()) {
+            if (activeRules.isNotEmpty()) {
+                item(
+                    key = "active-rules",
+                    contentType = "active-rules",
+                ) {
+                    ActiveRulesContent(
+                        rules = activeRules,
+                        episodeCount = totalEpisodeCount,
+                        appliedRules = appliedRules,
+                        onClickRule = onClickRule,
+                    )
+                }
+                if (inactiveRules.isNotEmpty() && toggleOtherOptions != null) {
                     item(
-                        key = "active-rules",
-                        contentType = "active-rules",
+                        key = "inactive-rules",
+                        contentType = "inactive-rules",
                     ) {
-                        ActiveRulesContent(
-                            rules = activeRules,
-                            episodeCount = totalEpisodeCount,
-                            appliedRules = appliedRules,
+                        InactiveRulesContent(
+                            rules = inactiveRules,
+                            isExpanded = areOtherOptionsExpanded,
                             onClickRule = onClickRule,
-                        )
-                    }
-                    if (inactiveRules.isNotEmpty() && toggleOtherOptions != null) {
-                        item(
-                            key = "inactive-rules",
-                            contentType = "inactive-rules",
-                        ) {
-                            InactiveRulesContent(
-                                rules = inactiveRules,
-                                isExpanded = areOtherOptionsExpanded,
-                                onClickRule = onClickRule,
-                                onToggleExpand = toggleOtherOptions,
-                                modifier = Modifier.padding(top = 32.dp),
-                            )
-                        }
-                    }
-                    item(
-                        key = "playlist-header",
-                        contentType = "playlist-header",
-                    ) {
-                        TextH20(
-                            text = stringResource(LR.string.preview_playlist, playlistName),
-                            modifier = Modifier
-                                .padding(horizontal = 16.dp)
-                                .padding(top = 32.dp),
-                        )
-                    }
-                    if (availableEpisodes.isNotEmpty()) {
-                        items(
-                            items = availableEpisodes,
-                            key = { episode -> episode.uuid },
-                            contentType = { "episode" },
-                        ) { episodeWrapper ->
-                            SmartEpisodeRow(
-                                episode = episodeWrapper.episode,
-                                useEpisodeArtwork = useEpisodeArtwork,
-                            )
-                        }
-                    } else {
-                        item(
-                            key = "no-episodes",
-                            contentType = "no-episodes",
-                        ) {
-                            Box(
-                                contentAlignment = Alignment.TopCenter,
-                                modifier = Modifier.fillMaxWidth(),
-                            ) {
-                                NoContentBanner(
-                                    iconResourceId = IR.drawable.ic_info,
-                                    title = stringResource(LR.string.smart_playlist_create_no_content_title),
-                                    body = stringResource(LR.string.smart_playlist_create_no_content_body),
-                                    modifier = Modifier.padding(top = 56.dp),
-                                )
-                            }
-                        }
-                    }
-                } else {
-                    item(
-                        key = "no-rules",
-                        contentType = "no-rules",
-                    ) {
-                        NoRulesContent(
-                            title = playlistName,
-                            onClickRule = onClickRule,
+                            onToggleExpand = toggleOtherOptions,
+                            modifier = Modifier.padding(top = 32.dp),
                         )
                     }
                 }
+                item(
+                    key = "playlist-header",
+                    contentType = "playlist-header",
+                ) {
+                    TextH20(
+                        text = stringResource(LR.string.preview_playlist, playlistName),
+                        modifier = Modifier
+                            .padding(horizontal = 16.dp)
+                            .padding(top = 32.dp),
+                    )
+                }
+                if (availableEpisodes.isNotEmpty()) {
+                    items(
+                        items = availableEpisodes,
+                        key = { episode -> episode.uuid },
+                        contentType = { "episode" },
+                    ) { episodeWrapper ->
+                        SmartEpisodeRow(
+                            episode = episodeWrapper.episode,
+                            useEpisodeArtwork = useEpisodeArtwork,
+                        )
+                    }
+                } else {
+                    item(
+                        key = "no-episodes",
+                        contentType = "no-episodes",
+                    ) {
+                        Box(
+                            contentAlignment = Alignment.TopCenter,
+                            modifier = Modifier.fillMaxWidth(),
+                        ) {
+                            NoContentBanner(
+                                iconResourceId = IR.drawable.ic_info,
+                                title = stringResource(LR.string.smart_playlist_create_no_content_title),
+                                body = stringResource(LR.string.smart_playlist_create_no_content_body),
+                                modifier = Modifier.padding(top = 56.dp),
+                            )
+                        }
+                    }
+                }
+            } else {
+                item(
+                    key = "no-rules",
+                    contentType = "no-rules",
+                ) {
+                    NoRulesContent(
+                        title = playlistName,
+                        onClickRule = onClickRule,
+                    )
+                }
             }
-            if (onCreatePlaylist != null) {
-                RowButton(
-                    text = stringResource(LR.string.create_smart_playlist),
-                    enabled = appliedRules.isAnyRuleApplied,
-                    onClick = onCreatePlaylist,
-                    includePadding = false,
-                    modifier = Modifier
-                        .padding(horizontal = 16.dp)
-                        .navigationBarsPadding(),
-                )
-            }
+        }
+        if (onCreatePlaylist != null) {
+            RowButton(
+                text = stringResource(LR.string.create_smart_playlist),
+                enabled = appliedRules.isAnyRuleApplied,
+                onClick = onCreatePlaylist,
+                includePadding = false,
+                modifier = Modifier
+                    .padding(horizontal = 16.dp)
+                    .navigationBarsPadding(),
+            )
         }
     }
 }
@@ -343,7 +329,6 @@ private fun AppliedRulesPageNoRulesPreview(
             areOtherOptionsExpanded = expanded,
             onCreatePlaylist = {},
             onClickRule = {},
-            onClickClose = {},
             toggleOtherOptions = { expanded = !expanded },
             modifier = Modifier.fillMaxSize(),
         )
@@ -377,7 +362,6 @@ private fun AppliedRulesPageEpisodesPreview(
             areOtherOptionsExpanded = expanded,
             onCreatePlaylist = {},
             onClickRule = {},
-            onClickClose = {},
             toggleOtherOptions = { expanded = !expanded },
             modifier = Modifier.fillMaxSize(),
         )
@@ -402,7 +386,6 @@ private fun AppliedRulesPageNoEpisodesPreview(
             areOtherOptionsExpanded = expanded,
             onCreatePlaylist = {},
             onClickRule = {},
-            onClickClose = {},
             toggleOtherOptions = { expanded = !expanded },
             modifier = Modifier.fillMaxSize(),
         )
