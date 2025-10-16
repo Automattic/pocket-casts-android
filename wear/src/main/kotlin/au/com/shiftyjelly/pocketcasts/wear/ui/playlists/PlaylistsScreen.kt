@@ -44,8 +44,8 @@ fun PlaylistsScreen(
     when (val state = uiState) { // the state needs to be immutable or the following error will happen 'Smart cast is impossible'
         is UiState.Loaded -> Content(
             playlists = state.playlists,
-            getPreviewMetadataFlow = viewModel::getPreviewMetadataFlow,
-            refreshPreviewMetadata = viewModel::refreshPreviewMetadata,
+            getArtworkUuidsFlow = viewModel::getArtworkUuidsFlow,
+            refreshArtworkUuids = viewModel::refreshArtworkUuids,
             onClickPlaylist = onClickPlaylist,
             modifier = modifier,
             columnState = columnState,
@@ -59,8 +59,8 @@ fun PlaylistsScreen(
 private fun Content(
     columnState: ScalingLazyColumnState,
     playlists: List<PlaylistPreview>,
-    getPreviewMetadataFlow: (String) -> StateFlow<PlaylistPreview.Metadata?>,
-    refreshPreviewMetadata: (String) -> Unit,
+    getArtworkUuidsFlow: (String) -> StateFlow<List<String>?>,
+    refreshArtworkUuids: suspend (String) -> Unit,
     onClickPlaylist: (PlaylistPreview) -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -81,15 +81,15 @@ private fun Content(
                 onClick = { onClickPlaylist(playlist) },
                 icon = {
                     if (usePlaylists) {
-                        val metadata by remember(playlist.uuid) {
-                            getPreviewMetadataFlow(playlist.uuid)
+                        val artworkUuids by remember(playlist.uuid) {
+                            getArtworkUuidsFlow(playlist.uuid)
                         }.collectAsState()
 
-                        LaunchedEffect(playlist.uuid, refreshPreviewMetadata) {
-                            refreshPreviewMetadata(playlist.uuid)
+                        LaunchedEffect(playlist.uuid, refreshArtworkUuids) {
+                            refreshArtworkUuids(playlist.uuid)
                         }
                         PlaylistArtwork(
-                            podcastUuids = metadata?.artworkPodcastUuids.orEmpty(),
+                            podcastUuids = artworkUuids.orEmpty(),
                             artworkSize = 32.dp,
                             elevation = 0.dp,
                             modifier = Modifier.padding(horizontal = 8.dp),

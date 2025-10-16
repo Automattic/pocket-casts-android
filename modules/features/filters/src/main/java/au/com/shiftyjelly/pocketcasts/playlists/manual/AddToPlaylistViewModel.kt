@@ -9,7 +9,6 @@ import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.compose.text.SearchFieldState
 import au.com.shiftyjelly.pocketcasts.models.to.PlaylistPreviewForEpisode
 import au.com.shiftyjelly.pocketcasts.repositories.playlist.PlaylistManager
-import au.com.shiftyjelly.pocketcasts.repositories.playlist.PlaylistPreview
 import au.com.shiftyjelly.pocketcasts.views.swipe.AddToPlaylistFragmentFactory.Source
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
@@ -34,7 +33,6 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 
 @OptIn(ExperimentalCoroutinesApi::class)
 @HiltViewModel(assistedFactory = AddToPlaylistViewModel.Factory::class)
@@ -84,14 +82,12 @@ class AddToPlaylistViewModel @AssistedInject constructor(
         emitAll(uiStates)
     }.stateIn(viewModelScope, SharingStarted.Eagerly, initialValue = null)
 
-    fun getPreviewMetadataFlow(playlistUuid: String): StateFlow<PlaylistPreview.Metadata?> {
-        return playlistManager.getPreviewMetadataFlow(playlistUuid)
+    fun getArtworkUuidsFlow(playlistUuid: String): StateFlow<List<String>?> {
+        return playlistManager.getArtworkUuidsFlow(playlistUuid)
     }
 
-    fun refreshPreviewMetadata(playlistUuid: String) {
-        viewModelScope.launch {
-            playlistManager.refreshPreviewMetadata(playlistUuid)
-        }
+    suspend fun refreshArtworkUuids(playlistUuid: String) {
+        playlistManager.refreshArtworkUuids(playlistUuid)
     }
 
     private var isCreationTriggered = false

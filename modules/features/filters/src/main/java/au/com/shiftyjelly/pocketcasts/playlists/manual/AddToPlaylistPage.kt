@@ -74,7 +74,6 @@ import au.com.shiftyjelly.pocketcasts.compose.preview.ThemePreviewParameterProvi
 import au.com.shiftyjelly.pocketcasts.compose.theme
 import au.com.shiftyjelly.pocketcasts.models.to.PlaylistPreviewForEpisode
 import au.com.shiftyjelly.pocketcasts.playlists.component.PlaylistNameInputField
-import au.com.shiftyjelly.pocketcasts.repositories.playlist.PlaylistPreview
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme.ThemeType
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -86,8 +85,8 @@ internal fun AddToPlaylistPage(
     playlistPreviews: List<PlaylistPreviewForEpisode>,
     unfilteredPlaylistsCount: Int,
     episodeLimit: Int,
-    getPreviewMetadataFlow: (String) -> StateFlow<PlaylistPreview.Metadata?>,
-    refreshPreviewMetadata: (String) -> Unit,
+    getArtworkUuidsFlow: (String) -> StateFlow<List<String>?>,
+    refreshArtworkUuids: suspend (String) -> Unit,
     onClickCreatePlaylist: () -> Unit,
     onChangeEpisodeInPlaylist: (PlaylistPreviewForEpisode) -> Unit,
     onClickContinueWithNewPlaylist: () -> Unit,
@@ -135,8 +134,8 @@ internal fun AddToPlaylistPage(
                     unfilteredPlaylistsCount = unfilteredPlaylistsCount,
                     episodeLimit = episodeLimit,
                     searchState = searchFieldState,
-                    getPreviewMetadataFlow = getPreviewMetadataFlow,
-                    refreshPreviewMetadata = refreshPreviewMetadata,
+                    getArtworkUuidsFlow = getArtworkUuidsFlow,
+                    refreshArtworkUuids = refreshArtworkUuids,
                     onCreatePlaylist = {
                         onClickContinueWithNewPlaylist()
                         navController.navigateOnce(AddToPlaylistRoutes.NEW_PLAYLIST)
@@ -162,8 +161,8 @@ private fun SelectPlaylistsPage(
     unfilteredPlaylistsCount: Int,
     episodeLimit: Int,
     searchState: TextFieldState,
-    getPreviewMetadataFlow: (String) -> StateFlow<PlaylistPreview.Metadata?>,
-    refreshPreviewMetadata: (String) -> Unit,
+    getArtworkUuidsFlow: (String) -> StateFlow<List<String>?>,
+    refreshArtworkUuids: suspend (String) -> Unit,
     onCreatePlaylist: () -> Unit,
     onChangeEpisodeInPlaylist: (PlaylistPreviewForEpisode) -> Unit,
     onClickDoneButton: () -> Unit,
@@ -201,8 +200,8 @@ private fun SelectPlaylistsPage(
             playlistPreviews = playlistPreviews,
             unfilteredPlaylistsCount = unfilteredPlaylistsCount,
             episodeLimit = episodeLimit,
-            getPreviewMetadataFlow = getPreviewMetadataFlow,
-            refreshPreviewMetadata = refreshPreviewMetadata,
+            getArtworkUuidsFlow = getArtworkUuidsFlow,
+            refreshArtworkUuids = refreshArtworkUuids,
             onChangeEpisodeInPlaylist = onChangeEpisodeInPlaylist,
             modifier = Modifier
                 .weight(1f)
@@ -264,8 +263,8 @@ private fun PlaylistPreviewsColumn(
     playlistPreviews: List<PlaylistPreviewForEpisode>,
     unfilteredPlaylistsCount: Int,
     episodeLimit: Int,
-    getPreviewMetadataFlow: (String) -> StateFlow<PlaylistPreview.Metadata?>,
-    refreshPreviewMetadata: (String) -> Unit,
+    getArtworkUuidsFlow: (String) -> StateFlow<List<String>?>,
+    refreshArtworkUuids: suspend (String) -> Unit,
     onChangeEpisodeInPlaylist: (PlaylistPreviewForEpisode) -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -300,8 +299,8 @@ private fun PlaylistPreviewsColumn(
                     playlist = playlist,
                     episodeLimit = episodeLimit,
                     showDivider = index != playlistPreviews.lastIndex,
-                    getPreviewMetadataFlow = getPreviewMetadataFlow,
-                    refreshPreviewMetadata = refreshPreviewMetadata,
+                    getArtworkUuidsFlow = getArtworkUuidsFlow,
+                    refreshArtworkUuids = refreshArtworkUuids,
                     modifier = Modifier
                         .clickable(
                             role = Role.Button,
@@ -341,16 +340,16 @@ private fun PlaylistPreviewRow(
     playlist: PlaylistPreviewForEpisode,
     episodeLimit: Int,
     showDivider: Boolean,
-    getPreviewMetadataFlow: (String) -> StateFlow<PlaylistPreview.Metadata?>,
-    refreshPreviewMetadata: (String) -> Unit,
+    getArtworkUuidsFlow: (String) -> StateFlow<List<String>?>,
+    refreshArtworkUuids: suspend (String) -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    val metadata by remember(playlist.uuid) {
-        getPreviewMetadataFlow(playlist.uuid)
+    val artworkUuids by remember(playlist.uuid) {
+        getArtworkUuidsFlow(playlist.uuid)
     }.collectAsState()
 
-    LaunchedEffect(playlist.uuid, refreshPreviewMetadata) {
-        refreshPreviewMetadata(playlist.uuid)
+    LaunchedEffect(playlist.uuid, refreshArtworkUuids) {
+        refreshArtworkUuids(playlist.uuid)
     }
 
     Column(
@@ -364,7 +363,7 @@ private fun PlaylistPreviewRow(
         ) {
             val alpha = if (playlist.canAddOrRemoveEpisode(episodeLimit)) 1f else 0.4f
             PlaylistArtwork(
-                podcastUuids = metadata?.artworkPodcastUuids.orEmpty(),
+                podcastUuids = artworkUuids.orEmpty(),
                 artworkSize = 56.dp,
                 elevation = if (playlist.canAddOrRemoveEpisode(episodeLimit)) 1.dp else 0.dp,
                 modifier = Modifier.alpha(alpha),
@@ -456,8 +455,8 @@ private fun AddToPlaylistPageEmptyStatePreview() {
             playlistPreviews = emptyList(),
             unfilteredPlaylistsCount = 0,
             episodeLimit = 100,
-            getPreviewMetadataFlow = { MutableStateFlow(null) },
-            refreshPreviewMetadata = {},
+            getArtworkUuidsFlow = { MutableStateFlow(null) },
+            refreshArtworkUuids = {},
             onClickCreatePlaylist = {},
             onChangeEpisodeInPlaylist = {},
             onClickContinueWithNewPlaylist = {},
@@ -476,8 +475,8 @@ private fun AddToPlaylistPageNoSearchPreview() {
             playlistPreviews = emptyList(),
             unfilteredPlaylistsCount = 1,
             episodeLimit = 100,
-            getPreviewMetadataFlow = { MutableStateFlow(null) },
-            refreshPreviewMetadata = {},
+            getArtworkUuidsFlow = { MutableStateFlow(null) },
+            refreshArtworkUuids = {},
             onClickCreatePlaylist = {},
             onChangeEpisodeInPlaylist = {},
             onClickContinueWithNewPlaylist = {},
@@ -524,8 +523,8 @@ private fun AddToPlaylistPagePreview(
                 ),
             ),
             episodeLimit = 100,
-            getPreviewMetadataFlow = { MutableStateFlow(null) },
-            refreshPreviewMetadata = {},
+            getArtworkUuidsFlow = { MutableStateFlow(null) },
+            refreshArtworkUuids = {},
             unfilteredPlaylistsCount = 4,
             navController = navController,
             onClickCreatePlaylist = {},
