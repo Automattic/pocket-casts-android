@@ -17,7 +17,6 @@ import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.MaterialTheme
-import androidx.compose.material3.adaptive.currentWindowAdaptiveInfo
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -29,7 +28,6 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
 import au.com.shiftyjelly.pocketcasts.compose.AppThemeWithBackground
-import au.com.shiftyjelly.pocketcasts.compose.adaptive.isAtMostMediumHeight
 import au.com.shiftyjelly.pocketcasts.compose.buttons.RowButton
 import au.com.shiftyjelly.pocketcasts.compose.components.PagerDotIndicator
 import au.com.shiftyjelly.pocketcasts.compose.components.TextH10
@@ -45,7 +43,6 @@ internal fun OnboardingPage(
     onGotItClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    val windowSizeClass = currentWindowAdaptiveInfo().windowSizeClass
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
         modifier = modifier
@@ -57,25 +54,20 @@ internal fun OnboardingPage(
         HorizontalPager(
             state = pagerState,
             verticalAlignment = Alignment.Top,
-            contentPadding = PaddingValues(
-                top = 16.dp + if (windowSizeClass.isAtMostMediumHeight()) 48.dp else 0.dp,
-            ),
+            contentPadding = PaddingValues(top = 64.dp),
             modifier = Modifier.weight(1f),
         ) { index ->
-            val verticalArrangement = if (windowSizeClass.isAtMostMediumHeight()) Arrangement.Top else Arrangement.Center
             when (index) {
                 0 -> OnboardingContent(
                     imageId = IR.drawable.playlists_onboarding_smart_playlists,
                     title = stringResource(LR.string.playlists_onboarding_smart_playlist_title),
                     description = stringResource(LR.string.playlists_onboarding_smart_playlist_description),
-                    verticalArrangement = verticalArrangement,
                 )
 
                 1 -> OnboardingContent(
                     imageId = IR.drawable.playlists_onboarding_playlists,
                     title = stringResource(LR.string.playlists_onboarding_playlist_title),
                     description = stringResource(LR.string.playlists_onboarding_playlist_description),
-                    verticalArrangement = verticalArrangement,
                 )
 
                 else -> error("Unknown onboarding page: $index")
@@ -107,12 +99,11 @@ private fun OnboardingContent(
     @DrawableRes imageId: Int,
     title: String,
     description: String,
-    verticalArrangement: Arrangement.Vertical,
     modifier: Modifier = Modifier,
 ) {
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = verticalArrangement,
+        verticalArrangement = Arrangement.Top,
         modifier = modifier.fillMaxSize(),
     ) {
         Column(
