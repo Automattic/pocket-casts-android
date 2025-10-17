@@ -50,7 +50,6 @@ import au.com.shiftyjelly.pocketcasts.models.type.SmartRules.PodcastsRule
 import au.com.shiftyjelly.pocketcasts.podcasts.viewmodel.PodcastSettingsViewModel.UiState
 import au.com.shiftyjelly.pocketcasts.repositories.extensions.drawableId
 import au.com.shiftyjelly.pocketcasts.repositories.playlist.Playlist
-import au.com.shiftyjelly.pocketcasts.repositories.playlist.PlaylistPreview
 import au.com.shiftyjelly.pocketcasts.repositories.playlist.SmartPlaylistPreview
 import au.com.shiftyjelly.pocketcasts.ui.extensions.getColor
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme.ThemeType
@@ -63,8 +62,8 @@ import au.com.shiftyjelly.pocketcasts.localization.R as LR
 @Composable
 internal fun PodcastSettingsPlaylistsPage(
     uiState: UiState,
-    getPreviewMetadataFlow: (String) -> StateFlow<PlaylistPreview.Metadata?>,
-    refreshPreviewMetadata: (String) -> Unit,
+    getArtworkUuidsFlow: (String) -> StateFlow<List<String>?>,
+    refreshArtworkUuids: suspend (String) -> Unit,
     onAddPodcastToPlaylists: (List<String>) -> Unit,
     onRemovePodcastFromPlaylists: (List<String>) -> Unit,
     modifier: Modifier = Modifier,
@@ -139,8 +138,8 @@ internal fun PodcastSettingsPlaylistsPage(
                     isSelected = isSelected,
                     showDivider = index != uiState.playlists.lastIndex,
                     usePlaylists = usePlaylists,
-                    getPreviewMetadataFlow = getPreviewMetadataFlow,
-                    refreshPreviewMetadata = refreshPreviewMetadata,
+                    getArtworkUuidsFlow = getArtworkUuidsFlow,
+                    refreshArtworkUuids = refreshArtworkUuids,
                     modifier = Modifier.clickable(
                         role = Role.Button,
                         onClick = {
@@ -164,17 +163,17 @@ private fun PlaylistRow(
     isSelected: Boolean,
     showDivider: Boolean,
     usePlaylists: Boolean,
-    getPreviewMetadataFlow: (String) -> StateFlow<PlaylistPreview.Metadata?>,
-    refreshPreviewMetadata: (String) -> Unit,
+    getArtworkUuidsFlow: (String) -> StateFlow<List<String>?>,
+    refreshArtworkUuids: suspend (String) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     if (usePlaylists) {
-        val metadata by remember(playlist.uuid) {
-            getPreviewMetadataFlow(playlist.uuid)
+        val artworkUuids by remember(playlist.uuid) {
+            getArtworkUuidsFlow(playlist.uuid)
         }.collectAsState()
 
-        LaunchedEffect(playlist.uuid, refreshPreviewMetadata) {
-            refreshPreviewMetadata(playlist.uuid)
+        LaunchedEffect(playlist.uuid, refreshArtworkUuids) {
+            refreshArtworkUuids(playlist.uuid)
         }
 
         Column(
@@ -187,7 +186,7 @@ private fun PlaylistRow(
                     .padding(horizontal = 16.dp, vertical = 12.dp),
             ) {
                 PlaylistArtwork(
-                    podcastUuids = metadata?.artworkPodcastUuids.orEmpty(),
+                    podcastUuids = artworkUuids.orEmpty(),
                     artworkSize = 56.dp,
                 )
                 Spacer(
@@ -278,8 +277,8 @@ private fun PodcastSettingsPlaylistsPagePreview(
                 },
                 globalUpNextLimit = 100,
             ),
-            getPreviewMetadataFlow = { MutableStateFlow(null) },
-            refreshPreviewMetadata = {},
+            getArtworkUuidsFlow = { MutableStateFlow(null) },
+            refreshArtworkUuids = {},
             onAddPodcastToPlaylists = {},
             onRemovePodcastFromPlaylists = {},
             modifier = Modifier.background(MaterialTheme.theme.colors.primaryUi02),

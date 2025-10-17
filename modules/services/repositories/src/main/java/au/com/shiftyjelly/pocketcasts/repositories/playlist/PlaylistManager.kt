@@ -16,9 +16,13 @@ interface PlaylistManager {
     // <editor-fold desc="Generic playlists">
     fun playlistPreviewsFlow(): Flow<List<PlaylistPreview>>
 
-    fun getPreviewMetadataFlow(playlistUuid: String): StateFlow<PlaylistPreview.Metadata?>
+    fun getArtworkUuidsFlow(playlistUuid: String): StateFlow<List<String>?>
 
-    suspend fun refreshPreviewMetadata(playlistUuid: String)
+    fun getEpisodeCountFlow(playlistUuid: String): StateFlow<Int?>
+
+    suspend fun refreshArtworkUuids(playlistUuid: String)
+
+    suspend fun refreshEpisodeCount(playlistUuid: String)
 
     suspend fun getAutoDownloadEpisodes(): List<PodcastEpisode>
 

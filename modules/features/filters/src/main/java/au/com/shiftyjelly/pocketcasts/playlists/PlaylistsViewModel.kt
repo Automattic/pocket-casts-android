@@ -51,14 +51,20 @@ class PlaylistsViewModel @Inject constructor(
         )
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(stopTimeout = 300.milliseconds), UiState.Empty)
 
-    fun getPreviewMetadataFlow(playlistUuid: String): StateFlow<PlaylistPreview.Metadata?> {
-        return playlistManager.getPreviewMetadataFlow(playlistUuid)
+    fun getArtworkUuidsFlow(playlistUuid: String): StateFlow<List<String>?> {
+        return playlistManager.getArtworkUuidsFlow(playlistUuid)
     }
 
-    fun refreshPreviewMetadata(playlistUuid: String) {
-        viewModelScope.launch {
-            playlistManager.refreshPreviewMetadata(playlistUuid)
-        }
+    fun getEpisodeCountFlow(playlistUuid: String): StateFlow<Int?> {
+        return playlistManager.getEpisodeCountFlow(playlistUuid)
+    }
+
+    suspend fun refreshArtworkUuids(playlistUuid: String) {
+        playlistManager.refreshArtworkUuids(playlistUuid)
+    }
+
+    suspend fun refreshEpisodeCount(playlistUuid: String) {
+        playlistManager.refreshEpisodeCount(playlistUuid)
     }
 
     fun deletePlaylist(uuid: String) {

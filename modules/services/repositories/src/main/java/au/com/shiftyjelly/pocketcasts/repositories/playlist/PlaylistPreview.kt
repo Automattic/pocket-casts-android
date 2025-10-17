@@ -9,11 +9,6 @@ sealed interface PlaylistPreview {
     val settings: Playlist.Settings
     val icon: PlaylistIcon
     val type: Playlist.Type
-
-    data class Metadata(
-        val episodeCount: Int,
-        val artworkPodcastUuids: List<String>,
-    )
 }
 
 data class SmartPlaylistPreview(
