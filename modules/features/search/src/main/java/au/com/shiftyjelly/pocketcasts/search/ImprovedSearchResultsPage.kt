@@ -26,7 +26,6 @@ import au.com.shiftyjelly.pocketcasts.compose.components.FadeConfig
 import au.com.shiftyjelly.pocketcasts.compose.components.FadedLazyColumn
 import au.com.shiftyjelly.pocketcasts.compose.components.HorizontalDivider
 import au.com.shiftyjelly.pocketcasts.compose.theme
-import au.com.shiftyjelly.pocketcasts.models.entity.BaseEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.Folder
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.to.ImprovedSearchResultItem
@@ -37,7 +36,6 @@ import au.com.shiftyjelly.pocketcasts.search.component.NoResultsView
 import au.com.shiftyjelly.pocketcasts.search.component.SearchFailedView
 import au.com.shiftyjelly.pocketcasts.search.component.SearchResultFilters
 import au.com.shiftyjelly.pocketcasts.views.helper.PlayButtonListener
-import kotlinx.coroutines.flow.Flow
 
 @Composable
 fun ImprovedSearchResultsPage(
@@ -51,9 +49,7 @@ fun ImprovedSearchResultsPage(
     onFilterSelect: (ResultsFilters) -> Unit,
     playButtonListener: PlayButtonListener,
     onScroll: () -> Unit,
-    episodePlaybackFlow: Flow<EpisodePlaybackData?>,
     modifier: Modifier = Modifier,
-    fetchEpisode: (suspend (ImprovedSearchResultItem.EpisodeItem) -> BaseEpisode?)? = null,
 ) {
     Column(
         modifier = modifier,
@@ -73,11 +69,9 @@ fun ImprovedSearchResultsPage(
                         onFollowPodcast = onFollowPodcast,
                         playButtonListener = playButtonListener,
                         onScroll = onScroll,
-                        fetchEpisode = fetchEpisode,
                         selectedFilterIndex = state.selectedFilterIndex,
                         filterOptions = state.filterOptions.toList(),
                         onFilterSelect = onFilterSelect,
-                        episodePlaybackFlow = episodePlaybackFlow,
                     )
                 }
             }
@@ -113,9 +107,7 @@ private fun ImprovedSearchResultsView(
     filterOptions: List<ResultsFilters>,
     selectedFilterIndex: Int,
     onFilterSelect: (ResultsFilters) -> Unit,
-    episodePlaybackFlow: Flow<EpisodePlaybackData?>,
     modifier: Modifier = Modifier,
-    fetchEpisode: (suspend (ImprovedSearchResultItem.EpisodeItem) -> BaseEpisode?)? = null,
 ) {
     val nestedScrollConnection = remember {
         object : NestedScrollConnection {
@@ -187,8 +179,6 @@ private fun ImprovedSearchResultsView(
                             episode = item,
                             onClick = { onEpisodeClick(item) },
                             playButtonListener = playButtonListener,
-                            fetchEpisode = fetchEpisode,
-                            episodePlaybackFlow = episodePlaybackFlow,
                         )
                     }
                 }

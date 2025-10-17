@@ -339,11 +339,9 @@ class SearchFragment : BaseFragment() {
                                 onFolderClick = ::onFolderClick,
                                 onFollowPodcast = { viewModel.onSubscribeToPodcast(it.uuid) },
                                 playButtonListener = playButtonListener,
-                                fetchEpisode = viewModel::fetchEpisode,
                                 onScroll = { UiUtil.hideKeyboard(searchView) },
                                 bottomInset = bottomInset.pxToDp(LocalContext.current).dp,
                                 onFilterSelect = viewModel::selectFilter,
-                                episodePlaybackFlow = viewModel.episodePlaybackFlow,
                             )
 
                         is SearchUiState.OldResults ->

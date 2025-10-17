@@ -5,16 +5,12 @@ import androidx.lifecycle.viewModelScope
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
-import au.com.shiftyjelly.pocketcasts.models.entity.BaseEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.to.EpisodeItem
 import au.com.shiftyjelly.pocketcasts.models.to.FolderItem
 import au.com.shiftyjelly.pocketcasts.models.to.ImprovedSearchResultItem
 import au.com.shiftyjelly.pocketcasts.models.to.SearchAutoCompleteItem
 import au.com.shiftyjelly.pocketcasts.models.to.SearchHistoryEntry
-import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
-import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackState
-import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
 import au.com.shiftyjelly.pocketcasts.repositories.searchhistory.SearchHistoryManager
 import au.com.shiftyjelly.pocketcasts.search.SearchResultsFragment.Companion.ResultsType
@@ -22,15 +18,10 @@ import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
-import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.firstOrNull
-import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.reactive.asFlow
-import kotlinx.coroutines.rx2.rxMaybe
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 @HiltViewModel
@@ -39,8 +30,6 @@ class SearchViewModel @Inject constructor(
     private val searchHistoryManager: SearchHistoryManager,
     private val podcastManager: PodcastManager,
     private val analyticsTracker: AnalyticsTracker,
-    private val episodeManager: EpisodeManager,
-    private val playbackManager: PlaybackManager,
 ) : ViewModel() {
     var isFragmentChangingConfigurations: Boolean = false
     var showSearchHistory: Boolean = true
@@ -51,18 +40,6 @@ class SearchViewModel @Inject constructor(
         SearchUiState.Idle,
     )
     val state: StateFlow<SearchUiState> = _state
-
-    val episodePlaybackFlow: Flow<EpisodePlaybackData?>
-        get() = playbackManager.playbackStateFlow.map {
-            if (it.state == PlaybackState.State.PLAYING) {
-                EpisodePlaybackData(
-                    playingEpisodeUuid = it.episodeUuid,
-                    playbackPosition = it.positionMs,
-                )
-            } else {
-                null
-            }
-        }
 
     init {
         if (FeatureFlag.isEnabled(Feature.IMPROVED_SEARCH_SUGGESTIONS)) {
@@ -157,16 +134,6 @@ class SearchViewModel @Inject constructor(
     fun onSubscribeToPodcast(podcast: Podcast) {
         if (podcast.isSubscribed) return
         onSubscribeToPodcast(podcast.uuid)
-    }
-
-    suspend fun fetchEpisode(episode: ImprovedSearchResultItem.EpisodeItem): BaseEpisode? {
-        return podcastManager.findOrDownloadPodcastRxSingle(episode.podcastUuid)
-            .flatMapMaybe {
-                rxMaybe {
-                    episodeManager.findByUuid(episode.uuid)
-                }
-            }
-            .toFlowable().asFlow().firstOrNull()
     }
 
     fun selectFilter(filter: ResultsFilters) {

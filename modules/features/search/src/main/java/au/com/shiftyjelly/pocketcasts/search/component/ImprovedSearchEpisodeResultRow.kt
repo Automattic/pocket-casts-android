@@ -10,8 +10,6 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.produceState
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -24,6 +22,9 @@ import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.viewinterop.AndroidView
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.compose.AppThemeWithBackground
 import au.com.shiftyjelly.pocketcasts.compose.components.EpisodeImage
@@ -38,17 +39,89 @@ import au.com.shiftyjelly.pocketcasts.models.entity.BaseEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.models.to.ImprovedSearchResultItem
 import au.com.shiftyjelly.pocketcasts.models.to.SearchAutoCompleteItem
-import au.com.shiftyjelly.pocketcasts.models.type.EpisodePlayingStatus
 import au.com.shiftyjelly.pocketcasts.repositories.images.PocketCastsImageRequestFactory
-import au.com.shiftyjelly.pocketcasts.search.EpisodePlaybackData
+import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
+import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackState
+import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
+import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.views.buttons.PlayButton
 import au.com.shiftyjelly.pocketcasts.views.helper.PlayButtonListener
+import dagger.assisted.Assisted
+import dagger.assisted.AssistedFactory
+import dagger.assisted.AssistedInject
+import dagger.hilt.android.lifecycle.HiltViewModel
 import java.util.Date
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.rx2.asFlow
+
+@OptIn(ExperimentalCoroutinesApi::class)
+@HiltViewModel(assistedFactory = ImprovedEpisodeRowViewModel.Factory::class)
+class ImprovedEpisodeRowViewModel @AssistedInject constructor(
+    podcastManager: PodcastManager,
+    playbackManager: PlaybackManager,
+    private val episodeManager: EpisodeManager,
+    @Assisted("episodeUuid") private val episodeUuid: String,
+    @Assisted("podcastUuid") private val podcastUuid: String,
+) : ViewModel() {
+
+    @AssistedFactory
+    interface Factory {
+        fun create(
+            @Assisted("episodeUuid") episodeUuid: String,
+            @Assisted("podcastUuid") podcastUuid: String,
+        ): ImprovedEpisodeRowViewModel
+    }
+
+    private val _uiState = MutableStateFlow<RowState>(RowState.Idle)
+
+    private val episodeFlow = podcastManager.findOrDownloadPodcastRxSingle(podcastUuid)
+        .toObservable().asFlow()
+        .flatMapLatest { ep ->
+            flow<BaseEpisode> { emit(episodeManager.findByUuid(episodeUuid)!!) }
+        }
+
+    private val episodePlaybackFlow = playbackManager.playbackStateFlow
+
+    init {
+        viewModelScope.launch {
+            combine<BaseEpisode, PlaybackState, RowState>(
+                episodeFlow,
+                episodePlaybackFlow,
+            ) { episode, playbackState -> RowState.Loaded(episode, playbackState) }
+                .catch {
+                    emit(RowState.Error(it))
+                }
+                .collect { state ->
+                    _uiState.update {
+                        state
+                    }
+                }
+        }
+    }
+
+    val state = _uiState.asStateFlow()
+
+    sealed interface RowState {
+        data object Idle : RowState
+        data class Loaded(
+            val episode: BaseEpisode,
+            val playbackState: PlaybackState,
+        ) : RowState
+
+        data class Error(val error: Throwable?) : RowState
+    }
+}
 
 @Composable
 fun ImprovedSearchEpisodeResultRow(
@@ -74,15 +147,8 @@ fun ImprovedSearchEpisodeResultRow(
     episode: ImprovedSearchResultItem.EpisodeItem,
     onClick: () -> Unit,
     playButtonListener: PlayButtonListener,
-    episodePlaybackFlow: Flow<EpisodePlaybackData?>,
     modifier: Modifier = Modifier,
-    fetchEpisode: (suspend (ImprovedSearchResultItem.EpisodeItem) -> BaseEpisode?)? = null,
 ) {
-    val baseEpisode: BaseEpisode? by produceState(null) {
-        value = fetchEpisode?.invoke(episode)
-    }
-    val playbackData by episodePlaybackFlow
-        .map { if (it?.playingEpisodeUuid == episode.uuid) it else null }.collectAsState(null)
 
     ImprovedSearchEpisodeResultRow(
         episodeUuid = episode.uuid,
@@ -93,8 +159,6 @@ fun ImprovedSearchEpisodeResultRow(
         playButtonListener = playButtonListener,
         onClick = onClick,
         modifier = modifier,
-        episode = baseEpisode,
-        playbackData = playbackData,
     )
 }
 
@@ -108,9 +172,15 @@ private fun ImprovedSearchEpisodeResultRow(
     onClick: () -> Unit,
     playButtonListener: PlayButton.OnClickListener,
     modifier: Modifier = Modifier,
-    episode: BaseEpisode? = null,
-    playbackData: EpisodePlaybackData? = null,
 ) {
+    val viewModel: ImprovedEpisodeRowViewModel = hiltViewModel(
+        creationCallback = { factory: ImprovedEpisodeRowViewModel.Factory ->
+            factory.create(episodeUuid = episodeUuid, podcastUuid = podcastUuid)
+        }
+    )
+
+    val state = viewModel.state.collectAsState().value
+
     Row(
         modifier = modifier
             .clickable(onClick = onClick)
@@ -160,30 +230,38 @@ private fun ImprovedSearchEpisodeResultRow(
                 maxLines = 1,
             )
         }
-        episode?.let {
-            val buttonColor = MaterialTheme.theme.colors.primaryInteractive01.toArgb()
-            AndroidView(
-                modifier = Modifier.size(48.dp),
-                factory = {
-                    PlayButton(it).apply {
-                        listener = playButtonListener
-                    }
-                },
-                update = { playButton ->
-                    val theEpisode = episode.apply {
-                        playing = playbackData != null
-                        playingStatus = if (playbackData != null) EpisodePlayingStatus.IN_PROGRESS else EpisodePlayingStatus.NOT_PLAYED
-                        playedUpToMs = playbackData?.playbackPosition ?: 0
-                    }
-                    val buttonType = PlayButton.calculateButtonType(theEpisode, true)
-                    playButton.setButtonType(
-                        episode = theEpisode,
-                        buttonType = buttonType,
-                        color = buttonColor,
-                        fromListUuid = null,
-                    )
-                },
-            )
+        when (state) {
+            is ImprovedEpisodeRowViewModel.RowState.Loaded -> {
+                val buttonColor = MaterialTheme.theme.colors.primaryInteractive01.toArgb()
+                AndroidView(
+                    modifier = Modifier.size(48.dp),
+                    factory = {
+                        PlayButton(it).apply {
+                            listener = playButtonListener
+                        }
+                    },
+                    update = { playButton ->
+                        val theEpisode = state.episode.apply {
+                            playing = state.playbackState.episodeUuid == episodeUuid && state.playbackState.state == PlaybackState.State.PLAYING
+                            playingStatus = state.episode.playingStatus
+                            playedUpToMs = if (state.playbackState.episodeUuid == episodeUuid) {
+                                state.playbackState.positionMs
+                            } else {
+                                0
+                            }
+                        }
+                        val buttonType = PlayButton.calculateButtonType(theEpisode, true)
+                        playButton.setButtonType(
+                            episode = theEpisode,
+                            buttonType = buttonType,
+                            color = buttonColor,
+                            fromListUuid = null,
+                        )
+                    },
+                )
+            }
+
+            else -> Unit
         }
     }
 }
