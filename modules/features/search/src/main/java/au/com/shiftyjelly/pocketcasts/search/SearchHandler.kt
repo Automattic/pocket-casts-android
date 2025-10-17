@@ -17,6 +17,8 @@ import au.com.shiftyjelly.pocketcasts.repositories.user.UserManager
 import au.com.shiftyjelly.pocketcasts.servers.ServiceManager
 import au.com.shiftyjelly.pocketcasts.servers.discover.GlobalServerSearch
 import au.com.shiftyjelly.pocketcasts.servers.podcast.PodcastCacheServiceManager
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import com.jakewharton.rxrelay2.BehaviorRelay
 import io.reactivex.Observable
 import io.reactivex.Single
@@ -49,7 +51,7 @@ class SearchHandler @Inject constructor(
 ) {
     private var source: SourceView = SourceView.UNKNOWN
     private val searchQuery = BehaviorRelay.create<Query>().apply {
-        accept(Query.SearchResults(""))
+        accept(if (FeatureFlag.isEnabled(Feature.IMPROVED_SEARCH_SUGGESTIONS)) Query.Suggestions("") else Query.SearchResults(""))
     }
 
     private val loadingObservable = BehaviorRelay.create<Boolean>().apply {
