@@ -1,5 +1,9 @@
 package au.com.shiftyjelly.pocketcasts.playlists.smart
 
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -10,11 +14,15 @@ import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import androidx.navigation.compose.currentBackStackEntryAsState
+import au.com.shiftyjelly.pocketcasts.compose.bars.NavigationButton
+import au.com.shiftyjelly.pocketcasts.compose.bars.ThemedTopAppBar
 import au.com.shiftyjelly.pocketcasts.compose.navigation.navigateOnce
 import au.com.shiftyjelly.pocketcasts.compose.navigation.slideInToEnd
 import au.com.shiftyjelly.pocketcasts.compose.navigation.slideInToStart
 import au.com.shiftyjelly.pocketcasts.compose.navigation.slideOutToEnd
 import au.com.shiftyjelly.pocketcasts.compose.navigation.slideOutToStart
+import au.com.shiftyjelly.pocketcasts.compose.theme
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.to.PlaylistEpisode
 import au.com.shiftyjelly.pocketcasts.models.type.SmartRules.DownloadStatusRule
@@ -38,127 +46,149 @@ internal fun ManageSmartRulesPage(
     builder: NavGraphBuilder.() -> Unit = {},
 ) {
     var areOtherOptionsExpanded by remember { mutableStateOf(false) }
+    val backStackEntry by navController.currentBackStackEntryAsState()
+    val isTopPageDisplayed = backStackEntry == null ||
+        backStackEntry?.destination?.route == startDestination ||
+        backStackEntry?.destination?.route == ManageSmartRulesRoutes.SMART_PLAYLIST_PREVIEW
 
     fun goBackToPreview() {
         navController.popBackStack(ManageSmartRulesRoutes.SMART_PLAYLIST_PREVIEW, inclusive = false)
     }
 
-    NavHost(
-        navController = navController,
-        startDestination = startDestination,
-        enterTransition = { slideInToStart() },
-        exitTransition = { slideOutToStart() },
-        popEnterTransition = { slideInToEnd() },
-        popExitTransition = { slideOutToEnd() },
-        modifier = modifier,
+    Column(
+        modifier = modifier.fillMaxSize(),
     ) {
-        builder()
-        composable(ManageSmartRulesRoutes.SMART_PLAYLIST_PREVIEW) {
-            AppliedRulesPage(
-                playlistName = playlistName,
-                appliedRules = appliedRules,
-                availableEpisodes = smartEpisodes,
-                totalEpisodeCount = totalEpisodeCount,
-                useEpisodeArtwork = useEpisodeArtwork,
-                areOtherOptionsExpanded = areOtherOptionsExpanded,
-                onCreatePlaylist = listener.createPlaylistCallback(),
-                onClickRule = { rule -> navController.navigateOnce(rule.toNavigationRoute()) },
-                toggleOtherOptions = { areOtherOptionsExpanded = !areOtherOptionsExpanded },
-                onClickClose = listener::onClose,
-            )
-        }
-        composable(ManageSmartRulesRoutes.SMART_RULE_PODCASTS) {
-            PodcastsRulePage(
-                useAllPodcasts = rulesBuilder.useAllPodcasts,
-                selectedPodcastUuids = rulesBuilder.selectedPodcasts,
-                podcasts = followedPodcasts,
-                onChangeUseAllPodcasts = listener::onChangeUseAllPodcasts,
-                onSelectPodcast = listener::onSelectPodcast,
-                onDeselectPodcast = listener::onDeselectPodcast,
-                onSelectAllPodcasts = listener::onSelectAllPodcasts,
-                onDeselectAllPodcasts = listener::onDeselectAllPodcasts,
-                onSaveRule = {
-                    listener.onApplyRule(RuleType.Podcasts)
+        ThemedTopAppBar(
+            navigationButton = NavigationButton.CloseBack(isClose = isTopPageDisplayed),
+            style = ThemedTopAppBar.Style.Immersive,
+            actions = {
+                if (backStackEntry?.destination?.route == ManageSmartRulesRoutes.SMART_RULE_PODCASTS) {
+                    PodcastRulesActions(
+                        useAllPodcasts = rulesBuilder.useAllPodcasts,
+                        selectedPodcastUuids = rulesBuilder.selectedPodcasts,
+                        podcasts = followedPodcasts,
+                        onSelectAllPodcasts = listener::onSelectAllPodcasts,
+                        onDeselectAllPodcasts = listener::onDeselectAllPodcasts,
+                    )
+                }
+            },
+            iconColor = MaterialTheme.theme.colors.primaryIcon03,
+            windowInsets = WindowInsets(0),
+            onNavigationClick = {
+                if (isTopPageDisplayed) {
+                    listener.onClose()
+                } else {
                     goBackToPreview()
-                },
-                onClickBack = ::goBackToPreview,
-            )
-        }
-        composable(ManageSmartRulesRoutes.SMART_RULE_EPISODE_STATUS) {
-            EpisodeStatusRulePage(
-                rule = rulesBuilder.episodeStatusRule,
-                onChangeUnplayedStatus = listener::onChangeUnplayedStatus,
-                onChangeInProgressStatus = listener::onChangeInProgressStatus,
-                onChangeCompletedStatus = listener::onChangeCompletedStatus,
-                onSaveRule = {
-                    listener.onApplyRule(RuleType.EpisodeStatus)
-                    goBackToPreview()
-                },
-                onClickBack = ::goBackToPreview,
-            )
-        }
-        composable(ManageSmartRulesRoutes.SMART_RULE_RELEASE_DATE) {
-            ReleaseDateRulePage(
-                selectedRule = rulesBuilder.releaseDateRule,
-                onSelectReleaseDate = listener::onUseReleaseDate,
-                onSaveRule = {
-                    listener.onApplyRule(RuleType.ReleaseDate)
-                    goBackToPreview()
-                },
-                onClickBack = ::goBackToPreview,
-            )
-        }
-        composable(ManageSmartRulesRoutes.SMART_RULE_EPISODE_DURATION) {
-            EpisodeDurationRulePage(
-                isDurationConstrained = rulesBuilder.isEpisodeDurationConstrained,
-                minDuration = rulesBuilder.minEpisodeDuration,
-                maxDuration = rulesBuilder.maxEpisodeDuration,
-                onChangeConstrainDuration = listener::onUseConstrainedDuration,
-                onDecrementMinDuration = listener::onDecrementMinDuration,
-                onIncrementMinDuration = listener::onIncrementMinDuration,
-                onDecrementMaxDuration = listener::onDecrementMaxDuration,
-                onIncrementMaxDuration = listener::onIncrementMaxDuration,
-                onSaveRule = {
-                    listener.onApplyRule(RuleType.EpisodeDuration)
-                    goBackToPreview()
-                },
-                onClickBack = ::goBackToPreview,
-            )
-        }
-        composable(ManageSmartRulesRoutes.SMART_RULE_DOWNLOAD_STATUS) {
-            DownloadStatusRulePage(
-                selectedRule = rulesBuilder.downloadStatusRule,
-                onSelectDownloadStatus = listener::onUseDownloadStatus,
-                onSaveRule = {
-                    listener.onApplyRule(RuleType.DownloadStatus)
-                    goBackToPreview()
-                },
-                onClickBack = ::goBackToPreview,
-            )
-        }
-        composable(ManageSmartRulesRoutes.SMART_RULE_MEDIA_TYPE) {
-            MediaTypeRulePage(
-                selectedRule = rulesBuilder.mediaTypeRule,
-                onSelectMediaType = listener::onUseMediaType,
-                onSaveRule = {
-                    listener.onApplyRule(RuleType.MediaType)
-                    goBackToPreview()
-                },
-                onClickBack = ::goBackToPreview,
-            )
-        }
-        composable(ManageSmartRulesRoutes.SMART_RULE_STARRED) {
-            StarredRulePage(
-                selectedRule = rulesBuilder.starredRule,
-                starredEpisodes = smartStarredEpisodes,
-                useEpisodeArtwork = useEpisodeArtwork,
-                onChangeUseStarredEpisodes = listener::onUseStarredEpisodes,
-                onSaveRule = {
-                    listener.onApplyRule(RuleType.Starred)
-                    goBackToPreview()
-                },
-                onClickBack = ::goBackToPreview,
-            )
+                }
+            },
+        )
+
+        NavHost(
+            navController = navController,
+            startDestination = startDestination,
+            enterTransition = { slideInToStart() },
+            exitTransition = { slideOutToStart() },
+            popEnterTransition = { slideInToEnd() },
+            popExitTransition = { slideOutToEnd() },
+        ) {
+            builder()
+            composable(ManageSmartRulesRoutes.SMART_PLAYLIST_PREVIEW) {
+                AppliedRulesPage(
+                    playlistName = playlistName,
+                    appliedRules = appliedRules,
+                    availableEpisodes = smartEpisodes,
+                    totalEpisodeCount = totalEpisodeCount,
+                    useEpisodeArtwork = useEpisodeArtwork,
+                    areOtherOptionsExpanded = areOtherOptionsExpanded,
+                    onCreatePlaylist = listener.createPlaylistCallback(),
+                    onClickRule = { rule -> navController.navigateOnce(rule.toNavigationRoute()) },
+                    toggleOtherOptions = { areOtherOptionsExpanded = !areOtherOptionsExpanded },
+                )
+            }
+            composable(ManageSmartRulesRoutes.SMART_RULE_PODCASTS) {
+                PodcastsRulePage(
+                    useAllPodcasts = rulesBuilder.useAllPodcasts,
+                    selectedPodcastUuids = rulesBuilder.selectedPodcasts,
+                    podcasts = followedPodcasts,
+                    onChangeUseAllPodcasts = listener::onChangeUseAllPodcasts,
+                    onSelectPodcast = listener::onSelectPodcast,
+                    onDeselectPodcast = listener::onDeselectPodcast,
+                    onSaveRule = {
+                        listener.onApplyRule(RuleType.Podcasts)
+                        goBackToPreview()
+                    },
+                )
+            }
+            composable(ManageSmartRulesRoutes.SMART_RULE_EPISODE_STATUS) {
+                EpisodeStatusRulePage(
+                    rule = rulesBuilder.episodeStatusRule,
+                    onChangeUnplayedStatus = listener::onChangeUnplayedStatus,
+                    onChangeInProgressStatus = listener::onChangeInProgressStatus,
+                    onChangeCompletedStatus = listener::onChangeCompletedStatus,
+                    onSaveRule = {
+                        listener.onApplyRule(RuleType.EpisodeStatus)
+                        goBackToPreview()
+                    },
+                )
+            }
+            composable(ManageSmartRulesRoutes.SMART_RULE_RELEASE_DATE) {
+                ReleaseDateRulePage(
+                    selectedRule = rulesBuilder.releaseDateRule,
+                    onSelectReleaseDate = listener::onUseReleaseDate,
+                    onSaveRule = {
+                        listener.onApplyRule(RuleType.ReleaseDate)
+                        goBackToPreview()
+                    },
+                )
+            }
+            composable(ManageSmartRulesRoutes.SMART_RULE_EPISODE_DURATION) {
+                EpisodeDurationRulePage(
+                    isDurationConstrained = rulesBuilder.isEpisodeDurationConstrained,
+                    minDuration = rulesBuilder.minEpisodeDuration,
+                    maxDuration = rulesBuilder.maxEpisodeDuration,
+                    onChangeConstrainDuration = listener::onUseConstrainedDuration,
+                    onDecrementMinDuration = listener::onDecrementMinDuration,
+                    onIncrementMinDuration = listener::onIncrementMinDuration,
+                    onDecrementMaxDuration = listener::onDecrementMaxDuration,
+                    onIncrementMaxDuration = listener::onIncrementMaxDuration,
+                    onSaveRule = {
+                        listener.onApplyRule(RuleType.EpisodeDuration)
+                        goBackToPreview()
+                    },
+                )
+            }
+            composable(ManageSmartRulesRoutes.SMART_RULE_DOWNLOAD_STATUS) {
+                DownloadStatusRulePage(
+                    selectedRule = rulesBuilder.downloadStatusRule,
+                    onSelectDownloadStatus = listener::onUseDownloadStatus,
+                    onSaveRule = {
+                        listener.onApplyRule(RuleType.DownloadStatus)
+                        goBackToPreview()
+                    },
+                )
+            }
+            composable(ManageSmartRulesRoutes.SMART_RULE_MEDIA_TYPE) {
+                MediaTypeRulePage(
+                    selectedRule = rulesBuilder.mediaTypeRule,
+                    onSelectMediaType = listener::onUseMediaType,
+                    onSaveRule = {
+                        listener.onApplyRule(RuleType.MediaType)
+                        goBackToPreview()
+                    },
+                )
+            }
+            composable(ManageSmartRulesRoutes.SMART_RULE_STARRED) {
+                StarredRulePage(
+                    selectedRule = rulesBuilder.starredRule,
+                    starredEpisodes = smartStarredEpisodes,
+                    useEpisodeArtwork = useEpisodeArtwork,
+                    onChangeUseStarredEpisodes = listener::onUseStarredEpisodes,
+                    onSaveRule = {
+                        listener.onApplyRule(RuleType.Starred)
+                        goBackToPreview()
+                    },
+                )
+            }
         }
     }
 }

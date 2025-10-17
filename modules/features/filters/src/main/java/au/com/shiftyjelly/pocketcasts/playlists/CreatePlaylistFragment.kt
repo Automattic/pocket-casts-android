@@ -98,7 +98,6 @@ internal class CreatePlaylistFragment : BaseDialogFragment() {
                                 }
                             }
                         },
-                        onClickClose = ::dismiss,
                     )
                 }
             }
