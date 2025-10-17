@@ -22,7 +22,7 @@ import au.com.shiftyjelly.pocketcasts.compose.components.TextH40
 import au.com.shiftyjelly.pocketcasts.compose.components.TextP50
 import au.com.shiftyjelly.pocketcasts.compose.preview.ThemePreviewParameterProvider
 import au.com.shiftyjelly.pocketcasts.compose.theme
-import au.com.shiftyjelly.pocketcasts.models.to.FolderItem
+import au.com.shiftyjelly.pocketcasts.models.to.ImprovedSearchResultItem
 import au.com.shiftyjelly.pocketcasts.models.to.SearchAutoCompleteItem
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.images.R as IR
@@ -47,31 +47,34 @@ fun ImprovedSearchPodcastResultRow(
 
 @Composable
 fun ImprovedSearchPodcastResultRow(
-    folderItem: FolderItem,
+    podcastItem: ImprovedSearchResultItem.PodcastItem,
     onClick: () -> Unit,
     onFollow: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    when (folderItem) {
-        is FolderItem.Podcast ->
-            ImprovedSearchPodcastResultRow(
-                podcastUuid = folderItem.podcast.uuid,
-                title = folderItem.podcast.title,
-                author = folderItem.podcast.author,
-                isSubscribed = folderItem.podcast.isSubscribed,
-                onClick = onClick,
-                onFollow = onFollow,
-                modifier = modifier,
-            )
+    ImprovedSearchPodcastResultRow(
+        podcastUuid = podcastItem.uuid,
+        title = podcastItem.title,
+        author = podcastItem.author,
+        isSubscribed = podcastItem.isFollowed,
+        onClick = onClick,
+        onFollow = onFollow,
+        modifier = modifier,
+    )
+}
 
-        is FolderItem.Folder ->
-            SearchFolderRow(
-                folder = folderItem.folder,
-                podcasts = folderItem.podcasts,
-                onClick = onClick,
-                modifier = modifier,
-            )
-    }
+@Composable
+fun ImprovedSearchFolderResultRow(
+    folderItem: ImprovedSearchResultItem.FolderItem,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    SearchFolderRow(
+        folder = folderItem.folder,
+        podcasts = folderItem.podcasts,
+        onClick = onClick,
+        modifier = modifier,
+    )
 }
 
 @Composable

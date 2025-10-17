@@ -50,6 +50,7 @@ dependencies {
     implementation(libs.timber)
 
     implementation(projects.modules.services.compose)
+    implementation(libs.hilt.navigation.compose)
     implementation(projects.modules.services.images)
     implementation(projects.modules.services.localization)
     implementation(projects.modules.services.utils)

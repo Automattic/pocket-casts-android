@@ -2,6 +2,8 @@ package au.com.shiftyjelly.pocketcasts.servers.podcast
 
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastRatings
 import au.com.shiftyjelly.pocketcasts.models.to.EpisodeItem
+import au.com.shiftyjelly.pocketcasts.servers.search.CombinedSearchRequest
+import au.com.shiftyjelly.pocketcasts.servers.search.CombinedSearchResponse
 import com.squareup.moshi.Json
 import com.squareup.moshi.JsonClass
 import io.reactivex.Single
@@ -119,4 +121,9 @@ interface PodcastCacheService {
 
     @POST("/podcast/suggest_folders")
     suspend fun suggestedFolders(@Body request: SuggestedFoldersRequest): SuggestedFoldersResponse
+
+    @POST("/search/combined")
+    suspend fun combinedSearch(
+        @Body request: CombinedSearchRequest,
+    ): CombinedSearchResponse
 }
