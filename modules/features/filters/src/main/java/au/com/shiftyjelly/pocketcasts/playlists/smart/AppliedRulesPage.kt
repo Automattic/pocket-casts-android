@@ -59,7 +59,7 @@ internal fun AppliedRulesPage(
     playlistName: String,
     appliedRules: AppliedRules,
     availableEpisodes: List<PlaylistEpisode.Available>,
-    totalEpisodeCount: Int,
+    starredEpisodeCount: Int,
     useEpisodeArtwork: Boolean,
     onClickRule: (RuleType) -> Unit,
     modifier: Modifier = Modifier,
@@ -90,7 +90,7 @@ internal fun AppliedRulesPage(
                 ) {
                     ActiveRulesContent(
                         rules = activeRules,
-                        episodeCount = totalEpisodeCount,
+                        starredEpisodeCount = starredEpisodeCount,
                         appliedRules = appliedRules,
                         onClickRule = onClickRule,
                     )
@@ -179,7 +179,7 @@ internal fun AppliedRulesPage(
 private fun ActiveRulesContent(
     rules: List<RuleType>,
     appliedRules: AppliedRules,
-    episodeCount: Int,
+    starredEpisodeCount: Int,
     onClickRule: (RuleType) -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -195,7 +195,7 @@ private fun ActiveRulesContent(
         AppliedRulesColumn(
             rules = rules,
             appliedRules = appliedRules,
-            episodeCount = episodeCount,
+            starredEpisodeCount = starredEpisodeCount,
             onClickRule = onClickRule,
         )
     }
@@ -324,7 +324,7 @@ private fun AppliedRulesPageNoRulesPreview(
             playlistName = "Comedy",
             appliedRules = AppliedRules.Companion.Empty,
             availableEpisodes = emptyList(),
-            totalEpisodeCount = 0,
+            starredEpisodeCount = 0,
             useEpisodeArtwork = false,
             areOtherOptionsExpanded = expanded,
             onCreatePlaylist = {},
@@ -357,7 +357,7 @@ private fun AppliedRulesPageEpisodesPreview(
                     ),
                 )
             },
-            totalEpisodeCount = 10,
+            starredEpisodeCount = 10,
             useEpisodeArtwork = false,
             areOtherOptionsExpanded = expanded,
             onCreatePlaylist = {},
@@ -381,7 +381,7 @@ private fun AppliedRulesPageNoEpisodesPreview(
                 podcasts = PodcastsRule.Any,
             ),
             availableEpisodes = emptyList(),
-            totalEpisodeCount = 0,
+            starredEpisodeCount = 0,
             useEpisodeArtwork = false,
             areOtherOptionsExpanded = expanded,
             onCreatePlaylist = {},

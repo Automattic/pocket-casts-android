@@ -41,17 +41,17 @@ class SmartRulesEditor @AssistedInject constructor(
         }
     }.stateIn(scope, SharingStarted.Lazily, initialValue = emptyList())
 
-    val totalEpisodeCount = rulesFlow.flatMapLatest { appliedRules ->
-        val smartRules = appliedRules.toSmartRules() ?: SmartRules.Default
-        val starredRules = smartRules.copy(starred = SmartRules.StarredRule.Starred)
-        playlistManager.smartEpisodesMetadataFlow(starredRules).map { it.episodeCount }
-    }.stateIn(scope, SharingStarted.Lazily, initialValue = 0)
-
     val smartStarredEpisodes = rulesFlow.flatMapLatest { appliedRules ->
         val smartRules = appliedRules.toSmartRules() ?: SmartRules.Default
         val starredRules = smartRules.copy(starred = SmartRules.StarredRule.Starred)
         playlistManager.smartEpisodesFlow(starredRules)
     }.stateIn(scope, SharingStarted.Lazily, initialValue = emptyList())
+
+    val starredEpisodeCount = rulesFlow.flatMapLatest { appliedRules ->
+        val smartRules = appliedRules.toSmartRules() ?: SmartRules.Default
+        val starredRules = smartRules.copy(starred = SmartRules.StarredRule.Starred)
+        playlistManager.smartEpisodesMetadataFlow(starredRules).map { it.episodeCount }
+    }.stateIn(scope, SharingStarted.Lazily, initialValue = 0)
 
     val followedPodcasts = podcastManager
         .findSubscribedFlow()

@@ -18,7 +18,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.rememberNestedScrollInteropConnection
-import androidx.core.os.BundleCompat
 import androidx.core.os.bundleOf
 import androidx.fragment.app.viewModels
 import androidx.fragment.compose.content
@@ -71,7 +70,7 @@ internal class EditRulesFragment : BaseDialogFragment() {
                     smartEpisodes = uiState.smartEpisodes,
                     smartStarredEpisodes = uiState.smartStarredEpisodes,
                     followedPodcasts = uiState.followedPodcasts,
-                    totalEpisodeCount = uiState.totalEpisodeCount,
+                    starredEpisodeCount = uiState.starredEpisodeCount,
                     useEpisodeArtwork = uiState.useEpisodeArtwork,
                     navController = navController,
                     listener = listener,
