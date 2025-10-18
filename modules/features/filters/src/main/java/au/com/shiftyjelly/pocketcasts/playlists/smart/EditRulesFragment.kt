@@ -72,6 +72,7 @@ internal class EditRulesFragment : BaseDialogFragment() {
                     followedPodcasts = uiState.followedPodcasts,
                     starredEpisodeCount = uiState.starredEpisodeCount,
                     useEpisodeArtwork = uiState.useEpisodeArtwork,
+                    isPlaylistPreviewShown = uiState.areSmartRulesEdited,
                     navController = navController,
                     listener = listener,
                     modifier = Modifier.fillMaxSize(),

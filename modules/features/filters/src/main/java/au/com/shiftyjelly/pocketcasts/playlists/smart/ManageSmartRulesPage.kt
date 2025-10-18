@@ -43,6 +43,7 @@ internal fun ManageSmartRulesPage(
     listener: ManageSmartRulesListener,
     modifier: Modifier = Modifier,
     startDestination: String = ManageSmartRulesRoutes.SMART_PLAYLIST_PREVIEW,
+    isPlaylistPreviewShown: Boolean = true,
     builder: NavGraphBuilder.() -> Unit = {},
 ) {
     var areOtherOptionsExpanded by remember { mutableStateOf(false) }
@@ -100,6 +101,7 @@ internal fun ManageSmartRulesPage(
                     starredEpisodeCount = starredEpisodeCount,
                     useEpisodeArtwork = useEpisodeArtwork,
                     areOtherOptionsExpanded = areOtherOptionsExpanded,
+                    isPlaylistPreviewShown = isPlaylistPreviewShown,
                     onCreatePlaylist = listener.createPlaylistCallback(),
                     onClickRule = { rule -> navController.navigateOnce(rule.toNavigationRoute()) },
                     toggleOtherOptions = { areOtherOptionsExpanded = !areOtherOptionsExpanded },

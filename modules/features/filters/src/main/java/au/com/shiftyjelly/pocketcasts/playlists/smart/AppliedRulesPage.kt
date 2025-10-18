@@ -64,6 +64,7 @@ internal fun AppliedRulesPage(
     onClickRule: (RuleType) -> Unit,
     modifier: Modifier = Modifier,
     areOtherOptionsExpanded: Boolean = false,
+    isPlaylistPreviewShown: Boolean = true,
     toggleOtherOptions: (() -> Unit)? = null,
     onCreatePlaylist: (() -> Unit)? = null,
 ) {
@@ -109,43 +110,45 @@ internal fun AppliedRulesPage(
                         )
                     }
                 }
-                item(
-                    key = "playlist-header",
-                    contentType = "playlist-header",
-                ) {
-                    TextH20(
-                        text = stringResource(LR.string.preview_playlist, playlistName),
-                        modifier = Modifier
-                            .padding(horizontal = 16.dp)
-                            .padding(top = 32.dp),
-                    )
-                }
-                if (availableEpisodes.isNotEmpty()) {
-                    items(
-                        items = availableEpisodes,
-                        key = { episode -> episode.uuid },
-                        contentType = { "episode" },
-                    ) { episodeWrapper ->
-                        SmartEpisodeRow(
-                            episode = episodeWrapper.episode,
-                            useEpisodeArtwork = useEpisodeArtwork,
+                if (isPlaylistPreviewShown) {
+                    item(
+                        key = "playlist-header",
+                        contentType = "playlist-header",
+                    ) {
+                        TextH20(
+                            text = stringResource(LR.string.preview_playlist, playlistName),
+                            modifier = Modifier
+                                .padding(horizontal = 16.dp)
+                                .padding(top = 32.dp),
                         )
                     }
-                } else {
-                    item(
-                        key = "no-episodes",
-                        contentType = "no-episodes",
-                    ) {
-                        Box(
-                            contentAlignment = Alignment.TopCenter,
-                            modifier = Modifier.fillMaxWidth(),
-                        ) {
-                            NoContentBanner(
-                                iconResourceId = IR.drawable.ic_info,
-                                title = stringResource(LR.string.smart_playlist_create_no_content_title),
-                                body = stringResource(LR.string.smart_playlist_create_no_content_body),
-                                modifier = Modifier.padding(top = 56.dp),
+                    if (availableEpisodes.isNotEmpty()) {
+                        items(
+                            items = availableEpisodes,
+                            key = { episode -> episode.uuid },
+                            contentType = { "episode" },
+                        ) { episodeWrapper ->
+                            SmartEpisodeRow(
+                                episode = episodeWrapper.episode,
+                                useEpisodeArtwork = useEpisodeArtwork,
                             )
+                        }
+                    } else {
+                        item(
+                            key = "no-episodes",
+                            contentType = "no-episodes",
+                        ) {
+                            Box(
+                                contentAlignment = Alignment.TopCenter,
+                                modifier = Modifier.fillMaxWidth(),
+                            ) {
+                                NoContentBanner(
+                                    iconResourceId = IR.drawable.ic_info,
+                                    title = stringResource(LR.string.smart_playlist_create_no_content_title),
+                                    body = stringResource(LR.string.smart_playlist_create_no_content_body),
+                                    modifier = Modifier.padding(top = 56.dp),
+                                )
+                            }
                         }
                     }
                 }
