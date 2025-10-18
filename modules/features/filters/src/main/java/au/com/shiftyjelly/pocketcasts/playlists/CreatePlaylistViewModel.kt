@@ -62,8 +62,8 @@ class CreatePlaylistViewModel @AssistedInject constructor(
         rulesEditor.builderFlow,
         rulesEditor.followedPodcasts,
         rulesEditor.smartEpisodes,
-        rulesEditor.totalEpisodeCount,
         rulesEditor.smartStarredEpisodes,
+        rulesEditor.starredEpisodeCount,
         settings.artworkConfiguration.flow.map { it.useEpisodeArtwork(Element.Filters) },
         ::UiState,
     ).stateIn(viewModelScope, SharingStarted.Eagerly, initialValue = UiState.Empty)
@@ -202,8 +202,8 @@ class CreatePlaylistViewModel @AssistedInject constructor(
         val rulesBuilder: RulesBuilder,
         val followedPodcasts: List<Podcast>,
         val smartEpisodes: List<PlaylistEpisode.Available>,
-        val totalEpisodeCount: Int,
         val smartStarredEpisodes: List<PlaylistEpisode.Available>,
+        val starredEpisodeCount: Int,
         val useEpisodeArtwork: Boolean,
     ) {
         companion object {
@@ -211,9 +211,9 @@ class CreatePlaylistViewModel @AssistedInject constructor(
                 appliedRules = AppliedRules.Empty,
                 rulesBuilder = RulesBuilder.Empty,
                 followedPodcasts = emptyList(),
-                totalEpisodeCount = 0,
                 smartEpisodes = emptyList(),
                 smartStarredEpisodes = emptyList(),
+                starredEpisodeCount = 0,
                 useEpisodeArtwork = false,
             )
         }

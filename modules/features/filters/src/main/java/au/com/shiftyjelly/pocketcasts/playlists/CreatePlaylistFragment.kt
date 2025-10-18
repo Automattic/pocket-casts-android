@@ -73,7 +73,7 @@ internal class CreatePlaylistFragment : BaseDialogFragment() {
                 smartEpisodes = uiState.smartEpisodes,
                 smartStarredEpisodes = uiState.smartStarredEpisodes,
                 followedPodcasts = uiState.followedPodcasts,
-                totalEpisodeCount = uiState.totalEpisodeCount,
+                starredEpisodeCount = uiState.starredEpisodeCount,
                 useEpisodeArtwork = uiState.useEpisodeArtwork,
                 navController = navController,
                 listener = listener,

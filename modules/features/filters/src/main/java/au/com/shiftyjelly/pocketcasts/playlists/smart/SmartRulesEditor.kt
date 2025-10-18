@@ -39,23 +39,23 @@ class SmartRulesEditor @AssistedInject constructor(
         } else {
             flowOf(emptyList())
         }
-    }.stateIn(scope, SharingStarted.Companion.Lazily, initialValue = emptyList())
-
-    val totalEpisodeCount = rulesFlow.flatMapLatest { appliedRules ->
-        val smartRules = appliedRules.toSmartRules() ?: SmartRules.Companion.Default
-        val starredRules = smartRules.copy(starred = SmartRules.StarredRule.Starred)
-        playlistManager.smartEpisodesMetadataFlow(starredRules).map { it.episodeCount }
-    }.stateIn(scope, SharingStarted.Companion.Lazily, initialValue = 0)
+    }.stateIn(scope, SharingStarted.Lazily, initialValue = emptyList())
 
     val smartStarredEpisodes = rulesFlow.flatMapLatest { appliedRules ->
-        val smartRules = appliedRules.toSmartRules() ?: SmartRules.Companion.Default
+        val smartRules = appliedRules.toSmartRules() ?: SmartRules.Default
         val starredRules = smartRules.copy(starred = SmartRules.StarredRule.Starred)
         playlistManager.smartEpisodesFlow(starredRules)
-    }.stateIn(scope, SharingStarted.Companion.Lazily, initialValue = emptyList())
+    }.stateIn(scope, SharingStarted.Lazily, initialValue = emptyList())
+
+    val starredEpisodeCount = rulesFlow.flatMapLatest { appliedRules ->
+        val smartRules = appliedRules.toSmartRules() ?: SmartRules.Default
+        val starredRules = smartRules.copy(starred = SmartRules.StarredRule.Starred)
+        playlistManager.smartEpisodesMetadataFlow(starredRules).map { it.episodeCount }
+    }.stateIn(scope, SharingStarted.Lazily, initialValue = 0)
 
     val followedPodcasts = podcastManager
         .findSubscribedFlow()
-        .stateIn(scope, SharingStarted.Companion.Lazily, initialValue = emptyList())
+        .stateIn(scope, SharingStarted.Lazily, initialValue = emptyList())
 
     fun useAllPodcasts(shouldUse: Boolean) {
         _builderFlow.update { builder ->

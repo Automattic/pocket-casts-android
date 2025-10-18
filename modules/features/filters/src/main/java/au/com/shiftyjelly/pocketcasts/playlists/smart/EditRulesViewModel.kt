@@ -19,6 +19,7 @@ import dagger.assisted.AssistedInject
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.NonCancellable
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.emitAll
 import kotlinx.coroutines.flow.first
@@ -36,6 +37,8 @@ class EditRulesViewModel @AssistedInject constructor(
     @Assisted private val playlistUuid: String,
 ) : ViewModel() {
     private var rulesEditor: SmartRulesEditor? = null
+
+    private val areSmartRulesEditedFlow = MutableStateFlow(false)
 
     val uiState = flow {
         val playlist = playlistManager.smartPlaylistFlow(playlistUuid).first()
@@ -64,19 +67,21 @@ class EditRulesViewModel @AssistedInject constructor(
                     editor.builderFlow,
                     editor.followedPodcasts,
                     editor.smartEpisodes,
-                    editor.totalEpisodeCount,
                     editor.smartStarredEpisodes,
+                    editor.starredEpisodeCount,
                     settings.artworkConfiguration.flow.map { it.useEpisodeArtwork(Element.Filters) },
-                ) { rules, builder, podcasts, episodes, episodeCount, smartEpisodes, showEpisodeArtwork ->
+                    areSmartRulesEditedFlow,
+                ) { rules, builder, podcasts, episodes, smartEpisodes, episodeCount, showEpisodeArtwork, areSmartRulesEdited ->
                     UiState(
                         playlistTitle = playlist.title,
                         appliedRules = rules,
                         rulesBuilder = builder,
                         followedPodcasts = podcasts,
                         smartEpisodes = episodes,
-                        totalEpisodeCount = episodeCount,
                         smartStarredEpisodes = smartEpisodes,
+                        starredEpisodeCount = episodeCount,
                         useEpisodeArtwork = showEpisodeArtwork,
+                        areSmartRulesEdited = areSmartRulesEdited,
                     )
                 },
             )
@@ -85,6 +90,7 @@ class EditRulesViewModel @AssistedInject constructor(
 
     fun applyRule(type: RuleType) {
         rulesEditor?.applyRule(type)
+        areSmartRulesEditedFlow.value = true
         viewModelScope.launch(NonCancellable) {
             val smartRules = uiState.value?.appliedRules?.toSmartRules()
             if (smartRules != null) {
@@ -182,9 +188,10 @@ class EditRulesViewModel @AssistedInject constructor(
         val rulesBuilder: RulesBuilder,
         val followedPodcasts: List<Podcast>,
         val smartEpisodes: List<PlaylistEpisode.Available>,
-        val totalEpisodeCount: Int,
         val smartStarredEpisodes: List<PlaylistEpisode.Available>,
+        val starredEpisodeCount: Int,
         val useEpisodeArtwork: Boolean,
+        val areSmartRulesEdited: Boolean,
     )
 
     @AssistedFactory

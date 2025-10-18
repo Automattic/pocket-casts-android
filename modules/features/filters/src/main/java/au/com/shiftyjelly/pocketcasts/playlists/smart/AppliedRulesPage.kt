@@ -59,11 +59,12 @@ internal fun AppliedRulesPage(
     playlistName: String,
     appliedRules: AppliedRules,
     availableEpisodes: List<PlaylistEpisode.Available>,
-    totalEpisodeCount: Int,
+    starredEpisodeCount: Int,
     useEpisodeArtwork: Boolean,
     onClickRule: (RuleType) -> Unit,
     modifier: Modifier = Modifier,
     areOtherOptionsExpanded: Boolean = false,
+    isPlaylistPreviewShown: Boolean = true,
     toggleOtherOptions: (() -> Unit)? = null,
     onCreatePlaylist: (() -> Unit)? = null,
 ) {
@@ -90,7 +91,7 @@ internal fun AppliedRulesPage(
                 ) {
                     ActiveRulesContent(
                         rules = activeRules,
-                        episodeCount = totalEpisodeCount,
+                        starredEpisodeCount = starredEpisodeCount,
                         appliedRules = appliedRules,
                         onClickRule = onClickRule,
                     )
@@ -109,43 +110,45 @@ internal fun AppliedRulesPage(
                         )
                     }
                 }
-                item(
-                    key = "playlist-header",
-                    contentType = "playlist-header",
-                ) {
-                    TextH20(
-                        text = stringResource(LR.string.preview_playlist, playlistName),
-                        modifier = Modifier
-                            .padding(horizontal = 16.dp)
-                            .padding(top = 32.dp),
-                    )
-                }
-                if (availableEpisodes.isNotEmpty()) {
-                    items(
-                        items = availableEpisodes,
-                        key = { episode -> episode.uuid },
-                        contentType = { "episode" },
-                    ) { episodeWrapper ->
-                        SmartEpisodeRow(
-                            episode = episodeWrapper.episode,
-                            useEpisodeArtwork = useEpisodeArtwork,
+                if (isPlaylistPreviewShown) {
+                    item(
+                        key = "playlist-header",
+                        contentType = "playlist-header",
+                    ) {
+                        TextH20(
+                            text = stringResource(LR.string.preview_playlist, playlistName),
+                            modifier = Modifier
+                                .padding(horizontal = 16.dp)
+                                .padding(top = 32.dp),
                         )
                     }
-                } else {
-                    item(
-                        key = "no-episodes",
-                        contentType = "no-episodes",
-                    ) {
-                        Box(
-                            contentAlignment = Alignment.TopCenter,
-                            modifier = Modifier.fillMaxWidth(),
-                        ) {
-                            NoContentBanner(
-                                iconResourceId = IR.drawable.ic_info,
-                                title = stringResource(LR.string.smart_playlist_create_no_content_title),
-                                body = stringResource(LR.string.smart_playlist_create_no_content_body),
-                                modifier = Modifier.padding(top = 56.dp),
+                    if (availableEpisodes.isNotEmpty()) {
+                        items(
+                            items = availableEpisodes,
+                            key = { episode -> episode.uuid },
+                            contentType = { "episode" },
+                        ) { episodeWrapper ->
+                            SmartEpisodeRow(
+                                episode = episodeWrapper.episode,
+                                useEpisodeArtwork = useEpisodeArtwork,
                             )
+                        }
+                    } else {
+                        item(
+                            key = "no-episodes",
+                            contentType = "no-episodes",
+                        ) {
+                            Box(
+                                contentAlignment = Alignment.TopCenter,
+                                modifier = Modifier.fillMaxWidth(),
+                            ) {
+                                NoContentBanner(
+                                    iconResourceId = IR.drawable.ic_info,
+                                    title = stringResource(LR.string.smart_playlist_create_no_content_title),
+                                    body = stringResource(LR.string.smart_playlist_create_no_content_body),
+                                    modifier = Modifier.padding(top = 56.dp),
+                                )
+                            }
                         }
                     }
                 }
@@ -179,7 +182,7 @@ internal fun AppliedRulesPage(
 private fun ActiveRulesContent(
     rules: List<RuleType>,
     appliedRules: AppliedRules,
-    episodeCount: Int,
+    starredEpisodeCount: Int,
     onClickRule: (RuleType) -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -195,7 +198,7 @@ private fun ActiveRulesContent(
         AppliedRulesColumn(
             rules = rules,
             appliedRules = appliedRules,
-            episodeCount = episodeCount,
+            starredEpisodeCount = starredEpisodeCount,
             onClickRule = onClickRule,
         )
     }
@@ -324,7 +327,7 @@ private fun AppliedRulesPageNoRulesPreview(
             playlistName = "Comedy",
             appliedRules = AppliedRules.Companion.Empty,
             availableEpisodes = emptyList(),
-            totalEpisodeCount = 0,
+            starredEpisodeCount = 0,
             useEpisodeArtwork = false,
             areOtherOptionsExpanded = expanded,
             onCreatePlaylist = {},
@@ -357,7 +360,7 @@ private fun AppliedRulesPageEpisodesPreview(
                     ),
                 )
             },
-            totalEpisodeCount = 10,
+            starredEpisodeCount = 10,
             useEpisodeArtwork = false,
             areOtherOptionsExpanded = expanded,
             onCreatePlaylist = {},
@@ -381,7 +384,7 @@ private fun AppliedRulesPageNoEpisodesPreview(
                 podcasts = PodcastsRule.Any,
             ),
             availableEpisodes = emptyList(),
-            totalEpisodeCount = 0,
+            starredEpisodeCount = 0,
             useEpisodeArtwork = false,
             areOtherOptionsExpanded = expanded,
             onCreatePlaylist = {},
