@@ -53,13 +53,13 @@ import au.com.shiftyjelly.pocketcasts.localization.R as LR
 internal fun AppliedRulesColumn(
     rules: List<RuleType>,
     appliedRules: AppliedRules,
-    episodeCount: Int,
+    starredEpisodeCount: Int,
     onClickRule: (RuleType) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     RulesColumn(
         rules = rules,
-        description = { rule -> appliedRules.description(rule, episodeCount) },
+        description = { rule -> appliedRules.description(rule, starredEpisodeCount) },
         onClickRule = onClickRule,
         modifier = modifier,
     )
@@ -172,7 +172,7 @@ private fun RuleRow(
 
 @Composable
 @ReadOnlyComposable
-private fun AppliedRules.description(ruleType: RuleType, episodeCount: Int) = when (ruleType) {
+private fun AppliedRules.description(ruleType: RuleType, starredEpisodeCount: Int) = when (ruleType) {
     RuleType.Podcasts -> when (podcasts) {
         is PodcastsRule.Any -> stringResource(LR.string.all)
         is PodcastsRule.Selected -> podcasts.uuids.size.toString()
@@ -251,7 +251,7 @@ private fun AppliedRules.description(ruleType: RuleType, episodeCount: Int) = wh
 
     RuleType.Starred -> when (starred) {
         SmartRules.StarredRule.Any -> stringResource(LR.string.off)
-        SmartRules.StarredRule.Starred -> episodeCount.toString()
+        SmartRules.StarredRule.Starred -> starredEpisodeCount.toString()
         null -> null
     }
 }
@@ -276,7 +276,7 @@ private fun AppliedRulesColumnPreview(
                     shorterThan = 1.hours + 10.minutes,
                 ),
             ),
-            episodeCount = 17,
+            starredEpisodeCount = 17,
             onClickRule = {},
         )
     }
