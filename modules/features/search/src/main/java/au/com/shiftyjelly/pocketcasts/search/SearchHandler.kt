@@ -31,6 +31,7 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOf
@@ -308,18 +309,27 @@ class SearchHandler @Inject constructor(
             } else {
                 flow {
                     emit(SearchUiState.SearchOperation.Loading(searchTerm = query))
-                    val localResults = localPodcasts.map {
-                        when (it) {
-                            is FolderItem.Folder -> ImprovedSearchResultItem.FolderItem(folder = it.folder, podcasts = it.podcasts)
-                            is FolderItem.Podcast -> ImprovedSearchResultItem.PodcastItem(uuid = it.uuid, isFollowed = subscribedUuids.contains(it.uuid), title = it.podcast.title, author = it.podcast.author)
+
+                    if (query.startsWith("http")) {
+                        val podcastSearch = serviceManager
+                            .searchForPodcastsRx(query)
+                            .map { list -> list.searchResults.map { ImprovedSearchResultItem.PodcastItem(uuid = it.uuid, title = it.title, author = it.author, isFollowed = subscribedUuids.contains(it.uuid)) } }
+                            .toObservable().asFlow().first()
+                        emit(SearchUiState.SearchOperation.Success(searchTerm = query, results = SearchResults.ImprovedResults(results = podcastSearch, filter = ResultsFilters.TOP_RESULTS)))
+                    } else {
+                        val localResults = localPodcasts.map {
+                            when (it) {
+                                is FolderItem.Folder -> ImprovedSearchResultItem.FolderItem(folder = it.folder, podcasts = it.podcasts)
+                                is FolderItem.Podcast -> ImprovedSearchResultItem.PodcastItem(uuid = it.uuid, isFollowed = subscribedUuids.contains(it.uuid), title = it.podcast.title, author = it.podcast.author)
+                            }
                         }
+                        if (localResults.isNotEmpty()) {
+                            emit(SearchUiState.SearchOperation.Success(searchTerm = query, results = SearchResults.ImprovedResults(results = localResults, filter = ResultsFilters.TOP_RESULTS)))
+                        }
+                        val apiResults = improvedSearchManager.combinedSearch(query)
+                        val combinedResults = (localResults + apiResults).distinctBy { it.uuid }
+                        emit(SearchUiState.SearchOperation.Success(searchTerm = query, results = SearchResults.ImprovedResults(results = combinedResults, filter = ResultsFilters.TOP_RESULTS)))
                     }
-                    if (localResults.isNotEmpty()) {
-                        emit(SearchUiState.SearchOperation.Success(searchTerm = query, results = SearchResults.ImprovedResults(results = localResults, filter = ResultsFilters.TOP_RESULTS)))
-                    }
-                    val apiResults = improvedSearchManager.combinedSearch(query)
-                    val combinedResults = (localResults + apiResults).distinctBy { it.uuid }
-                    emit(SearchUiState.SearchOperation.Success(searchTerm = query, results = SearchResults.ImprovedResults(results = combinedResults, filter = ResultsFilters.TOP_RESULTS)))
                 }.catch {
                     emit(SearchUiState.SearchOperation.Error(searchTerm = query, error = it) as SearchUiState.SearchOperation<SearchResults.ImprovedResults>)
                 }
