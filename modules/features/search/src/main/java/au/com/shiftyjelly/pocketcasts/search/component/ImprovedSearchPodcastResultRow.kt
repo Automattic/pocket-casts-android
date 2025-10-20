@@ -64,20 +64,6 @@ fun ImprovedSearchPodcastResultRow(
 }
 
 @Composable
-fun ImprovedSearchFolderResultRow(
-    folderItem: ImprovedSearchResultItem.FolderItem,
-    onClick: () -> Unit,
-    modifier: Modifier = Modifier,
-) {
-    SearchFolderRow(
-        folder = folderItem.folder,
-        podcasts = folderItem.podcasts,
-        onClick = onClick,
-        modifier = modifier,
-    )
-}
-
-@Composable
 private fun ImprovedSearchPodcastResultRow(
     podcastUuid: String,
     title: String,

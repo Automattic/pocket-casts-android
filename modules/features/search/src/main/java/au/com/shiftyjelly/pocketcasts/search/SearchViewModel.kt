@@ -46,14 +46,14 @@ class SearchViewModel @Inject constructor(
             viewModelScope.launch {
                 searchHandler.searchSuggestions
                     .collect { operation ->
-                        _state.update {
-                            if (it is SearchUiState.Idle || it is SearchUiState.Suggestions) {
+                        _state.update { uiState ->
+                            if (uiState is SearchUiState.Idle || uiState is SearchUiState.Suggestions) {
                                 when (operation) {
                                     is SearchUiState.SearchOperation.Error -> {
                                         analyticsTracker.track(
                                             AnalyticsEvent.IMPROVED_SEARCH_SUGGESTIONS_FAILED,
                                             mapOf(
-                                                "source" to "discover",
+                                                "source" to source,
                                             ),
                                         )
                                     }
@@ -62,13 +62,13 @@ class SearchViewModel @Inject constructor(
                                 }
 
                                 // only show loading for the initial query when autocomplete results are empty
-                                if (((it as? SearchUiState.Suggestions)?.operation as? SearchUiState.SearchOperation.Success)?.results?.isNotEmpty() == true && operation is SearchUiState.SearchOperation.Loading) {
-                                    it
+                                if (((uiState as? SearchUiState.Suggestions)?.operation as? SearchUiState.SearchOperation.Success)?.results?.isNotEmpty() == true && operation is SearchUiState.SearchOperation.Loading) {
+                                    uiState
                                 } else {
                                     SearchUiState.Suggestions(operation = operation)
                                 }
                             } else {
-                                it
+                                uiState
                             }
                         }
                     }
@@ -102,7 +102,7 @@ class SearchViewModel @Inject constructor(
         // Prevent updating the search query when navigating back to the search results after tapping on a result.
         if (query == _state.value.searchTerm) return
 
-        if (FeatureFlag.isEnabled(Feature.IMPROVED_SEARCH_SUGGESTIONS) && source == SourceView.DISCOVER) {
+        if (FeatureFlag.isEnabled(Feature.IMPROVED_SEARCH_SUGGESTIONS)) {
             searchHandler.updateAutCompleteQuery(query)
             _state.update {
                 if ((it is SearchUiState.OldResults || it is SearchUiState.ImprovedResults) && it.searchTerm.orEmpty().length > query.length) {

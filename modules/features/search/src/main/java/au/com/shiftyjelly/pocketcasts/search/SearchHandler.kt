@@ -148,20 +148,46 @@ class SearchHandler @Inject constructor(
 
     val searchSuggestions = combine(
         autoCompleteResults,
-        subscribedPodcastUuids.asFlow(),
-    ) { autoComplete, subscribedUuids ->
+        localPodcastsResults.asFlow()
+    ) { autoComplete, subscribedPodcasts ->
+        val followedUuids = subscribedPodcasts.map { item -> item.uuid }
         when (autoComplete) {
             is SearchUiState.SearchOperation.Success -> {
-                autoComplete.copy(
-                    results = autoComplete.results.map {
-                        when (it) {
-                            is SearchAutoCompleteItem.Podcast -> {
-                                it.copy(isSubscribed = subscribedUuids.contains(it.uuid))
-                            }
-
-                            else -> it
+                val remoteResults = autoComplete.results.map { autoCompleteItem ->
+                    when (autoCompleteItem) {
+                        is SearchAutoCompleteItem.Podcast -> {
+                            autoCompleteItem.copy(isSubscribed = followedUuids.contains(autoCompleteItem.uuid))
                         }
-                    },
+
+                        else -> autoCompleteItem
+                    }
+                }
+                val localResults = subscribedPodcasts.map { folderItem ->
+                    when (folderItem) {
+                        is FolderItem.Podcast -> SearchAutoCompleteItem.Podcast(
+                            uuid = folderItem.uuid,
+                            author = folderItem.podcast.author,
+                            title = folderItem.title,
+                            isSubscribed = true,
+                        )
+
+                        is FolderItem.Folder -> SearchAutoCompleteItem.Folder(
+                            uuid = folderItem.uuid,
+                            title = folderItem.title,
+                            podcasts = folderItem.podcasts.map {
+                                SearchAutoCompleteItem.Podcast(uuid = it.uuid, title = it.title, author = it.author, isSubscribed = true)
+                            },
+                            color = folderItem.folder.color
+                        )
+                    }
+                }
+                val suggestions = buildList {
+                    addAll(remoteResults.filterIsInstance<SearchAutoCompleteItem.Term>())
+                    addAll(localResults)
+                    addAll(remoteResults.filter { it !is SearchAutoCompleteItem.Term }.filter { !followedUuids.contains((it as? SearchAutoCompleteItem.Podcast)?.uuid.orEmpty()) })
+                }
+                autoComplete.copy(
+                    results = suggestions
                 )
             }
 
@@ -221,7 +247,13 @@ class SearchHandler @Inject constructor(
             }
         }
 
-    private val searchFlowable = Observables.combineLatest(searchQuery.filter { it is Query.SearchResults }, subscribedPodcastUuids, localPodcastsResults, serverSearchResults, loadingObservable) { searchTerm, subscribedPodcastUuids, localPodcastsResult, serverSearchResults, loading ->
+    private val searchFlowable = Observables.combineLatest(
+        searchQuery.filter { it is Query.SearchResults },
+        subscribedPodcastUuids,
+        localPodcastsResults,
+        serverSearchResults,
+        loadingObservable
+    ) { searchTerm, subscribedPodcastUuids, localPodcastsResult, serverSearchResults, loading ->
         if (loading) {
             SearchUiState.SearchOperation.Loading(searchTerm.term)
         } else if (serverSearchResults.error != null) {

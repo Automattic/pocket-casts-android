@@ -97,6 +97,13 @@ sealed class SearchHistoryEntry(
             podcastIds = podcastIds,
         )
 
+        fun fromAutoCompleteFolder(folder: SearchAutoCompleteItem.Folder) = Folder(
+            uuid = folder.uuid,
+            title = folder.title,
+            color = 0,
+            podcastIds = folder.podcasts.map { it.uuid }
+        )
+
         fun fromPodcast(podcast: PodcastModel) = Podcast(
             uuid = podcast.uuid,
             title = podcast.title,

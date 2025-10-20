@@ -311,6 +311,7 @@ class SearchFragment : BaseFragment() {
                             onTermClick = { viewModel.selectSuggestion(it.term) },
                             onPodcastClick = { onPodcastClick(SearchHistoryEntry.fromAutoCompletePodcast(it), it.isSubscribed) },
                             onPodcastFollow = { viewModel.onSubscribeToPodcast(it.uuid) },
+                            onFolderClick = { onFolderClick(SearchHistoryEntry.fromAutoCompleteFolder(it)) },
                             onEpisodeClick = {},
                             playButtonListener = playButtonListener,
                             onScroll = { UiUtil.hideKeyboard(searchView) },
@@ -404,12 +405,16 @@ class SearchFragment : BaseFragment() {
     }
 
     private fun onFolderClick(folder: Folder, podcasts: List<Podcast>) {
+        onFolderClick(SearchHistoryEntry.fromFolder(folder, podcasts.map { it.uuid }))
+    }
+
+    private fun onFolderClick(folder: SearchHistoryEntry.Folder) {
         viewModel.trackSearchResultTapped(
             source = source,
             uuid = folder.uuid,
             type = SearchResultType.FOLDER,
         )
-        searchHistoryViewModel.add(SearchHistoryEntry.fromFolder(folder, podcasts.map { it.uuid }))
+        searchHistoryViewModel.add(folder)
         listener?.onSearchFolderClick(folder.uuid)
         binding?.searchView?.let { UiUtil.hideKeyboard(it) }
     }
