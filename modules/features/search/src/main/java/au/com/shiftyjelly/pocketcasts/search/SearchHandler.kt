@@ -273,13 +273,16 @@ class SearchHandler @Inject constructor(
             } else {
                 flow {
                     emit(SearchUiState.SearchOperation.Loading(searchTerm = query))
-                    val apiResults = improvedSearchManager.combinedSearch(query)
                     val localResults = localPodcasts.map {
                         when (it) {
                             is FolderItem.Folder -> ImprovedSearchResultItem.FolderItem(folder = it.folder, podcasts = it.podcasts)
                             is FolderItem.Podcast -> ImprovedSearchResultItem.PodcastItem(uuid = it.uuid, isFollowed = subscribedUuids.contains(it.uuid), title = it.podcast.title, author = it.podcast.author)
                         }
                     }
+                    if (localResults.isNotEmpty()) {
+                        emit(SearchUiState.SearchOperation.Success(searchTerm = query, results = SearchResults.ImprovedResults(results = localResults, filter = ResultsFilters.TOP_RESULTS)))
+                    }
+                    val apiResults = improvedSearchManager.combinedSearch(query)
                     val combinedResults = (localResults + apiResults).distinctBy { it.uuid }
                     emit(SearchUiState.SearchOperation.Success(searchTerm = query, results = SearchResults.ImprovedResults(results = combinedResults, filter = ResultsFilters.TOP_RESULTS)))
                 }.catch {
