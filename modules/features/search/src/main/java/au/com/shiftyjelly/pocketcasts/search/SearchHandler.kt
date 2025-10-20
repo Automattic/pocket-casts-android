@@ -63,17 +63,17 @@ class SearchHandler @Inject constructor(
     private val signInStateObservable = userManager.getSignInState().startWith(SignInState.SignedOut).toObservable()
 
     private val localPodcastsResults = Observable
-        .combineLatest(searchQuery.filter { it is Query.SearchResults }, onlySearchRemoteObservable, signInStateObservable) { searchQuery, onlySearchRemoteObservable, signInState ->
-            Pair(if (onlySearchRemoteObservable) "" else searchQuery.term, signInState)
+        .combineLatest(searchQuery.map { it.term.trim() }, onlySearchRemoteObservable, signInStateObservable) { searchQuery, onlySearchRemoteObservable, signInState ->
+            Triple(searchQuery, onlySearchRemoteObservable, signInState)
         }
         .subscribeOn(Schedulers.io())
-        .switchMap { (query, signInState) ->
+        .switchMap { (query, onlySearchRemote, signInState) ->
             if (query.isEmpty()) {
                 Observable.just(emptyList())
             } else {
                 // search folders
                 val folderSearch =
-                    if (signInState.isSignedInAsPlusOrPatron) {
+                    if (signInState.isSignedInAsPlusOrPatron && !onlySearchRemote) {
                         // only show folders if the user has Plus
                         folderManager.findFoldersSingle()
                             .subscribeOn(Schedulers.io())
@@ -148,43 +148,46 @@ class SearchHandler @Inject constructor(
 
     val searchSuggestions = combine(
         autoCompleteResults,
-        localPodcastsResults.asFlow()
-    ) { autoComplete, subscribedPodcasts ->
-        val followedUuids = subscribedPodcasts.map { item -> item.uuid }
+        subscribedPodcastUuids.asFlow(),
+        localPodcastsResults.asFlow(),
+        onlySearchRemoteObservable.asFlow(),
+    ) { autoComplete, subscribedUuids, subscribedPodcasts, remoteOnly ->
         when (autoComplete) {
             is SearchUiState.SearchOperation.Success -> {
                 val remoteResults = autoComplete.results.map { autoCompleteItem ->
                     when (autoCompleteItem) {
                         is SearchAutoCompleteItem.Podcast -> {
-                            autoCompleteItem.copy(isSubscribed = followedUuids.contains(autoCompleteItem.uuid))
+                            autoCompleteItem.copy(isSubscribed = subscribedUuids.contains(autoCompleteItem.uuid))
                         }
 
                         else -> autoCompleteItem
                     }
                 }
-                val localResults = subscribedPodcasts.map { folderItem ->
-                    when (folderItem) {
-                        is FolderItem.Podcast -> SearchAutoCompleteItem.Podcast(
-                            uuid = folderItem.uuid,
-                            author = folderItem.podcast.author,
-                            title = folderItem.title,
-                            isSubscribed = true,
-                        )
+                val localResults = if (!remoteOnly) {
+                    subscribedPodcasts.map { folderItem ->
+                        when (folderItem) {
+                            is FolderItem.Podcast -> SearchAutoCompleteItem.Podcast(
+                                uuid = folderItem.uuid,
+                                author = folderItem.podcast.author,
+                                title = folderItem.title,
+                                isSubscribed = true,
+                            )
 
-                        is FolderItem.Folder -> SearchAutoCompleteItem.Folder(
-                            uuid = folderItem.uuid,
-                            title = folderItem.title,
-                            podcasts = folderItem.podcasts.map {
-                                SearchAutoCompleteItem.Podcast(uuid = it.uuid, title = it.title, author = it.author, isSubscribed = true)
-                            },
-                            color = folderItem.folder.color
-                        )
+                            is FolderItem.Folder -> SearchAutoCompleteItem.Folder(
+                                uuid = folderItem.uuid,
+                                title = folderItem.title,
+                                podcasts = folderItem.podcasts.map {
+                                    SearchAutoCompleteItem.Podcast(uuid = it.uuid, title = it.title, author = it.author, isSubscribed = true)
+                                },
+                                color = folderItem.folder.color
+                            )
+                        }
                     }
-                }
+                } else { emptyList() }
                 val suggestions = buildList {
                     addAll(remoteResults.filterIsInstance<SearchAutoCompleteItem.Term>())
                     addAll(localResults)
-                    addAll(remoteResults.filter { it !is SearchAutoCompleteItem.Term }.filter { !followedUuids.contains((it as? SearchAutoCompleteItem.Podcast)?.uuid.orEmpty()) })
+                    addAll(remoteResults.filter { it !is SearchAutoCompleteItem.Term }.filter { remoteOnly || !subscribedUuids.contains((it as? SearchAutoCompleteItem.Podcast)?.uuid.orEmpty()) })
                 }
                 autoComplete.copy(
                     results = suggestions
