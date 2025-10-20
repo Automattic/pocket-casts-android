@@ -59,8 +59,10 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.rx2.asFlow
@@ -88,7 +90,7 @@ class ImprovedEpisodeRowViewModel @AssistedInject constructor(
     private val episodeFlow = podcastManager.findOrDownloadPodcastRxSingle(podcastUuid)
         .toObservable().asFlow()
         .flatMapLatest { ep ->
-            flow<BaseEpisode> { emit(episodeManager.findByUuid(episodeUuid)!!) }
+            flow<BaseEpisode> { emit(checkNotNull(episodeManager.findByUuid(episodeUuid))) }
         }
 
     private val episodePlaybackFlow = playbackManager.playbackStateFlow
@@ -97,7 +99,13 @@ class ImprovedEpisodeRowViewModel @AssistedInject constructor(
         viewModelScope.launch {
             combine<BaseEpisode, PlaybackState, RowState>(
                 episodeFlow,
-                episodePlaybackFlow,
+                episodePlaybackFlow.map {
+                    if (it.episodeUuid == episodeUuid) {
+                        it
+                    } else {
+                        PlaybackState()
+                    }
+                }.distinctUntilChanged(),
             ) { episode, playbackState -> RowState.Loaded(episode, playbackState) }
                 .catch {
                     emit(RowState.Error(it))
@@ -174,6 +182,7 @@ private fun ImprovedSearchEpisodeResultRow(
     modifier: Modifier = Modifier,
 ) {
     val viewModel: ImprovedEpisodeRowViewModel = hiltViewModel(
+        key = episodeUuid,
         creationCallback = { factory: ImprovedEpisodeRowViewModel.Factory ->
             factory.create(episodeUuid = episodeUuid, podcastUuid = podcastUuid)
         }
@@ -236,6 +245,7 @@ private fun ImprovedSearchEpisodeResultRow(
                 AndroidView(
                     modifier = Modifier.size(48.dp),
                     factory = {
+
                         PlayButton(it).apply {
                             listener = playButtonListener
                         }
@@ -247,7 +257,12 @@ private fun ImprovedSearchEpisodeResultRow(
                             playedUpToMs = if (state.playbackState.episodeUuid == episodeUuid) {
                                 state.playbackState.positionMs
                             } else {
-                                0
+                                state.episode.playedUpToMs
+                            }
+                            durationMs = if (state.playbackState.episodeUuid == episodeUuid) {
+                                state.playbackState.durationMs
+                            } else  {
+                                state.episode.durationMs
                             }
                         }
                         val buttonType = PlayButton.calculateButtonType(theEpisode, true)
