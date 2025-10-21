@@ -32,7 +32,6 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.emptyFlow
-import kotlinx.coroutines.flow.filterIsInstance
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flow
@@ -153,7 +152,17 @@ class SearchHandler @Inject constructor(
     val searchSuggestions = combine(
         autoCompleteResults,
         onlySearchRemoteObservable.asFlow(),
-        searchQuery.asFlow().filterIsInstance<Query.Suggestions>().flatMapLatest { localPodcastsResults.asFlow() },
+        combine(
+            searchQuery.asFlow().map { it is Query.Suggestions },
+            localPodcastsResults.asFlow(),
+        ) { isSuggestion, localPodcasts -> isSuggestion to localPodcasts }
+            .flatMapLatest { (isSuggestion, localPodcasts) ->
+                if (isSuggestion) {
+                    flowOf(localPodcasts)
+                } else {
+                    emptyFlow()
+                }
+            },
     ) { autoComplete, onlyRemote, subscribedPodcasts ->
         val subscribedUuids = podcastManager.findSubscribedUuids()
         when (autoComplete) {

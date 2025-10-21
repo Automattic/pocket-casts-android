@@ -84,7 +84,7 @@ class SearchViewModel @Inject constructor(
             } else {
                 searchHandler.searchResults.collect {
                     showSearchHistory = false
-                    if (_state.value is SearchUiState.OldResults || !FeatureFlag.isEnabled(Feature.IMPROVED_SEARCH_SUGGESTIONS)) {
+                    if (_state.value is SearchUiState.OldResults) {
                         _state.value = SearchUiState.OldResults(operation = it as SearchUiState.SearchOperation<SearchResults.SegregatedResults>)
                     }
                     if (!FeatureFlag.isEnabled(Feature.IMPROVED_SEARCH_SUGGESTIONS) && it is SearchUiState.SearchOperation.Loading) {
