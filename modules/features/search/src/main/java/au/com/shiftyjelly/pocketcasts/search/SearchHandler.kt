@@ -152,9 +152,10 @@ class SearchHandler @Inject constructor(
     @OptIn(ExperimentalCoroutinesApi::class)
     val searchSuggestions = combine(
         autoCompleteResults,
-        subscribedPodcastUuids.asFlow(),
+        onlySearchRemoteObservable.asFlow(),
         searchQuery.asFlow().filterIsInstance<Query.Suggestions>().flatMapLatest { localPodcastsResults.asFlow() },
-    ) { autoComplete, subscribedUuids, subscribedPodcasts ->
+    ) { autoComplete, onlyRemote, subscribedPodcasts ->
+        val subscribedUuids = podcastManager.findSubscribedUuids()
         when (autoComplete) {
             is SearchUiState.SearchOperation.Success -> {
                 val remoteResults = autoComplete.results.map { autoCompleteItem ->
@@ -166,30 +167,34 @@ class SearchHandler @Inject constructor(
                         else -> autoCompleteItem
                     }
                 }
-                val localResults = subscribedPodcasts.map { folderItem ->
-                    when (folderItem) {
-                        is FolderItem.Podcast -> SearchAutoCompleteItem.Podcast(
-                            uuid = folderItem.uuid,
-                            author = folderItem.podcast.author,
-                            title = folderItem.title,
-                            isSubscribed = true,
-                        )
+                val localResults = if (onlyRemote) emptyList() else {
+                    subscribedPodcasts.map { folderItem ->
+                        when (folderItem) {
+                            is FolderItem.Podcast -> SearchAutoCompleteItem.Podcast(
+                                uuid = folderItem.uuid,
+                                author = folderItem.podcast.author,
+                                title = folderItem.title,
+                                isSubscribed = true,
+                            )
 
-                        is FolderItem.Folder -> SearchAutoCompleteItem.Folder(
-                            uuid = folderItem.uuid,
-                            title = folderItem.title,
-                            podcasts = folderItem.podcasts.map {
-                                SearchAutoCompleteItem.Podcast(uuid = it.uuid, title = it.title, author = it.author, isSubscribed = true)
-                            },
-                            color = folderItem.folder.color
-                        )
+                            is FolderItem.Folder -> SearchAutoCompleteItem.Folder(
+                                uuid = folderItem.uuid,
+                                title = folderItem.title,
+                                podcasts = folderItem.podcasts.map {
+                                    SearchAutoCompleteItem.Podcast(uuid = it.uuid, title = it.title, author = it.author, isSubscribed = true)
+                                },
+                                color = folderItem.folder.color
+                            )
+                        }
                     }
                 }
+
                 val suggestions = buildList {
                     addAll(remoteResults.filterIsInstance<SearchAutoCompleteItem.Term>())
                     addAll(localResults)
-                    addAll(remoteResults.filter { it !is SearchAutoCompleteItem.Term }.filter { !subscribedUuids.contains((it as? SearchAutoCompleteItem.Podcast)?.uuid.orEmpty()) })
+                    addAll(remoteResults.filter { it !is SearchAutoCompleteItem.Term }.filter { onlyRemote || !subscribedUuids.contains((it as? SearchAutoCompleteItem.Podcast)?.uuid.orEmpty()) })
                 }
+
                 autoComplete.copy(
                     results = suggestions
                 )
@@ -300,23 +305,22 @@ class SearchHandler @Inject constructor(
     @OptIn(ExperimentalCoroutinesApi::class)
     val improvedSearchResults: Flow<SearchUiState.SearchOperation<SearchResults.ImprovedResults>> = combine(
         searchQuery.filter { it is Query.SearchResults }.map { it.term.trim() }.asFlow(),
-        subscribedPodcastUuids.asFlow(),
         combine(
             searchQuery.asFlow().map { it is Query.SearchResults },
             localPodcastsResults.asFlow()
         ) { shouldPass, localResults ->
             shouldPass to localResults
         },
-    ) { query, subscribedPodcastUuids, localPodcasts -> Triple(query, subscribedPodcastUuids, localPodcasts) }
-        .flatMapLatest { (query, subscribedUuids, localPodcastsPair) ->
-            if (!localPodcastsPair.first) {
+    ) { query, localPodcasts -> Triple(query, localPodcasts.first, localPodcasts.second) }
+        .flatMapLatest { (query, isResultsQuery, localPodcasts) ->
+            if (!isResultsQuery) {
                 emptyFlow()
             } else if (query.isBlank()) {
                 flowOf(SearchUiState.SearchOperation.Success(searchTerm = query, results = SearchResults.ImprovedResults(results = emptyList(), filter = ResultsFilters.TOP_RESULTS)))
             } else {
                 flow {
                     emit(SearchUiState.SearchOperation.Loading(searchTerm = query))
-
+                    val subscribedUuids = podcastManager.findSubscribedUuids()
                     if (query.startsWith("http")) {
                         val podcastSearch = serviceManager
                             .searchForPodcastsRx(query)
@@ -324,16 +328,22 @@ class SearchHandler @Inject constructor(
                             .toObservable().asFlow().first()
                         emit(SearchUiState.SearchOperation.Success(searchTerm = query, results = SearchResults.ImprovedResults(results = podcastSearch, filter = ResultsFilters.TOP_RESULTS)))
                     } else {
-                        val localResults = localPodcastsPair.second.map {
+                        val localResults = localPodcasts.map {
                             when (it) {
                                 is FolderItem.Folder -> ImprovedSearchResultItem.FolderItem(folder = it.folder, podcasts = it.podcasts)
-                                is FolderItem.Podcast -> ImprovedSearchResultItem.PodcastItem(uuid = it.uuid, isFollowed = subscribedUuids.contains(it.uuid), title = it.podcast.title, author = it.podcast.author)
+                                is FolderItem.Podcast -> ImprovedSearchResultItem.PodcastItem(uuid = it.uuid, isFollowed = true, title = it.podcast.title, author = it.podcast.author)
                             }
                         }
                         if (localResults.isNotEmpty()) {
                             emit(SearchUiState.SearchOperation.Success(searchTerm = query, results = SearchResults.ImprovedResults(results = localResults, filter = ResultsFilters.TOP_RESULTS)))
                         }
-                        val apiResults = improvedSearchManager.combinedSearch(query)
+                        val apiResults = improvedSearchManager.combinedSearch(query).map {
+                            if (it is ImprovedSearchResultItem.PodcastItem) {
+                                it.copy(isFollowed = subscribedUuids.contains(it.uuid))
+                            } else {
+                                it
+                            }
+                        }
                         val combinedResults = (localResults + apiResults).distinctBy { it.uuid }
                         emit(SearchUiState.SearchOperation.Success(searchTerm = query, results = SearchResults.ImprovedResults(results = combinedResults, filter = ResultsFilters.TOP_RESULTS)))
                     }
