@@ -46,6 +46,7 @@ class SearchViewModel @Inject constructor(
             viewModelScope.launch {
                 searchHandler.searchSuggestions
                     .collect { operation ->
+                        showSearchHistory = false
                         _state.update { uiState ->
                             if (uiState is SearchUiState.Idle || uiState is SearchUiState.Suggestions) {
                                 when (operation) {
@@ -78,20 +79,20 @@ class SearchViewModel @Inject constructor(
         viewModelScope.launch {
             if (FeatureFlag.isEnabled(Feature.IMPROVED_SEARCH_RESULTS)) {
                 searchHandler.improvedSearchResults.collect {
+                    showSearchHistory = false
                     _state.value = SearchUiState.ImprovedResults(operation = it)
                     if (!FeatureFlag.isEnabled(Feature.IMPROVED_SEARCH_SUGGESTIONS) && it is SearchUiState.SearchOperation.Loading) {
                         saveSearchTerm(it.searchTerm)
-                        showSearchHistory = false
                     }
                 }
             } else {
                 searchHandler.searchResults.collect {
+                    showSearchHistory = false
                     if (_state.value is SearchUiState.OldResults || !FeatureFlag.isEnabled(Feature.IMPROVED_SEARCH_SUGGESTIONS)) {
                         _state.value = SearchUiState.OldResults(operation = it as SearchUiState.SearchOperation<SearchResults.SegregatedResults>)
                     }
                     if (!FeatureFlag.isEnabled(Feature.IMPROVED_SEARCH_SUGGESTIONS) && it is SearchUiState.SearchOperation.Loading) {
                         saveSearchTerm(it.searchTerm)
-                        showSearchHistory = false
                     }
                 }
             }
