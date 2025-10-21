@@ -39,6 +39,7 @@ import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.rx2.asFlow
+import kotlinx.coroutines.rx2.await
 import timber.log.Timber
 
 class SearchHandler @Inject constructor(
@@ -336,7 +337,7 @@ class SearchHandler @Inject constructor(
                         val podcastSearch = serviceManager
                             .searchForPodcastsRx(query)
                             .map { list -> list.searchResults.map { ImprovedSearchResultItem.PodcastItem(uuid = it.uuid, title = it.title, author = it.author, isFollowed = subscribedUuids.contains(it.uuid)) } }
-                            .toObservable().asFlow().first()
+                            .await()
                         emit(SearchUiState.SearchOperation.Success(searchTerm = query, results = SearchResults.ImprovedResults(results = podcastSearch, filter = ResultsFilters.TOP_RESULTS)))
                     } else {
                         val localResults = localPodcasts.map {

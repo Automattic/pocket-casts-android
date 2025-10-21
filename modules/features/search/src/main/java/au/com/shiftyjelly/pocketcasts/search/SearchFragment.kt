@@ -205,7 +205,6 @@ class SearchFragment : BaseFragment() {
             setHintTextColor(context.getThemeColor(hintColor))
             setOnEditorActionListener { _, actionId, event ->
                 if (actionId == EditorInfo.IME_ACTION_SEARCH || actionId == EditorInfo.IME_ACTION_DONE || (event.action == KeyEvent.ACTION_DOWN && event.keyCode == KeyEvent.KEYCODE_ENTER)) {
-                    // TODO check with FF off
                     viewModel.runSearchOnTerm(searchView.query.toString())
                     binding.searchHistoryPanel.hide()
                     UiUtil.hideKeyboard(searchView)
@@ -260,7 +259,6 @@ class SearchFragment : BaseFragment() {
                 val lowerCaseSearch = query.lowercase()
                 if ((characterCount == 1 && lowerCaseSearch.startsWith("h")) || (characterCount == 2 && lowerCaseSearch.startsWith("ht")) || (characterCount == 3 && lowerCaseSearch.startsWith("htt")) || lowerCaseSearch.startsWith("http")) {
                     if (((viewModel.state.value as? SearchUiState.OldResults)?.operation as? SearchUiState.SearchOperation.Success)?.results?.podcasts?.isNotEmpty() == true) {
-                        // TODO check this condition above
                         binding.searchHistoryPanel.hide()
                     }
                     return true
