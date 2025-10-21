@@ -200,10 +200,18 @@ class SearchViewModel @Inject constructor(
         )
     }
 
-    fun selectSuggestion(suggestion: String) {
-        saveSearchTerm(suggestion)
-        searchHandler.updateSearchQuery(suggestion, true)
+    fun runSearchOnTerm(term: String) {
+        saveSearchTerm(term)
+        searchHandler.updateSearchQuery(term, true)
 
+        _state.value = if (FeatureFlag.isEnabled(Feature.IMPROVED_SEARCH_RESULTS)) {
+            SearchUiState.ImprovedResults(operation = SearchUiState.SearchOperation.Loading(term))
+        } else {
+            SearchUiState.OldResults(operation = SearchUiState.SearchOperation.Loading(term))
+        }
+    }
+
+    fun selectSuggestion(suggestion: String) {
         analyticsTracker.track(
             AnalyticsEvent.IMPROVED_SEARCH_SUGGESTION_TERM_TAPPED,
             properties = mapOf(
@@ -212,11 +220,7 @@ class SearchViewModel @Inject constructor(
             ),
         )
 
-        _state.value = if (FeatureFlag.isEnabled(Feature.IMPROVED_SEARCH_RESULTS)) {
-            SearchUiState.ImprovedResults(operation = SearchUiState.SearchOperation.Loading(suggestion))
-        } else {
-            SearchUiState.OldResults(operation = SearchUiState.SearchOperation.Loading(suggestion))
-        }
+        runSearchOnTerm(suggestion)
     }
 
     fun onFragmentPause(isChangingConfigurations: Boolean?) {

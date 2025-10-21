@@ -171,7 +171,7 @@ class SearchFragment : BaseFragment() {
             is SearchHistoryEntry.Podcast -> listener?.onSearchPodcastClick(entry.uuid, SourceView.SEARCH)
             is SearchHistoryEntry.SearchTerm -> {
                 binding?.let {
-                    viewModel.selectSuggestion(entry.term)
+                    viewModel.runSearchOnTerm(entry.term)
                     it.searchView.setQuery(entry.term, true)
                     it.searchHistoryPanel.hide()
                     UiUtil.hideKeyboard(it.searchView)
@@ -205,7 +205,10 @@ class SearchFragment : BaseFragment() {
             setHintTextColor(context.getThemeColor(hintColor))
             setOnEditorActionListener { _, actionId, event ->
                 if (actionId == EditorInfo.IME_ACTION_SEARCH || actionId == EditorInfo.IME_ACTION_DONE || (event.action == KeyEvent.ACTION_DOWN && event.keyCode == KeyEvent.KEYCODE_ENTER)) {
-                    viewModel.selectSuggestion(searchView.query.toString())
+                    // TODO check with FF off
+                    viewModel.runSearchOnTerm(searchView.query.toString())
+                    binding.searchHistoryPanel.hide()
+                    UiUtil.hideKeyboard(searchView)
                     true
                 } else {
                     false
