@@ -17,6 +17,8 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
 import au.com.shiftyjelly.pocketcasts.compose.AppThemeWithBackground
+import au.com.shiftyjelly.pocketcasts.compose.components.FadeConfig
+import au.com.shiftyjelly.pocketcasts.compose.components.FadedLazyRow
 import au.com.shiftyjelly.pocketcasts.compose.components.TextH40
 import au.com.shiftyjelly.pocketcasts.compose.preview.ThemePreviewParameterProvider
 import au.com.shiftyjelly.pocketcasts.compose.theme
@@ -29,7 +31,11 @@ fun SearchResultFilters(
     onFilterSelect: (Int) -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    LazyRow(
+    FadedLazyRow(
+        fadeConfig = FadeConfig.Default.copy(
+            showStartFade = false,
+            showEndFade = true,
+        ),
         modifier = modifier,
         horizontalArrangement = Arrangement.spacedBy(8.dp),
     ) {
