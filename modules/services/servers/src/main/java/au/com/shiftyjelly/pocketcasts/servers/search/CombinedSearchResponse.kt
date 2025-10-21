@@ -15,7 +15,7 @@ sealed interface CombinedResult {
     data class PodcastResult(
         val uuid: String,
         val title: String,
-        val author: String,
+        val author: String? = "",
         val slug: String,
     ) : CombinedResult
 
