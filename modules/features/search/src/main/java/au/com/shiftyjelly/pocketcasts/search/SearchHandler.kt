@@ -167,7 +167,9 @@ class SearchHandler @Inject constructor(
                         else -> autoCompleteItem
                     }
                 }
-                val localResults = if (onlyRemote) emptyList() else {
+                val localResults = if (onlyRemote) {
+                    emptyList()
+                } else {
                     subscribedPodcasts.map { folderItem ->
                         when (folderItem) {
                             is FolderItem.Podcast -> SearchAutoCompleteItem.Podcast(
@@ -183,7 +185,7 @@ class SearchHandler @Inject constructor(
                                 podcasts = folderItem.podcasts.map {
                                     SearchAutoCompleteItem.Podcast(uuid = it.uuid, title = it.title, author = it.author, isSubscribed = true)
                                 },
-                                color = folderItem.folder.color
+                                color = folderItem.folder.color,
                             )
                         }
                     }
@@ -196,7 +198,7 @@ class SearchHandler @Inject constructor(
                 }
 
                 autoComplete.copy(
-                    results = suggestions
+                    results = suggestions,
                 )
             }
 
@@ -261,7 +263,7 @@ class SearchHandler @Inject constructor(
         subscribedPodcastUuids,
         localPodcastsResults,
         serverSearchResults,
-        loadingObservable
+        loadingObservable,
     ) { searchTerm, subscribedPodcastUuids, localPodcastsResult, serverSearchResults, loading ->
         if (loading) {
             SearchUiState.SearchOperation.Loading(searchTerm.term)
@@ -307,7 +309,7 @@ class SearchHandler @Inject constructor(
         searchQuery.filter { it is Query.SearchResults }.map { it.term.trim() }.asFlow(),
         combine(
             searchQuery.asFlow().map { it is Query.SearchResults },
-            localPodcastsResults.asFlow()
+            localPodcastsResults.asFlow(),
         ) { shouldPass, localResults ->
             shouldPass to localResults
         },

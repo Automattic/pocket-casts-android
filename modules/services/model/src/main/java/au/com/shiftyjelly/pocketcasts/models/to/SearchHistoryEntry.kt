@@ -101,7 +101,7 @@ sealed class SearchHistoryEntry(
             uuid = folder.uuid,
             title = folder.title,
             color = 0,
-            podcastIds = folder.podcasts.map { it.uuid }
+            podcastIds = folder.podcasts.map { it.uuid },
         )
 
         fun fromPodcast(podcast: PodcastModel) = Podcast(

@@ -42,7 +42,7 @@ fun SearchFolderRow(
         podcastUuids = podcastUuids,
         modifier = modifier,
         onClick = onClick,
-        showFollowed = showFollowed
+        showFollowed = showFollowed,
     )
 }
 

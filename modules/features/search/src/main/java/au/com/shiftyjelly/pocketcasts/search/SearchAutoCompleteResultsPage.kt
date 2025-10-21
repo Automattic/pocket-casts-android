@@ -108,7 +108,7 @@ fun SearchAutoCompleteResultsPage(
                         is SearchAutoCompleteItem.Folder -> ImprovedSearchFolderResultRow(
                             folder = item,
                             onClick = { onFolderClick(item) },
-                            modifier = Modifier.fillMaxWidth()
+                            modifier = Modifier.fillMaxWidth(),
                         )
                     }
                 }

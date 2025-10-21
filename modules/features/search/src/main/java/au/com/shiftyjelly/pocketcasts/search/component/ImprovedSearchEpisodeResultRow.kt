@@ -157,7 +157,6 @@ fun ImprovedSearchEpisodeResultRow(
     playButtonListener: PlayButtonListener,
     modifier: Modifier = Modifier,
 ) {
-
     ImprovedSearchEpisodeResultRow(
         episodeUuid = episode.uuid,
         podcastUuid = episode.podcastUuid,
@@ -185,7 +184,7 @@ private fun ImprovedSearchEpisodeResultRow(
         key = episodeUuid,
         creationCallback = { factory: ImprovedEpisodeRowViewModel.Factory ->
             factory.create(episodeUuid = episodeUuid, podcastUuid = podcastUuid)
-        }
+        },
     )
 
     val state = viewModel.state.collectAsState().value
@@ -245,7 +244,6 @@ private fun ImprovedSearchEpisodeResultRow(
                 AndroidView(
                     modifier = Modifier.size(48.dp),
                     factory = {
-
                         PlayButton(it).apply {
                             listener = playButtonListener
                         }
@@ -261,7 +259,7 @@ private fun ImprovedSearchEpisodeResultRow(
                             }
                             durationMs = if (state.playbackState.episodeUuid == episodeUuid) {
                                 state.playbackState.durationMs
-                            } else  {
+                            } else {
                                 state.episode.durationMs
                             }
                         }

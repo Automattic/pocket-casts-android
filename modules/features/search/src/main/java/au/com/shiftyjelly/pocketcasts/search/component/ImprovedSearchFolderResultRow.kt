@@ -59,13 +59,13 @@ private fun PreviewFolderRow(
                         uuid = "",
                         title = "podcast",
                         author = "author",
-                        isSubscribed = true
-                    )
+                        isSubscribed = true,
+                    ),
                 ),
                 color = 0xff00ff,
             ),
             onClick = {},
-            modifier = Modifier.fillMaxWidth()
+            modifier = Modifier.fillMaxWidth(),
         )
     }
 }
