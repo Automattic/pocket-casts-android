@@ -48,6 +48,8 @@ import au.com.shiftyjelly.pocketcasts.models.entity.ManualPlaylistPodcastSource
 import au.com.shiftyjelly.pocketcasts.playlists.manual.AddEpisodesViewModel.PodcastEpisodesUiState
 import au.com.shiftyjelly.pocketcasts.utils.extensions.requireString
 import kotlinx.coroutines.flow.StateFlow
+import okio.ByteString.Companion.decodeBase64
+import okio.ByteString.Companion.encodeUtf8
 import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
@@ -143,6 +145,7 @@ internal fun AddEpisodesPage(
                         onOpenFolder()
                         AddEpisodesRoutes.folderRoute(source.uuid, source.title)
                     }
+
                     is ManualPlaylistPodcastSource -> {
                         onOpenPodcast()
                         AddEpisodesRoutes.podcastRoute(source.uuid)
@@ -184,11 +187,11 @@ internal fun AddEpisodesPage(
             ) { backStackEntry ->
                 val arguments = requireNotNull(backStackEntry.arguments) { "Missing back stack entry arguments" }
                 val folderUuid = arguments.requireString(AddEpisodesRoutes.FOLDER_UUID_ARG)
-                val folderName = arguments.requireString(AddEpisodesRoutes.FOLDER_NAME_ARG)
+                val folderName = arguments.requireString(AddEpisodesRoutes.FOLDER_NAME_ARG).decodeBase64()?.utf8()
                 val podcasts by folderPodcastsFlow(folderUuid).collectAsState()
 
                 AddEpisodeSourcesColumn(
-                    title = folderName,
+                    title = folderName ?: stringResource(LR.string.your_podcasts),
                     sources = podcasts,
                     noContentData = NoContentData(
                         title = stringResource(LR.string.manual_playlist_search_no_podcast_title),
@@ -235,7 +238,7 @@ internal object AddEpisodesRoutes {
     const val PODCAST_UUID_ARG = "uuid"
     const val PODCAST = "$PODCAST_BASE/{$PODCAST_UUID_ARG}"
 
-    fun folderRoute(uuid: String, name: String) = "$FOLDER_BASE/$uuid/$name"
+    fun folderRoute(uuid: String, name: String) = "$FOLDER_BASE/$uuid/${name.encodeUtf8().base64Url()}"
 
     fun podcastRoute(uuid: String) = "$PODCAST_BASE/$uuid"
 }
