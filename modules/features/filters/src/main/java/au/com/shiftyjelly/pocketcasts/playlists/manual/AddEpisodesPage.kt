@@ -141,7 +141,7 @@ internal fun AddEpisodesPage(
                 val route = when (source) {
                     is ManualPlaylistFolderSource -> {
                         onOpenFolder()
-                        AddEpisodesRoutes.folderRoute(source.uuid)
+                        AddEpisodesRoutes.folderRoute(source.uuid, source.title)
                     }
                     is ManualPlaylistPodcastSource -> {
                         onOpenPodcast()
@@ -153,6 +153,7 @@ internal fun AddEpisodesPage(
 
             composable(AddEpisodesRoutes.HOME) {
                 AddEpisodeSourcesColumn(
+                    title = stringResource(LR.string.your_podcasts),
                     sources = episodeSources,
                     noContentData = NoContentData(
                         title = if (hasAnyFolders) {
@@ -176,13 +177,18 @@ internal fun AddEpisodesPage(
 
             composable(
                 AddEpisodesRoutes.FOLDER,
-                listOf(navArgument(AddEpisodesRoutes.FOLDER_UUID_ARG) { type = NavType.StringType }),
+                listOf(
+                    navArgument(AddEpisodesRoutes.FOLDER_UUID_ARG) { type = NavType.StringType },
+                    navArgument(AddEpisodesRoutes.FOLDER_NAME_ARG) { type = NavType.StringType },
+                ),
             ) { backStackEntry ->
                 val arguments = requireNotNull(backStackEntry.arguments) { "Missing back stack entry arguments" }
                 val folderUuid = arguments.requireString(AddEpisodesRoutes.FOLDER_UUID_ARG)
+                val folderName = arguments.requireString(AddEpisodesRoutes.FOLDER_NAME_ARG)
                 val podcasts by folderPodcastsFlow(folderUuid).collectAsState()
 
                 AddEpisodeSourcesColumn(
+                    title = folderName,
                     sources = podcasts,
                     noContentData = NoContentData(
                         title = stringResource(LR.string.manual_playlist_search_no_podcast_title),
@@ -222,13 +228,14 @@ internal object AddEpisodesRoutes {
 
     private const val FOLDER_BASE = "folder"
     const val FOLDER_UUID_ARG = "uuid"
-    const val FOLDER = "$FOLDER_BASE/{$FOLDER_UUID_ARG}"
+    const val FOLDER_NAME_ARG = "name"
+    const val FOLDER = "$FOLDER_BASE/{$FOLDER_UUID_ARG}/{$FOLDER_NAME_ARG}"
 
     const val PODCAST_BASE = "podcast"
     const val PODCAST_UUID_ARG = "uuid"
     const val PODCAST = "$PODCAST_BASE/{$PODCAST_UUID_ARG}"
 
-    fun folderRoute(uuid: String) = "$FOLDER_BASE/$uuid"
+    fun folderRoute(uuid: String, name: String) = "$FOLDER_BASE/$uuid/$name"
 
     fun podcastRoute(uuid: String) = "$PODCAST_BASE/$uuid"
 }
