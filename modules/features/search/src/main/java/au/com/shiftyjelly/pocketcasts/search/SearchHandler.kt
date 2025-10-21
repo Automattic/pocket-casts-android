@@ -1,6 +1,5 @@
 package au.com.shiftyjelly.pocketcasts.search
 
-import android.util.Log
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
@@ -32,12 +31,13 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.emptyFlow
+import kotlinx.coroutines.flow.filterIsInstance
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.rx2.asFlow
 import timber.log.Timber
@@ -72,7 +72,7 @@ class SearchHandler @Inject constructor(
         .subscribeOn(Schedulers.io())
         .switchMap { (query, onlySearchRemote, signInState) ->
             if (query.isEmpty() || onlySearchRemote) {
-                Observable.empty()
+                Observable.just(emptyList())
             } else {
                 // search folders
                 val folderSearch =
@@ -121,7 +121,6 @@ class SearchHandler @Inject constructor(
     private val autoCompleteResults = searchQuery.filter { it is Query.Suggestions }.asFlow()
         .map { it.term.trim() }
         .flatMapLatest { query ->
-            Log.i("===", "handler AutoComplete query=$query")
             if (query.isEmpty()) {
                 flowOf(
                     SearchUiState.SearchOperation.Success(
@@ -150,12 +149,12 @@ class SearchHandler @Inject constructor(
             }
         }
 
+    @OptIn(ExperimentalCoroutinesApi::class)
     val searchSuggestions = combine(
         autoCompleteResults,
         subscribedPodcastUuids.asFlow(),
-        localPodcastsResults.asFlow().onStart { emit(emptyList<FolderItem>()) },
-        onlySearchRemoteObservable.asFlow(),
-    ) { autoComplete, subscribedUuids, subscribedPodcasts, remoteOnly ->
+        searchQuery.asFlow().filterIsInstance<Query.Suggestions>().flatMapLatest { localPodcastsResults.asFlow() },
+    ) { autoComplete, subscribedUuids, subscribedPodcasts ->
         when (autoComplete) {
             is SearchUiState.SearchOperation.Success -> {
                 val remoteResults = autoComplete.results.map { autoCompleteItem ->
@@ -167,31 +166,29 @@ class SearchHandler @Inject constructor(
                         else -> autoCompleteItem
                     }
                 }
-                val localResults = if (!remoteOnly) {
-                    subscribedPodcasts.map { folderItem ->
-                        when (folderItem) {
-                            is FolderItem.Podcast -> SearchAutoCompleteItem.Podcast(
-                                uuid = folderItem.uuid,
-                                author = folderItem.podcast.author,
-                                title = folderItem.title,
-                                isSubscribed = true,
-                            )
+                val localResults = subscribedPodcasts.map { folderItem ->
+                    when (folderItem) {
+                        is FolderItem.Podcast -> SearchAutoCompleteItem.Podcast(
+                            uuid = folderItem.uuid,
+                            author = folderItem.podcast.author,
+                            title = folderItem.title,
+                            isSubscribed = true,
+                        )
 
-                            is FolderItem.Folder -> SearchAutoCompleteItem.Folder(
-                                uuid = folderItem.uuid,
-                                title = folderItem.title,
-                                podcasts = folderItem.podcasts.map {
-                                    SearchAutoCompleteItem.Podcast(uuid = it.uuid, title = it.title, author = it.author, isSubscribed = true)
-                                },
-                                color = folderItem.folder.color
-                            )
-                        }
+                        is FolderItem.Folder -> SearchAutoCompleteItem.Folder(
+                            uuid = folderItem.uuid,
+                            title = folderItem.title,
+                            podcasts = folderItem.podcasts.map {
+                                SearchAutoCompleteItem.Podcast(uuid = it.uuid, title = it.title, author = it.author, isSubscribed = true)
+                            },
+                            color = folderItem.folder.color
+                        )
                     }
-                } else { emptyList() }
+                }
                 val suggestions = buildList {
                     addAll(remoteResults.filterIsInstance<SearchAutoCompleteItem.Term>())
                     addAll(localResults)
-                    addAll(remoteResults.filter { it !is SearchAutoCompleteItem.Term }.filter { remoteOnly || !subscribedUuids.contains((it as? SearchAutoCompleteItem.Podcast)?.uuid.orEmpty()) })
+                    addAll(remoteResults.filter { it !is SearchAutoCompleteItem.Term }.filter { !subscribedUuids.contains((it as? SearchAutoCompleteItem.Podcast)?.uuid.orEmpty()) })
                 }
                 autoComplete.copy(
                     results = suggestions
@@ -257,7 +254,7 @@ class SearchHandler @Inject constructor(
     private val searchFlowable = Observables.combineLatest(
         searchQuery.filter { it is Query.SearchResults },
         subscribedPodcastUuids,
-        localPodcastsResults.startWith(emptyList<FolderItem>()),
+        localPodcastsResults,
         serverSearchResults,
         loadingObservable
     ) { searchTerm, subscribedPodcastUuids, localPodcastsResult, serverSearchResults, loading ->
@@ -302,12 +299,19 @@ class SearchHandler @Inject constructor(
 
     @OptIn(ExperimentalCoroutinesApi::class)
     val improvedSearchResults: Flow<SearchUiState.SearchOperation<SearchResults.ImprovedResults>> = combine(
-        searchQuery.filter { it is Query.SearchResults }.map { it.term.trim() }.asFlow().onEach { Log.i("====", "handler improvedSearch query=$it") },
+        searchQuery.filter { it is Query.SearchResults }.map { it.term.trim() }.asFlow(),
         subscribedPodcastUuids.asFlow(),
-        localPodcastsResults.asFlow().onStart { emit(emptyList<FolderItem>()) }.onEach { Log.i("===", "handler localpodcastsearch $it") },
+        combine(
+            searchQuery.asFlow().map { it is Query.SearchResults },
+            localPodcastsResults.asFlow()
+        ) { shouldPass, localResults ->
+            shouldPass to localResults
+        },
     ) { query, subscribedPodcastUuids, localPodcasts -> Triple(query, subscribedPodcastUuids, localPodcasts) }
-        .flatMapLatest { (query, subscribedUuids, localPodcasts) ->
-            if (query.isBlank()) {
+        .flatMapLatest { (query, subscribedUuids, localPodcastsPair) ->
+            if (!localPodcastsPair.first) {
+                emptyFlow()
+            } else if (query.isBlank()) {
                 flowOf(SearchUiState.SearchOperation.Success(searchTerm = query, results = SearchResults.ImprovedResults(results = emptyList(), filter = ResultsFilters.TOP_RESULTS)))
             } else {
                 flow {
@@ -320,7 +324,7 @@ class SearchHandler @Inject constructor(
                             .toObservable().asFlow().first()
                         emit(SearchUiState.SearchOperation.Success(searchTerm = query, results = SearchResults.ImprovedResults(results = podcastSearch, filter = ResultsFilters.TOP_RESULTS)))
                     } else {
-                        val localResults = localPodcasts.map {
+                        val localResults = localPodcastsPair.second.map {
                             when (it) {
                                 is FolderItem.Folder -> ImprovedSearchResultItem.FolderItem(folder = it.folder, podcasts = it.podcasts)
                                 is FolderItem.Podcast -> ImprovedSearchResultItem.PodcastItem(uuid = it.uuid, isFollowed = subscribedUuids.contains(it.uuid), title = it.podcast.title, author = it.podcast.author)
@@ -340,12 +344,10 @@ class SearchHandler @Inject constructor(
         }
 
     fun updateAutCompleteQuery(query: String) {
-        Log.w("===", "updateAutoCompelteQuery $query")
         searchQuery.accept(Query.Suggestions(query))
     }
 
     fun updateSearchQuery(query: String, immediate: Boolean = false) {
-        Log.w("===", "updateSearchQuery $query, immed=$immediate")
         searchQuery.accept(Query.SearchResults(query, immediate))
     }
 
