@@ -329,11 +329,6 @@ sealed interface SearchResults {
     }
 }
 
-data class EpisodePlaybackData(
-    val playingEpisodeUuid: String,
-    val playbackPosition: Int,
-)
-
 enum class ResultsFilters(val resId: Int) {
     TOP_RESULTS(LR.string.search_filters_top_results),
     PODCASTS(LR.string.search_filters_podcasts),
