@@ -1,5 +1,6 @@
 package au.com.shiftyjelly.pocketcasts.search
 
+import android.util.Log
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
@@ -36,6 +37,7 @@ import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.rx2.asFlow
 import timber.log.Timber
@@ -69,12 +71,12 @@ class SearchHandler @Inject constructor(
         }
         .subscribeOn(Schedulers.io())
         .switchMap { (query, onlySearchRemote, signInState) ->
-            if (query.isEmpty()) {
-                Observable.just(emptyList())
+            if (query.isEmpty() || onlySearchRemote) {
+                Observable.empty()
             } else {
                 // search folders
                 val folderSearch =
-                    if (signInState.isSignedInAsPlusOrPatron && !onlySearchRemote) {
+                    if (signInState.isSignedInAsPlusOrPatron) {
                         // only show folders if the user has Plus
                         folderManager.findFoldersSingle()
                             .subscribeOn(Schedulers.io())
@@ -119,6 +121,7 @@ class SearchHandler @Inject constructor(
     private val autoCompleteResults = searchQuery.filter { it is Query.Suggestions }.asFlow()
         .map { it.term.trim() }
         .flatMapLatest { query ->
+            Log.i("===", "handler AutoComplete query=$query")
             if (query.isEmpty()) {
                 flowOf(
                     SearchUiState.SearchOperation.Success(
@@ -150,7 +153,7 @@ class SearchHandler @Inject constructor(
     val searchSuggestions = combine(
         autoCompleteResults,
         subscribedPodcastUuids.asFlow(),
-        localPodcastsResults.asFlow(),
+        localPodcastsResults.asFlow().onStart { emit(emptyList<FolderItem>()) },
         onlySearchRemoteObservable.asFlow(),
     ) { autoComplete, subscribedUuids, subscribedPodcasts, remoteOnly ->
         when (autoComplete) {
@@ -254,7 +257,7 @@ class SearchHandler @Inject constructor(
     private val searchFlowable = Observables.combineLatest(
         searchQuery.filter { it is Query.SearchResults },
         subscribedPodcastUuids,
-        localPodcastsResults,
+        localPodcastsResults.startWith(emptyList<FolderItem>()),
         serverSearchResults,
         loadingObservable
     ) { searchTerm, subscribedPodcastUuids, localPodcastsResult, serverSearchResults, loading ->
@@ -299,9 +302,9 @@ class SearchHandler @Inject constructor(
 
     @OptIn(ExperimentalCoroutinesApi::class)
     val improvedSearchResults: Flow<SearchUiState.SearchOperation<SearchResults.ImprovedResults>> = combine(
-        searchQuery.filter { it is Query.SearchResults }.map { it.term.trim() }.asFlow(),
+        searchQuery.filter { it is Query.SearchResults }.map { it.term.trim() }.asFlow().onEach { Log.i("====", "handler improvedSearch query=$it") },
         subscribedPodcastUuids.asFlow(),
-        localPodcastsResults.asFlow(),
+        localPodcastsResults.asFlow().onStart { emit(emptyList<FolderItem>()) }.onEach { Log.i("===", "handler localpodcastsearch $it") },
     ) { query, subscribedPodcastUuids, localPodcasts -> Triple(query, subscribedPodcastUuids, localPodcasts) }
         .flatMapLatest { (query, subscribedUuids, localPodcasts) ->
             if (query.isBlank()) {
@@ -337,10 +340,12 @@ class SearchHandler @Inject constructor(
         }
 
     fun updateAutCompleteQuery(query: String) {
+        Log.w("===", "updateAutoCompelteQuery $query")
         searchQuery.accept(Query.Suggestions(query))
     }
 
     fun updateSearchQuery(query: String, immediate: Boolean = false) {
+        Log.w("===", "updateSearchQuery $query, immed=$immediate")
         searchQuery.accept(Query.SearchResults(query, immediate))
     }
 
