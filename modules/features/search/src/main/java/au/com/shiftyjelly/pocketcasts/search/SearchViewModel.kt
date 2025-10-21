@@ -48,28 +48,24 @@ class SearchViewModel @Inject constructor(
                     .collect { operation ->
                         showSearchHistory = false
                         _state.update { uiState ->
-                            if (uiState is SearchUiState.Idle || uiState is SearchUiState.Suggestions) {
-                                when (operation) {
-                                    is SearchUiState.SearchOperation.Error -> {
-                                        analyticsTracker.track(
-                                            AnalyticsEvent.IMPROVED_SEARCH_SUGGESTIONS_FAILED,
-                                            mapOf(
-                                                "source" to source,
-                                            ),
-                                        )
-                                    }
-
-                                    else -> Unit
+                            when (operation) {
+                                is SearchUiState.SearchOperation.Error -> {
+                                    analyticsTracker.track(
+                                        AnalyticsEvent.IMPROVED_SEARCH_SUGGESTIONS_FAILED,
+                                        mapOf(
+                                            "source" to source,
+                                        ),
+                                    )
                                 }
 
-                                // only show loading for the initial query when autocomplete results are empty
-                                if (((uiState as? SearchUiState.Suggestions)?.operation as? SearchUiState.SearchOperation.Success)?.results?.isNotEmpty() == true && operation is SearchUiState.SearchOperation.Loading) {
-                                    uiState
-                                } else {
-                                    SearchUiState.Suggestions(operation = operation)
-                                }
-                            } else {
+                                else -> Unit
+                            }
+
+                            // only show loading for the initial query when autocomplete results are empty
+                            if (((uiState as? SearchUiState.Suggestions)?.operation as? SearchUiState.SearchOperation.Success)?.results?.isNotEmpty() == true && operation is SearchUiState.SearchOperation.Loading) {
                                 uiState
+                            } else {
+                                SearchUiState.Suggestions(operation = operation)
                             }
                         }
                     }
