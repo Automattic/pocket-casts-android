@@ -36,6 +36,7 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.rules.TestWatcher
 import org.junit.runner.Description
@@ -280,6 +281,14 @@ class PlaylistManagerDsl : TestWatcher() {
         val playlistId = "playlist-id-$playlistIndex"
         val playlist = playlistDao.getAllPlaylistsIn(listOf(playlistId)).singleOrNull()
         assertEquals(PlaylistEntity.SYNC_STATUS_NOT_SYNCED, playlist?.syncStatus)
+    }
+
+    fun expectRearrangeTooltipSet() {
+        assertTrue(settings.showRearrangePlaylistsTooltip.value)
+    }
+
+    fun expectRearrangeTooltipNotSet() {
+        assertFalse(settings.showRearrangePlaylistsTooltip.value)
     }
 
     // Creators
