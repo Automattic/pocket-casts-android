@@ -174,7 +174,7 @@ class PlaylistFragment :
                 .flowWithLifecycle(viewLifecycleOwner.lifecycle)
                 .collect {
                     val hostListener = requireActivity() as FragmentHostListener
-                    Snackbar.make(hostListener.snackBarView(), getString(LR.string.up_next_saved_as_playlist_message), Snackbar.LENGTH_LONG)
+                    Snackbar.make(hostListener.snackBarView(), getString(LR.string.up_next_as_playlist_saved), Snackbar.LENGTH_LONG)
                         .setAction(LR.string.view) { hostListener.closeFiltersToRoot() }
                         .show()
                 }

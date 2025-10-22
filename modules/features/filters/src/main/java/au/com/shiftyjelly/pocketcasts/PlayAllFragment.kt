@@ -30,6 +30,7 @@ import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.rememberNestedScrollInteropConnection
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
@@ -146,7 +147,7 @@ private fun SaveQueuePage(
             modifier = Modifier.height(18.dp),
         )
         TextH20(
-            text = "Save your Up Next queue?",
+            text = stringResource(LR.string.up_next_as_playlist_title),
             textAlign = TextAlign.Center,
             modifier = Modifier.padding(horizontal = 24.dp),
         )
@@ -154,7 +155,7 @@ private fun SaveQueuePage(
             modifier = Modifier.height(8.dp),
         )
         TextP40(
-            text = "Your current Up Next will be replaced when you play this playlist. Save it first to keep it.",
+            text = stringResource(LR.string.up_next_as_playlist_body),
             fontSize = 15.sp,
             letterSpacing = 0.sp,
             textAlign = TextAlign.Center,
@@ -165,7 +166,7 @@ private fun SaveQueuePage(
             modifier = Modifier.height(24.dp),
         )
         RowButton(
-            text = "Save current queue",
+            text = stringResource(LR.string.up_next_as_playlist_button_primary),
             includePadding = false,
             onClick = onSaveQueue,
         )
@@ -173,7 +174,7 @@ private fun SaveQueuePage(
             modifier = Modifier.height(16.dp),
         )
         RowOutlinedButton(
-            text = "Replace and play",
+            text = stringResource(LR.string.up_next_as_playlist_button_secondary),
             includePadding = false,
             onClick = onReplaceAndPlay,
         )
@@ -202,7 +203,7 @@ private fun ReplaceAndPlayPage(
             modifier = Modifier.height(18.dp),
         )
         TextH20(
-            text = "Replace current Up Next?",
+            text = stringResource(LR.string.up_next_as_playlist_replace_title),
             textAlign = TextAlign.Center,
             modifier = Modifier.padding(horizontal = 24.dp),
         )
@@ -210,7 +211,7 @@ private fun ReplaceAndPlayPage(
             modifier = Modifier.height(8.dp),
         )
         TextP40(
-            text = "This will clear your current Up Next queue and start playing this playlist.",
+            text = stringResource(LR.string.up_next_as_playlist_replace_body),
             fontSize = 15.sp,
             letterSpacing = 0.sp,
             textAlign = TextAlign.Center,
@@ -221,7 +222,7 @@ private fun ReplaceAndPlayPage(
             modifier = Modifier.height(24.dp),
         )
         RowButton(
-            text = "Replace and play",
+            text = stringResource(LR.string.up_next_as_playlist_replace_button_primary),
             includePadding = false,
             colors = ButtonDefaults.buttonColors(backgroundColor = MaterialTheme.theme.colors.support05),
             onClick = onReplaceAndPlay,
@@ -230,7 +231,7 @@ private fun ReplaceAndPlayPage(
             modifier = Modifier.height(16.dp),
         )
         RowOutlinedButton(
-            text = "Cancel",
+            text = stringResource(LR.string.up_next_as_playlist_replace_button_secondary),
             includePadding = false,
             onClick = onDismiss,
         )
