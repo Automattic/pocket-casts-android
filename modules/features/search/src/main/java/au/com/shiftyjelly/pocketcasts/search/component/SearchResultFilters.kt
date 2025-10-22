@@ -23,16 +23,18 @@ import au.com.shiftyjelly.pocketcasts.compose.preview.ThemePreviewParameterProvi
 import au.com.shiftyjelly.pocketcasts.compose.theme
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 
+private val defaultFadeConfig = FadeConfig.Default.copy(
+    showStartFade = false,
+    showEndFade = true,
+)
+
 @Composable
 fun SearchResultFilters(
     items: List<String>,
     selectedIndex: Int,
     onFilterSelect: (Int) -> Unit,
     modifier: Modifier = Modifier,
-    fadeConfig: FadeConfig = FadeConfig.Default.copy(
-        showStartFade = false,
-        showEndFade = true,
-    ),
+    fadeConfig: FadeConfig = defaultFadeConfig,
 ) {
     FadedLazyRow(
         fadeConfig = fadeConfig,
@@ -69,14 +71,16 @@ private fun SearchFilterPill(
                         shape = CircleShape,
                     )
                 } else {
-                    Modifier.border(
-                        width = 1.dp,
-                        color = MaterialTheme.theme.colors.primaryIcon02,
-                        shape = CircleShape,
-                    ).background(
-                        color = MaterialTheme.colors.background,
-                        shape = CircleShape,
-                    )
+                    Modifier
+                        .border(
+                            width = 1.dp,
+                            color = MaterialTheme.theme.colors.primaryIcon02,
+                            shape = CircleShape,
+                        )
+                        .background(
+                            color = MaterialTheme.colors.background,
+                            shape = CircleShape,
+                        )
                 },
             )
             .clickable(onClick = onSelect)
