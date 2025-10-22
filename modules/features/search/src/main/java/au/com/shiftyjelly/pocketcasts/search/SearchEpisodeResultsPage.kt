@@ -32,7 +32,7 @@ fun SearchEpisodeResultsPage(
             title = stringResource(LR.string.search_results_all_episodes),
             onNavigationClick = { onBackPress() },
         )
-        ((state as? SearchUiState.Results)?.operation as? SearchUiState.SearchOperation.Success)?.let {
+        ((state as? SearchUiState.OldResults)?.operation as? SearchUiState.SearchOperation.Success)?.let {
             SearchEpisodeResultsView(
                 episodes = it.results.episodes,
                 onEpisodeClick = onEpisodeClick,
