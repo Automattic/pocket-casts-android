@@ -60,6 +60,8 @@ interface PlaylistManager {
     // <editor-fold desc="Manual playlists">
     suspend fun createManualPlaylist(name: String): String
 
+    suspend fun createManualPlaylistWithEpisodes(name: String, episodes: List<PodcastEpisode>): String
+
     fun manualPlaylistFlow(
         uuid: String,
         searchTerm: String? = null,

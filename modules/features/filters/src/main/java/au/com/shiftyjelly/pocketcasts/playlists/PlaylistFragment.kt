@@ -35,6 +35,7 @@ import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.ConcatAdapter
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import au.com.shiftyjelly.pocketcasts.PlayAllFragment
 import au.com.shiftyjelly.pocketcasts.compose.AppTheme
 import au.com.shiftyjelly.pocketcasts.compose.components.NoContentBanner
 import au.com.shiftyjelly.pocketcasts.compose.components.NoContentData
@@ -42,6 +43,7 @@ import au.com.shiftyjelly.pocketcasts.compose.extensions.setContentWithViewCompo
 import au.com.shiftyjelly.pocketcasts.compose.theme
 import au.com.shiftyjelly.pocketcasts.filters.R
 import au.com.shiftyjelly.pocketcasts.filters.databinding.PlaylistFragmentBinding
+import au.com.shiftyjelly.pocketcasts.playlists.PlaylistViewModel.PlayAllAction
 import au.com.shiftyjelly.pocketcasts.playlists.component.PlaylistEpisodeAdapter
 import au.com.shiftyjelly.pocketcasts.playlists.component.PlaylistEpisodesAdapterFactory
 import au.com.shiftyjelly.pocketcasts.playlists.component.PlaylistHeaderAdapter
@@ -56,7 +58,6 @@ import au.com.shiftyjelly.pocketcasts.repositories.playlist.PlaylistManager
 import au.com.shiftyjelly.pocketcasts.ui.helper.FragmentHostListener
 import au.com.shiftyjelly.pocketcasts.utils.extensions.dpToPx
 import au.com.shiftyjelly.pocketcasts.utils.extensions.requireParcelable
-import au.com.shiftyjelly.pocketcasts.views.dialog.ConfirmationDialog
 import au.com.shiftyjelly.pocketcasts.views.extensions.hideKeyboardOnScroll
 import au.com.shiftyjelly.pocketcasts.views.extensions.smoothScrollToTop
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseFragment
@@ -436,25 +437,22 @@ class PlaylistFragment :
         if (parentFragmentManager.findFragmentByTag("confirm_and_play") != null) {
             return
         }
-        val episodeCount = viewModel.uiState.value.playlist?.metadata?.displayedAvailableEpisodeCount ?: 0
-        when {
-            episodeCount <= 0 -> {
+        when (viewModel.computePlayAllAction()) {
+            PlayAllAction.ShowWarningDialog -> {
+                PlayAllFragment().show(childFragmentManager, "confirm_play_all")
+            }
+
+            PlayAllAction.ShowNoEpisodesSnackbar -> {
                 val snackbarView = (requireActivity() as FragmentHostListener).snackBarView()
                 Snackbar.make(snackbarView, getString(LR.string.play_all_no_episodes_message), Snackbar.LENGTH_LONG).show()
             }
-            viewModel.shouldShowPlayAllWarning() -> {
-                val buttonString = getString(LR.string.filters_play_episodes, episodeCount)
 
-                val dialog = ConfirmationDialog()
-                    .setTitle(getString(LR.string.filters_play_all))
-                    .setSummary(getString(LR.string.filters_play_all_summary))
-                    .setIconId(IR.drawable.ic_play_all)
-                    .setButtonType(ConfirmationDialog.ButtonType.Danger(buttonString))
-                    .setOnConfirm { viewModel.playAll() }
-                dialog.show(parentFragmentManager, "confirm_play_all")
-            }
-            else -> {
+            PlayAllAction.InsertAndPlayAll -> {
                 viewModel.playAll()
+            }
+
+            PlayAllAction.ResumePlayback -> {
+                viewModel.resumePlayback()
             }
         }
     }

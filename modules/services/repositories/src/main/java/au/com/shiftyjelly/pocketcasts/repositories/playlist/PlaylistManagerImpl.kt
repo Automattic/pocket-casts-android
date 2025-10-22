@@ -45,6 +45,7 @@ import kotlin.coroutines.CoroutineContext
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
 import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.Flow
@@ -282,6 +283,34 @@ class PlaylistManagerImpl(
                 syncStatus = SYNC_STATUS_NOT_SYNCED,
             ),
         )
+    }
+
+    override suspend fun createManualPlaylistWithEpisodes(name: String, episodes: List<PodcastEpisode>): String {
+        return appDatabase.withTransaction {
+            val playlistUuid = createManualPlaylist(name)
+            val playlistEpisodes = withContext(Dispatchers.Default) {
+                val podcastUuids = episodes.mapTo(mutableSetOf(), PodcastEpisode::podcastUuid)
+                val podcastSlugs = podcastDao.findAllIn(podcastUuids).associate { it.uuid to it.slug }
+                val now = clock.instant()
+                episodes.mapIndexed { index, episode ->
+                    ManualPlaylistEpisode(
+                        playlistUuid = playlistUuid,
+                        episodeUuid = episode.uuid,
+                        podcastUuid = episode.podcastUuid,
+                        title = episode.title,
+                        addedAt = now,
+                        publishedAt = episode.publishedDate.toInstant(),
+                        downloadUrl = episode.downloadUrl,
+                        episodeSlug = episode.slug,
+                        podcastSlug = podcastSlugs[episode.podcastUuid].orEmpty(),
+                        sortPosition = index,
+                        isSynced = false,
+                    )
+                }
+            }
+            playlistDao.upsertManualEpisodes(playlistEpisodes)
+            playlistUuid
+        }
     }
 
     override fun manualPlaylistFlow(uuid: String, searchTerm: String?): Flow<ManualPlaylist?> {

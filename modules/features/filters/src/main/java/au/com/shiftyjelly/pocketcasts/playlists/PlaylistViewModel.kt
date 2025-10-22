@@ -6,6 +6,9 @@ import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.compose.text.SearchFieldState
+import au.com.shiftyjelly.pocketcasts.models.entity.BaseEpisode
+import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
+import au.com.shiftyjelly.pocketcasts.models.to.PlaylistEpisode
 import au.com.shiftyjelly.pocketcasts.models.to.toPodcastEpisodes
 import au.com.shiftyjelly.pocketcasts.models.type.PlaylistEpisodeSortType
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
@@ -16,14 +19,19 @@ import au.com.shiftyjelly.pocketcasts.repositories.playlist.Playlist
 import au.com.shiftyjelly.pocketcasts.repositories.playlist.PlaylistManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
+import au.com.shiftyjelly.pocketcasts.utils.extensions.equalsBy
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
 import dagger.hilt.android.lifecycle.HiltViewModel
+import java.time.Clock
+import java.time.LocalDate
+import java.time.format.DateTimeFormatter
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.NonCancellable
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.asSharedFlow
@@ -31,6 +39,7 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 @OptIn(FlowPreview::class, ExperimentalCoroutinesApi::class)
 @HiltViewModel(assistedFactory = PlaylistViewModel.Factory::class)
@@ -43,6 +52,7 @@ class PlaylistViewModel @AssistedInject constructor(
     private val playbackManager: PlaybackManager,
     private val downloadManager: DownloadManager,
     private val settings: Settings,
+    private val clock: Clock,
     private val analyticsTracker: AnalyticsTracker,
 ) : ViewModel() {
     private var isNameChanged = false
@@ -79,9 +89,57 @@ class PlaylistViewModel @AssistedInject constructor(
         )
     }.stateIn(viewModelScope, SharingStarted.Lazily, initialValue = UiState.Empty)
 
-    fun shouldShowPlayAllWarning(): Boolean {
-        val queueEpisodes = playbackManager.upNextQueue.allEpisodes
-        return queueEpisodes.size >= PLAY_ALL_WARNING_EPISODE_COUNT
+    internal fun computePlayAllAction(): PlayAllAction {
+        val playlistEpisodes = uiState.value.playlist?.episodes.orEmpty()
+        if (playlistEpisodes.isEmpty()) {
+            return PlayAllAction.ShowNoEpisodesSnackbar
+        }
+
+        val limit = settings.getMaxUpNextEpisodes()
+        val episodesInQueue = playbackManager.upNextQueue.allEpisodes.take(limit)
+        if (episodesInQueue.isEmpty()) {
+            return PlayAllAction.InsertAndPlayAll
+        }
+
+        val episodesToPlay = playlistEpisodes.take(limit)
+        return if (episodesInQueue.equalsBy(episodesToPlay, BaseEpisode::uuid, PlaylistEpisode::uuid)) {
+            PlayAllAction.ResumePlayback
+        } else {
+            PlayAllAction.ShowWarningDialog
+        }
+    }
+
+    private var saveUpNextJob: Job? = null
+
+    fun saveUpNextAsPlaylists(upNextTranslation: String) {
+        if (saveUpNextJob?.isActive == true) {
+            return
+        }
+
+        // Captured outside of the coroutine so that it is synchronized with the current UI state
+        val upNextEpisodes = playbackManager.upNextQueue.allEpisodes
+
+        saveUpNextJob = viewModelScope.launch(NonCancellable) {
+            val baseName = buildString {
+                append(upNextTranslation)
+                runCatching {
+                    val formatter = DateTimeFormatter.ofPattern("MMMM dd")
+                    val formattedDate = LocalDate.now(clock).format(formatter)
+                    append(" - ")
+                    append(formattedDate)
+                }
+            }
+            val playlistEpisodes = withContext(Dispatchers.Default) {
+                upNextEpisodes
+                    .filterIsInstance<PodcastEpisode>()
+                    .chunked(PlaylistManager.MANUAL_PLAYLIST_EPISODE_LIMIT)
+                    .reversed()
+            }
+            playlistEpisodes.forEachIndexed { index, episodes ->
+                val name = if (index == 0) baseName else "$baseName (${index + 1})"
+                playlistManager.createManualPlaylistWithEpisodes(name, episodes)
+            }
+        }
     }
 
     private var playAllJob: Job? = null
@@ -99,6 +157,12 @@ class PlaylistViewModel @AssistedInject constructor(
             playbackManager.upNextQueue.removeAll()
             playbackManager.playEpisodes(episodes, SourceView.FILTERS)
             episodeManager.unarchiveAllInListBlocking(episodes)
+        }
+    }
+
+    fun resumePlayback() {
+        if (!playbackManager.isPlaying()) {
+            playbackManager.playQueue(SourceView.FILTERS)
         }
     }
 
@@ -341,6 +405,13 @@ class PlaylistViewModel @AssistedInject constructor(
         }
     }
 
+    internal enum class PlayAllAction {
+        ShowWarningDialog,
+        ShowNoEpisodesSnackbar,
+        InsertAndPlayAll,
+        ResumePlayback,
+    }
+
     @AssistedFactory
     interface Factory {
         fun create(
@@ -351,6 +422,5 @@ class PlaylistViewModel @AssistedInject constructor(
 
     companion object {
         const val DOWNLOAD_ALL_LIMIT = 100
-        private const val PLAY_ALL_WARNING_EPISODE_COUNT = 4
     }
 }

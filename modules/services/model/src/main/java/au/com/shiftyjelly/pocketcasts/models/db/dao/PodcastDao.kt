@@ -27,6 +27,9 @@ import kotlinx.coroutines.flow.Flow
 
 @Dao
 abstract class PodcastDao {
+    @Transaction
+    @Query("SELECT * FROM podcasts WHERE uuid IN (:uuids)")
+    abstract suspend fun findAllIn(uuids: Collection<String>): List<Podcast>
 
     @Transaction
     @Query("SELECT * FROM podcasts WHERE subscribed = 1 ORDER BY LOWER(title) ASC")
