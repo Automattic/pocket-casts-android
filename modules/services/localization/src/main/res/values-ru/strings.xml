@@ -1,11 +1,23 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2025-09-25 15:54:03+0000
+Translation-Revision-Date: 2025-10-09 13:54:04+0000
 Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);
 Generator: GlotPress/2.4.0-alpha
 Language: ru
 -->
 <resources>
+    <string name="winback_cancel_subscription_stay_button_label">Не отменять подписку</string>
+    <string name="filter_title">Заголовок списка воспроизведения</string>
+    <string name="filter_id">ИД списка воспроизведения</string>
+    <string name="filters_filter_name">Название списка воспроизведения</string>
+    <string name="playlists_not_found">Списки воспроизведения не найдены</string>
+    <string name="notification_filters_message_2">Создавайте списки воспроизведения, чтобы упорядочивать выпуски.</string>
+    <string name="settings_status_service_account_summary_2">Этот сервис используется для хранения информации о прослушивании выпусков, подписках на подкасты, списках воспроизведения и т. д.</string>
+    <string name="settings_choose_playlists">Выберите списки воспроизведения</string>
+    <string name="number_one">один</string>
+    <string name="settings_auto_download_playlists">Автоматически скачивать списки воспроизведения</string>
+    <string name="playlists_selected_all">Выбраны все списки воспроизведения</string>
+    <string name="podcasts_selected_all">Выбраны все подкасты</string>
     <string name="smart_playlists">Умные плейлисты</string>
     <string name="select_smart_playlists">Выбрать умные плейлисты</string>
     <string name="podcast_not_in_playlists">Не включено ни в один умный плейлист</string>
@@ -350,7 +362,6 @@ Language: ru
     <string name="settings_pixel_watch_subtitle">Замените пользовательские кнопки пропуска стандартными кнопками «Предыдущая/следующая запись»: они работают так же, как кнопки пропуска, но, кроме того, ещё и совместимы с большим количеством устройств.</string>
     <string name="settings_pixel_watch_title">Кнопки пропуска Pixel Watch</string>
     <string name="winback_cancel_subscription_cancel_button_label">Да, отмените мою подписку</string>
-    <string name="winback_cancel_subscription_stay_button_label">На самом деле я хочу остаться</string>
     <string name="winback_cancel_subscription_perk_files">Файлы, загруженные в вашу учётную запись Pocket Casts, будут удалены (однако файлы, загруженные на ваши мобильные устройства, сохранятся).</string>
     <string name="winback_cancel_subscription_perk_folders">Папки будут удалены, а их содержимое перемещено обратно на экран подкастов.</string>
     <string name="winback_cancel_subscription_perk_plus">С этой даты доступ к функциям Pocket Casts Plus будет заблокирован.</string>
@@ -587,7 +598,6 @@ Language: ru
     <string name="player_sleep_time_fired_end_of_chapter">Таймер сна остановился в конце главы.</string>
     <string name="player_sleep_in_chapters">Переход в спящий режим через %d гл.</string>
     <string name="player_sleep_timer_in_chapter_plural">Через %d гл.</string>
-    <string name="player_sleep_in_one_chapter">Переход в спящий режим через 1 главу</string>
     <string name="player_sleep_timer_in_chapter">Через 1 главу</string>
     <string name="player_sleep_timer_end_of_episode">Конец выпуска</string>
     <string name="player_sleep_timer_in_episode_plural">Через %d вып.</string>
@@ -597,7 +607,6 @@ Language: ru
     <string name="settings_use_episode_artwork_title">Оформление выпусков</string>
     <string name="settings_use_episode_artwork_advanced">Расширенные настройки оформления выпусков</string>
     <string name="player_sleep_in_episodes">Переход в режим ожидания через %d вып.</string>
-    <string name="player_sleep_in_one_episode">Переход в режим ожидания через 1 выпуск</string>
     <string name="player_sleep_timer_stopped_your_podcast">Таймер сна остановил ваш подкаст.</string>
     <string name="player_sleep_timer_restarted_after_device_shake">Таймер сна перезагружен после встряхивания устройства</string>
     <string name="widget_check_out_discover">Испытайте Discover и убедитесь сами</string>
@@ -736,7 +745,6 @@ Language: ru
     <string name="settings_continuous_playback_summary">Если в очереди «Следующие» ничего нет, запустится другой выпуск из подкаста или списка, который вы слушаете.</string>
     <string name="renew_your_subscription">Продлить подписку</string>
     <string name="log_in_watch_from_phone_instructions_3">Если возникла проблема, убедитесь, что на телефоне запущена та же версия Pocket Casts, что и на часах (%s)</string>
-    <string name="log_in_free_account">%s использует бесплатную учетную запись</string>
     <string name="player_play_failed_check_internet">Не удалось загрузить подкаст. Проверьте подключение к Интернету и повторите попытку.</string>
     <string name="empty_play_state">Выберите, с какого выпуска начать</string>
     <string name="settings_beta_features">Функции в бета-режиме</string>
@@ -845,10 +853,6 @@ Language: ru
     <string name="settings_media_actions_customise">Настройте действия с медиафайлами</string>
     <string name="onboarding_recommendations_more">Другие %s</string>
     <string name="clear_up_next">Очистить «Следующие»</string>
-    <string name="filter_id_or_title">ID или название фильтра</string>
-    <string name="filter_title">Название фильтра</string>
-    <string name="filter_id_description">Уникальный ID, представляющий собой фильтр. Может использоваться в операции \"Запрос фильтра\".</string>
-    <string name="filter_id">ID фильтра</string>
     <string name="episode_count">Счётчик выпусков</string>
     <string name="no_episodes_found_for_episode_ids_x">Выпуски не найдены для ID выпусков %1$s</string>
     <string name="no_episode_ids_provided">ID выпусков не указаны</string>
@@ -879,12 +883,14 @@ Language: ru
     <string name="podcast_id_description">Уникальный ID, представляющий собой подкаст. Может использоваться в операции \"Запросить выпуски подкаста\".</string>
     <string name="podcast_id">ID подкаста</string>
     <string name="pocket_casts_query_up_next_episodes">Запросить следующие выпуски Pocket Casts</string>
-    <string name="pocket_casts_query_filter_episodes">Запросить фильтрацию выпусков Pocket Casts</string>
-    <string name="pocket_casts_query_filters">Запросить фильтры Pocket Casts</string>
     <string name="pocket_casts_add_to_up_next">Добавить к следующему Pocket Casts</string>
     <string name="pocket_casts_query_podcast_episodes">Запросить выпуски подкастов Pocket Casts</string>
     <string name="pocket_casts_query_podcasts">Запросить подкасты Pocket Casts</string>
     <string name="onboarding_plus_can_be_canceled_at_any_time">Эту операцию можно отменить в любой момент.</string>
+    <string name="filter_id_or_title">Заголовок или ИД списка воспроизведения</string>
+    <string name="filter_id_description">Уникальный ИД, представляющий собой список воспроизведения. Может использоваться в операции «Запросить выпуски списка воспроизведения».</string>
+    <string name="pocket_casts_query_filter_episodes">Запросить выпуски списков воспроизведения Pocket Casts</string>
+    <string name="pocket_casts_query_filters">Запросить списки воспроизведения Pocket Casts</string>
     <string name="profile_cancel_confirm_cancel_button_title">Да, отмените мою подписку\".</string>
     <string name="profile_cancel_confirm_stay_button_title">На самом деле я хочу остаться\".</string>
     <string name="profile_cancel_confirm_item_web_player">Вы больше не сможете получить доступ к Pocket Casts в браузере или на настольном компьютере.</string>
@@ -981,9 +987,9 @@ Language: ru
     <string name="playback_speed_not_valid">Скорость воспроизведения %1$s недопустима</string>
     <string name="profile_account_upgraded">Учётная запись обновлена</string>
     <string name="pocket_casts_control_playback">Управление воспроизведением в Pocket Casts</string>
-    <string name="pocket_casts_play_filter">Фильтр воспроизведения в Pocket Casts</string>
     <string name="time_to_skip_not_valid">Невозможно перейти к указанному времени %1$s</string>
     <string name="time_to_skip_seconds">Переход ко временной отметке (с)</string>
+    <string name="pocket_casts_play_filter">Воспроизвести список воспроизведения Pocket Casts</string>
     <string name="settings_select_filters">Выбрать фильтры</string>
     <string name="settings_import_url_summary">Импортируйте подкасты из файла OPML с помощью URL-адреса.</string>
     <string name="settings_import_url">По URL-адресу</string>
@@ -1000,9 +1006,9 @@ Language: ru
     <string name="playback_command">Команда воспроизведения</string>
     <string name="command_x_not_valid">Невозможно выполнить команду %1$s</string>
     <string name="must_provide_command_name">Укажите имя команды</string>
-    <string name="no_episodes_in_filter_x">Нет выпусков в фильтре %1$s</string>
-    <string name="filter_x_not_found">Фильтр %1$s не найден</string>
-    <string name="must_provide_filter_name">Укажите имя фильтра</string>
+    <string name="no_episodes_in_filter_x">Нет выпусков в списке воспроизведения %1$s</string>
+    <string name="filter_x_not_found">Список воспроизведения %1$s не найден</string>
+    <string name="must_provide_filter_name">Необходимо указать название списка воспроизведения</string>
     <string name="end_of_year_launch_modal_summary">Просмотрите свой топ подкастов и рубрик, статистику прослушивания и другие показатели. Поделитесь ими с друзьями и поблагодарите любимых подкастеров.</string>
     <string name="settings_app_icon_halloween">Хэллоуин</string>
     <string name="end_of_year_launch_modal_primary_button_title">Просмотреть мой Playback 2024</string>
@@ -1129,7 +1135,6 @@ Language: ru
     <string name="discover_popular_in">Популярные в %s</string>
     <string name="discover_popular">Популярные</string>
     <string name="discover_top">Лучшие</string>
-    <string name="filters_filter_name">Имя фильтра</string>
     <string name="episode_short_episode">Э%d</string>
     <string name="episode_short_season">С%d</string>
     <string name="episode_short_season_episode">С%1$d Э%2$d</string>
@@ -1632,7 +1637,6 @@ Language: ru
     <string name="profile_stats_total">ВСЕГО:</string>
     <string name="profile_stats_time_saved_by">Сэкономленное время</string>
     <string name="profile_stats_since_listened_for">С %s вы слушали в течение</string>
-    <string name="profile_stats_share_to">Поделиться с…</string>
     <string name="profile_stat_days_listened">дней прослушано</string>
     <string name="profile_sonos_title">Pocket Casts и Sonos</string>
     <string name="profile_sonos_setup_account">Настройка учётной записи</string>
@@ -1692,8 +1696,8 @@ Language: ru
     <string name="profile_end_tour">ЗАВЕРШИТЬ ОЗНАКОМИТЕЛЬНЫЙ ТУР</string>
     <string name="profile_email">E-mail</string>
     <string name="profile_deleting_account">Удаление учётной записи…</string>
-    <string name="profile_license_agreement">Pocket Casts уважает вашу конфиденциальность. В настоящей Политике конфиденциальности разъясняется, какие сведения о вас мы собираем и в связи с чем, как мы можем поступать с этой информацией и как мы её обрабатываем. Оно распространяется на приложения Pocket Casts для iOS и Android, а также на веб-сервис Pocket Casts с соответствующими приложениями для macOS и Windows (которые совместно и по отдельности именуются Услугой). Используя Услугу, вы соглашаетесь с настоящей Политикой конфиденциальности. Если вы включите в приложении push-уведомления, мы сохраним push-токен, который нам предоставляет Apple, чтобы доставлять эти push-уведомления на вашем устройстве. Если вы покупаете веб-приложение, мы сохраняем идентификатор транзакции для вашей покупки. Если вы решили не создавать учётную запись и не пользоваться push-уведомлениями, на наших серверах не будет храниться никаких данных о вас. Веб-сервис Pocket Casts также использует файлы cookie и другие аналогичные технологии, позволяющие вам оставаться в системе. Если вы решите обратиться с запросом о поддержке в процессе использования Услуги, мы можем сформировать приложение, в котором будут содержаться дополнительные данные, помогающие решить вашу проблему, и вы сможете просмотреть их перед отправкой запроса.</string>
     <string name="profile_delete_from_device_title">Удалить с устройства</string>
+    <string name="profile_license_agreement">Pocket Casts уважает вашу конфиденциальность. В настоящей Политике конфиденциальности разъясняется, какие сведения о вас мы собираем и в связи с чем, как мы можем поступать с этой информацией и как мы её обрабатываем. Оно распространяется на приложения Pocket Casts для iOS и Android, а также на веб-сервис Pocket Casts с соответствующими приложениями для macOS и Windows (которые совместно и по отдельности именуются Услугой). Используя Услугу, вы соглашаетесь с настоящей Политикой конфиденциальности. Если вы включите в приложении push-уведомления, мы сохраним push-токен, который нам предоставляет Apple, чтобы доставлять эти push-уведомления на вашем устройстве. Если вы покупаете веб-приложение, мы сохраняем идентификатор транзакции для вашей покупки. Если вы решили не создавать учётную запись и не пользоваться push-уведомлениями, на наших серверах не будет храниться никаких данных о вас. Веб-сервис Pocket Casts также использует файлы cookie и другие аналогичные технологии, позволяющие вам оставаться в системе. Если вы решите обратиться с запросом о поддержке в процессе использования Услуги, мы можем сформировать приложение, в котором будут содержаться дополнительные данные, помогающие решить вашу проблему, и вы сможете просмотреть их перед отправкой запроса.</string>
     <string name="profile_delete_from_device_only">Удалить только с устройства</string>
     <string name="profile_delete_from_device">Удалить с устройства</string>
     <string name="profile_delete_from_cloud_title">Удалить из облака</string>
@@ -2248,6 +2252,11 @@ Language: ru
         <item quantity="one">Подкасты: %d</item>
         <item quantity="few">Подкасты: %d</item>
         <item quantity="many">Подкасты: %d</item>
+    </plurals>
+    <plurals name="podcasts_selected_count">
+        <item quantity="one">%1$dВыбран подкаст </item>
+        <item quantity="few">%1$d Выбрано подкастов:</item>
+        <item quantity="many">%1$d Выбрано подкастов:</item>
     </plurals>
     <plurals name="profile_stats_day_listened">
         <item quantity="one">дн. прослушано</item>

@@ -1,11 +1,23 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2025-09-24 16:54:03+0000
+Translation-Revision-Date: 2025-10-09 09:54:04+0000
 Plural-Forms: nplurals=6; plural=n==0 ? 0 : n==1 ? 1 : n==2 ? 2 : n%100>=3 && n%100<=10 ? 3 : n%100>=11 && n%100<=99 ? 4 : 5;
 Generator: GlotPress/2.4.0-alpha
 Language: ar
 -->
 <resources>
+    <string name="winback_cancel_subscription_stay_button_label">الاحتفاظ باشتراكي</string>
+    <string name="filter_title">عنوان قائمة التشغيل</string>
+    <string name="filter_id">معرّف قائمة التشغيل</string>
+    <string name="filters_filter_name">اسم قائمة التشغيل</string>
+    <string name="playlists_not_found">لم يُعثر على أي قوائم تشغيل</string>
+    <string name="notification_filters_message_2">أنشئ قوائم تشغيل لتتمكن من تنظيم حلقاتك.</string>
+    <string name="settings_status_service_account_summary_2">الخدمة المُستخدمة لتخزين تقدُّم الحلقة، وحلقات البث الصوتي التي تتابعها، وقوائم التشغيل، وغير ذلك.</string>
+    <string name="settings_choose_playlists">اختيار قوائم التشغيل</string>
+    <string name="number_one">واحد</string>
+    <string name="settings_auto_download_playlists">تنزيل قوائم التشغيل تلقائيًا</string>
+    <string name="playlists_selected_all">تم تحديد جميع قوائم التشغيل</string>
+    <string name="podcasts_selected_all">تم تحديد جميع حلقات البث الصوتي</string>
     <string name="smart_playlists">قوائم تشغيل ذكية</string>
     <string name="select_smart_playlists">تحديد قوائم تشغيل ذكية</string>
     <string name="podcast_not_in_playlists">غير مدرج في أي قوائم تشغيل ذكية</string>
@@ -350,7 +362,6 @@ Language: ar
     <string name="settings_pixel_watch_subtitle">استبدل أزرار التخطي المخصصة بأزرار التعقب القياسية التالية/السابقة التي تعمل كأزرار تخطٍ، ما يسمح بالتوافق مع مزيد من الأجهزة.</string>
     <string name="settings_pixel_watch_title">أزرار تخطي Pixel Watch</string>
     <string name="winback_cancel_subscription_cancel_button_label">نعم، ألغِ اشتراكي</string>
-    <string name="winback_cancel_subscription_stay_button_label">في الواقع، أريد البقاء</string>
     <string name="winback_cancel_subscription_perk_files">سيتم حذف كل الملفات المرفوعة إلى حسابك على Pocket Casts (لكن ستظل الملفات التي تم تنزيلها على أجهزتك المحمولة).</string>
     <string name="winback_cancel_subscription_perk_folders">ستتم إزالة مجلداتك كما ستنتقل محتوياتها مجددًا إلى شاشة البث الصوتي.</string>
     <string name="winback_cancel_subscription_perk_plus">سيتم قفل إمكانية الوصول إلى ميزات Pocket Casts Plus بعد هذا التاريخ.</string>
@@ -586,7 +597,6 @@ Language: ar
     <string name="hours_and_minutes">%d من الساعات و%d من الدقائق</string>
     <string name="player_sleep_time_fired_end_of_chapter">توقفَ مؤقت السكون في نهاية الفصل الخاص بك.</string>
     <string name="player_sleep_in_chapters">السكون في %d من الفصول</string>
-    <string name="player_sleep_in_one_chapter">السكون في الفصل الأول</string>
     <string name="player_sleep_timer_in_chapter_plural">في %d من الفصول</string>
     <string name="player_sleep_timer_in_chapter">في فصل واحد</string>
     <string name="player_sleep_timer_end_of_episode">نهاية الحلقة</string>
@@ -597,7 +607,6 @@ Language: ar
     <string name="settings_use_episode_artwork_title">العمل الفني للحلقة</string>
     <string name="settings_use_episode_artwork_advanced">إعدادات العمل الفني للحلقة المتقدمة</string>
     <string name="player_sleep_in_episodes">السكون في %d من الحلقات</string>
-    <string name="player_sleep_in_one_episode">السكون في حلقة واحدة</string>
     <string name="player_sleep_timer_stopped_your_podcast">أوقف مؤقت السكون البث الصوتي الخاص بك.</string>
     <string name="player_sleep_timer_restarted_after_device_shake">تمت إعادة تشغيل مؤقت السكون بعد هز الجهاز</string>
     <string name="widget_check_out_discover">تحقق من الاكتشاف للحصول على المزيد</string>
@@ -735,7 +744,6 @@ Language: ar
     <string name="onboarding_plus_feature_extra_themes_icons_title">القوالب والأيقونات الإضافية</string>
     <string name="settings_continuous_playback_summary">في حال كانت قائمة انتظار العناصر التالية لديك فارغة، سنقوم بتشغيل حلقات من البودكاست أو القائمة نفسها التي تستمع إليه حاليًا.</string>
     <string name="renew_your_subscription">تجديد الاشتراك الخاص بك</string>
-    <string name="log_in_free_account">يستخدم %s حسابًا مجانيًا</string>
     <string name="log_in_watch_from_phone_instructions_3">إذا كنت تواجه مشكلة، فتأكد من أن الهاتف يقوم بتشغيل الإصدار نفسه من Pocket Casts مثلما هو الحال مع ساعتك (%s)</string>
     <string name="empty_play_state">اختيار حلقة للبدء</string>
     <string name="player_play_failed_check_internet">يتعذر تحميل البودكاست. يرجى التحقق من اتصالك بالإنترنت والمحاولة مرة أخرى.</string>
@@ -848,8 +856,6 @@ Language: ar
     <string name="pocket_casts_query_podcasts">الاستعلام عن البودكاست في Pocket Casts</string>
     <string name="pocket_casts_query_podcast_episodes">الاستعلام عن حلقات البودكاست في Pocket Casts</string>
     <string name="pocket_casts_add_to_up_next">إضافة إلى التالي في Pocket Casts</string>
-    <string name="pocket_casts_query_filters">الاستعلام عن عوامل التصفية في Pocket Casts</string>
-    <string name="pocket_casts_query_filter_episodes">الاستعلام عن حلقات عوامل التصفية في Pocket Casts</string>
     <string name="pocket_casts_query_up_next_episodes">الاستعلام عن الحلقات التالية في Pocket Casts</string>
     <string name="podcast_id">معرف حلقة البودكاست</string>
     <string name="podcast_id_description">معرف فريد يمثّل حلقة البودكاست. يمكن استخدامه في إجراء \"الاستعلام عن حلقات البودكاست\".</string>
@@ -880,11 +886,11 @@ Language: ar
     <string name="no_episode_ids_provided">لم يتم توفير معرف الحلقة</string>
     <string name="no_episodes_found_for_episode_ids_x">لم يتم العثور على حلقات لمعرّفات الحلقات ⁦%1$s⁩</string>
     <string name="episode_count">عدد الحلقات</string>
-    <string name="filter_id">معرّف عامل التصفية</string>
-    <string name="filter_id_description">معرّف فريد يمثّل عامل التصفية. يمكن استخدامه في إجراء \"الاستعلام عن حلقات عامل التصفية\".</string>
-    <string name="filter_title">عنوان عامل التصفية</string>
-    <string name="filter_id_or_title">معرف أو عنوان عامل التصفية</string>
     <string name="episode_id">مُعرِّف الحلقة</string>
+    <string name="pocket_casts_query_filters">الاستعلام عن قوائم تشغيل Pocket Casts</string>
+    <string name="pocket_casts_query_filter_episodes">الاستعلام عن الحلقات في قوائم تشغيل Pocket Casts</string>
+    <string name="filter_id_description">معرّف فريد يمثّل قائمة التشغيل. يُمكن استخدامه في إجراء \"الاستعلام عن الحلقات في قائمة التشغيل\".</string>
+    <string name="filter_id_or_title">معرّف أو عنوان قائمة التشغيل</string>
     <string name="profile_cancel_confirm_item_plus">سيتم قفل الوصول إلى ميزات Pocket Casts Plus بعد هذا التاريخ.</string>
     <string name="profile_cancel_confirm_item_folders">ستتم إزالة مجلداتك كما ستنتقل محتوياتها مجددًا إلى شاشة حلقات البودكاست.</string>
     <string name="profile_cancel_confirm_item_uploads">سيتم حذف كل الملفات المرفوعة إلى حسابك على Pocket Casts (لكن ستظل الملفات التي تم تنزيلها على أجهزتك المحمولة).</string>
@@ -982,8 +988,8 @@ Language: ar
     <string name="profile_account_upgraded">تمت ترقية الحساب</string>
     <string name="time_to_skip_seconds">الوقت المطلوب تخطيه (ثوانٍ)</string>
     <string name="time_to_skip_not_valid">الوقت المطلوب تخطيه ⁦%1$s⁩ غير صالح</string>
-    <string name="pocket_casts_play_filter">عامل تصفية تشغيل Pocket Casts</string>
     <string name="pocket_casts_control_playback">التحكم في التشغيل في Pocket Casts</string>
+    <string name="pocket_casts_play_filter">تشغيل قائمة تشغيل في Pocket Casts</string>
     <string name="settings_select_filters">تحديد عوامل التصفية</string>
     <string name="settings_import_url">بوسطة عنوان URL</string>
     <string name="settings_import_url_summary">قم باستيراد حلقات البودكاست الخاصة بك من ملف OPML باستخدام عنوان URL.</string>
@@ -995,14 +1001,14 @@ Language: ar
     <string name="skip_to_time">التخطي إلى الوقت</string>
     <string name="time_to_skip_to_seconds">الوقت المطلوب تخطيه إلى (ثوانٍ)</string>
     <string name="time_to_skip_to_not_valid">الوقت المطلوب تخطيه إلى ⁦%1$s⁩ غير صالح</string>
-    <string name="must_provide_filter_name">لا بد من توفير اسم عامل التصفية</string>
-    <string name="filter_x_not_found">لم يتم العثور على عامل التصفية ⁦%1$s⁩</string>
-    <string name="no_episodes_in_filter_x">لا توجد حلقات في عامل تصفية ⁦%1$s⁩</string>
     <string name="must_provide_command_name">لا بد من توفير اسم الأمر</string>
     <string name="command_x_not_valid">الأمر ⁦%1$s⁩ غير صالح</string>
     <string name="playback_command">أمر التشغيل</string>
     <string name="chapter_to_skip_to">الفصل المطلوب تخطيه</string>
     <string name="chapter_to_skip_to_not_valid">الفصل المطلوب تخطيه إلى ⁦%1$s⁩ غير صالح</string>
+    <string name="must_provide_filter_name">يجب توفير اسم قائمة التشغيل</string>
+    <string name="filter_x_not_found">قائمة التشغيل ⁦%1$s⁩ غير موجودة</string>
+    <string name="no_episodes_in_filter_x">لا توجد حلقات في قائمة التشغيل ⁦%1$s⁩</string>
     <string name="settings_app_icon_halloween">عيد الهالوين</string>
     <string name="end_of_year_launch_modal_summary">اطلع على أهم حلقات البودكاست والتصنيفات وإحصاءات الاستماع الخاصة بك والمزيد. شارك مع الأصدقاء وعبّر عن المبدعين الذين تفضّلهم!</string>
     <string name="end_of_year_launch_modal_primary_button_title">عرض التشغيل الخاص بي في عام 2024</string>
@@ -1128,7 +1134,6 @@ Language: ar
     <string name="discover_popular_in">شائع في %s</string>
     <string name="discover_popular">شائع</string>
     <string name="discover_top">أعلى</string>
-    <string name="filters_filter_name">تصفية الاسم</string>
     <string name="episode_short_episode">E%d</string>
     <string name="episode_short_season">د%d</string>
     <string name="episode_short_season_episode">S%1$d E%2$d</string>
@@ -1272,8 +1277,8 @@ Language: ar
     <string name="settings_status_service_discover_summary">قسم الاكتشاف في التطبيق، بما في ذلك البحث عن بث صوتي.</string>
     <string name="settings_status_service_discover">الاكتشاف والبحث</string>
     <string name="settings_status_service_account">خدمة الحساب</string>
-    <string name="settings_status_service_hosts_help">يتمثَّل السبب الأكثر شيوعًا في أن لديك مانع إعلانات تم تكوينه على هاتفك أو شبكتك. سيتعيَّن عليك فتح هذا النطاق لتنزيل البث الصوتي. يرجى ملاحظة أن Pocket Casts لا يقوم بالاستضافة أو يختار مكان استضافة البث الصوتي، ويرجع هذا الأمر إلى مؤلف العرض وهو خارج عن سيطرتنا.</string>
     <string name="settings_status_service_refresh_summary">الخدمة المُستخدمة للعثور على حلقات جديدة.</string>
+    <string name="settings_status_service_hosts_help">يتمثَّل السبب الأكثر شيوعًا في أن لديك مانع إعلانات تم تكوينه على هاتفك أو شبكتك. سيتعيَّن عليك فتح هذا النطاق لتنزيل البث الصوتي. يرجى ملاحظة أن Pocket Casts لا يقوم بالاستضافة أو يختار مكان استضافة البث الصوتي، ويرجع هذا الأمر إلى مؤلف العرض وهو خارج عن سيطرتنا.</string>
     <string name="settings_status_service_refresh">تحديث الخدمة</string>
     <string name="settings_status_service_internet_help">يتعذر الاتصال بالإنترنت. حاول الاتصال على شبكة مختلفة (على سبيل المثال، بيانات هاتف).</string>
     <string name="settings_status_service_internet_summary">تحقَّق من حالة شبكتك.</string>
@@ -1573,7 +1578,6 @@ Language: ar
     <string name="profile_stats_time_saved_by">تم توفير الوقت عن طريق</string>
     <string name="profile_stats_skipping">التخطي</string>
     <string name="profile_stats_since_listened_for">منذ %s التي استمعت إليها</string>
-    <string name="profile_stats_share_to">المشاركة على..</string>
     <string name="profile_stats_trim_silence">إزالة السكوت</string>
     <string name="profile_stats_listened_for">الذي استمعت إليه</string>
     <string name="profile_stats_auto_skipping">التخطي التلقائي</string>
@@ -1643,8 +1647,8 @@ Language: ar
     <string name="profile_last_refresh">آخر تحديث: منذ %s</string>
     <string name="profile_joined">تم الانضمام:</string>
     <string name="profile_get_plus">قم بتنزيل Pocket Casts Plus لفتح هذه الميزة، بالإضافة إلى المزيد!</string>
-    <string name="profile_license_agreement">يُقدِّر Pocket Casts خصوصيتك. توضِّح سياسة الخصوصية هذه المعلومات التي نجمعها عنك والسبب وراء هذا، وما قد نفعله بتلك المعلومات وكيف نتعامل معها. تنطبق على تطبيقات Pocket Casts لنظام تشغيل iOS وAndroid وخدمة الويب Pocket Casts مع تطبيقات نظام تشغيل macOS وWindows المرتبطة (الخدمة مشتركة ومنفردة). باستخدام الخدمة، يعني أنك توافق على سياسة الخصوصية هذه. إذا قمت بتشغيل التنبيهات المنبثقة في التطبيق، فسنقوم بتخزين رمز الدفع المميز الذي توفره لنا Apple لتوصيل التنبيهات المنبثقة إلى جهازك. إذا اشتريت تطبيق الويب، فسنقوم بتخزين مُعرِّف المعاملة الخاصة بعملية الشراء الخاصة بك. إذا اخترت عدم إنشاء حساب ولم تستخدم التنبيهات المنبثقة، فلن يتم تخزين أي بيانات حولك على خوادمنا. تستخدم كذلك خدمة الويب Pocket Casts الكوكيز والتقنيات المشابهة للحفاظ على تسجيل دخولك. إذا اخترت إنشاء طلب دعم من داخل الخدمة، فقد نقوم بإنشاء مرفق يحتوي على بيانات إضافية للمساعدة على معالجة طلب الدعم الخاص بك الذي يرحب بك لعرضه قبل الإرسال.</string>
     <string name="profile_free_account">حساب مجاني</string>
+    <string name="profile_license_agreement">يُقدِّر Pocket Casts خصوصيتك. توضِّح سياسة الخصوصية هذه المعلومات التي نجمعها عنك والسبب وراء هذا، وما قد نفعله بتلك المعلومات وكيف نتعامل معها. تنطبق على تطبيقات Pocket Casts لنظام تشغيل iOS وAndroid وخدمة الويب Pocket Casts مع تطبيقات نظام تشغيل macOS وWindows المرتبطة (الخدمة مشتركة ومنفردة). باستخدام الخدمة، يعني أنك توافق على سياسة الخصوصية هذه. إذا قمت بتشغيل التنبيهات المنبثقة في التطبيق، فسنقوم بتخزين رمز الدفع المميز الذي توفره لنا Apple لتوصيل التنبيهات المنبثقة إلى جهازك. إذا اشتريت تطبيق الويب، فسنقوم بتخزين مُعرِّف المعاملة الخاصة بعملية الشراء الخاصة بك. إذا اخترت عدم إنشاء حساب ولم تستخدم التنبيهات المنبثقة، فلن يتم تخزين أي بيانات حولك على خوادمنا. تستخدم كذلك خدمة الويب Pocket Casts الكوكيز والتقنيات المشابهة للحفاظ على تسجيل دخولك. إذا اخترت إنشاء طلب دعم من داخل الخدمة، فقد نقوم بإنشاء مرفق يحتوي على بيانات إضافية للمساعدة على معالجة طلب الدعم الخاص بك الذي يرحب بك لعرضه قبل الإرسال.</string>
     <string name="profile_forgot_your_password">نسيتُ كلمة المرور الخاصة بي</string>
     <string name="profile_files_remove_image">استبدال صورة</string>
     <string name="profile_files_empty_summary">هل ترغب في الاستماع إلى ملفاتك الخاصة؟\nاضغط على زر + لفتحها في Pocket Casts، وستظهر هنا.</string>
@@ -2297,6 +2301,14 @@ Language: ar
         <item quantity="few">%d حلقات البث الصوتي</item>
         <item quantity="many">%d حلقات البث الصوتي</item>
         <item quantity="other">%d حلقات البث الصوتي</item>
+    </plurals>
+    <plurals name="podcasts_selected_count">
+        <item quantity="zero"> تم تحديد ⁦%1$d⁩ بث صوتي</item>
+        <item quantity="one"> تم تحديد ⁦%1$d⁩ بث صوتي</item>
+        <item quantity="two"> تم تحديد ⁦%1$d⁩ بث صوتي</item>
+        <item quantity="few"> تم تحديد ⁦%1$d⁩ بث صوتي</item>
+        <item quantity="many"> تم تحديد ⁦%1$d⁩ بث صوتي</item>
+        <item quantity="other"> تم تحديد ⁦%1$d⁩ بث صوتي</item>
     </plurals>
     <plurals name="profile_stats_day_listened">
         <item quantity="zero">اليوم الذي تم الاستماع فيه</item>

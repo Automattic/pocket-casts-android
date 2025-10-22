@@ -73,7 +73,6 @@ Language: en_GB
     <string name="settings_continuous_playback_summary">If your Up Next queue is empty, we\'ll play episodes from the same podcast or list you\'re currently listening to.</string>
     <string name="renew_your_subscription">Renew your Subscription</string>
     <string name="log_in_watch_from_phone_instructions_3">If you are having trouble, make sure your phone is running the same version of Pocket Casts as your watch (%s)</string>
-    <string name="log_in_free_account">%s is using a free account</string>
     <string name="player_play_failed_check_internet">Could not load podcast. Please check your internet connection and try again.</string>
     <string name="empty_play_state">Pick an episode to begin</string>
     <string name="settings_beta_features">Beta features</string>
@@ -195,7 +194,6 @@ Language: en_GB
     <string name="podcast_id_description">An unique ID that represents the podcast. Can be used on the \'Query Podcast Episodes\' action.</string>
     <string name="podcast_id">Podcast ID</string>
     <string name="pocket_casts_query_up_next_episodes">Pocket Casts Query Up Next Episodes</string>
-    <string name="pocket_casts_query_filter_episodes">Pocket Casts Query Filter Episodes</string>
     <string name="no_episode_ids_provided">No episode IDs provided</string>
     <string name="latest_episode_date">Latest Episode Date</string>
     <string name="added_date">Date Added</string>
@@ -203,10 +201,6 @@ Language: en_GB
     <string name="thumbnail_url">Thumbnail URL</string>
     <string name="played_percentage">Played Percentage</string>
     <string name="playing_status_explained">0 = Not Played; 1 = In Progress; 2 = Completed</string>
-    <string name="filter_id_or_title">Filter ID or Title</string>
-    <string name="filter_title">Filter Title</string>
-    <string name="filter_id_description">An unique ID that represents the filter. Can be used on the \'Query Filter Episodes\' action.</string>
-    <string name="filter_id">Filter ID</string>
     <string name="episode_count">Episode Count</string>
     <string name="no_episodes_found_for_episode_ids_x">No episodes found for episode IDs %1$s</string>
     <string name="playing_status">Playing Status</string>
@@ -214,7 +208,6 @@ Language: en_GB
     <string name="current">Current</string>
     <string name="last">Last</string>
     <string name="start_playing">Start Playing</string>
-    <string name="pocket_casts_query_filters">Pocket Casts Query Filters</string>
     <string name="pocket_casts_add_to_up_next">Pocket Casts Add To Up Next</string>
     <string name="pocket_casts_query_podcast_episodes">Pocket Casts Query Podcast Episodes</string>
     <string name="pocket_casts_query_podcasts">Pocket Casts Query Podcasts</string>
@@ -304,7 +297,6 @@ Language: en_GB
     <string name="set_volume_boost">Set Volume Boost</string>
     <string name="profile_account_upgraded">Account Upgraded</string>
     <string name="pocket_casts_control_playback">Pocket Casts Control Playback</string>
-    <string name="pocket_casts_play_filter">Pocket Casts Play Filter</string>
     <string name="time_to_skip_not_valid">Time to skip %1$s not valid</string>
     <string name="time_to_skip_seconds">Time To Skip (Seconds)</string>
     <string name="settings_select_filters">Select filters</string>
@@ -318,14 +310,11 @@ Language: en_GB
     <string name="skip_to_previous_chapter">Skip To Previous Chapter</string>
     <string name="skip_to_next_chapter">Skip To Next Chapter</string>
     <string name="tasker_variables">Tasker Variables</string>
-    <string name="filter_x_not_found">Filter %1$s not found</string>
-    <string name="must_provide_filter_name">Must provide filter name</string>
     <string name="chapter_to_skip_to_not_valid">Chapter to skip to %1$s not valid</string>
     <string name="chapter_to_skip_to">Chapter To Skip To</string>
     <string name="playback_command">Playback Command</string>
     <string name="command_x_not_valid">Command %1$s not valid</string>
     <string name="must_provide_command_name">Must provide command name</string>
-    <string name="no_episodes_in_filter_x">No episodes in Filter %1$s</string>
     <string name="end_of_year_launch_modal_summary">See your top podcasts, categories, listening stats and more. Share with friends and shout out your favourite creators!</string>
     <string name="settings_app_icon_halloween">Halloween</string>
     <string name="settings_show_played_summary">Episodes that you have finished playing will still be displayed</string>
@@ -450,7 +439,6 @@ Language: en_GB
     <string name="discover_popular_in">Popular in %s</string>
     <string name="discover_popular">Popular</string>
     <string name="discover_top">Top</string>
-    <string name="filters_filter_name">Filter Name</string>
     <string name="episode_short_episode">E%d</string>
     <string name="episode_short_season">S%d</string>
     <string name="episode_short_season_episode">S%1$d E%2$d</string>
@@ -888,7 +876,6 @@ Language: en_GB
     <string name="profile_stats_time_saved_by">Time Saved By</string>
     <string name="profile_stats_skipping">Skipping</string>
     <string name="profile_stats_since_listened_for">Since %s you\'ve listened for</string>
-    <string name="profile_stats_share_to">Share to…</string>
     <string name="profile_stats_trim_silence">Trim Silence</string>
     <string name="profile_stats_listened_for">You\'ve listened for</string>
     <string name="profile_stats_auto_skipping">Auto Skipping</string>

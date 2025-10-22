@@ -1,11 +1,23 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2025-09-24 14:54:03+0000
+Translation-Revision-Date: 2025-10-09 11:54:03+0000
 Plural-Forms: nplurals=2; plural=n != 1;
 Generator: GlotPress/2.4.0-alpha
 Language: de
 -->
 <resources>
+    <string name="winback_cancel_subscription_stay_button_label">Mein Abonnement behalten</string>
+    <string name="filter_title">Titel der Wiedergabeliste</string>
+    <string name="filter_id">ID der Wiedergabeliste</string>
+    <string name="filters_filter_name">Name der Wiedergabeliste</string>
+    <string name="playlists_not_found">Keine Wiedergabelisten gefunden</string>
+    <string name="notification_filters_message_2">Erstelle Wiedergabelisten, um deine Folgen zu organisieren.</string>
+    <string name="settings_status_service_account_summary_2">Der Dienst, mit dem Folgenfortschritt, abonnierte Podcasts, Wiedergabelisten etc. gespeichert wurden</string>
+    <string name="settings_choose_playlists">Wiedergabelisten auswählen</string>
+    <string name="number_one">eine</string>
+    <string name="settings_auto_download_playlists">Wiedergabelisten automatisch herunterladen</string>
+    <string name="playlists_selected_all">Alle Wiedergabelisten ausgewählt</string>
+    <string name="podcasts_selected_all">Alle Podcasts ausgewählt</string>
     <string name="smart_playlists">Intelligente Wiedergabelisten</string>
     <string name="select_smart_playlists">Intelligente Wiedergabelisten auswählen</string>
     <string name="podcast_not_in_playlists">Nicht in intelligenten Wiedergabelisten enthalten</string>
@@ -350,7 +362,6 @@ Language: de
     <string name="settings_pixel_watch_subtitle">Ersetze die individuellen „Überspringen“-Buttons mit den standardmäßigen „Nächster/Vorheriger Track“-Buttons, die als „Überspringen“-Buttons fungieren und so mit mehr Geräten kompatibel sind.</string>
     <string name="settings_pixel_watch_title">„Überspringen“-Buttons der Pixel Watch</string>
     <string name="winback_cancel_subscription_cancel_button_label">Ja, mein Abonnement kündigen</string>
-    <string name="winback_cancel_subscription_stay_button_label">Ich möchte das Abonnement doch weiterhin nutzen</string>
     <string name="winback_cancel_subscription_perk_files">Alle Dateien, die in dein Pocket Casts-Konto hochgeladen wurden, werden gelöscht (heruntergeladene Dateien auf deinen Mobilgeräten bleiben jedoch erhalten).</string>
     <string name="winback_cancel_subscription_perk_folders">Deine Ordner werden entfernt und ihre Inhalte werden zum Podcasts-Bildschirm verschoben.</string>
     <string name="winback_cancel_subscription_perk_plus">Der Zugriff auf Pocket Casts Plus-Funktionen wird nach diesem Datum gesperrt.</string>
@@ -586,7 +597,6 @@ Language: de
     <string name="hours_and_minutes">%d Stunden und %d Minuten</string>
     <string name="player_sleep_time_fired_end_of_chapter">Durch die Schlummerfunktion wurde die Wiedergabe am Ende deines Kapitels beendet.</string>
     <string name="player_sleep_in_chapters">Schlummerfunktion wird nach %d Kapiteln aktiviert</string>
-    <string name="player_sleep_in_one_chapter">Schlummerfunktion wird nach 1 Kapitel aktiviert</string>
     <string name="player_sleep_timer_in_chapter_plural">Nach %d Kapiteln</string>
     <string name="player_sleep_timer_in_chapter">Nach 1 Kapitel</string>
     <string name="player_sleep_timer_end_of_episode">Ende der Folge</string>
@@ -597,7 +607,6 @@ Language: de
     <string name="settings_use_episode_artwork_title">Cover der Folge</string>
     <string name="settings_use_episode_artwork_advanced">Erweiterte Einstellungen zum Cover der Folge</string>
     <string name="player_sleep_in_episodes">Schlummerfunktion startet nach %d Folgen</string>
-    <string name="player_sleep_in_one_episode">Schlummerfunktion startet nach 1 Folge</string>
     <string name="player_sleep_timer_stopped_your_podcast">Die Schlummerfunktion hat deinen Podcast angehalten.</string>
     <string name="player_sleep_timer_restarted_after_device_shake">Die Schlummerfunktion wurde nach dem Schütteln des Geräts neu gestartet</string>
     <string name="widget_check_out_discover">Unter „Entdecken“ erfährst du mehr</string>
@@ -736,7 +745,6 @@ Language: de
     <string name="settings_continuous_playback_summary">Wenn deine Warteschlange leer ist, spielen wir Folgen aus dem Podcast oder der Liste, die du dir gerade anhörst.</string>
     <string name="renew_your_subscription">Abonnement verlängern</string>
     <string name="log_in_watch_from_phone_instructions_3">Hast du Probleme? Stelle sicher, dass auf deinem Smartphone dieselbe Pocket Casts-Version installiert ist, wie auf deiner Uhr (%s)</string>
-    <string name="log_in_free_account">%s nutzt ein kostenloses Konto</string>
     <string name="player_play_failed_check_internet">Podcast konnte nicht geladen werden. Bitte überprüfe deine Internetverbindung und versuche es erneut.</string>
     <string name="empty_play_state">Wähle eine Folge aus, um loszulegen</string>
     <string name="settings_beta_features">Betafunktionen</string>
@@ -845,10 +853,6 @@ Language: de
     <string name="settings_media_actions_customise">Medienaktionen anpassen</string>
     <string name="onboarding_recommendations_more">Mehr %s</string>
     <string name="clear_up_next">Warteschlange löschen</string>
-    <string name="filter_id_or_title">Filter-ID oder -titel</string>
-    <string name="filter_title">Filtertitel</string>
-    <string name="filter_id_description">Eine eindeutige ID, die den Filter repräsentiert. Kann auf die Aktion „Von Filter gefundene Folgen abfragen“ angewendet werden.</string>
-    <string name="filter_id">Filter-ID</string>
     <string name="episode_count">Anzahl der Folgen</string>
     <string name="no_episodes_found_for_episode_ids_x">Keine Folgen für Folgen-IDs %1$s gefunden</string>
     <string name="no_episode_ids_provided">Keine Folgen-IDs angegeben</string>
@@ -879,12 +883,14 @@ Language: de
     <string name="podcast_id_description">Eine eindeutige ID, die den Podcast repräsentiert. Kann auf die Aktion „Podcast-Folgen abfragen“ angewendet werden.</string>
     <string name="podcast_id">Podcast-ID</string>
     <string name="pocket_casts_query_up_next_episodes">Pocket Casts – Nächste Folgen abfragen</string>
-    <string name="pocket_casts_query_filter_episodes">Pocket Casts – Von Filter gefundene Folgen abfragen</string>
-    <string name="pocket_casts_query_filters">Pocket Casts – Filter abfragen</string>
     <string name="pocket_casts_add_to_up_next">Pocket Casts – Zur Warteschlange hinzufügen</string>
     <string name="pocket_casts_query_podcast_episodes">Pocket Casts – Podcast-Folgen abfragen</string>
     <string name="pocket_casts_query_podcasts">Pocket Casts – Podcast abfragen</string>
     <string name="onboarding_plus_can_be_canceled_at_any_time">Kann jederzeit abgebrochen werden.</string>
+    <string name="filter_id_or_title">ID oder Titel der Wiedergabeliste</string>
+    <string name="filter_id_description">Eine eindeutige ID, die die Wiedergabeliste repräsentiert. Kann auf die Aktion „Wiedergabeliste-Folgen abfragen“ angewendet werden.</string>
+    <string name="pocket_casts_query_filter_episodes">Pocket Casts – Wiedergabeliste-Folgen abfragen</string>
+    <string name="pocket_casts_query_filters">Pocket Casts – Wiedergabelisten abfragen</string>
     <string name="profile_cancel_confirm_cancel_button_title">Ja, mein Abonnement kündigen</string>
     <string name="profile_cancel_confirm_stay_button_title">Ich möchte das Abonnement doch weiterhin nutzen</string>
     <string name="profile_cancel_confirm_item_web_player">Du wirst nicht länger über deinen Webbrowser oder Desktop-Computer auf Pocket Casts zugreifen können.</string>
@@ -981,9 +987,9 @@ Language: de
     <string name="playback_speed_not_valid">Wiedergabegeschwindigkeit %1$s nicht gültig</string>
     <string name="profile_account_upgraded">Konto aktualisiert</string>
     <string name="pocket_casts_control_playback">Pocket Casts-Wiedergabe-Steuerung</string>
-    <string name="pocket_casts_play_filter">Pocket Casts-Abspiel-Filter</string>
     <string name="time_to_skip_not_valid">Zeitpunkt, auf den du springen möchtest (%1$s), ist nicht gültig</string>
     <string name="time_to_skip_seconds">Zeitpunkt, auf den du springen möchtest (Sekunden)</string>
+    <string name="pocket_casts_play_filter">Pocket Casts – Wiedergabeliste abspielen</string>
     <string name="settings_select_filters">Filter auswählen</string>
     <string name="settings_import_url_summary">Importiere deine Podcasts von einer OPML-Datei mithilfe einer URL.</string>
     <string name="settings_import_url">Durch URL</string>
@@ -1000,9 +1006,9 @@ Language: de
     <string name="playback_command">Wiedergabe-Befehl</string>
     <string name="command_x_not_valid">Befehl %1$s nicht gültig</string>
     <string name="must_provide_command_name">Befehlsname erforderlich</string>
-    <string name="no_episodes_in_filter_x">Keine Folgen in Filter %1$s</string>
-    <string name="filter_x_not_found">Filter %1$s nicht gefunden</string>
-    <string name="must_provide_filter_name">Filtername erforderlich</string>
+    <string name="no_episodes_in_filter_x">Keine Folgen in Wiedergabeliste „%1$s“</string>
+    <string name="filter_x_not_found">Wiedergabeliste „%1$s“ nicht gefunden</string>
+    <string name="must_provide_filter_name">Name der Wiedergabeliste erforderlich</string>
     <string name="end_of_year_launch_modal_summary">Schau dir deine Top-Podcasts, Kategorien, Hörstatistiken und mehr an. Teile es mit Freunden und nenne deine bevorzugten Ersteller!</string>
     <string name="settings_app_icon_halloween">Halloween</string>
     <string name="end_of_year_launch_modal_primary_button_title">Meine Wiedergabeliste 2024 ansehen</string>
@@ -1128,7 +1134,6 @@ Language: de
     <string name="off">Aus</string>
     <string name="discover_popular_in">Beliebt in %s</string>
     <string name="discover_popular">Beliebt</string>
-    <string name="filters_filter_name">Filtername:</string>
     <string name="episode_short_episode">F%d</string>
     <string name="episode_short_season">S%d</string>
     <string name="episode_short_season_episode">S%1$d F%2$d</string>
@@ -1621,7 +1626,6 @@ Language: de
     <string name="profile_sub_android_goto">Wenn du dein Abonnement kündigen möchtest, musst du das über den Google Play Store tun.</string>
     <string name="profile_status_error_internet">🤔\n\nStatistiken konnten nicht geladen werden,\nüberprüfe deine Internetverbindung.</string>
     <string name="profile_stats_total">GESAMT</string>
-    <string name="profile_stats_share_to">Teilen auf …</string>
     <string name="profile_stat_days_listened">Tage angehört</string>
     <string name="profile_sonos_title">Pocket Casts und Sonos</string>
     <string name="profile_sonos_setup_account">Konto einrichten</string>
@@ -2225,6 +2229,10 @@ Language: de
     <plurals name="podcasts_count">
         <item quantity="one">%d Podcast</item>
         <item quantity="other">%d Podcasts</item>
+    </plurals>
+    <plurals name="podcasts_selected_count">
+        <item quantity="one">%1$d Podcast ausgewählt</item>
+        <item quantity="other">%1$d Podcasts ausgewählt</item>
     </plurals>
     <plurals name="profile_stats_day_listened">
         <item quantity="one">Tag angehört</item>

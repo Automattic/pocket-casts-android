@@ -31,6 +31,7 @@ import androidx.compose.material.RippleConfiguration
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -71,9 +72,12 @@ import au.com.shiftyjelly.pocketcasts.compose.navigation.slideOutToEnd
 import au.com.shiftyjelly.pocketcasts.compose.navigation.slideOutToStart
 import au.com.shiftyjelly.pocketcasts.compose.preview.ThemePreviewParameterProvider
 import au.com.shiftyjelly.pocketcasts.compose.theme
+import au.com.shiftyjelly.pocketcasts.models.to.PlaylistPreviewForEpisode
 import au.com.shiftyjelly.pocketcasts.playlists.component.PlaylistNameInputField
-import au.com.shiftyjelly.pocketcasts.repositories.playlist.PlaylistPreviewForEpisode
+import au.com.shiftyjelly.pocketcasts.repositories.playlist.PlaylistPreview
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme.ThemeType
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
@@ -81,6 +85,9 @@ import au.com.shiftyjelly.pocketcasts.localization.R as LR
 internal fun AddToPlaylistPage(
     playlistPreviews: List<PlaylistPreviewForEpisode>,
     unfilteredPlaylistsCount: Int,
+    episodeLimit: Int,
+    getPreviewMetadataFlow: (String) -> StateFlow<PlaylistPreview.Metadata?>,
+    refreshPreviewMetadata: (String) -> Unit,
     onClickCreatePlaylist: () -> Unit,
     onChangeEpisodeInPlaylist: (PlaylistPreviewForEpisode) -> Unit,
     onClickContinueWithNewPlaylist: () -> Unit,
@@ -126,7 +133,10 @@ internal fun AddToPlaylistPage(
                 SelectPlaylistsPage(
                     playlistPreviews = playlistPreviews,
                     unfilteredPlaylistsCount = unfilteredPlaylistsCount,
+                    episodeLimit = episodeLimit,
                     searchState = searchFieldState,
+                    getPreviewMetadataFlow = getPreviewMetadataFlow,
+                    refreshPreviewMetadata = refreshPreviewMetadata,
                     onCreatePlaylist = {
                         onClickContinueWithNewPlaylist()
                         navController.navigateOnce(AddToPlaylistRoutes.NEW_PLAYLIST)
@@ -150,7 +160,10 @@ internal fun AddToPlaylistPage(
 private fun SelectPlaylistsPage(
     playlistPreviews: List<PlaylistPreviewForEpisode>,
     unfilteredPlaylistsCount: Int,
+    episodeLimit: Int,
     searchState: TextFieldState,
+    getPreviewMetadataFlow: (String) -> StateFlow<PlaylistPreview.Metadata?>,
+    refreshPreviewMetadata: (String) -> Unit,
     onCreatePlaylist: () -> Unit,
     onChangeEpisodeInPlaylist: (PlaylistPreviewForEpisode) -> Unit,
     onClickDoneButton: () -> Unit,
@@ -187,6 +200,9 @@ private fun SelectPlaylistsPage(
         PlaylistPreviewsColumn(
             playlistPreviews = playlistPreviews,
             unfilteredPlaylistsCount = unfilteredPlaylistsCount,
+            episodeLimit = episodeLimit,
+            getPreviewMetadataFlow = getPreviewMetadataFlow,
+            refreshPreviewMetadata = refreshPreviewMetadata,
             onChangeEpisodeInPlaylist = onChangeEpisodeInPlaylist,
             modifier = Modifier
                 .weight(1f)
@@ -247,6 +263,9 @@ private fun NewPlaylistButton(
 private fun PlaylistPreviewsColumn(
     playlistPreviews: List<PlaylistPreviewForEpisode>,
     unfilteredPlaylistsCount: Int,
+    episodeLimit: Int,
+    getPreviewMetadataFlow: (String) -> StateFlow<PlaylistPreview.Metadata?>,
+    refreshPreviewMetadata: (String) -> Unit,
     onChangeEpisodeInPlaylist: (PlaylistPreviewForEpisode) -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -268,7 +287,7 @@ private fun PlaylistPreviewsColumn(
                 key = { _, playlist -> playlist.uuid },
                 contentType = { _, _ -> "playlist" },
             ) { index, playlist ->
-                val contentDescription = if (playlist.canAddOrRemoveEpisode) {
+                val contentDescription = if (playlist.canAddOrRemoveEpisode(episodeLimit)) {
                     if (playlist.hasEpisode) {
                         stringResource(LR.string.remove_from_playlist)
                     } else {
@@ -279,7 +298,10 @@ private fun PlaylistPreviewsColumn(
                 }
                 PlaylistPreviewRow(
                     playlist = playlist,
+                    episodeLimit = episodeLimit,
                     showDivider = index != playlistPreviews.lastIndex,
+                    getPreviewMetadataFlow = getPreviewMetadataFlow,
+                    refreshPreviewMetadata = refreshPreviewMetadata,
                     modifier = Modifier
                         .clickable(
                             role = Role.Button,
@@ -317,9 +339,20 @@ private fun PlaylistPreviewsColumn(
 @Composable
 private fun PlaylistPreviewRow(
     playlist: PlaylistPreviewForEpisode,
+    episodeLimit: Int,
     showDivider: Boolean,
+    getPreviewMetadataFlow: (String) -> StateFlow<PlaylistPreview.Metadata?>,
+    refreshPreviewMetadata: (String) -> Unit,
     modifier: Modifier = Modifier,
 ) {
+    val metadata by remember(playlist.uuid) {
+        getPreviewMetadataFlow(playlist.uuid)
+    }.collectAsState()
+
+    LaunchedEffect(playlist.uuid, refreshPreviewMetadata) {
+        refreshPreviewMetadata(playlist.uuid)
+    }
+
     Column(
         modifier = modifier,
     ) {
@@ -329,11 +362,11 @@ private fun PlaylistPreviewRow(
                 .fillMaxWidth()
                 .padding(horizontal = 16.dp, vertical = 12.dp),
         ) {
-            val alpha = if (playlist.canAddOrRemoveEpisode) 1f else 0.4f
+            val alpha = if (playlist.canAddOrRemoveEpisode(episodeLimit)) 1f else 0.4f
             PlaylistArtwork(
-                podcastUuids = playlist.artworkPodcastUuids,
+                podcastUuids = metadata?.artworkPodcastUuids.orEmpty(),
                 artworkSize = 56.dp,
-                elevation = if (playlist.canAddOrRemoveEpisode) 1.dp else 0.dp,
+                elevation = if (playlist.canAddOrRemoveEpisode(episodeLimit)) 1.dp else 0.dp,
                 modifier = Modifier.alpha(alpha),
             )
             Spacer(
@@ -357,7 +390,7 @@ private fun PlaylistPreviewRow(
             )
             Checkbox(
                 checked = playlist.hasEpisode,
-                enabled = playlist.canAddOrRemoveEpisode,
+                enabled = playlist.canAddOrRemoveEpisode(episodeLimit),
                 onCheckedChange = null,
                 modifier = Modifier.alpha(alpha),
             )
@@ -422,6 +455,9 @@ private fun AddToPlaylistPageEmptyStatePreview() {
         AddToPlaylistPage(
             playlistPreviews = emptyList(),
             unfilteredPlaylistsCount = 0,
+            episodeLimit = 100,
+            getPreviewMetadataFlow = { MutableStateFlow(null) },
+            refreshPreviewMetadata = {},
             onClickCreatePlaylist = {},
             onChangeEpisodeInPlaylist = {},
             onClickContinueWithNewPlaylist = {},
@@ -439,6 +475,9 @@ private fun AddToPlaylistPageNoSearchPreview() {
         AddToPlaylistPage(
             playlistPreviews = emptyList(),
             unfilteredPlaylistsCount = 1,
+            episodeLimit = 100,
+            getPreviewMetadataFlow = { MutableStateFlow(null) },
+            refreshPreviewMetadata = {},
             onClickCreatePlaylist = {},
             onChangeEpisodeInPlaylist = {},
             onClickContinueWithNewPlaylist = {},
@@ -463,35 +502,30 @@ private fun AddToPlaylistPagePreview(
                     uuid = "id-1",
                     title = "Playlist 1",
                     episodeCount = 99,
-                    artworkPodcastUuids = emptyList(),
                     hasEpisode = false,
-                    episodeLimit = 100,
                 ),
                 PlaylistPreviewForEpisode(
                     uuid = "id-2",
                     title = "Playlist 2",
                     episodeCount = 100,
-                    artworkPodcastUuids = emptyList(),
                     hasEpisode = false,
-                    episodeLimit = 100,
                 ),
                 PlaylistPreviewForEpisode(
                     uuid = "id-3",
                     title = "Playlist 3",
                     episodeCount = 100,
-                    artworkPodcastUuids = emptyList(),
                     hasEpisode = true,
-                    episodeLimit = 100,
                 ),
                 PlaylistPreviewForEpisode(
                     uuid = "id-4",
                     title = "Playlist 4",
                     episodeCount = 99,
-                    artworkPodcastUuids = emptyList(),
                     hasEpisode = true,
-                    episodeLimit = 100,
                 ),
             ),
+            episodeLimit = 100,
+            getPreviewMetadataFlow = { MutableStateFlow(null) },
+            refreshPreviewMetadata = {},
             unfilteredPlaylistsCount = 4,
             navController = navController,
             onClickCreatePlaylist = {},

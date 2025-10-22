@@ -60,7 +60,6 @@ Language: nb_NO
     <string name="onboarding_patron_feature_early_access_title">Tidlig tilgang til funksjoner</string>
     <string name="settings_continuous_playback_summary">Hvis Neste-køen er tom, spiller vi av episoder fra samme podcast eller liste som du lytter til nå.</string>
     <string name="renew_your_subscription">Forny abonnementet</string>
-    <string name="log_in_free_account">%s bruker en gratiskonto</string>
     <string name="log_in_watch_from_phone_instructions_3">Hvis du har problemer, må du kontrollere at telefonen kjører samme versjon av Pocket Casts som klokken (%s)</string>
     <string name="empty_play_state">Velg en episode for å begynne</string>
     <string name="player_play_failed_check_internet">Kunne ikke laste podcast. Kontroller internettilkoblingen og prøv på nytt.</string>
@@ -170,8 +169,6 @@ Language: nb_NO
     <string name="pocket_casts_query_podcasts">Pocket Casts-søk etter podcaster</string>
     <string name="pocket_casts_query_podcast_episodes">Pocket Casts-søk etter podcastepisoder</string>
     <string name="pocket_casts_add_to_up_next">Legg til Neste i Pocket Casts</string>
-    <string name="pocket_casts_query_filters">Pocket Casts-søkefiltre</string>
-    <string name="pocket_casts_query_filter_episodes">Pocket Casts-søkefiltre for episoder</string>
     <string name="pocket_casts_query_up_next_episodes">Pocket Casts-søk etter neste episoder</string>
     <string name="podcast_id">Podcast-ID</string>
     <string name="podcast_id_description">En unik ID som representerer podcasten. Kan brukes på handlingen Søk etter podcastepisoder.</string>
@@ -203,10 +200,6 @@ Language: nb_NO
     <string name="no_episode_ids_provided">Ingen episode-ID oppgitt</string>
     <string name="no_episodes_found_for_episode_ids_x">Fant ingen episoder for episode-ID %1$s</string>
     <string name="episode_count">Antall episoder</string>
-    <string name="filter_id">Filter-ID</string>
-    <string name="filter_id_description">En unik ID som representerer filteret. Kan brukes på handlingen Søk etter filtrerte episoder.</string>
-    <string name="filter_title">Filtertittel</string>
-    <string name="filter_id_or_title">Filter-ID eller -tittel</string>
     <string name="profile_cancel_confirm_item_plus">Tilgang til Pocket Casts Plus-funksjoner blir sperret etter denne datoen.</string>
     <string name="profile_cancel_confirm_item_folders">Mappene blir fjernet og innholdet flyttes tilbake til Podcasts-skjermbildet.</string>
     <string name="profile_cancel_confirm_item_uploads">Alle filer lastet opp til Pocket Casts-kontoen din, blir slettet (men filer lastet ned på mobilenhetene dine, blir værende).</string>
@@ -293,7 +286,6 @@ Language: nb_NO
     <string name="profile_account_upgraded">Konto oppgradert</string>
     <string name="time_to_skip_seconds">Tid å hoppe over (sekunder)</string>
     <string name="time_to_skip_not_valid">Tid å hoppe over %1$s er ikke gyldig</string>
-    <string name="pocket_casts_play_filter">Avspillingsfilter for Pocket Casts</string>
     <string name="pocket_casts_control_playback">Avspillingskontroll for Pocket Casts</string>
     <string name="settings_select_filters">Velg filtre</string>
     <string name="settings_import_url">Med URL</string>
@@ -306,9 +298,6 @@ Language: nb_NO
     <string name="skip_to_time">Gå til tidspunkt</string>
     <string name="time_to_skip_to_seconds">Tidspunkt å gå til (sekunder)</string>
     <string name="time_to_skip_to_not_valid">Tidspunktet å gå til %1$s er ikke gyldig</string>
-    <string name="must_provide_filter_name">Filternavn må oppgis</string>
-    <string name="filter_x_not_found">Fant ikke filteret %1$s</string>
-    <string name="no_episodes_in_filter_x">Ingen episoder i filteret %1$s</string>
     <string name="must_provide_command_name">Kommandonavn må oppgis</string>
     <string name="command_x_not_valid">Kommandoen %1$s er ikke gyldig</string>
     <string name="playback_command">Avspillingskommando</string>
@@ -437,7 +426,6 @@ Language: nb_NO
     <string name="discover_popular_in">Populær i %s</string>
     <string name="discover_popular">Populær</string>
     <string name="discover_top">Øverst</string>
-    <string name="filters_filter_name">Filternavn</string>
     <string name="episode_short_episode">E%d</string>
     <string name="episode_short_season">S%d</string>
     <string name="episode_short_season_episode">S%1$d E%2$d</string>
@@ -873,7 +861,6 @@ Language: nb_NO
     <string name="profile_stats_time_saved_by">Tid spart ved å</string>
     <string name="profile_stats_skipping">Hopper over</string>
     <string name="profile_stats_since_listened_for">Siden %s har du lyttet for</string>
-    <string name="profile_stats_share_to">Del til …</string>
     <string name="profile_stats_trim_silence">Kutt av stillhet</string>
     <string name="profile_stats_listened_for">Du har lyttet for</string>
     <string name="profile_stats_auto_skipping">Hopp over automatisk</string>

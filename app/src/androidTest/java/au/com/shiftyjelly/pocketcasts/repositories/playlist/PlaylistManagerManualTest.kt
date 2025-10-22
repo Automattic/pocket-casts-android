@@ -781,21 +781,6 @@ class PlaylistManagerManualTest {
                 ),
                 awaitItem(),
             )
-
-            insertPodcast(index = 1)
-            insertPodcastEpisode(index = 2, podcastIndex = 1)
-            assertEquals(
-                listOf(
-                    playlistPreviewForEpisode(index = 0) {
-                        it.copy(episodeCount = 0, hasEpisode = false)
-                    },
-                    playlistPreviewForEpisode(index = 1) {
-                        it.copy(episodeCount = 3, hasEpisode = true, artworkPodcastUuids = listOf("podcast-id-1"))
-                    },
-                    playlistPreviewForEpisode(index = 2),
-                ),
-                awaitItem(),
-            )
         }
     }
 

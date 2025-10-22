@@ -61,10 +61,11 @@ import au.com.shiftyjelly.pocketcasts.playlists.PlaylistsViewModel.UiState
 import au.com.shiftyjelly.pocketcasts.playlists.component.PlaylistPreviewRow
 import au.com.shiftyjelly.pocketcasts.repositories.playlist.ManualPlaylistPreview
 import au.com.shiftyjelly.pocketcasts.repositories.playlist.Playlist
-import au.com.shiftyjelly.pocketcasts.repositories.playlist.Playlist.Type
 import au.com.shiftyjelly.pocketcasts.repositories.playlist.PlaylistPreview
 import au.com.shiftyjelly.pocketcasts.repositories.playlist.SmartPlaylistPreview
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme.ThemeType
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import sh.calvin.reorderable.ReorderableItem
 import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
@@ -72,6 +73,8 @@ import au.com.shiftyjelly.pocketcasts.localization.R as LR
 @Composable
 internal fun PlaylistsPage(
     uiState: UiState,
+    getPreviewMetadataFlow: (String) -> StateFlow<PlaylistPreview.Metadata?>,
+    refreshPreviewMetadata: (String) -> Unit,
     onCreatePlaylist: () -> Unit,
     onDeletePlaylist: (PlaylistPreview) -> Unit,
     onOpenPlaylist: (PlaylistPreview) -> Unit,
@@ -106,6 +109,8 @@ internal fun PlaylistsPage(
 
             PlaylistsContent(
                 playlistsState = uiState.playlists,
+                getPreviewMetadataFlow = getPreviewMetadataFlow,
+                refreshPreviewMetadata = refreshPreviewMetadata,
                 showPremadePlaylistsTooltip = showTooltip,
                 listState = listState,
                 contentPadding = PaddingValues(
@@ -140,8 +145,10 @@ internal fun PlaylistsPage(
 }
 
 @Composable
-private fun ColumnScope.PlaylistsContent(
+private fun PlaylistsContent(
     playlistsState: PlaylistsState,
+    getPreviewMetadataFlow: (String) -> StateFlow<PlaylistPreview.Metadata?>,
+    refreshPreviewMetadata: (String) -> Unit,
     showPremadePlaylistsTooltip: Boolean,
     listState: LazyListState,
     contentPadding: PaddingValues,
@@ -170,6 +177,8 @@ private fun ColumnScope.PlaylistsContent(
                 if (playlists.isNotEmpty()) {
                     PlaylistsColumn(
                         playlists = playlists,
+                        getPreviewMetadataFlow = getPreviewMetadataFlow,
+                        refreshPreviewMetadata = refreshPreviewMetadata,
                         showPremadePlaylistsTooltip = showPremadePlaylistsTooltip,
                         listState = listState,
                         contentPadding = contentPadding,
@@ -200,6 +209,8 @@ private fun ColumnScope.PlaylistsContent(
 @Composable
 private fun PlaylistsColumn(
     playlists: List<PlaylistPreview>,
+    getPreviewMetadataFlow: (String) -> StateFlow<PlaylistPreview.Metadata?>,
+    refreshPreviewMetadata: (String) -> Unit,
     showPremadePlaylistsTooltip: Boolean,
     listState: LazyListState,
     contentPadding: PaddingValues,
@@ -242,6 +253,8 @@ private fun PlaylistsColumn(
 
                 PlaylistPreviewRow(
                     playlist = playlist,
+                    getPreviewMetadataFlow = getPreviewMetadataFlow,
+                    refreshPreviewMetadata = refreshPreviewMetadata,
                     showTooltip = showPremadePlaylistsTooltip && index == displayItems.lastIndex,
                     showDivider = index != displayItems.lastIndex,
                     backgroundColor = backgroundColor,
@@ -369,6 +382,8 @@ private fun PlaylistsPageEmptyStatePreview() {
                 showPremadePlaylistsTooltip = false,
                 miniPlayerInset = 0,
             ),
+            getPreviewMetadataFlow = { MutableStateFlow(null) },
+            refreshPreviewMetadata = {},
             onCreatePlaylist = {},
             onDeletePlaylist = {},
             onOpenPlaylist = {},
@@ -394,6 +409,8 @@ private fun PlaylistsPageEmptyStateNoBannerPreview() {
                 showPremadePlaylistsTooltip = false,
                 miniPlayerInset = 0,
             ),
+            getPreviewMetadataFlow = { MutableStateFlow(null) },
+            refreshPreviewMetadata = {},
             onCreatePlaylist = {},
             onDeletePlaylist = {},
             onOpenPlaylist = {},
@@ -420,16 +437,12 @@ private fun PlaylistPagePreview(
                         ManualPlaylistPreview(
                             uuid = "uuid-0",
                             title = "Playlist 0",
-                            episodeCount = 0,
-                            artworkPodcastUuids = emptyList(),
                             settings = Playlist.Settings.ForPreview,
                             icon = PlaylistIcon(0),
                         ),
                         SmartPlaylistPreview(
                             uuid = "uuid-1",
                             title = "Playlist 1",
-                            episodeCount = 253,
-                            artworkPodcastUuids = emptyList(),
                             settings = Playlist.Settings.ForPreview,
                             smartRules = SmartRules.Default,
                             icon = PlaylistIcon(0),
@@ -441,6 +454,8 @@ private fun PlaylistPagePreview(
                 showPremadePlaylistsTooltip = false,
                 miniPlayerInset = 0,
             ),
+            getPreviewMetadataFlow = { MutableStateFlow(null) },
+            refreshPreviewMetadata = {},
             onCreatePlaylist = {},
             onDeletePlaylist = {},
             onOpenPlaylist = {},
