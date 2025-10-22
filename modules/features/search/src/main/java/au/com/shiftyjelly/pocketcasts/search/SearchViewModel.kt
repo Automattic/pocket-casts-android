@@ -85,7 +85,7 @@ class SearchViewModel @Inject constructor(
                 searchHandler.searchResults.collect {
                     showSearchHistory = false
                     if (_state.value is SearchUiState.OldResults) {
-                        _state.value = SearchUiState.OldResults(operation = it as SearchUiState.SearchOperation<SearchResults.SegregatedResults>)
+                        _state.value = SearchUiState.OldResults(operation = it)
                     }
                     if (!FeatureFlag.isEnabled(Feature.IMPROVED_SEARCH_SUGGESTIONS) && it is SearchUiState.SearchOperation.Loading) {
                         saveSearchTerm(it.searchTerm)
@@ -143,14 +143,22 @@ class SearchViewModel @Inject constructor(
                 ),
             )
             _state.update { state ->
-                (state as SearchUiState.ImprovedResults).copy(
-                    selectedFilterIndex = ResultsFilters.entries.indexOf(filter),
-                    operation = (state.operation as? SearchUiState.SearchOperation.Success)?.let { success ->
-                        success.copy(
-                            results = success.results.copy(filter = filter),
-                        )
-                    } ?: state.operation,
-                )
+                when (state) {
+                    is SearchUiState.ImprovedResults -> {
+                        if (state.operation is SearchUiState.SearchOperation.Success) {
+                            state.copy(
+                                selectedFilterIndex = ResultsFilters.entries.indexOf(filter),
+                                operation = state.operation.copy(
+                                    results = state.operation.results.copy(filter = filter),
+                                ),
+                            )
+                        } else {
+                            state
+                        }
+                    }
+
+                    else -> state
+                }
             }
         }
     }
@@ -315,7 +323,7 @@ sealed interface SearchResults {
                 when (filter) {
                     ResultsFilters.TOP_RESULTS -> true
                     ResultsFilters.EPISODES -> item is ImprovedSearchResultItem.EpisodeItem
-                    ResultsFilters.PODCASTS -> item is ImprovedSearchResultItem.PodcastItem
+                    ResultsFilters.PODCASTS -> item is ImprovedSearchResultItem.PodcastItem || item is ImprovedSearchResultItem.FolderItem
                 }
             }
 

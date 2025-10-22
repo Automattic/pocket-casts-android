@@ -5,9 +5,8 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.itemsIndexed
-import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
@@ -30,12 +29,13 @@ fun SearchResultFilters(
     selectedIndex: Int,
     onFilterSelect: (Int) -> Unit,
     modifier: Modifier = Modifier,
+    fadeConfig: FadeConfig = FadeConfig.Default.copy(
+        showStartFade = false,
+        showEndFade = true,
+    ),
 ) {
     FadedLazyRow(
-        fadeConfig = FadeConfig.Default.copy(
-            showStartFade = false,
-            showEndFade = true,
-        ),
+        fadeConfig = fadeConfig,
         modifier = modifier,
         horizontalArrangement = Arrangement.spacedBy(8.dp),
     ) {
@@ -61,21 +61,21 @@ private fun SearchFilterPill(
     TextH40(
         text = title,
         modifier = modifier
-            .clip(RoundedCornerShape(100))
+            .clip(CircleShape)
             .then(
                 if (isSelected) {
                     Modifier.background(
                         color = MaterialTheme.theme.colors.primaryInteractive01,
-                        shape = RoundedCornerShape(100),
+                        shape = CircleShape,
                     )
                 } else {
                     Modifier.border(
                         width = 1.dp,
                         color = MaterialTheme.theme.colors.primaryIcon02,
-                        shape = RoundedCornerShape(100),
+                        shape = CircleShape,
                     ).background(
                         color = MaterialTheme.colors.background,
-                        shape = RoundedCornerShape(100),
+                        shape = CircleShape,
                     )
                 },
             )

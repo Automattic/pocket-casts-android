@@ -34,7 +34,7 @@ class ImprovedSearchManagerImpl @Inject constructor(
                     uuid = it.uuid,
                     title = it.title,
                     author = it.author.orEmpty(),
-                    isFollowed = false, // to be determined later
+                    isFollowed = false,
                 )
                 is CombinedResult.EpisodeResult -> ImprovedSearchResultItem.EpisodeItem(
                     uuid = it.uuid,

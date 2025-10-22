@@ -204,7 +204,7 @@ class SearchHandler @Inject constructor(
                 val suggestions = buildList {
                     addAll(remoteResults.filterIsInstance<SearchAutoCompleteItem.Term>())
                     addAll(localResults)
-                    addAll(remoteResults.filter { it !is SearchAutoCompleteItem.Term }.filter { onlyRemote || !subscribedUuids.contains((it as? SearchAutoCompleteItem.Podcast)?.uuid.orEmpty()) })
+                    addAll(remoteResults.filter { (it !is SearchAutoCompleteItem.Term) && (onlyRemote || !subscribedUuids.contains((it as? SearchAutoCompleteItem.Podcast)?.uuid.orEmpty())) })
                 }
 
                 autoComplete.copy(
@@ -356,7 +356,7 @@ class SearchHandler @Inject constructor(
                                 it
                             }
                         }
-                        val combinedResults = (localResults + apiResults).distinctBy { it.uuid }
+                        val combinedResults = (localResults + apiResults).distinctBy { it::class to it.uuid }
                         emit(SearchUiState.SearchOperation.Success(searchTerm = query, results = SearchResults.ImprovedResults(results = combinedResults, filter = ResultsFilters.TOP_RESULTS)))
                     }
                 }.catch {

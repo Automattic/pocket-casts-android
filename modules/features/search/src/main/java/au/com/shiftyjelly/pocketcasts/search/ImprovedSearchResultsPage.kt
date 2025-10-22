@@ -176,7 +176,7 @@ private fun ImprovedSearchResultsView(
                 }
             }
 
-            if (index < state.results.results.lastIndex) {
+            if (index < state.results.filteredResults.lastIndex) {
                 item {
                     HorizontalDivider(dividerModifier)
                 }
