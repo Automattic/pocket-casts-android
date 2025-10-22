@@ -70,6 +70,9 @@ class PlaylistViewModel @AssistedInject constructor(
     private val _showSettingsSignal = MutableSharedFlow<Unit>()
     val showSettingsSignal = _showSettingsSignal.asSharedFlow()
 
+    private val _upNextSavedAsPlaylistSignal = MutableSharedFlow<Unit>()
+    val upNextSavedAsPlaylistSignal = _upNextSavedAsPlaylistSignal.asSharedFlow()
+
     val searchState = SearchFieldState()
 
     private val playlistFlow = searchState.textFlow.flatMapLatest { searchTerm ->
@@ -111,7 +114,7 @@ class PlaylistViewModel @AssistedInject constructor(
 
     private var saveUpNextJob: Job? = null
 
-    fun saveUpNextAsPlaylists(upNextTranslation: String) {
+    fun saveUpNextAsPlaylist(upNextTranslation: String) {
         if (saveUpNextJob?.isActive == true) {
             return
         }
@@ -139,6 +142,7 @@ class PlaylistViewModel @AssistedInject constructor(
                 val name = if (index == 0) baseName else "$baseName (${index + 1})"
                 playlistManager.createManualPlaylistWithEpisodes(name, episodes)
             }
+            _upNextSavedAsPlaylistSignal.emit(Unit)
         }
     }
 

@@ -117,6 +117,7 @@ class PlaylistFragment :
         binding.setupToolbar()
         binding.setupChromeCast()
         binding.setupSettings()
+        setupUpNextSavedAsPlaylist()
         return binding.root
     }
 
@@ -164,6 +165,19 @@ class PlaylistFragment :
             viewModel.showSettingsSignal
                 .flowWithLifecycle(viewLifecycleOwner.lifecycle)
                 .collect { openSettings() }
+        }
+    }
+
+    private fun setupUpNextSavedAsPlaylist() {
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewModel.upNextSavedAsPlaylistSignal
+                .flowWithLifecycle(viewLifecycleOwner.lifecycle)
+                .collect {
+                    val hostListener = requireActivity() as FragmentHostListener
+                    Snackbar.make(hostListener.snackBarView(), getString(LR.string.up_next_saved_as_playlist_message), Snackbar.LENGTH_LONG)
+                        .setAction(LR.string.view) { hostListener.closeFiltersToRoot() }
+                        .show()
+                }
         }
     }
 

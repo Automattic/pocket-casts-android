@@ -234,6 +234,8 @@
     <string name="your_podcasts">Your Podcasts</string>
     <string name="unavailable">Unavailable</string>
     <string name="browse_shows">Browse Shows</string>
+    <!-- View as a verb.  -->
+    <string name="view">View</string>
 
     <string name="multiselect_actions_shown">Shortcut in toolbar</string>
     <string name="multiselect_actions_hidden">In overflow</string>
@@ -1045,6 +1047,7 @@
     <string name="smart_rule_starred_label">Starred Episodes</string>
     <string name="smart_rules">Smart Rules</string>
     <string name="smart_rules_description">Set up Smart Rules to automatically add episodes to your Smart Playlist.</string>
+    <string name="up_next_saved_as_playlist_message">Up Next saved as a playlist</string>
 
     <!-- Profile -->
 

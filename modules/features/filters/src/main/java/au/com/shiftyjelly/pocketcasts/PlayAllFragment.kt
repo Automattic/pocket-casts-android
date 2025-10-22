@@ -68,7 +68,7 @@ internal class PlayAllFragment : BaseDialogFragment() {
         ) {
             PlayAllPage(
                 onSaveQueue = {
-                    viewModel.saveUpNextAsPlaylists(getString(LR.string.up_next))
+                    viewModel.saveUpNextAsPlaylist(getString(LR.string.up_next))
                     viewModel.playAll()
                     dismiss()
                 },
