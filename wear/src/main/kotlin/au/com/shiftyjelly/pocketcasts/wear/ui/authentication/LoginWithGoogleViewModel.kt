@@ -64,6 +64,7 @@ class LoginWithGoogleViewModel @Inject constructor(
                 runCatching {
                     val googleIdOption: GetGoogleIdOption = GetGoogleIdOption.Builder()
                         .setFilterByAuthorizedAccounts(false)
+                        .setRequestVerifiedPhoneNumber(false)
                         .setServerClientId(Settings.GOOGLE_SIGN_IN_SERVER_CLIENT_ID)
                         .setNonce(UUID.randomUUID().toString())
                         .build()
