@@ -26,9 +26,8 @@ class SmartRulesEditor @AssistedInject constructor(
     @Assisted scope: CoroutineScope,
     @Assisted initialBuilder: RulesBuilder,
     @Assisted initialAppliedRules: AppliedRules,
+    @Assisted val podcastSearchState: SearchFieldState,
 ) {
-    val podcastSearchState = SearchFieldState()
-
     private val _builderFlow = MutableStateFlow(initialBuilder)
     val builderFlow = _builderFlow.asStateFlow()
 
@@ -224,6 +223,7 @@ class SmartRulesEditor @AssistedInject constructor(
             scope: CoroutineScope,
             initialBuilder: RulesBuilder,
             initialAppliedRules: AppliedRules,
+            podcastSearchState: SearchFieldState,
         ): SmartRulesEditor
     }
 }

@@ -74,7 +74,7 @@ internal class EditRulesFragment : BaseDialogFragment() {
                     followedPodcasts = uiState.followedPodcasts,
                     starredEpisodeCount = uiState.starredEpisodeCount,
                     useEpisodeArtwork = uiState.useEpisodeArtwork,
-                    podcastSearchState = viewModel.podcastSearchState?.textState ?: rememberTextFieldState(),
+                    podcastSearchState = viewModel.podcastSearchState.textState,
                     isPlaylistPreviewShown = uiState.areSmartRulesEdited,
                     navController = navController,
                     listener = listener,

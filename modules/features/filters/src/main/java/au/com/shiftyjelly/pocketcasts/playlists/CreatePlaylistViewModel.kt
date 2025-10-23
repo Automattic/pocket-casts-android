@@ -6,6 +6,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
+import au.com.shiftyjelly.pocketcasts.compose.text.SearchFieldState
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.to.PlaylistEpisode
 import au.com.shiftyjelly.pocketcasts.models.type.SmartRules
@@ -55,6 +56,7 @@ class CreatePlaylistViewModel @AssistedInject constructor(
         scope = viewModelScope,
         initialBuilder = RulesBuilder.Empty,
         initialAppliedRules = AppliedRules.Empty,
+        podcastSearchState = SearchFieldState(),
     )
 
     val podcastSearchState get() = rulesEditor.podcastSearchState

@@ -4,6 +4,7 @@ import androidx.compose.foundation.text.input.setTextAndSelectAll
 import androidx.compose.ui.text.TextRange
 import app.cash.turbine.test
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
+import au.com.shiftyjelly.pocketcasts.compose.text.SearchFieldState
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.type.SmartRules.DownloadStatusRule
 import au.com.shiftyjelly.pocketcasts.models.type.SmartRules.EpisodeDurationRule
@@ -33,7 +34,6 @@ import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Rule
 import org.junit.Test
-import org.mockito.kotlin.any
 import org.mockito.kotlin.anyOrNull
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
@@ -49,7 +49,12 @@ class CreatePlaylistViewModelTest {
     private val viewModel = CreatePlaylistViewModel(
         playlistManager = playlistManager,
         rulesEditorFactory = object : SmartRulesEditor.Factory {
-            override fun create(scope: CoroutineScope, initialBuilder: RulesBuilder, initialAppliedRules: AppliedRules): SmartRulesEditor {
+            override fun create(
+                scope: CoroutineScope,
+                initialBuilder: RulesBuilder,
+                initialAppliedRules: AppliedRules,
+                podcastSearchState: SearchFieldState,
+            ): SmartRulesEditor {
                 return SmartRulesEditor(
                     playlistManager = playlistManager,
                     podcastManager = mock {
@@ -58,6 +63,7 @@ class CreatePlaylistViewModelTest {
                     scope = scope,
                     initialBuilder = initialBuilder,
                     initialAppliedRules = initialAppliedRules,
+                    podcastSearchState = podcastSearchState,
                 )
             }
         },
