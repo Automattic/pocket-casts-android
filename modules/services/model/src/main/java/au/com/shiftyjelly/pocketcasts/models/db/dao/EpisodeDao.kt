@@ -297,8 +297,10 @@ abstract class EpisodeDao {
         LEFT JOIN podcasts ON podcast_episodes.podcast_id = podcasts.uuid
         WHERE last_playback_interaction_date IS NOT NULL
           AND last_playback_interaction_date > 0
-          AND (UPPER(podcast_episodes.title) LIKE '%' || UPPER(:query) || '%'  ESCAPE '\'
-               OR UPPER(podcasts.title) LIKE '%' || UPPER(:query) || '%'  ESCAPE '\')
+          AND (
+            podcast_episodes.cleanTitle LIKE '%' || :query || '%'  ESCAPE '\'
+            OR podcasts.title LIKE '%' || :query || '%'  ESCAPE '\'
+          )
         ORDER BY last_playback_interaction_date DESC
         LIMIT 100
     """,

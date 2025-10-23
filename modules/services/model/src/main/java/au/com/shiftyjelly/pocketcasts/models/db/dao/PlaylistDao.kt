@@ -29,7 +29,6 @@ import au.com.shiftyjelly.pocketcasts.models.type.PlaylistEpisodeSortType.Oldest
 import au.com.shiftyjelly.pocketcasts.models.type.PlaylistEpisodeSortType.ShortestToLongest
 import au.com.shiftyjelly.pocketcasts.models.type.SmartRules
 import au.com.shiftyjelly.pocketcasts.utils.extensions.escapeLike
-import au.com.shiftyjelly.pocketcasts.utils.extensions.unidecode
 import java.time.Clock
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
@@ -97,7 +96,7 @@ abstract class PlaylistDao {
           AND (
             -- trim isn't really needed because we trim in the application logic but it helps with tests
             TRIM(:searchTerm) IS '' 
-            OR playlist.title LIKE '%' || :searchTerm || '%' ESCAPE '\' COLLATE NOCASE
+            OR playlist.clean_title LIKE '%' || :searchTerm || '%' ESCAPE '\'
           )
         ORDER BY
           sortPosition ASC
@@ -145,7 +144,7 @@ abstract class PlaylistDao {
         updateNameInternal(
             uuid = uuid,
             name = name,
-            cleanName = name.unidecode(),
+            cleanName = name
         )
     }
 
@@ -317,8 +316,8 @@ abstract class PlaylistDao {
             WHEN :includeInFolders IS NOT 0 THEN 1 
             ELSE folder.deleted IS NOT 0
           END)
-          AND podcast.title LIKE '%' || :searchTerm || '%' ESCAPE '\' COLLATE NOCASE
-        ORDER BY podcast.title ASC
+          AND podcast.clean_title LIKE '%' || :searchTerm || '%' ESCAPE '\'
+        ORDER BY podcast.clean_title ASC
     """,
     )
     internal abstract suspend fun getAllPodcastPlaylistSources(
@@ -333,8 +332,8 @@ abstract class PlaylistDao {
         WHERE
           podcast.subscribed IS NOT 0
           AND podcast.folder_uuid IS (:folderUuid)
-          AND podcast.title LIKE '%' || :searchTerm || '%' ESCAPE '\' COLLATE NOCASE
-        ORDER BY podcast.title ASC
+          AND podcast.clean_title LIKE '%' || :searchTerm || '%' ESCAPE '\'
+        ORDER BY podcast.clean_title ASC
     """,
     )
     protected abstract suspend fun getPodcastPlaylistSourcesForFolderUnsafe(
@@ -370,7 +369,7 @@ abstract class PlaylistDao {
               AND podcast.folder_uuid IS folder.uuid
           ) > 0 
           AND (
-            folder.name LIKE '%' || :searchTerm || '%' ESCAPE '\' COLLATE NOCASE 
+            folder.clean_name LIKE '%' || :searchTerm || '%' ESCAPE '\' 
             OR (
               SELECT 
                 COUNT(*) 
@@ -379,11 +378,11 @@ abstract class PlaylistDao {
               WHERE 
                 podcast.subscribed IS NOT 0 
                 AND podcast.folder_uuid IS folder.uuid 
-                AND podcast.title LIKE '%' || :searchTerm || '%' ESCAPE '\' COLLATE NOCASE
+                AND podcast.clean_title LIKE '%' || :searchTerm || '%' ESCAPE '\'
             )
           ) 
         ORDER BY 
-          folder.name ASC
+          folder.clean_name ASC
     """,
     )
     internal abstract suspend fun getFolderPartialPlaylistSources(
@@ -423,11 +422,11 @@ abstract class PlaylistDao {
             FROM manual_playlist_episodes AS manual_episode
             WHERE manual_episode.playlist_uuid IS :playlistUuid AND manual_episode.podcast_uuid IS :podcastUuid
           )
-          AND episode.title LIKE '%' || :searchTerm || '%' ESCAPE '\' COLLATE NOCASE
+          AND episode.cleanTitle LIKE '%' || :searchTerm || '%' ESCAPE '\'
         ORDER BY
           episode.published_date DESC,
           episode.added_date DESC,
-          episode.title ASC
+          episode.cleanTitle ASC
     """,
     )
     protected abstract fun notAddedManualEpisodesFlowUnsafe(
@@ -563,8 +562,8 @@ abstract class PlaylistDao {
           AND (
             -- trim isn't really needed because we trim in the application logic but it helps with tests
             TRIM(:searchTerm) IS '' 
-            OR podcast.title LIKE '%' || :searchTerm || '%' ESCAPE '\' COLLATE NOCASE
-            OR podcast_episode.title LIKE '%' || :searchTerm || '%' ESCAPE '\' COLLATE NOCASE
+            OR podcast.clean_title LIKE '%' || :searchTerm || '%' ESCAPE '\'
+            OR podcast_episode.cleanTitle LIKE '%' || :searchTerm || '%' ESCAPE '\'
           )
         ORDER BY
           -- newest to oldest
@@ -631,9 +630,9 @@ abstract class PlaylistDao {
                 append(smartRules.toSqlWhereClause(clock))
                 if (escapedTerm != null) {
                     append(" AND (")
-                    append("episode.title LIKE '%' || '$escapedTerm' || '%' ESCAPE '\\' COLLATE NOCASE")
+                    append("episode.cleanTitle LIKE '%' || '$escapedTerm' || '%' ESCAPE '\\'")
                     append(" OR ")
-                    append("podcast.title LIKE '%' || '$escapedTerm' || '%' ESCAPE '\\' COLLATE NOCASE")
+                    append("podcast.clean_title LIKE '%' || '$escapedTerm' || '%' ESCAPE '\\'")
                     append(')')
                 }
             },
