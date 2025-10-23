@@ -215,7 +215,7 @@ private fun PodcastsColumn(
     modifier: Modifier = Modifier,
 ) {
     val listState = rememberLazyListState()
-    LaunchedEffect(podcasts.map { it.uuid }) {
+    LaunchedEffect(podcasts) {
         listState.scrollToItem(0)
     }
 
