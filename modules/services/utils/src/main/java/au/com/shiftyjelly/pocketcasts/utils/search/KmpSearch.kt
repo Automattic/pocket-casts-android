@@ -1,6 +1,6 @@
 package au.com.shiftyjelly.pocketcasts.utils.search
 
-import au.com.shiftyjelly.pocketcasts.utils.extensions.removeAccents
+import java.text.Normalizer
 
 fun String.kmpSearch(pattern: String): List<Int> {
     return KmpSearch(pattern).search(this)
@@ -82,5 +82,13 @@ private class KmpSearch(
         }
     }
 
-    private fun String.sanitize() = removeAccents().lowercase().toCharArray()
+    private fun String.sanitize() = removeAccents().toCharArray()
 }
+
+private val nfdDecomposedCharacters = """\p{Mn}+""".toRegex()
+
+private fun String.removeAccents() = Normalizer.normalize(this, Normalizer.Form.NFD)
+    .replace(nfdDecomposedCharacters, "")
+    .replace("\u0141", "L") // Remove L with stroke
+    .replace("\u0142", "l") // Remove l with stroke
+    .lowercase()

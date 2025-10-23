@@ -2,11 +2,11 @@ package au.com.shiftyjelly.pocketcasts.utils.extensions
 
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import java.security.MessageDigest
-import java.text.Normalizer
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
 import java.util.TimeZone
+import net.gcardone.junidecode.Junidecode
 import timber.log.Timber
 
 fun String.escapeLike(escapeChar: Char) = replace("$escapeChar", "$escapeChar$escapeChar")
@@ -70,10 +70,23 @@ fun String.removeNewLines(): String {
     return this.replace("[\n\r]".toRegex(), "")
 }
 
-fun String.removeAccents() = Normalizer.normalize(this, Normalizer.Form.NFD)
-    .replace("\\p{Mn}+".toRegex(), "")
-    .replace("\u0141", "L") // Remove L with stroke
-    .replace("\u0142", "l") // Remove l with stroke
+fun String.unidecode() = buildString {
+    val decoded = Junidecode.unidecode(this@unidecode)
+
+    var shouldAppendWhitespace = false
+    for (character in decoded) {
+        if (!character.isWhitespace()) {
+            append(character.lowercaseChar())
+            shouldAppendWhitespace = true
+        } else if (shouldAppendWhitespace) {
+            append(' ')
+            shouldAppendWhitespace = false
+        }
+    }
+    if (lastOrNull() == ' ') {
+        deleteCharAt(lastIndex)
+    }
+}
 
 fun String.sha1(): String? = hashString("SHA-1")
 fun String.sha256(): String? = hashString("SHA-256")

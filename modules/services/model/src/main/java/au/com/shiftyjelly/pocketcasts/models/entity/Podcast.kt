@@ -2,7 +2,6 @@ package au.com.shiftyjelly.pocketcasts.models.entity
 
 import android.content.Context
 import android.content.res.Resources
-import android.graphics.Color
 import android.text.format.DateUtils
 import androidx.core.graphics.toColorInt
 import androidx.room.ColumnInfo
@@ -20,6 +19,7 @@ import au.com.shiftyjelly.pocketcasts.models.to.PlaybackEffects
 import au.com.shiftyjelly.pocketcasts.models.to.PodcastGrouping
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodesSortType
 import au.com.shiftyjelly.pocketcasts.models.type.TrimMode
+import au.com.shiftyjelly.pocketcasts.utils.extensions.unidecode
 import java.io.Serializable
 import java.net.MalformedURLException
 import java.net.URL
@@ -146,6 +146,11 @@ data class Podcast(
         const val AUTO_DOWNLOAD_OFF = 0
         const val AUTO_DOWNLOAD_NEW_EPISODES = 1
     }
+
+    @ColumnInfo(name = "clean_title")
+    var cleanTitle: String = ""
+        get() = title.unidecode()
+        internal set
 
     @Transient
     @Ignore
