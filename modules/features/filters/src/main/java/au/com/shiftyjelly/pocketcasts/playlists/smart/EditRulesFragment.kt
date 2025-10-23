@@ -7,6 +7,8 @@ import android.view.ViewGroup
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.text.input.clearText
+import androidx.compose.foundation.text.input.rememberTextFieldState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -72,6 +74,7 @@ internal class EditRulesFragment : BaseDialogFragment() {
                     followedPodcasts = uiState.followedPodcasts,
                     starredEpisodeCount = uiState.starredEpisodeCount,
                     useEpisodeArtwork = uiState.useEpisodeArtwork,
+                    podcastSearchState = viewModel.podcastSearchState?.textState ?: rememberTextFieldState(),
                     isPlaylistPreviewShown = uiState.areSmartRulesEdited,
                     navController = navController,
                     listener = listener,
@@ -135,6 +138,7 @@ internal class EditRulesFragment : BaseDialogFragment() {
                 if (currentRoute != newRoute) {
                     currentRoute = newRoute
                     viewModel.clearTransientRules()
+                    viewModel.podcastSearchState?.textState?.clearText()
                 }
             }
         }

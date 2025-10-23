@@ -33,6 +33,8 @@ import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Rule
 import org.junit.Test
+import org.mockito.kotlin.any
+import org.mockito.kotlin.anyOrNull
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
 
@@ -51,7 +53,7 @@ class CreatePlaylistViewModelTest {
                 return SmartRulesEditor(
                     playlistManager = playlistManager,
                     podcastManager = mock {
-                        on { findSubscribedFlow() } doReturn followedPodcasts
+                        on { findSubscribedFlow(anyOrNull()) } doReturn followedPodcasts
                     },
                     scope = scope,
                     initialBuilder = initialBuilder,

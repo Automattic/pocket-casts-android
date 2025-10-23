@@ -38,6 +38,8 @@ class EditRulesViewModel @AssistedInject constructor(
 ) : ViewModel() {
     private var rulesEditor: SmartRulesEditor? = null
 
+    val podcastSearchState get() = rulesEditor?.podcastSearchState
+
     private val areSmartRulesEditedFlow = MutableStateFlow(false)
 
     val uiState = flow {

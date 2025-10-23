@@ -57,6 +57,8 @@ class CreatePlaylistViewModel @AssistedInject constructor(
         initialAppliedRules = AppliedRules.Empty,
     )
 
+    val podcastSearchState get() = rulesEditor.podcastSearchState
+
     val uiState = combine(
         rulesEditor.rulesFlow,
         rulesEditor.builderFlow,

@@ -144,7 +144,7 @@ abstract class PlaylistDao {
         updateNameInternal(
             uuid = uuid,
             name = name,
-            cleanName = name
+            cleanName = name,
         )
     }
 

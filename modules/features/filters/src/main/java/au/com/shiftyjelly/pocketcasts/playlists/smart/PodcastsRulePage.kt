@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
@@ -18,12 +19,16 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.selection.toggleable
+import androidx.compose.foundation.text.input.TextFieldState
+import androidx.compose.foundation.text.input.rememberTextFieldState
 import androidx.compose.material.Checkbox
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Switch
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -42,6 +47,8 @@ import au.com.shiftyjelly.pocketcasts.compose.AppThemeWithBackground
 import au.com.shiftyjelly.pocketcasts.compose.PreviewRegularDevice
 import au.com.shiftyjelly.pocketcasts.compose.components.FadedLazyColumn
 import au.com.shiftyjelly.pocketcasts.compose.components.PodcastImageDeprecated
+import au.com.shiftyjelly.pocketcasts.compose.components.SearchBar
+import au.com.shiftyjelly.pocketcasts.compose.components.SearchBarStyle
 import au.com.shiftyjelly.pocketcasts.compose.components.TextH30
 import au.com.shiftyjelly.pocketcasts.compose.components.TextH40
 import au.com.shiftyjelly.pocketcasts.compose.components.TextH60
@@ -49,6 +56,7 @@ import au.com.shiftyjelly.pocketcasts.compose.components.TextP50
 import au.com.shiftyjelly.pocketcasts.compose.preview.ThemePreviewParameterProvider
 import au.com.shiftyjelly.pocketcasts.compose.theme
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
+import au.com.shiftyjelly.pocketcasts.transcripts.SearchState
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme.ThemeType
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
@@ -62,6 +70,7 @@ internal fun PodcastsRulePage(
     onDeselectPodcast: (String) -> Unit,
     onSaveRule: () -> Unit,
     modifier: Modifier = Modifier,
+    searchState: TextFieldState = rememberTextFieldState(),
 ) {
     RulePage(
         title = stringResource(LR.string.filters_choose_podcasts),
@@ -76,8 +85,13 @@ internal fun PodcastsRulePage(
                 useAllPodcasts = useAllPodcasts,
                 onChangeUseAllPodcasts = onChangeUseAllPodcasts,
             )
-            Spacer(
-                modifier = Modifier.height(12.dp),
+            SearchBar(
+                state = searchState,
+                placeholder = stringResource(LR.string.search),
+                style = SearchBarStyle.Small,
+                modifier = Modifier
+                    .padding(horizontal = 16.dp, vertical = 12.dp)
+                    .fillMaxWidth(),
             )
             PodcastsColumn(
                 useAllPodcasts = useAllPodcasts,
@@ -196,9 +210,16 @@ private fun PodcastsColumn(
     bottomPadding: Dp,
     modifier: Modifier = Modifier,
 ) {
+    val listState = rememberLazyListState()
+    LaunchedEffect(podcasts.map { it.uuid }) {
+        listState.scrollToItem(0)
+    }
+
     val alpha by animateFloatAsState(if (useAllPodcasts) 0.4f else 1f)
+
     FadedLazyColumn(
         contentPadding = PaddingValues(bottom = bottomPadding),
+        state = listState,
         modifier = modifier.alpha(alpha),
     ) {
         items(podcasts) { podcast ->
