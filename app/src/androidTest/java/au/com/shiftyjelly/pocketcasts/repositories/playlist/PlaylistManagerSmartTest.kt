@@ -201,6 +201,7 @@ class PlaylistManagerSmartTest {
                 )
             },
         )
+        expectRearrangeTooltipNotSet()
     }
 
     @Test
@@ -222,6 +223,7 @@ class PlaylistManagerSmartTest {
                 )
             },
         )
+        expectRearrangeTooltipNotSet()
     }
 
     @Test
@@ -618,5 +620,14 @@ class PlaylistManagerSmartTest {
             }
             assertEquals(40.seconds, awaitItem()?.metadata?.playbackDurationLeft)
         }
+    }
+
+    @Test
+    fun setReorderPlaylistsTooltip() = dsl.test {
+        expectRearrangeTooltipNotSet()
+
+        manager.createSmartPlaylist(playlistDraft(index = 0))
+
+        expectRearrangeTooltipSet()
     }
 }

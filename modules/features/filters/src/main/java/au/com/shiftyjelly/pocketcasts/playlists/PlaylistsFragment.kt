@@ -73,7 +73,7 @@ class PlaylistsFragment :
                 },
                 onFreeAccountBannerDismiss = viewModel::dismissFreeAccountBanner,
                 onShowPremadePlaylistsTooltip = viewModel::trackTooltipShown,
-                onDismissPremadePlaylistsTooltip = viewModel::dismissPremadePlaylistsTooltip,
+                onDismissTooltip = viewModel::dismissTooltip,
             )
         }
 

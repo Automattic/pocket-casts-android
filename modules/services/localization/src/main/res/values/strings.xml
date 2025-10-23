@@ -1024,6 +1024,8 @@
     <string name="podcast_not_in_playlists">Not included in any Smart Playlists</string>
     <string name="premade_playlists_tooltip_body">We made these to help you get started.\nThey auto-update based on your listening.</string>
     <string name="premade_playlists_tooltip_title">Smart Playlists, ready to go</string>
+    <string name="rearrange_playlists_tooltip_body">Press and hold a playlist to move it.</string>
+    <string name="rearrange_playlists_tooltip_title">Reorder your playlists</string>
     <!-- %1$s is playlist's title -->
     <string name="preview_playlist">Preview %1$s</string>
     <string name="save_smart_rule">Save Smart Rule</string>

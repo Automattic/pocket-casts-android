@@ -82,11 +82,12 @@ internal fun PlaylistPreviewRow(
     getEpisodeCountFlow: (String) -> StateFlow<Int?>,
     refreshArtworkUuids: suspend (String) -> Unit,
     refreshEpisodeCount: suspend (String) -> Unit,
-    showTooltip: Boolean,
+    showPremadeTooltip: Boolean,
+    showRearrangeTooltip: Boolean,
+    onDismissTooltip: (PlaylistTooltip) -> Unit,
     showDivider: Boolean,
     onClick: () -> Unit,
     onDelete: () -> Unit,
-    onClickTooltip: () -> Unit,
     modifier: Modifier = Modifier,
     backgroundColor: Color = MaterialTheme.theme.colors.primaryUi01,
 ) {
@@ -219,7 +220,7 @@ internal fun PlaylistPreviewRow(
                         podcastUuids = artworkUuids.orEmpty(),
                         artworkSize = 56.dp,
                     )
-                    if (showTooltip) {
+                    if (showPremadeTooltip) {
                         TooltipPopup(
                             title = stringResource(LR.string.premade_playlists_tooltip_title),
                             body = stringResource(LR.string.premade_playlists_tooltip_body),
@@ -228,7 +229,7 @@ internal fun PlaylistPreviewRow(
                             maxWidth = 400.dp,
                             elevation = 8.dp,
                             anchorOffset = DpOffset(x = (-8).dp, y = 4.dp),
-                            onClick = onClickTooltip,
+                            onClick = { onDismissTooltip(PlaylistTooltip.Premade) },
                         )
                     }
                 }
@@ -255,20 +256,38 @@ internal fun PlaylistPreviewRow(
                     text = episodeCount?.toString().orEmpty(),
                     color = MaterialTheme.theme.colors.primaryText02,
                 )
-                Image(
-                    painter = painterResource(IR.drawable.ic_chevron_small_right),
-                    contentDescription = null,
-                    colorFilter = ColorFilter.tint(MaterialTheme.theme.colors.primaryText02),
-                    modifier = Modifier
-                        .padding(3.dp)
-                        .size(24.dp),
-                )
+                Box {
+                    Image(
+                        painter = painterResource(IR.drawable.ic_chevron_small_right),
+                        contentDescription = null,
+                        colorFilter = ColorFilter.tint(MaterialTheme.theme.colors.primaryText02),
+                        modifier = Modifier
+                            .padding(3.dp)
+                            .size(24.dp),
+                    )
+                    if (showRearrangeTooltip) {
+                        TooltipPopup(
+                            title = stringResource(LR.string.rearrange_playlists_tooltip_title),
+                            body = stringResource(LR.string.rearrange_playlists_tooltip_body),
+                            tipPosition = TipPosition.TopEnd,
+                            maxWidthFraction = 0.75f,
+                            maxWidth = 400.dp,
+                            elevation = 8.dp,
+                            onClick = { onDismissTooltip(PlaylistTooltip.Rearrange) },
+                        )
+                    }
+                }
             }
             if (showDivider) {
                 HorizontalDivider(startIndent = 16.dp)
             }
         }
     }
+}
+
+internal enum class PlaylistTooltip {
+    Premade,
+    Rearrange,
 }
 
 private enum class SwipeToDeleteAnchor {
@@ -306,11 +325,12 @@ private fun PlaylistPreviewRowPreview(
                 getEpisodeCountFlow = { MutableStateFlow(null) },
                 refreshArtworkUuids = {},
                 refreshEpisodeCount = {},
-                showTooltip = false,
+                showPremadeTooltip = false,
+                showRearrangeTooltip = false,
+                onDismissTooltip = {},
                 showDivider = true,
                 onClick = {},
                 onDelete = {},
-                onClickTooltip = {},
                 modifier = Modifier.fillMaxWidth(),
             )
             PlaylistPreviewRow(
@@ -324,11 +344,12 @@ private fun PlaylistPreviewRowPreview(
                 getEpisodeCountFlow = { MutableStateFlow(1) },
                 refreshArtworkUuids = {},
                 refreshEpisodeCount = {},
-                showTooltip = false,
+                showPremadeTooltip = false,
+                showRearrangeTooltip = false,
+                onDismissTooltip = {},
                 showDivider = true,
                 onClick = {},
                 onDelete = {},
-                onClickTooltip = {},
                 modifier = Modifier.fillMaxWidth(),
             )
             PlaylistPreviewRow(
@@ -343,11 +364,12 @@ private fun PlaylistPreviewRowPreview(
                 getEpisodeCountFlow = { MutableStateFlow(null) },
                 refreshArtworkUuids = {},
                 refreshEpisodeCount = {},
-                showTooltip = false,
+                showPremadeTooltip = false,
+                showRearrangeTooltip = false,
+                onDismissTooltip = {},
                 showDivider = false,
                 onClick = {},
                 onDelete = {},
-                onClickTooltip = {},
                 modifier = Modifier.fillMaxWidth(),
             )
         }
