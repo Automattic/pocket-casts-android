@@ -7,6 +7,9 @@ import androidx.credentials.CustomCredential
 import androidx.credentials.GetCredentialRequest
 import androidx.credentials.GetPasswordOption
 import androidx.credentials.PasswordCredential
+import androidx.credentials.exceptions.GetCredentialCancellationException
+import androidx.credentials.exceptions.GetCredentialException
+import androidx.credentials.exceptions.GetCredentialInterruptedException
 import androidx.credentials.exceptions.NoCredentialException
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -32,6 +35,7 @@ import kotlinx.coroutines.launch
 class LoginWithGoogleViewModel @Inject constructor(
     private val podcastManager: PodcastManager,
     private val syncManager: SyncManager,
+    private val credentialRequest: GetCredentialRequest,
     @ApplicationContext context: Context,
 ) : ViewModel() {
 
@@ -45,6 +49,7 @@ class LoginWithGoogleViewModel @Inject constructor(
         sealed interface Failed : State {
             data object GoogleLoginUnavailable : Failed
             data class CredentialError(val exception: Throwable) : Failed
+            data object Cancelled : Failed
             data object Other : Failed
         }
     }
@@ -63,20 +68,8 @@ class LoginWithGoogleViewModel @Inject constructor(
         if (isGoogleSignInAvailable) {
             viewModelScope.launch {
                 runCatching {
-                    val googleIdOption: GetGoogleIdOption = GetGoogleIdOption.Builder()
-                        .setFilterByAuthorizedAccounts(false)
-                        .setRequestVerifiedPhoneNumber(false)
-                        .setServerClientId(Settings.GOOGLE_SIGN_IN_SERVER_CLIENT_ID)
-                        .setNonce(UUID.randomUUID().toString())
-                        .build()
-
-                    val request: GetCredentialRequest = GetCredentialRequest.Builder()
-                        .addCredentialOption(googleIdOption)
-                        .addCredentialOption(GetPasswordOption())
-                        .build()
-
                     val result = credentialManager.getCredential(
-                        request = request,
+                        request = credentialRequest,
                         context = activity,
                     )
                     val credential = result.credential
@@ -99,12 +92,14 @@ class LoginWithGoogleViewModel @Inject constructor(
                                 _state.value = State.Failed.Other
                             }
                         }
+
                         is PasswordCredential -> {
                             signInWithPassword(
                                 email = credential.id,
                                 password = credential.password,
                             )
                         }
+
                         else -> {
                             LogBuffer.e(LogBuffer.TAG_INVALID_STATE, "Failed to sign in with Google One Tap")
                             _state.value = State.Failed.Other
@@ -112,10 +107,12 @@ class LoginWithGoogleViewModel @Inject constructor(
                     }
                 }.onFailure {
                     LogBuffer.e(LogBuffer.TAG_CRASH, it, "Unable to sign in with Google One Tap")
-                    _state.value = if (it is NoCredentialException) {
-                        State.Failed.GoogleLoginUnavailable
-                    } else {
-                        State.Failed.CredentialError(it)
+                    _state.value = when (it) {
+                        is NoCredentialException -> State.Failed.GoogleLoginUnavailable
+                        is GetCredentialCancellationException,
+                        is GetCredentialInterruptedException -> State.Failed.Cancelled
+
+                        else -> State.Failed.CredentialError(it)
                     }
                 }
             }
@@ -132,6 +129,7 @@ class LoginWithGoogleViewModel @Inject constructor(
             is LoginResult.Success -> {
                 podcastManager.refreshPodcastsAfterSignIn()
             }
+
             is LoginResult.Failed -> {
                 LogBuffer.i(LogBuffer.TAG_BACKGROUND_TASKS, "Failed to login with Google: ${loginResult.message}")
                 _state.value = State.Failed.Other
@@ -148,6 +146,7 @@ class LoginWithGoogleViewModel @Inject constructor(
             is LoginResult.Success -> {
                 podcastManager.refreshPodcastsAfterSignIn()
             }
+
             is LoginResult.Failed -> {
                 LogBuffer.i(LogBuffer.TAG_BACKGROUND_TASKS, "Failed to login with email and password: ${loginResult.message}")
                 _state.value = State.Failed.Other

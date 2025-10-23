@@ -83,9 +83,9 @@ fun NavGraphBuilder.authenticationNavGraph(
             LaunchedEffect(activity, showErrorToastMessage) {
                 showErrorToastMessage?.let {
                     Toast.makeText(activity, it, Toast.LENGTH_SHORT).show()
+                    delay(500L)
+                    navController.popBackStack()
                 }
-                delay(500L)
-                navController.popBackStack()
             }
 
             val defaultErrorMessage = stringResource(LR.string.onboarding_continue_with_google_error)
@@ -100,6 +100,9 @@ fun NavGraphBuilder.authenticationNavGraph(
                 onGoogleNotAvailable = {
                     showErrorToastMessage = defaultErrorMessage
                 },
+                onCancelled = {
+                    navController.popBackStack()
+                }
             )
         }
     }
