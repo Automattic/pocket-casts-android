@@ -29,6 +29,7 @@ import au.com.shiftyjelly.pocketcasts.models.type.PlaylistEpisodeSortType.Oldest
 import au.com.shiftyjelly.pocketcasts.models.type.PlaylistEpisodeSortType.ShortestToLongest
 import au.com.shiftyjelly.pocketcasts.models.type.SmartRules
 import au.com.shiftyjelly.pocketcasts.utils.extensions.escapeLike
+import au.com.shiftyjelly.pocketcasts.utils.extensions.unidecode
 import java.time.Clock
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
@@ -144,7 +145,7 @@ abstract class PlaylistDao {
         updateNameInternal(
             uuid = uuid,
             name = name,
-            cleanName = name,
+            cleanName = name.unidecode(),
         )
     }
 
