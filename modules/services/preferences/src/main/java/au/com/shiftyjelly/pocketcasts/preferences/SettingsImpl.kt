@@ -114,7 +114,7 @@ class SettingsImpl @Inject constructor(
 
     override val upNextShuffle: UserSetting<Boolean> = UserSetting.BoolPref(
         sharedPrefKey = "upNextShuffle",
-        defaultValue = true,
+        defaultValue = false,
         sharedPrefs = sharedPreferences,
     )
 
