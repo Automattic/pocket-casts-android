@@ -299,7 +299,7 @@ abstract class EpisodeDao {
           AND last_playback_interaction_date > 0
           AND (
             podcast_episodes.cleanTitle LIKE '%' || :query || '%'  ESCAPE '\'
-            OR podcasts.title LIKE '%' || :query || '%'  ESCAPE '\'
+            OR podcasts.clean_title LIKE '%' || :query || '%'  ESCAPE '\'
           )
         ORDER BY last_playback_interaction_date DESC
         LIMIT 100
