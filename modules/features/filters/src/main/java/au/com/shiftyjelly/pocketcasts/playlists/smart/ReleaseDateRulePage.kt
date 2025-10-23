@@ -26,13 +26,11 @@ internal fun ReleaseDateRulePage(
     selectedRule: ReleaseDateRule,
     onSelectReleaseDate: (ReleaseDateRule) -> Unit,
     onSaveRule: () -> Unit,
-    onClickBack: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     RulePage(
         title = stringResource(LR.string.filters_release_date),
         onSaveRule = onSaveRule,
-        onClickBack = onClickBack,
         modifier = modifier,
     ) { bottomPadding ->
         Column(
@@ -72,7 +70,6 @@ private fun ReleaseDateRulePreview(
             selectedRule = rule,
             onSelectReleaseDate = { rule = it },
             onSaveRule = {},
-            onClickBack = {},
         )
     }
 }

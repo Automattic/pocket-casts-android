@@ -26,13 +26,11 @@ class PlaylistsViewModel @Inject constructor(
         .map { UiState.Loaded(playlists = it) }
         .stateIn(viewModelScope, SharingStarted.Lazily, UiState.Loading)
 
-    fun getPreviewMetadataFlow(playlistUuid: String): StateFlow<PlaylistPreview.Metadata?> {
-        return playlistManager.getPreviewMetadataFlow(playlistUuid)
+    fun getArtworkUuidsFlow(playlistUuid: String): StateFlow<List<String>?> {
+        return playlistManager.getArtworkUuidsFlow(playlistUuid)
     }
 
-    fun refreshPreviewMetadata(playlistUuid: String) {
-        viewModelScope.launch {
-            playlistManager.refreshPreviewMetadata(playlistUuid)
-        }
+    suspend fun refreshArtworkUuids(playlistUuid: String) {
+        playlistManager.refreshArtworkUuids(playlistUuid)
     }
 }

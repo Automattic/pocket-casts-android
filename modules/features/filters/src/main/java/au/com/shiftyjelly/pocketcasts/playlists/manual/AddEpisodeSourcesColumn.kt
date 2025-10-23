@@ -44,6 +44,7 @@ import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 @Composable
 internal fun AddEpisodeSourcesColumn(
+    title: String,
     sources: List<ManualPlaylistEpisodeSource>?,
     noContentData: NoContentData,
     onClickSource: (ManualPlaylistEpisodeSource) -> Unit,
@@ -62,7 +63,7 @@ internal fun AddEpisodeSourcesColumn(
         if (!sources.isNullOrEmpty()) {
             item(key = "header", contentType = "header") {
                 TextH30(
-                    text = stringResource(LR.string.your_podcasts),
+                    text = title,
                     modifier = Modifier.padding(start = 16.dp, bottom = 8.dp),
                 )
             }
@@ -195,6 +196,7 @@ private fun BaseSourceRow(
 private fun EpisodeSourcesEmptyPreview() {
     AppThemeWithBackground(ThemeType.LIGHT) {
         AddEpisodeSourcesColumn(
+            title = "Your podcasts",
             sources = emptyList(),
             NoContentData(
                 title = "No podcasts found",
@@ -214,6 +216,7 @@ private fun EpisodeSourcesColumnPreview(
 ) {
     AppThemeWithBackground(themeType) {
         AddEpisodeSourcesColumn(
+            title = "Your podcasts",
             sources = listOf(
                 ManualPlaylistPodcastSource(
                     uuid = "id-1",

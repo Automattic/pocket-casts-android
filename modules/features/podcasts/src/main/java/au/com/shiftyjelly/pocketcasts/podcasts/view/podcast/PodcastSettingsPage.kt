@@ -42,8 +42,8 @@ internal fun PodcastSettingsPage(
     podcastTitle: String,
     toolbarColors: ToolbarColors,
     uiState: PodcastSettingsViewModel.UiState?,
-    getPreviewMetadataFlow: (String) -> StateFlow<PlaylistPreview.Metadata?>,
-    refreshPreviewMetadata: (String) -> Unit,
+    getArtworkUuidsFlow: (String) -> StateFlow<List<String>?>,
+    refreshArtworkUuids: suspend (String) -> Unit,
     onChangeNotifications: (Boolean) -> Unit,
     onChangeAutoDownload: (Boolean) -> Unit,
     onChangeAddToUpNext: (Boolean) -> Unit,
@@ -185,8 +185,8 @@ internal fun PodcastSettingsPage(
                 }
                 PodcastSettingsPlaylistsPage(
                     uiState = uiState,
-                    getPreviewMetadataFlow = getPreviewMetadataFlow,
-                    refreshPreviewMetadata = refreshPreviewMetadata,
+                    getArtworkUuidsFlow = getArtworkUuidsFlow,
+                    refreshArtworkUuids = refreshArtworkUuids,
                     onAddPodcastToPlaylists = onAddPodcastToPlaylists,
                     onRemovePodcastFromPlaylists = onRemovePodcastFromPlaylists,
                 )

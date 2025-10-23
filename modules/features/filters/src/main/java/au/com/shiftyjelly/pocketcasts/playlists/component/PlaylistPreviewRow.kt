@@ -78,8 +78,10 @@ import au.com.shiftyjelly.pocketcasts.localization.R as LR
 @Composable
 internal fun PlaylistPreviewRow(
     playlist: PlaylistPreview,
-    getPreviewMetadataFlow: (String) -> StateFlow<PlaylistPreview.Metadata?>,
-    refreshPreviewMetadata: (String) -> Unit,
+    getArtworkUuidsFlow: (String) -> StateFlow<List<String>?>,
+    getEpisodeCountFlow: (String) -> StateFlow<Int?>,
+    refreshArtworkUuids: suspend (String) -> Unit,
+    refreshEpisodeCount: suspend (String) -> Unit,
     showTooltip: Boolean,
     showDivider: Boolean,
     onClick: () -> Unit,
@@ -88,12 +90,20 @@ internal fun PlaylistPreviewRow(
     modifier: Modifier = Modifier,
     backgroundColor: Color = MaterialTheme.theme.colors.primaryUi01,
 ) {
-    val metadata by remember(playlist.uuid) {
-        getPreviewMetadataFlow(playlist.uuid)
+    val artworkUuids by remember(playlist.uuid) {
+        getArtworkUuidsFlow(playlist.uuid)
     }.collectAsState()
 
-    LaunchedEffect(playlist.uuid, refreshPreviewMetadata) {
-        refreshPreviewMetadata(playlist.uuid)
+    val episodeCount by remember(playlist.uuid) {
+        getEpisodeCountFlow(playlist.uuid)
+    }.collectAsState()
+
+    LaunchedEffect(playlist.uuid, refreshArtworkUuids) {
+        refreshArtworkUuids(playlist.uuid)
+    }
+
+    LaunchedEffect(playlist.uuid, refreshEpisodeCount) {
+        refreshEpisodeCount(playlist.uuid)
     }
 
     Box(
@@ -206,7 +216,7 @@ internal fun PlaylistPreviewRow(
             ) {
                 Box {
                     PlaylistArtwork(
-                        podcastUuids = metadata?.artworkPodcastUuids.orEmpty(),
+                        podcastUuids = artworkUuids.orEmpty(),
                         artworkSize = 56.dp,
                     )
                     if (showTooltip) {
@@ -242,7 +252,7 @@ internal fun PlaylistPreviewRow(
                     modifier = Modifier.width(16.dp),
                 )
                 TextP50(
-                    text = metadata?.episodeCount?.toString().orEmpty(),
+                    text = episodeCount?.toString().orEmpty(),
                     color = MaterialTheme.theme.colors.primaryText02,
                 )
                 Image(
@@ -292,8 +302,10 @@ private fun PlaylistPreviewRowPreview(
                     smartRules = SmartRules.Default,
                     icon = PlaylistIcon(0),
                 ),
-                getPreviewMetadataFlow = { MutableStateFlow(null) },
-                refreshPreviewMetadata = {},
+                getArtworkUuidsFlow = { MutableStateFlow(null) },
+                getEpisodeCountFlow = { MutableStateFlow(null) },
+                refreshArtworkUuids = {},
+                refreshEpisodeCount = {},
                 showTooltip = false,
                 showDivider = true,
                 onClick = {},
@@ -308,15 +320,10 @@ private fun PlaylistPreviewRowPreview(
                     settings = Playlist.Settings.ForPreview,
                     icon = PlaylistIcon(0),
                 ),
-                getPreviewMetadataFlow = {
-                    MutableStateFlow(
-                        PlaylistPreview.Metadata(
-                            episodeCount = 1,
-                            artworkPodcastUuids = listOf("podcast-uuid-1"),
-                        ),
-                    )
-                },
-                refreshPreviewMetadata = {},
+                getArtworkUuidsFlow = { MutableStateFlow(listOf("id-1")) },
+                getEpisodeCountFlow = { MutableStateFlow(1) },
+                refreshArtworkUuids = {},
+                refreshEpisodeCount = {},
                 showTooltip = false,
                 showDivider = true,
                 onClick = {},
@@ -332,15 +339,10 @@ private fun PlaylistPreviewRowPreview(
                     smartRules = SmartRules.Default,
                     icon = PlaylistIcon(0),
                 ),
-                getPreviewMetadataFlow = {
-                    MutableStateFlow(
-                        PlaylistPreview.Metadata(
-                            episodeCount = 1,
-                            artworkPodcastUuids = List(4) { "podcast-uuid-$it" },
-                        ),
-                    )
-                },
-                refreshPreviewMetadata = {},
+                getArtworkUuidsFlow = { MutableStateFlow(List(4) { "id-$it" }) },
+                getEpisodeCountFlow = { MutableStateFlow(null) },
+                refreshArtworkUuids = {},
+                refreshEpisodeCount = {},
                 showTooltip = false,
                 showDivider = false,
                 onClick = {},

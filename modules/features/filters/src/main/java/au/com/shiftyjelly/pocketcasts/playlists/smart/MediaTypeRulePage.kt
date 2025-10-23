@@ -26,13 +26,11 @@ internal fun MediaTypeRulePage(
     selectedRule: MediaTypeRule,
     onSelectMediaType: (MediaTypeRule) -> Unit,
     onSaveRule: () -> Unit,
-    onClickBack: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     RulePage(
         title = stringResource(LR.string.filters_chip_media_type),
         onSaveRule = onSaveRule,
-        onClickBack = onClickBack,
         modifier = modifier,
     ) { bottomPadding ->
         Column(
@@ -69,7 +67,6 @@ private fun MediaTypeRulePreview(
             selectedRule = rule,
             onSelectMediaType = { rule = it },
             onSaveRule = {},
-            onClickBack = {},
         )
     }
 }
