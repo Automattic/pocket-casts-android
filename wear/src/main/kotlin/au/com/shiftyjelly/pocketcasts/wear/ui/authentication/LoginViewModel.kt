@@ -32,14 +32,12 @@ class LoginViewModel @Inject constructor(
             val isGoogleSignInAvailable = Settings.GOOGLE_SIGN_IN_SERVER_CLIENT_ID.isNotEmpty()
 
             if (isGoogleSignInAvailable && Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
-                viewModelScope.launch {
-                    runCatching {
-                        credentialManager.prepareGetCredential(
-                            request = credentialRequest,
-                        )
-                    }.getOrNull()
-                    onFinish()
-                }
+                runCatching {
+                    credentialManager.prepareGetCredential(
+                        request = credentialRequest,
+                    )
+                }.getOrNull()
+                onFinish()
             }
         }
     }
