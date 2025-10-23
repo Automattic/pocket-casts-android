@@ -2,7 +2,6 @@ package au.com.shiftyjelly.pocketcasts.search
 
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
-import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
 import au.com.shiftyjelly.pocketcasts.repositories.searchhistory.SearchHistoryManager
 import au.com.shiftyjelly.pocketcasts.sharedtest.MainCoroutineRule
@@ -14,10 +13,8 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.Mock
 import org.mockito.junit.MockitoJUnitRunner
-import org.mockito.kotlin.mock
 import org.mockito.kotlin.never
 import org.mockito.kotlin.verify
-import org.mockito.kotlin.whenever
 
 @OptIn(ExperimentalCoroutinesApi::class)
 @RunWith(MockitoJUnitRunner::class)
@@ -34,16 +31,12 @@ class SearchViewModelTest {
     @Mock
     private lateinit var podcastManager: PodcastManager
 
-    @Mock
-    private lateinit var episodeManager: EpisodeManager
-
     private lateinit var viewModel: SearchViewModel
 
     @Before
     fun setUp() {
-        whenever(searchHandler.searchResults).thenReturn(mock())
         viewModel =
-            SearchViewModel(searchHandler, searchHistoryManager, podcastManager, AnalyticsTracker.test(), episodeManager)
+            SearchViewModel(searchHandler, searchHistoryManager, podcastManager, AnalyticsTracker.test())
     }
 
     @Test

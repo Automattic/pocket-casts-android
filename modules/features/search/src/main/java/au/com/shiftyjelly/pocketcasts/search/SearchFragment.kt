@@ -11,7 +11,9 @@ import android.view.View
 import android.view.ViewGroup
 import android.view.inputmethod.EditorInfo
 import androidx.appcompat.widget.SearchView
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.size
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
@@ -169,7 +171,7 @@ class SearchFragment : BaseFragment() {
             is SearchHistoryEntry.Podcast -> listener?.onSearchPodcastClick(entry.uuid, SourceView.SEARCH)
             is SearchHistoryEntry.SearchTerm -> {
                 binding?.let {
-                    viewModel.selectSuggestion(entry.term)
+                    viewModel.runSearchOnTerm(entry.term)
                     it.searchView.setQuery(entry.term, true)
                     it.searchHistoryPanel.hide()
                     UiUtil.hideKeyboard(it.searchView)
@@ -203,7 +205,9 @@ class SearchFragment : BaseFragment() {
             setHintTextColor(context.getThemeColor(hintColor))
             setOnEditorActionListener { _, actionId, event ->
                 if (actionId == EditorInfo.IME_ACTION_SEARCH || actionId == EditorInfo.IME_ACTION_DONE || (event.action == KeyEvent.ACTION_DOWN && event.keyCode == KeyEvent.KEYCODE_ENTER)) {
-                    viewModel.selectSuggestion(searchView.query.toString())
+                    viewModel.runSearchOnTerm(searchView.query.toString())
+                    binding.searchHistoryPanel.hide()
+                    UiUtil.hideKeyboard(searchView)
                     true
                 } else {
                     false
@@ -232,7 +236,7 @@ class SearchFragment : BaseFragment() {
             viewModel.state
                 .scan<SearchUiState, Pair<SearchUiState?, SearchUiState?>>(null to null) { acc, value -> acc.second to value }
                 .drop(1)
-                .filter { (previous, next) -> previous is SearchUiState.Suggestions && next is SearchUiState.Results }
+                .filter { (previous, next) -> previous is SearchUiState.Suggestions && (next is SearchUiState.OldResults || next is SearchUiState.ImprovedResults) }
                 .mapNotNull { (_, next) -> next?.searchTerm }
                 .collect {
                     if (it != searchView.query) {
@@ -254,7 +258,7 @@ class SearchFragment : BaseFragment() {
                 val characterCount = query.length
                 val lowerCaseSearch = query.lowercase()
                 if ((characterCount == 1 && lowerCaseSearch.startsWith("h")) || (characterCount == 2 && lowerCaseSearch.startsWith("ht")) || (characterCount == 3 && lowerCaseSearch.startsWith("htt")) || lowerCaseSearch.startsWith("http")) {
-                    if (((viewModel.state.value as? SearchUiState.Results)?.operation as? SearchUiState.SearchOperation.Success)?.results?.podcasts?.isNotEmpty() == true) {
+                    if (((viewModel.state.value as? SearchUiState.OldResults)?.operation as? SearchUiState.SearchOperation.Success)?.results?.podcasts?.isNotEmpty() == true) {
                         binding.searchHistoryPanel.hide()
                     }
                     return true
@@ -308,6 +312,7 @@ class SearchFragment : BaseFragment() {
                             onTermClick = { viewModel.selectSuggestion(it.term) },
                             onPodcastClick = { onPodcastClick(SearchHistoryEntry.fromAutoCompletePodcast(it), it.isSubscribed) },
                             onPodcastFollow = { viewModel.onSubscribeToPodcast(it.uuid) },
+                            onFolderClick = { onFolderClick(SearchHistoryEntry.fromAutoCompleteFolder(it)) },
                             onEpisodeClick = {},
                             playButtonListener = playButtonListener,
                             onScroll = { UiUtil.hideKeyboard(searchView) },
@@ -325,25 +330,25 @@ class SearchFragment : BaseFragment() {
             setContentWithViewCompositionStrategy {
                 val bottomInset by settings.bottomInset.collectAsStateWithLifecycle(initialValue = 0)
                 val state by viewModel.state.collectAsState()
-                (state as? SearchUiState.Results)?.let { results ->
-                    AppThemeWithBackground(theme.activeTheme) {
-                        if (FeatureFlag.isEnabled(Feature.IMPROVED_SEARCH_RESULTS)) {
+                AppThemeWithBackground(theme.activeTheme) {
+                    when (val state = state) {
+                        is SearchUiState.ImprovedResults ->
                             ImprovedSearchResultsPage(
-                                state = results,
+                                state = state,
                                 loading = state.isLoading,
-                                onEpisodeClick = ::onEpisodeClick,
-                                onPodcastClick = { onPodcastClick(SearchHistoryEntry.fromPodcast(it), it.isSubscribed) },
+                                onEpisodeClick = { onEpisodeClick(episode = SearchHistoryEntry.fromImprovedEpisodeResult(it)) },
+                                onPodcastClick = { onPodcastClick(SearchHistoryEntry.fromImprovedPodcastResult(it), it.isFollowed) },
                                 onFolderClick = ::onFolderClick,
-                                onFollowPodcast = ::onSubscribeToPodcast,
+                                onFollowPodcast = { viewModel.onSubscribeToPodcast(it.uuid) },
                                 playButtonListener = playButtonListener,
-                                fetchEpisode = viewModel::fetchEpisode,
                                 onScroll = { UiUtil.hideKeyboard(searchView) },
                                 bottomInset = bottomInset.pxToDp(LocalContext.current).dp,
                                 onFilterSelect = viewModel::selectFilter,
                             )
-                        } else {
+
+                        is SearchUiState.OldResults ->
                             SearchInlineResultsPage(
-                                state = results,
+                                state = state,
                                 loading = state.isLoading,
                                 onEpisodeClick = ::onEpisodeClick,
                                 onPodcastClick = { onPodcastClick(SearchHistoryEntry.fromPodcast(it), it.isSubscribed) },
@@ -353,22 +358,26 @@ class SearchFragment : BaseFragment() {
                                 onScroll = { UiUtil.hideKeyboard(searchView) },
                                 bottomInset = bottomInset.pxToDp(LocalContext.current).dp,
                             )
-                        }
+
+                        else -> Spacer(modifier = Modifier.size(0.dp))
                     }
                 }
-                binding.searchInlineResults.isVisible = state is SearchUiState.Results && !state.searchTerm.isNullOrBlank()
+                binding.searchInlineResults.isVisible = (state is SearchUiState.OldResults || state is SearchUiState.ImprovedResults) && !state.searchTerm.isNullOrBlank()
             }
         }
     }
 
     private fun onEpisodeClick(episodeItem: EpisodeItem) {
+        onEpisodeClick(SearchHistoryEntry.fromEpisode(episodeItem.toEpisode(), episodeItem.podcastTitle))
+    }
+
+    private fun onEpisodeClick(episode: SearchHistoryEntry.Episode) {
         viewModel.trackSearchResultTapped(
             source = source,
-            uuid = episodeItem.uuid,
+            uuid = episode.uuid,
             type = SearchResultType.EPISODE,
         )
-        val episode = episodeItem.toEpisode()
-        searchHistoryViewModel.add(SearchHistoryEntry.fromEpisode(episode, episodeItem.podcastTitle))
+        searchHistoryViewModel.add(episode)
         listener?.onSearchEpisodeClick(
             episodeUuid = episode.uuid,
             podcastUuid = episode.podcastUuid,
@@ -397,12 +406,16 @@ class SearchFragment : BaseFragment() {
     }
 
     private fun onFolderClick(folder: Folder, podcasts: List<Podcast>) {
+        onFolderClick(SearchHistoryEntry.fromFolder(folder, podcasts.map { it.uuid }))
+    }
+
+    private fun onFolderClick(folder: SearchHistoryEntry.Folder) {
         viewModel.trackSearchResultTapped(
             source = source,
             uuid = folder.uuid,
             type = SearchResultType.FOLDER,
         )
-        searchHistoryViewModel.add(SearchHistoryEntry.fromFolder(folder, podcasts.map { it.uuid }))
+        searchHistoryViewModel.add(folder)
         listener?.onSearchFolderClick(folder.uuid)
         binding?.searchView?.let { UiUtil.hideKeyboard(it) }
     }
