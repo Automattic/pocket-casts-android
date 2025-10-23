@@ -75,10 +75,10 @@ fun String.unidecode() = buildString {
 
     var shouldAppendWhitespace = false
     for (character in decoded) {
-        if (!character.isWhitespace()) {
+        if (character.isLetterOrDigit()) {
             append(character.lowercaseChar())
             shouldAppendWhitespace = true
-        } else if (shouldAppendWhitespace) {
+        } else if (character.isWhitespace() && shouldAppendWhitespace) {
             append(' ')
             shouldAppendWhitespace = false
         }

@@ -79,10 +79,24 @@ class UnidecodeTest {
     }
 
     @Test
+    fun `accept only letters or digits`() {
+        val input = "!(, word …-+=? and numbers 11 231 |\\/*&^"
+
+        assertEquals("word and numbers 11 231", input.unidecode())
+    }
+
+    @Test
     fun `collapse whitespace`() {
         val input = "  \t\nthis   is \n\t an example \n\t      "
 
         assertEquals("this is an example", input.unidecode())
+    }
+
+    @Test
+    fun `collapse accents`() {
+        val input = "It's you're l`accent"
+
+        assertEquals("its youre laccent", input.unidecode())
     }
 
     private fun assertDecoding(input: Map<List<String>, String>) {
