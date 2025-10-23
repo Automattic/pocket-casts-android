@@ -15,6 +15,7 @@ import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.navigation
 import androidx.wear.compose.navigation.composable
+import kotlinx.coroutines.delay
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 const val AUTHENTICATION_SUB_GRAPH = "authentication_graph"
@@ -83,6 +84,8 @@ fun NavGraphBuilder.authenticationNavGraph(
                 showErrorToastMessage?.let {
                     Toast.makeText(activity, it, Toast.LENGTH_SHORT).show()
                 }
+                delay(500L)
+                navController.popBackStack()
             }
 
             val defaultErrorMessage = stringResource(LR.string.onboarding_continue_with_google_error)
@@ -93,11 +96,9 @@ fun NavGraphBuilder.authenticationNavGraph(
                 },
                 onError = {
                     showErrorToastMessage = it?.toString() ?: defaultErrorMessage
-                    navController.popBackStack()
                 },
                 onGoogleNotAvailable = {
                     showErrorToastMessage = defaultErrorMessage
-                    navController.popBackStack()
                 },
             )
         }

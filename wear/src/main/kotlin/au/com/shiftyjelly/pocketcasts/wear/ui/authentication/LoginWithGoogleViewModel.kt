@@ -44,6 +44,7 @@ class LoginWithGoogleViewModel @Inject constructor(
 
         sealed interface Failed : State {
             data object GoogleLoginUnavailable : Failed
+            data class CredentialError(val exception: Throwable) : Failed
             data object Other : Failed
         }
     }
@@ -114,7 +115,7 @@ class LoginWithGoogleViewModel @Inject constructor(
                     _state.value = if (it is NoCredentialException) {
                         State.Failed.GoogleLoginUnavailable
                     } else {
-                        State.Failed.Other
+                        State.Failed.CredentialError(it)
                     }
                 }
             }

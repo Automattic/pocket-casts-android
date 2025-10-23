@@ -8,7 +8,7 @@ import au.com.shiftyjelly.pocketcasts.compose.CallOnce
 
 @Composable
 fun LoginWithGoogleScreen(
-    onError: () -> Unit,
+    onError: (t: Throwable?) -> Unit,
     onGoogleNotAvailable: () -> Unit,
     viewModel: LoginWithGoogleViewModel = hiltViewModel(),
     successContent: @Composable (LoginWithGoogleViewModel.State.SignedInWithGoogle) -> Unit,
@@ -19,12 +19,13 @@ fun LoginWithGoogleScreen(
     CallOnce {
         activity?.let {
             viewModel.tryCredentialsManager(activity)
-        } ?: onError()
+        } ?: onError(null)
     }
 
     when (state) {
         is LoginWithGoogleViewModel.State.Failed.GoogleLoginUnavailable -> onGoogleNotAvailable()
-        is LoginWithGoogleViewModel.State.Failed.Other -> onError()
+        is LoginWithGoogleViewModel.State.Failed.CredentialError -> onError(state.exception)
+        is LoginWithGoogleViewModel.State.Failed.Other -> onError(null)
         is LoginWithGoogleViewModel.State.SignedInWithGoogle -> {
             successContent(state)
         }
