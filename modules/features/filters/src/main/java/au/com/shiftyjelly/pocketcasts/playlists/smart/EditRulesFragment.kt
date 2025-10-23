@@ -58,7 +58,7 @@ internal class EditRulesFragment : BaseDialogFragment() {
             val navController = rememberNavController()
             val listener = rememberNavigationListener()
 
-            ClearTransientRulesStateEffect(navController)
+            ClearTransientStateEffect(navController)
 
             AnimatedNonNullVisibility(
                 item = viewModel.uiState.collectAsState().value,
@@ -130,7 +130,7 @@ internal class EditRulesFragment : BaseDialogFragment() {
     }
 
     @Composable
-    private fun ClearTransientRulesStateEffect(navController: NavController) {
+    private fun ClearTransientStateEffect(navController: NavController) {
         var currentRoute by rememberSaveable { mutableStateOf<String?>(null) }
         LaunchedEffect(navController) {
             navController.currentBackStackEntryFlow.collect { entry ->
