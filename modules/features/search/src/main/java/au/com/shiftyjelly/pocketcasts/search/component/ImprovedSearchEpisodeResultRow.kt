@@ -10,6 +10,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -84,7 +85,7 @@ class ImprovedEpisodeRowViewModel @Inject constructor(
 
     fun getEpisodeFlow(episodeUuid: String, podcastUuid: String): StateFlow<RowState> {
         return episodeFlowCache.getOrPut(EpisodeKey(episodeUuid, podcastUuid)) {
-            val flow = combine<BaseEpisode, PlaybackState, RowState>(
+            val flow = combine<PodcastEpisode, PlaybackState, RowState>(
                 podcastManager.findOrDownloadPodcastRxSingle(podcastUuid)
                     .toObservable().asFlow()
                     .flatMapLatest { ep ->
@@ -97,10 +98,30 @@ class ImprovedEpisodeRowViewModel @Inject constructor(
                         PlaybackState()
                     }
                 }.distinctUntilChanged(),
-            ) { episode, playbackState -> RowState.Loaded(episode, playbackState) }
-                .catch {
-                    emit(RowState.Error(it))
+            ) { episode, playbackState ->
+                val changedEpisode = episode.copy(
+                    playedUpToModified = if (playbackState.episodeUuid == episodeUuid) {
+                        System.currentTimeMillis()
+                    } else {
+                        episode.playedUpToModified
+                    }
+                ).also {
+                    it.playing = playbackState.episodeUuid == episodeUuid && playbackState.state == PlaybackState.State.PLAYING
+                    it.playedUpToMs = if (playbackState.episodeUuid == episodeUuid) {
+                        playbackState.positionMs
+                    } else {
+                        episode.playedUpToMs
+                    }
+                    it.durationMs = if (playbackState.episodeUuid == episodeUuid) {
+                        playbackState.durationMs
+                    } else {
+                        episode.durationMs
+                    }
                 }
+                RowState.Loaded(changedEpisode)
+            }.catch {
+                emit(RowState.Error(it))
+            }
             flow.stateIn(viewModelScope, SharingStarted.WhileSubscribed(stopTimeoutMillis = 300, replayExpirationMillis = 300), initialValue = RowState.Idle)
         }
     }
@@ -109,7 +130,6 @@ class ImprovedEpisodeRowViewModel @Inject constructor(
         data object Idle : RowState
         data class Loaded(
             val episode: BaseEpisode,
-            val playbackState: PlaybackState,
         ) : RowState
 
         data class Error(val error: Throwable?) : RowState
@@ -170,7 +190,7 @@ private fun ImprovedSearchEpisodeResultRow(
     rowStateFlow: (String, String) -> StateFlow<ImprovedEpisodeRowViewModel.RowState>,
     modifier: Modifier = Modifier,
 ) {
-    val state = rowStateFlow(episodeUuid, podcastUuid).collectAsState().value
+    val state by rowStateFlow(episodeUuid, podcastUuid).collectAsState()
 
     Row(
         modifier = modifier
@@ -221,7 +241,7 @@ private fun ImprovedSearchEpisodeResultRow(
                 maxLines = 1,
             )
         }
-        when (state) {
+        when (val state = state) {
             is ImprovedEpisodeRowViewModel.RowState.Loaded -> {
                 val buttonColor = MaterialTheme.theme.colors.primaryInteractive01.toArgb()
                 AndroidView(
@@ -232,23 +252,9 @@ private fun ImprovedSearchEpisodeResultRow(
                         }
                     },
                     update = { playButton ->
-                        val theEpisode = state.episode.apply {
-                            playing = state.playbackState.episodeUuid == episodeUuid && state.playbackState.state == PlaybackState.State.PLAYING
-                            playingStatus = state.episode.playingStatus
-                            playedUpToMs = if (state.playbackState.episodeUuid == episodeUuid) {
-                                state.playbackState.positionMs
-                            } else {
-                                state.episode.playedUpToMs
-                            }
-                            durationMs = if (state.playbackState.episodeUuid == episodeUuid) {
-                                state.playbackState.durationMs
-                            } else {
-                                state.episode.durationMs
-                            }
-                        }
-                        val buttonType = PlayButton.calculateButtonType(theEpisode, true)
+                        val buttonType = PlayButton.calculateButtonType(state.episode, true)
                         playButton.setButtonType(
-                            episode = theEpisode,
+                            episode = state.episode,
                             buttonType = buttonType,
                             color = buttonColor,
                             fromListUuid = null,
