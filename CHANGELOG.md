@@ -1,6 +1,8 @@
 7.101
 -----
-
+*   Updates
+    *   Improved login experience on WearOS
+        ([#4631](https://github.com/Automattic/pocket-casts-android/pull/4631))
 
 7.100
 -----
