@@ -2,6 +2,7 @@
 
 package au.com.shiftyjelly.pocketcasts.wear.ui.authentication
 
+import android.os.Build
 import android.widget.Toast
 import androidx.activity.compose.LocalActivity
 import androidx.compose.runtime.Composable
@@ -23,6 +24,7 @@ const val AUTHENTICATION_SUB_GRAPH = "authentication_graph"
 private object AuthenticationNavRoutes {
     const val LOGIN_SCREEN = "login_screen"
     const val LOGIN_WITH_GOOGLE = "login_with_google"
+    const val LOGIN_WITH_GOOGLE_LEGACY = "login_with_google_legacy"
     const val LOGIN_WITH_PHONE = "login_with_phone"
     const val LOGIN_WITH_EMAIL = "login_with_email"
 }
@@ -46,7 +48,12 @@ fun NavGraphBuilder.authenticationNavGraph(
         ) {
             LoginScreen(
                 onLoginWithGoogleClick = {
-                    navController.navigate(AuthenticationNavRoutes.LOGIN_WITH_GOOGLE)
+                    val route = if (Build.VERSION.SDK_INT > Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
+                        AuthenticationNavRoutes.LOGIN_WITH_GOOGLE
+                    } else {
+                        AuthenticationNavRoutes.LOGIN_WITH_GOOGLE_LEGACY
+                    }
+                    navController.navigate(route)
                 },
                 onLoginWithPhoneClick = {
                     navController.navigate(AuthenticationNavRoutes.LOGIN_WITH_PHONE)
@@ -87,7 +94,6 @@ fun NavGraphBuilder.authenticationNavGraph(
                     navController.popBackStack()
                 }
             }
-
             val defaultErrorMessage = stringResource(LR.string.onboarding_continue_with_google_error)
 
             LoginWithGoogleScreen(
@@ -103,6 +109,17 @@ fun NavGraphBuilder.authenticationNavGraph(
                 onCancel = {
                     navController.popBackStack()
                 },
+            )
+        }
+
+        composable(
+            route = AuthenticationNavRoutes.LOGIN_WITH_GOOGLE_LEGACY,
+        ) {
+            LegacyLoginWithGoogleScreen(
+                signInSuccessScreen = {
+                    googleSignInSuccessScreen(GoogleAccountData(name = it?.givenName.orEmpty(), avatarUrl = it?.photoUrl?.toString()))
+                },
+                onCancel = { navController.popBackStack() },
             )
         }
     }
