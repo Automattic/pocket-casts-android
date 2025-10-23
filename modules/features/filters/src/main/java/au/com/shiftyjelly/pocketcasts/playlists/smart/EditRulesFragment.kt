@@ -138,7 +138,7 @@ internal class EditRulesFragment : BaseDialogFragment() {
                 if (currentRoute != newRoute) {
                     currentRoute = newRoute
                     viewModel.clearTransientRules()
-                    viewModel.podcastSearchState?.textState?.clearText()
+                    viewModel.podcastSearchState.textState.clearText()
                 }
             }
         }
