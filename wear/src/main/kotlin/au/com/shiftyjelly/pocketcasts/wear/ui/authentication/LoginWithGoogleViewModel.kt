@@ -110,7 +110,8 @@ class LoginWithGoogleViewModel @Inject constructor(
                     _state.value = when (it) {
                         is NoCredentialException -> State.Failed.GoogleLoginUnavailable
                         is GetCredentialCancellationException,
-                        is GetCredentialInterruptedException -> State.Failed.Cancelled
+                        is GetCredentialInterruptedException,
+                        -> State.Failed.Cancelled
 
                         else -> State.Failed.CredentialError(it)
                     }

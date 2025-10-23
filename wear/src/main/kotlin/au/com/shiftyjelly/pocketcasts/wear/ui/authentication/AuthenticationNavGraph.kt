@@ -100,9 +100,9 @@ fun NavGraphBuilder.authenticationNavGraph(
                 onGoogleNotAvailable = {
                     showErrorToastMessage = defaultErrorMessage
                 },
-                onCancelled = {
+                onCancel = {
                     navController.popBackStack()
-                }
+                },
             )
         }
     }
