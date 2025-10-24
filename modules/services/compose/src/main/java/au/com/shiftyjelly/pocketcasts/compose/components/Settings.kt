@@ -183,6 +183,7 @@ fun SettingRow(
     showFlashWithDelay: Duration? = null, // if null, no flash is shown
     horizontalPadding: Dp = SettingsSection.horizontalPadding,
     verticalPadding: Dp = SettingsSection.verticalPadding,
+    primaryTextColor: Color = MaterialTheme.theme.colors.primaryText01,
     additionalContent: @Composable () -> Unit = {},
 ) {
     var flashAlphaTarget by remember { mutableFloatStateOf(0f) }
@@ -248,7 +249,7 @@ fun SettingRow(
             ) {
                 TextP40(
                     text = primaryText,
-                    color = MaterialTheme.theme.colors.primaryText01,
+                    color = primaryTextColor,
                 )
 
                 if (primaryTextEndDrawable != null) {
