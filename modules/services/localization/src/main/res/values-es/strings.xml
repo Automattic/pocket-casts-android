@@ -84,7 +84,7 @@ Language: es
     <string name="playlist_sort_by">Ordenar por</string>
     <string name="playlist_select_episodes">Seleccionar episodios</string>
     <string name="playlist_options">Opciones de la lista de reproducción</string>
-    <string name="smart_playlist_no_content_body">Llegados <aqu></aqu>í, puedes celebrar que la lista está terminada o modificar las reglas para encontrar más episodios.</string>
+    <string name="smart_playlist_no_content_body">Llegados aquí, puedes celebrar que la lista está terminada o modificar las reglas para encontrar más episodios.</string>
     <string name="smart_playlist_no_content_title">No hay episodios</string>
     <string name="playlist_play_all">Reproducir todo</string>
     <string name="smart_rules">Reglas inteligentes</string>
