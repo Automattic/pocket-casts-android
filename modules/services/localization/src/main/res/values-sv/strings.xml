@@ -1,23 +1,29 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2025-10-08 14:54:03+0000
+Translation-Revision-Date: 2025-10-22 12:54:03+0000
 Plural-Forms: nplurals=2; plural=n != 1;
 Generator: GlotPress/2.4.0-alpha
 Language: sv_SE
 -->
 <resources>
+    <string name="onboarding_upgrade_features_transcripts">Genererade transkriptioner</string>
+    <string name="search_filters_top_results">Populäraste resultat</string>
+    <string name="player_sleep_in_one_chapter">Sova när det nuvarande kapitlet tar slut</string>
+    <string name="player_sleep_in_one_episode">Sova när det nuvarande avsnittet tar slut</string>
+    <string name="player_sleep_timer_end_of_chapter">Kapitlets slut</string>
     <string name="winback_cancel_subscription_stay_button_label">Behåll min prenumeration</string>
+    <string name="player_up_next_sort">Sortera Nästa</string>
     <string name="filter_title">Spellistans rubrik</string>
     <string name="filter_id">Spellistans ID</string>
     <string name="filters_filter_name">Spellistans namn</string>
     <string name="playlists_not_found">Inga spellistor hittades</string>
-    <string name="notification_filters_message_2">Skapa smarta filter för att organisera dina avsnitt.</string>
-    <string name="settings_status_service_account_summary_2">Tjänsten som används för att lagra avsnittsförlopp, podcasts du följer, filter, osv.</string>
     <string name="settings_choose_playlists">Välj spellistor</string>
     <string name="number_one">en</string>
-    <string name="settings_auto_download_playlists">Ladda ner podcasts automatiskt</string>
     <string name="playlists_selected_all">Alla spellistor valda</string>
-    <string name="podcasts_selected_all">Alla podcasts valda.</string>
+    <string name="notification_filters_message_2">Skapa spellistor för att organisera dina avsnitt.</string>
+    <string name="settings_status_service_account_summary_2">Tjänsten som används för att lagra avsnittsförlopp, podcasts du följer, spellistor, osv.</string>
+    <string name="settings_auto_download_playlists">Ladda ner spellistor automatiskt</string>
+    <string name="podcasts_selected_all">Alla podcasts valda</string>
     <string name="smart_playlists">Smarta spellistor</string>
     <string name="select_smart_playlists">Välj smarta spellistor</string>
     <string name="podcast_not_in_playlists">Ingår inte i några smarta spellistor</string>
@@ -599,7 +605,6 @@ Language: sv_SE
     <string name="player_sleep_in_chapters">Viloläge efter %d kapitel</string>
     <string name="player_sleep_timer_in_chapter_plural">Efter %d kapitel</string>
     <string name="player_sleep_timer_in_chapter">Efter 1 kapitel</string>
-    <string name="player_sleep_timer_end_of_episode">Avsnittets slut</string>
     <string name="player_sleep_timer_in_episode_plural">Efter %d avsnitt</string>
     <string name="player_sleep_timer_in_episode">Efter 1 avsnitt</string>
     <string name="settings_use_episode_artwork_customization_description">Välj om du vill se avsnittsomslag i dessa sektioner av appen</string>
@@ -745,6 +750,7 @@ Language: sv_SE
     <string name="settings_continuous_playback_summary">Om din Nästa-kö är tom kommer vi att spela upp avsnitt från den podcast eller lista som du för närvarande lyssnar på.</string>
     <string name="renew_your_subscription">Förnya din prenumeration</string>
     <string name="log_in_watch_from_phone_instructions_3">Om du har problem, se till att din telefon kör samma version av Pocket Casts som din klocka (%s)</string>
+    <string name="log_in_free_account">%s använder ett gratiskonto</string>
     <string name="player_play_failed_check_internet">Det gick inte att ladda podcasten. Kontrollera din internetanslutning och försök igen.</string>
     <string name="empty_play_state">Välj ett avsnitt för att börja</string>
     <string name="settings_beta_features">Betafunktioner</string>
@@ -887,10 +893,10 @@ Language: sv_SE
     <string name="pocket_casts_query_podcasts">Pocket Casts – Sök podcasts</string>
     <string name="onboarding_plus_can_be_canceled_at_any_time">Kan avbrytas när som helst.</string>
     <string name="no_episodes_found_for_episode_ids_x">Inga avsnitt hittades för avsnitt-ID:n %1$s</string>
-    <string name="filter_id_or_title">Spellistans rubrik</string>
-    <string name="filter_id_description">Ett unikt ID som representerar podcasten. Kan användas för åtgärden \"Sök podcastavsnitt\".</string>
-    <string name="pocket_casts_query_filter_episodes">Pocket Casts – Sök podcastavsnitt</string>
-    <string name="pocket_casts_query_filters">Pocket Casts – Sök podcasts</string>
+    <string name="filter_id_or_title">Spellistans ID eller rubrik</string>
+    <string name="filter_id_description">Ett unikt ID som representerar spellistan. Kan användas för åtgärden \"Sök spellisteavsnitt\".</string>
+    <string name="pocket_casts_query_filter_episodes">Pocket Casts – Sök spellisteavsnitt</string>
+    <string name="pocket_casts_query_filters">Pocket Casts – Sök spellistor</string>
     <string name="profile_cancel_confirm_cancel_button_title">Ja, avsluta min prenumeration\"</string>
     <string name="profile_cancel_confirm_stay_button_title">Jag vill faktiskt fortsätta\"</string>
     <string name="profile_cancel_confirm_item_web_player">Du vill inte längre ha åtkomst till Pocket Casts via din webbläsare eller stationära dator.</string>
@@ -989,7 +995,7 @@ Language: sv_SE
     <string name="pocket_casts_control_playback">Uppspelningskontroller för Pocket Casts</string>
     <string name="time_to_skip_not_valid">Ogiltig tidpunkt att hoppa över: %1$s</string>
     <string name="time_to_skip_seconds">Tidpunkt att hoppa över (sekunder)</string>
-    <string name="pocket_casts_play_filter">Pocket Casts-spellista</string>
+    <string name="pocket_casts_play_filter">Pocket Casts – Spela spellista</string>
     <string name="settings_select_filters">Välj filter</string>
     <string name="settings_import_url_summary">Importera dina podcasts från en OPML-fil med hjälp av en URL.</string>
     <string name="settings_import_url">Efter URL</string>
@@ -1006,9 +1012,9 @@ Language: sv_SE
     <string name="playback_command">Uppspelningskommando</string>
     <string name="command_x_not_valid">Ogiltigt kommando: %1$s</string>
     <string name="must_provide_command_name">Kommandonamn måste anges</string>
-    <string name="no_episodes_in_filter_x">Inga avsnitt i spellista %1$s</string>
-    <string name="filter_x_not_found">Spellista hittades %1$s inte</string>
     <string name="must_provide_filter_name">Spellistans namn måste anges</string>
+    <string name="no_episodes_in_filter_x">Inga avsnitt i spellistan %1$s</string>
+    <string name="filter_x_not_found">Spellistan %1$s hittades inte</string>
     <string name="settings_app_icon_halloween">Halloween</string>
     <string name="end_of_year_launch_modal_summary">Se dina favoritpodcasts och -kategorier, lyssningsstatistik med mera. Dela med vänner och berätta om dina favoritkreatörer.</string>
     <string name="end_of_year_launch_modal_primary_button_title">Visa Min uppspelning 2024</string>
@@ -1789,6 +1795,7 @@ Language: sv_SE
     <string name="profile_cloud_cancel_upload">Avbryt uppladdning</string>
     <string name="profile_save_your_podcasts">Spara din podcasts i molnet och synkronisera dina förlopp med andra enheter</string>
     <string name="profile_create_password_requirements">Lösenord måste innehålla minst 6 tecken</string>
+    <string name="profile_stats_share_to">Dela till…</string>
     <string name="supporter">Supporter</string>
     <string name="filters">Filter</string>
     <string name="player_rearrange_actions_hidden">Fler åtgärder</string>
@@ -2053,6 +2060,7 @@ Language: sv_SE
     <string name="sort_oldest_to_newest">Äldst till nyast</string>
     <string name="player_sleep_time_fired">Sömntimern stoppades i slutet av ditt avsnitt.</string>
     <string name="podcast_unsubscribe_warning">Om du slutar följa tas alla nedladdade filer bort.</string>
+    <string name="player_sleep_timer_end_of_episode">Avsnittets slut</string>
     <string name="more">Mer</string>
     <string name="more_options">Fler alternativ</string>
     <string name="ok">OK</string>
@@ -2233,6 +2241,10 @@ Language: sv_SE
     <plurals name="podcasts_count">
         <item quantity="one">%d podcast</item>
         <item quantity="other">%d podcasts</item>
+    </plurals>
+    <plurals name="podcasts_selected_count">
+        <item quantity="one">%1$d podcast vald</item>
+        <item quantity="other">%1$d podcasts valda</item>
     </plurals>
     <plurals name="profile_stats_day_listened">
         <item quantity="one">Lyssnad dag</item>
