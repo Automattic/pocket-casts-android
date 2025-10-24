@@ -64,7 +64,7 @@ internal fun PodcastsRulePage(
     modifier: Modifier = Modifier,
 ) {
     RulePage(
-        title = stringResource(LR.string.smart_rule_podcasts_title),
+        title = stringResource(LR.string.filters_choose_podcasts),
         onSaveRule = onSaveRule,
         isSaveEnabled = useAllPodcasts || selectedPodcastUuids.isNotEmpty(),
         modifier = modifier,
@@ -126,9 +126,9 @@ internal fun PodcastRulesActions(
         ) {
             Text(
                 text = if (podcasts.size == selectedPodcastUuids.size) {
-                    stringResource(LR.string.smart_rule_podcasts_deselect_all)
+                    stringResource(LR.string.deselect_all)
                 } else {
-                    stringResource(LR.string.smart_rule_podcasts_select_all)
+                    stringResource(LR.string.select_all)
                 },
                 color = MaterialTheme.theme.colors.primaryText02,
                 fontSize = 17.sp,

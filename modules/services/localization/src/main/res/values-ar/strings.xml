@@ -37,7 +37,6 @@ Language: ar
     <string name="playlist_episode_unavailable_cta">إزالة من قائمة التشغيل</string>
     <string name="playlist_episode_unavailable_description">حذف منشئ podcast هذه الحلقة. ستبقى في قائمة تشغيلك حتى تزيلها.</string>
     <string name="playlist_episode_unavailable_title">الحلقة غير متوافرة</string>
-    <string name="playlist_archive_all">أرشفة الكل</string>
     <string name="episode_sort_custom_order">ترتيب مخصص</string>
     <string name="manual_playlist_search_no_podcast_or_folder_body">لم نتمكن من العثور على أي podcast أو مجلد لهذا البحث. جرِّب كلمة مفتاحية أخرى.</string>
     <string name="manual_playlist_search_no_podcast_title">لم يتم العثور على podcast</string>
@@ -47,7 +46,6 @@ Language: ar
     <string name="manual_playlist_no_content_title_alternative">ابدأ بإنشاء قائمة التشغيل الخاصة بك</string>
     <string name="manual_playlist_no_content_title">أضف حلقات إلى قائمة التشغيل الخاصة بك</string>
     <string name="manual_playlist_no_content_body">اسحب لليسار على الحلقة لإضافتها إلى قائمة التشغيل الخاصة بك.</string>
-    <string name="browse_shows">تصفّح العروض</string>
     <string name="unavailable">غير متاح</string>
     <string name="add_to_playlist_failure_message">قائمة التشغيل هذه ممتلئة. إزالة بعض الحلقات أو بدء حلقة جديدة.</string>
     <string name="added_to_playlist"> تمت إضافة ⁦%1$s⁩ إلى “⁦%2$s⁩”</string>
@@ -82,7 +80,6 @@ Language: ar
     <string name="playlist_setting_auto_download_description">تفعيل التنزيل التلقائي للحلقات في قائمة التشغيل هذه.</string>
     <string name="playlist_sort_by">فرز حسب</string>
     <string name="playlist_options">خيارات قائمة التشغيل</string>
-    <string name="playlist_download_all">تنزيل الكل</string>
     <string name="smart_rule_starred_label">الحلقات المميزة بنجمة</string>
     <string name="smart_rule_starred_description_disabled">لا تزال الحلقات المميزة بنجمة يمكن أن تظهر إذا كانت تطابق قواعدك الأخرى.</string>
     <string name="smart_rule_starred_description">تضمّن فقط الحلقات المميزة بنجمة التي تطابق قواعدك الأخرى.</string>
