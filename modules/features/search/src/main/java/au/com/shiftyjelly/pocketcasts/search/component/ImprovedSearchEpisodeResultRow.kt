@@ -40,6 +40,7 @@ import au.com.shiftyjelly.pocketcasts.models.entity.BaseEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.models.to.ImprovedSearchResultItem
 import au.com.shiftyjelly.pocketcasts.models.to.SearchAutoCompleteItem
+import au.com.shiftyjelly.pocketcasts.models.type.EpisodePlayingStatus
 import au.com.shiftyjelly.pocketcasts.repositories.images.PocketCastsImageRequestFactory
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackState
@@ -106,7 +107,8 @@ class ImprovedEpisodeRowViewModel @Inject constructor(
                         episode.playedUpToModified
                     }
                 ).also {
-                    it.playing = playbackState.episodeUuid == episodeUuid && playbackState.state == PlaybackState.State.PLAYING
+                    val isPlaying = playbackState.episodeUuid == episodeUuid && playbackState.state == PlaybackState.State.PLAYING
+                    it.playing = isPlaying
                     it.playedUpToMs = if (playbackState.episodeUuid == episodeUuid) {
                         playbackState.positionMs
                     } else {
@@ -116,6 +118,9 @@ class ImprovedEpisodeRowViewModel @Inject constructor(
                         playbackState.durationMs
                     } else {
                         episode.durationMs
+                    }
+                    if (isPlaying) {
+                        it.playingStatus = EpisodePlayingStatus.IN_PROGRESS
                     }
                 }
                 RowState.Loaded(changedEpisode)
