@@ -38,7 +38,7 @@ interface UpNextQueue {
     suspend fun playAllNext(episodes: List<BaseEpisode>, downloadManager: DownloadManager)
     suspend fun playAllLast(episodes: List<BaseEpisode>, downloadManager: DownloadManager)
     suspend fun removeEpisode(episode: BaseEpisode, shouldShuffleUpNext: Boolean = false)
-    suspend fun clearAndPlayAllBlocking(episodes: List<BaseEpisode>, downloadManager: DownloadManager)
+    suspend fun clearAndPlayAll(episodes: List<BaseEpisode>, downloadManager: DownloadManager)
     fun moveEpisode(from: Int, to: Int)
     fun changeList(episodes: List<BaseEpisode>)
     fun clearUpNext()
