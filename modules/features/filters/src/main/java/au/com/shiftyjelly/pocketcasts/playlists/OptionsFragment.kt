@@ -182,7 +182,7 @@ class OptionsFragment : BaseDialogFragment() {
                     add(
                         if (isShowingArchived && archivedEpisodeCount == episodeCount) {
                             PlaylistOption(
-                                title = getString(LR.string.playlist_unarchive_all),
+                                title = getString(LR.string.unarchive_all),
                                 iconId = IR.drawable.ic_unarchive,
                                 onClick = {
                                     viewModel.trackUnarchiveAllTapped()

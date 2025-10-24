@@ -9,7 +9,6 @@ import androidx.work.WorkManager
 import androidx.work.Worker
 import androidx.work.WorkerParameters
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
-import au.com.shiftyjelly.pocketcasts.repositories.di.ApplicationScope
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
@@ -27,7 +26,6 @@ import kotlinx.coroutines.withContext
 class RefreshPodcastsTask @AssistedInject constructor(
     @Assisted val context: Context,
     @Assisted val params: WorkerParameters,
-    @ApplicationScope private val applicationScope: CoroutineScope,
 ) : Worker(context, params) {
     private var refreshRunnable: RefreshPodcastsThread? = null
 
@@ -35,7 +33,6 @@ class RefreshPodcastsTask @AssistedInject constructor(
         LogBuffer.i(LogBuffer.TAG_BACKGROUND_TASKS, "RefreshPodcastsTask - Start")
         val refresh = RefreshPodcastsThread(
             context = this.applicationContext,
-            applicationScope = applicationScope,
             runNow = false,
         )
         this.refreshRunnable = refresh
@@ -100,7 +97,6 @@ class RefreshPodcastsTask @AssistedInject constructor(
                 LogBuffer.i(LogBuffer.TAG_BACKGROUND_TASKS, "RefreshPodcastsTask - runNow - Start")
                 val refreshThread = RefreshPodcastsThread(
                     context = context.applicationContext,
-                    applicationScope = applicationScope,
                     runNow = true,
                 )
                 refreshJob = async { refreshThread.run() }

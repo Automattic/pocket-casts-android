@@ -37,7 +37,6 @@ Language: sv_SE
     <string name="playlist_episode_unavailable_cta">Ta bort från spellista</string>
     <string name="playlist_episode_unavailable_description">Podcastens skapare har tagit bort detta avsnitt. Det kommer att finnas kvar i din spellista tills du tar bort det.</string>
     <string name="playlist_episode_unavailable_title">Avsnittet är inte tillgängligt</string>
-    <string name="playlist_archive_all">Arkivera alla</string>
     <string name="episode_sort_custom_order">Anpassad ordning</string>
     <string name="manual_playlist_search_no_podcast_or_folder_body">Vi kunde inte hitta någon podcast eller mapp för denna sökning. Prova med ett annat nyckelord.</string>
     <string name="manual_playlist_search_no_podcast_title">Ingen podcast hittades</string>
@@ -47,7 +46,6 @@ Language: sv_SE
     <string name="manual_playlist_no_content_title_alternative">Börja bygga din spellista</string>
     <string name="manual_playlist_no_content_title">Lägg till avsnitt i din spellista</string>
     <string name="manual_playlist_no_content_body">Svep åt vänster på ett avsnitt för att lägga till det i din spellista.</string>
-    <string name="browse_shows">Bläddra bland shower</string>
     <string name="unavailable">Inte tillgängligt</string>
     <string name="add_to_playlist_failure_message">Den här spellistan är full. Ta bort några avsnitt eller starta en ny.</string>
     <string name="added_to_playlist">%1$s har lagts till i “%2$s”</string>
@@ -85,7 +83,6 @@ Language: sv_SE
     <string name="playlist_sort_by">Sortera efter</string>
     <string name="playlist_select_episodes">Välj avsnitt</string>
     <string name="playlist_options">Spellistealternativ</string>
-    <string name="playlist_download_all">Ladda ner alla</string>
     <string name="smart_rule_starred_label">Stjärnmärkta avsnitt</string>
     <string name="smart_playlist_no_content_body">Det är antingen dags att fira att den här listan är slutförd eller att redigera dina regler för att hitta mer.</string>
     <string name="smart_playlist_no_content_title">Inga avsnitt</string>

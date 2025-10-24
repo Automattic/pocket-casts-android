@@ -92,7 +92,7 @@ class FiltersFragmentViewModelTest {
         whenever(settings.isFreeAccountFiltersBannerDismissed).thenReturn(bannerSetting)
         whenever(bannerSetting.flow).thenReturn(MutableStateFlow(false))
 
-        whenever(settings.showEmptyFiltersListTooltip).thenReturn(tooltipMock)
+        whenever(settings.showPremadePlaylistsTooltip).thenReturn(tooltipMock)
 
         val smartPlaylistManager = mock<SmartPlaylistManager>()
         whenever(smartPlaylistManager.findAllRxFlowable()).thenReturn(mock())

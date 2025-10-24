@@ -97,6 +97,13 @@ sealed class SearchHistoryEntry(
             podcastIds = podcastIds,
         )
 
+        fun fromAutoCompleteFolder(folder: SearchAutoCompleteItem.Folder) = Folder(
+            uuid = folder.uuid,
+            title = folder.title,
+            color = 0,
+            podcastIds = folder.podcasts.map { it.uuid },
+        )
+
         fun fromPodcast(podcast: PodcastModel) = Podcast(
             uuid = podcast.uuid,
             title = podcast.title,
@@ -104,6 +111,20 @@ sealed class SearchHistoryEntry(
         )
 
         fun fromAutoCompletePodcast(podcast: SearchAutoCompleteItem.Podcast) = Podcast(
+            uuid = podcast.uuid,
+            title = podcast.title,
+            author = podcast.author,
+        )
+
+        fun fromImprovedEpisodeResult(episode: ImprovedSearchResultItem.EpisodeItem) = Episode(
+            uuid = episode.uuid,
+            title = episode.title,
+            duration = episode.duration.inWholeSeconds.toDouble(),
+            podcastUuid = episode.podcastUuid,
+            podcastTitle = "",
+        )
+
+        fun fromImprovedPodcastResult(podcast: ImprovedSearchResultItem.PodcastItem) = Podcast(
             uuid = podcast.uuid,
             title = podcast.title,
             author = podcast.author,

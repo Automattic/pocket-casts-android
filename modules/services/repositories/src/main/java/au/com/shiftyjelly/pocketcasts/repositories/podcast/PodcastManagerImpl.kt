@@ -109,12 +109,6 @@ class PodcastManagerImpl @Inject constructor(
         }
     }
 
-    override fun unsubscribeBlocking(podcastUuid: String, playbackManager: PlaybackManager) {
-        runBlocking {
-            unsubscribe(podcastUuid, playbackManager)
-        }
-    }
-
     override fun unsubscribeAsync(podcastUuid: String, playbackManager: PlaybackManager) {
         launch {
             unsubscribe(podcastUuid, playbackManager)
@@ -126,14 +120,6 @@ class PodcastManagerImpl @Inject constructor(
      */
     override fun subscribeToPodcast(podcastUuid: String, sync: Boolean, shouldAutoDownload: Boolean) {
         subscribeManager.subscribeOnQueue(podcastUuid, sync, shouldAutoDownload)
-    }
-
-    /**
-     * Download and add podcast to the database. Or if it exists already just mark is as subscribed.
-     * Do this now rather than adding it to a queue.
-     */
-    override fun subscribeToPodcastRxSingle(podcastUuid: String, sync: Boolean, shouldAutoDownload: Boolean): Single<Podcast> {
-        return addPodcastRxSingle(podcastUuid = podcastUuid, sync = sync, subscribed = true, shouldAutoDownload = shouldAutoDownload)
     }
 
     override suspend fun subscribeToPodcastOrThrow(podcastUuid: String, sync: Boolean, shouldAutoDownload: Boolean): Podcast {
@@ -214,16 +200,8 @@ class PodcastManagerImpl @Inject constructor(
             .toFlowable(BackpressureStrategy.LATEST)
     }
 
-    override fun findPodcastsToSyncBlocking(): List<Podcast> {
-        return podcastDao.findNotSyncedBlocking()
-    }
-
     override suspend fun findPodcastsToSync(): List<Podcast> {
         return podcastDao.findNotSynced()
-    }
-
-    override fun findPodcastsAutodownloadBlocking(): List<Podcast> {
-        return podcastDao.findPodcastsAutoDownloadBlocking()
     }
 
     override fun episodeCountByPodcatUuidFlow(uuid: String): Flow<Int> {
@@ -441,14 +419,6 @@ class PodcastManagerImpl @Inject constructor(
         return podcastDao.searchByTitleBlocking("%$title%")
     }
 
-    override fun markPodcastUuidAsNotSyncedBlocking(podcastUuid: String) {
-        updateSyncStatusBlocking(podcastUuid, Podcast.SYNC_STATUS_NOT_SYNCED)
-    }
-
-    private fun updateSyncStatusBlocking(podcastUuid: String, syncStatus: Int) {
-        podcastDao.updateSyncStatusBlocking(syncStatus, podcastUuid)
-    }
-
     override fun updateGroupingBlocking(podcast: Podcast, grouping: PodcastGrouping) {
         podcastDao.updateGroupingBlocking(grouping, podcast.uuid)
     }
@@ -463,10 +433,6 @@ class PodcastManagerImpl @Inject constructor(
 
     override suspend fun markAllPodcastsUnsynced(uuids: Collection<String>) {
         podcastDao.updateAllSyncStatus(Podcast.SYNC_STATUS_NOT_SYNCED, uuids)
-    }
-
-    override suspend fun markAllPodcastsSynced() {
-        podcastDao.updateAllSyncStatus(Podcast.SYNC_STATUS_SYNCED)
     }
 
     override fun clearAllDownloadErrorsBlocking() {
@@ -485,24 +451,12 @@ class PodcastManagerImpl @Inject constructor(
         return podcastDao.countSubscribed()
     }
 
-    override fun countSubscribedRxSingle(): Single<Int> {
-        return podcastDao.countSubscribedRxSingle()
-    }
-
     override fun countSubscribedFlow(): Flow<Int> {
         return podcastDao.countSubscribedFlow()
     }
 
-    override fun countDownloadStatusBlocking(downloadStatus: Int): Int {
-        return podcastDao.countDownloadStatusBlocking(downloadStatus)
-    }
-
     override suspend fun hasEpisodesWithAutoDownloadStatus(downloadStatus: Int): Boolean {
         return podcastDao.hasEpisodesWithAutoDownloadStatus(downloadStatus)
-    }
-
-    override fun countDownloadStatusRxSingle(downloadStatus: Int): Single<Int> {
-        return Single.fromCallable { countDownloadStatusBlocking(downloadStatus) }
     }
 
     override fun countNotificationsOnBlocking(): Int {
@@ -528,10 +482,6 @@ class PodcastManagerImpl @Inject constructor(
 
     override suspend fun updatePodcast(podcast: Podcast) {
         podcastDao.updateSuspend(podcast)
-    }
-
-    override suspend fun updateAllAutoDownloadStatus(autoDownloadStatus: Int) {
-        podcastDao.updateAllAutoDownloadStatus(autoDownloadStatus)
     }
 
     override suspend fun updateAutoDownload(podcastUuids: Collection<String>, isEnabled: Boolean) {
@@ -598,10 +548,6 @@ class PodcastManagerImpl @Inject constructor(
             settings.notifyRefreshPodcast.set(true, updateModifiedAt = true)
         }
         podcastDao.updateShowNotifications(podcastUuid, show)
-    }
-
-    override suspend fun updateRefreshAvailable(podcastUuid: String, refreshAvailable: Boolean) {
-        podcastDao.updateRefreshAvailable(refreshAvailable, podcastUuid)
     }
 
     override suspend fun updateStartFromInSec(podcast: Podcast, autoStartFrom: Int) {

@@ -1,6 +1,10 @@
 7.101
 -----
-
+*   Updates
+    *   Improved login experience on WearOS
+        ([#4631](https://github.com/Automattic/pocket-casts-android/pull/4631))
+    *   Bring back legacy Google login on WearOS 14 and below
+        ([#4633](https://github.com/Automattic/pocket-casts-android/pull/4633))
 
 7.100
 -----
@@ -9,8 +13,6 @@
         ([#4586](https://github.com/Automattic/pocket-casts-android/pull/4586))
     *   Implement search suggestions
         ([#4571](https://github.com/Automattic/pocket-casts-android/pull/4571))
-    *   Update search results screen
-        ([#4583](https://github.com/Automattic/pocket-casts-android/pull/4583))
 *   Updates
     *   Improve sleep timer terminology and chapter option visibility
         ([#4564](https://github.com/Automattic/pocket-casts-android/pull/4564))

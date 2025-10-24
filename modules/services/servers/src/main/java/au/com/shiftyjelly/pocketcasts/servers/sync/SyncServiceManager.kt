@@ -34,6 +34,8 @@ import com.pocketcasts.service.api.ReferralRedemptionRequest
 import com.pocketcasts.service.api.ReferralRedemptionResponse
 import com.pocketcasts.service.api.ReferralValidationResponse
 import com.pocketcasts.service.api.SupportFeedbackRequest
+import com.pocketcasts.service.api.SyncUpdateRequest
+import com.pocketcasts.service.api.SyncUpdateResponse
 import com.pocketcasts.service.api.UserPlaylistListResponse
 import com.pocketcasts.service.api.UserPodcastListResponse
 import com.pocketcasts.service.api.WinbackResponse
@@ -45,7 +47,6 @@ import io.reactivex.Completable
 import io.reactivex.Flowable
 import io.reactivex.Single
 import java.io.File
-import java.time.Instant
 import java.util.Locale
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -54,8 +55,6 @@ import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.RequestBody.Companion.asRequestBody
 import retrofit2.Response
 import retrofit2.Retrofit
-import com.pocketcasts.service.api.SyncUpdateRequest as SyncUpdateProtoRequest
-import com.pocketcasts.service.api.SyncUpdateResponse as SyncUpdateProtoResponse
 
 /**
  * The only class outside of the server module that should use this class is the
@@ -142,20 +141,7 @@ open class SyncServiceManager @Inject constructor(
 
     suspend fun namedSettings(request: NamedSettingsRequest, token: AccessToken): NamedSettingsResponse = service.namedSettings(addBearer(token), request)
 
-    suspend fun syncUpdate(email: String, data: String, lastSyncTime: Instant, token: AccessToken): au.com.shiftyjelly.pocketcasts.servers.sync.update.SyncUpdateResponse {
-        val fields = mutableMapOf(
-            "email" to email,
-            "token" to token.value,
-            "data" to data,
-            "device_utc_time_ms" to System.currentTimeMillis().toString(),
-            "last_modified" to lastSyncTime.toString(),
-        )
-        addDeviceFields(fields)
-
-        return service.syncUpdate(fields)
-    }
-
-    suspend fun syncUpdateOrThrow(token: AccessToken, request: SyncUpdateProtoRequest): SyncUpdateProtoResponse {
+    suspend fun syncUpdateOrThrow(token: AccessToken, request: SyncUpdateRequest): SyncUpdateResponse {
         return service.syncUpdate(addBearer(token), request)
     }
 

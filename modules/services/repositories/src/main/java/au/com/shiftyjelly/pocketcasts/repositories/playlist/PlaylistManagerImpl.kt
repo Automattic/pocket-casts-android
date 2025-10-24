@@ -458,7 +458,7 @@ class PlaylistManagerImpl(
         }
 
     private suspend fun createPlaylist(entity: PlaylistEntity, uuid: String? = null): String {
-        return appDatabase.withTransaction {
+        val uuid = appDatabase.withTransaction {
             val uuids = playlistDao.getAllPlaylistUuids()
             val finalUuid = uuid?.takeIf { it !in uuids } ?: generateUniqueUuid(uuids)
             val finalEntity = entity.copy(uuid = finalUuid, sortPosition = 0)
@@ -469,6 +469,10 @@ class PlaylistManagerImpl(
             }
             finalUuid
         }
+        if (uuid !in Playlist.PREDEFINED_UUIDS) {
+            settings.showRearrangePlaylistsTooltip.set(true, updateModifiedAt = false)
+        }
+        return uuid
     }
 }
 

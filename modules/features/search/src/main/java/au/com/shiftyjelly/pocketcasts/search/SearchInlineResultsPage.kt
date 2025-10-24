@@ -57,7 +57,7 @@ private const val MAX_ITEM_COUNT = 20
 
 @Composable
 fun SearchInlineResultsPage(
-    state: SearchUiState.Results,
+    state: SearchUiState.OldResults,
     loading: Boolean,
     bottomInset: Dp,
     onEpisodeClick: (EpisodeItem) -> Unit,
@@ -110,7 +110,7 @@ fun SearchInlineResultsPage(
 
 @Composable
 private fun SearchResultsView(
-    state: SearchUiState.SearchOperation.Success<SearchResults>,
+    state: SearchUiState.SearchOperation.Success<SearchResults.SegregatedResults>,
     bottomInset: Dp,
     onEpisodeClick: (EpisodeItem) -> Unit,
     onPodcastClick: (Podcast) -> Unit,
@@ -255,8 +255,7 @@ private fun SearchResultsViewPreview(
         SearchResultsView(
             state = SearchUiState.SearchOperation.Success(
                 searchTerm = "",
-                results = SearchResults(
-
+                results = SearchResults.SegregatedResults(
                     podcasts = listOf(
                         FolderItem.Folder(
                             folder = Folder(

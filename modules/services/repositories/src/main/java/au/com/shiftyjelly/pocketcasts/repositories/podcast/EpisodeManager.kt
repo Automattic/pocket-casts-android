@@ -42,10 +42,8 @@ interface EpisodeManager {
     fun findEpisodesByPodcastOrderedRxFlowable(podcast: Podcast): Flowable<List<PodcastEpisode>>
     fun findEpisodesWhereRxFlowable(queryAfterWhere: String): Flowable<List<PodcastEpisode>>
 
-    fun findEpisodesToSyncBlocking(): List<PodcastEpisode>
     suspend fun findEpisodesToSync(): List<PodcastEpisode>
     fun findEpisodesForHistorySyncBlocking(): List<PodcastEpisode>
-    suspend fun markAllEpisodesSynced(episodes: List<PodcastEpisode>)
 
     fun findEpisodesDownloadingBlocking(queued: Boolean = true, waitingForPower: Boolean = true, waitingForWifi: Boolean = true, downloading: Boolean = true): List<PodcastEpisode>
 

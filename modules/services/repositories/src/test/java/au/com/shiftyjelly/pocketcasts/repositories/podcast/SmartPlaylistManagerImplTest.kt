@@ -71,7 +71,6 @@ class SmartPlaylistManagerImplTest {
             syncManager = syncManager,
             notificationManager = notificationManager,
             appDatabase = appDatabase,
-            playlistsInitializer = mock(),
             scope = CoroutineScope(dispatcher),
         )
     }

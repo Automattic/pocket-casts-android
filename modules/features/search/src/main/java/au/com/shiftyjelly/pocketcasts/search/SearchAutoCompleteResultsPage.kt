@@ -28,8 +28,10 @@ import au.com.shiftyjelly.pocketcasts.compose.preview.ThemePreviewParameterProvi
 import au.com.shiftyjelly.pocketcasts.compose.theme
 import au.com.shiftyjelly.pocketcasts.models.to.SearchAutoCompleteItem
 import au.com.shiftyjelly.pocketcasts.search.component.ImprovedSearchEpisodeResultRow
+import au.com.shiftyjelly.pocketcasts.search.component.ImprovedSearchFolderResultRow
 import au.com.shiftyjelly.pocketcasts.search.component.ImprovedSearchPodcastResultRow
 import au.com.shiftyjelly.pocketcasts.search.component.ImprovedSearchTermSuggestionRow
+import au.com.shiftyjelly.pocketcasts.search.component.SearchFolderItem
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.views.buttons.PlayButton
 
@@ -42,6 +44,7 @@ fun SearchAutoCompleteResultsPage(
     onPodcastClick: (SearchAutoCompleteItem.Podcast) -> Unit,
     onPodcastFollow: (SearchAutoCompleteItem.Podcast) -> Unit,
     onEpisodeClick: (SearchAutoCompleteItem.Episode) -> Unit,
+    onFolderClick: (SearchAutoCompleteItem.Folder) -> Unit,
     playButtonListener: PlayButton.OnClickListener,
     bottomInset: Dp,
     onScroll: () -> Unit,
@@ -101,6 +104,12 @@ fun SearchAutoCompleteResultsPage(
                             playButtonListener = playButtonListener,
                             modifier = Modifier.fillMaxWidth(),
                         )
+
+                        is SearchAutoCompleteItem.Folder -> ImprovedSearchFolderResultRow(
+                            folder = item,
+                            onClick = { onFolderClick(item) },
+                            modifier = Modifier.fillMaxWidth(),
+                        )
                     }
                 }
                 if (results.indices.last != index) {
@@ -133,13 +142,15 @@ private fun PreviewSearchAutoCompleteResultsPage(
                 SearchAutoCompleteItem.Term("matching text longer"),
                 SearchAutoCompleteItem.Term("text only matching later"),
                 SearchAutoCompleteItem.Term("this doesn't match but why is it returned then?"),
-                SearchAutoCompleteItem.Podcast(uuid = "", title = "Matching podcast", author = "Author", isSubscribed = false),
+                SearchAutoCompleteItem.Folder(uuid = "", title = "folder matching", podcasts = listOf(SearchAutoCompleteItem.Podcast(uuid = "", title = "Podcast", author = "", isSubscribed = true)), color = 0x00ffff),
                 SearchAutoCompleteItem.Podcast(uuid = "", title = "Matching podcast subscribed", author = "Author2", isSubscribed = true),
+                SearchAutoCompleteItem.Podcast(uuid = "", title = "Matching podcast", author = "Author", isSubscribed = false),
             ),
             onTermClick = {},
             onEpisodeClick = {},
             onPodcastClick = {},
             onPodcastFollow = {},
+            onFolderClick = {},
             onScroll = {},
             onReportSuggestionsRender = {},
             playButtonListener = object : PlayButton.OnClickListener {

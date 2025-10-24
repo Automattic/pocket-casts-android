@@ -76,10 +76,6 @@ abstract class PodcastDao {
     }
 
     @Transaction
-    @Query("SELECT * FROM podcasts WHERE auto_download_status = 1 AND subscribed = 1")
-    abstract fun findPodcastsAutoDownloadBlocking(): List<Podcast>
-
-    @Transaction
     @Query("SELECT * FROM podcasts WHERE subscribed = 1 AND folder_uuid = :folderUuid ORDER BY added_date ASC")
     protected abstract fun observeFolderOrderByAddedDateAsc(folderUuid: String): Flow<List<Podcast>>
 
@@ -244,9 +240,6 @@ abstract class PodcastDao {
         return Completable.fromAction { updateSyncStatusBlocking(syncStatus, uuid) }
     }
 
-    @Query("UPDATE podcasts SET sync_status = :syncStatus")
-    abstract suspend fun updateAllSyncStatus(syncStatus: Int)
-
     @Query("UPDATE podcasts SET sync_status = :syncStatus WHERE subscribed = 1")
     abstract suspend fun updateAllSubscribedSyncStatus(syncStatus: Int)
 
@@ -321,23 +314,13 @@ abstract class PodcastDao {
     abstract fun countSubscribedByUuidBlocking(uuid: String): Int
 
     @Query("SELECT COUNT(*) FROM podcasts WHERE subscribed = 1")
-    abstract fun countSubscribedRxSingle(): Single<Int>
-
-    @Query("SELECT COUNT(*) FROM podcasts WHERE subscribed = 1")
     abstract fun countSubscribedFlow(): Flow<Int>
 
     @Query("SELECT COUNT(*) FROM podcasts WHERE subscribed = 1 AND show_notifications = 1")
     abstract fun countNotificationsOnBlocking(): Int
 
-    @Query("SELECT COUNT(*) FROM podcasts WHERE subscribed = 1 AND auto_download_status = :downloadStatus")
-    abstract fun countDownloadStatusBlocking(downloadStatus: Int): Int
-
     @Query("SELECT COUNT(*) > 0 FROM podcasts WHERE subscribed = 1 AND auto_download_status = :downloadStatus")
     abstract suspend fun hasEpisodesWithAutoDownloadStatus(downloadStatus: Int): Boolean
-
-    fun existsBlocking(uuid: String): Boolean {
-        return countByUuidBlocking(uuid) != 0
-    }
 
     @Query("SELECT COUNT(*) FROM podcast_episodes WHERE podcast_id IS :podcastUuid")
     abstract fun episodeCountFlow(podcastUuid: String): Flow<Int>
@@ -401,9 +384,6 @@ abstract class PodcastDao {
     @Query("UPDATE podcasts SET subscribed = :subscribed WHERE uuid = :uuid")
     abstract fun updateSubscribedBlocking(subscribed: Boolean, uuid: String)
 
-    @Query("UPDATE podcasts SET refresh_available = :refreshAvailable WHERE uuid = :uuid")
-    abstract suspend fun updateRefreshAvailable(refreshAvailable: Boolean, uuid: String)
-
     fun updateSubscribedRxCompletable(subscribed: Boolean, uuid: String): Completable {
         return Completable.fromAction { updateSubscribedBlocking(subscribed, uuid) }
     }
@@ -433,9 +413,6 @@ abstract class PodcastDao {
         return Completable.fromAction { updateLatestEpisodeBlocking(episodeUuid, publishedDate, podcastUuid) }
     }
 
-    @Query("UPDATE podcasts SET auto_download_status = :autoDownloadStatus")
-    abstract suspend fun updateAllAutoDownloadStatus(autoDownloadStatus: Int)
-
     @Query("UPDATE podcasts SET show_notifications = :showNotifications, show_notifications_modified = :modified, sync_status = 0")
     abstract suspend fun updateAllShowNotifications(showNotifications: Boolean, modified: Date = Date())
 
@@ -451,9 +428,6 @@ abstract class PodcastDao {
             updateAutoDownloadStatusUnsafe(chunk, autoDownloadStatus)
         }
     }
-
-    @Query("SELECT * FROM podcasts WHERE sync_status = " + Podcast.SYNC_STATUS_NOT_SYNCED + " AND uuid IS NOT NULL")
-    abstract fun findNotSyncedBlocking(): List<Podcast>
 
     @Query("SELECT * FROM podcasts WHERE sync_status = " + Podcast.SYNC_STATUS_NOT_SYNCED + " AND uuid IS NOT NULL")
     abstract suspend fun findNotSynced(): List<Podcast>
