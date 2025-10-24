@@ -101,7 +101,7 @@ internal class SettingsFragment : BaseFragment() {
             .setButtonType(ConfirmationDialog.ButtonType.Danger(getString(LR.string.delete)))
             .setOnConfirm {
                 viewModel.deletePlaylist()
-                (requireActivity() as FragmentHostListener).closeToRoot()
+                (requireActivity() as FragmentHostListener).closeFiltersToRoot()
             }
         dialog.show(parentFragmentManager, "delete_playlist_confirmation")
     }
