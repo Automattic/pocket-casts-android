@@ -1,11 +1,29 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2025-09-25 09:54:03+0000
+Translation-Revision-Date: 2025-10-21 09:54:09+0000
 Plural-Forms: nplurals=1; plural=0;
 Generator: GlotPress/2.4.0-alpha
 Language: ko_KR
 -->
 <resources>
+    <string name="onboarding_upgrade_features_transcripts">생성된 대본</string>
+    <string name="search_filters_top_results">상위 결과</string>
+    <string name="player_sleep_in_one_chapter">현재 챕터 종료 시 절전</string>
+    <string name="player_sleep_in_one_episode">현재 에피소드 종료 시 절전</string>
+    <string name="player_sleep_timer_end_of_chapter">챕터 종료</string>
+    <string name="winback_cancel_subscription_stay_button_label">구독 유지하기</string>
+    <string name="player_up_next_sort">다음 차례 정렬</string>
+    <string name="filter_title">재생목록 제목</string>
+    <string name="filter_id">재생목록 ID</string>
+    <string name="filters_filter_name">재생목록 이름</string>
+    <string name="playlists_not_found">재생목록을 찾을 수 없음</string>
+    <string name="notification_filters_message_2">재생목록을 생성하여 에피소드를 정리하세요.</string>
+    <string name="settings_status_service_account_summary_2">에피소드 진행률, 팔로우한 팟캐스트, 재생목록 등을 저장하는 데 사용하는 서비스입니다.</string>
+    <string name="settings_choose_playlists">재생목록 선택</string>
+    <string name="number_one">1</string>
+    <string name="settings_auto_download_playlists">재생목록 자동 다운로드</string>
+    <string name="playlists_selected_all">모든 재생목록 선택됨</string>
+    <string name="podcasts_selected_all">모든 팟캐스트 선택됨</string>
     <string name="smart_playlists">스마트 재생목록</string>
     <string name="select_smart_playlists">스마트 재생목록 선택</string>
     <string name="podcast_not_in_playlists">어떤 스마트 재생목록에도 포함되지 않음</string>
@@ -587,7 +605,6 @@ Language: ko_KR
     <string name="player_sleep_in_chapters">%d개 챕터에서 중지됨</string>
     <string name="player_sleep_timer_in_chapter_plural">%d개 챕터에서</string>
     <string name="player_sleep_timer_in_chapter">1개 챕터에서</string>
-    <string name="player_sleep_timer_end_of_episode">에피소드 종료</string>
     <string name="player_sleep_timer_in_episode_plural">%d개 에피소드에서</string>
     <string name="player_sleep_timer_in_episode">1개 에피소드에서</string>
     <string name="settings_use_episode_artwork_customization_description">앱의 해당 섹션에서 에피소드 아트워크를 보려면 선택하세요</string>
@@ -733,6 +750,7 @@ Language: ko_KR
     <string name="settings_continuous_playback_summary">다음 큐가 비어 있으면 현재 듣고 있는 것과 동일한 팟캐스트 또는 목록의 에피소드를 재생합니다.</string>
     <string name="renew_your_subscription">구독 갱신</string>
     <string name="log_in_watch_from_phone_instructions_3">문제가 있는 경우 휴대폰에서 시계(%s)와 동일한 버전의 Pocket Casts를 실행하고 있는지 확인하세요.</string>
+    <string name="log_in_free_account">%s은(는) 무료 계정을 사용하고 있습니다.</string>
     <string name="player_play_failed_check_internet">팟캐스트를 로드할 수 없습니다. 인터넷 연결을 확인하고 다시 시도하세요.</string>
     <string name="empty_play_state">시작할 에피소드 선택</string>
     <string name="settings_beta_features">베타 기능</string>
@@ -875,6 +893,10 @@ Language: ko_KR
     <string name="pocket_casts_query_podcast_episodes">Pocket Casts 쿼리 팟캐스트 에피소드</string>
     <string name="pocket_casts_query_podcasts">Pocket Casts 쿼리 팟캐스트</string>
     <string name="onboarding_plus_can_be_canceled_at_any_time">언제든지 취소할 수 있습니다.</string>
+    <string name="filter_id_or_title">재생목록 ID 또는 제목</string>
+    <string name="filter_id_description">재생목록을 나타내는 고유 ID입니다. \'쿼리 재생목록 에피소드\' 작업에 사용할 수 있습니다.</string>
+    <string name="pocket_casts_query_filter_episodes">Pocket Casts 쿼리 재생목록 에피소드</string>
+    <string name="pocket_casts_query_filters">Pocket Casts 쿼리 재생목록</string>
     <string name="profile_cancel_confirm_cancel_button_title">예. 내 구독을 취소합니다.\"</string>
     <string name="profile_cancel_confirm_stay_button_title">사실은 남아 있고 싶습니다.\"</string>
     <string name="profile_cancel_confirm_item_web_player">더는 웹 브라우저 또는 데스크톱 컴퓨터를 사용하여 Pocket Casts에 접근하실 수 없습니다.</string>
@@ -973,6 +995,7 @@ Language: ko_KR
     <string name="pocket_casts_control_playback">Pocket Casts 컨트롤 재생</string>
     <string name="time_to_skip_not_valid">건너뛰기 시간 %1$s 유효하지 않음</string>
     <string name="time_to_skip_seconds">건너뛰기 시간(초)</string>
+    <string name="pocket_casts_play_filter">Pocket Casts 재생목록 재생</string>
     <string name="settings_select_filters">필터 선택</string>
     <string name="settings_import_url_summary">URL을 사용하여 OPML 파일에서 팟캐스트를 가져오세요.</string>
     <string name="settings_import_url">URL 사용</string>
@@ -989,6 +1012,9 @@ Language: ko_KR
     <string name="playback_command">재생 명령</string>
     <string name="command_x_not_valid">명령 %1$s 유효하지 않음</string>
     <string name="must_provide_command_name">명령 이름을 제공해야 함</string>
+    <string name="no_episodes_in_filter_x">재생목록 %1$s에 에피소드 없음</string>
+    <string name="filter_x_not_found">재생목록 %1$s을(를) 찾을 수 없음</string>
+    <string name="must_provide_filter_name">재생목록 이름을 입력해야 함</string>
     <string name="end_of_year_launch_modal_summary">상위 팟캐스트, 카테고리, 청취 통계 등이 표시됩니다. 친구와 공유하고 즐겨 찾는 팟캐스트 창작자에게 감사 인사를 보냅니다!</string>
     <string name="settings_app_icon_halloween">핼러윈</string>
     <string name="end_of_year_launch_modal_primary_button_title">2024년에 청취한 목록 보기</string>
@@ -1769,6 +1795,7 @@ Language: ko_KR
     <string name="profile_welcome_to_free">Pocket Casts에 오신 것을 환영합니다!</string>
     <string name="filters_title_new_releases">새 릴리즈</string>
     <string name="filters_create_colour_icon">색상 및 아이콘</string>
+    <string name="profile_stats_share_to">공유 대상…</string>
     <string name="filters_chip_all_your_podcasts">모든 내 팟캐스트</string>
     <string name="filters_all_your_podcasts">모든 내 팟캐스트</string>
     <string name="episode_filters">에피소드 필터</string>
@@ -2033,6 +2060,7 @@ Language: ko_KR
     <string name="sort_newest_to_oldest">날짜/시각 내림차순</string>
     <string name="player_sleep_time_fired">에피소드 종료 시 절전 타이머가 중지되었습니다.</string>
     <string name="podcast_unsubscribe_warning">팔로우를 취소하면 다운로드한 모든 파일이 삭제됩니다.</string>
+    <string name="player_sleep_timer_end_of_episode">에피소드 종료</string>
     <string name="archived_episodes_singular">아카이빙된 에피소드 1개</string>
     <string name="archive_summary">더는 표시하지 않으려는 경우에만 이렇게 해야 합니다.</string>
     <string name="archive_episodes_plural">에피소드 %1$d개 아카이빙</string>
@@ -2194,6 +2222,9 @@ Language: ko_KR
     </plurals>
     <plurals name="podcasts_count">
         <item quantity="other">팟캐스트 %d개</item>
+    </plurals>
+    <plurals name="podcasts_selected_count">
+        <item quantity="other">팟캐스트 %1$d개 선택됨</item>
     </plurals>
     <plurals name="profile_stats_day_listened">
         <item quantity="other">청취한 시간(일)</item>

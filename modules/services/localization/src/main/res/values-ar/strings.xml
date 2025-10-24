@@ -1,12 +1,18 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2025-10-09 09:54:04+0000
+Translation-Revision-Date: 2025-10-20 19:54:03+0000
 Plural-Forms: nplurals=6; plural=n==0 ? 0 : n==1 ? 1 : n==2 ? 2 : n%100>=3 && n%100<=10 ? 3 : n%100>=11 && n%100<=99 ? 4 : 5;
 Generator: GlotPress/2.4.0-alpha
 Language: ar
 -->
 <resources>
+    <string name="onboarding_upgrade_features_transcripts">النصوص المنشأة</string>
+    <string name="search_filters_top_results">أهم النتائج</string>
+    <string name="player_sleep_in_one_chapter">النوم في نهاية الفصل الحالي</string>
+    <string name="player_sleep_in_one_episode">النوم في نهاية الحلقة الحالية</string>
+    <string name="player_sleep_timer_end_of_chapter">نهاية الفصل</string>
     <string name="winback_cancel_subscription_stay_button_label">الاحتفاظ باشتراكي</string>
+    <string name="player_up_next_sort">فرز التالي</string>
     <string name="filter_title">عنوان قائمة التشغيل</string>
     <string name="filter_id">معرّف قائمة التشغيل</string>
     <string name="filters_filter_name">اسم قائمة التشغيل</string>
@@ -599,7 +605,6 @@ Language: ar
     <string name="player_sleep_in_chapters">السكون في %d من الفصول</string>
     <string name="player_sleep_timer_in_chapter_plural">في %d من الفصول</string>
     <string name="player_sleep_timer_in_chapter">في فصل واحد</string>
-    <string name="player_sleep_timer_end_of_episode">نهاية الحلقة</string>
     <string name="player_sleep_timer_in_episode_plural">في %d من الحلقات</string>
     <string name="player_sleep_timer_in_episode">في حلقة واحدة</string>
     <string name="settings_use_episode_artwork_customization_description">حدد ما إذا كنت تريد رؤية العمل الفني للحلقة في هذه الأقسام من التطبيق</string>
@@ -745,6 +750,7 @@ Language: ar
     <string name="settings_continuous_playback_summary">في حال كانت قائمة انتظار العناصر التالية لديك فارغة، سنقوم بتشغيل حلقات من البودكاست أو القائمة نفسها التي تستمع إليه حاليًا.</string>
     <string name="renew_your_subscription">تجديد الاشتراك الخاص بك</string>
     <string name="log_in_watch_from_phone_instructions_3">إذا كنت تواجه مشكلة، فتأكد من أن الهاتف يقوم بتشغيل الإصدار نفسه من Pocket Casts مثلما هو الحال مع ساعتك (%s)</string>
+    <string name="log_in_free_account">يستخدم %s حسابًا مجانيًا</string>
     <string name="empty_play_state">اختيار حلقة للبدء</string>
     <string name="player_play_failed_check_internet">يتعذر تحميل البودكاست. يرجى التحقق من اتصالك بالإنترنت والمحاولة مرة أخرى.</string>
     <string name="settings_beta_features">ميزات بيتا</string>
@@ -1789,6 +1795,7 @@ Language: ar
     <string name="filters_chip_download_status">حالة التنزيل</string>
     <string name="profile_create_password_requirements">يجب أن تكون كلمة المرور 6 أحرف على الأقل</string>
     <string name="filters_create_colour_icon">اللون والأيقونة</string>
+    <string name="profile_stats_share_to">المشاركة إلى …</string>
     <string name="filters_chip_all_your_podcasts">جميع حلقات بثك الصوتي</string>
     <string name="filters_all_your_podcasts">جميع حلقات بثك الصوتي</string>
     <string name="episode_filters">عوامل تصفية الحلقة</string>
@@ -2053,6 +2060,7 @@ Language: ar
     <string name="sort_newest_to_oldest">الأحدث الى الأقدم</string>
     <string name="podcast_unsubscribe_warning">سيؤدي إلغاء المتابعة إلى حذف جميع الملفات التي تم تنزيلها.</string>
     <string name="player_sleep_time_fired">توقف مؤقت السكون في نهاية حلقتك.</string>
+    <string name="player_sleep_timer_end_of_episode">نهاية الحلقة</string>
     <string name="archived_episodes_singular">تمت أرشفة حلقة واحدة</string>
     <string name="archive_summary">ينبغي أن تقوم بذلك فقط إذا كنت لا ترغب في رؤيتها بعد الآن.</string>
     <string name="archive_episodes_plural">أرشفة ⁦%1$d⁩ من الحلقات</string>

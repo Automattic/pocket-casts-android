@@ -1,12 +1,18 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2025-10-09 09:54:04+0000
+Translation-Revision-Date: 2025-10-21 11:54:06+0000
 Plural-Forms: nplurals=1; plural=0;
 Generator: GlotPress/2.4.0-alpha
 Language: zh_CN
 -->
 <resources>
+    <string name="onboarding_upgrade_features_transcripts">生成的文字转录稿</string>
+    <string name="search_filters_top_results">热门结果</string>
+    <string name="player_sleep_in_one_chapter">在本章节结束时进入睡眠状态</string>
+    <string name="player_sleep_in_one_episode">在本集结束时进入睡眠状态</string>
+    <string name="player_sleep_timer_end_of_chapter">章节结束</string>
     <string name="winback_cancel_subscription_stay_button_label">保留我的订阅</string>
+    <string name="player_up_next_sort">“接下来播放”排序</string>
     <string name="filter_title">播放列表标题</string>
     <string name="filter_id">播放列表 ID</string>
     <string name="filters_filter_name">播放列表名称</string>
@@ -599,7 +605,6 @@ Language: zh_CN
     <string name="player_sleep_in_chapters">%d 个章节后进入睡眠状态</string>
     <string name="player_sleep_timer_in_chapter_plural">%d 个章节后</string>
     <string name="player_sleep_timer_in_chapter">1 个章节后</string>
-    <string name="player_sleep_timer_end_of_episode">剧集结束</string>
     <string name="player_sleep_timer_in_episode_plural">%d 集后</string>
     <string name="player_sleep_timer_in_episode">1 集后</string>
     <string name="settings_use_episode_artwork_customization_description">选择是否要在应用程序的这些部分查看剧集插图</string>
@@ -745,6 +750,7 @@ Language: zh_CN
     <string name="settings_continuous_playback_summary">如果您的“接下来播放”队列中没有内容，我们会播放您目前正在收听的同一播客或列表中的剧集。</string>
     <string name="renew_your_subscription">续订您的订阅</string>
     <string name="log_in_watch_from_phone_instructions_3">如果您遇到问题，请确保您的手机运行的 Pocket Casts 版本与与手表相同 (%s)</string>
+    <string name="log_in_free_account">%s 正在使用免费账户</string>
     <string name="player_play_failed_check_internet">无法加载播客。 请检查您的网络连接，然后重试。</string>
     <string name="empty_play_state">选择一集以开始</string>
     <string name="settings_beta_features">测试版功能</string>
@@ -1789,6 +1795,7 @@ Language: zh_CN
     <string name="profile_stats_skipping">跳过</string>
     <string name="profile_create_password_requirements">密码不得少于 6 个字符</string>
     <string name="filters_create_colour_icon">颜色和图标</string>
+    <string name="profile_stats_share_to">共享至…</string>
     <string name="supporter">支持者</string>
     <string name="player_rearrange_actions_hidden">更多操作</string>
     <string name="player_up_next_clear_button">清除“接下来播放”</string>
@@ -2053,6 +2060,7 @@ Language: zh_CN
     <string name="sort_oldest_to_newest">最旧到最新</string>
     <string name="player_sleep_time_fired">睡眠定时器在剧集结束时停止。</string>
     <string name="podcast_unsubscribe_warning">取消关注将删除所有下载的文件。</string>
+    <string name="player_sleep_timer_end_of_episode">剧集结束</string>
     <string name="more">更多</string>
     <string name="more_options">更多选项</string>
     <string name="ok">确定</string>
