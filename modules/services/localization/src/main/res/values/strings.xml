@@ -988,7 +988,7 @@
     <string name="play_all_no_episodes_message">All episodes archived. Add or unarchive to play.</string>
     <string name="playlist_archive_all" translatable="false">@string/podcast_archive_all</string>
     <string name="playlist_artwork_description">Playlist’s artwork</string>
-    <string name="playlist_download_all">@string/podcast_download_all</string>
+    <string name="playlist_download_all" translatable="false">@string/podcast_download_all</string>
     <string name="playlist_edit_episodes">Rearrange episodes</string>
     <string name="playlist_edit_episodes_title">Edit playlist</string>
     <string name="playlist_episode_unavailable_title">Episode unavailable</string>
