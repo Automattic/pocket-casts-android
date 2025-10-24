@@ -6,6 +6,7 @@ import app.cash.turbine.test
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.compose.text.SearchFieldState
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
+import au.com.shiftyjelly.pocketcasts.models.type.PlaylistEpisodeSortType
 import au.com.shiftyjelly.pocketcasts.models.type.SmartRules.DownloadStatusRule
 import au.com.shiftyjelly.pocketcasts.models.type.SmartRules.EpisodeDurationRule
 import au.com.shiftyjelly.pocketcasts.models.type.SmartRules.EpisodeStatusRule
@@ -53,6 +54,7 @@ class CreatePlaylistViewModelTest {
                 scope: CoroutineScope,
                 initialBuilder: RulesBuilder,
                 initialAppliedRules: AppliedRules,
+                sortType: PlaylistEpisodeSortType,
                 podcastSearchState: SearchFieldState,
             ): SmartRulesEditor {
                 return SmartRulesEditor(
@@ -63,6 +65,7 @@ class CreatePlaylistViewModelTest {
                     scope = scope,
                     initialBuilder = initialBuilder,
                     initialAppliedRules = initialAppliedRules,
+                    sortType = sortType,
                     podcastSearchState = podcastSearchState,
                 )
             }

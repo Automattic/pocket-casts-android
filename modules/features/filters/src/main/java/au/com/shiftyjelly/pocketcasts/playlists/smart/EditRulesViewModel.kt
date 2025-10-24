@@ -59,6 +59,7 @@ class EditRulesViewModel @AssistedInject constructor(
                     podcasts = smartRules.podcasts,
                     episodeDuration = smartRules.episodeDuration,
                 ),
+                sortType = playlist.settings.sortType,
                 podcastSearchState = podcastSearchState,
             )
             rulesEditor = editor
