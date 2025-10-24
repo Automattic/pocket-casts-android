@@ -31,8 +31,8 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.emptyFlow
-import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOf
@@ -152,10 +152,10 @@ class SearchHandler @Inject constructor(
     @OptIn(ExperimentalCoroutinesApi::class)
     val searchSuggestions = combine(
         autoCompleteResults,
-        onlySearchRemoteObservable.asFlow(),
+        onlySearchRemoteObservable.asFlow().distinctUntilChanged(),
         combine(
             searchQuery.asFlow().map { it is Query.Suggestions },
-            localPodcastsResults.asFlow(),
+            localPodcastsResults.asFlow().distinctUntilChanged(),
         ) { isSuggestion, localPodcasts -> isSuggestion to localPodcasts }
             .flatMapLatest { (isSuggestion, localPodcasts) ->
                 if (isSuggestion) {
@@ -319,7 +319,7 @@ class SearchHandler @Inject constructor(
         searchQuery.filter { it is Query.SearchResults }.map { it.term.trim() }.asFlow(),
         combine(
             searchQuery.asFlow().map { it is Query.SearchResults },
-            localPodcastsResults.asFlow(),
+            localPodcastsResults.asFlow().distinctUntilChanged(),
         ) { shouldPass, localResults ->
             shouldPass to localResults
         },
