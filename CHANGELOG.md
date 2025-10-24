@@ -7,7 +7,7 @@
         ([#4633](https://github.com/Automattic/pocket-casts-android/pull/4633))
 *   Bug Fixes
     *   Improve performance of bulk Up Next operations
-        ([#4562](https://github.com/Automattic/pocket-casts-android/pull/4562))
+        ([#4641](https://github.com/Automattic/pocket-casts-android/pull/4641))
 
 7.100
 -----
