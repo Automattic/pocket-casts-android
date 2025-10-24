@@ -102,7 +102,7 @@ class UpNextQueueTest {
                 val episode = PodcastEpisode(uuid = uuid, publishedDate = Date())
                 uuids.add(uuid)
                 appDatabase.episodeDao().insertBlocking(episode)
-                upNextQueue.playLastBlocking(episode, downloadManager, null)
+                upNextQueue.playLast(episode, downloadManager, null)
             }
         }
 
@@ -143,7 +143,7 @@ class UpNextQueueTest {
                 val episode = PodcastEpisode(uuid = uuid, publishedDate = Date())
                 uuids.add(uuid)
                 appDatabase.episodeDao().insertBlocking(episode)
-                upNextQueue.playLastBlocking(episode, downloadManager, null)
+                upNextQueue.playLast(episode, downloadManager, null)
             }
         }
 
@@ -170,7 +170,7 @@ class UpNextQueueTest {
                 val episode = PodcastEpisode(uuid = uuid, publishedDate = Date())
                 uuids.add(uuid)
                 appDatabase.episodeDao().insertBlocking(episode)
-                upNextQueue.playLastBlocking(episode, downloadManager, null)
+                upNextQueue.playLast(episode, downloadManager, null)
             }
         }
 
@@ -188,7 +188,7 @@ class UpNextQueueTest {
         runBlocking {
             upNextQueue.removeEpisode(newCurrentEpisode!!)
             appDatabase.episodeDao().insertBlocking(playLastEpisode)
-            upNextQueue.playLastBlocking(playLastEpisode, downloadManager, null)
+            upNextQueue.playLast(playLastEpisode, downloadManager, null)
         }
 
         val queue = upNextQueue.queueEpisodes
@@ -205,7 +205,7 @@ class UpNextQueueTest {
                 val episode = PodcastEpisode(uuid = uuid, publishedDate = Date())
                 uuids.add(uuid)
                 appDatabase.episodeDao().insertBlocking(episode)
-                upNextQueue.playLastBlocking(episode, downloadManager, null)
+                upNextQueue.playLast(episode, downloadManager, null)
             }
         }
 
@@ -240,7 +240,7 @@ class UpNextQueueTest {
                 val episode = PodcastEpisode(uuid = uuid, publishedDate = Date())
                 uuids.add(uuid)
                 appDatabase.episodeDao().insertBlocking(episode)
-                upNextQueue.playLastBlocking(episode, downloadManager, null)
+                upNextQueue.playLast(episode, downloadManager, null)
             }
 
             upNextQueue.clearUpNext()
@@ -263,7 +263,7 @@ class UpNextQueueTest {
                 uuids.add(uuid)
                 episodes.add(episode)
                 appDatabase.episodeDao().insertBlocking(episode)
-                upNextQueue.playLastBlocking(episode, downloadManager, null)
+                upNextQueue.playLast(episode, downloadManager, null)
             }
 
             val initialEpisode = upNextQueue.currentEpisode

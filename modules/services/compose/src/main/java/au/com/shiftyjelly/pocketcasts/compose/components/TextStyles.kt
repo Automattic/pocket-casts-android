@@ -230,6 +230,7 @@ fun TextP40(
     fontSize: TextUnit = 16.sp,
     lineHeight: TextUnit = 22.sp,
     fontScale: Float = 1f,
+    letterSpacing: TextUnit = TextUnit.Unspecified,
 ) {
     Text(
         text = text,
@@ -241,6 +242,7 @@ fun TextP40(
         overflow = overflow,
         fontFamily = fontFamily,
         fontWeight = fontWeight,
+        letterSpacing = letterSpacing,
         modifier = modifier,
     )
 }

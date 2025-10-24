@@ -2,6 +2,7 @@ package au.com.shiftyjelly.pocketcasts.payment
 
 import android.app.Activity
 import java.math.BigDecimal
+import java.util.Locale
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
 
@@ -228,7 +229,7 @@ private fun PricingPhase.withDiscount(
     intervalCount: Int = 1,
 ): PricingPhase {
     val newAmount = price.amount.times(priceFraction.coerceIn(0.0..1.0).toBigDecimal()).stripTrailingZeros()
-    val newFormattedPrice = if (newAmount == BigDecimal.ZERO) "Free" else "$%.2f".format(newAmount.toDouble())
+    val newFormattedPrice = if (newAmount == BigDecimal.ZERO) "Free" else "$%.2f".format(Locale.ROOT, newAmount.toDouble())
     return copy(
         price = price.copy(amount = newAmount, formattedPrice = newFormattedPrice),
         schedule = PricingSchedule(recurrenceMode, period, intervalCount),

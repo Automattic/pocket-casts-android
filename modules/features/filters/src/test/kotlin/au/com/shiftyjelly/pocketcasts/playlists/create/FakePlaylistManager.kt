@@ -86,6 +86,10 @@ class FakePlaylistManager : PlaylistManager {
         return UUID.randomUUID().toString()
     }
 
+    override suspend fun createManualPlaylistWithEpisodes(name: String, episodes: List<PodcastEpisode>): String {
+        return ""
+    }
+
     val manualPlaylist = MutableStateFlow<ManualPlaylist?>(null)
     override fun manualPlaylistFlow(uuid: String, searchTerm: String?): Flow<ManualPlaylist?> {
         return manualPlaylist

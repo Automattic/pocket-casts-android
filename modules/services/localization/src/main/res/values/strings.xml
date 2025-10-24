@@ -234,6 +234,8 @@
     <string name="your_podcasts">Your podcasts</string>
     <string name="unavailable">Unavailable</string>
     <string name="browse_podcasts">Browse podcasts</string>
+    <!-- "View" is used as a verb here. As in "view this object" -->
+    <string name="view">View</string>
 
     <string name="multiselect_actions_shown">Shortcut in toolbar</string>
     <string name="multiselect_actions_hidden">In overflow</string>
@@ -1045,6 +1047,15 @@
     <string name="smart_rule_starred_label">Starred episodes</string>
     <string name="smart_rules">Smart Rules</string>
     <string name="smart_rules_description">Set up Smart Rules to automatically add episodes to your Smart Playlist.</string>
+    <string name="up_next_as_playlist_body">Your current Up Next will be replaced when you play this playlist. Save it first to keep it.</string>
+    <string name="up_next_as_playlist_button_primary">Save current queue</string>
+    <string name="up_next_as_playlist_button_secondary">Replace and play</string>
+    <string name="up_next_as_playlist_title">Save your Up Next queue?</string>
+    <string name="up_next_as_playlist_replace_body">This will clear your current Up Next queue and start playing this playlist.</string>
+    <string name="up_next_as_playlist_replace_button_primary" translatable="false">@string/up_next_as_playlist_button_secondary</string>
+    <string name="up_next_as_playlist_replace_button_secondary" translatable="false">@string/cancel</string>
+    <string name="up_next_as_playlist_replace_title">Replace current Up Next?</string>
+    <string name="up_next_as_playlist_saved">Up Next saved as a playlist</string>
 
     <!-- Profile -->
 

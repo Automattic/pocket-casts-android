@@ -11,6 +11,8 @@ import au.com.shiftyjelly.pocketcasts.models.type.PlaylistEpisodeSortType
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.preferences.model.AutoPlaySource
 import au.com.shiftyjelly.pocketcasts.repositories.download.DownloadManager
+import au.com.shiftyjelly.pocketcasts.repositories.playback.PlayAllHandler
+import au.com.shiftyjelly.pocketcasts.repositories.playback.PlayAllResponse
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.repositories.playlist.Playlist
 import au.com.shiftyjelly.pocketcasts.repositories.playlist.PlaylistManager
@@ -45,8 +47,11 @@ class PlaylistViewModel @AssistedInject constructor(
     private val playbackManager: PlaybackManager,
     private val downloadManager: DownloadManager,
     private val settings: Settings,
+    playAllHandlerFactory: PlayAllHandler.Factory,
     private val analyticsTracker: AnalyticsTracker,
 ) : ViewModel() {
+    private val playAllHandler = playAllHandlerFactory.create(SourceView.FILTERS)
+
     private var isNameChanged = false
     private var isAutoDownloadChanged = false
     private var isAutoDownloadLimitChanged = false
@@ -59,8 +64,14 @@ class PlaylistViewModel @AssistedInject constructor(
     private val _chromeCastSignal = MutableSharedFlow<Unit>()
     val chromeCastSignal = _chromeCastSignal.asSharedFlow()
 
+    private val _playAllResponseSignal = MutableSharedFlow<PlayAllResponse>()
+    val playAllResponseSignal = _playAllResponseSignal.asSharedFlow()
+
     private val _showSettingsSignal = MutableSharedFlow<Unit>()
     val showSettingsSignal = _showSettingsSignal.asSharedFlow()
+
+    private val _upNextSavedAsPlaylistSignal = MutableSharedFlow<Unit>()
+    val upNextSavedAsPlaylistSignal = _upNextSavedAsPlaylistSignal.asSharedFlow()
 
     val searchState = SearchFieldState()
 
@@ -81,9 +92,29 @@ class PlaylistViewModel @AssistedInject constructor(
         )
     }.stateIn(viewModelScope, SharingStarted.Lazily, initialValue = UiState.Empty)
 
-    fun shouldShowPlayAllWarning(): Boolean {
-        val queueEpisodes = playbackManager.upNextQueue.allEpisodes
-        return queueEpisodes.size >= PLAY_ALL_WARNING_EPISODE_COUNT
+    private var resolvePlayAllJob: Job? = null
+
+    fun handlePlayAllAction() {
+        if (resolvePlayAllJob?.isActive == true) {
+            return
+        }
+        resolvePlayAllJob = viewModelScope.launch {
+            val playlistEpisodes = uiState.value.playlist?.episodes.orEmpty()
+            val response = playAllHandler.handlePlayAllAction(playlistEpisodes)
+            _playAllResponseSignal.emit(response)
+        }
+    }
+
+    private var saveUpNextJob: Job? = null
+
+    fun saveUpNextAsPlaylist(upNextTranslation: String) {
+        if (saveUpNextJob?.isActive == true) {
+            return
+        }
+        saveUpNextJob = viewModelScope.launch(NonCancellable) {
+            playAllHandler.saveUpNextAsPlaylist(upNextTranslation)
+            _upNextSavedAsPlaylistSignal.emit(Unit)
+        }
     }
 
     private var playAllJob: Job? = null
@@ -92,15 +123,8 @@ class PlaylistViewModel @AssistedInject constructor(
         if (playAllJob?.isActive == true) {
             return
         }
-        playAllJob = viewModelScope.launch(Dispatchers.Default) {
-            val episodes = uiState.value.playlist
-                ?.episodes
-                ?.takeIf { it.isNotEmpty() }
-                ?.toPodcastEpisodes()
-                ?: return@launch
-            playbackManager.upNextQueue.removeAll()
-            playbackManager.playEpisodes(episodes, SourceView.FILTERS)
-            episodeManager.unarchiveAllInListBlocking(episodes)
+        playAllJob = viewModelScope.launch {
+            playAllHandler.playAllPendingEpisodes()
         }
     }
 
@@ -361,6 +385,5 @@ class PlaylistViewModel @AssistedInject constructor(
 
     companion object {
         const val DOWNLOAD_ALL_LIMIT = 100
-        private const val PLAY_ALL_WARNING_EPISODE_COUNT = 4
     }
 }
