@@ -24,6 +24,8 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.NonCancellable
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.asSharedFlow
@@ -187,6 +189,14 @@ class PlaylistViewModel @AssistedInject constructor(
             if (episodes.isNotEmpty()) {
                 episodeManager.unarchiveAllInListBlocking(episodes)
             }
+        }
+    }
+
+    fun deletePlaylist() {
+        viewModelScope.launch(NonCancellable) {
+            delay(300) // Some small delay to navigate back to the main UI first.
+            playlistManager.deletePlaylist(playlistUuid)
+            analyticsTracker.track(AnalyticsEvent.FILTER_DELETED)
         }
     }
 

@@ -16,11 +16,15 @@ import androidx.compose.ui.platform.LocalDensity
 import androidx.fragment.app.viewModels
 import au.com.shiftyjelly.pocketcasts.compose.AppThemeWithBackground
 import au.com.shiftyjelly.pocketcasts.compose.extensions.contentWithoutConsumedInsets
+import au.com.shiftyjelly.pocketcasts.ui.helper.FragmentHostListener
+import au.com.shiftyjelly.pocketcasts.views.dialog.ConfirmationDialog
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseFragment
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.drop
+import au.com.shiftyjelly.pocketcasts.images.R as IR
+import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 @OptIn(FlowPreview::class)
 @AndroidEntryPoint
@@ -47,6 +51,7 @@ internal class SettingsFragment : BaseFragment() {
                     autoDownloadEpisodeLimit = playlist.settings.autoDownloadLimit,
                     onChangeAutoDownloadValue = viewModel::updateAutoDownload,
                     onClickEpisodeLimit = ::openDownloadLimit,
+                    onClickDeletePlaylist = ::openDeleteConfirmation,
                     onClickBack = {
                         @Suppress("DEPRECATION")
                         requireActivity().onBackPressed()
@@ -83,5 +88,21 @@ internal class SettingsFragment : BaseFragment() {
             return
         }
         DownloadLimitFragment().show(parentFragmentManager, "auto_download_limit")
+    }
+
+    private fun openDeleteConfirmation() {
+        if (parentFragmentManager.findFragmentByTag("delete_playlist_confirmation") != null) {
+            return
+        }
+        val dialog = ConfirmationDialog()
+            .setTitle(getString(LR.string.delete_playlist_confirmation_title))
+            .setSummary(getString(LR.string.delete_playlist_confirmation_body))
+            .setIconId(IR.drawable.ic_warning)
+            .setButtonType(ConfirmationDialog.ButtonType.Danger(getString(LR.string.delete)))
+            .setOnConfirm {
+                viewModel.deletePlaylist()
+                (requireActivity() as FragmentHostListener).closeToRoot()
+            }
+        dialog.show(parentFragmentManager, "confirm_play_all")
     }
 }
