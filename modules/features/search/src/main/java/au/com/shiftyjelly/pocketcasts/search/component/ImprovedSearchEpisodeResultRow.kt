@@ -105,7 +105,7 @@ class ImprovedEpisodeRowViewModel @Inject constructor(
                         System.currentTimeMillis()
                     } else {
                         episode.playedUpToModified
-                    }
+                    },
                 ).also {
                     val isPlaying = playbackState.episodeUuid == episodeUuid && playbackState.state == PlaybackState.State.PLAYING
                     it.playing = isPlaying
