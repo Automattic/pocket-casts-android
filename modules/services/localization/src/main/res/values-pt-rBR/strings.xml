@@ -37,7 +37,6 @@ Language: pt_BR
     <string name="playlist_episode_unavailable_cta">Remover da lista de reprodução</string>
     <string name="playlist_episode_unavailable_description">O criador do podcast excluiu este episódio. Ele permanecerá em sua lista de reprodução até que você o remova.</string>
     <string name="playlist_episode_unavailable_title">Episódio indisponível</string>
-    <string name="playlist_archive_all">Arquivar tudo</string>
     <string name="episode_sort_custom_order">Ordenação personalizada</string>
     <string name="manual_playlist_search_no_podcast_or_folder_body">Não encontramos nenhum podcast ou pasta para essa pesquisa. Tente outra palavra-chave.</string>
     <string name="manual_playlist_search_no_podcast_title">Nenhum podcast encontrado</string>
@@ -47,7 +46,6 @@ Language: pt_BR
     <string name="manual_playlist_no_content_title_alternative">Comece a criar sua lista de reprodução</string>
     <string name="manual_playlist_no_content_title">Adicione episódios à sua lista de reprodução</string>
     <string name="manual_playlist_no_content_body">Arraste um episódio para a esquerda para adicioná-lo à sua lista de reprodução.</string>
-    <string name="browse_shows">Procurar programas</string>
     <string name="unavailable">Indisponível</string>
     <string name="added_to_playlist">%1$s adicionado a “%2$s”</string>
     <string name="add_to_playlist_failure_message">Esta playlist está cheia. Remova alguns episódios ou comece uma nova.</string>
@@ -84,7 +82,6 @@ Language: pt_BR
     <string name="playlist_sort_by">Ordenar por</string>
     <string name="playlist_select_episodes">Selecionar episódios</string>
     <string name="playlist_options">Opções da lista de reprodução</string>
-    <string name="playlist_download_all">Fazer download de tudo</string>
     <string name="smart_rule_starred_label">Episódios favoritados</string>
     <string name="smart_rule_starred_description_disabled">Episódios favoritados ainda poderão aparecer se corresponderem às suas outras regras.</string>
     <string name="smart_playlist_no_content_body">É hora de comemorar porque você completou a lista ou editar as regras para ouvir mais.</string>

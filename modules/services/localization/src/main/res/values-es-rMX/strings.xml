@@ -37,7 +37,6 @@ Language: es
     <string name="playlist_episode_unavailable_cta">Eliminar de la lista de reproducción</string>
     <string name="playlist_episode_unavailable_description">El creador del podcast ha eliminado este episodio. Permanecerá en tu lista de reproducción hasta que lo elimines.</string>
     <string name="playlist_episode_unavailable_title">Episodio no disponible</string>
-    <string name="playlist_archive_all">Archivar todo</string>
     <string name="episode_sort_custom_order">Orden personalizado</string>
     <string name="manual_playlist_search_no_podcast_or_folder_body">No hemos podido encontrar ningún podcast ni carpeta para esa búsqueda. Prueba con otra palabra clave.</string>
     <string name="manual_playlist_search_no_podcast_title">No se han encontrado podcasts</string>
@@ -47,7 +46,6 @@ Language: es
     <string name="manual_playlist_no_content_title_alternative">Empieza a crear tu lista de reproducción</string>
     <string name="manual_playlist_no_content_title">Añade episodios a tu lista de reproducción</string>
     <string name="manual_playlist_no_content_body">Desliza un episodio hacia la izquierda para añadirlo a la lista de reproducción.</string>
-    <string name="browse_shows">Explorar programas</string>
     <string name="unavailable">No disponible</string>
     <string name="add_to_playlist_failure_message">Esta lista de reproducción está completa. Eliminar algunos episodios o empezar uno nuevo.</string>
     <string name="added_to_playlist">%1$s añadido a «%2$s»</string>
@@ -86,7 +84,6 @@ Language: es
     <string name="playlist_sort_by">Ordenar por</string>
     <string name="playlist_select_episodes">Seleccionar episodios</string>
     <string name="playlist_options">Opciones de la lista de reproducción</string>
-    <string name="playlist_download_all">Descargar todo</string>
     <string name="smart_playlist_no_content_body">Llegados aquí, puedes celebrar que la lista está terminada o modificar las reglas para encontrar más episodios.</string>
     <string name="smart_playlist_no_content_title">No hay episodios</string>
     <string name="playlist_play_all">Reproducir todo</string>
