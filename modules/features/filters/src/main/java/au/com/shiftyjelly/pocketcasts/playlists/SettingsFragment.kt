@@ -103,6 +103,6 @@ internal class SettingsFragment : BaseFragment() {
                 viewModel.deletePlaylist()
                 (requireActivity() as FragmentHostListener).closeToRoot()
             }
-        dialog.show(parentFragmentManager, "confirm_play_all")
+        dialog.show(parentFragmentManager, "delete_playlist_confirmation")
     }
 }
