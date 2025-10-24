@@ -1,12 +1,18 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2025-10-09 13:54:04+0000
+Translation-Revision-Date: 2025-10-21 13:54:03+0000
 Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);
 Generator: GlotPress/2.4.0-alpha
 Language: ru
 -->
 <resources>
+    <string name="onboarding_upgrade_features_transcripts">Автоматические расшифровки</string>
+    <string name="search_filters_top_results">Лучшие результаты</string>
+    <string name="player_sleep_in_one_chapter">Переход в режим ожидания по окончании текущей главы</string>
+    <string name="player_sleep_in_one_episode">Переход в режим ожидания по окончании текущего выпуска</string>
+    <string name="player_sleep_timer_end_of_chapter">Конец главы</string>
     <string name="winback_cancel_subscription_stay_button_label">Не отменять подписку</string>
+    <string name="player_up_next_sort">Сортировать Up Next</string>
     <string name="filter_title">Заголовок списка воспроизведения</string>
     <string name="filter_id">ИД списка воспроизведения</string>
     <string name="filters_filter_name">Название списка воспроизведения</string>
@@ -596,7 +602,6 @@ Language: ru
     <string name="player_sleep_in_chapters">Переход в спящий режим через %d гл.</string>
     <string name="player_sleep_timer_in_chapter_plural">Через %d гл.</string>
     <string name="player_sleep_timer_in_chapter">Через 1 главу</string>
-    <string name="player_sleep_timer_end_of_episode">Конец выпуска</string>
     <string name="player_sleep_timer_in_episode_plural">Через %d вып.</string>
     <string name="player_sleep_timer_in_episode">Через 1 выпуск</string>
     <string name="settings_use_episode_artwork_customization_description">Выберите, если хотите, чтобы в этом разделе приложения отображалось оформление выпуска</string>
@@ -742,6 +747,7 @@ Language: ru
     <string name="settings_continuous_playback_summary">Если в очереди «Следующие» ничего нет, запустится другой выпуск из подкаста или списка, который вы слушаете.</string>
     <string name="renew_your_subscription">Продлить подписку</string>
     <string name="log_in_watch_from_phone_instructions_3">Если возникла проблема, убедитесь, что на телефоне запущена та же версия Pocket Casts, что и на часах (%s)</string>
+    <string name="log_in_free_account">%s использует бесплатную учётную запись</string>
     <string name="player_play_failed_check_internet">Не удалось загрузить подкаст. Проверьте подключение к Интернету и повторите попытку.</string>
     <string name="empty_play_state">Выберите, с какого выпуска начать</string>
     <string name="settings_beta_features">Функции в бета-режиме</string>
@@ -1786,6 +1792,7 @@ Language: ru
     <string name="profile_stats_listened_for">Вы прослушали</string>
     <string name="profile_create_password_requirements">Пароль должен содержать не менее шести символов</string>
     <string name="filters_create_colour_icon">ЦВЕТ И ЗНАЧОК</string>
+    <string name="profile_stats_share_to">Поделиться с…</string>
     <string name="supporter">Спонсор</string>
     <string name="filters">Фильтры</string>
     <string name="player_rearrange_actions_hidden">Другие действия</string>
@@ -2050,6 +2057,7 @@ Language: ru
     <string name="sort_oldest_to_newest">От старых к новым</string>
     <string name="player_sleep_time_fired">Таймер сна остановился в конце вашего выпуска.</string>
     <string name="podcast_unsubscribe_warning">При отказе от подписки все скачанные файлы будут удалены.</string>
+    <string name="player_sleep_timer_end_of_episode">Конец выпуска</string>
     <string name="more">Больше</string>
     <string name="more_options">Дополнительные параметры</string>
     <string name="ok">OK</string>
@@ -2251,9 +2259,9 @@ Language: ru
         <item quantity="many">Подкасты: %d</item>
     </plurals>
     <plurals name="podcasts_selected_count">
-        <item quantity="one">%1$dВыбран подкаст </item>
-        <item quantity="few">%1$d Выбрано подкастов:</item>
-        <item quantity="many">%1$d Выбрано подкастов:</item>
+        <item quantity="one">Выбран %1$d подкаст</item>
+        <item quantity="few">Выбрано подкастов: %1$d</item>
+        <item quantity="many">Выбрано подкастов: %1$d</item>
     </plurals>
     <plurals name="profile_stats_day_listened">
         <item quantity="one">дн. прослушано</item>

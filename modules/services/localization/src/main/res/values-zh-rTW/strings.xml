@@ -1,12 +1,18 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2025-10-09 13:54:12+0000
+Translation-Revision-Date: 2025-10-22 09:54:03+0000
 Plural-Forms: nplurals=1; plural=0;
 Generator: GlotPress/2.4.0-alpha
 Language: zh_TW
 -->
 <resources>
+    <string name="onboarding_upgrade_features_transcripts">生成逐字稿</string>
+    <string name="search_filters_top_results">熱門結果</string>
+    <string name="player_sleep_in_one_chapter">在目前的章節尾聲休眠</string>
+    <string name="player_sleep_in_one_episode">在目前的單集尾聲休眠</string>
+    <string name="player_sleep_timer_end_of_chapter">章節尾聲</string>
     <string name="winback_cancel_subscription_stay_button_label">保留訂閱</string>
+    <string name="player_up_next_sort">排序「接下來播放」</string>
     <string name="filter_title">播放清單標題</string>
     <string name="filter_id">播放清單 ID</string>
     <string name="filters_filter_name">播放清單名稱</string>
@@ -596,7 +602,6 @@ Language: zh_TW
     <string name="player_sleep_in_chapters">在 %d 個章節後休眠</string>
     <string name="player_sleep_timer_in_chapter_plural">%d 個章節後</string>
     <string name="player_sleep_timer_in_chapter">1 個章節後</string>
-    <string name="player_sleep_timer_end_of_episode">單集結束</string>
     <string name="player_sleep_timer_in_episode_plural">%d 集後</string>
     <string name="player_sleep_timer_in_episode">1 集後</string>
     <string name="settings_use_episode_artwork_customization_description">若想在應用程式的這些區段中查看單集封面圖片，請選取</string>
@@ -742,6 +747,7 @@ Language: zh_TW
     <string name="settings_continuous_playback_summary">如果「接下來播放」佇列是空的，我們會播放你正在聆聽的同一個 Podcast 或清單內的單集。</string>
     <string name="renew_your_subscription">續訂</string>
     <string name="log_in_watch_from_phone_instructions_3">如果遇到問題，請確認手機執行的 Pocket Casts 版本與手錶 (%s) 相同</string>
+    <string name="log_in_free_account">%s 正在使用免費帳號</string>
     <string name="player_play_failed_check_internet">無法載入 Podcast。 請檢查你的網際網路連線並再試一次。</string>
     <string name="empty_play_state">挑選單集以開始</string>
     <string name="settings_beta_features">Beta 功能</string>
@@ -1786,6 +1792,7 @@ Language: zh_TW
     <string name="filters_create_select_criteria">使用這些按鈕選取篩選條件，建立最新的智慧單集播放清單。</string>
     <string name="profile_create_password_requirements">密碼至少要有 6 個字元</string>
     <string name="filters_create_colour_icon">顏色和圖示</string>
+    <string name="profile_stats_share_to">分享至…</string>
     <string name="supporter">支持者</string>
     <string name="filters">篩選器</string>
     <string name="player_rearrange_actions_hidden">更多動作</string>
@@ -2050,6 +2057,7 @@ Language: zh_TW
     <string name="sort_oldest_to_newest">從最舊到最新</string>
     <string name="player_sleep_time_fired">睡眠計時器已在單集結束時停止。</string>
     <string name="podcast_unsubscribe_warning">若你取消追蹤，系統會將所有已下載的檔案刪除。</string>
+    <string name="player_sleep_timer_end_of_episode">單集尾聲</string>
     <string name="more">更多</string>
     <string name="more_options">更多選項</string>
     <string name="ok">OK</string>

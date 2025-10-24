@@ -431,7 +431,6 @@ Language: el_GR
     <string name="player_sleep_in_chapters">Ύπνος σε %d κεφάλαια</string>
     <string name="player_sleep_timer_in_chapter_plural">Σε %d κεφάλαια</string>
     <string name="player_sleep_timer_in_chapter">Σε 1 κεφάλαιο</string>
-    <string name="player_sleep_timer_end_of_episode">Τέλος επεισοδίου</string>
     <string name="player_sleep_timer_in_episode_plural">Σε %d επεισόδια</string>
     <string name="player_sleep_timer_in_episode">Σε 1 επεισόδιο</string>
     <string name="settings_use_episode_artwork_customization_description">Επίλεξε αν θέλεις να δεις το εξώφυλλο των επεισοδίων σε αυτές τις ενότητες της εφαρμογής</string>

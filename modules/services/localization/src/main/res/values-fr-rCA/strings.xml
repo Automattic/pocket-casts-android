@@ -1,12 +1,18 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2025-10-09 09:54:04+0000
+Translation-Revision-Date: 2025-10-21 15:54:03+0000
 Plural-Forms: nplurals=2; plural=n > 1;
 Generator: GlotPress/2.4.0-alpha
 Language: fr
 -->
 <resources>
+    <string name="onboarding_upgrade_features_transcripts">Transcriptions générées</string>
+    <string name="search_filters_top_results">Meilleurs résultats</string>
+    <string name="player_sleep_in_one_chapter">Mise en veille à la fin du chapitre en cours</string>
+    <string name="player_sleep_in_one_episode">Mise en veille à la fin de l’épisode en cours</string>
+    <string name="player_sleep_timer_end_of_chapter">Fin du chapitre</string>
     <string name="winback_cancel_subscription_stay_button_label">Conserver mon abonnement</string>
+    <string name="player_up_next_sort">Trier la file d\'attente</string>
     <string name="filter_title">Titre de la liste de lecture</string>
     <string name="filter_id">ID de la liste de lecture</string>
     <string name="filters_filter_name">Nom de la liste de lecture</string>
@@ -596,7 +602,6 @@ Language: fr
     <string name="player_sleep_in_chapters">Mise en veille dans %d chapitres</string>
     <string name="player_sleep_timer_in_chapter_plural">Dans %d chapitres</string>
     <string name="player_sleep_timer_in_chapter">Dans 1 chapitre</string>
-    <string name="player_sleep_timer_end_of_episode">Fin de l’épisode</string>
     <string name="player_sleep_timer_in_episode_plural">Dans %d épisodes</string>
     <string name="player_sleep_timer_in_episode">Dans 1 épisode</string>
     <string name="settings_use_episode_artwork_customization_description">Sélectionnez si vous désirez voir l’illustration de l’épisode dans ces sections de l’application</string>
@@ -742,6 +747,7 @@ Language: fr
     <string name="settings_continuous_playback_summary">Si votre file d’attente À écouter ensuite est vide, nous diffuserons les épisodes du même podcast ou de la même liste que ceux que vous écoutez actuellement.</string>
     <string name="renew_your_subscription">Renouveler votre abonnement</string>
     <string name="log_in_watch_from_phone_instructions_3">En cas de problème, assurez-vous que votre téléphone utilise la même version de Pocket Casts que votre montre (%s)</string>
+    <string name="log_in_free_account">%s utilise un compte gratuit</string>
     <string name="player_play_failed_check_internet">Impossible de charger le podcast. Veuillez vérifier votre connexion internet, puis réessayez.</string>
     <string name="empty_play_state">Choisissez un épisode pour commencer</string>
     <string name="settings_beta_features">Fonctionnalités bêta</string>
@@ -1786,6 +1792,7 @@ Language: fr
     <string name="profile_sub_ios_goto">Pour annuler votre abonnement, accédez à Réglages.</string>
     <string name="profile_create_password_requirements">Le mot de passe doit comporter au moins 6 caractères</string>
     <string name="filters_create_colour_icon">COULEUR ET ICÔNE</string>
+    <string name="profile_stats_share_to">Partager vers…</string>
     <string name="supporter">Abonné</string>
     <string name="filters">Filtres</string>
     <string name="player_rearrange_actions_hidden">Plus d’actions</string>
@@ -2050,6 +2057,7 @@ Language: fr
     <string name="sort_oldest_to_newest">Du plus ancien au plus récent</string>
     <string name="player_sleep_time_fired">Le minuteur de mise en veille s’est arrêté à la fin de votre épisode.</string>
     <string name="podcast_unsubscribe_warning">Le désabonnement supprimera tous les fichiers téléchargés.</string>
+    <string name="player_sleep_timer_end_of_episode">Fin de l’épisode</string>
     <string name="more">Plus</string>
     <string name="more_options">Plus d’options</string>
     <string name="ok">OK</string>

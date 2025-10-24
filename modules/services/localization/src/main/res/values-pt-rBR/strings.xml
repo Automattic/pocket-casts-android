@@ -1,12 +1,18 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2025-10-08 14:54:03+0000
+Translation-Revision-Date: 2025-10-22 12:54:04+0000
 Plural-Forms: nplurals=2; plural=(n > 1);
 Generator: GlotPress/2.4.0-alpha
 Language: pt_BR
 -->
 <resources>
+    <string name="onboarding_upgrade_features_transcripts">Transcrições geradas</string>
+    <string name="search_filters_top_results">Principais resultados</string>
+    <string name="player_sleep_in_one_episode">Dormindo no final do episódio atual</string>
+    <string name="player_sleep_timer_end_of_chapter">Fim do capítulo</string>
+    <string name="player_sleep_in_one_chapter">Dormindo no final do capítulo atual</string>
     <string name="winback_cancel_subscription_stay_button_label">Manter minha assinatura</string>
+    <string name="player_up_next_sort">Ordenar lista de Próximos</string>
     <string name="filter_title">Título da lista de reprodução</string>
     <string name="filter_id">ID da lista de reprodução</string>
     <string name="filters_filter_name">Nome da lista de reprodução</string>
@@ -596,7 +602,6 @@ Language: pt_BR
     <string name="player_sleep_in_chapters">Dormindo em %d capítulos</string>
     <string name="player_sleep_timer_in_chapter_plural">Em %d capítulos</string>
     <string name="player_sleep_timer_in_chapter">Em 1 capítulo</string>
-    <string name="player_sleep_timer_end_of_episode">Fim do episódio</string>
     <string name="player_sleep_timer_in_episode_plural">Em %d episódios</string>
     <string name="player_sleep_timer_in_episode">Em 1 episódio</string>
     <string name="settings_use_episode_artwork_customization_description">Selecione se deseja ver a arte do episódio nessas seções do aplicativo</string>
@@ -742,6 +747,7 @@ Language: pt_BR
     <string name="settings_continuous_playback_summary">Se a fila de Próximos estiver vazia, vamos reproduzir os episódios do mesmo podcast ou da lista que você está ouvindo.</string>
     <string name="renew_your_subscription">Renove sua assinatura</string>
     <string name="log_in_watch_from_phone_instructions_3">Se estiver tendo problemas, confira se a versão do Pocket Casts no celular e no smartwatch são a mesma (%s)</string>
+    <string name="log_in_free_account">%s está usando uma conta gratuita</string>
     <string name="player_play_failed_check_internet">Não foi possível carregar o podcast. Verifique sua conexão com a Internet e tente novamente.</string>
     <string name="empty_play_state">Escolha um episódio para começar</string>
     <string name="settings_beta_features">Funcionalidades Beta</string>
@@ -1786,6 +1792,7 @@ Language: pt_BR
     <string name="profile_cloud_settings">Configurações de arquivos</string>
     <string name="profile_create_password_requirements">A senha precisa ter ao menos seis caracteres.</string>
     <string name="filters_create_colour_icon">COR E ÍCONE</string>
+    <string name="profile_stats_share_to">Compartilhar em…</string>
     <string name="supporter">Apoiador</string>
     <string name="filters">Filtros</string>
     <string name="player_rearrange_actions_hidden">Mais ações</string>
@@ -2050,6 +2057,7 @@ Language: pt_BR
     <string name="sort_oldest_to_newest">Mais antigo a mais recente</string>
     <string name="player_sleep_time_fired">O temporizador parou no fim do seu episódio.</string>
     <string name="podcast_unsubscribe_warning">Deixar de seguir excluirá todos os arquivos baixados.</string>
+    <string name="player_sleep_timer_end_of_episode">Fim do episódio</string>
     <string name="more">Mais</string>
     <string name="more_options">Mais opções</string>
     <string name="ok">OK</string>

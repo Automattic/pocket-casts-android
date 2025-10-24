@@ -1,23 +1,29 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2025-10-09 09:54:04+0000
+Translation-Revision-Date: 2025-10-21 09:54:03+0000
 Plural-Forms: nplurals=2; plural=n != 1;
 Generator: GlotPress/2.4.0-alpha
 Language: it
 -->
 <resources>
-    <string name="winback_cancel_subscription_stay_button_label">Rinnova l\'abbonamento</string>
-    <string name="filter_title">Titolo della playlist</string>
+    <string name="onboarding_upgrade_features_transcripts">Trascrizioni generate</string>
+    <string name="search_filters_top_results">Risultati migliori</string>
+    <string name="player_sleep_in_one_chapter">In sospensione alla fine del capitolo corrente</string>
+    <string name="player_sleep_in_one_episode">In sospensione alla fine dell\'episodio corrente</string>
+    <string name="player_sleep_timer_end_of_chapter">Fine del capitolo</string>
+    <string name="winback_cancel_subscription_stay_button_label">Rinnova l\'iscrizione</string>
+    <string name="player_up_next_sort">Ordina la coda</string>
     <string name="filter_id">ID playlist</string>
+    <string name="filter_title">Titolo playlist</string>
     <string name="filters_filter_name">Nome playlist</string>
     <string name="playlists_not_found">Nessuna playlist trovata</string>
-    <string name="notification_filters_message_2">Crea filtri intelligenti per organizzare gli episodi.</string>
-    <string name="settings_status_service_account_summary_2">Il servizio usato per archiviare l\'avanzamento dell\'episodio, i podcast che segui, i filtri ecc.</string>
     <string name="settings_choose_playlists">Scegli playlist</string>
     <string name="number_one">una</string>
     <string name="settings_auto_download_playlists">Scarica automaticamente le playlist</string>
     <string name="playlists_selected_all">Tutte le playlist selezionate</string>
-    <string name="podcasts_selected_all">Tutti i podcast selezionati.</string>
+    <string name="notification_filters_message_2">Crea playlist per organizzare gli episodi.</string>
+    <string name="settings_status_service_account_summary_2">Il servizio usato per archiviare l\'avanzamento dell\'episodio, i podcast che segui, le playlist ecc.</string>
+    <string name="podcasts_selected_all">Tutti i podcast selezionati</string>
     <string name="smart_playlists">Playlist intelligenti</string>
     <string name="select_smart_playlists">Seleziona Playlist intelligenti</string>
     <string name="podcast_not_in_playlists">Non incluso in alcuna Playlist intelligente</string>
@@ -595,7 +601,6 @@ Language: it
     <string name="player_sleep_in_chapters">Spegnimento tra %d capitoli</string>
     <string name="player_sleep_timer_in_chapter_plural">Tra %d capitoli</string>
     <string name="player_sleep_timer_in_chapter">Tra 1 capitolo</string>
-    <string name="player_sleep_timer_end_of_episode">Fine dell\'episodio</string>
     <string name="player_sleep_timer_in_episode_plural">Tra %d episodi</string>
     <string name="player_sleep_timer_in_episode">Tra 1 episodio</string>
     <string name="settings_use_episode_artwork_customization_description">Seleziona se desideri vedere la grafica dell\'episodio in queste sezioni dell\'app</string>
@@ -741,6 +746,7 @@ Language: it
     <string name="settings_continuous_playback_summary">Se la coda Successivo è vuota, riprodurremo gli episodi dello stesso podcast o l\'elenco che stai ascoltando.</string>
     <string name="renew_your_subscription">Rinnova il tuo abbonamento</string>
     <string name="log_in_watch_from_phone_instructions_3">In caso di problemi, assicurati che sul tuo telefono sia in esecuzione la stessa versione di Pocket Casts del tuo orologio (%s)</string>
+    <string name="log_in_free_account">%s sta usando un account gratuito</string>
     <string name="player_play_failed_check_internet">Impossibile caricare il podcast. Controlla la connessione a Internet e riprova.</string>
     <string name="empty_play_state">Scegli un episodio per iniziare</string>
     <string name="settings_beta_features">Funzionalità beta</string>
@@ -883,10 +889,10 @@ Language: it
     <string name="pocket_casts_query_podcast_episodes">Pocket Casts query podcast episodi</string>
     <string name="pocket_casts_query_podcasts">Pocket Casts Query podcast</string>
     <string name="onboarding_plus_can_be_canceled_at_any_time">Può essere annullato in qualsiasi momento.</string>
-    <string name="filter_id_or_title">Titolo della playlist</string>
-    <string name="filter_id_description">Un ID univoco che rappresenta il podcast. Può essere utilizzato nell\'azione \"Episodi podcast query\"</string>
-    <string name="pocket_casts_query_filter_episodes">Pocket Casts query podcast episodi</string>
-    <string name="pocket_casts_query_filters">Pocket Casts Query podcast</string>
+    <string name="filter_id_or_title">Titolo o ID della playlist</string>
+    <string name="filter_id_description">Un ID univoco che rappresenta la playlist. Può essere utilizzato nell\'azione \"Episodi playlist query\"</string>
+    <string name="pocket_casts_query_filter_episodes">Pocket Casts query playlist episodi</string>
+    <string name="pocket_casts_query_filters">Pocket Casts Query playlist</string>
     <string name="profile_cancel_confirm_cancel_button_title">Sì, cancella il mio abbonamento\"</string>
     <string name="profile_cancel_confirm_stay_button_title">Anzi, voglio restare\"</string>
     <string name="profile_cancel_confirm_item_web_player">Non sarai più in grado di accedere a Pocket Casts utilizzando il tuo browser web o il tuo computer desktop.</string>
@@ -985,7 +991,7 @@ Language: it
     <string name="pocket_casts_control_playback">Riproduzione comando Pocket Casts</string>
     <string name="time_to_skip_not_valid">Momento a cui passare %1$s non valido</string>
     <string name="time_to_skip_seconds">Momento a cui passare (secondi)</string>
-    <string name="pocket_casts_play_filter">Playlist di Pocket Casts</string>
+    <string name="pocket_casts_play_filter">Avvia playlist di Pocket Casts</string>
     <string name="settings_select_filters">Seleziona filtri</string>
     <string name="settings_import_url_summary">Importa i podcast da un file OPML usando un URL.</string>
     <string name="settings_import_url">Tramite URL</string>
@@ -1785,6 +1791,7 @@ Language: it
     <string name="filters_play_all_from_here_summary">Questo cancellerà la tua coda in Prossimo e aggiungerà questi episodi.</string>
     <string name="profile_create_password_requirements">La password deve contenere almeno 6 caratteri</string>
     <string name="filters_create_colour_icon">COLORI E ICONE</string>
+    <string name="profile_stats_share_to">Condividi con…</string>
     <string name="supporter">Promotore</string>
     <string name="filters">Filtri</string>
     <string name="player_rearrange_actions_hidden">Altre azioni</string>
@@ -2049,6 +2056,7 @@ Language: it
     <string name="sort_oldest_to_newest">Dal più vecchio al più recente</string>
     <string name="player_sleep_time_fired">Timer di sospensione interrotto alla fine dell\'episodio.</string>
     <string name="podcast_unsubscribe_warning">Se smetti di seguire tutti i file scaricati saranno eliminati.</string>
+    <string name="player_sleep_timer_end_of_episode">Fine dell\'episodio</string>
     <string name="more">Altro</string>
     <string name="more_options">Altre opzioni</string>
     <string name="ok">OK</string>
@@ -2229,6 +2237,10 @@ Language: it
     <plurals name="podcasts_count">
         <item quantity="one">%d podcast</item>
         <item quantity="other">%d podcast</item>
+    </plurals>
+    <plurals name="podcasts_selected_count">
+        <item quantity="one">%1$d podcast selezionato</item>
+        <item quantity="other">%1$d podcast selezionati</item>
     </plurals>
     <plurals name="profile_stats_day_listened">
         <item quantity="one">Giorno di ascolto</item>

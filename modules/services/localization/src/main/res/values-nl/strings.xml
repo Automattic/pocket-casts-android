@@ -1,12 +1,18 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2025-10-09 15:54:03+0000
+Translation-Revision-Date: 2025-10-22 12:54:03+0000
 Plural-Forms: nplurals=2; plural=n != 1;
 Generator: GlotPress/2.4.0-alpha
 Language: nl
 -->
 <resources>
+    <string name="onboarding_upgrade_features_transcripts">Gegenereerde transcripties</string>
+    <string name="search_filters_top_results">Top resultaten</string>
+    <string name="player_sleep_in_one_chapter">Slaapstand inschakelen aan het einde van de huidige hoofdstuk</string>
+    <string name="player_sleep_in_one_episode">Slaapstand inschakelen aan het einde van de huidige aflevering</string>
+    <string name="player_sleep_timer_end_of_chapter">Einde van hoofdstuk</string>
     <string name="winback_cancel_subscription_stay_button_label">Mijn abonnement behouden</string>
+    <string name="player_up_next_sort">Hierna sorteren</string>
     <string name="filter_title">Titel van afspeellijst</string>
     <string name="filter_id">Afspeellijst-ID</string>
     <string name="filters_filter_name">Naam afspeellijst</string>
@@ -595,7 +601,6 @@ Language: nl
     <string name="player_sleep_in_chapters">Slaapstand over %d hoofdstukken</string>
     <string name="player_sleep_timer_in_chapter_plural">Over %d hoofdstukken</string>
     <string name="player_sleep_timer_in_chapter">Over 1 hoofdstuk</string>
-    <string name="player_sleep_timer_end_of_episode">Einde van de aflevering</string>
     <string name="player_sleep_timer_in_episode_plural">Over %d afleveringen</string>
     <string name="player_sleep_timer_in_episode">Over 1 aflevering</string>
     <string name="settings_use_episode_artwork_customization_description">Selecteer of je het artwork van de aflevering wil weergeven in deze gedeelten van de app</string>
@@ -741,6 +746,7 @@ Language: nl
     <string name="settings_continuous_playback_summary">Als je wachtrij Hierna leeg is, zullen we afleveringen afspelen van dezelfde podcast of uit dezelfde lijst waar je op dat moment naar aan het luisteren bent.</string>
     <string name="renew_your_subscription">Verleng je abonnement</string>
     <string name="log_in_watch_from_phone_instructions_3">Als het niet lukt, controleer dan of je telefoon dezelfde versie van Pocket Casts heeft als je horloge (%s)</string>
+    <string name="log_in_free_account">%s gebruikt een gratis account</string>
     <string name="player_play_failed_check_internet">Kan podcast niet laden. Controleer je internetverbinding en probeer het opnieuw.</string>
     <string name="empty_play_state">Kies een aflevering om te beginnen</string>
     <string name="settings_beta_features">Bèta-functies</string>
@@ -1785,6 +1791,7 @@ Language: nl
     <string name="profile_cloud_percentage_full">%d%% vol</string>
     <string name="profile_create_password_requirements">Wachtwoord moet bestaan uit ten minste 6 tekens</string>
     <string name="filters_create_colour_icon">KLEUR EN PICTOGRAM</string>
+    <string name="profile_stats_share_to">Deel naar…</string>
     <string name="supporter">Ondersteuner</string>
     <string name="filters">Filters</string>
     <string name="player_rearrange_actions_hidden">Meer acties</string>
@@ -2049,6 +2056,7 @@ Language: nl
     <string name="sort_oldest_to_newest">Oudste naar nieuwste</string>
     <string name="player_sleep_time_fired">Slaaptimer is gestopt aan het einde van de aflevering.</string>
     <string name="podcast_unsubscribe_warning">Als je je uitschrijft, worden alle gedownloade bestanden verwijderd.</string>
+    <string name="player_sleep_timer_end_of_episode">Einde van de aflevering</string>
     <string name="more">Meer</string>
     <string name="more_options">Meer opties</string>
     <string name="ok">Ok</string>
