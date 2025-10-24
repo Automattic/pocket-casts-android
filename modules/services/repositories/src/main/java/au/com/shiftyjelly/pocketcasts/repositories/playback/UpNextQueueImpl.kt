@@ -37,7 +37,7 @@ import kotlinx.coroutines.withContext
 import timber.log.Timber
 
 class UpNextQueueImpl @Inject constructor(
-    appDatabase: AppDatabase,
+    private val appDatabase: AppDatabase,
     private val settings: Settings,
     private val episodeManager: EpisodeManager,
     private val syncManager: SyncManager,
@@ -226,20 +226,24 @@ class UpNextQueueImpl @Inject constructor(
         }
     }
 
-    override suspend fun playLastBlocking(episode: BaseEpisode, downloadManager: DownloadManager, onAdd: (() -> Unit)?) {
-        playLastNowBlocking(episode, downloadManager, onAdd)
+    override suspend fun playLast(episode: BaseEpisode, downloadManager: DownloadManager, onAdd: (() -> Unit)?) {
+        withContext(coroutineContext) {
+            playLastNowBlocking(episode, downloadManager, onAdd)
+        }
     }
 
-    private suspend fun playLastNowBlocking(episode: BaseEpisode, downloadManager: DownloadManager, onAdd: (() -> Unit)?) = withContext(coroutineContext) {
+    override suspend fun playAllLast(episodes: List<BaseEpisode>, downloadManager: DownloadManager) = withContext(coroutineContext) {
+        appDatabase.runInTransaction {
+            episodes.forEach { playLastNowBlocking(it, downloadManager, null) }
+        }
+    }
+
+    private fun playLastNowBlocking(episode: BaseEpisode, downloadManager: DownloadManager, onAdd: (() -> Unit)?) {
         saveChangesBlocking(UpNextAction.PlayLast(episode, onAdd))
         downloadIfPossible(episode, downloadManager)
         if (episode.isFinished) {
             episodeManager.markAsNotPlayedBlocking(episode)
         }
-    }
-
-    override suspend fun playAllLast(episodes: List<BaseEpisode>, downloadManager: DownloadManager) = withContext(coroutineContext) {
-        episodes.forEach { playLastNowBlocking(it, downloadManager, null) }
     }
 
     override suspend fun removeEpisode(episode: BaseEpisode, shouldShuffleUpNext: Boolean) {

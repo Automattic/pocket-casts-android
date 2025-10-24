@@ -43,7 +43,6 @@ import au.com.shiftyjelly.pocketcasts.compose.extensions.setContentWithViewCompo
 import au.com.shiftyjelly.pocketcasts.compose.theme
 import au.com.shiftyjelly.pocketcasts.filters.R
 import au.com.shiftyjelly.pocketcasts.filters.databinding.PlaylistFragmentBinding
-import au.com.shiftyjelly.pocketcasts.playlists.PlaylistViewModel.PlayAllAction
 import au.com.shiftyjelly.pocketcasts.playlists.component.PlaylistEpisodeAdapter
 import au.com.shiftyjelly.pocketcasts.playlists.component.PlaylistEpisodesAdapterFactory
 import au.com.shiftyjelly.pocketcasts.playlists.component.PlaylistHeaderAdapter
@@ -53,6 +52,7 @@ import au.com.shiftyjelly.pocketcasts.playlists.component.PlaylistToolbar
 import au.com.shiftyjelly.pocketcasts.playlists.component.ToolbarConfig
 import au.com.shiftyjelly.pocketcasts.playlists.manual.AddEpisodesFragment
 import au.com.shiftyjelly.pocketcasts.playlists.smart.EditRulesFragment
+import au.com.shiftyjelly.pocketcasts.repositories.playback.PlayAllResponse
 import au.com.shiftyjelly.pocketcasts.repositories.playlist.Playlist
 import au.com.shiftyjelly.pocketcasts.repositories.playlist.PlaylistManager
 import au.com.shiftyjelly.pocketcasts.ui.helper.FragmentHostListener
@@ -117,6 +117,7 @@ class PlaylistFragment :
         binding.setupToolbar()
         binding.setupChromeCast()
         binding.setupSettings()
+        setupUpPlayAllAction()
         setupUpNextSavedAsPlaylist()
         return binding.root
     }
@@ -168,6 +169,30 @@ class PlaylistFragment :
         }
     }
 
+    private fun setupUpPlayAllAction() {
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewModel.playAllResponseSignal
+                .flowWithLifecycle(viewLifecycleOwner.lifecycle)
+                .collect { response ->
+                    if (parentFragmentManager.findFragmentByTag("confirm_and_play") != null) {
+                        return@collect
+                    }
+                    when (response) {
+                        PlayAllResponse.ShowWarning -> {
+                            PlayAllFragment().show(childFragmentManager, "confirm_play_all")
+                        }
+
+                        PlayAllResponse.ShowNoEpisodesToPlay -> {
+                            val snackbarView = (requireActivity() as FragmentHostListener).snackBarView()
+                            Snackbar.make(snackbarView, getString(LR.string.play_all_no_episodes_message), Snackbar.LENGTH_LONG).show()
+                        }
+
+                        PlayAllResponse.DoNothing -> Unit
+                    }
+                }
+        }
+    }
+
     private fun setupUpNextSavedAsPlaylist() {
         viewLifecycleOwner.lifecycleScope.launch {
             viewModel.upNextSavedAsPlaylistSignal
@@ -208,7 +233,7 @@ class PlaylistFragment :
                 label = getString(LR.string.play_all),
                 onClick = {
                     viewModel.trackPlayAllTapped()
-                    playAll()
+                    viewModel.handlePlayAllAction()
                 },
             ),
             searchState = viewModel.searchState.textState,
@@ -445,30 +470,6 @@ class PlaylistFragment :
         return remember { viewModel.uiState.map { it.playlist?.title.orEmpty() } }
             .collectAsState("")
             .value
-    }
-
-    private fun playAll() {
-        if (parentFragmentManager.findFragmentByTag("confirm_and_play") != null) {
-            return
-        }
-        when (viewModel.computePlayAllAction()) {
-            PlayAllAction.ShowWarningDialog -> {
-                PlayAllFragment().show(childFragmentManager, "confirm_play_all")
-            }
-
-            PlayAllAction.ShowNoEpisodesSnackbar -> {
-                val snackbarView = (requireActivity() as FragmentHostListener).snackBarView()
-                Snackbar.make(snackbarView, getString(LR.string.play_all_no_episodes_message), Snackbar.LENGTH_LONG).show()
-            }
-
-            PlayAllAction.InsertAndPlayAll -> {
-                viewModel.playAll()
-            }
-
-            PlayAllAction.ResumePlayback -> {
-                viewModel.resumePlayback()
-            }
-        }
     }
 
     private fun openEditor() {

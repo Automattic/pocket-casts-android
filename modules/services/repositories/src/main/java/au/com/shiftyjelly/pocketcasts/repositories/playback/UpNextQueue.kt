@@ -34,7 +34,7 @@ interface UpNextQueue {
     fun isCurrentEpisode(episode: BaseEpisode): Boolean
     suspend fun playNow(episode: BaseEpisode, automaticUpNextSource: AutoPlaySource?, onAdd: (() -> Unit)?)
     suspend fun playNextBlocking(episode: BaseEpisode, downloadManager: DownloadManager, onAdd: (() -> Unit)?)
-    suspend fun playLastBlocking(episode: BaseEpisode, downloadManager: DownloadManager, onAdd: (() -> Unit)?)
+    suspend fun playLast(episode: BaseEpisode, downloadManager: DownloadManager, onAdd: (() -> Unit)?)
     suspend fun playAllNext(episodes: List<BaseEpisode>, downloadManager: DownloadManager)
     suspend fun playAllLast(episodes: List<BaseEpisode>, downloadManager: DownloadManager)
     suspend fun removeEpisode(episode: BaseEpisode, shouldShuffleUpNext: Boolean = false)

@@ -17,17 +17,16 @@ fun <T> List<T>.padEnd(
     }
 }
 
-fun <T1, T2, R> List<T1>.equalsBy(
-    other: List<T2>,
-    leftSelector: (T1) -> R,
-    rightSelector: (T2) -> R,
+fun <T, R> List<T>.containsAllInOrderBy(
+    other: List<T>,
+    selector: (T) -> R,
 ): Boolean {
-    if (size != other.size) {
+    if (other.size > size) {
         return false
     }
 
-    for (index in indices) {
-        if (leftSelector(this[index]) != rightSelector(other[index])) {
+    for (index in other.indices) {
+        if (selector(this[index]) != selector(other[index])) {
             return false
         }
     }
