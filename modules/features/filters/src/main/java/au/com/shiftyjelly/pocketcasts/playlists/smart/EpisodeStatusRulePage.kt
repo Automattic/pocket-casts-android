@@ -28,14 +28,12 @@ internal fun EpisodeStatusRulePage(
     onChangeInProgressStatus: (Boolean) -> Unit,
     onChangeCompletedStatus: (Boolean) -> Unit,
     onSaveRule: () -> Unit,
-    onClickBack: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     RulePage(
         title = stringResource(LR.string.filters_chip_episode_status),
         onSaveRule = onSaveRule,
         isSaveEnabled = rule.unplayed || rule.inProgress || rule.completed,
-        onClickBack = onClickBack,
         modifier = modifier,
     ) { bottomPadding ->
         Column(
@@ -76,7 +74,6 @@ private fun EpisodeStatusRulePreview(
             onChangeInProgressStatus = { rule.copy(inProgress = it) },
             onChangeCompletedStatus = { rule.copy(completed = it) },
             onSaveRule = {},
-            onClickBack = {},
         )
     }
 }

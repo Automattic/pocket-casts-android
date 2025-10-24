@@ -6,6 +6,7 @@ plugins {
     alias(libs.plugins.kotlin.parcelize)
     alias(libs.plugins.compose.compiler)
     alias(libs.plugins.aboutlibraries)
+    alias(libs.plugins.aboutlibraries.android)
 }
 
 android {

@@ -59,6 +59,7 @@ import au.com.shiftyjelly.pocketcasts.models.type.SmartRules
 import au.com.shiftyjelly.pocketcasts.playlists.PlaylistsViewModel.PlaylistsState
 import au.com.shiftyjelly.pocketcasts.playlists.PlaylistsViewModel.UiState
 import au.com.shiftyjelly.pocketcasts.playlists.component.PlaylistPreviewRow
+import au.com.shiftyjelly.pocketcasts.playlists.component.PlaylistTooltip
 import au.com.shiftyjelly.pocketcasts.repositories.playlist.ManualPlaylistPreview
 import au.com.shiftyjelly.pocketcasts.repositories.playlist.Playlist
 import au.com.shiftyjelly.pocketcasts.repositories.playlist.PlaylistPreview
@@ -73,8 +74,10 @@ import au.com.shiftyjelly.pocketcasts.localization.R as LR
 @Composable
 internal fun PlaylistsPage(
     uiState: UiState,
-    getPreviewMetadataFlow: (String) -> StateFlow<PlaylistPreview.Metadata?>,
-    refreshPreviewMetadata: (String) -> Unit,
+    getArtworkUuidsFlow: (String) -> StateFlow<List<String>?>,
+    getEpisodeCountFlow: (String) -> StateFlow<Int?>,
+    refreshArtworkUuids: suspend (String) -> Unit,
+    refreshEpisodeCount: suspend (String) -> Unit,
     onCreatePlaylist: () -> Unit,
     onDeletePlaylist: (PlaylistPreview) -> Unit,
     onOpenPlaylist: (PlaylistPreview) -> Unit,
@@ -83,11 +86,11 @@ internal fun PlaylistsPage(
     onFreeAccountBannerCtaClick: () -> Unit,
     onFreeAccountBannerDismiss: () -> Unit,
     onShowPremadePlaylistsTooltip: () -> Unit,
-    onDismissPremadePlaylistsTooltip: () -> Unit,
+    onDismissTooltip: (PlaylistTooltip) -> Unit,
     modifier: Modifier = Modifier,
     listState: LazyListState = rememberLazyListState(),
 ) {
-    val showTooltip = uiState.showPremadePlaylistsTooltip
+    val topTooltip = uiState.displayedTooltips.firstOrNull()
 
     Box(
         modifier = Modifier
@@ -109,9 +112,12 @@ internal fun PlaylistsPage(
 
             PlaylistsContent(
                 playlistsState = uiState.playlists,
-                getPreviewMetadataFlow = getPreviewMetadataFlow,
-                refreshPreviewMetadata = refreshPreviewMetadata,
-                showPremadePlaylistsTooltip = showTooltip,
+                getArtworkUuidsFlow = getArtworkUuidsFlow,
+                getEpisodeCountFlow = getEpisodeCountFlow,
+                refreshArtworkUuids = refreshArtworkUuids,
+                refreshEpisodeCount = refreshEpisodeCount,
+                displayedTooltips = uiState.displayedTooltips,
+                onDismissTooltip = onDismissTooltip,
                 listState = listState,
                 contentPadding = PaddingValues(
                     bottom = LocalDensity.current.run { uiState.miniPlayerInset.toDp() },
@@ -121,10 +127,9 @@ internal fun PlaylistsPage(
                 onOpenPlaylist = onOpenPlaylist,
                 onReorderPlaylists = onReorderPlaylists,
                 onShowPlaylists = onShowPlaylists,
-                onDismissPremadePlaylistsTooltip = onDismissPremadePlaylistsTooltip,
             )
         }
-        if (showTooltip) {
+        if (topTooltip != null) {
             // We use a separate box to dismiss the tooltip instead of tooltip's 'onClickOutside'
             // in order to not dismiss the tooltip when the bottom navigation bar is tapped.
             Box(
@@ -133,7 +138,7 @@ internal fun PlaylistsPage(
                     .clickable(
                         indication = null,
                         interactionSource = null,
-                        onClick = onDismissPremadePlaylistsTooltip,
+                        onClick = { onDismissTooltip(topTooltip) },
                     ),
             )
 
@@ -147,9 +152,12 @@ internal fun PlaylistsPage(
 @Composable
 private fun PlaylistsContent(
     playlistsState: PlaylistsState,
-    getPreviewMetadataFlow: (String) -> StateFlow<PlaylistPreview.Metadata?>,
-    refreshPreviewMetadata: (String) -> Unit,
-    showPremadePlaylistsTooltip: Boolean,
+    getArtworkUuidsFlow: (String) -> StateFlow<List<String>?>,
+    getEpisodeCountFlow: (String) -> StateFlow<Int?>,
+    refreshArtworkUuids: suspend (String) -> Unit,
+    refreshEpisodeCount: suspend (String) -> Unit,
+    displayedTooltips: List<PlaylistTooltip>,
+    onDismissTooltip: (PlaylistTooltip) -> Unit,
     listState: LazyListState,
     contentPadding: PaddingValues,
     onCreatePlaylist: () -> Unit,
@@ -157,7 +165,6 @@ private fun PlaylistsContent(
     onOpenPlaylist: (PlaylistPreview) -> Unit,
     onReorderPlaylists: (List<String>) -> Unit,
     onShowPlaylists: (List<PlaylistPreview>) -> Unit,
-    onDismissPremadePlaylistsTooltip: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     AnimatedContent(
@@ -177,15 +184,17 @@ private fun PlaylistsContent(
                 if (playlists.isNotEmpty()) {
                     PlaylistsColumn(
                         playlists = playlists,
-                        getPreviewMetadataFlow = getPreviewMetadataFlow,
-                        refreshPreviewMetadata = refreshPreviewMetadata,
-                        showPremadePlaylistsTooltip = showPremadePlaylistsTooltip,
+                        getArtworkUuidsFlow = getArtworkUuidsFlow,
+                        getEpisodeCountFlow = getEpisodeCountFlow,
+                        refreshArtworkUuids = refreshArtworkUuids,
+                        refreshEpisodeCount = refreshEpisodeCount,
+                        displayedTooltips = displayedTooltips,
+                        onDismissTooltip = onDismissTooltip,
                         listState = listState,
                         contentPadding = contentPadding,
                         onDelete = onDeletePlaylist,
                         onOpen = onOpenPlaylist,
                         onReorderPlaylists = onReorderPlaylists,
-                        onDismissPremadePlaylistsTooltip = onDismissPremadePlaylistsTooltip,
                         modifier = Modifier.fillMaxSize(),
                     )
                 } else {
@@ -209,15 +218,17 @@ private fun PlaylistsContent(
 @Composable
 private fun PlaylistsColumn(
     playlists: List<PlaylistPreview>,
-    getPreviewMetadataFlow: (String) -> StateFlow<PlaylistPreview.Metadata?>,
-    refreshPreviewMetadata: (String) -> Unit,
-    showPremadePlaylistsTooltip: Boolean,
+    getArtworkUuidsFlow: (String) -> StateFlow<List<String>?>,
+    getEpisodeCountFlow: (String) -> StateFlow<Int?>,
+    refreshArtworkUuids: suspend (String) -> Unit,
+    refreshEpisodeCount: suspend (String) -> Unit,
+    displayedTooltips: List<PlaylistTooltip>,
+    onDismissTooltip: (PlaylistTooltip) -> Unit,
     listState: LazyListState,
     contentPadding: PaddingValues,
     onDelete: (PlaylistPreview) -> Unit,
     onOpen: (PlaylistPreview) -> Unit,
     onReorderPlaylists: (List<String>) -> Unit,
-    onDismissPremadePlaylistsTooltip: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val hapticFeedback = LocalHapticFeedback.current
@@ -243,6 +254,9 @@ private fun PlaylistsColumn(
         contentPadding = contentPadding,
         modifier = modifier,
     ) {
+        val showPremadeTooltip = PlaylistTooltip.Premade in displayedTooltips
+        val showRearrangeTooltip = PlaylistTooltip.Rearrange in displayedTooltips
+
         itemsIndexed(
             items = displayItems,
             key = { _, item -> item.uuid },
@@ -253,14 +267,17 @@ private fun PlaylistsColumn(
 
                 PlaylistPreviewRow(
                     playlist = playlist,
-                    getPreviewMetadataFlow = getPreviewMetadataFlow,
-                    refreshPreviewMetadata = refreshPreviewMetadata,
-                    showTooltip = showPremadePlaylistsTooltip && index == displayItems.lastIndex,
+                    getArtworkUuidsFlow = getArtworkUuidsFlow,
+                    getEpisodeCountFlow = getEpisodeCountFlow,
+                    refreshArtworkUuids = refreshArtworkUuids,
+                    refreshEpisodeCount = refreshEpisodeCount,
+                    showPremadeTooltip = showPremadeTooltip && index == displayItems.lastIndex,
+                    showRearrangeTooltip = showRearrangeTooltip && index == 0,
+                    onDismissTooltip = onDismissTooltip,
                     showDivider = index != displayItems.lastIndex,
                     backgroundColor = backgroundColor,
                     onDelete = { onDelete(playlist) },
                     onClick = { onOpen(playlist) },
-                    onClickTooltip = onDismissPremadePlaylistsTooltip,
                     modifier = Modifier
                         .longPressDraggableHandle(
                             onDragStarted = {
@@ -379,11 +396,13 @@ private fun PlaylistsPageEmptyStatePreview() {
                 playlists = PlaylistsState.Loaded(value = emptyList()),
                 showOnboarding = false,
                 showFreeAccountBanner = true,
-                showPremadePlaylistsTooltip = false,
+                displayedTooltips = emptyList(),
                 miniPlayerInset = 0,
             ),
-            getPreviewMetadataFlow = { MutableStateFlow(null) },
-            refreshPreviewMetadata = {},
+            getArtworkUuidsFlow = { MutableStateFlow(null) },
+            getEpisodeCountFlow = { MutableStateFlow(null) },
+            refreshArtworkUuids = {},
+            refreshEpisodeCount = {},
             onCreatePlaylist = {},
             onDeletePlaylist = {},
             onOpenPlaylist = {},
@@ -392,7 +411,7 @@ private fun PlaylistsPageEmptyStatePreview() {
             onFreeAccountBannerCtaClick = {},
             onFreeAccountBannerDismiss = {},
             onShowPremadePlaylistsTooltip = {},
-            onDismissPremadePlaylistsTooltip = {},
+            onDismissTooltip = {},
         )
     }
 }
@@ -406,11 +425,13 @@ private fun PlaylistsPageEmptyStateNoBannerPreview() {
                 playlists = PlaylistsState.Loaded(value = emptyList()),
                 showOnboarding = false,
                 showFreeAccountBanner = false,
-                showPremadePlaylistsTooltip = false,
+                displayedTooltips = emptyList(),
                 miniPlayerInset = 0,
             ),
-            getPreviewMetadataFlow = { MutableStateFlow(null) },
-            refreshPreviewMetadata = {},
+            getArtworkUuidsFlow = { MutableStateFlow(null) },
+            getEpisodeCountFlow = { MutableStateFlow(null) },
+            refreshArtworkUuids = {},
+            refreshEpisodeCount = {},
             onCreatePlaylist = {},
             onDeletePlaylist = {},
             onOpenPlaylist = {},
@@ -419,7 +440,7 @@ private fun PlaylistsPageEmptyStateNoBannerPreview() {
             onFreeAccountBannerCtaClick = {},
             onFreeAccountBannerDismiss = {},
             onShowPremadePlaylistsTooltip = {},
-            onDismissPremadePlaylistsTooltip = {},
+            onDismissTooltip = {},
         )
     }
 }
@@ -451,11 +472,13 @@ private fun PlaylistPagePreview(
                 ),
                 showOnboarding = false,
                 showFreeAccountBanner = true,
-                showPremadePlaylistsTooltip = false,
+                displayedTooltips = emptyList(),
                 miniPlayerInset = 0,
             ),
-            getPreviewMetadataFlow = { MutableStateFlow(null) },
-            refreshPreviewMetadata = {},
+            getArtworkUuidsFlow = { MutableStateFlow(null) },
+            getEpisodeCountFlow = { MutableStateFlow(null) },
+            refreshArtworkUuids = {},
+            refreshEpisodeCount = {},
             onCreatePlaylist = {},
             onDeletePlaylist = {},
             onOpenPlaylist = {},
@@ -464,7 +487,7 @@ private fun PlaylistPagePreview(
             onFreeAccountBannerCtaClick = {},
             onFreeAccountBannerDismiss = {},
             onShowPremadePlaylistsTooltip = {},
-            onDismissPremadePlaylistsTooltip = {},
+            onDismissTooltip = {},
         )
     }
 }

@@ -576,7 +576,8 @@ interface Settings {
 
     val showPodcastsRecentlyPlayedSortOrderTooltip: UserSetting<Boolean>
 
-    val showEmptyFiltersListTooltip: UserSetting<Boolean>
+    val showPremadePlaylistsTooltip: UserSetting<Boolean>
+    val showRearrangePlaylistsTooltip: UserSetting<Boolean>
 
     val suggestedFoldersDismissTimestamp: UserSetting<Instant?>
     val suggestedFoldersDismissCount: UserSetting<Int>

@@ -18,7 +18,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.rememberNestedScrollInteropConnection
-import androidx.core.os.BundleCompat
 import androidx.core.os.bundleOf
 import androidx.fragment.app.viewModels
 import androidx.fragment.compose.content
@@ -32,7 +31,6 @@ import au.com.shiftyjelly.pocketcasts.ui.helper.FragmentHostListener
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.utils.extensions.requireParcelable
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseDialogFragment
-import au.com.shiftyjelly.pocketcasts.views.swipe.AddToPlaylistFragmentFactory
 import au.com.shiftyjelly.pocketcasts.views.swipe.AddToPlaylistFragmentFactory.Source
 import dagger.hilt.android.AndroidEntryPoint
 import dagger.hilt.android.lifecycle.withCreationCallback
@@ -87,8 +85,8 @@ internal class AddToPlaylistFragment : BaseDialogFragment() {
                     navController = navController,
                     searchFieldState = viewModel.searchFieldState.textState,
                     newPlaylistNameState = viewModel.newPlaylistNameState,
-                    getPreviewMetadataFlow = viewModel::getPreviewMetadataFlow,
-                    refreshPreviewMetadata = viewModel::refreshPreviewMetadata,
+                    getArtworkUuidsFlow = viewModel::getArtworkUuidsFlow,
+                    refreshArtworkUuids = viewModel::refreshArtworkUuids,
                     onClickCreatePlaylist = {
                         viewModel.trackCreateNewPlaylistTapped()
                         viewModel.createPlaylist()

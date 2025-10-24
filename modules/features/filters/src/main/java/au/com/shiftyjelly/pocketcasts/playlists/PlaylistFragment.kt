@@ -190,7 +190,7 @@ class PlaylistFragment :
             },
             rightButton = PlaylistHeaderButtonData(
                 iconId = IR.drawable.ic_playlist_play,
-                label = getString(LR.string.playlist_play_all),
+                label = getString(LR.string.play_all),
                 onClick = {
                     viewModel.trackPlayAllTapped()
                     playAll()
@@ -355,7 +355,7 @@ class PlaylistFragment :
                         body = getString(LR.string.manual_playlist_no_content_body),
                         iconId = IR.drawable.ic_playlists,
                         primaryButton = NoContentData.Button(
-                            text = getString(LR.string.browse_shows),
+                            text = getString(LR.string.browse_podcasts),
                             onClick = {
                                 viewModel.trackBrowseShowsCtaTapped()
                                 val hostListener = (requireActivity() as FragmentHostListener)
@@ -436,19 +436,26 @@ class PlaylistFragment :
         if (parentFragmentManager.findFragmentByTag("confirm_and_play") != null) {
             return
         }
-        if (viewModel.shouldShowPlayAllWarning()) {
-            val episodeCount = viewModel.uiState.value.playlist?.episodes.orEmpty().size
-            val buttonString = getString(LR.string.filters_play_episodes, episodeCount)
+        val episodeCount = viewModel.uiState.value.playlist?.metadata?.displayedAvailableEpisodeCount ?: 0
+        when {
+            episodeCount <= 0 -> {
+                val snackbarView = (requireActivity() as FragmentHostListener).snackBarView()
+                Snackbar.make(snackbarView, getString(LR.string.play_all_no_episodes_message), Snackbar.LENGTH_LONG).show()
+            }
+            viewModel.shouldShowPlayAllWarning() -> {
+                val buttonString = getString(LR.string.filters_play_episodes, episodeCount)
 
-            val dialog = ConfirmationDialog()
-                .setTitle(getString(LR.string.filters_play_all))
-                .setSummary(getString(LR.string.filters_play_all_summary))
-                .setIconId(IR.drawable.ic_play_all)
-                .setButtonType(ConfirmationDialog.ButtonType.Danger(buttonString))
-                .setOnConfirm { viewModel.playAll() }
-            dialog.show(parentFragmentManager, "confirm_play_all")
-        } else {
-            viewModel.playAll()
+                val dialog = ConfirmationDialog()
+                    .setTitle(getString(LR.string.filters_play_all))
+                    .setSummary(getString(LR.string.filters_play_all_summary))
+                    .setIconId(IR.drawable.ic_play_all)
+                    .setButtonType(ConfirmationDialog.ButtonType.Danger(buttonString))
+                    .setOnConfirm { viewModel.playAll() }
+                dialog.show(parentFragmentManager, "confirm_play_all")
+            }
+            else -> {
+                viewModel.playAll()
+            }
         }
     }
 

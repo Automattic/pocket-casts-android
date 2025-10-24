@@ -1,6 +1,10 @@
 7.101
 -----
-
+*   Updates
+    *   Improved login experience on WearOS
+        ([#4631](https://github.com/Automattic/pocket-casts-android/pull/4631))
+    *   Bring back legacy Google login on WearOS 14 and below
+        ([#4633](https://github.com/Automattic/pocket-casts-android/pull/4633))
 
 7.100
 -----

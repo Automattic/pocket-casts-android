@@ -43,7 +43,6 @@ Language: ru
     <string name="playlist_episode_unavailable_cta">Удалить из плейлиста</string>
     <string name="playlist_episode_unavailable_description">Автор подкаста удалил этот выпуск. Он останется в вашем плейлисте, пока вы его не удалите.</string>
     <string name="playlist_episode_unavailable_title">Выпуск недоступен</string>
-    <string name="playlist_archive_all">Архивировать все</string>
     <string name="episode_sort_custom_order">Произвольный порядок</string>
     <string name="manual_playlist_search_no_podcast_or_folder_body">Не удалось найти выпуски и папки по этому запросу. Попробуйте поискать по другому ключевому слову.</string>
     <string name="manual_playlist_search_no_podcast_title">Подкастов не найдено</string>
@@ -53,7 +52,6 @@ Language: ru
     <string name="manual_playlist_no_content_title_alternative">Создать плейлист</string>
     <string name="manual_playlist_no_content_title">Добавить выпуски в плейлист</string>
     <string name="manual_playlist_no_content_body">Смахните выпуск влево, чтобы добавить его в плейлист.</string>
-    <string name="browse_shows">Просмотр шоу</string>
     <string name="unavailable">Недоступно</string>
     <string name="add_to_playlist_failure_message">Этот плейлист заполнен. Удалите несколько выпусков или создайте новый плейлист.</string>
     <string name="added_to_playlist">%1$s добавлен в «%2$s»</string>
@@ -92,7 +90,6 @@ Language: ru
     <string name="playlist_sort_by">Сортировать по</string>
     <string name="playlist_select_episodes">Выбрать выпуски</string>
     <string name="playlist_options">Настройки плейлиста</string>
-    <string name="playlist_download_all">Скачать все</string>
     <string name="smart_playlist_no_content_body">У вас два варианта: порадоваться завершению этого списка или изменить правила, чтобы его расширить.</string>
     <string name="smart_playlist_no_content_title">Нет выпусков</string>
     <string name="playlist_play_all">Воспроизвести все</string>

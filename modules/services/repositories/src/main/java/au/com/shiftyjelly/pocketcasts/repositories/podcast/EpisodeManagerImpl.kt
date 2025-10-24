@@ -863,23 +863,12 @@ class EpisodeManagerImpl @Inject constructor(
         }
     }
 
-    override fun findEpisodesToSyncBlocking(): List<PodcastEpisode> {
-        return episodeDao.findEpisodesToSyncBlocking()
-    }
-
     override suspend fun findEpisodesToSync(): List<PodcastEpisode> {
         return episodeDao.findEpisodesToSync()
     }
 
     override fun findEpisodesForHistorySyncBlocking(): List<PodcastEpisode> {
         return episodeDao.findEpisodesForHistorySyncBlocking()
-    }
-
-    override suspend fun markAllEpisodesSynced(episodes: List<PodcastEpisode>) {
-        val episodeUuids = episodes.map { it.uuid }
-        episodeUuids.chunked(500).forEach { chunked ->
-            episodeDao.markAllSynced(chunked)
-        }
     }
 
     // Playback manager is only optional for UI tests. Should never be optional in the app but can't work out

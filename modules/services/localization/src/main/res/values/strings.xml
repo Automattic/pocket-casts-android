@@ -229,11 +229,11 @@
     <string name="ad_report_reason_other">Other</string>
     <string name="banner_ad_plus_prompt">Say goodbye to banner ads and more with Pocket Casts Plus</string>
     <string name="ad_report_confirmation">You reported this ad.</string>
-    <string name="other_options">Other Options</string>
-    <string name="add_episodes">Add Episodes</string>
-    <string name="your_podcasts">Your Podcasts</string>
+    <string name="other_options">Other options</string>
+    <string name="add_episodes">Add episodes</string>
+    <string name="your_podcasts">Your podcasts</string>
     <string name="unavailable">Unavailable</string>
-    <string name="browse_shows">Browse Shows</string>
+    <string name="browse_podcasts">Browse podcasts</string>
 
     <string name="multiselect_actions_shown">Shortcut in toolbar</string>
     <string name="multiselect_actions_hidden">In overflow</string>
@@ -965,6 +965,9 @@
     <string name="create_smart_playlist">Create Smart Playlist</string>
     <string name="decrement_longer_than_duration">Decrement \"longer than\" duration</string>
     <string name="decrement_shorter_than_duration">Decrement \"shorter than\" duration</string>
+    <string name="delete_playlist">Delete Playlist</string>
+    <string name="delete_playlist_confirmation_body">Are you sure you want to delete your playlist? There’s no way to undo this.</string>
+    <string name="delete_playlist_confirmation_title">Delete Playlist?</string>
     <string name="enabled_rules">Enabled Rules</string>
     <!-- %1$s is status like 'In Progress' and %2$d is count of other episode statuses -->
     <string name="episode_status_rule_description">%1$s + %2$d</string>
@@ -985,16 +988,17 @@
     <string name="new_playlists_title_placeholder">Playlist’s name</string>
     <string name="new_smart_playlist_banner_body">Automatically add episodes based on rules</string>
     <string name="new_smart_playlist_banner_title">Make into Smart Playlist</string>
-    <string name="playlist_archive_all">Archive All</string>
+    <string name="play_all_no_episodes_message">All episodes archived. Add or unarchive to play.</string>
+    <string name="playlist_archive_all" translatable="false">@string/podcast_archive_all</string>
     <string name="playlist_artwork_description">Playlist’s artwork</string>
-    <string name="playlist_download_all">Download All</string>
-    <string name="playlist_edit_episodes">Rearrange Episodes</string>
+    <string name="playlist_download_all" translatable="false">@string/podcast_download_all</string>
+    <string name="playlist_edit_episodes">Rearrange episodes</string>
     <string name="playlist_edit_episodes_title">Edit playlist</string>
     <string name="playlist_episode_unavailable_title">Episode unavailable</string>
     <string name="playlist_episode_unavailable_description">The podcast creator deleted this episode. It will stay in your playlist until you remove it.</string>
     <string name="playlist_episode_unavailable_cta">Remove from playlist</string>
     <string name="playlist_episodes_archived_count">%1$d archived</string>
-    <string name="playlist_episodes_archived_title">No Episodes</string>
+    <string name="playlist_episodes_archived_title">No episodes</string>
     <plurals name="playlist_episodes_archived_description">
         <item quantity="one">Your episode in this playlist has been archived</item>
         <item quantity="other">All %1$d episodes of this playlist have been archived</item>
@@ -1002,12 +1006,10 @@
     <string name="playlist_episodes_hide_archived" translatable="false">@string/podcast_hide_archived</string>
     <string name="playlist_episodes_show_archived" translatable="false">@string/show_archived</string>
     <string name="playlist_is_full_description">Playlist is full. Try creating a new one.</string>
-    <string name="playlist_options">Playlist Options</string>
-    <string name="playlist_play_all">Play All</string>
-    <string name="playlist_select_episodes">Select Episodes</string>
+    <string name="playlist_options">Playlist options</string>
+    <string name="playlist_select_episodes">Select episodes</string>
     <string name="playlist_setting_auto_download_description">Enable to auto download episodes in this playlist.</string>
-    <string name="playlist_sort_by">Sort By</string>
-    <string name="playlist_unarchive_all">Unarchive All</string>
+    <string name="playlist_sort_by">Sort by</string>
     <string name="playlists">Playlists</string>
     <string name="playlists_empty_state_body">Playlists let you organize episodes manually or automatically with Smart Rules.</string>
     <string name="playlists_empty_state_title">Organize episodes your way</string>
@@ -1023,6 +1025,8 @@
     <string name="podcast_not_in_playlists">Not included in any Smart Playlists</string>
     <string name="premade_playlists_tooltip_body">We made these to help you get started.\nThey auto-update based on your listening.</string>
     <string name="premade_playlists_tooltip_title">Smart Playlists, ready to go</string>
+    <string name="rearrange_playlists_tooltip_body">Press and hold a playlist to move it.</string>
+    <string name="rearrange_playlists_tooltip_title">Reorder your playlists</string>
     <!-- %1$s is playlist's title -->
     <string name="preview_playlist">Preview %1$s</string>
     <string name="save_smart_rule">Save Smart Rule</string>
@@ -1035,13 +1039,10 @@
     <string name="smart_playlist_no_content_title">No episodes</string>
     <string name="smart_rule_podcasts_all_description">New podcasts you follow will be automatically added.</string>
     <string name="smart_rule_podcasts_all_description_disabled">New podcasts you follow will not be automatically added.</string>
-    <string name="smart_rule_podcasts_all_label">All Followed Podcasts</string>
-    <string name="smart_rule_podcasts_deselect_all">Deselect All</string>
-    <string name="smart_rule_podcasts_select_all">Select All</string>
-    <string name="smart_rule_podcasts_title">Choose Podcasts</string>
+    <string name="smart_rule_podcasts_all_label">All followed podcasts</string>
     <string name="smart_rule_starred_description">Only include starred episodes that match your other rules.</string>
     <string name="smart_rule_starred_description_disabled">Starred episodes can still appear if they match your other rules.</string>
-    <string name="smart_rule_starred_label">Starred Episodes</string>
+    <string name="smart_rule_starred_label">Starred episodes</string>
     <string name="smart_rules">Smart Rules</string>
     <string name="smart_rules_description">Set up Smart Rules to automatically add episodes to your Smart Playlist.</string>
 

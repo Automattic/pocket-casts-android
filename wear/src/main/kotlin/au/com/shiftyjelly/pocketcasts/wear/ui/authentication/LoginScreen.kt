@@ -38,8 +38,9 @@ fun LoginScreen(
                     colors = ChipDefaults.secondaryChipColors(),
                     icon = DrawableResPaintable(IR.drawable.google_g_white),
                     onClick = {
-                        viewModel.onGoogleLoginClicked()
-                        onLoginWithGoogleClick()
+                        viewModel.onGoogleLoginClicked {
+                            onLoginWithGoogleClick()
+                        }
                     },
                 )
             }

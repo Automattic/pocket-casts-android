@@ -27,11 +27,17 @@ class FakePlaylistManager : PlaylistManager {
         return playlistPreviews.asStateFlow()
     }
 
-    override fun getPreviewMetadataFlow(playlistUuid: String): StateFlow<PlaylistPreview.Metadata?> {
+    override fun getArtworkUuidsFlow(playlistUuid: String): StateFlow<List<String>?> {
         return MutableStateFlow(null)
     }
 
-    override suspend fun refreshPreviewMetadata(playlistUuid: String) = Unit
+    override fun getEpisodeCountFlow(playlistUuid: String): StateFlow<Int?> {
+        return MutableStateFlow(null)
+    }
+
+    override suspend fun refreshArtworkUuids(playlistUuid: String) = Unit
+
+    override suspend fun refreshEpisodeCount(playlistUuid: String) = Unit
 
     override suspend fun getAutoDownloadEpisodes(): List<PodcastEpisode> {
         return emptyList()

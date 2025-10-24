@@ -6,7 +6,6 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
@@ -16,13 +15,18 @@ import androidx.compose.foundation.selection.toggleable
 import androidx.compose.foundation.text.input.TextFieldState
 import androidx.compose.foundation.text.input.rememberTextFieldState
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.LocalRippleConfiguration
+import androidx.compose.material.MaterialTheme
+import androidx.compose.material.RippleConfiguration
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
@@ -36,8 +40,10 @@ import au.com.shiftyjelly.pocketcasts.compose.components.HorizontalDivider
 import au.com.shiftyjelly.pocketcasts.compose.components.SettingRow
 import au.com.shiftyjelly.pocketcasts.compose.components.SettingRowToggle
 import au.com.shiftyjelly.pocketcasts.compose.preview.ThemePreviewParameterProvider
+import au.com.shiftyjelly.pocketcasts.compose.theme
 import au.com.shiftyjelly.pocketcasts.playlists.component.PlaylistNameInputField
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme.ThemeType
+import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 @Composable
@@ -47,6 +53,7 @@ internal fun SettingsPage(
     autoDownloadEpisodeLimit: Int,
     onChangeAutoDownloadValue: (Boolean) -> Unit,
     onClickEpisodeLimit: () -> Unit,
+    onClickDeletePlaylist: () -> Unit,
     onClickBack: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -73,13 +80,9 @@ internal fun SettingsPage(
             },
             modifier = Modifier.padding(horizontal = 16.dp),
         )
-        Spacer(
-            modifier = Modifier.height(20.dp),
-        )
         HorizontalDivider(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 16.dp),
+            startIndent = 16.dp,
+            modifier = Modifier.padding(top = 20.dp),
         )
         AutoDownloadSwitchRow(
             isAutoDownloadEnabled = isAutoDownloadEnabled,
@@ -93,6 +96,12 @@ internal fun SettingsPage(
                 onClick = onClickEpisodeLimit,
             )
         }
+        HorizontalDivider(
+            startIndent = 16.dp,
+        )
+        DeleteButton(
+            onClick = onClickDeletePlaylist,
+        )
     }
 }
 
@@ -134,6 +143,30 @@ private fun AutoDownloadEpisodeCountRow(
     )
 }
 
+@Composable
+private fun DeleteButton(
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    CompositionLocalProvider(
+        LocalRippleConfiguration provides RippleConfiguration(color = MaterialTheme.theme.colors.support05),
+    ) {
+        SettingRow(
+            primaryText = stringResource(LR.string.delete_playlist),
+            primaryTextColor = MaterialTheme.theme.colors.support05,
+            icon = painterResource(IR.drawable.ic_delete),
+            iconTint = MaterialTheme.theme.colors.support05,
+            horizontalPadding = 16.dp,
+            verticalPadding = 16.dp,
+            modifier = modifier
+                .clickable(
+                    role = Role.Button,
+                    onClick = onClick,
+                ),
+        )
+    }
+}
+
 @PreviewRegularDevice
 @Composable
 private fun SettingsPagePreview(
@@ -149,6 +182,7 @@ private fun SettingsPagePreview(
             autoDownloadEpisodeLimit = 10,
             onChangeAutoDownloadValue = { isAutoDownloadEnabled = it },
             onClickEpisodeLimit = {},
+            onClickDeletePlaylist = {},
             onClickBack = {},
         )
     }

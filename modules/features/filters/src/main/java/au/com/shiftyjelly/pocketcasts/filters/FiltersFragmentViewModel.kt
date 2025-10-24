@@ -116,7 +116,7 @@ class FiltersFragmentViewModel @Inject constructor(
     }
 
     suspend fun shouldShowTooltipSuspend(filters: List<PlaylistEntity>, onShowTooltip: () -> Unit) {
-        if (!settings.showEmptyFiltersListTooltip.value) return
+        if (!settings.showPremadePlaylistsTooltip.value) return
         if (filters.size > 2) return
 
         val requiredUuids = setOf(Playlist.NEW_RELEASES_UUID, Playlist.IN_PROGRESS_UUID)
@@ -138,7 +138,7 @@ class FiltersFragmentViewModel @Inject constructor(
     }
 
     fun onTooltipClosed() {
-        settings.showEmptyFiltersListTooltip.set(false, updateModifiedAt = false)
+        settings.showPremadePlaylistsTooltip.set(false, updateModifiedAt = false)
         analyticsTracker.track(AnalyticsEvent.FILTER_TOOLTIP_CLOSED)
     }
 

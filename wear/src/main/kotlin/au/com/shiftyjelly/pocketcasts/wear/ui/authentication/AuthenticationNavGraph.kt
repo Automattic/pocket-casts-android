@@ -2,6 +2,7 @@
 
 package au.com.shiftyjelly.pocketcasts.wear.ui.authentication
 
+import android.os.Build
 import android.widget.Toast
 import androidx.activity.compose.LocalActivity
 import androidx.compose.runtime.Composable
@@ -10,10 +11,12 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.res.stringResource
 import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.navigation
 import androidx.wear.compose.navigation.composable
+import kotlinx.coroutines.delay
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 const val AUTHENTICATION_SUB_GRAPH = "authentication_graph"
@@ -45,7 +48,12 @@ fun NavGraphBuilder.authenticationNavGraph(
         ) {
             LoginScreen(
                 onLoginWithGoogleClick = {
-                    navController.navigate(AuthenticationNavRoutes.LOGIN_WITH_GOOGLE)
+                    val route = if (Build.VERSION.SDK_INT > Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
+                        AuthenticationNavRoutes.LOGIN_WITH_GOOGLE
+                    } else {
+                        AuthenticationNavRoutes.LOGIN_WITH_GOOGLE_LEGACY
+                    }
+                    navController.navigate(route)
                 },
                 onLoginWithPhoneClick = {
                     navController.navigate(AuthenticationNavRoutes.LOGIN_WITH_PHONE)
@@ -77,24 +85,28 @@ fun NavGraphBuilder.authenticationNavGraph(
         ) {
             val activity = LocalActivity.current
 
-            var showErrorToast by remember { mutableStateOf(false) }
+            var showErrorToastMessage by remember { mutableStateOf<String?>(null) }
 
-            LaunchedEffect(activity, showErrorToast) {
-                if (showErrorToast) {
-                    Toast.makeText(activity, LR.string.onboarding_continue_with_google_error, Toast.LENGTH_SHORT).show()
+            LaunchedEffect(activity, showErrorToastMessage) {
+                showErrorToastMessage?.let {
+                    Toast.makeText(activity, it, Toast.LENGTH_SHORT).show()
+                    delay(500L)
+                    navController.popBackStack()
                 }
             }
+            val defaultErrorMessage = stringResource(LR.string.onboarding_continue_with_google_error)
 
             LoginWithGoogleScreen(
                 successContent = {
                     googleSignInSuccessScreen(GoogleAccountData(name = it.name, avatarUrl = it.avatarUrl))
                 },
                 onError = {
-                    navController.popBackStack()
-                    navController.navigate(AuthenticationNavRoutes.LOGIN_WITH_GOOGLE_LEGACY)
+                    showErrorToastMessage = it?.toString() ?: defaultErrorMessage
                 },
                 onGoogleNotAvailable = {
-                    showErrorToast = true
+                    showErrorToastMessage = defaultErrorMessage
+                },
+                onCancel = {
                     navController.popBackStack()
                 },
             )

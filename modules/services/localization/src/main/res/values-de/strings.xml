@@ -43,7 +43,6 @@ Language: de
     <string name="playlist_episode_unavailable_cta">Aus Wiedergabeliste entfernen</string>
     <string name="playlist_episode_unavailable_description">Der Podcast-Ersteller hat diese Folge gelöscht. Sie bleibt in deiner Wiedergabeliste, bis du sie entfernst.</string>
     <string name="playlist_episode_unavailable_title">Folge nicht verfügbar</string>
-    <string name="playlist_archive_all">Alle archivieren</string>
     <string name="episode_sort_custom_order">Individuelle Reihenfolge</string>
     <string name="manual_playlist_search_no_podcast_or_folder_body">Wir konnten keinen Podcast oder Ordner für diese Suche finden. Versuche es mit einem anderen Stichwort.</string>
     <string name="manual_playlist_search_no_podcast_title">Kein Podcast gefunden</string>
@@ -53,7 +52,6 @@ Language: de
     <string name="manual_playlist_no_content_title_alternative">Deine Wiedergabeliste erstellen</string>
     <string name="manual_playlist_no_content_title">Folgen zu deiner Wiedergabeliste hinzufügen</string>
     <string name="manual_playlist_no_content_body">Wische bei einer Folge nach links, um sie zu deiner Wiedergabeliste hinzuzufügen.</string>
-    <string name="browse_shows">Shows durchsuchen</string>
     <string name="unavailable">Nicht verfügbar</string>
     <string name="added_to_playlist">%1$s zu „%2$s“ hinzugefügt</string>
     <string name="add_to_playlist_failure_message">Diese Wiedergabeliste ist voll. Entferne einige Folgen oder beginne eine neue.</string>
@@ -92,7 +90,6 @@ Language: de
     <string name="playlist_sort_by">Sortieren nach</string>
     <string name="playlist_select_episodes">Folgen auswählen</string>
     <string name="playlist_options">Wiedergabelisten-Optionen</string>
-    <string name="playlist_download_all">Alle herunterladen</string>
     <string name="smart_playlist_no_content_body">Jetzt kannst du entweder stolz darauf sein, deine Liste durchgehört zu haben, oder deine Regeln bearbeiten, um dir noch mehr Podcasts vorzuknöpfen.</string>
     <string name="smart_playlist_no_content_title">Keine Folgen</string>
     <string name="playlist_play_all">Alle Titel abspielen</string>

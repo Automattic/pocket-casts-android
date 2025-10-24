@@ -61,8 +61,8 @@ import au.com.shiftyjelly.pocketcasts.localization.R as LR
 @Composable
 internal fun AutoDownloadSettingsPlaylistsPage(
     playlists: List<PlaylistPreview>,
-    getPreviewMetadataFlow: (String) -> StateFlow<PlaylistPreview.Metadata?>,
-    refreshPreviewMetadata: (String) -> Unit,
+    getArtworkUuidsFlow: (String) -> StateFlow<List<String>?>,
+    refreshArtworkUuids: suspend (String) -> Unit,
     onChangePlaylist: (String, Boolean) -> Unit,
     onChangeAllPlaylists: (Boolean) -> Unit,
     modifier: Modifier = Modifier,
@@ -133,8 +133,8 @@ internal fun AutoDownloadSettingsPlaylistsPage(
                     isSelected = playlist.settings.isAutoDownloadEnabled,
                     showDivider = index != playlists.lastIndex,
                     usePlaylists = usePlaylists,
-                    getPreviewMetadataFlow = getPreviewMetadataFlow,
-                    refreshPreviewMetadata = refreshPreviewMetadata,
+                    getArtworkUuidsFlow = getArtworkUuidsFlow,
+                    refreshArtworkUuids = refreshArtworkUuids,
                     modifier = Modifier.toggleable(
                         role = Role.Checkbox,
                         value = playlist.settings.isAutoDownloadEnabled,
@@ -152,17 +152,17 @@ private fun PlaylistRow(
     isSelected: Boolean,
     showDivider: Boolean,
     usePlaylists: Boolean,
-    getPreviewMetadataFlow: (String) -> StateFlow<PlaylistPreview.Metadata?>,
-    refreshPreviewMetadata: (String) -> Unit,
+    getArtworkUuidsFlow: (String) -> StateFlow<List<String>?>,
+    refreshArtworkUuids: suspend (String) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     if (usePlaylists) {
-        val metadata by remember(playlist.uuid) {
-            getPreviewMetadataFlow(playlist.uuid)
+        val artworkUuids by remember(playlist.uuid) {
+            getArtworkUuidsFlow(playlist.uuid)
         }.collectAsState()
 
-        LaunchedEffect(playlist.uuid, refreshPreviewMetadata) {
-            refreshPreviewMetadata(playlist.uuid)
+        LaunchedEffect(playlist.uuid, refreshArtworkUuids) {
+            refreshArtworkUuids(playlist.uuid)
         }
 
         Column(
@@ -175,7 +175,7 @@ private fun PlaylistRow(
                     .padding(horizontal = 16.dp, vertical = 12.dp),
             ) {
                 PlaylistArtwork(
-                    podcastUuids = metadata?.artworkPodcastUuids.orEmpty(),
+                    podcastUuids = artworkUuids.orEmpty(),
                     artworkSize = 56.dp,
                 )
                 Spacer(
@@ -277,8 +277,8 @@ private fun AutoDownloadSettingsPlaylistsPagePreview(
                 ),
 
             ),
-            getPreviewMetadataFlow = { MutableStateFlow(null) },
-            refreshPreviewMetadata = {},
+            getArtworkUuidsFlow = { MutableStateFlow(null) },
+            refreshArtworkUuids = {},
             onChangePlaylist = { _, _ -> },
             onChangeAllPlaylists = {},
         )

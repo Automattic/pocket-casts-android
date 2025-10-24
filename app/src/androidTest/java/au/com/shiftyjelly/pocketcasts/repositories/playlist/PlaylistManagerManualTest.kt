@@ -908,4 +908,13 @@ class PlaylistManagerManualTest {
             assertEquals(45.seconds, awaitItem()?.metadata?.playbackDurationLeft)
         }
     }
+
+    @Test
+    fun setReorderPlaylistsTooltip() = dsl.test {
+        expectRearrangeTooltipNotSet()
+
+        manager.createManualPlaylist("Playlist name")
+
+        expectRearrangeTooltipSet()
+    }
 }

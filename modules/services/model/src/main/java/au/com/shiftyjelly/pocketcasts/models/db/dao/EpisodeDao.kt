@@ -263,10 +263,6 @@ abstract class EpisodeDao {
     abstract fun findDownloadingEpisodesIncludingFailedRxFlowable(failedDownloadCutoff: Long, failedEpisodeStatusEnum: EpisodeStatusEnum = EpisodeStatusEnum.DOWNLOAD_FAILED, downloadEpisodeStatusEnum: EpisodeStatusEnum = EpisodeStatusEnum.DOWNLOADED): Flowable<List<PodcastEpisode>>
 
     @Transaction
-    @Query("SELECT * FROM podcast_episodes WHERE (download_task_id IS NOT NULL AND episode_status == :notDownloaded)")
-    abstract suspend fun findStaleDownloads(notDownloaded: EpisodeStatusEnum = EpisodeStatusEnum.NOT_DOWNLOADED): List<PodcastEpisode>
-
-    @Transaction
     @Query("SELECT * FROM podcast_episodes WHERE (download_task_id IS NOT NULL AND episode_status != :status)")
     abstract suspend fun findNotFinishedDownloads(status: EpisodeStatusEnum = EpisodeStatusEnum.DOWNLOADED): List<PodcastEpisode>
 
@@ -404,9 +400,6 @@ abstract class EpisodeDao {
         return Single.fromCallable { existsBlocking(uuid) }
     }
 
-    @Query("UPDATE podcast_episodes SET starred_modified = NULL, archived_modified = NULL, duration_modified = NULL, played_up_to_modified = NULL, playing_status_modified = NULL WHERE uuid IN (:episodeUuids)")
-    abstract suspend fun markAllSynced(episodeUuids: List<String>)
-
     @Query("SELECT podcasts.uuid AS uuid, count(podcast_episodes.uuid) AS count FROM podcast_episodes, podcasts WHERE podcast_episodes.podcast_id = podcasts.uuid AND (podcast_episodes.playing_status = :playingStatusNotPlayed OR podcast_episodes.playing_status = :playingStatusInProgress) AND podcast_episodes.archived = 0 GROUP BY podcasts.uuid")
     protected abstract fun podcastToUnfinishedEpisodeCount(playingStatusNotPlayed: Int = EpisodePlayingStatus.NOT_PLAYED.ordinal, playingStatusInProgress: Int = EpisodePlayingStatus.IN_PROGRESS.ordinal): Flow<List<UuidCount>>
 
@@ -459,10 +452,6 @@ abstract class EpisodeDao {
         val firstResult = result[0] ?: return 0
         return Integer.parseInt(firstResult)
     }
-
-    @Transaction
-    @Query("SELECT * FROM podcast_episodes WHERE (playing_status_modified IS NOT NULL OR played_up_to_modified IS NOT NULL OR duration_modified IS NOT NULL OR archived_modified IS NOT NULL OR starred_modified IS NOT NULL OR deselected_chapters_modified IS NOT NULL) AND uuid IS NOT NULL LIMIT 2000")
-    abstract fun findEpisodesToSyncBlocking(): List<PodcastEpisode>
 
     @Transaction
     @Query("SELECT * FROM podcast_episodes WHERE (playing_status_modified IS NOT NULL OR played_up_to_modified IS NOT NULL OR duration_modified IS NOT NULL OR archived_modified IS NOT NULL OR starred_modified IS NOT NULL OR deselected_chapters_modified IS NOT NULL) AND uuid IS NOT NULL LIMIT 2000")

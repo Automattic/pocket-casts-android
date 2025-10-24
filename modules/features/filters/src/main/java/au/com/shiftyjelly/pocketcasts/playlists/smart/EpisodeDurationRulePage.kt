@@ -51,14 +51,12 @@ internal fun EpisodeDurationRulePage(
     onDecrementMaxDuration: () -> Unit,
     onIncrementMaxDuration: () -> Unit,
     onSaveRule: () -> Unit,
-    onClickBack: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     RulePage(
         title = stringResource(LR.string.filters_episode_duration),
         isSaveEnabled = maxDuration > minDuration,
         onSaveRule = onSaveRule,
-        onClickBack = onClickBack,
         modifier = modifier,
     ) { bottomPadding ->
         Column(
@@ -182,7 +180,6 @@ private fun EpisodeDurationRulePreview(
             onDecrementMaxDuration = { maxDuration -= 5.minutes },
             onIncrementMaxDuration = { maxDuration += 5.minutes },
             onSaveRule = {},
-            onClickBack = {},
         )
     }
 }
