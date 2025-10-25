@@ -1,7 +1,6 @@
 package au.com.shiftyjelly.pocketcasts.utils.search
 
 import au.com.shiftyjelly.pocketcasts.utils.extensions.removeAccents
-import java.text.Normalizer
 
 fun String.kmpSearch(pattern: String): List<Int> {
     return KmpSearch(pattern).search(this)
