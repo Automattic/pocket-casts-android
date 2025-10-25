@@ -9,6 +9,7 @@ import androidx.room.Upsert
 import au.com.shiftyjelly.pocketcasts.models.db.AppDatabase
 import au.com.shiftyjelly.pocketcasts.models.entity.Folder
 import au.com.shiftyjelly.pocketcasts.models.type.PodcastsSortType
+import au.com.shiftyjelly.pocketcasts.utils.extensions.unidecode
 import io.reactivex.Flowable
 import io.reactivex.Single
 import kotlinx.coroutines.flow.Flow
@@ -55,8 +56,22 @@ abstract class FolderDao {
     @Query("UPDATE folders SET color = :color, sync_modified = :syncModified WHERE uuid = :uuid")
     abstract suspend fun updateFolderColor(uuid: String, color: Int, syncModified: Long)
 
-    @Query("UPDATE folders SET name = :name, sync_modified = :syncModified WHERE uuid = :uuid")
-    abstract suspend fun updateFolderName(uuid: String, name: String, syncModified: Long)
+    @Query("UPDATE folders SET name = :name, clean_name = :cleanName, sync_modified = :syncModified WHERE uuid = :uuid")
+    protected abstract suspend fun updateFolderNameInternal(
+        uuid: String,
+        name: String,
+        cleanName: String,
+        syncModified: Long,
+    )
+
+    suspend fun updateFolderName(uuid: String, name: String, syncModified: Long) {
+        updateFolderNameInternal(
+            uuid = uuid,
+            name = name,
+            cleanName = name.unidecode(),
+            syncModified = syncModified,
+        )
+    }
 
     @Query("UPDATE folders SET podcasts_sort_type = :podcastsSortType, sync_modified = :syncModified WHERE uuid = :uuid")
     abstract suspend fun updateFolderSortType(uuid: String, podcastsSortType: PodcastsSortType, syncModified: Long)

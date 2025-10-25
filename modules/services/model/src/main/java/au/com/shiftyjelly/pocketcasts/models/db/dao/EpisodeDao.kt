@@ -15,6 +15,7 @@ import au.com.shiftyjelly.pocketcasts.models.db.helper.UuidCount
 import au.com.shiftyjelly.pocketcasts.models.entity.EpisodeDownloadFailureStatistics
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
+import au.com.shiftyjelly.pocketcasts.models.to.EpisodeWithTitle
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodePlayingStatus
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodeStatusEnum
 import io.reactivex.Flowable
@@ -488,4 +489,18 @@ abstract class EpisodeDao {
 
     @Query("SELECT * FROM podcast_episodes LIMIT :limit OFFSET :offset")
     abstract suspend fun getAllPodcastEpisodes(limit: Int, offset: Int): List<PodcastEpisode>
+
+    @Query("SELECT uuid, title FROM podcast_episodes WHERE cleanTitle != :title LIMIT 50000")
+    abstract suspend fun getEpisodesWithCleanTitleNotEqual(title: String): List<EpisodeWithTitle>
+
+    @Query("SELECT uuid, title FROM podcast_episodes WHERE cleanTitle = :title LIMIT 50000")
+    abstract suspend fun getEpisodesWithCleanTitleEqual(title: String): List<EpisodeWithTitle>
+
+    @Query("UPDATE OR IGNORE podcast_episodes SET cleanTitle = :title WHERE uuid = :uuid")
+    protected abstract suspend fun updateCleanTitle(uuid: String, title: String)
+
+    @Transaction
+    open suspend fun updateAllCleanTitles(episodes: Collection<EpisodeWithTitle>) {
+        episodes.forEach { episode -> updateCleanTitle(episode.uuid, episode.title) }
+    }
 }

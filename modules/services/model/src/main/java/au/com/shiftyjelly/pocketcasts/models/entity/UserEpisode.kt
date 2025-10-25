@@ -8,6 +8,7 @@ import androidx.room.PrimaryKey
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodePlayingStatus
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodeStatusEnum
 import au.com.shiftyjelly.pocketcasts.models.type.UserEpisodeServerStatus
+import au.com.shiftyjelly.pocketcasts.utils.extensions.unidecode
 import java.io.Serializable
 import java.util.Date
 
@@ -50,6 +51,12 @@ data class UserEpisode(
     @ColumnInfo(name = "deselected_chapters_modified") override var deselectedChaptersModified: Date? = null,
 ) : BaseEpisode,
     Serializable {
+
+    @ColumnInfo(name = "clean_title")
+    var cleanTitle: String = ""
+        get() = title.unidecode()
+        internal set
+
     // temporary variables
     @Ignore
     override var playing: Boolean = false
