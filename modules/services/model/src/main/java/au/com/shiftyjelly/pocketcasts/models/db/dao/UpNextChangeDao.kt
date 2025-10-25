@@ -4,6 +4,7 @@ import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
+import androidx.room.Transaction
 import au.com.shiftyjelly.pocketcasts.models.entity.BaseEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.UpNextChange
 
@@ -48,7 +49,8 @@ abstract class UpNextChangeDao {
         insertBlocking(change)
     }
 
-    fun saveReplace(episodeUuids: List<String>) {
+    @Transaction
+    open fun saveReplace(episodeUuids: List<String>) {
         val episodeUuidsString = episodeUuids.joinToString(separator = ",")
         val change = UpNextChange(type = UpNextChange.ACTION_REPLACE, uuids = episodeUuidsString, modified = System.currentTimeMillis())
         // a replace literally replaces everything that came before it, so empty the table out

@@ -24,9 +24,10 @@ data class UpNextEpisode(
     @ColumnInfo(name = "podcastUuid") var podcastUuid: String? = null,
 ) : Serializable
 
-fun BaseEpisode.toUpNextEpisode(): UpNextEpisode {
+fun BaseEpisode.toUpNextEpisode(position: Int = 0): UpNextEpisode {
     return UpNextEpisode(
         episodeUuid = uuid,
+        position = position,
         podcastUuid = if (this is PodcastEpisode) podcastUuid else null,
         title = title,
         downloadUrl = downloadUrl,
