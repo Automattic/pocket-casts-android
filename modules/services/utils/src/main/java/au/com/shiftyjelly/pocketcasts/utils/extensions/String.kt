@@ -2,6 +2,7 @@ package au.com.shiftyjelly.pocketcasts.utils.extensions
 
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import java.security.MessageDigest
+import java.text.Normalizer
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
@@ -69,6 +70,14 @@ fun CharSequence.splitIgnoreEmpty(delimiter: String): List<String> {
 fun String.removeNewLines(): String {
     return this.replace("[\n\r]".toRegex(), "")
 }
+
+private val nfdDecomposedCharacters = """\p{Mn}+""".toRegex()
+
+fun String.removeAccents() = Normalizer.normalize(this, Normalizer.Form.NFD)
+    .replace(nfdDecomposedCharacters, "")
+    .replace("\u0141", "L")
+    .replace("\u0142", "l")
+    .lowercase()
 
 fun String.unidecode() = buildString {
     val decoded = Junidecode.unidecode(this@unidecode)
