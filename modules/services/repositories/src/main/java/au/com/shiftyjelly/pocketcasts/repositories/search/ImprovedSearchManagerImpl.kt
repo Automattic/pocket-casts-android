@@ -17,7 +17,7 @@ class ImprovedSearchManagerImpl @Inject constructor(
     private val settings: Settings,
 ) : ImprovedSearchManager {
     override suspend fun autoCompleteSearch(term: String): List<SearchAutoCompleteItem> {
-        val response = autoCompleteSearchService.autoCompleteSearch(query = term, termsLimit = TERM_LIMIT, podcastsLimit = PODCAST_LIMIT, language = settings.discoverCountryCode.value)
+        val response = autoCompleteSearchService.autoCompleteSearch(query = term, termsLimit = TERM_LIMIT, podcastsLimit = PODCAST_LIMIT)
         return response.results.map {
             when (it) {
                 is AutoCompleteResult.TermResult -> SearchAutoCompleteItem.Term(term = it.value)

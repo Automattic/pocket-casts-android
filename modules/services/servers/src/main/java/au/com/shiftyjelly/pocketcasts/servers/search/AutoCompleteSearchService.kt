@@ -9,6 +9,5 @@ interface AutoCompleteSearchService {
         @Query("q") query: String,
         @Query("termsLimit") termsLimit: Int,
         @Query("podcastsLimit") podcastsLimit: Int,
-        @Query("language") language: String,
     ): AutoCompleteResponse
 }
