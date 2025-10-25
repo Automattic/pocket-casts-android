@@ -18,6 +18,7 @@ import au.com.shiftyjelly.pocketcasts.models.to.PodcastGrouping
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodeStatusEnum
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodesSortType
 import au.com.shiftyjelly.pocketcasts.models.type.TrimMode
+import au.com.shiftyjelly.pocketcasts.utils.extensions.escapeLike
 import io.reactivex.Completable
 import io.reactivex.Flowable
 import io.reactivex.Maybe
@@ -36,8 +37,21 @@ abstract class PodcastDao {
     abstract fun findSubscribedBlocking(): List<Podcast>
 
     @Transaction
-    @Query("SELECT * FROM podcasts WHERE subscribed = 1 ORDER BY LOWER(title) ASC")
-    abstract fun findSubscribedFlow(): Flow<List<Podcast>>
+    @Query(
+        """
+        SELECT *
+        FROM podcasts
+        WHERE
+          subscribed = 1
+          AND (TRIM(:searchTerm) IS '' OR clean_title LIKE '%' || :searchTerm || '%' ESCAPE '\')
+        ORDER BY clean_title ASC
+    """,
+    )
+    internal abstract fun findSubscribedFlowInternal(searchTerm: String): Flow<List<Podcast>>
+
+    fun findSubscribedFlow(searchTerm: String): Flow<List<Podcast>> {
+        return findSubscribedFlowInternal(searchTerm.escapeLike('\\'))
+    }
 
     @Transaction
     @Query("SELECT * FROM podcasts WHERE subscribed = 1 ORDER BY LOWER(title) ASC")

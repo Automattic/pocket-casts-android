@@ -10,10 +10,6 @@ import java.util.TimeZone
 import net.gcardone.junidecode.Junidecode
 import timber.log.Timber
 
-fun String.escapeLike(escapeChar: Char) = replace("$escapeChar", "$escapeChar$escapeChar")
-    .replace("%", "$escapeChar%")
-    .replace("_", "${escapeChar}_")
-
 val ISO_DATE_FORMATS = object : ThreadLocal<List<SimpleDateFormat>>() {
     override fun initialValue(): List<SimpleDateFormat> {
         return listOf(
@@ -94,6 +90,23 @@ fun String.unidecode() = buildString {
     }
     if (lastOrNull() == ' ') {
         deleteCharAt(lastIndex)
+    }
+}
+
+fun String.escapeLike(escapeChar: Char, unidecode: Boolean = true): String {
+    val base = if (unidecode) unidecode() else this
+    return buildString {
+        for (character in base) {
+            when (character) {
+                escapeChar, '%', '_' -> {
+                    append(escapeChar)
+                    append(character)
+                }
+                else -> {
+                    append(character)
+                }
+            }
+        }
     }
 }
 

@@ -1,6 +1,8 @@
 package au.com.shiftyjelly.pocketcasts.playlists.smart
 
+import au.com.shiftyjelly.pocketcasts.compose.text.SearchFieldState
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
+import au.com.shiftyjelly.pocketcasts.models.type.PlaylistEpisodeSortType
 import au.com.shiftyjelly.pocketcasts.models.type.SmartRules
 import au.com.shiftyjelly.pocketcasts.repositories.playlist.PlaylistManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
@@ -25,6 +27,8 @@ class SmartRulesEditor @AssistedInject constructor(
     @Assisted scope: CoroutineScope,
     @Assisted initialBuilder: RulesBuilder,
     @Assisted initialAppliedRules: AppliedRules,
+    @Assisted sortType: PlaylistEpisodeSortType,
+    @Assisted val podcastSearchState: SearchFieldState,
 ) {
     private val _builderFlow = MutableStateFlow(initialBuilder)
     val builderFlow = _builderFlow.asStateFlow()
@@ -35,7 +39,7 @@ class SmartRulesEditor @AssistedInject constructor(
     val smartEpisodes = rulesFlow.flatMapLatest { appliedRules ->
         val smartRules = appliedRules.toSmartRules()
         if (smartRules != null) {
-            playlistManager.smartEpisodesFlow(smartRules)
+            playlistManager.smartEpisodesFlow(smartRules, sortType)
         } else {
             flowOf(emptyList())
         }
@@ -44,7 +48,7 @@ class SmartRulesEditor @AssistedInject constructor(
     val smartStarredEpisodes = rulesFlow.flatMapLatest { appliedRules ->
         val smartRules = appliedRules.toSmartRules() ?: SmartRules.Default
         val starredRules = smartRules.copy(starred = SmartRules.StarredRule.Starred)
-        playlistManager.smartEpisodesFlow(starredRules)
+        playlistManager.smartEpisodesFlow(starredRules, sortType)
     }.stateIn(scope, SharingStarted.Lazily, initialValue = emptyList())
 
     val starredEpisodeCount = rulesFlow.flatMapLatest { appliedRules ->
@@ -53,8 +57,8 @@ class SmartRulesEditor @AssistedInject constructor(
         playlistManager.smartEpisodesMetadataFlow(starredRules).map { it.episodeCount }
     }.stateIn(scope, SharingStarted.Lazily, initialValue = 0)
 
-    val followedPodcasts = podcastManager
-        .findSubscribedFlow()
+    val followedPodcasts = podcastSearchState.textFlow
+        .flatMapLatest { searchTerm -> podcastManager.findSubscribedFlow(searchTerm) }
         .stateIn(scope, SharingStarted.Lazily, initialValue = emptyList())
 
     fun useAllPodcasts(shouldUse: Boolean) {
@@ -221,6 +225,8 @@ class SmartRulesEditor @AssistedInject constructor(
             scope: CoroutineScope,
             initialBuilder: RulesBuilder,
             initialAppliedRules: AppliedRules,
+            sortType: PlaylistEpisodeSortType,
+            podcastSearchState: SearchFieldState,
         ): SmartRulesEditor
     }
 }

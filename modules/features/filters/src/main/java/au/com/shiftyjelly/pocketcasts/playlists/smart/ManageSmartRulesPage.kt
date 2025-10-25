@@ -3,6 +3,8 @@ package au.com.shiftyjelly.pocketcasts.playlists.smart
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.text.input.TextFieldState
+import androidx.compose.foundation.text.input.rememberTextFieldState
 import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -44,6 +46,7 @@ internal fun ManageSmartRulesPage(
     modifier: Modifier = Modifier,
     startDestination: String = ManageSmartRulesRoutes.SMART_PLAYLIST_PREVIEW,
     isPlaylistPreviewShown: Boolean = true,
+    podcastSearchState: TextFieldState = rememberTextFieldState(),
     builder: NavGraphBuilder.() -> Unit = {},
 ) {
     var areOtherOptionsExpanded by remember { mutableStateOf(false) }
@@ -112,6 +115,7 @@ internal fun ManageSmartRulesPage(
                     useAllPodcasts = rulesBuilder.useAllPodcasts,
                     selectedPodcastUuids = rulesBuilder.selectedPodcasts,
                     podcasts = followedPodcasts,
+                    searchState = podcastSearchState,
                     onChangeUseAllPodcasts = listener::onChangeUseAllPodcasts,
                     onSelectPodcast = listener::onSelectPodcast,
                     onDeselectPodcast = listener::onDeselectPodcast,

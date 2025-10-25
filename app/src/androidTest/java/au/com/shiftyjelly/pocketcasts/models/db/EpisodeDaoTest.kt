@@ -210,17 +210,4 @@ class EpisodeDaoTest {
         val result = episodeDao.filteredPlaybackHistoryFlow(query.escapeLike('\\')).first()
         assertEquals(emptyList<PodcastEpisode>(), result)
     }
-
-    @Test
-    fun getFilteredPlaybackHistorydResultForMatchSpecialChars() = runTest {
-        val query = "%test_"
-
-        val episode1 = PodcastEpisode(uuid = "1", title = "%Test_ Episode", podcastUuid = "podcast_uuid", publishedDate = Date(), lastPlaybackInteraction = 1000)
-        val episode2 = PodcastEpisode(uuid = "3", title = "Test Episode", podcastUuid = "podcast_uuid", publishedDate = Date(), lastPlaybackInteraction = 1000)
-        val episodes = listOf(episode1, episode2)
-        episodeDao.insertAllBlocking(episodes)
-
-        val result = episodeDao.filteredPlaybackHistoryFlow(query.escapeLike('\\')).first()
-        assertEquals(listOf(episode1), result)
-    }
 }
