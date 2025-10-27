@@ -87,8 +87,6 @@ abstract class EpisodeDao {
           podcast_id = :podcastUuid
         ORDER BY (CASE
           WHEN UPPER(title) LIKE 'THE %' THEN SUBSTR(UPPER(title), 5)
-          WHEN UPPER(title) LIKE 'A %' THEN SUBSTR(UPPER(title), 3)
-          WHEN UPPER(title) LIKE 'AN %' THEN SUBSTR(UPPER(title), 4)
           ELSE UPPER(title)
         END) ASC
     """,
@@ -105,8 +103,6 @@ abstract class EpisodeDao {
           podcast_id = :podcastUuid
         ORDER BY (CASE
           WHEN UPPER(title) LIKE 'THE %' THEN SUBSTR(UPPER(title), 5)
-          WHEN UPPER(title) LIKE 'A %' THEN SUBSTR(UPPER(title), 3)
-          WHEN UPPER(title) LIKE 'AN %' THEN SUBSTR(UPPER(title), 4)
           ELSE UPPER(title)
         END) ASC
     """,
@@ -123,8 +119,6 @@ abstract class EpisodeDao {
           podcast_id = :podcastUuid
         ORDER BY (CASE
           WHEN UPPER(title) LIKE 'THE %' THEN SUBSTR(UPPER(title), 5)
-          WHEN UPPER(title) LIKE 'A %' THEN SUBSTR(UPPER(title), 3)
-          WHEN UPPER(title) LIKE 'AN %' THEN SUBSTR(UPPER(title), 4)
           ELSE UPPER(title)
         END) DESC
     """,
@@ -141,8 +135,6 @@ abstract class EpisodeDao {
           podcast_id = :podcastUuid
         ORDER BY (CASE
           WHEN UPPER(title) LIKE 'THE %' THEN SUBSTR(UPPER(title), 5)
-          WHEN UPPER(title) LIKE 'A %' THEN SUBSTR(UPPER(title), 3)
-          WHEN UPPER(title) LIKE 'AN %' THEN SUBSTR(UPPER(title), 4)
           ELSE UPPER(title)
         END) DESC
     """,
@@ -207,8 +199,6 @@ abstract class EpisodeDao {
           podcast_id = :podcastUuid
         ORDER BY (CASE
           WHEN UPPER(title) LIKE 'THE %' THEN SUBSTR(UPPER(title), 5)
-          WHEN UPPER(title) LIKE 'A %' THEN SUBSTR(UPPER(title), 3)
-          WHEN UPPER(title) LIKE 'AN %' THEN SUBSTR(UPPER(title), 4)
           ELSE UPPER(title)
         END) ASC
     """,
@@ -226,8 +216,6 @@ abstract class EpisodeDao {
           podcast_id = :podcastUuid
         ORDER BY (CASE
           WHEN UPPER(title) LIKE 'THE %' THEN SUBSTR(UPPER(title), 5)
-          WHEN UPPER(title) LIKE 'A %' THEN SUBSTR(UPPER(title), 3)
-          WHEN UPPER(title) LIKE 'AN %' THEN SUBSTR(UPPER(title), 4)
           ELSE UPPER(title)
         END) DESC
     """,
@@ -297,8 +285,10 @@ abstract class EpisodeDao {
         LEFT JOIN podcasts ON podcast_episodes.podcast_id = podcasts.uuid
         WHERE last_playback_interaction_date IS NOT NULL
           AND last_playback_interaction_date > 0
-          AND (UPPER(podcast_episodes.title) LIKE '%' || UPPER(:query) || '%'  ESCAPE '\'
-               OR UPPER(podcasts.title) LIKE '%' || UPPER(:query) || '%'  ESCAPE '\')
+          AND (
+            podcast_episodes.cleanTitle LIKE '%' || :query || '%'  ESCAPE '\'
+            OR podcasts.clean_title LIKE '%' || :query || '%'  ESCAPE '\'
+          )
         ORDER BY last_playback_interaction_date DESC
         LIMIT 100
     """,
