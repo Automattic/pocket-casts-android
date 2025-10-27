@@ -61,7 +61,6 @@ internal fun CreatePlaylistPage(
     titleState: TextFieldState,
     onCreateManualPlaylist: () -> Unit,
     onContinueToSmartPlaylist: () -> Unit,
-    onClickClose: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val focusRequester = remember { FocusRequester() }
@@ -73,47 +72,37 @@ internal fun CreatePlaylistPage(
             .fillMaxSize()
             .verticalScroll(rememberScrollState())
             .navigationBarsPadding()
-            .imePadding(),
+            .imePadding()
+            .padding(horizontal = 16.dp),
     ) {
-        ThemedTopAppBar(
-            navigationButton = NavigationButton.Close,
-            style = ThemedTopAppBar.Style.Immersive,
-            iconColor = MaterialTheme.theme.colors.primaryIcon03,
-            windowInsets = WindowInsets(0),
-            onNavigationClick = onClickClose,
+        TextH20(
+            text = stringResource(LR.string.new_playlist),
         )
-        Column(
-            modifier = Modifier.padding(horizontal = 16.dp),
-        ) {
-            TextH20(
-                text = stringResource(LR.string.new_playlist),
-            )
-            Spacer(
-                modifier = Modifier.height(16.dp),
-            )
-            PlaylistNameInputField(
-                state = titleState,
-                onClickImeAction = onCreateManualPlaylist,
-                modifier = Modifier.focusRequester(focusRequester),
-            )
-            Spacer(
-                modifier = Modifier.height(16.dp),
-            )
-            SmartPlaylistButton(
-                enabled = titleState.text.isNotBlank(),
-                onClick = onContinueToSmartPlaylist,
-                modifier = Modifier.fillMaxWidth(),
-            )
-            Spacer(
-                modifier = Modifier.height(24.dp),
-            )
-            RowButton(
-                text = stringResource(LR.string.create_playlist),
-                enabled = titleState.text.isNotBlank(),
-                onClick = onCreateManualPlaylist,
-                includePadding = false,
-            )
-        }
+        Spacer(
+            modifier = Modifier.height(16.dp),
+        )
+        PlaylistNameInputField(
+            state = titleState,
+            onClickImeAction = onCreateManualPlaylist,
+            modifier = Modifier.focusRequester(focusRequester),
+        )
+        Spacer(
+            modifier = Modifier.height(16.dp),
+        )
+        SmartPlaylistButton(
+            enabled = titleState.text.isNotBlank(),
+            onClick = onContinueToSmartPlaylist,
+            modifier = Modifier.fillMaxWidth(),
+        )
+        Spacer(
+            modifier = Modifier.height(24.dp),
+        )
+        RowButton(
+            text = stringResource(LR.string.create_playlist),
+            enabled = titleState.text.isNotBlank(),
+            onClick = onCreateManualPlaylist,
+            includePadding = false,
+        )
     }
 }
 
@@ -179,7 +168,6 @@ private fun CreatePlaylistPagePreview(
             titleState = titleState,
             onCreateManualPlaylist = {},
             onContinueToSmartPlaylist = {},
-            onClickClose = {},
             modifier = Modifier.fillMaxSize(),
         )
     }

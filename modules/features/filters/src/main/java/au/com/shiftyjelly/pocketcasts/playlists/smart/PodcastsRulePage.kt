@@ -60,53 +60,13 @@ internal fun PodcastsRulePage(
     onChangeUseAllPodcasts: (Boolean) -> Unit,
     onSelectPodcast: (String) -> Unit,
     onDeselectPodcast: (String) -> Unit,
-    onSelectAllPodcasts: () -> Unit,
-    onDeselectAllPodcasts: () -> Unit,
     onSaveRule: () -> Unit,
-    onClickBack: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     RulePage(
-        title = stringResource(LR.string.smart_rule_podcasts_title),
+        title = stringResource(LR.string.filters_choose_podcasts),
         onSaveRule = onSaveRule,
         isSaveEnabled = useAllPodcasts || selectedPodcastUuids.isNotEmpty(),
-        onClickBack = onClickBack,
-        toolbarActions = {
-            AnimatedVisibility(
-                enter = fadeIn,
-                exit = fadeOut,
-                visible = !useAllPodcasts,
-            ) {
-                Box(
-                    contentAlignment = Alignment.Center,
-                    modifier = Modifier
-                        .heightIn(min = 48.dp)
-                        .clickable(
-                            role = Role.Button,
-                            onClick = {
-                                if (podcasts.size == selectedPodcastUuids.size) {
-                                    onDeselectAllPodcasts()
-                                } else {
-                                    onSelectAllPodcasts()
-                                }
-                            },
-                        )
-                        .padding(horizontal = 16.dp)
-                        .semantics(mergeDescendants = true) {},
-                ) {
-                    Text(
-                        text = if (podcasts.size == selectedPodcastUuids.size) {
-                            stringResource(LR.string.smart_rule_podcasts_deselect_all)
-                        } else {
-                            stringResource(LR.string.smart_rule_podcasts_select_all)
-                        },
-                        color = MaterialTheme.theme.colors.primaryText02,
-                        fontSize = 17.sp,
-                        lineHeight = 22.sp,
-                    )
-                }
-            }
-        },
         modifier = modifier,
     ) { bottomPadding ->
         Column(
@@ -127,6 +87,52 @@ internal fun PodcastsRulePage(
                 onDeselectPodcast = onDeselectPodcast,
                 bottomPadding = bottomPadding,
                 modifier = Modifier.weight(1f),
+            )
+        }
+    }
+}
+
+@Composable
+internal fun PodcastRulesActions(
+    useAllPodcasts: Boolean,
+    selectedPodcastUuids: Set<String>,
+    podcasts: List<Podcast>,
+    onSelectAllPodcasts: () -> Unit,
+    onDeselectAllPodcasts: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    AnimatedVisibility(
+        enter = fadeIn,
+        exit = fadeOut,
+        visible = !useAllPodcasts,
+        modifier = modifier,
+    ) {
+        Box(
+            contentAlignment = Alignment.Center,
+            modifier = Modifier
+                .heightIn(min = 48.dp)
+                .clickable(
+                    role = Role.Button,
+                    onClick = {
+                        if (podcasts.size == selectedPodcastUuids.size) {
+                            onDeselectAllPodcasts()
+                        } else {
+                            onSelectAllPodcasts()
+                        }
+                    },
+                )
+                .padding(horizontal = 16.dp)
+                .semantics(mergeDescendants = true) {},
+        ) {
+            Text(
+                text = if (podcasts.size == selectedPodcastUuids.size) {
+                    stringResource(LR.string.deselect_all)
+                } else {
+                    stringResource(LR.string.select_all)
+                },
+                color = MaterialTheme.theme.colors.primaryText02,
+                fontSize = 17.sp,
+                lineHeight = 22.sp,
             )
         }
     }
@@ -296,10 +302,7 @@ private fun PodcastsRulePreview(
             onChangeUseAllPodcasts = { useAllPodcasts = it },
             onSelectPodcast = { podcastUuids += it },
             onDeselectPodcast = { podcastUuids -= it },
-            onSelectAllPodcasts = {},
-            onDeselectAllPodcasts = {},
             onSaveRule = {},
-            onClickBack = {},
         )
     }
 }

@@ -43,7 +43,6 @@ Language: fr
     <string name="playlist_episode_unavailable_cta">Retirer de la liste de lecture</string>
     <string name="playlist_episode_unavailable_description">Le créateur du podcast a supprimé cet épisode. Il restera dans votre liste de lecture jusqu’à ce que vous le supprimiez.</string>
     <string name="playlist_episode_unavailable_title">Épisode non disponible</string>
-    <string name="playlist_archive_all">Tout archiver</string>
     <string name="episode_sort_custom_order">Ordre personnalisé</string>
     <string name="manual_playlist_search_no_podcast_or_folder_body">Nous n’avons trouvé aucun podcast ou dossier correspondant à cette recherche. Essayez un autre mot clé.</string>
     <string name="manual_playlist_search_no_podcast_title">Aucun podcast trouvé</string>
@@ -53,7 +52,6 @@ Language: fr
     <string name="manual_playlist_no_content_title_alternative">Commencer à créer votre liste de lecture</string>
     <string name="manual_playlist_no_content_title">Ajouter des épisodes à votre liste de lecture</string>
     <string name="manual_playlist_no_content_body">Balayez un épisode vers la gauche pour l’ajouter à votre liste de lecture.</string>
-    <string name="browse_shows">Parcourir les émissions</string>
     <string name="unavailable">Indisponible</string>
     <string name="add_to_playlist_failure_message">Cette liste de lecture est pleine. Supprimez quelques épisodes ou commencez-en une nouvelle.</string>
     <string name="added_to_playlist">%1$s ajouté à « %2$s »</string>
@@ -92,7 +90,6 @@ Language: fr
     <string name="playlist_sort_by">Trier par</string>
     <string name="playlist_select_episodes">Sélectionner des épisodes</string>
     <string name="playlist_options">Options de la liste de lecture</string>
-    <string name="playlist_download_all">Tout télécharger</string>
     <string name="smart_playlist_no_content_body">Il est temps de fêter le fait d’avoir terminé cette liste ou de modifier vos règles afin d’en obtenir d’autres.</string>
     <string name="smart_playlist_no_content_title">Aucun épisode</string>
     <string name="playlist_play_all">Tout lire</string>

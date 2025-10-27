@@ -190,6 +190,7 @@ class AppDatabaseTest {
                 AppDatabase.MIGRATION_118_119,
                 AppDatabase.MIGRATION_119_120,
                 AppDatabase.MIGRATION_120_121,
+                AppDatabase.MIGRATION_121_122,
             )
             .build()
         // close the database and release any stream resources when the test finishes

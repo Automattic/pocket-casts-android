@@ -38,8 +38,6 @@ import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
 import au.com.shiftyjelly.pocketcasts.compose.AppThemeWithBackground
 import au.com.shiftyjelly.pocketcasts.compose.Devices
-import au.com.shiftyjelly.pocketcasts.compose.bars.NavigationButton
-import au.com.shiftyjelly.pocketcasts.compose.bars.ThemedTopAppBar
 import au.com.shiftyjelly.pocketcasts.compose.buttons.RowButton
 import au.com.shiftyjelly.pocketcasts.compose.components.FadedLazyColumn
 import au.com.shiftyjelly.pocketcasts.compose.components.NoContentBanner
@@ -61,12 +59,12 @@ internal fun AppliedRulesPage(
     playlistName: String,
     appliedRules: AppliedRules,
     availableEpisodes: List<PlaylistEpisode.Available>,
-    totalEpisodeCount: Int,
+    starredEpisodeCount: Int,
     useEpisodeArtwork: Boolean,
     onClickRule: (RuleType) -> Unit,
-    onClickClose: () -> Unit,
     modifier: Modifier = Modifier,
     areOtherOptionsExpanded: Boolean = false,
+    isPlaylistPreviewShown: Boolean = true,
     toggleOtherOptions: (() -> Unit)? = null,
     onCreatePlaylist: (() -> Unit)? = null,
 ) {
@@ -75,53 +73,44 @@ internal fun AppliedRulesPage(
             .fillMaxSize()
             .verticalScroll(rememberScrollState()),
     ) {
-        ThemedTopAppBar(
-            navigationButton = NavigationButton.Close,
-            style = ThemedTopAppBar.Style.Immersive,
-            iconColor = MaterialTheme.theme.colors.primaryIcon03,
-            windowInsets = WindowInsets(0),
-            onNavigationClick = onClickClose,
-        )
-        Column(
+        val activeRules = rememberActiveRules(appliedRules)
+        val inactiveRules = rememberInactiveRules(activeRules)
+
+        FadedLazyColumn(
+            contentPadding = if (onCreatePlaylist == null) {
+                WindowInsets.verticalNavigationBars.asPaddingValues()
+            } else {
+                PaddingValues(bottom = 24.dp)
+            },
             modifier = Modifier.weight(1f),
         ) {
-            val activeRules = rememberActiveRules(appliedRules)
-            val inactiveRules = rememberInactiveRules(activeRules)
-
-            FadedLazyColumn(
-                contentPadding = if (onCreatePlaylist == null) {
-                    WindowInsets.verticalNavigationBars.asPaddingValues()
-                } else {
-                    PaddingValues(bottom = 24.dp)
-                },
-                modifier = Modifier.weight(1f),
-            ) {
-                if (activeRules.isNotEmpty()) {
+            if (activeRules.isNotEmpty()) {
+                item(
+                    key = "active-rules",
+                    contentType = "active-rules",
+                ) {
+                    ActiveRulesContent(
+                        rules = activeRules,
+                        starredEpisodeCount = starredEpisodeCount,
+                        appliedRules = appliedRules,
+                        onClickRule = onClickRule,
+                    )
+                }
+                if (inactiveRules.isNotEmpty() && toggleOtherOptions != null) {
                     item(
-                        key = "active-rules",
-                        contentType = "active-rules",
+                        key = "inactive-rules",
+                        contentType = "inactive-rules",
                     ) {
-                        ActiveRulesContent(
-                            rules = activeRules,
-                            episodeCount = totalEpisodeCount,
-                            appliedRules = appliedRules,
+                        InactiveRulesContent(
+                            rules = inactiveRules,
+                            isExpanded = areOtherOptionsExpanded,
                             onClickRule = onClickRule,
+                            onToggleExpand = toggleOtherOptions,
+                            modifier = Modifier.padding(top = 32.dp),
                         )
                     }
-                    if (inactiveRules.isNotEmpty() && toggleOtherOptions != null) {
-                        item(
-                            key = "inactive-rules",
-                            contentType = "inactive-rules",
-                        ) {
-                            InactiveRulesContent(
-                                rules = inactiveRules,
-                                isExpanded = areOtherOptionsExpanded,
-                                onClickRule = onClickRule,
-                                onToggleExpand = toggleOtherOptions,
-                                modifier = Modifier.padding(top = 32.dp),
-                            )
-                        }
-                    }
+                }
+                if (isPlaylistPreviewShown) {
                     item(
                         key = "playlist-header",
                         contentType = "playlist-header",
@@ -162,29 +151,29 @@ internal fun AppliedRulesPage(
                             }
                         }
                     }
-                } else {
-                    item(
-                        key = "no-rules",
-                        contentType = "no-rules",
-                    ) {
-                        NoRulesContent(
-                            title = playlistName,
-                            onClickRule = onClickRule,
-                        )
-                    }
+                }
+            } else {
+                item(
+                    key = "no-rules",
+                    contentType = "no-rules",
+                ) {
+                    NoRulesContent(
+                        title = playlistName,
+                        onClickRule = onClickRule,
+                    )
                 }
             }
-            if (onCreatePlaylist != null) {
-                RowButton(
-                    text = stringResource(LR.string.create_smart_playlist),
-                    enabled = appliedRules.isAnyRuleApplied,
-                    onClick = onCreatePlaylist,
-                    includePadding = false,
-                    modifier = Modifier
-                        .padding(horizontal = 16.dp)
-                        .navigationBarsPadding(),
-                )
-            }
+        }
+        if (onCreatePlaylist != null) {
+            RowButton(
+                text = stringResource(LR.string.create_smart_playlist),
+                enabled = appliedRules.isAnyRuleApplied,
+                onClick = onCreatePlaylist,
+                includePadding = false,
+                modifier = Modifier
+                    .padding(horizontal = 16.dp)
+                    .navigationBarsPadding(),
+            )
         }
     }
 }
@@ -193,7 +182,7 @@ internal fun AppliedRulesPage(
 private fun ActiveRulesContent(
     rules: List<RuleType>,
     appliedRules: AppliedRules,
-    episodeCount: Int,
+    starredEpisodeCount: Int,
     onClickRule: (RuleType) -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -209,7 +198,7 @@ private fun ActiveRulesContent(
         AppliedRulesColumn(
             rules = rules,
             appliedRules = appliedRules,
-            episodeCount = episodeCount,
+            starredEpisodeCount = starredEpisodeCount,
             onClickRule = onClickRule,
         )
     }
@@ -338,12 +327,11 @@ private fun AppliedRulesPageNoRulesPreview(
             playlistName = "Comedy",
             appliedRules = AppliedRules.Companion.Empty,
             availableEpisodes = emptyList(),
-            totalEpisodeCount = 0,
+            starredEpisodeCount = 0,
             useEpisodeArtwork = false,
             areOtherOptionsExpanded = expanded,
             onCreatePlaylist = {},
             onClickRule = {},
-            onClickClose = {},
             toggleOtherOptions = { expanded = !expanded },
             modifier = Modifier.fillMaxSize(),
         )
@@ -372,12 +360,11 @@ private fun AppliedRulesPageEpisodesPreview(
                     ),
                 )
             },
-            totalEpisodeCount = 10,
+            starredEpisodeCount = 10,
             useEpisodeArtwork = false,
             areOtherOptionsExpanded = expanded,
             onCreatePlaylist = {},
             onClickRule = {},
-            onClickClose = {},
             toggleOtherOptions = { expanded = !expanded },
             modifier = Modifier.fillMaxSize(),
         )
@@ -397,12 +384,11 @@ private fun AppliedRulesPageNoEpisodesPreview(
                 podcasts = PodcastsRule.Any,
             ),
             availableEpisodes = emptyList(),
-            totalEpisodeCount = 0,
+            starredEpisodeCount = 0,
             useEpisodeArtwork = false,
             areOtherOptionsExpanded = expanded,
             onCreatePlaylist = {},
             onClickRule = {},
-            onClickClose = {},
             toggleOtherOptions = { expanded = !expanded },
             modifier = Modifier.fillMaxSize(),
         )

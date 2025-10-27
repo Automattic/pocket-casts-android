@@ -75,8 +75,8 @@ class AutoDownloadSettingsFragment :
                 AutoDownloadSettingsPage(
                     uiState = uiState,
                     navController = navController,
-                    getPreviewMetadataFlow = viewModel::getPreviewMetadataFlow,
-                    refreshPreviewMetadata = viewModel::refreshPreviewMetadata,
+                    getArtworkUuidsFlow = viewModel::getArtworkUuidsFlow,
+                    refreshArtworkUuids = viewModel::refreshArtworkUuids,
                     onChangeUpNextDownload = viewModel::changeUpNextDownload,
                     onChangeNewEpisodesDownload = viewModel::changeNewEpisodesDownload,
                     onChangeOnFollowDownload = viewModel::changeOnFollowDownload,

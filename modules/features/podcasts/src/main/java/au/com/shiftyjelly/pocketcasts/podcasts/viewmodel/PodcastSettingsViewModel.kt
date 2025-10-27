@@ -15,7 +15,6 @@ import au.com.shiftyjelly.pocketcasts.models.type.TrimMode
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.repositories.playlist.PlaylistManager
-import au.com.shiftyjelly.pocketcasts.repositories.playlist.PlaylistPreview
 import au.com.shiftyjelly.pocketcasts.repositories.playlist.SmartPlaylistPreview
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
 import au.com.shiftyjelly.pocketcasts.utils.extensions.decrementByOrRound
@@ -74,14 +73,12 @@ class PodcastSettingsViewModel @AssistedInject constructor(
         }
     }.stateIn(viewModelScope, started = SharingStarted.Eagerly, initialValue = null)
 
-    fun getPreviewMetadataFlow(playlistUuid: String): StateFlow<PlaylistPreview.Metadata?> {
-        return playlistManager.getPreviewMetadataFlow(playlistUuid)
+    fun getArtworkUuidsFlow(playlistUuid: String): StateFlow<List<String>?> {
+        return playlistManager.getArtworkUuidsFlow(playlistUuid)
     }
 
-    fun refreshPreviewMetadata(playlistUuid: String) {
-        viewModelScope.launch {
-            playlistManager.refreshPreviewMetadata(playlistUuid)
-        }
+    suspend fun refreshArtworkUuids(playlistUuid: String) {
+        playlistManager.refreshArtworkUuids(playlistUuid)
     }
 
     fun changeNotifications(enable: Boolean) {

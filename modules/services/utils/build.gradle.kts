@@ -43,6 +43,7 @@ dependencies {
     implementation(libs.play.auth)
     implementation(libs.play.cast)
     implementation(libs.rx2.android)
+    implementation(libs.unidecode)
 
     testImplementation(libs.coroutines.test)
     testImplementation(libs.junit)

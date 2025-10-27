@@ -42,7 +42,6 @@ Language: nl
     <string name="playlist_unarchive_all">Alles dearchiveren</string>
     <string name="playlist_episode_unavailable_cta">Verwijderen uit afspeellijst</string>
     <string name="playlist_episode_unavailable_title">Aflevering niet beschikbaar</string>
-    <string name="playlist_archive_all">Alles archiveren</string>
     <string name="episode_sort_custom_order">Aangepaste volgorde</string>
     <string name="playlist_episode_unavailable_description">De maker van de podcast heeft deze aflevering verwijderd. De podcast blijft in je afspeellijst staan totdat je deze verwijdert.</string>
     <string name="manual_playlist_search_no_podcast_or_folder_body">We kunnen geen aflevering vinden voor die zoekopdracht. Probeer een ander trefwoord.</string>
@@ -53,7 +52,6 @@ Language: nl
     <string name="manual_playlist_no_content_title_alternative">Begin met het bouwen van je afspeellijst</string>
     <string name="manual_playlist_no_content_title">Afleveringen aan je afspeellijst toevoegen</string>
     <string name="manual_playlist_no_content_body">Veeg naar links bij een aflevering om deze aan je afspeellijst toe te voegen.</string>
-    <string name="browse_shows">Door shows bladeren</string>
     <string name="unavailable">Niet beschikbaar</string>
     <string name="add_to_playlist_failure_message">Deze afspeellijst is vol. Verwijder een paar afleveringen of begin een nieuwe.</string>
     <string name="added_to_playlist">%1$s toegevoegd aan \'%2$s\'</string>
@@ -92,7 +90,6 @@ Language: nl
     <string name="playlist_sort_by">Sorteren op</string>
     <string name="playlist_select_episodes">Afleveringen selecteren</string>
     <string name="playlist_options">Afspeellijstopties</string>
-    <string name="playlist_download_all">Alles downloaden</string>
     <string name="smart_playlist_no_content_body">Het wordt ofwel tijd om te vieren dat je deze lijst hebt afgerond of om je regels te bewerken om er meer te krijgen.</string>
     <string name="smart_playlist_no_content_title">Geen afleveringen</string>
     <string name="playlist_play_all">Alles afspelen</string>

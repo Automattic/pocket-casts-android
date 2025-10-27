@@ -1,6 +1,24 @@
-7.101
+7.102
 -----
 
+
+7.101
+-----
+*   New Features
+    *   Update search results screen
+        ([#4583](https://github.com/Automattic/pocket-casts-android/pull/4583))
+    *   Integrate new combined search API
+        ([#4604](https://github.com/Automattic/pocket-casts-android/pull/4604))
+*   Updates
+    *   Improved login experience on WearOS
+        ([#4631](https://github.com/Automattic/pocket-casts-android/pull/4631))
+    *   Bring back legacy Google login on WearOS 14 and below
+        ([#4633](https://github.com/Automattic/pocket-casts-android/pull/4633))
+    *   Improve search results
+        ([#4637](https://github.com/Automattic/pocket-casts-android/pull/4637))
+*   Bug Fixes
+    *   Improve performance of bulk Up Next operations
+        ([#4641](https://github.com/Automattic/pocket-casts-android/pull/4641))
 
 7.100
 -----

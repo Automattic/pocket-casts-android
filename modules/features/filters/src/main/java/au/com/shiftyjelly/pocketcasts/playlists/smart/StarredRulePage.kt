@@ -50,7 +50,6 @@ internal fun StarredRulePage(
     useEpisodeArtwork: Boolean,
     onChangeUseStarredEpisodes: (Boolean) -> Unit,
     onSaveRule: () -> Unit,
-    onClickBack: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val useStarredEpisodes = when (selectedRule) {
@@ -61,7 +60,6 @@ internal fun StarredRulePage(
     RulePage(
         title = stringResource(LR.string.filters_title_starred),
         onSaveRule = onSaveRule,
-        onClickBack = onClickBack,
         modifier = modifier,
     ) { bottomPadding ->
         Column(
@@ -190,7 +188,6 @@ private fun StarredRulePreview(
                 rule = if (useStarred) StarredRule.Starred else StarredRule.Any
             },
             onSaveRule = {},
-            onClickBack = {},
         )
     }
 }

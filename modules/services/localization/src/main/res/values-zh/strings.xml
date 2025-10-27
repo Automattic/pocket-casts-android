@@ -43,7 +43,6 @@ Language: zh_CN
     <string name="playlist_episode_unavailable_cta">从播放列表中移除</string>
     <string name="playlist_episode_unavailable_description">播客创作者删除了此剧集。 在您移除之前，它将保留在您的播放列表中。</string>
     <string name="playlist_episode_unavailable_title">剧集无法播放</string>
-    <string name="playlist_archive_all">全部存档</string>
     <string name="episode_sort_custom_order">自定义排序</string>
     <string name="manual_playlist_search_no_podcast_or_folder_body">我们找不到任何符合该搜索条件的播客或文件夹。 请尝试使用其他关键字。</string>
     <string name="manual_playlist_search_no_podcast_title">未找到播客</string>
@@ -53,7 +52,6 @@ Language: zh_CN
     <string name="manual_playlist_no_content_title_alternative">开始构建您的播放列表</string>
     <string name="manual_playlist_no_content_title">将剧集添加到您的播放列表</string>
     <string name="manual_playlist_no_content_body">向左滑动剧集即可将其添加到您的播放列表。</string>
-    <string name="browse_shows">浏览节目</string>
     <string name="unavailable">不可用</string>
     <string name="add_to_playlist_failure_message">此播放列表已满。 删减几集或开始新的一集。</string>
     <string name="added_to_playlist">%1$s 已添加至“%2$s”</string>
@@ -91,7 +89,6 @@ Language: zh_CN
     <string name="playlist_sort_by">排序方式</string>
     <string name="playlist_select_episodes">选择剧集</string>
     <string name="playlist_options">播放列表选项</string>
-    <string name="playlist_download_all">下载全部</string>
     <string name="smart_rule_starred_description_disabled">如果符合您的其他规则，星标剧集仍会显示。</string>
     <string name="smart_playlist_no_content_body">您已完成此列表，但还可以编辑规则以获取更多内容。</string>
     <string name="smart_playlist_no_content_title">无剧集</string>
