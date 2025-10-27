@@ -553,6 +553,11 @@ class PlaylistManagerSmartTest {
                 it.copy(duration = 0.0, playedUpTo = 10.0)
             }
             assertEquals(40.seconds, awaitItem()?.metadata?.playbackDurationLeft)
+
+            insertPodcastEpisode(index = 5, podcastIndex = 0) {
+                it.copy(duration = 20.0, playingStatus = EpisodePlayingStatus.COMPLETED)
+            }
+            assertEquals(40.seconds, awaitItem()?.metadata?.playbackDurationLeft)
         }
     }
 

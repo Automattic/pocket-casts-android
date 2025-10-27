@@ -3,6 +3,7 @@ package au.com.shiftyjelly.pocketcasts.repositories.playlist
 import app.cash.turbine.test
 import au.com.shiftyjelly.pocketcasts.models.entity.PlaylistEntity.Companion.SYNC_STATUS_NOT_SYNCED
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
+import au.com.shiftyjelly.pocketcasts.models.type.EpisodePlayingStatus
 import au.com.shiftyjelly.pocketcasts.models.type.PlaylistEpisodeSortType
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
@@ -694,7 +695,7 @@ class PlaylistManagerManualTest {
     fun computeTotalPlaybackDurationLeft() = dsl.test {
         insertManualPlaylist(index = 0)
         insertPodcast(index = 0)
-        repeat(6) { index ->
+        repeat(7) { index ->
             insertManualEpisode(index = index, podcastIndex = 0, playlistIndex = 0)
         }
 
@@ -729,6 +730,11 @@ class PlaylistManagerManualTest {
 
             insertPodcastEpisode(index = 5, podcastIndex = 0) {
                 it.copy(duration = 5.0, isArchived = true)
+            }
+            assertEquals(40.seconds, awaitItem()?.metadata?.playbackDurationLeft)
+
+            insertPodcastEpisode(index = 6, podcastIndex = 0) {
+                it.copy(duration = 20.0, playingStatus = EpisodePlayingStatus.COMPLETED)
             }
             assertEquals(40.seconds, awaitItem()?.metadata?.playbackDurationLeft)
 
