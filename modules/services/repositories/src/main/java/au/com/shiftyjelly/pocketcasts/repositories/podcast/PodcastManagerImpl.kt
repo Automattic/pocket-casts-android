@@ -360,8 +360,8 @@ class PodcastManagerImpl @Inject constructor(
         return Single.fromCallable { findSubscribedBlocking() }
     }
 
-    override fun findSubscribedFlow(): Flow<List<Podcast>> {
-        return podcastDao.findSubscribedFlow()
+    override fun findSubscribedFlow(searchTerm: String?): Flow<List<Podcast>> {
+        return podcastDao.findSubscribedFlow(searchTerm.orEmpty())
     }
 
     override fun observePodcastsSortedByLatestEpisode(): Flow<List<Podcast>> {
