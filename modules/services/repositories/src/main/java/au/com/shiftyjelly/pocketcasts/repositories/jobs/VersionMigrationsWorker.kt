@@ -248,7 +248,7 @@ class VersionMigrationsWorker @AssistedInject constructor(
 
         upgradeMultiSelectItems(settings)
 
-        if (previousVersionCode < 9380) {
+        if (previousVersionCode < 9382) {
             EpisodeTitlesNormalizationWorker.enqueue(applicationContext)
         }
     }
