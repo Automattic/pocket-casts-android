@@ -74,6 +74,8 @@ internal fun PodcastSettingsHomePage(
     onIncrementSkipFirst: () -> Unit,
     onDecrementSkipLast: () -> Unit,
     onIncrementSkipLast: () -> Unit,
+    onClickSkipFirst: () -> Unit,
+    onClickSkipLast: () -> Unit,
     onChangePlaylistSettings: () -> Unit,
     onUnfollow: () -> Unit,
     modifier: Modifier = Modifier,
@@ -215,6 +217,7 @@ internal fun PodcastSettingsHomePage(
             verticalAlignment = Alignment.Companion.CenterVertically,
             modifier = Modifier
                 .fillMaxWidth()
+                .clickable(onClick = onClickSkipFirst)
                 .padding(end = 8.dp),
         ) {
             val resources = LocalResources.current
@@ -242,6 +245,7 @@ internal fun PodcastSettingsHomePage(
             verticalAlignment = Alignment.Companion.CenterVertically,
             modifier = Modifier
                 .fillMaxWidth()
+                .clickable(onClick = onClickSkipLast)
                 .padding(end = 8.dp),
         ) {
             val resources = LocalResources.current
@@ -372,6 +376,8 @@ private fun PodcastSettingsHomePagePreview(
             onIncrementSkipFirst = {},
             onDecrementSkipLast = {},
             onIncrementSkipLast = {},
+            onClickSkipLast = {},
+            onClickSkipFirst = {},
             onChangePlaylistSettings = {},
             onUnfollow = {},
             modifier = Modifier.background(MaterialTheme.theme.colors.primaryUi02),
