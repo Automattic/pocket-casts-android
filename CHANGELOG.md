@@ -5,6 +5,9 @@
         ([#4631](https://github.com/Automattic/pocket-casts-android/pull/4631))
     *   Bring back legacy Google login on WearOS 14 and below
         ([#4633](https://github.com/Automattic/pocket-casts-android/pull/4633))
+*   Bug Fixes
+    *   Improve performance of bulk Up Next operations
+        ([#4641](https://github.com/Automattic/pocket-casts-android/pull/4641))
 
 7.100
 -----
