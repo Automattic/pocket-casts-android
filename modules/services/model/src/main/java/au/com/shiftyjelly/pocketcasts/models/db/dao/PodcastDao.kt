@@ -44,7 +44,10 @@ abstract class PodcastDao {
         WHERE
           subscribed = 1
           AND (TRIM(:searchTerm) IS '' OR clean_title LIKE '%' || :searchTerm || '%' ESCAPE '\')
-        ORDER BY clean_title ASC
+        ORDER BY (CASE
+          WHEN clean_title LIKE 'the %' THEN SUBSTR(clean_title, 5)
+          ELSE clean_title
+        END) ASC
     """,
     )
     internal abstract fun findSubscribedFlowInternal(searchTerm: String): Flow<List<Podcast>>

@@ -318,7 +318,10 @@ abstract class PlaylistDao {
             ELSE folder.deleted IS NOT 0
           END)
           AND podcast.clean_title LIKE '%' || :searchTerm || '%' ESCAPE '\'
-        ORDER BY podcast.clean_title ASC
+        ORDER BY (CASE
+          WHEN podcast.clean_title LIKE 'the %' THEN SUBSTR(podcast.clean_title, 5)
+          ELSE podcast.clean_title
+        END) ASC
     """,
     )
     internal abstract suspend fun getAllPodcastPlaylistSources(
@@ -334,7 +337,10 @@ abstract class PlaylistDao {
           podcast.subscribed IS NOT 0
           AND podcast.folder_uuid IS (:folderUuid)
           AND podcast.clean_title LIKE '%' || :searchTerm || '%' ESCAPE '\'
-        ORDER BY podcast.clean_title ASC
+        ORDER BY (CASE
+          WHEN podcast.clean_title LIKE 'the %' THEN SUBSTR(podcast.clean_title, 5)
+          ELSE podcast.clean_title
+        END) ASC
     """,
     )
     protected abstract suspend fun getPodcastPlaylistSourcesForFolderUnsafe(
@@ -382,8 +388,10 @@ abstract class PlaylistDao {
                 AND podcast.clean_title LIKE '%' || :searchTerm || '%' ESCAPE '\'
             )
           ) 
-        ORDER BY 
-          folder.clean_name ASC
+        ORDER BY (CASE
+          WHEN folder.clean_name LIKE 'the %' THEN SUBSTR(folder.clean_name, 5)
+          ELSE folder.clean_name
+        END) ASC
     """,
     )
     internal abstract suspend fun getFolderPartialPlaylistSources(
@@ -427,7 +435,10 @@ abstract class PlaylistDao {
         ORDER BY
           episode.published_date DESC,
           episode.added_date DESC,
-          episode.cleanTitle ASC
+          (CASE
+            WHEN episode.cleanTitle LIKE 'the %' THEN SUBSTR(episode.cleanTitle, 5)
+            ELSE episode.cleanTitle
+          END) ASC
     """,
     )
     protected abstract fun notAddedManualEpisodesFlowUnsafe(

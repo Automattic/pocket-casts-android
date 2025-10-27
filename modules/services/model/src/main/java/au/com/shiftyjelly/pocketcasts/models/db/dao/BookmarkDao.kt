@@ -138,15 +138,11 @@ abstract class BookmarkDao {
               (CASE WHEN podcasts.title is NOT NULL THEN /* sort by podcast title if podcast title is not null */
                 (CASE
                       WHEN UPPER(podcasts.title) LIKE 'THE %' THEN SUBSTR(UPPER(podcasts.title), 5)
-                      WHEN UPPER(podcasts.title) LIKE 'A %' THEN SUBSTR(UPPER(podcasts.title), 3)
-                      WHEN UPPER(podcasts.title) LIKE 'AN %' THEN SUBSTR(UPPER(podcasts.title), 4)
                       ELSE UPPER(podcasts.title)
                 END) 
               ELSE /* sort by episode title if podcast title is null */
                 (CASE
                       WHEN UPPER(episodeTitle) LIKE 'THE %' THEN SUBSTR(UPPER(episodeTitle), 5)
-                      WHEN UPPER(episodeTitle) LIKE 'A %' THEN SUBSTR(UPPER(episodeTitle), 3)
-                      WHEN UPPER(episodeTitle) LIKE 'AN %' THEN SUBSTR(UPPER(episodeTitle), 4)
                       ELSE UPPER(episodeTitle)
                   END) 
               END) ASC,
