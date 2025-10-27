@@ -130,6 +130,7 @@ dependencies {
     implementation(projects.modules.services.ui)
     implementation(projects.modules.services.utils)
     implementation(projects.modules.services.views)
+    implementation(libs.splash)
 
     debugImplementation(libs.compose.ui.tooling)
 
