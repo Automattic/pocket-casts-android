@@ -12,6 +12,9 @@
         ([#4633](https://github.com/Automattic/pocket-casts-android/pull/4633))
     *   Improve search results
         ([#4637](https://github.com/Automattic/pocket-casts-android/pull/4637))
+*   Bug Fixes
+    *   Improve performance of bulk Up Next operations
+        ([#4641](https://github.com/Automattic/pocket-casts-android/pull/4641))
 
 7.100
 -----

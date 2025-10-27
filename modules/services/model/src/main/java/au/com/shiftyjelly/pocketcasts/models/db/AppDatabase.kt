@@ -78,6 +78,7 @@ import au.com.shiftyjelly.pocketcasts.models.entity.UserEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.UserNotifications
 import au.com.shiftyjelly.pocketcasts.models.entity.UserPodcastRating
 import au.com.shiftyjelly.pocketcasts.models.to.DbChapter
+import au.com.shiftyjelly.pocketcasts.utils.extensions.unidecode
 import java.io.File
 import java.util.Arrays
 import java.util.Date
@@ -107,7 +108,7 @@ import au.com.shiftyjelly.pocketcasts.localization.R as LR
         ManualPlaylistEpisode::class,
         BlazeAd::class,
     ],
-    version = 121,
+    version = 122,
     exportSchema = true,
     autoMigrations = [
         AutoMigration(from = 81, to = 82, spec = AppDatabase.Companion.DeleteSilenceRemovedMigration::class),
@@ -1233,6 +1234,65 @@ abstract class AppDatabase : RoomDatabase() {
             database.execSQL("ALTER TABLE playlists ADD COLUMN showArchivedEpisodes INTEGER NOT NULL DEFAULT 0")
         }
 
+        val MIGRATION_121_122 = addMigration(121, 122) { database ->
+            fun backfillNormalizedColumn(
+                table: String,
+                idColumn: String,
+                sourceColumn: String,
+                normalizedColumn: String,
+            ) {
+                database.execSQL("ALTER TABLE $table ADD COLUMN $normalizedColumn TEXT NOT NULL DEFAULT ''")
+
+                val statement = database.compileStatement("UPDATE $table SET $normalizedColumn = ? WHERE $idColumn = ?")
+                database.query("SELECT $idColumn, $sourceColumn FROM $table").use { cursor ->
+                    while (cursor.moveToNext()) {
+                        val uuid = cursor.getString(0)
+                        val normalizedValue = cursor.getString(1).unidecode()
+                        statement.clearBindings()
+                        statement.bindString(1, normalizedValue)
+                        statement.bindString(2, uuid)
+                        statement.executeUpdateDelete()
+                    }
+                }
+            }
+            backfillNormalizedColumn(
+                table = "bookmarks",
+                idColumn = "uuid",
+                sourceColumn = "title",
+                normalizedColumn = "clean_title",
+            )
+            backfillNormalizedColumn(
+                table = "folders",
+                idColumn = "uuid",
+                sourceColumn = "name",
+                normalizedColumn = "clean_name",
+            )
+            backfillNormalizedColumn(
+                table = "playlists",
+                idColumn = "uuid",
+                sourceColumn = "title",
+                normalizedColumn = "clean_title",
+            )
+            backfillNormalizedColumn(
+                table = "podcasts",
+                idColumn = "uuid",
+                sourceColumn = "title",
+                normalizedColumn = "clean_title",
+            )
+            backfillNormalizedColumn(
+                table = "user_episodes",
+                idColumn = "uuid",
+                sourceColumn = "title",
+                normalizedColumn = "clean_title",
+            )
+            backfillNormalizedColumn(
+                table = "manual_playlist_episodes",
+                idColumn = "episode_uuid",
+                sourceColumn = "title",
+                normalizedColumn = "clean_title",
+            )
+        }
+
         fun addMigrations(databaseBuilder: Builder<AppDatabase>, context: Context) {
             databaseBuilder.addMigrations(
                 addMigration(1, 2) { },
@@ -1644,6 +1704,7 @@ abstract class AppDatabase : RoomDatabase() {
                 MIGRATION_118_119,
                 MIGRATION_119_120,
                 MIGRATION_120_121,
+                MIGRATION_121_122,
             )
         }
 

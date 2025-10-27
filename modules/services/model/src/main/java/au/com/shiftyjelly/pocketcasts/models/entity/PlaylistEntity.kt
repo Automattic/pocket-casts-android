@@ -7,6 +7,7 @@ import androidx.room.PrimaryKey
 import au.com.shiftyjelly.pocketcasts.models.to.PlaylistIcon
 import au.com.shiftyjelly.pocketcasts.models.type.PlaylistEpisodeSortType
 import au.com.shiftyjelly.pocketcasts.utils.extensions.splitIgnoreEmpty
+import au.com.shiftyjelly.pocketcasts.utils.extensions.unidecode
 import java.io.Serializable
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
@@ -62,6 +63,12 @@ data class PlaylistEntity(
         const val LAST_2_WEEKS = 14 * 24
         const val LAST_MONTH = 31 * 24
     }
+
+    @ColumnInfo(name = "clean_title")
+    var cleanTitle: String = ""
+        get() = title.unidecode()
+        internal set
+
     val icon get() = PlaylistIcon(iconId)
 
     val isAudioOnly: Boolean

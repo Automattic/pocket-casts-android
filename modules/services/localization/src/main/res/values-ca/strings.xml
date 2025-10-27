@@ -1,11 +1,19 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2025-10-08 08:37:20+0000
+Translation-Revision-Date: 2025-10-23 15:35:16+0000
 Plural-Forms: nplurals=2; plural=n != 1;
 Generator: GlotPress/2.4.0-alpha
 Language: ca
 -->
 <resources>
+    <string name="rearrange_playlists_tooltip_title">Reorganitza les teves llistes de reproducció</string>
+    <string name="rearrange_playlists_tooltip_body">Prem i mantén premuda una llista de reproducció per moure-la.</string>
+    <string name="play_all_no_episodes_message">Tots els episodis s\'han arxivat. Afegeix o desarxiva per a reproduir.</string>
+    <string name="onboarding_upgrade_features_transcripts">Transcripcions generades</string>
+    <string name="search_filters_top_results">Millors resultats</string>
+    <string name="player_sleep_timer_end_of_chapter">Fi del capítol</string>
+    <string name="player_sleep_in_one_episode">Adormir-se al final de l\'episodi actual</string>
+    <string name="player_sleep_in_one_chapter">Adormir-se al final del capítol actual</string>
     <string name="winback_cancel_subscription_stay_button_label">Mantenir la meva subscripció</string>
     <string name="player_up_next_sort">Ordenar «Tot seguit».</string>
     <string name="filter_title">Títol de la llista de reproducció</string>
@@ -38,7 +46,6 @@ Language: ca
     <string name="playlist_episode_unavailable_cta">Esborrar de la llista de reproducció</string>
     <string name="playlist_episode_unavailable_description">L\'autor del pòdcast ha eliminat aquest episodi. Es quedarà a la teva llista de reproducció fins que l\'esborris.</string>
     <string name="playlist_episode_unavailable_title">Episodi no disponible. </string>
-    <string name="playlist_archive_all">Arxivar-ho tot</string>
     <string name="episode_sort_custom_order">Ordre personalitzat</string>
     <string name="manual_playlist_search_no_podcast_or_folder_body">No hem pogut trobar cap episodi per a aquesta cerca. Prova amb una altra paraula clau.</string>
     <string name="manual_playlist_search_no_podcast_title">No s\'han trobat pòdcasts</string>
@@ -48,7 +55,6 @@ Language: ca
     <string name="manual_playlist_no_content_title_alternative">Comença a crear la teva llista de reproducció</string>
     <string name="manual_playlist_no_content_title">Afegeix episodis a la teva llista de reproducció</string>
     <string name="manual_playlist_no_content_body">Llisca cap a l\'esquerra en un episodi per afegir-lo a la teva llista de reproducció.</string>
-    <string name="browse_shows">Navega pels pòdcasts</string>
     <string name="unavailable">No disponible</string>
     <string name="add_to_playlist_failure_message">Aquesta llista de reproducció és plena. Elimina alguns episodis o comença’n una de nova.</string>
     <string name="added_to_playlist">%1$s afegit a “%2$s”</string>
@@ -87,7 +93,6 @@ Language: ca
     <string name="playlist_sort_by">Ordenar per</string>
     <string name="playlist_select_episodes">Seleccionar episodis</string>
     <string name="playlist_options">Opcions de la llista de reproducció</string>
-    <string name="playlist_download_all">Descarregar-ho tot</string>
     <string name="smart_playlist_no_content_body">Arribats aquí, pots celebrar que la llista s\'ha acabat o modificar la configuració dels filtres per trobar més episodis.</string>
     <string name="smart_playlist_no_content_title">No hi ha episodis</string>
     <string name="playlist_play_all">Reprodueix-ho tot</string>
@@ -599,7 +604,6 @@ Language: ca
     <string name="player_sleep_time_fired_end_of_chapter">El temporitzador de son s\'ha aturat al final del capítol.</string>
     <string name="player_sleep_in_chapters">En suspensió en %d capítols</string>
     <string name="player_sleep_timer_in_episode">En acabar 1 episodi</string>
-    <string name="player_sleep_timer_end_of_episode">Final de l\'episodi</string>
     <string name="player_sleep_timer_in_episode_plural">En acabar %d episodis</string>
     <string name="player_sleep_timer_in_chapter_plural">En acabar %d capítols</string>
     <string name="player_sleep_timer_in_chapter">En acabar 1 capítol</string>
@@ -746,6 +750,7 @@ Language: ca
     <string name="settings_continuous_playback_summary">Si no tens cap episodi a la cua, es reproduirà els del pòdcast o llista que estiguis escoltant en aquell moment.</string>
     <string name="renew_your_subscription">Renova la teva subscripció</string>
     <string name="log_in_watch_from_phone_instructions_3">Si tens problemes, assegura\'t que el teu telèfon estigui executant la mateixa versió de Pocket Casts que el teu rellotge (%s)</string>
+    <string name="log_in_free_account">%s està utilitzant un compte gratuït</string>
     <string name="player_play_failed_check_internet">No s\'ha pogut carregar el pòdcast. Comprova la teva connexió a Internet i torna-ho a intentar.</string>
     <string name="empty_play_state">Tria un episodi per començar</string>
     <string name="settings_beta_features">Característiques beta</string>
@@ -1790,6 +1795,7 @@ Language: ca
     <string name="profile_refreshing">Actualitzant…</string>
     <string name="profile_create_subscription_failed">No s\'ha pogut crear la subscripció. Torna-ho a provar</string>
     <string name="profile_create_failed">No s\'ha pogut crear el compte. Torna-ho a provar</string>
+    <string name="profile_stats_share_to">Compartir amb…</string>
     <string name="podcasts">Pòdcasts</string>
     <string name="download_warning_title">Descarrega-ho tot</string>
     <string name="episode_row_download_failed">Error a la descàrrega</string>
@@ -2054,6 +2060,7 @@ Language: ca
     <string name="player_time_saved_no_hour">Felicitats! Estàs estalviant temps i acabant més pòdcasts.</string>
     <string name="search_podcasts">Cercar pòdcasts </string>
     <string name="podcast_unsubscribe_warning">Si deixes de seguir aquest pòdcast, s\'esborraran tots els arxius descarregats.</string>
+    <string name="player_sleep_timer_end_of_episode">Final de l\'episodi</string>
     <string name="pause">Pausar</string>
     <string name="play">Reproduir</string>
     <string name="search">Cercar</string>

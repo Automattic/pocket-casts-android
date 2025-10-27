@@ -1454,5 +1454,4 @@ Language: en_GB
     <string name="archive">Archive</string>
     <string name="add_to_up_next">Add to Up Next</string>
     <string name="in_progress">In progress</string>
-    <string name="player_sleep_timer_end_of_episode">End of episode</string>
 </resources>

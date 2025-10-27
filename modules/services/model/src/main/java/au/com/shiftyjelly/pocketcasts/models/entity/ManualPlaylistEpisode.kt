@@ -3,6 +3,7 @@ package au.com.shiftyjelly.pocketcasts.models.entity
 import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.Index
+import au.com.shiftyjelly.pocketcasts.utils.extensions.unidecode
 import java.time.Instant
 
 @Entity(
@@ -27,6 +28,7 @@ data class ManualPlaylistEpisode(
     @ColumnInfo(name = "podcast_slug") val podcastSlug: String,
     @ColumnInfo(name = "sort_position") val sortPosition: Int,
     @ColumnInfo(name = "is_synced") val isSynced: Boolean,
+    @ColumnInfo(name = "clean_title") val cleanTitle: String = title.unidecode(),
 ) {
     companion object {
         fun test(

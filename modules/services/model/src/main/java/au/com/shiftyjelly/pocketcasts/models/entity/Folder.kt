@@ -4,6 +4,7 @@ import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 import au.com.shiftyjelly.pocketcasts.models.type.PodcastsSortType
+import au.com.shiftyjelly.pocketcasts.utils.extensions.unidecode
 import java.util.Date
 
 @Entity(tableName = "folders")
@@ -19,6 +20,10 @@ data class Folder(
     @ColumnInfo(name = "deleted") var deleted: Boolean,
     @ColumnInfo(name = "sync_modified") var syncModified: Long,
 ) {
+    @ColumnInfo(name = "clean_name")
+    var cleanName: String = ""
+        get() = name.unidecode()
+        internal set
 
     companion object {
         // server side, the home folder also needs a UUID, so again we have a predefined value for it all clients use

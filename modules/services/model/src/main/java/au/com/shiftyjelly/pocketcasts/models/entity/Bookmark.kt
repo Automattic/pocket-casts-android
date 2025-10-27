@@ -6,6 +6,7 @@ import androidx.room.Ignore
 import androidx.room.Index
 import androidx.room.PrimaryKey
 import au.com.shiftyjelly.pocketcasts.models.type.SyncStatus
+import au.com.shiftyjelly.pocketcasts.utils.extensions.unidecode
 import java.io.Serializable
 import java.util.Calendar
 import java.util.Date
@@ -32,6 +33,11 @@ data class Bookmark(
     @Ignore val podcastTitle: String = "",
 ) : Serializable {
     constructor() : this(uuid = "")
+
+    @ColumnInfo(name = "clean_title")
+    var cleanTitle: String = ""
+        get() = title.unidecode()
+        internal set
 
     val adapterId: Long
         get() = UUID.nameUUIDFromBytes(uuid.toByteArray()).mostSignificantBits
