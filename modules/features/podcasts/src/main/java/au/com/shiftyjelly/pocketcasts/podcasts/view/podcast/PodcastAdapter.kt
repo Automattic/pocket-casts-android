@@ -300,7 +300,7 @@ class PodcastAdapter(
                 EpisodeViewHolder(
                     binding = binding,
                     showArtwork = settings.artworkConfiguration.value.useEpisodeArtwork(Element.Podcasts),
-                    fromListUuid = null,
+                    fromListUuid = fromListUuid,
                     imageRequestFactory = imageRequestFactory,
                     swipeRowActionsFactory = swipeRowActionsFactory,
                     rowDataProvider = rowDataProvider,
