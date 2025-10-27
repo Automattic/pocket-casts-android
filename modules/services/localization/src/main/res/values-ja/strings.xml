@@ -1,12 +1,18 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2025-10-09 09:54:04+0000
+Translation-Revision-Date: 2025-10-21 09:54:03+0000
 Plural-Forms: nplurals=1; plural=0;
 Generator: GlotPress/2.4.0-alpha
 Language: ja_JP
 -->
 <resources>
+    <string name="onboarding_upgrade_features_transcripts">生成されたトランスクリプト</string>
+    <string name="search_filters_top_results">上位の結果</string>
+    <string name="player_sleep_in_one_chapter">現在のチャプターの最後でスリープ</string>
+    <string name="player_sleep_in_one_episode">現在のエピソードの最後でスリープ</string>
+    <string name="player_sleep_timer_end_of_chapter">チャプター終了時</string>
     <string name="winback_cancel_subscription_stay_button_label">サブスクリプションを継続</string>
+    <string name="player_up_next_sort">次のエピソードを並べ替え</string>
     <string name="filter_title">プレイリストのタイトル</string>
     <string name="filter_id">プレイリスト ID</string>
     <string name="filters_filter_name">プレイリスト名</string>
@@ -37,7 +43,6 @@ Language: ja_JP
     <string name="playlist_episode_unavailable_cta">プレイリストから削除</string>
     <string name="playlist_episode_unavailable_description">ポッドキャスト作成者がこのエピソードを削除しました。 あなたが削除するまでは、ご自身のプレイリストに残ります。</string>
     <string name="playlist_episode_unavailable_title">エピソードが利用できません</string>
-    <string name="playlist_archive_all">すべてアーカイブ</string>
     <string name="episode_sort_custom_order">カスタムオーダー</string>
     <string name="manual_playlist_search_no_podcast_or_folder_body">その検索に該当するポッドキャストまたはフォルダーは見つかりませんでした。 別のキーワードを試してください。</string>
     <string name="manual_playlist_search_no_podcast_title">ポッドキャストが見つかりません</string>
@@ -47,7 +52,6 @@ Language: ja_JP
     <string name="manual_playlist_no_content_title_alternative">プレイリストの構築を開始</string>
     <string name="manual_playlist_no_content_title">プレイリストにエピソードを追加</string>
     <string name="manual_playlist_no_content_body">エピソードを左にスワイプしてプレイリストに追加します。</string>
-    <string name="browse_shows">番組を表示</string>
     <string name="unavailable">利用できません</string>
     <string name="add_to_playlist_failure_message">このプレイリストはいっぱいです。 エピソードをいくつか削除するか、新しいエピソードを開始します。</string>
     <string name="added_to_playlist">%1$s を「%2$s」に追加しました</string>
@@ -86,7 +90,6 @@ Language: ja_JP
     <string name="playlist_sort_by">並べ替え基準</string>
     <string name="playlist_select_episodes">エピソードを選択</string>
     <string name="playlist_options">プレイリストのオプション</string>
-    <string name="playlist_download_all">すべてをダウンロード</string>
     <string name="smart_playlist_no_content_body">リストにあるすべてのエピソードを再生しました。ルールを編集してさらに追加しますか ?</string>
     <string name="smart_playlist_no_content_title">エピソードなし</string>
     <string name="playlist_play_all">すべてを再生</string>
@@ -599,7 +602,6 @@ Language: ja_JP
     <string name="player_sleep_in_chapters">%d個のチャプターでスリープ中</string>
     <string name="player_sleep_timer_in_chapter_plural">%d個のチャプター</string>
     <string name="player_sleep_timer_in_chapter">1個のチャプター</string>
-    <string name="player_sleep_timer_end_of_episode">エピソード終了時</string>
     <string name="player_sleep_timer_in_episode_plural">%d件のエピソード</string>
     <string name="player_sleep_timer_in_episode">1件のエピソード</string>
     <string name="settings_use_episode_artwork_customization_description">アプリのこれらのセクションでエピソードのアートワークを表示する場合に選択します</string>
@@ -745,6 +747,7 @@ Language: ja_JP
     <string name="settings_continuous_playback_summary">「\"次のエピソード」が空の場合、現在視聴中のポッドキャストと同じものまたはリストからエピソードを再生します。</string>
     <string name="renew_your_subscription">サブスクリプションを更新</string>
     <string name="log_in_watch_from_phone_instructions_3">問題が発生した場合は、スマートフォンでウォッチと同じバージョンの Pocket Casts が実行されていることを確認します (%s)</string>
+    <string name="log_in_free_account">%s では無料アカウントを使用しています</string>
     <string name="player_play_failed_check_internet">ポッドキャストを読み込めませんでした。 ネットワーク接続を確認して、もう一度お試しください。</string>
     <string name="empty_play_state">開始するエピソードを選ぶ</string>
     <string name="settings_beta_features">ベータ版の機能</string>
@@ -1789,6 +1792,7 @@ Language: ja_JP
     <string name="profile_stats_time_saved_by">節約時間数</string>
     <string name="profile_create_password_requirements">6文字以上のパスワードを選んでください</string>
     <string name="filters_create_colour_icon">カラーとアイコン</string>
+    <string name="profile_stats_share_to">共有先…</string>
     <string name="supporter">サポーター</string>
     <string name="filters">フィルター</string>
     <string name="player_rearrange_actions_hidden">その他の操作</string>
@@ -2053,6 +2057,7 @@ Language: ja_JP
     <string name="sort_oldest_to_newest">古い順</string>
     <string name="player_sleep_time_fired">スリープタイマーがエピソードの最後で停止しました。</string>
     <string name="podcast_unsubscribe_warning">フォローを解除するとダウンロード済みファイルがすべて削除されます。</string>
+    <string name="player_sleep_timer_end_of_episode">エピソード終了時</string>
     <string name="more_options">追加オプション</string>
     <string name="ok">OK</string>
     <string name="pause">一時停止</string>

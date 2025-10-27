@@ -35,6 +35,7 @@ import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.ConcatAdapter
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import au.com.shiftyjelly.pocketcasts.PlayAllFragment
 import au.com.shiftyjelly.pocketcasts.compose.AppTheme
 import au.com.shiftyjelly.pocketcasts.compose.components.NoContentBanner
 import au.com.shiftyjelly.pocketcasts.compose.components.NoContentData
@@ -51,12 +52,12 @@ import au.com.shiftyjelly.pocketcasts.playlists.component.PlaylistToolbar
 import au.com.shiftyjelly.pocketcasts.playlists.component.ToolbarConfig
 import au.com.shiftyjelly.pocketcasts.playlists.manual.AddEpisodesFragment
 import au.com.shiftyjelly.pocketcasts.playlists.smart.EditRulesFragment
+import au.com.shiftyjelly.pocketcasts.repositories.playback.PlayAllResponse
 import au.com.shiftyjelly.pocketcasts.repositories.playlist.Playlist
 import au.com.shiftyjelly.pocketcasts.repositories.playlist.PlaylistManager
 import au.com.shiftyjelly.pocketcasts.ui.helper.FragmentHostListener
 import au.com.shiftyjelly.pocketcasts.utils.extensions.dpToPx
 import au.com.shiftyjelly.pocketcasts.utils.extensions.requireParcelable
-import au.com.shiftyjelly.pocketcasts.views.dialog.ConfirmationDialog
 import au.com.shiftyjelly.pocketcasts.views.extensions.hideKeyboardOnScroll
 import au.com.shiftyjelly.pocketcasts.views.extensions.smoothScrollToTop
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseFragment
@@ -116,6 +117,8 @@ class PlaylistFragment :
         binding.setupToolbar()
         binding.setupChromeCast()
         binding.setupSettings()
+        setupUpPlayAllAction()
+        setupUpNextSavedAsPlaylist()
         return binding.root
     }
 
@@ -166,6 +169,43 @@ class PlaylistFragment :
         }
     }
 
+    private fun setupUpPlayAllAction() {
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewModel.playAllResponseSignal
+                .flowWithLifecycle(viewLifecycleOwner.lifecycle)
+                .collect { response ->
+                    if (parentFragmentManager.findFragmentByTag("confirm_and_play") != null) {
+                        return@collect
+                    }
+                    when (response) {
+                        PlayAllResponse.ShowWarning -> {
+                            PlayAllFragment().show(childFragmentManager, "confirm_play_all")
+                        }
+
+                        PlayAllResponse.ShowNoEpisodesToPlay -> {
+                            val snackbarView = (requireActivity() as FragmentHostListener).snackBarView()
+                            Snackbar.make(snackbarView, getString(LR.string.play_all_no_episodes_message), Snackbar.LENGTH_LONG).show()
+                        }
+
+                        PlayAllResponse.DoNothing -> Unit
+                    }
+                }
+        }
+    }
+
+    private fun setupUpNextSavedAsPlaylist() {
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewModel.upNextSavedAsPlaylistSignal
+                .flowWithLifecycle(viewLifecycleOwner.lifecycle)
+                .collect {
+                    val hostListener = requireActivity() as FragmentHostListener
+                    Snackbar.make(hostListener.snackBarView(), getString(LR.string.up_next_as_playlist_saved), Snackbar.LENGTH_LONG)
+                        .setAction(LR.string.view) { hostListener.closeFiltersToRoot() }
+                        .show()
+                }
+        }
+    }
+
     private fun createHeaderAdapter(binding: PlaylistFragmentBinding): PlaylistHeaderAdapter {
         return PlaylistHeaderAdapter(
             themeType = theme.activeTheme,
@@ -190,10 +230,10 @@ class PlaylistFragment :
             },
             rightButton = PlaylistHeaderButtonData(
                 iconId = IR.drawable.ic_playlist_play,
-                label = getString(LR.string.playlist_play_all),
+                label = getString(LR.string.play_all),
                 onClick = {
                     viewModel.trackPlayAllTapped()
-                    playAll()
+                    viewModel.handlePlayAllAction()
                 },
             ),
             searchState = viewModel.searchState.textState,
@@ -355,7 +395,7 @@ class PlaylistFragment :
                         body = getString(LR.string.manual_playlist_no_content_body),
                         iconId = IR.drawable.ic_playlists,
                         primaryButton = NoContentData.Button(
-                            text = getString(LR.string.browse_shows),
+                            text = getString(LR.string.browse_podcasts),
                             onClick = {
                                 viewModel.trackBrowseShowsCtaTapped()
                                 val hostListener = (requireActivity() as FragmentHostListener)
@@ -430,33 +470,6 @@ class PlaylistFragment :
         return remember { viewModel.uiState.map { it.playlist?.title.orEmpty() } }
             .collectAsState("")
             .value
-    }
-
-    private fun playAll() {
-        if (parentFragmentManager.findFragmentByTag("confirm_and_play") != null) {
-            return
-        }
-        val episodeCount = viewModel.uiState.value.playlist?.metadata?.displayedAvailableEpisodeCount ?: 0
-        when {
-            episodeCount <= 0 -> {
-                val snackbarView = (requireActivity() as FragmentHostListener).snackBarView()
-                Snackbar.make(snackbarView, getString(LR.string.play_all_no_episodes_message), Snackbar.LENGTH_LONG).show()
-            }
-            viewModel.shouldShowPlayAllWarning() -> {
-                val buttonString = getString(LR.string.filters_play_episodes, episodeCount)
-
-                val dialog = ConfirmationDialog()
-                    .setTitle(getString(LR.string.filters_play_all))
-                    .setSummary(getString(LR.string.filters_play_all_summary))
-                    .setIconId(IR.drawable.ic_play_all)
-                    .setButtonType(ConfirmationDialog.ButtonType.Danger(buttonString))
-                    .setOnConfirm { viewModel.playAll() }
-                dialog.show(parentFragmentManager, "confirm_play_all")
-            }
-            else -> {
-                viewModel.playAll()
-            }
-        }
     }
 
     private fun openEditor() {

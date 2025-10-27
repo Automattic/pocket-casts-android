@@ -13,6 +13,7 @@ import com.squareup.moshi.JsonWriter
 import java.util.Locale
 
 private val replaceTheRegex = "^the ".toRegex()
+
 private fun cleanStringForSortInternal(value: String): String {
     return value.lowercase(Locale.getDefault()).replaceFirst(replaceTheRegex, "").removeAccents()
 }

@@ -29,6 +29,7 @@ import au.com.shiftyjelly.pocketcasts.models.type.PlaylistEpisodeSortType.Oldest
 import au.com.shiftyjelly.pocketcasts.models.type.PlaylistEpisodeSortType.ShortestToLongest
 import au.com.shiftyjelly.pocketcasts.models.type.SmartRules
 import au.com.shiftyjelly.pocketcasts.utils.extensions.escapeLike
+import au.com.shiftyjelly.pocketcasts.utils.extensions.unidecode
 import java.time.Clock
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
@@ -137,8 +138,16 @@ abstract class PlaylistDao {
     @Query("UPDATE playlists SET sortPosition = :position, syncStatus = $SYNC_STATUS_NOT_SYNCED WHERE uuid = :uuid")
     abstract suspend fun updateSortPosition(uuid: String, position: Int)
 
-    @Query("UPDATE playlists SET title = :name, syncStatus = $SYNC_STATUS_NOT_SYNCED WHERE uuid = :uuid")
-    abstract suspend fun updateName(uuid: String, name: String)
+    @Query("UPDATE playlists SET title = :name, clean_title = :cleanName, syncStatus = $SYNC_STATUS_NOT_SYNCED WHERE uuid = :uuid")
+    protected abstract suspend fun updateNameInternal(uuid: String, name: String, cleanName: String)
+
+    suspend fun updateName(uuid: String, name: String) {
+        updateNameInternal(
+            uuid = uuid,
+            name = name,
+            cleanName = name.unidecode(),
+        )
+    }
 
     @Query("UPDATE playlists SET sortId = :sortType, syncStatus = $SYNC_STATUS_NOT_SYNCED WHERE uuid = :uuid")
     abstract suspend fun updateSortType(uuid: String, sortType: PlaylistEpisodeSortType)
@@ -500,6 +509,7 @@ abstract class PlaylistDao {
           manual_episode.podcast_slug AS m_podcast_slug,
           manual_episode.sort_position AS m_sort_position,
           manual_episode.is_synced AS m_is_synced,
+          manual_episode.clean_title AS m_clean_title,
           -- podcast episode columns
           podcast_episode.uuid AS p_uuid,
           podcast_episode.episode_description AS p_episode_description,

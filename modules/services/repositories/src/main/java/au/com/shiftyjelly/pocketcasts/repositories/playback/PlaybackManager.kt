@@ -629,7 +629,7 @@ open class PlaybackManager @Inject constructor(
         userInitiated: Boolean = true,
     ) {
         val wasEmpty: Boolean = upNextQueue.isEmpty
-        upNextQueue.playLastBlocking(episode, downloadManager, null)
+        upNextQueue.playLast(episode, downloadManager, null)
         if (userInitiated) {
             episodeAnalytics.trackEvent(AnalyticsEvent.EPISODE_ADDED_TO_UP_NEXT, source, false, episode)
             notificationManager.updateUserFeatureInteraction(OnboardingNotificationType.UpNext)
@@ -687,7 +687,7 @@ open class PlaybackManager @Inject constructor(
             val topEpisode = episodes.first()
             playNowSync(episode = topEpisode, sourceView = sourceView)
             if (episodes.size > 1) {
-                upNextQueue.clearAndPlayAllBlocking(episodes.slice(1 until min(episodes.size, settings.getMaxUpNextEpisodes())), downloadManager)
+                upNextQueue.clearAndPlayAll(episodes.slice(1 until min(episodes.size, settings.getMaxUpNextEpisodes())), downloadManager)
             }
         }
     }
@@ -698,21 +698,27 @@ open class PlaybackManager @Inject constructor(
         }
 
         launch {
-            val currentEpisode = upNextQueue.currentEpisode?.uuid
-            val wasEmpty: Boolean = upNextQueue.isEmpty
-
-            upNextQueue.playAllLast(episodes.filter { it.uuid != currentEpisode }, downloadManager)
-            episodeAnalytics.trackBulkEvent(
-                event = AnalyticsEvent.EPISODE_BULK_ADD_TO_UP_NEXT,
-                count = episodes.size,
-                toTop = false,
-                source = source,
-            )
-            notificationManager.updateUserFeatureInteraction(OnboardingNotificationType.UpNext)
+            val wasEmpty = upNextQueue.isEmpty
+            addEpisodesLast(episodes, source)
             if (wasEmpty) {
                 loadCurrentEpisode(play = false)
             }
         }
+    }
+
+    suspend fun addEpisodesLast(episodes: List<BaseEpisode>, source: SourceView) {
+        if (episodes.isEmpty()) {
+            return
+        }
+        val currentEpisode = upNextQueue.currentEpisode?.uuid
+        upNextQueue.playAllLast(episodes.filter { it.uuid != currentEpisode }, downloadManager)
+        episodeAnalytics.trackBulkEvent(
+            event = AnalyticsEvent.EPISODE_BULK_ADD_TO_UP_NEXT,
+            count = episodes.size,
+            toTop = false,
+            source = source,
+        )
+        notificationManager.updateUserFeatureInteraction(OnboardingNotificationType.UpNext)
     }
 
     fun playEpisodesNext(episodes: List<BaseEpisode>, source: SourceView) {

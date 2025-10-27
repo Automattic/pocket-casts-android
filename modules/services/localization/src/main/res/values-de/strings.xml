@@ -1,12 +1,18 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2025-10-09 11:54:03+0000
+Translation-Revision-Date: 2025-10-21 13:54:03+0000
 Plural-Forms: nplurals=2; plural=n != 1;
 Generator: GlotPress/2.4.0-alpha
 Language: de
 -->
 <resources>
+    <string name="onboarding_upgrade_features_transcripts">Generierte Transkripte</string>
+    <string name="search_filters_top_results">Top-Ergebnisse</string>
+    <string name="player_sleep_in_one_chapter">Schlummerfunktion startet am Ende des aktuellen Kapitels</string>
+    <string name="player_sleep_in_one_episode">Schlummerfunktion startet am Ende der aktuellen Folge</string>
+    <string name="player_sleep_timer_end_of_chapter">Ende des Kapitels</string>
     <string name="winback_cancel_subscription_stay_button_label">Mein Abonnement behalten</string>
+    <string name="player_up_next_sort">„Als Nächstes“ sortieren</string>
     <string name="filter_title">Titel der Wiedergabeliste</string>
     <string name="filter_id">ID der Wiedergabeliste</string>
     <string name="filters_filter_name">Name der Wiedergabeliste</string>
@@ -37,7 +43,6 @@ Language: de
     <string name="playlist_episode_unavailable_cta">Aus Wiedergabeliste entfernen</string>
     <string name="playlist_episode_unavailable_description">Der Podcast-Ersteller hat diese Folge gelöscht. Sie bleibt in deiner Wiedergabeliste, bis du sie entfernst.</string>
     <string name="playlist_episode_unavailable_title">Folge nicht verfügbar</string>
-    <string name="playlist_archive_all">Alle archivieren</string>
     <string name="episode_sort_custom_order">Individuelle Reihenfolge</string>
     <string name="manual_playlist_search_no_podcast_or_folder_body">Wir konnten keinen Podcast oder Ordner für diese Suche finden. Versuche es mit einem anderen Stichwort.</string>
     <string name="manual_playlist_search_no_podcast_title">Kein Podcast gefunden</string>
@@ -47,7 +52,6 @@ Language: de
     <string name="manual_playlist_no_content_title_alternative">Deine Wiedergabeliste erstellen</string>
     <string name="manual_playlist_no_content_title">Folgen zu deiner Wiedergabeliste hinzufügen</string>
     <string name="manual_playlist_no_content_body">Wische bei einer Folge nach links, um sie zu deiner Wiedergabeliste hinzuzufügen.</string>
-    <string name="browse_shows">Shows durchsuchen</string>
     <string name="unavailable">Nicht verfügbar</string>
     <string name="added_to_playlist">%1$s zu „%2$s“ hinzugefügt</string>
     <string name="add_to_playlist_failure_message">Diese Wiedergabeliste ist voll. Entferne einige Folgen oder beginne eine neue.</string>
@@ -86,7 +90,6 @@ Language: de
     <string name="playlist_sort_by">Sortieren nach</string>
     <string name="playlist_select_episodes">Folgen auswählen</string>
     <string name="playlist_options">Wiedergabelisten-Optionen</string>
-    <string name="playlist_download_all">Alle herunterladen</string>
     <string name="smart_playlist_no_content_body">Jetzt kannst du entweder stolz darauf sein, deine Liste durchgehört zu haben, oder deine Regeln bearbeiten, um dir noch mehr Podcasts vorzuknöpfen.</string>
     <string name="smart_playlist_no_content_title">Keine Folgen</string>
     <string name="playlist_play_all">Alle Titel abspielen</string>
@@ -599,7 +602,6 @@ Language: de
     <string name="player_sleep_in_chapters">Schlummerfunktion wird nach %d Kapiteln aktiviert</string>
     <string name="player_sleep_timer_in_chapter_plural">Nach %d Kapiteln</string>
     <string name="player_sleep_timer_in_chapter">Nach 1 Kapitel</string>
-    <string name="player_sleep_timer_end_of_episode">Ende der Folge</string>
     <string name="player_sleep_timer_in_episode_plural">Nach %d Folgen</string>
     <string name="player_sleep_timer_in_episode">Nach 1 Folge</string>
     <string name="settings_use_episode_artwork_customization_description">Wähle aus, ob in diesen App-Bereichen das Cover der Folge angezeigt werden soll</string>
@@ -745,6 +747,7 @@ Language: de
     <string name="settings_continuous_playback_summary">Wenn deine Warteschlange leer ist, spielen wir Folgen aus dem Podcast oder der Liste, die du dir gerade anhörst.</string>
     <string name="renew_your_subscription">Abonnement verlängern</string>
     <string name="log_in_watch_from_phone_instructions_3">Hast du Probleme? Stelle sicher, dass auf deinem Smartphone dieselbe Pocket Casts-Version installiert ist, wie auf deiner Uhr (%s)</string>
+    <string name="log_in_free_account">%s nutzt ein kostenloses Konto</string>
     <string name="player_play_failed_check_internet">Podcast konnte nicht geladen werden. Bitte überprüfe deine Internetverbindung und versuche es erneut.</string>
     <string name="empty_play_state">Wähle eine Folge aus, um loszulegen</string>
     <string name="settings_beta_features">Betafunktionen</string>
@@ -1789,6 +1792,7 @@ Language: de
     <string name="profile_delete_account_question">Bist du sicher, dass du dein Konto löschen möchtest? Dies kann nicht rückgängig gemacht werden!</string>
     <string name="profile_create_password_requirements">Das Passwort muss mindestens 6 Zeichen lang sein</string>
     <string name="filters_create_colour_icon">FARBE &amp; ICON</string>
+    <string name="profile_stats_share_to">Teilen auf …</string>
     <string name="supporter">Unterstützer</string>
     <string name="filters">Filter</string>
     <string name="player_rearrange_actions_hidden">Weitere Aktionen</string>
@@ -2053,6 +2057,7 @@ Language: de
     <string name="sort_oldest_to_newest">Alt nach neu</string>
     <string name="player_sleep_time_fired">Durch die Schlummerfunktion wurde die Wiedergabe am Ende deiner Folge beendet.</string>
     <string name="podcast_unsubscribe_warning">Wenn du den Podcast nicht mehr abonnierst, werden alle heruntergeladenen Dateien entfernt.</string>
+    <string name="player_sleep_timer_end_of_episode">Ende der Folge</string>
     <string name="more">Mehr</string>
     <string name="more_options">Weitere Optionen</string>
     <string name="ok">OK</string>

@@ -247,6 +247,10 @@ class VersionMigrationsWorker @AssistedInject constructor(
         }
 
         upgradeMultiSelectItems(settings)
+
+        if (previousVersionCode < 9380) {
+            EpisodeTitlesNormalizationWorker.enqueue(applicationContext)
+        }
     }
 
     private fun removeOldTempPodcastDirectory() {

@@ -16,3 +16,20 @@ fun <T> List<T>.padEnd(
         this
     }
 }
+
+fun <T, R> List<T>.containsAllInOrderBy(
+    other: List<T>,
+    selector: (T) -> R,
+): Boolean {
+    if (other.size > size) {
+        return false
+    }
+
+    for (index in other.indices) {
+        if (selector(this[index]) != selector(other[index])) {
+            return false
+        }
+    }
+
+    return true
+}
