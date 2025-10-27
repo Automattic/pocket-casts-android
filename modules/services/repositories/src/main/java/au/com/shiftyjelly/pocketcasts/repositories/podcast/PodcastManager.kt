@@ -34,7 +34,7 @@ interface PodcastManager {
 
     fun findSubscribedBlocking(): List<Podcast>
     fun findSubscribedRxSingle(): Single<List<Podcast>>
-    fun findSubscribedFlow(): Flow<List<Podcast>>
+    fun findSubscribedFlow(searchTerm: String? = null): Flow<List<Podcast>>
     suspend fun findSubscribedSorted(): List<Podcast>
     suspend fun findSubscribedNoOrder(): List<Podcast>
     suspend fun findPodcastsInFolder(folderUuid: String): List<Podcast>

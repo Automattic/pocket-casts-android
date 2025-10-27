@@ -6,6 +6,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.text.input.clearText
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -64,7 +65,7 @@ internal class CreatePlaylistFragment : BaseDialogFragment() {
             val navController = rememberNavController()
             val listener = rememberNavigationListener()
 
-            ClearTransientRulesStateEffect(navController)
+            ClearTransientStateEffect(navController)
 
             ManageSmartRulesPage(
                 playlistName = viewModel.playlistNameState.text.toString(),
@@ -75,6 +76,7 @@ internal class CreatePlaylistFragment : BaseDialogFragment() {
                 followedPodcasts = uiState.followedPodcasts,
                 starredEpisodeCount = uiState.starredEpisodeCount,
                 useEpisodeArtwork = uiState.useEpisodeArtwork,
+                podcastSearchState = viewModel.podcastSearchState.textState,
                 navController = navController,
                 listener = listener,
                 startDestination = NavigationRoutes.NEW_PLAYLIST,
@@ -161,7 +163,7 @@ internal class CreatePlaylistFragment : BaseDialogFragment() {
     }
 
     @Composable
-    private fun ClearTransientRulesStateEffect(navController: NavController) {
+    private fun ClearTransientStateEffect(navController: NavController) {
         var currentRoute by rememberSaveable { mutableStateOf<String?>(null) }
         LaunchedEffect(navController) {
             navController.currentBackStackEntryFlow.collect { entry ->
@@ -169,6 +171,7 @@ internal class CreatePlaylistFragment : BaseDialogFragment() {
                 if (currentRoute != newRoute) {
                     currentRoute = newRoute
                     viewModel.clearTransientRules()
+                    viewModel.podcastSearchState.textState.clearText()
                 }
             }
         }
