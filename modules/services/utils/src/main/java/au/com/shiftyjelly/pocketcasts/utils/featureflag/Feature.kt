@@ -127,7 +127,7 @@ enum class Feature(
     NEW_ONBOARDING_UPGRADE(
         key = "new_onboarding_upgrade",
         title = "New Onboarding Upgrade",
-        defaultValue = isDebugOrPrototypeBuild,
+        defaultValue = true,
         tier = FeatureTier.Free,
         hasFirebaseRemoteFlag = true,
         hasDevToggle = true,
@@ -135,7 +135,7 @@ enum class Feature(
     NEW_ONBOARDING_ACCOUNT_CREATION(
         key = "new_onboarding_account_creation",
         title = "New Onboarding Account Creation",
-        defaultValue = isDebugOrPrototypeBuild,
+        defaultValue = true,
         tier = FeatureTier.Free,
         hasFirebaseRemoteFlag = true,
         hasDevToggle = true,
@@ -143,7 +143,7 @@ enum class Feature(
     NEW_ONBOARDING_RECOMMENDATIONS(
         key = "new_onboarding_recommendations_changes",
         title = "New Onboarding Recommendation Changes",
-        defaultValue = isDebugOrPrototypeBuild,
+        defaultValue = true,
         tier = FeatureTier.Free,
         hasFirebaseRemoteFlag = true,
         hasDevToggle = true,
