@@ -1,3 +1,9 @@
+7.102
+-----
+*   Bug Fixes
+    *   Fix search results not showing filter pills when there are no results
+        ([#4649](https://github.com/Automattic/pocket-casts-android/pull/4649))
+
 7.101
 -----
 *   New Features
