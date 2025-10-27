@@ -1,6 +1,8 @@
 7.102
 -----
-
+*   Updates
+    *   Bring back podcast setting skip first/last dialog
+        ([#4631](https://github.com/Automattic/pocket-casts-android/pull/4631))
 
 7.101
 -----
