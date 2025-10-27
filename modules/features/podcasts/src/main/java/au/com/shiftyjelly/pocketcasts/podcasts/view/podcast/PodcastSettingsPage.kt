@@ -54,7 +54,6 @@ import au.com.shiftyjelly.pocketcasts.podcasts.viewmodel.PodcastSettingsViewMode
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import au.com.shiftyjelly.pocketcasts.views.helper.ToolbarColors
-import com.google.protobuf.value
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
 import kotlinx.coroutines.flow.StateFlow
@@ -233,7 +232,7 @@ internal fun PodcastSettingsPage(
     }
 
     if (isSkipFirstDialogOpen) {
-        ChaneSkipDurationDialog(
+        ChangeSkipDurationDialog(
             title = stringResource(LR.string.podcast_settings_skip_first),
             placeholder = stringResource(LR.string.seconds_label),
             initialDuration = uiState?.podcast?.startFromSecs?.seconds ?: Duration.ZERO,
@@ -246,7 +245,7 @@ internal fun PodcastSettingsPage(
     }
 
     if (isSkipLastDialogOpen) {
-        ChaneSkipDurationDialog(
+        ChangeSkipDurationDialog(
             title = stringResource(LR.string.podcast_settings_skip_last),
             placeholder = stringResource(LR.string.seconds_label),
             initialDuration = uiState?.podcast?.skipLastSecs?.seconds ?: Duration.ZERO,
@@ -260,7 +259,7 @@ internal fun PodcastSettingsPage(
 }
 
 @Composable
-private fun ChaneSkipDurationDialog(
+private fun ChangeSkipDurationDialog(
     title: String,
     placeholder: String,
     initialDuration: Duration,
