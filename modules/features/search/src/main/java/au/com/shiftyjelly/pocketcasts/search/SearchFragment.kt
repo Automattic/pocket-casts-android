@@ -204,7 +204,7 @@ class SearchFragment : BaseFragment() {
             val hintColor = UR.attr.secondary_text_02
             setHintTextColor(context.getThemeColor(hintColor))
             setOnEditorActionListener { _, actionId, event ->
-                if (actionId == EditorInfo.IME_ACTION_SEARCH || actionId == EditorInfo.IME_ACTION_DONE || (event.action == KeyEvent.ACTION_DOWN && event.keyCode == KeyEvent.KEYCODE_ENTER)) {
+                if (searchView.query.toString().isNotBlank() && (actionId == EditorInfo.IME_ACTION_SEARCH || actionId == EditorInfo.IME_ACTION_DONE || (event.action == KeyEvent.ACTION_DOWN && event.keyCode == KeyEvent.KEYCODE_ENTER))) {
                     viewModel.runSearchOnTerm(searchView.query.toString())
                     binding.searchHistoryPanel.hide()
                     UiUtil.hideKeyboard(searchView)

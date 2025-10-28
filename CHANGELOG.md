@@ -1,6 +1,8 @@
 7.102
 -----
-
+*   Updates
+    *   Exclude empty searches from history
+        ([#4660](https://github.com/Automattic/pocket-casts-android/pull/4660))
 
 7.101
 -----
