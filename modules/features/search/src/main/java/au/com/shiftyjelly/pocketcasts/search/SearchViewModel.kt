@@ -123,6 +123,7 @@ class SearchViewModel @Inject constructor(
     }
 
     private fun saveSearchTerm(term: String) {
+        if (term.isEmpty()) return
         viewModelScope.launch {
             searchHistoryManager.add(SearchHistoryEntry.SearchTerm(term = term))
         }
