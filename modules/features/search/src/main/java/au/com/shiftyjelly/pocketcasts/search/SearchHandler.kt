@@ -349,11 +349,19 @@ class SearchHandler @Inject constructor(
                         if (localResults.isNotEmpty()) {
                             emit(SearchUiState.SearchOperation.Success(searchTerm = query, results = SearchResults.ImprovedResults(results = localResults, filter = ResultsFilters.TOP_RESULTS)))
                         }
-                        val apiResults = improvedSearchManager.combinedSearch(query).map {
-                            if (it is ImprovedSearchResultItem.PodcastItem) {
-                                it.copy(isFollowed = subscribedUuids.contains(it.uuid))
+                        val apiResults = try {
+                            improvedSearchManager.combinedSearch(query).map {
+                                if (it is ImprovedSearchResultItem.PodcastItem) {
+                                    it.copy(isFollowed = subscribedUuids.contains(it.uuid))
+                                } else {
+                                    it
+                                }
+                            }
+                        } catch (t: Throwable) {
+                            if (localResults.isEmpty()) {
+                                throw t
                             } else {
-                                it
+                                emptyList()
                             }
                         }
                         val combinedResults = (localResults + apiResults).distinctBy { it::class to it.uuid }
