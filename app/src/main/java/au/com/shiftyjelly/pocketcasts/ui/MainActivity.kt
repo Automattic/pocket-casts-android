@@ -449,18 +449,19 @@ class MainActivity :
         setContentView(binding.root)
 
         lifecycleScope.launch {
-            firebaseRemoteFeatureInitializer.initialize()
-            isReady = true
+            repeatOnLifecycle(Lifecycle.State.CREATED) {
+                firebaseRemoteFeatureInitializer.initialize()
+                isReady = true
 
-            withContext(Dispatchers.Main) {
-                onFirebaseInitComplete(savedInstanceState)
+                withContext(Dispatchers.Main) {
+                    onFirebaseInitComplete(savedInstanceState)
+                }
             }
         }
     }
 
     private fun onFirebaseInitComplete(savedInstanceState: Bundle?) {
         val showOnboarding = !settings.hasCompletedOnboarding() && !syncManager.isLoggedIn()
-        // Only show if savedInstanceState is null in order to avoid creating onboarding activity twice.
         if (showOnboarding) {
             openOnboardingFlow(OnboardingFlow.InitialOnboarding)
         }
