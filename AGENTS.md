@@ -105,7 +105,8 @@ Core Services (model, servers)
 ### Technology Stack
 
 **UI**:
-- **Jetpack Compose** (primary for new features) with Material
+- **Jetpack Compose** (primary for new features) with Material (Material2)
+  > Note: The codebase currently uses Material (Material2) for Compose components. Migration to Material3 is planned for the future.
 - **XML Views** (legacy)
 - View Binding enabled for XML layouts
 
