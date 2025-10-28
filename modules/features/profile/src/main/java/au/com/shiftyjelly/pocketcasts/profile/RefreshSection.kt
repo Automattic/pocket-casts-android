@@ -30,9 +30,8 @@ import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.tooling.preview.PreviewParameterProvider
 import androidx.compose.ui.unit.dp
 import au.com.shiftyjelly.pocketcasts.compose.AppThemeWithBackground
-import au.com.shiftyjelly.pocketcasts.compose.components.DialogButtonState
-import au.com.shiftyjelly.pocketcasts.compose.components.DialogFrame
-import au.com.shiftyjelly.pocketcasts.compose.components.DialogText
+import au.com.shiftyjelly.pocketcasts.compose.components.DialogButtonProperties
+import au.com.shiftyjelly.pocketcasts.compose.components.SimpleDialog
 import au.com.shiftyjelly.pocketcasts.compose.components.TextP50
 import au.com.shiftyjelly.pocketcasts.compose.preview.ThemePreviewParameterProvider
 import au.com.shiftyjelly.pocketcasts.compose.theme
@@ -139,12 +138,12 @@ private fun ErrorInfoDialog(
     onDismiss: () -> Unit,
 ) {
     if (message != null) {
-        DialogFrame(
+        SimpleDialog(
             onDismissRequest = onDismiss,
             title = stringResource(LR.string.profile_refresh_error),
-            content = { DialogText(message) },
-            buttons = listOf(
-                DialogButtonState(
+            body = message,
+            buttonProperties = listOf(
+                DialogButtonProperties(
                     text = stringResource(LR.string.ok),
                     onClick = onDismiss,
                 ),

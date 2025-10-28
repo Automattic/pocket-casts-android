@@ -158,7 +158,7 @@ fun <T> SettingRadioDialogRow(
                 options = options.map { Pair(it, optionToLocalisedString(it)) },
                 savedOption = savedOption,
                 onSave = onSave,
-                dismissDialog = { showDialog = false },
+                onDismissRequest = { showDialog = false },
             )
         }
     }

@@ -8,7 +8,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
-import au.com.shiftyjelly.pocketcasts.compose.components.DialogButtonState
+import au.com.shiftyjelly.pocketcasts.compose.components.DialogButtonProperties
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.download.FixDownloadsWorker
 import au.com.shiftyjelly.pocketcasts.repositories.file.FileStorage
@@ -20,7 +20,7 @@ import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import java.io.File
-import java.util.*
+import java.util.Locale
 import javax.inject.Inject
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -386,14 +386,14 @@ class StorageSettingsViewModel
         title = context.getString(LR.string.settings_storage_move_are_you_sure),
         message = context.getString(LR.string.settings_storage_move_message),
         buttons = listOf(
-            DialogButtonState(
+            DialogButtonProperties(
                 text = context.getString(LR.string.settings_storage_move_cancel).uppercase(
                     Locale.getDefault(),
                 ),
                 onClick = {},
 
             ),
-            DialogButtonState(
+            DialogButtonProperties(
                 text = context.getString(LR.string.settings_storage_move),
                 onClick = { movePodcasts(oldDirectory, newDirectory) },
             ),
@@ -410,14 +410,14 @@ class StorageSettingsViewModel
         buttons = buildList {
             if (showCancel) {
                 add(
-                    DialogButtonState(
+                    DialogButtonProperties(
                         text = context.getString(LR.string.cancel).uppercase(),
                         onClick = {},
                     ),
                 )
             }
             add(
-                DialogButtonState(
+                DialogButtonProperties(
                     text = context.getString(LR.string.ok),
                     onClick = {},
                 ),
@@ -468,6 +468,6 @@ class StorageSettingsViewModel
     data class AlertDialogState(
         val title: String,
         val message: String? = null,
-        val buttons: List<DialogButtonState>,
+        val buttons: List<DialogButtonProperties>,
     )
 }
