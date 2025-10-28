@@ -273,7 +273,7 @@ internal fun BoxScope.TopControls(
         PagerProgressingIndicator(
             state = pagerState,
             progress = progress,
-            activeColor = Color.Black,
+            activeColor = Color.White,
         )
         Spacer(
             modifier = Modifier.height(10.dp),
