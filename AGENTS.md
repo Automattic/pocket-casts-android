@@ -106,7 +106,7 @@ Core Services (model, servers)
 
 **UI**:
 - **Jetpack Compose** (primary for new features) with Material (Material2)
-  > Note: The codebase currently uses Material (Material2) for Compose components. Migration to Material3 is planned for the future.
+  > Note: The codebase currently uses Material (Material2) for Compose components. Migration to Material3 is in progress. **For all new Compose UI, use Material3 components unless you are working in a module that has not yet migrated.** If unsure, check the module's dependencies or consult the team. Existing code may still use Material2 until migration is complete.
 - **XML Views** (legacy)
 - View Binding enabled for XML layouts
 
