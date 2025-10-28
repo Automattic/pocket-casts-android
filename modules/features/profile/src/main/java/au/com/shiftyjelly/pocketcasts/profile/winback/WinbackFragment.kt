@@ -227,7 +227,6 @@ class WinbackFragment : BaseDialogFragment() {
             if (offerState?.isClaimingOffer == true) {
                 ProgressDialog(
                     text = stringResource(LR.string.winback_claiming_offer),
-                    onDismiss = {},
                 )
             }
 
