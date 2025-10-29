@@ -19,7 +19,7 @@ class ImprovedSearchManagerImpl @Inject constructor(
         return response.results.map {
             when (it) {
                 is AutoCompleteResult.TermResult -> SearchAutoCompleteItem.Term(term = it.value)
-                is AutoCompleteResult.PodcastResult -> SearchAutoCompleteItem.Podcast(uuid = it.value.uuid, title = it.value.title, author = it.value.author)
+                is AutoCompleteResult.PodcastResult -> SearchAutoCompleteItem.Podcast(uuid = it.value.uuid, title = it.value.title, author = it.value.author.orEmpty())
             }
         }
     }
