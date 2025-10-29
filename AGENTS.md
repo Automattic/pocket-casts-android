@@ -160,6 +160,13 @@ Core Services (model, servers)
 
 ### Image Resources
 
+- Add images to `modules/services/images` only
+
+**Prefer vector graphics (.svg) over rasterized formats when possible**:
+- Scalable to any screen density without quality loss
+- Smaller file size for simple graphics
+- Use for icons, logos, and simple illustrations
+
 **Prefer WebP format over PNG**:
 - New images should be `.webp` format for better compression and smaller APK size
 - PNG acceptable only for:

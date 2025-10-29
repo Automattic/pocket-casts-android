@@ -26,6 +26,15 @@
 
 ## Image Resources
 
+- Add images to `modules/services/images` only
+
+### Vector Graphics Preferred
+
+- **Prefer vector graphics (.svg)** over rasterized formats when possible
+  - Scalable to any screen density without quality loss
+  - Smaller file size for simple graphics
+  - Use for icons, logos, and simple illustrations
+
 ### WebP Format Required
 
 - **New images**: Always use `.webp` format for better compression and smaller APK
