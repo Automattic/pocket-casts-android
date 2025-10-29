@@ -54,6 +54,7 @@ class SearchViewModel @Inject constructor(
                                         AnalyticsEvent.IMPROVED_SEARCH_SUGGESTIONS_FAILED,
                                         mapOf(
                                             "source" to source,
+                                            "term" to operation.searchTerm,
                                         ),
                                     )
                                 }
