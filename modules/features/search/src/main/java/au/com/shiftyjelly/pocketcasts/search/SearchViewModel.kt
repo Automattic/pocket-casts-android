@@ -53,7 +53,7 @@ class SearchViewModel @Inject constructor(
                                     analyticsTracker.track(
                                         AnalyticsEvent.IMPROVED_SEARCH_SUGGESTIONS_FAILED,
                                         mapOf(
-                                            "source" to source,
+                                            "source" to source.analyticsValue,
                                             "term" to operation.searchTerm,
                                         ),
                                     )
@@ -140,7 +140,7 @@ class SearchViewModel @Inject constructor(
             analyticsTracker.track(
                 AnalyticsEvent.IMPROVED_SEARCH_FILTER_TAPPED,
                 mapOf(
-                    "source" to source,
+                    "source" to source.analyticsValue,
                     "filter" to filter.name,
                 ),
             )
@@ -223,7 +223,7 @@ class SearchViewModel @Inject constructor(
             AnalyticsEvent.IMPROVED_SEARCH_SUGGESTION_TERM_TAPPED,
             properties = mapOf(
                 "term" to suggestion,
-                "source" to source,
+                "source" to source.analyticsValue,
             ),
         )
 
@@ -266,7 +266,7 @@ class SearchViewModel @Inject constructor(
         analyticsTracker.track(
             AnalyticsEvent.IMPROVED_SEARCH_SUGGESTIONS_SHOWN,
             mapOf(
-                "source" to source,
+                "source" to source.analyticsValue,
             ),
         )
     }
