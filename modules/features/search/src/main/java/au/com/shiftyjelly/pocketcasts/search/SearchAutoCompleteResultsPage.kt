@@ -1,6 +1,7 @@
 package au.com.shiftyjelly.pocketcasts.search
 
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -15,6 +16,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.NestedScrollConnection
 import androidx.compose.ui.input.nestedscroll.nestedScroll
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.Dp
@@ -24,6 +26,7 @@ import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.compose.AppThemeWithBackground
 import au.com.shiftyjelly.pocketcasts.compose.CallOnce
 import au.com.shiftyjelly.pocketcasts.compose.components.HorizontalDivider
+import au.com.shiftyjelly.pocketcasts.compose.components.TextP40
 import au.com.shiftyjelly.pocketcasts.compose.preview.ThemePreviewParameterProvider
 import au.com.shiftyjelly.pocketcasts.compose.theme
 import au.com.shiftyjelly.pocketcasts.models.to.SearchAutoCompleteItem
@@ -31,9 +34,9 @@ import au.com.shiftyjelly.pocketcasts.search.component.ImprovedSearchEpisodeResu
 import au.com.shiftyjelly.pocketcasts.search.component.ImprovedSearchFolderResultRow
 import au.com.shiftyjelly.pocketcasts.search.component.ImprovedSearchPodcastResultRow
 import au.com.shiftyjelly.pocketcasts.search.component.ImprovedSearchTermSuggestionRow
-import au.com.shiftyjelly.pocketcasts.search.component.SearchFolderItem
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.views.buttons.PlayButton
+import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 @Composable
 fun SearchAutoCompleteResultsPage(
@@ -122,6 +125,22 @@ fun SearchAutoCompleteResultsPage(
                             color = MaterialTheme.theme.colors.secondaryText02,
                         )
                     }
+                }
+            }
+
+            if (results.isNotEmpty()) {
+                item {
+                    TextP40(
+                        modifier = Modifier
+                            .clickable(
+                                onClick = {
+                                    onTermClick(SearchAutoCompleteItem.Term(searchTerm))
+                                },
+                            )
+                            .padding(vertical = 8.dp, horizontal = 16.dp),
+                        text = stringResource(LR.string.search_suggestions_view_all, searchTerm),
+                        color = MaterialTheme.theme.colors.primaryInteractive01,
+                    )
                 }
             }
         }
