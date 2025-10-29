@@ -460,7 +460,6 @@ Language: fr
     <string name="transcript_error_not_available">Veuillez nous excuser, aucune transcription n’est disponible pour cet épisode.</string>
     <string name="referrals_banner_hide_label">Masquer cette bannière</string>
     <string name="referrals_banner_long_press_label">Masquez la bannière de parrainage réussi.</string>
-    <string name="end_of_year_prompt_card_title">La rétrospective 2024\nest disponible !</string>
     <string name="settings_auto_download_limit_auto_downloads">Limiter les téléchargements automatiques</string>
     <string name="settings_auto_download_limit_all_latest_episodes">Tous les derniers épisodes</string>
     <string name="settings_auto_download_limit_latest_episode">Dernier épisode</string>

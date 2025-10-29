@@ -463,7 +463,6 @@ Language: ca
     <string name="transcript_error_not_available">Aquest episodi no té transcripció disponible</string>
     <string name="referrals_banner_hide_label">Amaga aquest banner</string>
     <string name="referrals_banner_long_press_label">Amaga el banner de reclamació de la invitació.</string>
-    <string name="end_of_year_prompt_card_title">El repàs a 2024\nja és aquí!</string>
     <string name="settings_auto_download_limit_auto_downloads">Limitar les descàrregues automàtiques</string>
     <string name="settings_auto_download_limit_all_latest_episodes">Tots els últims episodis</string>
     <string name="settings_auto_download_limit_ten_latest_episode">10 darrers episodis</string>

@@ -460,7 +460,6 @@ Language: ko_KR
     <string name="transcript_error_not_available">죄송합니다. 이 에피소드에서는 대본을 사용할 수 없습니다.</string>
     <string name="referrals_banner_hide_label">배너 숨기기</string>
     <string name="referrals_banner_long_press_label">추천 신청 패스 배너를 숨깁니다.</string>
-    <string name="end_of_year_prompt_card_title">2024년에 청취한 목록을\n살펴보세요!</string>
     <string name="settings_auto_download_limit_auto_downloads">자동 다운로드 제한</string>
     <string name="settings_auto_download_limit_all_latest_episodes">모든 최신 에피소드</string>
     <string name="settings_auto_download_limit_ten_latest_episode">최신 에피소드 10개</string>

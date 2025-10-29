@@ -460,7 +460,6 @@ Language: sv_SE
     <string name="transcript_error_not_available">Det finns ingen transkription tillgänglig för det här avsnittet.</string>
     <string name="referrals_banner_hide_label">Dölj den här bannern</string>
     <string name="referrals_banner_long_press_label">Dölj hänvisningsbannern för att göra anspråk på pass.</string>
-    <string name="end_of_year_prompt_card_title">Uppspelning 2024\när här.</string>
     <string name="settings_auto_download_limit_auto_downloads">Begränsa automatiska nedladdningar</string>
     <string name="settings_auto_download_limit_all_latest_episodes">Alla senaste avsnitt</string>
     <string name="settings_auto_download_limit_ten_latest_episode">De 10 senaste avsnitten</string>

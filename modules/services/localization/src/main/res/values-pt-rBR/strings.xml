@@ -460,7 +460,6 @@ Language: pt_BR
     <string name="transcript_error_not_available">Não há transcrição disponível para este episódio.</string>
     <string name="referrals_banner_hide_label">Ocultar este banner</string>
     <string name="referrals_banner_long_press_label">Oculte o banner de aprovação da reivindicação de indicação.</string>
-    <string name="end_of_year_prompt_card_title">A retrospectiva de 2024\nestá disponível!</string>
     <string name="settings_auto_download_limit_auto_downloads">Limitar downloads automáticos</string>
     <string name="settings_auto_download_limit_all_latest_episodes">Todos os episódios mais recentes</string>
     <string name="settings_auto_download_limit_ten_latest_episode">10 episódios mais recentes</string>

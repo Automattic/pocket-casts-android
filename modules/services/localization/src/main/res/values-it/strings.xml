@@ -459,7 +459,6 @@ Language: it
     <string name="transcript_error_not_available">Siamo spiacenti, ma non è disponibile una trascrizione per questo episodio.</string>
     <string name="referrals_banner_hide_label">Nascondi il banner</string>
     <string name="referrals_banner_long_press_label">Nascondi il banner di riferimento per riscattare il pass.</string>
-    <string name="end_of_year_prompt_card_title">La riproduzione per il 2024\nè arrivata!</string>
     <string name="settings_auto_download_limit_auto_downloads">Limita i download automatici</string>
     <string name="settings_auto_download_limit_all_latest_episodes">Tutti gli ultimi episodi</string>
     <string name="settings_auto_download_limit_ten_latest_episode">10 ultimi episodi</string>
