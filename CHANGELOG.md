@@ -5,6 +5,8 @@
         ([#4655](https://github.com/Automattic/pocket-casts-android/pull/4655))
     *   Exclude empty searches from history
         ([#4660](https://github.com/Automattic/pocket-casts-android/pull/4660))
+    *   Show local podcast results when device is offline during search
+        ([#4661](https://github.com/Automattic/pocket-casts-android/pull/4661))
 
 7.101
 -----
