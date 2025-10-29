@@ -60,7 +60,7 @@ internal fun CoverStory(
         }
         LottieAnimation(
             applyOpacityToLayers = true,
-            contentScale = ContentScale.Inside ,
+            contentScale = ContentScale.Crop ,
             composition = composition,
             progress = { progress },
             modifier = Modifier.fillMaxWidth(),
