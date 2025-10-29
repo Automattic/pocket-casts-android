@@ -49,14 +49,16 @@ class SearchViewModel @Inject constructor(
                         showSearchHistory = false
                         _state.update { uiState ->
                             when (operation) {
-                                is SearchUiState.SearchOperation.Error -> {
-                                    analyticsTracker.track(
-                                        AnalyticsEvent.IMPROVED_SEARCH_SUGGESTIONS_FAILED,
-                                        mapOf(
-                                            "source" to source.analyticsValue,
-                                            "term" to operation.searchTerm,
-                                        ),
-                                    )
+                                is SearchUiState.SearchOperation.Success -> {
+                                    if (operation.results.isEmpty()) {
+                                        analyticsTracker.track(
+                                            AnalyticsEvent.IMPROVED_SEARCH_SUGGESTIONS_FAILED,
+                                            mapOf(
+                                                "source" to source.analyticsValue,
+                                                "term" to operation.searchTerm,
+                                            ),
+                                        )
+                                    }
                                 }
 
                                 else -> Unit
