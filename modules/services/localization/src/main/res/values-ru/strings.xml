@@ -460,7 +460,6 @@ Language: ru
     <string name="transcript_error_not_available">К сожалению, в этом выпуске нет расшифровки.</string>
     <string name="referrals_banner_hide_label">Скрыть баннер</string>
     <string name="referrals_banner_long_press_label">Скрыть баннер с требованием ссылки на источник перехода.</string>
-    <string name="end_of_year_prompt_card_title">Playback 2024\nуже стартует!</string>
     <string name="settings_auto_download_limit_auto_downloads">Ограничить автоматические загрузки</string>
     <string name="settings_auto_download_limit_all_latest_episodes">Только последний выпуск</string>
     <string name="settings_auto_download_limit_ten_latest_episode">10 последних выпусков</string>

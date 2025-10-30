@@ -2,7 +2,6 @@ package au.com.shiftyjelly.pocketcasts.repositories.search
 
 import au.com.shiftyjelly.pocketcasts.models.to.ImprovedSearchResultItem
 import au.com.shiftyjelly.pocketcasts.models.to.SearchAutoCompleteItem
-import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.servers.podcast.PodcastCacheService
 import au.com.shiftyjelly.pocketcasts.servers.search.AutoCompleteResult
 import au.com.shiftyjelly.pocketcasts.servers.search.AutoCompleteSearchService
@@ -14,14 +13,13 @@ import kotlin.time.Duration.Companion.seconds
 class ImprovedSearchManagerImpl @Inject constructor(
     private val autoCompleteSearchService: AutoCompleteSearchService,
     private val combinedSearchService: PodcastCacheService,
-    private val settings: Settings,
 ) : ImprovedSearchManager {
     override suspend fun autoCompleteSearch(term: String): List<SearchAutoCompleteItem> {
-        val response = autoCompleteSearchService.autoCompleteSearch(query = term, termsLimit = TERM_LIMIT, podcastsLimit = PODCAST_LIMIT)
+        val response = autoCompleteSearchService.autoCompleteSearch(query = term, termsLimit = null, podcastsLimit = null)
         return response.results.map {
             when (it) {
                 is AutoCompleteResult.TermResult -> SearchAutoCompleteItem.Term(term = it.value)
-                is AutoCompleteResult.PodcastResult -> SearchAutoCompleteItem.Podcast(uuid = it.value.uuid, title = it.value.title, author = it.value.author)
+                is AutoCompleteResult.PodcastResult -> SearchAutoCompleteItem.Podcast(uuid = it.value.uuid, title = it.value.title, author = it.value.author.orEmpty())
             }
         }
     }
@@ -45,10 +43,5 @@ class ImprovedSearchManagerImpl @Inject constructor(
                 )
             }
         }
-    }
-
-    private companion object {
-        const val TERM_LIMIT = 4
-        const val PODCAST_LIMIT = 4
     }
 }
