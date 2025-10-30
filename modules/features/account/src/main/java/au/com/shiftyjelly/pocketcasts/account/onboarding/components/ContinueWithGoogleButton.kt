@@ -2,6 +2,8 @@ package au.com.shiftyjelly.pocketcasts.account.onboarding.components
 
 import android.widget.Toast
 import androidx.activity.compose.LocalActivity
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.material.ButtonDefaults
 import androidx.compose.material.MaterialTheme
@@ -52,6 +54,17 @@ fun ContinueWithGoogleButton(
         Toast.makeText(activity, errorMessage, Toast.LENGTH_LONG).show()
     }
 
+    // request legacy Google Sign-In and process the result
+    val googleLegacySignInLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.StartActivityForResult(),
+    ) { result ->
+        viewModel.onGoogleLegacySignInResult(
+            result = result,
+            onSuccess = onComplete,
+            onError = showError,
+        )
+    }
+
     val onSignInClick = {
         viewModel.startGoogleOneTapSignIn(
             flow = flow,
@@ -59,6 +72,9 @@ fun ContinueWithGoogleButton(
             onError = showError,
             event = event,
             activity = activity,
+            onLegacySignInIntent = {
+                googleLegacySignInLauncher.launch(it)
+            },
         )
     }
 

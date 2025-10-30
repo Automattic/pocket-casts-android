@@ -67,6 +67,7 @@ dependencies {
     implementation(libs.navigation.compose)
     implementation(libs.navigation.fragment.ktx)
     implementation(libs.navigation.ui.ktx)
+    implementation(libs.play.auth)
     implementation(libs.play.cast)
     implementation(libs.retrofit)
     implementation(libs.rx2.android)
