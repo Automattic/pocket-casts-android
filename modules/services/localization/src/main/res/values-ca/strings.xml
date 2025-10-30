@@ -1016,7 +1016,6 @@ Language: ca
     <string name="must_provide_filter_name">Introdueix un nom de la llista de reproducció</string>
     <string name="settings_app_icon_halloween">Halloween</string>
     <string name="end_of_year_launch_modal_summary">Consulta quins han estat els pòdcasts i les categories que més has escoltat, les estadístiques d\'escolta i molt més. Comparteix-ho amb els teus amics i fes que tothom sàpiga quins són els teus creadors favorits!</string>
-    <string name="end_of_year_launch_modal_primary_button_title">Veure el meu 2024</string>
     <string name="settings_show_played_summary">Els episodis que has acabat d\'escoltar es seguiran mostrant</string>
     <string name="settings_show_played">Mostrar els episodis reproduïts</string>
     <string name="profile_privacy_policy_read">Llegeix la política de privacitat</string>

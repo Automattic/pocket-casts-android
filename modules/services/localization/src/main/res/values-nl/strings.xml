@@ -1012,7 +1012,6 @@ Language: nl
     <string name="must_provide_filter_name">Moet naam van afspeellijst opgeven</string>
     <string name="end_of_year_launch_modal_summary">See your top podcasts, categories, listening stats and more. Share with friends and shout out your favorite creators!</string>
     <string name="settings_app_icon_halloween">Halloween</string>
-    <string name="end_of_year_launch_modal_primary_button_title">Bekijk mijn Playback 2024</string>
     <string name="settings_show_played_summary">Afleveringen die helemaal zijn afgespeeld, worden nog steeds weergegeven</string>
     <string name="settings_show_played">Afgespeelde afleveringen weergeven</string>
     <string name="settings_privacy_crash_link_summary">Sta ons toe om je Pocket Casts-account aan crash-rapporten te koppelen.</string>

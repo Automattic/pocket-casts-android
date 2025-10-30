@@ -1013,7 +1013,6 @@ Language: de
     <string name="must_provide_filter_name">Name der Wiedergabeliste erforderlich</string>
     <string name="end_of_year_launch_modal_summary">Schau dir deine Top-Podcasts, Kategorien, Hörstatistiken und mehr an. Teile es mit Freunden und nenne deine bevorzugten Ersteller!</string>
     <string name="settings_app_icon_halloween">Halloween</string>
-    <string name="end_of_year_launch_modal_primary_button_title">Meine Wiedergabeliste 2024 ansehen</string>
     <string name="settings_show_played_summary">Folgen, die du bereits abgespielt hast, werden weiterhin angezeigt</string>
     <string name="settings_show_played">Abgespielte Folgen anzeigen</string>
     <string name="settings_privacy_crash_link_summary">Erlaube uns, dein Pocket Casts-Konto mit Absturzberichten zu verknüpfen.</string>

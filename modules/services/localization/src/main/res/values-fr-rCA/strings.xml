@@ -1013,7 +1013,6 @@ Language: fr
     <string name="must_provide_filter_name">Nom de la liste de lecture obligatoire</string>
     <string name="end_of_year_launch_modal_summary">Retrouvez vos meilleurs podcasts, catégories, statistiques d’écoute, et plus encore. Partagez du contenu avec vos amis et remerciez vos créateurs favoris !</string>
     <string name="settings_app_icon_halloween">Halloween</string>
-    <string name="end_of_year_launch_modal_primary_button_title">Voir ma rétrospective 2024</string>
     <string name="settings_show_played_summary">Les épisodes que vous avez terminé de lire continueront à s’afficher</string>
     <string name="settings_show_played">Voir les épisodes lus</string>
     <string name="settings_privacy_crash_link_summary">Permettez-nous d\'associer votre compte Pocket Casts aux rapports d\'incident.</string>

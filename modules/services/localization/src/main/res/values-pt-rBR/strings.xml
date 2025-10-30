@@ -1013,7 +1013,6 @@ Language: pt_BR
     <string name="must_provide_filter_name">É necessário fornecer o nome da lista de reprodução</string>
     <string name="end_of_year_launch_modal_summary">Veja seus principais podcasts, categorias, estatísticas de reprodução e muito mais. Compartilhe com amigos e divulgue seus criadores favoritos!</string>
     <string name="settings_app_icon_halloween">Halloween</string>
-    <string name="end_of_year_launch_modal_primary_button_title">Ver minha retrospectiva de 2024</string>
     <string name="settings_show_played_summary">Os episódios que você já terminou de reproduzir continuarão sendo exibidos</string>
     <string name="settings_show_played">Mostrar episódios reproduzidos</string>
     <string name="settings_privacy_crash_link_summary">Permita-nos vincular sua conta do Pocket Casts a relatórios de falha.</string>

@@ -5,6 +5,7 @@ import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -17,6 +18,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
@@ -65,50 +67,16 @@ fun EndOfYearLaunchBottomSheet(
     )
 }
 
-@OptIn(ExperimentalFoundationApi::class)
 @Composable
 private fun ImageContent(modifier: Modifier = Modifier) {
-    BoxWithConstraints(
+    Box(
         contentAlignment = Alignment.Center,
-        modifier = modifier
-            .fillMaxWidth()
-            .height(190.dp)
-            .background(Color(0xFFEE661C), RoundedCornerShape(16.dp))
-            .clipToBounds(),
+        modifier = modifier.fillMaxWidth(),
     ) {
-        val imageSize = if (maxWidth / maxHeight > 2.16f) {
-            val height = maxHeight * 0.8f
-            DpSize(width = height * 2.16f, height = height)
-        } else {
-            val width = maxWidth * 0.9f
-            DpSize(width = width, height = width / 2.16f)
-        }
-
         Image(
-            painter = painterResource(IR.drawable.end_of_year_2024_playback_text),
+            painter = painterResource(IR.drawable.playback_launch_banner),
             contentDescription = null,
-            modifier = Modifier
-                .offset(y = -imageSize.height - 6.dp)
-                .size(imageSize),
-        )
-        Image(
-            painter = painterResource(IR.drawable.end_of_year_2024_playback_text),
-            contentDescription = null,
-            modifier = Modifier.size(imageSize),
-        )
-        Image(
-            painter = painterResource(IR.drawable.end_of_year_2024_playback_text),
-            contentDescription = null,
-            modifier = Modifier
-                .offset(y = imageSize.height + 6.dp)
-                .size(imageSize),
-        )
-        Image(
-            painter = painterResource(IR.drawable.end_of_year_2024_sticker_1),
-            contentDescription = null,
-            modifier = Modifier
-                .offset(x = -imageSize.width / 4f, y = -imageSize.height / 4f)
-                .size(width = 116.dp, height = 88.dp),
+            modifier = Modifier.clip(RoundedCornerShape(16.dp)),
         )
     }
 }

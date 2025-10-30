@@ -1012,7 +1012,6 @@ Language: it
     <string name="must_provide_filter_name">Devi fornire il nome della playlist</string>
     <string name="end_of_year_launch_modal_summary">Visualizza i tuoi podcast principali, le categorie, le statistiche di ascolto e molto altro ancora. Condividi con gli amici e ringrazia pubblicamente i tuoi creatori preferiti!</string>
     <string name="settings_app_icon_halloween">Halloween</string>
-    <string name="end_of_year_launch_modal_primary_button_title">Visualizza Le mie riproduzioni 2024</string>
     <string name="settings_show_played_summary">Gli episodi che hai terminato di riprodurre verranno ancora visualizzati</string>
     <string name="settings_show_played">Mostra gli episodi riprodotti</string>
     <string name="settings_privacy_crash_link_summary">Consentici di collegare il tuo account Pocket Casts ai rapporti sugli arresti anomali.</string>
