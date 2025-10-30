@@ -30,5 +30,5 @@ sealed class AutoCompleteResult {
 data class PodcastResultValue(
     val uuid: String,
     val title: String,
-    val author: String,
+    val author: String? = null,
 )
