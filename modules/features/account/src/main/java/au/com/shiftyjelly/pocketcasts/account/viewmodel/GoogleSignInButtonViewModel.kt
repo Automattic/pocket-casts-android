@@ -1,5 +1,6 @@
 package au.com.shiftyjelly.pocketcasts.account.viewmodel
 
+import android.app.Activity
 import android.content.Context
 import androidx.credentials.CredentialManager
 import androidx.credentials.CustomCredential
@@ -52,6 +53,7 @@ class GoogleSignInButtonViewModel @Inject constructor(
         flow: OnboardingFlow?,
         onSuccess: (GoogleSignInState, Subscription?) -> Unit,
         onError: suspend () -> Unit,
+        activity: Activity,
         event: AnalyticsEvent = AnalyticsEvent.SETUP_ACCOUNT_BUTTON_TAPPED,
     ) {
         if (flow != null) {
@@ -80,7 +82,7 @@ class GoogleSignInButtonViewModel @Inject constructor(
 
                 val result = credentialManager.getCredential(
                     request = request,
-                    context = context,
+                    context = activity,
                 )
                 val credential = result.credential as CustomCredential
                 if (credential.type == GoogleIdTokenCredential.TYPE_GOOGLE_ID_TOKEN_CREDENTIAL) {

@@ -1,6 +1,7 @@
 package au.com.shiftyjelly.pocketcasts.account.onboarding.components
 
 import android.widget.Toast
+import androidx.activity.compose.LocalActivity
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.material.ButtonDefaults
 import androidx.compose.material.MaterialTheme
@@ -36,19 +37,19 @@ fun ContinueWithGoogleButton(
     event: AnalyticsEvent = AnalyticsEvent.SETUP_ACCOUNT_BUTTON_TAPPED,
     label: String = stringResource(LR.string.onboarding_continue_with_google),
 ) {
-    val context = LocalContext.current
+    val activity = checkNotNull(LocalActivity.current)
 
-    val showContinueWithGoogleButton = GoogleSignInButtonViewModel.showContinueWithGoogleButton(context)
+    val showContinueWithGoogleButton = GoogleSignInButtonViewModel.showContinueWithGoogleButton(activity)
     if (!showContinueWithGoogleButton) return
 
-    val errorMessage = if (!Network.isConnected(context)) {
+    val errorMessage = if (!Network.isConnected(activity)) {
         stringResource(LR.string.log_in_no_network)
     } else {
         stringResource(LR.string.onboarding_continue_with_google_error)
     }
 
     val showError = {
-        Toast.makeText(context, errorMessage, Toast.LENGTH_LONG).show()
+        Toast.makeText(activity, errorMessage, Toast.LENGTH_LONG).show()
     }
 
     val onSignInClick = {
@@ -57,6 +58,7 @@ fun ContinueWithGoogleButton(
             onSuccess = onComplete,
             onError = showError,
             event = event,
+            activity = activity,
         )
     }
 
