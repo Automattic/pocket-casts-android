@@ -460,7 +460,6 @@ Language: ja_JP
     <string name="transcript_error_not_available">申し訳ありません、このエピソードではトランスクリプトを利用できません。</string>
     <string name="referrals_banner_hide_label">このバナーを非表示</string>
     <string name="referrals_banner_long_press_label">リファラル取得パスのバナーを非表示にします。</string>
-    <string name="end_of_year_prompt_card_title">プレイバック2024\nはこちら !</string>
     <string name="settings_auto_download_limit_auto_downloads">自動ダウンロードを制限</string>
     <string name="settings_auto_download_limit_all_latest_episodes">すべての最新エピソード</string>
     <string name="settings_auto_download_limit_ten_latest_episode">10件の最新エピソード</string>

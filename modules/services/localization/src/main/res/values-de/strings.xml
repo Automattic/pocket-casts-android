@@ -460,7 +460,6 @@ Language: de
     <string name="transcript_error_not_available">Entschuldigung! Für diese Folge ist kein Transkript verfügbar.</string>
     <string name="referrals_banner_hide_label">Dieses Banner ausblenden</string>
     <string name="referrals_banner_long_press_label">Referral-Banner zum Sichern das Passes ausblenden.</string>
-    <string name="end_of_year_prompt_card_title">Wiedergabeliste 2024\nist endlich verfügbar!</string>
     <string name="settings_auto_download_limit_ten_latest_episode">Die 10 neuesten Folgen</string>
     <string name="settings_auto_download_limit_five_latest_episode">Die 5 neuesten Folgen</string>
     <string name="settings_auto_download_limit_three_latest_episode">Die 3 neuesten Folgen</string>

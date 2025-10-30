@@ -459,7 +459,6 @@ Language: nl
     <string name="transcript_error_not_available">Er is helaas geen transcriptie beschikbaar voor deze aflevering.</string>
     <string name="referrals_banner_hide_label">Deze banner verbergen</string>
     <string name="referrals_banner_long_press_label">Banner verwijzing geslaagd verbergen</string>
-    <string name="end_of_year_prompt_card_title">Playback 2024\nis hier!</string>
     <string name="settings_auto_download_limit_auto_downloads">Limiet automatische downloads</string>
     <string name="settings_auto_download_limit_all_latest_episodes">Alle nieuwste afleveringen</string>
     <string name="settings_auto_download_limit_ten_latest_episode">10 nieuwste afleveringen</string>

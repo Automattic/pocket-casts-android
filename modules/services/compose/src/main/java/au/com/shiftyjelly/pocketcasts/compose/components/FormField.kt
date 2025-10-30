@@ -79,6 +79,7 @@ fun FormField(
     enabled: Boolean = true,
     isError: Boolean = false,
     keyboardOptions: KeyboardOptions = FormFieldDefaults.keyboardOptions,
+    label: @Composable (() -> Unit)? = null,
     leadingIcon: @Composable (() -> Unit)? = null,
     trailingIcon: @Composable (() -> Unit)? = null,
 ) {
@@ -96,6 +97,7 @@ fun FormField(
         shape = RoundedCornerShape(6.dp),
         keyboardOptions = keyboardOptions,
         onKeyboardAction = KeyboardActionHandler { onImeAction() },
+        label = label,
         lineLimits = lineLimits,
         leadingIcon = leadingIcon,
         trailingIcon = trailingIcon,

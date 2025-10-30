@@ -220,7 +220,7 @@ abstract class PlaylistDao {
           SUM(IFNULL(podcastEpisode.archived, 0)) AS archived_episode_count,
           SUM(
             CASE
-              WHEN playlist.showArchivedEpisodes != 0 OR podcastEpisode.archived = 0
+              WHEN (playlist.showArchivedEpisodes != 0 OR podcastEpisode.archived = 0) AND podcastEpisode.playing_status != 2
               THEN MAX(0, IFNULL(podcastEpisode.duration, 0) - IFNULL(podcastEpisode.played_up_to, 0))
               ELSE 0
             END
@@ -467,7 +467,13 @@ abstract class PlaylistDao {
             selectClause = """
                 COUNT(*) AS episode_count, 
                 0 AS archived_episode_count,
-                SUM(MAX(episode.duration - episode.played_up_to, 0)) AS time_left
+                SUM(
+                  CASE
+                    WHEN episode.playing_status != 2
+                    THEN MAX(0, IFNULL(episode.duration, 0) - IFNULL(episode.played_up_to, 0))
+                    ELSE 0
+                  END
+                ) AS time_left
             """.trimIndent(),
             whereClause = smartRules.toSqlWhereClause(clock),
             orderByClause = null,

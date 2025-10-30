@@ -460,7 +460,6 @@ Language: zh_CN
     <string name="transcript_error_not_available">很抱歉，本剧集没有文字转录稿。</string>
     <string name="referrals_banner_hide_label">隐藏此横幅</string>
     <string name="referrals_banner_long_press_label">隐藏推荐申领通行证横幅。</string>
-    <string name="end_of_year_prompt_card_title">2024 年播放记录\n可在此查看！</string>
     <string name="settings_auto_download_limit_auto_downloads">限制自动下载次数</string>
     <string name="settings_auto_download_limit_ten_latest_episode">最新的 10 集剧集</string>
     <string name="settings_auto_download_limit_five_latest_episode">最新的 5 集剧集</string>

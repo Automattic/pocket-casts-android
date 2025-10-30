@@ -460,7 +460,6 @@ Language: ar
     <string name="transcript_error_not_available">عذرًا، لكن لا يوجد نص متاح لهذه الحلقة.</string>
     <string name="referrals_banner_hide_label">إخفاء هذا الشعار</string>
     <string name="referrals_banner_long_press_label">قم بإخفاء شعار تمرير مطالبة الإحالة.</string>
-    <string name="end_of_year_prompt_card_title">التشغيل في عام 2024\nإنه هنا!</string>
     <string name="settings_auto_download_limit_auto_downloads">تحديد التنزيلات التلقائية</string>
     <string name="settings_auto_download_limit_all_latest_episodes">جميع الحلقات الأحدث</string>
     <string name="settings_auto_download_limit_ten_latest_episode">أحدث 10 حلقات</string>

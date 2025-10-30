@@ -1,5 +1,12 @@
 7.102
 -----
+*   Updates
+    *   Bring back podcast setting skip first/last dialog
+        ([#4655](https://github.com/Automattic/pocket-casts-android/pull/4655))
+    *   Exclude empty searches from history
+        ([#4660](https://github.com/Automattic/pocket-casts-android/pull/4660))
+    *   Show local podcast results when device is offline during search
+        ([#4661](https://github.com/Automattic/pocket-casts-android/pull/4661))
 *   Bug Fixes
     *   Fix search results not showing filter pills when there are no results
         ([#4649](https://github.com/Automattic/pocket-casts-android/pull/4649))

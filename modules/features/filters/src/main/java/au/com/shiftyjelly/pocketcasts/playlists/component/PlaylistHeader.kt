@@ -400,7 +400,7 @@ private fun PlaylistInfoText(
     }
     val durationLeftText = remember(resources, playbackDurationLeft, episodeCount) {
         playbackDurationLeft
-            ?.takeIf { episodeCount != null && episodeCount > 0 }
+            ?.takeIf { episodeCount != null && episodeCount > 0 && it > Duration.ZERO }
             ?.toFriendlyString(resources, pluralResourceId = { unit -> unit.shortResourceId })
     }
     val playlistInfoText = remember(episodeCountText, durationLeftText) {

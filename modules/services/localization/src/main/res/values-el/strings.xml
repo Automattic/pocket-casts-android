@@ -290,7 +290,6 @@ Language: el_GR
     <string name="referrals_failed_to_load_offer">Λυπούμαστε, αλλά κάτι πήγε στραβά κατά την ανάκτηση του συνδέσμου παραπομπής σου.</string>
     <string name="referrals_banner_hide_label">Απόκρυψη αυτής της κεφαλίδας</string>
     <string name="referrals_banner_long_press_label">Απόκρυψη κεφαλίδας διεκδίκησης πάσου.</string>
-    <string name="end_of_year_prompt_card_title">H Αναπαραγωγή 2024\nείναι εδώ!</string>
     <string name="settings_auto_download_limit_auto_downloads">Περιορισμός αυτόματων λήψεων</string>
     <string name="settings_auto_download_limit_all_latest_episodes">Όλα τα Τελευταία Επεισόδια</string>
     <string name="settings_auto_download_limit_ten_latest_episode">10 Τελευταία Επεισόδια</string>
