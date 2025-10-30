@@ -15,8 +15,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Brush
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.nestedscroll.NestedScrollConnection
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.res.stringResource
@@ -56,23 +54,19 @@ fun ImprovedSearchResultsPage(
         when (val operation = state.operation) {
             is SearchUiState.SearchOperation.Error -> SearchFailedView()
             is SearchUiState.SearchOperation.Success -> {
-                if (operation.results.isEmpty) {
-                    NoResultsView()
-                } else {
-                    ImprovedSearchResultsView(
-                        state = operation,
-                        bottomInset = bottomInset,
-                        onEpisodeClick = onEpisodeClick,
-                        onPodcastClick = onPodcastClick,
-                        onFolderClick = onFolderClick,
-                        onFollowPodcast = onFollowPodcast,
-                        playButtonListener = playButtonListener,
-                        onScroll = onScroll,
-                        selectedFilterIndex = state.selectedFilterIndex,
-                        filterOptions = state.filterOptions.toList(),
-                        onFilterSelect = onFilterSelect,
-                    )
-                }
+                ImprovedSearchResultsView(
+                    state = operation,
+                    bottomInset = bottomInset,
+                    onEpisodeClick = onEpisodeClick,
+                    onPodcastClick = onPodcastClick,
+                    onFolderClick = onFolderClick,
+                    onFollowPodcast = onFollowPodcast,
+                    playButtonListener = playButtonListener,
+                    onScroll = onScroll,
+                    selectedFilterIndex = state.selectedFilterIndex,
+                    filterOptions = state.filterOptions.toList(),
+                    onFilterSelect = onFilterSelect,
+                )
             }
 
             else -> Unit
@@ -127,12 +121,11 @@ private fun ImprovedSearchResultsView(
             .nestedScroll(nestedScrollConnection),
     ) {
         stickyHeader {
-            val backgroundColor = MaterialTheme.colors.background
             SearchResultFilters(
                 modifier = Modifier
                     .fillMaxWidth()
                     .background(
-                        color = backgroundColor,
+                        color = MaterialTheme.colors.background,
                     )
                     .padding(16.dp),
                 items = filterOptions.map { stringResource(it.resId) },
@@ -141,44 +134,50 @@ private fun ImprovedSearchResultsView(
             )
         }
 
-        val dividerModifier = Modifier
-            .fillMaxWidth()
-            .padding(horizontal = 16.dp)
-        state.results.filteredResults.forEachIndexed { index, item ->
-            when (item) {
-                is ImprovedSearchResultItem.FolderItem -> {
-                    item(key = "folder-${item.uuid}", contentType = "folder") {
-                        ImprovedSearchFolderResultRow(
-                            folderItem = item,
-                            onClick = { onFolderClick(item.folder, item.podcasts) },
-                        )
-                    }
-                }
-
-                is ImprovedSearchResultItem.PodcastItem -> {
-                    item(key = "podcast-${item.uuid}", contentType = "podcast") {
-                        ImprovedSearchPodcastResultRow(
-                            podcastItem = item,
-                            onClick = { onPodcastClick(item) },
-                            onFollow = { onFollowPodcast(item) },
-                        )
-                    }
-                }
-
-                is ImprovedSearchResultItem.EpisodeItem -> {
-                    item(key = "episode-${item.uuid}", contentType = "episode") {
-                        ImprovedSearchEpisodeResultRow(
-                            episode = item,
-                            onClick = { onEpisodeClick(item) },
-                            playButtonListener = playButtonListener,
-                        )
-                    }
-                }
+        if (state.results.filteredResults.isEmpty()) {
+            item {
+                NoResultsView()
             }
+        } else {
+            val dividerModifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 16.dp)
+            state.results.filteredResults.forEachIndexed { index, item ->
+                when (item) {
+                    is ImprovedSearchResultItem.FolderItem -> {
+                        item(key = "folder-${item.uuid}", contentType = "folder") {
+                            ImprovedSearchFolderResultRow(
+                                folderItem = item,
+                                onClick = { onFolderClick(item.folder, item.podcasts) },
+                            )
+                        }
+                    }
 
-            if (index < state.results.filteredResults.lastIndex) {
-                item {
-                    HorizontalDivider(dividerModifier)
+                    is ImprovedSearchResultItem.PodcastItem -> {
+                        item(key = "podcast-${item.uuid}", contentType = "podcast") {
+                            ImprovedSearchPodcastResultRow(
+                                podcastItem = item,
+                                onClick = { onPodcastClick(item) },
+                                onFollow = { onFollowPodcast(item) },
+                            )
+                        }
+                    }
+
+                    is ImprovedSearchResultItem.EpisodeItem -> {
+                        item(key = "episode-${item.uuid}", contentType = "episode") {
+                            ImprovedSearchEpisodeResultRow(
+                                episode = item,
+                                onClick = { onEpisodeClick(item) },
+                                playButtonListener = playButtonListener,
+                            )
+                        }
+                    }
+                }
+
+                if (index < state.results.filteredResults.lastIndex) {
+                    item {
+                        HorizontalDivider(dividerModifier)
+                    }
                 }
             }
         }
