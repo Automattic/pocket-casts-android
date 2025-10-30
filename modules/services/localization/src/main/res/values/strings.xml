@@ -2693,5 +2693,5 @@
     <string name="search_filters_podcasts" translatable="false">@string/podcasts</string>
     <string name="search_filters_episodes" translatable="false">@string/episodes</string>
     <string name="search_suggestions_view_all">View all for \"%1$s\"</string>
-    <string name="eoy_playback_story_1_title">Your year in podcasts,\nwrapped and ready to relieve</string>
+    <string name="eoy_playback_intro_title">Your year in podcasts,\nwrapped and ready to relieve</string>
 </resources>
