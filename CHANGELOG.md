@@ -7,6 +7,8 @@
         ([#4660](https://github.com/Automattic/pocket-casts-android/pull/4660))
     *   Show local podcast results when device is offline during search
         ([#4661](https://github.com/Automattic/pocket-casts-android/pull/4661))
+    *   Show "View all for X" text under search suggestions
+        ([#4667](https://github.com/Automattic/pocket-casts-android/pull/4667))
 *   Bug Fixes
     *   Fix search results not showing filter pills when there are no results
         ([#4649](https://github.com/Automattic/pocket-casts-android/pull/4649))
