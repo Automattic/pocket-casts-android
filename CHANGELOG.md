@@ -1,5 +1,8 @@
 7.102
 -----
+*   New Features
+    *   Add new intro story for playback
+        ([#4670](https://github.com/Automattic/pocket-casts-android/pull/4670))
 *   Updates
     *   Bring back podcast setting skip first/last dialog
         ([#4655](https://github.com/Automattic/pocket-casts-android/pull/4655))
