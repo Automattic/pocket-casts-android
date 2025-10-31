@@ -1013,7 +1013,6 @@ Language: es
     <string name="must_provide_filter_name">Debes proporcionar el nombre de la lista de reproducción</string>
     <string name="settings_app_icon_halloween">Halloween</string>
     <string name="end_of_year_launch_modal_summary">Consulta cuáles han sido los podcasts y las categorías que más has escuchado, las estadísticas de escucha y mucho más. Compártelo con tus amigos y haz que todo el mundo sepa cuáles son tus creadores favoritos.</string>
-    <string name="end_of_year_launch_modal_primary_button_title">Ver Mi Playback 2024</string>
     <string name="settings_show_played_summary">Se seguirán mostrando los episodios que hayas terminado de reproducir.</string>
     <string name="settings_show_played">Mostrar episodios reproducidos</string>
     <string name="settings_privacy_crash_link_summary">Permítenos vincular tu cuenta de Pocket Casts a los informes de errores.</string>

@@ -1013,7 +1013,6 @@ Language: ar
     <string name="no_episodes_in_filter_x">لا توجد حلقات في قائمة التشغيل ⁦%1$s⁩</string>
     <string name="settings_app_icon_halloween">عيد الهالوين</string>
     <string name="end_of_year_launch_modal_summary">اطلع على أهم حلقات البودكاست والتصنيفات وإحصاءات الاستماع الخاصة بك والمزيد. شارك مع الأصدقاء وعبّر عن المبدعين الذين تفضّلهم!</string>
-    <string name="end_of_year_launch_modal_primary_button_title">عرض التشغيل الخاص بي في عام 2024</string>
     <string name="settings_show_played">عرض الحلقات التي تم تشغيلها</string>
     <string name="settings_show_played_summary">ستظل الحلقات التي أنهيت تشغيلها معروضة</string>
     <string name="profile_privacy_policy_read">قراءة سياسة الخصوصية</string>

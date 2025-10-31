@@ -1013,7 +1013,6 @@ Language: sv_SE
     <string name="filter_x_not_found">Spellistan %1$s hittades inte</string>
     <string name="settings_app_icon_halloween">Halloween</string>
     <string name="end_of_year_launch_modal_summary">Se dina favoritpodcasts och -kategorier, lyssningsstatistik med mera. Dela med vänner och berätta om dina favoritkreatörer.</string>
-    <string name="end_of_year_launch_modal_primary_button_title">Visa Min uppspelning 2024</string>
     <string name="settings_show_played_summary">Avsnitt som du har spelat klart kommer fortfarande att visas</string>
     <string name="settings_show_played">Visa spelade avsnitt</string>
     <string name="settings_title_privacy">Integritet</string>

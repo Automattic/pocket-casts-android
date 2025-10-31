@@ -20,9 +20,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.BlendMode
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -40,7 +38,6 @@ private val ImageWidth = 361f
 private val ImageHeight = 110f
 private val AspectRatio = ImageWidth / ImageHeight
 private val MaxImageWidth = 400.dp
-private val ColorRadioactiveGreen = Color(0xFF78D549)
 
 @Composable
 fun EndOfYearPromptCard(
@@ -56,13 +53,6 @@ fun EndOfYearPromptCard(
             .widthIn(max = MaxImageWidth)
             .aspectRatio(ratio = AspectRatio),
     ) {
-        val colorFilter = when (MaterialTheme.theme.type) {
-            Theme.ThemeType.RADIOACTIVE -> ColorFilter.tint(
-                color = ColorRadioactiveGreen,
-                blendMode = BlendMode.Modulate,
-            )
-            else -> null
-        }
         val textColor = when (MaterialTheme.theme.type) {
             Theme.ThemeType.RADIOACTIVE -> MaterialTheme.theme.colors.primaryText01
             else -> Color.White
@@ -73,7 +63,7 @@ fun EndOfYearPromptCard(
             painter = painterResource(IR.drawable.playback_banner),
             contentDescription = null,
             contentScale = ContentScale.Crop,
-            colorFilter = colorFilter,
+            colorFilter = MaterialTheme.theme.imageColorFilter,
         )
         Row(
             verticalAlignment = Alignment.CenterVertically,

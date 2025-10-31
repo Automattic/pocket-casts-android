@@ -463,7 +463,7 @@ class MainActivity :
                     if (settings.getEndOfYearShowModal()) {
                         setupEndOfYearLaunchBottomSheet()
                     }
-                    if (settings.getEndOfYearShowBadge2023()) {
+                    if (settings.getEndOfYearShowBadge2025()) {
                         binding.bottomNavigation.getOrCreateBadge(VR.id.navigation_profile)
                     }
                 }
@@ -579,10 +579,10 @@ class MainActivity :
 
     private fun resetEoYBadgeIfNeeded() {
         if (binding.bottomNavigation.getBadge(VR.id.navigation_profile) != null &&
-            settings.getEndOfYearShowBadge2023()
+            settings.getEndOfYearShowBadge2025()
         ) {
             binding.bottomNavigation.removeBadge(VR.id.navigation_profile)
-            settings.setEndOfYearShowBadge2023(false)
+            settings.setEndOfYearShowBadge2025(false)
         }
     }
 

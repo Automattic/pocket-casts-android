@@ -1013,7 +1013,6 @@ Language: ko_KR
     <string name="must_provide_filter_name">재생목록 이름을 입력해야 함</string>
     <string name="end_of_year_launch_modal_summary">상위 팟캐스트, 카테고리, 청취 통계 등이 표시됩니다. 친구와 공유하고 즐겨 찾는 팟캐스트 창작자에게 감사 인사를 보냅니다!</string>
     <string name="settings_app_icon_halloween">핼러윈</string>
-    <string name="end_of_year_launch_modal_primary_button_title">2024년에 청취한 목록 보기</string>
     <string name="settings_show_played_summary">재생을 마친 에피소드가 계속 표시됩니다.</string>
     <string name="settings_show_played">재생한 에피소드 표시</string>
     <string name="settings_privacy_crash_link_summary">Pocket Casts 계정을 충돌 보고서에 연결하도록 허용합니다.</string>

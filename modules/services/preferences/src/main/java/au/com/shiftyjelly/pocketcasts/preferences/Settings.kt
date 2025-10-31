@@ -493,8 +493,8 @@ interface Settings {
     val sendCrashReports: UserSetting<Boolean>
     val linkCrashReportsToUser: UserSetting<Boolean>
 
-    fun setEndOfYearShowBadge2023(value: Boolean)
-    fun getEndOfYearShowBadge2023(): Boolean
+    fun setEndOfYearShowBadge2025(value: Boolean)
+    fun getEndOfYearShowBadge2025(): Boolean
 
     fun setEndOfYearShowModal(value: Boolean)
     fun getEndOfYearShowModal(): Boolean

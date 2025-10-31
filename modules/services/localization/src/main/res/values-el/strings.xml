@@ -833,7 +833,6 @@ Language: el_GR
     <string name="chapter_to_skip_to">Παράλειψη σε Κεφάλαιο</string>
     <string name="end_of_year_launch_modal_summary">Δες τα κορυφαία σου podcasts, κατηγορίες, στατιστικά ακρόασης και άλλα. Μοιράσου με φίλους και πες για τους αγαπημένους σου δημιουργούς!</string>
     <string name="settings_app_icon_halloween">Χάλοουιν</string>
-    <string name="end_of_year_launch_modal_primary_button_title">Δες το Η Αναπαραγωγή Μου 2024</string>
     <string name="settings_show_played">Εμφάνιση αναπαραγμένων επεισοδίων</string>
     <string name="settings_show_played_summary">Τα επεισόδια που έχεις ολοκληρώσει θα εξακολουθούν να εμφανίζονται</string>
     <string name="settings_title_privacy">Απόρρητο</string>
