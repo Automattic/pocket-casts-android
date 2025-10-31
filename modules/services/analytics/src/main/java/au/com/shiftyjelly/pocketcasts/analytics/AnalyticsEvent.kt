@@ -471,6 +471,10 @@ enum class AnalyticsEvent(val key: String) {
     EPISODE_DETAIL_TRANSCRIPT_CARD_SHOWN("episode_detail_transcript_card_shown"),
     EPISODE_DETAIL_TRANSCRIPT_CARD_TAPPED("episode_detail_transcript_card_tapped"),
 
+    /* Onboarding intro */
+    ONBOARDING_INTRO_CAROUSEL_SHOWN("onboarding_carousel_shown"),
+    ONBOARDING_GET_STARTED("onboarding_get_started"),
+
     /* Recommendations */
     RECOMMENDATIONS_SHOWN("recommendations_shown"),
     RECOMMENDATIONS_DISMISSED("recommendations_dismissed"),
