@@ -77,6 +77,11 @@ class OnboardingLoginOrSignUpViewModel @Inject constructor(
             AnalyticsEvent.ONBOARDING_GET_STARTED,
             mapOf(AnalyticsProp.flow(flow), AnalyticsProp.ButtonTapped.getStarted),
         )
+        // keep it consistent with iOS
+        analyticsTracker.track(
+            AnalyticsEvent.SETUP_ACCOUNT_BUTTON_TAPPED,
+            mapOf(AnalyticsProp.flow(flow), AnalyticsProp.ButtonTapped.getStarted),
+        )
     }
 
     fun onLoginClicked(flow: OnboardingFlow) {
