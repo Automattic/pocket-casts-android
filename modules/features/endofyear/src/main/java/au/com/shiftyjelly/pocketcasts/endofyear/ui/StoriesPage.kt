@@ -281,10 +281,10 @@ internal fun BoxScope.TopControls(
         Image(
             painter = painterResource(IR.drawable.ic_close),
             contentDescription = stringResource(LR.string.close),
-            colorFilter = ColorFilter.tint(Color.Black),
+            colorFilter = ColorFilter.tint(Color.White),
             modifier = Modifier
                 // Increase touch target of the image
-                .offset(x = 12.dp, y = -12.dp)
+                .offset(x = 12.dp, y = (-12).dp)
                 .size(48.dp)
                 .clickable(
                     interactionSource = remember(::MutableInteractionSource),
@@ -293,7 +293,7 @@ internal fun BoxScope.TopControls(
                     role = Role.Button,
                     onClick = onClose,
                 )
-                .padding(12.dp),
+                .padding(10.dp),
         )
     }
 }

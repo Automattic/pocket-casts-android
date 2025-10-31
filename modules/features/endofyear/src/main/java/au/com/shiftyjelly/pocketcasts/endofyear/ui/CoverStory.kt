@@ -34,7 +34,7 @@ internal fun CoverStory(
     measurements: EndOfYearMeasurements,
 ) {
     val composition by rememberLottieComposition(
-        spec = LottieCompositionSpec.RawRes(IR.raw.pc_intro_i7),
+        spec = LottieCompositionSpec.RawRes(IR.raw.playback_intro_lottie),
     )
     val progress by animateLottieCompositionAsState(
         composition = composition,
