@@ -642,7 +642,6 @@ Language: ar
     <string name="settings_use_dark_up_next">استخدام قالب \"التالي\" الداكن</string>
     <string name="end_of_year_stories_theres_more">ثمَّة المزيد!</string>
     <string name="end_of_year_stories_year_completion_rate">معدل الإكمال</string>
-    <string name="end_of_year_stories_year_completion_rate_subtitle">من أصل ⁦%1$d⁩ من الحلقات التي بدأتها، لقد استمعتَ إلى ما مجموعه ⁦%2$d⁩ بالكامل</string>
     <string name="end_of_year_stories_year_completion_rate_title">معدل الإكمال الخاص بك هذا العام كان ⁦%1$d⁩%%</string>
     <string name="end_of_year_stories_year_over_share_text">وقت استماع ⁦%1$d⁩ الخاص بي مقارنة بـ ⁦%2$d⁩ </string>
     <string name="eoy_year_over_year_title_skyrocketed">بالمقارنة مع عام 2022، ارتفع وقت الاستماع الخاص بك ارتفاعًا شديدًا!</string>

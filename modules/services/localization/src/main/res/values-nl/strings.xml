@@ -641,7 +641,6 @@ Language: nl
     <string name="settings_use_dark_up_next">Donker thema voor Hierna gebruiken</string>
     <string name="end_of_year_stories_theres_more">Dat is niet alles!</string>
     <string name="end_of_year_stories_year_completion_rate">afrondingspercentage</string>
-    <string name="end_of_year_stories_year_completion_rate_subtitle">Van de %1$d afleveringen waar je aan bent begonnen, heb je dit aantal helemaal afgekeken %2$d</string>
     <string name="end_of_year_stories_year_completion_rate_title">Je afrondingspercentage dit jaar was %1$d%%</string>
     <string name="eoy_year_over_year_title_skyrocketed">Ten opzichte van 2022 is je luistertijd veel hoger!</string>
     <string name="end_of_year_stories_year_over_year_subtitle_went_down">Aaaah… er moet worden geleefd, toch?</string>

@@ -642,7 +642,6 @@ Language: es
     <string name="settings_use_dark_up_next">Utilizar tema Up Next oscuro</string>
     <string name="end_of_year_stories_theres_more">¡Y hay más!</string>
     <string name="end_of_year_stories_year_completion_rate">tasa de finalización</string>
-    <string name="end_of_year_stories_year_completion_rate_subtitle">De los %1$d episodios que has comenzado, has escuchado por completo un total de %2$d.</string>
     <string name="end_of_year_stories_year_completion_rate_title">Tu tasa de finalización de este año es de %1$d%%.</string>
     <string name="eoy_year_over_year_title_skyrocketed">En comparación con 2022, ¡tu tiempo de escucha se ha disparado!</string>
     <string name="end_of_year_stories_year_over_year_subtitle_went_down">La vida hay que vivirla, ¿no?</string>
