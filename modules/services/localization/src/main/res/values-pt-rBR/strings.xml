@@ -642,7 +642,6 @@ Language: pt_BR
     <string name="end_of_year_stories_theres_more">E tem mais!</string>
     <string name="end_of_year_stories_year_completion_rate">taxa de conclusão</string>
     <string name="eoy_year_over_year_title_skyrocketed">Em comparação com 2022, seu tempo de streaming disparou!</string>
-    <string name="end_of_year_stories_year_completion_rate_subtitle">Dos %1$d episódios que você começou, você concluiu um total de %2$d</string>
     <string name="end_of_year_stories_year_completion_rate_title">Sua taxa de conclusão este ano foi de %1$d%%</string>
     <string name="end_of_year_stories_year_over_year_subtitle_went_down">Poxa… tem sempre algo para se viver, né?</string>
     <string name="end_of_year_stories_year_over_share_text">Meu tempo de streaming de %1$d em comparação com %2$d</string>

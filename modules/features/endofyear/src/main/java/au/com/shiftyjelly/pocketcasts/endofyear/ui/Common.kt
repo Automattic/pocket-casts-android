@@ -14,9 +14,9 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor
-import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.colorResource
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextLayoutResult
 import androidx.compose.ui.text.TextStyle
@@ -28,6 +28,7 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import au.com.shiftyjelly.pocketcasts.compose.buttons.CircleIconButton
 import au.com.shiftyjelly.pocketcasts.compose.buttons.RowOutlinedButton
 import au.com.shiftyjelly.pocketcasts.compose.extensions.nonScaledSp
 import au.com.shiftyjelly.pocketcasts.endofyear.R
@@ -35,6 +36,7 @@ import au.com.shiftyjelly.pocketcasts.endofyear.StoryCaptureController
 import au.com.shiftyjelly.pocketcasts.models.to.Story
 import java.io.File
 import kotlinx.coroutines.launch
+import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 import au.com.shiftyjelly.pocketcasts.ui.R as UR
 
@@ -57,7 +59,7 @@ internal val Story.backgroundColor
         is Story.LongestEpisode -> Color(0xFFE0EFAD)
         is Story.PlusInterstitial -> Color(0xFFEFECAD)
         is Story.YearVsYear -> Color(0xFFEEB1F4)
-        is Story.CompletionRate -> Color(0xFFE0EFAD)
+        is Story.CompletionRate -> Color(0xFF27486A)
         is Story.Ending -> Color(0xFFEE661C)
     }
 
@@ -82,8 +84,12 @@ internal fun ShareStoryButton(
 ) {
     val scope = rememberCoroutineScope()
 
-    OutlinedEoyButton(
-        text = stringResource(LR.string.end_of_year_share_story),
+    CircleIconButton(
+        size = 40.dp,
+        icon = painterResource(IR.drawable.ic_share),
+        contentDescription = stringResource(LR.string.end_of_year_share_story),
+        backgroundColor = Color.Black.copy(alpha = 0.44f),
+        iconColor = Color.White,
         onClick = {
             scope.launch {
                 val file = controller.capture(story)
@@ -92,8 +98,7 @@ internal fun ShareStoryButton(
                 }
             }
         },
-        modifier = modifier
-            .onGloballyPositioned { controller.updateButtonHeightPx(story, it.size.height) },
+        modifier = modifier.padding(4.dp),
     )
 }
 
@@ -216,6 +221,7 @@ internal fun PreviewBox(
             progress = progress,
             measurements = measurements,
             onClose = {},
+            controller = StoryCaptureController.preview(),
         )
     }
 }
