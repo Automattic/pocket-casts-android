@@ -653,7 +653,6 @@ Language: ja_JP
     <string name="end_of_year_stories_year_over_year_title_went_up">%1$sと比較して、聴取時間が%2$s%%に急増しました</string>
     <string name="end_of_year_story_longest_episode_title">お聴きになった最長のエピソードは %1$s でした</string>
     <string name="end_of_year_replay">もう一度再生</string>
-    <string name="end_of_year_story_epilogue_title">本年もご聴取いただきありがとうございました。\n%1$dもよろしくお願いいたします。</string>
     <string name="end_of_year_listening_time_title">これはポッドキャストの合計聴取時間です。</string>
     <string name="end_of_year_story_top_categories_subtitle">%2$s話のエピソードで合計%1$s話聴きました</string>
     <string name="end_of_year_story_top_categories_title">%1$s があなたのお気に入りのカテゴリーだとお気づきでしたか ?</string>
@@ -961,7 +960,6 @@ Language: ja_JP
     <string name="end_of_year_story_top_categories_share_text">一番聴いたポッドキャストのカテゴリー</string>
     <string name="end_of_year_story_top_categories">トップカテゴリー</string>
     <string name="end_of_year_story_top_podcasts_share_text">今年再生数が多かったポッドキャストはこちら ! %1$s</string>
-    <string name="end_of_year_story_epilogue_subtitle">友達と共有したりお気に入りのポッドキャストクリエイターにエールを送ったりしましょう</string>
     <string name="end_of_year_story_listened_to_numbers_subtitle">何度も聴いたエピソードもありました…</string>
     <string name="end_of_year_story_longest_episode_share_text">%1$dに聴いた最長のエピソード %2$s</string>
     <string name="end_of_year_story_top_podcasts_list_title">%1$dに再生数が多かったポッドキャスト</string>

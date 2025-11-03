@@ -651,7 +651,6 @@ Language: ar
     <string name="end_of_year_stories_year_over_year_subtitle_went_up">هل أنت مستعد لوضع اللمسات الأخيرة على ⁦%1$s⁩؟</string>
     <string name="end_of_year_stories_year_over_year_title_went_up">مقارنة بـ ⁦%1$s⁩، ارتفع وقت الاستماع الخاص بك بشكل كبير ⁦%2$s⁩%% </string>
     <string name="end_of_year_prompt_card_summary">اطلع على إحصاءات الاستماع الخاصة بك وأهم حلقات البث الصوتي والمزيد.</string>
-    <string name="end_of_year_story_epilogue_title">شكرًا لك لاستماعك إلينا في هذا العام.\nنراك في ⁦%1$d⁩!</string>
     <string name="end_of_year_story_longest_episode_title">كانت أطول حلقة استمعتَ إليها ⁦%1$s⁩ </string>
     <string name="end_of_year_replay">التشغيل مجددًا</string>
     <string name="end_of_year_listening_time_title">كان هذا إجمالي وقتك في الاستماع إلى حلقات البث الصوتي</string>
@@ -958,7 +957,6 @@ Language: ar
     <string name="onboarding_email_invalid_message">يرجى إدخال بريد إلكتروني صالح</string>
     <string name="log_in">تسجيل الدخول</string>
     <string name="end_of_year_story_top_podcasts_share_text">أهم حلقات البودكاست الخاصة بي في العام! %1$s</string>
-    <string name="end_of_year_story_epilogue_subtitle">لا تنسَ المشاركة مع أصدقائك والتعبير عن مبدعي الحلقات الصوتية الذين تفضلهم</string>
     <string name="end_of_year_story_top_categories">أهم تصنيفاتك</string>
     <string name="end_of_year_story_top_categories_share_text">الأكثر استماعًا إلى تصنيفات الحلقات الصوتية</string>
     <string name="end_of_year_create_account_to_see">احفظ حلقاتك الصوتية في السحابة واحصل على تقييم نهاية العام وقم بمزامنة تقدُّمك مع الأجهزة الأخرى.</string>

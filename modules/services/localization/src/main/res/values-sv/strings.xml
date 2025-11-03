@@ -653,7 +653,6 @@ Language: sv_SE
     <string name="end_of_year_stories_year_over_year_title_went_up">Jämfört med %1$s ökade din lyssningstid med hisnande %2$s%%</string>
     <string name="end_of_year_story_longest_episode_title">Det längsta avsnittet du lyssnade på var %1$s</string>
     <string name="end_of_year_replay">Spela upp igen</string>
-    <string name="end_of_year_story_epilogue_title">Tack för att du lyssnat med oss i år.\nVi ses %1$d!</string>
     <string name="end_of_year_listening_time_title">Detta var den sammanlagda tiden du lyssnade på podcasts.</string>
     <string name="end_of_year_story_top_categories_subtitle">Du lyssnade på %1$s avsnitt i sammanlagt %2$s</string>
     <string name="end_of_year_story_top_categories_title">Visste du att %1$s var din favoritkategori</string>
@@ -961,7 +960,6 @@ Language: sv_SE
     <string name="end_of_year_create_account_to_see">Spara dina podcasts i molnet, få din årsslutsöversikt och synkronisera ditt lyssningsförlopp med andra enheter.</string>
     <string name="end_of_year_story_top_categories_share_text">Mina mest lyssnade podcastkategorier</string>
     <string name="end_of_year_story_top_podcasts_share_text">Mina favoritpodcasts för året. %1$s</string>
-    <string name="end_of_year_story_epilogue_subtitle">Glöm inte att dela med dina vänner och att berätta om dina favoritpodcastkreatörer</string>
     <string name="end_of_year_story_listened_to_numbers_subtitle">Det fanns dock ett avsnitt som du fortsatte att komma tillbaka till …</string>
     <string name="end_of_year_story_longest_episode_share_text">Det längsta avsnittet jag lyssnade på under %1$d %2$s</string>
     <string name="end_of_year_story_top_podcasts_list_title">Mina favoritpodcasts %1$d</string>

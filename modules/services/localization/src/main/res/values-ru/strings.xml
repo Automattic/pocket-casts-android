@@ -653,7 +653,6 @@ Language: ru
     <string name="end_of_year_stories_year_over_year_title_went_up">По сравнению с %1$s годом ваше время прослушивания возросло сразу на %2$s%%</string>
     <string name="end_of_year_story_longest_episode_title">Самым длинным эпизодом, который вы слушали, стал %1$s</string>
     <string name="end_of_year_replay">Прослушать ещё раз</string>
-    <string name="end_of_year_story_epilogue_title">Благодарим за то, что вы слушали вместе с нами в этом году.\nЖдём вас снова в %1$d году!</string>
     <string name="end_of_year_listening_time_title">Это ваше общее время прослушивания подкастов.</string>
     <string name="end_of_year_story_top_categories_title">Знаете ли вы, что вашей любимой категорией оказалась %1$s?</string>
     <string name="discover_category_society_abbreviation">Культура</string>
@@ -961,7 +960,6 @@ Language: ru
     <string name="end_of_year_story_top_categories_share_text">Рубрики подкастов, которые я слушаю чаще всего</string>
     <string name="end_of_year_story_top_categories">Ваши любимые рубрики</string>
     <string name="end_of_year_story_top_podcasts_share_text">Мои любимые подкасты этого года! %1$s</string>
-    <string name="end_of_year_story_epilogue_subtitle">Не забудьте поделиться с друзьями и рассказать о любимых подкастерах</string>
     <string name="end_of_year_story_listened_to_numbers_subtitle">Но было одно шоу, которое вы слушали снова и снова…</string>
     <string name="end_of_year_story_longest_episode_share_text">Самый продолжительный выпуск, прослушанный мною в %1$d году: %2$s</string>
     <string name="end_of_year_story_top_podcast_share_text">Мой любимый подкаст в %1$d году! %2$s</string>

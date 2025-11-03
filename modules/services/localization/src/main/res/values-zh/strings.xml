@@ -653,7 +653,6 @@ Language: zh_CN
     <string name="end_of_year_stories_year_over_year_title_went_up">与 %1$s 年相比，您的收听时长激增 %2$s%%</string>
     <string name="end_of_year_replay">再次播放</string>
     <string name="end_of_year_story_longest_episode_title">您收听的最长一集为 %1$s</string>
-    <string name="end_of_year_story_epilogue_title">感谢您今年收听我们的播客。\n%1$d 年再见！</string>
     <string name="end_of_year_listening_time_title">这是您收听播客的总时长。</string>
     <string name="end_of_year_story_top_categories_title">您是否知道 %1$s 是您最喜欢的分类？</string>
     <string name="discover_category_society_abbreviation">文化</string>
@@ -961,7 +960,6 @@ Language: zh_CN
     <string name="end_of_year_story_top_categories_share_text">我收听最多的播客分类</string>
     <string name="end_of_year_story_top_categories">您的热门分类</string>
     <string name="end_of_year_story_top_podcasts_share_text">我的年度热门播客！ %1$s</string>
-    <string name="end_of_year_story_epilogue_subtitle">不要忘记共享给朋友，告诉他们您最喜欢的播客创作者</string>
     <string name="end_of_year_story_listened_to_numbers_subtitle">但还有一个您经常收听的播客…</string>
     <string name="end_of_year_story_longest_episode_share_text">%1$d 年我收听时间最长的剧集%2$s</string>
     <string name="end_of_year_story_top_podcasts_list_title">我的 %1$d 年热门播客</string>

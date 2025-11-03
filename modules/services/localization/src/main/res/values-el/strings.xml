@@ -482,7 +482,6 @@ Language: el_GR
     <string name="end_of_year_stories_year_over_year_subtitle_flat">Και λένε ότι η συνέπεια είναι το κλειδί για την επιτυχία… ή κάτι τέτοιο!</string>
     <string name="end_of_year_stories_year_over_year_title_flat">Σε σχέση με το %1$s, ο χρόνος ακρόασης σου παρέμεινε αρκετά σταθερός</string>
     <string name="end_of_year_story_longest_episode_title">Το μεγαλύτερο επεισόδιο που ακούσες ήταν το %1$s</string>
-    <string name="end_of_year_story_epilogue_title">Ευχαριστούμε που ακούσες μαζί μας φέτος. Τα λέμε το %1$d!</string>
     <string name="end_of_year_replay">Παίξε ξανά</string>
     <string name="end_of_year_listening_time_title">Αυτός ήταν ο συνολικός σου χρόνος ακρόασης podcasts</string>
     <string name="end_of_year_story_top_categories_subtitle">Ακούσες %1$s επεισόδια από τα %2$s συνολικά</string>
@@ -788,7 +787,6 @@ Language: el_GR
     <string name="end_of_year_story_top_categories_share_text">Οι κατηγορίες podcast που άκουσα περισσότερο</string>
     <string name="end_of_year_story_top_podcast_share_text">Το αγαπημένο μου podcast του %1$d! %2$s</string>
     <string name="end_of_year_create_account_to_see">Αποθήκευσε τα podcast σου στο cloud, πάρε την ανασκόπησή σου για το τέλος της χρονιάς και συγχρόνισε την πρόοδό σου με άλλες συσκευές.</string>
-    <string name="end_of_year_story_epilogue_subtitle">Μην ξεχάσεις να μοιραστείς με τους φίλους σου και να επαινέσεις τους αγαπημένους σου δημιουργούς podcast</string>
     <string name="end_of_year_story_longest_episode_share_text">Το μεγαλύτερο επεισόδιο που άκουσα το %1$d %2$s</string>
     <string name="end_of_year_story_top_podcast_subtitle">Ακούσες %1$d επεισόδια από τα %2$s συνολικά του «%3$s»</string>
     <string name="end_of_year_story_listened_to_numbers_share_text">Άκουσα %1$d διαφορετικά podcasts και %2$d επεισόδια το %3$d</string>

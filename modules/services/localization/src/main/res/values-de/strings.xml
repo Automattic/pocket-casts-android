@@ -653,7 +653,6 @@ Language: de
     <string name="end_of_year_stories_year_over_year_title_went_up">Im Vergleich zu %1$s ist deine Audiozeit um ganze %2$s %% angestiegen</string>
     <string name="end_of_year_story_longest_episode_title">Die längste von dir angehörte Folge war %1$s</string>
     <string name="end_of_year_replay">Erneut abspielen</string>
-    <string name="end_of_year_story_epilogue_title">Vielen Dank, dass du dieses Jahr dein Audioerlebnis mit uns genossen hast.\nWir hören uns %1$d!</string>
     <string name="end_of_year_listening_time_title">Dies ist die Gesamtzeit der von dir angehörten Podcasts.</string>
     <string name="end_of_year_story_top_categories_subtitle">Du hast dir %1$s Folgen mit einer Gesamtdauer von %2$s angehört</string>
     <string name="end_of_year_story_top_categories_title">Schon gewusst? %1$s war deine Lieblingskategorie</string>
@@ -961,7 +960,6 @@ Language: de
     <string name="end_of_year_story_top_categories_share_text">Meine am häufigsten gehörten Podcast-Kategorien</string>
     <string name="end_of_year_story_top_categories">Deine Top-Kategorien</string>
     <string name="end_of_year_story_top_podcasts_share_text">Meine Top-Podcasts des Jahres! %1$s</string>
-    <string name="end_of_year_story_epilogue_subtitle">Vergiss nicht, sie mit deinen Freunden zu teilen und deine bevorzugten Podcast-Ersteller dankend zu erwähnen</string>
     <string name="end_of_year_story_listened_to_numbers_subtitle">Aber es gab eine, die dir besonders gut gefallen hat …</string>
     <string name="end_of_year_story_longest_episode_share_text">Die längste Folge, die ich mir %1$d angehört habe (%2$s)</string>
     <string name="end_of_year_story_top_podcasts_list_title">Meine Top-Podcasts %1$d</string>

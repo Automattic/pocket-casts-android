@@ -54,13 +54,13 @@ internal val Story.backgroundColor
         is Story.NumberOfShows -> Color(0xFFEFECAD)
         is Story.TopShow -> Color(0xFFEDB0F3)
         is Story.TopShows -> Color(0xFFE0EFAD)
-        is Story.Ratings -> Color(0xFFEFECAD)
+        is Story.Ratings -> Color(0xFFA22828)
         is Story.TotalTime -> Color(0xFFEDB0F3)
         is Story.LongestEpisode -> Color(0xFFE0EFAD)
         is Story.PlusInterstitial -> Color(0xFFEFECAD)
         is Story.YearVsYear -> Color(0xFFEEB1F4)
         is Story.CompletionRate -> Color(0xFF27486A)
-        is Story.Ending -> Color(0xFFEE661C)
+        is Story.Ending -> Color(0xFF27486A)
     }
 
 internal data class EndOfYearMeasurements(
@@ -117,6 +117,30 @@ internal fun OutlinedEoyButton(
         ),
         border = ButtonDefaults.outlinedBorder.copy(
             brush = SolidColor(colorResource(UR.color.coolgrey_90)),
+        ),
+        onClick = onClick,
+        includePadding = false,
+        modifier = modifier.padding(horizontal = 24.dp, vertical = 16.dp),
+    )
+}
+
+@Composable
+internal fun SolidEoyButton(
+    text: String,
+    backgroundColor: Color,
+    textColor: Color,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    RowOutlinedButton(
+        text = text,
+        fontSize = 18.nonScaledSp,
+        colors = ButtonDefaults.outlinedButtonColors(
+            backgroundColor = backgroundColor,
+            contentColor = textColor,
+        ),
+        border = ButtonDefaults.outlinedBorder.copy(
+            brush = SolidColor(backgroundColor),
         ),
         onClick = onClick,
         includePadding = false,
