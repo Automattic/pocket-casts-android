@@ -27,7 +27,6 @@ Language: ko_KR
     <string name="smart_playlists">스마트 재생목록</string>
     <string name="select_smart_playlists">스마트 재생목록 선택</string>
     <string name="podcast_not_in_playlists">어떤 스마트 재생목록에도 포함되지 않음</string>
-    <string name="playlist_is_full_description">재생목록이 가득 찼습니다. 새로운 재생목록을 만들어 보세요.</string>
     <string name="add_to_playlist_no_playlist_found_title">재생목록에 추가</string>
     <string name="add_to_playlist_no_playlist_found_body">해당 검색어와 일치하는 재생목록을 찾을 수 없습니다. 새 재생목록을 만들거나 다른 키워드로 검색해 보세요.</string>
     <string name="add_to_playlist_find_playlist">재생목록 찾기</string>

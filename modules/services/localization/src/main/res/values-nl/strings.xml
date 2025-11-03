@@ -27,7 +27,6 @@ Language: nl
     <string name="smart_playlists">Slimme afspeellijsten</string>
     <string name="select_smart_playlists">Slimme afspeellijsten selecteren</string>
     <string name="podcast_not_in_playlists">Niet inbegrepen in slimme afspeellijsten</string>
-    <string name="playlist_is_full_description">Afspeellijst is vol. Probeer een nieuwe aan te maken.</string>
     <string name="add_to_playlist_no_playlist_found_title">Toevoegen aan afspeellijst</string>
     <string name="add_to_playlist_no_playlist_found_body">We kunnen geen afspeellijst vinden voor die zoekopdracht. Maak een nieuwe afspeellijst of gebruik een ander trefwoord.</string>
     <string name="add_to_playlist_find_playlist">Afspeellijst zoeken</string>

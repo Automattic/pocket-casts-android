@@ -1007,7 +1007,7 @@
     </plurals>
     <string name="playlist_episodes_hide_archived" translatable="false">@string/podcast_hide_archived</string>
     <string name="playlist_episodes_show_archived" translatable="false">@string/show_archived</string>
-    <string name="playlist_is_full_description">Playlist is full. Try creating a new one.</string>
+    <string name="playlist_is_full_description" translatable="false">@string/add_to_playlist_failure_message</string>
     <string name="playlist_options">Playlist options</string>
     <string name="playlist_select_episodes">Select episodes</string>
     <string name="playlist_setting_auto_download_description">Enable to auto download episodes in this playlist.</string>

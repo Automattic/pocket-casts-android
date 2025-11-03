@@ -27,7 +27,6 @@ Language: it
     <string name="smart_playlists">Playlist intelligenti</string>
     <string name="select_smart_playlists">Seleziona Playlist intelligenti</string>
     <string name="podcast_not_in_playlists">Non incluso in alcuna Playlist intelligente</string>
-    <string name="playlist_is_full_description">Playlist piena. Prova a crearne una nuova.</string>
     <string name="add_to_playlist_no_playlist_found_title">Aggiungi alla playlist</string>
     <string name="add_to_playlist_no_playlist_found_body">Non abbiamo trovato alcuna playlist per la ricerca. Crea una nuova playlist o prova un\'altra parola chiave.</string>
     <string name="add_to_playlist_find_playlist">Cerca playlist</string>

@@ -27,7 +27,6 @@ Language: pt_BR
     <string name="smart_playlists">Listas de reprodução inteligente</string>
     <string name="select_smart_playlists">Selecione listas de reprodução inteligente</string>
     <string name="podcast_not_in_playlists">Não está incluso em nenhuma das listas de reprodução inteligente</string>
-    <string name="playlist_is_full_description">A lista de reprodução está cheia. Tente criar uma nova.</string>
     <string name="add_to_playlist_no_playlist_found_title">Adicionar à lista de reprodução</string>
     <string name="add_to_playlist_no_playlist_found_body">Não encontramos nenhuma lista de reprodução para essa pesquisa. Crie uma nova lista de reprodução ou tente outra palavra-chave.</string>
     <string name="add_to_playlist_find_playlist">Encontrar lista de reprodução</string>

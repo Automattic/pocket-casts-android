@@ -27,7 +27,6 @@ Language: zh_CN
     <string name="smart_playlists">智能播放列表</string>
     <string name="select_smart_playlists">选择智能播放列表</string>
     <string name="podcast_not_in_playlists">未包含在任何智能播放列表中</string>
-    <string name="playlist_is_full_description">播放列表已满。 尝试创建新播放列表。</string>
     <string name="add_to_playlist_no_playlist_found_title">添加至播放列表</string>
     <string name="add_to_playlist_no_playlist_found_body">我们找不到任何符合该搜索条件的播放列表。 创建新播放列表或尝试使用其他关键字。</string>
     <string name="add_to_playlist_find_playlist">查找播放列表</string>

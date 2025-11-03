@@ -30,7 +30,6 @@ Language: ca
     <string name="smart_playlists">Llistes de reproducció intel·ligents</string>
     <string name="select_smart_playlists">Selecciona llistes de reproducció intel·ligents</string>
     <string name="podcast_not_in_playlists">No inclòs en cap llista de reproducció intel·ligent</string>
-    <string name="playlist_is_full_description">La llista de reproducció està plena. Prova a crear-ne una de nova.</string>
     <string name="add_to_playlist_no_playlist_found_title">Afegeix a la llista de reproducció</string>
     <string name="add_to_playlist_no_playlist_found_body">No hem pogut trobar cap llista de reproducció amb aquesta cerca. Crea’n una de nova o prova amb una altra paraula clau.</string>
     <string name="add_to_playlist_find_playlist">Cercar una llista de reproducció</string>

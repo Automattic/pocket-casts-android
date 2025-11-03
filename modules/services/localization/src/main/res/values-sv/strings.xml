@@ -27,7 +27,6 @@ Language: sv_SE
     <string name="smart_playlists">Smarta spellistor</string>
     <string name="select_smart_playlists">Välj smarta spellistor</string>
     <string name="podcast_not_in_playlists">Ingår inte i några smarta spellistor</string>
-    <string name="playlist_is_full_description">Spellistan är full. Prova att skapa en ny.</string>
     <string name="add_to_playlist_no_playlist_found_title">Lägg till i spellista</string>
     <string name="add_to_playlist_no_playlist_found_body">Vi kunde inte hitta någon spellista för denna sökning. Skapa en ny spellista eller prova ett annat nyckelord.</string>
     <string name="add_to_playlist_find_playlist">Hitta spellista</string>
