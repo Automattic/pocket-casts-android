@@ -276,6 +276,22 @@ class PlaylistViewModel @AssistedInject constructor(
         analyticsTracker.track(AnalyticsEvent.FILTER_PLAY_ALL_TAPPED)
     }
 
+    fun trackSaveUpNextTapped() {
+        analyticsTracker.track(AnalyticsEvent.FILTER_PLAY_ALL_SAVE_UP_NEXT_TAPPED)
+    }
+
+    fun trackReplaceAndPlayTapped() {
+        analyticsTracker.track(AnalyticsEvent.FILTER_PLAY_ALL_REPLACE_AND_PLAY_TAPPED)
+    }
+
+    fun trackReplaceAndPlayConfirmTapped() {
+        analyticsTracker.track(AnalyticsEvent.FILTER_PLAY_ALL_REPLACE_AND_PLAY_CONFIRM_TAPPED)
+    }
+
+    fun trackPlayAllDismissed() {
+        analyticsTracker.track(AnalyticsEvent.FILTER_PLAY_ALL_DISMISSED)
+    }
+
     fun trackSelectEpisodesTapped() {
         analyticsTracker.track(AnalyticsEvent.FILTER_SELECT_EPISODES_TAPPED)
     }
