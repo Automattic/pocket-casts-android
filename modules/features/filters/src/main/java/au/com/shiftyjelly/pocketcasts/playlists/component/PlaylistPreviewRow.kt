@@ -42,7 +42,6 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.semantics
-import androidx.compose.ui.text.rememberTextMeasurer
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.DpOffset
@@ -115,8 +114,7 @@ internal fun PlaylistPreviewRow(
         }
         val density = LocalDensity.current
         val windowWidth = LocalWindowInfo.current.containerSize.width
-        val textMeasurer = rememberTextMeasurer()
-        val draggableAnchors = remember(windowWidth, density, textMeasurer) {
+        val draggableAnchors = remember(windowWidth, density) {
             val deleteIconSize = density.run { 24.dp.toPx() }
             val deleteIconPadding = density.run { 48.dp.toPx() }
             val deleteActionWidth = deleteIconSize + deleteIconPadding
