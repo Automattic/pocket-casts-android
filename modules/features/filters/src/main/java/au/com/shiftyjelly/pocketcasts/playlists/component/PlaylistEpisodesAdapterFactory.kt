@@ -67,6 +67,7 @@ class PlaylistEpisodesAdapterFactory @Inject constructor(
     ): PlaylistEpisodeAdapter {
         lateinit var adapter: PlaylistEpisodeAdapter
         configureDependencies(
+            playlistType = playlistType,
             getAdapter = { adapter },
             multiSelectToolbar = multiSelectToolbar,
             getEpisodes = { getEpisodes().map(PlaylistEpisode::toMultiselectEpisode) },
@@ -122,6 +123,7 @@ class PlaylistEpisodesAdapterFactory @Inject constructor(
     }
 
     private fun configureDependencies(
+        playlistType: Playlist.Type,
         getAdapter: () -> RecyclerView.Adapter<*>,
         multiSelectToolbar: MultiSelectToolbar,
         getEpisodes: () -> List<BaseEpisode>,
@@ -160,12 +162,18 @@ class PlaylistEpisodesAdapterFactory @Inject constructor(
                 } else {
                     AnalyticsEvent.FILTER_MULTI_SELECT_EXITED
                 }
-                analyticsTracker.track(event)
+                analyticsTracker.track(
+                    event,
+                    mapOf("filter_type" to playlistType.analyticsValue),
+                )
                 getAdapter().notifyItemRangeChanged(0, getEpisodes().size, MULTI_SELECT_TOGGLE_PAYLOAD)
             }
             listener = object : MultiSelectHelper.Listener<BaseEpisode> {
                 override fun multiSelectSelectAll() {
-                    analyticsTracker.track(AnalyticsEvent.FILTER_SELECT_ALL)
+                    analyticsTracker.track(
+                        AnalyticsEvent.FILTER_SELECT_ALL,
+                        mapOf("filter_type" to playlistType.analyticsValue),
+                    )
                     val episodes = getEpisodes()
                     multiSelectHelper.selectAllInList(episodes)
                     @SuppressLint("NotifyDataSetChanged")
@@ -173,7 +181,10 @@ class PlaylistEpisodesAdapterFactory @Inject constructor(
                 }
 
                 override fun multiSelectSelectNone() {
-                    analyticsTracker.track(AnalyticsEvent.FILTER_DESELECT_ALL)
+                    analyticsTracker.track(
+                        AnalyticsEvent.FILTER_DESELECT_ALL,
+                        mapOf("filter_type" to playlistType.analyticsValue),
+                    )
                     val episodes = getEpisodes()
                     multiSelectHelper.deselectAllInList(episodes)
                     @SuppressLint("NotifyDataSetChanged")
@@ -181,7 +192,10 @@ class PlaylistEpisodesAdapterFactory @Inject constructor(
                 }
 
                 override fun multiSelectSelectAllUp(multiSelectable: BaseEpisode) {
-                    analyticsTracker.track(AnalyticsEvent.FILTER_SELECT_ALL_ABOVE)
+                    analyticsTracker.track(
+                        AnalyticsEvent.FILTER_SELECT_ALL_ABOVE,
+                        mapOf("filter_type" to playlistType.analyticsValue),
+                    )
                     val episodes = getEpisodes()
                     val startIndex = episodes.indexOf(multiSelectable)
                     if (startIndex > -1) {
@@ -191,7 +205,10 @@ class PlaylistEpisodesAdapterFactory @Inject constructor(
                 }
 
                 override fun multiDeselectAllBelow(multiSelectable: BaseEpisode) {
-                    analyticsTracker.track(AnalyticsEvent.FILTER_DESELECT_ALL_BELOW)
+                    analyticsTracker.track(
+                        AnalyticsEvent.FILTER_DESELECT_ALL_BELOW,
+                        mapOf("filter_type" to playlistType.analyticsValue),
+                    )
                     val episodes = getEpisodes()
                     val startIndex = episodes.indexOf(multiSelectable)
                     if (startIndex > -1) {
@@ -202,7 +219,10 @@ class PlaylistEpisodesAdapterFactory @Inject constructor(
                 }
 
                 override fun multiDeselectAllAbove(multiSelectable: BaseEpisode) {
-                    analyticsTracker.track(AnalyticsEvent.FILTER_DESELECT_ALL_ABOVE)
+                    analyticsTracker.track(
+                        AnalyticsEvent.FILTER_DESELECT_ALL_ABOVE,
+                        mapOf("filter_type" to playlistType.analyticsValue),
+                    )
                     val episodes = getEpisodes()
                     val startIndex = episodes.indexOf(multiSelectable)
                     if (startIndex > -1) {
@@ -213,7 +233,10 @@ class PlaylistEpisodesAdapterFactory @Inject constructor(
                 }
 
                 override fun multiSelectSelectAllDown(multiSelectable: BaseEpisode) {
-                    analyticsTracker.track(AnalyticsEvent.FILTER_SELECT_ALL_BELOW)
+                    analyticsTracker.track(
+                        AnalyticsEvent.FILTER_SELECT_ALL_BELOW,
+                        mapOf("filter_type" to playlistType.analyticsValue),
+                    )
                     val episodes = getEpisodes()
                     val startIndex = episodes.indexOf(multiSelectable)
                     if (startIndex > -1) {
