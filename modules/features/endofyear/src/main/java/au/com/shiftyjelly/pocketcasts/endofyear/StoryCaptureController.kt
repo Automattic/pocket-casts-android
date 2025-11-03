@@ -84,10 +84,11 @@ internal fun rememberStoryCaptureController(): StoryCaptureController {
                             drawBitmap(
                                 pcLogo,
                                 (width - pcLogo.width).toFloat() / 2,
-                                height - (pcLogo.height * 1.5f), // pad the logo from the bottom by half its height
+                                height - (pcLogo.height * 1.5f), // Pad the logo from the bottom by half its height
                                 null,
                             )
-                        }
+                            // Draw at the correct ratio for Instagram sharing, this will include black bars in the image
+                        }.fitToAspectRatio(9f / 16)
                     }
                     withContext(Dispatchers.IO) {
                         val file = File(context.cacheDir, "pocket-casts-playback-screenshot.png")

@@ -85,7 +85,7 @@ internal fun ShareStoryButton(
     val scope = rememberCoroutineScope()
 
     CircleIconButton(
-        size = 48.dp,
+        size = 40.dp,
         icon = painterResource(IR.drawable.ic_share),
         contentDescription = stringResource(LR.string.end_of_year_share_story),
         backgroundColor = Color.Black.copy(alpha = 0.44f),
@@ -98,7 +98,7 @@ internal fun ShareStoryButton(
                 }
             }
         },
-        modifier = modifier,
+        modifier = modifier.padding(4.dp),
     )
 }
 
