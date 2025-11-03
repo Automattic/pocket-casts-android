@@ -1,6 +1,11 @@
+@file:Suppress("DEPRECATION")
+
 package au.com.shiftyjelly.pocketcasts.account.viewmodel
 
+import android.app.Activity
 import android.content.Context
+import android.content.Intent
+import androidx.activity.result.ActivityResult
 import androidx.credentials.CredentialManager
 import androidx.credentials.CustomCredential
 import androidx.credentials.GetCredentialRequest
@@ -20,6 +25,9 @@ import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingFlow
 import au.com.shiftyjelly.pocketcasts.utils.Util
 import au.com.shiftyjelly.pocketcasts.utils.extensions.isGooglePlayServicesAvailableSuccess
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
+import com.google.android.gms.auth.api.identity.Identity
+import com.google.android.gms.auth.api.signin.GoogleSignIn
+import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 import com.google.android.gms.common.GoogleApiAvailability
 import com.google.android.libraries.identity.googleid.GetSignInWithGoogleOption
 import com.google.android.libraries.identity.googleid.GoogleIdTokenCredential
@@ -52,6 +60,8 @@ class GoogleSignInButtonViewModel @Inject constructor(
         flow: OnboardingFlow?,
         onSuccess: (GoogleSignInState, Subscription?) -> Unit,
         onError: suspend () -> Unit,
+        activity: Activity,
+        onLegacySignInIntent: (Intent) -> Unit,
         event: AnalyticsEvent = AnalyticsEvent.SETUP_ACCOUNT_BUTTON_TAPPED,
     ) {
         if (flow != null) {
@@ -77,10 +87,9 @@ class GoogleSignInButtonViewModel @Inject constructor(
                 val request: GetCredentialRequest = GetCredentialRequest.Builder()
                     .addCredentialOption(googleIdOption)
                     .build()
-
                 val result = credentialManager.getCredential(
                     request = request,
-                    context = context,
+                    context = activity,
                 )
                 val credential = result.credential as CustomCredential
                 if (credential.type == GoogleIdTokenCredential.TYPE_GOOGLE_ID_TOKEN_CREDENTIAL) {
@@ -99,8 +108,48 @@ class GoogleSignInButtonViewModel @Inject constructor(
             } catch (e: Exception) {
                 if (e !is GetCredentialCancellationException) {
                     LogBuffer.e(LogBuffer.TAG_CRASH, e, "Unable to sign in with Google One Tap")
-                    onError()
+
+                    try {
+                        launchLegacyGoogleSignIn(onLegacySignInIntent)
+                    } catch (e: Exception) {
+                        LogBuffer.e(LogBuffer.TAG_CRASH, e, "Failed to launch legacy Google login")
+                        onError()
+                    }
                 }
+            }
+        }
+    }
+
+    private fun launchLegacyGoogleSignIn(onLegacySignInIntent: (Intent) -> Unit) {
+        val gso = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+            .requestIdToken(Settings.GOOGLE_SIGN_IN_SERVER_CLIENT_ID)
+            .requestEmail()
+            .build()
+
+        val googleSignInClient = GoogleSignIn.getClient(context, gso)
+        onLegacySignInIntent(googleSignInClient.signInIntent)
+    }
+
+    /**
+     * Handle the response from the legacy Google Sign-In intent.
+     */
+    fun onGoogleLegacySignInResult(result: ActivityResult, onSuccess: (GoogleSignInState, Subscription?) -> Unit, onError: () -> Unit) {
+        viewModelScope.launch {
+            try {
+                val credential = Identity.getSignInClient(context).getSignInCredentialFromIntent(result.data)
+                val idToken = credential.googleIdToken ?: throw Exception("Unable to sign in because no token was returned.")
+                signInWithGoogleToken(
+                    idToken = idToken,
+                    onSuccess = onSuccess,
+                    onError = onError,
+                )
+            } catch (e: Exception) {
+                LogBuffer.e(
+                    LogBuffer.TAG_CRASH,
+                    e,
+                    "Unable to get sign in credentials from legacy Google Sign-In result.",
+                )
+                onError()
             }
         }
     }

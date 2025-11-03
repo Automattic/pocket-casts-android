@@ -37,6 +37,7 @@ import au.com.shiftyjelly.pocketcasts.search.component.ImprovedSearchEpisodeResu
 import au.com.shiftyjelly.pocketcasts.search.component.ImprovedSearchFolderResultRow
 import au.com.shiftyjelly.pocketcasts.search.component.ImprovedSearchPodcastResultRow
 import au.com.shiftyjelly.pocketcasts.search.component.ImprovedSearchTermSuggestionRow
+import au.com.shiftyjelly.pocketcasts.search.component.NoSuggestionsView
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.views.buttons.PlayButton
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
@@ -81,71 +82,76 @@ fun SearchAutoCompleteResultsPage(
         ) {
             CircularProgressIndicator()
         }
-        LazyColumn(
-            modifier = Modifier.nestedScroll(nestedScrollConnection),
-            contentPadding = PaddingValues(bottom = bottomInset),
-        ) {
-            results.forEachIndexed { index, item ->
-                item(contentType = "content-${item.javaClass}") {
-                    when (item) {
-                        is SearchAutoCompleteItem.Term -> ImprovedSearchTermSuggestionRow(
-                            searchTerm = searchTerm,
-                            item = item,
-                            onClick = { onTermClick(item) },
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .height(40.dp),
-                        )
 
-                        is SearchAutoCompleteItem.Podcast -> ImprovedSearchPodcastResultRow(
-                            item = item,
-                            onClick = { onPodcastClick(item) },
-                            onFollow = { onPodcastFollow(item) },
-                            modifier = Modifier.fillMaxWidth(),
-                        )
-
-                        is SearchAutoCompleteItem.Episode -> ImprovedSearchEpisodeResultRow(
-                            item = item,
-                            onClick = { onEpisodeClick(item) },
-                            playButtonListener = playButtonListener,
-                            modifier = Modifier.fillMaxWidth(),
-                        )
-
-                        is SearchAutoCompleteItem.Folder -> ImprovedSearchFolderResultRow(
-                            folder = item,
-                            onClick = { onFolderClick(item) },
-                            modifier = Modifier.fillMaxWidth(),
-                        )
-                    }
-                }
-                if (results.indices.last != index) {
-                    item(contentType = "divider") {
-                        HorizontalDivider(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(horizontal = 16.dp),
-                            thickness = 0.5.dp,
-                            color = MaterialTheme.theme.colors.secondaryText02,
-                        )
-                    }
-                }
-            }
-
-            if (results.isNotEmpty()) {
-                item {
-                    TextP40(
-                        modifier = Modifier
-                            .semantics { role = Role.Button }
-                            .clickable(
-                                onClick = {
-                                    onTermClick(SearchAutoCompleteItem.Term(searchTerm))
-                                },
+        if (!isLoading && results.isEmpty()) {
+            NoSuggestionsView()
+        } else {
+            LazyColumn(
+                modifier = Modifier.nestedScroll(nestedScrollConnection),
+                contentPadding = PaddingValues(bottom = bottomInset),
+            ) {
+                results.forEachIndexed { index, item ->
+                    item(contentType = "content-${item.javaClass}") {
+                        when (item) {
+                            is SearchAutoCompleteItem.Term -> ImprovedSearchTermSuggestionRow(
+                                searchTerm = searchTerm,
+                                item = item,
+                                onClick = { onTermClick(item) },
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .height(40.dp),
                             )
-                            .padding(vertical = 8.dp, horizontal = 16.dp),
-                        text = stringResource(LR.string.search_suggestions_view_all, searchTerm),
-                        color = MaterialTheme.theme.colors.primaryInteractive01,
-                        maxLines = 1,
-                    )
+
+                            is SearchAutoCompleteItem.Podcast -> ImprovedSearchPodcastResultRow(
+                                item = item,
+                                onClick = { onPodcastClick(item) },
+                                onFollow = { onPodcastFollow(item) },
+                                modifier = Modifier.fillMaxWidth(),
+                            )
+
+                            is SearchAutoCompleteItem.Episode -> ImprovedSearchEpisodeResultRow(
+                                item = item,
+                                onClick = { onEpisodeClick(item) },
+                                playButtonListener = playButtonListener,
+                                modifier = Modifier.fillMaxWidth(),
+                            )
+
+                            is SearchAutoCompleteItem.Folder -> ImprovedSearchFolderResultRow(
+                                folder = item,
+                                onClick = { onFolderClick(item) },
+                                modifier = Modifier.fillMaxWidth(),
+                            )
+                        }
+                    }
+                    if (results.indices.last != index) {
+                        item(contentType = "divider") {
+                            HorizontalDivider(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(horizontal = 16.dp),
+                                thickness = 0.5.dp,
+                                color = MaterialTheme.theme.colors.secondaryText02,
+                            )
+                        }
+                    }
+                }
+
+                if (results.isNotEmpty()) {
+                    item {
+                        TextP40(
+                            modifier = Modifier
+                                .semantics { role = Role.Button }
+                                .clickable(
+                                    onClick = {
+                                        onTermClick(SearchAutoCompleteItem.Term(searchTerm))
+                                    },
+                                )
+                                .padding(vertical = 8.dp, horizontal = 16.dp),
+                            text = stringResource(LR.string.search_suggestions_view_all, searchTerm),
+                            color = MaterialTheme.theme.colors.primaryInteractive01,
+                            maxLines = 1,
+                        )
+                    }
                 }
             }
         }
@@ -170,6 +176,45 @@ private fun PreviewSearchAutoCompleteResultsPage(
                 SearchAutoCompleteItem.Podcast(uuid = "", title = "Matching podcast subscribed", author = "Author2", isSubscribed = true),
                 SearchAutoCompleteItem.Podcast(uuid = "", title = "Matching podcast", author = "Author", isSubscribed = false),
             ),
+            onTermClick = {},
+            onEpisodeClick = {},
+            onPodcastClick = {},
+            onPodcastFollow = {},
+            onFolderClick = {},
+            onScroll = {},
+            onReportSuggestionsRender = {},
+            playButtonListener = object : PlayButton.OnClickListener {
+                override var source: SourceView = SourceView.SEARCH_RESULTS
+
+                override fun onPlayClicked(episodeUuid: String) = Unit
+
+                override fun onPauseClicked() = Unit
+
+                override fun onPlayNext(episodeUuid: String) = Unit
+
+                override fun onPlayLast(episodeUuid: String) = Unit
+
+                override fun onDownload(episodeUuid: String) = Unit
+
+                override fun onStopDownloading(episodeUuid: String) = Unit
+
+                override fun onPlayedClicked(episodeUuid: String) = Unit
+            },
+            bottomInset = 0.dp,
+        )
+    }
+}
+
+@Preview
+@Composable
+private fun PreviewEmptySearchAutoCompleteResultsPage(
+    @PreviewParameter(ThemePreviewParameterProvider::class) themeType: Theme.ThemeType,
+) {
+    AppThemeWithBackground(themeType) {
+        SearchAutoCompleteResultsPage(
+            isLoading = false,
+            searchTerm = "matching",
+            results = emptyList(),
             onTermClick = {},
             onEpisodeClick = {},
             onPodcastClick = {},

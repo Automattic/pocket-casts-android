@@ -53,7 +53,7 @@ class OnboardingLoginOrSignUpViewModel @Inject constructor(
 
     fun onShown(flow: OnboardingFlow) {
         analyticsTracker.track(
-            AnalyticsEvent.SETUP_ACCOUNT_SHOWN,
+            AnalyticsEvent.ONBOARDING_INTRO_CAROUSEL_SHOWN,
             mapOf(AnalyticsProp.flow(flow)),
         )
     }
@@ -73,6 +73,11 @@ class OnboardingLoginOrSignUpViewModel @Inject constructor(
     }
 
     fun onGetStartedClicked(flow: OnboardingFlow) {
+        analyticsTracker.track(
+            AnalyticsEvent.ONBOARDING_GET_STARTED,
+            mapOf(AnalyticsProp.flow(flow), AnalyticsProp.ButtonTapped.getStarted),
+        )
+        // keep it consistent with iOS
         analyticsTracker.track(
             AnalyticsEvent.SETUP_ACCOUNT_BUTTON_TAPPED,
             mapOf(AnalyticsProp.flow(flow), AnalyticsProp.ButtonTapped.getStarted),
