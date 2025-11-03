@@ -27,7 +27,6 @@ Language: fr
     <string name="smart_playlists">Listes de lecture intelligentes</string>
     <string name="select_smart_playlists">Sélectionner des listes de lecture intelligentes</string>
     <string name="podcast_not_in_playlists">Inclus dans aucune liste de lecture intelligente</string>
-    <string name="playlist_is_full_description">La liste de lecture est pleine. Essayez d’en créer une nouvelle.</string>
     <string name="add_to_playlist_no_playlist_found_title">Ajouter à la liste de lecture</string>
     <string name="add_to_playlist_no_playlist_found_body">Nous n’avons trouvé aucune liste de lecture correspondant à cette recherche. Créez une nouvelle liste de lecture ou essayez un autre mot clé.</string>
     <string name="add_to_playlist_find_playlist">Trouver une liste de lecture</string>

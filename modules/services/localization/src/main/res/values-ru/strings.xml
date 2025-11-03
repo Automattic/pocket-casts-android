@@ -27,7 +27,6 @@ Language: ru
     <string name="smart_playlists">Умные плейлисты</string>
     <string name="select_smart_playlists">Выбрать умные плейлисты</string>
     <string name="podcast_not_in_playlists">Не включено ни в один умный плейлист</string>
-    <string name="playlist_is_full_description">Плейлист заполнен до отказа. Попробуйте создать новый.</string>
     <string name="add_to_playlist_no_playlist_found_title">Добавить в плейлист</string>
     <string name="add_to_playlist_no_playlist_found_body">Не удалось найти плейлисты по этому запросу. Создайте новый плейлист или попробуйте другое ключевое слово.</string>
     <string name="add_to_playlist_find_playlist">Найти плейлист</string>

@@ -27,7 +27,6 @@ Language: de
     <string name="smart_playlists">Intelligente Wiedergabelisten</string>
     <string name="select_smart_playlists">Intelligente Wiedergabelisten auswählen</string>
     <string name="podcast_not_in_playlists">Nicht in intelligenten Wiedergabelisten enthalten</string>
-    <string name="playlist_is_full_description">Wiedergabeliste ist voll. Erstelle eine neue.</string>
     <string name="add_to_playlist_no_playlist_found_title">Zur Wiedergabeliste hinzufügen</string>
     <string name="add_to_playlist_no_playlist_found_body">Wir konnten keine Wiedergabeliste für diese Suche finden. Erstelle eine neue Wiedergabeliste oder versuche es mit einem anderen Stichwort.</string>
     <string name="add_to_playlist_find_playlist">Wiedergabeliste suchen</string>

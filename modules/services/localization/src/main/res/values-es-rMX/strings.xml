@@ -27,7 +27,6 @@ Language: es
     <string name="smart_playlists">Listas de reproducción inteligentes</string>
     <string name="select_smart_playlists">Seleccionar listas de reproducción inteligentes</string>
     <string name="podcast_not_in_playlists">No se incluye en ninguna lista de reproducción inteligente</string>
-    <string name="playlist_is_full_description">La lista de reproducción está completa. Prueba a crear otra.</string>
     <string name="add_to_playlist_no_playlist_found_title">Añadir a lista de reproducción</string>
     <string name="add_to_playlist_no_playlist_found_body">No hemos podido encontrar ninguna lista de reproducción para esa búsqueda. Crea una lista de reproducción o prueba con otra palabra clave.</string>
     <string name="add_to_playlist_find_playlist">Buscar lista de reproducción</string>

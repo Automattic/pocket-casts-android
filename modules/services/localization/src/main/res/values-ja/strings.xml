@@ -27,7 +27,6 @@ Language: ja_JP
     <string name="smart_playlists">スマートプレイリスト</string>
     <string name="select_smart_playlists">スマートプレイリストを選択</string>
     <string name="podcast_not_in_playlists">どのスマートプレイリストにも含まれない</string>
-    <string name="playlist_is_full_description">プレイリストがいっぱいです。 新しいプレイリストの作成をお試しください。</string>
     <string name="add_to_playlist_no_playlist_found_title">プレイリストに追加</string>
     <string name="add_to_playlist_no_playlist_found_body">その検索に該当するプレイリストは見つかりませんでした。 新しいプレイリストを作成するか、別のキーワードをお試しください。</string>
     <string name="add_to_playlist_find_playlist">プレイリストを検索</string>
