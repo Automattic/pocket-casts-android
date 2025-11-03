@@ -66,7 +66,7 @@ internal fun CompletionRateStory(
                 in 0f..0.3f -> R.raw.playback_completion_rate_20p_lottie
                 in 0.3f..0.5f -> R.raw.playback_completion_rate_40p_lottie
                 in 0.5f..0.7f -> R.raw.playback_completion_rate_60p_lottie
-                in 0.7f..0.75f -> R.raw.playback_completion_rate_80p_lottie
+                in 0.7f..0.9f -> R.raw.playback_completion_rate_80p_lottie
                 else -> R.raw.playback_completion_rate_100p_lottie
             }
 

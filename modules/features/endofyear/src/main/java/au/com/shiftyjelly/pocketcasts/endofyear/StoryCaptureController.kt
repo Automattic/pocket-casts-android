@@ -84,7 +84,7 @@ internal fun rememberStoryCaptureController(): StoryCaptureController {
                             drawBitmap(
                                 pcLogo,
                                 (width - pcLogo.width).toFloat() / 2,
-                                height - (pcLogo.height * 1.5f),
+                                height - (pcLogo.height * 1.5f), // pad the logo from the bottom by half its height
                                 null,
                             )
                         }
