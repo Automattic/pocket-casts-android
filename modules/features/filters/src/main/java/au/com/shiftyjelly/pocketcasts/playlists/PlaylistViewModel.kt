@@ -338,8 +338,18 @@ class PlaylistViewModel @AssistedInject constructor(
         )
     }
 
+    fun trackFilterOptionsButtonTapped() {
+        analyticsTracker.track(
+            AnalyticsEvent.FILTER_OPTIONS_BUTTON_TAPPED,
+            mapOf("filter_type" to playlistType.analyticsValue),
+        )
+    }
+
     fun trackFilterOptionsTapped() {
-        analyticsTracker.track(AnalyticsEvent.FILTER_OPTIONS_TAPPED)
+        analyticsTracker.track(
+            AnalyticsEvent.FILTER_OPTIONS_TAPPED,
+            mapOf("filter_type" to playlistType.analyticsValue),
+        )
     }
 
     fun trackSortByChanged(type: PlaylistEpisodeSortType) {

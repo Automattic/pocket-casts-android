@@ -426,7 +426,10 @@ class PlaylistFragment :
                     @Suppress("DEPRECATION")
                     requireActivity().onBackPressed()
                 },
-                onClickOptions = ::openOptionsSheet,
+                onClickOptions = {
+                    viewModel.trackFilterOptionsButtonTapped()
+                    openOptionsSheet()
+                },
             )
         }
     }

@@ -327,6 +327,7 @@ enum class AnalyticsEvent(val key: String) {
     FILTER_PLAY_ALL_REPLACE_AND_PLAY_TAPPED("filter_play_all_replace_and_play_tapped"),
     FILTER_PLAY_ALL_REPLACE_AND_PLAY_CONFIRM_TAPPED("filter_play_all_replace_and_play_confirm_tapped"),
     FILTER_PLAY_ALL_DISMISSED("filter_play_all_dismissed"),
+    FILTER_OPTIONS_BUTTON_TAPPED("filter_options_button_tapped"),
     FILTER_SELECT_EPISODES_TAPPED("filter_select_episodes_tapped"),
     FILTER_SORT_BY_TAPPED("filter_sort_by_tapped"),
     FILTER_DOWNLOAD_ALL_TAPPED("filter_download_all_tapped"),
