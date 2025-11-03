@@ -77,10 +77,10 @@ class PlaylistsViewModel @Inject constructor(
         playlistManager.refreshEpisodeCount(playlistUuid)
     }
 
-    fun deletePlaylist(uuid: String) {
+    fun deletePlaylist(playlist: PlaylistPreview) {
         viewModelScope.launch {
-            playlistManager.deletePlaylist(uuid)
-            trackPlaylistDeleted()
+            playlistManager.deletePlaylist(playlist.uuid)
+            trackPlaylistDeleted(playlist)
         }
     }
 
@@ -118,8 +118,25 @@ class PlaylistsViewModel @Inject constructor(
         analyticsTracker.track(AnalyticsEvent.FILTER_LIST_REORDERED)
     }
 
-    fun trackPlaylistDeleted() {
-        analyticsTracker.track(AnalyticsEvent.FILTER_DELETED)
+    fun trackPlaylistDeleteTriggered(playlist: PlaylistPreview) {
+        analyticsTracker.track(
+            AnalyticsEvent.FILTER_DELETE_TRIGGERED,
+            mapOf("filter_type" to playlist.type.analyticsValue),
+        )
+    }
+
+    fun trackPlaylistDeleteDismissed(playlist: PlaylistPreview) {
+        analyticsTracker.track(
+            AnalyticsEvent.FILTER_DELETE_DISMISSED,
+            mapOf("filter_type" to playlist.type.analyticsValue),
+        )
+    }
+
+    fun trackPlaylistDeleted(playlist: PlaylistPreview) {
+        analyticsTracker.track(
+            AnalyticsEvent.FILTER_DELETED,
+            mapOf("filter_type" to playlist.type.analyticsValue),
+        )
     }
 
     fun trackCreatePlaylistClicked() {

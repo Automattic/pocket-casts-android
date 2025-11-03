@@ -220,7 +220,10 @@ class PlaylistViewModel @AssistedInject constructor(
         viewModelScope.launch(NonCancellable) {
             delay(300) // Some small delay to navigate back to the main UI first.
             playlistManager.deletePlaylist(playlistUuid)
-            analyticsTracker.track(AnalyticsEvent.FILTER_DELETED)
+            analyticsTracker.track(
+                AnalyticsEvent.FILTER_DELETED,
+                mapOf("filter_type" to playlistType.analyticsValue),
+            )
         }
     }
 
@@ -237,6 +240,20 @@ class PlaylistViewModel @AssistedInject constructor(
         viewModelScope.launch {
             playlistManager.toggleShowArchived(playlistUuid)
         }
+    }
+
+    fun trackDeleteTriggered() {
+        analyticsTracker.track(
+            AnalyticsEvent.FILTER_DELETE_TRIGGERED,
+            mapOf("filter_type" to playlistType.analyticsValue),
+        )
+    }
+
+    fun trackDeleteDismissed() {
+        analyticsTracker.track(
+            AnalyticsEvent.FILTER_DELETE_DISMISSED,
+            mapOf("filter_type" to playlistType.analyticsValue),
+        )
     }
 
     fun trackFilterShown() {

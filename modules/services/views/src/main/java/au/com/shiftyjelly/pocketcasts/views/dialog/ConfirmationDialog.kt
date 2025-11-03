@@ -53,12 +53,13 @@ open class ConfirmationDialog : BottomSheetDialogFragment() {
 
     private var onConfirm: (() -> Unit)? = null
     private var onSecondary: (() -> Unit)? = null
-    private var onDismiss: (() -> Unit)? = null
+    private var onDismiss: ((Boolean) -> Unit)? = null
     private var forceDarkTheme: Boolean = false
     private var displayConfirmButtonFirst: Boolean = false
     private var removeSecondaryButtonBorder: Boolean = false
     private var summaryTextSize: Float? = null
     private var binding: FragmentConfirmationBinding? = null
+    private var isDismissedWithoutAction = true
 
     @Inject lateinit var theme: Theme
 
@@ -171,6 +172,7 @@ open class ConfirmationDialog : BottomSheetDialogFragment() {
         btnConfirm.text = buttonType.text
         btnConfirm.setOnClickListener {
             onConfirm?.invoke()
+            isDismissedWithoutAction = false
             dismiss()
         }
 
@@ -196,13 +198,14 @@ open class ConfirmationDialog : BottomSheetDialogFragment() {
         btnSecondary.text = secondaryType?.text
         btnSecondary.setOnClickListener {
             onSecondary?.invoke()
+            isDismissedWithoutAction = false
             dismiss()
         }
     }
 
     override fun onDismiss(dialog: DialogInterface) {
         super.onDismiss(dialog)
-        onDismiss?.invoke()
+        onDismiss?.invoke(isDismissedWithoutAction)
     }
 
     fun setTitle(title: String): ConfirmationDialog {
@@ -245,7 +248,7 @@ open class ConfirmationDialog : BottomSheetDialogFragment() {
         return this
     }
 
-    fun setOnDismiss(onDismiss: (() -> Unit)?): ConfirmationDialog {
+    fun setOnDismiss(onDismiss: ((isDismissedWithoutAction: Boolean) -> Unit)?): ConfirmationDialog {
         this.onDismiss = onDismiss
         return this
     }

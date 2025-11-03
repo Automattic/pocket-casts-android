@@ -296,6 +296,8 @@ enum class AnalyticsEvent(val key: String) {
     FILTER_CREATE_AS_MANUAL_PLAYLIST_TAPPED("filter_create_as_manual_playlist_tapped"),
     FILTER_CREATE_AS_SMART_PLAYLIST_TAPPED("filter_create_as_smart_playlist_tapped"),
     FILTER_CREATED("filter_created"),
+    FILTER_DELETE_TRIGGERED("filter_delete_triggered"),
+    FILTER_DELETE_DISMISSED("filter_delete_dismissed"),
     FILTER_DELETED("filter_deleted"),
     FILTER_EDIT_DISMISSED("filter_edit_dismissed"),
     FILTER_LIST_REORDERED("filter_list_reordered"),
