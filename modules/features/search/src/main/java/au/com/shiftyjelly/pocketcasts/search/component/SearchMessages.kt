@@ -37,6 +37,15 @@ fun NoResultsView() {
 }
 
 @Composable
+fun NoSuggestionsView() {
+    MessageView(
+        imageResId = R.drawable.search,
+        titleResId = LR.string.search_suggestions_no_results_title,
+        summaryResId = LR.string.search_suggestions_no_results_message,
+    )
+}
+
+@Composable
 fun SearchFailedView() {
     MessageView(
         imageResId = IR.drawable.search_failed,

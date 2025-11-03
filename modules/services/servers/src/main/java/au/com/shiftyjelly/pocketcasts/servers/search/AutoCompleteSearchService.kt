@@ -7,7 +7,7 @@ interface AutoCompleteSearchService {
     @GET("/autocomplete/search")
     suspend fun autoCompleteSearch(
         @Query("q") query: String,
-        @Query("termsLimit") termsLimit: Int,
-        @Query("podcastsLimit") podcastsLimit: Int,
+        @Query("termsLimit") termsLimit: Int?,
+        @Query("podcastsLimit") podcastsLimit: Int?,
     ): AutoCompleteResponse
 }

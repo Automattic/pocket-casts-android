@@ -27,6 +27,7 @@ import io.reactivex.rxkotlin.Observables
 import io.reactivex.schedulers.Schedulers
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
+import kotlin.collections.map
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
@@ -180,25 +181,7 @@ class SearchHandler @Inject constructor(
                 val localResults = if (onlyRemote) {
                     emptyList()
                 } else {
-                    subscribedPodcasts.map { folderItem ->
-                        when (folderItem) {
-                            is FolderItem.Podcast -> SearchAutoCompleteItem.Podcast(
-                                uuid = folderItem.uuid,
-                                author = folderItem.podcast.author,
-                                title = folderItem.title,
-                                isSubscribed = true,
-                            )
-
-                            is FolderItem.Folder -> SearchAutoCompleteItem.Folder(
-                                uuid = folderItem.uuid,
-                                title = folderItem.title,
-                                podcasts = folderItem.podcasts.map {
-                                    SearchAutoCompleteItem.Podcast(uuid = it.uuid, title = it.title, author = it.author, isSubscribed = true)
-                                },
-                                color = folderItem.folder.color,
-                            )
-                        }
-                    }
+                    subscribedPodcasts.toResults()
                 }
 
                 val suggestions = buildList {
@@ -211,8 +194,36 @@ class SearchHandler @Inject constructor(
                     results = suggestions,
                 )
             }
+            is SearchUiState.SearchOperation.Error -> {
+                if (onlyRemote || subscribedPodcasts.isEmpty()) {
+                    autoComplete
+                } else {
+                    val localResults = subscribedPodcasts.toResults()
+                    SearchUiState.SearchOperation.Success(searchTerm = autoComplete.searchTerm, results = localResults)
+                }
+            }
 
             else -> autoComplete
+        }
+    }
+
+    private fun List<FolderItem>.toResults() = map { folderItem ->
+        when (folderItem) {
+            is FolderItem.Podcast -> SearchAutoCompleteItem.Podcast(
+                uuid = folderItem.uuid,
+                author = folderItem.podcast.author,
+                title = folderItem.title,
+                isSubscribed = true,
+            )
+
+            is FolderItem.Folder -> SearchAutoCompleteItem.Folder(
+                uuid = folderItem.uuid,
+                title = folderItem.title,
+                podcasts = folderItem.podcasts.map {
+                    SearchAutoCompleteItem.Podcast(uuid = it.uuid, title = it.title, author = it.author, isSubscribed = true)
+                },
+                color = folderItem.folder.color,
+            )
         }
     }
 
@@ -349,11 +360,19 @@ class SearchHandler @Inject constructor(
                         if (localResults.isNotEmpty()) {
                             emit(SearchUiState.SearchOperation.Success(searchTerm = query, results = SearchResults.ImprovedResults(results = localResults, filter = ResultsFilters.TOP_RESULTS)))
                         }
-                        val apiResults = improvedSearchManager.combinedSearch(query).map {
-                            if (it is ImprovedSearchResultItem.PodcastItem) {
-                                it.copy(isFollowed = subscribedUuids.contains(it.uuid))
+                        val apiResults = try {
+                            improvedSearchManager.combinedSearch(query).map {
+                                if (it is ImprovedSearchResultItem.PodcastItem) {
+                                    it.copy(isFollowed = subscribedUuids.contains(it.uuid))
+                                } else {
+                                    it
+                                }
+                            }
+                        } catch (t: Throwable) {
+                            if (localResults.isEmpty()) {
+                                throw t
                             } else {
-                                it
+                                emptyList()
                             }
                         }
                         val combinedResults = (localResults + apiResults).distinctBy { it::class to it.uuid }
