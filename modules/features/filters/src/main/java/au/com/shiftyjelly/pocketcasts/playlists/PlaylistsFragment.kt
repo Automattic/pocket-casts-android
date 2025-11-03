@@ -64,7 +64,10 @@ class PlaylistsFragment :
                         CreatePlaylistFragment().show(childFragmentManager, "create_playlist")
                     }
                 },
-                onDeletePlaylist = ::openDeleteConfirmation,
+                onDeletePlaylist = { playlist, settleRow ->
+                    viewModel.trackPlaylistDeleteTriggered(playlist)
+                    openDeleteConfirmation(playlist, settleRow)
+                },
                 onOpenPlaylist = { playlist ->
                     val fragment = PlaylistFragment.newInstance(playlist.uuid, playlist.type)
                     (requireActivity() as FragmentHostListener).addFragment(fragment)
@@ -120,8 +123,13 @@ class PlaylistsFragment :
             .setSummary(getString(LR.string.delete_playlist_confirmation_body))
             .setIconId(IR.drawable.ic_warning)
             .setButtonType(ConfirmationDialog.ButtonType.Danger(getString(LR.string.delete)))
-            .setOnConfirm { viewModel.deletePlaylist(playlist.uuid) }
-            .setOnDismiss(settleRow)
+            .setOnConfirm { viewModel.deletePlaylist(playlist) }
+            .setOnDismiss { isDismissedWithoutAction ->
+                if (isDismissedWithoutAction) {
+                    viewModel.trackPlaylistDeleteDismissed(playlist)
+                    settleRow()
+                }
+            }
         dialog.show(parentFragmentManager, "delete_playlist_confirmation")
     }
 
