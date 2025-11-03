@@ -1,5 +1,8 @@
 7.102
 -----
+*   New Features
+    *   Add new intro story for playback
+        ([#4670](https://github.com/Automattic/pocket-casts-android/pull/4670))
 
 7.101
 -----

@@ -81,8 +81,8 @@ class SettingsImpl @Inject constructor(
     companion object {
         private const val DEVICE_ID_KEY = "DeviceIdKey"
         private const val SHOWN_BATTERY_WARNING_KEY = "ShownBetteryWarningKey"
-        private const val END_OF_YEAR_SHOW_BADGE_2023_KEY = "EndOfYearShowBadge2023Key"
-        private const val END_OF_YEAR_SHOW_MODAL_2023_KEY = "EndOfYearModalShowModal2023Key"
+        private const val END_OF_YEAR_SHOW_BADGE_2025_KEY = "EndOfYearShowBadge2025Key"
+        private const val END_OF_YEAR_SHOW_MODAL_2025_KEY = "EndOfYearModalShowModal2025Key"
         private const val DONE_INITIAL_ONBOARDING_KEY = "CompletedOnboardingKey"
         private const val PROCESSED_SIGNOUT_KEY = "ProcessedSignout"
     }
@@ -1325,17 +1325,17 @@ class SettingsImpl @Inject constructor(
         sharedPrefs = sharedPreferences,
     )
 
-    override fun setEndOfYearShowBadge2023(value: Boolean) {
-        setBoolean(END_OF_YEAR_SHOW_BADGE_2023_KEY, value)
+    override fun setEndOfYearShowBadge2025(value: Boolean) {
+        setBoolean(END_OF_YEAR_SHOW_BADGE_2025_KEY, value)
     }
 
-    override fun getEndOfYearShowBadge2023(): Boolean = getBoolean(END_OF_YEAR_SHOW_BADGE_2023_KEY, true)
+    override fun getEndOfYearShowBadge2025(): Boolean = getBoolean(END_OF_YEAR_SHOW_BADGE_2025_KEY, true)
 
     override fun setEndOfYearShowModal(value: Boolean) {
-        setBoolean(END_OF_YEAR_SHOW_MODAL_2023_KEY, value)
+        setBoolean(END_OF_YEAR_SHOW_MODAL_2025_KEY, value)
     }
 
-    override fun getEndOfYearShowModal(): Boolean = getBoolean(END_OF_YEAR_SHOW_MODAL_2023_KEY, true)
+    override fun getEndOfYearShowModal(): Boolean = getBoolean(END_OF_YEAR_SHOW_MODAL_2025_KEY, true)
 
     override fun hasCompletedOnboarding() = getBoolean(DONE_INITIAL_ONBOARDING_KEY, false)
 

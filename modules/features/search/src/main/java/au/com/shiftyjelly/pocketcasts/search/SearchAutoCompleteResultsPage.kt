@@ -37,7 +37,6 @@ import au.com.shiftyjelly.pocketcasts.search.component.ImprovedSearchEpisodeResu
 import au.com.shiftyjelly.pocketcasts.search.component.ImprovedSearchFolderResultRow
 import au.com.shiftyjelly.pocketcasts.search.component.ImprovedSearchPodcastResultRow
 import au.com.shiftyjelly.pocketcasts.search.component.ImprovedSearchTermSuggestionRow
-import au.com.shiftyjelly.pocketcasts.search.component.NoResultsView
 import au.com.shiftyjelly.pocketcasts.search.component.NoSuggestionsView
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.views.buttons.PlayButton
@@ -153,6 +152,24 @@ fun SearchAutoCompleteResultsPage(
                             maxLines = 1,
                         )
                     }
+                }
+            }
+
+            if (results.isNotEmpty()) {
+                item {
+                    TextP40(
+                        modifier = Modifier
+                            .semantics { role = Role.Button }
+                            .clickable(
+                                onClick = {
+                                    onTermClick(SearchAutoCompleteItem.Term(searchTerm))
+                                },
+                            )
+                            .padding(vertical = 8.dp, horizontal = 16.dp),
+                        text = stringResource(LR.string.search_suggestions_view_all, searchTerm),
+                        color = MaterialTheme.theme.colors.primaryInteractive01,
+                        maxLines = 1,
+                    )
                 }
             }
         }

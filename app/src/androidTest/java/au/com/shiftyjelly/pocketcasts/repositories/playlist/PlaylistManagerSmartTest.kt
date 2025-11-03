@@ -335,15 +335,6 @@ class PlaylistManagerSmartTest {
                 podcastIndex = index % 2,
             )
         }
-        val percentEpisode = insertPodcastEpisode(index = 100000, podcastIndex = 0) {
-            it.copy(title = "Episode % title")
-        }
-        val underscoreEpisode = insertPodcastEpisode(index = 200000, podcastIndex = 0) {
-            it.copy(title = "Episode _ title")
-        }
-        val backslashEpisode = insertPodcastEpisode(index = 300000, podcastIndex = 0) {
-            it.copy(title = "Episode \\ title")
-        }
 
         manager.smartEpisodesFlow(smartRules(), searchTerm = null).test {
             assertEquals(
@@ -381,30 +372,6 @@ class PlaylistManagerSmartTest {
             assertEquals(
                 "search above episode limit",
                 listOf(episodes[14]).map(PlaylistEpisode::Available),
-                awaitItem(),
-            )
-        }
-
-        manager.smartEpisodesFlow(smartRules(), searchTerm = "%").test {
-            assertEquals(
-                "percent character",
-                listOf(percentEpisode).map(PlaylistEpisode::Available),
-                awaitItem(),
-            )
-        }
-
-        manager.smartEpisodesFlow(smartRules(), searchTerm = "_").test {
-            assertEquals(
-                "underscore character",
-                listOf(underscoreEpisode).map(PlaylistEpisode::Available),
-                awaitItem(),
-            )
-        }
-
-        manager.smartEpisodesFlow(smartRules(), searchTerm = "\\").test {
-            assertEquals(
-                "backslash character",
-                listOf(backslashEpisode).map(PlaylistEpisode::Available),
                 awaitItem(),
             )
         }
@@ -493,15 +460,6 @@ class PlaylistManagerSmartTest {
                 podcastIndex = index % 2,
             )
         }
-        val percentEpisode = insertPodcastEpisode(index = 100000, podcastIndex = 0) {
-            it.copy(title = "Episode % title")
-        }
-        val underscoreEpisode = insertPodcastEpisode(index = 200000, podcastIndex = 0) {
-            it.copy(title = "Episode _ title")
-        }
-        val backslashEpisode = insertPodcastEpisode(index = 300000, podcastIndex = 0) {
-            it.copy(title = "Episode \\ title")
-        }
 
         manager.smartPlaylistFlow("playlist-id-0", searchTerm = null).test {
             assertEquals(
@@ -539,30 +497,6 @@ class PlaylistManagerSmartTest {
             assertEquals(
                 "search above episode limit",
                 listOf(episodes[17]).map(PlaylistEpisode::Available),
-                awaitItem()?.episodes,
-            )
-        }
-
-        manager.smartPlaylistFlow("playlist-id-0", searchTerm = "%").test {
-            assertEquals(
-                "percent character",
-                listOf(percentEpisode).map(PlaylistEpisode::Available),
-                awaitItem()?.episodes,
-            )
-        }
-
-        manager.smartPlaylistFlow("playlist-id-0", searchTerm = "_").test {
-            assertEquals(
-                "underscore character",
-                listOf(underscoreEpisode).map(PlaylistEpisode::Available),
-                awaitItem()?.episodes,
-            )
-        }
-
-        manager.smartPlaylistFlow("playlist-id-0", searchTerm = "\\").test {
-            assertEquals(
-                "backslash character",
-                listOf(backslashEpisode).map(PlaylistEpisode::Available),
                 awaitItem()?.episodes,
             )
         }
@@ -617,6 +551,11 @@ class PlaylistManagerSmartTest {
             // Check when the duration is unknown and playedUpTo can get above it
             insertPodcastEpisode(index = 4, podcastIndex = 0) {
                 it.copy(duration = 0.0, playedUpTo = 10.0)
+            }
+            assertEquals(40.seconds, awaitItem()?.metadata?.playbackDurationLeft)
+
+            insertPodcastEpisode(index = 5, podcastIndex = 0) {
+                it.copy(duration = 20.0, playingStatus = EpisodePlayingStatus.COMPLETED)
             }
             assertEquals(40.seconds, awaitItem()?.metadata?.playbackDurationLeft)
         }

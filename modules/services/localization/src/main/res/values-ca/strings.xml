@@ -463,7 +463,6 @@ Language: ca
     <string name="transcript_error_not_available">Aquest episodi no té transcripció disponible</string>
     <string name="referrals_banner_hide_label">Amaga aquest banner</string>
     <string name="referrals_banner_long_press_label">Amaga el banner de reclamació de la invitació.</string>
-    <string name="end_of_year_prompt_card_title">El repàs a 2024\nja és aquí!</string>
     <string name="settings_auto_download_limit_auto_downloads">Limitar les descàrregues automàtiques</string>
     <string name="settings_auto_download_limit_all_latest_episodes">Tots els últims episodis</string>
     <string name="settings_auto_download_limit_ten_latest_episode">10 darrers episodis</string>
@@ -1017,7 +1016,6 @@ Language: ca
     <string name="must_provide_filter_name">Introdueix un nom de la llista de reproducció</string>
     <string name="settings_app_icon_halloween">Halloween</string>
     <string name="end_of_year_launch_modal_summary">Consulta quins han estat els pòdcasts i les categories que més has escoltat, les estadístiques d\'escolta i molt més. Comparteix-ho amb els teus amics i fes que tothom sàpiga quins són els teus creadors favorits!</string>
-    <string name="end_of_year_launch_modal_primary_button_title">Veure el meu 2024</string>
     <string name="settings_show_played_summary">Els episodis que has acabat d\'escoltar es seguiran mostrant</string>
     <string name="settings_show_played">Mostrar els episodis reproduïts</string>
     <string name="profile_privacy_policy_read">Llegeix la política de privacitat</string>

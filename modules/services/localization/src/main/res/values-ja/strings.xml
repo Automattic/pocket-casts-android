@@ -460,7 +460,6 @@ Language: ja_JP
     <string name="transcript_error_not_available">申し訳ありません、このエピソードではトランスクリプトを利用できません。</string>
     <string name="referrals_banner_hide_label">このバナーを非表示</string>
     <string name="referrals_banner_long_press_label">リファラル取得パスのバナーを非表示にします。</string>
-    <string name="end_of_year_prompt_card_title">プレイバック2024\nはこちら !</string>
     <string name="settings_auto_download_limit_auto_downloads">自動ダウンロードを制限</string>
     <string name="settings_auto_download_limit_all_latest_episodes">すべての最新エピソード</string>
     <string name="settings_auto_download_limit_ten_latest_episode">10件の最新エピソード</string>
@@ -1014,7 +1013,6 @@ Language: ja_JP
     <string name="must_provide_filter_name">プレイリスト名を入力する必要があります</string>
     <string name="end_of_year_launch_modal_summary">人気のポッドキャスト、カテゴリー、視聴統計などを確認します。 友達と共有したり、お気に入りのクリエイターにエールを送ったりしましょう。</string>
     <string name="settings_app_icon_halloween">ハロウィーン</string>
-    <string name="end_of_year_launch_modal_primary_button_title">マイプレイバック2024を表示</string>
     <string name="settings_show_played_summary">プレイを終了したエピソードは、引き続き表示されます。</string>
     <string name="settings_show_played">「再生されたエピソードを表示」</string>
     <string name="settings_privacy_crash_link_summary">クラッシュレポートへの Pocket Casts アカウントのリンクを許可します。 </string>

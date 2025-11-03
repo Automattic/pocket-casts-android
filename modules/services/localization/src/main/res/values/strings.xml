@@ -2024,12 +2024,11 @@
 
     <!-- End of Year -->
 
-    <string name="end_of_year_launch_modal_summary">See your top podcasts, categories, listening stats and more. Share with friends and shout out your favorite creators!</string>
-    <!-- Playback 2024 is a proper noun and shouldn't be translated -->
-    <string name="end_of_year_launch_modal_primary_button_title">View My Playback&#160;2024</string>
-    <!-- Playback 2024 is a proper noun and shouldn't be translated -->
-    <string name="end_of_year_prompt_card_title">Playback 2024\nis here!</string>
-    <string name="end_of_year_prompt_card_summary">See your listening&#160;stats, top&#160;podcasts, and&#160;more.</string>
+    <string name="end_of_year_launch_modal_summary">See your top podcasts, categories, listening stats and more. Share with friends and shout out your favorite&#160;creators!</string>
+    <!-- Playback 2025 is a proper noun and shouldn't be translated -->
+    <string name="end_of_year_launch_modal_primary_button_title">View My Playback&#160;2025</string>
+    <string name="end_of_year_prompt_card_title">Playback is here!</string>
+    <string name="end_of_year_prompt_card_summary">See your listening&#160;stats,\ntop&#160;podcasts, and&#160;more.</string>
     <string name="end_of_year_share_via" translatable="false">@string/podcasts_share_via</string>
     <string name="end_of_year_replay">Play again</string>
     <string name="end_of_year_listening_time_title">This was your total time listening to podcasts</string>
@@ -2695,4 +2694,5 @@
     <string name="search_suggestions_view_all">View all for \"%1$s\"</string>
     <string name="search_suggestions_no_results_title">No Results</string>
     <string name="search_suggestions_no_results_message">Try a new search, or by adding a podcast feed URL</string>
+    <string name="eoy_playback_intro_title">Your year in podcasts,\nwrapped and ready to relive</string>
 </resources>

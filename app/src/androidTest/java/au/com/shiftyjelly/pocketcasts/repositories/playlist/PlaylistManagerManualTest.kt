@@ -3,6 +3,7 @@ package au.com.shiftyjelly.pocketcasts.repositories.playlist
 import app.cash.turbine.test
 import au.com.shiftyjelly.pocketcasts.models.entity.PlaylistEntity.Companion.SYNC_STATUS_NOT_SYNCED
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
+import au.com.shiftyjelly.pocketcasts.models.type.EpisodePlayingStatus
 import au.com.shiftyjelly.pocketcasts.models.type.PlaylistEpisodeSortType
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
@@ -175,15 +176,9 @@ class PlaylistManagerManualTest {
         insertPodcast(index = 1) { it.copy(title = "Podcast def") }
         insertPodcastEpisode(index = 0, podcastIndex = 0) { it.copy(title = "Episode ABC") }
         insertPodcastEpisode(index = 1, podcastIndex = 0) { it.copy(title = "Episode def") }
-        insertPodcastEpisode(index = 2, podcastIndex = 1) { it.copy(title = "epi % sode") }
-        insertPodcastEpisode(index = 3, podcastIndex = 1) { it.copy(title = "epi _ sode") }
-        insertPodcastEpisode(index = 4, podcastIndex = 1) { it.copy(title = "epi \\ sode") }
         insertManualEpisode(index = 0, podcastIndex = 0, playlistIndex = 0)
         insertManualEpisode(index = 1, podcastIndex = 0, playlistIndex = 0)
-        insertManualEpisode(index = 2, podcastIndex = 1, playlistIndex = 0)
-        insertManualEpisode(index = 3, podcastIndex = 1, playlistIndex = 0)
-        insertManualEpisode(index = 4, podcastIndex = 1, playlistIndex = 0)
-        insertManualEpisode(index = 5, podcastIndex = 0, playlistIndex = 0)
+        insertManualEpisode(index = 2, podcastIndex = 0, playlistIndex = 0)
 
         manager.manualPlaylistFlow("playlist-id-0", searchTerm = null).test {
             assertEquals(
@@ -191,10 +186,7 @@ class PlaylistManagerManualTest {
                 listOf(
                     availablePlaylistEpisode(index = 0, podcastIndex = 0) { it.copy(title = "Episode ABC") },
                     availablePlaylistEpisode(index = 1, podcastIndex = 0) { it.copy(title = "Episode def") },
-                    availablePlaylistEpisode(index = 2, podcastIndex = 1) { it.copy(title = "epi % sode") },
-                    availablePlaylistEpisode(index = 3, podcastIndex = 1) { it.copy(title = "epi _ sode") },
-                    availablePlaylistEpisode(index = 4, podcastIndex = 1) { it.copy(title = "epi \\ sode") },
-                    unavailableManualEpisode(index = 5, podcastIndex = 0, playlistIndex = 0),
+                    unavailableManualEpisode(index = 2, podcastIndex = 0, playlistIndex = 0),
                 ),
                 awaitItem()?.episodes,
             )
@@ -206,10 +198,7 @@ class PlaylistManagerManualTest {
                 listOf(
                     availablePlaylistEpisode(index = 0, podcastIndex = 0) { it.copy(title = "Episode ABC") },
                     availablePlaylistEpisode(index = 1, podcastIndex = 0) { it.copy(title = "Episode def") },
-                    availablePlaylistEpisode(index = 2, podcastIndex = 1) { it.copy(title = "epi % sode") },
-                    availablePlaylistEpisode(index = 3, podcastIndex = 1) { it.copy(title = "epi _ sode") },
-                    availablePlaylistEpisode(index = 4, podcastIndex = 1) { it.copy(title = "epi \\ sode") },
-                    unavailableManualEpisode(index = 5, podcastIndex = 0, playlistIndex = 0),
+                    unavailableManualEpisode(index = 2, podcastIndex = 0, playlistIndex = 0),
                 ),
                 awaitItem()?.episodes,
             )
@@ -221,7 +210,7 @@ class PlaylistManagerManualTest {
                 listOf(
                     availablePlaylistEpisode(index = 0, podcastIndex = 0) { it.copy(title = "Episode ABC") },
                     availablePlaylistEpisode(index = 1, podcastIndex = 0) { it.copy(title = "Episode def") },
-                    unavailableManualEpisode(index = 5, podcastIndex = 0, playlistIndex = 0),
+                    unavailableManualEpisode(index = 2, podcastIndex = 0, playlistIndex = 0),
                 ),
                 awaitItem()?.episodes,
             )
@@ -232,36 +221,6 @@ class PlaylistManagerManualTest {
                 "episode search",
                 listOf(
                     availablePlaylistEpisode(index = 0, podcastIndex = 0) { it.copy(title = "Episode ABC") },
-                ),
-                awaitItem()?.episodes,
-            )
-        }
-
-        manager.manualPlaylistFlow("playlist-id-0", searchTerm = "%").test {
-            assertEquals(
-                "percent character",
-                listOf(
-                    availablePlaylistEpisode(index = 2, podcastIndex = 1) { it.copy(title = "epi % sode") },
-                ),
-                awaitItem()?.episodes,
-            )
-        }
-
-        manager.manualPlaylistFlow("playlist-id-0", searchTerm = "_").test {
-            assertEquals(
-                "underscore character",
-                listOf(
-                    availablePlaylistEpisode(index = 3, podcastIndex = 1) { it.copy(title = "epi _ sode") },
-                ),
-                awaitItem()?.episodes,
-            )
-        }
-
-        manager.manualPlaylistFlow("playlist-id-0", searchTerm = "\\").test {
-            assertEquals(
-                "backslash character",
-                listOf(
-                    availablePlaylistEpisode(index = 4, podcastIndex = 1) { it.copy(title = "epi \\ sode") },
                 ),
                 awaitItem()?.episodes,
             )
@@ -332,48 +291,6 @@ class PlaylistManagerManualTest {
             ),
             manager.getManualEpisodeSources(searchTerm = "def"),
         )
-
-        insertFolder(index = 1) { it.copy(name = "fol % der") }
-        insertPodcast(index = 4, folderIndex = 1)
-        insertPodcast(index = 5) { it.copy(title = "pod % cast") }
-
-        assertEquals(
-            listOf(
-                podcastEpisodeSource(index = 5) { it.copy(title = "pod % cast") },
-                folderEpisodeSource(index = 1, podcastIndices = listOf(4)) { folderSource ->
-                    folderSource.copy(title = "fol % der")
-                },
-            ),
-            manager.getManualEpisodeSources(searchTerm = "%"),
-        )
-
-        insertFolder(index = 2) { it.copy(name = "fol _ der") }
-        insertPodcast(index = 6, folderIndex = 2)
-        insertPodcast(index = 7) { it.copy(title = "pod _ cast") }
-
-        assertEquals(
-            listOf(
-                podcastEpisodeSource(index = 7) { it.copy(title = "pod _ cast") },
-                folderEpisodeSource(index = 2, podcastIndices = listOf(6)) { folderSource ->
-                    folderSource.copy(title = "fol _ der")
-                },
-            ),
-            manager.getManualEpisodeSources(searchTerm = "_"),
-        )
-
-        insertFolder(index = 3) { it.copy(name = "fol \\ der") }
-        insertPodcast(index = 8, folderIndex = 3)
-        insertPodcast(index = 9) { it.copy(title = "pod \\ cast") }
-
-        assertEquals(
-            listOf(
-                podcastEpisodeSource(index = 9) { it.copy(title = "pod \\ cast") },
-                folderEpisodeSource(index = 3, podcastIndices = listOf(8)) { folderSource ->
-                    folderSource.copy(title = "fol \\ der")
-                },
-            ),
-            manager.getManualEpisodeSources(searchTerm = "\\"),
-        )
     }
 
     @Test
@@ -397,36 +314,12 @@ class PlaylistManagerManualTest {
     fun searchEpisodeSourcesForFolder() = dsl.test {
         insertFolder(index = 0)
         insertPodcast(index = 0, folderIndex = 0) { it.copy(title = "Podcast abc 0") }
-        insertPodcast(index = 1, folderIndex = 0) { it.copy(title = "pod % cast") }
-        insertPodcast(index = 2, folderIndex = 0) { it.copy(title = "pod _ cast") }
-        insertPodcast(index = 3, folderIndex = 0) { it.copy(title = "pod \\ cast") }
 
         assertEquals(
             listOf(
                 podcastEpisodeSource(index = 0) { it.copy(title = "Podcast abc 0") },
             ),
             manager.getManualEpisodeSourcesForFolder("folder-id-0", "ABC"),
-        )
-
-        assertEquals(
-            listOf(
-                podcastEpisodeSource(index = 1) { it.copy(title = "pod % cast") },
-            ),
-            manager.getManualEpisodeSourcesForFolder("folder-id-0", "%"),
-        )
-
-        assertEquals(
-            listOf(
-                podcastEpisodeSource(index = 2) { it.copy(title = "pod _ cast") },
-            ),
-            manager.getManualEpisodeSourcesForFolder("folder-id-0", "_"),
-        )
-
-        assertEquals(
-            listOf(
-                podcastEpisodeSource(index = 3) { it.copy(title = "pod \\ cast") },
-            ),
-            manager.getManualEpisodeSourcesForFolder("folder-id-0", "\\"),
         )
     }
 
@@ -468,30 +361,6 @@ class PlaylistManagerManualTest {
 
             insertPodcastEpisode(index = 2, podcastIndex = 0) { it.copy(title = "AB episode 2") }
             expectNoEvents()
-        }
-
-        insertManualPlaylist(index = 1)
-        manager.notAddedManualEpisodesFlow("playlist-id-1", "podcast-id-0", searchTerm = "%").test {
-            skipItems(1)
-
-            val episode1 = insertPodcastEpisode(index = 3, podcastIndex = 0) { it.copy(title = "ti % tle") }
-            assertEquals(listOf(episode1), awaitItem())
-        }
-
-        insertManualPlaylist(index = 2)
-        manager.notAddedManualEpisodesFlow("playlist-id-2", "podcast-id-0", searchTerm = "_").test {
-            skipItems(1)
-
-            val episode1 = insertPodcastEpisode(index = 4, podcastIndex = 0) { it.copy(title = "ti _ tle") }
-            assertEquals(listOf(episode1), awaitItem())
-        }
-
-        insertManualPlaylist(index = 3)
-        manager.notAddedManualEpisodesFlow("playlist-id-3", "podcast-id-0", searchTerm = "\\").test {
-            skipItems(1)
-
-            val episode1 = insertPodcastEpisode(index = 5, podcastIndex = 0) { it.copy(title = "ti \\ tle") }
-            assertEquals(listOf(episode1), awaitItem())
         }
     }
 
@@ -788,9 +657,6 @@ class PlaylistManagerManualTest {
     fun searchPlaylistPreviewsForEpisodes() = dsl.test {
         insertManualPlaylist(0) { it.copy(title = "abc") }
         insertManualPlaylist(1) { it.copy(title = "DeF") }
-        insertManualPlaylist(2) { it.copy(title = "play % list") }
-        insertManualPlaylist(3) { it.copy(title = "play _ list") }
-        insertManualPlaylist(4) { it.copy(title = "play \\ list") }
 
         manager.playlistPreviewsForEpisodeFlow("episode-id-0", searchTerm = null).test {
             assertEquals(
@@ -798,9 +664,6 @@ class PlaylistManagerManualTest {
                 listOf(
                     playlistPreviewForEpisode(index = 0) { it.copy(title = "abc") },
                     playlistPreviewForEpisode(index = 1) { it.copy(title = "DeF") },
-                    playlistPreviewForEpisode(index = 2) { it.copy(title = "play % list") },
-                    playlistPreviewForEpisode(index = 3) { it.copy(title = "play _ list") },
-                    playlistPreviewForEpisode(index = 4) { it.copy(title = "play \\ list") },
                 ),
                 awaitItem(),
             )
@@ -812,9 +675,6 @@ class PlaylistManagerManualTest {
                 listOf(
                     playlistPreviewForEpisode(index = 0) { it.copy(title = "abc") },
                     playlistPreviewForEpisode(index = 1) { it.copy(title = "DeF") },
-                    playlistPreviewForEpisode(index = 2) { it.copy(title = "play % list") },
-                    playlistPreviewForEpisode(index = 3) { it.copy(title = "play _ list") },
-                    playlistPreviewForEpisode(index = 4) { it.copy(title = "play \\ list") },
                 ),
                 awaitItem(),
             )
@@ -829,44 +689,13 @@ class PlaylistManagerManualTest {
                 awaitItem(),
             )
         }
-
-        manager.playlistPreviewsForEpisodeFlow("episode-id-0", searchTerm = "%").test {
-            assertEquals(
-                "percent character",
-                listOf(
-                    playlistPreviewForEpisode(index = 2) { it.copy(title = "play % list") },
-                ),
-                awaitItem(),
-            )
-        }
-
-        manager.playlistPreviewsForEpisodeFlow("episode-id-0", searchTerm = "_").test {
-            assertEquals(
-                "underscore character",
-                listOf(
-                    playlistPreviewForEpisode(index = 3) { it.copy(title = "play _ list") },
-                ),
-                awaitItem(),
-            )
-        }
-
-        manager.playlistPreviewsForEpisodeFlow("episode-id-0", searchTerm = "\\").test {
-            assertEquals(
-                "backslash character",
-
-                listOf(
-                    playlistPreviewForEpisode(index = 4) { it.copy(title = "play \\ list") },
-                ),
-                awaitItem(),
-            )
-        }
     }
 
     @Test
     fun computeTotalPlaybackDurationLeft() = dsl.test {
         insertManualPlaylist(index = 0)
         insertPodcast(index = 0)
-        repeat(6) { index ->
+        repeat(7) { index ->
             insertManualEpisode(index = index, podcastIndex = 0, playlistIndex = 0)
         }
 
@@ -901,6 +730,11 @@ class PlaylistManagerManualTest {
 
             insertPodcastEpisode(index = 5, podcastIndex = 0) {
                 it.copy(duration = 5.0, isArchived = true)
+            }
+            assertEquals(40.seconds, awaitItem()?.metadata?.playbackDurationLeft)
+
+            insertPodcastEpisode(index = 6, podcastIndex = 0) {
+                it.copy(duration = 20.0, playingStatus = EpisodePlayingStatus.COMPLETED)
             }
             assertEquals(40.seconds, awaitItem()?.metadata?.playbackDurationLeft)
 

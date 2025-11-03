@@ -7,7 +7,7 @@ class EpisodePlayingStatusConverter {
 
     @TypeConverter
     fun toEpisodePlayingStatus(value: Int?): EpisodePlayingStatus? {
-        return if (value == null) null else EpisodePlayingStatus.values()[value]
+        return if (value == null) null else EpisodePlayingStatus.entries[value]
     }
 
     @TypeConverter

@@ -8,6 +8,6 @@ interface EndOfYearManager {
     suspend fun getPlayedEpisodeCount(year: Year = YEAR_TO_SYNC): Int
 
     companion object {
-        val YEAR_TO_SYNC = Year.of(2024)
+        val YEAR_TO_SYNC = Year.of(2025)
     }
 }

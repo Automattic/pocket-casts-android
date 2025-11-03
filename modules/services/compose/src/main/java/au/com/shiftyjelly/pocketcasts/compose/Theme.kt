@@ -10,6 +10,9 @@ import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.ReadOnlyComposable
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.staticCompositionLocalOf
+import androidx.compose.ui.graphics.BlendMode
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.unit.sp
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 
@@ -92,12 +95,18 @@ fun AutomotiveTheme(content: @Composable () -> Unit) {
     }
 }
 
+private val radioactiveColorFilter = ColorFilter.tint(
+    color = Color.radioactiveGreen,
+    blendMode = BlendMode.Modulate,
+)
+
 data class PocketCastsTheme(
     val type: Theme.ThemeType,
     val colors: ThemeColors,
 ) {
     val isDark get() = type.darkTheme
     val isLight get() = !isDark
+    val imageColorFilter get() = if (type == Theme.ThemeType.RADIOACTIVE) radioactiveColorFilter else null
 
     @Composable
     fun rememberPlayerColors(): PlayerColors? {

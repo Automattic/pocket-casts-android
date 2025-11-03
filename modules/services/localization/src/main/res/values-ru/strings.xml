@@ -460,7 +460,6 @@ Language: ru
     <string name="transcript_error_not_available">К сожалению, в этом выпуске нет расшифровки.</string>
     <string name="referrals_banner_hide_label">Скрыть баннер</string>
     <string name="referrals_banner_long_press_label">Скрыть баннер с требованием ссылки на источник перехода.</string>
-    <string name="end_of_year_prompt_card_title">Playback 2024\nуже стартует!</string>
     <string name="settings_auto_download_limit_auto_downloads">Ограничить автоматические загрузки</string>
     <string name="settings_auto_download_limit_all_latest_episodes">Только последний выпуск</string>
     <string name="settings_auto_download_limit_ten_latest_episode">10 последних выпусков</string>
@@ -1014,7 +1013,6 @@ Language: ru
     <string name="must_provide_filter_name">Необходимо указать название списка воспроизведения</string>
     <string name="end_of_year_launch_modal_summary">Просмотрите свой топ подкастов и рубрик, статистику прослушивания и другие показатели. Поделитесь ими с друзьями и поблагодарите любимых подкастеров.</string>
     <string name="settings_app_icon_halloween">Хэллоуин</string>
-    <string name="end_of_year_launch_modal_primary_button_title">Просмотреть мой Playback 2024</string>
     <string name="settings_show_played_summary">Выпуски, которые вы уже прослушали, будут по-прежнему отображаться</string>
     <string name="settings_show_played">Показывать прослушанные выпуски</string>
     <string name="settings_privacy_crash_link_summary">Разрешите подключить вашу учётную запись Pocket Casts к отчётам о сбоях.</string>
