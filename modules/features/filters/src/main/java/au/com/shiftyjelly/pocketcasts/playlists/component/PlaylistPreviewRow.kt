@@ -19,10 +19,10 @@ import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.material.Icon
 import androidx.compose.material.LocalRippleConfiguration
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.RippleConfiguration
-import androidx.compose.material.Text
 import androidx.compose.material.ripple.RippleAlpha
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
@@ -42,14 +42,12 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.semantics
-import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.rememberTextMeasurer
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import au.com.shiftyjelly.pocketcasts.compose.AppThemeWithBackground
 import au.com.shiftyjelly.pocketcasts.compose.components.HorizontalDivider
 import au.com.shiftyjelly.pocketcasts.compose.components.PlaylistArtwork
@@ -118,11 +116,10 @@ internal fun PlaylistPreviewRow(
         val density = LocalDensity.current
         val windowWidth = LocalWindowInfo.current.containerSize.width
         val textMeasurer = rememberTextMeasurer()
-        val deleteText = stringResource(LR.string.delete)
-        val draggableAnchors = remember(windowWidth, deleteText, density, textMeasurer) {
-            val textMeasureResult = textMeasurer.measure(deleteText, style = TextStyle(fontSize = 15.sp))
-            val deleteTextPadding = density.run { 48.dp.toPx() }
-            val deleteActionWidth = textMeasureResult.size.width.toFloat() + deleteTextPadding
+        val draggableAnchors = remember(windowWidth, density, textMeasurer) {
+            val deleteIconSize = density.run { 24.dp.toPx() }
+            val deleteIconPadding = density.run { 48.dp.toPx() }
+            val deleteActionWidth = deleteIconSize + deleteIconPadding
             val componentWidth = windowWidth.toFloat()
 
             DraggableAnchors {
@@ -180,10 +177,10 @@ internal fun PlaylistPreviewRow(
                         }
                         .padding(horizontal = 24.dp),
                 ) {
-                    Text(
-                        text = deleteText,
-                        color = Color.White,
-                        fontSize = 15.sp,
+                    Icon(
+                        painter = painterResource(IR.drawable.ic_delete),
+                        tint = Color.White,
+                        contentDescription = stringResource(LR.string.delete_playlist),
                     )
                 }
             }
