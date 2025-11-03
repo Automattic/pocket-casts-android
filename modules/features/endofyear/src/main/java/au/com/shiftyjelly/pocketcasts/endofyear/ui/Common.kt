@@ -1,7 +1,5 @@
 package au.com.shiftyjelly.pocketcasts.endofyear.ui
 
-import android.R.attr.onClick
-import android.R.attr.text
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.WindowInsets
@@ -16,7 +14,6 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor
-import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
@@ -224,6 +221,7 @@ internal fun PreviewBox(
             progress = progress,
             measurements = measurements,
             onClose = {},
+            controller = StoryCaptureController.preview(),
         )
     }
 }

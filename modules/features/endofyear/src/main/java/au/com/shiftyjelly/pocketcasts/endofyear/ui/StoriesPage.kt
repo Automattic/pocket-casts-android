@@ -39,6 +39,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
@@ -126,6 +127,7 @@ internal fun StoriesPage(
             progress = state.storyProgress,
             measurements = measurements,
             onClose = onClose,
+            controller = controller,
         )
 
         // Use an invisible 'PLAYBACK' text to compute an appropriate font size.
@@ -261,14 +263,21 @@ internal fun BoxScope.TopControls(
     progress: Float,
     measurements: EndOfYearMeasurements,
     onClose: () -> Unit,
+    controller: StoryCaptureController,
 ) {
+    val density = LocalDensity.current
+    // Calculate the height so that we can remove it from the share images
+    val statusBarHeightPx = measurements.statusBarInsets.getTop(density)
+    val extraPaddingPx = with(density) { 24.dp.roundToPx() }
+
     Column(
         horizontalAlignment = Alignment.End,
         modifier = Modifier
             .align(Alignment.TopCenter)
             .fillMaxWidth()
             .windowInsetsPadding(measurements.statusBarInsets)
-            .padding(start = 16.dp, end = 16.dp),
+            .padding(start = 16.dp, end = 16.dp)
+            .onGloballyPositioned { controller.topControlsHeightPx = it.size.height + statusBarHeightPx - extraPaddingPx },
     ) {
         PagerProgressingIndicator(
             state = pagerState,

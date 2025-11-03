@@ -53,52 +53,68 @@ internal fun CompletionRateStory(
     onShareStory: (File) -> Unit,
 ) {
     Box(
-        modifier = Modifier
-            .capturable(controller.captureController(story))
-            .fillMaxSize()
-            .background(story.backgroundColor),
-
+        modifier = Modifier.fillMaxSize(),
     ) {
-        val animationId = when (story.completionRate) {
-            in 0f..0.3f -> R.raw.playback_completion_rate_20p_lottie
-            in 0.3f..0.5f -> R.raw.playback_completion_rate_40p_lottie
-            in 0.5f..0.7f -> R.raw.playback_completion_rate_60p_lottie
-            in 0.7f..0.75f -> R.raw.playback_completion_rate_80p_lottie
-            else -> R.raw.playback_completion_rate_100p_lottie
-        }
-
-        val composition by rememberLottieComposition(
-            spec = LottieCompositionSpec.RawRes(animationId),
-        )
-        LottieAnimation(
-            contentScale = ContentScale.Crop,
-            composition = composition,
-            modifier = Modifier
-                .align(Alignment.BottomCenter)
-                .fillMaxSize(),
-        )
-
-        CompletionRateInfo(
-            story = story,
-            modifier = Modifier
-                .padding(top = measurements.closeButtonBottomEdge + 24.dp),
-        )
-
         Box(
             modifier = Modifier
-                .align(Alignment.BottomCenter)
-                .fillMaxWidth()
-                .height(100.dp)
-                .background(
-                    brush = Brush.verticalGradient(
-                        colors = listOf(
-                            story.backgroundColor.copy(alpha = 0f),
-                            story.backgroundColor,
+                .capturable(controller.captureController(story))
+                .fillMaxSize()
+                .background(story.backgroundColor),
+
+        ) {
+            val animationId = when (story.completionRate) {
+                in 0f..0.3f -> R.raw.playback_completion_rate_20p_lottie
+                in 0.3f..0.5f -> R.raw.playback_completion_rate_40p_lottie
+                in 0.5f..0.7f -> R.raw.playback_completion_rate_60p_lottie
+                in 0.7f..0.75f -> R.raw.playback_completion_rate_80p_lottie
+                else -> R.raw.playback_completion_rate_100p_lottie
+            }
+
+            val composition by rememberLottieComposition(
+                spec = LottieCompositionSpec.RawRes(animationId),
+            )
+            if (controller.isSharing) {
+                LottieAnimation(
+                    contentScale = ContentScale.Crop,
+                    composition = composition,
+                    alignment = Alignment.BottomCenter,
+                    progress = { 1f },
+                    modifier = Modifier
+                        .align(Alignment.BottomCenter)
+                        .fillMaxWidth(),
+                )
+            } else {
+                LottieAnimation(
+                    contentScale = ContentScale.Crop,
+                    composition = composition,
+                    alignment = Alignment.BottomCenter,
+                    modifier = Modifier
+                        .align(Alignment.BottomCenter)
+                        .fillMaxWidth(),
+                )
+            }
+
+            CompletionRateInfo(
+                story = story,
+                modifier = Modifier
+                    .padding(top = measurements.closeButtonBottomEdge + 24.dp),
+            )
+
+            Box(
+                modifier = Modifier
+                    .align(Alignment.BottomCenter)
+                    .fillMaxWidth()
+                    .height(100.dp)
+                    .background(
+                        brush = Brush.verticalGradient(
+                            colors = listOf(
+                                story.backgroundColor.copy(alpha = 0f),
+                                story.backgroundColor,
+                            ),
                         ),
                     ),
-                ),
-        )
-
+            )
+        }
         ShareStoryButton(
             story = story,
             controller = controller,
