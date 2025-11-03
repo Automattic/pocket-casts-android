@@ -1,27 +1,17 @@
 package au.com.shiftyjelly.pocketcasts.endofyear.ui
 
-import androidx.compose.animation.core.Spring
-import androidx.compose.animation.core.animateFloat
-import androidx.compose.animation.core.animateIntOffset
-import androidx.compose.animation.core.spring
-import androidx.compose.animation.core.updateTransition
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.BoxWithConstraintsScope
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.requiredWidth
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -31,33 +21,31 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.ColorFilter
-import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.colorResource
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.rememberTextMeasurer
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.Dp
-import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import au.com.shiftyjelly.pocketcasts.compose.Devices
-import au.com.shiftyjelly.pocketcasts.compose.components.HorizontalDirection
-import au.com.shiftyjelly.pocketcasts.compose.components.ScrollingRow
 import au.com.shiftyjelly.pocketcasts.compose.components.TextH10
-import au.com.shiftyjelly.pocketcasts.compose.components.TextH20
 import au.com.shiftyjelly.pocketcasts.compose.components.TextP40
 import au.com.shiftyjelly.pocketcasts.compose.extensions.nonScaledSp
 import au.com.shiftyjelly.pocketcasts.endofyear.StoryCaptureController
 import au.com.shiftyjelly.pocketcasts.models.to.Rating
 import au.com.shiftyjelly.pocketcasts.models.to.RatingStats
 import au.com.shiftyjelly.pocketcasts.models.to.Story
+import com.airbnb.lottie.compose.LottieAnimation
+import com.airbnb.lottie.compose.LottieClipSpec
+import com.airbnb.lottie.compose.LottieCompositionSpec
+import com.airbnb.lottie.compose.rememberLottieAnimatable
+import com.airbnb.lottie.compose.rememberLottieComposition
 import dev.shreyaspatil.capturable.capturable
 import java.io.File
 import kotlinx.coroutines.delay
@@ -122,46 +110,47 @@ private fun PresentRatings(
             .capturable(controller.captureController(story))
             .fillMaxSize()
             .background(story.backgroundColor)
-            .padding(top = measurements.closeButtonBottomEdge + 100.dp),
+            .padding(top = measurements.closeButtonBottomEdge + 20.dp),
     ) {
+        TextH10(
+            text = when (val rating = story.stats.max().first) {
+                Rating.One, Rating.Two, Rating.Three -> stringResource(LR.string.eoy_story_ratings_title_2)
+                Rating.Four, Rating.Five -> stringResource(LR.string.eoy_story_ratings_title_1, rating.numericalValue)
+            },
+            fontScale = measurements.smallDeviceFactor,
+            disableAutoScale = true,
+            fontSize = 25.sp,
+            color = colorResource(UR.color.white),
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 24.dp),
+            textAlign = TextAlign.Center,
+        )
+        Spacer(
+            modifier = Modifier.height(16.dp),
+        )
+        TextP40(
+            text = when (val rating = story.stats.max().first) {
+                Rating.One, Rating.Two, Rating.Three -> stringResource(LR.string.eoy_story_ratings_subtitle_2)
+                Rating.Four, Rating.Five -> stringResource(LR.string.eoy_story_ratings_subtitle_1, rating.numericalValue)
+            },
+            disableAutoScale = true,
+            color = colorResource(UR.color.white),
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 24.dp),
+            textAlign = TextAlign.Center,
+        )
         BoxWithConstraints(
             contentAlignment = Alignment.BottomCenter,
             modifier = Modifier
                 .fillMaxWidth()
-                .weight(1f)
-                .padding(horizontal = 24.dp),
+                .weight(1f),
         ) {
             RatingBars(
                 stats = story.stats,
                 areBarsVisible = areBarsVisible,
                 forceBarsVisible = controller.isSharing,
-            )
-        }
-        Column(
-            modifier = Modifier.background(story.backgroundColor),
-        ) {
-            Spacer(
-                modifier = Modifier.height(32.dp),
-            )
-            TextH10(
-                text = stringResource(LR.string.eoy_story_ratings_title_1),
-                fontScale = measurements.smallDeviceFactor,
-                disableAutoScale = true,
-                color = colorResource(UR.color.coolgrey_90),
-                modifier = Modifier.padding(horizontal = 24.dp),
-            )
-            Spacer(
-                modifier = Modifier.height(16.dp),
-            )
-            TextP40(
-                text = when (val rating = story.stats.max().first) {
-                    Rating.One, Rating.Two, Rating.Three -> stringResource(LR.string.eoy_story_ratings_subtitle_2)
-                    Rating.Four, Rating.Five -> stringResource(LR.string.eoy_story_ratings_subtitle_1, rating.numericalValue)
-                },
-                fontSize = 15.sp,
-                disableAutoScale = true,
-                color = colorResource(UR.color.coolgrey_90),
-                modifier = Modifier.padding(horizontal = 24.dp),
             )
             ShareStoryButton(
                 story = story,
@@ -209,105 +198,55 @@ private fun BoxWithConstraintsScope.RatingBars(
         modifier = Modifier.fillMaxSize(),
     ) {
         Rating.entries.forEach { rating ->
-            RatingBar(
+            AnimatedRatingBar(
                 rating = rating.numericalValue,
-                lineCount = (maxLineCount * stats.relativeToMax(rating)).toInt().coerceAtLeast(1),
-                textHeight = ratingTextHeight,
-                isVisible = areVisible,
-                forceVisible = forceBarsVisible,
+                heightRange = ((stats.relativeToMax(rating).coerceAtMost(1f) * 100f) / 10).toInt()
             )
         }
     }
 }
 
 @Composable
-private fun RowScope.RatingBar(
+private fun RowScope.AnimatedRatingBar(
     rating: Int,
-    lineCount: Int,
-    textHeight: Dp,
-    isVisible: Boolean,
-    forceVisible: Boolean,
+    heightRange: Int,
 ) {
-    val density = LocalDensity.current
-    val linesHeight = SectionHeight * lineCount
-
-    val transition = updateTransition(
-        targetState = isVisible,
-        label = "bar-transition-$rating",
+    val composition by rememberLottieComposition(
+        spec = LottieCompositionSpec.RawRes(IR.raw.playback_story_ratings_lottie)
     )
 
-    val textOffset by transition.animateIntOffset(
-        label = "text-offset",
-        transitionSpec = {
-            spring(
-                dampingRatio = Spring.DampingRatioLowBouncy,
-                stiffness = 50f,
-                visibilityThreshold = IntOffset(1, 1),
-            )
-        },
-        targetValueByState = { state ->
-            when (state) {
-                true -> IntOffset.Zero
-                false -> IntOffset(0, density.run { textHeight.roundToPx() })
-            }
-        },
-    )
-    val textAlpha by transition.animateFloat(
-        label = "text-alpha",
-        transitionSpec = {
-            spring(
-                dampingRatio = Spring.DampingRatioLowBouncy,
-                stiffness = 50f,
-            )
-        },
-        targetValueByState = { state ->
-            when (state) {
-                true -> 1f
-                false -> 0f
-            }
-        },
-    )
-    val barOffset by transition.animateIntOffset(
-        label = "bar-offset",
-        transitionSpec = {
-            spring(
-                dampingRatio = Spring.DampingRatioLowBouncy,
-                stiffness = 50f,
-                visibilityThreshold = IntOffset(1, 1),
-            )
-        },
-        targetValueByState = { state ->
-            when (state) {
-                true -> IntOffset.Zero
-                false -> IntOffset(0, density.run { (linesHeight * 1.1f).roundToPx() })
-            }
-        },
-    )
+    val animatable = rememberLottieAnimatable()
 
-    Column(
-        horizontalAlignment = Alignment.CenterHorizontally,
-        modifier = Modifier.weight(1f),
-    ) {
-        TextH20(
-            text = "$rating",
-            disableAutoScale = true,
-            color = colorResource(UR.color.coolgrey_90),
-            modifier = Modifier
-                .offset { if (forceVisible) IntOffset.Zero else textOffset }
-                .padding(bottom = 8.dp)
-                .alpha(if (forceVisible) 1f else textAlpha),
-        )
-        repeat(lineCount) {
-            Box(
-                modifier = Modifier
-                    .offset { if (forceVisible) IntOffset.Zero else barOffset }
-                    .padding(top = SpaceHeight)
-                    .fillMaxWidth()
-                    .height(BarHeight)
-                    .background(Color.Black),
-            )
+    composition?.let { comp ->
+        val fromMarker = comp.markers.find { it.name == "marker_$rating Start" }
+        val toMarker = comp.markers.find { it.name == "marker_$rating End" }
+
+        if (fromMarker != null && toMarker != null) {
+            LaunchedEffect(fromMarker, toMarker) {
+                animatable.animate(
+                    composition = comp,
+                    clipSpec = LottieClipSpec.Markers(
+                        min = fromMarker.name,
+                        max = toMarker.name,
+                        maxInclusive = true,
+                    ),
+                )
+            }
+        } else {
+            LaunchedEffect("") {
+                animatable.animate(composition)
+            }
         }
     }
+
+    LottieAnimation(
+        modifier = Modifier
+            .weight(1f),
+        composition = composition,
+        progress = { animatable.progress },
+        contentScale = ContentScale.FillBounds,
+    )
+
 }
 
 @Composable
@@ -320,70 +259,13 @@ private fun AbsentRatings(
         modifier = Modifier
             .fillMaxSize()
             .background(story.backgroundColor)
-            .padding(top = measurements.closeButtonBottomEdge),
+            .padding(top = measurements.closeButtonBottomEdge + 20.dp),
     ) {
-        OopsiesSection(
-            measurements = measurements,
-        )
         NoRatingsInfo(
             story = story,
             measurements = measurements,
             onLearnAboutRatings = onLearnAboutRatings,
         )
-    }
-}
-
-@Composable
-private fun ColumnScope.OopsiesSection(
-    measurements: EndOfYearMeasurements,
-) {
-    val textFactory = rememberHumaneTextFactory(
-        fontSize = 227.nonScaledSp * measurements.smallDeviceFactor,
-    )
-
-    Column(
-        verticalArrangement = Arrangement.Center,
-        modifier = Modifier
-            .weight(1f)
-            .requiredWidth(measurements.width * 1.5f),
-    ) {
-        OopsiesText(
-            scrollDirection = HorizontalDirection.Left,
-            textFactory = textFactory,
-        )
-        Spacer(
-            modifier = Modifier.height(12.dp * measurements.smallDeviceFactor),
-        )
-        OopsiesText(
-            scrollDirection = HorizontalDirection.Right,
-            textFactory = textFactory,
-        )
-    }
-}
-
-@Composable
-private fun OopsiesText(
-    scrollDirection: HorizontalDirection,
-    textFactory: HumaneTextFactory,
-) {
-    ScrollingRow(
-        items = listOf("OOOOPSIES"),
-        scrollDirection = scrollDirection,
-    ) { text ->
-        Row(
-            verticalAlignment = Alignment.CenterVertically,
-        ) {
-            textFactory.HumaneText(text)
-            Spacer(
-                modifier = Modifier.height(12.dp),
-            )
-            Image(
-                painter = painterResource(IR.drawable.eoy_star_text_stop),
-                contentDescription = null,
-                colorFilter = ColorFilter.tint(colorResource(UR.color.coolgrey_90)),
-                modifier = Modifier.padding(horizontal = 8.dp),
-            )
-        }
     }
 }
 
@@ -405,25 +287,48 @@ private fun NoRatingsInfo(
             modifier = Modifier.height(16.dp),
         )
         TextH10(
-            text = stringResource(LR.string.eoy_story_ratings_title_2),
+            text = stringResource(LR.string.eoy_story_ratings_title_no_ratings),
             fontScale = measurements.smallDeviceFactor,
             disableAutoScale = true,
-            color = colorResource(UR.color.coolgrey_90),
-            modifier = Modifier.padding(horizontal = 24.dp),
+            fontSize = 25.sp,
+            color = colorResource(UR.color.white),
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 24.dp),
+            textAlign = TextAlign.Center,
         )
         Spacer(
             modifier = Modifier.height(16.dp),
         )
         TextP40(
-            text = stringResource(LR.string.eoy_story_ratings_subtitle_3),
-            fontSize = 15.sp,
+            text = stringResource(LR.string.eoy_story_ratings_subtitle_no_ratings),
             disableAutoScale = true,
-            color = colorResource(UR.color.coolgrey_90),
-            modifier = Modifier.padding(horizontal = 24.dp),
+            color = colorResource(UR.color.white),
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 24.dp),
+            textAlign = TextAlign.Center,
         )
-        OutlinedEoyButton(
+        BoxWithConstraints(
+            contentAlignment = Alignment.BottomCenter,
+            modifier = Modifier
+                .fillMaxWidth()
+                .weight(1f),
+        ) {
+            RatingBars(
+                stats = story.stats,
+                areBarsVisible = true,
+                forceBarsVisible = false,
+            )
+        }
+        Spacer(
+            modifier = Modifier.height(16.dp),
+        )
+        SolidEoyButton(
             text = stringResource(LR.string.eoy_story_ratings_learn_button_label),
             onClick = onLearnAboutRatings,
+            backgroundColor = colorResource(UR.color.white),
+            textColor = colorResource(UR.color.black)
         )
     }
 }

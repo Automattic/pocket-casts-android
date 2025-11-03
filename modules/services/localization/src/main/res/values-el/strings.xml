@@ -279,12 +279,7 @@ Language: el_GR
     <string name="end_of_year_stories_year_over_year_title_went_up_a_lot">Σε σύγκριση με το %1$s, ο χρόνος ακρόασης σου αυξήθηκε κατά περισσότερο από 500%%</string>
     <string name="end_of_year_story_longest_episode_subtitle">Ήταν το «%1$s» από το «%2$s»</string>
     <string name="end_of_year_listening_time_subtitle">συνολική ακρόαση podcasts</string>
-    <string name="eoy_story_ratings_subtitle_2">Ευχαριστούμε που μοιράστηκες το σχόλιο σου με την κοινότητα των δημιουργών</string>
     <string name="eoy_story_ratings_learn_button_label">Μάθε για τις βαθμολογίες</string>
-    <string name="eoy_story_ratings_subtitle_3">Ήξερες ότι μπορείς να βαθμολογήσεις τις εκπομπές τώρα; Μοιράσου την αγάπη για τους αγαπημένους σου δημιουργούς και βοήθησέ τους να γίνουν γνωστοί!</string>
-    <string name="eoy_story_ratings_title_2">Ωχ-ωχ! Δεν υπάρχουν ακόμα βαθμολογίες podcast για να σου δείξουμε</string>
-    <string name="eoy_story_ratings_title_1">Ας δούμε τις βαθμολογίες σου!</string>
-    <string name="eoy_story_ratings_subtitle_1">Ουάου, τόσες πολλές αξιολογήσεις με %1$d αστέρια! Σε ευχαριστούμε που μοιράστηκες την αγάπη σου με τους αγαπημένους σου δημιουργούς!</string>
     <string name="transcript_error_not_available">Λυπούμαστε, αλλά αυτό το επεισόδιο δεν έχει διαθέσιμη μεταγραφή.</string>
     <string name="referrals_failed_to_load_offer">Λυπούμαστε, αλλά κάτι πήγε στραβά κατά την ανάκτηση του συνδέσμου παραπομπής σου.</string>
     <string name="referrals_banner_hide_label">Απόκρυψη αυτής της κεφαλίδας</string>

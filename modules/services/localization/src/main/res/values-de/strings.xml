@@ -464,11 +464,6 @@ Language: de
     <string name="end_of_year_listening_time_subtitle">gehörte Podcasts gesamt</string>
     <string name="end_of_year_story_longest_episode_subtitle">Das war „%1$s“ aus „%2$s“</string>
     <string name="eoy_story_ratings_learn_button_label">Mehr über Bewertungen</string>
-    <string name="eoy_story_ratings_subtitle_1">Wow, so viele %1$d-Sterne-Bewertungen! Vielen Dank, dass du deine Lieblingsersteller unterstützt!</string>
-    <string name="eoy_story_ratings_title_2">Tut uns leid! Hier gibt es noch keine Podcast-Bewertungen</string>
-    <string name="eoy_story_ratings_title_1">Sehen wir uns deine Bewertungen an!</string>
-    <string name="eoy_story_ratings_subtitle_3">Wusstest du schon, dass du Shows jetzt auch bewerten kannst? Erzähle anderen von deinen Lieblingserstellern und hilf dabei, diese noch bekannter zu machen!</string>
-    <string name="eoy_story_ratings_subtitle_2">Vielen Dank, dass du dein Feedback mit unserer Ersteller-Community geteilt hast</string>
     <string name="referrals_failed_to_load_offer">Entschuldigung! Beim Abrufen des Referral-Links ist ein Fehler aufgetreten.</string>
     <string name="transcript_error_not_available">Entschuldigung! Für diese Folge ist kein Transkript verfügbar.</string>
     <string name="referrals_banner_hide_label">Dieses Banner ausblenden</string>

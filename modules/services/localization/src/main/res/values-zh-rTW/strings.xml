@@ -464,11 +464,6 @@ Language: zh_TW
     <string name="end_of_year_story_longest_episode_subtitle">這是出自「%2$s」的「%1$s」</string>
     <string name="end_of_year_listening_time_subtitle">收聽 Podcast 的總時間</string>
     <string name="eoy_story_ratings_learn_button_label">了解評分</string>
-    <string name="eoy_story_ratings_subtitle_2">謝謝你與創作者社群分享意見回饋</string>
-    <string name="eoy_story_ratings_title_1">讓我們看看你的評分！</string>
-    <string name="eoy_story_ratings_subtitle_3">你知道現在可以為節目評分嗎？ 分享你對最愛創作者的支持心意，並協助他們獲得矚目！</string>
-    <string name="eoy_story_ratings_subtitle_1">哇！好多 %1$d 星級評分！ 謝謝你與最愛創作者分享支持心意！</string>
-    <string name="eoy_story_ratings_title_2">糟糕！ 目前沒有可顯示的 Podcast 評分</string>
     <string name="referrals_failed_to_load_offer">不好意思，擷取推薦連結時發生錯誤。</string>
     <string name="transcript_error_not_available">不好意思，此單集不提供逐字稿。</string>
     <string name="referrals_banner_hide_label">隱藏此橫幅</string>

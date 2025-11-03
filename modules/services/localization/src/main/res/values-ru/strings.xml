@@ -464,11 +464,6 @@ Language: ru
     <string name="end_of_year_story_longest_episode_subtitle">Это был выпуск «%1$s» из «%2$s»</string>
     <string name="end_of_year_listening_time_subtitle">общее время прослушивания подкастов</string>
     <string name="eoy_story_ratings_learn_button_label">Подробнее об оценках</string>
-    <string name="eoy_story_ratings_subtitle_3">Знаете ли вы, что теперь можно оценивать шоу? Выразите признательность своим любимым авторам и помогите им стать популярнее!</string>
-    <string name="eoy_story_ratings_subtitle_2">Благодарим за то, что поделились своим мнением с сообществом авторов</string>
-    <string name="eoy_story_ratings_subtitle_1">Ого, сколько %1$d-звёздных оценок! Благодарим за то, что вы выразили признательность своим любимым авторам!</string>
-    <string name="eoy_story_ratings_title_2">Ой! Оценок подкастов ещё нет</string>
-    <string name="eoy_story_ratings_title_1">Давайте посмотрим ваши оценки!</string>
     <string name="referrals_failed_to_load_offer">К сожалению, при получении ссылки на источник перехода возникла проблема.</string>
     <string name="transcript_error_not_available">К сожалению, в этом выпуске нет расшифровки.</string>
     <string name="referrals_banner_hide_label">Скрыть баннер</string>
