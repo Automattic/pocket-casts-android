@@ -85,7 +85,7 @@ internal fun PlaylistPreviewRow(
     onDismissTooltip: (PlaylistTooltip) -> Unit,
     showDivider: Boolean,
     onClick: () -> Unit,
-    onDelete: () -> Unit,
+    onDelete: (AnchoredDraggableState<SwipeToDeleteAnchor>) -> Unit,
     modifier: Modifier = Modifier,
     backgroundColor: Color = MaterialTheme.theme.colors.primaryUi01,
 ) {
@@ -137,7 +137,7 @@ internal fun PlaylistPreviewRow(
             snapshotFlow { draggableState.settledValue }.collectLatest { deleteAnchor ->
                 when (deleteAnchor) {
                     SwipeToDeleteAnchor.ShowDelete -> Unit
-                    SwipeToDeleteAnchor.Delete -> onDelete()
+                    SwipeToDeleteAnchor.Delete -> onDelete(draggableState)
                     SwipeToDeleteAnchor.Resting -> Unit
                 }
             }
@@ -153,7 +153,7 @@ internal fun PlaylistPreviewRow(
                     .fillMaxHeight()
                     .clickable(
                         role = Role.Button,
-                        onClick = onDelete,
+                        onClick = { onDelete(draggableState) },
                         enabled = draggableState.currentValue != SwipeToDeleteAnchor.Delete,
                     ),
             ) {
@@ -287,7 +287,7 @@ internal enum class PlaylistTooltip {
     Rearrange,
 }
 
-private enum class SwipeToDeleteAnchor {
+internal enum class SwipeToDeleteAnchor {
     Resting,
     ShowDelete,
     Delete,

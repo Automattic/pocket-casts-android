@@ -11,6 +11,8 @@ import androidx.compose.animation.shrinkVertically
 import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.gestures.AnchoredDraggableState
+import androidx.compose.foundation.gestures.animateTo
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
@@ -34,6 +36,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
@@ -60,6 +63,7 @@ import au.com.shiftyjelly.pocketcasts.playlists.PlaylistsViewModel.PlaylistsStat
 import au.com.shiftyjelly.pocketcasts.playlists.PlaylistsViewModel.UiState
 import au.com.shiftyjelly.pocketcasts.playlists.component.PlaylistPreviewRow
 import au.com.shiftyjelly.pocketcasts.playlists.component.PlaylistTooltip
+import au.com.shiftyjelly.pocketcasts.playlists.component.SwipeToDeleteAnchor
 import au.com.shiftyjelly.pocketcasts.repositories.playlist.ManualPlaylistPreview
 import au.com.shiftyjelly.pocketcasts.repositories.playlist.Playlist
 import au.com.shiftyjelly.pocketcasts.repositories.playlist.PlaylistPreview
@@ -67,6 +71,7 @@ import au.com.shiftyjelly.pocketcasts.repositories.playlist.SmartPlaylistPreview
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme.ThemeType
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.launch
 import sh.calvin.reorderable.ReorderableItem
 import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
@@ -79,7 +84,7 @@ internal fun PlaylistsPage(
     refreshArtworkUuids: suspend (String) -> Unit,
     refreshEpisodeCount: suspend (String) -> Unit,
     onCreatePlaylist: () -> Unit,
-    onDeletePlaylist: (PlaylistPreview) -> Unit,
+    onDeletePlaylist: (PlaylistPreview, settleRow: () -> Unit) -> Unit,
     onOpenPlaylist: (PlaylistPreview) -> Unit,
     onReorderPlaylists: (List<String>) -> Unit,
     onShowPlaylists: (List<PlaylistPreview>) -> Unit,
@@ -161,12 +166,14 @@ private fun PlaylistsContent(
     listState: LazyListState,
     contentPadding: PaddingValues,
     onCreatePlaylist: () -> Unit,
-    onDeletePlaylist: (PlaylistPreview) -> Unit,
+    onDeletePlaylist: (PlaylistPreview, settleRow: () -> Unit) -> Unit,
     onOpenPlaylist: (PlaylistPreview) -> Unit,
     onReorderPlaylists: (List<String>) -> Unit,
     onShowPlaylists: (List<PlaylistPreview>) -> Unit,
     modifier: Modifier = Modifier,
 ) {
+    val scope = rememberCoroutineScope()
+
     AnimatedContent(
         targetState = playlistsState,
         transitionSpec = { ContentTransitionSpec },
@@ -192,7 +199,11 @@ private fun PlaylistsContent(
                         onDismissTooltip = onDismissTooltip,
                         listState = listState,
                         contentPadding = contentPadding,
-                        onDelete = onDeletePlaylist,
+                        onDelete = { preview, draggableState ->
+                            onDeletePlaylist(preview) {
+                                scope.launch { draggableState.animateTo(SwipeToDeleteAnchor.Resting) }
+                            }
+                        },
                         onOpen = onOpenPlaylist,
                         onReorderPlaylists = onReorderPlaylists,
                         modifier = Modifier.fillMaxSize(),
@@ -226,7 +237,7 @@ private fun PlaylistsColumn(
     onDismissTooltip: (PlaylistTooltip) -> Unit,
     listState: LazyListState,
     contentPadding: PaddingValues,
-    onDelete: (PlaylistPreview) -> Unit,
+    onDelete: (PlaylistPreview, AnchoredDraggableState<SwipeToDeleteAnchor>) -> Unit,
     onOpen: (PlaylistPreview) -> Unit,
     onReorderPlaylists: (List<String>) -> Unit,
     modifier: Modifier = Modifier,
@@ -276,7 +287,7 @@ private fun PlaylistsColumn(
                     onDismissTooltip = onDismissTooltip,
                     showDivider = index != displayItems.lastIndex,
                     backgroundColor = backgroundColor,
-                    onDelete = { onDelete(playlist) },
+                    onDelete = { anchor -> onDelete(playlist, anchor) },
                     onClick = { onOpen(playlist) },
                     modifier = Modifier
                         .longPressDraggableHandle(
@@ -404,7 +415,7 @@ private fun PlaylistsPageEmptyStatePreview() {
             refreshArtworkUuids = {},
             refreshEpisodeCount = {},
             onCreatePlaylist = {},
-            onDeletePlaylist = {},
+            onDeletePlaylist = { _, _ -> },
             onOpenPlaylist = {},
             onReorderPlaylists = {},
             onShowPlaylists = {},
@@ -433,7 +444,7 @@ private fun PlaylistsPageEmptyStateNoBannerPreview() {
             refreshArtworkUuids = {},
             refreshEpisodeCount = {},
             onCreatePlaylist = {},
-            onDeletePlaylist = {},
+            onDeletePlaylist = { _, _ -> },
             onOpenPlaylist = {},
             onReorderPlaylists = {},
             onShowPlaylists = {},
@@ -480,7 +491,7 @@ private fun PlaylistPagePreview(
             refreshArtworkUuids = {},
             refreshEpisodeCount = {},
             onCreatePlaylist = {},
-            onDeletePlaylist = {},
+            onDeletePlaylist = { _, _ -> },
             onOpenPlaylist = {},
             onReorderPlaylists = {},
             onShowPlaylists = {},
