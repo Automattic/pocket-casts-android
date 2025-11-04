@@ -1,6 +1,7 @@
 package au.com.shiftyjelly.pocketcasts.endofyear.ui
 
 import androidx.compose.animation.core.FastOutLinearInEasing
+import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.animation.core.animateDp
 import androidx.compose.animation.core.animateFloat
 import androidx.compose.animation.core.tween
@@ -76,7 +77,7 @@ internal fun EndingStory(
             modifier = Modifier.height(16.dp),
         )
         TextH10(
-            text = stringResource(LR.string.end_of_year_story_epilogue_title, 2025),
+            text = stringResource(LR.string.end_of_year_story_epilogue_title),
             fontScale = measurements.smallDeviceFactor,
             disableAutoScale = true,
             fontSize = 25.sp,
@@ -161,7 +162,7 @@ private fun animateItem(start: Boolean, label: String): ItemAnimation {
     val transition = updateTransition(start, label)
     val alpha by transition.animateFloat(
         transitionSpec = {
-            tween(easing = FastOutLinearInEasing)
+            tween(durationMillis = 400, easing = FastOutLinearInEasing)
         },
     ) {
         if (it) {
@@ -172,7 +173,7 @@ private fun animateItem(start: Boolean, label: String): ItemAnimation {
     }
     val offset by transition.animateDp(
         transitionSpec = {
-            tween()
+            tween(durationMillis = 400, easing = FastOutSlowInEasing)
         },
     ) {
         if (it) {

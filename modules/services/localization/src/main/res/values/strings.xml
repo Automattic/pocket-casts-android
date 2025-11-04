@@ -2075,7 +2075,7 @@
     <!-- Text that appear when someone share the longest episode they listened to story to Twitter. %1$d is the year and %2$s is the URL to the episode. -->
     <string name="end_of_year_story_longest_episode_share_text">The longest episode I listened to in %1$d %2$s</string>
     <!-- Title for the epilogue story. %1$d is the yer. -->
-    <string name="end_of_year_story_epilogue_title">Thanks for spending your year with Pocket\u00A0Cats</string>
+    <string name="end_of_year_story_epilogue_title">Thanks for spending your year with Pocket\u00A0Casts</string>
     <!-- Subtitle for the epilogue story -->
     <string name="end_of_year_story_epilogue_subtitle">Share your Playback with friends and show some love to the podcasters who kept you company all year</string>
     <!-- Title of the top categories story. -->
