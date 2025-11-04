@@ -344,7 +344,7 @@ class PlaylistFragment :
                     Box(
                         modifier = Modifier
                             .fillMaxSize()
-                            .background(MaterialTheme.theme.colors.primaryUi02)
+                            .background(MaterialTheme.theme.colors.primaryUi02),
                     )
                 }
                 transition.AnimatedVisibility(
