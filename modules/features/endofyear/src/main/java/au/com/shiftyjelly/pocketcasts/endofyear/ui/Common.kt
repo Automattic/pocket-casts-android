@@ -52,7 +52,7 @@ internal val Story.backgroundColor
     get() = when (this) {
         is Story.Cover -> Color(0xFF27486A)
         is Story.NumberOfShows -> Color(0xFFEFECAD)
-        is Story.TopShow -> Color(0xFFEDB0F3)
+        is Story.TopShow -> Color(0xFF17423B)
         is Story.TopShows -> Color(0xFFE0EFAD)
         is Story.Ratings -> Color(0xFFEFECAD)
         is Story.TotalTime -> Color(0xFFEDB0F3)

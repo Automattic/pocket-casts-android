@@ -416,7 +416,6 @@ Language: ar
     <string name="icons_plus_prompt">الحصول على أيقونات تطبيق حصرية من خلال Pocket Casts Plus، والمزيد</string>
     <string name="themes_plus_prompt">الحصول على قوالب حصرية من خلال Pocket Casts Plus، والمزيد</string>
     <string name="folders_plus_prompt">تنظيم حلقات البث الصوتي الخاصة بك باستخدام Pocket Casts Plus والمزيد</string>
-    <string name="end_of_year_story_top_podcast_title">كان هذا أفضل بث صوتي لديك في ⁦%1$d⁩</string>
     <string name="drag_down_to_dismiss_content_description">السحب إلى الأسفل للتجاهل</string>
     <string name="maybe_later">ربما لاحقًا</string>
     <string name="need_to_free_up_space">هل تحتاج إلى توفير مساحة؟</string>

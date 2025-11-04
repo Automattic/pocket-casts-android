@@ -416,7 +416,6 @@ Language: ru
     <string name="icons_plus_prompt">Получайте эксклюзивные значки приложений с Pocket Casts Plus и многое другое</string>
     <string name="themes_plus_prompt">Получайте эксклюзивные темы с Pocket Casts Plus и многое другое</string>
     <string name="folders_plus_prompt">Упорядочивайте ваши подкасты с Pocket Casts Plus и многое другое</string>
-    <string name="end_of_year_story_top_podcast_title">Это был ваш лучший подкаст в %1$d году</string>
     <string name="drag_down_to_dismiss_content_description">Перетащите вниз, чтобы закрыть</string>
     <string name="maybe_later">Возможно, позже</string>
     <string name="need_to_free_up_space">Необходимо освободить место?</string>

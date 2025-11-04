@@ -247,7 +247,6 @@ Language: el_GR
     <string name="icons_plus_prompt">Απόκτησε αποκλειστικά εικονίδια εφαρμογής με το Pocket Casts Plus και άλλα</string>
     <string name="themes_plus_prompt">Απόκτησε αποκλειστικά θέματα με το Pocket Casts Plus και άλλα</string>
     <string name="folders_plus_prompt">Οργάνωσε τα podcast σου με το Pocket Casts Plus και άλλα</string>
-    <string name="end_of_year_story_top_podcast_title">Αυτό ήταν το κορυφαίο σου podcast το %1$d</string>
     <string name="drag_down_to_dismiss_content_description">Σύρε προς τα κάτω για απόρριψη</string>
     <string name="need_to_free_up_space">Χρειάζεσαι να ελευθερώσεις χώρο;</string>
     <string name="maybe_later">Ίσως αργότερα</string>

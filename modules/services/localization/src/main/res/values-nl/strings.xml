@@ -415,7 +415,6 @@ Language: nl
     <string name="icons_plus_prompt">Krijg exclusief toegang tot app-iconen met Pocket Casts Plus, en meer</string>
     <string name="themes_plus_prompt">Krijg exclusief toegang tot themas met Pocket Casts Plus, en meer</string>
     <string name="folders_plus_prompt">Organiseer je podcasts met Pocket Casts Plus, en meer</string>
-    <string name="end_of_year_story_top_podcast_title">Dit was je favoriete podcast in %1$d</string>
     <string name="drag_down_to_dismiss_content_description">Sleep naar beneden om te negeren</string>
     <string name="maybe_later">Misschien later</string>
     <string name="need_to_free_up_space">Wil je ruimte vrijmaken?</string>
