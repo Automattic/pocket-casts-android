@@ -16,6 +16,7 @@ import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalResources
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -36,14 +37,14 @@ import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.type.TrimMode
 import au.com.shiftyjelly.pocketcasts.podcasts.R
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme.ThemeType
-import au.com.shiftyjelly.pocketcasts.views.helper.ToolbarColors
+import au.com.shiftyjelly.pocketcasts.ui.theme.ThemeColor
 import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 @Composable
 internal fun PodcastSettingsEffectsPage(
     podcast: Podcast,
-    toolbarColors: ToolbarColors,
+    iconTint: Color,
     onChangePlaybackEffects: (Boolean) -> Unit,
     onDecrementSpeed: () -> Unit,
     onIncrementSpeed: () -> Unit,
@@ -82,7 +83,7 @@ internal fun PodcastSettingsEffectsPage(
                     SettingRow(
                         primaryText = stringResource(LR.string.player_effects_speed),
                         icon = painterResource(IR.drawable.ic_speed),
-                        iconTint = toolbarColors.iconComposeColor,
+                        iconTint = iconTint,
                         modifier = Modifier.weight(1f),
                     )
                     NumberStepper(
@@ -90,7 +91,7 @@ internal fun PodcastSettingsEffectsPage(
                         onPlusClick = onIncrementSpeed,
                         minusContentDescription = LR.string.player_effects_speed_down,
                         plusContentDescription = LR.string.player_effects_speed_up,
-                        tint = toolbarColors.iconComposeColor,
+                        tint = iconTint,
                     ) {
                         val locale = LocalResources.current.configuration.locales[0]
                         TextP40(
@@ -104,7 +105,7 @@ internal fun PodcastSettingsEffectsPage(
                 SettingRow(
                     primaryText = stringResource(LR.string.player_effects_trim_silence),
                     icon = painterResource(IR.drawable.ic_trim),
-                    iconTint = toolbarColors.iconComposeColor,
+                    iconTint = iconTint,
                     toggle = SettingRowToggle.Switch(
                         checked = podcast.trimMode != TrimMode.OFF,
                         enabled = true,
@@ -135,7 +136,7 @@ internal fun PodcastSettingsEffectsPage(
                 SettingRow(
                     primaryText = stringResource(LR.string.player_effects_volume_boost),
                     icon = painterResource(R.drawable.ic_volumeboost),
-                    iconTint = toolbarColors.iconComposeColor,
+                    iconTint = iconTint,
                     toggle = SettingRowToggle.Switch(
                         checked = podcast.isVolumeBoosted,
                         enabled = true,
@@ -165,11 +166,7 @@ private fun PodcastSettingsEffectsPagePreview(
                 trimMode = TrimMode.HIGH,
                 isVolumeBoosted = true,
             ),
-            toolbarColors = ToolbarColors.podcast(
-                lightColor = "#EC0404".toColorInt(),
-                darkColor = "#F47C84".toColorInt(),
-                theme = themeType,
-            ),
+            iconTint = Color(ThemeColor.podcastIcon02(themeType, "#EC0404".toColorInt())),
             onChangePlaybackEffects = {},
             onDecrementSpeed = {},
             onIncrementSpeed = {},

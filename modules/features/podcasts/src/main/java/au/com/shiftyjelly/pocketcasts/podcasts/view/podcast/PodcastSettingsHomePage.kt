@@ -23,10 +23,9 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalResources
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.tooling.preview.Preview
@@ -51,18 +50,18 @@ import au.com.shiftyjelly.pocketcasts.podcasts.viewmodel.PodcastSettingsViewMode
 import au.com.shiftyjelly.pocketcasts.repositories.playlist.Playlist
 import au.com.shiftyjelly.pocketcasts.repositories.playlist.SmartPlaylistPreview
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme.ThemeType
+import au.com.shiftyjelly.pocketcasts.ui.theme.ThemeColor
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import au.com.shiftyjelly.pocketcasts.views.helper.ToolbarColors
 import kotlin.time.Duration.Companion.seconds
-import timber.log.Timber
 import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 @Composable
 internal fun PodcastSettingsHomePage(
     uiState: PodcastSettingsViewModel.UiState,
-    toolbarColors: ToolbarColors,
+    iconTint: Color,
     onChangeNotifications: (Boolean) -> Unit,
     onChangeAutoDownload: (Boolean) -> Unit,
     onChangeAddToUpNext: (Boolean) -> Unit,
@@ -93,7 +92,7 @@ internal fun PodcastSettingsHomePage(
             } else {
                 painterResource(IR.drawable.ic_notifications)
             },
-            iconTint = toolbarColors.iconComposeColor,
+            iconTint = iconTint,
             toggle = SettingRowToggle.Switch(
                 checked = podcast.isShowNotifications,
                 enabled = true,
@@ -108,7 +107,7 @@ internal fun PodcastSettingsHomePage(
             primaryText = stringResource(LR.string.podcast_settings_auto_download),
             secondaryText = stringResource(LR.string.podcast_settings_auto_download_summary),
             icon = painterResource(IR.drawable.ic_download),
-            iconTint = toolbarColors.iconComposeColor,
+            iconTint = iconTint,
             toggle = SettingRowToggle.Switch(
                 checked = podcast.isAutoDownloadNewEpisodes,
                 enabled = true,
@@ -123,7 +122,7 @@ internal fun PodcastSettingsHomePage(
             primaryText = stringResource(LR.string.podcast_settings_add_to_up_next),
             secondaryText = stringResource(LR.string.podcast_settings_add_to_up_next_summary),
             icon = painterResource(IR.drawable.ic_upnext),
-            iconTint = toolbarColors.iconComposeColor,
+            iconTint = iconTint,
             toggle = SettingRowToggle.Switch(
                 checked = podcast.autoAddToUpNext != Podcast.AutoAddUpNext.OFF,
                 enabled = true,
@@ -171,7 +170,7 @@ internal fun PodcastSettingsHomePage(
         SettingRow(
             primaryText = stringResource(LR.string.podcast_settings_auto_archive),
             icon = painterResource(IR.drawable.ic_archive),
-            iconTint = toolbarColors.iconComposeColor,
+            iconTint = iconTint,
             modifier = Modifier.clickable(
                 role = Role.Button,
                 onClick = onChangeAutoArchiveSettings,
@@ -207,7 +206,7 @@ internal fun PodcastSettingsHomePage(
             } else {
                 painterResource(R.drawable.ic_effects_off)
             },
-            iconTint = toolbarColors.iconComposeColor,
+            iconTint = iconTint,
             modifier = Modifier.clickable(
                 role = Role.Button,
                 onClick = onChangePlaybackEffectsSettings,
@@ -232,13 +231,13 @@ internal fun PodcastSettingsHomePage(
                 primaryText = stringResource(LR.string.podcast_settings_skip_first),
                 secondaryText = duration,
                 icon = painterResource(R.drawable.ic_skipintros),
-                iconTint = toolbarColors.iconComposeColor,
+                iconTint = iconTint,
                 modifier = Modifier.weight(1f),
             )
             NumberStepper(
                 onMinusClick = onDecrementSkipFirst,
                 onPlusClick = onIncrementSkipFirst,
-                tint = toolbarColors.iconComposeColor,
+                tint = iconTint,
             )
         }
         Row(
@@ -260,13 +259,13 @@ internal fun PodcastSettingsHomePage(
                 primaryText = stringResource(LR.string.podcast_settings_skip_last),
                 secondaryText = duration,
                 icon = painterResource(R.drawable.ic_skip_outro),
-                iconTint = toolbarColors.iconComposeColor,
+                iconTint = iconTint,
                 modifier = Modifier.weight(1f),
             )
             NumberStepper(
                 onMinusClick = onDecrementSkipLast,
                 onPlusClick = onIncrementSkipLast,
-                tint = toolbarColors.iconComposeColor,
+                tint = iconTint,
             )
         }
         if (uiState.playlists.isNotEmpty()) {
@@ -297,7 +296,7 @@ internal fun PodcastSettingsHomePage(
                 } else {
                     painterResource(IR.drawable.ic_filters)
                 },
-                iconTint = toolbarColors.iconComposeColor,
+                iconTint = iconTint,
                 modifier = Modifier.clickable(
                     role = Role.Button,
                     onClick = onChangePlaylistSettings,
@@ -336,11 +335,7 @@ private fun PodcastSettingsHomePagePreview(
 ) {
     AppTheme(themeType) {
         PodcastSettingsHomePage(
-            toolbarColors = ToolbarColors.podcast(
-                lightColor = "#EC0404".toColorInt(),
-                darkColor = "#F47C84".toColorInt(),
-                theme = themeType,
-            ),
+            iconTint = MaterialTheme.theme.colors.primaryInteractive01,
             uiState = PodcastSettingsViewModel.UiState(
                 podcast = Podcast(
                     uuid = "podcast-uuid",
