@@ -3,6 +3,9 @@
 *   New Features
     *   Add new intro story for playback
         ([#4670](https://github.com/Automattic/pocket-casts-android/pull/4670))
+*   Bug Fixes
+    *   Fix podcast settings icon theming with Classic theme
+        ([#4562](https://github.com/Automattic/pocket-casts-android/pull/4562))
 
 7.101
 -----
