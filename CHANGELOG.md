@@ -5,7 +5,7 @@
         ([#4670](https://github.com/Automattic/pocket-casts-android/pull/4670))
 *   Bug Fixes
     *   Fix podcast settings icon theming with Classic theme
-        ([#4562](https://github.com/Automattic/pocket-casts-android/pull/4562))
+        ([#4687](https://github.com/Automattic/pocket-casts-android/pull/4687))
 
 7.101
 -----
