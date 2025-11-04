@@ -653,7 +653,6 @@ Language: pt_BR
     <string name="end_of_year_stories_year_over_year_title_went_up">Em comparação com %1$s, seu tempo de streaming aumentou muito %2$s%%</string>
     <string name="end_of_year_story_longest_episode_title">O episódio mais longo que você ouviu foi %1$s</string>
     <string name="end_of_year_replay">Ouvir de novo</string>
-    <string name="end_of_year_story_epilogue_title">Agradecemos por nos escolher este ano.\nNos vemos em %1$d!</string>
     <string name="end_of_year_listening_time_title">Este foi o seu tempo total ouvindo podcasts.</string>
     <string name="end_of_year_story_top_categories_subtitle">Você ouviu %1$s episódios em um total de %2$s</string>
     <string name="discover_category_society_abbreviation">Cultura</string>
@@ -961,7 +960,6 @@ Language: pt_BR
     <string name="end_of_year_story_top_categories">Suas principais categorias</string>
     <string name="end_of_year_story_top_podcasts_share_text">Meus principais podcasts do ano! %1$s</string>
     <string name="end_of_year_create_account_to_see">Salve seus podcasts na nuvem, receba sua avaliação de fim de ano e sincronize seu progresso com outros dispositivos.</string>
-    <string name="end_of_year_story_epilogue_subtitle">Não esqueça de compartilhar com seus amigos e agradecer a seus criadores favoritos</string>
     <string name="end_of_year_story_listened_to_numbers_subtitle">Mas tinha um que sempre fazia você pedir bis…</string>
     <string name="end_of_year_story_longest_episode_share_text">O episódio mais longo que eu ouvi em %1$d %2$s</string>
     <string name="end_of_year_story_top_podcasts_list_title">Meus principais podcasts de %1$d</string>

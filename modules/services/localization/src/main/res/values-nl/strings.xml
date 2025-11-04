@@ -652,7 +652,6 @@ Language: nl
     <string name="end_of_year_stories_year_over_year_title_went_up">Ten opzichte van %1$s is je luistertijd gestegen met maar liefst %2$s%%</string>
     <string name="end_of_year_story_longest_episode_title">De langste aflevering waarnaar je hebt geluisterd was %1$s</string>
     <string name="end_of_year_replay">Opnieuw afspelen</string>
-    <string name="end_of_year_story_epilogue_title">Bedankt dat je dit jaar met ons geluisterd hebt.\nTot ziens in %1$d!</string>
     <string name="end_of_year_listening_time_title">Dit was je totale luistertijd wat betreft podcasts.</string>
     <string name="end_of_year_story_top_categories_subtitle">Je hebt in totaal %2$s geluisterd naar %1$s afleveringen</string>
     <string name="end_of_year_story_top_categories_title">Wist je dat %1$s je favoriete categorie was</string>
@@ -960,7 +959,6 @@ Language: nl
     <string name="end_of_year_story_top_categories">Je beste categorieën</string>
     <string name="end_of_year_story_top_podcasts_share_text">Mijn beste podcasts van het jaar! %1$s</string>
     <string name="end_of_year_story_top_categories_share_text">Mijn meest beluisterde podcastcategorieën</string>
-    <string name="end_of_year_story_epilogue_subtitle">Vergeet niet om te delen met je vrienden en een shoutout te geven naar je favoriete podcastmakers</string>
     <string name="end_of_year_story_listened_to_numbers_subtitle">Maar er was er één waar je steeds maar weer naar terugkeerde …</string>
     <string name="end_of_year_story_longest_episode_share_text">De langste aflevering waarnaar ik heb geluisterd in %1$d %2$s</string>
     <string name="end_of_year_story_top_podcasts_list_title">Mijn beste podcasts van %1$d</string>

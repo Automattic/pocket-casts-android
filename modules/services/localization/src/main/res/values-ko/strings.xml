@@ -653,7 +653,6 @@ Language: ko_KR
     <string name="end_of_year_stories_year_over_year_title_went_up">%1$s년에 비해 청취 시간이 %2$s%%나 늘었습니다.</string>
     <string name="end_of_year_story_longest_episode_title">청취하신 가장 긴 에피소드는 %1$s였습니다.</string>
     <string name="end_of_year_replay">다시 재생</string>
-    <string name="end_of_year_story_epilogue_title">올해 청취해 주셔서 감사합니다.\n%1$d년에 뵙겠습니다!</string>
     <string name="end_of_year_listening_time_title">팟캐스트를 청취하셨던 총시간입니다.</string>
     <string name="end_of_year_story_top_categories_subtitle">총 %2$s 동안 %1$s개 에피소드를 청취하셨습니다.</string>
     <string name="end_of_year_story_top_categories_title">%1$s이(가) 좋아하는 카테고리라는 것을 알고 계셨습니까?</string>
@@ -960,7 +959,6 @@ Language: ko_KR
     <string name="end_of_year_create_account_to_see">팟캐스트를 클라우드에 저장하고, 연말 리뷰를 받고, 진행률을 다른 기기와 동기화하세요.</string>
     <string name="end_of_year_story_top_categories_share_text">내가 가장 많이 청취하는 팟캐스트 카테고리</string>
     <string name="end_of_year_story_top_categories">회원님의 상위 카테고리</string>
-    <string name="end_of_year_story_epilogue_subtitle">잊지 말고 친구와 공유하고 즐겨 찾는 팟캐스트 창작자에게 감사 인사 보내기</string>
     <string name="end_of_year_story_top_podcasts_share_text">나의 올해 상위 팟캐스트입니다! %1$s</string>
     <string name="end_of_year_story_listened_to_numbers_subtitle">그러나 반복 청취한 것이 있었습니다…</string>
     <string name="end_of_year_story_longest_episode_share_text">%1$d년에 내가 청취한 가장 긴 에피소드 %2$s</string>
