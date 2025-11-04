@@ -1,5 +1,6 @@
 package au.com.shiftyjelly.pocketcasts
 
+import android.content.DialogInterface
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.ViewGroup
@@ -56,6 +57,10 @@ import au.com.shiftyjelly.pocketcasts.localization.R as LR
 internal class PlayAllFragment : BaseDialogFragment() {
     private val viewModel by viewModels<PlaylistViewModel>({ requireParentFragment() })
 
+    private var isFinalizingActionUsed = false
+
+    private fun isDismissedWithoutAction() = !requireActivity().isChangingConfigurations && !isFinalizingActionUsed
+
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -69,16 +74,30 @@ internal class PlayAllFragment : BaseDialogFragment() {
         ) {
             PlayAllPage(
                 onSaveQueue = {
+                    viewModel.trackSaveUpNextTapped()
                     viewModel.saveUpNextAsPlaylist(getString(LR.string.up_next))
                     viewModel.playAll()
+                    isFinalizingActionUsed = true
                     dismiss()
                 },
                 onReplaceAndPlay = {
+                    viewModel.trackReplaceAndPlayTapped()
+                },
+                onConfirmReplaceAndPlay = {
+                    viewModel.trackReplaceAndPlayConfirmTapped()
                     viewModel.playAll()
+                    isFinalizingActionUsed = true
                     dismiss()
                 },
                 onDismiss = ::dismiss,
             )
+        }
+    }
+
+    override fun onDismiss(dialog: DialogInterface) {
+        super.onDismiss(dialog)
+        if (isDismissedWithoutAction()) {
+            viewModel.trackPlayAllDismissed()
         }
     }
 }
@@ -92,6 +111,7 @@ private enum class PlayAllNavigationKey {
 private fun PlayAllPage(
     onSaveQueue: () -> Unit,
     onReplaceAndPlay: () -> Unit,
+    onConfirmReplaceAndPlay: () -> Unit,
     onDismiss: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -113,11 +133,14 @@ private fun PlayAllPage(
             when (state) {
                 PlayAllNavigationKey.SaveQueue -> SaveQueuePage(
                     onSaveQueue = onSaveQueue,
-                    onReplaceAndPlay = { navigationKey = PlayAllNavigationKey.ReplaceAndPlay },
+                    onReplaceAndPlay = {
+                        navigationKey = PlayAllNavigationKey.ReplaceAndPlay
+                        onReplaceAndPlay()
+                    },
                 )
 
                 PlayAllNavigationKey.ReplaceAndPlay -> ReplaceAndPlayPage(
-                    onReplaceAndPlay = onReplaceAndPlay,
+                    onReplaceAndPlay = onConfirmReplaceAndPlay,
                     onDismiss = onDismiss,
                 )
             }
@@ -247,6 +270,7 @@ private fun PlayAllPagePreview(
         PlayAllPage(
             onSaveQueue = {},
             onReplaceAndPlay = {},
+            onConfirmReplaceAndPlay = {},
             onDismiss = {},
         )
     }
