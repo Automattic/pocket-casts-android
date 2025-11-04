@@ -122,11 +122,6 @@ class EndOfYearViewModel @AssistedInject constructor(
         subscription: Subscription?,
         topPodcastsLink: String?,
     ): List<Story> = buildList {
-        val topPodcast = stats.topPodcasts.firstOrNull()
-        if (topPodcast != null) {
-            add(Story.TopShow(topPodcast))
-            add(Story.TopShows(stats.topPodcasts, topPodcastsLink))
-        }
         add(Story.Cover)
         if (randomShowIds != null) {
             add(
@@ -138,6 +133,7 @@ class EndOfYearViewModel @AssistedInject constructor(
                 ),
             )
         }
+        val topPodcast = stats.topPodcasts.firstOrNull()
         if (topPodcast != null) {
             add(Story.TopShow(topPodcast))
             add(Story.TopShows(stats.topPodcasts, topPodcastsLink))

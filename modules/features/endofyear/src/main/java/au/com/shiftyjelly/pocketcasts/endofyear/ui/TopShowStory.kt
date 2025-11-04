@@ -28,6 +28,7 @@ import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.colorResource
+import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
@@ -39,7 +40,6 @@ import au.com.shiftyjelly.pocketcasts.compose.components.PodcastImage
 import au.com.shiftyjelly.pocketcasts.compose.components.TextH10
 import au.com.shiftyjelly.pocketcasts.compose.components.TextP40
 import au.com.shiftyjelly.pocketcasts.endofyear.StoryCaptureController
-import au.com.shiftyjelly.pocketcasts.localization.R
 import au.com.shiftyjelly.pocketcasts.models.to.Story
 import au.com.shiftyjelly.pocketcasts.models.to.TopPodcast
 import com.airbnb.lottie.compose.LottieAnimation
@@ -50,6 +50,7 @@ import dev.shreyaspatil.capturable.capturable
 import java.io.File
 import kotlin.time.Duration.Companion.days
 import au.com.shiftyjelly.pocketcasts.images.R as IR
+import au.com.shiftyjelly.pocketcasts.localization.R as LR
 import au.com.shiftyjelly.pocketcasts.ui.R as UR
 
 @OptIn(ExperimentalComposeUiApi::class)
@@ -73,7 +74,7 @@ internal fun TopShowStory(
             modifier = Modifier
                 .fillMaxWidth()
                 .height((maxHeight - animationContainerSize.times(1.3f)) / 2)
-                .align(Alignment.TopCenter)
+                .align(Alignment.TopCenter),
         )
 
         CenterContent(
@@ -90,7 +91,7 @@ internal fun TopShowStory(
             modifier = Modifier
                 .fillMaxWidth()
                 .height((maxHeight - animationContainerSize.times(1.3f)) / 2)
-                .align(Alignment.BottomCenter)
+                .align(Alignment.BottomCenter),
         )
     }
 }
@@ -104,7 +105,7 @@ private fun CenterContent(
     contentAlignment = Alignment.Center,
 ) {
     val composition by rememberLottieComposition(
-        spec = LottieCompositionSpec.RawRes(IR.raw.playback_story_top_podcast_lottie)
+        spec = LottieCompositionSpec.RawRes(IR.raw.playback_story_top_podcast_lottie),
     )
     val progress by animateLottieCompositionAsState(
         composition = composition,
@@ -132,7 +133,7 @@ private fun CenterContent(
     val scaleAnimation by artworkTransition.animateFloat(
         transitionSpec = {
             tween(durationMillis = 100, easing = FastOutLinearInEasing)
-        }
+        },
     ) {
         if (it) {
             1f
@@ -143,7 +144,7 @@ private fun CenterContent(
     val alphaAnimation by artworkTransition.animateFloat(
         transitionSpec = {
             tween(durationMillis = 100, easing = LinearEasing)
-        }
+        },
     ) {
         if (it) {
             1f
@@ -166,14 +167,14 @@ private fun CenterContent(
 @Composable
 private fun Header(
     measurements: EndOfYearMeasurements,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) = Column(
     modifier = modifier,
     verticalArrangement = Arrangement.spacedBy(8.dp, Alignment.CenterVertically),
 ) {
     TextH10(
         text = stringResource(
-            R.string.end_of_year_story_top_podcast_title,
+            LR.string.end_of_year_story_top_podcast_title,
             2025,
         ),
         fontSize = 25.sp,
@@ -186,7 +187,7 @@ private fun Header(
         textAlign = TextAlign.Center,
     )
     TextP40(
-        text = stringResource(R.string.end_of_year_story_top_podcast_subtitle),
+        text = stringResource(LR.string.end_of_year_story_top_podcast_subtitle),
         disableAutoScale = true,
         color = colorResource(UR.color.white),
         modifier = Modifier
@@ -209,10 +210,10 @@ private fun Footer(
 ) {
     TextP40(
         text = stringResource(
-            R.string.end_of_year_story_top_podcast_stats,
-            story.show.playedEpisodeCount,
-            story.show.playbackTime.inWholeDays.toInt(),
-            (story.show.playbackTime.minus(story.show.playbackTime.inWholeDays.days)).inWholeHours
+            LR.string.end_of_year_story_top_podcast_stats,
+            pluralStringResource(LR.plurals.episodes, story.show.playedEpisodeCount, story.show.playedEpisodeCount),
+            story.show.playbackTime.inWholeDays.toString() + " " + pluralStringResource(LR.plurals.day, story.show.playbackTime.inWholeDays.toInt()),
+            story.show.playbackTime.minus(story.show.playbackTime.inWholeDays.days).inWholeHours.toString() + " " + pluralStringResource(LR.plurals.hour, story.show.playbackTime.minus(story.show.playbackTime.inWholeDays.days).inWholeHours.toInt()),
         ),
         disableAutoScale = true,
         color = colorResource(UR.color.white),
