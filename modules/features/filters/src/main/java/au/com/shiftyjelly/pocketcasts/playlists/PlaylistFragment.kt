@@ -334,11 +334,15 @@ class PlaylistFragment :
         AppTheme(theme.activeTheme) {
             Box(
                 // Clickable to intercept events below the overlay
-                modifier = Modifier.clickable(
-                    onClick = {},
-                    interactionSource = null,
-                    indication = null,
-                ),
+                modifier = when (transition.currentState) {
+                    ContentState.Uninitialized, ContentState.HasNoEpisodes -> Modifier.clickable(
+                        onClick = {},
+                        interactionSource = null,
+                        indication = null,
+                    )
+
+                    ContentState.HasEpisode -> Modifier
+                },
             ) {
                 if (transition.currentState == ContentState.Uninitialized) {
                     Box(
