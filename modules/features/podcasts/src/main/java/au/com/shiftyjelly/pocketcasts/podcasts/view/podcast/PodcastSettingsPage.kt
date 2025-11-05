@@ -14,6 +14,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextOverflow
@@ -32,6 +33,8 @@ import au.com.shiftyjelly.pocketcasts.compose.navigation.slideOutToEnd
 import au.com.shiftyjelly.pocketcasts.compose.navigation.slideOutToStart
 import au.com.shiftyjelly.pocketcasts.compose.theme
 import au.com.shiftyjelly.pocketcasts.podcasts.viewmodel.PodcastSettingsViewModel
+import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
+import au.com.shiftyjelly.pocketcasts.ui.theme.ThemeColor
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import au.com.shiftyjelly.pocketcasts.views.helper.ToolbarColors
@@ -40,10 +43,24 @@ import kotlin.time.Duration.Companion.seconds
 import kotlinx.coroutines.flow.StateFlow
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
+internal data class SettingsColors(
+    val toolbarColors: ToolbarColors,
+    val iconColor: Color,
+) {
+    constructor(
+        lightColor: Int,
+        darkColor: Int,
+        theme: Theme.ThemeType,
+    ) : this(
+        toolbarColors = ToolbarColors.podcast(lightColor, darkColor, theme),
+        iconColor = Color(ThemeColor.podcastIcon02(theme, if (theme.darkTheme) darkColor else lightColor)),
+    )
+}
+
 @Composable
 internal fun PodcastSettingsPage(
     podcastTitle: String,
-    toolbarColors: ToolbarColors,
+    colors: SettingsColors,
     uiState: PodcastSettingsViewModel.UiState?,
     getArtworkUuidsFlow: (String) -> StateFlow<List<String>?>,
     refreshArtworkUuids: suspend (String) -> Unit,
@@ -103,7 +120,7 @@ internal fun PodcastSettingsPage(
                 Crossfade(toolbarTitle) { title ->
                     Text(
                         text = title,
-                        color = toolbarColors.titleComposeColor,
+                        color = colors.toolbarColors.titleComposeColor,
                         overflow = TextOverflow.Ellipsis,
                     )
                 }
@@ -115,8 +132,8 @@ internal fun PodcastSettingsPage(
                 }
             },
             style = ThemedTopAppBar.Style.Immersive,
-            backgroundColor = toolbarColors.backgroundComposeColor,
-            iconColor = toolbarColors.iconComposeColor,
+            backgroundColor = colors.toolbarColors.backgroundComposeColor,
+            iconColor = colors.toolbarColors.iconComposeColor,
             windowInsets = WindowInsets.statusBars,
         )
 
@@ -135,7 +152,7 @@ internal fun PodcastSettingsPage(
                 }
                 PodcastSettingsHomePage(
                     uiState = uiState,
-                    toolbarColors = toolbarColors,
+                    iconTint = colors.iconColor,
                     onChangeNotifications = onChangeNotifications,
                     onChangeAutoDownload = onChangeAutoDownload,
                     onChangeAddToUpNext = onChangeAddToUpNext,
@@ -187,7 +204,7 @@ internal fun PodcastSettingsPage(
                 }
                 PodcastSettingsEffectsPage(
                     podcast = uiState.podcast,
-                    toolbarColors = toolbarColors,
+                    iconTint = colors.iconColor,
                     onChangePlaybackEffects = onChangePlaybackEffects,
                     onDecrementSpeed = onDecrementPlaybackSpeed,
                     onIncrementSpeed = onIncrementPlaybackSpeed,

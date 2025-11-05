@@ -34,18 +34,6 @@ data class ToolbarColors(
             backgroundColor = ThemeColor.filterUi01(theme.activeTheme, color),
         )
 
-        fun podcast(podcast: PodcastData, theme: Theme) = ToolbarColors(
-            iconColor = ThemeColor.podcastIcon01(theme.activeTheme, podcast.getTintColor(theme.isDarkTheme)),
-            titleColor = ThemeColor.podcastText01(theme.activeTheme, podcast.getTintColor(theme.isDarkTheme)),
-            backgroundColor = ThemeColor.podcastUi01(theme.activeTheme, podcast.getTintColor(theme.isDarkTheme)),
-        )
-
-        fun podcast(lightColor: Int, darkColor: Int, theme: Theme) = ToolbarColors(
-            iconColor = ThemeColor.podcastIcon01(theme.activeTheme, if (theme.isDarkTheme) darkColor else lightColor),
-            titleColor = ThemeColor.podcastText01(theme.activeTheme, if (theme.isDarkTheme) darkColor else lightColor),
-            backgroundColor = ThemeColor.podcastUi01(theme.activeTheme, if (theme.isDarkTheme) darkColor else lightColor),
-        )
-
         fun podcast(lightColor: Int, darkColor: Int, theme: Theme.ThemeType) = ToolbarColors(
             iconColor = ThemeColor.podcastIcon01(theme, if (theme.darkTheme) darkColor else lightColor),
             titleColor = ThemeColor.podcastText01(theme, if (theme.darkTheme) darkColor else lightColor),
