@@ -847,8 +847,6 @@ class FakeTracker : Tracker {
 
     override fun refreshMetadata() = Unit
 
-    override fun getTrackerType() = TrackerType.FirstParty
-
     override fun flush() = Unit
 
     override fun clearAllData() = Unit

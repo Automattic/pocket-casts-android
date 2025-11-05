@@ -1,18 +1,24 @@
 package au.com.shiftyjelly.pocketcasts.analytics
 
-import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
-import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
-
 open class AnalyticsTracker(
     val trackers: List<Tracker>,
     val isFirstPartyTrackingEnabled: () -> Boolean,
 ) {
+    private var listeners = emptyList<Listener>()
+
+    fun addListener(listener: Listener) {
+        listeners += listener
+    }
+
     fun track(event: AnalyticsEvent, properties: Map<String, Any> = emptyMap()) {
         val isFirstPartyEnabled = isFirstPartyTrackingEnabled()
-        trackers.forEach { tracker ->
-            if (tracker.getTrackerType() == TrackerType.FirstParty && isFirstPartyEnabled) {
+        if (isFirstPartyEnabled) {
+            trackers.forEach { tracker ->
                 tracker.track(event, properties)
             }
+        }
+        listeners.forEach { listener ->
+            listener.onEvent(event, properties)
         }
     }
 
@@ -57,6 +63,10 @@ open class AnalyticsTracker(
 
     fun clearAllData() {
         trackers.forEach(Tracker::clearAllData)
+    }
+
+    interface Listener {
+        fun onEvent(event: AnalyticsEvent, properties: Map<String, Any>)
     }
 
     companion object {

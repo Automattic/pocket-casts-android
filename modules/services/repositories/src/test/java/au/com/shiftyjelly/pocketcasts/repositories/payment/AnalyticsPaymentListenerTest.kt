@@ -4,7 +4,6 @@ import android.app.Activity
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.analytics.Tracker
-import au.com.shiftyjelly.pocketcasts.analytics.TrackerType
 import au.com.shiftyjelly.pocketcasts.payment.FakePaymentDataSource
 import au.com.shiftyjelly.pocketcasts.payment.PaymentClient
 import au.com.shiftyjelly.pocketcasts.payment.PaymentResultCode
@@ -120,8 +119,6 @@ private class TestTracker : Tracker {
     override fun track(event: AnalyticsEvent, properties: Map<String, Any>) {
         _events += TrackEvent(event, properties)
     }
-
-    override fun getTrackerType() = TrackerType.FirstParty
 
     override fun refreshMetadata() = Unit
 
