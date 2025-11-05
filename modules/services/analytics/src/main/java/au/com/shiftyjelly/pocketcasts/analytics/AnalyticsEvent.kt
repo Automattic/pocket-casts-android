@@ -403,6 +403,7 @@ enum class AnalyticsEvent(val key: String) {
     PLAYER_CHAPTER_SELECTED("player_chapter_selected"),
     PLAYER_PREVIOUS_CHAPTER_TAPPED("player_previous_chapter_tapped"),
     PLAYER_NEXT_CHAPTER_TAPPED("player_next_chapter_tapped"),
+    PLAYER_EPISODE_COMPLETED("player_episode_completed"),
 
     /* Player - Sleep Timer */
     PLAYER_SLEEP_TIMER_ENABLED("player_sleep_timer_enabled"),

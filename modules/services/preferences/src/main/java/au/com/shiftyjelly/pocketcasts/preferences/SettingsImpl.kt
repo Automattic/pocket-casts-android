@@ -24,6 +24,7 @@ import au.com.shiftyjelly.pocketcasts.preferences.Settings.MediaNotificationCont
 import au.com.shiftyjelly.pocketcasts.preferences.di.PrivateSharedPreferences
 import au.com.shiftyjelly.pocketcasts.preferences.di.PublicSharedPreferences
 import au.com.shiftyjelly.pocketcasts.preferences.model.AppIconSetting
+import au.com.shiftyjelly.pocketcasts.preferences.model.AppReviewReason
 import au.com.shiftyjelly.pocketcasts.preferences.model.ArtworkConfiguration
 import au.com.shiftyjelly.pocketcasts.preferences.model.AutoAddUpNextLimitBehaviour
 import au.com.shiftyjelly.pocketcasts.preferences.model.AutoPlaySource
@@ -1088,7 +1089,7 @@ class SettingsImpl @Inject constructor(
         toString = { value -> encrypt(membershipAdapter.toJson(value)) },
     )
 
-    override val cachedSubscription = DelegatedSetting(
+    override val cachedSubscription = DelegatedReadSetting(
         delegate = cachedMembership,
         mapper = { membership -> membership.subscription },
     )
@@ -1608,6 +1609,30 @@ class SettingsImpl @Inject constructor(
     override val showPlaylistsOnboarding = UserSetting.BoolPref(
         sharedPrefKey = "show_playlists_onboarding",
         defaultValue = true,
+        sharedPrefs = sharedPreferences,
+    )
+
+    override val appReviewEpisodeCompletedTimestamps = UserSetting.PrefListFromString(
+        sharedPrefKey = "app_review_episode_completed_timestamps",
+        defaultValue = emptyList(),
+        fromString = { value -> runCatching { Instant.parse(value) }.getOrNull() },
+        toString = { value -> value.toString() },
+        sharedPrefs = sharedPreferences,
+    )
+
+    override val appReviewPromptTimestamps = UserSetting.PrefListFromString(
+        sharedPrefKey = "app_review_prompt_timestamp",
+        defaultValue = emptyList(),
+        fromString = { value -> runCatching { Instant.parse(value) }.getOrNull() },
+        toString = { value -> value.toString() },
+        sharedPrefs = sharedPreferences,
+    )
+
+    override val appReviewSubmittedReasons = UserSetting.PrefListFromString(
+        sharedPrefKey = "app_review_submitted_reasons",
+        defaultValue = emptyList(),
+        fromString = { value -> AppReviewReason.fromValue(value) ?: AppReviewReason.DevelopmentTrigger },
+        toString = { value -> value.analyticsValue },
         sharedPrefs = sharedPreferences,
     )
 }

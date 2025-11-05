@@ -13,7 +13,11 @@ interface ReadSetting<T> {
     val flow: StateFlow<T>
 }
 
-class DelegatedSetting<T, R>(
+interface ReadWriteSetting<T> : ReadSetting<T> {
+    fun set(value: T, updateModifiedAt: Boolean, commit: Boolean = false, clock: Clock = Clock.systemUTC())
+}
+
+class DelegatedReadSetting<T, R>(
     private val delegate: ReadSetting<T>,
     private val mapper: (T) -> R,
 ) : ReadSetting<R> {
@@ -27,7 +31,7 @@ class DelegatedSetting<T, R>(
 abstract class UserSetting<T>(
     val sharedPrefKey: String,
     protected val sharedPrefs: SharedPreferences,
-) : ReadSetting<T> {
+) : ReadWriteSetting<T> {
 
     private val modifiedAtKey = "${sharedPrefKey}ModifiedAt"
 
@@ -58,11 +62,11 @@ abstract class UserSetting<T>(
 
     protected abstract fun persist(value: T, commit: Boolean)
 
-    open fun set(
+    override fun set(
         value: T,
         updateModifiedAt: Boolean,
-        commit: Boolean = false,
-        clock: Clock = Clock.systemUTC(),
+        commit: Boolean,
+        clock: Clock,
     ) {
         persist(value, commit)
         _flow.value = get()
