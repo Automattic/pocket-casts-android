@@ -23,6 +23,7 @@ import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.stringResource
@@ -41,11 +42,14 @@ import au.com.shiftyjelly.pocketcasts.endofyear.StoryCaptureController
 import au.com.shiftyjelly.pocketcasts.models.to.Rating
 import au.com.shiftyjelly.pocketcasts.models.to.RatingStats
 import au.com.shiftyjelly.pocketcasts.models.to.Story
+import com.airbnb.lottie.LottieProperty
 import com.airbnb.lottie.compose.LottieAnimation
 import com.airbnb.lottie.compose.LottieClipSpec
 import com.airbnb.lottie.compose.LottieCompositionSpec
 import com.airbnb.lottie.compose.rememberLottieAnimatable
 import com.airbnb.lottie.compose.rememberLottieComposition
+import com.airbnb.lottie.compose.rememberLottieDynamicProperties
+import com.airbnb.lottie.compose.rememberLottieDynamicProperty
 import dev.shreyaspatil.capturable.capturable
 import java.io.File
 import kotlinx.coroutines.delay
@@ -238,6 +242,18 @@ private fun RowScope.AnimatedRatingBar(
             }
         }
     }
+    val dynamicProperties = rememberLottieDynamicProperties(
+        rememberLottieDynamicProperty(
+            property = LottieProperty.TEXT,
+            value = rating.toString(),
+            "main number",
+        ),
+        rememberLottieDynamicProperty(
+            property = LottieProperty.COLOR,
+            value = colorResource(UR.color.white).toArgb(),
+            "main number"
+        )
+    )
 
     LottieAnimation(
         modifier = Modifier
@@ -245,6 +261,7 @@ private fun RowScope.AnimatedRatingBar(
         composition = composition,
         progress = { animatable.progress },
         contentScale = ContentScale.FillBounds,
+        dynamicProperties = dynamicProperties,
     )
 
 }
