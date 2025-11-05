@@ -208,13 +208,26 @@ private fun Footer(
     horizontalAlignment = Alignment.CenterHorizontally,
     verticalArrangement = Arrangement.SpaceAround,
 ) {
+    val formattedEpisodeCount = pluralStringResource(LR.plurals.episodes, story.show.playedEpisodeCount, story.show.playedEpisodeCount)
+    val numberOfDays = story.show.playbackTime.inWholeDays
+    val formattedDaysCount = numberOfDays.toString() + " " + pluralStringResource(LR.plurals.day, numberOfDays.toInt())
+    val remainingHours = story.show.playbackTime.minus(numberOfDays.days).inWholeHours
+    val formattedHoursCount = remainingHours.toString() + " " + pluralStringResource(LR.plurals.hour, remainingHours.toInt())
     TextP40(
-        text = stringResource(
-            LR.string.end_of_year_story_top_podcast_stats,
-            pluralStringResource(LR.plurals.episodes, story.show.playedEpisodeCount, story.show.playedEpisodeCount),
-            story.show.playbackTime.inWholeDays.toString() + " " + pluralStringResource(LR.plurals.day, story.show.playbackTime.inWholeDays.toInt()),
-            story.show.playbackTime.minus(story.show.playbackTime.inWholeDays.days).inWholeHours.toString() + " " + pluralStringResource(LR.plurals.hour, story.show.playbackTime.minus(story.show.playbackTime.inWholeDays.days).inWholeHours.toInt()),
-        ),
+        text =  if (numberOfDays > 0) {
+            stringResource(
+                id = LR.string.end_of_year_story_top_podcast_stats_days,
+                formattedEpisodeCount,
+                formattedDaysCount,
+                formattedHoursCount,
+            )
+        } else {
+            stringResource(
+                id = LR.string.end_of_year_story_top_podcast_stats_hours,
+                formattedEpisodeCount,
+                formattedHoursCount,
+            )
+        },
         disableAutoScale = true,
         color = colorResource(UR.color.white),
         modifier = Modifier

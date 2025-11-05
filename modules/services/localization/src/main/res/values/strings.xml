@@ -2058,8 +2058,10 @@
     <string name="end_of_year_story_top_podcast_title">Your top podcast of %1$d</string>
     <!-- Subtitle for the story that displays the most listened podcasts by the user this year. -->
     <string name="end_of_year_story_top_podcast_subtitle">It doesn\'t get more \"you\" than this</string>
-    <!-- Subtitle for the story that display the most listened podcast by the user this year. %1$s is the of episodes, %2$s the days and %3$s hours you've listened to. -->
-    <string name="end_of_year_story_top_podcast_stats">%1$s, %2$s, and %3$s.\nThat\'s commitment!</string>
+    <!-- Subtitle for the story that display the most listened podcast by the user this year. %1$s is the number of episodes, %2$s the days and %3$s hours you've listened to. -->
+    <string name="end_of_year_story_top_podcast_stats_days">%1$s, %2$s, and %3$s.\nThat\'s commitment!</string>
+    <!-- Subtitle for the story that display the most listened podcast by the user this year. %1$s is the number of episodes, %2$s the hours you've listened to. -->
+    <string name="end_of_year_story_top_podcast_stats_hours">%1$s and %2$s.\nThat\'s commitment!</string>
     <plurals name="episodes">
         <item quantity="one">%1$d episode</item>
         <item quantity="other">%1$d episodes</item>
