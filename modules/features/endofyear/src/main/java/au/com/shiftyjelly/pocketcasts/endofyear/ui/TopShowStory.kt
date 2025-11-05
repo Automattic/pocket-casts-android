@@ -1,8 +1,9 @@
 package au.com.shiftyjelly.pocketcasts.endofyear.ui
 
-import androidx.compose.animation.core.FastOutLinearInEasing
+import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.animateFloat
+import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.core.updateTransition
 import androidx.compose.foundation.background
@@ -111,7 +112,11 @@ private fun CenterContent(
         composition = composition,
         iterations = 1,
     )
-    val hasStarted = progress > 0f
+    val isPlaying = progress > 0f
+    val lottieScaleAnimation by animateFloatAsState(
+        targetValue = if (isPlaying) 1.3f else 1.5f,
+        animationSpec = tween(durationMillis = 500, easing = FastOutSlowInEasing),
+    )
 
     LottieAnimation(
         composition = composition,
@@ -119,20 +124,20 @@ private fun CenterContent(
         modifier = Modifier
             .matchParentSize()
             .graphicsLayer {
-                scaleX = 1.3f
-                scaleY = 1.3f
+                scaleX = lottieScaleAnimation
+                scaleY = lottieScaleAnimation
             },
         contentScale = ContentScale.Fit,
     )
     var artworkTrigger by remember { mutableStateOf(false) }
-    LaunchedEffect(hasStarted) {
-        artworkTrigger = hasStarted
+    LaunchedEffect(isPlaying) {
+        artworkTrigger = isPlaying
     }
 
     val artworkTransition = updateTransition(artworkTrigger, "artwork transition")
     val scaleAnimation by artworkTransition.animateFloat(
         transitionSpec = {
-            tween(durationMillis = 100, easing = FastOutLinearInEasing)
+            tween(durationMillis = 250, easing = FastOutSlowInEasing)
         },
     ) {
         if (it) {
@@ -152,6 +157,7 @@ private fun CenterContent(
             0f
         }
     }
+
     PodcastImage(
         uuid = story.show.uuid,
         elevation = 0.dp,
@@ -214,7 +220,7 @@ private fun Footer(
     val remainingHours = story.show.playbackTime.minus(numberOfDays.days).inWholeHours
     val formattedHoursCount = remainingHours.toString() + " " + pluralStringResource(LR.plurals.hour, remainingHours.toInt())
     TextP40(
-        text =  if (numberOfDays > 0) {
+        text = if (numberOfDays > 0) {
             stringResource(
                 id = LR.string.end_of_year_story_top_podcast_stats_days,
                 formattedEpisodeCount,
