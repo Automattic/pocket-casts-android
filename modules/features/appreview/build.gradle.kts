@@ -21,6 +21,7 @@ dependencies {
 
     api(libs.dagger.hilt.android)
 
+    api(projects.modules.features.settings)
     api(projects.modules.services.model)
     api(projects.modules.services.compose)
     api(projects.modules.services.views)

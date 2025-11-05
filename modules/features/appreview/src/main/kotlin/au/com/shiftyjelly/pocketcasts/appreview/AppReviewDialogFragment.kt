@@ -10,6 +10,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.rememberNestedScrollInteropConnection
 import androidx.fragment.compose.content
+import au.com.shiftyjelly.pocketcasts.settings.HelpFragment
+import au.com.shiftyjelly.pocketcasts.ui.helper.FragmentHostListener
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseDialogFragment
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -25,9 +27,7 @@ class AppReviewDialogFragment : BaseDialogFragment() {
             modifier = Modifier.nestedScroll(rememberNestedScrollInteropConnection()),
         ) {
             AppReviewPage(
-                onClickNotReally = {
-                    dismiss()
-                },
+                onClickNotReally = ::goToHelpAndFeedback,
                 onClickYes = {
                     dismiss()
                 },
@@ -36,5 +36,13 @@ class AppReviewDialogFragment : BaseDialogFragment() {
                     .navigationBarsPadding(),
             )
         }
+    }
+
+    private fun goToHelpAndFeedback() {
+        dismiss()
+        val hostListener = requireActivity() as FragmentHostListener
+        hostListener.addFragment(HelpFragment())
+        hostListener.closeBottomSheet()
+        hostListener.closePlayer()
     }
 }
