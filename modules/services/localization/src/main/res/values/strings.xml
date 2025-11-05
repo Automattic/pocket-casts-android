@@ -2695,4 +2695,12 @@
     <string name="search_suggestions_no_results_title">No Results</string>
     <string name="search_suggestions_no_results_message">Try a new search, or by adding a podcast feed URL</string>
     <string name="eoy_playback_intro_title">Your year in podcasts,\nwrapped and ready to relive</string>
+
+    <!-- App rating prompt -->
+    <string name="app_rating_title">Enjoying Pocket\u00A0Casts?</string>
+    <string name="app_rating_body">Hi there! We’d love to know if you’re enjoying our\u00A0app.</string>
+    <!-- A label under the sad face emoji. A user will be redirected to help pages after tapping it. -->
+    <string name="app_rating_no_label">Not really</string>
+    <!-- A label under the happy face emoji. A user will be redirected to leave a review after tapping it. -->
+    <string name="app_rating_yes_label">Yes!</string>
 </resources>

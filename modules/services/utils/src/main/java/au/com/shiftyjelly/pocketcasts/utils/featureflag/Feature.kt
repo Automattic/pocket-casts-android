@@ -190,7 +190,7 @@ enum class Feature(
     ),
     IMPROVE_APP_RATINGS(
         key = "improve_app_ratings",
-        title = "Banner prompting for app ratings",
+        title = "Banner prompting for app rating",
         defaultValue = isDebugOrPrototypeBuild,
         tier = FeatureTier.Free,
         hasFirebaseRemoteFlag = false,
