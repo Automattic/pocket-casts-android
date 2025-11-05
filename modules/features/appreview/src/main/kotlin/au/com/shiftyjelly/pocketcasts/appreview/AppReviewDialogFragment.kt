@@ -39,10 +39,10 @@ class AppReviewDialogFragment : BaseDialogFragment() {
     }
 
     private fun goToHelpAndFeedback() {
-        dismiss()
         val hostListener = requireActivity() as FragmentHostListener
         hostListener.addFragment(HelpFragment())
         hostListener.closeBottomSheet()
         hostListener.closePlayer()
+        dismiss()
     }
 }
