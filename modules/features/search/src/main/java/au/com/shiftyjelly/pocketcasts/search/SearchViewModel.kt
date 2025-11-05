@@ -53,9 +53,21 @@ class SearchViewModel @Inject constructor(
                                     analyticsTracker.track(
                                         AnalyticsEvent.IMPROVED_SEARCH_SUGGESTIONS_FAILED,
                                         mapOf(
-                                            "source" to source,
+                                            "source" to source.analyticsValue,
+                                            "term" to operation.searchTerm,
                                         ),
                                     )
+                                }
+                                is SearchUiState.SearchOperation.Success -> {
+                                    if (operation.results.isEmpty()) {
+                                        analyticsTracker.track(
+                                            AnalyticsEvent.IMPROVED_SEARCH_EMPTY_RESULTS,
+                                            mapOf(
+                                                "source" to source.analyticsValue,
+                                                "term" to operation.searchTerm,
+                                            ),
+                                        )
+                                    }
                                 }
 
                                 else -> Unit
@@ -139,7 +151,7 @@ class SearchViewModel @Inject constructor(
             analyticsTracker.track(
                 AnalyticsEvent.IMPROVED_SEARCH_FILTER_TAPPED,
                 mapOf(
-                    "source" to source,
+                    "source" to source.analyticsValue,
                     "filter" to filter.name,
                 ),
             )
@@ -222,7 +234,7 @@ class SearchViewModel @Inject constructor(
             AnalyticsEvent.IMPROVED_SEARCH_SUGGESTION_TERM_TAPPED,
             properties = mapOf(
                 "term" to suggestion,
-                "source" to source,
+                "source" to source.analyticsValue,
             ),
         )
 
@@ -265,7 +277,7 @@ class SearchViewModel @Inject constructor(
         analyticsTracker.track(
             AnalyticsEvent.IMPROVED_SEARCH_SUGGESTIONS_SHOWN,
             mapOf(
-                "source" to source,
+                "source" to source.analyticsValue,
             ),
         )
     }
