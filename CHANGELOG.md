@@ -6,6 +6,8 @@
 *   Bug Fixes
     *   Fix podcast settings icon theming with Classic theme
         ([#4687](https://github.com/Automattic/pocket-casts-android/pull/4687))
+    *   Fix chapters sleep timer not being visible
+        ([#4691](https://github.com/Automattic/pocket-casts-android/pull/4691))
 
 7.101
 -----
