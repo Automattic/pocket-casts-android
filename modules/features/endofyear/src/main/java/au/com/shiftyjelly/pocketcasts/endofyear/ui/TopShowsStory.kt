@@ -2,6 +2,9 @@ package au.com.shiftyjelly.pocketcasts.endofyear.ui
 
 import androidx.annotation.RawRes
 import androidx.compose.animation.animateContentSize
+import androidx.compose.animation.core.FastOutSlowInEasing
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.ScrollState
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -10,10 +13,10 @@ import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -21,7 +24,11 @@ import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
@@ -30,6 +37,7 @@ import androidx.compose.ui.graphics.BlendMode
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.CompositingStrategy
+import androidx.compose.ui.graphics.TransformOrigin
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.colorResource
@@ -109,9 +117,15 @@ private fun TopShowsStory(
             story.shows.forEachIndexed { index, podcast ->
                 AnimatedContainer(
                     animationRes = if (index % 2 == 0) IR.raw.playback_top_shows_wave_1_lottie else IR.raw.playback_top_shows_wave_2_lottie
-                ) {
+                ) { scale ->
                     PodcastItem(
-                        modifier = Modifier.padding(start = 24.dp),
+                        modifier = Modifier
+                            .padding(start = 24.dp)
+                            .graphicsLayer {
+                                scaleX = scale
+                                scaleY = scale
+                                transformOrigin = TransformOrigin(0f, 0.5f)
+                            },
                         podcast = podcast,
                         index = index,
                         measurements = measurements,
@@ -129,13 +143,13 @@ private fun TopShowsStory(
 
 @Composable
 private fun AnimatedContainer(
-    modifier: Modifier = Modifier,
     @RawRes animationRes: Int,
-    content: @Composable BoxScope.() -> Unit,
+    modifier: Modifier = Modifier,
+    content: @Composable BoxScope.(Float) -> Unit,
 ) {
     Box(
-        modifier = modifier.animateContentSize(),
-        contentAlignment = Alignment.Center,
+        modifier = modifier,
+        contentAlignment = Alignment.CenterStart,
     ) {
         val composition by rememberLottieComposition(
             spec = LottieCompositionSpec.RawRes(animationRes)
@@ -143,12 +157,27 @@ private fun AnimatedContainer(
         LottieAnimation(
             modifier = Modifier
                 .height(94.dp)
-                .widthIn(max = 76.dp)
-                .align(Alignment.CenterStart),
+                .widthIn(max = 76.dp),
             composition = composition,
             contentScale = ContentScale.FillBounds
         )
-        content()
+
+        var animationTrigger by remember { mutableStateOf(false) }
+
+        LaunchedEffect(Unit) {
+            animationTrigger = true
+        }
+
+        val scaleFactor by animateFloatAsState(
+            targetValue = if (animationTrigger) 1f else .8f,
+            label = "scaleAnimation",
+            animationSpec = tween(
+                durationMillis = 600,
+                easing = FastOutSlowInEasing,
+            ),
+        )
+
+        content(scaleFactor)
     }
 }
 
@@ -184,7 +213,8 @@ private fun PodcastItem(
         Column(
             verticalArrangement = Arrangement.Center,
             modifier = Modifier
-                .fillMaxSize(),
+                .fillMaxHeight()
+                .weight(1f),
         ) {
             TextP40(
                 text = podcast.author,
