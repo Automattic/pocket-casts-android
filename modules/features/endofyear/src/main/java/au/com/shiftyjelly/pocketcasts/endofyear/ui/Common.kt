@@ -62,6 +62,19 @@ internal val Story.backgroundColor
         is Story.CompletionRate -> Color(0xFF27486A)
         is Story.Ending -> Color(0xFF27486A)
     }
+internal val Story.controlsColor
+    get() = when (this) {
+        is Story.Cover,
+        is Story.NumberOfShows,
+        is Story.TopShow,
+        is Story.Ratings,
+        is Story.TotalTime,
+        is Story.LongestEpisode,
+        is Story.YearVsYear,
+        is Story.CompletionRate,
+        is Story.Ending -> Color.White
+        else -> Color.Black
+    }
 
 internal data class EndOfYearMeasurements(
     val width: Dp,
@@ -246,6 +259,7 @@ internal fun PreviewBox(
             measurements = measurements,
             onClose = {},
             controller = StoryCaptureController.preview(),
+            colors = listOf(Color.White)
         )
     }
 }
