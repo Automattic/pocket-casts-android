@@ -21,18 +21,19 @@ import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
 
 class AppReviewManagerTest {
-    private val submittedReasonsSetting = TestSetting(emptyList<AppReviewReason>())
-    private val lastPromptSetting = TestSetting(emptyList<Instant>())
     private val episodesCompletedSetting = TestSetting(emptyList<Instant>())
+
+    private val submittedReasonsSetting = TestSetting(emptyList<AppReviewReason>())
+    private val lastPromptSetting = TestSetting<Instant?>(null)
 
     private val clock = MutableClock()
 
     private val manager = AppReviewManagerImpl(
         clock = clock,
         settings = mock<Settings> {
-            on { appReviewSubmittedReasons } doReturn submittedReasonsSetting
-            on { appReviewPromptTimestamps } doReturn lastPromptSetting
             on { appReviewEpisodeCompletedTimestamps } doReturn episodesCompletedSetting
+            on { appReviewSubmittedReasons } doReturn submittedReasonsSetting
+            on { appReviewLastPromptTimestamp } doReturn lastPromptSetting
         },
     )
 

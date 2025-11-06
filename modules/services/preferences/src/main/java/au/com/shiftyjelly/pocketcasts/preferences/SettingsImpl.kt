@@ -1620,9 +1620,9 @@ class SettingsImpl @Inject constructor(
         sharedPrefs = sharedPreferences,
     )
 
-    override val appReviewPromptTimestamps = UserSetting.PrefListFromString(
-        sharedPrefKey = "app_review_prompt_timestamp",
-        defaultValue = emptyList(),
+    override val appReviewLastPromptTimestamp = UserSetting.PrefFromString(
+        sharedPrefKey = "app_review_last_prompt_timestamp",
+        defaultValue = null,
         fromString = { value -> runCatching { Instant.parse(value) }.getOrNull() },
         toString = { value -> value.toString() },
         sharedPrefs = sharedPreferences,

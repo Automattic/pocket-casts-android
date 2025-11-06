@@ -77,15 +77,7 @@ class AppReviewManagerImpl @Inject constructor(
     private fun processSignalResult(result: AppReviewSignal.Result, reason: AppReviewReason) {
         when (result) {
             AppReviewSignal.Result.Consumed -> {
-                val lastTwoTimestamps = buildList {
-                    val lastTimestamp = settings.appReviewPromptTimestamps.value.lastOrNull()
-                    if (lastTimestamp != null) {
-                        add(lastTimestamp)
-                    }
-                    add(clock.instant())
-                }
-
-                settings.appReviewPromptTimestamps.set(lastTwoTimestamps, updateModifiedAt = false)
+                settings.appReviewLastPromptTimestamp.set(clock.instant(), updateModifiedAt = false)
 
                 if (reason != AppReviewReason.DevelopmentTrigger) {
                     val usedReasons = settings.appReviewSubmittedReasons.value
@@ -99,7 +91,7 @@ class AppReviewManagerImpl @Inject constructor(
 
     private fun hasEnoughTimePassedSinceLastPrompt(): Boolean {
         val now = clock.instant()
-        val lastReviewTimestamp = settings.appReviewPromptTimestamps.value.lastOrNull() ?: return true
+        val lastReviewTimestamp = settings.appReviewLastPromptTimestamp.value ?: return true
         return now.minus(30, ChronoUnit.DAYS).isAfter(lastReviewTimestamp)
     }
 
