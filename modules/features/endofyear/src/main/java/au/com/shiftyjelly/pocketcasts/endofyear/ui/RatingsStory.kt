@@ -1,7 +1,7 @@
 package au.com.shiftyjelly.pocketcasts.endofyear.ui
 
+import android.graphics.Typeface
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.BoxWithConstraintsScope
 import androidx.compose.foundation.layout.Column
@@ -15,9 +15,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
@@ -25,11 +22,9 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalInspectionMode
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.rememberTextMeasurer
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -37,7 +32,6 @@ import androidx.compose.ui.unit.sp
 import au.com.shiftyjelly.pocketcasts.compose.Devices
 import au.com.shiftyjelly.pocketcasts.compose.components.TextH10
 import au.com.shiftyjelly.pocketcasts.compose.components.TextP40
-import au.com.shiftyjelly.pocketcasts.compose.extensions.nonScaledSp
 import au.com.shiftyjelly.pocketcasts.endofyear.StoryCaptureController
 import au.com.shiftyjelly.pocketcasts.models.to.Rating
 import au.com.shiftyjelly.pocketcasts.models.to.RatingStats
@@ -53,7 +47,6 @@ import com.airbnb.lottie.compose.rememberLottieDynamicProperty
 import dev.shreyaspatil.capturable.capturable
 import java.io.File
 import kotlin.math.max
-import kotlinx.coroutines.delay
 import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 import au.com.shiftyjelly.pocketcasts.ui.R as UR
@@ -65,30 +58,12 @@ internal fun RatingsStory(
     controller: StoryCaptureController,
     onShareStory: (File) -> Unit,
     onLearnAboutRatings: () -> Unit,
-) = RatingsStory(
-    story = story,
-    measurements = measurements,
-    areBarsVisible = false,
-    controller = controller,
-    onShareStory = onShareStory,
-    onLearnAboutRatings = onLearnAboutRatings,
-)
-
-@Composable
-private fun RatingsStory(
-    story: Story.Ratings,
-    measurements: EndOfYearMeasurements,
-    areBarsVisible: Boolean,
-    controller: StoryCaptureController,
-    onShareStory: (File) -> Unit,
-    onLearnAboutRatings: () -> Unit,
 ) {
     val maxRatingCount = story.stats.max().second
     if (maxRatingCount != 0) {
         PresentRatings(
             story = story,
             measurements = measurements,
-            areBarsVisible = areBarsVisible,
             controller = controller,
             onShareStory = onShareStory,
         )
@@ -106,7 +81,6 @@ private fun RatingsStory(
 private fun PresentRatings(
     story: Story.Ratings,
     measurements: EndOfYearMeasurements,
-    areBarsVisible: Boolean,
     controller: StoryCaptureController,
     onShareStory: (File) -> Unit,
 ) {
@@ -154,9 +128,9 @@ private fun PresentRatings(
         ) {
             RatingBars(
                 stats = story.stats,
-                areBarsVisible = areBarsVisible,
                 forceBarsVisible = controller.isSharing,
-                modifier = Modifier.fillMaxSize()
+                modifier = Modifier
+                    .fillMaxSize()
                     .padding(bottom = 72.dp)
             )
             ShareStoryButton(
@@ -171,19 +145,18 @@ private fun PresentRatings(
 @Composable
 private fun BoxWithConstraintsScope.RatingBars(
     stats: RatingStats,
-    areBarsVisible: Boolean,
     forceBarsVisible: Boolean,
     modifier: Modifier = Modifier,
 ) {
     Row(
         verticalAlignment = Alignment.Bottom,
-        horizontalArrangement = Arrangement.spacedBy(8.dp),
         modifier = modifier,
     ) {
         Rating.entries.forEach { rating ->
             AnimatedRatingBar(
                 rating = rating.numericalValue,
-                heightRange = (stats.relativeToMax(rating) * 10).toInt()
+                heightRange = (stats.relativeToMax(rating) * 10).toInt(),
+                forceBarVisible = forceBarsVisible,
             )
         }
     }
@@ -193,35 +166,44 @@ private fun BoxWithConstraintsScope.RatingBars(
 private fun RowScope.AnimatedRatingBar(
     rating: Int,
     heightRange: Int,
+    forceBarVisible: Boolean,
 ) {
     val composition by rememberLottieComposition(
         spec = LottieCompositionSpec.RawRes(IR.raw.playback_story_ratings_pillar_lottie)
     )
 
     val animatable = rememberLottieAnimatable()
+    val isPreview = LocalInspectionMode.current
+    val freezeBar = forceBarVisible || isPreview
 
     composition?.let { comp ->
-        val markerIndex = max(1, comp.markers.size - heightRange)
-        val fromMarker = comp.markers.find { it.name == "marker_$markerIndex" } ?: comp.markers.lastOrNull()
-
-        if (fromMarker != null) {
-            LaunchedEffect(fromMarker) {
-                animatable.animate(
-                    composition = comp,
-                    clipSpec = LottieClipSpec.Marker(
-                        marker = fromMarker.name,
-                    ),
-                )
-            }
+        val targetMarker = if (heightRange > 0) {
+            val markerIndex = max(1, comp.markers.size - heightRange)
+            comp.markers.find { it.name == "marker_$markerIndex" } ?: comp.markers.lastOrNull()
         } else {
-            LaunchedEffect(Unit) {
-                animatable.animate(
-                    composition
-                )
+            null
+        }
+
+        LaunchedEffect(targetMarker, animatable) {
+            val clipSpec = if (targetMarker == null) {
+                LottieClipSpec.Frame(min = 0, max = 1)
+            } else {
+                LottieClipSpec.Marker(marker = targetMarker.name)
+            }
+
+            animatable.animate(
+                composition = composition,
+                clipSpec = clipSpec
+            )
+        }
+
+        LaunchedEffect(freezeBar, targetMarker, animatable) {
+            if (freezeBar && targetMarker != null) {
+                val endProgress = (targetMarker.startFrame + targetMarker.durationFrames) / comp.durationFrames
+                animatable.snapTo(comp, endProgress)
             }
         }
     }
-
 
     val dynamicProperties = rememberLottieDynamicProperties(
         rememberLottieDynamicProperty(
@@ -237,14 +219,15 @@ private fun RowScope.AnimatedRatingBar(
     )
 
     LottieAnimation(
-        modifier = Modifier
-            .weight(1f),
+        modifier = Modifier.weight(1f),
         composition = composition,
         progress = { animatable.progress },
         contentScale = ContentScale.FillBounds,
         dynamicProperties = dynamicProperties,
+        fontMap = mapOf(
+            "Inter-Regular" to Typeface.create("sans-serif", Typeface.NORMAL)
+        )
     )
-
 }
 
 @Composable
@@ -315,7 +298,6 @@ private fun NoRatingsInfo(
         ) {
             RatingBars(
                 stats = story.stats,
-                areBarsVisible = true,
                 forceBarsVisible = false,
             )
         }
@@ -346,7 +328,6 @@ private fun RatingsHighPreview() {
                 ),
             ),
             measurements = measurements,
-            areBarsVisible = true,
             controller = StoryCaptureController.preview(),
             onShareStory = {},
             onLearnAboutRatings = {},
@@ -369,7 +350,6 @@ private fun RatingsLowPreview() {
                 ),
             ),
             measurements = measurements,
-            areBarsVisible = true,
             controller = StoryCaptureController.preview(),
             onShareStory = {},
             onLearnAboutRatings = {},
@@ -392,7 +372,6 @@ private fun RatingsNonePreview() {
                 ),
             ),
             measurements = measurements,
-            areBarsVisible = true,
             controller = StoryCaptureController.preview(),
             onShareStory = {},
             onLearnAboutRatings = {},
