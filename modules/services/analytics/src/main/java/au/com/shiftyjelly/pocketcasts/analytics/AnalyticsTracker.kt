@@ -1,10 +1,12 @@
 package au.com.shiftyjelly.pocketcasts.analytics
 
+import java.util.concurrent.CopyOnWriteArrayList
+
 open class AnalyticsTracker(
     val trackers: List<Tracker>,
     val isFirstPartyTrackingEnabled: () -> Boolean,
 ) {
-    private var listeners = emptyList<Listener>()
+    private val listeners = CopyOnWriteArrayList<Listener>()
 
     fun addListener(listener: Listener) {
         listeners += listener
