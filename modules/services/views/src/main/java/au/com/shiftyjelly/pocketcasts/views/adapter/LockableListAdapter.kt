@@ -91,7 +91,7 @@ class LockingDragAndDropCallback<T>(
         lastDraggedPosition = draggedPosition
         lastTargetPosition = targetPosition
 
-        Collections.swap(items, draggedPosition, targetPosition)
+        items.add(targetPosition, items.removeAt(draggedPosition))
         adapter.forceSubmitList(items.toList())
         viewHolder.itemView.performHapticFeedback(HapticFeedbackConstants.CONTEXT_CLICK)
 
