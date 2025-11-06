@@ -28,7 +28,7 @@ enum class AppReviewReason(
         analyticsValue = "custom_theme_set",
     ),
     ReferralShared(
-        analyticsValue = "referrals_shared",
+        analyticsValue = "referral_shared",
     ),
     DevelopmentTrigger(
         analyticsValue = "development_trigger",
