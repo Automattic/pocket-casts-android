@@ -18,7 +18,7 @@ class AppReviewAnalyticsListener @Inject constructor(
         when (event) {
             AnalyticsEvent.PLAYER_EPISODE_COMPLETED -> {
                 val timestamps = episodesCompletedSetting.value
-                if (timestamps.size <= 3) {
+                if (timestamps.size < 3) {
                     episodesCompletedSetting.set(timestamps + clock.instant(), updateModifiedAt = false)
                 }
             }
