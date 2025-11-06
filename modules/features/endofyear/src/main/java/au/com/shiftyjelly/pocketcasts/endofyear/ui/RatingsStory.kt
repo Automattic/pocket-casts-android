@@ -156,6 +156,8 @@ private fun PresentRatings(
                 stats = story.stats,
                 areBarsVisible = areBarsVisible,
                 forceBarsVisible = controller.isSharing,
+                modifier = Modifier.fillMaxSize()
+                    .padding(bottom = 72.dp)
             )
             ShareStoryButton(
                 story = story,
@@ -171,11 +173,12 @@ private fun BoxWithConstraintsScope.RatingBars(
     stats: RatingStats,
     areBarsVisible: Boolean,
     forceBarsVisible: Boolean,
+    modifier: Modifier = Modifier,
 ) {
     Row(
         verticalAlignment = Alignment.Bottom,
         horizontalArrangement = Arrangement.spacedBy(8.dp),
-        modifier = Modifier.fillMaxSize(),
+        modifier = modifier,
     ) {
         Rating.entries.forEach { rating ->
             AnimatedRatingBar(
@@ -210,8 +213,15 @@ private fun RowScope.AnimatedRatingBar(
                     ),
                 )
             }
+        } else {
+            LaunchedEffect(Unit) {
+                animatable.animate(
+                    composition
+                )
+            }
         }
     }
+
 
     val dynamicProperties = rememberLottieDynamicProperties(
         rememberLottieDynamicProperty(
