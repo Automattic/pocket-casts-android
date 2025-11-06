@@ -179,6 +179,7 @@ class CreatePlaylistViewModel @AssistedInject constructor(
         isCreationTriggered = true
         viewModelScope.launch {
             val playlistUuid = playlistManager.createManualPlaylist(sanitizedName)
+            trackPlaylistCreated(rules = null)
             _createdPlaylist.complete(PlaylistCreated(playlistUuid, Type.Manual))
         }
     }
@@ -199,8 +200,8 @@ class CreatePlaylistViewModel @AssistedInject constructor(
         analyticsTracker.track(AnalyticsEvent.FILTER_CREATE_AS_SMART_PLAYLIST_TAPPED)
     }
 
-    fun trackPlaylistCreated(rules: SmartRules) {
-        analyticsTracker.track(AnalyticsEvent.FILTER_CREATED, rules.analyticsProperties())
+    fun trackPlaylistCreated(rules: SmartRules?) {
+        analyticsTracker.track(AnalyticsEvent.FILTER_CREATED, rules?.analyticsProperties() ?: emptyMap())
     }
 
     data class UiState(

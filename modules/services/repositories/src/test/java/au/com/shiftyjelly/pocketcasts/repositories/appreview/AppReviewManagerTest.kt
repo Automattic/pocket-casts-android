@@ -22,6 +22,14 @@ import org.mockito.kotlin.mock
 
 class AppReviewManagerTest {
     private val episodesCompletedSetting = TestSetting(emptyList<Instant>())
+    private val episodeStarredSetting = TestSetting<Instant?>(null)
+    private val podcastRatedSetting = TestSetting<Instant?>(null)
+    private val playlistCreatedSetting = TestSetting<Instant?>(null)
+    private val plusUpgradedSetting = TestSetting<Instant?>(null)
+    private val folderCreatedSetting = TestSetting<Instant?>(null)
+    private val bookmarkCreatedSetting = TestSetting<Instant?>(null)
+    private val themeChangedSetting = TestSetting<Instant?>(null)
+    private val referralSharedSetting = TestSetting<Instant?>(null)
 
     private val submittedReasonsSetting = TestSetting(emptyList<AppReviewReason>())
     private val lastPromptSetting = TestSetting<Instant?>(null)
@@ -32,6 +40,14 @@ class AppReviewManagerTest {
         clock = clock,
         settings = mock<Settings> {
             on { appReviewEpisodeCompletedTimestamps } doReturn episodesCompletedSetting
+            on { appReviewEpisodeStarredTimestamp } doReturn episodeStarredSetting
+            on { appReviewPodcastRatedTimestamp } doReturn podcastRatedSetting
+            on { appReviewPlaylistCreatedTimestamp } doReturn playlistCreatedSetting
+            on { appReviewPlusUpgradedTimestamp } doReturn plusUpgradedSetting
+            on { appReviewFolderCreatedTimestamp } doReturn folderCreatedSetting
+            on { appReviewBookmarkCreatedTimestamp } doReturn bookmarkCreatedSetting
+            on { appReviewThemeChangedTimestamp } doReturn themeChangedSetting
+            on { appReviewReferralSharedTimestamp } doReturn referralSharedSetting
             on { appReviewSubmittedReasons } doReturn submittedReasonsSetting
             on { appReviewLastPromptTimestamp } doReturn lastPromptSetting
         },
@@ -52,6 +68,108 @@ class AppReviewManagerTest {
             val signal = awaitItem()
             signal.consume()
             assertEquals(AppReviewReason.ThirdEpisodeCompleted, signal.reason)
+        }
+    }
+
+    @Test
+    fun `dispatch episode starred reason`() = runTest {
+        backgroundScope.launch { manager.monitorAppReviewReasons() }
+
+        manager.showPromptSignal.test {
+            episodeStarredSetting.set(clock.instant())
+            val signal = awaitItem()
+            signal.consume()
+            assertEquals(AppReviewReason.EpisodeStarred, signal.reason)
+        }
+    }
+
+    @Test
+    fun `dispatch show rated reason`() = runTest {
+        backgroundScope.launch { manager.monitorAppReviewReasons() }
+
+        manager.showPromptSignal.test {
+            podcastRatedSetting.set(clock.instant())
+            val signal = awaitItem()
+            signal.consume()
+            assertEquals(AppReviewReason.ShowRated, signal.reason)
+        }
+    }
+
+    @Test
+    fun `dispatch filter created reason`() = runTest {
+        backgroundScope.launch { manager.monitorAppReviewReasons() }
+
+        manager.showPromptSignal.test {
+            playlistCreatedSetting.set(clock.instant())
+            val signal = awaitItem()
+            signal.consume()
+            assertEquals(AppReviewReason.FilterCreated, signal.reason)
+        }
+    }
+
+    @Test
+    fun `dispatch plus upgraded reason`() = runTest {
+        backgroundScope.launch { manager.monitorAppReviewReasons() }
+
+        manager.showPromptSignal.test {
+            plusUpgradedSetting.set(clock.instant())
+            expectNoEvents()
+
+            clock += 2.days
+            expectNoEvents()
+
+            clock += 1.seconds
+            val signal = awaitItem()
+            signal.consume()
+            assertEquals(AppReviewReason.PlusUpgraded, signal.reason)
+        }
+    }
+
+    @Test
+    fun `dispatch folder created reason`() = runTest {
+        backgroundScope.launch { manager.monitorAppReviewReasons() }
+
+        manager.showPromptSignal.test {
+            folderCreatedSetting.set(clock.instant())
+            val signal = awaitItem()
+            signal.consume()
+            assertEquals(AppReviewReason.FolderCreated, signal.reason)
+        }
+    }
+
+    @Test
+    fun `dispatch bookmark created reason`() = runTest {
+        backgroundScope.launch { manager.monitorAppReviewReasons() }
+
+        manager.showPromptSignal.test {
+            bookmarkCreatedSetting.set(clock.instant())
+            val signal = awaitItem()
+            signal.consume()
+            assertEquals(AppReviewReason.BookmarkCreated, signal.reason)
+        }
+    }
+
+    @Test
+    fun `dispatch custom theme set reason`() = runTest {
+        backgroundScope.launch { manager.monitorAppReviewReasons() }
+
+        manager.showPromptSignal.test {
+            themeChangedSetting.set(clock.instant())
+            val signal = awaitItem()
+            signal.consume()
+            assertEquals(AppReviewReason.CustomThemeSet, signal.reason)
+        }
+    }
+
+    @Test
+    fun `dispatch referrals shared reason`() = runTest {
+        backgroundScope.launch { manager.monitorAppReviewReasons() }
+
+        manager.showPromptSignal.test {
+            referralSharedSetting.set(clock.instant())
+            val signal = awaitItem()
+            signal.consume()
+            assertEquals(AppReviewReason.ReferralShared, signal.reason)
         }
     }
 

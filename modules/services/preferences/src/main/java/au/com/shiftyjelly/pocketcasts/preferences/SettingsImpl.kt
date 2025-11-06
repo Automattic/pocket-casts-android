@@ -1620,8 +1620,64 @@ class SettingsImpl @Inject constructor(
         sharedPrefs = sharedPreferences,
     )
 
-    override val appReviewLastPromptTimestamp = UserSetting.PrefFromString(
-        sharedPrefKey = "app_review_last_prompt_timestamp",
+    override val appReviewEpisodeStarredTimestamp = UserSetting.PrefFromString(
+        sharedPrefKey = "app_review_episode_starred_timestamp",
+        defaultValue = null,
+        fromString = { value -> runCatching { Instant.parse(value) }.getOrNull() },
+        toString = { value -> value.toString() },
+        sharedPrefs = sharedPreferences,
+    )
+
+    override val appReviewPodcastRatedTimestamp = UserSetting.PrefFromString(
+        sharedPrefKey = "app_review_podcast_rated_timestamp",
+        defaultValue = null,
+        fromString = { value -> runCatching { Instant.parse(value) }.getOrNull() },
+        toString = { value -> value.toString() },
+        sharedPrefs = sharedPreferences,
+    )
+
+    override val appReviewPlaylistCreatedTimestamp = UserSetting.PrefFromString(
+        sharedPrefKey = "app_review_playlist_created_timestamp",
+        defaultValue = null,
+        fromString = { value -> runCatching { Instant.parse(value) }.getOrNull() },
+        toString = { value -> value.toString() },
+        sharedPrefs = sharedPreferences,
+    )
+
+    override val appReviewPlusUpgradedTimestamp = UserSetting.PrefFromString(
+        sharedPrefKey = "app_review_plus_upgraded_timestamp",
+        defaultValue = null,
+        fromString = { value -> runCatching { Instant.parse(value) }.getOrNull() },
+        toString = { value -> value.toString() },
+        sharedPrefs = sharedPreferences,
+    )
+
+    override val appReviewFolderCreatedTimestamp = UserSetting.PrefFromString(
+        sharedPrefKey = "app_review_folder_created_timestamp",
+        defaultValue = null,
+        fromString = { value -> runCatching { Instant.parse(value) }.getOrNull() },
+        toString = { value -> value.toString() },
+        sharedPrefs = sharedPreferences,
+    )
+
+    override val appReviewBookmarkCreatedTimestamp = UserSetting.PrefFromString(
+        sharedPrefKey = "app_review_bookmark_created_timestamp",
+        defaultValue = null,
+        fromString = { value -> runCatching { Instant.parse(value) }.getOrNull() },
+        toString = { value -> value.toString() },
+        sharedPrefs = sharedPreferences,
+    )
+
+    override val appReviewThemeChangedTimestamp = UserSetting.PrefFromString(
+        sharedPrefKey = "app_review_theme_changed_timestamp",
+        defaultValue = null,
+        fromString = { value -> runCatching { Instant.parse(value) }.getOrNull() },
+        toString = { value -> value.toString() },
+        sharedPrefs = sharedPreferences,
+    )
+
+    override val appReviewReferralSharedTimestamp = UserSetting.PrefFromString(
+        sharedPrefKey = "app_review_referral_shared_timestamp",
         defaultValue = null,
         fromString = { value -> runCatching { Instant.parse(value) }.getOrNull() },
         toString = { value -> value.toString() },
@@ -1633,6 +1689,14 @@ class SettingsImpl @Inject constructor(
         defaultValue = emptyList(),
         fromString = { value -> AppReviewReason.fromValue(value) },
         toString = { value -> value.analyticsValue },
+        sharedPrefs = sharedPreferences,
+    )
+
+    override val appReviewLastPromptTimestamp = UserSetting.PrefFromString(
+        sharedPrefKey = "app_review_last_prompt_timestamp",
+        defaultValue = null,
+        fromString = { value -> runCatching { Instant.parse(value) }.getOrNull() },
+        toString = { value -> value.toString() },
         sharedPrefs = sharedPreferences,
     )
 }

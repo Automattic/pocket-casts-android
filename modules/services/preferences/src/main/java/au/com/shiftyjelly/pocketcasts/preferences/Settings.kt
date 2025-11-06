@@ -593,7 +593,14 @@ interface Settings {
 
     // App review prompt policy settings
     val appReviewEpisodeCompletedTimestamps: ReadWriteSetting<List<Instant>>
-
+    val appReviewEpisodeStarredTimestamp: ReadWriteSetting<Instant?>
+    val appReviewPodcastRatedTimestamp: ReadWriteSetting<Instant?>
+    val appReviewPlaylistCreatedTimestamp: ReadWriteSetting<Instant?>
+    val appReviewPlusUpgradedTimestamp: ReadWriteSetting<Instant?>
+    val appReviewFolderCreatedTimestamp: ReadWriteSetting<Instant?>
+    val appReviewBookmarkCreatedTimestamp: ReadWriteSetting<Instant?>
+    val appReviewThemeChangedTimestamp: ReadWriteSetting<Instant?>
+    val appReviewReferralSharedTimestamp: ReadWriteSetting<Instant?>
     val appReviewSubmittedReasons: ReadWriteSetting<List<AppReviewReason>>
     val appReviewLastPromptTimestamp: ReadWriteSetting<Instant?>
 }

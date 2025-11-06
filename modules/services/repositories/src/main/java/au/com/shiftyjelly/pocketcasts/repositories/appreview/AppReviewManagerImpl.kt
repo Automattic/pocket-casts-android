@@ -101,35 +101,36 @@ class AppReviewManagerImpl @Inject constructor(
         }
 
         AppReviewReason.EpisodeStarred -> {
-            false
+            settings.appReviewEpisodeStarredTimestamp.value != null
         }
 
         AppReviewReason.ShowRated -> {
-            false
+            settings.appReviewPodcastRatedTimestamp.value != null
         }
 
         AppReviewReason.FilterCreated -> {
-            false
+            settings.appReviewPlaylistCreatedTimestamp.value != null
         }
 
         AppReviewReason.PlusUpgraded -> {
-            false
+            val upgradeTimestamp = settings.appReviewPlusUpgradedTimestamp.value
+            upgradeTimestamp != null && clock.instant().isAfter(upgradeTimestamp.plus(2, ChronoUnit.DAYS))
         }
 
         AppReviewReason.FolderCreated -> {
-            false
+            settings.appReviewFolderCreatedTimestamp.value != null
         }
 
         AppReviewReason.BookmarkCreated -> {
-            false
+            settings.appReviewBookmarkCreatedTimestamp.value != null
         }
 
         AppReviewReason.CustomThemeSet -> {
-            false
+            settings.appReviewThemeChangedTimestamp.value != null
         }
 
         AppReviewReason.ReferralShared -> {
-            false
+            settings.appReviewReferralSharedTimestamp.value != null
         }
 
         AppReviewReason.DevelopmentTrigger -> {
