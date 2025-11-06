@@ -72,7 +72,8 @@ internal val Story.controlsColor
         is Story.LongestEpisode,
         is Story.YearVsYear,
         is Story.CompletionRate,
-        is Story.Ending -> Color.White
+        is Story.Ending,
+        -> Color.White
         else -> Color.Black
     }
 
@@ -259,7 +260,7 @@ internal fun PreviewBox(
             measurements = measurements,
             onClose = {},
             controller = StoryCaptureController.preview(),
-            colors = listOf(Color.White)
+            colors = listOf(Color.White),
         )
     }
 }

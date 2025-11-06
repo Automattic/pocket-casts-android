@@ -61,8 +61,8 @@ import com.airbnb.lottie.compose.rememberLottieComposition
 import dev.shreyaspatil.capturable.capturable
 import java.io.File
 import kotlin.random.Random
-import au.com.shiftyjelly.pocketcasts.localization.R as LR
 import au.com.shiftyjelly.pocketcasts.images.R as IR
+import au.com.shiftyjelly.pocketcasts.localization.R as LR
 import au.com.shiftyjelly.pocketcasts.ui.R as UR
 
 @Composable
@@ -117,7 +117,7 @@ private fun TopShowsStory(
         ) {
             story.shows.forEachIndexed { index, podcast ->
                 AnimatedContainer(
-                    animationRes = if (index % 2 == 0) IR.raw.playback_top_shows_wave_1_lottie else IR.raw.playback_top_shows_wave_2_lottie
+                    animationRes = if (index % 2 == 0) IR.raw.playback_top_shows_wave_1_lottie else IR.raw.playback_top_shows_wave_2_lottie,
                 ) { scale ->
                     PodcastItem(
                         modifier = Modifier
@@ -153,7 +153,7 @@ private fun AnimatedContainer(
         contentAlignment = Alignment.CenterStart,
     ) {
         val composition by rememberLottieComposition(
-            spec = LottieCompositionSpec.RawRes(animationRes)
+            spec = LottieCompositionSpec.RawRes(animationRes),
         )
         LottieAnimation(
             modifier = Modifier
@@ -161,7 +161,7 @@ private fun AnimatedContainer(
                 .widthIn(max = 76.dp),
             composition = composition,
             iterations = LottieConstants.IterateForever,
-            contentScale = ContentScale.FillBounds
+            contentScale = ContentScale.FillBounds,
         )
 
         var animationTrigger by remember { mutableStateOf(false) }
