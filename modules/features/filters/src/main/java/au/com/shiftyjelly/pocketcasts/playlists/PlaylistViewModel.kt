@@ -220,7 +220,10 @@ class PlaylistViewModel @AssistedInject constructor(
         viewModelScope.launch(NonCancellable) {
             delay(300) // Some small delay to navigate back to the main UI first.
             playlistManager.deletePlaylist(playlistUuid)
-            analyticsTracker.track(AnalyticsEvent.FILTER_DELETED)
+            analyticsTracker.track(
+                AnalyticsEvent.FILTER_DELETED,
+                mapOf("filter_type" to playlistType.analyticsValue),
+            )
         }
     }
 
@@ -239,8 +242,25 @@ class PlaylistViewModel @AssistedInject constructor(
         }
     }
 
+    fun trackDeleteTriggered() {
+        analyticsTracker.track(
+            AnalyticsEvent.FILTER_DELETE_TRIGGERED,
+            mapOf("filter_type" to playlistType.analyticsValue),
+        )
+    }
+
+    fun trackDeleteDismissed() {
+        analyticsTracker.track(
+            AnalyticsEvent.FILTER_DELETE_DISMISSED,
+            mapOf("filter_type" to playlistType.analyticsValue),
+        )
+    }
+
     fun trackFilterShown() {
-        analyticsTracker.track(AnalyticsEvent.FILTER_SHOWN)
+        analyticsTracker.track(
+            AnalyticsEvent.FILTER_SHOWN,
+            mapOf("filter_type" to playlistType.analyticsValue),
+        )
     }
 
     fun trackAddEpisodesTapped() {
@@ -256,33 +276,89 @@ class PlaylistViewModel @AssistedInject constructor(
     }
 
     fun trackPlayAllTapped() {
-        analyticsTracker.track(AnalyticsEvent.FILTER_PLAY_ALL_TAPPED)
+        analyticsTracker.track(
+            AnalyticsEvent.FILTER_PLAY_ALL_TAPPED,
+            mapOf("filter_type" to playlistType.analyticsValue),
+        )
+    }
+
+    fun trackSaveUpNextTapped() {
+        analyticsTracker.track(
+            AnalyticsEvent.FILTER_PLAY_ALL_SAVE_UP_NEXT_TAPPED,
+            mapOf("filter_type" to playlistType.analyticsValue),
+        )
+    }
+
+    fun trackReplaceAndPlayTapped() {
+        analyticsTracker.track(
+            AnalyticsEvent.FILTER_PLAY_ALL_REPLACE_AND_PLAY_TAPPED,
+            mapOf("filter_type" to playlistType.analyticsValue),
+        )
+    }
+
+    fun trackReplaceAndPlayConfirmTapped() {
+        analyticsTracker.track(
+            AnalyticsEvent.FILTER_PLAY_ALL_REPLACE_AND_PLAY_CONFIRM_TAPPED,
+            mapOf("filter_type" to playlistType.analyticsValue),
+        )
+    }
+
+    fun trackPlayAllDismissed() {
+        analyticsTracker.track(
+            AnalyticsEvent.FILTER_PLAY_ALL_DISMISSED,
+            mapOf("filter_type" to playlistType.analyticsValue),
+        )
     }
 
     fun trackSelectEpisodesTapped() {
-        analyticsTracker.track(AnalyticsEvent.FILTER_SELECT_EPISODES_TAPPED)
+        analyticsTracker.track(
+            AnalyticsEvent.FILTER_SELECT_EPISODES_TAPPED,
+            mapOf("filter_type" to playlistType.analyticsValue),
+        )
     }
 
     fun trackSortByTapped() {
-        analyticsTracker.track(AnalyticsEvent.FILTER_SORT_BY_TAPPED)
+        analyticsTracker.track(
+            AnalyticsEvent.FILTER_SORT_BY_TAPPED,
+            mapOf("filter_type" to playlistType.analyticsValue),
+        )
     }
 
     fun trackDownloadAllTapped() {
-        analyticsTracker.track(AnalyticsEvent.FILTER_DOWNLOAD_ALL_TAPPED)
+        analyticsTracker.track(
+            AnalyticsEvent.FILTER_DOWNLOAD_ALL_TAPPED,
+            mapOf("filter_type" to playlistType.analyticsValue),
+        )
     }
 
     fun trackChromeCastTapped() {
-        analyticsTracker.track(AnalyticsEvent.FILTER_CHROME_CAST_TAPPED)
+        analyticsTracker.track(
+            AnalyticsEvent.FILTER_CHROME_CAST_TAPPED,
+            mapOf("filter_type" to playlistType.analyticsValue),
+        )
+    }
+
+    fun trackFilterOptionsButtonTapped() {
+        analyticsTracker.track(
+            AnalyticsEvent.FILTER_OPTIONS_BUTTON_TAPPED,
+            mapOf("filter_type" to playlistType.analyticsValue),
+        )
     }
 
     fun trackFilterOptionsTapped() {
-        analyticsTracker.track(AnalyticsEvent.FILTER_OPTIONS_TAPPED)
+        analyticsTracker.track(
+            AnalyticsEvent.FILTER_OPTIONS_TAPPED,
+            mapOf("filter_type" to playlistType.analyticsValue),
+        )
     }
 
     fun trackSortByChanged(type: PlaylistEpisodeSortType) {
         analyticsTracker.track(
             AnalyticsEvent.FILTER_SORT_BY_CHANGED,
-            mapOf("sort_order" to type.analyticsValue),
+            mapOf(
+                "sort_order" to type.analyticsValue,
+                "filter_type" to playlistType.analyticsValue,
+            ),
         )
     }
 
@@ -292,6 +368,7 @@ class PlaylistViewModel @AssistedInject constructor(
             mapOf(
                 "source" to "filters",
                 "enabled" to isEnabled,
+                "filter_type" to playlistType.analyticsValue,
             ),
         )
     }
@@ -310,6 +387,7 @@ class PlaylistViewModel @AssistedInject constructor(
                 "did_change_name" to isNameChanged,
                 "did_change_auto_download" to isAutoDownloadChanged,
                 "did_change_episode_count" to isAutoDownloadLimitChanged,
+                "filter_type" to playlistType.analyticsValue,
             ),
         )
     }

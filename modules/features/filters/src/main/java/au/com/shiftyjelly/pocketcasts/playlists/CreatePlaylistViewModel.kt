@@ -6,8 +6,10 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
+import au.com.shiftyjelly.pocketcasts.compose.text.SearchFieldState
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.to.PlaylistEpisode
+import au.com.shiftyjelly.pocketcasts.models.type.PlaylistEpisodeSortType
 import au.com.shiftyjelly.pocketcasts.models.type.SmartRules
 import au.com.shiftyjelly.pocketcasts.models.type.SmartRules.DownloadStatusRule
 import au.com.shiftyjelly.pocketcasts.models.type.SmartRules.MediaTypeRule
@@ -55,7 +57,11 @@ class CreatePlaylistViewModel @AssistedInject constructor(
         scope = viewModelScope,
         initialBuilder = RulesBuilder.Empty,
         initialAppliedRules = AppliedRules.Empty,
+        sortType = PlaylistEpisodeSortType.NewestToOldest,
+        podcastSearchState = SearchFieldState(),
     )
+
+    val podcastSearchState get() = rulesEditor.podcastSearchState
 
     val uiState = combine(
         rulesEditor.rulesFlow,

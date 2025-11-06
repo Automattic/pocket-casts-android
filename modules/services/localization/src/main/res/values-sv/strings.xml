@@ -27,7 +27,6 @@ Language: sv_SE
     <string name="smart_playlists">Smarta spellistor</string>
     <string name="select_smart_playlists">Välj smarta spellistor</string>
     <string name="podcast_not_in_playlists">Ingår inte i några smarta spellistor</string>
-    <string name="playlist_is_full_description">Spellistan är full. Prova att skapa en ny.</string>
     <string name="add_to_playlist_no_playlist_found_title">Lägg till i spellista</string>
     <string name="add_to_playlist_no_playlist_found_body">Vi kunde inte hitta någon spellista för denna sökning. Skapa en ny spellista eller prova ett annat nyckelord.</string>
     <string name="add_to_playlist_find_playlist">Hitta spellista</string>
@@ -460,7 +459,6 @@ Language: sv_SE
     <string name="transcript_error_not_available">Det finns ingen transkription tillgänglig för det här avsnittet.</string>
     <string name="referrals_banner_hide_label">Dölj den här bannern</string>
     <string name="referrals_banner_long_press_label">Dölj hänvisningsbannern för att göra anspråk på pass.</string>
-    <string name="end_of_year_prompt_card_title">Uppspelning 2024\när här.</string>
     <string name="settings_auto_download_limit_auto_downloads">Begränsa automatiska nedladdningar</string>
     <string name="settings_auto_download_limit_all_latest_episodes">Alla senaste avsnitt</string>
     <string name="settings_auto_download_limit_ten_latest_episode">De 10 senaste avsnitten</string>
@@ -643,7 +641,6 @@ Language: sv_SE
     <string name="settings_use_dark_up_next">Använd mörkt Up Next-tema</string>
     <string name="end_of_year_stories_theres_more">Och det finns mer!</string>
     <string name="end_of_year_stories_year_completion_rate">slutförandegrad</string>
-    <string name="end_of_year_stories_year_completion_rate_subtitle">Av de %1$d avsnitt du började lyssna på lyssnade du sammanlagt på %2$d</string>
     <string name="end_of_year_stories_year_completion_rate_title">Din slutförandegrad i år var %1$d%%</string>
     <string name="eoy_year_over_year_title_skyrocketed">Jämfört med 2022 har din lyssningstid skjutit i höjden!</string>
     <string name="end_of_year_stories_year_over_year_subtitle_went_down">Ack ja … det finns ett liv att leva, eller hur?</string>
@@ -656,7 +653,6 @@ Language: sv_SE
     <string name="end_of_year_stories_year_over_year_title_went_up">Jämfört med %1$s ökade din lyssningstid med hisnande %2$s%%</string>
     <string name="end_of_year_story_longest_episode_title">Det längsta avsnittet du lyssnade på var %1$s</string>
     <string name="end_of_year_replay">Spela upp igen</string>
-    <string name="end_of_year_story_epilogue_title">Tack för att du lyssnat med oss i år.\nVi ses %1$d!</string>
     <string name="end_of_year_listening_time_title">Detta var den sammanlagda tiden du lyssnade på podcasts.</string>
     <string name="end_of_year_story_top_categories_subtitle">Du lyssnade på %1$s avsnitt i sammanlagt %2$s</string>
     <string name="end_of_year_story_top_categories_title">Visste du att %1$s var din favoritkategori</string>
@@ -964,7 +960,6 @@ Language: sv_SE
     <string name="end_of_year_create_account_to_see">Spara dina podcasts i molnet, få din årsslutsöversikt och synkronisera ditt lyssningsförlopp med andra enheter.</string>
     <string name="end_of_year_story_top_categories_share_text">Mina mest lyssnade podcastkategorier</string>
     <string name="end_of_year_story_top_podcasts_share_text">Mina favoritpodcasts för året. %1$s</string>
-    <string name="end_of_year_story_epilogue_subtitle">Glöm inte att dela med dina vänner och att berätta om dina favoritpodcastkreatörer</string>
     <string name="end_of_year_story_listened_to_numbers_subtitle">Det fanns dock ett avsnitt som du fortsatte att komma tillbaka till …</string>
     <string name="end_of_year_story_longest_episode_share_text">Det längsta avsnittet jag lyssnade på under %1$d %2$s</string>
     <string name="end_of_year_story_top_podcasts_list_title">Mina favoritpodcasts %1$d</string>
@@ -1014,7 +1009,6 @@ Language: sv_SE
     <string name="filter_x_not_found">Spellistan %1$s hittades inte</string>
     <string name="settings_app_icon_halloween">Halloween</string>
     <string name="end_of_year_launch_modal_summary">Se dina favoritpodcasts och -kategorier, lyssningsstatistik med mera. Dela med vänner och berätta om dina favoritkreatörer.</string>
-    <string name="end_of_year_launch_modal_primary_button_title">Visa Min uppspelning 2024</string>
     <string name="settings_show_played_summary">Avsnitt som du har spelat klart kommer fortfarande att visas</string>
     <string name="settings_show_played">Visa spelade avsnitt</string>
     <string name="settings_title_privacy">Integritet</string>

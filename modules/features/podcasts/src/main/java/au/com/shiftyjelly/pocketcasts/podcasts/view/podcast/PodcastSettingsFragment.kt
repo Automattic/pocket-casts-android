@@ -10,7 +10,9 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
+import androidx.core.graphics.toColorInt
 import androidx.core.os.bundleOf
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
@@ -24,6 +26,7 @@ import au.com.shiftyjelly.pocketcasts.podcasts.viewmodel.PodcastSettingsViewMode
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.settings.AutoAddSettingsFragment
 import au.com.shiftyjelly.pocketcasts.ui.helper.FragmentHostListener
+import au.com.shiftyjelly.pocketcasts.ui.theme.ThemeColor
 import au.com.shiftyjelly.pocketcasts.utils.extensions.pxToDp
 import au.com.shiftyjelly.pocketcasts.utils.extensions.requireParcelable
 import au.com.shiftyjelly.pocketcasts.views.dialog.ConfirmationDialog
@@ -65,8 +68,8 @@ class PodcastSettingsFragment :
         AppTheme(theme.activeTheme) {
             val uiState by viewModel.uiState.collectAsState()
             val miniPlayerInset by settings.bottomInset.collectAsState(0)
-            val toolbarColors = remember(theme.activeTheme) {
-                ToolbarColors.podcast(args.lightTint, args.darkTint, theme)
+            val colors = remember(theme.activeTheme) {
+                SettingsColors(args.lightTint, args.darkTint, theme.activeTheme)
             }
             val navController = rememberNavController()
             this.navController = navController
@@ -74,7 +77,7 @@ class PodcastSettingsFragment :
             PodcastSettingsPage(
                 podcastTitle = args.title,
                 uiState = uiState,
-                toolbarColors = toolbarColors,
+                colors = colors,
                 navController = navController,
                 getArtworkUuidsFlow = viewModel::getArtworkUuidsFlow,
                 refreshArtworkUuids = viewModel::refreshArtworkUuids,
@@ -95,8 +98,10 @@ class PodcastSettingsFragment :
                 onChangeVolumeBoost = viewModel::changeVolumeBoost,
                 onDecrementSkipFirst = viewModel::decrementSkipFirst,
                 onIncrementSkipFirst = viewModel::incrementSkipFirst,
+                onChangeSkipFirst = viewModel::changeSkipFirst,
                 onDecrementSkipLast = viewModel::decrementSkipLast,
                 onIncrementSkipLast = viewModel::incrementSkipLast,
+                onChangeSkipLast = viewModel::changeSkipLast,
                 onAddPodcastToPlaylists = viewModel::addPodcastToPlaylists,
                 onRemovePodcastFromPlaylists = viewModel::removePodcastFromPlaylists,
                 onUnfollow = ::showUnfollowDialog,

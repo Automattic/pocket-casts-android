@@ -290,7 +290,6 @@ Language: el_GR
     <string name="referrals_failed_to_load_offer">Λυπούμαστε, αλλά κάτι πήγε στραβά κατά την ανάκτηση του συνδέσμου παραπομπής σου.</string>
     <string name="referrals_banner_hide_label">Απόκρυψη αυτής της κεφαλίδας</string>
     <string name="referrals_banner_long_press_label">Απόκρυψη κεφαλίδας διεκδίκησης πάσου.</string>
-    <string name="end_of_year_prompt_card_title">H Αναπαραγωγή 2024\nείναι εδώ!</string>
     <string name="settings_auto_download_limit_auto_downloads">Περιορισμός αυτόματων λήψεων</string>
     <string name="settings_auto_download_limit_all_latest_episodes">Όλα τα Τελευταία Επεισόδια</string>
     <string name="settings_auto_download_limit_ten_latest_episode">10 Τελευταία Επεισόδια</string>
@@ -474,7 +473,6 @@ Language: el_GR
     <string name="end_of_year_stories_year_completion_rate_title">Ο ρυθμός ολοκλήρωσής σου φέτος ήταν %1$d%%</string>
     <string name="end_of_year_stories_year_over_share_text">Ο χρόνος ακρόασης μου το %1$d σε σύγκριση με το %2$d</string>
     <string name="end_of_year_stories_year_completion_rate">ποσοστό ολοκλήρωσης</string>
-    <string name="end_of_year_stories_year_completion_rate_subtitle">Από τα %1$d επεισόδια που ξεκίνησες, ολοκλήρωσες συνολικά %2$d</string>
     <string name="eoy_year_over_year_title_skyrocketed">Σε σύγκριση με το 2022, ο χρόνος ακρόασης σου εκτοξεύτηκε!</string>
     <string name="end_of_year_stories_year_over_year_subtitle_went_down">Αααχ… έχεις και μια ζωή να ζήσεις, έτσι δεν είναι;</string>
     <string name="end_of_year_prompt_card_summary">Δες τα στατιστικά ακρόασης σου, τα κορυφαία podcasts και άλλα.</string>
@@ -484,7 +482,6 @@ Language: el_GR
     <string name="end_of_year_stories_year_over_year_subtitle_flat">Και λένε ότι η συνέπεια είναι το κλειδί για την επιτυχία… ή κάτι τέτοιο!</string>
     <string name="end_of_year_stories_year_over_year_title_flat">Σε σχέση με το %1$s, ο χρόνος ακρόασης σου παρέμεινε αρκετά σταθερός</string>
     <string name="end_of_year_story_longest_episode_title">Το μεγαλύτερο επεισόδιο που ακούσες ήταν το %1$s</string>
-    <string name="end_of_year_story_epilogue_title">Ευχαριστούμε που ακούσες μαζί μας φέτος. Τα λέμε το %1$d!</string>
     <string name="end_of_year_replay">Παίξε ξανά</string>
     <string name="end_of_year_listening_time_title">Αυτός ήταν ο συνολικός σου χρόνος ακρόασης podcasts</string>
     <string name="end_of_year_story_top_categories_subtitle">Ακούσες %1$s επεισόδια από τα %2$s συνολικά</string>
@@ -790,7 +787,6 @@ Language: el_GR
     <string name="end_of_year_story_top_categories_share_text">Οι κατηγορίες podcast που άκουσα περισσότερο</string>
     <string name="end_of_year_story_top_podcast_share_text">Το αγαπημένο μου podcast του %1$d! %2$s</string>
     <string name="end_of_year_create_account_to_see">Αποθήκευσε τα podcast σου στο cloud, πάρε την ανασκόπησή σου για το τέλος της χρονιάς και συγχρόνισε την πρόοδό σου με άλλες συσκευές.</string>
-    <string name="end_of_year_story_epilogue_subtitle">Μην ξεχάσεις να μοιραστείς με τους φίλους σου και να επαινέσεις τους αγαπημένους σου δημιουργούς podcast</string>
     <string name="end_of_year_story_longest_episode_share_text">Το μεγαλύτερο επεισόδιο που άκουσα το %1$d %2$s</string>
     <string name="end_of_year_story_top_podcast_subtitle">Ακούσες %1$d επεισόδια από τα %2$s συνολικά του «%3$s»</string>
     <string name="end_of_year_story_listened_to_numbers_share_text">Άκουσα %1$d διαφορετικά podcasts και %2$d επεισόδια το %3$d</string>
@@ -834,7 +830,6 @@ Language: el_GR
     <string name="chapter_to_skip_to">Παράλειψη σε Κεφάλαιο</string>
     <string name="end_of_year_launch_modal_summary">Δες τα κορυφαία σου podcasts, κατηγορίες, στατιστικά ακρόασης και άλλα. Μοιράσου με φίλους και πες για τους αγαπημένους σου δημιουργούς!</string>
     <string name="settings_app_icon_halloween">Χάλοουιν</string>
-    <string name="end_of_year_launch_modal_primary_button_title">Δες το Η Αναπαραγωγή Μου 2024</string>
     <string name="settings_show_played">Εμφάνιση αναπαραγμένων επεισοδίων</string>
     <string name="settings_show_played_summary">Τα επεισόδια που έχεις ολοκληρώσει θα εξακολουθούν να εμφανίζονται</string>
     <string name="settings_title_privacy">Απόρρητο</string>

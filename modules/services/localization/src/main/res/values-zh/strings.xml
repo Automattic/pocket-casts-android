@@ -27,7 +27,6 @@ Language: zh_CN
     <string name="smart_playlists">智能播放列表</string>
     <string name="select_smart_playlists">选择智能播放列表</string>
     <string name="podcast_not_in_playlists">未包含在任何智能播放列表中</string>
-    <string name="playlist_is_full_description">播放列表已满。 尝试创建新播放列表。</string>
     <string name="add_to_playlist_no_playlist_found_title">添加至播放列表</string>
     <string name="add_to_playlist_no_playlist_found_body">我们找不到任何符合该搜索条件的播放列表。 创建新播放列表或尝试使用其他关键字。</string>
     <string name="add_to_playlist_find_playlist">查找播放列表</string>
@@ -460,7 +459,6 @@ Language: zh_CN
     <string name="transcript_error_not_available">很抱歉，本剧集没有文字转录稿。</string>
     <string name="referrals_banner_hide_label">隐藏此横幅</string>
     <string name="referrals_banner_long_press_label">隐藏推荐申领通行证横幅。</string>
-    <string name="end_of_year_prompt_card_title">2024 年播放记录\n可在此查看！</string>
     <string name="settings_auto_download_limit_auto_downloads">限制自动下载次数</string>
     <string name="settings_auto_download_limit_ten_latest_episode">最新的 10 集剧集</string>
     <string name="settings_auto_download_limit_five_latest_episode">最新的 5 集剧集</string>
@@ -646,7 +644,6 @@ Language: zh_CN
     <string name="end_of_year_stories_year_completion_rate_title">您今年的完成率为 %1$d%%</string>
     <string name="eoy_year_over_year_title_skyrocketed">相比于 2022 年，您的收听时长飙升！</string>
     <string name="end_of_year_stories_year_over_year_subtitle_went_down">啊哈…生活还得继续，不是吗？</string>
-    <string name="end_of_year_stories_year_completion_rate_subtitle">从最初收听的 %1$d 集开始，您总共完整收听的时长为 %2$d</string>
     <string name="end_of_year_stories_year_over_share_text">我的 %1$d 年收听时长与 %2$d 年的比较情况</string>
     <string name="end_of_year_stories_year_over_year_subtitle_flat">人们常说，一致性是成功的关键…或诸如此类的话！</string>
     <string name="end_of_year_prompt_card_summary">查看您的收听统计数据、热门播客等。</string>
@@ -656,7 +653,6 @@ Language: zh_CN
     <string name="end_of_year_stories_year_over_year_title_went_up">与 %1$s 年相比，您的收听时长激增 %2$s%%</string>
     <string name="end_of_year_replay">再次播放</string>
     <string name="end_of_year_story_longest_episode_title">您收听的最长一集为 %1$s</string>
-    <string name="end_of_year_story_epilogue_title">感谢您今年收听我们的播客。\n%1$d 年再见！</string>
     <string name="end_of_year_listening_time_title">这是您收听播客的总时长。</string>
     <string name="end_of_year_story_top_categories_title">您是否知道 %1$s 是您最喜欢的分类？</string>
     <string name="discover_category_society_abbreviation">文化</string>
@@ -964,7 +960,6 @@ Language: zh_CN
     <string name="end_of_year_story_top_categories_share_text">我收听最多的播客分类</string>
     <string name="end_of_year_story_top_categories">您的热门分类</string>
     <string name="end_of_year_story_top_podcasts_share_text">我的年度热门播客！ %1$s</string>
-    <string name="end_of_year_story_epilogue_subtitle">不要忘记共享给朋友，告诉他们您最喜欢的播客创作者</string>
     <string name="end_of_year_story_listened_to_numbers_subtitle">但还有一个您经常收听的播客…</string>
     <string name="end_of_year_story_longest_episode_share_text">%1$d 年我收听时间最长的剧集%2$s</string>
     <string name="end_of_year_story_top_podcasts_list_title">我的 %1$d 年热门播客</string>
@@ -1014,7 +1009,6 @@ Language: zh_CN
     <string name="must_provide_filter_name">必须提供播放列表名称</string>
     <string name="end_of_year_launch_modal_summary">查看您的热门播客、分类、收听统计数据等。 分享给朋友，告诉他们您最喜欢的创作者！</string>
     <string name="settings_app_icon_halloween">万圣节</string>
-    <string name="end_of_year_launch_modal_primary_button_title">查看我的 2024 年播放记录</string>
     <string name="settings_show_played_summary">您已播放完的剧集仍会显示</string>
     <string name="settings_show_played">显示已播放的剧集</string>
     <string name="settings_privacy_crash_link_summary">允许我们将您的 Pocket Casts 账户与崩溃报告相关联。</string>

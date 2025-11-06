@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
+import au.com.shiftyjelly.pocketcasts.compose.text.SearchFieldState
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.to.PlaylistEpisode
 import au.com.shiftyjelly.pocketcasts.models.type.SmartRules.DownloadStatusRule
@@ -38,6 +39,8 @@ class EditRulesViewModel @AssistedInject constructor(
 ) : ViewModel() {
     private var rulesEditor: SmartRulesEditor? = null
 
+    val podcastSearchState = SearchFieldState()
+
     private val areSmartRulesEditedFlow = MutableStateFlow(false)
 
     val uiState = flow {
@@ -56,6 +59,8 @@ class EditRulesViewModel @AssistedInject constructor(
                     podcasts = smartRules.podcasts,
                     episodeDuration = smartRules.episodeDuration,
                 ),
+                sortType = playlist.settings.sortType,
+                podcastSearchState = podcastSearchState,
             )
             rulesEditor = editor
 

@@ -27,7 +27,6 @@ Language: nl
     <string name="smart_playlists">Slimme afspeellijsten</string>
     <string name="select_smart_playlists">Slimme afspeellijsten selecteren</string>
     <string name="podcast_not_in_playlists">Niet inbegrepen in slimme afspeellijsten</string>
-    <string name="playlist_is_full_description">Afspeellijst is vol. Probeer een nieuwe aan te maken.</string>
     <string name="add_to_playlist_no_playlist_found_title">Toevoegen aan afspeellijst</string>
     <string name="add_to_playlist_no_playlist_found_body">We kunnen geen afspeellijst vinden voor die zoekopdracht. Maak een nieuwe afspeellijst of gebruik een ander trefwoord.</string>
     <string name="add_to_playlist_find_playlist">Afspeellijst zoeken</string>
@@ -459,7 +458,6 @@ Language: nl
     <string name="transcript_error_not_available">Er is helaas geen transcriptie beschikbaar voor deze aflevering.</string>
     <string name="referrals_banner_hide_label">Deze banner verbergen</string>
     <string name="referrals_banner_long_press_label">Banner verwijzing geslaagd verbergen</string>
-    <string name="end_of_year_prompt_card_title">Playback 2024\nis hier!</string>
     <string name="settings_auto_download_limit_auto_downloads">Limiet automatische downloads</string>
     <string name="settings_auto_download_limit_all_latest_episodes">Alle nieuwste afleveringen</string>
     <string name="settings_auto_download_limit_ten_latest_episode">10 nieuwste afleveringen</string>
@@ -642,7 +640,6 @@ Language: nl
     <string name="settings_use_dark_up_next">Donker thema voor Hierna gebruiken</string>
     <string name="end_of_year_stories_theres_more">Dat is niet alles!</string>
     <string name="end_of_year_stories_year_completion_rate">afrondingspercentage</string>
-    <string name="end_of_year_stories_year_completion_rate_subtitle">Van de %1$d afleveringen waar je aan bent begonnen, heb je dit aantal helemaal afgekeken %2$d</string>
     <string name="end_of_year_stories_year_completion_rate_title">Je afrondingspercentage dit jaar was %1$d%%</string>
     <string name="eoy_year_over_year_title_skyrocketed">Ten opzichte van 2022 is je luistertijd veel hoger!</string>
     <string name="end_of_year_stories_year_over_year_subtitle_went_down">Aaaah… er moet worden geleefd, toch?</string>
@@ -655,7 +652,6 @@ Language: nl
     <string name="end_of_year_stories_year_over_year_title_went_up">Ten opzichte van %1$s is je luistertijd gestegen met maar liefst %2$s%%</string>
     <string name="end_of_year_story_longest_episode_title">De langste aflevering waarnaar je hebt geluisterd was %1$s</string>
     <string name="end_of_year_replay">Opnieuw afspelen</string>
-    <string name="end_of_year_story_epilogue_title">Bedankt dat je dit jaar met ons geluisterd hebt.\nTot ziens in %1$d!</string>
     <string name="end_of_year_listening_time_title">Dit was je totale luistertijd wat betreft podcasts.</string>
     <string name="end_of_year_story_top_categories_subtitle">Je hebt in totaal %2$s geluisterd naar %1$s afleveringen</string>
     <string name="end_of_year_story_top_categories_title">Wist je dat %1$s je favoriete categorie was</string>
@@ -963,7 +959,6 @@ Language: nl
     <string name="end_of_year_story_top_categories">Je beste categorieën</string>
     <string name="end_of_year_story_top_podcasts_share_text">Mijn beste podcasts van het jaar! %1$s</string>
     <string name="end_of_year_story_top_categories_share_text">Mijn meest beluisterde podcastcategorieën</string>
-    <string name="end_of_year_story_epilogue_subtitle">Vergeet niet om te delen met je vrienden en een shoutout te geven naar je favoriete podcastmakers</string>
     <string name="end_of_year_story_listened_to_numbers_subtitle">Maar er was er één waar je steeds maar weer naar terugkeerde …</string>
     <string name="end_of_year_story_longest_episode_share_text">De langste aflevering waarnaar ik heb geluisterd in %1$d %2$s</string>
     <string name="end_of_year_story_top_podcasts_list_title">Mijn beste podcasts van %1$d</string>
@@ -1013,7 +1008,6 @@ Language: nl
     <string name="must_provide_filter_name">Moet naam van afspeellijst opgeven</string>
     <string name="end_of_year_launch_modal_summary">See your top podcasts, categories, listening stats and more. Share with friends and shout out your favorite creators!</string>
     <string name="settings_app_icon_halloween">Halloween</string>
-    <string name="end_of_year_launch_modal_primary_button_title">Bekijk mijn Playback 2024</string>
     <string name="settings_show_played_summary">Afleveringen die helemaal zijn afgespeeld, worden nog steeds weergegeven</string>
     <string name="settings_show_played">Afgespeelde afleveringen weergeven</string>
     <string name="settings_privacy_crash_link_summary">Sta ons toe om je Pocket Casts-account aan crash-rapporten te koppelen.</string>

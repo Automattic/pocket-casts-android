@@ -27,7 +27,6 @@ Language: ko_KR
     <string name="smart_playlists">스마트 재생목록</string>
     <string name="select_smart_playlists">스마트 재생목록 선택</string>
     <string name="podcast_not_in_playlists">어떤 스마트 재생목록에도 포함되지 않음</string>
-    <string name="playlist_is_full_description">재생목록이 가득 찼습니다. 새로운 재생목록을 만들어 보세요.</string>
     <string name="add_to_playlist_no_playlist_found_title">재생목록에 추가</string>
     <string name="add_to_playlist_no_playlist_found_body">해당 검색어와 일치하는 재생목록을 찾을 수 없습니다. 새 재생목록을 만들거나 다른 키워드로 검색해 보세요.</string>
     <string name="add_to_playlist_find_playlist">재생목록 찾기</string>
@@ -460,7 +459,6 @@ Language: ko_KR
     <string name="transcript_error_not_available">죄송합니다. 이 에피소드에서는 대본을 사용할 수 없습니다.</string>
     <string name="referrals_banner_hide_label">배너 숨기기</string>
     <string name="referrals_banner_long_press_label">추천 신청 패스 배너를 숨깁니다.</string>
-    <string name="end_of_year_prompt_card_title">2024년에 청취한 목록을\n살펴보세요!</string>
     <string name="settings_auto_download_limit_auto_downloads">자동 다운로드 제한</string>
     <string name="settings_auto_download_limit_all_latest_episodes">모든 최신 에피소드</string>
     <string name="settings_auto_download_limit_ten_latest_episode">최신 에피소드 10개</string>
@@ -643,7 +641,6 @@ Language: ko_KR
     <string name="settings_use_dark_up_next">다음 에피소드에 어두운 테마 사용</string>
     <string name="end_of_year_stories_theres_more">더 있습니다!</string>
     <string name="end_of_year_stories_year_completion_rate">완료율</string>
-    <string name="end_of_year_stories_year_completion_rate_subtitle">시작하신 %1$d개 에피소드 중에서 총 %2$d개 완전히 청취</string>
     <string name="end_of_year_stories_year_completion_rate_title">올해 완료율은 %1$d%%이었습니다.</string>
     <string name="eoy_year_over_year_title_skyrocketed">2022년 대비 청취 시간이 급증했습니다!</string>
     <string name="end_of_year_stories_year_over_year_subtitle_went_down">일상생활도 중요하겠죠?</string>
@@ -656,7 +653,6 @@ Language: ko_KR
     <string name="end_of_year_stories_year_over_year_title_went_up">%1$s년에 비해 청취 시간이 %2$s%%나 늘었습니다.</string>
     <string name="end_of_year_story_longest_episode_title">청취하신 가장 긴 에피소드는 %1$s였습니다.</string>
     <string name="end_of_year_replay">다시 재생</string>
-    <string name="end_of_year_story_epilogue_title">올해 청취해 주셔서 감사합니다.\n%1$d년에 뵙겠습니다!</string>
     <string name="end_of_year_listening_time_title">팟캐스트를 청취하셨던 총시간입니다.</string>
     <string name="end_of_year_story_top_categories_subtitle">총 %2$s 동안 %1$s개 에피소드를 청취하셨습니다.</string>
     <string name="end_of_year_story_top_categories_title">%1$s이(가) 좋아하는 카테고리라는 것을 알고 계셨습니까?</string>
@@ -963,7 +959,6 @@ Language: ko_KR
     <string name="end_of_year_create_account_to_see">팟캐스트를 클라우드에 저장하고, 연말 리뷰를 받고, 진행률을 다른 기기와 동기화하세요.</string>
     <string name="end_of_year_story_top_categories_share_text">내가 가장 많이 청취하는 팟캐스트 카테고리</string>
     <string name="end_of_year_story_top_categories">회원님의 상위 카테고리</string>
-    <string name="end_of_year_story_epilogue_subtitle">잊지 말고 친구와 공유하고 즐겨 찾는 팟캐스트 창작자에게 감사 인사 보내기</string>
     <string name="end_of_year_story_top_podcasts_share_text">나의 올해 상위 팟캐스트입니다! %1$s</string>
     <string name="end_of_year_story_listened_to_numbers_subtitle">그러나 반복 청취한 것이 있었습니다…</string>
     <string name="end_of_year_story_longest_episode_share_text">%1$d년에 내가 청취한 가장 긴 에피소드 %2$s</string>
@@ -1014,7 +1009,6 @@ Language: ko_KR
     <string name="must_provide_filter_name">재생목록 이름을 입력해야 함</string>
     <string name="end_of_year_launch_modal_summary">상위 팟캐스트, 카테고리, 청취 통계 등이 표시됩니다. 친구와 공유하고 즐겨 찾는 팟캐스트 창작자에게 감사 인사를 보냅니다!</string>
     <string name="settings_app_icon_halloween">핼러윈</string>
-    <string name="end_of_year_launch_modal_primary_button_title">2024년에 청취한 목록 보기</string>
     <string name="settings_show_played_summary">재생을 마친 에피소드가 계속 표시됩니다.</string>
     <string name="settings_show_played">재생한 에피소드 표시</string>
     <string name="settings_privacy_crash_link_summary">Pocket Casts 계정을 충돌 보고서에 연결하도록 허용합니다.</string>

@@ -1007,7 +1007,7 @@
     </plurals>
     <string name="playlist_episodes_hide_archived" translatable="false">@string/podcast_hide_archived</string>
     <string name="playlist_episodes_show_archived" translatable="false">@string/show_archived</string>
-    <string name="playlist_is_full_description">Playlist is full. Try creating a new one.</string>
+    <string name="playlist_is_full_description" translatable="false">@string/add_to_playlist_failure_message</string>
     <string name="playlist_options">Playlist options</string>
     <string name="playlist_select_episodes">Select episodes</string>
     <string name="playlist_setting_auto_download_description">Enable to auto download episodes in this playlist.</string>
@@ -2024,12 +2024,11 @@
 
     <!-- End of Year -->
 
-    <string name="end_of_year_launch_modal_summary">See your top podcasts, categories, listening stats and more. Share with friends and shout out your favorite creators!</string>
-    <!-- Playback 2024 is a proper noun and shouldn't be translated -->
-    <string name="end_of_year_launch_modal_primary_button_title">View My Playback&#160;2024</string>
-    <!-- Playback 2024 is a proper noun and shouldn't be translated -->
-    <string name="end_of_year_prompt_card_title">Playback 2024\nis here!</string>
-    <string name="end_of_year_prompt_card_summary">See your listening&#160;stats, top&#160;podcasts, and&#160;more.</string>
+    <string name="end_of_year_launch_modal_summary">See your top podcasts, categories, listening stats and more. Share with friends and shout out your favorite&#160;creators!</string>
+    <!-- Playback 2025 is a proper noun and shouldn't be translated -->
+    <string name="end_of_year_launch_modal_primary_button_title">View My Playback&#160;2025</string>
+    <string name="end_of_year_prompt_card_title">Playback is here!</string>
+    <string name="end_of_year_prompt_card_summary">See your listening&#160;stats,\ntop&#160;podcasts, and&#160;more.</string>
     <string name="end_of_year_share_via" translatable="false">@string/podcasts_share_via</string>
     <string name="end_of_year_replay">Play again</string>
     <string name="end_of_year_listening_time_title">This was your total time listening to podcasts</string>
@@ -2076,9 +2075,9 @@
     <!-- Text that appear when someone share the longest episode they listened to story to Twitter. %1$d is the year and %2$s is the URL to the episode. -->
     <string name="end_of_year_story_longest_episode_share_text">The longest episode I listened to in %1$d %2$s</string>
     <!-- Title for the epilogue story. %1$d is the yer. -->
-    <string name="end_of_year_story_epilogue_title">Thank you for listening with us this year.\nSee you in %1$d!</string>
+    <string name="end_of_year_story_epilogue_title">Thanks for spending your year with Pocket\u00A0Casts</string>
     <!-- Subtitle for the epilogue story -->
-    <string name="end_of_year_story_epilogue_subtitle">Don’t forget to share with your friends and give a shout out to your favorite podcast creators</string>
+    <string name="end_of_year_story_epilogue_subtitle">Share your Playback with friends and show some love to the podcasters who kept you company all year</string>
     <!-- Title of the top categories story. -->
     <string name="end_of_year_story_top_categories">Your Top Categories</string>
     <!-- Title of the top categories story. %1$s being the name of the most listened category. -->
@@ -2111,9 +2110,9 @@
     <!-- Text for when a user shares the story comparing the this year (%1$d) and previous year (%2$d) listening time. -->
     <string name="end_of_year_stories_year_over_share_text">My %1$d listening time compared to %2$d</string>
     <!-- Title for the completion rate. %1$d is the percentage.-->
-    <string name="end_of_year_stories_year_completion_rate_title">Your completion rate this year was %1$d%%</string>
+    <string name="end_of_year_stories_year_completion_rate_title">Your completion rate was %1$d%%</string>
     <!-- Title for the completion rate. %1$d is the total of episodes listened this year, %2$d is the total of episodes fully listened to. -->
-    <string name="end_of_year_stories_year_completion_rate_subtitle">From the %1$d episodes you started you listened fully to a total of %2$d</string>
+    <string name="end_of_year_stories_year_completion_rate_subtitle">Out of %2$d episodes started, you finished %1$d.\nA stronger follow‑through than most gym memberships.</string>
     <!-- Title for when sharing the completion rate story to social media. %1$d is percentage -->
     <string name="end_of_year_stories_completion_rate_share_text">My completion rate this year was %1$d</string>
     <string name="end_of_year_stories_year_completion_rate">completion rate</string>
@@ -2695,4 +2694,5 @@
     <string name="search_suggestions_view_all">View all for \"%1$s\"</string>
     <string name="search_suggestions_no_results_title">No Results</string>
     <string name="search_suggestions_no_results_message">Try a new search, or by adding a podcast feed URL</string>
+    <string name="eoy_playback_intro_title">Your year in podcasts,\nwrapped and ready to relive</string>
 </resources>

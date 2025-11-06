@@ -20,6 +20,7 @@ import org.junit.runner.RunWith
 import org.mockito.Mock
 import org.mockito.junit.MockitoJUnitRunner
 import org.mockito.kotlin.any
+import org.mockito.kotlin.anyOrNull
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.stub
@@ -41,7 +42,7 @@ class NotificationsPreferencesRepositoryImplTest {
     @Before
     fun setup() {
         whenever(context.getString(any())).doReturn("")
-        whenever(podcastManager.findSubscribedFlow()).thenReturn(emptyFlow())
+        whenever(podcastManager.findSubscribedFlow(anyOrNull())).thenReturn(emptyFlow())
         whenever(settings.notifyRefreshPodcast).thenReturn(UserSetting.Mock(false, mock()))
         whenever(settings.newEpisodeNotificationActions).thenReturn(UserSetting.Mock(NewEpisodeNotificationAction.DefaultValues, mock()))
         whenever(settings.playOverNotification).thenReturn(UserSetting.Mock(PlayOverNotificationSetting.DUCK, mock()))

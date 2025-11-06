@@ -24,7 +24,6 @@ import androidx.compose.material.icons.outlined.Delete
 import androidx.compose.material.icons.outlined.Downloading
 import androidx.compose.material.icons.outlined.EditCalendar
 import androidx.compose.material.icons.outlined.Folder
-import androidx.compose.material.icons.outlined.HomeRepairService
 import androidx.compose.material.icons.outlined.NewReleases
 import androidx.compose.material.icons.outlined.Notifications
 import androidx.compose.runtime.Composable
@@ -272,7 +271,7 @@ private fun EndOfYear(
     modifier: Modifier = Modifier,
 ) {
     SettingRow(
-        primaryText = "Reset modal/profile badge",
+        primaryText = "Reset End of Year modal",
         secondaryText = "Reset modal and profile badge for end of year",
         icon = rememberVectorPainter(Icons.Outlined.EditCalendar),
         modifier = modifier.clickable { onClick() },

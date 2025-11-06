@@ -27,7 +27,6 @@ Language: es
     <string name="smart_playlists">Listas de reproducción inteligentes</string>
     <string name="select_smart_playlists">Seleccionar listas de reproducción inteligentes</string>
     <string name="podcast_not_in_playlists">No se incluye en ninguna lista de reproducción inteligente</string>
-    <string name="playlist_is_full_description">La lista de reproducción está completa. Prueba a crear otra.</string>
     <string name="add_to_playlist_no_playlist_found_title">Añadir a lista de reproducción</string>
     <string name="add_to_playlist_no_playlist_found_body">No hemos podido encontrar ninguna lista de reproducción para esa búsqueda. Crea una lista de reproducción o prueba con otra palabra clave.</string>
     <string name="add_to_playlist_find_playlist">Buscar lista de reproducción</string>
@@ -460,7 +459,6 @@ Language: es
     <string name="transcript_error_not_available">Lo sentimos, pero este episodio no tiene ninguna transcripción disponible.</string>
     <string name="referrals_banner_hide_label">Ocultar este banner</string>
     <string name="referrals_banner_long_press_label">Ocultar banner de pase de solicitud de recomendación.</string>
-    <string name="end_of_year_prompt_card_title">Playback 2024\nya está aquí.</string>
     <string name="settings_auto_download_limit_auto_downloads">Limitar descargar automáticas</string>
     <string name="settings_auto_download_limit_all_latest_episodes">Todos los últimos episodios</string>
     <string name="settings_auto_download_limit_ten_latest_episode">10 últimos episodios</string>
@@ -643,7 +641,6 @@ Language: es
     <string name="settings_use_dark_up_next">Utilizar tema Up Next oscuro</string>
     <string name="end_of_year_stories_theres_more">¡Y hay más!</string>
     <string name="end_of_year_stories_year_completion_rate">tasa de finalización</string>
-    <string name="end_of_year_stories_year_completion_rate_subtitle">De los %1$d episodios que has comenzado, has escuchado por completo un total de %2$d.</string>
     <string name="end_of_year_stories_year_completion_rate_title">Tu tasa de finalización de este año es de %1$d%%.</string>
     <string name="eoy_year_over_year_title_skyrocketed">En comparación con 2022, ¡tu tiempo de escucha se ha disparado!</string>
     <string name="end_of_year_stories_year_over_year_subtitle_went_down">La vida hay que vivirla, ¿no?</string>
@@ -656,7 +653,6 @@ Language: es
     <string name="end_of_year_stories_year_over_year_title_went_up">En comparación con %1$s, tu tiempo de escucha aumentó en un gran %2$s%%</string>
     <string name="end_of_year_story_longest_episode_title">El episodio más largo que escuchaste fue %1$s.</string>
     <string name="end_of_year_replay">Reproducir otra vez.</string>
-    <string name="end_of_year_story_epilogue_title">Gracias por escuchar con nosotros este año.\nNos vemos en %1$d.</string>
     <string name="end_of_year_listening_time_title">Este fue tu tiempo total de escucha de pódcast.</string>
     <string name="end_of_year_story_top_categories_subtitle">Escuchaste %1$s episodios de un total de %2$s</string>
     <string name="end_of_year_story_top_categories_title">¿Sabías que %1$s era tu categoría favorita?</string>
@@ -964,7 +960,6 @@ Language: es
     <string name="end_of_year_story_top_categories_share_text">Mis categorías de pódcast más escuchadas</string>
     <string name="end_of_year_story_top_categories">Tus categorías principales</string>
     <string name="end_of_year_story_top_podcasts_share_text">¡Mis pódcast favoritos del año! %1$s</string>
-    <string name="end_of_year_story_epilogue_subtitle">No olvides compartirlos con tus amigos y mandar un saludo a tus creadores de pódcast favoritos</string>
     <string name="end_of_year_story_listened_to_numbers_subtitle">Pero había uno al que siempre venías…</string>
     <string name="end_of_year_story_longest_episode_share_text">El episodio más largo que escuché en %1$d %2$s</string>
     <string name="end_of_year_story_top_podcasts_list_title">Mis podcasts principales de %1$d</string>
@@ -1014,7 +1009,6 @@ Language: es
     <string name="must_provide_filter_name">Debes proporcionar el nombre de la lista de reproducción</string>
     <string name="settings_app_icon_halloween">Halloween</string>
     <string name="end_of_year_launch_modal_summary">Consulta cuáles han sido los podcasts y las categorías que más has escuchado, las estadísticas de escucha y mucho más. Compártelo con tus amigos y haz que todo el mundo sepa cuáles son tus creadores favoritos.</string>
-    <string name="end_of_year_launch_modal_primary_button_title">Ver Mi Playback 2024</string>
     <string name="settings_show_played_summary">Se seguirán mostrando los episodios que hayas terminado de reproducir.</string>
     <string name="settings_show_played">Mostrar episodios reproducidos</string>
     <string name="settings_privacy_crash_link_summary">Permítenos vincular tu cuenta de Pocket Casts a los informes de errores.</string>

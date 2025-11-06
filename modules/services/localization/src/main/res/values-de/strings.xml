@@ -27,7 +27,6 @@ Language: de
     <string name="smart_playlists">Intelligente Wiedergabelisten</string>
     <string name="select_smart_playlists">Intelligente Wiedergabelisten auswählen</string>
     <string name="podcast_not_in_playlists">Nicht in intelligenten Wiedergabelisten enthalten</string>
-    <string name="playlist_is_full_description">Wiedergabeliste ist voll. Erstelle eine neue.</string>
     <string name="add_to_playlist_no_playlist_found_title">Zur Wiedergabeliste hinzufügen</string>
     <string name="add_to_playlist_no_playlist_found_body">Wir konnten keine Wiedergabeliste für diese Suche finden. Erstelle eine neue Wiedergabeliste oder versuche es mit einem anderen Stichwort.</string>
     <string name="add_to_playlist_find_playlist">Wiedergabeliste suchen</string>
@@ -460,7 +459,6 @@ Language: de
     <string name="transcript_error_not_available">Entschuldigung! Für diese Folge ist kein Transkript verfügbar.</string>
     <string name="referrals_banner_hide_label">Dieses Banner ausblenden</string>
     <string name="referrals_banner_long_press_label">Referral-Banner zum Sichern das Passes ausblenden.</string>
-    <string name="end_of_year_prompt_card_title">Wiedergabeliste 2024\nist endlich verfügbar!</string>
     <string name="settings_auto_download_limit_ten_latest_episode">Die 10 neuesten Folgen</string>
     <string name="settings_auto_download_limit_five_latest_episode">Die 5 neuesten Folgen</string>
     <string name="settings_auto_download_limit_three_latest_episode">Die 3 neuesten Folgen</string>
@@ -646,7 +644,6 @@ Language: de
     <string name="end_of_year_stories_year_completion_rate_title">Deine Abschlussquote lag dieses Jahr bei %1$d %%</string>
     <string name="eoy_year_over_year_title_skyrocketed">Im Vergleich zu 2022 ist deine Audiozeit in die Höhe geschnellt!</string>
     <string name="end_of_year_stories_year_over_year_subtitle_went_down">Man muss das Leben genießen, nicht wahr?</string>
-    <string name="end_of_year_stories_year_completion_rate_subtitle">Von deinen %1$d angefangenen Episoden, hast du insgesamt %2$d vollständig angehört</string>
     <string name="end_of_year_stories_year_over_share_text">Meine Audiozeit %1$d im Vergleich zu %2$d</string>
     <string name="end_of_year_stories_year_over_year_subtitle_flat">Man sagt, Beständigkeit ist der Schlüssel zum Erfolg … oder so ähnlich!</string>
     <string name="end_of_year_prompt_card_summary">Schau dir deine Audiostatistiken, Top-Podcasts und mehr an.</string>
@@ -656,7 +653,6 @@ Language: de
     <string name="end_of_year_stories_year_over_year_title_went_up">Im Vergleich zu %1$s ist deine Audiozeit um ganze %2$s %% angestiegen</string>
     <string name="end_of_year_story_longest_episode_title">Die längste von dir angehörte Folge war %1$s</string>
     <string name="end_of_year_replay">Erneut abspielen</string>
-    <string name="end_of_year_story_epilogue_title">Vielen Dank, dass du dieses Jahr dein Audioerlebnis mit uns genossen hast.\nWir hören uns %1$d!</string>
     <string name="end_of_year_listening_time_title">Dies ist die Gesamtzeit der von dir angehörten Podcasts.</string>
     <string name="end_of_year_story_top_categories_subtitle">Du hast dir %1$s Folgen mit einer Gesamtdauer von %2$s angehört</string>
     <string name="end_of_year_story_top_categories_title">Schon gewusst? %1$s war deine Lieblingskategorie</string>
@@ -964,7 +960,6 @@ Language: de
     <string name="end_of_year_story_top_categories_share_text">Meine am häufigsten gehörten Podcast-Kategorien</string>
     <string name="end_of_year_story_top_categories">Deine Top-Kategorien</string>
     <string name="end_of_year_story_top_podcasts_share_text">Meine Top-Podcasts des Jahres! %1$s</string>
-    <string name="end_of_year_story_epilogue_subtitle">Vergiss nicht, sie mit deinen Freunden zu teilen und deine bevorzugten Podcast-Ersteller dankend zu erwähnen</string>
     <string name="end_of_year_story_listened_to_numbers_subtitle">Aber es gab eine, die dir besonders gut gefallen hat …</string>
     <string name="end_of_year_story_longest_episode_share_text">Die längste Folge, die ich mir %1$d angehört habe (%2$s)</string>
     <string name="end_of_year_story_top_podcasts_list_title">Meine Top-Podcasts %1$d</string>
@@ -1014,7 +1009,6 @@ Language: de
     <string name="must_provide_filter_name">Name der Wiedergabeliste erforderlich</string>
     <string name="end_of_year_launch_modal_summary">Schau dir deine Top-Podcasts, Kategorien, Hörstatistiken und mehr an. Teile es mit Freunden und nenne deine bevorzugten Ersteller!</string>
     <string name="settings_app_icon_halloween">Halloween</string>
-    <string name="end_of_year_launch_modal_primary_button_title">Meine Wiedergabeliste 2024 ansehen</string>
     <string name="settings_show_played_summary">Folgen, die du bereits abgespielt hast, werden weiterhin angezeigt</string>
     <string name="settings_show_played">Abgespielte Folgen anzeigen</string>
     <string name="settings_privacy_crash_link_summary">Erlaube uns, dein Pocket Casts-Konto mit Absturzberichten zu verknüpfen.</string>

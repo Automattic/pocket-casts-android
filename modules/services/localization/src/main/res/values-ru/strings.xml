@@ -27,7 +27,6 @@ Language: ru
     <string name="smart_playlists">Умные плейлисты</string>
     <string name="select_smart_playlists">Выбрать умные плейлисты</string>
     <string name="podcast_not_in_playlists">Не включено ни в один умный плейлист</string>
-    <string name="playlist_is_full_description">Плейлист заполнен до отказа. Попробуйте создать новый.</string>
     <string name="add_to_playlist_no_playlist_found_title">Добавить в плейлист</string>
     <string name="add_to_playlist_no_playlist_found_body">Не удалось найти плейлисты по этому запросу. Создайте новый плейлист или попробуйте другое ключевое слово.</string>
     <string name="add_to_playlist_find_playlist">Найти плейлист</string>
@@ -460,7 +459,6 @@ Language: ru
     <string name="transcript_error_not_available">К сожалению, в этом выпуске нет расшифровки.</string>
     <string name="referrals_banner_hide_label">Скрыть баннер</string>
     <string name="referrals_banner_long_press_label">Скрыть баннер с требованием ссылки на источник перехода.</string>
-    <string name="end_of_year_prompt_card_title">Playback 2024\nуже стартует!</string>
     <string name="settings_auto_download_limit_auto_downloads">Ограничить автоматические загрузки</string>
     <string name="settings_auto_download_limit_all_latest_episodes">Только последний выпуск</string>
     <string name="settings_auto_download_limit_ten_latest_episode">10 последних выпусков</string>
@@ -643,7 +641,6 @@ Language: ru
     <string name="settings_use_dark_up_next_details">При включённом параметре Up Next будет всегда использовать тёмную тему, а при выключенном — соответствовать текущей теме</string>
     <string name="end_of_year_stories_theres_more">Есть и многое другое!</string>
     <string name="end_of_year_stories_year_completion_rate">процент завершения</string>
-    <string name="end_of_year_stories_year_completion_rate_subtitle">Из %1$d запущенных эпизодов всего вы дослушали до конца %2$d</string>
     <string name="end_of_year_stories_year_completion_rate_title">Ваш процент завершения в этом году равен %1$d%%</string>
     <string name="eoy_year_over_year_title_skyrocketed">По сравнению с 2022 г. вы посвятили прослушиванию намного больше времени!</string>
     <string name="end_of_year_stories_year_over_year_subtitle_went_down">И… как, вам хватает времени на всё остальное?</string>
@@ -656,7 +653,6 @@ Language: ru
     <string name="end_of_year_stories_year_over_year_title_went_up">По сравнению с %1$s годом ваше время прослушивания возросло сразу на %2$s%%</string>
     <string name="end_of_year_story_longest_episode_title">Самым длинным эпизодом, который вы слушали, стал %1$s</string>
     <string name="end_of_year_replay">Прослушать ещё раз</string>
-    <string name="end_of_year_story_epilogue_title">Благодарим за то, что вы слушали вместе с нами в этом году.\nЖдём вас снова в %1$d году!</string>
     <string name="end_of_year_listening_time_title">Это ваше общее время прослушивания подкастов.</string>
     <string name="end_of_year_story_top_categories_title">Знаете ли вы, что вашей любимой категорией оказалась %1$s?</string>
     <string name="discover_category_society_abbreviation">Культура</string>
@@ -964,7 +960,6 @@ Language: ru
     <string name="end_of_year_story_top_categories_share_text">Рубрики подкастов, которые я слушаю чаще всего</string>
     <string name="end_of_year_story_top_categories">Ваши любимые рубрики</string>
     <string name="end_of_year_story_top_podcasts_share_text">Мои любимые подкасты этого года! %1$s</string>
-    <string name="end_of_year_story_epilogue_subtitle">Не забудьте поделиться с друзьями и рассказать о любимых подкастерах</string>
     <string name="end_of_year_story_listened_to_numbers_subtitle">Но было одно шоу, которое вы слушали снова и снова…</string>
     <string name="end_of_year_story_longest_episode_share_text">Самый продолжительный выпуск, прослушанный мною в %1$d году: %2$s</string>
     <string name="end_of_year_story_top_podcast_share_text">Мой любимый подкаст в %1$d году! %2$s</string>
@@ -1014,7 +1009,6 @@ Language: ru
     <string name="must_provide_filter_name">Необходимо указать название списка воспроизведения</string>
     <string name="end_of_year_launch_modal_summary">Просмотрите свой топ подкастов и рубрик, статистику прослушивания и другие показатели. Поделитесь ими с друзьями и поблагодарите любимых подкастеров.</string>
     <string name="settings_app_icon_halloween">Хэллоуин</string>
-    <string name="end_of_year_launch_modal_primary_button_title">Просмотреть мой Playback 2024</string>
     <string name="settings_show_played_summary">Выпуски, которые вы уже прослушали, будут по-прежнему отображаться</string>
     <string name="settings_show_played">Показывать прослушанные выпуски</string>
     <string name="settings_privacy_crash_link_summary">Разрешите подключить вашу учётную запись Pocket Casts к отчётам о сбоях.</string>
