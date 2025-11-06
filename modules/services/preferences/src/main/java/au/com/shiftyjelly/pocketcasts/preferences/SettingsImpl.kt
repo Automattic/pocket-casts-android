@@ -1631,7 +1631,7 @@ class SettingsImpl @Inject constructor(
     override val appReviewSubmittedReasons = UserSetting.PrefListFromString(
         sharedPrefKey = "app_review_submitted_reasons",
         defaultValue = emptyList(),
-        fromString = { value -> AppReviewReason.fromValue(value) ?: AppReviewReason.DevelopmentTrigger },
+        fromString = { value -> AppReviewReason.fromValue(value) },
         toString = { value -> value.analyticsValue },
         sharedPrefs = sharedPreferences,
     )
