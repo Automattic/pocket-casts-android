@@ -1,19 +1,27 @@
 package au.com.shiftyjelly.pocketcasts.endofyear.ui
 
+import androidx.annotation.RawRes
+import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.ScrollState
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
@@ -23,6 +31,7 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.CompositingStrategy
 import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
@@ -37,10 +46,14 @@ import au.com.shiftyjelly.pocketcasts.compose.components.TextP40
 import au.com.shiftyjelly.pocketcasts.endofyear.StoryCaptureController
 import au.com.shiftyjelly.pocketcasts.models.to.Story
 import au.com.shiftyjelly.pocketcasts.models.to.TopPodcast
+import com.airbnb.lottie.compose.LottieAnimation
+import com.airbnb.lottie.compose.LottieCompositionSpec
+import com.airbnb.lottie.compose.rememberLottieComposition
 import dev.shreyaspatil.capturable.capturable
 import java.io.File
 import kotlin.random.Random
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
+import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.ui.R as UR
 
 @Composable
@@ -82,23 +95,28 @@ private fun TopShowsStory(
             modifier = Modifier.padding(horizontal = 24.dp),
             textAlign = TextAlign.Center,
         )
-
+        Spacer(modifier = Modifier.height(32.dp))
         val scrollState = rememberScrollState()
         Column(
-            verticalArrangement = Arrangement.spacedBy(32.dp),
+            verticalArrangement = Arrangement.spacedBy(16.dp),
             modifier = Modifier
                 .fillMaxWidth()
                 .weight(1f)
-                .padding(horizontal = 24.dp)
+                .padding(end = 24.dp)
                 .fadeScrollingEdges(scrollState)
                 .verticalScroll(scrollState),
         ) {
             story.shows.forEachIndexed { index, podcast ->
-                PodcastItem(
-                    podcast = podcast,
-                    index = index,
-                    measurements = measurements,
-                )
+                AnimatedContainer(
+                    animationRes = if (index % 2 == 0) IR.raw.playback_top_shows_wave_1_lottie else IR.raw.playback_top_shows_wave_2_lottie
+                ) {
+                    PodcastItem(
+                        modifier = Modifier.padding(start = 24.dp),
+                        podcast = podcast,
+                        index = index,
+                        measurements = measurements,
+                    )
+                }
             }
         }
         ShareStoryButton(
@@ -110,15 +128,40 @@ private fun TopShowsStory(
 }
 
 @Composable
+private fun AnimatedContainer(
+    modifier: Modifier = Modifier,
+    @RawRes animationRes: Int,
+    content: @Composable BoxScope.() -> Unit,
+) {
+    Box(
+        modifier = modifier.animateContentSize(),
+        contentAlignment = Alignment.Center,
+    ) {
+        val composition by rememberLottieComposition(
+            spec = LottieCompositionSpec.RawRes(animationRes)
+        )
+        LottieAnimation(
+            modifier = Modifier
+                .height(94.dp)
+                .widthIn(max = 76.dp)
+                .align(Alignment.CenterStart),
+            composition = composition,
+            contentScale = ContentScale.FillBounds
+        )
+        content()
+    }
+}
+
+@Composable
 private fun PodcastItem(
     podcast: TopPodcast,
     index: Int,
     measurements: EndOfYearMeasurements,
+    modifier: Modifier = Modifier,
 ) {
     Row(
         verticalAlignment = Alignment.CenterVertically,
-        modifier = Modifier
-            .fillMaxWidth(),
+        modifier = modifier,
     ) {
         TextP30(
             text = "#${index + 1}",
@@ -128,11 +171,12 @@ private fun PodcastItem(
         Spacer(
             modifier = Modifier.width(16.dp),
         )
+        val artworkSize = if (index == 0) 100.dp else 77.dp
         PodcastImage(
             uuid = podcast.uuid,
             elevation = 0.dp,
             cornerSize = 4.dp,
-            modifier = Modifier.size(72.dp * measurements.scale),
+            modifier = Modifier.size(artworkSize * measurements.scale),
         )
         Spacer(
             modifier = Modifier.width(16.dp),
