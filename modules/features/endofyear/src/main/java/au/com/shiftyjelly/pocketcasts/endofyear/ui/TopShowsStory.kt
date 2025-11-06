@@ -1,7 +1,6 @@
 package au.com.shiftyjelly.pocketcasts.endofyear.ui
 
 import androidx.annotation.RawRes
-import androidx.compose.animation.animateContentSize
 import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
@@ -65,26 +64,11 @@ import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 import au.com.shiftyjelly.pocketcasts.ui.R as UR
 
+@OptIn(ExperimentalComposeUiApi::class)
 @Composable
 internal fun TopShowsStory(
     story: Story.TopShows,
     measurements: EndOfYearMeasurements,
-    controller: StoryCaptureController,
-    onShareStory: (File) -> Unit,
-) = TopShowsStory(
-    story = story,
-    measurements = measurements,
-    onShareStory = onShareStory,
-    controller = controller,
-    initialAnimationProgress = 0f,
-)
-
-@OptIn(ExperimentalComposeUiApi::class)
-@Composable
-private fun TopShowsStory(
-    story: Story.TopShows,
-    measurements: EndOfYearMeasurements,
-    initialAnimationProgress: Float,
     controller: StoryCaptureController,
     onShareStory: (File) -> Unit,
 ) {
@@ -118,6 +102,7 @@ private fun TopShowsStory(
             story.shows.forEachIndexed { index, podcast ->
                 AnimatedContainer(
                     animationRes = if (index % 2 == 0) IR.raw.playback_top_shows_wave_1_lottie else IR.raw.playback_top_shows_wave_2_lottie,
+                    controller = controller,
                 ) { scale ->
                     PodcastItem(
                         modifier = Modifier
@@ -145,6 +130,7 @@ private fun TopShowsStory(
 @Composable
 private fun AnimatedContainer(
     @RawRes animationRes: Int,
+    controller: StoryCaptureController,
     modifier: Modifier = Modifier,
     content: @Composable BoxScope.(Float) -> Unit,
 ) {
@@ -171,7 +157,13 @@ private fun AnimatedContainer(
         }
 
         val scaleFactor by animateFloatAsState(
-            targetValue = if (animationTrigger) 1f else .8f,
+            targetValue = if (controller.isSharing) {
+                1f
+            } else if (animationTrigger) {
+                1f
+            } else {
+                .8f
+            },
             label = "scaleAnimation",
             animationSpec = tween(
                 durationMillis = 600,
@@ -316,7 +308,6 @@ private fun TopShowsPreview() {
                 podcastListUrl = null,
             ),
             measurements = measurements,
-            initialAnimationProgress = 1f,
             controller = StoryCaptureController.preview(),
             onShareStory = {},
         )
