@@ -83,9 +83,12 @@ import androidx.compose.ui.text.LinkAnnotation
 import androidx.compose.ui.text.LinkInteractionListener
 import androidx.compose.ui.text.Placeholder
 import androidx.compose.ui.text.PlaceholderVerticalAlign
+import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.TextLinkStyles
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.Constraints
@@ -100,7 +103,6 @@ import au.com.shiftyjelly.pocketcasts.compose.AppThemeWithBackground
 import au.com.shiftyjelly.pocketcasts.compose.Devices
 import au.com.shiftyjelly.pocketcasts.compose.components.ExpandableText
 import au.com.shiftyjelly.pocketcasts.compose.components.PodcastImage
-import au.com.shiftyjelly.pocketcasts.compose.components.PodcastImageDeprecated
 import au.com.shiftyjelly.pocketcasts.compose.components.TextH20
 import au.com.shiftyjelly.pocketcasts.compose.components.TextH40
 import au.com.shiftyjelly.pocketcasts.compose.components.TextP60
@@ -328,9 +330,13 @@ private fun PodcastCategoriesLabel(
                     LinkAnnotation.Clickable(
                         tag = "category",
                         linkInteractionListener = LinkInteractionListener { onClickCategory() },
+                        styles = TextLinkStyles(
+                            style = SpanStyle(textDecoration = TextDecoration.None),
+                            focusedStyle = SpanStyle(textDecoration = TextDecoration.Underline),
+                        ),
                     ),
                     start = 0,
-                    end = category.length + if (author.isNotBlank()) 2 else 0,
+                    end = category.length,
                 )
             }
         }
