@@ -157,9 +157,7 @@ private fun AnimatedContainer(
         }
 
         val scaleFactor by animateFloatAsState(
-            targetValue = if (controller.isSharing) {
-                1f
-            } else if (animationTrigger) {
+            targetValue = if (controller.isSharing || animationTrigger) {
                 1f
             } else {
                 .8f
