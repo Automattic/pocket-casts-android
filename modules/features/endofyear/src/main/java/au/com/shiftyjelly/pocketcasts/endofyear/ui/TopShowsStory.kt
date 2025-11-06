@@ -56,6 +56,7 @@ import au.com.shiftyjelly.pocketcasts.models.to.Story
 import au.com.shiftyjelly.pocketcasts.models.to.TopPodcast
 import com.airbnb.lottie.compose.LottieAnimation
 import com.airbnb.lottie.compose.LottieCompositionSpec
+import com.airbnb.lottie.compose.LottieConstants
 import com.airbnb.lottie.compose.rememberLottieComposition
 import dev.shreyaspatil.capturable.capturable
 import java.io.File
@@ -159,6 +160,7 @@ private fun AnimatedContainer(
                 .height(94.dp)
                 .widthIn(max = 76.dp),
             composition = composition,
+            iterations = LottieConstants.IterateForever,
             contentScale = ContentScale.FillBounds
         )
 
