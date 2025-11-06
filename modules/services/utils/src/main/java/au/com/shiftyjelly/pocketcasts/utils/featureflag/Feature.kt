@@ -188,6 +188,14 @@ enum class Feature(
         hasFirebaseRemoteFlag = true,
         hasDevToggle = true,
     ),
+    IMPROVE_APP_RATINGS(
+        key = "improve_app_ratings",
+        title = "Banner prompting for app rating",
+        defaultValue = isDebugOrPrototypeBuild,
+        tier = FeatureTier.Free,
+        hasFirebaseRemoteFlag = false,
+        hasDevToggle = true,
+    ),
 
     // This is set of features used only for testing purposes.
     TEST_FREE_FEATURE(
