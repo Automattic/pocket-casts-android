@@ -5,7 +5,7 @@
         ([#4670](https://github.com/Automattic/pocket-casts-android/pull/4670))
 *   Bug Fixes
     *   Fix podcasts drag & drop swapping podcasts' positions
-        ([#4687](https://github.com/Automattic/pocket-casts-android/pull/4687))
+        ([#4699](https://github.com/Automattic/pocket-casts-android/pull/4699))
     *   Fix podcast settings icon theming with Classic theme
         ([#4687](https://github.com/Automattic/pocket-casts-android/pull/4687))
     *   Fix chapters sleep timer not being visible
