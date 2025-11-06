@@ -144,13 +144,13 @@ private class AppReviewSignalImpl(
 ) : AppReviewSignal {
     override fun consume() {
         if (continuation.isActive) {
-            continuation.resume(AppReviewSignal.Result.Consumed)
+            runCatching { continuation.resume(AppReviewSignal.Result.Consumed) }
         }
     }
 
     override fun ignore() {
         if (continuation.isActive) {
-            continuation.resume(AppReviewSignal.Result.Ignored)
+            runCatching { continuation.resume(AppReviewSignal.Result.Ignored) }
         }
     }
 }
