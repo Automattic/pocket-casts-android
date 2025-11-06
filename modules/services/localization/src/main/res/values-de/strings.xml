@@ -416,7 +416,6 @@ Language: de
     <string name="icons_plus_prompt">Hol dir exklusive App-Icons mit Pocket Casts Plus und vieles mehr</string>
     <string name="themes_plus_prompt">Hol dir exklusive Themes mit Pocket Casts Plus und vieles mehr</string>
     <string name="folders_plus_prompt">Organisiere deine Podcasts mit Pocket Casts Plus und vieles mehr</string>
-    <string name="end_of_year_story_top_podcast_title">Dies war dein Top-Podcast in %1$d</string>
     <string name="drag_down_to_dismiss_content_description">Zum Verwerfen nach unten ziehen</string>
     <string name="maybe_later">Vielleicht später</string>
     <string name="need_to_free_up_space">Du benötigst mehr Speicherplatz?</string>

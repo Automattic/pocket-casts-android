@@ -416,7 +416,6 @@ Language: ko_KR
     <string name="icons_plus_prompt">Pocket Casts Plus로 독점 앱 아이콘을 받고 더 많은 혜택을 누리세요</string>
     <string name="themes_plus_prompt">Pocket Casts Plus로 독점 테마를 받고 더 많은 혜택을 누리세요</string>
     <string name="folders_plus_prompt">Pocket Casts Plus로 팟캐스트를 구성하고 더 많은 혜택을 누리세요</string>
-    <string name="end_of_year_story_top_podcast_title">%1$d 회원님의 상위 팟캐스트입니다</string>
     <string name="drag_down_to_dismiss_content_description">해제하려면 아래로 끌어오세요</string>
     <string name="maybe_later">나중에</string>
     <string name="need_to_free_up_space">용량이 모자라시나요?</string>

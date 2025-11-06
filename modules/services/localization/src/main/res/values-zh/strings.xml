@@ -416,7 +416,6 @@ Language: zh_CN
     <string name="icons_plus_prompt">通过 Pocket Casts Plus 获取独家应用程序图标，并享用更多功能</string>
     <string name="themes_plus_prompt">通过 Pocket Casts Plus 获取专属主题，并享用更多功能</string>
     <string name="folders_plus_prompt">通过 Pocket Casts Plus 整理您的播客，并享用更多功能</string>
-    <string name="end_of_year_story_top_podcast_title">这是您在 %1$d 年的热门播客</string>
     <string name="drag_down_to_dismiss_content_description">向下拖动即可取消</string>
     <string name="maybe_later">稍后再说</string>
     <string name="need_to_free_up_space">需要释放空间？</string>

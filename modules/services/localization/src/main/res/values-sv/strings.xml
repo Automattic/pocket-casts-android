@@ -416,7 +416,6 @@ Language: sv_SE
     <string name="icons_plus_prompt">Få exklusiva appikoner och mer därtill med Pocket Casts Plus</string>
     <string name="themes_plus_prompt">Få exklusiva teman och mer därtill med Pocket Casts Plus</string>
     <string name="folders_plus_prompt">Organisera dina podcasts och mer därtill med Pocket Casts Plus</string>
-    <string name="end_of_year_story_top_podcast_title">Det här var din favoritpodcast under %1$d</string>
     <string name="drag_down_to_dismiss_content_description">Dra ner för att avfärda</string>
     <string name="maybe_later">Kanske senare</string>
     <string name="need_to_free_up_space">Behöver du frigöra utrymme?</string>

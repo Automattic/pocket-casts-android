@@ -416,7 +416,6 @@ Language: pt_BR
     <string name="icons_plus_prompt">Tenha ícones de apps exclusivos e muito mais com o Pocket Casts Plus</string>
     <string name="themes_plus_prompt">Tenha temas exclusivos e muito mais com o Pocket Casts Plus</string>
     <string name="folders_plus_prompt">Organize seus podcasts e muito mais com o Pocket Casts Plus</string>
-    <string name="end_of_year_story_top_podcast_title">Este foi o seu podcast mais ouvido em %1$d</string>
     <string name="drag_down_to_dismiss_content_description">Arraste para baixo para ignorar</string>
     <string name="maybe_later">Talvez mais tarde</string>
     <string name="need_to_free_up_space">Precisa liberar espaço?</string>

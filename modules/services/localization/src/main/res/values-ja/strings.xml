@@ -416,7 +416,6 @@ Language: ja_JP
     <string name="icons_plus_prompt">Pocket Casts Plus で専用アプリアイコンの取得などを利用しましょう</string>
     <string name="themes_plus_prompt">Pocket Casts Plus で専用テーマの取得などを利用しましょう</string>
     <string name="folders_plus_prompt">Pocket Casts Plus でポッドキャストの整理などを利用しましょう</string>
-    <string name="end_of_year_story_top_podcast_title">こちらが%1$dにあなたが一番再生したポッドキャストです</string>
     <string name="drag_down_to_dismiss_content_description">下にドラッグして閉じる</string>
     <string name="maybe_later">後で</string>
     <string name="need_to_free_up_space">容量を空ける必要がありますか ?</string>

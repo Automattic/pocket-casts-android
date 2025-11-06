@@ -419,7 +419,6 @@ Language: ca
     <string name="icons_plus_prompt">Aconsegueix icones de l\'app exclusives amb Pocket Casts Plus, i més</string>
     <string name="themes_plus_prompt">Aconsegueix temes exclusius amb Pocket Casts Plus, i més</string>
     <string name="folders_plus_prompt">Organitza els teus pòdcasts amb Pocket Casts Plus, i més</string>
-    <string name="end_of_year_story_top_podcast_title">Aquest va ser el teu pòdcast més escoltat en %1$d</string>
     <string name="drag_down_to_dismiss_content_description">Arrossega cap avall per a descartar</string>
     <string name="maybe_later">Potser més tard</string>
     <string name="need_to_free_up_space">Necessites alliberar espai?</string>
