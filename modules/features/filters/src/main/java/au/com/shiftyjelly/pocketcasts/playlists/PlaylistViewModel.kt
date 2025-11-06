@@ -381,6 +381,9 @@ class PlaylistViewModel @AssistedInject constructor(
     }
 
     fun trackEditDismissed() {
+        if (isNameChanged) {
+            analyticsTracker.track(AnalyticsEvent.FILTER_NAME_UPDATED)
+        }
         analyticsTracker.track(
             AnalyticsEvent.FILTER_EDIT_DISMISSED,
             mapOf(
