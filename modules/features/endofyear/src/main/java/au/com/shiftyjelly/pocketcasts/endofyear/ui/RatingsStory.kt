@@ -52,6 +52,7 @@ import com.airbnb.lottie.compose.rememberLottieDynamicProperties
 import com.airbnb.lottie.compose.rememberLottieDynamicProperty
 import dev.shreyaspatil.capturable.capturable
 import java.io.File
+import kotlin.math.max
 import kotlinx.coroutines.delay
 import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
@@ -165,37 +166,12 @@ private fun PresentRatings(
     }
 }
 
-private val BarHeight = 1.5.dp
-private val SpaceHeight = 4.dp
-private val SectionHeight = BarHeight + SpaceHeight
-
 @Composable
 private fun BoxWithConstraintsScope.RatingBars(
     stats: RatingStats,
     areBarsVisible: Boolean,
     forceBarsVisible: Boolean,
 ) {
-    // Measure text height to account for available space for rating lines
-    val textMeasurer = rememberTextMeasurer()
-    val fontSize = 22.nonScaledSp
-    val ratingTextHeight = remember(maxHeight) {
-        textMeasurer.measure(
-            text = "1",
-            style = TextStyle(
-                fontSize = fontSize,
-                lineHeight = 30.sp,
-                fontWeight = FontWeight.W700,
-            ),
-        ).size.height.dp + 8.dp // Plus padding
-    }
-    val maxLineCount = (maxHeight - ratingTextHeight) / SectionHeight
-
-    var areVisible by remember { mutableStateOf(areBarsVisible) }
-    LaunchedEffect(Unit) {
-        delay(350)
-        areVisible = true
-    }
-
     Row(
         verticalAlignment = Alignment.Bottom,
         horizontalArrangement = Arrangement.spacedBy(8.dp),
@@ -204,7 +180,7 @@ private fun BoxWithConstraintsScope.RatingBars(
         Rating.entries.forEach { rating ->
             AnimatedRatingBar(
                 rating = rating.numericalValue,
-                heightRange = ((stats.relativeToMax(rating).coerceAtMost(1f) * 100f) / 10).toInt()
+                heightRange = (stats.relativeToMax(rating) * 10).toInt()
             )
         }
     }
@@ -216,32 +192,27 @@ private fun RowScope.AnimatedRatingBar(
     heightRange: Int,
 ) {
     val composition by rememberLottieComposition(
-        spec = LottieCompositionSpec.RawRes(IR.raw.playback_story_ratings_lottie)
+        spec = LottieCompositionSpec.RawRes(IR.raw.playback_story_ratings_pillar_lottie)
     )
 
     val animatable = rememberLottieAnimatable()
 
     composition?.let { comp ->
-        val fromMarker = comp.markers.find { it.name == "marker_$rating Start" }
-        val toMarker = comp.markers.find { it.name == "marker_$rating End" }
+        val markerIndex = max(1, comp.markers.size - heightRange)
+        val fromMarker = comp.markers.find { it.name == "marker_$markerIndex" } ?: comp.markers.lastOrNull()
 
-        if (fromMarker != null && toMarker != null) {
-            LaunchedEffect(fromMarker, toMarker) {
+        if (fromMarker != null) {
+            LaunchedEffect(fromMarker) {
                 animatable.animate(
                     composition = comp,
-                    clipSpec = LottieClipSpec.Markers(
-                        min = fromMarker.name,
-                        max = toMarker.name,
-                        maxInclusive = true,
+                    clipSpec = LottieClipSpec.Marker(
+                        marker = fromMarker.name,
                     ),
                 )
             }
-        } else {
-            LaunchedEffect("") {
-                animatable.animate(composition)
-            }
         }
     }
+
     val dynamicProperties = rememberLottieDynamicProperties(
         rememberLottieDynamicProperty(
             property = LottieProperty.TEXT,
