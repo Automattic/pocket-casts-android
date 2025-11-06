@@ -459,7 +459,6 @@ Language: nl
     <string name="end_of_year_stories_subscribe_to_plus">Steun Pocket Casts door je in te schrijven voor Plus en krijg toegang tot meer statistieken en Premium-functies zoals bladwijzers, mappen en voorselectie van hoofdstukken!</string>
     <string name="settings_real_time_playback_summary">Als dit is ingeschakeld, toont de speler de resterende tijd, aangepast aan de afspeelsnelheid en overgeslagen hoofdstukken.</string>
     <string name="settings_real_time_playback">Resterende tijd aanpassen</string>
-    <string name="end_of_year_stories_year_over_year_title_went_up_a_lot">Ten opzichte van %1$s is je luistertijd gestegen met meer dan 500%%</string>
     <string name="end_of_year_story_longest_episode_subtitle">Het was \'%1$s\' van \'%2$s\'</string>
     <string name="end_of_year_listening_time_subtitle">totaal naar podcasts geluisterd</string>
     <string name="eoy_story_ratings_learn_button_label">Meer informatie over beoordelingen</string>
@@ -656,15 +655,8 @@ Language: nl
     <string name="end_of_year_stories_theres_more">Dat is niet alles!</string>
     <string name="end_of_year_stories_year_completion_rate">afrondingspercentage</string>
     <string name="eoy_year_over_year_title_skyrocketed">Ten opzichte van 2022 is je luistertijd veel hoger!</string>
-    <string name="end_of_year_stories_year_over_year_subtitle_went_down">Aaaah… er moet worden geleefd, toch?</string>
     <string name="end_of_year_stories_year_over_share_text">Mijn luistertijd in %1$d, ten opzichte van %2$d</string>
-    <string name="end_of_year_stories_year_completion_rate_title">Je afrondingspercentage dit jaar was %1$d%%</string>
-    <string name="end_of_year_stories_year_over_year_subtitle_flat">Consistentie is de sleutel tot succes… of zoiets!</string>
     <string name="end_of_year_prompt_card_summary">Bekijk je luisterstatistieken, top podcasts en meer.</string>
-    <string name="end_of_year_stories_year_over_year_title_went_down">Ten opzichte van %1$s is je luistertijd een klein beetje omlaag gegaan</string>
-    <string name="end_of_year_stories_year_over_year_title_flat">Ten opzichte van %1$s is je luistertijd redelijk hetzelfde gebleven</string>
-    <string name="end_of_year_stories_year_over_year_subtitle_went_up">Klaar om dit te overtreffen in %1$s?</string>
-    <string name="end_of_year_stories_year_over_year_title_went_up">Ten opzichte van %1$s is je luistertijd gestegen met maar liefst %2$s%%</string>
     <string name="end_of_year_story_longest_episode_title">De langste aflevering waarnaar je hebt geluisterd was %1$s</string>
     <string name="end_of_year_replay">Opnieuw afspelen</string>
     <string name="end_of_year_listening_time_title">Dit was je totale luistertijd wat betreft podcasts.</string>

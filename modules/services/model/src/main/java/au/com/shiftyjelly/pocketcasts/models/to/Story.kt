@@ -71,12 +71,25 @@ sealed interface Story {
         override val isFree = false
         override val analyticsValue = "year_vs_year"
 
-        val yearOverYearChange
-            get() = when {
-                lastYearDuration == thisYearDuration -> 1.0
-                lastYearDuration == Duration.ZERO -> Double.POSITIVE_INFINITY
-                else -> thisYearDuration / lastYearDuration
-            }
+        val yearOverYearChange = when (lastYearDuration) {
+            thisYearDuration -> 1.0
+            Duration.ZERO -> Double.POSITIVE_INFINITY
+            else -> thisYearDuration / lastYearDuration
+        }
+
+        val trend = when (yearOverYearChange) {
+            in 0.0..0.9 -> Trend.Down
+            in 0.9..1.1 -> Trend.Same
+            in 1.1..5.0 -> Trend.Up
+            else -> Trend.UpALot
+        }
+
+        sealed class Trend {
+            data object Down : Trend()
+            data object Same : Trend()
+            data object Up : Trend()
+            data object UpALot : Trend()
+        }
     }
 
     data class CompletionRate(

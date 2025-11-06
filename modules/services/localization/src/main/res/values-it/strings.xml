@@ -459,7 +459,6 @@ Language: it
     <string name="settings_real_time_playback">Modifica il tempo rimanente</string>
     <string name="end_of_year_stories_subscribe_to_plus">Supporta Pocket Casts abbonandoti a Plus per ottenere più statistiche, oltre a funzionalità premium come segnalibri, cartelle e la possibilità di preselezionare i capitoli.</string>
     <string name="settings_real_time_playback_summary">Quando è attivo, il lettore mostrerà il tempo rimanente, a seconda della velocità di riproduzione impostata e dei capitoli saltati.</string>
-    <string name="end_of_year_stories_year_over_year_title_went_up_a_lot">Rispetto al %1$s, il tuo tempo di ascolto è aumentato di più del 500%%</string>
     <string name="end_of_year_story_longest_episode_subtitle">Era \"%1$s\" di \"%2$s\"</string>
     <string name="end_of_year_listening_time_subtitle">ascolto di podcast totale</string>
     <string name="eoy_story_ratings_learn_button_label">Scopri di più sulle valutazioni</string>
@@ -656,15 +655,10 @@ Language: it
     <string name="end_of_year_stories_theres_more">E c\'è di più.</string>
     <string name="eoy_year_over_year_title_skyrocketed">Rispetto al 2022, il tuo tempo di ascolto è salito alle stelle.</string>
     <string name="end_of_year_stories_year_completion_rate">tasso di completamento</string>
-    <string name="end_of_year_stories_year_over_year_subtitle_went_down">Ma hai ancora tutta la vita davanti, giusto?</string>
+    <string name="end_of_year_stories_year_completion_rate_title">Il tuo tasso di completamento quest\'anno è stato: %1$d%%</string>
     <string name="end_of_year_stories_year_over_share_text">Il mio tempo di ascolto nel %1$d rispetto al %2$d</string>
     <string name="end_of_year_stories_year_completion_rate_title">Il tuo tasso di completamento è stato %1$d%%</string>
     <string name="end_of_year_prompt_card_summary">Visualizza le statistiche di ascolto, i migliori podcast e molto altro ancora.</string>
-    <string name="end_of_year_stories_year_over_year_subtitle_flat">Dicono che la costanza sia la chiave per il successo. O qualcosa del genere.</string>
-    <string name="end_of_year_stories_year_over_year_title_went_down">Rispetto al %1$s, il tuo tempo di ascolto è leggermente diminuito</string>
-    <string name="end_of_year_stories_year_over_year_title_flat">Rispetto al %1$s, il tuo tempo di ascolto è rimasto abbastanza costante</string>
-    <string name="end_of_year_stories_year_over_year_subtitle_went_up">Vuoi superarlo nel %1$s?</string>
-    <string name="end_of_year_stories_year_over_year_title_went_up">Rispetto al %1$s, il tuo tempo di ascolto è aumentato notevolmente (%2$s%%)</string>
     <string name="end_of_year_replay">Riproduci di nuovo</string>
     <string name="end_of_year_story_longest_episode_title">L\'episodio più lungo che hai ascoltato è stato %1$s</string>
     <string name="end_of_year_listening_time_title">Questo è stato il tuo tempo totale di ascolto di podcast.</string>

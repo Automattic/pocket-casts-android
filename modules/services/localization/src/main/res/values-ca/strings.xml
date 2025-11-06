@@ -444,7 +444,6 @@ Language: ca
     <string name="eoy_story_stories_subscribe_to_plus_button_label">Consulta Pocket Casts Plus</string>
     <string name="end_of_year_stories_subscribe_to_plus">Ajuda Pocket Casts subscrivint-te a Plus i obtén més estadístiques, a més de funcions Prèmium com ara marcadors, carpetes o capítols preseleccionats!</string>
     <string name="settings_real_time_playback_summary">Si està activat, el reproductor mostrarà el temps restant, ajustat per la velocitat de reproducció i els capítols saltats.</string>
-    <string name="end_of_year_stories_year_over_year_title_went_up_a_lot">Comparat amb %1$s, el teu temps que has escoltat ha augmentat més d\'un 500%%</string>
     <string name="end_of_year_story_longest_episode_subtitle">Era \"%1$s\" de \"%2$s\"</string>
     <string name="end_of_year_listening_time_subtitle">total escoltant pòdcasts</string>
     <string name="eoy_story_ratings_learn_button_label">Informa\'t sobre les valoracions</string>
@@ -640,14 +639,9 @@ Language: ca
     <string name="end_of_year_stories_theres_more">Encara hi ha més!</string>
     <string name="end_of_year_stories_year_completion_rate">taxa de finalització</string>
     <string name="eoy_year_over_year_title_skyrocketed">Comparat amb el 2022, el teu temps d\'escolta ha pujat com un coet!</string>
-    <string name="end_of_year_stories_year_over_year_subtitle_went_down">Aaaah… la vida s\'ha de viure, no?</string>
+    <string name="end_of_year_stories_year_completion_rate_title">La teva taxa de finalització enguany ha estat del %1$d%%</string>
     <string name="end_of_year_stories_year_over_share_text">El meu %1$d temps escoltat comparat amb %2$d</string>
     <string name="end_of_year_prompt_card_summary">Consulta les teves estadístiques d\'escolta, els millors pòdcasts i molt més.</string>
-    <string name="end_of_year_stories_year_over_year_subtitle_flat">I diuen que la constància és la clau de l\'èxit… o alguna cosa així!</string>
-    <string name="end_of_year_stories_year_over_year_title_went_down">Comparat amb %1$s, el teu que has escoltat ha baixat una mica.</string>
-    <string name="end_of_year_stories_year_over_year_title_flat">Comparat amb %1$s, el teu temps que has escoltat s\'ha mantingut força constant.</string>
-    <string name="end_of_year_stories_year_over_year_subtitle_went_up">Preparat per a superar-ho al %1$s?</string>
-    <string name="end_of_year_stories_year_over_year_title_went_up">Comparat amb %1$s, el teu temps que ha escoltat ha augmentat un impressionant %2$s%%</string>
     <string name="end_of_year_replay">Torna a reproduir-ho</string>
     <string name="end_of_year_story_longest_episode_title">L\'episodi més llarg que vas escoltar va ser %1$s</string>
     <string name="end_of_year_listening_time_title">Aquest va ser el vostre temps total escoltant pòdcasts</string>

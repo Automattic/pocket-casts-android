@@ -460,7 +460,6 @@ Language: ru
     <string name="settings_real_time_playback_summary">Если эта функция включена, проигрыватель будет показывать оставшееся время с учётом скорости воспроизведения и пропущенных глав.</string>
     <string name="settings_real_time_playback">Настроить оставшееся время</string>
     <string name="end_of_year_stories_subscribe_to_plus">Поддержите Pocket Casts, подписавшись на Plus, и пользуйтесь развёрнутой статистикой и премиум-функциями, например: закладками, папками и предварительным выбором глав.</string>
-    <string name="end_of_year_stories_year_over_year_title_went_up_a_lot">В сравнении с %1$s годом вы провели на 500%% больше времени, слушая подкасты.</string>
     <string name="end_of_year_story_longest_episode_subtitle">Это был выпуск «%1$s» из «%2$s»</string>
     <string name="end_of_year_listening_time_subtitle">общее время прослушивания подкастов</string>
     <string name="eoy_story_ratings_learn_button_label">Подробнее об оценках</string>
@@ -657,15 +656,9 @@ Language: ru
     <string name="end_of_year_stories_theres_more">Есть и многое другое!</string>
     <string name="end_of_year_stories_year_completion_rate">процент завершения</string>
     <string name="eoy_year_over_year_title_skyrocketed">По сравнению с 2022 г. вы посвятили прослушиванию намного больше времени!</string>
-    <string name="end_of_year_stories_year_over_year_subtitle_went_down">И… как, вам хватает времени на всё остальное?</string>
     <string name="end_of_year_stories_year_over_share_text">Время прослушивания в %1$d году по сравнению с %2$d годом</string>
     <string name="end_of_year_stories_year_completion_rate_title">Ваш процент завершения составил %1$d%%</string>
     <string name="end_of_year_prompt_card_summary">Просмотрите свой топ подкастов, статистику прослушивания и другие показатели.</string>
-    <string name="end_of_year_stories_year_over_year_subtitle_flat">Говорят, постоянство — ключ к успеху… или что-то в этом роде.</string>
-    <string name="end_of_year_stories_year_over_year_title_went_down">По сравнению с %1$s годом вы стали слушать немного меньше.</string>
-    <string name="end_of_year_stories_year_over_year_title_flat">Вы посвятили прослушиванию примерно столько же времени, сколько и в %1$s году.</string>
-    <string name="end_of_year_stories_year_over_year_subtitle_went_up">Готовы превзойти свой рекорд в %1$s году?</string>
-    <string name="end_of_year_stories_year_over_year_title_went_up">По сравнению с %1$s годом ваше время прослушивания возросло сразу на %2$s%%</string>
     <string name="end_of_year_story_longest_episode_title">Самым длинным эпизодом, который вы слушали, стал %1$s</string>
     <string name="end_of_year_replay">Прослушать ещё раз</string>
     <string name="end_of_year_listening_time_title">Это ваше общее время прослушивания подкастов.</string>
