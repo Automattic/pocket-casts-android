@@ -20,16 +20,11 @@ import au.com.shiftyjelly.pocketcasts.compose.extensions.contentWithoutConsumedI
 import au.com.shiftyjelly.pocketcasts.compose.theme
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.ui.helper.FragmentHostListener
-import au.com.shiftyjelly.pocketcasts.utils.extensions.sha1
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseFragment
-import com.google.protobuf.kotlin.toByteStringUtf8
 import com.mikepenz.aboutlibraries.Libs
-import com.mikepenz.aboutlibraries.entity.Developer
-import com.mikepenz.aboutlibraries.entity.Funding
 import com.mikepenz.aboutlibraries.entity.Library
 import com.mikepenz.aboutlibraries.entity.License
 import com.mikepenz.aboutlibraries.entity.Organization
-import com.mikepenz.aboutlibraries.entity.Scm
 import com.mikepenz.aboutlibraries.ui.compose.LibrariesContainer
 import com.mikepenz.aboutlibraries.ui.compose.LibraryDefaults
 import com.mikepenz.aboutlibraries.ui.compose.android.produceLibraries
@@ -38,13 +33,10 @@ import com.mikepenz.aboutlibraries.ui.compose.util.author
 import com.mikepenz.aboutlibraries.util.withContext
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
-import kotlinx.collections.immutable.ImmutableList
-import kotlinx.collections.immutable.ImmutableSet
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.collections.immutable.persistentSetOf
 import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.launch
-import kotlinx.serialization.SerialName
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 @AndroidEntryPoint
@@ -113,7 +105,7 @@ class LicensesFragment : BaseFragment() {
     }
 }
 
-private val CcByLicense = """
+private const val CC_BY_LICENSE = """
 Attribution 4.0 International
 
 =======================================================================
@@ -509,9 +501,9 @@ the avoidance of doubt, this paragraph does not form part of the
 public licenses.
 
 Creative Commons may be contacted at creativecommons.org.
-""".trimIndent()
+"""
 
-private val CcByLicenseHash = CcByLicense.sha1()!!
+private const val CC_BY_LICENSE_HASH = "8545eb1b9fe947523b00ad7d021c94f241f47130"
 
 private val appReviewEmojisLibrary: Library = Library(
     uniqueId = "noto-emoji-animation",
@@ -527,8 +519,8 @@ private val appReviewEmojisLibrary: Library = Library(
         License(
             name = "CC BY 4.0",
             url = "https://creativecommons.org/licenses/by/4.0/legalcode",
-            licenseContent = CcByLicense,
-            hash = CcByLicenseHash,
+            licenseContent = CC_BY_LICENSE,
+            hash = CC_BY_LICENSE_HASH,
         ),
     ),
     developers = persistentListOf(),
