@@ -1,11 +1,31 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2025-10-21 09:54:03+0000
+Translation-Revision-Date: 2025-11-06 09:54:04+0000
 Plural-Forms: nplurals=2; plural=n != 1;
 Generator: GlotPress/2.4.0-alpha
 Language: it
 -->
 <resources>
+    <string name="end_of_year_stories_year_completion_rate_subtitle">Degli %2$d episodi iniziati, ne hai finiti %1$d.\nUn follow through più forte rispetto alla maggior parte delle iscrizioni alla palestra.</string>
+    <string name="search_suggestions_no_results_message">Prova una nuova ricerca o aggiungi un URL di feed del podcast</string>
+    <string name="search_suggestions_no_results_title">Nessun risultato</string>
+    <string name="eoy_playback_intro_title">Il tuo anno in podcast,\nriassunto e pronto da rivivere</string>
+    <string name="search_suggestions_view_all">Visualizza tutto per \"%1$s\"</string>
+    <string name="up_next_as_playlist_saved">Successivo salvato come playlist</string>
+    <string name="up_next_as_playlist_replace_body">Questa azione cancellerà la coda Successivo attuale e inizierà a riprodurre questa playlist.</string>
+    <string name="up_next_as_playlist_title">Salvare la coda Successivo?</string>
+    <string name="up_next_as_playlist_button_secondary">Sostituisci e riproduci</string>
+    <string name="up_next_as_playlist_button_primary">Salva la coda attuale</string>
+    <string name="up_next_as_playlist_replace_title">Sostituire l\'attuale Successivo?</string>
+    <string name="up_next_as_playlist_body">L\'attuale Successivo verrà sostituito quando riproduci questa playlist. Salvalo per tenerlo.</string>
+    <string name="delete_playlist_confirmation_title">Eliminare la playlist?</string>
+    <string name="delete_playlist_confirmation_body">Vuoi eliminare la playlist? Questa operazione non può essere annullata.</string>
+    <string name="delete_playlist">Elimina playlist</string>
+    <string name="view">Visualizza</string>
+    <string name="browse_podcasts">Sfoglia i podcast</string>
+    <string name="rearrange_playlists_tooltip_title">Riordina le playlist</string>
+    <string name="rearrange_playlists_tooltip_body">Tieni premuta la playlist per spostarla.</string>
+    <string name="play_all_no_episodes_message">Tutti gli episodi sono stati archiviati. Aggiungi o rimuovi l\'archivio per riprodurre.</string>
     <string name="onboarding_upgrade_features_transcripts">Trascrizioni generate</string>
     <string name="search_filters_top_results">Risultati migliori</string>
     <string name="player_sleep_in_one_chapter">In sospensione alla fine del capitolo corrente</string>
@@ -27,7 +47,6 @@ Language: it
     <string name="smart_playlists">Playlist intelligenti</string>
     <string name="select_smart_playlists">Seleziona Playlist intelligenti</string>
     <string name="podcast_not_in_playlists">Non incluso in alcuna Playlist intelligente</string>
-    <string name="playlist_is_full_description">Playlist piena. Prova a crearne una nuova.</string>
     <string name="add_to_playlist_no_playlist_found_title">Aggiungi alla playlist</string>
     <string name="add_to_playlist_no_playlist_found_body">Non abbiamo trovato alcuna playlist per la ricerca. Crea una nuova playlist o prova un\'altra parola chiave.</string>
     <string name="add_to_playlist_find_playlist">Cerca playlist</string>
@@ -39,7 +58,6 @@ Language: it
     <string name="playlist_episodes_archived_count">%1$d archiviato/i</string>
     <string name="playlist_edit_episodes_title">Modifica playlist</string>
     <string name="playlist_edit_episodes">Riorganizza episodi</string>
-    <string name="playlist_unarchive_all">Annulla archiviazione di tutti</string>
     <string name="playlist_episode_unavailable_cta">Rimuovi dalla playlist</string>
     <string name="playlist_episode_unavailable_description">Il creatore del podcast ha eliminato questo episodio. Rimarrà nella playlist finché non la rimuovi.</string>
     <string name="playlist_episode_unavailable_title">Episodio non disponibile</string>
@@ -92,10 +110,7 @@ Language: it
     <string name="playlist_options">Opzioni della playlist</string>
     <string name="smart_playlist_no_content_body">O è il momento di festeggiare il completamento di questo elenco o è quello di modificare le regole per ottenerne altri.</string>
     <string name="smart_playlist_no_content_title">Nessun episodio</string>
-    <string name="playlist_play_all">Riproduci tutto</string>
     <string name="smart_rules">Regole intelligenti</string>
-    <string name="smart_rule_podcasts_deselect_all">Deseleziona tutto</string>
-    <string name="smart_rule_podcasts_select_all">Seleziona tutto</string>
     <string name="smart_rule_podcasts_all_description_disabled">I nuovi podcast che segui non verranno aggiunti automaticamente.</string>
     <string name="onboarding_upgrade_pp">Politica sulla privacy</string>
     <string name="onboarding_upgrade_tnc">Termini e condizioni</string>
@@ -117,7 +132,6 @@ Language: it
     <string name="save_smart_rule">Salva regola intelligente</string>
     <string name="smart_rule_podcasts_all_description">I nuovi podcast che segui verranno aggiunti automaticamente.</string>
     <string name="smart_rule_podcasts_all_label">Tutti i podcast che segui</string>
-    <string name="smart_rule_podcasts_title">Scegli i podcast</string>
     <string name="onboarding_bookmarks_title">Segnalibri: dimentica la frase \"chissà dov\'è\"</string>
     <string name="smart_rules_description">Configura regole intelligenti per aggiungere automaticamente episodi alla tua playlist intelligente.</string>
     <string name="create_smart_playlist">Crea playlist intelligente</string>
@@ -416,7 +430,6 @@ Language: it
     <string name="icons_plus_prompt">Ottieni icone di app esclusive con Pocket Casts Plus e molto altro ancora</string>
     <string name="themes_plus_prompt">Ottieni temi esclusivi con Pocket Casts Plus e molto altro ancora</string>
     <string name="folders_plus_prompt">Organizza i tuoi podcast con Pocket Casts Plus e molto altro ancora</string>
-    <string name="end_of_year_story_top_podcast_title">Questo è stato il podcast migliore nel %1$d</string>
     <string name="drag_down_to_dismiss_content_description">Trascina verso il basso per eliminare</string>
     <string name="maybe_later">Forse dopo</string>
     <string name="need_to_free_up_space">Hai bisogno di liberare spazio?</string>
@@ -459,7 +472,7 @@ Language: it
     <string name="transcript_error_not_available">Siamo spiacenti, ma non è disponibile una trascrizione per questo episodio.</string>
     <string name="referrals_banner_hide_label">Nascondi il banner</string>
     <string name="referrals_banner_long_press_label">Nascondi il banner di riferimento per riscattare il pass.</string>
-    <string name="end_of_year_prompt_card_title">La riproduzione per il 2024\nè arrivata!</string>
+    <string name="end_of_year_prompt_card_title">La riproduzione è qui!</string>
     <string name="settings_auto_download_limit_auto_downloads">Limita i download automatici</string>
     <string name="settings_auto_download_limit_all_latest_episodes">Tutti gli ultimi episodi</string>
     <string name="settings_auto_download_limit_ten_latest_episode">10 ultimi episodi</string>
@@ -643,10 +656,9 @@ Language: it
     <string name="end_of_year_stories_theres_more">E c\'è di più.</string>
     <string name="eoy_year_over_year_title_skyrocketed">Rispetto al 2022, il tuo tempo di ascolto è salito alle stelle.</string>
     <string name="end_of_year_stories_year_completion_rate">tasso di completamento</string>
-    <string name="end_of_year_stories_year_completion_rate_subtitle">Dei %1$d episodi iniziati, ne hai ascoltati integralmente un totale pari a: %2$d</string>
-    <string name="end_of_year_stories_year_completion_rate_title">Il tuo tasso di completamento quest\'anno è stato: %1$d%%</string>
     <string name="end_of_year_stories_year_over_year_subtitle_went_down">Ma hai ancora tutta la vita davanti, giusto?</string>
     <string name="end_of_year_stories_year_over_share_text">Il mio tempo di ascolto nel %1$d rispetto al %2$d</string>
+    <string name="end_of_year_stories_year_completion_rate_title">Il tuo tasso di completamento è stato %1$d%%</string>
     <string name="end_of_year_prompt_card_summary">Visualizza le statistiche di ascolto, i migliori podcast e molto altro ancora.</string>
     <string name="end_of_year_stories_year_over_year_subtitle_flat">Dicono che la costanza sia la chiave per il successo. O qualcosa del genere.</string>
     <string name="end_of_year_stories_year_over_year_title_went_down">Rispetto al %1$s, il tuo tempo di ascolto è leggermente diminuito</string>
@@ -655,7 +667,6 @@ Language: it
     <string name="end_of_year_stories_year_over_year_title_went_up">Rispetto al %1$s, il tuo tempo di ascolto è aumentato notevolmente (%2$s%%)</string>
     <string name="end_of_year_replay">Riproduci di nuovo</string>
     <string name="end_of_year_story_longest_episode_title">L\'episodio più lungo che hai ascoltato è stato %1$s</string>
-    <string name="end_of_year_story_epilogue_title">Ti ringraziamo per averci ascoltato quest\'anno.\nCi vediamo nel %1$d!</string>
     <string name="end_of_year_listening_time_title">Questo è stato il tuo tempo totale di ascolto di podcast.</string>
     <string name="end_of_year_story_top_categories_subtitle">Hai ascoltato %1$s episodi per un totale di %2$s</string>
     <string name="discover_category_society_abbreviation">Cultura</string>
@@ -963,13 +974,11 @@ Language: it
     <string name="end_of_year_story_top_categories_share_text">I più ascoltati nelle categorie podcast</string>
     <string name="end_of_year_story_top_categories">Categorie migliori</string>
     <string name="end_of_year_story_top_podcasts_share_text">I miei podcast preferiti dell\'anno! %1$s</string>
-    <string name="end_of_year_story_epilogue_subtitle">Non dimenticare di condividere con i tuoi amici e ringrazia i creatori dei tuoi podcast preferiti</string>
     <string name="end_of_year_story_listened_to_numbers_subtitle">C\'è stato però uno su cui continuavi ad andare…</string>
     <string name="end_of_year_story_longest_episode_share_text">L\'episodio più lungo ascoltato nel %1$d: %2$s</string>
     <string name="end_of_year_story_top_podcasts_list_title">I miei podcast preferiti del %1$d</string>
     <string name="end_of_year_story_top_podcast_share_text">Il mio podcast preferito del %1$d. %2$s</string>
     <string name="end_of_year_story_listened_to_numbers_share_text">Nel %3$d ho ascoltato %1$d podcast differenti e %2$d episodi</string>
-    <string name="end_of_year_story_top_podcast_subtitle">Hai ascoltato %1$d episodi per un totale di %2$s di \"%3$s\"</string>
     <string name="end_of_year_story_listened_to_categories">Hai ascoltato %1$d differenti categorie quest\'anno</string>
     <string name="end_of_year_story_listened_to_categories_subtitle">Diamo un\'occhiata ad alcuni dei tuoi preferiti…</string>
     <string name="end_of_year_story_intro_title">Festeggiamo il tuo anno di ascolto!</string>
@@ -1013,7 +1022,7 @@ Language: it
     <string name="must_provide_filter_name">Devi fornire il nome della playlist</string>
     <string name="end_of_year_launch_modal_summary">Visualizza i tuoi podcast principali, le categorie, le statistiche di ascolto e molto altro ancora. Condividi con gli amici e ringrazia pubblicamente i tuoi creatori preferiti!</string>
     <string name="settings_app_icon_halloween">Halloween</string>
-    <string name="end_of_year_launch_modal_primary_button_title">Visualizza Le mie riproduzioni 2024</string>
+    <string name="end_of_year_launch_modal_primary_button_title">Visualizza Le mie riproduzioni 2025</string>
     <string name="settings_show_played_summary">Gli episodi che hai terminato di riprodurre verranno ancora visualizzati</string>
     <string name="settings_show_played">Mostra gli episodi riprodotti</string>
     <string name="settings_privacy_crash_link_summary">Consentici di collegare il tuo account Pocket Casts ai rapporti sugli arresti anomali.</string>
