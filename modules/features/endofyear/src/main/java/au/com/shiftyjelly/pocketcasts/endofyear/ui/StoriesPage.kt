@@ -221,7 +221,6 @@ private fun Stories(
             )
             is Story.TotalTime -> TotalTimeStory(
                 story = story,
-                measurements = measurements,
                 controller = controller,
                 onShareStory = { file -> onShareStory(story, file) },
             )

@@ -34,6 +34,7 @@ import com.airbnb.lottie.compose.rememberLottieDynamicProperties
 import com.airbnb.lottie.compose.rememberLottieDynamicProperty
 import dev.shreyaspatil.capturable.capturable
 import java.io.File
+import java.text.NumberFormat
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.days
 import kotlin.time.Duration.Companion.hours
@@ -46,7 +47,6 @@ import au.com.shiftyjelly.pocketcasts.localization.R as LR
 @Composable
 internal fun TotalTimeStory(
     story: Story.TotalTime,
-    measurements: EndOfYearMeasurements,
     controller: StoryCaptureController,
     onShareStory: (File) -> Unit,
 ) {
@@ -57,12 +57,12 @@ internal fun TotalTimeStory(
             .background(story.backgroundColor),
     ) {
         val totalMinutes = story.duration.inWholeMinutes
-        var animatedNumber by remember { mutableLongStateOf((totalMinutes - 1000).coerceAtLeast(0)) }
+        val startMinutes = totalMinutes - totalMinutes % 1000
+        var animatedNumber by remember { mutableLongStateOf(startMinutes) }
 
-        LaunchedEffect(totalMinutes) {
-            val startValue = (totalMinutes - 1000).coerceAtLeast(0)
+        LaunchedEffect(totalMinutes, startMinutes) {
             val endValue = totalMinutes
-            val animatable = Animatable(startValue.toFloat())
+            val animatable = Animatable(startMinutes.toFloat())
 
             animatable.animateTo(
                 targetValue = endValue.toFloat(),
@@ -79,10 +79,14 @@ internal fun TotalTimeStory(
             spec = LottieCompositionSpec.RawRes(IR.raw.total_time_text),
         )
 
+        val formattedNumber = remember(animatedNumber) {
+            NumberFormat.getNumberInstance().format(animatedNumber)
+        }
+
         val dynamicProperties = rememberLottieDynamicProperties(
             rememberLottieDynamicProperty(
                 property = LottieProperty.TEXT,
-                value = animatedNumber.toString(),
+                value = formattedNumber,
                 "content",
                 "40,456",
             ),
@@ -136,7 +140,6 @@ private fun TotalTimePreview(
             story = Story.TotalTime(
                 duration = duration,
             ),
-            measurements = measurements,
             controller = StoryCaptureController.preview(),
             onShareStory = {},
         )
