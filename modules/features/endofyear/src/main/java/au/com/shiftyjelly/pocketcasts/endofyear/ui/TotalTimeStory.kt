@@ -1,33 +1,37 @@
 package au.com.shiftyjelly.pocketcasts.endofyear.ui
 
-import android.content.Context
-import androidx.compose.foundation.Image
+import android.graphics.Typeface
+import androidx.compose.animation.core.Animatable
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableLongStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.layout.SubcomposeLayout
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.colorResource
-import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.tooling.preview.PreviewParameterProvider
 import androidx.compose.ui.unit.dp
 import au.com.shiftyjelly.pocketcasts.compose.Devices
-import au.com.shiftyjelly.pocketcasts.compose.components.AutoResizeText
-import au.com.shiftyjelly.pocketcasts.compose.components.TextH10
 import au.com.shiftyjelly.pocketcasts.endofyear.StoryCaptureController
-import au.com.shiftyjelly.pocketcasts.localization.helper.FriendlyDurationUnit
-import au.com.shiftyjelly.pocketcasts.localization.helper.toFriendlyString
 import au.com.shiftyjelly.pocketcasts.models.to.Story
+import com.airbnb.lottie.LottieProperty
+import com.airbnb.lottie.compose.LottieAnimation
+import com.airbnb.lottie.compose.LottieCompositionSpec
+import com.airbnb.lottie.compose.rememberLottieComposition
+import com.airbnb.lottie.compose.rememberLottieDynamicProperties
+import com.airbnb.lottie.compose.rememberLottieDynamicProperty
 import dev.shreyaspatil.capturable.capturable
 import java.io.File
 import kotlin.time.Duration
@@ -37,7 +41,6 @@ import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
 import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
-import au.com.shiftyjelly.pocketcasts.ui.R as UR
 
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
@@ -51,102 +54,77 @@ internal fun TotalTimeStory(
         modifier = Modifier
             .capturable(controller.captureController(story))
             .fillMaxSize()
-            .background(story.backgroundColor)
-            .padding(top = measurements.closeButtonBottomEdge),
+            .background(story.backgroundColor),
     ) {
-        val texts = getListeningTimeTexts(LocalContext.current, story.duration)
-        SubcomposeLayout { constraints ->
-            val subtitle = subcompose("subtitle") {
-                TextH10(
-                    text = texts.subtitle,
-                    color = colorResource(UR.color.coolgrey_90),
-                    fontScale = measurements.smallDeviceFactor,
-                    disableAutoScale = true,
-                    modifier = Modifier.padding(horizontal = 24.dp),
-                )
-            }[0].measure(constraints)
+        val totalMinutes = story.duration.inWholeMinutes
+        var animatedNumber by remember { mutableLongStateOf((totalMinutes - 1000).coerceAtLeast(0)) }
 
-            val shareButton = subcompose("share-button") {
-                ShareStoryButton(
-                    story = story,
-                    controller = controller,
-                    onShare = onShareStory,
-                )
-            }[0].measure(constraints)
+        LaunchedEffect(totalMinutes) {
+            val startValue = (totalMinutes - 1000).coerceAtLeast(0)
+            val endValue = totalMinutes
+            val animatable = Animatable(startValue.toFloat())
 
-            val titleConstraints = constraints.copy(
-                maxHeight = constraints.maxHeight - shareButton.height - subtitle.height,
-            )
-            val title = subcompose("title") {
-                AutoResizeText(
-                    text = texts.mainNumber,
-                    fontFamily = humaneFontFamily,
-                    fontWeight = FontWeight.Bold,
-                    maxLines = 1,
-                    color = Color.Black,
-                    // Humane font uses about 15% of its height for the ascent line
-                    // We need to adjust height for it in order to center the text as we
-                    // do not use any characters that go to the ascent line
-                    heightFactor = 0.84f,
-                    modifier = Modifier.padding(horizontal = 16.dp),
-                )
-            }[0].measure(titleConstraints)
-
-            layout(constraints.maxWidth, constraints.maxHeight) {
-                title.place(
-                    x = (titleConstraints.maxWidth - title.width) / 2,
-                    y = (titleConstraints.maxHeight - title.height) / 2,
-                )
-                subtitle.place(
-                    x = 0,
-                    y = constraints.maxHeight - shareButton.height - subtitle.height,
-                )
-                shareButton.place(
-                    x = 0,
-                    y = constraints.maxHeight - shareButton.height,
-                )
+            animatable.animateTo(
+                targetValue = endValue.toFloat(),
+                animationSpec = tween(durationMillis = 2000),
+            ) {
+                animatedNumber = this.value.toLong()
             }
         }
-        Image(
-            painter = painterResource(IR.drawable.end_of_year_2024_sticker_6),
-            contentDescription = null,
+
+        val mask by rememberLottieComposition(
+            spec = LottieCompositionSpec.RawRes(IR.raw.total_time_mask),
+        )
+        val text by rememberLottieComposition(
+            spec = LottieCompositionSpec.RawRes(IR.raw.total_time_text),
+        )
+
+        val dynamicProperties = rememberLottieDynamicProperties(
+            rememberLottieDynamicProperty(
+                property = LottieProperty.TEXT,
+                value = animatedNumber.toString(),
+                "content",
+                "40,456",
+            ),
+            rememberLottieDynamicProperty(
+                property = LottieProperty.TEXT,
+                value = stringResource(LR.string.end_of_year_listening_time_subtitle),
+                "content",
+                "minutes listened",
+            ),
+        )
+
+        val context = LocalContext.current
+        LottieAnimation(
+            composition = mask,
             modifier = Modifier
-                .padding(start = 20.dp)
-                .size(
-                    width = 197.dp * measurements.scale,
-                    height = 165.dp * measurements.scale,
-                ),
+                .fillMaxSize(),
+            contentScale = ContentScale.FillBounds,
+        )
+        LottieAnimation(
+            composition = text,
+            modifier = Modifier
+                .fillMaxSize(),
+            contentScale = ContentScale.FillBounds,
+            dynamicProperties = dynamicProperties,
+            fontMap = remember {
+                mapOf(
+                    "Inter-Medium" to Typeface.create("sans-serif", Typeface.NORMAL),
+                    "Humane-SemiBold" to Typeface.createFromAsset(context.assets, "fonts/humane_semibold.otf"),
+                )
+            },
+        )
+
+        ShareStoryButton(
+            modifier = Modifier
+                .padding(bottom = 18.dp)
+                .align(Alignment.BottomCenter),
+            story = story,
+            controller = controller,
+            onShare = onShareStory,
         )
     }
 }
-
-@Composable
-private fun getListeningTimeTexts(
-    context: Context,
-    duration: Duration,
-): ListeningTimeTexts {
-    val (mainNumber, subtitle) = remember(duration, context) {
-        val timeText = duration.toFriendlyString(
-            resources = context.resources,
-            maxPartCount = 3,
-            minUnit = FriendlyDurationUnit.Minute,
-            maxUnit = if (duration < 100.hours) FriendlyDurationUnit.Hour else FriendlyDurationUnit.Day,
-        )
-        val timeTextStrings = timeText.split(" ")
-        val mainNumber = timeTextStrings.firstOrNull() ?: ""
-        val subtitle = timeTextStrings.drop(1).joinToString(
-            separator = " ",
-            postfix = " ${context.getString(LR.string.end_of_year_listening_time_subtitle)}",
-        )
-        mainNumber to subtitle
-    }
-    return ListeningTimeTexts(mainNumber, subtitle)
-}
-
-private data class ListeningTimeTexts(
-    val mainNumber: String,
-    val subtitle: String,
-)
 
 @Preview(device = Devices.PORTRAIT_REGULAR)
 @Composable
