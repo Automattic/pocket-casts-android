@@ -24,9 +24,9 @@ import androidx.compose.material.icons.outlined.Delete
 import androidx.compose.material.icons.outlined.Downloading
 import androidx.compose.material.icons.outlined.EditCalendar
 import androidx.compose.material.icons.outlined.Folder
-import androidx.compose.material.icons.outlined.HomeRepairService
 import androidx.compose.material.icons.outlined.NewReleases
 import androidx.compose.material.icons.outlined.Notifications
+import androidx.compose.material.icons.outlined.StarBorder
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -63,6 +63,7 @@ fun DeveloperPage(
     onResetSuggestedFoldersSuggestion: () -> Unit,
     onResetPlaylistsOnboarding: () -> Unit,
     onResetNotificationsPrompt: () -> Unit,
+    onShowAppReviewPrompt: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     var openCrashMessageDialog by remember { mutableStateOf(false) }
@@ -104,6 +105,9 @@ fun DeveloperPage(
         }
         item {
             ShowWhatsNew(onClick = onShowWhatsNewClick)
+        }
+        item {
+            ShowAppReviewPrompt(onClick = onShowAppReviewPrompt)
         }
         item {
             NotificationsTesting(onClick = onShowNotificationsTestingClick)
@@ -272,7 +276,7 @@ private fun EndOfYear(
     modifier: Modifier = Modifier,
 ) {
     SettingRow(
-        primaryText = "Reset modal/profile badge",
+        primaryText = "Reset End of Year modal",
         secondaryText = "Reset modal and profile badge for end of year",
         icon = rememberVectorPainter(Icons.Outlined.EditCalendar),
         modifier = modifier.clickable { onClick() },
@@ -288,6 +292,19 @@ private fun ShowWhatsNew(
         primaryText = "Show What's New",
         secondaryText = "Open the What's New page",
         icon = rememberVectorPainter(Icons.Outlined.NewReleases),
+        modifier = modifier.clickable { onClick() },
+    )
+}
+
+@Composable
+private fun ShowAppReviewPrompt(
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    SettingRow(
+        primaryText = "Show app review prompt",
+        secondaryText = "Open the prompt to give ratings",
+        icon = rememberVectorPainter(Icons.Outlined.StarBorder),
         modifier = modifier.clickable { onClick() },
     )
 }
@@ -363,6 +380,7 @@ private fun DeveloperPagePreview() {
         onShowNotificationsTestingClick = {},
         onResetPlaylistsOnboarding = {},
         onResetNotificationsPrompt = {},
+        onShowAppReviewPrompt = {},
     )
 }
 

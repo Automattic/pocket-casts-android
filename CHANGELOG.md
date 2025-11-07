@@ -1,5 +1,17 @@
 7.102
 -----
+*   New Features
+    *   Add new intro story for playback
+        ([#4670](https://github.com/Automattic/pocket-casts-android/pull/4670))
+*   Bug Fixes
+    *   Fix podcasts drag & drop swapping podcasts' positions
+        ([#4699](https://github.com/Automattic/pocket-casts-android/pull/4699))
+    *   Fix podcast settings icon theming with Classic theme
+        ([#4687](https://github.com/Automattic/pocket-casts-android/pull/4687))
+    *   Fix chapters sleep timer not being visible
+        ([#4691](https://github.com/Automattic/pocket-casts-android/pull/4691))
+    *   Fix 3-button navigation obstructing the podcast rating button
+        ([#4698](https://github.com/Automattic/pocket-casts-android/pull/4698))
 
 7.101
 -----

@@ -56,7 +56,6 @@ class FirebaseAnalyticsTracker @Inject constructor(
         Timber.d("Analytic event: $name properties: $properties")
     }
 
-    override fun getTrackerType() = TrackerType.FirstParty
     override fun refreshMetadata() {}
     override fun flush() {}
     override fun clearAllData() {}

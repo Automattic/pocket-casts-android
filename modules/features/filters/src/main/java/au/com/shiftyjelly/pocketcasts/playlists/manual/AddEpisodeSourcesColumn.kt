@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.MaterialTheme
@@ -49,12 +50,8 @@ internal fun AddEpisodeSourcesColumn(
     noContentData: NoContentData,
     onClickSource: (ManualPlaylistEpisodeSource) -> Unit,
     modifier: Modifier = Modifier,
+    listState: LazyListState = rememberLazyListState(),
 ) {
-    val listState = rememberLazyListState()
-    LaunchedEffect(sources) {
-        listState.scrollToItem(0)
-    }
-
     FadedLazyColumn(
         state = listState,
         contentPadding = WindowInsets.verticalNavigationBars.asPaddingValues(),

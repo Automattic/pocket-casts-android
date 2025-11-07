@@ -47,7 +47,8 @@ import au.com.shiftyjelly.pocketcasts.views.R as VR
 @AndroidEntryPoint
 class SleepFragment : BaseDialogFragment() {
 
-    @Inject lateinit var analyticsTracker: AnalyticsTracker
+    @Inject
+    lateinit var analyticsTracker: AnalyticsTracker
 
     override val statusBarIconColor = StatusBarIconColor.Light
 
@@ -194,20 +195,16 @@ class SleepFragment : BaseDialogFragment() {
             binding?.sleepingInText?.text = text
         }
 
-        viewModel.isSleepRunning.combineLatest(
-            viewModel.isSleepAtEndOfEpisodeOrChapter,
-        ).observe(viewLifecycleOwner) { (isSleepRunning, isSleepAtEndOfChapter) ->
-            binding?.sleepSetup?.isVisible = !isSleepRunning
-            binding?.sleepRunning?.isVisible = isSleepRunning
-            binding?.sleepSetupChapter?.isVisible = !isSleepRunning && isSleepAtEndOfChapter
-            binding?.sleepRunningChapter?.isVisible = isSleepRunning && isSleepAtEndOfChapter
-        }
+        viewModel.isSleepRunning
+            .combineLatest(viewModel.isSleepAtEndOfEpisodeOrChapter)
+            .observe(viewLifecycleOwner) { (isSleepRunning, isSleepAtEndOfEpisodeOrChapter) ->
+                binding?.sleepSetup?.isVisible = !isSleepRunning
+                binding?.sleepSetupChapter?.isVisible = !isSleepRunning && args.hasChapters
 
-        viewModel.isSleepRunning.combineLatest(viewModel.isSleepAtEndOfEpisodeOrChapter)
-            .observe(viewLifecycleOwner) { (isSleepRunning, isSleepAtEndOfEpisode) ->
-                binding?.sleepRunningTime?.isVisible = isSleepRunning && !isSleepAtEndOfEpisode
-                binding?.sleepRunningChapter?.isVisible = isSleepRunning && !isSleepAtEndOfEpisode && args.hasChapters
-                binding?.sleepRunningEndOfEpisodeOrChapter?.isVisible = isSleepRunning && isSleepAtEndOfEpisode
+                binding?.sleepRunning?.isVisible = isSleepRunning
+                binding?.sleepRunningChapter?.isVisible = isSleepRunning && !isSleepAtEndOfEpisodeOrChapter && args.hasChapters
+                binding?.sleepRunningEndOfEpisodeOrChapter?.isVisible = isSleepRunning && isSleepAtEndOfEpisodeOrChapter
+                binding?.sleepRunningTime?.isVisible = isSleepRunning && !isSleepAtEndOfEpisodeOrChapter
             }
 
         viewModel.playingEpisodeLive.observe(

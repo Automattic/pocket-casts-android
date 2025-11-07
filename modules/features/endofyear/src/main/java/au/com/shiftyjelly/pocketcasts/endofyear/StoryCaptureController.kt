@@ -48,12 +48,7 @@ internal fun rememberStoryCaptureController(): StoryCaptureController {
         object : StoryCaptureController {
             private var _isSharing by mutableStateOf(false)
             override val isSharing get() = _isSharing
-
-            private val buttonHeights = mutableMapOf<Class<Story>, Int>()
-
-            override fun updateButtonHeightPx(story: Story, height: Int) {
-                buttonHeights += story.javaClass to height
-            }
+            override var topControlsHeightPx = 0
 
             override fun captureController(story: Story): CaptureController = when (story) {
                 is Story.Cover -> cover
@@ -70,11 +65,6 @@ internal fun rememberStoryCaptureController(): StoryCaptureController {
             }
 
             override suspend fun capture(story: Story): File? {
-                val buttonHeightPx = buttonHeights[story.javaClass]
-                if (buttonHeightPx == null) {
-                    return null
-                }
-
                 _isSharing = true
                 delay(50) // A small delay to settle stories animations before capturing a screenshot
                 val controller = captureController(story)
@@ -84,34 +74,20 @@ internal fun rememberStoryCaptureController(): StoryCaptureController {
                             .asAndroidBitmap()
                             .copy(Bitmap.Config.ARGB_8888, false)
 
-                        val logoHeight = (buttonHeightPx * 0.5f).roundToInt()
-                        val logoWidth = ((logoHeight * 153).toDouble() / 38).roundToInt()
                         val pcLogo = AppCompatResources.getDrawable(context, IR.drawable.pc_logo_pill)!!
                             .toBitmap()
-                            .scale(width = logoWidth, height = logoHeight)
 
-                        createBitmap(background.width, background.height).applyCanvas {
+                        createBitmap(background.width, background.height - topControlsHeightPx).applyCanvas {
                             // Draw captured bitmap
-                            drawBitmap(background, 0f, 0f, null)
-                            // Hide bottom button behind an empty rect
-                            val paint = Paint().apply {
-                                isDither = true
-                                color = story.backgroundColor.toArgb()
-                            }
-                            drawRect(
-                                0f,
-                                height - buttonHeightPx.toFloat(),
-                                width.toFloat(),
-                                height.toFloat(),
-                                paint,
-                            )
+                            drawBitmap(background, 0f, -topControlsHeightPx.toFloat(), null)
                             // Draw PC logo
                             drawBitmap(
                                 pcLogo,
                                 (width - pcLogo.width).toFloat() / 2,
-                                (height - buttonHeightPx + (buttonHeightPx - pcLogo.height) / 2).toFloat(),
+                                height - (pcLogo.height * 1.5f), // Pad the logo from the bottom by half its height
                                 null,
                             )
+                            // Draw at the correct ratio for Instagram sharing, this will include black bars in the image
                         }.fitToAspectRatio(9f / 16)
                     }
                     withContext(Dispatchers.IO) {
@@ -132,8 +108,8 @@ internal fun rememberStoryCaptureController(): StoryCaptureController {
 
 internal interface StoryCaptureController {
     val isSharing: Boolean
+    var topControlsHeightPx: Int
 
-    fun updateButtonHeightPx(story: Story, height: Int)
     fun captureController(story: Story): CaptureController
     suspend fun capture(story: Story): File?
 
@@ -143,10 +119,9 @@ internal interface StoryCaptureController {
             private val controller = rememberCaptureController()
 
             override val isSharing = false
+            override var topControlsHeightPx = 0
 
             override fun captureController(story: Story) = controller
-
-            override fun updateButtonHeightPx(story: Story, height: Int) = Unit
 
             override suspend fun capture(story: Story): File? {
                 return null

@@ -45,6 +45,7 @@ dependencies {
     implementation(libs.compose.ui.tooling.preview)
     implementation(libs.coroutines.core)
     implementation(libs.timber)
+    implementation(libs.lottie.compose)
 
     implementation(projects.modules.features.account)
     implementation(projects.modules.features.settings)

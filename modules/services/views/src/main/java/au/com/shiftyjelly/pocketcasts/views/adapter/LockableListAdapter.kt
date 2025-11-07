@@ -5,7 +5,6 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
-import java.util.Collections
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
@@ -91,7 +90,7 @@ class LockingDragAndDropCallback<T>(
         lastDraggedPosition = draggedPosition
         lastTargetPosition = targetPosition
 
-        Collections.swap(items, draggedPosition, targetPosition)
+        items.add(targetPosition, items.removeAt(draggedPosition))
         adapter.forceSubmitList(items.toList())
         viewHolder.itemView.performHapticFeedback(HapticFeedbackConstants.CONTEXT_CLICK)
 

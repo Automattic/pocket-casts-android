@@ -5,6 +5,8 @@ import android.widget.Toast
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
+import au.com.shiftyjelly.pocketcasts.preferences.model.AppReviewReason
+import au.com.shiftyjelly.pocketcasts.repositories.appreview.AppReviewManagerImpl
 import au.com.shiftyjelly.pocketcasts.repositories.download.UpdateEpisodeDetailsTask
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
@@ -34,6 +36,7 @@ class DeveloperViewModel
     private val settings: Settings,
     @ApplicationContext private val context: Context,
     private val crashLogging: CrashLogging,
+    private val appReviewManagerImpl: AppReviewManagerImpl,
 ) : ViewModel() {
 
     fun forceRefresh() {
@@ -151,7 +154,7 @@ class DeveloperViewModel
     }
 
     fun resetEoYModalProfileBadge() {
-        settings.setEndOfYearShowBadge2023(true)
+        settings.setEndOfYearShowBadge2025(true)
         settings.setEndOfYearShowModal(true)
     }
 
@@ -175,5 +178,11 @@ class DeveloperViewModel
 
     fun resetNotificationsPrompt() {
         settings.notificationsPromptAcknowledged.set(false, updateModifiedAt = false)
+    }
+
+    fun showAppReviewPrompt() {
+        viewModelScope.launch {
+            appReviewManagerImpl.triggerPrompt(AppReviewReason.DevelopmentTrigger)
+        }
     }
 }

@@ -48,6 +48,7 @@ include(":wear")
 // features
 include(":modules:features:account")
 include(":modules:features:ads")
+include(":modules:features:appreview")
 include(":modules:features:cartheme")
 include(":modules:features:discover")
 include(":modules:features:endofyear")

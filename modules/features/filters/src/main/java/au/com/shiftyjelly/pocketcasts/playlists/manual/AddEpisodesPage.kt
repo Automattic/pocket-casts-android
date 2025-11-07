@@ -9,11 +9,13 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.text.input.TextFieldState
 import androidx.compose.foundation.text.input.rememberTextFieldState
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
@@ -130,6 +132,9 @@ internal fun AddEpisodesPage(
             modifier = Modifier.height(24.dp),
         )
 
+        val homeListState = rememberLazyListState()
+        val folderListState = rememberLazyListState()
+
         NavHost(
             navController = navController,
             startDestination = AddEpisodesRoutes.HOME,
@@ -172,6 +177,7 @@ internal fun AddEpisodesPage(
                         iconId = IR.drawable.ic_exclamation_circle,
                     ),
                     onClickSource = navigateToSource,
+                    listState = homeListState,
                     modifier = Modifier
                         .fillMaxSize()
                         .imePadding(),
@@ -199,6 +205,7 @@ internal fun AddEpisodesPage(
                         iconId = IR.drawable.ic_exclamation_circle,
                     ),
                     onClickSource = navigateToSource,
+                    listState = folderListState,
                     modifier = Modifier
                         .fillMaxSize()
                         .imePadding(),

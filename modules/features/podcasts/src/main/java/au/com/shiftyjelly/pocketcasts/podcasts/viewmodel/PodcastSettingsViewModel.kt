@@ -288,6 +288,10 @@ class PodcastSettingsViewModel @AssistedInject constructor(
         changeSkipFirst { value -> value.incrementByOrRound(5).coerceAtLeast(0) }
     }
 
+    fun changeSkipFirst(rawDuration: String) {
+        changeSkipFirst { value -> rawDuration.toIntOrNull() ?: value }
+    }
+
     private fun changeSkipFirst(block: (Int) -> Int) {
         val podcast = podcastFlow.value ?: return
         viewModelScope.launch {
@@ -308,6 +312,10 @@ class PodcastSettingsViewModel @AssistedInject constructor(
 
     fun incrementSkipLast() {
         changeSkipLast { value -> value.incrementByOrRound(5).coerceAtLeast(0) }
+    }
+
+    fun changeSkipLast(rawDuration: String) {
+        changeSkipLast { value -> rawDuration.toIntOrNull() ?: value }
     }
 
     private fun changeSkipLast(block: (Int) -> Int) {

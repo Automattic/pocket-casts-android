@@ -20,7 +20,7 @@ enum class RuleType(
         analyticsValue = "episode_status",
     ),
     ReleaseDate(
-        iconId = R.drawable.ic_calendar,
+        iconId = R.drawable.ic_filters_calendar,
         titleId = au.com.shiftyjelly.pocketcasts.localization.R.string.filters_release_date,
         analyticsValue = "release_date",
     ),

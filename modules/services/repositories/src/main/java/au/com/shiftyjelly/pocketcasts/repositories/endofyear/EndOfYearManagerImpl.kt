@@ -23,7 +23,7 @@ class EndOfYearManagerImpl @Inject constructor(
     override suspend fun isEligibleForEndOfYear(year: Year): Boolean {
         val epochStart = year.toEpochMillis(clock.zone)
         val epochEnd = year.plusYears(1).toEpochMillis(clock.zone)
-        return FeatureFlag.isEnabled(Feature.END_OF_YEAR_2024) && getTotalPlaybackTime(epochStart, epochEnd) > 5.minutes
+        return FeatureFlag.isEnabled(Feature.END_OF_YEAR_2025) && getTotalPlaybackTime(epochStart, epochEnd) > 5.minutes
     }
 
     override suspend fun getStats(year: Year): EndOfYearStats = coroutineScope {

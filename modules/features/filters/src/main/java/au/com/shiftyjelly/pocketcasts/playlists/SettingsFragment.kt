@@ -51,7 +51,10 @@ internal class SettingsFragment : BaseFragment() {
                     autoDownloadEpisodeLimit = playlist.settings.autoDownloadLimit,
                     onChangeAutoDownloadValue = viewModel::updateAutoDownload,
                     onClickEpisodeLimit = ::openDownloadLimit,
-                    onClickDeletePlaylist = ::openDeleteConfirmation,
+                    onClickDeletePlaylist = {
+                        viewModel.trackDeleteTriggered()
+                        openDeleteConfirmation()
+                    },
                     onClickBack = {
                         @Suppress("DEPRECATION")
                         requireActivity().onBackPressed()
@@ -102,6 +105,11 @@ internal class SettingsFragment : BaseFragment() {
             .setOnConfirm {
                 viewModel.deletePlaylist()
                 (requireActivity() as FragmentHostListener).closeFiltersToRoot()
+            }
+            .setOnDismiss { isDismissedWithoutAction ->
+                if (isDismissedWithoutAction) {
+                    viewModel.trackDeleteDismissed()
+                }
             }
         dialog.show(parentFragmentManager, "delete_playlist_confirmation")
     }

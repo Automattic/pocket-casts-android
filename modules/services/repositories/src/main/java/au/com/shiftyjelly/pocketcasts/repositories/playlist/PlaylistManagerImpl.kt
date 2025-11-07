@@ -469,8 +469,9 @@ class PlaylistManagerImpl(
             }
             finalUuid
         }
-        if (uuid !in Playlist.PREDEFINED_UUIDS) {
-            settings.showRearrangePlaylistsTooltip.set(true, updateModifiedAt = false)
+        val setting = settings.showRearrangePlaylistsTooltip
+        if (uuid !in Playlist.PREDEFINED_UUIDS && setting.modifiedAt == null) {
+            setting.set(true, updateModifiedAt = true)
         }
         return uuid
     }

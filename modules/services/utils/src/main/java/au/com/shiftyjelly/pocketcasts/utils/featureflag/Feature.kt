@@ -20,12 +20,12 @@ enum class Feature(
         hasFirebaseRemoteFlag = true,
         hasDevToggle = false,
     ),
-    END_OF_YEAR_2024(
-        key = "end_of_year_2024",
-        title = "End of Year 2024",
-        defaultValue = false,
+    END_OF_YEAR_2025(
+        key = "end_of_year_2025",
+        title = "End of Year 2025",
+        defaultValue = isDebugOrPrototypeBuild,
         tier = FeatureTier.Free,
-        hasFirebaseRemoteFlag = true,
+        hasFirebaseRemoteFlag = false,
         hasDevToggle = false,
     ),
     INTRO_PLUS_OFFER_ENABLED(
@@ -186,6 +186,14 @@ enum class Feature(
         defaultValue = isDebugOrPrototypeBuild,
         tier = FeatureTier.Free,
         hasFirebaseRemoteFlag = true,
+        hasDevToggle = true,
+    ),
+    IMPROVE_APP_RATINGS(
+        key = "improve_app_ratings",
+        title = "Banner prompting for app rating",
+        defaultValue = isDebugOrPrototypeBuild,
+        tier = FeatureTier.Free,
+        hasFirebaseRemoteFlag = false,
         hasDevToggle = true,
     ),
 

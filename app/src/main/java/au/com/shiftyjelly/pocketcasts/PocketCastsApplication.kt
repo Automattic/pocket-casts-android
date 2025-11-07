@@ -13,6 +13,8 @@ import au.com.shiftyjelly.pocketcasts.engage.EngageSdkBridge
 import au.com.shiftyjelly.pocketcasts.models.db.dao.UpNextDao
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodeStatusEnum
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
+import au.com.shiftyjelly.pocketcasts.repositories.appreview.AppReviewAnalyticsListener
+import au.com.shiftyjelly.pocketcasts.repositories.appreview.AppReviewManager
 import au.com.shiftyjelly.pocketcasts.repositories.di.ApplicationScope
 import au.com.shiftyjelly.pocketcasts.repositories.download.DownloadManager
 import au.com.shiftyjelly.pocketcasts.repositories.endofyear.EndOfYearSync
@@ -132,6 +134,10 @@ class PocketCastsApplication :
 
     @Inject lateinit var playlistInteractionNotifier: PlaylistInteractionNotifier
 
+    @Inject lateinit var appReviewManager: AppReviewManager
+
+    @Inject lateinit var appReviewAnalyticsListener: AppReviewAnalyticsListener
+
     override fun onCreate() {
         if (BuildConfig.DEBUG) {
             StrictMode.setThreadPolicy(
@@ -163,6 +169,7 @@ class PocketCastsApplication :
     private fun setupAnalytics() {
         analyticsTracker.clearAllData()
         analyticsTracker.refreshMetadata()
+        analyticsTracker.addListener(appReviewAnalyticsListener)
         downloadStatisticsReporter.setup()
         experimentProvider.initialize()
     }
@@ -278,6 +285,7 @@ class PocketCastsApplication :
         engageSdkBridge.registerIntegration()
         shortcutsSynchronizer.keepShortcutsInSync()
         playlistInteractionNotifier.monitorPlaylistsInteraction()
+        applicationScope.launch { appReviewManager.monitorAppReviewReasons() }
 
         keepPlayerWidgetsUpdated()
 

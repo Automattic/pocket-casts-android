@@ -37,7 +37,6 @@ import au.com.shiftyjelly.pocketcasts.search.component.ImprovedSearchEpisodeResu
 import au.com.shiftyjelly.pocketcasts.search.component.ImprovedSearchFolderResultRow
 import au.com.shiftyjelly.pocketcasts.search.component.ImprovedSearchPodcastResultRow
 import au.com.shiftyjelly.pocketcasts.search.component.ImprovedSearchTermSuggestionRow
-import au.com.shiftyjelly.pocketcasts.search.component.NoResultsView
 import au.com.shiftyjelly.pocketcasts.search.component.NoSuggestionsView
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.views.buttons.PlayButton
