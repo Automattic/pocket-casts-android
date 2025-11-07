@@ -32,6 +32,7 @@ import androidx.core.view.isVisible
 import androidx.core.view.updateLayoutParams
 import androidx.core.view.updatePadding
 import androidx.dynamicanimation.animation.DynamicAnimation.TRANSLATION_Y
+import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.commitNow
 import androidx.lifecycle.Lifecycle
@@ -134,6 +135,7 @@ import au.com.shiftyjelly.pocketcasts.podcasts.view.podcast.PodcastFragment
 import au.com.shiftyjelly.pocketcasts.podcasts.view.podcasts.PodcastsFragment
 import au.com.shiftyjelly.pocketcasts.podcasts.view.share.ShareListIncomingFragment
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
+import au.com.shiftyjelly.pocketcasts.preferences.model.AppReviewReason
 import au.com.shiftyjelly.pocketcasts.profile.ProfileFragment
 import au.com.shiftyjelly.pocketcasts.profile.SubCancelledFragment
 import au.com.shiftyjelly.pocketcasts.profile.TrialFinishedFragment
@@ -1897,7 +1899,7 @@ class MainActivity :
                 .flowWithLifecycle(lifecycle, Lifecycle.State.RESUMED)
                 .onStart { delay(3.seconds) } // Do not blast user with a review immediately on start
                 .collect { signal ->
-                    if (FeatureFlag.isEnabled(Feature.IMPROVE_APP_RATINGS) && supportFragmentManager.findFragmentByTag("app_review_prompt") == null) {
+                    if (canDisplayAppRatingsPrompt(signal.reason)) {
                         AppReviewDialogFragment().show(supportFragmentManager, "app_review_prompt")
                         signal.consume()
                     } else {
@@ -1905,5 +1907,20 @@ class MainActivity :
                     }
                 }
         }
+    }
+
+    private fun canDisplayAppRatingsPrompt(reason: AppReviewReason): Boolean {
+        return reason == AppReviewReason.DevelopmentTrigger || (
+            FeatureFlag.isEnabled(Feature.IMPROVE_APP_RATINGS) &&
+                navigator.isAtRootOfStack() &&
+                !navigator.isShowingModal() &&
+                childrenWithBackStack.all { it.getBackstackCount() == 0 } &&
+                supportFragmentManager.backStackEntryCount == 0 &&
+                supportFragmentManager.fragments.none { it is DialogFragment } &&
+                frameBottomSheetBehavior.state == BottomSheetBehavior.STATE_COLLAPSED &&
+                !viewModel.shouldShowStoriesModal.value &&
+                !binding.playerBottomSheet.isPlayerOpen &&
+                !binding.root.isTouching
+            )
     }
 }
