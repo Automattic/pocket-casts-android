@@ -81,13 +81,13 @@ private fun BoxScope.YearVsYearAnimation(
     val animationId = when (trend) {
         Trend.Same -> R.raw.playback_year_vs_year_same_lottie
         Trend.Down -> R.raw.playback_year_vs_year_down_lottie
-        Trend.Up,
-        Trend.UpALot,
-        -> R.raw.playback_year_vs_year_up_lottie
+        Trend.Up -> R.raw.playback_year_vs_year_up_lottie
+        Trend.UpALot -> R.raw.playback_year_vs_year_up_a_lot_lottie
     }
 
     val composition by rememberLottieComposition(
         spec = LottieCompositionSpec.RawRes(animationId),
+        imageAssetsFolder = "lottie-images",
     )
     if (isSharing) {
         LottieAnimation(
