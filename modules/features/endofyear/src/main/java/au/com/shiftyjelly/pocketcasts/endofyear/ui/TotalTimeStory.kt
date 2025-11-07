@@ -18,6 +18,7 @@ import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalInspectionMode
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
@@ -29,6 +30,7 @@ import au.com.shiftyjelly.pocketcasts.models.to.Story
 import com.airbnb.lottie.LottieProperty
 import com.airbnb.lottie.compose.LottieAnimation
 import com.airbnb.lottie.compose.LottieCompositionSpec
+import com.airbnb.lottie.compose.animateLottieCompositionAsState
 import com.airbnb.lottie.compose.rememberLottieComposition
 import com.airbnb.lottie.compose.rememberLottieDynamicProperties
 import com.airbnb.lottie.compose.rememberLottieDynamicProperty
@@ -56,24 +58,37 @@ internal fun TotalTimeStory(
             .fillMaxSize()
             .background(story.backgroundColor),
     ) {
+        val isPreview = LocalInspectionMode.current
+        val freezeAnimation = controller.isSharing || isPreview
         val totalMinutes = story.duration.inWholeMinutes
-        val startMinutes = totalMinutes - totalMinutes % 1000
+        val startMinutes = if (freezeAnimation) totalMinutes else totalMinutes - totalMinutes % 1000
+
         var animatedNumber by remember { mutableLongStateOf(startMinutes) }
 
-        LaunchedEffect(totalMinutes, startMinutes) {
-            val endValue = totalMinutes
-            val animatable = Animatable(startMinutes.toFloat())
+        LaunchedEffect(totalMinutes, startMinutes, freezeAnimation) {
+            if (freezeAnimation) {
+                animatedNumber = totalMinutes
+            } else {
+                val endValue = totalMinutes
+                val animatable = Animatable(startMinutes.toFloat())
 
-            animatable.animateTo(
-                targetValue = endValue.toFloat(),
-                animationSpec = tween(durationMillis = 2000),
-            ) {
-                animatedNumber = this.value.toLong()
+                animatable.animateTo(
+                    targetValue = endValue.toFloat(),
+                    animationSpec = tween(durationMillis = 2000),
+                ) {
+                    animatedNumber = this.value.toLong()
+                }
             }
         }
 
         val text by rememberLottieComposition(
             spec = LottieCompositionSpec.RawRes(IR.raw.playback_story_total_listened_lottie),
+        )
+
+        val animationProgress by animateLottieCompositionAsState(
+            composition = text,
+            isPlaying = !freezeAnimation,
+            iterations = 1,
         )
 
         val formattedNumber = remember(animatedNumber) {
@@ -98,6 +113,7 @@ internal fun TotalTimeStory(
         val context = LocalContext.current
         LottieAnimation(
             composition = text,
+            progress = { if (freezeAnimation) 1.0f else animationProgress },
             modifier = Modifier
                 .fillMaxSize(),
             contentScale = ContentScale.FillBounds,
