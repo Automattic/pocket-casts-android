@@ -8,6 +8,8 @@
         ([#4687](https://github.com/Automattic/pocket-casts-android/pull/4687))
     *   Fix chapters sleep timer not being visible
         ([#4691](https://github.com/Automattic/pocket-casts-android/pull/4691))
+    *   Fix 3-button navigation obstructing the podcast rating button
+        ([#4698](https://github.com/Automattic/pocket-casts-android/pull/4698))
 
 7.101
 -----
