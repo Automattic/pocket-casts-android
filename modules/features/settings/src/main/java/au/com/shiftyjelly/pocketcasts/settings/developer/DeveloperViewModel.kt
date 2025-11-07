@@ -5,6 +5,7 @@ import android.widget.Toast
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
+import au.com.shiftyjelly.pocketcasts.preferences.model.AppReviewReason
 import au.com.shiftyjelly.pocketcasts.repositories.appreview.AppReviewManagerImpl
 import au.com.shiftyjelly.pocketcasts.repositories.download.UpdateEpisodeDetailsTask
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
@@ -181,7 +182,7 @@ class DeveloperViewModel
 
     fun showAppReviewPrompt() {
         viewModelScope.launch {
-            appReviewManagerImpl.showPrompt()
+            appReviewManagerImpl.triggerPrompt(AppReviewReason.DevelopmentTrigger)
         }
     }
 }

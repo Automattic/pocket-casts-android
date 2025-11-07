@@ -1300,6 +1300,7 @@ open class PlaybackManager @Inject constructor(
                 LogBuffer.e(LogBuffer.TAG_PLAYBACK, "OnCompletion uuid does not match playback state current episode, ignoring onComplete event.")
                 return
             }
+            analyticsTracker.track(AnalyticsEvent.PLAYER_EPISODE_COMPLETED)
 
             // remove from Up Next
             upNextQueue.removeEpisode(episode, shouldShuffleUpNext = settings.upNextShuffle.value)
@@ -2146,6 +2147,7 @@ open class PlaybackManager @Inject constructor(
                     sleepEndOfEpisode(episode)
                     episodeManager.markAsPlayedBlocking(episode, this, podcastManager)
                 } else {
+                    analyticsTracker.track(AnalyticsEvent.PLAYER_EPISODE_COMPLETED)
                     statsManager.addTimeSavedAutoSkipping(timeRemaining.toLong() * 1000L)
                     episodeManager.markAsPlayedBlocking(episode, this, podcastManager)
                     LogBuffer.i(LogBuffer.TAG_PLAYBACK, "Skipping remainder of ${episode.title} with skip last $skipLast")

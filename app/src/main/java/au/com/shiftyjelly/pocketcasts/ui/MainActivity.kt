@@ -207,6 +207,7 @@ import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 import kotlin.coroutines.CoroutineContext
 import kotlin.time.Duration
+import kotlin.time.Duration.Companion.seconds
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
@@ -215,6 +216,7 @@ import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
@@ -1893,9 +1895,13 @@ class MainActivity :
         lifecycleScope.launch {
             appReviewManager.showPromptSignal
                 .flowWithLifecycle(lifecycle)
-                .collect {
+                .onStart { delay(5.seconds) } // TODO: PCDROID-260
+                .collect { signal ->
                     if (FeatureFlag.isEnabled(Feature.IMPROVE_APP_RATINGS) && supportFragmentManager.findFragmentByTag("app_review_prompt") == null) {
                         AppReviewDialogFragment().show(supportFragmentManager, "app_review_prompt")
+                        signal.consume()
+                    } else {
+                        signal.ignore()
                     }
                 }
         }

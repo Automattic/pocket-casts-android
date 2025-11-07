@@ -13,6 +13,7 @@ import au.com.shiftyjelly.pocketcasts.models.type.Membership
 import au.com.shiftyjelly.pocketcasts.models.type.PodcastsSortType
 import au.com.shiftyjelly.pocketcasts.models.type.Subscription
 import au.com.shiftyjelly.pocketcasts.preferences.model.AppIconSetting
+import au.com.shiftyjelly.pocketcasts.preferences.model.AppReviewReason
 import au.com.shiftyjelly.pocketcasts.preferences.model.ArtworkConfiguration
 import au.com.shiftyjelly.pocketcasts.preferences.model.AutoAddUpNextLimitBehaviour
 import au.com.shiftyjelly.pocketcasts.preferences.model.AutoPlaySource
@@ -589,4 +590,10 @@ interface Settings {
     val showFreeAccountEncouragement: UserSetting<Boolean>
 
     val showPlaylistsOnboarding: UserSetting<Boolean>
+
+    // App review prompt policy settings
+    val appReviewEpisodeCompletedTimestamps: ReadWriteSetting<List<Instant>>
+
+    val appReviewSubmittedReasons: ReadWriteSetting<List<AppReviewReason>>
+    val appReviewLastPromptTimestamp: ReadWriteSetting<Instant?>
 }
