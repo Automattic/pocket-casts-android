@@ -1128,6 +1128,7 @@ open class PlaybackManager @Inject constructor(
     /** LISTENERS  */
 
     suspend fun onPlayerError(event: PlayerEvent.PlayerError) {
+        settings.recordErrorSession()
         val episode = getCurrentEpisode()
 
         try {

@@ -41,13 +41,18 @@ class AppReviewManagerTest {
 
     private val submittedReasonsSetting = TestSetting(emptyList<AppReviewReason>())
     private val lastPromptSetting = TestSetting<Instant?>(null)
+    private val lastDeclineTimestampsSetting = TestSetting(emptyList<Instant>())
+    private val errorSessionsSetting = TestSetting(emptyList<String>())
+    private val crashTimestampSetting = TestSetting<Instant?>(null)
 
     private val clock = MutableClock()
     private val loopIdleDuration = 1.seconds
+    private var sessionIds = mutableListOf<String>()
 
     private val manager = AppReviewManagerImpl(
         clock = clock,
         settings = mock<Settings> {
+            on { sessionIds } doReturn sessionIds
             on { appReviewEpisodeCompletedTimestamps } doReturn episodesCompletedSetting
             on { appReviewEpisodeStarredTimestamp } doReturn episodeStarredSetting
             on { appReviewPodcastRatedTimestamp } doReturn podcastRatedSetting
@@ -59,6 +64,9 @@ class AppReviewManagerTest {
             on { appReviewReferralSharedTimestamp } doReturn referralSharedSetting
             on { appReviewSubmittedReasons } doReturn submittedReasonsSetting
             on { appReviewLastPromptTimestamp } doReturn lastPromptSetting
+            on { appReviewLastDeclineTimestamps } doReturn lastDeclineTimestampsSetting
+            on { appReviewErrorSessionIds } doReturn errorSessionsSetting
+            on { appReviewCrashTimestamp } doReturn crashTimestampSetting
         },
         loopIdleDuration = loopIdleDuration,
     )
@@ -202,8 +210,75 @@ class AppReviewManagerTest {
     }
 
     @Test
+    fun `dispatch event only if the prompt was not declined twice in 60 days`() = runTest {
+        testInLoop {
+            lastDeclineTimestampsSetting.set(
+                listOf(
+                    clock.instant().minusMillis(61.days.inWholeMilliseconds),
+                    clock.instant(),
+                ),
+            )
+            episodeStarredSetting.set(clock.instant())
+            awaitSignalAndIgnore()
+
+            lastDeclineTimestampsSetting.set(
+                listOf(
+                    clock.instant().minusMillis(60.days.inWholeMilliseconds),
+                    clock.instant(),
+                ),
+            )
+            episodeStarredSetting.set(clock.instant())
+            expectNoSignal()
+        }
+    }
+
+    @Test
+    fun `dispatch event only if error occurred in the last 2 sessions`() = runTest {
+        testInLoop {
+            sessionIds.add("1")
+            errorSessionsSetting.set(listOf("1"))
+
+            episodeStarredSetting.set(clock.instant())
+            expectNoSignal()
+
+            sessionIds.add("2")
+            expectNoSignal()
+
+            sessionIds.add("3")
+            val signal = awaitSignalAndConsume()
+            assertEquals(AppReviewReason.EpisodeStarred, signal.reason)
+        }
+    }
+
+    @Test
+    fun `dispatch event only if there was no crash in a week`() = runTest {
+        testInLoop {
+            crashTimestampSetting.set(clock.instant())
+
+            episodeStarredSetting.set(clock.instant())
+            expectNoSignal()
+
+            clock += 7.days
+            expectNoSignal()
+
+            clock += 1.seconds
+            val signal = awaitSignalAndConsume()
+            assertEquals(AppReviewReason.EpisodeStarred, signal.reason)
+        }
+    }
+
+    @Test
     fun `do not monitor if all reasons were dispatched`() = runTest {
         submittedReasonsSetting.set(AppReviewReason.entries - AppReviewReason.DevelopmentTrigger)
+
+        val job = launch { manager.monitorAppReviewReasons() }
+        yield()
+        assertTrue(job.isCompleted)
+    }
+
+    @Test
+    fun `do not monitor if user declined twice in 60 days`() = runTest {
+        lastDeclineTimestampsSetting.set(listOf(clock.instant(), clock.instant()))
 
         val job = launch { manager.monitorAppReviewReasons() }
         yield()

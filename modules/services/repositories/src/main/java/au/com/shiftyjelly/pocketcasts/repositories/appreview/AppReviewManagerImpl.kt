@@ -18,6 +18,7 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.suspendCancellableCoroutine
+import java.time.Duration as JavaDuration
 
 @Singleton
 class AppReviewManagerImpl(
@@ -44,7 +45,7 @@ class AppReviewManagerImpl(
         if (!isMonitoring.getAndSet(true)) {
             while (true) {
                 val usedReasons = settings.appReviewSubmittedReasons.value
-                if (usedReasons.containsAll(UserBasedReasons)) {
+                if (usedReasons.containsAll(UserBasedReasons) || !isNotDeclinedTwiceIn60Days()) {
                     break
                 }
 
@@ -71,19 +72,14 @@ class AppReviewManagerImpl(
     }
 
     private fun calculatePromptReviewReason(): AppReviewReason? {
-        if (!FeatureFlag.isEnabled(Feature.IMPROVE_APP_RATINGS)) {
-            return null
-        }
-
-        if (!hasEnoughTimePassedSinceLastPrompt()) {
+        if (!canDispatchSignal()) {
             return null
         }
 
         val usedReasons = settings.appReviewSubmittedReasons.value
-        val reason = UserBasedReasons
+        return UserBasedReasons
             .filterNot(usedReasons::contains)
             .firstOrNull(::isReasonApplicable)
-        return reason
     }
 
     private fun processSignalResult(result: AppReviewSignal.Result, reason: AppReviewReason) {
@@ -101,10 +97,41 @@ class AppReviewManagerImpl(
         }
     }
 
-    private fun hasEnoughTimePassedSinceLastPrompt(): Boolean {
-        val now = clock.instant()
+    private fun canDispatchSignal(): Boolean {
+        return FeatureFlag.isEnabled(Feature.IMPROVE_APP_RATINGS) &&
+            is30DaysSinceLastPrompt() &&
+            isNotDeclinedTwiceIn60Days() &&
+            isNoErrorsInLast2Sessions() &&
+            isNoCrashesIn7Days()
+    }
+
+    private fun is30DaysSinceLastPrompt(): Boolean {
+        val thirtyDaysAgo = clock.instant().minus(30, ChronoUnit.DAYS)
         val lastReviewTimestamp = settings.appReviewLastPromptTimestamp.value ?: return true
-        return now.minus(30, ChronoUnit.DAYS).isAfter(lastReviewTimestamp)
+        return thirtyDaysAgo.isAfter(lastReviewTimestamp)
+    }
+
+    private fun isNotDeclinedTwiceIn60Days(): Boolean {
+        val declineTimestamps = settings.appReviewLastDeclineTimestamps.value.takeLast(2)
+        return when (declineTimestamps.size) {
+            0, 1 -> true
+            else -> {
+                val first = declineTimestamps[0]
+                val second = declineTimestamps[1]
+                JavaDuration.between(first, second).abs().toDays() > 60
+            }
+        }
+    }
+
+    private fun isNoErrorsInLast2Sessions(): Boolean {
+        val recentSessions = settings.sessionIds.takeLast(2)
+        return settings.appReviewErrorSessionIds.value.none(recentSessions::contains)
+    }
+
+    private fun isNoCrashesIn7Days(): Boolean {
+        val sevenDaysAgo = clock.instant().minus(7, ChronoUnit.DAYS)
+        val lastCrashTimestamp = settings.appReviewCrashTimestamp.value ?: return true
+        return sevenDaysAgo.isAfter(lastCrashTimestamp)
     }
 
     private fun isReasonApplicable(reason: AppReviewReason) = when (reason) {
