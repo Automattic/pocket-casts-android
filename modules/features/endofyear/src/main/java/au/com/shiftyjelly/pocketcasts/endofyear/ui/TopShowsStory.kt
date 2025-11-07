@@ -1,85 +1,74 @@
 package au.com.shiftyjelly.pocketcasts.endofyear.ui
 
-import androidx.compose.animation.core.Animatable
-import androidx.compose.animation.core.Spring
-import androidx.compose.animation.core.spring
-import androidx.compose.foundation.Image
+import androidx.annotation.RawRes
+import androidx.compose.animation.core.FastOutSlowInEasing
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.ScrollState
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.drawWithContent
-import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.BlendMode
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.CompositingStrategy
+import androidx.compose.ui.graphics.TransformOrigin
 import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.colorResource
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import au.com.shiftyjelly.pocketcasts.compose.Devices
-import au.com.shiftyjelly.pocketcasts.compose.components.PodcastImageDeprecated
+import au.com.shiftyjelly.pocketcasts.compose.components.PodcastImage
 import au.com.shiftyjelly.pocketcasts.compose.components.TextH10
-import au.com.shiftyjelly.pocketcasts.compose.components.TextH20
+import au.com.shiftyjelly.pocketcasts.compose.components.TextP30
 import au.com.shiftyjelly.pocketcasts.compose.components.TextP40
 import au.com.shiftyjelly.pocketcasts.endofyear.StoryCaptureController
 import au.com.shiftyjelly.pocketcasts.models.to.Story
 import au.com.shiftyjelly.pocketcasts.models.to.TopPodcast
+import com.airbnb.lottie.compose.LottieAnimation
+import com.airbnb.lottie.compose.LottieCompositionSpec
+import com.airbnb.lottie.compose.LottieConstants
+import com.airbnb.lottie.compose.rememberLottieComposition
 import dev.shreyaspatil.capturable.capturable
 import java.io.File
 import kotlin.random.Random
-import kotlin.time.Duration.Companion.milliseconds
-import kotlin.time.Duration.Companion.seconds
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.isActive
 import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 import au.com.shiftyjelly.pocketcasts.ui.R as UR
 
+@OptIn(ExperimentalComposeUiApi::class)
 @Composable
 internal fun TopShowsStory(
     story: Story.TopShows,
     measurements: EndOfYearMeasurements,
-    controller: StoryCaptureController,
-    onShareStory: (File) -> Unit,
-) = TopShowsStory(
-    story = story,
-    measurements = measurements,
-    onShareStory = onShareStory,
-    controller = controller,
-    initialAnimationProgress = 0f,
-)
-
-@OptIn(ExperimentalComposeUiApi::class)
-@Composable
-private fun TopShowsStory(
-    story: Story.TopShows,
-    measurements: EndOfYearMeasurements,
-    initialAnimationProgress: Float,
     controller: StoryCaptureController,
     onShareStory: (File) -> Unit,
 ) {
@@ -89,70 +78,99 @@ private fun TopShowsStory(
             .fillMaxSize()
             .background(story.backgroundColor)
             .padding(top = measurements.closeButtonBottomEdge + 16.dp),
+        horizontalAlignment = Alignment.CenterHorizontally,
     ) {
-        val animationProgress = remember { Animatable(initialAnimationProgress) }
-        LaunchedEffect(Unit) {
-            delay(350.milliseconds)
-            while (isActive) {
-                if (animationProgress.value == 0f) {
-                    animationProgress.animateTo(
-                        targetValue = 1f,
-                        animationSpec = spring(
-                            dampingRatio = Spring.DampingRatioLowBouncy,
-                            stiffness = 75f,
-                            visibilityThreshold = 0.01f,
-                        ),
-                    )
-                    delay(4.seconds)
-                } else {
-                    animationProgress.animateTo(
-                        targetValue = 0f,
-                        animationSpec = spring(
-                            dampingRatio = Spring.DampingRatioNoBouncy,
-                            stiffness = 400f,
-                            visibilityThreshold = 0.01f,
-                        ),
-                    )
-                    delay(1200.milliseconds)
-                }
-            }
-        }
-
+        TextH10(
+            text = stringResource(LR.string.eoy_story_top_podcasts_title),
+            fontScale = measurements.smallDeviceFactor,
+            fontSize = 25.sp,
+            disableAutoScale = true,
+            modifier = Modifier.padding(horizontal = 24.dp),
+            textAlign = TextAlign.Center,
+        )
+        Spacer(modifier = Modifier.height(32.dp))
         val scrollState = rememberScrollState()
         Column(
-            verticalArrangement = Arrangement.spacedBy(8.dp),
+            verticalArrangement = Arrangement.spacedBy(16.dp),
             modifier = Modifier
                 .fillMaxWidth()
                 .weight(1f)
-                .padding(horizontal = 24.dp)
+                .padding(end = 24.dp)
                 .fadeScrollingEdges(scrollState)
                 .verticalScroll(scrollState),
         ) {
             story.shows.forEachIndexed { index, podcast ->
-                PodcastItem(
-                    podcast = podcast,
-                    index = index,
-                    measurements = measurements,
-                    animationProgress = if (controller.isSharing) 1f else animationProgress.value,
-                )
+                AnimatedContainer(
+                    animationRes = if (index % 2 == 0) IR.raw.playback_top_shows_wave_1_lottie else IR.raw.playback_top_shows_wave_2_lottie,
+                    controller = controller,
+                ) { scale ->
+                    PodcastItem(
+                        modifier = Modifier
+                            .padding(start = 24.dp)
+                            .graphicsLayer {
+                                scaleX = scale
+                                scaleY = scale
+                                transformOrigin = TransformOrigin(0f, 0.5f)
+                            },
+                        podcast = podcast,
+                        index = index,
+                        measurements = measurements,
+                    )
+                }
             }
         }
-        Spacer(
-            modifier = Modifier.height(16.dp),
+        ShareStoryButton(
+            modifier = Modifier.padding(bottom = 18.dp),
+            story = story,
+            controller = controller,
+            onShare = onShareStory,
         )
-        Column {
-            TextH10(
-                text = stringResource(LR.string.eoy_story_top_podcasts_title),
-                fontScale = measurements.smallDeviceFactor,
-                disableAutoScale = true,
-                modifier = Modifier.padding(horizontal = 24.dp),
-            )
-            ShareStoryButton(
-                story = story,
-                controller = controller,
-                onShare = onShareStory,
-            )
+    }
+}
+
+@Composable
+private fun AnimatedContainer(
+    @RawRes animationRes: Int,
+    controller: StoryCaptureController,
+    modifier: Modifier = Modifier,
+    content: @Composable BoxScope.(Float) -> Unit,
+) {
+    Box(
+        modifier = modifier,
+        contentAlignment = Alignment.CenterStart,
+    ) {
+        val composition by rememberLottieComposition(
+            spec = LottieCompositionSpec.RawRes(animationRes),
+        )
+        LottieAnimation(
+            modifier = Modifier
+                .height(94.dp)
+                .widthIn(max = 76.dp),
+            composition = composition,
+            iterations = LottieConstants.IterateForever,
+            contentScale = ContentScale.FillBounds,
+        )
+
+        var animationTrigger by remember { mutableStateOf(false) }
+
+        LaunchedEffect(Unit) {
+            animationTrigger = true
         }
+
+        val scaleFactor by animateFloatAsState(
+            targetValue = if (controller.isSharing || animationTrigger) {
+                1f
+            } else {
+                .8f
+            },
+            label = "scaleAnimation",
+            animationSpec = tween(
+                durationMillis = 600,
+                easing = FastOutSlowInEasing,
+            ),
+        )
+
+        content(scaleFactor)
     }
 }
 
@@ -161,53 +179,35 @@ private fun PodcastItem(
     podcast: TopPodcast,
     index: Int,
     measurements: EndOfYearMeasurements,
-    animationProgress: Float,
+    modifier: Modifier = Modifier,
 ) {
     Row(
         verticalAlignment = Alignment.CenterVertically,
-        modifier = Modifier
-            .fillMaxWidth()
-            .height(100.dp * measurements.scale),
+        modifier = modifier,
     ) {
-        TextH20(
+        TextP30(
             text = "#${index + 1}",
             disableAutoScale = true,
             color = colorResource(UR.color.coolgrey_90),
-            modifier = Modifier
-                .offset { IntOffset(x = (50.dp * (1f - animationProgress)).roundToPx(), y = 0) }
-                .alpha(animationProgress),
         )
         Spacer(
             modifier = Modifier.width(16.dp),
         )
-        Box(
-            contentAlignment = Alignment.Center,
-            modifier = Modifier
-                .size(100.dp * measurements.scale)
-                .scale(animationProgress)
-                .alpha(animationProgress),
-        ) {
-            Image(
-                painter = painterResource(stickers[index % stickers.size]),
-                contentDescription = null,
-            )
-            @Suppress("DEPRECATION")
-            PodcastImageDeprecated(
-                uuid = podcast.uuid,
-                elevation = 0.dp,
-                cornerSize = 4.dp,
-                modifier = Modifier.size(72.dp * measurements.scale),
-            )
-        }
+        val artworkSize = if (index == 0) 100.dp else 77.dp
+        PodcastImage(
+            uuid = podcast.uuid,
+            elevation = 0.dp,
+            cornerSize = 4.dp,
+            modifier = Modifier.size(artworkSize * measurements.scale),
+        )
         Spacer(
             modifier = Modifier.width(16.dp),
         )
         Column(
             verticalArrangement = Arrangement.Center,
             modifier = Modifier
-                .offset { IntOffset(x = -(50.dp * (1f - animationProgress)).roundToPx(), y = 0) }
-                .fillMaxSize()
-                .alpha(animationProgress),
+                .fillMaxHeight()
+                .weight(1f),
         ) {
             TextP40(
                 text = podcast.author,
@@ -217,7 +217,7 @@ private fun PodcastItem(
                 color = colorResource(UR.color.coolgrey_90),
                 maxLines = 1,
             )
-            TextH20(
+            TextP30(
                 text = podcast.title,
                 fontScale = measurements.smallDeviceFactor,
                 disableAutoScale = true,
@@ -227,12 +227,6 @@ private fun PodcastItem(
         }
     }
 }
-
-private val stickers = listOf(
-    IR.drawable.end_of_year_2024_sticker_3,
-    IR.drawable.end_of_year_2024_sticker_4,
-    IR.drawable.end_of_year_2024_sticker_5,
-)
 
 private fun Modifier.fadeScrollingEdges(
     scrollState: ScrollState,
@@ -313,7 +307,6 @@ private fun TopShowsPreview() {
                 podcastListUrl = null,
             ),
             measurements = measurements,
-            initialAnimationProgress = 1f,
             controller = StoryCaptureController.preview(),
             onShareStory = {},
         )

@@ -125,6 +125,7 @@ internal fun StoriesPage(
         TopControls(
             pagerState = pagerState,
             progress = state.storyProgress,
+            color = (state as? UiState.Synced)?.stories?.get(pagerState.currentPage)?.controlsColor ?: Color.White,
             measurements = measurements,
             onClose = onClose,
             controller = controller,
@@ -261,6 +262,7 @@ private fun Stories(
 internal fun BoxScope.TopControls(
     pagerState: PagerState,
     progress: Float,
+    color: Color,
     measurements: EndOfYearMeasurements,
     onClose: () -> Unit,
     controller: StoryCaptureController,
@@ -282,7 +284,7 @@ internal fun BoxScope.TopControls(
         PagerProgressingIndicator(
             state = pagerState,
             progress = progress,
-            activeColor = Color.White,
+            activeColor = color,
         )
         Spacer(
             modifier = Modifier.height(10.dp),
@@ -290,7 +292,7 @@ internal fun BoxScope.TopControls(
         Image(
             painter = painterResource(IR.drawable.ic_close),
             contentDescription = stringResource(LR.string.close),
-            colorFilter = ColorFilter.tint(Color.White),
+            colorFilter = ColorFilter.tint(color),
             modifier = Modifier
                 // Increase touch target of the image
                 .offset(x = 12.dp, y = (-12).dp)
