@@ -1,5 +1,6 @@
 package au.com.shiftyjelly.pocketcasts.repositories.appreview
 
+import app.cash.turbine.TurbineTestContext
 import app.cash.turbine.test
 import au.com.shiftyjelly.pocketcasts.preferences.ReadWriteSetting
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
@@ -7,11 +8,17 @@ import au.com.shiftyjelly.pocketcasts.preferences.model.AppReviewReason
 import au.com.shiftyjelly.pocketcasts.sharedtest.MutableClock
 import java.time.Clock
 import java.time.Instant
+import kotlin.time.Duration
 import kotlin.time.Duration.Companion.days
 import kotlin.time.Duration.Companion.seconds
+import kotlinx.coroutines.CoroutineStart
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.cancelAndJoin
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.test.TestScope
+import kotlinx.coroutines.test.advanceTimeBy
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.yield
 import org.junit.Assert.assertEquals
@@ -20,6 +27,7 @@ import org.junit.Test
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
 
+@OptIn(ExperimentalCoroutinesApi::class)
 class AppReviewManagerTest {
     private val episodesCompletedSetting = TestSetting(emptyList<Instant>())
     private val episodeStarredSetting = TestSetting<Instant?>(null)
@@ -35,6 +43,7 @@ class AppReviewManagerTest {
     private val lastPromptSetting = TestSetting<Instant?>(null)
 
     private val clock = MutableClock()
+    private val loopIdleDuration = 1.seconds
 
     private val manager = AppReviewManagerImpl(
         clock = clock,
@@ -51,153 +60,122 @@ class AppReviewManagerTest {
             on { appReviewSubmittedReasons } doReturn submittedReasonsSetting
             on { appReviewLastPromptTimestamp } doReturn lastPromptSetting
         },
+        loopIdleDuration = loopIdleDuration,
     )
 
     @Test
     fun `dispatch third episode completed reason`() = runTest {
-        backgroundScope.launch { manager.monitorAppReviewReasons() }
-
-        manager.showPromptSignal.test {
+        testInLoop {
             episodesCompletedSetting.set(List(1) { clock.instant() })
-            expectNoEvents()
+            expectNoSignal()
 
             episodesCompletedSetting.set(List(2) { clock.instant() })
-            expectNoEvents()
+            expectNoSignal()
 
             episodesCompletedSetting.set(List(3) { clock.instant() })
-            val signal = awaitItem()
-            signal.consume()
+            val signal = awaitSignalAndConsume()
             assertEquals(AppReviewReason.ThirdEpisodeCompleted, signal.reason)
         }
     }
 
     @Test
     fun `dispatch episode starred reason`() = runTest {
-        backgroundScope.launch { manager.monitorAppReviewReasons() }
-
-        manager.showPromptSignal.test {
+        testInLoop {
             episodeStarredSetting.set(clock.instant())
-            val signal = awaitItem()
-            signal.consume()
+            val signal = awaitSignalAndConsume()
             assertEquals(AppReviewReason.EpisodeStarred, signal.reason)
         }
     }
 
     @Test
     fun `dispatch show rated reason`() = runTest {
-        backgroundScope.launch { manager.monitorAppReviewReasons() }
-
-        manager.showPromptSignal.test {
+        testInLoop {
             podcastRatedSetting.set(clock.instant())
-            val signal = awaitItem()
-            signal.consume()
+            val signal = awaitSignalAndConsume()
             assertEquals(AppReviewReason.ShowRated, signal.reason)
         }
     }
 
     @Test
     fun `dispatch filter created reason`() = runTest {
-        backgroundScope.launch { manager.monitorAppReviewReasons() }
-
-        manager.showPromptSignal.test {
+        testInLoop {
             playlistCreatedSetting.set(clock.instant())
-            val signal = awaitItem()
-            signal.consume()
+            val signal = awaitSignalAndConsume()
             assertEquals(AppReviewReason.FilterCreated, signal.reason)
         }
     }
 
     @Test
     fun `dispatch plus upgraded reason`() = runTest {
-        backgroundScope.launch { manager.monitorAppReviewReasons() }
-
-        manager.showPromptSignal.test {
+        testInLoop {
             plusUpgradedSetting.set(clock.instant())
-            expectNoEvents()
+            expectNoSignal()
 
             clock += 2.days
-            expectNoEvents()
+            expectNoSignal()
 
             clock += 1.seconds
-            val signal = awaitItem()
-            signal.consume()
+            val signal = awaitSignalAndConsume()
             assertEquals(AppReviewReason.PlusUpgraded, signal.reason)
         }
     }
 
     @Test
     fun `dispatch folder created reason`() = runTest {
-        backgroundScope.launch { manager.monitorAppReviewReasons() }
-
-        manager.showPromptSignal.test {
+        testInLoop {
             folderCreatedSetting.set(clock.instant())
-            val signal = awaitItem()
-            signal.consume()
+            val signal = awaitSignalAndConsume()
             assertEquals(AppReviewReason.FolderCreated, signal.reason)
         }
     }
 
     @Test
     fun `dispatch bookmark created reason`() = runTest {
-        backgroundScope.launch { manager.monitorAppReviewReasons() }
-
-        manager.showPromptSignal.test {
+        testInLoop {
             bookmarkCreatedSetting.set(clock.instant())
-            val signal = awaitItem()
-            signal.consume()
+            val signal = awaitSignalAndConsume()
             assertEquals(AppReviewReason.BookmarkCreated, signal.reason)
         }
     }
 
     @Test
     fun `dispatch custom theme set reason`() = runTest {
-        backgroundScope.launch { manager.monitorAppReviewReasons() }
-
-        manager.showPromptSignal.test {
+        testInLoop {
             themeChangedSetting.set(clock.instant())
-            val signal = awaitItem()
-            signal.consume()
+            val signal = awaitSignalAndConsume()
             assertEquals(AppReviewReason.CustomThemeSet, signal.reason)
         }
     }
 
     @Test
     fun `dispatch referrals shared reason`() = runTest {
-        backgroundScope.launch { manager.monitorAppReviewReasons() }
-
-        manager.showPromptSignal.test {
+        testInLoop {
             referralSharedSetting.set(clock.instant())
-            val signal = awaitItem()
-            signal.consume()
+            val signal = awaitSignalAndConsume()
             assertEquals(AppReviewReason.ReferralShared, signal.reason)
         }
     }
 
     @Test
     fun `do not dispatch the same event twice if consumed`() = runTest {
-        backgroundScope.launch { manager.monitorAppReviewReasons() }
-
-        manager.showPromptSignal.test {
+        testInLoop {
             episodesCompletedSetting.set(List(3) { clock.instant() })
-            awaitItem().consume()
+            awaitSignalAndConsume()
 
             clock += 1.seconds // Move the clock so the values are different
             episodesCompletedSetting.set(List(3) { clock.instant() })
             episodesCompletedSetting.set(List(4) { clock.instant() })
-            expectNoEvents()
+            expectNoSignal()
         }
     }
 
     @Test
     fun `dispatch the same event again if not consumed`() = runTest {
-        backgroundScope.launch { manager.monitorAppReviewReasons() }
-
-        manager.showPromptSignal.test {
+        testInLoop {
             episodesCompletedSetting.set(List(3) { clock.instant() })
-            awaitItem().ignore()
+            awaitSignalAndIgnore()
 
-            val signal = awaitItem()
-            signal.consume()
+            val signal = awaitSignalAndConsume()
             assertEquals(AppReviewReason.ThirdEpisodeCompleted, signal.reason)
         }
     }
@@ -206,20 +184,19 @@ class AppReviewManagerTest {
     fun `dispatch event only if the prompt was not triggered in 30 days`() = runTest {
         backgroundScope.launch { manager.monitorAppReviewReasons() }
 
-        manager.showPromptSignal.test {
+        testInLoop {
             val trigger = launch { manager.triggerPrompt(AppReviewReason.DevelopmentTrigger) }
-            awaitItem().consume()
+            awaitSignalAndConsume()
             trigger.join()
 
             episodesCompletedSetting.set(List(3) { clock.instant() })
-            expectNoEvents()
+            expectNoSignal()
 
-            clock += 50.days
-            expectNoEvents()
+            clock += 30.days
+            expectNoSignal()
 
             clock += 1.days
-            val signal = awaitItem()
-            signal.consume()
+            val signal = awaitSignalAndConsume()
             assertEquals(AppReviewReason.ThirdEpisodeCompleted, signal.reason)
         }
     }
@@ -231,6 +208,42 @@ class AppReviewManagerTest {
         val job = launch { manager.monitorAppReviewReasons() }
         yield()
         assertTrue(job.isCompleted)
+    }
+
+    private suspend fun testInLoop(validate: suspend LoopContext.() -> Unit) {
+        manager.showPromptSignal.test {
+            val monitoringJob = launch(start = CoroutineStart.UNDISPATCHED) { manager.monitorAppReviewReasons() }
+
+            val loopContext = LoopContext(this, loopIdleDuration)
+            loopContext.validate()
+
+            monitoringJob.cancelAndJoin()
+        }
+    }
+
+    private class LoopContext(
+        private val turbineContext: TurbineTestContext<AppReviewSignal>,
+        private val loopIdleDuration: Duration,
+    ) {
+        suspend fun TestScope.awaitSignalAndConsume(): AppReviewSignal {
+            runLoopCycle()
+            return turbineContext.awaitItem().also { it.consume() }
+        }
+
+        suspend fun TestScope.awaitSignalAndIgnore(): AppReviewSignal {
+            runLoopCycle()
+            return turbineContext.awaitItem().also { it.ignore() }
+        }
+
+        suspend fun TestScope.expectNoSignal() {
+            runLoopCycle()
+            turbineContext.expectNoEvents()
+        }
+
+        private suspend fun TestScope.runLoopCycle() {
+            advanceTimeBy(loopIdleDuration)
+            yield()
+        }
     }
 }
 
