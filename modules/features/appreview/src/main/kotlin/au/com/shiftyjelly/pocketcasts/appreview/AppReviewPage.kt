@@ -103,6 +103,7 @@ private fun EmojiButtons(
     ) {
         var isAnimationRunning by remember { mutableStateOf(false) }
         val animationProgress by animateFloatAsState(
+            // Animating to the very start and end makes images not visible
             targetValue = if (isAnimationRunning) 0.99f else 0.01f,
             animationSpec = tween(durationMillis = 3000, easing = LinearEasing),
         )
