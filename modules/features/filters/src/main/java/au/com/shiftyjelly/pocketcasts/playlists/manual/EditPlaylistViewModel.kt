@@ -5,6 +5,8 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.models.to.PlaylistEpisode
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.preferences.model.ArtworkConfiguration
@@ -29,6 +31,7 @@ class EditPlaylistViewModel @AssistedInject constructor(
     @Assisted private val playlistUuid: String,
     private val playlistManager: PlaylistManager,
     private val settings: Settings,
+    private val tracker: AnalyticsTracker,
 ) : ViewModel() {
     private var isOrderChanged = false
     private var _episodes by mutableStateOf(emptyList<PlaylistEpisode>())
@@ -50,6 +53,7 @@ class EditPlaylistViewModel @AssistedInject constructor(
     fun deleteEpisode(episodeUuid: String) {
         _episodes = _episodes.filter { it.uuid != episodeUuid }
         viewModelScope.launch {
+            tracker.track(AnalyticsEvent.FILTER_MANUAL_EPISODE_DELETED)
             playlistManager.deleteManualEpisode(playlistUuid, episodeUuid)
         }
     }
@@ -62,6 +66,7 @@ class EditPlaylistViewModel @AssistedInject constructor(
     fun persistEpisodesOrder() {
         if (isOrderChanged) {
             viewModelScope.launch(NonCancellable) {
+                tracker.track(AnalyticsEvent.FILTER_MANUAL_EPISODES_REARRANGED)
                 val sortedUuids = withContext(Dispatchers.Default) {
                     _episodes.map(PlaylistEpisode::uuid)
                 }

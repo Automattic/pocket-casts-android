@@ -116,6 +116,17 @@ class OptionsFragment : BaseDialogFragment() {
         return remember(playlistType, sortType, playlist.metadata) {
             val hasEpisodes = episodeCount > 0
             buildList {
+                add(
+                    PlaylistOption(
+                        title = getString(LR.string.chromecast),
+                        iconId = IR.drawable.ic_chrome_cast,
+                        onClick = {
+                            viewModel.trackChromeCastTapped()
+                            viewModel.startChromeCast()
+                            dismiss()
+                        },
+                    ),
+                )
                 if (hasEpisodes) {
                     add(
                         PlaylistOption(
@@ -167,17 +178,6 @@ class OptionsFragment : BaseDialogFragment() {
                         ),
                     )
                 }
-                add(
-                    PlaylistOption(
-                        title = getString(LR.string.chromecast),
-                        iconId = IR.drawable.ic_chrome_cast,
-                        onClick = {
-                            viewModel.trackChromeCastTapped()
-                            viewModel.startChromeCast()
-                            dismiss()
-                        },
-                    ),
-                )
                 if (hasEpisodes && playlistType == Playlist.Type.Manual) {
                     add(
                         if (isShowingArchived && archivedEpisodeCount == episodeCount) {
