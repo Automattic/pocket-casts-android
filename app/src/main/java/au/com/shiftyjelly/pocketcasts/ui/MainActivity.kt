@@ -1894,8 +1894,8 @@ class MainActivity :
     private fun setupAppReviewPrompt() {
         lifecycleScope.launch {
             appReviewManager.showPromptSignal
-                .flowWithLifecycle(lifecycle)
-                .onStart { delay(5.seconds) } // TODO: PCDROID-260
+                .flowWithLifecycle(lifecycle, Lifecycle.State.RESUMED)
+                .onStart { delay(3.seconds) } // Do not blast user with a review immediately on start
                 .collect { signal ->
                     if (FeatureFlag.isEnabled(Feature.IMPROVE_APP_RATINGS) && supportFragmentManager.findFragmentByTag("app_review_prompt") == null) {
                         AppReviewDialogFragment().show(supportFragmentManager, "app_review_prompt")

@@ -10,6 +10,7 @@ import java.util.concurrent.atomic.AtomicBoolean
 import javax.inject.Inject
 import javax.inject.Singleton
 import kotlin.coroutines.resume
+import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
 import kotlinx.coroutines.CancellableContinuation
 import kotlinx.coroutines.channels.Channel
@@ -19,10 +20,21 @@ import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.suspendCancellableCoroutine
 
 @Singleton
-class AppReviewManagerImpl @Inject constructor(
+class AppReviewManagerImpl(
     private val settings: Settings,
     private val clock: Clock,
+    private val loopIdleDuration: Duration,
 ) : AppReviewManager {
+    @Inject
+    constructor(
+        settings: Settings,
+        clock: Clock,
+    ) : this(
+        settings = settings,
+        clock = clock,
+        loopIdleDuration = 5.seconds,
+    )
+
     private val signalChannel = Channel<AppReviewSignal>()
     override val showPromptSignal: Flow<AppReviewSignal> get() = signalChannel.receiveAsFlow()
 
@@ -36,11 +48,11 @@ class AppReviewManagerImpl @Inject constructor(
                     break
                 }
 
-                delay(5.seconds)
                 val reason = calculatePromptReviewReason()
                 if (reason != null) {
                     triggerPrompt(reason)
                 }
+                delay(loopIdleDuration)
             }
         }
     }
@@ -101,35 +113,36 @@ class AppReviewManagerImpl @Inject constructor(
         }
 
         AppReviewReason.EpisodeStarred -> {
-            false
+            settings.appReviewEpisodeStarredTimestamp.value != null
         }
 
         AppReviewReason.ShowRated -> {
-            false
+            settings.appReviewPodcastRatedTimestamp.value != null
         }
 
         AppReviewReason.FilterCreated -> {
-            false
+            settings.appReviewPlaylistCreatedTimestamp.value != null
         }
 
         AppReviewReason.PlusUpgraded -> {
-            false
+            val upgradeTimestamp = settings.appReviewPlusUpgradedTimestamp.value
+            upgradeTimestamp != null && clock.instant().isAfter(upgradeTimestamp.plus(2, ChronoUnit.DAYS))
         }
 
         AppReviewReason.FolderCreated -> {
-            false
+            settings.appReviewFolderCreatedTimestamp.value != null
         }
 
         AppReviewReason.BookmarkCreated -> {
-            false
+            settings.appReviewBookmarkCreatedTimestamp.value != null
         }
 
         AppReviewReason.CustomThemeSet -> {
-            false
+            settings.appReviewThemeChangedTimestamp.value != null
         }
 
         AppReviewReason.ReferralShared -> {
-            false
+            settings.appReviewReferralSharedTimestamp.value != null
         }
 
         AppReviewReason.DevelopmentTrigger -> {

@@ -101,6 +101,7 @@ class AddToPlaylistViewModel @AssistedInject constructor(
         viewModelScope.launch {
             val playlistUuid = playlistManager.createManualPlaylist(sanitizedName)
             playlistManager.addManualEpisode(playlistUuid, episodeUuid)
+            tracker.track(AnalyticsEvent.FILTER_CREATED)
             _createdPlaylist.complete(playlistUuid)
         }
     }
