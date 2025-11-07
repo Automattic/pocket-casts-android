@@ -59,8 +59,6 @@ class AnalyticsTrackerTest {
             _events += TrackEvent(event, properties)
         }
 
-        override fun getTrackerType() = TrackerType.FirstParty
-
         override fun refreshMetadata() = Unit
 
         override fun flush() = Unit

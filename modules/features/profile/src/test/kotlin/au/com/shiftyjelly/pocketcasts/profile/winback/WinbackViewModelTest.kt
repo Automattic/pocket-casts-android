@@ -6,7 +6,6 @@ import app.cash.turbine.test
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.analytics.Tracker
-import au.com.shiftyjelly.pocketcasts.analytics.TrackerType
 import au.com.shiftyjelly.pocketcasts.models.type.Subscription
 import au.com.shiftyjelly.pocketcasts.payment.AcknowledgedSubscription
 import au.com.shiftyjelly.pocketcasts.payment.BillingCycle
@@ -846,8 +845,6 @@ class FakeTracker : Tracker {
     }
 
     override fun refreshMetadata() = Unit
-
-    override fun getTrackerType() = TrackerType.FirstParty
 
     override fun flush() = Unit
 

@@ -4,7 +4,6 @@ import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.analytics.Tracker
-import au.com.shiftyjelly.pocketcasts.analytics.TrackerType
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.models.to.LongestEpisode
@@ -676,8 +675,6 @@ class SharingAnalyticsTest {
         override fun track(event: AnalyticsEvent, properties: Map<String, Any>) {
             _events += TrackEvent(event, properties)
         }
-
-        override fun getTrackerType() = TrackerType.FirstParty
 
         override fun refreshMetadata() = Unit
 
