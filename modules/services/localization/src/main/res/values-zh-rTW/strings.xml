@@ -1,11 +1,31 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2025-10-22 09:54:03+0000
+Translation-Revision-Date: 2025-11-05 12:54:03+0000
 Plural-Forms: nplurals=1; plural=0;
 Generator: GlotPress/2.4.0-alpha
 Language: zh_TW
 -->
 <resources>
+    <string name="end_of_year_stories_year_completion_rate_subtitle">你一共聽了 %2$d 個單集，並完成了 %1$d 集。\n堅持不懈，比大多數健身房會員資格還強。</string>
+    <string name="search_suggestions_no_results_message">嘗試新的搜尋，或新增 Podcast 摘要 URL</string>
+    <string name="search_suggestions_no_results_title">沒有結果</string>
+    <string name="eoy_playback_intro_title">你的 Podcast 年度回顧\n直送到家，立即重溫</string>
+    <string name="search_suggestions_view_all">檢視「%1$s」的所有內容</string>
+    <string name="up_next_as_playlist_saved">已將「接下來播放」儲存為播放清單</string>
+    <string name="up_next_as_playlist_replace_title">要取代目前的「接下來播放」嗎？</string>
+    <string name="up_next_as_playlist_replace_body">這個動作將清除目前的「接下來播放」佇列，系統會開始播放此清單的內容。</string>
+    <string name="up_next_as_playlist_title">要儲存「接下來播放」佇列嗎？</string>
+    <string name="up_next_as_playlist_button_secondary">取代並播放</string>
+    <string name="up_next_as_playlist_button_primary">儲存目前的佇列</string>
+    <string name="up_next_as_playlist_body">播放此播放清單時，系統會取代目前「接下來播放」的內容。 先儲存才能保留。</string>
+    <string name="delete_playlist_confirmation_title">要刪除播放清單嗎？</string>
+    <string name="delete_playlist_confirmation_body">你確定要刪除播放清單？ 此動作無法復原。</string>
+    <string name="delete_playlist">刪除播放清單</string>
+    <string name="view">檢視</string>
+    <string name="browse_podcasts">瀏覽 Podcast</string>
+    <string name="rearrange_playlists_tooltip_title">重新排列播放清單順序</string>
+    <string name="rearrange_playlists_tooltip_body">若要移動播放清單，請先按住清單。</string>
+    <string name="play_all_no_episodes_message">已封存所有單集 新增或取消封存以播放。</string>
     <string name="onboarding_upgrade_features_transcripts">生成逐字稿</string>
     <string name="search_filters_top_results">熱門結果</string>
     <string name="player_sleep_in_one_chapter">在目前的章節尾聲休眠</string>
@@ -38,7 +58,6 @@ Language: zh_TW
     <string name="playlist_episodes_archived_count">已封存 %1$d 集</string>
     <string name="playlist_edit_episodes_title">編輯播放清單</string>
     <string name="playlist_edit_episodes">重新排列單集</string>
-    <string name="playlist_unarchive_all">全部取消封存</string>
     <string name="playlist_episode_unavailable_cta">從播放清單移除</string>
     <string name="playlist_episode_unavailable_description">Podcast 創作者已將本集刪除。 除非移除，否則該單集將持續保留在播放清單中。</string>
     <string name="playlist_episode_unavailable_title">無法提供單集</string>
@@ -91,10 +110,7 @@ Language: zh_TW
     <string name="playlist_options">播放清單選項</string>
     <string name="smart_playlist_no_content_body">恭喜你聽完這份清單了，或者你可以編輯篩選規則以獲得更多內容。</string>
     <string name="smart_playlist_no_content_title">沒有單集</string>
-    <string name="playlist_play_all">全部播放</string>
     <string name="smart_rules">智慧規則</string>
-    <string name="smart_rule_podcasts_deselect_all">取消全選</string>
-    <string name="smart_rule_podcasts_select_all">選取全部</string>
     <string name="smart_rule_podcasts_all_description_disabled">系統不會自動新增你追蹤的新 Podcast 節目。</string>
     <string name="onboarding_upgrade_pp">隱私權政策</string>
     <string name="onboarding_upgrade_tnc">條款和條件</string>
@@ -116,7 +132,6 @@ Language: zh_TW
     <string name="save_smart_rule">儲存智慧規則</string>
     <string name="smart_rule_podcasts_all_description">系統會自動新增你追蹤的新 Podcast 節目。</string>
     <string name="smart_rule_podcasts_all_label">所有追蹤的 Podcast</string>
-    <string name="smart_rule_podcasts_title">選擇 Podcast</string>
     <string name="onboarding_bookmarks_title">書籤：不會再找不到喜歡的內容</string>
     <string name="create_smart_playlist">建立智慧播放清單</string>
     <string name="ad_report_confirmation">你檢舉了這則廣告。</string>
@@ -458,6 +473,7 @@ Language: zh_TW
     <string name="transcript_error_not_available">不好意思，此單集不提供逐字稿。</string>
     <string name="referrals_banner_hide_label">隱藏此橫幅</string>
     <string name="referrals_banner_long_press_label">隱藏推薦領取體驗券橫幅。</string>
+    <string name="end_of_year_prompt_card_title">歡迎瀏覽播放回顧！</string>
     <string name="settings_auto_download_limit_auto_downloads">限制自動下載</string>
     <string name="settings_auto_download_limit_all_latest_episodes">所有最新單集</string>
     <string name="settings_auto_download_limit_ten_latest_episode">10 個最新單集</string>
@@ -640,10 +656,10 @@ Language: zh_TW
     <string name="settings_use_dark_up_next">使用暗色系「接下來播放」佈景主題</string>
     <string name="end_of_year_stories_theres_more">還有更多有趣內容！</string>
     <string name="end_of_year_stories_year_completion_rate">完成率</string>
-    <string name="end_of_year_stories_year_completion_rate_title">你今年的完成率為 %1$d%%</string>
     <string name="eoy_year_over_year_title_skyrocketed">比起 2022 年，你的收聽時間可說是一飛沖天！</string>
     <string name="end_of_year_stories_year_over_year_subtitle_went_down">啊啊啊…人就是要享受生活，對吧？</string>
     <string name="end_of_year_stories_year_over_share_text">我在 %1$d 年與 %2$d 年的收聽時間比較</string>
+    <string name="end_of_year_stories_year_completion_rate_title">你的完成率為 %1$d%%</string>
     <string name="end_of_year_stories_year_over_year_subtitle_flat">大家都說，成功的關鍵在於持之以恆…大概是這樣吧！</string>
     <string name="end_of_year_prompt_card_summary">看看你的收聽統計和最愛 Podcast 等資料吧。</string>
     <string name="end_of_year_stories_year_over_year_title_went_down">比起 %1$s 年，你的收聽時間稍微下降了</string>
@@ -964,7 +980,6 @@ Language: zh_TW
     <string name="end_of_year_story_top_podcast_share_text">%1$d 年我最愛的 Podcast！ %2$s</string>
     <string name="end_of_year_story_listened_to_numbers_share_text">我在 %3$d 年收聽了 %1$d 個不同的 Podcast，總共 %2$d 集</string>
     <string name="end_of_year_story_top_podcasts_list_title">%1$d 年我最常聽的 Podcast</string>
-    <string name="end_of_year_story_top_podcast_subtitle">你收聽了 %1$d 集的「%3$s」，總共 %2$s</string>
     <string name="end_of_year_story_listened_to_categories">你今年收聽了 %1$d 個不同分類</string>
     <string name="end_of_year_story_listened_to_categories_subtitle">來看看你最愛的內容…</string>
     <string name="end_of_year_story_intro_title">來慶祝你收聽節目的這一年！</string>
@@ -1008,6 +1023,7 @@ Language: zh_TW
     <string name="no_episodes_in_filter_x">播放清單「%1$s」中沒有單集</string>
     <string name="settings_app_icon_halloween">萬聖節</string>
     <string name="end_of_year_launch_modal_summary">查看你最熱門的 Podcast、分類、收聽統計等資料。和朋友分享這些資訊，並向你最喜愛的創作者表達敬意！</string>
+    <string name="end_of_year_launch_modal_primary_button_title">檢視我的 2025 年度播放回顧</string>
     <string name="settings_show_played_summary">你已播放完畢的節目仍會顯示</string>
     <string name="settings_show_played">顯示已播放的節目</string>
     <string name="settings_privacy_crash_link_summary">允許我們將你的 Pocket Casts 帳號連結至當機報告。</string>

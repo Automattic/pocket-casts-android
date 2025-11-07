@@ -469,7 +469,6 @@ Language: el_GR
     <string name="settings_use_dark_up_next_details">Όταν ενεργοποιηθεί, το Επόμενο θα χρησιμοποιεί πάντα το σκοτεινό θέμα ή θα ταιριάζει με το τρέχον θέμα όταν είναι ανενεργό.</string>
     <string name="settings_use_dark_up_next">Χρησιμοποίησε το Σκοτεινό Θέμα του Επόμενο</string>
     <string name="end_of_year_stories_theres_more">Υπάρχουν κι άλλα!</string>
-    <string name="end_of_year_stories_year_completion_rate_title">Ο ρυθμός ολοκλήρωσής σου φέτος ήταν %1$d%%</string>
     <string name="end_of_year_stories_year_over_share_text">Ο χρόνος ακρόασης μου το %1$d σε σύγκριση με το %2$d</string>
     <string name="end_of_year_stories_year_completion_rate">ποσοστό ολοκλήρωσης</string>
     <string name="eoy_year_over_year_title_skyrocketed">Σε σύγκριση με το 2022, ο χρόνος ακρόασης σου εκτοξεύτηκε!</string>
@@ -787,7 +786,6 @@ Language: el_GR
     <string name="end_of_year_story_top_podcast_share_text">Το αγαπημένο μου podcast του %1$d! %2$s</string>
     <string name="end_of_year_create_account_to_see">Αποθήκευσε τα podcast σου στο cloud, πάρε την ανασκόπησή σου για το τέλος της χρονιάς και συγχρόνισε την πρόοδό σου με άλλες συσκευές.</string>
     <string name="end_of_year_story_longest_episode_share_text">Το μεγαλύτερο επεισόδιο που άκουσα το %1$d %2$s</string>
-    <string name="end_of_year_story_top_podcast_subtitle">Ακούσες %1$d επεισόδια από τα %2$s συνολικά του «%3$s»</string>
     <string name="end_of_year_story_listened_to_numbers_share_text">Άκουσα %1$d διαφορετικά podcasts και %2$d επεισόδια το %3$d</string>
     <string name="end_of_year_story_listened_to_numbers_subtitle">Αλλά υπήρχε ένα στο οποίο πάντα επέστρεφες…</string>
     <string name="end_of_year_story_listened_to_numbers">Ακούσες %1$d διαφορετικές εκπομπές και %2$d επεισόδια συνολικά</string>

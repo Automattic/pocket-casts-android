@@ -1,11 +1,31 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2025-10-22 12:54:03+0000
+Translation-Revision-Date: 2025-11-06 13:54:04+0000
 Plural-Forms: nplurals=2; plural=n != 1;
 Generator: GlotPress/2.4.0-alpha
 Language: sv_SE
 -->
 <resources>
+    <string name="end_of_year_stories_year_completion_rate_subtitle">Du lyssnade klart på  av de %2$d avsnitt som startades %1$d.\nEn bättre resultat än med de flesta gymmedlemskap.</string>
+    <string name="search_suggestions_no_results_message">Prova en ny sökning eller att lägga till en podcastflödes-URL</string>
+    <string name="search_suggestions_no_results_title">Inga resultat</string>
+    <string name="eoy_playback_intro_title">Ditt podcastår\ninslaget och redo att återupplevas</string>
+    <string name="search_suggestions_view_all">Visa alla för ”%1$s”</string>
+    <string name="up_next_as_playlist_saved">Nästa har sparats som en spellista</string>
+    <string name="up_next_as_playlist_replace_title">Ersätt nuvarande Nästa?</string>
+    <string name="up_next_as_playlist_replace_body">Detta kommer att rensa din nuvarande Nästa-kö och börja spela upp denna spellista.</string>
+    <string name="up_next_as_playlist_title">Spara din Nästa-kö?</string>
+    <string name="up_next_as_playlist_button_secondary">Ersätt och spela upp</string>
+    <string name="up_next_as_playlist_button_primary">Spara nuvarande kö</string>
+    <string name="up_next_as_playlist_body">Din nuvarande Nästa kommer att ersättas när du spelar upp denna spellista. Spara den först för att behålla den.</string>
+    <string name="delete_playlist_confirmation_title">Ta bort spellista?</string>
+    <string name="delete_playlist_confirmation_body">Är du säker på att du vill ta bort din spellista? Det går inte att ångra åtgärden.</string>
+    <string name="delete_playlist">Ta bort spellista</string>
+    <string name="view">Visa</string>
+    <string name="browse_podcasts">Bläddra bland podcasts</string>
+    <string name="rearrange_playlists_tooltip_title">Ändra ordning på dina spellistor</string>
+    <string name="rearrange_playlists_tooltip_body">Tryck och håll ned på en spellista för att flytta den.</string>
+    <string name="play_all_no_episodes_message">Alla avsnitt arkiverade. Lägg till eller avarkivera för att spela upp.</string>
     <string name="onboarding_upgrade_features_transcripts">Genererade transkriptioner</string>
     <string name="search_filters_top_results">Populäraste resultat</string>
     <string name="player_sleep_in_one_chapter">Sova när det nuvarande kapitlet tar slut</string>
@@ -38,7 +58,6 @@ Language: sv_SE
     <string name="playlist_episodes_archived_count">%1$d arkiverade</string>
     <string name="playlist_edit_episodes_title">Redigera spellista</string>
     <string name="playlist_edit_episodes">Ordna om avsnitt</string>
-    <string name="playlist_unarchive_all">Avarkivera alla</string>
     <string name="playlist_episode_unavailable_cta">Ta bort från spellista</string>
     <string name="playlist_episode_unavailable_description">Podcastens skapare har tagit bort detta avsnitt. Det kommer att finnas kvar i din spellista tills du tar bort det.</string>
     <string name="playlist_episode_unavailable_title">Avsnittet är inte tillgängligt</string>
@@ -91,10 +110,7 @@ Language: sv_SE
     <string name="smart_rule_starred_label">Stjärnmärkta avsnitt</string>
     <string name="smart_playlist_no_content_body">Det är antingen dags att fira att den här listan är slutförd eller att redigera dina regler för att hitta mer.</string>
     <string name="smart_playlist_no_content_title">Inga avsnitt</string>
-    <string name="playlist_play_all">Spela upp alla</string>
     <string name="smart_rules">Smarta regler</string>
-    <string name="smart_rule_podcasts_deselect_all">Avmarkera alla</string>
-    <string name="smart_rule_podcasts_select_all">Välj alla</string>
     <string name="smart_rule_podcasts_all_description_disabled">Nya podcasts som du följer kommer inte att läggas till automatiskt.</string>
     <string name="onboarding_upgrade_pp">Integritetspolicy</string>
     <string name="onboarding_upgrade_tnc">Användarvillkor</string>
@@ -116,7 +132,6 @@ Language: sv_SE
     <string name="save_smart_rule">Spara smart regel</string>
     <string name="smart_rule_podcasts_all_description">Nya podcasts som du följer kommer att läggas till automatiskt.</string>
     <string name="smart_rule_podcasts_all_label">Alla följda podcasts</string>
-    <string name="smart_rule_podcasts_title">Välj podcasts</string>
     <string name="onboarding_bookmarks_title">Bokmärken: inget mer ”var kan det där ha varit?”</string>
     <string name="smart_rules_description">Konfigurera smarta regler för att automatiskt lägga till avsnitt i din smarta spellista.</string>
     <string name="create_smart_playlist">Skapa smart spellista</string>
@@ -458,6 +473,7 @@ Language: sv_SE
     <string name="transcript_error_not_available">Det finns ingen transkription tillgänglig för det här avsnittet.</string>
     <string name="referrals_banner_hide_label">Dölj den här bannern</string>
     <string name="referrals_banner_long_press_label">Dölj hänvisningsbannern för att göra anspråk på pass.</string>
+    <string name="end_of_year_prompt_card_title">Din uppspelning är här!</string>
     <string name="settings_auto_download_limit_auto_downloads">Begränsa automatiska nedladdningar</string>
     <string name="settings_auto_download_limit_all_latest_episodes">Alla senaste avsnitt</string>
     <string name="settings_auto_download_limit_ten_latest_episode">De 10 senaste avsnitten</string>
@@ -640,10 +656,10 @@ Language: sv_SE
     <string name="settings_use_dark_up_next">Använd mörkt Up Next-tema</string>
     <string name="end_of_year_stories_theres_more">Och det finns mer!</string>
     <string name="end_of_year_stories_year_completion_rate">slutförandegrad</string>
-    <string name="end_of_year_stories_year_completion_rate_title">Din slutförandegrad i år var %1$d%%</string>
     <string name="eoy_year_over_year_title_skyrocketed">Jämfört med 2022 har din lyssningstid skjutit i höjden!</string>
     <string name="end_of_year_stories_year_over_year_subtitle_went_down">Ack ja … det finns ett liv att leva, eller hur?</string>
     <string name="end_of_year_stories_year_over_share_text">Min lyssningstid för %1$d jämfört med %2$d</string>
+    <string name="end_of_year_stories_year_completion_rate_title">Din slutförandegrad var %1$d%%</string>
     <string name="end_of_year_stories_year_over_year_subtitle_flat">Och det sägs att kontinuitet är nyckeln till framgång … eller något i den stilen!</string>
     <string name="end_of_year_prompt_card_summary">Se din lyssningsstatistik, dina favoritpodcasts och mycket mer.</string>
     <string name="end_of_year_stories_year_over_year_title_went_down">Jämfört med %1$s har din lyssningstid minskat något</string>
@@ -964,7 +980,6 @@ Language: sv_SE
     <string name="end_of_year_story_top_podcasts_list_title">Mina favoritpodcasts %1$d</string>
     <string name="end_of_year_story_top_podcast_share_text">Min favoritpodcast %1$d! %2$s</string>
     <string name="end_of_year_story_listened_to_numbers_share_text">Jag lyssnade på %1$d olika podcasts och %2$d avsnitt under %3$d</string>
-    <string name="end_of_year_story_top_podcast_subtitle">Du lyssnade på %1$d avsnitt i sammanlagt %2$s av \"%3$s\"</string>
     <string name="end_of_year_story_listened_to_categories_subtitle">Låt oss ta en titt på några av dina favoriter …</string>
     <string name="end_of_year_story_listened_to_categories">Du lyssnade på %1$d olika kategorier i år</string>
     <string name="end_of_year_story_intro_title">Låt oss fira ditt lyssningsår.</string>
@@ -1008,6 +1023,7 @@ Language: sv_SE
     <string name="filter_x_not_found">Spellistan %1$s hittades inte</string>
     <string name="settings_app_icon_halloween">Halloween</string>
     <string name="end_of_year_launch_modal_summary">Se dina favoritpodcasts och -kategorier, lyssningsstatistik med mera. Dela med vänner och berätta om dina favoritkreatörer.</string>
+    <string name="end_of_year_launch_modal_primary_button_title">Visa min uppspelning 2025</string>
     <string name="settings_show_played_summary">Avsnitt som du har spelat klart kommer fortfarande att visas</string>
     <string name="settings_show_played">Visa spelade avsnitt</string>
     <string name="settings_title_privacy">Integritet</string>

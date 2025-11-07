@@ -1,11 +1,31 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2025-10-21 11:54:06+0000
+Translation-Revision-Date: 2025-11-06 09:54:04+0000
 Plural-Forms: nplurals=1; plural=0;
 Generator: GlotPress/2.4.0-alpha
 Language: zh_CN
 -->
 <resources>
+    <string name="end_of_year_stories_year_completion_rate_subtitle">在开始的 %2$d 集中，您已看完 %1$d 集。\n比大多数健身房会员资格更持久的后续服务。</string>
+    <string name="search_suggestions_no_results_message">尝试新的搜索，或添加播客源 URL</string>
+    <string name="search_suggestions_no_results_title">无结果</string>
+    <string name="eoy_playback_intro_title">您的年度播客盘点，\n已打包就绪，随时可供重温</string>
+    <string name="search_suggestions_view_all">查看“%1$s”的全部内容</string>
+    <string name="up_next_as_playlist_saved">“接下来播放”已保存为播放列表</string>
+    <string name="up_next_as_playlist_replace_title">替换当前的“接下来播放”？</string>
+    <string name="up_next_as_playlist_replace_body">此操作将清除您当前的“接下来播放”队列并开始播放此播放列表。</string>
+    <string name="up_next_as_playlist_title">保存您的“接下来播放”队列？</string>
+    <string name="up_next_as_playlist_button_secondary">替换并播放</string>
+    <string name="up_next_as_playlist_button_primary">保存当前队列</string>
+    <string name="up_next_as_playlist_body">在您播放此播放列表时，您当前的“接下来播放”将被替换。 先保存才能保留。</string>
+    <string name="delete_playlist_confirmation_title">删除播放列表？</string>
+    <string name="delete_playlist_confirmation_body">是否确定要删除您的播放列表？ 一经删除，将无法撤销。</string>
+    <string name="delete_playlist">删除播放列表</string>
+    <string name="view">查看</string>
+    <string name="browse_podcasts">浏览播客</string>
+    <string name="rearrange_playlists_tooltip_title">重新排列您的播放列表</string>
+    <string name="rearrange_playlists_tooltip_body">长按播放列表即可移动。</string>
+    <string name="play_all_no_episodes_message">所有剧集已存档。 添加或取消存档即可播放。</string>
     <string name="onboarding_upgrade_features_transcripts">生成的文字转录稿</string>
     <string name="search_filters_top_results">热门结果</string>
     <string name="player_sleep_in_one_chapter">在本章节结束时进入睡眠状态</string>
@@ -38,7 +58,6 @@ Language: zh_CN
     <string name="playlist_episodes_archived_count">%1$d 已存档</string>
     <string name="playlist_edit_episodes_title">编辑播放列表</string>
     <string name="playlist_edit_episodes">重新排列剧集</string>
-    <string name="playlist_unarchive_all">全部取消存档</string>
     <string name="playlist_episode_unavailable_cta">从播放列表中移除</string>
     <string name="playlist_episode_unavailable_description">播客创作者删除了此剧集。 在您移除之前，它将保留在您的播放列表中。</string>
     <string name="playlist_episode_unavailable_title">剧集无法播放</string>
@@ -92,9 +111,6 @@ Language: zh_CN
     <string name="smart_playlist_no_content_body">您已完成此列表，但还可以编辑规则以获取更多内容。</string>
     <string name="smart_playlist_no_content_title">无剧集</string>
     <string name="smart_rules">智能规则</string>
-    <string name="playlist_play_all">播放全部</string>
-    <string name="smart_rule_podcasts_deselect_all">取消全选</string>
-    <string name="smart_rule_podcasts_select_all">全选</string>
     <string name="smart_rule_podcasts_all_description_disabled">您关注的新播客不会自动添加。</string>
     <string name="onboarding_upgrade_pp">隐私政策</string>
     <string name="onboarding_upgrade_tnc">条款和条件</string>
@@ -116,7 +132,6 @@ Language: zh_CN
     <string name="save_smart_rule">保存智能规则</string>
     <string name="smart_rule_podcasts_all_description">您关注的新播客将会自动添加。</string>
     <string name="smart_rule_podcasts_all_label">所有已关注播客</string>
-    <string name="smart_rule_podcasts_title">选择播客</string>
     <string name="onboarding_bookmarks_title">书签：随时找回进度</string>
     <string name="smart_rules_description">设置智能规则，自动将剧集添加到您的智能播放列表。</string>
     <string name="create_smart_playlist">创建智能播放列表</string>
@@ -458,6 +473,7 @@ Language: zh_CN
     <string name="transcript_error_not_available">很抱歉，本剧集没有文字转录稿。</string>
     <string name="referrals_banner_hide_label">隐藏此横幅</string>
     <string name="referrals_banner_long_press_label">隐藏推荐申领通行证横幅。</string>
+    <string name="end_of_year_prompt_card_title">播放记录现已上线！</string>
     <string name="settings_auto_download_limit_auto_downloads">限制自动下载次数</string>
     <string name="settings_auto_download_limit_ten_latest_episode">最新的 10 集剧集</string>
     <string name="settings_auto_download_limit_five_latest_episode">最新的 5 集剧集</string>
@@ -640,10 +656,10 @@ Language: zh_CN
     <string name="settings_use_dark_up_next">使用深色的“下一个”主题</string>
     <string name="end_of_year_stories_theres_more">更多精彩有待进一步探索！</string>
     <string name="end_of_year_stories_year_completion_rate">完成率</string>
-    <string name="end_of_year_stories_year_completion_rate_title">您今年的完成率为 %1$d%%</string>
     <string name="eoy_year_over_year_title_skyrocketed">相比于 2022 年，您的收听时长飙升！</string>
     <string name="end_of_year_stories_year_over_year_subtitle_went_down">啊哈…生活还得继续，不是吗？</string>
     <string name="end_of_year_stories_year_over_share_text">我的 %1$d 年收听时长与 %2$d 年的比较情况</string>
+    <string name="end_of_year_stories_year_completion_rate_title">您的完成率为 %1$d%%</string>
     <string name="end_of_year_stories_year_over_year_subtitle_flat">人们常说，一致性是成功的关键…或诸如此类的话！</string>
     <string name="end_of_year_prompt_card_summary">查看您的收听统计数据、热门播客等。</string>
     <string name="end_of_year_stories_year_over_year_title_went_down">与 %1$s 年相比，您的收听时长略微减少</string>
@@ -964,7 +980,6 @@ Language: zh_CN
     <string name="end_of_year_story_top_podcasts_list_title">我的 %1$d 年热门播客</string>
     <string name="end_of_year_story_top_podcast_share_text">%1$d 年我最喜欢的播客！ %2$s</string>
     <string name="end_of_year_story_listened_to_numbers_share_text">我在 %3$d 年收听了 %1$d 个不同的播客和 %2$d 部剧集</string>
-    <string name="end_of_year_story_top_podcast_subtitle">您收听了 %1$d 集“%3$s”节目，总时长为 %2$s</string>
     <string name="end_of_year_story_listened_to_categories">您今年收听了 %1$d 种不同的分类</string>
     <string name="end_of_year_story_listened_to_categories_subtitle">我们来看看您最喜欢的内容…</string>
     <string name="end_of_year_story_intro_title">我们来庆祝您的聆听之年！</string>
@@ -1008,6 +1023,7 @@ Language: zh_CN
     <string name="must_provide_filter_name">必须提供播放列表名称</string>
     <string name="end_of_year_launch_modal_summary">查看您的热门播客、分类、收听统计数据等。 分享给朋友，告诉他们您最喜欢的创作者！</string>
     <string name="settings_app_icon_halloween">万圣节</string>
+    <string name="end_of_year_launch_modal_primary_button_title">查看我的 2025 年播放记录</string>
     <string name="settings_show_played_summary">您已播放完的剧集仍会显示</string>
     <string name="settings_show_played">显示已播放的剧集</string>
     <string name="settings_privacy_crash_link_summary">允许我们将您的 Pocket Casts 账户与崩溃报告相关联。</string>

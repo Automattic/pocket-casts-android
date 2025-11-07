@@ -1,11 +1,31 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2025-10-20 19:54:03+0000
+Translation-Revision-Date: 2025-11-05 14:54:04+0000
 Plural-Forms: nplurals=6; plural=n==0 ? 0 : n==1 ? 1 : n==2 ? 2 : n%100>=3 && n%100<=10 ? 3 : n%100>=11 && n%100<=99 ? 4 : 5;
 Generator: GlotPress/2.4.0-alpha
 Language: ar
 -->
 <resources>
+    <string name="end_of_year_stories_year_completion_rate_subtitle">من بين ⁦%2$d⁩ الحلقات التي بدأت في مشاهدتها، أنهيت⁦%1$d⁩.\nمتابعة أقوى‑من معظم اشتراكات الصالات الرياضية.</string>
+    <string name="search_suggestions_no_results_message">جرب بحثًا جديدًا، أو أضِف عنوان تلقيم URL البث الصوتي</string>
+    <string name="search_suggestions_no_results_title">لا توجد نتائج</string>
+    <string name="eoy_playback_intro_title">أحداث العام الخاصة بك في البودكاست،\nمختتم وجاهز للاسترجاع</string>
+    <string name="search_suggestions_view_all">عرض الكل لـ \"⁦%1$s⁩\"</string>
+    <string name="up_next_as_playlist_saved">تم حفظ التالي كقائمة تشغيل</string>
+    <string name="up_next_as_playlist_replace_title">هل تريد استبدال قائمة التالي الحالية؟</string>
+    <string name="up_next_as_playlist_replace_body">سيؤدي هذا إلى مسح قائمة الانتظار الحالية والبدء في تشغيل قائمة التشغيل هذه.</string>
+    <string name="up_next_as_playlist_title">هل تريد حفظ قائمة الانتظار الخاصة بك؟</string>
+    <string name="up_next_as_playlist_button_secondary">استبدال وتشغيل</string>
+    <string name="up_next_as_playlist_button_primary">حفظ قائمة الانتظار الحالية</string>
+    <string name="up_next_as_playlist_body">سيتم استبدال قائمة التالي الحالية عند تشغيل قائمة التشغيل هذه. حفظها أولًا للاحتفاظ بها.</string>
+    <string name="delete_playlist_confirmation_title">هل تريد حذف قائمة التشغيل؟</string>
+    <string name="delete_playlist_confirmation_body">هل هل أنت متأكد من رغبتك في حذف قائمة التشغيل الخاصة بك؟ لا توجد طريقة للتراجع عن هذا.</string>
+    <string name="delete_playlist">حذف قائمة التشغيل</string>
+    <string name="view">عرض</string>
+    <string name="browse_podcasts">تصفح البث الصوتي</string>
+    <string name="rearrange_playlists_tooltip_title">إعادة ترتيب قوائم التشغيل الخاصة بك</string>
+    <string name="rearrange_playlists_tooltip_body">اضغط باستمرار على قائمة التشغيل لتحريكها.</string>
+    <string name="play_all_no_episodes_message">تم أرشفة جميع الحلقات. أضِف أو ألغِ الأرشفة لتشغيلها.</string>
     <string name="onboarding_upgrade_features_transcripts">النصوص المنشأة</string>
     <string name="search_filters_top_results">أهم النتائج</string>
     <string name="player_sleep_in_one_chapter">النوم في نهاية الفصل الحالي</string>
@@ -38,7 +58,6 @@ Language: ar
     <string name="playlist_episodes_archived_count">⁦%1$d⁩ مؤرشف</string>
     <string name="playlist_edit_episodes_title">تحرير قائمة تشغيل</string>
     <string name="playlist_edit_episodes">إعادة ترتيب الحلقات</string>
-    <string name="playlist_unarchive_all">إلغاء أرشفة الكل</string>
     <string name="playlist_episode_unavailable_cta">إزالة من قائمة التشغيل</string>
     <string name="playlist_episode_unavailable_description">حذف منشئ podcast هذه الحلقة. ستبقى في قائمة تشغيلك حتى تزيلها.</string>
     <string name="playlist_episode_unavailable_title">الحلقة غير متوافرة</string>
@@ -91,10 +110,7 @@ Language: ar
     <string name="playlist_select_episodes">تحديد الحلقات</string>
     <string name="smart_playlist_no_content_body">إمّا أن الوقت قد حان للاحتفال بإكمال هذه القائمة، أو تحرير القواعد للحصول على المزيد.</string>
     <string name="smart_playlist_no_content_title">لا توجد حلقات</string>
-    <string name="playlist_play_all">تشغيل الكل</string>
     <string name="smart_rules">القواعد الذكية</string>
-    <string name="smart_rule_podcasts_deselect_all">إلغاء تحديد الكل</string>
-    <string name="smart_rule_podcasts_select_all">تحديد الكل</string>
     <string name="smart_rule_podcasts_all_description_disabled">لن تتم إضافة برامج البث الصوتي الجديدة التي تتابعها تلقائيًا.</string>
     <string name="onboarding_upgrade_pp">سياسة\u00A0الخصوصية</string>
     <string name="onboarding_upgrade_tnc">الشروط\u00A0و\u00A0الأحكام</string>
@@ -116,7 +132,6 @@ Language: ar
     <string name="save_smart_rule">حفظ القاعدة الذكية</string>
     <string name="smart_rule_podcasts_all_description">سيتم إضافة برامج البث الصوتي الجديدة التي تتابعها تلقائيًا.</string>
     <string name="smart_rule_podcasts_all_label">جميع برامج البث الصوتي التي تتابعها</string>
-    <string name="smart_rule_podcasts_title">اختيار برامج البث الصوتي</string>
     <string name="onboarding_bookmarks_title">الإشارات المرجعية: قل وداعًا لسؤال \"أين توقفت؟\"</string>
     <string name="smart_rules_description">أنشئ قواعد ذكية لإضافة الحلقات تلقائيًا إلى قائمة التشغيل الذكية.</string>
     <string name="create_smart_playlist">إنشاء قائمة تشغيل ذكية</string>
@@ -458,6 +473,7 @@ Language: ar
     <string name="transcript_error_not_available">عذرًا، لكن لا يوجد نص متاح لهذه الحلقة.</string>
     <string name="referrals_banner_hide_label">إخفاء هذا الشعار</string>
     <string name="referrals_banner_long_press_label">قم بإخفاء شعار تمرير مطالبة الإحالة.</string>
+    <string name="end_of_year_prompt_card_title">التشغيل هنا!</string>
     <string name="settings_auto_download_limit_auto_downloads">تحديد التنزيلات التلقائية</string>
     <string name="settings_auto_download_limit_all_latest_episodes">جميع الحلقات الأحدث</string>
     <string name="settings_auto_download_limit_ten_latest_episode">أحدث 10 حلقات</string>
@@ -640,10 +656,10 @@ Language: ar
     <string name="settings_use_dark_up_next">استخدام قالب \"التالي\" الداكن</string>
     <string name="end_of_year_stories_theres_more">ثمَّة المزيد!</string>
     <string name="end_of_year_stories_year_completion_rate">معدل الإكمال</string>
-    <string name="end_of_year_stories_year_completion_rate_title">معدل الإكمال الخاص بك هذا العام كان ⁦%1$d⁩%%</string>
     <string name="end_of_year_stories_year_over_share_text">وقت استماع ⁦%1$d⁩ الخاص بي مقارنة بـ ⁦%2$d⁩ </string>
     <string name="eoy_year_over_year_title_skyrocketed">بالمقارنة مع عام 2022، ارتفع وقت الاستماع الخاص بك ارتفاعًا شديدًا!</string>
     <string name="end_of_year_stories_year_over_year_subtitle_went_down">أجل… هناك حياة يجب أن تعيشها، أليس كذلك؟</string>
+    <string name="end_of_year_stories_year_completion_rate_title">معدل الإكمال الخاص بك هذا العام كان ⁦%1$d⁩%%</string>
     <string name="end_of_year_stories_year_over_year_title_went_down">مقارنة بـ ⁦%1$s⁩، فقد انخفض وقت الاستماع لديك قليلاً</string>
     <string name="end_of_year_stories_year_over_year_subtitle_flat">ويقولون إن الاتساق هو مفتاح النجاح… أو شيء من هذا القبيل!</string>
     <string name="end_of_year_stories_year_over_year_title_flat">مقارنة بـ ⁦%1$s⁩، ظل وقت الاستماع الخاص بك ثابتًا إلى حد كبير</string>
@@ -960,7 +976,6 @@ Language: ar
     <string name="end_of_year_story_top_categories_share_text">الأكثر استماعًا إلى تصنيفات الحلقات الصوتية</string>
     <string name="end_of_year_create_account_to_see">احفظ حلقاتك الصوتية في السحابة واحصل على تقييم نهاية العام وقم بمزامنة تقدُّمك مع الأجهزة الأخرى.</string>
     <string name="end_of_year_story_top_podcasts_list_title">أهم حلقات البث الصوت الخاصة بي في ⁦%1$d⁩</string>
-    <string name="end_of_year_story_top_podcast_subtitle">لقد استمعتَ إلى ⁦%1$d⁩ من الحلقات بإجمالي ⁦%2$s⁩ من أصل \"⁦%3$s⁩\"</string>
     <string name="end_of_year_story_listened_to_numbers_subtitle">لكن هناك مساحة كنت لا تزال تأتي إليها…</string>
     <string name="end_of_year_story_listened_to_numbers_share_text">استمعتُ إلى ⁦%1$d⁩ من حلقات البث الصوتي المختلفة و⁦%2$d⁩ من الحلقات في ⁦%3$d⁩</string>
     <string name="end_of_year_story_top_podcast_share_text">حلقات البث الصوتي المفضلة لدي في ⁦%1$d⁩! %2$s</string>
@@ -1008,6 +1023,7 @@ Language: ar
     <string name="no_episodes_in_filter_x">لا توجد حلقات في قائمة التشغيل ⁦%1$s⁩</string>
     <string name="settings_app_icon_halloween">عيد الهالوين</string>
     <string name="end_of_year_launch_modal_summary">اطلع على أهم حلقات البودكاست والتصنيفات وإحصاءات الاستماع الخاصة بك والمزيد. شارك مع الأصدقاء وعبّر عن المبدعين الذين تفضّلهم!</string>
+    <string name="end_of_year_launch_modal_primary_button_title">عرض التشغيل الخاص بي في عام 2025</string>
     <string name="settings_show_played">عرض الحلقات التي تم تشغيلها</string>
     <string name="settings_show_played_summary">ستظل الحلقات التي أنهيت تشغيلها معروضة</string>
     <string name="profile_privacy_policy_read">قراءة سياسة الخصوصية</string>

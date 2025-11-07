@@ -1,11 +1,31 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2025-10-21 09:54:09+0000
+Translation-Revision-Date: 2025-11-06 09:54:03+0000
 Plural-Forms: nplurals=1; plural=0;
 Generator: GlotPress/2.4.0-alpha
 Language: ko_KR
 -->
 <resources>
+    <string name="end_of_year_stories_year_completion_rate_subtitle">시작한 %2$d개 에피소드 중 %1$d개를 완료했습니다.\n헬스장보다 자주 찾는 팟캐스트.</string>
+    <string name="search_suggestions_no_results_message">다른 검색어로 시도하거나 팟캐스트 피드 URL을 추가하세요</string>
+    <string name="search_suggestions_no_results_title">결과 없음</string>
+    <string name="eoy_playback_intro_title">회원님의 팟캐스트 원년\n예쁘게 정리한 추억을 다시 살펴보세요</string>
+    <string name="search_suggestions_view_all">\"%1$s\"에 대해 모두 보기</string>
+    <string name="up_next_as_playlist_saved">다음 차례 재생목록으로 저장됨</string>
+    <string name="up_next_as_playlist_replace_title">현재 다음 차례를 교체할까요?</string>
+    <string name="up_next_as_playlist_replace_body">그러면 현재 다음 차례 대기열이 지워지고 이 재생목록이 재생됩니다.</string>
+    <string name="up_next_as_playlist_title">다음 차례 대기열을 저장할까요?</string>
+    <string name="up_next_as_playlist_button_secondary">교체하고 재생</string>
+    <string name="up_next_as_playlist_button_primary">현재 대기열 저장</string>
+    <string name="up_next_as_playlist_body">이 재생목록을 재생하면 현재 다음 차례가 교체됩니다. 보관하려면 먼저 저장하세요.</string>
+    <string name="delete_playlist_confirmation_title">재생목록을 삭제할까요?</string>
+    <string name="delete_playlist_confirmation_body">재생목록을 삭제하시겠습니까? 이 작업은 되돌릴 수 없습니다.</string>
+    <string name="delete_playlist">재생목록 삭제</string>
+    <string name="view">보기</string>
+    <string name="browse_podcasts">팟캐스트 찾아보기</string>
+    <string name="rearrange_playlists_tooltip_title">재생목록 재정렬</string>
+    <string name="rearrange_playlists_tooltip_body">이동하려면 재생목록을 길게 누르세요.</string>
+    <string name="play_all_no_episodes_message">전체 에피소드가 아카이빙되었습니다. 재생하려면 추가하거나 아카이빙을 취소하세요.</string>
     <string name="onboarding_upgrade_features_transcripts">생성된 대본</string>
     <string name="search_filters_top_results">상위 결과</string>
     <string name="player_sleep_in_one_chapter">현재 챕터 종료 시 절전</string>
@@ -38,7 +58,6 @@ Language: ko_KR
     <string name="playlist_episodes_archived_count">%1$d개 보관됨</string>
     <string name="playlist_edit_episodes_title">재생목록 편집</string>
     <string name="playlist_edit_episodes">에피소드 재정렬</string>
-    <string name="playlist_unarchive_all">모두 보관 해제</string>
     <string name="playlist_episode_unavailable_cta">재생목록에서 제거</string>
     <string name="playlist_episode_unavailable_description">팟캐스트 크리에이터가 이 에피소드를 삭제했습니다. 회원님이 제거할 때까지 회원님 재생목록에는 남아 있습니다.</string>
     <string name="playlist_episode_unavailable_title">에피소드를 사용할 수 없음</string>
@@ -91,10 +110,7 @@ Language: ko_KR
     <string name="playlist_options">재생목록 옵션</string>
     <string name="smart_playlist_no_content_body">목록을 완료한 것을 축하하거나 조금 더 가져오기 위해 규칙을 편집할 시간입니다.</string>
     <string name="smart_playlist_no_content_title">에피소드 없음</string>
-    <string name="playlist_play_all">모두 재생</string>
     <string name="smart_rules">스마트 규칙</string>
-    <string name="smart_rule_podcasts_deselect_all">모두 선택 해제</string>
-    <string name="smart_rule_podcasts_select_all">모두 선택</string>
     <string name="smart_rule_podcasts_all_description_disabled">팔로우하시는 새 팟캐스트가 자동으로 추가됩니다.</string>
     <string name="onboarding_upgrade_pp">개인정보 보호\u00A0정책</string>
     <string name="onboarding_upgrade_tnc">약관\u00A0및\u00A0조건</string>
@@ -116,7 +132,6 @@ Language: ko_KR
     <string name="save_smart_rule">스마트 규칙 저장</string>
     <string name="smart_rule_podcasts_all_description">팔로우하시는 새 팟캐스트가 자동으로 추가됩니다.</string>
     <string name="smart_rule_podcasts_all_label">팔로우한 모든 팟캐스트</string>
-    <string name="smart_rule_podcasts_title">팟캐스트 선택</string>
     <string name="onboarding_bookmarks_title">북마크: 좋아하는 에피소드를 한눈에 보기</string>
     <string name="smart_rules_description">스마트 규칙을 설정하여 자동으로 에피소드를 스마트 재생목록에 추가하세요.</string>
     <string name="create_smart_playlist">스마트 재생목록 만들기</string>
@@ -458,6 +473,7 @@ Language: ko_KR
     <string name="transcript_error_not_available">죄송합니다. 이 에피소드에서는 대본을 사용할 수 없습니다.</string>
     <string name="referrals_banner_hide_label">배너 숨기기</string>
     <string name="referrals_banner_long_press_label">추천 신청 패스 배너를 숨깁니다.</string>
+    <string name="end_of_year_prompt_card_title">연말 결산이 찾아왔습니다!</string>
     <string name="settings_auto_download_limit_auto_downloads">자동 다운로드 제한</string>
     <string name="settings_auto_download_limit_all_latest_episodes">모든 최신 에피소드</string>
     <string name="settings_auto_download_limit_ten_latest_episode">최신 에피소드 10개</string>
@@ -640,10 +656,10 @@ Language: ko_KR
     <string name="settings_use_dark_up_next">다음 에피소드에 어두운 테마 사용</string>
     <string name="end_of_year_stories_theres_more">더 있습니다!</string>
     <string name="end_of_year_stories_year_completion_rate">완료율</string>
-    <string name="end_of_year_stories_year_completion_rate_title">올해 완료율은 %1$d%%이었습니다.</string>
     <string name="eoy_year_over_year_title_skyrocketed">2022년 대비 청취 시간이 급증했습니다!</string>
     <string name="end_of_year_stories_year_over_year_subtitle_went_down">일상생활도 중요하겠죠?</string>
     <string name="end_of_year_stories_year_over_share_text">%2$d년 대비 내 %1$d년 청취 시간</string>
+    <string name="end_of_year_stories_year_completion_rate_title">올해 완료율은 %1$d%%이었습니다</string>
     <string name="end_of_year_stories_year_over_year_subtitle_flat">일관성이 성공의 열쇠라는 말도 있습니다!</string>
     <string name="end_of_year_prompt_card_summary">청취 통계, 상위 팟캐스트 등이 표시됩니다.</string>
     <string name="end_of_year_stories_year_over_year_title_went_down">%1$s년 대비 청취 시간이 조금 줄었습니다.</string>
@@ -964,7 +980,6 @@ Language: ko_KR
     <string name="end_of_year_story_top_podcasts_list_title">나의 %1$d년 상위 팟캐스트</string>
     <string name="end_of_year_story_top_podcast_share_text">내가 즐겨찾는 %1$d년 팟캐스트입니다! %2$s</string>
     <string name="end_of_year_story_listened_to_numbers_share_text">내가 %3$d년에 청취한 팟캐스트는 %1$d가지, 에피소드는 %2$d개</string>
-    <string name="end_of_year_story_top_podcast_subtitle">\"%3$s\"의 총 %2$s개 에피소드 중 %1$d개를 청취하셨습니다.</string>
     <string name="end_of_year_story_listened_to_categories_subtitle">회원님의 즐겨찾기 중 일부를 살펴보겠습니다…</string>
     <string name="end_of_year_story_listened_to_categories">회원님이 올해 청취한 카테고리는 %1$d가지</string>
     <string name="end_of_year_story_intro_title">회원님의 청취 원년을 축하합니다!</string>
@@ -1008,6 +1023,7 @@ Language: ko_KR
     <string name="must_provide_filter_name">재생목록 이름을 입력해야 함</string>
     <string name="end_of_year_launch_modal_summary">상위 팟캐스트, 카테고리, 청취 통계 등이 표시됩니다. 친구와 공유하고 즐겨 찾는 팟캐스트 창작자에게 감사 인사를 보냅니다!</string>
     <string name="settings_app_icon_halloween">핼러윈</string>
+    <string name="end_of_year_launch_modal_primary_button_title">2025년에 청취한 목록 보기</string>
     <string name="settings_show_played_summary">재생을 마친 에피소드가 계속 표시됩니다.</string>
     <string name="settings_show_played">재생한 에피소드 표시</string>
     <string name="settings_privacy_crash_link_summary">Pocket Casts 계정을 충돌 보고서에 연결하도록 허용합니다.</string>
