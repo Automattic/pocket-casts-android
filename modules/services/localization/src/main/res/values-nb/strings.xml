@@ -265,7 +265,6 @@ Language: nb_NO
     <string name="onboarding_email_invalid_message">Oppgi en gyldig e-postadresse</string>
     <string name="log_in">Logg på</string>
     <string name="end_of_year_story_top_podcasts_share_text">Mine favorittpodcaster for året! %1$s</string>
-    <string name="end_of_year_story_epilogue_subtitle">Ikke glem å dele med vennene dine og fremheve favorittene blant podcastskaperne</string>
     <string name="end_of_year_story_top_categories">Favorittkategoriene dine</string>
     <string name="end_of_year_story_top_categories_share_text">Podcastkategoriene jeg lyttet mest til</string>
     <string name="end_of_year_create_account_to_see">Lagre podcastene dine i skyen, få en gjennomgang ved årsslutt, og synkroniser fremdriften med andre enheter.</string>

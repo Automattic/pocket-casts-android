@@ -1,11 +1,31 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2025-10-21 13:54:03+0000
+Translation-Revision-Date: 2025-11-06 16:54:03+0000
 Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);
 Generator: GlotPress/2.4.0-alpha
 Language: ru
 -->
 <resources>
+    <string name="end_of_year_stories_year_completion_rate_subtitle">Из %2$d начатых выпусков вы завершили %1$d.\nКуда регулярнее, чем большинство абонементов в спортзал!</string>
+    <string name="search_suggestions_no_results_message">Попробуйте уточнить поиск, введя URL-адрес ленты подкаста.</string>
+    <string name="search_suggestions_no_results_title">Нет результатов</string>
+    <string name="eoy_playback_intro_title">Ваш год в подкастах\nуже ждёт вас под ёлочкой в подарочной обёртке</string>
+    <string name="search_suggestions_view_all">Посмотреть все «%1$s»</string>
+    <string name="up_next_as_playlist_saved">Очередь «Следующие» сохранена как плейлист</string>
+    <string name="up_next_as_playlist_replace_title">Заменить текущую очередь «Следующие»?</string>
+    <string name="up_next_as_playlist_replace_body">Текущая очередь «Следующие» будет сброшена, и начнётся воспроизведение этого плейлиста.</string>
+    <string name="up_next_as_playlist_title">Сохранить очередь «Следующие»?</string>
+    <string name="up_next_as_playlist_button_secondary">Заменить и воспроизвести</string>
+    <string name="up_next_as_playlist_button_primary">Сохранить текущую очередь</string>
+    <string name="up_next_as_playlist_body">При воспроизведении этого плейлиста текущая очередь «Следующие» будет заменена. Сохраните её, если она вам нужна.</string>
+    <string name="delete_playlist_confirmation_title">Удалить плейлист?</string>
+    <string name="delete_playlist_confirmation_body">Вы действительно хотите удалить плейлист? Отменить эту операцию будет невозможно.</string>
+    <string name="delete_playlist">Удалить плейлист</string>
+    <string name="view">Просмотр</string>
+    <string name="browse_podcasts">Просмотр подкастов</string>
+    <string name="rearrange_playlists_tooltip_title">Изменить очерёдность плейлистов</string>
+    <string name="rearrange_playlists_tooltip_body">Нажмите и удерживайте плейлист, чтобы переместить его.</string>
+    <string name="play_all_no_episodes_message">Все выпуски архивированы. Чтобы начать воспроизведение, добавьте или распакуйте архив.</string>
     <string name="onboarding_upgrade_features_transcripts">Автоматические расшифровки</string>
     <string name="search_filters_top_results">Лучшие результаты</string>
     <string name="player_sleep_in_one_chapter">Переход в режим ожидания по окончании текущей главы</string>
@@ -27,7 +47,6 @@ Language: ru
     <string name="smart_playlists">Умные плейлисты</string>
     <string name="select_smart_playlists">Выбрать умные плейлисты</string>
     <string name="podcast_not_in_playlists">Не включено ни в один умный плейлист</string>
-    <string name="playlist_is_full_description">Плейлист заполнен до отказа. Попробуйте создать новый.</string>
     <string name="add_to_playlist_no_playlist_found_title">Добавить в плейлист</string>
     <string name="add_to_playlist_no_playlist_found_body">Не удалось найти плейлисты по этому запросу. Создайте новый плейлист или попробуйте другое ключевое слово.</string>
     <string name="add_to_playlist_find_playlist">Найти плейлист</string>
@@ -39,7 +58,6 @@ Language: ru
     <string name="playlist_episodes_archived_count">Архивировано: %1$d</string>
     <string name="playlist_edit_episodes_title">Редактировать плейлист</string>
     <string name="playlist_edit_episodes">Изменить очерёдность выпусков</string>
-    <string name="playlist_unarchive_all">Разархивировать все</string>
     <string name="playlist_episode_unavailable_cta">Удалить из плейлиста</string>
     <string name="playlist_episode_unavailable_description">Автор подкаста удалил этот выпуск. Он останется в вашем плейлисте, пока вы его не удалите.</string>
     <string name="playlist_episode_unavailable_title">Выпуск недоступен</string>
@@ -92,10 +110,7 @@ Language: ru
     <string name="playlist_options">Настройки плейлиста</string>
     <string name="smart_playlist_no_content_body">У вас два варианта: порадоваться завершению этого списка или изменить правила, чтобы его расширить.</string>
     <string name="smart_playlist_no_content_title">Нет выпусков</string>
-    <string name="playlist_play_all">Воспроизвести все</string>
     <string name="smart_rules">Умные правила</string>
-    <string name="smart_rule_podcasts_deselect_all">Снять выделение</string>
-    <string name="smart_rule_podcasts_select_all">Выбрать все</string>
     <string name="smart_rule_podcasts_all_description_disabled">Новые подкасты, на которые вы будете подписываться, не будут добавляться автоматически.</string>
     <string name="onboarding_upgrade_pp">Политика\u00A0конфиденциальности</string>
     <string name="onboarding_upgrade_tnc">Условия\u00A0предоставления\u00A0услуг</string>
@@ -117,7 +132,6 @@ Language: ru
     <string name="save_smart_rule">Сохранить умное правило</string>
     <string name="smart_rule_podcasts_all_description">Новые подкасты, на которые вы будете подписываться, станут добавляться автоматически</string>
     <string name="smart_rule_podcasts_all_label">Все подкасты в подписках</string>
-    <string name="smart_rule_podcasts_title">Выбрать подкасты</string>
     <string name="smart_rules_description">Настройте умные правила, чтобы автоматически добавлять выпуски в свой умный плейлист.</string>
     <string name="create_smart_playlist">Создать умный плейлист</string>
     <string name="ad_report_confirmation">Вы пожаловались на эту рекламу.</string>
@@ -417,7 +431,6 @@ Language: ru
     <string name="icons_plus_prompt">Получайте эксклюзивные значки приложений с Pocket Casts Plus и многое другое</string>
     <string name="themes_plus_prompt">Получайте эксклюзивные темы с Pocket Casts Plus и многое другое</string>
     <string name="folders_plus_prompt">Упорядочивайте ваши подкасты с Pocket Casts Plus и многое другое</string>
-    <string name="end_of_year_story_top_podcast_title">Это был ваш лучший подкаст в %1$d году</string>
     <string name="drag_down_to_dismiss_content_description">Перетащите вниз, чтобы закрыть</string>
     <string name="maybe_later">Возможно, позже</string>
     <string name="need_to_free_up_space">Необходимо освободить место?</string>
@@ -460,7 +473,7 @@ Language: ru
     <string name="transcript_error_not_available">К сожалению, в этом выпуске нет расшифровки.</string>
     <string name="referrals_banner_hide_label">Скрыть баннер</string>
     <string name="referrals_banner_long_press_label">Скрыть баннер с требованием ссылки на источник перехода.</string>
-    <string name="end_of_year_prompt_card_title">Playback 2024\nуже стартует!</string>
+    <string name="end_of_year_prompt_card_title">Всё, что вы прослушали за год!</string>
     <string name="settings_auto_download_limit_auto_downloads">Ограничить автоматические загрузки</string>
     <string name="settings_auto_download_limit_all_latest_episodes">Только последний выпуск</string>
     <string name="settings_auto_download_limit_ten_latest_episode">10 последних выпусков</string>
@@ -643,11 +656,10 @@ Language: ru
     <string name="settings_use_dark_up_next_details">При включённом параметре Up Next будет всегда использовать тёмную тему, а при выключенном — соответствовать текущей теме</string>
     <string name="end_of_year_stories_theres_more">Есть и многое другое!</string>
     <string name="end_of_year_stories_year_completion_rate">процент завершения</string>
-    <string name="end_of_year_stories_year_completion_rate_subtitle">Из %1$d запущенных эпизодов всего вы дослушали до конца %2$d</string>
-    <string name="end_of_year_stories_year_completion_rate_title">Ваш процент завершения в этом году равен %1$d%%</string>
     <string name="eoy_year_over_year_title_skyrocketed">По сравнению с 2022 г. вы посвятили прослушиванию намного больше времени!</string>
     <string name="end_of_year_stories_year_over_year_subtitle_went_down">И… как, вам хватает времени на всё остальное?</string>
     <string name="end_of_year_stories_year_over_share_text">Время прослушивания в %1$d году по сравнению с %2$d годом</string>
+    <string name="end_of_year_stories_year_completion_rate_title">Ваш процент завершения составил %1$d%%</string>
     <string name="end_of_year_prompt_card_summary">Просмотрите свой топ подкастов, статистику прослушивания и другие показатели.</string>
     <string name="end_of_year_stories_year_over_year_subtitle_flat">Говорят, постоянство — ключ к успеху… или что-то в этом роде.</string>
     <string name="end_of_year_stories_year_over_year_title_went_down">По сравнению с %1$s годом вы стали слушать немного меньше.</string>
@@ -656,7 +668,6 @@ Language: ru
     <string name="end_of_year_stories_year_over_year_title_went_up">По сравнению с %1$s годом ваше время прослушивания возросло сразу на %2$s%%</string>
     <string name="end_of_year_story_longest_episode_title">Самым длинным эпизодом, который вы слушали, стал %1$s</string>
     <string name="end_of_year_replay">Прослушать ещё раз</string>
-    <string name="end_of_year_story_epilogue_title">Благодарим за то, что вы слушали вместе с нами в этом году.\nЖдём вас снова в %1$d году!</string>
     <string name="end_of_year_listening_time_title">Это ваше общее время прослушивания подкастов.</string>
     <string name="end_of_year_story_top_categories_title">Знаете ли вы, что вашей любимой категорией оказалась %1$s?</string>
     <string name="discover_category_society_abbreviation">Культура</string>
@@ -964,13 +975,11 @@ Language: ru
     <string name="end_of_year_story_top_categories_share_text">Рубрики подкастов, которые я слушаю чаще всего</string>
     <string name="end_of_year_story_top_categories">Ваши любимые рубрики</string>
     <string name="end_of_year_story_top_podcasts_share_text">Мои любимые подкасты этого года! %1$s</string>
-    <string name="end_of_year_story_epilogue_subtitle">Не забудьте поделиться с друзьями и рассказать о любимых подкастерах</string>
     <string name="end_of_year_story_listened_to_numbers_subtitle">Но было одно шоу, которое вы слушали снова и снова…</string>
     <string name="end_of_year_story_longest_episode_share_text">Самый продолжительный выпуск, прослушанный мною в %1$d году: %2$s</string>
     <string name="end_of_year_story_top_podcast_share_text">Мой любимый подкаст в %1$d году! %2$s</string>
     <string name="end_of_year_story_listened_to_numbers_share_text">Я прослушал(а) %1$d подкастов(а) и %2$d выпусков(а) в %3$d году</string>
     <string name="end_of_year_story_top_podcasts_list_title">Мои любимые подкасты в %1$d году</string>
-    <string name="end_of_year_story_top_podcast_subtitle">Вы прослушали %1$d эпизодов «%3$s» общей продолжительностью %2$s</string>
     <string name="end_of_year_story_listened_to_categories">В этом году вы выбрали %1$d рубрик (-и)</string>
     <string name="end_of_year_story_listened_to_categories_subtitle">Взглянем на самые популярные…</string>
     <string name="end_of_year_story_intro_title">Давайте отметим ваш год прослушивания!</string>
@@ -1014,7 +1023,7 @@ Language: ru
     <string name="must_provide_filter_name">Необходимо указать название списка воспроизведения</string>
     <string name="end_of_year_launch_modal_summary">Просмотрите свой топ подкастов и рубрик, статистику прослушивания и другие показатели. Поделитесь ими с друзьями и поблагодарите любимых подкастеров.</string>
     <string name="settings_app_icon_halloween">Хэллоуин</string>
-    <string name="end_of_year_launch_modal_primary_button_title">Просмотреть мой Playback 2024</string>
+    <string name="end_of_year_launch_modal_primary_button_title">Просмотреть мою историю прослушиваний за 2025 год</string>
     <string name="settings_show_played_summary">Выпуски, которые вы уже прослушали, будут по-прежнему отображаться</string>
     <string name="settings_show_played">Показывать прослушанные выпуски</string>
     <string name="settings_privacy_crash_link_summary">Разрешите подключить вашу учётную запись Pocket Casts к отчётам о сбоях.</string>
