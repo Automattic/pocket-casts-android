@@ -79,7 +79,7 @@ internal fun NewOnboardingCreateAccountPage(
     val pocketCastsTheme = MaterialTheme.theme
 
     CallOnce {
-        viewModel.onShown()
+        viewModel.onShown(flow = flow)
     }
 
     LaunchedEffect(onUpdateSystemBars) {
@@ -90,7 +90,7 @@ internal fun NewOnboardingCreateAccountPage(
     }
 
     BackHandler {
-        viewModel.onBackPressed()
+        viewModel.onBackPressed(flow = flow)
         onBackPress()
     }
 
@@ -103,6 +103,10 @@ internal fun NewOnboardingCreateAccountPage(
             .fillMaxHeight()
             .verticalScroll(rememberScrollState()),
     ) {
+        val onClose = {
+            viewModel.onClose(flow = flow)
+            onSkip()
+        }
         if (flow.shouldOfferLogin) {
             NavigationIconButton(
                 modifier = Modifier
@@ -110,14 +114,14 @@ internal fun NewOnboardingCreateAccountPage(
                     .padding(horizontal = 8.dp, vertical = 16.dp),
                 tint = MaterialTheme.theme.colors.primaryInteractive01,
                 navigationButton = NavigationButton.Close,
-                onClick = onSkip,
+                onClick = onClose,
             )
         } else {
             TextP40(
                 modifier = Modifier
                     .align(Alignment.End)
                     .padding(end = 16.dp, top = 11.dp)
-                    .clickable(onClick = onSkip)
+                    .clickable(onClick = onClose)
                     .padding(horizontal = 8.dp, vertical = 4.dp),
                 text = stringResource(LR.string.not_now),
                 color = MaterialTheme.theme.colors.primaryInteractive01,
@@ -196,7 +200,7 @@ internal fun OnboardingCreateAccountPage(
     val pocketCastsTheme = MaterialTheme.theme
 
     CallOnce {
-        viewModel.onShown()
+        viewModel.onShown(flow = null)
     }
 
     LaunchedEffect(onUpdateSystemBars) {
@@ -207,7 +211,7 @@ internal fun OnboardingCreateAccountPage(
     }
 
     BackHandler {
-        viewModel.onBackPressed()
+        viewModel.onBackPressed(flow = null)
         onBackPress()
     }
 
@@ -228,7 +232,7 @@ internal fun OnboardingCreateAccountPage(
         ThemedTopAppBar(
             title = stringResource(LR.string.create_account),
             onNavigationClick = {
-                viewModel.onBackPressed()
+                viewModel.onBackPressed(flow = null)
                 onBackPress()
             },
         )

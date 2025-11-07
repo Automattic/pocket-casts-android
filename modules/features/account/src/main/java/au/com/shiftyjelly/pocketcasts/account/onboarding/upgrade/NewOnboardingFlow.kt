@@ -127,6 +127,7 @@ object NewOnboardingFlow {
                     }
                 },
                 onClickLogin = {
+                    viewModel.onLogInPressed(flow)
                     navController.navigate(ROUTE_LOG_IN)
                 },
             )

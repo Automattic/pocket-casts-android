@@ -53,18 +53,42 @@ class OnboardingCreateAccountViewModel @Inject constructor(
     )
     val stateFlow: StateFlow<OnboardingCreateAccountState> = _stateFlow
 
-    fun onShown() {
-        analyticsTracker.track(AnalyticsEvent.CREATE_ACCOUNT_SHOWN)
+    fun onShown(flow: OnboardingFlow?) {
+        analyticsTracker.track(
+            event = AnalyticsEvent.SETUP_ACCOUNT_SHOWN,
+            properties = flow?.let { mapOf(AnalyticsProp.flow(flow)) }.orEmpty(),
+        )
     }
 
-    fun onBackPressed() {
-        analyticsTracker.track(AnalyticsEvent.CREATE_ACCOUNT_DISMISSED)
+    fun onBackPressed(flow: OnboardingFlow?) {
+        if (flow is OnboardingFlow.InitialOnboarding) {
+            // Don't track back presses from initial onboarding flow
+            return
+        }
+        analyticsTracker.track(
+            AnalyticsEvent.SETUP_ACCOUNT_DISMISSED,
+            properties = flow?.let { mapOf(AnalyticsProp.flow(it)) }.orEmpty(),
+        )
+    }
+
+    fun onClose(flow: OnboardingFlow) {
+        analyticsTracker.track(
+            event = AnalyticsEvent.SETUP_ACCOUNT_DISMISSED,
+            properties = mapOf(AnalyticsProp.flow(flow)),
+        )
     }
 
     fun onSignUpEmailPressed(flow: OnboardingFlow) {
         analyticsTracker.track(
             AnalyticsEvent.SETUP_ACCOUNT_BUTTON_TAPPED,
             mapOf(AnalyticsProp.flow(flow), AnalyticsProp.ButtonTapped.createAccount),
+        )
+    }
+
+    fun onLogInPressed(flow: OnboardingFlow) {
+        analyticsTracker.track(
+            AnalyticsEvent.SETUP_ACCOUNT_BUTTON_TAPPED,
+            mapOf(AnalyticsProp.flow(flow), AnalyticsProp.ButtonTapped.signIn),
         )
     }
 
