@@ -72,11 +72,8 @@ internal fun TotalTimeStory(
             }
         }
 
-        val mask by rememberLottieComposition(
-            spec = LottieCompositionSpec.RawRes(IR.raw.total_time_mask),
-        )
         val text by rememberLottieComposition(
-            spec = LottieCompositionSpec.RawRes(IR.raw.total_time_text),
+            spec = LottieCompositionSpec.RawRes(IR.raw.playback_story_total_listened_lottie),
         )
 
         val formattedNumber = remember(animatedNumber) {
@@ -99,12 +96,6 @@ internal fun TotalTimeStory(
         )
 
         val context = LocalContext.current
-        LottieAnimation(
-            composition = mask,
-            modifier = Modifier
-                .fillMaxSize(),
-            contentScale = ContentScale.FillBounds,
-        )
         LottieAnimation(
             composition = text,
             modifier = Modifier
