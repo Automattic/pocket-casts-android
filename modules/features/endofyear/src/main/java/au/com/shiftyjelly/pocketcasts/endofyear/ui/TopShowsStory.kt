@@ -120,6 +120,7 @@ internal fun TopShowsStory(
             }
         }
         ShareStoryButton(
+            modifier = Modifier.padding(bottom = 18.dp),
             story = story,
             controller = controller,
             onShare = onShareStory,
