@@ -1920,7 +1920,7 @@ class MainActivity :
                 frameBottomSheetBehavior.state == BottomSheetBehavior.STATE_COLLAPSED &&
                 !viewModel.shouldShowStoriesModal.value &&
                 !binding.playerBottomSheet.isPlayerOpen &&
-                !binding.root.isTouching
+                !binding.root.wasTouchedInLast(2.seconds)
             )
     }
 }
