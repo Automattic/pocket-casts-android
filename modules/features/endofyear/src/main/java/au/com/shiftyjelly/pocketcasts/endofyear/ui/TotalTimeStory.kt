@@ -11,6 +11,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableLongStateOf
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -64,11 +65,13 @@ internal fun TotalTimeStory(
         val startMinutes = if (freezeAnimation) totalMinutes else totalMinutes - totalMinutes % 1000
 
         var animatedNumber by remember { mutableLongStateOf(startMinutes) }
+        var animationCompleted by remember { mutableStateOf(false) }
 
         LaunchedEffect(totalMinutes, startMinutes, freezeAnimation) {
             if (freezeAnimation) {
                 animatedNumber = totalMinutes
-            } else {
+                animationCompleted = true
+            } else if (!animationCompleted) {
                 val endValue = totalMinutes
                 val animatable = Animatable(startMinutes.toFloat())
 
@@ -87,9 +90,15 @@ internal fun TotalTimeStory(
 
         val animationProgress by animateLottieCompositionAsState(
             composition = text,
-            isPlaying = !freezeAnimation,
+            isPlaying = !freezeAnimation && !animationCompleted,
             iterations = 1,
         )
+
+        LaunchedEffect(animationProgress) {
+            if (animationProgress == 1f) {
+                animationCompleted = true
+            }
+        }
 
         val formattedNumber = remember(animatedNumber) {
             NumberFormat.getNumberInstance().format(animatedNumber)
@@ -113,7 +122,7 @@ internal fun TotalTimeStory(
         val context = LocalContext.current
         LottieAnimation(
             composition = text,
-            progress = { if (freezeAnimation) 1.0f else animationProgress },
+            progress = { if (freezeAnimation || animationCompleted) 1.0f else animationProgress },
             modifier = Modifier
                 .fillMaxSize(),
             contentScale = ContentScale.FillBounds,
