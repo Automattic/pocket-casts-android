@@ -12,6 +12,8 @@
         ([#4691](https://github.com/Automattic/pocket-casts-android/pull/4691))
     *   Fix 3-button navigation obstructing the podcast rating button
         ([#4698](https://github.com/Automattic/pocket-casts-android/pull/4698))
+    *   Fix search bar jumps out of view
+        ([#4707](https://github.com/Automattic/pocket-casts-android/pull/4707))
 
 7.101
 -----
