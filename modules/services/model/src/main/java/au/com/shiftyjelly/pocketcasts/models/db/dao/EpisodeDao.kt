@@ -494,6 +494,6 @@ abstract class EpisodeDao {
         episodes.forEach { episode -> updateCleanTitle(episode.uuid, episode.title) }
     }
 
-    @Query("SELECT NOT EXISTS(SELECT * FROM podcast_episodes WHERE cleanTitle IS NULL OR TRIM(cleanTitle) = '' OR cleanTitle IS :normalizationToken)")
+    @Query("SELECT NOT EXISTS(SELECT * FROM podcast_episodes WHERE cleanTitle IS NULL OR TRIM(cleanTitle) = '' OR cleanTitle = :normalizationToken)")
     abstract fun hasNormalizedEpisodeTitles(normalizationToken: String): Flow<Boolean>
 }
