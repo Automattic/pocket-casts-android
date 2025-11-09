@@ -80,7 +80,9 @@ class EpisodeRowDataProvider @Inject constructor(
         return playbackManager.playbackStateRelay
             .startWith(emptyState)
             .map { if (it.episodeUuid == episodeUuid) it else emptyState }
-            .distinctUntilChanged()
+            .distinctUntilChanged { prev, curr ->
+                prev.state == curr.state && prev.episodeUuid == curr.episodeUuid
+            }
     }
 
     private fun isInUpNextObservable(episodeUuid: String): Observable<Boolean> {

@@ -12,6 +12,9 @@
         ([#4691](https://github.com/Automattic/pocket-casts-android/pull/4691))
     *   Fix 3-button navigation obstructing the podcast rating button
         ([#4698](https://github.com/Automattic/pocket-casts-android/pull/4698))
+    *   Fix episode list play button flickering
+        ([#4709](https://github.com/Automattic/pocket-casts-android/pull/4709))
+    
 
 7.101
 -----
