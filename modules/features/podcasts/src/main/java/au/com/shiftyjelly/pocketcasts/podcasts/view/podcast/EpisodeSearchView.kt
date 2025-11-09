@@ -45,7 +45,11 @@ class EpisodeSearchView @JvmOverloads constructor(context: Context, attrs: Attri
         val cancelSearchBtn = findViewById<ImageButton>(R.id.cancelSearchBtn)
         searchText.setOnFocusChangeListener { _, hasFocus ->
             if (hasFocus) {
-                onFocus?.invoke()
+                // Only trigger scroll when starting a new search (empty field)
+                // to avoid pushing the search box out of view when editing
+                if (searchText.text.isEmpty()) {
+                    onFocus?.invoke()
+                }
                 cancelSearchBtn.show()
             } else {
                 cancelSearchBtn.hide()
