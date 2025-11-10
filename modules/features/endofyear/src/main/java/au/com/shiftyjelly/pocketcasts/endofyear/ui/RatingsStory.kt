@@ -2,8 +2,7 @@ package au.com.shiftyjelly.pocketcasts.endofyear.ui
 
 import android.graphics.Typeface
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.BoxWithConstraints
-import androidx.compose.foundation.layout.BoxWithConstraintsScope
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.RowScope
@@ -15,13 +14,11 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Brush
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
-import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalInspectionMode
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.stringResource
@@ -69,6 +66,10 @@ internal fun RatingsStory(
         )
     } else {
         AbsentRatings(
+            modifier = Modifier
+                .background(color = story.backgroundColor)
+                .fillMaxSize()
+                .padding(top = measurements.closeButtonBottomEdge + 20.dp),
             story = story,
             measurements = measurements,
             onLearnAboutRatings = onLearnAboutRatings,
@@ -120,7 +121,7 @@ private fun PresentRatings(
                 .padding(horizontal = 24.dp),
             textAlign = TextAlign.Center,
         )
-        BoxWithConstraints(
+        Box(
             contentAlignment = Alignment.BottomCenter,
             modifier = Modifier
                 .fillMaxWidth()
@@ -143,7 +144,7 @@ private fun PresentRatings(
 }
 
 @Composable
-private fun BoxWithConstraintsScope.RatingBars(
+private fun RatingBars(
     stats: RatingStats,
     forceBarsVisible: Boolean,
     modifier: Modifier = Modifier,
@@ -222,47 +223,24 @@ private fun RowScope.AnimatedRatingBar(
         modifier = Modifier.weight(1f),
         composition = composition,
         progress = { animatable.progress },
-        contentScale = ContentScale.FillBounds,
         dynamicProperties = dynamicProperties,
-        fontMap = mapOf(
-            "Inter-Regular" to Typeface.create("sans-serif", Typeface.NORMAL)
-        )
+        fontMap = remember {
+            mapOf(
+                "Inter-Regular" to Typeface.create("sans-serif", Typeface.NORMAL)
+            )
+        },
     )
 }
 
 @Composable
 private fun AbsentRatings(
+    modifier: Modifier = Modifier,
     story: Story.Ratings,
     measurements: EndOfYearMeasurements,
     onLearnAboutRatings: () -> Unit,
 ) {
     Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(story.backgroundColor)
-            .padding(top = measurements.closeButtonBottomEdge + 20.dp),
-    ) {
-        NoRatingsInfo(
-            story = story,
-            measurements = measurements,
-            onLearnAboutRatings = onLearnAboutRatings,
-        )
-    }
-}
-
-@Composable
-private fun NoRatingsInfo(
-    story: Story.Ratings,
-    measurements: EndOfYearMeasurements,
-    onLearnAboutRatings: () -> Unit,
-) {
-    Column(
-        modifier = Modifier.background(
-            brush = Brush.verticalGradient(
-                0f to Color.Transparent,
-                0.1f to story.backgroundColor,
-            ),
-        ),
+        modifier = modifier,
     ) {
         Spacer(
             modifier = Modifier.height(16.dp),
@@ -290,17 +268,13 @@ private fun NoRatingsInfo(
                 .padding(horizontal = 24.dp),
             textAlign = TextAlign.Center,
         )
-        BoxWithConstraints(
-            contentAlignment = Alignment.BottomCenter,
+        RatingBars(
             modifier = Modifier
                 .fillMaxWidth()
                 .weight(1f),
-        ) {
-            RatingBars(
-                stats = story.stats,
-                forceBarsVisible = false,
-            )
-        }
+            stats = story.stats,
+            forceBarsVisible = false,
+        )
         Spacer(
             modifier = Modifier.height(16.dp),
         )
