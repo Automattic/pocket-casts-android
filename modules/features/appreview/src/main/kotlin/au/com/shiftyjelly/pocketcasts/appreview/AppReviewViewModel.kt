@@ -13,7 +13,7 @@ class AppReviewViewModel @Inject constructor(
 ) : ViewModel() {
     fun declineAppReview() {
         val newTimestamps = buildList {
-            addAll(settings.appReviewLastDeclineTimestamps.value)
+            addAll(settings.appReviewLastDeclineTimestamps.value.takeLast(1))
             add(clock.instant())
         }
         settings.appReviewLastDeclineTimestamps.set(newTimestamps, updateModifiedAt = false)
