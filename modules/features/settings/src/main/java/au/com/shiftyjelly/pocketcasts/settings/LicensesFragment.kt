@@ -86,6 +86,7 @@ class LicensesFragment : BaseFragment() {
                 showLicenseBadges = true,
                 colors = LibraryDefaults.libraryColors(
                     libraryContentColor = MaterialTheme.theme.colors.primaryText01,
+                    dialogContentColor = MaterialTheme.theme.colors.primaryText01,
                 ),
                 libraries = produceLibraries { context ->
                     val libs = Libs.Builder()
