@@ -273,6 +273,9 @@ interface Settings {
         )
     }
 
+    val currentSessionId: String
+    val sessionIds: List<String>
+
     val selectPodcastSortTypeObservable: Observable<PodcastsSortType>
     val multiSelectItemsObservable: Observable<List<String>>
     val refreshStateFlow: StateFlow<RefreshState>
@@ -603,4 +606,8 @@ interface Settings {
     val appReviewReferralSharedTimestamp: ReadWriteSetting<Instant?>
     val appReviewSubmittedReasons: ReadWriteSetting<List<AppReviewReason>>
     val appReviewLastPromptTimestamp: ReadWriteSetting<Instant?>
+    val appReviewLastDeclineTimestamps: ReadWriteSetting<List<Instant>>
+    val appReviewCrashTimestamp: ReadWriteSetting<Instant?>
+    val appReviewErrorSessionIds: ReadSetting<List<String>>
+    fun recordErrorSession()
 }

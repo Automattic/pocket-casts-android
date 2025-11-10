@@ -84,7 +84,7 @@ class DataSyncProcess(
                     syncPlaybackHistory()
                     syncPodcastRatings()
                 }
-            }
+            }.onFailure { settings.recordErrorSession() }
         }
     }
 

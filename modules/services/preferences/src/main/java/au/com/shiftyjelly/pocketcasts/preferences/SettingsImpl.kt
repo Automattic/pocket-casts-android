@@ -59,6 +59,7 @@ import javax.crypto.SecretKeyFactory
 import javax.crypto.spec.PBEKeySpec
 import javax.crypto.spec.PBEParameterSpec
 import javax.inject.Inject
+import javax.inject.Singleton
 import kotlin.math.max
 import kotlin.time.Duration.Companion.days
 import kotlin.time.Duration.Companion.milliseconds
@@ -71,6 +72,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.distinctUntilChanged
 import timber.log.Timber
 
+@Singleton
 class SettingsImpl @Inject constructor(
     @PublicSharedPreferences private val sharedPreferences: SharedPreferences,
     @PrivateSharedPreferences private val privatePreferences: SharedPreferences,
@@ -89,6 +91,26 @@ class SettingsImpl @Inject constructor(
     }
 
     private var languageCode: String? = null
+
+    private val sessionIdsSetting = UserSetting.PrefListFromString(
+        sharedPrefKey = "app_session_ids",
+        defaultValue = emptyList(),
+        fromString = { value -> value },
+        toString = { value -> value },
+        sharedPrefs = sharedPreferences,
+    )
+
+    override val currentSessionId = UUID.randomUUID().toString()
+
+    init {
+        val newIds = buildList {
+            addAll(sessionIdsSetting.value.takeLast(9))
+            add(currentSessionId)
+        }
+        sessionIdsSetting.set(newIds, updateModifiedAt = false)
+    }
+
+    override val sessionIds get() = sessionIdsSetting.value
 
     override val selectPodcastSortTypeObservable = BehaviorRelay.create<PodcastsSortType>().apply { accept(getSelectPodcastsSortType()) }
     override val multiSelectItemsObservable = BehaviorRelay.create<List<String>>().apply { accept(getMultiSelectItems()) }
@@ -1687,7 +1709,7 @@ class SettingsImpl @Inject constructor(
     override val appReviewSubmittedReasons = UserSetting.PrefListFromString(
         sharedPrefKey = "app_review_submitted_reasons",
         defaultValue = emptyList(),
-        fromString = { value -> AppReviewReason.fromValue(value) },
+        fromString = { value -> AppReviewReason.fromValue(value) ?: AppReviewReason.DevelopmentTrigger },
         toString = { value -> value.analyticsValue },
         sharedPrefs = sharedPreferences,
     )
@@ -1699,4 +1721,41 @@ class SettingsImpl @Inject constructor(
         toString = { value -> value.toString() },
         sharedPrefs = sharedPreferences,
     )
+
+    override val appReviewLastDeclineTimestamps = UserSetting.PrefListFromString(
+        sharedPrefKey = "app_review_last_decline_timestamps",
+        defaultValue = emptyList(),
+        fromString = { value -> runCatching { Instant.parse(value) }.getOrNull() },
+        toString = { value -> value.toString() },
+        sharedPrefs = sharedPreferences,
+    )
+
+    override val appReviewCrashTimestamp = UserSetting.PrefFromString(
+        sharedPrefKey = "app_review_crash_timestamp",
+        defaultValue = null,
+        fromString = { value -> runCatching { Instant.parse(value) }.getOrNull() },
+        toString = { value -> value.toString() },
+        sharedPrefs = sharedPreferences,
+    )
+
+    override val appReviewErrorSessionIds = UserSetting.PrefListFromString(
+        sharedPrefKey = "app_review_error_session_ids",
+        defaultValue = emptyList(),
+        fromString = { value -> value },
+        toString = { value -> value },
+        sharedPrefs = sharedPreferences,
+    )
+
+    override fun recordErrorSession() {
+        val recentIds = appReviewErrorSessionIds.value
+        if (currentSessionId in recentIds) {
+            return
+        }
+
+        val newIds = buildList {
+            addAll(appReviewErrorSessionIds.value.takeLast(1))
+            add(currentSessionId)
+        }
+        appReviewErrorSessionIds.set(newIds, updateModifiedAt = false)
+    }
 }

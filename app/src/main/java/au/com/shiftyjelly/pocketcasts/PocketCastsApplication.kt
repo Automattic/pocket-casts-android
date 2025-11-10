@@ -14,6 +14,7 @@ import au.com.shiftyjelly.pocketcasts.models.db.dao.UpNextDao
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodeStatusEnum
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.appreview.AppReviewAnalyticsListener
+import au.com.shiftyjelly.pocketcasts.repositories.appreview.AppReviewExceptionHandler
 import au.com.shiftyjelly.pocketcasts.repositories.appreview.AppReviewManager
 import au.com.shiftyjelly.pocketcasts.repositories.di.ApplicationScope
 import au.com.shiftyjelly.pocketcasts.repositories.download.DownloadManager
@@ -37,6 +38,7 @@ import au.com.shiftyjelly.pocketcasts.repositories.user.UserManager
 import au.com.shiftyjelly.pocketcasts.shared.AppLifecycleObserver
 import au.com.shiftyjelly.pocketcasts.shared.DownloadStatisticsReporter
 import au.com.shiftyjelly.pocketcasts.ui.helper.AppIcon
+import au.com.shiftyjelly.pocketcasts.utils.ChainedExceptionHandler
 import au.com.shiftyjelly.pocketcasts.utils.TimberDebugTree
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
@@ -138,6 +140,8 @@ class PocketCastsApplication :
 
     @Inject lateinit var appReviewAnalyticsListener: AppReviewAnalyticsListener
 
+    @Inject lateinit var appReviewExceptionHandler: AppReviewExceptionHandler
+
     override fun onCreate() {
         if (BuildConfig.DEBUG) {
             StrictMode.setThreadPolicy(
@@ -175,9 +179,14 @@ class PocketCastsApplication :
     }
 
     private fun setupCrashLogging() {
-        Thread.getDefaultUncaughtExceptionHandler()?.let {
-            Thread.setDefaultUncaughtExceptionHandler(LogBufferUncaughtExceptionHandler(it))
-        }
+        val exceptionHandler = ChainedExceptionHandler(
+            listOfNotNull(
+                LogBufferUncaughtExceptionHandler(),
+                appReviewExceptionHandler,
+                Thread.getDefaultUncaughtExceptionHandler(),
+            ),
+        )
+        Thread.setDefaultUncaughtExceptionHandler(exceptionHandler)
 
         initializeRemoteLogging()
 
