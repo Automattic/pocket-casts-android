@@ -2106,7 +2106,7 @@
     <!-- Subtitle of the story that compares year listening time when this year's listening time is bigger than last's year. %1$s is the year -->
     <string name="end_of_year_stories_year_over_year_subtitle_went_up">Hope you stretched first!</string>
     <!-- Subtitle of the story when this year's listening time is bigger than previous year by more than 500%. -->
-    <string name="end_of_year_stories_year_over_year_subtitle_went_up_a_lot">You listened 500% more this year — welcome to the club</string>
+    <string name="end_of_year_stories_year_over_year_subtitle_went_up_a_lot">You listened more than 500% this year — welcome to the club</string>
     <!-- Title of the story when this year's listening time is almost the same as the previous year. %1$s is the year -->
     <string name="end_of_year_stories_year_over_year_title_flat">Your %1$s listening held steady</string>
     <!-- Subtitle of the story that compares year listening time when this year's listening time is almost the same as last's year -->

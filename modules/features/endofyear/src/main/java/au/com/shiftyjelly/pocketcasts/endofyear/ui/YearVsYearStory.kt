@@ -36,7 +36,7 @@ import com.airbnb.lottie.compose.rememberLottieDynamicProperties
 import com.airbnb.lottie.compose.rememberLottieDynamicProperty
 import dev.shreyaspatil.capturable.capturable
 import java.io.File
-import kotlin.math.roundToInt
+import kotlin.math.absoluteValue
 import kotlin.time.Duration.Companion.hours
 import timber.log.Timber
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
@@ -156,11 +156,11 @@ private fun TextInfo(
     val title = when (story.trend) {
         Trend.Same -> stringResource(LR.string.end_of_year_stories_year_over_year_title_flat, EndOfYearManager.YEAR.toString())
         Trend.Down -> {
-            val percentageString = (100 * story.yearOverYearChange).roundToInt().toString()
+            val percentageString = story.percentageChange.absoluteValue.toString()
             stringResource(LR.string.end_of_year_stories_year_over_year_title_went_down, percentageString)
         }
         Trend.Up -> {
-            val percentageString = (100 * story.yearOverYearChange).roundToInt().toString()
+            val percentageString = story.percentageChange.toString()
             stringResource(LR.string.end_of_year_stories_year_over_year_title_went_up, EndOfYearManager.YEAR.toString(), percentageString)
         }
         Trend.UpALot -> stringResource(LR.string.end_of_year_stories_year_over_year_title_went_up_a_lot)
