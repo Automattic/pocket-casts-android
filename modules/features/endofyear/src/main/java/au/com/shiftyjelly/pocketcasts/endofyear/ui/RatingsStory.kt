@@ -171,10 +171,14 @@ private fun RatingBars(
         modifier = modifier,
         horizontalArrangement = arrangement ?: Arrangement.Start
     ) {
+        val shouldNormalize = stats.count() > 0
         Rating.entries.forEach { rating ->
+            val barRange = (stats.relativeToMax(rating) * 10).roundToInt()
             AnimatedRatingBar(
                 rating = rating.numericalValue,
-                heightRange = (stats.relativeToMax(rating) * 10).roundToInt(),
+                heightRange = if (shouldNormalize) {
+                    barRange.coerceIn(1, 10)
+                } else barRange,
                 forceBarVisible = forceBarsVisible,
                 contentScale = arrangement?.let { ContentScale.FillBounds }
             )
