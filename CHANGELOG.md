@@ -1,6 +1,8 @@
-7.102
+8.0
 -----
 *   New Features
+    *   Add support for Manual Playlists and rebrand Filters as Smart Playlists
+        ([#4711](https://github.com/Automattic/pocket-casts-android/pull/4670))
     *   Add new intro story for playback
         ([#4670](https://github.com/Automattic/pocket-casts-android/pull/4670))
 *   Bug Fixes
@@ -14,6 +16,8 @@
         ([#4698](https://github.com/Automattic/pocket-casts-android/pull/4698))
     *   Fix search bar jumps out of view
         ([#4707](https://github.com/Automattic/pocket-casts-android/pull/4707))
+    *   Fix episode list play button flickering
+        ([#4709](https://github.com/Automattic/pocket-casts-android/pull/4709))
 
 7.101
 -----

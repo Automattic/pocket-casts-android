@@ -114,11 +114,15 @@ abstract class BaseEpisodeViewHolder<T : Any>(
         val previousUuid = boundItem?.let(::toPodcastEpisode)?.uuid
         setupInitialState(item, tint, isMultiSelectEnabled, streamByDefault)
 
-        if (previousUuid != episode.uuid || !isObservingRowData) {
+        val isNewEpisode = previousUuid != episode.uuid || !isObservingRowData
+        if (isNewEpisode) {
             observeRowData()
         }
         bindArtwork(useEpisodeArtwork)
-        bindPlaybackButton()
+        // Only bind playback button for new episodes; observable handles updates for existing ones
+        if (isNewEpisode) {
+            bindPlaybackButton()
+        }
         bindTitle()
         bindDate()
         bindStatus(downloadProgress = 0)

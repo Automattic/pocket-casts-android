@@ -159,9 +159,9 @@ enum class Feature(
     PLAYLISTS_REBRANDING(
         key = "playlists_rebranding",
         title = "Playlists",
-        defaultValue = isDebugOrPrototypeBuild,
+        defaultValue = true,
         tier = FeatureTier.Free,
-        hasFirebaseRemoteFlag = false,
+        hasFirebaseRemoteFlag = true,
         hasDevToggle = true,
     ),
     SHARE_TRANSCRIPTS(

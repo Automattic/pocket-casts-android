@@ -168,10 +168,14 @@
     <string name="on">On</string>
     <string name="expanded">Expanded</string>
     <string name="collapsed">Collapsed</string>
+    <string name="database">Database</string>
     <string name="details">Details</string>
     <string name="episode">Episode</string>
     <string name="episodes">Episodes</string>
     <string name="none">None</string>
+    <string name="normalized">Normalized</string>
+    <string name="not_normalized">Not normalized</string>
+    <string name="normalization_started">Normalization started</string>
     <string name="expand_details">Expand details</string>
     <string name="add_podcasts">Add Podcasts</string>
     <string name="please_try_again">Please try again</string>
@@ -963,14 +967,14 @@
     <!-- Accessibility description. %1$s is an episode title-->
     <string name="add_to_playlist_episode_desc">Add %1$s to playlist</string>
     <string name="add_to_playlist_failure_message">This playlist is full. Remove a few episodes or start a new one.</string>
-    <string name="create_playlist">Create Playlist</string>
-    <string name="create_smart_playlist">Create Smart Playlist</string>
+    <string name="create_playlist">Create playlist</string>
+    <string name="create_smart_playlist">Create smart playlist</string>
     <string name="decrement_longer_than_duration">Decrement \"longer than\" duration</string>
     <string name="decrement_shorter_than_duration">Decrement \"shorter than\" duration</string>
-    <string name="delete_playlist">Delete Playlist</string>
+    <string name="delete_playlist">Delete playlist</string>
     <string name="delete_playlist_confirmation_body">Are you sure you want to delete your playlist? There’s no way to undo this.</string>
-    <string name="delete_playlist_confirmation_title">Delete Playlist?</string>
-    <string name="enabled_rules">Enabled Rules</string>
+    <string name="delete_playlist_confirmation_title">Delete playlist?</string>
+    <string name="enabled_rules">Enabled rules</string>
     <!-- %1$s is status like 'In Progress' and %2$d is count of other episode statuses -->
     <string name="episode_status_rule_description">%1$s + %2$d</string>
     <string name="increment_longer_than_duration">Increment \"longer than\" duration</string>
@@ -986,10 +990,10 @@
     <string name="manual_playlist_search_no_podcast_title">No podcast found</string>
     <string name="manual_playlist_search_no_podcast_or_folder_body">We couldn’t find any podcast or folder for that search. Try another keyword.</string>
     <string name="manual_playlist_search_no_podcast_or_folder_title" translatable="false">@string/manual_playlist_search_no_podcast_title</string>
-    <string name="new_playlist">New Playlist</string>
+    <string name="new_playlist">New playlist</string>
     <string name="new_playlists_title_placeholder">Playlist’s name</string>
     <string name="new_smart_playlist_banner_body">Automatically add episodes based on rules</string>
-    <string name="new_smart_playlist_banner_title">Make into Smart Playlist</string>
+    <string name="new_smart_playlist_banner_title">Make into smart playlist</string>
     <string name="play_all_no_episodes_message">All episodes archived. Add or unarchive to play.</string>
     <string name="playlist_archive_all" translatable="false">@string/podcast_archive_all</string>
     <string name="playlist_artwork_description">Playlist’s artwork</string>
@@ -1013,28 +1017,28 @@
     <string name="playlist_setting_auto_download_description">Enable to auto download episodes in this playlist.</string>
     <string name="playlist_sort_by">Sort by</string>
     <string name="playlists">Playlists</string>
-    <string name="playlists_empty_state_body">Playlists let you organize episodes manually or automatically with Smart Rules.</string>
+    <string name="playlists_empty_state_body">Playlists let you organize episodes manually or automatically with smart rules.</string>
     <string name="playlists_empty_state_title">Organize episodes your way</string>
-    <string name="playlists_onboarding_playlist_description">Want more control? Manual Playlists let you build custom queues, great for trips, themes, or just your current vibe. Whether Smart or Manual, playlists work the way you do.</string>
-    <string name="playlists_onboarding_playlist_title">Introducing Playlists</string>
-    <string name="playlists_onboarding_smart_playlist_description">They still work exactly the same, using rules to auto-add your episodes. All your existing Filters are right here, nothing’s changed but the name.</string>
-    <string name="playlists_onboarding_smart_playlist_title">Filters are now Smart Playlists</string>
+    <string name="playlists_onboarding_playlist_description">Want more control? Manual playlists let you build custom queues, great for trips, themes, or just your current vibe. Whether smart or manual, playlists work the way you do.</string>
+    <string name="playlists_onboarding_playlist_title">Introducing playlists</string>
+    <string name="playlists_onboarding_smart_playlist_description">They still work exactly the same, using rules to auto-add your episodes. All your existing filters are right here, nothing’s changed but the name.</string>
+    <string name="playlists_onboarding_smart_playlist_title">Filters are now smart playlists</string>
     <string name="playlists_selected_all">All playlists selected</string>
     <plurals name="playlists_selected_count">
         <item quantity="one">%1$d playlist selected</item>
         <item quantity="other">%1$d playlists selected</item>
     </plurals>
-    <string name="podcast_not_in_playlists">Not included in any Smart Playlists</string>
+    <string name="podcast_not_in_playlists">Not included in any smart playlists</string>
     <string name="premade_playlists_tooltip_body">We made these to help you get started.\nThey auto-update based on your listening.</string>
-    <string name="premade_playlists_tooltip_title">Smart Playlists, ready to go</string>
+    <string name="premade_playlists_tooltip_title">Smart playlists, ready to go</string>
     <string name="rearrange_playlists_tooltip_body">Press and hold a playlist to move it.</string>
     <string name="rearrange_playlists_tooltip_title">Reorder your playlists</string>
     <!-- %1$s is playlist's title -->
     <string name="preview_playlist">Preview %1$s</string>
-    <string name="save_smart_rule">Save Smart Rule</string>
-    <string name="select_smart_playlists">Select Smart Playlists</string>
-    <string name="smart_playlist">Smart Playlist</string>
-    <string name="smart_playlists">Smart Playlists</string>
+    <string name="save_smart_rule">Save smart rule</string>
+    <string name="select_smart_playlists">Select smart playlists</string>
+    <string name="smart_playlist">Smart playlist</string>
+    <string name="smart_playlists">Smart playlists</string>
     <string name="smart_playlist_create_no_content_body">None of the episodes in your podcasts match these rules.\n\nTry adjusting the rules, or save this playlist for future episodes that might fit.</string>
     <string name="smart_playlist_create_no_content_title">No matching episodes</string>
     <string name="smart_playlist_no_content_body">Either it’s time to celebrate completing this list, or edit your rules to get some more.</string>
@@ -1045,8 +1049,8 @@
     <string name="smart_rule_starred_description">Only include starred episodes that match your other rules.</string>
     <string name="smart_rule_starred_description_disabled">Starred episodes can still appear if they match your other rules.</string>
     <string name="smart_rule_starred_label">Starred episodes</string>
-    <string name="smart_rules">Smart Rules</string>
-    <string name="smart_rules_description">Set up Smart Rules to automatically add episodes to your Smart Playlist.</string>
+    <string name="smart_rules">Smart rules</string>
+    <string name="smart_rules_description">Set up smart rules to automatically add episodes to your smart playlist.</string>
     <string name="up_next_as_playlist_body">Your current Up Next will be replaced when you play this playlist. Save it first to keep it.</string>
     <string name="up_next_as_playlist_button_primary">Save current queue</string>
     <string name="up_next_as_playlist_button_secondary">Replace and play</string>
@@ -1653,6 +1657,8 @@
     <string name="settings_storage_store_on">Store podcasts on</string>
     <string name="settings_storage_fix_downloads">Fix downloads</string>
     <string name="settings_storage_fix_downloads_description">Attempt to restore any downloaded files if they are missing in the Pocket Casts app.</string>
+    <string name="settings_storage_normalize_episode_titles">Normalize episode titles</string>
+    <string name="settings_storage_normalize_episode_titles_description">Status: %1$s\nSome parts of the app use an episode search that requires normalized titles. Tapping this setting runs database normalization if the episodes aren\'t normalized already.</string>
     <string name="settings_subscribe_to_played">Follow played podcasts</string>
     <string name="settings_show_played">Show played episodes</string>
     <string name="settings_show_played_summary">Episodes that you have finished playing will still be displayed</string>
@@ -2325,7 +2331,7 @@
 
     <string name="must_provide_filter_name">Must provide playlist name</string>
     <string name="filter_x_not_found">Playlist %1$s not found</string>
-    <string name="no_episodes_in_filter_x">No episodes in Playlist %1$s</string>
+    <string name="no_episodes_in_filter_x">No episodes in playlist %1$s</string>
     <string name="must_provide_command_name">Must provide command name</string>
     <string name="command_x_not_valid">Command %1$s not valid</string>
     <string name="playback_command">Playback Command</string>

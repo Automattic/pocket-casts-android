@@ -53,7 +53,7 @@ class EpisodeTitlesNormalizationWorker @AssistedInject constructor(
     companion object {
         // We're using the letter "ó" as a token as it is guaranteed to not be present
         // in the normalized name. It can be any letter that is cleaned up by String.unidecode().
-        private const val NORMALIZATION_TOKEN = "__ó__"
+        const val NORMALIZATION_TOKEN = "__ó__"
 
         private const val WORKER_TAG = "pocket_casts_episode_titles_normalization_worker_tag"
 
