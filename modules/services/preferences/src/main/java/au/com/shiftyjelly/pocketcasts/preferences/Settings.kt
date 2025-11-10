@@ -604,6 +604,7 @@ interface Settings {
     val appReviewBookmarkCreatedTimestamp: ReadWriteSetting<Instant?>
     val appReviewThemeChangedTimestamp: ReadWriteSetting<Instant?>
     val appReviewReferralSharedTimestamp: ReadWriteSetting<Instant?>
+    val appReviewPlaybackSharedTimestamp: ReadWriteSetting<Instant?>
     val appReviewSubmittedReasons: ReadWriteSetting<List<AppReviewReason>>
     val appReviewLastPromptTimestamp: ReadWriteSetting<Instant?>
     val appReviewLastDeclineTimestamps: ReadWriteSetting<List<Instant>>
