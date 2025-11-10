@@ -103,8 +103,8 @@ private fun BoxScope.YearVsYearAnimation(
     }
     val lastYearHours = story.lastYearDuration.inWholeHours
     val thisYearHours = story.thisYearDuration.inWholeHours
-    val lastYearText = lastYearHours.toString() + " " + pluralStringResource(id = LR.plurals.hour, count = lastYearHours.toInt())
-    val thisYearText = thisYearHours.toString() + " " + pluralStringResource(id = LR.plurals.hour, count = thisYearHours.toInt())
+    val lastYearText = "$lastYearHours ${pluralStringResource(id = LR.plurals.hour, count = lastYearHours.toInt())}"
+    val thisYearText = "$thisYearHours ${pluralStringResource(id = LR.plurals.hour, count = thisYearHours.toInt())}"
     val dynamicProperties = rememberLottieDynamicProperties(
         rememberLottieDynamicProperty(
             property = LottieProperty.TEXT,
