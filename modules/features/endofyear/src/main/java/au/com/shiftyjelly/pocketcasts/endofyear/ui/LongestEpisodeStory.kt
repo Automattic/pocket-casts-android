@@ -1,19 +1,35 @@
 package au.com.shiftyjelly.pocketcasts.endofyear.ui
 
+import androidx.compose.animation.core.FastOutSlowInEasing
+import androidx.compose.animation.core.LinearEasing
+import androidx.compose.animation.core.animateFloat
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.core.updateTransition
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.requiredSize
+import androidx.compose.foundation.layout.size
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.scale
+import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.stringResource
@@ -21,6 +37,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.min
 import androidx.compose.ui.unit.sp
 import au.com.shiftyjelly.pocketcasts.compose.Devices
 import au.com.shiftyjelly.pocketcasts.compose.components.PodcastImage
@@ -33,11 +50,12 @@ import au.com.shiftyjelly.pocketcasts.models.to.LongestEpisode
 import au.com.shiftyjelly.pocketcasts.models.to.Story
 import com.airbnb.lottie.compose.LottieAnimation
 import com.airbnb.lottie.compose.LottieCompositionSpec
+import com.airbnb.lottie.compose.animateLottieCompositionAsState
 import com.airbnb.lottie.compose.rememberLottieComposition
 import dev.shreyaspatil.capturable.capturable
 import java.io.File
-import au.com.shiftyjelly.pocketcasts.localization.R as LR
 import au.com.shiftyjelly.pocketcasts.images.R as IR
+import au.com.shiftyjelly.pocketcasts.localization.R as LR
 import au.com.shiftyjelly.pocketcasts.ui.R as UR
 
 @OptIn(ExperimentalComposeUiApi::class)
@@ -48,25 +66,34 @@ internal fun LongestEpisodeStory(
     controller: StoryCaptureController,
     onShareStory: (File) -> Unit,
 ) {
-    Column(
+    BoxWithConstraints(
         modifier = Modifier
             .capturable(controller.captureController(story))
             .fillMaxSize()
             .background(story.backgroundColor)
             .padding(top = measurements.closeButtonBottomEdge),
-        horizontalAlignment = Alignment.CenterHorizontally,
     ) {
+        val animationContainerSize = min(maxWidth, maxHeight)
         Header(
             story = story,
             measurements = measurements,
+            modifier = Modifier
+                .fillMaxWidth()
+                .height((maxHeight - animationContainerSize.times(1.3f)) / 2)
+                .align(Alignment.TopCenter),
         )
         Content(
             story = story,
-            measurements = measurements,
             forceCoversVisible = controller.isSharing,
-            modifier = Modifier.weight(1f),
+            modifier = Modifier
+                .size(animationContainerSize)
+                .align(Alignment.Center),
         )
         Footer(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height((maxHeight - animationContainerSize.times(1.3f)) / 2)
+                .align(Alignment.BottomCenter),
             story = story,
             controller = controller,
             onShareStory = onShareStory,
@@ -79,39 +106,81 @@ internal fun LongestEpisodeStory(
 @Composable
 private fun Content(
     story: Story.LongestEpisode,
-    measurements: EndOfYearMeasurements,
     forceCoversVisible: Boolean,
     modifier: Modifier = Modifier,
+) = Box(
+    modifier = modifier,
+    contentAlignment = Alignment.Center,
 ) {
-    Box(
-        contentAlignment = Alignment.Center,
-        modifier = modifier.fillMaxWidth(),
-    ) {
-        val composition by rememberLottieComposition(
-            spec = LottieCompositionSpec.RawRes(IR.raw.playback_longest_episode_lottie)
-        )
-        LottieAnimation(
-            composition = composition,
-            modifier = Modifier.fillMaxWidth(),
-        )
+    val composition by rememberLottieComposition(
+        spec = LottieCompositionSpec.RawRes(IR.raw.playback_longest_episode_lottie),
+    )
+    val progress by animateLottieCompositionAsState(
+        composition = composition,
+        iterations = Integer.MAX_VALUE
+    )
+    val isPlaying = progress > 0f
 
-        PodcastImage(
-            uuid = story.episode.podcastId,
-            elevation = 0.dp,
-            cornerSize = 4.dp,
-            imageSize = 196.dp,
-            modifier = modifier,
-        )
+    LottieAnimation(
+        composition = composition,
+        progress = { progress },
+        modifier = Modifier
+            .matchParentSize(),
+        contentScale = ContentScale.FillWidth,
+    )
+    var artworkTrigger by remember { mutableStateOf(false) }
+    LaunchedEffect(isPlaying) {
+        artworkTrigger = isPlaying
     }
+
+    val artworkTransition = updateTransition(artworkTrigger, "artwork transition")
+    val scaleAnimation by artworkTransition.animateFloat(
+        transitionSpec = {
+            tween(durationMillis = 500, easing = FastOutSlowInEasing)
+        },
+    ) {
+        if (it) {
+            1f
+        } else {
+            1.1f
+        }
+    }
+    val alphaAnimation by artworkTransition.animateFloat(
+        transitionSpec = {
+            tween(durationMillis = 100, easing = LinearEasing)
+        },
+    ) {
+        if (it) {
+            1f
+        } else {
+            0f
+        }
+    }
+
+    PodcastImage(
+        uuid = story.episode.podcastId,
+        elevation = 0.dp,
+        cornerSize = 4.dp,
+        modifier = Modifier
+            .requiredSize(196.dp)
+            .scale(scaleAnimation)
+            .offset(y = -60.dp)
+            .graphicsLayer {
+                alpha = alphaAnimation
+            },
+    )
 }
 
 @Composable
 private fun Header(
     story: Story.LongestEpisode,
     measurements: EndOfYearMeasurements,
+    modifier: Modifier = Modifier,
 ) {
     Column(
+        modifier = modifier,
         horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Center,
     ) {
         val context = LocalContext.current
         TextH10(
@@ -153,22 +222,29 @@ private fun Footer(
     controller: StoryCaptureController,
     onShareStory: (File) -> Unit,
     measurements: EndOfYearMeasurements,
+    modifier: Modifier = Modifier,
 ) {
-    TextP40(
-        text = stringResource(LR.string.end_of_year_story_longest_episode_share_text, story.episode.episodeTitle, story.episode.podcastTitle),
-        textAlign = TextAlign.Center,
-        disableAutoScale = true,
-        fontScale = measurements.smallDeviceFactor,
-        fontWeight = FontWeight.W500,
-        color = colorResource(UR.color.white),
-        modifier = Modifier.padding(horizontal = 24.dp),
-    )
-    ShareStoryButton(
-        modifier = Modifier.padding(bottom = 18.dp),
-        story = story,
-        controller = controller,
-        onShare = onShareStory,
-    )
+    Column(
+        modifier = modifier,
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.SpaceAround,
+    ) {
+        TextP40(
+            text = stringResource(LR.string.end_of_year_story_longest_episode_share_text, story.episode.episodeTitle, story.episode.podcastTitle),
+            textAlign = TextAlign.Center,
+            disableAutoScale = true,
+            fontScale = measurements.smallDeviceFactor,
+            fontWeight = FontWeight.W500,
+            color = colorResource(UR.color.white),
+            modifier = Modifier.padding(horizontal = 24.dp),
+        )
+        ShareStoryButton(
+            modifier = Modifier.padding(bottom = 18.dp),
+            story = story,
+            controller = controller,
+            onShare = onShareStory,
+        )
+    }
 }
 
 @Preview(device = Devices.PORTRAIT_REGULAR)
