@@ -4,6 +4,8 @@ class ChainedExceptionHandler(
     val handlers: List<Thread.UncaughtExceptionHandler>,
 ) : Thread.UncaughtExceptionHandler {
     override fun uncaughtException(thread: Thread, throwable: Throwable) {
-        handlers.forEach { handler -> handler.uncaughtException(thread, throwable) }
+        handlers.forEach { handler ->
+            runCatching { handler.uncaughtException(thread, throwable) }
+        }
     }
 }
