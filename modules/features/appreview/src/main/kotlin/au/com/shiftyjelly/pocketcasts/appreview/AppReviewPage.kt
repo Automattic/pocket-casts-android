@@ -1,5 +1,9 @@
 package au.com.shiftyjelly.pocketcasts.appreview
 
+import androidx.annotation.RawRes
+import androidx.compose.animation.core.LinearEasing
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -14,9 +18,13 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.LocalRippleConfiguration
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.RippleConfiguration
-import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -32,10 +40,13 @@ import androidx.compose.ui.unit.dp
 import au.com.shiftyjelly.pocketcasts.compose.AppThemeWithBackground
 import au.com.shiftyjelly.pocketcasts.compose.components.TextH30
 import au.com.shiftyjelly.pocketcasts.compose.components.TextH50
-import au.com.shiftyjelly.pocketcasts.compose.extensions.nonScaledSp
 import au.com.shiftyjelly.pocketcasts.compose.preview.ThemePreviewParameterProvider
 import au.com.shiftyjelly.pocketcasts.compose.theme
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
+import com.airbnb.lottie.compose.LottieAnimation
+import com.airbnb.lottie.compose.LottieCompositionSpec
+import com.airbnb.lottie.compose.rememberLottieComposition
+import kotlinx.coroutines.delay
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 @Composable
@@ -90,13 +101,25 @@ private fun EmojiButtons(
     Row(
         modifier = modifier.fillMaxWidth(),
     ) {
+        var isAnimationRunning by remember { mutableStateOf(false) }
+        val animationProgress by animateFloatAsState(
+            // Animating to the very start and end makes images not visible
+            targetValue = if (isAnimationRunning) 0.99f else 0.01f,
+            animationSpec = tween(durationMillis = 3000, easing = LinearEasing),
+        )
+        LaunchedEffect(Unit) {
+            delay(450)
+            isAnimationRunning = true
+        }
+
         Box(
             contentAlignment = Alignment.Center,
             modifier = Modifier.weight(1f),
         ) {
             EmojiButton(
-                emoji = "\uD83D\uDE14",
+                emojiId = R.raw.app_review_no_animation,
                 text = stringResource(LR.string.app_rating_no_label),
+                animationProgress = animationProgress,
                 onClick = onClickNotReally,
             )
         }
@@ -105,8 +128,9 @@ private fun EmojiButtons(
             modifier = Modifier.weight(1f),
         ) {
             EmojiButton(
-                emoji = "\uD83E\uDD70",
+                emojiId = R.raw.app_review_yes_animation,
                 text = stringResource(LR.string.app_rating_yes_label),
+                animationProgress = animationProgress,
                 onClick = onClickYes,
             )
         }
@@ -115,8 +139,9 @@ private fun EmojiButtons(
 
 @Composable
 private fun EmojiButton(
-    emoji: String,
+    @RawRes emojiId: Int,
     text: String,
+    animationProgress: Float,
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -134,9 +159,13 @@ private fun EmojiButton(
                 role = Role.Button
             },
     ) {
-        Text(
-            text = emoji,
-            fontSize = 68.nonScaledSp,
+        val lottieComposition by rememberLottieComposition(
+            spec = LottieCompositionSpec.RawRes(emojiId),
+        )
+        LottieAnimation(
+            composition = lottieComposition,
+            progress = { animationProgress },
+            modifier = Modifier.size(68.dp),
         )
         TextH30(
             text = text,

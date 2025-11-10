@@ -33,5 +33,6 @@ dependencies {
     implementation(libs.compose.ui.tooling.preview)
     implementation(libs.fragment.compose)
     implementation(libs.fragment.ktx)
+    implementation(libs.lottie.compose)
     implementation(libs.timber)
 }
