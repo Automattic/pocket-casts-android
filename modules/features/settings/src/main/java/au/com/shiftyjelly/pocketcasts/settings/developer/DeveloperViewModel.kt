@@ -13,6 +13,8 @@ import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.SuggestedFoldersManager
 import com.automattic.android.tracks.crashlogging.CrashLogging
+import com.google.android.play.core.ktx.requestReview
+import com.google.android.play.core.review.testing.FakeReviewManager
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import javax.inject.Inject
@@ -38,6 +40,7 @@ class DeveloperViewModel
     private val crashLogging: CrashLogging,
     private val appReviewManagerImpl: AppReviewManagerImpl,
 ) : ViewModel() {
+    private val reviewManager = FakeReviewManager(context)
 
     fun forceRefresh() {
         podcastManager.refreshPodcasts(fromLog = "dev")
@@ -182,7 +185,8 @@ class DeveloperViewModel
 
     fun showAppReviewPrompt() {
         viewModelScope.launch {
-            appReviewManagerImpl.triggerPrompt(AppReviewReason.DevelopmentTrigger)
+            val reviewInfo = reviewManager.requestReview()
+            appReviewManagerImpl.triggerPrompt(AppReviewReason.DevelopmentTrigger, reviewInfo)
         }
     }
 }

@@ -6,6 +6,8 @@ import au.com.shiftyjelly.pocketcasts.preferences.ReadWriteSetting
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.preferences.model.AppReviewReason
 import au.com.shiftyjelly.pocketcasts.sharedtest.MutableClock
+import com.google.android.play.core.ktx.requestReview
+import com.google.android.play.core.review.testing.FakeReviewManager
 import java.time.Clock
 import java.time.Instant
 import kotlin.time.Duration
@@ -24,10 +26,17 @@ import kotlinx.coroutines.yield
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Test
+import org.junit.runner.RunWith
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
+import org.robolectric.Robolectric
+import org.robolectric.RobolectricTestRunner
+import org.robolectric.RuntimeEnvironment
+import org.robolectric.annotation.Config
 
 @OptIn(ExperimentalCoroutinesApi::class)
+@Config(manifest = Config.NONE)
+@RunWith(RobolectricTestRunner::class)
 class AppReviewManagerTest {
     private val episodesCompletedSetting = TestSetting(emptyList<Instant>())
     private val episodeStarredSetting = TestSetting<Instant?>(null)
@@ -45,6 +54,8 @@ class AppReviewManagerTest {
     private val lastDeclineTimestampsSetting = TestSetting(emptyList<Instant>())
     private val errorSessionsSetting = TestSetting(emptyList<String>())
     private val crashTimestampSetting = TestSetting<Instant?>(null)
+
+    private val googleManager = FakeReviewManager(RuntimeEnvironment.getApplication())
 
     private val clock = MutableClock()
     private val loopIdleDuration = 1.seconds
@@ -70,6 +81,7 @@ class AppReviewManagerTest {
             on { appReviewErrorSessionIds } doReturn errorSessionsSetting
             on { appReviewCrashTimestamp } doReturn crashTimestampSetting
         },
+        googleManager = googleManager,
         loopIdleDuration = loopIdleDuration,
     )
 
@@ -204,7 +216,12 @@ class AppReviewManagerTest {
         backgroundScope.launch { manager.monitorAppReviewReasons() }
 
         testInLoop {
-            val trigger = launch { manager.triggerPrompt(AppReviewReason.DevelopmentTrigger) }
+            val trigger = launch {
+                manager.triggerPrompt(
+                    AppReviewReason.DevelopmentTrigger,
+                    googleManager.requestReview(),
+                )
+            }
             awaitSignalAndConsume()
             trigger.join()
 
