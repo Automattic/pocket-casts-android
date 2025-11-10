@@ -19,6 +19,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.drawWithContent
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
@@ -130,24 +131,23 @@ private fun PresentRatings(
             contentAlignment = Alignment.BottomCenter,
             modifier = Modifier
                 .fillMaxWidth()
-                .weight(1f),
+                .weight(1f)
+                .drawWithContent {
+                    drawContent()
+                    drawRect(
+                        brush = Brush.verticalGradient(
+                            colors = listOf(Color.Transparent, story.backgroundColor),
+                            startY = size.height - 64.dp.toPx(),
+                            endY = size.height
+                        )
+                    )
+                },
         ) {
             RatingBars(
                 stats = story.stats,
                 forceBarsVisible = controller.isSharing,
                 modifier = Modifier
                     .fillMaxSize(),
-            )
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(64.dp)
-                    .background(
-                        brush = Brush.verticalGradient(
-                            0f to Color.Transparent,
-                            1f to story.backgroundColor,
-                        ),
-                    ),
             )
             ShareStoryButton(
                 story = story,
