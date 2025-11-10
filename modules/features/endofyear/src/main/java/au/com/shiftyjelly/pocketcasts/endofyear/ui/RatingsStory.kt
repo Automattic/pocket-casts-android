@@ -43,7 +43,7 @@ import com.airbnb.lottie.compose.rememberLottieDynamicProperties
 import com.airbnb.lottie.compose.rememberLottieDynamicProperty
 import dev.shreyaspatil.capturable.capturable
 import java.io.File
-import kotlin.math.max
+import kotlin.math.roundToInt
 import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 import au.com.shiftyjelly.pocketcasts.ui.R as UR
@@ -157,7 +157,7 @@ private fun RatingBars(
         Rating.entries.forEach { rating ->
             AnimatedRatingBar(
                 rating = rating.numericalValue,
-                heightRange = (stats.relativeToMax(rating) * 10).toInt(),
+                heightRange = (stats.relativeToMax(rating) * 10).roundToInt(),
                 forceBarVisible = forceBarsVisible,
             )
         }
@@ -180,7 +180,7 @@ private fun RowScope.AnimatedRatingBar(
 
     composition?.let { comp ->
         val markerIndex = comp.markers.size - heightRange
-        val targetMarker = comp.markers.find { it.name == "marker_$markerIndex" } ?: comp.markers.lastOrNull()
+        val targetMarker = comp.markers.find { it.name == "marker_$markerIndex" } ?: comp.markers.firstOrNull()
 
         LaunchedEffect(targetMarker, animatable) {
             val clipSpec = if (targetMarker == null) {
