@@ -95,15 +95,11 @@ private fun BoxScope.YearVsYearAnimation(
     }
     // the lottie animations use the Inter font, for the text to load we need to provide a replacement font or it doesn't show
     val fontMap = remember {
-        try {
-            mapOf(
-                "Inter-Regular" to Typeface.create("sans-serif", Typeface.NORMAL),
-                "Inter" to Typeface.create("sans-serif", Typeface.NORMAL),
-            )
-        } catch (e: Exception) {
-            Timber.e(e, "Failed to load font for Lottie animation")
-            emptyMap()
+        runCatching {
+            mapOf("Inter" to Typeface.create(Typeface.DEFAULT, Typeface.BOLD))
         }
+            .onFailure { e -> Timber.e(e, "Failed to load font for Lottie animation") }
+            .getOrElse { emptyMap() }
     }
     val lastYearHours = story.lastYearDuration.inWholeHours
     val thisYearHours = story.thisYearDuration.inWholeHours
