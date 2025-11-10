@@ -168,10 +168,14 @@
     <string name="on">On</string>
     <string name="expanded">Expanded</string>
     <string name="collapsed">Collapsed</string>
+    <string name="database">Database</string>
     <string name="details">Details</string>
     <string name="episode">Episode</string>
     <string name="episodes">Episodes</string>
     <string name="none">None</string>
+    <string name="normalized">Normalized</string>
+    <string name="not_normalized">Not normalized</string>
+    <string name="normalization_started">Normalization started</string>
     <string name="expand_details">Expand details</string>
     <string name="add_podcasts">Add Podcasts</string>
     <string name="please_try_again">Please try again</string>
@@ -1653,6 +1657,8 @@
     <string name="settings_storage_store_on">Store podcasts on</string>
     <string name="settings_storage_fix_downloads">Fix downloads</string>
     <string name="settings_storage_fix_downloads_description">Attempt to restore any downloaded files if they are missing in the Pocket Casts app.</string>
+    <string name="settings_storage_normalize_episode_titles">Normalize episode titles</string>
+    <string name="settings_storage_normalize_episode_titles_description">Status: %1$s\nSome parts of the app use an episode search that requires normalized titles. Tapping this setting runs database normalization if the episodes aren\'t normalized already.</string>
     <string name="settings_subscribe_to_played">Follow played podcasts</string>
     <string name="settings_show_played">Show played episodes</string>
     <string name="settings_show_played_summary">Episodes that you have finished playing will still be displayed</string>

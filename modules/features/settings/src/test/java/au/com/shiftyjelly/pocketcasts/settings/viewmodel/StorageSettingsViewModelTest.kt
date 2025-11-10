@@ -2,6 +2,7 @@ package au.com.shiftyjelly.pocketcasts.settings.viewmodel
 
 import android.content.Context
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
+import au.com.shiftyjelly.pocketcasts.models.db.dao.EpisodeDao
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.preferences.UserSetting
 import au.com.shiftyjelly.pocketcasts.repositories.file.FileStorage
@@ -16,6 +17,7 @@ import junit.framework.TestCase.assertEquals
 import junit.framework.TestCase.assertFalse
 import junit.framework.TestCase.assertTrue
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
@@ -46,6 +48,9 @@ class StorageSettingsViewModelTest {
     private lateinit var episodeManager: EpisodeManager
 
     @Mock
+    private lateinit var episodeDao: EpisodeDao
+
+    @Mock
     private lateinit var fileStorage: FileStorage
 
     @Mock
@@ -74,9 +79,11 @@ class StorageSettingsViewModelTest {
         whenever(settings.backgroundRefreshPodcasts).thenReturn(UserSetting.Mock(true, mock()))
         whenever(settings.warnOnMeteredNetwork).thenReturn(UserSetting.Mock(true, mock()))
         whenever(episodeManager.findDownloadedEpisodesRxFlowable()).thenReturn(Flowable.empty())
+        whenever(episodeDao.hasNormalizedEpisodeTitles(any())).thenReturn(flowOf(true))
         viewModel = StorageSettingsViewModel(
             episodeManager,
             fileStorage,
+            episodeDao,
             fileUtil,
             settings,
             analyticsTracker,
