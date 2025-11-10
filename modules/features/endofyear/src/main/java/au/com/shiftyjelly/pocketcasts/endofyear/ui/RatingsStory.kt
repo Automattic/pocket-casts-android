@@ -2,6 +2,7 @@ package au.com.shiftyjelly.pocketcasts.endofyear.ui
 
 import android.graphics.Typeface
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -19,6 +20,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.toArgb
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalInspectionMode
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.stringResource
@@ -149,16 +151,19 @@ private fun RatingBars(
     stats: RatingStats,
     forceBarsVisible: Boolean,
     modifier: Modifier = Modifier,
+    arrangement: Arrangement.Horizontal? = null
 ) {
     Row(
         verticalAlignment = Alignment.Bottom,
         modifier = modifier,
+        horizontalArrangement = arrangement ?: Arrangement.Start
     ) {
         Rating.entries.forEach { rating ->
             AnimatedRatingBar(
                 rating = rating.numericalValue,
                 heightRange = (stats.relativeToMax(rating) * 10).roundToInt(),
                 forceBarVisible = forceBarsVisible,
+                contentScale = arrangement?.let { ContentScale.FillBounds }
             )
         }
     }
@@ -169,6 +174,7 @@ private fun RowScope.AnimatedRatingBar(
     rating: Int,
     heightRange: Int,
     forceBarVisible: Boolean,
+    contentScale: ContentScale?,
 ) {
     val composition by rememberLottieComposition(
         spec = LottieCompositionSpec.RawRes(IR.raw.playback_story_ratings_pillar_lottie)
@@ -221,6 +227,7 @@ private fun RowScope.AnimatedRatingBar(
         composition = composition,
         progress = { animatable.progress },
         dynamicProperties = dynamicProperties,
+        contentScale = contentScale ?: ContentScale.Fit,
         fontMap = remember {
             mapOf(
                 "Inter-Regular" to Typeface.create("sans-serif", Typeface.NORMAL)
@@ -271,6 +278,7 @@ private fun AbsentRatings(
                 .weight(1f),
             stats = story.stats,
             forceBarsVisible = false,
+            arrangement = Arrangement.spacedBy(1.dp)
         )
         Spacer(
             modifier = Modifier.height(16.dp),
