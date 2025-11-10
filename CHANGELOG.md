@@ -3,8 +3,6 @@
 *   New Features
     *   Add support for Manual Playlists and rebrand Filters as Smart Playlists
         ([#4711](https://github.com/Automattic/pocket-casts-android/pull/4670))
-    *   Add new intro story for playback
-        ([#4670](https://github.com/Automattic/pocket-casts-android/pull/4670))
 *   Bug Fixes
     *   Fix podcasts drag & drop swapping podcasts' positions
         ([#4699](https://github.com/Automattic/pocket-casts-android/pull/4699))
