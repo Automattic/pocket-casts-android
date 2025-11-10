@@ -108,29 +108,19 @@ platform :android do
     ensure_git_status_clean
     Fastlane::Helper::GitHelper.checkout_and_pull(DEFAULT_BRANCH)
 
-    # Use provided version from release tool, or fall back to computed version
-    computed_version = release_version_next
-    new_version = version || computed_version
-
-    # Fail if provided version differs from computed version
-    if version && version != computed_version
-      error_message = <<~ERROR
-        ❌ Version mismatch detected!
-
-        The explicitly-provided version from the release tool is '#{version}' but the computed version from the codebase is '#{computed_version}'.
-
-        This mismatch must be resolved before proceeding with the code freeze. Please investigate and ensure the versions are aligned.
-      ERROR
-      buildkite_annotate(style: 'error', context: 'code-freeze-version-mismatch', message: error_message) if is_ci
-      UI.user_error!(error_message)
-    end
+    # If a new version is passed, use it as source of truth from now on
+    new_version = version || release_version_next
+    release_branch_name = "release/#{new_version}"
+    new_beta_version = beta_version_next(version_name: new_version)
+    new_build_code = build_code_next
 
     confirmation_message = <<-MESSAGE
 
       Code Freeze:
-      • New release branch from #{DEFAULT_BRANCH}: release/#{new_version}
+      • New release branch from #{DEFAULT_BRANCH}: #{release_branch_name}
+
       • Current release version and build code: #{release_version_current} (#{build_code_current}).
-      • New release version and build code: #{beta_version_code_freeze} (#{build_code_next}).
+      • New release version and build code: #{new_beta_version} (#{new_build_code}).
 
     MESSAGE
 
@@ -138,16 +128,17 @@ platform :android do
     UI.user_error!("Terminating as requested. Don't forget to run the remainder of this automation manually.") unless skip_confirm || UI.confirm('Do you want to continue?')
 
     # Create the release branch
+    ensure_branch_does_not_exist!(release_branch_name)
+
     UI.message('Creating release branch...')
-    release_branch_name = "release/#{new_version}"
     Fastlane::Helper::GitHelper.create_branch(release_branch_name, from: DEFAULT_BRANCH)
     UI.success("Done! New release branch is: #{git_branch}")
 
     # Bump the version and build code
     UI.message('Bumping beta version and build code...')
     VERSION_FILE.write_version(
-      version_name: beta_version_code_freeze,
-      version_code: build_code_next
+      version_name: new_beta_version,
+      version_code: new_build_code
     )
     commit_version_bump
     UI.success("Done! New Beta Version: #{beta_version_current}. New Build Code: #{build_code_current}")
@@ -266,15 +257,16 @@ platform :android do
     parsed_version = VERSION_FORMATTER.parse(new_version)
     previous_version = VERSION_FORMATTER.release_version(VERSION_CALCULATOR.previous_patch_version(version: parsed_version))
 
+    release_branch_name = "release/#{new_version}"
+
     # Check versions
     message = <<-MESSAGE
+      New hotfix branch from tag #{previous_version}: #{release_branch_name}
 
       New hotfix version: #{new_version}
 
       Current build code: #{build_code_current}
       New build code: #{new_version_code}
-
-      Branching from tag: #{previous_version}
 
     MESSAGE
 
@@ -287,7 +279,7 @@ platform :android do
 
     # Create the hotfix branch
     UI.message('Creating hotfix branch...')
-    Fastlane::Helper::GitHelper.create_branch("release/#{new_version}", from: previous_version)
+    Fastlane::Helper::GitHelper.create_branch(release_branch_name, from: previous_version)
     UI.success("Done! New hotfix branch is: #{git_branch}")
 
     # Bump the hotfix version and build code and write it to the `version.properties` file
@@ -864,25 +856,12 @@ platform :android do
     VERSION_FORMATTER.beta_version(current_version)
   end
 
-  # Returns the beta version that is used by the code freeze
-  # It first increments the minor number, which also resets the build number to 0
-  # It then bumps the build number so the -rc-1 can be appended to the code freeze version
-  def beta_version_code_freeze
-    # Read the current release version from the version.properties file and parse it into an AppVersion object
-    current_version = VERSION_FORMATTER.parse(version_name_current)
-    # Calculate the next major version number
-    next_version = VERSION_CALCULATOR.next_release_version(version: current_version)
-    # Calculate the next build number
-    beta_version_code_freeze = VERSION_CALCULATOR.next_build_number(version: next_version)
-    # Return the formatted release version
-    VERSION_FORMATTER.beta_version(beta_version_code_freeze)
-  end
-
   # Returns the beta version of the app in the format `1.2-rc-1`
   #
-  def beta_version_next
+  def beta_version_next(version_name: nil)
+    version_name ||= version_name_current
     # Read the current release version from `version.properties` and parse it into an AppVersion object
-    current_version = VERSION_FORMATTER.parse(version_name_current)
+    current_version = VERSION_FORMATTER.parse(version_name)
     # Calculate the next beta version
     beta_version_next = VERSION_CALCULATOR.next_build_number(version: current_version)
     # Return the formatted release version
@@ -939,5 +918,16 @@ platform :android do
     else
       is_beta ? PLAY_STORE_TRACK_BETA : PLAY_STORE_TRACK_PRODUCTION
     end
+  end
+
+  def ensure_branch_does_not_exist!(branch_name)
+    return unless Fastlane::Helper::GitHelper.branch_exists_on_remote?(branch_name: branch_name)
+
+    error_message = "The branch `#{branch_name}` already exists. Please check first if there is an existing Pull Request that needs to be merged or closed first, " \
+                    'or delete the branch to then run again the release task.'
+
+    buildkite_annotate(style: 'error', context: 'error-checking-branch', message: error_message) if is_ci
+
+    UI.user_error!(error_message)
   end
 end
