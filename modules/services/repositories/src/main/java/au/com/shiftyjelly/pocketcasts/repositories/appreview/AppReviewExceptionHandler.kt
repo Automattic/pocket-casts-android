@@ -10,7 +10,7 @@ class AppReviewExceptionHandler @Inject constructor(
 ) : Thread.UncaughtExceptionHandler {
     override fun uncaughtException(t: Thread, e: Throwable) {
         runCatching {
-            settings.appReviewCrashTimestamp.set(clock.instant(), updateModifiedAt = false)
+            settings.appReviewCrashTimestamp.set(clock.instant(), updateModifiedAt = false, commit = true)
         }
     }
 }
