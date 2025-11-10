@@ -136,7 +136,7 @@ private fun PresentRatings(
                 stats = story.stats,
                 forceBarsVisible = controller.isSharing,
                 modifier = Modifier
-                    .fillMaxSize()
+                    .fillMaxSize(),
             )
             Box(
                 modifier = Modifier
@@ -145,15 +145,15 @@ private fun PresentRatings(
                     .background(
                         brush = Brush.verticalGradient(
                             0f to Color.Transparent,
-                            0.9f to story.backgroundColor,
+                            1f to story.backgroundColor,
                         ),
-                    )
+                    ),
             )
             ShareStoryButton(
                 story = story,
                 controller = controller,
                 onShare = onShareStory,
-                modifier = Modifier.padding(bottom = 18.dp)
+                modifier = Modifier.padding(bottom = 18.dp),
             )
         }
     }
@@ -164,12 +164,12 @@ private fun RatingBars(
     stats: RatingStats,
     forceBarsVisible: Boolean,
     modifier: Modifier = Modifier,
-    arrangement: Arrangement.Horizontal? = null
+    arrangement: Arrangement.Horizontal? = null,
 ) {
     Row(
         verticalAlignment = Alignment.Bottom,
         modifier = modifier,
-        horizontalArrangement = arrangement ?: Arrangement.Start
+        horizontalArrangement = arrangement ?: Arrangement.Start,
     ) {
         val shouldNormalize = stats.count() > 0
         Rating.entries.forEach { rating ->
@@ -178,9 +178,11 @@ private fun RatingBars(
                 rating = rating.numericalValue,
                 heightRange = if (shouldNormalize) {
                     barRange.coerceIn(1, 10)
-                } else barRange,
+                } else {
+                    barRange
+                },
                 forceBarVisible = forceBarsVisible,
-                contentScale = arrangement?.let { ContentScale.FillBounds }
+                contentScale = arrangement?.let { ContentScale.FillBounds },
             )
         }
     }
@@ -194,7 +196,7 @@ private fun RowScope.AnimatedRatingBar(
     contentScale: ContentScale?,
 ) {
     val composition by rememberLottieComposition(
-        spec = LottieCompositionSpec.RawRes(IR.raw.playback_story_ratings_pillar_lottie)
+        spec = LottieCompositionSpec.RawRes(IR.raw.playback_story_ratings_pillar_lottie),
     )
 
     val animatable = rememberLottieAnimatable()
@@ -205,7 +207,7 @@ private fun RowScope.AnimatedRatingBar(
         val markerIndex = comp.markers.size - heightRange
         val targetMarker = comp.markers.find { it.name == "marker_$markerIndex" } ?: comp.markers.firstOrNull()
 
-        LaunchedEffect(targetMarker, animatable) {
+        LaunchedEffect(targetMarker) {
             val clipSpec = if (targetMarker == null) {
                 LottieClipSpec.Frame(min = 0, max = 1)
             } else {
@@ -214,11 +216,11 @@ private fun RowScope.AnimatedRatingBar(
 
             animatable.animate(
                 composition = composition,
-                clipSpec = clipSpec
+                clipSpec = clipSpec,
             )
         }
 
-        LaunchedEffect(freezeBar, targetMarker, animatable) {
+        LaunchedEffect(freezeBar, targetMarker) {
             if (freezeBar && targetMarker != null) {
                 val endProgress = (targetMarker.startFrame + targetMarker.durationFrames) / comp.durationFrames
                 animatable.snapTo(comp, endProgress)
@@ -235,8 +237,8 @@ private fun RowScope.AnimatedRatingBar(
         rememberLottieDynamicProperty(
             property = LottieProperty.COLOR,
             value = colorResource(UR.color.white).toArgb(),
-            "main number"
-        )
+            "main number",
+        ),
     )
 
     LottieAnimation(
@@ -247,7 +249,7 @@ private fun RowScope.AnimatedRatingBar(
         contentScale = contentScale ?: ContentScale.Fit,
         fontMap = remember {
             mapOf(
-                "Inter-Regular" to Typeface.create("sans-serif", Typeface.NORMAL)
+                "Inter-Regular" to Typeface.create("sans-serif", Typeface.NORMAL),
             )
         },
     )
@@ -255,10 +257,10 @@ private fun RowScope.AnimatedRatingBar(
 
 @Composable
 private fun AbsentRatings(
-    modifier: Modifier = Modifier,
     story: Story.Ratings,
     measurements: EndOfYearMeasurements,
     onLearnAboutRatings: () -> Unit,
+    modifier: Modifier = Modifier,
 ) {
     Column(
         modifier = modifier,
@@ -295,7 +297,7 @@ private fun AbsentRatings(
                 .weight(1f),
             stats = story.stats,
             forceBarsVisible = false,
-            arrangement = Arrangement.spacedBy(1.dp)
+            arrangement = Arrangement.spacedBy(1.dp),
         )
         Spacer(
             modifier = Modifier.height(16.dp),
@@ -304,7 +306,7 @@ private fun AbsentRatings(
             text = stringResource(LR.string.eoy_story_ratings_learn_button_label),
             onClick = onLearnAboutRatings,
             backgroundColor = colorResource(UR.color.white),
-            textColor = colorResource(UR.color.black)
+            textColor = colorResource(UR.color.black),
         )
         Spacer(
             modifier = Modifier.height(18.dp),
