@@ -19,6 +19,8 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalInspectionMode
@@ -60,7 +62,7 @@ internal fun RatingsStory(
     onLearnAboutRatings: () -> Unit,
 ) {
     val maxRatingCount = story.stats.max().second
-    val modifier =  Modifier
+    val modifier = Modifier
         .fillMaxSize()
         .background(story.backgroundColor)
         .padding(top = measurements.closeButtonBottomEdge + 20.dp)
@@ -135,6 +137,17 @@ private fun PresentRatings(
                 forceBarsVisible = controller.isSharing,
                 modifier = Modifier
                     .fillMaxSize()
+            )
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(64.dp)
+                    .background(
+                        brush = Brush.verticalGradient(
+                            0f to Color.Transparent,
+                            0.9f to story.backgroundColor,
+                        ),
+                    )
             )
             ShareStoryButton(
                 story = story,
