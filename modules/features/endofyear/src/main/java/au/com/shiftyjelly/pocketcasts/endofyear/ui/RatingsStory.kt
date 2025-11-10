@@ -179,12 +179,8 @@ private fun RowScope.AnimatedRatingBar(
     val freezeBar = forceBarVisible || isPreview
 
     composition?.let { comp ->
-        val targetMarker = if (heightRange > 0) {
-            val markerIndex = max(1, comp.markers.size - heightRange)
-            comp.markers.find { it.name == "marker_$markerIndex" } ?: comp.markers.lastOrNull()
-        } else {
-            null
-        }
+        val markerIndex = comp.markers.size - heightRange
+        val targetMarker = comp.markers.find { it.name == "marker_$markerIndex" } ?: comp.markers.lastOrNull()
 
         LaunchedEffect(targetMarker, animatable) {
             val clipSpec = if (targetMarker == null) {
