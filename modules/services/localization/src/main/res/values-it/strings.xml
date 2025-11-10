@@ -655,7 +655,6 @@ Language: it
     <string name="end_of_year_stories_theres_more">E c\'è di più.</string>
     <string name="eoy_year_over_year_title_skyrocketed">Rispetto al 2022, il tuo tempo di ascolto è salito alle stelle.</string>
     <string name="end_of_year_stories_year_completion_rate">tasso di completamento</string>
-    <string name="end_of_year_stories_year_completion_rate_title">Il tuo tasso di completamento quest\'anno è stato: %1$d%%</string>
     <string name="end_of_year_stories_year_over_share_text">Il mio tempo di ascolto nel %1$d rispetto al %2$d</string>
     <string name="end_of_year_stories_year_completion_rate_title">Il tuo tasso di completamento è stato %1$d%%</string>
     <string name="end_of_year_prompt_card_summary">Visualizza le statistiche di ascolto, i migliori podcast e molto altro ancora.</string>

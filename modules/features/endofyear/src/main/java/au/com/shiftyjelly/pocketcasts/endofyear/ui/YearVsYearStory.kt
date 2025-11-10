@@ -1,5 +1,6 @@
 package au.com.shiftyjelly.pocketcasts.endofyear.ui
 
+import android.graphics.Typeface
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxScope
@@ -8,10 +9,12 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
@@ -25,13 +28,17 @@ import au.com.shiftyjelly.pocketcasts.models.to.Story
 import au.com.shiftyjelly.pocketcasts.models.to.Story.YearVsYear.Trend
 import au.com.shiftyjelly.pocketcasts.payment.SubscriptionTier
 import au.com.shiftyjelly.pocketcasts.repositories.endofyear.EndOfYearManager
+import com.airbnb.lottie.LottieProperty
 import com.airbnb.lottie.compose.LottieAnimation
 import com.airbnb.lottie.compose.LottieCompositionSpec
 import com.airbnb.lottie.compose.rememberLottieComposition
+import com.airbnb.lottie.compose.rememberLottieDynamicProperties
+import com.airbnb.lottie.compose.rememberLottieDynamicProperty
 import dev.shreyaspatil.capturable.capturable
 import java.io.File
 import kotlin.math.roundToInt
 import kotlin.time.Duration.Companion.hours
+import timber.log.Timber
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 @OptIn(ExperimentalComposeUiApi::class)
@@ -55,6 +62,7 @@ internal fun YearVsYearStory(
             YearVsYearAnimation(
                 trend = story.trend,
                 isSharing = controller.isSharing,
+                story = story,
             )
 
             TextInfo(
@@ -77,6 +85,7 @@ internal fun YearVsYearStory(
 private fun BoxScope.YearVsYearAnimation(
     trend: Trend,
     isSharing: Boolean,
+    story: Story.YearVsYear,
 ) {
     val animationId = when (trend) {
         Trend.Same -> R.raw.playback_year_vs_year_same_lottie
@@ -84,7 +93,34 @@ private fun BoxScope.YearVsYearAnimation(
         Trend.Up -> R.raw.playback_year_vs_year_up_lottie
         Trend.UpALot -> R.raw.playback_year_vs_year_up_a_lot_lottie
     }
-
+    // the lottie animations use the Inter font, for the text to load we need to provide a replacement font or it doesn't show
+    val fontMap = remember {
+        try {
+            mapOf(
+                "Inter-Regular" to Typeface.create("sans-serif", Typeface.NORMAL),
+                "Inter" to Typeface.create("sans-serif", Typeface.NORMAL),
+            )
+        } catch (e: Exception) {
+            Timber.e(e, "Failed to load font for Lottie animation")
+            emptyMap()
+        }
+    }
+    val lastYearHours = story.lastYearDuration.inWholeHours
+    val thisYearHours = story.thisYearDuration.inWholeHours
+    val lastYearText = lastYearHours.toString() + " " + pluralStringResource(id = LR.plurals.hour, count = lastYearHours.toInt())
+    val thisYearText = thisYearHours.toString() + " " + pluralStringResource(id = LR.plurals.hour, count = thisYearHours.toInt())
+    val dynamicProperties = rememberLottieDynamicProperties(
+        rememberLottieDynamicProperty(
+            property = LottieProperty.TEXT,
+            value = lastYearText,
+            keyPath = arrayOf("hours_2024"),
+        ),
+        rememberLottieDynamicProperty(
+            property = LottieProperty.TEXT,
+            value = thisYearText,
+            keyPath = arrayOf("hours_2025"),
+        ),
+    )
     val composition by rememberLottieComposition(
         spec = LottieCompositionSpec.RawRes(animationId),
         imageAssetsFolder = "lottie-images",
@@ -95,6 +131,8 @@ private fun BoxScope.YearVsYearAnimation(
             composition = composition,
             alignment = Alignment.BottomCenter,
             progress = { 1f },
+            fontMap = fontMap,
+            dynamicProperties = dynamicProperties,
             modifier = Modifier
                 .align(Alignment.BottomCenter)
                 .fillMaxWidth(),
@@ -105,6 +143,8 @@ private fun BoxScope.YearVsYearAnimation(
             composition = composition,
             applyOpacityToLayers = true,
             alignment = Alignment.BottomCenter,
+            fontMap = fontMap,
+            dynamicProperties = dynamicProperties,
             modifier = Modifier
                 .align(Alignment.BottomCenter)
                 .fillMaxWidth(),
