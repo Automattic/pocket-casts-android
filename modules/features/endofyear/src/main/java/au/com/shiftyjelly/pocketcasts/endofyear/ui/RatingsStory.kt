@@ -48,6 +48,7 @@ import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 import au.com.shiftyjelly.pocketcasts.ui.R as UR
 
+@OptIn(ExperimentalComposeUiApi::class)
 @Composable
 internal fun RatingsStory(
     story: Story.Ratings,
@@ -57,8 +58,15 @@ internal fun RatingsStory(
     onLearnAboutRatings: () -> Unit,
 ) {
     val maxRatingCount = story.stats.max().second
+    val modifier =  Modifier
+        .fillMaxSize()
+        .background(story.backgroundColor)
+        .padding(top = measurements.closeButtonBottomEdge + 20.dp)
     if (maxRatingCount != 0) {
         PresentRatings(
+            modifier = Modifier
+                .capturable(controller.captureController(story))
+                .then(modifier),
             story = story,
             measurements = measurements,
             controller = controller,
@@ -66,10 +74,7 @@ internal fun RatingsStory(
         )
     } else {
         AbsentRatings(
-            modifier = Modifier
-                .background(color = story.backgroundColor)
-                .fillMaxSize()
-                .padding(top = measurements.closeButtonBottomEdge + 20.dp),
+            modifier = modifier,
             story = story,
             measurements = measurements,
             onLearnAboutRatings = onLearnAboutRatings,
@@ -77,20 +82,16 @@ internal fun RatingsStory(
     }
 }
 
-@OptIn(ExperimentalComposeUiApi::class)
 @Composable
 private fun PresentRatings(
     story: Story.Ratings,
     measurements: EndOfYearMeasurements,
     controller: StoryCaptureController,
     onShareStory: (File) -> Unit,
+    modifier: Modifier = Modifier,
 ) {
     Column(
-        modifier = Modifier
-            .capturable(controller.captureController(story))
-            .fillMaxSize()
-            .background(story.backgroundColor)
-            .padding(top = measurements.closeButtonBottomEdge + 20.dp),
+        modifier = modifier,
     ) {
         TextH10(
             text = when (val rating = story.stats.max().first) {
@@ -132,12 +133,12 @@ private fun PresentRatings(
                 forceBarsVisible = controller.isSharing,
                 modifier = Modifier
                     .fillMaxSize()
-                    .padding(bottom = 72.dp)
             )
             ShareStoryButton(
                 story = story,
                 controller = controller,
                 onShare = onShareStory,
+                modifier = Modifier.padding(bottom = 18.dp)
             )
         }
     }
@@ -283,6 +284,9 @@ private fun AbsentRatings(
             onClick = onLearnAboutRatings,
             backgroundColor = colorResource(UR.color.white),
             textColor = colorResource(UR.color.black)
+        )
+        Spacer(
+            modifier = Modifier.height(18.dp),
         )
     }
 }
