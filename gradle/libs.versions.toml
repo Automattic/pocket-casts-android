@@ -18,7 +18,7 @@
 [versions]
 aboutlibraries = "13.1.0"
 android-gradle-plugin = "8.13.0"
-billing = "8.0.0"
+billing = "8.1.0"
 coil = "2.7.0"
 compose = "2025.05.01" # https://developer.android.com/jetpack/compose/bom/bom-mapping
 datastore = "1.1.7"
