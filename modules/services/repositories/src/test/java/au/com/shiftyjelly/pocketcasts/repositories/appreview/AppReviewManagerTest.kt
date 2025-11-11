@@ -38,6 +38,7 @@ class AppReviewManagerTest {
     private val bookmarkCreatedSetting = TestSetting<Instant?>(null)
     private val themeChangedSetting = TestSetting<Instant?>(null)
     private val referralSharedSetting = TestSetting<Instant?>(null)
+    private val playbackSharedSetting = TestSetting<Instant?>(null)
 
     private val submittedReasonsSetting = TestSetting(emptyList<AppReviewReason>())
     private val lastPromptSetting = TestSetting<Instant?>(null)
@@ -62,6 +63,7 @@ class AppReviewManagerTest {
             on { appReviewBookmarkCreatedTimestamp } doReturn bookmarkCreatedSetting
             on { appReviewThemeChangedTimestamp } doReturn themeChangedSetting
             on { appReviewReferralSharedTimestamp } doReturn referralSharedSetting
+            on { appReviewPlaybackSharedTimestamp } doReturn playbackSharedSetting
             on { appReviewSubmittedReasons } doReturn submittedReasonsSetting
             on { appReviewLastPromptTimestamp } doReturn lastPromptSetting
             on { appReviewLastDeclineTimestamps } doReturn lastDeclineTimestampsSetting
@@ -161,6 +163,15 @@ class AppReviewManagerTest {
             referralSharedSetting.set(clock.instant())
             val signal = awaitSignalAndConsume()
             assertEquals(AppReviewReason.ReferralShared, signal.reason)
+        }
+    }
+
+    @Test
+    fun `dispatch playback shared reason`() = runTest {
+        testInLoop {
+            playbackSharedSetting.set(clock.instant())
+            val signal = awaitSignalAndConsume()
+            assertEquals(AppReviewReason.PlaybackShared, signal.reason)
         }
     }
 

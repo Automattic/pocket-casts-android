@@ -172,6 +172,10 @@ class AppReviewManagerImpl(
             settings.appReviewReferralSharedTimestamp.value != null
         }
 
+        AppReviewReason.PlaybackShared -> {
+            settings.appReviewPlaybackSharedTimestamp.value != null
+        }
+
         AppReviewReason.DevelopmentTrigger -> {
             true
         }
