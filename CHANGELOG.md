@@ -1,6 +1,8 @@
 8.1
 -----
-
+*   Updates
+    *   Add periodical requests for the app rating
+        ([#4725](https://github.com/Automattic/pocket-casts-android/pull/4725))
 
 8.0
 -----
