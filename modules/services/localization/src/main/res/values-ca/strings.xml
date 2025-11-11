@@ -447,11 +447,6 @@ Language: ca
     <string name="end_of_year_story_longest_episode_subtitle">Era \"%1$s\" de \"%2$s\"</string>
     <string name="end_of_year_listening_time_subtitle">total escoltant pòdcasts</string>
     <string name="eoy_story_ratings_learn_button_label">Informa\'t sobre les valoracions</string>
-    <string name="eoy_story_ratings_subtitle_3">Sabies que ara pots valorar els pòdcasts? Comparteix l\'amor pels teus creadors favorits i ajuda\'ls a ser reconeguts!</string>
-    <string name="eoy_story_ratings_subtitle_2">Gràcies per compartir la teva valoració amb la comunitat de creadors</string>
-    <string name="eoy_story_ratings_subtitle_1">Uau, quantes valoracions de %1$d estrelles! Gràcies per compartir l\'amor amb els teus creadors favorits!</string>
-    <string name="eoy_story_ratings_title_2">Oh-oh! Encara no hi ha valoracions del pòdcast per a mostrar encara.</string>
-    <string name="eoy_story_ratings_title_1">Anem a veure les teves valoracions!</string>
     <string name="referrals_failed_to_load_offer">Ho sento, però hi ha hagut un problema en obtenir el teu enllaç de referència.</string>
     <string name="transcript_error_not_available">Aquest episodi no té transcripció disponible</string>
     <string name="referrals_banner_hide_label">Amaga aquest banner</string>

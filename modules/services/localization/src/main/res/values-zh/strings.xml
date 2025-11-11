@@ -463,11 +463,6 @@ Language: zh_CN
     <string name="end_of_year_listening_time_subtitle">播客收听总量</string>
     <string name="end_of_year_story_longest_episode_subtitle">从“%2$s”到“%1$s”</string>
     <string name="eoy_story_ratings_learn_button_label">了解评分</string>
-    <string name="eoy_story_ratings_subtitle_2">感谢您与创作者社区分享反馈意见</string>
-    <string name="eoy_story_ratings_title_1">让我们看看您的评分！</string>
-    <string name="eoy_story_ratings_subtitle_3">您知道吗？现在可以对节目进行评分了。 对您所喜爱的创作者表达欣赏，并帮助他们获得关注！</string>
-    <string name="eoy_story_ratings_subtitle_1">哇，这么多 %1$d 星评价！ 感谢您对您所喜爱的创作者表达欣赏！</string>
-    <string name="eoy_story_ratings_title_2">哎呀！ 暂无播客评分可向您展示</string>
     <string name="referrals_failed_to_load_offer">很抱歉，获取您的推荐链接时出错了。</string>
     <string name="transcript_error_not_available">很抱歉，本剧集没有文字转录稿。</string>
     <string name="referrals_banner_hide_label">隐藏此横幅</string>

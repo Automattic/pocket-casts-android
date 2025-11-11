@@ -463,11 +463,6 @@ Language: ko_KR
     <string name="end_of_year_story_longest_episode_subtitle">\"%2$s\"의 \"%1$s\"이었습니다.</string>
     <string name="end_of_year_listening_time_subtitle">청취한 팟캐스트의 총 개수</string>
     <string name="eoy_story_ratings_learn_button_label">평가에 대해 알아보기</string>
-    <string name="eoy_story_ratings_subtitle_3">지금 프로그램을 평가할 수 있다는 사실을 알고 계셨나요? 좋아하는 창작자에 대한 애정을 공유하고 이들이 주목받을 수 있도록 도와주세요!</string>
-    <string name="eoy_story_ratings_subtitle_2">창작자 커뮤니티에 피드백을 공유해 주셔서 감사합니다.</string>
-    <string name="eoy_story_ratings_subtitle_1">와, 별 %1$d개짜리 평가가 많군요! 좋아하는 제작자에 대한 애정을 공유해 주셔서 감사합니다!</string>
-    <string name="eoy_story_ratings_title_2">이런! 아직 보여드릴 만한 팟캐스트 평가가 없습니다.</string>
-    <string name="eoy_story_ratings_title_1">회원님이 평가해 주세요!</string>
     <string name="referrals_failed_to_load_offer">죄송합니다. 추천 링크를 가져오는 중에 문제가 발생했습니다.</string>
     <string name="transcript_error_not_available">죄송합니다. 이 에피소드에서는 대본을 사용할 수 없습니다.</string>
     <string name="referrals_banner_hide_label">배너 숨기기</string>

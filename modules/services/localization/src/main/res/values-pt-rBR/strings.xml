@@ -463,11 +463,6 @@ Language: pt_BR
     <string name="end_of_year_story_longest_episode_subtitle">Foi \"%1$s\" de \"%2$s\"</string>
     <string name="end_of_year_listening_time_subtitle">no total ouvindo podcasts</string>
     <string name="eoy_story_ratings_learn_button_label">Entenda as classificações</string>
-    <string name="eoy_story_ratings_subtitle_3">Sabia que agora você pode classificar programas? Compartilhe todo o seu amor por seus criadores favoritos para atrair mais ouvintes.</string>
-    <string name="eoy_story_ratings_subtitle_2">Obrigado por compartilhar seu feedback com a comunidade de criadores</string>
-    <string name="eoy_story_ratings_subtitle_1">Uau! Quantas classificações com %1$d estrelas. Obrigado por compartilhar todo o seu amor pelos seus criadores favoritos.</string>
-    <string name="eoy_story_ratings_title_2">Vish! Ainda não há classificações em podcasts</string>
-    <string name="eoy_story_ratings_title_1">Vamos ver suas classificações!</string>
     <string name="referrals_failed_to_load_offer">Ocorreu um erro ao buscar seu link de indicação.</string>
     <string name="transcript_error_not_available">Não há transcrição disponível para este episódio.</string>
     <string name="referrals_banner_hide_label">Ocultar este banner</string>

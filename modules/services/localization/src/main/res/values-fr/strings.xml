@@ -463,11 +463,6 @@ Language: fr
     <string name="end_of_year_story_longest_episode_subtitle">C’était « %1$s » de « %2$s »</string>
     <string name="end_of_year_listening_time_subtitle">écoute totale de podcasts</string>
     <string name="eoy_story_ratings_learn_button_label">En savoir plus sur les évaluations</string>
-    <string name="eoy_story_ratings_title_1">Voyons vos évaluations !</string>
-    <string name="eoy_story_ratings_subtitle_3">Le saviez-vous ? Vous pouvez désormais évaluer les émissions. Faites connaître vos créateurs favoris et aidez-les à se faire remarquer !</string>
-    <string name="eoy_story_ratings_subtitle_2">Merci d’avoir partagé votre avis avec la communauté de créateurs</string>
-    <string name="eoy_story_ratings_subtitle_1">Waouh, tellement d’évaluations %1$d étoiles ! Merci d’avoir partagé votre appréciation avec vos créateurs favoris !</string>
-    <string name="eoy_story_ratings_title_2">Oh oh ! Aucune évaluation de podcast à vous montrer pour l’instant</string>
     <string name="referrals_failed_to_load_offer">Veuillez nous excuser, un problème est survenu lors de l’extraction de votre lien de parrainage.</string>
     <string name="transcript_error_not_available">Veuillez nous excuser, aucune transcription n’est disponible pour cet épisode.</string>
     <string name="referrals_banner_hide_label">Masquer cette bannière</string>

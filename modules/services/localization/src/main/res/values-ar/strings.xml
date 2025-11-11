@@ -463,11 +463,6 @@ Language: ar
     <string name="end_of_year_story_longest_episode_subtitle">كانت \"⁦%1$s⁩\" من \"⁦%2$s⁩\"</string>
     <string name="end_of_year_listening_time_subtitle">الاستماع الكامل إلى حلقات البث الصوتي</string>
     <string name="eoy_story_ratings_learn_button_label">التعرُّف على التقييمات</string>
-    <string name="eoy_story_ratings_subtitle_3">هل كنت تعلم أنه يمكنك تقييم العروض الآن؟ شارك شغف منشئي المحتوى المفضلين لديك وساعدهم على جذب الانتباه!</string>
-    <string name="eoy_story_ratings_subtitle_2">شكرًا على مشاركة ملاحظاتك مع مجتمع منشئي المحتوى</string>
-    <string name="eoy_story_ratings_subtitle_1">رائع، العديد من ⁦%1$d⁩ من التقييمات بالنجوم! شكرًا على مشاركة الشغف مع المنشئين المفضلين لديك!</string>
-    <string name="eoy_story_ratings_title_2">أوه أوه! لا توجد تقييمات للبث صوتي لعرضها أمامك حتى الآن</string>
-    <string name="eoy_story_ratings_title_1">لنر تقييماتك!</string>
     <string name="referrals_failed_to_load_offer">عذرًا، حدث خطأ ما في أثناء إحضار رابط الإحالة.</string>
     <string name="transcript_error_not_available">عذرًا، لكن لا يوجد نص متاح لهذه الحلقة.</string>
     <string name="referrals_banner_hide_label">إخفاء هذا الشعار</string>

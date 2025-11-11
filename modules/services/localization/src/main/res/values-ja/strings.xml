@@ -463,11 +463,6 @@ Language: ja_JP
     <string name="end_of_year_story_longest_episode_subtitle">「%2$s」の「%1$s」でした</string>
     <string name="end_of_year_listening_time_subtitle">ポッドキャストを聴いた合計</string>
     <string name="eoy_story_ratings_learn_button_label">評価について</string>
-    <string name="eoy_story_ratings_subtitle_3">番組を評価できるようになったことをご存知ですか ? お気に入りのクリエイターへの熱い思いを共有し、そのクリエイターが注目されるよう支援しましょう。</string>
-    <string name="eoy_story_ratings_subtitle_2">クリエイターコミュニティにフィードバックを共有していただき、ありがとうございます</string>
-    <string name="eoy_story_ratings_subtitle_1">%1$dつ星評価がとても多いですね ! お気に入りのクリエイターへの熱い思いを共有していただき、ありがとうございます。</string>
-    <string name="eoy_story_ratings_title_2">おっと ! 表示するポッドキャストの評価はまだありません</string>
-    <string name="eoy_story_ratings_title_1">あなたの評価を確認しましょう。</string>
     <string name="referrals_failed_to_load_offer">申し訳ありません、リファラルリンクの取得中にエラーが発生しました。</string>
     <string name="transcript_error_not_available">申し訳ありません、このエピソードではトランスクリプトを利用できません。</string>
     <string name="referrals_banner_hide_label">このバナーを非表示</string>

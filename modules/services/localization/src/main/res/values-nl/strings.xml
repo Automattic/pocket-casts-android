@@ -462,11 +462,6 @@ Language: nl
     <string name="end_of_year_story_longest_episode_subtitle">Het was \'%1$s\' van \'%2$s\'</string>
     <string name="end_of_year_listening_time_subtitle">totaal naar podcasts geluisterd</string>
     <string name="eoy_story_ratings_learn_button_label">Meer informatie over beoordelingen</string>
-    <string name="eoy_story_ratings_subtitle_3">Wist je dat je nu shows kan beoordelen? Deel je liefde voor je favoriete makers en breng ze onder de aandacht!</string>
-    <string name="eoy_story_ratings_subtitle_2">Bedankt dat je je feedback deelt met de community van makers</string>
-    <string name="eoy_story_ratings_subtitle_1">Wauw, zoveel beoordelingen van %1$d sterren! Bedankt dat je je liefde voor je favoriete makers toont!</string>
-    <string name="eoy_story_ratings_title_2">Oh oh! Er zijn nog geen podcastbeoordelingen voor je</string>
-    <string name="eoy_story_ratings_title_1">Laten we naar je beoordelingen kijken!</string>
     <string name="referrals_failed_to_load_offer">Er is iets fout gegaan bij het ophalen van je verwijzingslink.</string>
     <string name="transcript_error_not_available">Er is helaas geen transcriptie beschikbaar voor deze aflevering.</string>
     <string name="referrals_banner_hide_label">Deze banner verbergen</string>
