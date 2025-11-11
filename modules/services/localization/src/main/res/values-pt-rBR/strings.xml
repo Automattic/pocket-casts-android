@@ -460,7 +460,6 @@ Language: pt_BR
     <string name="end_of_year_stories_subscribe_to_plus">Junte-se ao Pocket Casts ao assinar o Plus e aumente as estatísticas, além de funcionalidades premium como pastas, favoritos e pré-seleção de capítulos!</string>
     <string name="settings_real_time_playback_summary">Se o player estiver ligado, ele vai mostrar o tempo restante ajustado para a velocidade de reprodução e capítulos pulados.</string>
     <string name="settings_real_time_playback">Ajustar tempo restante</string>
-    <string name="end_of_year_stories_year_over_year_title_went_up_a_lot">Em comparação com %1$s, seu tempo de streaming aumentou em mais de 500%%</string>
     <string name="end_of_year_story_longest_episode_subtitle">Foi \"%1$s\" de \"%2$s\"</string>
     <string name="end_of_year_listening_time_subtitle">no total ouvindo podcasts</string>
     <string name="eoy_story_ratings_learn_button_label">Entenda as classificações</string>
@@ -657,15 +656,9 @@ Language: pt_BR
     <string name="end_of_year_stories_theres_more">E tem mais!</string>
     <string name="end_of_year_stories_year_completion_rate">taxa de conclusão</string>
     <string name="eoy_year_over_year_title_skyrocketed">Em comparação com 2022, seu tempo de streaming disparou!</string>
-    <string name="end_of_year_stories_year_over_year_subtitle_went_down">Poxa… tem sempre algo para se viver, né?</string>
+    <string name="end_of_year_stories_year_completion_rate_title">Sua taxa de conclusão este ano foi de %1$d%%</string>
     <string name="end_of_year_stories_year_over_share_text">Meu tempo de streaming de %1$d em comparação com %2$d</string>
-    <string name="end_of_year_stories_year_completion_rate_title">Sua taxa de conclusão foi de %1$d%%</string>
-    <string name="end_of_year_stories_year_over_year_subtitle_flat">E dizem que continuidade é a chave do sucesso… ou algo parecido.</string>
     <string name="end_of_year_prompt_card_summary">Veja suas estatísticas de streaming, principais podcasts e muito mais.</string>
-    <string name="end_of_year_stories_year_over_year_title_went_down">Em comparação com %1$s, seu tempo de streaming diminuiu um pouco</string>
-    <string name="end_of_year_stories_year_over_year_title_flat">Em comparação com %1$s, seu tempo de streaming permaneceu bastante consistente</string>
-    <string name="end_of_year_stories_year_over_year_subtitle_went_up">Tudo pronto para se superar em %1$s?</string>
-    <string name="end_of_year_stories_year_over_year_title_went_up">Em comparação com %1$s, seu tempo de streaming aumentou muito %2$s%%</string>
     <string name="end_of_year_story_longest_episode_title">O episódio mais longo que você ouviu foi %1$s</string>
     <string name="end_of_year_replay">Ouvir de novo</string>
     <string name="end_of_year_listening_time_title">Este foi o seu tempo total ouvindo podcasts.</string>

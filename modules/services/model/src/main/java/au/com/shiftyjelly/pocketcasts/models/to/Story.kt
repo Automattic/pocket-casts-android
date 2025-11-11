@@ -1,6 +1,7 @@
 package au.com.shiftyjelly.pocketcasts.models.to
 
 import au.com.shiftyjelly.pocketcasts.payment.SubscriptionTier
+import kotlin.math.roundToInt
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
 import au.com.shiftyjelly.pocketcasts.models.to.LongestEpisode as LongestEpisodeData
@@ -71,12 +72,31 @@ sealed interface Story {
         override val isFree = false
         override val analyticsValue = "year_vs_year"
 
-        val yearOverYearChange
-            get() = when {
-                lastYearDuration == thisYearDuration -> 1.0
-                lastYearDuration == Duration.ZERO -> Double.POSITIVE_INFINITY
-                else -> thisYearDuration / lastYearDuration
-            }
+        val percentageChange = when (lastYearDuration) {
+            thisYearDuration -> 0
+            Duration.ZERO -> Int.MAX_VALUE
+            else -> (((thisYearDuration - lastYearDuration) / lastYearDuration) * 100.00).roundToInt()
+        }
+
+        val ratioChange = when (lastYearDuration) {
+            thisYearDuration -> 1.0
+            Duration.ZERO -> Double.POSITIVE_INFINITY
+            else -> thisYearDuration / lastYearDuration
+        }
+
+        val trend = when {
+            ratioChange < 0.9 -> Trend.Down
+            ratioChange <= 1.1 -> Trend.Same
+            ratioChange < 5.0 -> Trend.Up
+            else -> Trend.UpALot
+        }
+
+        enum class Trend {
+            Down,
+            Same,
+            Up,
+            UpALot,
+        }
     }
 
     data class CompletionRate(

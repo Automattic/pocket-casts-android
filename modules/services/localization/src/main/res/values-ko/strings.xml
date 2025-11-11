@@ -460,7 +460,6 @@ Language: ko_KR
     <string name="end_of_year_stories_subscribe_to_plus">Plus를 구독해 Pocket Casts를 지원하고, 더 상세한 통계를 제공받고, 북마크, 폴더 또는 챕터 미리 선택과 같은 프리미엄 기능을 이용해 보세요.</string>
     <string name="settings_real_time_playback_summary">이 설정을 켜면 재생 속도에 맞게 조정된 남은 시간과 건너뛴 챕터가 플레이어에 표시됩니다.</string>
     <string name="settings_real_time_playback">남은 시간 조정</string>
-    <string name="end_of_year_stories_year_over_year_title_went_up_a_lot">%1$s년 대비 청취 시간이 500% 넘게 증가했습니다.%%</string>
     <string name="end_of_year_story_longest_episode_subtitle">\"%2$s\"의 \"%1$s\"이었습니다.</string>
     <string name="end_of_year_listening_time_subtitle">청취한 팟캐스트의 총 개수</string>
     <string name="eoy_story_ratings_learn_button_label">평가에 대해 알아보기</string>
@@ -657,15 +656,8 @@ Language: ko_KR
     <string name="end_of_year_stories_theres_more">더 있습니다!</string>
     <string name="end_of_year_stories_year_completion_rate">완료율</string>
     <string name="eoy_year_over_year_title_skyrocketed">2022년 대비 청취 시간이 급증했습니다!</string>
-    <string name="end_of_year_stories_year_over_year_subtitle_went_down">일상생활도 중요하겠죠?</string>
     <string name="end_of_year_stories_year_over_share_text">%2$d년 대비 내 %1$d년 청취 시간</string>
-    <string name="end_of_year_stories_year_completion_rate_title">올해 완료율은 %1$d%%이었습니다</string>
-    <string name="end_of_year_stories_year_over_year_subtitle_flat">일관성이 성공의 열쇠라는 말도 있습니다!</string>
     <string name="end_of_year_prompt_card_summary">청취 통계, 상위 팟캐스트 등이 표시됩니다.</string>
-    <string name="end_of_year_stories_year_over_year_title_went_down">%1$s년 대비 청취 시간이 조금 줄었습니다.</string>
-    <string name="end_of_year_stories_year_over_year_title_flat">%1$s년 대비 청취 시간이 상당히 일정하게 유지되었습니다.</string>
-    <string name="end_of_year_stories_year_over_year_subtitle_went_up">%1$s년에 정점을 찍을 준비가 되셨나요?</string>
-    <string name="end_of_year_stories_year_over_year_title_went_up">%1$s년에 비해 청취 시간이 %2$s%%나 늘었습니다.</string>
     <string name="end_of_year_story_longest_episode_title">청취하신 가장 긴 에피소드는 %1$s였습니다.</string>
     <string name="end_of_year_replay">다시 재생</string>
     <string name="end_of_year_listening_time_title">팟캐스트를 청취하셨던 총시간입니다.</string>

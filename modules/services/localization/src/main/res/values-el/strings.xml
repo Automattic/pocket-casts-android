@@ -276,7 +276,6 @@ Language: el_GR
     <string name="eoy_story_stories_subscribe_to_plus_button_label">Ρίξε μια ματιά στο Pocket Casts Plus</string>
     <string name="settings_real_time_playback">Προσαρμογή υπολειπόμενου χρόνου</string>
     <string name="settings_real_time_playback_summary">Αν είναι ενεργό, το πρόγραμμα αναπαραγωγής θα δείχνει τον υπολοιπόμενο χρόνο, προσαρμοσμένο στην ταχύτητα αναπαραγωγής και στα παραλειπόμενα κεφάλαια.</string>
-    <string name="end_of_year_stories_year_over_year_title_went_up_a_lot">Σε σύγκριση με το %1$s, ο χρόνος ακρόασης σου αυξήθηκε κατά περισσότερο από 500%%</string>
     <string name="end_of_year_story_longest_episode_subtitle">Ήταν το «%1$s» από το «%2$s»</string>
     <string name="end_of_year_listening_time_subtitle">συνολική ακρόαση podcasts</string>
     <string name="eoy_story_ratings_subtitle_2">Ευχαριστούμε που μοιράστηκες το σχόλιο σου με την κοινότητα των δημιουργών</string>
@@ -472,13 +471,7 @@ Language: el_GR
     <string name="end_of_year_stories_year_over_share_text">Ο χρόνος ακρόασης μου το %1$d σε σύγκριση με το %2$d</string>
     <string name="end_of_year_stories_year_completion_rate">ποσοστό ολοκλήρωσης</string>
     <string name="eoy_year_over_year_title_skyrocketed">Σε σύγκριση με το 2022, ο χρόνος ακρόασης σου εκτοξεύτηκε!</string>
-    <string name="end_of_year_stories_year_over_year_subtitle_went_down">Αααχ… έχεις και μια ζωή να ζήσεις, έτσι δεν είναι;</string>
     <string name="end_of_year_prompt_card_summary">Δες τα στατιστικά ακρόασης σου, τα κορυφαία podcasts και άλλα.</string>
-    <string name="end_of_year_stories_year_over_year_title_went_down">Σε σύγκριση με το %1$s, ο χρόνος ακρόασης σου μειώθηκε λίγο</string>
-    <string name="end_of_year_stories_year_over_year_subtitle_went_up">Πάμε να το σπάσουμε το %1$s;</string>
-    <string name="end_of_year_stories_year_over_year_title_went_up">Σε σύγκριση με το %1$s, ο χρόνος ακρόασης σου αυξήθηκε κατά ένα εντυπωσιακό %2$s%%</string>
-    <string name="end_of_year_stories_year_over_year_subtitle_flat">Και λένε ότι η συνέπεια είναι το κλειδί για την επιτυχία… ή κάτι τέτοιο!</string>
-    <string name="end_of_year_stories_year_over_year_title_flat">Σε σχέση με το %1$s, ο χρόνος ακρόασης σου παρέμεινε αρκετά σταθερός</string>
     <string name="end_of_year_story_longest_episode_title">Το μεγαλύτερο επεισόδιο που ακούσες ήταν το %1$s</string>
     <string name="end_of_year_replay">Παίξε ξανά</string>
     <string name="end_of_year_listening_time_title">Αυτός ήταν ο συνολικός σου χρόνος ακρόασης podcasts</string>

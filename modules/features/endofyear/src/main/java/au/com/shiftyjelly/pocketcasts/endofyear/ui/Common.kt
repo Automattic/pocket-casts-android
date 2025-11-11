@@ -58,7 +58,7 @@ internal val Story.backgroundColor
         is Story.TotalTime -> Color(0xFFEDB0F3)
         is Story.LongestEpisode -> Color(0xFFE0EFAD)
         is Story.PlusInterstitial -> Color(0xFFEFECAD)
-        is Story.YearVsYear -> Color(0xFFEEB1F4)
+        is Story.YearVsYear -> Color(0xFFA22828)
         is Story.CompletionRate -> Color(0xFF27486A)
         is Story.Ending -> Color(0xFF27486A)
     }
