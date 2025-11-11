@@ -1,6 +1,8 @@
 8.1
 -----
-
+*   Updates
+    *   Make sure Firebase remote config is available at startup
+        ([#4652](https://github.com/Automattic/pocket-casts-android/pull/4652))
 
 8.0
 -----
@@ -78,8 +80,6 @@
         ([#4594](https://github.com/Automattic/pocket-casts-android/pull/4594))
     *   Fix podcasts page drag & drop issues
         ([#4596](https://github.com/Automattic/pocket-casts-android/pull/4596))
-    *   Make sure Firebase remote config is available at startup
-        ([#4652](https://github.com/Automattic/pocket-casts-android/pull/4652))
 
 7.99
 -----
