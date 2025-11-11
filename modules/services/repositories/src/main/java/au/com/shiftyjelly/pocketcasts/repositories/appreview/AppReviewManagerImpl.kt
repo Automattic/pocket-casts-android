@@ -154,7 +154,7 @@ class AppReviewManagerImpl(
     private fun isPromptedInLast30Days(): Boolean {
         val thirtyDaysAgo = clock.instant().minus(30, ChronoUnit.DAYS)
         val lastReviewTimestamp = settings.appReviewLastPromptTimestamp.value ?: return false
-        return lastReviewTimestamp == thirtyDaysAgo || lastReviewTimestamp.isAfter(thirtyDaysAgo)
+        return !lastReviewTimestamp.isBefore(thirtyDaysAgo)
     }
 
     private fun isDeclinedTwiceIn60Days(): Boolean {
@@ -177,7 +177,7 @@ class AppReviewManagerImpl(
     private fun hasCrashedInLast7Days(): Boolean {
         val sevenDaysAgo = clock.instant().minus(7, ChronoUnit.DAYS)
         val lastCrashTimestamp = settings.appReviewCrashTimestamp.value ?: return false
-        return lastCrashTimestamp == sevenDaysAgo || lastCrashTimestamp.isAfter(sevenDaysAgo)
+        return !lastCrashTimestamp.isBefore(sevenDaysAgo)
     }
 
     private fun isReasonApplicable(reason: AppReviewReason) = when (reason) {
