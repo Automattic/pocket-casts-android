@@ -72,11 +72,10 @@ internal fun TotalTimeStory(
                 animatedNumber = totalMinutes
                 animationCompleted = true
             } else if (!animationCompleted) {
-                val endValue = totalMinutes
                 val animatable = Animatable(startMinutes.toFloat())
 
                 animatable.animateTo(
-                    targetValue = endValue.toFloat(),
+                    targetValue = totalMinutes.toFloat(),
                     animationSpec = tween(durationMillis = 2000),
                 ) {
                     animatedNumber = this.value.toLong()
@@ -100,8 +99,9 @@ internal fun TotalTimeStory(
             }
         }
 
+        val formatter = remember { NumberFormat.getNumberInstance() }
         val formattedNumber = remember(animatedNumber) {
-            NumberFormat.getNumberInstance().format(animatedNumber)
+            formatter.format(animatedNumber)
         }
 
         val dynamicProperties = rememberLottieDynamicProperties(
