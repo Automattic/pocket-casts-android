@@ -138,8 +138,8 @@ private fun PresentRatings(
                         brush = Brush.verticalGradient(
                             colors = listOf(Color.Transparent, story.backgroundColor),
                             startY = size.height - 64.dp.toPx(),
-                            endY = size.height
-                        )
+                            endY = size.height,
+                        ),
                     )
                 },
         ) {
