@@ -12,6 +12,13 @@ sealed interface Story {
     val isShareble: Boolean get() = true
     val analyticsValue: String
 
+    data object PlaceholderWhileLoading : Story {
+        override val isShareble = false
+        override val analyticsValue = "loading_placeholder"
+        override val previewDuration: Duration
+            get() = Duration.INFINITE
+    }
+
     data object Cover : Story {
         override val isShareble = false
         override val analyticsValue = "cover"

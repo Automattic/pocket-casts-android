@@ -1,5 +1,6 @@
 package au.com.shiftyjelly.pocketcasts.endofyear
 
+import android.util.Log
 import androidx.compose.runtime.Immutable
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -30,9 +31,11 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 
@@ -48,6 +51,16 @@ class EndOfYearViewModel @AssistedInject constructor(
     private val sharingClient: StorySharingClient,
     private val analyticsTracker: AnalyticsTracker,
 ) : ViewModel() {
+
+    private companion object {
+        val placeholderStories = buildList {
+            add(Story.Cover)
+            repeat(10) {
+                add(Story.PlaceholderWhileLoading)
+            }
+        }
+    }
+
     private val syncState = MutableStateFlow<SyncState>(SyncState.Syncing)
 
     private val eoyStatsAction = CachedAction<Year, Pair<EndOfYearStats, RandomShowIds?>> {
@@ -78,13 +91,15 @@ class EndOfYearViewModel @AssistedInject constructor(
     private val _switchStory = MutableSharedFlow<Unit>()
     internal val switchStory get() = _switchStory.asSharedFlow()
 
-    internal val uiState = combine(
+    internal val uiState: StateFlow<UiState> = combine(
         syncState,
         settings.cachedSubscription.flow,
         topPodcastsLink,
-        progress,
+        progress.onEach { Log.w("===", "progress=$it") },
         ::createUiModel,
-    ).stateIn(viewModelScope, SharingStarted.Lazily, UiState.Syncing)
+    ).stateIn(viewModelScope, SharingStarted.Lazily, UiState.Syncing(
+        stories = placeholderStories, storyProgress = 0f,
+    ))
 
     internal fun syncData() {
         viewModelScope.launch {
@@ -103,16 +118,21 @@ class EndOfYearViewModel @AssistedInject constructor(
         topPodcastsLink: String?,
         progress: Float,
     ) = when (syncState) {
-        SyncState.Syncing -> UiState.Syncing
+        SyncState.Syncing -> UiState.Syncing(stories = placeholderStories, storyProgress = progress)
         SyncState.Failure -> UiState.Failure
         SyncState.Synced -> {
-            val (stats, randomShowIds) = eoyStatsAction.run(year, viewModelScope).await()
-            val stories = createStories(stats, randomShowIds, subscription, topPodcastsLink)
-            UiState.Synced(
-                stories = stories,
-                isPaidAccount = subscription != null,
-                storyProgress = progress,
-            )
+            val currentValue = uiState.value
+            if (currentValue is UiState.Syncing) {
+                currentValue.copy(storyProgress = progress)
+            } else {
+                val (stats, randomShowIds) = eoyStatsAction.run(year, viewModelScope).await()
+                val stories = createStories(stats, randomShowIds, subscription, topPodcastsLink)
+                UiState.Synced(
+                    stories = stories,
+                    isPaidAccount = subscription != null,
+                    storyProgress = progress,
+                )
+            }
         }
     }
 
@@ -197,11 +217,10 @@ class EndOfYearViewModel @AssistedInject constructor(
     }
 
     internal fun getNextStoryIndex(currentIndex: Int): Int? {
-        val state = uiState.value as? UiState.Synced ?: return null
-        val stories = state.stories
+        val stories = (uiState.value as? UiState.Syncing)?.stories ?: (uiState.value as? UiState.Synced)?.stories ?: return null
 
         val nextStory = stories.getOrNull(currentIndex + 1) ?: return null
-        return if (state.isPaidAccount || nextStory.isFree) {
+        return if ((uiState.value as? UiState.Synced)?.isPaidAccount == true || nextStory.isFree) {
             currentIndex + 1
         } else {
             stories.drop(currentIndex + 1)
@@ -322,8 +341,15 @@ class EndOfYearViewModel @AssistedInject constructor(
 @Immutable
 internal sealed interface UiState {
     val storyProgress: Float get() = 0f
+    val storyCount: Int get() = 0
 
-    data object Syncing : UiState
+    data class Syncing(
+        val stories: List<Story>,
+        override val storyProgress: Float
+    ) : UiState {
+        override val storyCount: Int
+            get() = stories.size
+    }
 
     data object Failure : UiState
 
@@ -332,7 +358,10 @@ internal sealed interface UiState {
         val stories: List<Story>,
         val isPaidAccount: Boolean,
         override val storyProgress: Float,
-    ) : UiState
+    ) : UiState {
+        override val storyCount: Int
+            get() = stories.size
+    }
 }
 
 private sealed interface SyncState {

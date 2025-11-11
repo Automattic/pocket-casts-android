@@ -141,7 +141,7 @@ class StoriesActivity : ComponentActivity() {
         }
         val scope = rememberCoroutineScope()
         val state by viewModel.uiState.collectAsState()
-        val pagerState = rememberPagerState(pageCount = { (state as? UiState.Synced)?.stories?.size ?: 0 })
+        val pagerState = rememberPagerState(pageCount = { state.storyCount })
         val storyChanger = remember(pagerState, scope) {
             StoryChanger(pagerState, viewModel, scope)
         }
@@ -169,11 +169,14 @@ class StoriesActivity : ComponentActivity() {
                 onLearnAboutRatings = ::openRatingsInfo,
                 onClickUpsell = ::startUpsellFlow,
                 onRestartPlayback = storyChanger::reset,
-                onRetry = viewModel::syncData,
                 onClose = {
                     viewModel.trackStoriesClosed("close_button")
                     finish()
                 },
+                onFailedToLoad = {
+                    // TODO show snack with error: Sorry, we couldn't load Playback + retry action
+                    finish()
+                }
             )
         }
 
@@ -202,7 +205,7 @@ class StoriesActivity : ComponentActivity() {
 
         LaunchedEffect(Unit) {
             viewModel.switchStory.collect {
-                val stories = (state as? UiState.Synced)?.stories.orEmpty()
+                val stories = (state as? UiState.Synced)?.stories ?: (state as? UiState.Syncing)?.stories.orEmpty()
                 if (stories.getOrNull(pagerState.currentPage) is Story.Ending) {
                     viewModel.trackStoriesAutoFinished()
                     finish()
@@ -213,7 +216,7 @@ class StoriesActivity : ComponentActivity() {
         }
 
         LaunchedEffect(state::class) {
-            if (state is UiState.Synced) {
+            if (state is UiState.Synced || state is UiState.Syncing) {
                 // Track displayed page to not report it twice from different events.
                 // This can happen, for example, after the first launch.
                 // Both currentPage and pageCount trigger an event when the pager is set up.
@@ -221,7 +224,7 @@ class StoriesActivity : ComponentActivity() {
                 // Inform VM about a story changed due to explicit changes of the current page.
                 launch {
                     snapshotFlow { pagerState.currentPage }.collect { index ->
-                        val stories = (state as? UiState.Synced)?.stories
+                        val stories = (state as? UiState.Synced)?.stories ?: (state as? UiState.Syncing)?.stories
                         val newStory = stories?.getOrNull(index)
                         if (newStory != null && lastStory != newStory) {
                             lastStory = newStory
@@ -230,10 +233,10 @@ class StoriesActivity : ComponentActivity() {
                     }
                 }
                 // Inform VM about a story changed due to a change in the stories list
-                // This happens when a user sucessfully upgrades their account.
+                // This happens when a user successfully upgrades their account.
                 launch {
                     snapshotFlow { pagerState.pageCount }.collect {
-                        val stories = (state as? UiState.Synced)?.stories
+                        val stories = (state as? UiState.Synced)?.stories ?: (state as? UiState.Syncing)?.stories
                         val newStory = stories?.getOrNull(pagerState.currentPage)
                         if (newStory != null && lastStory != newStory) {
                             lastStory = newStory
