@@ -864,4 +864,10 @@ enum class AnalyticsEvent(val key: String) {
     IMPROVED_SEARCH_SUGGESTIONS_FAILED("search_predictive_failed"),
     IMPROVED_SEARCH_SUGGESTION_TERM_TAPPED("search_predictive_term_tapped"),
     IMPROVED_SEARCH_EMPTY_RESULTS("search_empty_results"),
+
+    /* App Ratings */
+    USER_SATISFACTION_SURVEY_SHOWN("user_satisfaction_survey_shown"),
+    USER_SATISFACTION_SURVEY_DISMISSED("user_satisfaction_survey_dismissed"),
+    USER_SATISFACTION_SURVEY_YES_RESPONSE("user_satisfaction_survey_yes_response"),
+    USER_SATISFACTION_SURVEY_NO_RESPONSE("user_satisfaction_survey_no_response"),
 }
