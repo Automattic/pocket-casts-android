@@ -8,6 +8,7 @@ import androidx.compose.animation.core.tween
 import androidx.compose.animation.core.updateTransition
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -67,14 +68,14 @@ internal fun TopShowStory(
             .capturable(controller.captureController(story))
             .fillMaxSize()
             .background(story.backgroundColor)
-            .padding(top = measurements.closeButtonBottomEdge),
+            .padding(top = measurements.closeButtonBottomEdge + 16.dp),
     ) {
         val animationContainerSize = min(maxWidth, maxHeight)
         Header(
             measurements = measurements,
             modifier = Modifier
                 .fillMaxWidth()
-                .height((maxHeight - animationContainerSize.times(1.3f)) / 2)
+                .height((maxHeight - animationContainerSize) / 2)
                 .align(Alignment.TopCenter),
         )
 
@@ -91,7 +92,7 @@ internal fun TopShowStory(
             onShareStory = onShareStory,
             modifier = Modifier
                 .fillMaxWidth()
-                .height((maxHeight - animationContainerSize.times(1.3f)) / 2)
+                .height((maxHeight - animationContainerSize) / 2)
                 .align(Alignment.BottomCenter),
         )
     }
@@ -176,7 +177,7 @@ private fun Header(
     modifier: Modifier = Modifier,
 ) = Column(
     modifier = modifier,
-    verticalArrangement = Arrangement.spacedBy(8.dp, Alignment.CenterVertically),
+    verticalArrangement = Arrangement.spacedBy(8.dp),
 ) {
     TextH10(
         text = stringResource(
@@ -209,10 +210,8 @@ private fun Footer(
     controller: StoryCaptureController,
     onShareStory: (File) -> Unit,
     modifier: Modifier = Modifier,
-) = Column(
+) = Box(
     modifier = modifier,
-    horizontalAlignment = Alignment.CenterHorizontally,
-    verticalArrangement = Arrangement.SpaceAround,
 ) {
     val formattedEpisodeCount = pluralStringResource(LR.plurals.episodes, story.show.playedEpisodeCount, story.show.playedEpisodeCount)
     val numberOfDays = story.show.playbackTime.inWholeDays
@@ -238,10 +237,12 @@ private fun Footer(
         color = colorResource(UR.color.white),
         modifier = Modifier
             .fillMaxWidth()
-            .padding(horizontal = 24.dp),
+            .padding(horizontal = 24.dp)
+            .align(Alignment.Center),
         textAlign = TextAlign.Center,
     )
     ShareStoryButton(
+        modifier = Modifier.padding(bottom = 18.dp).align(Alignment.BottomCenter),
         story = story,
         controller = controller,
         onShare = onShareStory,
