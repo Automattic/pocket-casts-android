@@ -58,6 +58,9 @@ class AppReviewManagerImpl(
                     }
 
                     is AppReviewTriggerData.Failure -> {
+                        if (triggerData.reason.shouldCleanUpData) {
+                            clearAllUnusedReasons()
+                        }
                         if (triggerData.reason.isFinal) {
                             break
                         }
@@ -136,6 +139,7 @@ class AppReviewManagerImpl(
         when (result) {
             AppReviewSignal.Result.Consumed -> {
                 settings.appReviewLastPromptTimestamp.set(clock.instant(), updateModifiedAt = false)
+                clearAllUnusedReasons()
 
                 if (reason != AppReviewReason.DevelopmentTrigger) {
                     val usedReasons = settings.appReviewSubmittedReasons.value
@@ -226,6 +230,58 @@ class AppReviewManagerImpl(
             true
         }
     }
+
+    private fun clearAllUnusedReasons() {
+        val usedReasons = settings.appReviewSubmittedReasons.value
+        val unusedReasons = UserBasedReasons - usedReasons
+        with(settings) {
+            unusedReasons.forEach { reason ->
+                when (reason) {
+                    AppReviewReason.ThirdEpisodeCompleted -> {
+                        appReviewEpisodeCompletedTimestamps.set(emptyList(), updateModifiedAt = false)
+                    }
+
+                    AppReviewReason.EpisodeStarred -> {
+                        appReviewEpisodeStarredTimestamp.set(null, updateModifiedAt = false)
+                    }
+
+                    AppReviewReason.ShowRated -> {
+                        appReviewPodcastRatedTimestamp.set(null, updateModifiedAt = false)
+                    }
+
+                    AppReviewReason.FilterCreated -> {
+                        appReviewPlaylistCreatedTimestamp.set(null, updateModifiedAt = false)
+                    }
+
+                    AppReviewReason.PlusUpgraded -> {
+                        appReviewPlusUpgradedTimestamp.set(null, updateModifiedAt = false)
+                    }
+
+                    AppReviewReason.FolderCreated -> {
+                        appReviewFolderCreatedTimestamp.set(null, updateModifiedAt = false)
+                    }
+
+                    AppReviewReason.BookmarkCreated -> {
+                        appReviewBookmarkCreatedTimestamp.set(null, updateModifiedAt = false)
+                    }
+
+                    AppReviewReason.CustomThemeSet -> {
+                        appReviewThemeChangedTimestamp.set(null, updateModifiedAt = false)
+                    }
+
+                    AppReviewReason.ReferralShared -> {
+                        appReviewReferralSharedTimestamp.set(null, updateModifiedAt = false)
+                    }
+
+                    AppReviewReason.PlaybackShared -> {
+                        appReviewPlaybackSharedTimestamp.set(null, updateModifiedAt = false)
+                    }
+
+                    AppReviewReason.DevelopmentTrigger -> Unit
+                }
+            }
+        }
+    }
 }
 
 private class AppReviewSignalImpl(
@@ -244,6 +300,10 @@ private class AppReviewSignalImpl(
             runCatching { continuation.resume(AppReviewSignal.Result.Ignored) }
         }
     }
+
+    override fun toString(): String {
+        return "AppReviewSignalImpl(reason=$reason, reviewInfo=$reviewInfo)"
+    }
 }
 
 private enum class AppReviewDeclineReason(
@@ -251,39 +311,58 @@ private enum class AppReviewDeclineReason(
      * Whether the event loop should be stopped when this is a decline reason.
      */
     val isFinal: Boolean,
+    /**
+     * Whether unsued app review reasons should be cleared. This is done to avoid
+     * dispatching lingering prompts. For example, if a user creates a bookmark
+     * we show the review prompt. However, we do not show prompts for the next
+     * month. During that period new reasons like starring an episode should not be
+     * accounted for.
+     */
+    val shouldCleanUpData: Boolean,
 ) {
     FeatureNotEnabled(
         isFinal = true,
+        shouldCleanUpData = false,
     ),
     CrashedRecently(
         isFinal = false,
+        shouldCleanUpData = true,
     ),
     ErrorInRecentSessions(
         isFinal = false,
+        shouldCleanUpData = true,
     ),
     PromptDeclinedMultipleTimes(
         isFinal = true,
+        shouldCleanUpData = false,
     ),
     PromptShownRecently(
         isFinal = false,
+        shouldCleanUpData = true,
     ),
     AllReasonsUsed(
         isFinal = true,
+        shouldCleanUpData = false,
     ),
     NoReasonApplicable(
         isFinal = false,
+        shouldCleanUpData = false,
     ),
     GoogleInternal(
         isFinal = true,
+        shouldCleanUpData = false,
     ),
     GoogleInvalidRequest(
         isFinal = true,
+        shouldCleanUpData = false,
     ),
     GooglePlayStoreNotFound(
         isFinal = true,
+        shouldCleanUpData = false,
     ),
     GoogleUnknown(
         isFinal = true,
+        shouldCleanUpData = false,
     ),
 }
 

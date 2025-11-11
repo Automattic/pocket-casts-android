@@ -213,8 +213,6 @@ class AppReviewManagerTest {
 
     @Test
     fun `dispatch event only if the prompt was not triggered in 30 days`() = runTest {
-        backgroundScope.launch { manager.monitorAppReviewReasons() }
-
         testInLoop {
             val trigger = launch {
                 manager.triggerPrompt(
@@ -225,15 +223,16 @@ class AppReviewManagerTest {
             awaitSignalAndConsume()
             trigger.join()
 
-            episodesCompletedSetting.set(List(3) { clock.instant() })
+            episodeStarredSetting.set(clock.instant())
             expectNoSignal()
 
             clock += 30.days
             expectNoSignal()
 
             clock += 1.days
+            episodeStarredSetting.set(clock.instant())
             val signal = awaitSignalAndConsume()
-            assertEquals(AppReviewReason.ThirdEpisodeCompleted, signal.reason)
+            assertEquals(AppReviewReason.EpisodeStarred, signal.reason)
         }
     }
 
@@ -273,6 +272,7 @@ class AppReviewManagerTest {
             expectNoSignal()
 
             sessionIds.add("3")
+            episodeStarredSetting.set(clock.instant())
             val signal = awaitSignalAndConsume()
             assertEquals(AppReviewReason.EpisodeStarred, signal.reason)
         }
@@ -282,7 +282,6 @@ class AppReviewManagerTest {
     fun `dispatch event only if there was no crash in a week`() = runTest {
         testInLoop {
             crashTimestampSetting.set(clock.instant())
-
             episodeStarredSetting.set(clock.instant())
             expectNoSignal()
 
@@ -290,6 +289,7 @@ class AppReviewManagerTest {
             expectNoSignal()
 
             clock += 1.seconds
+            episodeStarredSetting.set(clock.instant())
             val signal = awaitSignalAndConsume()
             assertEquals(AppReviewReason.EpisodeStarred, signal.reason)
         }
@@ -313,6 +313,41 @@ class AppReviewManagerTest {
         assertTrue(job.isCompleted)
     }
 
+    @Test
+    fun `clear unused app review reasons after one is dispatched`() = runTest {
+        testInLoop {
+            episodeStarredSetting.set(clock.instant())
+            bookmarkCreatedSetting.set(clock.instant())
+
+            var signal = awaitSignalAndConsume()
+            assertEquals(AppReviewReason.EpisodeStarred, signal.reason)
+
+            clock += 100.days
+            expectNoSignal()
+
+            bookmarkCreatedSetting.set(clock.instant())
+            signal = awaitSignalAndConsume()
+            assertEquals(AppReviewReason.BookmarkCreated, signal.reason)
+        }
+    }
+
+    @Test
+    fun `clear unused app review reasons after prompting fails`() = runTest {
+        testInLoop {
+            crashTimestampSetting.set(clock.instant())
+            episodeStarredSetting.set(clock.instant())
+
+            expectNoSignal()
+
+            clock += 100.days
+            expectNoSignal()
+
+            episodeStarredSetting.set(clock.instant())
+            val signal = awaitSignalAndConsume()
+            assertEquals(AppReviewReason.EpisodeStarred, signal.reason)
+        }
+    }
+
     private suspend fun testInLoop(validate: suspend LoopContext.() -> Unit) {
         manager.showPromptSignal.test {
             val monitoringJob = launch(start = CoroutineStart.UNDISPATCHED) { manager.monitorAppReviewReasons() }
@@ -330,17 +365,22 @@ class AppReviewManagerTest {
     ) {
         suspend fun TestScope.awaitSignalAndConsume(): AppReviewSignal {
             runLoopCycle()
-            return turbineContext.awaitItem().also { it.consume() }
+            val signal = turbineContext.awaitItem().also { it.consume() }
+            yield()
+            return signal
         }
 
         suspend fun TestScope.awaitSignalAndIgnore(): AppReviewSignal {
             runLoopCycle()
-            return turbineContext.awaitItem().also { it.ignore() }
+            val signal = turbineContext.awaitItem().also { it.ignore() }
+            yield()
+            return signal
         }
 
         suspend fun TestScope.expectNoSignal() {
             runLoopCycle()
             turbineContext.expectNoEvents()
+            yield()
         }
 
         private suspend fun TestScope.runLoopCycle() {
