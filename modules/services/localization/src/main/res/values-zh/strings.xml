@@ -935,7 +935,6 @@ Language: zh_CN
     <string name="onboarding_log_in">登录</string>
     <string name="plus_trial_duration_free_trial">%s 免费试用版</string>
     <string name="onboarding_plus_recurring_after_free_trial">定期付款将在您的 %1$s (%2$s) 后开始</string>
-    <string name="end_of_year_stories_failed">无法加载年终故事，请检查您的互联网连接。</string>
     <string name="onboarding_plus_feature_themes_icons_text">选择您的真实颜色。 仅面向 Plus 俱乐部的专属图标和主题。</string>
     <string name="onboarding_plus_feature_themes_icons_title">主题和图标</string>
     <string name="onboarding_plus_feature_cloud_storage_text">将文件上传到云存储空间，在任何地方都能访问这些文件。</string>

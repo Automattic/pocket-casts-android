@@ -936,7 +936,6 @@ Language: ja_JP
     <string name="plus_trial_duration_free_trial">%s 無料トライアル</string>
     <string name="onboarding_sign_up">登録</string>
     <string name="onboarding_plus_recurring_after_free_trial">%1$s (%2$s) 後に定期支払いが開始します</string>
-    <string name="end_of_year_stories_failed">年末のストーリーを読み込めません。インターネット接続を確認してください。</string>
     <string name="onboarding_plus_feature_themes_icons_text">あなたの個性を表現しましょう。 Plus クラブ限定の特別なアイコンとテーマ。</string>
     <string name="onboarding_plus_feature_themes_icons_title">テーマとアイコン</string>
     <string name="onboarding_plus_feature_cloud_storage_text">ファイルをクラウドストレージにアップロードしてどこからでも利用できるようにします。</string>

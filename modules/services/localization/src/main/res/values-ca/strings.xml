@@ -919,7 +919,6 @@ Language: ca
     <string name="onboarding_sign_up">Registra\'t</string>
     <string name="plus_trial_duration_free_trial">Prova gratuïta de %s</string>
     <string name="onboarding_plus_recurring_after_free_trial">Els pagaments recurrents començaran després del teu %1$s (%2$s)</string>
-    <string name="end_of_year_stories_failed">No es poden carregar les teves històries de cap d\'any, comprova la teva connexió a internet.</string>
     <string name="onboarding_plus_feature_themes_icons_title">Temes i icones</string>
     <string name="onboarding_recommendations_import">Importar</string>
     <string name="onboarding_recommendations_find_favorite_podcasts">Troba els teus pòdcasts preferits</string>

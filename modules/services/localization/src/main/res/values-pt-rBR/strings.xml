@@ -936,7 +936,6 @@ Language: pt_BR
     <string name="onboarding_log_in">Fazer login</string>
     <string name="plus_trial_duration_free_trial">teste gratuito de %s</string>
     <string name="onboarding_plus_recurring_after_free_trial">O pagamento recorrente começará após seu %1$s (%2$s)</string>
-    <string name="end_of_year_stories_failed">Não é possível carregar seus stories de fim de ano. Verifique sua conexão com a Internet.</string>
     <string name="onboarding_plus_feature_themes_icons_text">Expresse sua individualidade. Temas e ícones exclusivos para o Plus.</string>
     <string name="onboarding_plus_feature_themes_icons_title">Temas e ícones</string>
     <string name="onboarding_plus_feature_cloud_storage_text">Faça upload dos seus arquivos na nuvem para acessá-los em qualquer lugar.</string>

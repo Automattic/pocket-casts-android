@@ -934,7 +934,6 @@ Language: nl
     <string name="onboarding_log_in">Log in</string>
     <string name="plus_trial_duration_free_trial">%s gratis proefversie</string>
     <string name="onboarding_plus_recurring_after_free_trial">Herhaaldelijke betalingen beginnen na je %1$s (%2$s)</string>
-    <string name="end_of_year_stories_failed">Kan je eindejaarsverhalen niet laden, controleer je internetverbinding.</string>
     <string name="onboarding_plus_feature_themes_icons_text">Toon je ware aard. Exclusieve pictogrammen en thema\'s voor Plus-abonnees.</string>
     <string name="onboarding_plus_feature_themes_icons_title">Thema\'s en pictogrammen</string>
     <string name="onboarding_plus_feature_cloud_storage_text">Wanneer je je bestanden naar een cloudopslag uploadt, zijn ze overal beschikbaar.</string>

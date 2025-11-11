@@ -935,7 +935,6 @@ Language: fr
     <string name="onboarding_log_in">Se connecter</string>
     <string name="plus_trial_duration_free_trial">Essai gratuit %s</string>
     <string name="onboarding_plus_recurring_after_free_trial">Les paiements récurrents commenceront après votre %1$s (%2$s)</string>
-    <string name="end_of_year_stories_failed">Impossible de charger vos stories de fin d’année. Vérifiez votre connexion Internet.</string>
     <string name="onboarding_plus_feature_themes_icons_text">Affichez vos véritables couleurs. Des icônes et des thèmes exclusifs pour le club Plus uniquement.</string>
     <string name="onboarding_plus_feature_themes_icons_title">Thèmes et icônes</string>
     <string name="onboarding_plus_feature_cloud_storage_text">Chargez vos fichiers dans le stockage Cloud afin de pouvoir y accéder n’importe où.</string>

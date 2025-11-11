@@ -935,7 +935,6 @@ Language: es
     <string name="onboarding_welcome_recommendations_text">Encuentra pódcasts poco conocidos y pódcasts populares en nuestra página Descubrir, con selecciones elegidas con cariño.</string>
     <string name="onboarding_plus_become_a_plus_member">Conviértete en miembro Plus y disfruta de todas las funciones de Pocket Casts</string>
     <string name="onboarding_plus_recurring_after_free_trial">Los pagos recurrentes comenzarán después de tu %1$s (%2$s)</string>
-    <string name="end_of_year_stories_failed">No se han podido cargar las historias de final de año, comprueba tu conexión a Internet.</string>
     <string name="onboarding_plus_feature_themes_icons_text">Muéstrate tal y como eres. Iconos y temas exclusivos solo para miembros Plus.</string>
     <string name="onboarding_plus_feature_themes_icons_title">Temas e iconos</string>
     <string name="onboarding_plus_feature_cloud_storage_text">Carga tus archivos en el almacenamiento en la nube para que estén disponibles desde cualquier lugar.</string>
