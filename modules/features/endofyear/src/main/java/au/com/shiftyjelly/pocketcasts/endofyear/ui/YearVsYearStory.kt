@@ -154,14 +154,14 @@ private fun TextInfo(
     measurements: EndOfYearMeasurements,
 ) {
     val title = when (story.trend) {
-        Trend.Same -> stringResource(LR.string.end_of_year_stories_year_over_year_title_flat, EndOfYearManager.YEAR.toString())
+        Trend.Same -> stringResource(LR.string.end_of_year_stories_year_over_year_title_flat, EndOfYearManager.YEAR_TO_SYNC.value.toString())
         Trend.Down -> {
             val percentageString = story.percentageChange.absoluteValue.toString()
             stringResource(LR.string.end_of_year_stories_year_over_year_title_went_down, percentageString)
         }
         Trend.Up -> {
             val percentageString = story.percentageChange.toString()
-            stringResource(LR.string.end_of_year_stories_year_over_year_title_went_up, EndOfYearManager.YEAR.toString(), percentageString)
+            stringResource(LR.string.end_of_year_stories_year_over_year_title_went_up, (EndOfYearManager.YEAR_TO_SYNC.value - 1).toString(), percentageString)
         }
         Trend.UpALot -> stringResource(LR.string.end_of_year_stories_year_over_year_title_went_up_a_lot)
     }

@@ -91,11 +91,11 @@ sealed interface Story {
             else -> Trend.UpALot
         }
 
-        sealed class Trend {
-            data object Down : Trend()
-            data object Same : Trend()
-            data object Up : Trend()
-            data object UpALot : Trend()
+        enum class Trend {
+            Down,
+            Same,
+            Up,
+            UpALot,
         }
     }
 

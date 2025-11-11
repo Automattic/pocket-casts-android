@@ -2115,8 +2115,6 @@
     <string name="end_of_year_stories_year_over_year_title_went_down">Your listening dipped %1$s%% this&#160;year</string>
     <!-- Subtitle of the story that compares year listening time when this year's listening time is less than last's year -->
     <string name="end_of_year_stories_year_over_year_subtitle_went_down">But hey, quality over quantity</string>
-    <!-- Title of the story when this year's listening time is way bigger than previous year. -->
-    <string name="eoy_year_over_year_title_skyrocketed">Compared to 2022, your listening time skyrocketed!</string>
     <!-- Text for when a user shares the story comparing the this year (%1$d) and previous year (%2$d) listening time. -->
     <string name="end_of_year_stories_year_over_share_text">My %1$d listening time compared to %2$d</string>
     <!-- Title for the completion rate. %1$d is the percentage.-->
