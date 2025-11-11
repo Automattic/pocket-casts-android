@@ -312,7 +312,7 @@ private enum class AppReviewDeclineReason(
      */
     val isFinal: Boolean,
     /**
-     * Whether unsued app review reasons should be cleared. This is done to avoid
+     * Whether unused app review reasons should be cleared. This is done to avoid
      * dispatching lingering prompts. For example, if a user creates a bookmark
      * we show the review prompt. However, we do not show prompts for the next
      * month. During that period new reasons like starring an episode should not be
