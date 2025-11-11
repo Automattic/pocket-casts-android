@@ -442,19 +442,21 @@ class MainActivity :
 
         playbackManager.setNotificationPermissionChecker(this)
 
-        var isReady = false
+        var isReady = settings.hasCompletedOnboarding()
         splashScreen.setKeepOnScreenCondition { !isReady }
 
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        lifecycleScope.launch {
-            repeatOnLifecycle(Lifecycle.State.CREATED) {
-                firebaseRemoteFeatureInitializer.initialize()
-                isReady = true
+        if (!isReady) {
+            lifecycleScope.launch {
+                repeatOnLifecycle(Lifecycle.State.CREATED) {
+                    firebaseRemoteFeatureInitializer.initialize()
+                    isReady = true
 
-                withContext(Dispatchers.Main) {
-                    onFirebaseInitComplete(savedInstanceState)
+                    withContext(Dispatchers.Main) {
+                        onFirebaseInitComplete(savedInstanceState)
+                    }
                 }
             }
         }
