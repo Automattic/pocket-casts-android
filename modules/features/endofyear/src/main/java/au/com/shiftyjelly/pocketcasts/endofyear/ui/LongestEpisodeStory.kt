@@ -37,6 +37,8 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.min
 import androidx.compose.ui.unit.sp
@@ -92,9 +94,11 @@ internal fun LongestEpisodeStory(
                 .height((maxHeight - animationContainerSize) / 2)
                 .align(Alignment.TopCenter),
         )
+        val artworkSize = 196.dp * sizeFactor
         Content(
             story = story,
             forceCoversVisible = controller.isSharing,
+            artworkSize = artworkSize,
             modifier = Modifier
                 .size(animationContainerSize)
                 .align(Alignment.Center),
@@ -116,9 +120,10 @@ internal fun LongestEpisodeStory(
 @Composable
 private fun Content(
     story: Story.LongestEpisode,
+    artworkSize: Dp,
     forceCoversVisible: Boolean,
     modifier: Modifier = Modifier,
-) = Box(
+) = BoxWithConstraints(
     modifier = modifier,
     contentAlignment = Alignment.Center,
 ) {
@@ -146,7 +151,7 @@ private fun Content(
     val artworkTransition = updateTransition(artworkTrigger, "artwork transition")
     val scaleAnimation by artworkTransition.animateFloat(
         transitionSpec = {
-            tween(durationMillis = 500, easing = FastOutSlowInEasing)
+            tween(durationMillis = 800, easing = FastOutSlowInEasing)
         },
     ) {
         if (it) {
@@ -172,9 +177,9 @@ private fun Content(
         elevation = 0.dp,
         cornerSize = 4.dp,
         modifier = Modifier
-            .requiredSize(196.dp)
+            .requiredSize(artworkSize)
             .scale(scaleAnimation)
-            .offset(y = -60.dp)
+            .offset(y = -maxHeight * .2f)
             .graphicsLayer {
                 alpha = alphaAnimation
             },
