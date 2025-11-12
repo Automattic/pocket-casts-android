@@ -27,6 +27,10 @@ class FakePlaylistManager : PlaylistManager {
         return playlistPreviews.asStateFlow()
     }
 
+    override suspend fun findPlaylistPreview(uuid: String): PlaylistPreview? {
+        return null
+    }
+
     override fun getArtworkUuidsFlow(playlistUuid: String): StateFlow<List<String>?> {
         return MutableStateFlow(null)
     }

@@ -40,7 +40,8 @@ class AddToPlaylistViewModel @AssistedInject constructor(
     private val playlistManager: PlaylistManager,
     private val tracker: AnalyticsTracker,
     @Assisted private val source: Source,
-    @Assisted("id") private val episodeUuid: String,
+    @Assisted("episodeUuid") private val episodeUuid: String,
+    @Assisted("podcastUuid") private val podcastUuid: String,
     @Assisted("title") initialPlaylistTitle: String,
 ) : ViewModel() {
     private val previewsFlow = MutableStateFlow<List<PlaylistPreviewForEpisode>?>(null)
@@ -143,7 +144,10 @@ class AddToPlaylistViewModel @AssistedInject constructor(
         )
     }
 
-    fun trackEpisodeAddTapped(isPlaylistFull: Boolean) {
+    fun trackEpisodeAddTapped(
+        playlist: PlaylistPreviewForEpisode,
+        isPlaylistFull: Boolean,
+    ) {
         tracker.track(
             AnalyticsEvent.ADD_TO_PLAYLISTS_EPISODE_ADD_TAPPED,
             mapOf(
@@ -151,12 +155,34 @@ class AddToPlaylistViewModel @AssistedInject constructor(
                 "is_playlist_full" to isPlaylistFull,
             ),
         )
+        if (!isPlaylistFull) {
+            tracker.track(
+                AnalyticsEvent.EPISODE_ADDED_TO_LIST,
+                buildMap {
+                    put("playlist_name", playlist.title)
+                    put("playlist_uuid", playlist.uuid)
+                    put("episode_uuid", episodeUuid)
+                    put("podcast_uuid", podcastUuid)
+                    put("source", source.analyticsValue)
+                },
+            )
+        }
     }
 
-    fun trackEpisodeRemoveTapped() {
+    fun trackEpisodeRemoveTapped(playlist: PlaylistPreviewForEpisode) {
         tracker.track(
             AnalyticsEvent.ADD_TO_PLAYLISTS_EPISODE_REMOVE_TAPPED,
             mapOf("source" to source.analyticsValue),
+        )
+        tracker.track(
+            AnalyticsEvent.EPISODE_REMOVED_FROM_LIST,
+            buildMap {
+                put("playlist_name", playlist.title)
+                put("playlist_uuid", playlist.uuid)
+                put("episode_uuid", episodeUuid)
+                put("podcast_uuid", podcastUuid)
+                put("source", source.analyticsValue)
+            },
         )
     }
 
@@ -184,7 +210,8 @@ class AddToPlaylistViewModel @AssistedInject constructor(
     interface Factory {
         fun create(
             source: Source,
-            @Assisted("id") episodeUuid: String,
+            @Assisted("episodeUuid") episodeUuid: String,
+            @Assisted("podcastUuid") podcastUuid: String,
             @Assisted("title") initialPlaylistTitle: String,
         ): AddToPlaylistViewModel
     }

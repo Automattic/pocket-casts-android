@@ -141,8 +141,12 @@ fun PlayerShelf(
             shelfSharedViewModel.onMoreClick()
         },
         onAddToPlaylistClick = {
-            val episodeUuid = playerViewModel.episode?.uuid ?: return@PlayerShelfContent
-            shelfSharedViewModel.onAddToPlaylistClick(episodeUuid, ShelfItemSource.Shelf)
+            val episode = playerViewModel.episode ?: return@PlayerShelfContent
+            shelfSharedViewModel.onAddToPlaylistClick(
+                episodeUuid = episode.uuid,
+                podcastUuid = episode.podcastOrSubstituteUuid,
+                source = ShelfItemSource.Shelf,
+            )
         },
         modifier = modifier,
     )

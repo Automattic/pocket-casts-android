@@ -63,6 +63,9 @@ abstract class PlaylistDao {
     @Query("SELECT * FROM playlists WHERE deleted = 0 AND draft = 0 ORDER BY sortPosition ASC")
     abstract fun allPlaylistsFlow(): Flow<List<PlaylistEntity>>
 
+    @Query("SELECT * FROM playlists WHERE uuid = :uuid")
+    abstract suspend fun findPlaylistByUuid(uuid: String): PlaylistEntity?
+
     @Query(
         """
         SELECT

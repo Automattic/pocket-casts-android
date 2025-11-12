@@ -401,6 +401,7 @@ class PlayerHeaderFragment :
                                 val fragment = addToPlaylistFragmentFactory.create(
                                     source = AddToPlaylistFragmentFactory.Source.Shelf,
                                     episodeUuid = navigationState.episodeUuid,
+                                    podcastUuid = navigationState.podcastUuid,
                                     customTheme = Theme.ThemeType.DARK,
                                 )
                                 fragment.show(parentFragmentManager, "add-to-playlist")

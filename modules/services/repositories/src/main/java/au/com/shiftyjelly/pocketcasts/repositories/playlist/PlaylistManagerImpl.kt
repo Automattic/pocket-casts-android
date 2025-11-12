@@ -98,6 +98,10 @@ class PlaylistManagerImpl(
         }
     }
 
+    override suspend fun findPlaylistPreview(uuid: String): PlaylistPreview? {
+        return playlistDao.findPlaylistByUuid(uuid)?.toPlaylistPreview()
+    }
+
     private val artworkCache = ConcurrentHashMap<String, MutableStateFlow<List<String>?>>()
     private val episodeCountCache = ConcurrentHashMap<String, MutableStateFlow<Int?>>()
 
