@@ -1,6 +1,7 @@
 package au.com.shiftyjelly.pocketcasts.repositories.appreview
 
 import au.com.shiftyjelly.pocketcasts.preferences.model.AppReviewReason
+import com.google.android.play.core.review.ReviewInfo
 import kotlinx.coroutines.flow.Flow
 
 interface AppReviewManager {
@@ -11,6 +12,8 @@ interface AppReviewManager {
 
 interface AppReviewSignal {
     val reason: AppReviewReason
+
+    val reviewInfo: ReviewInfo
 
     fun consume()
 

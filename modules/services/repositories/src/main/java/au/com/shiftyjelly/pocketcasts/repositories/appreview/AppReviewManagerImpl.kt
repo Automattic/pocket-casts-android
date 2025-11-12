@@ -4,6 +4,10 @@ import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.preferences.model.AppReviewReason
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
+import com.google.android.play.core.ktx.requestReview
+import com.google.android.play.core.review.ReviewException
+import com.google.android.play.core.review.ReviewInfo
+import com.google.android.play.core.review.model.ReviewErrorCode
 import java.time.Clock
 import java.time.temporal.ChronoUnit
 import java.util.concurrent.atomic.AtomicBoolean
@@ -18,21 +22,25 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.suspendCancellableCoroutine
+import com.google.android.play.core.review.ReviewManager as GoogleReviewManager
 import java.time.Duration as JavaDuration
 
 @Singleton
 class AppReviewManagerImpl(
     private val settings: Settings,
     private val clock: Clock,
+    private val googleManager: GoogleReviewManager,
     private val loopIdleDuration: Duration,
 ) : AppReviewManager {
     @Inject
     constructor(
         settings: Settings,
         clock: Clock,
+        googleManager: GoogleReviewManager,
     ) : this(
         settings = settings,
         clock = clock,
+        googleManager = googleManager,
         loopIdleDuration = 5.seconds,
     )
 
@@ -44,24 +52,77 @@ class AppReviewManagerImpl(
     override suspend fun monitorAppReviewReasons() {
         if (!isMonitoring.getAndSet(true)) {
             while (true) {
-                val usedReasons = settings.appReviewSubmittedReasons.value
-                if (usedReasons.containsAll(UserBasedReasons) || !isNotDeclinedTwiceIn60Days()) {
-                    break
-                }
+                when (val triggerData = calculateTriggerData()) {
+                    is AppReviewTriggerData.Success -> {
+                        triggerPrompt(triggerData.reason, triggerData.reviewInfo)
+                    }
 
-                val reason = calculatePromptReviewReason()
-                if (reason != null) {
-                    triggerPrompt(reason)
+                    is AppReviewTriggerData.Failure -> {
+                        if (triggerData.reason.isFinal) {
+                            break
+                        }
+                    }
                 }
                 delay(loopIdleDuration)
             }
         }
     }
 
-    suspend fun triggerPrompt(reason: AppReviewReason) {
+    private suspend fun calculateTriggerData(): AppReviewTriggerData {
+        if (!FeatureFlag.isEnabled(Feature.IMPROVE_APP_RATINGS)) {
+            return AppReviewTriggerData.Failure(AppReviewDeclineReason.FeatureNotEnabled)
+        }
+
+        if (isDeclinedTwiceIn60Days()) {
+            return AppReviewTriggerData.Failure(AppReviewDeclineReason.PromptDeclinedMultipleTimes)
+        }
+
+        if (areAllAppReviewReasonsUsed()) {
+            return AppReviewTriggerData.Failure(AppReviewDeclineReason.AllReasonsUsed)
+        }
+
+        val reviewInfo = runCatching { googleManager.requestReview() }.getOrElse { error ->
+            val reason = if (error is ReviewException) {
+                when (error.errorCode) {
+                    ReviewErrorCode.INTERNAL_ERROR -> AppReviewDeclineReason.GoogleInternal
+                    ReviewErrorCode.INVALID_REQUEST -> AppReviewDeclineReason.GoogleInvalidRequest
+                    ReviewErrorCode.PLAY_STORE_NOT_FOUND -> AppReviewDeclineReason.GooglePlayStoreNotFound
+                    else -> AppReviewDeclineReason.GoogleUnknown
+                }
+            } else {
+                AppReviewDeclineReason.GoogleUnknown
+            }
+            return AppReviewTriggerData.Failure(reason)
+        }
+
+        if (isPromptedInLast30Days()) {
+            return AppReviewTriggerData.Failure(AppReviewDeclineReason.PromptShownRecently)
+        }
+
+        if (hasFailedInLast2Sessions()) {
+            return AppReviewTriggerData.Failure(AppReviewDeclineReason.ErrorInRecentSessions)
+        }
+
+        if (hasCrashedInLast7Days()) {
+            return AppReviewTriggerData.Failure(AppReviewDeclineReason.CrashedRecently)
+        }
+
+        val usedReasons = settings.appReviewSubmittedReasons.value
+        val promptReason = UserBasedReasons
+            .filterNot(usedReasons::contains)
+            .firstOrNull(::isReasonApplicable)
+        if (promptReason == null) {
+            return AppReviewTriggerData.Failure(AppReviewDeclineReason.NoReasonApplicable)
+        }
+
+        return AppReviewTriggerData.Success(promptReason, reviewInfo)
+    }
+
+    suspend fun triggerPrompt(reason: AppReviewReason, reviewInfo: ReviewInfo) {
         val result = suspendCancellableCoroutine { continuation ->
             val data = AppReviewSignalImpl(
                 reason = reason,
+                reviewInfo = reviewInfo,
                 continuation = continuation,
             )
             if (signalChannel.trySend(data).isFailure) {
@@ -69,17 +130,6 @@ class AppReviewManagerImpl(
             }
         }
         processSignalResult(result, reason)
-    }
-
-    private fun calculatePromptReviewReason(): AppReviewReason? {
-        if (!canDispatchSignal()) {
-            return null
-        }
-
-        val usedReasons = settings.appReviewSubmittedReasons.value
-        return UserBasedReasons
-            .filterNot(usedReasons::contains)
-            .firstOrNull(::isReasonApplicable)
     }
 
     private fun processSignalResult(result: AppReviewSignal.Result, reason: AppReviewReason) {
@@ -97,41 +147,37 @@ class AppReviewManagerImpl(
         }
     }
 
-    private fun canDispatchSignal(): Boolean {
-        return FeatureFlag.isEnabled(Feature.IMPROVE_APP_RATINGS) &&
-            is30DaysSinceLastPrompt() &&
-            isNotDeclinedTwiceIn60Days() &&
-            isNoErrorsInLast2Sessions() &&
-            isNoCrashesIn7Days()
+    private fun areAllAppReviewReasonsUsed(): Boolean {
+        return settings.appReviewSubmittedReasons.value.containsAll(UserBasedReasons)
     }
 
-    private fun is30DaysSinceLastPrompt(): Boolean {
+    private fun isPromptedInLast30Days(): Boolean {
         val thirtyDaysAgo = clock.instant().minus(30, ChronoUnit.DAYS)
-        val lastReviewTimestamp = settings.appReviewLastPromptTimestamp.value ?: return true
-        return thirtyDaysAgo.isAfter(lastReviewTimestamp)
+        val lastReviewTimestamp = settings.appReviewLastPromptTimestamp.value ?: return false
+        return !lastReviewTimestamp.isBefore(thirtyDaysAgo)
     }
 
-    private fun isNotDeclinedTwiceIn60Days(): Boolean {
+    private fun isDeclinedTwiceIn60Days(): Boolean {
         val declineTimestamps = settings.appReviewLastDeclineTimestamps.value.takeLast(2)
         return when (declineTimestamps.size) {
-            0, 1 -> true
+            0, 1 -> false
             else -> {
                 val first = declineTimestamps[0]
                 val second = declineTimestamps[1]
-                JavaDuration.between(first, second).abs().toDays() > 60
+                JavaDuration.between(first, second).abs().toDays() <= 60
             }
         }
     }
 
-    private fun isNoErrorsInLast2Sessions(): Boolean {
+    private fun hasFailedInLast2Sessions(): Boolean {
         val recentSessions = settings.sessionIds.takeLast(2)
-        return settings.appReviewErrorSessionIds.value.none(recentSessions::contains)
+        return settings.appReviewErrorSessionIds.value.any(recentSessions::contains)
     }
 
-    private fun isNoCrashesIn7Days(): Boolean {
+    private fun hasCrashedInLast7Days(): Boolean {
         val sevenDaysAgo = clock.instant().minus(7, ChronoUnit.DAYS)
-        val lastCrashTimestamp = settings.appReviewCrashTimestamp.value ?: return true
-        return sevenDaysAgo.isAfter(lastCrashTimestamp)
+        val lastCrashTimestamp = settings.appReviewCrashTimestamp.value ?: return false
+        return !lastCrashTimestamp.isBefore(sevenDaysAgo)
     }
 
     private fun isReasonApplicable(reason: AppReviewReason) = when (reason) {
@@ -184,6 +230,7 @@ class AppReviewManagerImpl(
 
 private class AppReviewSignalImpl(
     override val reason: AppReviewReason,
+    override val reviewInfo: ReviewInfo,
     private val continuation: CancellableContinuation<AppReviewSignal.Result>,
 ) : AppReviewSignal {
     override fun consume() {
@@ -197,6 +244,58 @@ private class AppReviewSignalImpl(
             runCatching { continuation.resume(AppReviewSignal.Result.Ignored) }
         }
     }
+}
+
+private enum class AppReviewDeclineReason(
+    /**
+     * Whether the event loop should be stopped when this is a decline reason.
+     */
+    val isFinal: Boolean,
+) {
+    FeatureNotEnabled(
+        isFinal = true,
+    ),
+    CrashedRecently(
+        isFinal = false,
+    ),
+    ErrorInRecentSessions(
+        isFinal = false,
+    ),
+    PromptDeclinedMultipleTimes(
+        isFinal = true,
+    ),
+    PromptShownRecently(
+        isFinal = false,
+    ),
+    AllReasonsUsed(
+        isFinal = true,
+    ),
+    NoReasonApplicable(
+        isFinal = false,
+    ),
+    GoogleInternal(
+        isFinal = true,
+    ),
+    GoogleInvalidRequest(
+        isFinal = true,
+    ),
+    GooglePlayStoreNotFound(
+        isFinal = true,
+    ),
+    GoogleUnknown(
+        isFinal = true,
+    ),
+}
+
+private sealed interface AppReviewTriggerData {
+    data class Success(
+        val reason: AppReviewReason,
+        val reviewInfo: ReviewInfo,
+    ) : AppReviewTriggerData
+
+    data class Failure(
+        val reason: AppReviewDeclineReason,
+    ) : AppReviewTriggerData
 }
 
 private val UserBasedReasons = AppReviewReason.entries - AppReviewReason.DevelopmentTrigger
