@@ -22,6 +22,7 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.suspendCancellableCoroutine
+import timber.log.Timber
 import com.google.android.play.core.review.ReviewManager as GoogleReviewManager
 import java.time.Duration as JavaDuration
 
@@ -54,10 +55,15 @@ class AppReviewManagerImpl(
             while (true) {
                 when (val triggerData = calculateTriggerData()) {
                     is AppReviewTriggerData.Success -> {
+                        Timber.d("App review triggered: ${triggerData.reason}")
                         triggerPrompt(triggerData.reason, triggerData.reviewInfo)
                     }
 
                     is AppReviewTriggerData.Failure -> {
+                        Timber.d("App review not triggered: ${triggerData.reason}")
+                        if (triggerData.reason.shouldCleanUpData) {
+                            clearAllUnusedReasons()
+                        }
                         if (triggerData.reason.isFinal) {
                             break
                         }
@@ -136,6 +142,7 @@ class AppReviewManagerImpl(
         when (result) {
             AppReviewSignal.Result.Consumed -> {
                 settings.appReviewLastPromptTimestamp.set(clock.instant(), updateModifiedAt = false)
+                clearAllUnusedReasons()
 
                 if (reason != AppReviewReason.DevelopmentTrigger) {
                     val usedReasons = settings.appReviewSubmittedReasons.value
@@ -226,6 +233,58 @@ class AppReviewManagerImpl(
             true
         }
     }
+
+    private fun clearAllUnusedReasons() {
+        val usedReasons = settings.appReviewSubmittedReasons.value
+        val unusedReasons = UserBasedReasons - usedReasons
+        with(settings) {
+            unusedReasons.forEach { reason ->
+                when (reason) {
+                    AppReviewReason.ThirdEpisodeCompleted -> {
+                        appReviewEpisodeCompletedTimestamps.set(emptyList(), updateModifiedAt = false)
+                    }
+
+                    AppReviewReason.EpisodeStarred -> {
+                        appReviewEpisodeStarredTimestamp.set(null, updateModifiedAt = false)
+                    }
+
+                    AppReviewReason.ShowRated -> {
+                        appReviewPodcastRatedTimestamp.set(null, updateModifiedAt = false)
+                    }
+
+                    AppReviewReason.FilterCreated -> {
+                        appReviewPlaylistCreatedTimestamp.set(null, updateModifiedAt = false)
+                    }
+
+                    AppReviewReason.PlusUpgraded -> {
+                        appReviewPlusUpgradedTimestamp.set(null, updateModifiedAt = false)
+                    }
+
+                    AppReviewReason.FolderCreated -> {
+                        appReviewFolderCreatedTimestamp.set(null, updateModifiedAt = false)
+                    }
+
+                    AppReviewReason.BookmarkCreated -> {
+                        appReviewBookmarkCreatedTimestamp.set(null, updateModifiedAt = false)
+                    }
+
+                    AppReviewReason.CustomThemeSet -> {
+                        appReviewThemeChangedTimestamp.set(null, updateModifiedAt = false)
+                    }
+
+                    AppReviewReason.ReferralShared -> {
+                        appReviewReferralSharedTimestamp.set(null, updateModifiedAt = false)
+                    }
+
+                    AppReviewReason.PlaybackShared -> {
+                        appReviewPlaybackSharedTimestamp.set(null, updateModifiedAt = false)
+                    }
+
+                    AppReviewReason.DevelopmentTrigger -> Unit
+                }
+            }
+        }
+    }
 }
 
 private class AppReviewSignalImpl(
@@ -244,6 +303,10 @@ private class AppReviewSignalImpl(
             runCatching { continuation.resume(AppReviewSignal.Result.Ignored) }
         }
     }
+
+    override fun toString(): String {
+        return "AppReviewSignalImpl(reason=$reason, reviewInfo=$reviewInfo)"
+    }
 }
 
 private enum class AppReviewDeclineReason(
@@ -251,39 +314,57 @@ private enum class AppReviewDeclineReason(
      * Whether the event loop should be stopped when this is a decline reason.
      */
     val isFinal: Boolean,
+    /**
+     * Whether unused app review reasons should be cleared. This prevents dispatching lingering prompts.
+     * Cleanup occurs when: (1) a prompt is successfully shown, or (2) prompting fails due to temporary
+     * conditions like crashes or errors, ensuring stale reasons don't trigger prompts once the condition
+     * is resolved.
+     */
+    val shouldCleanUpData: Boolean,
 ) {
     FeatureNotEnabled(
         isFinal = true,
+        shouldCleanUpData = false,
     ),
     CrashedRecently(
         isFinal = false,
+        shouldCleanUpData = true,
     ),
     ErrorInRecentSessions(
         isFinal = false,
+        shouldCleanUpData = true,
     ),
     PromptDeclinedMultipleTimes(
         isFinal = true,
+        shouldCleanUpData = false,
     ),
     PromptShownRecently(
         isFinal = false,
+        shouldCleanUpData = true,
     ),
     AllReasonsUsed(
         isFinal = true,
+        shouldCleanUpData = false,
     ),
     NoReasonApplicable(
         isFinal = false,
+        shouldCleanUpData = false,
     ),
     GoogleInternal(
         isFinal = true,
+        shouldCleanUpData = false,
     ),
     GoogleInvalidRequest(
         isFinal = true,
+        shouldCleanUpData = false,
     ),
     GooglePlayStoreNotFound(
         isFinal = true,
+        shouldCleanUpData = false,
     ),
     GoogleUnknown(
         isFinal = true,
+        shouldCleanUpData = false,
     ),
 }
 
