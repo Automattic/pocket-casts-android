@@ -1,5 +1,7 @@
 package au.com.shiftyjelly.pocketcasts.repositories.appreview
 
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.preferences.model.AppReviewReason
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
@@ -30,6 +32,7 @@ import java.time.Duration as JavaDuration
 class AppReviewManagerImpl(
     private val settings: Settings,
     private val clock: Clock,
+    private val tracker: AnalyticsTracker,
     private val googleManager: GoogleReviewManager,
     private val loopIdleDuration: Duration,
 ) : AppReviewManager {
@@ -37,10 +40,12 @@ class AppReviewManagerImpl(
     constructor(
         settings: Settings,
         clock: Clock,
+        tracker: AnalyticsTracker,
         googleManager: GoogleReviewManager,
     ) : this(
         settings = settings,
         clock = clock,
+        tracker = tracker,
         googleManager = googleManager,
         loopIdleDuration = 5.seconds,
     )
@@ -49,6 +54,8 @@ class AppReviewManagerImpl(
     override val showPromptSignal: Flow<AppReviewSignal> get() = signalChannel.receiveAsFlow()
 
     private val isMonitoring = AtomicBoolean()
+
+    private val trackedFailureEvents = mutableSetOf<AppReviewDeclineReason>()
 
     override suspend fun monitorAppReviewReasons() {
         if (!isMonitoring.getAndSet(true)) {
@@ -63,6 +70,12 @@ class AppReviewManagerImpl(
                         Timber.d("App review not triggered: ${triggerData.reason}")
                         if (triggerData.reason.shouldCleanUpData) {
                             clearAllUnusedReasons()
+                        }
+                        if (triggerData.reason.analyticsValue != null && trackedFailureEvents.add(triggerData.reason)) {
+                            tracker.track(
+                                AnalyticsEvent.USER_SATISFACTION_SURVEY_NOT_SHOWN,
+                                mapOf("policy" to triggerData.reason.analyticsValue),
+                            )
                         }
                         if (triggerData.reason.isFinal) {
                             break
@@ -321,50 +334,62 @@ private enum class AppReviewDeclineReason(
      * is resolved.
      */
     val shouldCleanUpData: Boolean,
+    val analyticsValue: String?,
 ) {
     FeatureNotEnabled(
         isFinal = true,
         shouldCleanUpData = false,
+        analyticsValue = null,
     ),
     CrashedRecently(
         isFinal = false,
         shouldCleanUpData = true,
+        analyticsValue = "crashed_recently",
     ),
     ErrorInRecentSessions(
         isFinal = false,
         shouldCleanUpData = true,
+        analyticsValue = "error_in_recent_sessions",
     ),
     PromptDeclinedMultipleTimes(
         isFinal = true,
         shouldCleanUpData = false,
+        analyticsValue = "prompt_declined_multiple_times",
     ),
     PromptShownRecently(
         isFinal = false,
         shouldCleanUpData = true,
+        analyticsValue = "prompt_shown_recently",
     ),
     AllReasonsUsed(
         isFinal = true,
         shouldCleanUpData = false,
+        analyticsValue = null,
     ),
     NoReasonApplicable(
         isFinal = false,
         shouldCleanUpData = false,
+        analyticsValue = null,
     ),
     GoogleInternal(
         isFinal = true,
         shouldCleanUpData = false,
+        analyticsValue = "google_internal",
     ),
     GoogleInvalidRequest(
         isFinal = true,
         shouldCleanUpData = false,
+        analyticsValue = "google_invalid_request",
     ),
     GooglePlayStoreNotFound(
         isFinal = true,
         shouldCleanUpData = false,
+        analyticsValue = "google_play_store_not_found",
     ),
     GoogleUnknown(
         isFinal = true,
         shouldCleanUpData = false,
+        analyticsValue = "google_unknown",
     ),
 }
 

@@ -867,6 +867,7 @@ enum class AnalyticsEvent(val key: String) {
 
     /* App Ratings */
     USER_SATISFACTION_SURVEY_SHOWN("user_satisfaction_survey_shown"),
+    USER_SATISFACTION_SURVEY_NOT_SHOWN("user_satisfaction_survey_not_shown"),
     USER_SATISFACTION_SURVEY_DISMISSED("user_satisfaction_survey_dismissed"),
     USER_SATISFACTION_SURVEY_YES_RESPONSE("user_satisfaction_survey_yes_response"),
     USER_SATISFACTION_SURVEY_NO_RESPONSE("user_satisfaction_survey_no_response"),
