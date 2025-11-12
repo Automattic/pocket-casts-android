@@ -315,11 +315,10 @@ private enum class AppReviewDeclineReason(
      */
     val isFinal: Boolean,
     /**
-     * Whether unused app review reasons should be cleared. This is done to avoid
-     * dispatching lingering prompts. For example, if a user creates a bookmark
-     * we show the review prompt. However, we do not show prompts for the next
-     * month. During that period new reasons like starring an episode should not be
-     * accounted for.
+     * Whether unused app review reasons should be cleared. This prevents dispatching lingering prompts.
+     * Cleanup occurs when: (1) a prompt is successfully shown, or (2) prompting fails due to temporary
+     * conditions like crashes or errors, ensuring stale reasons don't trigger prompts once the condition
+     * is resolved.
      */
     val shouldCleanUpData: Boolean,
 ) {
