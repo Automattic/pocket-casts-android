@@ -308,6 +308,8 @@ class AppReviewManagerTest {
 
     @Test
     fun `do not monitor if user declined twice in 60 days`() = runTest {
+        episodeStarredSetting.set(clock.instant())
+
         lastDeclineTimestampsSetting.set(listOf(clock.instant(), clock.instant()))
 
         val job = launch { manager.monitorAppReviewReasons() }

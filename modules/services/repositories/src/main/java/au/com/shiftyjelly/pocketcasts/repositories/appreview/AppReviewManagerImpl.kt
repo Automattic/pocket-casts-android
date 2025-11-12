@@ -92,12 +92,20 @@ class AppReviewManagerImpl(
             return AppReviewTriggerData.Failure(AppReviewDeclineReason.FeatureNotEnabled)
         }
 
-        if (isDeclinedTwiceIn60Days()) {
-            return AppReviewTriggerData.Failure(AppReviewDeclineReason.PromptDeclinedMultipleTimes)
-        }
-
         if (areAllAppReviewReasonsUsed()) {
             return AppReviewTriggerData.Failure(AppReviewDeclineReason.AllReasonsUsed)
+        }
+
+        val usedReasons = settings.appReviewSubmittedReasons.value
+        val promptReason = UserBasedReasons
+            .filterNot(usedReasons::contains)
+            .firstOrNull(::isReasonApplicable)
+        if (promptReason == null) {
+            return AppReviewTriggerData.Failure(AppReviewDeclineReason.NoReasonApplicable)
+        }
+
+        if (isDeclinedTwiceIn60Days()) {
+            return AppReviewTriggerData.Failure(AppReviewDeclineReason.PromptDeclinedMultipleTimes)
         }
 
         val reviewInfo = runCatching { googleManager.requestReview() }.getOrElse { error ->
@@ -124,14 +132,6 @@ class AppReviewManagerImpl(
 
         if (hasCrashedInLast7Days()) {
             return AppReviewTriggerData.Failure(AppReviewDeclineReason.CrashedRecently)
-        }
-
-        val usedReasons = settings.appReviewSubmittedReasons.value
-        val promptReason = UserBasedReasons
-            .filterNot(usedReasons::contains)
-            .firstOrNull(::isReasonApplicable)
-        if (promptReason == null) {
-            return AppReviewTriggerData.Failure(AppReviewDeclineReason.NoReasonApplicable)
         }
 
         return AppReviewTriggerData.Success(promptReason, reviewInfo)
