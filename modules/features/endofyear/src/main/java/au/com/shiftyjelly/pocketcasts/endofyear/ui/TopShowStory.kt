@@ -57,7 +57,7 @@ import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 import au.com.shiftyjelly.pocketcasts.ui.R as UR
 
-private const val mediumHeightFactor = .6f
+private const val MEDIUM_HEIGHT_FACTOR = .6f
 
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
@@ -76,7 +76,7 @@ internal fun TopShowStory(
     ) {
         val windowSize = currentWindowAdaptiveInfo().windowSizeClass
         val sizeFactor = if (windowSize.isAtMostMediumHeight()) {
-            mediumHeightFactor
+            MEDIUM_HEIGHT_FACTOR
         } else {
             1f
         }
