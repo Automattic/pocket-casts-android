@@ -17,6 +17,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.requiredSize
 import androidx.compose.foundation.layout.size
+import androidx.compose.material3.adaptive.currentWindowAdaptiveInfo
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -38,6 +39,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.min
 import androidx.compose.ui.unit.sp
 import au.com.shiftyjelly.pocketcasts.compose.Devices
+import au.com.shiftyjelly.pocketcasts.compose.adaptive.isAtMostMediumHeight
 import au.com.shiftyjelly.pocketcasts.compose.components.PodcastImage
 import au.com.shiftyjelly.pocketcasts.compose.components.TextH10
 import au.com.shiftyjelly.pocketcasts.compose.components.TextP40
@@ -55,8 +57,7 @@ import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 import au.com.shiftyjelly.pocketcasts.ui.R as UR
 
-private val SQUARE_LIKE_SCREEN_ASPECT_RATIO = 2
-private val SIZE_FACTOR_SQUARE_LIKE = .6f
+private const val mediumHeightFactor = .6f
 
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
@@ -73,11 +74,11 @@ internal fun TopShowStory(
             .background(story.backgroundColor)
             .padding(top = measurements.closeButtonBottomEdge + 16.dp),
     ) {
-        val aspectRatio = maxHeight / maxWidth
-        val sizeFactor = if (aspectRatio > SQUARE_LIKE_SCREEN_ASPECT_RATIO) {
-            1f
+        val windowSize = currentWindowAdaptiveInfo().windowSizeClass
+        val sizeFactor = if (windowSize.isAtMostMediumHeight()) {
+            mediumHeightFactor
         } else {
-            SIZE_FACTOR_SQUARE_LIKE
+            1f
         }
         val animationContainerSize = min(maxWidth, maxHeight) * sizeFactor
         Header(
@@ -99,10 +100,10 @@ internal fun TopShowStory(
             story = story,
             controller = controller,
             onShareStory = onShareStory,
-            textAlignment = if (aspectRatio > SQUARE_LIKE_SCREEN_ASPECT_RATIO) {
-                Alignment.Center
-            } else {
+            textAlignment = if (windowSize.isAtMostMediumHeight()) {
                 Alignment.TopCenter
+            } else {
+                Alignment.Center
             },
             modifier = Modifier
                 .fillMaxWidth()
