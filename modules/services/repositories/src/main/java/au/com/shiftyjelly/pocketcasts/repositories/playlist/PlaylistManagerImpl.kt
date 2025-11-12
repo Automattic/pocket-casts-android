@@ -114,7 +114,7 @@ class PlaylistManagerImpl(
     }
 
     override suspend fun refreshArtworkUuids(playlistUuid: String) {
-        val playlistPreview = playlistDao.getAllPlaylistsIn(listOf(playlistUuid)).firstOrNull()?.toPlaylistPreview() ?: return
+        val playlistPreview = findPlaylistPreview(playlistUuid) ?: return
         val flow = getArtworkUuidsFlow(playlistUuid)
         flow.value = when (playlistPreview) {
             is ManualPlaylistPreview -> manualPlaylistArtworkPodcastsFlow(playlistUuid)
@@ -123,7 +123,7 @@ class PlaylistManagerImpl(
     }
 
     override suspend fun refreshEpisodeCount(playlistUuid: String) {
-        val playlistPreview = playlistDao.getAllPlaylistsIn(listOf(playlistUuid)).firstOrNull()?.toPlaylistPreview() ?: return
+        val playlistPreview = findPlaylistPreview(playlistUuid) ?: return
         val flow = getEpisodeCountFlow(playlistUuid)
         flow.value = when (playlistPreview) {
             is ManualPlaylistPreview -> playlistDao.manualPlaylistMetadataFlow(playlistUuid)
