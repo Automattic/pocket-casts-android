@@ -22,6 +22,7 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.suspendCancellableCoroutine
+import timber.log.Timber
 import com.google.android.play.core.review.ReviewManager as GoogleReviewManager
 import java.time.Duration as JavaDuration
 
@@ -58,6 +59,7 @@ class AppReviewManagerImpl(
                     }
 
                     is AppReviewTriggerData.Failure -> {
+                        Timber.d("App review not triggered: ${triggerData.reason}")
                         if (triggerData.reason.shouldCleanUpData) {
                             clearAllUnusedReasons()
                         }
