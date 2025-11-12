@@ -2,6 +2,7 @@ package au.com.shiftyjelly.pocketcasts.repositories.appreview
 
 import app.cash.turbine.TurbineTestContext
 import app.cash.turbine.test
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.preferences.ReadWriteSetting
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.preferences.model.AppReviewReason
@@ -81,6 +82,7 @@ class AppReviewManagerTest {
             on { appReviewErrorSessionIds } doReturn errorSessionsSetting
             on { appReviewCrashTimestamp } doReturn crashTimestampSetting
         },
+        tracker = AnalyticsTracker.test(),
         googleManager = googleManager,
         loopIdleDuration = loopIdleDuration,
     )
@@ -306,6 +308,8 @@ class AppReviewManagerTest {
 
     @Test
     fun `do not monitor if user declined twice in 60 days`() = runTest {
+        episodeStarredSetting.set(clock.instant())
+
         lastDeclineTimestampsSetting.set(listOf(clock.instant(), clock.instant()))
 
         val job = launch { manager.monitorAppReviewReasons() }
