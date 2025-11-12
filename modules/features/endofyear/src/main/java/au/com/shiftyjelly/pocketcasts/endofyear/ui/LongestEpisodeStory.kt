@@ -32,13 +32,13 @@ import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalInspectionMode
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
-import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.min
 import androidx.compose.ui.unit.sp
@@ -97,7 +97,7 @@ internal fun LongestEpisodeStory(
         val artworkSize = 196.dp * sizeFactor
         Content(
             story = story,
-            forceCoversVisible = controller.isSharing,
+            forceVisible = controller.isSharing,
             artworkSize = artworkSize,
             modifier = Modifier
                 .size(animationContainerSize)
@@ -121,7 +121,7 @@ internal fun LongestEpisodeStory(
 private fun Content(
     story: Story.LongestEpisode,
     artworkSize: Dp,
-    forceCoversVisible: Boolean,
+    forceVisible: Boolean,
     modifier: Modifier = Modifier,
 ) = BoxWithConstraints(
     modifier = modifier,
@@ -130,22 +130,26 @@ private fun Content(
     val composition by rememberLottieComposition(
         spec = LottieCompositionSpec.RawRes(IR.raw.playback_longest_episode_lottie),
     )
+    val isPreview = LocalInspectionMode.current
+    val freezeAnimation = forceVisible || isPreview
+
     val progress by animateLottieCompositionAsState(
         composition = composition,
-        iterations = Integer.MAX_VALUE
+        iterations = Integer.MAX_VALUE,
+        isPlaying = !freezeAnimation
     )
     val isPlaying = progress > 0f
 
     LottieAnimation(
         composition = composition,
-        progress = { progress },
+        progress = { if (freezeAnimation) 1f else progress },
         modifier = Modifier
             .matchParentSize(),
         contentScale = ContentScale.FillWidth,
     )
     var artworkTrigger by remember { mutableStateOf(false) }
-    LaunchedEffect(isPlaying) {
-        artworkTrigger = isPlaying
+    LaunchedEffect(isPlaying, freezeAnimation) {
+        artworkTrigger = freezeAnimation || isPlaying
     }
 
     val artworkTransition = updateTransition(artworkTrigger, "artwork transition")
