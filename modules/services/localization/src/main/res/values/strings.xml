@@ -998,8 +998,8 @@
     <string name="playlist_archive_all" translatable="false">@string/podcast_archive_all</string>
     <string name="playlist_artwork_description">Playlist’s artwork</string>
     <string name="playlist_download_all" translatable="false">@string/podcast_download_all</string>
-    <string name="playlist_edit_episodes">Rearrange episodes</string>
-    <string name="playlist_edit_episodes_title">Edit playlist</string>
+    <string name="playlist_edit_episodes">Reorder episodes</string>
+    <string name="playlist_edit_episodes_title" translatable="false">@string/playlist_edit_episodes</string>
     <string name="playlist_episode_unavailable_title">Episode unavailable</string>
     <string name="playlist_episode_unavailable_description">The podcast creator deleted this episode. It will stay in your playlist until you remove it.</string>
     <string name="playlist_episode_unavailable_cta">Remove from playlist</string>

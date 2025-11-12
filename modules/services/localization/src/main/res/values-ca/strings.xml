@@ -40,7 +40,6 @@ Language: ca
     <string name="add_to_up_next_top">Afegir al principi de la cua</string>
     <string name="playlist_episodes_archived_title">No hi ha episodis</string>
     <string name="playlist_episodes_archived_count">%1$d arxivats</string>
-    <string name="playlist_edit_episodes_title">Editar la llista</string>
     <string name="playlist_edit_episodes">Reorganitzar els episodis</string>
     <string name="playlist_episode_unavailable_cta">Esborrar de la llista de reproducció</string>
     <string name="playlist_episode_unavailable_description">L\'autor del pòdcast ha eliminat aquest episodi. Es quedarà a la teva llista de reproducció fins que l\'esborris.</string>

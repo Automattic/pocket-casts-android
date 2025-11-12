@@ -57,7 +57,6 @@ Language: de
     <string name="playlist_episodes_archived_title">Keine Folgen</string>
     <string name="playlist_episodes_archived_count">%1$d archiviert</string>
     <string name="playlist_edit_episodes">Folgen neu anordnen</string>
-    <string name="playlist_edit_episodes_title">Playlist bearbeiten</string>
     <string name="playlist_episode_unavailable_title">Folge nicht verfügbar</string>
     <string name="episode_sort_custom_order">Individuelle Reihenfolge</string>
     <string name="playlist_episode_unavailable_cta">Aus Playlist entfernen</string>

@@ -56,7 +56,6 @@ Language: it
     <string name="add_to_up_next_top">Aggiungi a Successivo dall\'inizio </string>
     <string name="playlist_episodes_archived_title">Nessun episodio</string>
     <string name="playlist_episodes_archived_count">%1$d archiviato/i</string>
-    <string name="playlist_edit_episodes_title">Modifica playlist</string>
     <string name="playlist_edit_episodes">Riorganizza episodi</string>
     <string name="playlist_episode_unavailable_cta">Rimuovi dalla playlist</string>
     <string name="playlist_episode_unavailable_description">Il creatore del podcast ha eliminato questo episodio. Rimarrà nella playlist finché non la rimuovi.</string>

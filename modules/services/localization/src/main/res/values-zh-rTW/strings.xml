@@ -56,7 +56,6 @@ Language: zh_TW
     <string name="add_to_up_next_top">新增至「接下來播放」開頭</string>
     <string name="playlist_episodes_archived_title">沒有單集</string>
     <string name="playlist_episodes_archived_count">已封存 %1$d 集</string>
-    <string name="playlist_edit_episodes_title">編輯播放清單</string>
     <string name="playlist_edit_episodes">重新排列單集</string>
     <string name="playlist_episode_unavailable_cta">從播放清單移除</string>
     <string name="playlist_episode_unavailable_description">Podcast 創作者已將本集刪除。 除非移除，否則該單集將持續保留在播放清單中。</string>

@@ -56,7 +56,6 @@ Language: zh_CN
     <string name="add_to_up_next_top">添加到“接下来播放”顶部</string>
     <string name="playlist_episodes_archived_title">无剧集</string>
     <string name="playlist_episodes_archived_count">%1$d 已存档</string>
-    <string name="playlist_edit_episodes_title">编辑播放列表</string>
     <string name="playlist_edit_episodes">重新排列剧集</string>
     <string name="playlist_episode_unavailable_cta">从播放列表中移除</string>
     <string name="playlist_episode_unavailable_description">播客创作者删除了此剧集。 在您移除之前，它将保留在您的播放列表中。</string>

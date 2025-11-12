@@ -57,7 +57,6 @@ Language: fr
     <string name="playlist_episodes_archived_title">Aucun épisode</string>
     <string name="playlist_episodes_archived_count">%1$d archivé(s)</string>
     <string name="playlist_edit_episodes">Réorganiser les épisodes</string>
-    <string name="playlist_edit_episodes_title">Modifier la playlist</string>
     <string name="playlist_episode_unavailable_title">Épisode non disponible</string>
     <string name="episode_sort_custom_order">Ordre personnalisé</string>
     <string name="playlist_episode_unavailable_cta">Retirer de la playlist</string>
