@@ -2133,9 +2133,13 @@
     <string name="end_of_year_stories_completion_rate_share_text">My completion rate this year was %1$d</string>
     <string name="end_of_year_stories_year_completion_rate">completion rate</string>
     <!-- Title of the story paywall. Telling the users that there are more stories to check. -->
-    <string name="end_of_year_stories_theres_more">There\’s more!</string>>
-    <!-- Subtitle explaining the user why they should susbcribe to Plus in the context of the end of year stories. -->
-    <string name="end_of_year_stories_subscribe_to_plus">Support Pocket Casts by subscribing to Plus and get more stats, plus Premium features like bookmarks, folders or preselect chapters!</string>
+    <string name="end_of_year_stories_theres_more">Want the deep dive?</string>
+    <!-- Title of the story paywall if the user is already a Plus subscriber. -->
+    <string name="end_of_year_stories_plus_title">Thanks for supporting Pocket&#160;Casts!</string>
+    <!-- Subtitle explaining the user why they should subscribe to Plus in the context of the end of year stories. -->
+    <string name="end_of_year_stories_subscribe_to_plus">Subscribe to Pocket Casts Plus for extended stats, bookmarks, folders, chapter selection, and more ways to dig into your listening habits</string>
+    <!-- Subtitle explaining the user reason for having Plus in the context of the end of year stories. -->
+    <string name="end_of_year_stories_already_subscribed_to_plus">Your Plus perks unlock extra stats and power&#160;features</string>
     <!-- Label of a button to incetivise users to subscribe to Pocket Casts Plus. -->
     <string name="eoy_story_stories_subscribe_to_plus_button_label">Check out Pocket Casts Plus</string>
     <!-- Title for the story showing the podcast ratings given by the user when they gave high ratings. -->
