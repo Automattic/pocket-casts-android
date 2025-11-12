@@ -63,7 +63,7 @@ import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 import au.com.shiftyjelly.pocketcasts.ui.R as UR
 
-private const val smallScreenSizeFactor = .6f
+private const val SMALL_SCREEN_SIZE_FACTOR = .6f
 
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
@@ -82,7 +82,7 @@ internal fun LongestEpisodeStory(
     ) {
         val windowSize = currentWindowAdaptiveInfo().windowSizeClass
         val sizeFactor = if (windowSize.isAtMostMediumHeight()) {
-            smallScreenSizeFactor
+            SMALL_SCREEN_SIZE_FACTOR
         } else {
             1f
         }
@@ -117,7 +117,6 @@ internal fun LongestEpisodeStory(
     }
 }
 
-
 @Composable
 private fun Content(
     story: Story.LongestEpisode,
@@ -137,7 +136,7 @@ private fun Content(
     val progress by animateLottieCompositionAsState(
         composition = composition,
         iterations = LottieConstants.IterateForever,
-        isPlaying = !freezeAnimation
+        isPlaying = !freezeAnimation,
     )
     val hasAnimationStarted = progress > 0f
 
@@ -256,7 +255,7 @@ private fun Footer(
             fontWeight = FontWeight.W500,
             color = colorResource(UR.color.white),
             modifier = Modifier
-                .padding(horizontal = 24.dp)
+                .padding(horizontal = 24.dp),
         )
     }
     ShareStoryButton(
