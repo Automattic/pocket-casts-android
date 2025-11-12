@@ -18,6 +18,7 @@ import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.requiredSize
 import androidx.compose.foundation.layout.size
+import androidx.compose.material3.adaptive.currentWindowAdaptiveInfo
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -40,6 +41,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.min
 import androidx.compose.ui.unit.sp
 import au.com.shiftyjelly.pocketcasts.compose.Devices
+import au.com.shiftyjelly.pocketcasts.compose.adaptive.isAtMostMediumHeight
 import au.com.shiftyjelly.pocketcasts.compose.components.PodcastImage
 import au.com.shiftyjelly.pocketcasts.compose.components.TextH10
 import au.com.shiftyjelly.pocketcasts.compose.components.TextP40
@@ -58,6 +60,8 @@ import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 import au.com.shiftyjelly.pocketcasts.ui.R as UR
 
+private const val smallScreenSizeFactor = .6f
+
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
 internal fun LongestEpisodeStory(
@@ -73,13 +77,19 @@ internal fun LongestEpisodeStory(
             .background(story.backgroundColor)
             .padding(top = measurements.closeButtonBottomEdge),
     ) {
-        val animationContainerSize = min(maxWidth, maxHeight)
+        val windowSize = currentWindowAdaptiveInfo().windowSizeClass
+        val sizeFactor = if (windowSize.isAtMostMediumHeight()) {
+            smallScreenSizeFactor
+        } else {
+            1f
+        }
+        val animationContainerSize = min(maxWidth, maxHeight) * sizeFactor
         Header(
             story = story,
             measurements = measurements,
             modifier = Modifier
                 .fillMaxWidth()
-                .height((maxHeight - animationContainerSize.times(1.3f)) / 2)
+                .height((maxHeight - animationContainerSize) / 2)
                 .align(Alignment.TopCenter),
         )
         Content(
@@ -92,7 +102,7 @@ internal fun LongestEpisodeStory(
         Footer(
             modifier = Modifier
                 .fillMaxWidth()
-                .height((maxHeight - animationContainerSize.times(1.3f)) / 2)
+                .height((maxHeight - animationContainerSize) / 2)
                 .align(Alignment.BottomCenter),
             story = story,
             controller = controller,
@@ -223,11 +233,10 @@ private fun Footer(
     onShareStory: (File) -> Unit,
     measurements: EndOfYearMeasurements,
     modifier: Modifier = Modifier,
-) {
-    Column(
-        modifier = modifier,
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.SpaceAround,
+) = Column(modifier = modifier, horizontalAlignment = Alignment.CenterHorizontally) {
+    Box(
+        modifier = Modifier.weight(1f),
+        contentAlignment = Alignment.Center,
     ) {
         TextP40(
             text = stringResource(LR.string.end_of_year_story_longest_episode_share_text, story.episode.episodeTitle, story.episode.podcastTitle),
@@ -236,15 +245,17 @@ private fun Footer(
             fontScale = measurements.smallDeviceFactor,
             fontWeight = FontWeight.W500,
             color = colorResource(UR.color.white),
-            modifier = Modifier.padding(horizontal = 24.dp),
-        )
-        ShareStoryButton(
-            modifier = Modifier.padding(bottom = 18.dp),
-            story = story,
-            controller = controller,
-            onShare = onShareStory,
+            modifier = Modifier
+                .padding(horizontal = 24.dp)
         )
     }
+    ShareStoryButton(
+        modifier = Modifier
+            .padding(bottom = 18.dp),
+        story = story,
+        controller = controller,
+        onShare = onShareStory,
+    )
 }
 
 @Preview(device = Devices.PORTRAIT_REGULAR)
