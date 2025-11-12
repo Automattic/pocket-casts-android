@@ -55,6 +55,7 @@ class AppReviewManagerImpl(
             while (true) {
                 when (val triggerData = calculateTriggerData()) {
                     is AppReviewTriggerData.Success -> {
+                        Timber.d("App review triggered: ${triggerData.reason}")
                         triggerPrompt(triggerData.reason, triggerData.reviewInfo)
                     }
 
