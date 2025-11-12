@@ -74,7 +74,11 @@ internal fun TopShowStory(
             .padding(top = measurements.closeButtonBottomEdge + 16.dp),
     ) {
         val aspectRatio = maxHeight / maxWidth
-        val sizeFactor = if (aspectRatio > SQUARE_LIKE_SCREEN_ASPECT_RATIO) { 1f } else { SIZE_FACTOR_SQUARE_LIKE }
+        val sizeFactor = if (aspectRatio > SQUARE_LIKE_SCREEN_ASPECT_RATIO) {
+            1f
+        } else {
+            SIZE_FACTOR_SQUARE_LIKE
+        }
         val animationContainerSize = min(maxWidth, maxHeight) * sizeFactor
         Header(
             measurements = measurements,
