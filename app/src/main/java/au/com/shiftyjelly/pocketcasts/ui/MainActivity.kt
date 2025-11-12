@@ -450,15 +450,20 @@ class MainActivity :
 
         if (!isReady) {
             lifecycleScope.launch {
-                repeatOnLifecycle(Lifecycle.State.CREATED) {
+                // avoid initialization during config changes
+                repeatOnLifecycle(Lifecycle.State.STARTED) {
                     firebaseRemoteFeatureInitializer.initialize()
                     isReady = true
 
                     withContext(Dispatchers.Main) {
-                        onFirebaseInitComplete(savedInstanceState)
+                        if (!isChangingConfigurations) {
+                            onFirebaseInitComplete(savedInstanceState)
+                        }
                     }
                 }
             }
+        } else {
+            onFirebaseInitComplete(savedInstanceState)
         }
     }
 
