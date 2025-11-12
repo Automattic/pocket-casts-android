@@ -55,6 +55,9 @@ import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 import au.com.shiftyjelly.pocketcasts.ui.R as UR
 
+private val SQUARE_LIKE_SCREEN_ASPECT_RATIO = 2
+private val SIZE_FACTOR_SQUARE_LIKE = .6f
+
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
 internal fun TopShowStory(
@@ -70,7 +73,9 @@ internal fun TopShowStory(
             .background(story.backgroundColor)
             .padding(top = measurements.closeButtonBottomEdge + 16.dp),
     ) {
-        val animationContainerSize = min(maxWidth, maxHeight)
+        val aspectRatio = maxHeight / maxWidth
+        val sizeFactor = if (aspectRatio > SQUARE_LIKE_SCREEN_ASPECT_RATIO) { 1f } else { SIZE_FACTOR_SQUARE_LIKE }
+        val animationContainerSize = min(maxWidth, maxHeight) * sizeFactor
         Header(
             measurements = measurements,
             modifier = Modifier
@@ -90,6 +95,11 @@ internal fun TopShowStory(
             story = story,
             controller = controller,
             onShareStory = onShareStory,
+            textAlignment = if (aspectRatio > SQUARE_LIKE_SCREEN_ASPECT_RATIO) {
+                Alignment.Center
+            } else {
+                Alignment.TopCenter
+            },
             modifier = Modifier
                 .fillMaxWidth()
                 .height((maxHeight - animationContainerSize) / 2)
@@ -210,6 +220,7 @@ private fun Footer(
     controller: StoryCaptureController,
     onShareStory: (File) -> Unit,
     modifier: Modifier = Modifier,
+    textAlignment: Alignment = Alignment.Center,
 ) = Box(
     modifier = modifier,
 ) {
@@ -237,8 +248,8 @@ private fun Footer(
         color = colorResource(UR.color.white),
         modifier = Modifier
             .fillMaxWidth()
-            .padding(horizontal = 24.dp)
-            .align(Alignment.Center),
+            .padding(24.dp)
+            .align(textAlignment),
         textAlign = TextAlign.Center,
     )
     ShareStoryButton(
