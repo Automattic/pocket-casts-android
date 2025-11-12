@@ -54,6 +54,7 @@ import au.com.shiftyjelly.pocketcasts.models.to.LongestEpisode
 import au.com.shiftyjelly.pocketcasts.models.to.Story
 import com.airbnb.lottie.compose.LottieAnimation
 import com.airbnb.lottie.compose.LottieCompositionSpec
+import com.airbnb.lottie.compose.LottieConstants
 import com.airbnb.lottie.compose.animateLottieCompositionAsState
 import com.airbnb.lottie.compose.rememberLottieComposition
 import dev.shreyaspatil.capturable.capturable
@@ -135,10 +136,10 @@ private fun Content(
 
     val progress by animateLottieCompositionAsState(
         composition = composition,
-        iterations = Integer.MAX_VALUE,
+        iterations = LottieConstants.IterateForever,
         isPlaying = !freezeAnimation
     )
-    val isPlaying = progress > 0f
+    val hasAnimationStarted = progress > 0f
 
     LottieAnimation(
         composition = composition,
@@ -148,8 +149,8 @@ private fun Content(
         contentScale = ContentScale.FillWidth,
     )
     var artworkTrigger by remember { mutableStateOf(false) }
-    LaunchedEffect(isPlaying, freezeAnimation) {
-        artworkTrigger = freezeAnimation || isPlaying
+    LaunchedEffect(hasAnimationStarted, freezeAnimation) {
+        artworkTrigger = freezeAnimation || hasAnimationStarted
     }
 
     val artworkTransition = updateTransition(artworkTrigger, "artwork transition")
