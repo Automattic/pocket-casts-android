@@ -23,7 +23,7 @@ import androidx.media3.common.Player.REPEAT_MODE_ALL
 import androidx.media3.common.Player.RepeatMode
 import androidx.media3.exoplayer.ExoPlayer
 import androidx.media3.ui.compose.PlayerSurface
-import androidx.media3.ui.compose.SURFACE_TYPE_SURFACE_VIEW
+import androidx.media3.ui.compose.SURFACE_TYPE_TEXTURE_VIEW
 import androidx.media3.ui.compose.state.rememberPresentationState
 
 @Composable
@@ -64,7 +64,8 @@ fun VideoSurface(
         player?.let {
             PlayerSurface(
                 player = it,
-                surfaceType = SURFACE_TYPE_SURFACE_VIEW,
+                // use TextureView instead of SurfaceView to avoid rendering issues on Android 24
+                surfaceType = SURFACE_TYPE_TEXTURE_VIEW,
                 modifier = videoRatio?.let { ratio -> Modifier.aspectRatio(ratio) } ?: Modifier,
             )
         } ?: run {
