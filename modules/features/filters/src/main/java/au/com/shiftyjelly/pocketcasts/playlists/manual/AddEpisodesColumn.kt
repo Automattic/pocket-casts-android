@@ -1,5 +1,6 @@
 package au.com.shiftyjelly.pocketcasts.playlists.manual
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -25,7 +26,9 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -143,6 +146,7 @@ private fun EpisodeRow(
                 placeholderType = PlaceholderType.Small,
                 corners = 4.dp,
                 modifier = Modifier
+                    .alphaIfArchived(episode)
                     .size(56.dp)
                     .shadow(2.dp, RoundedCornerShape(4.dp)),
             )
@@ -153,7 +157,8 @@ private fun EpisodeRow(
                 verticalArrangement = Arrangement.SpaceBetween,
                 modifier = Modifier
                     .weight(1f)
-                    .fillMaxHeight(),
+                    .fillMaxHeight()
+                    .alphaIfArchived(episode),
             ) {
                 TextC70(
                     text = episode.rememberHeaderText(),
@@ -163,9 +168,8 @@ private fun EpisodeRow(
                     lineHeight = 15.sp,
                     maxLines = 2,
                 )
-                TextH60(
-                    text = episode.rememberTimeLeftText(),
-                    color = MaterialTheme.theme.colors.primaryText02,
+                Footer(
+                    episode = episode,
                 )
             }
             Spacer(
@@ -188,6 +192,38 @@ private fun EpisodeRow(
 }
 
 @Composable
+private fun Footer(
+    episode: PodcastEpisode,
+    modifier: Modifier = Modifier,
+) {
+    Row(
+        verticalAlignment = Alignment.Bottom,
+        modifier = modifier,
+    ) {
+        if (episode.isArchived) {
+            Image(
+                painter = painterResource(IR.drawable.ic_archive),
+                contentDescription = null,
+                colorFilter = ColorFilter.tint(MaterialTheme.theme.colors.primaryText02),
+                modifier = Modifier
+                    .padding(end = 4.dp)
+                    .size(14.dp),
+            )
+        }
+        TextH60(
+            text = buildString {
+                if (episode.isArchived) {
+                    append(stringResource(LR.string.archived))
+                    append(" • ")
+                }
+                append(episode.rememberTimeLeftText())
+            },
+            color = MaterialTheme.theme.colors.primaryText02,
+        )
+    }
+}
+
+@Composable
 private fun PodcastEpisode.rememberHeaderText(): AnnotatedString {
     val context = LocalContext.current
     val formatter = remember(context) { RelativeDateFormatter(context) }
@@ -205,6 +241,8 @@ private fun PodcastEpisode.rememberTimeLeftText(): String {
         TimeHelper.getTimeLeft(playedUpToMs, durationMs.toLong(), isInProgress, context).text
     }
 }
+
+private fun Modifier.alphaIfArchived(episode: PodcastEpisode) = if (episode.isArchived) alpha(0.4f) else this
 
 @Preview
 @Composable
@@ -251,6 +289,7 @@ private fun EpisodesColumnPreview(
                         title = "Episode $index",
                         duration = 1200.0,
                         publishedDate = Date(0),
+                        isArchived = index == 1,
                     )
                 },
             ),
