@@ -234,7 +234,11 @@ private fun Stories(
             is Story.PlusInterstitial -> PlusInterstitialStory(
                 story = story,
                 measurements = measurements,
-                onClick = onClickUpsell,
+                onClickUpsell = onClickUpsell,
+                onClickContinue = {
+                    // move forward to the next story
+                    onChangeStory(true)
+                },
             )
             is Story.YearVsYear -> YearVsYearStory(
                 story = story,

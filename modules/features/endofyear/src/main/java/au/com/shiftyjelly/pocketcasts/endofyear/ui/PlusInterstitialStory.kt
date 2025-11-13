@@ -35,7 +35,8 @@ import au.com.shiftyjelly.pocketcasts.ui.R as UR
 internal fun PlusInterstitialStory(
     story: Story.PlusInterstitial,
     measurements: EndOfYearMeasurements,
-    onClick: () -> Unit,
+    onClickUpsell: () -> Unit,
+    onClickContinue: () -> Unit,
 ) {
     Box(
         modifier = Modifier
@@ -70,7 +71,8 @@ internal fun PlusInterstitialStory(
             PlusInfo(
                 story = story,
                 measurements = measurements,
-                onClick = onClick,
+                onClickUpsell = onClickUpsell,
+                onClickContinue = onClickContinue,
             )
         }
     }
@@ -80,7 +82,8 @@ internal fun PlusInterstitialStory(
 private fun PlusInfo(
     story: Story.PlusInterstitial,
     measurements: EndOfYearMeasurements,
-    onClick: () -> Unit,
+    onClickUpsell: () -> Unit,
+    onClickContinue: () -> Unit,
 ) {
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
@@ -138,7 +141,13 @@ private fun PlusInfo(
             text = buttonLabel,
             backgroundColor = colorResource(UR.color.coolgrey_90),
             textColor = Color.White,
-            onClick = onClick,
+            onClick = {
+                if (story.subscriptionTier == null) {
+                    onClickUpsell()
+                } else {
+                    onClickContinue()
+                }
+            },
         )
 
         Spacer(Modifier.height(16.dp))
@@ -152,7 +161,8 @@ private fun PlusInterstitialPreview() {
         PlusInterstitialStory(
             story = Story.PlusInterstitial(subscriptionTier = SubscriptionTier.Plus),
             measurements = measurements,
-            onClick = {},
+            onClickUpsell = {},
+            onClickContinue = {},
         )
     }
 }
