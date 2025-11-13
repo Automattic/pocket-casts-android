@@ -20,12 +20,12 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import au.com.shiftyjelly.pocketcasts.compose.Devices
 import au.com.shiftyjelly.pocketcasts.compose.components.TextH30
+import au.com.shiftyjelly.pocketcasts.endofyear.R
 import au.com.shiftyjelly.pocketcasts.models.to.Story
 import com.airbnb.lottie.compose.LottieAnimation
 import com.airbnb.lottie.compose.LottieCompositionSpec
 import com.airbnb.lottie.compose.animateLottieCompositionAsState
 import com.airbnb.lottie.compose.rememberLottieComposition
-import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 @Composable
@@ -34,7 +34,7 @@ internal fun CoverStory(
     measurements: EndOfYearMeasurements,
 ) {
     val composition by rememberLottieComposition(
-        spec = LottieCompositionSpec.RawRes(IR.raw.playback_intro_lottie),
+        spec = LottieCompositionSpec.RawRes(R.raw.playback_intro_lottie),
     )
     val progress by animateLottieCompositionAsState(
         composition = composition,
