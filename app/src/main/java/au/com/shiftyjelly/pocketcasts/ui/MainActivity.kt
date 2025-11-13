@@ -465,17 +465,6 @@ class MainActivity :
         } else {
             onFirebaseInitComplete(savedInstanceState)
         }
-    }
-
-    private fun onFirebaseInitComplete(savedInstanceState: Bundle?) {
-        val showOnboarding = !settings.hasCompletedOnboarding() && !syncManager.isLoggedIn()
-        if (showOnboarding) {
-            openOnboardingFlow(OnboardingFlow.InitialOnboarding)
-        }
-
-        if (!FeatureFlag.isEnabled(Feature.NEW_ONBOARDING_ACCOUNT_CREATION)) {
-            checkForNotificationPermission()
-        }
 
         ViewCompat.setOnApplyWindowInsetsListener(binding.root) { _, windowInsets ->
             val insets = windowInsets.getInsets(WindowInsetsCompat.Type.systemBars() or WindowInsetsCompat.Type.displayCutout())
@@ -620,6 +609,17 @@ class MainActivity :
         setupAppReviewPrompt()
     }
 
+    private fun onFirebaseInitComplete(savedInstanceState: Bundle?) {
+        val showOnboarding = !settings.hasCompletedOnboarding() && !syncManager.isLoggedIn()
+        if (showOnboarding) {
+            openOnboardingFlow(OnboardingFlow.InitialOnboarding)
+        }
+
+        if (!FeatureFlag.isEnabled(Feature.NEW_ONBOARDING_ACCOUNT_CREATION)) {
+            checkForNotificationPermission()
+        }
+    }
+
     private fun resetEoYBadgeIfNeeded() {
         if (binding.bottomNavigation.getBadge(VR.id.navigation_profile) != null &&
             settings.getEndOfYearShowBadge2025()
@@ -631,7 +631,7 @@ class MainActivity :
 
     private fun encourageAccountCreation() {
         lifecycleScope.launch {
-            repeatOnLifecycle(Lifecycle.State.STARTED) {
+            repeatOnLifecycle(Lifecycle.State.CREATED) {
                 val encourageAccountCreation = settings.showFreeAccountEncouragement.value
                 if (!encourageAccountCreation) {
                     return@repeatOnLifecycle
@@ -653,7 +653,9 @@ class MainActivity :
     }
 
     override fun launchIntent(onboardingFlow: OnboardingFlow): Intent {
-        return OnboardingActivity.newInstance(this, onboardingFlow)
+        return OnboardingActivity.newInstance(this, onboardingFlow).apply {
+            flags = Intent.FLAG_ACTIVITY_SINGLE_TOP or Intent.FLAG_ACTIVITY_BROUGHT_TO_FRONT
+        }
     }
 
     override fun openOnboardingFlow(onboardingFlow: OnboardingFlow) {
