@@ -200,14 +200,9 @@ private fun Footer(
         verticalAlignment = Alignment.Bottom,
         modifier = modifier,
     ) {
-        val episodeIcon = if (episode.isArchived) {
-            IR.drawable.ic_archive
-        } else {
-            null
-        }
-        if (episodeIcon != null) {
+        if (episode.isArchived) {
             Image(
-                painter = painterResource(episodeIcon),
+                painter = painterResource(IR.drawable.ic_archive),
                 contentDescription = null,
                 colorFilter = ColorFilter.tint(MaterialTheme.theme.colors.primaryText02),
                 modifier = Modifier
