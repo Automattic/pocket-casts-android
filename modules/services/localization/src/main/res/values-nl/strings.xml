@@ -459,7 +459,6 @@ Language: nl
     <string name="end_of_year_stories_subscribe_to_plus">Steun Pocket Casts door je in te schrijven voor Plus en krijg toegang tot meer statistieken en Premium-functies zoals bladwijzers, mappen en voorselectie van hoofdstukken!</string>
     <string name="settings_real_time_playback_summary">Als dit is ingeschakeld, toont de speler de resterende tijd, aangepast aan de afspeelsnelheid en overgeslagen hoofdstukken.</string>
     <string name="settings_real_time_playback">Resterende tijd aanpassen</string>
-    <string name="end_of_year_story_longest_episode_subtitle">Het was \'%1$s\' van \'%2$s\'</string>
     <string name="end_of_year_listening_time_subtitle">totaal naar podcasts geluisterd</string>
     <string name="eoy_story_ratings_learn_button_label">Meer informatie over beoordelingen</string>
     <string name="referrals_failed_to_load_offer">Er is iets fout gegaan bij het ophalen van je verwijzingslink.</string>
@@ -652,7 +651,6 @@ Language: nl
     <string name="eoy_year_over_year_title_skyrocketed">Ten opzichte van 2022 is je luistertijd veel hoger!</string>
     <string name="end_of_year_stories_year_over_share_text">Mijn luistertijd in %1$d, ten opzichte van %2$d</string>
     <string name="end_of_year_prompt_card_summary">Bekijk je luisterstatistieken, top podcasts en meer.</string>
-    <string name="end_of_year_story_longest_episode_title">De langste aflevering waarnaar je hebt geluisterd was %1$s</string>
     <string name="end_of_year_replay">Opnieuw afspelen</string>
     <string name="end_of_year_listening_time_title">Dit was je totale luistertijd wat betreft podcasts.</string>
     <string name="end_of_year_story_top_categories_subtitle">Je hebt in totaal %2$s geluisterd naar %1$s afleveringen</string>

@@ -460,7 +460,6 @@ Language: sv_SE
     <string name="end_of_year_stories_subscribe_to_plus">Stöd Pocket Casts genom att prenumerera på Plus och få mer statistik, plus premiumfunktioner som bokmärken, mappar och förvalda kapitel.</string>
     <string name="settings_real_time_playback_summary">Om detta är aktiverat kommer spelaren att visa återstående tid, justerad för uppspelningshastighet och överhoppade kapitel.</string>
     <string name="settings_real_time_playback">Justera återstående tid</string>
-    <string name="end_of_year_story_longest_episode_subtitle">Det var \"%1$s\" från \"%2$s\"</string>
     <string name="end_of_year_listening_time_subtitle">Sammanlagt lyssnande på podcasts</string>
     <string name="eoy_story_ratings_learn_button_label">Läs om betyg</string>
     <string name="referrals_failed_to_load_offer">Något gick fel vid hämtningen av din hänvisningslänk.</string>
@@ -653,7 +652,6 @@ Language: sv_SE
     <string name="eoy_year_over_year_title_skyrocketed">Jämfört med 2022 har din lyssningstid skjutit i höjden!</string>
     <string name="end_of_year_stories_year_over_share_text">Min lyssningstid för %1$d jämfört med %2$d</string>
     <string name="end_of_year_prompt_card_summary">Se din lyssningsstatistik, dina favoritpodcasts och mycket mer.</string>
-    <string name="end_of_year_story_longest_episode_title">Det längsta avsnittet du lyssnade på var %1$s</string>
     <string name="end_of_year_replay">Spela upp igen</string>
     <string name="end_of_year_listening_time_title">Detta var den sammanlagda tiden du lyssnade på podcasts.</string>
     <string name="end_of_year_story_top_categories_subtitle">Du lyssnade på %1$s avsnitt i sammanlagt %2$s</string>

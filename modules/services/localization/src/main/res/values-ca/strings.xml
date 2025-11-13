@@ -444,7 +444,6 @@ Language: ca
     <string name="eoy_story_stories_subscribe_to_plus_button_label">Consulta Pocket Casts Plus</string>
     <string name="end_of_year_stories_subscribe_to_plus">Ajuda Pocket Casts subscrivint-te a Plus i obtén més estadístiques, a més de funcions Prèmium com ara marcadors, carpetes o capítols preseleccionats!</string>
     <string name="settings_real_time_playback_summary">Si està activat, el reproductor mostrarà el temps restant, ajustat per la velocitat de reproducció i els capítols saltats.</string>
-    <string name="end_of_year_story_longest_episode_subtitle">Era \"%1$s\" de \"%2$s\"</string>
     <string name="end_of_year_listening_time_subtitle">total escoltant pòdcasts</string>
     <string name="eoy_story_ratings_learn_button_label">Informa\'t sobre les valoracions</string>
     <string name="referrals_failed_to_load_offer">Ho sento, però hi ha hagut un problema en obtenir el teu enllaç de referència.</string>
@@ -638,7 +637,6 @@ Language: ca
     <string name="end_of_year_stories_year_over_share_text">El meu %1$d temps escoltat comparat amb %2$d</string>
     <string name="end_of_year_prompt_card_summary">Consulta les teves estadístiques d\'escolta, els millors pòdcasts i molt més.</string>
     <string name="end_of_year_replay">Torna a reproduir-ho</string>
-    <string name="end_of_year_story_longest_episode_title">L\'episodi més llarg que vas escoltar va ser %1$s</string>
     <string name="end_of_year_listening_time_title">Aquest va ser el vostre temps total escoltant pòdcasts</string>
     <string name="discover_category_health_abbreviation">Salut</string>
     <string name="discover_category_kids_abbreviation">Família</string>

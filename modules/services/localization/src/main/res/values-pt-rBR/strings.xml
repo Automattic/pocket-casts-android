@@ -460,7 +460,6 @@ Language: pt_BR
     <string name="end_of_year_stories_subscribe_to_plus">Junte-se ao Pocket Casts ao assinar o Plus e aumente as estatísticas, além de funcionalidades premium como pastas, favoritos e pré-seleção de capítulos!</string>
     <string name="settings_real_time_playback_summary">Se o player estiver ligado, ele vai mostrar o tempo restante ajustado para a velocidade de reprodução e capítulos pulados.</string>
     <string name="settings_real_time_playback">Ajustar tempo restante</string>
-    <string name="end_of_year_story_longest_episode_subtitle">Foi \"%1$s\" de \"%2$s\"</string>
     <string name="end_of_year_listening_time_subtitle">no total ouvindo podcasts</string>
     <string name="eoy_story_ratings_learn_button_label">Entenda as classificações</string>
     <string name="referrals_failed_to_load_offer">Ocorreu um erro ao buscar seu link de indicação.</string>
@@ -654,7 +653,6 @@ Language: pt_BR
     <string name="end_of_year_stories_year_completion_rate_title">Sua taxa de conclusão este ano foi de %1$d%%</string>
     <string name="end_of_year_stories_year_over_share_text">Meu tempo de streaming de %1$d em comparação com %2$d</string>
     <string name="end_of_year_prompt_card_summary">Veja suas estatísticas de streaming, principais podcasts e muito mais.</string>
-    <string name="end_of_year_story_longest_episode_title">O episódio mais longo que você ouviu foi %1$s</string>
     <string name="end_of_year_replay">Ouvir de novo</string>
     <string name="end_of_year_listening_time_title">Este foi o seu tempo total ouvindo podcasts.</string>
     <string name="end_of_year_story_top_categories_subtitle">Você ouviu %1$s episódios em um total de %2$s</string>
