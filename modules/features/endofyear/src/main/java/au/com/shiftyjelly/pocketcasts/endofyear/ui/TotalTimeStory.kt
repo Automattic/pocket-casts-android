@@ -84,7 +84,7 @@ internal fun TotalTimeStory(
         }
 
         val text by rememberLottieComposition(
-            spec = LottieCompositionSpec.RawRes(R.raw.playback_story_total_listened_lottie),
+            spec = LottieCompositionSpec.RawRes(R.raw.playback_total_listened_lottie),
         )
 
         val animationProgress by animateLottieCompositionAsState(

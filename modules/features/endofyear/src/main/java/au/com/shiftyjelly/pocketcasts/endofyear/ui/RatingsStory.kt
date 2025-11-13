@@ -196,7 +196,7 @@ private fun RowScope.AnimatedRatingBar(
     contentScale: ContentScale?,
 ) {
     val composition by rememberLottieComposition(
-        spec = LottieCompositionSpec.RawRes(R.raw.playback_story_ratings_pillar_lottie),
+        spec = LottieCompositionSpec.RawRes(R.raw.playback_ratings_pillar_lottie),
     )
 
     val animatable = rememberLottieAnimatable()

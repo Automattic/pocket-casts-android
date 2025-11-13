@@ -122,7 +122,7 @@ private fun CenterContent(
     contentAlignment = Alignment.Center,
 ) {
     val composition by rememberLottieComposition(
-        spec = LottieCompositionSpec.RawRes(R.raw.playback_story_top_podcast_lottie),
+        spec = LottieCompositionSpec.RawRes(R.raw.playback_top_show_lottie),
     )
     val progress by animateLottieCompositionAsState(
         composition = composition,
