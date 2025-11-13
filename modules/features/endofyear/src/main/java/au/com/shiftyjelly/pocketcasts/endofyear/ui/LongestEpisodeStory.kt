@@ -248,7 +248,7 @@ private fun Footer(
         contentAlignment = Alignment.Center,
     ) {
         TextP40(
-            text = stringResource(LR.string.end_of_year_story_longest_episode_share_text, story.episode.episodeTitle, story.episode.podcastTitle),
+            text = stringResource(LR.string.end_of_year_story_longest_episode_stats, story.episode.episodeTitle, story.episode.podcastTitle),
             textAlign = TextAlign.Center,
             disableAutoScale = true,
             fontScale = measurements.smallDeviceFactor,

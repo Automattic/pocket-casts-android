@@ -460,7 +460,6 @@ Language: ru
     <string name="settings_real_time_playback_summary">Если эта функция включена, проигрыватель будет показывать оставшееся время с учётом скорости воспроизведения и пропущенных глав.</string>
     <string name="settings_real_time_playback">Настроить оставшееся время</string>
     <string name="end_of_year_stories_subscribe_to_plus">Поддержите Pocket Casts, подписавшись на Plus, и пользуйтесь развёрнутой статистикой и премиум-функциями, например: закладками, папками и предварительным выбором глав.</string>
-    <string name="end_of_year_story_longest_episode_subtitle">Это был выпуск «%1$s» из «%2$s»</string>
     <string name="end_of_year_listening_time_subtitle">общее время прослушивания подкастов</string>
     <string name="eoy_story_ratings_learn_button_label">Подробнее об оценках</string>
     <string name="referrals_failed_to_load_offer">К сожалению, при получении ссылки на источник перехода возникла проблема.</string>
@@ -654,7 +653,6 @@ Language: ru
     <string name="end_of_year_stories_year_over_share_text">Время прослушивания в %1$d году по сравнению с %2$d годом</string>
     <string name="end_of_year_stories_year_completion_rate_title">Ваш процент завершения составил %1$d%%</string>
     <string name="end_of_year_prompt_card_summary">Просмотрите свой топ подкастов, статистику прослушивания и другие показатели.</string>
-    <string name="end_of_year_story_longest_episode_title">Самым длинным эпизодом, который вы слушали, стал %1$s</string>
     <string name="end_of_year_replay">Прослушать ещё раз</string>
     <string name="end_of_year_listening_time_title">Это ваше общее время прослушивания подкастов.</string>
     <string name="end_of_year_story_top_categories_title">Знаете ли вы, что вашей любимой категорией оказалась %1$s?</string>

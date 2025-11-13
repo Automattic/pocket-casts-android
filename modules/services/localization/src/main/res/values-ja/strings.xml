@@ -460,7 +460,6 @@ Language: ja_JP
     <string name="end_of_year_stories_subscribe_to_plus">Plus にサブスクリプションして Pocket Casts をサポートし、より多くの統計情報や、ブックマーク、フォルダー、チャプターの事前選択などのプレミアム機能を手に入れましょう。</string>
     <string name="settings_real_time_playback_summary">オンにすると、再生速度とスキップされたチャプターに合わせて調整された残り時間がプレーヤーに表示されます。</string>
     <string name="settings_real_time_playback">残り時間を調整</string>
-    <string name="end_of_year_story_longest_episode_subtitle">「%2$s」の「%1$s」でした</string>
     <string name="end_of_year_listening_time_subtitle">ポッドキャストを聴いた合計</string>
     <string name="eoy_story_ratings_learn_button_label">評価について</string>
     <string name="referrals_failed_to_load_offer">申し訳ありません、リファラルリンクの取得中にエラーが発生しました。</string>
@@ -654,7 +653,6 @@ Language: ja_JP
     <string name="end_of_year_stories_year_over_share_text">%1$dと%2$dの聴取時間の比較</string>
     <string name="end_of_year_stories_year_completion_rate_title">完了率は%1$d%% です</string>
     <string name="end_of_year_prompt_card_summary">視聴統計、人気のポッドキャストなどを確認します。</string>
-    <string name="end_of_year_story_longest_episode_title">お聴きになった最長のエピソードは %1$s でした</string>
     <string name="end_of_year_replay">もう一度再生</string>
     <string name="end_of_year_listening_time_title">これはポッドキャストの合計聴取時間です。</string>
     <string name="end_of_year_story_top_categories_subtitle">%2$s話のエピソードで合計%1$s話聴きました</string>

@@ -461,7 +461,6 @@ Language: de
     <string name="settings_real_time_playback_summary">Wenn er eingeschaltet ist, zeigt der Player die verbleibende Zeit an, unter Berücksichtigung von Wiedergabegeschwindigkeit und übersprungenen Kapiteln.</string>
     <string name="settings_real_time_playback">Verbleibende Zeit anpassen</string>
     <string name="end_of_year_listening_time_subtitle">gehörte Podcasts gesamt</string>
-    <string name="end_of_year_story_longest_episode_subtitle">Das war „%1$s“ aus „%2$s“</string>
     <string name="eoy_story_ratings_learn_button_label">Mehr über Bewertungen</string>
     <string name="referrals_failed_to_load_offer">Entschuldigung! Beim Abrufen des Referral-Links ist ein Fehler aufgetreten.</string>
     <string name="transcript_error_not_available">Entschuldigung! Für diese Folge ist kein Transkript verfügbar.</string>
@@ -653,7 +652,6 @@ Language: de
     <string name="eoy_year_over_year_title_skyrocketed">Im Vergleich zu 2022 ist deine Audiozeit in die Höhe geschnellt!</string>
     <string name="end_of_year_stories_year_over_share_text">Meine Audiozeit %1$d im Vergleich zu %2$d</string>
     <string name="end_of_year_prompt_card_summary">Schau dir deine Audiostatistiken, Top-Podcasts und mehr an.</string>
-    <string name="end_of_year_story_longest_episode_title">Die längste von dir angehörte Folge war %1$s</string>
     <string name="end_of_year_replay">Erneut abspielen</string>
     <string name="end_of_year_listening_time_title">Dies ist die Gesamtzeit der von dir angehörten Podcasts.</string>
     <string name="end_of_year_story_top_categories_subtitle">Du hast dir %1$s Folgen mit einer Gesamtdauer von %2$s angehört</string>

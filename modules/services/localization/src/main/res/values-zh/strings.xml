@@ -461,7 +461,6 @@ Language: zh_CN
     <string name="settings_real_time_playback_summary">如果开启，播放器会显示剩余时间，并根据播放速度和跳过的章节对此进行调整。</string>
     <string name="settings_real_time_playback">调整剩余时间</string>
     <string name="end_of_year_listening_time_subtitle">播客收听总量</string>
-    <string name="end_of_year_story_longest_episode_subtitle">从“%2$s”到“%1$s”</string>
     <string name="eoy_story_ratings_learn_button_label">了解评分</string>
     <string name="referrals_failed_to_load_offer">很抱歉，获取您的推荐链接时出错了。</string>
     <string name="transcript_error_not_available">很抱歉，本剧集没有文字转录稿。</string>
@@ -654,7 +653,6 @@ Language: zh_CN
     <string name="end_of_year_stories_year_over_share_text">我的 %1$d 年收听时长与 %2$d 年的比较情况</string>
     <string name="end_of_year_prompt_card_summary">查看您的收听统计数据、热门播客等。</string>
     <string name="end_of_year_replay">再次播放</string>
-    <string name="end_of_year_story_longest_episode_title">您收听的最长一集为 %1$s</string>
     <string name="end_of_year_listening_time_title">这是您收听播客的总时长。</string>
     <string name="end_of_year_story_top_categories_title">您是否知道 %1$s 是您最喜欢的分类？</string>
     <string name="discover_category_society_abbreviation">文化</string>

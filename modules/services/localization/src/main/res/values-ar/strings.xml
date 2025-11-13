@@ -460,7 +460,6 @@ Language: ar
     <string name="end_of_year_stories_subscribe_to_plus">ادعم Pocket Casts عن طريق الاشتراك في Plus والحصول على مزيد من الإحصاءات، إضافة إلى الميزات المميزة، مثل: الإشارات المرجعية أو المجلدات أو الفصول المحددة سابقًا!</string>
     <string name="settings_real_time_playback_summary">إذا كان قيد التشغيل، فسيعرض المشغِّل الوقت المتبقي، ويتم ضبطه حسب سرعة التشغيل، والفصول التي تم تخطيها.</string>
     <string name="settings_real_time_playback">ضبط الوقت المتبقي</string>
-    <string name="end_of_year_story_longest_episode_subtitle">كانت \"⁦%1$s⁩\" من \"⁦%2$s⁩\"</string>
     <string name="end_of_year_listening_time_subtitle">الاستماع الكامل إلى حلقات البث الصوتي</string>
     <string name="eoy_story_ratings_learn_button_label">التعرُّف على التقييمات</string>
     <string name="referrals_failed_to_load_offer">عذرًا، حدث خطأ ما في أثناء إحضار رابط الإحالة.</string>
@@ -653,7 +652,6 @@ Language: ar
     <string name="end_of_year_stories_year_over_share_text">وقت استماع ⁦%1$d⁩ الخاص بي مقارنة بـ ⁦%2$d⁩ </string>
     <string name="eoy_year_over_year_title_skyrocketed">بالمقارنة مع عام 2022، ارتفع وقت الاستماع الخاص بك ارتفاعًا شديدًا!</string>
     <string name="end_of_year_prompt_card_summary">اطلع على إحصاءات الاستماع الخاصة بك وأهم حلقات البث الصوتي والمزيد.</string>
-    <string name="end_of_year_story_longest_episode_title">كانت أطول حلقة استمعتَ إليها ⁦%1$s⁩ </string>
     <string name="end_of_year_replay">التشغيل مجددًا</string>
     <string name="end_of_year_listening_time_title">كان هذا إجمالي وقتك في الاستماع إلى حلقات البث الصوتي</string>
     <string name="end_of_year_story_top_categories_subtitle">لقد استمعتَ إلى ⁦%1$s⁩ من الحلقات بإجمالي ⁦%2$s⁩</string>
