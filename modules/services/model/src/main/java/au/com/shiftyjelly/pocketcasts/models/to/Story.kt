@@ -58,7 +58,9 @@ sealed interface Story {
         override val analyticsValue = "longest_episode"
     }
 
-    data object PlusInterstitial : Story {
+    data class PlusInterstitial(
+        val subscriptionTier: SubscriptionTier?,
+    ) : Story {
         override val previewDuration = null
         override val isShareble = false
         override val analyticsValue = "plus_interstitial"

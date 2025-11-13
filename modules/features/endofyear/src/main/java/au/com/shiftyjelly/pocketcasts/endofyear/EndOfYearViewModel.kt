@@ -144,9 +144,11 @@ class EndOfYearViewModel @AssistedInject constructor(
         if (longestEpisode != null) {
             add(Story.LongestEpisode(longestEpisode))
         }
-        if (subscription == null) {
-            add(Story.PlusInterstitial)
-        }
+        add(
+            Story.PlusInterstitial(
+                subscriptionTier = subscription?.tier,
+            ),
+        )
         add(
             Story.YearVsYear(
                 lastYearDuration = stats.lastYearPlaybackTime,
