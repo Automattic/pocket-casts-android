@@ -1,15 +1,18 @@
 package au.com.shiftyjelly.pocketcasts.endofyear
 
 import android.app.Activity
+import android.content.Context
 import android.content.Intent
 import android.graphics.Color
 import android.os.Bundle
+import android.view.View
 import android.view.WindowManager
 import androidx.activity.ComponentActivity
 import androidx.activity.SystemBarStyle
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.ActivityResultLauncher
+import androidx.activity.result.contract.ActivityResultContract
 import androidx.activity.viewModels
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
@@ -47,9 +50,12 @@ import au.com.shiftyjelly.pocketcasts.repositories.endofyear.EndOfYearManager
 import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingFlow
 import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingLauncher
 import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingUpgradeSource
+import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
+import au.com.shiftyjelly.pocketcasts.ui.theme.ThemeColor
 import au.com.shiftyjelly.pocketcasts.utils.ScreenshotCaptureDetector
 import au.com.shiftyjelly.pocketcasts.utils.Util
 import au.com.shiftyjelly.pocketcasts.views.activity.WebViewActivity
+import com.google.android.material.snackbar.Snackbar
 import dagger.hilt.android.AndroidEntryPoint
 import dagger.hilt.android.lifecycle.withCreationCallback
 import java.io.File
@@ -174,7 +180,7 @@ class StoriesActivity : ComponentActivity() {
                     finish()
                 },
                 onFailedToLoad = {
-                    // TODO show snack with error: Sorry, we couldn't load Playback + retry action
+                    setResult(0, StoriesActivityContract.setResult(source))
                     finish()
                 }
             )
@@ -320,10 +326,31 @@ class StoriesActivity : ComponentActivity() {
     companion object {
         private const val ARG_SOURCE = "source"
 
+        fun intent(activity: Activity, source: StoriesSource) = Intent(activity, StoriesActivity::class.java)
+            .putExtra(ARG_SOURCE, source)
+
         fun open(activity: Activity, source: StoriesSource) {
-            val intent = Intent(activity, StoriesActivity::class.java)
-                .putExtra(ARG_SOURCE, source)
+            val intent = intent(activity, source)
             activity.startActivity(intent)
+        }
+    }
+
+    class StoriesActivityContract: ActivityResultContract<Intent, StoriesSource?>() {
+        companion object {
+            private const val EXTRA_SOURCE = "stories_source"
+
+            fun setResult(source: StoriesSource) = Intent().apply{
+                putExtra(EXTRA_SOURCE, source)
+            }
+        }
+        override fun createIntent(context: Context, input: Intent) = input
+
+        override fun parseResult(resultCode: Int, intent: Intent?): StoriesSource? {
+            return if (intent == null || resultCode == RESULT_OK) {
+                null
+            } else {
+                IntentCompat.getParcelableExtra(intent, EXTRA_SOURCE, StoriesSource::class.java)
+            }
         }
     }
 }

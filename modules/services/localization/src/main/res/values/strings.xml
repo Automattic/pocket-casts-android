@@ -2155,6 +2155,7 @@
     <!-- Text that appear when someone share the ratings story to Twitter. %1$d is a number of rated shows, %2$d is the year, and %3$d is the most used rating (from 1 to 5) -->
     <string name="end_of_year_story_ratings_share_text">I rated %1$d different podcasts in %2$d, with %3$d as my most used rating</string>
     <string name="end_of_year_cant_share_message">This story can\'t be shared</string>
+    <string name="end_of_year_failed_to_load_message">Sorry, we couldn\'t load Playback</string>
 
     <!-- Onboarding -->
 
