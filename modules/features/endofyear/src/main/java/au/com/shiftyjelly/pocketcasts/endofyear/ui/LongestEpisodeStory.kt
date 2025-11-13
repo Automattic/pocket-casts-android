@@ -64,6 +64,7 @@ import au.com.shiftyjelly.pocketcasts.localization.R as LR
 import au.com.shiftyjelly.pocketcasts.ui.R as UR
 
 private const val SMALL_SCREEN_SIZE_FACTOR = .6f
+private const val ANIMATION_SCALE_FACTOR_FULL_WIDTH = 1.2f
 
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
@@ -100,6 +101,11 @@ internal fun LongestEpisodeStory(
             story = story,
             forceVisible = controller.isSharing,
             artworkSize = artworkSize,
+            animationScale = if (windowSize.isAtMostMediumHeight()) {
+                1f
+            } else {
+                ANIMATION_SCALE_FACTOR_FULL_WIDTH
+            },
             modifier = Modifier
                 .size(animationContainerSize)
                 .align(Alignment.Center),
@@ -123,6 +129,7 @@ private fun Content(
     artworkSize: Dp,
     forceVisible: Boolean,
     modifier: Modifier = Modifier,
+    animationScale: Float = 1f,
 ) = BoxWithConstraints(
     modifier = modifier,
     contentAlignment = Alignment.Center,
@@ -144,7 +151,8 @@ private fun Content(
         composition = composition,
         progress = { if (freezeAnimation) 1f else progress },
         modifier = Modifier
-            .matchParentSize(),
+            .matchParentSize()
+            .scale(animationScale),
         contentScale = ContentScale.FillWidth,
     )
     var artworkTrigger by remember { mutableStateOf(false) }
@@ -213,6 +221,7 @@ private fun Header(
                 },
             ),
             fontSize = 25.sp,
+            lineHeight = 30.sp,
             textAlign = TextAlign.Center,
             fontScale = measurements.smallDeviceFactor,
             disableAutoScale = true,
