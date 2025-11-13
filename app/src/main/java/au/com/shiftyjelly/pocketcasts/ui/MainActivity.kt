@@ -1934,7 +1934,9 @@ class MainActivity :
                 .onStart { delay(3.seconds) } // Do not blast user with a review immediately on start
                 .collect { signal ->
                     if (canDisplayAppRatingsPrompt(signal.reason)) {
-                        AppReviewDialogFragment().show(supportFragmentManager, "app_review_prompt")
+                        AppReviewDialogFragment
+                            .newInstance(signal.reason, signal.reviewInfo)
+                            .show(supportFragmentManager, "app_review_prompt")
                         signal.consume()
                     } else {
                         signal.ignore()

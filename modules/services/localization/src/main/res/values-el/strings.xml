@@ -276,7 +276,6 @@ Language: el_GR
     <string name="eoy_story_stories_subscribe_to_plus_button_label">Ρίξε μια ματιά στο Pocket Casts Plus</string>
     <string name="settings_real_time_playback">Προσαρμογή υπολειπόμενου χρόνου</string>
     <string name="settings_real_time_playback_summary">Αν είναι ενεργό, το πρόγραμμα αναπαραγωγής θα δείχνει τον υπολοιπόμενο χρόνο, προσαρμοσμένο στην ταχύτητα αναπαραγωγής και στα παραλειπόμενα κεφάλαια.</string>
-    <string name="end_of_year_story_longest_episode_subtitle">Ήταν το «%1$s» από το «%2$s»</string>
     <string name="end_of_year_listening_time_subtitle">συνολική ακρόαση podcasts</string>
     <string name="eoy_story_ratings_learn_button_label">Μάθε για τις βαθμολογίες</string>
     <string name="transcript_error_not_available">Λυπούμαστε, αλλά αυτό το επεισόδιο δεν έχει διαθέσιμη μεταγραφή.</string>
@@ -467,7 +466,6 @@ Language: el_GR
     <string name="end_of_year_stories_year_completion_rate">ποσοστό ολοκλήρωσης</string>
     <string name="eoy_year_over_year_title_skyrocketed">Σε σύγκριση με το 2022, ο χρόνος ακρόασης σου εκτοξεύτηκε!</string>
     <string name="end_of_year_prompt_card_summary">Δες τα στατιστικά ακρόασης σου, τα κορυφαία podcasts και άλλα.</string>
-    <string name="end_of_year_story_longest_episode_title">Το μεγαλύτερο επεισόδιο που ακούσες ήταν το %1$s</string>
     <string name="end_of_year_replay">Παίξε ξανά</string>
     <string name="end_of_year_listening_time_title">Αυτός ήταν ο συνολικός σου χρόνος ακρόασης podcasts</string>
     <string name="end_of_year_story_top_categories_subtitle">Ακούσες %1$s επεισόδια από τα %2$s συνολικά</string>
