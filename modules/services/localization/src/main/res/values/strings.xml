@@ -2141,7 +2141,7 @@
     <!-- Subtitle explaining the user reason for having Plus in the context of the end of year stories. -->
     <string name="end_of_year_stories_already_subscribed_to_plus">Your Plus perks unlock extra stats and power&#160;features</string>
     <!-- Label of a button to incentivize users to subscribe to Pocket Casts Plus. -->
-    <string name="eoy_story_stories_subscribe_to_plus_button_label">Check out Pocket Casts Plus</string>
+    <string name="eoy_story_stories_subscribe_to_plus_button_label">Get Pocket Casts Plus</string>
     <!-- Title for the story showing the podcast ratings given by the user when they gave high ratings. -->
     <string name="eoy_story_ratings_title_1">You dropped %1$d-star ratings like confetti!</string>
     <!-- Title for the story showing the podcast ratings given by the user when they gave low ratings. -->
