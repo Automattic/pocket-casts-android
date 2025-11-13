@@ -26,6 +26,7 @@ import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.tooling.preview.PreviewParameterProvider
 import androidx.compose.ui.unit.dp
 import au.com.shiftyjelly.pocketcasts.compose.Devices
+import au.com.shiftyjelly.pocketcasts.endofyear.R
 import au.com.shiftyjelly.pocketcasts.endofyear.StoryCaptureController
 import au.com.shiftyjelly.pocketcasts.models.to.Story
 import com.airbnb.lottie.LottieProperty
@@ -43,7 +44,6 @@ import kotlin.time.Duration.Companion.days
 import kotlin.time.Duration.Companion.hours
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
-import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 @OptIn(ExperimentalComposeUiApi::class)
@@ -84,7 +84,7 @@ internal fun TotalTimeStory(
         }
 
         val text by rememberLottieComposition(
-            spec = LottieCompositionSpec.RawRes(IR.raw.playback_story_total_listened_lottie),
+            spec = LottieCompositionSpec.RawRes(R.raw.playback_story_total_listened_lottie),
         )
 
         val animationProgress by animateLottieCompositionAsState(
