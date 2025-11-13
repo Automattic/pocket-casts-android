@@ -1,6 +1,5 @@
 package au.com.shiftyjelly.pocketcasts.endofyear
 
-import android.util.Log
 import androidx.compose.runtime.Immutable
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -35,7 +34,6 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 
@@ -54,7 +52,7 @@ class EndOfYearViewModel @AssistedInject constructor(
 
     private companion object {
         val placeholderStories = buildList {
-            add(Story.Cover)
+            add(Story.BlankCover)
             repeat(10) {
                 add(Story.PlaceholderWhileLoading)
             }
@@ -62,6 +60,7 @@ class EndOfYearViewModel @AssistedInject constructor(
     }
 
     private val syncState = MutableStateFlow<SyncState>(SyncState.Syncing)
+    private val statsLoaded = MutableStateFlow(false)
 
     private val eoyStatsAction = CachedAction<Year, Pair<EndOfYearStats, RandomShowIds?>> {
         val stats = endOfYearManager.getStats(year)
@@ -93,9 +92,10 @@ class EndOfYearViewModel @AssistedInject constructor(
 
     internal val uiState: StateFlow<UiState> = combine(
         syncState,
+        statsLoaded,
         settings.cachedSubscription.flow,
         topPodcastsLink,
-        progress.onEach { Log.w("===", "progress=$it") },
+        progress,
         ::createUiModel,
     ).stateIn(viewModelScope, SharingStarted.Lazily, UiState.Syncing(
         stories = placeholderStories, storyProgress = 0f,
@@ -104,35 +104,43 @@ class EndOfYearViewModel @AssistedInject constructor(
     internal fun syncData() {
         viewModelScope.launch {
             syncState.emit(SyncState.Syncing)
+            statsLoaded.emit(false)
+
             val isSynced = endOfYearSync.sync(year)
             if (!isSynced) {
                 trackFailedToLoad()
+                syncState.emit(SyncState.Failure)
+                return@launch
             }
-            syncState.emit(if (isSynced) SyncState.Synced else SyncState.Failure)
+
+            syncState.emit(SyncState.Synced)
+
+            launch {
+                eoyStatsAction.run(year, viewModelScope).await()
+                statsLoaded.emit(true)
+            }
         }
     }
 
     private suspend fun createUiModel(
         syncState: SyncState,
+        statsLoaded: Boolean,
         subscription: Subscription?,
         topPodcastsLink: String?,
         progress: Float,
-    ) = when (syncState) {
-        SyncState.Syncing -> UiState.Syncing(stories = placeholderStories, storyProgress = progress)
-        SyncState.Failure -> UiState.Failure
-        SyncState.Synced -> {
-            val currentValue = uiState.value
-            if (currentValue is UiState.Syncing) {
-                currentValue.copy(storyProgress = progress)
-            } else {
-                val (stats, randomShowIds) = eoyStatsAction.run(year, viewModelScope).await()
-                val stories = createStories(stats, randomShowIds, subscription, topPodcastsLink)
-                UiState.Synced(
-                    stories = stories,
-                    isPaidAccount = subscription != null,
-                    storyProgress = progress,
-                )
-            }
+    ) = when {
+        syncState is SyncState.Failure -> UiState.Failure
+        statsLoaded -> {
+            val (stats, randomShowIds) = eoyStatsAction.run(year, viewModelScope).await()
+            val stories = createStories(stats, randomShowIds, subscription, topPodcastsLink)
+            UiState.Synced(
+                stories = stories,
+                isPaidAccount = subscription != null,
+                storyProgress = progress,
+            )
+        }
+        else -> {
+            UiState.Syncing(stories = placeholderStories, storyProgress = progress)
         }
     }
 

@@ -198,6 +198,10 @@ private fun Stories(
         },
     ) { index ->
         when (val story = stories[index]) {
+            is Story.BlankCover -> BlankCoverStory(
+                story = story,
+                measurements = measurements,
+            )
             is Story.PlaceholderWhileLoading -> LoadingStory(
                 story = story,
                 measurements = measurements,

@@ -653,6 +653,7 @@ data class SharingRequest internal constructor(
                 context: Context,
                 shortUrl: String,
             ) = when (story) {
+                is Story.BlankCover -> shortUrl
                 is Story.PlaceholderWhileLoading -> shortUrl
                 is Story.Cover -> shortUrl
                 is Story.NumberOfShows -> buildString {
