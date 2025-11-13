@@ -57,7 +57,6 @@ Language: nl
     <string name="playlist_episodes_archived_title">Geen afleveringen</string>
     <string name="playlist_episodes_archived_count">%1$d gearchiveerd</string>
     <string name="playlist_edit_episodes">Afleveringen herschikken</string>
-    <string name="playlist_edit_episodes_title">Playlist bewerken</string>
     <string name="playlist_episode_unavailable_title">Aflevering niet beschikbaar</string>
     <string name="episode_sort_custom_order">Aangepaste volgorde</string>
     <string name="playlist_episode_unavailable_cta">Verwijderen uit playlist</string>

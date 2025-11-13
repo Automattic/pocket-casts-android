@@ -56,7 +56,6 @@ Language: ru
     <string name="add_to_up_next_top">Добавить в начало списка «Следующие»</string>
     <string name="playlist_episodes_archived_title">Нет выпусков</string>
     <string name="playlist_episodes_archived_count">Архивировано: %1$d</string>
-    <string name="playlist_edit_episodes_title">Редактировать плейлист</string>
     <string name="playlist_edit_episodes">Изменить очерёдность выпусков</string>
     <string name="playlist_episode_unavailable_cta">Удалить из плейлиста</string>
     <string name="playlist_episode_unavailable_description">Автор подкаста удалил этот выпуск. Он останется в вашем плейлисте, пока вы его не удалите.</string>

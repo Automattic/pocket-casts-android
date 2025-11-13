@@ -56,7 +56,6 @@ Language: ja_JP
     <string name="add_to_up_next_top">「次のエピソード待機リスト」の上部に追加</string>
     <string name="playlist_episodes_archived_title">エピソードなし</string>
     <string name="playlist_episodes_archived_count">%1$d件をアーカイブ済み</string>
-    <string name="playlist_edit_episodes_title">プレイリストを編集</string>
     <string name="playlist_edit_episodes">エピソードを並べ替え</string>
     <string name="playlist_episode_unavailable_cta">プレイリストから削除</string>
     <string name="playlist_episode_unavailable_description">ポッドキャスト作成者がこのエピソードを削除しました。 あなたが削除するまでは、ご自身のプレイリストに残ります。</string>

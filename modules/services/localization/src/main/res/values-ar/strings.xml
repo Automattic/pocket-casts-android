@@ -56,7 +56,6 @@ Language: ar
     <string name="add_to_up_next_top">إضافة في بداية قائمة التشغيل التالية</string>
     <string name="playlist_episodes_archived_title">لا توجد حلقات</string>
     <string name="playlist_episodes_archived_count">⁦%1$d⁩ مؤرشف</string>
-    <string name="playlist_edit_episodes_title">تحرير قائمة تشغيل</string>
     <string name="playlist_edit_episodes">إعادة ترتيب الحلقات</string>
     <string name="playlist_episode_unavailable_cta">إزالة من قائمة التشغيل</string>
     <string name="playlist_episode_unavailable_description">حذف منشئ podcast هذه الحلقة. ستبقى في قائمة تشغيلك حتى تزيلها.</string>
