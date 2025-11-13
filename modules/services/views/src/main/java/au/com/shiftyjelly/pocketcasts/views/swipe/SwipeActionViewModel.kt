@@ -119,7 +119,7 @@ class SwipeActionViewModel @AssistedInject constructor(
                     put("playlist_uuid", playlistUuid)
                     put("episode_uuid", episodeUuid)
                     put("podcast_uuid", podcastUuid)
-                    put("source", "swipe")
+                    put("source", "swipe_remove")
                 },
             )
         }

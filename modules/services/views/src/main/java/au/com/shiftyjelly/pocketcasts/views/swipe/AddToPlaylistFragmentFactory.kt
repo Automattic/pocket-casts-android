@@ -13,12 +13,15 @@ interface AddToPlaylistFragmentFactory {
 
     enum class Source(
         val analyticsValue: String,
+        val episodeEditAnalyticsValue: String,
     ) {
         Swipe(
             analyticsValue = "swipe",
+            episodeEditAnalyticsValue = "swipe_edit",
         ),
         Shelf(
             analyticsValue = "shelf",
+            episodeEditAnalyticsValue = "shelf",
         ),
     }
 

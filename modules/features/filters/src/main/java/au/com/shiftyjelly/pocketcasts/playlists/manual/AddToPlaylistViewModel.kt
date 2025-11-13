@@ -163,7 +163,7 @@ class AddToPlaylistViewModel @AssistedInject constructor(
                     put("playlist_uuid", playlist.uuid)
                     put("episode_uuid", episodeUuid)
                     put("podcast_uuid", podcastUuid)
-                    put("source", source.analyticsValue)
+                    put("source", source.episodeEditAnalyticsValue)
                 },
             )
         }
@@ -181,7 +181,7 @@ class AddToPlaylistViewModel @AssistedInject constructor(
                 put("playlist_uuid", playlist.uuid)
                 put("episode_uuid", episodeUuid)
                 put("podcast_uuid", podcastUuid)
-                put("source", source.analyticsValue)
+                put("source", source.episodeEditAnalyticsValue)
             },
         )
     }
