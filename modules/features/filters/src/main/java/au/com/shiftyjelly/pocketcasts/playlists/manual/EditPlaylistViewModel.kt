@@ -50,11 +50,24 @@ class EditPlaylistViewModel @AssistedInject constructor(
         }
     }
 
-    fun deleteEpisode(episodeUuid: String) {
+    fun deleteEpisode(episodeUuid: String, podcastUuid: String) {
         _episodes = _episodes.filter { it.uuid != episodeUuid }
         viewModelScope.launch {
-            tracker.track(AnalyticsEvent.FILTER_MANUAL_EPISODE_DELETED)
             playlistManager.deleteManualEpisode(playlistUuid, episodeUuid)
+
+            val playlistName = playlistManager.findPlaylistPreview(playlistUuid)?.title
+            tracker.track(
+                AnalyticsEvent.EPISODE_REMOVED_FROM_LIST,
+                buildMap {
+                    if (playlistName != null) {
+                        put("playlist_name", playlistName)
+                    }
+                    put("playlist_uuid", playlistUuid)
+                    put("episode_uuid", episodeUuid)
+                    put("podcast_uuid", podcastUuid)
+                    put("source", "playlist_rearrange")
+                },
+            )
         }
     }
 

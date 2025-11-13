@@ -47,6 +47,7 @@ import au.com.shiftyjelly.pocketcasts.compose.theme
 import au.com.shiftyjelly.pocketcasts.models.entity.ManualPlaylistEpisodeSource
 import au.com.shiftyjelly.pocketcasts.models.entity.ManualPlaylistFolderSource
 import au.com.shiftyjelly.pocketcasts.models.entity.ManualPlaylistPodcastSource
+import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.playlists.manual.AddEpisodesViewModel.PodcastEpisodesUiState
 import au.com.shiftyjelly.pocketcasts.utils.extensions.requireString
 import kotlinx.coroutines.flow.StateFlow
@@ -66,7 +67,7 @@ internal fun AddEpisodesPage(
     useEpisodeArtwork: Boolean,
     onOpenPodcast: () -> Unit,
     onOpenFolder: () -> Unit,
-    onAddEpisode: (String) -> Unit,
+    onAddEpisode: (PodcastEpisode) -> Unit,
     onClickNavigationButton: () -> Unit,
     onClickDoneButton: () -> Unit,
     modifier: Modifier = Modifier,
@@ -223,7 +224,7 @@ internal fun AddEpisodesPage(
                 AddEpisodesColumn(
                     uiState = uiState,
                     useEpisodeArtwork = useEpisodeArtwork,
-                    onAddEpisode = { episode -> onAddEpisode(episode.uuid) },
+                    onAddEpisode = { episode -> onAddEpisode(episode) },
                     modifier = Modifier
                         .fillMaxSize()
                         .imePadding(),

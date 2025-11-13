@@ -99,13 +99,19 @@ class PlaylistEpisodesAdapterFactory @Inject constructor(
                     is PlaylistEpisode.Unavailable -> if (childFragmentManager.findFragmentByTag("unavailable_episode_sheet") == null) {
                         UnavailableEpisodeFragment.newInstance(
                             episodeUuid = episodeWrapper.uuid,
+                            podcastUuid = episodeWrapper.podcastUuid,
                         ).show(childFragmentManager, "unavailable_episode_sheet")
                     }
                 }
             },
             onSwipeAction = { episode, action ->
                 fragment.viewLifecycleOwner.lifecycleScope.launch {
-                    swipeActionViewModel.handleAction(action, episode.uuid, childFragmentManager)
+                    swipeActionViewModel.handleAction(
+                        action = action,
+                        episodeUuid = episode.uuid,
+                        podcastUuid = episode.podcastUuid,
+                        fragmentManager = childFragmentManager,
+                    )
                 }
             },
             playButtonListener = playButtonListener,

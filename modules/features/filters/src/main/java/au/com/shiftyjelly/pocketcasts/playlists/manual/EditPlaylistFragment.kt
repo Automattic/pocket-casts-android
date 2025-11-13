@@ -40,7 +40,12 @@ internal class EditPlaylistFragment : BaseFragment() {
             EditPlaylistPage(
                 episodes = viewModel.episodes,
                 useEpisodeArtwork = viewModel.useEpisodeArtwork.collectAsState(false).value,
-                onDeleteEpisode = { episode -> viewModel.deleteEpisode(episode.uuid) },
+                onDeleteEpisode = { episode ->
+                    viewModel.deleteEpisode(
+                        episode.uuid,
+                        episode.podcastUuid,
+                    )
+                },
                 onReorderEpisodes = viewModel::updateEpisodesOrder,
                 onClickBack = {
                     @Suppress("DEPRECATION")

@@ -440,6 +440,22 @@ class PlaylistViewModel @AssistedInject constructor(
         analyticsTracker.track(AnalyticsEvent.FILTER_SHOW_ARCHIVED_CTA_EMPTY_TAPPED)
     }
 
+    fun trackDeleteUnavailableEpisode(episodeUuid: String, podcastUuid: String) {
+        val playlistName = uiState.value.playlist?.title
+        analyticsTracker.track(
+            AnalyticsEvent.EPISODE_REMOVED_FROM_LIST,
+            buildMap {
+                if (playlistName != null) {
+                    put("playlist_name", playlistName)
+                }
+                put("playlist_uuid", playlistUuid)
+                put("episode_uuid", episodeUuid)
+                put("podcast_uuid", podcastUuid)
+                put("source", "unavailable_episode")
+            },
+        )
+    }
+
     fun updateAutoPlaySource() {
         settings.trackingAutoPlaySource.set(AutoPlaySource.fromId(playlistUuid), updateModifiedAt = false)
     }

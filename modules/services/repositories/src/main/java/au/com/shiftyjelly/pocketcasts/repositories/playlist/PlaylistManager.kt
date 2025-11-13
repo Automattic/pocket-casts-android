@@ -16,6 +16,8 @@ interface PlaylistManager {
     // <editor-fold desc="Generic playlists">
     fun playlistPreviewsFlow(): Flow<List<PlaylistPreview>>
 
+    suspend fun findPlaylistPreview(uuid: String): PlaylistPreview?
+
     fun getArtworkUuidsFlow(playlistUuid: String): StateFlow<List<String>?>
 
     fun getEpisodeCountFlow(playlistUuid: String): StateFlow<Int?>

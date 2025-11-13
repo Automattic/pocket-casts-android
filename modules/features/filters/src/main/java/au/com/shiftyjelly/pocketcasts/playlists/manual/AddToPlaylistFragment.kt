@@ -48,6 +48,7 @@ internal class AddToPlaylistFragment : BaseDialogFragment() {
                 factory.create(
                     source = args.source,
                     episodeUuid = args.episodeUuid,
+                    podcastUuid = args.podcastUuid,
                     initialPlaylistTitle = getString(LR.string.new_playlist),
                 )
             }
@@ -94,14 +95,14 @@ internal class AddToPlaylistFragment : BaseDialogFragment() {
                     onChangeEpisodeInPlaylist = { playlist ->
                         if (playlist.canAddOrRemoveEpisode(uiState.episodeLimit)) {
                             if (playlist.hasEpisode) {
-                                viewModel.trackEpisodeRemoveTapped()
+                                viewModel.trackEpisodeRemoveTapped(playlist)
                                 viewModel.removeFromPlaylist(playlist.uuid)
                             } else {
-                                viewModel.trackEpisodeAddTapped(isPlaylistFull = false)
+                                viewModel.trackEpisodeAddTapped(playlist, isPlaylistFull = false)
                                 viewModel.addToPlaylist(playlist.uuid)
                             }
                         } else {
-                            viewModel.trackEpisodeAddTapped(isPlaylistFull = true)
+                            viewModel.trackEpisodeAddTapped(playlist, isPlaylistFull = true)
                             if (snackbarHostState.currentSnackbarData == null) {
                                 coroutineScope.launch {
                                     snackbarHostState.showSnackbar(getString(LR.string.playlist_is_full_description))
@@ -149,6 +150,7 @@ internal class AddToPlaylistFragment : BaseDialogFragment() {
     private class Args(
         val source: Source,
         val episodeUuid: String,
+        val podcastUuid: String,
         val customTheme: Theme.ThemeType?,
     ) : Parcelable
 
@@ -158,9 +160,17 @@ internal class AddToPlaylistFragment : BaseDialogFragment() {
         fun newInstance(
             source: Source,
             episodeUuid: String,
+            podcastUuid: String,
             customTheme: Theme.ThemeType? = null,
         ) = AddToPlaylistFragment().apply {
-            arguments = bundleOf(NEW_INSTANCE_ARGS to Args(source, episodeUuid, customTheme))
+            arguments = bundleOf(
+                NEW_INSTANCE_ARGS to Args(
+                    source = source,
+                    episodeUuid = episodeUuid,
+                    podcastUuid = podcastUuid,
+                    customTheme = customTheme,
+                ),
+            )
         }
     }
 }

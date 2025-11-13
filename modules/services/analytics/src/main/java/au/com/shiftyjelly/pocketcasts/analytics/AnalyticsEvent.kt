@@ -344,12 +344,13 @@ enum class AnalyticsEvent(val key: String) {
     FILTER_SHOW_ARCHIVED_CTA_EMPTY_TAPPED("filter_show_archived_cta_empty_tapped"),
     FILTER_NAME_UPDATED("filter_name_updated"),
     FILTER_MANUAL_EPISODES_REARRANGED("filter_manual_episodes_rearranged"),
-    FILTER_MANUAL_EPISODE_DELETED("filter_manual_episode_deleted"),
     ADD_TO_PLAYLISTS_SHOWN("add_to_playlists_shown"),
     ADD_TO_PLAYLISTS_EPISODE_ADD_TAPPED("add_to_playlists_episode_add_tapped"),
     ADD_TO_PLAYLISTS_EPISODE_REMOVE_TAPPED("add_to_playlists_episode_remove_tapped"),
     ADD_TO_PLAYLISTS_NEW_PLAYLIST_TAPPED("add_to_playlists_new_playlist_tapped"),
     ADD_TO_PLAYLISTS_CREATE_NEW_PLAYLIST_TAPPED("add_to_playlists_create_new_playlist_tapped"),
+    EPISODE_ADDED_TO_LIST("episode_added_to_list"),
+    EPISODE_REMOVED_FROM_LIST("episode_removed_from_list"),
 
     /* Discover */
     DISCOVER_SHOWN("discover_shown"),

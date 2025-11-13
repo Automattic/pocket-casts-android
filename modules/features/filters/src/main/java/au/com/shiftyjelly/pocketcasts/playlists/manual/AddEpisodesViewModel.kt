@@ -131,12 +131,25 @@ class AddEpisodesViewModel @AssistedInject constructor(
         tracker.track(AnalyticsEvent.FILTER_ADD_EPISODES_PODCAST_TAPPED)
     }
 
-    fun trackEpisodeTapped() {
-        val episodeCount = uiState.value?.playlist?.metadata?.totalEpisodeCount ?: Int.MAX_VALUE
+    fun trackEpisodeTapped(episode: PodcastEpisode) {
+        val playlist = uiState.value?.playlist ?: return
+        val isPlaylistFull = playlist.metadata.totalEpisodeCount >= PlaylistManager.MANUAL_PLAYLIST_EPISODE_LIMIT
         tracker.track(
             AnalyticsEvent.FILTER_ADD_EPISODES_EPISODE_TAPPED,
-            mapOf("is_playlist_full" to (episodeCount >= PlaylistManager.MANUAL_PLAYLIST_EPISODE_LIMIT)),
+            mapOf("is_playlist_full" to isPlaylistFull),
         )
+        if (!isPlaylistFull) {
+            tracker.track(
+                AnalyticsEvent.EPISODE_ADDED_TO_LIST,
+                buildMap {
+                    put("playlist_name", playlist.title)
+                    put("playlist_uuid", playlist.uuid)
+                    put("episode_uuid", episode.uuid)
+                    put("podcast_uuid", episode.podcastUuid)
+                    put("source", "playlist_editor")
+                },
+            )
+        }
     }
 
     data class UiState(

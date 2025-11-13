@@ -62,6 +62,10 @@ class UnavailableEpisodeFragment : BaseDialogFragment() {
                 UnavailableEpisodePage(
                     onClickRemove = {
                         viewModel.deleteEpisode(args.episodeUuid)
+                        viewModel.trackDeleteUnavailableEpisode(
+                            episodeUuid = args.episodeUuid,
+                            podcastUuid = args.podcastUuid,
+                        )
                         dismiss()
                     },
                     modifier = Modifier.padding(
@@ -78,6 +82,7 @@ class UnavailableEpisodeFragment : BaseDialogFragment() {
     @Parcelize
     private class Args(
         val episodeUuid: String,
+        val podcastUuid: String,
     ) : Parcelable
 
     companion object {
@@ -85,8 +90,14 @@ class UnavailableEpisodeFragment : BaseDialogFragment() {
 
         fun newInstance(
             episodeUuid: String,
+            podcastUuid: String,
         ) = UnavailableEpisodeFragment().apply {
-            arguments = bundleOf(NEW_INSTANCE_ARGS to Args(episodeUuid))
+            arguments = bundleOf(
+                NEW_INSTANCE_ARGS to Args(
+                    episodeUuid = episodeUuid,
+                    podcastUuid = podcastUuid,
+                ),
+            )
         }
     }
 }
