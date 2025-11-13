@@ -4,7 +4,6 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -15,6 +14,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -35,7 +35,7 @@ import au.com.shiftyjelly.pocketcasts.ui.R as UR
 internal fun PlusInterstitialStory(
     story: Story.PlusInterstitial,
     measurements: EndOfYearMeasurements,
-    onClickUpsell: () -> Unit,
+    onClick: () -> Unit,
 ) {
     Box(
         modifier = Modifier
@@ -70,7 +70,7 @@ internal fun PlusInterstitialStory(
             PlusInfo(
                 story = story,
                 measurements = measurements,
-                onClickUpsell = onClickUpsell,
+                onClick = onClick,
             )
         }
     }
@@ -80,22 +80,21 @@ internal fun PlusInterstitialStory(
 private fun PlusInfo(
     story: Story.PlusInterstitial,
     measurements: EndOfYearMeasurements,
-    onClickUpsell: () -> Unit,
+    onClick: () -> Unit,
 ) {
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
         modifier = Modifier.fillMaxWidth(),
     ) {
-        Spacer(
-            modifier = Modifier.height(16.dp),
-        )
+        Spacer(Modifier.height(16.dp))
+
         SubscriptionBadgeForTier(
             tier = story.subscriptionTier ?: SubscriptionTier.Plus,
             displayMode = SubscriptionBadgeDisplayMode.Black,
         )
-        Spacer(
-            modifier = Modifier.height(16.dp),
-        )
+
+        Spacer(Modifier.height(16.dp))
+
         val title = if (story.subscriptionTier == null) {
             stringResource(LR.string.end_of_year_stories_theres_more)
         } else {
@@ -105,12 +104,14 @@ private fun PlusInfo(
             text = title,
             fontScale = measurements.smallDeviceFactor,
             disableAutoScale = true,
-            color = colorResource(UR.color.coolgrey_90),
+            color = Color.Black,
+            textAlign = TextAlign.Center,
+            fontWeight = FontWeight.W600,
             modifier = Modifier.padding(horizontal = 24.dp),
         )
-        Spacer(
-            modifier = Modifier.height(16.dp),
-        )
+
+        Spacer(Modifier.height(16.dp))
+
         val description = if (story.subscriptionTier == null) {
             stringResource(LR.string.end_of_year_stories_subscribe_to_plus)
         } else {
@@ -118,21 +119,29 @@ private fun PlusInfo(
         }
         TextP40(
             text = description,
-            fontSize = 15.sp,
+            lineHeight = 20.85.sp,
+            fontWeight = FontWeight.W500,
             disableAutoScale = true,
-            color = colorResource(UR.color.coolgrey_90),
+            color = Color.Black,
             textAlign = TextAlign.Center,
             modifier = Modifier.padding(horizontal = 24.dp),
         )
+
+        Spacer(Modifier.height(16.dp))
+
+        val buttonLabel = if (story.subscriptionTier == null) {
+            stringResource(LR.string.eoy_story_stories_subscribe_to_plus_button_label)
+        } else {
+            stringResource(LR.string.navigation_continue)
+        }
         SolidEoyButton(
-            text = stringResource(LR.string.eoy_story_stories_subscribe_to_plus_button_label),
+            text = buttonLabel,
             backgroundColor = colorResource(UR.color.coolgrey_90),
             textColor = Color.White,
-            onClick = onClickUpsell,
+            onClick = onClick,
         )
-        Spacer(
-            modifier = Modifier.height(16.dp),
-        )
+
+        Spacer(Modifier.height(16.dp))
     }
 }
 
@@ -143,7 +152,7 @@ private fun PlusInterstitialPreview() {
         PlusInterstitialStory(
             story = Story.PlusInterstitial(subscriptionTier = SubscriptionTier.Plus),
             measurements = measurements,
-            onClickUpsell = {},
+            onClick = {},
         )
     }
 }

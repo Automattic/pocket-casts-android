@@ -234,7 +234,7 @@ private fun Stories(
             is Story.PlusInterstitial -> PlusInterstitialStory(
                 story = story,
                 measurements = measurements,
-                onClickUpsell = onClickUpsell,
+                onClick = onClickUpsell,
             )
             is Story.YearVsYear -> YearVsYearStory(
                 story = story,
