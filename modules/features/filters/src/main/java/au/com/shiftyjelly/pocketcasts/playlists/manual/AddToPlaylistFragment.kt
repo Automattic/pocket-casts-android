@@ -18,6 +18,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.rememberNestedScrollInteropConnection
+import androidx.compose.ui.res.stringResource
 import androidx.core.os.bundleOf
 import androidx.fragment.app.viewModels
 import androidx.fragment.compose.content
@@ -25,6 +26,7 @@ import androidx.navigation.compose.rememberNavController
 import au.com.shiftyjelly.pocketcasts.compose.CallOnce
 import au.com.shiftyjelly.pocketcasts.compose.components.AnimatedNonNullVisibility
 import au.com.shiftyjelly.pocketcasts.compose.components.ThemedSnackbarHost
+import au.com.shiftyjelly.pocketcasts.models.to.PlaylistPreviewForEpisode
 import au.com.shiftyjelly.pocketcasts.playlists.PlaylistFragment
 import au.com.shiftyjelly.pocketcasts.repositories.playlist.Playlist
 import au.com.shiftyjelly.pocketcasts.ui.helper.FragmentHostListener
@@ -32,6 +34,7 @@ import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.utils.extensions.requireParcelable
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseDialogFragment
 import au.com.shiftyjelly.pocketcasts.views.swipe.AddToPlaylistFragmentFactory.Source
+import com.google.android.material.snackbar.Snackbar
 import dagger.hilt.android.AndroidEntryPoint
 import dagger.hilt.android.lifecycle.withCreationCallback
 import kotlinx.coroutines.launch
@@ -113,7 +116,10 @@ internal class AddToPlaylistFragment : BaseDialogFragment() {
                     onClickContinueWithNewPlaylist = {
                         viewModel.trackNewPlaylistTapped()
                     },
-                    onClickDoneButton = ::dismiss,
+                    onClickDoneButton = {
+                        showDoneSnackbar(viewModel.getPlaylistsAddedTo())
+                        dismiss()
+                    },
                     onClickNavigationButton = {
                         if (!navController.popBackStack()) {
                             dismiss()
@@ -132,17 +138,34 @@ internal class AddToPlaylistFragment : BaseDialogFragment() {
         }
     }
 
+    private fun showDoneSnackbar(playlistsAddedTo: Set<PlaylistPreviewForEpisode>) {
+        val hostListener = requireActivity() as FragmentHostListener
+        val snackbarView = hostListener.snackBarView()
+        val snackbar = when (val size = playlistsAddedTo.size) {
+            0 -> return
+
+            1 -> {
+                val playlist = playlistsAddedTo.first()
+                val message = getString(LR.string.added_to_playlist_single, playlist.title)
+                Snackbar.make(snackbarView, message, Snackbar.LENGTH_LONG)
+                    .setAction(LR.string.view) { hostListener.openManualPlaylist(playlist.uuid) }
+            }
+
+            else -> {
+                val message = resources.getQuantityString(LR.plurals.added_to_playlist_single_multiple, size, size)
+                Snackbar.make(snackbarView, message, Snackbar.LENGTH_LONG)
+            }
+        }
+        snackbar.show()
+    }
+
     @Composable
     private fun OpenCreatedPlaylistEffect() {
         LaunchedEffect(Unit) {
             val playlistUuid = viewModel.createdPlaylist.await()
 
             dismiss()
-            val hostListener = requireActivity() as FragmentHostListener
-            hostListener.closeFiltersToRoot()
-            hostListener.addFragment(PlaylistFragment.newInstance(playlistUuid, Playlist.Type.Manual))
-            hostListener.closeBottomSheet()
-            hostListener.closePlayer()
+            (requireActivity() as FragmentHostListener).openManualPlaylist(playlistUuid)
         }
     }
 
@@ -173,6 +196,16 @@ internal class AddToPlaylistFragment : BaseDialogFragment() {
             )
         }
     }
+}
+
+// This is deliberately not a member function to avoid memory leaks when showing a snackbar.
+// Having it as a member function would require capturing a reference to the fragment
+// in snackbar's action lambda leading to a memory leak.
+private fun FragmentHostListener.openManualPlaylist(playlistUuid: String) {
+    closeFiltersToRoot()
+    addFragment(PlaylistFragment.newInstance(playlistUuid, Playlist.Type.Manual))
+    closeBottomSheet()
+    closePlayer()
 }
 
 private val fadeIn = fadeIn()

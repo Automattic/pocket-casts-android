@@ -967,6 +967,12 @@
     <!-- Accessibility description. %1$s is an episode title-->
     <string name="add_to_playlist_episode_desc">Add %1$s to playlist</string>
     <string name="add_to_playlist_failure_message">This playlist is full. Remove a few episodes or start a new one.</string>
+    <!-- %1$s is a playlist title  -->
+    <string name="added_to_playlist_single">Added to %1$s</string>
+    <plurals name="added_to_playlist_single_multiple">
+        <item quantity="one">Added to %d playlist</item>
+        <item quantity="other">Added to %d playlists</item>
+    </plurals>
     <string name="create_playlist">Create playlist</string>
     <string name="create_smart_playlist">Create smart playlist</string>
     <string name="decrement_longer_than_duration">Decrement \"longer than\" duration</string>
