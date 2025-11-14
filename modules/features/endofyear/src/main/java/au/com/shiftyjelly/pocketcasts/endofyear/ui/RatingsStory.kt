@@ -136,9 +136,9 @@ private fun PresentRatings(
                     drawContent()
                     drawRect(
                         brush = Brush.verticalGradient(
-                            colors = listOf(Color.Transparent, story.backgroundColor),
-                            startY = size.height - 64.dp.toPx(),
-                            endY = size.height,
+                            0f to Color.Transparent,
+                            0.85f to Color.Transparent,
+                            1f to story.backgroundColor
                         ),
                     )
                 },
@@ -176,11 +176,7 @@ private fun RatingBars(
             val barRange = (stats.relativeToMax(rating) * 10).roundToInt()
             AnimatedRatingBar(
                 rating = rating.numericalValue,
-                heightRange = if (shouldNormalize) {
-                    barRange.coerceIn(1, 10)
-                } else {
-                    barRange
-                },
+                heightRange = barRange,
                 forceBarVisible = forceBarsVisible,
                 contentScale = arrangement?.let { ContentScale.FillBounds },
             )
@@ -194,16 +190,20 @@ private fun RowScope.AnimatedRatingBar(
     heightRange: Int,
     forceBarVisible: Boolean,
     contentScale: ContentScale?,
-) {
-    val composition by rememberLottieComposition(
-        spec = LottieCompositionSpec.RawRes(R.raw.playback_ratings_pillar_lottie),
+) = Box(modifier = Modifier.weight(1f)) {
+    val pillarComposition by rememberLottieComposition(
+        spec = LottieCompositionSpec.RawRes(R.raw.pillar_bars_i3),
+    )
+    val numberComposition by rememberLottieComposition(
+        spec = LottieCompositionSpec.RawRes(R.raw.pillar_numbers_i3),
     )
 
-    val animatable = rememberLottieAnimatable()
+    val pillarAnimatable = rememberLottieAnimatable()
+    val numberAnimatable = rememberLottieAnimatable()
     val isPreview = LocalInspectionMode.current
     val freezeBar = forceBarVisible || isPreview
 
-    composition?.let { comp ->
+    pillarComposition?.let { comp ->
         val markerIndex = comp.markers.size - heightRange
         val targetMarker = comp.markers.find { it.name == "marker_$markerIndex" } ?: comp.markers.firstOrNull()
 
@@ -214,8 +214,8 @@ private fun RowScope.AnimatedRatingBar(
                 LottieClipSpec.Marker(marker = targetMarker.name)
             }
 
-            animatable.animate(
-                composition = composition,
+            pillarAnimatable.animate(
+                composition = pillarComposition,
                 clipSpec = clipSpec,
             )
         }
@@ -223,7 +223,33 @@ private fun RowScope.AnimatedRatingBar(
         LaunchedEffect(freezeBar, targetMarker) {
             if (freezeBar && targetMarker != null) {
                 val endProgress = (targetMarker.startFrame + targetMarker.durationFrames) / comp.durationFrames
-                animatable.snapTo(comp, endProgress)
+                pillarAnimatable.snapTo(comp, endProgress)
+            }
+        }
+    }
+
+
+    numberComposition?.let { comp ->
+        val markerIndex = comp.markers.size - heightRange
+        val targetMarker = comp.markers.find { it.name == "marker_$markerIndex" } ?: comp.markers.firstOrNull()
+
+        LaunchedEffect(targetMarker) {
+            val clipSpec = if (targetMarker == null) {
+                LottieClipSpec.Frame(min = 0, max = 1)
+            } else {
+                LottieClipSpec.Marker(marker = targetMarker.name)
+            }
+
+            numberAnimatable.animate(
+                composition = numberComposition,
+                clipSpec = clipSpec,
+            )
+        }
+
+        LaunchedEffect(freezeBar, targetMarker) {
+            if (freezeBar && targetMarker != null) {
+                val endProgress = (targetMarker.startFrame + targetMarker.durationFrames) / comp.durationFrames
+                numberAnimatable.snapTo(comp, endProgress)
             }
         }
     }
@@ -242,9 +268,16 @@ private fun RowScope.AnimatedRatingBar(
     )
 
     LottieAnimation(
-        modifier = Modifier.weight(1f),
-        composition = composition,
-        progress = { animatable.progress },
+        modifier = Modifier.fillMaxSize(),
+        composition = pillarComposition,
+        progress = { pillarAnimatable.progress },
+        contentScale = contentScale ?: ContentScale.Fit,
+    )
+
+    LottieAnimation(
+        modifier = Modifier.fillMaxSize(),
+        composition = numberComposition,
+        progress = { numberAnimatable.progress },
         dynamicProperties = dynamicProperties,
         contentScale = contentScale ?: ContentScale.Fit,
         fontMap = remember {
