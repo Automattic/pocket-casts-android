@@ -27,9 +27,12 @@ import androidx.media3.ui.compose.PlayerSurface
 import androidx.media3.ui.compose.SURFACE_TYPE_TEXTURE_VIEW
 import androidx.media3.ui.compose.state.rememberPresentationState
 
+/**
+ * Only use for end of year videos and not podcast videos as using the ExoPlayer in this way isn't optimal.
+ */
 @UnstableApi
 @Composable
-fun VideoSurface(
+internal fun VideoSurface(
     @RawRes videoResourceId: Int,
     modifier: Modifier = Modifier,
     backgroundColor: Color = Color.Black,
