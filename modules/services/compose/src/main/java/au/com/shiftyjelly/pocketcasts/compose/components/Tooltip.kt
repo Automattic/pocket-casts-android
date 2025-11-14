@@ -193,14 +193,14 @@ private fun rememberTooltipColors(): Triple<Color, Color, Color> {
         val baseTitle = theme.colors.primaryText01
         val baseDescription = theme.colors.primaryText02
         if (theme.isDark) {
-            Triple(baseBackground.brightenColor(), baseTitle.brightenColor(), baseDescription.brightenColor())
+            Triple(baseBackground.brighten(), baseTitle.brighten(), baseDescription.brighten())
         } else {
             Triple(baseBackground, baseTitle, baseDescription)
         }
     }
 }
 
-private fun Color.brightenColor() = modifyHsv { h, s, v ->
+private fun Color.brighten() = modifyHsv { h, s, v ->
     val newValue = (v.coerceAtLeast(0.1f) * 1.4f).coerceAtMost(1f)
     Color.hsv(h, s, newValue)
 }
