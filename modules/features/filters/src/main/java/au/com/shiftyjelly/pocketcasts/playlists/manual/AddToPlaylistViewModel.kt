@@ -83,6 +83,27 @@ class AddToPlaylistViewModel @AssistedInject constructor(
         emitAll(uiStates)
     }.stateIn(viewModelScope, SharingStarted.Eagerly, initialValue = null)
 
+    private val playlistsChanges = mutableMapOf<String, Boolean>()
+
+    private fun cachePlaylistChange(uuid: String, shouldAdd: Boolean) {
+        // If the change is not present add it.
+        playlistsChanges.merge(uuid, shouldAdd) { isCurrentlyAdded, _ ->
+            if (isCurrentlyAdded == shouldAdd) {
+                // If the change is already stored keep it.
+                isCurrentlyAdded
+            } else {
+                // If playlist was added but will be removed or vice-versa remove the change value.
+                null
+            }
+        }
+    }
+
+    fun getPlaylistsAddedTo(): Set<PlaylistPreviewForEpisode> {
+        val playlists = uiState.value?.playlistPreviews.orEmpty()
+        val uuidsAddedTo = playlistsChanges.filterValues { it }.keys
+        return playlists.filterTo(mutableSetOf()) { playlist -> playlist.uuid in uuidsAddedTo }
+    }
+
     fun getArtworkUuidsFlow(playlistUuid: String): StateFlow<List<String>?> {
         return playlistManager.getArtworkUuidsFlow(playlistUuid)
     }
@@ -108,6 +129,8 @@ class AddToPlaylistViewModel @AssistedInject constructor(
     }
 
     fun addToPlaylist(playlistUuid: String) {
+        cachePlaylistChange(playlistUuid, shouldAdd = true)
+
         viewModelScope.launch(Dispatchers.Default + NonCancellable) {
             previewsFlow.update { previews ->
                 previews?.map { preview ->
@@ -123,6 +146,8 @@ class AddToPlaylistViewModel @AssistedInject constructor(
     }
 
     fun removeFromPlaylist(playlistUuid: String) {
+        cachePlaylistChange(playlistUuid, shouldAdd = false)
+
         viewModelScope.launch(Dispatchers.Default + NonCancellable) {
             previewsFlow.update { previews ->
                 previews?.map { preview ->
