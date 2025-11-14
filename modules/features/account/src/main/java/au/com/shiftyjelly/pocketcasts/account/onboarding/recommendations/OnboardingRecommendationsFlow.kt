@@ -45,6 +45,7 @@ object OnboardingRecommendationsFlow {
             composable(INTERESTS) {
                 OnboardingInterestsPage(
                     theme = theme,
+                    flow = flow,
                     onBackPress = { navController.popBackStack() },
                     onShowRecommendations = { navController.navigate(RECOMMENDATIONS) },
                     onUpdateSystemBars = onUpdateSystemBars,
@@ -53,7 +54,8 @@ object OnboardingRecommendationsFlow {
 
             composable(RECOMMENDATIONS) {
                 OnboardingRecommendationsStartPage(
-                    theme,
+                    theme = theme,
+                    flow = flow,
                     onImportClick = { navController.navigate(OnboardingImportFlow.ROUTE) },
                     onSearch = with(LocalContext.current) {
                         {
