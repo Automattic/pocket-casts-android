@@ -18,6 +18,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.geometry.RoundRect
 import androidx.compose.ui.geometry.Size
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Outline
 import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.PathOperation
@@ -40,6 +41,7 @@ import androidx.compose.ui.window.PopupProperties
 import au.com.shiftyjelly.pocketcasts.compose.AppThemeWithBackground
 import au.com.shiftyjelly.pocketcasts.compose.preview.ThemePreviewParameterProvider
 import au.com.shiftyjelly.pocketcasts.compose.theme
+import au.com.shiftyjelly.pocketcasts.ui.helper.modifyHsv
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 
 @Composable
@@ -107,10 +109,7 @@ fun Tooltip(
     elevation: Dp = 16.dp,
 ) {
     val tooltipShape = TooltipShape(tipPosition)
-    val backgroundColor = when (MaterialTheme.theme.type) {
-        Theme.ThemeType.DARK_CONTRAST -> MaterialTheme.theme.colors.primaryUi05
-        else -> MaterialTheme.theme.colors.primaryUi01
-    }
+    val (backgroundColor, titleColor, descriptionColor) = rememberTooltipColors()
 
     Box(
         modifier = (if (elevation > 0.dp) Modifier.shadow(elevation, tooltipShape) else Modifier)
@@ -128,6 +127,7 @@ fun Tooltip(
             }
             TextH40(
                 text = title,
+                color = titleColor,
             )
             if (body != null) {
                 Spacer(
@@ -135,7 +135,7 @@ fun Tooltip(
                 )
                 TextP50(
                     text = body,
-                    color = MaterialTheme.theme.colors.primaryText02,
+                    color = descriptionColor,
                 )
             }
             if (tipPosition.isBottomAligned()) {
@@ -183,6 +183,26 @@ enum class TipPosition {
             LayoutDirection.Rtl -> BottomStart
         }
     }
+}
+
+@Composable
+private fun rememberTooltipColors(): Triple<Color, Color, Color> {
+    val theme = MaterialTheme.theme
+    return remember(theme) {
+        val baseBackground = theme.colors.primaryUi01
+        val baseTitle = theme.colors.primaryText01
+        val baseDescription = theme.colors.primaryText02
+        if (theme.isDark) {
+            Triple(baseBackground.brightenColor(), baseTitle.brightenColor(), baseDescription.brightenColor())
+        } else {
+            Triple(baseBackground, baseTitle, baseDescription)
+        }
+    }
+}
+
+private fun Color.brightenColor() = modifyHsv { h, s, v ->
+    val newValue = (v.coerceAtLeast(0.1f) * 1.4f).coerceAtMost(1f)
+    Color.hsv(h, s, newValue)
 }
 
 @Composable
