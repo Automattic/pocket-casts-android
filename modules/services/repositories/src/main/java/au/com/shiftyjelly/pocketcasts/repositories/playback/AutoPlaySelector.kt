@@ -62,7 +62,7 @@ class AutoPlaySelector @Inject constructor(
     ): List<PodcastEpisode> {
         val episodes = episodeManager
             .findEpisodesByPodcastOrderedSuspend(podcast)
-            .filterNot(PodcastEpisode::isArchived)
+            .filter { episode -> !episode.isArchived || episode.uuid == currentEpisodeUuid  }
 
         return withContext(Dispatchers.Default) {
             val modifiedEpisodes = when (podcast.grouping) {
