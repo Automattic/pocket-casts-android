@@ -199,8 +199,9 @@ internal class AddToPlaylistFragment : BaseDialogFragment() {
 }
 
 // This is deliberately not a member function to avoid memory leaks when showing a snackbar.
-// Having it as a member function would require capturing a reference to the fragment
-// in snackbar's action lambda leading to a memory leak.
+// If this were a member function of the fragment, any lambda (such as the one passed to setAction())
+// that references it would capture the fragment's `this` reference, potentially causing a memory leak.
+// Making it an extension function on FragmentHostListener ensures only the activity and playlistUuid are captured.
 private fun FragmentHostListener.openManualPlaylist(playlistUuid: String) {
     closeFiltersToRoot()
     addFragment(PlaylistFragment.newInstance(playlistUuid, Playlist.Type.Manual))
