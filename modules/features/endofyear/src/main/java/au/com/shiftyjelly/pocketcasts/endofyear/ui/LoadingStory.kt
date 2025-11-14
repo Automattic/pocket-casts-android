@@ -15,7 +15,7 @@ import au.com.shiftyjelly.pocketcasts.ui.R as UR
 @Composable
 internal fun LoadingStory(
     story: Story.PlaceholderWhileLoading,
-    measurements: EndOfYearMeasurements
+    measurements: EndOfYearMeasurements,
 ) {
     Box(
         modifier = Modifier

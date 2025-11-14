@@ -916,7 +916,7 @@ class MainActivity :
 
     private fun showStories(source: StoriesSource) {
         endOfYearActivityLauncher.launch(
-            StoriesActivity.intent(activity = this, source = source)
+            StoriesActivity.intent(activity = this, source = source),
         )
     }
 

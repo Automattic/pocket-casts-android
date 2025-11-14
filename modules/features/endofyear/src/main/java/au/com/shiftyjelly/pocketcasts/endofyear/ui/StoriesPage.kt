@@ -181,17 +181,21 @@ private fun Stories(
     HorizontalPager(
         state = pagerState,
         userScrollEnabled = false,
-        modifier = if (blockGestures) Modifier else Modifier.pointerInput(Unit) {
-            awaitEachGesture {
-                awaitFirstDown().consume()
-                val timeMark = TimeSource.Monotonic.markNow()
-                onHoldStory()
-                val up = waitForUpOrCancellation()?.also { it.consume() }
-                if (up != null && timeMark.elapsedNow() < 250.milliseconds) {
-                    val moveForward = up.position.x > widthPx / 2
-                    onChangeStory(moveForward)
+        modifier = if (blockGestures) {
+            Modifier
+        } else {
+            Modifier.pointerInput(Unit) {
+                awaitEachGesture {
+                    awaitFirstDown().consume()
+                    val timeMark = TimeSource.Monotonic.markNow()
+                    onHoldStory()
+                    val up = waitForUpOrCancellation()?.also { it.consume() }
+                    if (up != null && timeMark.elapsedNow() < 250.milliseconds) {
+                        val moveForward = up.position.x > widthPx / 2
+                        onChangeStory(moveForward)
+                    }
+                    onReleaseStory()
                 }
-                onReleaseStory()
             }
         },
     ) { index ->

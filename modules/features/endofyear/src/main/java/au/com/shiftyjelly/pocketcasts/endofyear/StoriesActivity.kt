@@ -5,7 +5,6 @@ import android.content.Context
 import android.content.Intent
 import android.graphics.Color
 import android.os.Bundle
-import android.view.View
 import android.view.WindowManager
 import androidx.activity.ComponentActivity
 import androidx.activity.SystemBarStyle
@@ -50,12 +49,9 @@ import au.com.shiftyjelly.pocketcasts.repositories.endofyear.EndOfYearManager
 import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingFlow
 import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingLauncher
 import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingUpgradeSource
-import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
-import au.com.shiftyjelly.pocketcasts.ui.theme.ThemeColor
 import au.com.shiftyjelly.pocketcasts.utils.ScreenshotCaptureDetector
 import au.com.shiftyjelly.pocketcasts.utils.Util
 import au.com.shiftyjelly.pocketcasts.views.activity.WebViewActivity
-import com.google.android.material.snackbar.Snackbar
 import dagger.hilt.android.AndroidEntryPoint
 import dagger.hilt.android.lifecycle.withCreationCallback
 import java.io.File
@@ -182,7 +178,7 @@ class StoriesActivity : ComponentActivity() {
                 onFailedToLoad = {
                     setResult(0, StoriesActivityContract.setResult(source))
                     finish()
-                }
+                },
             )
         }
 
@@ -335,11 +331,11 @@ class StoriesActivity : ComponentActivity() {
         }
     }
 
-    class StoriesActivityContract: ActivityResultContract<Intent, StoriesSource?>() {
+    class StoriesActivityContract : ActivityResultContract<Intent, StoriesSource?>() {
         companion object {
             private const val EXTRA_SOURCE = "stories_source"
 
-            fun setResult(source: StoriesSource) = Intent().apply{
+            fun setResult(source: StoriesSource) = Intent().apply {
                 putExtra(EXTRA_SOURCE, source)
             }
         }

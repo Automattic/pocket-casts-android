@@ -105,11 +105,16 @@ class EndOfYearViewModel @AssistedInject constructor(
             coverStoryGracePeriodExpired = gracePeriodExpired,
             subscription = subscription,
             topPodcastsLink = topPodcasts,
-            progress = progress
+            progress = progress,
         )
-    }.stateIn(viewModelScope, SharingStarted.Lazily, UiState.Syncing(
-        stories = placeholderStories, storyProgress = 0f,
-    ))
+    }.stateIn(
+        viewModelScope,
+        SharingStarted.Lazily,
+        UiState.Syncing(
+            stories = placeholderStories,
+            storyProgress = 0f,
+        ),
+    )
 
     internal fun syncData() {
         viewModelScope.launch {
@@ -383,7 +388,7 @@ internal sealed interface UiState {
 
     data class Syncing(
         val stories: List<Story>,
-        override val storyProgress: Float
+        override val storyProgress: Float,
     ) : UiState {
         override val storyCount: Int
             get() = stories.size
