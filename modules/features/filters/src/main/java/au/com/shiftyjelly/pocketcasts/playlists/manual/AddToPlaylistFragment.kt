@@ -1,5 +1,6 @@
 package au.com.shiftyjelly.pocketcasts.playlists.manual
 
+import android.content.DialogInterface
 import android.os.Bundle
 import android.os.Parcelable
 import android.view.LayoutInflater
@@ -116,10 +117,7 @@ internal class AddToPlaylistFragment : BaseDialogFragment() {
                     onClickContinueWithNewPlaylist = {
                         viewModel.trackNewPlaylistTapped()
                     },
-                    onClickDoneButton = {
-                        showDoneSnackbar(viewModel.getPlaylistsAddedTo())
-                        dismiss()
-                    },
+                    onClickDoneButton = ::dismiss,
                     onClickNavigationButton = {
                         if (!navController.popBackStack()) {
                             dismiss()
@@ -135,6 +133,13 @@ internal class AddToPlaylistFragment : BaseDialogFragment() {
                     .align(Alignment.BottomCenter)
                     .navigationBarsPadding(),
             )
+        }
+    }
+
+    override fun onDismiss(dialog: DialogInterface) {
+        super.onDismiss(dialog)
+        if (!requireActivity().isChangingConfigurations) {
+            showDoneSnackbar(viewModel.getPlaylistsAddedTo())
         }
     }
 
