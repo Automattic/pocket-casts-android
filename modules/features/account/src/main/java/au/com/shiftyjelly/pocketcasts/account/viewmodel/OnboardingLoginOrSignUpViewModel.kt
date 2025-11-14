@@ -4,7 +4,7 @@ import android.app.Application
 import android.content.Context
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
-import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsParameter
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
@@ -52,55 +52,35 @@ class OnboardingLoginOrSignUpViewModel @Inject constructor(
     }
 
     fun onShown(flow: OnboardingFlow) {
-        analyticsTracker.track(
-            AnalyticsEvent.ONBOARDING_INTRO_CAROUSEL_SHOWN,
-            mapOf(AnalyticsProp.flow(flow)),
-        )
+        analyticsTracker.trackOnboardingIntroCarouselShown(flow.analyticsValue)
     }
 
     fun onDismiss(flow: OnboardingFlow) {
-        analyticsTracker.track(
-            AnalyticsEvent.SETUP_ACCOUNT_DISMISSED,
-            mapOf(AnalyticsProp.flow(flow)),
-        )
+        analyticsTracker.trackSetupAccountDismissed(flow.analyticsValue)
     }
 
     fun onSignUpClicked(flow: OnboardingFlow) {
-        analyticsTracker.track(
-            AnalyticsEvent.SETUP_ACCOUNT_BUTTON_TAPPED,
-            mapOf(AnalyticsProp.flow(flow), AnalyticsProp.ButtonTapped.createAccount),
+        analyticsTracker.trackSetupAccountButtonTapped(
+            flow = flow.analyticsValue,
+            button = AnalyticsParameter.SetupAccountButton.CreateAccount,
         )
     }
 
     fun onGetStartedClicked(flow: OnboardingFlow) {
-        analyticsTracker.track(
-            AnalyticsEvent.ONBOARDING_GET_STARTED,
-            mapOf(AnalyticsProp.flow(flow), AnalyticsProp.ButtonTapped.getStarted),
+        analyticsTracker.trackOnboardingGetStarted(
+            flow = flow.analyticsValue,
         )
         // keep it consistent with iOS
-        analyticsTracker.track(
-            AnalyticsEvent.SETUP_ACCOUNT_BUTTON_TAPPED,
-            mapOf(AnalyticsProp.flow(flow), AnalyticsProp.ButtonTapped.getStarted),
+        analyticsTracker.trackSetupAccountButtonTapped(
+            flow = flow.analyticsValue,
+            button = AnalyticsParameter.SetupAccountButton.GetStarted,
         )
     }
 
     fun onLoginClicked(flow: OnboardingFlow) {
-        analyticsTracker.track(
-            AnalyticsEvent.SETUP_ACCOUNT_BUTTON_TAPPED,
-            mapOf(AnalyticsProp.flow(flow), AnalyticsProp.ButtonTapped.signIn),
+        analyticsTracker.trackSetupAccountButtonTapped(
+            flow = flow.analyticsValue,
+            button = AnalyticsParameter.SetupAccountButton.SignIn,
         )
-    }
-
-    companion object {
-        object AnalyticsProp {
-            fun flow(flow: OnboardingFlow) = "flow" to flow.analyticsValue
-            object ButtonTapped {
-                private const val BUTTON = "button"
-                val signIn = BUTTON to "sign_in"
-                val createAccount = BUTTON to "create_account"
-                val continueWithGoogle = BUTTON to "continue_with_google"
-                val getStarted = BUTTON to "get_started"
-            }
-        }
     }
 }

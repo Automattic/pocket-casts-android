@@ -127,6 +127,7 @@ object NewOnboardingFlow {
                     }
                 },
                 onClickLogin = {
+                    viewModel.onLogInPressed(flow)
                     navController.navigate(ROUTE_LOG_IN)
                 },
             )
@@ -135,6 +136,7 @@ object NewOnboardingFlow {
         composable(OldOnboardingFlow.CREATE_FREE_ACCOUNT) {
             OnboardingCreateAccountPage(
                 theme = theme,
+                flow = flow,
                 onBackPress = { navController.popBackStack() },
                 onCreateAccount = onAccountCreated,
                 onUpdateSystemBars = onUpdateSystemBars,

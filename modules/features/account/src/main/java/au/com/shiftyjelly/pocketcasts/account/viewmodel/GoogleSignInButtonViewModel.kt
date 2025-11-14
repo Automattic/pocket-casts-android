@@ -12,7 +12,7 @@ import androidx.credentials.GetCredentialRequest
 import androidx.credentials.exceptions.GetCredentialCancellationException
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsParameter
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.models.type.Subscription
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
@@ -62,17 +62,12 @@ class GoogleSignInButtonViewModel @Inject constructor(
         onError: suspend () -> Unit,
         activity: Activity,
         onLegacySignInIntent: (Intent) -> Unit,
-        event: AnalyticsEvent = AnalyticsEvent.SETUP_ACCOUNT_BUTTON_TAPPED,
     ) {
         if (flow != null) {
-            analyticsTracker.track(AnalyticsEvent.SSO_STARTED, mapOf("source" to "google"))
-
-            analyticsTracker.track(
-                event,
-                mapOf(
-                    OnboardingLoginOrSignUpViewModel.Companion.AnalyticsProp.flow(flow),
-                    OnboardingLoginOrSignUpViewModel.Companion.AnalyticsProp.ButtonTapped.continueWithGoogle,
-                ),
+            analyticsTracker.trackSsoStartedGoogle()
+            analyticsTracker.trackSetupAccountButtonTapped(
+                flow = flow.analyticsValue,
+                button = AnalyticsParameter.SetupAccountButton.ContinueWithGoogle,
             )
         } else if (!Util.isAutomotive(context)) {
             throw IllegalArgumentException("OnboardingFlow must be provided for non-automotive devices")

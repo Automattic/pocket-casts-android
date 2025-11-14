@@ -2,10 +2,10 @@ package au.com.shiftyjelly.pocketcasts.account.onboarding.recommendations
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.repositories.categories.CategoriesManager
 import au.com.shiftyjelly.pocketcasts.servers.model.DiscoverCategory
+import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingFlow
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -32,23 +32,21 @@ class OnboardingInterestsViewModel @Inject constructor(
         fetchCategories()
     }
 
-    fun onShow() {
-        analyticsTracker.track(AnalyticsEvent.INTERESTS_SHOWN)
+    fun onShow(flow: OnboardingFlow) {
+        analyticsTracker.trackInterestsShown(flow = flow.analyticsValue)
     }
 
-    fun skipSelection() {
-        analyticsTracker.track(AnalyticsEvent.INTERESTS_NOT_NOW_TAPPED)
+    fun skipSelection(flow: OnboardingFlow) {
+        analyticsTracker.trackInterestsNotNowTapped(flow = flow.analyticsValue)
         categoriesManager.setInterestCategories(emptySet())
     }
 
-    fun updateSelectedCategory(category: DiscoverCategory, isSelected: Boolean) {
-        analyticsTracker.track(
-            AnalyticsEvent.INTERESTS_CATEGORY_SELECTED,
-            mapOf(
-                "category_id" to category.id,
-                "name" to category.name,
-                "is_selected" to isSelected,
-            ),
+    fun updateSelectedCategory(category: DiscoverCategory, isSelected: Boolean, flow: OnboardingFlow) {
+        analyticsTracker.trackInterestsCategorySelected(
+            flow = flow.analyticsValue,
+            categoryId = category.id,
+            categoryName = category.name,
+            isSelected = isSelected,
         )
         _state.update {
             it.copy(
@@ -61,8 +59,8 @@ class OnboardingInterestsViewModel @Inject constructor(
         }
     }
 
-    fun showMore() {
-        analyticsTracker.track(AnalyticsEvent.INTERESTS_SHOW_MORE_TAPPED)
+    fun showMore(flow: OnboardingFlow) {
+        analyticsTracker.trackInterestsShowMoreTapped(flow = flow.analyticsValue)
         _state.update {
             it.copy(
                 displayedCategories = it.allCategories,
@@ -70,12 +68,10 @@ class OnboardingInterestsViewModel @Inject constructor(
         }
     }
 
-    fun saveInterests() {
-        analyticsTracker.track(
-            AnalyticsEvent.INTERESTS_CONTINUE_TAPPED,
-            mapOf(
-                "categories" to _state.value.selectedCategories.map { it.id }.joinToString(", "),
-            ),
+    fun saveInterests(flow: OnboardingFlow) {
+        analyticsTracker.trackInterestsContinueTapped(
+            flow = flow.analyticsValue,
+            categories = _state.value.selectedCategories.map { it.name },
         )
         categoriesManager.setInterestCategories(_state.value.selectedCategories)
     }

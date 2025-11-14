@@ -177,6 +177,7 @@ object OldOnboardingFlow {
         composable(CREATE_FREE_ACCOUNT) {
             OnboardingCreateAccountPage(
                 theme = theme,
+                flow = flow,
                 onBackPress = { navController.popBackStack() },
                 onCreateAccount = onAccountCreated,
                 onUpdateSystemBars = onUpdateSystemBars,
