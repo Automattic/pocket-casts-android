@@ -959,7 +959,6 @@ Language: zh_TW
     <string name="end_of_year_story_top_categories_share_text">我最常收聽的 Podcast 分類</string>
     <string name="end_of_year_story_top_categories">你最愛的分類</string>
     <string name="end_of_year_story_top_podcasts_share_text">本年度我最愛的 Podcast！ %1$s</string>
-    <string name="end_of_year_story_listened_to_numbers_subtitle">但有個節目你已成為忠實聽眾了…</string>
     <string name="end_of_year_story_longest_episode_share_text">我在 %1$d %2$s收聽時間最長的一集</string>
     <string name="end_of_year_story_top_podcast_share_text">%1$d 年我最愛的 Podcast！ %2$s</string>
     <string name="end_of_year_story_listened_to_numbers_share_text">我在 %3$d 年收聽了 %1$d 個不同的 Podcast，總共 %2$d 集</string>
@@ -967,7 +966,6 @@ Language: zh_TW
     <string name="end_of_year_story_listened_to_categories">你今年收聽了 %1$d 個不同分類</string>
     <string name="end_of_year_story_listened_to_categories_subtitle">來看看你最愛的內容…</string>
     <string name="end_of_year_story_intro_title">來慶祝你收聽節目的這一年！</string>
-    <string name="end_of_year_story_listened_to_numbers">你一共收聽了 %1$d 個不同節目和 %2$d 集內容</string>
     <string name="end_of_year_story_listened_to_categories_share_text">我在 2023 年收聽了 %1$d 個不同的分類</string>
     <string name="end_of_year_story_listened_to_share_text">你今年花了 %1$s收聽 Podcast</string>
     <string name="settings_media_notification_controls">媒體通知控制項</string>

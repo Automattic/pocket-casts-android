@@ -2054,10 +2054,7 @@
     <!-- Text that appears when someone shares the listened categories to story to Twitter, for example. %1$d is a placeholder for the number of categories. -->
     <string name="end_of_year_story_listened_to_categories_share_text">I listened to %1$d different categories in 2023</string>
     <!-- String telling the user how much podcasts and episodes they listened to this year, %1$d is a placeholder for the number of podcasts and %2$d is a placeholder fo the number of episodes. -->
-    <string name="end_of_year_story_listened_to_numbers">You listened to %1$d different shows and %2$d episodes in total</string>
-    <string name="end_of_year_story_listened_to_numbers_english_only" translatable="false">You listened to\n%1$d different shows\nand %2$d episodes in total</string>
-    <!-- Subtitle for the story containing number of podcasts and episodes played this year. Segway for the next story. -->
-    <string name="end_of_year_story_listened_to_numbers_subtitle">But there was one that you kept coming to…</string>
+    <string name="end_of_year_story_listened_to_numbers">You tuned in to %1$d podcasts and %2$d episodes</string>
     <!-- Text that appear when someone share the listened numbers story to Twitter. %1$d is a placeholder for the number of podcasts listened and %2$d for the number of episodes. %3$d is the year. -->
     <string name="end_of_year_story_listened_to_numbers_share_text">I listened to %1$d different podcasts and %2$d episodes in %3$d</string>
     <!-- Title for the story that display the most listened podcast by the user this year. %1$d is the year -->

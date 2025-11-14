@@ -943,12 +943,10 @@ Language: ca
     <string name="end_of_year_story_top_categories">Les teves principals categories</string>
     <string name="end_of_year_story_top_categories_share_text">Les meves categories de pòdcasts més escoltades</string>
     <string name="end_of_year_story_top_podcasts_share_text">Els meus pòdcasts preferits de l\'any! %1$s</string>
-    <string name="end_of_year_story_listened_to_numbers_subtitle">Però n\'hi havia un al que tornaves…</string>
     <string name="end_of_year_story_longest_episode_share_text">L\'episodi més llarg que vaig escoltar en %1$d %2$s</string>
     <string name="end_of_year_story_top_podcasts_list_title">Els meus pòdcasts preferits de %1$d</string>
     <string name="end_of_year_story_top_podcast_share_text">El meu pòdcast favorit de %1$d! %2$s</string>
     <string name="end_of_year_story_listened_to_numbers_share_text">He escoltat %1$d pòdcasts diferents i %2$d episodis en %3$d.</string>
-    <string name="end_of_year_story_listened_to_numbers">Has escoltat %1$d programes diferents i %2$d episodis en total</string>
     <string name="end_of_year_story_listened_to_categories">Has escoltat %1$d categories diferents aquest any</string>
     <string name="end_of_year_story_intro_title">Celebram l\'any que portes escoltant!</string>
     <string name="end_of_year_story_listened_to_categories_share_text">He escoltat %1$d categories diferents el 2023</string>

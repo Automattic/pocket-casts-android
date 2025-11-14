@@ -772,7 +772,6 @@ Language: el_GR
     <string name="end_of_year_create_account_to_see">Αποθήκευσε τα podcast σου στο cloud, πάρε την ανασκόπησή σου για το τέλος της χρονιάς και συγχρόνισε την πρόοδό σου με άλλες συσκευές.</string>
     <string name="end_of_year_story_longest_episode_share_text">Το μεγαλύτερο επεισόδιο που άκουσα το %1$d %2$s</string>
     <string name="end_of_year_story_listened_to_numbers_share_text">Άκουσα %1$d διαφορετικά podcasts και %2$d επεισόδια το %3$d</string>
-    <string name="end_of_year_story_listened_to_numbers_subtitle">Αλλά υπήρχε ένα στο οποίο πάντα επέστρεφες…</string>
     <string name="end_of_year_story_listened_to_numbers">Ακούσες %1$d διαφορετικές εκπομπές και %2$d επεισόδια συνολικά</string>
     <string name="end_of_year_story_listened_to_categories">Ακούσες %1$d διαφορετικές κατηγορίες φέτος</string>
     <string name="end_of_year_story_listened_to_categories_share_text">Άκουσα %1$d διαφορετικές κατηγορίες το 2023</string>

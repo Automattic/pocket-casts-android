@@ -959,7 +959,6 @@ Language: es
     <string name="end_of_year_story_top_categories_share_text">Mis categorías de pódcast más escuchadas</string>
     <string name="end_of_year_story_top_categories">Tus categorías principales</string>
     <string name="end_of_year_story_top_podcasts_share_text">¡Mis pódcast favoritos del año! %1$s</string>
-    <string name="end_of_year_story_listened_to_numbers_subtitle">Pero había uno al que siempre venías…</string>
     <string name="end_of_year_story_longest_episode_share_text">El episodio más largo que escuché en %1$d %2$s</string>
     <string name="end_of_year_story_top_podcasts_list_title">Mis podcasts principales de %1$d</string>
     <string name="end_of_year_story_top_podcast_share_text">Mi podcast favorito de %1$d. %2$s</string>
@@ -967,7 +966,6 @@ Language: es
     <string name="end_of_year_story_listened_to_categories">Escuchaste %1$d categorías diferentes este año.</string>
     <string name="end_of_year_story_listened_to_categories_subtitle">Vamos a echar un vistazo a algunos de tus favoritos…</string>
     <string name="end_of_year_story_intro_title">¡Celebremos el año que llevas escuchando pódcast!</string>
-    <string name="end_of_year_story_listened_to_numbers">Has escuchado %1$d programas diferentes y %2$d episodios en total</string>
     <string name="end_of_year_story_listened_to_categories_share_text">Escuché %1$d categorías diferentes en 2023.</string>
     <string name="end_of_year_story_listened_to_share_text">Este año he pasado %1$s escuchando pódcasts</string>
     <string name="settings_media_notification_controls">Controles de notificación de medios</string>

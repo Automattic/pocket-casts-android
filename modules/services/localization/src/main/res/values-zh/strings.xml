@@ -959,7 +959,6 @@ Language: zh_CN
     <string name="end_of_year_story_top_categories_share_text">我收听最多的播客分类</string>
     <string name="end_of_year_story_top_categories">您的热门分类</string>
     <string name="end_of_year_story_top_podcasts_share_text">我的年度热门播客！ %1$s</string>
-    <string name="end_of_year_story_listened_to_numbers_subtitle">但还有一个您经常收听的播客…</string>
     <string name="end_of_year_story_longest_episode_share_text">%1$d 年我收听时间最长的剧集%2$s</string>
     <string name="end_of_year_story_top_podcasts_list_title">我的 %1$d 年热门播客</string>
     <string name="end_of_year_story_top_podcast_share_text">%1$d 年我最喜欢的播客！ %2$s</string>
@@ -967,7 +966,6 @@ Language: zh_CN
     <string name="end_of_year_story_listened_to_categories">您今年收听了 %1$d 种不同的分类</string>
     <string name="end_of_year_story_listened_to_categories_subtitle">我们来看看您最喜欢的内容…</string>
     <string name="end_of_year_story_intro_title">我们来庆祝您的聆听之年！</string>
-    <string name="end_of_year_story_listened_to_numbers">您总共收听了 %1$d 个不同的节目和 %2$d 部剧集</string>
     <string name="end_of_year_story_listened_to_categories_share_text">我在 2023 年收听了 %1$d 种不同的分类</string>
     <string name="end_of_year_story_listened_to_share_text">我今年收听播客的时间为 %1$s</string>
     <string name="settings_media_notification_controls">媒体通知控件</string>
