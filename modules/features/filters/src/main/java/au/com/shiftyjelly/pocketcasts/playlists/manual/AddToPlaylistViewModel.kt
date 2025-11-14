@@ -238,8 +238,3 @@ class AddToPlaylistViewModel @AssistedInject constructor(
         ): AddToPlaylistViewModel
     }
 }
-
-private enum class PlaylistChange {
-    Added,
-    Removed,
-}
