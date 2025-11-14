@@ -167,7 +167,7 @@ class EndOfYearViewModel @AssistedInject constructor(
             add(
                 Story.NumberOfShows(
                     showCount = stats.playedPodcastCount,
-                    epsiodeCount = stats.playedEpisodeCount,
+                    episodeCount = stats.playedEpisodeCount,
                     topShowIds = randomShowIds.topShows,
                     bottomShowIds = randomShowIds.bottomShows,
                 ),

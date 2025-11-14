@@ -187,7 +187,7 @@ class EndOfYearViewModelTest {
             val story = awaitStory<NumberOfShows>()
 
             assertEquals(stats.playedPodcastCount, story.showCount)
-            assertEquals(stats.playedEpisodeCount, story.epsiodeCount)
+            assertEquals(stats.playedEpisodeCount, story.episodeCount)
             // We select 8 random episodes to display in the UI
             assertEquals(4, story.topShowIds.distinct().size)
             assertEquals(4, story.bottomShowIds.distinct().size)

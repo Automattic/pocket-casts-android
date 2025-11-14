@@ -1,6 +1,5 @@
 package au.com.shiftyjelly.pocketcasts.sharing
 
-import android.R.attr.text
 import android.content.ClipData
 import android.content.ClipboardManager
 import android.content.Context
@@ -255,7 +254,7 @@ class SharingClient(
         }
 
         is SharingRequest.Data.EndOfYearStory -> {
-            if (data.story.isShareble) {
+            if (data.story.isShareable) {
                 val text = buildString {
                     append(data.sharingMessage(context, hostUrl))
                     append(" #pocketcasts #playback")
@@ -660,7 +659,7 @@ data class SharingRequest internal constructor(
                         context.getString(
                             LR.string.end_of_year_story_listened_to_numbers_share_text,
                             story.showCount,
-                            story.epsiodeCount,
+                            story.episodeCount,
                             year.value,
                         ),
                     )

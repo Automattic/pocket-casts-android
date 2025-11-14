@@ -257,7 +257,7 @@ class StoriesActivity : ComponentActivity() {
             screenshotDetectedFlow.collectLatest {
                 val stories = (state as? UiState.Synced)?.stories
                 val currentStory = stories?.getOrNull(pagerState.currentPage)
-                if (currentStory?.isShareble == true) {
+                if (currentStory?.isShareable == true) {
                     viewModel.pauseStoryAutoProgress(StoryProgressPauseReason.ScreenshotDialog)
                     showScreenshotDialog = true
                 }
