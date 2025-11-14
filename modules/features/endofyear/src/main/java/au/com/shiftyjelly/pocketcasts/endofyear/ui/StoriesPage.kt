@@ -96,7 +96,6 @@ internal fun StoriesPage(
         } else if (!isTextSizeComputed) {
             // oopsie
         } else if (state is UiState.Syncing) {
-            Log.d("===", "Syncing")
             Stories(
                 stories = state.stories,
                 measurements = measurements,
@@ -112,7 +111,6 @@ internal fun StoriesPage(
                 blockGestures = true,
             )
         } else if (state is UiState.Synced) {
-            Log.d("===", "Synced!")
             Stories(
                 stories = state.stories,
                 measurements = measurements,
@@ -198,10 +196,6 @@ private fun Stories(
         },
     ) { index ->
         when (val story = stories[index]) {
-            is Story.BlankCover -> BlankCoverStory(
-                story = story,
-                measurements = measurements,
-            )
             is Story.PlaceholderWhileLoading -> LoadingStory(
                 story = story,
                 measurements = measurements,

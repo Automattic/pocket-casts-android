@@ -52,7 +52,7 @@ class EndOfYearViewModel @AssistedInject constructor(
 
     private companion object {
         val placeholderStories = buildList {
-            add(Story.BlankCover)
+            add(Story.Cover)
             repeat(10) {
                 add(Story.PlaceholderWhileLoading)
             }
@@ -61,6 +61,7 @@ class EndOfYearViewModel @AssistedInject constructor(
 
     private val syncState = MutableStateFlow<SyncState>(SyncState.Syncing)
     private val statsLoaded = MutableStateFlow(false)
+    private val coverStoryGracePeriodExpired = MutableStateFlow(false)
 
     private val eoyStatsAction = CachedAction<Year, Pair<EndOfYearStats, RandomShowIds?>> {
         val stats = endOfYearManager.getStats(year)
@@ -91,13 +92,22 @@ class EndOfYearViewModel @AssistedInject constructor(
     internal val switchStory get() = _switchStory.asSharedFlow()
 
     internal val uiState: StateFlow<UiState> = combine(
-        syncState,
-        statsLoaded,
-        settings.cachedSubscription.flow,
-        topPodcastsLink,
-        progress,
-        ::createUiModel,
-    ).stateIn(viewModelScope, SharingStarted.Lazily, UiState.Syncing(
+        combine(syncState, statsLoaded, coverStoryGracePeriodExpired) { syncState, statsLoaded, gracePeriod ->
+            Triple(syncState, statsLoaded, gracePeriod)
+        },
+        combine(settings.cachedSubscription.flow, topPodcastsLink, progress) { subscription, link, prog ->
+            Triple(subscription, link, prog)
+        },
+    ) { (syncState, statsLoaded, gracePeriodExpired), (subscription, topPodcasts, progress) ->
+        createUiModel(
+            syncState = syncState,
+            statsLoaded = statsLoaded,
+            coverStoryGracePeriodExpired = gracePeriodExpired,
+            subscription = subscription,
+            topPodcastsLink = topPodcasts,
+            progress = progress
+        )
+    }.stateIn(viewModelScope, SharingStarted.Lazily, UiState.Syncing(
         stories = placeholderStories, storyProgress = 0f,
     ))
 
@@ -105,6 +115,7 @@ class EndOfYearViewModel @AssistedInject constructor(
         viewModelScope.launch {
             syncState.emit(SyncState.Syncing)
             statsLoaded.emit(false)
+            coverStoryGracePeriodExpired.emit(false)
 
             val isSynced = endOfYearSync.sync(year)
             if (!isSynced) {
@@ -125,12 +136,13 @@ class EndOfYearViewModel @AssistedInject constructor(
     private suspend fun createUiModel(
         syncState: SyncState,
         statsLoaded: Boolean,
+        coverStoryGracePeriodExpired: Boolean,
         subscription: Subscription?,
         topPodcastsLink: String?,
         progress: Float,
     ) = when {
         syncState is SyncState.Failure -> UiState.Failure
-        statsLoaded -> {
+        statsLoaded && coverStoryGracePeriodExpired -> {
             val (stats, randomShowIds) = eoyStatsAction.run(year, viewModelScope).await()
             val stories = createStories(stats, randomShowIds, subscription, topPodcastsLink)
             UiState.Synced(
@@ -208,7 +220,25 @@ class EndOfYearViewModel @AssistedInject constructor(
                         progress.value = currentProgress
                         delay(progressDelay)
                     }
-                    _switchStory.emit(Unit)
+
+                    if (story == Story.Cover && !coverStoryGracePeriodExpired.value) {
+                        // if we have data ready, display it
+                        if (statsLoaded.value) {
+                            coverStoryGracePeriodExpired.emit(true)
+                            _switchStory.emit(Unit)
+                        } else {
+                            // wait for 2 more seconds to give data more time to arrive
+                            delay(2000)
+                            coverStoryGracePeriodExpired.emit(true)
+
+                            if (!statsLoaded.value) {
+                                progress.value = 0f
+                            }
+                            _switchStory.emit(Unit)
+                        }
+                    } else {
+                        _switchStory.emit(Unit)
+                    }
                 }
             } else {
                 progress.value = 1f
