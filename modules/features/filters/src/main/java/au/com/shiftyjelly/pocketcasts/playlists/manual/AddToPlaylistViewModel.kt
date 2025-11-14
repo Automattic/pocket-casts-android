@@ -86,10 +86,13 @@ class AddToPlaylistViewModel @AssistedInject constructor(
     private val playlistsChanges = mutableMapOf<String, Boolean>()
 
     private fun cachePlaylistChange(uuid: String, shouldAdd: Boolean) {
+        // If the change is not present add it.
         playlistsChanges.merge(uuid, shouldAdd) { isCurrentlyAdded, _ ->
             if (isCurrentlyAdded == shouldAdd) {
-                shouldAdd
+                // If the change is already stored keep it.
+                isCurrentlyAdded
             } else {
+                // If playlist was added but will be removed or vice-versa remove the change value.
                 null
             }
         }
