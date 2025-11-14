@@ -65,10 +65,6 @@ class OnboardingCreateAccountViewModel @Inject constructor(
     }
 
     fun onSetupAccountDismissed(flow: OnboardingFlow) {
-        if (flow is OnboardingFlow.InitialOnboarding) {
-            // Don't track back presses from initial onboarding flow
-            return
-        }
         analyticsTracker.trackSetupAccountDismissed(
             flow = flow.analyticsValue,
         )
