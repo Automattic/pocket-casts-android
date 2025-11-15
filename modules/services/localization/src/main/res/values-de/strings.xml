@@ -933,7 +933,6 @@ Language: de
     <string name="onboarding_plus_continuing_agrees_to">Indem du fortfährst, stimmst du unserer %1$s und den %2$s zu.</string>
     <string name="plus_trial_duration_free_trial">Gratis-Test für %s</string>
     <string name="onboarding_plus_recurring_after_free_trial">Wiederkehrende Zahlungen beginnen nach deinem %1$s (%2$s)</string>
-    <string name="end_of_year_stories_failed">Deine Geschichten zum Jahresende konnten nicht geladen werden, überprüfe deine Internetverbindung.</string>
     <string name="onboarding_plus_feature_themes_icons_text">Farbe bekennen. Exklusive Icons und Themes nur für Plus-Abonnenten.</string>
     <string name="onboarding_plus_feature_themes_icons_title">Themes und Icons</string>
     <string name="onboarding_plus_feature_cloud_storage_text">Lade deine Dateien in den Cloud-Speicher. Dann kannst du von überall aus darauf zugreifen.</string>

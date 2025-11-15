@@ -742,7 +742,6 @@ Language: el_GR
     <string name="onboarding_plus_become_a_plus_member">Γίνε μέλος Plus και ξεκλείδωσε όλες τις δυνατότητες του Pocket Casts</string>
     <string name="onboarding_plus_continuing_agrees_to">Συνεχίζοντας, συμφωνείς με %1$s και %2$s.</string>
     <string name="onboarding_plus_recurring_after_free_trial">Οι επαναλαμβανόμενες πληρωμές θα ξεκινήσουν μετά το %1$s (%2$s)</string>
-    <string name="end_of_year_stories_failed">Δεν μπορούμε να φορτώσουμε τις ιστορίες σου για το τέλος της χρονιάς, έλεγξε τη σύνδεση στο διαδίκτυο.</string>
     <string name="onboarding_plus_feature_themes_icons_title">Θέματα &amp; Εικονίδια</string>
     <string name="not_now">Όχι τώρα</string>
     <string name="onboarding_recommendations_import">Εισαγωγή</string>

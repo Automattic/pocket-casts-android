@@ -51,6 +51,7 @@ internal fun rememberStoryCaptureController(): StoryCaptureController {
             override var topControlsHeightPx = 0
 
             override fun captureController(story: Story): CaptureController = when (story) {
+                is Story.PlaceholderWhileLoading -> cover
                 is Story.Cover -> cover
                 is Story.NumberOfShows -> numOfShows
                 is Story.TopShow -> topShow

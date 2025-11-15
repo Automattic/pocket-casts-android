@@ -727,7 +727,7 @@ class SharingClientTest {
         }
         val story = Story.NumberOfShows(
             showCount = 100,
-            epsiodeCount = 200,
+            episodeCount = 200,
             topShowIds = emptyList(),
             bottomShowIds = emptyList(),
         )

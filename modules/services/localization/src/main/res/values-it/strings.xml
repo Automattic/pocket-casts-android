@@ -933,7 +933,6 @@ Language: it
     <string name="onboarding_log_in">Accesso</string>
     <string name="plus_trial_duration_free_trial">Periodo di prova %s</string>
     <string name="onboarding_plus_recurring_after_free_trial">I pagamenti ricorrenti inizieranno dopo la %1$s (%2$s)</string>
-    <string name="end_of_year_stories_failed">Impossibile caricare le storie della fine dell\'anno, controlla la connessione Internet.</string>
     <string name="onboarding_plus_feature_themes_icons_text">Mostra i tuoi reali colori. Icone e temi esclusivi solo per chi fa parte del club Plus.</string>
     <string name="onboarding_plus_feature_themes_icons_title">Temi e icone</string>
     <string name="onboarding_plus_feature_cloud_storage_text">Carica i tuoi file sull\'archiviazione su cloud e rendili disponibili per qualsiasi postazione.</string>
