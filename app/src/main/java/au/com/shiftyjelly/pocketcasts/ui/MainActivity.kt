@@ -34,6 +34,7 @@ import androidx.core.view.updatePadding
 import androidx.dynamicanimation.animation.DynamicAnimation.TRANSLATION_Y
 import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.commitNow
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.Observer
@@ -1914,15 +1915,43 @@ class MainActivity :
     private fun canDisplayAppRatingsPrompt(reason: AppReviewReason): Boolean {
         return reason == AppReviewReason.DevelopmentTrigger || (
             FeatureFlag.isEnabled(Feature.IMPROVE_APP_RATINGS) &&
-                navigator.isAtRootOfStack() &&
-                !navigator.isShowingModal() &&
-                childrenWithBackStack.all { it.getBackstackCount() == 0 } &&
-                supportFragmentManager.backStackEntryCount == 0 &&
-                supportFragmentManager.fragments.none { it is DialogFragment } &&
+                !binding.root.wasTouchedInLast(2.seconds) &&
                 frameBottomSheetBehavior.state == BottomSheetBehavior.STATE_COLLAPSED &&
                 !viewModel.shouldShowStoriesModal.value &&
                 !binding.playerBottomSheet.isPlayerOpen &&
-                !binding.root.wasTouchedInLast(2.seconds)
+                isAtRootOfStack() &&
+                isNoDialogShown() &&
+                areChildrenAtRootOfStack() &&
+                isNoChildDialogShown()
             )
+    }
+
+    private fun isAtRootOfStack(): Boolean {
+        return navigator.isAtRootOfStack() && supportFragmentManager.isAtRootOfStack()
+    }
+
+    private fun isNoDialogShown(): Boolean {
+        return !navigator.isShowingModal() && supportFragmentManager.isNoDialogShown()
+    }
+
+    private fun areChildrenAtRootOfStack(): Boolean {
+        return childrenWithBackStack.all { it.getBackstackCount() == 0 } &&
+            supportFragmentManager.fragments
+                .filter { fragment -> fragment.host != null }
+                .all { fragment -> fragment.childFragmentManager.isAtRootOfStack() }
+    }
+
+    private fun isNoChildDialogShown(): Boolean {
+        return supportFragmentManager.fragments
+            .filter { fragment -> fragment.host != null }
+            .all { fragment -> fragment.childFragmentManager.isNoDialogShown() }
+    }
+
+    private fun FragmentManager.isAtRootOfStack(): Boolean {
+        return backStackEntryCount == 0
+    }
+
+    private fun FragmentManager.isNoDialogShown(): Boolean {
+        return fragments.none { it is DialogFragment }
     }
 }
