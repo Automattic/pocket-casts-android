@@ -1,6 +1,8 @@
 8.1
 -----
 *   Updates
+    *   Make sure Firebase remote config is available at startup
+        ([#4652](https://github.com/Automattic/pocket-casts-android/pull/4652))
     *   Add periodic requests for the app rating
         ([#4725](https://github.com/Automattic/pocket-casts-android/pull/4725))
     *   Allow one character episode searches
