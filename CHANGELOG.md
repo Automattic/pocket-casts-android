@@ -3,6 +3,8 @@
 *   Updates
     *   Add periodic requests for the app rating
         ([#4725](https://github.com/Automattic/pocket-casts-android/pull/4725))
+    *   Allow one character episode searches
+        ([#4734](https://github.com/Automattic/pocket-casts-android/pull/4734))
 
 8.0
 -----
