@@ -4,6 +4,7 @@ import app.cash.turbine.test
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.repositories.categories.CategoriesManager
 import au.com.shiftyjelly.pocketcasts.servers.model.DiscoverCategory
+import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingFlow
 import au.com.shiftyjelly.pocketcasts.sharedtest.MainCoroutineRule
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -54,7 +55,7 @@ class OnboardingInterestsViewModelTest {
             val item = awaitItem()
             assert(!item.isShowingAllCategories)
 
-            viewModel.showMore()
+            viewModel.showMore(flow = OnboardingFlow.InitialOnboarding)
 
             val nextItem = awaitItem()
             assert(nextItem.isShowingAllCategories)
@@ -70,7 +71,7 @@ class OnboardingInterestsViewModelTest {
             val item = awaitItem()
             assert(item.selectedCategories.isEmpty())
 
-            viewModel.updateSelectedCategory(demoCategories[0], true)
+            viewModel.updateSelectedCategory(category = demoCategories[0], isSelected = true, flow = OnboardingFlow.InitialOnboarding)
             val nextItem = awaitItem()
             assert(nextItem.selectedCategories.isNotEmpty())
         }
