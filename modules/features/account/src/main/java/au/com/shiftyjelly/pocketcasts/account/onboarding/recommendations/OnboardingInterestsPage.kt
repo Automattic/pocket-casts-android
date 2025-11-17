@@ -12,7 +12,6 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.foundation.layout.wrapContentWidth
@@ -46,6 +45,7 @@ import au.com.shiftyjelly.pocketcasts.compose.components.TextP40
 import au.com.shiftyjelly.pocketcasts.compose.preview.ThemePreviewParameterProvider
 import au.com.shiftyjelly.pocketcasts.compose.theme
 import au.com.shiftyjelly.pocketcasts.servers.model.DiscoverCategory
+import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingFlow
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.utils.Util
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
@@ -53,6 +53,7 @@ import au.com.shiftyjelly.pocketcasts.localization.R as LR
 @Composable
 fun OnboardingInterestsPage(
     theme: Theme.ThemeType,
+    flow: OnboardingFlow,
     onBackPress: () -> Unit,
     onShowRecommendations: () -> Unit,
     onUpdateSystemBars: (SystemBarsStyles) -> Unit,
@@ -70,7 +71,7 @@ fun OnboardingInterestsPage(
     }
 
     CallOnce {
-        viewModel.onShow()
+        viewModel.onShow(flow)
     }
 
     BackHandler {
@@ -80,16 +81,24 @@ fun OnboardingInterestsPage(
     Content(
         modifier = modifier.fillMaxSize(),
         state = state,
-        onCategorySelectionChange = viewModel::updateSelectedCategory,
+        onCategorySelectionChange = { category, isSelected ->
+            viewModel.updateSelectedCategory(
+                category = category,
+                isSelected = isSelected,
+                flow = flow,
+            )
+        },
         onContinuePress = {
-            viewModel.saveInterests()
+            viewModel.saveInterests(flow)
             onShowRecommendations()
         },
         onNotNowPress = {
-            viewModel.skipSelection()
+            viewModel.skipSelection(flow)
             onShowRecommendations()
         },
-        onShowMoreCategories = viewModel::showMore,
+        onShowMoreCategories = {
+            viewModel.showMore(flow)
+        },
     )
 }
 

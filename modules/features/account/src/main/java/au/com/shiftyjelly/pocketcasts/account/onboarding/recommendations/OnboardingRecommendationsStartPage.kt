@@ -71,6 +71,7 @@ import au.com.shiftyjelly.pocketcasts.compose.extensions.header
 import au.com.shiftyjelly.pocketcasts.compose.podcast.PodcastSubscribeImage
 import au.com.shiftyjelly.pocketcasts.compose.preview.ThemePreviewParameterProvider
 import au.com.shiftyjelly.pocketcasts.compose.theme
+import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingFlow
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
@@ -79,6 +80,7 @@ import au.com.shiftyjelly.pocketcasts.localization.R as LR
 @Composable
 fun OnboardingRecommendationsStartPage(
     theme: Theme.ThemeType,
+    flow: OnboardingFlow,
     onImportClick: () -> Unit,
     onSearch: () -> Unit,
     onBackPress: () -> Unit,
@@ -92,7 +94,7 @@ fun OnboardingRecommendationsStartPage(
     val pocketCastsTheme = MaterialTheme.theme
 
     CallOnce {
-        viewModel.onShown()
+        viewModel.onShown(flow)
     }
 
     LaunchedEffect(onUpdateSystemBars) {
@@ -101,7 +103,7 @@ fun OnboardingRecommendationsStartPage(
         onUpdateSystemBars(SystemBarsStyles(statusBar, navigationBar))
     }
     BackHandler {
-        viewModel.onBackPressed()
+        viewModel.onBackPressed(flow)
         onBackPress()
     }
 
@@ -109,16 +111,21 @@ fun OnboardingRecommendationsStartPage(
         state = state,
         buttonRes = state.buttonRes,
         onImportClick = {
-            viewModel.onImportClick()
+            viewModel.onImportClick(flow)
             onImportClick()
         },
-        onSubscribeClick = viewModel::updateSubscribed,
+        onSubscribeClick = { podcast ->
+            viewModel.updateSubscribed(
+                podcast = podcast,
+                flow = flow,
+            )
+        },
         onSearch = {
-            viewModel.onSearch()
+            viewModel.onSearch(flow)
             onSearch()
         },
         onComplete = {
-            viewModel.onComplete()
+            viewModel.onComplete(flow)
             onComplete()
         },
         modifier = modifier,
