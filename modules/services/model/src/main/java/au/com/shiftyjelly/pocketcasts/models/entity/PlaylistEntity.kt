@@ -9,7 +9,6 @@ import au.com.shiftyjelly.pocketcasts.models.type.PlaylistEpisodeSortType
 import au.com.shiftyjelly.pocketcasts.utils.extensions.splitIgnoreEmpty
 import au.com.shiftyjelly.pocketcasts.utils.extensions.unidecode
 import java.io.Serializable
-import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 @Entity(
     tableName = "playlists",
@@ -71,79 +70,9 @@ data class PlaylistEntity(
 
     val icon get() = PlaylistIcon(iconId)
 
-    val isAudioOnly: Boolean
-        get() = audioVideo == AUDIO_VIDEO_FILTER_AUDIO_ONLY
-
-    val isVideoOnly: Boolean
-        get() = audioVideo == AUDIO_VIDEO_FILTER_VIDEO_ONLY
-
     var podcastUuidList: List<String>
         get() = podcastUuids?.splitIgnoreEmpty(",") ?: emptyList()
         set(value) {
             podcastUuids = value.joinToString(separator = ",")
         }
-
-    val episodeOptionStringIds: List<Int>
-        get() {
-            val list = mutableListOf<Int>()
-            if (unplayed && partiallyPlayed && finished) {
-                return emptyList()
-            }
-
-            if (unplayed) {
-                list.add(LR.string.unplayed)
-            }
-            if (partiallyPlayed) {
-                list.add(LR.string.in_progress)
-            }
-            if (finished) {
-                list.add(LR.string.played)
-            }
-            return list.toList()
-        }
-
-    val downloadOptionStrings: List<Int>
-        get() {
-            val list = mutableListOf<Int>()
-            if (downloaded && notDownloaded) {
-                return emptyList()
-            }
-
-            if (downloaded) {
-                list.add(LR.string.downloaded)
-            }
-            if (notDownloaded) {
-                list.add(LR.string.not_downloaded)
-            }
-            return list.toList()
-        }
-
-    val audioOptionStrings: List<Int>
-        get() {
-            val list = mutableListOf<Int>()
-            if (audioVideo == AUDIO_VIDEO_FILTER_ALL) {
-                return emptyList()
-            }
-            if (isAudioOnly) {
-                list.add(LR.string.audio)
-            }
-            if (isVideoOnly) {
-                list.add(LR.string.video)
-            }
-            return list.toList()
-        }
-
-    val stringForFilterHours: Int
-        get() = when (filterHours) {
-            ANYTIME -> LR.string.filters_release_date
-            LAST_24_HOURS -> LR.string.filters_time_24_hours
-            LAST_3_DAYS -> LR.string.filters_time_3_days
-            LAST_WEEK -> LR.string.filters_time_week
-            LAST_2_WEEKS -> LR.string.filters_time_2_weeks
-            LAST_MONTH -> LR.string.filters_time_month
-            else -> LR.string.filters_release_date
-        }
-
-    val isAllEpisodes: Boolean
-        get() = unplayed && partiallyPlayed && finished && notDownloaded && downloaded && audioVideo == AUDIO_VIDEO_FILTER_ALL && allPodcasts && !filterDuration && filterHours == 0 && !starred
 }
