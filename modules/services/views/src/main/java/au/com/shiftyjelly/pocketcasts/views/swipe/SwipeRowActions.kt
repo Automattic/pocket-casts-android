@@ -6,8 +6,6 @@ import au.com.shiftyjelly.pocketcasts.models.entity.UserEpisode
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.playback.UpNextQueue
 import au.com.shiftyjelly.pocketcasts.repositories.playlist.Playlist
-import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
-import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import javax.inject.Inject
 
 data class SwipeRowActions(
@@ -40,19 +38,10 @@ data class SwipeRowActions(
         val Empty = SwipeRowActions()
     }
 
-    class Factory internal constructor(
+    class Factory @Inject constructor(
         private val settings: Settings,
         private val queue: UpNextQueue,
-        private val makeFlagImmutable: Boolean,
     ) {
-        @Inject
-        constructor(
-            settings: Settings,
-            queue: UpNextQueue,
-        ) : this(settings, queue, makeFlagImmutable = true)
-
-        private val arePlaylistsAvailable get() = FeatureFlag.isEnabled(Feature.PLAYLISTS_REBRANDING, immutable = makeFlagImmutable)
-
         fun unavailablePlaylistEpisode() = buildSwipeRowActions {
             rtl1 = SwipeAction.RemoveFromPlaylist
         }
@@ -81,9 +70,7 @@ data class SwipeRowActions(
                 Playlist.Type.Smart -> {
                     rtl1 = episode.archiveSwipeAction()
                     rtl2 = SwipeAction.Share
-                    if (arePlaylistsAvailable) {
-                        rtl3 = SwipeAction.AddToPlaylist
-                    }
+                    rtl3 = SwipeAction.AddToPlaylist
                 }
             }
         }
@@ -103,9 +90,7 @@ data class SwipeRowActions(
 
             rtl1 = episode.archiveSwipeAction()
             rtl2 = SwipeAction.Share
-            if (arePlaylistsAvailable) {
-                rtl3 = SwipeAction.AddToPlaylist
-            }
+            rtl3 = SwipeAction.AddToPlaylist
         }
 
         fun userEpisode(
@@ -130,7 +115,7 @@ data class SwipeRowActions(
             ltr1 = SwipeAction.AddToUpNextTop
             ltr2 = SwipeAction.AddToUpNextBottom
             rtl1 = SwipeAction.RemoveFromUpNext
-            if (arePlaylistsAvailable && episode is PodcastEpisode) {
+            if (episode is PodcastEpisode) {
                 rtl2 = SwipeAction.AddToPlaylist
             }
         }

@@ -8,8 +8,6 @@ import au.com.shiftyjelly.pocketcasts.models.type.PlaylistEpisodeSortType
 import au.com.shiftyjelly.pocketcasts.repositories.sync.SyncManager
 import au.com.shiftyjelly.pocketcasts.servers.extensions.toInstant
 import au.com.shiftyjelly.pocketcasts.servers.extensions.toTimestamp
-import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
-import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import com.google.protobuf.boolValue
 import com.google.protobuf.int32Value
 import com.google.protobuf.int64Value
@@ -53,7 +51,6 @@ internal class PlaylistSync(
     private val appDatabase: AppDatabase,
 ) {
     private val playlistDao = appDatabase.playlistDao()
-    private val useManualPlaylists get() = FeatureFlag.isEnabled(Feature.PLAYLISTS_REBRANDING, immutable = true)
 
     suspend fun fullSync() {
         processServerPlaylists(
@@ -99,13 +96,6 @@ internal class PlaylistSync(
                 applyServerPlaylist(playlist, serverPlaylist)
             }
             val newPlaylists = remainingPlaylist
-                .filter { playlist ->
-                    if (useManualPlaylists) {
-                        true
-                    } else {
-                        !isManual(playlist)
-                    }
-                }
                 .mapNotNull { serverPlaylist ->
                     if (getUuid(serverPlaylist) !in existingPlaylistUuids) {
                         applyServerPlaylist(PlaylistEntity(), serverPlaylist)
@@ -115,25 +105,15 @@ internal class PlaylistSync(
                 }
             playlistDao.upsertAllPlaylists(existingPlaylists + newPlaylists)
 
-            if (useManualPlaylists) {
-                remainingPlaylist.forEach { playlist ->
-                    playlistDao.deleteAllManualEpisodes(getUuid(playlist))
-                    playlistDao.upsertManualEpisodes(getManualEpisodes(playlist))
-                }
+            remainingPlaylist.forEach { playlist ->
+                playlistDao.deleteAllManualEpisodes(getUuid(playlist))
+                playlistDao.upsertManualEpisodes(getManualEpisodes(playlist))
             }
         }
     }
 
     suspend fun incrementalData(): List<Record> {
-        val playlists = playlistDao
-            .getAllUnsyncedPlaylists()
-            .filter { playlist ->
-                if (useManualPlaylists) {
-                    true
-                } else {
-                    !playlist.manual
-                }
-            }
+        val playlists = playlistDao.getAllUnsyncedPlaylists()
         return withContext(Dispatchers.Default) {
             playlists.map { localPlaylist ->
                 record {

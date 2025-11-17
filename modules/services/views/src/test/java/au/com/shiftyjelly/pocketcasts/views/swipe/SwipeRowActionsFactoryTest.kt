@@ -7,11 +7,8 @@ import au.com.shiftyjelly.pocketcasts.preferences.UserSetting
 import au.com.shiftyjelly.pocketcasts.repositories.playback.UpNextQueue
 import au.com.shiftyjelly.pocketcasts.repositories.playlist.Playlist
 import au.com.shiftyjelly.pocketcasts.sharedtest.InMemoryFeatureFlagRule
-import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
-import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import java.util.Date
 import org.junit.Assert.assertEquals
-import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -31,8 +28,6 @@ class SwipeRowActionsFactoryTest {
 
     @Before
     fun setup() {
-        FeatureFlag.setEnabled(Feature.PLAYLISTS_REBRANDING, true)
-
         val upNextSetting = mock<UserSetting<Settings.UpNextAction>> {
             on { value } doAnswer { upNextAction }
         }
@@ -42,7 +37,7 @@ class SwipeRowActionsFactoryTest {
         val queue = mock<UpNextQueue> {
             on { contains(any()) } doAnswer { isEpisodeInUpNext }
         }
-        factory = SwipeRowActions.Factory(settings, queue, makeFlagImmutable = false)
+        factory = SwipeRowActions.Factory(settings, queue)
     }
 
     @Test
@@ -385,20 +380,5 @@ class SwipeRowActionsFactoryTest {
             ),
             factory.upNextEpisode(userEpisode),
         )
-    }
-
-    @Test
-    fun `actions for disabled playlists`() {
-        FeatureFlag.setEnabled(Feature.PLAYLISTS_REBRANDING, false)
-
-        val podcastEpisode = PodcastEpisode(uuid = "", publishedDate = Date())
-        val userEpisode = UserEpisode(uuid = "", publishedDate = Date())
-
-        assertTrue(SwipeAction.AddToPlaylist !in factory.podcastEpisode(podcastEpisode))
-        assertTrue(SwipeAction.AddToPlaylist !in factory.availablePlaylistEpisode(Playlist.Type.Smart, podcastEpisode))
-        assertTrue(SwipeAction.AddToPlaylist !in factory.availablePlaylistEpisode(Playlist.Type.Manual, podcastEpisode))
-        assertTrue(SwipeAction.AddToPlaylist !in factory.upNextEpisode(podcastEpisode))
-        assertTrue(SwipeAction.AddToPlaylist !in factory.upNextEpisode(userEpisode))
-        assertTrue(SwipeAction.AddToPlaylist !in factory.userEpisode(userEpisode))
     }
 }

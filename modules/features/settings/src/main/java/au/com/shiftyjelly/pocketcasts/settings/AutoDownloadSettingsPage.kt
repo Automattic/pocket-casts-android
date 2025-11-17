@@ -25,8 +25,6 @@ import au.com.shiftyjelly.pocketcasts.compose.navigation.slideInToStart
 import au.com.shiftyjelly.pocketcasts.compose.navigation.slideOutToEnd
 import au.com.shiftyjelly.pocketcasts.compose.navigation.slideOutToStart
 import au.com.shiftyjelly.pocketcasts.settings.viewmodel.AutoDownloadSettingsViewModel.UiState
-import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
-import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import kotlinx.coroutines.flow.StateFlow
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
@@ -58,11 +56,7 @@ internal fun AutoDownloadSettingsPage(
     val toolbarTitle = when (route) {
         AutoDownloadSettingsRoute.Home -> stringResource(LR.string.auto_download)
         AutoDownloadSettingsRoute.Podcasts -> stringResource(LR.string.settings_auto_download_podcasts)
-        AutoDownloadSettingsRoute.Playlists -> if (FeatureFlag.isEnabled(Feature.PLAYLISTS_REBRANDING, immutable = true)) {
-            stringResource(LR.string.settings_auto_download_playlists)
-        } else {
-            stringResource(LR.string.settings_auto_download_filters)
-        }
+        AutoDownloadSettingsRoute.Playlists -> stringResource(LR.string.settings_auto_download_playlists)
     }
 
     Column(

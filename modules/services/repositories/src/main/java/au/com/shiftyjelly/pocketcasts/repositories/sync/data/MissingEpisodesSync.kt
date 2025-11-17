@@ -7,8 +7,6 @@ import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodePlayingStatus
 import au.com.shiftyjelly.pocketcasts.repositories.sync.SyncManager
 import au.com.shiftyjelly.pocketcasts.servers.extensions.toDate
-import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
-import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import com.pocketcasts.service.api.EpisodeResponse
 import com.pocketcasts.service.api.podcastsEpisodesRequest
 import com.pocketcasts.service.api.publishedOrNull
@@ -21,12 +19,8 @@ internal class MissingEpisodesSync(
     private val playlistDao = appDatabase.playlistDao()
     private val episodeDao = appDatabase.episodeDao()
     private val podcastDao = appDatabase.podcastDao()
-    private val useManualPlaylists get() = FeatureFlag.isEnabled(Feature.PLAYLISTS_REBRANDING, immutable = true)
 
     suspend fun sync() {
-        if (!useManualPlaylists) {
-            return
-        }
         val missingEpisodes = playlistDao.getAllMissingManualEpisodes()
         if (missingEpisodes.isEmpty()) {
             return
