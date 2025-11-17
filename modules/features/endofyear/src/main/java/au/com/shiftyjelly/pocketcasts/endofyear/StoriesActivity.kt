@@ -5,6 +5,7 @@ import android.content.Context
 import android.content.Intent
 import android.graphics.Color
 import android.os.Bundle
+import android.os.Parcelable
 import android.view.WindowManager
 import androidx.activity.ComponentActivity
 import androidx.activity.SystemBarStyle
@@ -60,6 +61,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
+import kotlinx.parcelize.Parcelize
 import timber.log.Timber
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
@@ -85,20 +87,24 @@ class StoriesActivity : ComponentActivity() {
         },
     )
 
-    @Inject lateinit var settings: Settings
+    @Inject
+    lateinit var settings: Settings
 
     private val onboardingLauncher: ActivityResultLauncher<Intent> = registerForActivityResult(OnboardingActivityContract()) { result ->
         when (result) {
             is OnboardingFinish.Done, is OnboardingFinish.DoneGoToDiscover -> {
                 settings.setHasDoneInitialOnboarding()
             }
+
             is OnboardingFinish.DoneShowPlusPromotion -> {
                 settings.setHasDoneInitialOnboarding()
                 OnboardingLauncher.openOnboardingFlow(this, OnboardingFlow.Upsell(OnboardingUpgradeSource.LOGIN_PLUS_PROMOTION))
             }
+
             is OnboardingFinish.DoneShowWelcomeInReferralFlow -> {
                 settings.showReferralWelcome.set(true, updateModifiedAt = false)
             }
+
             is OnboardingFinish.DoneApplySuggestedFolders, null -> {
                 Timber.e("Unexpected result $result from onboarding activity")
             }
@@ -331,7 +337,16 @@ class StoriesActivity : ComponentActivity() {
         }
     }
 
-    class StoriesActivityContract : ActivityResultContract<Intent, StoriesSource?>() {
+    class StoriesActivityContract : ActivityResultContract<Intent, StoriesActivityContract.Result>() {
+
+        sealed class Result : Parcelable {
+            @Parcelize
+            data class Failure(val source: StoriesSource?) : Result()
+
+            @Parcelize
+            data object Success : Result()
+        }
+
         companion object {
             private const val EXTRA_SOURCE = "stories_source"
 
@@ -339,13 +354,15 @@ class StoriesActivity : ComponentActivity() {
                 putExtra(EXTRA_SOURCE, source)
             }
         }
+
         override fun createIntent(context: Context, input: Intent) = input
 
-        override fun parseResult(resultCode: Int, intent: Intent?): StoriesSource? {
+        override fun parseResult(resultCode: Int, intent: Intent?): Result {
             return if (intent == null || resultCode == RESULT_OK) {
-                null
+                Result.Success
             } else {
-                IntentCompat.getParcelableExtra(intent, EXTRA_SOURCE, StoriesSource::class.java)
+                Result.Failure(
+                    source = IntentCompat.getParcelableExtra(intent, EXTRA_SOURCE, StoriesSource::class.java))
             }
         }
     }

@@ -380,15 +380,20 @@ class MainActivity :
     }
 
     private val endOfYearActivityLauncher: ActivityResultLauncher<Intent> = registerForActivityResult(StoriesActivity.StoriesActivityContract()) { result ->
-        result?.let { source ->
-            val view = snackBarView()
-            val action = View.OnClickListener {
-                showStories(source = source)
+        when (result) {
+            is StoriesActivity.StoriesActivityContract.Result.Failure -> {
+                result.source?.let { source ->
+                    val view = snackBarView()
+                    val action = View.OnClickListener {
+                        showStories(source = source)
+                    }
+                    Snackbar.make(view, getString(LR.string.end_of_year_failed_to_load_message), Snackbar.LENGTH_LONG)
+                        .setAction(LR.string.retry, action)
+                        .setTextColor(ThemeColor.primaryText01(Theme.ThemeType.DARK))
+                        .show()
+                }
             }
-            Snackbar.make(view, getString(LR.string.end_of_year_failed_to_load_message), Snackbar.LENGTH_LONG)
-                .setAction(LR.string.retry, action)
-                .setTextColor(ThemeColor.primaryText01(Theme.ThemeType.DARK))
-                .show()
+            else -> Unit
         }
     }
 
