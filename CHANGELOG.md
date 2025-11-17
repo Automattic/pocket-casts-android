@@ -3,6 +3,8 @@
 *   Updates
     *   Add periodic requests for the app rating
         ([#4725](https://github.com/Automattic/pocket-casts-android/pull/4725))
+    *   Improve tooltips' contrast issues when dark theme is used
+        ([#4737](https://github.com/Automattic/pocket-casts-android/pull/4737))
     *   Allow one character episode searches
         ([#4734](https://github.com/Automattic/pocket-casts-android/pull/4734))
 
