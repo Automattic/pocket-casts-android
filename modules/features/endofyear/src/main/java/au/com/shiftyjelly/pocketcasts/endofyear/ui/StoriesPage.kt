@@ -1,7 +1,6 @@
 package au.com.shiftyjelly.pocketcasts.endofyear.ui
 
 import android.content.Context
-import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.awaitEachGesture
@@ -40,7 +39,6 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.unit.DpSize
-import androidx.compose.ui.unit.coerceAtLeast
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import au.com.shiftyjelly.pocketcasts.compose.components.PagerProgressingIndicator
@@ -75,9 +73,7 @@ internal fun StoriesPage(
         modifier = Modifier.then(size),
     ) {
         val density = LocalDensity.current
-        val widthPx = density.run { maxWidth.toPx() }
 
-        var isTextSizeComputed by remember { mutableStateOf(false) }
         var coverFontSize by remember { mutableStateOf(24.sp) }
         var coverTextHeight by remember { mutableStateOf(0.dp) }
         val measurements = remember(maxWidth, maxHeight, insets, coverFontSize, coverTextHeight) {
@@ -93,8 +89,6 @@ internal fun StoriesPage(
 
         if (state is UiState.Failure) {
             onFailedToLoad()
-        } else if (!isTextSizeComputed) {
-            // oopsie
         } else if (state is UiState.Syncing) {
             Stories(
                 stories = state.stories,
@@ -134,30 +128,6 @@ internal fun StoriesPage(
             onClose = onClose,
             controller = controller,
         )
-
-        // Use an invisible 'PLAYBACK' text to compute an appropriate font size.
-        // The font should occupy the whole viewport's width with some padding.
-        if (!isTextSizeComputed) {
-            PlaybackText(
-                color = Color.Transparent,
-                fontSize = coverFontSize,
-                onTextLayout = { result ->
-                    when {
-                        isTextSizeComputed -> Unit
-                        else -> {
-                            val textSize = result.size.width
-                            val ratio = 0.88 * widthPx / textSize
-                            if (ratio !in 0.95..1.01) {
-                                coverFontSize *= ratio
-                            } else {
-                                coverTextHeight = density.run { (result.firstBaseline).toDp() * 1.1f }.coerceAtLeast(0.dp)
-                                isTextSizeComputed = true
-                            }
-                        }
-                    }
-                },
-            )
-        }
     }
 }
 
