@@ -81,7 +81,10 @@ class EpisodeRowDataProvider @Inject constructor(
             .startWith(emptyState)
             .map { if (it.episodeUuid == episodeUuid) it else emptyState }
             .distinctUntilChanged { prev, curr ->
-                prev.state == curr.state && prev.episodeUuid == curr.episodeUuid
+                prev.state == curr.state &&
+                    prev.episodeUuid == curr.episodeUuid &&
+                    prev.positionMs == curr.positionMs &&
+                    prev.isBuffering == curr.isBuffering
             }
     }
 
