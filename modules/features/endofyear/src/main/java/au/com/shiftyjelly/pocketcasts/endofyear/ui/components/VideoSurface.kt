@@ -8,10 +8,8 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -41,8 +39,8 @@ internal fun VideoSurface(
     videoRatio: Float? = null,
 ) {
     val context = LocalContext.current
-    var player by remember { mutableStateOf<Player?>(null) }
-    val presentationState = rememberPresentationState(player)
+    val player = remember { mutableStateOf<Player?>(null) }
+    val presentationState = rememberPresentationState(player.value)
 
     LifecycleStartEffect(Unit) {
         val uri = Uri.Builder()
@@ -50,15 +48,15 @@ internal fun VideoSurface(
             .authority(context.packageName)
             .path(videoResourceId.toString())
             .build()
-        player = ExoPlayer.Builder(context).build().apply {
+        player.value = ExoPlayer.Builder(context).build().apply {
             setMediaItem(MediaItem.fromUri(uri))
             repeatMode = repeat
             prepare()
             playWhenReady = play
         }
         onStopOrDispose {
-            player?.apply { release() }
-            player = null
+            player.value?.apply { release() }
+            player.value = null
         }
     }
 
@@ -66,7 +64,7 @@ internal fun VideoSurface(
         contentAlignment = Alignment.Center,
         modifier = modifier,
     ) {
-        player?.let {
+        player.value?.let {
             PlayerSurface(
                 player = it,
                 // use TextureView instead of SurfaceView to avoid rendering issues on Android 24
