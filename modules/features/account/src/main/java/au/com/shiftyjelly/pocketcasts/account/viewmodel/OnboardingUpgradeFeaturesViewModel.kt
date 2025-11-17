@@ -187,8 +187,8 @@ class OnboardingUpgradeFeaturesViewModel @AssistedInject constructor(
             AnalyticsEvent.PLUS_PROMOTION_DETAILS_TAPPED,
             properties = mapOf(
                 "version" to 1,
-                "variant" to variant.analyticsValue
-            )
+                "variant" to variant.analyticsValue,
+            ),
         )
     }
 

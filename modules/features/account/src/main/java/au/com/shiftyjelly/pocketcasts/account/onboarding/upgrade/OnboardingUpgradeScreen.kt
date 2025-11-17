@@ -150,8 +150,8 @@ private fun CompactHeightUpscaledFontUpgradeScreen(
     onChangeSelectedPlan: (SubscriptionPlan) -> Unit,
     onClickPrivacyPolicy: () -> Unit,
     onClickTermsAndConditions: () -> Unit,
-    modifier: Modifier = Modifier,
     onClickSeeAllFeatures: (OnboardingUpgradeFeaturesState.NewOnboardingVariant) -> Unit,
+    modifier: Modifier = Modifier,
 ) {
     val coroutineScope = rememberCoroutineScope()
     val contentPages = state.onboardingVariant.toContentPages(
@@ -241,8 +241,8 @@ private fun RegularUpgradeScreen(
     onChangeSelectedPlan: (SubscriptionPlan) -> Unit,
     onClickPrivacyPolicy: () -> Unit,
     onClickTermsAndConditions: () -> Unit,
-    modifier: Modifier = Modifier,
     onClickSeeAllFeatures: (OnboardingUpgradeFeaturesState.NewOnboardingVariant) -> Unit,
+    modifier: Modifier = Modifier,
 ) {
     val (contentFocusRequester, footerFocusRequester) = remember { FocusRequester.createRefs() }
 
@@ -447,7 +447,7 @@ private fun OnboardingUpgradeFeaturesState.NewOnboardingVariant.toContentPages(
         OnboardingUpgradeSource.FOLDERS_PODCAST_SCREEN,
         OnboardingUpgradeSource.SUGGESTED_FOLDERS,
         OnboardingUpgradeSource.FOLDERS,
-            -> {
+        -> {
             add(UpgradePagerContent.Folders)
             add(
                 UpgradePagerContent.Features(
@@ -459,7 +459,7 @@ private fun OnboardingUpgradeFeaturesState.NewOnboardingVariant.toContentPages(
 
         OnboardingUpgradeSource.BOOKMARKS,
         OnboardingUpgradeSource.BOOKMARKS_SHELF_ACTION,
-            -> {
+        -> {
             add(UpgradePagerContent.Bookmarks)
             add(
                 UpgradePagerContent.Features(
