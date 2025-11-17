@@ -1,5 +1,6 @@
 package au.com.shiftyjelly.pocketcasts.endofyear
 
+import android.app.Activity
 import androidx.compose.runtime.Immutable
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -368,6 +369,18 @@ class EndOfYearViewModel @AssistedInject constructor(
         } else {
             null
         }
+    }
+
+    fun screenshotDetected(story: Story, activity: Activity) {
+        analyticsTracker.track(
+            event = AnalyticsEvent.END_OF_YEAR_STORY_SHARED,
+            properties = mapOf(
+                "activity" to activity.javaClass.name,
+                "from" to "screenshot",
+                "story" to story.analyticsValue,
+                "year" to year.value,
+            ),
+        )
     }
 
     private data class RandomShowIds(

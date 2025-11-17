@@ -266,6 +266,7 @@ class SharingClient(
                     values = mapOf(
                         "story" to data.story.analyticsValue,
                         "year" to data.year.value,
+                        "from" to "button",
                     ),
                 )
                 Intent()
