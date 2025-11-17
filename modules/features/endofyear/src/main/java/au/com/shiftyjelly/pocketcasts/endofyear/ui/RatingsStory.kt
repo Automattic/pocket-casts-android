@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -23,7 +24,6 @@ import androidx.compose.ui.draw.drawWithContent
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
-import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalInspectionMode
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.stringResource
@@ -80,7 +80,6 @@ internal fun RatingsStory(
     } else {
         AbsentRatings(
             modifier = modifier,
-            story = story,
             measurements = measurements,
             onLearnAboutRatings = onLearnAboutRatings,
         )
@@ -138,7 +137,7 @@ private fun PresentRatings(
                         brush = Brush.verticalGradient(
                             0f to Color.Transparent,
                             0.85f to Color.Transparent,
-                            1f to story.backgroundColor
+                            1f to story.backgroundColor,
                         ),
                     )
                 },
@@ -164,12 +163,10 @@ private fun RatingBars(
     stats: RatingStats,
     forceBarsVisible: Boolean,
     modifier: Modifier = Modifier,
-    arrangement: Arrangement.Horizontal? = null,
 ) {
     Row(
         verticalAlignment = Alignment.Bottom,
         modifier = modifier,
-        horizontalArrangement = arrangement ?: Arrangement.Start,
     ) {
         val shouldNormalize = stats.count() > 0
         Rating.entries.forEach { rating ->
@@ -178,7 +175,6 @@ private fun RatingBars(
                 rating = rating.numericalValue,
                 heightRange = barRange,
                 forceBarVisible = forceBarsVisible,
-                contentScale = arrangement?.let { ContentScale.FillBounds },
             )
         }
     }
@@ -189,7 +185,6 @@ private fun RowScope.AnimatedRatingBar(
     rating: Int,
     heightRange: Int,
     forceBarVisible: Boolean,
-    contentScale: ContentScale?,
 ) = Box(modifier = Modifier.weight(1f)) {
     val pillarComposition by rememberLottieComposition(
         spec = LottieCompositionSpec.RawRes(R.raw.pillar_bars_i3),
@@ -227,7 +222,6 @@ private fun RowScope.AnimatedRatingBar(
             }
         }
     }
-
 
     numberComposition?.let { comp ->
         val markerIndex = comp.markers.size - heightRange
@@ -271,7 +265,6 @@ private fun RowScope.AnimatedRatingBar(
         modifier = Modifier.fillMaxSize(),
         composition = pillarComposition,
         progress = { pillarAnimatable.progress },
-        contentScale = contentScale ?: ContentScale.Fit,
     )
 
     LottieAnimation(
@@ -279,7 +272,6 @@ private fun RowScope.AnimatedRatingBar(
         composition = numberComposition,
         progress = { numberAnimatable.progress },
         dynamicProperties = dynamicProperties,
-        contentScale = contentScale ?: ContentScale.Fit,
         fontMap = remember {
             mapOf(
                 "Inter-Regular" to Typeface.create("sans-serif", Typeface.NORMAL),
@@ -290,7 +282,6 @@ private fun RowScope.AnimatedRatingBar(
 
 @Composable
 private fun AbsentRatings(
-    story: Story.Ratings,
     measurements: EndOfYearMeasurements,
     onLearnAboutRatings: () -> Unit,
     modifier: Modifier = Modifier,
@@ -324,14 +315,36 @@ private fun AbsentRatings(
                 .padding(horizontal = 24.dp),
             textAlign = TextAlign.Center,
         )
-        RatingBars(
+        Row(
             modifier = Modifier
                 .fillMaxWidth()
                 .weight(1f),
-            stats = story.stats,
-            forceBarsVisible = false,
-            arrangement = Arrangement.spacedBy(1.dp),
-        )
+            horizontalArrangement = Arrangement.spacedBy(1.dp),
+            verticalAlignment = Alignment.Bottom,
+        ) {
+            repeat(5) { index ->
+                Column(
+                    modifier = Modifier
+                        .weight(1f)
+                        .fillMaxHeight(),
+                ) {
+                    Spacer(modifier = Modifier.weight(1f))
+                    TextP40(
+                        modifier = Modifier.fillMaxWidth()
+                            .padding(bottom = 8.dp),
+                        text = (index + 1).toString(),
+                        textAlign = TextAlign.Center,
+                        color = colorResource(UR.color.white),
+                    )
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(16.dp)
+                            .background(color = Color(0xFFFF4562)),
+                    )
+                }
+            }
+        }
         Spacer(
             modifier = Modifier.height(16.dp),
         )
