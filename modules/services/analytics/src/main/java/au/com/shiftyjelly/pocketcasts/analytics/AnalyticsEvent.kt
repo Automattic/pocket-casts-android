@@ -53,6 +53,7 @@ enum class AnalyticsEvent(val key: String) {
     PLUS_PROMOTION_SUBSCRIPTION_FREQUENCY_CHANGED("plus_promotion_subscription_frequency_changed"),
     PLUS_PROMOTION_PRIVACY_POLICY_TAPPED("plus_promotion_privacy_policy_tapped"),
     PLUS_PROMOTION_TERMS_AND_CONDITIONS_TAPPED("plus_promotion_terms_and_conditions_tapped"),
+    PLUS_PROMOTION_DETAILS_TAPPED("plus_promotion_details_tapped"),
     UPGRADE_BANNER_DISMISSED("upgrade_banner_dismissed"),
 
     /* Pull to refresh */
