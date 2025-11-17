@@ -1,14 +1,15 @@
 package au.com.shiftyjelly.pocketcasts.endofyear.ui
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.gestures.snapping.rememberSnapFlingBehavior
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.pager.PageSize
+import androidx.compose.foundation.pager.VerticalPager
+import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -120,85 +121,69 @@ private fun PodcastCoverCarousel(
     coverSize: Dp,
     modifier: Modifier = Modifier,
 ) {
-    val listState = rememberLazyListState(initialFirstVisibleItemIndex = Int.MAX_VALUE / 2)
-    val flingBehavior = rememberSnapFlingBehavior(lazyListState = listState)
+    val pagerState = rememberPagerState(
+        initialPage = Int.MAX_VALUE / 2,
+        pageCount = { Int.MAX_VALUE },
+    )
 
-    // Auto-scroll with fling effect
+    // Auto-scroll effect
     LaunchedEffect(Unit) {
-        snapshotFlow { listState.isScrollInProgress }
+        snapshotFlow { pagerState.isScrollInProgress }
             .distinctUntilChanged()
             .collect { isScrolling ->
                 if (!isScrolling) {
-                    delay(2000) // Wait 2 seconds before next scroll
-                    val targetIndex = listState.firstVisibleItemIndex + 1
-                    listState.animateScrollToItem(targetIndex)
+                    delay(800) // Wait 0.8 seconds before next scroll
+                    val targetPage = pagerState.currentPage + 1
+                    pagerState.animateScrollToPage(targetPage)
                 }
             }
     }
 
-    Box(
+    BoxWithConstraints(
         modifier = modifier.height(coverSize * 1.5f),
         contentAlignment = Alignment.Center,
     ) {
-        LazyColumn(
-            state = listState,
-            horizontalAlignment = Alignment.CenterHorizontally,
-            flingBehavior = flingBehavior,
+        VerticalPager(
+            state = pagerState,
+            beyondViewportPageCount = 3,
             modifier = Modifier.fillMaxSize(),
-        ) {
-            items(
-                count = Int.MAX_VALUE,
-                key = { it },
-            ) { index ->
-                val podcastId = podcastIds[index % podcastIds.size]
+            userScrollEnabled = false,
+            pageSize = PageSize.Fixed(coverSize * 0.35f) // Tight spacing for stacked effect
+        ) { page ->
+            val podcastId = podcastIds[page % podcastIds.size]
 
-                // Calculate offset from center item
-                val layoutInfo = listState.layoutInfo
-                val visibleItems = layoutInfo.visibleItemsInfo
-                val centerOffset = layoutInfo.viewportSize.height / 2
+            // Calculate relative position from current page (negative = above, positive = below)
+            val relativePosition = (page - pagerState.currentPage) - pagerState.currentPageOffsetFraction
+            val pageOffset = relativePosition.absoluteValue
 
-                val itemInfo = visibleItems.find { it.index == index }
-                val offsetFromCenter = itemInfo?.let {
-                    val itemCenter = it.offset + it.size / 2
-                    (itemCenter - centerOffset).toFloat()
-                } ?: 0f
+            // Aggressive scale for compact carousel effect
+            // Center: 1.0f, Adjacent: 0.75f, Distance 2: 0.65f, Distance 3+: 0.6f
+            val scale = when {
+                pageOffset < 1f -> 1f - (pageOffset * 0.25f) // Interpolate from 1.0 to 0.75
+                pageOffset < 2f -> 0.75f - ((pageOffset - 1f) * 0.1f) // Interpolate from 0.75 to 0.65
+                pageOffset < 3f -> 0.65f - ((pageOffset - 2f) * 0.05f) // Interpolate from 0.65 to 0.6
+                else -> 0.6f
+            }
 
-                // Normalize distance (0 = center, 1 = edge)
-                val normalizedDistance = (offsetFromCenter.absoluteValue / centerOffset).coerceIn(0f, 1f)
+            // Subtle horizontal offset for depth
+            val translationX = pageOffset * 5f
 
-                // Scale: 1.0 at center, 0.85 at edges
-                val scale = 1f - (normalizedDistance * 0.15f)
-
-                // Translation: push items toward center for tight stacking
-                val translationY = if (offsetFromCenter < 0) {
-                    // Items above center - push down
-                    normalizedDistance * 220f
-                } else {
-                    // Items below center - push up
-                    -normalizedDistance * 220f
-                }
-
-                // Horizontal offset for depth
-                val translationX = normalizedDistance * 12f
-
-                Box(
-                    modifier = Modifier.height(coverSize),
-                    contentAlignment = Alignment.Center,
-                ) {
-                    PodcastImage(
-                        uuid = podcastId,
-                        cornerSize = 4.dp,
-                        modifier = Modifier
-                            .size(coverSize)
-                            .graphicsLayer {
-                                scaleX = scale
-                                scaleY = scale
-                                this.translationY = translationY
-                                this.translationX = translationX
-                                shadowElevation = (1f - normalizedDistance) * 12f
-                            },
-                    )
-                }
+            Box(
+                modifier = Modifier.fillMaxSize(),
+                contentAlignment = Alignment.Center,
+            ) {
+                PodcastImage(
+                    uuid = podcastId,
+                    cornerSize = 4.dp,
+                    modifier = Modifier
+                        .size(coverSize)
+                        .graphicsLayer {
+                            scaleX = scale
+                            scaleY = scale
+                            this.translationX = translationX
+                            shadowElevation = (1f - pageOffset.coerceAtMost(1f)) * 16f
+                        },
+                )
             }
         }
     }
