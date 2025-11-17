@@ -235,6 +235,10 @@ private fun Stories(
                 story = story,
                 measurements = measurements,
                 onClickUpsell = onClickUpsell,
+                onClickContinue = {
+                    // move forward to the next story
+                    onChangeStory(true)
+                },
             )
             is Story.YearVsYear -> YearVsYearStory(
                 story = story,
