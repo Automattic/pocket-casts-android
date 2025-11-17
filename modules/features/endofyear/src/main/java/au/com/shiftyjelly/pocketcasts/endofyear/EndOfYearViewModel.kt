@@ -127,6 +127,8 @@ class EndOfYearViewModel @AssistedInject constructor(
                 trackFailedToLoad()
                 syncState.emit(SyncState.Failure)
                 return@launch
+            } else {
+                coverStoryGracePeriodExpired.emit(true)
             }
 
             syncState.emit(SyncState.Synced)

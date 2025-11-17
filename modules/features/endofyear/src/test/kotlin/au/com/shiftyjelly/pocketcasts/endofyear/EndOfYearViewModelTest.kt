@@ -127,7 +127,8 @@ class EndOfYearViewModelTest {
     @Test
     fun `initialize in syncing state`() = runTest {
         viewModel.uiState.test {
-            assertEquals(UiState.Syncing, awaitItem())
+            val awaitItem = awaitItem()
+            assert(awaitItem is UiState.Syncing)
         }
     }
 
