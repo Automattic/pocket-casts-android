@@ -15,8 +15,6 @@ import au.com.shiftyjelly.pocketcasts.repositories.playlist.SmartPlaylistPreview
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
 import au.com.shiftyjelly.pocketcasts.settings.AutoDownloadSettingsRoute
 import au.com.shiftyjelly.pocketcasts.utils.extensions.combine
-import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
-import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 import kotlinx.coroutines.Dispatchers
@@ -46,11 +44,7 @@ class AutoDownloadSettingsViewModel @Inject constructor(
             podcastsFlow.value = podcastManager.findSubscribedFlow().first()
         }
         viewModelScope.launch {
-            playlistsFlow.value = if (FeatureFlag.isEnabled(Feature.PLAYLISTS_REBRANDING, immutable = true)) {
-                playlistManager.playlistPreviewsFlow()
-            } else {
-                playlistManager.playlistPreviewsFlow().map { playlists -> playlists.filterIsInstance<SmartPlaylistPreview>() }
-            }.first()
+            playlistsFlow.value = playlistManager.playlistPreviewsFlow().first()
         }
     }
 

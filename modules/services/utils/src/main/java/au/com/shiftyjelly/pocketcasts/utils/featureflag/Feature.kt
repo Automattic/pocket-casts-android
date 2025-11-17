@@ -156,14 +156,6 @@ enum class Feature(
         hasFirebaseRemoteFlag = true,
         hasDevToggle = true,
     ),
-    PLAYLISTS_REBRANDING(
-        key = "playlists_rebranding",
-        title = "Playlists",
-        defaultValue = true,
-        tier = FeatureTier.Free,
-        hasFirebaseRemoteFlag = true,
-        hasDevToggle = true,
-    ),
     SHARE_TRANSCRIPTS(
         key = "share_transcripts",
         title = "Share transcripts",

@@ -39,8 +39,6 @@ import au.com.shiftyjelly.pocketcasts.repositories.playback.FOLDER_ROOT_PREFIX
 import au.com.shiftyjelly.pocketcasts.repositories.playlist.Playlist
 import au.com.shiftyjelly.pocketcasts.repositories.playlist.PlaylistPreview
 import au.com.shiftyjelly.pocketcasts.utils.Util
-import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
-import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import coil.executeBlocking
 import coil.imageLoader
 import java.io.File
@@ -196,25 +194,17 @@ object AutoConverter {
         val icon = playlist.icon
         val nonDefaultIcon = icon.takeIf { it.id != 0 }
 
-        val drawableId = if (FeatureFlag.isEnabled(Feature.PLAYLISTS_REBRANDING, immutable = true)) {
-            when (playlist.type) {
-                Playlist.Type.Manual -> if (Util.isAutomotive(context)) {
-                    IR.drawable.ic_automotive_playlist_manual
-                } else {
-                    IR.drawable.ic_auto_playlist_manual
-                }
-
-                Playlist.Type.Smart -> if (Util.isAutomotive(context)) {
-                    nonDefaultIcon?.automotiveDrawableId ?: IR.drawable.ic_automotive_playlist_smart
-                } else {
-                    nonDefaultIcon?.autoDrawableId ?: IR.drawable.ic_auto_playlist_smart
-                }
-            }
-        } else {
-            if (Util.isAutomotive(context)) {
-                icon.automotiveDrawableId
+        val drawableId = when (playlist.type) {
+            Playlist.Type.Manual -> if (Util.isAutomotive(context)) {
+                IR.drawable.ic_automotive_playlist_manual
             } else {
-                icon.autoDrawableId
+                IR.drawable.ic_auto_playlist_manual
+            }
+
+            Playlist.Type.Smart -> if (Util.isAutomotive(context)) {
+                nonDefaultIcon?.automotiveDrawableId ?: IR.drawable.ic_automotive_playlist_smart
+            } else {
+                nonDefaultIcon?.autoDrawableId ?: IR.drawable.ic_auto_playlist_smart
             }
         }
         return getBitmapUri(drawableId, context)

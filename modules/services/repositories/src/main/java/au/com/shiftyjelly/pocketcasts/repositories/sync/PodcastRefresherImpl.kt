@@ -10,8 +10,6 @@ import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
 import au.com.shiftyjelly.pocketcasts.servers.podcast.PodcastCacheServiceManager
 import au.com.shiftyjelly.pocketcasts.utils.DateUtil
-import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
-import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import com.automattic.android.tracks.crashlogging.CrashLogging
 import java.util.Calendar
@@ -108,11 +106,7 @@ class PodcastRefresherImpl @Inject constructor(
             val twoWeeksAgo = Calendar.getInstance()
                 .apply { add(Calendar.DAY_OF_MONTH, -14) }
                 .time
-            val episodesInPlaylists = if (FeatureFlag.isEnabled(Feature.PLAYLISTS_REBRANDING, immutable = true)) {
-                playlistDao.getEpisodesAddedToManualPlaylists()
-            } else {
-                emptyList()
-            }
+            val episodesInPlaylists = playlistDao.getEpisodesAddedToManualPlaylists()
             val episodesToDelete = existingEpisodes
                 .map(PodcastEpisode::uuid)
                 .subtract(updatedPodcast.episodes.mapTo(mutableSetOf(), PodcastEpisode::uuid))

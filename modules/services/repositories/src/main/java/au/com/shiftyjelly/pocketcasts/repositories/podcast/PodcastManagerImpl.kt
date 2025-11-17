@@ -30,8 +30,6 @@ import au.com.shiftyjelly.pocketcasts.repositories.sync.SyncManager
 import au.com.shiftyjelly.pocketcasts.servers.refresh.RefreshServiceManager
 import au.com.shiftyjelly.pocketcasts.servers.refresh.UpdatePodcastResponse.EpisodeFound
 import au.com.shiftyjelly.pocketcasts.servers.refresh.UpdatePodcastResponse.Retry
-import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
-import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import com.jakewharton.rxrelay2.PublishRelay
 import dagger.hilt.android.qualifiers.ApplicationContext
@@ -715,11 +713,7 @@ class PodcastManagerImpl @Inject constructor(
     }
 
     private suspend fun isPodcastInManualPlaylist(podcast: Podcast): Boolean {
-        val podcastsInPlaylists = if (FeatureFlag.isEnabled(Feature.PLAYLISTS_REBRANDING, immutable = true)) {
-            playlistDao.getPodcastsAddedToManualPlaylists()
-        } else {
-            emptyList()
-        }
+        val podcastsInPlaylists = playlistDao.getPodcastsAddedToManualPlaylists()
         return podcast.uuid in podcastsInPlaylists
     }
 }

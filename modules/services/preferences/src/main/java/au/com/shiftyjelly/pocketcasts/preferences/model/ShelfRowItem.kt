@@ -4,8 +4,6 @@ import androidx.annotation.StringRes
 import au.com.shiftyjelly.pocketcasts.models.entity.BaseEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.UserEpisode
-import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
-import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
@@ -50,7 +48,7 @@ enum class ShelfItem(
     AddToPlaylist(
         id = "add_to_playlist",
         titleId = { LR.string.add_to_playlist_description },
-        showIf = { it is PodcastEpisode && FeatureFlag.isEnabled(Feature.PLAYLISTS_REBRANDING, immutable = true) },
+        showIf = { it is PodcastEpisode },
         iconId = { IR.drawable.ic_add_to_playlist_action },
         analyticsValue = "add_to_playlist",
     ),
