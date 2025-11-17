@@ -13,11 +13,7 @@ Language: zh_TW
     <string name="search_suggestions_view_all">檢視「%1$s」的所有內容</string>
     <string name="up_next_as_playlist_saved">已將「接下來播放」儲存為播放清單</string>
     <string name="up_next_as_playlist_replace_title">要取代目前的「接下來播放」嗎？</string>
-    <string name="up_next_as_playlist_replace_body">這個動作將清除目前的「接下來播放」佇列，系統會開始播放此清單的內容。</string>
-    <string name="up_next_as_playlist_title">要儲存「接下來播放」佇列嗎？</string>
     <string name="up_next_as_playlist_button_secondary">取代並播放</string>
-    <string name="up_next_as_playlist_button_primary">儲存目前的佇列</string>
-    <string name="up_next_as_playlist_body">播放此播放清單時，系統會取代目前「接下來播放」的內容。 先儲存才能保留。</string>
     <string name="delete_playlist_confirmation_title">要刪除播放清單嗎？</string>
     <string name="delete_playlist_confirmation_body">你確定要刪除播放清單？ 此動作無法復原。</string>
     <string name="delete_playlist">刪除播放清單</string>

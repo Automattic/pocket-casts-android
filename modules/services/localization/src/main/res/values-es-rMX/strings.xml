@@ -13,11 +13,7 @@ Language: es
     <string name="search_suggestions_view_all">Ver todo para «%1$s»</string>
     <string name="up_next_as_playlist_saved">Cola Reproducir a continuación guardada como una playlist</string>
     <string name="up_next_as_playlist_replace_title">¿Sustituir cola Reproducir a continuación actual?</string>
-    <string name="up_next_as_playlist_replace_body">Esto borrará la cola actual de Reproducir a continuación y empezará a reproducirse esta playlist.</string>
-    <string name="up_next_as_playlist_title">¿Guardar la cola Reproducir a continuación?</string>
     <string name="up_next_as_playlist_button_secondary">Sustituir y reproducir</string>
-    <string name="up_next_as_playlist_button_primary">Guardar cola actual</string>
-    <string name="up_next_as_playlist_body">Tu cola Reproducir a continuación actual se sustituirá cuando reproduzcas esta playlist. Guárdala primero para conservarla.</string>
     <string name="delete_playlist_confirmation_title">¿Eliminar playlist?</string>
     <string name="delete_playlist_confirmation_body">¿Seguro que quieres eliminar tu playlist? Esta acción no se puede deshacer.</string>
     <string name="delete_playlist">Eliminar playlist</string>

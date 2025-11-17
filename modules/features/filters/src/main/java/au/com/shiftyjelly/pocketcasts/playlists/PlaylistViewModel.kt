@@ -75,6 +75,8 @@ class PlaylistViewModel @AssistedInject constructor(
 
     val searchState = SearchFieldState()
 
+    val saveUpNextDefaultValue get() = settings.saveUpNextAsPlaylist.value
+
     private val playlistFlow = searchState.textFlow.flatMapLatest { searchTerm ->
         when (playlistType) {
             Playlist.Type.Manual -> playlistManager.manualPlaylistFlow(playlistUuid, searchTerm)
@@ -106,25 +108,27 @@ class PlaylistViewModel @AssistedInject constructor(
     }
 
     private var saveUpNextJob: Job? = null
-
-    fun saveUpNextAsPlaylist(upNextTranslation: String) {
-        if (saveUpNextJob?.isActive == true) {
-            return
-        }
-        saveUpNextJob = viewModelScope.launch(NonCancellable) {
-            playAllHandler.saveUpNextAsPlaylist(upNextTranslation)
-            _upNextSavedAsPlaylistSignal.emit(Unit)
-        }
-    }
-
     private var playAllJob: Job? = null
 
-    fun playAll() {
-        if (playAllJob?.isActive == true) {
-            return
+    fun saveUpNextAsPlaylist(saveUpNext: Boolean, upNextTranslation: String) {
+        analyticsTracker.track(
+            AnalyticsEvent.FILTER_PLAY_ALL_REPLACE_AND_PLAY_TAPPED,
+            mapOf(
+                "filter_type" to playlistType.analyticsValue,
+                "save_up_next" to saveUpNext,
+            ),
+        )
+        settings.saveUpNextAsPlaylist.set(saveUpNext, updateModifiedAt = false)
+        if (saveUpNext && saveUpNextJob?.isActive != true) {
+            saveUpNextJob = viewModelScope.launch(NonCancellable) {
+                playAllHandler.saveUpNextAsPlaylist(upNextTranslation)
+                _upNextSavedAsPlaylistSignal.emit(Unit)
+            }
         }
-        playAllJob = viewModelScope.launch {
-            playAllHandler.playAllPendingEpisodes()
+        if (playAllJob?.isActive != true) {
+            playAllJob = viewModelScope.launch(NonCancellable) {
+                playAllHandler.playAllPendingEpisodes()
+            }
         }
     }
 
@@ -278,27 +282,6 @@ class PlaylistViewModel @AssistedInject constructor(
     fun trackPlayAllTapped() {
         analyticsTracker.track(
             AnalyticsEvent.FILTER_PLAY_ALL_TAPPED,
-            mapOf("filter_type" to playlistType.analyticsValue),
-        )
-    }
-
-    fun trackSaveUpNextTapped() {
-        analyticsTracker.track(
-            AnalyticsEvent.FILTER_PLAY_ALL_SAVE_UP_NEXT_TAPPED,
-            mapOf("filter_type" to playlistType.analyticsValue),
-        )
-    }
-
-    fun trackReplaceAndPlayTapped() {
-        analyticsTracker.track(
-            AnalyticsEvent.FILTER_PLAY_ALL_REPLACE_AND_PLAY_TAPPED,
-            mapOf("filter_type" to playlistType.analyticsValue),
-        )
-    }
-
-    fun trackReplaceAndPlayConfirmTapped() {
-        analyticsTracker.track(
-            AnalyticsEvent.FILTER_PLAY_ALL_REPLACE_AND_PLAY_CONFIRM_TAPPED,
             mapOf("filter_type" to playlistType.analyticsValue),
         )
     }

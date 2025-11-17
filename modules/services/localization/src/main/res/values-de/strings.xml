@@ -13,11 +13,7 @@ Language: de
     <string name="search_suggestions_view_all">Alle anzeigen für „%1$s“</string>
     <string name="up_next_as_playlist_saved">Warteschlange als Playlist gespeichert</string>
     <string name="up_next_as_playlist_replace_title">Aktuelle Warteschlange ersetzen?</string>
-    <string name="up_next_as_playlist_replace_body">Dadurch wird deine aktuelle Warteschlange gelöscht und diese Playlist abgespielt.</string>
-    <string name="up_next_as_playlist_title">Deine Warteschlange speichern?</string>
     <string name="up_next_as_playlist_button_secondary">Ersetzen und abspielen</string>
-    <string name="up_next_as_playlist_button_primary">Aktuelle Warteschlange speichern</string>
-    <string name="up_next_as_playlist_body">Deine aktuelle Warteschlange wird ersetzt, wenn du diese Playlist abspielst. Speichere sie zuerst, um sie zu behalten.</string>
     <string name="delete_playlist_confirmation_title">Playlist löschen?</string>
     <string name="delete_playlist_confirmation_body">Bist du sicher, dass du deine Playlist löschen möchtest? Diese Aktion kann nicht rückgängig gemacht werden.</string>
     <string name="delete_playlist">Playlist löschen</string>

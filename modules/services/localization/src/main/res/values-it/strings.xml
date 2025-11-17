@@ -12,12 +12,8 @@ Language: it
     <string name="eoy_playback_intro_title">Il tuo anno in podcast,\nriassunto e pronto da rivivere</string>
     <string name="search_suggestions_view_all">Visualizza tutto per \"%1$s\"</string>
     <string name="up_next_as_playlist_saved">Successivo salvato come playlist</string>
-    <string name="up_next_as_playlist_replace_body">Questa azione cancellerà la coda Successivo attuale e inizierà a riprodurre questa playlist.</string>
-    <string name="up_next_as_playlist_title">Salvare la coda Successivo?</string>
     <string name="up_next_as_playlist_button_secondary">Sostituisci e riproduci</string>
-    <string name="up_next_as_playlist_button_primary">Salva la coda attuale</string>
     <string name="up_next_as_playlist_replace_title">Sostituire l\'attuale Successivo?</string>
-    <string name="up_next_as_playlist_body">L\'attuale Successivo verrà sostituito quando riproduci questa playlist. Salvalo per tenerlo.</string>
     <string name="delete_playlist_confirmation_title">Eliminare la playlist?</string>
     <string name="delete_playlist_confirmation_body">Vuoi eliminare la playlist? Questa operazione non può essere annullata.</string>
     <string name="delete_playlist">Elimina playlist</string>

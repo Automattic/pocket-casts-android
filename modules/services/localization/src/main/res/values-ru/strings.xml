@@ -13,11 +13,7 @@ Language: ru
     <string name="search_suggestions_view_all">Посмотреть все «%1$s»</string>
     <string name="up_next_as_playlist_saved">Очередь «Следующие» сохранена как плейлист</string>
     <string name="up_next_as_playlist_replace_title">Заменить текущую очередь «Следующие»?</string>
-    <string name="up_next_as_playlist_replace_body">Текущая очередь «Следующие» будет сброшена, и начнётся воспроизведение этого плейлиста.</string>
-    <string name="up_next_as_playlist_title">Сохранить очередь «Следующие»?</string>
     <string name="up_next_as_playlist_button_secondary">Заменить и воспроизвести</string>
-    <string name="up_next_as_playlist_button_primary">Сохранить текущую очередь</string>
-    <string name="up_next_as_playlist_body">При воспроизведении этого плейлиста текущая очередь «Следующие» будет заменена. Сохраните её, если она вам нужна.</string>
     <string name="delete_playlist_confirmation_title">Удалить плейлист?</string>
     <string name="delete_playlist_confirmation_body">Вы действительно хотите удалить плейлист? Отменить эту операцию будет невозможно.</string>
     <string name="delete_playlist">Удалить плейлист</string>
