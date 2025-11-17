@@ -131,7 +131,7 @@ class AddToPlaylistViewModel @AssistedInject constructor(
     fun addToPlaylist(playlistUuid: String) {
         cachePlaylistChange(playlistUuid, shouldAdd = true)
 
-        viewModelScope.launch(Dispatchers.Default + NonCancellable) {
+        viewModelScope.launch(Dispatchers.Default) {
             previewsFlow.update { previews ->
                 previews?.map { preview ->
                     if (preview.uuid == playlistUuid) {
@@ -141,14 +141,13 @@ class AddToPlaylistViewModel @AssistedInject constructor(
                     }
                 }
             }
-            playlistManager.addManualEpisode(playlistUuid, episodeUuid)
         }
     }
 
     fun removeFromPlaylist(playlistUuid: String) {
         cachePlaylistChange(playlistUuid, shouldAdd = false)
 
-        viewModelScope.launch(Dispatchers.Default + NonCancellable) {
+        viewModelScope.launch(Dispatchers.Default) {
             previewsFlow.update { previews ->
                 previews?.map { preview ->
                     if (preview.uuid == playlistUuid) {
@@ -158,7 +157,18 @@ class AddToPlaylistViewModel @AssistedInject constructor(
                     }
                 }
             }
-            playlistManager.deleteManualEpisode(playlistUuid, episodeUuid)
+        }
+    }
+
+    fun commitPlaylistChanges() {
+        viewModelScope.launch(NonCancellable) {
+            for ((playlistUuid, isAdded) in playlistsChanges) {
+                if (isAdded) {
+                    playlistManager.addManualEpisode(playlistUuid, episodeUuid)
+                } else {
+                    playlistManager.deleteManualEpisode(playlistUuid, episodeUuid)
+                }
+            }
         }
     }
 

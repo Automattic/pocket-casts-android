@@ -46,6 +46,8 @@ import au.com.shiftyjelly.pocketcasts.localization.R as LR
 internal class AddToPlaylistFragment : BaseDialogFragment() {
     private val args get() = requireArguments().requireParcelable<Args>(NEW_INSTANCE_ARGS)
 
+    private var isDoneTapped = false
+
     private val viewModel by viewModels<AddToPlaylistViewModel>(
         extrasProducer = {
             defaultViewModelCreationExtras.withCreationCallback<AddToPlaylistViewModel.Factory> { factory ->
@@ -117,7 +119,11 @@ internal class AddToPlaylistFragment : BaseDialogFragment() {
                     onClickContinueWithNewPlaylist = {
                         viewModel.trackNewPlaylistTapped()
                     },
-                    onClickDoneButton = ::dismiss,
+                    onClickDoneButton = {
+                        isDoneTapped = true
+                        viewModel.commitPlaylistChanges()
+                        dismiss()
+                    },
                     onClickNavigationButton = {
                         if (!navController.popBackStack()) {
                             dismiss()
@@ -138,7 +144,7 @@ internal class AddToPlaylistFragment : BaseDialogFragment() {
 
     override fun onDismiss(dialog: DialogInterface) {
         super.onDismiss(dialog)
-        if (!requireActivity().isChangingConfigurations) {
+        if (!requireActivity().isChangingConfigurations && isDoneTapped) {
             showDoneSnackbar(viewModel.getPlaylistsAddedTo())
         }
     }
