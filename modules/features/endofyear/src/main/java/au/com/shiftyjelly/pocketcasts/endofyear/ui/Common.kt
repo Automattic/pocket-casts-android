@@ -260,6 +260,7 @@ internal fun PreviewBox(
             progress = progress,
             measurements = measurements,
             onClose = {},
+            onNextStory = {},
             controller = StoryCaptureController.preview(),
             color = Color.White,
         )

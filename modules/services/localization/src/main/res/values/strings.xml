@@ -2162,6 +2162,7 @@
     <string name="end_of_year_story_ratings_share_text">I rated %1$d different podcasts in %2$d, with %3$d as my most used rating</string>
     <string name="end_of_year_cant_share_message">This story can\'t be shared</string>
     <string name="end_of_year_failed_to_load_message">Sorry, we couldn\'t load Playback</string>
+    <string name="end_of_year_next_story">Next story</string>
 
     <!-- Onboarding -->
 

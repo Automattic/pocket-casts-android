@@ -1,6 +1,6 @@
 package au.com.shiftyjelly.pocketcasts.endofyear
 
-import android.app.Activity
+import android.content.Context
 import androidx.compose.runtime.Immutable
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -17,12 +17,14 @@ import au.com.shiftyjelly.pocketcasts.repositories.endofyear.EndOfYearStats
 import au.com.shiftyjelly.pocketcasts.repositories.endofyear.EndOfYearSync
 import au.com.shiftyjelly.pocketcasts.servers.list.ListServiceManager
 import au.com.shiftyjelly.pocketcasts.sharing.SharingRequest
+import au.com.shiftyjelly.pocketcasts.utils.Util
 import au.com.shiftyjelly.pocketcasts.utils.coroutines.CachedAction
 import au.com.shiftyjelly.pocketcasts.utils.extensions.padEnd
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
 import dagger.hilt.android.lifecycle.HiltViewModel
+import dagger.hilt.android.qualifiers.ApplicationContext
 import java.io.File
 import java.time.Year
 import kotlinx.coroutines.Job
@@ -49,6 +51,7 @@ class EndOfYearViewModel @AssistedInject constructor(
     private val listServiceManager: ListServiceManager,
     private val sharingClient: StorySharingClient,
     private val analyticsTracker: AnalyticsTracker,
+    @ApplicationContext private val context: Context,
 ) : ViewModel() {
 
     private companion object {
@@ -215,11 +218,12 @@ class EndOfYearViewModel @AssistedInject constructor(
 
     internal fun onStoryChanged(story: Story) {
         trackStoryShown(story)
+        val isTalkbackOn = Util.isTalkbackOn(context)
         viewModelScope.launch {
             countDownJob?.cancelAndJoin()
             progress.value = 0f
             val previewDuration = story.previewDuration
-            if (previewDuration != null) {
+            if (previewDuration != null && !isTalkbackOn) {
                 val progressDelay = previewDuration / 100
                 countDownJob = launch {
                     var currentProgress = 0f
