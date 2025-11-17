@@ -149,6 +149,7 @@ internal fun OnboardingUpgradeFeaturesPage(
                     onSubscribePress = { onClickSubscribe(false) },
                     onClickPrivacyPolicy = { viewModel.onPrivacyPolicyPressed() },
                     onClickTermsAndConditions = { viewModel.onTermsAndConditionsPressed() },
+                    onClickSeeAllFeatures = viewModel::onReportSeeAllFeaturesPressed,
                 )
             } else {
                 UpgradeLayout(

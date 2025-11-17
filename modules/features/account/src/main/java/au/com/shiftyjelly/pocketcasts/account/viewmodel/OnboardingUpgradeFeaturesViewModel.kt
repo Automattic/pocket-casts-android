@@ -182,6 +182,16 @@ class OnboardingUpgradeFeaturesViewModel @AssistedInject constructor(
         analyticsTracker.track(AnalyticsEvent.SELECT_PAYMENT_FREQUENCY_DISMISSED, analyticsProps(flow = flow, source = source, variant = experimentProvider.getVariation(Experiment.NewOnboardingABTest).toNewOnboardingVariant()))
     }
 
+    fun onReportSeeAllFeaturesPressed(variant: OnboardingUpgradeFeaturesState.NewOnboardingVariant) {
+        analyticsTracker.track(
+            AnalyticsEvent.PLUS_PROMOTION_DETAILS_TAPPED,
+            properties = mapOf(
+                "version" to 1,
+                "variant" to variant.analyticsValue,
+            ),
+        )
+    }
+
     @AssistedFactory
     interface Factory {
         fun create(flow: OnboardingFlow): OnboardingUpgradeFeaturesViewModel
@@ -216,9 +226,9 @@ sealed class OnboardingUpgradeFeaturesState {
         BOTH,
     }
 
-    enum class NewOnboardingVariant {
-        FEATURES_FIRST,
-        TRIAL_FIRST_WHEN_ELIGIBLE,
+    enum class NewOnboardingVariant(val analyticsValue: String) {
+        FEATURES_FIRST("A"),
+        TRIAL_FIRST_WHEN_ELIGIBLE("B"),
     }
 
     data class Loaded(
