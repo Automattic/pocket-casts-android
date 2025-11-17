@@ -2,7 +2,7 @@ package au.com.shiftyjelly.pocketcasts.endofyear.ui
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.BoxWithConstraints
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -13,12 +13,12 @@ import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.zIndex
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalInspectionMode
 import androidx.compose.ui.res.colorResource
@@ -29,7 +29,6 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlin.math.absoluteValue
 import au.com.shiftyjelly.pocketcasts.compose.Devices
 import au.com.shiftyjelly.pocketcasts.compose.components.PodcastImage
@@ -128,19 +127,14 @@ private fun PodcastCoverCarousel(
 
     // Auto-scroll effect
     LaunchedEffect(Unit) {
-        snapshotFlow { pagerState.isScrollInProgress }
-            .distinctUntilChanged()
-            .collect { isScrolling ->
-                if (!isScrolling) {
-                    delay(800) // Wait 0.8 seconds before next scroll
-                    val targetPage = pagerState.currentPage + 1
-                    pagerState.animateScrollToPage(targetPage)
-                }
-            }
+        while (true) {
+            delay(1000) // Wait 1 second before next scroll
+            pagerState.animateScrollToPage(pagerState.currentPage + 1)
+        }
     }
 
-    BoxWithConstraints(
-        modifier = modifier.height(coverSize * 1.5f),
+    Box(
+        modifier = modifier.height(coverSize * 2.5f), // Taller to show 3 above + center + 3 below
         contentAlignment = Alignment.Center,
     ) {
         VerticalPager(
@@ -148,7 +142,9 @@ private fun PodcastCoverCarousel(
             beyondViewportPageCount = 3,
             modifier = Modifier.fillMaxSize(),
             userScrollEnabled = false,
-            pageSize = PageSize.Fixed(coverSize * 0.35f) // Tight spacing for stacked effect
+            pageSize = PageSize.Fixed(coverSize), // Tight spacing for stacked effect
+            pageSpacing = (-coverSize * 0.9f), // Negative spacing for 0.1f peek
+            contentPadding = PaddingValues(vertical = coverSize * 0.75f) // Center the current page
         ) { page ->
             val podcastId = podcastIds[page % podcastIds.size]
 
@@ -168,23 +164,19 @@ private fun PodcastCoverCarousel(
             // Subtle horizontal offset for depth
             val translationX = pageOffset * 5f
 
-            Box(
-                modifier = Modifier.fillMaxSize(),
-                contentAlignment = Alignment.Center,
-            ) {
-                PodcastImage(
-                    uuid = podcastId,
-                    cornerSize = 4.dp,
-                    modifier = Modifier
-                        .size(coverSize)
-                        .graphicsLayer {
-                            scaleX = scale
-                            scaleY = scale
-                            this.translationX = translationX
-                            shadowElevation = (1f - pageOffset.coerceAtMost(1f)) * 16f
-                        },
-                )
-            }
+            PodcastImage(
+                uuid = podcastId,
+                cornerSize = 4.dp,
+                modifier = Modifier
+                    .size(coverSize)
+                    .graphicsLayer {
+                        scaleX = scale
+                        scaleY = scale
+                        this.translationX = translationX
+                        shadowElevation = (1f - pageOffset.coerceAtMost(1f)) * 16f
+                    }
+                    .zIndex(1f - pageOffset), // Center item on top, others layered behind
+            )
         }
     }
 }
