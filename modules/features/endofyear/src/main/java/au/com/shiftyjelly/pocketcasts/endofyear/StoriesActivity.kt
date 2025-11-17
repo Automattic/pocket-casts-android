@@ -14,7 +14,6 @@ import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContract
 import androidx.activity.viewModels
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.WindowInsets
@@ -159,11 +158,7 @@ class StoriesActivity : ComponentActivity() {
         Box(
             contentAlignment = Alignment.Center,
             modifier = Modifier
-                .fillMaxSize()
-                .clickable {
-                    viewModel.trackStoriesClosed("tapped_outside")
-                    finish()
-                },
+                .fillMaxSize(),
         ) {
             StoriesPage(
                 state = state,
