@@ -356,8 +356,7 @@ class StoriesActivity : ComponentActivity() {
             return if (intent == null || resultCode == RESULT_OK) {
                 Result.Success
             } else {
-                Result.Failure(
-                    source = IntentCompat.getParcelableExtra(intent, EXTRA_SOURCE, StoriesSource::class.java))
+                Result.Failure(source = IntentCompat.getParcelableExtra(intent, EXTRA_SOURCE, StoriesSource::class.java))
             }
         }
     }
