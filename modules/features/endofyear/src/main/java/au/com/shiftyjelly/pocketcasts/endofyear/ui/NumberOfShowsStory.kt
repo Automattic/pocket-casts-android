@@ -113,7 +113,7 @@ internal fun NumberOfShowsStory(
             260.dp
         }
         PodcastCoverCarousel(
-            podcastIds = story.bottomShowIds,
+            podcastIds = story.randomShowIds,
             coverSize = coverSize,
             modifier = Modifier.align(alignment = Alignment.Center),
             freezeAnimation = controller.isSharing,
@@ -202,8 +202,7 @@ private fun NumberOfShowsPreview() {
             story = Story.NumberOfShows(
                 showCount = 20,
                 episodeCount = 125,
-                topShowIds = List(4) { "id-$it" },
-                bottomShowIds = List(4) { "id-$it" },
+                randomShowIds = List(7) { "id-$it" },
             ),
             measurements = measurements,
             controller = StoryCaptureController.preview(),
