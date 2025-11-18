@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -23,7 +24,6 @@ import androidx.compose.ui.draw.drawWithContent
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
-import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalInspectionMode
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.stringResource
@@ -80,7 +80,6 @@ internal fun RatingsStory(
     } else {
         AbsentRatings(
             modifier = modifier,
-            story = story,
             measurements = measurements,
             onLearnAboutRatings = onLearnAboutRatings,
         )
@@ -106,6 +105,7 @@ private fun PresentRatings(
             fontScale = measurements.smallDeviceFactor,
             disableAutoScale = true,
             fontSize = 25.sp,
+            lineHeight = 30.sp,
             color = colorResource(UR.color.white),
             modifier = Modifier
                 .fillMaxWidth()
@@ -131,23 +131,23 @@ private fun PresentRatings(
             contentAlignment = Alignment.BottomCenter,
             modifier = Modifier
                 .fillMaxWidth()
-                .weight(1f)
-                .drawWithContent {
-                    drawContent()
-                    drawRect(
-                        brush = Brush.verticalGradient(
-                            colors = listOf(Color.Transparent, story.backgroundColor),
-                            startY = size.height - 64.dp.toPx(),
-                            endY = size.height,
-                        ),
-                    )
-                },
+                .weight(1f),
         ) {
             RatingBars(
                 stats = story.stats,
                 forceBarsVisible = controller.isSharing,
                 modifier = Modifier
-                    .fillMaxSize(),
+                    .fillMaxSize()
+                    .drawWithContent {
+                        drawContent()
+                        drawRect(
+                            brush = Brush.verticalGradient(
+                                0f to Color.Transparent,
+                                0.85f to Color.Transparent,
+                                1f to story.backgroundColor,
+                            ),
+                        )
+                    },
             )
             ShareStoryButton(
                 story = story,
@@ -164,25 +164,18 @@ private fun RatingBars(
     stats: RatingStats,
     forceBarsVisible: Boolean,
     modifier: Modifier = Modifier,
-    arrangement: Arrangement.Horizontal? = null,
 ) {
     Row(
         verticalAlignment = Alignment.Bottom,
         modifier = modifier,
-        horizontalArrangement = arrangement ?: Arrangement.Start,
     ) {
         val shouldNormalize = stats.count() > 0
         Rating.entries.forEach { rating ->
             val barRange = (stats.relativeToMax(rating) * 10).roundToInt()
             AnimatedRatingBar(
                 rating = rating.numericalValue,
-                heightRange = if (shouldNormalize) {
-                    barRange.coerceIn(1, 10)
-                } else {
-                    barRange
-                },
+                heightRange = barRange,
                 forceBarVisible = forceBarsVisible,
-                contentScale = arrangement?.let { ContentScale.FillBounds },
             )
         }
     }
@@ -193,17 +186,20 @@ private fun RowScope.AnimatedRatingBar(
     rating: Int,
     heightRange: Int,
     forceBarVisible: Boolean,
-    contentScale: ContentScale?,
-) {
-    val composition by rememberLottieComposition(
-        spec = LottieCompositionSpec.RawRes(R.raw.playback_ratings_pillar_lottie),
+) = Box(modifier = Modifier.weight(1f)) {
+    val pillarComposition by rememberLottieComposition(
+        spec = LottieCompositionSpec.RawRes(R.raw.pillar_bars_i3),
+    )
+    val numberComposition by rememberLottieComposition(
+        spec = LottieCompositionSpec.RawRes(R.raw.pillar_numbers_i3),
     )
 
-    val animatable = rememberLottieAnimatable()
+    val pillarAnimatable = rememberLottieAnimatable()
+    val numberAnimatable = rememberLottieAnimatable()
     val isPreview = LocalInspectionMode.current
     val freezeBar = forceBarVisible || isPreview
 
-    composition?.let { comp ->
+    pillarComposition?.let { comp ->
         val markerIndex = comp.markers.size - heightRange
         val targetMarker = comp.markers.find { it.name == "marker_$markerIndex" } ?: comp.markers.firstOrNull()
 
@@ -214,8 +210,8 @@ private fun RowScope.AnimatedRatingBar(
                 LottieClipSpec.Marker(marker = targetMarker.name)
             }
 
-            animatable.animate(
-                composition = composition,
+            pillarAnimatable.animate(
+                composition = pillarComposition,
                 clipSpec = clipSpec,
             )
         }
@@ -223,7 +219,32 @@ private fun RowScope.AnimatedRatingBar(
         LaunchedEffect(freezeBar, targetMarker) {
             if (freezeBar && targetMarker != null) {
                 val endProgress = (targetMarker.startFrame + targetMarker.durationFrames) / comp.durationFrames
-                animatable.snapTo(comp, endProgress)
+                pillarAnimatable.snapTo(comp, endProgress)
+            }
+        }
+    }
+
+    numberComposition?.let { comp ->
+        val markerIndex = comp.markers.size - heightRange
+        val targetMarker = comp.markers.find { it.name == "marker_$markerIndex" } ?: comp.markers.firstOrNull()
+
+        LaunchedEffect(targetMarker) {
+            val clipSpec = if (targetMarker == null) {
+                LottieClipSpec.Frame(min = 0, max = 1)
+            } else {
+                LottieClipSpec.Marker(marker = targetMarker.name)
+            }
+
+            numberAnimatable.animate(
+                composition = numberComposition,
+                clipSpec = clipSpec,
+            )
+        }
+
+        LaunchedEffect(freezeBar, targetMarker) {
+            if (freezeBar && targetMarker != null) {
+                val endProgress = (targetMarker.startFrame + targetMarker.durationFrames) / comp.durationFrames
+                numberAnimatable.snapTo(comp, endProgress)
             }
         }
     }
@@ -242,11 +263,16 @@ private fun RowScope.AnimatedRatingBar(
     )
 
     LottieAnimation(
-        modifier = Modifier.weight(1f),
-        composition = composition,
-        progress = { animatable.progress },
+        modifier = Modifier.fillMaxSize(),
+        composition = pillarComposition,
+        progress = { pillarAnimatable.progress },
+    )
+
+    LottieAnimation(
+        modifier = Modifier.fillMaxSize(),
+        composition = numberComposition,
+        progress = { numberAnimatable.progress },
         dynamicProperties = dynamicProperties,
-        contentScale = contentScale ?: ContentScale.Fit,
         fontMap = remember {
             mapOf(
                 "Inter-Regular" to Typeface.create("sans-serif", Typeface.NORMAL),
@@ -257,7 +283,6 @@ private fun RowScope.AnimatedRatingBar(
 
 @Composable
 private fun AbsentRatings(
-    story: Story.Ratings,
     measurements: EndOfYearMeasurements,
     onLearnAboutRatings: () -> Unit,
     modifier: Modifier = Modifier,
@@ -291,14 +316,36 @@ private fun AbsentRatings(
                 .padding(horizontal = 24.dp),
             textAlign = TextAlign.Center,
         )
-        RatingBars(
+        Row(
             modifier = Modifier
                 .fillMaxWidth()
                 .weight(1f),
-            stats = story.stats,
-            forceBarsVisible = false,
-            arrangement = Arrangement.spacedBy(1.dp),
-        )
+            horizontalArrangement = Arrangement.spacedBy(1.dp),
+            verticalAlignment = Alignment.Bottom,
+        ) {
+            repeat(5) { index ->
+                Column(
+                    modifier = Modifier
+                        .weight(1f)
+                        .fillMaxHeight(),
+                ) {
+                    Spacer(modifier = Modifier.weight(1f))
+                    TextP40(
+                        modifier = Modifier.fillMaxWidth()
+                            .padding(bottom = 8.dp),
+                        text = (index + 1).toString(),
+                        textAlign = TextAlign.Center,
+                        color = colorResource(UR.color.white),
+                    )
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(16.dp)
+                            .background(color = Color(0xFFFF4562)),
+                    )
+                }
+            }
+        }
         Spacer(
             modifier = Modifier.height(16.dp),
         )
