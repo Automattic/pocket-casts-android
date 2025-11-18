@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.pager.PageSize
 import androidx.compose.foundation.pager.VerticalPager
 import androidx.compose.foundation.pager.rememberPagerState
+import androidx.compose.material3.adaptive.currentWindowAdaptiveInfo
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -29,6 +30,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.zIndex
 import au.com.shiftyjelly.pocketcasts.compose.Devices
+import au.com.shiftyjelly.pocketcasts.compose.adaptive.isAtMostMediumHeight
+import au.com.shiftyjelly.pocketcasts.compose.adaptive.isAtMostMediumWidth
 import au.com.shiftyjelly.pocketcasts.compose.components.PodcastImage
 import au.com.shiftyjelly.pocketcasts.compose.components.TextH10
 import au.com.shiftyjelly.pocketcasts.endofyear.R
@@ -61,6 +64,7 @@ internal fun NumberOfShowsStory(
             .background(story.backgroundColor)
             .padding(top = measurements.closeButtonBottomEdge + 16.dp),
     ) {
+        val windowSize = currentWindowAdaptiveInfo().windowSizeClass
         TextH10(
             text = stringResource(
                 LR.string.end_of_year_story_listened_to_numbers,
@@ -73,7 +77,13 @@ internal fun NumberOfShowsStory(
             textAlign = TextAlign.Center,
             fontScale = measurements.smallDeviceFactor,
             color = colorResource(UR.color.white),
-            modifier = Modifier.padding(horizontal = 42.dp),
+            modifier = Modifier.padding(
+                horizontal = if (windowSize.isAtMostMediumHeight()) {
+                    24.dp
+                } else {
+                    42.dp
+                }
+            ),
         )
 
         val composition by rememberLottieComposition(
@@ -97,9 +107,14 @@ internal fun NumberOfShowsStory(
             contentScale = ContentScale.FillWidth,
         )
 
+        val coverSize = if (windowSize.isAtMostMediumHeight()) {
+            180.dp
+        } else {
+            260.dp
+        }
         PodcastCoverCarousel(
             podcastIds = story.bottomShowIds,
-            coverSize = 260.dp,
+            coverSize = coverSize,
             modifier = Modifier.align(alignment = Alignment.Center),
         )
 
