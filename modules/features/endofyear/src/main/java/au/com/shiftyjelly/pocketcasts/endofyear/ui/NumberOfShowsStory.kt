@@ -28,8 +28,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import kotlinx.coroutines.delay
-import kotlin.math.absoluteValue
+import androidx.compose.ui.zIndex
 import au.com.shiftyjelly.pocketcasts.compose.Devices
 import au.com.shiftyjelly.pocketcasts.compose.components.PodcastImage
 import au.com.shiftyjelly.pocketcasts.compose.components.TextH10
@@ -43,6 +42,8 @@ import com.airbnb.lottie.compose.animateLottieCompositionAsState
 import com.airbnb.lottie.compose.rememberLottieComposition
 import dev.shreyaspatil.capturable.capturable
 import java.io.File
+import kotlin.math.absoluteValue
+import kotlinx.coroutines.delay
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 import au.com.shiftyjelly.pocketcasts.ui.R as UR
 
@@ -113,7 +114,6 @@ internal fun NumberOfShowsStory(
     }
 }
 
-
 @Composable
 private fun PodcastCoverCarousel(
     podcastIds: List<String>,
@@ -125,58 +125,53 @@ private fun PodcastCoverCarousel(
         pageCount = { Int.MAX_VALUE },
     )
 
-    // Auto-scroll effect
     LaunchedEffect(Unit) {
         while (true) {
-            delay(1000) // Wait 1 second before next scroll
+            delay(1_000)
             pagerState.animateScrollToPage(pagerState.currentPage + 1)
         }
     }
 
     Box(
-        modifier = modifier.height(coverSize * 2.5f), // Taller to show 3 above + center + 3 below
+        modifier = modifier,
         contentAlignment = Alignment.Center,
     ) {
         VerticalPager(
             state = pagerState,
             beyondViewportPageCount = 3,
-            modifier = Modifier.fillMaxSize(),
             userScrollEnabled = false,
-            pageSize = PageSize.Fixed(coverSize), // Tight spacing for stacked effect
-            pageSpacing = (-coverSize * 0.9f), // Negative spacing for 0.1f peek
-            contentPadding = PaddingValues(vertical = coverSize * 0.75f) // Center the current page
+            pageSize = PageSize.Fixed(coverSize),
+            pageSpacing = (-coverSize * 0.9f),
+            contentPadding = PaddingValues(vertical = coverSize * 0.75f),
         ) { page ->
             val podcastId = podcastIds[page % podcastIds.size]
 
-            // Calculate relative position from current page (negative = above, positive = below)
             val relativePosition = (page - pagerState.currentPage) - pagerState.currentPageOffsetFraction
             val pageOffset = relativePosition.absoluteValue
 
-            // Aggressive scale for compact carousel effect
-            // Center: 1.0f, Adjacent: 0.75f, Distance 2: 0.65f, Distance 3+: 0.6f
-            val scale = when {
-                pageOffset < 1f -> 1f - (pageOffset * 0.25f) // Interpolate from 1.0 to 0.75
-                pageOffset < 2f -> 0.75f - ((pageOffset - 1f) * 0.1f) // Interpolate from 0.75 to 0.65
-                pageOffset < 3f -> 0.65f - ((pageOffset - 2f) * 0.05f) // Interpolate from 0.65 to 0.6
-                else -> 0.6f
+            if (pageOffset <= 3f) {
+                val scale = when {
+                    pageOffset < 1f -> 1f - (pageOffset * 0.05f)
+                    pageOffset < 2f -> 0.95f - ((pageOffset - 1f) * 0.05f)
+                    pageOffset < 3f -> 0.9f - ((pageOffset - 2f) * 0.05f)
+                    else -> 0.85f
+                }
+
+                val translationX = pageOffset * 5f
+
+                PodcastImage(
+                    uuid = podcastId,
+                    cornerSize = 4.dp,
+                    modifier = Modifier
+                        .size(coverSize)
+                        .graphicsLayer {
+                            scaleX = scale
+                            scaleY = scale
+                            this.translationX = translationX
+                        }
+                        .zIndex(1f - pageOffset),
+                )
             }
-
-            // Subtle horizontal offset for depth
-            val translationX = pageOffset * 5f
-
-            PodcastImage(
-                uuid = podcastId,
-                cornerSize = 4.dp,
-                modifier = Modifier
-                    .size(coverSize)
-                    .graphicsLayer {
-                        scaleX = scale
-                        scaleY = scale
-                        this.translationX = translationX
-                        shadowElevation = (1f - pageOffset.coerceAtMost(1f)) * 16f
-                    }
-                    .zIndex(1f - pageOffset), // Center item on top, others layered behind
-            )
         }
     }
 }
