@@ -54,7 +54,7 @@ internal fun CoverStory(
             TextH30(
                 fontScale = measurements.smallDeviceFactor,
                 fontSize = 25.sp,
-                lineHeight = 28.sp,
+                lineHeight = 30.sp,
                 text = stringResource(LR.string.eoy_playback_intro_title),
                 modifier = Modifier.padding(horizontal = 42.dp),
                 color = Color.White,
