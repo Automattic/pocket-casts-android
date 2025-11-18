@@ -307,21 +307,21 @@ internal fun BoxScope.TopControls(
             modifier = Modifier.fillMaxWidth(),
         ) {
             if (isTalkbackOn) {
-                if (pagerState.currentPage > 0) {
-                    TopControlButton(
-                        painter = rememberVectorPainter(Icons.AutoMirrored.Rounded.ArrowBack),
-                        contentDescription = stringResource(LR.string.end_of_year_previous_story),
-                        color = color,
-                        onClick = onPreviousStory,
-                        iconPadding = 12.dp,
-                    )
-                }
+                TopControlButton(
+                    painter = rememberVectorPainter(Icons.AutoMirrored.Rounded.ArrowBack),
+                    contentDescription = stringResource(LR.string.end_of_year_previous_story),
+                    color = color,
+                    onClick = onPreviousStory,
+                    iconPadding = 12.dp,
+                    enabled = pagerState.currentPage > 0,
+                )
                 TopControlButton(
                     painter = rememberVectorPainter(Icons.AutoMirrored.Rounded.ArrowForward),
                     contentDescription = stringResource(LR.string.end_of_year_next_story),
                     color = color,
                     onClick = onNextStory,
                     iconPadding = 12.dp,
+                    enabled = pagerState.currentPage < pagerState.pageCount - 1,
                 )
             }
 
@@ -344,11 +344,13 @@ fun TopControlButton(
     onClick: () -> Unit,
     iconPadding: Dp,
     modifier: Modifier = Modifier,
+    enabled: Boolean = true,
 ) {
     Image(
         painter = painter,
         contentDescription = contentDescription,
         colorFilter = ColorFilter.tint(color),
+        alpha = if (enabled) 1f else 0.4f,
         modifier = modifier
             .size(48.dp)
             .clickable(
@@ -357,6 +359,7 @@ fun TopControlButton(
                 onClickLabel = contentDescription,
                 role = Role.Button,
                 onClick = onClick,
+                enabled = enabled,
             )
             .padding(iconPadding),
     )
