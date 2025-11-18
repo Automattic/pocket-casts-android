@@ -8,7 +8,7 @@
     *   Allow one character episode searches
         ([#4734](https://github.com/Automattic/pocket-casts-android/pull/4734))
 *   Bug Fixes
-    *   Fix an issue with unplayed episodes do not show play button
+    *   Fix an issue where unplayed episodes do not show play button
         ([#4749](https://github.com/Automattic/pocket-casts-android/pull/4749))
 
 8.0
