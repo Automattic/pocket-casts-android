@@ -24,6 +24,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.platform.ComposeView
 import androidx.core.app.ActivityOptionsCompat
 import androidx.core.content.ContextCompat
+import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
@@ -184,6 +185,7 @@ import au.com.shiftyjelly.pocketcasts.utils.Network
 import au.com.shiftyjelly.pocketcasts.utils.Util
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.FirebaseRemoteFeatureInitializer
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import au.com.shiftyjelly.pocketcasts.utils.observeOnce
 import au.com.shiftyjelly.pocketcasts.view.LockableBottomSheetBehavior
@@ -309,6 +311,9 @@ class MainActivity :
 
     @Inject
     lateinit var appReviewManager: AppReviewManager
+
+    @Inject
+    lateinit var firebaseRemoteFeatureInitializer: FirebaseRemoteFeatureInitializer
 
     private val viewModel: MainActivityViewModel by viewModels()
     private val disposables = CompositeDisposable()
@@ -443,8 +448,12 @@ class MainActivity :
 
     override fun onCreate(savedInstanceState: Bundle?) {
         Timber.d("Main Activity onCreate")
+
         // Changing the theme draws the status and navigation bars as black, unless this is manually set
         WindowCompat.setDecorFitsSystemWindows(window, false)
+
+        val splashScreen = installSplashScreen()
+
         super.onCreate(savedInstanceState)
         theme.setupThemeForConfig(this, resources.configuration)
         enableEdgeToEdge(navigationBarStyle = theme.getNavigationBarStyle(this))
@@ -452,16 +461,28 @@ class MainActivity :
 
         playbackManager.setNotificationPermissionChecker(this)
 
-        val showOnboarding = !settings.hasCompletedOnboarding() && !syncManager.isLoggedIn()
-        // Only show if savedInstanceState is null in order to avoid creating onboarding activity twice.
-        if (showOnboarding && savedInstanceState == null) {
-            openOnboardingFlow(OnboardingFlow.InitialOnboarding)
-        }
+        var isReady = settings.hasCompletedOnboarding()
+        splashScreen.setKeepOnScreenCondition { !isReady }
 
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
-        if (!FeatureFlag.isEnabled(Feature.NEW_ONBOARDING_ACCOUNT_CREATION)) {
-            checkForNotificationPermission()
+
+        if (!isReady) {
+            lifecycleScope.launch {
+                // avoid initialization during config changes
+                repeatOnLifecycle(Lifecycle.State.STARTED) {
+                    firebaseRemoteFeatureInitializer.initialize()
+                    isReady = true
+
+                    withContext(Dispatchers.Main) {
+                        if (!isChangingConfigurations) {
+                            onFirebaseInitComplete(savedInstanceState)
+                        }
+                    }
+                }
+            }
+        } else {
+            onFirebaseInitComplete(savedInstanceState)
         }
 
         ViewCompat.setOnApplyWindowInsetsListener(binding.root) { _, windowInsets ->
@@ -607,6 +628,17 @@ class MainActivity :
         setupAppReviewPrompt()
     }
 
+    private fun onFirebaseInitComplete(savedInstanceState: Bundle?) {
+        val showOnboarding = !settings.hasCompletedOnboarding() && !syncManager.isLoggedIn()
+        if (showOnboarding) {
+            openOnboardingFlow(OnboardingFlow.InitialOnboarding)
+        }
+
+        if (!FeatureFlag.isEnabled(Feature.NEW_ONBOARDING_ACCOUNT_CREATION)) {
+            checkForNotificationPermission()
+        }
+    }
+
     private fun resetEoYBadgeIfNeeded() {
         if (binding.bottomNavigation.getBadge(VR.id.navigation_profile) != null &&
             settings.getEndOfYearShowBadge2025()
@@ -618,7 +650,7 @@ class MainActivity :
 
     private fun encourageAccountCreation() {
         lifecycleScope.launch {
-            repeatOnLifecycle(Lifecycle.State.STARTED) {
+            repeatOnLifecycle(Lifecycle.State.CREATED) {
                 val encourageAccountCreation = settings.showFreeAccountEncouragement.value
                 if (!encourageAccountCreation) {
                     return@repeatOnLifecycle
@@ -640,14 +672,16 @@ class MainActivity :
     }
 
     override fun launchIntent(onboardingFlow: OnboardingFlow): Intent {
-        return OnboardingActivity.newInstance(this, onboardingFlow)
+        return OnboardingActivity.newInstance(this, onboardingFlow).apply {
+            flags = Intent.FLAG_ACTIVITY_SINGLE_TOP or Intent.FLAG_ACTIVITY_BROUGHT_TO_FRONT
+        }
     }
 
     override fun openOnboardingFlow(onboardingFlow: OnboardingFlow) {
         onboardingLauncher.launch(
             launchIntent(onboardingFlow),
             ActivityOptionsCompat
-                .makeCustomAnimation(this, R.anim.onboarding_enter, R.anim.onboarding_disappear),
+                .makeCustomAnimation(this@MainActivity, R.anim.onboarding_enter, R.anim.onboarding_disappear),
         )
     }
 

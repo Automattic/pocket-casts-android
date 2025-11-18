@@ -34,11 +34,6 @@ class FirebaseRemoteFeatureProvider(
 
     init {
         scope.launch {
-            firebaseRemoteConfig.fetchSuspending()
-                .map { firebaseRemoteConfig.activateSuspending().getOrThrow() }
-                .onSuccess { Timber.i("Firebase feature flag refreshed") }
-                .onFailure { Timber.e(it, "Failed to refresh Firebase feature flags") }
-
             firebaseRemoteConfig.configUpdates.collect {
                 firebaseRemoteConfig.activateSuspending()
                     .onSuccess { Timber.i("Firebase feature flag refreshed") }
