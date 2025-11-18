@@ -1,8 +1,5 @@
 package au.com.shiftyjelly.pocketcasts.endofyear
 
-import android.content.Context
-import android.view.accessibility.AccessibilityManager
-import android.view.accessibility.AccessibilityManager.AccessibilityStateChangeListener
 import androidx.compose.runtime.Immutable
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -19,14 +16,13 @@ import au.com.shiftyjelly.pocketcasts.repositories.endofyear.EndOfYearStats
 import au.com.shiftyjelly.pocketcasts.repositories.endofyear.EndOfYearSync
 import au.com.shiftyjelly.pocketcasts.servers.list.ListServiceManager
 import au.com.shiftyjelly.pocketcasts.sharing.SharingRequest
-import au.com.shiftyjelly.pocketcasts.utils.Util
+import au.com.shiftyjelly.pocketcasts.utils.accessibility.AccessibilityManager
 import au.com.shiftyjelly.pocketcasts.utils.coroutines.CachedAction
 import au.com.shiftyjelly.pocketcasts.utils.extensions.padEnd
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
 import dagger.hilt.android.lifecycle.HiltViewModel
-import dagger.hilt.android.qualifiers.ApplicationContext
 import java.io.File
 import java.time.Year
 import kotlinx.coroutines.Job
@@ -53,7 +49,7 @@ class EndOfYearViewModel @AssistedInject constructor(
     private val listServiceManager: ListServiceManager,
     private val sharingClient: StorySharingClient,
     private val analyticsTracker: AnalyticsTracker,
-    @ApplicationContext private val context: Context,
+    private val accessibilityManager: AccessibilityManager,
 ) : ViewModel() {
 
     private companion object {
@@ -90,13 +86,6 @@ class EndOfYearViewModel @AssistedInject constructor(
         }
     }
 
-    // monitor if talkback is enabled
-    private val accessibilityManager = context.getSystemService(Context.ACCESSIBILITY_SERVICE) as? AccessibilityManager?
-    private val talkbackEnabledState = MutableStateFlow(Util.isTalkbackOn(context))
-    private val accessibilityStateChangeListener = AccessibilityStateChangeListener {
-        talkbackEnabledState.value = it
-    }
-
     private val progress = MutableStateFlow(0f)
     private var countDownJob: Job? = null
     private val storyAutoProgressPauseReasons = MutableStateFlow(setOf(StoryProgressPauseReason.ScreenInBackground))
@@ -130,11 +119,11 @@ class EndOfYearViewModel @AssistedInject constructor(
     )
 
     init {
-        accessibilityManager?.addAccessibilityStateChangeListener(accessibilityStateChangeListener)
+        accessibilityManager.startListening()
     }
 
     override fun onCleared() {
-        accessibilityManager?.removeAccessibilityStateChangeListener(accessibilityStateChangeListener)
+        accessibilityManager.stopListening()
         super.onCleared()
     }
 
@@ -169,6 +158,7 @@ class EndOfYearViewModel @AssistedInject constructor(
         subscription: Subscription?,
         topPodcastsLink: String?,
         progress: Float,
+        isTalkBackOn: Boolean,
     ) = when (syncState) {
         SyncState.Syncing -> UiState.Syncing
         SyncState.Failure -> UiState.Failure
@@ -179,7 +169,7 @@ class EndOfYearViewModel @AssistedInject constructor(
                 stories = stories,
                 isPaidAccount = subscription != null,
                 storyProgress = progress,
-                isTalkbackOn = isTalkbackOn,
+                isTalkBackOn = isTalkBackOn,
             )
         }
         else -> {
@@ -242,7 +232,7 @@ class EndOfYearViewModel @AssistedInject constructor(
             countDownJob?.cancelAndJoin()
             progress.value = 0f
             val previewDuration = story.previewDuration
-            val talkbackOff = !talkbackEnabledState.value
+            val talkbackOff = !accessibilityManager.isTalkBackOnFlow.value
             if (previewDuration != null && talkbackOff) {
                 val progressDelay = previewDuration / 100
                 countDownJob = launch {
@@ -441,6 +431,7 @@ internal sealed interface UiState {
         val stories: List<Story>,
         val isPaidAccount: Boolean,
         override val storyProgress: Float,
+        val isTalkBackOn: Boolean,
     ) : UiState
 }
 

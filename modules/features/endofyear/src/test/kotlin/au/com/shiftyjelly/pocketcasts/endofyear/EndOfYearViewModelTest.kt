@@ -33,6 +33,7 @@ import au.com.shiftyjelly.pocketcasts.servers.list.PodcastList
 import au.com.shiftyjelly.pocketcasts.sharedtest.MainCoroutineRule
 import au.com.shiftyjelly.pocketcasts.sharing.SharingRequest
 import au.com.shiftyjelly.pocketcasts.sharing.SharingResponse
+import au.com.shiftyjelly.pocketcasts.utils.accessibility.AccessibilityManager
 import java.time.Instant
 import java.time.Year
 import java.util.Date
@@ -42,6 +43,7 @@ import kotlin.time.Duration.Companion.minutes
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.test.runTest
 import org.junit.Before
@@ -121,6 +123,7 @@ class EndOfYearViewModelTest {
             listServiceManager = listServiceManager,
             sharingClient = FakeSharingClient(),
             analyticsTracker = AnalyticsTracker.test(),
+            accessibilityManager = FakeAccessibilityManager(isTalkBackEnabled = false),
         )
     }
 
@@ -709,5 +712,13 @@ class EndOfYearViewModelTest {
                 error = null,
             )
         }
+    }
+
+    private class FakeAccessibilityManager(isTalkBackEnabled: Boolean) : AccessibilityManager {
+        override val isTalkBackOnFlow: StateFlow<Boolean>
+            get() = MutableStateFlow(false)
+
+        override fun startListening() {}
+        override fun stopListening() {}
     }
 }

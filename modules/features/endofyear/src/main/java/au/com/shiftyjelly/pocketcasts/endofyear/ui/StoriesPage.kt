@@ -138,7 +138,7 @@ internal fun StoriesPage(
             progress = state.storyProgress,
             color = (state as? UiState.Synced)?.stories?.get(pagerState.currentPage)?.controlsColor ?: Color.White,
             measurements = measurements,
-            isTalkbackOn = (state as? UiState.Synced)?.isTalkbackOn ?: false,
+            isTalkbackOn = (state as? UiState.Synced)?.isTalkBackOn ?: false,
             onClose = onClose,
             onPreviousStory = { onChangeStory(false) },
             onNextStory = { onChangeStory(true) },
