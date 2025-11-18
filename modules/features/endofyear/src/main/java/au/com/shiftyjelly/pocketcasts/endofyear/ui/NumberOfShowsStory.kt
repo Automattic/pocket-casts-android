@@ -69,7 +69,7 @@ internal fun NumberOfShowsStory(
             text = stringResource(
                 LR.string.end_of_year_story_listened_to_numbers,
                 story.showCount,
-                story.epsiodeCount,
+                story.episodeCount,
             ),
             fontSize = 25.sp,
             lineHeight = 30.sp,
