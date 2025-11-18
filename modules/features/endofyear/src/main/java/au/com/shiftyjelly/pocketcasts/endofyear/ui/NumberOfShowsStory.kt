@@ -18,7 +18,6 @@ import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.graphicsLayer
-import androidx.compose.ui.zIndex
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalInspectionMode
 import androidx.compose.ui.res.colorResource
@@ -103,6 +102,7 @@ internal fun NumberOfShowsStory(
             coverSize = 260.dp,
             modifier = Modifier.align(alignment = Alignment.Center),
         )
+
         ShareStoryButton(
             modifier = Modifier
                 .padding(bottom = 18.dp)
@@ -119,6 +119,8 @@ private fun PodcastCoverCarousel(
     podcastIds: List<String>,
     coverSize: Dp,
     modifier: Modifier = Modifier,
+    peekFraction: Float = .1f,
+    peekingItems: Int = 3,
 ) {
     val pagerState = rememberPagerState(
         initialPage = Int.MAX_VALUE / 2,
@@ -133,31 +135,24 @@ private fun PodcastCoverCarousel(
     }
 
     Box(
-        modifier = modifier,
+        modifier = modifier.height(coverSize + coverSize * peekFraction * peekingItems * 2),
         contentAlignment = Alignment.Center,
     ) {
         VerticalPager(
             state = pagerState,
-            beyondViewportPageCount = 3,
+            beyondViewportPageCount = peekingItems,
             userScrollEnabled = false,
             pageSize = PageSize.Fixed(coverSize),
-            pageSpacing = (-coverSize * 0.9f),
-            contentPadding = PaddingValues(vertical = coverSize * 0.75f),
+            pageSpacing = -coverSize * (1f - peekFraction),
+            contentPadding = PaddingValues(vertical = coverSize * peekFraction * peekingItems),
         ) { page ->
             val podcastId = podcastIds[page % podcastIds.size]
 
             val relativePosition = (page - pagerState.currentPage) - pagerState.currentPageOffsetFraction
             val pageOffset = relativePosition.absoluteValue
 
-            if (pageOffset <= 3f) {
-                val scale = when {
-                    pageOffset < 1f -> 1f - (pageOffset * 0.05f)
-                    pageOffset < 2f -> 0.95f - ((pageOffset - 1f) * 0.05f)
-                    pageOffset < 3f -> 0.9f - ((pageOffset - 2f) * 0.05f)
-                    else -> 0.85f
-                }
-
-                val translationX = pageOffset * 5f
+            if (pageOffset <= peekingItems) {
+                val scale = 1f - (pageOffset * 0.05f).coerceAtMost(0.15f)
 
                 PodcastImage(
                     uuid = podcastId,
@@ -167,7 +162,8 @@ private fun PodcastCoverCarousel(
                         .graphicsLayer {
                             scaleX = scale
                             scaleY = scale
-                            this.translationX = translationX
+                            translationX = pageOffset * 5f
+                            shadowElevation = (1f - pageOffset.coerceAtMost(1f)) * 16f
                         }
                         .zIndex(1f - pageOffset),
                 )
