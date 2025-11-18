@@ -100,7 +100,8 @@ class EndOfYearViewModel @AssistedInject constructor(
         combine(settings.cachedSubscription.flow, topPodcastsLink, progress) { subscription, link, prog ->
             Triple(subscription, link, prog)
         },
-    ) { (syncState, statsLoaded, gracePeriodExpired), (subscription, topPodcasts, progress) ->
+        accessibilityManager.isTalkBackOnFlow,
+    ) { (syncState, statsLoaded, gracePeriodExpired), (subscription, topPodcasts, progress), isTalkBackOn ->
         createUiModel(
             syncState = syncState,
             statsLoaded = statsLoaded,
@@ -108,6 +109,7 @@ class EndOfYearViewModel @AssistedInject constructor(
             subscription = subscription,
             topPodcastsLink = topPodcasts,
             progress = progress,
+            isTalkBackOn = isTalkBackOn,
         )
     }.stateIn(
         viewModelScope,
@@ -159,10 +161,9 @@ class EndOfYearViewModel @AssistedInject constructor(
         topPodcastsLink: String?,
         progress: Float,
         isTalkBackOn: Boolean,
-    ) = when (syncState) {
-        SyncState.Syncing -> UiState.Syncing
-        SyncState.Failure -> UiState.Failure
-        SyncState.Synced -> {
+    ) = when {
+        syncState is SyncState.Failure -> UiState.Failure
+        statsLoaded && coverStoryGracePeriodExpired -> {
             val (stats, randomShowIds) = eoyStatsAction.run(year, viewModelScope).await()
             val stories = createStories(stats, randomShowIds, subscription, topPodcastsLink)
             UiState.Synced(
@@ -176,7 +177,6 @@ class EndOfYearViewModel @AssistedInject constructor(
             UiState.Syncing(stories = placeholderStories, storyProgress = progress)
         }
     }
-
     private fun createStories(
         stats: EndOfYearStats,
         randomShowIds: RandomShowIds?,
