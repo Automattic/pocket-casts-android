@@ -586,6 +586,7 @@ abstract class PlaylistDao {
             OR podcast.clean_title LIKE '%' || :searchTerm || '%' ESCAPE '\'
             OR podcast_episode.cleanTitle LIKE '%' || :searchTerm || '%' ESCAPE '\'
           )
+          OR manual_episode.episode_uuid IS :forcedEpisodeUuid
         ORDER BY
           -- newest to oldest
           CASE WHEN playlist.sortId IS 0 THEN IFNULL(podcast_episode.published_date, manual_episode.published_at) END DESC,
@@ -607,12 +608,14 @@ abstract class PlaylistDao {
     internal abstract fun manualEpisodesRawFlow(
         playlistUuid: String,
         searchTerm: String,
+        forcedEpisodeUuid: String?,
     ): Flow<List<RawManualEpisode>>
 
     fun manualEpisodesFlow(
         playlistUuid: String,
-        searchTerm: String,
-    ) = manualEpisodesRawFlow(playlistUuid, searchTerm.escapeLike('\\')).map { rawEpisodes ->
+        searchTerm: String = "",
+        forcedEpisodeUuid: String? = null,
+    ) = manualEpisodesRawFlow(playlistUuid, searchTerm.escapeLike('\\'), forcedEpisodeUuid).map { rawEpisodes ->
         rawEpisodes.map(RawManualEpisode::toEpisode)
     }
 
@@ -643,12 +646,18 @@ abstract class PlaylistDao {
         sortType: PlaylistEpisodeSortType,
         limit: Int,
         searchTerm: String? = null,
+        forcedEpisodeUuid: String? = null,
     ): Flow<List<PlaylistEpisode.Available>> {
         val escapedTerm = searchTerm?.takeIf(String::isNotBlank)?.escapeLike('\\')
         val query = createSmartPlaylistEpisodeQuery(
             selectClause = "episode.*",
             whereClause = buildString {
                 append(smartRules.toSqlWhereClause(clock))
+                if (forcedEpisodeUuid != null) {
+                    append(" OR (")
+                    append("episode.uuid = '$forcedEpisodeUuid'")
+                    append(')')
+                }
                 if (escapedTerm != null) {
                     append(" AND (")
                     append("episode.cleanTitle LIKE '%' || '$escapedTerm' || '%' ESCAPE '\\'")

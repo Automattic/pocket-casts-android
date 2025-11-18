@@ -5,7 +5,6 @@ import au.com.shiftyjelly.pocketcasts.models.entity.BaseEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.UserEpisode
-import au.com.shiftyjelly.pocketcasts.models.to.PlaylistEpisode
 import au.com.shiftyjelly.pocketcasts.models.to.PodcastGrouping
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodePlayingStatus
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodeStatusEnum
@@ -38,9 +37,10 @@ class AutoPlaySelector @Inject constructor(
                 if (podcast != null) {
                     findPodcastEpisodes(podcast, currentEpisodeUuid)
                 } else {
-                    findPlaylistEpisodes(source.uuid)
+                    findPlaylistEpisodes(source.uuid, currentEpisodeUuid)
                 }
             }
+
             AutoPlaySource.Predefined.Downloads -> findDownloadedEpisodes()
             AutoPlaySource.Predefined.Files -> findUserEpisodes()
             AutoPlaySource.Predefined.Starred -> findStarredEpisodes()
@@ -62,7 +62,7 @@ class AutoPlaySelector @Inject constructor(
     ): List<PodcastEpisode> {
         val episodes = episodeManager
             .findEpisodesByPodcastOrderedSuspend(podcast)
-            .filter { episode -> !episode.isArchived || episode.uuid == currentEpisodeUuid  }
+            .filter { episode -> !episode.isArchived || episode.uuid == currentEpisodeUuid }
 
         return withContext(Dispatchers.Default) {
             val modifiedEpisodes = when (podcast.grouping) {
@@ -91,16 +91,13 @@ class AutoPlaySelector @Inject constructor(
         }
     }
 
-    private suspend fun findPlaylistEpisodes(playlistUuid: String): List<PodcastEpisode> {
-        val smartPlaylist = playlistManager.smartPlaylistFlow(playlistUuid).first()
-        val playlist = smartPlaylist ?: playlistManager.manualPlaylistFlow(playlistUuid).first()
-
-        return withContext(Dispatchers.Default) {
-            playlist?.episodes
-                ?.mapNotNull(PlaylistEpisode::toPodcastEpisode)
-                ?.filterNot(PodcastEpisode::isArchived)
-                .orEmpty()
-        }
+    private suspend fun findPlaylistEpisodes(
+        playlistUuid: String,
+        currentEpisodeUuid: String?,
+    ): List<PodcastEpisode> {
+        return playlistManager
+            .getAutoPlayEpisodes(playlistUuid, currentEpisodeUuid)
+            .filter { episode -> !episode.isArchived || episode.uuid == currentEpisodeUuid }
     }
 
     private suspend fun findDownloadedEpisodes(): List<PodcastEpisode> {

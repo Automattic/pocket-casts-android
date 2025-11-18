@@ -569,4 +569,54 @@ class PlaylistManagerSmartTest {
 
         expectRearrangeTooltipSet()
     }
+
+    @Test
+    fun getAutoPlayEpisodes() = dsl.test {
+        insertSmartPlaylist(index = 0)
+        insertPodcast(index = 0)
+        repeat(3) { index ->
+            insertPodcastEpisode(index = index, podcastIndex = 0)
+        }
+
+        assertEquals(
+            listOf(
+                podcastEpisode(index = 0, podcastIndex = 0),
+                podcastEpisode(index = 1, podcastIndex = 0),
+                podcastEpisode(index = 2, podcastIndex = 0),
+            ),
+            manager.getAutoPlayEpisodes("playlist-id-0", currentEpisodeUuid = null),
+        )
+
+        manager.updateSortType("playlist-id-0", PlaylistEpisodeSortType.OldestToNewest)
+        assertEquals(
+            listOf(
+                podcastEpisode(index = 2, podcastIndex = 0),
+                podcastEpisode(index = 1, podcastIndex = 0),
+                podcastEpisode(index = 0, podcastIndex = 0),
+            ),
+            manager.getAutoPlayEpisodes("playlist-id-0", currentEpisodeUuid = null),
+        )
+
+        updatePodcastEpisode(podcastEpisode(index = 1, podcastIndex = 0) { it.copy(isArchived = true) })
+
+        // Archived episodes are ignored for auto play.
+        assertEquals(
+            listOf(
+                podcastEpisode(index = 2, podcastIndex = 0),
+                podcastEpisode(index = 0, podcastIndex = 0),
+            ),
+            manager.getAutoPlayEpisodes("playlist-id-0", currentEpisodeUuid = null),
+        )
+
+        // Make sure that current episode is added even if it is ignore to correctly determine the next episode.
+        // Current episode is filtered out during auto play selection process.
+        assertEquals(
+            listOf(
+                podcastEpisode(index = 2, podcastIndex = 0),
+                podcastEpisode(index = 1, podcastIndex = 0) { it.copy(isArchived = true) },
+                podcastEpisode(index = 0, podcastIndex = 0),
+            ),
+            manager.getAutoPlayEpisodes("playlist-id-0", currentEpisodeUuid = "episode-id-1"),
+        )
+    }
 }

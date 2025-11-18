@@ -8,7 +8,6 @@ import au.com.shiftyjelly.pocketcasts.models.to.PlaylistEpisodeMetadata
 import au.com.shiftyjelly.pocketcasts.models.to.PlaylistPreviewForEpisode
 import au.com.shiftyjelly.pocketcasts.models.type.SmartRules
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import au.com.shiftyjelly.pocketcasts.models.type.PlaylistEpisodeSortType as SortType
 
@@ -16,7 +15,9 @@ interface PlaylistManager {
     // <editor-fold desc="Generic playlists">
     fun playlistPreviewsFlow(): Flow<List<PlaylistPreview>>
 
-    suspend fun findPlaylistPreview(uuid: String): PlaylistPreview?
+    suspend fun findPlaylistPreview(playlistUuid: String): PlaylistPreview?
+
+    suspend fun getAutoPlayEpisodes(playlistUuid: String, currentEpisodeUuid: String?): List<PodcastEpisode>
 
     fun getArtworkUuidsFlow(playlistUuid: String): StateFlow<List<String>?>
 
