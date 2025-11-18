@@ -337,7 +337,7 @@ internal fun BoxScope.TopControls(
 }
 
 @Composable
-fun TopControlButton(
+private fun TopControlButton(
     painter: Painter,
     contentDescription: String,
     color: Color,

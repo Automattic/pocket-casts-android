@@ -1,7 +1,6 @@
 package au.com.shiftyjelly.pocketcasts.utils.accessibility
 
 import android.content.Context
-import android.view.accessibility.AccessibilityManager.AccessibilityStateChangeListener
 import au.com.shiftyjelly.pocketcasts.utils.Util
 import dagger.hilt.android.qualifiers.ApplicationContext
 import javax.inject.Inject
@@ -23,16 +22,16 @@ class AccessibilityManagerImpl @Inject constructor(
     private val _isTalkBackOnFlow = MutableStateFlow(false)
     override val isTalkBackOnFlow: StateFlow<Boolean> = _isTalkBackOnFlow.asStateFlow()
 
-    private val accessibilityStateChangeListener = AccessibilityStateChangeListener {
-        _isTalkBackOnFlow.value = it
+    private val touchExplorationStateChangeListener = AndroidAccessibilityManager.TouchExplorationStateChangeListener { enabled ->
+        _isTalkBackOnFlow.value = enabled
     }
 
     override fun startListening() {
         _isTalkBackOnFlow.value = Util.isTalkbackOn(context)
-        accessibilityManager?.addAccessibilityStateChangeListener(accessibilityStateChangeListener)
+        accessibilityManager?.addTouchExplorationStateChangeListener(touchExplorationStateChangeListener)
     }
 
     override fun stopListening() {
-        accessibilityManager?.removeAccessibilityStateChangeListener(accessibilityStateChangeListener)
+        accessibilityManager?.removeTouchExplorationStateChangeListener(touchExplorationStateChangeListener)
     }
 }
