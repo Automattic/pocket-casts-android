@@ -2105,8 +2105,6 @@
     <string name="end_of_year_story_top_categories_share_text">My most listened to podcast categories</string>
     <!-- Description to why the user needs to create an account to see their end of year stats. -->
     <string name="end_of_year_create_account_to_see">Save your podcasts in the cloud, get your end of year review and sync your progress with other devices.</string>
-    <!-- When loading the End of Year stats stories fails. -->
-    <string name="end_of_year_stories_failed">Unable to load your end of year stories, check your internet connection.</string>
     <!--Title of the story when this year's listening time is bigger than previous year. %1$s is the year, %2$s% is the percentage -->
     <string name="end_of_year_stories_year_over_year_title_went_up">Compared to %1$s, your listening time skyrocketed&#160;%2$s%%</string>
     <!--Title of the story when this year's listening time is bigger than previous year by more than 500%. -->
@@ -2163,6 +2161,7 @@
     <!-- Text that appear when someone share the ratings story to Twitter. %1$d is a number of rated shows, %2$d is the year, and %3$d is the most used rating (from 1 to 5) -->
     <string name="end_of_year_story_ratings_share_text">I rated %1$d different podcasts in %2$d, with %3$d as my most used rating</string>
     <string name="end_of_year_cant_share_message">This story can\'t be shared</string>
+    <string name="end_of_year_failed_to_load_message">Sorry, we couldn\'t load Playback</string>
 
     <!-- Onboarding -->
 

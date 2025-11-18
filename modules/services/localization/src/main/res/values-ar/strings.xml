@@ -933,7 +933,6 @@ Language: ar
     <string name="onboarding_welcome_recommendations_text">اعثر على حلقات البودكاست غير الملاحظة والرائجة في صفحة الاكتشاف المنسقة لدينا.</string>
     <string name="onboarding_welcome_recommendations_button">العثور على حلقة البودكاست التالية الخاصة بي</string>
     <string name="onboarding_plus_recurring_after_free_trial">ستبدأ المدفوعات المتكررة بعد ⁦%1$s⁩ الخاص بك⁦%2$s⁩</string>
-    <string name="end_of_year_stories_failed">يتعذر تحميل قصص نهاية العالم، تحقق من اتصالك بالإنترنت.</string>
     <string name="not_now">ليس الآن</string>
     <string name="onboarding_recommendations_find_favorite_podcasts">العثور على حلقات البودكاست التي أفضّلها</string>
     <string name="onboarding_recommendations_make_pocket_casts_yours">اجعل Pocket Casts خاصًا بك من خلال تحديد حلقات البودكاست التي تفضلها أو قم باستيرادها من مشغل حلقة بودكاست أخرى. يمكنك دومًا القيام بذلك لاحقًا.</string>

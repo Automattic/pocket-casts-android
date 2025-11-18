@@ -933,7 +933,6 @@ Language: zh_TW
     <string name="onboarding_plus_terms_and_conditions">條款與細則</string>
     <string name="onboarding_welcome_recommendations_text">在我們精心策劃的「探索」頁面中尋找還不出名與正在快速竄升的 Podcast。</string>
     <string name="onboarding_plus_recurring_after_free_trial">定期付款將在%1$s後開始 (%2$s)</string>
-    <string name="end_of_year_stories_failed">無法載入你的年度回顧，請檢查網際網路連線</string>
     <string name="onboarding_plus_feature_themes_icons_title">佈景主題和圖示</string>
     <string name="onboarding_plus_feature_cloud_storage_text">將你的檔案上傳至雲端儲存空間，隨時隨地使用。</string>
     <string name="onboarding_plus_feature_folders_title">資料夾</string>

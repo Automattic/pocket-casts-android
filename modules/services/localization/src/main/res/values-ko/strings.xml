@@ -933,7 +933,6 @@ Language: ko_KR
     <string name="onboarding_welcome_recommendations_button">내 다음 팟캐스트 찾기</string>
     <string name="onboarding_plus_start_free_trial_and_subscribe">무료 평가판 시작 및 구독</string>
     <string name="onboarding_plus_recurring_after_free_trial">%1$s(%2$s) 이후 반복 결제 시작 예정</string>
-    <string name="end_of_year_stories_failed">연말 스토리를 로드할 수 없습니다. 인터넷 연결을 확인하세요.</string>
     <string name="onboarding_plus_feature_themes_icons_text">트루 컬러를 이용하세요. Plus 클럽 전용 아이콘과 테마입니다.</string>
     <string name="onboarding_plus_feature_themes_icons_title">테마 및 아이콘</string>
     <string name="onboarding_plus_feature_cloud_storage_text">파일을 클라우드 저장 공간으로 업로드하고 어디에서나 사용할 수 있습니다.</string>

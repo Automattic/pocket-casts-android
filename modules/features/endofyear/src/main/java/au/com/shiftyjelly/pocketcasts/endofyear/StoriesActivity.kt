@@ -1,17 +1,19 @@
 package au.com.shiftyjelly.pocketcasts.endofyear
 
 import android.app.Activity
+import android.content.Context
 import android.content.Intent
 import android.graphics.Color
 import android.os.Bundle
+import android.os.Parcelable
 import android.view.WindowManager
 import androidx.activity.ComponentActivity
 import androidx.activity.SystemBarStyle
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.ActivityResultLauncher
+import androidx.activity.result.contract.ActivityResultContract
 import androidx.activity.viewModels
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.WindowInsets
@@ -58,6 +60,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
+import kotlinx.parcelize.Parcelize
 import timber.log.Timber
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
@@ -83,20 +86,24 @@ class StoriesActivity : ComponentActivity() {
         },
     )
 
-    @Inject lateinit var settings: Settings
+    @Inject
+    lateinit var settings: Settings
 
     private val onboardingLauncher: ActivityResultLauncher<Intent> = registerForActivityResult(OnboardingActivityContract()) { result ->
         when (result) {
             is OnboardingFinish.Done, is OnboardingFinish.DoneGoToDiscover -> {
                 settings.setHasDoneInitialOnboarding()
             }
+
             is OnboardingFinish.DoneShowPlusPromotion -> {
                 settings.setHasDoneInitialOnboarding()
                 OnboardingLauncher.openOnboardingFlow(this, OnboardingFlow.Upsell(OnboardingUpgradeSource.LOGIN_PLUS_PROMOTION))
             }
+
             is OnboardingFinish.DoneShowWelcomeInReferralFlow -> {
                 settings.showReferralWelcome.set(true, updateModifiedAt = false)
             }
+
             is OnboardingFinish.DoneApplySuggestedFolders, null -> {
                 Timber.e("Unexpected result $result from onboarding activity")
             }
@@ -141,7 +148,7 @@ class StoriesActivity : ComponentActivity() {
         }
         val scope = rememberCoroutineScope()
         val state by viewModel.uiState.collectAsState()
-        val pagerState = rememberPagerState(pageCount = { (state as? UiState.Synced)?.stories?.size ?: 0 })
+        val pagerState = rememberPagerState(pageCount = { state.storyCount })
         val storyChanger = remember(pagerState, scope) {
             StoryChanger(pagerState, viewModel, scope)
         }
@@ -151,11 +158,7 @@ class StoriesActivity : ComponentActivity() {
         Box(
             contentAlignment = Alignment.Center,
             modifier = Modifier
-                .fillMaxSize()
-                .clickable {
-                    viewModel.trackStoriesClosed("tapped_outside")
-                    finish()
-                },
+                .fillMaxSize(),
         ) {
             StoriesPage(
                 state = state,
@@ -169,9 +172,12 @@ class StoriesActivity : ComponentActivity() {
                 onLearnAboutRatings = ::openRatingsInfo,
                 onClickUpsell = ::startUpsellFlow,
                 onRestartPlayback = storyChanger::reset,
-                onRetry = viewModel::syncData,
                 onClose = {
                     viewModel.trackStoriesClosed("close_button")
+                    finish()
+                },
+                onFailedToLoad = {
+                    setResult(0, StoriesActivityContract.setResult(source))
                     finish()
                 },
             )
@@ -202,7 +208,7 @@ class StoriesActivity : ComponentActivity() {
 
         LaunchedEffect(Unit) {
             viewModel.switchStory.collect {
-                val stories = (state as? UiState.Synced)?.stories.orEmpty()
+                val stories = (state as? UiState.Synced)?.stories ?: (state as? UiState.Syncing)?.stories.orEmpty()
                 if (stories.getOrNull(pagerState.currentPage) is Story.Ending) {
                     viewModel.trackStoriesAutoFinished()
                     finish()
@@ -213,7 +219,7 @@ class StoriesActivity : ComponentActivity() {
         }
 
         LaunchedEffect(state::class) {
-            if (state is UiState.Synced) {
+            if (state is UiState.Synced || state is UiState.Syncing) {
                 // Track displayed page to not report it twice from different events.
                 // This can happen, for example, after the first launch.
                 // Both currentPage and pageCount trigger an event when the pager is set up.
@@ -221,7 +227,7 @@ class StoriesActivity : ComponentActivity() {
                 // Inform VM about a story changed due to explicit changes of the current page.
                 launch {
                     snapshotFlow { pagerState.currentPage }.collect { index ->
-                        val stories = (state as? UiState.Synced)?.stories
+                        val stories = (state as? UiState.Synced)?.stories ?: (state as? UiState.Syncing)?.stories
                         val newStory = stories?.getOrNull(index)
                         if (newStory != null && lastStory != newStory) {
                             lastStory = newStory
@@ -230,10 +236,10 @@ class StoriesActivity : ComponentActivity() {
                     }
                 }
                 // Inform VM about a story changed due to a change in the stories list
-                // This happens when a user sucessfully upgrades their account.
+                // This happens when a user successfully upgrades their account.
                 launch {
                     snapshotFlow { pagerState.pageCount }.collect {
-                        val stories = (state as? UiState.Synced)?.stories
+                        val stories = (state as? UiState.Synced)?.stories ?: (state as? UiState.Syncing)?.stories
                         val newStory = stories?.getOrNull(pagerState.currentPage)
                         if (newStory != null && lastStory != newStory) {
                             lastStory = newStory
@@ -248,7 +254,7 @@ class StoriesActivity : ComponentActivity() {
             screenshotDetectedFlow.collectLatest {
                 val stories = (state as? UiState.Synced)?.stories
                 val currentStory = stories?.getOrNull(pagerState.currentPage)
-                if (currentStory?.isShareble == true) {
+                if (currentStory?.isShareable == true) {
                     viewModel.pauseStoryAutoProgress(StoryProgressPauseReason.ScreenshotDialog)
                     showScreenshotDialog = true
                 }
@@ -317,10 +323,41 @@ class StoriesActivity : ComponentActivity() {
     companion object {
         private const val ARG_SOURCE = "source"
 
+        fun intent(activity: Activity, source: StoriesSource) = Intent(activity, StoriesActivity::class.java)
+            .putExtra(ARG_SOURCE, source)
+
         fun open(activity: Activity, source: StoriesSource) {
-            val intent = Intent(activity, StoriesActivity::class.java)
-                .putExtra(ARG_SOURCE, source)
+            val intent = intent(activity, source)
             activity.startActivity(intent)
+        }
+    }
+
+    class StoriesActivityContract : ActivityResultContract<Intent, StoriesActivityContract.Result>() {
+
+        sealed class Result : Parcelable {
+            @Parcelize
+            data class Failure(val source: StoriesSource?) : Result()
+
+            @Parcelize
+            data object Success : Result()
+        }
+
+        companion object {
+            private const val EXTRA_SOURCE = "stories_source"
+
+            fun setResult(source: StoriesSource) = Intent().apply {
+                putExtra(EXTRA_SOURCE, source)
+            }
+        }
+
+        override fun createIntent(context: Context, input: Intent) = input
+
+        override fun parseResult(resultCode: Int, intent: Intent?): Result {
+            return if (intent == null || resultCode == RESULT_OK) {
+                Result.Success
+            } else {
+                Result.Failure(source = IntentCompat.getParcelableExtra(intent, EXTRA_SOURCE, StoriesSource::class.java))
+            }
         }
     }
 }

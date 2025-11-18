@@ -933,7 +933,6 @@ Language: sv_SE
     <string name="onboarding_log_in">Logga in</string>
     <string name="plus_trial_duration_free_trial">%s gratis provperiod</string>
     <string name="onboarding_plus_recurring_after_free_trial">Återkommande betalningar börjar efter din %1$s (%2$s)</string>
-    <string name="end_of_year_stories_failed">Det gick inte att ladda dina årsslutsberättelser. Kontrollera din anslutning.</string>
     <string name="onboarding_plus_feature_themes_icons_text">Välj dina egna färger. Exklusiva ikoner och teman för Plus-medlemmar.</string>
     <string name="onboarding_plus_feature_themes_icons_title">Teman och ikoner</string>
     <string name="onboarding_plus_feature_cloud_storage_text">Ladda upp dina filer till molnlagringen och ha dem tillgängliga överallt.</string>

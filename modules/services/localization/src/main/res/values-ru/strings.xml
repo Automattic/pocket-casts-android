@@ -934,7 +934,6 @@ Language: ru
     <string name="onboarding_log_in">Войти</string>
     <string name="plus_trial_duration_free_trial">Бесплатный пробный период %s</string>
     <string name="onboarding_plus_recurring_after_free_trial">Регулярные платежи начнутся после %1$s (%2$s)</string>
-    <string name="end_of_year_stories_failed">Не удаётся загрузить итоги года, проверьте подключение к Интернету</string>
     <string name="onboarding_plus_feature_themes_icons_text">Покажите себя во всей красе. Эксклюзивные темы и значки только для членов клуба Plus.</string>
     <string name="onboarding_plus_feature_themes_icons_title">Темы и значки</string>
     <string name="onboarding_plus_feature_cloud_storage_text">Загрузите файлы в облачное хранилище и пользуйтесь ими, где бы вы ни находились.</string>

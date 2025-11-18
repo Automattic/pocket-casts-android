@@ -61,6 +61,7 @@ internal val Story.backgroundColor
         is Story.YearVsYear -> Color(0xFFA22828)
         is Story.CompletionRate -> Color(0xFF27486A)
         is Story.Ending -> Color(0xFF27486A)
+        is Story.PlaceholderWhileLoading -> Color(0xFF27486A)
     }
 internal val Story.controlsColor
     get() = when (this) {

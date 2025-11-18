@@ -468,7 +468,7 @@ class SharingAnalyticsTest {
     fun `log number of shows story sharing`() {
         val story = Story.NumberOfShows(
             showCount = 100,
-            epsiodeCount = 200,
+            episodeCount = 200,
             topShowIds = emptyList(),
             bottomShowIds = emptyList(),
         )
