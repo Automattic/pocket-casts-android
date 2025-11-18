@@ -19,7 +19,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.rememberNestedScrollInteropConnection
-import androidx.compose.ui.res.stringResource
 import androidx.core.os.bundleOf
 import androidx.fragment.app.viewModels
 import androidx.fragment.compose.content
@@ -45,6 +44,8 @@ import au.com.shiftyjelly.pocketcasts.localization.R as LR
 @AndroidEntryPoint
 internal class AddToPlaylistFragment : BaseDialogFragment() {
     private val args get() = requireArguments().requireParcelable<Args>(NEW_INSTANCE_ARGS)
+
+    private var isDoneTapped = false
 
     private val viewModel by viewModels<AddToPlaylistViewModel>(
         extrasProducer = {
@@ -117,7 +118,11 @@ internal class AddToPlaylistFragment : BaseDialogFragment() {
                     onClickContinueWithNewPlaylist = {
                         viewModel.trackNewPlaylistTapped()
                     },
-                    onClickDoneButton = ::dismiss,
+                    onClickDoneButton = {
+                        isDoneTapped = true
+                        viewModel.commitPlaylistChanges()
+                        dismiss()
+                    },
                     onClickNavigationButton = {
                         if (!navController.popBackStack()) {
                             dismiss()
@@ -138,7 +143,7 @@ internal class AddToPlaylistFragment : BaseDialogFragment() {
 
     override fun onDismiss(dialog: DialogInterface) {
         super.onDismiss(dialog)
-        if (!requireActivity().isChangingConfigurations) {
+        if (!requireActivity().isChangingConfigurations && isDoneTapped) {
             showDoneSnackbar(viewModel.getPlaylistsAddedTo())
         }
     }
