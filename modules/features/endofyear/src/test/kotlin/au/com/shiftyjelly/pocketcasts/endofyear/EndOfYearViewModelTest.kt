@@ -714,9 +714,9 @@ class EndOfYearViewModelTest {
         }
     }
 
-    private class FakeAccessibilityManager(isTalkBackEnabled: Boolean) : AccessibilityManager {
+    private class FakeAccessibilityManager(val isTalkBackEnabled: Boolean) : AccessibilityManager {
         override val isTalkBackOnFlow: StateFlow<Boolean>
-            get() = MutableStateFlow(false)
+            get() = MutableStateFlow(isTalkBackEnabled)
 
         override fun startListening() {}
         override fun stopListening() {}
