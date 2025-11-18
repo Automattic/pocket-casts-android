@@ -82,7 +82,7 @@ internal fun NumberOfShowsStory(
                     24.dp
                 } else {
                     42.dp
-                }
+                },
             ),
         )
 
