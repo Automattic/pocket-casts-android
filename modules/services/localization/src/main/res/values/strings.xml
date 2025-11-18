@@ -1057,14 +1057,11 @@
     <string name="smart_rule_starred_label">Starred episodes</string>
     <string name="smart_rules">Smart rules</string>
     <string name="smart_rules_description">Set up smart rules to automatically add episodes to your smart playlist.</string>
-    <string name="up_next_as_playlist_body">Your current Up Next will be replaced when you play this playlist. Save it first to keep it.</string>
-    <string name="up_next_as_playlist_button_primary">Save current queue</string>
     <string name="up_next_as_playlist_button_secondary">Replace and play</string>
-    <string name="up_next_as_playlist_title">Save your Up Next queue?</string>
-    <string name="up_next_as_playlist_replace_body">This will clear your current Up Next queue and start playing this playlist.</string>
+    <string name="up_next_as_playlist_replace_body">Playing this will replace your current Up Next.</string>
+    <string name="up_next_as_playlist_replace_switch_description">Save your current Up&#160;Next queue as a playlist.</string>
     <string name="up_next_as_playlist_replace_button_primary" translatable="false">@string/up_next_as_playlist_button_secondary</string>
-    <string name="up_next_as_playlist_replace_button_secondary" translatable="false">@string/cancel</string>
-    <string name="up_next_as_playlist_replace_title">Replace current Up Next?</string>
+    <string name="up_next_as_playlist_replace_title">Replace your Up Next?</string>
     <string name="up_next_as_playlist_saved">Up Next saved as a playlist</string>
 
     <!-- Profile -->

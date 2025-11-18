@@ -13,11 +13,7 @@ Language: nl
     <string name="search_suggestions_view_all">Alles weergeven voor \'%1$s\'</string>
     <string name="up_next_as_playlist_saved">Hierna opgeslagen als playlist</string>
     <string name="up_next_as_playlist_replace_title">Huidige Hierna vervangen?</string>
-    <string name="up_next_as_playlist_replace_body">Hierdoor wordt je huidige wachtrij Hierna gewist en wordt deze playlist afgespeeld.</string>
-    <string name="up_next_as_playlist_title">Wachtrij Hierna opslaan?</string>
     <string name="up_next_as_playlist_button_secondary">Vervangen en afspelen</string>
-    <string name="up_next_as_playlist_button_primary">Huidige wachtrij opslaan</string>
-    <string name="up_next_as_playlist_body">Je huidige Hierna wordt vervangen wanneer je deze playlist afspeelt. Sla het eerst op om het te behouden.</string>
     <string name="delete_playlist_confirmation_title">Playlist verwijderen?</string>
     <string name="delete_playlist_confirmation_body">Weet je zeker dat je je playlist wilt verwijderen? Dit kan niet ongedaan worden gemaakt.</string>
     <string name="delete_playlist">Playlist verwijderen</string>

@@ -13,11 +13,7 @@ Language: ja_JP
     <string name="search_suggestions_view_all">「%1$s」のすべてを表示</string>
     <string name="up_next_as_playlist_saved">「次のエピソード」をプレイリストとして保存しました</string>
     <string name="up_next_as_playlist_replace_title">現在の「次のエピソード」を置換しますか ?</string>
-    <string name="up_next_as_playlist_replace_body">これにより、現在の「次のエピソード待機リスト」がクリアされ、このプレイリストの再生が開始します。</string>
-    <string name="up_next_as_playlist_title">「次のエピソード待機リスト」を保存しますか ?</string>
     <string name="up_next_as_playlist_button_secondary">置換して再生</string>
-    <string name="up_next_as_playlist_button_primary">現在の待機リストを保存</string>
-    <string name="up_next_as_playlist_body">このプレイリストを再生すると、現在の「次のエピソード」が置換されます。 保存してキープしておきます。</string>
     <string name="delete_playlist_confirmation_title">プレイリストを削除しますか ?</string>
     <string name="delete_playlist_confirmation_body">プレイリストを削除してもよいですか ? この操作を元に戻すことはできません。</string>
     <string name="delete_playlist">プレイリストを削除</string>
