@@ -2,11 +2,13 @@ package au.com.shiftyjelly.pocketcasts.endofyear.ui
 
 import android.content.Context
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.awaitEachGesture
 import androidx.compose.foundation.gestures.awaitFirstDown
 import androidx.compose.foundation.gestures.waitForUpOrCancellation
 import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
@@ -24,6 +26,7 @@ import androidx.compose.material.Button
 import androidx.compose.material.ButtonDefaults
 import androidx.compose.material.LinearProgressIndicator
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.rounded.ArrowBack
 import androidx.compose.material.icons.automirrored.rounded.ArrowForward
 import androidx.compose.material.ripple
 import androidx.compose.runtime.Composable
@@ -45,12 +48,13 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import au.com.shiftyjelly.pocketcasts.compose.components.PagerProgressingIndicator
+import au.com.shiftyjelly.pocketcasts.compose.components.TextH30
+import au.com.shiftyjelly.pocketcasts.compose.components.TextP40
 import au.com.shiftyjelly.pocketcasts.endofyear.StoryCaptureController
 import au.com.shiftyjelly.pocketcasts.endofyear.UiState
 import au.com.shiftyjelly.pocketcasts.models.to.Story
@@ -134,7 +138,9 @@ internal fun StoriesPage(
             progress = state.storyProgress,
             color = (state as? UiState.Synced)?.stories?.get(pagerState.currentPage)?.controlsColor ?: Color.White,
             measurements = measurements,
+            isTalkbackOn = (state as? UiState.Synced)?.isTalkbackOn ?: false,
             onClose = onClose,
+            onPreviousStory = { onChangeStory(false) },
             onNextStory = { onChangeStory(true) },
             controller = controller,
         )
@@ -271,7 +277,9 @@ internal fun BoxScope.TopControls(
     progress: Float,
     color: Color,
     measurements: EndOfYearMeasurements,
+    isTalkbackOn: Boolean,
     onClose: () -> Unit,
+    onPreviousStory: () -> Unit,
     onNextStory: () -> Unit,
     controller: StoryCaptureController,
 ) {
@@ -279,8 +287,6 @@ internal fun BoxScope.TopControls(
     // Calculate the height so that we can remove it from the share images
     val statusBarHeightPx = measurements.statusBarInsets.getTop(density)
     val extraPaddingPx = with(density) { 24.dp.roundToPx() }
-    val context = LocalContext.current
-    val isTalkbackOn = remember { Util.isTalkbackOn(context) }
 
     Column(
         horizontalAlignment = Alignment.End,
@@ -301,6 +307,15 @@ internal fun BoxScope.TopControls(
             modifier = Modifier.fillMaxWidth(),
         ) {
             if (isTalkbackOn) {
+                if (pagerState.currentPage > 0) {
+                    TopControlButton(
+                        painter = rememberVectorPainter(Icons.AutoMirrored.Rounded.ArrowBack),
+                        contentDescription = stringResource(LR.string.end_of_year_previous_story),
+                        color = color,
+                        onClick = onPreviousStory,
+                        iconPadding = 12.dp,
+                    )
+                }
                 TopControlButton(
                     painter = rememberVectorPainter(Icons.AutoMirrored.Rounded.ArrowForward),
                     contentDescription = stringResource(LR.string.end_of_year_next_story),

@@ -2163,6 +2163,7 @@
     <string name="end_of_year_cant_share_message">This story can\'t be shared</string>
     <string name="end_of_year_failed_to_load_message">Sorry, we couldn\'t load Playback</string>
     <string name="end_of_year_next_story">Next story</string>
+    <string name="end_of_year_previous_story">Previous story</string>
 
     <!-- Onboarding -->
 

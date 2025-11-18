@@ -1,6 +1,8 @@
 package au.com.shiftyjelly.pocketcasts.endofyear
 
 import android.content.Context
+import android.view.accessibility.AccessibilityManager
+import android.view.accessibility.AccessibilityManager.AccessibilityStateChangeListener
 import androidx.compose.runtime.Immutable
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -88,6 +90,13 @@ class EndOfYearViewModel @AssistedInject constructor(
         }
     }
 
+    // monitor if talkback is enabled
+    private val accessibilityManager = context.getSystemService(Context.ACCESSIBILITY_SERVICE) as? AccessibilityManager?
+    private val talkbackEnabledState = MutableStateFlow(Util.isTalkbackOn(context))
+    private val accessibilityStateChangeListener = AccessibilityStateChangeListener {
+        talkbackEnabledState.value = it
+    }
+
     private val progress = MutableStateFlow(0f)
     private var countDownJob: Job? = null
     private val storyAutoProgressPauseReasons = MutableStateFlow(setOf(StoryProgressPauseReason.ScreenInBackground))
@@ -120,6 +129,15 @@ class EndOfYearViewModel @AssistedInject constructor(
         ),
     )
 
+    init {
+        accessibilityManager?.addAccessibilityStateChangeListener(accessibilityStateChangeListener)
+    }
+
+    override fun onCleared() {
+        accessibilityManager?.removeAccessibilityStateChangeListener(accessibilityStateChangeListener)
+        super.onCleared()
+    }
+
     internal fun syncData() {
         viewModelScope.launch {
             syncState.emit(SyncState.Syncing)
@@ -151,15 +169,17 @@ class EndOfYearViewModel @AssistedInject constructor(
         subscription: Subscription?,
         topPodcastsLink: String?,
         progress: Float,
-    ) = when {
-        syncState is SyncState.Failure -> UiState.Failure
-        statsLoaded && coverStoryGracePeriodExpired -> {
+    ) = when (syncState) {
+        SyncState.Syncing -> UiState.Syncing
+        SyncState.Failure -> UiState.Failure
+        SyncState.Synced -> {
             val (stats, randomShowIds) = eoyStatsAction.run(year, viewModelScope).await()
             val stories = createStories(stats, randomShowIds, subscription, topPodcastsLink)
             UiState.Synced(
                 stories = stories,
                 isPaidAccount = subscription != null,
                 storyProgress = progress,
+                isTalkbackOn = isTalkbackOn,
             )
         }
         else -> {
@@ -218,12 +238,12 @@ class EndOfYearViewModel @AssistedInject constructor(
 
     internal fun onStoryChanged(story: Story) {
         trackStoryShown(story)
-        val isTalkbackOn = Util.isTalkbackOn(context)
         viewModelScope.launch {
             countDownJob?.cancelAndJoin()
             progress.value = 0f
             val previewDuration = story.previewDuration
-            if (previewDuration != null && !isTalkbackOn) {
+            val talkbackOff = !talkbackEnabledState.value
+            if (previewDuration != null && talkbackOff) {
                 val progressDelay = previewDuration / 100
                 countDownJob = launch {
                     var currentProgress = 0f
@@ -421,10 +441,7 @@ internal sealed interface UiState {
         val stories: List<Story>,
         val isPaidAccount: Boolean,
         override val storyProgress: Float,
-    ) : UiState {
-        override val storyCount: Int
-            get() = stories.size
-    }
+    ) : UiState
 }
 
 private sealed interface SyncState {
