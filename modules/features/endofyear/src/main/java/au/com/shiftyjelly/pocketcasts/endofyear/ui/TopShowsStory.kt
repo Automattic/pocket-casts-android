@@ -84,6 +84,7 @@ internal fun TopShowsStory(
             text = stringResource(LR.string.eoy_story_top_podcasts_title),
             fontScale = measurements.smallDeviceFactor,
             fontSize = 25.sp,
+            lineHeight = 30.sp,
             disableAutoScale = true,
             modifier = Modifier.padding(horizontal = 24.dp),
             textAlign = TextAlign.Center,

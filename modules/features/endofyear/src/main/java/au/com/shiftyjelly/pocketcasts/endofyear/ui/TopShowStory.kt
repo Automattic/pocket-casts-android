@@ -200,6 +200,7 @@ private fun Header(
             2025,
         ),
         fontSize = 25.sp,
+        lineHeight = 30.sp,
         fontScale = measurements.smallDeviceFactor,
         disableAutoScale = true,
         color = colorResource(UR.color.white),
