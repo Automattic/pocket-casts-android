@@ -105,6 +105,7 @@ private fun PresentRatings(
             fontScale = measurements.smallDeviceFactor,
             disableAutoScale = true,
             fontSize = 25.sp,
+            lineHeight = 30.sp,
             color = colorResource(UR.color.white),
             modifier = Modifier
                 .fillMaxWidth()
@@ -130,23 +131,23 @@ private fun PresentRatings(
             contentAlignment = Alignment.BottomCenter,
             modifier = Modifier
                 .fillMaxWidth()
-                .weight(1f)
-                .drawWithContent {
-                    drawContent()
-                    drawRect(
-                        brush = Brush.verticalGradient(
-                            0f to Color.Transparent,
-                            0.85f to Color.Transparent,
-                            1f to story.backgroundColor,
-                        ),
-                    )
-                },
+                .weight(1f),
         ) {
             RatingBars(
                 stats = story.stats,
                 forceBarsVisible = controller.isSharing,
                 modifier = Modifier
-                    .fillMaxSize(),
+                    .fillMaxSize()
+                    .drawWithContent {
+                        drawContent()
+                        drawRect(
+                            brush = Brush.verticalGradient(
+                                0f to Color.Transparent,
+                                0.85f to Color.Transparent,
+                                1f to story.backgroundColor,
+                            ),
+                        )
+                    },
             )
             ShareStoryButton(
                 story = story,
