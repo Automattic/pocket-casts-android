@@ -59,7 +59,7 @@ internal fun NumberOfShowsStory(
             .capturable(controller.captureController(story))
             .fillMaxSize()
             .background(story.backgroundColor)
-            .padding(top = measurements.closeButtonBottomEdge),
+            .padding(top = measurements.closeButtonBottomEdge + 16.dp),
     ) {
         TextH10(
             text = stringResource(
@@ -73,7 +73,7 @@ internal fun NumberOfShowsStory(
             textAlign = TextAlign.Center,
             fontScale = measurements.smallDeviceFactor,
             color = colorResource(UR.color.white),
-            modifier = Modifier.padding(horizontal = 24.dp),
+            modifier = Modifier.padding(horizontal = 42.dp),
         )
 
         val composition by rememberLottieComposition(
