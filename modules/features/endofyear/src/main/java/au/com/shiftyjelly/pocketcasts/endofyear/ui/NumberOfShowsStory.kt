@@ -116,6 +116,7 @@ internal fun NumberOfShowsStory(
             podcastIds = story.bottomShowIds,
             coverSize = coverSize,
             modifier = Modifier.align(alignment = Alignment.Center),
+            freezeAnimation = controller.isSharing,
         )
 
         ShareStoryButton(
@@ -134,6 +135,7 @@ private fun PodcastCoverCarousel(
     podcastIds: List<String>,
     coverSize: Dp,
     modifier: Modifier = Modifier,
+    freezeAnimation: Boolean = false,
     peekFraction: Float = .1f,
     peekingItems: Int = 3,
 ) {
@@ -142,10 +144,15 @@ private fun PodcastCoverCarousel(
         pageCount = { Int.MAX_VALUE },
     )
 
-    LaunchedEffect(Unit) {
+    val isPreview = LocalInspectionMode.current
+    val freezeAnimation = freezeAnimation || isPreview
+
+    LaunchedEffect(freezeAnimation) {
         while (true) {
             delay(1_000)
-            pagerState.animateScrollToPage(pagerState.currentPage + 1)
+            if (!freezeAnimation) {
+                pagerState.animateScrollToPage(pagerState.currentPage + 1)
+            }
         }
     }
 
