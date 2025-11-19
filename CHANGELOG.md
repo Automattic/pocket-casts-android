@@ -10,6 +10,8 @@
 *   Bug Fixes
     *   Fix an issue where unplayed episodes do not show play button
         ([#4749](https://github.com/Automattic/pocket-casts-android/pull/4749))
+    *   Fix autoplay not starting playback from the current position in the list
+        ([#4755](https://github.com/Automattic/pocket-casts-android/pull/4755))
 
 8.0
 -----
