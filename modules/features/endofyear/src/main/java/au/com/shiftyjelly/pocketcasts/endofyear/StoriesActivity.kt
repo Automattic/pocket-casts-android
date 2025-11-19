@@ -256,6 +256,7 @@ class StoriesActivity : ComponentActivity() {
                 val currentStory = stories?.getOrNull(pagerState.currentPage)
                 if (currentStory?.isShareable == true) {
                     viewModel.pauseStoryAutoProgress(StoryProgressPauseReason.ScreenshotDialog)
+                    viewModel.screenshotDetected(story = currentStory, activity = this@StoriesActivity)
                     showScreenshotDialog = true
                 }
             }
