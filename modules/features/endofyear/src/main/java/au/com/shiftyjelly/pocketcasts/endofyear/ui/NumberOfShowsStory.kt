@@ -46,6 +46,7 @@ import com.airbnb.lottie.compose.rememberLottieComposition
 import dev.shreyaspatil.capturable.capturable
 import java.io.File
 import kotlin.math.absoluteValue
+import kotlin.time.Duration.Companion.milliseconds
 import kotlinx.coroutines.delay
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 import au.com.shiftyjelly.pocketcasts.ui.R as UR
@@ -131,6 +132,10 @@ internal fun NumberOfShowsStory(
     }
 }
 
+private const val PAGE_COUNT = 100
+private val SCROLL_INTERVAL = 700.milliseconds
+private val SCROLL_ANIM_DURATION_MS = 650
+
 @Composable
 private fun PodcastCoverCarousel(
     podcastIds: List<String>,
@@ -141,24 +146,25 @@ private fun PodcastCoverCarousel(
     peekingItems: Int = 3,
 ) {
     val pagerState = rememberPagerState(
-        initialPage = Int.MAX_VALUE / 2,
-        pageCount = { Int.MAX_VALUE },
+        initialPage = PAGE_COUNT / 2,
+        pageCount = { PAGE_COUNT },
     )
 
     val isPreview = LocalInspectionMode.current
     val freezeAnimation = freezeAnimation || isPreview
 
     LaunchedEffect(freezeAnimation) {
+        delay(SCROLL_INTERVAL)
         while (true) {
-            delay(700)
             if (!freezeAnimation) {
                 pagerState.animateScrollToPage(
                     page = pagerState.currentPage + 1,
                     animationSpec = tween(
-                        durationMillis = 650,
+                        durationMillis = SCROLL_ANIM_DURATION_MS,
                         easing = CubicBezierEasing(.9f, 0f, .08f, 1f),
                     ),
                 )
+                delay(SCROLL_INTERVAL)
             }
         }
     }
@@ -175,6 +181,7 @@ private fun PodcastCoverCarousel(
             pageSpacing = -coverSize * (1f - peekFraction) + 8.dp,
             contentPadding = PaddingValues(vertical = coverSize * peekFraction * peekingItems),
         ) { page ->
+            if (podcastIds.isEmpty()) return@VerticalPager
             val podcastId = podcastIds[page % podcastIds.size]
 
             val relativePosition = (page - pagerState.currentPage) - pagerState.currentPageOffsetFraction
