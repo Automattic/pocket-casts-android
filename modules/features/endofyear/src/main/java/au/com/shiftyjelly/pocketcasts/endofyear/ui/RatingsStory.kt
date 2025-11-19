@@ -24,6 +24,7 @@ import androidx.compose.ui.draw.drawWithContent
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalInspectionMode
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.stringResource
@@ -135,35 +136,23 @@ private fun PresentRatings(
                 .padding(horizontal = 24.dp),
             textAlign = TextAlign.Center,
         )
-        Box(
-            contentAlignment = Alignment.BottomCenter,
+        RatingBars(
+            stats = story.stats,
+            forceBarsVisible = controller.isSharing,
             modifier = Modifier
+                .weight(1f)
                 .fillMaxWidth()
-                .weight(1f),
-        ) {
-            RatingBars(
-                stats = story.stats,
-                forceBarsVisible = controller.isSharing,
-                modifier = Modifier
-                    .fillMaxSize()
-                    .drawWithContent {
-                        drawContent()
-                        drawRect(
-                            brush = Brush.verticalGradient(
-                                0f to Color.Transparent,
-                                0.85f to Color.Transparent,
-                                1f to story.backgroundColor,
-                            ),
-                        )
-                    },
-            )
-            ShareStoryButton(
-                story = story,
-                controller = controller,
-                onShare = onShareStory,
-                modifier = Modifier.padding(bottom = 18.dp),
-            )
-        }
+                .drawWithContent {
+                    drawContent()
+                    drawRect(
+                        brush = Brush.verticalGradient(
+                            0f to Color.Transparent,
+                            0.85f to Color.Transparent,
+                            1f to story.backgroundColor,
+                        ),
+                    )
+                },
+        )
     }
 }
 
@@ -177,7 +166,6 @@ private fun RatingBars(
         verticalAlignment = Alignment.Bottom,
         modifier = modifier,
     ) {
-        val shouldNormalize = stats.count() > 0
         Rating.entries.forEach { rating ->
             val barRange = (stats.relativeToMax(rating) * 10).roundToInt()
             AnimatedRatingBar(
@@ -274,6 +262,7 @@ private fun RowScope.AnimatedRatingBar(
         modifier = Modifier.fillMaxSize(),
         composition = pillarComposition,
         progress = { pillarAnimatable.progress },
+        contentScale = ContentScale.FillBounds,
     )
 
     LottieAnimation(
@@ -339,7 +328,8 @@ private fun AbsentRatings(
                 ) {
                     Spacer(modifier = Modifier.weight(1f))
                     TextP40(
-                        modifier = Modifier.fillMaxWidth()
+                        modifier = Modifier
+                            .fillMaxWidth()
                             .padding(bottom = 8.dp),
                         text = (index + 1).toString(),
                         textAlign = TextAlign.Center,
