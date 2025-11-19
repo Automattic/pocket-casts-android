@@ -61,7 +61,7 @@ internal fun EndingStory(
             modifier = Modifier.weight(1f),
         )
         Image(
-            painter = painterResource(IR.drawable.navdrawer_logo),
+            painter = painterResource(IR.drawable.pocket_casts_logo),
             contentDescription = null,
             modifier = Modifier
                 .size(60.dp)
