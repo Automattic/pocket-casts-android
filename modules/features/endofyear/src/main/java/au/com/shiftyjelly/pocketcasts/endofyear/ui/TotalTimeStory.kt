@@ -53,87 +53,89 @@ internal fun TotalTimeStory(
     controller: StoryCaptureController,
     onShareStory: (File) -> Unit,
 ) {
-    Box(
-        modifier = Modifier
-            .capturable(controller.captureController(story))
-            .fillMaxSize()
-            .background(story.backgroundColor),
-    ) {
-        val isPreview = LocalInspectionMode.current
-        val freezeAnimation = controller.isSharing || isPreview
-        val totalMinutes = story.duration.inWholeMinutes
-        val startMinutes = if (freezeAnimation) totalMinutes else totalMinutes - totalMinutes % 1000
+    Box {
+        Box(
+            modifier = Modifier
+                .capturable(controller.captureController(story))
+                .fillMaxSize()
+                .background(story.backgroundColor),
+        ) {
+            val isPreview = LocalInspectionMode.current
+            val freezeAnimation = controller.isSharing || isPreview
+            val totalMinutes = story.duration.inWholeMinutes
+            val startMinutes = if (freezeAnimation) totalMinutes else totalMinutes - totalMinutes % 1000
 
-        var animatedNumber by remember { mutableLongStateOf(startMinutes) }
-        var animationCompleted by remember { mutableStateOf(false) }
+            var animatedNumber by remember { mutableLongStateOf(startMinutes) }
+            var animationCompleted by remember { mutableStateOf(false) }
 
-        LaunchedEffect(totalMinutes, startMinutes, freezeAnimation) {
-            if (freezeAnimation) {
-                animatedNumber = totalMinutes
-                animationCompleted = true
-            } else if (!animationCompleted) {
-                val animatable = Animatable(startMinutes.toFloat())
+            LaunchedEffect(totalMinutes, startMinutes, freezeAnimation) {
+                if (freezeAnimation) {
+                    animatedNumber = totalMinutes
+                    animationCompleted = true
+                } else if (!animationCompleted) {
+                    val animatable = Animatable(startMinutes.toFloat())
 
-                animatable.animateTo(
-                    targetValue = totalMinutes.toFloat(),
-                    animationSpec = tween(durationMillis = 2000),
-                ) {
-                    animatedNumber = this.value.toLong()
+                    animatable.animateTo(
+                        targetValue = totalMinutes.toFloat(),
+                        animationSpec = tween(durationMillis = 2000),
+                    ) {
+                        animatedNumber = this.value.toLong()
+                    }
                 }
             }
-        }
 
-        val text by rememberLottieComposition(
-            spec = LottieCompositionSpec.RawRes(R.raw.playback_total_listened_lottie),
-        )
+            val text by rememberLottieComposition(
+                spec = LottieCompositionSpec.RawRes(R.raw.playback_total_listened_lottie),
+            )
 
-        val animationProgress by animateLottieCompositionAsState(
-            composition = text,
-            isPlaying = !freezeAnimation && !animationCompleted,
-            iterations = 1,
-        )
+            val animationProgress by animateLottieCompositionAsState(
+                composition = text,
+                isPlaying = !freezeAnimation && !animationCompleted,
+                iterations = 1,
+            )
 
-        LaunchedEffect(animationProgress) {
-            if (animationProgress == 1f) {
-                animationCompleted = true
+            LaunchedEffect(animationProgress) {
+                if (animationProgress == 1f) {
+                    animationCompleted = true
+                }
             }
+
+            val formatter = remember { NumberFormat.getNumberInstance() }
+            val formattedNumber = remember(animatedNumber) {
+                formatter.format(animatedNumber)
+            }
+
+            val dynamicProperties = rememberLottieDynamicProperties(
+                rememberLottieDynamicProperty(
+                    property = LottieProperty.TEXT,
+                    value = formattedNumber,
+                    "content",
+                    "40,456",
+                ),
+                rememberLottieDynamicProperty(
+                    property = LottieProperty.TEXT,
+                    value = stringResource(LR.string.end_of_year_listening_time_subtitle),
+                    "content",
+                    "minutes listened",
+                ),
+            )
+
+            val context = LocalContext.current
+            LottieAnimation(
+                composition = text,
+                progress = { if (freezeAnimation || animationCompleted) 1.0f else animationProgress },
+                modifier = Modifier
+                    .fillMaxSize(),
+                contentScale = ContentScale.FillBounds,
+                dynamicProperties = dynamicProperties,
+                fontMap = remember {
+                    mapOf(
+                        "Inter-Medium" to Typeface.create("sans-serif", Typeface.NORMAL),
+                        "Humane-SemiBold" to Typeface.createFromAsset(context.assets, "fonts/humane_semibold.otf"),
+                    )
+                },
+            )
         }
-
-        val formatter = remember { NumberFormat.getNumberInstance() }
-        val formattedNumber = remember(animatedNumber) {
-            formatter.format(animatedNumber)
-        }
-
-        val dynamicProperties = rememberLottieDynamicProperties(
-            rememberLottieDynamicProperty(
-                property = LottieProperty.TEXT,
-                value = formattedNumber,
-                "content",
-                "40,456",
-            ),
-            rememberLottieDynamicProperty(
-                property = LottieProperty.TEXT,
-                value = stringResource(LR.string.end_of_year_listening_time_subtitle),
-                "content",
-                "minutes listened",
-            ),
-        )
-
-        val context = LocalContext.current
-        LottieAnimation(
-            composition = text,
-            progress = { if (freezeAnimation || animationCompleted) 1.0f else animationProgress },
-            modifier = Modifier
-                .fillMaxSize(),
-            contentScale = ContentScale.FillBounds,
-            dynamicProperties = dynamicProperties,
-            fontMap = remember {
-                mapOf(
-                    "Inter-Medium" to Typeface.create("sans-serif", Typeface.NORMAL),
-                    "Humane-SemiBold" to Typeface.createFromAsset(context.assets, "fonts/humane_semibold.otf"),
-                )
-            },
-        )
 
         ShareStoryButton(
             modifier = Modifier

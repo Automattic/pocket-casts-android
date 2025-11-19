@@ -74,51 +74,59 @@ internal fun LongestEpisodeStory(
     controller: StoryCaptureController,
     onShareStory: (File) -> Unit,
 ) {
-    BoxWithConstraints(
-        modifier = Modifier
-            .capturable(controller.captureController(story))
-            .fillMaxSize()
-            .background(story.backgroundColor)
-            .padding(top = measurements.closeButtonBottomEdge),
-    ) {
-        val windowSize = currentWindowAdaptiveInfo().windowSizeClass
-        val sizeFactor = if (windowSize.isAtMostMediumHeight()) {
-            SMALL_SCREEN_SIZE_FACTOR
-        } else {
-            1f
-        }
-        val animationContainerSize = min(maxWidth, maxHeight) * sizeFactor
-        Header(
-            story = story,
-            measurements = measurements,
+    Box {
+        BoxWithConstraints(
             modifier = Modifier
-                .fillMaxWidth()
-                .height((maxHeight - animationContainerSize) / 2)
-                .align(Alignment.TopCenter),
-        )
-        val artworkSize = 196.dp * sizeFactor
-        Content(
-            story = story,
-            forceVisible = controller.isSharing,
-            artworkSize = artworkSize,
-            animationScale = if (windowSize.isAtMostMediumHeight()) {
-                1f
+                .capturable(controller.captureController(story))
+                .fillMaxSize()
+                .background(story.backgroundColor)
+                .padding(top = measurements.closeButtonBottomEdge + 16.dp, bottom = 64.dp),
+        ) {
+            val windowSize = currentWindowAdaptiveInfo().windowSizeClass
+            val sizeFactor = if (windowSize.isAtMostMediumHeight()) {
+                SMALL_SCREEN_SIZE_FACTOR
             } else {
-                ANIMATION_SCALE_FACTOR_FULL_WIDTH
-            },
+                1f
+            }
+            val animationContainerSize = min(maxWidth, maxHeight) * sizeFactor
+            Header(
+                story = story,
+                measurements = measurements,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height((maxHeight - animationContainerSize) / 2)
+                    .align(Alignment.TopCenter),
+            )
+            val artworkSize = 196.dp * sizeFactor
+            Content(
+                story = story,
+                forceVisible = controller.isSharing,
+                artworkSize = artworkSize,
+                animationScale = if (windowSize.isAtMostMediumHeight()) {
+                    1f
+                } else {
+                    ANIMATION_SCALE_FACTOR_FULL_WIDTH
+                },
+                modifier = Modifier
+                    .size(animationContainerSize)
+                    .align(Alignment.Center),
+            )
+            Footer(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height((maxHeight - animationContainerSize) / 2)
+                    .align(Alignment.BottomCenter),
+                story = story,
+                measurements = measurements,
+            )
+        }
+        ShareStoryButton(
             modifier = Modifier
-                .size(animationContainerSize)
-                .align(Alignment.Center),
-        )
-        Footer(
-            modifier = Modifier
-                .fillMaxWidth()
-                .height((maxHeight - animationContainerSize) / 2)
-                .align(Alignment.BottomCenter),
+                .padding(bottom = 18.dp)
+                .align(alignment = Alignment.BottomCenter),
             story = story,
             controller = controller,
-            onShareStory = onShareStory,
-            measurements = measurements,
+            onShare = onShareStory,
         )
     }
 }
@@ -247,8 +255,6 @@ private fun Header(
 @Composable
 private fun Footer(
     story: Story.LongestEpisode,
-    controller: StoryCaptureController,
-    onShareStory: (File) -> Unit,
     measurements: EndOfYearMeasurements,
     modifier: Modifier = Modifier,
 ) = Column(modifier = modifier, horizontalAlignment = Alignment.CenterHorizontally) {
@@ -267,13 +273,6 @@ private fun Footer(
                 .padding(horizontal = 24.dp),
         )
     }
-    ShareStoryButton(
-        modifier = Modifier
-            .padding(bottom = 18.dp),
-        story = story,
-        controller = controller,
-        onShare = onShareStory,
-    )
 }
 
 @Preview(device = Devices.PORTRAIT_REGULAR)

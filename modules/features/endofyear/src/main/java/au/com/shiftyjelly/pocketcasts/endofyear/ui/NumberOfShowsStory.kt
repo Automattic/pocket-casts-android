@@ -59,67 +59,69 @@ internal fun NumberOfShowsStory(
     controller: StoryCaptureController,
     onShareStory: (File) -> Unit,
 ) {
-    Box(
-        modifier = Modifier
-            .capturable(controller.captureController(story))
-            .fillMaxSize()
-            .background(story.backgroundColor)
-            .padding(top = measurements.closeButtonBottomEdge + 16.dp),
-    ) {
-        val windowSize = currentWindowAdaptiveInfo().windowSizeClass
-        TextH10(
-            text = stringResource(
-                LR.string.end_of_year_story_listened_to_numbers,
-                story.showCount,
-                story.episodeCount,
-            ),
-            fontSize = 25.sp,
-            lineHeight = 30.sp,
-            disableAutoScale = true,
-            textAlign = TextAlign.Center,
-            fontScale = measurements.smallDeviceFactor,
-            color = colorResource(UR.color.white),
-            modifier = Modifier.padding(
-                horizontal = if (windowSize.isAtMostMediumHeight()) {
-                    24.dp
-                } else {
-                    42.dp
-                },
-            ),
-        )
-
-        val composition by rememberLottieComposition(
-            spec = LottieCompositionSpec.RawRes(R.raw.playback_number_of_shows_lottie),
-        )
-        val isPreview = LocalInspectionMode.current
-        val freezeAnimation = controller.isSharing || isPreview
-
-        val progress by animateLottieCompositionAsState(
-            composition = composition,
-            iterations = LottieConstants.IterateForever,
-            isPlaying = !freezeAnimation,
-        )
-
-        LottieAnimation(
-            composition = composition,
-            progress = { if (freezeAnimation) 1f else progress },
+    Box {
+        Box(
             modifier = Modifier
-                .matchParentSize()
-                .scale(1.2f),
-            contentScale = ContentScale.FillWidth,
-        )
+                .capturable(controller.captureController(story))
+                .fillMaxSize()
+                .background(story.backgroundColor)
+                .padding(top = measurements.closeButtonBottomEdge + 16.dp),
+        ) {
+            val windowSize = currentWindowAdaptiveInfo().windowSizeClass
+            TextH10(
+                text = stringResource(
+                    LR.string.end_of_year_story_listened_to_numbers,
+                    story.showCount,
+                    story.episodeCount,
+                ),
+                fontSize = 25.sp,
+                lineHeight = 30.sp,
+                disableAutoScale = true,
+                textAlign = TextAlign.Center,
+                fontScale = measurements.smallDeviceFactor,
+                color = colorResource(UR.color.white),
+                modifier = Modifier.padding(
+                    horizontal = if (windowSize.isAtMostMediumHeight()) {
+                        24.dp
+                    } else {
+                        42.dp
+                    },
+                ),
+            )
 
-        val coverSize = if (windowSize.isAtMostMediumHeight()) {
-            180.dp
-        } else {
-            260.dp
+            val composition by rememberLottieComposition(
+                spec = LottieCompositionSpec.RawRes(R.raw.playback_number_of_shows_lottie),
+            )
+            val isPreview = LocalInspectionMode.current
+            val freezeAnimation = controller.isSharing || isPreview
+
+            val progress by animateLottieCompositionAsState(
+                composition = composition,
+                iterations = LottieConstants.IterateForever,
+                isPlaying = !freezeAnimation,
+            )
+
+            LottieAnimation(
+                composition = composition,
+                progress = { if (freezeAnimation) 1f else progress },
+                modifier = Modifier
+                    .matchParentSize()
+                    .scale(1.2f),
+                contentScale = ContentScale.FillWidth,
+            )
+
+            val coverSize = if (windowSize.isAtMostMediumHeight()) {
+                180.dp
+            } else {
+                260.dp
+            }
+            PodcastCoverCarousel(
+                podcastIds = story.randomShowIds,
+                coverSize = coverSize,
+                modifier = Modifier.align(alignment = Alignment.Center),
+                freezeAnimation = controller.isSharing,
+            )
         }
-        PodcastCoverCarousel(
-            podcastIds = story.randomShowIds,
-            coverSize = coverSize,
-            modifier = Modifier.align(alignment = Alignment.Center),
-            freezeAnimation = controller.isSharing,
-        )
 
         ShareStoryButton(
             modifier = Modifier
@@ -134,7 +136,7 @@ internal fun NumberOfShowsStory(
 
 private const val PAGE_COUNT = 100
 private val SCROLL_INTERVAL = 700.milliseconds
-private val SCROLL_ANIM_DURATION_MS = 650
+private const val SCROLL_ANIM_DURATION_MS = 650
 
 @Composable
 private fun PodcastCoverCarousel(

@@ -68,15 +68,24 @@ internal fun RatingsStory(
         .background(story.backgroundColor)
         .padding(top = measurements.closeButtonBottomEdge + 20.dp)
     if (maxRatingCount != 0) {
-        PresentRatings(
-            modifier = Modifier
-                .capturable(controller.captureController(story))
-                .then(modifier),
-            story = story,
-            measurements = measurements,
-            controller = controller,
-            onShareStory = onShareStory,
-        )
+        Box {
+            PresentRatings(
+                modifier = Modifier
+                    .capturable(controller.captureController(story))
+                    .then(modifier),
+                story = story,
+                measurements = measurements,
+                controller = controller,
+            )
+            ShareStoryButton(
+                story = story,
+                controller = controller,
+                onShare = onShareStory,
+                modifier = Modifier
+                    .padding(bottom = 18.dp)
+                    .align(alignment = Alignment.BottomCenter),
+            )
+        }
     } else {
         AbsentRatings(
             modifier = modifier,
@@ -91,7 +100,6 @@ private fun PresentRatings(
     story: Story.Ratings,
     measurements: EndOfYearMeasurements,
     controller: StoryCaptureController,
-    onShareStory: (File) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Column(
