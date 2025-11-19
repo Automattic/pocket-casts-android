@@ -469,8 +469,7 @@ class SharingAnalyticsTest {
         val story = Story.NumberOfShows(
             showCount = 100,
             episodeCount = 200,
-            topShowIds = emptyList(),
-            bottomShowIds = emptyList(),
+            randomShowIds = emptyList(),
         )
         val request = SharingRequest.endOfYearStory(story, Year.of(1000), tempFolder.newFile()).build()
 
