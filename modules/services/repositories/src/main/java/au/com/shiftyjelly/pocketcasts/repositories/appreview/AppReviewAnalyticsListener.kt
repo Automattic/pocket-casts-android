@@ -25,6 +25,7 @@ class AppReviewAnalyticsListener @Inject constructor(
     private val bookmarkCreatedSetting = settings.appReviewBookmarkCreatedTimestamp
     private val themeChangedSetting = settings.appReviewThemeChangedTimestamp
     private val referralSharedSetting = settings.appReviewReferralSharedTimestamp
+    private val playbackSharedSetting = settings.appReviewPlaybackSharedTimestamp
 
     override fun onEvent(event: AnalyticsEvent, properties: Map<String, Any>) {
         if (!FeatureFlag.isEnabled(Feature.IMPROVE_APP_RATINGS)) {
@@ -69,6 +70,10 @@ class AppReviewAnalyticsListener @Inject constructor(
 
             AnalyticsEvent.REFERRAL_PASS_SHARED -> {
                 updateSetting(referralSharedSetting)
+            }
+
+            AnalyticsEvent.END_OF_YEAR_STORY_SHARED -> {
+                updateSetting(playbackSharedSetting)
             }
 
             else -> Unit

@@ -727,7 +727,7 @@ class SharingClientTest {
         }
         val story = Story.NumberOfShows(
             showCount = 100,
-            epsiodeCount = 200,
+            episodeCount = 200,
             topShowIds = emptyList(),
             bottomShowIds = emptyList(),
         )
@@ -996,7 +996,7 @@ class SharingClientTest {
     @Test
     fun sharePlusInterstitialStory() = runTest {
         val screenshot = File(context.cacheDir, "file.png").also { it.writeBytes(Random.nextBytes(8)) }
-        val story = Story.PlusInterstitial
+        val story = Story.PlusInterstitial(subscriptionTier = null)
         val request = SharingRequest.endOfYearStory(story, Year.of(1000), screenshot).build()
 
         val response = client.share(request)

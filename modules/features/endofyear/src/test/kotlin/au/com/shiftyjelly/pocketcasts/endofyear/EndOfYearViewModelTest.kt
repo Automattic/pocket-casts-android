@@ -127,7 +127,8 @@ class EndOfYearViewModelTest {
     @Test
     fun `initialize in syncing state`() = runTest {
         viewModel.uiState.test {
-            assertEquals(UiState.Syncing, awaitItem())
+            val awaitItem = awaitItem()
+            assert(awaitItem is UiState.Syncing)
         }
     }
 
@@ -187,7 +188,7 @@ class EndOfYearViewModelTest {
             val story = awaitStory<NumberOfShows>()
 
             assertEquals(stats.playedPodcastCount, story.showCount)
-            assertEquals(stats.playedEpisodeCount, story.epsiodeCount)
+            assertEquals(stats.playedEpisodeCount, story.episodeCount)
             // We select 8 random episodes to display in the UI
             assertEquals(4, story.topShowIds.distinct().size)
             assertEquals(4, story.bottomShowIds.distinct().size)
@@ -416,33 +417,6 @@ class EndOfYearViewModelTest {
     }
 
     @Test
-    fun `plus interstitial for Plus user`() = runTest {
-        endOfYearSync.isSynced.add(true)
-        endOfYearManager.stats.add(stats)
-
-        viewModel.syncData()
-        viewModel.uiState.test {
-            val stories = awaitStories()
-
-            assertDoesNotHaveStory<PlusInterstitial>(stories)
-        }
-    }
-
-    @Test
-    fun `plus interstitial for Patron user`() = runTest {
-        endOfYearSync.isSynced.add(true)
-        endOfYearManager.stats.add(stats)
-        subscriptionFlow.value = patronSubscription
-
-        viewModel.syncData()
-        viewModel.uiState.test {
-            val stories = awaitStories()
-
-            assertDoesNotHaveStory<PlusInterstitial>(stories)
-        }
-    }
-
-    @Test
     fun `year vs year`() = runTest {
         endOfYearSync.isSynced.add(true)
         endOfYearManager.stats.add(stats)
@@ -479,26 +453,6 @@ class EndOfYearViewModelTest {
                 ),
                 story,
             )
-        }
-    }
-
-    @Test
-    fun `update stories with subscription tier`() = runTest {
-        endOfYearSync.isSynced.add(true)
-        endOfYearManager.stats.add(stats)
-        subscriptionFlow.value = null
-
-        viewModel.syncData()
-        viewModel.uiState.test {
-            assertHasStory<PlusInterstitial>(awaitStories())
-
-            subscriptionFlow.value = plusSubscription
-            endOfYearManager.stats.add(stats)
-            assertDoesNotHaveStory<PlusInterstitial>(awaitStories())
-
-            subscriptionFlow.value = null
-            endOfYearManager.stats.add(stats)
-            assertHasStory<PlusInterstitial>(awaitStories())
         }
     }
 
@@ -621,8 +575,9 @@ class EndOfYearViewModelTest {
         assertEquals(5, viewModel.getNextStoryIndex(stories.indexOf<Ratings>()))
         assertEquals(6, viewModel.getNextStoryIndex(stories.indexOf<TotalTime>()))
         assertEquals(7, viewModel.getNextStoryIndex(stories.indexOf<LongestEpisode>()))
-        assertEquals(8, viewModel.getNextStoryIndex(stories.indexOf<YearVsYear>()))
-        assertEquals(9, viewModel.getNextStoryIndex(stories.indexOf<CompletionRate>()))
+        assertEquals(8, viewModel.getNextStoryIndex(stories.indexOf<PlusInterstitial>()))
+        assertEquals(9, viewModel.getNextStoryIndex(stories.indexOf<YearVsYear>()))
+        assertEquals(10, viewModel.getNextStoryIndex(stories.indexOf<CompletionRate>()))
         assertEquals(null, viewModel.getNextStoryIndex(stories.indexOf<Ending>()))
     }
 
@@ -641,9 +596,10 @@ class EndOfYearViewModelTest {
         assertEquals(3, viewModel.getPreviousStoryIndex(stories.indexOf<Ratings>()))
         assertEquals(4, viewModel.getPreviousStoryIndex(stories.indexOf<TotalTime>()))
         assertEquals(5, viewModel.getPreviousStoryIndex(stories.indexOf<LongestEpisode>()))
-        assertEquals(6, viewModel.getPreviousStoryIndex(stories.indexOf<YearVsYear>()))
-        assertEquals(7, viewModel.getPreviousStoryIndex(stories.indexOf<CompletionRate>()))
-        assertEquals(8, viewModel.getPreviousStoryIndex(stories.indexOf<Ending>()))
+        assertEquals(6, viewModel.getPreviousStoryIndex(stories.indexOf<PlusInterstitial>()))
+        assertEquals(7, viewModel.getPreviousStoryIndex(stories.indexOf<YearVsYear>()))
+        assertEquals(8, viewModel.getPreviousStoryIndex(stories.indexOf<CompletionRate>()))
+        assertEquals(9, viewModel.getPreviousStoryIndex(stories.indexOf<Ending>()))
     }
 
     @Test

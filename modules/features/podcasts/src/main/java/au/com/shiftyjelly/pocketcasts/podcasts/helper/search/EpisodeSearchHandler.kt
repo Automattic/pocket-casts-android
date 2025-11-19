@@ -25,7 +25,7 @@ class EpisodeSearchHandler @Inject constructor(
             Observable.timer(searchDebounce, TimeUnit.MILLISECONDS)
         }
     }.switchMapSingle { searchTerm ->
-        if (searchTerm.length > 2) {
+        if (searchTerm.length > 1) {
             cacheServiceManager.searchEpisodes(podcastUuid, searchTerm)
                 .map { SearchResult(searchTerm, it) }
                 .onErrorReturnItem(noSearchResult)

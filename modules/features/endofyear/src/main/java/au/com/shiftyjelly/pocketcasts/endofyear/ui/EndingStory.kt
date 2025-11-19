@@ -81,6 +81,7 @@ internal fun EndingStory(
             fontScale = measurements.smallDeviceFactor,
             disableAutoScale = true,
             fontSize = 25.sp,
+            lineHeight = 30.sp,
             color = colorResource(UR.color.white),
             modifier = Modifier
                 .fillMaxWidth()

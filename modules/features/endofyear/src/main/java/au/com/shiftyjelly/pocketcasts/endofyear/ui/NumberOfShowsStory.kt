@@ -98,7 +98,7 @@ internal fun NumberOfShowsStory(
                 text = stringResource(
                     R.string.end_of_year_story_listened_to_numbers,
                     story.showCount,
-                    story.epsiodeCount,
+                    story.episodeCount,
                 ),
                 disableAutoScale = true,
                 fontScale = measurements.smallDeviceFactor,
@@ -157,7 +157,7 @@ private fun NumberOfShowsPreview() {
         NumberOfShowsStory(
             story = Story.NumberOfShows(
                 showCount = 20,
-                epsiodeCount = 125,
+                episodeCount = 125,
                 topShowIds = List(4) { "id-$it" },
                 bottomShowIds = List(4) { "id-$it" },
             ),

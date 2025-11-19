@@ -25,6 +25,7 @@ dependencies {
     api(libs.media3.extractor)
     api(libs.moshi)
     api(libs.okhttp)
+    api(libs.play.review)
     api(libs.rx2.java)
     api(libs.rx2.relay)
     api(libs.work.runtime)

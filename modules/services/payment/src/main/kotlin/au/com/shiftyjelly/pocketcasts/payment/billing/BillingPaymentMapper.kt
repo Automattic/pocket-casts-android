@@ -11,7 +11,7 @@ import au.com.shiftyjelly.pocketcasts.payment.Purchase
 import au.com.shiftyjelly.pocketcasts.payment.PurchaseState
 import au.com.shiftyjelly.pocketcasts.payment.SubscriptionOffer
 import au.com.shiftyjelly.pocketcasts.payment.SubscriptionPlan
-import com.android.billingclient.api.BillingFlowParams.SubscriptionUpdateParams.ReplacementMode
+import com.android.billingclient.api.BillingFlowParams.ProductDetailsParams.SubscriptionProductReplacementParams.ReplacementMode
 import com.android.billingclient.api.ProductDetails
 import com.android.billingclient.api.ProductDetails.RecurrenceMode
 import com.android.billingclient.api.ProductDetails as GoogleProduct
@@ -66,9 +66,12 @@ internal class BillingPaymentMapper(
         val (product, offerToken) = findMatchForPlan(productDetails, key) ?: return null
 
         val productQuery = BillingFlowRequest.ProductQuery(product, offerToken)
-        val updateQuery = findActivePurchase(purchases)?.let { (purchaseToken, purchasedProductId) ->
+        val updateQuery = findActivePurchase(purchases)?.let { purchasedProductId ->
             findReplacementMode(purchasedProductId, key)?.let { replacementMode ->
-                BillingFlowRequest.SubscriptionUpdateQuery(purchaseToken, replacementMode)
+                BillingFlowRequest.SubscriptionUpdateQuery(
+                    oldProductId = purchasedProductId,
+                    replacementMode = replacementMode,
+                )
             }
         }
         return BillingFlowRequest(productQuery, updateQuery)
@@ -256,7 +259,7 @@ internal class BillingPaymentMapper(
         return matchingProduct to token
     }
 
-    private fun findActivePurchase(purchases: List<GooglePurchase>): Pair<String, String>? {
+    private fun findActivePurchase(purchases: List<GooglePurchase>): String? {
         val activePurchases = purchases.filter { it.isAcknowledged && it.isAutoRenewing }
         if (activePurchases.size > 1) {
             val context = mapOf("purchases" to activePurchases.joinToString { "${it.orderId}: ${it.products}" })
@@ -274,7 +277,7 @@ internal class BillingPaymentMapper(
             return null
         }
 
-        return activePurchase.purchaseToken to activePurchase.products.first()
+        return activePurchase.products.first()
     }
 
     /**

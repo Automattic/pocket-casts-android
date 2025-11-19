@@ -193,7 +193,7 @@ enum class Feature(
         title = "Banner prompting for app rating",
         defaultValue = isDebugOrPrototypeBuild,
         tier = FeatureTier.Free,
-        hasFirebaseRemoteFlag = false,
+        hasFirebaseRemoteFlag = true,
         hasDevToggle = true,
     ),
 

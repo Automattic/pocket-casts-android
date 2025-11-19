@@ -18,7 +18,7 @@
 [versions]
 aboutlibraries = "13.1.0"
 android-gradle-plugin = "8.13.0"
-billing = "8.0.0"
+billing = "8.1.0"
 coil = "2.7.0"
 compose = "2025.05.01" # https://developer.android.com/jetpack/compose/bom/bom-mapping
 datastore = "1.1.7"
@@ -43,7 +43,7 @@ media3 = "1.8.0"
 mockito = "5.20.0"
 mockito-kotlin = "6.1.0"
 moshi = "1.15.2"
-navigation = "2.9.5"
+navigation = "2.9.6"
 okhttp = "5.3.0"
 protobuf = "4.33.0"
 protobuf-plugin = "0.9.5"
@@ -171,6 +171,7 @@ media3-exoplayer = { module = "androidx.media3:media3-exoplayer", version.ref = 
 media3-exoplayer-hls = { module = "androidx.media3:media3-exoplayer-hls", version.ref = "media3" }
 media3-extractor = { module = "androidx.media3:media3-extractor", version.ref = "media3" }
 media3-ui = { module = "androidx.media3:media3-ui", version.ref = "media3" }
+media3-ui-compose = { module = "androidx.media3:media3-ui-compose", version.ref = "media3" }
 
 # Mockito
 mockito-android = { module = "org.mockito:mockito-android", version.ref = "mockito" }

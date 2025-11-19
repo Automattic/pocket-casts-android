@@ -50,6 +50,7 @@ import au.com.shiftyjelly.pocketcasts.compose.components.PodcastImage
 import au.com.shiftyjelly.pocketcasts.compose.components.TextH10
 import au.com.shiftyjelly.pocketcasts.compose.components.TextP30
 import au.com.shiftyjelly.pocketcasts.compose.components.TextP40
+import au.com.shiftyjelly.pocketcasts.endofyear.R
 import au.com.shiftyjelly.pocketcasts.endofyear.StoryCaptureController
 import au.com.shiftyjelly.pocketcasts.models.to.Story
 import au.com.shiftyjelly.pocketcasts.models.to.TopPodcast
@@ -60,7 +61,6 @@ import com.airbnb.lottie.compose.rememberLottieComposition
 import dev.shreyaspatil.capturable.capturable
 import java.io.File
 import kotlin.random.Random
-import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 import au.com.shiftyjelly.pocketcasts.ui.R as UR
 
@@ -84,6 +84,7 @@ internal fun TopShowsStory(
             text = stringResource(LR.string.eoy_story_top_podcasts_title),
             fontScale = measurements.smallDeviceFactor,
             fontSize = 25.sp,
+            lineHeight = 30.sp,
             disableAutoScale = true,
             modifier = Modifier.padding(horizontal = 24.dp),
             textAlign = TextAlign.Center,
@@ -101,7 +102,7 @@ internal fun TopShowsStory(
         ) {
             story.shows.forEachIndexed { index, podcast ->
                 AnimatedContainer(
-                    animationRes = if (index % 2 == 0) IR.raw.playback_top_shows_wave_1_lottie else IR.raw.playback_top_shows_wave_2_lottie,
+                    animationRes = if (index % 2 == 0) R.raw.playback_top_shows_wave_1_lottie else R.raw.playback_top_shows_wave_2_lottie,
                     controller = controller,
                 ) { scale ->
                     PodcastItem(

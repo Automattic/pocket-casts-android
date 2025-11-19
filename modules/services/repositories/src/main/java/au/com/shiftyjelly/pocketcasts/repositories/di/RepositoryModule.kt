@@ -1,5 +1,6 @@
 package au.com.shiftyjelly.pocketcasts.repositories.di
 
+import android.content.Context
 import androidx.work.WorkerFactory
 import au.com.shiftyjelly.pocketcasts.analytics.AccountStatusInfo
 import au.com.shiftyjelly.pocketcasts.crashlogging.CrashReportPermissionCheck
@@ -83,11 +84,14 @@ import au.com.shiftyjelly.pocketcasts.repositories.user.StatsManagerImpl
 import au.com.shiftyjelly.pocketcasts.repositories.user.UserManager
 import au.com.shiftyjelly.pocketcasts.repositories.user.UserManagerImpl
 import au.com.shiftyjelly.pocketcasts.repositories.user.UserSettingsCrashReportPermission
+import com.google.android.play.core.review.ReviewManager
+import com.google.android.play.core.review.ReviewManagerFactory
 import com.squareup.moshi.Moshi
 import dagger.Binds
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
+import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import dagger.multibindings.IntoMap
 import javax.inject.Singleton
@@ -264,6 +268,12 @@ abstract class RepositoryModule {
         @TranscriptTypeKey(TranscriptType.Html)
         fun provideHtmlParser(): TranscriptParser {
             return HtmlParser()
+        }
+
+        @Provides
+        @Singleton
+        fun provideGoogleReviewManager(@ApplicationContext context: Context): ReviewManager {
+            return ReviewManagerFactory.create(context)
         }
     }
 }
