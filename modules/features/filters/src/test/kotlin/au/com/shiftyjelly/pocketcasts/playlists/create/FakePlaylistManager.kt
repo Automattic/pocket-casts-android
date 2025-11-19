@@ -27,6 +27,10 @@ class FakePlaylistManager : PlaylistManager {
         return playlistPreviews.asStateFlow()
     }
 
+    override suspend fun findPlaylistPreview(uuid: String): PlaylistPreview? {
+        return null
+    }
+
     override fun getArtworkUuidsFlow(playlistUuid: String): StateFlow<List<String>?> {
         return MutableStateFlow(null)
     }
@@ -111,11 +115,18 @@ class FakePlaylistManager : PlaylistManager {
         return flowOf(emptyList())
     }
 
+    val addManualEpisodeTurbine = Turbine<Pair<String, String>>(name = "addManualEpisodeTurbine")
     override suspend fun addManualEpisode(playlistUuid: String, episodeUuid: String): Boolean {
+        addManualEpisodeTurbine.add(playlistUuid to episodeUuid)
         return true
     }
 
     override suspend fun sortManualEpisodes(playlistUuid: String, episodeUuids: List<String>) = Unit
 
-    override suspend fun deleteManualEpisodes(playlistUuid: String, episodeUuids: Collection<String>) = Unit
+    val deleteManualEpisodeTurbine = Turbine<Pair<String, String>>(name = "deleteManualEpisodeTurbine")
+    override suspend fun deleteManualEpisodes(playlistUuid: String, episodeUuids: Collection<String>) {
+        for (episodeUuid in episodeUuids) {
+            deleteManualEpisodeTurbine.add(playlistUuid to episodeUuid)
+        }
+    }
 }

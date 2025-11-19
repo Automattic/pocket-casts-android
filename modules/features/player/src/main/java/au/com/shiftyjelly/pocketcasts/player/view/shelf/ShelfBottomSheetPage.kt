@@ -79,6 +79,7 @@ fun ShelfBottomSheetPage(
                     ShelfItem.Sleep -> {
                         shelfSharedViewModel.onSleepClick(ShelfItemSource.OverflowMenu)
                     }
+
                     ShelfItem.Star -> shelfSharedViewModel.onStarClick(ShelfItemSource.OverflowMenu)
                     ShelfItem.Transcript -> shelfSharedViewModel.onTranscriptClick(enabled, ShelfItemSource.OverflowMenu)
                     ShelfItem.Share -> {
@@ -122,16 +123,19 @@ fun ShelfBottomSheetPage(
                         OnboardingUpgradeSource.BOOKMARKS_SHELF_ACTION,
                         ShelfItemSource.OverflowMenu,
                     )
+
                     ShelfItem.Download -> {
                         playerViewModel.handleDownloadClickFromPlaybackActions(
                             onDownloadStart = { shelfSharedViewModel.onEpisodeDownloadStart(ShelfItemSource.OverflowMenu) },
                             onDeleteStart = { shelfSharedViewModel.onEpisodeRemoveClick(ShelfItemSource.OverflowMenu) },
                         )
                     }
+
                     ShelfItem.AddToPlaylist -> {
-                        val episodeUuid = playerViewModel.episode?.uuid ?: return@MenuShelfItems
+                        val episode = playerViewModel.episode ?: return@MenuShelfItems
                         shelfSharedViewModel.onAddToPlaylistClick(
-                            episodeUuid = episodeUuid,
+                            episodeUuid = episode.uuid,
+                            podcastUuid = episode.podcastOrSubstituteUuid,
                             source = ShelfItemSource.OverflowMenu,
                         )
                     }

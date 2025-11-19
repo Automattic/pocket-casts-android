@@ -122,7 +122,12 @@ class FilterEpisodeListFragment : BaseFragment() {
             artworkContext = Element.Filters,
             onSwipeAction = { episode, swipeAction ->
                 viewLifecycleOwner.lifecycleScope.launch {
-                    swipeActionViewModel.handleAction(swipeAction, episode.uuid, childFragmentManager)
+                    swipeActionViewModel.handleAction(
+                        action = swipeAction,
+                        episodeUuid = episode.uuid,
+                        podcastUuid = episode.podcastOrSubstituteUuid,
+                        fragmentManager = childFragmentManager,
+                    )
                 }
             },
         )

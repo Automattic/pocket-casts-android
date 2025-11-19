@@ -13,11 +13,7 @@ Language: sv_SE
     <string name="search_suggestions_view_all">Visa alla för ”%1$s”</string>
     <string name="up_next_as_playlist_saved">Nästa har sparats som en spellista</string>
     <string name="up_next_as_playlist_replace_title">Ersätt nuvarande Nästa?</string>
-    <string name="up_next_as_playlist_replace_body">Detta kommer att rensa din nuvarande Nästa-kö och börja spela upp denna spellista.</string>
-    <string name="up_next_as_playlist_title">Spara din Nästa-kö?</string>
     <string name="up_next_as_playlist_button_secondary">Ersätt och spela upp</string>
-    <string name="up_next_as_playlist_button_primary">Spara nuvarande kö</string>
-    <string name="up_next_as_playlist_body">Din nuvarande Nästa kommer att ersättas när du spelar upp denna spellista. Spara den först för att behålla den.</string>
     <string name="delete_playlist_confirmation_title">Ta bort spellista?</string>
     <string name="delete_playlist_confirmation_body">Är du säker på att du vill ta bort din spellista? Det går inte att ångra åtgärden.</string>
     <string name="delete_playlist">Ta bort spellista</string>
@@ -56,7 +52,6 @@ Language: sv_SE
     <string name="add_to_up_next_top">Lägg till högst upp i Nästa</string>
     <string name="playlist_episodes_archived_title">Inga avsnitt</string>
     <string name="playlist_episodes_archived_count">%1$d arkiverade</string>
-    <string name="playlist_edit_episodes_title">Redigera spellista</string>
     <string name="playlist_edit_episodes">Ordna om avsnitt</string>
     <string name="playlist_episode_unavailable_cta">Ta bort från spellista</string>
     <string name="playlist_episode_unavailable_description">Podcastens skapare har tagit bort detta avsnitt. Det kommer att finnas kvar i din spellista tills du tar bort det.</string>

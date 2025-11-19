@@ -1,5 +1,6 @@
 package au.com.shiftyjelly.pocketcasts.playlists.manual
 
+import android.content.DialogInterface
 import android.os.Bundle
 import android.os.Parcelable
 import android.view.LayoutInflater
@@ -25,6 +26,7 @@ import androidx.navigation.compose.rememberNavController
 import au.com.shiftyjelly.pocketcasts.compose.CallOnce
 import au.com.shiftyjelly.pocketcasts.compose.components.AnimatedNonNullVisibility
 import au.com.shiftyjelly.pocketcasts.compose.components.ThemedSnackbarHost
+import au.com.shiftyjelly.pocketcasts.models.to.PlaylistPreviewForEpisode
 import au.com.shiftyjelly.pocketcasts.playlists.PlaylistFragment
 import au.com.shiftyjelly.pocketcasts.repositories.playlist.Playlist
 import au.com.shiftyjelly.pocketcasts.ui.helper.FragmentHostListener
@@ -32,6 +34,7 @@ import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.utils.extensions.requireParcelable
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseDialogFragment
 import au.com.shiftyjelly.pocketcasts.views.swipe.AddToPlaylistFragmentFactory.Source
+import com.google.android.material.snackbar.Snackbar
 import dagger.hilt.android.AndroidEntryPoint
 import dagger.hilt.android.lifecycle.withCreationCallback
 import kotlinx.coroutines.launch
@@ -42,12 +45,15 @@ import au.com.shiftyjelly.pocketcasts.localization.R as LR
 internal class AddToPlaylistFragment : BaseDialogFragment() {
     private val args get() = requireArguments().requireParcelable<Args>(NEW_INSTANCE_ARGS)
 
+    private var isDoneTapped = false
+
     private val viewModel by viewModels<AddToPlaylistViewModel>(
         extrasProducer = {
             defaultViewModelCreationExtras.withCreationCallback<AddToPlaylistViewModel.Factory> { factory ->
                 factory.create(
                     source = args.source,
                     episodeUuid = args.episodeUuid,
+                    podcastUuid = args.podcastUuid,
                     initialPlaylistTitle = getString(LR.string.new_playlist),
                 )
             }
@@ -94,14 +100,14 @@ internal class AddToPlaylistFragment : BaseDialogFragment() {
                     onChangeEpisodeInPlaylist = { playlist ->
                         if (playlist.canAddOrRemoveEpisode(uiState.episodeLimit)) {
                             if (playlist.hasEpisode) {
-                                viewModel.trackEpisodeRemoveTapped()
+                                viewModel.trackEpisodeRemoveTapped(playlist)
                                 viewModel.removeFromPlaylist(playlist.uuid)
                             } else {
-                                viewModel.trackEpisodeAddTapped(isPlaylistFull = false)
+                                viewModel.trackEpisodeAddTapped(playlist, isPlaylistFull = false)
                                 viewModel.addToPlaylist(playlist.uuid)
                             }
                         } else {
-                            viewModel.trackEpisodeAddTapped(isPlaylistFull = true)
+                            viewModel.trackEpisodeAddTapped(playlist, isPlaylistFull = true)
                             if (snackbarHostState.currentSnackbarData == null) {
                                 coroutineScope.launch {
                                     snackbarHostState.showSnackbar(getString(LR.string.playlist_is_full_description))
@@ -112,7 +118,11 @@ internal class AddToPlaylistFragment : BaseDialogFragment() {
                     onClickContinueWithNewPlaylist = {
                         viewModel.trackNewPlaylistTapped()
                     },
-                    onClickDoneButton = ::dismiss,
+                    onClickDoneButton = {
+                        isDoneTapped = true
+                        viewModel.commitPlaylistChanges()
+                        dismiss()
+                    },
                     onClickNavigationButton = {
                         if (!navController.popBackStack()) {
                             dismiss()
@@ -131,17 +141,41 @@ internal class AddToPlaylistFragment : BaseDialogFragment() {
         }
     }
 
+    override fun onDismiss(dialog: DialogInterface) {
+        super.onDismiss(dialog)
+        if (!requireActivity().isChangingConfigurations && isDoneTapped) {
+            showDoneSnackbar(viewModel.getPlaylistsAddedTo())
+        }
+    }
+
+    private fun showDoneSnackbar(playlistsAddedTo: Set<PlaylistPreviewForEpisode>) {
+        val hostListener = requireActivity() as FragmentHostListener
+        val snackbarView = hostListener.snackBarView()
+        val snackbar = when (val size = playlistsAddedTo.size) {
+            0 -> return
+
+            1 -> {
+                val playlist = playlistsAddedTo.first()
+                val message = getString(LR.string.added_to_playlist_single, playlist.title)
+                Snackbar.make(snackbarView, message, Snackbar.LENGTH_LONG)
+                    .setAction(LR.string.view) { hostListener.openManualPlaylist(playlist.uuid) }
+            }
+
+            else -> {
+                val message = resources.getQuantityString(LR.plurals.added_to_playlist_single_multiple, size, size)
+                Snackbar.make(snackbarView, message, Snackbar.LENGTH_LONG)
+            }
+        }
+        snackbar.show()
+    }
+
     @Composable
     private fun OpenCreatedPlaylistEffect() {
         LaunchedEffect(Unit) {
             val playlistUuid = viewModel.createdPlaylist.await()
 
             dismiss()
-            val hostListener = requireActivity() as FragmentHostListener
-            hostListener.closeFiltersToRoot()
-            hostListener.addFragment(PlaylistFragment.newInstance(playlistUuid, Playlist.Type.Manual))
-            hostListener.closeBottomSheet()
-            hostListener.closePlayer()
+            (requireActivity() as FragmentHostListener).openManualPlaylist(playlistUuid)
         }
     }
 
@@ -149,6 +183,7 @@ internal class AddToPlaylistFragment : BaseDialogFragment() {
     private class Args(
         val source: Source,
         val episodeUuid: String,
+        val podcastUuid: String,
         val customTheme: Theme.ThemeType?,
     ) : Parcelable
 
@@ -158,11 +193,30 @@ internal class AddToPlaylistFragment : BaseDialogFragment() {
         fun newInstance(
             source: Source,
             episodeUuid: String,
+            podcastUuid: String,
             customTheme: Theme.ThemeType? = null,
         ) = AddToPlaylistFragment().apply {
-            arguments = bundleOf(NEW_INSTANCE_ARGS to Args(source, episodeUuid, customTheme))
+            arguments = bundleOf(
+                NEW_INSTANCE_ARGS to Args(
+                    source = source,
+                    episodeUuid = episodeUuid,
+                    podcastUuid = podcastUuid,
+                    customTheme = customTheme,
+                ),
+            )
         }
     }
+}
+
+// This is deliberately not a member function to avoid memory leaks when showing a snackbar.
+// If this were a member function of the fragment, any lambda (such as the one passed to setAction())
+// that references it would capture the fragment's `this` reference, potentially causing a memory leak.
+// Making it an extension function on FragmentHostListener ensures only the activity and playlistUuid are captured.
+private fun FragmentHostListener.openManualPlaylist(playlistUuid: String) {
+    closeFiltersToRoot()
+    addFragment(PlaylistFragment.newInstance(playlistUuid, Playlist.Type.Manual))
+    closeBottomSheet()
+    closePlayer()
 }
 
 private val fadeIn = fadeIn()

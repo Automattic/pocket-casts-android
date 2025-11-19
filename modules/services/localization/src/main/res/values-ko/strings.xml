@@ -13,11 +13,7 @@ Language: ko_KR
     <string name="search_suggestions_view_all">\"%1$s\"에 대해 모두 보기</string>
     <string name="up_next_as_playlist_saved">다음 차례 재생목록으로 저장됨</string>
     <string name="up_next_as_playlist_replace_title">현재 다음 차례를 교체할까요?</string>
-    <string name="up_next_as_playlist_replace_body">그러면 현재 다음 차례 대기열이 지워지고 이 재생목록이 재생됩니다.</string>
-    <string name="up_next_as_playlist_title">다음 차례 대기열을 저장할까요?</string>
     <string name="up_next_as_playlist_button_secondary">교체하고 재생</string>
-    <string name="up_next_as_playlist_button_primary">현재 대기열 저장</string>
-    <string name="up_next_as_playlist_body">이 재생목록을 재생하면 현재 다음 차례가 교체됩니다. 보관하려면 먼저 저장하세요.</string>
     <string name="delete_playlist_confirmation_title">재생목록을 삭제할까요?</string>
     <string name="delete_playlist_confirmation_body">재생목록을 삭제하시겠습니까? 이 작업은 되돌릴 수 없습니다.</string>
     <string name="delete_playlist">재생목록 삭제</string>
@@ -56,7 +52,6 @@ Language: ko_KR
     <string name="add_to_up_next_top">다음 차례에 추가(맨 처음)</string>
     <string name="playlist_episodes_archived_title">에피소드 없음</string>
     <string name="playlist_episodes_archived_count">%1$d개 보관됨</string>
-    <string name="playlist_edit_episodes_title">재생목록 편집</string>
     <string name="playlist_edit_episodes">에피소드 재정렬</string>
     <string name="playlist_episode_unavailable_cta">재생목록에서 제거</string>
     <string name="playlist_episode_unavailable_description">팟캐스트 크리에이터가 이 에피소드를 삭제했습니다. 회원님이 제거할 때까지 회원님 재생목록에는 남아 있습니다.</string>

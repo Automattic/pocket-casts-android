@@ -593,6 +593,7 @@ interface Settings {
     val showFreeAccountEncouragement: UserSetting<Boolean>
 
     val showPlaylistsOnboarding: UserSetting<Boolean>
+    val saveUpNextAsPlaylist: UserSetting<Boolean>
 
     // App review prompt policy settings
     val appReviewEpisodeCompletedTimestamps: ReadWriteSetting<List<Instant>>

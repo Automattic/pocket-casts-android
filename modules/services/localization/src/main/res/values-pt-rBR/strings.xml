@@ -12,12 +12,8 @@ Language: pt_BR
     <string name="eoy_playback_intro_title">Seu ano em podcasts\nporque recordar é viver</string>
     <string name="search_suggestions_view_all">Ver tudo sobre \"%1$s\"</string>
     <string name="up_next_as_playlist_button_secondary">Substituir e reproduzir</string>
-    <string name="up_next_as_playlist_button_primary">Salvar fila atual</string>
     <string name="up_next_as_playlist_saved">Up Next salva como uma playlist</string>
     <string name="up_next_as_playlist_replace_title">Substituir Up Next?</string>
-    <string name="up_next_as_playlist_replace_body">Isso limpará sua fila Up Next atual e começará a reproduzir esta playlist.</string>
-    <string name="up_next_as_playlist_title">Salvar sua fila Up Next?</string>
-    <string name="up_next_as_playlist_body">A fila Up Next atual será substituída quando você reproduzir esta playlist. Salve primeiro para mantê-la.</string>
     <string name="delete_playlist_confirmation_title">Excluir playlist?</string>
     <string name="delete_playlist_confirmation_body">Tem certeza de que deseja excluir sua playlist? Esta ação não pode ser desfeita.</string>
     <string name="view">Visualizar</string>
@@ -57,7 +53,6 @@ Language: pt_BR
     <string name="playlist_episodes_archived_title">Sem episódios</string>
     <string name="playlist_episodes_archived_count">%1$d arquivado(s)</string>
     <string name="playlist_edit_episodes">Reorganizar episódios</string>
-    <string name="playlist_edit_episodes_title">Editar playlist</string>
     <string name="playlist_episode_unavailable_title">Episódio indisponível</string>
     <string name="episode_sort_custom_order">Ordenação personalizada</string>
     <string name="playlist_episode_unavailable_cta">Remover da playlist</string>

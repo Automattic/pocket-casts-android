@@ -967,6 +967,12 @@
     <!-- Accessibility description. %1$s is an episode title-->
     <string name="add_to_playlist_episode_desc">Add %1$s to playlist</string>
     <string name="add_to_playlist_failure_message">This playlist is full. Remove a few episodes or start a new one.</string>
+    <!-- %1$s is a playlist title  -->
+    <string name="added_to_playlist_single">Added to %1$s</string>
+    <plurals name="added_to_playlist_single_multiple">
+        <item quantity="one">Added to %d playlist</item>
+        <item quantity="other">Added to %d playlists</item>
+    </plurals>
     <string name="create_playlist">Create playlist</string>
     <string name="create_smart_playlist">Create smart playlist</string>
     <string name="decrement_longer_than_duration">Decrement \"longer than\" duration</string>
@@ -998,8 +1004,8 @@
     <string name="playlist_archive_all" translatable="false">@string/podcast_archive_all</string>
     <string name="playlist_artwork_description">Playlist’s artwork</string>
     <string name="playlist_download_all" translatable="false">@string/podcast_download_all</string>
-    <string name="playlist_edit_episodes">Rearrange episodes</string>
-    <string name="playlist_edit_episodes_title">Edit playlist</string>
+    <string name="playlist_edit_episodes">Reorder episodes</string>
+    <string name="playlist_edit_episodes_title" translatable="false">@string/playlist_edit_episodes</string>
     <string name="playlist_episode_unavailable_title">Episode unavailable</string>
     <string name="playlist_episode_unavailable_description">The podcast creator deleted this episode. It will stay in your playlist until you remove it.</string>
     <string name="playlist_episode_unavailable_cta">Remove from playlist</string>
@@ -1051,14 +1057,11 @@
     <string name="smart_rule_starred_label">Starred episodes</string>
     <string name="smart_rules">Smart rules</string>
     <string name="smart_rules_description">Set up smart rules to automatically add episodes to your smart playlist.</string>
-    <string name="up_next_as_playlist_body">Your current Up Next will be replaced when you play this playlist. Save it first to keep it.</string>
-    <string name="up_next_as_playlist_button_primary">Save current queue</string>
     <string name="up_next_as_playlist_button_secondary">Replace and play</string>
-    <string name="up_next_as_playlist_title">Save your Up Next queue?</string>
-    <string name="up_next_as_playlist_replace_body">This will clear your current Up Next queue and start playing this playlist.</string>
+    <string name="up_next_as_playlist_replace_body">Playing this will replace your current Up Next.</string>
+    <string name="up_next_as_playlist_replace_switch_description">Save your current Up&#160;Next queue as a playlist.</string>
     <string name="up_next_as_playlist_replace_button_primary" translatable="false">@string/up_next_as_playlist_button_secondary</string>
-    <string name="up_next_as_playlist_replace_button_secondary" translatable="false">@string/cancel</string>
-    <string name="up_next_as_playlist_replace_title">Replace current Up Next?</string>
+    <string name="up_next_as_playlist_replace_title">Replace your Up Next?</string>
     <string name="up_next_as_playlist_saved">Up Next saved as a playlist</string>
 
     <!-- Profile -->

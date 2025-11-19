@@ -18,9 +18,15 @@ object SharingModule {
         override fun create(
             source: Source,
             episodeUuid: String,
+            podcastUuid: String,
             customTheme: Theme.ThemeType?,
         ): BaseDialogFragment {
-            return AddToPlaylistFragment.newInstance(source, episodeUuid, customTheme)
+            return AddToPlaylistFragment.newInstance(
+                source = source,
+                episodeUuid = episodeUuid,
+                podcastUuid = podcastUuid,
+                customTheme = customTheme,
+            )
         }
     }
 }

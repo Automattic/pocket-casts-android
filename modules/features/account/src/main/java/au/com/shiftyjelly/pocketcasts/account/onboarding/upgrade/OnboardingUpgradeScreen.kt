@@ -105,6 +105,7 @@ fun OnboardingUpgradeScreen(
     onChangeSelectedPlan: (SubscriptionPlan) -> Unit,
     onClickPrivacyPolicy: () -> Unit,
     onClickTermsAndConditions: () -> Unit,
+    onClickSeeAllFeatures: (OnboardingUpgradeFeaturesState.NewOnboardingVariant) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     BoxWithConstraints(
@@ -123,6 +124,7 @@ fun OnboardingUpgradeScreen(
                 onChangeSelectedPlan = onChangeSelectedPlan,
                 onClickPrivacyPolicy = onClickPrivacyPolicy,
                 onClickTermsAndConditions = onClickTermsAndConditions,
+                onClickSeeAllFeatures = onClickSeeAllFeatures,
             )
         } else {
             RegularUpgradeScreen(
@@ -133,6 +135,7 @@ fun OnboardingUpgradeScreen(
                 onChangeSelectedPlan = onChangeSelectedPlan,
                 onClickPrivacyPolicy = onClickPrivacyPolicy,
                 onClickTermsAndConditions = onClickTermsAndConditions,
+                onClickSeeAllFeatures = onClickSeeAllFeatures,
             )
         }
     }
@@ -147,6 +150,7 @@ private fun CompactHeightUpscaledFontUpgradeScreen(
     onChangeSelectedPlan: (SubscriptionPlan) -> Unit,
     onClickPrivacyPolicy: () -> Unit,
     onClickTermsAndConditions: () -> Unit,
+    onClickSeeAllFeatures: (OnboardingUpgradeFeaturesState.NewOnboardingVariant) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val coroutineScope = rememberCoroutineScope()
@@ -184,6 +188,7 @@ private fun CompactHeightUpscaledFontUpgradeScreen(
                     content.toComponent(
                         index = index,
                         scrollToNext = scrollToNext,
+                        onClickSeeAllFeatures = onClickSeeAllFeatures,
                         modifier = Modifier
                             .height(IntrinsicSize.Min)
                             .padding(top = if (index == 0) 32.dp else 0.dp)
@@ -236,6 +241,7 @@ private fun RegularUpgradeScreen(
     onChangeSelectedPlan: (SubscriptionPlan) -> Unit,
     onClickPrivacyPolicy: () -> Unit,
     onClickTermsAndConditions: () -> Unit,
+    onClickSeeAllFeatures: (OnboardingUpgradeFeaturesState.NewOnboardingVariant) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val (contentFocusRequester, footerFocusRequester) = remember { FocusRequester.createRefs() }
@@ -259,6 +265,7 @@ private fun RegularUpgradeScreen(
                 plan = state.selectedBasePlan,
                 source = source,
             ),
+            onClickSeeAllFeatures = onClickSeeAllFeatures,
             selfFocusRequester = contentFocusRequester,
             downFocusRequester = footerFocusRequester,
         )
@@ -549,6 +556,7 @@ private fun UpgradeContent(
     pages: List<UpgradePagerContent>,
     selfFocusRequester: FocusRequester,
     downFocusRequester: FocusRequester,
+    onClickSeeAllFeatures: (OnboardingUpgradeFeaturesState.NewOnboardingVariant) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val coroutineScope = rememberCoroutineScope()
@@ -599,7 +607,7 @@ private fun UpgradeContent(
                         scrollState.animateScrollTo(((index + 1) % pages.size) * contentHeight)
                     }
                 }
-                content.toComponent(index = index, scrollToNext = scrollToNext, modifier = baseModifier)()
+                content.toComponent(index = index, scrollToNext = scrollToNext, modifier = baseModifier, onClickSeeAllFeatures = onClickSeeAllFeatures)()
             }
         }
         Box(
@@ -634,6 +642,7 @@ private fun UpgradeContent(
 private fun UpgradePagerContent.toComponent(
     index: Int,
     scrollToNext: () -> Unit,
+    onClickSeeAllFeatures: (OnboardingUpgradeFeaturesState.NewOnboardingVariant) -> Unit,
     modifier: Modifier = Modifier,
 ): @Composable () -> Unit {
     val topPaddingForGenericContent = if (index != 0) 16.dp else 0.dp
@@ -648,7 +657,10 @@ private fun UpgradePagerContent.toComponent(
                         top = topPaddingForGenericContent,
                     ),
                 features = this,
-                onCtaClick = scrollToNext,
+                onCtaClick = {
+                    onClickSeeAllFeatures(OnboardingUpgradeFeaturesState.NewOnboardingVariant.FEATURES_FIRST)
+                    scrollToNext()
+                },
             )
 
             is UpgradePagerContent.TrialSchedule -> ScheduleContent(
@@ -660,7 +672,10 @@ private fun UpgradePagerContent.toComponent(
                         top = topPaddingForGenericContent,
                     ),
                 trialSchedule = this,
-                onCtaClick = scrollToNext,
+                onCtaClick = {
+                    onClickSeeAllFeatures(OnboardingUpgradeFeaturesState.NewOnboardingVariant.TRIAL_FIRST_WHEN_ELIGIBLE)
+                    scrollToNext()
+                },
             )
 
             is UpgradePagerContent.Folders -> FoldersUpgradeContent(
@@ -729,7 +744,7 @@ private fun ScheduleContent(
                 text = stringResource(LR.string.onboarding_upgrade_schedule_see_features),
                 modifier = Modifier
                     .padding(vertical = 24.dp)
-                    .clickable { onCtaClick() },
+                    .clickable(onClick = onCtaClick),
                 color = MaterialTheme.theme.colors.primaryInteractive01,
             )
         }
@@ -933,6 +948,7 @@ private fun PreviewOnboardingUpgradeScreen(
             onClickTermsAndConditions = {},
             onChangeSelectedPlan = {},
             source = OnboardingUpgradeSource.ACCOUNT_DETAILS,
+            onClickSeeAllFeatures = {},
         )
     }
 }
@@ -962,6 +978,7 @@ private fun PreviewOnboardingUpgradeScreenSmall(
             onClickTermsAndConditions = {},
             onChangeSelectedPlan = {},
             source = OnboardingUpgradeSource.ACCOUNT_DETAILS,
+            onClickSeeAllFeatures = {},
         )
     }
 }

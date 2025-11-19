@@ -34,7 +34,6 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import au.com.shiftyjelly.pocketcasts.account.onboarding.components.ContinueWithGoogleButton
 import au.com.shiftyjelly.pocketcasts.account.viewmodel.GoogleSignInState
@@ -79,7 +78,7 @@ internal fun NewOnboardingCreateAccountPage(
     val pocketCastsTheme = MaterialTheme.theme
 
     CallOnce {
-        viewModel.onShown()
+        viewModel.onSetupAccountShown(flow = flow)
     }
 
     LaunchedEffect(onUpdateSystemBars) {
@@ -90,7 +89,7 @@ internal fun NewOnboardingCreateAccountPage(
     }
 
     BackHandler {
-        viewModel.onBackPressed()
+        viewModel.onSetupAccountDismissed(flow = flow)
         onBackPress()
     }
 
@@ -103,6 +102,10 @@ internal fun NewOnboardingCreateAccountPage(
             .fillMaxHeight()
             .verticalScroll(rememberScrollState()),
     ) {
+        val onClose = {
+            viewModel.onSetupAccountDismissed(flow = flow)
+            onSkip()
+        }
         if (flow.shouldOfferLogin) {
             NavigationIconButton(
                 modifier = Modifier
@@ -110,14 +113,14 @@ internal fun NewOnboardingCreateAccountPage(
                     .padding(horizontal = 8.dp, vertical = 16.dp),
                 tint = MaterialTheme.theme.colors.primaryInteractive01,
                 navigationButton = NavigationButton.Close,
-                onClick = onSkip,
+                onClick = onClose,
             )
         } else {
             TextP40(
                 modifier = Modifier
                     .align(Alignment.End)
                     .padding(end = 16.dp, top = 11.dp)
-                    .clickable(onClick = onSkip)
+                    .clickable(onClick = onClose)
                     .padding(horizontal = 8.dp, vertical = 4.dp),
                 text = stringResource(LR.string.not_now),
                 color = MaterialTheme.theme.colors.primaryInteractive01,
@@ -185,6 +188,7 @@ private val OnboardingFlow.shouldOfferLogin: Boolean
 @Composable
 internal fun OnboardingCreateAccountPage(
     theme: Theme.ThemeType,
+    flow: OnboardingFlow,
     onBackPress: () -> Unit,
     onCreateAccount: () -> Unit,
     onUpdateSystemBars: (SystemBarsStyles) -> Unit,
@@ -196,7 +200,7 @@ internal fun OnboardingCreateAccountPage(
     val pocketCastsTheme = MaterialTheme.theme
 
     CallOnce {
-        viewModel.onShown()
+        viewModel.onCreateAccountShown(flow = flow)
     }
 
     LaunchedEffect(onUpdateSystemBars) {
@@ -207,7 +211,7 @@ internal fun OnboardingCreateAccountPage(
     }
 
     BackHandler {
-        viewModel.onBackPressed()
+        viewModel.onCreateAccountDismissed(flow = flow)
         onBackPress()
     }
 
@@ -228,7 +232,7 @@ internal fun OnboardingCreateAccountPage(
         ThemedTopAppBar(
             title = stringResource(LR.string.create_account),
             onNavigationClick = {
-                viewModel.onBackPressed()
+                viewModel.onCreateAccountDismissed(flow = flow)
                 onBackPress()
             },
         )
@@ -293,6 +297,7 @@ private fun OnboardingCreateAccountPagePreview(
     AppThemeWithBackground(themeType) {
         OnboardingCreateAccountPage(
             theme = themeType,
+            flow = OnboardingFlow.LoggedOut,
             onBackPress = {},
             onCreateAccount = {},
             onUpdateSystemBars = {},

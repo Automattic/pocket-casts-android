@@ -40,7 +40,8 @@ class AddToPlaylistViewModel @AssistedInject constructor(
     private val playlistManager: PlaylistManager,
     private val tracker: AnalyticsTracker,
     @Assisted private val source: Source,
-    @Assisted("id") private val episodeUuid: String,
+    @Assisted("episodeUuid") private val episodeUuid: String,
+    @Assisted("podcastUuid") private val podcastUuid: String,
     @Assisted("title") initialPlaylistTitle: String,
 ) : ViewModel() {
     private val previewsFlow = MutableStateFlow<List<PlaylistPreviewForEpisode>?>(null)
@@ -82,6 +83,27 @@ class AddToPlaylistViewModel @AssistedInject constructor(
         emitAll(uiStates)
     }.stateIn(viewModelScope, SharingStarted.Eagerly, initialValue = null)
 
+    private val playlistsChanges = mutableMapOf<String, Boolean>()
+
+    private fun cachePlaylistChange(uuid: String, shouldAdd: Boolean) {
+        // If the change is not present add it.
+        playlistsChanges.merge(uuid, shouldAdd) { isCurrentlyAdded, _ ->
+            if (isCurrentlyAdded == shouldAdd) {
+                // If the change is already stored keep it.
+                isCurrentlyAdded
+            } else {
+                // If playlist was added but will be removed or vice-versa remove the change value.
+                null
+            }
+        }
+    }
+
+    fun getPlaylistsAddedTo(): Set<PlaylistPreviewForEpisode> {
+        val playlists = uiState.value?.playlistPreviews.orEmpty()
+        val uuidsAddedTo = playlistsChanges.filterValues { it }.keys
+        return playlists.filterTo(mutableSetOf()) { playlist -> playlist.uuid in uuidsAddedTo }
+    }
+
     fun getArtworkUuidsFlow(playlistUuid: String): StateFlow<List<String>?> {
         return playlistManager.getArtworkUuidsFlow(playlistUuid)
     }
@@ -107,7 +129,9 @@ class AddToPlaylistViewModel @AssistedInject constructor(
     }
 
     fun addToPlaylist(playlistUuid: String) {
-        viewModelScope.launch(Dispatchers.Default + NonCancellable) {
+        cachePlaylistChange(playlistUuid, shouldAdd = true)
+
+        viewModelScope.launch(Dispatchers.Default) {
             previewsFlow.update { previews ->
                 previews?.map { preview ->
                     if (preview.uuid == playlistUuid) {
@@ -117,12 +141,13 @@ class AddToPlaylistViewModel @AssistedInject constructor(
                     }
                 }
             }
-            playlistManager.addManualEpisode(playlistUuid, episodeUuid)
         }
     }
 
     fun removeFromPlaylist(playlistUuid: String) {
-        viewModelScope.launch(Dispatchers.Default + NonCancellable) {
+        cachePlaylistChange(playlistUuid, shouldAdd = false)
+
+        viewModelScope.launch(Dispatchers.Default) {
             previewsFlow.update { previews ->
                 previews?.map { preview ->
                     if (preview.uuid == playlistUuid) {
@@ -132,7 +157,18 @@ class AddToPlaylistViewModel @AssistedInject constructor(
                     }
                 }
             }
-            playlistManager.deleteManualEpisode(playlistUuid, episodeUuid)
+        }
+    }
+
+    fun commitPlaylistChanges() {
+        viewModelScope.launch(NonCancellable) {
+            for ((playlistUuid, isAdded) in playlistsChanges) {
+                if (isAdded) {
+                    playlistManager.addManualEpisode(playlistUuid, episodeUuid)
+                } else {
+                    playlistManager.deleteManualEpisode(playlistUuid, episodeUuid)
+                }
+            }
         }
     }
 
@@ -143,7 +179,10 @@ class AddToPlaylistViewModel @AssistedInject constructor(
         )
     }
 
-    fun trackEpisodeAddTapped(isPlaylistFull: Boolean) {
+    fun trackEpisodeAddTapped(
+        playlist: PlaylistPreviewForEpisode,
+        isPlaylistFull: Boolean,
+    ) {
         tracker.track(
             AnalyticsEvent.ADD_TO_PLAYLISTS_EPISODE_ADD_TAPPED,
             mapOf(
@@ -151,12 +190,34 @@ class AddToPlaylistViewModel @AssistedInject constructor(
                 "is_playlist_full" to isPlaylistFull,
             ),
         )
+        if (!isPlaylistFull) {
+            tracker.track(
+                AnalyticsEvent.EPISODE_ADDED_TO_LIST,
+                buildMap {
+                    put("playlist_name", playlist.title)
+                    put("playlist_uuid", playlist.uuid)
+                    put("episode_uuid", episodeUuid)
+                    put("podcast_uuid", podcastUuid)
+                    put("source", source.episodeEditAnalyticsValue)
+                },
+            )
+        }
     }
 
-    fun trackEpisodeRemoveTapped() {
+    fun trackEpisodeRemoveTapped(playlist: PlaylistPreviewForEpisode) {
         tracker.track(
             AnalyticsEvent.ADD_TO_PLAYLISTS_EPISODE_REMOVE_TAPPED,
             mapOf("source" to source.analyticsValue),
+        )
+        tracker.track(
+            AnalyticsEvent.EPISODE_REMOVED_FROM_LIST,
+            buildMap {
+                put("playlist_name", playlist.title)
+                put("playlist_uuid", playlist.uuid)
+                put("episode_uuid", episodeUuid)
+                put("podcast_uuid", podcastUuid)
+                put("source", source.episodeEditAnalyticsValue)
+            },
         )
     }
 
@@ -184,7 +245,8 @@ class AddToPlaylistViewModel @AssistedInject constructor(
     interface Factory {
         fun create(
             source: Source,
-            @Assisted("id") episodeUuid: String,
+            @Assisted("episodeUuid") episodeUuid: String,
+            @Assisted("podcastUuid") podcastUuid: String,
             @Assisted("title") initialPlaylistTitle: String,
         ): AddToPlaylistViewModel
     }

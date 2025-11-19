@@ -88,9 +88,9 @@ internal class AddEpisodesFragment : BaseDialogFragment() {
                     onOpenFolder = {
                         viewModel.trackFolderTapped()
                     },
-                    onAddEpisode = { episodeUuid ->
-                        viewModel.trackEpisodeTapped()
-                        viewModel.addEpisode(episodeUuid)
+                    onAddEpisode = { episode ->
+                        viewModel.trackEpisodeTapped(episode)
+                        viewModel.addEpisode(episode.uuid)
                     },
                     onClickNavigationButton = {
                         if (!navController.popBackStack()) {

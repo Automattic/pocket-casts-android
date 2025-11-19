@@ -1634,6 +1634,12 @@ class SettingsImpl @Inject constructor(
         sharedPrefs = sharedPreferences,
     )
 
+    override val saveUpNextAsPlaylist = UserSetting.BoolPref(
+        sharedPrefKey = "save_up_next_as_playlist",
+        defaultValue = true,
+        sharedPrefs = sharedPreferences,
+    )
+
     override val appReviewEpisodeCompletedTimestamps = UserSetting.PrefListFromString(
         sharedPrefKey = "app_review_episode_completed_timestamps",
         defaultValue = emptyList(),

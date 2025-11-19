@@ -13,11 +13,7 @@ Language: fr
     <string name="search_suggestions_view_all">Tout afficher pour « %1$s »</string>
     <string name="up_next_as_playlist_saved">File d’attente enregistrée comme playlist</string>
     <string name="up_next_as_playlist_replace_title">Remplacer la file d’attente actuelle ?</string>
-    <string name="up_next_as_playlist_replace_body">Cela effacera votre file d’attente actuelle et commencera à lire cette playlist.</string>
-    <string name="up_next_as_playlist_title">Enregistrer votre file d’attente ?</string>
     <string name="up_next_as_playlist_button_secondary">Remplacer et lire</string>
-    <string name="up_next_as_playlist_button_primary">Enregistrer la file d’attente actuelle</string>
-    <string name="up_next_as_playlist_body">Votre file d’attente actuelle sera remplacée lorsque vous lirez cette playlist. Enregistrez-la d’abord pour la conserver.</string>
     <string name="delete_playlist_confirmation_title">Supprimer la playlist ?</string>
     <string name="delete_playlist_confirmation_body">Voulez-vous vraiment supprimer votre playlist ? Il n’est pas possible d’annuler cette action.</string>
     <string name="delete_playlist">Supprimer la playlist</string>
@@ -57,7 +53,6 @@ Language: fr
     <string name="playlist_episodes_archived_title">Aucun épisode</string>
     <string name="playlist_episodes_archived_count">%1$d archivé(s)</string>
     <string name="playlist_edit_episodes">Réorganiser les épisodes</string>
-    <string name="playlist_edit_episodes_title">Modifier la playlist</string>
     <string name="playlist_episode_unavailable_title">Épisode non disponible</string>
     <string name="episode_sort_custom_order">Ordre personnalisé</string>
     <string name="playlist_episode_unavailable_cta">Retirer de la playlist</string>

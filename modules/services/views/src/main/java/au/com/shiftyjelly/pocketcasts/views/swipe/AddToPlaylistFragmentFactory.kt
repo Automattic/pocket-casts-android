@@ -7,17 +7,21 @@ interface AddToPlaylistFragmentFactory {
     fun create(
         source: Source,
         episodeUuid: String,
+        podcastUuid: String,
         customTheme: Theme.ThemeType? = null,
     ): BaseDialogFragment
 
     enum class Source(
         val analyticsValue: String,
+        val episodeEditAnalyticsValue: String,
     ) {
         Swipe(
             analyticsValue = "swipe",
+            episodeEditAnalyticsValue = "swipe_edit",
         ),
         Shelf(
             analyticsValue = "shelf",
+            episodeEditAnalyticsValue = "shelf",
         ),
     }
 
@@ -27,6 +31,7 @@ interface AddToPlaylistFragmentFactory {
             override fun create(
                 source: Source,
                 episodeUuid: String,
+                podcastUuid: String,
                 customTheme: Theme.ThemeType?,
             ): BaseDialogFragment {
                 error("Adding episodes to playlist is not supported")

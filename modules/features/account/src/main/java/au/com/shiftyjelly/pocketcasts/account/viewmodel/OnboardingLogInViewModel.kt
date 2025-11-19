@@ -4,7 +4,6 @@ import android.app.Application
 import android.content.Context
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
-import au.com.shiftyjelly.pocketcasts.account.viewmodel.OnboardingLoginOrSignUpViewModel.Companion.AnalyticsProp
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.analytics.experiments.ExperimentProvider
@@ -65,16 +64,14 @@ class OnboardingLogInViewModel @Inject constructor(
     }
 
     fun onSignInButtonTapped(flow: OnboardingFlow) {
-        analyticsTracker.track(
-            AnalyticsEvent.SIGNIN_BUTTON_TAPPED,
-            mapOf(AnalyticsProp.flow(flow), AnalyticsProp.ButtonTapped.signIn),
+        analyticsTracker.trackSignInButtonTapped(
+            flow = flow.analyticsValue,
         )
     }
 
     fun onForgotPasswordTapped(flow: OnboardingFlow) {
-        analyticsTracker.track(
-            AnalyticsEvent.SIGNIN_FORGOT_PASSWORD_TAPPED,
-            mapOf(AnalyticsProp.flow(flow)),
+        analyticsTracker.trackSignInForgotPasswordTapped(
+            flow = flow.analyticsValue,
         )
     }
 
