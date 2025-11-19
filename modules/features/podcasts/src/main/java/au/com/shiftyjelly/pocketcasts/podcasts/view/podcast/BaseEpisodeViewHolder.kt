@@ -51,7 +51,11 @@ abstract class BaseEpisodeViewHolder<T : Any>(
 
     private var boundItem: T? = null
 
-    private val episode get() = toPodcastEpisode(requireNotNull(boundItem))
+    private var isPlaying = false
+
+    private val episode get() = toPodcastEpisode(requireNotNull(boundItem)).apply {
+        this.playing = isPlaying
+    }
 
     private inline val context get() = itemView.context
 
@@ -119,10 +123,7 @@ abstract class BaseEpisodeViewHolder<T : Any>(
             observeRowData()
         }
         bindArtwork(useEpisodeArtwork)
-        // Only bind playback button for new episodes; observable handles updates for existing ones
-        if (isNewEpisode) {
-            bindPlaybackButton()
-        }
+        bindPlaybackButton()
         bindTitle()
         bindDate()
         bindStatus(downloadProgress = 0)
@@ -166,7 +167,7 @@ abstract class BaseEpisodeViewHolder<T : Any>(
             .doOnSubscribe { isObservingRowData = true }
             .doOnDispose { isObservingRowData = false }
             .subscribeBy(onNext = { data ->
-                episode.playing = data.playbackState.isPlaying && data.playbackState.episodeUuid == episode.uuid
+                isPlaying = data.playbackState.isPlaying && data.playbackState.episodeUuid == episode.uuid
                 bindPlaybackButton()
 
                 binding.imgUpNext.isVisible = data.isInUpNext
