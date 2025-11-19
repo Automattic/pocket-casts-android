@@ -218,7 +218,7 @@ class StoriesActivity : ComponentActivity() {
             }
         }
 
-        var lastStory by remember { mutableStateOf<Story?>(null)}
+        var lastStory by remember { mutableStateOf<Story?>(null) }
         LaunchedEffect(state::class) {
             if (state is UiState.Synced || state is UiState.Syncing) {
                 // Track displayed page to not report it twice from different events.
