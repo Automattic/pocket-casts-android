@@ -790,7 +790,7 @@ class PlaylistManagerManualTest {
             manager.getAutoPlayEpisodes("playlist-id-0", currentEpisodeUuid = null),
         )
 
-        // Make sure that current episode is added even if it is ignore to correctly determine the next episode.
+        // Make sure that current episode is added even if it is ignored to correctly determine the next episode.
         // Current episode is filtered out during auto play selection process.
         assertEquals(
             listOf(
