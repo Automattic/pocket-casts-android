@@ -1,5 +1,7 @@
 package au.com.shiftyjelly.pocketcasts.endofyear.ui
 
+import androidx.compose.animation.core.CubicBezierEasing
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
@@ -31,7 +33,6 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.zIndex
 import au.com.shiftyjelly.pocketcasts.compose.Devices
 import au.com.shiftyjelly.pocketcasts.compose.adaptive.isAtMostMediumHeight
-import au.com.shiftyjelly.pocketcasts.compose.adaptive.isAtMostMediumWidth
 import au.com.shiftyjelly.pocketcasts.compose.components.PodcastImage
 import au.com.shiftyjelly.pocketcasts.compose.components.TextH10
 import au.com.shiftyjelly.pocketcasts.endofyear.R
@@ -149,9 +150,15 @@ private fun PodcastCoverCarousel(
 
     LaunchedEffect(freezeAnimation) {
         while (true) {
-            delay(1_000)
+            delay(700)
             if (!freezeAnimation) {
-                pagerState.animateScrollToPage(pagerState.currentPage + 1)
+                pagerState.animateScrollToPage(
+                    page = pagerState.currentPage + 1,
+                    animationSpec = tween(
+                        durationMillis = 650,
+                        easing = CubicBezierEasing(.9f, 0f, .08f, 1f),
+                    ),
+                )
             }
         }
     }
@@ -165,7 +172,7 @@ private fun PodcastCoverCarousel(
             beyondViewportPageCount = peekingItems,
             userScrollEnabled = false,
             pageSize = PageSize.Fixed(coverSize),
-            pageSpacing = -coverSize * (1f - peekFraction),
+            pageSpacing = -coverSize * (1f - peekFraction) + 8.dp,
             contentPadding = PaddingValues(vertical = coverSize * peekFraction * peekingItems),
         ) { page ->
             val podcastId = podcastIds[page % podcastIds.size]
@@ -174,7 +181,7 @@ private fun PodcastCoverCarousel(
             val pageOffset = relativePosition.absoluteValue
 
             if (pageOffset <= peekingItems) {
-                val scale = 1f - (pageOffset * 0.05f).coerceAtMost(0.15f)
+                val scale = 1f - (pageOffset * peekFraction).coerceAtMost(peekFraction * peekingItems)
 
                 PodcastImage(
                     uuid = podcastId,
@@ -184,8 +191,6 @@ private fun PodcastCoverCarousel(
                         .graphicsLayer {
                             scaleX = scale
                             scaleY = scale
-                            translationX = pageOffset * 5f
-                            shadowElevation = (1f - pageOffset.coerceAtMost(1f)) * 16f
                         }
                         .zIndex(1f - pageOffset),
                 )
