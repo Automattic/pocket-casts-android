@@ -955,7 +955,6 @@ Language: ja_JP
     <string name="end_of_year_story_top_categories_share_text">一番聴いたポッドキャストのカテゴリー</string>
     <string name="end_of_year_story_top_categories">トップカテゴリー</string>
     <string name="end_of_year_story_top_podcasts_share_text">今年再生数が多かったポッドキャストはこちら ! %1$s</string>
-    <string name="end_of_year_story_listened_to_numbers_subtitle">何度も聴いたエピソードもありました…</string>
     <string name="end_of_year_story_longest_episode_share_text">%1$dに聴いた最長のエピソード %2$s</string>
     <string name="end_of_year_story_top_podcasts_list_title">%1$dに再生数が多かったポッドキャスト</string>
     <string name="end_of_year_story_top_podcast_share_text">%1$dのお気に入りのポッドキャストはこちら ! %2$s</string>
@@ -963,7 +962,6 @@ Language: ja_JP
     <string name="end_of_year_story_listened_to_categories">今年、%1$d個のカテゴリーを聴きました</string>
     <string name="end_of_year_story_listened_to_categories_subtitle">お気に入りをいくつか振り返りましょう…</string>
     <string name="end_of_year_story_intro_title">今年聴いたポッドキャストを振り返ってみましょう。</string>
-    <string name="end_of_year_story_listened_to_numbers">%1$d個のショーで合計%2$d話のエピソードを聴きました</string>
     <string name="end_of_year_story_listened_to_categories_share_text">2023年は%1$d個のカテゴリーを聴きました</string>
     <string name="end_of_year_story_listened_to_share_text">今年ポッドキャストを聴いた時間は%1$s時間でした</string>
     <string name="settings_media_notification_controls">メディア通知コントロール</string>

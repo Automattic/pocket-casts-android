@@ -51,7 +51,7 @@ internal val humaneFontFamily = FontFamily(
 internal val Story.backgroundColor
     get() = when (this) {
         is Story.Cover -> Color(0xFF27486A)
-        is Story.NumberOfShows -> Color(0xFFEFECAD)
+        is Story.NumberOfShows -> Color(0xFF27486A)
         is Story.TopShow -> Color(0xFF17423B)
         is Story.TopShows -> Color(0xFF96BCD1)
         is Story.Ratings -> Color(0xFFA22828)

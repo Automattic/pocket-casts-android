@@ -28,8 +28,7 @@ sealed interface Story {
     data class NumberOfShows(
         val showCount: Int,
         val episodeCount: Int,
-        val topShowIds: List<String>,
-        val bottomShowIds: List<String>,
+        val randomShowIds: List<String>,
     ) : Story {
         override val analyticsValue = "number_of_shows"
     }

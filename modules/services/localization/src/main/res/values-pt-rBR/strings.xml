@@ -955,7 +955,6 @@ Language: pt_BR
     <string name="end_of_year_story_top_categories">Suas principais categorias</string>
     <string name="end_of_year_story_top_podcasts_share_text">Meus principais podcasts do ano! %1$s</string>
     <string name="end_of_year_create_account_to_see">Salve seus podcasts na nuvem, receba sua avaliação de fim de ano e sincronize seu progresso com outros dispositivos.</string>
-    <string name="end_of_year_story_listened_to_numbers_subtitle">Mas tinha um que sempre fazia você pedir bis…</string>
     <string name="end_of_year_story_longest_episode_share_text">O episódio mais longo que eu ouvi em %1$d %2$s</string>
     <string name="end_of_year_story_top_podcasts_list_title">Meus principais podcasts de %1$d</string>
     <string name="end_of_year_story_top_podcast_share_text">Meu podcast favorito de %1$d! %2$s</string>
@@ -963,7 +962,6 @@ Language: pt_BR
     <string name="end_of_year_story_listened_to_categories">Você ouviu %1$d categorias diferentes neste ano</string>
     <string name="end_of_year_story_listened_to_categories_subtitle">Vamos dar uma olhada em alguns dos seus favoritos…</string>
     <string name="end_of_year_story_intro_title">Vamos celebrar seu ano em podcasts!</string>
-    <string name="end_of_year_story_listened_to_numbers">Você ouviu %1$d programas diferentes e %2$d episódios no total</string>
     <string name="end_of_year_story_listened_to_categories_share_text">Eu ouvi %1$d categorias diferentes em 2023</string>
     <string name="end_of_year_story_listened_to_share_text">Eu passei %1$s ouvindo podcasts neste ano</string>
     <string name="settings_media_notification_controls">Controles de notificação de mídia</string>

@@ -955,7 +955,6 @@ Language: ru
     <string name="end_of_year_story_top_categories_share_text">Рубрики подкастов, которые я слушаю чаще всего</string>
     <string name="end_of_year_story_top_categories">Ваши любимые рубрики</string>
     <string name="end_of_year_story_top_podcasts_share_text">Мои любимые подкасты этого года! %1$s</string>
-    <string name="end_of_year_story_listened_to_numbers_subtitle">Но было одно шоу, которое вы слушали снова и снова…</string>
     <string name="end_of_year_story_longest_episode_share_text">Самый продолжительный выпуск, прослушанный мною в %1$d году: %2$s</string>
     <string name="end_of_year_story_top_podcast_share_text">Мой любимый подкаст в %1$d году! %2$s</string>
     <string name="end_of_year_story_listened_to_numbers_share_text">Я прослушал(а) %1$d подкастов(а) и %2$d выпусков(а) в %3$d году</string>
@@ -963,7 +962,6 @@ Language: ru
     <string name="end_of_year_story_listened_to_categories">В этом году вы выбрали %1$d рубрик (-и)</string>
     <string name="end_of_year_story_listened_to_categories_subtitle">Взглянем на самые популярные…</string>
     <string name="end_of_year_story_intro_title">Давайте отметим ваш год прослушивания!</string>
-    <string name="end_of_year_story_listened_to_numbers">Вы прослушали %1$d шоу и %2$d выпусков</string>
     <string name="end_of_year_story_listened_to_categories_share_text">Я выбрал(а) %1$d рубрик(и) в 2023 году</string>
     <string name="end_of_year_story_listened_to_share_text">В этом году я провел(а) %1$s, слушая подкасты</string>
     <string name="settings_media_notification_controls">Элементы управления уведомлениями о медиафайлах</string>

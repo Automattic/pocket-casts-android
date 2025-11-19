@@ -955,7 +955,6 @@ Language: ar
     <string name="end_of_year_story_top_categories_share_text">الأكثر استماعًا إلى تصنيفات الحلقات الصوتية</string>
     <string name="end_of_year_create_account_to_see">احفظ حلقاتك الصوتية في السحابة واحصل على تقييم نهاية العام وقم بمزامنة تقدُّمك مع الأجهزة الأخرى.</string>
     <string name="end_of_year_story_top_podcasts_list_title">أهم حلقات البث الصوت الخاصة بي في ⁦%1$d⁩</string>
-    <string name="end_of_year_story_listened_to_numbers_subtitle">لكن هناك مساحة كنت لا تزال تأتي إليها…</string>
     <string name="end_of_year_story_listened_to_numbers_share_text">استمعتُ إلى ⁦%1$d⁩ من حلقات البث الصوتي المختلفة و⁦%2$d⁩ من الحلقات في ⁦%3$d⁩</string>
     <string name="end_of_year_story_top_podcast_share_text">حلقات البث الصوتي المفضلة لدي في ⁦%1$d⁩! %2$s</string>
     <string name="end_of_year_story_longest_episode_share_text">أطول حلقة استمعتُ إليها في ⁦%1$d⁩ %2$s</string>
@@ -964,7 +963,6 @@ Language: ar
     <string name="end_of_year_story_listened_to_categories_subtitle">لنلقِ نظرة إلى بعض مفضلاتك…</string>
     <string name="end_of_year_story_listened_to_share_text">قضيتُ ⁦%1$s⁩ في الاستماع إلى حلقات البث الصوتي في هذا العام</string>
     <string name="end_of_year_story_listened_to_categories_share_text">استمعتُ إلى ⁦%1$d⁩ من التصنيفات المختلفة في 2023</string>
-    <string name="end_of_year_story_listened_to_numbers">لقد استمعتُ إلى ⁦%1$d⁩ من حلقات البودكاست المختلفة و⁦%2$d⁩ من الحلقات</string>
     <string name="playback_speed">سرعة التشغيل</string>
     <string name="settings_media_notification_controls">عناصر التحكم في تنبيهات الوسائط</string>
     <string name="playback_speed_not_valid">سرعة التشغيل ⁦%1$s⁩ غير صالحة</string>
