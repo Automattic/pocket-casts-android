@@ -895,7 +895,6 @@ class MainActivity :
                                     mapOf("year" to EndOfYearManager.YEAR_TO_SYNC.value),
                                 )
                                 settings.setEndOfYearShowModal(false)
-                                viewModel.updateStoriesModalShowState(false)
                             },
                         )
                     }
