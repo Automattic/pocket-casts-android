@@ -111,6 +111,7 @@ class AccountDetailsFragment : BaseFragment() {
                 }
             },
             onClickSubscribe = { planKey ->
+                // this is an old onboarding flow callback, we still want to track this event here
                 analyticsTracker.track(AnalyticsEvent.PLUS_PROMOTION_UPGRADE_BUTTON_TAPPED)
                 val source = OnboardingUpgradeSource.PROFILE
                 val onboardingFlow = OnboardingFlow.PlusAccountUpgrade(source, planKey.tier, planKey.billingCycle)
@@ -156,7 +157,12 @@ class AccountDetailsFragment : BaseFragment() {
             onSignOut = { signOut() },
             onDeleteAccount = { deleteAccount() },
             onAccountUpgradeClick = {
-                analyticsTracker.track(AnalyticsEvent.PLUS_PROMOTION_UPGRADE_BUTTON_TAPPED, mapOf("version" to "1"))
+                analyticsTracker.track(
+                    AnalyticsEvent.PLUS_PROMOTION_BANNER_BUTTON_TAPPED, mapOf(
+                        "source" to OnboardingUpgradeSource.PROFILE.analyticsValue,
+                        "flow" to OnboardingFlow.NewOnboardingAccountUpgrade,
+                    )
+                )
                 val onboardingFlow = OnboardingFlow.NewOnboardingAccountUpgrade
                 OnboardingLauncher.openOnboardingFlow(requireActivity(), onboardingFlow)
             },
