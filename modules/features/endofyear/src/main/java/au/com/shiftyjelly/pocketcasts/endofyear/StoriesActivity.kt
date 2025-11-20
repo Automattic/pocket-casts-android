@@ -148,7 +148,7 @@ class StoriesActivity : ComponentActivity() {
         }
         val scope = rememberCoroutineScope()
         val state by viewModel.uiState.collectAsState()
-        val pagerState = rememberPagerState(pageCount = { state.storyCount })
+        val pagerState = rememberPagerState(pageCount = { state.stories.size })
         val storyChanger = remember(pagerState, scope) {
             StoryChanger(pagerState, viewModel, scope)
         }
@@ -174,10 +174,6 @@ class StoriesActivity : ComponentActivity() {
                 onRestartPlayback = storyChanger::reset,
                 onClose = {
                     viewModel.trackStoriesClosed("close_button")
-                    finish()
-                },
-                onFailedToLoad = {
-                    setResult(0, StoriesActivityContract.setResult(source))
                     finish()
                 },
             )
@@ -270,6 +266,12 @@ class StoriesActivity : ComponentActivity() {
                     viewModel.resumeStoryAutoProgress(StoryProgressPauseReason.TakingScreenshot)
                 }
             }
+        }
+
+        LaunchedEffect(Unit) {
+            viewModel.syncFailedSignal.await()
+            setResult(0, StoriesActivityContract.setResult(source))
+            finish()
         }
     }
 

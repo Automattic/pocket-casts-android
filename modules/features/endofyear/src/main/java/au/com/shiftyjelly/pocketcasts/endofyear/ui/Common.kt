@@ -65,17 +65,18 @@ internal val Story.backgroundColor
     }
 internal val Story.controlsColor
     get() = when (this) {
-        is Story.Cover,
-        is Story.NumberOfShows,
-        is Story.TopShow,
-        is Story.Ratings,
-        is Story.TotalTime,
-        is Story.LongestEpisode,
-        is Story.YearVsYear,
-        is Story.CompletionRate,
-        is Story.Ending,
-        -> Color.White
-        else -> Color.Black
+        is Story.Cover -> Color.White
+        is Story.NumberOfShows -> Color.White
+        is Story.TopShow -> Color.White
+        is Story.TopShows -> Color.Black
+        is Story.Ratings -> Color.White
+        is Story.TotalTime -> Color.White
+        is Story.LongestEpisode -> Color.White
+        is Story.PlusInterstitial -> Color.Black
+        is Story.YearVsYear -> Color.White
+        is Story.CompletionRate -> Color.White
+        is Story.Ending -> Color.White
+        is Story.PlaceholderWhileLoading -> Color.White
     }
 
 internal data class EndOfYearMeasurements(
