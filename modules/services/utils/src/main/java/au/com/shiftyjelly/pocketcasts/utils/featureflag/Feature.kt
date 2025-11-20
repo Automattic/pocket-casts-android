@@ -25,7 +25,7 @@ enum class Feature(
         title = "End of Year 2025",
         defaultValue = isDebugOrPrototypeBuild,
         tier = FeatureTier.Free,
-        hasFirebaseRemoteFlag = false,
+        hasFirebaseRemoteFlag = true,
         hasDevToggle = false,
     ),
     INTRO_PLUS_OFFER_ENABLED(
