@@ -134,9 +134,10 @@ internal fun NumberOfShowsStory(
     }
 }
 
-private const val PAGE_COUNT = 100
+private const val PAGE_COUNT = Int.MAX_VALUE
 private val SCROLL_INTERVAL = 700.milliseconds
 private const val SCROLL_ANIM_DURATION_MS = 650
+private val SCROLL_ANIM_CURVE = CubicBezierEasing(.9f, 0f, .08f, 1f)
 
 @Composable
 private fun PodcastCoverCarousel(
@@ -145,7 +146,7 @@ private fun PodcastCoverCarousel(
     modifier: Modifier = Modifier,
     freezeAnimation: Boolean = false,
     peekFraction: Float = .1f,
-    peekingItems: Int = 3,
+    peekingItems: Int = 4,
 ) {
     val pagerState = rememberPagerState(
         initialPage = PAGE_COUNT / 2,
@@ -156,18 +157,19 @@ private fun PodcastCoverCarousel(
     val freezeAnimation = freezeAnimation || isPreview
 
     LaunchedEffect(freezeAnimation) {
-        delay(SCROLL_INTERVAL)
+        if (freezeAnimation) {
+            return@LaunchedEffect
+        }
+
         while (true) {
-            if (!freezeAnimation) {
-                pagerState.animateScrollToPage(
-                    page = pagerState.currentPage + 1,
-                    animationSpec = tween(
-                        durationMillis = SCROLL_ANIM_DURATION_MS,
-                        easing = CubicBezierEasing(.9f, 0f, .08f, 1f),
-                    ),
-                )
-                delay(SCROLL_INTERVAL)
-            }
+            delay(SCROLL_INTERVAL)
+            pagerState.animateScrollToPage(
+                page = pagerState.currentPage + 1,
+                animationSpec = tween(
+                    durationMillis = SCROLL_ANIM_DURATION_MS,
+                    easing = SCROLL_ANIM_CURVE,
+                ),
+            )
         }
     }
 
@@ -191,6 +193,12 @@ private fun PodcastCoverCarousel(
 
             if (pageOffset <= peekingItems) {
                 val scale = 1f - (pageOffset * peekFraction).coerceAtMost(peekFraction * peekingItems)
+                val maxOffset = peekingItems.toFloat()
+                val imageAlpha = if (pageOffset > (maxOffset - 1f)) {
+                    (-pageOffset + maxOffset).coerceIn(0f, 1f)
+                } else {
+                    1f
+                }
 
                 PodcastImage(
                     uuid = podcastId,
@@ -200,6 +208,7 @@ private fun PodcastCoverCarousel(
                         .graphicsLayer {
                             scaleX = scale
                             scaleY = scale
+                            alpha = imageAlpha
                         }
                         .zIndex(1f - pageOffset),
                 )
