@@ -433,7 +433,10 @@ internal sealed interface UiState {
         val isPaidAccount: Boolean,
         override val storyProgress: Float,
         val isTalkBackOn: Boolean,
-    ) : UiState
+    ) : UiState {
+        override val storyCount: Int
+            get() = stories.size
+    }
 }
 
 private sealed interface SyncState {
