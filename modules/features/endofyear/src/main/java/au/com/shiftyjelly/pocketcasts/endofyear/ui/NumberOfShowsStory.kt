@@ -133,7 +133,8 @@ internal fun NumberOfShowsStory(
     }
 }
 
-private const val PAGE_COUNT = 100
+private const val PAGE_COUNT = Int.MAX_VALUE
+private const val SCROLL_ANIM_DURATION_MS = 650
 private val SCROLL_INTERVAL = 700.milliseconds
 private val ANIMATION_CURVE = CubicBezierEasing(.9f, 0f, .08f, 1f)
 
