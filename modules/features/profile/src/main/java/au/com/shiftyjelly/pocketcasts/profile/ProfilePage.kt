@@ -73,6 +73,7 @@ internal fun ProfilePage(
     onHeaderClick: () -> Unit,
     onCreateFreeAccountBannerClick: () -> Unit,
     onDismissCreateFreeAccountBannerClick: () -> Unit,
+    onEndOfYearCardShow: () -> Unit,
     onPlaybackClick: () -> Unit,
     onClaimReferralsClick: () -> Unit,
     onHideReferralsCardClick: () -> Unit,
@@ -137,6 +138,7 @@ internal fun ProfilePage(
                     item {
                         EndOfYearPromptCard(
                             onClick = onPlaybackClick,
+                            onShow = onEndOfYearCardShow,
                             modifier = Modifier.padding(horizontal = horizontalPadding),
                         )
                     }
@@ -398,6 +400,7 @@ private fun ProfilePageStub(
         onHeaderClick = {},
         onCreateFreeAccountBannerClick = {},
         onDismissCreateFreeAccountBannerClick = {},
+        onEndOfYearCardShow = {},
         onPlaybackClick = {},
         onSendReferralsClick = {},
         onHideReferralsCardClick = {},

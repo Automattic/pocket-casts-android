@@ -887,14 +887,15 @@ class MainActivity :
                             parent = viewGroup,
                             shouldShow = shouldShow,
                             onClick = {
+                                analyticsTracker.trackEndOfYearModalTapped(year = EndOfYearManager.YEAR_TO_SYNC.value)
                                 showStoriesOrAccount(StoriesSource.MODAL.value)
                             },
                             onExpand = {
-                                analyticsTracker.track(
-                                    AnalyticsEvent.END_OF_YEAR_MODAL_SHOWN,
-                                    mapOf("year" to EndOfYearManager.YEAR_TO_SYNC.value),
-                                )
+                                analyticsTracker.trackEndOfYearModalShown(year = EndOfYearManager.YEAR_TO_SYNC.value)
                                 settings.setEndOfYearShowModal(false)
+                            },
+                            onCollapse = {
+                                analyticsTracker.trackEndOfYearModalDismissed(year = EndOfYearManager.YEAR_TO_SYNC.value)
                             },
                         )
                     }

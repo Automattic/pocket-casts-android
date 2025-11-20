@@ -216,6 +216,33 @@ open class AnalyticsTracker(
         trackWithFlow(event = AnalyticsEvent.SIGNIN_FORGOT_PASSWORD_TAPPED, flow = flow)
     }
 
+    fun trackEndOfYearModalShown(year: Int) {
+        track(
+            event = AnalyticsEvent.END_OF_YEAR_MODAL_SHOWN,
+            properties = mapOf(
+                AnalyticsParameter.YEAR to year,
+            ),
+        )
+    }
+
+    fun trackEndOfYearModalTapped(year: Int) {
+        track(
+            event = AnalyticsEvent.END_OF_YEAR_MODAL_TAPPED,
+            properties = mapOf(
+                AnalyticsParameter.YEAR to year,
+            ),
+        )
+    }
+
+    fun trackEndOfYearModalDismissed(year: Int) {
+        track(
+            event = AnalyticsEvent.END_OF_YEAR_MODAL_DISMISSED,
+            properties = mapOf(
+                AnalyticsParameter.YEAR to year,
+            ),
+        )
+    }
+
     fun refreshMetadata() {
         trackers.forEach(Tracker::refreshMetadata)
     }

@@ -9,6 +9,7 @@ import android.os.Parcelable
 import android.view.WindowManager
 import androidx.activity.ComponentActivity
 import androidx.activity.SystemBarStyle
+import androidx.activity.compose.BackHandler
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.ActivityResultLauncher
@@ -146,6 +147,12 @@ class StoriesActivity : ComponentActivity() {
         LaunchedEffect(Unit) {
             viewModel.syncData()
         }
+
+        BackHandler {
+            viewModel.trackStoriesClosed(source = "back_button")
+            finish()
+        }
+
         val scope = rememberCoroutineScope()
         val state by viewModel.uiState.collectAsState()
         val pagerState = rememberPagerState(pageCount = { state.storyCount })
@@ -171,6 +178,7 @@ class StoriesActivity : ComponentActivity() {
                 onReleaseStory = { viewModel.resumeStoryAutoProgress(StoryProgressPauseReason.UserHoldingStory) },
                 onLearnAboutRatings = ::openRatingsInfo,
                 onClickUpsell = ::startUpsellFlow,
+                onClickPlusContinue = viewModel::trackPlusContinued,
                 onRestartPlayback = storyChanger::reset,
                 onClose = {
                     viewModel.trackStoriesClosed("close_button")
