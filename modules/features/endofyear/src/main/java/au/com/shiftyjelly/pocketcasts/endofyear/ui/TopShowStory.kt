@@ -1,6 +1,6 @@
 package au.com.shiftyjelly.pocketcasts.endofyear.ui
 
-import androidx.compose.animation.core.FastOutSlowInEasing
+import androidx.compose.animation.core.CubicBezierEasing
 import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.animateFloat
 import androidx.compose.animation.core.animateFloatAsState
@@ -135,9 +135,13 @@ private fun CenterContent(
         iterations = 1,
     )
     val isPlaying = progress > 0f
+    val animationSpec = tween<Float>(
+        durationMillis = 1000,
+        easing = CubicBezierEasing(.33f, 0f, 0f, 1f),
+    )
     val lottieScaleAnimation by animateFloatAsState(
         targetValue = if (isPlaying) 1.3f else 1.5f,
-        animationSpec = tween(durationMillis = 500, easing = FastOutSlowInEasing),
+        animationSpec = animationSpec,
     )
 
     LottieAnimation(
@@ -159,13 +163,13 @@ private fun CenterContent(
     val artworkTransition = updateTransition(artworkTrigger, "artwork transition")
     val scaleAnimation by artworkTransition.animateFloat(
         transitionSpec = {
-            tween(durationMillis = 250, easing = FastOutSlowInEasing)
+            animationSpec
         },
     ) {
         if (it) {
-            1f
+            .95f
         } else {
-            1.2f
+            1f
         }
     }
     val alphaAnimation by artworkTransition.animateFloat(
