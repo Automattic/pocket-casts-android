@@ -1,7 +1,6 @@
 package au.com.shiftyjelly.pocketcasts.endofyear.ui
 
 import androidx.compose.animation.core.CubicBezierEasing
-import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
@@ -195,11 +194,10 @@ private fun PodcastCoverCarousel(
             if (pageOffset <= peekingItems) {
                 val scale = 1f - (pageOffset * peekFraction).coerceAtMost(peekFraction * peekingItems)
                 val maxOffset = peekingItems.toFloat()
-                val imageAlpha = if (pageOffset <= (maxOffset - 1f)) {
-                    1f
+                val imageAlpha = if (pageOffset > (maxOffset - 1f)) {
+                    (-pageOffset + maxOffset).coerceIn(0f, 1f)
                 } else {
-                    val normalizedOffset = (-pageOffset + maxOffset).coerceIn(0f, 1f)
-                    LinearEasing.transform(normalizedOffset)
+                    1f
                 }
 
                 PodcastImage(
