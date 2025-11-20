@@ -158,10 +158,11 @@ class AccountDetailsFragment : BaseFragment() {
             onDeleteAccount = { deleteAccount() },
             onAccountUpgradeClick = {
                 analyticsTracker.track(
-                    AnalyticsEvent.PLUS_PROMOTION_BANNER_BUTTON_TAPPED, mapOf(
+                    AnalyticsEvent.PLUS_PROMOTION_BANNER_BUTTON_TAPPED,
+                    mapOf(
                         "source" to OnboardingUpgradeSource.PROFILE.analyticsValue,
                         "flow" to OnboardingFlow.NewOnboardingAccountUpgrade,
-                    )
+                    ),
                 )
                 val onboardingFlow = OnboardingFlow.NewOnboardingAccountUpgrade
                 OnboardingLauncher.openOnboardingFlow(requireActivity(), onboardingFlow)

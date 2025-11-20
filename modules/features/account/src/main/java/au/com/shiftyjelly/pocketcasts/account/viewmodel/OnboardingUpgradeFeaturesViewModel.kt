@@ -99,7 +99,7 @@ class OnboardingUpgradeFeaturesViewModel @AssistedInject constructor(
         val properties = analyticsProps(
             flow = flow,
             source = source,
-            variant = experimentProvider.getVariation(Experiment.NewOnboardingABTest).toNewOnboardingVariant()
+            variant = experimentProvider.getVariation(Experiment.NewOnboardingABTest).toNewOnboardingVariant(),
         ).toMutableMap().apply {
             put("value", billingCycle.analyticsValue)
         }
@@ -155,8 +155,8 @@ class OnboardingUpgradeFeaturesViewModel @AssistedInject constructor(
                 analyticsProps(
                     flow = flow,
                     source = source,
-                    variant = experimentProvider.getVariation(Experiment.NewOnboardingABTest).toNewOnboardingVariant()
-                )
+                    variant = experimentProvider.getVariation(Experiment.NewOnboardingABTest).toNewOnboardingVariant(),
+                ),
             )
         } else {
             analyticsTracker.track(
@@ -208,7 +208,7 @@ class OnboardingUpgradeFeaturesViewModel @AssistedInject constructor(
                 flow = flow,
                 variant = variant ?: experimentProvider.getVariation(Experiment.NewOnboardingABTest).toNewOnboardingVariant(),
                 source = source,
-            )
+            ),
         )
     }
 
