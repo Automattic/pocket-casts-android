@@ -218,12 +218,12 @@ class StoriesActivity : ComponentActivity() {
             }
         }
 
+        var lastStory by remember { mutableStateOf<Story?>(null) }
         LaunchedEffect(state::class) {
             if (state is UiState.Synced || state is UiState.Syncing) {
                 // Track displayed page to not report it twice from different events.
                 // This can happen, for example, after the first launch.
                 // Both currentPage and pageCount trigger an event when the pager is set up.
-                var lastStory: Story? = null
                 // Inform VM about a story changed due to explicit changes of the current page.
                 launch {
                     snapshotFlow { pagerState.currentPage }.collect { index ->

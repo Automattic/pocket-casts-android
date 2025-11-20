@@ -1,6 +1,7 @@
 package au.com.shiftyjelly.pocketcasts.endofyear
 
 import android.app.Activity
+import androidx.annotation.VisibleForTesting
 import androidx.compose.runtime.Immutable
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -128,8 +129,6 @@ class EndOfYearViewModel @AssistedInject constructor(
                 trackFailedToLoad()
                 syncState.emit(SyncState.Failure)
                 return@launch
-            } else {
-                coverStoryGracePeriodExpired.emit(true)
             }
 
             syncState.emit(SyncState.Synced)
@@ -139,6 +138,11 @@ class EndOfYearViewModel @AssistedInject constructor(
                 statsLoaded.emit(true)
             }
         }
+    }
+
+    @VisibleForTesting
+    internal fun markGracePeriodExpired() {
+        coverStoryGracePeriodExpired.value = true
     }
 
     private suspend fun createUiModel(
