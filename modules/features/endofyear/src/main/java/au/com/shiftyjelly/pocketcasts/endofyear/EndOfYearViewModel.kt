@@ -1,7 +1,6 @@
 package au.com.shiftyjelly.pocketcasts.endofyear
 
 import android.app.Activity
-import androidx.annotation.VisibleForTesting
 import androidx.compose.runtime.Immutable
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -26,6 +25,9 @@ import dagger.assisted.AssistedInject
 import dagger.hilt.android.lifecycle.HiltViewModel
 import java.io.File
 import java.time.Year
+import kotlin.time.Duration
+import kotlinx.coroutines.CompletableDeferred
+import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.cancelAndJoin
 import kotlinx.coroutines.delay
@@ -51,19 +53,9 @@ class EndOfYearViewModel @AssistedInject constructor(
     private val sharingClient: StorySharingClient,
     private val analyticsTracker: AnalyticsTracker,
 ) : ViewModel() {
-
-    private companion object {
-        val placeholderStories = buildList {
-            add(Story.Cover)
-            repeat(10) {
-                add(Story.PlaceholderWhileLoading)
-            }
-        }
-    }
-
     private val syncState = MutableStateFlow<SyncState>(SyncState.Syncing)
-    private val statsLoaded = MutableStateFlow(false)
-    private val coverStoryGracePeriodExpired = MutableStateFlow(false)
+    private val _syncFailedSignal = CompletableDeferred<Unit>()
+    internal val syncFailedSignal: Deferred<Unit> get() = _syncFailedSignal
 
     private val eoyStatsAction = CachedAction<Year, Pair<EndOfYearStats, RandomShowIds?>> {
         val stats = endOfYearManager.getStats(year)
@@ -94,67 +86,46 @@ class EndOfYearViewModel @AssistedInject constructor(
     internal val switchStory get() = _switchStory.asSharedFlow()
 
     internal val uiState: StateFlow<UiState> = combine(
-        combine(syncState, statsLoaded, coverStoryGracePeriodExpired) { syncState, statsLoaded, gracePeriod ->
-            Triple(syncState, statsLoaded, gracePeriod)
-        },
-        combine(settings.cachedSubscription.flow, topPodcastsLink, progress) { subscription, link, prog ->
-            Triple(subscription, link, prog)
-        },
-    ) { (syncState, statsLoaded, gracePeriodExpired), (subscription, topPodcasts, progress) ->
-        createUiModel(
-            syncState = syncState,
-            statsLoaded = statsLoaded,
-            coverStoryGracePeriodExpired = gracePeriodExpired,
-            subscription = subscription,
-            topPodcastsLink = topPodcasts,
-            progress = progress,
-        )
-    }.stateIn(
-        viewModelScope,
-        SharingStarted.Lazily,
-        UiState.Syncing(
-            stories = placeholderStories,
-            storyProgress = 0f,
-        ),
-    )
+        syncState,
+        settings.cachedSubscription.flow,
+        topPodcastsLink,
+        progress,
+        ::createUiModel,
+    ).stateIn(viewModelScope, SharingStarted.Lazily, UiState.Syncing(storyProgress = 0f))
+
+    private var syncJob: Job? = null
 
     internal fun syncData() {
-        viewModelScope.launch {
+        if (syncJob != null) {
+            return
+        }
+
+        syncJob = viewModelScope.launch {
             syncState.emit(SyncState.Syncing)
-            statsLoaded.emit(false)
-            coverStoryGracePeriodExpired.emit(false)
 
             val isSynced = endOfYearSync.sync(year)
             if (!isSynced) {
                 trackFailedToLoad()
-                syncState.emit(SyncState.Failure)
+                _syncFailedSignal.complete(Unit)
                 return@launch
             }
 
+            eoyStatsAction.run(year, viewModelScope).await()
             syncState.emit(SyncState.Synced)
-
-            launch {
-                eoyStatsAction.run(year, viewModelScope).await()
-                statsLoaded.emit(true)
-            }
         }
-    }
-
-    @VisibleForTesting
-    internal fun markGracePeriodExpired() {
-        coverStoryGracePeriodExpired.value = true
     }
 
     private suspend fun createUiModel(
         syncState: SyncState,
-        statsLoaded: Boolean,
-        coverStoryGracePeriodExpired: Boolean,
         subscription: Subscription?,
         topPodcastsLink: String?,
         progress: Float,
-    ) = when {
-        syncState is SyncState.Failure -> UiState.Failure
-        statsLoaded && coverStoryGracePeriodExpired -> {
+    ) = when (syncState) {
+        SyncState.Syncing -> UiState.Syncing(
+            storyProgress = progress,
+        )
+
+        SyncState.Synced -> {
             val (stats, randomShowIds) = eoyStatsAction.run(year, viewModelScope).await()
             val stories = createStories(stats, randomShowIds, subscription, topPodcastsLink)
             UiState.Synced(
@@ -162,9 +133,6 @@ class EndOfYearViewModel @AssistedInject constructor(
                 isPaidAccount = subscription != null,
                 storyProgress = progress,
             )
-        }
-        else -> {
-            UiState.Syncing(stories = placeholderStories, storyProgress = progress)
         }
     }
 
@@ -220,41 +188,31 @@ class EndOfYearViewModel @AssistedInject constructor(
     internal fun onStoryChanged(story: Story) {
         trackStoryShown(story)
         viewModelScope.launch {
-            countDownJob?.cancelAndJoin()
             progress.value = 0f
-            val previewDuration = story.previewDuration
-            if (previewDuration != null) {
-                val progressDelay = previewDuration / 100
-                countDownJob = launch {
-                    var currentProgress = 0f
-                    while (currentProgress < 1f) {
-                        storyAutoProgressPauseReasons.first { it.isEmpty() }
-                        currentProgress += 0.01f
-                        progress.value = currentProgress
-                        delay(progressDelay)
-                    }
+            countDownJob?.cancelAndJoin()
+            when (val previewDuration = story.previewDuration) {
+                Duration.INFINITE -> {
+                    progress.value = 0f
+                }
 
-                    if (story == Story.Cover && !coverStoryGracePeriodExpired.value) {
-                        // if we have data ready, display it
-                        if (statsLoaded.value) {
-                            coverStoryGracePeriodExpired.emit(true)
-                            _switchStory.emit(Unit)
-                        } else {
-                            // wait for 2 more seconds to give data more time to arrive
-                            delay(2000)
-                            coverStoryGracePeriodExpired.emit(true)
+                null -> {
+                    progress.value = 1f
+                }
 
-                            if (!statsLoaded.value) {
-                                progress.value = 0f
-                            }
-                            _switchStory.emit(Unit)
+                else -> {
+                    progress.value = 0f
+                    val progressDelay = previewDuration / 100
+                    countDownJob = launch {
+                        var currentProgress = 0f
+                        while (currentProgress < 1f) {
+                            storyAutoProgressPauseReasons.first { it.isEmpty() }
+                            currentProgress += 0.01f
+                            progress.value = currentProgress
+                            delay(progressDelay)
                         }
-                    } else {
                         _switchStory.emit(Unit)
                     }
                 }
-            } else {
-                progress.value = 1f
             }
         }
     }
@@ -268,30 +226,50 @@ class EndOfYearViewModel @AssistedInject constructor(
     }
 
     internal fun getNextStoryIndex(currentIndex: Int): Int? {
-        val stories = (uiState.value as? UiState.Syncing)?.stories ?: (uiState.value as? UiState.Synced)?.stories ?: return null
+        return when (val state = uiState.value) {
+            is UiState.Synced -> {
+                val stories = state.stories
+                val nextStory = stories.getOrNull(currentIndex + 1) ?: return null
+                if (state.isPaidAccount || nextStory.isFree) {
+                    currentIndex + 1
+                } else {
+                    stories
+                        .drop(currentIndex + 1)
+                        .firstOrNull { it.isFree }
+                        ?.let(stories::indexOf)
+                        .takeIf { it != -1 }
+                }
+            }
 
-        val nextStory = stories.getOrNull(currentIndex + 1) ?: return null
-        return if ((uiState.value as? UiState.Synced)?.isPaidAccount == true || nextStory.isFree) {
-            currentIndex + 1
-        } else {
-            stories.drop(currentIndex + 1)
-                .firstOrNull { it.isFree }
-                ?.let(stories::indexOf)
-        }.takeIf { it != -1 }
+            is UiState.Syncing -> {
+                if (currentIndex == 0 && state.storyProgress >= 1f) {
+                    1
+                } else {
+                    null
+                }
+            }
+        }
     }
 
     internal fun getPreviousStoryIndex(currentIndex: Int): Int? {
-        val state = uiState.value as? UiState.Synced ?: return null
-        val stories = state.stories
+        return when (val state = uiState.value) {
+            is UiState.Synced -> {
+                val stories = state.stories
+                val previousStory = state.stories.getOrNull(currentIndex - 1) ?: return null
+                if (state.isPaidAccount || previousStory.isFree) {
+                    currentIndex - 1
+                } else {
+                    stories.take(currentIndex)
+                        .lastOrNull { it.isFree }
+                        ?.let(stories::indexOf)
+                        ?.takeIf { it != -1 }
+                }
+            }
 
-        val previousStory = state.stories.getOrNull(currentIndex - 1) ?: return null
-        return if (state.isPaidAccount || previousStory.isFree) {
-            currentIndex - 1
-        } else {
-            stories.take(currentIndex)
-                .lastOrNull { it.isFree }
-                ?.let(stories::indexOf)
-        }?.takeIf { it != -1 }
+            is UiState.Syncing -> {
+                null
+            }
+        }
     }
 
     internal fun share(story: Story, screenshot: File) {
@@ -403,33 +381,25 @@ class EndOfYearViewModel @AssistedInject constructor(
 
 @Immutable
 internal sealed interface UiState {
-    val storyProgress: Float get() = 0f
-    val storyCount: Int get() = 0
+    val storyProgress: Float
+    val stories: List<Story>
 
     data class Syncing(
-        val stories: List<Story>,
         override val storyProgress: Float,
     ) : UiState {
-        override val storyCount: Int
-            get() = stories.size
+        override val stories get() = placeholderStories
     }
-
-    data object Failure : UiState
 
     @Immutable
     data class Synced(
-        val stories: List<Story>,
         val isPaidAccount: Boolean,
         override val storyProgress: Float,
-    ) : UiState {
-        override val storyCount: Int
-            get() = stories.size
-    }
+        override val stories: List<Story>,
+    ) : UiState
 }
 
 private sealed interface SyncState {
     data object Syncing : SyncState
-    data object Failure : SyncState
     data object Synced : SyncState
 }
 
@@ -438,4 +408,11 @@ internal enum class StoryProgressPauseReason {
     UserHoldingStory,
     ScreenshotDialog,
     TakingScreenshot,
+}
+
+private val placeholderStories = buildList {
+    add(Story.Cover)
+    repeat(10) {
+        add(Story.PlaceholderWhileLoading)
+    }
 }

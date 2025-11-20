@@ -136,9 +136,7 @@ class EndOfYearViewModelTest {
         endOfYearSync.isSynced.add(false)
 
         viewModel.syncData()
-        viewModel.uiState.test {
-            assertEquals(UiState.Failure, awaitItem())
-        }
+        assertTrue(viewModel.syncFailedSignal.isCompleted)
     }
 
     @Test
@@ -147,7 +145,6 @@ class EndOfYearViewModelTest {
         endOfYearManager.stats.add(stats)
 
         viewModel.syncData()
-        viewModel.markGracePeriodExpired()
         viewModel.uiState.test {
             assertTrue(awaitItem() is UiState.Synced)
         }
@@ -160,7 +157,6 @@ class EndOfYearViewModelTest {
         subscriptionFlow.value = null
 
         viewModel.syncData()
-        viewModel.markGracePeriodExpired()
         viewModel.uiState.test {
             val stories = awaitStories()
 
@@ -185,7 +181,6 @@ class EndOfYearViewModelTest {
         endOfYearManager.stats.add(stats)
 
         viewModel.syncData()
-        viewModel.markGracePeriodExpired()
         viewModel.uiState.test {
             val story = awaitStory<NumberOfShows>()
 
@@ -203,7 +198,6 @@ class EndOfYearViewModelTest {
         endOfYearManager.stats.add(stats.copy(playedPodcastIds = listOf("id")))
 
         viewModel.syncData()
-        viewModel.markGracePeriodExpired()
         viewModel.uiState.test {
             val story = awaitStory<NumberOfShows>()
 
@@ -217,7 +211,6 @@ class EndOfYearViewModelTest {
         endOfYearManager.stats.add(stats.copy(playedPodcastIds = List(6) { "id-$it" }))
 
         viewModel.syncData()
-        viewModel.markGracePeriodExpired()
         viewModel.uiState.test {
             val story = awaitStory<NumberOfShows>()
 
@@ -232,7 +225,6 @@ class EndOfYearViewModelTest {
         endOfYearManager.stats.add(stats.copy(playedPodcastIds = emptyList()))
 
         viewModel.syncData()
-        viewModel.markGracePeriodExpired()
         viewModel.uiState.test {
             val stories = awaitStories()
 
@@ -246,7 +238,6 @@ class EndOfYearViewModelTest {
         endOfYearManager.stats.add(stats)
 
         viewModel.syncData()
-        viewModel.markGracePeriodExpired()
         viewModel.uiState.test {
             val story = awaitStory<TopShow>()
 
@@ -263,7 +254,6 @@ class EndOfYearViewModelTest {
         endOfYearManager.stats.add(stats.copy(topPodcasts = emptyList()))
 
         viewModel.syncData()
-        viewModel.markGracePeriodExpired()
         viewModel.uiState.test {
             val stories = awaitStories()
 
@@ -277,7 +267,6 @@ class EndOfYearViewModelTest {
         endOfYearManager.stats.add(stats)
 
         viewModel.syncData()
-        viewModel.markGracePeriodExpired()
         viewModel.uiState.test {
             val story = awaitStory<TopShows>()
 
@@ -294,7 +283,6 @@ class EndOfYearViewModelTest {
         endOfYearManager.stats.add(stats)
 
         viewModel.syncData()
-        viewModel.markGracePeriodExpired()
         viewModel.uiState.test {
             assertEquals(
                 TopShows(stats.topPodcasts, podcastListUrl = null),
@@ -315,7 +303,6 @@ class EndOfYearViewModelTest {
         endOfYearManager.stats.add(stats.copy(topPodcasts = emptyList()))
 
         viewModel.syncData()
-        viewModel.markGracePeriodExpired()
         viewModel.uiState.test {
             val stories = awaitStories()
 
@@ -329,7 +316,6 @@ class EndOfYearViewModelTest {
         endOfYearManager.stats.add(stats)
 
         viewModel.syncData()
-        viewModel.markGracePeriodExpired()
         viewModel.uiState.test {
             val story = awaitStory<Ratings>()
 
@@ -346,7 +332,6 @@ class EndOfYearViewModelTest {
         endOfYearManager.stats.add(stats)
 
         viewModel.syncData()
-        viewModel.markGracePeriodExpired()
         viewModel.uiState.test {
             val story = awaitStory<TotalTime>()
 
@@ -363,7 +348,6 @@ class EndOfYearViewModelTest {
         endOfYearManager.stats.add(stats)
 
         viewModel.syncData()
-        viewModel.markGracePeriodExpired()
         viewModel.uiState.test {
             val story = awaitStory<LongestEpisode>()
 
@@ -380,7 +364,6 @@ class EndOfYearViewModelTest {
         endOfYearManager.stats.add(stats.copy(longestEpisode = null))
 
         viewModel.syncData()
-        viewModel.markGracePeriodExpired()
         viewModel.uiState.test {
             val stories = awaitStories()
 
@@ -395,7 +378,6 @@ class EndOfYearViewModelTest {
         subscriptionFlow.value = null
 
         viewModel.syncData()
-        viewModel.markGracePeriodExpired()
         viewModel.uiState.test {
             val stories = awaitStories()
 
@@ -409,7 +391,6 @@ class EndOfYearViewModelTest {
         endOfYearManager.stats.add(stats)
 
         viewModel.syncData()
-        viewModel.markGracePeriodExpired()
         viewModel.uiState.test {
             val story = awaitStory<YearVsYear>()
 
@@ -430,7 +411,6 @@ class EndOfYearViewModelTest {
         endOfYearManager.stats.add(stats)
 
         viewModel.syncData()
-        viewModel.markGracePeriodExpired()
         viewModel.uiState.test {
             val story = awaitStory<CompletionRate>()
 
@@ -452,7 +432,6 @@ class EndOfYearViewModelTest {
         subscriptionFlow.value = null
 
         viewModel.syncData()
-        viewModel.markGracePeriodExpired()
         viewModel.resumeStoryAutoProgress(StoryProgressPauseReason.ScreenInBackground)
         val stories = (viewModel.uiState.first() as UiState.Synced).stories
 
@@ -501,7 +480,6 @@ class EndOfYearViewModelTest {
         subscriptionFlow.value = null
 
         viewModel.syncData()
-        viewModel.markGracePeriodExpired()
         val stories = (viewModel.uiState.first() as UiState.Synced).stories
 
         viewModel.switchStory.test {
@@ -529,7 +507,6 @@ class EndOfYearViewModelTest {
         subscriptionFlow.value = null
 
         viewModel.syncData()
-        viewModel.markGracePeriodExpired()
         val stories = (viewModel.uiState.first() as UiState.Synced).stories
 
         viewModel.switchStory.test {
@@ -558,7 +535,6 @@ class EndOfYearViewModelTest {
         endOfYearManager.stats.add(stats)
 
         viewModel.syncData()
-        viewModel.markGracePeriodExpired()
         val stories = (viewModel.uiState.first() as UiState.Synced).stories
 
         assertEquals(1, viewModel.getNextStoryIndex(stories.indexOf<Cover>()))
@@ -580,7 +556,6 @@ class EndOfYearViewModelTest {
         endOfYearManager.stats.add(stats)
 
         viewModel.syncData()
-        viewModel.markGracePeriodExpired()
         val stories = (viewModel.uiState.first() as UiState.Synced).stories
 
         assertEquals(null, viewModel.getPreviousStoryIndex(stories.indexOf<Cover>()))
@@ -603,7 +578,6 @@ class EndOfYearViewModelTest {
         subscriptionFlow.value = null
 
         viewModel.syncData()
-        viewModel.markGracePeriodExpired()
         val stories = (viewModel.uiState.first() as UiState.Synced).stories
 
         assertEquals(1, viewModel.getNextStoryIndex(stories.indexOf<Cover>()))
@@ -626,7 +600,6 @@ class EndOfYearViewModelTest {
         subscriptionFlow.value = null
 
         viewModel.syncData()
-        viewModel.markGracePeriodExpired()
         val stories = (viewModel.uiState.first() as UiState.Synced).stories
 
         assertEquals(null, viewModel.getPreviousStoryIndex(stories.indexOf<Cover>()))
@@ -649,7 +622,6 @@ class EndOfYearViewModelTest {
         subscriptionFlow.value = null
 
         viewModel.syncData()
-        viewModel.markGracePeriodExpired()
         viewModel.uiState.test {
             val stories = awaitStories()
 
