@@ -269,6 +269,7 @@ object NewOnboardingFlow {
                 OnboardingUpgradeSource.UP_NEXT_SHUFFLE,
                 OnboardingUpgradeSource.GENERATED_TRANSCRIPTS,
                 OnboardingUpgradeSource.DEEP_LINK,
+                OnboardingUpgradeSource.FINISHED_ONBOARDING,
                 OnboardingUpgradeSource.UNKNOWN,
                 -> false
 

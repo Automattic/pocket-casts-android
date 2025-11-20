@@ -105,7 +105,7 @@ fun OnboardingUpgradeScreen(
     onChangeSelectedPlan: (SubscriptionPlan) -> Unit,
     onClickPrivacyPolicy: () -> Unit,
     onClickTermsAndConditions: () -> Unit,
-    onClickSeeAllFeatures: (OnboardingUpgradeFeaturesState.NewOnboardingVariant) -> Unit,
+    onClickSeeAllFeatures: (OnboardingUpgradeFeaturesState.NewOnboardingVariant?) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     BoxWithConstraints(
@@ -150,7 +150,7 @@ private fun CompactHeightUpscaledFontUpgradeScreen(
     onChangeSelectedPlan: (SubscriptionPlan) -> Unit,
     onClickPrivacyPolicy: () -> Unit,
     onClickTermsAndConditions: () -> Unit,
-    onClickSeeAllFeatures: (OnboardingUpgradeFeaturesState.NewOnboardingVariant) -> Unit,
+    onClickSeeAllFeatures: (OnboardingUpgradeFeaturesState.NewOnboardingVariant?) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val coroutineScope = rememberCoroutineScope()
@@ -241,7 +241,7 @@ private fun RegularUpgradeScreen(
     onChangeSelectedPlan: (SubscriptionPlan) -> Unit,
     onClickPrivacyPolicy: () -> Unit,
     onClickTermsAndConditions: () -> Unit,
-    onClickSeeAllFeatures: (OnboardingUpgradeFeaturesState.NewOnboardingVariant) -> Unit,
+    onClickSeeAllFeatures: (OnboardingUpgradeFeaturesState.NewOnboardingVariant?) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val (contentFocusRequester, footerFocusRequester) = remember { FocusRequester.createRefs() }
@@ -556,7 +556,7 @@ private fun UpgradeContent(
     pages: List<UpgradePagerContent>,
     selfFocusRequester: FocusRequester,
     downFocusRequester: FocusRequester,
-    onClickSeeAllFeatures: (OnboardingUpgradeFeaturesState.NewOnboardingVariant) -> Unit,
+    onClickSeeAllFeatures: (OnboardingUpgradeFeaturesState.NewOnboardingVariant?) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val coroutineScope = rememberCoroutineScope()
@@ -642,7 +642,7 @@ private fun UpgradeContent(
 private fun UpgradePagerContent.toComponent(
     index: Int,
     scrollToNext: () -> Unit,
-    onClickSeeAllFeatures: (OnboardingUpgradeFeaturesState.NewOnboardingVariant) -> Unit,
+    onClickSeeAllFeatures: (OnboardingUpgradeFeaturesState.NewOnboardingVariant?) -> Unit,
     modifier: Modifier = Modifier,
 ): @Composable () -> Unit {
     val topPaddingForGenericContent = if (index != 0) 16.dp else 0.dp
@@ -680,22 +680,34 @@ private fun UpgradePagerContent.toComponent(
 
             is UpgradePagerContent.Folders -> FoldersUpgradeContent(
                 modifier = modifier,
-                onCtaClick = scrollToNext,
+                onCtaClick = {
+                    onClickSeeAllFeatures(null)
+                    scrollToNext()
+                },
             )
 
             is UpgradePagerContent.Bookmarks -> BookmarksUpgradeContent(
                 modifier = modifier,
-                onCtaClick = scrollToNext,
+                onCtaClick = {
+                    onClickSeeAllFeatures(null)
+                    scrollToNext()
+                },
             )
 
             is UpgradePagerContent.Shuffle -> ShuffleUpgradeContent(
                 modifier = modifier,
-                onCtaClick = scrollToNext,
+                onCtaClick = {
+                    onClickSeeAllFeatures(null)
+                    scrollToNext()
+                },
             )
 
             is UpgradePagerContent.PreselectChapters -> PreselectChaptersUpgradeContent(
                 modifier = modifier,
-                onCtaClick = scrollToNext,
+                onCtaClick = {
+                    onClickSeeAllFeatures(null)
+                    scrollToNext()
+                },
             )
         }
     }
