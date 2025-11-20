@@ -7,7 +7,7 @@ import kotlin.time.Duration.Companion.seconds
 import au.com.shiftyjelly.pocketcasts.models.to.LongestEpisode as LongestEpisodeData
 
 sealed interface Story {
-    val previewDuration: Duration? get() = 10.seconds
+    val previewDuration: Duration? get() = 7.seconds
     val isFree: Boolean get() = true
     val isShareable: Boolean get() = true
     val analyticsValue: String
