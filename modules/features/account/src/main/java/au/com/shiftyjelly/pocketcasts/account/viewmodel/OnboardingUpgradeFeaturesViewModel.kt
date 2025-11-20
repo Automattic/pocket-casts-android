@@ -131,7 +131,7 @@ class OnboardingUpgradeFeaturesViewModel @AssistedInject constructor(
             val planKey = loadedState.selectedPlan.key
             trackPaymentFrequencyButtonTapped(planKey, source)
             viewModelScope.launch {
-                val purchaseResult = paymentClient.purchaseSubscriptionPlan(planKey, flow.source.analyticsValue, activity)
+                val purchaseResult = paymentClient.purchaseSubscriptionPlan(key = planKey, purchaseSource = (source ?: flow.source).analyticsValue, activity = activity, purchaseFlow = flow.analyticsValue)
 
                 when (purchaseResult) {
                     is PurchaseResult.Purchased -> {

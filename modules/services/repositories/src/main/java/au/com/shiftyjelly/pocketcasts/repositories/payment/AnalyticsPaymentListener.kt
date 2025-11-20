@@ -11,14 +11,16 @@ import au.com.shiftyjelly.pocketcasts.payment.SubscriptionTier
 internal class AnalyticsPaymentListener(
     private val tracker: AnalyticsTracker,
 ) : PaymentClient.Listener {
-    override fun onSubscriptionPurchased(key: SubscriptionPlan.Key, purchaseSource: String, result: PurchaseResult) {
-        val baseProperties = mutableMapOf(
-            "tier" to key.tier.analyticsValue,
-            "frequency" to key.billingCycle.analyticsValue,
-            "offer_type" to (key.offer?.analyticsValue ?: "none"),
-            "product" to key.productLegacyAnalyticsValue(),
-            "source" to purchaseSource,
-        )
+    override fun onSubscriptionPurchased(key: SubscriptionPlan.Key, purchaseSource: String, purchaseFlow: String?, result: PurchaseResult) {
+        val baseProperties = buildMap {
+            put("tier", key.tier.analyticsValue)
+            put("frequency", key.billingCycle.analyticsValue)
+            put("offer_type", (key.offer?.analyticsValue ?: "none"))
+            put("product_legacy", key.productLegacyAnalyticsValue())
+            put("product", key.productId)
+            put("source", purchaseSource)
+            purchaseFlow?.let { put("flow", it) }
+        }
         val (event, properties) = when (result) {
             is PurchaseResult.Purchased -> {
                 AnalyticsEvent.PURCHASE_SUCCESSFUL to baseProperties
