@@ -149,7 +149,7 @@ class StoriesActivity : ComponentActivity() {
         }
 
         BackHandler {
-            viewModel.trackStoriesClosed("back_button")
+            viewModel.trackStoriesClosed(source = "back_button")
             finish()
         }
 

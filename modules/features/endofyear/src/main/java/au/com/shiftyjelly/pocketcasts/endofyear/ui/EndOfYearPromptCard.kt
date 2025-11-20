@@ -103,5 +103,5 @@ fun EndOfYearPromptCard(
 @Preview
 @Composable
 private fun EndOfYearPromptCardPreview() {
-    EndOfYearPromptCard(onClick = {}, onShown = {})
+    EndOfYearPromptCard(onClick = {}, onShow = {})
 }
