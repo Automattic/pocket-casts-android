@@ -315,6 +315,10 @@ class EndOfYearViewModel @AssistedInject constructor(
         )
     }
 
+    internal fun trackPlusContinued() {
+        trackEvent(AnalyticsEvent.END_OF_YEAR_PLUS_CONTINUED)
+    }
+
     internal fun trackStoriesAutoFinished() {
         trackEvent(
             AnalyticsEvent.END_OF_YEAR_STORIES_DISMISSED,

@@ -514,6 +514,8 @@ enum class AnalyticsEvent(val key: String) {
 
     /* End of Year */
     END_OF_YEAR_MODAL_SHOWN("end_of_year_modal_shown"),
+    END_OF_YEAR_MODAL_DISMISSED("end_of_year_modal_dismissed"),
+    END_OF_YEAR_MODAL_TAPPED("end_of_year_modal_tapped"),
     END_OF_YEAR_STORIES_SHOWN("end_of_year_stories_shown"),
     END_OF_YEAR_STORIES_DISMISSED("end_of_year_stories_dismissed"),
     END_OF_YEAR_STORIES_FAILED_TO_LOAD("end_of_year_stories_failed_to_load"),
@@ -521,8 +523,10 @@ enum class AnalyticsEvent(val key: String) {
     END_OF_YEAR_STORY_SHOWN("end_of_year_story_shown"),
     END_OF_YEAR_STORY_SHARE("end_of_year_story_share"),
     END_OF_YEAR_STORY_SHARED("end_of_year_story_shared"),
+    END_OF_YEAR_PROFILE_CARD_SHOWN("end_of_year_profile_card_shown"),
     END_OF_YEAR_PROFILE_CARD_TAPPED("end_of_year_profile_card_tapped"),
     END_OF_YEAR_UPSELL_SHOWN("end_of_year_upsell_shown"),
+    END_OF_YEAR_PLUS_CONTINUED("end_of_year_plus_continued"),
     END_OF_YEAR_LEARN_RATINGS_SHOWN("end_of_year_learn_ratings_shown"),
 
     /* Welcome */

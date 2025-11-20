@@ -144,6 +144,13 @@ class ProfileViewModel @Inject constructor(
         refreshStatsTrigger.tryEmit(Unit)
     }
 
+    internal fun onEndOfYearBannerShown() {
+        tracker.track(
+            AnalyticsEvent.END_OF_YEAR_PROFILE_CARD_SHOWN,
+            mapOf("year" to EndOfYearManager.YEAR_TO_SYNC.value),
+        )
+    }
+
     internal fun onPlaybackClick() {
         tracker.track(
             AnalyticsEvent.END_OF_YEAR_PROFILE_CARD_TAPPED,

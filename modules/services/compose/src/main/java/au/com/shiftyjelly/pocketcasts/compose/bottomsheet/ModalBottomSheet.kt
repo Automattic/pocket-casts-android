@@ -27,6 +27,7 @@ fun ModalBottomSheet(
     shouldShow: Boolean,
     content: BottomSheetContentState.Content,
     onExpand: () -> Unit,
+    onCollapse: () -> Unit,
     modifier: Modifier = Modifier,
     sheetState: ModalBottomSheetState = rememberModalBottomSheetState(
         initialValue = ModalBottomSheetValue.Hidden,
@@ -63,6 +64,7 @@ fun ModalBottomSheet(
                     onExpand.invoke()
                 } else if (sheetState.currentValue == ModalBottomSheetValue.Hidden) {
                     if (isSheetShown) {
+                        onCollapse.invoke()
                         /* Remove bottom sheet from parent view when bottom sheet is hidden
                         on dismiss or back action for talkback to function properly. */
                         parent.removeAllViews()

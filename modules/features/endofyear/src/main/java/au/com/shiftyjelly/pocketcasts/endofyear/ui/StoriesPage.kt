@@ -64,6 +64,7 @@ internal fun StoriesPage(
     onReleaseStory: () -> Unit,
     onLearnAboutRatings: () -> Unit,
     onClickUpsell: () -> Unit,
+    onClickPlusContinue: () -> Unit,
     onRestartPlayback: () -> Unit,
     onClose: () -> Unit,
     onFailedToLoad: () -> Unit,
@@ -101,6 +102,7 @@ internal fun StoriesPage(
                 onReleaseStory = onReleaseStory,
                 onLearnAboutRatings = onLearnAboutRatings,
                 onClickUpsell = onClickUpsell,
+                onClickPlusContinue = onClickPlusContinue,
                 onRestartPlayback = onRestartPlayback,
                 blockGestures = true,
             )
@@ -116,6 +118,7 @@ internal fun StoriesPage(
                 onReleaseStory = onReleaseStory,
                 onLearnAboutRatings = onLearnAboutRatings,
                 onClickUpsell = onClickUpsell,
+                onClickPlusContinue = onClickPlusContinue,
                 onRestartPlayback = onRestartPlayback,
             )
         }
@@ -143,6 +146,7 @@ private fun Stories(
     onReleaseStory: () -> Unit,
     onLearnAboutRatings: () -> Unit,
     onClickUpsell: () -> Unit,
+    onClickPlusContinue: () -> Unit,
     onRestartPlayback: () -> Unit,
     blockGestures: Boolean = false,
 ) {
@@ -227,6 +231,7 @@ private fun Stories(
                 measurements = measurements,
                 onClickUpsell = onClickUpsell,
                 onClickContinue = {
+                    onClickPlusContinue()
                     // move forward to the next story
                     onChangeStory(true)
                 },
