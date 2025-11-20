@@ -72,56 +72,58 @@ internal fun TopShowsStory(
     controller: StoryCaptureController,
     onShareStory: (File) -> Unit,
 ) {
-    Column(
-        modifier = Modifier
-            .capturable(controller.captureController(story))
-            .fillMaxSize()
-            .background(story.backgroundColor)
-            .padding(top = measurements.closeButtonBottomEdge + 16.dp),
-        horizontalAlignment = Alignment.CenterHorizontally,
-    ) {
-        TextH10(
-            text = stringResource(LR.string.eoy_story_top_podcasts_title),
-            fontScale = measurements.smallDeviceFactor,
-            fontSize = 25.sp,
-            lineHeight = 30.sp,
-            disableAutoScale = true,
-            modifier = Modifier.padding(horizontal = 24.dp),
-            textAlign = TextAlign.Center,
-        )
-        Spacer(modifier = Modifier.height(32.dp))
-        val scrollState = rememberScrollState()
+    Box {
         Column(
-            verticalArrangement = Arrangement.spacedBy(16.dp),
             modifier = Modifier
-                .fillMaxWidth()
-                .weight(1f)
-                .padding(end = 24.dp)
-                .fadeScrollingEdges(scrollState)
-                .verticalScroll(scrollState),
+                .capturable(controller.captureController(story))
+                .fillMaxSize()
+                .background(story.backgroundColor)
+                .padding(top = measurements.closeButtonBottomEdge + 16.dp, bottom = 64.dp),
+            horizontalAlignment = Alignment.CenterHorizontally,
         ) {
-            story.shows.forEachIndexed { index, podcast ->
-                AnimatedContainer(
-                    animationRes = if (index % 2 == 0) R.raw.playback_top_shows_wave_1_lottie else R.raw.playback_top_shows_wave_2_lottie,
-                    controller = controller,
-                ) { scale ->
-                    PodcastItem(
-                        modifier = Modifier
-                            .padding(start = 24.dp)
-                            .graphicsLayer {
-                                scaleX = scale
-                                scaleY = scale
-                                transformOrigin = TransformOrigin(0f, 0.5f)
-                            },
-                        podcast = podcast,
-                        index = index,
-                        measurements = measurements,
-                    )
+            TextH10(
+                text = stringResource(LR.string.eoy_story_top_podcasts_title),
+                fontScale = measurements.smallDeviceFactor,
+                fontSize = 25.sp,
+                lineHeight = 30.sp,
+                disableAutoScale = true,
+                modifier = Modifier.padding(horizontal = 24.dp),
+                textAlign = TextAlign.Center,
+            )
+            Spacer(modifier = Modifier.height(32.dp))
+            val scrollState = rememberScrollState()
+            Column(
+                verticalArrangement = Arrangement.spacedBy(16.dp),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .weight(1f)
+                    .padding(end = 24.dp)
+                    .fadeScrollingEdges(scrollState)
+                    .verticalScroll(scrollState),
+            ) {
+                story.shows.forEachIndexed { index, podcast ->
+                    AnimatedContainer(
+                        animationRes = if (index % 2 == 0) R.raw.playback_top_shows_wave_1_lottie else R.raw.playback_top_shows_wave_2_lottie,
+                        controller = controller,
+                    ) { scale ->
+                        PodcastItem(
+                            modifier = Modifier
+                                .padding(start = 24.dp)
+                                .graphicsLayer {
+                                    scaleX = scale
+                                    scaleY = scale
+                                    transformOrigin = TransformOrigin(0f, 0.5f)
+                                },
+                            podcast = podcast,
+                            index = index,
+                            measurements = measurements,
+                        )
+                    }
                 }
             }
         }
         ShareStoryButton(
-            modifier = Modifier.padding(bottom = 18.dp),
+            modifier = Modifier.padding(bottom = 18.dp).align(Alignment.BottomCenter),
             story = story,
             controller = controller,
             onShare = onShareStory,
