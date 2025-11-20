@@ -145,7 +145,7 @@ private fun PodcastCoverCarousel(
     modifier: Modifier = Modifier,
     freezeAnimation: Boolean = false,
     peekFraction: Float = .1f,
-    peekingItems: Int = 3,
+    peekingItems: Int = 4,
 ) {
     val pagerState = rememberPagerState(
         initialPage = PAGE_COUNT / 2,
@@ -192,6 +192,13 @@ private fun PodcastCoverCarousel(
 
             if (pageOffset <= peekingItems) {
                 val scale = 1f - (pageOffset * peekFraction).coerceAtMost(peekFraction * peekingItems)
+                val maxOffset = peekingItems.toFloat()
+                val imageAlpha = if (pageOffset >= 0.0f && pageOffset <= (maxOffset - 1f)) {
+                    1f
+                } else {
+                    val normalizedOffset = (-pageOffset + maxOffset).coerceIn(0f, 1f)
+                    LinearEasing.transform(normalizedOffset)
+                }
 
                 PodcastImage(
                     uuid = podcastId,
@@ -201,6 +208,7 @@ private fun PodcastCoverCarousel(
                         .graphicsLayer {
                             scaleX = scale
                             scaleY = scale
+                            alpha = imageAlpha
                         }
                         .zIndex(1f - pageOffset),
                 )
