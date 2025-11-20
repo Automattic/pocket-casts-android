@@ -1,6 +1,7 @@
 package au.com.shiftyjelly.pocketcasts.endofyear.ui
 
 import androidx.compose.animation.core.CubicBezierEasing
+import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
@@ -134,7 +135,7 @@ internal fun NumberOfShowsStory(
 
 private const val PAGE_COUNT = 100
 private val SCROLL_INTERVAL = 700.milliseconds
-private val SCROLL_ANIM_DURATION_MS = 650
+private val ANIMATION_CURVE = CubicBezierEasing(.9f, 0f, .08f, 1f)
 
 @Composable
 private fun PodcastCoverCarousel(
@@ -154,18 +155,19 @@ private fun PodcastCoverCarousel(
     val freezeAnimation = freezeAnimation || isPreview
 
     LaunchedEffect(freezeAnimation) {
-        delay(SCROLL_INTERVAL)
+        if (freezeAnimation) {
+            return@LaunchedEffect
+        }
+
         while (true) {
-            if (!freezeAnimation) {
-                pagerState.animateScrollToPage(
-                    page = pagerState.currentPage + 1,
-                    animationSpec = tween(
-                        durationMillis = SCROLL_ANIM_DURATION_MS,
-                        easing = CubicBezierEasing(.9f, 0f, .08f, 1f),
-                    ),
-                )
-                delay(SCROLL_INTERVAL)
-            }
+            delay(SCROLL_INTERVAL)
+            pagerState.animateScrollToPage(
+                page = pagerState.currentPage + 1,
+                animationSpec = tween(
+                    durationMillis = SCROLL_ANIM_DURATION_MS,
+                    easing = ANIMATION_CURVE,
+                ),
+            )
         }
     }
 
