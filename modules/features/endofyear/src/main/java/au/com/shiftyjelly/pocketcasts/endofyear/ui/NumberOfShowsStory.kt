@@ -195,7 +195,7 @@ private fun PodcastCoverCarousel(
             if (pageOffset <= peekingItems) {
                 val scale = 1f - (pageOffset * peekFraction).coerceAtMost(peekFraction * peekingItems)
                 val maxOffset = peekingItems.toFloat()
-                val imageAlpha = if (pageOffset >= 0.0f && pageOffset <= (maxOffset - 1f)) {
+                val imageAlpha = if (pageOffset <= (maxOffset - 1f)) {
                     1f
                 } else {
                     val normalizedOffset = (-pageOffset + maxOffset).coerceIn(0f, 1f)
