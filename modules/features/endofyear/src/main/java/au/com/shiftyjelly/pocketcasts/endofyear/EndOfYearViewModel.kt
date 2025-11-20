@@ -1,5 +1,6 @@
 package au.com.shiftyjelly.pocketcasts.endofyear
 
+import android.app.Activity
 import androidx.compose.runtime.Immutable
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
