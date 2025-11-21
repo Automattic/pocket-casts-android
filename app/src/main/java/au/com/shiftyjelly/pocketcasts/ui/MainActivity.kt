@@ -390,7 +390,6 @@ class MainActivity :
                     }
                     Snackbar.make(view, getString(LR.string.end_of_year_failed_to_load_message), Snackbar.LENGTH_LONG)
                         .setAction(LR.string.retry, action)
-                        .setTextColor(ThemeColor.primaryText01(Theme.ThemeType.DARK))
                         .show()
                 }
             }
@@ -1901,9 +1900,6 @@ class MainActivity :
 
         Snackbar.make(view, snackbarMessage, Snackbar.LENGTH_LONG)
             .setAction(LR.string.settings_view, action)
-            .setActionTextColor(result.tintColor)
-            .setBackgroundTint(ThemeColor.primaryUi01(Theme.ThemeType.DARK))
-            .setTextColor(ThemeColor.primaryText01(Theme.ThemeType.DARK))
             .show()
     }
 
