@@ -232,6 +232,11 @@ class SearchFragment : BaseFragment() {
             true
         }
 
+        searchView.findViewById<View>(androidx.appcompat.R.id.search_close_btn)?.setOnClickListener {
+            analyticsTracker.track(AnalyticsEvent.SEARCH_CLEARED, mapOf("source" to source.analyticsValue))
+            searchView.setQuery("", false)
+        }
+
         lifecycleScope.launch {
             // detect when we select a suggestion
             viewModel.state
