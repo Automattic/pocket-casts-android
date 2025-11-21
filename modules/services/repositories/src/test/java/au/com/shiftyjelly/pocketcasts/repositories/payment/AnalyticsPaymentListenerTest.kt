@@ -36,8 +36,7 @@ class AnalyticsPaymentListenerTest {
                 "tier" to "plus",
                 "frequency" to "yearly",
                 "offer_type" to "none",
-                "product_legacy" to "yearly",
-                "product" to "com.pocketcasts.plus.yearly",
+                "product" to "yearly",
                 "source" to "purchase_source",
             ),
         )
@@ -57,7 +56,6 @@ class AnalyticsPaymentListenerTest {
                 "tier" to "patron",
                 "frequency" to "monthly",
                 "offer_type" to "referral",
-                "product_legacy" to "com.pocketcasts.monthly.patron",
                 "product" to "com.pocketcasts.monthly.patron",
                 "source" to "purchase_source",
                 "error" to "user_cancelled",
@@ -79,8 +77,7 @@ class AnalyticsPaymentListenerTest {
                 "tier" to "plus",
                 "frequency" to "yearly",
                 "offer_type" to "none",
-                "product_legacy" to "yearly",
-                "product" to "com.pocketcasts.plus.yearly",
+                "product" to "yearly",
                 "source" to "purchase_source",
                 "error" to "unknown",
                 "error_code" to 404,
@@ -104,8 +101,8 @@ class AnalyticsPaymentListenerTest {
         val productProperties = tracker.events.map { it.properties["product"] }
         assertEquals(
             listOf(
-                "com.pocketcasts.plus.monthly",
-                "com.pocketcasts.plus.yearly",
+                "monthly",
+                "yearly",
                 "com.pocketcasts.monthly.patron",
                 "com.pocketcasts.yearly.patron",
             ),

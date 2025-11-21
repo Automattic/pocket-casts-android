@@ -16,8 +16,7 @@ internal class AnalyticsPaymentListener(
             put("tier", key.tier.analyticsValue)
             put("frequency", key.billingCycle.analyticsValue)
             put("offer_type", (key.offer?.analyticsValue ?: "none"))
-            put("product_legacy", key.productLegacyAnalyticsValue())
-            put("product", key.productId)
+            put("product", key.productLegacyAnalyticsValue())
             put("source", purchaseSource)
             purchaseFlow?.let { put("flow", it) }
         }
