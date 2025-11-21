@@ -126,10 +126,10 @@ private fun ImprovedSearchResultsView(
     }
     val listState = rememberLazyListState()
 
-    LaunchedEffect(state, onResultsShow, onEmptyResultsShow) {
-        if (!state.results.filteredResults.isEmpty()) {
+    LaunchedEffect(state.searchTerm, state.results.filteredResults.size, onResultsShow, onEmptyResultsShow) {
+        if (state.results.filteredResults.isNotEmpty()) {
             onResultsShow()
-        } else if (!state.searchTerm.isEmpty()) {
+        } else if (state.searchTerm.isNotEmpty()) {
             onEmptyResultsShow()
         }
     }
