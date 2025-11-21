@@ -324,7 +324,7 @@ class SearchFragment : BaseFragment() {
                         )
                     }
                 }
-                binding.searchSuggestions.isVisible = state is SearchUiState.Suggestions
+                binding.searchSuggestions.isVisible = state is SearchUiState.Suggestions && !state.searchTerm.isNullOrBlank()
             }
         }
 

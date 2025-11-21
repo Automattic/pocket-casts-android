@@ -68,10 +68,6 @@ fun SearchAutoCompleteResultsPage(
         }
     }
 
-    CallOnce {
-        onReportSuggestionsRender()
-    }
-
     Box(
         modifier = modifier,
     ) {
@@ -87,6 +83,10 @@ fun SearchAutoCompleteResultsPage(
         if (!isLoading && results.isEmpty()) {
             NoSuggestionsView()
         } else {
+            CallOnce {
+                onReportSuggestionsRender()
+            }
+
             LazyColumn(
                 modifier = Modifier.nestedScroll(nestedScrollConnection),
                 contentPadding = PaddingValues(bottom = bottomInset),
