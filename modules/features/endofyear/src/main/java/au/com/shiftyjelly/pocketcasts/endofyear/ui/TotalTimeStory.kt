@@ -21,6 +21,8 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalInspectionMode
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.tooling.preview.PreviewParameterProvider
@@ -54,15 +56,19 @@ internal fun TotalTimeStory(
     onShareStory: (File) -> Unit,
 ) {
     Box {
+        val totalMinutes = story.duration.inWholeMinutes
+        val storyDescription = stringResource(LR.string.end_of_year_listening_time_subtitle_with_number, totalMinutes)
         Box(
             modifier = Modifier
                 .capturable(controller.captureController(story))
                 .fillMaxSize()
-                .background(story.backgroundColor),
+                .background(story.backgroundColor)
+                .semantics {
+                    contentDescription = storyDescription
+                },
         ) {
             val isPreview = LocalInspectionMode.current
             val freezeAnimation = controller.isSharing || isPreview
-            val totalMinutes = story.duration.inWholeMinutes
             val startMinutes = if (freezeAnimation) totalMinutes else totalMinutes - totalMinutes % 1000
 
             var animatedNumber by remember { mutableLongStateOf(startMinutes) }

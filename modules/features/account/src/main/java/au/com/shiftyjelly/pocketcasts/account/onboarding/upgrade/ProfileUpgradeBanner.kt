@@ -85,6 +85,7 @@ private fun FeatureCard(
             SubscriptionBadge(
                 iconRes = subscriptionPlan.badgeIconRes,
                 shortNameRes = subscriptionPlan.shortNameRes,
+                contentDescriptionRes = subscriptionPlan.badgeContentDescriptionRes,
             )
 
             val offerText = subscriptionPlan.offerBadgeText

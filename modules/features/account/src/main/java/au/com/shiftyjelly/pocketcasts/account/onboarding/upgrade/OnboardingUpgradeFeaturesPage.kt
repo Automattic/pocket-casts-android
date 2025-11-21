@@ -408,6 +408,7 @@ private fun FeatureCard(
                     SubscriptionBadge(
                         iconRes = subscriptionPlan.badgeIconRes,
                         shortNameRes = subscriptionPlan.shortNameRes,
+                        contentDescriptionRes = subscriptionPlan.badgeContentDescriptionRes,
                         backgroundColor = Color.Black,
                         textColor = Color.White,
                         modifier = Modifier
@@ -435,6 +436,7 @@ private fun FeatureCard(
                     SubscriptionBadge(
                         iconRes = subscriptionPlan.badgeIconRes,
                         shortNameRes = subscriptionPlan.shortNameRes,
+                        contentDescriptionRes = subscriptionPlan.badgeContentDescriptionRes,
                         backgroundColor = Color.Black,
                         textColor = Color.White,
                         modifier = Modifier

@@ -25,6 +25,7 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalInspectionMode
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.clearAndSetSemantics
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
@@ -174,7 +175,9 @@ private fun PodcastCoverCarousel(
     }
 
     Box(
-        modifier = modifier.height(coverSize + coverSize * peekFraction * peekingItems * 2),
+        modifier = modifier
+            .height(coverSize + coverSize * peekFraction * peekingItems * 2)
+            .clearAndSetSemantics { },
         contentAlignment = Alignment.Center,
     ) {
         VerticalPager(

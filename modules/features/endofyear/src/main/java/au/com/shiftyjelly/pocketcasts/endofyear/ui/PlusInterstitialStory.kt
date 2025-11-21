@@ -14,6 +14,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
@@ -91,44 +92,51 @@ private fun PlusInfo(
     ) {
         Spacer(Modifier.height(16.dp))
 
-        SubscriptionBadgeForTier(
-            tier = story.subscriptionTier ?: SubscriptionTier.Plus,
-            displayMode = SubscriptionBadgeDisplayMode.Black,
-        )
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally,
+            modifier = Modifier
+                .fillMaxWidth()
+                .semantics(mergeDescendants = true) {},
+        ) {
+            SubscriptionBadgeForTier(
+                tier = story.subscriptionTier ?: SubscriptionTier.Plus,
+                displayMode = SubscriptionBadgeDisplayMode.Black,
+            )
 
-        Spacer(Modifier.height(16.dp))
+            Spacer(Modifier.height(16.dp))
 
-        val title = if (story.subscriptionTier == null) {
-            stringResource(LR.string.end_of_year_stories_theres_more)
-        } else {
-            stringResource(LR.string.end_of_year_stories_plus_title)
+            val title = if (story.subscriptionTier == null) {
+                stringResource(LR.string.end_of_year_stories_theres_more)
+            } else {
+                stringResource(LR.string.end_of_year_stories_plus_title)
+            }
+            TextH10(
+                text = title,
+                fontScale = measurements.smallDeviceFactor,
+                disableAutoScale = true,
+                color = Color.Black,
+                textAlign = TextAlign.Center,
+                fontWeight = FontWeight.W600,
+                modifier = Modifier.padding(horizontal = 24.dp),
+            )
+
+            Spacer(Modifier.height(16.dp))
+
+            val description = if (story.subscriptionTier == null) {
+                stringResource(LR.string.end_of_year_stories_subscribe_to_plus)
+            } else {
+                stringResource(LR.string.end_of_year_stories_already_subscribed_to_plus)
+            }
+            TextP40(
+                text = description,
+                lineHeight = 20.85.sp,
+                fontWeight = FontWeight.W500,
+                disableAutoScale = true,
+                color = Color.Black,
+                textAlign = TextAlign.Center,
+                modifier = Modifier.padding(horizontal = 24.dp),
+            )
         }
-        TextH10(
-            text = title,
-            fontScale = measurements.smallDeviceFactor,
-            disableAutoScale = true,
-            color = Color.Black,
-            textAlign = TextAlign.Center,
-            fontWeight = FontWeight.W600,
-            modifier = Modifier.padding(horizontal = 24.dp),
-        )
-
-        Spacer(Modifier.height(16.dp))
-
-        val description = if (story.subscriptionTier == null) {
-            stringResource(LR.string.end_of_year_stories_subscribe_to_plus)
-        } else {
-            stringResource(LR.string.end_of_year_stories_already_subscribed_to_plus)
-        }
-        TextP40(
-            text = description,
-            lineHeight = 20.85.sp,
-            fontWeight = FontWeight.W500,
-            disableAutoScale = true,
-            color = Color.Black,
-            textAlign = TextAlign.Center,
-            modifier = Modifier.padding(horizontal = 24.dp),
-        )
 
         Spacer(Modifier.height(16.dp))
 

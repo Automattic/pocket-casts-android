@@ -27,6 +27,7 @@ import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.IntOffset
@@ -75,42 +76,49 @@ internal fun EndingStory(
         Spacer(
             modifier = Modifier.height(16.dp),
         )
-        TextH10(
-            text = stringResource(LR.string.end_of_year_story_epilogue_title),
-            fontScale = measurements.smallDeviceFactor,
-            disableAutoScale = true,
-            fontSize = 25.sp,
-            lineHeight = 30.sp,
-            color = colorResource(UR.color.white),
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally,
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(horizontal = 24.dp)
-                .offset {
-                    IntOffset(x = 0, y = animations.title.offset.roundToInt())
-                }
-                .graphicsLayer {
-                    alpha = animations.title.alpha
-                },
-            textAlign = TextAlign.Center,
-        )
-        Spacer(
-            modifier = Modifier.height(16.dp),
-        )
-        TextP40(
-            text = stringResource(LR.string.end_of_year_story_epilogue_subtitle),
-            disableAutoScale = true,
-            color = colorResource(UR.color.white),
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 24.dp)
-                .offset {
-                    IntOffset(x = 0, y = animations.subTitle.offset.roundToInt())
-                }
-                .graphicsLayer {
-                    alpha = animations.subTitle.alpha
-                },
-            textAlign = TextAlign.Center,
-        )
+                .semantics(mergeDescendants = true) {},
+        ) {
+            TextH10(
+                text = stringResource(LR.string.end_of_year_story_epilogue_title),
+                fontScale = measurements.smallDeviceFactor,
+                disableAutoScale = true,
+                fontSize = 25.sp,
+                lineHeight = 30.sp,
+                color = colorResource(UR.color.white),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 24.dp)
+                    .offset {
+                        IntOffset(x = 0, y = animations.title.offset.roundToInt())
+                    }
+                    .graphicsLayer {
+                        alpha = animations.title.alpha
+                    },
+                textAlign = TextAlign.Center,
+            )
+            Spacer(
+                modifier = Modifier.height(16.dp),
+            )
+            TextP40(
+                text = stringResource(LR.string.end_of_year_story_epilogue_subtitle),
+                disableAutoScale = true,
+                color = colorResource(UR.color.white),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 24.dp)
+                    .offset {
+                        IntOffset(x = 0, y = animations.subTitle.offset.roundToInt())
+                    }
+                    .graphicsLayer {
+                        alpha = animations.subTitle.alpha
+                    },
+                textAlign = TextAlign.Center,
+            )
+        }
         Spacer(modifier = Modifier.weight(1f))
         SolidEoyButton(
             text = stringResource(LR.string.end_of_year_replay),
