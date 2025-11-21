@@ -12,6 +12,7 @@ import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -21,6 +22,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.Velocity
 import androidx.compose.ui.unit.dp
+import au.com.shiftyjelly.pocketcasts.compose.CallOnce
 import au.com.shiftyjelly.pocketcasts.compose.components.HorizontalDivider
 import au.com.shiftyjelly.pocketcasts.compose.theme
 import au.com.shiftyjelly.pocketcasts.models.entity.Folder
@@ -46,13 +48,21 @@ fun ImprovedSearchResultsPage(
     onFilterSelect: (ResultsFilters) -> Unit,
     playButtonListener: PlayButtonListener,
     onScroll: () -> Unit,
+    onResultsShown: () -> Unit,
+    onEmptyResultsShown: () -> Unit,
+    onErrorShown: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Column(
         modifier = modifier,
     ) {
         when (val operation = state.operation) {
-            is SearchUiState.SearchOperation.Error -> SearchFailedView()
+            is SearchUiState.SearchOperation.Error -> {
+                CallOnce {
+                    onErrorShown()
+                }
+                SearchFailedView()
+            }
             is SearchUiState.SearchOperation.Success -> {
                 ImprovedSearchResultsView(
                     state = operation,
@@ -66,6 +76,8 @@ fun ImprovedSearchResultsPage(
                     selectedFilterIndex = state.selectedFilterIndex,
                     filterOptions = state.filterOptions.toList(),
                     onFilterSelect = onFilterSelect,
+                    onEmptyResultsShown = onEmptyResultsShown,
+                    onResultsShown = onResultsShown,
                 )
             }
 
@@ -100,6 +112,8 @@ private fun ImprovedSearchResultsView(
     filterOptions: List<ResultsFilters>,
     selectedFilterIndex: Int,
     onFilterSelect: (ResultsFilters) -> Unit,
+    onResultsShown: () -> Unit,
+    onEmptyResultsShown: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val nestedScrollConnection = remember {
@@ -111,6 +125,14 @@ private fun ImprovedSearchResultsView(
         }
     }
     val listState = rememberLazyListState()
+
+    LaunchedEffect(state) {
+        if (!state.results.filteredResults.isEmpty()) {
+            onResultsShown()
+        } else if (!state.searchTerm.isEmpty()){
+            onEmptyResultsShown()
+        }
+    }
 
     LazyColumn(
         state = listState,

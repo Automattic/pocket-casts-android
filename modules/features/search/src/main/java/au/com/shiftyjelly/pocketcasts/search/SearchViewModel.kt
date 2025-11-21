@@ -59,7 +59,7 @@ class SearchViewModel @Inject constructor(
                                     )
                                 }
                                 is SearchUiState.SearchOperation.Success -> {
-                                    if (operation.results.isEmpty()) {
+                                    if (operation.results.isEmpty() && operation.searchTerm.isNotEmpty()) {
                                         analyticsTracker.track(
                                             AnalyticsEvent.IMPROVED_SEARCH_EMPTY_RESULTS,
                                             mapOf(
@@ -144,6 +144,35 @@ class SearchViewModel @Inject constructor(
     fun onSubscribeToPodcast(podcast: Podcast) {
         if (podcast.isSubscribed) return
         onSubscribeToPodcast(podcast.uuid)
+    }
+
+    fun reportEmptyResultsShown() {
+        analyticsTracker.track(
+            AnalyticsEvent.IMPROVED_SEARCH_EMPTY_RESULTS,
+            mapOf(
+                "source" to source.analyticsValue,
+                "term" to state.value.searchTerm.orEmpty()
+            )
+        )
+    }
+
+    fun reportResultsShown() {
+        analyticsTracker.track(
+            AnalyticsEvent.SEARCH_LIST_SHOWN,
+            mapOf(
+                "source" to source.analyticsValue
+            )
+        )
+    }
+
+    fun reportErrorResultsShown() {
+        analyticsTracker.track(
+            AnalyticsEvent.SEARCH_FAILED,
+            mapOf(
+                "source" to source.analyticsValue,
+                "term" to state.value.searchTerm.orEmpty()
+            )
+        )
     }
 
     fun selectFilter(filter: ResultsFilters) {
@@ -282,7 +311,7 @@ class SearchViewModel @Inject constructor(
         )
     }
 
-    fun trackViewAllSuggestionsClick(term: String) {
+    fun onViewAllSuggestionsClick(term: String) {
         analyticsTracker.track(
             AnalyticsEvent.IMPROVED_SEARCH_VIEW_ALL_TAPPED,
             mapOf(
@@ -290,6 +319,8 @@ class SearchViewModel @Inject constructor(
                 "term" to term
             )
         )
+
+        runSearchOnTerm(term)
     }
 
     enum class SearchResultType(val value: String) {

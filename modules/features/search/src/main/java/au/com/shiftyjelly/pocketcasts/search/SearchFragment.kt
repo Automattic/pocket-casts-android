@@ -320,7 +320,7 @@ class SearchFragment : BaseFragment() {
                             bottomInset = bottomInset.pxToDp(LocalContext.current).dp,
                             isLoading = suggestions.operation is SearchUiState.SearchOperation.Loading,
                             onReportSuggestionsRender = viewModel::trackSuggestionsShown,
-                            onReportViewAllClick = viewModel::trackViewAllSuggestionsClick
+                            onReportViewAllClick = viewModel::onViewAllSuggestionsClick
                         )
                     }
                 }
@@ -346,6 +346,9 @@ class SearchFragment : BaseFragment() {
                                 onScroll = { UiUtil.hideKeyboard(searchView) },
                                 bottomInset = bottomInset.pxToDp(LocalContext.current).dp,
                                 onFilterSelect = viewModel::selectFilter,
+                                onResultsShown = viewModel::reportResultsShown,
+                                onEmptyResultsShown = viewModel::reportEmptyResultsShown,
+                                onErrorShown = viewModel::reportErrorResultsShown,
                             )
 
                         is SearchUiState.OldResults ->

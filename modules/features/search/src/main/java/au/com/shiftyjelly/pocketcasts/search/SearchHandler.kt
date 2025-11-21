@@ -361,6 +361,7 @@ class SearchHandler @Inject constructor(
                             emit(SearchUiState.SearchOperation.Success(searchTerm = query, results = SearchResults.ImprovedResults(results = localResults, filter = ResultsFilters.TOP_RESULTS)))
                         }
                         val apiResults = try {
+                            analyticsTracker.track(AnalyticsEvent.SEARCH_PERFORMED, AnalyticsProp.sourceMap(source))
                             improvedSearchManager.combinedSearch(query).map {
                                 if (it is ImprovedSearchResultItem.PodcastItem) {
                                     it.copy(isFollowed = subscribedUuids.contains(it.uuid))

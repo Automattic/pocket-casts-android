@@ -145,7 +145,6 @@ fun SearchAutoCompleteResultsPage(
                                 .clickable(
                                     onClick = {
                                         onReportViewAllClick(searchTerm)
-                                        onTermClick(SearchAutoCompleteItem.Term(searchTerm))
                                     },
                                 )
                                 .padding(vertical = 8.dp, horizontal = 16.dp),
