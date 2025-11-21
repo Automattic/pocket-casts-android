@@ -17,6 +17,7 @@ import au.com.shiftyjelly.pocketcasts.repositories.endofyear.EndOfYearStats
 import au.com.shiftyjelly.pocketcasts.repositories.endofyear.EndOfYearSync
 import au.com.shiftyjelly.pocketcasts.servers.list.ListServiceManager
 import au.com.shiftyjelly.pocketcasts.sharing.SharingRequest
+import au.com.shiftyjelly.pocketcasts.utils.accessibility.AccessibilityManager
 import au.com.shiftyjelly.pocketcasts.utils.coroutines.CachedAction
 import au.com.shiftyjelly.pocketcasts.utils.extensions.padEnd
 import dagger.assisted.Assisted
@@ -52,6 +53,7 @@ class EndOfYearViewModel @AssistedInject constructor(
     private val listServiceManager: ListServiceManager,
     private val sharingClient: StorySharingClient,
     private val analyticsTracker: AnalyticsTracker,
+    private val accessibilityManager: AccessibilityManager,
 ) : ViewModel() {
     private val syncState = MutableStateFlow<SyncState>(SyncState.Syncing)
     private val _syncFailedSignal = CompletableDeferred<Unit>()
@@ -90,10 +92,20 @@ class EndOfYearViewModel @AssistedInject constructor(
         settings.cachedSubscription.flow,
         topPodcastsLink,
         progress,
+        accessibilityManager.isTalkBackOnFlow,
         ::createUiModel,
-    ).stateIn(viewModelScope, SharingStarted.Lazily, UiState.Syncing(storyProgress = 0f))
+    ).stateIn(viewModelScope, SharingStarted.Lazily, UiState.Syncing(storyProgress = 0f, isTalkBackOn = false))
 
     private var syncJob: Job? = null
+
+    init {
+        accessibilityManager.startListening()
+    }
+
+    override fun onCleared() {
+        accessibilityManager.stopListening()
+        super.onCleared()
+    }
 
     internal fun syncData() {
         if (syncJob != null) {
@@ -120,9 +132,11 @@ class EndOfYearViewModel @AssistedInject constructor(
         subscription: Subscription?,
         topPodcastsLink: String?,
         progress: Float,
+        isTalkBackOn: Boolean,
     ) = when (syncState) {
         SyncState.Syncing -> UiState.Syncing(
             storyProgress = progress,
+            isTalkBackOn = isTalkBackOn,
         )
 
         SyncState.Synced -> {
@@ -132,10 +146,10 @@ class EndOfYearViewModel @AssistedInject constructor(
                 stories = stories,
                 isPaidAccount = subscription != null,
                 storyProgress = progress,
+                isTalkBackOn = isTalkBackOn,
             )
         }
     }
-
     private fun createStories(
         stats: EndOfYearStats,
         randomShowIds: RandomShowIds?,
@@ -190,12 +204,14 @@ class EndOfYearViewModel @AssistedInject constructor(
         viewModelScope.launch {
             progress.value = 0f
             countDownJob?.cancelAndJoin()
-            when (val previewDuration = story.previewDuration) {
-                Duration.INFINITE -> {
+            val talkbackOn = accessibilityManager.isTalkBackOnFlow.value
+            val previewDuration = story.previewDuration
+            when {
+                previewDuration == Duration.INFINITE || talkbackOn -> {
                     progress.value = 0f
                 }
 
-                null -> {
+                previewDuration == null -> {
                     progress.value = 1f
                 }
 
@@ -387,9 +403,11 @@ class EndOfYearViewModel @AssistedInject constructor(
 internal sealed interface UiState {
     val storyProgress: Float
     val stories: List<Story>
+    val isTalkBackOn: Boolean
 
     data class Syncing(
         override val storyProgress: Float,
+        override val isTalkBackOn: Boolean,
     ) : UiState {
         override val stories get() = placeholderStories
     }
@@ -399,6 +417,7 @@ internal sealed interface UiState {
         val isPaidAccount: Boolean,
         override val storyProgress: Float,
         override val stories: List<Story>,
+        override val isTalkBackOn: Boolean,
     ) : UiState
 }
 

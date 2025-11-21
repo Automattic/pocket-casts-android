@@ -13,6 +13,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -38,7 +39,8 @@ internal fun HeaderText(
         horizontalAlignment = Alignment.CenterHorizontally,
         modifier = modifier
             .padding(horizontal = 24.dp)
-            .padding(top = measurements.closeButtonBottomEdge + 24.dp),
+            .padding(top = measurements.closeButtonBottomEdge + 24.dp)
+            .semantics(mergeDescendants = true) {},
     ) {
         if (subscriptionTier != null) {
             SubscriptionBadgeForTier(
