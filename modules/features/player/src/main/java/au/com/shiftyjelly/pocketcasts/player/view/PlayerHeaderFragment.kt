@@ -517,18 +517,12 @@ class PlayerHeaderFragment :
 
         Snackbar.make(view, snackbarMessage, Snackbar.LENGTH_LONG)
             .setAction(LR.string.settings_view, viewBookmarksAction)
-            .setActionTextColor(result.tintColor)
-            .setBackgroundTint(ThemeColor.primaryUi01(Theme.ThemeType.DARK))
-            .setTextColor(ThemeColor.primaryText01(Theme.ThemeType.DARK))
             .show()
     }
 
     private fun showSnackBar(text: CharSequence) {
         parentFragment?.view?.let {
-            Snackbar.make(it, text, Snackbar.LENGTH_SHORT)
-                .setBackgroundTint(ThemeColor.primaryUi01(Theme.ThemeType.LIGHT))
-                .setTextColor(ThemeColor.primaryText01(Theme.ThemeType.LIGHT))
-                .show()
+            Snackbar.make(it, text, Snackbar.LENGTH_SHORT).show()
         }
     }
 
