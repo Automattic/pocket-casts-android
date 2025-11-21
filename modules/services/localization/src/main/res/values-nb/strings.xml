@@ -242,7 +242,6 @@ Language: nb_NO
     <string name="onboarding_welcome_recommendations_title">Oppdag noe nytt</string>
     <string name="onboarding_welcome_recommendations_text">Finn både ukjente og trendy podcaster på den håndlagde Oppdag-siden.</string>
     <string name="onboarding_welcome_recommendations_button">Finn min neste podcast</string>
-    <string name="end_of_year_stories_failed">Kan ikke laste årsslutthistoriene, kontroller internettilkoblingen.</string>
     <string name="not_now">Ikke nå</string>
     <string name="onboarding_recommendations_find_favorite_podcasts">Finn favorittpodcasten din</string>
     <string name="onboarding_recommendations_make_pocket_casts_yours">Gjør Pocket Casts til din egen ved å velge favorittpodcaster eller importere dem fra en annen podcastspiller. Du kan alltids gjøre dette senere.</string>

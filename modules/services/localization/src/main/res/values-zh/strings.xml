@@ -1,18 +1,45 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2025-11-06 09:54:04+0000
+Translation-Revision-Date: 2025-11-13 09:54:05+0000
 Plural-Forms: nplurals=1; plural=0;
 Generator: GlotPress/2.4.0-alpha
 Language: zh_CN
 -->
 <resources>
+    <string name="eoy_story_ratings_subtitle_no_ratings">分享您所喜爱的内容，助力心仪创作者获得关注</string>
+    <string name="eoy_story_ratings_subtitle_2">评论能让精彩的节目获得关注</string>
+    <string name="eoy_story_ratings_subtitle_1">世界各地的创作者都感激这份喜爱</string>
+    <string name="eoy_story_ratings_title_no_ratings">暂无评分，但还有时间！</string>
+    <string name="eoy_story_ratings_title_2">感谢分享您的反馈。</string>
+    <string name="eoy_story_ratings_title_1">您抛撒 %1$d 星评价，如同狂欢的彩纸！</string>
+    <string name="end_of_year_listening_time_subtitle">已收听的分钟数</string>
+    <string name="end_of_year_stories_year_over_year_subtitle_went_down">但话说回来，质量比数量重要</string>
+    <string name="end_of_year_stories_year_over_year_title_went_down">您的收听量今年下降了 %1$s%%</string>
+    <string name="end_of_year_stories_year_over_year_subtitle_flat">始终如一，值得信赖，如同您咖啡店的固定订单</string>
+    <string name="end_of_year_stories_year_over_year_title_flat">您的 %1$s 年收听量保持稳定</string>
+    <string name="end_of_year_stories_year_over_year_subtitle_went_up_a_lot">今年您的收听量增长了 500% 以上，欢迎加入这个行列</string>
+    <string name="end_of_year_stories_year_over_year_title_went_up_a_lot">从新人到王者！</string>
+    <string name="settings_storage_normalize_episode_titles_description">状态：%1$s\n该应用程序的某些部分使用剧集搜索功能，该功能需要使用规范化的标题。 如果剧集尚未规范化，则轻点此设置将运行数据库规范化。</string>
+    <string name="settings_storage_normalize_episode_titles">规范化剧集标题</string>
+    <string name="normalization_started">规范化已开始</string>
+    <string name="not_normalized">未规范化</string>
+    <string name="normalized">已规范化</string>
+    <string name="database">数据库</string>
+    <string name="end_of_year_story_top_podcast_stats_hours">%1$s 和 %2$s。\n这是承诺！</string>
+    <string name="end_of_year_story_top_podcast_stats_days">%1$s、%2$s 和 %3$s。\n这是承诺！</string>
+    <string name="end_of_year_story_top_podcast_subtitle">这可以说是为您量身打造的专属体验</string>
+    <string name="app_rating_yes_label">是！</string>
+    <string name="app_rating_no_label">不太喜欢</string>
+    <string name="app_rating_body">您好！ 我们很想知道您是否喜欢我们的应用程序。</string>
+    <string name="app_rating_title">喜欢 Pocket Casts？</string>
+    <string name="end_of_year_story_epilogue_subtitle">与朋友分享您的播放记录，并向陪伴您度过一整年的播主表达谢意</string>
+    <string name="end_of_year_story_epilogue_title">感谢您这一年与 Pocket Casts 相伴同行</string>
     <string name="end_of_year_stories_year_completion_rate_subtitle">在开始的 %2$d 集中，您已看完 %1$d 集。\n比大多数健身房会员资格更持久的后续服务。</string>
     <string name="search_suggestions_no_results_message">尝试新的搜索，或添加播客源 URL</string>
     <string name="search_suggestions_no_results_title">无结果</string>
     <string name="eoy_playback_intro_title">您的年度播客盘点，\n已打包就绪，随时可供重温</string>
     <string name="search_suggestions_view_all">查看“%1$s”的全部内容</string>
     <string name="up_next_as_playlist_saved">“接下来播放”已保存为播放列表</string>
-    <string name="up_next_as_playlist_replace_title">替换当前的“接下来播放”？</string>
     <string name="up_next_as_playlist_button_secondary">替换并播放</string>
     <string name="delete_playlist_confirmation_title">删除播放列表？</string>
     <string name="delete_playlist_confirmation_body">是否确定要删除您的播放列表？ 一经删除，将无法撤销。</string>
@@ -52,7 +79,6 @@ Language: zh_CN
     <string name="add_to_up_next_top">添加到“接下来播放”顶部</string>
     <string name="playlist_episodes_archived_title">无剧集</string>
     <string name="playlist_episodes_archived_count">%1$d 已存档</string>
-    <string name="playlist_edit_episodes">重新排列剧集</string>
     <string name="playlist_episode_unavailable_cta">从播放列表中移除</string>
     <string name="playlist_episode_unavailable_description">播客创作者删除了此剧集。 在您移除之前，它将保留在您的播放列表中。</string>
     <string name="playlist_episode_unavailable_title">剧集无法播放</string>
@@ -426,6 +452,7 @@ Language: zh_CN
     <string name="icons_plus_prompt">通过 Pocket Casts Plus 获取独家应用程序图标，并享用更多功能</string>
     <string name="themes_plus_prompt">通过 Pocket Casts Plus 获取专属主题，并享用更多功能</string>
     <string name="folders_plus_prompt">通过 Pocket Casts Plus 整理您的播客，并享用更多功能</string>
+    <string name="end_of_year_story_top_podcast_title">您的 %1$d 年热门播客</string>
     <string name="drag_down_to_dismiss_content_description">向下拖动即可取消</string>
     <string name="maybe_later">稍后再说</string>
     <string name="need_to_free_up_space">需要释放空间？</string>
@@ -451,19 +478,9 @@ Language: zh_CN
     <string name="up_next_shuffle_disable_button_content_description">下一个随机播放禁用</string>
     <string name="up_next_shuffle_button_content_description">下一个随机播放</string>
     <string name="podcast_ratings_page_title">评级</string>
-    <string name="eoy_story_stories_subscribe_to_plus_button_label">了解 Pocket Casts Plus</string>
-    <string name="end_of_year_stories_subscribe_to_plus">通过订阅 Plus 为 Pocket Casts 提供支持，并获得更多统计信息，以及书签、文件夹或预选章节等高级功能！</string>
     <string name="settings_real_time_playback_summary">如果开启，播放器会显示剩余时间，并根据播放速度和跳过的章节对此进行调整。</string>
     <string name="settings_real_time_playback">调整剩余时间</string>
-    <string name="end_of_year_stories_year_over_year_title_went_up_a_lot">与 %1$s 年相比，您的收听时长增加了 500 %%以上</string>
-    <string name="end_of_year_listening_time_subtitle">播客收听总量</string>
-    <string name="end_of_year_story_longest_episode_subtitle">从“%2$s”到“%1$s”</string>
     <string name="eoy_story_ratings_learn_button_label">了解评分</string>
-    <string name="eoy_story_ratings_subtitle_2">感谢您与创作者社区分享反馈意见</string>
-    <string name="eoy_story_ratings_title_1">让我们看看您的评分！</string>
-    <string name="eoy_story_ratings_subtitle_3">您知道吗？现在可以对节目进行评分了。 对您所喜爱的创作者表达欣赏，并帮助他们获得关注！</string>
-    <string name="eoy_story_ratings_subtitle_1">哇，这么多 %1$d 星评价！ 感谢您对您所喜爱的创作者表达欣赏！</string>
-    <string name="eoy_story_ratings_title_2">哎呀！ 暂无播客评分可向您展示</string>
     <string name="referrals_failed_to_load_offer">很抱歉，获取您的推荐链接时出错了。</string>
     <string name="transcript_error_not_available">很抱歉，本剧集没有文字转录稿。</string>
     <string name="referrals_banner_hide_label">隐藏此横幅</string>
@@ -649,20 +666,12 @@ Language: zh_CN
     <string name="bookmark_not_found">未找到书签</string>
     <string name="settings_use_dark_up_next_details">启用后，“下一个”将始终使用深色主题；禁用后，将与当前主题匹配</string>
     <string name="settings_use_dark_up_next">使用深色的“下一个”主题</string>
-    <string name="end_of_year_stories_theres_more">更多精彩有待进一步探索！</string>
     <string name="end_of_year_stories_year_completion_rate">完成率</string>
-    <string name="eoy_year_over_year_title_skyrocketed">相比于 2022 年，您的收听时长飙升！</string>
-    <string name="end_of_year_stories_year_over_year_subtitle_went_down">啊哈…生活还得继续，不是吗？</string>
     <string name="end_of_year_stories_year_over_share_text">我的 %1$d 年收听时长与 %2$d 年的比较情况</string>
     <string name="end_of_year_stories_year_completion_rate_title">您的完成率为 %1$d%%</string>
-    <string name="end_of_year_stories_year_over_year_subtitle_flat">人们常说，一致性是成功的关键…或诸如此类的话！</string>
     <string name="end_of_year_prompt_card_summary">查看您的收听统计数据、热门播客等。</string>
-    <string name="end_of_year_stories_year_over_year_title_went_down">与 %1$s 年相比，您的收听时长略微减少</string>
-    <string name="end_of_year_stories_year_over_year_title_flat">与 %1$s 年相比，您的收听时长保持一致</string>
-    <string name="end_of_year_stories_year_over_year_subtitle_went_up">准备在 %1$s 年进一步提升？</string>
-    <string name="end_of_year_stories_year_over_year_title_went_up">与 %1$s 年相比，您的收听时长激增 %2$s%%</string>
+    <string name="end_of_year_stories_year_over_year_title_went_up">相比于 %1$s 年，您的收听时长飙升了 %2$s%%</string>
     <string name="end_of_year_replay">再次播放</string>
-    <string name="end_of_year_story_longest_episode_title">您收听的最长一集为 %1$s</string>
     <string name="end_of_year_listening_time_title">这是您收听播客的总时长。</string>
     <string name="end_of_year_story_top_categories_title">您是否知道 %1$s 是您最喜欢的分类？</string>
     <string name="discover_category_society_abbreviation">文化</string>
@@ -943,7 +952,6 @@ Language: zh_CN
     <string name="onboarding_log_in">登录</string>
     <string name="plus_trial_duration_free_trial">%s 免费试用版</string>
     <string name="onboarding_plus_recurring_after_free_trial">定期付款将在您的 %1$s (%2$s) 后开始</string>
-    <string name="end_of_year_stories_failed">无法加载年终故事，请检查您的互联网连接。</string>
     <string name="onboarding_plus_feature_themes_icons_text">选择您的真实颜色。 仅面向 Plus 俱乐部的专属图标和主题。</string>
     <string name="onboarding_plus_feature_themes_icons_title">主题和图标</string>
     <string name="onboarding_plus_feature_cloud_storage_text">将文件上传到云存储空间，在任何地方都能访问这些文件。</string>
@@ -970,7 +978,6 @@ Language: zh_CN
     <string name="end_of_year_story_top_categories_share_text">我收听最多的播客分类</string>
     <string name="end_of_year_story_top_categories">您的热门分类</string>
     <string name="end_of_year_story_top_podcasts_share_text">我的年度热门播客！ %1$s</string>
-    <string name="end_of_year_story_listened_to_numbers_subtitle">但还有一个您经常收听的播客…</string>
     <string name="end_of_year_story_longest_episode_share_text">%1$d 年我收听时间最长的剧集%2$s</string>
     <string name="end_of_year_story_top_podcasts_list_title">我的 %1$d 年热门播客</string>
     <string name="end_of_year_story_top_podcast_share_text">%1$d 年我最喜欢的播客！ %2$s</string>
@@ -978,7 +985,6 @@ Language: zh_CN
     <string name="end_of_year_story_listened_to_categories">您今年收听了 %1$d 种不同的分类</string>
     <string name="end_of_year_story_listened_to_categories_subtitle">我们来看看您最喜欢的内容…</string>
     <string name="end_of_year_story_intro_title">我们来庆祝您的聆听之年！</string>
-    <string name="end_of_year_story_listened_to_numbers">您总共收听了 %1$d 个不同的节目和 %2$d 部剧集</string>
     <string name="end_of_year_story_listened_to_categories_share_text">我在 2023 年收听了 %1$d 种不同的分类</string>
     <string name="end_of_year_story_listened_to_share_text">我今年收听播客的时间为 %1$s</string>
     <string name="settings_media_notification_controls">媒体通知控件</string>
@@ -2181,6 +2187,9 @@ Language: zh_CN
     </plurals>
     <plurals name="episode_count">
         <item quantity="other">%d 集</item>
+    </plurals>
+    <plurals name="episodes">
+        <item quantity="other">%1$d 集</item>
     </plurals>
     <plurals name="hour">
         <item quantity="other">小时</item>

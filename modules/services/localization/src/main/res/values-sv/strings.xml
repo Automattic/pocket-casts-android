@@ -1,18 +1,45 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2025-11-06 13:54:04+0000
+Translation-Revision-Date: 2025-11-14 09:54:17+0000
 Plural-Forms: nplurals=2; plural=n != 1;
 Generator: GlotPress/2.4.0-alpha
 Language: sv_SE
 -->
 <resources>
+    <string name="eoy_story_ratings_subtitle_no_ratings">Hjälp dina favoritkreatörer att bli upptäckta genom att dela det du älskar</string>
+    <string name="eoy_story_ratings_title_no_ratings">Inga betyg än, men det finns fortfarande tid!</string>
+    <string name="eoy_story_ratings_title_2">Tack för att du delar din feedback.</string>
+    <string name="eoy_story_ratings_subtitle_2">Recensioner hjälper fantastiska shower att bli hittade</string>
+    <string name="eoy_story_ratings_subtitle_1">Kreatörer överallt uppskattar kärleken</string>
+    <string name="eoy_story_ratings_title_1">Du har delat ut %1$d-stjärniga betyg som konfetti!</string>
+    <string name="end_of_year_listening_time_subtitle">lyssnade minuter</string>
+    <string name="end_of_year_stories_year_over_year_subtitle_went_down">Men hej, kvalitet över kvantitet</string>
+    <string name="end_of_year_stories_year_over_year_title_went_down">Ditt lyssnande minskade med %1$s%% i år</string>
+    <string name="end_of_year_stories_year_over_year_subtitle_flat">Konsekvent, pålitligt, precis som din kafébeställning</string>
+    <string name="end_of_year_stories_year_over_year_subtitle_went_up_a_lot">Du lyssnade mer än 500 % i år — välkommen till klubben</string>
+    <string name="end_of_year_stories_year_over_year_title_flat">Din lyssnande %1$s höll sig stabilt</string>
+    <string name="end_of_year_stories_year_over_year_title_went_up_a_lot">Från noll till hjälte!</string>
+    <string name="settings_storage_normalize_episode_titles_description">Status: %1$s\nVissa delar av appen använder en avsnittssökning som kräver normaliserade rubriker. Om du trycker på den här inställningen körs databasnormalisering om avsnitten inte redan är normaliserade.</string>
+    <string name="normalization_started">Normalisering påbörjad</string>
+    <string name="database">Databas</string>
+    <string name="settings_storage_normalize_episode_titles">Normalisera avsnittstitlar</string>
+    <string name="not_normalized">Inte normaliserat</string>
+    <string name="normalized">Normaliserat</string>
+    <string name="end_of_year_story_top_podcast_subtitle">Det blir inte mer ”du” än så här</string>
+    <string name="end_of_year_story_top_podcast_stats_hours">%1$s och %2$s.\nDet är engagemang!</string>
+    <string name="end_of_year_story_top_podcast_stats_days">%1$s, %2$s och %3$s.\nDet är engagemang!</string>
+    <string name="app_rating_yes_label">Ja!</string>
+    <string name="app_rating_no_label">Inte direkt</string>
+    <string name="app_rating_body">Hej där! Vi vill gärna veta om du gillar vår app.</string>
+    <string name="app_rating_title">Gillar du Pocket Casts?</string>
+    <string name="end_of_year_story_epilogue_subtitle">Dela din uppspelning med vänner och ge lite kärlek till de podcasters som höll dig sällskap hela året</string>
+    <string name="end_of_year_story_epilogue_title">Tack för att du spenderar ditt år med Pocket Casts</string>
     <string name="end_of_year_stories_year_completion_rate_subtitle">Du lyssnade klart på  av de %2$d avsnitt som startades %1$d.\nEn bättre resultat än med de flesta gymmedlemskap.</string>
     <string name="search_suggestions_no_results_message">Prova en ny sökning eller att lägga till en podcastflödes-URL</string>
     <string name="search_suggestions_no_results_title">Inga resultat</string>
     <string name="eoy_playback_intro_title">Ditt podcastår\ninslaget och redo att återupplevas</string>
     <string name="search_suggestions_view_all">Visa alla för ”%1$s”</string>
     <string name="up_next_as_playlist_saved">Nästa har sparats som en spellista</string>
-    <string name="up_next_as_playlist_replace_title">Ersätt nuvarande Nästa?</string>
     <string name="up_next_as_playlist_button_secondary">Ersätt och spela upp</string>
     <string name="delete_playlist_confirmation_title">Ta bort spellista?</string>
     <string name="delete_playlist_confirmation_body">Är du säker på att du vill ta bort din spellista? Det går inte att ångra åtgärden.</string>
@@ -52,7 +79,6 @@ Language: sv_SE
     <string name="add_to_up_next_top">Lägg till högst upp i Nästa</string>
     <string name="playlist_episodes_archived_title">Inga avsnitt</string>
     <string name="playlist_episodes_archived_count">%1$d arkiverade</string>
-    <string name="playlist_edit_episodes">Ordna om avsnitt</string>
     <string name="playlist_episode_unavailable_cta">Ta bort från spellista</string>
     <string name="playlist_episode_unavailable_description">Podcastens skapare har tagit bort detta avsnitt. Det kommer att finnas kvar i din spellista tills du tar bort det.</string>
     <string name="playlist_episode_unavailable_title">Avsnittet är inte tillgängligt</string>
@@ -426,6 +452,7 @@ Language: sv_SE
     <string name="icons_plus_prompt">Få exklusiva appikoner och mer därtill med Pocket Casts Plus</string>
     <string name="themes_plus_prompt">Få exklusiva teman och mer därtill med Pocket Casts Plus</string>
     <string name="folders_plus_prompt">Organisera dina podcasts och mer därtill med Pocket Casts Plus</string>
+    <string name="end_of_year_story_top_podcast_title">Dina favoritpodcasts %1$d</string>
     <string name="drag_down_to_dismiss_content_description">Dra ner för att avfärda</string>
     <string name="maybe_later">Kanske senare</string>
     <string name="need_to_free_up_space">Behöver du frigöra utrymme?</string>
@@ -451,19 +478,9 @@ Language: sv_SE
     <string name="up_next_shuffle_disable_button_content_description">Inaktivera slumpmässig Nästa-uppspelning</string>
     <string name="up_next_shuffle_button_content_description">Slumpmässig Nästa-uppspelning</string>
     <string name="podcast_ratings_page_title">Betyg</string>
-    <string name="eoy_story_stories_subscribe_to_plus_button_label">Kolla in Pocket Casts Plus</string>
-    <string name="end_of_year_stories_subscribe_to_plus">Stöd Pocket Casts genom att prenumerera på Plus och få mer statistik, plus premiumfunktioner som bokmärken, mappar och förvalda kapitel.</string>
     <string name="settings_real_time_playback_summary">Om detta är aktiverat kommer spelaren att visa återstående tid, justerad för uppspelningshastighet och överhoppade kapitel.</string>
     <string name="settings_real_time_playback">Justera återstående tid</string>
-    <string name="end_of_year_stories_year_over_year_title_went_up_a_lot">Jämfört med %1$s ökade din lyssningstid med över 500 %%</string>
-    <string name="end_of_year_story_longest_episode_subtitle">Det var \"%1$s\" från \"%2$s\"</string>
-    <string name="end_of_year_listening_time_subtitle">Sammanlagt lyssnande på podcasts</string>
     <string name="eoy_story_ratings_learn_button_label">Läs om betyg</string>
-    <string name="eoy_story_ratings_subtitle_3">Visste du att du kan betygsätta shower nu? Dela kärleken till dina favoritkreatörer och hjälp dem att synas.</string>
-    <string name="eoy_story_ratings_subtitle_2">Tack för att du delar din feedback med kreatörscommunityn</string>
-    <string name="eoy_story_ratings_subtitle_1">Wow, så många %1$d-stjärniga betyg Tack för att du delar kärleken till dina favoritkreatörer.</string>
-    <string name="eoy_story_ratings_title_2">Oj då! Inga podcastbetyg att visa dig ännu</string>
-    <string name="eoy_story_ratings_title_1">Låt oss se dina betyg.</string>
     <string name="referrals_failed_to_load_offer">Något gick fel vid hämtningen av din hänvisningslänk.</string>
     <string name="transcript_error_not_available">Det finns ingen transkription tillgänglig för det här avsnittet.</string>
     <string name="referrals_banner_hide_label">Dölj den här bannern</string>
@@ -649,19 +666,11 @@ Language: sv_SE
     <string name="bookmark_not_found">Bokmärke hittades inte</string>
     <string name="settings_use_dark_up_next_details">När det är aktiverat kommer Up Next alltid att använda mörkt tema, eller matcha det aktuella temat när det är inaktiverat</string>
     <string name="settings_use_dark_up_next">Använd mörkt Up Next-tema</string>
-    <string name="end_of_year_stories_theres_more">Och det finns mer!</string>
     <string name="end_of_year_stories_year_completion_rate">slutförandegrad</string>
-    <string name="eoy_year_over_year_title_skyrocketed">Jämfört med 2022 har din lyssningstid skjutit i höjden!</string>
-    <string name="end_of_year_stories_year_over_year_subtitle_went_down">Ack ja … det finns ett liv att leva, eller hur?</string>
     <string name="end_of_year_stories_year_over_share_text">Min lyssningstid för %1$d jämfört med %2$d</string>
     <string name="end_of_year_stories_year_completion_rate_title">Din slutförandegrad var %1$d%%</string>
-    <string name="end_of_year_stories_year_over_year_subtitle_flat">Och det sägs att kontinuitet är nyckeln till framgång … eller något i den stilen!</string>
     <string name="end_of_year_prompt_card_summary">Se din lyssningsstatistik, dina favoritpodcasts och mycket mer.</string>
-    <string name="end_of_year_stories_year_over_year_title_went_down">Jämfört med %1$s har din lyssningstid minskat något</string>
-    <string name="end_of_year_stories_year_over_year_title_flat">Jämfört med %1$s var din lyssningstid ganska oförändrad</string>
-    <string name="end_of_year_stories_year_over_year_subtitle_went_up">Är du redo att toppa det under %1$s?</string>
-    <string name="end_of_year_stories_year_over_year_title_went_up">Jämfört med %1$s ökade din lyssningstid med hisnande %2$s%%</string>
-    <string name="end_of_year_story_longest_episode_title">Det längsta avsnittet du lyssnade på var %1$s</string>
+    <string name="end_of_year_stories_year_over_year_title_went_up">Jämfört med %1$s har din lyssningstid skjutit i höjden med %2$s%%</string>
     <string name="end_of_year_replay">Spela upp igen</string>
     <string name="end_of_year_listening_time_title">Detta var den sammanlagda tiden du lyssnade på podcasts.</string>
     <string name="end_of_year_story_top_categories_subtitle">Du lyssnade på %1$s avsnitt i sammanlagt %2$s</string>
@@ -943,7 +952,6 @@ Language: sv_SE
     <string name="onboarding_log_in">Logga in</string>
     <string name="plus_trial_duration_free_trial">%s gratis provperiod</string>
     <string name="onboarding_plus_recurring_after_free_trial">Återkommande betalningar börjar efter din %1$s (%2$s)</string>
-    <string name="end_of_year_stories_failed">Det gick inte att ladda dina årsslutsberättelser. Kontrollera din anslutning.</string>
     <string name="onboarding_plus_feature_themes_icons_text">Välj dina egna färger. Exklusiva ikoner och teman för Plus-medlemmar.</string>
     <string name="onboarding_plus_feature_themes_icons_title">Teman och ikoner</string>
     <string name="onboarding_plus_feature_cloud_storage_text">Ladda upp dina filer till molnlagringen och ha dem tillgängliga överallt.</string>
@@ -970,7 +978,6 @@ Language: sv_SE
     <string name="end_of_year_create_account_to_see">Spara dina podcasts i molnet, få din årsslutsöversikt och synkronisera ditt lyssningsförlopp med andra enheter.</string>
     <string name="end_of_year_story_top_categories_share_text">Mina mest lyssnade podcastkategorier</string>
     <string name="end_of_year_story_top_podcasts_share_text">Mina favoritpodcasts för året. %1$s</string>
-    <string name="end_of_year_story_listened_to_numbers_subtitle">Det fanns dock ett avsnitt som du fortsatte att komma tillbaka till …</string>
     <string name="end_of_year_story_longest_episode_share_text">Det längsta avsnittet jag lyssnade på under %1$d %2$s</string>
     <string name="end_of_year_story_top_podcasts_list_title">Mina favoritpodcasts %1$d</string>
     <string name="end_of_year_story_top_podcast_share_text">Min favoritpodcast %1$d! %2$s</string>
@@ -978,7 +985,6 @@ Language: sv_SE
     <string name="end_of_year_story_listened_to_categories_subtitle">Låt oss ta en titt på några av dina favoriter …</string>
     <string name="end_of_year_story_listened_to_categories">Du lyssnade på %1$d olika kategorier i år</string>
     <string name="end_of_year_story_intro_title">Låt oss fira ditt lyssningsår.</string>
-    <string name="end_of_year_story_listened_to_numbers">Du lyssnade sammanlagt på %1$d olika podcasts och %2$d avsnitt</string>
     <string name="end_of_year_story_listened_to_categories_share_text">Jag lyssnade på %1$d olika kategorier under 2023</string>
     <string name="end_of_year_story_listened_to_share_text">Jag lyssnade på podcasts %1$s i år</string>
     <string name="settings_media_notification_controls">Mediaaviseringskontroller</string>
@@ -2186,6 +2192,10 @@ Language: sv_SE
     <plurals name="episode_count">
         <item quantity="one">%d avsnitt</item>
         <item quantity="other">%d avsnitt</item>
+    </plurals>
+    <plurals name="episodes">
+        <item quantity="one">%1$d avsnitt</item>
+        <item quantity="other">%1$d avsnitt</item>
     </plurals>
     <plurals name="hour">
         <item quantity="one">timme</item>
