@@ -152,7 +152,7 @@ class SearchViewModel @Inject constructor(
                 AnalyticsEvent.IMPROVED_SEARCH_FILTER_TAPPED,
                 mapOf(
                     "source" to source.analyticsValue,
-                    "filter" to filter.name,
+                    "filter" to filter.analyticsValue,
                 ),
             )
             _state.update { state ->
@@ -356,10 +356,10 @@ sealed interface SearchResults {
     }
 }
 
-enum class ResultsFilters(val resId: Int) {
-    TOP_RESULTS(LR.string.search_filters_top_results),
-    PODCASTS(LR.string.search_filters_podcasts),
-    EPISODES(LR.string.search_filters_episodes),
+enum class ResultsFilters(val resId: Int, val analyticsValue: String) {
+    TOP_RESULTS(LR.string.search_filters_top_results, "allResults"),
+    PODCASTS(LR.string.search_filters_podcasts, "podcasts"),
+    EPISODES(LR.string.search_filters_episodes, "episodes"),
 }
 
 sealed interface SearchUiState {
