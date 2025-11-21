@@ -282,6 +282,16 @@ class SearchViewModel @Inject constructor(
         )
     }
 
+    fun trackViewAllSuggestionsClick(term: String) {
+        analyticsTracker.track(
+            AnalyticsEvent.IMPROVED_SEARCH_VIEW_ALL_TAPPED,
+            mapOf(
+                "source" to source.analyticsValue,
+                "term" to term
+            )
+        )
+    }
+
     enum class SearchResultType(val value: String) {
         PODCAST_LOCAL_RESULT("podcast_local_result"),
         PODCAST_REMOTE_RESULT("podcast_remote_result"),

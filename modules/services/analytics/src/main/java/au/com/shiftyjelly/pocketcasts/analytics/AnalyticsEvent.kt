@@ -864,4 +864,5 @@ enum class AnalyticsEvent(val key: String) {
     IMPROVED_SEARCH_SUGGESTIONS_FAILED("search_predictive_failed"),
     IMPROVED_SEARCH_SUGGESTION_TERM_TAPPED("search_predictive_term_tapped"),
     IMPROVED_SEARCH_EMPTY_RESULTS("search_empty_results"),
+    IMPROVED_SEARCH_VIEW_ALL_TAPPED("search_predictive_view_all_tapped"),
 }

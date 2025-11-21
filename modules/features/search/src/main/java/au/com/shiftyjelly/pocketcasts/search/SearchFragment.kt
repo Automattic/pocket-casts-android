@@ -319,6 +319,7 @@ class SearchFragment : BaseFragment() {
                             bottomInset = bottomInset.pxToDp(LocalContext.current).dp,
                             isLoading = suggestions.operation is SearchUiState.SearchOperation.Loading,
                             onReportSuggestionsRender = viewModel::trackSuggestionsShown,
+                            onReportViewAllClick = viewModel::trackViewAllSuggestionsClick
                         )
                     }
                 }

@@ -56,6 +56,7 @@ fun SearchAutoCompleteResultsPage(
     bottomInset: Dp,
     onScroll: () -> Unit,
     onReportSuggestionsRender: () -> Unit,
+    onReportViewAllClick: (String) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val nestedScrollConnection = remember {
@@ -143,6 +144,7 @@ fun SearchAutoCompleteResultsPage(
                                 .semantics { role = Role.Button }
                                 .clickable(
                                     onClick = {
+                                        onReportViewAllClick(searchTerm)
                                         onTermClick(SearchAutoCompleteItem.Term(searchTerm))
                                     },
                                 )
@@ -183,6 +185,7 @@ private fun PreviewSearchAutoCompleteResultsPage(
             onFolderClick = {},
             onScroll = {},
             onReportSuggestionsRender = {},
+            onReportViewAllClick = {},
             playButtonListener = object : PlayButton.OnClickListener {
                 override var source: SourceView = SourceView.SEARCH_RESULTS
 
@@ -222,6 +225,7 @@ private fun PreviewEmptySearchAutoCompleteResultsPage(
             onFolderClick = {},
             onScroll = {},
             onReportSuggestionsRender = {},
+            onReportViewAllClick = {},
             playButtonListener = object : PlayButton.OnClickListener {
                 override var source: SourceView = SourceView.SEARCH_RESULTS
 
