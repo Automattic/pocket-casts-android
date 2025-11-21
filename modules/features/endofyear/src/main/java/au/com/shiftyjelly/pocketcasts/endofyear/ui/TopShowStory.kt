@@ -1,6 +1,6 @@
 package au.com.shiftyjelly.pocketcasts.endofyear.ui
 
-import androidx.compose.animation.core.FastOutSlowInEasing
+import androidx.compose.animation.core.CubicBezierEasing
 import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.animateFloat
 import androidx.compose.animation.core.animateFloatAsState
@@ -67,48 +67,54 @@ internal fun TopShowStory(
     controller: StoryCaptureController,
     onShareStory: (File) -> Unit,
 ) {
-    BoxWithConstraints(
-        modifier = Modifier
-            .capturable(controller.captureController(story))
-            .fillMaxSize()
-            .background(story.backgroundColor)
-            .padding(top = measurements.closeButtonBottomEdge + 16.dp),
-    ) {
-        val windowSize = currentWindowAdaptiveInfo().windowSizeClass
-        val sizeFactor = if (windowSize.isAtMostMediumHeight()) {
-            MEDIUM_HEIGHT_FACTOR
-        } else {
-            1f
+    Box {
+        BoxWithConstraints(
+            modifier = Modifier
+                .capturable(controller.captureController(story))
+                .fillMaxSize()
+                .background(story.backgroundColor)
+                .padding(top = measurements.closeButtonBottomEdge + 16.dp, bottom = 64.dp),
+        ) {
+            val windowSize = currentWindowAdaptiveInfo().windowSizeClass
+            val sizeFactor = if (windowSize.isAtMostMediumHeight()) {
+                MEDIUM_HEIGHT_FACTOR
+            } else {
+                1f
+            }
+            val animationContainerSize = min(maxWidth, maxHeight) * sizeFactor
+            Header(
+                measurements = measurements,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height((maxHeight - animationContainerSize) / 2)
+                    .align(Alignment.TopCenter),
+            )
+
+            CenterContent(
+                story = story,
+                modifier = Modifier
+                    .size(animationContainerSize)
+                    .align(Alignment.Center),
+            )
+
+            Footer(
+                story = story,
+                textAlignment = if (windowSize.isAtMostMediumHeight()) {
+                    Alignment.TopCenter
+                } else {
+                    Alignment.Center
+                },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height((maxHeight - animationContainerSize) / 2)
+                    .align(Alignment.BottomCenter),
+            )
         }
-        val animationContainerSize = min(maxWidth, maxHeight) * sizeFactor
-        Header(
-            measurements = measurements,
-            modifier = Modifier
-                .fillMaxWidth()
-                .height((maxHeight - animationContainerSize) / 2)
-                .align(Alignment.TopCenter),
-        )
-
-        CenterContent(
-            story = story,
-            modifier = Modifier
-                .size(animationContainerSize)
-                .align(Alignment.Center),
-        )
-
-        Footer(
+        ShareStoryButton(
+            modifier = Modifier.padding(bottom = 18.dp).align(Alignment.BottomCenter),
             story = story,
             controller = controller,
-            onShareStory = onShareStory,
-            textAlignment = if (windowSize.isAtMostMediumHeight()) {
-                Alignment.TopCenter
-            } else {
-                Alignment.Center
-            },
-            modifier = Modifier
-                .fillMaxWidth()
-                .height((maxHeight - animationContainerSize) / 2)
-                .align(Alignment.BottomCenter),
+            onShare = onShareStory,
         )
     }
 }
@@ -129,9 +135,13 @@ private fun CenterContent(
         iterations = 1,
     )
     val isPlaying = progress > 0f
+    val animationSpec = tween<Float>(
+        durationMillis = 1000,
+        easing = CubicBezierEasing(.33f, 0f, 0f, 1f),
+    )
     val lottieScaleAnimation by animateFloatAsState(
         targetValue = if (isPlaying) 1.3f else 1.5f,
-        animationSpec = tween(durationMillis = 500, easing = FastOutSlowInEasing),
+        animationSpec = animationSpec,
     )
 
     LottieAnimation(
@@ -153,13 +163,13 @@ private fun CenterContent(
     val artworkTransition = updateTransition(artworkTrigger, "artwork transition")
     val scaleAnimation by artworkTransition.animateFloat(
         transitionSpec = {
-            tween(durationMillis = 250, easing = FastOutSlowInEasing)
+            animationSpec
         },
     ) {
         if (it) {
-            1f
+            .95f
         } else {
-            1.2f
+            1f
         }
     }
     val alphaAnimation by artworkTransition.animateFloat(
@@ -223,8 +233,6 @@ private fun Header(
 @Composable
 private fun Footer(
     story: Story.TopShow,
-    controller: StoryCaptureController,
-    onShareStory: (File) -> Unit,
     modifier: Modifier = Modifier,
     textAlignment: Alignment = Alignment.Center,
 ) = Box(
@@ -257,12 +265,6 @@ private fun Footer(
             .padding(24.dp)
             .align(textAlignment),
         textAlign = TextAlign.Center,
-    )
-    ShareStoryButton(
-        modifier = Modifier.padding(bottom = 18.dp).align(Alignment.BottomCenter),
-        story = story,
-        controller = controller,
-        onShare = onShareStory,
     )
 }
 

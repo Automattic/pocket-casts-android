@@ -155,7 +155,7 @@ class StoriesActivity : ComponentActivity() {
 
         val scope = rememberCoroutineScope()
         val state by viewModel.uiState.collectAsState()
-        val pagerState = rememberPagerState(pageCount = { state.storyCount })
+        val pagerState = rememberPagerState(pageCount = { state.stories.size })
         val storyChanger = remember(pagerState, scope) {
             StoryChanger(pagerState, viewModel, scope)
         }
@@ -182,10 +182,6 @@ class StoriesActivity : ComponentActivity() {
                 onRestartPlayback = storyChanger::reset,
                 onClose = {
                     viewModel.trackStoriesClosed("close_button")
-                    finish()
-                },
-                onFailedToLoad = {
-                    setResult(0, StoriesActivityContract.setResult(source))
                     finish()
                 },
             )
@@ -226,12 +222,12 @@ class StoriesActivity : ComponentActivity() {
             }
         }
 
+        var lastStory by remember { mutableStateOf<Story?>(null) }
         LaunchedEffect(state::class) {
             if (state is UiState.Synced || state is UiState.Syncing) {
                 // Track displayed page to not report it twice from different events.
                 // This can happen, for example, after the first launch.
                 // Both currentPage and pageCount trigger an event when the pager is set up.
-                var lastStory: Story? = null
                 // Inform VM about a story changed due to explicit changes of the current page.
                 launch {
                     snapshotFlow { pagerState.currentPage }.collect { index ->
@@ -278,6 +274,12 @@ class StoriesActivity : ComponentActivity() {
                     viewModel.resumeStoryAutoProgress(StoryProgressPauseReason.TakingScreenshot)
                 }
             }
+        }
+
+        LaunchedEffect(Unit) {
+            viewModel.syncFailedSignal.await()
+            setResult(0, StoriesActivityContract.setResult(source))
+            finish()
         }
     }
 

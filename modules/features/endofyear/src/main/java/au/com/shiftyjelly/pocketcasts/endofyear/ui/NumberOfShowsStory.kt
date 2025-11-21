@@ -59,67 +59,69 @@ internal fun NumberOfShowsStory(
     controller: StoryCaptureController,
     onShareStory: (File) -> Unit,
 ) {
-    Box(
-        modifier = Modifier
-            .capturable(controller.captureController(story))
-            .fillMaxSize()
-            .background(story.backgroundColor)
-            .padding(top = measurements.closeButtonBottomEdge + 16.dp),
-    ) {
-        val windowSize = currentWindowAdaptiveInfo().windowSizeClass
-        TextH10(
-            text = stringResource(
-                LR.string.end_of_year_story_listened_to_numbers,
-                story.showCount,
-                story.episodeCount,
-            ),
-            fontSize = 25.sp,
-            lineHeight = 30.sp,
-            disableAutoScale = true,
-            textAlign = TextAlign.Center,
-            fontScale = measurements.smallDeviceFactor,
-            color = colorResource(UR.color.white),
-            modifier = Modifier.padding(
-                horizontal = if (windowSize.isAtMostMediumHeight()) {
-                    24.dp
-                } else {
-                    42.dp
-                },
-            ),
-        )
-
-        val composition by rememberLottieComposition(
-            spec = LottieCompositionSpec.RawRes(R.raw.playback_number_of_shows_lottie),
-        )
-        val isPreview = LocalInspectionMode.current
-        val freezeAnimation = controller.isSharing || isPreview
-
-        val progress by animateLottieCompositionAsState(
-            composition = composition,
-            iterations = LottieConstants.IterateForever,
-            isPlaying = !freezeAnimation,
-        )
-
-        LottieAnimation(
-            composition = composition,
-            progress = { if (freezeAnimation) 1f else progress },
+    Box {
+        Box(
             modifier = Modifier
-                .matchParentSize()
-                .scale(1.2f),
-            contentScale = ContentScale.FillWidth,
-        )
+                .capturable(controller.captureController(story))
+                .fillMaxSize()
+                .background(story.backgroundColor)
+                .padding(top = measurements.closeButtonBottomEdge + 16.dp),
+        ) {
+            val windowSize = currentWindowAdaptiveInfo().windowSizeClass
+            TextH10(
+                text = stringResource(
+                    LR.string.end_of_year_story_listened_to_numbers,
+                    story.showCount,
+                    story.episodeCount,
+                ),
+                fontSize = 25.sp,
+                lineHeight = 30.sp,
+                disableAutoScale = true,
+                textAlign = TextAlign.Center,
+                fontScale = measurements.smallDeviceFactor,
+                color = colorResource(UR.color.white),
+                modifier = Modifier.padding(
+                    horizontal = if (windowSize.isAtMostMediumHeight()) {
+                        24.dp
+                    } else {
+                        42.dp
+                    },
+                ),
+            )
 
-        val coverSize = if (windowSize.isAtMostMediumHeight()) {
-            180.dp
-        } else {
-            260.dp
+            val composition by rememberLottieComposition(
+                spec = LottieCompositionSpec.RawRes(R.raw.playback_number_of_shows_lottie),
+            )
+            val isPreview = LocalInspectionMode.current
+            val freezeAnimation = controller.isSharing || isPreview
+
+            val progress by animateLottieCompositionAsState(
+                composition = composition,
+                iterations = LottieConstants.IterateForever,
+                isPlaying = !freezeAnimation,
+            )
+
+            LottieAnimation(
+                composition = composition,
+                progress = { if (freezeAnimation) 1f else progress },
+                modifier = Modifier
+                    .matchParentSize()
+                    .scale(1.2f),
+                contentScale = ContentScale.FillWidth,
+            )
+
+            val coverSize = if (windowSize.isAtMostMediumHeight()) {
+                180.dp
+            } else {
+                260.dp
+            }
+            PodcastCoverCarousel(
+                podcastIds = story.randomShowIds,
+                coverSize = coverSize,
+                modifier = Modifier.align(alignment = Alignment.Center),
+                freezeAnimation = controller.isSharing,
+            )
         }
-        PodcastCoverCarousel(
-            podcastIds = story.randomShowIds,
-            coverSize = coverSize,
-            modifier = Modifier.align(alignment = Alignment.Center),
-            freezeAnimation = controller.isSharing,
-        )
 
         ShareStoryButton(
             modifier = Modifier
@@ -132,9 +134,10 @@ internal fun NumberOfShowsStory(
     }
 }
 
-private const val PAGE_COUNT = 100
+private const val PAGE_COUNT = Int.MAX_VALUE
 private val SCROLL_INTERVAL = 700.milliseconds
-private val SCROLL_ANIM_DURATION_MS = 650
+private const val SCROLL_ANIM_DURATION_MS = 650
+private val SCROLL_ANIM_CURVE = CubicBezierEasing(.9f, 0f, .08f, 1f)
 
 @Composable
 private fun PodcastCoverCarousel(
@@ -143,7 +146,7 @@ private fun PodcastCoverCarousel(
     modifier: Modifier = Modifier,
     freezeAnimation: Boolean = false,
     peekFraction: Float = .1f,
-    peekingItems: Int = 3,
+    peekingItems: Int = 4,
 ) {
     val pagerState = rememberPagerState(
         initialPage = PAGE_COUNT / 2,
@@ -154,18 +157,19 @@ private fun PodcastCoverCarousel(
     val freezeAnimation = freezeAnimation || isPreview
 
     LaunchedEffect(freezeAnimation) {
-        delay(SCROLL_INTERVAL)
+        if (freezeAnimation) {
+            return@LaunchedEffect
+        }
+
         while (true) {
-            if (!freezeAnimation) {
-                pagerState.animateScrollToPage(
-                    page = pagerState.currentPage + 1,
-                    animationSpec = tween(
-                        durationMillis = SCROLL_ANIM_DURATION_MS,
-                        easing = CubicBezierEasing(.9f, 0f, .08f, 1f),
-                    ),
-                )
-                delay(SCROLL_INTERVAL)
-            }
+            delay(SCROLL_INTERVAL)
+            pagerState.animateScrollToPage(
+                page = pagerState.currentPage + 1,
+                animationSpec = tween(
+                    durationMillis = SCROLL_ANIM_DURATION_MS,
+                    easing = SCROLL_ANIM_CURVE,
+                ),
+            )
         }
     }
 
@@ -189,6 +193,12 @@ private fun PodcastCoverCarousel(
 
             if (pageOffset <= peekingItems) {
                 val scale = 1f - (pageOffset * peekFraction).coerceAtMost(peekFraction * peekingItems)
+                val maxOffset = peekingItems.toFloat()
+                val imageAlpha = if (pageOffset > (maxOffset - 1f)) {
+                    (-pageOffset + maxOffset).coerceIn(0f, 1f)
+                } else {
+                    1f
+                }
 
                 PodcastImage(
                     uuid = podcastId,
@@ -198,6 +208,7 @@ private fun PodcastCoverCarousel(
                         .graphicsLayer {
                             scaleX = scale
                             scaleY = scale
+                            alpha = imageAlpha
                         }
                         .zIndex(1f - pageOffset),
                 )
