@@ -1,18 +1,45 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2025-11-06 13:54:04+0000
+Translation-Revision-Date: 2025-11-13 11:54:04+0000
 Plural-Forms: nplurals=2; plural=n > 1;
 Generator: GlotPress/2.4.0-alpha
 Language: fr
 -->
 <resources>
+    <string name="eoy_story_ratings_subtitle_no_ratings">Faites découvrir vos créateurs préférés en partageant ce que vous aimez</string>
+    <string name="eoy_story_ratings_subtitle_2">Les avis aident à trouver des émissions de qualité</string>
+    <string name="eoy_story_ratings_subtitle_1">Les créateurs de tous horizons apprécient les marques d’estime</string>
+    <string name="eoy_story_ratings_title_no_ratings">Pas encore d’évaluations, mais il est encore temps !</string>
+    <string name="eoy_story_ratings_title_2">Merci pour votre retour.</string>
+    <string name="eoy_story_ratings_title_1">Vous avez distribué les %1$d étoiles comme des bonbons !</string>
+    <string name="end_of_year_listening_time_subtitle">minutes écoutées</string>
+    <string name="end_of_year_stories_year_over_year_subtitle_went_down">Mais bon, la qualité plutôt que la quantité</string>
+    <string name="end_of_year_stories_year_over_year_title_went_down">Votre écoute a baissé de %1$s %% cette année</string>
+    <string name="end_of_year_stories_year_over_year_subtitle_flat">Cohérent, fiable, comme votre commande au café</string>
+    <string name="end_of_year_stories_year_over_year_title_flat">Votre écoute est restée stable en %1$s</string>
+    <string name="end_of_year_stories_year_over_year_subtitle_went_up_a_lot">Vous avez écouté plus de 500 % cette année – bienvenue au club</string>
+    <string name="end_of_year_stories_year_over_year_title_went_up_a_lot">De zéro à héros !</string>
+    <string name="settings_storage_normalize_episode_titles_description">État : %1$s\nCertaines parties de l’application utilisent une recherche d’épisode qui nécessite des titres normalisés. Si les épisodes ne sont pas déjà normalisés, ce réglage exécute la normalisation de la base de données.</string>
+    <string name="settings_storage_normalize_episode_titles">Normaliser les titres des épisodes</string>
+    <string name="normalization_started">Normalisation commencée</string>
+    <string name="not_normalized">Non normalisé</string>
+    <string name="normalized">Normalisé</string>
+    <string name="database">Base de données</string>
+    <string name="end_of_year_story_top_podcast_stats_hours">%1$s et %2$s.\nÇa, c’est de l’engagement !</string>
+    <string name="end_of_year_story_top_podcast_stats_days">%1$s, %2$s et %3$s.\nÇa, c’est de l’engagement !</string>
+    <string name="end_of_year_story_top_podcast_subtitle">Il n’y a pas plus « vous » que ça</string>
+    <string name="app_rating_yes_label">Oui !</string>
+    <string name="app_rating_no_label">Pas vraiment</string>
+    <string name="app_rating_body">Bonjour ! Nous aimerions savoir si vous appréciez notre\u00A0application.</string>
+    <string name="app_rating_title">Vous appréciez Pocket\u00A0Casts ?</string>
+    <string name="end_of_year_story_epilogue_subtitle">Partagez votre Rétrospective avec vos amis et montrez aux podcasteurs qui vous ont tenu compagnie toute l’année que vous les appréciez</string>
+    <string name="end_of_year_story_epilogue_title">Merci d’avoir passé votre année avec Pocket\u00A0Casts</string>
     <string name="end_of_year_stories_year_completion_rate_subtitle">Sur les %2$d épisodes commencés, vous en avez terminé %1$d.\nUn suivi plus efficace que la plupart des adhésions à une salle de sport.</string>
     <string name="search_suggestions_no_results_message">Essayez une nouvelle recherche ou ajoutez une URL de flux de podcast</string>
     <string name="search_suggestions_no_results_title">Aucun résultat</string>
     <string name="eoy_playback_intro_title">Votre année en podcasts,\nemballée et prête à être passée en revue</string>
     <string name="search_suggestions_view_all">Tout afficher pour « %1$s »</string>
     <string name="up_next_as_playlist_saved">File d’attente enregistrée comme playlist</string>
-    <string name="up_next_as_playlist_replace_title">Remplacer la file d’attente actuelle ?</string>
     <string name="up_next_as_playlist_button_secondary">Remplacer et lire</string>
     <string name="delete_playlist_confirmation_title">Supprimer la playlist ?</string>
     <string name="delete_playlist_confirmation_body">Voulez-vous vraiment supprimer votre playlist ? Il n’est pas possible d’annuler cette action.</string>
@@ -52,7 +79,6 @@ Language: fr
     <string name="remove_from_playlist">Retirer de la playlist</string>
     <string name="playlist_episodes_archived_title">Aucun épisode</string>
     <string name="playlist_episodes_archived_count">%1$d archivé(s)</string>
-    <string name="playlist_edit_episodes">Réorganiser les épisodes</string>
     <string name="playlist_episode_unavailable_title">Épisode non disponible</string>
     <string name="episode_sort_custom_order">Ordre personnalisé</string>
     <string name="playlist_episode_unavailable_cta">Retirer de la playlist</string>
@@ -426,6 +452,7 @@ Language: fr
     <string name="icons_plus_prompt">Obtenir des icônes d’application exclusives avec Pocket Casts Plus, et plus encore</string>
     <string name="themes_plus_prompt">Obtenir des thèmes exclusifs avec Pocket Casts Plus, et plus encore</string>
     <string name="folders_plus_prompt">Organiser vos podcasts avec Pocket Casts Plus, et plus encore</string>
+    <string name="end_of_year_story_top_podcast_title">Votre meilleur podcast de %1$d</string>
     <string name="drag_down_to_dismiss_content_description">Faire glisser vers le bas pour ignorer</string>
     <string name="maybe_later">Peut-être plus tard</string>
     <string name="need_to_free_up_space">Besoin de libérer de l’espace ?</string>
@@ -451,19 +478,9 @@ Language: fr
     <string name="up_next_shuffle_disable_button_content_description">Désactiver la lecture aléatoire dans la file d’attente</string>
     <string name="up_next_shuffle_button_content_description">Lecture aléatoire dans la file d’attente</string>
     <string name="podcast_ratings_page_title">Évaluations</string>
-    <string name="eoy_story_stories_subscribe_to_plus_button_label">Découvrir Pocket Casts Plus</string>
     <string name="settings_real_time_playback">Ajuster le temps restant</string>
-    <string name="end_of_year_stories_subscribe_to_plus">Soutenez Pocket Casts en vous abonnant à Plus et obtenez davantage de statistiques, sans compter les fonctionnalités Premium comme les signets, les dossiers ou la présélection de chapitres !</string>
     <string name="settings_real_time_playback_summary">En cas d’activation, le lecteur affichera le temps restant, ajusté selon la vitesse de lecture et les chapitres passés.</string>
-    <string name="end_of_year_stories_year_over_year_title_went_up_a_lot">Par rapport à l’année %1$s, votre temps d’écoute a augmenté de plus de 500 %%</string>
-    <string name="end_of_year_story_longest_episode_subtitle">C’était « %1$s » de « %2$s »</string>
-    <string name="end_of_year_listening_time_subtitle">écoute totale de podcasts</string>
     <string name="eoy_story_ratings_learn_button_label">En savoir plus sur les évaluations</string>
-    <string name="eoy_story_ratings_title_1">Voyons vos évaluations !</string>
-    <string name="eoy_story_ratings_subtitle_3">Le saviez-vous ? Vous pouvez désormais évaluer les émissions. Faites connaître vos créateurs favoris et aidez-les à se faire remarquer !</string>
-    <string name="eoy_story_ratings_subtitle_2">Merci d’avoir partagé votre avis avec la communauté de créateurs</string>
-    <string name="eoy_story_ratings_subtitle_1">Waouh, tellement d’évaluations %1$d étoiles ! Merci d’avoir partagé votre appréciation avec vos créateurs favoris !</string>
-    <string name="eoy_story_ratings_title_2">Oh oh ! Aucune évaluation de podcast à vous montrer pour l’instant</string>
     <string name="referrals_failed_to_load_offer">Veuillez nous excuser, un problème est survenu lors de l’extraction de votre lien de parrainage.</string>
     <string name="transcript_error_not_available">Veuillez nous excuser, aucune transcription n’est disponible pour cet épisode.</string>
     <string name="referrals_banner_hide_label">Masquer cette bannière</string>
@@ -649,19 +666,11 @@ Language: fr
     <string name="bookmark_not_found">Impossible de trouver le favori</string>
     <string name="settings_use_dark_up_next_details">Quand l’option est activée, la File d’attente affichera toujours le thème sombre ou alors elle correspondra au thème actuel si l’option est désactivée</string>
     <string name="settings_use_dark_up_next">Utiliser le thème File d’attente sombre</string>
-    <string name="end_of_year_stories_theres_more">Ce n’est pas tout !</string>
     <string name="end_of_year_stories_year_completion_rate">taux d’achèvement</string>
-    <string name="eoy_year_over_year_title_skyrocketed">Par rapport à 2022, votre temps d’écoute a explosé !</string>
-    <string name="end_of_year_stories_year_over_year_subtitle_went_down">Aaaah… il faut vivre sa vie à fond, n’est-ce pas ?</string>
     <string name="end_of_year_stories_year_over_share_text">Mon temps d’écoute en %1$d par rapport à %2$d</string>
     <string name="end_of_year_stories_year_completion_rate_title">Cette année, votre taux d’achèvement s’élève à %1$d %%</string>
-    <string name="end_of_year_stories_year_over_year_subtitle_flat">On dit que la constance est la clé du succès… ou un truc du genre !</string>
     <string name="end_of_year_prompt_card_summary">Retrouvez vos statistiques d’écoute, vos meilleurs podcasts et plus encore.</string>
-    <string name="end_of_year_stories_year_over_year_title_went_down">Par rapport à l’année %1$s, votre temps d’écoute a légèrement diminué</string>
-    <string name="end_of_year_stories_year_over_year_title_flat">Par rapport à l’année %1$s, votre temps d’écoute est resté assez stable</string>
-    <string name="end_of_year_stories_year_over_year_subtitle_went_up">On fait mieux en %1$s ?</string>
-    <string name="end_of_year_stories_year_over_year_title_went_up">Par rapport à l’année %1$s, votre temps d’écoute a bondi de %2$s %%</string>
-    <string name="end_of_year_story_longest_episode_title">%1$s est l’épisode le plus long que vous avez écouté</string>
+    <string name="end_of_year_stories_year_over_year_title_went_up">Par rapport à %1$s, votre temps d’écoute a explosé de %2$s %%</string>
     <string name="end_of_year_replay">Réécouter</string>
     <string name="end_of_year_listening_time_title">Il s’agit de votre temps total d’écoute de podcasts.</string>
     <string name="end_of_year_story_top_categories_title">Le saviez-vous ? %1$s est votre catégorie favorite</string>
@@ -943,7 +952,6 @@ Language: fr
     <string name="onboarding_log_in">Se connecter</string>
     <string name="plus_trial_duration_free_trial">Essai gratuit %s</string>
     <string name="onboarding_plus_recurring_after_free_trial">Les paiements récurrents commenceront après votre %1$s (%2$s)</string>
-    <string name="end_of_year_stories_failed">Impossible de charger vos stories de fin d’année. Vérifiez votre connexion Internet.</string>
     <string name="onboarding_plus_feature_themes_icons_text">Affichez vos véritables couleurs. Des icônes et des thèmes exclusifs pour le club Plus uniquement.</string>
     <string name="onboarding_plus_feature_themes_icons_title">Thèmes et icônes</string>
     <string name="onboarding_plus_feature_cloud_storage_text">Chargez vos fichiers dans le stockage Cloud afin de pouvoir y accéder n’importe où.</string>
@@ -970,7 +978,6 @@ Language: fr
     <string name="end_of_year_story_top_categories_share_text">Mes catégories de podcasts les plus écoutés</string>
     <string name="end_of_year_story_top_categories">Vos meilleures catégories</string>
     <string name="end_of_year_story_top_podcasts_share_text">Mes meilleurs podcasts de l\'année ! %1$s</string>
-    <string name="end_of_year_story_listened_to_numbers_subtitle">Vous avez écouté plusieurs fois une même émission…</string>
     <string name="end_of_year_story_longest_episode_share_text">L’épisode le plus long que j’ai écouté en %1$d %2$s</string>
     <string name="end_of_year_story_top_podcasts_list_title">Mes meilleurs podcasts de %1$d</string>
     <string name="end_of_year_story_top_podcast_share_text">Mon podcast préféré de %1$d ! %2$s</string>
@@ -978,7 +985,6 @@ Language: fr
     <string name="end_of_year_story_listened_to_categories">Cette année, vous avez écouté %1$d catégories différentes</string>
     <string name="end_of_year_story_listened_to_categories_subtitle">Rétrospective sur certains de vos podcasts préférés…</string>
     <string name="end_of_year_story_intro_title">Un an d’écoute, ça se fête !</string>
-    <string name="end_of_year_story_listened_to_numbers">Vous avez écouté %1$d émissions différentes et %2$d épisodes au total</string>
     <string name="end_of_year_story_listened_to_categories_share_text">J’ai écouté %1$d catégories différentes en 2023</string>
     <string name="end_of_year_story_listened_to_share_text">J’ai passé %1$s à écouter des podcasts cette année</string>
     <string name="settings_media_notification_controls">Contrôles de notification des médias</string>
@@ -2186,6 +2192,10 @@ Language: fr
     <plurals name="episode_count">
         <item quantity="one">%d épisode</item>
         <item quantity="other">%d épisodes</item>
+    </plurals>
+    <plurals name="episodes">
+        <item quantity="one">%1$d épisode</item>
+        <item quantity="other">%1$d épisodes</item>
     </plurals>
     <plurals name="hour">
         <item quantity="one">heure</item>

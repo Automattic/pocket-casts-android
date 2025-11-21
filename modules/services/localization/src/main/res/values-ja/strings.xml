@@ -1,18 +1,45 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2025-11-06 09:54:06+0000
+Translation-Revision-Date: 2025-11-13 09:54:05+0000
 Plural-Forms: nplurals=1; plural=0;
 Generator: GlotPress/2.4.0-alpha
 Language: ja_JP
 -->
 <resources>
+    <string name="eoy_story_ratings_subtitle_no_ratings">お気に入りのクリエイターが注目されるよう、好きなことを共有して応援しよう</string>
+    <string name="eoy_story_ratings_subtitle_2">レビューは魅力的な番組が注目を集めるのに役立ちます</string>
+    <string name="eoy_story_ratings_subtitle_1">世界中のクリエイターが愛を大切にしています</string>
+    <string name="eoy_story_ratings_title_no_ratings">今のところ評価はありませんが、まだ時間はあります。</string>
+    <string name="eoy_story_ratings_title_2">フィードバックを共有いただきありがとうございます。</string>
+    <string name="eoy_story_ratings_title_1">まるで紙吹雪のように%1$dつ星評価をつけました !</string>
+    <string name="end_of_year_listening_time_subtitle">聴取分数</string>
+    <string name="end_of_year_stories_year_over_year_subtitle_went_down">でも、量より質が大事ですよね</string>
+    <string name="end_of_year_stories_year_over_year_title_went_down">今年の聴取時間が%1$s%%減少しました</string>
+    <string name="end_of_year_stories_year_over_year_subtitle_flat">コーヒーショップでの注文のように、いつも変わらず、頼りになる存在です</string>
+    <string name="end_of_year_stories_year_over_year_title_flat">%1$sの聴取時間は変わりませんでした</string>
+    <string name="end_of_year_stories_year_over_year_subtitle_went_up_a_lot">今年は500%以上聴いたんですね – クラブへようこそ</string>
+    <string name="end_of_year_stories_year_over_year_title_went_up_a_lot">ゼロからヒーローへ !</string>
+    <string name="settings_storage_normalize_episode_titles_description">ステータス: %1$s\nアプリの一部では、正規化されたタイトルが必要となるエピソード検索が使用されています。 この設定をタップすると、エピソードがまだ正規化されていない場合にデータベースの正規化が実行されます。</string>
+    <string name="settings_storage_normalize_episode_titles">エピソードタイトルを正規化</string>
+    <string name="normalization_started">正規化を開始しました</string>
+    <string name="not_normalized">正規化されていません</string>
+    <string name="normalized">正規化</string>
+    <string name="database">データベース</string>
+    <string name="end_of_year_story_top_podcast_stats_hours">%1$s と %2$s。\nこれはコミットメントです。</string>
+    <string name="end_of_year_story_top_podcast_stats_days">%1$s、%2$s および%3$s です。\nこれはコミットメントです。</string>
+    <string name="end_of_year_story_top_podcast_subtitle">これ以上に「あなたらしい」ものはありません</string>
+    <string name="app_rating_yes_label">はい。</string>
+    <string name="app_rating_no_label">そこまででない</string>
+    <string name="app_rating_body">こんにちは。 \u00A0 アプリをお楽しみいただいているかどうかお知らせください。</string>
+    <string name="app_rating_title">Pocket\u00A0Casts を楽しんでいますか ?</string>
+    <string name="end_of_year_story_epilogue_subtitle">プレイバックを友達と共有しましょう。1年間あなたを盛り上げてくれたポッドキャスターたちに感謝の気持ちを伝えましょう</string>
+    <string name="end_of_year_story_epilogue_title">1年間 Pocket\u00A0Casts をご愛顧いただきありがとうございます</string>
     <string name="end_of_year_stories_year_completion_rate_subtitle">開始した%2$d件のエピソードのうち、%1$d件を完了しました。\nほとんどのジム会員よりもフォロースルーが強力です。</string>
     <string name="search_suggestions_no_results_message">新しい検索を試すか、ポッドキャストフィードの URL を追加してください</string>
     <string name="search_suggestions_no_results_title">結果はありません</string>
     <string name="eoy_playback_intro_title">ポッドキャストで振り返る1年\n振り返る準備は万端</string>
     <string name="search_suggestions_view_all">「%1$s」のすべてを表示</string>
     <string name="up_next_as_playlist_saved">「次のエピソード」をプレイリストとして保存しました</string>
-    <string name="up_next_as_playlist_replace_title">現在の「次のエピソード」を置換しますか ?</string>
     <string name="up_next_as_playlist_button_secondary">置換して再生</string>
     <string name="delete_playlist_confirmation_title">プレイリストを削除しますか ?</string>
     <string name="delete_playlist_confirmation_body">プレイリストを削除してもよいですか ? この操作を元に戻すことはできません。</string>
@@ -52,7 +79,6 @@ Language: ja_JP
     <string name="add_to_up_next_top">「次のエピソード待機リスト」の上部に追加</string>
     <string name="playlist_episodes_archived_title">エピソードなし</string>
     <string name="playlist_episodes_archived_count">%1$d件をアーカイブ済み</string>
-    <string name="playlist_edit_episodes">エピソードを並べ替え</string>
     <string name="playlist_episode_unavailable_cta">プレイリストから削除</string>
     <string name="playlist_episode_unavailable_description">ポッドキャスト作成者がこのエピソードを削除しました。 あなたが削除するまでは、ご自身のプレイリストに残ります。</string>
     <string name="playlist_episode_unavailable_title">エピソードが利用できません</string>
@@ -426,6 +452,7 @@ Language: ja_JP
     <string name="icons_plus_prompt">Pocket Casts Plus で専用アプリアイコンの取得などを利用しましょう</string>
     <string name="themes_plus_prompt">Pocket Casts Plus で専用テーマの取得などを利用しましょう</string>
     <string name="folders_plus_prompt">Pocket Casts Plus でポッドキャストの整理などを利用しましょう</string>
+    <string name="end_of_year_story_top_podcast_title">%1$d の人気ポッドキャスト</string>
     <string name="drag_down_to_dismiss_content_description">下にドラッグして閉じる</string>
     <string name="maybe_later">後で</string>
     <string name="need_to_free_up_space">容量を空ける必要がありますか ?</string>
@@ -451,19 +478,9 @@ Language: ja_JP
     <string name="up_next_shuffle_disable_button_content_description">次のシャッフルの無効化</string>
     <string name="up_next_shuffle_button_content_description">次のシャッフル</string>
     <string name="podcast_ratings_page_title">評価機能</string>
-    <string name="eoy_story_stories_subscribe_to_plus_button_label">Pocket Casts Plus をチェック</string>
-    <string name="end_of_year_stories_subscribe_to_plus">Plus にサブスクリプションして Pocket Casts をサポートし、より多くの統計情報や、ブックマーク、フォルダー、チャプターの事前選択などのプレミアム機能を手に入れましょう。</string>
     <string name="settings_real_time_playback_summary">オンにすると、再生速度とスキップされたチャプターに合わせて調整された残り時間がプレーヤーに表示されます。</string>
     <string name="settings_real_time_playback">残り時間を調整</string>
-    <string name="end_of_year_stories_year_over_year_title_went_up_a_lot">%1$sと比較して、聴取時間が500%%以上増加しました</string>
-    <string name="end_of_year_story_longest_episode_subtitle">「%2$s」の「%1$s」でした</string>
-    <string name="end_of_year_listening_time_subtitle">ポッドキャストを聴いた合計</string>
     <string name="eoy_story_ratings_learn_button_label">評価について</string>
-    <string name="eoy_story_ratings_subtitle_3">番組を評価できるようになったことをご存知ですか ? お気に入りのクリエイターへの熱い思いを共有し、そのクリエイターが注目されるよう支援しましょう。</string>
-    <string name="eoy_story_ratings_subtitle_2">クリエイターコミュニティにフィードバックを共有していただき、ありがとうございます</string>
-    <string name="eoy_story_ratings_subtitle_1">%1$dつ星評価がとても多いですね ! お気に入りのクリエイターへの熱い思いを共有していただき、ありがとうございます。</string>
-    <string name="eoy_story_ratings_title_2">おっと ! 表示するポッドキャストの評価はまだありません</string>
-    <string name="eoy_story_ratings_title_1">あなたの評価を確認しましょう。</string>
     <string name="referrals_failed_to_load_offer">申し訳ありません、リファラルリンクの取得中にエラーが発生しました。</string>
     <string name="transcript_error_not_available">申し訳ありません、このエピソードではトランスクリプトを利用できません。</string>
     <string name="referrals_banner_hide_label">このバナーを非表示</string>
@@ -649,19 +666,11 @@ Language: ja_JP
     <string name="bookmark_not_found">ブックマークが見つかりません</string>
     <string name="settings_use_dark_up_next_details">有効にすると、「次のエピソード待機リスト」では常にダークテーマを使用し、無効にすると現在のテーマと一致します</string>
     <string name="settings_use_dark_up_next">次のエピソード待機リストのダークテーマを使用</string>
-    <string name="end_of_year_stories_theres_more">その他にもございます !</string>
     <string name="end_of_year_stories_year_completion_rate">完了率</string>
-    <string name="eoy_year_over_year_title_skyrocketed">2022年と比較して、聴取時間が急増しました !</string>
-    <string name="end_of_year_stories_year_over_year_subtitle_went_down">生きてこその人生ですね。</string>
     <string name="end_of_year_stories_year_over_share_text">%1$dと%2$dの聴取時間の比較</string>
     <string name="end_of_year_stories_year_completion_rate_title">完了率は%1$d%% です</string>
     <string name="end_of_year_prompt_card_summary">視聴統計、人気のポッドキャストなどを確認します。</string>
-    <string name="end_of_year_stories_year_over_year_subtitle_flat">一貫性が成功の鍵であるとかなんとか言われています。</string>
-    <string name="end_of_year_stories_year_over_year_title_went_down">%1$sと比較して、聴取時間が少し減りました</string>
-    <string name="end_of_year_stories_year_over_year_title_flat">%1$sと比較して、聴取時間は一定していました</string>
-    <string name="end_of_year_stories_year_over_year_subtitle_went_up">%1$sにこの記録を上回る準備はできていますか ?</string>
-    <string name="end_of_year_stories_year_over_year_title_went_up">%1$sと比較して、聴取時間が%2$s%%に急増しました</string>
-    <string name="end_of_year_story_longest_episode_title">お聴きになった最長のエピソードは %1$s でした</string>
+    <string name="end_of_year_stories_year_over_year_title_went_up">%1$sと比較して、聴取時間が急増しました%2$s%%</string>
     <string name="end_of_year_replay">もう一度再生</string>
     <string name="end_of_year_listening_time_title">これはポッドキャストの合計聴取時間です。</string>
     <string name="end_of_year_story_top_categories_subtitle">%2$s話のエピソードで合計%1$s話聴きました</string>
@@ -943,7 +952,6 @@ Language: ja_JP
     <string name="plus_trial_duration_free_trial">%s 無料トライアル</string>
     <string name="onboarding_sign_up">登録</string>
     <string name="onboarding_plus_recurring_after_free_trial">%1$s (%2$s) 後に定期支払いが開始します</string>
-    <string name="end_of_year_stories_failed">年末のストーリーを読み込めません。インターネット接続を確認してください。</string>
     <string name="onboarding_plus_feature_themes_icons_text">あなたの個性を表現しましょう。 Plus クラブ限定の特別なアイコンとテーマ。</string>
     <string name="onboarding_plus_feature_themes_icons_title">テーマとアイコン</string>
     <string name="onboarding_plus_feature_cloud_storage_text">ファイルをクラウドストレージにアップロードしてどこからでも利用できるようにします。</string>
@@ -970,7 +978,6 @@ Language: ja_JP
     <string name="end_of_year_story_top_categories_share_text">一番聴いたポッドキャストのカテゴリー</string>
     <string name="end_of_year_story_top_categories">トップカテゴリー</string>
     <string name="end_of_year_story_top_podcasts_share_text">今年再生数が多かったポッドキャストはこちら ! %1$s</string>
-    <string name="end_of_year_story_listened_to_numbers_subtitle">何度も聴いたエピソードもありました…</string>
     <string name="end_of_year_story_longest_episode_share_text">%1$dに聴いた最長のエピソード %2$s</string>
     <string name="end_of_year_story_top_podcasts_list_title">%1$dに再生数が多かったポッドキャスト</string>
     <string name="end_of_year_story_top_podcast_share_text">%1$dのお気に入りのポッドキャストはこちら ! %2$s</string>
@@ -978,7 +985,6 @@ Language: ja_JP
     <string name="end_of_year_story_listened_to_categories">今年、%1$d個のカテゴリーを聴きました</string>
     <string name="end_of_year_story_listened_to_categories_subtitle">お気に入りをいくつか振り返りましょう…</string>
     <string name="end_of_year_story_intro_title">今年聴いたポッドキャストを振り返ってみましょう。</string>
-    <string name="end_of_year_story_listened_to_numbers">%1$d個のショーで合計%2$d話のエピソードを聴きました</string>
     <string name="end_of_year_story_listened_to_categories_share_text">2023年は%1$d個のカテゴリーを聴きました</string>
     <string name="end_of_year_story_listened_to_share_text">今年ポッドキャストを聴いた時間は%1$s時間でした</string>
     <string name="settings_media_notification_controls">メディア通知コントロール</string>
@@ -2181,6 +2187,9 @@ Language: ja_JP
     </plurals>
     <plurals name="episode_count">
         <item quantity="other">%d件のエピソード</item>
+    </plurals>
+    <plurals name="episodes">
+        <item quantity="other">%1$d件のエピソード</item>
     </plurals>
     <plurals name="hour">
         <item quantity="other">時間</item>

@@ -1,18 +1,45 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2025-11-05 14:54:04+0000
+Translation-Revision-Date: 2025-11-12 15:54:04+0000
 Plural-Forms: nplurals=6; plural=n==0 ? 0 : n==1 ? 1 : n==2 ? 2 : n%100>=3 && n%100<=10 ? 3 : n%100>=11 && n%100<=99 ? 4 : 5;
 Generator: GlotPress/2.4.0-alpha
 Language: ar
 -->
 <resources>
+    <string name="eoy_story_ratings_subtitle_no_ratings">ساعد صنّاع المحتوى المفضلين لديك على الظهور من خلال مشاركة ما تحب</string>
+    <string name="eoy_story_ratings_subtitle_2">تساعد المراجعات في اكتشاف البرامج الرائعة</string>
+    <string name="eoy_story_ratings_subtitle_1">يقدر صنّاع المحتوى في كل مكان دعمك ومحبتك</string>
+    <string name="eoy_story_ratings_title_no_ratings">لا توجد تقييمات حتى الآن، ولكن لا يزال هناك وقت!</string>
+    <string name="eoy_story_ratings_title_2">نشكرك على مشاركة ملاحظاتك.</string>
+    <string name="eoy_story_ratings_title_1">لقد وزّعت تقييمات من ⁦%1$d⁩ نجوم كأنها زينة احتفال!</string>
+    <string name="end_of_year_listening_time_subtitle">الدقائق التي تم الاستماع فيها</string>
+    <string name="end_of_year_stories_year_over_year_subtitle_went_down">لكن تذكّر، الجودة أهم من الكمية</string>
+    <string name="end_of_year_stories_year_over_year_title_went_down">انخفض الاستماع الخاص بك ⁦%1$s⁩%% هذا العام</string>
+    <string name="end_of_year_stories_year_over_year_subtitle_flat">متسق، ويمكن الاعتماد عليه، مثل طلب المقهى الخاص بك</string>
+    <string name="end_of_year_stories_year_over_year_title_flat">ظل استماع ⁦%1$s⁩ الخاص بك ثابتًا</string>
+    <string name="end_of_year_stories_year_over_year_subtitle_went_up_a_lot">لقد استمعت بنسبة تفوق 500% هذا العام — أهلاً بك بين المستمعين المميزين</string>
+    <string name="end_of_year_stories_year_over_year_title_went_up_a_lot">من صفر إلى بطل!</string>
+    <string name="settings_storage_normalize_episode_titles_description">الحالة: ⁦%1$s⁩\nتستخدم بعض أجزاء التطبيق البحث في الحلقة الذي يتطلب عناوين مُوحّدة. يؤدي النقر على هذا الإعداد إلى تشغيل عملية توحيد قاعدة البيانات إذا لم يتم توحيد الحلقات بالفعل.</string>
+    <string name="settings_storage_normalize_episode_titles">توحيد عناوين الحلقات</string>
+    <string name="normalization_started">تم بدء عملية التوحيد</string>
+    <string name="not_normalized">غير مُوحّد</string>
+    <string name="normalized">مُوحّد</string>
+    <string name="database">قاعدة البيانات</string>
+    <string name="end_of_year_story_top_podcast_stats_hours">⁦%1$s⁩ و⁦%2$s⁩.\n هذا هو الالتزام!</string>
+    <string name="end_of_year_story_top_podcast_stats_days">%1$s، ⁦%2$s⁩ و⁦%3$s⁩.\n هذا هو الالتزام!</string>
+    <string name="end_of_year_story_top_podcast_subtitle">لا شيء يمثلك \"أنت\" أفضل من هذا!</string>
+    <string name="app_rating_yes_label">نعم!</string>
+    <string name="app_rating_no_label">ليس تمامًا</string>
+    <string name="app_rating_body">مرحبًا! نود أن نعرف ما إذا كنت تستمتع بتطبيق\u00A0appالخاص بنا.</string>
+    <string name="app_rating_title">هل تستمتع بـ Pocket\u00A0Casts؟</string>
+    <string name="end_of_year_story_epilogue_subtitle">شارك تجربة الاستماع الخاصة بك مع الأصدقاء وأظهر بعض الدعم لصنّاع البودكاست الذين رافقوك طوال العام</string>
+    <string name="end_of_year_story_epilogue_title">نشكرك على قضاء عامك مع Pocket\u00A0Casts</string>
     <string name="end_of_year_stories_year_completion_rate_subtitle">من بين ⁦%2$d⁩ الحلقات التي بدأت في مشاهدتها، أنهيت⁦%1$d⁩.\nمتابعة أقوى‑من معظم اشتراكات الصالات الرياضية.</string>
     <string name="search_suggestions_no_results_message">جرب بحثًا جديدًا، أو أضِف عنوان تلقيم URL البث الصوتي</string>
     <string name="search_suggestions_no_results_title">لا توجد نتائج</string>
     <string name="eoy_playback_intro_title">أحداث العام الخاصة بك في البودكاست،\nمختتم وجاهز للاسترجاع</string>
     <string name="search_suggestions_view_all">عرض الكل لـ \"⁦%1$s⁩\"</string>
     <string name="up_next_as_playlist_saved">تم حفظ التالي كقائمة تشغيل</string>
-    <string name="up_next_as_playlist_replace_title">هل تريد استبدال قائمة التالي الحالية؟</string>
     <string name="up_next_as_playlist_button_secondary">استبدال وتشغيل</string>
     <string name="delete_playlist_confirmation_title">هل تريد حذف قائمة التشغيل؟</string>
     <string name="delete_playlist_confirmation_body">هل هل أنت متأكد من رغبتك في حذف قائمة التشغيل الخاصة بك؟ لا توجد طريقة للتراجع عن هذا.</string>
@@ -52,7 +79,6 @@ Language: ar
     <string name="add_to_up_next_top">إضافة في بداية قائمة التشغيل التالية</string>
     <string name="playlist_episodes_archived_title">لا توجد حلقات</string>
     <string name="playlist_episodes_archived_count">⁦%1$d⁩ مؤرشف</string>
-    <string name="playlist_edit_episodes">إعادة ترتيب الحلقات</string>
     <string name="playlist_episode_unavailable_cta">إزالة من قائمة التشغيل</string>
     <string name="playlist_episode_unavailable_description">حذف منشئ podcast هذه الحلقة. ستبقى في قائمة تشغيلك حتى تزيلها.</string>
     <string name="playlist_episode_unavailable_title">الحلقة غير متوافرة</string>
@@ -426,6 +452,7 @@ Language: ar
     <string name="icons_plus_prompt">الحصول على أيقونات تطبيق حصرية من خلال Pocket Casts Plus، والمزيد</string>
     <string name="themes_plus_prompt">الحصول على قوالب حصرية من خلال Pocket Casts Plus، والمزيد</string>
     <string name="folders_plus_prompt">تنظيم حلقات البث الصوتي الخاصة بك باستخدام Pocket Casts Plus والمزيد</string>
+    <string name="end_of_year_story_top_podcast_title">البودكاست المفضل لديك ⁦%1$d⁩</string>
     <string name="drag_down_to_dismiss_content_description">السحب إلى الأسفل للتجاهل</string>
     <string name="maybe_later">ربما لاحقًا</string>
     <string name="need_to_free_up_space">هل تحتاج إلى توفير مساحة؟</string>
@@ -451,19 +478,9 @@ Language: ar
     <string name="up_next_shuffle_disable_button_content_description">تعطيل خلط العناصر التالية</string>
     <string name="up_next_shuffle_button_content_description">خلط العناصر التالية</string>
     <string name="podcast_ratings_page_title">تقييمات</string>
-    <string name="eoy_story_stories_subscribe_to_plus_button_label">التحقق من Pocket Casts Plus</string>
-    <string name="end_of_year_stories_subscribe_to_plus">ادعم Pocket Casts عن طريق الاشتراك في Plus والحصول على مزيد من الإحصاءات، إضافة إلى الميزات المميزة، مثل: الإشارات المرجعية أو المجلدات أو الفصول المحددة سابقًا!</string>
     <string name="settings_real_time_playback_summary">إذا كان قيد التشغيل، فسيعرض المشغِّل الوقت المتبقي، ويتم ضبطه حسب سرعة التشغيل، والفصول التي تم تخطيها.</string>
     <string name="settings_real_time_playback">ضبط الوقت المتبقي</string>
-    <string name="end_of_year_stories_year_over_year_title_went_up_a_lot">بالمقارنة مع ⁦%1$s⁩، ارتفع وقت الاستماع لديك بأكثر من 500%% </string>
-    <string name="end_of_year_story_longest_episode_subtitle">كانت \"⁦%1$s⁩\" من \"⁦%2$s⁩\"</string>
-    <string name="end_of_year_listening_time_subtitle">الاستماع الكامل إلى حلقات البث الصوتي</string>
     <string name="eoy_story_ratings_learn_button_label">التعرُّف على التقييمات</string>
-    <string name="eoy_story_ratings_subtitle_3">هل كنت تعلم أنه يمكنك تقييم العروض الآن؟ شارك شغف منشئي المحتوى المفضلين لديك وساعدهم على جذب الانتباه!</string>
-    <string name="eoy_story_ratings_subtitle_2">شكرًا على مشاركة ملاحظاتك مع مجتمع منشئي المحتوى</string>
-    <string name="eoy_story_ratings_subtitle_1">رائع، العديد من ⁦%1$d⁩ من التقييمات بالنجوم! شكرًا على مشاركة الشغف مع المنشئين المفضلين لديك!</string>
-    <string name="eoy_story_ratings_title_2">أوه أوه! لا توجد تقييمات للبث صوتي لعرضها أمامك حتى الآن</string>
-    <string name="eoy_story_ratings_title_1">لنر تقييماتك!</string>
     <string name="referrals_failed_to_load_offer">عذرًا، حدث خطأ ما في أثناء إحضار رابط الإحالة.</string>
     <string name="transcript_error_not_available">عذرًا، لكن لا يوجد نص متاح لهذه الحلقة.</string>
     <string name="referrals_banner_hide_label">إخفاء هذا الشعار</string>
@@ -649,19 +666,11 @@ Language: ar
     <string name="bookmark_not_found">لم يتم العثور على إشارة مرجعية</string>
     <string name="settings_use_dark_up_next_details">عند التمكين، سيستخدم \"التالي\" دائمًا القالب الداكن، أو سيتطابق مع القالب الحالي عند تعطيله</string>
     <string name="settings_use_dark_up_next">استخدام قالب \"التالي\" الداكن</string>
-    <string name="end_of_year_stories_theres_more">ثمَّة المزيد!</string>
     <string name="end_of_year_stories_year_completion_rate">معدل الإكمال</string>
     <string name="end_of_year_stories_year_over_share_text">وقت استماع ⁦%1$d⁩ الخاص بي مقارنة بـ ⁦%2$d⁩ </string>
-    <string name="eoy_year_over_year_title_skyrocketed">بالمقارنة مع عام 2022، ارتفع وقت الاستماع الخاص بك ارتفاعًا شديدًا!</string>
-    <string name="end_of_year_stories_year_over_year_subtitle_went_down">أجل… هناك حياة يجب أن تعيشها، أليس كذلك؟</string>
     <string name="end_of_year_stories_year_completion_rate_title">معدل الإكمال الخاص بك هذا العام كان ⁦%1$d⁩%%</string>
-    <string name="end_of_year_stories_year_over_year_title_went_down">مقارنة بـ ⁦%1$s⁩، فقد انخفض وقت الاستماع لديك قليلاً</string>
-    <string name="end_of_year_stories_year_over_year_subtitle_flat">ويقولون إن الاتساق هو مفتاح النجاح… أو شيء من هذا القبيل!</string>
-    <string name="end_of_year_stories_year_over_year_title_flat">مقارنة بـ ⁦%1$s⁩، ظل وقت الاستماع الخاص بك ثابتًا إلى حد كبير</string>
-    <string name="end_of_year_stories_year_over_year_subtitle_went_up">هل أنت مستعد لوضع اللمسات الأخيرة على ⁦%1$s⁩؟</string>
-    <string name="end_of_year_stories_year_over_year_title_went_up">مقارنة بـ ⁦%1$s⁩، ارتفع وقت الاستماع الخاص بك بشكل كبير ⁦%2$s⁩%% </string>
     <string name="end_of_year_prompt_card_summary">اطلع على إحصاءات الاستماع الخاصة بك وأهم حلقات البث الصوتي والمزيد.</string>
-    <string name="end_of_year_story_longest_episode_title">كانت أطول حلقة استمعتَ إليها ⁦%1$s⁩ </string>
+    <string name="end_of_year_stories_year_over_year_title_went_up">بالمقارنة مع ⁦%1$s⁩، ارتفع وقت الاستماع الخاص بك ارتفاعًا شديدًا ⁦%2$s⁩%%</string>
     <string name="end_of_year_replay">التشغيل مجددًا</string>
     <string name="end_of_year_listening_time_title">كان هذا إجمالي وقتك في الاستماع إلى حلقات البث الصوتي</string>
     <string name="end_of_year_story_top_categories_subtitle">لقد استمعتَ إلى ⁦%1$s⁩ من الحلقات بإجمالي ⁦%2$s⁩</string>
@@ -943,7 +952,6 @@ Language: ar
     <string name="onboarding_welcome_recommendations_text">اعثر على حلقات البودكاست غير الملاحظة والرائجة في صفحة الاكتشاف المنسقة لدينا.</string>
     <string name="onboarding_welcome_recommendations_button">العثور على حلقة البودكاست التالية الخاصة بي</string>
     <string name="onboarding_plus_recurring_after_free_trial">ستبدأ المدفوعات المتكررة بعد ⁦%1$s⁩ الخاص بك⁦%2$s⁩</string>
-    <string name="end_of_year_stories_failed">يتعذر تحميل قصص نهاية العالم، تحقق من اتصالك بالإنترنت.</string>
     <string name="not_now">ليس الآن</string>
     <string name="onboarding_recommendations_find_favorite_podcasts">العثور على حلقات البودكاست التي أفضّلها</string>
     <string name="onboarding_recommendations_make_pocket_casts_yours">اجعل Pocket Casts خاصًا بك من خلال تحديد حلقات البودكاست التي تفضلها أو قم باستيرادها من مشغل حلقة بودكاست أخرى. يمكنك دومًا القيام بذلك لاحقًا.</string>
@@ -971,7 +979,6 @@ Language: ar
     <string name="end_of_year_story_top_categories_share_text">الأكثر استماعًا إلى تصنيفات الحلقات الصوتية</string>
     <string name="end_of_year_create_account_to_see">احفظ حلقاتك الصوتية في السحابة واحصل على تقييم نهاية العام وقم بمزامنة تقدُّمك مع الأجهزة الأخرى.</string>
     <string name="end_of_year_story_top_podcasts_list_title">أهم حلقات البث الصوت الخاصة بي في ⁦%1$d⁩</string>
-    <string name="end_of_year_story_listened_to_numbers_subtitle">لكن هناك مساحة كنت لا تزال تأتي إليها…</string>
     <string name="end_of_year_story_listened_to_numbers_share_text">استمعتُ إلى ⁦%1$d⁩ من حلقات البث الصوتي المختلفة و⁦%2$d⁩ من الحلقات في ⁦%3$d⁩</string>
     <string name="end_of_year_story_top_podcast_share_text">حلقات البث الصوتي المفضلة لدي في ⁦%1$d⁩! %2$s</string>
     <string name="end_of_year_story_longest_episode_share_text">أطول حلقة استمعتُ إليها في ⁦%1$d⁩ %2$s</string>
@@ -980,7 +987,6 @@ Language: ar
     <string name="end_of_year_story_listened_to_categories_subtitle">لنلقِ نظرة إلى بعض مفضلاتك…</string>
     <string name="end_of_year_story_listened_to_share_text">قضيتُ ⁦%1$s⁩ في الاستماع إلى حلقات البث الصوتي في هذا العام</string>
     <string name="end_of_year_story_listened_to_categories_share_text">استمعتُ إلى ⁦%1$d⁩ من التصنيفات المختلفة في 2023</string>
-    <string name="end_of_year_story_listened_to_numbers">لقد استمعتُ إلى ⁦%1$d⁩ من حلقات البودكاست المختلفة و⁦%2$d⁩ من الحلقات</string>
     <string name="playback_speed">سرعة التشغيل</string>
     <string name="settings_media_notification_controls">عناصر التحكم في تنبيهات الوسائط</string>
     <string name="playback_speed_not_valid">سرعة التشغيل ⁦%1$s⁩ غير صالحة</string>
@@ -2206,6 +2212,14 @@ Language: ar
         <item quantity="few">%d من الحلقات</item>
         <item quantity="many">%d من الحلقات</item>
         <item quantity="other">%d من الحلقات</item>
+    </plurals>
+    <plurals name="episodes">
+        <item quantity="zero">⁦%1$d⁩ من الحلقات</item>
+        <item quantity="one">⁦%1$d⁩ من الحلقات</item>
+        <item quantity="two">⁦%1$d⁩ من الحلقات</item>
+        <item quantity="few">⁦%1$d⁩ من الحلقات</item>
+        <item quantity="many">⁦%1$d⁩ من الحلقات</item>
+        <item quantity="other">⁦%1$d⁩ من الحلقات</item>
     </plurals>
     <plurals name="hour">
         <item quantity="zero">ساعة</item>
