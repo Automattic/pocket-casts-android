@@ -118,6 +118,7 @@ internal fun EndingStory(
             backgroundColor = colorResource(UR.color.white),
             textColor = colorResource(UR.color.black),
         )
+        Spacer(Modifier.height(16.dp))
     }
 }
 
