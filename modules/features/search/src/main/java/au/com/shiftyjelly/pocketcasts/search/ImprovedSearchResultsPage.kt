@@ -48,9 +48,9 @@ fun ImprovedSearchResultsPage(
     onFilterSelect: (ResultsFilters) -> Unit,
     playButtonListener: PlayButtonListener,
     onScroll: () -> Unit,
-    onResultsShown: () -> Unit,
-    onEmptyResultsShown: () -> Unit,
-    onErrorShown: () -> Unit,
+    onResultsShow: () -> Unit,
+    onEmptyResultsShow: () -> Unit,
+    onErrorShow: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Column(
@@ -59,7 +59,7 @@ fun ImprovedSearchResultsPage(
         when (val operation = state.operation) {
             is SearchUiState.SearchOperation.Error -> {
                 CallOnce {
-                    onErrorShown()
+                    onErrorShow()
                 }
                 SearchFailedView()
             }
@@ -76,8 +76,8 @@ fun ImprovedSearchResultsPage(
                     selectedFilterIndex = state.selectedFilterIndex,
                     filterOptions = state.filterOptions.toList(),
                     onFilterSelect = onFilterSelect,
-                    onEmptyResultsShown = onEmptyResultsShown,
-                    onResultsShown = onResultsShown,
+                    onEmptyResultsShow = onEmptyResultsShow,
+                    onResultsShow = onResultsShow,
                 )
             }
 
@@ -112,8 +112,8 @@ private fun ImprovedSearchResultsView(
     filterOptions: List<ResultsFilters>,
     selectedFilterIndex: Int,
     onFilterSelect: (ResultsFilters) -> Unit,
-    onResultsShown: () -> Unit,
-    onEmptyResultsShown: () -> Unit,
+    onResultsShow: () -> Unit,
+    onEmptyResultsShow: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val nestedScrollConnection = remember {
@@ -126,11 +126,11 @@ private fun ImprovedSearchResultsView(
     }
     val listState = rememberLazyListState()
 
-    LaunchedEffect(state) {
+    LaunchedEffect(state, onResultsShow, onEmptyResultsShow) {
         if (!state.results.filteredResults.isEmpty()) {
-            onResultsShown()
-        } else if (!state.searchTerm.isEmpty()){
-            onEmptyResultsShown()
+            onResultsShow()
+        } else if (!state.searchTerm.isEmpty()) {
+            onEmptyResultsShow()
         }
     }
 

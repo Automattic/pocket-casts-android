@@ -151,8 +151,8 @@ class SearchViewModel @Inject constructor(
             AnalyticsEvent.IMPROVED_SEARCH_EMPTY_RESULTS,
             mapOf(
                 "source" to source.analyticsValue,
-                "term" to state.value.searchTerm.orEmpty()
-            )
+                "term" to state.value.searchTerm.orEmpty(),
+            ),
         )
     }
 
@@ -160,8 +160,8 @@ class SearchViewModel @Inject constructor(
         analyticsTracker.track(
             AnalyticsEvent.SEARCH_LIST_SHOWN,
             mapOf(
-                "source" to source.analyticsValue
-            )
+                "source" to source.analyticsValue,
+            ),
         )
     }
 
@@ -170,8 +170,8 @@ class SearchViewModel @Inject constructor(
             AnalyticsEvent.SEARCH_FAILED,
             mapOf(
                 "source" to source.analyticsValue,
-                "term" to state.value.searchTerm.orEmpty()
-            )
+                "term" to state.value.searchTerm.orEmpty(),
+            ),
         )
     }
 
@@ -316,8 +316,8 @@ class SearchViewModel @Inject constructor(
             AnalyticsEvent.IMPROVED_SEARCH_VIEW_ALL_TAPPED,
             mapOf(
                 "source" to source.analyticsValue,
-                "term" to term
-            )
+                "term" to term,
+            ),
         )
 
         runSearchOnTerm(term)
