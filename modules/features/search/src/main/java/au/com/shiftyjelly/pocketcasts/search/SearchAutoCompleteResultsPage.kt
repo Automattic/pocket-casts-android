@@ -46,6 +46,7 @@ import au.com.shiftyjelly.pocketcasts.localization.R as LR
 fun SearchAutoCompleteResultsPage(
     searchTerm: String,
     isLoading: Boolean,
+    isError: Boolean,
     results: List<SearchAutoCompleteItem>,
     onTermClick: (SearchAutoCompleteItem.Term) -> Unit,
     onPodcastClick: (SearchAutoCompleteItem.Podcast) -> Unit,
@@ -80,9 +81,9 @@ fun SearchAutoCompleteResultsPage(
             CircularProgressIndicator()
         }
 
-        if (!isLoading && results.isEmpty()) {
+        if (isError || results.isEmpty()) {
             NoSuggestionsView()
-        } else {
+        } else if (!isLoading) {
             CallOnce {
                 onReportSuggestionsRender()
             }
@@ -167,6 +168,7 @@ private fun PreviewSearchAutoCompleteResultsPage(
     AppThemeWithBackground(themeType) {
         SearchAutoCompleteResultsPage(
             isLoading = false,
+            isError = false,
             searchTerm = "matching",
             results = listOf(
                 SearchAutoCompleteItem.Term("matching text"),
@@ -215,6 +217,7 @@ private fun PreviewEmptySearchAutoCompleteResultsPage(
     AppThemeWithBackground(themeType) {
         SearchAutoCompleteResultsPage(
             isLoading = false,
+            isError = false,
             searchTerm = "matching",
             results = emptyList(),
             onTermClick = {},
