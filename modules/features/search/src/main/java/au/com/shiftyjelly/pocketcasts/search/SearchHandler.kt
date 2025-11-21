@@ -349,6 +349,7 @@ class SearchHandler @Inject constructor(
                             .searchForPodcastsRx(query)
                             .map { list -> list.searchResults.map { ImprovedSearchResultItem.PodcastItem(uuid = it.uuid, title = it.title, author = it.author, isFollowed = subscribedUuids.contains(it.uuid)) } }
                             .await()
+                        analyticsTracker.track(AnalyticsEvent.SEARCH_PERFORMED, AnalyticsProp.sourceMap(source))
                         emit(SearchUiState.SearchOperation.Success(searchTerm = query, results = SearchResults.ImprovedResults(results = podcastSearch, filter = ResultsFilters.TOP_RESULTS)))
                     } else {
                         val localResults = localPodcasts.map {
@@ -361,6 +362,7 @@ class SearchHandler @Inject constructor(
                             emit(SearchUiState.SearchOperation.Success(searchTerm = query, results = SearchResults.ImprovedResults(results = localResults, filter = ResultsFilters.TOP_RESULTS)))
                         }
                         val apiResults = try {
+                            analyticsTracker.track(AnalyticsEvent.SEARCH_PERFORMED, AnalyticsProp.sourceMap(source))
                             improvedSearchManager.combinedSearch(query).map {
                                 if (it is ImprovedSearchResultItem.PodcastItem) {
                                     it.copy(isFollowed = subscribedUuids.contains(it.uuid))

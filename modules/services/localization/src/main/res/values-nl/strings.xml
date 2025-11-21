@@ -1,18 +1,45 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2025-11-06 18:54:04+0000
+Translation-Revision-Date: 2025-11-13 11:54:04+0000
 Plural-Forms: nplurals=2; plural=n != 1;
 Generator: GlotPress/2.4.0-alpha
 Language: nl
 -->
 <resources>
+    <string name="eoy_story_ratings_subtitle_no_ratings">Help je favoriete makers ontdekken door te delen waar je van houdt</string>
+    <string name="eoy_story_ratings_subtitle_2">Beoordelingen helpen geweldige shows te vinden</string>
+    <string name="eoy_story_ratings_subtitle_1">Overal waarderen makers de liefde</string>
+    <string name="eoy_story_ratings_title_no_ratings">Nog geen beoordelingen, maar er is nog tijd!</string>
+    <string name="eoy_story_ratings_title_2">Bedankt dat je je feedback met ons deelt.</string>
+    <string name="eoy_story_ratings_title_1">Je hebt als confetti met %1$d-sterrenbeoordelingen gestrooid!</string>
+    <string name="end_of_year_listening_time_subtitle">minuten geluisterd</string>
+    <string name="end_of_year_stories_year_over_year_subtitle_went_down">Maar ja, kwaliteit gaat boven kwantiteit</string>
+    <string name="end_of_year_stories_year_over_year_title_went_down">Je hebt dit jaar %1$s%% minder geluisterd</string>
+    <string name="end_of_year_stories_year_over_year_subtitle_flat">Consistent en betrouwbaar, net zoals je koffiebestelling</string>
+    <string name="end_of_year_stories_year_over_year_title_flat">Je luistergedrag in %1$s bleef stabiel</string>
+    <string name="end_of_year_stories_year_over_year_subtitle_went_up_a_lot">Je hebt dit jaar 500% meer geluisterd - welkom bij de club</string>
+    <string name="end_of_year_stories_year_over_year_title_went_up_a_lot">Van nul naar held!</string>
+    <string name="settings_storage_normalize_episode_titles_description">Status: %1$s\nSommige delen van de app gebruiken een afleveringzoekopdracht die genormaliseerde titels vereist. Door op deze instelling te tikken, wordt de database genormaliseerd als de afleveringen nog niet genormaliseerd zijn.</string>
+    <string name="settings_storage_normalize_episode_titles">Afleveringstitels normaliseren</string>
+    <string name="normalization_started">Normalisatie gestart</string>
+    <string name="not_normalized">Niet genormaliseerd</string>
+    <string name="normalized">Genormaliseerd</string>
+    <string name="database">Database</string>
+    <string name="end_of_year_story_top_podcast_stats_hours">%1$s en %2$s.\nDat is waar we voor staan!</string>
+    <string name="end_of_year_story_top_podcast_stats_days">%1$s, %2$s en %3$s.\nDat is waar we voor staan!</string>
+    <string name="end_of_year_story_top_podcast_subtitle">Het wordt niet meer \"jij\" dan dit</string>
+    <string name="app_rating_yes_label">Ja!</string>
+    <string name="app_rating_no_label">Niet echt</string>
+    <string name="app_rating_body">Hallo! We willen graag weten of je onze \u00A0app leuk vindt.</string>
+    <string name="app_rating_title">Vind je Pocket\u00A0Casts leuk?</string>
+    <string name="end_of_year_story_epilogue_subtitle">Deel je Playback met vrienden en toon wat liefde aan de podcasters die je het hele jaar gezelschap hielden</string>
+    <string name="end_of_year_story_epilogue_title">Bedankt dat je je jaar bij Pocket\u00A0Casts hebt doorgebracht</string>
     <string name="end_of_year_stories_year_completion_rate_subtitle">Van alle %2$d afleveringen die zijn gestart, zijn er %1$d klaar.\nEen sterkere followt‑hrough dan de meeste sportschoollidmaatschappen.</string>
     <string name="search_suggestions_no_results_message">Probeer een nieuwe zoekopdracht of voeg een URL van een podcast-feed toe</string>
     <string name="search_suggestions_no_results_title">Geen resultaten</string>
     <string name="eoy_playback_intro_title">Jouw jaar in podcasts\nverpakt en klaar om te herbeleven</string>
     <string name="search_suggestions_view_all">Alles weergeven voor \'%1$s\'</string>
     <string name="up_next_as_playlist_saved">Hierna opgeslagen als playlist</string>
-    <string name="up_next_as_playlist_replace_title">Huidige Hierna vervangen?</string>
     <string name="up_next_as_playlist_button_secondary">Vervangen en afspelen</string>
     <string name="delete_playlist_confirmation_title">Playlist verwijderen?</string>
     <string name="delete_playlist_confirmation_body">Weet je zeker dat je je playlist wilt verwijderen? Dit kan niet ongedaan worden gemaakt.</string>
@@ -52,7 +79,6 @@ Language: nl
     <string name="remove_from_playlist">Verwijderen uit playlist</string>
     <string name="playlist_episodes_archived_title">Geen afleveringen</string>
     <string name="playlist_episodes_archived_count">%1$d gearchiveerd</string>
-    <string name="playlist_edit_episodes">Afleveringen herschikken</string>
     <string name="playlist_episode_unavailable_title">Aflevering niet beschikbaar</string>
     <string name="episode_sort_custom_order">Aangepaste volgorde</string>
     <string name="playlist_episode_unavailable_cta">Verwijderen uit playlist</string>
@@ -425,6 +451,7 @@ Language: nl
     <string name="icons_plus_prompt">Krijg exclusief toegang tot app-iconen met Pocket Casts Plus, en meer</string>
     <string name="themes_plus_prompt">Krijg exclusief toegang tot themas met Pocket Casts Plus, en meer</string>
     <string name="folders_plus_prompt">Organiseer je podcasts met Pocket Casts Plus, en meer</string>
+    <string name="end_of_year_story_top_podcast_title">Je beste podcast van %1$d</string>
     <string name="drag_down_to_dismiss_content_description">Sleep naar beneden om te negeren</string>
     <string name="maybe_later">Misschien later</string>
     <string name="need_to_free_up_space">Wil je ruimte vrijmaken?</string>
@@ -450,11 +477,8 @@ Language: nl
     <string name="up_next_shuffle_disable_button_content_description">Hierna shuffle uitschakelen</string>
     <string name="up_next_shuffle_button_content_description">Hierna shuffle</string>
     <string name="podcast_ratings_page_title">Beoordelingen</string>
-    <string name="eoy_story_stories_subscribe_to_plus_button_label">Bekijk eens Pocket Casts Plus</string>
-    <string name="end_of_year_stories_subscribe_to_plus">Steun Pocket Casts door je in te schrijven voor Plus en krijg toegang tot meer statistieken en Premium-functies zoals bladwijzers, mappen en voorselectie van hoofdstukken!</string>
     <string name="settings_real_time_playback_summary">Als dit is ingeschakeld, toont de speler de resterende tijd, aangepast aan de afspeelsnelheid en overgeslagen hoofdstukken.</string>
     <string name="settings_real_time_playback">Resterende tijd aanpassen</string>
-    <string name="end_of_year_listening_time_subtitle">totaal naar podcasts geluisterd</string>
     <string name="eoy_story_ratings_learn_button_label">Meer informatie over beoordelingen</string>
     <string name="referrals_failed_to_load_offer">Er is iets fout gegaan bij het ophalen van je verwijzingslink.</string>
     <string name="transcript_error_not_available">Er is helaas geen transcriptie beschikbaar voor deze aflevering.</string>
@@ -641,11 +665,11 @@ Language: nl
     <string name="bookmark_not_found">Bladwijzer niet gevonden</string>
     <string name="settings_use_dark_up_next_details">Indien ingeschakeld gebruikt Hierna altijd het donkere thema en indien uitgeschakeld gebruikt het het huidige thema</string>
     <string name="settings_use_dark_up_next">Donker thema voor Hierna gebruiken</string>
-    <string name="end_of_year_stories_theres_more">Dat is niet alles!</string>
     <string name="end_of_year_stories_year_completion_rate">afrondingspercentage</string>
-    <string name="eoy_year_over_year_title_skyrocketed">Ten opzichte van 2022 is je luistertijd veel hoger!</string>
     <string name="end_of_year_stories_year_over_share_text">Mijn luistertijd in %1$d, ten opzichte van %2$d</string>
+    <string name="end_of_year_stories_year_completion_rate_title">Je afrondingspercentage dit jaar was %1$d%%</string>
     <string name="end_of_year_prompt_card_summary">Bekijk je luisterstatistieken, top podcasts en meer.</string>
+    <string name="end_of_year_stories_year_over_year_title_went_up">Ten opzichte van %1$s is je luistertijd veel hoger! %2$s%%</string>
     <string name="end_of_year_replay">Opnieuw afspelen</string>
     <string name="end_of_year_listening_time_title">Dit was je totale luistertijd wat betreft podcasts.</string>
     <string name="end_of_year_story_top_categories_subtitle">Je hebt in totaal %2$s geluisterd naar %1$s afleveringen</string>
@@ -2167,6 +2191,10 @@ Language: nl
     <plurals name="episode_count">
         <item quantity="one">%d aflevering</item>
         <item quantity="other">%d afleveringen</item>
+    </plurals>
+    <plurals name="episodes">
+        <item quantity="one">%1$d aflevering</item>
+        <item quantity="other">%1$d afleveringen</item>
     </plurals>
     <plurals name="hour">
         <item quantity="one">uur</item>

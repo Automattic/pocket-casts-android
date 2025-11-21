@@ -59,7 +59,7 @@ class SearchViewModel @Inject constructor(
                                     )
                                 }
                                 is SearchUiState.SearchOperation.Success -> {
-                                    if (operation.results.isEmpty()) {
+                                    if (operation.results.isEmpty() && operation.searchTerm.isNotEmpty()) {
                                         analyticsTracker.track(
                                             AnalyticsEvent.IMPROVED_SEARCH_EMPTY_RESULTS,
                                             mapOf(
@@ -146,13 +146,42 @@ class SearchViewModel @Inject constructor(
         onSubscribeToPodcast(podcast.uuid)
     }
 
+    fun reportEmptyResultsShown() {
+        analyticsTracker.track(
+            AnalyticsEvent.IMPROVED_SEARCH_EMPTY_RESULTS,
+            mapOf(
+                "source" to source.analyticsValue,
+                "term" to state.value.searchTerm.orEmpty(),
+            ),
+        )
+    }
+
+    fun reportResultsShown() {
+        analyticsTracker.track(
+            AnalyticsEvent.SEARCH_LIST_SHOWN,
+            mapOf(
+                "source" to source.analyticsValue,
+            ),
+        )
+    }
+
+    fun reportErrorResultsShown() {
+        analyticsTracker.track(
+            AnalyticsEvent.SEARCH_FAILED,
+            mapOf(
+                "source" to source.analyticsValue,
+                "term" to state.value.searchTerm.orEmpty(),
+            ),
+        )
+    }
+
     fun selectFilter(filter: ResultsFilters) {
         if (FeatureFlag.isEnabled(Feature.IMPROVED_SEARCH_RESULTS) && _state.value is SearchUiState.ImprovedResults) {
             analyticsTracker.track(
                 AnalyticsEvent.IMPROVED_SEARCH_FILTER_TAPPED,
                 mapOf(
                     "source" to source.analyticsValue,
-                    "filter" to filter.name,
+                    "filter" to filter.analyticsValue,
                 ),
             )
             _state.update { state ->
@@ -282,6 +311,18 @@ class SearchViewModel @Inject constructor(
         )
     }
 
+    fun onViewAllSuggestionsClick(term: String) {
+        analyticsTracker.track(
+            AnalyticsEvent.IMPROVED_SEARCH_VIEW_ALL_TAPPED,
+            mapOf(
+                "source" to source.analyticsValue,
+                "term" to term,
+            ),
+        )
+
+        runSearchOnTerm(term)
+    }
+
     enum class SearchResultType(val value: String) {
         PODCAST_LOCAL_RESULT("podcast_local_result"),
         PODCAST_REMOTE_RESULT("podcast_remote_result"),
@@ -299,7 +340,7 @@ class SearchViewModel @Inject constructor(
 
         fun searchShownOrDismissed(source: SourceView) = mapOf(SOURCE to source.analyticsValue)
 
-        fun podcastSubscribed(source: SourceView, uuid: String) = mapOf(SOURCE to "${source.analyticsValue}_search", UUID to uuid)
+        fun podcastSubscribed(source: SourceView, uuid: String) = mapOf(SOURCE to source.analyticsValue, UUID to uuid)
 
         fun searchListShown(source: SourceView, type: ResultsType) = mapOf(SOURCE to source.analyticsValue, DISPLAYING to type.value)
     }
@@ -346,10 +387,10 @@ sealed interface SearchResults {
     }
 }
 
-enum class ResultsFilters(val resId: Int) {
-    TOP_RESULTS(LR.string.search_filters_top_results),
-    PODCASTS(LR.string.search_filters_podcasts),
-    EPISODES(LR.string.search_filters_episodes),
+enum class ResultsFilters(val resId: Int, val analyticsValue: String) {
+    TOP_RESULTS(LR.string.search_filters_top_results, "allResults"),
+    PODCASTS(LR.string.search_filters_podcasts, "podcasts"),
+    EPISODES(LR.string.search_filters_episodes, "episodes"),
 }
 
 sealed interface SearchUiState {

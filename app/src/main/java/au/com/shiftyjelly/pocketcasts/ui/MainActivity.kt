@@ -361,7 +361,7 @@ class MainActivity :
 
             is OnboardingFinish.DoneShowPlusPromotion -> {
                 settings.setHasDoneInitialOnboarding()
-                OnboardingLauncher.openOnboardingFlow(this, OnboardingFlow.Upsell(OnboardingUpgradeSource.LOGIN_PLUS_PROMOTION))
+                OnboardingLauncher.openOnboardingFlow(this, OnboardingFlow.Upsell(OnboardingUpgradeSource.FINISHED_ONBOARDING))
             }
 
             is OnboardingFinish.DoneShowWelcomeInReferralFlow -> {

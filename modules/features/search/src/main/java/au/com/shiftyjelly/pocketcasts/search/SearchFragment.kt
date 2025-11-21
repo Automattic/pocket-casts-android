@@ -127,6 +127,7 @@ class SearchFragment : BaseFragment() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         viewModel.trackSearchShownOrDismissed(AnalyticsEvent.SEARCH_SHOWN, source)
+        playButtonListener.source = source
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
@@ -231,6 +232,11 @@ class SearchFragment : BaseFragment() {
             true
         }
 
+        searchView.findViewById<View>(androidx.appcompat.R.id.search_close_btn)?.setOnClickListener {
+            analyticsTracker.track(AnalyticsEvent.SEARCH_CLEARED, mapOf("source" to source.analyticsValue))
+            searchView.setQuery("", false)
+        }
+
         lifecycleScope.launch {
             // detect when we select a suggestion
             viewModel.state
@@ -318,11 +324,13 @@ class SearchFragment : BaseFragment() {
                             onScroll = { UiUtil.hideKeyboard(searchView) },
                             bottomInset = bottomInset.pxToDp(LocalContext.current).dp,
                             isLoading = suggestions.operation is SearchUiState.SearchOperation.Loading,
+                            isError = suggestions.operation is SearchUiState.SearchOperation.Error,
                             onReportSuggestionsRender = viewModel::trackSuggestionsShown,
+                            onReportViewAllClick = viewModel::onViewAllSuggestionsClick,
                         )
                     }
                 }
-                binding.searchSuggestions.isVisible = state is SearchUiState.Suggestions
+                binding.searchSuggestions.isVisible = state is SearchUiState.Suggestions && !state.searchTerm.isNullOrBlank()
             }
         }
 
@@ -344,6 +352,9 @@ class SearchFragment : BaseFragment() {
                                 onScroll = { UiUtil.hideKeyboard(searchView) },
                                 bottomInset = bottomInset.pxToDp(LocalContext.current).dp,
                                 onFilterSelect = viewModel::selectFilter,
+                                onResultsShow = viewModel::reportResultsShown,
+                                onEmptyResultsShow = viewModel::reportEmptyResultsShown,
+                                onErrorShow = viewModel::reportErrorResultsShown,
                             )
 
                         is SearchUiState.OldResults ->

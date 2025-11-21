@@ -46,6 +46,7 @@ import au.com.shiftyjelly.pocketcasts.localization.R as LR
 fun SearchAutoCompleteResultsPage(
     searchTerm: String,
     isLoading: Boolean,
+    isError: Boolean,
     results: List<SearchAutoCompleteItem>,
     onTermClick: (SearchAutoCompleteItem.Term) -> Unit,
     onPodcastClick: (SearchAutoCompleteItem.Podcast) -> Unit,
@@ -56,6 +57,7 @@ fun SearchAutoCompleteResultsPage(
     bottomInset: Dp,
     onScroll: () -> Unit,
     onReportSuggestionsRender: () -> Unit,
+    onReportViewAllClick: (String) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val nestedScrollConnection = remember {
@@ -65,10 +67,6 @@ fun SearchAutoCompleteResultsPage(
                 return super.onPostFling(consumed, available)
             }
         }
-    }
-
-    CallOnce {
-        onReportSuggestionsRender()
     }
 
     Box(
@@ -83,9 +81,13 @@ fun SearchAutoCompleteResultsPage(
             CircularProgressIndicator()
         }
 
-        if (!isLoading && results.isEmpty()) {
+        if (isError || results.isEmpty()) {
             NoSuggestionsView()
-        } else {
+        } else if (!isLoading) {
+            CallOnce {
+                onReportSuggestionsRender()
+            }
+
             LazyColumn(
                 modifier = Modifier.nestedScroll(nestedScrollConnection),
                 contentPadding = PaddingValues(bottom = bottomInset),
@@ -143,7 +145,7 @@ fun SearchAutoCompleteResultsPage(
                                 .semantics { role = Role.Button }
                                 .clickable(
                                     onClick = {
-                                        onTermClick(SearchAutoCompleteItem.Term(searchTerm))
+                                        onReportViewAllClick(searchTerm)
                                     },
                                 )
                                 .padding(vertical = 8.dp, horizontal = 16.dp),
@@ -166,6 +168,7 @@ private fun PreviewSearchAutoCompleteResultsPage(
     AppThemeWithBackground(themeType) {
         SearchAutoCompleteResultsPage(
             isLoading = false,
+            isError = false,
             searchTerm = "matching",
             results = listOf(
                 SearchAutoCompleteItem.Term("matching text"),
@@ -183,6 +186,7 @@ private fun PreviewSearchAutoCompleteResultsPage(
             onFolderClick = {},
             onScroll = {},
             onReportSuggestionsRender = {},
+            onReportViewAllClick = {},
             playButtonListener = object : PlayButton.OnClickListener {
                 override var source: SourceView = SourceView.SEARCH_RESULTS
 
@@ -213,6 +217,7 @@ private fun PreviewEmptySearchAutoCompleteResultsPage(
     AppThemeWithBackground(themeType) {
         SearchAutoCompleteResultsPage(
             isLoading = false,
+            isError = false,
             searchTerm = "matching",
             results = emptyList(),
             onTermClick = {},
@@ -222,6 +227,7 @@ private fun PreviewEmptySearchAutoCompleteResultsPage(
             onFolderClick = {},
             onScroll = {},
             onReportSuggestionsRender = {},
+            onReportViewAllClick = {},
             playButtonListener = object : PlayButton.OnClickListener {
                 override var source: SourceView = SourceView.SEARCH_RESULTS
 

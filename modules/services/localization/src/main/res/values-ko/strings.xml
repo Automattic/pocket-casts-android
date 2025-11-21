@@ -1,18 +1,45 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2025-11-06 09:54:03+0000
+Translation-Revision-Date: 2025-11-13 09:54:05+0000
 Plural-Forms: nplurals=1; plural=0;
 Generator: GlotPress/2.4.0-alpha
 Language: ko_KR
 -->
 <resources>
+    <string name="eoy_story_ratings_subtitle_no_ratings">좋아하는 콘텐츠를 공유하여 좋아하는 크리에이터가 발견될 수 있도록 돕기</string>
+    <string name="eoy_story_ratings_subtitle_2">리뷰는 좋은 프로그램을 찾는 데 도움이 됩니다</string>
+    <string name="eoy_story_ratings_subtitle_1">어디서나 크리에이터들은 사랑을 받고 싶어 합니다</string>
+    <string name="eoy_story_ratings_title_no_ratings">지금은 평점이 없지만 아직 시간이 있습니다!</string>
+    <string name="eoy_story_ratings_title_2">피드백을 공유해 주셔서 감사합니다.</string>
+    <string name="eoy_story_ratings_title_1">화려하게 별점 %1$d개를 주셨습니다!</string>
+    <string name="end_of_year_listening_time_subtitle">청취한 시간(분)</string>
+    <string name="end_of_year_stories_year_over_year_subtitle_went_down">중요한 것은 횟수보다 품질</string>
+    <string name="end_of_year_stories_year_over_year_title_went_down">올해 청취 횟수가 %1$s%%만큼 감소했습니다.</string>
+    <string name="end_of_year_stories_year_over_year_subtitle_flat">커피 주문처럼 꾸준하게</string>
+    <string name="end_of_year_stories_year_over_year_title_flat">%1$s에도 꾸준하게 청취하셨습니다.</string>
+    <string name="end_of_year_stories_year_over_year_subtitle_went_up_a_lot">올해 청취 시간이 500% 이상 증가했습니다. 환영합니다.</string>
+    <string name="end_of_year_stories_year_over_year_title_went_up_a_lot">0에서 주인공으로!</string>
+    <string name="settings_storage_normalize_episode_titles_description">상태: %1$s\n앱의 일부분에서는 정규화된 제목이 필요한 에피소드 검색을 사용합니다. 이 설정을 누르면 에피소드가 아직 정규화되지 않은 경우 데이터베이스 정규화가 실행됩니다.</string>
+    <string name="settings_storage_normalize_episode_titles">에피소드 제목 정규화</string>
+    <string name="normalization_started">정규화 시작됨</string>
+    <string name="not_normalized">정규화되지 않음</string>
+    <string name="normalized">정규화됨</string>
+    <string name="database">데이터베이스</string>
+    <string name="end_of_year_story_top_podcast_stats_hours">%1$s 및 %2$s.\n열심히 청취하셨습니다!</string>
+    <string name="end_of_year_story_top_podcast_stats_days">%1$s, %2$s 및 %3$s.\n열심히 청취하셨습니다!</string>
+    <string name="end_of_year_story_top_podcast_subtitle">이보다 많이 들은 게 없습니다.</string>
+    <string name="app_rating_yes_label">예!</string>
+    <string name="app_rating_no_label">관심 없음</string>
+    <string name="app_rating_body">안녕하세요! \u00A0앱을 즐겁게 사용하고 계시는지 알고 싶습니다.</string>
+    <string name="app_rating_title">Pocket\u00A0Casts를 즐겨 사용하시나요?</string>
+    <string name="end_of_year_story_epilogue_subtitle">재생 기록을 친구와 공유하고 1년 내내 함께한 팟캐스터에게 사랑을 보여주세요.</string>
+    <string name="end_of_year_story_epilogue_title">Pocket\u00A0Casts와 함께 한 해를 보내주셔서 감사합니다.</string>
     <string name="end_of_year_stories_year_completion_rate_subtitle">시작한 %2$d개 에피소드 중 %1$d개를 완료했습니다.\n헬스장보다 자주 찾는 팟캐스트.</string>
     <string name="search_suggestions_no_results_message">다른 검색어로 시도하거나 팟캐스트 피드 URL을 추가하세요</string>
     <string name="search_suggestions_no_results_title">결과 없음</string>
     <string name="eoy_playback_intro_title">회원님의 팟캐스트 원년\n예쁘게 정리한 추억을 다시 살펴보세요</string>
     <string name="search_suggestions_view_all">\"%1$s\"에 대해 모두 보기</string>
     <string name="up_next_as_playlist_saved">다음 차례 재생목록으로 저장됨</string>
-    <string name="up_next_as_playlist_replace_title">현재 다음 차례를 교체할까요?</string>
     <string name="up_next_as_playlist_button_secondary">교체하고 재생</string>
     <string name="delete_playlist_confirmation_title">재생목록을 삭제할까요?</string>
     <string name="delete_playlist_confirmation_body">재생목록을 삭제하시겠습니까? 이 작업은 되돌릴 수 없습니다.</string>
@@ -52,7 +79,6 @@ Language: ko_KR
     <string name="add_to_up_next_top">다음 차례에 추가(맨 처음)</string>
     <string name="playlist_episodes_archived_title">에피소드 없음</string>
     <string name="playlist_episodes_archived_count">%1$d개 보관됨</string>
-    <string name="playlist_edit_episodes">에피소드 재정렬</string>
     <string name="playlist_episode_unavailable_cta">재생목록에서 제거</string>
     <string name="playlist_episode_unavailable_description">팟캐스트 크리에이터가 이 에피소드를 삭제했습니다. 회원님이 제거할 때까지 회원님 재생목록에는 남아 있습니다.</string>
     <string name="playlist_episode_unavailable_title">에피소드를 사용할 수 없음</string>
@@ -426,6 +452,7 @@ Language: ko_KR
     <string name="icons_plus_prompt">Pocket Casts Plus로 독점 앱 아이콘을 받고 더 많은 혜택을 누리세요</string>
     <string name="themes_plus_prompt">Pocket Casts Plus로 독점 테마를 받고 더 많은 혜택을 누리세요</string>
     <string name="folders_plus_prompt">Pocket Casts Plus로 팟캐스트를 구성하고 더 많은 혜택을 누리세요</string>
+    <string name="end_of_year_story_top_podcast_title">회원님의 %1$d 상위 팟캐스트</string>
     <string name="drag_down_to_dismiss_content_description">해제하려면 아래로 끌어오세요</string>
     <string name="maybe_later">나중에</string>
     <string name="need_to_free_up_space">용량이 모자라시나요?</string>
@@ -451,11 +478,8 @@ Language: ko_KR
     <string name="up_next_shuffle_disable_button_content_description">다음 순서 섞기 비활성화</string>
     <string name="up_next_shuffle_button_content_description">다음 순서 섞기</string>
     <string name="podcast_ratings_page_title">평가</string>
-    <string name="eoy_story_stories_subscribe_to_plus_button_label">Pocket Casts Plus 알아보기</string>
-    <string name="end_of_year_stories_subscribe_to_plus">Plus를 구독해 Pocket Casts를 지원하고, 더 상세한 통계를 제공받고, 북마크, 폴더 또는 챕터 미리 선택과 같은 프리미엄 기능을 이용해 보세요.</string>
     <string name="settings_real_time_playback_summary">이 설정을 켜면 재생 속도에 맞게 조정된 남은 시간과 건너뛴 챕터가 플레이어에 표시됩니다.</string>
     <string name="settings_real_time_playback">남은 시간 조정</string>
-    <string name="end_of_year_listening_time_subtitle">청취한 팟캐스트의 총 개수</string>
     <string name="eoy_story_ratings_learn_button_label">평가에 대해 알아보기</string>
     <string name="referrals_failed_to_load_offer">죄송합니다. 추천 링크를 가져오는 중에 문제가 발생했습니다.</string>
     <string name="transcript_error_not_available">죄송합니다. 이 에피소드에서는 대본을 사용할 수 없습니다.</string>
@@ -642,11 +666,11 @@ Language: ko_KR
     <string name="bookmark_not_found">북마크를 찾을 수 없음</string>
     <string name="settings_use_dark_up_next_details">활성화되면 다음 에피소드에 항상 어두운 테마를 사용하고 비활성화되면 현재와 일치하는 테마를 사용합니다.</string>
     <string name="settings_use_dark_up_next">다음 에피소드에 어두운 테마 사용</string>
-    <string name="end_of_year_stories_theres_more">더 있습니다!</string>
     <string name="end_of_year_stories_year_completion_rate">완료율</string>
-    <string name="eoy_year_over_year_title_skyrocketed">2022년 대비 청취 시간이 급증했습니다!</string>
     <string name="end_of_year_stories_year_over_share_text">%2$d년 대비 내 %1$d년 청취 시간</string>
+    <string name="end_of_year_stories_year_completion_rate_title">올해 완료율은 %1$d%%이었습니다</string>
     <string name="end_of_year_prompt_card_summary">청취 통계, 상위 팟캐스트 등이 표시됩니다.</string>
+    <string name="end_of_year_stories_year_over_year_title_went_up">%1$s 대비 청취 시간이 %2$s%% 급증했습니다!</string>
     <string name="end_of_year_replay">다시 재생</string>
     <string name="end_of_year_listening_time_title">팟캐스트를 청취하셨던 총시간입니다.</string>
     <string name="end_of_year_story_top_categories_subtitle">총 %2$s 동안 %1$s개 에피소드를 청취하셨습니다.</string>
@@ -1632,9 +1656,9 @@ Language: ko_KR
     <string name="profile_navigation_listening_history">청취 기록</string>
     <string name="profile_navigation_files">파일</string>
     <string name="profile_monthly">매월</string>
-    <string name="profile_license_agreement">Pocket Casts에서는 개인정보를 소중하게 취급합니다. 이 개인정보 취급방침에서는 회원님에 대해 수집하는 정보와 수집 이유, 해당 정보로 무엇을 할 수 있으며 어떻게 취급하는지를 설명합니다. macOS 및 Windows 앱과 연결된 Pocket Casts 웹 서비스(서비스로 통칭)와 iOS 및 Android Pocket Casts 앱에 적용됩니다. 서비스를 이용하면 이 개인정보 취급방침에 동의하는 것입니다. 앱에서 푸시 알림을 켜면 Apple에서 제공하는 푸시 토큰이 해당 푸시 알림을 기기에 전달하기 위해 저장됩니다. 웹 앱을 구매하면 구매의 거래 ID가 저장됩니다. 계정을 생성하지 않기로 선택하고 푸시 알림을 사용하지 않으면 회원님에 대한 데이터가 서버에 저장되지 않습니다. Pocket Casts 웹 서비스에서는 쿠키 및 유사한 기술을 사용하여 로그인 상태를 유지합니다. 서비스 내에서 후원 요청을 생성하기로 선택하는 경우 제출하기 전에 볼 수 있는 후원 요청을 해결하는 데 도움이 되는 추가 데이터가 포함된 첨부 파일이 생성될 수 있습니다.</string>
     <string name="profile_last_refresh">마지막 새로 고침: %s 전</string>
     <string name="profile_joined">가입됨:</string>
+    <string name="profile_license_agreement">Pocket Casts에서는 개인정보를 소중하게 취급합니다. 이 개인정보 취급방침에서는 회원님에 대해 수집하는 정보와 수집 이유, 해당 정보로 무엇을 할 수 있으며 어떻게 취급하는지를 설명합니다. macOS 및 Windows 앱과 연결된 Pocket Casts 웹 서비스(서비스로 통칭)와 iOS 및 Android Pocket Casts 앱에 적용됩니다. 서비스를 이용하면 이 개인정보 취급방침에 동의하는 것입니다. 앱에서 푸시 알림을 켜면 Apple에서 제공하는 푸시 토큰이 해당 푸시 알림을 기기에 전달하기 위해 저장됩니다. 웹 앱을 구매하면 구매의 거래 ID가 저장됩니다. 계정을 생성하지 않기로 선택하고 푸시 알림을 사용하지 않으면 회원님에 대한 데이터가 서버에 저장되지 않습니다. Pocket Casts 웹 서비스에서는 쿠키 및 유사한 기술을 사용하여 로그인 상태를 유지합니다. 서비스 내에서 후원 요청을 생성하기로 선택하는 경우 제출하기 전에 볼 수 있는 후원 요청을 해결하는 데 도움이 되는 추가 데이터가 포함된 첨부 파일이 생성될 수 있습니다.</string>
     <string name="profile_get_plus">이 기능과 훨씬 더 많은 기능을 잠금 해제하려면 Pocket Casts Plus를 받으세요!</string>
     <string name="profile_free_account">무료 계정</string>
     <string name="profile_forgot_your_password">비밀번호를 잊었음</string>
@@ -2163,6 +2187,9 @@ Language: ko_KR
     </plurals>
     <plurals name="episode_count">
         <item quantity="other">에피소드 %d개</item>
+    </plurals>
+    <plurals name="episodes">
+        <item quantity="other">에피소드 %1$d개</item>
     </plurals>
     <plurals name="hour">
         <item quantity="other">시간</item>

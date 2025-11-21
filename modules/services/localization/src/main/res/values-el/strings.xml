@@ -272,11 +272,8 @@ Language: el_GR
     <string name="podcast_ratings_page_title">Βαθμολογίες</string>
     <string name="up_next_shuffle_disable_button_content_description">Απενεργοποίηση ανακατέματος στο Επόμενο</string>
     <string name="up_next_shuffle_button_content_description">Ανακάτεμα στο Επόμενο</string>
-    <string name="end_of_year_stories_subscribe_to_plus">Στήριξε το Pocket Casts με εγγραφή στο Plus και απόκτησε περισσότερα στατιστικά, καθώς και Premium χαρακτηριστικά όπως σελιδοδείκτες, φακέλους ή προεπιλεγμένα κεφάλαια!</string>
-    <string name="eoy_story_stories_subscribe_to_plus_button_label">Ρίξε μια ματιά στο Pocket Casts Plus</string>
     <string name="settings_real_time_playback">Προσαρμογή υπολειπόμενου χρόνου</string>
     <string name="settings_real_time_playback_summary">Αν είναι ενεργό, το πρόγραμμα αναπαραγωγής θα δείχνει τον υπολοιπόμενο χρόνο, προσαρμοσμένο στην ταχύτητα αναπαραγωγής και στα παραλειπόμενα κεφάλαια.</string>
-    <string name="end_of_year_listening_time_subtitle">συνολική ακρόαση podcasts</string>
     <string name="eoy_story_ratings_learn_button_label">Μάθε για τις βαθμολογίες</string>
     <string name="transcript_error_not_available">Λυπούμαστε, αλλά αυτό το επεισόδιο δεν έχει διαθέσιμη μεταγραφή.</string>
     <string name="referrals_failed_to_load_offer">Λυπούμαστε, αλλά κάτι πήγε στραβά κατά την ανάκτηση του συνδέσμου παραπομπής σου.</string>
@@ -461,10 +458,8 @@ Language: el_GR
     <string name="bookmark_not_found">Δεν βρέθηκε ο σελιδοδείκτης</string>
     <string name="settings_use_dark_up_next_details">Όταν ενεργοποιηθεί, το Επόμενο θα χρησιμοποιεί πάντα το σκοτεινό θέμα ή θα ταιριάζει με το τρέχον θέμα όταν είναι ανενεργό.</string>
     <string name="settings_use_dark_up_next">Χρησιμοποίησε το Σκοτεινό Θέμα του Επόμενο</string>
-    <string name="end_of_year_stories_theres_more">Υπάρχουν κι άλλα!</string>
     <string name="end_of_year_stories_year_over_share_text">Ο χρόνος ακρόασης μου το %1$d σε σύγκριση με το %2$d</string>
     <string name="end_of_year_stories_year_completion_rate">ποσοστό ολοκλήρωσης</string>
-    <string name="eoy_year_over_year_title_skyrocketed">Σε σύγκριση με το 2022, ο χρόνος ακρόασης σου εκτοξεύτηκε!</string>
     <string name="end_of_year_prompt_card_summary">Δες τα στατιστικά ακρόασης σου, τα κορυφαία podcasts και άλλα.</string>
     <string name="end_of_year_replay">Παίξε ξανά</string>
     <string name="end_of_year_listening_time_title">Αυτός ήταν ο συνολικός σου χρόνος ακρόασης podcasts</string>
@@ -772,7 +767,6 @@ Language: el_GR
     <string name="end_of_year_create_account_to_see">Αποθήκευσε τα podcast σου στο cloud, πάρε την ανασκόπησή σου για το τέλος της χρονιάς και συγχρόνισε την πρόοδό σου με άλλες συσκευές.</string>
     <string name="end_of_year_story_longest_episode_share_text">Το μεγαλύτερο επεισόδιο που άκουσα το %1$d %2$s</string>
     <string name="end_of_year_story_listened_to_numbers_share_text">Άκουσα %1$d διαφορετικά podcasts και %2$d επεισόδια το %3$d</string>
-    <string name="end_of_year_story_listened_to_numbers">Ακούσες %1$d διαφορετικές εκπομπές και %2$d επεισόδια συνολικά</string>
     <string name="end_of_year_story_listened_to_categories">Ακούσες %1$d διαφορετικές κατηγορίες φέτος</string>
     <string name="end_of_year_story_listened_to_categories_share_text">Άκουσα %1$d διαφορετικές κατηγορίες το 2023</string>
     <string name="end_of_year_story_listened_to_categories_subtitle">Ας ρίξουμε μια ματιά σε μερικά από τα αγαπημένα σου…</string>
@@ -1372,9 +1366,9 @@ Language: el_GR
     <string name="filters_create_select_criteria">Επίλεξε τα κριτήρια φίλτρου σου χρησιμοποιώντας αυτά τα κουμπιά για να δημιουργήσεις μια ενημερωμένη έξυπνη λίστα αναπαραγωγής επεισοδίων.</string>
     <string name="profile_select_account_type">Επιλογή Τύπου Λογαριασμού</string>
     <string name="filters_preview">ΠΡΟΕΠΙΣΚΟΠΗΣΗ</string>
+    <string name="profile_license_agreement">Το Pocket Casts εκτιμά την ιδιωτικότητά σου. Αυτή η Πολιτική Απορρήτου εξηγεί ποιες πληροφορίες συλλέγουμε σχετικά με σένα και γιατί, τι μπορούμε να κάνουμε με αυτές τις πληροφορίες και πώς τις χειριζόμαστε. Ισχύει για τις εφαρμογές Pocket Casts για iOS και Android, καθώς και για τη διαδικτυακή υπηρεσία Pocket Casts με τις σχετικές εφαρμογές για macOS και Windows (από κοινού και ξεχωριστά, η Υπηρεσία). Χρησιμοποιώντας την Υπηρεσία, συμφωνείς με την παρούσα Πολιτική απορρήτου. Εάν ενεργοποιήσεις τις ειδοποιήσεις push στην εφαρμογή, αποθηκεύουμε το push token που μας παρέχει η Apple προκειμένου να παραδώσουμε αυτές τις ειδοποιήσεις push στη συσκευή σου. Εάν αγοράσεις την εφαρμογή web, αποθηκεύουμε ένα αναγνωριστικό συναλλαγής για την αγορά σου. Εάν επιλέξεις να μην δημιουργήσεις λογαριασμό και δεν χρησιμοποιείς τις ειδοποιήσεις push, δεν αποθηκεύονται δεδομένα σχετικά με σένα στους διακομιστές μας. Η διαδικτυακή υπηρεσία Pocket Casts χρησιμοποιεί επίσης cookies και παρόμοιες τεχνολογίες για να σε κρατάει σε σύνδεση. Σε περίπτωση που επιλέξεις να δημιουργήσεις ένα αίτημα υποστήριξης μέσα από την Υπηρεσία, ενδέχεται να δημιουργήσουμε ένα συνημμένο αρχείο που περιέχει πρόσθετα δεδομένα για να σε βοηθήσουμε στην αντιμετώπιση του αιτήματός υποστήριξης σου, το οποίο μπορείς να δεις πριν από την υποβολή του.</string>
     <string name="profile_plus">plus</string>
     <string name="filters_stepper_plus">Plus</string>
-    <string name="profile_license_agreement">Το Pocket Casts εκτιμά την ιδιωτικότητά σου. Αυτή η Πολιτική Απορρήτου εξηγεί ποιες πληροφορίες συλλέγουμε σχετικά με σένα και γιατί, τι μπορούμε να κάνουμε με αυτές τις πληροφορίες και πώς τις χειριζόμαστε. Ισχύει για τις εφαρμογές Pocket Casts για iOS και Android, καθώς και για τη διαδικτυακή υπηρεσία Pocket Casts με τις σχετικές εφαρμογές για macOS και Windows (από κοινού και ξεχωριστά, η Υπηρεσία). Χρησιμοποιώντας την Υπηρεσία, συμφωνείς με την παρούσα Πολιτική απορρήτου. Εάν ενεργοποιήσεις τις ειδοποιήσεις push στην εφαρμογή, αποθηκεύουμε το push token που μας παρέχει η Apple προκειμένου να παραδώσουμε αυτές τις ειδοποιήσεις push στη συσκευή σου. Εάν αγοράσεις την εφαρμογή web, αποθηκεύουμε ένα αναγνωριστικό συναλλαγής για την αγορά σου. Εάν επιλέξεις να μην δημιουργήσεις λογαριασμό και δεν χρησιμοποιείς τις ειδοποιήσεις push, δεν αποθηκεύονται δεδομένα σχετικά με σένα στους διακομιστές μας. Η διαδικτυακή υπηρεσία Pocket Casts χρησιμοποιεί επίσης cookies και παρόμοιες τεχνολογίες για να σε κρατάει σε σύνδεση. Σε περίπτωση που επιλέξεις να δημιουργήσεις ένα αίτημα υποστήριξης μέσα από την Υπηρεσία, ενδέχεται να δημιουργήσουμε ένα συνημμένο αρχείο που περιέχει πρόσθετα δεδομένα για να σε βοηθήσουμε στην αντιμετώπιση του αιτήματός υποστήριξης σου, το οποίο μπορείς να δεις πριν από την υποβολή του.</string>
     <string name="filters_play_episodes">Αναπαραγωγή %d επεισοδίων</string>
     <string name="profile_per_month">Ανά μήνα</string>
     <string name="profile_per">ανά</string>

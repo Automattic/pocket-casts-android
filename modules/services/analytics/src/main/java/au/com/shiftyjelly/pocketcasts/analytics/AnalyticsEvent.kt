@@ -55,6 +55,7 @@ enum class AnalyticsEvent(val key: String) {
     PLUS_PROMOTION_TERMS_AND_CONDITIONS_TAPPED("plus_promotion_terms_and_conditions_tapped"),
     PLUS_PROMOTION_DETAILS_TAPPED("plus_promotion_details_tapped"),
     UPGRADE_BANNER_DISMISSED("upgrade_banner_dismissed"),
+    PLUS_PROMOTION_BANNER_BUTTON_TAPPED("plus_promotion_banner_button_tapped"),
 
     /* Pull to refresh */
     PULLED_TO_REFRESH("pulled_to_refresh"),
@@ -868,6 +869,7 @@ enum class AnalyticsEvent(val key: String) {
     IMPROVED_SEARCH_SUGGESTIONS_FAILED("search_predictive_failed"),
     IMPROVED_SEARCH_SUGGESTION_TERM_TAPPED("search_predictive_term_tapped"),
     IMPROVED_SEARCH_EMPTY_RESULTS("search_empty_results"),
+    IMPROVED_SEARCH_VIEW_ALL_TAPPED("search_predictive_view_all_tapped"),
 
     /* App Ratings */
     USER_SATISFACTION_SURVEY_SHOWN("user_satisfaction_survey_shown"),

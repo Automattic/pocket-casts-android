@@ -268,6 +268,7 @@ object OldOnboardingFlow {
                 OnboardingUpgradeSource.GENERATED_TRANSCRIPTS,
                 OnboardingUpgradeSource.DEEP_LINK,
                 OnboardingUpgradeSource.UNKNOWN,
+                OnboardingUpgradeSource.FINISHED_ONBOARDING,
                 -> false
 
                 OnboardingUpgradeSource.RECOMMENDATIONS -> true

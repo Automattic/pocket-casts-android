@@ -24,7 +24,7 @@ class AnalyticsPaymentListenerTest {
     )
 
     @Test
-    fun `successfull purchase`() = runTest {
+    fun `successful purchase`() = runTest {
         val key = SubscriptionPlan.PlusYearlyPreview.key
 
         paymentClient.purchaseSubscriptionPlan(key, "purchase_source", mock<Activity>())

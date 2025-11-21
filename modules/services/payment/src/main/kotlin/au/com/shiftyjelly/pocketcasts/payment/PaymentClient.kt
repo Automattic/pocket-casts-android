@@ -42,6 +42,7 @@ class PaymentClient @Inject constructor(
         key: SubscriptionPlan.Key,
         purchaseSource: String,
         activity: Activity,
+        purchaseFlow: String? = null,
     ): PurchaseResult = coroutineScope {
         forEachListener { onPurchaseSubscriptionPlan(key) }
         val purchaseUpdatesJob = launch(start = CoroutineStart.UNDISPATCHED) { listenToPurchaseUpdates() }
@@ -59,7 +60,7 @@ class PaymentClient @Inject constructor(
             }
         }
         purchaseUpdatesJob.cancelAndJoin()
-        forEachListener { onSubscriptionPurchased(key, purchaseSource, purchaseResult) }
+        forEachListener { onSubscriptionPurchased(key = key, purchaseSource = purchaseSource, purchaseFlow = purchaseFlow, result = purchaseResult) }
         purchaseResult
     }
 
@@ -173,7 +174,7 @@ class PaymentClient @Inject constructor(
 
         fun onPurchaseSubscriptionPlan(key: SubscriptionPlan.Key) = Unit
 
-        fun onSubscriptionPurchased(key: SubscriptionPlan.Key, purchaseSource: String, result: PurchaseResult) = Unit
+        fun onSubscriptionPurchased(key: SubscriptionPlan.Key, purchaseSource: String, purchaseFlow: String?, result: PurchaseResult) = Unit
 
         fun onConfirmPurchase(purchase: Purchase) = Unit
 

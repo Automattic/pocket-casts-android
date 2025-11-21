@@ -1,12 +1,32 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2025-10-31 16:29:44+0000
+Translation-Revision-Date: 2025-11-07 23:48:55+0000
 Plural-Forms: nplurals=2; plural=n != 1;
 Generator: GlotPress/2.4.0-alpha
 Language: ca
 -->
 <resources>
+    <string name="end_of_year_story_top_podcast_stats_hours">%1$s i %2$s. Això sí que és compromís!</string>
+    <string name="end_of_year_story_top_podcast_stats_days">%1$s, %2$s i %3$s. Això sí que és compromís!</string>
+    <string name="end_of_year_story_top_podcast_subtitle">No hi ha res que sigui més “tu” que això</string>
+    <string name="app_rating_yes_label">Sí!</string>
+    <string name="app_rating_no_label">No gaire</string>
+    <string name="app_rating_body">Hola! Ens encantaria saber si estàs gaudint de la nostra\u00A0app.</string>
+    <string name="app_rating_title">Gaudeixes de Pocket\u00A0Casts?</string>
+    <string name="end_of_year_story_epilogue_subtitle">Comparteix la teva reproducció amb els amics i mostra afecte als podcasters que t’han fet companyia durant tot l’any</string>
+    <string name="end_of_year_story_epilogue_title">Gràcies per passar el teu any amb Pocket\u00A0Casts</string>
+    <string name="end_of_year_stories_year_completion_rate_subtitle">De %2$d episodis començats, n\'has acabat %1$d.\nUn seguiment més fort que la majoria de les subscripcions al gimnàs.</string>
+    <string name="search_suggestions_no_results_message">Prova una nova cerca, o afegeix una URL de feed de pòdcast</string>
+    <string name="search_suggestions_no_results_title">Cap resultat</string>
+    <string name="eoy_playback_intro_title">El teu any en pòdcasts,\nresumit i llest per reviure.</string>
+    <string name="search_suggestions_view_all">Veure-ho tot per \"%1$s\"</string>
+    <string name="up_next_as_playlist_saved">La cua «Tot seguit» s\'ha desat com una llista de reproducció</string>
+    <string name="up_next_as_playlist_button_secondary">Substitueix i reprodueix</string>
+    <string name="delete_playlist_confirmation_title">Esborrar la llista de reproducció?</string>
+    <string name="delete_playlist_confirmation_body">Estàs segur que vols esborrar la teva llista de reproducció? No hi ha manera de desfer-ho.</string>
     <string name="view">Veure</string>
+    <string name="delete_playlist">Esborrar la llista de reproducció</string>
+    <string name="browse_podcasts">Navegar pels pòdcasts</string>
     <string name="rearrange_playlists_tooltip_title">Reorganitza les teves llistes de reproducció</string>
     <string name="rearrange_playlists_tooltip_body">Prem i mantén premuda una llista de reproducció per moure-la.</string>
     <string name="play_all_no_episodes_message">Tots els episodis s\'han arxivat. Afegeix o desarxiva per a reproduir.</string>
@@ -40,7 +60,6 @@ Language: ca
     <string name="add_to_up_next_top">Afegir al principi de la cua</string>
     <string name="playlist_episodes_archived_title">No hi ha episodis</string>
     <string name="playlist_episodes_archived_count">%1$d arxivats</string>
-    <string name="playlist_edit_episodes">Reorganitzar els episodis</string>
     <string name="playlist_episode_unavailable_cta">Esborrar de la llista de reproducció</string>
     <string name="playlist_episode_unavailable_description">L\'autor del pòdcast ha eliminat aquest episodi. Es quedarà a la teva llista de reproducció fins que l\'esborris.</string>
     <string name="playlist_episode_unavailable_title">Episodi no disponible. </string>
@@ -414,6 +433,7 @@ Language: ca
     <string name="icons_plus_prompt">Aconsegueix icones de l\'app exclusives amb Pocket Casts Plus, i més</string>
     <string name="themes_plus_prompt">Aconsegueix temes exclusius amb Pocket Casts Plus, i més</string>
     <string name="folders_plus_prompt">Organitza els teus pòdcasts amb Pocket Casts Plus, i més</string>
+    <string name="end_of_year_story_top_podcast_title">Aquest va ser el teu pòdcast més escoltat en %1$d</string>
     <string name="drag_down_to_dismiss_content_description">Arrossega cap avall per a descartar</string>
     <string name="maybe_later">Potser més tard</string>
     <string name="need_to_free_up_space">Necessites alliberar espai?</string>
@@ -440,15 +460,13 @@ Language: ca
     <string name="up_next_shuffle_disable_button_content_description">Desactivar el mode aleatori a la cua \'Tot seguit\'</string>
     <string name="up_next_shuffle_button_content_description">Mode aleatori a \'Tot seguit\'</string>
     <string name="settings_real_time_playback">Ajusta el temps restant</string>
-    <string name="eoy_story_stories_subscribe_to_plus_button_label">Consulta Pocket Casts Plus</string>
-    <string name="end_of_year_stories_subscribe_to_plus">Ajuda Pocket Casts subscrivint-te a Plus i obtén més estadístiques, a més de funcions Prèmium com ara marcadors, carpetes o capítols preseleccionats!</string>
     <string name="settings_real_time_playback_summary">Si està activat, el reproductor mostrarà el temps restant, ajustat per la velocitat de reproducció i els capítols saltats.</string>
-    <string name="end_of_year_listening_time_subtitle">total escoltant pòdcasts</string>
     <string name="eoy_story_ratings_learn_button_label">Informa\'t sobre les valoracions</string>
     <string name="referrals_failed_to_load_offer">Ho sento, però hi ha hagut un problema en obtenir el teu enllaç de referència.</string>
     <string name="transcript_error_not_available">Aquest episodi no té transcripció disponible</string>
     <string name="referrals_banner_hide_label">Amaga aquest banner</string>
     <string name="referrals_banner_long_press_label">Amaga el banner de reclamació de la invitació.</string>
+    <string name="end_of_year_prompt_card_title">El repàs  de l\'any ja és aquí!</string>
     <string name="settings_auto_download_limit_auto_downloads">Limitar les descàrregues automàtiques</string>
     <string name="settings_auto_download_limit_all_latest_episodes">Tots els últims episodis</string>
     <string name="settings_auto_download_limit_ten_latest_episode">10 darrers episodis</string>
@@ -629,11 +647,9 @@ Language: ca
     <string name="bookmark_not_found">No s\'ha trobat el marcador</string>
     <string name="settings_use_dark_up_next">Emprar el tema fosc a la llista \'Tot seguit\'</string>
     <string name="settings_use_dark_up_next_details">Quan està activat, \'Tot seguit\' sempre utilitzarà el tema fosc, o coincidirà amb el tema actual quan estigui desactivat</string>
-    <string name="end_of_year_stories_theres_more">Encara hi ha més!</string>
     <string name="end_of_year_stories_year_completion_rate">taxa de finalització</string>
-    <string name="eoy_year_over_year_title_skyrocketed">Comparat amb el 2022, el teu temps d\'escolta ha pujat com un coet!</string>
-    <string name="end_of_year_stories_year_completion_rate_title">La teva taxa de finalització enguany ha estat del %1$d%%</string>
     <string name="end_of_year_stories_year_over_share_text">El meu %1$d temps escoltat comparat amb %2$d</string>
+    <string name="end_of_year_stories_year_completion_rate_title">La teva taxa de finalització enguany ha estat del %1$d%%</string>
     <string name="end_of_year_prompt_card_summary">Consulta les teves estadístiques d\'escolta, els millors pòdcasts i molt més.</string>
     <string name="end_of_year_replay">Torna a reproduir-ho</string>
     <string name="end_of_year_listening_time_title">Aquest va ser el vostre temps total escoltant pòdcasts</string>
@@ -988,6 +1004,7 @@ Language: ca
     <string name="must_provide_filter_name">Introdueix un nom de la llista de reproducció</string>
     <string name="settings_app_icon_halloween">Halloween</string>
     <string name="end_of_year_launch_modal_summary">Consulta quins han estat els pòdcasts i les categories que més has escoltat, les estadístiques d\'escolta i molt més. Comparteix-ho amb els teus amics i fes que tothom sàpiga quins són els teus creadors favorits!</string>
+    <string name="end_of_year_launch_modal_primary_button_title">Veure la meva reproducció del 2025</string>
     <string name="settings_show_played_summary">Els episodis que has acabat d\'escoltar es seguiran mostrant</string>
     <string name="settings_show_played">Mostrar els episodis reproduïts</string>
     <string name="profile_privacy_policy_read">Llegeix la política de privacitat</string>
@@ -2155,6 +2172,10 @@ Language: ca
     <plurals name="episode_count">
         <item quantity="one">%d episodi</item>
         <item quantity="other">%d episodis</item>
+    </plurals>
+    <plurals name="episodes">
+        <item quantity="one">%1$d episodi</item>
+        <item quantity="other">%1$d episodis</item>
     </plurals>
     <plurals name="hour">
         <item quantity="one">hora</item>

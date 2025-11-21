@@ -1,18 +1,45 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2025-11-05 12:54:03+0000
+Translation-Revision-Date: 2025-11-13 09:54:05+0000
 Plural-Forms: nplurals=1; plural=0;
 Generator: GlotPress/2.4.0-alpha
 Language: zh_TW
 -->
 <resources>
+    <string name="eoy_story_ratings_subtitle_no_ratings">分享喜愛內容，讓更多人聽見你的最愛創作者</string>
+    <string name="eoy_story_ratings_subtitle_2">分享評論，讓更多人聽見精彩節目</string>
+    <string name="eoy_story_ratings_subtitle_1">各地的創作者對你表達的心意都會心懷感激</string>
+    <string name="eoy_story_ratings_title_no_ratings">還沒評分，不過還有時間！</string>
+    <string name="eoy_story_ratings_title_2">歡迎分享意見回饋。</string>
+    <string name="eoy_story_ratings_title_1">你分享 %1$d 星評分，就像放鞭炮一樣！</string>
+    <string name="end_of_year_listening_time_subtitle">分鐘 (收聽時間)</string>
+    <string name="end_of_year_stories_year_over_year_subtitle_went_down">但真的，質比量更重要</string>
+    <string name="end_of_year_stories_year_over_year_title_went_down">你今年的收聽時間下降了 %1$s%%</string>
+    <string name="end_of_year_stories_year_over_year_subtitle_flat">穩定可靠，堅若磐石</string>
+    <string name="end_of_year_stories_year_over_year_title_flat">你的 %1$s 年收聽狀況維持穩定</string>
+    <string name="end_of_year_stories_year_over_year_subtitle_went_up_a_lot">你今年的收聽時間成長幅度超過 500%，歡迎加入我們的行列</string>
+    <string name="end_of_year_stories_year_over_year_title_went_up_a_lot">直上天際！</string>
+    <string name="settings_storage_normalize_episode_titles_description">狀態：%1$s\n應用程式的某部分的功能，使用需要標準化的標題才能進行單集搜尋。 若單集尚未進行標準化，只要點選此設定，系統就會執行資料庫標準化。</string>
+    <string name="settings_storage_normalize_episode_titles">將單集標題標準化</string>
+    <string name="normalization_started">已開始標準化作業</string>
+    <string name="not_normalized">未標準化</string>
+    <string name="normalized">已標準化</string>
+    <string name="database">資料庫</string>
+    <string name="end_of_year_story_top_podcast_stats_hours">%1$s 和 %2$s。\n真的很投入其中！</string>
+    <string name="end_of_year_story_top_podcast_stats_days">%1$s、%2$s 和 %3$s。\n真的很投入其中！</string>
+    <string name="end_of_year_story_top_podcast_subtitle">徹底展現你的聽覺品味</string>
+    <string name="app_rating_yes_label">可以！</string>
+    <string name="app_rating_no_label">不太想</string>
+    <string name="app_rating_body">你好！ 歡迎分享你的應用程式滿意度。</string>
+    <string name="app_rating_title">Pocket\u00A0Casts 使用起來還滿意嗎？</string>
+    <string name="end_of_year_story_epilogue_subtitle">與好友分享年度播放回顧，向陪伴你一整年的 Podcast 主講人表達心意</string>
+    <string name="end_of_year_story_epilogue_title">感謝你這一年來持續使用 Pocket\u00A0Casts</string>
     <string name="end_of_year_stories_year_completion_rate_subtitle">你一共聽了 %2$d 個單集，並完成了 %1$d 集。\n堅持不懈，比大多數健身房會員資格還強。</string>
     <string name="search_suggestions_no_results_message">嘗試新的搜尋，或新增 Podcast 摘要 URL</string>
     <string name="search_suggestions_no_results_title">沒有結果</string>
     <string name="eoy_playback_intro_title">你的 Podcast 年度回顧\n直送到家，立即重溫</string>
     <string name="search_suggestions_view_all">檢視「%1$s」的所有內容</string>
     <string name="up_next_as_playlist_saved">已將「接下來播放」儲存為播放清單</string>
-    <string name="up_next_as_playlist_replace_title">要取代目前的「接下來播放」嗎？</string>
     <string name="up_next_as_playlist_button_secondary">取代並播放</string>
     <string name="delete_playlist_confirmation_title">要刪除播放清單嗎？</string>
     <string name="delete_playlist_confirmation_body">你確定要刪除播放清單？ 此動作無法復原。</string>
@@ -52,7 +79,6 @@ Language: zh_TW
     <string name="add_to_up_next_top">新增至「接下來播放」開頭</string>
     <string name="playlist_episodes_archived_title">沒有單集</string>
     <string name="playlist_episodes_archived_count">已封存 %1$d 集</string>
-    <string name="playlist_edit_episodes">重新排列單集</string>
     <string name="playlist_episode_unavailable_cta">從播放清單移除</string>
     <string name="playlist_episode_unavailable_description">Podcast 創作者已將本集刪除。 除非移除，否則該單集將持續保留在播放清單中。</string>
     <string name="playlist_episode_unavailable_title">無法提供單集</string>
@@ -426,6 +452,7 @@ Language: zh_TW
     <string name="icons_plus_prompt">Pocket Casts Plus 帶給你專屬應用程式圖示和更多內容</string>
     <string name="themes_plus_prompt">Pocket Casts Plus 帶給你專屬佈景主題和更多內容</string>
     <string name="folders_plus_prompt">運用 Pocket Casts Plus 打理 Podcast 和更多內容</string>
+    <string name="end_of_year_story_top_podcast_title">你的 %1$d 最愛 Podcast</string>
     <string name="drag_down_to_dismiss_content_description">向下拖曳即可關閉</string>
     <string name="maybe_later">稍後再說</string>
     <string name="need_to_free_up_space">需要騰出更多空間？</string>
@@ -452,10 +479,7 @@ Language: zh_TW
     <string name="up_next_shuffle_disable_button_content_description">停用「接下來隨機播放」</string>
     <string name="up_next_shuffle_button_content_description">接下來隨機播放</string>
     <string name="settings_real_time_playback">調整剩餘時間</string>
-    <string name="eoy_story_stories_subscribe_to_plus_button_label">訂閱 Pocket Casts Plus</string>
-    <string name="end_of_year_stories_subscribe_to_plus">若想支持 Pocket Casts，不妨訂閱 Plus 方案，不僅能取得更多統計資料，還可獲得書籤、資料夾或預先選取的章節等進階版功能！</string>
     <string name="settings_real_time_playback_summary">啟用後，播放器會顯示剩餘時間，並根據播放速度和跳過的段落進行調整。</string>
-    <string name="end_of_year_listening_time_subtitle">收聽 Podcast 的總時間</string>
     <string name="eoy_story_ratings_learn_button_label">了解評分</string>
     <string name="referrals_failed_to_load_offer">不好意思，擷取推薦連結時發生錯誤。</string>
     <string name="transcript_error_not_available">不好意思，此單集不提供逐字稿。</string>
@@ -642,11 +666,11 @@ Language: zh_TW
     <string name="bookmark_not_found">找不到書籤</string>
     <string name="settings_use_dark_up_next_details">啟用後，「接下來播放」將永遠使用深色系佈景主題；若停用，系統則將採用與屆時設定相符的主題</string>
     <string name="settings_use_dark_up_next">使用暗色系「接下來播放」佈景主題</string>
-    <string name="end_of_year_stories_theres_more">還有更多有趣內容！</string>
     <string name="end_of_year_stories_year_completion_rate">完成率</string>
-    <string name="eoy_year_over_year_title_skyrocketed">比起 2022 年，你的收聽時間可說是一飛沖天！</string>
     <string name="end_of_year_stories_year_over_share_text">我在 %1$d 年與 %2$d 年的收聽時間比較</string>
+    <string name="end_of_year_stories_year_completion_rate_title">你的完成率為 %1$d%%</string>
     <string name="end_of_year_prompt_card_summary">看看你的收聽統計和最愛 Podcast 等資料吧。</string>
+    <string name="end_of_year_stories_year_over_year_title_went_up">比起 %1$s 年，你的收聽時間飆高了 %2$s%%</string>
     <string name="end_of_year_replay">再次播放</string>
     <string name="end_of_year_listening_time_title">這是你收聽 Podcast 的總時間。</string>
     <string name="end_of_year_story_top_categories_subtitle">你收聽了 %1$s 集，總共 %2$s</string>
@@ -2163,6 +2187,9 @@ Language: zh_TW
     </plurals>
     <plurals name="episode_count">
         <item quantity="other">%d 集</item>
+    </plurals>
+    <plurals name="episodes">
+        <item quantity="other">%1$d 集</item>
     </plurals>
     <plurals name="hour">
         <item quantity="other">小時</item>
