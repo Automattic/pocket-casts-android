@@ -33,6 +33,7 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -187,6 +188,7 @@ private fun CenterContent(
     PodcastImage(
         uuid = story.show.uuid,
         elevation = 0.dp,
+        contentDescription = story.show.title,
         modifier = Modifier
             .requiredSize(maxOf(maxWidth.times(.7f), maxHeight.times(.7f)))
             .scale(scaleAnimation)
@@ -201,7 +203,7 @@ private fun Header(
     measurements: EndOfYearMeasurements,
     modifier: Modifier = Modifier,
 ) = Column(
-    modifier = modifier,
+    modifier = modifier.semantics(mergeDescendants = true) {},
     verticalArrangement = Arrangement.spacedBy(8.dp),
 ) {
     TextH10(

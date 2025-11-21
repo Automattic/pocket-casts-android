@@ -81,6 +81,7 @@ internal fun TranscriptsPaywall(
             SubscriptionBadge(
                 iconRes = R.drawable.ic_plus,
                 shortNameRes = LR.string.pocket_casts_plus_short,
+                contentDescriptionRes = LR.string.pocket_casts_plus_badge,
                 fontSize = 16.sp,
                 padding = 6.dp,
                 textColor = Color.Black,

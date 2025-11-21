@@ -41,6 +41,7 @@ import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -186,7 +187,7 @@ private fun PodcastItem(
 ) {
     Row(
         verticalAlignment = Alignment.CenterVertically,
-        modifier = modifier,
+        modifier = modifier.semantics(mergeDescendants = true) {},
     ) {
         TextP30(
             text = "#${index + 1}",
@@ -199,6 +200,7 @@ private fun PodcastItem(
         val artworkSize = if (index == 0) 100.dp else 77.dp
         PodcastImage(
             uuid = podcast.uuid,
+            contentDescription = null,
             elevation = 0.dp,
             cornerSize = 4.dp,
             modifier = Modifier.size(artworkSize * measurements.scale),

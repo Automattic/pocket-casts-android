@@ -19,6 +19,8 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.clearAndSetSemantics
+import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
@@ -44,6 +46,7 @@ import au.com.shiftyjelly.pocketcasts.localization.R as LR
 fun SubscriptionBadge(
     @DrawableRes iconRes: Int,
     @StringRes shortNameRes: Int,
+    @StringRes contentDescriptionRes: Int,
     modifier: Modifier = Modifier,
     iconColor: Color = Color.Unspecified,
     iconSize: Dp = 14.dp,
@@ -59,7 +62,16 @@ fun SubscriptionBadge(
             .background(background, RoundedCornerShape(percent = 50))
             .padding(horizontal = padding * 2, vertical = padding),
     ) {
-        SubscriptionBadgeContent(iconRes, iconSize, iconColor, shortNameRes, textColor, fontSize, padding)
+        SubscriptionBadgeContent(
+            iconRes = iconRes,
+            iconSize = iconSize,
+            iconColor = iconColor,
+            shortNameRes = shortNameRes,
+            contentDescriptionRes = contentDescriptionRes,
+            textColor = textColor,
+            fontSize = fontSize,
+            padding = padding,
+        )
     }
 }
 
@@ -67,6 +79,7 @@ fun SubscriptionBadge(
 fun SubscriptionBadge(
     @DrawableRes iconRes: Int,
     @StringRes shortNameRes: Int,
+    @StringRes contentDescriptionRes: Int,
     backgroundBrush: Brush,
     modifier: Modifier = Modifier,
     iconColor: Color = Color.Unspecified,
@@ -80,7 +93,16 @@ fun SubscriptionBadge(
             .background(backgroundBrush, RoundedCornerShape(percent = 50))
             .padding(horizontal = padding * 2, vertical = padding),
     ) {
-        SubscriptionBadgeContent(iconRes, iconSize, iconColor, shortNameRes, textColor, fontSize, padding)
+        SubscriptionBadgeContent(
+            iconRes = iconRes,
+            iconSize = iconSize,
+            iconColor = iconColor,
+            shortNameRes = shortNameRes,
+            contentDescriptionRes = contentDescriptionRes,
+            textColor = textColor,
+            fontSize = fontSize,
+            padding = padding,
+        )
     }
 }
 
@@ -90,13 +112,17 @@ private fun SubscriptionBadgeContent(
     iconSize: Dp,
     iconColor: Color,
     shortNameRes: Int,
+    contentDescriptionRes: Int,
     textColor: Color?,
     fontSize: TextUnit,
     padding: Dp,
+    modifier: Modifier = Modifier,
 ) {
+    val contentDescription = stringResource(contentDescriptionRes)
     Row(
-        modifier = Modifier
-            .semantics(mergeDescendants = true) {},
+        modifier = modifier.clearAndSetSemantics {
+            this.contentDescription = contentDescription
+        },
         verticalAlignment = Alignment.CenterVertically,
     ) {
         Icon(
@@ -132,6 +158,7 @@ fun SubscriptionBadgeForTier(
             padding = padding,
             iconRes = IR.drawable.ic_plus,
             shortNameRes = LR.string.pocket_casts_plus_short,
+            contentDescriptionRes = LR.string.pocket_casts_plus_badge,
             iconColor = when (displayMode) {
                 SubscriptionBadgeDisplayMode.Black -> Color.plusGold
                 SubscriptionBadgeDisplayMode.Colored,
@@ -165,6 +192,7 @@ fun SubscriptionBadgeForTier(
             padding = padding,
             iconRes = IR.drawable.ic_patron,
             shortNameRes = LR.string.pocket_casts_patron_short,
+            contentDescriptionRes = LR.string.pocket_casts_patron_badge,
             iconColor = when (displayMode) {
                 SubscriptionBadgeDisplayMode.Black -> Color.patronPurpleLight
                 SubscriptionBadgeDisplayMode.Colored,
@@ -415,6 +443,7 @@ private fun SubscriptionBadgePlusWithGradientBackgroundPreview() {
         padding = 4.dp,
         iconRes = IR.drawable.ic_plus,
         shortNameRes = LR.string.pocket_casts_plus_short,
+        contentDescriptionRes = LR.string.pocket_casts_plus_badge,
         iconColor = Color.Black,
         backgroundBrush = Brush.horizontalGradient(
             0f to Color.plusGoldLight,

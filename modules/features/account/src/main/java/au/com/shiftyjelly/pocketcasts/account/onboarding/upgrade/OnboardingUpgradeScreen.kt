@@ -367,6 +367,7 @@ private fun UpgradeHeader(
             SubscriptionBadge(
                 iconRes = selectedPlan.badgeIconRes,
                 shortNameRes = selectedPlan.shortNameRes,
+                contentDescriptionRes = selectedPlan.badgeContentDescriptionRes,
                 backgroundColor = Color.Black,
                 textColor = Color.White,
                 modifier = Modifier
