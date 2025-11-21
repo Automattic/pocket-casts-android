@@ -95,8 +95,12 @@ class OnboardingUpgradeFeaturesViewModel @AssistedInject constructor(
         else -> OnboardingUpgradeFeaturesState.NewOnboardingVariant.FEATURES_FIRST
     }
 
-    fun changeBillingCycle(billingCycle: BillingCycle) {
-        val properties = analyticsProps(flow = flow, variant = experimentProvider.getVariation(Experiment.NewOnboardingABTest).toNewOnboardingVariant()).toMutableMap().apply {
+    fun changeBillingCycle(billingCycle: BillingCycle, source: OnboardingUpgradeSource? = null) {
+        val properties = analyticsProps(
+            flow = flow,
+            source = source,
+            variant = experimentProvider.getVariation(Experiment.NewOnboardingABTest).toNewOnboardingVariant(),
+        ).toMutableMap().apply {
             put("value", billingCycle.analyticsValue)
         }
         analyticsTracker.track(AnalyticsEvent.PLUS_PROMOTION_SUBSCRIPTION_FREQUENCY_CHANGED, properties)
@@ -120,13 +124,14 @@ class OnboardingUpgradeFeaturesViewModel @AssistedInject constructor(
     fun purchaseSelectedPlan(
         activity: Activity,
         onComplete: () -> Unit,
+        source: OnboardingUpgradeSource? = null,
     ) {
         _state.update { value -> (value as? OnboardingUpgradeFeaturesState.Loaded)?.copy(purchaseFailed = false) ?: value }
         (state.value as? OnboardingUpgradeFeaturesState.Loaded)?.let { loadedState ->
             val planKey = loadedState.selectedPlan.key
-            trackPaymentFrequencyButtonTapped(planKey)
+            trackPaymentFrequencyButtonTapped(planKey, source)
             viewModelScope.launch {
-                val purchaseResult = paymentClient.purchaseSubscriptionPlan(planKey, flow.source.analyticsValue, activity)
+                val purchaseResult = paymentClient.purchaseSubscriptionPlan(key = planKey, purchaseSource = (source ?: flow.source).analyticsValue, activity = activity, purchaseFlow = flow.analyticsValue)
 
                 when (purchaseResult) {
                     is PurchaseResult.Purchased -> {
@@ -143,15 +148,26 @@ class OnboardingUpgradeFeaturesViewModel @AssistedInject constructor(
         }
     }
 
-    private fun trackPaymentFrequencyButtonTapped(plan: SubscriptionPlan.Key) {
-        analyticsTracker.track(
-            AnalyticsEvent.SELECT_PAYMENT_FREQUENCY_NEXT_BUTTON_TAPPED,
-            mapOf(
-                "flow" to flow.analyticsValue,
-                "source" to flow.source.analyticsValue,
-                "product" to plan.productId,
-            ),
-        )
+    private fun trackPaymentFrequencyButtonTapped(plan: SubscriptionPlan.Key, source: OnboardingUpgradeSource?) {
+        if (FeatureFlag.isEnabled(Feature.NEW_ONBOARDING_UPGRADE)) {
+            analyticsTracker.track(
+                AnalyticsEvent.PLUS_PROMOTION_UPGRADE_BUTTON_TAPPED,
+                analyticsProps(
+                    flow = flow,
+                    source = source,
+                    variant = experimentProvider.getVariation(Experiment.NewOnboardingABTest).toNewOnboardingVariant(),
+                ),
+            )
+        } else {
+            analyticsTracker.track(
+                AnalyticsEvent.SELECT_PAYMENT_FREQUENCY_NEXT_BUTTON_TAPPED,
+                mapOf(
+                    "flow" to flow.analyticsValue,
+                    "source" to flow.source.analyticsValue,
+                    "product" to plan.productId,
+                ),
+            )
+        }
     }
 
     fun onShown(flow: OnboardingFlow, source: OnboardingUpgradeSource) {
@@ -166,12 +182,12 @@ class OnboardingUpgradeFeaturesViewModel @AssistedInject constructor(
         analyticsTracker.track(AnalyticsEvent.PLUS_PROMOTION_NOT_NOW_BUTTON_TAPPED, analyticsProps(flow = flow, source = source, variant = experimentProvider.getVariation(Experiment.NewOnboardingABTest).toNewOnboardingVariant()))
     }
 
-    fun onPrivacyPolicyPressed() {
-        analyticsTracker.track(AnalyticsEvent.PLUS_PROMOTION_PRIVACY_POLICY_TAPPED, analyticsProps(flow = flow, variant = experimentProvider.getVariation(Experiment.NewOnboardingABTest).toNewOnboardingVariant()))
+    fun onPrivacyPolicyPressed(source: OnboardingUpgradeSource) {
+        analyticsTracker.track(AnalyticsEvent.PLUS_PROMOTION_PRIVACY_POLICY_TAPPED, analyticsProps(flow = flow, source = source, variant = experimentProvider.getVariation(Experiment.NewOnboardingABTest).toNewOnboardingVariant()))
     }
 
-    fun onTermsAndConditionsPressed() {
-        analyticsTracker.track(AnalyticsEvent.PLUS_PROMOTION_TERMS_AND_CONDITIONS_TAPPED, analyticsProps(flow = flow, variant = experimentProvider.getVariation(Experiment.NewOnboardingABTest).toNewOnboardingVariant()))
+    fun onTermsAndConditionsPressed(source: OnboardingUpgradeSource) {
+        analyticsTracker.track(AnalyticsEvent.PLUS_PROMOTION_TERMS_AND_CONDITIONS_TAPPED, analyticsProps(flow = flow, source = source, variant = experimentProvider.getVariation(Experiment.NewOnboardingABTest).toNewOnboardingVariant()))
     }
 
     fun onSelectPaymentFrequencyShown(flow: OnboardingFlow, source: OnboardingUpgradeSource) {
@@ -182,12 +198,16 @@ class OnboardingUpgradeFeaturesViewModel @AssistedInject constructor(
         analyticsTracker.track(AnalyticsEvent.SELECT_PAYMENT_FREQUENCY_DISMISSED, analyticsProps(flow = flow, source = source, variant = experimentProvider.getVariation(Experiment.NewOnboardingABTest).toNewOnboardingVariant()))
     }
 
-    fun onReportSeeAllFeaturesPressed(variant: OnboardingUpgradeFeaturesState.NewOnboardingVariant) {
+    fun onReportSeeAllFeaturesPressed(
+        variant: OnboardingUpgradeFeaturesState.NewOnboardingVariant?,
+        source: OnboardingUpgradeSource,
+    ) {
         analyticsTracker.track(
             AnalyticsEvent.PLUS_PROMOTION_DETAILS_TAPPED,
-            properties = mapOf(
-                "version" to 1,
-                "variant" to variant.analyticsValue,
+            properties = analyticsProps(
+                flow = flow,
+                variant = variant ?: experimentProvider.getVariation(Experiment.NewOnboardingABTest).toNewOnboardingVariant(),
+                source = source,
             ),
         )
     }
@@ -203,7 +223,8 @@ class OnboardingUpgradeFeaturesViewModel @AssistedInject constructor(
             variant: OnboardingUpgradeFeaturesState.NewOnboardingVariant,
             source: OnboardingUpgradeSource? = null,
         ) = buildMap {
-            put("flow", flow.analyticsValue)
+            val properFlow = if (source == OnboardingUpgradeSource.FINISHED_ONBOARDING) OnboardingFlow.InitialOnboarding else flow
+            put("flow", properFlow.analyticsValue)
             source?.let {
                 put("source", it.analyticsValue)
             }

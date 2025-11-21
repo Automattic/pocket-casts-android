@@ -55,6 +55,7 @@ enum class AnalyticsEvent(val key: String) {
     PLUS_PROMOTION_TERMS_AND_CONDITIONS_TAPPED("plus_promotion_terms_and_conditions_tapped"),
     PLUS_PROMOTION_DETAILS_TAPPED("plus_promotion_details_tapped"),
     UPGRADE_BANNER_DISMISSED("upgrade_banner_dismissed"),
+    PLUS_PROMOTION_BANNER_BUTTON_TAPPED("plus_promotion_banner_button_tapped"),
 
     /* Pull to refresh */
     PULLED_TO_REFRESH("pulled_to_refresh"),
