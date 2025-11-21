@@ -5,7 +5,7 @@ import au.com.shiftyjelly.pocketcasts.payment.SubscriptionOffer
 import au.com.shiftyjelly.pocketcasts.payment.SubscriptionPlan
 import au.com.shiftyjelly.pocketcasts.payment.SubscriptionTier
 import au.com.shiftyjelly.pocketcasts.payment.TestListener
-import com.android.billingclient.api.BillingFlowParams.SubscriptionUpdateParams.ReplacementMode
+import com.android.billingclient.api.BillingFlowParams.ProductDetailsParams.SubscriptionProductReplacementParams.ReplacementMode
 import com.android.billingclient.api.createGoogleOfferDetails
 import com.android.billingclient.api.createGoogleProductDetails
 import com.android.billingclient.api.createGooglePurchase
@@ -101,7 +101,7 @@ class BillingPaymentMapperFlowParamsTest {
             assertEquals(
                 BillingFlowRequest(
                     BillingFlowRequest.ProductQuery(product, "offer-token"),
-                    BillingFlowRequest.SubscriptionUpdateQuery("purchase-token-1", ReplacementMode.CHARGE_FULL_PRICE),
+                    BillingFlowRequest.SubscriptionUpdateQuery(SubscriptionPlan.PLUS_MONTHLY_PRODUCT_ID, ReplacementMode.CHARGE_FULL_PRICE),
                 ),
                 request,
             )
@@ -348,9 +348,9 @@ class BillingPaymentMapperFlowParamsTest {
 
         @Test
         fun `create billing request with correct replacement mode`() {
+            val currentProductId = SubscriptionPlan.productId(fromTier, fromBillingCycle)
             val currentPurchase = createGooglePurchase(
-                purchaseToken = "purchase-token",
-                productIds = listOf(SubscriptionPlan.productId(fromTier, fromBillingCycle)),
+                productIds = listOf(currentProductId),
             )
             val newPlanKey = SubscriptionPlan.Key(toTier, toBillingCycle, offer = null)
             val product = createGoogleProductDetails(
@@ -367,7 +367,7 @@ class BillingPaymentMapperFlowParamsTest {
                 assertNull(request?.subscriptionUpdateQuery)
             } else {
                 assertEquals(
-                    BillingFlowRequest.SubscriptionUpdateQuery("purchase-token", expectedReplacementMode),
+                    BillingFlowRequest.SubscriptionUpdateQuery(currentProductId, expectedReplacementMode),
                     request?.subscriptionUpdateQuery,
                 )
             }
@@ -404,11 +404,11 @@ class BillingPaymentMapperFlowParamsTest {
         }
 
         @Test
-        fun `craete billing request with full price replacement mode for offers`() {
+        fun `create billing request with full price replacement mode for offers`() {
             SubscriptionOffer.entries.forEach { offer ->
+                val currentProductId = SubscriptionPlan.productId(fromTier, fromBillingCycle)
                 val currentPurchase = createGooglePurchase(
-                    purchaseToken = "purchase-token",
-                    productIds = listOf(SubscriptionPlan.productId(fromTier, fromBillingCycle)),
+                    productIds = listOf(currentProductId),
                 )
                 val newPlanKey = SubscriptionPlan.Key(toTier, toBillingCycle, offer)
                 val product = createGoogleProductDetails(
@@ -421,7 +421,7 @@ class BillingPaymentMapperFlowParamsTest {
                 val request = mapper.toBillingFlowRequest(newPlanKey, listOf(product), listOf(currentPurchase))
 
                 assertEquals(
-                    BillingFlowRequest.SubscriptionUpdateQuery("purchase-token", ReplacementMode.CHARGE_FULL_PRICE),
+                    BillingFlowRequest.SubscriptionUpdateQuery(currentProductId, ReplacementMode.CHARGE_FULL_PRICE),
                     request?.subscriptionUpdateQuery,
                 )
             }
@@ -548,12 +548,13 @@ class BillingPaymentMapperFlowParamsTest {
     }
 }
 
-private val SubscriptionPlan.Key.name get() = buildString {
-    append(tier)
-    append(' ')
-    append(billingCycle)
-    if (offer != null) {
+private val SubscriptionPlan.Key.name
+    get() = buildString {
+        append(tier)
         append(' ')
-        append(offer)
+        append(billingCycle)
+        if (offer != null) {
+            append(' ')
+            append(offer)
+        }
     }
-}

@@ -17,13 +17,13 @@
 
 [versions]
 aboutlibraries = "13.1.0"
-android-gradle-plugin = "8.13.0"
-billing = "8.0.0"
+android-gradle-plugin = "8.13.1"
+billing = "8.1.0"
 coil = "2.7.0"
 compose = "2025.05.01" # https://developer.android.com/jetpack/compose/bom/bom-mapping
 datastore = "1.1.7"
 dependency-analysis = "3.4.1"
-firebase = "34.5.0"
+firebase = "34.6.0"
 fragment = "1.8.9"
 glance = "1.1.1"
 google-services = "4.4.4"
@@ -38,14 +38,14 @@ ktlint = "1.7.1"
 ktlint-compose-rules = "0.4.27"
 lifecycle = "2.9.4"
 lottie = "6.7.1"
-measure-builds = "3.2.1"
+measure-builds = "3.2.2"
 media3 = "1.8.0"
 mockito = "5.20.0"
 mockito-kotlin = "6.1.0"
 moshi = "1.15.2"
-navigation = "2.9.5"
-okhttp = "5.3.0"
-protobuf = "4.33.0"
+navigation = "2.9.6"
+okhttp = "5.3.1"
+protobuf = "4.33.1"
 protobuf-plugin = "0.9.5"
 retrofit = "3.0.0"
 room = "2.8.3"
@@ -171,6 +171,7 @@ media3-exoplayer = { module = "androidx.media3:media3-exoplayer", version.ref = 
 media3-exoplayer-hls = { module = "androidx.media3:media3-exoplayer-hls", version.ref = "media3" }
 media3-extractor = { module = "androidx.media3:media3-extractor", version.ref = "media3" }
 media3-ui = { module = "androidx.media3:media3-ui", version.ref = "media3" }
+media3-ui-compose = { module = "androidx.media3:media3-ui-compose", version.ref = "media3" }
 
 # Mockito
 mockito-android = { module = "org.mockito:mockito-android", version.ref = "mockito" }
@@ -288,7 +289,7 @@ leakcanary = "com.squareup.leakcanary:leakcanary-android:2.14"
 material = "com.google.android.material:material:1.13.0"
 material-dialogs = "com.afollestad.material-dialogs:core:3.3.0"
 material-progressbar = "me.zhanghai.android.materialprogressbar:library:1.6.1"
-play-auth = "com.google.android.gms:play-services-auth:20.4.0"
+play-auth = "com.google.android.gms:play-services-auth:21.4.0"
 play-cast = "com.google.android.gms:play-services-cast-framework:22.2.0"
 play-review = "com.google.android.play:review-ktx:2.0.2"
 play-wearable = "com.google.android.gms:play-services-wearable:19.0.0"
@@ -297,7 +298,7 @@ robolectric = "org.robolectric:robolectric:4.16"
 timber = "com.jakewharton.timber:timber:5.0.1"
 turbine = "app.cash.turbine:turbine:1.2.1"
 unidecode = "net.gcardone.junidecode:junidecode:0.5.2"
-zxing = "com.google.zxing:core:3.5.3"
+zxing = "com.google.zxing:core:3.5.4"
 
 [plugins]
 aboutlibraries = { id = "com.mikepenz.aboutlibraries.plugin", version.ref = "aboutlibraries" }

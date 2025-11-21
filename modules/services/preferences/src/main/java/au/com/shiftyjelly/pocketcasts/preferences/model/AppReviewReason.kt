@@ -30,6 +30,9 @@ enum class AppReviewReason(
     ReferralShared(
         analyticsValue = "referral_shared",
     ),
+    PlaybackShared(
+        analyticsValue = "playback_shared",
+    ),
     DevelopmentTrigger(
         analyticsValue = "development_trigger",
     ),

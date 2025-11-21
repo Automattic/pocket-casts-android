@@ -1,8 +1,7 @@
 package au.com.shiftyjelly.pocketcasts.endofyear.ui
 
-import androidx.compose.animation.core.FastOutLinearInEasing
-import androidx.compose.animation.core.FastOutSlowInEasing
-import androidx.compose.animation.core.animateDp
+import androidx.compose.animation.core.CubicBezierEasing
+import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.animateFloat
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.core.updateTransition
@@ -30,7 +29,6 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -38,6 +36,7 @@ import au.com.shiftyjelly.pocketcasts.compose.Devices
 import au.com.shiftyjelly.pocketcasts.compose.components.TextH10
 import au.com.shiftyjelly.pocketcasts.compose.components.TextP40
 import au.com.shiftyjelly.pocketcasts.models.to.Story
+import kotlin.math.roundToInt
 import kotlinx.coroutines.delay
 import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
@@ -62,12 +61,12 @@ internal fun EndingStory(
             modifier = Modifier.weight(1f),
         )
         Image(
-            painter = painterResource(IR.drawable.navdrawer_logo),
+            painter = painterResource(IR.drawable.pocket_casts_logo),
             contentDescription = null,
             modifier = Modifier
                 .size(60.dp)
                 .offset {
-                    IntOffset(x = 0, y = animations.icon.offset.roundToPx())
+                    IntOffset(x = 0, y = animations.icon.offset.roundToInt())
                 }
                 .graphicsLayer {
                     alpha = animations.icon.alpha
@@ -81,12 +80,13 @@ internal fun EndingStory(
             fontScale = measurements.smallDeviceFactor,
             disableAutoScale = true,
             fontSize = 25.sp,
+            lineHeight = 30.sp,
             color = colorResource(UR.color.white),
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(horizontal = 24.dp)
                 .offset {
-                    IntOffset(x = 0, y = animations.title.offset.roundToPx())
+                    IntOffset(x = 0, y = animations.title.offset.roundToInt())
                 }
                 .graphicsLayer {
                     alpha = animations.title.alpha
@@ -104,7 +104,7 @@ internal fun EndingStory(
                 .fillMaxWidth()
                 .padding(horizontal = 24.dp)
                 .offset {
-                    IntOffset(x = 0, y = animations.subTitle.offset.roundToPx())
+                    IntOffset(x = 0, y = animations.subTitle.offset.roundToInt())
                 }
                 .graphicsLayer {
                     alpha = animations.subTitle.alpha
@@ -118,12 +118,13 @@ internal fun EndingStory(
             backgroundColor = colorResource(UR.color.white),
             textColor = colorResource(UR.color.black),
         )
+        Spacer(Modifier.height(16.dp))
     }
 }
 
 private class ItemAnimation(
     val alpha: Float,
-    val offset: Dp,
+    val offset: Float,
 )
 
 private class Animations(
@@ -144,9 +145,9 @@ private fun screenAnimations(): Animations {
 
     LaunchedEffect(Unit) {
         iconAnimationTrigger = true
-        delay(75)
+        delay(70)
         titleAnimationTrigger = true
-        delay(75)
+        delay(70)
         subTitleAnimationTrigger = true
     }
 
@@ -162,7 +163,7 @@ private fun animateItem(start: Boolean, label: String): ItemAnimation {
     val transition = updateTransition(start, label)
     val alpha by transition.animateFloat(
         transitionSpec = {
-            tween(durationMillis = 400, easing = FastOutLinearInEasing)
+            tween(durationMillis = 340, easing = LinearEasing, delayMillis = 250)
         },
     ) {
         if (it) {
@@ -171,15 +172,15 @@ private fun animateItem(start: Boolean, label: String): ItemAnimation {
             0f
         }
     }
-    val offset by transition.animateDp(
+    val offset by transition.animateFloat(
         transitionSpec = {
-            tween(durationMillis = 400, easing = FastOutSlowInEasing)
+            tween(durationMillis = 1200, easing = CubicBezierEasing(.4f, 0f, 0f, 1f))
         },
     ) {
         if (it) {
-            0.dp
+            0f
         } else {
-            24.dp
+            100f
         }
     }
 

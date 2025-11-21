@@ -1,6 +1,6 @@
 package au.com.shiftyjelly.pocketcasts.endofyear.ui
 
-import androidx.compose.animation.core.FastOutSlowInEasing
+import androidx.compose.animation.core.CubicBezierEasing
 import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.animateFloat
 import androidx.compose.animation.core.animateFloatAsState
@@ -8,6 +8,7 @@ import androidx.compose.animation.core.tween
 import androidx.compose.animation.core.updateTransition
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -16,6 +17,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.requiredSize
 import androidx.compose.foundation.layout.size
+import androidx.compose.material3.adaptive.currentWindowAdaptiveInfo
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -37,9 +39,11 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.min
 import androidx.compose.ui.unit.sp
 import au.com.shiftyjelly.pocketcasts.compose.Devices
+import au.com.shiftyjelly.pocketcasts.compose.adaptive.isAtMostMediumHeight
 import au.com.shiftyjelly.pocketcasts.compose.components.PodcastImage
 import au.com.shiftyjelly.pocketcasts.compose.components.TextH10
 import au.com.shiftyjelly.pocketcasts.compose.components.TextP40
+import au.com.shiftyjelly.pocketcasts.endofyear.R
 import au.com.shiftyjelly.pocketcasts.endofyear.StoryCaptureController
 import au.com.shiftyjelly.pocketcasts.models.to.Story
 import au.com.shiftyjelly.pocketcasts.models.to.TopPodcast
@@ -50,9 +54,10 @@ import com.airbnb.lottie.compose.rememberLottieComposition
 import dev.shreyaspatil.capturable.capturable
 import java.io.File
 import kotlin.time.Duration.Companion.days
-import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 import au.com.shiftyjelly.pocketcasts.ui.R as UR
+
+private const val MEDIUM_HEIGHT_FACTOR = .6f
 
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
@@ -62,37 +67,54 @@ internal fun TopShowStory(
     controller: StoryCaptureController,
     onShareStory: (File) -> Unit,
 ) {
-    BoxWithConstraints(
-        modifier = Modifier
-            .capturable(controller.captureController(story))
-            .fillMaxSize()
-            .background(story.backgroundColor)
-            .padding(top = measurements.closeButtonBottomEdge),
-    ) {
-        val animationContainerSize = min(maxWidth, maxHeight)
-        Header(
-            measurements = measurements,
+    Box {
+        BoxWithConstraints(
             modifier = Modifier
-                .fillMaxWidth()
-                .height((maxHeight - animationContainerSize.times(1.3f)) / 2)
-                .align(Alignment.TopCenter),
-        )
+                .capturable(controller.captureController(story))
+                .fillMaxSize()
+                .background(story.backgroundColor)
+                .padding(top = measurements.closeButtonBottomEdge + 16.dp, bottom = 64.dp),
+        ) {
+            val windowSize = currentWindowAdaptiveInfo().windowSizeClass
+            val sizeFactor = if (windowSize.isAtMostMediumHeight()) {
+                MEDIUM_HEIGHT_FACTOR
+            } else {
+                1f
+            }
+            val animationContainerSize = min(maxWidth, maxHeight) * sizeFactor
+            Header(
+                measurements = measurements,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height((maxHeight - animationContainerSize) / 2)
+                    .align(Alignment.TopCenter),
+            )
 
-        CenterContent(
-            story = story,
-            modifier = Modifier
-                .size(animationContainerSize)
-                .align(Alignment.Center),
-        )
+            CenterContent(
+                story = story,
+                modifier = Modifier
+                    .size(animationContainerSize)
+                    .align(Alignment.Center),
+            )
 
-        Footer(
+            Footer(
+                story = story,
+                textAlignment = if (windowSize.isAtMostMediumHeight()) {
+                    Alignment.TopCenter
+                } else {
+                    Alignment.Center
+                },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height((maxHeight - animationContainerSize) / 2)
+                    .align(Alignment.BottomCenter),
+            )
+        }
+        ShareStoryButton(
+            modifier = Modifier.padding(bottom = 18.dp).align(Alignment.BottomCenter),
             story = story,
             controller = controller,
-            onShareStory = onShareStory,
-            modifier = Modifier
-                .fillMaxWidth()
-                .height((maxHeight - animationContainerSize.times(1.3f)) / 2)
-                .align(Alignment.BottomCenter),
+            onShare = onShareStory,
         )
     }
 }
@@ -106,16 +128,20 @@ private fun CenterContent(
     contentAlignment = Alignment.Center,
 ) {
     val composition by rememberLottieComposition(
-        spec = LottieCompositionSpec.RawRes(IR.raw.playback_story_top_podcast_lottie),
+        spec = LottieCompositionSpec.RawRes(R.raw.playback_top_show_lottie),
     )
     val progress by animateLottieCompositionAsState(
         composition = composition,
         iterations = 1,
     )
     val isPlaying = progress > 0f
+    val animationSpec = tween<Float>(
+        durationMillis = 1000,
+        easing = CubicBezierEasing(.33f, 0f, 0f, 1f),
+    )
     val lottieScaleAnimation by animateFloatAsState(
         targetValue = if (isPlaying) 1.3f else 1.5f,
-        animationSpec = tween(durationMillis = 500, easing = FastOutSlowInEasing),
+        animationSpec = animationSpec,
     )
 
     LottieAnimation(
@@ -137,13 +163,13 @@ private fun CenterContent(
     val artworkTransition = updateTransition(artworkTrigger, "artwork transition")
     val scaleAnimation by artworkTransition.animateFloat(
         transitionSpec = {
-            tween(durationMillis = 250, easing = FastOutSlowInEasing)
+            animationSpec
         },
     ) {
         if (it) {
-            1f
+            .95f
         } else {
-            1.2f
+            1f
         }
     }
     val alphaAnimation by artworkTransition.animateFloat(
@@ -176,7 +202,7 @@ private fun Header(
     modifier: Modifier = Modifier,
 ) = Column(
     modifier = modifier,
-    verticalArrangement = Arrangement.spacedBy(8.dp, Alignment.CenterVertically),
+    verticalArrangement = Arrangement.spacedBy(8.dp),
 ) {
     TextH10(
         text = stringResource(
@@ -184,6 +210,7 @@ private fun Header(
             2025,
         ),
         fontSize = 25.sp,
+        lineHeight = 30.sp,
         fontScale = measurements.smallDeviceFactor,
         disableAutoScale = true,
         color = colorResource(UR.color.white),
@@ -206,13 +233,10 @@ private fun Header(
 @Composable
 private fun Footer(
     story: Story.TopShow,
-    controller: StoryCaptureController,
-    onShareStory: (File) -> Unit,
     modifier: Modifier = Modifier,
-) = Column(
+    textAlignment: Alignment = Alignment.Center,
+) = Box(
     modifier = modifier,
-    horizontalAlignment = Alignment.CenterHorizontally,
-    verticalArrangement = Arrangement.SpaceAround,
 ) {
     val formattedEpisodeCount = pluralStringResource(LR.plurals.episodes, story.show.playedEpisodeCount, story.show.playedEpisodeCount)
     val numberOfDays = story.show.playbackTime.inWholeDays
@@ -238,13 +262,9 @@ private fun Footer(
         color = colorResource(UR.color.white),
         modifier = Modifier
             .fillMaxWidth()
-            .padding(horizontal = 24.dp),
+            .padding(24.dp)
+            .align(textAlignment),
         textAlign = TextAlign.Center,
-    )
-    ShareStoryButton(
-        story = story,
-        controller = controller,
-        onShare = onShareStory,
     )
 }
 

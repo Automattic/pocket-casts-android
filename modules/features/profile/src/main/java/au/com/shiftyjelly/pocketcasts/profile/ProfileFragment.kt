@@ -112,6 +112,9 @@ class ProfileFragment :
             onDismissCreateFreeAccountBannerClick = {
                 profileViewModel.dismissFreeAccountBanner()
             },
+            onEndOfYearCardShow = {
+                profileViewModel.onEndOfYearCardShown()
+            },
             onPlaybackClick = {
                 profileViewModel.onPlaybackClick()
                 (activity as? FragmentHostListener)?.showStoriesOrAccount(StoriesSource.PROFILE.value)
