@@ -29,6 +29,7 @@ fun EndOfYearLaunchBottomSheet(
     parent: ViewGroup,
     onClick: () -> Unit,
     onExpand: () -> Unit,
+    onCollapse: () -> Unit,
     modifier: Modifier = Modifier,
     shouldShow: Boolean = true,
 ) {
@@ -42,6 +43,7 @@ fun EndOfYearLaunchBottomSheet(
         sheetState = sheetState,
         shouldShow = shouldShow,
         onExpand = onExpand,
+        onCollapse = onCollapse,
         content = BottomSheetContentState.Content(
             imageContent = {
                 ImageContent(
