@@ -24,7 +24,7 @@ class AnalyticsPaymentListenerTest {
     )
 
     @Test
-    fun `successfull purchase`() = runTest {
+    fun `successful purchase`() = runTest {
         val key = SubscriptionPlan.PlusYearlyPreview.key
 
         paymentClient.purchaseSubscriptionPlan(key, "purchase_source", mock<Activity>())
@@ -36,7 +36,8 @@ class AnalyticsPaymentListenerTest {
                 "tier" to "plus",
                 "frequency" to "yearly",
                 "offer_type" to "none",
-                "product" to "yearly",
+                "product_legacy" to "yearly",
+                "product" to "com.pocketcasts.plus.yearly",
                 "source" to "purchase_source",
             ),
         )
@@ -56,6 +57,7 @@ class AnalyticsPaymentListenerTest {
                 "tier" to "patron",
                 "frequency" to "monthly",
                 "offer_type" to "referral",
+                "product_legacy" to "com.pocketcasts.monthly.patron",
                 "product" to "com.pocketcasts.monthly.patron",
                 "source" to "purchase_source",
                 "error" to "user_cancelled",
@@ -77,7 +79,8 @@ class AnalyticsPaymentListenerTest {
                 "tier" to "plus",
                 "frequency" to "yearly",
                 "offer_type" to "none",
-                "product" to "yearly",
+                "product_legacy" to "yearly",
+                "product" to "com.pocketcasts.plus.yearly",
                 "source" to "purchase_source",
                 "error" to "unknown",
                 "error_code" to 404,
@@ -101,8 +104,8 @@ class AnalyticsPaymentListenerTest {
         val productProperties = tracker.events.map { it.properties["product"] }
         assertEquals(
             listOf(
-                "monthly",
-                "yearly",
+                "com.pocketcasts.plus.monthly",
+                "com.pocketcasts.plus.yearly",
                 "com.pocketcasts.monthly.patron",
                 "com.pocketcasts.yearly.patron",
             ),

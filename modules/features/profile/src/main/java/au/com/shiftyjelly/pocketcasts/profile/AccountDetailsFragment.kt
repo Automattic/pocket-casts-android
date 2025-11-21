@@ -161,7 +161,7 @@ class AccountDetailsFragment : BaseFragment() {
                     AnalyticsEvent.PLUS_PROMOTION_BANNER_BUTTON_TAPPED,
                     mapOf(
                         "source" to OnboardingUpgradeSource.PROFILE.analyticsValue,
-                        "flow" to OnboardingFlow.NewOnboardingAccountUpgrade,
+                        "flow" to OnboardingFlow.NewOnboardingAccountUpgrade.analyticsValue,
                     ),
                 )
                 val onboardingFlow = OnboardingFlow.NewOnboardingAccountUpgrade
