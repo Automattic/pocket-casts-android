@@ -309,7 +309,7 @@ class SearchViewModel @Inject constructor(
 
         fun searchShownOrDismissed(source: SourceView) = mapOf(SOURCE to source.analyticsValue)
 
-        fun podcastSubscribed(source: SourceView, uuid: String) = mapOf(SOURCE to "${source.analyticsValue}_search", UUID to uuid)
+        fun podcastSubscribed(source: SourceView, uuid: String) = mapOf(SOURCE to source.analyticsValue, UUID to uuid)
 
         fun searchListShown(source: SourceView, type: ResultsType) = mapOf(SOURCE to source.analyticsValue, DISPLAYING to type.value)
     }
