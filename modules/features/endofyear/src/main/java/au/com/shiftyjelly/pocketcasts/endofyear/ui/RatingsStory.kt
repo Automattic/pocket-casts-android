@@ -354,7 +354,7 @@ private fun AbsentRatings(
             textColor = colorResource(UR.color.black),
         )
         Spacer(
-            modifier = Modifier.height(18.dp),
+            modifier = Modifier.height(16.dp),
         )
     }
 }
