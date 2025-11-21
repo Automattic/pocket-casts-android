@@ -71,7 +71,6 @@ class EndOfYearViewModelTest {
         isAutoRenewing = true,
         giftDays = 0,
     )
-    private val patronSubscription = plusSubscription.copy(tier = SubscriptionTier.Patron)
     private val subscriptionFlow = MutableStateFlow<Subscription?>(plusSubscription)
 
     private val stats = EndOfYearStats(
@@ -140,9 +139,7 @@ class EndOfYearViewModelTest {
         endOfYearSync.isSynced.add(false)
 
         viewModel.syncData()
-        viewModel.uiState.test {
-            assertEquals(UiState.Failure, awaitItem())
-        }
+        assertTrue(viewModel.syncFailedSignal.isCompleted)
     }
 
     @Test

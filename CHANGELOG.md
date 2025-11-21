@@ -1,5 +1,8 @@
 8.1
 -----
+*   New Features
+    *   Add Playback 2025 so you can get a recap of your listening habits from this year
+        ([#4762](https://github.com/Automattic/pocket-casts-android/pull/4762))
 *   Updates
     *   Add periodic requests for the app rating
         ([#4725](https://github.com/Automattic/pocket-casts-android/pull/4725))

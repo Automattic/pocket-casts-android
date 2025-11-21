@@ -71,7 +71,6 @@ internal fun StoriesPage(
     onClickUpsell: () -> Unit,
     onRestartPlayback: () -> Unit,
     onClose: () -> Unit,
-    onFailedToLoad: () -> Unit,
 ) {
     val size = LocalContext.current.sizeLimit?.let(Modifier::size) ?: Modifier.fillMaxSize()
     BoxWithConstraints(
@@ -92,43 +91,24 @@ internal fun StoriesPage(
             )
         }
 
-        if (state is UiState.Failure) {
-            onFailedToLoad()
-        } else if (state is UiState.Syncing) {
-            Stories(
-                stories = state.stories,
-                measurements = measurements,
-                controller = controller,
-                pagerState = pagerState,
-                onChangeStory = onChangeStory,
-                onShareStory = onShareStory,
-                onHoldStory = onHoldStory,
-                onReleaseStory = onReleaseStory,
-                onLearnAboutRatings = onLearnAboutRatings,
-                onClickUpsell = onClickUpsell,
-                onRestartPlayback = onRestartPlayback,
-                blockGestures = true,
-            )
-        } else if (state is UiState.Synced) {
-            Stories(
-                stories = state.stories,
-                measurements = measurements,
-                controller = controller,
-                pagerState = pagerState,
-                onChangeStory = onChangeStory,
-                onShareStory = onShareStory,
-                onHoldStory = onHoldStory,
-                onReleaseStory = onReleaseStory,
-                onLearnAboutRatings = onLearnAboutRatings,
-                onClickUpsell = onClickUpsell,
-                onRestartPlayback = onRestartPlayback,
-            )
-        }
+        Stories(
+            stories = state.stories,
+            measurements = measurements,
+            controller = controller,
+            pagerState = pagerState,
+            onChangeStory = onChangeStory,
+            onShareStory = onShareStory,
+            onHoldStory = onHoldStory,
+            onReleaseStory = onReleaseStory,
+            onLearnAboutRatings = onLearnAboutRatings,
+            onClickUpsell = onClickUpsell,
+            onRestartPlayback = onRestartPlayback,
+        )
 
         TopControls(
             pagerState = pagerState,
             progress = state.storyProgress,
-            color = (state as? UiState.Synced)?.stories?.get(pagerState.currentPage)?.controlsColor ?: Color.White,
+            color = state.stories.getOrNull(pagerState.currentPage)?.controlsColor ?: Color.White,
             measurements = measurements,
             isTalkbackOn = (state as? UiState.Synced)?.isTalkBackOn ?: false,
             onClose = onClose,
@@ -152,28 +132,23 @@ private fun Stories(
     onLearnAboutRatings: () -> Unit,
     onClickUpsell: () -> Unit,
     onRestartPlayback: () -> Unit,
-    blockGestures: Boolean = false,
 ) {
     val widthPx = LocalDensity.current.run { measurements.width.toPx() }
 
     HorizontalPager(
         state = pagerState,
         userScrollEnabled = false,
-        modifier = if (blockGestures) {
-            Modifier
-        } else {
-            Modifier.pointerInput(Unit) {
-                awaitEachGesture {
-                    awaitFirstDown().consume()
-                    val timeMark = TimeSource.Monotonic.markNow()
-                    onHoldStory()
-                    val up = waitForUpOrCancellation()?.also { it.consume() }
-                    if (up != null && timeMark.elapsedNow() < 250.milliseconds) {
-                        val moveForward = up.position.x > widthPx / 2
-                        onChangeStory(moveForward)
-                    }
-                    onReleaseStory()
+        modifier = Modifier.pointerInput(Unit) {
+            awaitEachGesture {
+                awaitFirstDown().consume()
+                val timeMark = TimeSource.Monotonic.markNow()
+                onHoldStory()
+                val up = waitForUpOrCancellation()?.also { it.consume() }
+                if (up != null && timeMark.elapsedNow() < 250.milliseconds) {
+                    val moveForward = up.position.x > widthPx / 2
+                    onChangeStory(moveForward)
                 }
+                onReleaseStory()
             }
         },
     ) { index ->
