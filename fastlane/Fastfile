@@ -255,13 +255,26 @@ platform :android do
 
     # Parse the provided version into an AppVersion object
     parsed_version = VERSION_FORMATTER.parse(new_version)
+    # Validate that this is a hotfix version (must have a patch component > 0)
+    UI.user_error!("Invalid hotfix version '#{new_version}'. Must include a patch number.") unless parsed_version.patch.to_i.positive?
     previous_version = VERSION_FORMATTER.release_version(VERSION_CALCULATOR.previous_patch_version(version: parsed_version))
 
     release_branch_name = "release/#{new_version}"
+    previous_release_branch = "release/#{previous_version}"
+
+    # Determine the base for the hotfix branch: either a tag or a release branch
+    base_ref_for_hotfix = if git_tag_exists(tag: previous_version, remote: true)
+                            previous_version
+                          elsif Fastlane::Helper::GitHelper.branch_exists_on_remote?(branch_name: previous_release_branch)
+                            UI.message("ℹ️  Tag '#{previous_version}' not found on the remote. Using release branch '#{previous_release_branch}' as the base for hotfix instead.")
+                            previous_release_branch
+                          else
+                            UI.user_error!("Neither tag '#{previous_version}' nor branch '#{previous_release_branch}' exists on the remote! A hotfix branch cannot be created.")
+                          end
 
     # Check versions
     message = <<-MESSAGE
-      New hotfix branch from tag #{previous_version}: #{release_branch_name}
+      New hotfix branch from #{base_ref_for_hotfix}: #{release_branch_name}
 
       New hotfix version: #{new_version}
 
@@ -274,13 +287,17 @@ platform :android do
     UI.user_error!("Terminating as requested. Don't forget to run the remainder of this automation manually.") unless skip_confirm || UI.confirm('Do you want to continue?')
 
     # Check tags
-    UI.user_error!("The version `#{new_version}` tag already exists!") if git_tag_exists(tag: new_version)
-    UI.user_error!("Version #{previous_version} is not tagged! A hotfix branch cannot be created.") unless git_tag_exists(tag: previous_version)
+    UI.user_error!("Version '#{new_version}' already exists on the remote! Abort!") if git_tag_exists(tag: new_version, remote: true)
+
+    # Fetch the base ref to ensure it's available locally
+    sh('git', 'fetch', 'origin', base_ref_for_hotfix)
+
+    ensure_branch_does_not_exist!(release_branch_name)
 
     # Create the hotfix branch
-    UI.message('Creating hotfix branch...')
-    Fastlane::Helper::GitHelper.create_branch(release_branch_name, from: previous_version)
-    UI.success("Done! New hotfix branch is: #{git_branch}")
+    UI.message("Creating hotfix branch from '#{base_ref_for_hotfix}'...")
+    Fastlane::Helper::GitHelper.create_branch(release_branch_name, from: base_ref_for_hotfix)
+    UI.success("Done! New hotfix branch is: '#{git_branch}'")
 
     # Bump the hotfix version and build code and write it to the `version.properties` file
     UI.message('Bumping hotfix version and build code...')
@@ -290,7 +307,7 @@ platform :android do
     )
     commit_version_bump
     push_to_git_remote(set_upstream: true, tags: false)
-    UI.success("Done! New Release Version: #{release_version_current}. New Build Code: #{build_code_current}")
+    UI.success("Done! New Release Version: '#{release_version_current}'. New Build Code: '#{build_code_current}'")
   end
 
   # @param skip_confirm [Boolean] If true, avoids any interactive prompt
@@ -856,15 +873,16 @@ platform :android do
     VERSION_FORMATTER.beta_version(current_version)
   end
 
-  # Returns the beta version of the app in the format `1.2-rc-1`
+  # Returns the next beta version in the format `1.2-rc-2` (increments the build number)
   #
   def beta_version_next(version_name: nil)
+    # Use provided version or read the current version from version.properties
     version_name ||= version_name_current
-    # Read the current release version from `version.properties` and parse it into an AppVersion object
+    # Parse the version string (e.g., "1.2-rc-1") into an AppVersion object
     current_version = VERSION_FORMATTER.parse(version_name)
-    # Calculate the next beta version
+    # Increment the build number to get the next beta version
     beta_version_next = VERSION_CALCULATOR.next_build_number(version: current_version)
-    # Return the formatted release version
+    # Format as beta version (e.g., "1.2-rc-2")
     VERSION_FORMATTER.beta_version(beta_version_next)
   end
 
