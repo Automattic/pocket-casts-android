@@ -156,8 +156,11 @@ class AutomotiveSettingsPreferenceFragment : PreferenceFragmentCompat() {
                 val timeAmount = resources.getStringPluralSecondsMinutesHoursDaysOrYears(time)
                 getString(LR.string.profile_last_refresh, timeAmount)
             }
+
             is RefreshState.Never -> getString(LR.string.profile_refreshed_never)
+
             is RefreshState.Refreshing -> getString(LR.string.profile_refreshing)
+
             is RefreshState.Failed -> getString(LR.string.profile_refresh_failed)
         }
         preferenceRefreshNow.summary = status

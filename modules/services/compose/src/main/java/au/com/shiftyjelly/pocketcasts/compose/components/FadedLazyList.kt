@@ -170,6 +170,7 @@ private class FadedEdgeState(
                     is FadeSize.Relative -> viewportSize.height * fadeSize.value
                 },
             )
+
             Orientation.Horizontal -> viewportSize.copy(
                 width = when (val fadeSize = config.size) {
                     is FadeSize.Fixed -> density.run { fadeSize.value.toPx() }
@@ -298,6 +299,7 @@ private class FadedEdgeState(
             startY = start,
             endY = end,
         )
+
         Orientation.Horizontal -> Brush.horizontalGradient(
             colorStops = colorStops,
             startX = start,

@@ -122,6 +122,7 @@ fun ReferralsClaimGuestPassPage(
                     NavigationEvent.Close -> {
                         onDismiss()
                     }
+
                     NavigationEvent.Welcome -> openOnboardingFlow(
                         activity = requireNotNull(activity),
                         onboardingFlow = OnboardingFlow.Welcome,

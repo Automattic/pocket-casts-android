@@ -25,12 +25,17 @@ fun LoginWithGoogleScreen(
 
     when (state) {
         is LoginWithGoogleViewModel.State.Failed.GoogleLoginUnavailable -> onGoogleNotAvailable()
+
         is LoginWithGoogleViewModel.State.Failed.CredentialError -> onError(state.exception)
+
         is LoginWithGoogleViewModel.State.Failed.Other -> onError(null)
+
         is LoginWithGoogleViewModel.State.Failed.Cancelled -> onCancel()
+
         is LoginWithGoogleViewModel.State.SignedInWithGoogle -> {
             successContent(state)
         }
+
         is LoginWithGoogleViewModel.State.Idle -> Unit
     }
 }

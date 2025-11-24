@@ -205,8 +205,11 @@ internal class NotificationsPreferencesRepositoryImpl @Inject constructor(
 
         when {
             notificationCount == 0 -> TextResource.fromStringId(LR.string.settings_podcasts_selected_zero)
+
             notificationCount == 1 -> TextResource.fromStringId(LR.string.settings_podcasts_selected_one)
+
             notificationCount >= podcastCount -> TextResource.fromStringId(LR.string.settings_podcasts_selected_all)
+
             else -> TextResource.fromStringId(
                 LR.string.settings_podcasts_selected_x,
                 notificationCount,
@@ -228,6 +231,7 @@ internal class NotificationsPreferencesRepositoryImpl @Inject constructor(
         }
         return when (val ringtone = RingtoneManager.getRingtone(context, ringtonePath.toUri())) {
             null -> ""
+
             else -> {
                 val title = ringtone.getTitle(context)
                 if (title == NotificationSound.DEFAULT_SOUND) {

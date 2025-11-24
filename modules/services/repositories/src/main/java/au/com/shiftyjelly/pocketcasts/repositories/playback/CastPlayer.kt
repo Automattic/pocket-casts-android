@@ -339,20 +339,24 @@ class CastPlayer(val context: Context, override val onPlayerEvent: (Player, Play
             MediaStatus.PLAYER_STATE_IDLE -> if (idleReason == MediaStatus.IDLE_REASON_FINISHED) {
                 onPlayerEvent(this, PlayerEvent.Completion(episodeUuid))
             }
+
             MediaStatus.PLAYER_STATE_BUFFERING, MediaStatus.PLAYER_STATE_LOADING -> {
                 state = PlaybackStateCompat.STATE_BUFFERING
                 onPlayerEvent(this, PlayerEvent.BufferingStateChanged)
             }
+
             MediaStatus.PLAYER_STATE_PLAYING -> {
                 state = PlaybackStateCompat.STATE_PLAYING
                 setMetadataFromRemote()
                 onPlayerEvent(this, PlayerEvent.PlayerPlaying)
             }
+
             MediaStatus.PLAYER_STATE_PAUSED -> {
                 state = PlaybackStateCompat.STATE_PAUSED
                 setMetadataFromRemote()
                 onPlayerEvent(this, PlayerEvent.PlayerPaused)
             }
+
             else -> {
                 Timber.w("Unknown Cast event $status")
             }

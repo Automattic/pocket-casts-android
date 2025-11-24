@@ -79,7 +79,9 @@ data class SmartRules(
         override fun toSqlWhereClause(clock: Clock) = buildString {
             val statuses = when (this@DownloadStatusRule) {
                 Any -> return@buildString
+
                 Downloaded -> listOf(EpisodeStatusEnum.DOWNLOADED)
+
                 NotDownloaded -> listOf(
                     EpisodeStatusEnum.DOWNLOADING,
                     EpisodeStatusEnum.QUEUED,

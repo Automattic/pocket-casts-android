@@ -57,7 +57,9 @@ internal fun AutoDownloadSettingsPage(
     }
     val toolbarTitle = when (route) {
         AutoDownloadSettingsRoute.Home -> stringResource(LR.string.auto_download)
+
         AutoDownloadSettingsRoute.Podcasts -> stringResource(LR.string.settings_auto_download_podcasts)
+
         AutoDownloadSettingsRoute.Playlists -> if (FeatureFlag.isEnabled(Feature.PLAYLISTS_REBRANDING, immutable = true)) {
             stringResource(LR.string.settings_auto_download_playlists)
         } else {

@@ -76,6 +76,7 @@ internal fun rememberBackgroundAssetControler(
                     isDither = true
                     shader = LinearGradient(0f, 0f, 0f, BITMAP_HEIGHT.toFloat(), shareColors.cardBottom.toArgb(), shareColors.cardTop.toArgb(), Shader.TileMode.CLAMP)
                 }
+
                 Horizontal, Square -> Paint().apply {
                     isDither = true
                     color = shareColors.background.toArgb()

@@ -44,6 +44,7 @@ internal class CardCoordinates(
                 offset = { type ->
                     when (type) {
                         CardType.Vertical -> IntOffset(0, 0)
+
                         CardType.Horizontal, CardType.Square, CardType.Audio -> {
                             val viewPortHeight = scrollState.viewportSize
                             val isMeasured = viewPortHeight != 0

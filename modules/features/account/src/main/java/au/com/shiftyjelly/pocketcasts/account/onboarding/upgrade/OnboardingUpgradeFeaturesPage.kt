@@ -132,7 +132,9 @@ internal fun OnboardingUpgradeFeaturesPage(
     SetStatusBarBackground(scrollState, onUpdateSystemBars)
 
     when (state) {
-        is OnboardingUpgradeFeaturesState.Loading -> Unit // Do Nothing
+        is OnboardingUpgradeFeaturesState.Loading -> Unit
+
+        // Do Nothing
         is OnboardingUpgradeFeaturesState.Loaded -> {
             if (FeatureFlag.isEnabled(Feature.NEW_ONBOARDING_UPGRADE)) {
                 OnboardingUpgradeScreen(

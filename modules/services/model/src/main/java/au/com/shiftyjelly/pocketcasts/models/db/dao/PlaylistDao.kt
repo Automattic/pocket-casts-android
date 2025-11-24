@@ -694,8 +694,11 @@ abstract class PlaylistDao {
         // Drag & drop is not supported for smart playlists.
         // Fall back to newest to oldest instead.
         NewestToOldest, DragAndDrop -> "episode.published_date DESC, episode.added_date DESC"
+
         OldestToNewest -> "episode.published_date ASC, episode.added_date ASC"
+
         ShortestToLongest -> "episode.duration ASC, episode.added_date DESC"
+
         LongestToShortest -> "episode.duration DESC, episode.added_date DESC"
     }
 

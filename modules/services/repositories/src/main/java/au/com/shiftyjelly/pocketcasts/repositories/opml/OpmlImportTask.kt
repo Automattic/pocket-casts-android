@@ -106,7 +106,9 @@ class OpmlImportTask @AssistedInject constructor(
             val uri = inputData.getString(INPUT_URI)?.toUri()
             val source = when {
                 url != null -> createUrlOpmlSource(url)
+
                 uri != null -> createUriOpmlSource(uri)
+
                 else -> {
                     trackFailure(reason = "no_input_found")
                     null

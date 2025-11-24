@@ -2926,22 +2926,31 @@ object ThemeColor {
         return when (theme) {
             Theme.ThemeType.LIGHT ->
                 primaryUi01Light
+
             Theme.ThemeType.DARK ->
                 primaryUi01Dark
+
             Theme.ThemeType.EXTRA_DARK ->
                 primaryUi01ExtraDark
+
             Theme.ThemeType.ELECTRIC ->
                 primaryUi01Electric
+
             Theme.ThemeType.CLASSIC_LIGHT ->
                 primaryUi01ClassicLight
+
             Theme.ThemeType.INDIGO ->
                 primaryUi01Indigo
+
             Theme.ThemeType.RADIOACTIVE ->
                 primaryUi01Radioactive
+
             Theme.ThemeType.ROSE ->
                 primaryUi01Rose
+
             Theme.ThemeType.LIGHT_CONTRAST ->
                 primaryUi01LightContrast
+
             Theme.ThemeType.DARK_CONTRAST ->
                 primaryUi01DarkContrast
         }
@@ -2951,22 +2960,31 @@ object ThemeColor {
         return when (theme) {
             Theme.ThemeType.LIGHT ->
                 primaryUi01ActiveLight
+
             Theme.ThemeType.DARK ->
                 primaryUi01ActiveDark
+
             Theme.ThemeType.EXTRA_DARK ->
                 primaryUi01ActiveExtraDark
+
             Theme.ThemeType.ELECTRIC ->
                 primaryUi01ActiveElectric
+
             Theme.ThemeType.CLASSIC_LIGHT ->
                 primaryUi01ActiveClassicLight
+
             Theme.ThemeType.INDIGO ->
                 primaryUi01ActiveIndigo
+
             Theme.ThemeType.RADIOACTIVE ->
                 primaryUi01ActiveRadioactive
+
             Theme.ThemeType.ROSE ->
                 primaryUi01ActiveRose
+
             Theme.ThemeType.LIGHT_CONTRAST ->
                 primaryUi01ActiveLightContrast
+
             Theme.ThemeType.DARK_CONTRAST ->
                 primaryUi01ActiveDarkContrast
         }
@@ -2976,22 +2994,31 @@ object ThemeColor {
         return when (theme) {
             Theme.ThemeType.LIGHT ->
                 primaryUi02Light
+
             Theme.ThemeType.DARK ->
                 primaryUi02Dark
+
             Theme.ThemeType.EXTRA_DARK ->
                 primaryUi02ExtraDark
+
             Theme.ThemeType.ELECTRIC ->
                 primaryUi02Electric
+
             Theme.ThemeType.CLASSIC_LIGHT ->
                 primaryUi02ClassicLight
+
             Theme.ThemeType.INDIGO ->
                 primaryUi02Indigo
+
             Theme.ThemeType.RADIOACTIVE ->
                 primaryUi02Radioactive
+
             Theme.ThemeType.ROSE ->
                 primaryUi02Rose
+
             Theme.ThemeType.LIGHT_CONTRAST ->
                 primaryUi02LightContrast
+
             Theme.ThemeType.DARK_CONTRAST ->
                 primaryUi02DarkContrast
         }
@@ -3001,22 +3028,31 @@ object ThemeColor {
         return when (theme) {
             Theme.ThemeType.LIGHT ->
                 primaryUi02SelectedLight
+
             Theme.ThemeType.DARK ->
                 primaryUi02SelectedDark
+
             Theme.ThemeType.EXTRA_DARK ->
                 primaryUi02SelectedExtraDark
+
             Theme.ThemeType.ELECTRIC ->
                 primaryUi02SelectedElectric
+
             Theme.ThemeType.CLASSIC_LIGHT ->
                 primaryUi02SelectedClassicLight
+
             Theme.ThemeType.INDIGO ->
                 primaryUi02SelectedIndigo
+
             Theme.ThemeType.RADIOACTIVE ->
                 primaryUi02SelectedRadioactive
+
             Theme.ThemeType.ROSE ->
                 primaryUi02SelectedRose
+
             Theme.ThemeType.LIGHT_CONTRAST ->
                 primaryUi02SelectedLightContrast
+
             Theme.ThemeType.DARK_CONTRAST ->
                 primaryUi02SelectedDarkContrast
         }
@@ -3026,22 +3062,31 @@ object ThemeColor {
         return when (theme) {
             Theme.ThemeType.LIGHT ->
                 primaryUi02ActiveLight
+
             Theme.ThemeType.DARK ->
                 primaryUi02ActiveDark
+
             Theme.ThemeType.EXTRA_DARK ->
                 primaryUi02ActiveExtraDark
+
             Theme.ThemeType.ELECTRIC ->
                 primaryUi02ActiveElectric
+
             Theme.ThemeType.CLASSIC_LIGHT ->
                 primaryUi02ActiveClassicLight
+
             Theme.ThemeType.INDIGO ->
                 primaryUi02ActiveIndigo
+
             Theme.ThemeType.RADIOACTIVE ->
                 primaryUi02ActiveRadioactive
+
             Theme.ThemeType.ROSE ->
                 primaryUi02ActiveRose
+
             Theme.ThemeType.LIGHT_CONTRAST ->
                 primaryUi02ActiveLightContrast
+
             Theme.ThemeType.DARK_CONTRAST ->
                 primaryUi02ActiveDarkContrast
         }
@@ -3051,22 +3096,31 @@ object ThemeColor {
         return when (theme) {
             Theme.ThemeType.LIGHT ->
                 primaryUi03Light
+
             Theme.ThemeType.DARK ->
                 primaryUi03Dark
+
             Theme.ThemeType.EXTRA_DARK ->
                 primaryUi03ExtraDark
+
             Theme.ThemeType.ELECTRIC ->
                 primaryUi03Electric
+
             Theme.ThemeType.CLASSIC_LIGHT ->
                 primaryUi03ClassicLight
+
             Theme.ThemeType.INDIGO ->
                 primaryUi03Indigo
+
             Theme.ThemeType.RADIOACTIVE ->
                 primaryUi03Radioactive
+
             Theme.ThemeType.ROSE ->
                 primaryUi03Rose
+
             Theme.ThemeType.LIGHT_CONTRAST ->
                 primaryUi03LightContrast
+
             Theme.ThemeType.DARK_CONTRAST ->
                 primaryUi03DarkContrast
         }
@@ -3076,22 +3130,31 @@ object ThemeColor {
         return when (theme) {
             Theme.ThemeType.LIGHT ->
                 primaryUi04Light
+
             Theme.ThemeType.DARK ->
                 primaryUi04Dark
+
             Theme.ThemeType.EXTRA_DARK ->
                 primaryUi04ExtraDark
+
             Theme.ThemeType.ELECTRIC ->
                 primaryUi04Electric
+
             Theme.ThemeType.CLASSIC_LIGHT ->
                 primaryUi04ClassicLight
+
             Theme.ThemeType.INDIGO ->
                 primaryUi04Indigo
+
             Theme.ThemeType.RADIOACTIVE ->
                 primaryUi04Radioactive
+
             Theme.ThemeType.ROSE ->
                 primaryUi04Rose
+
             Theme.ThemeType.LIGHT_CONTRAST ->
                 primaryUi04LightContrast
+
             Theme.ThemeType.DARK_CONTRAST ->
                 primaryUi04DarkContrast
         }
@@ -3101,22 +3164,31 @@ object ThemeColor {
         return when (theme) {
             Theme.ThemeType.LIGHT ->
                 primaryUi05Light
+
             Theme.ThemeType.DARK ->
                 primaryUi05Dark
+
             Theme.ThemeType.EXTRA_DARK ->
                 primaryUi05ExtraDark
+
             Theme.ThemeType.ELECTRIC ->
                 primaryUi05Electric
+
             Theme.ThemeType.CLASSIC_LIGHT ->
                 primaryUi05ClassicLight
+
             Theme.ThemeType.INDIGO ->
                 primaryUi05Indigo
+
             Theme.ThemeType.RADIOACTIVE ->
                 primaryUi05Radioactive
+
             Theme.ThemeType.ROSE ->
                 primaryUi05Rose
+
             Theme.ThemeType.LIGHT_CONTRAST ->
                 primaryUi05LightContrast
+
             Theme.ThemeType.DARK_CONTRAST ->
                 primaryUi05DarkContrast
         }
@@ -3126,22 +3198,31 @@ object ThemeColor {
         return when (theme) {
             Theme.ThemeType.LIGHT ->
                 primaryUi05SelectedLight
+
             Theme.ThemeType.DARK ->
                 primaryUi05SelectedDark
+
             Theme.ThemeType.EXTRA_DARK ->
                 primaryUi05SelectedExtraDark
+
             Theme.ThemeType.ELECTRIC ->
                 primaryUi05SelectedElectric
+
             Theme.ThemeType.CLASSIC_LIGHT ->
                 primaryUi05SelectedClassicLight
+
             Theme.ThemeType.INDIGO ->
                 primaryUi05SelectedIndigo
+
             Theme.ThemeType.RADIOACTIVE ->
                 primaryUi05SelectedRadioactive
+
             Theme.ThemeType.ROSE ->
                 primaryUi05SelectedRose
+
             Theme.ThemeType.LIGHT_CONTRAST ->
                 primaryUi05SelectedLightContrast
+
             Theme.ThemeType.DARK_CONTRAST ->
                 primaryUi05SelectedDarkContrast
         }
@@ -3151,22 +3232,31 @@ object ThemeColor {
         return when (theme) {
             Theme.ThemeType.LIGHT ->
                 primaryUi06Light
+
             Theme.ThemeType.DARK ->
                 primaryUi06Dark
+
             Theme.ThemeType.EXTRA_DARK ->
                 primaryUi06ExtraDark
+
             Theme.ThemeType.ELECTRIC ->
                 primaryUi06Electric
+
             Theme.ThemeType.CLASSIC_LIGHT ->
                 primaryUi06ClassicLight
+
             Theme.ThemeType.INDIGO ->
                 primaryUi06Indigo
+
             Theme.ThemeType.RADIOACTIVE ->
                 primaryUi06Radioactive
+
             Theme.ThemeType.ROSE ->
                 primaryUi06Rose
+
             Theme.ThemeType.LIGHT_CONTRAST ->
                 primaryUi06LightContrast
+
             Theme.ThemeType.DARK_CONTRAST ->
                 primaryUi06DarkContrast
         }
@@ -3176,22 +3266,31 @@ object ThemeColor {
         return when (theme) {
             Theme.ThemeType.LIGHT ->
                 primaryIcon01Light
+
             Theme.ThemeType.DARK ->
                 primaryIcon01Dark
+
             Theme.ThemeType.EXTRA_DARK ->
                 primaryIcon01ExtraDark
+
             Theme.ThemeType.ELECTRIC ->
                 primaryIcon01Electric
+
             Theme.ThemeType.CLASSIC_LIGHT ->
                 primaryIcon01ClassicLight
+
             Theme.ThemeType.INDIGO ->
                 primaryIcon01Indigo
+
             Theme.ThemeType.RADIOACTIVE ->
                 primaryIcon01Radioactive
+
             Theme.ThemeType.ROSE ->
                 primaryIcon01Rose
+
             Theme.ThemeType.LIGHT_CONTRAST ->
                 primaryIcon01LightContrast
+
             Theme.ThemeType.DARK_CONTRAST ->
                 primaryIcon01DarkContrast
         }
@@ -3201,22 +3300,31 @@ object ThemeColor {
         return when (theme) {
             Theme.ThemeType.LIGHT ->
                 primaryIcon01ActiveLight
+
             Theme.ThemeType.DARK ->
                 primaryIcon01ActiveDark
+
             Theme.ThemeType.EXTRA_DARK ->
                 primaryIcon01ActiveExtraDark
+
             Theme.ThemeType.ELECTRIC ->
                 primaryIcon01ActiveElectric
+
             Theme.ThemeType.CLASSIC_LIGHT ->
                 primaryIcon01ActiveClassicLight
+
             Theme.ThemeType.INDIGO ->
                 primaryIcon01ActiveIndigo
+
             Theme.ThemeType.RADIOACTIVE ->
                 primaryIcon01ActiveRadioactive
+
             Theme.ThemeType.ROSE ->
                 primaryIcon01ActiveRose
+
             Theme.ThemeType.LIGHT_CONTRAST ->
                 primaryIcon01ActiveLightContrast
+
             Theme.ThemeType.DARK_CONTRAST ->
                 primaryIcon01ActiveDarkContrast
         }
@@ -3226,22 +3334,31 @@ object ThemeColor {
         return when (theme) {
             Theme.ThemeType.LIGHT ->
                 primaryIcon02Light
+
             Theme.ThemeType.DARK ->
                 primaryIcon02Dark
+
             Theme.ThemeType.EXTRA_DARK ->
                 primaryIcon02ExtraDark
+
             Theme.ThemeType.ELECTRIC ->
                 primaryIcon02Electric
+
             Theme.ThemeType.CLASSIC_LIGHT ->
                 primaryIcon02ClassicLight
+
             Theme.ThemeType.INDIGO ->
                 primaryIcon02Indigo
+
             Theme.ThemeType.RADIOACTIVE ->
                 primaryIcon02Radioactive
+
             Theme.ThemeType.ROSE ->
                 primaryIcon02Rose
+
             Theme.ThemeType.LIGHT_CONTRAST ->
                 primaryIcon02LightContrast
+
             Theme.ThemeType.DARK_CONTRAST ->
                 primaryIcon02DarkContrast
         }
@@ -3251,22 +3368,31 @@ object ThemeColor {
         return when (theme) {
             Theme.ThemeType.LIGHT ->
                 primaryIcon02SelectedLight
+
             Theme.ThemeType.DARK ->
                 primaryIcon02SelectedDark
+
             Theme.ThemeType.EXTRA_DARK ->
                 primaryIcon02SelectedExtraDark
+
             Theme.ThemeType.ELECTRIC ->
                 primaryIcon02SelectedElectric
+
             Theme.ThemeType.CLASSIC_LIGHT ->
                 primaryIcon02SelectedClassicLight
+
             Theme.ThemeType.INDIGO ->
                 primaryIcon02SelectedIndigo
+
             Theme.ThemeType.RADIOACTIVE ->
                 primaryIcon02SelectedRadioactive
+
             Theme.ThemeType.ROSE ->
                 primaryIcon02SelectedRose
+
             Theme.ThemeType.LIGHT_CONTRAST ->
                 primaryIcon02SelectedLightContrast
+
             Theme.ThemeType.DARK_CONTRAST ->
                 primaryIcon02SelectedDarkContrast
         }
@@ -3276,22 +3402,31 @@ object ThemeColor {
         return when (theme) {
             Theme.ThemeType.LIGHT ->
                 primaryIcon02ActiveLight
+
             Theme.ThemeType.DARK ->
                 primaryIcon02ActiveDark
+
             Theme.ThemeType.EXTRA_DARK ->
                 primaryIcon02ActiveExtraDark
+
             Theme.ThemeType.ELECTRIC ->
                 primaryIcon02ActiveElectric
+
             Theme.ThemeType.CLASSIC_LIGHT ->
                 primaryIcon02ActiveClassicLight
+
             Theme.ThemeType.INDIGO ->
                 primaryIcon02ActiveIndigo
+
             Theme.ThemeType.RADIOACTIVE ->
                 primaryIcon02ActiveRadioactive
+
             Theme.ThemeType.ROSE ->
                 primaryIcon02ActiveRose
+
             Theme.ThemeType.LIGHT_CONTRAST ->
                 primaryIcon02ActiveLightContrast
+
             Theme.ThemeType.DARK_CONTRAST ->
                 primaryIcon02ActiveDarkContrast
         }
@@ -3301,22 +3436,31 @@ object ThemeColor {
         return when (theme) {
             Theme.ThemeType.LIGHT ->
                 primaryIcon03Light
+
             Theme.ThemeType.DARK ->
                 primaryIcon03Dark
+
             Theme.ThemeType.EXTRA_DARK ->
                 primaryIcon03ExtraDark
+
             Theme.ThemeType.ELECTRIC ->
                 primaryIcon03Electric
+
             Theme.ThemeType.CLASSIC_LIGHT ->
                 primaryIcon03ClassicLight
+
             Theme.ThemeType.INDIGO ->
                 primaryIcon03Indigo
+
             Theme.ThemeType.RADIOACTIVE ->
                 primaryIcon03Radioactive
+
             Theme.ThemeType.ROSE ->
                 primaryIcon03Rose
+
             Theme.ThemeType.LIGHT_CONTRAST ->
                 primaryIcon03LightContrast
+
             Theme.ThemeType.DARK_CONTRAST ->
                 primaryIcon03DarkContrast
         }
@@ -3326,22 +3470,31 @@ object ThemeColor {
         return when (theme) {
             Theme.ThemeType.LIGHT ->
                 primaryIcon03ActiveLight
+
             Theme.ThemeType.DARK ->
                 primaryIcon03ActiveDark
+
             Theme.ThemeType.EXTRA_DARK ->
                 primaryIcon03ActiveExtraDark
+
             Theme.ThemeType.ELECTRIC ->
                 primaryIcon03ActiveElectric
+
             Theme.ThemeType.CLASSIC_LIGHT ->
                 primaryIcon03ActiveClassicLight
+
             Theme.ThemeType.INDIGO ->
                 primaryIcon03ActiveIndigo
+
             Theme.ThemeType.RADIOACTIVE ->
                 primaryIcon03ActiveRadioactive
+
             Theme.ThemeType.ROSE ->
                 primaryIcon03ActiveRose
+
             Theme.ThemeType.LIGHT_CONTRAST ->
                 primaryIcon03ActiveLightContrast
+
             Theme.ThemeType.DARK_CONTRAST ->
                 primaryIcon03ActiveDarkContrast
         }
@@ -3351,22 +3504,31 @@ object ThemeColor {
         return when (theme) {
             Theme.ThemeType.LIGHT ->
                 primaryText01Light
+
             Theme.ThemeType.DARK ->
                 primaryText01Dark
+
             Theme.ThemeType.EXTRA_DARK ->
                 primaryText01ExtraDark
+
             Theme.ThemeType.ELECTRIC ->
                 primaryText01Electric
+
             Theme.ThemeType.CLASSIC_LIGHT ->
                 primaryText01ClassicLight
+
             Theme.ThemeType.INDIGO ->
                 primaryText01Indigo
+
             Theme.ThemeType.RADIOACTIVE ->
                 primaryText01Radioactive
+
             Theme.ThemeType.ROSE ->
                 primaryText01Rose
+
             Theme.ThemeType.LIGHT_CONTRAST ->
                 primaryText01LightContrast
+
             Theme.ThemeType.DARK_CONTRAST ->
                 primaryText01DarkContrast
         }
@@ -3376,22 +3538,31 @@ object ThemeColor {
         return when (theme) {
             Theme.ThemeType.LIGHT ->
                 primaryText02Light
+
             Theme.ThemeType.DARK ->
                 primaryText02Dark
+
             Theme.ThemeType.EXTRA_DARK ->
                 primaryText02ExtraDark
+
             Theme.ThemeType.ELECTRIC ->
                 primaryText02Electric
+
             Theme.ThemeType.CLASSIC_LIGHT ->
                 primaryText02ClassicLight
+
             Theme.ThemeType.INDIGO ->
                 primaryText02Indigo
+
             Theme.ThemeType.RADIOACTIVE ->
                 primaryText02Radioactive
+
             Theme.ThemeType.ROSE ->
                 primaryText02Rose
+
             Theme.ThemeType.LIGHT_CONTRAST ->
                 primaryText02LightContrast
+
             Theme.ThemeType.DARK_CONTRAST ->
                 primaryText02DarkContrast
         }
@@ -3401,22 +3572,31 @@ object ThemeColor {
         return when (theme) {
             Theme.ThemeType.LIGHT ->
                 primaryText02SelectedLight
+
             Theme.ThemeType.DARK ->
                 primaryText02SelectedDark
+
             Theme.ThemeType.EXTRA_DARK ->
                 primaryText02SelectedExtraDark
+
             Theme.ThemeType.ELECTRIC ->
                 primaryText02SelectedElectric
+
             Theme.ThemeType.CLASSIC_LIGHT ->
                 primaryText02SelectedClassicLight
+
             Theme.ThemeType.INDIGO ->
                 primaryText02SelectedIndigo
+
             Theme.ThemeType.RADIOACTIVE ->
                 primaryText02SelectedRadioactive
+
             Theme.ThemeType.ROSE ->
                 primaryText02SelectedRose
+
             Theme.ThemeType.LIGHT_CONTRAST ->
                 primaryText02SelectedLightContrast
+
             Theme.ThemeType.DARK_CONTRAST ->
                 primaryText02SelectedDarkContrast
         }
@@ -3426,22 +3606,31 @@ object ThemeColor {
         return when (theme) {
             Theme.ThemeType.LIGHT ->
                 primaryField01Light
+
             Theme.ThemeType.DARK ->
                 primaryField01Dark
+
             Theme.ThemeType.EXTRA_DARK ->
                 primaryField01ExtraDark
+
             Theme.ThemeType.ELECTRIC ->
                 primaryField01Electric
+
             Theme.ThemeType.CLASSIC_LIGHT ->
                 primaryField01ClassicLight
+
             Theme.ThemeType.INDIGO ->
                 primaryField01Indigo
+
             Theme.ThemeType.RADIOACTIVE ->
                 primaryField01Radioactive
+
             Theme.ThemeType.ROSE ->
                 primaryField01Rose
+
             Theme.ThemeType.LIGHT_CONTRAST ->
                 primaryField01LightContrast
+
             Theme.ThemeType.DARK_CONTRAST ->
                 primaryField01DarkContrast
         }
@@ -3451,22 +3640,31 @@ object ThemeColor {
         return when (theme) {
             Theme.ThemeType.LIGHT ->
                 primaryField01ActiveLight
+
             Theme.ThemeType.DARK ->
                 primaryField01ActiveDark
+
             Theme.ThemeType.EXTRA_DARK ->
                 primaryField01ActiveExtraDark
+
             Theme.ThemeType.ELECTRIC ->
                 primaryField01ActiveElectric
+
             Theme.ThemeType.CLASSIC_LIGHT ->
                 primaryField01ActiveClassicLight
+
             Theme.ThemeType.INDIGO ->
                 primaryField01ActiveIndigo
+
             Theme.ThemeType.RADIOACTIVE ->
                 primaryField01ActiveRadioactive
+
             Theme.ThemeType.ROSE ->
                 primaryField01ActiveRose
+
             Theme.ThemeType.LIGHT_CONTRAST ->
                 primaryField01ActiveLightContrast
+
             Theme.ThemeType.DARK_CONTRAST ->
                 primaryField01ActiveDarkContrast
         }
@@ -3476,22 +3674,31 @@ object ThemeColor {
         return when (theme) {
             Theme.ThemeType.LIGHT ->
                 primaryField02Light
+
             Theme.ThemeType.DARK ->
                 primaryField02Dark
+
             Theme.ThemeType.EXTRA_DARK ->
                 primaryField02ExtraDark
+
             Theme.ThemeType.ELECTRIC ->
                 primaryField02Electric
+
             Theme.ThemeType.CLASSIC_LIGHT ->
                 primaryField02ClassicLight
+
             Theme.ThemeType.INDIGO ->
                 primaryField02Indigo
+
             Theme.ThemeType.RADIOACTIVE ->
                 primaryField02Radioactive
+
             Theme.ThemeType.ROSE ->
                 primaryField02Rose
+
             Theme.ThemeType.LIGHT_CONTRAST ->
                 primaryField02LightContrast
+
             Theme.ThemeType.DARK_CONTRAST ->
                 primaryField02DarkContrast
         }
@@ -3501,22 +3708,31 @@ object ThemeColor {
         return when (theme) {
             Theme.ThemeType.LIGHT ->
                 primaryField02ActiveLight
+
             Theme.ThemeType.DARK ->
                 primaryField02ActiveDark
+
             Theme.ThemeType.EXTRA_DARK ->
                 primaryField02ActiveExtraDark
+
             Theme.ThemeType.ELECTRIC ->
                 primaryField02ActiveElectric
+
             Theme.ThemeType.CLASSIC_LIGHT ->
                 primaryField02ActiveClassicLight
+
             Theme.ThemeType.INDIGO ->
                 primaryField02ActiveIndigo
+
             Theme.ThemeType.RADIOACTIVE ->
                 primaryField02ActiveRadioactive
+
             Theme.ThemeType.ROSE ->
                 primaryField02ActiveRose
+
             Theme.ThemeType.LIGHT_CONTRAST ->
                 primaryField02ActiveLightContrast
+
             Theme.ThemeType.DARK_CONTRAST ->
                 primaryField02ActiveDarkContrast
         }
@@ -3526,22 +3742,31 @@ object ThemeColor {
         return when (theme) {
             Theme.ThemeType.LIGHT ->
                 primaryField03Light
+
             Theme.ThemeType.DARK ->
                 primaryField03Dark
+
             Theme.ThemeType.EXTRA_DARK ->
                 primaryField03ExtraDark
+
             Theme.ThemeType.ELECTRIC ->
                 primaryField03Electric
+
             Theme.ThemeType.CLASSIC_LIGHT ->
                 primaryField03ClassicLight
+
             Theme.ThemeType.INDIGO ->
                 primaryField03Indigo
+
             Theme.ThemeType.RADIOACTIVE ->
                 primaryField03Radioactive
+
             Theme.ThemeType.ROSE ->
                 primaryField03Rose
+
             Theme.ThemeType.LIGHT_CONTRAST ->
                 primaryField03LightContrast
+
             Theme.ThemeType.DARK_CONTRAST ->
                 primaryField03DarkContrast
         }
@@ -3551,22 +3776,31 @@ object ThemeColor {
         return when (theme) {
             Theme.ThemeType.LIGHT ->
                 primaryField03ActiveLight
+
             Theme.ThemeType.DARK ->
                 primaryField03ActiveDark
+
             Theme.ThemeType.EXTRA_DARK ->
                 primaryField03ActiveExtraDark
+
             Theme.ThemeType.ELECTRIC ->
                 primaryField03ActiveElectric
+
             Theme.ThemeType.CLASSIC_LIGHT ->
                 primaryField03ActiveClassicLight
+
             Theme.ThemeType.INDIGO ->
                 primaryField03ActiveIndigo
+
             Theme.ThemeType.RADIOACTIVE ->
                 primaryField03ActiveRadioactive
+
             Theme.ThemeType.ROSE ->
                 primaryField03ActiveRose
+
             Theme.ThemeType.LIGHT_CONTRAST ->
                 primaryField03ActiveLightContrast
+
             Theme.ThemeType.DARK_CONTRAST ->
                 primaryField03ActiveDarkContrast
         }
@@ -3576,22 +3810,31 @@ object ThemeColor {
         return when (theme) {
             Theme.ThemeType.LIGHT ->
                 primaryInteractive01Light
+
             Theme.ThemeType.DARK ->
                 primaryInteractive01Dark
+
             Theme.ThemeType.EXTRA_DARK ->
                 primaryInteractive01ExtraDark
+
             Theme.ThemeType.ELECTRIC ->
                 primaryInteractive01Electric
+
             Theme.ThemeType.CLASSIC_LIGHT ->
                 primaryInteractive01ClassicLight
+
             Theme.ThemeType.INDIGO ->
                 primaryInteractive01Indigo
+
             Theme.ThemeType.RADIOACTIVE ->
                 primaryInteractive01Radioactive
+
             Theme.ThemeType.ROSE ->
                 primaryInteractive01Rose
+
             Theme.ThemeType.LIGHT_CONTRAST ->
                 primaryInteractive01LightContrast
+
             Theme.ThemeType.DARK_CONTRAST ->
                 primaryInteractive01DarkContrast
         }
@@ -3601,22 +3844,31 @@ object ThemeColor {
         return when (theme) {
             Theme.ThemeType.LIGHT ->
                 primaryInteractive01HoverLight
+
             Theme.ThemeType.DARK ->
                 primaryInteractive01HoverDark
+
             Theme.ThemeType.EXTRA_DARK ->
                 primaryInteractive01HoverExtraDark
+
             Theme.ThemeType.ELECTRIC ->
                 primaryInteractive01HoverElectric
+
             Theme.ThemeType.CLASSIC_LIGHT ->
                 primaryInteractive01HoverClassicLight
+
             Theme.ThemeType.INDIGO ->
                 primaryInteractive01HoverIndigo
+
             Theme.ThemeType.RADIOACTIVE ->
                 primaryInteractive01HoverRadioactive
+
             Theme.ThemeType.ROSE ->
                 primaryInteractive01HoverRose
+
             Theme.ThemeType.LIGHT_CONTRAST ->
                 primaryInteractive01HoverLightContrast
+
             Theme.ThemeType.DARK_CONTRAST ->
                 primaryInteractive01HoverDarkContrast
         }
@@ -3626,22 +3878,31 @@ object ThemeColor {
         return when (theme) {
             Theme.ThemeType.LIGHT ->
                 primaryInteractive01ActiveLight
+
             Theme.ThemeType.DARK ->
                 primaryInteractive01ActiveDark
+
             Theme.ThemeType.EXTRA_DARK ->
                 primaryInteractive01ActiveExtraDark
+
             Theme.ThemeType.ELECTRIC ->
                 primaryInteractive01ActiveElectric
+
             Theme.ThemeType.CLASSIC_LIGHT ->
                 primaryInteractive01ActiveClassicLight
+
             Theme.ThemeType.INDIGO ->
                 primaryInteractive01ActiveIndigo
+
             Theme.ThemeType.RADIOACTIVE ->
                 primaryInteractive01ActiveRadioactive
+
             Theme.ThemeType.ROSE ->
                 primaryInteractive01ActiveRose
+
             Theme.ThemeType.LIGHT_CONTRAST ->
                 primaryInteractive01ActiveLightContrast
+
             Theme.ThemeType.DARK_CONTRAST ->
                 primaryInteractive01ActiveDarkContrast
         }
@@ -3651,22 +3912,31 @@ object ThemeColor {
         return when (theme) {
             Theme.ThemeType.LIGHT ->
                 primaryInteractive01DisabledLight
+
             Theme.ThemeType.DARK ->
                 primaryInteractive01DisabledDark
+
             Theme.ThemeType.EXTRA_DARK ->
                 primaryInteractive01DisabledExtraDark
+
             Theme.ThemeType.ELECTRIC ->
                 primaryInteractive01DisabledElectric
+
             Theme.ThemeType.CLASSIC_LIGHT ->
                 primaryInteractive01DisabledClassicLight
+
             Theme.ThemeType.INDIGO ->
                 primaryInteractive01DisabledIndigo
+
             Theme.ThemeType.RADIOACTIVE ->
                 primaryInteractive01DisabledRadioactive
+
             Theme.ThemeType.ROSE ->
                 primaryInteractive01DisabledRose
+
             Theme.ThemeType.LIGHT_CONTRAST ->
                 primaryInteractive01DisabledLightContrast
+
             Theme.ThemeType.DARK_CONTRAST ->
                 primaryInteractive01DisabledDarkContrast
         }
@@ -3676,22 +3946,31 @@ object ThemeColor {
         return when (theme) {
             Theme.ThemeType.LIGHT ->
                 primaryInteractive02Light
+
             Theme.ThemeType.DARK ->
                 primaryInteractive02Dark
+
             Theme.ThemeType.EXTRA_DARK ->
                 primaryInteractive02ExtraDark
+
             Theme.ThemeType.ELECTRIC ->
                 primaryInteractive02Electric
+
             Theme.ThemeType.CLASSIC_LIGHT ->
                 primaryInteractive02ClassicLight
+
             Theme.ThemeType.INDIGO ->
                 primaryInteractive02Indigo
+
             Theme.ThemeType.RADIOACTIVE ->
                 primaryInteractive02Radioactive
+
             Theme.ThemeType.ROSE ->
                 primaryInteractive02Rose
+
             Theme.ThemeType.LIGHT_CONTRAST ->
                 primaryInteractive02LightContrast
+
             Theme.ThemeType.DARK_CONTRAST ->
                 primaryInteractive02DarkContrast
         }
@@ -3701,22 +3980,31 @@ object ThemeColor {
         return when (theme) {
             Theme.ThemeType.LIGHT ->
                 primaryInteractive02HoverLight
+
             Theme.ThemeType.DARK ->
                 primaryInteractive02HoverDark
+
             Theme.ThemeType.EXTRA_DARK ->
                 primaryInteractive02HoverExtraDark
+
             Theme.ThemeType.ELECTRIC ->
                 primaryInteractive02HoverElectric
+
             Theme.ThemeType.CLASSIC_LIGHT ->
                 primaryInteractive02HoverClassicLight
+
             Theme.ThemeType.INDIGO ->
                 primaryInteractive02HoverIndigo
+
             Theme.ThemeType.RADIOACTIVE ->
                 primaryInteractive02HoverRadioactive
+
             Theme.ThemeType.ROSE ->
                 primaryInteractive02HoverRose
+
             Theme.ThemeType.LIGHT_CONTRAST ->
                 primaryInteractive02HoverLightContrast
+
             Theme.ThemeType.DARK_CONTRAST ->
                 primaryInteractive02HoverDarkContrast
         }
@@ -3726,22 +4014,31 @@ object ThemeColor {
         return when (theme) {
             Theme.ThemeType.LIGHT ->
                 primaryInteractive02ActiveLight
+
             Theme.ThemeType.DARK ->
                 primaryInteractive02ActiveDark
+
             Theme.ThemeType.EXTRA_DARK ->
                 primaryInteractive02ActiveExtraDark
+
             Theme.ThemeType.ELECTRIC ->
                 primaryInteractive02ActiveElectric
+
             Theme.ThemeType.CLASSIC_LIGHT ->
                 primaryInteractive02ActiveClassicLight
+
             Theme.ThemeType.INDIGO ->
                 primaryInteractive02ActiveIndigo
+
             Theme.ThemeType.RADIOACTIVE ->
                 primaryInteractive02ActiveRadioactive
+
             Theme.ThemeType.ROSE ->
                 primaryInteractive02ActiveRose
+
             Theme.ThemeType.LIGHT_CONTRAST ->
                 primaryInteractive02ActiveLightContrast
+
             Theme.ThemeType.DARK_CONTRAST ->
                 primaryInteractive02ActiveDarkContrast
         }
@@ -3751,22 +4048,31 @@ object ThemeColor {
         return when (theme) {
             Theme.ThemeType.LIGHT ->
                 primaryInteractive03Light
+
             Theme.ThemeType.DARK ->
                 primaryInteractive03Dark
+
             Theme.ThemeType.EXTRA_DARK ->
                 primaryInteractive03ExtraDark
+
             Theme.ThemeType.ELECTRIC ->
                 primaryInteractive03Electric
+
             Theme.ThemeType.CLASSIC_LIGHT ->
                 primaryInteractive03ClassicLight
+
             Theme.ThemeType.INDIGO ->
                 primaryInteractive03Indigo
+
             Theme.ThemeType.RADIOACTIVE ->
                 primaryInteractive03Radioactive
+
             Theme.ThemeType.ROSE ->
                 primaryInteractive03Rose
+
             Theme.ThemeType.LIGHT_CONTRAST ->
                 primaryInteractive03LightContrast
+
             Theme.ThemeType.DARK_CONTRAST ->
                 primaryInteractive03DarkContrast
         }
@@ -3776,22 +4082,31 @@ object ThemeColor {
         return when (theme) {
             Theme.ThemeType.LIGHT ->
                 secondaryUi01Light
+
             Theme.ThemeType.DARK ->
                 secondaryUi01Dark
+
             Theme.ThemeType.EXTRA_DARK ->
                 secondaryUi01ExtraDark
+
             Theme.ThemeType.ELECTRIC ->
                 secondaryUi01Electric
+
             Theme.ThemeType.CLASSIC_LIGHT ->
                 secondaryUi01ClassicLight
+
             Theme.ThemeType.INDIGO ->
                 secondaryUi01Indigo
+
             Theme.ThemeType.RADIOACTIVE ->
                 secondaryUi01Radioactive
+
             Theme.ThemeType.ROSE ->
                 secondaryUi01Rose
+
             Theme.ThemeType.LIGHT_CONTRAST ->
                 secondaryUi01LightContrast
+
             Theme.ThemeType.DARK_CONTRAST ->
                 secondaryUi01DarkContrast
         }
@@ -3801,22 +4116,31 @@ object ThemeColor {
         return when (theme) {
             Theme.ThemeType.LIGHT ->
                 secondaryUi02Light
+
             Theme.ThemeType.DARK ->
                 secondaryUi02Dark
+
             Theme.ThemeType.EXTRA_DARK ->
                 secondaryUi02ExtraDark
+
             Theme.ThemeType.ELECTRIC ->
                 secondaryUi02Electric
+
             Theme.ThemeType.CLASSIC_LIGHT ->
                 secondaryUi02ClassicLight
+
             Theme.ThemeType.INDIGO ->
                 secondaryUi02Indigo
+
             Theme.ThemeType.RADIOACTIVE ->
                 secondaryUi02Radioactive
+
             Theme.ThemeType.ROSE ->
                 secondaryUi02Rose
+
             Theme.ThemeType.LIGHT_CONTRAST ->
                 secondaryUi02LightContrast
+
             Theme.ThemeType.DARK_CONTRAST ->
                 secondaryUi02DarkContrast
         }
@@ -3826,22 +4150,31 @@ object ThemeColor {
         return when (theme) {
             Theme.ThemeType.LIGHT ->
                 secondaryIcon01Light
+
             Theme.ThemeType.DARK ->
                 secondaryIcon01Dark
+
             Theme.ThemeType.EXTRA_DARK ->
                 secondaryIcon01ExtraDark
+
             Theme.ThemeType.ELECTRIC ->
                 secondaryIcon01Electric
+
             Theme.ThemeType.CLASSIC_LIGHT ->
                 secondaryIcon01ClassicLight
+
             Theme.ThemeType.INDIGO ->
                 secondaryIcon01Indigo
+
             Theme.ThemeType.RADIOACTIVE ->
                 secondaryIcon01Radioactive
+
             Theme.ThemeType.ROSE ->
                 secondaryIcon01Rose
+
             Theme.ThemeType.LIGHT_CONTRAST ->
                 secondaryIcon01LightContrast
+
             Theme.ThemeType.DARK_CONTRAST ->
                 secondaryIcon01DarkContrast
         }
@@ -3851,22 +4184,31 @@ object ThemeColor {
         return when (theme) {
             Theme.ThemeType.LIGHT ->
                 secondaryIcon02Light
+
             Theme.ThemeType.DARK ->
                 secondaryIcon02Dark
+
             Theme.ThemeType.EXTRA_DARK ->
                 secondaryIcon02ExtraDark
+
             Theme.ThemeType.ELECTRIC ->
                 secondaryIcon02Electric
+
             Theme.ThemeType.CLASSIC_LIGHT ->
                 secondaryIcon02ClassicLight
+
             Theme.ThemeType.INDIGO ->
                 secondaryIcon02Indigo
+
             Theme.ThemeType.RADIOACTIVE ->
                 secondaryIcon02Radioactive
+
             Theme.ThemeType.ROSE ->
                 secondaryIcon02Rose
+
             Theme.ThemeType.LIGHT_CONTRAST ->
                 secondaryIcon02LightContrast
+
             Theme.ThemeType.DARK_CONTRAST ->
                 secondaryIcon02DarkContrast
         }
@@ -3876,22 +4218,31 @@ object ThemeColor {
         return when (theme) {
             Theme.ThemeType.LIGHT ->
                 secondaryText01Light
+
             Theme.ThemeType.DARK ->
                 secondaryText01Dark
+
             Theme.ThemeType.EXTRA_DARK ->
                 secondaryText01ExtraDark
+
             Theme.ThemeType.ELECTRIC ->
                 secondaryText01Electric
+
             Theme.ThemeType.CLASSIC_LIGHT ->
                 secondaryText01ClassicLight
+
             Theme.ThemeType.INDIGO ->
                 secondaryText01Indigo
+
             Theme.ThemeType.RADIOACTIVE ->
                 secondaryText01Radioactive
+
             Theme.ThemeType.ROSE ->
                 secondaryText01Rose
+
             Theme.ThemeType.LIGHT_CONTRAST ->
                 secondaryText01LightContrast
+
             Theme.ThemeType.DARK_CONTRAST ->
                 secondaryText01DarkContrast
         }
@@ -3901,22 +4252,31 @@ object ThemeColor {
         return when (theme) {
             Theme.ThemeType.LIGHT ->
                 secondaryText02Light
+
             Theme.ThemeType.DARK ->
                 secondaryText02Dark
+
             Theme.ThemeType.EXTRA_DARK ->
                 secondaryText02ExtraDark
+
             Theme.ThemeType.ELECTRIC ->
                 secondaryText02Electric
+
             Theme.ThemeType.CLASSIC_LIGHT ->
                 secondaryText02ClassicLight
+
             Theme.ThemeType.INDIGO ->
                 secondaryText02Indigo
+
             Theme.ThemeType.RADIOACTIVE ->
                 secondaryText02Radioactive
+
             Theme.ThemeType.ROSE ->
                 secondaryText02Rose
+
             Theme.ThemeType.LIGHT_CONTRAST ->
                 secondaryText02LightContrast
+
             Theme.ThemeType.DARK_CONTRAST ->
                 secondaryText02DarkContrast
         }
@@ -3926,22 +4286,31 @@ object ThemeColor {
         return when (theme) {
             Theme.ThemeType.LIGHT ->
                 secondaryField01Light
+
             Theme.ThemeType.DARK ->
                 secondaryField01Dark
+
             Theme.ThemeType.EXTRA_DARK ->
                 secondaryField01ExtraDark
+
             Theme.ThemeType.ELECTRIC ->
                 secondaryField01Electric
+
             Theme.ThemeType.CLASSIC_LIGHT ->
                 secondaryField01ClassicLight
+
             Theme.ThemeType.INDIGO ->
                 secondaryField01Indigo
+
             Theme.ThemeType.RADIOACTIVE ->
                 secondaryField01Radioactive
+
             Theme.ThemeType.ROSE ->
                 secondaryField01Rose
+
             Theme.ThemeType.LIGHT_CONTRAST ->
                 secondaryField01LightContrast
+
             Theme.ThemeType.DARK_CONTRAST ->
                 secondaryField01DarkContrast
         }
@@ -3951,22 +4320,31 @@ object ThemeColor {
         return when (theme) {
             Theme.ThemeType.LIGHT ->
                 secondaryField01ActiveLight
+
             Theme.ThemeType.DARK ->
                 secondaryField01ActiveDark
+
             Theme.ThemeType.EXTRA_DARK ->
                 secondaryField01ActiveExtraDark
+
             Theme.ThemeType.ELECTRIC ->
                 secondaryField01ActiveElectric
+
             Theme.ThemeType.CLASSIC_LIGHT ->
                 secondaryField01ActiveClassicLight
+
             Theme.ThemeType.INDIGO ->
                 secondaryField01ActiveIndigo
+
             Theme.ThemeType.RADIOACTIVE ->
                 secondaryField01ActiveRadioactive
+
             Theme.ThemeType.ROSE ->
                 secondaryField01ActiveRose
+
             Theme.ThemeType.LIGHT_CONTRAST ->
                 secondaryField01ActiveLightContrast
+
             Theme.ThemeType.DARK_CONTRAST ->
                 secondaryField01ActiveDarkContrast
         }
@@ -3976,22 +4354,31 @@ object ThemeColor {
         return when (theme) {
             Theme.ThemeType.LIGHT ->
                 secondaryInteractive01Light
+
             Theme.ThemeType.DARK ->
                 secondaryInteractive01Dark
+
             Theme.ThemeType.EXTRA_DARK ->
                 secondaryInteractive01ExtraDark
+
             Theme.ThemeType.ELECTRIC ->
                 secondaryInteractive01Electric
+
             Theme.ThemeType.CLASSIC_LIGHT ->
                 secondaryInteractive01ClassicLight
+
             Theme.ThemeType.INDIGO ->
                 secondaryInteractive01Indigo
+
             Theme.ThemeType.RADIOACTIVE ->
                 secondaryInteractive01Radioactive
+
             Theme.ThemeType.ROSE ->
                 secondaryInteractive01Rose
+
             Theme.ThemeType.LIGHT_CONTRAST ->
                 secondaryInteractive01LightContrast
+
             Theme.ThemeType.DARK_CONTRAST ->
                 secondaryInteractive01DarkContrast
         }
@@ -4001,22 +4388,31 @@ object ThemeColor {
         return when (theme) {
             Theme.ThemeType.LIGHT ->
                 secondaryInteractive01HoverLight
+
             Theme.ThemeType.DARK ->
                 secondaryInteractive01HoverDark
+
             Theme.ThemeType.EXTRA_DARK ->
                 secondaryInteractive01HoverExtraDark
+
             Theme.ThemeType.ELECTRIC ->
                 secondaryInteractive01HoverElectric
+
             Theme.ThemeType.CLASSIC_LIGHT ->
                 secondaryInteractive01HoverClassicLight
+
             Theme.ThemeType.INDIGO ->
                 secondaryInteractive01HoverIndigo
+
             Theme.ThemeType.RADIOACTIVE ->
                 secondaryInteractive01HoverRadioactive
+
             Theme.ThemeType.ROSE ->
                 secondaryInteractive01HoverRose
+
             Theme.ThemeType.LIGHT_CONTRAST ->
                 secondaryInteractive01HoverLightContrast
+
             Theme.ThemeType.DARK_CONTRAST ->
                 secondaryInteractive01HoverDarkContrast
         }
@@ -4026,22 +4422,31 @@ object ThemeColor {
         return when (theme) {
             Theme.ThemeType.LIGHT ->
                 secondaryInteractive01ActiveLight
+
             Theme.ThemeType.DARK ->
                 secondaryInteractive01ActiveDark
+
             Theme.ThemeType.EXTRA_DARK ->
                 secondaryInteractive01ActiveExtraDark
+
             Theme.ThemeType.ELECTRIC ->
                 secondaryInteractive01ActiveElectric
+
             Theme.ThemeType.CLASSIC_LIGHT ->
                 secondaryInteractive01ActiveClassicLight
+
             Theme.ThemeType.INDIGO ->
                 secondaryInteractive01ActiveIndigo
+
             Theme.ThemeType.RADIOACTIVE ->
                 secondaryInteractive01ActiveRadioactive
+
             Theme.ThemeType.ROSE ->
                 secondaryInteractive01ActiveRose
+
             Theme.ThemeType.LIGHT_CONTRAST ->
                 secondaryInteractive01ActiveLightContrast
+
             Theme.ThemeType.DARK_CONTRAST ->
                 secondaryInteractive01ActiveDarkContrast
         }
@@ -4051,22 +4456,31 @@ object ThemeColor {
         return when (activeTheme) {
             Theme.ThemeType.LIGHT ->
                 podcastUi01Light(podcastColor)
+
             Theme.ThemeType.DARK ->
                 podcastUi01Dark(podcastColor)
+
             Theme.ThemeType.EXTRA_DARK ->
                 podcastUi01ExtraDark(podcastColor)
+
             Theme.ThemeType.ELECTRIC ->
                 podcastUi01Electric(podcastColor)
+
             Theme.ThemeType.CLASSIC_LIGHT ->
                 podcastUi01ClassicLight(podcastColor)
+
             Theme.ThemeType.INDIGO ->
                 podcastUi01Indigo(podcastColor)
+
             Theme.ThemeType.RADIOACTIVE ->
                 podcastUi01Radioactive(podcastColor)
+
             Theme.ThemeType.ROSE ->
                 podcastUi01Rose(podcastColor)
+
             Theme.ThemeType.LIGHT_CONTRAST ->
                 podcastUi01LightContrast(podcastColor)
+
             Theme.ThemeType.DARK_CONTRAST ->
                 podcastUi01DarkContrast(podcastColor)
         }
@@ -4076,22 +4490,31 @@ object ThemeColor {
         return when (activeTheme) {
             Theme.ThemeType.LIGHT ->
                 podcastUi02Light(podcastColor)
+
             Theme.ThemeType.DARK ->
                 podcastUi02Dark(podcastColor)
+
             Theme.ThemeType.EXTRA_DARK ->
                 podcastUi02ExtraDark(podcastColor)
+
             Theme.ThemeType.ELECTRIC ->
                 podcastUi02Electric(podcastColor)
+
             Theme.ThemeType.CLASSIC_LIGHT ->
                 podcastUi02ClassicLight(podcastColor)
+
             Theme.ThemeType.INDIGO ->
                 podcastUi02Indigo(podcastColor)
+
             Theme.ThemeType.RADIOACTIVE ->
                 podcastUi02Radioactive(podcastColor)
+
             Theme.ThemeType.ROSE ->
                 podcastUi02Rose(podcastColor)
+
             Theme.ThemeType.LIGHT_CONTRAST ->
                 podcastUi02LightContrast(podcastColor)
+
             Theme.ThemeType.DARK_CONTRAST ->
                 podcastUi02DarkContrast(podcastColor)
         }
@@ -4101,22 +4524,31 @@ object ThemeColor {
         return when (activeTheme) {
             Theme.ThemeType.LIGHT ->
                 podcastUi03Light(podcastColor)
+
             Theme.ThemeType.DARK ->
                 podcastUi03Dark(podcastColor)
+
             Theme.ThemeType.EXTRA_DARK ->
                 podcastUi03ExtraDark(podcastColor)
+
             Theme.ThemeType.ELECTRIC ->
                 podcastUi03Electric(podcastColor)
+
             Theme.ThemeType.CLASSIC_LIGHT ->
                 podcastUi03ClassicLight(podcastColor)
+
             Theme.ThemeType.INDIGO ->
                 podcastUi03Indigo(podcastColor)
+
             Theme.ThemeType.RADIOACTIVE ->
                 podcastUi03Radioactive(podcastColor)
+
             Theme.ThemeType.ROSE ->
                 podcastUi03Rose(podcastColor)
+
             Theme.ThemeType.LIGHT_CONTRAST ->
                 podcastUi03LightContrast(podcastColor)
+
             Theme.ThemeType.DARK_CONTRAST ->
                 podcastUi03DarkContrast(podcastColor)
         }
@@ -4126,22 +4558,31 @@ object ThemeColor {
         return when (activeTheme) {
             Theme.ThemeType.LIGHT ->
                 podcastUi04Light(podcastColor)
+
             Theme.ThemeType.DARK ->
                 podcastUi04Dark(podcastColor)
+
             Theme.ThemeType.EXTRA_DARK ->
                 podcastUi04ExtraDark(podcastColor)
+
             Theme.ThemeType.ELECTRIC ->
                 podcastUi04Electric(podcastColor)
+
             Theme.ThemeType.CLASSIC_LIGHT ->
                 podcastUi04ClassicLight(podcastColor)
+
             Theme.ThemeType.INDIGO ->
                 podcastUi04Indigo(podcastColor)
+
             Theme.ThemeType.RADIOACTIVE ->
                 podcastUi04Radioactive(podcastColor)
+
             Theme.ThemeType.ROSE ->
                 podcastUi04Rose(podcastColor)
+
             Theme.ThemeType.LIGHT_CONTRAST ->
                 podcastUi04LightContrast(podcastColor)
+
             Theme.ThemeType.DARK_CONTRAST ->
                 podcastUi04DarkContrast(podcastColor)
         }
@@ -4151,22 +4592,31 @@ object ThemeColor {
         return when (activeTheme) {
             Theme.ThemeType.LIGHT ->
                 podcastUi05Light(podcastColor)
+
             Theme.ThemeType.DARK ->
                 podcastUi05Dark(podcastColor)
+
             Theme.ThemeType.EXTRA_DARK ->
                 podcastUi05ExtraDark(podcastColor)
+
             Theme.ThemeType.ELECTRIC ->
                 podcastUi05Electric(podcastColor)
+
             Theme.ThemeType.CLASSIC_LIGHT ->
                 podcastUi05ClassicLight(podcastColor)
+
             Theme.ThemeType.INDIGO ->
                 podcastUi05Indigo(podcastColor)
+
             Theme.ThemeType.RADIOACTIVE ->
                 podcastUi05Radioactive(podcastColor)
+
             Theme.ThemeType.ROSE ->
                 podcastUi05Rose(podcastColor)
+
             Theme.ThemeType.LIGHT_CONTRAST ->
                 podcastUi05LightContrast(podcastColor)
+
             Theme.ThemeType.DARK_CONTRAST ->
                 podcastUi05DarkContrast(podcastColor)
         }
@@ -4176,22 +4626,31 @@ object ThemeColor {
         return when (activeTheme) {
             Theme.ThemeType.LIGHT ->
                 podcastUi06Light(podcastColor)
+
             Theme.ThemeType.DARK ->
                 podcastUi06Dark(podcastColor)
+
             Theme.ThemeType.EXTRA_DARK ->
                 podcastUi06ExtraDark(podcastColor)
+
             Theme.ThemeType.ELECTRIC ->
                 podcastUi06Electric(podcastColor)
+
             Theme.ThemeType.CLASSIC_LIGHT ->
                 podcastUi06ClassicLight(podcastColor)
+
             Theme.ThemeType.INDIGO ->
                 podcastUi06Indigo(podcastColor)
+
             Theme.ThemeType.RADIOACTIVE ->
                 podcastUi06Radioactive(podcastColor)
+
             Theme.ThemeType.ROSE ->
                 podcastUi06Rose(podcastColor)
+
             Theme.ThemeType.LIGHT_CONTRAST ->
                 podcastUi06LightContrast(podcastColor)
+
             Theme.ThemeType.DARK_CONTRAST ->
                 podcastUi06DarkContrast(podcastColor)
         }
@@ -4201,22 +4660,31 @@ object ThemeColor {
         return when (activeTheme) {
             Theme.ThemeType.LIGHT ->
                 podcastIcon01Light(podcastColor)
+
             Theme.ThemeType.DARK ->
                 podcastIcon01Dark(podcastColor)
+
             Theme.ThemeType.EXTRA_DARK ->
                 podcastIcon01ExtraDark(podcastColor)
+
             Theme.ThemeType.ELECTRIC ->
                 podcastIcon01Electric(podcastColor)
+
             Theme.ThemeType.CLASSIC_LIGHT ->
                 podcastIcon01ClassicLight(podcastColor)
+
             Theme.ThemeType.INDIGO ->
                 podcastIcon01Indigo(podcastColor)
+
             Theme.ThemeType.RADIOACTIVE ->
                 podcastIcon01Radioactive(podcastColor)
+
             Theme.ThemeType.ROSE ->
                 podcastIcon01Rose(podcastColor)
+
             Theme.ThemeType.LIGHT_CONTRAST ->
                 podcastIcon01LightContrast(podcastColor)
+
             Theme.ThemeType.DARK_CONTRAST ->
                 podcastIcon01DarkContrast(podcastColor)
         }
@@ -4226,22 +4694,31 @@ object ThemeColor {
         return when (activeTheme) {
             Theme.ThemeType.LIGHT ->
                 podcastIcon02Light(podcastColor)
+
             Theme.ThemeType.DARK ->
                 podcastIcon02Dark(podcastColor)
+
             Theme.ThemeType.EXTRA_DARK ->
                 podcastIcon02ExtraDark(podcastColor)
+
             Theme.ThemeType.ELECTRIC ->
                 podcastIcon02Electric(podcastColor)
+
             Theme.ThemeType.CLASSIC_LIGHT ->
                 podcastIcon02ClassicLight(podcastColor)
+
             Theme.ThemeType.INDIGO ->
                 podcastIcon02Indigo(podcastColor)
+
             Theme.ThemeType.RADIOACTIVE ->
                 podcastIcon02Radioactive(podcastColor)
+
             Theme.ThemeType.ROSE ->
                 podcastIcon02Rose(podcastColor)
+
             Theme.ThemeType.LIGHT_CONTRAST ->
                 podcastIcon02LightContrast(podcastColor)
+
             Theme.ThemeType.DARK_CONTRAST ->
                 podcastIcon02DarkContrast(podcastColor)
         }
@@ -4251,22 +4728,31 @@ object ThemeColor {
         return when (activeTheme) {
             Theme.ThemeType.LIGHT ->
                 podcastIcon03Light(podcastColor)
+
             Theme.ThemeType.DARK ->
                 podcastIcon03Dark(podcastColor)
+
             Theme.ThemeType.EXTRA_DARK ->
                 podcastIcon03ExtraDark(podcastColor)
+
             Theme.ThemeType.ELECTRIC ->
                 podcastIcon03Electric(podcastColor)
+
             Theme.ThemeType.CLASSIC_LIGHT ->
                 podcastIcon03ClassicLight(podcastColor)
+
             Theme.ThemeType.INDIGO ->
                 podcastIcon03Indigo(podcastColor)
+
             Theme.ThemeType.RADIOACTIVE ->
                 podcastIcon03Radioactive(podcastColor)
+
             Theme.ThemeType.ROSE ->
                 podcastIcon03Rose(podcastColor)
+
             Theme.ThemeType.LIGHT_CONTRAST ->
                 podcastIcon03LightContrast(podcastColor)
+
             Theme.ThemeType.DARK_CONTRAST ->
                 podcastIcon03DarkContrast(podcastColor)
         }
@@ -4276,22 +4762,31 @@ object ThemeColor {
         return when (activeTheme) {
             Theme.ThemeType.LIGHT ->
                 podcastText01Light(podcastColor)
+
             Theme.ThemeType.DARK ->
                 podcastText01Dark(podcastColor)
+
             Theme.ThemeType.EXTRA_DARK ->
                 podcastText01ExtraDark(podcastColor)
+
             Theme.ThemeType.ELECTRIC ->
                 podcastText01Electric(podcastColor)
+
             Theme.ThemeType.CLASSIC_LIGHT ->
                 podcastText01ClassicLight(podcastColor)
+
             Theme.ThemeType.INDIGO ->
                 podcastText01Indigo(podcastColor)
+
             Theme.ThemeType.RADIOACTIVE ->
                 podcastText01Radioactive(podcastColor)
+
             Theme.ThemeType.ROSE ->
                 podcastText01Rose(podcastColor)
+
             Theme.ThemeType.LIGHT_CONTRAST ->
                 podcastText01LightContrast(podcastColor)
+
             Theme.ThemeType.DARK_CONTRAST ->
                 podcastText01DarkContrast(podcastColor)
         }
@@ -4301,22 +4796,31 @@ object ThemeColor {
         return when (activeTheme) {
             Theme.ThemeType.LIGHT ->
                 podcastText02Light(podcastColor)
+
             Theme.ThemeType.DARK ->
                 podcastText02Dark(podcastColor)
+
             Theme.ThemeType.EXTRA_DARK ->
                 podcastText02ExtraDark(podcastColor)
+
             Theme.ThemeType.ELECTRIC ->
                 podcastText02Electric(podcastColor)
+
             Theme.ThemeType.CLASSIC_LIGHT ->
                 podcastText02ClassicLight(podcastColor)
+
             Theme.ThemeType.INDIGO ->
                 podcastText02Indigo(podcastColor)
+
             Theme.ThemeType.RADIOACTIVE ->
                 podcastText02Radioactive(podcastColor)
+
             Theme.ThemeType.ROSE ->
                 podcastText02Rose(podcastColor)
+
             Theme.ThemeType.LIGHT_CONTRAST ->
                 podcastText02LightContrast(podcastColor)
+
             Theme.ThemeType.DARK_CONTRAST ->
                 podcastText02DarkContrast(podcastColor)
         }
@@ -4326,22 +4830,31 @@ object ThemeColor {
         return when (activeTheme) {
             Theme.ThemeType.LIGHT ->
                 podcastInteractive01Light(podcastColor)
+
             Theme.ThemeType.DARK ->
                 podcastInteractive01Dark(podcastColor)
+
             Theme.ThemeType.EXTRA_DARK ->
                 podcastInteractive01ExtraDark(podcastColor)
+
             Theme.ThemeType.ELECTRIC ->
                 podcastInteractive01Electric(podcastColor)
+
             Theme.ThemeType.CLASSIC_LIGHT ->
                 podcastInteractive01ClassicLight(podcastColor)
+
             Theme.ThemeType.INDIGO ->
                 podcastInteractive01Indigo(podcastColor)
+
             Theme.ThemeType.RADIOACTIVE ->
                 podcastInteractive01Radioactive(podcastColor)
+
             Theme.ThemeType.ROSE ->
                 podcastInteractive01Rose(podcastColor)
+
             Theme.ThemeType.LIGHT_CONTRAST ->
                 podcastInteractive01LightContrast(podcastColor)
+
             Theme.ThemeType.DARK_CONTRAST ->
                 podcastInteractive01DarkContrast(podcastColor)
         }
@@ -4351,22 +4864,31 @@ object ThemeColor {
         return when (activeTheme) {
             Theme.ThemeType.LIGHT ->
                 podcastInteractive01ActiveLight(podcastColor)
+
             Theme.ThemeType.DARK ->
                 podcastInteractive01ActiveDark(podcastColor)
+
             Theme.ThemeType.EXTRA_DARK ->
                 podcastInteractive01ActiveExtraDark(podcastColor)
+
             Theme.ThemeType.ELECTRIC ->
                 podcastInteractive01ActiveElectric(podcastColor)
+
             Theme.ThemeType.CLASSIC_LIGHT ->
                 podcastInteractive01ActiveClassicLight(podcastColor)
+
             Theme.ThemeType.INDIGO ->
                 podcastInteractive01ActiveIndigo(podcastColor)
+
             Theme.ThemeType.RADIOACTIVE ->
                 podcastInteractive01ActiveRadioactive(podcastColor)
+
             Theme.ThemeType.ROSE ->
                 podcastInteractive01ActiveRose(podcastColor)
+
             Theme.ThemeType.LIGHT_CONTRAST ->
                 podcastInteractive01ActiveLightContrast(podcastColor)
+
             Theme.ThemeType.DARK_CONTRAST ->
                 podcastInteractive01ActiveDarkContrast(podcastColor)
         }
@@ -4376,22 +4898,31 @@ object ThemeColor {
         return when (activeTheme) {
             Theme.ThemeType.LIGHT ->
                 podcastInteractive02Light(podcastColor)
+
             Theme.ThemeType.DARK ->
                 podcastInteractive02Dark(podcastColor)
+
             Theme.ThemeType.EXTRA_DARK ->
                 podcastInteractive02ExtraDark(podcastColor)
+
             Theme.ThemeType.ELECTRIC ->
                 podcastInteractive02Electric(podcastColor)
+
             Theme.ThemeType.CLASSIC_LIGHT ->
                 podcastInteractive02ClassicLight(podcastColor)
+
             Theme.ThemeType.INDIGO ->
                 podcastInteractive02Indigo(podcastColor)
+
             Theme.ThemeType.RADIOACTIVE ->
                 podcastInteractive02Radioactive(podcastColor)
+
             Theme.ThemeType.ROSE ->
                 podcastInteractive02Rose(podcastColor)
+
             Theme.ThemeType.LIGHT_CONTRAST ->
                 podcastInteractive02LightContrast(podcastColor)
+
             Theme.ThemeType.DARK_CONTRAST ->
                 podcastInteractive02DarkContrast(podcastColor)
         }
@@ -4401,22 +4932,31 @@ object ThemeColor {
         return when (activeTheme) {
             Theme.ThemeType.LIGHT ->
                 podcastInteractive03Light(podcastColor)
+
             Theme.ThemeType.DARK ->
                 podcastInteractive03Dark(podcastColor)
+
             Theme.ThemeType.EXTRA_DARK ->
                 podcastInteractive03ExtraDark(podcastColor)
+
             Theme.ThemeType.ELECTRIC ->
                 podcastInteractive03Electric(podcastColor)
+
             Theme.ThemeType.CLASSIC_LIGHT ->
                 podcastInteractive03ClassicLight(podcastColor)
+
             Theme.ThemeType.INDIGO ->
                 podcastInteractive03Indigo(podcastColor)
+
             Theme.ThemeType.RADIOACTIVE ->
                 podcastInteractive03Radioactive(podcastColor)
+
             Theme.ThemeType.ROSE ->
                 podcastInteractive03Rose(podcastColor)
+
             Theme.ThemeType.LIGHT_CONTRAST ->
                 podcastInteractive03LightContrast(podcastColor)
+
             Theme.ThemeType.DARK_CONTRAST ->
                 podcastInteractive03DarkContrast(podcastColor)
         }
@@ -4426,22 +4966,31 @@ object ThemeColor {
         return when (activeTheme) {
             Theme.ThemeType.LIGHT ->
                 podcastInteractive03ActiveLight(podcastColor)
+
             Theme.ThemeType.DARK ->
                 podcastInteractive03ActiveDark(podcastColor)
+
             Theme.ThemeType.EXTRA_DARK ->
                 podcastInteractive03ActiveExtraDark(podcastColor)
+
             Theme.ThemeType.ELECTRIC ->
                 podcastInteractive03ActiveElectric(podcastColor)
+
             Theme.ThemeType.CLASSIC_LIGHT ->
                 podcastInteractive03ActiveClassicLight(podcastColor)
+
             Theme.ThemeType.INDIGO ->
                 podcastInteractive03ActiveIndigo(podcastColor)
+
             Theme.ThemeType.RADIOACTIVE ->
                 podcastInteractive03ActiveRadioactive(podcastColor)
+
             Theme.ThemeType.ROSE ->
                 podcastInteractive03ActiveRose(podcastColor)
+
             Theme.ThemeType.LIGHT_CONTRAST ->
                 podcastInteractive03ActiveLightContrast(podcastColor)
+
             Theme.ThemeType.DARK_CONTRAST ->
                 podcastInteractive03ActiveDarkContrast(podcastColor)
         }
@@ -4451,22 +5000,31 @@ object ThemeColor {
         return when (activeTheme) {
             Theme.ThemeType.LIGHT ->
                 podcastInteractive04Light(podcastColor)
+
             Theme.ThemeType.DARK ->
                 podcastInteractive04Dark(podcastColor)
+
             Theme.ThemeType.EXTRA_DARK ->
                 podcastInteractive04ExtraDark(podcastColor)
+
             Theme.ThemeType.ELECTRIC ->
                 podcastInteractive04Electric(podcastColor)
+
             Theme.ThemeType.CLASSIC_LIGHT ->
                 podcastInteractive04ClassicLight(podcastColor)
+
             Theme.ThemeType.INDIGO ->
                 podcastInteractive04Indigo(podcastColor)
+
             Theme.ThemeType.RADIOACTIVE ->
                 podcastInteractive04Radioactive(podcastColor)
+
             Theme.ThemeType.ROSE ->
                 podcastInteractive04Rose(podcastColor)
+
             Theme.ThemeType.LIGHT_CONTRAST ->
                 podcastInteractive04LightContrast(podcastColor)
+
             Theme.ThemeType.DARK_CONTRAST ->
                 podcastInteractive04DarkContrast(podcastColor)
         }
@@ -4476,22 +5034,31 @@ object ThemeColor {
         return when (activeTheme) {
             Theme.ThemeType.LIGHT ->
                 podcastInteractive05Light(podcastColor)
+
             Theme.ThemeType.DARK ->
                 podcastInteractive05Dark(podcastColor)
+
             Theme.ThemeType.EXTRA_DARK ->
                 podcastInteractive05ExtraDark(podcastColor)
+
             Theme.ThemeType.ELECTRIC ->
                 podcastInteractive05Electric(podcastColor)
+
             Theme.ThemeType.CLASSIC_LIGHT ->
                 podcastInteractive05ClassicLight(podcastColor)
+
             Theme.ThemeType.INDIGO ->
                 podcastInteractive05Indigo(podcastColor)
+
             Theme.ThemeType.RADIOACTIVE ->
                 podcastInteractive05Radioactive(podcastColor)
+
             Theme.ThemeType.ROSE ->
                 podcastInteractive05Rose(podcastColor)
+
             Theme.ThemeType.LIGHT_CONTRAST ->
                 podcastInteractive05LightContrast(podcastColor)
+
             Theme.ThemeType.DARK_CONTRAST ->
                 podcastInteractive05DarkContrast(podcastColor)
         }
@@ -4501,22 +5068,31 @@ object ThemeColor {
         return when (activeTheme) {
             Theme.ThemeType.LIGHT ->
                 podcastOndarkLight(podcastColor)
+
             Theme.ThemeType.DARK ->
                 podcastOndarkDark(podcastColor)
+
             Theme.ThemeType.EXTRA_DARK ->
                 podcastOndarkExtraDark(podcastColor)
+
             Theme.ThemeType.ELECTRIC ->
                 podcastOndarkElectric(podcastColor)
+
             Theme.ThemeType.CLASSIC_LIGHT ->
                 podcastOndarkClassicLight(podcastColor)
+
             Theme.ThemeType.INDIGO ->
                 podcastOndarkIndigo(podcastColor)
+
             Theme.ThemeType.RADIOACTIVE ->
                 podcastOndarkRadioactive(podcastColor)
+
             Theme.ThemeType.ROSE ->
                 podcastOndarkRose(podcastColor)
+
             Theme.ThemeType.LIGHT_CONTRAST ->
                 podcastOndarkLightContrast(podcastColor)
+
             Theme.ThemeType.DARK_CONTRAST ->
                 podcastOndarkDarkContrast(podcastColor)
         }
@@ -4526,22 +5102,31 @@ object ThemeColor {
         return when (activeTheme) {
             Theme.ThemeType.LIGHT ->
                 podcastOnlightLight(podcastColor)
+
             Theme.ThemeType.DARK ->
                 podcastOnlightDark(podcastColor)
+
             Theme.ThemeType.EXTRA_DARK ->
                 podcastOnlightExtraDark(podcastColor)
+
             Theme.ThemeType.ELECTRIC ->
                 podcastOnlightElectric(podcastColor)
+
             Theme.ThemeType.CLASSIC_LIGHT ->
                 podcastOnlightClassicLight(podcastColor)
+
             Theme.ThemeType.INDIGO ->
                 podcastOnlightIndigo(podcastColor)
+
             Theme.ThemeType.RADIOACTIVE ->
                 podcastOnlightRadioactive(podcastColor)
+
             Theme.ThemeType.ROSE ->
                 podcastOnlightRose(podcastColor)
+
             Theme.ThemeType.LIGHT_CONTRAST ->
                 podcastOnlightLightContrast(podcastColor)
+
             Theme.ThemeType.DARK_CONTRAST ->
                 podcastOnlightDarkContrast(podcastColor)
         }
@@ -4551,22 +5136,31 @@ object ThemeColor {
         return when (activeTheme) {
             Theme.ThemeType.LIGHT ->
                 filterUi01Light(filterColor)
+
             Theme.ThemeType.DARK ->
                 filterUi01Dark(filterColor)
+
             Theme.ThemeType.EXTRA_DARK ->
                 filterUi01ExtraDark(filterColor)
+
             Theme.ThemeType.ELECTRIC ->
                 filterUi01Electric(filterColor)
+
             Theme.ThemeType.CLASSIC_LIGHT ->
                 filterUi01ClassicLight(filterColor)
+
             Theme.ThemeType.INDIGO ->
                 filterUi01Indigo(filterColor)
+
             Theme.ThemeType.RADIOACTIVE ->
                 filterUi01Radioactive(filterColor)
+
             Theme.ThemeType.ROSE ->
                 filterUi01Rose(filterColor)
+
             Theme.ThemeType.LIGHT_CONTRAST ->
                 filterUi01LightContrast(filterColor)
+
             Theme.ThemeType.DARK_CONTRAST ->
                 filterUi01DarkContrast(filterColor)
         }
@@ -4576,22 +5170,31 @@ object ThemeColor {
         return when (activeTheme) {
             Theme.ThemeType.LIGHT ->
                 filterUi02Light(filterColor)
+
             Theme.ThemeType.DARK ->
                 filterUi02Dark(filterColor)
+
             Theme.ThemeType.EXTRA_DARK ->
                 filterUi02ExtraDark(filterColor)
+
             Theme.ThemeType.ELECTRIC ->
                 filterUi02Electric(filterColor)
+
             Theme.ThemeType.CLASSIC_LIGHT ->
                 filterUi02ClassicLight(filterColor)
+
             Theme.ThemeType.INDIGO ->
                 filterUi02Indigo(filterColor)
+
             Theme.ThemeType.RADIOACTIVE ->
                 filterUi02Radioactive(filterColor)
+
             Theme.ThemeType.ROSE ->
                 filterUi02Rose(filterColor)
+
             Theme.ThemeType.LIGHT_CONTRAST ->
                 filterUi02LightContrast(filterColor)
+
             Theme.ThemeType.DARK_CONTRAST ->
                 filterUi02DarkContrast(filterColor)
         }
@@ -4601,22 +5204,31 @@ object ThemeColor {
         return when (activeTheme) {
             Theme.ThemeType.LIGHT ->
                 filterUi03Light(filterColor)
+
             Theme.ThemeType.DARK ->
                 filterUi03Dark(filterColor)
+
             Theme.ThemeType.EXTRA_DARK ->
                 filterUi03ExtraDark(filterColor)
+
             Theme.ThemeType.ELECTRIC ->
                 filterUi03Electric(filterColor)
+
             Theme.ThemeType.CLASSIC_LIGHT ->
                 filterUi03ClassicLight(filterColor)
+
             Theme.ThemeType.INDIGO ->
                 filterUi03Indigo(filterColor)
+
             Theme.ThemeType.RADIOACTIVE ->
                 filterUi03Radioactive(filterColor)
+
             Theme.ThemeType.ROSE ->
                 filterUi03Rose(filterColor)
+
             Theme.ThemeType.LIGHT_CONTRAST ->
                 filterUi03LightContrast(filterColor)
+
             Theme.ThemeType.DARK_CONTRAST ->
                 filterUi03DarkContrast(filterColor)
         }
@@ -4626,22 +5238,31 @@ object ThemeColor {
         return when (activeTheme) {
             Theme.ThemeType.LIGHT ->
                 filterUi04Light(filterColor)
+
             Theme.ThemeType.DARK ->
                 filterUi04Dark(filterColor)
+
             Theme.ThemeType.EXTRA_DARK ->
                 filterUi04ExtraDark(filterColor)
+
             Theme.ThemeType.ELECTRIC ->
                 filterUi04Electric(filterColor)
+
             Theme.ThemeType.CLASSIC_LIGHT ->
                 filterUi04ClassicLight(filterColor)
+
             Theme.ThemeType.INDIGO ->
                 filterUi04Indigo(filterColor)
+
             Theme.ThemeType.RADIOACTIVE ->
                 filterUi04Radioactive(filterColor)
+
             Theme.ThemeType.ROSE ->
                 filterUi04Rose(filterColor)
+
             Theme.ThemeType.LIGHT_CONTRAST ->
                 filterUi04LightContrast(filterColor)
+
             Theme.ThemeType.DARK_CONTRAST ->
                 filterUi04DarkContrast(filterColor)
         }
@@ -4651,22 +5272,31 @@ object ThemeColor {
         return when (activeTheme) {
             Theme.ThemeType.LIGHT ->
                 filterIcon01Light(filterColor)
+
             Theme.ThemeType.DARK ->
                 filterIcon01Dark(filterColor)
+
             Theme.ThemeType.EXTRA_DARK ->
                 filterIcon01ExtraDark(filterColor)
+
             Theme.ThemeType.ELECTRIC ->
                 filterIcon01Electric(filterColor)
+
             Theme.ThemeType.CLASSIC_LIGHT ->
                 filterIcon01ClassicLight(filterColor)
+
             Theme.ThemeType.INDIGO ->
                 filterIcon01Indigo(filterColor)
+
             Theme.ThemeType.RADIOACTIVE ->
                 filterIcon01Radioactive(filterColor)
+
             Theme.ThemeType.ROSE ->
                 filterIcon01Rose(filterColor)
+
             Theme.ThemeType.LIGHT_CONTRAST ->
                 filterIcon01LightContrast(filterColor)
+
             Theme.ThemeType.DARK_CONTRAST ->
                 filterIcon01DarkContrast(filterColor)
         }
@@ -4676,22 +5306,31 @@ object ThemeColor {
         return when (activeTheme) {
             Theme.ThemeType.LIGHT ->
                 filterIcon02Light(filterColor)
+
             Theme.ThemeType.DARK ->
                 filterIcon02Dark(filterColor)
+
             Theme.ThemeType.EXTRA_DARK ->
                 filterIcon02ExtraDark(filterColor)
+
             Theme.ThemeType.ELECTRIC ->
                 filterIcon02Electric(filterColor)
+
             Theme.ThemeType.CLASSIC_LIGHT ->
                 filterIcon02ClassicLight(filterColor)
+
             Theme.ThemeType.INDIGO ->
                 filterIcon02Indigo(filterColor)
+
             Theme.ThemeType.RADIOACTIVE ->
                 filterIcon02Radioactive(filterColor)
+
             Theme.ThemeType.ROSE ->
                 filterIcon02Rose(filterColor)
+
             Theme.ThemeType.LIGHT_CONTRAST ->
                 filterIcon02LightContrast(filterColor)
+
             Theme.ThemeType.DARK_CONTRAST ->
                 filterIcon02DarkContrast(filterColor)
         }
@@ -4701,22 +5340,31 @@ object ThemeColor {
         return when (activeTheme) {
             Theme.ThemeType.LIGHT ->
                 filterText01Light(filterColor)
+
             Theme.ThemeType.DARK ->
                 filterText01Dark(filterColor)
+
             Theme.ThemeType.EXTRA_DARK ->
                 filterText01ExtraDark(filterColor)
+
             Theme.ThemeType.ELECTRIC ->
                 filterText01Electric(filterColor)
+
             Theme.ThemeType.CLASSIC_LIGHT ->
                 filterText01ClassicLight(filterColor)
+
             Theme.ThemeType.INDIGO ->
                 filterText01Indigo(filterColor)
+
             Theme.ThemeType.RADIOACTIVE ->
                 filterText01Radioactive(filterColor)
+
             Theme.ThemeType.ROSE ->
                 filterText01Rose(filterColor)
+
             Theme.ThemeType.LIGHT_CONTRAST ->
                 filterText01LightContrast(filterColor)
+
             Theme.ThemeType.DARK_CONTRAST ->
                 filterText01DarkContrast(filterColor)
         }
@@ -4726,22 +5374,31 @@ object ThemeColor {
         return when (activeTheme) {
             Theme.ThemeType.LIGHT ->
                 filterText02Light(filterColor)
+
             Theme.ThemeType.DARK ->
                 filterText02Dark(filterColor)
+
             Theme.ThemeType.EXTRA_DARK ->
                 filterText02ExtraDark(filterColor)
+
             Theme.ThemeType.ELECTRIC ->
                 filterText02Electric(filterColor)
+
             Theme.ThemeType.CLASSIC_LIGHT ->
                 filterText02ClassicLight(filterColor)
+
             Theme.ThemeType.INDIGO ->
                 filterText02Indigo(filterColor)
+
             Theme.ThemeType.RADIOACTIVE ->
                 filterText02Radioactive(filterColor)
+
             Theme.ThemeType.ROSE ->
                 filterText02Rose(filterColor)
+
             Theme.ThemeType.LIGHT_CONTRAST ->
                 filterText02LightContrast(filterColor)
+
             Theme.ThemeType.DARK_CONTRAST ->
                 filterText02DarkContrast(filterColor)
         }
@@ -4751,22 +5408,31 @@ object ThemeColor {
         return when (activeTheme) {
             Theme.ThemeType.LIGHT ->
                 filterInteractive01Light(filterColor)
+
             Theme.ThemeType.DARK ->
                 filterInteractive01Dark(filterColor)
+
             Theme.ThemeType.EXTRA_DARK ->
                 filterInteractive01ExtraDark(filterColor)
+
             Theme.ThemeType.ELECTRIC ->
                 filterInteractive01Electric(filterColor)
+
             Theme.ThemeType.CLASSIC_LIGHT ->
                 filterInteractive01ClassicLight(filterColor)
+
             Theme.ThemeType.INDIGO ->
                 filterInteractive01Indigo(filterColor)
+
             Theme.ThemeType.RADIOACTIVE ->
                 filterInteractive01Radioactive(filterColor)
+
             Theme.ThemeType.ROSE ->
                 filterInteractive01Rose(filterColor)
+
             Theme.ThemeType.LIGHT_CONTRAST ->
                 filterInteractive01LightContrast(filterColor)
+
             Theme.ThemeType.DARK_CONTRAST ->
                 filterInteractive01DarkContrast(filterColor)
         }
@@ -4776,22 +5442,31 @@ object ThemeColor {
         return when (activeTheme) {
             Theme.ThemeType.LIGHT ->
                 filterInteractive01ActiveLight(filterColor)
+
             Theme.ThemeType.DARK ->
                 filterInteractive01ActiveDark(filterColor)
+
             Theme.ThemeType.EXTRA_DARK ->
                 filterInteractive01ActiveExtraDark(filterColor)
+
             Theme.ThemeType.ELECTRIC ->
                 filterInteractive01ActiveElectric(filterColor)
+
             Theme.ThemeType.CLASSIC_LIGHT ->
                 filterInteractive01ActiveClassicLight(filterColor)
+
             Theme.ThemeType.INDIGO ->
                 filterInteractive01ActiveIndigo(filterColor)
+
             Theme.ThemeType.RADIOACTIVE ->
                 filterInteractive01ActiveRadioactive(filterColor)
+
             Theme.ThemeType.ROSE ->
                 filterInteractive01ActiveRose(filterColor)
+
             Theme.ThemeType.LIGHT_CONTRAST ->
                 filterInteractive01ActiveLightContrast(filterColor)
+
             Theme.ThemeType.DARK_CONTRAST ->
                 filterInteractive01ActiveDarkContrast(filterColor)
         }
@@ -4801,22 +5476,31 @@ object ThemeColor {
         return when (activeTheme) {
             Theme.ThemeType.LIGHT ->
                 filterInteractive02Light(filterColor)
+
             Theme.ThemeType.DARK ->
                 filterInteractive02Dark(filterColor)
+
             Theme.ThemeType.EXTRA_DARK ->
                 filterInteractive02ExtraDark(filterColor)
+
             Theme.ThemeType.ELECTRIC ->
                 filterInteractive02Electric(filterColor)
+
             Theme.ThemeType.CLASSIC_LIGHT ->
                 filterInteractive02ClassicLight(filterColor)
+
             Theme.ThemeType.INDIGO ->
                 filterInteractive02Indigo(filterColor)
+
             Theme.ThemeType.RADIOACTIVE ->
                 filterInteractive02Radioactive(filterColor)
+
             Theme.ThemeType.ROSE ->
                 filterInteractive02Rose(filterColor)
+
             Theme.ThemeType.LIGHT_CONTRAST ->
                 filterInteractive02LightContrast(filterColor)
+
             Theme.ThemeType.DARK_CONTRAST ->
                 filterInteractive02DarkContrast(filterColor)
         }
@@ -4826,22 +5510,31 @@ object ThemeColor {
         return when (activeTheme) {
             Theme.ThemeType.LIGHT ->
                 filterInteractive03Light(filterColor)
+
             Theme.ThemeType.DARK ->
                 filterInteractive03Dark(filterColor)
+
             Theme.ThemeType.EXTRA_DARK ->
                 filterInteractive03ExtraDark(filterColor)
+
             Theme.ThemeType.ELECTRIC ->
                 filterInteractive03Electric(filterColor)
+
             Theme.ThemeType.CLASSIC_LIGHT ->
                 filterInteractive03ClassicLight(filterColor)
+
             Theme.ThemeType.INDIGO ->
                 filterInteractive03Indigo(filterColor)
+
             Theme.ThemeType.RADIOACTIVE ->
                 filterInteractive03Radioactive(filterColor)
+
             Theme.ThemeType.ROSE ->
                 filterInteractive03Rose(filterColor)
+
             Theme.ThemeType.LIGHT_CONTRAST ->
                 filterInteractive03LightContrast(filterColor)
+
             Theme.ThemeType.DARK_CONTRAST ->
                 filterInteractive03DarkContrast(filterColor)
         }
@@ -4851,22 +5544,31 @@ object ThemeColor {
         return when (activeTheme) {
             Theme.ThemeType.LIGHT ->
                 filterInteractive03ActiveLight(filterColor)
+
             Theme.ThemeType.DARK ->
                 filterInteractive03ActiveDark(filterColor)
+
             Theme.ThemeType.EXTRA_DARK ->
                 filterInteractive03ActiveExtraDark(filterColor)
+
             Theme.ThemeType.ELECTRIC ->
                 filterInteractive03ActiveElectric(filterColor)
+
             Theme.ThemeType.CLASSIC_LIGHT ->
                 filterInteractive03ActiveClassicLight(filterColor)
+
             Theme.ThemeType.INDIGO ->
                 filterInteractive03ActiveIndigo(filterColor)
+
             Theme.ThemeType.RADIOACTIVE ->
                 filterInteractive03ActiveRadioactive(filterColor)
+
             Theme.ThemeType.ROSE ->
                 filterInteractive03ActiveRose(filterColor)
+
             Theme.ThemeType.LIGHT_CONTRAST ->
                 filterInteractive03ActiveLightContrast(filterColor)
+
             Theme.ThemeType.DARK_CONTRAST ->
                 filterInteractive03ActiveDarkContrast(filterColor)
         }
@@ -4876,22 +5578,31 @@ object ThemeColor {
         return when (activeTheme) {
             Theme.ThemeType.LIGHT ->
                 filterInteractive04Light(filterColor)
+
             Theme.ThemeType.DARK ->
                 filterInteractive04Dark(filterColor)
+
             Theme.ThemeType.EXTRA_DARK ->
                 filterInteractive04ExtraDark(filterColor)
+
             Theme.ThemeType.ELECTRIC ->
                 filterInteractive04Electric(filterColor)
+
             Theme.ThemeType.CLASSIC_LIGHT ->
                 filterInteractive04ClassicLight(filterColor)
+
             Theme.ThemeType.INDIGO ->
                 filterInteractive04Indigo(filterColor)
+
             Theme.ThemeType.RADIOACTIVE ->
                 filterInteractive04Radioactive(filterColor)
+
             Theme.ThemeType.ROSE ->
                 filterInteractive04Rose(filterColor)
+
             Theme.ThemeType.LIGHT_CONTRAST ->
                 filterInteractive04LightContrast(filterColor)
+
             Theme.ThemeType.DARK_CONTRAST ->
                 filterInteractive04DarkContrast(filterColor)
         }
@@ -4901,22 +5612,31 @@ object ThemeColor {
         return when (activeTheme) {
             Theme.ThemeType.LIGHT ->
                 filterInteractive05Light(filterColor)
+
             Theme.ThemeType.DARK ->
                 filterInteractive05Dark(filterColor)
+
             Theme.ThemeType.EXTRA_DARK ->
                 filterInteractive05ExtraDark(filterColor)
+
             Theme.ThemeType.ELECTRIC ->
                 filterInteractive05Electric(filterColor)
+
             Theme.ThemeType.CLASSIC_LIGHT ->
                 filterInteractive05ClassicLight(filterColor)
+
             Theme.ThemeType.INDIGO ->
                 filterInteractive05Indigo(filterColor)
+
             Theme.ThemeType.RADIOACTIVE ->
                 filterInteractive05Radioactive(filterColor)
+
             Theme.ThemeType.ROSE ->
                 filterInteractive05Rose(filterColor)
+
             Theme.ThemeType.LIGHT_CONTRAST ->
                 filterInteractive05LightContrast(filterColor)
+
             Theme.ThemeType.DARK_CONTRAST ->
                 filterInteractive05DarkContrast(filterColor)
         }
@@ -4926,22 +5646,31 @@ object ThemeColor {
         return when (activeTheme) {
             Theme.ThemeType.LIGHT ->
                 filterInteractive06Light(filterColor)
+
             Theme.ThemeType.DARK ->
                 filterInteractive06Dark(filterColor)
+
             Theme.ThemeType.EXTRA_DARK ->
                 filterInteractive06ExtraDark(filterColor)
+
             Theme.ThemeType.ELECTRIC ->
                 filterInteractive06Electric(filterColor)
+
             Theme.ThemeType.CLASSIC_LIGHT ->
                 filterInteractive06ClassicLight(filterColor)
+
             Theme.ThemeType.INDIGO ->
                 filterInteractive06Indigo(filterColor)
+
             Theme.ThemeType.RADIOACTIVE ->
                 filterInteractive06Radioactive(filterColor)
+
             Theme.ThemeType.ROSE ->
                 filterInteractive06Rose(filterColor)
+
             Theme.ThemeType.LIGHT_CONTRAST ->
                 filterInteractive06LightContrast(filterColor)
+
             Theme.ThemeType.DARK_CONTRAST ->
                 filterInteractive06DarkContrast(filterColor)
         }
@@ -4951,22 +5680,31 @@ object ThemeColor {
         return when (theme) {
             Theme.ThemeType.LIGHT ->
                 support01Light
+
             Theme.ThemeType.DARK ->
                 support01Dark
+
             Theme.ThemeType.EXTRA_DARK ->
                 support01ExtraDark
+
             Theme.ThemeType.ELECTRIC ->
                 support01Electric
+
             Theme.ThemeType.CLASSIC_LIGHT ->
                 support01ClassicLight
+
             Theme.ThemeType.INDIGO ->
                 support01Indigo
+
             Theme.ThemeType.RADIOACTIVE ->
                 support01Radioactive
+
             Theme.ThemeType.ROSE ->
                 support01Rose
+
             Theme.ThemeType.LIGHT_CONTRAST ->
                 support01LightContrast
+
             Theme.ThemeType.DARK_CONTRAST ->
                 support01DarkContrast
         }
@@ -4976,22 +5714,31 @@ object ThemeColor {
         return when (theme) {
             Theme.ThemeType.LIGHT ->
                 support02Light
+
             Theme.ThemeType.DARK ->
                 support02Dark
+
             Theme.ThemeType.EXTRA_DARK ->
                 support02ExtraDark
+
             Theme.ThemeType.ELECTRIC ->
                 support02Electric
+
             Theme.ThemeType.CLASSIC_LIGHT ->
                 support02ClassicLight
+
             Theme.ThemeType.INDIGO ->
                 support02Indigo
+
             Theme.ThemeType.RADIOACTIVE ->
                 support02Radioactive
+
             Theme.ThemeType.ROSE ->
                 support02Rose
+
             Theme.ThemeType.LIGHT_CONTRAST ->
                 support02LightContrast
+
             Theme.ThemeType.DARK_CONTRAST ->
                 support02DarkContrast
         }
@@ -5001,22 +5748,31 @@ object ThemeColor {
         return when (theme) {
             Theme.ThemeType.LIGHT ->
                 support03Light
+
             Theme.ThemeType.DARK ->
                 support03Dark
+
             Theme.ThemeType.EXTRA_DARK ->
                 support03ExtraDark
+
             Theme.ThemeType.ELECTRIC ->
                 support03Electric
+
             Theme.ThemeType.CLASSIC_LIGHT ->
                 support03ClassicLight
+
             Theme.ThemeType.INDIGO ->
                 support03Indigo
+
             Theme.ThemeType.RADIOACTIVE ->
                 support03Radioactive
+
             Theme.ThemeType.ROSE ->
                 support03Rose
+
             Theme.ThemeType.LIGHT_CONTRAST ->
                 support03LightContrast
+
             Theme.ThemeType.DARK_CONTRAST ->
                 support03DarkContrast
         }
@@ -5026,22 +5782,31 @@ object ThemeColor {
         return when (theme) {
             Theme.ThemeType.LIGHT ->
                 support04Light
+
             Theme.ThemeType.DARK ->
                 support04Dark
+
             Theme.ThemeType.EXTRA_DARK ->
                 support04ExtraDark
+
             Theme.ThemeType.ELECTRIC ->
                 support04Electric
+
             Theme.ThemeType.CLASSIC_LIGHT ->
                 support04ClassicLight
+
             Theme.ThemeType.INDIGO ->
                 support04Indigo
+
             Theme.ThemeType.RADIOACTIVE ->
                 support04Radioactive
+
             Theme.ThemeType.ROSE ->
                 support04Rose
+
             Theme.ThemeType.LIGHT_CONTRAST ->
                 support04LightContrast
+
             Theme.ThemeType.DARK_CONTRAST ->
                 support04DarkContrast
         }
@@ -5051,22 +5816,31 @@ object ThemeColor {
         return when (theme) {
             Theme.ThemeType.LIGHT ->
                 support05Light
+
             Theme.ThemeType.DARK ->
                 support05Dark
+
             Theme.ThemeType.EXTRA_DARK ->
                 support05ExtraDark
+
             Theme.ThemeType.ELECTRIC ->
                 support05Electric
+
             Theme.ThemeType.CLASSIC_LIGHT ->
                 support05ClassicLight
+
             Theme.ThemeType.INDIGO ->
                 support05Indigo
+
             Theme.ThemeType.RADIOACTIVE ->
                 support05Radioactive
+
             Theme.ThemeType.ROSE ->
                 support05Rose
+
             Theme.ThemeType.LIGHT_CONTRAST ->
                 support05LightContrast
+
             Theme.ThemeType.DARK_CONTRAST ->
                 support05DarkContrast
         }
@@ -5076,22 +5850,31 @@ object ThemeColor {
         return when (theme) {
             Theme.ThemeType.LIGHT ->
                 support06Light
+
             Theme.ThemeType.DARK ->
                 support06Dark
+
             Theme.ThemeType.EXTRA_DARK ->
                 support06ExtraDark
+
             Theme.ThemeType.ELECTRIC ->
                 support06Electric
+
             Theme.ThemeType.CLASSIC_LIGHT ->
                 support06ClassicLight
+
             Theme.ThemeType.INDIGO ->
                 support06Indigo
+
             Theme.ThemeType.RADIOACTIVE ->
                 support06Radioactive
+
             Theme.ThemeType.ROSE ->
                 support06Rose
+
             Theme.ThemeType.LIGHT_CONTRAST ->
                 support06LightContrast
+
             Theme.ThemeType.DARK_CONTRAST ->
                 support06DarkContrast
         }
@@ -5101,22 +5884,31 @@ object ThemeColor {
         return when (theme) {
             Theme.ThemeType.LIGHT ->
                 support07Light
+
             Theme.ThemeType.DARK ->
                 support07Dark
+
             Theme.ThemeType.EXTRA_DARK ->
                 support07ExtraDark
+
             Theme.ThemeType.ELECTRIC ->
                 support07Electric
+
             Theme.ThemeType.CLASSIC_LIGHT ->
                 support07ClassicLight
+
             Theme.ThemeType.INDIGO ->
                 support07Indigo
+
             Theme.ThemeType.RADIOACTIVE ->
                 support07Radioactive
+
             Theme.ThemeType.ROSE ->
                 support07Rose
+
             Theme.ThemeType.LIGHT_CONTRAST ->
                 support07LightContrast
+
             Theme.ThemeType.DARK_CONTRAST ->
                 support07DarkContrast
         }
@@ -5126,22 +5918,31 @@ object ThemeColor {
         return when (theme) {
             Theme.ThemeType.LIGHT ->
                 support08Light
+
             Theme.ThemeType.DARK ->
                 support08Dark
+
             Theme.ThemeType.EXTRA_DARK ->
                 support08ExtraDark
+
             Theme.ThemeType.ELECTRIC ->
                 support08Electric
+
             Theme.ThemeType.CLASSIC_LIGHT ->
                 support08ClassicLight
+
             Theme.ThemeType.INDIGO ->
                 support08Indigo
+
             Theme.ThemeType.RADIOACTIVE ->
                 support08Radioactive
+
             Theme.ThemeType.ROSE ->
                 support08Rose
+
             Theme.ThemeType.LIGHT_CONTRAST ->
                 support08LightContrast
+
             Theme.ThemeType.DARK_CONTRAST ->
                 support08DarkContrast
         }
@@ -5151,22 +5952,31 @@ object ThemeColor {
         return when (theme) {
             Theme.ThemeType.LIGHT ->
                 support09Light
+
             Theme.ThemeType.DARK ->
                 support09Dark
+
             Theme.ThemeType.EXTRA_DARK ->
                 support09ExtraDark
+
             Theme.ThemeType.ELECTRIC ->
                 support09Electric
+
             Theme.ThemeType.CLASSIC_LIGHT ->
                 support09ClassicLight
+
             Theme.ThemeType.INDIGO ->
                 support09Indigo
+
             Theme.ThemeType.RADIOACTIVE ->
                 support09Radioactive
+
             Theme.ThemeType.ROSE ->
                 support09Rose
+
             Theme.ThemeType.LIGHT_CONTRAST ->
                 support09LightContrast
+
             Theme.ThemeType.DARK_CONTRAST ->
                 support09DarkContrast
         }
@@ -5176,22 +5986,31 @@ object ThemeColor {
         return when (theme) {
             Theme.ThemeType.LIGHT ->
                 support10Light
+
             Theme.ThemeType.DARK ->
                 support10Dark
+
             Theme.ThemeType.EXTRA_DARK ->
                 support10ExtraDark
+
             Theme.ThemeType.ELECTRIC ->
                 support10Electric
+
             Theme.ThemeType.CLASSIC_LIGHT ->
                 support10ClassicLight
+
             Theme.ThemeType.INDIGO ->
                 support10Indigo
+
             Theme.ThemeType.RADIOACTIVE ->
                 support10Radioactive
+
             Theme.ThemeType.ROSE ->
                 support10Rose
+
             Theme.ThemeType.LIGHT_CONTRAST ->
                 support10LightContrast
+
             Theme.ThemeType.DARK_CONTRAST ->
                 support10DarkContrast
         }
@@ -5201,22 +6020,31 @@ object ThemeColor {
         return when (activeTheme) {
             Theme.ThemeType.LIGHT ->
                 playerBackground01Light(podcastColor)
+
             Theme.ThemeType.DARK ->
                 playerBackground01Dark(podcastColor)
+
             Theme.ThemeType.EXTRA_DARK ->
                 playerBackground01ExtraDark(podcastColor)
+
             Theme.ThemeType.ELECTRIC ->
                 playerBackground01Electric(podcastColor)
+
             Theme.ThemeType.CLASSIC_LIGHT ->
                 playerBackground01ClassicLight(podcastColor)
+
             Theme.ThemeType.INDIGO ->
                 playerBackground01Indigo(podcastColor)
+
             Theme.ThemeType.RADIOACTIVE ->
                 playerBackground01Radioactive(podcastColor)
+
             Theme.ThemeType.ROSE ->
                 playerBackground01Rose(podcastColor)
+
             Theme.ThemeType.LIGHT_CONTRAST ->
                 playerBackground01LightContrast(podcastColor)
+
             Theme.ThemeType.DARK_CONTRAST ->
                 playerBackground01DarkContrast(podcastColor)
         }
@@ -5226,22 +6054,31 @@ object ThemeColor {
         return when (activeTheme) {
             Theme.ThemeType.LIGHT ->
                 playerBackground02Light(podcastColor)
+
             Theme.ThemeType.DARK ->
                 playerBackground02Dark(podcastColor)
+
             Theme.ThemeType.EXTRA_DARK ->
                 playerBackground02ExtraDark(podcastColor)
+
             Theme.ThemeType.ELECTRIC ->
                 playerBackground02Electric(podcastColor)
+
             Theme.ThemeType.CLASSIC_LIGHT ->
                 playerBackground02ClassicLight(podcastColor)
+
             Theme.ThemeType.INDIGO ->
                 playerBackground02Indigo(podcastColor)
+
             Theme.ThemeType.RADIOACTIVE ->
                 playerBackground02Radioactive(podcastColor)
+
             Theme.ThemeType.ROSE ->
                 playerBackground02Rose(podcastColor)
+
             Theme.ThemeType.LIGHT_CONTRAST ->
                 playerBackground02LightContrast(podcastColor)
+
             Theme.ThemeType.DARK_CONTRAST ->
                 playerBackground02DarkContrast(podcastColor)
         }
@@ -5251,22 +6088,31 @@ object ThemeColor {
         return when (activeTheme) {
             Theme.ThemeType.LIGHT ->
                 playerHighlight01Light(podcastColor)
+
             Theme.ThemeType.DARK ->
                 playerHighlight01Dark(podcastColor)
+
             Theme.ThemeType.EXTRA_DARK ->
                 playerHighlight01ExtraDark(podcastColor)
+
             Theme.ThemeType.ELECTRIC ->
                 playerHighlight01Electric(podcastColor)
+
             Theme.ThemeType.CLASSIC_LIGHT ->
                 playerHighlight01ClassicLight(podcastColor)
+
             Theme.ThemeType.INDIGO ->
                 playerHighlight01Indigo(podcastColor)
+
             Theme.ThemeType.RADIOACTIVE ->
                 playerHighlight01Radioactive(podcastColor)
+
             Theme.ThemeType.ROSE ->
                 playerHighlight01Rose(podcastColor)
+
             Theme.ThemeType.LIGHT_CONTRAST ->
                 playerHighlight01LightContrast(podcastColor)
+
             Theme.ThemeType.DARK_CONTRAST ->
                 playerHighlight01DarkContrast(podcastColor)
         }
@@ -5276,22 +6122,31 @@ object ThemeColor {
         return when (activeTheme) {
             Theme.ThemeType.LIGHT ->
                 playerHighlight02Light(podcastColor)
+
             Theme.ThemeType.DARK ->
                 playerHighlight02Dark(podcastColor)
+
             Theme.ThemeType.EXTRA_DARK ->
                 playerHighlight02ExtraDark(podcastColor)
+
             Theme.ThemeType.ELECTRIC ->
                 playerHighlight02Electric(podcastColor)
+
             Theme.ThemeType.CLASSIC_LIGHT ->
                 playerHighlight02ClassicLight(podcastColor)
+
             Theme.ThemeType.INDIGO ->
                 playerHighlight02Indigo(podcastColor)
+
             Theme.ThemeType.RADIOACTIVE ->
                 playerHighlight02Radioactive(podcastColor)
+
             Theme.ThemeType.ROSE ->
                 playerHighlight02Rose(podcastColor)
+
             Theme.ThemeType.LIGHT_CONTRAST ->
                 playerHighlight02LightContrast(podcastColor)
+
             Theme.ThemeType.DARK_CONTRAST ->
                 playerHighlight02DarkContrast(podcastColor)
         }
@@ -5301,22 +6156,31 @@ object ThemeColor {
         return when (activeTheme) {
             Theme.ThemeType.LIGHT ->
                 playerHighlight03Light(podcastColor)
+
             Theme.ThemeType.DARK ->
                 playerHighlight03Dark(podcastColor)
+
             Theme.ThemeType.EXTRA_DARK ->
                 playerHighlight03ExtraDark(podcastColor)
+
             Theme.ThemeType.ELECTRIC ->
                 playerHighlight03Electric(podcastColor)
+
             Theme.ThemeType.CLASSIC_LIGHT ->
                 playerHighlight03ClassicLight(podcastColor)
+
             Theme.ThemeType.INDIGO ->
                 playerHighlight03Indigo(podcastColor)
+
             Theme.ThemeType.RADIOACTIVE ->
                 playerHighlight03Radioactive(podcastColor)
+
             Theme.ThemeType.ROSE ->
                 playerHighlight03Rose(podcastColor)
+
             Theme.ThemeType.LIGHT_CONTRAST ->
                 playerHighlight03LightContrast(podcastColor)
+
             Theme.ThemeType.DARK_CONTRAST ->
                 playerHighlight03DarkContrast(podcastColor)
         }
@@ -5326,22 +6190,31 @@ object ThemeColor {
         return when (activeTheme) {
             Theme.ThemeType.LIGHT ->
                 playerHighlight04Light(podcastColor)
+
             Theme.ThemeType.DARK ->
                 playerHighlight04Dark(podcastColor)
+
             Theme.ThemeType.EXTRA_DARK ->
                 playerHighlight04ExtraDark(podcastColor)
+
             Theme.ThemeType.ELECTRIC ->
                 playerHighlight04Electric(podcastColor)
+
             Theme.ThemeType.CLASSIC_LIGHT ->
                 playerHighlight04ClassicLight(podcastColor)
+
             Theme.ThemeType.INDIGO ->
                 playerHighlight04Indigo(podcastColor)
+
             Theme.ThemeType.RADIOACTIVE ->
                 playerHighlight04Radioactive(podcastColor)
+
             Theme.ThemeType.ROSE ->
                 playerHighlight04Rose(podcastColor)
+
             Theme.ThemeType.LIGHT_CONTRAST ->
                 playerHighlight04LightContrast(podcastColor)
+
             Theme.ThemeType.DARK_CONTRAST ->
                 playerHighlight04DarkContrast(podcastColor)
         }
@@ -5351,22 +6224,31 @@ object ThemeColor {
         return when (activeTheme) {
             Theme.ThemeType.LIGHT ->
                 playerHighlight05Light(podcastColor)
+
             Theme.ThemeType.DARK ->
                 playerHighlight05Dark(podcastColor)
+
             Theme.ThemeType.EXTRA_DARK ->
                 playerHighlight05ExtraDark(podcastColor)
+
             Theme.ThemeType.ELECTRIC ->
                 playerHighlight05Electric(podcastColor)
+
             Theme.ThemeType.CLASSIC_LIGHT ->
                 playerHighlight05ClassicLight(podcastColor)
+
             Theme.ThemeType.INDIGO ->
                 playerHighlight05Indigo(podcastColor)
+
             Theme.ThemeType.RADIOACTIVE ->
                 playerHighlight05Radioactive(podcastColor)
+
             Theme.ThemeType.ROSE ->
                 playerHighlight05Rose(podcastColor)
+
             Theme.ThemeType.LIGHT_CONTRAST ->
                 playerHighlight05LightContrast(podcastColor)
+
             Theme.ThemeType.DARK_CONTRAST ->
                 playerHighlight05DarkContrast(podcastColor)
         }
@@ -5376,22 +6258,31 @@ object ThemeColor {
         return when (activeTheme) {
             Theme.ThemeType.LIGHT ->
                 playerHighlight06Light(podcastColor)
+
             Theme.ThemeType.DARK ->
                 playerHighlight06Dark(podcastColor)
+
             Theme.ThemeType.EXTRA_DARK ->
                 playerHighlight06ExtraDark(podcastColor)
+
             Theme.ThemeType.ELECTRIC ->
                 playerHighlight06Electric(podcastColor)
+
             Theme.ThemeType.CLASSIC_LIGHT ->
                 playerHighlight06ClassicLight(podcastColor)
+
             Theme.ThemeType.INDIGO ->
                 playerHighlight06Indigo(podcastColor)
+
             Theme.ThemeType.RADIOACTIVE ->
                 playerHighlight06Radioactive(podcastColor)
+
             Theme.ThemeType.ROSE ->
                 playerHighlight06Rose(podcastColor)
+
             Theme.ThemeType.LIGHT_CONTRAST ->
                 playerHighlight06LightContrast(podcastColor)
+
             Theme.ThemeType.DARK_CONTRAST ->
                 playerHighlight06DarkContrast(podcastColor)
         }
@@ -5401,22 +6292,31 @@ object ThemeColor {
         return when (activeTheme) {
             Theme.ThemeType.LIGHT ->
                 playerHighlight07Light(podcastColor)
+
             Theme.ThemeType.DARK ->
                 playerHighlight07Dark(podcastColor)
+
             Theme.ThemeType.EXTRA_DARK ->
                 playerHighlight07ExtraDark(podcastColor)
+
             Theme.ThemeType.ELECTRIC ->
                 playerHighlight07Electric(podcastColor)
+
             Theme.ThemeType.CLASSIC_LIGHT ->
                 playerHighlight07ClassicLight(podcastColor)
+
             Theme.ThemeType.INDIGO ->
                 playerHighlight07Indigo(podcastColor)
+
             Theme.ThemeType.RADIOACTIVE ->
                 playerHighlight07Radioactive(podcastColor)
+
             Theme.ThemeType.ROSE ->
                 playerHighlight07Rose(podcastColor)
+
             Theme.ThemeType.LIGHT_CONTRAST ->
                 playerHighlight07LightContrast(podcastColor)
+
             Theme.ThemeType.DARK_CONTRAST ->
                 playerHighlight07DarkContrast(podcastColor)
         }
@@ -5426,22 +6326,31 @@ object ThemeColor {
         return when (theme) {
             Theme.ThemeType.LIGHT ->
                 playerContrast01Light
+
             Theme.ThemeType.DARK ->
                 playerContrast01Dark
+
             Theme.ThemeType.EXTRA_DARK ->
                 playerContrast01ExtraDark
+
             Theme.ThemeType.ELECTRIC ->
                 playerContrast01Electric
+
             Theme.ThemeType.CLASSIC_LIGHT ->
                 playerContrast01ClassicLight
+
             Theme.ThemeType.INDIGO ->
                 playerContrast01Indigo
+
             Theme.ThemeType.RADIOACTIVE ->
                 playerContrast01Radioactive
+
             Theme.ThemeType.ROSE ->
                 playerContrast01Rose
+
             Theme.ThemeType.LIGHT_CONTRAST ->
                 playerContrast01LightContrast
+
             Theme.ThemeType.DARK_CONTRAST ->
                 playerContrast01DarkContrast
         }
@@ -5451,22 +6360,31 @@ object ThemeColor {
         return when (theme) {
             Theme.ThemeType.LIGHT ->
                 playerContrast02Light
+
             Theme.ThemeType.DARK ->
                 playerContrast02Dark
+
             Theme.ThemeType.EXTRA_DARK ->
                 playerContrast02ExtraDark
+
             Theme.ThemeType.ELECTRIC ->
                 playerContrast02Electric
+
             Theme.ThemeType.CLASSIC_LIGHT ->
                 playerContrast02ClassicLight
+
             Theme.ThemeType.INDIGO ->
                 playerContrast02Indigo
+
             Theme.ThemeType.RADIOACTIVE ->
                 playerContrast02Radioactive
+
             Theme.ThemeType.ROSE ->
                 playerContrast02Rose
+
             Theme.ThemeType.LIGHT_CONTRAST ->
                 playerContrast02LightContrast
+
             Theme.ThemeType.DARK_CONTRAST ->
                 playerContrast02DarkContrast
         }
@@ -5476,22 +6394,31 @@ object ThemeColor {
         return when (theme) {
             Theme.ThemeType.LIGHT ->
                 playerContrast03Light
+
             Theme.ThemeType.DARK ->
                 playerContrast03Dark
+
             Theme.ThemeType.EXTRA_DARK ->
                 playerContrast03ExtraDark
+
             Theme.ThemeType.ELECTRIC ->
                 playerContrast03Electric
+
             Theme.ThemeType.CLASSIC_LIGHT ->
                 playerContrast03ClassicLight
+
             Theme.ThemeType.INDIGO ->
                 playerContrast03Indigo
+
             Theme.ThemeType.RADIOACTIVE ->
                 playerContrast03Radioactive
+
             Theme.ThemeType.ROSE ->
                 playerContrast03Rose
+
             Theme.ThemeType.LIGHT_CONTRAST ->
                 playerContrast03LightContrast
+
             Theme.ThemeType.DARK_CONTRAST ->
                 playerContrast03DarkContrast
         }
@@ -5501,22 +6428,31 @@ object ThemeColor {
         return when (theme) {
             Theme.ThemeType.LIGHT ->
                 playerContrast04Light
+
             Theme.ThemeType.DARK ->
                 playerContrast04Dark
+
             Theme.ThemeType.EXTRA_DARK ->
                 playerContrast04ExtraDark
+
             Theme.ThemeType.ELECTRIC ->
                 playerContrast04Electric
+
             Theme.ThemeType.CLASSIC_LIGHT ->
                 playerContrast04ClassicLight
+
             Theme.ThemeType.INDIGO ->
                 playerContrast04Indigo
+
             Theme.ThemeType.RADIOACTIVE ->
                 playerContrast04Radioactive
+
             Theme.ThemeType.ROSE ->
                 playerContrast04Rose
+
             Theme.ThemeType.LIGHT_CONTRAST ->
                 playerContrast04LightContrast
+
             Theme.ThemeType.DARK_CONTRAST ->
                 playerContrast04DarkContrast
         }
@@ -5526,22 +6462,31 @@ object ThemeColor {
         return when (theme) {
             Theme.ThemeType.LIGHT ->
                 playerContrast05Light
+
             Theme.ThemeType.DARK ->
                 playerContrast05Dark
+
             Theme.ThemeType.EXTRA_DARK ->
                 playerContrast05ExtraDark
+
             Theme.ThemeType.ELECTRIC ->
                 playerContrast05Electric
+
             Theme.ThemeType.CLASSIC_LIGHT ->
                 playerContrast05ClassicLight
+
             Theme.ThemeType.INDIGO ->
                 playerContrast05Indigo
+
             Theme.ThemeType.RADIOACTIVE ->
                 playerContrast05Radioactive
+
             Theme.ThemeType.ROSE ->
                 playerContrast05Rose
+
             Theme.ThemeType.LIGHT_CONTRAST ->
                 playerContrast05LightContrast
+
             Theme.ThemeType.DARK_CONTRAST ->
                 playerContrast05DarkContrast
         }
@@ -5551,22 +6496,31 @@ object ThemeColor {
         return when (theme) {
             Theme.ThemeType.LIGHT ->
                 playerContrast06Light
+
             Theme.ThemeType.DARK ->
                 playerContrast06Dark
+
             Theme.ThemeType.EXTRA_DARK ->
                 playerContrast06ExtraDark
+
             Theme.ThemeType.ELECTRIC ->
                 playerContrast06Electric
+
             Theme.ThemeType.CLASSIC_LIGHT ->
                 playerContrast06ClassicLight
+
             Theme.ThemeType.INDIGO ->
                 playerContrast06Indigo
+
             Theme.ThemeType.RADIOACTIVE ->
                 playerContrast06Radioactive
+
             Theme.ThemeType.ROSE ->
                 playerContrast06Rose
+
             Theme.ThemeType.LIGHT_CONTRAST ->
                 playerContrast06LightContrast
+
             Theme.ThemeType.DARK_CONTRAST ->
                 playerContrast06DarkContrast
         }
@@ -5576,22 +6530,31 @@ object ThemeColor {
         return when (theme) {
             Theme.ThemeType.LIGHT ->
                 contrast01Light
+
             Theme.ThemeType.DARK ->
                 contrast01Dark
+
             Theme.ThemeType.EXTRA_DARK ->
                 contrast01ExtraDark
+
             Theme.ThemeType.ELECTRIC ->
                 contrast01Electric
+
             Theme.ThemeType.CLASSIC_LIGHT ->
                 contrast01ClassicLight
+
             Theme.ThemeType.INDIGO ->
                 contrast01Indigo
+
             Theme.ThemeType.RADIOACTIVE ->
                 contrast01Radioactive
+
             Theme.ThemeType.ROSE ->
                 contrast01Rose
+
             Theme.ThemeType.LIGHT_CONTRAST ->
                 contrast01LightContrast
+
             Theme.ThemeType.DARK_CONTRAST ->
                 contrast01DarkContrast
         }
@@ -5601,22 +6564,31 @@ object ThemeColor {
         return when (theme) {
             Theme.ThemeType.LIGHT ->
                 contrast02Light
+
             Theme.ThemeType.DARK ->
                 contrast02Dark
+
             Theme.ThemeType.EXTRA_DARK ->
                 contrast02ExtraDark
+
             Theme.ThemeType.ELECTRIC ->
                 contrast02Electric
+
             Theme.ThemeType.CLASSIC_LIGHT ->
                 contrast02ClassicLight
+
             Theme.ThemeType.INDIGO ->
                 contrast02Indigo
+
             Theme.ThemeType.RADIOACTIVE ->
                 contrast02Radioactive
+
             Theme.ThemeType.ROSE ->
                 contrast02Rose
+
             Theme.ThemeType.LIGHT_CONTRAST ->
                 contrast02LightContrast
+
             Theme.ThemeType.DARK_CONTRAST ->
                 contrast02DarkContrast
         }
@@ -5626,22 +6598,31 @@ object ThemeColor {
         return when (theme) {
             Theme.ThemeType.LIGHT ->
                 contrast03Light
+
             Theme.ThemeType.DARK ->
                 contrast03Dark
+
             Theme.ThemeType.EXTRA_DARK ->
                 contrast03ExtraDark
+
             Theme.ThemeType.ELECTRIC ->
                 contrast03Electric
+
             Theme.ThemeType.CLASSIC_LIGHT ->
                 contrast03ClassicLight
+
             Theme.ThemeType.INDIGO ->
                 contrast03Indigo
+
             Theme.ThemeType.RADIOACTIVE ->
                 contrast03Radioactive
+
             Theme.ThemeType.ROSE ->
                 contrast03Rose
+
             Theme.ThemeType.LIGHT_CONTRAST ->
                 contrast03LightContrast
+
             Theme.ThemeType.DARK_CONTRAST ->
                 contrast03DarkContrast
         }
@@ -5651,22 +6632,31 @@ object ThemeColor {
         return when (theme) {
             Theme.ThemeType.LIGHT ->
                 contrast04Light
+
             Theme.ThemeType.DARK ->
                 contrast04Dark
+
             Theme.ThemeType.EXTRA_DARK ->
                 contrast04ExtraDark
+
             Theme.ThemeType.ELECTRIC ->
                 contrast04Electric
+
             Theme.ThemeType.CLASSIC_LIGHT ->
                 contrast04ClassicLight
+
             Theme.ThemeType.INDIGO ->
                 contrast04Indigo
+
             Theme.ThemeType.RADIOACTIVE ->
                 contrast04Radioactive
+
             Theme.ThemeType.ROSE ->
                 contrast04Rose
+
             Theme.ThemeType.LIGHT_CONTRAST ->
                 contrast04LightContrast
+
             Theme.ThemeType.DARK_CONTRAST ->
                 contrast04DarkContrast
         }
@@ -5676,22 +6666,31 @@ object ThemeColor {
         return when (theme) {
             Theme.ThemeType.LIGHT ->
                 filter01Light
+
             Theme.ThemeType.DARK ->
                 filter01Dark
+
             Theme.ThemeType.EXTRA_DARK ->
                 filter01ExtraDark
+
             Theme.ThemeType.ELECTRIC ->
                 filter01Electric
+
             Theme.ThemeType.CLASSIC_LIGHT ->
                 filter01ClassicLight
+
             Theme.ThemeType.INDIGO ->
                 filter01Indigo
+
             Theme.ThemeType.RADIOACTIVE ->
                 filter01Radioactive
+
             Theme.ThemeType.ROSE ->
                 filter01Rose
+
             Theme.ThemeType.LIGHT_CONTRAST ->
                 filter01LightContrast
+
             Theme.ThemeType.DARK_CONTRAST ->
                 filter01DarkContrast
         }
@@ -5701,22 +6700,31 @@ object ThemeColor {
         return when (theme) {
             Theme.ThemeType.LIGHT ->
                 filter02Light
+
             Theme.ThemeType.DARK ->
                 filter02Dark
+
             Theme.ThemeType.EXTRA_DARK ->
                 filter02ExtraDark
+
             Theme.ThemeType.ELECTRIC ->
                 filter02Electric
+
             Theme.ThemeType.CLASSIC_LIGHT ->
                 filter02ClassicLight
+
             Theme.ThemeType.INDIGO ->
                 filter02Indigo
+
             Theme.ThemeType.RADIOACTIVE ->
                 filter02Radioactive
+
             Theme.ThemeType.ROSE ->
                 filter02Rose
+
             Theme.ThemeType.LIGHT_CONTRAST ->
                 filter02LightContrast
+
             Theme.ThemeType.DARK_CONTRAST ->
                 filter02DarkContrast
         }
@@ -5726,22 +6734,31 @@ object ThemeColor {
         return when (theme) {
             Theme.ThemeType.LIGHT ->
                 filter03Light
+
             Theme.ThemeType.DARK ->
                 filter03Dark
+
             Theme.ThemeType.EXTRA_DARK ->
                 filter03ExtraDark
+
             Theme.ThemeType.ELECTRIC ->
                 filter03Electric
+
             Theme.ThemeType.CLASSIC_LIGHT ->
                 filter03ClassicLight
+
             Theme.ThemeType.INDIGO ->
                 filter03Indigo
+
             Theme.ThemeType.RADIOACTIVE ->
                 filter03Radioactive
+
             Theme.ThemeType.ROSE ->
                 filter03Rose
+
             Theme.ThemeType.LIGHT_CONTRAST ->
                 filter03LightContrast
+
             Theme.ThemeType.DARK_CONTRAST ->
                 filter03DarkContrast
         }
@@ -5751,22 +6768,31 @@ object ThemeColor {
         return when (theme) {
             Theme.ThemeType.LIGHT ->
                 filter04Light
+
             Theme.ThemeType.DARK ->
                 filter04Dark
+
             Theme.ThemeType.EXTRA_DARK ->
                 filter04ExtraDark
+
             Theme.ThemeType.ELECTRIC ->
                 filter04Electric
+
             Theme.ThemeType.CLASSIC_LIGHT ->
                 filter04ClassicLight
+
             Theme.ThemeType.INDIGO ->
                 filter04Indigo
+
             Theme.ThemeType.RADIOACTIVE ->
                 filter04Radioactive
+
             Theme.ThemeType.ROSE ->
                 filter04Rose
+
             Theme.ThemeType.LIGHT_CONTRAST ->
                 filter04LightContrast
+
             Theme.ThemeType.DARK_CONTRAST ->
                 filter04DarkContrast
         }
@@ -5776,22 +6802,31 @@ object ThemeColor {
         return when (theme) {
             Theme.ThemeType.LIGHT ->
                 filter05Light
+
             Theme.ThemeType.DARK ->
                 filter05Dark
+
             Theme.ThemeType.EXTRA_DARK ->
                 filter05ExtraDark
+
             Theme.ThemeType.ELECTRIC ->
                 filter05Electric
+
             Theme.ThemeType.CLASSIC_LIGHT ->
                 filter05ClassicLight
+
             Theme.ThemeType.INDIGO ->
                 filter05Indigo
+
             Theme.ThemeType.RADIOACTIVE ->
                 filter05Radioactive
+
             Theme.ThemeType.ROSE ->
                 filter05Rose
+
             Theme.ThemeType.LIGHT_CONTRAST ->
                 filter05LightContrast
+
             Theme.ThemeType.DARK_CONTRAST ->
                 filter05DarkContrast
         }
@@ -5801,22 +6836,31 @@ object ThemeColor {
         return when (theme) {
             Theme.ThemeType.LIGHT ->
                 filter06Light
+
             Theme.ThemeType.DARK ->
                 filter06Dark
+
             Theme.ThemeType.EXTRA_DARK ->
                 filter06ExtraDark
+
             Theme.ThemeType.ELECTRIC ->
                 filter06Electric
+
             Theme.ThemeType.CLASSIC_LIGHT ->
                 filter06ClassicLight
+
             Theme.ThemeType.INDIGO ->
                 filter06Indigo
+
             Theme.ThemeType.RADIOACTIVE ->
                 filter06Radioactive
+
             Theme.ThemeType.ROSE ->
                 filter06Rose
+
             Theme.ThemeType.LIGHT_CONTRAST ->
                 filter06LightContrast
+
             Theme.ThemeType.DARK_CONTRAST ->
                 filter06DarkContrast
         }
@@ -5826,22 +6870,31 @@ object ThemeColor {
         return when (theme) {
             Theme.ThemeType.LIGHT ->
                 filter07Light
+
             Theme.ThemeType.DARK ->
                 filter07Dark
+
             Theme.ThemeType.EXTRA_DARK ->
                 filter07ExtraDark
+
             Theme.ThemeType.ELECTRIC ->
                 filter07Electric
+
             Theme.ThemeType.CLASSIC_LIGHT ->
                 filter07ClassicLight
+
             Theme.ThemeType.INDIGO ->
                 filter07Indigo
+
             Theme.ThemeType.RADIOACTIVE ->
                 filter07Radioactive
+
             Theme.ThemeType.ROSE ->
                 filter07Rose
+
             Theme.ThemeType.LIGHT_CONTRAST ->
                 filter07LightContrast
+
             Theme.ThemeType.DARK_CONTRAST ->
                 filter07DarkContrast
         }
@@ -5851,22 +6904,31 @@ object ThemeColor {
         return when (theme) {
             Theme.ThemeType.LIGHT ->
                 filter08Light
+
             Theme.ThemeType.DARK ->
                 filter08Dark
+
             Theme.ThemeType.EXTRA_DARK ->
                 filter08ExtraDark
+
             Theme.ThemeType.ELECTRIC ->
                 filter08Electric
+
             Theme.ThemeType.CLASSIC_LIGHT ->
                 filter08ClassicLight
+
             Theme.ThemeType.INDIGO ->
                 filter08Indigo
+
             Theme.ThemeType.RADIOACTIVE ->
                 filter08Radioactive
+
             Theme.ThemeType.ROSE ->
                 filter08Rose
+
             Theme.ThemeType.LIGHT_CONTRAST ->
                 filter08LightContrast
+
             Theme.ThemeType.DARK_CONTRAST ->
                 filter08DarkContrast
         }
@@ -5876,22 +6938,31 @@ object ThemeColor {
         return when (theme) {
             Theme.ThemeType.LIGHT ->
                 filter09Light
+
             Theme.ThemeType.DARK ->
                 filter09Dark
+
             Theme.ThemeType.EXTRA_DARK ->
                 filter09ExtraDark
+
             Theme.ThemeType.ELECTRIC ->
                 filter09Electric
+
             Theme.ThemeType.CLASSIC_LIGHT ->
                 filter09ClassicLight
+
             Theme.ThemeType.INDIGO ->
                 filter09Indigo
+
             Theme.ThemeType.RADIOACTIVE ->
                 filter09Radioactive
+
             Theme.ThemeType.ROSE ->
                 filter09Rose
+
             Theme.ThemeType.LIGHT_CONTRAST ->
                 filter09LightContrast
+
             Theme.ThemeType.DARK_CONTRAST ->
                 filter09DarkContrast
         }
@@ -5901,22 +6972,31 @@ object ThemeColor {
         return when (theme) {
             Theme.ThemeType.LIGHT ->
                 filter10Light
+
             Theme.ThemeType.DARK ->
                 filter10Dark
+
             Theme.ThemeType.EXTRA_DARK ->
                 filter10ExtraDark
+
             Theme.ThemeType.ELECTRIC ->
                 filter10Electric
+
             Theme.ThemeType.CLASSIC_LIGHT ->
                 filter10ClassicLight
+
             Theme.ThemeType.INDIGO ->
                 filter10Indigo
+
             Theme.ThemeType.RADIOACTIVE ->
                 filter10Radioactive
+
             Theme.ThemeType.ROSE ->
                 filter10Rose
+
             Theme.ThemeType.LIGHT_CONTRAST ->
                 filter10LightContrast
+
             Theme.ThemeType.DARK_CONTRAST ->
                 filter10DarkContrast
         }
@@ -5926,22 +7006,31 @@ object ThemeColor {
         return when (theme) {
             Theme.ThemeType.LIGHT ->
                 filter11Light
+
             Theme.ThemeType.DARK ->
                 filter11Dark
+
             Theme.ThemeType.EXTRA_DARK ->
                 filter11ExtraDark
+
             Theme.ThemeType.ELECTRIC ->
                 filter11Electric
+
             Theme.ThemeType.CLASSIC_LIGHT ->
                 filter11ClassicLight
+
             Theme.ThemeType.INDIGO ->
                 filter11Indigo
+
             Theme.ThemeType.RADIOACTIVE ->
                 filter11Radioactive
+
             Theme.ThemeType.ROSE ->
                 filter11Rose
+
             Theme.ThemeType.LIGHT_CONTRAST ->
                 filter11LightContrast
+
             Theme.ThemeType.DARK_CONTRAST ->
                 filter11DarkContrast
         }
@@ -5951,22 +7040,31 @@ object ThemeColor {
         return when (theme) {
             Theme.ThemeType.LIGHT ->
                 filter12Light
+
             Theme.ThemeType.DARK ->
                 filter12Dark
+
             Theme.ThemeType.EXTRA_DARK ->
                 filter12ExtraDark
+
             Theme.ThemeType.ELECTRIC ->
                 filter12Electric
+
             Theme.ThemeType.CLASSIC_LIGHT ->
                 filter12ClassicLight
+
             Theme.ThemeType.INDIGO ->
                 filter12Indigo
+
             Theme.ThemeType.RADIOACTIVE ->
                 filter12Radioactive
+
             Theme.ThemeType.ROSE ->
                 filter12Rose
+
             Theme.ThemeType.LIGHT_CONTRAST ->
                 filter12LightContrast
+
             Theme.ThemeType.DARK_CONTRAST ->
                 filter12DarkContrast
         }
@@ -5976,22 +7074,31 @@ object ThemeColor {
         return when (theme) {
             Theme.ThemeType.LIGHT ->
                 veilLight
+
             Theme.ThemeType.DARK ->
                 veilDark
+
             Theme.ThemeType.EXTRA_DARK ->
                 veilExtraDark
+
             Theme.ThemeType.ELECTRIC ->
                 veilElectric
+
             Theme.ThemeType.CLASSIC_LIGHT ->
                 veilClassicLight
+
             Theme.ThemeType.INDIGO ->
                 veilIndigo
+
             Theme.ThemeType.RADIOACTIVE ->
                 veilRadioactive
+
             Theme.ThemeType.ROSE ->
                 veilRose
+
             Theme.ThemeType.LIGHT_CONTRAST ->
                 veilLightContrast
+
             Theme.ThemeType.DARK_CONTRAST ->
                 veilDarkContrast
         }
@@ -6001,22 +7108,31 @@ object ThemeColor {
         return when (theme) {
             Theme.ThemeType.LIGHT ->
                 gradient01ALight
+
             Theme.ThemeType.DARK ->
                 gradient01ADark
+
             Theme.ThemeType.EXTRA_DARK ->
                 gradient01AExtraDark
+
             Theme.ThemeType.ELECTRIC ->
                 gradient01AElectric
+
             Theme.ThemeType.CLASSIC_LIGHT ->
                 gradient01AClassicLight
+
             Theme.ThemeType.INDIGO ->
                 gradient01AIndigo
+
             Theme.ThemeType.RADIOACTIVE ->
                 gradient01ARadioactive
+
             Theme.ThemeType.ROSE ->
                 gradient01ARose
+
             Theme.ThemeType.LIGHT_CONTRAST ->
                 gradient01ALightContrast
+
             Theme.ThemeType.DARK_CONTRAST ->
                 gradient01ADarkContrast
         }
@@ -6026,22 +7142,31 @@ object ThemeColor {
         return when (theme) {
             Theme.ThemeType.LIGHT ->
                 gradient01ELight
+
             Theme.ThemeType.DARK ->
                 gradient01EDark
+
             Theme.ThemeType.EXTRA_DARK ->
                 gradient01EExtraDark
+
             Theme.ThemeType.ELECTRIC ->
                 gradient01EElectric
+
             Theme.ThemeType.CLASSIC_LIGHT ->
                 gradient01EClassicLight
+
             Theme.ThemeType.INDIGO ->
                 gradient01EIndigo
+
             Theme.ThemeType.RADIOACTIVE ->
                 gradient01ERadioactive
+
             Theme.ThemeType.ROSE ->
                 gradient01ERose
+
             Theme.ThemeType.LIGHT_CONTRAST ->
                 gradient01ELightContrast
+
             Theme.ThemeType.DARK_CONTRAST ->
                 gradient01EDarkContrast
         }
@@ -6051,22 +7176,31 @@ object ThemeColor {
         return when (theme) {
             Theme.ThemeType.LIGHT ->
                 gradient02ALight
+
             Theme.ThemeType.DARK ->
                 gradient02ADark
+
             Theme.ThemeType.EXTRA_DARK ->
                 gradient02AExtraDark
+
             Theme.ThemeType.ELECTRIC ->
                 gradient02AElectric
+
             Theme.ThemeType.CLASSIC_LIGHT ->
                 gradient02AClassicLight
+
             Theme.ThemeType.INDIGO ->
                 gradient02AIndigo
+
             Theme.ThemeType.RADIOACTIVE ->
                 gradient02ARadioactive
+
             Theme.ThemeType.ROSE ->
                 gradient02ARose
+
             Theme.ThemeType.LIGHT_CONTRAST ->
                 gradient02ALightContrast
+
             Theme.ThemeType.DARK_CONTRAST ->
                 gradient02ADarkContrast
         }
@@ -6076,22 +7210,31 @@ object ThemeColor {
         return when (theme) {
             Theme.ThemeType.LIGHT ->
                 gradient02ELight
+
             Theme.ThemeType.DARK ->
                 gradient02EDark
+
             Theme.ThemeType.EXTRA_DARK ->
                 gradient02EExtraDark
+
             Theme.ThemeType.ELECTRIC ->
                 gradient02EElectric
+
             Theme.ThemeType.CLASSIC_LIGHT ->
                 gradient02EClassicLight
+
             Theme.ThemeType.INDIGO ->
                 gradient02EIndigo
+
             Theme.ThemeType.RADIOACTIVE ->
                 gradient02ERadioactive
+
             Theme.ThemeType.ROSE ->
                 gradient02ERose
+
             Theme.ThemeType.LIGHT_CONTRAST ->
                 gradient02ELightContrast
+
             Theme.ThemeType.DARK_CONTRAST ->
                 gradient02EDarkContrast
         }
@@ -6101,22 +7244,31 @@ object ThemeColor {
         return when (theme) {
             Theme.ThemeType.LIGHT ->
                 gradient03ALight
+
             Theme.ThemeType.DARK ->
                 gradient03ADark
+
             Theme.ThemeType.EXTRA_DARK ->
                 gradient03AExtraDark
+
             Theme.ThemeType.ELECTRIC ->
                 gradient03AElectric
+
             Theme.ThemeType.CLASSIC_LIGHT ->
                 gradient03AClassicLight
+
             Theme.ThemeType.INDIGO ->
                 gradient03AIndigo
+
             Theme.ThemeType.RADIOACTIVE ->
                 gradient03ARadioactive
+
             Theme.ThemeType.ROSE ->
                 gradient03ARose
+
             Theme.ThemeType.LIGHT_CONTRAST ->
                 gradient03ALightContrast
+
             Theme.ThemeType.DARK_CONTRAST ->
                 gradient03ADarkContrast
         }
@@ -6126,22 +7278,31 @@ object ThemeColor {
         return when (theme) {
             Theme.ThemeType.LIGHT ->
                 gradient03ELight
+
             Theme.ThemeType.DARK ->
                 gradient03EDark
+
             Theme.ThemeType.EXTRA_DARK ->
                 gradient03EExtraDark
+
             Theme.ThemeType.ELECTRIC ->
                 gradient03EElectric
+
             Theme.ThemeType.CLASSIC_LIGHT ->
                 gradient03EClassicLight
+
             Theme.ThemeType.INDIGO ->
                 gradient03EIndigo
+
             Theme.ThemeType.RADIOACTIVE ->
                 gradient03ERadioactive
+
             Theme.ThemeType.ROSE ->
                 gradient03ERose
+
             Theme.ThemeType.LIGHT_CONTRAST ->
                 gradient03ELightContrast
+
             Theme.ThemeType.DARK_CONTRAST ->
                 gradient03EDarkContrast
         }
@@ -6151,22 +7312,31 @@ object ThemeColor {
         return when (theme) {
             Theme.ThemeType.LIGHT ->
                 gradient04ALight
+
             Theme.ThemeType.DARK ->
                 gradient04ADark
+
             Theme.ThemeType.EXTRA_DARK ->
                 gradient04AExtraDark
+
             Theme.ThemeType.ELECTRIC ->
                 gradient04AElectric
+
             Theme.ThemeType.CLASSIC_LIGHT ->
                 gradient04AClassicLight
+
             Theme.ThemeType.INDIGO ->
                 gradient04AIndigo
+
             Theme.ThemeType.RADIOACTIVE ->
                 gradient04ARadioactive
+
             Theme.ThemeType.ROSE ->
                 gradient04ARose
+
             Theme.ThemeType.LIGHT_CONTRAST ->
                 gradient04ALightContrast
+
             Theme.ThemeType.DARK_CONTRAST ->
                 gradient04ADarkContrast
         }
@@ -6176,22 +7346,31 @@ object ThemeColor {
         return when (theme) {
             Theme.ThemeType.LIGHT ->
                 gradient04ELight
+
             Theme.ThemeType.DARK ->
                 gradient04EDark
+
             Theme.ThemeType.EXTRA_DARK ->
                 gradient04EExtraDark
+
             Theme.ThemeType.ELECTRIC ->
                 gradient04EElectric
+
             Theme.ThemeType.CLASSIC_LIGHT ->
                 gradient04EClassicLight
+
             Theme.ThemeType.INDIGO ->
                 gradient04EIndigo
+
             Theme.ThemeType.RADIOACTIVE ->
                 gradient04ERadioactive
+
             Theme.ThemeType.ROSE ->
                 gradient04ERose
+
             Theme.ThemeType.LIGHT_CONTRAST ->
                 gradient04ELightContrast
+
             Theme.ThemeType.DARK_CONTRAST ->
                 gradient04EDarkContrast
         }
@@ -6201,22 +7380,31 @@ object ThemeColor {
         return when (theme) {
             Theme.ThemeType.LIGHT ->
                 gradient05ALight
+
             Theme.ThemeType.DARK ->
                 gradient05ADark
+
             Theme.ThemeType.EXTRA_DARK ->
                 gradient05AExtraDark
+
             Theme.ThemeType.ELECTRIC ->
                 gradient05AElectric
+
             Theme.ThemeType.CLASSIC_LIGHT ->
                 gradient05AClassicLight
+
             Theme.ThemeType.INDIGO ->
                 gradient05AIndigo
+
             Theme.ThemeType.RADIOACTIVE ->
                 gradient05ARadioactive
+
             Theme.ThemeType.ROSE ->
                 gradient05ARose
+
             Theme.ThemeType.LIGHT_CONTRAST ->
                 gradient05ALightContrast
+
             Theme.ThemeType.DARK_CONTRAST ->
                 gradient05ADarkContrast
         }
@@ -6226,22 +7414,31 @@ object ThemeColor {
         return when (theme) {
             Theme.ThemeType.LIGHT ->
                 gradient05ELight
+
             Theme.ThemeType.DARK ->
                 gradient05EDark
+
             Theme.ThemeType.EXTRA_DARK ->
                 gradient05EExtraDark
+
             Theme.ThemeType.ELECTRIC ->
                 gradient05EElectric
+
             Theme.ThemeType.CLASSIC_LIGHT ->
                 gradient05EClassicLight
+
             Theme.ThemeType.INDIGO ->
                 gradient05EIndigo
+
             Theme.ThemeType.RADIOACTIVE ->
                 gradient05ERadioactive
+
             Theme.ThemeType.ROSE ->
                 gradient05ERose
+
             Theme.ThemeType.LIGHT_CONTRAST ->
                 gradient05ELightContrast
+
             Theme.ThemeType.DARK_CONTRAST ->
                 gradient05EDarkContrast
         }
@@ -6251,22 +7448,31 @@ object ThemeColor {
         return when (theme) {
             Theme.ThemeType.LIGHT ->
                 imageFilter01Light
+
             Theme.ThemeType.DARK ->
                 imageFilter01Dark
+
             Theme.ThemeType.EXTRA_DARK ->
                 imageFilter01ExtraDark
+
             Theme.ThemeType.ELECTRIC ->
                 imageFilter01Electric
+
             Theme.ThemeType.CLASSIC_LIGHT ->
                 imageFilter01ClassicLight
+
             Theme.ThemeType.INDIGO ->
                 imageFilter01Indigo
+
             Theme.ThemeType.RADIOACTIVE ->
                 imageFilter01Radioactive
+
             Theme.ThemeType.ROSE ->
                 imageFilter01Rose
+
             Theme.ThemeType.LIGHT_CONTRAST ->
                 imageFilter01LightContrast
+
             Theme.ThemeType.DARK_CONTRAST ->
                 imageFilter01DarkContrast
         }
@@ -6276,22 +7482,31 @@ object ThemeColor {
         return when (theme) {
             Theme.ThemeType.LIGHT ->
                 imageFilter02Light
+
             Theme.ThemeType.DARK ->
                 imageFilter02Dark
+
             Theme.ThemeType.EXTRA_DARK ->
                 imageFilter02ExtraDark
+
             Theme.ThemeType.ELECTRIC ->
                 imageFilter02Electric
+
             Theme.ThemeType.CLASSIC_LIGHT ->
                 imageFilter02ClassicLight
+
             Theme.ThemeType.INDIGO ->
                 imageFilter02Indigo
+
             Theme.ThemeType.RADIOACTIVE ->
                 imageFilter02Radioactive
+
             Theme.ThemeType.ROSE ->
                 imageFilter02Rose
+
             Theme.ThemeType.LIGHT_CONTRAST ->
                 imageFilter02LightContrast
+
             Theme.ThemeType.DARK_CONTRAST ->
                 imageFilter02DarkContrast
         }
@@ -6301,22 +7516,31 @@ object ThemeColor {
         return when (theme) {
             Theme.ThemeType.LIGHT ->
                 imageFilter03Light
+
             Theme.ThemeType.DARK ->
                 imageFilter03Dark
+
             Theme.ThemeType.EXTRA_DARK ->
                 imageFilter03ExtraDark
+
             Theme.ThemeType.ELECTRIC ->
                 imageFilter03Electric
+
             Theme.ThemeType.CLASSIC_LIGHT ->
                 imageFilter03ClassicLight
+
             Theme.ThemeType.INDIGO ->
                 imageFilter03Indigo
+
             Theme.ThemeType.RADIOACTIVE ->
                 imageFilter03Radioactive
+
             Theme.ThemeType.ROSE ->
                 imageFilter03Rose
+
             Theme.ThemeType.LIGHT_CONTRAST ->
                 imageFilter03LightContrast
+
             Theme.ThemeType.DARK_CONTRAST ->
                 imageFilter03DarkContrast
         }
@@ -6326,22 +7550,31 @@ object ThemeColor {
         return when (theme) {
             Theme.ThemeType.LIGHT ->
                 imageFilter04Light
+
             Theme.ThemeType.DARK ->
                 imageFilter04Dark
+
             Theme.ThemeType.EXTRA_DARK ->
                 imageFilter04ExtraDark
+
             Theme.ThemeType.ELECTRIC ->
                 imageFilter04Electric
+
             Theme.ThemeType.CLASSIC_LIGHT ->
                 imageFilter04ClassicLight
+
             Theme.ThemeType.INDIGO ->
                 imageFilter04Indigo
+
             Theme.ThemeType.RADIOACTIVE ->
                 imageFilter04Radioactive
+
             Theme.ThemeType.ROSE ->
                 imageFilter04Rose
+
             Theme.ThemeType.LIGHT_CONTRAST ->
                 imageFilter04LightContrast
+
             Theme.ThemeType.DARK_CONTRAST ->
                 imageFilter04DarkContrast
         }
@@ -6351,22 +7584,31 @@ object ThemeColor {
         return when (theme) {
             Theme.ThemeType.LIGHT ->
                 category01Light
+
             Theme.ThemeType.DARK ->
                 category01Dark
+
             Theme.ThemeType.EXTRA_DARK ->
                 category01ExtraDark
+
             Theme.ThemeType.ELECTRIC ->
                 category01Electric
+
             Theme.ThemeType.CLASSIC_LIGHT ->
                 category01ClassicLight
+
             Theme.ThemeType.INDIGO ->
                 category01Indigo
+
             Theme.ThemeType.RADIOACTIVE ->
                 category01Radioactive
+
             Theme.ThemeType.ROSE ->
                 category01Rose
+
             Theme.ThemeType.LIGHT_CONTRAST ->
                 category01LightContrast
+
             Theme.ThemeType.DARK_CONTRAST ->
                 category01DarkContrast
         }
@@ -6376,22 +7618,31 @@ object ThemeColor {
         return when (theme) {
             Theme.ThemeType.LIGHT ->
                 category02Light
+
             Theme.ThemeType.DARK ->
                 category02Dark
+
             Theme.ThemeType.EXTRA_DARK ->
                 category02ExtraDark
+
             Theme.ThemeType.ELECTRIC ->
                 category02Electric
+
             Theme.ThemeType.CLASSIC_LIGHT ->
                 category02ClassicLight
+
             Theme.ThemeType.INDIGO ->
                 category02Indigo
+
             Theme.ThemeType.RADIOACTIVE ->
                 category02Radioactive
+
             Theme.ThemeType.ROSE ->
                 category02Rose
+
             Theme.ThemeType.LIGHT_CONTRAST ->
                 category02LightContrast
+
             Theme.ThemeType.DARK_CONTRAST ->
                 category02DarkContrast
         }
@@ -6401,22 +7652,31 @@ object ThemeColor {
         return when (theme) {
             Theme.ThemeType.LIGHT ->
                 category03Light
+
             Theme.ThemeType.DARK ->
                 category03Dark
+
             Theme.ThemeType.EXTRA_DARK ->
                 category03ExtraDark
+
             Theme.ThemeType.ELECTRIC ->
                 category03Electric
+
             Theme.ThemeType.CLASSIC_LIGHT ->
                 category03ClassicLight
+
             Theme.ThemeType.INDIGO ->
                 category03Indigo
+
             Theme.ThemeType.RADIOACTIVE ->
                 category03Radioactive
+
             Theme.ThemeType.ROSE ->
                 category03Rose
+
             Theme.ThemeType.LIGHT_CONTRAST ->
                 category03LightContrast
+
             Theme.ThemeType.DARK_CONTRAST ->
                 category03DarkContrast
         }
@@ -6426,22 +7686,31 @@ object ThemeColor {
         return when (theme) {
             Theme.ThemeType.LIGHT ->
                 category04Light
+
             Theme.ThemeType.DARK ->
                 category04Dark
+
             Theme.ThemeType.EXTRA_DARK ->
                 category04ExtraDark
+
             Theme.ThemeType.ELECTRIC ->
                 category04Electric
+
             Theme.ThemeType.CLASSIC_LIGHT ->
                 category04ClassicLight
+
             Theme.ThemeType.INDIGO ->
                 category04Indigo
+
             Theme.ThemeType.RADIOACTIVE ->
                 category04Radioactive
+
             Theme.ThemeType.ROSE ->
                 category04Rose
+
             Theme.ThemeType.LIGHT_CONTRAST ->
                 category04LightContrast
+
             Theme.ThemeType.DARK_CONTRAST ->
                 category04DarkContrast
         }
@@ -6451,22 +7720,31 @@ object ThemeColor {
         return when (theme) {
             Theme.ThemeType.LIGHT ->
                 category05Light
+
             Theme.ThemeType.DARK ->
                 category05Dark
+
             Theme.ThemeType.EXTRA_DARK ->
                 category05ExtraDark
+
             Theme.ThemeType.ELECTRIC ->
                 category05Electric
+
             Theme.ThemeType.CLASSIC_LIGHT ->
                 category05ClassicLight
+
             Theme.ThemeType.INDIGO ->
                 category05Indigo
+
             Theme.ThemeType.RADIOACTIVE ->
                 category05Radioactive
+
             Theme.ThemeType.ROSE ->
                 category05Rose
+
             Theme.ThemeType.LIGHT_CONTRAST ->
                 category05LightContrast
+
             Theme.ThemeType.DARK_CONTRAST ->
                 category05DarkContrast
         }
@@ -6476,22 +7754,31 @@ object ThemeColor {
         return when (theme) {
             Theme.ThemeType.LIGHT ->
                 category06Light
+
             Theme.ThemeType.DARK ->
                 category06Dark
+
             Theme.ThemeType.EXTRA_DARK ->
                 category06ExtraDark
+
             Theme.ThemeType.ELECTRIC ->
                 category06Electric
+
             Theme.ThemeType.CLASSIC_LIGHT ->
                 category06ClassicLight
+
             Theme.ThemeType.INDIGO ->
                 category06Indigo
+
             Theme.ThemeType.RADIOACTIVE ->
                 category06Radioactive
+
             Theme.ThemeType.ROSE ->
                 category06Rose
+
             Theme.ThemeType.LIGHT_CONTRAST ->
                 category06LightContrast
+
             Theme.ThemeType.DARK_CONTRAST ->
                 category06DarkContrast
         }
@@ -6501,22 +7788,31 @@ object ThemeColor {
         return when (theme) {
             Theme.ThemeType.LIGHT ->
                 category07Light
+
             Theme.ThemeType.DARK ->
                 category07Dark
+
             Theme.ThemeType.EXTRA_DARK ->
                 category07ExtraDark
+
             Theme.ThemeType.ELECTRIC ->
                 category07Electric
+
             Theme.ThemeType.CLASSIC_LIGHT ->
                 category07ClassicLight
+
             Theme.ThemeType.INDIGO ->
                 category07Indigo
+
             Theme.ThemeType.RADIOACTIVE ->
                 category07Radioactive
+
             Theme.ThemeType.ROSE ->
                 category07Rose
+
             Theme.ThemeType.LIGHT_CONTRAST ->
                 category07LightContrast
+
             Theme.ThemeType.DARK_CONTRAST ->
                 category07DarkContrast
         }
@@ -6526,22 +7822,31 @@ object ThemeColor {
         return when (theme) {
             Theme.ThemeType.LIGHT ->
                 category08Light
+
             Theme.ThemeType.DARK ->
                 category08Dark
+
             Theme.ThemeType.EXTRA_DARK ->
                 category08ExtraDark
+
             Theme.ThemeType.ELECTRIC ->
                 category08Electric
+
             Theme.ThemeType.CLASSIC_LIGHT ->
                 category08ClassicLight
+
             Theme.ThemeType.INDIGO ->
                 category08Indigo
+
             Theme.ThemeType.RADIOACTIVE ->
                 category08Radioactive
+
             Theme.ThemeType.ROSE ->
                 category08Rose
+
             Theme.ThemeType.LIGHT_CONTRAST ->
                 category08LightContrast
+
             Theme.ThemeType.DARK_CONTRAST ->
                 category08DarkContrast
         }
@@ -6551,22 +7856,31 @@ object ThemeColor {
         return when (theme) {
             Theme.ThemeType.LIGHT ->
                 category09Light
+
             Theme.ThemeType.DARK ->
                 category09Dark
+
             Theme.ThemeType.EXTRA_DARK ->
                 category09ExtraDark
+
             Theme.ThemeType.ELECTRIC ->
                 category09Electric
+
             Theme.ThemeType.CLASSIC_LIGHT ->
                 category09ClassicLight
+
             Theme.ThemeType.INDIGO ->
                 category09Indigo
+
             Theme.ThemeType.RADIOACTIVE ->
                 category09Radioactive
+
             Theme.ThemeType.ROSE ->
                 category09Rose
+
             Theme.ThemeType.LIGHT_CONTRAST ->
                 category09LightContrast
+
             Theme.ThemeType.DARK_CONTRAST ->
                 category09DarkContrast
         }
@@ -6576,22 +7890,31 @@ object ThemeColor {
         return when (theme) {
             Theme.ThemeType.LIGHT ->
                 category10Light
+
             Theme.ThemeType.DARK ->
                 category10Dark
+
             Theme.ThemeType.EXTRA_DARK ->
                 category10ExtraDark
+
             Theme.ThemeType.ELECTRIC ->
                 category10Electric
+
             Theme.ThemeType.CLASSIC_LIGHT ->
                 category10ClassicLight
+
             Theme.ThemeType.INDIGO ->
                 category10Indigo
+
             Theme.ThemeType.RADIOACTIVE ->
                 category10Radioactive
+
             Theme.ThemeType.ROSE ->
                 category10Rose
+
             Theme.ThemeType.LIGHT_CONTRAST ->
                 category10LightContrast
+
             Theme.ThemeType.DARK_CONTRAST ->
                 category10DarkContrast
         }
@@ -6601,22 +7924,31 @@ object ThemeColor {
         return when (theme) {
             Theme.ThemeType.LIGHT ->
                 category11Light
+
             Theme.ThemeType.DARK ->
                 category11Dark
+
             Theme.ThemeType.EXTRA_DARK ->
                 category11ExtraDark
+
             Theme.ThemeType.ELECTRIC ->
                 category11Electric
+
             Theme.ThemeType.CLASSIC_LIGHT ->
                 category11ClassicLight
+
             Theme.ThemeType.INDIGO ->
                 category11Indigo
+
             Theme.ThemeType.RADIOACTIVE ->
                 category11Radioactive
+
             Theme.ThemeType.ROSE ->
                 category11Rose
+
             Theme.ThemeType.LIGHT_CONTRAST ->
                 category11LightContrast
+
             Theme.ThemeType.DARK_CONTRAST ->
                 category11DarkContrast
         }
@@ -6626,22 +7958,31 @@ object ThemeColor {
         return when (theme) {
             Theme.ThemeType.LIGHT ->
                 category12Light
+
             Theme.ThemeType.DARK ->
                 category12Dark
+
             Theme.ThemeType.EXTRA_DARK ->
                 category12ExtraDark
+
             Theme.ThemeType.ELECTRIC ->
                 category12Electric
+
             Theme.ThemeType.CLASSIC_LIGHT ->
                 category12ClassicLight
+
             Theme.ThemeType.INDIGO ->
                 category12Indigo
+
             Theme.ThemeType.RADIOACTIVE ->
                 category12Radioactive
+
             Theme.ThemeType.ROSE ->
                 category12Rose
+
             Theme.ThemeType.LIGHT_CONTRAST ->
                 category12LightContrast
+
             Theme.ThemeType.DARK_CONTRAST ->
                 category12DarkContrast
         }
@@ -6651,22 +7992,31 @@ object ThemeColor {
         return when (theme) {
             Theme.ThemeType.LIGHT ->
                 category13Light
+
             Theme.ThemeType.DARK ->
                 category13Dark
+
             Theme.ThemeType.EXTRA_DARK ->
                 category13ExtraDark
+
             Theme.ThemeType.ELECTRIC ->
                 category13Electric
+
             Theme.ThemeType.CLASSIC_LIGHT ->
                 category13ClassicLight
+
             Theme.ThemeType.INDIGO ->
                 category13Indigo
+
             Theme.ThemeType.RADIOACTIVE ->
                 category13Radioactive
+
             Theme.ThemeType.ROSE ->
                 category13Rose
+
             Theme.ThemeType.LIGHT_CONTRAST ->
                 category13LightContrast
+
             Theme.ThemeType.DARK_CONTRAST ->
                 category13DarkContrast
         }
@@ -6676,22 +8026,31 @@ object ThemeColor {
         return when (theme) {
             Theme.ThemeType.LIGHT ->
                 category14Light
+
             Theme.ThemeType.DARK ->
                 category14Dark
+
             Theme.ThemeType.EXTRA_DARK ->
                 category14ExtraDark
+
             Theme.ThemeType.ELECTRIC ->
                 category14Electric
+
             Theme.ThemeType.CLASSIC_LIGHT ->
                 category14ClassicLight
+
             Theme.ThemeType.INDIGO ->
                 category14Indigo
+
             Theme.ThemeType.RADIOACTIVE ->
                 category14Radioactive
+
             Theme.ThemeType.ROSE ->
                 category14Rose
+
             Theme.ThemeType.LIGHT_CONTRAST ->
                 category14LightContrast
+
             Theme.ThemeType.DARK_CONTRAST ->
                 category14DarkContrast
         }
@@ -6701,22 +8060,31 @@ object ThemeColor {
         return when (theme) {
             Theme.ThemeType.LIGHT ->
                 category15Light
+
             Theme.ThemeType.DARK ->
                 category15Dark
+
             Theme.ThemeType.EXTRA_DARK ->
                 category15ExtraDark
+
             Theme.ThemeType.ELECTRIC ->
                 category15Electric
+
             Theme.ThemeType.CLASSIC_LIGHT ->
                 category15ClassicLight
+
             Theme.ThemeType.INDIGO ->
                 category15Indigo
+
             Theme.ThemeType.RADIOACTIVE ->
                 category15Radioactive
+
             Theme.ThemeType.ROSE ->
                 category15Rose
+
             Theme.ThemeType.LIGHT_CONTRAST ->
                 category15LightContrast
+
             Theme.ThemeType.DARK_CONTRAST ->
                 category15DarkContrast
         }
@@ -6726,22 +8094,31 @@ object ThemeColor {
         return when (theme) {
             Theme.ThemeType.LIGHT ->
                 category16Light
+
             Theme.ThemeType.DARK ->
                 category16Dark
+
             Theme.ThemeType.EXTRA_DARK ->
                 category16ExtraDark
+
             Theme.ThemeType.ELECTRIC ->
                 category16Electric
+
             Theme.ThemeType.CLASSIC_LIGHT ->
                 category16ClassicLight
+
             Theme.ThemeType.INDIGO ->
                 category16Indigo
+
             Theme.ThemeType.RADIOACTIVE ->
                 category16Radioactive
+
             Theme.ThemeType.ROSE ->
                 category16Rose
+
             Theme.ThemeType.LIGHT_CONTRAST ->
                 category16LightContrast
+
             Theme.ThemeType.DARK_CONTRAST ->
                 category16DarkContrast
         }
@@ -6751,22 +8128,31 @@ object ThemeColor {
         return when (theme) {
             Theme.ThemeType.LIGHT ->
                 category17Light
+
             Theme.ThemeType.DARK ->
                 category17Dark
+
             Theme.ThemeType.EXTRA_DARK ->
                 category17ExtraDark
+
             Theme.ThemeType.ELECTRIC ->
                 category17Electric
+
             Theme.ThemeType.CLASSIC_LIGHT ->
                 category17ClassicLight
+
             Theme.ThemeType.INDIGO ->
                 category17Indigo
+
             Theme.ThemeType.RADIOACTIVE ->
                 category17Radioactive
+
             Theme.ThemeType.ROSE ->
                 category17Rose
+
             Theme.ThemeType.LIGHT_CONTRAST ->
                 category17LightContrast
+
             Theme.ThemeType.DARK_CONTRAST ->
                 category17DarkContrast
         }
@@ -6776,22 +8162,31 @@ object ThemeColor {
         return when (theme) {
             Theme.ThemeType.LIGHT ->
                 category18Light
+
             Theme.ThemeType.DARK ->
                 category18Dark
+
             Theme.ThemeType.EXTRA_DARK ->
                 category18ExtraDark
+
             Theme.ThemeType.ELECTRIC ->
                 category18Electric
+
             Theme.ThemeType.CLASSIC_LIGHT ->
                 category18ClassicLight
+
             Theme.ThemeType.INDIGO ->
                 category18Indigo
+
             Theme.ThemeType.RADIOACTIVE ->
                 category18Radioactive
+
             Theme.ThemeType.ROSE ->
                 category18Rose
+
             Theme.ThemeType.LIGHT_CONTRAST ->
                 category18LightContrast
+
             Theme.ThemeType.DARK_CONTRAST ->
                 category18DarkContrast
         }
@@ -6801,22 +8196,31 @@ object ThemeColor {
         return when (theme) {
             Theme.ThemeType.LIGHT ->
                 category19Light
+
             Theme.ThemeType.DARK ->
                 category19Dark
+
             Theme.ThemeType.EXTRA_DARK ->
                 category19ExtraDark
+
             Theme.ThemeType.ELECTRIC ->
                 category19Electric
+
             Theme.ThemeType.CLASSIC_LIGHT ->
                 category19ClassicLight
+
             Theme.ThemeType.INDIGO ->
                 category19Indigo
+
             Theme.ThemeType.RADIOACTIVE ->
                 category19Radioactive
+
             Theme.ThemeType.ROSE ->
                 category19Rose
+
             Theme.ThemeType.LIGHT_CONTRAST ->
                 category19LightContrast
+
             Theme.ThemeType.DARK_CONTRAST ->
                 category19DarkContrast
         }

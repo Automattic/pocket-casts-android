@@ -171,10 +171,13 @@ internal class BillingPaymentMapper(
                 period = period,
                 recurrenceMode = when (pricingPhase.recurrenceMode) {
                     RecurrenceMode.NON_RECURRING -> PricingSchedule.RecurrenceMode.NonRecurring
+
                     RecurrenceMode.FINITE_RECURRING -> PricingSchedule.RecurrenceMode.Recurring(
                         value = pricingPhase.billingCycleCount,
                     )
+
                     RecurrenceMode.INFINITE_RECURRING -> PricingSchedule.RecurrenceMode.Infinite
+
                     else -> {
                         dispatchMessage("Unrecognized recurrence mode '${pricingPhase.recurrenceMode}'", mappingContext)
                         return null
@@ -340,9 +343,13 @@ internal class BillingPaymentMapper(
 
             else -> null
         }
+
         SubscriptionOffer.IntroOffer -> ReplacementMode.CHARGE_FULL_PRICE
+
         SubscriptionOffer.Trial -> ReplacementMode.CHARGE_FULL_PRICE
+
         SubscriptionOffer.Referral -> ReplacementMode.CHARGE_FULL_PRICE
+
         SubscriptionOffer.Winback -> ReplacementMode.CHARGE_FULL_PRICE
     }
 

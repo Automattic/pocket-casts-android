@@ -65,6 +65,7 @@ fun Spanned.toAnnotatedString(urlColor: Int? = null): AnnotatedString = buildAnn
                     )
                 }
             }
+
             // Underline
             is UnderlineSpan -> {
                 addStyle(
@@ -73,6 +74,7 @@ fun Spanned.toAnnotatedString(urlColor: Int? = null): AnnotatedString = buildAnn
                     end,
                 )
             }
+
             // Foreground Color
             is ForegroundColorSpan -> {
                 addStyle(
@@ -81,6 +83,7 @@ fun Spanned.toAnnotatedString(urlColor: Int? = null): AnnotatedString = buildAnn
                     end,
                 )
             }
+
             // Background Color
             is BackgroundColorSpan -> {
                 addStyle(
@@ -89,6 +92,7 @@ fun Spanned.toAnnotatedString(urlColor: Int? = null): AnnotatedString = buildAnn
                     end,
                 )
             }
+
             // Strikethrough (Line-through)
             is StrikethroughSpan -> {
                 addStyle(
@@ -97,6 +101,7 @@ fun Spanned.toAnnotatedString(urlColor: Int? = null): AnnotatedString = buildAnn
                     end,
                 )
             }
+
             // Relative Size (scales the text)
             is RelativeSizeSpan -> {
                 // For a real-world app, you'd need the base font size to multiply by span.sizeChange.
@@ -109,6 +114,7 @@ fun Spanned.toAnnotatedString(urlColor: Int? = null): AnnotatedString = buildAnn
                     end,
                 )
             }
+
             // URL or clickable text
             is URLSpan -> {
                 // You can store the URL as an annotation and optionally add a style
@@ -130,6 +136,7 @@ fun Spanned.toAnnotatedString(urlColor: Int? = null): AnnotatedString = buildAnn
                     end,
                 )
             }
+
             // Subscript
             is SubscriptSpan -> {
                 // Compose doesn't have a built-in subscript style,
@@ -142,6 +149,7 @@ fun Spanned.toAnnotatedString(urlColor: Int? = null): AnnotatedString = buildAnn
                     end,
                 )
             }
+
             // Superscript
             is SuperscriptSpan -> {
                 // Similarly, let's demonstrate a smaller font size with a shift
@@ -152,6 +160,7 @@ fun Spanned.toAnnotatedString(urlColor: Int? = null): AnnotatedString = buildAnn
                     end,
                 )
             }
+
             // You can keep adding more span types as needed
             else -> {}
         }

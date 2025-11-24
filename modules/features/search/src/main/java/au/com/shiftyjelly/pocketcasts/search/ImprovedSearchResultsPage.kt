@@ -63,6 +63,7 @@ fun ImprovedSearchResultsPage(
                 }
                 SearchFailedView()
             }
+
             is SearchUiState.SearchOperation.Success -> {
                 ImprovedSearchResultsView(
                     state = operation,

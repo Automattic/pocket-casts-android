@@ -203,6 +203,7 @@ object AutoConverter {
                 } else {
                     IR.drawable.ic_auto_playlist_manual
                 }
+
                 Playlist.Type.Smart -> if (Util.isAutomotive(context)) {
                     nonDefaultIcon?.automotiveDrawableId ?: IR.drawable.ic_automotive_playlist_smart
                 } else {

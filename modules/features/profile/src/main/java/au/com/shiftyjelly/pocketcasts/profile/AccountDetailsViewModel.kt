@@ -56,6 +56,7 @@ class AccountDetailsViewModel @Inject constructor(
     internal val headerState = signInState.asFlow().map { state ->
         when (state) {
             is SignInState.SignedOut -> AccountHeaderState.empty()
+
             is SignInState.SignedIn -> {
                 val subscription = state.subscription
                 AccountHeaderState(
@@ -158,6 +159,7 @@ class AccountDetailsViewModel @Inject constructor(
         } else {
             when (val subscriptionsResult = paymentClient.loadAcknowledgedSubscriptions()) {
                 is PaymentResult.Failure -> WinbackInitParams.Empty
+
                 is PaymentResult.Success -> WinbackInitParams(
                     hasGoogleSubscription = subscriptionsResult.value.any { it.isAutoRenewing },
                 )

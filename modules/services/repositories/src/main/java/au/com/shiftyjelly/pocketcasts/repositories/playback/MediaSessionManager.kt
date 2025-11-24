@@ -435,8 +435,11 @@ class MediaSessionManager(
         settings.mediaControlItems.value.take(visibleCount).forEach { mediaControl ->
             when (mediaControl) {
                 MediaNotificationControls.Archive -> addCustomAction(stateBuilder, APP_ACTION_ARCHIVE, "Archive", IR.drawable.ic_archive)
+
                 MediaNotificationControls.MarkAsPlayed -> addCustomAction(stateBuilder, APP_ACTION_MARK_AS_PLAYED, "Mark as played", IR.drawable.auto_markasplayed)
+
                 MediaNotificationControls.PlayNext -> addCustomAction(stateBuilder, APP_ACTION_PLAY_NEXT, "Play next", com.google.android.gms.cast.framework.R.drawable.cast_ic_mini_controller_skip_next)
+
                 MediaNotificationControls.PlaybackSpeed -> {
                     if (playbackManager.isAudioEffectsAvailable()) {
                         val drawableId = when (playbackState.playbackSpeed.roundedSpeed()) {
@@ -492,6 +495,7 @@ class MediaSessionManager(
                         stateBuilder.addCustomAction(APP_ACTION_CHANGE_SPEED, "Change speed", drawableId)
                     }
                 }
+
                 MediaNotificationControls.Star -> {
                     if (currentEpisode is PodcastEpisode) {
                         if (currentEpisode.isStarred) {
@@ -531,12 +535,12 @@ class MediaSessionManager(
                 logEvent(keyEvent.toString())
                 if (keyEvent.action == KeyEvent.ACTION_DOWN) {
                     LogBuffer.i(LogBuffer.TAG_PLAYBACK, "Media button Android event: ${keyEvent.action}")
+                    /**
+                     * KEYCODE_MEDIA_PLAY_PAUSE - called when the player audio has focus
+                     * KEYCODE_MEDIA_PLAY - can be called when the player doesn't have focus such when sleep mode
+                     * KEYCODE_HEADSETHOOK - called on most wired headsets
+                     */
                     val inputEvent = when (keyEvent.keyCode) {
-                        /**
-                         * KEYCODE_MEDIA_PLAY_PAUSE - called when the player audio has focus
-                         * KEYCODE_MEDIA_PLAY - can be called when the player doesn't have focus such when sleep mode
-                         * KEYCODE_HEADSETHOOK - called on most wired headsets
-                         */
                         KeyEvent.KEYCODE_MEDIA_PLAY, KeyEvent.KEYCODE_MEDIA_PLAY_PAUSE, KeyEvent.KEYCODE_HEADSETHOOK -> MediaEvent.SingleTap
                         KeyEvent.KEYCODE_MEDIA_NEXT -> MediaEvent.DoubleTap
                         KeyEvent.KEYCODE_MEDIA_PREVIOUS -> MediaEvent.TripleTap
@@ -599,15 +603,18 @@ class MediaSessionManager(
         private fun handleMediaButtonAction(action: HeadphoneAction) {
             when (action) {
                 HeadphoneAction.ADD_BOOKMARK -> onAddBookmark()
+
                 HeadphoneAction.SKIP_FORWARD -> {
                     onSkipToNext()
                     if (!playbackManager.isPlaying()) {
                         enqueueCommand("play") { playbackManager.playQueueSuspend(source) }
                     }
                 }
+
                 HeadphoneAction.SKIP_BACK -> {
                     onSkipToPrevious()
                 }
+
                 HeadphoneAction.NEXT_CHAPTER,
                 HeadphoneAction.PREVIOUS_CHAPTER,
                 -> Timber.e(ACTION_NOT_SUPPORTED)
@@ -709,14 +716,21 @@ class MediaSessionManager(
                 APP_ACTION_SKIP_BACK -> enqueueCommand("custom action: skip back") {
                     playbackManager.skipBackwardSuspend()
                 }
+
                 APP_ACTION_SKIP_FWD -> enqueueCommand("custom action: skip forward") {
                     playbackManager.skipForwardSuspend()
                 }
+
                 APP_ACTION_MARK_AS_PLAYED -> markAsPlayed()
+
                 APP_ACTION_STAR -> starEpisode()
+
                 APP_ACTION_UNSTAR -> unstarEpisode()
+
                 APP_ACTION_CHANGE_SPEED -> changePlaybackSpeed()
+
                 APP_ACTION_ARCHIVE -> archive()
+
                 APP_ACTION_PLAY_NEXT -> enqueueCommand("suctom action: play next") {
                     playbackManager.playNextInQueue()
                 }

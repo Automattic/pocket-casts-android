@@ -44,6 +44,7 @@ class ChangePwdViewModel
             is ChangePasswordState.Failure -> {
                 errors.addAll(existingState.errors)
             }
+
             else -> {}
         }
         if (add) errors.add(error) else errors.remove(error)

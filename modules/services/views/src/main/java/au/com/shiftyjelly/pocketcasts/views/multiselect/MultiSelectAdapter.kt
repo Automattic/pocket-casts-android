@@ -92,10 +92,12 @@ class MultiSelectAdapter(val editable: Boolean, val listener: ((MultiSelectActio
                 val binding = AdapterMultiselectItemBinding.inflate(layoutInflater, parent, false)
                 ItemViewHolder(binding)
             }
+
             R.layout.adapter_multiselect_title -> {
                 val binding = AdapterMultiselectTitleBinding.inflate(layoutInflater, parent, false)
                 TitleViewHolder(binding)
             }
+
             else -> throw IllegalStateException("Unknown view type in shelf")
         }
     }

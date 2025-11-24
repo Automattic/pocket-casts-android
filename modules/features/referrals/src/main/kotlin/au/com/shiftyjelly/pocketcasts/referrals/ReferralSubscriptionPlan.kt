@@ -58,22 +58,27 @@ data class ReferralSubscriptionPlan private constructor(
                     PaymentResultCode.DeveloperError,
                     "Can't create referral offer from ${plan.offer}",
                 )
+
                 plan.pricingPhases.size != 2 -> PaymentResult.Failure(
                     PaymentResultCode.DeveloperError,
                     "${plan.offer} should have 2 pricing phases",
                 )
+
                 plan.pricingPhases[0].price.amount.stripTrailingZeros() != BigDecimal.ZERO -> PaymentResult.Failure(
                     PaymentResultCode.DeveloperError,
                     "${plan.offer} should have free initial period. Found ${plan.pricingPhases[0].price}",
                 )
+
                 plan.pricingPhases[0].schedule.recurrenceMode !is RecurrenceMode.Recurring -> PaymentResult.Failure(
                     PaymentResultCode.DeveloperError,
                     "${plan.offer} should have recurring initial period",
                 )
+
                 plan.pricingPhases[1].schedule.recurrenceMode != RecurrenceMode.Infinite -> PaymentResult.Failure(
                     PaymentResultCode.DeveloperError,
                     "${plan.offer} should have infinite second period",
                 )
+
                 else -> PaymentResult.Success(
                     ReferralSubscriptionPlan(plan.key, plan.pricingPhases[0], plan.pricingPhases[1]),
                 )

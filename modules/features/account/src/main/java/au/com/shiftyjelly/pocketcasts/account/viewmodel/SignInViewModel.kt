@@ -29,6 +29,7 @@ class SignInViewModel
             is SignInState.Failure -> {
                 errors.addAll(existingState.errors)
             }
+
             else -> {}
         }
         if (add) errors.add(error) else errors.remove(error)
@@ -81,6 +82,7 @@ class SignInViewModel
                     podcastManager.refreshPodcastsAfterSignIn()
                     signInState.postValue(SignInState.Success)
                 }
+
                 is LoginResult.Failed -> {
                     val message = result.message
                     val errors = mutableSetOf(SignInError.SERVER)

@@ -79,6 +79,7 @@ internal sealed interface PlayerWidgetEpisode {
                 podcastUuid = episode.podcastUuid,
                 artworkUrl = episode.imageUrl,
             )
+
             is UserEpisode -> User(
                 uuid = episode.uuid,
                 title = episode.title,

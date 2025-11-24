@@ -133,6 +133,7 @@ class FolderManagerImpl @Inject constructor(
                     }
                     podcasts.add(podcast)
                 }
+
                 is FolderItem.Folder -> {
                     val folder = folderItem.folder.apply {
                         sortPosition = index
@@ -173,6 +174,7 @@ class FolderManagerImpl @Inject constructor(
             PodcastsSortType.EPISODE_DATE_NEWEST_TO_OLDEST,
             PodcastsSortType.RECENTLY_PLAYED,
             -> folderItems
+
             else -> folderItems.sortedWith(sortType.folderComparator)
         }
     }
@@ -203,7 +205,9 @@ class FolderManagerImpl @Inject constructor(
         // use a query to get the podcasts ordered by episode release date
         return when (folder.podcastsSortType) {
             PodcastsSortType.EPISODE_DATE_NEWEST_TO_OLDEST -> podcastManager.findFolderPodcastsOrderByLatestEpisode(folderUuid = folderUuid)
+
             PodcastsSortType.RECENTLY_PLAYED -> podcastManager.findFolderPodcastsOrderByRecentlyPlayedEpisode(folderUuid = folderUuid)
+
             else -> {
                 val podcasts = podcastManager.findPodcastsInFolder(folderUuid = folderUuid)
                 podcasts.sortedWith(folder.podcastsSortType.podcastComparator)

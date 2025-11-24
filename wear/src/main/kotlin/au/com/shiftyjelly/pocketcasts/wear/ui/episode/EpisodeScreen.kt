@@ -142,6 +142,7 @@ fun EpisodeScreen(
                         )
 
                         EpisodeStatusEnum.DOWNLOADED -> DownloadButtonState.Downloaded(downloadSize)
+
                         EpisodeStatusEnum.DOWNLOAD_FAILED -> DownloadButtonState.Errored
                     },
                     modifier = Modifier.size(24.dp),
