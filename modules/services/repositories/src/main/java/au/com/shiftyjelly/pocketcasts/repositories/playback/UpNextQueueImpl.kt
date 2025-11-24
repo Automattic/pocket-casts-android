@@ -125,8 +125,11 @@ class UpNextQueueImpl @Inject constructor(
     private fun saveChangesBlocking(action: UpNextAction) {
         when (action) {
             is UpNextAction.PlayNow -> insertUpNextEpisodeBlocking(episode = action.episode, position = 0)
+
             is UpNextAction.PlayNext -> insertUpNextEpisodeBlocking(episode = action.episode, position = 1)
+
             is UpNextAction.PlayLast -> insertUpNextEpisodeBlocking(episode = action.episode, position = -1)
+
             is UpNextAction.ReplaceAll -> appDatabase.runInTransaction {
                 upNextDao.deleteAllBlocking()
                 val episodes = action.episodes.mapIndexed { index, episode ->
@@ -134,12 +137,19 @@ class UpNextQueueImpl @Inject constructor(
                 }
                 upNextDao.insertAllBlocking(episodes)
             }
+
             is UpNextAction.Remove -> upNextDao.deleteByUuidBlocking(uuid = action.episode.uuid)
+
             is UpNextAction.RemoveAndShuffle -> upNextDao.deleteByUuidBlocking(uuid = action.episode.uuid)
+
             is UpNextAction.Rearrange -> upNextDao.saveAllBlocking(episodes = action.episodes)
+
             is UpNextAction.Import -> upNextDao.saveAllBlocking(episodes = action.episodes)
+
             is UpNextAction.ClearUpNext -> upNextDao.deleteAllNotCurrentBlocking()
+
             is UpNextAction.ClearAll -> upNextDao.deleteAllBlocking()
+
             is UpNextAction.ClearAllIncludingChanges -> {
                 upNextDao.deleteAllBlocking()
                 upNextChangeDao.deleteAllBlocking()

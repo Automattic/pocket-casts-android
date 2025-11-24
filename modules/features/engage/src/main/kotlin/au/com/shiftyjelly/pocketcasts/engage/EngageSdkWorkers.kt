@@ -135,10 +135,12 @@ internal abstract class ClusterSyncWorker(
                 Timber.tag(TAG).d("Max retry attempt count exceeded. Current attempt: $runAttemptCount. Failing '$type' cluster sync.")
                 Result.failure()
             }
+
             !client.isServiceAvailable.await() -> {
                 Timber.tag(TAG).d("Engage SDK service is not avaialable. Failing '$type' cluster sync.")
                 Result.failure()
             }
+
             else -> submitCluster(service).awaitSafe()
         }
     }
@@ -165,8 +167,10 @@ internal abstract class ClusterSyncWorker(
             AppEngageErrorCode.SERVICE_CALL_INTERNAL,
             AppEngageErrorCode.SERVICE_CALL_RESOURCE_EXHAUSTED,
             -> true
+
             else -> false
         }
+
         else -> false
     }
 }

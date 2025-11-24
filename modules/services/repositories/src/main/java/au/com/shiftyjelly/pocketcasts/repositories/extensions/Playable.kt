@@ -25,9 +25,11 @@ private fun episodeSummaryText(episode: PodcastEpisode, dateFormatter: RelativeD
     val resources = context.resources
     var startText = when (episode.episodeType) {
         is PodcastEpisode.EpisodeType.Regular -> PodcastEpisode.seasonPrefix(episode.episodeType, episode.season, episode.number, resources)
+
         is PodcastEpisode.EpisodeType.Bonus -> resources.getString(R.string.episode_bonus).uppercase(
             Locale.getDefault(),
         )
+
         is PodcastEpisode.EpisodeType.Trailer -> (
             if ((episode.season ?: 0) > 0) {
                 resources.getString(R.string.episode_season_trailer, episode.season)

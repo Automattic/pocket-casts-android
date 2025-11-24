@@ -193,8 +193,11 @@ private class ShowPageAdapter : DeepLinkAdapter {
     override fun create(intent: Intent) = if (intent.action == ACTION_VIEW) {
         when (intent.getStringExtra(EXTRA_PAGE)) {
             "podcasts" -> ShowPodcastsDeepLink
+
             "search" -> ShowDiscoverDeepLink
+
             "upnext" -> ShowUpNextModalDeepLink
+
             "playlist" -> {
                 val uuid = intent.getStringExtra(EXTRA_PLAYLIST_UUID) ?: return null
                 val type = intent.getStringExtra(EXTRA_PLAYLIST_TYPE) ?: return null
@@ -527,6 +530,7 @@ private class ShareLinkAdapter(
                     autoPlay = uriData.getQueryParameter(EXTRA_AUTO_PLAY).toBoolean(),
                     sourceView = uriData.getQueryParameter(EXTRA_SOURCE_VIEW),
                 )
+
                 // handle the different podcast share links such as /itunes/itunes_id, /feed/feed_url
                 else -> ShowPodcastFromUrlDeepLink(uriData.toString())
             }

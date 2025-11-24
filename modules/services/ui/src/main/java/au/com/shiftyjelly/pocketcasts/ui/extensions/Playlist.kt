@@ -30,7 +30,9 @@ val PlaylistEntity.Companion.themeColors: List<Int>
 fun PlaylistEntity.getStringForDuration(context: Context?): String {
     return when {
         context == null -> ""
+
         !filterDuration -> context.getString(LR.string.filters_duration)
+
         else -> {
             val longer = TimeHelper.getTimeDurationShortString(timeMs = (longerThan.toDouble() * 60000).toLong(), context = context)
             val shorter = TimeHelper.getTimeDurationShortString(timeMs = (shorterThan.toDouble() * 60000).toLong(), context = context)

@@ -87,6 +87,7 @@ class AppReviewDialogFragment : BaseDialogFragment() {
         if (!requireActivity().isChangingConfigurations) {
             when (userReviewResponse) {
                 UserReviewResponse.Yes -> Unit
+
                 UserReviewResponse.No -> {
                     viewModel.declineAppReview()
                 }

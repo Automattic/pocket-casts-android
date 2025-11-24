@@ -67,6 +67,7 @@ class WearMainActivityViewModel @Inject constructor(
     private fun onLoginFromPhoneResult(loginResult: LoginResult) {
         when (loginResult) {
             is LoginResult.Failed -> { /* do nothing */ }
+
             is LoginResult.Success -> {
                 viewModelScope.launch {
                     podcastManager.refreshPodcastsAfterSignIn()

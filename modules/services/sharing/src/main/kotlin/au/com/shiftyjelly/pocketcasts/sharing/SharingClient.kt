@@ -504,17 +504,26 @@ data class SharingRequest internal constructor(
 
         private val Data.analyticsValue get() = when (this) {
             is Data.Podcast -> "podcast"
+
             is Data.Episode -> "episode"
+
             is Data.EpisodePosition -> when (type) {
                 TimestampType.Episode -> "current_time"
                 TimestampType.Bookmark -> "bookmark_time"
             }
+
             is Data.EpisodeFile -> "episode_file"
+
             is Data.ClipLink -> "clip_link"
+
             is Data.ClipAudio -> "clip_audio"
+
             is Data.ClipVideo -> "clip_video"
+
             is Data.ReferralLink -> "referral_link"
+
             is Data.EndOfYearStory -> "end_of_year_story"
+
             is Data.Transcript -> "transcript"
         }
 
@@ -654,7 +663,9 @@ data class SharingRequest internal constructor(
                 shortUrl: String,
             ) = when (story) {
                 is Story.PlaceholderWhileLoading -> shortUrl
+
                 is Story.Cover -> shortUrl
+
                 is Story.NumberOfShows -> buildString {
                     append(
                         context.getString(
@@ -667,12 +678,15 @@ data class SharingRequest internal constructor(
                     append(' ')
                     append(shortUrl)
                 }
+
                 is Story.TopShow -> context.getString(
                     LR.string.end_of_year_story_top_podcast_share_text,
                     year.value,
                     "$shortUrl/podcast/${story.show.uuid}",
                 )
+
                 is Story.TopShows -> context.getString(LR.string.end_of_year_story_top_podcasts_share_text, story.podcastListUrl ?: shortUrl)
+
                 is Story.Ratings -> buildString {
                     append(
                         context.getString(
@@ -685,6 +699,7 @@ data class SharingRequest internal constructor(
                     append(' ')
                     append(shortUrl)
                 }
+
                 is Story.TotalTime -> buildString {
                     append(
                         context.getString(
@@ -695,12 +710,15 @@ data class SharingRequest internal constructor(
                     append(' ')
                     append(shortUrl)
                 }
+
                 is Story.LongestEpisode -> context.getString(
                     LR.string.end_of_year_story_longest_episode_share_text,
                     year.value,
                     "$shortUrl/episode/${story.episode.episodeId}",
                 )
+
                 is Story.PlusInterstitial -> shortUrl
+
                 is Story.YearVsYear -> buildString {
                     append(
                         context.getString(
@@ -712,6 +730,7 @@ data class SharingRequest internal constructor(
                     append(' ')
                     append(shortUrl)
                 }
+
                 is Story.CompletionRate -> buildString {
                     append(
                         context.getString(
@@ -722,6 +741,7 @@ data class SharingRequest internal constructor(
                     append(' ')
                     append(shortUrl)
                 }
+
                 is Story.Ending -> shortUrl
             }
 

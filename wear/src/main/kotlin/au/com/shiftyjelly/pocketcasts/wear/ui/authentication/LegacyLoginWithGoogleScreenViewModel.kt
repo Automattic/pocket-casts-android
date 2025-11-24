@@ -50,6 +50,7 @@ class LegacyLoginWithGoogleScreenViewModel @Inject constructor(
                 is LoginResult.Failed -> {
                     LogBuffer.i(LogBuffer.TAG_BACKGROUND_TASKS, "Failed to login with Google: ${loginResult.message}")
                 }
+
                 is LoginResult.Success -> {
                     podcastManager.refreshPodcastsAfterSignIn()
                 }

@@ -186,9 +186,11 @@ private fun AppliedRules.description(ruleType: RuleType, starredEpisodeCount: In
                     episodeStatus.inProgress && episodeStatus.completed -> {
                         stringResource(LR.string.episode_status_rule_description, stringResource(LR.string.unplayed), 2)
                     }
+
                     episodeStatus.inProgress || episodeStatus.completed -> {
                         stringResource(LR.string.episode_status_rule_description, stringResource(LR.string.unplayed), 1)
                     }
+
                     else -> {
                         stringResource(LR.string.unplayed)
                     }
@@ -207,6 +209,7 @@ private fun AppliedRules.description(ruleType: RuleType, starredEpisodeCount: In
                 episodeStatus.completed -> {
                     stringResource(LR.string.played)
                 }
+
                 else -> null
             }
         } else {
@@ -226,12 +229,14 @@ private fun AppliedRules.description(ruleType: RuleType, starredEpisodeCount: In
 
     RuleType.EpisodeDuration -> when (episodeDuration) {
         is EpisodeDurationRule.Any -> stringResource(LR.string.off)
+
         is EpisodeDurationRule.Constrained -> {
             val context = LocalContext.current
             val min = TimeHelper.getTimeDurationShortString(episodeDuration.longerThan.inWholeMilliseconds, context)
             val max = TimeHelper.getTimeDurationShortString(episodeDuration.shorterThan.inWholeMilliseconds, context)
             "$min - $max"
         }
+
         null -> null
     }
 

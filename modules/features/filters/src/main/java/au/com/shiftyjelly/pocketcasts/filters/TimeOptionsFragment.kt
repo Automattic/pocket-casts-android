@@ -187,6 +187,7 @@ class TimeOptionsFragment :
 
             selectedPosition = when (optionType) {
                 OptionsType.Time -> options.indexOfFirst { it.playlistValue!! >= playlist.filterHours }
+
                 OptionsType.Downloaded -> if (playlist.downloaded && playlist.notDownloaded) {
                     0
                 } else if (playlist.downloaded) {
@@ -194,6 +195,7 @@ class TimeOptionsFragment :
                 } else {
                     2
                 }
+
                 OptionsType.AudioVideo -> if (playlist.audioVideo == PlaylistEntity.AUDIO_VIDEO_FILTER_ALL) {
                     0
                 } else if (playlist.audioVideo == PlaylistEntity.AUDIO_VIDEO_FILTER_AUDIO_ONLY) {

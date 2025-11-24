@@ -39,6 +39,7 @@ fun ReferralsIconWithTooltip(
 
     when (state) {
         is UiState.Loading, UiState.NoOffer -> Unit
+
         is UiState.Loaded -> {
             ReferralsIconWithTooltip(
                 state = state,

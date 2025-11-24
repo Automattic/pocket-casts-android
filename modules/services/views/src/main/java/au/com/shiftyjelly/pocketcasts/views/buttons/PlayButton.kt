@@ -92,10 +92,15 @@ class PlayButton @JvmOverloads constructor(
                 listener?. onPlayClicked(episodeUuid)
                 UiUtil.hideKeyboard(this)
             }
+
             PlayButtonType.PAUSE -> listener?.onPauseClicked()
+
             PlayButtonType.DOWNLOAD -> listener?.onDownload(episodeUuid)
+
             PlayButtonType.STOP_DOWNLOAD -> listener?.onStopDownloading(episodeUuid)
+
             PlayButtonType.PLAYBACK_FAILED -> listener?.onPlayClicked(episodeUuid)
+
             PlayButtonType.PLAYED -> listener?.onPlayedClicked(episodeUuid)
         }
     }

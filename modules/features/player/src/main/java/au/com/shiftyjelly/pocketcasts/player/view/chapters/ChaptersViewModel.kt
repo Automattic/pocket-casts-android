@@ -54,6 +54,7 @@ class ChaptersViewModel @AssistedInject constructor(
     @OptIn(ExperimentalCoroutinesApi::class)
     private fun Mode.uiStateFlow() = when (this) {
         is Mode.Episode -> createUiStateFlow(episodeId)
+
         is Mode.Player ->
             playbackManager.playbackStateFlow
                 .map { it.episodeUuid }
@@ -87,12 +88,14 @@ class ChaptersViewModel @AssistedInject constructor(
 
             when {
                 playbackState.episodeUuid == episodeId && playbackState.positionMs.milliseconds in chapter -> _showPlayer.emit(Unit)
+
                 playbackState.episodeUuid == episodeId -> {
                     playbackManager.skipToChapter(chapter)
                     if (!playbackState.isPlaying) {
                         playbackManager.playNowSuspend(episodeId)
                     }
                 }
+
                 playbackState.episodeUuid != episodeId -> {
                     val episode = episodeManager.findEpisodeByUuid(episodeId) ?: return@launch
                     episode.playedUpToMs = chapter.startTime.inWholeMilliseconds.toInt()
@@ -175,6 +178,7 @@ class ChaptersViewModel @AssistedInject constructor(
         } else {
             episode.playedUpToMs
         }
+
         is Mode.Player -> playbackState.positionMs
     }.milliseconds
 

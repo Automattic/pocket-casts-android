@@ -384,7 +384,7 @@ class DownloadEpisodeTask @AssistedInject constructor(
                 val contentType = body.contentType()
 
                 // basic sanity checks to make sure the file looks big enough and it's content type isn't text
-                if (bytesRemaining in 1..<BAD_EPISODE_SIZE || bytesRemaining in 1..<SUSPECT_EPISODE_SIZE && contentType?.toString().orEmpty().contains("text", ignoreCase = true)) {
+                if (bytesRemaining in 1..<BAD_EPISODE_SIZE || (bytesRemaining in 1..<SUSPECT_EPISODE_SIZE && contentType?.toString().orEmpty().contains("text", ignoreCase = true))) {
                     episodeDownloadError.reason = EpisodeDownloadError.Reason.SuspiciousContent
                     if (!emitter.isDisposed) {
                         emitter.onError(DownloadFailed(FileNotFoundException(), "File not found. The podcast author may have moved or deleted this episode file.", false))

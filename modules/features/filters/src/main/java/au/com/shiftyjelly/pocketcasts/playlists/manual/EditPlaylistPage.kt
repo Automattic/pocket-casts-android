@@ -291,6 +291,7 @@ private fun Footer(
             } else {
                 null
             }
+
             is PlaylistEpisode.Unavailable -> IR.drawable.ic_episode_unavailable
         }
         if (episodeIcon != null) {

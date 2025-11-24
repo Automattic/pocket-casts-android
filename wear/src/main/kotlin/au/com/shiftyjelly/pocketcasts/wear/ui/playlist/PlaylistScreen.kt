@@ -57,6 +57,7 @@ fun PlaylistScreen(
         is UiState.Loading -> LoadingScreen(
             modifier = modifier,
         )
+
         is UiState.Empty -> {
             Column(
                 verticalArrangement = Arrangement.Center,

@@ -76,6 +76,7 @@ class AppearanceSettingsFragment : BaseFragment() {
         viewModel.createAccountState.observe(viewLifecycleOwner) { state ->
             when (state) {
                 is SettingsAppearanceState.ThemesAndIconsLoading -> {}
+
                 is SettingsAppearanceState.ThemesAndIconsLoaded -> {
                     val mainWidth = activity?.resources?.displayMetrics?.widthPixels // Display metrics gives the app size not the display, it's badly named. Works in chromebooks and split screen
                     val isSignedInAsPlusOrPatron = viewModel.signInState.value?.isSignedInAsPlusOrPatron ?: false
@@ -112,6 +113,7 @@ class AppearanceSettingsFragment : BaseFragment() {
                     binding.appIconRecyclerView.setHasFixedSize(true)
                     scrollToCurrentAppIcon()
                 }
+
                 else -> {}
             }
         }

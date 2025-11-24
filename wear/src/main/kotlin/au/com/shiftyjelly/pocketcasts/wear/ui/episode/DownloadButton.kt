@@ -33,7 +33,9 @@ fun DownloadButton(
     ) {
         when (downloadButtonState) {
             is DownloadButtonState.Downloading -> downloadButtonState.progressPercent
+
             is DownloadButtonState.Queued -> 0f
+
             is DownloadButtonState.Downloaded,
             is DownloadButtonState.NotDownloaded,
             DownloadButtonState.Errored,
@@ -52,11 +54,13 @@ fun DownloadButton(
             painter = painterResource(
                 when (downloadButtonState) {
                     is DownloadButtonState.Downloaded -> R.drawable.ic_downloaded
+
                     DownloadButtonState.Queued,
                     is DownloadButtonState.Downloading,
                     -> R.drawable.ic_downloading
 
                     DownloadButtonState.Errored -> R.drawable.ic_retry
+
                     is DownloadButtonState.NotDownloaded -> R.drawable.ic_download
                 },
             ),

@@ -29,6 +29,7 @@ internal fun PodcastCard(
         constrainedSize = constrainedSize,
         modifier = modifier,
     )
+
     CardType.Horizontal -> HorizontalPodcastCard(
         podcast = podcast,
         episodeCount = episodeCount,
@@ -38,6 +39,7 @@ internal fun PodcastCard(
         constrainedSize = constrainedSize,
         modifier = modifier,
     )
+
     CardType.Square -> SquarePodcastCard(
         podcast = podcast,
         episodeCount = episodeCount,

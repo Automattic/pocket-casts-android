@@ -38,9 +38,11 @@ fun GiveRatingPage(
             },
             modifier = modifier,
         )
+
         is GiveRatingViewModel.State.Loading -> GiveRatingLoadingScreen(
             modifier = modifier,
         )
+
         is GiveRatingViewModel.State.NotAllowedToRate -> GiveRatingNotAllowedToRate(
             state = currentState,
             onDismiss = onDismiss,
@@ -49,6 +51,7 @@ fun GiveRatingPage(
             },
             modifier = modifier,
         )
+
         is GiveRatingViewModel.State.ErrorWhenLoadingPodcast -> {
             GiveRatingErrorScreen(
                 onDismiss = onDismiss,

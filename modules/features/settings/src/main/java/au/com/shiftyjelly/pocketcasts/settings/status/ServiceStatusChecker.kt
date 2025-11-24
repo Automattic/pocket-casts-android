@@ -20,6 +20,7 @@ class ServiceStatusChecker @Inject constructor(
     suspend fun check(check: Check): ServiceStatus {
         return when (check) {
             is Check.Internet -> checkInternet()
+
             is Check.Urls -> {
                 var status: ServiceStatus = ServiceStatus.Failed(userMessage = null, log = "No urls checked")
                 for (url in check.urls) {

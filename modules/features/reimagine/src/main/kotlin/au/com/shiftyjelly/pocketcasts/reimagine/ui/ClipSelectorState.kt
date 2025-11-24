@@ -118,11 +118,13 @@ internal class ClipSelectorState(
                 scale = 1f
                 onTimelineScaleUpdate(scale, secondsPerTick)
             }
+
             newScale < 1f && expectedSpace <= scaleTippingPoint -> if (secondsPerTick != maxSecondsPerTick) {
                 secondsPerTick *= 5
                 scale = scaleTippingPoint / expectedSpace
                 onTimelineScaleUpdate(scale, secondsPerTick)
             }
+
             else -> {
                 scale = newScale
                 onTimelineScaleUpdate(scale, secondsPerTick)

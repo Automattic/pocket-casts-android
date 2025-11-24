@@ -86,6 +86,7 @@ class WhatsNewFragment : BaseFragment() {
     private fun performConfirmAction(navigationState: NavigationState) {
         when (navigationState) {
             is NavigationState.StartUpsellFlow -> startUpsellFlow(navigationState.source)
+
             is NavigationState.ForceClose -> {
                 @Suppress("DEPRECATION")
                 activity?.onBackPressed()

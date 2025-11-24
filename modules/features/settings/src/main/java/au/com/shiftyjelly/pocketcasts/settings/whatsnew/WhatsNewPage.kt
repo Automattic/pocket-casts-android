@@ -52,6 +52,7 @@ fun WhatsNewPage(
     val state by viewModel.state.collectAsState()
     when (state) {
         is UiState.Loading -> Unit
+
         is UiState.Loaded -> {
             val uiState = state as UiState.Loaded
             WhatsNewPageLoaded(

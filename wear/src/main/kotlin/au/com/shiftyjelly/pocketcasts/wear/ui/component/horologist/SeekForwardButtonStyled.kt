@@ -29,6 +29,7 @@ fun SeekForwardButtonStyled(
             id = R.string.horologist_seek_back_button_seconds_content_description,
             seekButtonIncrement.seconds,
         )
+
         SeekButtonIncrement.Unknown -> stringResource(id = R.string.horologist_seek_back_button_content_description)
     }
 

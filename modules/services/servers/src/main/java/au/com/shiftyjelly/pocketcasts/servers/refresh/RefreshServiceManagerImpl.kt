@@ -53,7 +53,9 @@ class RefreshServiceManagerImpl @Inject constructor(
                         UpdatePodcastResponse.NoEpisodeFound
                     }
                 }
+
                 200 -> UpdatePodcastResponse.EpisodeFound
+
                 else -> UpdatePodcastResponse.NoEpisodeFound
             }
         } catch (e: IOException) {

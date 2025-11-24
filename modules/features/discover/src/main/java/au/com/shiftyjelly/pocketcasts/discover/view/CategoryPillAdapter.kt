@@ -120,12 +120,14 @@ private class AllCategoriesPillViewHolder(
                 binding.categoryIcon.setImageResource(R.drawable.ic_arrow_close)
                 binding.categoryPill.background = ContextCompat.getDrawable(context, R.drawable.category_clear_all_pill_background)
             }
+
             is CategoryPill.AllItems.Collapsed -> {
                 binding.categoryName.text = context.getString(LR.string.discover_all_categories)
                 binding.categoryPill.contentDescription = context.getString(LR.string.discover_show_all_categories)
                 binding.categoryIcon.setImageResource(R.drawable.ic_arrow_down)
                 binding.categoryPill.background = ContextCompat.getDrawable(context, R.drawable.category_pill_background)
             }
+
             is CategoryPill.AllItems.Expanded -> {
                 binding.categoryName.text = context.getString(LR.string.discover_all_categories)
                 binding.categoryPill.contentDescription = context.getString(LR.string.discover_show_all_categories)
