@@ -38,6 +38,7 @@ import au.com.shiftyjelly.pocketcasts.compose.components.TextH10
 import au.com.shiftyjelly.pocketcasts.compose.components.TextP40
 import au.com.shiftyjelly.pocketcasts.endofyear.R
 import au.com.shiftyjelly.pocketcasts.endofyear.StoryCaptureController
+import au.com.shiftyjelly.pocketcasts.endofyear.ui.components.HeaderText
 import au.com.shiftyjelly.pocketcasts.models.to.Rating
 import au.com.shiftyjelly.pocketcasts.models.to.RatingStats
 import au.com.shiftyjelly.pocketcasts.models.to.Story
@@ -68,7 +69,7 @@ internal fun RatingsStory(
     val modifier = Modifier
         .fillMaxSize()
         .background(story.backgroundColor)
-        .padding(top = measurements.closeButtonBottomEdge + 20.dp)
+        .padding(top = measurements.closeButtonBottomEdge + 24.dp)
     if (maxRatingCount != 0) {
         Box {
             PresentRatings(
@@ -107,35 +108,20 @@ private fun PresentRatings(
     Column(
         modifier = modifier.semantics(mergeDescendants = true) {},
     ) {
-        TextH10(
-            text = when (val rating = story.stats.max().first) {
-                Rating.One, Rating.Two, Rating.Three -> stringResource(LR.string.eoy_story_ratings_title_2)
-                Rating.Four, Rating.Five -> stringResource(LR.string.eoy_story_ratings_title_1, rating.numericalValue)
-            },
-            fontScale = measurements.smallDeviceFactor,
-            disableAutoScale = true,
-            fontSize = 25.sp,
-            lineHeight = 30.sp,
-            color = colorResource(UR.color.white),
+        val title = when (val rating = story.stats.max().first) {
+            Rating.One, Rating.Two, Rating.Three -> stringResource(LR.string.eoy_story_ratings_title_2)
+            Rating.Four, Rating.Five -> stringResource(LR.string.eoy_story_ratings_title_1, rating.numericalValue)
+        }
+        val subtitle = when (val rating = story.stats.max().first) {
+            Rating.One, Rating.Two, Rating.Three -> stringResource(LR.string.eoy_story_ratings_subtitle_2)
+            Rating.Four, Rating.Five -> stringResource(LR.string.eoy_story_ratings_subtitle_1, rating.numericalValue)
+        }
+        HeaderText(
+            title = title,
+            subtitle = subtitle,
+            titleMaxLines = 2,
             modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 24.dp),
-            textAlign = TextAlign.Center,
-        )
-        Spacer(
-            modifier = Modifier.height(16.dp),
-        )
-        TextP40(
-            text = when (val rating = story.stats.max().first) {
-                Rating.One, Rating.Two, Rating.Three -> stringResource(LR.string.eoy_story_ratings_subtitle_2)
-                Rating.Four, Rating.Five -> stringResource(LR.string.eoy_story_ratings_subtitle_1, rating.numericalValue)
-            },
-            disableAutoScale = true,
-            color = colorResource(UR.color.white),
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 24.dp),
-            textAlign = TextAlign.Center,
+                .fillMaxWidth(),
         )
         RatingBars(
             stats = story.stats,

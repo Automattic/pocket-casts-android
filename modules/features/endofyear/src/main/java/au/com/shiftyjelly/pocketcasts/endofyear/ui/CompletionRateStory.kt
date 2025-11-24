@@ -47,8 +47,8 @@ internal fun CompletionRateStory(
             modifier = Modifier
                 .capturable(controller.captureController(story))
                 .fillMaxSize()
-                .background(story.backgroundColor),
-
+                .background(story.backgroundColor)
+                .padding(top = measurements.closeButtonBottomEdge + 24.dp),
         ) {
             val animationId = when (story.completionRate) {
                 in 0f..0.3f -> R.raw.playback_completion_rate_20p_lottie
@@ -92,7 +92,6 @@ internal fun CompletionRateStory(
                     story.listenedCount,
                 ),
                 subscriptionTier = story.subscriptionTier,
-                measurements = measurements,
             )
             Box(
                 modifier = Modifier

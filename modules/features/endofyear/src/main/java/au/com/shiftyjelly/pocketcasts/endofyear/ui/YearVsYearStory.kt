@@ -58,6 +58,7 @@ internal fun YearVsYearStory(
                 .capturable(controller.captureController(story))
                 .fillMaxSize()
                 .background(story.backgroundColor)
+                .padding(top = measurements.closeButtonBottomEdge + 24.dp)
                 .semantics(mergeDescendants = true) {},
             contentAlignment = Alignment.TopCenter,
         ) {
@@ -180,7 +181,6 @@ private fun TextInfo(
         subtitle = subtitle,
         subscriptionTier = story.subscriptionTier,
         titleMaxLines = 2,
-        measurements = measurements,
     )
 }
 
