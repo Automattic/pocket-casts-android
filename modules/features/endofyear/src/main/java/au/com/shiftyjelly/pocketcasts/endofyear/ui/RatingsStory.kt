@@ -69,7 +69,7 @@ internal fun RatingsStory(
     val modifier = Modifier
         .fillMaxSize()
         .background(story.backgroundColor)
-        .padding(top = measurements.closeButtonBottomEdge + 24.dp)
+        .padding(top = measurements.closeButtonBottomEdge + 16.dp)
     if (maxRatingCount != 0) {
         Box {
             PresentRatings(
@@ -119,9 +119,9 @@ private fun PresentRatings(
         HeaderText(
             title = title,
             subtitle = subtitle,
-            titleMaxLines = 2,
             modifier = Modifier
                 .fillMaxWidth(),
+            measurements = measurements,
         )
         RatingBars(
             stats = story.stats,

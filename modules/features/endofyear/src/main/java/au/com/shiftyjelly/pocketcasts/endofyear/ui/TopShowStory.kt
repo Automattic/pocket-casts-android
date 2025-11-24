@@ -34,6 +34,7 @@ import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -229,6 +230,7 @@ private fun Header(
             .fillMaxWidth()
             .padding(horizontal = 24.dp),
         textAlign = TextAlign.Center,
+        fontWeight = FontWeight.W500,
     )
 }
 

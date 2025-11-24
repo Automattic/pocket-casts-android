@@ -7,19 +7,17 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.text.BasicText
-import androidx.compose.foundation.text.TextAutoSize
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.semantics.semantics
-import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import au.com.shiftyjelly.pocketcasts.compose.components.TextH10
 import au.com.shiftyjelly.pocketcasts.compose.components.TextP40
 import au.com.shiftyjelly.pocketcasts.compose.images.SubscriptionBadgeDisplayMode
 import au.com.shiftyjelly.pocketcasts.compose.images.SubscriptionBadgeForTier
@@ -30,10 +28,11 @@ import au.com.shiftyjelly.pocketcasts.payment.SubscriptionTier
 internal fun HeaderText(
     title: String,
     subtitle: String,
+    measurements: EndOfYearMeasurements,
     modifier: Modifier = Modifier,
     textColor: Color = Color.White,
     subscriptionTier: SubscriptionTier? = null,
-    titleMaxLines: Int = 1,
+    titleMaxLines: Int = 2,
 ) {
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
@@ -50,17 +49,15 @@ internal fun HeaderText(
                 modifier = Modifier.height(16.dp),
             )
         }
-        BasicText(
+        TextH10(
             text = title,
-            style = TextStyle(
-                fontSize = 25.sp,
-                fontWeight = FontWeight.W700,
-                textAlign = TextAlign.Center,
-                lineHeight = 30.sp,
-            ),
-            color = { textColor },
-            autoSize = TextAutoSize.StepBased(maxFontSize = 25.sp),
+            color = textColor,
+            fontSize = 25.sp,
+            lineHeight = 30.sp,
+            disableAutoScale = true,
+            fontScale = measurements.smallDeviceFactor,
             maxLines = titleMaxLines,
+            textAlign = TextAlign.Center,
         )
         Spacer(
             modifier = Modifier.height(8.dp),
@@ -90,8 +87,8 @@ private fun CompletionRatePreview() {
         HeaderText(
             title = "Compared to 2024, your listening time skyrocketed 20%",
             subtitle = "Hope you stretched first!",
+            measurements = measurements,
             subscriptionTier = SubscriptionTier.Plus,
-            titleMaxLines = 2,
             modifier = Modifier
                 .background(Color(0xFF27486A))
                 .padding(16.dp),

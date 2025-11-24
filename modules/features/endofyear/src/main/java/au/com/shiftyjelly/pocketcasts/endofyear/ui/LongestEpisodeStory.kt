@@ -245,6 +245,7 @@ private fun Header(
             ),
             disableAutoScale = true,
             color = colorResource(UR.color.white),
+            fontWeight = FontWeight.W500,
             modifier = Modifier.padding(horizontal = 24.dp),
         )
     }

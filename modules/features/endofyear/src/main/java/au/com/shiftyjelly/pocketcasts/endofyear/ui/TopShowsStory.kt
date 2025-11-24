@@ -85,6 +85,7 @@ internal fun TopShowsStory(
                 title = stringResource(LR.string.eoy_story_top_podcasts_title),
                 subtitle = stringResource(LR.string.eoy_story_top_podcasts_subtitle),
                 textColor = Color.Black,
+                measurements = measurements,
             )
             Spacer(modifier = Modifier.height(32.dp))
             val scrollState = rememberScrollState()

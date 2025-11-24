@@ -180,7 +180,7 @@ private fun TextInfo(
         title = title,
         subtitle = subtitle,
         subscriptionTier = story.subscriptionTier,
-        titleMaxLines = 2,
+        measurements = measurements,
     )
 }
 
