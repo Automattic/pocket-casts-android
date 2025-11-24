@@ -78,7 +78,7 @@ internal fun TopShowsStory(
                 .capturable(controller.captureController(story))
                 .fillMaxSize()
                 .background(story.backgroundColor)
-                .padding(top = measurements.closeButtonBottomEdge + 24.dp, bottom = 64.dp),
+                .padding(top = measurements.closeButtonBottomEdge + 16.dp, bottom = 64.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
             HeaderText(
