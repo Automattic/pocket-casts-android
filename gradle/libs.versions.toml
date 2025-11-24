@@ -75,7 +75,7 @@ coil-base = { module = "io.coil-kt:coil-base", version.ref = "coil" }
 coil-compose = { module = "io.coil-kt:coil-compose", version.ref = "coil" }
 
 # Compose
-compose-activity = "androidx.activity:activity-compose:1.11.0"
+compose-activity = "androidx.activity:activity-compose:1.12.0"
 compose-animation = { module = "androidx.compose.animation:animation" }
 compose-animation-graphics = { module = "androidx.compose.animation:animation-graphics" }
 compose-bom = { module = "androidx.compose:compose-bom", version.ref = "compose" }
