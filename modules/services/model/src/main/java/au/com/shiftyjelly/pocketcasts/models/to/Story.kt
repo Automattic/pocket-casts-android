@@ -22,7 +22,6 @@ sealed interface Story {
     data object Cover : Story {
         override val isShareable = false
         override val analyticsValue = "cover"
-        override val previewDuration get() = 5.seconds
     }
 
     data class NumberOfShows(

@@ -42,17 +42,16 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.semantics
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import au.com.shiftyjelly.pocketcasts.compose.Devices
 import au.com.shiftyjelly.pocketcasts.compose.components.PodcastImage
-import au.com.shiftyjelly.pocketcasts.compose.components.TextH10
 import au.com.shiftyjelly.pocketcasts.compose.components.TextP30
 import au.com.shiftyjelly.pocketcasts.compose.components.TextP40
 import au.com.shiftyjelly.pocketcasts.endofyear.R
 import au.com.shiftyjelly.pocketcasts.endofyear.StoryCaptureController
+import au.com.shiftyjelly.pocketcasts.endofyear.ui.components.HeaderText
 import au.com.shiftyjelly.pocketcasts.models.to.Story
 import au.com.shiftyjelly.pocketcasts.models.to.TopPodcast
 import com.airbnb.lottie.compose.LottieAnimation
@@ -79,17 +78,13 @@ internal fun TopShowsStory(
                 .capturable(controller.captureController(story))
                 .fillMaxSize()
                 .background(story.backgroundColor)
-                .padding(top = measurements.closeButtonBottomEdge + 16.dp, bottom = 64.dp),
+                .padding(top = measurements.closeButtonBottomEdge + 24.dp, bottom = 64.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
-            TextH10(
-                text = stringResource(LR.string.eoy_story_top_podcasts_title),
-                fontScale = measurements.smallDeviceFactor,
-                fontSize = 25.sp,
-                lineHeight = 30.sp,
-                disableAutoScale = true,
-                modifier = Modifier.padding(horizontal = 24.dp),
-                textAlign = TextAlign.Center,
+            HeaderText(
+                title = stringResource(LR.string.eoy_story_top_podcasts_title),
+                subtitle = stringResource(LR.string.eoy_story_top_podcasts_subtitle),
+                textColor = Color.Black,
             )
             Spacer(modifier = Modifier.height(32.dp))
             val scrollState = rememberScrollState()

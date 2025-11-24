@@ -30,16 +30,15 @@ import au.com.shiftyjelly.pocketcasts.payment.SubscriptionTier
 internal fun HeaderText(
     title: String,
     subtitle: String,
-    subscriptionTier: SubscriptionTier?,
-    measurements: EndOfYearMeasurements,
     modifier: Modifier = Modifier,
+    textColor: Color = Color.White,
+    subscriptionTier: SubscriptionTier? = null,
     titleMaxLines: Int = 1,
 ) {
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
         modifier = modifier
             .padding(horizontal = 24.dp)
-            .padding(top = measurements.closeButtonBottomEdge + 24.dp)
             .semantics(mergeDescendants = true) {},
     ) {
         if (subscriptionTier != null) {
@@ -59,7 +58,7 @@ internal fun HeaderText(
                 textAlign = TextAlign.Center,
                 lineHeight = 30.sp,
             ),
-            color = { Color.White },
+            color = { textColor },
             autoSize = TextAutoSize.StepBased(maxFontSize = 25.sp),
             maxLines = titleMaxLines,
         )
@@ -69,7 +68,7 @@ internal fun HeaderText(
         TextP40(
             text = subtitle,
             disableAutoScale = true,
-            color = Color.White,
+            color = textColor,
             fontWeight = FontWeight.W500,
             textAlign = TextAlign.Center,
         )
@@ -93,7 +92,6 @@ private fun CompletionRatePreview() {
             subtitle = "Hope you stretched first!",
             subscriptionTier = SubscriptionTier.Plus,
             titleMaxLines = 2,
-            measurements = measurements,
             modifier = Modifier
                 .background(Color(0xFF27486A))
                 .padding(16.dp),
