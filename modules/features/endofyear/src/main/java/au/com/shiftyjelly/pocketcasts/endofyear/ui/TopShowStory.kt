@@ -100,11 +100,6 @@ internal fun TopShowStory(
 
             Footer(
                 story = story,
-                textAlignment = if (windowSize.isAtMostMediumHeight()) {
-                    Alignment.TopCenter
-                } else {
-                    Alignment.Center
-                },
                 modifier = Modifier
                     .fillMaxWidth()
                     .height((maxHeight - animationContainerSize) / 2)
@@ -236,9 +231,9 @@ private fun Header(
 private fun Footer(
     story: Story.TopShow,
     modifier: Modifier = Modifier,
-    textAlignment: Alignment = Alignment.Center,
 ) = Box(
     modifier = modifier,
+    contentAlignment = Alignment.BottomCenter,
 ) {
     val formattedEpisodeCount = pluralStringResource(LR.plurals.episodes, story.show.playedEpisodeCount, story.show.playedEpisodeCount)
     val numberOfDays = story.show.playbackTime.inWholeDays
@@ -265,7 +260,7 @@ private fun Footer(
         modifier = Modifier
             .fillMaxWidth()
             .padding(24.dp)
-            .align(textAlignment),
+            .padding(bottom = 24.dp),
         textAlign = TextAlign.Center,
     )
 }

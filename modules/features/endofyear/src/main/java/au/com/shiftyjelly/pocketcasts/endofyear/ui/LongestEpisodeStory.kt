@@ -262,17 +262,17 @@ private fun Footer(
 ) = Column(modifier = modifier, horizontalAlignment = Alignment.CenterHorizontally) {
     Box(
         modifier = Modifier.weight(1f),
-        contentAlignment = Alignment.Center,
+        contentAlignment = Alignment.BottomCenter,
     ) {
         TextP40(
             text = stringResource(LR.string.end_of_year_story_longest_episode_stats, story.episode.episodeTitle, story.episode.podcastTitle),
             textAlign = TextAlign.Center,
             disableAutoScale = true,
             fontScale = measurements.smallDeviceFactor,
-            fontWeight = FontWeight.W500,
             color = colorResource(UR.color.white),
             modifier = Modifier
-                .padding(horizontal = 24.dp),
+                .padding(24.dp)
+                .padding(bottom = 24.dp),
         )
     }
 }
