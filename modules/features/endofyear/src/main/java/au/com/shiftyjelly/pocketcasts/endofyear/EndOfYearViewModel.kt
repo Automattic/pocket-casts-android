@@ -150,6 +150,7 @@ class EndOfYearViewModel @AssistedInject constructor(
             )
         }
     }
+
     private fun createStories(
         stats: EndOfYearStats,
         randomShowIds: RandomShowIds?,
