@@ -259,7 +259,7 @@ private fun Footer(
         color = colorResource(UR.color.white),
         modifier = Modifier
             .fillMaxWidth()
-            .padding(24.dp)
+            .padding(horizontal = 24.dp)
             .padding(bottom = 24.dp),
         textAlign = TextAlign.Center,
     )

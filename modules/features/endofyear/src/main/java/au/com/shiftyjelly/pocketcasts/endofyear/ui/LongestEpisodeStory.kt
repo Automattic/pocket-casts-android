@@ -36,7 +36,6 @@ import androidx.compose.ui.platform.LocalInspectionMode
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.semantics
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
@@ -64,7 +63,7 @@ import java.io.File
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 import au.com.shiftyjelly.pocketcasts.ui.R as UR
 
-private const val SMALL_SCREEN_SIZE_FACTOR = .6f
+private const val SMALL_SCREEN_SIZE_FACTOR = .7f
 private const val ANIMATION_SCALE_FACTOR_FULL_WIDTH = 1.2f
 
 @OptIn(ExperimentalComposeUiApi::class)
@@ -109,13 +108,14 @@ internal fun LongestEpisodeStory(
                     ANIMATION_SCALE_FACTOR_FULL_WIDTH
                 },
                 modifier = Modifier
-                    .size(animationContainerSize)
+                    .padding(top = 32.dp)
+                    .size(animationContainerSize + 32.dp)
                     .align(Alignment.Center),
             )
             Footer(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height((maxHeight - animationContainerSize) / 2)
+                    .height(((maxHeight - animationContainerSize) / 2) - 32.dp)
                     .align(Alignment.BottomCenter),
                 story = story,
                 measurements = measurements,
@@ -271,7 +271,7 @@ private fun Footer(
             fontScale = measurements.smallDeviceFactor,
             color = colorResource(UR.color.white),
             modifier = Modifier
-                .padding(24.dp)
+                .padding(horizontal = 24.dp)
                 .padding(bottom = 24.dp),
         )
     }
