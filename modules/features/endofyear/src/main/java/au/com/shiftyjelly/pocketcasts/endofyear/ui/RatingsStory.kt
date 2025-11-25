@@ -257,6 +257,7 @@ private fun RowScope.AnimatedRatingBar(
         composition = numberComposition,
         progress = { numberAnimatable.progress },
         dynamicProperties = dynamicProperties,
+        contentScale = ContentScale.FillBounds,
         fontMap = remember {
             mapOf(
                 "Inter-Regular" to Typeface.create("sans-serif", Typeface.NORMAL),
