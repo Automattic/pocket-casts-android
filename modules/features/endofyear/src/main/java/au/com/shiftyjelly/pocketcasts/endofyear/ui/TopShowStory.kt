@@ -58,8 +58,8 @@ import kotlin.time.Duration.Companion.days
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 import au.com.shiftyjelly.pocketcasts.ui.R as UR
 
-val AnimationEndScale = 1.3f
-val AnimationStartScale = 1.8f
+private const val ANIMATION_START_SCALE = 1.8f
+private const val ANIMATION_END_SCALE = 1.3f
 
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
@@ -103,7 +103,7 @@ internal fun TopShowStory(
 
             val contentHeight = maxHeight - headerHeight - footerHeight
             // reduce the size to account for the growth during the animation
-            val contentHeightMinusGrowth = contentHeight - (contentHeight * (AnimationEndScale - 1f))
+            val contentHeightMinusGrowth = contentHeight / ANIMATION_END_SCALE
 
             CenterContent(
                 story = story,
@@ -145,7 +145,7 @@ private fun CenterContent(
     )
 
     val lottieScaleAnimation by animateFloatAsState(
-        targetValue = if (isPlaying) AnimationEndScale else AnimationStartScale,
+        targetValue = if (isPlaying) ANIMATION_END_SCALE else ANIMATION_START_SCALE,
         animationSpec = animationSpec,
     )
 
