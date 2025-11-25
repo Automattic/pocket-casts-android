@@ -393,6 +393,7 @@
     <string name="player_full_screen">Full screen</string>
     <string name="player_more_actions">More actions</string>
     <string name="player_notification_skip_back">Back %d secs</string>
+    <string name="player_notification_skip_back_seconds">Back %d seconds</string>
     <string name="player_notification_skip_forward">Forward %d secs</string>
     <string name="player_notification_skip_forward_seconds">Forward %d seconds</string>
     <string name="player_pip">Enter Picture-in-picture</string>

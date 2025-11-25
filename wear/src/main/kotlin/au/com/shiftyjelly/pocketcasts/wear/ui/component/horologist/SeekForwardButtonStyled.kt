@@ -17,6 +17,7 @@ import au.com.shiftyjelly.pocketcasts.localization.R as LR
 fun SeekForwardButtonStyled(
     onClick: () -> Unit,
     seekButtonIncrement: SeekButtonIncrement,
+    skipForward: Boolean,
     modifier: Modifier = Modifier,
     icon: ImageVector = MediaButtonDefaults.seekForwardIcon(seekButtonIncrement),
     enabled: Boolean = true,
@@ -26,11 +27,11 @@ fun SeekForwardButtonStyled(
 ) {
     val contentDescription = when (seekButtonIncrement) {
         is SeekButtonIncrement.Known -> stringResource(
-            id = LR.string.player_notification_skip_forward_seconds,
+            id = if (skipForward) LR.string.player_notification_skip_forward_seconds else LR.string.player_notification_skip_back_seconds,
             seekButtonIncrement.seconds,
         )
 
-        SeekButtonIncrement.Unknown -> stringResource(id = LR.string.skip_forward)
+        SeekButtonIncrement.Unknown -> stringResource(id = if (skipForward) LR.string.skip_forward else LR.string.skip_back)
     }
 
     MediaButton(
