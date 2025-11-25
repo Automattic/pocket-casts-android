@@ -91,11 +91,15 @@ class PlaylistManagerImpl(
     override fun playlistPreviewsFlow(): Flow<List<PlaylistPreview>> {
         return playlistDao.allPlaylistsFlow().map { playlists ->
             withContext(computationContext) {
-                playlists.map { playlist ->
-                    playlist.toPlaylistPreview()
-                }
+                playlists
+                    .map { playlist -> playlist.toPlaylistPreview() }
+                    .distinctBy { it.uuid }
             }
         }
+    }
+
+    override suspend fun findPlaylistPreview(uuid: String): PlaylistPreview? {
+        return playlistDao.findPlaylistByUuid(uuid)?.toPlaylistPreview()
     }
 
     override suspend fun findPlaylistPreview(playlistUuid: String): PlaylistPreview? {
@@ -384,7 +388,9 @@ class PlaylistManagerImpl(
     }
 
     override fun playlistPreviewsForEpisodeFlow(episodeUuid: String, searchTerm: String?): Flow<List<PlaylistPreviewForEpisode>> {
-        return playlistDao.playlistPreviewsForEpisodeFlow(episodeUuid, searchTerm.orEmpty())
+        return playlistDao
+            .playlistPreviewsForEpisodeFlow(episodeUuid, searchTerm.orEmpty())
+            .map { playlists -> playlists.distinctBy { it.uuid } }
     }
 
     override suspend fun getManualEpisodeSources(searchTerm: String?): List<ManualPlaylistEpisodeSource> {
@@ -550,7 +556,7 @@ private val PlaylistEntity.smartRules
         } else {
             StarredRule.Any
         },
-        podcasts = if (podcastUuidList.isEmpty()) {
+        podcasts = if (allPodcasts || podcastUuidList.isEmpty()) {
             PodcastsRule.Any
         } else {
             PodcastsRule.Selected(podcastUuidList.toSet())
