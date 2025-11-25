@@ -102,6 +102,39 @@ class PlaylistManagerImpl(
         return playlistDao.findPlaylistByUuid(uuid)?.toPlaylistPreview()
     }
 
+    override suspend fun findPlaylistPreview(playlistUuid: String): PlaylistPreview? {
+        return playlistDao.findPlaylistByUuid(playlistUuid)?.toPlaylistPreview()
+    }
+
+    override suspend fun getAutoPlayEpisodes(playlistUuid: String, currentEpisodeUuid: String?): List<PodcastEpisode> {
+        return when (val playlist = findPlaylistPreview(playlistUuid)) {
+            is ManualPlaylistPreview -> withContext(computationContext) {
+                playlistDao
+                    .manualEpisodesFlow(
+                        playlistUuid = playlistUuid,
+                        forcedEpisodeUuid = currentEpisodeUuid,
+                    )
+                    .first()
+                    .toPodcastEpisodes()
+            }
+
+            is SmartPlaylistPreview -> withContext(computationContext) {
+                playlistDao
+                    .smartEpisodesFlow(
+                        clock = clock,
+                        smartRules = playlist.smartRules,
+                        sortType = playlist.settings.sortType,
+                        limit = smartEpisodeLimit,
+                        forcedEpisodeUuid = currentEpisodeUuid,
+                    )
+                    .first()
+                    .toPodcastEpisodes()
+            }
+
+            null -> emptyList()
+        }
+    }
+
     private val artworkCache = ConcurrentHashMap<String, MutableStateFlow<List<String>?>>()
     private val episodeCountCache = ConcurrentHashMap<String, MutableStateFlow<Int?>>()
 

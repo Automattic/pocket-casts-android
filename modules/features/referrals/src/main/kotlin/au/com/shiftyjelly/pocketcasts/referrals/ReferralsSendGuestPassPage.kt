@@ -194,6 +194,7 @@ private fun SendGuestPassContent(
             padding = 4.dp,
             iconRes = IR.drawable.ic_plus,
             shortNameRes = LR.string.pocket_casts_plus_short,
+            contentDescriptionRes = LR.string.pocket_casts_plus_badge,
             iconColor = Color.Black,
             backgroundBrush = plusBackgroundBrush,
             textColor = Color.Black,

@@ -247,6 +247,7 @@ private fun NewUpgradeAccountCard(
             SubscriptionBadge(
                 iconRes = recommendedPlan.badgeIconRes,
                 shortNameRes = recommendedPlan.shortNameRes,
+                contentDescriptionRes = recommendedPlan.badgeContentDescriptionRes,
                 backgroundColor = Color.Black,
                 textColor = Color.White,
                 modifier = Modifier

@@ -27,8 +27,12 @@ class FakePlaylistManager : PlaylistManager {
         return playlistPreviews.asStateFlow()
     }
 
-    override suspend fun findPlaylistPreview(uuid: String): PlaylistPreview? {
+    override suspend fun findPlaylistPreview(playlistUuid: String): PlaylistPreview? {
         return null
+    }
+
+    override suspend fun getAutoPlayEpisodes(playlistUuid: String, currentEpisodeUuid: String?): List<PodcastEpisode> {
+        return emptyList()
     }
 
     override fun getArtworkUuidsFlow(playlistUuid: String): StateFlow<List<String>?> {

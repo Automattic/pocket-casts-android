@@ -48,6 +48,7 @@ fun PodcastImage(
     } else {
         PlaceholderType.Small
     },
+    contentDescription: String? = stringResource(LR.string.podcast_artwork_description),
 ) {
     val context = LocalContext.current
     val imageRequest = remember(uuid, placeholderType) {
@@ -61,7 +62,7 @@ fun PodcastImage(
     Image(
         painter = rememberAsyncImagePainter(imageRequest, contentScale = ContentScale.Crop),
         contentScale = ContentScale.Crop,
-        contentDescription = stringResource(LR.string.podcast_artwork_description),
+        contentDescription = contentDescription,
         modifier = modifier
             .size(imageSize)
             .then(

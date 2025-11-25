@@ -2,38 +2,26 @@ package au.com.shiftyjelly.pocketcasts.endofyear.ui
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.text.BasicText
-import androidx.compose.foundation.text.TextAutoSize
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.tooling.preview.PreviewParameterProvider
-import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import au.com.shiftyjelly.pocketcasts.compose.Devices
-import au.com.shiftyjelly.pocketcasts.compose.components.TextP40
-import au.com.shiftyjelly.pocketcasts.compose.images.SubscriptionBadgeDisplayMode
-import au.com.shiftyjelly.pocketcasts.compose.images.SubscriptionBadgeForTier
 import au.com.shiftyjelly.pocketcasts.endofyear.R
 import au.com.shiftyjelly.pocketcasts.endofyear.StoryCaptureController
+import au.com.shiftyjelly.pocketcasts.endofyear.ui.components.HeaderText
 import au.com.shiftyjelly.pocketcasts.models.to.Story
 import au.com.shiftyjelly.pocketcasts.payment.SubscriptionTier
 import com.airbnb.lottie.compose.LottieAnimation
@@ -59,8 +47,8 @@ internal fun CompletionRateStory(
             modifier = Modifier
                 .capturable(controller.captureController(story))
                 .fillMaxSize()
-                .background(story.backgroundColor),
-
+                .background(story.backgroundColor)
+                .padding(top = measurements.closeButtonBottomEdge + 24.dp),
         ) {
             val animationId = when (story.completionRate) {
                 in 0f..0.3f -> R.raw.playback_completion_rate_20p_lottie
@@ -93,13 +81,18 @@ internal fun CompletionRateStory(
                         .fillMaxWidth(),
                 )
             }
-
-            CompletionRateInfo(
-                story = story,
-                modifier = Modifier
-                    .padding(top = measurements.closeButtonBottomEdge + 24.dp),
+            HeaderText(
+                title = stringResource(
+                    LR.string.end_of_year_stories_year_completion_rate_title,
+                    (story.completionRate * 100).roundToInt(),
+                ),
+                subtitle = stringResource(
+                    LR.string.end_of_year_stories_year_completion_rate_subtitle,
+                    story.completedCount,
+                    story.listenedCount,
+                ),
+                subscriptionTier = story.subscriptionTier,
             )
-
             Box(
                 modifier = Modifier
                     .align(Alignment.BottomCenter)
@@ -124,72 +117,6 @@ internal fun CompletionRateStory(
                 .padding(bottom = 16.dp),
         )
     }
-}
-
-@Composable
-private fun CompletionRateInfo(
-    story: Story.CompletionRate,
-    modifier: Modifier = Modifier,
-) {
-    Column(
-        horizontalAlignment = Alignment.CenterHorizontally,
-        modifier = modifier,
-    ) {
-        val subscriptionTier = story.subscriptionTier
-        if (subscriptionTier != null) {
-            SubscriptionBadgeForTier(
-                tier = subscriptionTier,
-                displayMode = SubscriptionBadgeDisplayMode.Black,
-            )
-        }
-        Spacer(
-            modifier = Modifier.height(16.dp),
-        )
-        HeaderText(
-            text = stringResource(
-                LR.string.end_of_year_stories_year_completion_rate_title,
-                (story.completionRate * 100).roundToInt(),
-            ),
-            modifier = Modifier.padding(horizontal = 24.dp),
-        )
-        Spacer(
-            modifier = Modifier.height(16.dp),
-        )
-        TextP40(
-            text = stringResource(
-                LR.string.end_of_year_stories_year_completion_rate_subtitle,
-                story.completedCount,
-                story.listenedCount,
-            ),
-            disableAutoScale = true,
-            color = Color.White,
-            fontWeight = FontWeight.W500,
-            textAlign = TextAlign.Center,
-            modifier = Modifier.padding(horizontal = 24.dp),
-        )
-    }
-}
-
-@Composable
-private fun HeaderText(
-    text: String,
-    modifier: Modifier = Modifier,
-    color: Color = Color.White,
-    fontSize: TextUnit = 25.sp,
-    fontWeight: FontWeight = FontWeight.W700,
-    maxLines: Int = 1,
-) {
-    BasicText(
-        text = text,
-        style = TextStyle(
-            fontSize = fontSize,
-            fontWeight = fontWeight,
-        ),
-        color = { color },
-        autoSize = TextAutoSize.StepBased(),
-        maxLines = maxLines,
-        modifier = modifier,
-    )
 }
 
 @Preview(device = Devices.PORTRAIT_REGULAR)

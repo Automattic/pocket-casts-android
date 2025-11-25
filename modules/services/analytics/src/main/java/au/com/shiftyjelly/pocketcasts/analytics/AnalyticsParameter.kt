@@ -14,6 +14,7 @@ object AnalyticsParameter {
     const val UUID = "uuid"
     const val SOURCE = "source"
     const val BUTTON = "button"
+    const val YEAR = "year"
 
     enum class SetupAccountButton(val value: String) {
         SignIn("sign_in"),

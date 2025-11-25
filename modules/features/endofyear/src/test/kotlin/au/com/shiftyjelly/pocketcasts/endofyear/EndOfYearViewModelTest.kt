@@ -33,6 +33,7 @@ import au.com.shiftyjelly.pocketcasts.servers.list.PodcastList
 import au.com.shiftyjelly.pocketcasts.sharedtest.MainCoroutineRule
 import au.com.shiftyjelly.pocketcasts.sharing.SharingRequest
 import au.com.shiftyjelly.pocketcasts.sharing.SharingResponse
+import au.com.shiftyjelly.pocketcasts.utils.accessibility.AccessibilityManager
 import java.time.Instant
 import java.time.Year
 import java.util.Date
@@ -42,6 +43,7 @@ import kotlin.time.Duration.Companion.minutes
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.test.runTest
 import org.junit.Before
@@ -69,7 +71,6 @@ class EndOfYearViewModelTest {
         isAutoRenewing = true,
         giftDays = 0,
     )
-    private val patronSubscription = plusSubscription.copy(tier = SubscriptionTier.Patron)
     private val subscriptionFlow = MutableStateFlow<Subscription?>(plusSubscription)
 
     private val stats = EndOfYearStats(
@@ -121,13 +122,15 @@ class EndOfYearViewModelTest {
             listServiceManager = listServiceManager,
             sharingClient = FakeSharingClient(),
             analyticsTracker = AnalyticsTracker.test(),
+            accessibilityManager = FakeAccessibilityManager(isTalkBackEnabled = false),
         )
     }
 
     @Test
     fun `initialize in syncing state`() = runTest {
         viewModel.uiState.test {
-            assertEquals(UiState.Syncing, awaitItem())
+            val awaitItem = awaitItem()
+            assert(awaitItem is UiState.Syncing)
         }
     }
 
@@ -136,9 +139,7 @@ class EndOfYearViewModelTest {
         endOfYearSync.isSynced.add(false)
 
         viewModel.syncData()
-        viewModel.uiState.test {
-            assertEquals(UiState.Failure, awaitItem())
-        }
+        assertTrue(viewModel.syncFailedSignal.isCompleted)
     }
 
     @Test
@@ -187,12 +188,10 @@ class EndOfYearViewModelTest {
             val story = awaitStory<NumberOfShows>()
 
             assertEquals(stats.playedPodcastCount, story.showCount)
-            assertEquals(stats.playedEpisodeCount, story.epsiodeCount)
-            // We select 8 random episodes to display in the UI
-            assertEquals(4, story.topShowIds.distinct().size)
-            assertEquals(4, story.bottomShowIds.distinct().size)
-            assertEquals(emptySet<String>(), story.topShowIds.intersect(story.bottomShowIds))
-            assertTrue(stats.playedPodcastIds.containsAll(story.topShowIds))
+            assertEquals(stats.playedEpisodeCount, story.episodeCount)
+            // We select 7 random shows to display in the UI
+            assertEquals(7, story.randomShowIds.distinct().size)
+            assertTrue(stats.playedPodcastIds.containsAll(story.randomShowIds))
         }
     }
 
@@ -205,29 +204,7 @@ class EndOfYearViewModelTest {
         viewModel.uiState.test {
             val story = awaitStory<NumberOfShows>()
 
-            assertEquals(List(4) { "id" }, story.topShowIds)
-            assertEquals(List(4) { "id" }, story.bottomShowIds)
-        }
-    }
-
-    @Test
-    fun `number of shows for three shows`() = runTest {
-        endOfYearSync.isSynced.add(true)
-        endOfYearManager.stats.add(stats.copy(playedPodcastIds = List(3) { "id-$it" }))
-
-        viewModel.syncData()
-        viewModel.uiState.test {
-            val story = awaitStory<NumberOfShows>()
-
-            assertEquals(4, story.topShowIds.size)
-            assertEquals(4, story.bottomShowIds.size)
-
-            // Verify list rotation
-            assertEquals(story.topShowIds[0], story.topShowIds[3])
-            assertEquals(story.topShowIds[1], story.bottomShowIds[0])
-            assertEquals(story.topShowIds[2], story.bottomShowIds[1])
-            assertEquals(story.topShowIds[3], story.bottomShowIds[2])
-            assertEquals(story.bottomShowIds[0], story.bottomShowIds[3])
+            assertEquals(List(7) { "id" }, story.randomShowIds)
         }
     }
 
@@ -240,12 +217,8 @@ class EndOfYearViewModelTest {
         viewModel.uiState.test {
             val story = awaitStory<NumberOfShows>()
 
-            assertEquals(4, story.topShowIds.size)
-            assertEquals(4, story.bottomShowIds.size)
-
-            // Verify list rotation
-            assertEquals(story.topShowIds[0], story.bottomShowIds[2])
-            assertEquals(story.topShowIds[1], story.bottomShowIds[3])
+            assertEquals(7, story.randomShowIds.size)
+            assertEquals(stats.playedPodcastIds[0], story.randomShowIds[6])
         }
     }
 
@@ -416,33 +389,6 @@ class EndOfYearViewModelTest {
     }
 
     @Test
-    fun `plus interstitial for Plus user`() = runTest {
-        endOfYearSync.isSynced.add(true)
-        endOfYearManager.stats.add(stats)
-
-        viewModel.syncData()
-        viewModel.uiState.test {
-            val stories = awaitStories()
-
-            assertDoesNotHaveStory<PlusInterstitial>(stories)
-        }
-    }
-
-    @Test
-    fun `plus interstitial for Patron user`() = runTest {
-        endOfYearSync.isSynced.add(true)
-        endOfYearManager.stats.add(stats)
-        subscriptionFlow.value = patronSubscription
-
-        viewModel.syncData()
-        viewModel.uiState.test {
-            val stories = awaitStories()
-
-            assertDoesNotHaveStory<PlusInterstitial>(stories)
-        }
-    }
-
-    @Test
     fun `year vs year`() = runTest {
         endOfYearSync.isSynced.add(true)
         endOfYearManager.stats.add(stats)
@@ -479,26 +425,6 @@ class EndOfYearViewModelTest {
                 ),
                 story,
             )
-        }
-    }
-
-    @Test
-    fun `update stories with subscription tier`() = runTest {
-        endOfYearSync.isSynced.add(true)
-        endOfYearManager.stats.add(stats)
-        subscriptionFlow.value = null
-
-        viewModel.syncData()
-        viewModel.uiState.test {
-            assertHasStory<PlusInterstitial>(awaitStories())
-
-            subscriptionFlow.value = plusSubscription
-            endOfYearManager.stats.add(stats)
-            assertDoesNotHaveStory<PlusInterstitial>(awaitStories())
-
-            subscriptionFlow.value = null
-            endOfYearManager.stats.add(stats)
-            assertHasStory<PlusInterstitial>(awaitStories())
         }
     }
 
@@ -621,8 +547,9 @@ class EndOfYearViewModelTest {
         assertEquals(5, viewModel.getNextStoryIndex(stories.indexOf<Ratings>()))
         assertEquals(6, viewModel.getNextStoryIndex(stories.indexOf<TotalTime>()))
         assertEquals(7, viewModel.getNextStoryIndex(stories.indexOf<LongestEpisode>()))
-        assertEquals(8, viewModel.getNextStoryIndex(stories.indexOf<YearVsYear>()))
-        assertEquals(9, viewModel.getNextStoryIndex(stories.indexOf<CompletionRate>()))
+        assertEquals(8, viewModel.getNextStoryIndex(stories.indexOf<PlusInterstitial>()))
+        assertEquals(9, viewModel.getNextStoryIndex(stories.indexOf<YearVsYear>()))
+        assertEquals(10, viewModel.getNextStoryIndex(stories.indexOf<CompletionRate>()))
         assertEquals(null, viewModel.getNextStoryIndex(stories.indexOf<Ending>()))
     }
 
@@ -641,9 +568,10 @@ class EndOfYearViewModelTest {
         assertEquals(3, viewModel.getPreviousStoryIndex(stories.indexOf<Ratings>()))
         assertEquals(4, viewModel.getPreviousStoryIndex(stories.indexOf<TotalTime>()))
         assertEquals(5, viewModel.getPreviousStoryIndex(stories.indexOf<LongestEpisode>()))
-        assertEquals(6, viewModel.getPreviousStoryIndex(stories.indexOf<YearVsYear>()))
-        assertEquals(7, viewModel.getPreviousStoryIndex(stories.indexOf<CompletionRate>()))
-        assertEquals(8, viewModel.getPreviousStoryIndex(stories.indexOf<Ending>()))
+        assertEquals(6, viewModel.getPreviousStoryIndex(stories.indexOf<PlusInterstitial>()))
+        assertEquals(7, viewModel.getPreviousStoryIndex(stories.indexOf<YearVsYear>()))
+        assertEquals(8, viewModel.getPreviousStoryIndex(stories.indexOf<CompletionRate>()))
+        assertEquals(9, viewModel.getPreviousStoryIndex(stories.indexOf<Ending>()))
     }
 
     @Test
@@ -781,5 +709,13 @@ class EndOfYearViewModelTest {
                 error = null,
             )
         }
+    }
+
+    private class FakeAccessibilityManager(val isTalkBackEnabled: Boolean) : AccessibilityManager {
+        override val isTalkBackOnFlow: StateFlow<Boolean>
+            get() = MutableStateFlow(isTalkBackEnabled)
+
+        override fun startListening() {}
+        override fun stopListening() {}
     }
 }

@@ -14,18 +14,19 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import au.com.shiftyjelly.pocketcasts.compose.Devices
 import au.com.shiftyjelly.pocketcasts.compose.components.TextH30
+import au.com.shiftyjelly.pocketcasts.endofyear.R
 import au.com.shiftyjelly.pocketcasts.models.to.Story
 import com.airbnb.lottie.compose.LottieAnimation
 import com.airbnb.lottie.compose.LottieCompositionSpec
 import com.airbnb.lottie.compose.animateLottieCompositionAsState
 import com.airbnb.lottie.compose.rememberLottieComposition
-import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 @Composable
@@ -34,7 +35,7 @@ internal fun CoverStory(
     measurements: EndOfYearMeasurements,
 ) {
     val composition by rememberLottieComposition(
-        spec = LottieCompositionSpec.RawRes(IR.raw.playback_intro_lottie),
+        spec = LottieCompositionSpec.RawRes(R.raw.playback_intro_lottie),
     )
     val progress by animateLottieCompositionAsState(
         composition = composition,
@@ -45,7 +46,8 @@ internal fun CoverStory(
         contentAlignment = Alignment.Center,
         modifier = Modifier
             .fillMaxSize()
-            .background(story.backgroundColor),
+            .background(story.backgroundColor)
+            .semantics(mergeDescendants = true) {},
     ) {
         AnimatedVisibility(
             enter = fadeIn(),
@@ -54,7 +56,7 @@ internal fun CoverStory(
             TextH30(
                 fontScale = measurements.smallDeviceFactor,
                 fontSize = 25.sp,
-                lineHeight = 28.sp,
+                lineHeight = 30.sp,
                 text = stringResource(LR.string.eoy_playback_intro_title),
                 modifier = Modifier.padding(horizontal = 42.dp),
                 color = Color.White,

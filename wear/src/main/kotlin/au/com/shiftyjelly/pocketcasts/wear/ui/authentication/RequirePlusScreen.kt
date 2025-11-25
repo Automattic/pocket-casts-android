@@ -53,6 +53,7 @@ fun RequirePlusScreen(
                 SubscriptionBadge(
                     iconRes = IR.drawable.ic_plus,
                     shortNameRes = LR.string.pocket_casts_plus_short,
+                    contentDescriptionRes = LR.string.pocket_casts_plus_badge,
                     iconColor = Color.Black,
                     backgroundColor = colorResource(UR.color.plus_gold),
                     textColor = Color.Black,

@@ -2,32 +2,27 @@ package au.com.shiftyjelly.pocketcasts.endofyear.ui
 
 import android.content.Context
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.awaitEachGesture
 import androidx.compose.foundation.gestures.awaitFirstDown
 import androidx.compose.foundation.gestures.waitForUpOrCancellation
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.PagerState
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.Button
-import androidx.compose.material.ButtonDefaults
-import androidx.compose.material.LinearProgressIndicator
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.rounded.ArrowBack
+import androidx.compose.material.icons.automirrored.rounded.ArrowForward
 import androidx.compose.material.ripple
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -38,6 +33,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
+import androidx.compose.ui.graphics.painter.Painter
+import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalContext
@@ -45,16 +42,11 @@ import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
-import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.DpSize
-import androidx.compose.ui.unit.coerceAtLeast
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import au.com.shiftyjelly.pocketcasts.compose.Devices
 import au.com.shiftyjelly.pocketcasts.compose.components.PagerProgressingIndicator
-import au.com.shiftyjelly.pocketcasts.compose.components.TextH30
-import au.com.shiftyjelly.pocketcasts.compose.components.TextP40
 import au.com.shiftyjelly.pocketcasts.endofyear.StoryCaptureController
 import au.com.shiftyjelly.pocketcasts.endofyear.UiState
 import au.com.shiftyjelly.pocketcasts.models.to.Story
@@ -77,8 +69,8 @@ internal fun StoriesPage(
     onReleaseStory: () -> Unit,
     onLearnAboutRatings: () -> Unit,
     onClickUpsell: () -> Unit,
+    onClickPlusContinue: () -> Unit,
     onRestartPlayback: () -> Unit,
-    onRetry: () -> Unit,
     onClose: () -> Unit,
 ) {
     val size = LocalContext.current.sizeLimit?.let(Modifier::size) ?: Modifier.fillMaxSize()
@@ -86,9 +78,7 @@ internal fun StoriesPage(
         modifier = Modifier.then(size),
     ) {
         val density = LocalDensity.current
-        val widthPx = density.run { maxWidth.toPx() }
 
-        var isTextSizeComputed by remember { mutableStateOf(false) }
         var coverFontSize by remember { mutableStateOf(24.sp) }
         var coverTextHeight by remember { mutableStateOf(0.dp) }
         val measurements = remember(maxWidth, maxHeight, insets, coverFontSize, coverTextHeight) {
@@ -102,58 +92,32 @@ internal fun StoriesPage(
             )
         }
 
-        if (state is UiState.Failure) {
-            ErrorMessage(onRetry)
-        } else if (state is UiState.Syncing || !isTextSizeComputed) {
-            LoadingIndicator()
-        } else if (state is UiState.Synced) {
-            Stories(
-                stories = state.stories,
-                measurements = measurements,
-                controller = controller,
-                pagerState = pagerState,
-                onChangeStory = onChangeStory,
-                onShareStory = onShareStory,
-                onHoldStory = onHoldStory,
-                onReleaseStory = onReleaseStory,
-                onLearnAboutRatings = onLearnAboutRatings,
-                onClickUpsell = onClickUpsell,
-                onRestartPlayback = onRestartPlayback,
-            )
-        }
+        Stories(
+            stories = state.stories,
+            measurements = measurements,
+            controller = controller,
+            pagerState = pagerState,
+            onChangeStory = onChangeStory,
+            onShareStory = onShareStory,
+            onHoldStory = onHoldStory,
+            onReleaseStory = onReleaseStory,
+            onLearnAboutRatings = onLearnAboutRatings,
+            onClickUpsell = onClickUpsell,
+            onClickPlusContinue = onClickPlusContinue,
+            onRestartPlayback = onRestartPlayback,
+        )
 
         TopControls(
             pagerState = pagerState,
             progress = state.storyProgress,
-            color = (state as? UiState.Synced)?.stories?.get(pagerState.currentPage)?.controlsColor ?: Color.White,
+            color = state.stories.getOrNull(pagerState.currentPage)?.controlsColor ?: Color.White,
             measurements = measurements,
+            isTalkbackOn = state.isTalkBackOn,
             onClose = onClose,
+            onPreviousStory = { onChangeStory(false) },
+            onNextStory = { onChangeStory(true) },
             controller = controller,
         )
-
-        // Use an invisible 'PLAYBACK' text to compute an appropriate font size.
-        // The font should occupy the whole viewport's width with some padding.
-        if (!isTextSizeComputed) {
-            PlaybackText(
-                color = Color.Transparent,
-                fontSize = coverFontSize,
-                onTextLayout = { result ->
-                    when {
-                        isTextSizeComputed -> Unit
-                        else -> {
-                            val textSize = result.size.width
-                            val ratio = 0.88 * widthPx / textSize
-                            if (ratio !in 0.95..1.01) {
-                                coverFontSize *= ratio
-                            } else {
-                                coverTextHeight = density.run { (result.firstBaseline).toDp() * 1.1f }.coerceAtLeast(0.dp)
-                                isTextSizeComputed = true
-                            }
-                        }
-                    }
-                },
-            )
-        }
     }
 }
 
@@ -169,6 +133,7 @@ private fun Stories(
     onReleaseStory: () -> Unit,
     onLearnAboutRatings: () -> Unit,
     onClickUpsell: () -> Unit,
+    onClickPlusContinue: () -> Unit,
     onRestartPlayback: () -> Unit,
 ) {
     val widthPx = LocalDensity.current.run { measurements.width.toPx() }
@@ -191,28 +156,37 @@ private fun Stories(
         },
     ) { index ->
         when (val story = stories[index]) {
+            is Story.PlaceholderWhileLoading -> LoadingStory(
+                story = story,
+                measurements = measurements,
+            )
+
             is Story.Cover -> CoverStory(
                 story = story,
                 measurements = measurements,
             )
+
             is Story.NumberOfShows -> NumberOfShowsStory(
                 story = story,
                 measurements = measurements,
                 controller = controller,
                 onShareStory = { file -> onShareStory(story, file) },
             )
+
             is Story.TopShow -> TopShowStory(
                 story = story,
                 measurements = measurements,
                 controller = controller,
                 onShareStory = { file -> onShareStory(story, file) },
             )
+
             is Story.TopShows -> TopShowsStory(
                 story = story,
                 measurements = measurements,
                 controller = controller,
                 onShareStory = { file -> onShareStory(story, file) },
             )
+
             is Story.Ratings -> RatingsStory(
                 story = story,
                 measurements = measurements,
@@ -220,35 +194,45 @@ private fun Stories(
                 onShareStory = { file -> onShareStory(story, file) },
                 onLearnAboutRatings = onLearnAboutRatings,
             )
+
             is Story.TotalTime -> TotalTimeStory(
                 story = story,
-                measurements = measurements,
                 controller = controller,
                 onShareStory = { file -> onShareStory(story, file) },
             )
+
             is Story.LongestEpisode -> LongestEpisodeStory(
                 story = story,
                 measurements = measurements,
                 controller = controller,
                 onShareStory = { file -> onShareStory(story, file) },
             )
+
             is Story.PlusInterstitial -> PlusInterstitialStory(
                 story = story,
                 measurements = measurements,
                 onClickUpsell = onClickUpsell,
+                onClickContinue = {
+                    onClickPlusContinue()
+                    // move forward to the next story
+                    onChangeStory(true)
+                },
             )
+
             is Story.YearVsYear -> YearVsYearStory(
                 story = story,
                 measurements = measurements,
                 controller = controller,
                 onShareStory = { file -> onShareStory(story, file) },
             )
+
             is Story.CompletionRate -> CompletionRateStory(
                 story = story,
                 measurements = measurements,
                 controller = controller,
                 onShareStory = { file -> onShareStory(story, file) },
             )
+
             is Story.Ending -> EndingStory(
                 story = story,
                 measurements = measurements,
@@ -264,7 +248,10 @@ internal fun BoxScope.TopControls(
     progress: Float,
     color: Color,
     measurements: EndOfYearMeasurements,
+    isTalkbackOn: Boolean,
     onClose: () -> Unit,
+    onPreviousStory: () -> Unit,
+    onNextStory: () -> Unit,
     controller: StoryCaptureController,
 ) {
     val density = LocalDensity.current
@@ -278,79 +265,75 @@ internal fun BoxScope.TopControls(
             .align(Alignment.TopCenter)
             .fillMaxWidth()
             .windowInsetsPadding(measurements.statusBarInsets)
-            .padding(start = 16.dp, end = 16.dp)
             .onGloballyPositioned { controller.topControlsHeightPx = it.size.height + statusBarHeightPx - extraPaddingPx },
     ) {
         PagerProgressingIndicator(
             state = pagerState,
             progress = progress,
             activeColor = color,
+            modifier = Modifier.padding(horizontal = 16.dp),
         )
-        Spacer(
-            modifier = Modifier.height(10.dp),
-        )
-        Image(
-            painter = painterResource(IR.drawable.ic_close),
-            contentDescription = stringResource(LR.string.close),
-            colorFilter = ColorFilter.tint(color),
-            modifier = Modifier
-                // Increase touch target of the image
-                .offset(x = 12.dp, y = (-12).dp)
-                .size(48.dp)
-                .clickable(
-                    interactionSource = remember(::MutableInteractionSource),
-                    indication = ripple(color = Color.Black, bounded = false),
-                    onClickLabel = stringResource(LR.string.close),
-                    role = Role.Button,
-                    onClick = onClose,
-                )
-                .padding(10.dp),
-        )
-    }
-}
-
-@Composable
-private fun LoadingIndicator() {
-    Box(
-        contentAlignment = Alignment.Center,
-        modifier = Modifier
-            .fillMaxSize()
-            .background(Story.Cover.backgroundColor)
-            .padding(16.dp),
-    ) {
-        LinearProgressIndicator(color = Color.Black)
-    }
-}
-
-@Composable
-private fun ErrorMessage(
-    onRetry: () -> Unit,
-) {
-    Column(
-        verticalArrangement = Arrangement.Center,
-        horizontalAlignment = Alignment.CenterHorizontally,
-        modifier = Modifier
-            .fillMaxSize()
-            .background(Story.Cover.backgroundColor),
-    ) {
-        TextH30(
-            text = stringResource(id = LR.string.end_of_year_stories_failed),
-            textAlign = TextAlign.Center,
-            color = Color.Black,
-            modifier = Modifier.padding(horizontal = 40.dp),
-        )
-        Button(
-            onClick = onRetry,
-            shape = RoundedCornerShape(20.dp),
-            colors = ButtonDefaults.buttonColors(backgroundColor = Color(0xFFEEB1F4)),
-            modifier = Modifier.padding(top = 20.dp),
+        Row(
+            horizontalArrangement = Arrangement.End,
+            modifier = Modifier.fillMaxWidth(),
         ) {
-            TextP40(
-                text = stringResource(id = LR.string.retry),
-                color = Color.Black,
+            if (isTalkbackOn) {
+                TopControlButton(
+                    painter = rememberVectorPainter(Icons.AutoMirrored.Rounded.ArrowBack),
+                    contentDescription = stringResource(LR.string.end_of_year_previous_story),
+                    color = color,
+                    onClick = onPreviousStory,
+                    iconPadding = 12.dp,
+                    enabled = pagerState.currentPage > 0,
+                )
+                TopControlButton(
+                    painter = rememberVectorPainter(Icons.AutoMirrored.Rounded.ArrowForward),
+                    contentDescription = stringResource(LR.string.end_of_year_next_story),
+                    color = color,
+                    onClick = onNextStory,
+                    iconPadding = 12.dp,
+                    enabled = pagerState.currentPage < pagerState.pageCount - 1,
+                )
+            }
+
+            TopControlButton(
+                painter = painterResource(IR.drawable.ic_close),
+                contentDescription = stringResource(LR.string.close),
+                color = color,
+                onClick = onClose,
+                iconPadding = 10.dp,
             )
         }
     }
+}
+
+@Composable
+private fun TopControlButton(
+    painter: Painter,
+    contentDescription: String,
+    color: Color,
+    onClick: () -> Unit,
+    iconPadding: Dp,
+    modifier: Modifier = Modifier,
+    enabled: Boolean = true,
+) {
+    Image(
+        painter = painter,
+        contentDescription = contentDescription,
+        colorFilter = ColorFilter.tint(color),
+        alpha = if (enabled) 1f else 0.4f,
+        modifier = modifier
+            .size(48.dp)
+            .clickable(
+                interactionSource = remember(::MutableInteractionSource),
+                indication = ripple(color = Color.Black, bounded = false),
+                onClickLabel = contentDescription,
+                role = Role.Button,
+                onClick = onClick,
+                enabled = enabled,
+            )
+            .padding(iconPadding),
+    )
 }
 
 private val Context.sizeLimit: DpSize?
@@ -365,11 +348,3 @@ private val Context.sizeLimit: DpSize?
             null
         }
     }
-
-@Preview(device = Devices.PORTRAIT_REGULAR)
-@Composable
-private fun ErrorMessagePreview() {
-    ErrorMessage(
-        onRetry = {},
-    )
-}

@@ -45,7 +45,9 @@ class EpisodeSearchView @JvmOverloads constructor(context: Context, attrs: Attri
         val cancelSearchBtn = findViewById<ImageButton>(R.id.cancelSearchBtn)
         searchText.setOnFocusChangeListener { _, hasFocus ->
             if (hasFocus) {
-                onFocus?.invoke()
+                if (searchText.text.isEmpty()) {
+                    onFocus?.invoke()
+                }
                 cancelSearchBtn.show()
             } else {
                 cancelSearchBtn.hide()

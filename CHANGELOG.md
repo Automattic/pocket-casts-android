@@ -1,6 +1,24 @@
-8.1
+8.2
 -----
 
+
+8.1
+-----
+*   New Features
+    *   Add Playback 2025 so you can get a recap of your listening habits from this year
+        ([#4762](https://github.com/Automattic/pocket-casts-android/pull/4762))
+*   Updates
+    *   Add periodic requests for the app rating
+        ([#4725](https://github.com/Automattic/pocket-casts-android/pull/4725))
+    *   Improve tooltips' contrast issues when dark theme is used
+        ([#4737](https://github.com/Automattic/pocket-casts-android/pull/4737))
+    *   Allow one character episode searches
+        ([#4734](https://github.com/Automattic/pocket-casts-android/pull/4734))
+*   Bug Fixes
+    *   Fix an issue where unplayed episodes do not show play button
+        ([#4749](https://github.com/Automattic/pocket-casts-android/pull/4749))
+    *   Fix autoplay not starting playback from the current position in the list
+        ([#4755](https://github.com/Automattic/pocket-casts-android/pull/4755))
 
 8.0
 -----
@@ -16,9 +34,10 @@
         ([#4691](https://github.com/Automattic/pocket-casts-android/pull/4691))
     *   Fix 3-button navigation obstructing the podcast rating button
         ([#4698](https://github.com/Automattic/pocket-casts-android/pull/4698))
+    *   Fix search bar jumps out of view
+        ([#4707](https://github.com/Automattic/pocket-casts-android/pull/4707))
     *   Fix episode list play button flickering
         ([#4709](https://github.com/Automattic/pocket-casts-android/pull/4709))
-    
 
 7.101
 -----

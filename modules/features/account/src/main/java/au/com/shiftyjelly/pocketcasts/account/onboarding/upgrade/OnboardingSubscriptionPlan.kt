@@ -66,6 +66,12 @@ data class OnboardingSubscriptionPlan private constructor(
             SubscriptionTier.Patron -> IR.drawable.ic_patron
         }
 
+    val badgeContentDescriptionRes
+        get() = when (key.tier) {
+            SubscriptionTier.Plus -> LR.string.pocket_casts_plus_badge
+            SubscriptionTier.Patron -> LR.string.pocket_casts_patron_badge
+        }
+
     val pageTitle
         get() = when (key.tier) {
             SubscriptionTier.Plus -> LR.string.onboarding_upgrade_generic_title

@@ -8,25 +8,26 @@ internal data class BillingFlowRequest(
     val subscriptionUpdateQuery: SubscriptionUpdateQuery?,
 ) {
     fun toGoogleParams(): BillingFlowParams {
+        val replacementParams = subscriptionUpdateQuery?.let { query ->
+            BillingFlowParams.ProductDetailsParams.SubscriptionProductReplacementParams.newBuilder()
+                .setOldProductId(query.oldProductId)
+                .setReplacementMode(query.replacementMode)
+                .build()
+        }
+
         val productParams = BillingFlowParams.ProductDetailsParams.newBuilder()
             .setProductDetails(productQuery.product)
             .setOfferToken(productQuery.offerToken)
-            .build()
-        val subscriptionUpdateParams = subscriptionUpdateQuery?.let { query ->
-            BillingFlowParams.SubscriptionUpdateParams.newBuilder()
-                .setOldPurchaseToken(query.purchaseToken)
-                .setSubscriptionReplacementMode(query.replacementMode)
-                .build()
-        }
-        return BillingFlowParams.newBuilder()
-            .setProductDetailsParamsList(listOf(productParams))
             .let { builder ->
-                if (subscriptionUpdateParams != null) {
-                    builder.setSubscriptionUpdateParams(subscriptionUpdateParams)
+                if (replacementParams != null) {
+                    builder.setSubscriptionProductReplacementParams(replacementParams)
                 } else {
                     builder
                 }
             }
+            .build()
+        return BillingFlowParams.newBuilder()
+            .setProductDetailsParamsList(listOf(productParams))
             .build()
     }
 
@@ -36,7 +37,7 @@ internal data class BillingFlowRequest(
     )
 
     data class SubscriptionUpdateQuery(
-        val purchaseToken: String,
+        val oldProductId: String,
         val replacementMode: Int,
     )
 }
