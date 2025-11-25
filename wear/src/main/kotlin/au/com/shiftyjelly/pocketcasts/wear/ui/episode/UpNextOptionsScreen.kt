@@ -20,6 +20,7 @@ import com.google.android.horologist.compose.layout.ScalingLazyColumnDefaults
 import com.google.android.horologist.compose.layout.ScalingLazyColumnState
 import com.google.android.horologist.compose.layout.ScreenScaffold
 import com.google.android.horologist.compose.layout.rememberColumnState
+import com.google.android.horologist.compose.layout.rememberResponsiveColumnState
 import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
@@ -28,10 +29,8 @@ fun UpNextOptionsScreen(
     episodeScreenViewModelStoreOwner: ViewModelStoreOwner,
     onComplete: () -> Unit,
 ) {
-    val columnState = rememberColumnState(
-        factory = ScalingLazyColumnDefaults.belowTimeText(
-            verticalArrangement = Arrangement.spacedBy(0.dp, Alignment.Top),
-        ),
+    val columnState = rememberResponsiveColumnState(
+        verticalArrangement = Arrangement.spacedBy(0.dp, Alignment.Top),
     )
     ScreenScaffold(
         timeText = {},

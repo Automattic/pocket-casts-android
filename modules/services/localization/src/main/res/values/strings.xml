@@ -111,6 +111,7 @@
     <string name="sign_out">Sign out</string>
     <string name="skip_back">Skip back</string>
     <string name="skip_forward">Skip forward</string>
+    <string name="set_volume">Set volume</string>
     <string name="slumber_studios" translatable="false">Slumber&#160;Studios</string>
     <string name="sort_by">Sort by</string>
     <string name="star">Star</string>
@@ -393,6 +394,7 @@
     <string name="player_more_actions">More actions</string>
     <string name="player_notification_skip_back">Back %d secs</string>
     <string name="player_notification_skip_forward">Forward %d secs</string>
+    <string name="player_notification_skip_forward_seconds">Forward %d seconds</string>
     <string name="player_pip">Enter Picture-in-picture</string>
     <string name="player_sleep_15_minutes">15 minutes</string>
     <string name="player_sleep_30_minutes">30 minutes</string>

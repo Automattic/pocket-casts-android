@@ -24,6 +24,7 @@ import au.com.shiftyjelly.pocketcasts.wear.ui.player.NowPlayingScreen
 import au.com.shiftyjelly.pocketcasts.wear.ui.player.StreamingConfirmationScreen
 import com.google.android.horologist.compose.layout.ScalingLazyColumnDefaults
 import com.google.android.horologist.compose.layout.rememberColumnState
+import com.google.android.horologist.compose.layout.rememberResponsiveColumnState
 import kotlinx.coroutines.launch
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
@@ -76,10 +77,8 @@ object EpisodeScreenFlow {
                     swipeToDismissState = swipeToDismissState,
                 ) {
                     EpisodeScreen(
-                        columnState = rememberColumnState(
-                            factory = ScalingLazyColumnDefaults.belowTimeText(
-                                verticalArrangement = Arrangement.spacedBy(0.dp, Alignment.Top),
-                            ),
+                        columnState = rememberResponsiveColumnState(
+                            verticalArrangement = Arrangement.spacedBy(0.dp, Alignment.Top),
                         ),
                         navigateToPodcast = navigateToPodcast,
                         navigateToUpNextOptions = { navController.navigate(UP_NEXT_OPTIONS_SCREEN) },
