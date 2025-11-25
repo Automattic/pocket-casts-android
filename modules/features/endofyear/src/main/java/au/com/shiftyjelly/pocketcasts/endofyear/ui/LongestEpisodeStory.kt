@@ -10,7 +10,6 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -217,7 +216,7 @@ private fun Header(
     Column(
         modifier = modifier.semantics(mergeDescendants = true) {},
         horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center,
+        verticalArrangement = Arrangement.spacedBy(8.dp),
     ) {
         val context = LocalContext.current
         TextH10(
@@ -238,9 +237,6 @@ private fun Header(
             color = colorResource(UR.color.white),
             modifier = Modifier.padding(horizontal = 24.dp),
         )
-        Spacer(
-            modifier = Modifier.height(8.dp),
-        )
         TextP40(
             text = stringResource(
                 LR.string.end_of_year_story_longest_episode_subtitle,
@@ -249,6 +245,7 @@ private fun Header(
             ),
             disableAutoScale = true,
             color = colorResource(UR.color.white),
+            fontWeight = FontWeight.W500,
             modifier = Modifier.padding(horizontal = 24.dp),
         )
     }

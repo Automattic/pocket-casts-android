@@ -92,6 +92,7 @@ internal fun CompletionRateStory(
                     story.listenedCount,
                 ),
                 subscriptionTier = story.subscriptionTier,
+                measurements = measurements,
             )
             Box(
                 modifier = Modifier
