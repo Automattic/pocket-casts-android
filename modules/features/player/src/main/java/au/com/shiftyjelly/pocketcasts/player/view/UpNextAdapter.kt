@@ -139,6 +139,7 @@ class UpNextAdapter(
             )
 
             R.layout.adapter_up_next_playing -> PlayingViewHolder(AdapterUpNextPlayingBinding.inflate(inflater, parent, false))
+
             else -> throw IllegalStateException("Unknown view type in up next")
         }
     }

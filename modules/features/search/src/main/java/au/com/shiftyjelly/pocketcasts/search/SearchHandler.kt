@@ -194,6 +194,7 @@ class SearchHandler @Inject constructor(
                     results = suggestions,
                 )
             }
+
             is SearchUiState.SearchOperation.Error -> {
                 if (onlyRemote || subscribedPodcasts.isEmpty()) {
                     autoComplete

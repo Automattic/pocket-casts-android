@@ -99,6 +99,7 @@ class NotificationOpenReceiverActivity : AppCompatActivity() {
             }
 
             null -> null
+
             else -> {
                 Intent().apply {
                     flags = intent.flags

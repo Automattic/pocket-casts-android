@@ -50,12 +50,14 @@ object CloudDeleteHelper {
                         userEpisodeManager.delete(episode, playbackManager)
                     }
                 }
+
                 is DeleteState.Cloud -> {
                     userEpisodeManager.removeFromCloud(episode)
                     if (!episode.isDownloaded) {
                         userEpisodeManager.delete(episode, playbackManager)
                     }
                 }
+
                 is DeleteState.Everywhere -> {
                     userEpisodeManager.removeFromCloud(episode)
                     userEpisodeManager.delete(episode, playbackManager)
@@ -85,12 +87,14 @@ object CloudDeleteHelper {
                     .setButtonType(ConfirmationDialog.ButtonType.Danger(resources.getString(LR.string.profile_delete_from_device)))
                     .setOnConfirm { deleteFunction(episodes, deleteState) }
             }
+
             is DeleteState.Cloud -> {
                 confirmationDialog
                     .setTitle(resources.getString(LR.string.profile_delete_from_cloud_title))
                     .setButtonType(ConfirmationDialog.ButtonType.Danger(resources.getString(LR.string.profile_delete_from_cloud)))
                     .setOnConfirm { deleteFunction(episodes, deleteState) }
             }
+
             is DeleteState.Everywhere -> {
                 confirmationDialog
                     .setTitle(resources.getString(LR.string.profile_delete_file_title))

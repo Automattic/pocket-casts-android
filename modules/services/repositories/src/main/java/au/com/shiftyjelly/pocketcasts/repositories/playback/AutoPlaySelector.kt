@@ -42,8 +42,11 @@ class AutoPlaySelector @Inject constructor(
             }
 
             AutoPlaySource.Predefined.Downloads -> findDownloadedEpisodes()
+
             AutoPlaySource.Predefined.Files -> findUserEpisodes()
+
             AutoPlaySource.Predefined.Starred -> findStarredEpisodes()
+
             AutoPlaySource.Predefined.None -> emptyList()
         }
         val episode = if (currentEpisodeUuid == null) {

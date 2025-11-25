@@ -162,7 +162,9 @@ enum class TipPosition {
 
     internal fun normalize(layoutDirection: LayoutDirection) = when (this) {
         TopCenter -> TopCenter
+
         BottomCenter -> BottomCenter
+
         TopStart -> when (layoutDirection) {
             LayoutDirection.Ltr -> TopStart
             LayoutDirection.Rtl -> TopEnd

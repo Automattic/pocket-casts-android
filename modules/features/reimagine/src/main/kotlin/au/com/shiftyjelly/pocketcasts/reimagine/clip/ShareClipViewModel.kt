@@ -143,9 +143,11 @@ class ShareClipViewModel @AssistedInject constructor(
             clipRange.durationInSeconds < 1 -> {
                 viewModelScope.launch { _snackbarMessages.emit(SnackbarMessage.ClipStartAfterEnd) }
             }
+
             clipRange.end > episodeDurtion -> {
                 viewModelScope.launch { _snackbarMessages.emit(SnackbarMessage.ClipEndAfterEpisodeDuration(episodeDurtion)) }
             }
+
             else -> {
                 sharingState.update { it.copy(step = Step.PlatformSelection) }
             }
@@ -215,6 +217,7 @@ class ShareClipViewModel @AssistedInject constructor(
                 clipAnalytics.clipShared(clipRange, ClipShareType.Link, cardType)
                 Result.success(clipLinkRequest(podcast, episode, clipRange, platform, cardType, sourceView))
             }
+
             is CardType.Audio -> {
                 clipAnalytics.clipShared(clipRange, ClipShareType.Audio, cardType)
                 Result.success(audioClipRequest(podcast, episode, clipRange, sourceView))

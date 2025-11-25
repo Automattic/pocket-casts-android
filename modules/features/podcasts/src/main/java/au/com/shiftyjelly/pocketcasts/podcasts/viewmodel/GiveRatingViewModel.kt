@@ -200,18 +200,23 @@ fun starsToRating(star: Stars): Int = when (star) {
     Stars.One -> {
         1
     }
+
     Stars.Two -> {
         2
     }
+
     Stars.Three -> {
         3
     }
+
     Stars.Four -> {
         4
     }
+
     Stars.Five -> {
         5
     }
+
     else -> {
         5
     }

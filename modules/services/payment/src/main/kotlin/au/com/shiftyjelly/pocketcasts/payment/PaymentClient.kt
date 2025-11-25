@@ -201,6 +201,7 @@ class PaymentClient @Inject constructor(
 
 private fun PaymentResult<*>.toPurchaseResult() = when (this) {
     is PaymentResult.Success -> PurchaseResult.Purchased
+
     is PaymentResult.Failure -> when (code) {
         PaymentResultCode.UserCancelled -> PurchaseResult.Cancelled
         else -> PurchaseResult.Failure(code)

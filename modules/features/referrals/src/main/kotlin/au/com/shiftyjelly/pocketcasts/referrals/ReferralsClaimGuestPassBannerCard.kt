@@ -67,6 +67,7 @@ fun ReferralsClaimGuestPassBannerCard(
 
     when (state) {
         is UiState.Loading, UiState.NoOffer -> Unit
+
         is UiState.Loaded -> {
             ReferralsClaimGuestPassBannerCard(
                 state = state,

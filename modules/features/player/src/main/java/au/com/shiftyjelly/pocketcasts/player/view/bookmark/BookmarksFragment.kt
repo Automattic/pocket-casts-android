@@ -164,7 +164,9 @@ class BookmarksFragment : BaseFragment() {
                             sourceView == SourceView.PROFILE -> {
                                 bottomInset.value.pxToDp(LocalContext.current).dp
                             }
+
                             Build.VERSION.SDK_INT > 29 -> WindowInsets.navigationBars.asPaddingValues().calculateBottomPadding()
+
                             else -> 56.dp
                         },
                     )

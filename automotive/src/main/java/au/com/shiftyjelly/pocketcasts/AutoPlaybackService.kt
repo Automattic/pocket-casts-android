@@ -84,15 +84,25 @@ class AutoPlaybackService : PlaybackService() {
             try {
                 val items: List<MediaBrowserCompat.MediaItem> = when (parentId) {
                     MEDIA_ID_ROOT -> loadRootChildren()
+
                     PODCASTS_ROOT -> loadPodcastsChildren()
+
                     FILTERS_ROOT -> loadFiltersRoot()
+
                     DISCOVER_ROOT -> loadDiscoverRoot()
+
                     PROFILE_ROOT -> loadProfileRoot()
+
                     PROFILE_FILES -> loadFilesChildren()
+
                     PROFILE_LISTENING_HISTORY -> loadListeningHistoryChildren()
+
                     PROFILE_STARRED -> loadStarredChildren()
+
                     RECENT_ROOT -> loadRecentChildren()
+
                     SUGGESTED_ROOT -> loadSuggestedChildren()
+
                     else -> {
                         if (parentId.startsWith(FOLDER_ROOT_PREFIX)) {
                             loadFolderPodcastsChildren(folderUuid = parentId.substring(FOLDER_ROOT_PREFIX.length))

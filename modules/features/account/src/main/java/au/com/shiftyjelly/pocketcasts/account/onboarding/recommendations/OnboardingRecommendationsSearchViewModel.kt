@@ -84,6 +84,7 @@ class OnboardingRecommendationsSearchViewModel @Inject constructor(
                                 )
                             }
                     }
+
                     else -> emptyList()
                 }
 

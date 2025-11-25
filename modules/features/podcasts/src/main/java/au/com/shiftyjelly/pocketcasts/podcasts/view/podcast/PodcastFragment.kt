@@ -1087,6 +1087,7 @@ class PodcastFragment : BaseFragment() {
             viewModel.refreshState.collect { state ->
                 when (state) {
                     PodcastViewModel.RefreshState.NotStarted -> {}
+
                     PodcastViewModel.RefreshState.NewEpisodeFound -> {
                         binding?.swipeRefreshLayout?.isRefreshing = false
                         showSnackBar(getString(LR.string.podcast_refresh_new_episode_found))

@@ -118,8 +118,11 @@ internal fun RefreshSection(
 @Composable
 private fun RefreshState?.toLabel() = when (this) {
     is RefreshState.Failed -> stringResource(LR.string.profile_refresh_failed)
+
     is RefreshState.Never -> stringResource(LR.string.profile_refreshed_never)
+
     is RefreshState.Refreshing -> stringResource(LR.string.profile_refreshing)
+
     is RefreshState.Success -> {
         val resources = LocalContext.current.resources
         val timeAmount = remember(date) {

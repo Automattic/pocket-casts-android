@@ -102,6 +102,7 @@ fun String.escapeLike(escapeChar: Char, unidecode: Boolean = true): String {
                     append(escapeChar)
                     append(character)
                 }
+
                 else -> {
                     append(character)
                 }

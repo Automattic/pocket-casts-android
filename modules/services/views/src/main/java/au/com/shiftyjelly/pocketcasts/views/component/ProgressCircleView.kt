@@ -74,11 +74,13 @@ class ProgressCircleView @JvmOverloads constructor(
     fun setEpisode(episode: BaseEpisode, isPlayed: Boolean) {
         drawState = when {
             isPlayed -> DRAW_EMPTY
+
             episode.isInProgress -> {
                 directionMultiplier = -1f
                 playbackDegrees = calculatePlaybackDegrees(episode.playedUpToMs, episode.durationMs)
                 DRAW_PROGRESS
             }
+
             else -> DRAW_FULL
         }
     }

@@ -135,6 +135,7 @@ data class SubscriptionPlans private constructor(
                 )
 
                 0 -> PaymentResult.Failure(PaymentResultCode.DeveloperError, "No matching product found for $key")
+
                 else -> PaymentResult.Failure(PaymentResultCode.DeveloperError, "Multiple matching products found for $key. $matchingProducts")
             }
         }
@@ -317,6 +318,7 @@ enum class SubscriptionOffer(
 
             SubscriptionTier.Patron -> null
         }
+
         Trial -> when (tier) {
             SubscriptionTier.Plus -> when (billingCycle) {
                 BillingCycle.Monthly -> null

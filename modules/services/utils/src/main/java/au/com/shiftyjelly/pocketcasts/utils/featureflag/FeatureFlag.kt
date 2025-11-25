@@ -91,7 +91,9 @@ object FeatureFlag {
 
             SubscriptionTier.Plus -> when (feature.tier) {
                 is FeatureTier.Free -> true
+
                 is FeatureTier.Patron -> false
+
                 is FeatureTier.Plus -> {
                     val provider = findProviderForFeature<FeatureProvider>(feature) ?: return true
                     val releaseVersion = provider.currentReleaseVersion

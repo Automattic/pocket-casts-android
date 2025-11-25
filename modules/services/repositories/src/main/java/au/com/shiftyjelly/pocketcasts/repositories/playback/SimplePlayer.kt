@@ -234,7 +234,9 @@ class SimplePlayer(
                         onBufferingStateChanged()
                         onDurationAvailable()
                     }
+
                     Player.STATE_BUFFERING -> onBufferingStateChanged()
+
                     Player.STATE_ENDED -> onCompletion()
                 }
             }

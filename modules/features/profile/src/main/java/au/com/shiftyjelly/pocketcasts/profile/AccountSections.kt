@@ -79,47 +79,56 @@ internal fun AccountSections(
                         config = config,
                         onClick = { state.email?.let(onChangeAvatar) },
                     )
+
                     AccountSection.ChangeEmail -> ButtonSection(
                         section = section,
                         config = config,
                         onClick = onChangeEmail,
                     )
+
                     AccountSection.ChangePassword -> ButtonSection(
                         section = section,
                         config = config,
                         onClick = onChangePassword,
                     )
+
                     AccountSection.UpgradeToPatron -> ButtonSection(
                         section = section,
                         config = config,
                         onClick = onUpgradeToPatron,
                     )
+
                     AccountSection.CancelSubscription -> ButtonSection(
                         section = section,
                         config = config,
                         onClick = { onCancelSubscription(state.winbackInitParams) },
                     )
+
                     AccountSection.Newsletter -> SwitchSection(
                         isToggled = state.isSubscribedToNewsLetter,
                         section = section,
                         config = config,
                         onChange = onChangeNewsletterSubscription,
                     )
+
                     AccountSection.PrivacyPolicy -> ButtonSection(
                         section = section,
                         config = config,
                         onClick = onShowPrivacyPolicy,
                     )
+
                     AccountSection.TermsOfUse -> ButtonSection(
                         section = section,
                         config = config,
                         onClick = onShowTermsOfUse,
                     )
+
                     AccountSection.SignOut -> ButtonSection(
                         section = section,
                         config = config,
                         onClick = onSignOut,
                     )
+
                     AccountSection.DeleteAccount -> ButtonSection(
                         section = section,
                         config = config,

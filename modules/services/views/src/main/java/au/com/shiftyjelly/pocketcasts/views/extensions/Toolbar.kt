@@ -41,6 +41,7 @@ fun Toolbar.setup(
     }
     when (chromeCastButton) {
         ChromeCastButton.None -> {}
+
         is ChromeCastButton.Shown ->
             setupChromeCastButton(context) {
                 chromeCastButton.chromeCastAnalytics.trackChromeCastViewShown()
