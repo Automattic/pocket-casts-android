@@ -521,7 +521,7 @@ private val PlaylistEntity.smartRules
         } else {
             StarredRule.Any
         },
-        podcasts = if (podcastUuidList.isEmpty()) {
+        podcasts = if (allPodcasts || podcastUuidList.isEmpty()) {
             PodcastsRule.Any
         } else {
             PodcastsRule.Selected(podcastUuidList.toSet())
