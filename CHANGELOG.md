@@ -1,6 +1,8 @@
 8.2
 -----
-
+*   Updates
+    *   Upgraded Compose and the Wear OS libraries to the latest versions 
+        ([#4796](https://github.com/Automattic/pocket-casts-android/pull/4796))
 
 8.1
 -----
