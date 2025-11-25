@@ -98,10 +98,6 @@ class PlaylistManagerImpl(
         }
     }
 
-    override suspend fun findPlaylistPreview(uuid: String): PlaylistPreview? {
-        return playlistDao.findPlaylistByUuid(uuid)?.toPlaylistPreview()
-    }
-
     override suspend fun findPlaylistPreview(playlistUuid: String): PlaylistPreview? {
         return playlistDao.findPlaylistByUuid(playlistUuid)?.toPlaylistPreview()
     }
