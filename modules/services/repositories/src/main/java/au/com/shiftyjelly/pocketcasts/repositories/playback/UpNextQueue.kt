@@ -63,10 +63,12 @@ interface UpNextQueue {
             fun isEqualWithEpisodeCompare(stateOne: State, stateTwo: State, isPlayingEpisodeEqual: (BaseEpisode, BaseEpisode) -> Boolean): Boolean {
                 return when {
                     stateOne is Empty && stateTwo is Empty -> true
+
                     stateOne is Loaded && stateTwo is Loaded -> {
                         stateOne.queue.map { it.uuid } == stateTwo.queue.map { it.uuid } &&
                             isPlayingEpisodeEqual(stateOne.episode, stateTwo.episode)
                     }
+
                     else -> false
                 }
             }

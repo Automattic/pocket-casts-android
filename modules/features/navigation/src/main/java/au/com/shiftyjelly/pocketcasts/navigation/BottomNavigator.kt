@@ -1,6 +1,6 @@
 package au.com.shiftyjelly.pocketcasts.navigation
 
-/**
+/*
  * Copyright 2019 Pandora Media, LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -282,7 +282,9 @@ open class BottomNavigator internal constructor() : ViewModel() {
     private fun getInfoEvents(command: FragmentTransactionCommand): List<NavigatorAction> {
         return when (command) {
             is AddAndShow -> listOf(NavigatorAction.NewFragmentAdded(command.fragment))
+
             is AddOnTop -> listOf(NavigatorAction.NewFragmentAdded(command.fragment))
+
             is RemoveAllAndAdd -> {
                 command.remove
                     .map {
@@ -290,6 +292,7 @@ open class BottomNavigator internal constructor() : ViewModel() {
                     }
                     .plus(NavigatorAction.NewFragmentAdded(command.add.fragment))
             }
+
             is ShowAndRemove ->
                 listOf(
                     NavigatorAction.FragmentRemoved(
@@ -297,19 +300,24 @@ open class BottomNavigator internal constructor() : ViewModel() {
                         command.showTag.className,
                     ),
                 )
+
             is RemoveAllAndShowExisting -> {
                 command.remove
                     .map {
                         NavigatorAction.FragmentRemoved(it.className, command.show.tag.className)
                     }
             }
-            is ShowExisting -> emptyList() // tracked by tabSwitches
+
+            is ShowExisting -> emptyList()
+
+            // tracked by tabSwitches
             is Clear -> command.allCurrentTags.map {
                 NavigatorAction.FragmentRemoved(
                     it.className,
                     null,
                 )
             }
+
             is FragmentTransactionCommand.RemoveUnknown -> emptyList() // no info
         }
     }

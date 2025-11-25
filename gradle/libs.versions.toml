@@ -34,9 +34,9 @@ java = "17"
 kotlin = "2.2.21"
 kotlin-coroutines = "1.10.2"
 ksp = "2.3.2"
-ktlint = "1.7.1"
-ktlint-compose-rules = "0.4.27"
-lifecycle = "2.9.4"
+ktlint = "1.8.0"
+ktlint-compose-rules = "0.4.28"
+lifecycle = "2.10.0"
 lottie = "6.7.1"
 measure-builds = "3.2.2"
 media3 = "1.8.0"
@@ -48,7 +48,7 @@ okhttp = "5.3.1"
 protobuf = "4.33.1"
 protobuf-plugin = "0.9.5"
 retrofit = "3.0.0"
-room = "2.8.3"
+room = "2.8.4"
 security-lint = "1.0.3"
 sentry-plugin = "5.12.2"
 tasker-plugin = "0.4.10"
@@ -75,7 +75,7 @@ coil-base = { module = "io.coil-kt:coil-base", version.ref = "coil" }
 coil-compose = { module = "io.coil-kt:coil-compose", version.ref = "coil" }
 
 # Compose
-compose-activity = "androidx.activity:activity-compose:1.11.0"
+compose-activity = "androidx.activity:activity-compose:1.12.0"
 compose-animation = { module = "androidx.compose.animation:animation" }
 compose-animation-graphics = { module = "androidx.compose.animation:animation-graphics" }
 compose-bom = { module = "androidx.compose:compose-bom", version.ref = "compose" }

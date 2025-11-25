@@ -342,11 +342,13 @@ class EpisodeContainerFragment :
                             forceDark = forceDarkTheme,
                             autoPlay = autoPlay,
                         )
+
                 Section.Bookmarks -> BookmarksFragment.newInstance(
                     sourceView = SourceView.EPISODE_DETAILS,
                     episodeUuid = requireNotNull(episodeUUID),
                     forceDarkTheme = forceDarkTheme,
                 )
+
                 Section.Chapters -> ChaptersFragment.forEpisode(
                     episodeUuid = requireNotNull(episodeUUID),
                 )

@@ -161,15 +161,20 @@ fun SubscriptionBadgeForTier(
             contentDescriptionRes = LR.string.pocket_casts_plus_badge,
             iconColor = when (displayMode) {
                 SubscriptionBadgeDisplayMode.Black -> Color.plusGold
+
                 SubscriptionBadgeDisplayMode.Colored,
                 SubscriptionBadgeDisplayMode.ColoredDark,
                 -> MaterialTheme.theme.colors.primaryUi01
+
                 SubscriptionBadgeDisplayMode.ColoredWithWhiteForeground -> Color.White
+
                 SubscriptionBadgeDisplayMode.ColoredWithBlackForeground -> Color.Black
             },
             backgroundColor = when (displayMode) {
                 SubscriptionBadgeDisplayMode.Black -> Color.Black
+
                 SubscriptionBadgeDisplayMode.ColoredDark -> Color.plusGoldDark
+
                 SubscriptionBadgeDisplayMode.Colored,
                 SubscriptionBadgeDisplayMode.ColoredWithWhiteForeground,
                 SubscriptionBadgeDisplayMode.ColoredWithBlackForeground,
@@ -177,10 +182,13 @@ fun SubscriptionBadgeForTier(
             },
             textColor = when (displayMode) {
                 SubscriptionBadgeDisplayMode.Black -> Color.White
+
                 SubscriptionBadgeDisplayMode.Colored,
                 SubscriptionBadgeDisplayMode.ColoredDark,
                 -> MaterialTheme.theme.colors.primaryUi01
+
                 SubscriptionBadgeDisplayMode.ColoredWithWhiteForeground -> Color.White
+
                 SubscriptionBadgeDisplayMode.ColoredWithBlackForeground -> Color.Black
             },
             iconSize = iconSize,
@@ -195,15 +203,19 @@ fun SubscriptionBadgeForTier(
             contentDescriptionRes = LR.string.pocket_casts_patron_badge,
             iconColor = when (displayMode) {
                 SubscriptionBadgeDisplayMode.Black -> Color.patronPurpleLight
+
                 SubscriptionBadgeDisplayMode.Colored,
                 SubscriptionBadgeDisplayMode.ColoredDark,
                 SubscriptionBadgeDisplayMode.ColoredWithWhiteForeground,
                 -> Color.White
+
                 SubscriptionBadgeDisplayMode.ColoredWithBlackForeground -> Color.Black
             },
             backgroundColor = when (displayMode) {
                 SubscriptionBadgeDisplayMode.Black -> Color.Black
+
                 SubscriptionBadgeDisplayMode.ColoredDark -> Color.patronPurpleDark
+
                 SubscriptionBadgeDisplayMode.Colored,
                 SubscriptionBadgeDisplayMode.ColoredWithWhiteForeground,
                 SubscriptionBadgeDisplayMode.ColoredWithBlackForeground,
@@ -211,10 +223,12 @@ fun SubscriptionBadgeForTier(
             },
             textColor = when (displayMode) {
                 SubscriptionBadgeDisplayMode.Black -> Color.White
+
                 SubscriptionBadgeDisplayMode.Colored,
                 SubscriptionBadgeDisplayMode.ColoredDark,
                 SubscriptionBadgeDisplayMode.ColoredWithWhiteForeground,
                 -> Color.White
+
                 SubscriptionBadgeDisplayMode.ColoredWithBlackForeground -> Color.Black
             },
             iconSize = iconSize,

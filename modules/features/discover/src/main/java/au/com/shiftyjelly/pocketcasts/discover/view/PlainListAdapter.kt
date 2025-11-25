@@ -130,14 +130,17 @@ class PlainListAdapter(
                 podcastRow.updatePadding(left = sixteenDp, right = sixteenDp)
                 PodcastViewHolder(podcastRow)
             }
+
             R.layout.row_episode -> {
                 val episodeRow = EpisodeRow(parent.context)
                 episodeRow.listTintColor = listTintColor
                 EpisodeViewHolder(episodeRow)
             }
+
             R.layout.row_promotion -> {
                 PromotionViewHolder(RowPromotionBinding.inflate(inflater, parent, false))
             }
+
             else -> throw IllegalStateException("Unknown row type in discover list")
         }
     }

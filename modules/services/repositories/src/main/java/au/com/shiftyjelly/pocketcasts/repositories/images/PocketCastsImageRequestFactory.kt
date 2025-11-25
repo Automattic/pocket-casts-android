@@ -136,6 +136,7 @@ data class PocketCastsImageRequestFactory(
 
     private fun RequestType.listener(context: Context, onSuccess: () -> Unit): ImageRequest.Listener? = when (this) {
         is RequestType.PodcastEpisode -> RetryWithPodcastListener(episode.podcastArtworkUrl(context), onSuccess)
+
         else -> object : ImageRequest.Listener {
             override fun onSuccess(request: ImageRequest, result: SuccessResult) = onSuccess()
         }

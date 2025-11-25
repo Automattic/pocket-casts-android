@@ -18,7 +18,7 @@ class TouchDetectionFrameLayout @JvmOverloads constructor(
 
     fun wasTouchedInLast(duration: Duration): Boolean {
         val timestamp = recentReleaseTimestamp
-        return isTouching || timestamp != null && timestamp.isAfter(Instant.now().minusMillis(duration.inWholeMilliseconds))
+        return isTouching || (timestamp != null && timestamp.isAfter(Instant.now().minusMillis(duration.inWholeMilliseconds)))
     }
 
     override fun dispatchTouchEvent(event: MotionEvent): Boolean {

@@ -20,6 +20,7 @@ class ResetPasswordViewModel @Inject constructor(
             is ResetPasswordState.Failure -> {
                 errors.addAll(existingState.errors)
             }
+
             else -> {}
         }
         if (add) errors.add(error) else errors.remove(error)

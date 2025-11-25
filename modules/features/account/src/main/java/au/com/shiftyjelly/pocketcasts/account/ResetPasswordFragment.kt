@@ -61,6 +61,7 @@ class ResetPasswordFragment : BaseFragment() {
                     is ResetPasswordState.Empty -> {
                         updateForm(false)
                     }
+
                     is ResetPasswordState.Failure -> {
                         progress.isVisible = false
 
@@ -75,10 +76,12 @@ class ResetPasswordFragment : BaseFragment() {
                             viewModel.clearServerError()
                         }
                     }
+
                     is ResetPasswordState.Loading -> {
                         txtError.text = ""
                         progress.isVisible = true
                     }
+
                     is ResetPasswordState.Success -> {
                         progress.isVisible = false
                         UiUtil.displayAlert(
@@ -111,7 +114,7 @@ class ResetPasswordFragment : BaseFragment() {
         val emailColor = context.getThemeColor(UR.attr.primary_interactive_01)
         val emailDrawable = context.getTintedDrawable(IR.drawable.ic_mail, emailColor)
         val tickColor = context.getThemeColor(UR.attr.support_02)
-        val tickDrawable = if (!invalidEmail)context.getTintedDrawable(IR.drawable.ic_tick_circle, tickColor) else null
+        val tickDrawable = if (!invalidEmail) context.getTintedDrawable(IR.drawable.ic_tick_circle, tickColor) else null
         val max = 64
         emailDrawable?.setBounds(0, 0, max, max)
         tickDrawable?.setBounds(0, 0, max, max)

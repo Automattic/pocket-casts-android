@@ -96,9 +96,11 @@ fun rememberQrPainter(
             is QrState.Loading -> {
                 ColorPainter(androidx.compose.ui.graphics.Color.Transparent)
             }
+
             is QrState.Success -> {
                 BitmapPainter(state.bitmap.asImageBitmap())
             }
+
             is QrState.Error -> {
                 ColorPainter(androidx.compose.ui.graphics.Color.Gray)
             }

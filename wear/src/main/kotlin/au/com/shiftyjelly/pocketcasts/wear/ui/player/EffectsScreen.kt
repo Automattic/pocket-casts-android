@@ -86,6 +86,7 @@ private fun Content(
         }
         when (state) {
             EffectsViewModel.State.Loading -> Unit
+
             is EffectsViewModel.State.Loaded -> {
                 item {
                     SpeedChip(

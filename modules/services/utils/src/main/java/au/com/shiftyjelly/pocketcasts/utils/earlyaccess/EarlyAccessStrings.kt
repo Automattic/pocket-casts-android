@@ -31,6 +31,7 @@ object EarlyAccessStrings {
                 -> isReleaseCandidate
 
                 EarlyAccessState.After -> false
+
                 null -> false
             }
 

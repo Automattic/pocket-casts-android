@@ -82,6 +82,7 @@ private fun UpNextHistoryPageView(
 
         when (state) {
             is UiState.Loading -> LoadingView()
+
             is UiState.Loaded -> {
                 UpNextHistoryEntries(
                     historyEntries = state.entries,

@@ -80,6 +80,7 @@ class MultiSelectToolbar @JvmOverloads constructor(
                             item.setShowAsAction(MenuItem.SHOW_AS_ACTION_NEVER)
                         }
                     }
+
                     is MultiSelectEpisodesHelper -> {
                         val overflow = menu.add(Menu.NONE, R.id.menu_overflow, 0, context.getString(LR.string.more_options))
                         overflow.setIcon(IR.drawable.ic_more_vert_black_24dp)

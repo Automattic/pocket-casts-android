@@ -50,6 +50,7 @@ fun CountBadge(
         val textColor = style.textColor()
         when (style) {
             is CountBadgeStyle.Small -> return
+
             is CountBadgeStyle.Medium -> TextH60(
                 text = text,
                 color = textColor,

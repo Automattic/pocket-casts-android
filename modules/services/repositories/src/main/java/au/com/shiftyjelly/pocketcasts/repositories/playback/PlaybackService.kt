@@ -301,6 +301,7 @@ open class PlaybackService :
                         LogBuffer.i(LogBuffer.TAG_PLAYBACK, "can't startForeground as the notification is null")
                     }
                 }
+
                 PlaybackStateCompat.STATE_NONE,
                 PlaybackStateCompat.STATE_STOPPED,
                 PlaybackStateCompat.STATE_PAUSED,
@@ -430,10 +431,15 @@ open class PlaybackService :
         launch {
             val items: List<MediaBrowserCompat.MediaItem> = when (parentId) {
                 RECENT_ROOT -> loadRecentChildren()
+
                 SUGGESTED_ROOT -> loadSuggestedChildren()
+
                 MEDIA_ID_ROOT -> loadRootChildren()
+
                 PODCASTS_ROOT -> loadPodcastsChildren()
+
                 FILES_ROOT -> loadFilesChildren()
+
                 else -> {
                     if (parentId.startsWith(FOLDER_ROOT_PREFIX)) {
                         loadFolderPodcastsChildren(folderUuid = parentId.substring(FOLDER_ROOT_PREFIX.length))

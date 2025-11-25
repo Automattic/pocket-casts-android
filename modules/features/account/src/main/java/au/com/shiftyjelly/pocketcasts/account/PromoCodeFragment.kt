@@ -60,6 +60,7 @@ class PromoCodeFragment : BaseFragment() {
                     is PromoCodeViewModel.ViewState.Loading -> {
                         showLoading()
                     }
+
                     is PromoCodeViewModel.ViewState.Success -> {
                         binding.loadedGroup.isVisible = false
                         // We need to set this to true here so we know not to show the gift dialog.
@@ -71,6 +72,7 @@ class PromoCodeFragment : BaseFragment() {
                         activity?.setResult(RESULT_OK, result)
                         activity?.finish()
                     }
+
                     is PromoCodeViewModel.ViewState.NotSignedIn -> {
                         binding.progress.isVisible = false
                         binding.loadedGroup.isVisible = true
@@ -91,6 +93,7 @@ class PromoCodeFragment : BaseFragment() {
                             showLoading()
                         }
                     }
+
                     is PromoCodeViewModel.ViewState.Failed -> {
                         binding.progress.isVisible = false
                         binding.loadedGroup.isVisible = true

@@ -40,6 +40,7 @@ class EndOfYearSyncImpl @Inject constructor(
     override suspend fun sync(year: Year): Boolean {
         return when {
             isDataSynced() -> true
+
             canSyncData() -> supervisorScope {
                 val jobs = listOf(
                     thisYearSync.run(year, scope = this),
@@ -51,6 +52,7 @@ class EndOfYearSyncImpl @Inject constructor(
                     .onSuccess { timestampSetting.set(clock.instant(), updateModifiedAt = false) }
                     .getOrElse { error -> if (error !is CancellationException) false else throw error }
             }
+
             else -> false
         }
     }

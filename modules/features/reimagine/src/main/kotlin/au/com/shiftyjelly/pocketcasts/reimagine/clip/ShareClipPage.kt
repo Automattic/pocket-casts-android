@@ -159,6 +159,7 @@ internal fun ShareClipPage(
             state = state,
             snackbarHostState = snackbarHostState,
         )
+
         else -> VerticalClipPage(
             episode = episode,
             podcast = podcast,
@@ -423,6 +424,7 @@ private fun DescriptionContent(
             when (step) {
                 Step.ClipSelection -> when (orientation) {
                     Configuration.ORIENTATION_LANDSCAPE -> Unit
+
                     else -> TextH40(
                         text = stringResource(descriptionId),
                         textAlign = TextAlign.Center,
@@ -431,6 +433,7 @@ private fun DescriptionContent(
                         modifier = Modifier.padding(horizontal = 24.dp),
                     )
                 }
+
                 Step.PlatformSelection -> TextH40(
                     text = stringResource(LR.string.share_clip_edit_label),
                     textAlign = TextAlign.Center,
@@ -456,6 +459,7 @@ private fun DescriptionContent(
             }
             val bottomSpace = when (orientation) {
                 Configuration.ORIENTATION_LANDSCAPE -> 0.dp
+
                 else -> when (step) {
                     Step.ClipSelection -> 12.dp
                     Step.PlatformSelection -> 48.dp
@@ -528,6 +532,7 @@ private fun ColumnScope.PagingContent(
                 constrainedSize = { _, _ -> coordiantes.size },
                 modifier = modifier,
             )
+
             is CardType.Audio -> Box(
                 contentAlignment = Alignment.Center,
                 modifier = modifier,
@@ -579,6 +584,7 @@ private fun PageControlsContent(
                 onNavigationButtonClick = onNavigationButtonClick,
                 state = state,
             )
+
             Step.PlatformSelection -> SharingControls(
                 episode = episode,
                 podcast = podcast,
@@ -636,6 +642,7 @@ private fun ClipControls(
                         CardType.Vertical, CardType.Horizontal, CardType.Square -> {
                             listener.onShowPlatformSelection()
                         }
+
                         CardType.Audio -> {
                             listener.onShareClip(
                                 podcast = podcast,

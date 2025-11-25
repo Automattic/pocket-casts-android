@@ -79,74 +79,92 @@ class MultiSelectEpisodesHelper @Inject constructor(
                 archive(resources = resources, fragmentManager = fragmentManager)
                 true
             }
+
             UR.id.menu_unarchive -> {
                 unarchive(resources = resources)
                 true
             }
+
             R.id.menu_delete -> {
                 delete(resources, fragmentManager)
                 true
             }
+
             R.id.menu_share -> {
                 share(fragmentManager)
                 true
             }
+
             R.id.menu_download -> {
                 download(resources, fragmentManager)
                 true
             }
+
             UR.id.menu_undownload -> {
                 deleteDownload(resources, fragmentManager)
                 true
             }
+
             R.id.menu_mark_played -> {
                 markAsPlayed(resources = resources, fragmentManager = fragmentManager)
                 true
             }
+
             UR.id.menu_markasunplayed -> {
                 markAsUnplayed(resources = resources)
                 true
             }
+
             R.id.menu_playnext -> {
                 playNext(resources = resources)
                 true
             }
+
             R.id.menu_playlast -> {
                 playLast(resources = resources)
                 true
             }
+
             R.id.menu_select_all -> {
                 selectAll()
                 true
             }
+
             R.id.menu_unselect_all -> {
                 unselectAll()
                 true
             }
+
             R.id.menu_removefromupnext -> {
                 removeFromUpNext(resources = resources)
                 true
             }
+
             R.id.menu_movetotop -> {
                 moveToTop()
                 true
             }
+
             R.id.menu_movetobottom -> {
                 moveToBottom()
                 true
             }
+
             R.id.menu_star -> {
                 star(resources = resources)
                 true
             }
+
             UR.id.menu_unstar -> {
                 unstar(resources = resources)
                 true
             }
+
             UR.id.menu_remove_listening_history -> {
                 removeListeningHistory(resources = resources)
                 true
             }
+
             else -> false
         }
     }

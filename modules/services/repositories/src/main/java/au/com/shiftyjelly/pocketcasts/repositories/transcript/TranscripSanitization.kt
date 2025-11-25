@@ -64,6 +64,7 @@ private fun List<TranscriptEntry>.joinSplitSentences(): List<TranscriptEntry> {
     mapNotNullTo(entries) { entry ->
         when (entry) {
             is TranscriptEntry.Speaker -> entry
+
             is TranscriptEntry.Text -> {
                 val text = entry.value
                 if (text.endsAsSentence()) {

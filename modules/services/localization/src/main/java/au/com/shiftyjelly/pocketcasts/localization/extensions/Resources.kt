@@ -56,10 +56,12 @@ fun Resources.getStringPluralYears(count: Int): String {
 fun Resources.getStringPluralDaysMonthsOrYears(days: Int): String {
     return when {
         days <= 30 -> getStringPluralDays(days)
+
         days < 365 -> {
             val months = (days / 30.0).roundToInt()
             getStringPluralMonths(months)
         }
+
         else -> {
             val years = (days / 365.0).roundToInt()
             getStringPluralYears(years)

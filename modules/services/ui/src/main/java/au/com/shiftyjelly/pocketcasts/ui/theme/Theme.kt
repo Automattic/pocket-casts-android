@@ -225,11 +225,13 @@ class Theme @Inject constructor(private val settings: Settings) {
                     setUseSystemTheme(false, null)
                 }
             }
+
             Configuration.UI_MODE_NIGHT_YES -> { // Night mode is active, we're using dark theme
                 if (!activeTheme.darkTheme) {
                     setUseSystemTheme(false, null)
                 }
             }
+
             else -> getPreferredDarkThemeFromPreferences()
         }
 
@@ -246,10 +248,14 @@ class Theme @Inject constructor(private val settings: Settings) {
             val theme = when (configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK) {
                 Configuration.UI_MODE_NIGHT_NO -> {
                     getPreferredLightFromPreferences()
-                } // Night mode is not active, we're using the light theme
+                }
+
+                // Night mode is not active, we're using the light theme
                 Configuration.UI_MODE_NIGHT_YES -> {
                     getPreferredDarkThemeFromPreferences()
-                } // Night mode is active, we're using dark theme
+                }
+
+                // Night mode is active, we're using dark theme
                 else -> getPreferredDarkThemeFromPreferences()
             }
 
@@ -408,6 +414,7 @@ class Theme @Inject constructor(private val settings: Settings) {
                     useDarkStatusBarIcons(window)
                 }
             }
+
             StatusBarIconColor.ThemeNoToolbar -> {
                 if (activeTheme.backgroundLightIcons) {
                     useLightStatusBarIcons(window)
@@ -415,8 +422,11 @@ class Theme @Inject constructor(private val settings: Settings) {
                     useDarkStatusBarIcons(window)
                 }
             }
+
             StatusBarIconColor.Dark -> useDarkStatusBarIcons(window)
+
             StatusBarIconColor.Light -> useLightStatusBarIcons(window)
+
             is StatusBarIconColor.UpNext -> {
                 if (getUpNextTheme(isFullScreen = color.isFullScreen).toolbarLightIcons) {
                     useLightStatusBarIcons(window)

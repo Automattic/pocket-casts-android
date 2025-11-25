@@ -105,6 +105,7 @@ class LoginWithGoogleViewModel @Inject constructor(
                     LogBuffer.e(LogBuffer.TAG_CRASH, it, "Unable to sign in with Google One Tap")
                     _state.value = when (it) {
                         is NoCredentialException -> State.Failed.GoogleLoginUnavailable
+
                         is GetCredentialCancellationException,
                         is GetCredentialInterruptedException,
                         -> State.Failed.Cancelled

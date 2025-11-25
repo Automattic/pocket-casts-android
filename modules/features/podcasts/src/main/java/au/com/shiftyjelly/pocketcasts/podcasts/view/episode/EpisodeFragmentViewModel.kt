@@ -308,12 +308,15 @@ class EpisodeFragmentViewModel @Inject constructor(
                     playbackManager.pause(sourceView = source)
                     return false
                 }
+
                 timestamp != null -> {
                     startPlaybackTimestamp = null
                     autoDispatchPlay = false
                     play(episode, timestamp)
                     return true
-                } else -> {
+                }
+
+                else -> {
                     startPlaybackTimestamp = null
                     autoDispatchPlay = false
                     fromListUuid?.let {

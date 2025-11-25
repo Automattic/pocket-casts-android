@@ -12,10 +12,14 @@ data class ReleaseVersion(
     override fun compareTo(other: ReleaseVersion): Int {
         return when {
             this.major != other.major -> this.major - other.major
+
             this.minor != other.minor -> this.minor - other.minor
+
             (this.patch ?: 0) != (other.patch ?: 0) -> (this.patch ?: 0) - (other.patch ?: 0)
+
             (this.releaseCandidate ?: Int.MAX_VALUE) != (other.releaseCandidate ?: Int.MAX_VALUE) ->
                 (this.releaseCandidate ?: Int.MAX_VALUE) - (other.releaseCandidate ?: Int.MAX_VALUE)
+
             else -> 0
         }
     }

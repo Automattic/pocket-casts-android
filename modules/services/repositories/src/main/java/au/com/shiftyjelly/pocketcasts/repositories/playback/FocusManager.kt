@@ -147,6 +147,7 @@ class FocusManager(
                 LogBuffer.i(LogBuffer.TAG_PLAYBACK, "Audio focus gained. Should resume: $shouldResume. Device removed: $deviceRemovedWhileFocusLost.")
                 focusChangeListener.onFocusGain(shouldResume)
             }
+
             in LOSS_FOCUS_LIST -> {
                 audioFocus = when {
                     focusChange == AudioManager.AUDIOFOCUS_LOSS -> AUDIO_NO_FOCUS_NO_DUCK
@@ -160,6 +161,7 @@ class FocusManager(
                 LogBuffer.i(LogBuffer.TAG_PLAYBACK, "Audio focus lost. Play over notification: $playOverNotification, is transient: $isLostTransient")
                 focusChangeListener.onFocusLoss(playOverNotification, isLostTransient)
             }
+
             else -> {
                 LogBuffer.i(LogBuffer.TAG_PLAYBACK, "Unexpected audio focus change: $focusString.")
             }

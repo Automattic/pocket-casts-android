@@ -34,10 +34,12 @@ fun GradientIcon(
             val defaultColor = MaterialTheme.theme.colors.primaryInteractive01
             listOf(defaultColor, defaultColor)
         }
+
         1 -> {
             val onlyColor = colors.first()
             listOf(onlyColor, onlyColor)
         }
+
         else -> colors
     }
 
