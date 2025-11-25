@@ -13,11 +13,9 @@ import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.requiredSize
 import androidx.compose.foundation.layout.size
-import androidx.compose.material3.adaptive.currentWindowAdaptiveInfo
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -30,6 +28,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.layout.onSizeChanged
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
@@ -37,11 +37,10 @@ import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.min
 import androidx.compose.ui.unit.sp
 import au.com.shiftyjelly.pocketcasts.compose.Devices
-import au.com.shiftyjelly.pocketcasts.compose.adaptive.isAtMostMediumHeight
 import au.com.shiftyjelly.pocketcasts.compose.components.PodcastImage
 import au.com.shiftyjelly.pocketcasts.compose.components.TextH10
 import au.com.shiftyjelly.pocketcasts.compose.components.TextP40
@@ -59,7 +58,8 @@ import kotlin.time.Duration.Companion.days
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 import au.com.shiftyjelly.pocketcasts.ui.R as UR
 
-private const val MEDIUM_HEIGHT_FACTOR = .6f
+val AnimationEndScale = 1.3f
+val AnimationStartScale = 1.8f
 
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
@@ -77,34 +77,40 @@ internal fun TopShowStory(
                 .background(story.backgroundColor)
                 .padding(top = measurements.closeButtonBottomEdge + 16.dp, bottom = 64.dp),
         ) {
-            val windowSize = currentWindowAdaptiveInfo().windowSizeClass
-            val sizeFactor = if (windowSize.isAtMostMediumHeight()) {
-                MEDIUM_HEIGHT_FACTOR
-            } else {
-                1f
-            }
-            val animationContainerSize = min(maxWidth, maxHeight) * sizeFactor
+            var headerHeight by remember { mutableStateOf(0.dp) }
+            var footerHeight by remember { mutableStateOf(0.dp) }
+            val density = LocalDensity.current
+
             Header(
                 measurements = measurements,
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height((maxHeight - animationContainerSize) / 2)
+                    .onSizeChanged { size ->
+                        with(density) { headerHeight = size.height.toDp() }
+                    }
                     .align(Alignment.TopCenter),
-            )
-
-            CenterContent(
-                story = story,
-                modifier = Modifier
-                    .size(animationContainerSize)
-                    .align(Alignment.Center),
             )
 
             Footer(
                 story = story,
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height((maxHeight - animationContainerSize) / 2)
+                    .onSizeChanged { size ->
+                        with(density) { footerHeight = size.height.toDp() }
+                    }
                     .align(Alignment.BottomCenter),
+            )
+
+            val contentHeight = maxHeight - headerHeight - footerHeight
+            // reduce the size to account for the growth during the animation
+            val contentHeightMinusGrowth = contentHeight - (contentHeight * (AnimationEndScale - 1f))
+
+            CenterContent(
+                story = story,
+                size = contentHeightMinusGrowth,
+                modifier = Modifier
+                    .size(contentHeightMinusGrowth)
+                    .align(Alignment.Center),
             )
         }
         ShareStoryButton(
@@ -119,8 +125,9 @@ internal fun TopShowStory(
 @Composable
 private fun CenterContent(
     story: Story.TopShow,
+    size: Dp,
     modifier: Modifier = Modifier,
-) = BoxWithConstraints(
+) = Box(
     modifier = modifier,
     contentAlignment = Alignment.Center,
 ) {
@@ -136,8 +143,9 @@ private fun CenterContent(
         durationMillis = 1000,
         easing = CubicBezierEasing(.33f, 0f, 0f, 1f),
     )
+
     val lottieScaleAnimation by animateFloatAsState(
-        targetValue = if (isPlaying) 1.3f else 1.5f,
+        targetValue = if (isPlaying) AnimationEndScale else AnimationStartScale,
         animationSpec = animationSpec,
     )
 
@@ -186,7 +194,7 @@ private fun CenterContent(
         elevation = 0.dp,
         contentDescription = story.show.title,
         modifier = Modifier
-            .requiredSize(maxOf(maxWidth.times(.7f), maxHeight.times(.7f)))
+            .requiredSize(size.times(.7f))
             .scale(scaleAnimation)
             .graphicsLayer {
                 alpha = alphaAnimation
