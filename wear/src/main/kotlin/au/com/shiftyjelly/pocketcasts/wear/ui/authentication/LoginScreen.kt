@@ -7,7 +7,7 @@ import au.com.shiftyjelly.pocketcasts.compose.BuildConfig
 import au.com.shiftyjelly.pocketcasts.compose.CallOnce
 import com.google.android.horologist.compose.layout.ScalingLazyColumn
 import com.google.android.horologist.compose.layout.ScreenScaffold
-import com.google.android.horologist.compose.layout.rememberColumnState
+import com.google.android.horologist.compose.layout.rememberResponsiveColumnState
 import com.google.android.horologist.compose.material.Chip
 import com.google.android.horologist.images.base.paintable.DrawableResPaintable
 import au.com.shiftyjelly.pocketcasts.images.R as IR
@@ -20,7 +20,7 @@ fun LoginScreen(
     viewModel: LoginViewModel = hiltViewModel(),
     onLoginWithEmailClick: () -> Unit,
 ) {
-    val columnState = rememberColumnState()
+    val columnState = rememberResponsiveColumnState()
 
     ScreenScaffold(
         scrollState = columnState,

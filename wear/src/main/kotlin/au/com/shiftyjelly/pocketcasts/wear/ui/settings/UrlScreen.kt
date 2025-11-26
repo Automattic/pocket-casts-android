@@ -9,6 +9,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
+import androidx.concurrent.futures.await
 import androidx.core.net.toUri
 import androidx.navigation.NavGraphBuilder
 import androidx.wear.compose.material.Text
@@ -19,9 +20,8 @@ import au.com.shiftyjelly.pocketcasts.wear.ui.component.ScreenHeaderChip
 import au.com.shiftyjelly.pocketcasts.wear.ui.component.WatchListChip
 import com.google.android.horologist.compose.layout.ScalingLazyColumn
 import com.google.android.horologist.compose.layout.ScreenScaffold
-import com.google.android.horologist.compose.layout.rememberColumnState
+import com.google.android.horologist.compose.layout.rememberResponsiveColumnState
 import java.util.concurrent.Executors
-import kotlinx.coroutines.guava.await
 import kotlinx.coroutines.launch
 import timber.log.Timber
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
@@ -60,7 +60,7 @@ fun UrlScreen(
     url: String,
     modifier: Modifier = Modifier,
 ) {
-    val columnState = rememberColumnState()
+    val columnState = rememberResponsiveColumnState()
 
     ScreenScaffold(
         scrollState = columnState,

@@ -12,7 +12,7 @@ import au.com.shiftyjelly.pocketcasts.BuildConfig
 import au.com.shiftyjelly.pocketcasts.wear.ui.component.WatchListChip
 import com.google.android.horologist.compose.layout.ScalingLazyColumn
 import com.google.android.horologist.compose.layout.ScreenScaffold
-import com.google.android.horologist.compose.layout.rememberColumnState
+import com.google.android.horologist.compose.layout.rememberResponsiveColumnState
 import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
@@ -26,7 +26,7 @@ fun WearAboutScreen(
     onPrivacyClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    val columnState = rememberColumnState()
+    val columnState = rememberResponsiveColumnState()
     ScreenScaffold(
         scrollState = columnState,
         modifier = modifier,

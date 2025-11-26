@@ -1,8 +1,6 @@
 package au.com.shiftyjelly.pocketcasts.wear.ui.component
 
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.pager.PagerState
-import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -13,12 +11,14 @@ import androidx.compose.ui.Modifier
 import androidx.navigation.NavController
 import androidx.wear.compose.foundation.SwipeToDismissBoxState
 import androidx.wear.compose.foundation.edgeSwipeToDismiss
+import androidx.wear.compose.foundation.pager.PagerState
+import androidx.wear.compose.foundation.pager.rememberPagerState
 import au.com.shiftyjelly.pocketcasts.wear.ui.UpNextScreen
 import au.com.shiftyjelly.pocketcasts.wear.ui.episode.EpisodeScreenFlow
 import au.com.shiftyjelly.pocketcasts.wear.ui.player.NowPlayingScreen
 import com.google.android.horologist.compose.layout.ScalingLazyColumnState
 import com.google.android.horologist.compose.layout.ScreenScaffold
-import com.google.android.horologist.compose.layout.rememberColumnState
+import com.google.android.horologist.compose.layout.rememberResponsiveColumnState
 import com.google.android.horologist.compose.pager.PagerScreen
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
@@ -44,7 +44,7 @@ fun NowPlayingPager(
     firstPageContent: @Composable NowPlayingPagerScope.() -> Unit,
 ) {
     val pagerState = rememberPagerState { NowPlayingPager.PAGE_COUNT }
-    val columState = rememberColumnState()
+    val columState = rememberResponsiveColumnState()
     val pagerScope = remember(pagerState, columState) { NowPlayingPagerScope(pagerState, columState) }
 
     ScreenScaffold(
@@ -109,7 +109,7 @@ fun NowPlayingPager(
                         navigateToEpisode = { episodeUuid ->
                             navController.navigate(EpisodeScreenFlow.navigateRoute(episodeUuid))
                         },
-                        columnState = rememberColumnState(),
+                        columnState = rememberResponsiveColumnState(),
                     )
                 }
             }

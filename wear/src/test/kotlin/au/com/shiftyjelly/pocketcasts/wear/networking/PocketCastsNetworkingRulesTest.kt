@@ -8,10 +8,9 @@ import com.google.android.horologist.networks.data.NetworkType.Cell
 import com.google.android.horologist.networks.data.NetworkType.Wifi
 import com.google.android.horologist.networks.data.Networks
 import com.google.android.horologist.networks.data.RequestType
+import com.google.android.horologist.networks.data.Status
 import junit.framework.TestCase.assertEquals
 import org.junit.Test
-import org.mockito.kotlin.mock
-import org.mockito.kotlin.whenever
 
 class PocketCastsNetworkingRulesTest {
 
@@ -137,23 +136,31 @@ class PocketCastsNetworkingRulesTest {
         availableNetworkTypes: List<NetworkType>,
         expectedNetworkType: NetworkType,
     ) {
-        val networks = mockNetworksWithTypes(availableNetworkTypes)
+        val networks = buildNetworksWithTypes(availableNetworkTypes)
         val resultNetworkStatus = PocketCastsNetworkingRules.getPreferredNetwork(networks, requestType)
         assertEquals(expectedNetworkType, resultNetworkStatus!!.networkInfo.type)
     }
 
-    private fun mockNetworksWithTypes(networkTypes: List<NetworkType>): Networks = mock<Networks>().apply {
-        val networkStatuses = networkTypes.map { mockNetworkStatus(it) }
-        whenever(this.networks).thenReturn(networkStatuses)
-    }
+    private fun buildNetworksWithTypes(networkTypes: List<NetworkType>) = Networks(
+        activeNetwork = null,
+        networks = networkTypes.map { buildNetworkStatus(it) },
+    )
 
-    private fun mockNetworkStatus(networkType: NetworkType): NetworkStatus = mock<NetworkStatus>().apply {
-        val networkInfo = mockNetworkInfo(networkType)
-        whenever(this.networkInfo).thenReturn(networkInfo)
-    }
+    private fun buildNetworkStatus(networkType: NetworkType) = NetworkStatus(
+        id = "",
+        status = Status.Available,
+        networkInfo = buildNetworkInfo(networkType),
+        addresses = emptyList(),
+        capabilities = null,
+        linkProperties = null,
+        bindSocket = {},
+    )
 
-    private fun mockNetworkInfo(networkType: NetworkType): NetworkInfo = mock<NetworkInfo>().apply {
-        whenever(this.type).thenReturn(networkType)
+    private fun buildNetworkInfo(networkType: NetworkType): NetworkInfo = when (networkType) {
+        Wifi -> NetworkInfo.Wifi(name = "")
+        Cell -> NetworkInfo.Cellular(name = "")
+        BT -> NetworkInfo.Bluetooth(name = "")
+        else -> NetworkInfo.Unknown()
     }
 
     private fun assertPrefers(
@@ -163,13 +170,7 @@ class PocketCastsNetworkingRulesTest {
     ) {
         assertEquals(
             expectedOutput,
-            input.map {
-                val networkInfo = mock<NetworkInfo>()
-                whenever(networkInfo.type).thenReturn(it)
-                val networkStatus = mock<NetworkStatus>()
-                whenever(networkStatus.networkInfo).thenReturn(networkInfo)
-                networkStatus
-            }
+            buildNetworksWithTypes(input).networks
                 .prefer(*prefer.toTypedArray())
                 ?.networkInfo
                 ?.type,

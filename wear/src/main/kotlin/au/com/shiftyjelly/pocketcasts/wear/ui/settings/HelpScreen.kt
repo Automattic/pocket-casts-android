@@ -17,7 +17,7 @@ import au.com.shiftyjelly.pocketcasts.wear.ui.component.ScreenHeaderChip
 import au.com.shiftyjelly.pocketcasts.wear.ui.component.WatchListChip
 import com.google.android.horologist.compose.layout.ScalingLazyColumn
 import com.google.android.horologist.compose.layout.ScreenScaffold
-import com.google.android.horologist.compose.layout.rememberColumnState
+import com.google.android.horologist.compose.layout.rememberResponsiveColumnState
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 object HelpScreen {
@@ -28,7 +28,7 @@ object HelpScreen {
 fun HelpScreen(viewModel: HelpScreenViewModel = hiltViewModel()) {
     val state = viewModel.state.collectAsState().value
     val context = LocalContext.current
-    val columnState = rememberColumnState()
+    val columnState = rememberResponsiveColumnState()
 
     ScreenScaffold(
         scrollState = columnState,

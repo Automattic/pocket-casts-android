@@ -19,7 +19,7 @@ import au.com.shiftyjelly.pocketcasts.wear.ui.component.ScreenHeaderChip
 import com.google.android.horologist.compose.layout.ScalingLazyColumn
 import com.google.android.horologist.compose.layout.ScalingLazyColumnState
 import com.google.android.horologist.compose.layout.ScreenScaffold
-import com.google.android.horologist.compose.layout.rememberColumnState
+import com.google.android.horologist.compose.layout.rememberResponsiveColumnState
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 object PrivacySettingsScreen {
@@ -32,7 +32,7 @@ fun PrivacySettingsScreen(
     viewModel: PrivacySettingsViewModel = hiltViewModel(),
 ) {
     val state by viewModel.state.collectAsState()
-    val scrollState = rememberColumnState()
+    val scrollState = rememberResponsiveColumnState()
 
     ScreenScaffold(
         scrollState = scrollState,

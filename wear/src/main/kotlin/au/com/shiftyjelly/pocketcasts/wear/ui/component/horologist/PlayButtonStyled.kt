@@ -9,9 +9,9 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.wear.compose.material.ButtonColors
-import com.google.android.horologist.media.ui.R
 import com.google.android.horologist.media.ui.components.controls.MediaButton
 import com.google.android.horologist.media.ui.components.controls.MediaButtonDefaults
+import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 @Composable
 fun PlayButtonStyled(
@@ -25,7 +25,7 @@ fun PlayButtonStyled(
     MediaButton(
         onClick = onClick,
         icon = icon,
-        contentDescription = stringResource(id = R.string.horologist_play_button_content_description),
+        contentDescription = stringResource(id = LR.string.play),
         modifier = modifier,
         enabled = enabled,
         colors = colors,

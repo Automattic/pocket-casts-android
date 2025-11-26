@@ -8,10 +8,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
-import com.google.android.horologist.audio.ui.R
 import com.google.android.horologist.audio.ui.VolumeUiState
 import com.google.android.horologist.audio.ui.components.actions.SettingsButton
-import com.google.android.horologist.compose.material.IconRtlMode
+import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 @Composable
 fun SetVolumeButtonStyled(
@@ -32,7 +31,6 @@ fun SetVolumeButtonStyled(
             volumeUiState?.isMax == false -> imageVolume
             else -> imageVolumeMax // volumeUiState == null || volumeUiState.isMax == true
         },
-        iconRtlMode = IconRtlMode.Mirrored,
-        contentDescription = stringResource(R.string.horologist_set_volume_content_description),
+        contentDescription = stringResource(LR.string.set_volume),
     )
 }
