@@ -12,12 +12,10 @@ import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.requiredSize
 import androidx.compose.foundation.layout.size
-import androidx.compose.material3.adaptive.currentWindowAdaptiveInfo
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -30,7 +28,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalInspectionMode
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.stringResource
@@ -40,10 +40,8 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.min
 import androidx.compose.ui.unit.sp
 import au.com.shiftyjelly.pocketcasts.compose.Devices
-import au.com.shiftyjelly.pocketcasts.compose.adaptive.isAtMostMediumHeight
 import au.com.shiftyjelly.pocketcasts.compose.components.PodcastImage
 import au.com.shiftyjelly.pocketcasts.compose.components.TextH10
 import au.com.shiftyjelly.pocketcasts.compose.components.TextP40
@@ -63,7 +61,6 @@ import java.io.File
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 import au.com.shiftyjelly.pocketcasts.ui.R as UR
 
-private const val SMALL_SCREEN_SIZE_FACTOR = .7f
 private const val ANIMATION_SCALE_FACTOR_FULL_WIDTH = 1.2f
 
 @OptIn(ExperimentalComposeUiApi::class)
@@ -82,43 +79,41 @@ internal fun LongestEpisodeStory(
                 .background(story.backgroundColor)
                 .padding(top = measurements.closeButtonBottomEdge + 16.dp, bottom = 64.dp),
         ) {
-            val windowSize = currentWindowAdaptiveInfo().windowSizeClass
-            val sizeFactor = if (windowSize.isAtMostMediumHeight()) {
-                SMALL_SCREEN_SIZE_FACTOR
-            } else {
-                1f
-            }
-            val animationContainerSize = min(maxWidth, maxHeight) * sizeFactor
+            var headerHeight by remember { mutableStateOf(0.dp) }
+            var footerHeight by remember { mutableStateOf(0.dp) }
+            val density = LocalDensity.current
             Header(
                 story = story,
                 measurements = measurements,
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height((maxHeight - animationContainerSize) / 2)
+                    .onSizeChanged { size ->
+                        with(density) { headerHeight = size.height.toDp() }
+                    }
                     .align(Alignment.TopCenter),
-            )
-            val artworkSize = 196.dp * sizeFactor
-            Content(
-                story = story,
-                forceVisible = controller.isSharing,
-                artworkSize = artworkSize,
-                animationScale = if (windowSize.isAtMostMediumHeight()) {
-                    1f
-                } else {
-                    ANIMATION_SCALE_FACTOR_FULL_WIDTH
-                },
-                modifier = Modifier
-                    .padding(top = 32.dp)
-                    .size(animationContainerSize + 32.dp)
-                    .align(Alignment.Center),
             )
             Footer(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(((maxHeight - animationContainerSize) / 2) - 32.dp)
+                    .onSizeChanged { size ->
+                        with(density) { footerHeight = size.height.toDp() }
+                    }
                     .align(Alignment.BottomCenter),
                 story = story,
                 measurements = measurements,
+            )
+
+            val contentHeight = maxHeight - headerHeight - footerHeight
+            // reduce the size to account for the growth during the animation
+            val contentHeightMinusGrowth = contentHeight / ANIMATION_SCALE_FACTOR_FULL_WIDTH
+            Content(
+                story = story,
+                forceVisible = controller.isSharing,
+                modifier = Modifier
+                    .padding(top = 32.dp)
+                    .size(contentHeightMinusGrowth)
+                    .align(Alignment.Center),
+                size = contentHeightMinusGrowth,
             )
         }
         ShareStoryButton(
@@ -135,10 +130,9 @@ internal fun LongestEpisodeStory(
 @Composable
 private fun Content(
     story: Story.LongestEpisode,
-    artworkSize: Dp,
     forceVisible: Boolean,
+    size: Dp,
     modifier: Modifier = Modifier,
-    animationScale: Float = 1f,
 ) = BoxWithConstraints(
     modifier = modifier,
     contentAlignment = Alignment.Center,
@@ -161,7 +155,7 @@ private fun Content(
         progress = { if (freezeAnimation) 1f else progress },
         modifier = Modifier
             .matchParentSize()
-            .scale(animationScale),
+            .scale(1.2f),
         contentScale = ContentScale.FillWidth,
     )
     var artworkTrigger by remember { mutableStateOf(false) }
@@ -199,7 +193,7 @@ private fun Content(
         elevation = 0.dp,
         cornerSize = 4.dp,
         modifier = Modifier
-            .requiredSize(artworkSize)
+            .requiredSize(size * .6f)
             .scale(scaleAnimation)
             .offset(y = -maxHeight * .2f)
             .graphicsLayer {
@@ -257,22 +251,20 @@ private fun Footer(
     story: Story.LongestEpisode,
     measurements: EndOfYearMeasurements,
     modifier: Modifier = Modifier,
-) = Column(modifier = modifier, horizontalAlignment = Alignment.CenterHorizontally) {
-    Box(
-        modifier = Modifier.weight(1f),
-        contentAlignment = Alignment.BottomCenter,
-    ) {
-        TextP40(
-            text = stringResource(LR.string.end_of_year_story_longest_episode_stats, story.episode.episodeTitle, story.episode.podcastTitle),
-            textAlign = TextAlign.Center,
-            disableAutoScale = true,
-            fontScale = measurements.smallDeviceFactor,
-            color = colorResource(UR.color.white),
-            modifier = Modifier
-                .padding(horizontal = 24.dp)
-                .padding(bottom = 24.dp),
-        )
-    }
+) = Box(
+    modifier = modifier,
+    contentAlignment = Alignment.BottomCenter,
+) {
+    TextP40(
+        text = stringResource(LR.string.end_of_year_story_longest_episode_stats, story.episode.episodeTitle, story.episode.podcastTitle),
+        textAlign = TextAlign.Center,
+        disableAutoScale = true,
+        fontScale = measurements.smallDeviceFactor,
+        color = colorResource(UR.color.white),
+        modifier = Modifier
+            .padding(horizontal = 24.dp)
+            .padding(bottom = 24.dp),
+    )
 }
 
 @Preview(device = Devices.PORTRAIT_REGULAR)
