@@ -61,7 +61,6 @@ import java.io.File
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 import au.com.shiftyjelly.pocketcasts.ui.R as UR
 
-private const val SMALL_SCREEN_SIZE_FACTOR = .7f
 private const val ANIMATION_SCALE_FACTOR_FULL_WIDTH = 1.2f
 
 @OptIn(ExperimentalComposeUiApi::class)
@@ -252,22 +251,20 @@ private fun Footer(
     story: Story.LongestEpisode,
     measurements: EndOfYearMeasurements,
     modifier: Modifier = Modifier,
-) = Column(modifier = modifier, horizontalAlignment = Alignment.CenterHorizontally) {
-    Box(
-        modifier = modifier,
-        contentAlignment = Alignment.BottomCenter,
-    ) {
-        TextP40(
-            text = stringResource(LR.string.end_of_year_story_longest_episode_stats, story.episode.episodeTitle, story.episode.podcastTitle),
-            textAlign = TextAlign.Center,
-            disableAutoScale = true,
-            fontScale = measurements.smallDeviceFactor,
-            color = colorResource(UR.color.white),
-            modifier = Modifier
-                .padding(horizontal = 24.dp)
-                .padding(bottom = 24.dp),
-        )
-    }
+) = Box(
+    modifier = modifier,
+    contentAlignment = Alignment.BottomCenter,
+) {
+    TextP40(
+        text = stringResource(LR.string.end_of_year_story_longest_episode_stats, story.episode.episodeTitle, story.episode.podcastTitle),
+        textAlign = TextAlign.Center,
+        disableAutoScale = true,
+        fontScale = measurements.smallDeviceFactor,
+        color = colorResource(UR.color.white),
+        modifier = Modifier
+            .padding(horizontal = 24.dp)
+            .padding(bottom = 24.dp),
+    )
 }
 
 @Preview(device = Devices.PORTRAIT_REGULAR)
