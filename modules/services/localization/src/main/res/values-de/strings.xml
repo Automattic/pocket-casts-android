@@ -1665,7 +1665,7 @@ Language: de
     <string name="profile_privacy_policy_title">Datenschutzerklärung</string>
     <string name="profile_privacy_policy">Datenschutzerklärung</string>
     <string name="profile_plus_thankyou">The Pocket Casts Webplayer ist jetzt Bestandteil von Pocket Casts Plus. Als Dankeschön für deine Unterstützung haben wir für dein Konto ein Upgrade auf Pocket Casts Plus für %s vorgenommen.</string>
-    <string name="profile_plus_expires_in">Plus läuft ab am %s</string>
+    <string name="profile_plus_expires_in">Plus läuft in %s ab</string>
     <string name="profile_plus_expires">Läuft ab %s</string>
     <string name="profile_plus_expired">Plus ist abgelaufen</string>
     <string name="profile_plus">plus</string>
