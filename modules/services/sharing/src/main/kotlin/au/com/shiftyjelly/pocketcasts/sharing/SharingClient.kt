@@ -716,7 +716,7 @@ data class SharingRequest internal constructor(
                     append(
                         context.getString(
                             LR.string.end_of_year_stories_completion_rate_share_text,
-                            year.value,
+                            story.completionRatePercentage,
                         ),
                     )
                     append(' ')
