@@ -955,13 +955,13 @@ class SharingClientTest {
     fun shareCompletionRateStory() = runTest {
         val screenshot = File(context.cacheDir, "file.png").also { it.writeBytes(Random.nextBytes(8)) }
         val text = buildString {
-            append(context.getString(LR.string.end_of_year_stories_completion_rate_share_text, 1000))
+            append(context.getString(LR.string.end_of_year_stories_completion_rate_share_text, 25))
             append(" https://pca.st")
             append(" #pocketcasts #playback1000")
         }
         val story = Story.CompletionRate(
-            listenedCount = 0,
-            completedCount = 0,
+            listenedCount = 100,
+            completedCount = 25,
             subscriptionTier = null,
         )
         val request = SharingRequest.endOfYearStory(story, Year.of(1000), screenshot).build()
