@@ -120,6 +120,9 @@ sealed interface Story {
                 listenedCount == 0 -> 1.0
                 else -> completedCount.toDouble() / listenedCount
             }
+
+        val completionRatePercentage
+            get() = (completionRate * 100).roundToInt()
     }
 
     data object Ending : Story {
