@@ -1340,7 +1340,7 @@ class SettingsImpl @Inject constructor(
 
     override val sendCrashReports = UserSetting.BoolPref(
         sharedPrefKey = "SendCrashReportsKey",
-        defaultValue = BuildConfig.DATA_COLLECTION_DEFAULT_VALUE ?: true,
+        defaultValue = BuildConfig.SEND_CRASH_REPORTS_DEFAULT_VALUE ?: true,
         sharedPrefs = sharedPreferences,
     )
 
@@ -1362,7 +1362,7 @@ class SettingsImpl @Inject constructor(
 
     override fun getEndOfYearShowModal(): Boolean = getBoolean(END_OF_YEAR_SHOW_MODAL_2025_KEY, true)
 
-    override fun hasCompletedOnboarding() = getBoolean(DONE_INITIAL_ONBOARDING_KEY, false)
+    override fun hasCompletedOnboarding() = getBoolean(DONE_INITIAL_ONBOARDING_KEY, BuildConfig.DONE_INITIAL_ONBOARDING_DEFAULT_VALUE ?: false)
 
     override fun setHasDoneInitialOnboarding() {
         setBoolean(DONE_INITIAL_ONBOARDING_KEY, true)

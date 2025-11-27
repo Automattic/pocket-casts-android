@@ -15,15 +15,24 @@ android {
 
     defaultConfig {
         val localPropertiesFile = rootProject.file("local.properties")
-        val dataCollectionValue = if (localPropertiesFile.exists() && localPropertiesFile.isFile) {
+        var dataCollection: Boolean? = null
+        var sendCrashReports: Boolean? = null
+        var doneInitialOnboarding: Boolean? = null
+        var autoDownloadOnFollow: Boolean? = null
+        if (localPropertiesFile.exists() && localPropertiesFile.isFile) {
             val properties = Properties().apply {
                 load(localPropertiesFile.inputStream())
             }
-            properties.getProperty("au.com.shiftyjelly.pocketcasts.data.collection")?.toBooleanStrictOrNull()
-        } else {
-            null
+            dataCollection = properties.getProperty("au.com.shiftyjelly.pocketcasts.data.collection")?.toBooleanStrictOrNull()
+            sendCrashReports = properties.getProperty("au.com.shiftyjelly.pocketcasts.send.crash.reports")?.toBooleanStrictOrNull()
+            doneInitialOnboarding = properties.getProperty("au.com.shiftyjelly.pocketcasts.done.initial.onboarding")?.toBooleanStrictOrNull()
+            autoDownloadOnFollow = properties.getProperty("au.com.shiftyjelly.pocketcasts.auto.download.on.follow")?.toBooleanStrictOrNull()
         }
-        buildConfigField("Boolean", "DATA_COLLECTION_DEFAULT_VALUE", dataCollectionValue.toString())
+        buildConfigField("Boolean", "DATA_COLLECTION_DEFAULT_VALUE", dataCollection.toString())
+        buildConfigField("Boolean", "SEND_CRASH_REPORTS_DEFAULT_VALUE", sendCrashReports.toString())
+        buildConfigField("Boolean", "DONE_INITIAL_ONBOARDING_DEFAULT_VALUE", doneInitialOnboarding.toString())
+        buildConfigField("Boolean", "AUTO_DOWNLOAD_ON_FOLLOW_DEFAULT_VALUE", autoDownloadOnFollow.toString())
+
     }
 }
 

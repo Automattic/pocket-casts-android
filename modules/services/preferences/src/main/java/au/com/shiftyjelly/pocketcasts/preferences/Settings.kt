@@ -120,6 +120,8 @@ interface Settings {
         const val AUTOMOTIVE_CONNECTED_TO_MEDIA_SESSION = "automotive_connected_to_media_session"
 
         const val SHOW_REFERRALS_TOOLTIP = "show_referrals_tooltip"
+
+        val AUTO_DOWNLOAD_ON_FOLLOW_DEFAULT_VALUE = BuildConfig.AUTO_DOWNLOAD_ON_FOLLOW_DEFAULT_VALUE ?: true
     }
 
     enum class NotificationChannel(val id: String) {
