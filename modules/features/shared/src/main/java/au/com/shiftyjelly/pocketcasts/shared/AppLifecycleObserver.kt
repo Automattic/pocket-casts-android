@@ -139,7 +139,7 @@ class AppLifecycleObserver(
                     settings.autoPlayNextEpisodeOnEmpty.set(true, updateModifiedAt = false)
 
                     // For new users we want to auto download on follow podcast by default
-                    settings.autoDownloadOnFollowPodcast.set(true, updateModifiedAt = false)
+                    settings.autoDownloadOnFollowPodcast.set(Settings.AUTO_DOWNLOAD_ON_FOLLOW_DEFAULT_VALUE, updateModifiedAt = false)
 
                     // For new users we want to enable all notifications by default
                     settings.notifyRefreshPodcast.set(true, updateModifiedAt = false)
