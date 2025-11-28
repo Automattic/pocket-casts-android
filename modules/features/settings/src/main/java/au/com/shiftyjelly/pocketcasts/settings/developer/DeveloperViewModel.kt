@@ -189,4 +189,8 @@ class DeveloperViewModel
             appReviewManagerImpl.triggerPrompt(AppReviewReason.DevelopmentTrigger, reviewInfo)
         }
     }
+
+    fun clearAppReviewTimestamps() {
+        appReviewManagerImpl.clearSettings()
+    }
 }

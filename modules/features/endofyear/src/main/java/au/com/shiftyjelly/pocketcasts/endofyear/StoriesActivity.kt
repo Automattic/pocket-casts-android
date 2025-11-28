@@ -148,11 +148,6 @@ class StoriesActivity : ComponentActivity() {
             viewModel.syncData()
         }
 
-        BackHandler {
-            viewModel.trackStoriesClosed(source = "back_button")
-            finish()
-        }
-
         val scope = rememberCoroutineScope()
         val state by viewModel.uiState.collectAsState()
         val pagerState = rememberPagerState(pageCount = { state.stories.size })
@@ -161,6 +156,12 @@ class StoriesActivity : ComponentActivity() {
         }
         val captureController = rememberStoryCaptureController()
         var showScreenshotDialog by remember { mutableStateOf(false) }
+
+        BackHandler {
+            val story = state.stories.getOrNull(pagerState.currentPage)
+            viewModel.trackStoriesClosed(source = "back_button", story = story)
+            finish()
+        }
 
         Box(
             contentAlignment = Alignment.Center,
@@ -181,7 +182,8 @@ class StoriesActivity : ComponentActivity() {
                 onClickPlusContinue = viewModel::trackPlusContinued,
                 onRestartPlayback = storyChanger::reset,
                 onClose = {
-                    viewModel.trackStoriesClosed("close_button")
+                    val story = state.stories.getOrNull(pagerState.currentPage)
+                    viewModel.trackStoriesClosed(source = "close_button", story = story)
                     finish()
                 },
             )

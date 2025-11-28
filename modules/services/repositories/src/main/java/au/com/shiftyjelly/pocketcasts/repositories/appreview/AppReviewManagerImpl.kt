@@ -238,12 +238,36 @@ class AppReviewManagerImpl(
             settings.appReviewReferralSharedTimestamp.value != null
         }
 
-        AppReviewReason.PlaybackShared -> {
-            settings.appReviewPlaybackSharedTimestamp.value != null
+        AppReviewReason.EndOfYearShared -> {
+            settings.appReviewEndOfYearSharedTimestamp.value != null
+        }
+
+        AppReviewReason.EndOfYearCompleted -> {
+            settings.appReviewEndOfYearCompletedTimestamp.value != null
         }
 
         AppReviewReason.DevelopmentTrigger -> {
             true
+        }
+    }
+
+    fun clearSettings() {
+        with(settings) {
+            appReviewEpisodeCompletedTimestamps.set(emptyList(), updateModifiedAt = false)
+            appReviewEpisodeStarredTimestamp.set(null, updateModifiedAt = false)
+            appReviewPodcastRatedTimestamp.set(null, updateModifiedAt = false)
+            appReviewPlaylistCreatedTimestamp.set(null, updateModifiedAt = false)
+            appReviewPlusUpgradedTimestamp.set(null, updateModifiedAt = false)
+            appReviewFolderCreatedTimestamp.set(null, updateModifiedAt = false)
+            appReviewBookmarkCreatedTimestamp.set(null, updateModifiedAt = false)
+            appReviewThemeChangedTimestamp.set(null, updateModifiedAt = false)
+            appReviewReferralSharedTimestamp.set(null, updateModifiedAt = false)
+            appReviewEndOfYearSharedTimestamp.set(null, updateModifiedAt = false)
+            appReviewEndOfYearCompletedTimestamp.set(null, updateModifiedAt = false)
+            appReviewLastPromptTimestamp.set(null, updateModifiedAt = false)
+            appReviewLastDeclineTimestamps.set(emptyList(), updateModifiedAt = false)
+            appReviewCrashTimestamp.set(null, updateModifiedAt = false)
+            appReviewSubmittedReasons.set(emptyList(), updateModifiedAt = false)
         }
     }
 
@@ -289,8 +313,12 @@ class AppReviewManagerImpl(
                         appReviewReferralSharedTimestamp.set(null, updateModifiedAt = false)
                     }
 
-                    AppReviewReason.PlaybackShared -> {
-                        appReviewPlaybackSharedTimestamp.set(null, updateModifiedAt = false)
+                    AppReviewReason.EndOfYearShared -> {
+                        appReviewEndOfYearSharedTimestamp.set(null, updateModifiedAt = false)
+                    }
+
+                    AppReviewReason.EndOfYearCompleted -> {
+                        appReviewEndOfYearCompletedTimestamp.set(null, updateModifiedAt = false)
                     }
 
                     AppReviewReason.DevelopmentTrigger -> Unit
