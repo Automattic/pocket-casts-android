@@ -215,8 +215,9 @@ class StoriesActivity : ComponentActivity() {
         LaunchedEffect(Unit) {
             viewModel.switchStory.collect {
                 val stories = (state as? UiState.Synced)?.stories ?: (state as? UiState.Syncing)?.stories.orEmpty()
-                if (stories.getOrNull(pagerState.currentPage) is Story.Ending) {
-                    viewModel.trackStoriesAutoFinished()
+                val story = stories.getOrNull(pagerState.currentPage)
+                if (story is Story.Ending) {
+                    viewModel.trackStoriesAutoFinished(story = story)
                     finish()
                 } else {
                     storyChanger.change(moveForward = true)

@@ -308,12 +308,9 @@ class EndOfYearViewModel @AssistedInject constructor(
     }
 
     internal fun trackStoriesClosed(source: String, story: Story?) {
-        trackEvent(
-            AnalyticsEvent.END_OF_YEAR_STORIES_DISMISSED,
-            mapOf(
-                "source" to source,
-                "story" to story?.analyticsValue.orEmpty(),
-            ),
+        trackStoriesDismissed(
+            story = story,
+            source = source,
         )
     }
 
@@ -321,10 +318,20 @@ class EndOfYearViewModel @AssistedInject constructor(
         trackEvent(AnalyticsEvent.END_OF_YEAR_PLUS_CONTINUED)
     }
 
-    internal fun trackStoriesAutoFinished() {
+    internal fun trackStoriesAutoFinished(story: Story) {
+        trackStoriesDismissed(
+            story = story,
+            source = "auto_progress",
+        )
+    }
+
+    private fun trackStoriesDismissed(story: Story?, source: String) {
         trackEvent(
-            AnalyticsEvent.END_OF_YEAR_STORIES_DISMISSED,
-            mapOf("source" to "auto_progress"),
+            event = AnalyticsEvent.END_OF_YEAR_STORIES_DISMISSED,
+            properties = mapOf(
+                "source" to source,
+                "story" to story?.analyticsValue.orEmpty(),
+            ),
         )
     }
 
