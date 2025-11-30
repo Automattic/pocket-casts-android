@@ -65,7 +65,7 @@ fun DeveloperPage(
     onResetPlaylistsOnboarding: () -> Unit,
     onResetNotificationsPrompt: () -> Unit,
     onShowAppReviewPrompt: () -> Unit,
-    onClearAppReviewTimestamps: () -> Unit,
+    onClearAppReviewSettings: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     var openCrashMessageDialog by remember { mutableStateOf(false) }
@@ -112,7 +112,7 @@ fun DeveloperPage(
             ShowAppReviewPrompt(onClick = onShowAppReviewPrompt)
         }
         item {
-            ClearAppReviewTimestamps(onClick = onClearAppReviewTimestamps)
+            ClearAppReviewSettings(onClick = onClearAppReviewSettings)
         }
         item {
             NotificationsTesting(onClick = onShowNotificationsTestingClick)
@@ -318,7 +318,7 @@ private fun ShowAppReviewPrompt(
 }
 
 @Composable
-private fun ClearAppReviewTimestamps(
+private fun ClearAppReviewSettings(
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -416,7 +416,7 @@ private fun DeveloperPagePreview() {
         onResetPlaylistsOnboarding = {},
         onResetNotificationsPrompt = {},
         onShowAppReviewPrompt = {},
-        onClearAppReviewTimestamps = {},
+        onClearAppReviewSettings = {},
     )
 }
 

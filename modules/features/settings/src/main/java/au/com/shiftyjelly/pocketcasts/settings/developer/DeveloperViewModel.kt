@@ -190,7 +190,7 @@ class DeveloperViewModel
         }
     }
 
-    fun clearAppReviewTimestamps() {
+    fun clearAppReviewSettings() {
         appReviewManagerImpl.clearSettings()
     }
 }
