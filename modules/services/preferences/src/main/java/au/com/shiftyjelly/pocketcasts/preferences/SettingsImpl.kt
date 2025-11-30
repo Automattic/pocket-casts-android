@@ -1712,8 +1712,16 @@ class SettingsImpl @Inject constructor(
         sharedPrefs = sharedPreferences,
     )
 
-    override val appReviewPlaybackSharedTimestamp = UserSetting.PrefFromString(
-        sharedPrefKey = "app_review_playback_shared_timestamp",
+    override val appReviewEndOfYearSharedTimestamp = UserSetting.PrefFromString(
+        sharedPrefKey = "app_review_end_of_year_shared_timestamp",
+        defaultValue = null,
+        fromString = { value -> runCatching { Instant.parse(value) }.getOrNull() },
+        toString = { value -> value.toString() },
+        sharedPrefs = sharedPreferences,
+    )
+
+    override val appReviewEndOfYearCompletedTimestamp = UserSetting.PrefFromString(
+        sharedPrefKey = "app_review_end_of_year_completed_timestamp",
         defaultValue = null,
         fromString = { value -> runCatching { Instant.parse(value) }.getOrNull() },
         toString = { value -> value.toString() },

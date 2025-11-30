@@ -47,6 +47,7 @@ class DeveloperFragment : BaseFragment() {
                 onResetPlaylistsOnboarding = viewModel::resetPlaylistsOnboarding,
                 onResetNotificationsPrompt = viewModel::resetNotificationsPrompt,
                 onShowAppReviewPrompt = viewModel::showAppReviewPrompt,
+                onClearAppReviewSettings = viewModel::clearAppReviewSettings,
             )
         }
     }
