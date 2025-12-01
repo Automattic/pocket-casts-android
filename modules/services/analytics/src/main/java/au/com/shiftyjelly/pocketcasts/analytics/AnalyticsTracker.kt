@@ -258,9 +258,16 @@ class AnalyticsTracker(
     }
 
     companion object {
-        fun test(vararg trackers: Tracker) = AnalyticsTracker(
-            trackers = trackers.toSet(),
+        fun test() = AnalyticsTracker(emptySet(), emptySet())
+
+        fun test(tracker: Tracker) = AnalyticsTracker(
+            trackers = setOf(tracker),
             listeners = emptySet(),
+        )
+
+        fun test(listener: Listener) = AnalyticsTracker(
+            trackers = emptySet(),
+            listeners = setOf(listener),
         )
     }
 }
