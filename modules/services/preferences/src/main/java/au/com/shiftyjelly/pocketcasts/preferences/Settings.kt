@@ -26,6 +26,7 @@ import au.com.shiftyjelly.pocketcasts.preferences.model.NewEpisodeNotificationAc
 import au.com.shiftyjelly.pocketcasts.preferences.model.NotificationVibrateSetting
 import au.com.shiftyjelly.pocketcasts.preferences.model.PlayOverNotificationSetting
 import au.com.shiftyjelly.pocketcasts.preferences.model.PodcastGridLayoutType
+import au.com.shiftyjelly.pocketcasts.preferences.model.SelectedPlaylist
 import au.com.shiftyjelly.pocketcasts.preferences.model.ShelfItem
 import au.com.shiftyjelly.pocketcasts.preferences.model.ThemeSetting
 import io.reactivex.Observable
@@ -416,6 +417,7 @@ interface Settings {
     fun setSelectedFilter(filterUUID: String?)
     fun selectedTab(): Int?
     fun setSelectedTab(selected: Int?)
+    val selectedPlaylist: ReadWriteSetting<SelectedPlaylist?>
 
     fun contains(key: String, isPrivate: Boolean = false): Boolean
 

@@ -38,6 +38,7 @@ import au.com.shiftyjelly.pocketcasts.preferences.model.NewEpisodeNotificationAc
 import au.com.shiftyjelly.pocketcasts.preferences.model.NotificationVibrateSetting
 import au.com.shiftyjelly.pocketcasts.preferences.model.PlayOverNotificationSetting
 import au.com.shiftyjelly.pocketcasts.preferences.model.PodcastGridLayoutType
+import au.com.shiftyjelly.pocketcasts.preferences.model.SelectedPlaylist
 import au.com.shiftyjelly.pocketcasts.preferences.model.ShelfItem
 import au.com.shiftyjelly.pocketcasts.preferences.model.ThemeSetting
 import au.com.shiftyjelly.pocketcasts.utils.AppPlatform
@@ -863,6 +864,16 @@ class SettingsImpl @Inject constructor(
             sharedPreferences.edit().remove("selected_tab").commit()
         }
     }
+
+    private val selectedPlaylistAdapter = moshi.adapter(SelectedPlaylist::class.java)
+
+    override val selectedPlaylist = UserSetting.PrefFromString(
+        sharedPrefKey = "app_start_selected_playlist",
+        defaultValue = null,
+        fromString = { value -> runCatching { selectedPlaylistAdapter.fromJson(value) }.getOrNull() },
+        toString = { value -> selectedPlaylistAdapter.toJson(value) },
+        sharedPrefs = sharedPreferences,
+    )
 
     override fun selectedTab(): Int? {
         if (contains("selected_tab")) {
