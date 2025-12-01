@@ -1,10 +1,13 @@
 package au.com.shiftyjelly.pocketcasts.analytics
 
 import android.os.Bundle
+import au.com.shiftyjelly.pocketcasts.preferences.Settings
+import au.com.shiftyjelly.pocketcasts.preferences.UserSetting
 import org.junit.Assert.assertEquals
 import org.junit.Before
 import org.junit.Test
 import org.mockito.kotlin.argumentCaptor
+import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.verify
@@ -13,7 +16,7 @@ import org.mockito.kotlin.verifyNoInteractions
 class FirebaseAnalyticsTrackerTest {
 
     private lateinit var firebaseAnalytics: FirebaseAnalyticsWrapper
-    private lateinit var tracker: FirebaseAnalyticsTracker
+    private lateinit var tracker: AnalyticsTracker
 
     companion object {
         private const val LIST_ID = "f255e707-1498-431e-8559-1e2c7125a561"
@@ -24,7 +27,17 @@ class FirebaseAnalyticsTrackerTest {
     @Before
     fun setUp() {
         firebaseAnalytics = mock<FirebaseAnalyticsWrapper> {}
-        tracker = FirebaseAnalyticsTracker(firebaseAnalytics = firebaseAnalytics)
+        val setting = mock<UserSetting<Boolean>> {
+            on { value } doReturn true
+        }
+        tracker = AnalyticsTracker.test(
+            FirebaseAnalyticsTracker(
+                firebaseAnalytics = firebaseAnalytics,
+                settings = mock<Settings> {
+                    on { collectAnalytics } doReturn setting
+                },
+            ),
+        )
     }
 
     @Test

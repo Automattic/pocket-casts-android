@@ -13,7 +13,6 @@ import au.com.shiftyjelly.pocketcasts.engage.EngageSdkBridge
 import au.com.shiftyjelly.pocketcasts.models.db.dao.UpNextDao
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodeStatusEnum
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
-import au.com.shiftyjelly.pocketcasts.repositories.appreview.AppReviewAnalyticsListener
 import au.com.shiftyjelly.pocketcasts.repositories.appreview.AppReviewExceptionHandler
 import au.com.shiftyjelly.pocketcasts.repositories.appreview.AppReviewManager
 import au.com.shiftyjelly.pocketcasts.repositories.di.ApplicationScope
@@ -138,8 +137,6 @@ class PocketCastsApplication :
 
     @Inject lateinit var appReviewManager: AppReviewManager
 
-    @Inject lateinit var appReviewAnalyticsListener: AppReviewAnalyticsListener
-
     @Inject lateinit var appReviewExceptionHandler: AppReviewExceptionHandler
 
     override fun onCreate() {
@@ -173,7 +170,6 @@ class PocketCastsApplication :
     private fun setupAnalytics() {
         analyticsTracker.clearAllData()
         analyticsTracker.refreshMetadata()
-        analyticsTracker.addListener(appReviewAnalyticsListener)
         downloadStatisticsReporter.setup()
         experimentProvider.initialize()
     }
