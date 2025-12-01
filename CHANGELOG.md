@@ -20,7 +20,7 @@
     *   Fix autoplay not starting playback from the current position in the list
         ([#4755](https://github.com/Automattic/pocket-casts-android/pull/4755))
     *   Fix playlists not reopening on app launch
-        ([#4755](https://github.com/Automattic/pocket-casts-android/pull/4755))
+        ([#4808](https://github.com/Automattic/pocket-casts-android/pull/4808))
 
 8.0
 -----
