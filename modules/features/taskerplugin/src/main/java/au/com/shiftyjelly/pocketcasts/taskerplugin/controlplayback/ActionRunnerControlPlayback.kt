@@ -34,13 +34,17 @@ class ActionRunnerControlPlayback : TaskerPluginRunnerActionNoOutput<InputContro
 
         when (commandEnum) {
             InputControlPlayback.PlaybackCommand.SkipToNextChapter -> playbackManager.skipToNextSelectedOrLastChapter()
+
             InputControlPlayback.PlaybackCommand.SkipToChapter -> {
                 val chapterToSkipTo = input.regular.chapterToSkipTo?.toIntOrNull() ?: return TaskerPluginResultError(ERROR_INVALID_CHAPTER_TO_SKIP_TO_PROVIDED, context.getString(R.string.chapter_to_skip_to_not_valid, input.regular.chapterToSkipTo))
 
                 playbackManager.skipToChapter(chapterToSkipTo)
             }
+
             InputControlPlayback.PlaybackCommand.SkipToPreviousChapter -> playbackManager.skipToPreviousSelectedOrLastChapter()
+
             InputControlPlayback.PlaybackCommand.SkipToTime -> playbackManager.seekToTimeMs(input.regular.skipToSeconds?.toIntOrNull()?.let { it * 1000 } ?: return TaskerPluginResultError(ERROR_INVALID_TIME_TO_SKIP_TO_PROVIDED, context.getString(R.string.time_to_skip_to_not_valid, input.regular.skipToSeconds)))
+
             InputControlPlayback.PlaybackCommand.SkipForward, InputControlPlayback.PlaybackCommand.SkipBack -> {
                 val jumpAmountSeconds = input.regular.skipSeconds?.toIntOrNull() ?: return TaskerPluginResultError(ERROR_INVALID_TIME_TO_SKIP_PROVIDED, context.getString(R.string.time_to_skip_not_valid, input.regular.skipSeconds))
 
@@ -50,19 +54,23 @@ class ActionRunnerControlPlayback : TaskerPluginRunnerActionNoOutput<InputContro
                     playbackManager.skipForward(jumpAmountSeconds = jumpAmountSeconds, sourceView = SourceView.TASKER)
                 }
             }
+
             InputControlPlayback.PlaybackCommand.PlayNextInQueue -> playbackManager.playNextInQueue(
                 SourceView.TASKER,
             )
+
             InputControlPlayback.PlaybackCommand.SetPlaybackSpeed -> {
                 val speed = input.regular.playbackSpeed?.toDoubleOrNull() ?: return TaskerPluginResultError(ERROR_INVALID_PLAYBACK_SPEED_PROVIDED, context.getString(R.string.playback_speed_not_valid, input.regular.playbackSpeed))
 
                 context.updateEffects { playbackSpeed = speed.roundedSpeed() }
             }
+
             InputControlPlayback.PlaybackCommand.SetTrimSilenceMode -> {
                 val trimSilenceMode = input.regular.trimSilenceModeEnum ?: return TaskerPluginResultError(ERROR_INVALID_TRIM_SILENCE_MODE_PROVIDED, context.getString(R.string.trim_silence_mode_not_valid, input.regular.trimSilenceMode))
 
                 context.updateEffects { trimMode = trimSilenceMode }
             }
+
             InputControlPlayback.PlaybackCommand.SetVolumeBoost -> {
                 val volumeBoostEnabled = input.regular.volumeBoostEnabled?.toBooleanStrictOrNull() ?: return TaskerPluginResultError(ERROR_INVALID_VOLUME_BOOST_VALUE_PROVIDED, context.getString(R.string.volume_boost_enabled_not_valid, input.regular.volumeBoostEnabled))
 

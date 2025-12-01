@@ -351,7 +351,9 @@ class PodcastManagerImpl @Inject constructor(
         return when (sortType) {
             // use a query to get the podcasts ordered by episode release date or recently played episodes
             PodcastsSortType.EPISODE_DATE_NEWEST_TO_OLDEST -> findPodcastsOrderByLatestEpisode(orderAsc = false)
+
             PodcastsSortType.RECENTLY_PLAYED -> findPodcastsOrderByRecentlyPlayedEpisode()
+
             else -> podcastDao.findSubscribedNoOrder().sortedWith(sortType.podcastComparator)
         }
     }

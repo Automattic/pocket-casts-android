@@ -137,18 +137,22 @@ object LogBuffer {
                 prefix = "D "
                 Timber.tag(tag).d("%s%s", timberPrefix, logMessage)
             }
+
             Log.INFO -> {
                 prefix = "I "
                 Timber.tag(tag).i("%s%s", timberPrefix, logMessage)
             }
+
             Log.WARN -> {
                 prefix = "W "
                 Timber.tag(tag).w("%s%s", timberPrefix, logMessage)
             }
+
             Log.ERROR -> {
                 prefix = "E "
                 Timber.tag(tag).e("%s%s", timberPrefix, logMessage)
             }
+
             else -> prefix = ""
         }
 

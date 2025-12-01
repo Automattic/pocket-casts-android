@@ -69,20 +69,24 @@ class NotificationWorker @AssistedInject constructor(
             is OnboardingNotificationType.Sync -> {
                 userManager.getSignInState().awaitFirstOrNull()?.isSignedIn != true
             }
+
             is TrendingAndRecommendationsNotificationType.Recommendations -> {
                 userManager.getSignInState().awaitFirstOrNull()?.isSignedIn == true
             }
+
             is NewFeaturesAndTipsNotificationType.SmartFolders -> {
                 suggestedFoldersManager.refreshSuggestedFolders()
                 val folders = suggestedFoldersManager.observeSuggestedFolders().firstOrNull()
                 !folders.isNullOrEmpty()
             }
+
             is OnboardingNotificationType.PlusUpsell,
             is OffersNotificationType.UpgradeNow,
             -> {
                 val subscription = settings.cachedSubscription.value
                 subscription == null || subscription.expiryDate.isBefore(Instant.now())
             }
+
             else -> true
         }
     }

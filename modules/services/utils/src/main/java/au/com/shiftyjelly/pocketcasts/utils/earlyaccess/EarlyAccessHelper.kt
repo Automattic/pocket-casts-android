@@ -20,6 +20,7 @@ object EarlyAccessHelper {
         }
         return when (relativeToEarlyPatronAccess) {
             null -> feature.tier
+
             EarlyAccessState.Before,
             EarlyAccessState.During,
             -> if (isReleaseCandidate) feature.tier else FeatureTier.Patron

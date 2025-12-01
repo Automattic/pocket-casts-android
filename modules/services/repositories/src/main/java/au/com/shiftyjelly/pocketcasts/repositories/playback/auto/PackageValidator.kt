@@ -23,7 +23,6 @@ import android.content.pm.PackageInfo.REQUESTED_PERMISSION_GRANTED
 import android.content.pm.PackageManager
 import android.content.res.XmlResourceParser
 import android.os.Process
-import android.support.v4.media.session.MediaSessionCompat
 import android.util.Base64
 import android.util.Log
 import androidx.annotation.XmlRes
@@ -111,29 +110,31 @@ class PackageValidator(context: Context, @XmlRes xmlResId: Int) {
         val isCallerKnown = when {
             // If it's our own app making the call, allow it.
             callingUid == Process.myUid() -> true
+
             // If it's one of the apps on the allow list, allow it.
             isPackageInAllowList -> true
+
             // If the system is making the call, allow it.
             callingUid == Process.SYSTEM_UID -> true
+
             // If the app was signed by the same certificate as the platform itself, also allow it.
             callerSignature == platformSignature -> true
-            /**
-             * [MEDIA_CONTENT_CONTROL] permission is only available to system applications, and
-             * while it isn't required to allow these apps to connect to a
-             * [MediaBrowserServiceCompat], allowing this ensures optimal compatability with apps
-             * such as Android TV and the Google Assistant.
-             */
+
+            // [MEDIA_CONTENT_CONTROL] permission is only available to system applications, and
+            // while it isn't required to allow these apps to connect to a
+            // [MediaBrowserServiceCompat], allowing this ensures optimal compatability with apps
+            // such as Android TV and the Google Assistant.
             callerPackageInfo.permissions.contains(MEDIA_CONTENT_CONTROL) -> true
-            /**
-             * If the calling app has a notification listener it is able to retrieve notifications
-             * and can connect to an active [MediaSessionCompat].
-             *
-             * It's not required to allow apps with a notification listener to
-             * connect to your [MediaBrowserServiceCompat], but it does allow easy compatibility
-             * with apps such as Wear OS.
-             */
+
+            // If the calling app has a notification listener it is able to retrieve notifications
+            // and can connect to an active [MediaSessionCompat].
+            //
+            // It's not required to allow apps with a notification listener to
+            // connect to your [MediaBrowserServiceCompat], but it does allow easy compatibility
+            // with apps such as Wear OS.
             NotificationManagerCompat.getEnabledListenerPackages(this.context)
                 .contains(callerPackageInfo.packageName) -> true
+
             // If none of the pervious checks succeeded, then the caller is unrecognized.
             else -> false
         }

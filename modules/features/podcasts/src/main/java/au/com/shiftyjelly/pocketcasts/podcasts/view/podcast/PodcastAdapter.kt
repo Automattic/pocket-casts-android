@@ -284,17 +284,29 @@ class PodcastAdapter(
             )
 
             VIEW_TYPE_TABS -> TabsViewHolder(ComposeView(parent.context), theme)
+
             VIEW_TYPE_EPISODE_HEADER -> EpisodeHeaderViewHolder(AdapterEpisodeHeaderBinding.inflate(inflater, parent, false), onEpisodesOptionsClicked, onSearchFocus)
+
             VIEW_TYPE_EPISODE_LIMIT_ROW -> EpisodeLimitViewHolder(inflater.inflate(R.layout.adapter_episode_limit, parent, false))
+
             VIEW_TYPE_DIVIDER_TITLE -> DividerTitleViewHolder(inflater.inflate(R.layout.adapter_divider_row, parent, false))
+
             VIEW_TYPE_BOOKMARKS -> BookmarkViewHolder(ComposeView(parent.context), theme)
+
             VIEW_TYPE_BOOKMARK_HEADER -> BookmarkHeaderViewHolder(ComposeView(parent.context), theme)
+
             VIEW_TYPE_BOOKMARK_UPSELL -> BookmarkUpsellViewHolder(ComposeView(parent.context), onGetBookmarksClicked, theme)
+
             VIEW_TYPE_EMPTY_LIST -> EmptyListViewHolder(ComposeView(parent.context), theme)
+
             VIEW_TYPE_RECOMMENDED_PODCAST -> RecommendedPodcastViewHolder(ComposeView(parent.context), theme)
+
             VIEW_TYPE_DIVIDER_SUBTITLE -> DividerSubTitleViewHolder(ComposeView(parent.context), theme)
+
             VIEW_TYPE_PADDING_ROW -> PaddingViewHolder(ComposeView(parent.context))
+
             VIEW_TYPE_LOADING_ROW -> LoadingViewHolder(ComposeView(parent.context), theme)
+
             else -> {
                 val binding = AdapterEpisodeBinding.inflate(inflater, parent, false)
                 EpisodeViewHolder(
@@ -330,17 +342,29 @@ class PodcastAdapter(
             )
 
             is EpisodeViewHolder -> bindEpisodeViewHolder(holder, position, animateMultiSelection = false)
+
             is TabsViewHolder -> holder.bind(getItem(position) as TabsHeader)
+
             is EpisodeHeaderViewHolder -> bindingEpisodeHeaderViewHolder(holder, position)
+
             is EpisodeLimitViewHolder -> bindEpisodeLimitRow(holder, position)
+
             is DividerTitleViewHolder -> bindDividerRow(holder, position)
+
             is BookmarkViewHolder -> holder.bind(getItem(position) as BookmarkItemData)
+
             is BookmarkHeaderViewHolder -> holder.bind(getItem(position) as BookmarkHeader)
+
             is BookmarkUpsellViewHolder -> holder.bind()
+
             is EmptyListViewHolder -> holder.bind(getItem(position) as EmptyList)
+
             is RecommendedPodcastViewHolder -> holder.bind(getItem(position) as RecommendedPodcast)
+
             is DividerSubTitleViewHolder -> holder.bind(getItem(position) as DividerSubTitleRow)
+
             is PaddingViewHolder -> holder.bind(getItem(position) as PaddingRow)
+
             is LoadingViewHolder -> holder.bind()
         }
     }

@@ -193,7 +193,7 @@ fun carouselCoordinator(
             }
 
             if (
-                nextIndex == currentIndex && event is CarouselEvent.Next && !isPerpetual || // already at last index in finite mode
+                (nextIndex == currentIndex && event is CarouselEvent.Next && !isPerpetual) || // already at last index in finite mode
                 (currentIndex == cycleRange.first && event is CarouselEvent.Previous && !isPerpetual) // already at first index in finite mode
             ) {
                 continue

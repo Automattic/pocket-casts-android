@@ -137,7 +137,9 @@ class PodcastsViewModel @AssistedInject constructor(
     ) = UiState(
         items = when {
             signInState.isNoAccountOrFree -> buildPodcastItems(podcasts, sortType)
+
             folderUuid == null -> buildHomeFolderItems(podcasts, folders, sortType)
+
             else -> folders.find { it.uuid == folderUuid }
                 ?.podcasts
                 ?.map(FolderItem::Podcast)

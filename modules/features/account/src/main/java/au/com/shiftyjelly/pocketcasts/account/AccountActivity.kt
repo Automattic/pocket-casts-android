@@ -96,6 +96,7 @@ class AccountActivity : AppCompatActivity() {
                         R.id.createDoneFragment, R.id.accountFragment, R.id.promoCodeFragment -> {
                             binding.toolbar?.isVisible = false
                         }
+
                         else -> {
                             binding.toolbar?.isVisible = true
                         }
@@ -105,6 +106,7 @@ class AccountActivity : AppCompatActivity() {
                         R.id.createDoneFragment, R.id.accountFragment, R.id.promoCodeFragment -> {
                             IR.drawable.ic_close
                         }
+
                         else -> {
                             IR.drawable.ic_arrow_back
                         }
@@ -146,7 +148,9 @@ class AccountActivity : AppCompatActivity() {
                 }
                 source?.let { mapOf(SOURCE_KEY to source) }
             }
+
             R.id.accountFragment -> mapOf(SOURCE_KEY to ACCOUNT_PROP_VALUE)
+
             else -> null
         } ?: emptyMap()
         analyticsEvent?.let { analyticsTracker.track(it, properties) }

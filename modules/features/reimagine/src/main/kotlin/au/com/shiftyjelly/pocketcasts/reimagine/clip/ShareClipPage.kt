@@ -23,6 +23,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -159,6 +160,7 @@ internal fun ShareClipPage(
             state = state,
             snackbarHostState = snackbarHostState,
         )
+
         else -> VerticalClipPage(
             episode = episode,
             podcast = podcast,
@@ -204,7 +206,8 @@ private fun VerticalClipPage(
     Box(
         modifier = Modifier
             .background(shareColors.background)
-            .fillMaxSize(),
+            .fillMaxSize()
+            .navigationBarsPadding(),
     ) {
         AnimatedVisiblity(podcast = podcast, episode = episode) { podcast, episode ->
             Column {
@@ -423,6 +426,7 @@ private fun DescriptionContent(
             when (step) {
                 Step.ClipSelection -> when (orientation) {
                     Configuration.ORIENTATION_LANDSCAPE -> Unit
+
                     else -> TextH40(
                         text = stringResource(descriptionId),
                         textAlign = TextAlign.Center,
@@ -431,6 +435,7 @@ private fun DescriptionContent(
                         modifier = Modifier.padding(horizontal = 24.dp),
                     )
                 }
+
                 Step.PlatformSelection -> TextH40(
                     text = stringResource(LR.string.share_clip_edit_label),
                     textAlign = TextAlign.Center,
@@ -456,6 +461,7 @@ private fun DescriptionContent(
             }
             val bottomSpace = when (orientation) {
                 Configuration.ORIENTATION_LANDSCAPE -> 0.dp
+
                 else -> when (step) {
                     Step.ClipSelection -> 12.dp
                     Step.PlatformSelection -> 48.dp
@@ -528,6 +534,7 @@ private fun ColumnScope.PagingContent(
                 constrainedSize = { _, _ -> coordiantes.size },
                 modifier = modifier,
             )
+
             is CardType.Audio -> Box(
                 contentAlignment = Alignment.Center,
                 modifier = modifier,
@@ -579,6 +586,7 @@ private fun PageControlsContent(
                 onNavigationButtonClick = onNavigationButtonClick,
                 state = state,
             )
+
             Step.PlatformSelection -> SharingControls(
                 episode = episode,
                 podcast = podcast,
@@ -636,6 +644,7 @@ private fun ClipControls(
                         CardType.Vertical, CardType.Horizontal, CardType.Square -> {
                             listener.onShowPlatformSelection()
                         }
+
                         CardType.Audio -> {
                             listener.onShareClip(
                                 podcast = podcast,

@@ -253,7 +253,9 @@ class EffectsFragment :
 
         when (view.id) {
             binding.btnSpeedUp.id -> changePlaybackSpeed(effects, podcast, effects.playbackSpeed + 0.1)
+
             binding.btnSpeedDown.id -> changePlaybackSpeed(effects, podcast, effects.playbackSpeed - 0.1)
+
             binding.lblSpeed.id -> {
                 when (effects.playbackSpeed) {
                     1.0 -> changePlaybackSpeed(effects, podcast, 1.5)

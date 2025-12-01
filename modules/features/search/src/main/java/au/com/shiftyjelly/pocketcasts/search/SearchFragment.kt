@@ -169,7 +169,9 @@ class SearchFragment : BaseFragment() {
             )
 
             is SearchHistoryEntry.Folder -> listener?.onSearchFolderClick(entry.uuid)
+
             is SearchHistoryEntry.Podcast -> listener?.onSearchPodcastClick(entry.uuid, SourceView.SEARCH)
+
             is SearchHistoryEntry.SearchTerm -> {
                 binding?.let {
                     viewModel.runSearchOnTerm(entry.term)

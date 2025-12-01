@@ -58,6 +58,7 @@ class SearchViewModel @Inject constructor(
                                         ),
                                     )
                                 }
+
                                 is SearchUiState.SearchOperation.Success -> {
                                     if (operation.results.isEmpty() && operation.searchTerm.isNotEmpty()) {
                                         analyticsTracker.track(

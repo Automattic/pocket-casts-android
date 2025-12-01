@@ -141,6 +141,7 @@ class AutoAddSettingsFragment :
                 AutoAddUpNextLimitBehaviour.ONLY_ADD_TO_TOP -> {
                     AutoAddTopSections.Footer(getString(LR.string.settings_auto_up_next_limit_reached_top_summary, state.limit))
                 }
+
                 AutoAddUpNextLimitBehaviour.STOP_ADDING -> {
                     AutoAddTopSections.Footer(getString(LR.string.settings_auto_up_next_limit_reached_stop_summary, state.limit))
                 }

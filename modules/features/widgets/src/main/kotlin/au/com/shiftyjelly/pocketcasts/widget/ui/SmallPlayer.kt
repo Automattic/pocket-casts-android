@@ -26,6 +26,7 @@ internal fun SmallPlayer(state: SmallPlayerWidgetState) {
     }
     val contentDescription = when {
         state.episode == null -> LR.string.pocket_casts
+
         // don't use a pause state as TalkBack will take focus and cause the state to change
         else -> LR.string.play_episode
     }.let { LocalContext.current.getString(it) }

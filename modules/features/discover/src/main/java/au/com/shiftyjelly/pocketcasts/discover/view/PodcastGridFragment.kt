@@ -55,6 +55,7 @@ class PodcastGridFragment : PodcastGridListFragment() {
                 val binding = binding ?: return@Observer
                 when (state) {
                     is PodcastListViewState.Loading -> {}
+
                     is PodcastListViewState.ListLoaded -> {
                         feed = state.feed
                         feed?.let {
@@ -80,6 +81,7 @@ class PodcastGridFragment : PodcastGridListFragment() {
 
                         adapter.submitList(state.feed.podcasts)
                     }
+
                     is PodcastListViewState.Error -> {
                         Timber.e("Could not load feed ${state.error.message}")
                     }

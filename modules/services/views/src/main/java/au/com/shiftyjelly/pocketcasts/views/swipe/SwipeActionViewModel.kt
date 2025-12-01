@@ -216,14 +216,20 @@ suspend fun SwipeActionViewModel.handleAction(
     SwipeAction.AddToUpNextTop -> addToUpNextTop(
         episodeUuid = episodeUuid,
     )
+
     SwipeAction.AddToUpNextBottom -> addToUpNextBottom(episodeUuid = episodeUuid)
+
     SwipeAction.RemoveFromUpNext -> removeFromUpNext(episodeUuid = episodeUuid)
+
     SwipeAction.Share -> shareEpisode(
         episodeUuid = episodeUuid,
         fragmentManager = fragmentManager,
     )
+
     SwipeAction.Archive -> archive(episodeUuid = episodeUuid)
+
     SwipeAction.Unarchive -> unarchive(episodeUuid = episodeUuid)
+
     SwipeAction.RemoveFromPlaylist -> removeFromPlaylist(
         episodeUuid = episodeUuid,
         podcastUuid = podcastUuid,
@@ -233,6 +239,7 @@ suspend fun SwipeActionViewModel.handleAction(
         episodeUuid = episodeUuid,
         fragmentManager = fragmentManager,
     )
+
     SwipeAction.AddToPlaylist -> addToPlaylist(
         episodeUuid = episodeUuid,
         podcastUuid = podcastUuid,

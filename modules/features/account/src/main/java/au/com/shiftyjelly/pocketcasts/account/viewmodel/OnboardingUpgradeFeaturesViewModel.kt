@@ -140,6 +140,7 @@ class OnboardingUpgradeFeaturesViewModel @AssistedInject constructor(
                     }
 
                     is PurchaseResult.Cancelled -> Unit
+
                     is PurchaseResult.Failure -> {
                         _state.update { value -> (value as? OnboardingUpgradeFeaturesState.Loaded)?.copy(purchaseFailed = true) ?: value }
                     }

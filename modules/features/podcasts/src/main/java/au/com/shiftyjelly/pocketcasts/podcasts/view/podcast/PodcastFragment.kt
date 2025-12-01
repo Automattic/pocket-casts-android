@@ -11,6 +11,7 @@ import android.view.ViewGroup
 import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.combinedClickable
+import androidx.compose.foundation.layout.consumeWindowInsets
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableStateOf
@@ -1087,6 +1088,7 @@ class PodcastFragment : BaseFragment() {
             viewModel.refreshState.collect { state ->
                 when (state) {
                     PodcastViewModel.RefreshState.NotStarted -> {}
+
                     PodcastViewModel.RefreshState.NewEpisodeFound -> {
                         binding?.swipeRefreshLayout?.isRefreshing = false
                         showSnackBar(getString(LR.string.podcast_refresh_new_episode_found))
@@ -1310,6 +1312,8 @@ private class ToolbarController {
         onColorChange: (Color) -> Unit,
     ) {
         view.setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
+        // Stop the insets between Compose and the View system interfering with each other. Without this the full screen player is under the status and navigation bars.
+        view.consumeWindowInsets = true
         view.setContent {
             AppTheme(theme.activeTheme) {
                 PodcastToolbar(

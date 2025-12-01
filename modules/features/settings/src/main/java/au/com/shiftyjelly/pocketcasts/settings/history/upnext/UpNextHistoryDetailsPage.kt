@@ -93,6 +93,7 @@ private fun UpNextHistoryDetailsView(
         )
         when (state) {
             is UiState.Loading -> LoadingView()
+
             is UiState.Loaded -> {
                 UpNextHistoryEpisodes(
                     state = state,

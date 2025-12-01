@@ -79,6 +79,7 @@ fun SwipeableStars(
     LaunchedEffect(touchX, desiredStopPoint) {
         when (changeType) {
             ChangeType.Immediate -> sliderPosition.snapTo(touchX)
+
             ChangeType.Animated -> sliderPosition.animateTo(
                 targetValue = desiredStopPoint,
                 animationSpec = spring(stiffness = Spring.StiffnessMediumLow),
@@ -205,7 +206,9 @@ private fun getDesiredStopPoint(
     initialRate: Int?,
 ) = remember(stopPoints, touchX, stopPointType) {
     when (stopPointType) {
-        StopPointType.None -> touchX // ignore stop points
+        StopPointType.None -> touchX
+
+        // ignore stop points
 
         StopPointType.InitialStars -> {
             if (initialRate == null) return@remember touchX

@@ -54,6 +54,7 @@ fun PodcastControlButtonsStyled(
                 iconAlign = seekIconAlign,
                 colors = colors,
                 enabled = seekBackButtonEnabled,
+                skipForward = false,
             )
         },
         middleButton = {
@@ -80,6 +81,7 @@ fun PodcastControlButtonsStyled(
                 iconAlign = seekIconAlign,
                 colors = colors,
                 enabled = seekForwardButtonEnabled,
+                skipForward = true,
             )
         },
     )
