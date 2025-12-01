@@ -10,6 +10,7 @@ import au.com.shiftyjelly.pocketcasts.models.to.toPodcastEpisodes
 import au.com.shiftyjelly.pocketcasts.models.type.PlaylistEpisodeSortType
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.preferences.model.AutoPlaySource
+import au.com.shiftyjelly.pocketcasts.preferences.model.SelectedPlaylist
 import au.com.shiftyjelly.pocketcasts.repositories.download.DownloadManager
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlayAllHandler
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlayAllResponse
@@ -35,6 +36,7 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
+import au.com.shiftyjelly.pocketcasts.views.R as VR
 
 @OptIn(FlowPreview::class, ExperimentalCoroutinesApi::class)
 @HiltViewModel(assistedFactory = PlaylistViewModel.Factory::class)
@@ -441,6 +443,17 @@ class PlaylistViewModel @AssistedInject constructor(
 
     fun updateAutoPlaySource() {
         settings.trackingAutoPlaySource.set(AutoPlaySource.fromId(playlistUuid), updateModifiedAt = false)
+    }
+
+    fun setSelectedPlaylist() {
+        val playlist = SelectedPlaylist(playlistUuid, playlistType.analyticsValue)
+        settings.selectedPlaylist.set(playlist, updateModifiedAt = false)
+    }
+
+    fun clearSelectedPlaylist() {
+        if (settings.selectedPlaylist.value?.uuid == playlistUuid) {
+            settings.selectedPlaylist.set(null, updateModifiedAt = false)
+        }
     }
 
     data class UiState(

@@ -104,6 +104,7 @@ class PlaylistFragment :
         super.onCreate(savedInstanceState)
         if (savedInstanceState == null) {
             viewModel.trackFilterShown()
+            viewModel.setSelectedPlaylist()
         }
     }
 
@@ -532,7 +533,13 @@ class PlaylistFragment :
     }
 
     override fun onBackPressed(): Boolean {
-        return adapterFactory.onBackPressed() || super.onBackPressed()
+        val isBackIntercepted = adapterFactory.onBackPressed()
+        return if (!isBackIntercepted) {
+            viewModel.clearSelectedPlaylist()
+            super.onBackPressed()
+        } else {
+            true
+        }
     }
 
     override fun getBackstackCount(): Int {
