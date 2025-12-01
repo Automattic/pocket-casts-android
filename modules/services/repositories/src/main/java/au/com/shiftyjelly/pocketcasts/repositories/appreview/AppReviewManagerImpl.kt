@@ -238,8 +238,12 @@ class AppReviewManagerImpl(
             settings.appReviewReferralSharedTimestamp.value != null
         }
 
-        AppReviewReason.PlaybackShared -> {
-            settings.appReviewPlaybackSharedTimestamp.value != null
+        AppReviewReason.EndOfYearShared -> {
+            settings.appReviewEndOfYearSharedTimestamp.value != null
+        }
+
+        AppReviewReason.EndOfYearCompleted -> {
+            settings.appReviewEndOfYearCompletedTimestamp.value != null
         }
 
         AppReviewReason.DevelopmentTrigger -> {
@@ -289,8 +293,12 @@ class AppReviewManagerImpl(
                         appReviewReferralSharedTimestamp.set(null, updateModifiedAt = false)
                     }
 
-                    AppReviewReason.PlaybackShared -> {
-                        appReviewPlaybackSharedTimestamp.set(null, updateModifiedAt = false)
+                    AppReviewReason.EndOfYearShared -> {
+                        appReviewEndOfYearSharedTimestamp.set(null, updateModifiedAt = false)
+                    }
+
+                    AppReviewReason.EndOfYearCompleted -> {
+                        appReviewEndOfYearCompletedTimestamp.set(null, updateModifiedAt = false)
                     }
 
                     AppReviewReason.DevelopmentTrigger -> Unit

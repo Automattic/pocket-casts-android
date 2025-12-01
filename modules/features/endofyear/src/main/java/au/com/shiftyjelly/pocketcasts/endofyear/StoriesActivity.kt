@@ -148,11 +148,6 @@ class StoriesActivity : ComponentActivity() {
             viewModel.syncData()
         }
 
-        BackHandler {
-            viewModel.trackStoriesClosed(source = "back_button")
-            finish()
-        }
-
         val scope = rememberCoroutineScope()
         val state by viewModel.uiState.collectAsState()
         val pagerState = rememberPagerState(pageCount = { state.stories.size })
@@ -161,6 +156,12 @@ class StoriesActivity : ComponentActivity() {
         }
         val captureController = rememberStoryCaptureController()
         var showScreenshotDialog by remember { mutableStateOf(false) }
+
+        BackHandler {
+            val story = state.stories.getOrNull(pagerState.currentPage)
+            viewModel.trackStoriesClosed(source = "back_button", story = story)
+            finish()
+        }
 
         Box(
             contentAlignment = Alignment.Center,
@@ -181,7 +182,8 @@ class StoriesActivity : ComponentActivity() {
                 onClickPlusContinue = viewModel::trackPlusContinued,
                 onRestartPlayback = storyChanger::reset,
                 onClose = {
-                    viewModel.trackStoriesClosed("close_button")
+                    val story = state.stories.getOrNull(pagerState.currentPage)
+                    viewModel.trackStoriesClosed(source = "close_button", story = story)
                     finish()
                 },
             )
@@ -196,8 +198,7 @@ class StoriesActivity : ComponentActivity() {
                 onShare = {
                     showScreenshotDialog = false
                     viewModel.resumeStoryAutoProgress(StoryProgressPauseReason.ScreenshotDialog)
-                    val stories = (state as? UiState.Synced)?.stories
-                    val story = stories?.getOrNull(pagerState.currentPage)
+                    val story = state.stories.getOrNull(pagerState.currentPage)
                     if (story != null) {
                         scope.launch {
                             val screenshot = captureController.capture(story)
@@ -212,9 +213,9 @@ class StoriesActivity : ComponentActivity() {
 
         LaunchedEffect(Unit) {
             viewModel.switchStory.collect {
-                val stories = (state as? UiState.Synced)?.stories ?: (state as? UiState.Syncing)?.stories.orEmpty()
-                if (stories.getOrNull(pagerState.currentPage) is Story.Ending) {
-                    viewModel.trackStoriesAutoFinished()
+                val story = state.stories.getOrNull(pagerState.currentPage)
+                if (story is Story.Ending) {
+                    viewModel.trackStoriesAutoFinished(story = story)
                     finish()
                 } else {
                     storyChanger.change(moveForward = true)
@@ -231,8 +232,7 @@ class StoriesActivity : ComponentActivity() {
                 // Inform VM about a story changed due to explicit changes of the current page.
                 launch {
                     snapshotFlow { pagerState.currentPage }.collect { index ->
-                        val stories = (state as? UiState.Synced)?.stories ?: (state as? UiState.Syncing)?.stories
-                        val newStory = stories?.getOrNull(index)
+                        val newStory = state.stories.getOrNull(index)
                         if (newStory != null && lastStory != newStory) {
                             lastStory = newStory
                             viewModel.onStoryChanged(newStory)
@@ -243,8 +243,7 @@ class StoriesActivity : ComponentActivity() {
                 // This happens when a user successfully upgrades their account.
                 launch {
                     snapshotFlow { pagerState.pageCount }.collect {
-                        val stories = (state as? UiState.Synced)?.stories ?: (state as? UiState.Syncing)?.stories
-                        val newStory = stories?.getOrNull(pagerState.currentPage)
+                        val newStory = state.stories.getOrNull(pagerState.currentPage)
                         if (newStory != null && lastStory != newStory) {
                             lastStory = newStory
                             viewModel.onStoryChanged(newStory)
@@ -256,8 +255,7 @@ class StoriesActivity : ComponentActivity() {
 
         LaunchedEffect(Unit) {
             screenshotDetectedFlow.collectLatest {
-                val stories = (state as? UiState.Synced)?.stories
-                val currentStory = stories?.getOrNull(pagerState.currentPage)
+                val currentStory = state.stories.getOrNull(pagerState.currentPage)
                 if (currentStory?.isShareable == true) {
                     viewModel.pauseStoryAutoProgress(StoryProgressPauseReason.ScreenshotDialog)
                     viewModel.screenshotDetected(story = currentStory, activity = this@StoriesActivity)
