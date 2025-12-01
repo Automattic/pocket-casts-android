@@ -29,7 +29,6 @@ import com.airbnb.lottie.compose.LottieCompositionSpec
 import com.airbnb.lottie.compose.rememberLottieComposition
 import dev.shreyaspatil.capturable.capturable
 import java.io.File
-import kotlin.math.roundToInt
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 @OptIn(ExperimentalComposeUiApi::class)
@@ -84,7 +83,7 @@ internal fun CompletionRateStory(
             HeaderText(
                 title = stringResource(
                     LR.string.end_of_year_stories_year_completion_rate_title,
-                    (story.completionRate * 100).roundToInt(),
+                    story.completionRatePercentage,
                 ),
                 subtitle = stringResource(
                     LR.string.end_of_year_stories_year_completion_rate_subtitle,
@@ -92,6 +91,7 @@ internal fun CompletionRateStory(
                     story.listenedCount,
                 ),
                 subscriptionTier = story.subscriptionTier,
+                measurements = measurements,
             )
             Box(
                 modifier = Modifier

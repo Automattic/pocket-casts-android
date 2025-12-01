@@ -189,4 +189,24 @@ class DeveloperViewModel
             appReviewManagerImpl.triggerPrompt(AppReviewReason.DevelopmentTrigger, reviewInfo)
         }
     }
+
+    fun clearAppReviewSettings() {
+        with(settings) {
+            appReviewEpisodeCompletedTimestamps.set(emptyList(), updateModifiedAt = false)
+            appReviewEpisodeStarredTimestamp.set(null, updateModifiedAt = false)
+            appReviewPodcastRatedTimestamp.set(null, updateModifiedAt = false)
+            appReviewPlaylistCreatedTimestamp.set(null, updateModifiedAt = false)
+            appReviewPlusUpgradedTimestamp.set(null, updateModifiedAt = false)
+            appReviewFolderCreatedTimestamp.set(null, updateModifiedAt = false)
+            appReviewBookmarkCreatedTimestamp.set(null, updateModifiedAt = false)
+            appReviewThemeChangedTimestamp.set(null, updateModifiedAt = false)
+            appReviewReferralSharedTimestamp.set(null, updateModifiedAt = false)
+            appReviewEndOfYearSharedTimestamp.set(null, updateModifiedAt = false)
+            appReviewEndOfYearCompletedTimestamp.set(null, updateModifiedAt = false)
+            appReviewLastPromptTimestamp.set(null, updateModifiedAt = false)
+            appReviewLastDeclineTimestamps.set(emptyList(), updateModifiedAt = false)
+            appReviewCrashTimestamp.set(null, updateModifiedAt = false)
+            appReviewSubmittedReasons.set(emptyList(), updateModifiedAt = false)
+        }
+    }
 }

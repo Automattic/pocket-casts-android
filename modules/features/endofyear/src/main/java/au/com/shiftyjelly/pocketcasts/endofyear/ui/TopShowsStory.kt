@@ -78,13 +78,14 @@ internal fun TopShowsStory(
                 .capturable(controller.captureController(story))
                 .fillMaxSize()
                 .background(story.backgroundColor)
-                .padding(top = measurements.closeButtonBottomEdge + 24.dp, bottom = 64.dp),
+                .padding(top = measurements.closeButtonBottomEdge + 16.dp, bottom = 64.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
             HeaderText(
                 title = stringResource(LR.string.eoy_story_top_podcasts_title),
                 subtitle = stringResource(LR.string.eoy_story_top_podcasts_subtitle),
                 textColor = Color.Black,
+                measurements = measurements,
             )
             Spacer(modifier = Modifier.height(32.dp))
             val scrollState = rememberScrollState()

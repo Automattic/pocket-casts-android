@@ -2134,7 +2134,7 @@
     <!-- Title for the completion rate. %1$d is the total of episodes listened this year, %2$d is the total of episodes fully listened to. -->
     <string name="end_of_year_stories_year_completion_rate_subtitle">Out of %2$d episodes started, you finished %1$d.\nA stronger follow‑through than most gym&#160;memberships.</string>
     <!-- Title for when sharing the completion rate story to social media. %1$d is percentage -->
-    <string name="end_of_year_stories_completion_rate_share_text">My completion rate this year was %1$d</string>
+    <string name="end_of_year_stories_completion_rate_share_text">My completion rate this year was %1$d%%</string>
     <string name="end_of_year_stories_year_completion_rate">completion rate</string>
     <!-- Title of the story paywall. Telling the users that there are more stories to check. -->
     <string name="end_of_year_stories_theres_more">Want the deep dive?</string>

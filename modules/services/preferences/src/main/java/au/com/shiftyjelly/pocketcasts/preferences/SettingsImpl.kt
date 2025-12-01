@@ -38,6 +38,7 @@ import au.com.shiftyjelly.pocketcasts.preferences.model.NewEpisodeNotificationAc
 import au.com.shiftyjelly.pocketcasts.preferences.model.NotificationVibrateSetting
 import au.com.shiftyjelly.pocketcasts.preferences.model.PlayOverNotificationSetting
 import au.com.shiftyjelly.pocketcasts.preferences.model.PodcastGridLayoutType
+import au.com.shiftyjelly.pocketcasts.preferences.model.SelectedPlaylist
 import au.com.shiftyjelly.pocketcasts.preferences.model.ShelfItem
 import au.com.shiftyjelly.pocketcasts.preferences.model.ThemeSetting
 import au.com.shiftyjelly.pocketcasts.utils.AppPlatform
@@ -863,6 +864,16 @@ class SettingsImpl @Inject constructor(
             sharedPreferences.edit().remove("selected_tab").commit()
         }
     }
+
+    private val selectedPlaylistAdapter = moshi.adapter(SelectedPlaylist::class.java)
+
+    override val selectedPlaylist = UserSetting.PrefFromString(
+        sharedPrefKey = "app_start_selected_playlist",
+        defaultValue = null,
+        fromString = { value -> runCatching { selectedPlaylistAdapter.fromJson(value) }.getOrNull() },
+        toString = { value -> selectedPlaylistAdapter.toJson(value) },
+        sharedPrefs = sharedPreferences,
+    )
 
     override fun selectedTab(): Int? {
         if (contains("selected_tab")) {
@@ -1714,8 +1725,16 @@ class SettingsImpl @Inject constructor(
         sharedPrefs = sharedPreferences,
     )
 
-    override val appReviewPlaybackSharedTimestamp = UserSetting.PrefFromString(
-        sharedPrefKey = "app_review_playback_shared_timestamp",
+    override val appReviewEndOfYearSharedTimestamp = UserSetting.PrefFromString(
+        sharedPrefKey = "app_review_end_of_year_shared_timestamp",
+        defaultValue = null,
+        fromString = { value -> runCatching { Instant.parse(value) }.getOrNull() },
+        toString = { value -> value.toString() },
+        sharedPrefs = sharedPreferences,
+    )
+
+    override val appReviewEndOfYearCompletedTimestamp = UserSetting.PrefFromString(
+        sharedPrefKey = "app_review_end_of_year_completed_timestamp",
         defaultValue = null,
         fromString = { value -> runCatching { Instant.parse(value) }.getOrNull() },
         toString = { value -> value.toString() },
