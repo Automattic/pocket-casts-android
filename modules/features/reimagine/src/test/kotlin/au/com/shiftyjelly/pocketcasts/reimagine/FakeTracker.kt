@@ -1,15 +1,22 @@
 package au.com.shiftyjelly.pocketcasts.reimagine
 
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
+import au.com.shiftyjelly.pocketcasts.analytics.TrackedEvent
 import au.com.shiftyjelly.pocketcasts.analytics.Tracker
 
 class FakeTracker : Tracker {
-    private val _events = mutableListOf<TrackEvent>()
+    private val _events = mutableListOf<TrackedEvent>()
 
     val events get() = _events.toList()
 
-    override fun track(event: AnalyticsEvent, properties: Map<String, Any>) {
-        _events += TrackEvent(event, properties)
+    override val id get() = "fake_tracker"
+
+    override fun shouldTrack(event: AnalyticsEvent) = true
+
+    override fun track(event: AnalyticsEvent, properties: Map<String, Any>): TrackedEvent {
+        val trackedEvent = TrackedEvent(event, properties)
+        _events += trackedEvent
+        return trackedEvent
     }
 
     override fun refreshMetadata() = Unit
@@ -18,8 +25,3 @@ class FakeTracker : Tracker {
 
     override fun clearAllData() = Unit
 }
-
-data class TrackEvent(
-    val type: AnalyticsEvent,
-    val properties: Map<String, Any>,
-)

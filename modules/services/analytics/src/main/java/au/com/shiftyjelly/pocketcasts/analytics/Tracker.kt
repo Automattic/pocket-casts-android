@@ -1,8 +1,15 @@
 package au.com.shiftyjelly.pocketcasts.analytics
 
 interface Tracker {
-    fun track(event: AnalyticsEvent, properties: Map<String, Any> = emptyMap())
+    val id: String
+
+    fun shouldTrack(event: AnalyticsEvent): Boolean
+
+    fun track(event: AnalyticsEvent, properties: Map<String, Any> = emptyMap()): TrackedEvent
+
     fun refreshMetadata()
+
     fun flush()
+
     fun clearAllData()
 }

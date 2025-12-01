@@ -10,6 +10,7 @@ import androidx.lifecycle.testing.TestLifecycleOwner
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.analytics.EpisodeAnalytics
+import au.com.shiftyjelly.pocketcasts.analytics.TrackedEvent
 import au.com.shiftyjelly.pocketcasts.analytics.Tracker
 import au.com.shiftyjelly.pocketcasts.models.db.dao.EpisodeDao
 import au.com.shiftyjelly.pocketcasts.models.entity.EpisodeDownloadFailureStatistics
@@ -33,7 +34,7 @@ class DownloadStatisticsReporterTest {
     )
 
     private val testDispatcher = UnconfinedTestDispatcher()
-    private val tracker = TestTracker()
+    private val tracker = FakeTracker()
     private val lifecycleOwner = TestLifecycleOwner(
         initialState = INITIALIZED,
         coroutineDispatcher = testDispatcher,
@@ -48,7 +49,7 @@ class DownloadStatisticsReporterTest {
         }
         reporter = DownloadStatisticsReporter(
             episodeDao,
-            EpisodeAnalytics(AnalyticsTracker.test(tracker, isFirstPartyEnabled = true)),
+            EpisodeAnalytics(AnalyticsTracker.test(tracker)),
             lifecycleOwner,
             CoroutineScope(testDispatcher),
         )
@@ -59,7 +60,7 @@ class DownloadStatisticsReporterTest {
         reporter.setup()
 
         lifecycleOwner.handleLifecycleEvent(ON_RESUME)
-        val (event, properties) = tracker.trackedEvents.single()
+        val (event, properties) = tracker.events.single()
 
         assertEquals(AnalyticsEvent.EPISODE_DOWNLOAD_STALE, event)
         assertEquals(
@@ -80,11 +81,11 @@ class DownloadStatisticsReporterTest {
         lifecycleOwner.handleLifecycleEvent(ON_START)
         lifecycleOwner.handleLifecycleEvent(ON_STOP)
 
-        assertEquals(0, tracker.trackedEvents.size)
+        assertEquals(0, tracker.events.size)
 
         lifecycleOwner.handleLifecycleEvent(ON_RESUME)
 
-        assertEquals(1, tracker.trackedEvents.size)
+        assertEquals(1, tracker.events.size)
     }
 
     @Test
@@ -95,7 +96,7 @@ class DownloadStatisticsReporterTest {
         lifecycleOwner.handleLifecycleEvent(ON_PAUSE)
         lifecycleOwner.handleLifecycleEvent(ON_RESUME)
 
-        assertEquals(1, tracker.trackedEvents.size)
+        assertEquals(1, tracker.events.size)
     }
 
     @Test
@@ -120,21 +121,28 @@ class DownloadStatisticsReporterTest {
         lifecycleOwner.handleLifecycleEvent(ON_RESUME)
 
         assertEquals(0, lifecycleOwner.observerCount)
-        assertEquals(1, tracker.trackedEvents.size)
+        assertEquals(1, tracker.events.size)
+    }
+}
+
+private class FakeTracker : Tracker {
+    private val _events = mutableListOf<TrackedEvent>()
+
+    val events get() = _events.toList()
+
+    override val id get() = "fake_tracker"
+
+    override fun shouldTrack(event: AnalyticsEvent) = true
+
+    override fun track(event: AnalyticsEvent, properties: Map<String, Any>): TrackedEvent {
+        val trackedEvent = TrackedEvent(event, properties)
+        _events += trackedEvent
+        return trackedEvent
     }
 
-    private class TestTracker : Tracker {
-        private val _trackedEvents = mutableListOf<Pair<AnalyticsEvent, Map<String, Any>>>()
-        val trackedEvents get() = _trackedEvents.toList()
+    override fun refreshMetadata() = Unit
 
-        override fun track(event: AnalyticsEvent, properties: Map<String, Any>) {
-            _trackedEvents.add(event to properties)
-        }
+    override fun flush() = Unit
 
-        override fun refreshMetadata() = Unit
-
-        override fun flush() = Unit
-
-        override fun clearAllData() = Unit
-    }
+    override fun clearAllData() = Unit
 }

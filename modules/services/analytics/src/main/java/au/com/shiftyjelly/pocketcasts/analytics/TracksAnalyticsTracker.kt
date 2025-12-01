@@ -10,7 +10,6 @@ import au.com.shiftyjelly.pocketcasts.utils.Util
 import com.automattic.android.tracks.TracksClient
 import dagger.hilt.android.qualifiers.ApplicationContext
 import javax.inject.Inject
-import kotlin.coroutines.CoroutineContext
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -23,43 +22,45 @@ class TracksAnalyticsTracker @Inject constructor(
     private val displayUtil: DisplayUtil,
     private val settings: Settings,
     private val accountStatusInfo: AccountStatusInfo,
-) : IdentifyingTracker(preferences),
-    CoroutineScope {
+) : IdentifyingTracker(preferences) {
+    private val scope = CoroutineScope(Dispatchers.IO)
+
     private val tracksClient: TracksClient? = TracksClient.getClient(appContext)
+
     override val anonIdPrefKey: String = TRACKS_ANON_ID
-    override val coroutineContext: CoroutineContext = Dispatchers.IO
 
     private var predefinedEventProperties = emptyMap<String, Any>()
 
-    override fun track(event: AnalyticsEvent, properties: Map<String, Any>) {
-        if (tracksClient == null) return
+    override val id get() = ID
 
-        launch {
-            val eventKey = event.key
-            val user = userId ?: anonID ?: generateNewAnonID()
-            val userType = userId?.let {
-                TracksClient.NosaraUserType.POCKETCASTS
-            } ?: TracksClient.NosaraUserType.ANON
+    override fun shouldTrack(event: AnalyticsEvent): Boolean {
+        return tracksClient != null && settings.collectAnalytics.value
+    }
 
-            /* Create the merged JSON Object of properties.
-            Properties defined by the user have precedence over the default ones pre-defined at "event level" */
-            val propertiesToJSON = JSONObject(properties)
-            predefinedEventProperties.forEach { (key, value) ->
-                if (propertiesToJSON.has(key)) {
-                    Timber.w("The user has defined a property named: '$key' that will override the same property pre-defined at event level. This may generate unexpected behavior!!")
-                    Timber.w("User value: ${propertiesToJSON.get(key)} - pre-defined value: $value")
-                } else {
-                    propertiesToJSON.put(key, value)
+    override fun track(event: AnalyticsEvent, properties: Map<String, Any>): TrackedEvent {
+        if (tracksClient != null) {
+            scope.launch {
+                val eventKey = event.key
+                val user = userId ?: anonID ?: generateNewAnonID()
+                val userType = userId?.let { TracksClient.NosaraUserType.POCKETCASTS } ?: TracksClient.NosaraUserType.ANON
+
+                // Create the merged JSON Object of properties.
+                // Properties defined by the user have precedence over the default ones pre-defined at "event level"
+                val propertiesToJSON = JSONObject(properties)
+                predefinedEventProperties.forEach { (key, value) ->
+                    if (propertiesToJSON.has(key)) {
+                        Timber.w("The user has defined a property named: '$key' that will override the same property pre-defined at event level. This may generate unexpected behavior!!")
+                        Timber.w("User value: ${propertiesToJSON.get(key)} - pre-defined value: $value")
+                    } else {
+                        propertiesToJSON.put(key, value)
+                    }
                 }
-            }
 
-            tracksClient.track(EVENTS_PREFIX + eventKey, propertiesToJSON, user, userType)
-            if (propertiesToJSON.length() > 0) {
-                Timber.tag("Tracks").i("\uD83D\uDD35 Tracked: $eventKey, Properties: $propertiesToJSON")
-            } else {
-                Timber.tag("Tracks").i("\uD83D\uDD35 Tracked: $eventKey")
+                tracksClient.track(EVENTS_PREFIX + eventKey, propertiesToJSON, user, userType)
             }
         }
+
+        return TrackedEvent(event, predefinedEventProperties + properties)
     }
 
     private fun updatePredefinedEventProperties() {
@@ -136,6 +137,7 @@ class TracksAnalyticsTracker @Inject constructor(
     }
 
     companion object {
+        private const val ID = "Tracks"
         private const val TRACKS_ANON_ID = "nosara_tracks_anon_id"
         private const val EVENTS_PREFIX = "pcandroid_"
         const val INVALID_OR_NULL_VALUE = "none"

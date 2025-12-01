@@ -6,7 +6,6 @@ import au.com.shiftyjelly.pocketcasts.analytics.AnonymousBumpStatsTracker
 import au.com.shiftyjelly.pocketcasts.analytics.FirebaseAnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.analytics.FirebaseAnalyticsWrapper
 import au.com.shiftyjelly.pocketcasts.analytics.TracksAnalyticsTracker
-import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import com.google.firebase.analytics.FirebaseAnalytics
 import dagger.Module
 import dagger.Provides
@@ -24,10 +23,8 @@ object TrackerModule {
         tracksTracker: TracksAnalyticsTracker,
         bumpStatsTracker: AnonymousBumpStatsTracker,
         firebaseAnalyticsTracker: FirebaseAnalyticsTracker,
-        settings: Settings,
     ): AnalyticsTracker = AnalyticsTracker(
         trackers = listOf(tracksTracker, bumpStatsTracker, firebaseAnalyticsTracker),
-        isFirstPartyTrackingEnabled = { settings.collectAnalytics.value },
     )
 
     @Provides

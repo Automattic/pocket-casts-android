@@ -4,7 +4,6 @@ import java.util.concurrent.CopyOnWriteArrayList
 
 open class AnalyticsTracker(
     val trackers: List<Tracker>,
-    val isFirstPartyTrackingEnabled: () -> Boolean,
 ) {
     private val listeners = CopyOnWriteArrayList<Listener>()
 
@@ -13,12 +12,9 @@ open class AnalyticsTracker(
     }
 
     fun track(event: AnalyticsEvent, properties: Map<String, Any> = emptyMap()) {
-        val isFirstPartyEnabled = isFirstPartyTrackingEnabled()
-        if (isFirstPartyEnabled) {
-            trackers.forEach { tracker ->
-                tracker.track(event, properties)
-            }
-        }
+        trackers
+            .filter { tracker -> tracker.shouldTrack(event) }
+            .forEach { tracker -> tracker.track(event, properties) }
         listeners.forEach { listener ->
             listener.onEvent(event, properties)
         }
@@ -260,6 +256,6 @@ open class AnalyticsTracker(
     }
 
     companion object {
-        fun test(vararg trackers: Tracker, isFirstPartyEnabled: Boolean = false) = AnalyticsTracker(trackers.toList(), { isFirstPartyEnabled })
+        fun test(vararg trackers: Tracker) = AnalyticsTracker(trackers.toList())
     }
 }

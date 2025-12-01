@@ -3,6 +3,7 @@ package au.com.shiftyjelly.pocketcasts.sharing
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
+import au.com.shiftyjelly.pocketcasts.analytics.TrackedEvent
 import au.com.shiftyjelly.pocketcasts.analytics.Tracker
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
@@ -23,9 +24,9 @@ class SharingAnalyticsTest {
     @get:Rule
     val tempFolder = TemporaryFolder()
 
-    private val tracker = TestTracker()
+    private val tracker = FakeTracker()
 
-    private val analytics = SharingAnalytics(AnalyticsTracker.test(tracker, isFirstPartyEnabled = true))
+    private val analytics = SharingAnalytics(AnalyticsTracker.test(tracker))
 
     private val podcast = Podcast()
     private val episode = PodcastEpisode(uuid = "uuid", publishedDate = Date())
@@ -665,37 +666,38 @@ class SharingAnalyticsTest {
             ),
         )
     }
+}
 
-    class TestTracker : Tracker {
-        private val _events = mutableListOf<TrackEvent>()
+private class FakeTracker : Tracker {
+    private val _events = mutableListOf<TrackedEvent>()
 
-        val events get() = _events.toList()
+    val events get() = _events.toList()
 
-        override fun track(event: AnalyticsEvent, properties: Map<String, Any>) {
-            _events += TrackEvent(event, properties)
-        }
+    override val id get() = "fake_tracker"
 
-        override fun refreshMetadata() = Unit
+    override fun shouldTrack(event: AnalyticsEvent) = true
 
-        override fun flush() = Unit
-
-        override fun clearAllData() = Unit
+    override fun track(event: AnalyticsEvent, properties: Map<String, Any>): TrackedEvent {
+        val trackedEvent = TrackedEvent(event, properties)
+        _events += trackedEvent
+        return trackedEvent
     }
 
-    data class TrackEvent(
-        val type: AnalyticsEvent,
-        val properties: Map<String, Any>,
-    ) {
-        fun assertType(type: AnalyticsEvent) {
-            assertEquals(type, this.type)
-        }
+    override fun refreshMetadata() = Unit
 
-        fun assertProperty(key: String, value: Any?) {
-            assertEquals(value, properties[key])
-        }
+    override fun flush() = Unit
 
-        fun assertProperties(properties: Map<String, Any>) {
-            assertEquals(properties, this.properties)
-        }
-    }
+    override fun clearAllData() = Unit
+}
+
+private fun TrackedEvent.assertType(type: AnalyticsEvent) {
+    assertEquals(type, this.key)
+}
+
+private fun TrackedEvent.assertProperty(key: String, value: Any?) {
+    assertEquals(value, properties[key])
+}
+
+private fun TrackedEvent.assertProperties(properties: Map<String, Any>) {
+    assertEquals(properties, this.properties)
 }

@@ -12,7 +12,7 @@ abstract class IdentifyingTracker(
     protected abstract val anonIdPrefKey: String?
     var userId: String? = null
 
-    abstract override fun track(event: AnalyticsEvent, properties: Map<String, Any>)
+    abstract override fun track(event: AnalyticsEvent, properties: Map<String, Any>): TrackedEvent
     abstract override fun refreshMetadata()
 
     abstract override fun flush()

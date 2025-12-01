@@ -4,9 +4,9 @@ import app.cash.turbine.test
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
+import au.com.shiftyjelly.pocketcasts.analytics.TrackedEvent
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.reimagine.FakeTracker
-import au.com.shiftyjelly.pocketcasts.reimagine.TrackEvent
 import au.com.shiftyjelly.pocketcasts.reimagine.podcast.SharePodcastViewModel.UiState
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
 import au.com.shiftyjelly.pocketcasts.sharedtest.MainCoroutineRule
@@ -41,7 +41,7 @@ class SharePodcastViewModelTest {
             podcast.uuid,
             SourceView.PLAYER,
             podcastManager,
-            AnalyticsTracker.test(tracker, isFirstPartyEnabled = true),
+            AnalyticsTracker.test(tracker),
         )
     }
 
@@ -65,7 +65,7 @@ class SharePodcastViewModelTest {
         val event = tracker.events.last()
 
         assertEquals(
-            TrackEvent(
+            TrackedEvent(
                 AnalyticsEvent.SHARE_SCREEN_SHOWN,
                 mapOf(
                     "type" to "podcast",
