@@ -325,7 +325,7 @@ class EndOfYearViewModel @AssistedInject constructor(
         )
     }
 
-    private fun trackStoriesDismissed(story: Story?, source: String) {
+    private fun trackStoriesDismissed(source: String, story: Story?) {
         trackEvent(
             event = AnalyticsEvent.END_OF_YEAR_STORIES_DISMISSED,
             properties = mapOf(
