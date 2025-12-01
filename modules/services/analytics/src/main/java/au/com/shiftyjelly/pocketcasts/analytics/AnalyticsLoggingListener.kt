@@ -20,18 +20,17 @@ internal class AnalyticsLoggingListener : AnalyticsTracker.Listener {
 
                     if (trackedEvents.isNotEmpty()) {
                         val (usedTrackers, skippedTrackers) = trackedEvents.toList().partition { (_, trackedEvent) -> trackedEvent != null }
-                        append("\n⠀⠀ ") // The first two characters after the new line are not spaces but U+2800 to align the text correctly with the blue dot
+                        append('\n')
                         if (usedTrackers.isNotEmpty()) {
-                            append("Used: ")
-                            append(usedTrackers.joinToString(prefix = "[", postfix = "]") { (id, _) -> id })
+                            append(" - Used: ")
+                            append(usedTrackers.joinToString { (id, _) -> id })
                             if (skippedTrackers.isNotEmpty()) {
-                                append(",")
+                                append('\n')
                             }
-                            append(" ")
                         }
                         if (skippedTrackers.isNotEmpty()) {
-                            append("Skipped: ")
-                            append(skippedTrackers.joinToString(prefix = "[", postfix = "]") { (id, _) -> id })
+                            append(" - Skipped: ")
+                            append(skippedTrackers.joinToString { (id, _) -> id })
                         }
                     }
                 },
