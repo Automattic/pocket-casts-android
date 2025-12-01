@@ -12,6 +12,7 @@ import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.verifyNoInteractions
+import org.mockito.kotlin.whenever
 
 class FirebaseAnalyticsTrackerTest {
 
@@ -27,9 +28,8 @@ class FirebaseAnalyticsTrackerTest {
     @Before
     fun setUp() {
         firebaseAnalytics = mock<FirebaseAnalyticsWrapper> {}
-        val setting = mock<UserSetting<Boolean>> {
-            on { value } doReturn true
-        }
+        val setting = mock<UserSetting<Boolean>>()
+        whenever(setting.value).thenReturn(true)
         tracker = AnalyticsTracker.test(
             FirebaseAnalyticsTracker(
                 firebaseAnalytics = firebaseAnalytics,
