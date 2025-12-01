@@ -532,14 +532,15 @@ class PlaylistFragment :
         }
     }
 
-    override fun onBackPressed(): Boolean {
-        val isBackIntercepted = adapterFactory.onBackPressed()
-        return if (!isBackIntercepted) {
+    override fun onPause() {
+        if (isRemoving) {
             viewModel.clearSelectedPlaylist()
-            super.onBackPressed()
-        } else {
-            true
         }
+        super.onPause()
+    }
+
+    override fun onBackPressed(): Boolean {
+        return adapterFactory.onBackPressed() || super.onBackPressed()
     }
 
     override fun getBackstackCount(): Int {
