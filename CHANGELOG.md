@@ -1,8 +1,8 @@
 8.2
 -----
-*   Updates
-    *   Upgraded Compose and the Wear OS libraries to the latest versions 
-        ([#4796](https://github.com/Automattic/pocket-casts-android/pull/4796))
+*   Bug Fixes
+    *   Fix Android 10 full screen player appearing under the status and navigation bars
+        ([#4804](https://github.com/Automattic/pocket-casts-android/pull/4804))
 
 8.1
 -----
