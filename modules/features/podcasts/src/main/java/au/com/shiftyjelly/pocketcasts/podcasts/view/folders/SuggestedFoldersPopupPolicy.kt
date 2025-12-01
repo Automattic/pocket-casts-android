@@ -19,13 +19,16 @@ class SuggestedFoldersPopupPolicy @Inject constructor(
 
         return when {
             subscription != null -> false
+
             currentCount == 0 -> true
+
             currentCount == 1 -> {
                 timestampSetting.value
                     ?.plusMillis(7.days.inWholeMilliseconds)
                     ?.isBefore(clock.instant())
                     ?: true
             }
+
             else -> false
         }
     }

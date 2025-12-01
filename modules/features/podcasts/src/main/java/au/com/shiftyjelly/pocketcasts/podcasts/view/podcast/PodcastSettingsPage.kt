@@ -98,8 +98,11 @@ internal fun PodcastSettingsPage(
     val backStackEntry by navController.currentBackStackEntryAsState()
     val toolbarTitle = when (backStackEntry?.destination?.route) {
         PodcastSettingsRoutes.HOME, null -> podcastTitle
+
         PodcastSettingsRoutes.ARCHIVE -> stringResource(LR.string.podcast_settings_auto_archive)
+
         PodcastSettingsRoutes.EFFECTS -> stringResource(LR.string.podcast_playback_effects)
+
         PodcastSettingsRoutes.PLAYLISTS -> if (FeatureFlag.isEnabled(Feature.PLAYLISTS_REBRANDING, immutable = true)) {
             stringResource(LR.string.select_smart_playlists)
         } else {

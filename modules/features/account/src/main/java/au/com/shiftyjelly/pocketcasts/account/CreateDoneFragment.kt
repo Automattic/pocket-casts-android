@@ -49,14 +49,17 @@ class CreateDoneFragment : BaseFragment() {
                     is CreateAccountState.CurrentlyValid -> {
                         progress.isVisible = false
                     }
+
                     is CreateAccountState.AccountCreated -> {
                         progress.isVisible = false
                         processCreated(viewModel.subscriptionType.value)
                     }
+
                     is CreateAccountState.Finished -> {
                         progress.isVisible = false
                         processCreated(viewModel.subscriptionType.value)
                     }
+
                     is CreateAccountState.Failure -> {
                         progress.isVisible = false
                         val serverFail = it.errors.contains(CreateAccountError.CANNOT_CREATE_ACCOUNT)
@@ -64,6 +67,7 @@ class CreateDoneFragment : BaseFragment() {
                             updateForm(complete = true, title = getString(LR.string.profile_create_failed_title), detail = getString(LR.string.please_try_again))
                         }
                     }
+
                     else -> {}
                 }
             },

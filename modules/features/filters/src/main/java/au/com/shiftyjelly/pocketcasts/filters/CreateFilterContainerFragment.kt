@@ -72,6 +72,7 @@ class CreateFilterContainerFragment : BaseFragment() {
                             activity?.onBackPressed()
                         }
                     }
+
                     1 -> {
                         binding.toolbar.title = getString(LR.string.filters_create_filter_details)
                         binding.btnCreate.text = getString(LR.string.filters_create_save_filter)

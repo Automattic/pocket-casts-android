@@ -22,7 +22,7 @@ data class Chapter(
         get() = endTime - startTime
 
     operator fun contains(duration: Duration): Boolean {
-        return duration in startTime..<endTime || duration > startTime && endTime <= Duration.ZERO
+        return duration in startTime..<endTime || (duration > startTime && endTime <= Duration.ZERO)
     }
 
     fun remainingTime(

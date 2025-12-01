@@ -256,7 +256,9 @@ class CloudFileBottomSheetFragment : BottomSheetDialogFragment() {
 
                 binding.lblCloud.text = when (episode.serverStatus) {
                     UserEpisodeServerStatus.LOCAL -> getString(LR.string.profile_cloud_upload)
+
                     UserEpisodeServerStatus.UPLOADING, UserEpisodeServerStatus.WAITING_FOR_WIFI, UserEpisodeServerStatus.QUEUED -> getString(LR.string.profile_cloud_cancel_upload)
+
                     UserEpisodeServerStatus.UPLOADED -> getString(
                         if (episode.isDownloaded) {
                             LR.string.profile_cloud_remove
@@ -266,6 +268,7 @@ class CloudFileBottomSheetFragment : BottomSheetDialogFragment() {
                             LR.string.download
                         },
                     )
+
                     UserEpisodeServerStatus.MISSING -> ""
                 }
 
@@ -279,7 +282,9 @@ class CloudFileBottomSheetFragment : BottomSheetDialogFragment() {
                 binding.layoutCloud.setOnClickListener {
                     when (episode.serverStatus) {
                         UserEpisodeServerStatus.LOCAL, UserEpisodeServerStatus.MISSING -> upload(episode, Network.isUnmeteredConnection(binding.layoutCloud.context))
+
                         UserEpisodeServerStatus.UPLOADING, UserEpisodeServerStatus.WAITING_FOR_WIFI, UserEpisodeServerStatus.QUEUED -> viewModel.cancelUpload(episode)
+
                         UserEpisodeServerStatus.UPLOADED -> if (episode.isDownloaded) {
                             viewModel.removeEpisode(episode)
                         } else if (episode.isDownloading) {
@@ -336,6 +341,7 @@ class CloudFileBottomSheetFragment : BottomSheetDialogFragment() {
                             layoutLockedCloud.isVisible = true
                         }
                     }
+
                     else -> {
                         layoutCloud.isVisible = false
                         layoutLockedCloud.isVisible = true

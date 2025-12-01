@@ -117,6 +117,7 @@ fun HorizontalPagerWrapper(
                                     isSubContentFocused = false
                                     true
                                 }
+
                                 Key.DirectionLeft -> {
                                     val prev = (index - 1).coerceAtLeast(0)
                                     focusRequesters[prev].requestFocus()
@@ -126,6 +127,7 @@ fun HorizontalPagerWrapper(
                                     isSubContentFocused = false
                                     true
                                 }
+
                                 Key.DirectionDown -> {
                                     if (!isSubContentFocused) {
                                         subContentFocusRequesters[index].requestFocus()
@@ -135,6 +137,7 @@ fun HorizontalPagerWrapper(
                                         false
                                     }
                                 }
+
                                 else -> false
                             }
                         } else {

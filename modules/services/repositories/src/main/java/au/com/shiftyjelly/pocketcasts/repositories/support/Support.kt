@@ -487,7 +487,10 @@ private fun AutoPlaySource.prettyPrint(
     }
 
     AutoPlaySource.Predefined.Downloads -> "Downloads"
+
     AutoPlaySource.Predefined.Files -> "Files"
+
     AutoPlaySource.Predefined.Starred -> "Starred"
+
     AutoPlaySource.Predefined.None -> "None"
 }

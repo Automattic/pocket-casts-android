@@ -181,6 +181,7 @@ class AppReviewManagerImpl(
         val declineTimestamps = settings.appReviewLastDeclineTimestamps.value.takeLast(2)
         return when (declineTimestamps.size) {
             0, 1 -> false
+
             else -> {
                 val first = declineTimestamps[0]
                 val second = declineTimestamps[1]

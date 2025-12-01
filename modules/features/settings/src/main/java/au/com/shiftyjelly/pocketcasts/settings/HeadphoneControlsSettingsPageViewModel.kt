@@ -110,6 +110,7 @@ class HeadphoneControlsSettingsPageViewModel @Inject constructor(
         -> true
 
         HeadphoneAction.ADD_BOOKMARK -> state.value.isAddBookmarkEnabled
+
         HeadphoneAction.NEXT_CHAPTER,
         HeadphoneAction.PREVIOUS_CHAPTER,
         -> {

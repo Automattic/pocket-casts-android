@@ -370,6 +370,7 @@ private fun HelpWebViewContainer(
                     }
 
                     loadingState !is LoadingState.Finished && !loadedBefore -> ContainerState.Loading
+
                     else -> {
                         loadedBefore = true
                         ContainerState.Loaded
@@ -407,6 +408,7 @@ private fun HelpWebViewContainer(
                     onContactSupport = onContactSupport,
                     modifier = Modifier.fillMaxSize(),
                 )
+
                 // Web View is not part of AnimatedContent because we want to keep it active
                 // to load pages regardless of the container state
                 ContainerState.Loaded, ContainerState.Initalizing -> Unit
@@ -511,7 +513,9 @@ private class HelpWebViewClient(
 
         when {
             url.contains("feedback", ignoreCase = true) -> onSendFeedbackEmail()
+
             contactSupportAction.any { url.startsWith(it) } -> onContactSupport()
+
             url.startsWith("https://support.pocketcasts.com") -> {
                 val androidUrl = if ("device=android" !in url) {
                     buildString {

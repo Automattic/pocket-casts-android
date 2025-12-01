@@ -992,6 +992,7 @@ class SettingsImpl @Inject constructor(
         fromString = { actionIdsString ->
             when (actionIdsString) {
                 "" -> NewEpisodeNotificationAction.DefaultValues
+
                 else -> actionIdsString.splitIgnoreEmpty(",").mapNotNull { actionIdString ->
                     NewEpisodeNotificationAction.entries.find { action ->
                         action.id.toString() == actionIdString
@@ -1011,6 +1012,7 @@ class SettingsImpl @Inject constructor(
         sharedPrefKey = "autoUpNextEmpty",
         defaultValue = when (Util.getAppPlatform(context)) {
             AppPlatform.Automotive -> true
+
             AppPlatform.Phone,
             AppPlatform.WearOs,
             -> false

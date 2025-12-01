@@ -208,6 +208,7 @@ class FiltersFragment :
                 openCreate()
                 true
             }
+
             else -> false
         }
     }

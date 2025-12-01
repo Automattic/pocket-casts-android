@@ -44,7 +44,9 @@ class SyncSettingsTask(context: Context, parameters: WorkerParameters) : Corouti
                     if (value.value is Number) { // Probably will have to change this when we do other settings, but for now just Number is fine
                         when (key) {
                             "skipForward" -> settings.skipForwardInSecs.set(value.value.toInt(), updateModifiedAt = false)
+
                             "skipBack" -> settings.skipBackInSecs.set(value.value.toInt(), updateModifiedAt = false)
+
                             "gridOrder" -> {
                                 val sortType = PodcastsSortType.fromServerId(value.value.toInt())
                                 settings.podcastsSortType.set(sortType, updateModifiedAt = false)

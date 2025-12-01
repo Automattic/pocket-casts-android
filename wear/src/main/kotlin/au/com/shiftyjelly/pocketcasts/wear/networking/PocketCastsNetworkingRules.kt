@@ -67,6 +67,7 @@ object PocketCastsNetworkingRules : NetworkingRules {
                 }
 
             RequestType.MediaRequest.MediaRequestType.Download -> null
+
             null -> null
         }
             // Otherwise, prefer faster networks if available

@@ -145,6 +145,7 @@ class UpNextSyncWorker @AssistedInject constructor(
                 episodes = episodes,
             )
         }
+
         else -> {
             val uuid = change.uuid
             val episode = if (uuid == null) null else episodeManager.findEpisodeByUuid(uuid)

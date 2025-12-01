@@ -104,9 +104,11 @@ class ShareListIncomingFragment :
                     adapter.load(share.title, share.description, share.podcasts)
                     adapter.notifyDataSetChanged()
                 }
+
                 is ShareState.Loading -> {
                     this.binding?.progressCircle?.show()
                 }
+
                 else -> {
                     this.binding?.progressCircle?.hide()
                 }

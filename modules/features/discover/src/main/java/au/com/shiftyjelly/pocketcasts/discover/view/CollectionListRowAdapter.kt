@@ -175,6 +175,7 @@ class CollectionListRowAdapter(
         val items = getItem(position) ?: emptyList()
         when (val collectionItem = items.firstOrNull()) {
             is CollectionHeader -> (holder as HeaderViewHolder).bind(collectionItem)
+
             is CollectionPodcast -> {
                 val podcasts = items.filterIsInstance<CollectionPodcast>().map { it.podcast }
                 (holder as PodcastsViewHolder).bindPodcasts(podcasts)

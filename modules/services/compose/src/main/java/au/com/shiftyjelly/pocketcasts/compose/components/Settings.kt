@@ -281,6 +281,7 @@ fun SettingRow(
                     onCheckedChange = null,
                 )
             }
+
             is SettingRowToggle.Switch -> {
                 Spacer(Modifier.width(12.dp))
                 Switch(
@@ -293,6 +294,7 @@ fun SettingRow(
                     ),
                 )
             }
+
             SettingRowToggle.None -> {
                 /* Nothing */
             }

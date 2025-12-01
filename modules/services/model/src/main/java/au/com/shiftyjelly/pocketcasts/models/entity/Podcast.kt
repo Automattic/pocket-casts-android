@@ -294,9 +294,13 @@ data class Podcast(
         val resources = context.resources
         return when {
             expectedTime < sevenDaysAgo -> null
+
             DateUtils.isToday(expectedTime) -> resources.getString(LR.string.podcast_next_episode_today)
+
             DateUtils.isToday(expectedTime - DateUtils.DAY_IN_MILLIS) -> resources.getString(LR.string.podcast_next_episode_tomorrow)
+
             expectedTime in sevenDaysAgo..now -> resources.getString(LR.string.podcast_next_episode_any_day_now)
+
             else -> {
                 val formattedDate = RelativeDateFormatter(context).format(expectedDate)
                 resources.getString(LR.string.podcast_next_episode_value, formattedDate)

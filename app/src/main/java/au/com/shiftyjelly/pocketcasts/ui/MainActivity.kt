@@ -393,6 +393,7 @@ class MainActivity :
                         .show()
                 }
             }
+
             else -> Unit
         }
     }
@@ -1046,6 +1047,7 @@ class MainActivity :
                 viewModel.navigationState.collect { navigationState ->
                     when (navigationState) {
                         is NavigationState.BookmarksForCurrentlyPlaying -> showPlayerBookmarks()
+
                         is NavigationState.BookmarksForPodcastEpisode -> {
                             // Once episode container fragment is shown, bookmarks tab is shown from inside it based on the new source
                             openEpisodeDialog(
@@ -1854,10 +1856,15 @@ class MainActivity :
     private fun trackTabOpened(tab: Int, isInitial: Boolean = false) {
         val event: AnalyticsEvent? = when (tab) {
             VR.id.navigation_podcasts -> AnalyticsEvent.PODCASTS_TAB_OPENED
+
             VR.id.navigation_upnext -> AnalyticsEvent.UP_NEXT_TAB_OPENED
+
             VR.id.navigation_filters -> AnalyticsEvent.FILTERS_TAB_OPENED
+
             VR.id.navigation_discover -> AnalyticsEvent.DISCOVER_TAB_OPENED
+
             VR.id.navigation_profile -> AnalyticsEvent.PROFILE_TAB_OPENED
+
             else -> {
                 Timber.e("Can't open invalid tab")
                 null

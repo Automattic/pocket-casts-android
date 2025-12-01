@@ -85,6 +85,7 @@ fun OnboardingUpgradeFlow(
             }
 
             ModalBottomSheetValue.Expanded -> viewModel.onSelectPaymentFrequencyShown(flow, source)
+
             else -> {}
         }
     }
