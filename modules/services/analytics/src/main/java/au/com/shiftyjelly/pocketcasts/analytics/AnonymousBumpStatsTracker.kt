@@ -5,6 +5,7 @@ import au.com.shiftyjelly.pocketcasts.models.entity.AnonymousBumpStat
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import java.util.Locale
 import javax.inject.Inject
+import kotlin.coroutines.CoroutineContext
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -12,10 +13,11 @@ import kotlinx.coroutines.launch
 class AnonymousBumpStatsTracker @Inject constructor(
     appDatabase: AppDatabase,
     private val settings: Settings,
-) : Tracker {
-    private val scope = CoroutineScope(Dispatchers.IO)
-
+) : Tracker,
+    CoroutineScope {
     private val bumpStatsDao = appDatabase.bumpStatsDao()
+
+    override val coroutineContext: CoroutineContext = Dispatchers.IO
 
     override val id get() = ID
 
@@ -24,7 +26,7 @@ class AnonymousBumpStatsTracker @Inject constructor(
     }
 
     override fun track(event: AnalyticsEvent, properties: Map<String, Any>): TrackedEvent {
-        scope.launch {
+        launch {
             val bumpStat = AnonymousBumpStat(
                 name = event.name.lowercase(Locale.getDefault()),
                 customEventProps = properties,

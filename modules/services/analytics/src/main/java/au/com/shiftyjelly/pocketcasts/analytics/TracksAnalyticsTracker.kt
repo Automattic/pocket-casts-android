@@ -10,6 +10,7 @@ import au.com.shiftyjelly.pocketcasts.utils.Util
 import com.automattic.android.tracks.TracksClient
 import dagger.hilt.android.qualifiers.ApplicationContext
 import javax.inject.Inject
+import kotlin.coroutines.CoroutineContext
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -22,14 +23,15 @@ class TracksAnalyticsTracker @Inject constructor(
     private val displayUtil: DisplayUtil,
     private val settings: Settings,
     private val accountStatusInfo: AccountStatusInfo,
-) : IdentifyingTracker(preferences) {
-    private val scope = CoroutineScope(Dispatchers.IO)
-
+) : IdentifyingTracker(preferences),
+    CoroutineScope {
     private val tracksClient: TracksClient? = TracksClient.getClient(appContext)
+
+    private var predefinedEventProperties = emptyMap<String, Any>()
 
     override val anonIdPrefKey: String = TRACKS_ANON_ID
 
-    private var predefinedEventProperties = emptyMap<String, Any>()
+    override val coroutineContext: CoroutineContext = Dispatchers.IO
 
     override val id get() = ID
 
@@ -39,7 +41,7 @@ class TracksAnalyticsTracker @Inject constructor(
 
     override fun track(event: AnalyticsEvent, properties: Map<String, Any>): TrackedEvent {
         if (tracksClient != null) {
-            scope.launch {
+            launch {
                 val eventKey = event.key
                 val user = userId ?: anonID ?: generateNewAnonID()
                 val userType = userId?.let { TracksClient.NosaraUserType.POCKETCASTS } ?: TracksClient.NosaraUserType.ANON
@@ -60,7 +62,13 @@ class TracksAnalyticsTracker @Inject constructor(
             }
         }
 
-        return TrackedEvent(event, predefinedEventProperties + properties)
+        val usedProperties = buildMap {
+            putAll(properties)
+            predefinedEventProperties.forEach { (key, value) ->
+                putIfAbsent(key, value)
+            }
+        }
+        return TrackedEvent(event, usedProperties)
     }
 
     private fun updatePredefinedEventProperties() {
