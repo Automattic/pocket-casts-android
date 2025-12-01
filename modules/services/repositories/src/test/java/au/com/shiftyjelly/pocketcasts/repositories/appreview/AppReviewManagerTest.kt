@@ -3,13 +3,11 @@ package au.com.shiftyjelly.pocketcasts.repositories.appreview
 import app.cash.turbine.TurbineTestContext
 import app.cash.turbine.test
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
-import au.com.shiftyjelly.pocketcasts.preferences.ReadWriteSetting
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.preferences.model.AppReviewReason
 import au.com.shiftyjelly.pocketcasts.sharedtest.MutableClock
 import com.google.android.play.core.ktx.requestReview
 import com.google.android.play.core.review.testing.FakeReviewManager
-import java.time.Clock
 import java.time.Instant
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.days
@@ -17,8 +15,6 @@ import kotlin.time.Duration.Companion.seconds
 import kotlinx.coroutines.CoroutineStart
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.cancelAndJoin
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.TestScope
 import kotlinx.coroutines.test.advanceTimeBy
@@ -30,7 +26,6 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
-import org.robolectric.Robolectric
 import org.robolectric.RobolectricTestRunner
 import org.robolectric.RuntimeEnvironment
 import org.robolectric.annotation.Config
@@ -48,7 +43,8 @@ class AppReviewManagerTest {
     private val bookmarkCreatedSetting = TestSetting<Instant?>(null)
     private val themeChangedSetting = TestSetting<Instant?>(null)
     private val referralSharedSetting = TestSetting<Instant?>(null)
-    private val playbackSharedSetting = TestSetting<Instant?>(null)
+    private val endOfYearSharedSetting = TestSetting<Instant?>(null)
+    private val endOfYearCompletedSetting = TestSetting<Instant?>(null)
 
     private val submittedReasonsSetting = TestSetting(emptyList<AppReviewReason>())
     private val lastPromptSetting = TestSetting<Instant?>(null)
@@ -75,7 +71,8 @@ class AppReviewManagerTest {
             on { appReviewBookmarkCreatedTimestamp } doReturn bookmarkCreatedSetting
             on { appReviewThemeChangedTimestamp } doReturn themeChangedSetting
             on { appReviewReferralSharedTimestamp } doReturn referralSharedSetting
-            on { appReviewPlaybackSharedTimestamp } doReturn playbackSharedSetting
+            on { appReviewEndOfYearSharedTimestamp } doReturn endOfYearSharedSetting
+            on { appReviewEndOfYearCompletedTimestamp } doReturn endOfYearCompletedSetting
             on { appReviewSubmittedReasons } doReturn submittedReasonsSetting
             on { appReviewLastPromptTimestamp } doReturn lastPromptSetting
             on { appReviewLastDeclineTimestamps } doReturn lastDeclineTimestampsSetting
@@ -183,9 +180,18 @@ class AppReviewManagerTest {
     @Test
     fun `dispatch playback shared reason`() = runTest {
         testInLoop {
-            playbackSharedSetting.set(clock.instant())
+            endOfYearSharedSetting.set(clock.instant())
             val signal = awaitSignalAndConsume()
-            assertEquals(AppReviewReason.PlaybackShared, signal.reason)
+            assertEquals(AppReviewReason.EndOfYearShared, signal.reason)
+        }
+    }
+
+    @Test
+    fun `dispatch playback completed reason`() = runTest {
+        testInLoop {
+            endOfYearCompletedSetting.set(clock.instant())
+            val signal = awaitSignalAndConsume()
+            assertEquals(AppReviewReason.EndOfYearCompleted, signal.reason)
         }
     }
 
@@ -392,22 +398,4 @@ class AppReviewManagerTest {
             yield()
         }
     }
-}
-
-private class TestSetting<T>(
-    initialValue: T,
-) : ReadWriteSetting<T> {
-    private val stateFlow = MutableStateFlow(initialValue)
-
-    override val value: T
-        get() = stateFlow.value
-
-    override val flow: StateFlow<T>
-        get() = stateFlow
-
-    override fun set(value: T, updateModifiedAt: Boolean, commit: Boolean, clock: Clock) {
-        stateFlow.value = value
-    }
-
-    fun set(value: T) = set(value, updateModifiedAt = false)
 }
