@@ -48,14 +48,11 @@ abstract class PlaylistDao {
     @Upsert
     abstract suspend fun upsertManualEpisodes(episode: Collection<ManualPlaylistEpisode>)
 
-    @Query("SELECT * FROM playlists WHERE deleted = 0 ORDER BY sortPosition ASC")
-    abstract suspend fun getAllPlaylists(): List<PlaylistEntity>
-
     @Query(
         """
         SELECT * 
         FROM playlists
-        WHERE deleted IS 0 IS 0 AND autoDownload IS NOT 0
+        WHERE deleted IS 0 AND autoDownload IS NOT 0
     """,
     )
     abstract suspend fun getAllAutoDownloadPlaylists(): List<PlaylistEntity>
@@ -127,9 +124,6 @@ abstract class PlaylistDao {
 
     @Query("SELECT uuid FROM playlists ORDER BY sortPosition ASC")
     abstract suspend fun getAllPlaylistUuids(): List<String>
-
-    @Query("SELECT * FROM playlists WHERE manual = 0 AND deleted = 0 AND uuid = :uuid")
-    abstract suspend fun getSmartPlaylistFlow(uuid: String): PlaylistEntity?
 
     @Query("SELECT * FROM playlists WHERE manual = 0 AND deleted = 0 AND uuid = :uuid")
     abstract fun smartPlaylistFlow(uuid: String): Flow<PlaylistEntity?>
@@ -234,9 +228,6 @@ abstract class PlaylistDao {
     """,
     )
     abstract fun manualPlaylistMetadataFlow(playlistUuid: String): Flow<PlaylistEpisodeMetadata>
-
-    @Query("SELECT episode_uuid FROM manual_playlist_episodes WHERE playlist_uuid IS :playlistUuid")
-    abstract suspend fun getManualPlaylistEpisodeUuids(playlistUuid: String): List<String>
 
     @Query(
         """

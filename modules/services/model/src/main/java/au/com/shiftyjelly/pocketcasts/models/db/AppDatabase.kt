@@ -1340,7 +1340,7 @@ abstract class AppDatabase : RoomDatabase() {
                         """.trimIndent(),
                 )
 
-                // Copy data the old table to the new one
+                // Copy the old table to the new one
                 execSQL(
                     """
                         INSERT INTO playlists_tmp(
