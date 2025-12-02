@@ -12,19 +12,14 @@ import java.io.Serializable
 
 @Entity(
     tableName = "playlists",
-    indices = [
-        Index(name = "playlists_uuid", value = arrayOf("uuid")),
-    ],
 )
 data class PlaylistEntity(
-    @PrimaryKey @ColumnInfo(name = "_id") var id: Long? = null,
-    @ColumnInfo(name = "uuid") var uuid: String = "",
+    @PrimaryKey @ColumnInfo(name = "uuid") var uuid: String,
     @ColumnInfo(name = "title") var title: String = "",
     @ColumnInfo(name = "iconId") var iconId: Int = 0,
     @ColumnInfo(name = "sortPosition") var sortPosition: Int? = null,
     @ColumnInfo(name = "sortId") var sortType: PlaylistEpisodeSortType = PlaylistEpisodeSortType.NewestToOldest,
     @ColumnInfo(name = "manual") var manual: Boolean = false,
-    @ColumnInfo(name = "draft") var draft: Boolean = false, // Used when creating a new filter
     @ColumnInfo(name = "deleted") var deleted: Boolean = false,
     @ColumnInfo(name = "syncStatus") var syncStatus: Int = SYNC_STATUS_SYNCED,
     // Auto download configuration

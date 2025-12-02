@@ -48,19 +48,19 @@ abstract class PlaylistDao {
     @Upsert
     abstract suspend fun upsertManualEpisodes(episode: Collection<ManualPlaylistEpisode>)
 
-    @Query("SELECT * FROM playlists WHERE deleted = 0 AND draft = 0 ORDER BY sortPosition ASC")
+    @Query("SELECT * FROM playlists WHERE deleted = 0 ORDER BY sortPosition ASC")
     abstract suspend fun getAllPlaylists(): List<PlaylistEntity>
 
     @Query(
         """
         SELECT * 
         FROM playlists
-        WHERE deleted IS 0 AND draft IS 0 AND autoDownload IS NOT 0
+        WHERE deleted IS 0 IS 0 AND autoDownload IS NOT 0
     """,
     )
     abstract suspend fun getAllAutoDownloadPlaylists(): List<PlaylistEntity>
 
-    @Query("SELECT * FROM playlists WHERE deleted = 0 AND draft = 0 ORDER BY sortPosition ASC")
+    @Query("SELECT * FROM playlists WHERE deleted = 0 ORDER BY sortPosition ASC")
     abstract fun allPlaylistsFlow(): Flow<List<PlaylistEntity>>
 
     @Query("SELECT * FROM playlists WHERE uuid = :uuid")
@@ -95,7 +95,6 @@ abstract class PlaylistDao {
           playlists AS playlist
         WHERE
           deleted IS 0
-          AND draft IS 0
           AND playlist.manual IS NOT 0
           AND (
             -- trim isn't really needed because we trim in the application logic but it helps with tests
@@ -123,19 +122,19 @@ abstract class PlaylistDao {
         }
     }
 
-    @Query("SELECT * FROM playlists WHERE draft = 0 AND syncStatus = $SYNC_STATUS_NOT_SYNCED")
+    @Query("SELECT * FROM playlists WHERE syncStatus = $SYNC_STATUS_NOT_SYNCED")
     abstract suspend fun getAllUnsyncedPlaylists(): List<PlaylistEntity>
 
     @Query("SELECT uuid FROM playlists ORDER BY sortPosition ASC")
     abstract suspend fun getAllPlaylistUuids(): List<String>
 
-    @Query("SELECT * FROM playlists WHERE manual = 0 AND deleted = 0 AND draft = 0 AND uuid = :uuid")
+    @Query("SELECT * FROM playlists WHERE manual = 0 AND deleted = 0 AND uuid = :uuid")
     abstract suspend fun getSmartPlaylistFlow(uuid: String): PlaylistEntity?
 
-    @Query("SELECT * FROM playlists WHERE manual = 0 AND deleted = 0 AND draft = 0 AND uuid = :uuid")
+    @Query("SELECT * FROM playlists WHERE manual = 0 AND deleted = 0 AND uuid = :uuid")
     abstract fun smartPlaylistFlow(uuid: String): Flow<PlaylistEntity?>
 
-    @Query("SELECT * FROM playlists WHERE manual != 0 AND deleted = 0 AND draft = 0 AND uuid = :uuid")
+    @Query("SELECT * FROM playlists WHERE manual != 0 AND deleted = 0 AND uuid = :uuid")
     abstract fun manualPlaylistFlow(uuid: String): Flow<PlaylistEntity?>
 
     @Query("UPDATE playlists SET sortPosition = :position, syncStatus = $SYNC_STATUS_NOT_SYNCED WHERE uuid = :uuid")
@@ -712,7 +711,6 @@ abstract class PlaylistDao {
         FROM playlists AS playlist
         WHERE 
           playlist.deleted = 0 
-          AND playlist.draft = 0
         ORDER BY playlist.sortPosition ASC 
         LIMIT 1
     """,
