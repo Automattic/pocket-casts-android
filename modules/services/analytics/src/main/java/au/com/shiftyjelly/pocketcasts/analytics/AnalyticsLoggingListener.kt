@@ -20,17 +20,17 @@ internal class AnalyticsLoggingListener : AnalyticsTracker.Listener {
 
                     if (trackedEvents.isNotEmpty()) {
                         val (usedTrackers, skippedTrackers) = trackedEvents.toList().partition { (_, trackedEvent) -> trackedEvent != null }
-                        append('\n')
+                        append(", ")
                         if (usedTrackers.isNotEmpty()) {
-                            append(" - Used: ")
-                            append(usedTrackers.joinToString { (id, _) -> id })
+                            append("Used: ")
+                            append(usedTrackers.joinToString(prefix = "[", postfix = "]") { (id, _) -> id })
                             if (skippedTrackers.isNotEmpty()) {
-                                append('\n')
+                                append(", ")
                             }
                         }
                         if (skippedTrackers.isNotEmpty()) {
-                            append(" - Skipped: ")
-                            append(skippedTrackers.joinToString { (id, _) -> id })
+                            append("Skipped: ")
+                            append(skippedTrackers.joinToString(prefix = "[", postfix = "]") { (id, _) -> id })
                         }
                     }
                 },
