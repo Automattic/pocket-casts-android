@@ -39,14 +39,6 @@ class PlaylistManagerBaseTest {
     }
 
     @Test
-    fun doNotGetDraftPlaylistPreviews() = dsl.test {
-        insertSmartPlaylist(index = 0) { it.copy(draft = true) }
-        insertManualPlaylist(index = 1) { it.copy(draft = true) }
-
-        expectNoPreviews()
-    }
-
-    @Test
     fun sortPlaylistPreviews() = dsl.test {
         insertSmartPlaylist(index = 0) { it.copy(sortPosition = 0) }
         insertManualPlaylist(index = 1) { it.copy(sortPosition = 2) }

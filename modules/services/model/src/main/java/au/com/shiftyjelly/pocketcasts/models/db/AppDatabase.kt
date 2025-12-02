@@ -1305,7 +1305,8 @@ abstract class AppDatabase : RoomDatabase() {
                             GROUP BY uuid
                         )
                         DELETE FROM playlists WHERE _id NOT IN (SELECT _id FROM keep)
-                    """.trimIndent())
+                    """.trimIndent(),
+                )
 
                 // Create new playlists table
                 execSQL(
@@ -1337,7 +1338,7 @@ abstract class AppDatabase : RoomDatabase() {
                             showArchivedEpisodes INTEGER NOT NULL,
                             clean_title TEXT NOT NULL
                         )
-                        """.trimIndent(),
+                    """.trimIndent(),
                 )
 
                 // Copy the old table to the new one
@@ -1397,7 +1398,7 @@ abstract class AppDatabase : RoomDatabase() {
                             showArchivedEpisodes,
                             clean_title
                         FROM playlists
-                        """.trimIndent(),
+                    """.trimIndent(),
                 )
                 execSQL("DROP TABLE playlists")
                 execSQL("ALTER TABLE playlists_tmp RENAME TO playlists")
