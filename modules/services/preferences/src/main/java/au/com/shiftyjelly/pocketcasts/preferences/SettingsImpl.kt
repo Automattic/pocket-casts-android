@@ -849,14 +849,6 @@ class SettingsImpl @Inject constructor(
         sharedPrefs = sharedPreferences,
     )
 
-    override fun selectedFilter(): String? {
-        return getString(Settings.PREFERENCE_SELECTED_FILTER, null)
-    }
-
-    override fun setSelectedFilter(filterUUID: String?) {
-        setString(Settings.PREFERENCE_SELECTED_FILTER, filterUUID, now = true)
-    }
-
     override fun setSelectedTab(selected: Int?) {
         if (selected != null) {
             setInt("selected_tab", selected)

@@ -99,7 +99,6 @@ internal fun PodcastSettingsPage(
         PodcastSettingsRoutes.ARCHIVE -> stringResource(LR.string.podcast_settings_auto_archive)
         PodcastSettingsRoutes.EFFECTS -> stringResource(LR.string.podcast_playback_effects)
         PodcastSettingsRoutes.PLAYLISTS -> stringResource(LR.string.select_smart_playlists)
-
         else -> podcastTitle
     }
 

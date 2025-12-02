@@ -57,7 +57,6 @@ import timber.log.Timber
 
 class PodcastManagerImpl @Inject constructor(
     private val episodeManager: EpisodeManager,
-    private val smartPlaylistManager: SmartPlaylistManager,
     private val settings: Settings,
     @ApplicationContext private val context: Context,
     private val subscribeManager: SubscribeManager,
@@ -99,7 +98,6 @@ class PodcastManagerImpl @Inject constructor(
             podcastDao.updateSuspend(podcast)
 
             episodeManager.deleteEpisodeFilesAsync(episodes, playbackManager)
-            smartPlaylistManager.removePodcastFromPlaylists(podcastUuid)
 
             unsubscribeRelay.accept(podcastUuid)
         } catch (t: Throwable) {
