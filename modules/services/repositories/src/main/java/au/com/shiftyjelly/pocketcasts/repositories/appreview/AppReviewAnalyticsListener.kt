@@ -2,6 +2,7 @@ package au.com.shiftyjelly.pocketcasts.repositories.appreview
 
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
+import au.com.shiftyjelly.pocketcasts.analytics.TrackedEvent
 import au.com.shiftyjelly.pocketcasts.preferences.ReadWriteSetting
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
@@ -28,7 +29,11 @@ class AppReviewAnalyticsListener @Inject constructor(
     private val endOfYearSharedSetting = settings.appReviewEndOfYearSharedTimestamp
     private val endOfYearCompletedSetting = settings.appReviewEndOfYearCompletedTimestamp
 
-    override fun onEvent(event: AnalyticsEvent, properties: Map<String, Any>) {
+    override fun onEvent(
+        event: AnalyticsEvent,
+        properties: Map<String, Any>,
+        trackedEvents: Map<String, TrackedEvent?>,
+    ) {
         if (!FeatureFlag.isEnabled(Feature.IMPROVE_APP_RATINGS)) {
             return
         }

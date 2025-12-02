@@ -4,13 +4,13 @@ import app.cash.turbine.test
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
+import au.com.shiftyjelly.pocketcasts.analytics.TrackedEvent
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.preferences.UserSetting
 import au.com.shiftyjelly.pocketcasts.preferences.model.ArtworkConfiguration
 import au.com.shiftyjelly.pocketcasts.reimagine.FakeTracker
-import au.com.shiftyjelly.pocketcasts.reimagine.TrackEvent
 import au.com.shiftyjelly.pocketcasts.reimagine.clip.FakeClipPlayer.PlaybackState
 import au.com.shiftyjelly.pocketcasts.reimagine.clip.SharingState.Step
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
@@ -73,7 +73,7 @@ class ShareClipViewModelTest {
                 clipId = "clip-id",
                 source = SourceView.PLAYER,
                 initialClipRange = clipRange,
-                analyticsTracker = AnalyticsTracker.test(tracker, isFirstPartyEnabled = true),
+                analyticsTracker = AnalyticsTracker.test(tracker),
             ),
             episodeManager,
             podcastManager,
@@ -177,7 +177,7 @@ class ShareClipViewModelTest {
             val event = tracker.events.last()
 
             assertEquals(
-                TrackEvent(
+                TrackedEvent(
                     AnalyticsEvent.SHARE_SCREEN_PLAY_TAPPED,
                     mapOf(
                         "episode_uuid" to "episode-id",
@@ -202,7 +202,7 @@ class ShareClipViewModelTest {
             val event = tracker.events.last()
 
             assertEquals(
-                TrackEvent(
+                TrackedEvent(
                     AnalyticsEvent.SHARE_SCREEN_PAUSE_TAPPED,
                     mapOf(
                         "episode_uuid" to "episode-id",
@@ -225,7 +225,7 @@ class ShareClipViewModelTest {
         val event = tracker.events.last()
 
         assertEquals(
-            TrackEvent(
+            TrackedEvent(
                 AnalyticsEvent.SHARE_SCREEN_SHOWN,
                 mapOf(
                     "type" to "clip",
@@ -254,7 +254,7 @@ class ShareClipViewModelTest {
         val event = tracker.events.last()
 
         assertEquals(
-            TrackEvent(
+            TrackedEvent(
                 AnalyticsEvent.SHARE_SCREEN_CLIP_SHARED,
                 mapOf(
                     "episode_uuid" to "episode-id",
@@ -288,7 +288,7 @@ class ShareClipViewModelTest {
         val event = tracker.events.last()
 
         assertEquals(
-            TrackEvent(
+            TrackedEvent(
                 AnalyticsEvent.SHARE_SCREEN_CLIP_SHARED,
                 mapOf(
                     "episode_uuid" to "episode-id",
@@ -322,7 +322,7 @@ class ShareClipViewModelTest {
         val event = tracker.events.last()
 
         assertEquals(
-            TrackEvent(
+            TrackedEvent(
                 AnalyticsEvent.SHARE_SCREEN_CLIP_SHARED,
                 mapOf(
                     "episode_uuid" to "episode-id",
@@ -356,7 +356,7 @@ class ShareClipViewModelTest {
         val event = tracker.events.last()
 
         assertEquals(
-            TrackEvent(
+            TrackedEvent(
                 AnalyticsEvent.SHARE_SCREEN_CLIP_SHARED,
                 mapOf(
                     "episode_uuid" to "episode-id",
@@ -390,7 +390,7 @@ class ShareClipViewModelTest {
         val event = tracker.events.last()
 
         assertEquals(
-            TrackEvent(
+            TrackedEvent(
                 AnalyticsEvent.SHARE_SCREEN_CLIP_SHARED,
                 mapOf(
                     "episode_uuid" to "episode-id",
@@ -424,7 +424,7 @@ class ShareClipViewModelTest {
         val event = tracker.events.last()
 
         assertEquals(
-            TrackEvent(
+            TrackedEvent(
                 AnalyticsEvent.SHARE_SCREEN_CLIP_SHARED,
                 mapOf(
                     "episode_uuid" to "episode-id",

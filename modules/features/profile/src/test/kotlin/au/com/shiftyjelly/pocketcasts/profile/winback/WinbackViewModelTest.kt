@@ -5,6 +5,7 @@ import app.cash.turbine.TurbineTestContext
 import app.cash.turbine.test
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
+import au.com.shiftyjelly.pocketcasts.analytics.TrackedEvent
 import au.com.shiftyjelly.pocketcasts.analytics.Tracker
 import au.com.shiftyjelly.pocketcasts.models.type.Subscription
 import au.com.shiftyjelly.pocketcasts.payment.AcknowledgedSubscription
@@ -62,7 +63,7 @@ class WinbackViewModelTest {
             paymentClient = PaymentClient.test(paymentDataSource),
             referralManager = referralManager,
             settings = settings,
-            tracker = AnalyticsTracker.test(tracker, isFirstPartyEnabled = true),
+            tracker = AnalyticsTracker.test(tracker),
         )
     }
 
@@ -575,7 +576,7 @@ class WinbackViewModelTest {
 
         val event = tracker.events.single()
         assertEquals(
-            TrackEvent(
+            TrackedEvent(
                 AnalyticsEvent.WINBACK_SCREEN_SHOWN,
                 mapOf("screen" to "screen_key"),
             ),
@@ -589,7 +590,7 @@ class WinbackViewModelTest {
 
         val event = tracker.events.single()
         assertEquals(
-            TrackEvent(
+            TrackedEvent(
                 AnalyticsEvent.WINBACK_SCREEN_DISMISSED,
                 mapOf("screen" to "screen_key"),
             ),
@@ -603,7 +604,7 @@ class WinbackViewModelTest {
 
         val event = tracker.events.single()
         assertEquals(
-            TrackEvent(AnalyticsEvent.WINBACK_CONTINUE_BUTTON_TAP, emptyMap()),
+            TrackedEvent(AnalyticsEvent.WINBACK_CONTINUE_BUTTON_TAP, emptyMap()),
             event,
         )
     }
@@ -619,7 +620,7 @@ class WinbackViewModelTest {
 
         val event = tracker.events.single()
         assertEquals(
-            TrackEvent(
+            TrackedEvent(
                 AnalyticsEvent.WINBACK_MAIN_SCREEN_ROW_TAP,
                 mapOf(
                     "row" to "claim_offer",
@@ -642,7 +643,7 @@ class WinbackViewModelTest {
 
         val event = tracker.events.single()
         assertEquals(
-            TrackEvent(
+            TrackedEvent(
                 AnalyticsEvent.WINBACK_MAIN_SCREEN_ROW_TAP,
                 mapOf(
                     "row" to "claim_offer",
@@ -665,7 +666,7 @@ class WinbackViewModelTest {
 
         val event = tracker.events.single()
         assertEquals(
-            TrackEvent(
+            TrackedEvent(
                 AnalyticsEvent.WINBACK_MAIN_SCREEN_ROW_TAP,
                 mapOf(
                     "row" to "claim_offer",
@@ -688,7 +689,7 @@ class WinbackViewModelTest {
 
         val event = tracker.events.single()
         assertEquals(
-            TrackEvent(
+            TrackedEvent(
                 AnalyticsEvent.WINBACK_MAIN_SCREEN_ROW_TAP,
                 mapOf(
                     "row" to "claim_offer",
@@ -706,7 +707,7 @@ class WinbackViewModelTest {
 
         val event = tracker.events.single()
         assertEquals(
-            TrackEvent(
+            TrackedEvent(
                 AnalyticsEvent.WINBACK_MAIN_SCREEN_ROW_TAP,
                 mapOf("row" to "available_plans"),
             ),
@@ -720,7 +721,7 @@ class WinbackViewModelTest {
 
         val event = tracker.events.single()
         assertEquals(
-            TrackEvent(
+            TrackedEvent(
                 AnalyticsEvent.WINBACK_MAIN_SCREEN_ROW_TAP,
                 mapOf("row" to "help_and_feedback"),
             ),
@@ -734,7 +735,7 @@ class WinbackViewModelTest {
 
         val event = tracker.events.single()
         assertEquals(
-            TrackEvent(AnalyticsEvent.WINBACK_OFFER_CLAIMED_DONE_BUTTON_TAPPED, emptyMap()),
+            TrackedEvent(AnalyticsEvent.WINBACK_OFFER_CLAIMED_DONE_BUTTON_TAPPED, emptyMap()),
             event,
         )
     }
@@ -745,7 +746,7 @@ class WinbackViewModelTest {
 
         val event = tracker.events.single()
         assertEquals(
-            TrackEvent(AnalyticsEvent.WINBACK_AVAILABLE_PLANS_BACK_BUTTON_TAPPED, emptyMap()),
+            TrackedEvent(AnalyticsEvent.WINBACK_AVAILABLE_PLANS_BACK_BUTTON_TAPPED, emptyMap()),
             event,
         )
     }
@@ -763,13 +764,13 @@ class WinbackViewModelTest {
 
         assertEquals(
             listOf(
-                TrackEvent(
+                TrackedEvent(
                     AnalyticsEvent.WINBACK_AVAILABLE_PLANS_SELECT_PLAN,
                     mapOf(
                         "product" to SubscriptionPlan.PLUS_MONTHLY_PRODUCT_ID,
                     ),
                 ),
-                TrackEvent(
+                TrackedEvent(
                     AnalyticsEvent.WINBACK_AVAILABLE_PLANS_NEW_PLAN_PURCHASE_SUCCESSFUL,
                     mapOf(
                         "current_product" to SubscriptionPlan.PLUS_YEARLY_PRODUCT_ID,
@@ -787,7 +788,7 @@ class WinbackViewModelTest {
 
         val event = tracker.events.single()
         assertEquals(
-            TrackEvent(AnalyticsEvent.WINBACK_CANCEL_CONFIRMATION_STAY_BUTTON_TAPPED, emptyMap()),
+            TrackedEvent(AnalyticsEvent.WINBACK_CANCEL_CONFIRMATION_STAY_BUTTON_TAPPED, emptyMap()),
             event,
         )
     }
@@ -798,7 +799,7 @@ class WinbackViewModelTest {
 
         val event = tracker.events.single()
         assertEquals(
-            TrackEvent(AnalyticsEvent.WINBACK_CANCEL_CONFIRMATION_CANCEL_BUTTON_TAPPED, emptyMap()),
+            TrackedEvent(AnalyticsEvent.WINBACK_CANCEL_CONFIRMATION_CANCEL_BUTTON_TAPPED, emptyMap()),
             event,
         )
     }
@@ -836,12 +837,18 @@ private fun createSuccessReferralResult(
 )
 
 class FakeTracker : Tracker {
-    private val _events = mutableListOf<TrackEvent>()
+    private val _events = mutableListOf<TrackedEvent>()
 
     val events get() = _events.toList()
 
-    override fun track(event: AnalyticsEvent, properties: Map<String, Any>) {
-        _events += TrackEvent(event, properties)
+    override val id get() = "fake_tracker"
+
+    override fun shouldTrack(event: AnalyticsEvent) = true
+
+    override fun track(event: AnalyticsEvent, properties: Map<String, Any>): TrackedEvent {
+        val trackedEvent = TrackedEvent(event, properties)
+        _events += trackedEvent
+        return trackedEvent
     }
 
     override fun refreshMetadata() = Unit
@@ -850,8 +857,3 @@ class FakeTracker : Tracker {
 
     override fun clearAllData() = Unit
 }
-
-data class TrackEvent(
-    val type: AnalyticsEvent,
-    val properties: Map<String, Any>,
-)

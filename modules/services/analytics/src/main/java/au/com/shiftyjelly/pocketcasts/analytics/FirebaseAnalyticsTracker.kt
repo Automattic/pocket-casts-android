@@ -1,13 +1,39 @@
 package au.com.shiftyjelly.pocketcasts.analytics
 
 import android.os.Bundle
+import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import javax.inject.Inject
-import timber.log.Timber
 
 class FirebaseAnalyticsTracker @Inject constructor(
     private val firebaseAnalytics: FirebaseAnalyticsWrapper,
+    private val settings: Settings,
 ) : Tracker {
-    companion object {
+    override val id get() = ID
+
+    override fun shouldTrack(event: AnalyticsEvent): Boolean {
+        return event in EVENTS && settings.collectAnalytics.value
+    }
+
+    override fun track(event: AnalyticsEvent, properties: Map<String, Any>): TrackedEvent {
+        val name = ANALYTIC_EVENT_TO_FIREBASE_NAME[event] ?: event.key
+        val bundle = Bundle().apply {
+            properties.forEach { (key, value) ->
+                putString(key, value.toString())
+            }
+        }
+        firebaseAnalytics.logEvent(name, bundle)
+        return TrackedEvent(event, properties, usedKey = name)
+    }
+
+    override fun refreshMetadata() = Unit
+
+    override fun flush() = Unit
+
+    override fun clearAllData() = Unit
+
+    private companion object {
+        private const val ID = "Firebase"
+
         private val EVENTS = listOf(
             AnalyticsEvent.DISCOVER_FEATURED_PODCAST_SUBSCRIBED,
             AnalyticsEvent.DISCOVER_FEATURED_PODCAST_TAPPED,
@@ -28,8 +54,6 @@ class FirebaseAnalyticsTracker @Inject constructor(
             AnalyticsEvent.BANNER_AD_REPORT,
         )
 
-        private fun shouldTrack(event: AnalyticsEvent) = EVENTS.contains(event)
-
         // Firebase event names that are different to Tracks
         private val ANALYTIC_EVENT_TO_FIREBASE_NAME = mapOf(
             AnalyticsEvent.DISCOVER_LIST_EPISODE_TAPPED to "discover_list_podcast_episode_tap",
@@ -38,25 +62,4 @@ class FirebaseAnalyticsTracker @Inject constructor(
             AnalyticsEvent.DISCOVER_LIST_SHOW_ALL_TAPPED to "discover_list_show_all",
         )
     }
-
-    override fun track(event: AnalyticsEvent, properties: Map<String, Any>) {
-        if (!shouldTrack(event)) {
-            return
-        }
-
-        val name = ANALYTIC_EVENT_TO_FIREBASE_NAME[event] ?: event.key
-
-        val bundle = Bundle().apply {
-            properties.forEach { (key, value) ->
-                putString(key, value.toString())
-            }
-        }
-        firebaseAnalytics.logEvent(name, bundle)
-
-        Timber.d("Analytic event: $name properties: $properties")
-    }
-
-    override fun refreshMetadata() {}
-    override fun flush() {}
-    override fun clearAllData() {}
 }

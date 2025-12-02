@@ -4,6 +4,7 @@ import android.content.Context
 import androidx.room.Room
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
+import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.analytics.EpisodeAnalytics
 import au.com.shiftyjelly.pocketcasts.models.db.dao.EpisodeDao
 import au.com.shiftyjelly.pocketcasts.models.di.ModelModule
@@ -53,7 +54,6 @@ class AutoArchiveTest {
     val downloadManager = mock<DownloadManager> {}
     val podcastCacheServiceManager = mock<PodcastCacheServiceManager> {}
     val userEpisodeManager = mock<UserEpisodeManager> {}
-    val episodeAnalytics = EpisodeAnalytics(mock())
 
     @OptIn(ExperimentalCoroutinesApi::class)
     private val testDispatcher = UnconfinedTestDispatcher()
@@ -93,7 +93,7 @@ class AutoArchiveTest {
             podcastCacheServiceManager = podcastCacheServiceManager,
             userEpisodeManager = userEpisodeManager,
             ioDispatcher = testDispatcher,
-            episodeAnalytics = episodeAnalytics,
+            episodeAnalytics = EpisodeAnalytics(AnalyticsTracker.test()),
         )
     }
 
