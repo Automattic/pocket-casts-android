@@ -9,6 +9,10 @@ plugins {
     alias(libs.plugins.compose.compiler)
 }
 
+sentry {
+    projectName = project.property("sentryAutomotiveProject")?.toString()
+}
+
 android {
     namespace = "au.com.shiftyjelly.pocketcasts"
 
