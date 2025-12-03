@@ -1,7 +1,6 @@
 package au.com.shiftyjelly.pocketcasts
 
 import android.annotation.SuppressLint
-import android.net.Uri
 import android.os.Bundle
 import android.support.v4.media.MediaBrowserCompat
 import android.support.v4.media.MediaDescriptionCompat
@@ -33,8 +32,6 @@ import au.com.shiftyjelly.pocketcasts.servers.model.DiscoverRow
 import au.com.shiftyjelly.pocketcasts.servers.model.DisplayStyle
 import au.com.shiftyjelly.pocketcasts.servers.model.ListType
 import au.com.shiftyjelly.pocketcasts.servers.model.transformWithRegion
-import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
-import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
@@ -128,16 +125,8 @@ class AutoPlaybackService : PlaybackService() {
         val podcastsItem = buildListMediaItem(id = PODCASTS_ROOT, title = LR.string.podcasts, drawable = IR.drawable.auto_tab_podcasts)
         val filtersItem = buildListMediaItem(
             id = FILTERS_ROOT,
-            title = if (FeatureFlag.isEnabled(Feature.PLAYLISTS_REBRANDING, immutable = true)) {
-                LR.string.playlists
-            } else {
-                LR.string.filters
-            },
-            drawable = if (FeatureFlag.isEnabled(Feature.PLAYLISTS_REBRANDING, immutable = true)) {
-                IR.drawable.auto_tab_playlists
-            } else {
-                IR.drawable.auto_tab_filter
-            },
+            title = LR.string.playlists,
+            drawable = IR.drawable.auto_tab_playlists,
             extras = extrasContentAsList,
         )
         val discoverItem = buildListMediaItem(id = DISCOVER_ROOT, title = LR.string.discover, drawable = IR.drawable.auto_tab_discover)

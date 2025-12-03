@@ -35,8 +35,6 @@ import au.com.shiftyjelly.pocketcasts.compose.theme
 import au.com.shiftyjelly.pocketcasts.podcasts.viewmodel.PodcastSettingsViewModel
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import au.com.shiftyjelly.pocketcasts.ui.theme.ThemeColor
-import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
-import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import au.com.shiftyjelly.pocketcasts.views.helper.ToolbarColors
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
@@ -98,17 +96,9 @@ internal fun PodcastSettingsPage(
     val backStackEntry by navController.currentBackStackEntryAsState()
     val toolbarTitle = when (backStackEntry?.destination?.route) {
         PodcastSettingsRoutes.HOME, null -> podcastTitle
-
         PodcastSettingsRoutes.ARCHIVE -> stringResource(LR.string.podcast_settings_auto_archive)
-
         PodcastSettingsRoutes.EFFECTS -> stringResource(LR.string.podcast_playback_effects)
-
-        PodcastSettingsRoutes.PLAYLISTS -> if (FeatureFlag.isEnabled(Feature.PLAYLISTS_REBRANDING, immutable = true)) {
-            stringResource(LR.string.select_smart_playlists)
-        } else {
-            stringResource(LR.string.settings_select_filters)
-        }
-
+        PodcastSettingsRoutes.PLAYLISTS -> stringResource(LR.string.select_smart_playlists)
         else -> podcastTitle
     }
 

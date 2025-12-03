@@ -13,7 +13,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import au.com.shiftyjelly.pocketcasts.compose.AppThemeWithBackground
 import au.com.shiftyjelly.pocketcasts.compose.PreviewRegularDevice
@@ -24,8 +23,6 @@ import au.com.shiftyjelly.pocketcasts.compose.preview.ThemePreviewParameterProvi
 import au.com.shiftyjelly.pocketcasts.models.type.AutoDownloadLimitSetting
 import au.com.shiftyjelly.pocketcasts.settings.viewmodel.AutoDownloadSettingsViewModel.UiState
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme.ThemeType
-import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
-import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 @Composable
@@ -127,30 +124,14 @@ internal fun AutoDownloadSettingsHomePage(
                 )
             }
         }
-        val usePlaylists = FeatureFlag.isEnabled(Feature.PLAYLISTS_REBRANDING, immutable = true)
         SettingSection(
-            heading = if (usePlaylists) {
-                stringResource(LR.string.playlists)
-            } else {
-                stringResource(LR.string.filters)
-            },
+            heading = stringResource(LR.string.playlists),
         ) {
             SettingRow(
-                primaryText = if (usePlaylists) {
-                    stringResource(LR.string.settings_choose_playlists)
-                } else {
-                    stringResource(LR.string.settings_auto_download_filters_episodes)
-                },
-                secondaryText = if (usePlaylists) {
-                    when (enabledPlaylistsCount) {
-                        uiState.playlists.size -> stringResource(LR.string.playlists_selected_all)
-                        else -> pluralStringResource(LR.plurals.playlists_selected_count, enabledPlaylistsCount, enabledPlaylistsCount)
-                    }
-                } else {
-                    when (enabledPlaylistsCount) {
-                        1 -> stringResource(LR.string.filters_chosen_singular)
-                        else -> stringResource(LR.string.filters_chosen_plural, enabledPlaylistsCount)
-                    }
+                primaryText = stringResource(LR.string.settings_choose_playlists),
+                secondaryText = when (enabledPlaylistsCount) {
+                    uiState.playlists.size -> stringResource(LR.string.playlists_selected_all)
+                    else -> pluralStringResource(LR.plurals.playlists_selected_count, enabledPlaylistsCount, enabledPlaylistsCount)
                 },
                 modifier = Modifier.clickable(
                     role = Role.Button,

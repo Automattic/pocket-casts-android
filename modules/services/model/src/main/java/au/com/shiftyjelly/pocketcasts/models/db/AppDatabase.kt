@@ -47,7 +47,6 @@ import au.com.shiftyjelly.pocketcasts.models.db.dao.PlaylistDao
 import au.com.shiftyjelly.pocketcasts.models.db.dao.PodcastDao
 import au.com.shiftyjelly.pocketcasts.models.db.dao.PodcastRatingsDao
 import au.com.shiftyjelly.pocketcasts.models.db.dao.SearchHistoryDao
-import au.com.shiftyjelly.pocketcasts.models.db.dao.SmartPlaylistDao
 import au.com.shiftyjelly.pocketcasts.models.db.dao.SuggestedFoldersDao
 import au.com.shiftyjelly.pocketcasts.models.db.dao.TranscriptDao
 import au.com.shiftyjelly.pocketcasts.models.db.dao.UpNextChangeDao
@@ -142,7 +141,6 @@ import au.com.shiftyjelly.pocketcasts.localization.R as LR
 abstract class AppDatabase : RoomDatabase() {
     abstract fun podcastDao(): PodcastDao
     abstract fun episodeDao(): EpisodeDao
-    abstract fun smartPlaylistDao(): SmartPlaylistDao
     abstract fun playlistDao(): PlaylistDao
     abstract fun upNextDao(): UpNextDao
     abstract fun upNextChangeDao(): UpNextChangeDao

@@ -713,13 +713,9 @@ abstract class PlaylistDao {
         WHERE 
           playlist.deleted = 0 
           AND playlist.draft = 0
-          AND (CASE 
-            WHEN :allowManual IS NOT 0 THEN 1 
-            ELSE playlist.manual = 0
-          END)
         ORDER BY playlist.sortPosition ASC 
         LIMIT 1
     """,
     )
-    abstract fun playlistShortcutFlow(allowManual: Boolean): Flow<PlaylistShortcut?>
+    abstract fun playlistShortcutFlow(): Flow<PlaylistShortcut?>
 }

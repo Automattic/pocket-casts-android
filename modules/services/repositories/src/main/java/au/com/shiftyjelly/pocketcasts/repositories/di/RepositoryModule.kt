@@ -51,8 +51,6 @@ import au.com.shiftyjelly.pocketcasts.repositories.podcast.FolderManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.FolderManagerImpl
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManagerImpl
-import au.com.shiftyjelly.pocketcasts.repositories.podcast.SmartPlaylistManager
-import au.com.shiftyjelly.pocketcasts.repositories.podcast.SmartPlaylistManagerImpl
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.UserEpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.UserEpisodeManagerImpl
 import au.com.shiftyjelly.pocketcasts.repositories.ratings.RatingsManager
@@ -138,10 +136,6 @@ abstract class RepositoryModule {
     @Binds
     @Singleton
     abstract fun providesEpisodeManager(episodeManagerImpl: EpisodeManagerImpl): EpisodeManager
-
-    @Binds
-    @Singleton
-    abstract fun providesSmartPlaylistManager(smartPlaylistManagerImpl: SmartPlaylistManagerImpl): SmartPlaylistManager
 
     @Binds
     @Singleton

@@ -27,8 +27,6 @@ import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
 import au.com.shiftyjelly.pocketcasts.utils.FileUtil
 import au.com.shiftyjelly.pocketcasts.utils.Util
-import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
-import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import com.squareup.moshi.Moshi
 import dagger.assisted.Assisted
@@ -344,8 +342,6 @@ class VersionMigrationsWorker @AssistedInject constructor(
     }
 
     private fun configurePlaylistForNewUsersOnboarding() {
-        if (FeatureFlag.isEnabled(Feature.PLAYLISTS_REBRANDING, immutable = true)) {
-            settings.showPlaylistsOnboarding.set(false, updateModifiedAt = false)
-        }
+        settings.showPlaylistsOnboarding.set(false, updateModifiedAt = false)
     }
 }

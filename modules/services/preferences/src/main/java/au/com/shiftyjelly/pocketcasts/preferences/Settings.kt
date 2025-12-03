@@ -88,7 +88,6 @@ interface Settings {
         const val PREFERENCE_LAST_MODIFIED = "lastModified"
         const val PREFERENCE_FIRST_SYNC_RUN = "firstSyncRun"
         const val PREFERENCE_GLOBAL_STREAMING_MODE = "globalStreamingMode"
-        const val PREFERENCE_SELECTED_FILTER = "selectedFilter"
         const val PREFERENCE_CHAPTERS_EXPANDED = "chaptersExpanded"
         const val PREFERENCE_UPNEXT_EXPANDED = "upnextExpanded"
         const val INTELLIGENT_PLAYBACK_RESUMPTION = "intelligentPlaybackResumption"
@@ -413,8 +412,6 @@ interface Settings {
     val autoArchiveAfterPlaying: UserSetting<AutoArchiveAfterPlaying>
     val autoArchiveInactive: UserSetting<AutoArchiveInactive>
 
-    fun selectedFilter(): String?
-    fun setSelectedFilter(filterUUID: String?)
     fun selectedTab(): Int?
     fun setSelectedTab(selected: Int?)
     val selectedPlaylist: ReadWriteSetting<SelectedPlaylist?>

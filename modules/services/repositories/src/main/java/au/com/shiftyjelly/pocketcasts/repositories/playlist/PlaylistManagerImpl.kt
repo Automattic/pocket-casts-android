@@ -34,8 +34,6 @@ import au.com.shiftyjelly.pocketcasts.repositories.di.DefaultDispatcher
 import au.com.shiftyjelly.pocketcasts.repositories.playlist.PlaylistManager.Companion.MANUAL_PLAYLIST_EPISODE_LIMIT
 import au.com.shiftyjelly.pocketcasts.repositories.playlist.PlaylistManager.Companion.PLAYLIST_ARTWORK_EPISODE_LIMIT
 import au.com.shiftyjelly.pocketcasts.repositories.playlist.PlaylistManager.Companion.SMART_PLAYLIST_EPISODE_LIMIT
-import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
-import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import java.time.Clock
 import java.util.UUID
 import java.util.concurrent.ConcurrentHashMap
@@ -164,15 +162,7 @@ class PlaylistManagerImpl(
         return appDatabase.withTransaction {
             val playlists = playlistDao.getAllAutoDownloadPlaylists()
             withContext(computationContext) {
-                val useManual = FeatureFlag.isEnabled(Feature.PLAYLISTS_REBRANDING, immutable = true)
                 playlists
-                    .let { playlists ->
-                        if (useManual) {
-                            playlists
-                        } else {
-                            playlists.filterNot(PlaylistEntity::manual)
-                        }
-                    }
                     .flatMap { playlist ->
                         val playlistFlow = if (playlist.manual) {
                             manualPlaylistFlow(playlist.uuid)

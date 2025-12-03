@@ -17,8 +17,6 @@ import au.com.shiftyjelly.pocketcasts.deeplink.TrendingDeepLink
 import au.com.shiftyjelly.pocketcasts.deeplink.UpsellDeepLink
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.preferences.Settings.NotificationId
-import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
-import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 sealed interface NotificationType {
@@ -117,11 +115,7 @@ sealed class OnboardingNotificationType(
         dayOffset = 3,
         analyticsType = "onboardingFilters",
     ) {
-        override val messageRes get() = if (FeatureFlag.isEnabled(Feature.PLAYLISTS_REBRANDING, immutable = true)) {
-            LR.string.notification_filters_message_2
-        } else {
-            LR.string.notification_filters_message
-        }
+        override val messageRes get() = LR.string.notification_filters_message_2
 
         override fun toIntent(context: Context) = ShowFiltersDeepLink.toIntent(context)
     }
