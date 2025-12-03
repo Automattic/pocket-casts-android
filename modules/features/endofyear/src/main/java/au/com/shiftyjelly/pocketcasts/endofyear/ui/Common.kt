@@ -144,7 +144,6 @@ internal fun PreviewBox(
             onClose = {},
             onPreviousStory = {},
             onNextStory = {},
-            controller = StoryCaptureController.preview(),
             isTalkbackOn = false,
             color = Color.White,
         )

@@ -36,7 +36,6 @@ import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.input.pointer.pointerInput
-import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
@@ -116,7 +115,6 @@ internal fun StoriesPage(
             onClose = onClose,
             onPreviousStory = { onChangeStory(false) },
             onNextStory = { onChangeStory(true) },
-            controller = controller,
         )
     }
 }
@@ -252,20 +250,13 @@ internal fun BoxScope.TopControls(
     onClose: () -> Unit,
     onPreviousStory: () -> Unit,
     onNextStory: () -> Unit,
-    controller: StoryCaptureController,
 ) {
-    val density = LocalDensity.current
-    // Calculate the height so that we can remove it from the share images
-    val statusBarHeightPx = measurements.statusBarInsets.getTop(density)
-    val extraPaddingPx = with(density) { 24.dp.roundToPx() }
-
     Column(
         horizontalAlignment = Alignment.End,
         modifier = Modifier
             .align(Alignment.TopCenter)
             .fillMaxWidth()
-            .windowInsetsPadding(measurements.statusBarInsets)
-            .onGloballyPositioned { controller.topControlsHeightPx = it.size.height + statusBarHeightPx - extraPaddingPx },
+            .windowInsetsPadding(measurements.statusBarInsets),
     ) {
         PagerProgressingIndicator(
             state = pagerState,
