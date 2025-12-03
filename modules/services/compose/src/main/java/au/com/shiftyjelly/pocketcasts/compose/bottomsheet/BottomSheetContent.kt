@@ -1,15 +1,20 @@
 package au.com.shiftyjelly.pocketcasts.compose.bottomsheet
 
+import android.R.attr.top
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.WindowInsetsSides
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.only
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.widthIn
+import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.ButtonDefaults
 import androidx.compose.material.MaterialTheme
@@ -29,6 +34,7 @@ import au.com.shiftyjelly.pocketcasts.compose.AppTheme
 import au.com.shiftyjelly.pocketcasts.compose.buttons.RowButton
 import au.com.shiftyjelly.pocketcasts.compose.buttons.RowOutlinedButton
 import au.com.shiftyjelly.pocketcasts.compose.components.TextH50
+import au.com.shiftyjelly.pocketcasts.compose.layout.verticalNavigationBars
 import au.com.shiftyjelly.pocketcasts.compose.preview.ThemePreviewParameterProvider
 import au.com.shiftyjelly.pocketcasts.compose.theme
 import au.com.shiftyjelly.pocketcasts.ui.extensions.inPortrait
@@ -80,7 +86,8 @@ fun BottomSheetContent(
         modifier = modifier
             .fillMaxWidth()
             .background(MaterialTheme.colors.background)
-            .padding(ContentPadding),
+            .padding(start = ContentPadding, top = ContentPadding, end = ContentPadding)
+            .windowInsetsPadding(WindowInsets.verticalNavigationBars.only(WindowInsetsSides.Bottom)),
         contentAlignment = Alignment.TopCenter,
     ) {
         Column(

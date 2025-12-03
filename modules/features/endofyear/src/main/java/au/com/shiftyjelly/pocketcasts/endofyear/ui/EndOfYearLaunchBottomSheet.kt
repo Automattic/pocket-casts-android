@@ -47,7 +47,7 @@ fun EndOfYearLaunchBottomSheet(
         content = BottomSheetContentState.Content(
             imageContent = {
                 ImageContent(
-                    modifier = modifier.clickable {
+                    modifier = Modifier.clickable {
                         onClick()
                         scope.launch { sheetState.hide() }
                     },
@@ -59,6 +59,7 @@ fun EndOfYearLaunchBottomSheet(
                 onClick = onClick,
             ),
         ),
+        modifier = modifier,
     )
 }
 
