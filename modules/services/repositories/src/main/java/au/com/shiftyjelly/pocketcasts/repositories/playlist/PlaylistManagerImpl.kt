@@ -89,9 +89,7 @@ class PlaylistManagerImpl(
     override fun playlistPreviewsFlow(): Flow<List<PlaylistPreview>> {
         return playlistDao.allPlaylistsFlow().map { playlists ->
             withContext(computationContext) {
-                playlists
-                    .map { playlist -> playlist.toPlaylistPreview() }
-                    .distinctBy { it.uuid }
+                playlists.map { playlist -> playlist.toPlaylistPreview() }
             }
         }
     }
@@ -300,6 +298,7 @@ class PlaylistManagerImpl(
     override suspend fun createManualPlaylist(name: String): String {
         return createPlaylist(
             entity = PlaylistEntity(
+                uuid = "", // It's safe to set an empty UUID here because we generate one in createPlaylist()
                 title = name,
                 manual = true,
                 sortType = PlaylistEpisodeSortType.DragAndDrop,
@@ -374,9 +373,7 @@ class PlaylistManagerImpl(
     }
 
     override fun playlistPreviewsForEpisodeFlow(episodeUuid: String, searchTerm: String?): Flow<List<PlaylistPreviewForEpisode>> {
-        return playlistDao
-            .playlistPreviewsForEpisodeFlow(episodeUuid, searchTerm.orEmpty())
-            .map { playlists -> playlists.distinctBy { it.uuid } }
+        return playlistDao.playlistPreviewsForEpisodeFlow(episodeUuid, searchTerm.orEmpty())
     }
 
     override suspend fun getManualEpisodeSources(searchTerm: String?): List<ManualPlaylistEpisodeSource> {
@@ -570,7 +567,6 @@ private fun SmartPlaylistDraft.toPlaylistEntity() = PlaylistEntity(
     },
     sortPosition = 1,
     manual = false,
-    draft = false,
     deleted = false,
     syncStatus = SYNC_STATUS_NOT_SYNCED,
 ).applySmartRules(rules)

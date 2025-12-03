@@ -57,7 +57,6 @@ internal class PlaylistSync(
             serverPlaylists = syncManager.getPlaylistsOrThrow().playlistsList,
             getUuid = { playlist -> playlist.originalUuid },
             isDeleted = { playlist -> playlist.isDeletedOrNull?.value == true },
-            isManual = { playlist -> playlist.manualOrNull?.value == true },
             applyServerPlaylist = { localPlaylist, serverPlaylist -> localPlaylist.applyServerPlaylist(serverPlaylist) },
             getManualEpisodes = { serverPlaylist -> toManualEpisodes(serverPlaylist) },
         )
@@ -68,7 +67,6 @@ internal class PlaylistSync(
             serverPlaylists = serverPlaylists,
             getUuid = { playlist -> playlist.originalUuid },
             isDeleted = { playlist -> playlist.isDeletedOrNull?.value == true },
-            isManual = { playlist -> playlist.manualOrNull?.value == true },
             applyServerPlaylist = { localPlaylist, serverPlaylist -> localPlaylist.applyServerPlaylist(serverPlaylist) },
             getManualEpisodes = { serverPlaylist -> toManualEpisodes(serverPlaylist) },
         )
@@ -78,7 +76,6 @@ internal class PlaylistSync(
         serverPlaylists: List<T>,
         getUuid: (T) -> String,
         isDeleted: (T) -> Boolean,
-        isManual: (T) -> Boolean,
         applyServerPlaylist: (PlaylistEntity, T) -> PlaylistEntity,
         getManualEpisodes: (T) -> List<ManualPlaylistEpisode>,
     ) {
@@ -97,8 +94,9 @@ internal class PlaylistSync(
             }
             val newPlaylists = remainingPlaylist
                 .mapNotNull { serverPlaylist ->
-                    if (getUuid(serverPlaylist) !in existingPlaylistUuids) {
-                        applyServerPlaylist(PlaylistEntity(), serverPlaylist)
+                    val uuid = getUuid(serverPlaylist)
+                    if (uuid !in existingPlaylistUuids) {
+                        applyServerPlaylist(PlaylistEntity(uuid = uuid), serverPlaylist)
                     } else {
                         null
                     }

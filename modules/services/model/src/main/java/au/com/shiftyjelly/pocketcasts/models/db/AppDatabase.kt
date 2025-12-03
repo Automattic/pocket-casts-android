@@ -107,7 +107,7 @@ import au.com.shiftyjelly.pocketcasts.localization.R as LR
         ManualPlaylistEpisode::class,
         BlazeAd::class,
     ],
-    version = 122,
+    version = 123,
     exportSchema = true,
     autoMigrations = [
         AutoMigration(from = 81, to = 82, spec = AppDatabase.Companion.DeleteSilenceRemovedMigration::class),
@@ -1291,6 +1291,120 @@ abstract class AppDatabase : RoomDatabase() {
             )
         }
 
+        val MIGRATION_122_123 = addMigration(122, 123) { database ->
+            with(database) {
+                // Delete any potentially lingering drafts
+                execSQL("DELETE FROM playlists WHERE draft != 0")
+
+                // Delete duplicate UUIDs
+                execSQL(
+                    """
+                        WITH keep AS (
+                            SELECT MIN(_id) AS _id
+                            FROM playlists
+                            GROUP BY uuid
+                        )
+                        DELETE FROM playlists WHERE _id NOT IN (SELECT _id FROM keep)
+                    """.trimIndent(),
+                )
+
+                // Create new playlists table
+                execSQL(
+                    """
+                        CREATE TABLE playlists_tmp(
+                            uuid TEXT PRIMARY KEY NOT NULL,
+                            title TEXT NOT NULL,
+                            iconId INTEGER NOT NULL,
+                            sortPosition INTEGER,
+                            sortId INTEGER NOT NULL,
+                            manual INTEGER NOT NULL,
+                            deleted INTEGER NOT NULL,
+                            syncStatus INTEGER NOT NULL,
+                            autoDownload INTEGER NOT NULL,
+                            autoDownloadLimit INTEGER NOT NULL,
+                            unplayed INTEGER NOT NULL,
+                            partiallyPlayed INTEGER NOT NULL,
+                            finished INTEGER NOT NULL,
+                            downloaded INTEGER NOT NULL,
+                            notDownloaded INTEGER NOT NULL,
+                            audioVideo INTEGER NOT NULL,
+                            filterHours INTEGER NOT NULL,
+                            starred INTEGER NOT NULL,
+                            allPodcasts INTEGER NOT NULL,
+                            podcastUuids TEXT,
+                            filterDuration INTEGER NOT NULL,
+                            longerThan INTEGER NOT NULL,
+                            shorterThan INTEGER NOT NULL,
+                            showArchivedEpisodes INTEGER NOT NULL,
+                            clean_title TEXT NOT NULL
+                        )
+                    """.trimIndent(),
+                )
+
+                // Copy the old table to the new one
+                execSQL(
+                    """
+                        INSERT INTO playlists_tmp(
+                            uuid,
+                            title,
+                            iconId,
+                            sortPosition,
+                            sortId,
+                            manual,
+                            deleted,
+                            syncStatus,
+                            autoDownload,
+                            autoDownloadLimit,
+                            unplayed,
+                            partiallyPlayed,
+                            finished,
+                            downloaded,
+                            notDownloaded,
+                            audioVideo,
+                            filterHours,
+                            starred,
+                            allPodcasts,
+                            podcastUuids,
+                            filterDuration,
+                            longerThan,
+                            shorterThan,
+                            showArchivedEpisodes,
+                            clean_title
+                        )
+                        SELECT
+                            uuid,
+                            title,
+                            iconId,
+                            sortPosition,
+                            sortId,
+                            manual,
+                            deleted,
+                            syncStatus,
+                            autoDownload,
+                            autoDownloadLimit,
+                            unplayed,
+                            partiallyPlayed,
+                            finished,
+                            downloaded,
+                            notDownloaded,
+                            audioVideo,
+                            filterHours,
+                            starred,
+                            allPodcasts,
+                            podcastUuids,
+                            filterDuration,
+                            longerThan,
+                            shorterThan,
+                            showArchivedEpisodes,
+                            clean_title
+                        FROM playlists
+                    """.trimIndent(),
+                )
+                execSQL("DROP TABLE playlists")
+                execSQL("ALTER TABLE playlists_tmp RENAME TO playlists")
+            }
+        }
+
         fun addMigrations(databaseBuilder: Builder<AppDatabase>, context: Context) {
             databaseBuilder.addMigrations(
                 addMigration(1, 2) { },
@@ -1703,6 +1817,7 @@ abstract class AppDatabase : RoomDatabase() {
                 MIGRATION_119_120,
                 MIGRATION_120_121,
                 MIGRATION_121_122,
+                MIGRATION_122_123,
             )
         }
 

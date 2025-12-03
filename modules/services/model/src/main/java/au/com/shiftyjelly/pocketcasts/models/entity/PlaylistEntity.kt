@@ -2,29 +2,22 @@ package au.com.shiftyjelly.pocketcasts.models.entity
 
 import androidx.room.ColumnInfo
 import androidx.room.Entity
-import androidx.room.Index
 import androidx.room.PrimaryKey
 import au.com.shiftyjelly.pocketcasts.models.to.PlaylistIcon
 import au.com.shiftyjelly.pocketcasts.models.type.PlaylistEpisodeSortType
 import au.com.shiftyjelly.pocketcasts.utils.extensions.splitIgnoreEmpty
 import au.com.shiftyjelly.pocketcasts.utils.extensions.unidecode
-import java.io.Serializable
 
 @Entity(
     tableName = "playlists",
-    indices = [
-        Index(name = "playlists_uuid", value = arrayOf("uuid")),
-    ],
 )
 data class PlaylistEntity(
-    @PrimaryKey @ColumnInfo(name = "_id") var id: Long? = null,
-    @ColumnInfo(name = "uuid") var uuid: String = "",
+    @PrimaryKey @ColumnInfo(name = "uuid") var uuid: String,
     @ColumnInfo(name = "title") var title: String = "",
     @ColumnInfo(name = "iconId") var iconId: Int = 0,
     @ColumnInfo(name = "sortPosition") var sortPosition: Int? = null,
     @ColumnInfo(name = "sortId") var sortType: PlaylistEpisodeSortType = PlaylistEpisodeSortType.NewestToOldest,
     @ColumnInfo(name = "manual") var manual: Boolean = false,
-    @ColumnInfo(name = "draft") var draft: Boolean = false, // Used when creating a new filter
     @ColumnInfo(name = "deleted") var deleted: Boolean = false,
     @ColumnInfo(name = "syncStatus") var syncStatus: Int = SYNC_STATUS_SYNCED,
     // Auto download configuration
@@ -46,7 +39,7 @@ data class PlaylistEntity(
     @ColumnInfo(name = "shorterThan") var shorterThan: Int = 40,
     // Manual playlist configuration
     @ColumnInfo(name = "showArchivedEpisodes") var showArchivedEpisodes: Boolean = false,
-) : Serializable {
+) {
     companion object {
         const val AUDIO_VIDEO_FILTER_ALL = 0
         const val AUDIO_VIDEO_FILTER_AUDIO_ONLY = 1
