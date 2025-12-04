@@ -12,7 +12,7 @@ plugins {
 }
 
 sentry {
-    projectName = project.property("sentryWearProject")?.toString()
+    projectName = project.findProperty("sentryWearProject")?.toString()
 }
 
 android {
@@ -36,7 +36,7 @@ android {
         named("release") {
             manifestPlaceholders["appIcon"] = "@mipmap/ic_launcher"
 
-            if (project.property("sentryWearProject")?.toString().isNullOrBlank()) {
+            if (project.findProperty("sentryWearProject")?.toString().isNullOrBlank()) {
                 println("WARNING: Sentry configuration not found. The ProGuard mapping files won't be uploaded.")
             }
         }
