@@ -70,7 +70,11 @@ class AlbumArtContentProvider : ContentProvider() {
         val request = requestFactory.createForFileOrUrl(url.toString())
         return when (val result = runBlocking { execute(request) }) {
             is SuccessResult -> result.diskCacheKey?.let { key -> getCachedArtworkFile(key) }
-            is ErrorResult -> null
+
+            is ErrorResult -> {
+                LogBuffer.e(LogBuffer.TAG_INVALID_STATE, result.throwable, "Failed to load artwork for url: $url")
+                null
+            }
         }
     }
 

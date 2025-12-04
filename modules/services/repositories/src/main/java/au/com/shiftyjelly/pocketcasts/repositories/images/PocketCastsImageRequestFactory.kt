@@ -20,7 +20,6 @@ import coil3.request.transformations
 import coil3.transform.RoundedCornersTransformation
 import coil3.transform.Transformation
 import java.io.File
-import okhttp3.HttpUrl.Companion.toHttpUrlOrNull
 import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast as PodcastEntity
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode as PodcastEpisodeEntity
@@ -91,7 +90,7 @@ data class PocketCastsImageRequestFactory(
         is RequestType.Podcast -> data(context)
         is RequestType.PodcastEpisode -> data(context)
         is RequestType.UserEpisode -> data()
-        is RequestType.FileOrUrl -> filePathOrUrl.toHttpUrlOrNull() ?: File(filePathOrUrl)
+        is RequestType.FileOrUrl -> filePathOrUrl
     }
 
     private fun RequestType.Podcast.data(context: Context) = podcastUuid?.let { podcastArtworkUrl(context, it) } ?: placeholderId
