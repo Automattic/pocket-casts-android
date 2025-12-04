@@ -16,6 +16,7 @@ import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.platform.LocalResources
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
@@ -71,6 +72,7 @@ private fun Content(
     onClick: () -> Unit,
 ) {
     val context = LocalContext.current
+    val resources = LocalResources.current
     val density = LocalDensity.current
 
     WatchListChip(
@@ -92,7 +94,7 @@ private fun Content(
                 val imageRequest = remember(episode.uuid, useEpisodeArtwork, density) {
                     // set the image size or the image crop won't work correctly
                     val imageWidthPx = with(density) {
-                        context.resources.displayMetrics.widthPixels - (ChipDefaults.ChipHorizontalPadding.toPx() * 2).toInt()
+                        resources.displayMetrics.widthPixels - (ChipDefaults.ChipHorizontalPadding.toPx() * 2).toInt()
                     }
                     val imageHeightPx = with(density) {
                         ChipDefaults.Height.toPx().toInt()
