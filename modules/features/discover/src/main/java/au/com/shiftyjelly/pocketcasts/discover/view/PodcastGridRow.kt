@@ -97,8 +97,7 @@ class PodcastGridRow @JvmOverloads constructor(
         val podcast = podcast
         val imageSize = imageSize
         if (podcast != null && imageSize != null) {
-            val request = imageRequestFactory.createForPodcast(podcast.uuid)
-            request.loadInto(imagePodcast)
+            imageRequestFactory.createForPodcast(podcast.uuid).loadInto(imagePodcast)
         }
     }
 
