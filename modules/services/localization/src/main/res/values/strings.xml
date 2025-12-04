@@ -234,7 +234,6 @@
     <string name="ad_report_reason_other">Other</string>
     <string name="banner_ad_plus_prompt">Say goodbye to banner ads and more with Pocket Casts Plus</string>
     <string name="ad_report_confirmation">You reported this ad.</string>
-    <string name="other_options">Other options</string>
     <string name="add_episodes">Add episodes</string>
     <string name="your_podcasts">Your podcasts</string>
     <string name="unavailable">Unavailable</string>
@@ -954,6 +953,7 @@
     <string name="manual_playlist_search_no_podcast_title">No podcast found</string>
     <string name="manual_playlist_search_no_podcast_or_folder_body">We couldn’t find any podcast or folder for that search. Try another keyword.</string>
     <string name="manual_playlist_search_no_podcast_or_folder_title" translatable="false">@string/manual_playlist_search_no_podcast_title</string>
+    <string name="more_rules">More rules</string>
     <string name="new_playlist">New playlist</string>
     <string name="new_playlists_title_placeholder">Playlist’s name</string>
     <string name="new_smart_playlist_banner_body">Automatically add episodes based on rules</string>
