@@ -9,13 +9,16 @@ import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.playback.EpisodeFileMetadata
 import au.com.shiftyjelly.pocketcasts.utils.Util
 import au.com.shiftyjelly.pocketcasts.utils.extensions.dpToPx
-import au.com.shiftyjelly.pocketcasts.utils.images.RoundedCornersTransformation
-import coil.imageLoader
-import coil.request.ErrorResult
-import coil.request.ImageRequest
-import coil.request.SuccessResult
-import coil.target.Target
-import coil.transform.Transformation
+import coil3.imageLoader
+import coil3.request.ErrorResult
+import coil3.request.ImageRequest
+import coil3.request.SuccessResult
+import coil3.request.error
+import coil3.request.placeholder
+import coil3.request.target
+import coil3.request.transformations
+import coil3.transform.RoundedCornersTransformation
+import coil3.transform.Transformation
 import java.io.File
 import okhttp3.HttpUrl.Companion.toHttpUrlOrNull
 import au.com.shiftyjelly.pocketcasts.images.R as IR
@@ -65,7 +68,7 @@ data class PocketCastsImageRequestFactory(
         onSuccess: () -> Unit,
     ) = ImageRequest.Builder(context)
         .data(type.data(context))
-        .placeholder(placeholderId)
+        .let { if (placeholderType == PlaceholderType.None) it else it.placeholder(placeholderId) }
         .error(if (isDarkTheme) IR.drawable.defaultartwork_dark else IR.drawable.defaultartwork)
         .transformations(
             buildList {
@@ -150,8 +153,6 @@ data class PocketCastsImageRequestFactory(
 }
 
 fun ImageRequest.loadInto(view: ImageView) = context.imageLoader.enqueue(newBuilder().target(view).build())
-
-fun ImageRequest.loadInto(target: Target) = context.imageLoader.enqueue(newBuilder().target(target).build())
 
 private sealed interface RequestType {
     data class Podcast(val podcastUuid: String?) : RequestType

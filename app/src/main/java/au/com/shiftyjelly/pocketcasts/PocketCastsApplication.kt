@@ -45,8 +45,8 @@ import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBufferUncaughtExceptionHandler
 import au.com.shiftyjelly.pocketcasts.utils.log.RxJavaUncaughtExceptionHandling
 import au.com.shiftyjelly.pocketcasts.widget.PlayerWidgetManager
-import coil.Coil
-import coil.ImageLoader
+import coil3.ImageLoader
+import coil3.SingletonImageLoader
 import com.google.firebase.FirebaseApp
 import com.squareup.moshi.Moshi
 import dagger.hilt.android.HiltAndroidApp
@@ -211,7 +211,7 @@ class PocketCastsApplication :
             notificationManager.setupOffersNotifications()
             appLifecycleObserver.setup()
 
-            Coil.setImageLoader(coilImageLoader)
+            SingletonImageLoader.setSafe { coilImageLoader }
 
             withContext(Dispatchers.Default) {
                 playbackManager.setup()

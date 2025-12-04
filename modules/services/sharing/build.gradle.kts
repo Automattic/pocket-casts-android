@@ -28,6 +28,7 @@ dependencies {
     implementation(platform(libs.compose.bom))
 
     implementation(libs.coil)
+    implementation(libs.coil.network.okhttp)
     implementation(libs.coroutines.core)
     implementation(libs.timber)
 

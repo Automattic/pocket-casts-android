@@ -12,14 +12,15 @@ import android.net.Uri
 import android.util.AttributeSet
 import android.view.View
 import androidx.core.content.ContextCompat
-import androidx.core.graphics.drawable.toBitmap
 import androidx.core.graphics.toRect
 import au.com.shiftyjelly.pocketcasts.ui.extensions.getThemeColor
 import au.com.shiftyjelly.pocketcasts.ui.extensions.getTintedDrawable
-import coil.imageLoader
-import coil.request.ImageRequest
-import coil.target.Target
-import coil.transform.CircleCropTransformation
+import coil3.Image
+import coil3.imageLoader
+import coil3.request.ImageRequest
+import coil3.request.transformations
+import coil3.toBitmap
+import coil3.transform.CircleCropTransformation
 import au.com.shiftyjelly.pocketcasts.ui.R as UR
 
 private const val DRAW_FULL = 0
@@ -157,10 +158,10 @@ class ProfileCircleView @JvmOverloads constructor(
     }
 
     private fun loadImageFromUri(uri: Uri, size: Int) {
-        val target = object : Target {
-            override fun onError(error: Drawable?) {
+        val target = object : coil3.target.Target {
+            override fun onError(error: Image?) {
             }
-            override fun onSuccess(result: Drawable) {
+            override fun onSuccess(result: Image) {
                 bitmap = result.toBitmap()
                 update()
                 invalidate()

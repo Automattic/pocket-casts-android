@@ -12,10 +12,10 @@ import android.graphics.PorterDuffXfermode
 import au.com.shiftyjelly.pocketcasts.ui.R
 import au.com.shiftyjelly.pocketcasts.ui.extensions.getThemeColor
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
-import coil.size.Size
-import coil.transform.Transformation
+import coil3.size.Size
+import coil3.transform.Transformation
 
-class ThemedImageTintTransformation(context: Context) : Transformation {
+class ThemedImageTintTransformation(context: Context) : Transformation() {
     private val isActive = Theme.isImageTintEnabled(context)
     private val themeTag = Theme.imageTintThemeTag(context)
 
@@ -32,7 +32,7 @@ class ThemedImageTintTransformation(context: Context) : Transformation {
         return id.hashCode()
     }
 
-    override suspend fun transform(input: Bitmap, size: Size): Bitmap {
+    override suspend fun transform(input: coil3.Bitmap, size: Size): coil3.Bitmap {
         val result = Bitmap.createBitmap(input.width, input.height, Bitmap.Config.ARGB_8888)
         if (!isActive) return input
 

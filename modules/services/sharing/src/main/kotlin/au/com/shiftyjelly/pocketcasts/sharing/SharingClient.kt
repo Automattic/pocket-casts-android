@@ -15,7 +15,6 @@ import android.graphics.Bitmap
 import android.os.Build
 import androidx.annotation.StringRes
 import androidx.core.content.getSystemService
-import androidx.core.graphics.drawable.toBitmap
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.deeplink.ReferralsDeepLink
@@ -36,8 +35,9 @@ import au.com.shiftyjelly.pocketcasts.sharing.SocialPlatform.WhatsApp
 import au.com.shiftyjelly.pocketcasts.sharing.SocialPlatform.X
 import au.com.shiftyjelly.pocketcasts.utils.FileUtil
 import au.com.shiftyjelly.pocketcasts.utils.toSecondsWithSingleMilli
-import coil.executeBlocking
-import coil.imageLoader
+import coil3.executeBlocking
+import coil3.imageLoader
+import coil3.toBitmap
 import java.io.File
 import java.io.FileOutputStream
 import java.time.Year
@@ -332,7 +332,7 @@ class SharingClient(
             val coverUri = withContext(Dispatchers.IO) {
                 runCatching {
                     val request = imageRequestFactory.create(podcast)
-                    context.imageLoader.executeBlocking(request).drawable?.toBitmap()?.let { bitmap ->
+                    context.imageLoader.executeBlocking(request).image?.toBitmap()?.let { bitmap ->
                         val imageFile = File(context.cacheDir, "share_podcast_thumbnail.jpg")
                         FileOutputStream(imageFile).use { bitmap.compress(Bitmap.CompressFormat.JPEG, 100, it) }
                         FileUtil.getUriForFile(context, imageFile)

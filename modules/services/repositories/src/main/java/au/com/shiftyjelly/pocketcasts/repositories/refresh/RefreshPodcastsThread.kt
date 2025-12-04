@@ -13,7 +13,6 @@ import androidx.core.app.ActivityCompat
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import androidx.core.content.ContextCompat
-import androidx.core.graphics.drawable.toBitmap
 import androidx.core.text.HtmlCompat
 import androidx.work.ListenableWorker
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
@@ -55,8 +54,9 @@ import au.com.shiftyjelly.pocketcasts.utils.AppPlatform
 import au.com.shiftyjelly.pocketcasts.utils.Network
 import au.com.shiftyjelly.pocketcasts.utils.Util
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
-import coil.executeBlocking
-import coil.imageLoader
+import coil3.executeBlocking
+import coil3.imageLoader
+import coil3.toBitmap
 import dagger.hilt.EntryPoint
 import dagger.hilt.EntryPoints
 import dagger.hilt.InstallIn
@@ -667,7 +667,7 @@ class RefreshPodcastsThread(
             val podcast = podcastManager.findPodcastByUuidBlocking(uuid) ?: return null
 
             val imageRequest = PocketCastsImageRequestFactory(context, isDarkTheme = true, size = 400).create(podcast)
-            return context.imageLoader.executeBlocking(imageRequest).drawable?.toBitmap()
+            return context.imageLoader.executeBlocking(imageRequest).image?.toBitmap()
         }
 
         private fun getPodcastNotificationBitmap(uuid: String?, podcastManager: PodcastManager, context: Context): Bitmap? {
@@ -680,7 +680,7 @@ class RefreshPodcastsThread(
             val width = resources.getDimension(android.R.dimen.notification_large_icon_width).toInt()
 
             val imageRequest = PocketCastsImageRequestFactory(context, isDarkTheme = true, size = width).create(podcast)
-            return context.imageLoader.executeBlocking(imageRequest).drawable?.toBitmap()
+            return context.imageLoader.executeBlocking(imageRequest).image?.toBitmap()
         }
 
         private fun getEpisodeNotificationBitmap(episode: PodcastEpisode, settings: Settings, context: Context): Bitmap? {
@@ -688,7 +688,7 @@ class RefreshPodcastsThread(
             val width = resources.getDimension(android.R.dimen.notification_large_icon_width).toInt()
 
             val imageRequest = PocketCastsImageRequestFactory(context, isDarkTheme = true, size = width).create(episode, settings.artworkConfiguration.value.useEpisodeArtwork)
-            return context.imageLoader.executeBlocking(imageRequest).drawable?.toBitmap()
+            return context.imageLoader.executeBlocking(imageRequest).image?.toBitmap()
         }
 
         private fun formatNotificationLine(podcastName: String?, episodeName: String?, context: Context): CharSequence {

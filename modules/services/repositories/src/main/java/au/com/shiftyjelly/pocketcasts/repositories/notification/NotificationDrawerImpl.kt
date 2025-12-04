@@ -11,7 +11,6 @@ import android.support.v4.media.session.PlaybackStateCompat.ACTION_SKIP_TO_NEXT
 import android.support.v4.media.session.PlaybackStateCompat.ACTION_SKIP_TO_PREVIOUS
 import android.support.v4.media.session.PlaybackStateCompat.ACTION_STOP
 import androidx.core.app.NotificationCompat
-import androidx.core.graphics.drawable.toBitmap
 import androidx.media.app.NotificationCompat.MediaStyle
 import androidx.media.session.MediaButtonReceiver
 import au.com.shiftyjelly.pocketcasts.models.entity.BaseEpisode
@@ -23,8 +22,11 @@ import au.com.shiftyjelly.pocketcasts.repositories.images.PocketCastsImageReques
 import au.com.shiftyjelly.pocketcasts.repositories.images.PocketCastsImageRequestFactory.PlaceholderType
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
-import coil.executeBlocking
-import coil.imageLoader
+import coil3.executeBlocking
+import coil3.imageLoader
+import coil3.request.ErrorResult
+import coil3.request.SuccessResult
+import coil3.toBitmap
 import dagger.hilt.android.qualifiers.ApplicationContext
 import javax.inject.Inject
 import kotlinx.coroutines.runBlocking
@@ -90,12 +92,18 @@ class NotificationDrawerImpl @Inject constructor(
 
     private fun loadArtwork(episode: BaseEpisode, useEpisodeArtwork: Boolean): Bitmap? {
         val request = imageRequestFactory.create(episode, useEpisodeArtwork)
-        return context.imageLoader.executeBlocking(request).drawable?.toBitmap() ?: loadPlaceholderBitmap()
+        return when (val result = context.imageLoader.executeBlocking(request)) {
+            is SuccessResult -> result.image.toBitmap()
+            is ErrorResult -> loadPlaceholderBitmap()
+        }
     }
 
     private fun loadPlaceholderBitmap(): Bitmap? {
         val request = imageRequestFactory.createForPodcast(podcastUuid = null)
-        return context.imageLoader.executeBlocking(request).drawable?.toBitmap()
+        return when (val result = context.imageLoader.executeBlocking(request)) {
+            is SuccessResult -> result.image.toBitmap()
+            is ErrorResult -> null
+        }
     }
 
     private fun getNotificationData(episodeUuid: String?, useEpisodeArtwork: Boolean): NotificationData {
