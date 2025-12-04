@@ -19,6 +19,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.WhileSubscribed
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.reactive.asFlow
@@ -40,7 +41,7 @@ class PlaylistsViewModel @Inject constructor(
     internal val uiState = combine(
         playlistManager.playlistPreviewsFlow(),
         settings.showPlaylistsOnboarding.flow,
-        showFreeAccountBanner,
+        showFreeAccountBanner.onStart { emit(false) },
         settings.showPremadePlaylistsTooltip.flow,
         settings.showRearrangePlaylistsTooltip.flow,
         settings.bottomInset,
