@@ -139,7 +139,10 @@ class AppLifecycleObserver(
                     settings.autoPlayNextEpisodeOnEmpty.set(true, updateModifiedAt = false)
 
                     // For new users we want to auto download on follow podcast by default
-                    settings.autoDownloadOnFollowPodcast.set(true, updateModifiedAt = false)
+                    // If condition is a solution for development initialization scripts. Internal-ref: p1764840798661999/1764122715.191139-slack-C028JAG44VD
+                    if (!settings.contains(settings.autoDownloadOnFollowPodcast.sharedPrefKey)) {
+                        settings.autoDownloadOnFollowPodcast.set(true, updateModifiedAt = false)
+                    }
 
                     // For new users we want to enable all notifications by default
                     settings.notifyRefreshPodcast.set(true, updateModifiedAt = false)
