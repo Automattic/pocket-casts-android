@@ -10,8 +10,8 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.wear.compose.material.ButtonColors
 import androidx.wear.compose.material.ButtonDefaults
-import com.google.android.horologist.media.ui.R
 import com.google.android.horologist.media.ui.components.controls.MediaButton
+import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 @Composable
 fun PauseButtonStyled(
@@ -25,7 +25,7 @@ fun PauseButtonStyled(
     MediaButton(
         onClick = onClick,
         icon = icon,
-        contentDescription = stringResource(id = R.string.horologist_pause_button_content_description),
+        contentDescription = stringResource(id = LR.string.pause),
         modifier = modifier,
         enabled = enabled,
         colors = colors,

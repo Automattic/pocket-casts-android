@@ -4,13 +4,13 @@ import app.cash.turbine.test
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
+import au.com.shiftyjelly.pocketcasts.analytics.TrackedEvent
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.preferences.UserSetting
 import au.com.shiftyjelly.pocketcasts.preferences.model.ArtworkConfiguration
 import au.com.shiftyjelly.pocketcasts.reimagine.FakeTracker
-import au.com.shiftyjelly.pocketcasts.reimagine.TrackEvent
 import au.com.shiftyjelly.pocketcasts.reimagine.timestamp.ShareEpisodeTimestampViewModel.UiState
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
@@ -57,7 +57,7 @@ class ShareEpisodeTimestampViewModelTest {
             episodeManager,
             podcastManager,
             settings,
-            AnalyticsTracker.test(tracker, isFirstPartyEnabled = true),
+            AnalyticsTracker.test(tracker),
         )
     }
 
@@ -82,7 +82,7 @@ class ShareEpisodeTimestampViewModelTest {
         val event = tracker.events.last()
 
         assertEquals(
-            TrackEvent(
+            TrackedEvent(
                 AnalyticsEvent.SHARE_SCREEN_SHOWN,
                 mapOf(
                     "type" to "episode_timestamp",

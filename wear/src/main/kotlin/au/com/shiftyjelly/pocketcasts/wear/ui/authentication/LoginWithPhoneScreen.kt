@@ -14,7 +14,7 @@ import androidx.wear.compose.material.Text
 import au.com.shiftyjelly.pocketcasts.BuildConfig
 import com.google.android.horologist.compose.layout.ScalingLazyColumn
 import com.google.android.horologist.compose.layout.ScreenScaffold
-import com.google.android.horologist.compose.layout.rememberColumnState
+import com.google.android.horologist.compose.layout.rememberResponsiveColumnState
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 @Composable
@@ -22,7 +22,7 @@ fun LoginWithPhoneScreen(
     onLoginClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    val columnState = rememberColumnState()
+    val columnState = rememberResponsiveColumnState()
 
     ScreenScaffold(
         scrollState = columnState,

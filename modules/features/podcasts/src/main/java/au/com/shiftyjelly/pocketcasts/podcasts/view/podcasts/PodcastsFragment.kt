@@ -726,6 +726,7 @@ class PodcastsFragment :
                 PodcastGridLayoutType.LARGE_ARTWORK, PodcastGridLayoutType.SMALL_ARTWORK -> {
                     outRect.set(gridItemPadding, gridItemPadding, gridItemPadding, gridItemPadding)
                 }
+
                 PodcastGridLayoutType.LIST_VIEW -> Unit
             }
         }

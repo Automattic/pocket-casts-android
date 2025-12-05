@@ -34,8 +34,6 @@ import au.com.shiftyjelly.pocketcasts.repositories.di.DefaultDispatcher
 import au.com.shiftyjelly.pocketcasts.repositories.playlist.PlaylistManager.Companion.MANUAL_PLAYLIST_EPISODE_LIMIT
 import au.com.shiftyjelly.pocketcasts.repositories.playlist.PlaylistManager.Companion.PLAYLIST_ARTWORK_EPISODE_LIMIT
 import au.com.shiftyjelly.pocketcasts.repositories.playlist.PlaylistManager.Companion.SMART_PLAYLIST_EPISODE_LIMIT
-import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
-import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import java.time.Clock
 import java.util.UUID
 import java.util.concurrent.ConcurrentHashMap
@@ -91,9 +89,7 @@ class PlaylistManagerImpl(
     override fun playlistPreviewsFlow(): Flow<List<PlaylistPreview>> {
         return playlistDao.allPlaylistsFlow().map { playlists ->
             withContext(computationContext) {
-                playlists
-                    .map { playlist -> playlist.toPlaylistPreview() }
-                    .distinctBy { it.uuid }
+                playlists.map { playlist -> playlist.toPlaylistPreview() }
             }
         }
     }
@@ -164,15 +160,7 @@ class PlaylistManagerImpl(
         return appDatabase.withTransaction {
             val playlists = playlistDao.getAllAutoDownloadPlaylists()
             withContext(computationContext) {
-                val useManual = FeatureFlag.isEnabled(Feature.PLAYLISTS_REBRANDING, immutable = true)
                 playlists
-                    .let { playlists ->
-                        if (useManual) {
-                            playlists
-                        } else {
-                            playlists.filterNot(PlaylistEntity::manual)
-                        }
-                    }
                     .flatMap { playlist ->
                         val playlistFlow = if (playlist.manual) {
                             manualPlaylistFlow(playlist.uuid)
@@ -310,6 +298,7 @@ class PlaylistManagerImpl(
     override suspend fun createManualPlaylist(name: String): String {
         return createPlaylist(
             entity = PlaylistEntity(
+                uuid = "", // It's safe to set an empty UUID here because we generate one in createPlaylist()
                 title = name,
                 manual = true,
                 sortType = PlaylistEpisodeSortType.DragAndDrop,
@@ -384,9 +373,7 @@ class PlaylistManagerImpl(
     }
 
     override fun playlistPreviewsForEpisodeFlow(episodeUuid: String, searchTerm: String?): Flow<List<PlaylistPreviewForEpisode>> {
-        return playlistDao
-            .playlistPreviewsForEpisodeFlow(episodeUuid, searchTerm.orEmpty())
-            .map { playlists -> playlists.distinctBy { it.uuid } }
+        return playlistDao.playlistPreviewsForEpisodeFlow(episodeUuid, searchTerm.orEmpty())
     }
 
     override suspend fun getManualEpisodeSources(searchTerm: String?): List<ManualPlaylistEpisodeSource> {
@@ -580,7 +567,6 @@ private fun SmartPlaylistDraft.toPlaylistEntity() = PlaylistEntity(
     },
     sortPosition = 1,
     manual = false,
-    draft = false,
     deleted = false,
     syncStatus = SYNC_STATUS_NOT_SYNCED,
 ).applySmartRules(rules)

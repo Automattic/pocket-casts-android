@@ -41,16 +41,23 @@ internal class FragmentTransactionHandler(
         @Suppress("UNUSED_VARIABLE") // val exhaustWhen is just used to help us remember to add the when if a new command is added
         val exhaustWhen = when (command) {
             is AddAndShow -> addAndShowFragment(command.fragment, command.tag, runnable)
+
             is AddOnTop -> addOnTop(command.fragment, command.tag, runnable)
+
             is ShowExisting -> showFragment(command.tag, runnable)
+
             is ShowAndRemove -> showAndRemoveFragment(
                 command.showTag,
                 command.removeTag,
                 runnable,
             )
+
             is Clear -> clear(runnable)
+
             is RemoveAllAndAdd -> removeAllAndAdd(command.remove, command.add.fragment, command.add.tag, runnable)
+
             is RemoveAllAndShowExisting -> removeAllAndShow(command.remove, command.show.tag, runnable)
+
             is RemoveUnknown -> removeUnknown(command, runnable)
         }
     }

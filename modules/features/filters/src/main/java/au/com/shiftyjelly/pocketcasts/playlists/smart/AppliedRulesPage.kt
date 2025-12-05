@@ -93,6 +93,7 @@ internal fun AppliedRulesPage(
                         rules = activeRules,
                         starredEpisodeCount = starredEpisodeCount,
                         appliedRules = appliedRules,
+                        showHeader = onCreatePlaylist == null,
                         onClickRule = onClickRule,
                     )
                 }
@@ -183,18 +184,21 @@ private fun ActiveRulesContent(
     rules: List<RuleType>,
     appliedRules: AppliedRules,
     starredEpisodeCount: Int,
+    showHeader: Boolean,
     onClickRule: (RuleType) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Column(
         modifier = modifier.padding(horizontal = 16.dp),
     ) {
-        TextH20(
-            text = stringResource(LR.string.enabled_rules),
-        )
-        Spacer(
-            modifier = Modifier.height(16.dp),
-        )
+        if (showHeader) {
+            TextH20(
+                text = stringResource(LR.string.enabled_rules),
+            )
+            Spacer(
+                modifier = Modifier.height(16.dp),
+            )
+        }
         AppliedRulesColumn(
             rules = rules,
             appliedRules = appliedRules,
@@ -227,7 +231,7 @@ private fun InactiveRulesContent(
                 .semantics(true) {},
         ) {
             TextH20(
-                text = stringResource(LR.string.other_options),
+                text = stringResource(LR.string.more_rules),
             )
             Spacer(
                 modifier = Modifier.weight(1f),

@@ -296,7 +296,6 @@ class PlaylistManagerDsl : TestWatcher() {
         val id = "playlist-id-$index"
         return builder(
             PlaylistEntity(
-                id = index.toLong() + 1,
                 uuid = id,
                 title = "Playlist title $index",
             ),
@@ -307,7 +306,6 @@ class PlaylistManagerDsl : TestWatcher() {
         val id = "playlist-id-$index"
         return builder(
             PlaylistEntity(
-                id = index.toLong() + 1,
                 uuid = id,
                 title = "Playlist title $index",
                 sortType = PlaylistEpisodeSortType.DragAndDrop,

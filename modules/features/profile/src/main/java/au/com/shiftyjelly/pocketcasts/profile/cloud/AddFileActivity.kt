@@ -6,7 +6,6 @@ import android.content.Context
 import android.content.Intent
 import android.content.res.ColorStateList
 import android.graphics.Bitmap
-import android.graphics.drawable.Drawable
 import android.net.Uri
 import android.os.Bundle
 import android.provider.MediaStore
@@ -21,7 +20,6 @@ import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
 import androidx.core.content.IntentCompat
-import androidx.core.graphics.drawable.toBitmap
 import androidx.core.view.isVisible
 import androidx.media3.common.MediaItem
 import androidx.media3.common.Player
@@ -61,9 +59,11 @@ import au.com.shiftyjelly.pocketcasts.views.extensions.setSystemWindowInsetToPad
 import au.com.shiftyjelly.pocketcasts.views.extensions.setup
 import au.com.shiftyjelly.pocketcasts.views.helper.NavigationIcon
 import au.com.shiftyjelly.pocketcasts.views.helper.UiUtil
-import coil.imageLoader
-import coil.request.ImageRequest
-import coil.target.Target
+import coil3.Image
+import coil3.imageLoader
+import coil3.request.ImageRequest
+import coil3.target.Target
+import coil3.toBitmap
 import dagger.hilt.android.AndroidEntryPoint
 import java.io.File
 import java.io.FileOutputStream
@@ -420,11 +420,11 @@ class AddFileActivity :
 
     private fun loadImageFromUri(uri: Uri, isFile: Boolean = false) {
         val target = object : Target {
-            override fun onError(error: Drawable?) {
+            override fun onError(error: Image?) {
                 clearImageView()
             }
 
-            override fun onSuccess(result: Drawable) {
+            override fun onSuccess(result: Image) {
                 binding.btnImage.text = getString(LR.string.profile_files_remove_image)
                 bitmap = result.toBitmap()
                 binding.imgFileArtwork.setImageBitmap(bitmap)
@@ -472,6 +472,7 @@ class AddFileActivity :
                 saveFile()
                 true
             }
+
             else -> false
         }
     }

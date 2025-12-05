@@ -108,7 +108,6 @@ import au.com.shiftyjelly.pocketcasts.discover.view.PodcastListFragment
 import au.com.shiftyjelly.pocketcasts.endofyear.StoriesActivity
 import au.com.shiftyjelly.pocketcasts.endofyear.StoriesActivity.StoriesSource
 import au.com.shiftyjelly.pocketcasts.endofyear.ui.EndOfYearLaunchBottomSheet
-import au.com.shiftyjelly.pocketcasts.filters.FiltersFragment
 import au.com.shiftyjelly.pocketcasts.localization.helper.LocaliseHelper
 import au.com.shiftyjelly.pocketcasts.models.entity.Podcast
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
@@ -157,7 +156,6 @@ import au.com.shiftyjelly.pocketcasts.repositories.playback.UpNextSource
 import au.com.shiftyjelly.pocketcasts.repositories.playlist.Playlist
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
-import au.com.shiftyjelly.pocketcasts.repositories.podcast.SmartPlaylistManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.UserEpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.refresh.RefreshPodcastsTask
 import au.com.shiftyjelly.pocketcasts.repositories.sync.SyncManager
@@ -257,9 +255,6 @@ class MainActivity :
 
     @Inject
     lateinit var podcastManager: PodcastManager
-
-    @Inject
-    lateinit var smartPlaylistManager: SmartPlaylistManager
 
     @Inject
     lateinit var episodeManager: EpisodeManager
@@ -393,6 +388,7 @@ class MainActivity :
                         .show()
                 }
             }
+
             else -> Unit
         }
     }
@@ -477,12 +473,7 @@ class MainActivity :
             }
         }
 
-        val menuId = if (FeatureFlag.isEnabled(Feature.PLAYLISTS_REBRANDING, immutable = true)) {
-            VR.menu.navigation_playlists
-        } else {
-            VR.menu.navigation
-        }
-        binding.bottomNavigation.inflateMenu(menuId)
+        binding.bottomNavigation.inflateMenu(VR.menu.navigation)
 
         lifecycleScope.launch {
             lifecycle.repeatOnLifecycle(Lifecycle.State.CREATED) {
@@ -501,14 +492,7 @@ class MainActivity :
         var selectedTab = settings.selectedTab()
         val tabs = buildMap {
             put(VR.id.navigation_podcasts) { FragmentInfo(PodcastsFragment(), true) }
-            put(VR.id.navigation_filters) {
-                val fragment = if (FeatureFlag.isEnabled(Feature.PLAYLISTS_REBRANDING, immutable = true)) {
-                    PlaylistsFragment()
-                } else {
-                    FiltersFragment()
-                }
-                FragmentInfo(fragment, true)
-            }
+            put(VR.id.navigation_filters) { FragmentInfo(PlaylistsFragment(), true) }
             put(VR.id.navigation_discover) { FragmentInfo(DiscoverFragment(), false) }
             put(VR.id.navigation_profile) { FragmentInfo(ProfileFragment(), true) }
             put(VR.id.navigation_upnext) {
@@ -1046,6 +1030,7 @@ class MainActivity :
                 viewModel.navigationState.collect { navigationState ->
                     when (navigationState) {
                         is NavigationState.BookmarksForCurrentlyPlaying -> showPlayerBookmarks()
+
                         is NavigationState.BookmarksForPodcastEpisode -> {
                             // Once episode container fragment is shown, bookmarks tab is shown from inside it based on the new source
                             openEpisodeDialog(
@@ -1484,25 +1469,10 @@ class MainActivity :
                 }
 
                 is ShowPlaylistDeepLink -> {
-                    if (FeatureFlag.isEnabled(Feature.PLAYLISTS_REBRANDING, immutable = true)) {
-                        val type = Playlist.Type.fromValue(deepLink.playlistType) ?: return
-                        closePlayer()
-                        openTab(VR.id.navigation_filters)
-                        addFragment(PlaylistFragment.newInstance(deepLink.playlistUuid, type))
-                    } else {
-                        launch(Dispatchers.Default) {
-                            smartPlaylistManager.findByUuid(deepLink.playlistUuid)?.let {
-                                withContext(Dispatchers.Main) {
-                                    settings.setSelectedFilter(it.uuid)
-                                    // HACK: Go diving to find if a filter fragment
-                                    closePlayer()
-                                    openTab(VR.id.navigation_filters)
-                                    val filtersFragment = supportFragmentManager.fragments.find { it is FiltersFragment } as? FiltersFragment
-                                    filtersFragment?.openPlaylist(it)
-                                }
-                            }
-                        }
-                    }
+                    val type = Playlist.Type.fromValue(deepLink.playlistType) ?: return
+                    closePlayer()
+                    openTab(VR.id.navigation_filters)
+                    addFragment(PlaylistFragment.newInstance(deepLink.playlistUuid, type))
                 }
 
                 is CreateAccountDeepLink -> {
@@ -1854,10 +1824,15 @@ class MainActivity :
     private fun trackTabOpened(tab: Int, isInitial: Boolean = false) {
         val event: AnalyticsEvent? = when (tab) {
             VR.id.navigation_podcasts -> AnalyticsEvent.PODCASTS_TAB_OPENED
+
             VR.id.navigation_upnext -> AnalyticsEvent.UP_NEXT_TAB_OPENED
+
             VR.id.navigation_filters -> AnalyticsEvent.FILTERS_TAB_OPENED
+
             VR.id.navigation_discover -> AnalyticsEvent.DISCOVER_TAB_OPENED
+
             VR.id.navigation_profile -> AnalyticsEvent.PROFILE_TAB_OPENED
+
             else -> {
                 Timber.e("Can't open invalid tab")
                 null

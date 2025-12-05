@@ -63,6 +63,7 @@ internal fun SharePodcastPage(
             listener = listener,
             snackbarHostState = snackbarHostState,
         )
+
         else -> VerticalSharePodcastPage(
             podcast = podcast,
             episodeCount = episodeCount,

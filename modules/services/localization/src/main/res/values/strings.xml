@@ -111,6 +111,7 @@
     <string name="sign_out">Sign out</string>
     <string name="skip_back">Skip back</string>
     <string name="skip_forward">Skip forward</string>
+    <string name="set_volume">Set volume</string>
     <string name="slumber_studios" translatable="false">Slumber&#160;Studios</string>
     <string name="sort_by">Sort by</string>
     <string name="star">Star</string>
@@ -233,7 +234,6 @@
     <string name="ad_report_reason_other">Other</string>
     <string name="banner_ad_plus_prompt">Say goodbye to banner ads and more with Pocket Casts Plus</string>
     <string name="ad_report_confirmation">You reported this ad.</string>
-    <string name="other_options">Other options</string>
     <string name="add_episodes">Add episodes</string>
     <string name="your_podcasts">Your podcasts</string>
     <string name="unavailable">Unavailable</string>
@@ -392,7 +392,9 @@
     <string name="player_full_screen">Full screen</string>
     <string name="player_more_actions">More actions</string>
     <string name="player_notification_skip_back">Back %d secs</string>
+    <string name="player_notification_skip_back_seconds">Back %d seconds</string>
     <string name="player_notification_skip_forward">Forward %d secs</string>
+    <string name="player_notification_skip_forward_seconds">Forward %d seconds</string>
     <string name="player_pip">Enter Picture-in-picture</string>
     <string name="player_sleep_15_minutes">15 minutes</string>
     <string name="player_sleep_30_minutes">30 minutes</string>
@@ -727,7 +729,6 @@
     <string name="podcast_unsubscribe_downloaded_file_singular">1 Downloaded File</string>
     <string name="podcast_unsubscribe_downloaded_file_plural">%d Downloaded Files</string>
     <string name="podcast_unsubscribe_warning">Unfollowing will delete all downloaded files.</string>
-    <string name="podcast_not_in_filters">Not included in any filters</string>
     <string name="podcast_included_in_filters">Included in %s</string>
     <string name="podcast_effects_summary_speed">Speed %s×</string>
     <string name="podcast_effects_summary_trim_silence_on">trim silence on</string>
@@ -881,65 +882,24 @@
 
     <!-- Filters -->
 
-    <string name="filters">Filters</string>
-    <string name="episode_filters">Episode Filters</string>
-    <string name="filters_all_your_podcasts">All your podcasts</string>
-    <string name="filters_auto_download_limit" translatable="false">@string/episodes_plural</string>
-    <string name="filters_chip_episode_status">Episode Status</string>
-    <string name="filters_chip_all_your_podcasts">All Your Podcasts</string>
-    <string name="filters_chip_download_status">Download Status</string>
-    <string name="filters_chip_media_type">Media Type</string>
+    <string name="filters_chip_episode_status">Episode status</string>
+    <string name="filters_chip_download_status">Download status</string>
+    <string name="filters_chip_media_type">Media type</string>
     <string name="filters_chip_starred" translatable="false">@string/starred</string>
     <string name="filters_choose_podcasts">Choose podcasts</string>
-    <string name="filters_chosen_none">None selected</string>
-    <string name="filters_chosen_plural">%d filters chosen</string>
-    <string name="filters_chosen_singular">1 filter chosen</string>
-    <string name="filters_create">Create</string>
-    <string name="filters_create_add_more">Add more criteria to finish refining your filter.</string>
-    <string name="filters_create_auto_download" translatable="false">@string/auto_download</string>
-    <string name="filters_create_colour_icon">COLOR &amp; ICON</string>
-    <string name="filters_create_filter">Create filter</string>
-    <string name="filters_create_filter_by">FILTER BY</string>
-    <string name="filters_create_filter_details">Filter details</string>
-    <string name="filters_create_name">NAME</string>
-    <string name="filters_filter_name">Playlist Name</string>
+    <string name="filters_filter_name">Playlist name</string>
     <string name="filters_create_options">Filter options</string>
     <string name="filters_create_save_filter">Save filter</string>
     <string name="filters_create_select_criteria">Select your filter criteria using these buttons to create an up to date smart playlist of episodes.</string>
     <string name="filters_download_first">First</string>
-    <string name="filters_download_limit_10">10 episodes</string>
-    <string name="filters_download_limit_100">100 episodes</string>
-    <string name="filters_download_limit_20">20 episodes</string>
-    <string name="filters_download_limit_40">40 episodes</string>
-    <string name="filters_download_limit_3">3 episodes</string>
-    <string name="filters_download_limit_5">5 episodes</string>
     <string name="filters_download_title">Auto download first</string>
-    <string name="filters_duration_error_body">Filtering for episodes longer than %1$dm but shorter than %2$dm would cause a rift in our space time continuum. Sorry.</string>
-    <string name="filters_duration_error_title">Yes, But No</string>
     <string name="filters_duration_longer_than">Longer than</string>
     <string name="filters_duration_shorter_than">Shorter than</string>
     <string name="filters_duration">Duration</string>
-    <string name="filters_episode_duration">Episode Duration</string>
+    <string name="filters_episode_duration">Episode duration</string>
     <string name="filters_filter_by_duration">Filter by duration</string>
-    <string name="filters_no_episodes">No Episodes Found</string>
-    <string name="filters_no_matching_episodes">The criteria you selected doesn&#x2019;t match any current episodes in your subscriptions.\n\nChoose different criteria, or save this filter if you think it will match episodes in the future.</string>
-    <string name="filters_no_matching_episodes_title">No Matching Episodes</string>
-    <string name="filters_not_found">No filters found</string>
+    <string name="filters_no_episodes">No episodes found</string>
     <string name="playlists_not_found">No playlists found</string>
-    <string name="filters_options_delete">Delete filter</string>
-    <string name="filters_options_download_all">Download all</string>
-    <string name="filters_options_play_all" translatable="false">@string/play_all</string>
-    <string name="filters_options_settings">Filter settings</string>
-    <string name="filters_options_sort_by">Sort By</string>
-    <string name="filters_play_all" translatable="false">@string/play_all</string>
-    <string name="filters_play_all_from_here_summary">This will clear your current Up Next queue and add all the following episodes.</string>
-    <string name="filters_play_all_summary">This will clear your current Up Next queue.</string>
-    <string name="filters_play_episodes">Play %d episodes</string>
-    <string name="filters_preview">PREVIEW</string>
-    <string name="filters_see_more_episodes">To see more episodes, try changing your filter settings.</string>
-    <string name="filters_update_filter">Update filter</string>
-    <string name="filters_stepper_minus">Minus</string>
-    <string name="filters_stepper_plus">Plus</string>
     <string name="filters_time_24_hours">Last 24 hours</string>
     <string name="filters_time_2_weeks">Last 2 weeks</string>
     <string name="filters_time_3_days">Last 3 days</string>
@@ -949,12 +909,7 @@
     <string name="filters_title_in_progress" translatable="false">@string/in_progress_uppercase</string>
     <string name="filters_title_new_releases">New Releases</string>
     <string name="filters_title_starred" translatable="false">@string/starred</string>
-    <string name="filters_warning_delete_button" translatable="false">@string/filters_options_delete</string>
-    <string name="filters_warning_delete_summary">This cannot be undone.</string>
-    <string name="filters_release_date">Release Date</string>
-    <string name="filters_download_options">Download Options</string>
-    <string name="filters_tooltip_title">Organize your episodes</string>
-    <string name="filters_tooltip_subtitle">Create smart filters to organize your episodes. Filter by duration, release date, media type, and more.</string>
+    <string name="filters_release_date">Release date</string>
 
     <!-- Playlists -->
 
@@ -998,6 +953,7 @@
     <string name="manual_playlist_search_no_podcast_title">No podcast found</string>
     <string name="manual_playlist_search_no_podcast_or_folder_body">We couldn’t find any podcast or folder for that search. Try another keyword.</string>
     <string name="manual_playlist_search_no_podcast_or_folder_title" translatable="false">@string/manual_playlist_search_no_podcast_title</string>
+    <string name="more_rules">More rules</string>
     <string name="new_playlist">New playlist</string>
     <string name="new_playlists_title_placeholder">Playlist’s name</string>
     <string name="new_smart_playlist_banner_body">Automatically add episodes based on rules</string>
@@ -1451,8 +1407,6 @@
     <string name="settings_auto_download_clear_errors">Clear all download errors</string>
     <string name="settings_auto_download_clearing_errors">Clearing all download errors</string>
     <string name="settings_auto_download_playlists">Auto download playlists</string>
-    <string name="settings_auto_download_filters">Auto download filters</string>
-    <string name="settings_auto_download_filters_episodes">All filter episodes</string>
     <string name="settings_auto_download_new_episodes">New episodes</string>
     <string name="settings_auto_download_on_follow_podcast">On Follow</string>
 
@@ -1493,7 +1447,6 @@
     <string name="settings_battery_update_message">Please tap the \"%s\" switch above to update your battery settings.</string>
     <string name="settings_battery_usage_message">Battery usage must be unrestricted to ensure uninterrupted playback when your screen is off.</string>
     <string name="settings_battery_learn_more_url" translatable="false">https://support.pocketcasts.com/article/playback-pausing-randomly-or-when-screen-is-locked/</string>
-    <string name="settings_select_filters">Select filters</string>
     <string name="settings_choose_podcasts">Choose podcasts</string>
     <string name="settings_choose_playlists">Choose playlists</string>
     <string name="settings_close_upgrade_offer">close upgrade offer</string>
@@ -1814,7 +1767,6 @@
     <string name="settings_status_service_refresh">Refresh Service</string>
     <string name="settings_status_service_refresh_summary">The service used to find new episodes.</string>
     <string name="settings_status_service_account">Account Service</string>
-    <string name="settings_status_service_account_summary">The service used to store episode progress, podcasts you follow, filters, etc.</string>
     <string name="settings_status_service_account_summary_2">The service used to store episode progress, podcasts you follow, playlists, etc.</string>
     <string name="settings_status_service_discover"><![CDATA[Discover & Search]]></string>
     <string name="settings_status_service_discover_summary">The discover section of the app, including podcast search.</string>
@@ -2600,8 +2552,6 @@
     <string name="encourage_account_banner_action_label">Create a free account</string>
     <string name="encourage_account_sync_banner_title">Your shows, on any device</string>
     <string name="encourage_account_sync_banner_description">Create a free account to sync your shows and listen anywhere.</string>
-    <string name="encourage_account_filters_banner_title">Keep your filters in sync</string>
-    <string name="encourage_account_filters_banner_description">Create a free account to sync your filters on any device.</string>
     <string name="encourage_account_playlists_banner_title">Keep your playlists in sync</string>
     <string name="encourage_account_playlists_banner_description">Create a free account to sync your playlists on any device.</string>
     <string name="encourage_account_history_banner_title">Keep track of what you’ve played</string>
@@ -2615,7 +2565,6 @@
     <string name="notification_up_next_title">Simplify your queue</string>
     <string name="notification_up_next_message">Build a playback queue and say goodbye to jumping around between episodes.</string>
     <string name="notification_filters_title">Organize your episodes</string>
-    <string name="notification_filters_message">Create smart filters to organize your episodes.</string>
     <string name="notification_filters_message_2">Create playlists to organize your episodes.</string>
     <string name="notification_themes_title">Time for a new look</string>
     <string name="notification_themes_message">Browse our themes and find the one that suits your style.</string>

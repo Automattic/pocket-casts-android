@@ -13,7 +13,6 @@ import au.com.shiftyjelly.pocketcasts.engage.EngageSdkBridge
 import au.com.shiftyjelly.pocketcasts.models.db.dao.UpNextDao
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodeStatusEnum
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
-import au.com.shiftyjelly.pocketcasts.repositories.appreview.AppReviewAnalyticsListener
 import au.com.shiftyjelly.pocketcasts.repositories.appreview.AppReviewExceptionHandler
 import au.com.shiftyjelly.pocketcasts.repositories.appreview.AppReviewManager
 import au.com.shiftyjelly.pocketcasts.repositories.di.ApplicationScope
@@ -46,8 +45,8 @@ import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBufferUncaughtExceptionHandler
 import au.com.shiftyjelly.pocketcasts.utils.log.RxJavaUncaughtExceptionHandling
 import au.com.shiftyjelly.pocketcasts.widget.PlayerWidgetManager
-import coil.Coil
-import coil.ImageLoader
+import coil3.ImageLoader
+import coil3.SingletonImageLoader
 import com.google.firebase.FirebaseApp
 import com.squareup.moshi.Moshi
 import dagger.hilt.android.HiltAndroidApp
@@ -138,8 +137,6 @@ class PocketCastsApplication :
 
     @Inject lateinit var appReviewManager: AppReviewManager
 
-    @Inject lateinit var appReviewAnalyticsListener: AppReviewAnalyticsListener
-
     @Inject lateinit var appReviewExceptionHandler: AppReviewExceptionHandler
 
     override fun onCreate() {
@@ -173,7 +170,6 @@ class PocketCastsApplication :
     private fun setupAnalytics() {
         analyticsTracker.clearAllData()
         analyticsTracker.refreshMetadata()
-        analyticsTracker.addListener(appReviewAnalyticsListener)
         downloadStatisticsReporter.setup()
         experimentProvider.initialize()
     }
@@ -215,7 +211,7 @@ class PocketCastsApplication :
             notificationManager.setupOffersNotifications()
             appLifecycleObserver.setup()
 
-            Coil.setImageLoader(coilImageLoader)
+            SingletonImageLoader.setSafe { coilImageLoader }
 
             withContext(Dispatchers.Default) {
                 playbackManager.setup()

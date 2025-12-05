@@ -46,6 +46,7 @@ dependencies {
     implementation(libs.androidx.palette)
     implementation(libs.androidx.preference.ktx)
     implementation(libs.coil)
+    implementation(libs.coil.network.okhttp)
     implementation(libs.compose.ui.graphics)
     implementation(libs.coroutines.core)
     implementation(libs.coroutines.rx2)

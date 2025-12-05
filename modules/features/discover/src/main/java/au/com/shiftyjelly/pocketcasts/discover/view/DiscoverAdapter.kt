@@ -93,10 +93,13 @@ import au.com.shiftyjelly.pocketcasts.views.extensions.hideRow
 import au.com.shiftyjelly.pocketcasts.views.extensions.show
 import au.com.shiftyjelly.pocketcasts.views.extensions.showIf
 import au.com.shiftyjelly.pocketcasts.views.extensions.showRow
-import coil.imageLoader
-import coil.load
-import coil.request.ImageRequest
-import coil.transform.CircleCropTransformation
+import coil3.asDrawable
+import coil3.imageLoader
+import coil3.load
+import coil3.request.ImageRequest
+import coil3.request.allowHardware
+import coil3.request.transformations
+import coil3.transform.CircleCropTransformation
 import io.reactivex.Flowable
 import io.reactivex.Single
 import io.reactivex.android.schedulers.AndroidSchedulers
@@ -109,7 +112,6 @@ import java.util.Locale
 import kotlin.math.ceil
 import kotlin.math.min
 import kotlinx.coroutines.MainScope
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 import timber.log.Timber
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
@@ -297,7 +299,9 @@ internal class DiscoverAdapter(
             override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
                 super.onScrollStateChanged(recyclerView, newState)
                 when (newState) {
-                    RecyclerView.SCROLL_STATE_SETTLING -> Unit // Do nothing
+                    RecyclerView.SCROLL_STATE_SETTLING -> Unit
+
+                    // Do nothing
                     RecyclerView.SCROLL_STATE_DRAGGING -> {
                         draggingStarted = true
                         autoScrollHelper?.stopAutoScrollTimer()
@@ -667,12 +671,19 @@ internal class DiscoverAdapter(
         val inflater = LayoutInflater.from(parent.context)
         return when (viewType) {
             R.layout.row_podcast_large_list -> LargeListViewHolder(RowPodcastLargeListBinding.inflate(inflater, parent, false))
+
             R.layout.row_podcast_large_list_with_podcast -> LargeListWithPodcastViewHolder(RowPodcastLargeListWithPodcastBinding.inflate(inflater, parent, false))
+
             R.layout.row_podcast_small_list -> SmallListViewHolder(RowPodcastSmallListBinding.inflate(inflater, parent, false))
+
             R.layout.row_carousel_list -> CarouselListViewHolder(RowCarouselListBinding.inflate(inflater, parent, false))
+
             R.layout.row_error -> ErrorViewHolder(RowErrorBinding.inflate(inflater, parent, false))
+
             R.layout.row_change_region -> ChangeRegionViewHolder(RowChangeRegionBinding.inflate(inflater, parent, false))
+
             R.layout.row_categories -> CategoriesViewHolder(RowCategoriesBinding.inflate(inflater, parent, false))
+
             R.layout.row_category_pills -> CategoryPillsViewHolder(
                 binding = RowCategoryPillsBinding.inflate(inflater, parent, false),
                 onSearchClick = listener::onClickSearch,
@@ -682,12 +693,19 @@ internal class DiscoverAdapter(
             )
 
             R.layout.row_most_popular_podcasts -> MostPopularPodcastsViewHolder(RowMostPopularPodcastsBinding.inflate(inflater, parent, false))
+
             R.layout.row_remaining_podcasts_by_category -> RemainingPodcastsByCategoryViewHolder(RowRemainingPodcastsByCategoryBinding.inflate(inflater, parent, false))
+
             R.layout.row_category_ad -> CategoryAdViewHolder(RowCategoryAdBinding.inflate(inflater, parent, false))
+
             R.layout.row_single_podcast -> SinglePodcastViewHolder(RowSinglePodcastBinding.inflate(inflater, parent, false))
+
             R.layout.row_single_episode -> SingleEpisodeViewHolder(RowSingleEpisodeBinding.inflate(inflater, parent, false))
+
             R.layout.row_collection_list_deprecated -> CollectionListDeprecatedViewHolder(RowCollectionListDeprecatedBinding.inflate(inflater, parent, false))
+
             R.layout.row_collection_list -> CollectionListViewHolder(RowCollectionListBinding.inflate(inflater, parent, false))
+
             else -> ErrorViewHolder(RowErrorBinding.inflate(inflater, parent, false))
         }
     }
@@ -696,10 +714,15 @@ internal class DiscoverAdapter(
         val row = getItem(position)
         return when (row) {
             is NetworkLoadableList -> row.adapterId
+
             is ChangeRegionRow -> 1L
+
             is MostPopularPodcastsByCategoryRow -> 2L
+
             is RemainingPodcastsByCategoryRow -> 3L
+
             is CategoryAdRow -> "CategoryAdRow${row.categoryId}".hashCode().toLong()
+
             else -> {
                 Timber.w("Discover adapter item id not found. Position: $position")
                 position.toLong()
@@ -715,10 +738,15 @@ internal class DiscoverAdapter(
                 if (row.type is ListType.PodcastList) {
                     return when (row.displayStyle) {
                         is DisplayStyle.Carousel -> R.layout.row_carousel_list
+
                         is DisplayStyle.LargeList -> R.layout.row_podcast_large_list
+
                         is DisplayStyle.LargeListWithPodcast -> R.layout.row_podcast_large_list_with_podcast
+
                         is DisplayStyle.SmallList -> R.layout.row_podcast_small_list
+
                         is DisplayStyle.SinglePodcast -> R.layout.row_single_podcast
+
                         is DisplayStyle.CollectionList ->
                             if (FeatureFlag.isEnabled(GUEST_LISTS_NETWORK_HIGHLIGHTS_REDESIGN)) R.layout.row_collection_list else R.layout.row_collection_list_deprecated
 
@@ -727,6 +755,7 @@ internal class DiscoverAdapter(
                 } else if (row.type is ListType.EpisodeList) {
                     return when (row.displayStyle) {
                         is DisplayStyle.SingleEpisode -> R.layout.row_single_episode
+
                         is DisplayStyle.CollectionList ->
                             if (FeatureFlag.isEnabled(GUEST_LISTS_NETWORK_HIGHLIGHTS_REDESIGN)) R.layout.row_collection_list else R.layout.row_collection_list_deprecated
 
@@ -1090,7 +1119,7 @@ internal class DiscoverAdapter(
             chip.text = row.region.name.tryToLocalise(resources)
             val context = chip.context
             val request = ImageRequest.Builder(context).data(row.region.flag).target {
-                chip.chipIcon = it
+                chip.chipIcon = it.asDrawable(resources)
             }.allowHardware(false).build()
             context.imageLoader.enqueue(request)
             chip.setOnClickListener { onChangeRegion?.invoke() }

@@ -49,8 +49,6 @@ import au.com.shiftyjelly.pocketcasts.podcasts.viewmodel.PodcastSettingsViewMode
 import au.com.shiftyjelly.pocketcasts.repositories.playlist.Playlist
 import au.com.shiftyjelly.pocketcasts.repositories.playlist.SmartPlaylistPreview
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme.ThemeType
-import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
-import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import kotlin.time.Duration.Companion.seconds
 import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
@@ -266,20 +264,10 @@ internal fun PodcastSettingsHomePage(
             )
         }
         if (uiState.playlists.isNotEmpty()) {
-            val usePlaylists = FeatureFlag.isEnabled(Feature.PLAYLISTS_REBRANDING, immutable = true)
-
             SettingRow(
-                primaryText = if (usePlaylists) {
-                    stringResource(LR.string.smart_playlists)
-                } else {
-                    stringResource(LR.string.filters)
-                },
+                primaryText = stringResource(LR.string.smart_playlists),
                 secondaryText = when (uiState.selectedPlaylists.size) {
-                    0 -> if (usePlaylists) {
-                        stringResource(LR.string.podcast_not_in_playlists)
-                    } else {
-                        stringResource(LR.string.podcast_not_in_filters)
-                    }
+                    0 -> stringResource(LR.string.podcast_not_in_playlists)
 
                     else -> {
                         val titles = remember(uiState.selectedPlaylists) {
@@ -288,11 +276,7 @@ internal fun PodcastSettingsHomePage(
                         stringResource(LR.string.podcast_included_in_filters, titles)
                     }
                 },
-                icon = if (usePlaylists) {
-                    painterResource(IR.drawable.ic_playlists)
-                } else {
-                    painterResource(IR.drawable.ic_filters)
-                },
+                icon = painterResource(IR.drawable.ic_playlists),
                 iconTint = iconTint,
                 modifier = Modifier.clickable(
                     role = Role.Button,
@@ -304,7 +288,7 @@ internal fun PodcastSettingsHomePage(
             modifier = Modifier.height(16.dp),
         )
         Box(
-            contentAlignment = Alignment.Companion.Center,
+            contentAlignment = Alignment.Center,
             modifier = Modifier
                 .fillMaxWidth()
                 .heightIn(min = 56.dp)

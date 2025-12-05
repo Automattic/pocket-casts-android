@@ -48,6 +48,7 @@ dependencies {
     implementation(libs.androidx.preference.ktx)
     implementation(libs.coil)
     implementation(libs.coil.compose)
+    implementation(libs.coil.network.okhttp)
     implementation(libs.compose.activity)
     implementation(libs.compose.animation)
     implementation(libs.compose.constraintlayout)

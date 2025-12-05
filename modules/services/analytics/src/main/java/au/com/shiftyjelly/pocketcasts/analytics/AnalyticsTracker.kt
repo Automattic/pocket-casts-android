@@ -1,26 +1,20 @@
 package au.com.shiftyjelly.pocketcasts.analytics
 
-import java.util.concurrent.CopyOnWriteArrayList
-
-open class AnalyticsTracker(
-    val trackers: List<Tracker>,
-    val isFirstPartyTrackingEnabled: () -> Boolean,
+class AnalyticsTracker(
+    private val trackers: Set<Tracker>,
+    private val listeners: Set<Listener>,
 ) {
-    private val listeners = CopyOnWriteArrayList<Listener>()
-
-    fun addListener(listener: Listener) {
-        listeners += listener
-    }
-
     fun track(event: AnalyticsEvent, properties: Map<String, Any> = emptyMap()) {
-        val isFirstPartyEnabled = isFirstPartyTrackingEnabled()
-        if (isFirstPartyEnabled) {
-            trackers.forEach { tracker ->
+        val trackedEvents = trackers.associate { tracker ->
+            val trackedEvent = if (tracker.shouldTrack(event)) {
                 tracker.track(event, properties)
+            } else {
+                null
             }
+            tracker.id to trackedEvent
         }
         listeners.forEach { listener ->
-            listener.onEvent(event, properties)
+            listener.onEvent(event, properties, trackedEvents)
         }
     }
 
@@ -256,10 +250,24 @@ open class AnalyticsTracker(
     }
 
     interface Listener {
-        fun onEvent(event: AnalyticsEvent, properties: Map<String, Any>)
+        fun onEvent(
+            event: AnalyticsEvent,
+            properties: Map<String, Any>,
+            trackedEvents: Map<String, TrackedEvent?>,
+        )
     }
 
     companion object {
-        fun test(vararg trackers: Tracker, isFirstPartyEnabled: Boolean = false) = AnalyticsTracker(trackers.toList(), { isFirstPartyEnabled })
+        fun test() = AnalyticsTracker(emptySet(), emptySet())
+
+        fun test(tracker: Tracker) = AnalyticsTracker(
+            trackers = setOf(tracker),
+            listeners = emptySet(),
+        )
+
+        fun test(listener: Listener) = AnalyticsTracker(
+            trackers = emptySet(),
+            listeners = setOf(listener),
+        )
     }
 }

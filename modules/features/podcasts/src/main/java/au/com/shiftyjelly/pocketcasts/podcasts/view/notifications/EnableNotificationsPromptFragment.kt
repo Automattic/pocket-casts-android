@@ -114,6 +114,7 @@ internal class EnableNotificationsPromptFragment : BaseDialogFragment() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             when {
                 PermissionChecker.checkSelfPermission(requireActivity(), Manifest.permission.POST_NOTIFICATIONS) == PermissionChecker.PERMISSION_GRANTED -> Unit
+
                 shouldShowRequestPermissionRationale(Manifest.permission.POST_NOTIFICATIONS) -> {
                     notificationHelper.openNotificationSettings(requireActivity())
                 }

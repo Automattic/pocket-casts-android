@@ -1,7 +1,6 @@
 package au.com.shiftyjelly.pocketcasts.widget.ui
 
 import android.graphics.Bitmap
-import android.graphics.drawable.Drawable
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -9,7 +8,6 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.unit.Dp
-import androidx.core.graphics.drawable.toBitmap
 import androidx.glance.GlanceModifier
 import androidx.glance.Image
 import androidx.glance.ImageProvider
@@ -23,7 +21,8 @@ import androidx.glance.semantics.semantics
 import androidx.glance.unit.ColorProvider
 import au.com.shiftyjelly.pocketcasts.repositories.images.PocketCastsImageRequestFactory
 import au.com.shiftyjelly.pocketcasts.widget.data.PlayerWidgetEpisode
-import coil.imageLoader
+import coil3.imageLoader
+import coil3.toBitmap
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
@@ -74,11 +73,10 @@ internal fun EpisodeImage(
                 cornerRadius = if (isSystemCornerRadiusSupported) 0 else 6,
             )
             val request = requestFactory.create(episode.toBaseEpisode(), useEpisodeArtwork)
-            var drawable: Drawable? = null
-            while (drawable == null) {
-                drawable = context.imageLoader.execute(request).drawable
+            val image = context.imageLoader.execute(request).image
+            episodeBitmap = withContext(Dispatchers.Default) {
+                image?.toBitmap()
             }
-            episodeBitmap = withContext(Dispatchers.Default) { drawable.toBitmap() }
         }
     }
 }

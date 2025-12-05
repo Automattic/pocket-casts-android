@@ -26,40 +26,49 @@ class TracksAnalyticsTracker @Inject constructor(
 ) : IdentifyingTracker(preferences),
     CoroutineScope {
     private val tracksClient: TracksClient? = TracksClient.getClient(appContext)
-    override val anonIdPrefKey: String = TRACKS_ANON_ID
-    override val coroutineContext: CoroutineContext = Dispatchers.IO
 
     private var predefinedEventProperties = emptyMap<String, Any>()
 
-    override fun track(event: AnalyticsEvent, properties: Map<String, Any>) {
-        if (tracksClient == null) return
+    override val anonIdPrefKey: String = TRACKS_ANON_ID
 
-        launch {
-            val eventKey = event.key
-            val user = userId ?: anonID ?: generateNewAnonID()
-            val userType = userId?.let {
-                TracksClient.NosaraUserType.POCKETCASTS
-            } ?: TracksClient.NosaraUserType.ANON
+    override val coroutineContext: CoroutineContext = Dispatchers.IO
 
-            /* Create the merged JSON Object of properties.
-            Properties defined by the user have precedence over the default ones pre-defined at "event level" */
-            val propertiesToJSON = JSONObject(properties)
-            predefinedEventProperties.forEach { (key, value) ->
-                if (propertiesToJSON.has(key)) {
-                    Timber.w("The user has defined a property named: '$key' that will override the same property pre-defined at event level. This may generate unexpected behavior!!")
-                    Timber.w("User value: ${propertiesToJSON.get(key)} - pre-defined value: $value")
-                } else {
-                    propertiesToJSON.put(key, value)
+    override val id get() = ID
+
+    override fun shouldTrack(event: AnalyticsEvent): Boolean {
+        return tracksClient != null && settings.collectAnalytics.value
+    }
+
+    override fun track(event: AnalyticsEvent, properties: Map<String, Any>): TrackedEvent {
+        if (tracksClient != null) {
+            launch {
+                val eventKey = event.key
+                val user = userId ?: anonID ?: generateNewAnonID()
+                val userType = userId?.let { TracksClient.NosaraUserType.POCKETCASTS } ?: TracksClient.NosaraUserType.ANON
+
+                // Create the merged JSON Object of properties.
+                // Properties defined by the user have precedence over the default ones pre-defined at "event level"
+                val propertiesToJSON = JSONObject(properties)
+                predefinedEventProperties.forEach { (key, value) ->
+                    if (propertiesToJSON.has(key)) {
+                        Timber.w("The user has defined a property named: '$key' that will override the same property pre-defined at event level. This may generate unexpected behavior!!")
+                        Timber.w("User value: ${propertiesToJSON.get(key)} - pre-defined value: $value")
+                    } else {
+                        propertiesToJSON.put(key, value)
+                    }
                 }
-            }
 
-            tracksClient.track(EVENTS_PREFIX + eventKey, propertiesToJSON, user, userType)
-            if (propertiesToJSON.length() > 0) {
-                Timber.tag("Tracks").i("\uD83D\uDD35 Tracked: $eventKey, Properties: $propertiesToJSON")
-            } else {
-                Timber.tag("Tracks").i("\uD83D\uDD35 Tracked: $eventKey")
+                tracksClient.track(EVENTS_PREFIX + eventKey, propertiesToJSON, user, userType)
             }
         }
+
+        val usedProperties = buildMap {
+            putAll(properties)
+            predefinedEventProperties.forEach { (key, value) ->
+                putIfAbsent(key, value)
+            }
+        }
+        return TrackedEvent(event, usedProperties)
     }
 
     private fun updatePredefinedEventProperties() {
@@ -136,6 +145,7 @@ class TracksAnalyticsTracker @Inject constructor(
     }
 
     companion object {
+        private const val ID = "Tracks"
         private const val TRACKS_ANON_ID = "nosara_tracks_anon_id"
         private const val EVENTS_PREFIX = "pcandroid_"
         const val INVALID_OR_NULL_VALUE = "none"

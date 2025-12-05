@@ -12,7 +12,6 @@ import android.support.v4.media.MediaDescriptionCompat.EXTRA_DOWNLOAD_STATUS
 import android.support.v4.media.MediaDescriptionCompat.STATUS_DOWNLOADED
 import android.support.v4.media.MediaDescriptionCompat.STATUS_NOT_DOWNLOADED
 import androidx.annotation.DrawableRes
-import androidx.core.graphics.drawable.toBitmap
 import androidx.core.net.toUri
 import androidx.core.os.bundleOf
 import androidx.media.utils.MediaConstants.DESCRIPTION_EXTRAS_KEY_COMPLETION_PERCENTAGE
@@ -39,10 +38,9 @@ import au.com.shiftyjelly.pocketcasts.repositories.playback.FOLDER_ROOT_PREFIX
 import au.com.shiftyjelly.pocketcasts.repositories.playlist.Playlist
 import au.com.shiftyjelly.pocketcasts.repositories.playlist.PlaylistPreview
 import au.com.shiftyjelly.pocketcasts.utils.Util
-import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
-import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
-import coil.executeBlocking
-import coil.imageLoader
+import coil3.executeBlocking
+import coil3.imageLoader
+import coil3.toBitmap
 import java.io.File
 import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
@@ -167,12 +165,12 @@ object AutoConverter {
         )
 
         val request = imageRequestFactory.create(episode, useEpisodeArtwork)
-        return context.imageLoader.executeBlocking(request).drawable?.toBitmap() ?: loadPlaceholderBitmap(imageRequestFactory, context)
+        return context.imageLoader.executeBlocking(request).image?.toBitmap() ?: loadPlaceholderBitmap(imageRequestFactory, context)
     }
 
     private fun loadPlaceholderBitmap(imageRequestFactory: PocketCastsImageRequestFactory, context: Context): Bitmap? {
         val request = imageRequestFactory.createForPodcast(podcastUuid = null)
-        return context.imageLoader.executeBlocking(request).drawable?.toBitmap()
+        return context.imageLoader.executeBlocking(request).image?.toBitmap()
     }
 
     private fun getBitmapUriForFolder(context: Context, folder: Folder?): Uri? {
@@ -196,24 +194,17 @@ object AutoConverter {
         val icon = playlist.icon
         val nonDefaultIcon = icon.takeIf { it.id != 0 }
 
-        val drawableId = if (FeatureFlag.isEnabled(Feature.PLAYLISTS_REBRANDING, immutable = true)) {
-            when (playlist.type) {
-                Playlist.Type.Manual -> if (Util.isAutomotive(context)) {
-                    IR.drawable.ic_automotive_playlist_manual
-                } else {
-                    IR.drawable.ic_auto_playlist_manual
-                }
-                Playlist.Type.Smart -> if (Util.isAutomotive(context)) {
-                    nonDefaultIcon?.automotiveDrawableId ?: IR.drawable.ic_automotive_playlist_smart
-                } else {
-                    nonDefaultIcon?.autoDrawableId ?: IR.drawable.ic_auto_playlist_smart
-                }
-            }
-        } else {
-            if (Util.isAutomotive(context)) {
-                icon.automotiveDrawableId
+        val drawableId = when (playlist.type) {
+            Playlist.Type.Manual -> if (Util.isAutomotive(context)) {
+                IR.drawable.ic_automotive_playlist_manual
             } else {
-                icon.autoDrawableId
+                IR.drawable.ic_auto_playlist_manual
+            }
+
+            Playlist.Type.Smart -> if (Util.isAutomotive(context)) {
+                nonDefaultIcon?.automotiveDrawableId ?: IR.drawable.ic_automotive_playlist_smart
+            } else {
+                nonDefaultIcon?.autoDrawableId ?: IR.drawable.ic_auto_playlist_smart
             }
         }
         return getBitmapUri(drawableId, context)

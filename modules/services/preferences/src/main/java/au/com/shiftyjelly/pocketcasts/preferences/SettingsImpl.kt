@@ -849,14 +849,6 @@ class SettingsImpl @Inject constructor(
         sharedPrefs = sharedPreferences,
     )
 
-    override fun selectedFilter(): String? {
-        return getString(Settings.PREFERENCE_SELECTED_FILTER, null)
-    }
-
-    override fun setSelectedFilter(filterUUID: String?) {
-        setString(Settings.PREFERENCE_SELECTED_FILTER, filterUUID, now = true)
-    }
-
     override fun setSelectedTab(selected: Int?) {
         if (selected != null) {
             setInt("selected_tab", selected)
@@ -992,6 +984,7 @@ class SettingsImpl @Inject constructor(
         fromString = { actionIdsString ->
             when (actionIdsString) {
                 "" -> NewEpisodeNotificationAction.DefaultValues
+
                 else -> actionIdsString.splitIgnoreEmpty(",").mapNotNull { actionIdString ->
                     NewEpisodeNotificationAction.entries.find { action ->
                         action.id.toString() == actionIdString
@@ -1011,6 +1004,7 @@ class SettingsImpl @Inject constructor(
         sharedPrefKey = "autoUpNextEmpty",
         defaultValue = when (Util.getAppPlatform(context)) {
             AppPlatform.Automotive -> true
+
             AppPlatform.Phone,
             AppPlatform.WearOs,
             -> false
@@ -1343,13 +1337,13 @@ class SettingsImpl @Inject constructor(
 
     override val collectAnalytics = UserSetting.BoolPref(
         sharedPrefKey = "SendUsageStatsKey",
-        defaultValue = BuildConfig.DATA_COLLECTION_DEFAULT_VALUE ?: true,
+        defaultValue = true,
         sharedPrefs = sharedPreferences,
     )
 
     override val sendCrashReports = UserSetting.BoolPref(
         sharedPrefKey = "SendCrashReportsKey",
-        defaultValue = BuildConfig.DATA_COLLECTION_DEFAULT_VALUE ?: true,
+        defaultValue = true,
         sharedPrefs = sharedPreferences,
     )
 

@@ -4,8 +4,8 @@ import org.junit.Assert.assertEquals
 import org.junit.Test
 
 class AnalyticsTrackerTest {
-    private val testTracker = TestTracker()
-    private val analyticsTracker = AnalyticsTracker.test(testTracker, isFirstPartyEnabled = true)
+    private val testTracker = FakeTracker()
+    private val analyticsTracker = AnalyticsTracker.test(testTracker)
 
     @Test
     fun trackBannerAdImpression() {
@@ -49,33 +49,34 @@ class AnalyticsTrackerTest {
             ),
         )
     }
+}
 
-    private class TestTracker : Tracker {
-        private val _events = mutableListOf<TrackEvent>()
+private class FakeTracker : Tracker {
+    private val _events = mutableListOf<TrackedEvent>()
 
-        val events get() = _events.toList()
+    val events get() = _events.toList()
 
-        override fun track(event: AnalyticsEvent, properties: Map<String, Any>) {
-            _events += TrackEvent(event, properties)
-        }
+    override val id get() = "fake_tracker"
 
-        override fun refreshMetadata() = Unit
+    override fun shouldTrack(event: AnalyticsEvent) = true
 
-        override fun flush() = Unit
-
-        override fun clearAllData() = Unit
+    override fun track(event: AnalyticsEvent, properties: Map<String, Any>): TrackedEvent {
+        val trackedEvent = TrackedEvent(event, properties)
+        _events += trackedEvent
+        return trackedEvent
     }
 
-    private data class TrackEvent(
-        val type: AnalyticsEvent,
-        val properties: Map<String, Any>,
-    ) {
-        fun assertType(type: AnalyticsEvent) {
-            assertEquals(type, this.type)
-        }
+    override fun refreshMetadata() = Unit
 
-        fun assertProperties(properties: Map<String, Any>) {
-            assertEquals(properties, this.properties)
-        }
-    }
+    override fun flush() = Unit
+
+    override fun clearAllData() = Unit
+}
+
+private fun TrackedEvent.assertType(type: AnalyticsEvent) {
+    assertEquals(type, this.key)
+}
+
+private fun TrackedEvent.assertProperties(properties: Map<String, Any>) {
+    assertEquals(properties, this.properties)
 }

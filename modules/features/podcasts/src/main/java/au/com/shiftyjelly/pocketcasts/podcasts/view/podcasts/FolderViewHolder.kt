@@ -56,6 +56,7 @@ class FolderViewHolder(
                             onClick = { onFolderClick(folder) },
                         )
                     }
+
                     else -> {
                         FolderGridAdapter(
                             color = color,

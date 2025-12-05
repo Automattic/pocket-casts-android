@@ -8,7 +8,7 @@ import androidx.recyclerview.widget.RecyclerView
 import au.com.shiftyjelly.pocketcasts.discover.databinding.ItemCategoryBinding
 import au.com.shiftyjelly.pocketcasts.servers.model.DiscoverCategory
 import au.com.shiftyjelly.pocketcasts.servers.model.NetworkLoadableList
-import coil.load
+import coil3.load
 
 val CATEGORY_DIFF = object : DiffUtil.ItemCallback<DiscoverCategory>() {
     override fun areItemsTheSame(oldItem: DiscoverCategory, newItem: DiscoverCategory): Boolean {

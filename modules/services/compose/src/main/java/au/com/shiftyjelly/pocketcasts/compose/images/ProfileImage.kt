@@ -4,11 +4,15 @@ import androidx.compose.animation.Crossfade
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Image
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.platform.LocalContext
-import coil.compose.rememberAsyncImagePainter
-import coil.request.ImageRequest
+import coil3.compose.AsyncImagePainter
+import coil3.compose.rememberAsyncImagePainter
+import coil3.request.ImageRequest
+import coil3.request.crossfade
 
 @Composable
 fun ProfileImage(
@@ -23,9 +27,11 @@ fun ProfileImage(
             .crossfade(true)
             .build(),
     )
+    val state by avatarPainter.state.collectAsState()
+    val isShowingPlaceholder = state !is AsyncImagePainter.State.Success
 
     Crossfade(
-        avatarPainter.state.painter == null,
+        isShowingPlaceholder,
         animationSpec = tween(500),
     ) { showPlaceholder ->
         Image(

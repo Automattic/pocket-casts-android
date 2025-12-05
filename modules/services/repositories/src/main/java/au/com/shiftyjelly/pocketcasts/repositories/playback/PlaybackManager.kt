@@ -1382,7 +1382,9 @@ open class PlaybackManager @Inject constructor(
 
         return when (Util.getAppPlatform(application)) {
             AppPlatform.Automotive -> episodeWithSource?.first ?: episodeManager.findLatestEpisodeToPlayBlocking()
+
             AppPlatform.WearOs -> episodeWithSource?.first
+
             AppPlatform.Phone -> {
                 if (episodeWithSource != null) {
                     val (_, source) = episodeWithSource
@@ -1601,7 +1603,7 @@ open class PlaybackManager @Inject constructor(
         focusWasPlaying = null
     }
 
-    /** PRIVATE METHODS  */
+    // PRIVATE METHODS
 
     /**
      * Check the player is initialised and if we are using the correct player either the system or cast player.
@@ -1705,6 +1707,7 @@ open class PlaybackManager @Inject constructor(
                     }
                 }
             }
+
             is UserEpisode -> {
                 if (episode.serverStatus == UserEpisodeServerStatus.UPLOADED) {
                     try {

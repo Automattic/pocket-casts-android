@@ -335,7 +335,9 @@ private fun WearApp(
     }
 
     when (signInState) {
-        is SignInState.SignedOut -> Unit // Do nothing
+        is SignInState.SignedOut -> Unit
+
+        // Do nothing
 
         is SignInState.SignedIn -> {
             val subscription = signInState.subscription

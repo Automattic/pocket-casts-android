@@ -8,15 +8,16 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.wear.compose.material.ButtonColors
-import com.google.android.horologist.media.ui.R
 import com.google.android.horologist.media.ui.components.controls.MediaButton
 import com.google.android.horologist.media.ui.components.controls.MediaButtonDefaults
 import com.google.android.horologist.media.ui.components.controls.SeekButtonIncrement
+import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 @Composable
 fun SeekForwardButtonStyled(
     onClick: () -> Unit,
     seekButtonIncrement: SeekButtonIncrement,
+    skipForward: Boolean,
     modifier: Modifier = Modifier,
     icon: ImageVector = MediaButtonDefaults.seekForwardIcon(seekButtonIncrement),
     enabled: Boolean = true,
@@ -26,10 +27,11 @@ fun SeekForwardButtonStyled(
 ) {
     val contentDescription = when (seekButtonIncrement) {
         is SeekButtonIncrement.Known -> stringResource(
-            id = R.string.horologist_seek_back_button_seconds_content_description,
+            id = if (skipForward) LR.string.player_notification_skip_forward_seconds else LR.string.player_notification_skip_back_seconds,
             seekButtonIncrement.seconds,
         )
-        SeekButtonIncrement.Unknown -> stringResource(id = R.string.horologist_seek_back_button_content_description)
+
+        SeekButtonIncrement.Unknown -> stringResource(id = if (skipForward) LR.string.skip_forward else LR.string.skip_back)
     }
 
     MediaButton(

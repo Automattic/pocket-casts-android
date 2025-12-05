@@ -40,7 +40,6 @@ import au.com.shiftyjelly.pocketcasts.repositories.playback.auto.PackageValidato
 import au.com.shiftyjelly.pocketcasts.repositories.playlist.Playlist
 import au.com.shiftyjelly.pocketcasts.repositories.playlist.PlaylistManager
 import au.com.shiftyjelly.pocketcasts.repositories.playlist.PlaylistPreview
-import au.com.shiftyjelly.pocketcasts.repositories.playlist.SmartPlaylistPreview
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.FolderManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
@@ -50,8 +49,6 @@ import au.com.shiftyjelly.pocketcasts.servers.podcast.PodcastCacheServiceManager
 import au.com.shiftyjelly.pocketcasts.utils.IS_RUNNING_UNDER_TEST
 import au.com.shiftyjelly.pocketcasts.utils.SchedulerProvider
 import au.com.shiftyjelly.pocketcasts.utils.Util
-import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
-import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import com.jakewharton.rxrelay2.BehaviorRelay
 import dagger.hilt.android.AndroidEntryPoint
@@ -301,6 +298,7 @@ open class PlaybackService :
                         LogBuffer.i(LogBuffer.TAG_PLAYBACK, "can't startForeground as the notification is null")
                     }
                 }
+
                 PlaybackStateCompat.STATE_NONE,
                 PlaybackStateCompat.STATE_STOPPED,
                 PlaybackStateCompat.STATE_PAUSED,
@@ -430,10 +428,15 @@ open class PlaybackService :
         launch {
             val items: List<MediaBrowserCompat.MediaItem> = when (parentId) {
                 RECENT_ROOT -> loadRecentChildren()
+
                 SUGGESTED_ROOT -> loadSuggestedChildren()
+
                 MEDIA_ID_ROOT -> loadRootChildren()
+
                 PODCASTS_ROOT -> loadPodcastsChildren()
+
                 FILES_ROOT -> loadFilesChildren()
+
                 else -> {
                     if (parentId.startsWith(FOLDER_ROOT_PREFIX)) {
                         loadFolderPodcastsChildren(folderUuid = parentId.substring(FOLDER_ROOT_PREFIX.length))
@@ -764,12 +767,7 @@ open class PlaybackService :
     }
 
     protected suspend fun getPlaylistPreviews(): List<PlaylistPreview> {
-        val playlists = playlistManager.playlistPreviewsFlow().first()
-        return if (FeatureFlag.isEnabled(Feature.PLAYLISTS_REBRANDING, immutable = true)) {
-            playlists
-        } else {
-            playlists.filterIsInstance<SmartPlaylistPreview>()
-        }
+        return playlistManager.playlistPreviewsFlow().first()
     }
 
     protected suspend fun getPlaylistEpisodes(

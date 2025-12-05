@@ -30,8 +30,6 @@ import au.com.shiftyjelly.pocketcasts.repositories.sync.SyncManager
 import au.com.shiftyjelly.pocketcasts.servers.refresh.RefreshServiceManager
 import au.com.shiftyjelly.pocketcasts.servers.refresh.UpdatePodcastResponse.EpisodeFound
 import au.com.shiftyjelly.pocketcasts.servers.refresh.UpdatePodcastResponse.Retry
-import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
-import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import com.jakewharton.rxrelay2.PublishRelay
 import dagger.hilt.android.qualifiers.ApplicationContext
@@ -59,7 +57,6 @@ import timber.log.Timber
 
 class PodcastManagerImpl @Inject constructor(
     private val episodeManager: EpisodeManager,
-    private val smartPlaylistManager: SmartPlaylistManager,
     private val settings: Settings,
     @ApplicationContext private val context: Context,
     private val subscribeManager: SubscribeManager,
@@ -101,7 +98,6 @@ class PodcastManagerImpl @Inject constructor(
             podcastDao.updateSuspend(podcast)
 
             episodeManager.deleteEpisodeFilesAsync(episodes, playbackManager)
-            smartPlaylistManager.removePodcastFromPlaylists(podcastUuid)
 
             unsubscribeRelay.accept(podcastUuid)
         } catch (t: Throwable) {
@@ -351,7 +347,9 @@ class PodcastManagerImpl @Inject constructor(
         return when (sortType) {
             // use a query to get the podcasts ordered by episode release date or recently played episodes
             PodcastsSortType.EPISODE_DATE_NEWEST_TO_OLDEST -> findPodcastsOrderByLatestEpisode(orderAsc = false)
+
             PodcastsSortType.RECENTLY_PLAYED -> findPodcastsOrderByRecentlyPlayedEpisode()
+
             else -> podcastDao.findSubscribedNoOrder().sortedWith(sortType.podcastComparator)
         }
     }
@@ -713,11 +711,7 @@ class PodcastManagerImpl @Inject constructor(
     }
 
     private suspend fun isPodcastInManualPlaylist(podcast: Podcast): Boolean {
-        val podcastsInPlaylists = if (FeatureFlag.isEnabled(Feature.PLAYLISTS_REBRANDING, immutable = true)) {
-            playlistDao.getPodcastsAddedToManualPlaylists()
-        } else {
-            emptyList()
-        }
+        val podcastsInPlaylists = playlistDao.getPodcastsAddedToManualPlaylists()
         return podcast.uuid in podcastsInPlaylists
     }
 }

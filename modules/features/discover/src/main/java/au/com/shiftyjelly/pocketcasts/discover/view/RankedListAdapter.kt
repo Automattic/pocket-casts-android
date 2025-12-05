@@ -50,6 +50,7 @@ class RankedListAdapter(
                     onPodcastSubscribe(podcast.uuid)
                 }
             }
+
             is RankedPodcastViewHolder -> {
                 holder.podcastRow.podcast = podcast
                 holder.itemView.setOnClickListener {

@@ -445,6 +445,7 @@ class PlaybackSettingsFragment : BaseFragment() {
             primaryText = stringResource(LR.string.settings_podcast_episode_grouping),
             secondaryText = when (saved) {
                 PodcastGrouping.None -> stringResource(LR.string.settings_podcast_episode_grouping_summary_none)
+
                 else -> {
                     val selected = stringResource(saved.groupName).lowercase(Locale.getDefault())
                     stringResource(LR.string.settings_podcast_episode_grouping_summary, selected)

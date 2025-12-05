@@ -9,9 +9,11 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
@@ -23,7 +25,7 @@ import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import androidx.wear.compose.foundation.ExperimentalWearFoundationApi
-import androidx.wear.compose.foundation.rememberActiveFocusRequester
+import androidx.wear.compose.foundation.requestFocusOnHierarchyActive
 import androidx.wear.compose.foundation.rotary.rotaryScrollable
 import androidx.wear.compose.material.MaterialTheme
 import androidx.wear.compose.material.Scaffold
@@ -128,8 +130,8 @@ fun NowPlayingScreen(
                             seekBackButtonEnabled = true,
                             onSeekForwardButtonClick = playerViewModel::onSeekForwardButtonClick,
                             seekForwardButtonEnabled = true,
-                            seekBackIcon = ImageVector.vectorResource(au.com.shiftyjelly.pocketcasts.images.R.drawable.wear_skip_back),
-                            seekForwardIcon = ImageVector.vectorResource(au.com.shiftyjelly.pocketcasts.images.R.drawable.wear_skip_foreward),
+                            seekBackIcon = ImageVector.vectorResource(IR.drawable.wear_skip_back),
+                            seekForwardIcon = ImageVector.vectorResource(IR.drawable.wear_skip_foreward),
                             playIcon = ImageVector.vectorResource(IR.drawable.wear_play),
                             pauseIcon = ImageVector.vectorResource(IR.drawable.wear_pause),
                             seekIconSize = 35.dp,
@@ -140,6 +142,7 @@ fun NowPlayingScreen(
                             sidePadding = 12.dp,
                         )
                     }
+
                     is NowPlayingViewModel.State.Empty -> {
                         PodcastControlButtonsStyled(
                             onPlayButtonClick = {},
@@ -150,14 +153,15 @@ fun NowPlayingScreen(
                             seekBackButtonEnabled = false,
                             onSeekForwardButtonClick = {},
                             seekForwardButtonEnabled = false,
-                            seekBackIcon = ImageVector.vectorResource(au.com.shiftyjelly.pocketcasts.images.R.drawable.wear_skip_back),
-                            seekForwardIcon = ImageVector.vectorResource(au.com.shiftyjelly.pocketcasts.images.R.drawable.wear_skip_foreward),
+                            seekBackIcon = ImageVector.vectorResource(IR.drawable.wear_skip_back),
+                            seekForwardIcon = ImageVector.vectorResource(IR.drawable.wear_skip_foreward),
                             playIcon = ImageVector.vectorResource(IR.drawable.wear_play),
                             pauseIcon = ImageVector.vectorResource(IR.drawable.wear_pause),
                             sidePadding = 12.dp,
                             seekIconAlign = Alignment.CenterHorizontally,
                         )
                     }
+
                     is NowPlayingViewModel.State.Loading -> {}
                 }
             },
@@ -172,7 +176,9 @@ fun NowPlayingScreen(
             },
             background = {
                 when (state) {
-                    NowPlayingViewModel.State.Loading -> Unit // Do Nothing
+                    NowPlayingViewModel.State.Loading -> Unit
+
+                    // Do Nothing
                     NowPlayingViewModel.State.Empty -> Unit
 
                     is NowPlayingViewModel.State.Loaded -> {
@@ -182,9 +188,10 @@ fun NowPlayingScreen(
             },
             modifier = Modifier
                 .onVolumeChangeByScroll(
-                    focusRequester = rememberActiveFocusRequester(),
+                    focusRequester = remember { FocusRequester() },
                     onVolumeChangeByScroll = volumeViewModel::onVolumeChangeByScroll,
-                ),
+                )
+                .requestFocusOnHierarchyActive(),
         )
     }
 }
@@ -236,7 +243,8 @@ fun NowPlayingSettingsButtons(
 private fun Modifier.onVolumeChangeByScroll(
     focusRequester: FocusRequester,
     onVolumeChangeByScroll: (scrollPixels: Float) -> Unit,
-) = rotaryScrollable(
-    behavior = accumulatedBehavior(onValueChange = onVolumeChangeByScroll),
-    focusRequester = focusRequester,
-)
+) = focusRequester(focusRequester)
+    .rotaryScrollable(
+        behavior = accumulatedBehavior(onValueChange = onVolumeChangeByScroll),
+        focusRequester = focusRequester,
+    )

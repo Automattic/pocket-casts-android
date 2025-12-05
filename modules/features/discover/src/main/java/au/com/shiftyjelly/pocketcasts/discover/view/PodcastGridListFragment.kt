@@ -46,8 +46,9 @@ import au.com.shiftyjelly.pocketcasts.views.activity.WebViewActivity
 import au.com.shiftyjelly.pocketcasts.views.extensions.hide
 import au.com.shiftyjelly.pocketcasts.views.extensions.show
 import au.com.shiftyjelly.pocketcasts.views.fragments.BaseFragment
-import coil.load
-import coil.transform.CircleCropTransformation
+import coil3.load
+import coil3.request.transformations
+import coil3.transform.CircleCropTransformation
 import javax.inject.Inject
 import kotlinx.coroutines.launch
 import timber.log.Timber

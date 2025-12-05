@@ -73,6 +73,7 @@ fun SearchInlineResultsPage(
     ) {
         when (val operation = state.operation) {
             is SearchUiState.SearchOperation.Error -> SearchFailedView()
+
             is SearchUiState.SearchOperation.Success -> {
                 if (operation.results.isEmpty) {
                     NoResultsView()

@@ -140,6 +140,7 @@ sealed class MultiSelectEpisodeAction(
 
                     return DeleteDownload
                 }
+
                 Archive.groupId -> {
                     for (episode in selected) {
                         if (episode is PodcastEpisode && !episode.isArchived) {
@@ -149,6 +150,7 @@ sealed class MultiSelectEpisodeAction(
 
                     return if (selected.filterIsInstance<UserEpisode>().size == selected.size) DeleteUserEpisode else Unarchive
                 }
+
                 MarkAsPlayed.groupId -> {
                     for (episode in selected) {
                         if (!episode.isFinished) {
@@ -158,6 +160,7 @@ sealed class MultiSelectEpisodeAction(
 
                     return MarkAsUnplayed
                 }
+
                 Star.groupId -> {
                     if (selected.filterIsInstance<UserEpisode>().isNotEmpty()) return null
                     for (episode in selected) {
@@ -168,6 +171,7 @@ sealed class MultiSelectEpisodeAction(
 
                     return Unstar
                 }
+
                 RemoveListeningHistory.groupId -> {
                     if (selected.any { it is UserEpisode }) return null
 
@@ -176,8 +180,11 @@ sealed class MultiSelectEpisodeAction(
                     }
                     return if (hasPlayedAnyEpisode) RemoveListeningHistory else null
                 }
+
                 PlayNext.groupId -> return PlayNext
+
                 PlayLast.groupId -> return PlayLast
+
                 Share.groupId -> {
                     if (selected.size == 1 &&
                         selected.firstOrNull() is PodcastEpisode

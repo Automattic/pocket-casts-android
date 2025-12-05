@@ -29,6 +29,7 @@ dependencies {
     api(projects.modules.services.repositories)
 
     implementation(libs.coil)
+    implementation(libs.coil.network.okhttp)
     implementation(libs.compose.material3)
     implementation(libs.glance.appwidget)
     implementation(libs.glance.material3)

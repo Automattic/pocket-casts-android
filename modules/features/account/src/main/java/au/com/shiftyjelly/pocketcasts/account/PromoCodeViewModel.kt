@@ -104,6 +104,7 @@ class PromoCodeViewModel @Inject constructor(
                     }
                     ViewState.Failed(isSignedIn, title, message, images.first, images.second, shouldShowSignup = it.code() == 404)
                 }
+
                 else -> {
                     ViewState.Failed(isSignedIn, "Error", "An unknown error occurred.\n${it.message ?: it.toString()}", R.drawable.ic_promocode_expired, R.drawable.ic_promo_expired_overlay, shouldShowSignup = false)
                 }

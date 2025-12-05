@@ -27,12 +27,14 @@ sealed interface ProfileUpgradeBannerState {
                     add(plusYearlyPlanWithOffer())
                     add(patronYearlyPlan())
                 }
+
                 BillingCycle.Yearly -> {
                     if (isRenewingSubscription) {
                         add(plusYearlyPlan())
                         add(patronYearlyPlan())
                     }
                 }
+
                 BillingCycle.Monthly -> {
                     if (isRenewingSubscription) {
                         add(plusMonthlyPlan())

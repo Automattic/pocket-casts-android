@@ -3,6 +3,7 @@ package au.com.shiftyjelly.pocketcasts.repositories.payment
 import android.app.Activity
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
+import au.com.shiftyjelly.pocketcasts.analytics.TrackedEvent
 import au.com.shiftyjelly.pocketcasts.analytics.Tracker
 import au.com.shiftyjelly.pocketcasts.payment.FakePaymentDataSource
 import au.com.shiftyjelly.pocketcasts.payment.PaymentClient
@@ -15,12 +16,12 @@ import org.junit.Test
 import org.mockito.kotlin.mock
 
 class AnalyticsPaymentListenerTest {
-    private val tracker = TestTracker()
+    private val tracker = FakeTracker()
 
     private val dataSource = FakePaymentDataSource()
     private val paymentClient = PaymentClient.test(
         dataSource,
-        AnalyticsPaymentListener(AnalyticsTracker.test(tracker, isFirstPartyEnabled = true)),
+        AnalyticsPaymentListener(AnalyticsTracker.test(tracker)),
     )
 
     @Test
@@ -111,13 +112,19 @@ class AnalyticsPaymentListenerTest {
     }
 }
 
-private class TestTracker : Tracker {
-    private val _events = mutableListOf<TrackEvent>()
+private class FakeTracker : Tracker {
+    private val _events = mutableListOf<TrackedEvent>()
 
     val events get() = _events.toList()
 
-    override fun track(event: AnalyticsEvent, properties: Map<String, Any>) {
-        _events += TrackEvent(event, properties)
+    override val id get() = "fake_tracker"
+
+    override fun shouldTrack(event: AnalyticsEvent) = true
+
+    override fun track(event: AnalyticsEvent, properties: Map<String, Any>): TrackedEvent {
+        val trackedEvent = TrackedEvent(event, properties)
+        _events += trackedEvent
+        return trackedEvent
     }
 
     override fun refreshMetadata() = Unit
@@ -127,15 +134,10 @@ private class TestTracker : Tracker {
     override fun clearAllData() = Unit
 }
 
-private data class TrackEvent(
-    val type: AnalyticsEvent,
-    val properties: Map<String, Any>,
-) {
-    fun assertType(type: AnalyticsEvent) {
-        assertEquals(type, this.type)
-    }
+private fun TrackedEvent.assertType(type: AnalyticsEvent) {
+    assertEquals(type, this.key)
+}
 
-    fun assertProperties(properties: Map<String, Any>) {
-        assertEquals(properties, this.properties)
-    }
+private fun TrackedEvent.assertProperties(properties: Map<String, Any>) {
+    assertEquals(properties, this.properties)
 }

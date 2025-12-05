@@ -16,8 +16,11 @@ internal class EngageSdkBroadcastReceiver : BroadcastReceiver() {
         Timber.tag(TAG).d("Received Engage SDK broadcast: $action")
         when (action) {
             Intents.ACTION_PUBLISH_RECOMMENDATION -> EngageSdkWorkers.enqueueOneOffRecommendationsWork(context)
+
             Intents.ACTION_PUBLISH_CONTINUATION -> EngageSdkWorkers.enqueueOneOffContinuationWork(context)
+
             Intents.ACTION_PUBLISH_FEATURED -> EngageSdkWorkers.enqueueOneOffFeaturedWork(context)
+
             else -> {
                 Timber.tag(TAG).d("Unexpected Engage SDK broadcast action: $action")
             }
