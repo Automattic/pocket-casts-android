@@ -19,6 +19,7 @@ import coil3.Image
 import coil3.imageLoader
 import coil3.request.ImageRequest
 import coil3.request.transformations
+import coil3.target.Target
 import coil3.toBitmap
 import coil3.transform.CircleCropTransformation
 import au.com.shiftyjelly.pocketcasts.ui.R as UR
@@ -158,7 +159,7 @@ class ProfileCircleView @JvmOverloads constructor(
     }
 
     private fun loadImageFromUri(uri: Uri, size: Int) {
-        val target = object : coil3.target.Target {
+        val target = object : Target {
             override fun onError(error: Image?) {
             }
             override fun onSuccess(result: Image) {

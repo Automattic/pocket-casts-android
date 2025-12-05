@@ -14,6 +14,7 @@ import au.com.shiftyjelly.pocketcasts.ui.extensions.getThemeColor
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import coil3.size.Size
 import coil3.transform.Transformation
+import coil3.Bitmap as CoilBitmap
 
 class ThemedImageTintTransformation(context: Context) : Transformation() {
     private val isActive = Theme.isImageTintEnabled(context)
@@ -32,7 +33,7 @@ class ThemedImageTintTransformation(context: Context) : Transformation() {
         return id.hashCode()
     }
 
-    override suspend fun transform(input: coil3.Bitmap, size: Size): coil3.Bitmap {
+    override suspend fun transform(input: CoilBitmap, size: Size): CoilBitmap {
         val result = Bitmap.createBitmap(input.width, input.height, Bitmap.Config.ARGB_8888)
         if (!isActive) return input
 
