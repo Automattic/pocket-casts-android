@@ -1,11 +1,31 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2025-11-13 09:54:05+0000
+Translation-Revision-Date: 2025-11-27 09:54:03+0000
 Plural-Forms: nplurals=1; plural=0;
 Generator: GlotPress/2.4.0-alpha
 Language: ko_KR
 -->
 <resources>
+    <string name="eoy_story_top_podcasts_subtitle">더 많은 즐겨찾기, 더 많은 재생, 더 많은 맞춤형 기능</string>
+    <string name="eoy_story_top_podcasts_title">다른 최애 팟캐스트</string>
+    <string name="end_of_year_listening_time_subtitle_with_number">청취한 시간: %1$d분</string>
+    <string name="pocket_casts_patron_badge">Pocket Casts 후원 배지</string>
+    <string name="pocket_casts_plus_badge">Pocket Casts Plus</string>
+    <string name="end_of_year_stories_year_over_year_subtitle_went_up">더 많은 팟캐스트, 더 많은 즐거움</string>
+    <string name="end_of_year_previous_story">이전 스토리</string>
+    <string name="end_of_year_next_story">다음 스토리</string>
+    <string name="end_of_year_story_listened_to_numbers">%1$d개 팟캐스트와 %2$d개 에피소드를 시청하셨습니다.</string>
+    <string name="up_next_as_playlist_replace_switch_description">현재 다음 차례 대기열을 재생목록으로 저장합니다.</string>
+    <string name="up_next_as_playlist_replace_body">이 항목을 재생하면 현재의 다음 차례 대기열이 대체됩니다.</string>
+    <string name="added_to_playlist_single">%1$s에 추가됨</string>
+    <string name="end_of_year_failed_to_load_message">죄송합니다. 재생을 로드할 수 없습니다.</string>
+    <string name="end_of_year_stories_already_subscribed_to_plus">Plus 혜택으로 추가 통계와 강력한 기능 활용</string>
+    <string name="end_of_year_stories_subscribe_to_plus">Pocket Casts Plus를 구독하여 확장된 통계, 북마크, 폴더, 챕터 선택 등 청취 습관을 자세히 알아보세요.</string>
+    <string name="end_of_year_stories_plus_title">Pocket Casts를 지원해 주셔서 감사합니다!</string>
+    <string name="end_of_year_stories_theres_more">더 자세히 알아보고 싶으신가요?</string>
+    <string name="end_of_year_story_longest_episode_stats">가장 긴 에피소드는 %2$s의 %1$s이었습니다.</string>
+    <string name="end_of_year_story_longest_episode_subtitle">스트레칭부터 해 주세요!</string>
+    <string name="end_of_year_story_longest_episode_title">회원님의 마라톤 청취: %1$s</string>
     <string name="eoy_story_ratings_subtitle_no_ratings">좋아하는 콘텐츠를 공유하여 좋아하는 크리에이터가 발견될 수 있도록 돕기</string>
     <string name="eoy_story_ratings_subtitle_2">리뷰는 좋은 프로그램을 찾는 데 도움이 됩니다</string>
     <string name="eoy_story_ratings_subtitle_1">어디서나 크리에이터들은 사랑을 받고 싶어 합니다</string>
@@ -41,6 +61,7 @@ Language: ko_KR
     <string name="search_suggestions_view_all">\"%1$s\"에 대해 모두 보기</string>
     <string name="up_next_as_playlist_saved">다음 차례 재생목록으로 저장됨</string>
     <string name="up_next_as_playlist_button_secondary">교체하고 재생</string>
+    <string name="up_next_as_playlist_replace_title">다음 차례 대기열을 대체하시겠습니까?</string>
     <string name="delete_playlist_confirmation_title">재생목록을 삭제할까요?</string>
     <string name="delete_playlist_confirmation_body">재생목록을 삭제하시겠습니까? 이 작업은 되돌릴 수 없습니다.</string>
     <string name="delete_playlist">재생목록 삭제</string>
@@ -79,6 +100,7 @@ Language: ko_KR
     <string name="add_to_up_next_top">다음 차례에 추가(맨 처음)</string>
     <string name="playlist_episodes_archived_title">에피소드 없음</string>
     <string name="playlist_episodes_archived_count">%1$d개 보관됨</string>
+    <string name="playlist_edit_episodes">에피소드 재정렬</string>
     <string name="playlist_episode_unavailable_cta">재생목록에서 제거</string>
     <string name="playlist_episode_unavailable_description">팟캐스트 크리에이터가 이 에피소드를 삭제했습니다. 회원님이 제거할 때까지 회원님 재생목록에는 남아 있습니다.</string>
     <string name="playlist_episode_unavailable_title">에피소드를 사용할 수 없음</string>
@@ -135,7 +157,6 @@ Language: ko_KR
     <string name="smart_rule_podcasts_all_description_disabled">팔로우하시는 새 팟캐스트가 자동으로 추가됩니다.</string>
     <string name="onboarding_upgrade_pp">개인정보 보호\u00A0정책</string>
     <string name="onboarding_upgrade_tnc">약관\u00A0및\u00A0조건</string>
-    <string name="other_options">다른 옵션</string>
     <string name="increment_shorter_than_duration">최대 길이 늘이기</string>
     <string name="decrement_shorter_than_duration">최대 길이 줄이기</string>
     <string name="increment_longer_than_duration">최소 길이 늘이기</string>
@@ -251,7 +272,6 @@ Language: ko_KR
     <string name="notification_themes_message">테마를 둘러보며 회원님의 스타일에 어울리는 테마를 찾아보세요.</string>
     <string name="notification_content_recommendations_trending_message">이번 주에 다른 사람들이 어떤 걸 듣고 있는지 확인하세요.</string>
     <string name="notification_themes_title">새로운 모습을 위한 시간</string>
-    <string name="notification_filters_message">스마트 필터를 생성하여 에피소드를 정리하세요.</string>
     <string name="notification_filters_title">에피소드 정리</string>
     <string name="notification_up_next_message">재생 대기열을 만들어 한 에피소드가 끝나도 헤매지 않도록 하세요.</string>
     <string name="notification_up_next_title">대기열 간소화</string>
@@ -311,8 +331,6 @@ Language: ko_KR
     <string name="onboarding_get_started">시작하기</string>
     <string name="encourage_account_history_banner_description">무료 계정을 만들어 청취 기록을 어디에서나 동기화하세요.</string>
     <string name="encourage_account_history_banner_title">재생한 내용 추적</string>
-    <string name="encourage_account_filters_banner_description">무료 계정을 만들어 모든 기기에서 필터를 동기화하세요.</string>
-    <string name="encourage_account_filters_banner_title">필터 동기화 유지</string>
     <string name="encourage_account_sync_banner_description">무료 계정을 만들어 프로그램을 동기화하고 어디에서나 청취하세요.</string>
     <string name="encourage_account_sync_banner_title">모든 기기에서 프로그램 동기화</string>
     <string name="encourage_account_banner_action_label">무료 계정 생성</string>
@@ -325,8 +343,6 @@ Language: ko_KR
     <string name="tracking_consent_dialog_message">분석을 통해 앱을 개선하고 광고 캠페인이 성공적인지 측정합니다.</string>
     <string name="tracking_consent_dialog_title">\"Pocket Casts\"에서 타사 앱과 웹사이트에서 회원님의 활동을 추적하도록 허용할까요?</string>
     <string name="donate">기부</string>
-    <string name="filters_tooltip_subtitle">스마트 필터를 생성하여 에피소드를 정리하세요. 기간, 릴리스 날짜, 미디어 유형 등으로 필터링합니다.</string>
-    <string name="filters_tooltip_title">에피소드 정리</string>
     <string name="podcasts_sort_by_recently_played">최근 재생</string>
     <string name="podcasts_sort_by_tooltip_message">이제 최근 재생순으로 정렬하여 이전에 중단한 지점부터 이어서 들을 수 있습니다.</string>
     <string name="podcasts_sort_by_tooltip_title">최근 재생순으로 정렬</string>
@@ -472,7 +488,6 @@ Language: ko_KR
     <string name="podcast_this">이 팟캐스트</string>
     <string name="end_of_year_cant_share_message">이 스토리는 공유할 수 없습니다.</string>
     <string name="end_of_year_story_ratings_share_text">내가 %2$d년에 평가한 팟캐스트는 %1$d가지, 가장 많이 사용한 평점은 %3$d</string>
-    <string name="end_of_year_stories_completion_rate_share_text">올해 완료율은 %1$d이었습니다.</string>
     <string name="end_of_year_share_dialog_message">이 이미지를 회원님의 소셜 미디어에 붙여 넣고 즐겨 찾는 프로그램과 크리에이터에게 감사 인사를 보내세요.</string>
     <string name="end_of_year_share_dialog_title">이 스토리 공유 여부</string>
     <string name="up_next_shuffle_disable_button_content_description">다음 순서 섞기 비활성화</string>
@@ -480,6 +495,7 @@ Language: ko_KR
     <string name="podcast_ratings_page_title">평가</string>
     <string name="settings_real_time_playback_summary">이 설정을 켜면 재생 속도에 맞게 조정된 남은 시간과 건너뛴 챕터가 플레이어에 표시됩니다.</string>
     <string name="settings_real_time_playback">남은 시간 조정</string>
+    <string name="eoy_story_stories_subscribe_to_plus_button_label">Pocket Casts Plus 구독</string>
     <string name="eoy_story_ratings_learn_button_label">평가에 대해 알아보기</string>
     <string name="referrals_failed_to_load_offer">죄송합니다. 추천 링크를 가져오는 중에 문제가 발생했습니다.</string>
     <string name="transcript_error_not_available">죄송합니다. 이 에피소드에서는 대본을 사용할 수 없습니다.</string>
@@ -679,8 +695,6 @@ Language: ko_KR
     <string name="discover_category_religion_abbreviation">영성</string>
     <string name="discover_category_kids_abbreviation">가족</string>
     <string name="discover_category_health_abbreviation">건강</string>
-    <string name="eoy_story_top_podcasts_subtitle">2023년 가장 많이 청취한 프로그램 5개</string>
-    <string name="eoy_story_top_podcasts_title">이런 프로그램도 많이 청취하셨습니다!</string>
     <string name="end_of_year_share_story">이 스토리 공유</string>
     <string name="podcast_log_in_to_rate">평가를 남기려면 로그인 필요</string>
     <string name="podcast_submit_rating_no_internet">인터넷에 연결되지 않았습니다. 인터넷에 연결한 다음 평가를 제출하세요.</string>
@@ -723,7 +737,6 @@ Language: ko_KR
     <string name="bookmark_added">북마크 \"%s\" 추가됨</string>
     <string name="add_bookmark_title">북마크 추가</string>
     <string name="add_bookmark">북마크 추가</string>
-    <string name="filters_not_found">필터를 찾을 수 없음</string>
     <string name="bookmarks_sort_timestamp">타임스탬프</string>
     <string name="bookmarks_select_option">북마크 선택</string>
     <string name="bookmarks_delete_summary_singular">이 북마크가 삭제됩니다. 실행하면 취소할 수 없습니다.</string>
@@ -736,7 +749,6 @@ Language: ko_KR
     <string name="deselect_all_below">아래 항목 모두 선택 해제</string>
     <string name="deselect_all_above">위 항목 모두 선택 해제</string>
     <string name="edit">수정</string>
-    <string name="filters_download_limit_3">에피소드 3개</string>
     <string name="settings_title_headphone_controls">헤드폰 제어 기능</string>
     <string name="settings_headphone_controls_confirmation_sound_summary">북마크 생성 후 헤드폰으로 확인 소리를 재생하세요.</string>
     <string name="settings_headphone_controls_confirmation_sound">북마크 확인 소리</string>
@@ -1003,7 +1015,6 @@ Language: ko_KR
     <string name="time_to_skip_not_valid">건너뛰기 시간 %1$s 유효하지 않음</string>
     <string name="time_to_skip_seconds">건너뛰기 시간(초)</string>
     <string name="pocket_casts_play_filter">Pocket Casts 재생목록 재생</string>
-    <string name="settings_select_filters">필터 선택</string>
     <string name="settings_import_url_summary">URL을 사용하여 OPML 파일에서 팟캐스트를 가져오세요.</string>
     <string name="settings_import_url">URL 사용</string>
     <string name="time_to_skip_to_not_valid">%1$s(으)로 건너뛰기 시간 유효하지 않음</string>
@@ -1158,9 +1169,7 @@ Language: ko_KR
     <string name="podcast_notifications_off">알림 끄기</string>
     <string name="podcast_notifications_on">알림 켜기</string>
     <string name="share">공유</string>
-    <string name="filters_update_filter">필터 업데이트</string>
     <string name="filters_chip_episode_status">에피소드 상태</string>
-    <string name="filters_download_options">다운로드 옵션</string>
     <string name="filters_release_date">릴리스 날짜</string>
     <string name="filters_duration">지속시간</string>
     <string name="player_up_next_time_remaining">총 남은 시간 %s</string>
@@ -1483,8 +1492,6 @@ Language: ko_KR
     <string name="settings_auto_download_unmetered">무제한 데이터 WiFi에서만</string>
     <string name="settings_auto_download_podcasts">팟캐스트 자동 다운로드</string>
     <string name="settings_auto_download_new_episodes">새 에피소드</string>
-    <string name="settings_auto_download_filters_episodes">모든 필터 에피소드</string>
-    <string name="settings_auto_download_filters">필터 자동 다운로드</string>
     <string name="settings_auto_download_clearing_errors">모든 다운로드 오류 지우기</string>
     <string name="settings_auto_download_clear_errors">모든 다운로드 오류 지우기</string>
     <string name="settings_auto_download_charging">청구 시에만</string>
@@ -1547,7 +1554,6 @@ Language: ko_KR
     <string name="plus_desktop_apps">데스크톱 앱</string>
     <string name="settings_notification_vibrate_never">안 함</string>
     <string name="settings_logs">로그</string>
-    <string name="settings_status_service_account_summary">에피소드 진행률, 팔로우한 팟캐스트 등을 저장하는 데 사용하는 서비스입니다.</string>
     <string name="settings_show_archived_summary_show">팔로우하는 새 팟캐스트에 아카이빙한 에피소드가 표시됩니다.</string>
     <string name="settings_show_archived_summary_hide">팔로우하는 새 팟캐스트에 아카이빙한 에피소드가 표시되지 않습니다.</string>
     <string name="settings_podcast_episode_grouping_summary_none">팔로우하는 새 팟캐스트의 에피소드가 그룹화되지 않습니다.</string>
@@ -1658,12 +1664,12 @@ Language: ko_KR
     <string name="profile_monthly">매월</string>
     <string name="profile_last_refresh">마지막 새로 고침: %s 전</string>
     <string name="profile_joined">가입됨:</string>
-    <string name="profile_license_agreement">Pocket Casts에서는 개인정보를 소중하게 취급합니다. 이 개인정보 취급방침에서는 회원님에 대해 수집하는 정보와 수집 이유, 해당 정보로 무엇을 할 수 있으며 어떻게 취급하는지를 설명합니다. macOS 및 Windows 앱과 연결된 Pocket Casts 웹 서비스(서비스로 통칭)와 iOS 및 Android Pocket Casts 앱에 적용됩니다. 서비스를 이용하면 이 개인정보 취급방침에 동의하는 것입니다. 앱에서 푸시 알림을 켜면 Apple에서 제공하는 푸시 토큰이 해당 푸시 알림을 기기에 전달하기 위해 저장됩니다. 웹 앱을 구매하면 구매의 거래 ID가 저장됩니다. 계정을 생성하지 않기로 선택하고 푸시 알림을 사용하지 않으면 회원님에 대한 데이터가 서버에 저장되지 않습니다. Pocket Casts 웹 서비스에서는 쿠키 및 유사한 기술을 사용하여 로그인 상태를 유지합니다. 서비스 내에서 후원 요청을 생성하기로 선택하는 경우 제출하기 전에 볼 수 있는 후원 요청을 해결하는 데 도움이 되는 추가 데이터가 포함된 첨부 파일이 생성될 수 있습니다.</string>
     <string name="profile_get_plus">이 기능과 훨씬 더 많은 기능을 잠금 해제하려면 Pocket Casts Plus를 받으세요!</string>
     <string name="profile_free_account">무료 계정</string>
     <string name="profile_forgot_your_password">비밀번호를 잊었음</string>
     <string name="profile_files_remove_image">이미지 교체</string>
     <string name="profile_files_empty_summary">자신의 파일을 청취하시겠나요?\n+ 버튼을 눌러 Pocket Casts에서 열면 여기에 표시됩니다.</string>
+    <string name="profile_license_agreement">Pocket Casts에서는 개인정보를 소중하게 취급합니다. 이 개인정보 취급방침에서는 회원님에 대해 수집하는 정보와 수집 이유, 해당 정보로 무엇을 할 수 있으며 어떻게 취급하는지를 설명합니다. macOS 및 Windows 앱과 연결된 Pocket Casts 웹 서비스(서비스로 통칭)와 iOS 및 Android Pocket Casts 앱에 적용됩니다. 서비스를 이용하면 이 개인정보 취급방침에 동의하는 것입니다. 앱에서 푸시 알림을 켜면 Apple에서 제공하는 푸시 토큰이 해당 푸시 알림을 기기에 전달하기 위해 저장됩니다. 웹 앱을 구매하면 구매의 거래 ID가 저장됩니다. 계정을 생성하지 않기로 선택하고 푸시 알림을 사용하지 않으면 회원님에 대한 데이터가 서버에 저장되지 않습니다. Pocket Casts 웹 서비스에서는 쿠키 및 유사한 기술을 사용하여 로그인 상태를 유지합니다. 서비스 내에서 후원 요청을 생성하기로 선택하는 경우 제출하기 전에 볼 수 있는 후원 요청을 해결하는 데 도움이 되는 추가 데이터가 포함된 첨부 파일이 생성될 수 있습니다.</string>
     <string name="profile_files_addfile_save">저장</string>
     <string name="profile_files_add_filename">이름</string>
     <string name="profile_files_add_custom_image">사용자 정의 이미지 추가</string>
@@ -1750,63 +1756,28 @@ Language: ko_KR
     <string name="profile_access_ends">접근 종료: %s</string>
     <string name="profile_access_ended">접근 종료됨: %s</string>
     <string name="profile">프로필</string>
-    <string name="filters_warning_delete_summary">취소할 수 없습니다.</string>
     <string name="filters_time_week">지난주</string>
     <string name="filters_time_month">지난달</string>
     <string name="filters_time_anytime">모든 기간</string>
     <string name="filters_time_3_days">최근 3일</string>
     <string name="filters_time_2_weeks">최근 2주</string>
     <string name="filters_time_24_hours">최근 24시간</string>
-    <string name="filters_stepper_plus">Plus</string>
-    <string name="filters_stepper_minus">Minus</string>
-    <string name="filters_see_more_episodes">에피소드를 더 보려면 필터 설정을 변경해 보세요.</string>
-    <string name="filters_preview">미리보기</string>
-    <string name="filters_play_episodes">에피소드 %d개 재생</string>
-    <string name="filters_play_all_summary">그러면 현재 다음 차례 대기열이 지워집니다.</string>
-    <string name="filters_play_all_from_here_summary">그러면 현재 다음 차례 대기열이 지워지고 다음과 같은 에피소드가 모두 추가됩니다.</string>
-    <string name="filters_options_sort_by">정렬 기준</string>
-    <string name="filters_options_settings">필터 설정</string>
-    <string name="filters_options_download_all">모두 다운로드</string>
-    <string name="filters_options_delete">필터 삭제</string>
-    <string name="filters_no_matching_episodes_title">일치하는 에피소드 없음</string>
-    <string name="filters_no_matching_episodes">선택하신 기준이 구독 중인 현재 에피소드와 일치하지 않습니다.\n\n다른 기준을 선택하거나, 앞으로 에피소드와 일치하겠다고 생각하면 이 필터를 저장하세요.</string>
     <string name="filters_no_episodes">에피소드를 찾을 수 없음</string>
     <string name="filters_filter_by_duration">기간으로 필터링</string>
     <string name="filters_episode_duration">에피소드 기간</string>
     <string name="filters_duration_shorter_than">다음 미만</string>
     <string name="filters_duration_longer_than">다음 초과</string>
-    <string name="filters_duration_error_title">예, 하지만 아니요</string>
-    <string name="filters_duration_error_body">%1$d분보다 길지만 %2$d분보다 짧은 에피소드를 필터링하면 사차원 공간에 균열이 발생할 수 있습니다. 죄송합니다.</string>
     <string name="filters_download_title">첫 번째 자동 다운로드</string>
-    <string name="filters_download_limit_5">에피소드 5개</string>
-    <string name="filters_download_limit_40">에피소드 40개</string>
-    <string name="filters_download_limit_20">에피소드 20개</string>
-    <string name="filters_download_limit_100">에피소드 100개</string>
-    <string name="filters_download_limit_10">에피소드 10개</string>
     <string name="filters_download_first">첫 번째</string>
     <string name="filters_create_select_criteria">에피소드의 최신 스마트 재생목록을 생성하려면 이러한 버튼을 사용하여 필터 기준을 선택하세요.</string>
     <string name="filters_create_save_filter">필터 저장</string>
     <string name="filters_create_options">필터 옵션</string>
-    <string name="filters_create_name">이름</string>
-    <string name="filters_create_filter_details">필터 상세 정보</string>
-    <string name="filters_create_filter_by">필터링 기준</string>
-    <string name="filters_create_filter">필터 생성</string>
-    <string name="filters_create_add_more">필터 세분화를 마치려면 기준을 더 추가하세요.</string>
-    <string name="filters_create">생성</string>
-    <string name="filters_chosen_singular">필터 1개 추가됨</string>
-    <string name="filters_chosen_plural">필터 %d개 추가됨</string>
-    <string name="filters_chosen_none">선택되지 않음</string>
     <string name="filters_choose_podcasts">팟캐스트 선택</string>
     <string name="filters_chip_media_type">미디어 유형</string>
     <string name="filters_chip_download_status">다운로드 상태</string>
     <string name="profile_welcome_to_free">Pocket Casts에 오신 것을 환영합니다!</string>
     <string name="filters_title_new_releases">새 릴리즈</string>
-    <string name="filters_create_colour_icon">색상 및 아이콘</string>
     <string name="profile_stats_share_to">공유 대상…</string>
-    <string name="filters_chip_all_your_podcasts">모든 내 팟캐스트</string>
-    <string name="filters_all_your_podcasts">모든 내 팟캐스트</string>
-    <string name="episode_filters">에피소드 필터</string>
-    <string name="filters">필터</string>
     <string name="supporter_cancel_active_until_delete_plural">후원자 상태가 %s까지 활성 상태로 유지됩니다. 이후에는 이러한 팟캐스트를 더는 재생할 수 없습니다.</string>
     <string name="supporter_cancel_active_until_delete_singular">후원자 상태가 %s까지 활성 상태로 유지됩니다. 이후에는 이 팟캐스트를 더는 재생할 수 없습니다.</string>
     <string name="supporter_cancel_active_until">후원자 상태가 %s까지 활성 상태로 유지됩니다. 이 날짜 이전에 릴리스된 에피소드만 청취하실 수 있습니다.</string>
@@ -1853,7 +1824,6 @@ Language: ko_KR
     <string name="podcast_effects_summary_trim_silence_on">Trim Silence 켜기</string>
     <string name="podcast_effects_summary_speed">속도 %s배</string>
     <string name="podcast_included_in_filters">%s에 포함됨</string>
-    <string name="podcast_not_in_filters">필터에 포함되지 않음</string>
     <string name="podcast_unsubscribe_downloaded_file_plural">다운로드한 파일 %d개</string>
     <string name="podcast_unsubscribe_downloaded_file_singular">다운로드한 파일 1개</string>
     <string name="podcast_share_open_fail">공유한 팟캐스트에 관한 상세 정보를 로드할 수 없습니다. 이 문제가 지속되면 공유한 사람에게 연락하여 무슨 일이 있는지 물어보세요.</string>
@@ -2173,6 +2143,9 @@ Language: ko_KR
     <string name="unarchive">아카이빙 취소</string>
     <string name="archive">아카이빙</string>
     <string name="add_to_up_next">다음 차례에 추가</string>
+    <plurals name="added_to_playlist_single_multiple">
+        <item quantity="other">%d 재생목록에 추가됨</item>
+    </plurals>
     <plurals name="chapter">
         <item quantity="other">챕터</item>
     </plurals>

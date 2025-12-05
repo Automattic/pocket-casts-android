@@ -1,11 +1,31 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2025-11-13 11:54:04+0000
+Translation-Revision-Date: 2025-11-28 09:54:03+0000
 Plural-Forms: nplurals=2; plural=n > 1;
 Generator: GlotPress/2.4.0-alpha
 Language: fr
 -->
 <resources>
+    <string name="eoy_story_top_podcasts_subtitle">Plus de favoris, plus de lecture, plus comme vous</string>
+    <string name="eoy_story_top_podcasts_title">Vos autres incontournables</string>
+    <string name="pocket_casts_patron_badge">Badge Pocket Casts Patron</string>
+    <string name="pocket_casts_plus_badge">Badge Pocket Casts Plus</string>
+    <string name="end_of_year_listening_time_subtitle_with_number">%1$d minutes écoutées</string>
+    <string name="end_of_year_stories_year_over_year_subtitle_went_up">Plus de podcasts, plus de joie</string>
+    <string name="end_of_year_previous_story">Story précédente</string>
+    <string name="end_of_year_next_story">Story suivante</string>
+    <string name="end_of_year_story_listened_to_numbers">Vous avez écouté %1$d podcasts et %2$d épisodes</string>
+    <string name="up_next_as_playlist_replace_switch_description">Enregistrez votre file d’attente actuelle comme liste de lecture.</string>
+    <string name="up_next_as_playlist_replace_body">Cette lecture remplacera votre file d’attente actuelle.</string>
+    <string name="added_to_playlist_single">Ajouté à %1$s</string>
+    <string name="end_of_year_failed_to_load_message">Toutes nos excuses, impossible de charger la rétrospective</string>
+    <string name="end_of_year_stories_already_subscribed_to_plus">Vos avantages Plus débloquent des statistiques et des fonctionnalités de puissance supplémentaires</string>
+    <string name="end_of_year_stories_subscribe_to_plus">Abonnez-vous à Pocket Casts Plus pour profiter de statistiques, de signets, de dossiers, d’une sélection de chapitres étendue et d’autres façons de découvrir vos habitudes d’écoute</string>
+    <string name="end_of_year_stories_plus_title">Merci de soutenir Pocket Casts !</string>
+    <string name="end_of_year_stories_theres_more">Vous voulez une immersion en profondeur ?</string>
+    <string name="end_of_year_story_longest_episode_stats">L’épisode le plus long était « %1$s » de « %2$s »</string>
+    <string name="end_of_year_story_longest_episode_subtitle">J’espère que vous avez pensé aux étirements au préalable !</string>
+    <string name="end_of_year_story_longest_episode_title">Votre marathon d’écoute : %1$s</string>
     <string name="eoy_story_ratings_subtitle_no_ratings">Faites découvrir vos créateurs préférés en partageant ce que vous aimez</string>
     <string name="eoy_story_ratings_subtitle_2">Les avis aident à trouver des émissions de qualité</string>
     <string name="eoy_story_ratings_subtitle_1">Les créateurs de tous horizons apprécient les marques d’estime</string>
@@ -41,6 +61,7 @@ Language: fr
     <string name="search_suggestions_view_all">Tout afficher pour « %1$s »</string>
     <string name="up_next_as_playlist_saved">File d’attente enregistrée comme playlist</string>
     <string name="up_next_as_playlist_button_secondary">Remplacer et lire</string>
+    <string name="up_next_as_playlist_replace_title">Remplacer votre file d’attente ?</string>
     <string name="delete_playlist_confirmation_title">Supprimer la playlist ?</string>
     <string name="delete_playlist_confirmation_body">Voulez-vous vraiment supprimer votre playlist ? Il n’est pas possible d’annuler cette action.</string>
     <string name="delete_playlist">Supprimer la playlist</string>
@@ -79,6 +100,7 @@ Language: fr
     <string name="remove_from_playlist">Retirer de la playlist</string>
     <string name="playlist_episodes_archived_title">Aucun épisode</string>
     <string name="playlist_episodes_archived_count">%1$d archivé(s)</string>
+    <string name="playlist_edit_episodes">Réorganiser les épisodes</string>
     <string name="playlist_episode_unavailable_title">Épisode non disponible</string>
     <string name="episode_sort_custom_order">Ordre personnalisé</string>
     <string name="playlist_episode_unavailable_cta">Retirer de la playlist</string>
@@ -135,7 +157,6 @@ Language: fr
     <string name="smart_rule_podcasts_all_description_disabled">Les nouveaux podcasts auxquels vous vous abonnez ne seront pas ajoutés automatiquement.</string>
     <string name="onboarding_upgrade_pp">Politique\u00A0de\u00A0confidentialité</string>
     <string name="onboarding_upgrade_tnc">Conditions\u00A0\u00A0générales</string>
-    <string name="other_options">Autres options</string>
     <string name="increment_shorter_than_duration">Augmenter la durée « inférieure à »</string>
     <string name="decrement_shorter_than_duration">Réduire la durée « inférieure à »</string>
     <string name="increment_longer_than_duration">Augmenter la durée « supérieure à »</string>
@@ -251,7 +272,6 @@ Language: fr
     <string name="notification_themes_message">Parcourez nos thèmes et trouvez celui qui vous correspond.</string>
     <string name="notification_content_recommendations_trending_message">Découvrez ce que tout le monde écoute cette semaine.</string>
     <string name="notification_themes_title">L’heure est venue d’un nouveau look</string>
-    <string name="notification_filters_message">Créez des filtres intelligents pour organiser vos épisodes.</string>
     <string name="notification_filters_title">Organiser vos épisodes</string>
     <string name="notification_up_next_message">Créez une file d’attente de lecture et dites adieu aux sauts entre les épisodes.</string>
     <string name="notification_up_next_title">Simplifier votre file d’attente</string>
@@ -311,8 +331,6 @@ Language: fr
     <string name="onboarding_get_started">Commencer</string>
     <string name="encourage_account_history_banner_description">Créez un compte gratuit pour synchroniser votre historique d’écoute partout.</string>
     <string name="encourage_account_history_banner_title">Garder une trace de ce que vous avez écouté</string>
-    <string name="encourage_account_filters_banner_description">Créez un compte gratuit pour synchroniser vos filtres sur tous vos appareils.</string>
-    <string name="encourage_account_filters_banner_title">Synchroniser vos filtres</string>
     <string name="encourage_account_sync_banner_description">Créez un compte gratuit pour synchroniser vos émissions et les écouter où que vous soyez.</string>
     <string name="encourage_account_sync_banner_title">Vos émissions, sur tous vos appareils</string>
     <string name="encourage_account_banner_action_label">Créer un compte gratuit</string>
@@ -325,8 +343,6 @@ Language: fr
     <string name="tracking_consent_dialog_message">Nous utilisons les statistiques pour améliorer l’application et mesurer le succès de nos campagnes publicitaires.</string>
     <string name="tracking_consent_dialog_title">Autoriser « Pocket Casts » à suivre votre activité sur les applications et sites Web d’autres entreprises ?</string>
     <string name="donate">Faire un don</string>
-    <string name="filters_tooltip_subtitle">Créez des filtres intelligents pour organiser vos épisodes. Filtrez par durée, date de sortie, type de média, etc.</string>
-    <string name="filters_tooltip_title">Organiser vos épisodes</string>
     <string name="podcasts_sort_by_recently_played">Lectures récentes</string>
     <string name="podcasts_sort_by_tooltip_message">Vous pouvez désormais trier par Lectures récentes et reprendre rapidement là où vous en étiez.</string>
     <string name="podcasts_sort_by_tooltip_title">Trier par « Lectures récentes »</string>
@@ -471,7 +487,6 @@ Language: fr
     <string name="manage_downloads">Gérer les téléchargements</string>
     <string name="podcast_this">Ce podcast</string>
     <string name="end_of_year_cant_share_message">Impossible de partager cette story</string>
-    <string name="end_of_year_stories_completion_rate_share_text">Cette année, mon taux d’achèvement s’élève à %1$d</string>
     <string name="end_of_year_story_ratings_share_text">J’ai évalué %1$d podcasts différents en %2$d, que j’ai le plus souvent notés %3$d</string>
     <string name="end_of_year_share_dialog_message">Coller cette image sur vos réseaux sociaux et faire connaître vos émissions et créateurs préférés</string>
     <string name="end_of_year_share_dialog_title">Partager cette story ?</string>
@@ -480,6 +495,7 @@ Language: fr
     <string name="podcast_ratings_page_title">Évaluations</string>
     <string name="settings_real_time_playback">Ajuster le temps restant</string>
     <string name="settings_real_time_playback_summary">En cas d’activation, le lecteur affichera le temps restant, ajusté selon la vitesse de lecture et les chapitres passés.</string>
+    <string name="eoy_story_stories_subscribe_to_plus_button_label">Obtenir Pocket Casts Plus</string>
     <string name="eoy_story_ratings_learn_button_label">En savoir plus sur les évaluations</string>
     <string name="referrals_failed_to_load_offer">Veuillez nous excuser, un problème est survenu lors de l’extraction de votre lien de parrainage.</string>
     <string name="transcript_error_not_available">Veuillez nous excuser, aucune transcription n’est disponible pour cet épisode.</string>
@@ -679,8 +695,6 @@ Language: fr
     <string name="discover_category_kids_abbreviation">Famille</string>
     <string name="discover_category_health_abbreviation">Santé</string>
     <string name="end_of_year_story_top_categories_subtitle">Vous avez écouté %1$s épisode(s) pour une durée totale de %2$s</string>
-    <string name="eoy_story_top_podcasts_subtitle">Voici les 5 émissions que vous avez le plus écoutées en 2023\"</string>
-    <string name="eoy_story_top_podcasts_title">Vous avez aussi adoré ces émissions !</string>
     <string name="end_of_year_share_story">Partager cette story</string>
     <string name="podcast_log_in_to_rate">Vous devez vous connecter pour laisser une note</string>
     <string name="podcast_submit_rating_no_internet">Aucune connexion Internet détectée. Veuillez vous connecter à Internet pour envoyer une note.</string>
@@ -723,7 +737,6 @@ Language: fr
     <string name="bookmark_added">Signet « %s » ajouté</string>
     <string name="add_bookmark_title">Ajouter un signet</string>
     <string name="add_bookmark">Ajouter un signet</string>
-    <string name="filters_not_found">Aucun filtre trouvé</string>
     <string name="bookmarks_sort_timestamp">Horodatage</string>
     <string name="bookmarks_select_option">Sélectionner des favoris</string>
     <string name="bookmarks_delete_summary_singular">Ce favori sera supprimé. Cette action ne peut pas être annulée.</string>
@@ -736,7 +749,6 @@ Language: fr
     <string name="deselect_all_below">Désélectionner tous les éléments ci-dessous</string>
     <string name="deselect_all_above">Désélectionner tous les éléments ci-dessus</string>
     <string name="edit">Editer</string>
-    <string name="filters_download_limit_3">3 épisodes</string>
     <string name="settings_title_headphone_controls">Commandes du casque</string>
     <string name="settings_headphone_controls_confirmation_sound_summary">Émettez un son de confirmation dans votre casque après la création d’un signet.</string>
     <string name="settings_headphone_controls_confirmation_sound">Son de confirmation lors de l’ajout d’un signet</string>
@@ -1003,7 +1015,6 @@ Language: fr
     <string name="time_to_skip_not_valid">Séquence à passer (%1$s) non valide</string>
     <string name="time_to_skip_seconds">Séquence à passer (secondes)</string>
     <string name="pocket_casts_play_filter">Pocket Casts Lire la playlist</string>
-    <string name="settings_select_filters">Sélectionner les filtres</string>
     <string name="settings_import_url_summary">Importez vos podcasts à partir d’un fichier OPML en utilisant une URL.</string>
     <string name="settings_import_url">Par URL</string>
     <string name="time_to_skip_to_not_valid">Séquence à laquelle passer (%1$s) non valide</string>
@@ -1158,9 +1169,7 @@ Language: fr
     <string name="podcast_notifications_off">Notifications désactivées</string>
     <string name="podcast_notifications_on">Notifications activées</string>
     <string name="share">Partager</string>
-    <string name="filters_update_filter">Mettre à jour le filtre</string>
     <string name="filters_chip_episode_status">Statut de l\'épisode</string>
-    <string name="filters_download_options">Options de téléchargement</string>
     <string name="filters_release_date">Date de diffusion</string>
     <string name="filters_duration">Durée</string>
     <string name="player_up_next_time_remaining">Temps total restant %s</string>
@@ -1484,8 +1493,6 @@ Language: fr
     <string name="settings_auto_download_unmetered">Uniquement sur WiFi illimité</string>
     <string name="settings_auto_download_podcasts">Télécharger automatiquement les podcasts</string>
     <string name="settings_auto_download_new_episodes">Nouveaux épisodes</string>
-    <string name="settings_auto_download_filters_episodes">Tous les épisodes filtrés</string>
-    <string name="settings_auto_download_filters">Télécharger automatiquement les filtres</string>
     <string name="settings_auto_download_clearing_errors">Effacement de toutes les erreurs de téléchargement</string>
     <string name="settings_auto_download_clear_errors">Effacer toutes les erreurs de téléchargement</string>
     <string name="settings_auto_download_charging">Uniquement lors de la charge</string>
@@ -1547,7 +1554,6 @@ Language: fr
     <string name="plus_slash_month">%s /mois</string>
     <string name="settings_notification_vibrate_never">Jamais</string>
     <string name="settings_logs">Journaux</string>
-    <string name="settings_status_service_account_summary">Le service utilisé pour stocker la progression des épisodes, vos abonnements à des podcasts, les filtres, etc.</string>
     <string name="settings_show_archived_summary_hide">Les nouveaux podcasts auxquels vous vous abonnez n’afficheront pas d’épisodes archivés.</string>
     <string name="settings_export_send_email_summary">Exportez vos podcasts au format OPML super geek (mais largement pris en charge).</string>
     <string name="settings_podcast_episode_grouping_summary_none">Les épisodes des nouveaux podcasts auxquels vous vous abonnez ne seront pas groupés.</string>
@@ -1577,11 +1583,9 @@ Language: fr
     <string name="profile_files_add_custom_image">Ajouter une image personnalisée</string>
     <string name="profile_files_addfile_save">Enregistrer</string>
     <string name="profile_navigation_files">Fichiers</string>
-    <string name="filters_create_name">NOM</string>
     <string name="filters_chip_download_status">Statut du téléchargement</string>
     <string name="filters_chip_media_type">Type de média</string>
     <string name="filters_episode_duration">Durée de l’épisode</string>
-    <string name="filters_duration_error_title">Oui, mais non</string>
     <string name="filters_time_24_hours">24 dernières heures</string>
     <string name="filters_time_2_weeks">2 dernières semaines</string>
     <string name="filters_time_3_days">3 derniers jours</string>
@@ -1614,13 +1618,11 @@ Language: fr
     <string name="profile_sonos_linking_failed">Échec de la connexion</string>
     <string name="profile_sonos_connect_account">La connexion à Sonos permettra à l’application Sonos d’accéder aux informations de l’épisode.\n\nVotre adresse e-mail, votre mot de passe et d’autres éléments sensibles ne sont jamais partagés.</string>
     <string name="profile_sonos_need_account">Vous devez avoir un compte Pocket Casts pour pouvoir vous connecter à Sonos.</string>
-    <string name="filters_options_sort_by">Trier par</string>
     <string name="profile_stats_auto_skipping">Saut automatique</string>
     <string name="profile_stats_skipping">Ignorer</string>
     <string name="profile_stats_variable_speed">Vitesse variable</string>
     <string name="profile_terms_of_use_title">Conditions d’utilisation</string>
     <string name="profile_payment_try_again">Recommencer</string>
-    <string name="filters_stepper_plus">Plus</string>
     <string name="profile_monthly">Mensuellement</string>
     <string name="profile_none">Aucun</string>
     <string name="profile_supporter_thanks">Merci pour votre soutien !</string>
@@ -1759,56 +1761,27 @@ Language: fr
     <string name="profile_account_delete_yes">Oui, supprimez-le</string>
     <string name="profile_access_ends">Expiration de l’accès le : %s</string>
     <string name="profile_access_ended">Accès expiré le : %s</string>
-    <string name="filters_warning_delete_summary">Cette action ne peut pas être annulée.</string>
     <string name="filters_time_anytime">À tout moment</string>
-    <string name="filters_stepper_minus">Moins</string>
-    <string name="filters_see_more_episodes">Pour voir plus d’épisodes, essayez de modifier vos réglages de filtre.</string>
-    <string name="filters_preview">APERÇU</string>
-    <string name="filters_play_episodes">Lire %d épisodes</string>
-    <string name="filters_options_settings">Réglages de filtre</string>
-    <string name="filters_options_download_all">Tout télécharger</string>
-    <string name="filters_options_delete">Supprimer le filtre</string>
-    <string name="filters_no_matching_episodes_title">Aucun épisode correspondant</string>
-    <string name="filters_no_matching_episodes">Les critères que vous avez sélectionnés ne correspondent à aucun épisode actuel de vos abonnements.\n\nChoisissez des critères différents ou enregistrez ce filtre si vous pensez qu’il correspondra à des épisodes ultérieurement.</string>
     <string name="filters_no_episodes">Aucun épisode trouvé</string>
     <string name="filters_filter_by_duration">Filtrer par durée</string>
     <string name="filters_duration_shorter_than">Moins de</string>
     <string name="filters_duration_longer_than">Plus de</string>
-    <string name="filters_duration_error_body">Filtrer les épisodes de plus de %1$dm mais de moins de %2$dm provoquerait une faille dans notre continuum espace-temps. Désolé.</string>
     <string name="filters_download_title">Télécharger automatiquement les premiers</string>
-    <string name="filters_download_limit_5">5 épisodes</string>
-    <string name="filters_download_limit_40">40 épisodes</string>
-    <string name="filters_download_limit_20">20 épisodes</string>
-    <string name="filters_download_limit_100">100 épisodes</string>
-    <string name="filters_download_limit_10">10 épisodes</string>
     <string name="filters_create_save_filter">Enregistrer le filtre</string>
     <string name="filters_create_options">Options de filtre</string>
-    <string name="filters_create_filter_details">Détails du filtre</string>
-    <string name="filters_create_filter_by">FILTRER PAR</string>
-    <string name="filters_create_filter">Créer un filtre</string>
-    <string name="filters_create_add_more">Ajoutez plus de critères pour finir d’affiner votre filtre.</string>
-    <string name="filters_create">Créer</string>
-    <string name="filters_chosen_singular">1 filtre choisi</string>
-    <string name="filters_chosen_plural">%d filtres choisis</string>
-    <string name="filters_chosen_none">Aucun sélectionné</string>
     <string name="filters_choose_podcasts">Sélectionner des podcasts</string>
     <string name="profile_cloud_settings">Réglages des fichiers</string>
     <string name="profile_cloud_auto_add_to_up_next">Ajouter automatiquement à la file d\'attente </string>
     <string name="profile_cloud_all_files_added">Tous les fichiers ajoutés à vos fichiers seront ajoutés à la file d\'attente.</string>
-    <string name="filters_play_all_from_here_summary">Cela effacera votre file d’attente actuelle et ajoutera tous les épisodes suivants.</string>
-    <string name="filters_play_all_summary">Ceci effacera votre file d’attente actuelle.</string>
     <string name="profile_sub_ios_goto">Pour annuler votre abonnement, accédez à Réglages.</string>
     <string name="profile_create_password_requirements">Le mot de passe doit comporter au moins 6 caractères</string>
-    <string name="filters_create_colour_icon">COULEUR ET ICÔNE</string>
     <string name="profile_stats_share_to">Partager vers…</string>
     <string name="profile_newsletter_detail">Recevez des actualités, des mises à jour d’applications, des playlists thématiques, des interviews et plus encore.</string>
     <string name="filters_create_select_criteria">Sélectionnez vos critères de filtre à l’aide de ces boutons pour créer une playlist intelligente d’épisodes à jour.</string>
     <string name="supporter">Abonné</string>
-    <string name="filters">Filtres</string>
     <string name="player_rearrange_actions_hidden">Plus d’actions</string>
     <string name="download_warning_title">Tout télécharger</string>
     <string name="podcast_unsubscribe_downloaded_file_singular">1 fichier téléchargé</string>
-    <string name="filters_chip_all_your_podcasts">Tous vos podcasts</string>
     <string name="podcasts_mark_played">Marquer comme lu</string>
     <string name="podcasts_mark_unplayed">Marquer comme non lu</string>
     <string name="player_tab_playing_wide">En cours de lecture</string>
@@ -1853,8 +1826,6 @@ Language: fr
     <string name="podcast_notifications">Notifications</string>
     <string name="player_effects_trim_silence">Couper les silences</string>
     <string name="podcast_settings_skip_first_summary">0 secondes</string>
-    <string name="filters_all_your_podcasts">Tous vos podcasts</string>
-    <string name="episode_filters">Filtres d’épisode</string>
     <string name="supporter_cancel_active_until_delete_plural">Le statut de l’abonné restera actif jusqu’au %s. Après cette date, vous ne pourrez plus écouter ces podcasts.</string>
     <string name="supporter_cancel_active_until_delete_singular">Le statut de l’abonné restera actif jusqu’au %s. Après cette date, vous ne pourrez plus écouter ce podcast.</string>
     <string name="supporter_cancel_active_until">Le statut de l’abonné restera actif jusqu’au %s. Vous ne pourrez écouter que les épisodes sortis avant cette date.</string>
@@ -1895,7 +1866,6 @@ Language: fr
     <string name="podcast_effects_summary_trim_silence_on">coupure des silences activée</string>
     <string name="podcast_effects_summary_speed">Vitesse %s×</string>
     <string name="podcast_included_in_filters">Inclus dans %s</string>
-    <string name="podcast_not_in_filters">Inclus dans aucun filtre</string>
     <string name="podcast_unsubscribe_downloaded_file_plural">%d Fichiers téléchargés</string>
     <string name="podcast_share_open_fail">Impossible de charger les détails du podcast partagé. Si ce problème persiste, vous pouvez contacter la personne qui a partagé avec vous et lui demander ce qui se passe.</string>
     <string name="podcast_share_open_fail_title">Échec ultime</string>
@@ -2173,6 +2143,10 @@ Language: fr
     <string name="auto_archive">Archiver automatiquement</string>
     <string name="archive_episode">Archiver l’épisode</string>
     <string name="add_to_up_next">Ajouter à la file d\'attente</string>
+    <plurals name="added_to_playlist_single_multiple">
+        <item quantity="one">Ajouter à %d liste de lecture</item>
+        <item quantity="other">Ajouter à %d listes de lecture</item>
+    </plurals>
     <plurals name="chapter">
         <item quantity="one">chapitre</item>
         <item quantity="other">chapitres</item>
