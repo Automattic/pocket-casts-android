@@ -143,7 +143,7 @@ class SubscribeManager @Inject constructor(
                     .data(url)
                     .memoryCachePolicy(CachePolicy.DISABLED)
                     .build()
-                context.imageLoader.execute(request)
+                context.imageLoader.enqueue(request)
             }
         } catch (e: Exception) {
             Timber.e(e, "Error caching artwork for podcast ${podcast.uuid}")
