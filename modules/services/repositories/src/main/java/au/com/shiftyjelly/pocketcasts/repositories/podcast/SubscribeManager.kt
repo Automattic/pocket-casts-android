@@ -15,16 +15,18 @@ import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.download.DownloadHelper
 import au.com.shiftyjelly.pocketcasts.repositories.download.DownloadManager
 import au.com.shiftyjelly.pocketcasts.repositories.images.PocketCastsImageRequestFactory
+import au.com.shiftyjelly.pocketcasts.repositories.images.PodcastImage
 import au.com.shiftyjelly.pocketcasts.repositories.sync.SyncManager
 import au.com.shiftyjelly.pocketcasts.servers.cdn.ArtworkColors
 import au.com.shiftyjelly.pocketcasts.servers.cdn.StaticServiceManager
 import au.com.shiftyjelly.pocketcasts.servers.podcast.PodcastCacheServiceManager
 import au.com.shiftyjelly.pocketcasts.servers.sync.PodcastEpisodesResponse
 import au.com.shiftyjelly.pocketcasts.utils.Optional
+import au.com.shiftyjelly.pocketcasts.utils.Util
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
-import coil3.executeBlocking
 import coil3.imageLoader
 import coil3.request.CachePolicy
+import coil3.request.ImageRequest
 import com.jakewharton.rxrelay2.PublishRelay
 import dagger.hilt.android.qualifiers.ApplicationContext
 import io.reactivex.Completable
@@ -133,14 +135,19 @@ class SubscribeManager @Inject constructor(
             }
     }
 
-    private fun cacheArtworkRxCompletable(podcast: Podcast): Completable {
-        return Completable.fromAction {
-            val request = imageRequestFactory.create(podcast)
-                .newBuilder()
-                .memoryCachePolicy(CachePolicy.DISABLED)
-                .build()
-            context.imageLoader.executeBlocking(request)
-        }.onErrorComplete()
+    private fun cacheArtworkRxCompletable(podcast: Podcast) = rxCompletable {
+        try {
+            val urls = PodcastImage.getArtworkUrls(uuid = podcast.uuid, isWearOS = Util.isWearOs(context))
+            urls.forEach { url ->
+                val request = ImageRequest.Builder(context)
+                    .data(url)
+                    .memoryCachePolicy(CachePolicy.DISABLED)
+                    .build()
+                context.imageLoader.execute(request)
+            }
+        } catch (e: Exception) {
+            Timber.e(e, "Error caching artwork for podcast ${podcast.uuid}")
+        }
     }
 
     fun isSubscribingToPodcast(podcastUuid: String): Boolean {
