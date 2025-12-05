@@ -27,6 +27,7 @@ dependencies {
 
     implementation(libs.androidx.webkit)
     implementation(libs.coil.compose)
+    implementation(libs.coil.network.okhttp)
     implementation(libs.compose.activity)
     implementation(libs.compose.animation)
     implementation(libs.compose.animation.graphics)

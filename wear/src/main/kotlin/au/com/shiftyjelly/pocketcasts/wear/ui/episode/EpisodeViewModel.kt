@@ -2,7 +2,6 @@ package au.com.shiftyjelly.pocketcasts.wear.ui.episode
 
 import android.app.Application
 import android.content.Context
-import android.graphics.drawable.BitmapDrawable
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
 import androidx.compose.ui.graphics.Color
@@ -36,9 +35,11 @@ import au.com.shiftyjelly.pocketcasts.utils.extensions.combine
 import au.com.shiftyjelly.pocketcasts.views.helper.CloudDeleteHelper
 import au.com.shiftyjelly.pocketcasts.wear.ui.player.AudioOutputSelectorHelper
 import au.com.shiftyjelly.pocketcasts.wear.ui.player.StreamingConfirmationScreen
-import coil.ImageLoader
-import coil.request.ImageRequest
-import coil.request.SuccessResult
+import coil3.ImageLoader
+import coil3.request.ImageRequest
+import coil3.request.SuccessResult
+import coil3.request.allowHardware
+import coil3.toBitmap
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import javax.inject.Inject
@@ -472,9 +473,7 @@ class EpisodeViewModel @Inject constructor(
 
         val successResult = loader.execute(request) as? SuccessResult
             ?: return@let null
-        val resultDrawable = successResult.drawable as? BitmapDrawable
-            ?: return@let null
-        val bitmap = resultDrawable.bitmap
+        val bitmap = successResult.image.toBitmap()
 
         // Set a timeout to make sure the user isn't blocked for too long just
         // because we're trying to extract a tint color.

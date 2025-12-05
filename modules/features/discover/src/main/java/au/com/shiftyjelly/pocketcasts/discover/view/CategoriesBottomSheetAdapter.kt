@@ -8,7 +8,7 @@ import androidx.recyclerview.widget.RecyclerView
 import au.com.shiftyjelly.pocketcasts.discover.databinding.ItemCategoryBinding
 import au.com.shiftyjelly.pocketcasts.localization.helper.tryToLocalise
 import au.com.shiftyjelly.pocketcasts.servers.model.DiscoverCategory
-import coil.load
+import coil3.load
 
 class CategoriesBottomSheetAdapter(
     private val onCategoryClick: (DiscoverCategory) -> Unit,

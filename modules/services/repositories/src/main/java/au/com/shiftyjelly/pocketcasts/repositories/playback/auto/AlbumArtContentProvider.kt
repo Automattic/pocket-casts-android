@@ -8,10 +8,10 @@ import android.net.Uri
 import android.os.ParcelFileDescriptor
 import au.com.shiftyjelly.pocketcasts.repositories.images.PocketCastsImageRequestFactory
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
-import coil.ImageLoader
-import coil.annotation.ExperimentalCoilApi
-import coil.request.ErrorResult
-import coil.request.SuccessResult
+import coil3.ImageLoader
+import coil3.annotation.ExperimentalCoilApi
+import coil3.request.ErrorResult
+import coil3.request.SuccessResult
 import dagger.hilt.EntryPoint
 import dagger.hilt.InstallIn
 import dagger.hilt.android.EntryPointAccessors
@@ -20,7 +20,6 @@ import java.io.File
 import kotlinx.coroutines.runBlocking
 import okhttp3.HttpUrl
 import okhttp3.HttpUrl.Companion.toHttpUrlOrNull
-import okio.use
 import timber.log.Timber
 
 class AlbumArtContentProvider : ContentProvider() {
@@ -71,7 +70,11 @@ class AlbumArtContentProvider : ContentProvider() {
         val request = requestFactory.createForFileOrUrl(url.toString())
         return when (val result = runBlocking { execute(request) }) {
             is SuccessResult -> result.diskCacheKey?.let { key -> getCachedArtworkFile(key) }
-            is ErrorResult -> null
+
+            is ErrorResult -> {
+                LogBuffer.e(LogBuffer.TAG_INVALID_STATE, result.throwable, "Failed to load artwork for url: $url")
+                null
+            }
         }
     }
 

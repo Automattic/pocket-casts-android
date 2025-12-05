@@ -6,6 +6,8 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -14,9 +16,9 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import coil.compose.AsyncImagePainter
-import coil.compose.rememberAsyncImagePainter
-import coil.request.ImageRequest
+import coil3.compose.AsyncImagePainter
+import coil3.compose.rememberAsyncImagePainter
+import coil3.request.ImageRequest
 
 @Composable
 internal fun CoilImage(
@@ -44,7 +46,7 @@ internal fun CoilImage(
                 .then(if (expandContentSize) Modifier.fillMaxSize() else Modifier)
                 .clip(if (corners == null) RectangleShape else RoundedCornerShape(corners)),
         )
-        val state = painter.state
+        val state by painter.state.collectAsState()
         if (showTitle && state is AsyncImagePainter.State.Error) {
             TextP60(
                 text = title,

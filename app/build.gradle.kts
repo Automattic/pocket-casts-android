@@ -70,6 +70,7 @@ dependencies {
     implementation(libs.androidx.mediarouter)
     implementation(libs.automattic.crashlogging)
     implementation(libs.coil)
+    implementation(libs.coil.network.okhttp)
     implementation(libs.compose.ui)
     implementation(libs.coroutines.android)
     implementation(libs.coroutines.core)

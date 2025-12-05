@@ -14,8 +14,8 @@ import au.com.shiftyjelly.pocketcasts.repositories.images.PocketCastsImageReques
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
 import au.com.shiftyjelly.pocketcasts.ui.extensions.themed
 import au.com.shiftyjelly.pocketcasts.ui.images.CoilManager
-import coil.imageLoader
-import coil.request.CachePolicy
+import coil3.imageLoader
+import coil3.request.CachePolicy
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
 import kotlinx.coroutines.Dispatchers

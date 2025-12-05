@@ -25,7 +25,7 @@ import androidx.compose.ui.unit.dp
 import au.com.shiftyjelly.pocketcasts.repositories.images.PocketCastsImageRequestFactory
 import au.com.shiftyjelly.pocketcasts.repositories.images.PocketCastsImageRequestFactory.PlaceholderType
 import au.com.shiftyjelly.pocketcasts.ui.extensions.themed
-import coil.compose.rememberAsyncImagePainter
+import coil3.compose.rememberAsyncImagePainter
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 fun podcastImageCornerSize(width: Dp): Dp {

@@ -93,10 +93,13 @@ import au.com.shiftyjelly.pocketcasts.views.extensions.hideRow
 import au.com.shiftyjelly.pocketcasts.views.extensions.show
 import au.com.shiftyjelly.pocketcasts.views.extensions.showIf
 import au.com.shiftyjelly.pocketcasts.views.extensions.showRow
-import coil.imageLoader
-import coil.load
-import coil.request.ImageRequest
-import coil.transform.CircleCropTransformation
+import coil3.asDrawable
+import coil3.imageLoader
+import coil3.load
+import coil3.request.ImageRequest
+import coil3.request.allowHardware
+import coil3.request.transformations
+import coil3.transform.CircleCropTransformation
 import io.reactivex.Flowable
 import io.reactivex.Single
 import io.reactivex.android.schedulers.AndroidSchedulers
@@ -109,7 +112,6 @@ import java.util.Locale
 import kotlin.math.ceil
 import kotlin.math.min
 import kotlinx.coroutines.MainScope
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 import timber.log.Timber
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
@@ -1117,7 +1119,7 @@ internal class DiscoverAdapter(
             chip.text = row.region.name.tryToLocalise(resources)
             val context = chip.context
             val request = ImageRequest.Builder(context).data(row.region.flag).target {
-                chip.chipIcon = it
+                chip.chipIcon = it.asDrawable(resources)
             }.allowHardware(false).build()
             context.imageLoader.enqueue(request)
             chip.setOnClickListener { onChangeRegion?.invoke() }

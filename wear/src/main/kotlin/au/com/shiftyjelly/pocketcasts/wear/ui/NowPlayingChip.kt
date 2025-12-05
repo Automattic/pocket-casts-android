@@ -15,6 +15,8 @@ import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.platform.LocalResources
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
@@ -30,7 +32,7 @@ import au.com.shiftyjelly.pocketcasts.repositories.playback.UpNextQueue
 import au.com.shiftyjelly.pocketcasts.ui.extensions.themed
 import au.com.shiftyjelly.pocketcasts.wear.theme.WearAppTheme
 import au.com.shiftyjelly.pocketcasts.wear.ui.component.WatchListChip
-import coil.compose.rememberAsyncImagePainter
+import coil3.compose.rememberAsyncImagePainter
 import com.airbnb.lottie.compose.LottieAnimation
 import com.airbnb.lottie.compose.LottieCompositionSpec
 import com.airbnb.lottie.compose.LottieConstants
@@ -70,6 +72,8 @@ private fun Content(
     onClick: () -> Unit,
 ) {
     val context = LocalContext.current
+    val resources = LocalResources.current
+    val density = LocalDensity.current
 
     WatchListChip(
         title = if (isPlaying) {
@@ -87,9 +91,24 @@ private fun Content(
         secondaryLabel = episode?.title,
         colors = ChipDefaults.imageBackgroundChipColors(
             backgroundImagePainter = if (episode != null) {
-                val imageRequest = remember(episode.uuid, useEpisodeArtwork) {
-                    PocketCastsImageRequestFactory(context).themed().create(episode, useEpisodeArtwork)
+                val imageRequest = remember(episode.uuid, useEpisodeArtwork, density) {
+                    // set the image size or the image crop won't work correctly
+                    val imageWidthPx = with(density) {
+                        resources.displayMetrics.widthPixels - (ChipDefaults.ChipHorizontalPadding.toPx() * 2).toInt()
+                    }
+                    val imageHeightPx = with(density) {
+                        ChipDefaults.Height.toPx().toInt()
+                    }
+                    PocketCastsImageRequestFactory(context).themed()
+                        .create(episode, useEpisodeArtwork)
+                        .newBuilder()
+                        .size(
+                            width = imageWidthPx,
+                            height = imageHeightPx,
+                        )
+                        .build()
                 }
+
                 rememberAsyncImagePainter(
                     model = imageRequest,
                     contentScale = ContentScale.Crop,

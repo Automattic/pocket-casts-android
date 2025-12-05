@@ -40,7 +40,7 @@ import au.com.shiftyjelly.pocketcasts.compose.preview.ThemePreviewParameterProvi
 import au.com.shiftyjelly.pocketcasts.compose.theme
 import au.com.shiftyjelly.pocketcasts.payment.SubscriptionTier
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
-import coil.compose.AsyncImage
+import coil3.compose.AsyncImage
 import au.com.shiftyjelly.pocketcasts.images.R as IR
 
 @Composable

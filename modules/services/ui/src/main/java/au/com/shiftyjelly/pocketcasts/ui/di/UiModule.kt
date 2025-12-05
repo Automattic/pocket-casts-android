@@ -2,8 +2,11 @@ package au.com.shiftyjelly.pocketcasts.ui.di
 
 import android.content.Context
 import au.com.shiftyjelly.pocketcasts.servers.di.Artwork
-import coil.ImageLoader
-import coil.disk.DiskCache
+import coil3.ImageLoader
+import coil3.disk.DiskCache
+import coil3.disk.directory
+import coil3.network.okhttp.OkHttpNetworkFetcherFactory
+import coil3.request.crossfade
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -24,7 +27,15 @@ class UiModule {
     ): ImageLoader {
         return ImageLoader.Builder(context)
             .crossfade(true)
-            .okHttpClient(client)
+            .components {
+                add(
+                    OkHttpNetworkFetcherFactory(
+                        callFactory = {
+                            client
+                        },
+                    ),
+                )
+            }
             .diskCache {
                 DiskCache.Builder()
                     .directory(context.cacheDir.resolve("ImageCache"))
