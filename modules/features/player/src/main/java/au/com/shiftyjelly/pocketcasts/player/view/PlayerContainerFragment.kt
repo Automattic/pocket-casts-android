@@ -201,7 +201,7 @@ class PlayerContainerFragment :
             }
             val upNextDrawable: Drawable? = AppCompatResources.getDrawable(binding.upNextButton.context, drawableId)
             binding.upNextButton.setImageDrawable(upNextDrawable)
-            binding.countText.text = if (upNextCount == 0) "" else upNextCount.toString()
+            binding.countText.text = if (upNextCount == 0) "" else upNextCount.coerceAtMost(Settings.UP_NEXT_BADGE_MAX_COUNT).toString()
 
             binding.upNextButton.setOnClickListener {
                 analyticsTracker.track(AnalyticsEvent.UP_NEXT_SHOWN, mapOf(SOURCE_KEY to UpNextSource.PLAYER.analyticsValue))

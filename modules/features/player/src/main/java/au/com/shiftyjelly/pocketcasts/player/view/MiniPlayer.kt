@@ -13,6 +13,7 @@ import androidx.core.view.isVisible
 import au.com.shiftyjelly.pocketcasts.models.entity.BaseEpisode
 import au.com.shiftyjelly.pocketcasts.player.R
 import au.com.shiftyjelly.pocketcasts.player.databinding.ViewMiniPlayerBinding
+import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.images.PocketCastsImageRequestFactory
 import au.com.shiftyjelly.pocketcasts.repositories.images.loadInto
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackState
@@ -37,10 +38,6 @@ import au.com.shiftyjelly.pocketcasts.localization.R as LR
 class MiniPlayer @JvmOverloads constructor(context: Context, attrs: AttributeSet? = null) :
     FrameLayout(context, attrs),
     CoroutineScope {
-
-    companion object {
-        private const val MAX_UP_NEXT_COUNT = 999
-    }
 
     override val coroutineContext: CoroutineContext
         get() = Dispatchers.Main
@@ -156,8 +153,8 @@ class MiniPlayer @JvmOverloads constructor(context: Context, attrs: AttributeSet
         }
 
         // cap the episode count to avoid small text or overflow issues
-        val upNextCount = upNextState.queueSize().coerceAtMost(MAX_UP_NEXT_COUNT)
-        binding.countText.text = upNextCount.toString()
+        val upNextCount = upNextState.queueSize()
+        binding.countText.text = upNextCount.coerceAtMost(Settings.UP_NEXT_BADGE_MAX_COUNT).toString()
         binding.countText.isVisible = upNextCount > 0
 
         val drawableId = when {
