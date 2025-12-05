@@ -38,6 +38,10 @@ class MiniPlayer @JvmOverloads constructor(context: Context, attrs: AttributeSet
     FrameLayout(context, attrs),
     CoroutineScope {
 
+    companion object {
+        private const val MAX_UP_NEXT_COUNT = 999
+    }
+
     override val coroutineContext: CoroutineContext
         get() = Dispatchers.Main
 
@@ -151,7 +155,8 @@ class MiniPlayer @JvmOverloads constructor(context: Context, attrs: AttributeSet
             }
         }
 
-        val upNextCount: Int = upNextState.queueSize()
+        // cap the episode count to avoid small text or overflow issues
+        val upNextCount = upNextState.queueSize().coerceAtMost(MAX_UP_NEXT_COUNT)
         binding.countText.text = upNextCount.toString()
         binding.countText.isVisible = upNextCount > 0
 
