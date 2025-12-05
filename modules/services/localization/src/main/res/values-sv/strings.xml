@@ -1,11 +1,31 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2025-11-14 09:54:17+0000
+Translation-Revision-Date: 2025-11-27 13:54:03+0000
 Plural-Forms: nplurals=2; plural=n != 1;
 Generator: GlotPress/2.4.0-alpha
 Language: sv_SE
 -->
 <resources>
+    <string name="eoy_story_top_podcasts_subtitle">Mer favoriter, mer lek, mer du</string>
+    <string name="eoy_story_top_podcasts_title">Dina andra favoriter</string>
+    <string name="end_of_year_listening_time_subtitle_with_number">%1$d lyssnade minuter</string>
+    <string name="pocket_casts_patron_badge">Pocket Casts Patron-märke</string>
+    <string name="pocket_casts_plus_badge">Pocket Casts Plus-märke</string>
+    <string name="end_of_year_stories_year_over_year_subtitle_went_up">Mer podcasts, mer glädje</string>
+    <string name="end_of_year_previous_story">Föregående berättelse</string>
+    <string name="end_of_year_next_story">Nästa berättelse</string>
+    <string name="end_of_year_story_listened_to_numbers">Du har lyssnat på %1$d podcasts och %2$d avsnitt</string>
+    <string name="up_next_as_playlist_replace_switch_description">Spara din nuvarande Nästa-kö som en spellista.</string>
+    <string name="up_next_as_playlist_replace_body">Om du spelar upp det här kommer din nuvarande Nästa att ersättas.</string>
+    <string name="added_to_playlist_single">Tillagd till %1$s</string>
+    <string name="end_of_year_failed_to_load_message">Det gick inte att ladda uppspelning</string>
+    <string name="end_of_year_stories_already_subscribed_to_plus">Dina Plus-förmåner låser upp extra statistik- och power-funktioner</string>
+    <string name="end_of_year_stories_subscribe_to_plus">Prenumerera på Pocket Casts Plus för utökad statistik, bokmärken, mappar, kapitelval och fler sätt att fördjupa dig i dina lyssningsvanor</string>
+    <string name="end_of_year_stories_plus_title">Tack för att du stödjer Pocket Casts!</string>
+    <string name="end_of_year_stories_theres_more">Vad sägs om en djupdykning?</string>
+    <string name="end_of_year_story_longest_episode_stats">Det längsta avsnittet var %1$s från %2$s</string>
+    <string name="end_of_year_story_longest_episode_subtitle">Hoppas att du stretchade först!</string>
+    <string name="end_of_year_story_longest_episode_title">Din maratonlyssning: %1$s</string>
     <string name="eoy_story_ratings_subtitle_no_ratings">Hjälp dina favoritkreatörer att bli upptäckta genom att dela det du älskar</string>
     <string name="eoy_story_ratings_title_no_ratings">Inga betyg än, men det finns fortfarande tid!</string>
     <string name="eoy_story_ratings_title_2">Tack för att du delar din feedback.</string>
@@ -41,6 +61,7 @@ Language: sv_SE
     <string name="search_suggestions_view_all">Visa alla för ”%1$s”</string>
     <string name="up_next_as_playlist_saved">Nästa har sparats som en spellista</string>
     <string name="up_next_as_playlist_button_secondary">Ersätt och spela upp</string>
+    <string name="up_next_as_playlist_replace_title">Byt ut din Nästa?</string>
     <string name="delete_playlist_confirmation_title">Ta bort spellista?</string>
     <string name="delete_playlist_confirmation_body">Är du säker på att du vill ta bort din spellista? Det går inte att ångra åtgärden.</string>
     <string name="delete_playlist">Ta bort spellista</string>
@@ -79,6 +100,7 @@ Language: sv_SE
     <string name="add_to_up_next_top">Lägg till högst upp i Nästa</string>
     <string name="playlist_episodes_archived_title">Inga avsnitt</string>
     <string name="playlist_episodes_archived_count">%1$d arkiverade</string>
+    <string name="playlist_edit_episodes">Sortera om avsnitt</string>
     <string name="playlist_episode_unavailable_cta">Ta bort från spellista</string>
     <string name="playlist_episode_unavailable_description">Podcastens skapare har tagit bort detta avsnitt. Det kommer att finnas kvar i din spellista tills du tar bort det.</string>
     <string name="playlist_episode_unavailable_title">Avsnittet är inte tillgängligt</string>
@@ -135,7 +157,6 @@ Language: sv_SE
     <string name="smart_rule_podcasts_all_description_disabled">Nya podcasts som du följer kommer inte att läggas till automatiskt.</string>
     <string name="onboarding_upgrade_pp">Integritetspolicy</string>
     <string name="onboarding_upgrade_tnc">Användarvillkor</string>
-    <string name="other_options">Andra alternativ</string>
     <string name="increment_shorter_than_duration">Öka varaktigheten för ”kortare än”</string>
     <string name="decrement_shorter_than_duration">Minska varaktigheten för ”kortare än”</string>
     <string name="increment_longer_than_duration">Öka varaktigheten för ”längre än”</string>
@@ -255,7 +276,6 @@ Language: sv_SE
     <string name="settings_notification_new_features">Nya funktioner och tips</string>
     <string name="settings_notification_recommendations">Trendande och rekommendationer</string>
     <string name="settings_notification_daily_reminders">Dagliga påminnelser</string>
-    <string name="notification_filters_message">Skapa smarta filter för att organisera dina avsnitt.</string>
     <string name="notification_up_next_message">Bygg en uppspelningskö och säg adjö till att hoppa runt mellan avsnitt.</string>
     <string name="notification_up_next_title">Förenkla din kö</string>
     <string name="notification_import_message">Byter du från en annan app? Ta med alla dina favoritshower till Pocket Casts.</string>
@@ -311,8 +331,6 @@ Language: sv_SE
     <string name="onboarding_get_started">Kom igång</string>
     <string name="encourage_account_history_banner_description">Skapa ett gratis konto för att synkronisera din lyssningshistorik överallt.</string>
     <string name="encourage_account_history_banner_title">Håll koll på vad du har spelat upp</string>
-    <string name="encourage_account_filters_banner_description">Skapa ett gratis konto för att synkronisera dina filter på vilken enhet som helst.</string>
-    <string name="encourage_account_filters_banner_title">Håll dina filter synkroniserade</string>
     <string name="encourage_account_sync_banner_description">Skapa ett gratis konto för att synkronisera dina shower och lyssna var som helst.</string>
     <string name="encourage_account_sync_banner_title">Dina shower, på vilken enhet som helst</string>
     <string name="encourage_account_banner_action_label">Skapa ett gratis konto</string>
@@ -325,8 +343,6 @@ Language: sv_SE
     <string name="tracking_consent_dialog_message">Vi använder analyser för att göra appen bättre och för att mäta om våra annonskampanjer är framgångsrika.</string>
     <string name="tracking_consent_dialog_title">Tillåt \"Pocket Casts\" att spåra din aktivitet i andra företags appar och webbplatser?</string>
     <string name="donate">Donera</string>
-    <string name="filters_tooltip_subtitle">Skapa smarta filter för att organisera dina avsnitt. Filtrera efter varaktighet, utgivningsdatum, mediatyp med mera.</string>
-    <string name="filters_tooltip_title">Organisera dina avsnitt</string>
     <string name="podcasts_sort_by_recently_played">Senast spelade</string>
     <string name="podcasts_sort_by_tooltip_message">Nu kan du sortera efter \"senast spelade\" och snabbt fortsätta där du slutade.</string>
     <string name="podcasts_sort_by_tooltip_title">Sortera efter \"senast spelade\"</string>
@@ -472,7 +488,6 @@ Language: sv_SE
     <string name="podcast_this">Den här podcasten</string>
     <string name="end_of_year_cant_share_message">Den här berättelsen kan inte delas</string>
     <string name="end_of_year_story_ratings_share_text">Jag betygsatte %1$d olika podcasts under %2$d, med %3$d som mitt mest använda betyg</string>
-    <string name="end_of_year_stories_completion_rate_share_text">Min slutförandegrad i år var %1$d</string>
     <string name="end_of_year_share_dialog_message">Klistra in den här bilden på dina sociala medier och uppmärksamma dina favoritshower och deras skapare</string>
     <string name="end_of_year_share_dialog_title">Dela den här berättelsen?</string>
     <string name="up_next_shuffle_disable_button_content_description">Inaktivera slumpmässig Nästa-uppspelning</string>
@@ -480,6 +495,7 @@ Language: sv_SE
     <string name="podcast_ratings_page_title">Betyg</string>
     <string name="settings_real_time_playback_summary">Om detta är aktiverat kommer spelaren att visa återstående tid, justerad för uppspelningshastighet och överhoppade kapitel.</string>
     <string name="settings_real_time_playback">Justera återstående tid</string>
+    <string name="eoy_story_stories_subscribe_to_plus_button_label">Skaffa Pocket Casts Plus</string>
     <string name="eoy_story_ratings_learn_button_label">Läs om betyg</string>
     <string name="referrals_failed_to_load_offer">Något gick fel vid hämtningen av din hänvisningslänk.</string>
     <string name="transcript_error_not_available">Det finns ingen transkription tillgänglig för det här avsnittet.</string>
@@ -679,8 +695,6 @@ Language: sv_SE
     <string name="discover_category_religion_abbreviation">Spiritualitet</string>
     <string name="discover_category_kids_abbreviation">Familj</string>
     <string name="discover_category_health_abbreviation">Hälsa</string>
-    <string name="eoy_story_top_podcasts_subtitle">Det här är de fem podcasts du lyssnade mest på 2023\"</string>
-    <string name="eoy_story_top_podcasts_title">Du lyssnade även mycket på dessa podcasts.</string>
     <string name="end_of_year_share_story">Dela den här berättelsen</string>
     <string name="podcast_log_in_to_rate">Du måste logga in för att ge ett betyg</string>
     <string name="podcast_submit_rating_no_internet">Ingen internetanslutning hittades. Anslut till internet för att lämna ett betyg.</string>
@@ -723,7 +737,6 @@ Language: sv_SE
     <string name="add_bookmark_title">Lägg till bokmärke</string>
     <string name="add_bookmark">Lägg till bokmärke</string>
     <string name="skipping_to">Hoppar till %s</string>
-    <string name="filters_not_found">Inga filter hittades</string>
     <string name="bookmarks_sort_timestamp">Tidsstämpel</string>
     <string name="bookmarks_select_option">Välj bokmärken</string>
     <string name="bookmarks_delete_summary_singular">Detta bokmärke kommer att tas bort. Det här går inte att ångra.</string>
@@ -736,7 +749,6 @@ Language: sv_SE
     <string name="deselect_all_below">Avmarkera alla nedan</string>
     <string name="deselect_all_above">Avmarkera alla ovan</string>
     <string name="edit">Redigera</string>
-    <string name="filters_download_limit_3">3 avsnitt</string>
     <string name="settings_title_headphone_controls">Hörlurskontroller</string>
     <string name="settings_headphone_controls_confirmation_sound_summary">Spela upp ett bekräftelseljud när ett bokmärke har skapats med dina hörlurar.</string>
     <string name="settings_headphone_controls_confirmation_sound">Bekräftelseljud för bokmärke</string>
@@ -1003,7 +1015,6 @@ Language: sv_SE
     <string name="time_to_skip_not_valid">Ogiltig tidpunkt att hoppa över: %1$s</string>
     <string name="time_to_skip_seconds">Tidpunkt att hoppa över (sekunder)</string>
     <string name="pocket_casts_play_filter">Pocket Casts – Spela spellista</string>
-    <string name="settings_select_filters">Välj filter</string>
     <string name="settings_import_url_summary">Importera dina podcasts från en OPML-fil med hjälp av en URL.</string>
     <string name="settings_import_url">Efter URL</string>
     <string name="time_to_skip_to_not_valid">Ogiltig tidpunkt att hoppa till: %1$s</string>
@@ -1158,7 +1169,6 @@ Language: sv_SE
     <string name="podcast_notifications_off">Aviseringar av</string>
     <string name="podcast_notifications_on">Aviseringar på</string>
     <string name="share">Dela</string>
-    <string name="filters_update_filter">Uppdatera filter</string>
     <string name="filters_chip_episode_status">Avsnittsstatus</string>
     <string name="all">Alla</string>
     <string name="filters_release_date">Utgivningsdatum</string>
@@ -1167,7 +1177,6 @@ Language: sv_SE
     <string name="audio">Ljud</string>
     <string name="not_downloaded">Ej nedladdat</string>
     <string name="downloaded">Nedladdat</string>
-    <string name="filters_download_options">Nedladdningsalternativ</string>
     <string name="player_up_next_time_remaining">Total återstående tid %s</string>
     <string name="profile_cloud_edit_file">Redigera fil</string>
     <string name="profile_cloud_add_file">Lägg till fil</string>
@@ -1488,8 +1497,6 @@ Language: sv_SE
     <string name="settings_auto_download_unmetered">Endast på WiFi utan datapriser</string>
     <string name="settings_auto_download_podcasts">Ladda ner podcasts automatiskt</string>
     <string name="settings_auto_download_new_episodes">Nya avsnitt</string>
-    <string name="settings_auto_download_filters_episodes">Alla filteravsnitt</string>
-    <string name="settings_auto_download_filters">Ladda ner filter automatiskt</string>
     <string name="settings_auto_download_clearing_errors">Rensar alla nedladdningsfel</string>
     <string name="settings_auto_download_clear_errors">Rensa alla nedladdningsfel</string>
     <string name="settings_auto_download_charging">Endast under laddning</string>
@@ -1547,7 +1554,6 @@ Language: sv_SE
     <string name="settings_notification_vibrate_never">Aldrig</string>
     <string name="settings_logs">Loggar</string>
     <string name="plus_trial_finished_detail">Din gratis provperiod har nått sitt slut. Ditt konto har nu nedgraderats till gratis.</string>
-    <string name="settings_status_service_account_summary">Tjänsten som används för att lagra avsnittsförlopp, podcasts du följer, filter, osv.</string>
     <string name="settings_show_archived_summary_show">Nya podcasts som du följer kommer att visa arkiverade avsnitt.</string>
     <string name="settings_show_archived_summary_hide">Nya podcasts som du följer kommer inte att visa arkiverade avsnitt.</string>
     <string name="settings_podcast_episode_grouping_summary_none">Nya podcasts som du följer kommer inte att gruppera sina avsnitt.</string>
@@ -1576,12 +1582,9 @@ Language: sv_SE
     <string name="profile_files_add_custom_image">Lägg till anpassad bild</string>
     <string name="profile_files_addfile_save">Spara</string>
     <string name="profile_navigation_files">Filer</string>
-    <string name="filters_create_colour_icon">FÄRG OCH IKON</string>
-    <string name="filters_create_name">NAMN</string>
     <string name="filters_chip_download_status">Nedladdningsstatus</string>
     <string name="filters_chip_media_type">Mediatyp</string>
     <string name="filters_episode_duration">Avsnittslängd</string>
-    <string name="filters_duration_error_title">Ja, men nej</string>
     <string name="filters_time_24_hours">Senaste 24 timmarna</string>
     <string name="filters_time_2_weeks">Senaste 2 veckorna</string>
     <string name="filters_time_3_days">Senaste 3 dagarna</string>
@@ -1593,7 +1596,6 @@ Language: sv_SE
     <string name="profile_navigation_listening_history">Lyssningshistorik</string>
     <string name="profile_cloud_only_on_wifi">Endast via WiFi</string>
     <string name="profile_cloud_playback_failed">Uppspelningen misslyckades</string>
-    <string name="filters_play_all_summary">Detta kommer att rensa din nuvarande Nästa-kö.</string>
     <string name="plus_cloud_storage">Molnlagring</string>
     <string name="profile_payment_cancelled">Betalningen har avbrutits</string>
     <string name="profile_sub_from_ios">Din prenumeration hanteras av Apple App Store</string>
@@ -1616,13 +1618,11 @@ Language: sv_SE
     <string name="profile_sonos_linking_failed">Länkningen misslyckades</string>
     <string name="profile_sonos_connect_account">Genom att ansluta till Sonos ger du Sonos-appen tillåtelse att komma åt din avsnittsinformation.\n\nDin e-postadress, ditt lösenord eller annan känslig information delas aldrig.</string>
     <string name="profile_sonos_need_account">Du behöver ha ett Pocket Casts-konto för att ansluta till Sonos.</string>
-    <string name="filters_options_sort_by">Sortera efter</string>
     <string name="profile_stats_auto_skipping">Hoppa över automatiskt</string>
     <string name="profile_stats_skipping">Hoppa över</string>
     <string name="profile_stats_variable_speed">Variabel hastighet</string>
     <string name="profile_terms_of_use_title">Användningsvillkor</string>
     <string name="profile_payment_try_again">Försök igen</string>
-    <string name="filters_stepper_plus">Plus</string>
     <string name="profile_monthly">Månadsvis</string>
     <string name="profile_none">Ingen</string>
     <string name="profile_supporter_thanks">Tack för ditt stöd!</string>
@@ -1760,40 +1760,15 @@ Language: sv_SE
     <string name="profile_account_delete_yes">Ja, ta bort det</string>
     <string name="profile_access_ends">Åtkomst upphör: %s</string>
     <string name="profile_access_ended">Åtkomst upphörde: %s</string>
-    <string name="filters_warning_delete_summary">Det här går inte att ångra.</string>
     <string name="filters_time_anytime">När som helst</string>
-    <string name="filters_stepper_minus">Minus</string>
-    <string name="filters_see_more_episodes">För att se fler avsnitt, prova att ändra dina filterinställningar.</string>
-    <string name="filters_preview">FÖRHANDSGRANSKA</string>
-    <string name="filters_play_episodes">Spela upp %d avsnitt</string>
-    <string name="filters_play_all_from_here_summary">Detta kommer att rensa din nuvarande Nästa-kö och lägga till alla följande avsnitt.</string>
-    <string name="filters_options_settings">Filterinställningar</string>
-    <string name="filters_options_download_all">Ladda ner alla</string>
-    <string name="filters_options_delete">Ta bort filter</string>
-    <string name="filters_no_matching_episodes_title">Inga matchande avsnitt</string>
-    <string name="filters_no_matching_episodes">Dina valda kriterier matchar inte några nuvarande avsnitt i dina prenumerationer.\n\nVälj andra filterkriterier, eller spara det här filtret om du tror att det kommer att matcha framtida avsnitt.</string>
     <string name="filters_no_episodes">Inga avsnitt hittades</string>
     <string name="filters_filter_by_duration">Filtrera efter varaktighet</string>
     <string name="filters_duration_shorter_than">Kortare än</string>
     <string name="filters_duration_longer_than">Längre än</string>
-    <string name="filters_duration_error_body">Att filtrera efter avsnitt som är längre än %1$d minut men kortare än %2$d minut skulle orsaka en reva i tidsrymden. Tyvärr.</string>
     <string name="filters_download_title">Ladda ner första automatiskt</string>
-    <string name="filters_download_limit_5">5 avsnitt</string>
-    <string name="filters_download_limit_40">40 avsnitt</string>
-    <string name="filters_download_limit_20">20 avsnitt</string>
-    <string name="filters_download_limit_100">100 avsnitt</string>
-    <string name="filters_download_limit_10">10 avsnitt</string>
     <string name="filters_create_select_criteria">Välj dina filterkriterier med hjälp av dessa knappar för att skapa en aktuell och smart spellista med avsnitt.</string>
     <string name="filters_create_save_filter">Spara filter</string>
     <string name="filters_create_options">Filtreringsalternativ</string>
-    <string name="filters_create_filter_details">Filterinformation</string>
-    <string name="filters_create_filter_by">FILTRERA EFTER</string>
-    <string name="filters_create_filter">Skapa filter</string>
-    <string name="filters_create_add_more">Lägg till fler kriterier för att förfina ditt filter.</string>
-    <string name="filters_create">Skapa</string>
-    <string name="filters_chosen_singular">1 filter valt</string>
-    <string name="filters_chosen_plural">%d filter valda</string>
-    <string name="filters_chosen_none">Inga valda</string>
     <string name="filters_choose_podcasts">Välj podcasts</string>
     <string name="profile_cloud_settings">Filinställningar</string>
     <string name="profile_refreshing">Uppdaterar …</string>
@@ -1804,7 +1779,6 @@ Language: sv_SE
     <string name="profile_create_password_requirements">Lösenord måste innehålla minst 6 tecken</string>
     <string name="profile_stats_share_to">Dela till…</string>
     <string name="supporter">Supporter</string>
-    <string name="filters">Filter</string>
     <string name="player_rearrange_actions_hidden">Fler åtgärder</string>
     <string name="player_up_next_clear_button">Rensa Nästa</string>
     <string name="download_warning_title">Ladda ner alla</string>
@@ -1852,8 +1826,6 @@ Language: sv_SE
     <string name="podcast_notifications">Aviseringar</string>
     <string name="player_effects_trim_silence">Trimma tystnad</string>
     <string name="podcast_settings_skip_first_summary">0 sekunder</string>
-    <string name="filters_all_your_podcasts">Alla dina podcasts</string>
-    <string name="episode_filters">Avsnittsfilter</string>
     <string name="supporter_cancel_active_until_delete_singular">Supporterstatusen kommer att förbli aktiv till %s. Därefter kommer du inte längre att kunna spela upp denna podcast.</string>
     <string name="supporter_cancel_active_until">Supporterstatusen kommer att förbli aktiv till %s. Du kommer endast att kunna lyssna på avsnitt som släppts före detta datum.</string>
     <string name="supporter_payment_url_not_found">Det gick inte att information om betalnings-URL</string>
@@ -1891,7 +1863,6 @@ Language: sv_SE
     <string name="podcast_effects_summary_trim_silence_on">Trimma tystnad på</string>
     <string name="podcast_effects_summary_speed">Hastighet %s×</string>
     <string name="podcast_included_in_filters">Ingår i %s</string>
-    <string name="podcast_not_in_filters">Ingår inte i några filter</string>
     <string name="podcast_share_open_fail">Det gick inte att läsa in informationen om den delade podcasten. Om problemet kvarstår kan du överväga att kontakta personen som delade den med dig och fråga vad problemet är.</string>
     <string name="podcast_share_open_fail_title">Misslyckades</string>
     <string name="podcast_add_failed">Det gick inte att lägga till podcasten.</string>
@@ -2059,7 +2030,6 @@ Language: sv_SE
     <string name="podcasts">Podcasts</string>
     <string name="podcasts_plural">%d podcasts</string>
     <string name="podcasts_menu_search_podcasts">Sök podcasts</string>
-    <string name="filters_chip_all_your_podcasts">Alla dina podcasts</string>
     <string name="player_time_saved_no_hour">Grattis! Du sparar tid och hinner gå igenom fler podcasts.</string>
     <string name="supporter_cancel_active_until_delete_plural">Supporterstatus kommer att förbli aktiv tills %s. Efter det kommer du inte att kunna spela dessa podcasts längre.</string>
     <string name="podcasts_share_all_podcasts_selected">Alla podcasts valda. Knappen Avmarkera alla</string>
@@ -2173,6 +2143,10 @@ Language: sv_SE
     <string name="go_to_files">Gå till filer</string>
     <string name="go_to_podcast">Gå till podcast</string>
     <string name="delete">Ta bort</string>
+    <plurals name="added_to_playlist_single_multiple">
+        <item quantity="one">Tillagd i %d spellista</item>
+        <item quantity="other">Tillagd i %d spellistor</item>
+    </plurals>
     <plurals name="chapter">
         <item quantity="one">kapitel</item>
         <item quantity="other">kapitel</item>
