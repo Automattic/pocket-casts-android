@@ -10,7 +10,7 @@ import javax.inject.Singleton
 class CoilManager @Inject constructor(val imageLoader: ImageLoader) {
 
     fun clearCache(uuid: String) {
-        val urls = PodcastImage.getArtworkUrls(uuid = uuid)
+        val urls = PodcastImage.getArtworkUrls(uuid = uuid, isWearOS = false)
         for (url in urls) {
             imageLoader.diskCache?.remove(url)
             LogBuffer.i(LogBuffer.TAG_BACKGROUND_TASKS, "Removing $url from image cache.")
