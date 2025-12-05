@@ -4,6 +4,9 @@
 
 8.2
 -----
+*   Updates
+    *   When following a podcast cache the smaller podcast images
+        ([#4827](https://github.com/Automattic/pocket-casts-android/pull/4827))
 *   Bug Fixes
     *   Fix Android 10 full screen player appearing under the status and navigation bars
         ([#4804](https://github.com/Automattic/pocket-casts-android/pull/4804))
