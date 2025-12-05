@@ -1,11 +1,31 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2025-11-13 09:54:05+0000
+Translation-Revision-Date: 2025-11-28 09:54:04+0000
 Plural-Forms: nplurals=1; plural=0;
 Generator: GlotPress/2.4.0-alpha
 Language: ja_JP
 -->
 <resources>
+    <string name="eoy_story_top_podcasts_subtitle">お気に入りを増やして楽しめば、もっとあなたらしく</string>
+    <string name="eoy_story_top_podcasts_title">その他の定番ポッドキャスト</string>
+    <string name="end_of_year_listening_time_subtitle_with_number">%1$d分聴取</string>
+    <string name="pocket_casts_patron_badge">Pocket Casts Patron バッジ</string>
+    <string name="pocket_casts_plus_badge">Pocket Casts Plus バッジ</string>
+    <string name="end_of_year_stories_year_over_year_subtitle_went_up">聞けば聞くほど、もっと幸せ</string>
+    <string name="end_of_year_previous_story">前のストーリー</string>
+    <string name="end_of_year_next_story">次のストーリー</string>
+    <string name="end_of_year_story_listened_to_numbers">%1$d個のポッドキャストで%2$d個のエピソードを聴きました</string>
+    <string name="up_next_as_playlist_replace_switch_description">現在の「次のエピソード」待機リストをプレイリストとして保存します。</string>
+    <string name="up_next_as_playlist_replace_body">これを再生すると、現在の「次のエピソード」が置き換えられます。</string>
+    <string name="added_to_playlist_single">%1$s に追加しました</string>
+    <string name="end_of_year_failed_to_load_message">再生を読み込めませんでした</string>
+    <string name="end_of_year_stories_already_subscribed_to_plus">Plus の特典で追加の統計情報と強力な機能を利用できます</string>
+    <string name="end_of_year_stories_subscribe_to_plus">Pocket Casts Plus をサブスクリプションすると、追加の統計情報、ブックマーク、フォルダー、チャプターの選択などで、聴取習慣を詳しく知ることができます</string>
+    <string name="end_of_year_stories_plus_title">Pocket Casts をご利用いただきありがとうございます。</string>
+    <string name="end_of_year_stories_theres_more">詳しく知りたいですか ?</string>
+    <string name="end_of_year_story_longest_episode_stats">最も長かったエピソードは「%2$s」の「%1$s」です</string>
+    <string name="end_of_year_story_longest_episode_subtitle">ストレッチは済ませましたね ?</string>
+    <string name="end_of_year_story_longest_episode_title">聴取マラソン: %1$s</string>
     <string name="eoy_story_ratings_subtitle_no_ratings">お気に入りのクリエイターが注目されるよう、好きなことを共有して応援しよう</string>
     <string name="eoy_story_ratings_subtitle_2">レビューは魅力的な番組が注目を集めるのに役立ちます</string>
     <string name="eoy_story_ratings_subtitle_1">世界中のクリエイターが愛を大切にしています</string>
@@ -41,6 +61,7 @@ Language: ja_JP
     <string name="search_suggestions_view_all">「%1$s」のすべてを表示</string>
     <string name="up_next_as_playlist_saved">「次のエピソード」をプレイリストとして保存しました</string>
     <string name="up_next_as_playlist_button_secondary">置換して再生</string>
+    <string name="up_next_as_playlist_replace_title">「次のエピソード」を置き換えますか ?</string>
     <string name="delete_playlist_confirmation_title">プレイリストを削除しますか ?</string>
     <string name="delete_playlist_confirmation_body">プレイリストを削除してもよいですか ? この操作を元に戻すことはできません。</string>
     <string name="delete_playlist">プレイリストを削除</string>
@@ -79,6 +100,7 @@ Language: ja_JP
     <string name="add_to_up_next_top">「次のエピソード待機リスト」の上部に追加</string>
     <string name="playlist_episodes_archived_title">エピソードなし</string>
     <string name="playlist_episodes_archived_count">%1$d件をアーカイブ済み</string>
+    <string name="playlist_edit_episodes">エピソードを並べ替え</string>
     <string name="playlist_episode_unavailable_cta">プレイリストから削除</string>
     <string name="playlist_episode_unavailable_description">ポッドキャスト作成者がこのエピソードを削除しました。 あなたが削除するまでは、ご自身のプレイリストに残ります。</string>
     <string name="playlist_episode_unavailable_title">エピソードが利用できません</string>
@@ -135,7 +157,6 @@ Language: ja_JP
     <string name="smart_rule_podcasts_all_description_disabled">新たにフォローするポッドキャストは自動的に追加されません。</string>
     <string name="onboarding_upgrade_pp">プライバシー\u00A0ポリシー</string>
     <string name="onboarding_upgrade_tnc">利用\u00A0\u00A0規約</string>
-    <string name="other_options">その他のオプション</string>
     <string name="increment_shorter_than_duration">「次の再生時間より短い」の時間を増やす</string>
     <string name="decrement_shorter_than_duration">「次の再生時間より短い」の時間を減らす</string>
     <string name="increment_longer_than_duration">「次の再生時間より長い」の時間を増やす</string>
@@ -251,7 +272,6 @@ Language: ja_JP
     <string name="notification_themes_message">テーマを閲覧し、自分のスタイルに合ったものを見つけましょう。</string>
     <string name="notification_content_recommendations_trending_message">他のユーザーが今週聴いているポッドキャストをチェックしましょう。</string>
     <string name="notification_themes_title">新しい外観を利用</string>
-    <string name="notification_filters_message">スマートフィルターを作成してエピソードを整理します。</string>
     <string name="notification_filters_title">エピソードを整理</string>
     <string name="notification_up_next_message">再生キューを作成します。エピソード間を移動する手間はもう必要ありません。</string>
     <string name="notification_up_next_title">キューを簡素化</string>
@@ -311,8 +331,6 @@ Language: ja_JP
     <string name="onboarding_get_started">開始する</string>
     <string name="encourage_account_history_banner_description">無料アカウントを作成すると、どこでも聴取履歴を同期できます。</string>
     <string name="encourage_account_history_banner_title">再生内容の追跡を継続</string>
-    <string name="encourage_account_filters_banner_description">無料アカウントを作成すると、どの端末でもフィルターを同期できます。</string>
-    <string name="encourage_account_filters_banner_title">フィルターの同期を維持</string>
     <string name="encourage_account_sync_banner_description">無料アカウントを作成すると、番組を同期して場所を問わず聴取できます。</string>
     <string name="encourage_account_sync_banner_title">あらゆる端末で番組を楽しむ</string>
     <string name="encourage_account_banner_action_label">無料アカウントを作成</string>
@@ -325,8 +343,6 @@ Language: ja_JP
     <string name="tracking_consent_dialog_message">当社ではアナリティクスを使用して、アプリの改良や、広告キャンペーンが成功したかどうかの測定を行っています。</string>
     <string name="tracking_consent_dialog_title">「Pocket Casts」が他社のアプリやサイトでのアクティビティを追跡することを許可しますか ?</string>
     <string name="donate">寄付</string>
-    <string name="filters_tooltip_subtitle">スマートフィルターを作成してエピソードを整理します。 期間、リリース日、メディアタイプなどで絞り込みます。</string>
-    <string name="filters_tooltip_title">エピソードを整理</string>
     <string name="podcasts_sort_by_recently_played">最近再生済み</string>
     <string name="podcasts_sort_by_tooltip_message">「最近再生済み」で並べ替えて、中断したところをすばやく確認できるようになりました。</string>
     <string name="podcasts_sort_by_tooltip_title">「最近再生済み」で並べ替え</string>
@@ -472,7 +488,6 @@ Language: ja_JP
     <string name="podcast_this">このポッドキャスト</string>
     <string name="end_of_year_cant_share_message">このストーリーは共有できません</string>
     <string name="end_of_year_story_ratings_share_text">%2$dは%1$d個のポッドキャストを評価し、最もよく使った評価は%3$dでした</string>
-    <string name="end_of_year_stories_completion_rate_share_text">今年の完了率は%1$d です</string>
     <string name="end_of_year_share_dialog_message">この画像をソーシャルに貼り付けて、お気に入りのショーや作成者を応援しましょう</string>
     <string name="end_of_year_share_dialog_title">このストーリーを共有しませんか ?</string>
     <string name="up_next_shuffle_disable_button_content_description">次のシャッフルの無効化</string>
@@ -480,6 +495,7 @@ Language: ja_JP
     <string name="podcast_ratings_page_title">評価機能</string>
     <string name="settings_real_time_playback_summary">オンにすると、再生速度とスキップされたチャプターに合わせて調整された残り時間がプレーヤーに表示されます。</string>
     <string name="settings_real_time_playback">残り時間を調整</string>
+    <string name="eoy_story_stories_subscribe_to_plus_button_label">Pocket Casts Plus を入手</string>
     <string name="eoy_story_ratings_learn_button_label">評価について</string>
     <string name="referrals_failed_to_load_offer">申し訳ありません、リファラルリンクの取得中にエラーが発生しました。</string>
     <string name="transcript_error_not_available">申し訳ありません、このエピソードではトランスクリプトを利用できません。</string>
@@ -679,8 +695,6 @@ Language: ja_JP
     <string name="discover_category_religion_abbreviation">スピリチュアル</string>
     <string name="discover_category_kids_abbreviation">ファミリー</string>
     <string name="discover_category_health_abbreviation">健康</string>
-    <string name="eoy_story_top_podcasts_subtitle">2023年に最も視聴されたトップ5です</string>
-    <string name="eoy_story_top_podcasts_title">そしてこれらのショーも大変気に入っていただけました !</string>
     <string name="end_of_year_share_story">このストーリーを共有</string>
     <string name="podcast_log_in_to_rate">評価を残すにはログインする必要があります</string>
     <string name="podcast_submit_rating_no_internet">インターネット接続が見つかりません。 評価を送信するにはインターネットに接続してください。</string>
@@ -723,7 +737,6 @@ Language: ja_JP
     <string name="bookmark_added">ブックマーク「%s」を追加しました</string>
     <string name="add_bookmark_title">ブックマークを追加</string>
     <string name="add_bookmark">ブックマークを追加</string>
-    <string name="filters_not_found">フィルターが見つかりません</string>
     <string name="bookmarks_sort_timestamp">タイムスタンプ</string>
     <string name="bookmarks_select_option">ブックマークを選択する</string>
     <string name="bookmarks_delete_summary_singular">このブックマークは削除されます。 この操作は元に戻すことができません。</string>
@@ -736,7 +749,6 @@ Language: ja_JP
     <string name="deselect_all_below">以下すべての選択を解除</string>
     <string name="deselect_all_above">以上すべての選択を解除</string>
     <string name="edit">編集する</string>
-    <string name="filters_download_limit_3">3エピソード</string>
     <string name="settings_title_headphone_controls">ヘッドフォン操作</string>
     <string name="settings_headphone_controls_confirmation_sound_summary">ヘッドフォンでブックマークを作成したら、確認音声を再生します。</string>
     <string name="settings_headphone_controls_confirmation_sound">確認音声をブックマーク</string>
@@ -1003,7 +1015,6 @@ Language: ja_JP
     <string name="time_to_skip_not_valid">スキップ先の時間%1$sが無効です</string>
     <string name="time_to_skip_seconds">スキップ先の時間 (秒)</string>
     <string name="pocket_casts_play_filter">Pocket Casts プレイリストを再生</string>
-    <string name="settings_select_filters">フィルターを選択する</string>
     <string name="settings_import_url_summary">URL を使用して OPML ファイルからポッドキャストをインポートします。</string>
     <string name="settings_import_url">URL を使用</string>
     <string name="time_to_skip_to_not_valid">スキップ先の時間%1$sが無効です</string>
@@ -1158,10 +1169,8 @@ Language: ja_JP
     <string name="podcast_notifications_off">通知オフ</string>
     <string name="podcast_notifications_on">通知オン</string>
     <string name="share">共有</string>
-    <string name="filters_update_filter">フィルターを更新</string>
     <string name="filters_chip_episode_status">エピソードのステータス</string>
     <string name="all">すべて</string>
-    <string name="filters_download_options">ダウンロードオプション</string>
     <string name="filters_release_date">リリース日</string>
     <string name="filters_duration">期間</string>
     <string name="player_up_next_time_remaining">合計残り時間 %s</string>
@@ -1497,8 +1506,6 @@ Language: ja_JP
     <string name="settings_auto_download_unmetered">従量制課金が行われない Wi-Fi のみ</string>
     <string name="settings_auto_download_podcasts">ポッドキャストを自動ダウンロード</string>
     <string name="settings_auto_download_new_episodes">新規エピソード</string>
-    <string name="settings_auto_download_filters_episodes">すべてのフィルターエピソード</string>
-    <string name="settings_auto_download_filters">フィルターを自動ダウンロード</string>
     <string name="settings_auto_download_clearing_errors">すべてのダウンロードエラーをクリアしています</string>
     <string name="settings_auto_download_clear_errors">すべてのダウンロードエラーをクリア</string>
     <string name="settings_auto_download_charging">充電中のみ</string>
@@ -1547,7 +1554,6 @@ Language: ja_JP
     <string name="plus_slash_month">%s / 月</string>
     <string name="settings_notification_vibrate_never">なし</string>
     <string name="settings_logs">ログ</string>
-    <string name="settings_status_service_account_summary">エピソードの進捗、フォローするポッドキャスト、フィルターなどを保存するために使用するサービスです。</string>
     <string name="settings_show_archived_summary_show">フォローする新しいポッドキャストにアーカイブ済みエピソードが表示されます。</string>
     <string name="settings_show_archived_summary_hide">フォローする新しいポッドキャストにアーカイブ済みエピソードが表示されません。</string>
     <string name="settings_podcast_episode_grouping_summary_none">フォローする新しいポッドキャストでエピソードがグループ化されません。</string>
@@ -1577,11 +1583,9 @@ Language: ja_JP
     <string name="profile_files_add_custom_image">カスタム画像を追加</string>
     <string name="profile_files_addfile_save">保存</string>
     <string name="profile_navigation_files">ファイル</string>
-    <string name="filters_create_name">名前</string>
     <string name="filters_chip_download_status">ダウンロードのステータス</string>
     <string name="filters_chip_media_type">メディアの種類</string>
     <string name="filters_episode_duration">エピソード時間</string>
-    <string name="filters_duration_error_title">今一度ご確認ください</string>
     <string name="filters_time_24_hours">過去24時間</string>
     <string name="filters_time_2_weeks">過去2週間</string>
     <string name="filters_time_3_days">過去3日</string>
@@ -1593,7 +1597,6 @@ Language: ja_JP
     <string name="profile_navigation_listening_history">聴取履歴</string>
     <string name="profile_cloud_only_on_wifi">Wi-Fi 接続中のみ</string>
     <string name="profile_cloud_playback_failed">再生に失敗</string>
-    <string name="filters_play_all_summary">この選択により、現在の次のエピソード待機リストの項目はクリアされます。</string>
     <string name="plus_cloud_storage">クラウドストレージ</string>
     <string name="profile_payment_cancelled">支払いをキャンセル済み</string>
     <string name="profile_sub_from_ios">サブスクリプションは Apple App Store によって管理されます</string>
@@ -1616,13 +1619,11 @@ Language: ja_JP
     <string name="profile_sonos_linking_failed">リンクに失敗</string>
     <string name="profile_sonos_connect_account">Sonos に接続すると Sonos アプリがエピソード情報にアクセスできるようになります。\n\nお客様のメールアドレス、パスワード、その他の機密情報が共有されることはありません。</string>
     <string name="profile_sonos_need_account">Pocket Casts アカウントを作成してから Sonos に接続してください。</string>
-    <string name="filters_options_sort_by">並び替えオプション</string>
     <string name="profile_stats_auto_skipping">自動スキップ</string>
     <string name="profile_stats_skipping">スキップ</string>
     <string name="profile_stats_variable_speed">速度調整</string>
     <string name="profile_terms_of_use_title">利用規約</string>
     <string name="profile_payment_try_again">もう一度お試しください</string>
-    <string name="filters_stepper_plus">Plus</string>
     <string name="profile_monthly">月払い</string>
     <string name="profile_none">なし</string>
     <string name="profile_supporter_thanks">ご支援いただきありがとうございます。</string>
@@ -1695,13 +1696,13 @@ Language: ja_JP
     <string name="profile_newsletter_detail">ニュースやアプリの更新、特定のテーマを取り上げたプレイリスト、インタビューなどをお楽しみください。</string>
     <string name="profile_new_password">新規パスワード</string>
     <string name="profile_new_email_address">新しいメールアドレス</string>
+    <string name="profile_license_agreement">Pocket Casts ではお客様のプライバシーを何よりも大切にしています。 このプライバシーポリシーでは、お客様から収集する情報の種類とその理由、その情報を使用して当社で行う可能性があること、当社での情報の扱い方について説明しています。 プライバシーポリシーは iOS と Android の Pocket Casts アプリ、および macOS アプリと Windows アプリに関連付けられている Pocket Casts Web サービスに適用されます (これらを総称して「サービス」と呼びます)。 サービスを利用することで、このプライバシーポリシーに同意したものとみなされます。 アプリでプッシュ通知をオンにした場合、お使いの端末にプッシュ通知を配信するために、Apple から提供されるプッシュトークンを当社で保管します。 Web アプリを購入された場合、当社では購入に関連する取引 ID を保存します。 アカウントを作成せず、プッシュ通知を使用しない場合、お客様に関するデータが当社のサーバーに保存されることはありません。 また、Pocket Casts の Web サービスでは Cookie やその類似テクノロジーを使用してお客様のログインを維持します。 サービス内からサポートリクエストを生成することを選択した場合、送信前に表示できるサポートリクエストへの対処に使用する追加データを含む添付ファイルを生成する場合があります。</string>
     <string name="profile_last_refresh">最終再読み込み: %s前</string>
     <string name="profile_joined">参加済み:</string>
     <string name="profile_get_plus">Pocket Casts Plus を取得してこれらの機能をフルに利用しましょう !</string>
     <string name="profile_free_account">無料アカウント</string>
     <string name="profile_files_remove_image">画像を置換</string>
     <string name="profile_files_empty_summary">自身のファイルを聴きたい場合は、\n+ ボタンをタップして Pocket Casts で開くとここに表示されます。</string>
-    <string name="profile_license_agreement">Pocket Casts ではお客様のプライバシーを何よりも大切にしています。 このプライバシーポリシーでは、お客様から収集する情報の種類とその理由、その情報を使用して当社で行う可能性があること、当社での情報の扱い方について説明しています。 プライバシーポリシーは iOS と Android の Pocket Casts アプリ、および macOS アプリと Windows アプリに関連付けられている Pocket Casts Web サービスに適用されます (これらを総称して「サービス」と呼びます)。 サービスを利用することで、このプライバシーポリシーに同意したものとみなされます。 アプリでプッシュ通知をオンにした場合、お使いの端末にプッシュ通知を配信するために、Apple から提供されるプッシュトークンを当社で保管します。 Web アプリを購入された場合、当社では購入に関連する取引 ID を保存します。 アカウントを作成せず、プッシュ通知を使用しない場合、お客様に関するデータが当社のサーバーに保存されることはありません。 また、Pocket Casts の Web サービスでは Cookie やその類似テクノロジーを使用してお客様のログインを維持します。 サービス内からサポートリクエストを生成することを選択した場合、送信前に表示できるサポートリクエストへの対処に使用する追加データを含む添付ファイルを生成する場合があります。</string>
     <string name="profile_files_add_filename">名前</string>
     <string name="profile_file_locked">ロック中</string>
     <string name="profile_file">ファイル</string>
@@ -1763,53 +1764,25 @@ Language: ja_JP
     <string name="profile_account_delete_yes">はい、削除します</string>
     <string name="profile_access_ends">アクセス権終了予定日: %s</string>
     <string name="profile_access_ended">アクセス権終了日: %s</string>
-    <string name="filters_warning_delete_summary">この操作は元に戻すことができません。</string>
     <string name="filters_time_anytime">すべての期間</string>
-    <string name="filters_stepper_minus">マイナス</string>
-    <string name="filters_see_more_episodes">他のエピソードを表示するには、フィルター設定を変更してみてください。</string>
-    <string name="filters_preview">プレビュー</string>
-    <string name="filters_play_episodes">%d件のエピソードを再生</string>
-    <string name="filters_play_all_from_here_summary">この操作によって、現在の次のエピソード待機リストがクリアされ、以降のエピソードがすべて追加されます。</string>
-    <string name="filters_options_settings">フィルター設定</string>
-    <string name="filters_options_download_all">すべてをダウンロード</string>
-    <string name="filters_options_delete">フィルターを削除</string>
-    <string name="filters_no_matching_episodes_title">一致するエピソードがありません</string>
-    <string name="filters_no_matching_episodes">選択した基準に一致する最新エピソードがサブスクリプションにありません。\n\n別の基準を選択してください。将来のエピソードと一致すると思われる場合はこのフィルターを保存してください。</string>
     <string name="filters_no_episodes">エピソードがありません</string>
     <string name="filters_filter_by_duration">再生時間でフィルター</string>
     <string name="filters_duration_shorter_than">次の再生時間より短い</string>
     <string name="filters_duration_longer_than">次の再生時間より長い</string>
-    <string name="filters_duration_error_body">%1$d分より長く%2$d分より短いエピソードを絞り込むことは、時間の仕組みに逆らうことになるためできません。 残念です。</string>
     <string name="filters_download_title">自動ダウンロードする最初のエピソード件数</string>
-    <string name="filters_download_limit_5">5件のエピソード</string>
-    <string name="filters_download_limit_40">40件のエピソード</string>
-    <string name="filters_download_limit_20">20件のエピソード</string>
-    <string name="filters_download_limit_100">100件のエピソード</string>
-    <string name="filters_download_limit_10">10件のエピソード</string>
     <string name="filters_create_select_criteria">これらのボタンを使用してフィルター条件を選択し、エピソードの最新のスマートプレイリストを作成します。</string>
     <string name="filters_create_save_filter">フィルターを保存</string>
     <string name="filters_create_options">フィルターオプション</string>
-    <string name="filters_create_filter_details">フィルターの詳細</string>
-    <string name="filters_create_filter_by">絞り込み条件</string>
-    <string name="filters_create_filter">フィルターを作成</string>
-    <string name="filters_create_add_more">条件をさらに追加してフィルターの絞り込みを完了します。</string>
-    <string name="filters_create">作成</string>
-    <string name="filters_chosen_singular">1件のフィルターを選択済み</string>
-    <string name="filters_chosen_plural">%d件のフィルターを選択済み</string>
-    <string name="filters_chosen_none">未選択</string>
     <string name="filters_choose_podcasts">ポッドキャストを選択</string>
     <string name="profile_cloud_settings">ファイル設定</string>
     <string name="profile_stats_time_saved_by">節約時間数</string>
     <string name="profile_create_password_requirements">6文字以上のパスワードを選んでください</string>
-    <string name="filters_create_colour_icon">カラーとアイコン</string>
     <string name="profile_stats_share_to">共有先…</string>
     <string name="supporter">サポーター</string>
-    <string name="filters">フィルター</string>
     <string name="player_rearrange_actions_hidden">その他の操作</string>
     <string name="player_up_next_clear_button">次のエピソードをクリア</string>
     <string name="download_warning_title">すべてをダウンロード</string>
     <string name="podcast_unsubscribe_downloaded_file_singular">1件のダウンロード済みファイル</string>
-    <string name="filters_chip_all_your_podcasts">すべてのポッドキャスト</string>
     <string name="podcasts_mark_played">再生済みとしてマーク</string>
     <string name="podcasts_mark_unplayed">未再生としてマーク</string>
     <string name="player_tab_playing_wide">再生中</string>
@@ -1856,8 +1829,6 @@ Language: ja_JP
     <string name="podcast_notifications">通知</string>
     <string name="player_effects_trim_silence">無音時間をカット</string>
     <string name="podcast_settings_skip_first_summary">0秒</string>
-    <string name="filters_all_your_podcasts">すべてのポッドキャスト</string>
-    <string name="episode_filters">エピソードフィルター</string>
     <string name="supporter_cancel_active_until_delete_plural">サポーターステータスは%sまで有効です。 その後はこれらのポッドキャストを再生できなくなります。</string>
     <string name="supporter_cancel_active_until_delete_singular">サポーターステータスは%sまで有効です。 その後はこのポッドキャストを再生できなくなります。</string>
     <string name="supporter_cancel_active_until">サポーターステータスは%sまで有効です。 この日までにリリースされたエピソードのみ聴取できます。</string>
@@ -1898,7 +1869,6 @@ Language: ja_JP
     <string name="podcast_effects_summary_trim_silence_on">無音時間のカット: オン</string>
     <string name="podcast_effects_summary_speed">%s倍速</string>
     <string name="podcast_included_in_filters">%s に同梱</string>
-    <string name="podcast_not_in_filters">どのフィルターにも含まれていません</string>
     <string name="podcast_unsubscribe_downloaded_file_plural">%dダウンロード済みファイル</string>
     <string name="podcast_share_open_fail">共有ポッドキャストの詳細を読み込めません。 この問題が解決されない場合は、共有した人物に連絡して何が起きているか確認してください。</string>
     <string name="podcast_add_failed">ポッドキャストを追加できません。</string>
@@ -2173,6 +2143,9 @@ Language: ja_JP
     <string name="auto_download">自動ダウンロード</string>
     <string name="auto_archive">自動アーカイブ</string>
     <string name="archive_episode">エピソードをアーカイブ</string>
+    <plurals name="added_to_playlist_single_multiple">
+        <item quantity="other">%d件のプレイリストに追加しました</item>
+    </plurals>
     <plurals name="chapter">
         <item quantity="other">チャプター</item>
     </plurals>

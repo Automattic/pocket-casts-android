@@ -1,11 +1,31 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2025-11-13 11:54:04+0000
+Translation-Revision-Date: 2025-11-26 15:54:03+0000
 Plural-Forms: nplurals=2; plural=n != 1;
 Generator: GlotPress/2.4.0-alpha
 Language: es
 -->
 <resources>
+    <string name="eoy_story_top_podcasts_subtitle">Más favoritos, más reproducción, más tú</string>
+    <string name="eoy_story_top_podcasts_title">Tus otros favoritos</string>
+    <string name="end_of_year_listening_time_subtitle_with_number">%1$d minutos escuchados</string>
+    <string name="pocket_casts_patron_badge">Insignia de Pocket Casts Patron</string>
+    <string name="pocket_casts_plus_badge">Insignia de Pocket Casts Plus</string>
+    <string name="end_of_year_stories_year_over_year_subtitle_went_up">Más podcasts, más disfrute</string>
+    <string name="end_of_year_previous_story">Story anterior</string>
+    <string name="end_of_year_next_story">Story siguiente</string>
+    <string name="end_of_year_story_listened_to_numbers">Has escuchado %1$d podcasts y %2$d episodios</string>
+    <string name="up_next_as_playlist_replace_switch_description">Guardar tu cola Siguiente actual como lista de reproducción.</string>
+    <string name="up_next_as_playlist_replace_body">Si reproduces esto, reemplazará a la cola Siguiente actual.</string>
+    <string name="added_to_playlist_single">Añadido a %1$s</string>
+    <string name="end_of_year_failed_to_load_message">No hemos podido cargar Playback</string>
+    <string name="end_of_year_stories_already_subscribed_to_plus">Tus ventajas Plus desbloquean estadísticas adicionales y funciones avanzadas</string>
+    <string name="end_of_year_stories_subscribe_to_plus">Suscríbete a Pocket Casts Plus para conseguir estadísticas ampliadas, marcadores, carpetas, selección de capítulos y más formas de profundizar en tus hábitos de escucha</string>
+    <string name="end_of_year_stories_plus_title">¡Gracias por apoyar Pocket Casts!</string>
+    <string name="end_of_year_stories_theres_more">¿Quieres un análisis a fondo?</string>
+    <string name="end_of_year_story_longest_episode_stats">El episodio más largo fue «%1$s» de «%2$s»</string>
+    <string name="end_of_year_story_longest_episode_subtitle">¡Esperamos que hicieras estiramientos antes!</string>
+    <string name="end_of_year_story_longest_episode_title">Tu maratón de escucha: %1$s</string>
     <string name="eoy_story_ratings_subtitle_no_ratings">Ayuda a que otros usuarios conozcan a tus creadores favoritos compartiendo lo que más te gusta</string>
     <string name="eoy_story_ratings_subtitle_2">Las reseñas ayudan a encontrar buenos programas</string>
     <string name="eoy_story_ratings_subtitle_1">Los creadores de todo el mundo aprecian el cariño</string>
@@ -41,6 +61,7 @@ Language: es
     <string name="search_suggestions_view_all">Ver todo para «%1$s»</string>
     <string name="up_next_as_playlist_saved">Cola Reproducir a continuación guardada como una playlist</string>
     <string name="up_next_as_playlist_button_secondary">Sustituir y reproducir</string>
+    <string name="up_next_as_playlist_replace_title">¿Reemplazar la cola Siguiente?</string>
     <string name="delete_playlist_confirmation_title">¿Eliminar playlist?</string>
     <string name="delete_playlist_confirmation_body">¿Seguro que quieres eliminar tu playlist? Esta acción no se puede deshacer.</string>
     <string name="delete_playlist">Eliminar playlist</string>
@@ -79,6 +100,7 @@ Language: es
     <string name="remove_from_playlist">Eliminar de la playlist</string>
     <string name="playlist_episodes_archived_title">No hay episodios</string>
     <string name="playlist_episodes_archived_count">%1$d archivado(s)</string>
+    <string name="playlist_edit_episodes">Reordenar episodios</string>
     <string name="playlist_episode_unavailable_title">Episodio no disponible</string>
     <string name="episode_sort_custom_order">Orden personalizado</string>
     <string name="playlist_episode_unavailable_cta">Eliminar de la playlist</string>
@@ -135,7 +157,6 @@ Language: es
     <string name="smart_rule_podcasts_all_description_disabled">Los podcasts nuevos que sigas se añadirán automáticamente.</string>
     <string name="onboarding_upgrade_pp">Política\u00A0de\u00A0Privacidad</string>
     <string name="onboarding_upgrade_tnc">Términos\u00A0y\u00A0Condiciones</string>
-    <string name="other_options">Otras opciones</string>
     <string name="episode_status_rule_description">%1$s + %2$d</string>
     <string name="smart_playlist_create_no_content_title">No hay episodios que coincidan</string>
     <string name="enabled_rules">Reglas activadas</string>
@@ -251,7 +272,6 @@ Language: es
     <string name="notification_staff_picks_message">Podcasts solo para ti, seleccionados por personas reales a las que les encantan los podcasts.</string>
     <string name="notification_content_recommendations_trending_message">Echa un vistazo a lo que todo el mundo está escuchando esta semana.</string>
     <string name="notification_themes_title">Es hora de cambiar de aspecto</string>
-    <string name="notification_filters_message">Crea filtros inteligentes para organizar tus episodios.</string>
     <string name="notification_filters_title">Organiza tus episodios</string>
     <string name="notification_up_next_message">Crea una cola de reproducción y despídete de los saltos entre episodios.</string>
     <string name="notification_up_next_title">Simplifica tu cola</string>
@@ -311,8 +331,6 @@ Language: es
     <string name="onboarding_get_started">Empezar ahora</string>
     <string name="encourage_account_history_banner_description">Crea una cuenta gratuita para sincronizar tu historial de escucha estés donde estés.</string>
     <string name="encourage_account_history_banner_title">Haz un seguimiento de lo que has reproducido</string>
-    <string name="encourage_account_filters_banner_description">Crea una cuenta gratuita para sincronizar tus filtros en cualquier dispositivo.</string>
-    <string name="encourage_account_filters_banner_title">Mantén tus filtros sincronizados</string>
     <string name="encourage_account_sync_banner_description">Crea una cuenta gratuita para sincronizar tus programas y escucharlos estés donde estés.</string>
     <string name="encourage_account_banner_action_label">Crear una cuenta gratuita</string>
     <string name="encourage_account_sync_banner_title">Tus programas en cualquier dispositivo</string>
@@ -325,8 +343,6 @@ Language: es
     <string name="tracking_consent_dialog_reject">Pedir a la aplicación que no rastree</string>
     <string name="tracking_consent_dialog_title">¿Permitir que «Pocket Casts» rastree tu actividad en las aplicaciones y webs de otras empresas?</string>
     <string name="donate">Contribuir</string>
-    <string name="filters_tooltip_subtitle">Crea filtros inteligentes para organizar tus episodios. Filtra por duración, fecha de lanzamiento, tipo de medio y más.</string>
-    <string name="filters_tooltip_title">Organiza tus episodios</string>
     <string name="podcasts_sort_by_recently_played">Reproducido recientemente</string>
     <string name="podcasts_sort_by_tooltip_message">Ahora puedes ordenar por Reproducido recientemente y seguir por donde lo dejaste sin perder tiempo.</string>
     <string name="podcasts_sort_by_tooltip_title">Ordenar por «Reproducido recientemente»</string>
@@ -472,7 +488,6 @@ Language: es
     <string name="podcast_this">Este podcast</string>
     <string name="end_of_year_cant_share_message">Esta historia no se puede compartir</string>
     <string name="end_of_year_story_ratings_share_text">He valorado %1$d podcasts diferentes en %2$d y he indicado que %3$d es el que más utilizo</string>
-    <string name="end_of_year_stories_completion_rate_share_text">Mi tasa de finalización de este año es de %1$d</string>
     <string name="end_of_year_share_dialog_message">Pega esta imagen en tus redes sociales y haz que todo el mundo sepa cuáles son tus programas y creadores favoritos</string>
     <string name="end_of_year_share_dialog_title">¿Quieres compartir esta historia?</string>
     <string name="up_next_shuffle_disable_button_content_description">Reproducción aleatoria desactivada</string>
@@ -480,6 +495,7 @@ Language: es
     <string name="podcast_ratings_page_title">Valoraciones</string>
     <string name="settings_real_time_playback_summary">Si esta opción está activada, el reproductor mostrará el tiempo restante, ajustado a la velocidad de reproducción y los capítulos omitidos.</string>
     <string name="settings_real_time_playback">Ajustar tiempo restante</string>
+    <string name="eoy_story_stories_subscribe_to_plus_button_label">Obtener Pocket Casts Plus</string>
     <string name="eoy_story_ratings_learn_button_label">Más información sobre las valoraciones</string>
     <string name="referrals_failed_to_load_offer">Lo sentimos, pero se ha producido un error al buscar tu enlace de recomendación.</string>
     <string name="transcript_error_not_available">Lo sentimos, pero este episodio no tiene ninguna transcripción disponible.</string>
@@ -679,8 +695,6 @@ Language: es
     <string name="discover_category_religion_abbreviation">Espiritualidad</string>
     <string name="discover_category_kids_abbreviation">Familia</string>
     <string name="discover_category_health_abbreviation">Salud</string>
-    <string name="eoy_story_top_podcasts_subtitle">Este es tu top 5 de lo más escuchado en 2023</string>
-    <string name="eoy_story_top_podcasts_title">Y también escuchaste mucho estos programas.</string>
     <string name="end_of_year_share_story">Compartir esta historia</string>
     <string name="podcast_log_in_to_rate">Debes acceder para dejar una valoración</string>
     <string name="podcast_submit_rating_no_internet">No se ha encontrado ninguna conexión a Internet. Conéctate a Internet para enviar una valoración.</string>
@@ -723,7 +737,6 @@ Language: es
     <string name="bookmark_added">Se ha añadido el marcador \"%s\"</string>
     <string name="add_bookmark_title">Añadir marcador</string>
     <string name="add_bookmark">Añadir marcador</string>
-    <string name="filters_not_found">No se ha encontrado ningún filtro</string>
     <string name="bookmarks_sort_timestamp">Marca temporal</string>
     <string name="bookmarks_select_option">Elegir marcador</string>
     <string name="bookmarks_delete_summary_singular">Este marcador se eliminará. Esta acción no se puede deshacer.</string>
@@ -736,7 +749,6 @@ Language: es
     <string name="deselect_all_below">Anular la selección de todo lo que aparece a continuación</string>
     <string name="deselect_all_above">Anular la selección de todo lo anterior</string>
     <string name="edit">Editar</string>
-    <string name="filters_download_limit_3">Tres episodios</string>
     <string name="settings_title_headphone_controls">Controles de los auriculares</string>
     <string name="settings_headphone_controls_confirmation_sound">Sonido de confirmación para marcadores</string>
     <string name="settings_headphone_controls_choice_skip_forward">Saltar adelante</string>
@@ -1003,7 +1015,6 @@ Language: es
     <string name="time_to_skip_not_valid">Tiempo para saltar %1$s no válido</string>
     <string name="time_to_skip_seconds">Tiempo para saltar (segundos)</string>
     <string name="pocket_casts_play_filter">Reproducir playlist en Pocket Casts</string>
-    <string name="settings_select_filters">Seleccionar filtros</string>
     <string name="settings_import_url_summary">Importa tus podcasts desde un archivo OPML a través de una URL.</string>
     <string name="settings_import_url">Por URL</string>
     <string name="time_to_skip_to_not_valid">Tiempo al que saltar %1$s no válido</string>
@@ -1158,10 +1169,8 @@ Language: es
     <string name="podcast_notifications_off">Notificaciones desactivadas</string>
     <string name="podcast_notifications_on">Notificaciones activadas</string>
     <string name="share">Compartir</string>
-    <string name="filters_update_filter">Actualizar filtro</string>
     <string name="filters_chip_episode_status">Estado del episodio</string>
     <string name="all">Todo</string>
-    <string name="filters_download_options">Opciones de descarga</string>
     <string name="filters_release_date">Fecha de publicación</string>
     <string name="filters_duration">Duración</string>
     <string name="player_up_next_time_remaining">Tiempo restante total %s</string>
@@ -1487,8 +1496,6 @@ Language: es
     <string name="settings_auto_download_unmetered">Solo con wifi no medida</string>
     <string name="settings_auto_download_podcasts">Descargar podcasts automáticamente</string>
     <string name="settings_auto_download_new_episodes">Nuevos episodios</string>
-    <string name="settings_auto_download_filters_episodes">Todos los episodios filtrados</string>
-    <string name="settings_auto_download_filters">Filtros de descarga automática</string>
     <string name="settings_auto_download_clearing_errors">Borrando todos los errores de descargas</string>
     <string name="settings_auto_download_clear_errors">Borrar todos los errores de descargas</string>
     <string name="settings_auto_download_charging">Solo mientras se carga</string>
@@ -1547,7 +1554,6 @@ Language: es
     <string name="plus_slash_month">%s/mes</string>
     <string name="settings_notification_vibrate_never">Nunca</string>
     <string name="settings_logs">Registros</string>
-    <string name="settings_status_service_account_summary">El servicio se utiliza para almacenar el progreso de los episodios, los pódcasts que sigues, los filtros, etc.</string>
     <string name="settings_show_archived_summary_show">Los pódcasts que sigas mostrarán los episodios archivados.</string>
     <string name="settings_show_archived_summary_hide">Los pódcasts nuevos que sigas no mostrarán los episodios archivados.</string>
     <string name="settings_podcast_episode_grouping_summary_none">Los pódcasts nuevos que sigas no agruparán sus episodios.</string>
@@ -1577,11 +1583,9 @@ Language: es
     <string name="profile_files_add_custom_image">Añadir imagen personalizada</string>
     <string name="profile_files_addfile_save">Guardar</string>
     <string name="profile_navigation_files">Archivos</string>
-    <string name="filters_create_name">NOMBRE</string>
     <string name="filters_chip_download_status">Estado de la descarga</string>
     <string name="filters_chip_media_type">Tipo de archivo multimedia</string>
     <string name="filters_episode_duration">Duración del episodio</string>
-    <string name="filters_duration_error_title">Sí, pero en realidad no</string>
     <string name="filters_time_24_hours">Últimas 24 horas</string>
     <string name="filters_time_2_weeks">Últimas 2 semanas</string>
     <string name="filters_time_3_days">Últimos 3 días</string>
@@ -1593,7 +1597,6 @@ Language: es
     <string name="profile_navigation_listening_history">Historial de elementos escuchados</string>
     <string name="profile_cloud_only_on_wifi">Solo con wifi</string>
     <string name="profile_cloud_playback_failed">Se ha producido un error en la reproducción</string>
-    <string name="filters_play_all_summary">Esto borrará la cola A continuación actual.</string>
     <string name="plus_cloud_storage">Almacenamiento en la nube</string>
     <string name="profile_payment_cancelled">Pago cancelado</string>
     <string name="profile_sub_from_ios">La suscripción se gestiona a través del App Store de Apple </string>
@@ -1616,13 +1619,11 @@ Language: es
     <string name="profile_sonos_linking_failed">Se ha producido un error en la vinculación</string>
     <string name="profile_sonos_connect_account">Al conectarte a Sonos, permitirás que la aplicación acceda a la información del episodio.\n\nNunca se compartirá tu dirección de correo electrónico, contraseña ni otra información confidencial.</string>
     <string name="profile_sonos_need_account">Para poder conectarte con Sonos, necesitas una cuenta de Pocket Casts.</string>
-    <string name="filters_options_sort_by">Ordenar por</string>
     <string name="profile_stats_auto_skipping">Salto automático</string>
     <string name="profile_stats_skipping">Saltando</string>
     <string name="profile_stats_variable_speed">Velocidad variable</string>
     <string name="profile_terms_of_use_title">Condiciones de uso</string>
     <string name="profile_payment_try_again">Intentar de nuevo</string>
-    <string name="filters_stepper_plus">Plus</string>
     <string name="profile_monthly">Mensual</string>
     <string name="profile_none">Ninguno</string>
     <string name="profile_supporter_thanks">¡Gracias por tu apoyo!</string>
@@ -1695,6 +1696,7 @@ Language: es
     <string name="profile_next_payment">Siguiente pago %s</string>
     <string name="profile_new_password">Nueva contraseña</string>
     <string name="profile_new_email_address">Nueva dirección de correo electrónico</string>
+    <string name="profile_license_agreement">Pocket Casts valora tu privacidad. Esta Política de privacidad explica la información que recopilamos sobre ti y por qué, qué podemos hacer con ella y cómo la gestionamos. Esta política se aplica a las aplicaciones de Pocket Casts de iOS y Android y al servicio web de Pocket Casts asociado con aplicaciones de macOS y Windows (de manera conjunta, el Servicio). Al usar este Servicio, aceptas esta Política de privacidad. Si activas las notificaciones push en la aplicación, almacenamos el token push que nos proporciona Apple para enviar esas notificaciones a tu dispositivo. Si compras la aplicación web, almacenamos el ID de transacción de la compra. Si eliges no crear una cuenta y no usas las notificaciones push, no se almacenará ningún dato tuyo en nuestros servidores. El servicio web de Pocket Casts también utiliza cookies y tecnologías similares para mantener tu sesión iniciada. Si quieres, puedes generar una solicitud de soporte dentro del Servicio. Es posible que creemos un archivo adjunto con datos adicionales para ayudarte a resolver esta solicitud. Te invitamos a que la veas antes de enviarla.</string>
     <string name="profile_last_refresh">Última actualización: hace %s</string>
     <string name="profile_joined">Se ha unido:</string>
     <string name="profile_get_plus">Consigue Pocket Casts Plus para desbloquear esta función y muchas otras más.</string>
@@ -1705,7 +1707,6 @@ Language: es
     <string name="profile_file_locked">bloqueado</string>
     <string name="profile_file">Archivo</string>
     <string name="profile_feature_requires">Esta función necesita \nPocket Casts Plus</string>
-    <string name="profile_license_agreement">Pocket Casts valora tu privacidad. Esta Política de privacidad explica la información que recopilamos sobre ti y por qué, qué podemos hacer con ella y cómo la gestionamos. Esta política se aplica a las aplicaciones de Pocket Casts de iOS y Android y al servicio web de Pocket Casts asociado con aplicaciones de macOS y Windows (de manera conjunta, el Servicio). Al usar este Servicio, aceptas esta Política de privacidad. Si activas las notificaciones push en la aplicación, almacenamos el token push que nos proporciona Apple para enviar esas notificaciones a tu dispositivo. Si compras la aplicación web, almacenamos el ID de transacción de la compra. Si eliges no crear una cuenta y no usas las notificaciones push, no se almacenará ningún dato tuyo en nuestros servidores. El servicio web de Pocket Casts también utiliza cookies y tecnologías similares para mantener tu sesión iniciada. Si quieres, puedes generar una solicitud de soporte dentro del Servicio. Es posible que creemos un archivo adjunto con datos adicionales para ayudarte a resolver esta solicitud. Te invitamos a que la veas antes de enviarla.</string>
     <string name="profile_ends">Finaliza %s</string>
     <string name="profile_ended">Finalizó el %s</string>
     <string name="profile_end_tour">FINALIZAR RECORRIDO</string>
@@ -1763,53 +1764,25 @@ Language: es
     <string name="profile_account_delete_yes">Sí, bórrala</string>
     <string name="profile_access_ends">El acceso termina: %s</string>
     <string name="profile_access_ended">El acceso terminó: %s</string>
-    <string name="filters_warning_delete_summary">Esta acción no se puede deshacer.</string>
     <string name="filters_time_anytime">En cualquier momento</string>
-    <string name="filters_stepper_minus">Menos</string>
-    <string name="filters_see_more_episodes">Para ver menos episodios, prueba a cambiar los ajustes de los filtros.</string>
-    <string name="filters_preview">VISTA PREVIA</string>
-    <string name="filters_play_episodes">Reproducir %d episodios</string>
-    <string name="filters_play_all_from_here_summary">Se borrará la cola actual de A continuación y se añadirán todos los siguientes episodios.</string>
-    <string name="filters_options_download_all">Descargar todo</string>
-    <string name="filters_options_delete">Eliminar filtro</string>
-    <string name="filters_no_matching_episodes_title">No hay episodios que coincidan</string>
-    <string name="filters_no_matching_episodes">Los criterios que has elegido no coinciden con ningún episodio en tus suscripciones.\n\nElige otros criterios o guarda este filtro si crees que coincidirá con algún episodio más tarde.</string>
     <string name="filters_no_episodes">No se ha encontrado ningún episodio</string>
     <string name="filters_filter_by_duration">Filtrar por duración</string>
     <string name="filters_duration_shorter_than">Menos de</string>
     <string name="filters_duration_longer_than">Más de</string>
-    <string name="filters_duration_error_body">Filtrar los episodios de más de %1$d min pero de menos de %2$d min provocaría una fisura en el continuo espacio-tiempo. Lo sentimos.</string>
     <string name="filters_download_title">Descargar automáticamente primero</string>
-    <string name="filters_download_limit_5">5 episodios</string>
-    <string name="filters_download_limit_40">40 episodios</string>
-    <string name="filters_download_limit_20">20 episodios</string>
-    <string name="filters_download_limit_100">100 episodios</string>
-    <string name="filters_download_limit_10">10 episodios</string>
     <string name="filters_create_save_filter">Guardar filtro</string>
     <string name="filters_create_options">Opciones de filtro</string>
-    <string name="filters_create_filter_details">Información sobre el filtro</string>
-    <string name="filters_create_filter_by">FILTRAR POR</string>
-    <string name="filters_create_filter">Crear filtro</string>
-    <string name="filters_create_add_more">Añade más criterios para terminar de acotar tu filtro.</string>
-    <string name="filters_create">Crear</string>
-    <string name="filters_chosen_singular">1 filtro elegido</string>
-    <string name="filters_chosen_plural">%d filtros elegidos</string>
-    <string name="filters_chosen_none">Ningún filtro elegido</string>
     <string name="filters_choose_podcasts">Elegir podcasts</string>
     <string name="profile_cloud_settings">Ajustes de los archivos</string>
-    <string name="filters_options_settings">Ajustes de filtro</string>
     <string name="profile_create_password_requirements">La contraseña debe tener al menos 6 caracteres.</string>
-    <string name="filters_create_colour_icon">COLOR E ICONO</string>
     <string name="profile_stats_share_to">Compartir con…</string>
     <string name="profile_newsletter_detail">Recibe noticias, actualizaciones de la aplicación, playlists por tema, entrevistas y más.</string>
     <string name="filters_create_select_criteria">Elige los criterios de los filtros con estos botones para crear una playlist inteligente y actualizada de episodios.</string>
     <string name="supporter">Seguidor</string>
-    <string name="filters">Filtros</string>
     <string name="player_rearrange_actions_hidden">Más acciones</string>
     <string name="player_up_next_clear_button">Borrar A continuación</string>
     <string name="download_warning_title">Descargar todo</string>
     <string name="podcast_unsubscribe_downloaded_file_singular">1 archivo descargado</string>
-    <string name="filters_chip_all_your_podcasts">Todos tus podcasts</string>
     <string name="podcasts_mark_unplayed">Marcar los no reproducidos</string>
     <string name="player_tab_playing">En reproducción</string>
     <string name="podcasts_badges_off">Off</string>
@@ -1854,8 +1827,6 @@ Language: es
     <string name="podcast_notifications">Avisos</string>
     <string name="player_effects_trim_silence">Recortar silencio</string>
     <string name="podcast_settings_skip_first_summary">0 segundos</string>
-    <string name="filters_all_your_podcasts">Todos tus podcasts</string>
-    <string name="episode_filters">Filtros de episodios</string>
     <string name="supporter_cancel_active_until_delete_plural">El estado del seguidor permanecerá activo hasta el %s. Después de esta fecha, ya no podrás reproducir estos podcasts.</string>
     <string name="supporter_cancel_active_until_delete_singular">El estado del seguidor permanecerá activo hasta el %s. Después de esta fecha, no podrás reproducir este podcast.</string>
     <string name="supporter_cancel_active_until">El estado del seguidor permanecerá activo hasta el %s. Solo podrás escuchar los episodios que se publiquen antes de esta fecha.</string>
@@ -1895,7 +1866,6 @@ Language: es
     <string name="podcast_effects_summary_trim_silence_on">activar recortar silencio</string>
     <string name="podcast_effects_summary_speed">Velocidad %sx</string>
     <string name="podcast_included_in_filters">Incluido en %s</string>
-    <string name="podcast_not_in_filters">No se incluye en ningún filtro</string>
     <string name="podcast_unsubscribe_downloaded_file_plural">%d Archivos descargados</string>
     <string name="podcast_share_open_fail">No se han podido cargar los datos del podcast compartido. Si el problema continúa, puedes probar a ponerte en contacto con la persona que te lo compartió y preguntarle qué pasa.</string>
     <string name="podcast_share_open_fail_title">Fallo total</string>
@@ -2173,6 +2143,10 @@ Language: es
     <string name="auto_download">Descargar automáticamente</string>
     <string name="auto_archive">Archivar automáticamente</string>
     <string name="archive_episode">Archivar episodio</string>
+    <plurals name="added_to_playlist_single_multiple">
+        <item quantity="one">Añadido a %d playlist</item>
+        <item quantity="other">Añadido a %d playlists</item>
+    </plurals>
     <plurals name="chapter">
         <item quantity="one">capítulo</item>
         <item quantity="other">capítulos</item>

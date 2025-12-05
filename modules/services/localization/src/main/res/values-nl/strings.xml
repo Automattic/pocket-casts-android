@@ -1,11 +1,31 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2025-11-13 11:54:04+0000
+Translation-Revision-Date: 2025-11-27 11:54:04+0000
 Plural-Forms: nplurals=2; plural=n != 1;
 Generator: GlotPress/2.4.0-alpha
 Language: nl
 -->
 <resources>
+    <string name="eoy_story_top_podcasts_subtitle">Meer favorieten, meer spelen, meer jij</string>
+    <string name="eoy_story_top_podcasts_title">Je andere favorieten</string>
+    <string name="end_of_year_listening_time_subtitle_with_number">%1$d minuten geluisterd</string>
+    <string name="pocket_casts_patron_badge">Pocket Casts Patron-badge</string>
+    <string name="pocket_casts_plus_badge">Pocket Casts Plus-badge</string>
+    <string name="end_of_year_stories_year_over_year_subtitle_went_up">Meer podcasts, meer plezier</string>
+    <string name="end_of_year_previous_story">Vorig verhaal</string>
+    <string name="end_of_year_next_story">Volgend verhaal</string>
+    <string name="end_of_year_story_listened_to_numbers">Je hebt naar %1$d podcasts en %2$d afleveringen geluisterd</string>
+    <string name="up_next_as_playlist_replace_switch_description">Sla je huidige wachtrij Hierna op als afspeellijst.</string>
+    <string name="up_next_as_playlist_replace_body">Als je dit afspeelt, wordt je huidige Hierna vervangen.</string>
+    <string name="added_to_playlist_single">Toegevoegd aan %1$s</string>
+    <string name="end_of_year_failed_to_load_message">Sorry, we konden het afspelen niet laden</string>
+    <string name="end_of_year_stories_already_subscribed_to_plus">Met je Plus-extraatjes ontgrendel je extra statistieken en krachtige functies</string>
+    <string name="end_of_year_stories_subscribe_to_plus">Abonneer je op Pocket Casts Plus voor uitgebreide statistieken, bladwijzers, mappen, hoofdstuk-selectie en meer manieren om je luistergewoonten te leren kennen</string>
+    <string name="end_of_year_stories_plus_title">Bedankt voor de ondersteuning van Pocket Casts!</string>
+    <string name="end_of_year_stories_theres_more">Wil je diep gaan?</string>
+    <string name="end_of_year_story_longest_episode_stats">De langste aflevering was \'%1$s\' van \'%2$s\'</string>
+    <string name="end_of_year_story_longest_episode_subtitle">Hopelijk heb je je eerst uitgestrekt!</string>
+    <string name="end_of_year_story_longest_episode_title">Je luistermarathon: %1$s</string>
     <string name="eoy_story_ratings_subtitle_no_ratings">Help je favoriete makers ontdekken door te delen waar je van houdt</string>
     <string name="eoy_story_ratings_subtitle_2">Beoordelingen helpen geweldige shows te vinden</string>
     <string name="eoy_story_ratings_subtitle_1">Overal waarderen makers de liefde</string>
@@ -41,6 +61,7 @@ Language: nl
     <string name="search_suggestions_view_all">Alles weergeven voor \'%1$s\'</string>
     <string name="up_next_as_playlist_saved">Hierna opgeslagen als playlist</string>
     <string name="up_next_as_playlist_button_secondary">Vervangen en afspelen</string>
+    <string name="up_next_as_playlist_replace_title">Je Hierna vervangen?</string>
     <string name="delete_playlist_confirmation_title">Playlist verwijderen?</string>
     <string name="delete_playlist_confirmation_body">Weet je zeker dat je je playlist wilt verwijderen? Dit kan niet ongedaan worden gemaakt.</string>
     <string name="delete_playlist">Playlist verwijderen</string>
@@ -79,6 +100,7 @@ Language: nl
     <string name="remove_from_playlist">Verwijderen uit playlist</string>
     <string name="playlist_episodes_archived_title">Geen afleveringen</string>
     <string name="playlist_episodes_archived_count">%1$d gearchiveerd</string>
+    <string name="playlist_edit_episodes">Afleveringen herschikken</string>
     <string name="playlist_episode_unavailable_title">Aflevering niet beschikbaar</string>
     <string name="episode_sort_custom_order">Aangepaste volgorde</string>
     <string name="playlist_episode_unavailable_cta">Verwijderen uit playlist</string>
@@ -135,7 +157,6 @@ Language: nl
     <string name="smart_rule_podcasts_all_description_disabled">Nieuwe podcasts die je volgt, worden automatisch toegevoegd.</string>
     <string name="onboarding_upgrade_pp">Privacy\u00A0Policy</string>
     <string name="onboarding_upgrade_tnc">Algemene voorwaarden\u00A0and\u00A0Conditions</string>
-    <string name="other_options">Andere opties</string>
     <string name="increment_shorter_than_duration">\'korter dan\' duur verhogen</string>
     <string name="decrement_shorter_than_duration">\'korter dan\' duur verlagen</string>
     <string name="increment_longer_than_duration">\'langer dan\' duur verhogen</string>
@@ -250,7 +271,6 @@ Language: nl
     <string name="notification_themes_message">Blader door onze thema\'s en vind het thema dat bij je stijl past.</string>
     <string name="notification_content_recommendations_trending_message">Bekijk hier waar anderen deze week naar luisteren.</string>
     <string name="notification_themes_title">Tijd voor een nieuwe look</string>
-    <string name="notification_filters_message">Maak slimme filters aan om je afleveringen te organiseren.</string>
     <string name="notification_filters_title">Organiseer je afleveringen</string>
     <string name="notification_up_next_message">Maak een afspeelwachtrij en neem afscheid van zoeken naar afleveringen.</string>
     <string name="notification_up_next_title">Vereenvoudig je wachtrij</string>
@@ -310,8 +330,6 @@ Language: nl
     <string name="onboarding_get_started">Aan de slag</string>
     <string name="encourage_account_history_banner_description">Maak een gratis account aan om je luistergeschiedenis overal te synchroniseren.</string>
     <string name="encourage_account_history_banner_title">Houd bij wat je hebt afgespeeld</string>
-    <string name="encourage_account_filters_banner_description">Maak een gratis account aan om je filters op elk apparaat te synchroniseren.</string>
-    <string name="encourage_account_filters_banner_title">Houd je filters gesynchroniseerd</string>
     <string name="encourage_account_sync_banner_description">Maak een gratis account aan om je shows te synchroniseren en overal te luisteren.</string>
     <string name="encourage_account_sync_banner_title">Je shows, op elk apparaat</string>
     <string name="encourage_account_banner_action_label">Een gratis-account aanmaken</string>
@@ -324,8 +342,6 @@ Language: nl
     <string name="tracking_consent_dialog_message">We gebruiken analyses om de app te verbeteren en bij te houden of onze advertentiecampagnes werken.</string>
     <string name="tracking_consent_dialog_title">\'Pocket Casts\' toestaan om je activiteit in de apps en websites van andere bedrijven te volgen?</string>
     <string name="donate">Doneren</string>
-    <string name="filters_tooltip_subtitle">Maak slimme filters aan om je afleveringen te organiseren. Filter op duur, uitgavedatum, mediatype en meer.</string>
-    <string name="filters_tooltip_title">Organiseer je afleveringen</string>
     <string name="podcasts_sort_by_recently_played">Recent afgespeeld</string>
     <string name="podcasts_sort_by_tooltip_message">Je kan nu sorteren op Recent afgespeeld en snel doorgaan naar waar je gebleven was.</string>
     <string name="podcasts_sort_by_tooltip_title">Sorteren op \'Recent afgespeeld\'</string>
@@ -471,7 +487,6 @@ Language: nl
     <string name="podcast_this">Deze podcast</string>
     <string name="end_of_year_cant_share_message">Dit verhaal kan niet gedeeld worden</string>
     <string name="end_of_year_story_ratings_share_text">Ik heb %1$d verschillende podcasts beoordeeld in %2$d, me %3$d als mijn meest gegeven beoordeling</string>
-    <string name="end_of_year_stories_completion_rate_share_text">Mijn afrondingspercentage dit jaar was %1$d</string>
     <string name="end_of_year_share_dialog_message">Plaats deze afbeelding op je sociale media en noem je favoriete shows en makers</string>
     <string name="end_of_year_share_dialog_title">Dit verhaal delen?</string>
     <string name="up_next_shuffle_disable_button_content_description">Hierna shuffle uitschakelen</string>
@@ -479,6 +494,7 @@ Language: nl
     <string name="podcast_ratings_page_title">Beoordelingen</string>
     <string name="settings_real_time_playback_summary">Als dit is ingeschakeld, toont de speler de resterende tijd, aangepast aan de afspeelsnelheid en overgeslagen hoofdstukken.</string>
     <string name="settings_real_time_playback">Resterende tijd aanpassen</string>
+    <string name="eoy_story_stories_subscribe_to_plus_button_label">Neem Pocket Casts Plus</string>
     <string name="eoy_story_ratings_learn_button_label">Meer informatie over beoordelingen</string>
     <string name="referrals_failed_to_load_offer">Er is iets fout gegaan bij het ophalen van je verwijzingslink.</string>
     <string name="transcript_error_not_available">Er is helaas geen transcriptie beschikbaar voor deze aflevering.</string>
@@ -678,8 +694,6 @@ Language: nl
     <string name="discover_category_religion_abbreviation">Spiritualiteit</string>
     <string name="discover_category_kids_abbreviation">Familie</string>
     <string name="discover_category_health_abbreviation">Gezondheid</string>
-    <string name="eoy_story_top_podcasts_subtitle">Dit is je top 5 meest geluisterd in 2023*</string>
-    <string name="eoy_story_top_podcasts_title">En deze shows vond je ook geweldig!</string>
     <string name="end_of_year_share_story">Deel dit verhaal</string>
     <string name="podcast_log_in_to_rate">Je moet inloggen om een beoordeling achter te laten</string>
     <string name="podcast_submit_rating_no_internet">Geen internetverbinding gevonden. Maak verbinding met het internet om een beoordeling in te dienen.</string>
@@ -722,7 +736,6 @@ Language: nl
     <string name="bookmark_added">Bladwijzer %s toegevoegd</string>
     <string name="add_bookmark_title">Bladwijzer toevoegen</string>
     <string name="add_bookmark">Bladwijzer toevoegen</string>
-    <string name="filters_not_found">Geen filters gevonden</string>
     <string name="bookmarks_sort_timestamp">Tijdstempel</string>
     <string name="bookmarks_select_option">Bladwijzers selecteren</string>
     <string name="bookmarks_delete_summary_singular">Deze bladwijzer wordt verwijderd. Deze actie kan niet ongedaan worden gemaakt.</string>
@@ -735,7 +748,6 @@ Language: nl
     <string name="deselect_all_below">Alles hieronder deselecteren</string>
     <string name="deselect_all_above">Alles hierboven deselecteren</string>
     <string name="edit">Bewerk</string>
-    <string name="filters_download_limit_3">3 afleveringen</string>
     <string name="settings_title_headphone_controls">Koptelefoonbediening</string>
     <string name="settings_headphone_controls_confirmation_sound_summary">Speel een bevestigingsgeluid op je koptelefoon af nadat een bladwijzer is aangemaakt.</string>
     <string name="settings_headphone_controls_confirmation_sound">Bevestigingsgeluid bladwijzer</string>
@@ -1002,7 +1014,6 @@ Language: nl
     <string name="time_to_skip_not_valid">Tijd om door te spoelen %1$s niet geldig</string>
     <string name="time_to_skip_seconds">Tijd om door te spoelen (seconden)</string>
     <string name="pocket_casts_play_filter">Playlist afspelen met Pocket Casts</string>
-    <string name="settings_select_filters">Filters selecteren</string>
     <string name="settings_import_url_summary">Importeer je podcasts vanuit een OPML-bestand met een URL.</string>
     <string name="settings_import_url">Op URL</string>
     <string name="time_to_skip_to_not_valid">Tijd om naar door te spoelen %1$s niet geldig</string>
@@ -1157,10 +1168,8 @@ Language: nl
     <string name="podcast_notifications_off">Meldingen uit</string>
     <string name="podcast_notifications_on">Meldingen aan</string>
     <string name="share">Delen</string>
-    <string name="filters_update_filter">Filter bijwerken</string>
     <string name="filters_chip_episode_status">Status van aflevering</string>
     <string name="all">Alles</string>
-    <string name="filters_download_options">Downlaodopties</string>
     <string name="filters_release_date">Uitgavedatum</string>
     <string name="filters_duration">Duur</string>
     <string name="player_up_next_time_remaining">Totale resterende tijd %s</string>
@@ -1488,8 +1497,6 @@ Language: nl
     <string name="settings_auto_download_unmetered">Alleen wifi zonder limiet</string>
     <string name="settings_auto_download_podcasts">Podcasts automatisch downloaden</string>
     <string name="settings_auto_download_new_episodes">Nieuwe afleveringen</string>
-    <string name="settings_auto_download_filters_episodes">Alle filterafleveringen</string>
-    <string name="settings_auto_download_filters">Filters automatisch downloaden</string>
     <string name="settings_auto_download_clearing_errors">Alle downloadfouten wissen…</string>
     <string name="settings_auto_download_clear_errors">Alle downloadfouten wissen</string>
     <string name="settings_auto_download_charging">Alleen bij opladen</string>
@@ -1546,7 +1553,6 @@ Language: nl
     <string name="plus_slash_month">%s / maand</string>
     <string name="settings_notification_vibrate_never">Nooit</string>
     <string name="settings_logs">Logbestanden</string>
-    <string name="settings_status_service_account_summary">De service die wordt gebruikt om afleveringsvoortgang, abonnementen, filters etc. op te slaan.</string>
     <string name="settings_show_archived_summary_show">Nieuwe podcasts waarop je je abonneert tonen gearchiveerde afleveringen.</string>
     <string name="settings_show_archived_summary_hide">Nieuwe podcasts waarop je je abonneert tonen geen gearchiveerde afleveringen.</string>
     <string name="settings_podcast_episode_grouping_summary">Nieuwe podcasts waarop je je abonneert tonen afleveringen gegroepeerd op %s.</string>
@@ -1576,11 +1582,9 @@ Language: nl
     <string name="profile_files_add_custom_image">Aangepaste afbeelding toevoegen</string>
     <string name="profile_files_addfile_save">Opslaan</string>
     <string name="profile_navigation_files">Bestanden</string>
-    <string name="filters_create_name">NAAM</string>
     <string name="filters_chip_download_status">Downloadstatus</string>
     <string name="filters_chip_media_type">Type media</string>
     <string name="filters_episode_duration">Duur van aflevering</string>
-    <string name="filters_duration_error_title">Ja, maar ook weer niet</string>
     <string name="filters_time_24_hours">Afgelopen 24 uur</string>
     <string name="filters_time_2_weeks">Afgelopen 2 weken</string>
     <string name="filters_time_3_days">Afgelopen 3 dagen</string>
@@ -1592,7 +1596,6 @@ Language: nl
     <string name="profile_navigation_listening_history">Luistergeschiedenis</string>
     <string name="profile_cloud_only_on_wifi">Alleen via wifi</string>
     <string name="profile_cloud_playback_failed">Afspelen mislukt</string>
-    <string name="filters_play_all_summary">Hierdoor wordt je huidige wachtrij Hierna gewist.</string>
     <string name="plus_cloud_storage">Opslag in de cloud</string>
     <string name="profile_payment_cancelled">Betaling geannuleerd</string>
     <string name="profile_sub_from_ios">Je abonnement wordt beheerd door de Apple App Store</string>
@@ -1613,13 +1616,11 @@ Language: nl
     <string name="profile_sonos_linking_failed">Koppelen mislukt</string>
     <string name="profile_sonos_connect_account">Door verbinding te maken met Sonos kan de Sonos-app informatie over je aflevering ophalen.\n\nJe e-mailadres, wachtwoord en andere gevoelige gegevens worden nooit gedeeld.</string>
     <string name="profile_sonos_need_account">Je moet een Pocket Casts-account hebben voordat je verbinding kan maken met Sonos.</string>
-    <string name="filters_options_sort_by">Sorteren op</string>
     <string name="profile_stats_auto_skipping">Automatisch overslaan</string>
     <string name="profile_stats_skipping">Overslaan</string>
     <string name="profile_stats_variable_speed">Variabele snelheid</string>
     <string name="profile_terms_of_use_title">Gebruiksvoorwaarden</string>
     <string name="profile_payment_try_again">Probeer opnieuw</string>
-    <string name="filters_stepper_plus">Plus</string>
     <string name="profile_monthly">Maandelijks</string>
     <string name="profile_none">Geen</string>
     <string name="profile_supporter_thanks">Bedankt voor je ondersteuning!</string>
@@ -1757,38 +1758,13 @@ Language: nl
     <string name="profile_account_delete_yes">Ja, verwijderen</string>
     <string name="profile_access_ends">Toegang eindigt: %s</string>
     <string name="profile_access_ended">Toegang beëindigd: %s</string>
-    <string name="filters_warning_delete_summary">Deze actie kan niet ongedaan worden gemaakt.</string>
     <string name="filters_time_anytime">Elk moment</string>
-    <string name="filters_stepper_minus">Min</string>
-    <string name="filters_see_more_episodes">Om meer afleveringen te zien kun je proberen je filterinstellingen aan te passen.</string>
-    <string name="filters_preview">VOORBEELD BEKIJKEN</string>
-    <string name="filters_play_episodes">%d afleveringen afspelen</string>
-    <string name="filters_play_all_from_here_summary">Hierdoor wordt je huidige wachtrij Hierna gewist en alle volgende afleveringen toegevoegd,</string>
-    <string name="filters_options_settings">Filterinstellingen</string>
-    <string name="filters_options_download_all">Alles downloaden</string>
-    <string name="filters_options_delete">Filter verwijderen</string>
-    <string name="filters_no_matching_episodes_title">Geen overeenkomende afleveringen</string>
-    <string name="filters_no_matching_episodes">De geselecteerde criteria komen niet overeen met afleveringen in je abonnementen.\n\nKies andere criteria of sla dit filter op als je denkt dat het overeenkomt met toekomstige afleveringen.</string>
     <string name="filters_no_episodes">Geen afleveringen gevonden</string>
     <string name="filters_filter_by_duration">Filteren op duur</string>
     <string name="filters_duration_shorter_than">Korter dan</string>
     <string name="filters_duration_longer_than">Langer dan</string>
-    <string name="filters_duration_error_body">Als je zou filteren op afleveringen die langer zijn dan %1$d m, maar korter zijn dan %2$d m, dan veroorzaakt dit een scheur in ons ruimte-tijd-continuüm. Sorry.</string>
     <string name="filters_download_title">Automatisch eerste downloaden</string>
-    <string name="filters_download_limit_5">5 afleveringen</string>
-    <string name="filters_download_limit_40">40 afleveringen</string>
-    <string name="filters_download_limit_20">20 afleveringen</string>
-    <string name="filters_download_limit_100">100 afleveringen</string>
-    <string name="filters_download_limit_10">10 afleveringen</string>
     <string name="filters_create_save_filter">Filter opslaan</string>
-    <string name="filters_create_filter_details">Filtergegevens</string>
-    <string name="filters_create_filter_by">FILTEREN OP</string>
-    <string name="filters_create_filter">Filter aanmaken</string>
-    <string name="filters_create_add_more">Voeg meer criteria toe om je filter verder te verfijnen.</string>
-    <string name="filters_create">Aanmaken</string>
-    <string name="filters_chosen_singular">1 filter gekozen</string>
-    <string name="filters_chosen_plural">%d filters gekozen</string>
-    <string name="filters_chosen_none">Geen geselecteerd</string>
     <string name="filters_choose_podcasts">Podcasts kiezen</string>
     <string name="profile_cloud_settings">Bestandsinstellingen</string>
     <string name="profile_stats_trim_silence">Stiltes wegfilteren</string>
@@ -1798,17 +1774,14 @@ Language: nl
     <string name="profile_create_newsletter_summary">Ontvang nieuws, app-updates, thematische podcastlijsten, interviews en meer</string>
     <string name="profile_cloud_percentage_full">%d%% vol</string>
     <string name="profile_create_password_requirements">Wachtwoord moet bestaan uit ten minste 6 tekens</string>
-    <string name="filters_create_colour_icon">KLEUR EN PICTOGRAM</string>
     <string name="profile_stats_share_to">Deel naar…</string>
     <string name="profile_newsletter_detail">Ontvang nieuws, app-updates, themaplaylists, interviews en meer.</string>
     <string name="filters_create_select_criteria">Selecteer je filtercriteria om een bijgewerkte intelligente playlist met afleveringen te maken.</string>
     <string name="supporter">Ondersteuner</string>
-    <string name="filters">Filters</string>
     <string name="player_rearrange_actions_hidden">Meer acties</string>
     <string name="player_up_next_clear_button">Hierna wissen</string>
     <string name="download_warning_title">Alles downloaden</string>
     <string name="podcast_unsubscribe_downloaded_file_singular">1 gedownload bestand</string>
-    <string name="filters_chip_all_your_podcasts">Al je podcasts</string>
     <string name="podcasts_mark_played">Afgespeeld markeren</string>
     <string name="podcasts_mark_unplayed">Niet-afgespeeld markeren</string>
     <string name="player_tab_playing_wide">Bezig met afspelen</string>
@@ -1854,8 +1827,6 @@ Language: nl
     <string name="podcast_group_season">Seizoen</string>
     <string name="podcast_notifications">Meldingen</string>
     <string name="podcast_settings_skip_first_summary">0 seconden</string>
-    <string name="filters_all_your_podcasts">Al je podcasts</string>
-    <string name="episode_filters">Afleveringfilters</string>
     <string name="supporter_cancel_active_until_delete_plural">Ondersteunerstatus blijft actief tot %s. Daarna kan je deze podcasts niet meer afspelen.</string>
     <string name="supporter_cancel_active_until_delete_singular">Ondersteunerstatus blijft actief tot %s. Daarna kan je deze podcast niet meer afspelen.</string>
     <string name="supporter_cancel_active_until">Ondersteunerstatus blijft actief tot %s. Je kan alleen nog luisteren naar afleveringen die vóór deze datum zijn uitgegeven.</string>
@@ -1894,7 +1865,6 @@ Language: nl
     <string name="podcast_effects_summary_volume_boost_on">volumeboost aan</string>
     <string name="podcast_effects_summary_speed">Snelheid %s×</string>
     <string name="podcast_included_in_filters">Inbegrepen in %s</string>
-    <string name="podcast_not_in_filters">Niet toegevoegd aan filters</string>
     <string name="podcast_unsubscribe_downloaded_file_plural">%d Gedownloade bestanden</string>
     <string name="podcast_share_open_fail">Kon geen details laden over de gedeelde podcast. Als het probleem blijft bestaan, kun je contact opnemen met de persoon die met je heeft gedeeld en vragen wat er mis is.</string>
     <string name="podcast_share_open_fail_title">Mislukt</string>
@@ -2172,6 +2142,10 @@ Language: nl
     <string name="archive_episode">Aflevering archiveren</string>
     <string name="archive">Archiveren</string>
     <string name="in_progress">Aan het beluisteren</string>
+    <plurals name="added_to_playlist_single_multiple">
+        <item quantity="one">Toevoegen aan %d playlist</item>
+        <item quantity="other">Toevoegen aan %d playlists</item>
+    </plurals>
     <plurals name="chapter">
         <item quantity="one">hoofdstuk</item>
         <item quantity="other">hoofdstukken</item>
@@ -2267,10 +2241,6 @@ Language: nl
     <plurals name="profile_stats_hour_listened">
         <item quantity="one">Uur geluisterd</item>
         <item quantity="other">Uren geluisterd</item>
-    </plurals>
-    <plurals name="profile_stats_hour_saved">
-        <item quantity="one">Uur opgeslagen</item>
-        <item quantity="other">Uren opgeslagen</item>
     </plurals>
     <plurals name="profile_stats_minute_listened">
         <item quantity="one">Minuut geluisterd</item>

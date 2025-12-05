@@ -1,11 +1,50 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2025-11-07 23:48:55+0000
+Translation-Revision-Date: 2025-11-26 23:56:41+0000
 Plural-Forms: nplurals=2; plural=n != 1;
 Generator: GlotPress/2.4.0-alpha
 Language: ca
 -->
 <resources>
+    <string name="eoy_story_top_podcasts_title">Els teus altres preferits</string>
+    <string name="eoy_story_top_podcasts_subtitle">Més favorits, més reproducció, més tu</string>
+    <string name="pocket_casts_plus_badge">Insígnia de Pocket Casts Plus</string>
+    <string name="pocket_casts_patron_badge">Insígnia de Pocket Casts Patron</string>
+    <string name="end_of_year_listening_time_subtitle_with_number">%1$d minuts escoltats</string>
+    <string name="end_of_year_stories_year_over_year_subtitle_went_up">Més pòdcasts, més alegria</string>
+    <string name="end_of_year_next_story">Història següent</string>
+    <string name="end_of_year_previous_story">Història anterior</string>
+    <string name="end_of_year_story_listened_to_numbers">Has escoltat %1$d pòdcasts i %2$d episodis</string>
+    <string name="up_next_as_playlist_replace_body">Reproduir això substituirà la cua actual de Tot seguit.</string>
+    <string name="up_next_as_playlist_replace_switch_description">Desa la cua de Tot Seguit com a llista de reproducció.</string>
+    <string name="added_to_playlist_single">Afegit a %1$s</string>
+    <string name="end_of_year_failed_to_load_message">Ho sento, no s\'ha pogut carregar la reproducció</string>
+    <string name="end_of_year_stories_theres_more">Vols aprofundir més?</string>
+    <string name="end_of_year_stories_plus_title">Gràcies per donar suport a Pocket Casts!</string>
+    <string name="end_of_year_stories_subscribe_to_plus">Subscriu-te a Pocket Casts Plus per a estadístiques ampliades, marcadors, carpetes, selecció de capítols i més maneres de millorar els teus hàbits d\'escolta</string>
+    <string name="end_of_year_stories_already_subscribed_to_plus">Els teus avantatges Plus activen estadístiques addicionals i funcions avançades</string>
+    <string name="end_of_year_story_longest_episode_title">La teva escolta de marató: %1$s</string>
+    <string name="end_of_year_story_longest_episode_subtitle">Esperem que hagis estirat primer!</string>
+    <string name="end_of_year_story_longest_episode_stats">L\'episodi més llarg va ser “%1$s” de “%2$s”</string>
+    <string name="end_of_year_listening_time_subtitle">minuts escoltats</string>
+    <string name="eoy_story_ratings_title_2">Gràcies per compartir la teva opinió.</string>
+    <string name="eoy_story_ratings_title_no_ratings">No hi ha valoracions encara, però encara hi ha temps!</string>
+    <string name="eoy_story_ratings_subtitle_1">Els creadors de tot arreu aprecien l\'amor</string>
+    <string name="eoy_story_ratings_subtitle_2">Les ressenyes ajuden a trobar bons pòdcasts</string>
+    <string name="eoy_story_ratings_subtitle_no_ratings">Ajuda que altres usuaris coneguin els teus creadors favorits compartint allò que més t\'agrada</string>
+    <string name="eoy_story_ratings_title_1">Has deixat valoracions de %1$d estrelles com si fossin confeti</string>
+    <string name="end_of_year_stories_year_over_year_subtitle_flat">Consistent i fiable, com el teu cafè preferit</string>
+    <string name="end_of_year_stories_year_over_year_title_went_down">La teva escolta ha baixat un %1$s%% enguany</string>
+    <string name="end_of_year_stories_year_over_year_subtitle_went_down">Però ei, qualitat abans que quantitat</string>
+    <string name="end_of_year_stories_year_over_year_title_went_up_a_lot">De zero a heroi!</string>
+    <string name="end_of_year_stories_year_over_year_subtitle_went_up_a_lot">Has escoltat un 500% més enguany — benvingut al club</string>
+    <string name="end_of_year_stories_year_over_year_title_flat">La teva %1$s escolta s\'ha mantingut estable</string>
+    <string name="database">Base de dades</string>
+    <string name="normalized">Normalitzat</string>
+    <string name="not_normalized">No normalitzat</string>
+    <string name="normalization_started">Normalització començada</string>
+    <string name="settings_storage_normalize_episode_titles">Normalitzar els títols dels episodis</string>
+    <string name="settings_storage_normalize_episode_titles_description">Estat: %1$s\nAlgunes parts de l\'aplicació utilitzen una cerca d\'episodis que requereix títols normalitzats. Tocar aquesta configuració executa la normalització de la base de dades si els episodis no estan normalitzats ja.</string>
     <string name="end_of_year_story_top_podcast_stats_hours">%1$s i %2$s. Això sí que és compromís!</string>
     <string name="end_of_year_story_top_podcast_stats_days">%1$s, %2$s i %3$s. Això sí que és compromís!</string>
     <string name="end_of_year_story_top_podcast_subtitle">No hi ha res que sigui més “tu” que això</string>
@@ -22,6 +61,7 @@ Language: ca
     <string name="search_suggestions_view_all">Veure-ho tot per \"%1$s\"</string>
     <string name="up_next_as_playlist_saved">La cua «Tot seguit» s\'ha desat com una llista de reproducció</string>
     <string name="up_next_as_playlist_button_secondary">Substitueix i reprodueix</string>
+    <string name="up_next_as_playlist_replace_title">Substituir l\'actual «Tot seguit»?</string>
     <string name="delete_playlist_confirmation_title">Esborrar la llista de reproducció?</string>
     <string name="delete_playlist_confirmation_body">Estàs segur que vols esborrar la teva llista de reproducció? No hi ha manera de desfer-ho.</string>
     <string name="view">Veure</string>
@@ -60,6 +100,7 @@ Language: ca
     <string name="add_to_up_next_top">Afegir al principi de la cua</string>
     <string name="playlist_episodes_archived_title">No hi ha episodis</string>
     <string name="playlist_episodes_archived_count">%1$d arxivats</string>
+    <string name="playlist_edit_episodes">Reordenar els episodis</string>
     <string name="playlist_episode_unavailable_cta">Esborrar de la llista de reproducció</string>
     <string name="playlist_episode_unavailable_description">L\'autor del pòdcast ha eliminat aquest episodi. Es quedarà a la teva llista de reproducció fins que l\'esborris.</string>
     <string name="playlist_episode_unavailable_title">Episodi no disponible. </string>
@@ -125,7 +166,6 @@ Language: ca
     <string name="smart_playlist_create_no_content_title">No hi ha episodis que coincideixin</string>
     <string name="preview_playlist">Previsualització %1$s</string>
     <string name="enabled_rules">Regles activades</string>
-    <string name="other_options">Altres opcions</string>
     <string name="in_progress_uppercase">En progrés</string>
     <string name="onboarding_preselect_chapters_chapter_title">Capítol %1$d</string>
     <string name="onboarding_preselect_chapters_title">Preselecciona capítols: directe al més interessant</string>
@@ -232,7 +272,6 @@ Language: ca
     <string name="notification_themes_message">Explora els nostres temes i troba el que s\'adapti al teu estil.</string>
     <string name="notification_content_recommendations_trending_message">Consulta el que tothom està escoltant aquesta setmana.</string>
     <string name="notification_themes_title">És l\'hora de renovar l\'aspecte</string>
-    <string name="notification_filters_message">Crear filtres intel·ligents per organitzar els teus episodis.</string>
     <string name="notification_filters_title">Organitzar els teus episodis</string>
     <string name="notification_up_next_message">Crea una cua de reproducció i digues adéu a saltar entre episodis.</string>
     <string name="notification_up_next_title">Simplificar la teva cua</string>
@@ -292,8 +331,6 @@ Language: ca
     <string name="onboarding_get_started">Comença</string>
     <string name="encourage_account_history_banner_description">Crea un compte gratuït per sincronitzar el teu historial d\'escolta a tot arreu.</string>
     <string name="encourage_account_history_banner_title">Fes un seguiment del que has escoltat</string>
-    <string name="encourage_account_filters_banner_description">Crea un compte gratuït per sincronitzar els teus filtres en qualsevol dispositiu.</string>
-    <string name="encourage_account_filters_banner_title">Mantén els teus filtres sincronitzats</string>
     <string name="encourage_account_sync_banner_description">Crea un compte gratuït per sincronitzar els teus pòdcasts i escoltar-los a qualsevol lloc.</string>
     <string name="encourage_account_sync_banner_title">Els teus pòdcasts, a qualsevol dispositiu</string>
     <string name="encourage_account_banner_action_label">Crea un compte gratuït</string>
@@ -306,8 +343,6 @@ Language: ca
     <string name="tracking_consent_dialog_message">Fem servir analítiques per millorar l\'app i mesurar si les nostres campanyes publicitàries són exitoses.</string>
     <string name="tracking_consent_dialog_title">Permets que «Pocket Casts» faci un seguiment de la teva activitat a les aplicacions i llocs web d’altres empreses?</string>
     <string name="donate">Feu una donació</string>
-    <string name="filters_tooltip_subtitle">Crea filtres intel·ligents per organitzar els teus episodis. Filtra per durada, data de llançament, tipus de mitjà, i més.</string>
-    <string name="filters_tooltip_title">Organitza els teus episodis</string>
     <string name="podcasts_sort_by_recently_played">Reproduït recentment</string>
     <string name="podcasts_sort_by_tooltip_message">Ara pots ordenar per Reproduït recentment i continuar des d’on ho vas deixar sense perdre temps.</string>
     <string name="podcasts_sort_by_tooltip_title">Ordenar per «Reproduït recentment»</string>
@@ -453,7 +488,6 @@ Language: ca
     <string name="podcast_this">Aquest pòdcast</string>
     <string name="end_of_year_cant_share_message">Aquesta història no es pot compartir</string>
     <string name="end_of_year_story_ratings_share_text">Vaig valorar %1$d pòdcasts diferents a %2$d, amb %3$d com la meva valoració més utilitzada</string>
-    <string name="end_of_year_stories_completion_rate_share_text">La meva taxa de finalització aquest any ha estat %1$d</string>
     <string name="end_of_year_share_dialog_message">Copia aquesta imatge a les teves xarxes socials i fes una crida sobre els teus programes i creadors preferits</string>
     <string name="end_of_year_share_dialog_title">Compartir aquesta història?</string>
     <string name="podcast_ratings_page_title">Valoracions</string>
@@ -461,6 +495,7 @@ Language: ca
     <string name="up_next_shuffle_button_content_description">Mode aleatori a \'Tot seguit\'</string>
     <string name="settings_real_time_playback">Ajusta el temps restant</string>
     <string name="settings_real_time_playback_summary">Si està activat, el reproductor mostrarà el temps restant, ajustat per la velocitat de reproducció i els capítols saltats.</string>
+    <string name="eoy_story_stories_subscribe_to_plus_button_label">Aconsegueix Pocket Casts Plus</string>
     <string name="eoy_story_ratings_learn_button_label">Informa\'t sobre les valoracions</string>
     <string name="referrals_failed_to_load_offer">Ho sento, però hi ha hagut un problema en obtenir el teu enllaç de referència.</string>
     <string name="transcript_error_not_available">Aquest episodi no té transcripció disponible</string>
@@ -651,6 +686,7 @@ Language: ca
     <string name="end_of_year_stories_year_over_share_text">El meu %1$d temps escoltat comparat amb %2$d</string>
     <string name="end_of_year_stories_year_completion_rate_title">La teva taxa de finalització enguany ha estat del %1$d%%</string>
     <string name="end_of_year_prompt_card_summary">Consulta les teves estadístiques d\'escolta, els millors pòdcasts i molt més.</string>
+    <string name="end_of_year_stories_year_over_year_title_went_up">Comparat amb %1$s, el teu temps d\'escolta s\'ha disparat un %2$s%%</string>
     <string name="end_of_year_replay">Torna a reproduir-ho</string>
     <string name="end_of_year_listening_time_title">Aquest va ser el vostre temps total escoltant pòdcasts</string>
     <string name="discover_category_health_abbreviation">Salut</string>
@@ -659,8 +695,6 @@ Language: ca
     <string name="discover_category_society_abbreviation">Cultura</string>
     <string name="end_of_year_story_top_categories_subtitle">Has escoltat %1$s episodis en total de %2$s</string>
     <string name="end_of_year_story_top_categories_title">Sabies que %1$s era la teva categoria preferida?</string>
-    <string name="eoy_story_top_podcasts_title">I tu també has estat gran en aquests pòdcasts!</string>
-    <string name="eoy_story_top_podcasts_subtitle">Aquest és el top 5 del més escoltat al 2023\"</string>
     <string name="end_of_year_share_story">Comparteix aquesta història</string>
     <string name="podcast_log_in_to_rate">Has d\'iniciar sessió per deixar una valoració</string>
     <string name="podcast_submit_rating_no_internet">No s\'ha trobat connexió a Internet. Connecta\'t per enviar una valoració.</string>
@@ -703,7 +737,6 @@ Language: ca
     <string name="save_bookmark">Desar marcador</string>
     <string name="bookmark_added">S\'ha afegit el marcador \"%s\"</string>
     <string name="add_bookmark">Afegeix un marcador</string>
-    <string name="filters_not_found">No s\'han trobat filtres</string>
     <string name="bookmarks_sort_timestamp">Marca temporal</string>
     <string name="bookmarks_select_option">Selecciona marcadors</string>
     <string name="bookmarks_delete_summary_singular">Aquest marcador s\'eliminarà. Això no es pot desfer.</string>
@@ -716,7 +749,6 @@ Language: ca
     <string name="deselect_all_below">Desselecciona tot el que apareix a continuació</string>
     <string name="deselect_all_above">Desseleccionar tot l\'anterior</string>
     <string name="edit">Editar</string>
-    <string name="filters_download_limit_3">3 episodis</string>
     <string name="settings_headphone_controls_choice_next_chapter">Capítol següent</string>
     <string name="settings_headphone_controls_choice_previous_chapter">Capítol anterior</string>
     <string name="settings_headphone_controls_confirmation_sound_summary">Reprodueix un so de confirmació en crear un marcador amb els auriculars.</string>
@@ -983,7 +1015,6 @@ Language: ca
     <string name="time_to_skip_not_valid">Temps de salt %1$s no vàlid</string>
     <string name="time_to_skip_seconds">Temps a saltar (segons)</string>
     <string name="pocket_casts_play_filter">Reproduir llista de reproducció de Pocket Casts</string>
-    <string name="settings_select_filters">Seleccionar filtres</string>
     <string name="settings_import_url">Per URL</string>
     <string name="settings_import_url_summary">Importa els teus pòdcasts des d\'un arxiu OMPL emprant una URL.</string>
     <string name="skip_to_previous_chapter">Salta al capítol anterior</string>
@@ -1139,7 +1170,6 @@ Language: ca
     <string name="podcast_notifications_on">Notificacions activades</string>
     <string name="share">Compartir</string>
     <string name="filters_chip_episode_status">Estat de l\'episodi</string>
-    <string name="filters_update_filter">Actualitzar el filtre</string>
     <string name="all">Tot</string>
     <string name="audio">Àudio</string>
     <string name="downloaded">Descarregat</string>
@@ -1147,7 +1177,6 @@ Language: ca
     <string name="filters_release_date">Data de publicació</string>
     <string name="not_downloaded">No descarregat</string>
     <string name="video">Vídeo</string>
-    <string name="filters_download_options">Opcions de descàrrega</string>
     <string name="player_up_next_time_remaining">Temps total que queda %s</string>
     <string name="profile_cloud_add_file">Afegir fitxer</string>
     <string name="profile_cloud_edit_file">Editar el fitxer</string>
@@ -1517,8 +1546,6 @@ Language: ca
     <string name="settings_auto_download_unmetered_summary">Si desactives aquesta opció, es podran descarregar arxius amb xarxes mòbils i amb un altre tipus de xarxes d\'ús mesurat. Comprova la configuració de xarxa per a més informació.</string>
     <string name="settings_auto_download_unmetered">Només amb WiFi sense límit</string>
     <string name="settings_auto_download_podcasts">Descarregar pòdcasts automàticament</string>
-    <string name="settings_auto_download_filters_episodes">Tots els episodis filtrats</string>
-    <string name="settings_auto_download_filters">Filtres de descàrrega automàtica</string>
     <string name="settings_status_service_ad_blocker_help_plural">La causa més comuna és que tens un bloquejador de publicitat configurat al teu telèfon o xarxa. Necessitaràs desbloquejar els dominis %s</string>
     <string name="settings_status_service_ad_blocker_help_singular">La causa més comuna és que tens un bloquejador de publicitat configurat al teu telèfon o xarxa. Haureu de desbloquejar el domini %s</string>
     <string name="settings_support_please_wait">Espera un moment mentre recollim  les dades per ajudar al nostre equip de suport</string>
@@ -1527,7 +1554,6 @@ Language: ca
     <string name="settings_storage">Emmagatzematge</string>
     <string name="settings_import_opml_toast">Important els pòdcasts…</string>
     <string name="settings_app_icon_updated_message">És possible que la icona nova trigui un parell de minuts a aparèixer i veureu dues icones a la pantalla on es mostrin les vostres aplicacions. És normal. Arrossega la nova a la la pantalla d\'inici i estarà tot llest!</string>
-    <string name="settings_status_service_account_summary">El servei es fa servir per emmagatzemar el progrés dels episodis, les subscripcions, els filtres, etc.</string>
     <string name="settings_show_archived_summary_show">Els nous pòdcasts als quals us subscriviu mostraran els episodis arxivats.</string>
     <string name="settings_show_archived_summary_hide">Els nous pòdcasts als quals us subscriviu no mostraran els episodis arxivats.</string>
     <string name="settings_podcast_episode_grouping_summary_none">Els pòdcasts nous als quals us subscriviu no agruparan els seus episodis.</string>
@@ -1537,21 +1563,12 @@ Language: ca
     <string name="profile">Perfil</string>
     <string name="filters_chip_download_status">Estat de la descàrrega</string>
     <string name="filters_chip_media_type">Tipus d\'arxiu multimèdia</string>
-    <string name="filters_create_add_more">Afegeix més paràmetres per acabar de millor el teu filtre.</string>
-    <string name="filters_create_filter_by">FILTRAR PER</string>
-    <string name="filters_create_name">NOM</string>
     <string name="filters_create_select_criteria">Seleccioneu els vostres criteris de filtre amb aquests botons per crear una llista de reproducció intel·ligent d\'episodis actualitzada.</string>
     <string name="filters_download_first">Primer</string>
-    <string name="filters_duration_error_title">Sí, però no</string>
     <string name="filters_duration_longer_than">Més de</string>
     <string name="filters_duration_shorter_than">Menys de</string>
     <string name="filters_episode_duration">Durada de l\'episodi</string>
     <string name="filters_filter_by_duration">Filtrar per durada</string>
-    <string name="filters_no_matching_episodes_title">No hi ha episodis que coincideixin</string>
-    <string name="filters_options_sort_by">Ordenar per</string>
-    <string name="filters_play_all_summary">Això esborrarà la teva cua actual de la llista \'Tot seguit\'.</string>
-    <string name="filters_preview">VISTA PRÈVIA</string>
-    <string name="filters_stepper_plus">Plus</string>
     <string name="filters_time_24_hours">Les darreres 24 hores</string>
     <string name="filters_time_2_weeks">Les 2 darreres setmanes</string>
     <string name="filters_time_3_days">Els darrers 3 dies</string>
@@ -1700,8 +1717,8 @@ Language: ca
     <string name="profile_one_year_free">1 any gratuït</string>
     <string name="profile_not_signed_in">NO HAS INICIAT SESSIÓ</string>
     <string name="profile_next_payment">Proper pagament: %s</string>
-    <string name="profile_license_agreement">Pocket Casts valora la teva privadesa. Aquesta política de privadesa explica quina informació recopilem sobre tu i per què, què podem fer amb aquesta informació i com la gestionem. S\'aplica a les aplicacions Pocket Casts per iOS i Android, i al servei web Pocket Casts amb les aplicacions associades per macOS i Windows (conjuntament i de manera solidària, el Servei). En utilitzar el servei, acceptes aquesta política de privadesa. Si actives les notificacions push a l\'aplicació, emmagatzemem el token push que Apple ens proporciona per poder enviar-te aquestes notificacions push al teu dispositiu. Si compres l\'aplicació web, emmagatzemem una id de transacció per la teva compra. Si decideixes no crear un compte, i no utilitzes notificacions push, no s\'emmagatzema cap dada teva als nostres servidors. El servei web Pocket Casts també utilitza cookies i tecnologies similars per mantenir-te connectat. Si decideixes generar una sol·licitud d\'assistència des del servei, podem generar un adjunt que contingui dades addicionals per ajudar a abordar la teva sol·licitud d\'assistència que pots consultar abans de la seva presentació.</string>
     <string name="profile_last_refresh">Darrera actualització: fa %s</string>
+    <string name="profile_license_agreement">Pocket Casts valora la teva privadesa. Aquesta política de privadesa explica quina informació recopilem sobre tu i per què, què podem fer amb aquesta informació i com la gestionem. S\'aplica a les aplicacions Pocket Casts per iOS i Android, i al servei web Pocket Casts amb les aplicacions associades per macOS i Windows (conjuntament i de manera solidària, el Servei). En utilitzar el servei, acceptes aquesta política de privadesa. Si actives les notificacions push a l\'aplicació, emmagatzemem el token push que Apple ens proporciona per poder enviar-te aquestes notificacions push al teu dispositiu. Si compres l\'aplicació web, emmagatzemem una id de transacció per la teva compra. Si decideixes no crear un compte, i no utilitzes notificacions push, no s\'emmagatzema cap dada teva als nostres servidors. El servei web Pocket Casts també utilitza cookies i tecnologies similars per mantenir-te connectat. Si decideixes generar una sol·licitud d\'assistència des del servei, podem generar un adjunt que contingui dades addicionals per ajudar a abordar la teva sol·licitud d\'assistència que pots consultar abans de la seva presentació.</string>
     <string name="profile_joined">S\'ha unit:</string>
     <string name="profile_files_remove_image">Canviar la imatge</string>
     <string name="profile_files_empty_summary">Vols escoltar els teus propis fitxers? \nToca el botó + per obrir-los a Pocket Casts, i apareixeran aquí.</string>
@@ -1748,32 +1765,10 @@ Language: ca
     <string name="profile_account_delete_yes">Sí, esborra-ho</string>
     <string name="profile_access_ends">L\'accés s\'acaba: %s</string>
     <string name="profile_access_ended">Accés finalitzat: %s</string>
-    <string name="filters_warning_delete_summary">Aquesta acció no es pot desfer.</string>
-    <string name="filters_stepper_minus">Menys</string>
-    <string name="filters_see_more_episodes">Per veure més episodis, prova a canviar la configuració del filtre.</string>
-    <string name="filters_play_episodes">Reprodueix %d episodis</string>
-    <string name="filters_play_all_from_here_summary">Això esborrarà la teva cua actual de \'Tot seguit\' i afegirà tots els episodis següents.</string>
-    <string name="filters_options_settings">Configuració del filtre</string>
-    <string name="filters_options_download_all">Descarrega-ho tot</string>
-    <string name="filters_options_delete">Esborrar el filtre</string>
-    <string name="filters_no_matching_episodes">Els criteris que has seleccionat no coincideixen amb cap episodi actual de les teves subscripcions.\n\nTria criteris diferents, o desa aquest filtre si creus que coincidirà amb episodis en el futur.</string>
     <string name="filters_no_episodes">No s\'han trobat episodis.</string>
-    <string name="filters_duration_error_body">Filtrar episodis més llargs que %1$dm però més curts que %2$dm causaria una fractura en el nostre continu espai-temps. Ens sap greu.</string>
     <string name="filters_download_title">Descarregar primer automàticament</string>
-    <string name="filters_download_limit_5">5 episodis</string>
-    <string name="filters_download_limit_40">40 episodis</string>
-    <string name="filters_download_limit_20">20 episodis</string>
-    <string name="filters_download_limit_100">100 episodis</string>
-    <string name="filters_download_limit_10">10 episodis</string>
     <string name="filters_create_save_filter">Desa el filtre</string>
     <string name="filters_create_options">Opcions del filtre</string>
-    <string name="filters_create_filter_details">Detalls del filtre</string>
-    <string name="filters_create_filter">Crear filtre</string>
-    <string name="filters_create_colour_icon">COLOR I ICONA</string>
-    <string name="filters_create">Crear</string>
-    <string name="filters_chosen_singular">1 filtre triat</string>
-    <string name="filters_chosen_plural">%d filtres triats</string>
-    <string name="filters_chosen_none">Cap seleccionat</string>
     <string name="filters_choose_podcasts">Triar pòdcasts</string>
     <string name="profile_sub_cancel_hint2">Tots els fitxers pujats al teu compte de Pocket Casts seran eliminats</string>
     <string name="profile_stats_since_listened_for">Des de %s has escoltat durant…</string>
@@ -1789,8 +1784,6 @@ Language: ca
     <string name="episode_row_waiting_for_wifi">Esperant a la xarxa Wi-Fi</string>
     <string name="episode_sort_long_to_short">De més llarg a més curt</string>
     <string name="episode_sort_short_to_long">De més curt a més llarg</string>
-    <string name="filters">Filtres</string>
-    <string name="filters_chip_all_your_podcasts">Tots els teus pòdcasts</string>
     <string name="player_action_next_chapter">Capítol següent</string>
     <string name="player_action_previous_chapter">Capítol anterior</string>
     <string name="player_actions_hidden_for_custom">Amagat per episodis personalitzats</string>
@@ -1853,8 +1846,6 @@ Language: ca
     <string name="supporter">Col·laborador</string>
     <string name="supporter_check_contributions">Per a més informació, consulta les contribucions</string>
     <string name="supporter_payment_cancelled">Seguidor: cancel·lat</string>
-    <string name="filters_all_your_podcasts">Tots els teus pòdcasts</string>
-    <string name="episode_filters">Filtres d\'episodis</string>
     <string name="supporter_cancel_active_until_delete_plural">L\'estat de col·laborador romandrà actiu fins a %s. Després ja no podreu reproduir aquests pòdcasts.</string>
     <string name="supporter_cancel_active_until_delete_singular">L\'estat de col·laborador romandrà actiu fins a %s. Després ja no podreu reproduir aquest pòdcast.</string>
     <string name="supporter_cancel_active_until">L\'estat de col·laborador romandrà actiu fins a %s. Només podreu escoltar els episodis publicats abans d\'aquesta data.</string>
@@ -1891,7 +1882,6 @@ Language: ca
     <string name="podcast_effects_summary_trim_silence_on">activar retallar silencis</string>
     <string name="podcast_effects_summary_speed">Velocitat %s×</string>
     <string name="podcast_included_in_filters">Inclòs a %s</string>
-    <string name="podcast_not_in_filters">No inclòs a cap filtre</string>
     <string name="podcast_unsubscribe_downloaded_file_plural">%d Arxius descarregats</string>
     <string name="podcast_share_open_fail_title">Fall total</string>
     <string name="podcast_add_failed">No es pot afegir el pòdcast.</string>
@@ -2153,6 +2143,10 @@ Language: ca
     <string name="auto_archive">Arxivar automàticament</string>
     <string name="archive_episode">Arxivar episodi</string>
     <string name="add_to_up_next">Afegir a la llista \'Tot seguit\'</string>
+    <plurals name="added_to_playlist_single_multiple">
+        <item quantity="one">Afegit a %d llista de reproducció</item>
+        <item quantity="other">Afegit a %d llistes de reproducció</item>
+    </plurals>
     <plurals name="chapter">
         <item quantity="one">capítol</item>
         <item quantity="other">capítols</item>

@@ -1,7 +1,6 @@
 package au.com.shiftyjelly.pocketcasts.endofyear
 
 import android.graphics.Bitmap
-import android.graphics.Paint
 import androidx.appcompat.content.res.AppCompatResources
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -9,13 +8,10 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.graphics.asAndroidBitmap
-import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalContext
 import androidx.core.graphics.applyCanvas
 import androidx.core.graphics.createBitmap
 import androidx.core.graphics.drawable.toBitmap
-import androidx.core.graphics.scale
-import au.com.shiftyjelly.pocketcasts.endofyear.ui.backgroundColor
 import au.com.shiftyjelly.pocketcasts.models.to.Story
 import au.com.shiftyjelly.pocketcasts.utils.fitToAspectRatio
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
@@ -23,7 +19,6 @@ import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer.TAG_CRASH
 import dev.shreyaspatil.capturable.controller.CaptureController
 import dev.shreyaspatil.capturable.controller.rememberCaptureController
 import java.io.File
-import kotlin.math.roundToInt
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.withContext
@@ -48,7 +43,6 @@ internal fun rememberStoryCaptureController(): StoryCaptureController {
         object : StoryCaptureController {
             private var _isSharing by mutableStateOf(false)
             override val isSharing get() = _isSharing
-            override var topControlsHeightPx = 0
 
             override fun captureController(story: Story): CaptureController = when (story) {
                 is Story.PlaceholderWhileLoading -> cover
@@ -78,14 +72,14 @@ internal fun rememberStoryCaptureController(): StoryCaptureController {
                         val pcLogo = AppCompatResources.getDrawable(context, IR.drawable.pc_logo_pill)!!
                             .toBitmap()
 
-                        createBitmap(background.width, background.height - topControlsHeightPx).applyCanvas {
+                        createBitmap(background.width, background.height).applyCanvas {
                             // Draw captured bitmap
-                            drawBitmap(background, 0f, -topControlsHeightPx.toFloat(), null)
+                            drawBitmap(background, 0f, 0f, null)
                             // Draw PC logo
                             drawBitmap(
                                 pcLogo,
                                 (width - pcLogo.width).toFloat() / 2,
-                                height - (pcLogo.height * 1.5f), // Pad the logo from the bottom by half its height
+                                height - (pcLogo.height * 2f), // Pad the logo from the bottom by its height
                                 null,
                             )
                             // Draw at the correct ratio for Instagram sharing, this will include black bars in the image
@@ -109,7 +103,6 @@ internal fun rememberStoryCaptureController(): StoryCaptureController {
 
 internal interface StoryCaptureController {
     val isSharing: Boolean
-    var topControlsHeightPx: Int
 
     fun captureController(story: Story): CaptureController
     suspend fun capture(story: Story): File?
@@ -120,7 +113,6 @@ internal interface StoryCaptureController {
             private val controller = rememberCaptureController()
 
             override val isSharing = false
-            override var topControlsHeightPx = 0
 
             override fun captureController(story: Story) = controller
 

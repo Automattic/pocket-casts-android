@@ -18,6 +18,7 @@ import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
 
 class AppReviewAnalyticsListenerTest {
+
     @get:Rule
     val featureFlagRule = InMemoryFeatureFlagRule()
 

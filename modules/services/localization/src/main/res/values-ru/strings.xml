@@ -1,11 +1,31 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2025-11-14 09:54:06+0000
+Translation-Revision-Date: 2025-11-28 09:54:04+0000
 Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);
 Generator: GlotPress/2.4.0-alpha
 Language: ru
 -->
 <resources>
+    <string name="eoy_story_top_podcasts_subtitle">Больше любимых подкастов, больше удовольствия, больше индивидуальности</string>
+    <string name="eoy_story_top_podcasts_title">Остальные ваши показатели</string>
+    <string name="end_of_year_listening_time_subtitle_with_number">%1$d мин прослушано</string>
+    <string name="pocket_casts_patron_badge">Эмблема Pocket Casts Patron</string>
+    <string name="pocket_casts_plus_badge">Эмблема Pocket Casts Plus</string>
+    <string name="end_of_year_stories_year_over_year_subtitle_went_up">Больше подкастов, больше радости</string>
+    <string name="end_of_year_previous_story">Предыдущая история</string>
+    <string name="end_of_year_next_story">Следующая история</string>
+    <string name="end_of_year_story_listened_to_numbers">Вы подключались к %1$d подкастам и %2$d выпускам</string>
+    <string name="up_next_as_playlist_replace_switch_description">Сохранить текущий список «Следующие» как плейлист.</string>
+    <string name="up_next_as_playlist_replace_body">При запуске он заменит текущий список «Следующие».</string>
+    <string name="added_to_playlist_single">Добавлено в %1$s</string>
+    <string name="end_of_year_failed_to_load_message">Не удалось загрузить Ваш год в подкастах</string>
+    <string name="end_of_year_stories_already_subscribed_to_plus">Привилегии Plus позволяют вам пользоваться расширенной статистикой и мощными функциями</string>
+    <string name="end_of_year_stories_subscribe_to_plus">Подписывайтесь на Pocket Casts Plus и пользуйтесь расширенной статистикой, закладками, папками, выбором глав и множеством других инструментов для прослушивания</string>
+    <string name="end_of_year_stories_plus_title">Благодарим вас за поддержку Pocket Casts!</string>
+    <string name="end_of_year_stories_theres_more">Хотите больше возможностей?</string>
+    <string name="end_of_year_story_longest_episode_stats">Самым длинным выпуском стал «%1$s» из «%2$s»</string>
+    <string name="end_of_year_story_longest_episode_subtitle">Готовьтесь узнать новости!</string>
+    <string name="end_of_year_story_longest_episode_title">Ваш марафонский сеанс прослушивания: %1$s</string>
     <string name="eoy_story_ratings_subtitle_no_ratings">Помогайте своим любимым авторам приобретать известность — делитесь тем, что вам нравится</string>
     <string name="eoy_story_ratings_subtitle_2">Отзывы помогают в поисках лучших шоу</string>
     <string name="eoy_story_ratings_subtitle_1">Всем авторам приятно получать признание</string>
@@ -41,6 +61,7 @@ Language: ru
     <string name="search_suggestions_view_all">Посмотреть все «%1$s»</string>
     <string name="up_next_as_playlist_saved">Очередь «Следующие» сохранена как плейлист</string>
     <string name="up_next_as_playlist_button_secondary">Заменить и воспроизвести</string>
+    <string name="up_next_as_playlist_replace_title">Заменить список «Следующие»?</string>
     <string name="delete_playlist_confirmation_title">Удалить плейлист?</string>
     <string name="delete_playlist_confirmation_body">Вы действительно хотите удалить плейлист? Отменить эту операцию будет невозможно.</string>
     <string name="delete_playlist">Удалить плейлист</string>
@@ -79,6 +100,7 @@ Language: ru
     <string name="add_to_up_next_top">Добавить в начало списка «Следующие»</string>
     <string name="playlist_episodes_archived_title">Нет выпусков</string>
     <string name="playlist_episodes_archived_count">Архивировано: %1$d</string>
+    <string name="playlist_edit_episodes">Изменить очерёдность выпусков</string>
     <string name="playlist_episode_unavailable_cta">Удалить из плейлиста</string>
     <string name="playlist_episode_unavailable_description">Автор подкаста удалил этот выпуск. Он останется в вашем плейлисте, пока вы его не удалите.</string>
     <string name="playlist_episode_unavailable_title">Выпуск недоступен</string>
@@ -135,7 +157,6 @@ Language: ru
     <string name="smart_rule_podcasts_all_description_disabled">Новые подкасты, на которые вы будете подписываться, не будут добавляться автоматически.</string>
     <string name="onboarding_upgrade_pp">Политика\u00A0конфиденциальности</string>
     <string name="onboarding_upgrade_tnc">Условия\u00A0предоставления\u00A0услуг</string>
-    <string name="other_options">Другие варианты</string>
     <string name="increment_shorter_than_duration">Увеличить продолжительность «короче чем»</string>
     <string name="decrement_shorter_than_duration">Уменьшить продолжительность «короче чем»</string>
     <string name="increment_longer_than_duration">Увеличить продолжительность «длиннее чем»</string>
@@ -182,9 +203,9 @@ Language: ru
     <string name="onboarding_upgrade_patron_title">Вам нравится то, что мы делаем, и вы хотите нас поддержать?</string>
     <string name="smart_playlist">Умный плейлист</string>
     <string name="onboarding_upgrade_patron_cloud_storage">100 ГБ облачного хранилища для ваших файлов</string>
-    <string name="playlists_onboarding_playlist_description">Хотите расширить возможности управления? Свои плейлисты — это функция, дающая вам возможность составлять собственные списки воспроизведения. Создавайте тематические плейлисты, сборники в дорогу или просто списки под настроение. Плейлисты — «свои» или «умные» — действуют так же, как и вы сами.</string>
     <string name="playlists_onboarding_playlist_title">Знакомьтесь: плейлисты</string>
     <string name="playlists_onboarding_smart_playlist_description">Всё работает точно так же, как и раньше: выпуски автоматически добавляются по установленным правилам. Все ваши фильтры никуда не делись, и ничего не изменилось, кроме названия.</string>
+    <string name="playlists_onboarding_playlist_description">Хотите расширить возможности управления? Свои плейлисты — это функция, дающая вам возможность составлять собственные списки воспроизведения. Создавайте тематические плейлисты, сборники в дорогу или просто списки под настроение. Плейлисты — «свои» или «умные» — действуют так же, как и вы сами.</string>
     <string name="playlists_onboarding_smart_playlist_title">Умные плейлисты — это новое название фильтров</string>
     <string name="playlists">Плейлисты</string>
     <string name="onboarding_upgrade_billing_cycle_yearly">Годовой тарифный план</string>
@@ -251,7 +272,6 @@ Language: ru
     <string name="notification_themes_message">Просмотрите наши темы и найдите ту, которая отвечает вашему стилю.</string>
     <string name="notification_content_recommendations_trending_message">Посмотрите, что популярно на этой неделе.</string>
     <string name="notification_themes_title">Пора освежить дизайн</string>
-    <string name="notification_filters_message">Создавайте умные фильтры, чтобы упорядочивать выпуски.</string>
     <string name="notification_filters_title">Упорядочивайте выпуски</string>
     <string name="notification_up_next_message">Создавайте списки воспроизведения и забудьте о беспорядке в выпусках.</string>
     <string name="notification_up_next_title">Упростите очередь</string>
@@ -311,8 +331,6 @@ Language: ru
     <string name="onboarding_get_started">Начать</string>
     <string name="encourage_account_history_banner_description">Создайте бесплатную учётную запись, чтобы синхронизировать журнал прослушивания на всех устройствах.</string>
     <string name="encourage_account_history_banner_title">Следите за тем, что вы прослушали</string>
-    <string name="encourage_account_filters_banner_description">Создайте бесплатную учётную запись, чтобы синхронизировать фильтры на всех устройствах.</string>
-    <string name="encourage_account_filters_banner_title">Синхронизируйте фильтры</string>
     <string name="encourage_account_sync_banner_description">Создайте бесплатную учётную запись, чтобы синхронизировать и слушать шоу где угодно.</string>
     <string name="encourage_account_sync_banner_title">Ваши шоу на всех устройствах</string>
     <string name="encourage_account_banner_action_label">Создать бесплатную учётную запись</string>
@@ -325,8 +343,6 @@ Language: ru
     <string name="tracking_consent_dialog_message">Пользуясь аналитическими данными, мы улучшаем приложение и оцениваем успешность рекламных кампаний.</string>
     <string name="tracking_consent_dialog_title">Разрешить Pocket Casts отслеживать вашу деятельность в приложениях и на веб-сайтах других компаний?</string>
     <string name="donate">Пожертвовать</string>
-    <string name="filters_tooltip_subtitle">Создавайте умные фильтры, чтобы упорядочивать выпуски Фильтрация по продолжительности, дате выпуска, типу медиафайла и др.</string>
-    <string name="filters_tooltip_title">Упорядочивайте выпуски</string>
     <string name="podcasts_sort_by_recently_played">Недавно прослушанные</string>
     <string name="podcasts_sort_by_tooltip_message">Теперь вы можете упорядочивать записи по дате прослушивания и сразу начинать воспроизведение с того места, на котором остановились.</string>
     <string name="podcasts_sort_by_tooltip_title">Сортировать по категории «Недавно прослушанные»</string>
@@ -471,7 +487,6 @@ Language: ru
     <string name="manage_downloads">Управлять скачиваниями</string>
     <string name="podcast_this">Этот подкаст</string>
     <string name="end_of_year_cant_share_message">Этой историей поделиться нельзя</string>
-    <string name="end_of_year_stories_completion_rate_share_text">Мой процент завершения в этом году равен %1$d</string>
     <string name="end_of_year_story_ratings_share_text">Я оценивал(а) разные подкасты (%1$d) в %2$d, чаще всего на %3$d.</string>
     <string name="end_of_year_share_dialog_message">Разместите это изображение в социальных сетях, чтобы рассказать о своих любимых шоу и авторах.</string>
     <string name="end_of_year_share_dialog_title">Поделиться этой историей?</string>
@@ -480,6 +495,7 @@ Language: ru
     <string name="podcast_ratings_page_title">Оценки</string>
     <string name="settings_real_time_playback_summary">Если эта функция включена, проигрыватель будет показывать оставшееся время с учётом скорости воспроизведения и пропущенных глав.</string>
     <string name="settings_real_time_playback">Настроить оставшееся время</string>
+    <string name="eoy_story_stories_subscribe_to_plus_button_label">Приобретайте Pocket Casts Plus</string>
     <string name="eoy_story_ratings_learn_button_label">Подробнее об оценках</string>
     <string name="referrals_failed_to_load_offer">К сожалению, при получении ссылки на источник перехода возникла проблема.</string>
     <string name="transcript_error_not_available">К сожалению, в этом выпуске нет расшифровки.</string>
@@ -679,8 +695,6 @@ Language: ru
     <string name="discover_category_kids_abbreviation">Семья</string>
     <string name="discover_category_health_abbreviation">Здоровье</string>
     <string name="end_of_year_story_top_categories_subtitle">Вы прослушали %1$s эпизодов общей продолжительностью %2$s</string>
-    <string name="eoy_story_top_podcasts_subtitle">Эти 5 набрали больше всего прослушиваний в 2023 году\"</string>
-    <string name="eoy_story_top_podcasts_title">А ещё вы были на высоте в этих шоу!</string>
     <string name="end_of_year_share_story">Поделитесь этим</string>
     <string name="podcast_log_in_to_rate">Чтобы поставить оценку, необходимо войти в систему</string>
     <string name="podcast_submit_rating_no_internet">Отсутствует подключение к Интернету. Чтобы отправить оценку, подключитесь к Интернету.</string>
@@ -723,7 +737,6 @@ Language: ru
     <string name="change_title">Изменить название</string>
     <string name="bookmark_added">Закладка «%s» добавлена</string>
     <string name="add_bookmark_title">Добавление закладки</string>
-    <string name="filters_not_found">Фильтры не найдены</string>
     <string name="bookmarks_sort_timestamp">Отметка времени</string>
     <string name="bookmarks_select_option">Выбрать закладки</string>
     <string name="bookmarks_delete_summary_singular">Закладка будет удалена. Это действие нельзя отменить.</string>
@@ -736,7 +749,6 @@ Language: ru
     <string name="deselect_all_below">Отменить выбор всех ниже</string>
     <string name="deselect_all_above">Отменить выбор всех выше</string>
     <string name="edit">Править</string>
-    <string name="filters_download_limit_3">3 выпуска</string>
     <string name="settings_title_headphone_controls">Элементы управления наушников</string>
     <string name="settings_headphone_controls_confirmation_sound_summary">Звук подтверждения при создании закладки с помощью наушников.</string>
     <string name="settings_headphone_controls_confirmation_sound">Звук добавления в закладки</string>
@@ -1003,7 +1015,6 @@ Language: ru
     <string name="time_to_skip_not_valid">Невозможно перейти к указанному времени %1$s</string>
     <string name="time_to_skip_seconds">Переход ко временной отметке (с)</string>
     <string name="pocket_casts_play_filter">Воспроизвести список воспроизведения Pocket Casts</string>
-    <string name="settings_select_filters">Выбрать фильтры</string>
     <string name="settings_import_url_summary">Импортируйте подкасты из файла OPML с помощью URL-адреса.</string>
     <string name="settings_import_url">По URL-адресу</string>
     <string name="time_to_skip_to_not_valid">Невозможно перейти к указанному времени %1$s</string>
@@ -1158,10 +1169,8 @@ Language: ru
     <string name="podcast_notifications_off">Уведомления откл.</string>
     <string name="podcast_notifications_on">Уведомления вкл.</string>
     <string name="share">Поделиться</string>
-    <string name="filters_update_filter">Обновить фильтр</string>
     <string name="filters_chip_episode_status">Статус выпуска</string>
     <string name="all">Все</string>
-    <string name="filters_download_options">Параметры загрузки</string>
     <string name="filters_release_date">Сбросить дату</string>
     <string name="filters_duration">Продолжительность</string>
     <string name="player_up_next_time_remaining">Оставшееся время %s</string>
@@ -1493,8 +1502,6 @@ Language: ru
     <string name="settings_auto_download_unmetered">Только в сети WiFi без тарификации</string>
     <string name="settings_auto_download_podcasts">Автоматически скачивать подкасты</string>
     <string name="settings_auto_download_new_episodes">Следующие выпуски</string>
-    <string name="settings_auto_download_filters_episodes">Выпуски из всех фильтров</string>
-    <string name="settings_auto_download_filters">Фильтры автоматического скачивания</string>
     <string name="settings_auto_download_clearing_errors">Удаление всех ошибок скачивания</string>
     <string name="settings_auto_download_clear_errors">Удалить все ошибки скачивания</string>
     <string name="settings_auto_download_charging">Только во время зарядки</string>
@@ -1547,7 +1554,6 @@ Language: ru
     <string name="plus_slash_month">%s в месяц</string>
     <string name="settings_notification_vibrate_never">Никогда</string>
     <string name="settings_logs">Журналы</string>
-    <string name="settings_status_service_account_summary">Этот сервис используется для хранения информации о прослушивании выпусков, подписках на подкасты, фильтрах и т. д.</string>
     <string name="settings_show_archived_summary_show">В новых подкастах, на которые вы подписаны, будут показываться архивные выпуски.</string>
     <string name="settings_show_archived_summary_hide">В новых подкастах, на которые вы подписаны, не будут показываться архивные выпуски.</string>
     <string name="settings_podcast_episode_grouping_summary_none">В новых подкастах, на которые вы подписаны, выпуски не будут сгруппированы.</string>
@@ -1576,11 +1582,9 @@ Language: ru
     <string name="profile_files_add_custom_image">Добавьте настраиваемое изображение</string>
     <string name="profile_files_addfile_save">Сохранить</string>
     <string name="profile_navigation_files">Файлы</string>
-    <string name="filters_create_name">НАЗВАНИЕ</string>
     <string name="filters_chip_download_status">Статус скачивания</string>
     <string name="filters_chip_media_type">Тип медиафайла</string>
     <string name="filters_episode_duration">Длительность эпизода</string>
-    <string name="filters_duration_error_title">Похоже, но нет</string>
     <string name="filters_time_24_hours">Последние 24 часа</string>
     <string name="filters_time_2_weeks">Последние 2 недели</string>
     <string name="filters_time_3_days">Последние 3 дня</string>
@@ -1592,7 +1596,6 @@ Language: ru
     <string name="profile_navigation_listening_history">История прослушивания</string>
     <string name="profile_cloud_only_on_wifi">Только по WiFi</string>
     <string name="profile_cloud_playback_failed">Не удалось воспроизвести</string>
-    <string name="filters_play_all_summary">При этом текущая очередь «Следующие» будет очищена.</string>
     <string name="plus_cloud_storage">Облачное хранилище</string>
     <string name="profile_payment_cancelled">Оплата отменена</string>
     <string name="profile_sub_from_ios">Ваша подписка управляется магазином Apple App Store</string>
@@ -1615,13 +1618,11 @@ Language: ru
     <string name="profile_sonos_linking_failed">Не удалось привязать</string>
     <string name="profile_sonos_connect_account">При подключении к Sonos приложение Sonos получит доступ к информации о вашем выпуске.\n\nВаш адрес электронной почты, пароль и другие конфиденциальные данные никогда не разглашаются.</string>
     <string name="profile_sonos_need_account">Для подключения к Sonos нужна учетная запись Pocket Casts.</string>
-    <string name="filters_options_sort_by">Приоритет сортировки</string>
     <string name="profile_stats_auto_skipping">Автоматический пропуск</string>
     <string name="profile_stats_skipping">Пропуск</string>
     <string name="profile_stats_variable_speed">Переменная скорость</string>
     <string name="profile_terms_of_use_title">Условия использования</string>
     <string name="profile_payment_try_again">Попробуйте еще раз.</string>
-    <string name="filters_stepper_plus">Plus</string>
     <string name="profile_monthly">Ежемесячно</string>
     <string name="profile_none">Пусто</string>
     <string name="profile_supporter_thanks">Спасибо за вашу поддержку!</string>
@@ -1710,7 +1711,6 @@ Language: ru
     <string name="profile_email">E-mail</string>
     <string name="profile_deleting_account">Удаление учётной записи…</string>
     <string name="profile_delete_from_device_title">Удалить с устройства</string>
-    <string name="profile_license_agreement">Pocket Casts уважает вашу конфиденциальность. В настоящей Политике конфиденциальности разъясняется, какие сведения о вас мы собираем и в связи с чем, как мы можем поступать с этой информацией и как мы её обрабатываем. Оно распространяется на приложения Pocket Casts для iOS и Android, а также на веб-сервис Pocket Casts с соответствующими приложениями для macOS и Windows (которые совместно и по отдельности именуются Услугой). Используя Услугу, вы соглашаетесь с настоящей Политикой конфиденциальности. Если вы включите в приложении push-уведомления, мы сохраним push-токен, который нам предоставляет Apple, чтобы доставлять эти push-уведомления на вашем устройстве. Если вы покупаете веб-приложение, мы сохраняем идентификатор транзакции для вашей покупки. Если вы решили не создавать учётную запись и не пользоваться push-уведомлениями, на наших серверах не будет храниться никаких данных о вас. Веб-сервис Pocket Casts также использует файлы cookie и другие аналогичные технологии, позволяющие вам оставаться в системе. Если вы решите обратиться с запросом о поддержке в процессе использования Услуги, мы можем сформировать приложение, в котором будут содержаться дополнительные данные, помогающие решить вашу проблему, и вы сможете просмотреть их перед отправкой запроса.</string>
     <string name="profile_delete_from_device_only">Удалить только с устройства</string>
     <string name="profile_delete_from_device">Удалить с устройства</string>
     <string name="profile_delete_from_cloud_title">Удалить из облака</string>
@@ -1718,6 +1718,7 @@ Language: ru
     <string name="profile_delete_everywhere">Удалить отовсюду</string>
     <string name="profile_delete_account_title">Удалить учётную запись?</string>
     <string name="profile_delete_account_failed_title">Не удалось удалить учётную запись</string>
+    <string name="profile_license_agreement">Pocket Casts уважает вашу конфиденциальность. В настоящей Политике конфиденциальности разъясняется, какие сведения о вас мы собираем и в связи с чем, как мы можем поступать с этой информацией и как мы её обрабатываем. Оно распространяется на приложения Pocket Casts для iOS и Android, а также на веб-сервис Pocket Casts с соответствующими приложениями для macOS и Windows (которые совместно и по отдельности именуются Услугой). Используя Услугу, вы соглашаетесь с настоящей Политикой конфиденциальности. Если вы включите в приложении push-уведомления, мы сохраним push-токен, который нам предоставляет Apple, чтобы доставлять эти push-уведомления на вашем устройстве. Если вы покупаете веб-приложение, мы сохраняем идентификатор транзакции для вашей покупки. Если вы решили не создавать учётную запись и не пользоваться push-уведомлениями, на наших серверах не будет храниться никаких данных о вас. Веб-сервис Pocket Casts также использует файлы cookie и другие аналогичные технологии, позволяющие вам оставаться в системе. Если вы решите обратиться с запросом о поддержке в процессе использования Услуги, мы можем сформировать приложение, в котором будут содержаться дополнительные данные, помогающие решить вашу проблему, и вы сможете просмотреть их перед отправкой запроса.</string>
     <string name="profile_delete_account_failed_message">К сожалению, нам не удалось удалить вашу учётную запись.</string>
     <string name="profile_delete_account">Удалить учётную запись</string>
     <string name="profile_current_password">Текущий пароль</string>
@@ -1762,54 +1763,26 @@ Language: ru
     <string name="profile_account_delete_yes">Да, удалить</string>
     <string name="profile_access_ends">Доступ прекращается: %s</string>
     <string name="profile_access_ended">Доступ прекращён: %s</string>
-    <string name="filters_warning_delete_summary">Это действие нельзя отменить.</string>
     <string name="filters_time_anytime">За любое время</string>
-    <string name="filters_stepper_minus">Минус</string>
-    <string name="filters_see_more_episodes">Чтобы увидеть больше выпусков, попробуйте изменить настройки фильтра.</string>
-    <string name="filters_preview">ПРЕДВАРИТЕЛЬНЫЙ ПРОСМОТР</string>
-    <string name="filters_play_episodes">Прослушать выпуски (%d)</string>
-    <string name="filters_play_all_from_here_summary">Текущая очередь «Следующие» будет очищена, и в неё будут добавлены все следующие выпуски.</string>
-    <string name="filters_options_settings">Настройки фильтра</string>
-    <string name="filters_options_download_all">Скачать всё</string>
-    <string name="filters_options_delete">Удалить фильтр</string>
-    <string name="filters_no_matching_episodes_title">Нет соответствующих выпусков</string>
-    <string name="filters_no_matching_episodes">Ни один текущий выпуск в ваших подписках не соответствует заданным условиям.\n\nИзмените условия или сохраните этот фильтр, если вы предполагаете появление соответствующих выпусков в будущем.</string>
     <string name="filters_no_episodes">Выпуски не найдены</string>
     <string name="filters_filter_by_duration">Фильтровать по длительности</string>
     <string name="filters_duration_shorter_than">Короче</string>
     <string name="filters_duration_longer_than">Длиннее</string>
-    <string name="filters_duration_error_body">Фильтрация выпусков по времени длиннее %1$d мин, но короче %2$d мин. разорвёт наш пространственно-временной континуум. Извините!</string>
     <string name="filters_download_title">Автоматическое скачивание первых</string>
-    <string name="filters_download_limit_5">5 выпусков</string>
-    <string name="filters_download_limit_40">40 выпусков</string>
-    <string name="filters_download_limit_20">20 выпусков</string>
-    <string name="filters_download_limit_100">100 выпусков</string>
-    <string name="filters_download_limit_10">10 выпусков</string>
     <string name="filters_create_select_criteria">С помощью этих кнопок выберите условия фильтрации, чтобы создать актуальный плейлист выпусков.</string>
     <string name="filters_create_save_filter">Сохранить фильтр</string>
-    <string name="filters_create_filter_details">Сведения о фильтре</string>
-    <string name="filters_create_filter_by">ФИЛЬТРОВАТЬ ПО</string>
-    <string name="filters_create_filter">Создать фильтр</string>
-    <string name="filters_create_add_more">Добавьте дополнительные условия, чтобы уточнить фильтр.</string>
-    <string name="filters_create">Создать</string>
-    <string name="filters_chosen_singular">Выбран 1 фильтр</string>
-    <string name="filters_chosen_plural">Выбрано фильтров (%d)</string>
-    <string name="filters_chosen_none">Ни один не выбран</string>
     <string name="filters_choose_podcasts">Выбрать подкасты</string>
     <string name="profile_cloud_settings">Настройки файлов</string>
     <string name="filters_create_options">Настройки фильтра</string>
     <string name="profile_account_created">Учетная запись создана</string>
     <string name="profile_stats_listened_for">Вы прослушали</string>
     <string name="profile_create_password_requirements">Пароль должен содержать не менее шести символов</string>
-    <string name="filters_create_colour_icon">ЦВЕТ И ЗНАЧОК</string>
     <string name="profile_stats_share_to">Поделиться с…</string>
     <string name="supporter">Спонсор</string>
-    <string name="filters">Фильтры</string>
     <string name="player_rearrange_actions_hidden">Другие действия</string>
     <string name="player_up_next_clear_button">Очистить «Следующие»</string>
     <string name="download_warning_title">Скачать все</string>
     <string name="podcast_unsubscribe_downloaded_file_singular">Скачан 1 файл</string>
-    <string name="filters_chip_all_your_podcasts">Все ваши подкасты</string>
     <string name="podcasts_mark_played">Отметить прослушанным</string>
     <string name="podcasts_mark_unplayed">Отметить как непрослушанный</string>
     <string name="player_tab_playing_wide">Сейчас воспроизводится</string>
@@ -1855,8 +1828,6 @@ Language: ru
     <string name="podcast_notifications">Уведомления</string>
     <string name="player_effects_trim_silence">Удалить паузы</string>
     <string name="podcast_settings_skip_first_summary">0 секунд</string>
-    <string name="filters_all_your_podcasts">Все ваши подкасты</string>
-    <string name="episode_filters">Фильтры выпусков</string>
     <string name="supporter_cancel_active_until_delete_plural">Статус спонсора действует до %s. После этого вы не сможете прослушивать эти подкасты.</string>
     <string name="supporter_cancel_active_until_delete_singular">Статус спонсора действует до %s. После этого вы не сможете прослушивать этот подкаст.</string>
     <string name="supporter_cancel_active_until">Статус спонсора действует до %s. Вы сможете прослушивать только те выпуски, которые вышли до этой даты.</string>
@@ -1897,7 +1868,6 @@ Language: ru
     <string name="podcast_effects_summary_trim_silence_on">удаление пауз включено</string>
     <string name="podcast_effects_summary_speed">Скорость %s×</string>
     <string name="podcast_included_in_filters">Включено в %s</string>
-    <string name="podcast_not_in_filters">Не включен ни в один фильтр</string>
     <string name="podcast_unsubscribe_downloaded_file_plural">%d Скачанные файлы</string>
     <string name="podcast_share_open_fail">Не удаётся загрузить сведения об общих подкастах. Если эта проблема сохраняется, попробуйте связаться с пользователем, который поделился с вами, и узнать у него, в чём дело.</string>
     <string name="podcast_share_open_fail_title">Полный провал</string>
@@ -2173,6 +2143,11 @@ Language: ru
     <string name="archive_episode">Архивировать выпуск</string>
     <string name="downloads">Загрузки</string>
     <string name="unarchive">Из архива</string>
+    <plurals name="added_to_playlist_single_multiple">
+        <item quantity="one">Добавлен в плейлисты (%d)</item>
+        <item quantity="few">Добавлен в плейлисты (%d)</item>
+        <item quantity="many">Добавлен в плейлисты (%d)</item>
+    </plurals>
     <plurals name="chapter">
         <item quantity="one">глава</item>
         <item quantity="few">главы</item>
