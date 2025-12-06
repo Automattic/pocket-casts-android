@@ -13,6 +13,7 @@ import androidx.core.view.isVisible
 import au.com.shiftyjelly.pocketcasts.models.entity.BaseEpisode
 import au.com.shiftyjelly.pocketcasts.player.R
 import au.com.shiftyjelly.pocketcasts.player.databinding.ViewMiniPlayerBinding
+import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.images.PocketCastsImageRequestFactory
 import au.com.shiftyjelly.pocketcasts.repositories.images.loadInto
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackState
@@ -151,8 +152,9 @@ class MiniPlayer @JvmOverloads constructor(context: Context, attrs: AttributeSet
             }
         }
 
-        val upNextCount: Int = upNextState.queueSize()
-        binding.countText.text = upNextCount.toString()
+        // cap the episode count to avoid small text or overflow issues
+        val upNextCount = upNextState.queueSize()
+        binding.countText.text = upNextCount.coerceAtMost(Settings.UP_NEXT_BADGE_MAX_COUNT).toString()
         binding.countText.isVisible = upNextCount > 0
 
         val drawableId = when {

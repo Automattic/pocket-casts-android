@@ -91,6 +91,7 @@ interface Settings {
         const val PREFERENCE_CHAPTERS_EXPANDED = "chaptersExpanded"
         const val PREFERENCE_UPNEXT_EXPANDED = "upnextExpanded"
         const val INTELLIGENT_PLAYBACK_RESUMPTION = "intelligentPlaybackResumption"
+        const val UP_NEXT_BADGE_MAX_COUNT = 999
 
         const val STORAGE_ON_CUSTOM_FOLDER = "custom_folder"
 

@@ -3,6 +3,8 @@
 *   Bug Fixes
     *   Fix Android 10 full screen player appearing under the status and navigation bars
         ([#4804](https://github.com/Automattic/pocket-casts-android/pull/4804))
+    *   Fix the mini player Up Next count overflow
+        ([#4826](https://github.com/Automattic/pocket-casts-android/pull/4826))
     *   Fix 3-button navigation obstructing the sharing buttons
         ([#4810](https://github.com/Automattic/pocket-casts-android/pull/4810))
 
