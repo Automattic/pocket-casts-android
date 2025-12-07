@@ -4,6 +4,9 @@
 
 8.2
 -----
+*   New Features
+    *   Allow Wear OS playback through the watch speaker
+        ([#4830](https://github.com/Automattic/pocket-casts-android/pull/4830))
 *   Bug Fixes
     *   Fix Android 10 full screen player appearing under the status and navigation bars
         ([#4804](https://github.com/Automattic/pocket-casts-android/pull/4804))
