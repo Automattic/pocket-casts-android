@@ -203,7 +203,7 @@ abstract class EpisodeDao {
         END) ASC
     """,
     )
-    abstract fun findByPodcastOrderTitleAscRxFlowable(podcastUuid: String): Flowable<List<PodcastEpisode>>
+    abstract fun findByPodcastOrderTitleAscFlow(podcastUuid: String): Flow<List<PodcastEpisode>>
 
     @Transaction
     @Query(
@@ -220,23 +220,23 @@ abstract class EpisodeDao {
         END) DESC
     """,
     )
-    abstract fun findByPodcastOrderTitleDescRxFlowable(podcastUuid: String): Flowable<List<PodcastEpisode>>
+    abstract fun findByPodcastOrderTitleDescFlow(podcastUuid: String): Flow<List<PodcastEpisode>>
 
     @Transaction
     @Query("SELECT * FROM podcast_episodes WHERE podcast_id = :podcastUuid ORDER BY published_date ASC")
-    abstract fun findByPodcastOrderPublishedDateAscRxFlowable(podcastUuid: String): Flowable<List<PodcastEpisode>>
+    abstract fun findByPodcastOrderPublishedDateAscFlow(podcastUuid: String): Flow<List<PodcastEpisode>>
 
     @Transaction
     @Query("SELECT * FROM podcast_episodes WHERE podcast_id = :podcastUuid ORDER BY published_date DESC")
-    abstract fun findByPodcastOrderPublishedDateDescFlowable(podcastUuid: String): Flowable<List<PodcastEpisode>>
+    abstract fun findByPodcastOrderPublishedDateDescFlow(podcastUuid: String): Flow<List<PodcastEpisode>>
 
     @Transaction
     @Query("SELECT * FROM podcast_episodes WHERE podcast_id = :podcastUuid ORDER BY duration ASC")
-    abstract fun findByPodcastOrderDurationAscFlowable(podcastUuid: String): Flowable<List<PodcastEpisode>>
+    abstract fun findByPodcastOrderDurationAscFlow(podcastUuid: String): Flow<List<PodcastEpisode>>
 
     @Transaction
     @Query("SELECT * FROM podcast_episodes WHERE podcast_id = :podcastUuid ORDER BY duration DESC")
-    abstract fun findByPodcastOrderDurationDescFlowable(podcastUuid: String): Flowable<List<PodcastEpisode>>
+    abstract fun findByPodcastOrderDurationDescFlow(podcastUuid: String): Flow<List<PodcastEpisode>>
 
     @Query("UPDATE podcast_episodes SET downloaded_error_details = NULL, episode_status = :episodeStatusNotDownloaded WHERE episode_status = :episodeStatusFailed")
     abstract fun clearAllDownloadErrorsBlocking(episodeStatusNotDownloaded: EpisodeStatusEnum, episodeStatusFailed: EpisodeStatusEnum)

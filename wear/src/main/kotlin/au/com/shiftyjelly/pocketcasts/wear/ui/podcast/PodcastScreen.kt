@@ -50,16 +50,17 @@ fun PodcastScreen(
 ) {
     val artworkConfiguration by viewModel.artworkConfiguration.collectAsState()
 
-    when (val state = viewModel.uiState) {
+    val state by viewModel.uiState.collectAsState()
+    when (val currentState = state) {
         is UiState.Loaded -> Content(
-            state = state,
+            state = currentState,
             useEpisodeArtwork = artworkConfiguration.useEpisodeArtwork,
             onEpisodeTap = onEpisodeTap,
             modifier = modifier,
             columnState = columnState,
         )
 
-        UiState.Empty -> Unit // Do Nothing
+        is UiState.Empty -> Unit // Do Nothing
     }
 }
 

@@ -39,7 +39,7 @@ interface EpisodeManager {
     fun findNotificationEpisodesBlocking(date: Date): List<PodcastEpisode>
     fun findLatestUnfinishedEpisodeByPodcastBlocking(podcast: Podcast): PodcastEpisode?
     fun findLatestEpisodeToPlayBlocking(): PodcastEpisode?
-    fun findEpisodesByPodcastOrderedRxFlowable(podcast: Podcast): Flowable<List<PodcastEpisode>>
+    fun findEpisodesByPodcastOrderedFlow(podcast: Podcast): Flow<List<PodcastEpisode>>
     fun findEpisodesWhereRxFlowable(queryAfterWhere: String): Flowable<List<PodcastEpisode>>
 
     suspend fun findEpisodesToSync(): List<PodcastEpisode>
