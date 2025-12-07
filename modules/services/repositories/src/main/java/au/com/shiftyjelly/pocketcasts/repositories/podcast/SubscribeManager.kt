@@ -26,6 +26,7 @@ import au.com.shiftyjelly.pocketcasts.utils.Util
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import coil3.imageLoader
 import coil3.request.CachePolicy
+import coil3.request.ErrorResult
 import coil3.request.ImageRequest
 import com.jakewharton.rxrelay2.PublishRelay
 import dagger.hilt.android.qualifiers.ApplicationContext
@@ -143,7 +144,10 @@ class SubscribeManager @Inject constructor(
                     .data(url)
                     .memoryCachePolicy(CachePolicy.DISABLED)
                     .build()
-                context.imageLoader.enqueue(request)
+                val result = context.imageLoader.execute(request)
+                if (result is ErrorResult) {
+                    Timber.i("Could not cache artwork for podcast ${podcast.uuid} from $url. ${result.throwable.message}")
+                }
             }
         } catch (e: Exception) {
             Timber.e(e, "Error caching artwork for podcast ${podcast.uuid}")
