@@ -781,9 +781,9 @@ class EpisodeManagerImpl @Inject constructor(
         }
     }
 
-    override fun findDownloadEpisodesRxFlowable(): Flowable<List<PodcastEpisode>> {
+    override fun findDownloadEpisodesFlow(): Flow<List<PodcastEpisode>> {
         val failedDownloadCutoff = Date().time - 7.days()
-        return episodeDao.findDownloadingEpisodesIncludingFailedRxFlowable(failedDownloadCutoff)
+        return episodeDao.findDownloadingEpisodesIncludingFailedFlow(failedDownloadCutoff)
     }
 
     override fun findDownloadedEpisodesRxFlowable(): Flowable<List<PodcastEpisode>> {

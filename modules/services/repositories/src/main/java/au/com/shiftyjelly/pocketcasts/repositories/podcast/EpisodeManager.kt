@@ -47,7 +47,7 @@ interface EpisodeManager {
 
     fun findEpisodesDownloadingBlocking(queued: Boolean = true, waitingForPower: Boolean = true, waitingForWifi: Boolean = true, downloading: Boolean = true): List<PodcastEpisode>
 
-    fun findDownloadEpisodesRxFlowable(): Flowable<List<PodcastEpisode>>
+    fun findDownloadEpisodesFlow(): Flow<List<PodcastEpisode>>
     fun findDownloadedEpisodesRxFlowable(): Flowable<List<PodcastEpisode>>
     fun findStarredEpisodesRxFlowable(): Flowable<List<PodcastEpisode>>
     suspend fun findStarredEpisodes(): List<PodcastEpisode>
