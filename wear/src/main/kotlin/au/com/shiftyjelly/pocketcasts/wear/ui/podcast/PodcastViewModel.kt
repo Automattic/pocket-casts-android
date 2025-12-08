@@ -13,6 +13,7 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.emitAll
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
@@ -39,29 +40,27 @@ class PodcastViewModel @Inject constructor(
 
     val artworkConfiguration = settings.artworkConfiguration.flow
 
-    var uiState: StateFlow<UiState> = flow {
+    val uiState: StateFlow<UiState> = flow {
         val podcast = podcastManager.findPodcastByUuid(podcastUuid)
         if (podcast == null) {
             emit(UiState.Empty)
-            return@flow
-        }
+        } else {
+            emitAll(
+                episodeManager.findEpisodesByPodcastOrderedFlow(podcast)
+                    .map { episodes ->
+                        val filtered = episodes.filterNot { it.isArchived || it.isFinished }
+                        val sorted = podcast.grouping.sortFunction?.let { sortFunction ->
+                            filtered.sortedByDescending(sortFunction)
+                        } ?: filtered
 
-        episodeManager.findEpisodesByPodcastOrderedFlow(podcast)
-            .map { episodes ->
-                val filtered = episodes.filterNot { it.isArchived || it.isFinished }
-                podcast.grouping.sortFunction?.let { sortFunction ->
-                    filtered.sortedByDescending(sortFunction)
-                } ?: filtered
-            }
-            .collect { episodes ->
-                emit(
-                    UiState.Loaded(
-                        podcast = podcast,
-                        episodes = episodes,
-                        theme = theme,
-                    ),
-                )
-            }
+                        UiState.Loaded(
+                            podcast = podcast,
+                            episodes = sorted,
+                            theme = theme,
+                        )
+                    },
+            )
+        }
     }.stateIn(
         scope = viewModelScope,
         started = SharingStarted.WhileSubscribed(1000),
