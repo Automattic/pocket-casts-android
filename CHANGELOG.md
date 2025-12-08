@@ -1,6 +1,8 @@
 8.3
 -----
-
+*   New Features
+    *   Allow Wear OS playback through the watch speaker
+        ([#4830](https://github.com/Automattic/pocket-casts-android/pull/4830))
 
 8.2
 -----
