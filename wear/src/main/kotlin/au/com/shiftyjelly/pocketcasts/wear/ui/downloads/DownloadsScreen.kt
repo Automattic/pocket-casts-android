@@ -32,10 +32,15 @@ fun DownloadsScreen(
     viewModel: DownloadsScreenViewModel = hiltViewModel(),
     onItemClick: (PodcastEpisode) -> Unit,
 ) {
-    val state by viewModel.stateFlow.collectAsState()
+    val uiState by viewModel.stateFlow.collectAsState()
     val artworkConfiguration by viewModel.artworkConfiguration.collectAsState()
 
-    Content(columnState, state, artworkConfiguration.useEpisodeArtwork(Element.Downloads), onItemClick)
+    Content(
+        columnState = columnState,
+        uiState = uiState,
+        useEpisodeArtwork = artworkConfiguration.useEpisodeArtwork(Element.Downloads),
+        onItemClick = onItemClick,
+    )
 }
 
 @Composable

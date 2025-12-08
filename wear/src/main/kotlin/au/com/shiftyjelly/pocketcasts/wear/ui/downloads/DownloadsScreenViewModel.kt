@@ -22,7 +22,7 @@ class DownloadsScreenViewModel @Inject constructor(
         object Loading : UiState()
         object Empty : UiState()
         data class Loaded(
-            val episodes: List<PodcastEpisode> = emptyList(),
+            val episodes: List<PodcastEpisode>,
         ) : UiState()
     }
 

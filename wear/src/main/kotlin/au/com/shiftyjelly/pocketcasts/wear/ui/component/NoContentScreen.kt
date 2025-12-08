@@ -32,6 +32,7 @@ fun NoContentScreen(@StringRes title: Int, @StringRes message: Int, modifier: Mo
             Text(
                 text = stringResource(message),
                 color = MaterialTheme.colors.onPrimary,
+                textAlign = TextAlign.Center,
             )
         }
     }
@@ -39,7 +40,7 @@ fun NoContentScreen(@StringRes title: Int, @StringRes message: Int, modifier: Mo
 
 @Preview(device = WearDevices.SMALL_ROUND)
 @Composable
-private fun LoadingScreenPreview() {
+private fun NoContentScreenPreview() {
     WearAppTheme {
         NoContentScreen(
             title = LR.string.downloads,
