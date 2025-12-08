@@ -6,6 +6,9 @@
 *   Updates
     *   When following a podcast cache the smaller podcast images
         ([#4827](https://github.com/Automattic/pocket-casts-android/pull/4827))
+*   Bug Fixes
+    *   On Wear OS hide archived or played episodes
+        ([#4831](https://github.com/Automattic/pocket-casts-android/pull/4831))
 
 8.2
 -----
@@ -16,8 +19,6 @@
         ([#4826](https://github.com/Automattic/pocket-casts-android/pull/4826))
     *   Fix 3-button navigation obstructing the sharing buttons
         ([#4810](https://github.com/Automattic/pocket-casts-android/pull/4810))
-    *   On Wear OS hide archived or played episodes
-        ([#4831](https://github.com/Automattic/pocket-casts-android/pull/4831))
 
 8.1
 -----
