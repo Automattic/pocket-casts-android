@@ -1,15 +1,7 @@
-*   New Features
-    *   Add Playback 2025 so you can get a recap of your listening habits from this year
-        ([#4762](https://github.com/Automattic/pocket-casts-android/pull/4762))
-*   Updates
-    *   Add periodic requests for the app rating
-        ([#4725](https://github.com/Automattic/pocket-casts-android/pull/4725))
-    *   Improve tooltips' contrast issues when dark theme is used
-        ([#4737](https://github.com/Automattic/pocket-casts-android/pull/4737))
-    *   Allow one character episode searches
-        ([#4734](https://github.com/Automattic/pocket-casts-android/pull/4734))
 *   Bug Fixes
-    *   Fix an issue where unplayed episodes do not show play button
-        ([#4749](https://github.com/Automattic/pocket-casts-android/pull/4749))
-    *   Fix autoplay not starting playback from the current position in the list
-        ([#4755](https://github.com/Automattic/pocket-casts-android/pull/4755))
+    *   Fix Android 10 full screen player appearing under the status and navigation bars
+        ([#4804](https://github.com/Automattic/pocket-casts-android/pull/4804))
+    *   Fix the mini player Up Next count overflow
+        ([#4826](https://github.com/Automattic/pocket-casts-android/pull/4826))
+    *   Fix 3-button navigation obstructing the sharing buttons
+        ([#4810](https://github.com/Automattic/pocket-casts-android/pull/4810))
