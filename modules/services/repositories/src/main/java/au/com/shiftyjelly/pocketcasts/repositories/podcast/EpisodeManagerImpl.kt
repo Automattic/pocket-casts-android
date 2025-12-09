@@ -440,7 +440,13 @@ class EpisodeManagerImpl @Inject constructor(
 
     override suspend fun updateAllStarred(episodes: List<PodcastEpisode>, starred: Boolean) {
         episodes.chunked(500).forEach { episodesChunk ->
-            episodeDao.updateAllStarred(episodesChunk.map { it.uuid }, starred, System.currentTimeMillis())
+            val modified = System.currentTimeMillis()
+            episodeDao.updateAllStarred(
+                episodesUuids = episodesChunk.map { it.uuid },
+                starred = starred,
+                starredModified = modified,
+                lastStarredDate = modified,
+            )
         }
     }
 

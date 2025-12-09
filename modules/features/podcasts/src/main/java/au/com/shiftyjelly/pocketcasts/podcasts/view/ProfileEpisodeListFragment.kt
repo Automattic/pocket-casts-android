@@ -262,7 +262,9 @@ class ProfileEpisodeListFragment :
         super.onViewCreated(view, savedInstanceState)
         viewModel.setup(mode)
 
-        startStarredSyncWorker()
+        if (savedInstanceState == null) {
+            startStarredSyncWorker()
+        }
 
         updateToolbar()
 

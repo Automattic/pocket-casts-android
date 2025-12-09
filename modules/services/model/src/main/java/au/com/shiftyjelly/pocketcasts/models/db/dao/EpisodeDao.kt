@@ -414,8 +414,8 @@ abstract class EpisodeDao {
     @Query("UPDATE podcast_episodes SET starred = :starred, last_starred_date = :lastStarredDate WHERE uuid = :uuid")
     abstract suspend fun updateStarredNoSync(starred: Boolean, lastStarredDate: Long, uuid: String)
 
-    @Query("UPDATE podcast_episodes SET starred = :starred, starred_modified = :modified WHERE uuid IN (:episodesUUIDs)")
-    abstract suspend fun updateAllStarred(episodesUUIDs: List<String>, starred: Boolean, modified: Long)
+    @Query("UPDATE podcast_episodes SET starred = :starred, starred_modified = :starredModified, last_starred_date = :lastStarredDate WHERE uuid IN (:episodesUuids)")
+    abstract suspend fun updateAllStarred(episodesUuids: List<String>, starred: Boolean, starredModified: Long, lastStarredDate: Long)
 
     @Query("UPDATE podcast_episodes SET archived = 0, archived_modified = :modified, last_archive_interaction_date = :modified, exclude_from_episode_limit = 1 WHERE uuid = :uuid")
     abstract fun unarchiveBlocking(uuid: String, modified: Long)
