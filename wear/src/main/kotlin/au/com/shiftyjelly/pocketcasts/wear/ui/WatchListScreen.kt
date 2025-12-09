@@ -110,7 +110,7 @@ fun WatchListScreen(
                 title = stringResource(LR.string.profile_navigation_starred),
                 iconRes = IR.drawable.ic_starred,
                 onClick = {
-                    viewModel.onFilesClicked()
+                    viewModel.onStarredClicked()
                     navigateToRoute(StarredScreen.ROUTE)
                 },
             )
