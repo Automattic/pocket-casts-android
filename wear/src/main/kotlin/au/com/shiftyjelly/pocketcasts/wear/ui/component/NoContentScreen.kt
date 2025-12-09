@@ -20,21 +20,16 @@ import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
 @Composable
 fun NoContentScreen(@StringRes title: Int, @StringRes message: Int, modifier: Modifier = Modifier) {
-    Column(
+    Box(
         modifier = modifier.fillMaxSize(),
-        horizontalAlignment = Alignment.CenterHorizontally,
     ) {
         ScreenHeaderChip(text = title)
-        Box(
-            modifier = Modifier.weight(1f),
-            contentAlignment = Alignment.Center,
-        ) {
-            Text(
-                text = stringResource(message),
-                color = MaterialTheme.colors.onPrimary,
-                textAlign = TextAlign.Center,
-            )
-        }
+        Text(
+            text = stringResource(message),
+            color = MaterialTheme.colors.onPrimary,
+            textAlign = TextAlign.Center,
+            modifier = Modifier.align(Alignment.Center),
+        )
     }
 }
 
