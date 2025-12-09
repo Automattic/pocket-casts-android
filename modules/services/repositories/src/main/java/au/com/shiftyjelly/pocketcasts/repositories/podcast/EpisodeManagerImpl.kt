@@ -412,8 +412,23 @@ class EpisodeManagerImpl @Inject constructor(
         }
     }
 
+    override suspend fun starEpisodeFromServer(episode: PodcastEpisode, modified: Long) {
+        episodeDao.updateStarredNoSync(
+            starred = true,
+            lastStarredDate = modified,
+            uuid = episode.uuid,
+        )
+    }
+
     override suspend fun starEpisode(episode: PodcastEpisode, starred: Boolean, sourceView: SourceView) {
-        episodeDao.updateStarred(starred, System.currentTimeMillis(), episode.uuid)
+        val modifiedDate = System.currentTimeMillis()
+        episodeDao.updateStarred(
+            starred = starred,
+            starredModified = modifiedDate,
+            lastStarredDate = modifiedDate,
+            uuid = episode.uuid,
+        )
+
         val event =
             if (starred) {
                 AnalyticsEvent.EPISODE_STARRED
@@ -433,7 +448,7 @@ class EpisodeManagerImpl @Inject constructor(
         // Retrieve the episode to make sure we have the latest starred status
         findByUuid(episode.uuid)?.let {
             episode.isStarred = !it.isStarred
-            starEpisode(episode, episode.isStarred, sourceView)
+            starEpisode(episode = episode, starred = episode.isStarred, sourceView = sourceView)
         }
     }
 
@@ -1026,6 +1041,13 @@ class EpisodeManagerImpl @Inject constructor(
                     }
                 }
             }
+    }
+
+    override suspend fun downloadMissingPodcastEpisode(episodeUuid: String, podcastUuid: String): PodcastEpisode? {
+        val response = podcastCacheServiceManager.getPodcastAndEpisode(podcastUuid = podcastUuid, episodeUuid = episodeUuid)
+        val episode = response.episodes.firstOrNull() ?: return null
+        add(episodes = listOf(episode), podcastUuid = podcastUuid, downloadMetaData = false)
+        return findByUuid(episodeUuid)
     }
 
     override suspend fun calculatePlayedUptoSumInSecsWithinDays(days: Int): Double {
