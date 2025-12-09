@@ -51,7 +51,7 @@ class StarredSyncWorker @AssistedInject constructor(
                 .addTag(WORKER_TAG)
                 .setConstraints(constraints)
                 .build()
-            return WorkManager.getInstance(context).enqueueUniqueWork(WORKER_TAG, ExistingWorkPolicy.APPEND_OR_REPLACE, workRequest)
+            return WorkManager.getInstance(context).enqueueUniqueWork(WORKER_TAG, ExistingWorkPolicy.KEEP, workRequest)
         }
     }
 
@@ -100,10 +100,9 @@ class StarredSyncWorker @AssistedInject constructor(
         val podcast = podcastManager.findOrDownloadPodcastRxSingle(podcastUuid).await() ?: return
 
         // import missing episodes
-        val episodeStartTime = SystemClock.elapsedRealtime()
         var localEpisode = episodeManager.findByUuid(episodeUuid)
 
-        // podcast not followed aren't kept up to date, so we need to download the episode
+        // podcasts not followed aren't kept up to date, so we need to download the episode
         if (localEpisode == null && !podcast.isSubscribed) {
             localEpisode = episodeManager.downloadMissingPodcastEpisode(episodeUuid = episodeUuid, podcastUuid = podcastUuid)
         }
@@ -114,12 +113,10 @@ class StarredSyncWorker @AssistedInject constructor(
 
         // sync starred state
         if (!localEpisode.isStarred || localEpisode.lastStarredDate != serverEpisode.starredModified) {
-            val syncStartTime = SystemClock.elapsedRealtime()
             episodeManager.starEpisodeFromServer(
                 episode = localEpisode,
                 modified = serverEpisode.starredModified,
             )
-            LogBuffer.i(LogBuffer.TAG_BACKGROUND_TASKS, "StarredSyncWorker - synced starred state for $episodeUuid - ${String.format(Locale.ENGLISH, "%d ms", SystemClock.elapsedRealtime() - syncStartTime)}")
         }
     }
 }
