@@ -1,1 +1,2 @@
 secret.properties filter=git-conceal diff=git-conceal
+sentry.properties filter=git-conceal diff=git-conceal
