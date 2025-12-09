@@ -48,7 +48,7 @@ class StarredSyncWorker @AssistedInject constructor(
 
     override suspend fun doWork() = coroutineScope {
         val startTime = SystemClock.elapsedRealtime()
-        try {
+        return@coroutineScope try {
             LogBuffer.i(LogBuffer.TAG_BACKGROUND_TASKS, "StarredSyncWorker - started")
             performSync()
             LogBuffer.i(LogBuffer.TAG_BACKGROUND_TASKS, "StarredSyncWorker - finished - ${String.format(Locale.ENGLISH, "%d ms", SystemClock.elapsedRealtime() - startTime)}")
