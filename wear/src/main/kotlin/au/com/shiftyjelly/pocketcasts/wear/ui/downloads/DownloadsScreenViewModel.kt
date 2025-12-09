@@ -19,8 +19,8 @@ class DownloadsScreenViewModel @Inject constructor(
 ) : ViewModel() {
 
     sealed class UiState {
-        object Loading : UiState()
-        object Empty : UiState()
+        data object Loading : UiState()
+        data object Empty : UiState()
         data class Loaded(
             val episodes: List<PodcastEpisode>,
         ) : UiState()
