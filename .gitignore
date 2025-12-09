@@ -44,7 +44,6 @@ fastlane/README.md
 /vendor
 
 # secrets
-secret.properties
 .configure-files/firebase.secrets.json
 firebase.secrets.json
 *.keystore
