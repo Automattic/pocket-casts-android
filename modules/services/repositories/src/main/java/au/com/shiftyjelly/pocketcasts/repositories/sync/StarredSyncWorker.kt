@@ -11,6 +11,7 @@ import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.Operation
 import androidx.work.WorkManager
 import androidx.work.WorkerParameters
+import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
@@ -18,6 +19,7 @@ import com.pocketcasts.service.api.StarredEpisode
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
 import java.util.Locale
+import java.util.concurrent.TimeUnit
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.rx2.await
 
@@ -28,10 +30,12 @@ class StarredSyncWorker @AssistedInject constructor(
     private val episodeManager: EpisodeManager,
     private val podcastManager: PodcastManager,
     private val syncManager: SyncManager,
+    private val settings: Settings,
 ) : CoroutineWorker(context, workerParams) {
 
     companion object {
         private const val WORKER_TAG = "pocket_casts_starred_sync_worker_tag"
+        private val ONE_WEEK_MS = TimeUnit.DAYS.toMillis(7)
 
         fun enqueue(syncManager: SyncManager, context: Context): Operation? {
             if (!syncManager.isLoggedIn()) {
@@ -65,10 +69,26 @@ class StarredSyncWorker @AssistedInject constructor(
     }
 
     private suspend fun performSync() {
-        val episodeList = syncManager.getStarredEpisodesOrThrow().episodesList
+        val serverEpisodes = syncManager.getStarredEpisodesOrThrow().episodesList
 
-        episodeList.forEach { serverEpisode ->
+        // ignore older episodes we have already processed or missing episode will cause lots of server calls and a slow sync. Include all episodes starred in the last week to handle slow syncing devices.
+        val lastStarredModified = settings.getStarredServerModified()
+        val oneWeekAgo = System.currentTimeMillis() - ONE_WEEK_MS
+        val serverEpisodesFiltered = serverEpisodes.filter { episode ->
+            episode.starredModified >= oneWeekAgo || episode.starredModified > lastStarredModified
+        }
+
+        var maxStarredModified = lastStarredModified
+        serverEpisodesFiltered.forEach { serverEpisode ->
             processServerEpisode(serverEpisode)
+            if (serverEpisode.starredModified > maxStarredModified) {
+                maxStarredModified = serverEpisode.starredModified
+            }
+        }
+
+        // update the last sync time
+        if (maxStarredModified > lastStarredModified) {
+            settings.setStarredServerModified(maxStarredModified)
         }
     }
 
