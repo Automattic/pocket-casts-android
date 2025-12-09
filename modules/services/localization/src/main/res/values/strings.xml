@@ -242,6 +242,7 @@
     <string name="pocket_casts_patron_badge">Pocket Casts Patron badge</string>
     <!-- "View" is used as a verb here. As in "view this object" -->
     <string name="view">View</string>
+    <string name="no_episodes">No episodes</string>
 
     <string name="multiselect_actions_shown">Shortcut in toolbar</string>
     <string name="multiselect_actions_hidden">In overflow</string>

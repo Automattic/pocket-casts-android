@@ -4,6 +4,8 @@
     *   Allow Wear OS playback through the watch speaker
         ([#4830](https://github.com/Automattic/pocket-casts-android/pull/4830))
 *   Updates
+    *   Improve Wear OS downloads page with a loading spinner and empty message
+        ([#4837](https://github.com/Automattic/pocket-casts-android/pull/4837))
     *   When following a podcast cache the smaller podcast images
         ([#4827](https://github.com/Automattic/pocket-casts-android/pull/4827))
 
