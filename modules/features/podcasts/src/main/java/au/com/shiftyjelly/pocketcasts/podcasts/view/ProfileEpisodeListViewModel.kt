@@ -29,7 +29,6 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.reactive.asFlow
-import kotlinx.coroutines.rx2.asFlowable
 import au.com.shiftyjelly.pocketcasts.images.R as IR
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
@@ -57,9 +56,9 @@ class ProfileEpisodeListViewModel @Inject constructor(
     fun setup(mode: Mode) {
         this.mode = mode
         val episodeListFlowable = when (mode) {
-            is Mode.Downloaded -> episodeManager.findDownloadEpisodesFlow().asFlowable()
-            is Mode.Starred -> episodeManager.findStarredEpisodesRxFlowable()
-            is Mode.History -> episodeManager.findPlaybackHistoryEpisodesRxFlowable()
+            is Mode.Downloaded -> episodeManager.findDownloadEpisodesFlow()
+            is Mode.Starred -> episodeManager.findStarredEpisodesFlow()
+            is Mode.History -> episodeManager.findPlaybackHistoryEpisodesFlow()
         }
         viewModelScope.launch {
             val searchResultsFlow = _searchQueryFlow
@@ -71,7 +70,7 @@ class ProfileEpisodeListViewModel @Inject constructor(
                     }
                 }
             combine(
-                episodeListFlowable.asFlow(),
+                episodeListFlowable,
                 searchResultsFlow,
             ) { episodeList, searchResults ->
                 val searchQuery = searchQueryFlow.value

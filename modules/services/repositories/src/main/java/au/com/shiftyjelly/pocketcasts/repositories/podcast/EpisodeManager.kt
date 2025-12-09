@@ -49,7 +49,7 @@ interface EpisodeManager {
 
     fun findDownloadEpisodesFlow(): Flow<List<PodcastEpisode>>
     fun findDownloadedEpisodesRxFlowable(): Flowable<List<PodcastEpisode>>
-    fun findStarredEpisodesRxFlowable(): Flowable<List<PodcastEpisode>>
+    fun findStarredEpisodesFlow(): Flow<List<PodcastEpisode>>
     suspend fun findStarredEpisodes(): List<PodcastEpisode>
     suspend fun downloadedEpisodesThatHaveNotBeenPlayedCount(): Int
 
@@ -121,7 +121,7 @@ interface EpisodeManager {
     suspend fun deleteEpisodeFiles(episodes: List<PodcastEpisode>, playbackManager: PlaybackManager)
 
     fun unarchiveAllInListBlocking(episodes: List<PodcastEpisode>)
-    fun findPlaybackHistoryEpisodesRxFlowable(): Flowable<List<PodcastEpisode>>
+    fun findPlaybackHistoryEpisodesFlow(): Flow<List<PodcastEpisode>>
     fun filteredPlaybackHistoryEpisodesFlow(query: String): Flow<List<PodcastEpisode>>
     suspend fun findPlaybackHistoryEpisodes(): List<PodcastEpisode>
     fun checkPodcastForEpisodeLimitBlocking(podcast: Podcast, playbackManager: PlaybackManager?)
