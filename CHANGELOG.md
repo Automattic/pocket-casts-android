@@ -8,6 +8,8 @@
 *   Updates
     *   Improve Wear OS downloads page with a loading spinner and empty message
         ([#4837](https://github.com/Automattic/pocket-casts-android/pull/4837))
+    *   Improve starred page to include episodes for unfollowed podcasts and fix sort order
+        ([#4839](https://github.com/Automattic/pocket-casts-android/pull/4839))
     *   When following a podcast cache the smaller podcast images
         ([#4827](https://github.com/Automattic/pocket-casts-android/pull/4827))
 *   Bug Fixes
