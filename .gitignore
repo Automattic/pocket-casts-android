@@ -18,9 +18,6 @@ build/
 *.iws
 *.ipr
 
-# Android
-google-upload-credentials.json
-
 ### fastlane ###
 # fastlane - A streamlined workflow tool for Cocoa deployment
 

@@ -3,3 +3,4 @@ sentry.properties filter=git-conceal diff=git-conceal
 app/google-services.json filter=git-conceal diff=git-conceal
 automotive/google-services.json filter=git-conceal diff=git-conceal
 wear/google-services.json filter=git-conceal diff=git-conceal
+google-upload-credentials.json filter=git-conceal diff=git-conceal
