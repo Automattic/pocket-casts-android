@@ -89,7 +89,7 @@ private fun ContentLoaded(
 
 @Preview(device = WearDevices.SMALL_ROUND)
 @Composable
-private fun DownloadsScreenPreview() {
+private fun EpisodeListScreenPreview() {
     WearAppTheme {
         EpisodeListScreen(
             columnState = ScalingLazyColumnState(),
