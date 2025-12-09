@@ -19,7 +19,6 @@ build/
 *.ipr
 
 # Android
-google-services.json
 google-upload-credentials.json
 
 ### fastlane ###
