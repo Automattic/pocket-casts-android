@@ -3,7 +3,9 @@ package au.com.shiftyjelly.pocketcasts.wear.ui.starred
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.platform.LocalContext
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import au.com.shiftyjelly.pocketcasts.compose.CallOnce
 import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.preferences.model.ArtworkConfiguration.Element
 import au.com.shiftyjelly.pocketcasts.wear.ui.component.EpisodeListScreen
@@ -22,6 +24,11 @@ fun StarredScreen(
 ) {
     val uiState by viewModel.stateFlow.collectAsState()
     val artworkConfiguration by viewModel.artworkConfiguration.collectAsState()
+
+    val context = LocalContext.current
+    CallOnce {
+        viewModel.refresh(context)
+    }
 
     EpisodeListScreen(
         columnState = columnState,
