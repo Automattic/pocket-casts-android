@@ -195,7 +195,7 @@ class ProfileEpisodeListViewModelTest {
         val userManager = mock<UserManager>()
         val bannerSetting = mock<UserSetting<Boolean>>()
 
-        whenever(episodeManager.findDownloadEpisodesRxFlowable()).thenReturn(flowOf(downloadedEpisodes).asFlowable())
+        whenever(episodeManager.findDownloadEpisodesFlow()).thenReturn(flowOf(downloadedEpisodes))
         whenever(episodeManager.findStarredEpisodesRxFlowable()).thenReturn(flowOf(starredEpisodes).asFlowable())
         whenever(episodeManager.findPlaybackHistoryEpisodesRxFlowable()).thenReturn(flowOf(listeningHistoryEpisodes).asFlowable())
         whenever(episodeManager.filteredPlaybackHistoryEpisodesFlow(anyOrNull())).thenReturn(flowOf(emptyList()))
