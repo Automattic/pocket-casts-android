@@ -161,14 +161,14 @@ class EpisodeManagerImpl @Inject constructor(
         }
     }
 
-    override fun findEpisodesByPodcastOrderedRxFlowable(podcast: Podcast): Flowable<List<PodcastEpisode>> {
+    override fun findEpisodesByPodcastOrderedFlow(podcast: Podcast): Flow<List<PodcastEpisode>> {
         return when (podcast.episodesSortType) {
-            EpisodesSortType.EPISODES_SORT_BY_TITLE_ASC -> episodeDao.findByPodcastOrderTitleAscRxFlowable(podcastUuid = podcast.uuid)
-            EpisodesSortType.EPISODES_SORT_BY_TITLE_DESC -> episodeDao.findByPodcastOrderTitleDescRxFlowable(podcastUuid = podcast.uuid)
-            EpisodesSortType.EPISODES_SORT_BY_DATE_ASC -> episodeDao.findByPodcastOrderPublishedDateAscRxFlowable(podcastUuid = podcast.uuid)
-            EpisodesSortType.EPISODES_SORT_BY_LENGTH_ASC -> episodeDao.findByPodcastOrderDurationAscFlowable(podcastUuid = podcast.uuid)
-            EpisodesSortType.EPISODES_SORT_BY_LENGTH_DESC -> episodeDao.findByPodcastOrderDurationDescFlowable(podcastUuid = podcast.uuid)
-            else -> episodeDao.findByPodcastOrderPublishedDateDescFlowable(podcastUuid = podcast.uuid)
+            EpisodesSortType.EPISODES_SORT_BY_TITLE_ASC -> episodeDao.findByPodcastOrderTitleAscFlow(podcastUuid = podcast.uuid)
+            EpisodesSortType.EPISODES_SORT_BY_TITLE_DESC -> episodeDao.findByPodcastOrderTitleDescFlow(podcastUuid = podcast.uuid)
+            EpisodesSortType.EPISODES_SORT_BY_DATE_ASC -> episodeDao.findByPodcastOrderPublishedDateAscFlow(podcastUuid = podcast.uuid)
+            EpisodesSortType.EPISODES_SORT_BY_LENGTH_ASC -> episodeDao.findByPodcastOrderDurationAscFlow(podcastUuid = podcast.uuid)
+            EpisodesSortType.EPISODES_SORT_BY_LENGTH_DESC -> episodeDao.findByPodcastOrderDurationDescFlow(podcastUuid = podcast.uuid)
+            else -> episodeDao.findByPodcastOrderPublishedDateDescFlow(podcastUuid = podcast.uuid)
         }
     }
 

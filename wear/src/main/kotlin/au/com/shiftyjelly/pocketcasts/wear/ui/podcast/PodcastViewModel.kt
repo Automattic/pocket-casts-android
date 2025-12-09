@@ -1,8 +1,5 @@
 package au.com.shiftyjelly.pocketcasts.wear.ui.podcast
 
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.setValue
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -14,11 +11,12 @@ import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
-import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.emitAll
+import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.reactive.asFlow
 
 @HiltViewModel
 class PodcastViewModel @Inject constructor(
@@ -42,32 +40,30 @@ class PodcastViewModel @Inject constructor(
 
     val artworkConfiguration = settings.artworkConfiguration.flow
 
-    var uiState: UiState by mutableStateOf(UiState.Empty)
-        private set
+    val uiState: StateFlow<UiState> = flow {
+        val podcast = podcastManager.findPodcastByUuid(podcastUuid)
+        if (podcast == null) {
+            emit(UiState.Empty)
+        } else {
+            emitAll(
+                episodeManager.findEpisodesByPodcastOrderedFlow(podcast)
+                    .map { episodes ->
+                        val filtered = episodes.filterNot { it.isArchived || it.isFinished }
+                        val sorted = podcast.grouping.sortFunction?.let { sortFunction ->
+                            filtered.sortedByDescending(sortFunction)
+                        } ?: filtered
 
-    init {
-        viewModelScope.launch(Dispatchers.Default) {
-            val podcast = podcastManager.findPodcastByUuid(podcastUuid)
-            podcast?.let {
-                episodeManager.findEpisodesByPodcastOrderedRxFlowable(it)
-                    .asFlow()
-                    .map { podcastEpisodes ->
-                        val sortFunction = podcast.grouping.sortFunction
-                        if (sortFunction != null) {
-                            podcastEpisodes.sortedByDescending(sortFunction)
-                        } else {
-                            podcastEpisodes
-                        }
-                    }
-                    .stateIn(viewModelScope)
-                    .collect { episodes ->
-                        uiState = UiState.Loaded(
+                        UiState.Loaded(
                             podcast = podcast,
-                            episodes = episodes,
+                            episodes = sorted,
                             theme = theme,
                         )
-                    }
-            }
+                    },
+            )
         }
-    }
+    }.stateIn(
+        scope = viewModelScope,
+        started = SharingStarted.WhileSubscribed(1000),
+        initialValue = UiState.Empty,
+    )
 }
