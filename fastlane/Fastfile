@@ -13,7 +13,7 @@ USER_ENV_FILE_PATH = File.join(Dir.home, ENV_FILE_NAME)
 PROJECT_ROOT_FOLDER = File.dirname(File.expand_path(__dir__))
 PROTOTYPE_BUILD_DOMAIN = 'https://cdn.a8c-ci.services'
 APP_PACKAGE_NAME = 'au.com.shiftyjelly.pocketcasts'
-GOOGLE_FIREBASE_SECRETS_PATH = File.join(PROJECT_ROOT_FOLDER, '.configure-files', 'firebase.secrets.json')
+GOOGLE_FIREBASE_SECRETS_PATH = File.join(PROJECT_ROOT_FOLDER, 'firebase.secrets.json')
 ORIGINALS_METADATA_DIR_PATH = File.join(PROJECT_ROOT_FOLDER, 'metadata')
 RELEASE_NOTES_SOURCE_PATH = File.join(PROJECT_ROOT_FOLDER, 'CHANGELOG.md')
 EXTRACTED_RELEASE_NOTES_PATH = File.join(ORIGINALS_METADATA_DIR_PATH, 'release_notes.txt')
@@ -612,6 +612,7 @@ platform :android do
   # Build the application and instrumented tests, then run the tests in Firebase Test Lab
   #
   lane :build_and_instrumented_test do
+    project_id = firebase_secret(name: 'project_id') # Also checks if the file is encrypted and aborts early if so
     gradle(tasks: %w[assembleDebug assembleDebugAndroidTest])
 
     # Run the instrumented tests in Firebase Test Lab
@@ -622,7 +623,7 @@ platform :android do
     apk_dir = File.join(PROJECT_ROOT_FOLDER, 'app', 'build', 'outputs', 'apk')
 
     android_firebase_test(
-      project_id: firebase_secret(name: 'project_id'),
+      project_id: project_id,
       key_file: GOOGLE_FIREBASE_SECRETS_PATH,
       model: 'Pixel2.arm',
       version: 30,
@@ -811,7 +812,13 @@ platform :android do
   end
 
   def firebase_secret(name:)
-    UI.user_error!('Unable to locale Firebase Secrets File – did you run `bundle exec fastlane run configure_apply`?') unless File.file? GOOGLE_FIREBASE_SECRETS_PATH
+    UI.user_error!('Unable to locate Firebase Secrets File.') unless File.file?(GOOGLE_FIREBASE_SECRETS_PATH)
+    # Check if file is encrypted (git-conceal header: null byte followed by "a8ccrypt")
+    File.open(GOOGLE_FIREBASE_SECRETS_PATH, 'rb') do |f|
+      if f.read(9) == "\0a8ccrypt"
+        UI.user_error!("#{GOOGLE_FIREBASE_SECRETS_PATH} file is encrypted. Use 'git-conceal unlock' to decrypt your working copy if you are an automattician.")
+      end
+    end
     key_file_secrets = JSON.parse(File.read(GOOGLE_FIREBASE_SECRETS_PATH))
     UI.user_error!("Unable to find key `#{name}` in #{GOOGLE_FIREBASE_SECRETS_PATH}") if key_file_secrets[name].nil?
     key_file_secrets[name]

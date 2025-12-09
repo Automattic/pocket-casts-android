@@ -41,7 +41,6 @@ fastlane/README.md
 
 # secrets
 .configure-files/firebase.secrets.json
-firebase.secrets.json
 *.keystore
 *.jks
 !debug.keystore
