@@ -89,7 +89,7 @@ project.apply {
         val storeFilePath = secretProperties.getProperty("signingKeyStoreFile", null)
         if (!storeFilePath.isNullOrBlank()) {
             val storeFile = file(storeFilePath)
-            canSignRelease = storeFile.exists()
+            canSignRelease = storeFile.exists() && !isFileEncrypted(storeFile)
             set("storeFile", storeFile)
             set("storePassword", secretProperties.getProperty("signingKeyStorePassword", null))
             set("keyAlias", secretProperties.getProperty("signingKeyAlias", null))

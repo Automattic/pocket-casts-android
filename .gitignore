@@ -41,9 +41,11 @@ fastlane/README.md
 
 # secrets
 .configure-files/firebase.secrets.json
-*.keystore
 *.jks
+# debug.keystore is not secret
 !debug.keystore
+# release.keystore is secret, but encrypted with git-conceal (see .gitattributes)
+!release.keystore
 
 # Silver Searcher ignore file
 .agignore

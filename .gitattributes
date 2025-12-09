@@ -5,3 +5,4 @@ automotive/google-services.json filter=git-conceal diff=git-conceal
 wear/google-services.json filter=git-conceal diff=git-conceal
 google-upload-credentials.json filter=git-conceal diff=git-conceal
 firebase.secrets.json filter=git-conceal diff=git-conceal
+release.keystore filter=git-conceal diff=git-conceal
