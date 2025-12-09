@@ -11,7 +11,7 @@ plugins {
 
 fun isFileEncrypted(file: File): Boolean {
     val gitConcealHeader = byteArrayOf(0x00, 0x61, 0x38, 0x63, 0x63, 0x72, 0x79, 0x70, 0x74)
-    file.inputStream().use { stream ->
+    return file.inputStream().use { stream ->
         val header = ByteArray(gitConcealHeader.size)
         val read = stream.read(header)
         read == gitConcealHeader.size && header.contentEquals(gitConcealHeader)
