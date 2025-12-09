@@ -267,7 +267,7 @@ abstract class EpisodeDao {
 
     @Transaction
     @Query("SELECT * FROM podcast_episodes WHERE starred = 1")
-    abstract fun findStarredEpisodesRxFlowable(): Flowable<List<PodcastEpisode>>
+    abstract fun findStarredEpisodesFlow(): Flow<List<PodcastEpisode>>
 
     @Transaction
     @Query("SELECT * FROM podcast_episodes WHERE starred = 1")
@@ -275,7 +275,7 @@ abstract class EpisodeDao {
 
     @Transaction
     @Query("SELECT * FROM podcast_episodes WHERE last_playback_interaction_date IS NOT NULL AND last_playback_interaction_date > 0 ORDER BY last_playback_interaction_date DESC LIMIT 1000")
-    abstract fun findPlaybackHistoryRxFlowable(): Flowable<List<PodcastEpisode>>
+    abstract fun findPlaybackHistoryFlow(): Flow<List<PodcastEpisode>>
 
     @Transaction
     @Query(

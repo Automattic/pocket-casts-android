@@ -16,7 +16,6 @@ import io.reactivex.Flowable
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.flowOf
-import kotlinx.coroutines.rx2.asFlowable
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Rule
@@ -196,8 +195,8 @@ class ProfileEpisodeListViewModelTest {
         val bannerSetting = mock<UserSetting<Boolean>>()
 
         whenever(episodeManager.findDownloadEpisodesFlow()).thenReturn(flowOf(downloadedEpisodes))
-        whenever(episodeManager.findStarredEpisodesRxFlowable()).thenReturn(flowOf(starredEpisodes).asFlowable())
-        whenever(episodeManager.findPlaybackHistoryEpisodesRxFlowable()).thenReturn(flowOf(listeningHistoryEpisodes).asFlowable())
+        whenever(episodeManager.findStarredEpisodesFlow()).thenReturn(flowOf(starredEpisodes))
+        whenever(episodeManager.findPlaybackHistoryEpisodesFlow()).thenReturn(flowOf(listeningHistoryEpisodes))
         whenever(episodeManager.filteredPlaybackHistoryEpisodesFlow(anyOrNull())).thenReturn(flowOf(emptyList()))
         whenever(userManager.getSignInState()).thenReturn(Flowable.empty())
         whenever(settings.isFreeAccountHistoryBannerDismissed).thenReturn(bannerSetting)

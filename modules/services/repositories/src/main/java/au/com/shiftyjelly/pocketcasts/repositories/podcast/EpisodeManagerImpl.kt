@@ -205,8 +205,8 @@ class EpisodeManagerImpl @Inject constructor(
             }
     }
 
-    override fun findPlaybackHistoryEpisodesRxFlowable(): Flowable<List<PodcastEpisode>> {
-        return episodeDao.findPlaybackHistoryRxFlowable()
+    override fun findPlaybackHistoryEpisodesFlow(): Flow<List<PodcastEpisode>> {
+        return episodeDao.findPlaybackHistoryFlow()
     }
 
     override fun filteredPlaybackHistoryEpisodesFlow(query: String): Flow<List<PodcastEpisode>> {
@@ -794,8 +794,8 @@ class EpisodeManagerImpl @Inject constructor(
         return episodeDao.downloadedEpisodesThatHaveNotBeenPlayedCount()
     }
 
-    override fun findStarredEpisodesRxFlowable(): Flowable<List<PodcastEpisode>> {
-        return episodeDao.findStarredEpisodesRxFlowable()
+    override fun findStarredEpisodesFlow(): Flow<List<PodcastEpisode>> {
+        return episodeDao.findStarredEpisodesFlow()
     }
 
     override suspend fun findStarredEpisodes(): List<PodcastEpisode> {

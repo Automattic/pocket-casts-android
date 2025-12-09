@@ -72,6 +72,10 @@ class WatchListScreenViewModel @Inject constructor(
         analyticsTracker.track(AnalyticsEvent.WEAR_MAIN_LIST_FILES_TAPPED)
     }
 
+    fun onStarredClicked() {
+        analyticsTracker.track(AnalyticsEvent.WEAR_MAIN_LIST_STARRED_TAPPED)
+    }
+
     fun onSettingsClicked() {
         analyticsTracker.track(AnalyticsEvent.WEAR_MAIN_LIST_SETTINGS_TAPPED)
     }

@@ -1,4 +1,4 @@
-package au.com.shiftyjelly.pocketcasts.wear.ui.downloads
+package au.com.shiftyjelly.pocketcasts.wear.ui.starred
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -13,12 +13,12 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 
 @HiltViewModel
-class DownloadsScreenViewModel @Inject constructor(
+class StarredScreenViewModel @Inject constructor(
     episodeManager: EpisodeManager,
     settings: Settings,
 ) : ViewModel() {
 
-    val stateFlow: StateFlow<EpisodeListUiState> = episodeManager.findDownloadEpisodesFlow().map { episodes ->
+    val stateFlow: StateFlow<EpisodeListUiState> = episodeManager.findStarredEpisodesFlow().map { episodes ->
         if (episodes.isEmpty()) {
             EpisodeListUiState.Empty
         } else {

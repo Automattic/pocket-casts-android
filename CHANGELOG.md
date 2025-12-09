@@ -3,6 +3,8 @@
 *   New Features
     *   Allow Wear OS playback through the watch speaker
         ([#4830](https://github.com/Automattic/pocket-casts-android/pull/4830))
+    *   Add the starred episodes screen on Wear OS
+        ([#4838](https://github.com/Automattic/pocket-casts-android/pull/4838))
 *   Updates
     *   Improve Wear OS downloads page with a loading spinner and empty message
         ([#4837](https://github.com/Automattic/pocket-casts-android/pull/4837))

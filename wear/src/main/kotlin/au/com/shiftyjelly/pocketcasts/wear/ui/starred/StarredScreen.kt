@@ -1,4 +1,4 @@
-package au.com.shiftyjelly.pocketcasts.wear.ui.downloads
+package au.com.shiftyjelly.pocketcasts.wear.ui.starred
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -10,14 +10,14 @@ import au.com.shiftyjelly.pocketcasts.wear.ui.component.EpisodeListScreen
 import com.google.android.horologist.compose.layout.ScalingLazyColumnState
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
 
-object DownloadsScreen {
-    const val ROUTE = "downloads_screen"
+object StarredScreen {
+    const val ROUTE = "starred_screen"
 }
 
 @Composable
-fun DownloadsScreen(
+fun StarredScreen(
     columnState: ScalingLazyColumnState,
-    viewModel: DownloadsScreenViewModel = hiltViewModel(),
+    viewModel: StarredScreenViewModel = hiltViewModel(),
     onItemClick: (PodcastEpisode) -> Unit,
 ) {
     val uiState by viewModel.stateFlow.collectAsState()
@@ -26,8 +26,8 @@ fun DownloadsScreen(
     EpisodeListScreen(
         columnState = columnState,
         uiState = uiState,
-        title = LR.string.downloads,
-        useEpisodeArtwork = artworkConfiguration.useEpisodeArtwork(Element.Downloads),
+        title = LR.string.profile_navigation_starred,
+        useEpisodeArtwork = artworkConfiguration.useEpisodeArtwork(Element.Starred),
         onItemClick = onItemClick,
     )
 }
