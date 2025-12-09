@@ -18,6 +18,15 @@ If you're just looking to install Pocket Casts Android, you can find it on [Goog
 
 ## Build Instructions
 
+<details><summary>If you are an automattician, you will need to decrypt secrets from the repository first</summary>
+
+ - [Install `git-conceal` on your machine](https://github.com/Automattic/git-conceal?tab=readme-ov-file#installation)
+ - Access [the secrets decryption key for `git-conceal` in our Secret Store](https://mc.a8c.com/secret-store/?secret_id=13763)
+ - Run `echo "THE_SECRET_KEY" | base64 -d | git-conceal unlock -`
+
+You only have to do this once after your initial clone of the repo. This will install git filters which will take care of transparently encrypting/decrypting files on the fly during commit and checkout operations for you.
+</details>
+
 1. Make sure you've installed [Android Studio](https://developer.android.com/studio/index.html).
 2. In Android Studio, open the project from the local repository.
 3. Go to Tools → Device Manager and create an emulated device.
