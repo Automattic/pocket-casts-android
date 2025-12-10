@@ -19,7 +19,7 @@ import kotlinx.coroutines.flow.stateIn
 class StarredScreenViewModel @Inject constructor(
     episodeManager: EpisodeManager,
     settings: Settings,
-    val syncManager: SyncManager,
+    private val syncManager: SyncManager,
 ) : ViewModel() {
 
     val stateFlow: StateFlow<EpisodeListUiState> = episodeManager.findStarredEpisodesFlow().map { episodes ->

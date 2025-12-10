@@ -55,9 +55,7 @@ class StarredSync @Inject constructor(
         val episodeUuid = serverEpisode.uuid
 
         // Import missing podcast
-        val podcast = podcastManager.findOrDownloadPodcastRxSingle(podcastUuid).await() ?: run {
-            return
-        }
+        val podcast = podcastManager.findOrDownloadPodcastRxSingle(podcastUuid).await() ?: return
 
         // Import missing episodes
         var localEpisode = episodeManager.findByUuid(episodeUuid)
