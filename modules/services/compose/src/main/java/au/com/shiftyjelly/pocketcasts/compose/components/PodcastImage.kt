@@ -52,7 +52,11 @@ fun PodcastImage(
 ) {
     val context = LocalContext.current
     val imageRequest = remember(uuid, placeholderType) {
-        PocketCastsImageRequestFactory(context, placeholderType = placeholderType).themed().createForPodcast(uuid)
+        PocketCastsImageRequestFactory(
+            context = context,
+            placeholderType = placeholderType,
+            size = imageSize.value.toInt(),
+        ).themed().createForPodcast(uuid)
     }
     val shape = if (cornerSize != null) {
         RoundedCornerShape(cornerSize)
@@ -91,10 +95,6 @@ fun PodcastImageDeprecated(
 ) {
     val context = LocalContext.current
 
-    val imageRequest = remember(uuid) {
-        PocketCastsImageRequestFactory(context, placeholderType = placeholderType).themed().createForPodcast(uuid)
-    }
-
     BoxWithConstraints(
         modifier = modifier
             .semantics(mergeDescendants = true) {
@@ -102,6 +102,14 @@ fun PodcastImageDeprecated(
                 contentDescription = context.getString(LR.string.podcast_artwork_description)
             },
     ) {
+        val imageRequest = remember(uuid, maxWidth) {
+            PocketCastsImageRequestFactory(
+                context = context,
+                size = maxWidth.value.toInt(),
+                placeholderType = placeholderType,
+            ).themed().createForPodcast(uuid)
+        }
+
         val corners = if (roundCorners) cornerSize ?: podcastImageCornerSize(maxWidth) else null
         if (dropShadow) {
             val finalElevation = elevation ?: when {

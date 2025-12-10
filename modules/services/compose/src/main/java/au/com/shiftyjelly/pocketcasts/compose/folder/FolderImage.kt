@@ -35,6 +35,7 @@ import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import au.com.shiftyjelly.pocketcasts.compose.AppThemeWithBackground
+import au.com.shiftyjelly.pocketcasts.compose.components.PodcastImage
 import au.com.shiftyjelly.pocketcasts.compose.components.PodcastImageDeprecated
 import au.com.shiftyjelly.pocketcasts.compose.extensions.nonScaledSp
 import au.com.shiftyjelly.pocketcasts.compose.images.CountBadge
@@ -204,8 +205,7 @@ private fun FolderPodcastImage(
             }
         }
     } else {
-        @Suppress("DEPRECATION")
-        PodcastImageDeprecated(
+        PodcastImage(
             uuid = uuid,
             modifier = modifier,
         )

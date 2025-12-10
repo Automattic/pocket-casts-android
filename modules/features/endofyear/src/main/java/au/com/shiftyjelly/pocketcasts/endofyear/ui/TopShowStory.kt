@@ -193,6 +193,7 @@ private fun CenterContent(
         uuid = story.show.uuid,
         elevation = 0.dp,
         contentDescription = story.show.title,
+        imageSize = size,
         modifier = Modifier
             .requiredSize(size.times(.7f))
             .scale(scaleAnimation)
