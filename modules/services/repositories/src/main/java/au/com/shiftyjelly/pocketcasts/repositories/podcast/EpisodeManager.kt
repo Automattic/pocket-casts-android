@@ -86,6 +86,7 @@ interface EpisodeManager {
     fun markAsPlayedBlocking(episode: BaseEpisode?, playbackManager: PlaybackManager, podcastManager: PodcastManager, shouldShuffleUpNext: Boolean = false)
     fun markAsPlaybackErrorBlocking(episode: BaseEpisode?, errorMessage: String?)
     fun markAsPlaybackErrorBlocking(episode: BaseEpisode?, event: PlayerEvent.PlayerError, isPlaybackRemote: Boolean)
+    suspend fun starEpisodeFromServer(episode: PodcastEpisode, modified: Long)
     suspend fun starEpisode(episode: PodcastEpisode, starred: Boolean, sourceView: SourceView)
     suspend fun updateAllStarred(episodes: List<PodcastEpisode>, starred: Boolean)
     suspend fun toggleStarEpisode(episode: PodcastEpisode, sourceView: SourceView)
@@ -116,6 +117,7 @@ interface EpisodeManager {
     suspend fun countEpisodes(): Int
     fun countEpisodesWhereBlocking(queryAfterWhere: String): Int
     fun downloadMissingEpisodeRxMaybe(episodeUuid: String, podcastUuid: String, skeletonEpisode: PodcastEpisode, podcastManager: PodcastManager, downloadMetaData: Boolean, source: SourceView): Maybe<BaseEpisode>
+    suspend fun downloadMissingPodcastEpisode(episodeUuid: String, podcastUuid: String): PodcastEpisode?
 
     fun deleteEpisodeFilesAsync(episodes: List<PodcastEpisode>, playbackManager: PlaybackManager)
     suspend fun deleteEpisodeFiles(episodes: List<PodcastEpisode>, playbackManager: PlaybackManager)

@@ -24,6 +24,7 @@ import com.pocketcasts.service.api.ReferralCodeResponse
 import com.pocketcasts.service.api.ReferralRedemptionRequest
 import com.pocketcasts.service.api.ReferralRedemptionResponse
 import com.pocketcasts.service.api.ReferralValidationResponse
+import com.pocketcasts.service.api.StarredEpisodesResponse
 import com.pocketcasts.service.api.SupportFeedbackRequest
 import com.pocketcasts.service.api.SyncUpdateRequest
 import com.pocketcasts.service.api.SyncUpdateResponse
@@ -207,4 +208,8 @@ interface SyncService {
     @Headers("Content-Type: application/octet-stream")
     @POST("/referrals/redeem")
     suspend fun redeemReferralCode(@Header("Authorization") authorization: String, @Body request: ReferralRedemptionRequest): Response<ReferralRedemptionResponse>
+
+    @Headers("Content-Type: application/octet-stream")
+    @POST("/starred/list")
+    suspend fun getStarredEpisodes(@Header("Authorization") authorization: String): StarredEpisodesResponse
 }

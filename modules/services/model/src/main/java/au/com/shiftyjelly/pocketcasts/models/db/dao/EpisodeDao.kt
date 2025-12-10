@@ -266,7 +266,7 @@ abstract class EpisodeDao {
     ): Int
 
     @Transaction
-    @Query("SELECT * FROM podcast_episodes WHERE starred = 1")
+    @Query("SELECT * FROM podcast_episodes WHERE starred = 1 ORDER BY last_starred_date DESC")
     abstract fun findStarredEpisodesFlow(): Flow<List<PodcastEpisode>>
 
     @Transaction
@@ -408,11 +408,14 @@ abstract class EpisodeDao {
     @Query("SELECT podcast_episodes.* FROM podcast_episodes JOIN podcasts ON podcast_episodes.podcast_id = podcasts.uuid WHERE podcasts.subscribed = 1 AND podcast_episodes.playing_status != 2 AND podcast_episodes.archived = 0 ORDER BY podcast_episodes.published_date DESC LIMIT 1")
     abstract fun findLatestEpisodeToPlayBlocking(): PodcastEpisode?
 
-    @Query("UPDATE podcast_episodes SET starred = :starred, starred_modified = :modified WHERE uuid = :uuid")
-    abstract suspend fun updateStarred(starred: Boolean, modified: Long, uuid: String)
+    @Query("UPDATE podcast_episodes SET starred = :starred, starred_modified = :starredModified, last_starred_date = :lastStarredDate WHERE uuid = :uuid")
+    abstract suspend fun updateStarred(starred: Boolean, starredModified: Long, lastStarredDate: Long, uuid: String)
 
-    @Query("UPDATE podcast_episodes SET starred = :starred, starred_modified = :modified WHERE uuid IN (:episodesUUIDs)")
-    abstract suspend fun updateAllStarred(episodesUUIDs: List<String>, starred: Boolean, modified: Long)
+    @Query("UPDATE podcast_episodes SET starred = :starred, last_starred_date = :lastStarredDate WHERE uuid = :uuid")
+    abstract suspend fun updateStarredNoSync(starred: Boolean, lastStarredDate: Long, uuid: String)
+
+    @Query("UPDATE podcast_episodes SET starred = :starred, starred_modified = :starredModified, last_starred_date = :lastStarredDate WHERE uuid IN (:episodesUuids)")
+    abstract suspend fun updateAllStarred(episodesUuids: List<String>, starred: Boolean, starredModified: Long, lastStarredDate: Long)
 
     @Query("UPDATE podcast_episodes SET archived = 0, archived_modified = :modified, last_archive_interaction_date = :modified, exclude_from_episode_limit = 1 WHERE uuid = :uuid")
     abstract fun unarchiveBlocking(uuid: String, modified: Long)

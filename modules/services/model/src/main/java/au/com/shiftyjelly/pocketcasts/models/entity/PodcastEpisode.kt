@@ -47,6 +47,7 @@ data class PodcastEpisode(
     @ColumnInfo(name = "played_up_to_modified") override var playedUpToModified: Long? = null,
     @ColumnInfo(name = "duration_modified") var durationModified: Long? = null,
     @ColumnInfo(name = "starred_modified") var starredModified: Long? = null,
+    @ColumnInfo(name = "last_starred_date") var lastStarredDate: Long? = null,
     @ColumnInfo(name = "archived") override var isArchived: Boolean = false,
     @ColumnInfo(name = "archived_modified") var archivedModified: Long? = null,
     @ColumnInfo(name = "season") var season: Long? = null,
