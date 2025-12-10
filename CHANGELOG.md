@@ -10,6 +10,8 @@
         ([#4837](https://github.com/Automattic/pocket-casts-android/pull/4837))
     *   When following a podcast cache the smaller podcast images
         ([#4827](https://github.com/Automattic/pocket-casts-android/pull/4827))
+    *   On Wear OS show archived or played episodes as greyed out
+        ([#4842](https://github.com/Automattic/pocket-casts-android/pull/4842))
 *   Bug Fixes
     *   Improve help & feedback page padding
         ([#4843](https://github.com/Automattic/pocket-casts-android/pull/4843))
