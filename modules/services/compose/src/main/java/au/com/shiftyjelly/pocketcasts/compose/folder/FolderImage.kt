@@ -209,7 +209,6 @@ private fun FolderPodcastImage(
         PodcastImage(
             uuid = uuid,
             imageSize = imageSize,
-            modifier = modifier.size(imageSize),
         )
     }
 }
