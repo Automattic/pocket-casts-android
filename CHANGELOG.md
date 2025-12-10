@@ -11,6 +11,8 @@
     *   When following a podcast cache the smaller podcast images
         ([#4827](https://github.com/Automattic/pocket-casts-android/pull/4827))
 *   Bug Fixes
+    *   Improve help & feedback page padding
+        ([#4843](https://github.com/Automattic/pocket-casts-android/pull/4843))
     *   On Wear OS hide archived or played episodes
         ([#4831](https://github.com/Automattic/pocket-casts-android/pull/4831))
 
