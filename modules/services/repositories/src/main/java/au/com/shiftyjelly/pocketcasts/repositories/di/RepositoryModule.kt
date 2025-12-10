@@ -10,6 +10,7 @@ import au.com.shiftyjelly.pocketcasts.models.to.TranscriptType
 import au.com.shiftyjelly.pocketcasts.payment.PurchaseApprover
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.preferences.SettingsImpl
+import au.com.shiftyjelly.pocketcasts.repositories.MetricsAndChillListener
 import au.com.shiftyjelly.pocketcasts.repositories.ads.BlazeAdsManager
 import au.com.shiftyjelly.pocketcasts.repositories.ads.BlazeAdsManagerImpl
 import au.com.shiftyjelly.pocketcasts.repositories.appreview.AppReviewAnalyticsListener
@@ -241,6 +242,10 @@ abstract class RepositoryModule {
     @Binds
     @IntoSet
     abstract fun provideAppReviewAnalyticsListener(appReviewAnalyticsListener: AppReviewAnalyticsListener): AnalyticsTracker.Listener
+
+    @Binds
+    @IntoSet
+    abstract fun provideMetricAndChillAnalyticsListener(listener: MetricsAndChillListener): AnalyticsTracker.Listener
 
     companion object {
         @Provides
