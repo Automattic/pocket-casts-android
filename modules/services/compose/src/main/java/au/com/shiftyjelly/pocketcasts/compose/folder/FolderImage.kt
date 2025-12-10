@@ -31,12 +31,12 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.LineHeightStyle
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import au.com.shiftyjelly.pocketcasts.compose.AppThemeWithBackground
 import au.com.shiftyjelly.pocketcasts.compose.components.PodcastImage
-import au.com.shiftyjelly.pocketcasts.compose.components.PodcastImageDeprecated
 import au.com.shiftyjelly.pocketcasts.compose.extensions.nonScaledSp
 import au.com.shiftyjelly.pocketcasts.compose.images.CountBadge
 import au.com.shiftyjelly.pocketcasts.compose.images.CountBadgeStyle
@@ -100,14 +100,14 @@ fun FolderImage(
                             uuid = podcastUuids.getOrNull(0),
                             color = color,
                             gradientColor = topPodcastImageGradient,
-                            modifier = Modifier.size(podcastSize),
+                            imageSize = podcastSize,
                         )
                         Spacer(modifier = Modifier.height(imagePadding))
                         FolderPodcastImage(
                             uuid = podcastUuids.getOrNull(2),
                             color = color,
                             gradientColor = bottomPodcastImageGradient,
-                            modifier = Modifier.size(podcastSize),
+                            imageSize = podcastSize,
                         )
                     }
                     Spacer(modifier = Modifier.width(imagePadding))
@@ -116,14 +116,14 @@ fun FolderImage(
                             uuid = podcastUuids.getOrNull(1),
                             color = color,
                             gradientColor = topPodcastImageGradient,
-                            modifier = Modifier.size(podcastSize),
+                            imageSize = podcastSize,
                         )
                         Spacer(modifier = Modifier.height(imagePadding))
                         FolderPodcastImage(
                             uuid = podcastUuids.getOrNull(3),
                             color = color,
                             gradientColor = bottomPodcastImageGradient,
-                            modifier = Modifier.size(podcastSize),
+                            imageSize = podcastSize,
                         )
                     }
                 }
@@ -173,10 +173,11 @@ private fun FolderPodcastImage(
     uuid: String?,
     color: Color,
     gradientColor: List<Color>,
+    imageSize: Dp,
     modifier: Modifier = Modifier,
 ) {
     if (uuid == null) {
-        BoxWithConstraints(modifier) {
+        BoxWithConstraints(modifier.size(imageSize)) {
             val corners = when {
                 maxWidth <= 50.dp -> 3.dp
                 maxWidth <= 200.dp -> 4.dp
@@ -207,7 +208,8 @@ private fun FolderPodcastImage(
     } else {
         PodcastImage(
             uuid = uuid,
-            modifier = modifier,
+            imageSize = imageSize,
+            modifier = modifier.size(imageSize),
         )
     }
 }
