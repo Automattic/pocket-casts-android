@@ -51,7 +51,7 @@ fun PodcastImage(
     contentDescription: String? = stringResource(LR.string.podcast_artwork_description),
 ) {
     val context = LocalContext.current
-    val imageRequest = remember(uuid, placeholderType) {
+    val imageRequest = remember(uuid, placeholderType, imageSize) {
         PocketCastsImageRequestFactory(
             context = context,
             placeholderType = placeholderType,
