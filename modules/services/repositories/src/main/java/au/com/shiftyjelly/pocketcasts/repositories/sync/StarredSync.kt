@@ -38,9 +38,13 @@ class StarredSync @Inject constructor(
 
         var maxStarredModified = lastStarredModified
         serverEpisodesFiltered.forEach { serverEpisode ->
-            processServerEpisode(serverEpisode)
-            if (serverEpisode.starredModified > maxStarredModified) {
-                maxStarredModified = serverEpisode.starredModified
+            try {
+                processServerEpisode(serverEpisode)
+                if (serverEpisode.starredModified > maxStarredModified) {
+                    maxStarredModified = serverEpisode.starredModified
+                }
+            } catch (e: Exception) {
+                Timber.e(e, "StarredSync - failed to process episode: ${serverEpisode.uuid}")
             }
         }
 
