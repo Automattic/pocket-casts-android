@@ -3,7 +3,6 @@ package au.com.shiftyjelly.pocketcasts.repositories.images
 import android.content.Context
 import android.widget.ImageView
 import androidx.annotation.DrawableRes
-import androidx.annotation.Px
 import au.com.shiftyjelly.pocketcasts.models.entity.BaseEpisode
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.playback.EpisodeFileMetadata
@@ -28,8 +27,8 @@ import au.com.shiftyjelly.pocketcasts.models.entity.UserEpisode as UserEpisodeEn
 data class PocketCastsImageRequestFactory(
     val context: Context,
     private val isDarkTheme: Boolean = false,
-    @Px private val cornerRadius: Int = 0,
-    @Px private val size: Int? = null,
+    private val cornerRadius: Int = 0,
+    private val size: Int? = null,
     private val placeholderType: PlaceholderType = PlaceholderType.Large,
     private val transformations: List<Transformation> = emptyList(),
 ) {
