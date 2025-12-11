@@ -14,6 +14,7 @@ import kotlin.coroutines.suspendCoroutine
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withTimeoutOrNull
 import timber.log.Timber
 
 @Singleton
@@ -58,6 +59,24 @@ class FirebaseRemoteFeatureProvider(
     }
 
     override fun hasFeature(feature: Feature) = feature.hasFirebaseRemoteFlag
+
+    suspend fun ensureFetched(timeoutMillis: Long = 2000): Boolean {
+        return try {
+            withTimeoutOrNull(timeoutMillis) {
+                firebaseRemoteConfig.fetchSuspending()
+                    .map { firebaseRemoteConfig.activateSuspending().getOrThrow() }
+                    .onSuccess { Timber.i("Firebase Remote Config fetched and activated successfully") }
+                    .onFailure { Timber.e(it, "Failed to fetch Firebase Remote Config") }
+                    .isSuccess
+            } ?: run {
+                Timber.w("Firebase Remote Config fetch timed out after ${timeoutMillis}ms, continuing with cached values")
+                false
+            }
+        } catch (e: Exception) {
+            Timber.e(e, "Exception during Firebase Remote Config fetch")
+            false
+        }
+    }
 }
 
 private suspend fun FirebaseRemoteConfig.fetchSuspending() = suspendCoroutine<Result<Unit>> { continuation ->

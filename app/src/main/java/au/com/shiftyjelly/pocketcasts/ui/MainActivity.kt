@@ -182,6 +182,7 @@ import au.com.shiftyjelly.pocketcasts.utils.Network
 import au.com.shiftyjelly.pocketcasts.utils.Util
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.FeatureFlag
+import au.com.shiftyjelly.pocketcasts.utils.featureflag.providers.FirebaseRemoteFeatureProvider
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import au.com.shiftyjelly.pocketcasts.utils.observeOnce
 import au.com.shiftyjelly.pocketcasts.view.LockableBottomSheetBehavior
@@ -304,6 +305,9 @@ class MainActivity :
 
     @Inject
     lateinit var appReviewManager: AppReviewManager
+
+    @Inject
+    lateinit var firebaseRemoteFeatureProvider: FirebaseRemoteFeatureProvider
 
     private val viewModel: MainActivityViewModel by viewModels()
     private val disposables = CompositeDisposable()
@@ -446,6 +450,10 @@ class MainActivity :
         bottomSheetTag = savedInstanceState?.getString(SAVEDSTATE_BOTTOM_SHEET_TAG)
 
         playbackManager.setNotificationPermissionChecker(this)
+
+        runBlocking {
+            firebaseRemoteFeatureProvider.ensureFetched()
+        }
 
         val showOnboarding = !settings.hasCompletedOnboarding() && !syncManager.isLoggedIn()
         // Only show if savedInstanceState is null in order to avoid creating onboarding activity twice.
