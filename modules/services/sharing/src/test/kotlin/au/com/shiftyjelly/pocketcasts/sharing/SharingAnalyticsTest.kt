@@ -635,7 +635,7 @@ class SharingAnalyticsTest {
         event.assertProperties(
             mapOf(
                 "type" to "end_of_year_story",
-                "story" to "current_year_vs_year",
+                "story" to "year_vs_year",
                 "source" to "unknown",
                 "action" to "system_sheet",
                 "current_year" to 1000,

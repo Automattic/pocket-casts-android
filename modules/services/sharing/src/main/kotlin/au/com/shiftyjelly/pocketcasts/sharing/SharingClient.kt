@@ -437,7 +437,7 @@ data class SharingRequest internal constructor(
         ) = Builder(Data.EndOfYearStory(story, year, screenshot))
             .setAnalyticsEvent(AnalyticsEvent.END_OF_YEAR_STORY_SHARE)
             .addAnalyticsProperty("story", story.analyticsValue)
-            .addAnalyticsProperty("year", year.value)
+            .addAnalyticsProperty("current_year", year.value)
 
         fun transcript(
             podcastUuid: String?,
