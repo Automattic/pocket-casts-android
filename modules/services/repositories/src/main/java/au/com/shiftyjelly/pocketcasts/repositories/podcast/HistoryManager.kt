@@ -63,8 +63,6 @@ class HistoryManager @Inject constructor(
             .toList()
             .await()
 
-        val skeletonEpisodes = mutableListOf<PodcastEpisode>()
-
         for (change in changes) {
             val interactionDate = change.modifiedAt.toLong()
 
@@ -89,8 +87,6 @@ class HistoryManager @Inject constructor(
                 }
             }
         }
-
-        episodeManager.insertBlocking(skeletonEpisodes)
 
         if (updateServerModified) {
             settings.setHistoryServerModified(response.serverModified)
