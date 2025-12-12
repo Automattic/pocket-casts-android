@@ -6,11 +6,11 @@ fi
 
 "$(dirname "${BASH_SOURCE[0]}")/restore-cache.sh"
 
+echo "--- :closed_lock_with_key: Installing Secrets"
+git-conceal-unlock
+
 echo "--- :rubygems: Setting up Gems"
 install_gems
-
-echo "--- :closed_lock_with_key: Installing Secrets"
-bundle exec fastlane run configure_apply
 
 echo "--- 🧹 Linting"
 # Run lint on app module first, to make sure that the lint-results-debug.sarif file is always generated
