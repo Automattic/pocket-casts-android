@@ -14,6 +14,7 @@ import au.com.shiftyjelly.pocketcasts.repositories.file.CloudFilesManager
 import au.com.shiftyjelly.pocketcasts.repositories.playlist.PlaylistManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
+import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
 import dagger.hilt.android.qualifiers.ApplicationContext
 import javax.inject.Inject
 import kotlinx.coroutines.Dispatchers
@@ -56,6 +57,10 @@ class AutoPlaySelector @Inject constructor(
             episodes.getOrNull(currentEpisodeIndex + 1) ?: episodes.firstOrNull()?.takeIf { it.uuid != currentEpisodeUuid }
         }
 
+        if (episode != null) {
+            LogBuffer.i(LogBuffer.TAG_PLAYBACK, "Auto play selected episode=${episode.uuid} from source=$source")
+        }
+
         return episode?.let { it to source }
     }
 
@@ -65,7 +70,10 @@ class AutoPlaySelector @Inject constructor(
     ): List<PodcastEpisode> {
         val episodes = episodeManager
             .findEpisodesByPodcastOrderedSuspend(podcast)
-            .filter { episode -> !episode.isArchived || episode.uuid == currentEpisodeUuid }
+            .filter { episode ->
+                (!episode.isArchived && !episode.isFinished) ||
+                    episode.uuid == currentEpisodeUuid
+            }
 
         return withContext(Dispatchers.Default) {
             val modifiedEpisodes = when (podcast.grouping) {
@@ -100,7 +108,10 @@ class AutoPlaySelector @Inject constructor(
     ): List<PodcastEpisode> {
         return playlistManager
             .getAutoPlayEpisodes(playlistUuid, currentEpisodeUuid)
-            .filter { episode -> !episode.isArchived || episode.uuid == currentEpisodeUuid }
+            .filter { episode ->
+                (!episode.isArchived && !episode.isFinished) ||
+                    episode.uuid == currentEpisodeUuid
+            }
     }
 
     private suspend fun findDownloadedEpisodes(): List<PodcastEpisode> {

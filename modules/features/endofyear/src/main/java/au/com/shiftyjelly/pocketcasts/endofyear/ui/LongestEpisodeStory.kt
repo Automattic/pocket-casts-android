@@ -192,6 +192,7 @@ private fun Content(
         contentDescription = story.episode.podcastTitle,
         elevation = 0.dp,
         cornerSize = 4.dp,
+        imageSize = size,
         modifier = Modifier
             .requiredSize(size * .6f)
             .scale(scaleAnimation)

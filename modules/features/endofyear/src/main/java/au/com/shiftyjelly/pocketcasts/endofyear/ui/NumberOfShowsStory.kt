@@ -206,6 +206,7 @@ private fun PodcastCoverCarousel(
                 PodcastImage(
                     uuid = podcastId,
                     cornerSize = 4.dp,
+                    imageSize = coverSize,
                     modifier = Modifier
                         .size(coverSize)
                         .graphicsLayer {

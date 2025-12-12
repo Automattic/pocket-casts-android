@@ -199,6 +199,7 @@ private fun PodcastItem(
             contentDescription = null,
             elevation = 0.dp,
             cornerSize = 4.dp,
+            imageSize = artworkSize,
             modifier = Modifier.size(artworkSize * measurements.scale),
         )
         Spacer(
