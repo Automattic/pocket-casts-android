@@ -55,6 +55,7 @@ import com.pocketcasts.service.api.PodcastsEpisodesRequest
 import com.pocketcasts.service.api.ReferralCodeResponse
 import com.pocketcasts.service.api.ReferralRedemptionResponse
 import com.pocketcasts.service.api.ReferralValidationResponse
+import com.pocketcasts.service.api.StarredEpisodesResponse
 import com.pocketcasts.service.api.SyncUpdateRequest
 import com.pocketcasts.service.api.SyncUpdateResponse
 import com.pocketcasts.service.api.UserPlaylistListResponse
@@ -373,6 +374,10 @@ class SyncManagerImpl @Inject constructor(
 
     override fun episodeSyncRxCompletable(request: EpisodeSyncRequest): Completable = getCacheTokenOrLoginRxCompletable { token ->
         syncServiceManager.episodeSync(request, token)
+    }
+
+    override suspend fun getStarredEpisodesOrThrow(): StarredEpisodesResponse = getCacheTokenOrLogin { token ->
+        syncServiceManager.getStarredEpisodes(token)
     }
 
     // Rating

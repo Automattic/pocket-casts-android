@@ -545,6 +545,7 @@ abstract class PlaylistDao {
           podcast_episode.played_up_to_modified AS p_played_up_to_modified,
           podcast_episode.duration_modified AS p_duration_modified,
           podcast_episode.starred_modified AS p_starred_modified,
+          podcast_episode.last_starred_date AS p_last_starred_date,
           podcast_episode.archived AS p_archived,
           podcast_episode.archived_modified AS p_archived_modified,
           podcast_episode.season AS p_season,

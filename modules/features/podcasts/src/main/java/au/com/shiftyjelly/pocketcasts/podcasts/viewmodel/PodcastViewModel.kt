@@ -787,7 +787,8 @@ private fun Flowable<CombinedData>.buildUiState(
             "Observing podcast ${podcast.uuid} episode changes",
         )
         Flowable.combineLatest(
-            episodeManager.findEpisodesByPodcastOrderedRxFlowable(podcast)
+            episodeManager.findEpisodesByPodcastOrderedFlow(podcast)
+                .asFlowable()
                 .doOnNext {
                     // load the recommendations after the episodes have been loaded
                     recommendationsHandler.setEnabled(true)

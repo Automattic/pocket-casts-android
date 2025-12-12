@@ -70,6 +70,12 @@ class WatchListScreenViewModelTest {
     }
 
     @Test
+    fun `test onStarredClicked tapped`() {
+        viewModel.onStarredClicked()
+        verify(analyticsTracker).track(AnalyticsEvent.WEAR_MAIN_LIST_STARRED_TAPPED)
+    }
+
+    @Test
     fun `test onSettingsClicked tapped`() {
         viewModel.onSettingsClicked()
         verify(analyticsTracker).track(AnalyticsEvent.WEAR_MAIN_LIST_SETTINGS_TAPPED)

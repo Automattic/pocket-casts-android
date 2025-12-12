@@ -362,7 +362,7 @@ class EndOfYearViewModel @AssistedInject constructor(
             event,
             buildMap {
                 putAll(properties)
-                put("year", year.value)
+                put("current_year", year.value)
             },
         )
     }
@@ -390,7 +390,7 @@ class EndOfYearViewModel @AssistedInject constructor(
                 "activity" to activity.javaClass.name,
                 "from" to "screenshot",
                 "story" to story.analyticsValue,
-                "year" to year.value,
+                "current_year" to year.value,
             ),
         )
     }

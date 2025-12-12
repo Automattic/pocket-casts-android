@@ -46,16 +46,10 @@ class HelpFragment :
             val context = LocalContext.current
             val keyboardHeight = WindowInsets.ime.asPaddingValues().calculateBottomPadding()
 
-            val bottomPadding by settings.bottomInset.collectAsState(0)
-            val miniPlayerPadding = bottomPadding.pxToDp(context).dp
-
-            val basePadding = 16.dp
-            val keyboardPadding = if (keyboardHeight > 0.dp) {
-                24.dp
-            } else {
-                0.dp
-            }
-            val totalPadding = basePadding + keyboardPadding + miniPlayerPadding
+            val miniPlayerPaddingPx by settings.bottomInset.collectAsState(0)
+            val miniPlayerPadding = miniPlayerPaddingPx.pxToDp(context).dp
+            // Once the keyboard is shown let the window soft input adjust resize position the view as the mini player is no longer visible
+            val bottomPadding = if (keyboardHeight == 0.dp) miniPlayerPadding else 0.dp
 
             HelpPage(
                 activity = requireActivity(),
@@ -73,7 +67,7 @@ class HelpFragment :
                 onWebViewDispose = { webView = null },
                 modifier = Modifier
                     .fillMaxSize()
-                    .padding(bottom = totalPadding),
+                    .padding(bottom = bottomPadding),
             )
         }
     }

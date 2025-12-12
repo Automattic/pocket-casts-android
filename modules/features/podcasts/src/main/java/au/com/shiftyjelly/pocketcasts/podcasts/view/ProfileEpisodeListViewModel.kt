@@ -55,10 +55,10 @@ class ProfileEpisodeListViewModel @Inject constructor(
     @OptIn(ExperimentalCoroutinesApi::class)
     fun setup(mode: Mode) {
         this.mode = mode
-        val episodeListFlowable = when (mode) {
-            is Mode.Downloaded -> episodeManager.findDownloadEpisodesRxFlowable()
-            is Mode.Starred -> episodeManager.findStarredEpisodesRxFlowable()
-            is Mode.History -> episodeManager.findPlaybackHistoryEpisodesRxFlowable()
+        val episodeListFlow = when (mode) {
+            is Mode.Downloaded -> episodeManager.findDownloadEpisodesFlow()
+            is Mode.Starred -> episodeManager.findStarredEpisodesFlow()
+            is Mode.History -> episodeManager.findPlaybackHistoryEpisodesFlow()
         }
         viewModelScope.launch {
             val searchResultsFlow = _searchQueryFlow
@@ -70,7 +70,7 @@ class ProfileEpisodeListViewModel @Inject constructor(
                     }
                 }
             combine(
-                episodeListFlowable.asFlow(),
+                episodeListFlow,
                 searchResultsFlow,
             ) { episodeList, searchResults ->
                 val searchQuery = searchQueryFlow.value

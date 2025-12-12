@@ -33,6 +33,7 @@ import com.pocketcasts.service.api.ReferralCodeResponse
 import com.pocketcasts.service.api.ReferralRedemptionRequest
 import com.pocketcasts.service.api.ReferralRedemptionResponse
 import com.pocketcasts.service.api.ReferralValidationResponse
+import com.pocketcasts.service.api.StarredEpisodesResponse
 import com.pocketcasts.service.api.SupportFeedbackRequest
 import com.pocketcasts.service.api.SyncUpdateRequest
 import com.pocketcasts.service.api.SyncUpdateResponse
@@ -291,6 +292,10 @@ open class SyncServiceManager @Inject constructor(
             .setMessage(message)
             .build()
         return service.sendFeedback(addBearer(token), request)
+    }
+
+    suspend fun getStarredEpisodes(token: AccessToken): StarredEpisodesResponse {
+        return service.getStarredEpisodes(addBearer(token))
     }
 
     // Referral
