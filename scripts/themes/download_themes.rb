@@ -14,9 +14,9 @@ class String
   end
 end
 
-def response_to_tokens_map(response)
+def values_to_tokens_map(values)
   tokens = []
-  response.values.each do |row|
+  values.each do |row|
     key = row[0]
     next if key.nil? || key.empty?
 
@@ -98,5 +98,5 @@ def download_themes
   response = service.get_spreadsheet_values spreadsheet_id, range
   puts 'No data found.' if response.values.empty?
 
-  response_to_tokens_map(response)
+  values_to_tokens_map(response.values)
 end

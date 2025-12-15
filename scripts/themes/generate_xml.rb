@@ -7,7 +7,7 @@ THEME_FILE = '../../modules/services/ui/src/main/res/values/themes.xml'
 
 def write_to_theme_file(output, file_marker)
   contents = File.read(THEME_FILE)
-  new_contents = String.new("")
+  new_contents = String.new('')
   reading = true
   contents.lines.each do |line|
     reading = true if line.include?("#{file_marker} - WARNING AUTO GENERATED, DO NOT EDIT - end")
