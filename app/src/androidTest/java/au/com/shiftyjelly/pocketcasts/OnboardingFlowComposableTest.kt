@@ -34,7 +34,6 @@ import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
-import org.mockito.kotlin.mock
 import au.com.shiftyjelly.pocketcasts.ui.R as UR
 
 /**
@@ -58,7 +57,7 @@ class OnboardingFlowComposableTest {
 
     fun setupAppNavHost(
         flow: OnboardingFlow,
-        signInState: SignInState = mock(),
+        signInState: SignInState = SignInState.SignedIn(email = "", subscription = null),
         exitOnboarding: (OnboardingExitInfo) -> Unit = {},
         completeOnboardingToDiscover: () -> Unit = {},
     ) {

@@ -19,6 +19,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalResources
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
@@ -209,7 +210,7 @@ internal sealed interface SubscriptionHeaderState {
 
 @Composable
 private fun SubscriptionHeaderState.labels(): Labels {
-    val context = LocalContext.current
+    val resources = LocalResources.current
     return if (isChampion) {
         Labels(
             start = Label(
@@ -231,10 +232,12 @@ private fun SubscriptionHeaderState.labels(): Labels {
             }
 
             is SubscriptionHeaderState.PaidRenew -> {
-                val expiryDate = Date(Date().time + expiresIn.inWholeMilliseconds)
+                val expiryDate = remember(expiresIn) {
+                    Date(Date().time + expiresIn.inWholeMilliseconds).toLocalizedFormatLongStyle()
+                }
                 Labels(
                     start = Label(
-                        text = stringResource(LR.string.profile_next_payment, expiryDate.toLocalizedFormatLongStyle()),
+                        text = stringResource(LR.string.profile_next_payment, expiryDate),
                     ),
                     end = Label(
                         text = when (billingCycle) {
@@ -247,11 +250,14 @@ private fun SubscriptionHeaderState.labels(): Labels {
             }
 
             is SubscriptionHeaderState.PaidCancel -> {
+                val expiryDate = remember(expiresIn) {
+                    Date(Date().time + expiresIn.inWholeMilliseconds).toLocalizedFormatLongStyle()
+                }
                 Labels(
                     start = Label(
                         text = when {
                             platform == SubscriptionPlatform.Gift -> {
-                                val daysString = context.resources.getStringPluralDaysMonthsOrYears(giftDaysLeft)
+                                val daysString = resources.getStringPluralDaysMonthsOrYears(giftDaysLeft)
                                 stringResource(LR.string.profile_time_free, daysString)
                             }
 
@@ -262,8 +268,7 @@ private fun SubscriptionHeaderState.labels(): Labels {
                     ),
                     end = Label(
                         text = run {
-                            val expiryDate = Date(Date().time + expiresIn.inWholeMilliseconds)
-                            stringResource(LR.string.profile_plus_expires, expiryDate.toLocalizedFormatLongStyle())
+                            stringResource(LR.string.profile_plus_expires, expiryDate)
                         },
                     ),
                 )

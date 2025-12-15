@@ -16,7 +16,7 @@ end
 
 def response_to_tokens_map(response)
   tokens = []
-  response.each_value do |row|
+  response.values.each do |row|
     key = row[0]
     next if key.nil? || key.empty?
 

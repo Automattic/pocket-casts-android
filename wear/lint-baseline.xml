@@ -1,59 +1,59 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<issues format="6" by="lint 8.11.1" type="baseline" client="gradle" dependencies="false" name="AGP (8.11.1)" variant="all" version="8.11.1">
+<issues format="6" by="lint 8.13.2" type="baseline" client="gradle" dependencies="false" name="AGP (8.13.2)" variant="all" version="8.13.2">
 
     <issue
-        id="DoNotMockDataClass"
-        message="&apos;com.google.android.horologist.networks.data.Networks&apos; is a data class, so mocking it should not be necessary"
-        errorLine1="    private fun mockNetworksWithTypes(networkTypes: List&lt;NetworkType>): Networks = mock&lt;Networks>().apply {"
-        errorLine2="                                                                                   ~~~~~~~~~~~~~~~~">
+        id="DefaultLocale"
+        message="Implicitly using the default locale is a common source of bugs: Use `String.format(Locale, ...)` instead"
+        errorLine1="                        text = String.format(&quot;%.1fx&quot;, state.playbackEffects.playbackSpeed),"
+        errorLine2="                               ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
-            file="src/test/kotlin/au/com/shiftyjelly/pocketcasts/wear/networking/PocketCastsNetworkingRulesTest.kt"
-            line="145"
-            column="84"/>
+            file="src/main/kotlin/au/com/shiftyjelly/pocketcasts/wear/ui/player/EffectsScreen.kt"
+            line="177"
+            column="32"/>
     </issue>
 
     <issue
-        id="DoNotMockDataClass"
-        message="&apos;com.google.android.horologist.networks.data.NetworkStatus&apos; is a data class, so mocking it should not be necessary"
-        errorLine1="    private fun mockNetworkStatus(networkType: NetworkType): NetworkStatus = mock&lt;NetworkStatus>().apply {"
-        errorLine2="                                                                             ~~~~~~~~~~~~~~~~~~~~~">
+        id="MissingAutoVerifyAttribute"
+        message="Custom scheme intent filters should explicitly set the `autoVerify` attribute to true"
+        errorLine1="            &lt;intent-filter>"
+        errorLine2="            ^">
         <location
-            file="src/test/kotlin/au/com/shiftyjelly/pocketcasts/wear/networking/PocketCastsNetworkingRulesTest.kt"
-            line="150"
-            column="78"/>
+            file="src/main/AndroidManifest.xml"
+            line="52"
+            column="13"/>
     </issue>
 
     <issue
-        id="DoNotMockDataClass"
-        message="&apos;com.google.android.horologist.networks.data.NetworkStatus&apos; is a data class, so mocking it should not be necessary"
-        errorLine1="                val networkStatus = mock&lt;NetworkStatus>()"
-        errorLine2="                                    ~~~~~~~~~~~~~~~~~~~~~">
+        id="ExportedService"
+        message="Exported service does not require permission"
+        errorLine1="        &lt;service"
+        errorLine2="         ~~~~~~~">
         <location
-            file="src/test/kotlin/au/com/shiftyjelly/pocketcasts/wear/networking/PocketCastsNetworkingRulesTest.kt"
-            line="169"
-            column="37"/>
+            file="src/main/AndroidManifest.xml"
+            line="80"
+            column="10"/>
     </issue>
 
     <issue
-        id="DoNotMockSealedClass"
-        message="&apos;com.google.android.horologist.networks.data.NetworkInfo&apos; is a sealed type and has a restricted type hierarchy, use a subtype instead."
-        errorLine1="    private fun mockNetworkInfo(networkType: NetworkType): NetworkInfo = mock&lt;NetworkInfo>().apply {"
-        errorLine2="                                                                         ~~~~~~~~~~~~~~~~~~~">
+        id="AutoboxingStateCreation"
+        message="Prefer `mutableFloatStateOf` instead of `mutableStateOf`"
+        errorLine1="    private val actual = mutableStateOf(initial)"
+        errorLine2="                         ~~~~~~~~~~~~~~">
         <location
-            file="src/test/kotlin/au/com/shiftyjelly/pocketcasts/wear/networking/PocketCastsNetworkingRulesTest.kt"
-            line="155"
-            column="74"/>
+            file="src/main/kotlin/au/com/shiftyjelly/pocketcasts/wear/ui/component/horologist/ProgressStateHolderStyled.kt"
+            line="31"
+            column="26"/>
     </issue>
 
     <issue
-        id="DoNotMockSealedClass"
-        message="&apos;com.google.android.horologist.networks.data.NetworkInfo&apos; is a sealed type and has a restricted type hierarchy, use a subtype instead."
-        errorLine1="                val networkInfo = mock&lt;NetworkInfo>()"
-        errorLine2="                                  ~~~~~~~~~~~~~~~~~~~">
+        id="WearRecents"
+        message="Set `taskAffinity` for Wear activities to make them appear correctly in recents"
+        errorLine1="        &lt;activity"
+        errorLine2="        ^">
         <location
-            file="src/test/kotlin/au/com/shiftyjelly/pocketcasts/wear/networking/PocketCastsNetworkingRulesTest.kt"
-            line="167"
-            column="35"/>
+            file="src/main/AndroidManifest.xml"
+            line="45"
+            column="9"/>
     </issue>
 
 </issues>
