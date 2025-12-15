@@ -128,8 +128,9 @@ class PodcastRefresherImpl @Inject constructor(
             existingPodcast.refreshAvailable != updatedPodcast.refreshAvailable ||
             existingPodcast.fundingUrl != updatedPodcast.fundingUrl
         ) {
+            LogBuffer.i(LogBuffer.TAG_BACKGROUND_TASKS, "Refresh required update for podcast ${existingPodcast.uuid}")
             appDatabase.podcastDao().updateRefresh(
-                uuid = updatedPodcast.uuid,
+                uuid = existingPodcast.uuid,
                 title = updatedPodcast.title,
                 author = updatedPodcast.author,
                 podcastCategory = updatedPodcast.podcastCategory,
