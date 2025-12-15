@@ -36,6 +36,20 @@ fun podcastImageCornerSize(width: Dp): Dp {
     }
 }
 
+/**
+ * Displays a podcast artwork image with rounded corners and optional shadow.
+ *
+ * @param uuid Podcast uuid.
+ * @param modifier The modifier to be applied to the image.
+ * @param imageSize The display size of the image in both width and height.
+ * @param imageRequestSize The resolution to load from network/cache. Defaults to [imageSize].
+ * Set to a fixed size when [imageSize] is animated to prevent reloading.
+ * @param cornerSize The corner radius for rounding the image. Set to null for a rectangle shape.
+ * @param elevation The shadow elevation applied to the image. Set to null to disable the shadow.
+ * @param placeholderType The type of placeholder to show while the image is loading.
+ * Automatically uses [PlaceholderType.Large] for images larger than 200.dp.
+ * @param contentDescription The accessibility description for the image.
+ */
 @Composable
 fun PodcastImage(
     uuid: String,
