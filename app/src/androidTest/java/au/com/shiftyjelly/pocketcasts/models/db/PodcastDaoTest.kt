@@ -83,17 +83,6 @@ class PodcastDaoTest {
     }
 
     @Test
-    fun testUpdatePodcastRx() {
-        val uuid = UUID.randomUUID().toString()
-        val podcast = Podcast(uuid = uuid, isSubscribed = false)
-        podcastDao.insertBlocking(podcast)
-        assert(podcastDao.findByUuidBlocking(uuid)?.isSubscribed == false)
-        podcast.isSubscribed = true
-        podcastDao.updateRxCompletable(podcast).blockingAwait()
-        assertTrue("Podcast should be updated to subscribed", podcastDao.findByUuidBlocking(uuid)?.isSubscribed == true)
-    }
-
-    @Test
     fun testFindSubscribed() {
         val subscribed = Podcast(uuid = UUID.randomUUID().toString(), isSubscribed = true)
         val unsubscribed = Podcast(uuid = UUID.randomUUID().toString(), isSubscribed = false)
