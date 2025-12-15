@@ -18,4 +18,10 @@ if (gradle.ext["develocityToken"] != null) {
             }
         }
     }
+} else {
+    develocity {
+        buildScan {
+                publishing.onlyIf { false }
+        }
+    }
 }
