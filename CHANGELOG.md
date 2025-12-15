@@ -9,6 +9,8 @@
         ([#4804](https://github.com/Automattic/pocket-casts-android/pull/4804))
     *   Fix the mini player Up Next count overflow
         ([#4826](https://github.com/Automattic/pocket-casts-android/pull/4826))
+    *   Improve help & feedback page padding
+        ([#4858](https://github.com/Automattic/pocket-casts-android/pull/4858)) 
     *   Fix 3-button navigation obstructing the sharing buttons
         ([#4810](https://github.com/Automattic/pocket-casts-android/pull/4810))
 
