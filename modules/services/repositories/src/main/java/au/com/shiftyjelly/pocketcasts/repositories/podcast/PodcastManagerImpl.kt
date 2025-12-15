@@ -83,7 +83,6 @@ class PodcastManagerImpl @Inject constructor(
     override suspend fun unsubscribe(podcastUuid: String, playbackManager: PlaybackManager) {
         try {
             val podcast = podcastDao.findPodcastByUuid(podcastUuid) ?: return
-            val episodes = episodeManager.findEpisodesByPodcastOrderedSuspend(podcast)
 
             podcast.isSubscribed = false
             podcast.syncStatus = Podcast.SYNC_STATUS_NOT_SYNCED
@@ -97,6 +96,7 @@ class PodcastManagerImpl @Inject constructor(
             podcast.folderUuid = null
             podcastDao.updateSuspend(podcast)
 
+            val episodes = episodeManager.findEpisodesByPodcastOrderedSuspend(podcast)
             episodeManager.deleteEpisodeFilesAsync(episodes, playbackManager)
 
             unsubscribeRelay.accept(podcastUuid)
