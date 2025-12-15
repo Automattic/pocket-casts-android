@@ -41,6 +41,7 @@ fun PodcastImage(
     uuid: String,
     modifier: Modifier = Modifier,
     imageSize: Dp = 56.dp,
+    imageRequestSize: Dp = imageSize,
     cornerSize: Dp? = imageSize / 14,
     elevation: Dp? = 2.dp,
     placeholderType: PlaceholderType = if (imageSize > 200.dp) {
@@ -51,11 +52,11 @@ fun PodcastImage(
     contentDescription: String? = stringResource(LR.string.podcast_artwork_description),
 ) {
     val context = LocalContext.current
-    val imageRequest = remember(uuid, placeholderType, imageSize) {
+    val imageRequest = remember(uuid, placeholderType, imageRequestSize) {
         PocketCastsImageRequestFactory(
             context = context,
             placeholderType = placeholderType,
-            size = imageSize.value.toInt(),
+            size = imageRequestSize.value.toInt(),
         ).themed().createForPodcast(uuid)
     }
     val shape = if (cornerSize != null) {
