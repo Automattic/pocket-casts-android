@@ -1,27 +1,12 @@
-// Temporarily disabling Develocity to address CI failures under the assumption they are due to an expired trial.
-// See https://a8c.slack.com/archives/CC7L49W13/p1765762270890589
-if (gradle.ext["develocityToken"] != null) {
-    develocity {
-        buildScan {
-            server = "https://develocity.a8c-ci.services/"
-            accessKey = gradle.ext["develocityToken"]
-
-            if (gradle.ext["isCi"]) {
-                uploadInBackground = false
-            } else if (gradle.ext["measureBuildsEnabled"]?.toBoolean()) {
-                obfuscation {
-                    hostname { "" }
-                    ipAddresses { it.collect { "0.0.0.0" } }
-                }
-            } else {
-                publishing.onlyIf { false }
-            }
-        }
-    }
-} else {
-    develocity {
-        buildScan {
-                publishing.onlyIf { false }
+develocity {
+    buildScan {
+        if (gradle.ext["isCi"]) {
+            termsOfUseUrl = 'https://gradle.com/terms-of-service'
+            termsOfUseAgree = 'yes'
+            tag 'CI'
+            uploadInBackground = false
+        } else {
+            publishing.onlyIf { false }
         }
     }
 }
