@@ -162,6 +162,12 @@ enum class UpNextPageSource(val analyticsValue: String) {
     }
 }
 
+/**
+ * Used to track which code path triggered an Up Next change, helping diagnose issues
+ * where episodes are unexpectedly added, removed, or reordered.
+ *
+ * @property value Human readable description of the change source for logging
+ */
 enum class UpNextChangeSource(val value: String) {
     AutoArchiveAfterPlaying("Auto archive after playing"),
     AutoArchiveInactive("Auto archive inactive"),
@@ -185,11 +191,8 @@ enum class UpNextChangeSource(val value: String) {
     PlayButton("Play button"),
     PlayLastButton("Play last button"),
     PlayNextButton("Play next button"),
-    PlayerArchive("Player archive"),
+    Player("Player"),
     PlayerBroadcast("Player broadcast"),
-    PlayerMarkAsPlayed("Player mark as played"),
-    PlayerNextEpisodeButton("Player next episode button"),
-    PlayerPlayButton("Player play button"),
     PodcastPageArchiveAll("Podcast page archive all"),
     PodcastPageArchivePlayed("Podcast page archive played"),
     RefreshAutoAdd("Refresh auto add"),

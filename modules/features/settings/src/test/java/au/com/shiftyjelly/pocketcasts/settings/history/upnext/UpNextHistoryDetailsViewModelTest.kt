@@ -11,6 +11,7 @@ import au.com.shiftyjelly.pocketcasts.preferences.UserSetting
 import au.com.shiftyjelly.pocketcasts.preferences.model.ArtworkConfiguration
 import au.com.shiftyjelly.pocketcasts.repositories.history.upnext.UpNextHistoryManager
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
+import au.com.shiftyjelly.pocketcasts.repositories.playback.UpNextChangeSource
 import au.com.shiftyjelly.pocketcasts.repositories.playback.UpNextQueue
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
 import au.com.shiftyjelly.pocketcasts.settings.history.upnext.UpNextHistoryDetailsViewModel.UiState
@@ -102,7 +103,7 @@ class UpNextHistoryDetailsViewModelTest {
         viewModel.state.test {
             viewModel.restoreUpNext()
             awaitItem()
-            verify(playbackManager).playEpisodesLast(episodes, SourceView.UP_NEXT_HISTORY)
+            verify(playbackManager).playEpisodesLast(episodes = episodes, source = SourceView.UP_NEXT_HISTORY, changeSource = UpNextChangeSource.RestoreHistory)
         }
     }
 

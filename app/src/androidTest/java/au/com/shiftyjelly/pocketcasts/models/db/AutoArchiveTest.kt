@@ -19,6 +19,7 @@ import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.preferences.UserSetting
 import au.com.shiftyjelly.pocketcasts.repositories.download.DownloadManager
 import au.com.shiftyjelly.pocketcasts.repositories.file.FileStorage
+import au.com.shiftyjelly.pocketcasts.repositories.playback.UpNextChangeSource
 import au.com.shiftyjelly.pocketcasts.repositories.playback.UpNextQueue
 import au.com.shiftyjelly.pocketcasts.repositories.playback.UpNextQueueImpl
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
@@ -539,7 +540,7 @@ class AutoArchiveTest {
         val updatedNewEpisode = episodeDao.findByUuid(newUUID)!!
         assertTrue("Episode should be archived as it was archive modified 8 day ago (inactive setting = 7d)", updatedNewEpisode.isArchived)
 
-        runBlocking { upNext.playLast(updatedNewEpisode, downloadManager, null) }
+        runBlocking { upNext.playLast(updatedNewEpisode, downloadManager, UpNextChangeSource.AutoArchiveAfterPlaying, null) }
 
         val updatedNewEpisodeInUpNext = episodeDao.findByUuid(newUUID)!!
         assertTrue("Episode should not be archived as it was added to up next", !updatedNewEpisodeInUpNext.isArchived)

@@ -415,5 +415,9 @@ class UpNextQueueImpl @Inject constructor(
 }
 
 private fun logEpisodeUuids(episodes: List<BaseEpisode>): String {
-    return if (episodes.size > 20) "20+" else episodes.joinToString { it.uuid }
+    return if (episodes.size > 10) {
+        "${episodes.take(10).joinToString { it.uuid }}... (${episodes.size} total)"
+    } else {
+        episodes.joinToString { it.uuid }
+    }
 }

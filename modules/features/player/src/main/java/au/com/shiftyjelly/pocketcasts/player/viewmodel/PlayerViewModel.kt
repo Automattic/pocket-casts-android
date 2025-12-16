@@ -477,7 +477,7 @@ class PlayerViewModel @Inject constructor(
     fun playEpisode(uuid: String, sourceView: SourceView = SourceView.UNKNOWN) {
         launch {
             val episode = episodeManager.findEpisodeByUuid(uuid) ?: return@launch
-            playbackManager.playNow(episode = episode, sourceView = sourceView, changeSource = UpNextChangeSource.PlayerPlayButton)
+            playbackManager.playNow(episode = episode, sourceView = sourceView, changeSource = UpNextChangeSource.Player)
         }
     }
 
@@ -506,19 +506,19 @@ class PlayerViewModel @Inject constructor(
     }
 
     fun onNextEpisodeClick() {
-        playbackManager.playNextInQueue(sourceView = source, changeSource = UpNextChangeSource.PlayerNextEpisodeButton)
+        playbackManager.playNextInQueue(sourceView = source, changeSource = UpNextChangeSource.Player)
     }
 
     fun markAsPlayedConfirmed(episode: BaseEpisode, shouldShuffleUpNext: Boolean = false) {
         launch {
-            episodeManager.markAsPlayedBlocking(episode, playbackManager, podcastManager, shouldShuffleUpNext, changeSource = UpNextChangeSource.PlayerMarkAsPlayed)
+            episodeManager.markAsPlayedBlocking(episode, playbackManager, podcastManager, shouldShuffleUpNext, changeSource = UpNextChangeSource.Player)
             episodeAnalytics.trackEvent(AnalyticsEvent.EPISODE_MARKED_AS_PLAYED, source, episode.uuid)
         }
     }
 
     fun archiveConfirmed(episode: PodcastEpisode) {
         launch {
-            episodeManager.archiveBlocking(episode, playbackManager, sync = true, shouldShuffleUpNext = settings.upNextShuffle.value, changeSource = UpNextChangeSource.PlayerArchive)
+            episodeManager.archiveBlocking(episode, playbackManager, sync = true, shouldShuffleUpNext = settings.upNextShuffle.value, changeSource = UpNextChangeSource.Player)
             episodeAnalytics.trackEvent(AnalyticsEvent.EPISODE_ARCHIVED, source, episode.uuid)
         }
     }

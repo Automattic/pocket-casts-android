@@ -17,6 +17,7 @@ import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.preferences.UserSetting
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackState
+import au.com.shiftyjelly.pocketcasts.repositories.playback.UpNextChangeSource
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.ChapterManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
 import au.com.shiftyjelly.pocketcasts.sharedtest.MainCoroutineRule
@@ -208,7 +209,7 @@ class ChaptersViewModelTest {
         chaptersViewModel.playChapter(chapters[2])
 
         verify(playbackManager, times(1)).skipToChapter(chapters[2])
-        verifyBlocking(playbackManager, never()) { playNowSuspend("id") }
+        verifyBlocking(playbackManager, never()) { playNowSuspend("id", changeSource = UpNextChangeSource.Chapter) }
     }
 
     @Test
@@ -218,7 +219,7 @@ class ChaptersViewModelTest {
         chaptersViewModel.playChapter(chapters[2])
 
         verify(playbackManager, times(1)).skipToChapter(chapters[2])
-        verifyBlocking(playbackManager, times(1)) { playNowSuspend("id") }
+        verifyBlocking(playbackManager, times(1)) { playNowSuspend("id", changeSource = UpNextChangeSource.Chapter) }
     }
 
     @Test
@@ -240,7 +241,7 @@ class ChaptersViewModelTest {
         chaptersViewModel.playChapter(chapter)
 
         verify(episodeManager, times(1)).updatePlayedUpToBlocking(episode, chapter.startTime.inWholeSeconds.toDouble(), forceUpdate = true)
-        verifyBlocking(playbackManager, times(1)) { playNowSuspend(episode) }
+        verifyBlocking(playbackManager, times(1)) { playNowSuspend(episode, changeSource = UpNextChangeSource.Chapter) }
     }
 
     @Test
