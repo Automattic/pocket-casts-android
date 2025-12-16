@@ -21,8 +21,8 @@ steps:
       queue: "tumblr-metal"
     retry:
       manual:
+        reason: If release jobs fail, you should always re-trigger the task from ReleaseV2 rather than retrying the individual job from Buildkite
         allowed: false
-        reason: "Always prefer re-triggering a new build from ReleaseV2 rather than retrying the individual job from Buildkite"
 
   - label: ":github: Publish Draft GitHub Release"
     if: build.env("PUBLISH_DRAFT_GITHUB_RELEASE") == "true"
@@ -41,5 +41,5 @@ steps:
       queue: "tumblr-metal"
     retry:
       manual:
+        reason: If release jobs fail, you should always re-trigger the task from ReleaseV2 rather than retrying the individual job from Buildkite
         allowed: false
-        reason: "Always prefer re-triggering a new build from ReleaseV2 rather than retrying the individual job from Buildkite"
