@@ -152,7 +152,7 @@ import au.com.shiftyjelly.pocketcasts.repositories.notification.NotificationHelp
 import au.com.shiftyjelly.pocketcasts.repositories.opml.OpmlImportTask
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackState
-import au.com.shiftyjelly.pocketcasts.repositories.playback.UpNextSource
+import au.com.shiftyjelly.pocketcasts.repositories.playback.UpNextPageSource
 import au.com.shiftyjelly.pocketcasts.repositories.playlist.Playlist
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
@@ -177,7 +177,6 @@ import au.com.shiftyjelly.pocketcasts.ui.helper.FragmentHostListener
 import au.com.shiftyjelly.pocketcasts.ui.helper.NavigationBarColor
 import au.com.shiftyjelly.pocketcasts.ui.helper.StatusBarIconColor
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
-import au.com.shiftyjelly.pocketcasts.ui.theme.ThemeColor
 import au.com.shiftyjelly.pocketcasts.utils.Network
 import au.com.shiftyjelly.pocketcasts.utils.Util
 import au.com.shiftyjelly.pocketcasts.utils.featureflag.Feature
@@ -499,7 +498,7 @@ class MainActivity :
                 FragmentInfo(
                     UpNextFragment.newInstance(
                         embedded = false,
-                        source = UpNextSource.UP_NEXT_TAB,
+                        source = UpNextPageSource.UpNextTab,
                     ),
                     true,
                 )
@@ -838,7 +837,7 @@ class MainActivity :
     }
 
     override fun onUpNextClicked() {
-        showUpNextFragment(UpNextSource.MINI_PLAYER)
+        showUpNextFragment(UpNextPageSource.MiniPlayer)
     }
 
     override fun onMiniPlayerLongClick() {
@@ -853,7 +852,7 @@ class MainActivity :
         ).show(this)
     }
 
-    private fun showUpNextFragment(source: UpNextSource) {
+    private fun showUpNextFragment(source: UpNextPageSource) {
         analyticsTracker.track(AnalyticsEvent.UP_NEXT_SHOWN, mapOf(SOURCE_KEY to source.analyticsValue))
         showBottomSheet(UpNextFragment.newInstance(source = source))
     }
@@ -1153,7 +1152,7 @@ class MainActivity :
         if (intent.getStringExtra(EXTRA_PAGE) == ShowUpNextModalDeepLink.pageId) {
             intent.removeExtra(EXTRA_PAGE)
             binding.playerBottomSheet.openPlayer()
-            showUpNextFragment(UpNextSource.UP_NEXT_SHORTCUT)
+            showUpNextFragment(UpNextPageSource.UpNextShortcut)
         }
     }
 

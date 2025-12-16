@@ -13,6 +13,7 @@ import au.com.shiftyjelly.pocketcasts.repositories.di.ApplicationScope
 import au.com.shiftyjelly.pocketcasts.repositories.download.DownloadHelper
 import au.com.shiftyjelly.pocketcasts.repositories.download.DownloadManager
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
+import au.com.shiftyjelly.pocketcasts.repositories.playback.UpNextChangeSource
 import au.com.shiftyjelly.pocketcasts.repositories.playback.containsUuid
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
@@ -105,27 +106,27 @@ class CloudBottomSheetViewModel @Inject constructor(
     }
 
     fun removeFromUpNext(episode: UserEpisode) {
-        playbackManager.removeEpisode(episodeToRemove = episode, source = source)
+        playbackManager.removeEpisode(episodeToRemove = episode, source = source, changeSource = UpNextChangeSource.UserEpisode)
         trackOptionTapped(UP_NEXT_DELETE)
     }
 
     fun playNext(episode: UserEpisode) {
         applicationScope.launch(Dispatchers.Default) {
-            playbackManager.playNext(episode = episode, source = source)
+            playbackManager.playNext(episode = episode, source = source, changeSource = UpNextChangeSource.UserEpisode)
             trackOptionTapped(UP_NEXT_ADD_TOP)
         }
     }
 
     fun playLast(episode: UserEpisode) {
         applicationScope.launch(Dispatchers.Default) {
-            playbackManager.playLast(episode = episode, source = source)
+            playbackManager.playLast(episode = episode, source = source, changeSource = UpNextChangeSource.UserEpisode)
             trackOptionTapped(UP_NEXT_ADD_BOTTOM)
         }
     }
 
     fun markAsPlayed(episode: UserEpisode) {
         viewModelScope.launch(Dispatchers.Default) {
-            episodeManager.markAsPlayedBlocking(episode, playbackManager, podcastManager)
+            episodeManager.markAsPlayedBlocking(episode, playbackManager, podcastManager, changeSource = UpNextChangeSource.UserEpisode)
             episodeAnalytics.trackEvent(AnalyticsEvent.EPISODE_MARKED_AS_PLAYED, source, episode.uuid)
             trackOptionTapped(MARK_PLAYED)
         }
@@ -140,7 +141,7 @@ class CloudBottomSheetViewModel @Inject constructor(
     }
 
     fun playNow(episode: UserEpisode, forceStream: Boolean) {
-        playbackManager.playNow(episode = episode, forceStream = forceStream, sourceView = source)
+        playbackManager.playNow(episode = episode, forceStream = forceStream, sourceView = source, changeSource = UpNextChangeSource.UserEpisode)
         analyticsTracker.track(AnalyticsEvent.USER_FILE_PLAY_PAUSE_BUTTON_TAPPED, mapOf(OPTION_KEY to PLAY))
     }
 

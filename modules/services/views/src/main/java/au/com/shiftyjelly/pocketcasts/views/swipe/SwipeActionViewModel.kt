@@ -12,6 +12,7 @@ import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.models.entity.UserEpisode
 import au.com.shiftyjelly.pocketcasts.repositories.di.ApplicationScope
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
+import au.com.shiftyjelly.pocketcasts.repositories.playback.UpNextChangeSource
 import au.com.shiftyjelly.pocketcasts.repositories.playlist.PlaylistManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
@@ -52,7 +53,7 @@ class SwipeActionViewModel @AssistedInject constructor(
         // and runs blocking code on the main thread.
         viewModelScope.launch {
             val episode = episodeManager.findEpisodeByUuid(episodeUuid) ?: return@launch
-            playbackManager.playNext(episode, swipeSource.toSourceView())
+            playbackManager.playNext(episode, source = swipeSource.toSourceView(), changeSource = UpNextChangeSource.Swipe)
         }
     }
 
@@ -63,7 +64,7 @@ class SwipeActionViewModel @AssistedInject constructor(
         // and runs blocking code on the main thread.
         viewModelScope.launch(Dispatchers.IO) {
             val episode = episodeManager.findEpisodeByUuid(episodeUuid) ?: return@launch
-            playbackManager.playLast(episode, swipeSource.toSourceView())
+            playbackManager.playLast(episode, source = swipeSource.toSourceView(), changeSource = UpNextChangeSource.Swipe)
         }
     }
 
@@ -74,7 +75,7 @@ class SwipeActionViewModel @AssistedInject constructor(
         // and runs blocking code on the main thread.
         viewModelScope.launch {
             val episode = episodeManager.findEpisodeByUuid(episodeUuid) ?: return@launch
-            playbackManager.removeEpisode(episode, swipeSource.toSourceView())
+            playbackManager.removeEpisode(episode, source = swipeSource.toSourceView(), changeSource = UpNextChangeSource.Swipe)
         }
     }
 
@@ -84,7 +85,7 @@ class SwipeActionViewModel @AssistedInject constructor(
         viewModelScope.launch {
             val episode = episodeManager.findEpisodeByUuid(episodeUuid) as? PodcastEpisode ?: return@launch
             withContext(Dispatchers.IO) {
-                episodeManager.archiveBlocking(episode, playbackManager)
+                episodeManager.archiveBlocking(episode, playbackManager, changeSource = UpNextChangeSource.Swipe)
             }
         }
     }

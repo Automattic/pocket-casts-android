@@ -19,6 +19,7 @@ import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.di.ApplicationScope
 import au.com.shiftyjelly.pocketcasts.repositories.download.DownloadManager
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
+import au.com.shiftyjelly.pocketcasts.repositories.playback.UpNextChangeSource
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.UserEpisodeManager
@@ -195,7 +196,7 @@ class MultiSelectEpisodesHelper @Inject constructor(
                 return@launch
             }
 
-            episodeManager.markAllAsPlayed(list, playbackManager, podcastManager)
+            episodeManager.markAllAsPlayed(episodes = list, playbackManager = playbackManager, podcastManager = podcastManager, changeSource = UpNextChangeSource.MultiSelect)
             episodeAnalytics.trackBulkEvent(AnalyticsEvent.EPISODE_BULK_MARKED_AS_PLAYED, source, list.size)
             launch(Dispatchers.Main) {
                 val snackText = resources.getStringPlural(selectedList.size, LR.string.marked_as_played_singular, LR.string.marked_as_played_plural)
@@ -237,7 +238,7 @@ class MultiSelectEpisodesHelper @Inject constructor(
                 return@launch
             }
 
-            episodeManager.archiveAllInList(list, playbackManager)
+            episodeManager.archiveAllInList(list, playbackManager, changeSource = UpNextChangeSource.MultiSelect)
             episodeAnalytics.trackBulkEvent(AnalyticsEvent.EPISODE_BULK_ARCHIVED, source, list.size)
             withContext(Dispatchers.Main) {
                 val snackText = resources.getStringPlural(selectedList.size, LR.string.archived_episodes_singular, LR.string.archived_episodes_plural)
@@ -409,7 +410,7 @@ class MultiSelectEpisodesHelper @Inject constructor(
         val size = min(settings.getMaxUpNextEpisodes(), selectedList.count())
         val trimmedList = selectedList.subList(0, size).toList()
         launch {
-            playbackManager.playEpisodesNext(episodes = trimmedList, source = source)
+            playbackManager.playEpisodesNext(episodes = trimmedList, source = source, changeSource = UpNextChangeSource.MultiSelect)
             withContext(Dispatchers.Main) {
                 val snackText = resources.getStringPlural(size, LR.string.added_to_up_next_singular, LR.string.added_to_up_next_plural)
                 showSnackBar(snackText)
@@ -427,7 +428,7 @@ class MultiSelectEpisodesHelper @Inject constructor(
         val size = min(settings.getMaxUpNextEpisodes(), selectedList.count())
         val trimmedList = selectedList.subList(0, size).toList()
         launch {
-            playbackManager.playEpisodesLast(episodes = trimmedList, source = source)
+            playbackManager.playEpisodesLast(episodes = trimmedList, source = source, changeSource = UpNextChangeSource.MultiSelect)
             withContext(Dispatchers.Main) {
                 val snackText = resources.getStringPlural(size, LR.string.added_to_up_next_singular, LR.string.added_to_up_next_plural)
                 showSnackBar(snackText)
@@ -499,7 +500,7 @@ class MultiSelectEpisodesHelper @Inject constructor(
         val list = selectedList.toList()
         launch {
             list.forEach {
-                playbackManager.upNextQueue.removeEpisode(it)
+                playbackManager.upNextQueue.removeEpisode(episode = it, changeSource = UpNextChangeSource.MultiSelect)
             }
 
             withContext(Dispatchers.Main) {
@@ -513,13 +514,13 @@ class MultiSelectEpisodesHelper @Inject constructor(
 
     private fun moveToTop() {
         val list = selectedList.toList()
-        playbackManager.playEpisodesNext(episodes = list, source = source)
+        playbackManager.playEpisodesNext(episodes = list, source = source, changeSource = UpNextChangeSource.MultiSelect)
         closeMultiSelect()
     }
 
     private fun moveToBottom() {
         val list = selectedList.toList()
-        playbackManager.playEpisodesLast(episodes = list, source = source)
+        playbackManager.playEpisodesLast(episodes = list, source = source, changeSource = UpNextChangeSource.MultiSelect)
         closeMultiSelect()
     }
 

@@ -7,6 +7,7 @@ import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.repositories.colors.ColorManager
 import au.com.shiftyjelly.pocketcasts.repositories.lists.ListRepository
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
+import au.com.shiftyjelly.pocketcasts.repositories.playback.UpNextChangeSource
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
 import au.com.shiftyjelly.pocketcasts.repositories.user.UserManager
@@ -162,7 +163,7 @@ class PodcastListViewModel @Inject constructor(
     }
 
     fun playEpisode(episode: PodcastEpisode) {
-        playbackManager.playNow(episode, forceStream = true, sourceView = SourceView.DISCOVER_PODCAST_LIST)
+        playbackManager.playNow(episode, forceStream = true, sourceView = SourceView.DISCOVER_PODCAST_LIST, changeSource = UpNextChangeSource.DiscoverPodcastList)
     }
 
     fun stopPlayback() {

@@ -3,6 +3,7 @@ package au.com.shiftyjelly.pocketcasts.taskerplugin.addtoupnext
 import android.content.Context
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.localization.R
+import au.com.shiftyjelly.pocketcasts.repositories.playback.UpNextChangeSource
 import au.com.shiftyjelly.pocketcasts.taskerplugin.base.hilt.episodeManager
 import au.com.shiftyjelly.pocketcasts.taskerplugin.base.hilt.playbackManager
 import com.joaomgcd.taskerpluginlibrary.action.TaskerPluginRunnerActionNoOutput
@@ -45,9 +46,9 @@ class ActionRunnerAddToUpNext : TaskerPluginRunnerActionNoOutput<InputAddToUpNex
         }
 
         if (regularInput.startPlaying?.toBooleanStrictOrNull() == true) {
-            playbackManager.playEpisodes(episodesToPlay, SourceView.TASKER)
+            playbackManager.playEpisodes(episodes = episodesToPlay, sourceView = SourceView.TASKER, changeSource = UpNextChangeSource.Tasker)
         } else {
-            upNextQueue.changeList(episodesToPlay)
+            upNextQueue.changeList(episodes = episodesToPlay, changeSource = UpNextChangeSource.Tasker)
         }
         return TaskerPluginResultSucess()
     }

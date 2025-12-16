@@ -19,6 +19,7 @@ import au.com.shiftyjelly.pocketcasts.models.to.Transcript
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.download.DownloadManager
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
+import au.com.shiftyjelly.pocketcasts.repositories.playback.UpNextChangeSource
 import au.com.shiftyjelly.pocketcasts.repositories.playback.UpNextQueue
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
@@ -233,7 +234,7 @@ class EpisodeFragmentViewModel @Inject constructor(
             episode?.let { episode ->
                 if (isOn) {
                     event = AnalyticsEvent.EPISODE_MARKED_AS_PLAYED
-                    episodeManager.markAsPlayedBlocking(episode, playbackManager, podcastManager)
+                    episodeManager.markAsPlayedBlocking(episode, playbackManager, podcastManager, changeSource = UpNextChangeSource.EpisodeDialog)
                 } else {
                     event = AnalyticsEvent.EPISODE_MARKED_AS_UNPLAYED
                     episodeManager.markAsNotPlayedBlocking(episode)
@@ -248,15 +249,15 @@ class EpisodeFragmentViewModel @Inject constructor(
             return if (!isOn) {
                 launch {
                     if (addLast) {
-                        playbackManager.playLast(episode = episode, source = source)
+                        playbackManager.playLast(episode = episode, source = source, changeSource = UpNextChangeSource.EpisodeDialog)
                     } else {
-                        playbackManager.playNext(episode = episode, source = source)
+                        playbackManager.playNext(episode = episode, source = source, changeSource = UpNextChangeSource.EpisodeDialog)
                     }
                 }
 
                 true
             } else {
-                playbackManager.removeEpisode(episodeToRemove = episode, source = source)
+                playbackManager.removeEpisode(episodeToRemove = episode, source = source, changeSource = UpNextChangeSource.EpisodeDialog)
 
                 false
             }
@@ -281,7 +282,7 @@ class EpisodeFragmentViewModel @Inject constructor(
         launch {
             episode?.let { episode ->
                 if (isOn) {
-                    episodeManager.archiveBlocking(episode, playbackManager)
+                    episodeManager.archiveBlocking(episode, playbackManager, changeSource = UpNextChangeSource.EpisodeDialog)
                     episodeAnalytics.trackEvent(AnalyticsEvent.EPISODE_ARCHIVED, source, episode.uuid)
                 } else {
                     episodeManager.unarchiveBlocking(episode)
@@ -327,6 +328,7 @@ class EpisodeFragmentViewModel @Inject constructor(
                         forceStream = force,
                         showedStreamWarning = showedStreamWarning,
                         sourceView = source,
+                        changeSource = UpNextChangeSource.EpisodeDialog,
                     )
                     warningsHelper.showBatteryWarningSnackbarIfAppropriate()
                     return true
@@ -342,7 +344,7 @@ class EpisodeFragmentViewModel @Inject constructor(
         timestamp: Duration?,
     ) {
         viewModelScope.launch(Dispatchers.IO + NonCancellable) {
-            playbackManager.playNowSync(episode, sourceView = source)
+            playbackManager.playNowSync(episode, sourceView = source, changeSource = UpNextChangeSource.EpisodeDialog)
             if (timestamp != null) {
                 playbackManager.seekToTimeMsSuspend(timestamp.toInt(DurationUnit.MILLISECONDS))
             }

@@ -34,6 +34,7 @@ import au.com.shiftyjelly.pocketcasts.repositories.images.PocketCastsImageReques
 import au.com.shiftyjelly.pocketcasts.repositories.notification.NotificationHelper
 import au.com.shiftyjelly.pocketcasts.repositories.notification.NotificationOpenReceiverActivity
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
+import au.com.shiftyjelly.pocketcasts.repositories.playback.UpNextChangeSource
 import au.com.shiftyjelly.pocketcasts.repositories.playlist.PlaylistManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.FolderManager
@@ -356,7 +357,8 @@ class RefreshPodcastsThread(
                 .map { it.uuid }
 
             playbackManager.addEpisodes(
-                episodesToAddToUpNext.filter { !alreadyProcessedEpisodes.contains(it.second.uuid) },
+                episodes = episodesToAddToUpNext.filter { !alreadyProcessedEpisodes.contains(it.second.uuid) },
+                changeSource = UpNextChangeSource.RefreshAutoAdd,
             )
         }
     }

@@ -38,8 +38,9 @@ import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackState
 import au.com.shiftyjelly.pocketcasts.repositories.playback.SleepTimer
 import au.com.shiftyjelly.pocketcasts.repositories.playback.SleepTimerState
+import au.com.shiftyjelly.pocketcasts.repositories.playback.UpNextChangeSource
+import au.com.shiftyjelly.pocketcasts.repositories.playback.UpNextPageSource
 import au.com.shiftyjelly.pocketcasts.repositories.playback.UpNextQueue
-import au.com.shiftyjelly.pocketcasts.repositories.playback.UpNextSource
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
@@ -476,7 +477,7 @@ class PlayerViewModel @Inject constructor(
     fun playEpisode(uuid: String, sourceView: SourceView = SourceView.UNKNOWN) {
         launch {
             val episode = episodeManager.findEpisodeByUuid(uuid) ?: return@launch
-            playbackManager.playNow(episode = episode, sourceView = sourceView)
+            playbackManager.playNow(episode = episode, sourceView = sourceView, changeSource = UpNextChangeSource.PlayerPlayButton)
         }
     }
 
@@ -505,19 +506,19 @@ class PlayerViewModel @Inject constructor(
     }
 
     fun onNextEpisodeClick() {
-        playbackManager.playNextInQueue(sourceView = source)
+        playbackManager.playNextInQueue(sourceView = source, changeSource = UpNextChangeSource.PlayerNextEpisodeButton)
     }
 
     fun markAsPlayedConfirmed(episode: BaseEpisode, shouldShuffleUpNext: Boolean = false) {
         launch {
-            episodeManager.markAsPlayedBlocking(episode, playbackManager, podcastManager, shouldShuffleUpNext)
+            episodeManager.markAsPlayedBlocking(episode, playbackManager, podcastManager, shouldShuffleUpNext, changeSource = UpNextChangeSource.PlayerMarkAsPlayed)
             episodeAnalytics.trackEvent(AnalyticsEvent.EPISODE_MARKED_AS_PLAYED, source, episode.uuid)
         }
     }
 
     fun archiveConfirmed(episode: PodcastEpisode) {
         launch {
-            episodeManager.archiveBlocking(episode, playbackManager, sync = true, shouldShuffleUpNext = settings.upNextShuffle.value)
+            episodeManager.archiveBlocking(episode, playbackManager, sync = true, shouldShuffleUpNext = settings.upNextShuffle.value, changeSource = UpNextChangeSource.PlayerArchive)
             episodeAnalytics.trackEvent(AnalyticsEvent.EPISODE_ARCHIVED, source, episode.uuid)
         }
     }
@@ -663,7 +664,7 @@ class PlayerViewModel @Inject constructor(
     }
 
     fun changeUpNextEpisodes(episodes: List<BaseEpisode>) {
-        playbackManager.changeUpNext(episodes)
+        playbackManager.changeUpNext(episodes, changeSource = UpNextChangeSource.UpNextDragAndDrop)
     }
 
     fun saveEffects(effects: PlaybackEffects, podcast: Podcast) {
@@ -692,15 +693,15 @@ class PlayerViewModel @Inject constructor(
         trackPlaybackEffectsEvent(AnalyticsEvent.PLAYBACK_EFFECT_SETTINGS_CHANGED)
     }
 
-    fun clearUpNext(context: Context, upNextSource: UpNextSource): ClearUpNextDialog {
+    fun clearUpNext(context: Context, upNextPageSource: UpNextPageSource): ClearUpNextDialog {
         val dialog = ClearUpNextDialog(
-            source = upNextSource,
+            source = upNextPageSource,
             removeNowPlaying = false,
             playbackManager = playbackManager,
             analyticsTracker = analyticsTracker,
             context = context,
         )
-        val forceDarkTheme = settings.useDarkUpNextTheme.value && upNextSource != UpNextSource.UP_NEXT_TAB
+        val forceDarkTheme = settings.useDarkUpNextTheme.value && upNextPageSource != UpNextPageSource.UpNextTab
         dialog.setForceDarkTheme(forceDarkTheme)
         return dialog
     }

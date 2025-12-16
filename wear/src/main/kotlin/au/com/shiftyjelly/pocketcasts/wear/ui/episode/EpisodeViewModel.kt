@@ -22,6 +22,7 @@ import au.com.shiftyjelly.pocketcasts.profile.cloud.AddFileActivity
 import au.com.shiftyjelly.pocketcasts.repositories.di.ApplicationScope
 import au.com.shiftyjelly.pocketcasts.repositories.download.DownloadManager
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
+import au.com.shiftyjelly.pocketcasts.repositories.playback.UpNextChangeSource
 import au.com.shiftyjelly.pocketcasts.repositories.playback.UpNextPosition
 import au.com.shiftyjelly.pocketcasts.repositories.playback.UpNextQueue
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
@@ -355,6 +356,7 @@ class EpisodeViewModel @Inject constructor(
             playbackManager.playNowSync(
                 episode = episode,
                 sourceView = sourceView,
+                changeSource = UpNextChangeSource.EpisodeDialog,
             )
             _showNowPlaying.emit(true)
         }
@@ -379,6 +381,7 @@ class EpisodeViewModel @Inject constructor(
                 upNextPosition = upNextPosition,
                 episode = state.episode,
                 source = sourceView,
+                changeSource = UpNextChangeSource.EpisodeDialog,
             )
         }
     }
@@ -388,6 +391,7 @@ class EpisodeViewModel @Inject constructor(
         playbackManager.removeEpisode(
             episodeToRemove = state.episode,
             source = SourceView.EPISODE_DETAILS,
+            changeSource = UpNextChangeSource.EpisodeDialog,
         )
     }
 
@@ -425,7 +429,7 @@ class EpisodeViewModel @Inject constructor(
                     episode.uuid,
                 )
             } else {
-                episodeManager.archiveBlocking(episode, playbackManager)
+                episodeManager.archiveBlocking(episode, playbackManager, changeSource = UpNextChangeSource.EpisodeDialog)
                 episodeAnalytics.trackEvent(
                     AnalyticsEvent.EPISODE_ARCHIVED,
                     sourceView,
@@ -455,7 +459,7 @@ class EpisodeViewModel @Inject constructor(
                     episodeManager.markAsNotPlayedBlocking(episode)
                     AnalyticsEvent.EPISODE_MARKED_AS_UNPLAYED
                 } else {
-                    episodeManager.markAsPlayedBlocking(episode, playbackManager, podcastManager)
+                    episodeManager.markAsPlayedBlocking(episode, playbackManager, podcastManager, changeSource = UpNextChangeSource.EpisodeDialog)
                     AnalyticsEvent.EPISODE_MARKED_AS_PLAYED
                 }
                 episodeAnalytics.trackEvent(event, sourceView, episode.uuid)

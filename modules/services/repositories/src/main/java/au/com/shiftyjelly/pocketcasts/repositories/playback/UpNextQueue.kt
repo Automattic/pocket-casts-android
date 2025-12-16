@@ -32,22 +32,22 @@ interface UpNextQueue {
 
     val allEpisodes get(): List<BaseEpisode> = currentEpisode?.let { listOf(it) + queueEpisodes } ?: queueEpisodes
     fun isCurrentEpisode(episode: BaseEpisode): Boolean
-    suspend fun playNow(episode: BaseEpisode, automaticUpNextSource: AutoPlaySource?, onAdd: (() -> Unit)?)
-    suspend fun playNextBlocking(episode: BaseEpisode, downloadManager: DownloadManager, onAdd: (() -> Unit)?)
-    suspend fun playLast(episode: BaseEpisode, downloadManager: DownloadManager, onAdd: (() -> Unit)?)
-    suspend fun playAllNext(episodes: List<BaseEpisode>, downloadManager: DownloadManager)
-    suspend fun playAllLast(episodes: List<BaseEpisode>, downloadManager: DownloadManager)
-    suspend fun removeEpisode(episode: BaseEpisode, shouldShuffleUpNext: Boolean = false)
-    suspend fun clearAndPlayAll(episodes: List<BaseEpisode>, downloadManager: DownloadManager)
-    fun moveEpisode(from: Int, to: Int)
-    fun changeList(episodes: List<BaseEpisode>)
-    fun clearUpNext()
-    fun removeAll()
-    suspend fun removeAllIncludingChanges()
+    suspend fun playNow(episode: BaseEpisode, automaticUpNextSource: AutoPlaySource?, changeSource: UpNextChangeSource, onAdd: (() -> Unit)?)
+    suspend fun playNextBlocking(episode: BaseEpisode, downloadManager: DownloadManager, changeSource: UpNextChangeSource, onAdd: (() -> Unit)?)
+    suspend fun playLast(episode: BaseEpisode, downloadManager: DownloadManager, changeSource: UpNextChangeSource, onAdd: (() -> Unit)?)
+    suspend fun playAllNext(episodes: List<BaseEpisode>, downloadManager: DownloadManager, changeSource: UpNextChangeSource)
+    suspend fun playAllLast(episodes: List<BaseEpisode>, downloadManager: DownloadManager, changeSource: UpNextChangeSource)
+    suspend fun removeEpisode(episode: BaseEpisode, shouldShuffleUpNext: Boolean = false, changeSource: UpNextChangeSource)
+    suspend fun clearAndPlayAll(episodes: List<BaseEpisode>, downloadManager: DownloadManager, changeSource: UpNextChangeSource)
+    fun moveEpisode(from: Int, to: Int, changeSource: UpNextChangeSource)
+    fun changeList(episodes: List<BaseEpisode>, changeSource: UpNextChangeSource)
+    fun clearUpNext(changeSource: UpNextChangeSource)
+    fun removeAll(changeSource: UpNextChangeSource)
+    suspend fun removeAllIncludingChanges(changeSource: UpNextChangeSource)
     suspend fun importServerChangesBlocking(episodes: List<BaseEpisode>, playbackManager: PlaybackManager, downloadManager: DownloadManager)
     fun contains(uuid: String): Boolean
     fun updateCurrentEpisodeState(state: State)
-    fun sortUpNext(sortType: UpNextSortType)
+    fun sortUpNext(sortType: UpNextSortType, changeSource: UpNextChangeSource)
 
     sealed class State {
         object Empty : State()
@@ -148,18 +148,69 @@ interface UpNextQueue {
     }
 }
 
-enum class UpNextSource(val analyticsValue: String) {
-    MINI_PLAYER("mini_player"),
-    PLAYER("player"),
-    NOW_PLAYING("now_playing"),
-    UP_NEXT_SHORTCUT("up_next_shortcut"),
-    UP_NEXT_TAB("up_next_tab"),
-    UNKNOWN("unknown"),
+enum class UpNextPageSource(val analyticsValue: String) {
+    MiniPlayer("mini_player"),
+    Player("player"),
+    NowPlaying("now_playing"),
+    UpNextShortcut("up_next_shortcut"),
+    UpNextTab("up_next_tab"),
+    Unknown("unknown"),
     ;
 
     companion object {
-        fun fromString(string: String) = UpNextSource.values().find { it.analyticsValue == string } ?: UNKNOWN
+        fun fromString(string: String) = entries.find { it.analyticsValue == string } ?: Unknown
     }
+}
+
+enum class UpNextChangeSource(val value: String) {
+    AutoArchiveAfterPlaying("Auto archive after playing"),
+    AutoArchiveInactive("Auto archive inactive"),
+    AutoPlay("Auto play"),
+    BookmarkPlayButton("Bookmark play button"),
+    Discover("Discover"),
+    DiscoverPodcastList("Discover podcast list"),
+    Chapter("Chapter"),
+    ChromecastEventPlay("Chromecast event play"),
+    ClearUpNextDialog("Clear dialog"),
+    EpisodeCompleted("Episode completed"),
+    EpisodeDialog("Episode dialog"),
+    EpisodeLimit("Episode limit"),
+    Playlist("Playlist"),
+    MediaSession("Media session"),
+    MiniPlayer("Mini player"),
+    MultiSelect("Multi select"),
+    Notification("Notification"),
+    PlayAllButton("Play all button"),
+    PlayAllButtonAppend("Play all button append"),
+    PlayButton("Play button"),
+    PlayLastButton("Play last button"),
+    PlayNextButton("Play next button"),
+    PlayerArchive("Player archive"),
+    PlayerBroadcast("Player broadcast"),
+    PlayerMarkAsPlayed("Player mark as played"),
+    PlayerNextEpisodeButton("Player next episode button"),
+    PlayerPlayButton("Player play button"),
+    PodcastPageArchiveAll("Podcast page archive all"),
+    PodcastPageArchivePlayed("Podcast page archive played"),
+    RefreshAutoAdd("Refresh auto add"),
+    RestoreHistory("Restore history"),
+    ServerImport("Server import"),
+    ServerImportEmpty("Server import empty"),
+    SignOutClearData("Sign out and clear data"),
+    SkipLast("Skip last"),
+    SleepTimerEnd("Sleep timer end"),
+    Swipe("Swipe"),
+    Tasker("Tasker"),
+    TranscriptPlayButton("Transcript play button"),
+    UpNextDragAndDrop("Up next drag and drop"),
+    UpNextSort("Up next sort"),
+    UserEpisode("User episode"),
+    UserEpisodePlaybackFailed("User episode playback failed"),
+    UserSyncArchive("User sync archive"),
+    UserSyncMarkAsPlayed("User sync mark as played"),
+    VersionMigrations("Version migrations"),
+    WarningPlayButton("Warning play button"),
+    Widget("Widget"),
 }
 
 fun Observable<UpNextQueue.State>.containsUuid(uuid: String): Observable<Boolean> {

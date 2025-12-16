@@ -34,6 +34,7 @@ import au.com.shiftyjelly.pocketcasts.repositories.di.ApplicationScope
 import au.com.shiftyjelly.pocketcasts.repositories.download.DownloadManager
 import au.com.shiftyjelly.pocketcasts.repositories.notification.NotificationHelper
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
+import au.com.shiftyjelly.pocketcasts.repositories.playback.UpNextChangeSource
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.FolderManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
@@ -276,7 +277,7 @@ class PodcastViewModel @Inject constructor(
         launch {
             val episodeState = uiState.value
             if (episodeState is UiState.Loaded) {
-                episodeManager.archiveAllInList(episodeState.episodes, playbackManager)
+                episodeManager.archiveAllInList(episodeState.episodes, playbackManager, changeSource = UpNextChangeSource.PodcastPageArchiveAll)
                 trackEpisodeBulkEvent(AnalyticsEvent.EPISODE_BULK_ARCHIVED, episodeState.episodes.size)
             }
         }
@@ -379,7 +380,7 @@ class PodcastViewModel @Inject constructor(
         val podcast = this.podcast.value ?: return
         launch {
             val episodes = episodeManager.findEpisodesByPodcastOrderedBlocking(podcast).filter { it.isFinished }
-            episodeManager.archiveAllInList(episodes, playbackManager)
+            episodeManager.archiveAllInList(episodes, playbackManager, changeSource = UpNextChangeSource.PodcastPageArchivePlayed)
             trackEpisodeBulkEvent(AnalyticsEvent.EPISODE_BULK_ARCHIVED, episodes.size)
         }
     }
@@ -443,7 +444,7 @@ class PodcastViewModel @Inject constructor(
                 val shouldLoadOrSwitchEpisode = !playbackManager.isPlaying() ||
                     playbackManager.getCurrentEpisode()?.uuid != bookmarkEpisode.uuid
                 if (shouldLoadOrSwitchEpisode) {
-                    playbackManager.playNowSync(it, sourceView = SourceView.PODCAST_SCREEN)
+                    playbackManager.playNowSync(episode = it, sourceView = SourceView.PODCAST_SCREEN, changeSource = UpNextChangeSource.BookmarkPlayButton)
                 }
             }
             playbackManager.seekToTimeMs(bookmark.timeSecs * 1000)

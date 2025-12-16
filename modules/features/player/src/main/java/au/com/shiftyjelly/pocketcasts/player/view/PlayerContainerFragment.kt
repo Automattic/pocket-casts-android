@@ -36,7 +36,7 @@ import au.com.shiftyjelly.pocketcasts.player.viewmodel.BookmarksViewModel
 import au.com.shiftyjelly.pocketcasts.player.viewmodel.PlayerViewModel
 import au.com.shiftyjelly.pocketcasts.player.viewmodel.ShelfSharedViewModel
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
-import au.com.shiftyjelly.pocketcasts.repositories.playback.UpNextSource
+import au.com.shiftyjelly.pocketcasts.repositories.playback.UpNextPageSource
 import au.com.shiftyjelly.pocketcasts.ui.helper.FragmentHostListener
 import au.com.shiftyjelly.pocketcasts.ui.helper.NavigationBarColor
 import au.com.shiftyjelly.pocketcasts.ui.helper.StatusBarIconColor
@@ -106,7 +106,7 @@ class PlayerContainerFragment :
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        val upNextFragment = UpNextFragment.newInstance(embedded = true, source = UpNextSource.NOW_PLAYING)
+        val upNextFragment = UpNextFragment.newInstance(embedded = true, source = UpNextPageSource.NowPlaying)
         childFragmentManager.beginTransaction().replace(R.id.upNextFrameBottomSheet, upNextFragment).commitAllowingStateLoss()
 
         val binding = binding ?: return
@@ -129,7 +129,7 @@ class PlayerContainerFragment :
                 updateUpNextVisibility(newState != BottomSheetBehavior.STATE_COLLAPSED)
 
                 if (newState == BottomSheetBehavior.STATE_EXPANDED) {
-                    analyticsTracker.track(AnalyticsEvent.UP_NEXT_SHOWN, mapOf(SOURCE_KEY to UpNextSource.NOW_PLAYING.analyticsValue))
+                    analyticsTracker.track(AnalyticsEvent.UP_NEXT_SHOWN, mapOf(SOURCE_KEY to UpNextPageSource.NowPlaying.analyticsValue))
 
                     activity?.let {
                         theme.updateWindowNavigationBarColor(window = it.window, navigationBarColor = NavigationBarColor.UpNext(isFullScreen = true))
@@ -204,7 +204,7 @@ class PlayerContainerFragment :
             binding.countText.text = if (upNextCount == 0) "" else upNextCount.coerceAtMost(Settings.UP_NEXT_BADGE_MAX_COUNT).toString()
 
             binding.upNextButton.setOnClickListener {
-                analyticsTracker.track(AnalyticsEvent.UP_NEXT_SHOWN, mapOf(SOURCE_KEY to UpNextSource.PLAYER.analyticsValue))
+                analyticsTracker.track(AnalyticsEvent.UP_NEXT_SHOWN, mapOf(SOURCE_KEY to UpNextPageSource.Player.analyticsValue))
                 openUpNext()
             }
         }

@@ -14,6 +14,7 @@ import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.categories.CategoriesManager
 import au.com.shiftyjelly.pocketcasts.repositories.lists.ListRepository
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
+import au.com.shiftyjelly.pocketcasts.repositories.playback.UpNextChangeSource
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
 import au.com.shiftyjelly.pocketcasts.repositories.sync.SyncManager
@@ -326,7 +327,7 @@ class DiscoverViewModel @Inject constructor(
     }
 
     fun playEpisode(episode: PodcastEpisode) {
-        playbackManager.playNow(episode = episode, forceStream = true, sourceView = sourceView)
+        playbackManager.playNow(episode = episode, forceStream = true, sourceView = sourceView, changeSource = UpNextChangeSource.Discover)
     }
 
     fun stopPlayback() {

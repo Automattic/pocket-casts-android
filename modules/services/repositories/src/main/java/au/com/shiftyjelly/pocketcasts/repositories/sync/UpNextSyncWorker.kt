@@ -21,6 +21,7 @@ import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.download.DownloadManager
 import au.com.shiftyjelly.pocketcasts.repositories.history.upnext.UpNextHistoryManager
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
+import au.com.shiftyjelly.pocketcasts.repositories.playback.UpNextChangeSource
 import au.com.shiftyjelly.pocketcasts.repositories.playback.UpNextQueue
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
@@ -166,7 +167,7 @@ class UpNextSyncWorker @AssistedInject constructor(
     private suspend fun readResponse(response: UpNextSyncResponse) {
         if (settings.getUpNextServerModified() == 0L && response.episodes.isNullOrEmpty() && playbackManager.getCurrentEpisode() != null) {
             // Server sent empty up next for first log in and we have an up next list already, we should keep the local copy
-            upNextQueue.changeList(playbackManager.upNextQueue.queueEpisodes) // Change list will automatically include the current episode
+            upNextQueue.changeList(episodes = playbackManager.upNextQueue.queueEpisodes, changeSource = UpNextChangeSource.ServerImportEmpty) // Change list will automatically include the current episode
             return
         }
 

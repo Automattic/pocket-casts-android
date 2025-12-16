@@ -4,10 +4,8 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
-import au.com.shiftyjelly.pocketcasts.models.db.AppDatabase
-import au.com.shiftyjelly.pocketcasts.models.db.dao.UpNextDao
 import au.com.shiftyjelly.pocketcasts.models.type.UpNextSortType
-import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
+import au.com.shiftyjelly.pocketcasts.repositories.playback.UpNextChangeSource
 import au.com.shiftyjelly.pocketcasts.repositories.playback.UpNextQueue
 import au.com.shiftyjelly.pocketcasts.repositories.user.UserManager
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -39,6 +37,6 @@ class UpNextViewModel @Inject constructor(
             AnalyticsEvent.UP_NEXT_SORT,
             mapOf("sort_type" to sortType.analyticsValue),
         )
-        upNextQueue.sortUpNext(sortType)
+        upNextQueue.sortUpNext(sortType, changeSource = UpNextChangeSource.UpNextSort)
     }
 }

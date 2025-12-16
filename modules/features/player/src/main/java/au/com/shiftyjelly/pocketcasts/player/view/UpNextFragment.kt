@@ -41,8 +41,8 @@ import au.com.shiftyjelly.pocketcasts.player.viewmodel.PlayerViewModel
 import au.com.shiftyjelly.pocketcasts.player.viewmodel.UpNextViewModel
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
+import au.com.shiftyjelly.pocketcasts.repositories.playback.UpNextPageSource
 import au.com.shiftyjelly.pocketcasts.repositories.playback.UpNextQueue
-import au.com.shiftyjelly.pocketcasts.repositories.playback.UpNextSource
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
 import au.com.shiftyjelly.pocketcasts.ui.helper.FragmentHostListener
 import au.com.shiftyjelly.pocketcasts.ui.helper.NavigationBarColor
@@ -94,7 +94,7 @@ class UpNextFragment :
         private const val UP = "up"
         private const val UP_NEXT_ADAPTER_POSITION = 2
 
-        fun newInstance(embedded: Boolean = false, source: UpNextSource): UpNextFragment {
+        fun newInstance(embedded: Boolean = false, source: UpNextPageSource): UpNextFragment {
             val fragment = UpNextFragment()
             fragment.arguments = bundleOf(ARG_EMBEDDED to embedded, ARG_SOURCE to source.analyticsValue)
             return fragment
@@ -147,11 +147,11 @@ class UpNextFragment :
     val isEmbedded: Boolean
         get() = arguments?.getBoolean(ARG_EMBEDDED) ?: false
 
-    val upNextSource: UpNextSource
-        get() = arguments?.getString(ARG_SOURCE)?.let { UpNextSource.fromString(it) } ?: UpNextSource.UNKNOWN
+    val upNextPageSource: UpNextPageSource
+        get() = arguments?.getString(ARG_SOURCE)?.let { UpNextPageSource.fromString(it) } ?: UpNextPageSource.Unknown
 
     val overrideTheme: Theme.ThemeType
-        get() = theme.getUpNextTheme(isFullScreen = upNextSource != UpNextSource.UP_NEXT_TAB)
+        get() = theme.getUpNextTheme(isFullScreen = upNextPageSource != UpNextPageSource.UpNextTab)
 
     val multiSelectListener = object : MultiSelectHelper.Listener<BaseEpisode> {
         override fun multiSelectSelectAll() {
@@ -217,7 +217,7 @@ class UpNextFragment :
         val binding = FragmentUpnextBinding.inflate(themedInflater, container, false).also {
             realBinding = it
         }
-        if (upNextSource == UpNextSource.UP_NEXT_TAB) {
+        if (upNextPageSource == UpNextPageSource.UpNextTab) {
             analyticsTracker.track(AnalyticsEvent.UP_NEXT_SHOWN, mapOf("source" to "tab_bar"))
         }
 
@@ -262,7 +262,7 @@ class UpNextFragment :
             multiSelectHelper = multiSelectHelper,
             fragmentManager = childFragmentManager,
             analyticsTracker = analyticsTracker,
-            upNextSource = upNextSource,
+            upNextPageSource = upNextPageSource,
             settings = settings,
             playbackManager = playbackManager,
             swipeRowActionsFactory = swipeRowActionsFactory,
@@ -305,7 +305,7 @@ class UpNextFragment :
             toolbar = binding.toolbar,
             title = getString(LR.string.up_next),
             menu = R.menu.upnext,
-            navigationIcon = if (upNextSource != UpNextSource.UP_NEXT_TAB) {
+            navigationIcon = if (upNextPageSource != UpNextPageSource.UpNextTab) {
                 NavigationIcon.Close
             } else {
                 NavigationIcon.None
@@ -314,10 +314,10 @@ class UpNextFragment :
             onNavigationClick = { close() },
             toolbarColors = null,
         )
-        if (upNextSource != UpNextSource.UP_NEXT_TAB) {
+        if (upNextPageSource != UpNextPageSource.UpNextTab) {
             toolbar.setNavigationIcon(IR.drawable.ic_close)
         }
-        toolbar.menu.findItem(R.id.media_route_menu_item)?.isVisible = upNextSource == UpNextSource.UP_NEXT_TAB
+        toolbar.menu.findItem(R.id.media_route_menu_item)?.isVisible = upNextPageSource == UpNextPageSource.UpNextTab
         toolbar.navigationIcon?.setTint(ThemeColor.secondaryIcon01(overrideTheme))
         toolbar.menu.tintIcons(ThemeColor.secondaryIcon01(overrideTheme))
         toolbar.setOnMenuItemClickListener {
@@ -433,17 +433,17 @@ class UpNextFragment :
         (parentFragment as? PlayerContainerFragment)?.upNextBottomSheetBehavior?.state == BottomSheetBehavior.STATE_EXPANDED
 
     override fun onClearUpNext() {
-        playerViewModel.clearUpNext(context = requireContext(), upNextSource = upNextSource)
+        playerViewModel.clearUpNext(context = requireContext(), upNextPageSource = upNextPageSource)
             .showClearUpNextConfirmationDialog(parentFragmentManager, tag = "up_next_clear_dialog")
     }
 
     override fun onDiscoverTapped() {
-        if (upNextSource == UpNextSource.NOW_PLAYING) {
+        if (upNextPageSource == UpNextPageSource.NowPlaying) {
             (activity as FragmentHostListener).closePlayer()
-        } else if (upNextSource == UpNextSource.MINI_PLAYER) {
+        } else if (upNextPageSource == UpNextPageSource.MiniPlayer) {
             close()
         }
-        analyticsTracker.track(AnalyticsEvent.UP_NEXT_DISCOVER_BUTTON_TAPPED, mapOf("source" to upNextSource.analyticsValue))
+        analyticsTracker.track(AnalyticsEvent.UP_NEXT_DISCOVER_BUTTON_TAPPED, mapOf("source" to upNextPageSource.analyticsValue))
         (activity as FragmentHostListener).openTab(VR.id.navigation_discover)
     }
 
@@ -538,7 +538,7 @@ class UpNextFragment :
 
     private fun trackUpNextEvent(event: AnalyticsEvent, props: Map<String, Any> = emptyMap()) {
         val properties = HashMap<String, Any>()
-        properties[SOURCE_KEY] = upNextSource.analyticsValue
+        properties[SOURCE_KEY] = upNextPageSource.analyticsValue
         properties.putAll(props)
         analyticsTracker.track(event, properties)
     }

@@ -27,6 +27,7 @@ import au.com.shiftyjelly.pocketcasts.compose.components.rememberViewInteropNest
 import au.com.shiftyjelly.pocketcasts.compose.extensions.contentWithoutConsumedInsets
 import au.com.shiftyjelly.pocketcasts.models.to.Transcript
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
+import au.com.shiftyjelly.pocketcasts.repositories.playback.UpNextChangeSource
 import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingFlow
 import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingLauncher
 import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingUpgradeSource
@@ -160,7 +161,7 @@ class TranscriptFragment : BaseDialogFragment() {
                     playbackManger.pause(sourceView = SourceView.EPISODE_TRANSCRIPT)
                 } else {
                     scope.launch {
-                        playbackManger.playNowSuspend(args.episodeUuid, sourceView = SourceView.EPISODE_TRANSCRIPT)
+                        playbackManger.playNowSuspend(args.episodeUuid, sourceView = SourceView.EPISODE_TRANSCRIPT, changeSource = UpNextChangeSource.TranscriptPlayButton)
                     }
                 }
             },

@@ -8,6 +8,7 @@ import au.com.shiftyjelly.pocketcasts.models.type.EpisodePlayingStatus
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodeStatusEnum
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlayerEvent
+import au.com.shiftyjelly.pocketcasts.repositories.playback.UpNextChangeSource
 import io.reactivex.Flowable
 import io.reactivex.Maybe
 import java.util.Date
@@ -80,10 +81,10 @@ interface EpisodeManager {
     fun updateAllEpisodeStatusBlocking(episodeStatus: EpisodeStatusEnum)
 
     fun markAsNotPlayedBlocking(episode: BaseEpisode?)
-    suspend fun markAllAsPlayed(episodes: List<BaseEpisode>, playbackManager: PlaybackManager, podcastManager: PodcastManager)
-    fun markedAsPlayedExternally(episode: PodcastEpisode, playbackManager: PlaybackManager, podcastManager: PodcastManager)
-    fun markAsPlayedAsync(episode: BaseEpisode?, playbackManager: PlaybackManager, podcastManager: PodcastManager, shouldShuffleUpNext: Boolean = false)
-    fun markAsPlayedBlocking(episode: BaseEpisode?, playbackManager: PlaybackManager, podcastManager: PodcastManager, shouldShuffleUpNext: Boolean = false)
+    suspend fun markAllAsPlayed(episodes: List<BaseEpisode>, playbackManager: PlaybackManager, podcastManager: PodcastManager, changeSource: UpNextChangeSource)
+    fun markedAsPlayedExternally(episode: PodcastEpisode, playbackManager: PlaybackManager, podcastManager: PodcastManager, changeSource: UpNextChangeSource)
+    fun markAsPlayedAsync(episode: BaseEpisode?, playbackManager: PlaybackManager, podcastManager: PodcastManager, shouldShuffleUpNext: Boolean = false, changeSource: UpNextChangeSource)
+    fun markAsPlayedBlocking(episode: BaseEpisode?, playbackManager: PlaybackManager, podcastManager: PodcastManager, shouldShuffleUpNext: Boolean = false, changeSource: UpNextChangeSource)
     fun markAsPlaybackErrorBlocking(episode: BaseEpisode?, errorMessage: String?)
     fun markAsPlaybackErrorBlocking(episode: BaseEpisode?, event: PlayerEvent.PlayerError, isPlaybackRemote: Boolean)
     suspend fun starEpisode(episode: PodcastEpisode, starred: Boolean, sourceView: SourceView)
@@ -91,10 +92,10 @@ interface EpisodeManager {
     suspend fun toggleStarEpisode(episode: PodcastEpisode, sourceView: SourceView)
     fun clearPlaybackErrorBlocking(episode: BaseEpisode?)
     fun clearDownloadErrorBlocking(episode: PodcastEpisode?)
-    fun archiveBlocking(episode: PodcastEpisode, playbackManager: PlaybackManager, sync: Boolean = true, shouldShuffleUpNext: Boolean = false)
-    fun archivePlayedEpisode(episode: BaseEpisode, playbackManager: PlaybackManager, podcastManager: PodcastManager, sync: Boolean)
+    fun archiveBlocking(episode: PodcastEpisode, playbackManager: PlaybackManager, sync: Boolean = true, shouldShuffleUpNext: Boolean = false, changeSource: UpNextChangeSource)
+    fun archivePlayedEpisode(episode: BaseEpisode, playbackManager: PlaybackManager, podcastManager: PodcastManager, sync: Boolean, changeSource: UpNextChangeSource)
     fun unarchiveBlocking(episode: BaseEpisode)
-    suspend fun archiveAllInList(episodes: List<PodcastEpisode>, playbackManager: PlaybackManager?)
+    suspend fun archiveAllInList(episodes: List<PodcastEpisode>, playbackManager: PlaybackManager?, changeSource: UpNextChangeSource)
     fun checkForEpisodesToAutoArchiveBlocking(playbackManager: PlaybackManager?, podcastManager: PodcastManager)
     fun userHasInteractedWithEpisode(episode: PodcastEpisode, playbackManager: PlaybackManager): Boolean
     fun clearEpisodePlaybackInteractionDatesBeforeBlocking(lastCleared: Date)

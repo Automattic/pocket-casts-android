@@ -70,7 +70,7 @@ class PlayerBroadcastReceiver : BroadcastReceiver() {
     }
 
     private fun playNext() {
-        playbackManager.playNextInQueue(sourceView = sourceView)
+        playbackManager.playNextInQueue(sourceView = sourceView, changeSource = UpNextChangeSource.PlayerBroadcast)
     }
 
     private fun stop() {

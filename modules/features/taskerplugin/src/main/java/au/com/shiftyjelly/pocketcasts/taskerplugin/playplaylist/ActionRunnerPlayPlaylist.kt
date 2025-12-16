@@ -4,6 +4,7 @@ import android.content.Context
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.localization.R
 import au.com.shiftyjelly.pocketcasts.models.to.PlaylistEpisode
+import au.com.shiftyjelly.pocketcasts.repositories.playback.UpNextChangeSource
 import au.com.shiftyjelly.pocketcasts.taskerplugin.base.findPlaylist
 import au.com.shiftyjelly.pocketcasts.taskerplugin.base.hilt.playbackManager
 import au.com.shiftyjelly.pocketcasts.taskerplugin.base.hilt.playlistManager
@@ -41,8 +42,8 @@ class ActionRunnerPlayPlaylist : TaskerPluginRunnerActionNoOutput<InputPlayPlayl
             return TaskerPluginResultError(ERROR_PLAYLIST_NO_EPISODES, context.getString(R.string.no_episodes_in_filter_x, title))
         }
 
-        playbackManager.upNextQueue.removeAll()
-        playbackManager.playEpisodes(episodes, SourceView.TASKER)
+        playbackManager.upNextQueue.removeAll(changeSource = UpNextChangeSource.Tasker)
+        playbackManager.playEpisodes(episodes = episodes, sourceView = SourceView.TASKER, changeSource = UpNextChangeSource.Tasker)
         return TaskerPluginResultSucess()
     }
 }

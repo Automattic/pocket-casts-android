@@ -27,6 +27,7 @@ import au.com.shiftyjelly.pocketcasts.repositories.download.UpdateEpisodeDetails
 import au.com.shiftyjelly.pocketcasts.repositories.file.FileStorage
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlayerEvent
+import au.com.shiftyjelly.pocketcasts.repositories.playback.UpNextChangeSource
 import au.com.shiftyjelly.pocketcasts.servers.podcast.PodcastCacheServiceManager
 import au.com.shiftyjelly.pocketcasts.utils.FileUtil
 import au.com.shiftyjelly.pocketcasts.utils.Network
@@ -448,12 +449,12 @@ class EpisodeManagerImpl @Inject constructor(
         UpdateEpisodeDetailsTask.enqueue(episodes, context)
     }
 
-    override suspend fun markAllAsPlayed(episodes: List<BaseEpisode>, playbackManager: PlaybackManager, podcastManager: PodcastManager) {
+    override suspend fun markAllAsPlayed(episodes: List<BaseEpisode>, playbackManager: PlaybackManager, podcastManager: PodcastManager, changeSource: UpNextChangeSource) {
         val justEpisodes = episodes.filterIsInstance<PodcastEpisode>()
         justEpisodes.chunked(500).forEach { episodeDao.updateAllPlayingStatus(it.map { it.uuid }, System.currentTimeMillis(), EpisodePlayingStatus.COMPLETED) }
-        archiveAllPlayedEpisodes(justEpisodes, playbackManager, podcastManager)
+        archiveAllPlayedEpisodes(justEpisodes, playbackManager, podcastManager, changeSource)
 
-        justEpisodes.forEach { playbackManager.removeEpisode(episodeToRemove = it, source = SourceView.UNKNOWN, userInitiated = false) }
+        justEpisodes.forEach { playbackManager.removeEpisode(episodeToRemove = it, source = SourceView.UNKNOWN, userInitiated = false, changeSource = changeSource) }
 
         userEpisodeManager.markAllAsPlayed(episodes.filterIsInstance<UserEpisode>(), playbackManager)
     }
@@ -471,34 +472,34 @@ class EpisodeManagerImpl @Inject constructor(
         }
     }
 
-    override fun markedAsPlayedExternally(episode: PodcastEpisode, playbackManager: PlaybackManager, podcastManager: PodcastManager) {
-        playbackManager.removeEpisode(episode, source = SourceView.UNKNOWN, userInitiated = false)
+    override fun markedAsPlayedExternally(episode: PodcastEpisode, playbackManager: PlaybackManager, podcastManager: PodcastManager, changeSource: UpNextChangeSource) {
+        playbackManager.removeEpisode(episode, source = SourceView.UNKNOWN, userInitiated = false, changeSource = changeSource)
 
         // Auto archive after playing if the episode isn't already archived
         if (!episode.isArchived) {
-            archivePlayedEpisode(episode, playbackManager, podcastManager, sync = true)
+            archivePlayedEpisode(episode, playbackManager, podcastManager, sync = true, changeSource = changeSource)
         }
     }
 
-    override fun markAsPlayedAsync(episode: BaseEpisode?, playbackManager: PlaybackManager, podcastManager: PodcastManager, shouldShuffleUpNext: Boolean) {
+    override fun markAsPlayedAsync(episode: BaseEpisode?, playbackManager: PlaybackManager, podcastManager: PodcastManager, shouldShuffleUpNext: Boolean, changeSource: UpNextChangeSource) {
         launch {
-            markAsPlayedBlocking(episode, playbackManager, podcastManager, shouldShuffleUpNext)
+            markAsPlayedBlocking(episode, playbackManager, podcastManager, shouldShuffleUpNext, changeSource)
         }
     }
 
-    override fun markAsPlayedBlocking(episode: BaseEpisode?, playbackManager: PlaybackManager, podcastManager: PodcastManager, shouldShuffleUpNext: Boolean) {
+    override fun markAsPlayedBlocking(episode: BaseEpisode?, playbackManager: PlaybackManager, podcastManager: PodcastManager, shouldShuffleUpNext: Boolean, changeSource: UpNextChangeSource) {
         if (episode == null) {
             return
         }
 
-        playbackManager.removeEpisode(episode, source = SourceView.UNKNOWN, userInitiated = false, shouldShuffleUpNext = shouldShuffleUpNext)
+        playbackManager.removeEpisode(episode, source = SourceView.UNKNOWN, userInitiated = false, shouldShuffleUpNext = shouldShuffleUpNext, changeSource = changeSource)
 
         episode.playingStatus = EpisodePlayingStatus.COMPLETED
 
         updatePlayingStatusBlocking(episode, EpisodePlayingStatus.COMPLETED)
 
         // Auto archive after playing
-        archivePlayedEpisode(episode, playbackManager, podcastManager, sync = true)
+        archivePlayedEpisode(episode, playbackManager, podcastManager, sync = true, changeSource = changeSource)
 
         if (episode is UserEpisode) {
             launch {
@@ -629,7 +630,7 @@ class EpisodeManagerImpl @Inject constructor(
         episode.downloadErrorDetails = null
     }
 
-    override fun archivePlayedEpisode(episode: BaseEpisode, playbackManager: PlaybackManager, podcastManager: PodcastManager, sync: Boolean) {
+    override fun archivePlayedEpisode(episode: BaseEpisode, playbackManager: PlaybackManager, podcastManager: PodcastManager, sync: Boolean, changeSource: UpNextChangeSource) {
         launch {
             if (episode !is PodcastEpisode) return@launch
             // check if we are meant to archive after episode is played
@@ -643,13 +644,13 @@ class EpisodeManagerImpl @Inject constructor(
                     episodeDao.updateArchivedNoSyncBlocking(true, System.currentTimeMillis(), episode.uuid)
                 }
                 episode.isArchived = true
-                cleanUpEpisode(episode, playbackManager)
+                cleanUpEpisode(episode = episode, playbackManager = playbackManager, changeSource = changeSource)
             }
         }
     }
 
     @Suppress("NAME_SHADOWING")
-    private suspend fun archiveAllPlayedEpisodes(episodes: List<PodcastEpisode>, playbackManager: PlaybackManager, podcastManager: PodcastManager) {
+    private suspend fun archiveAllPlayedEpisodes(episodes: List<PodcastEpisode>, playbackManager: PlaybackManager, podcastManager: PodcastManager, changeSource: UpNextChangeSource) {
         val episodesWithoutStarred = if (!settings.autoArchiveIncludesStarred.value) episodes.filter { !it.isStarred } else episodes // Remove starred episodes if we have to
         val episodesByPodcast = episodesWithoutStarred.groupBy { it.podcastUuid }.toMutableMap() // Sort in to podcasts
 
@@ -658,12 +659,12 @@ class EpisodeManagerImpl @Inject constructor(
             val archiveAfterPlaying = podcast.autoArchiveAfterPlaying ?: settings.autoArchiveAfterPlaying.value
 
             if (archiveAfterPlaying == AutoArchiveAfterPlaying.AfterPlaying) {
-                archiveAllInList(episodes, playbackManager)
+                archiveAllInList(episodes, playbackManager, changeSource = changeSource)
             }
         }
     }
 
-    override fun archiveBlocking(episode: PodcastEpisode, playbackManager: PlaybackManager, sync: Boolean, shouldShuffleUpNext: Boolean) {
+    override fun archiveBlocking(episode: PodcastEpisode, playbackManager: PlaybackManager, sync: Boolean, shouldShuffleUpNext: Boolean, changeSource: UpNextChangeSource) {
         if (sync) {
             episodeDao.updateArchivedBlocking(true, System.currentTimeMillis(), episode.uuid)
         } else {
@@ -671,15 +672,15 @@ class EpisodeManagerImpl @Inject constructor(
         }
         episode.isArchived = true
         runBlocking {
-            cleanUpEpisode(episode, playbackManager, shouldShuffleUpNext)
+            cleanUpEpisode(episode, playbackManager, shouldShuffleUpNext, changeSource = changeSource)
         }
     }
 
     @Suppress("NAME_SHADOWING")
-    private suspend fun cleanUpEpisode(episode: BaseEpisode, playbackManager: PlaybackManager?, shouldShuffleUpNext: Boolean = false) {
+    private suspend fun cleanUpEpisode(episode: BaseEpisode, playbackManager: PlaybackManager?, shouldShuffleUpNext: Boolean = false, changeSource: UpNextChangeSource) {
         val playbackManager = playbackManager ?: return
         deleteEpisodeFile(episode, playbackManager, disableAutoDownload = true, updateDatabase = true)
-        playbackManager.removeEpisode(episode, source = SourceView.UNKNOWN, userInitiated = false, shouldShuffleUpNext = shouldShuffleUpNext)
+        playbackManager.removeEpisode(episode, source = SourceView.UNKNOWN, userInitiated = false, shouldShuffleUpNext = shouldShuffleUpNext, changeSource = changeSource)
     }
 
     override suspend fun findStaleDownloads(): List<PodcastEpisode> {
@@ -876,6 +877,7 @@ class EpisodeManagerImpl @Inject constructor(
     override suspend fun archiveAllInList(
         episodes: List<PodcastEpisode>,
         playbackManager: PlaybackManager?,
+        changeSource: UpNextChangeSource,
     ) {
         withContext(ioDispatcher) {
             appDatabase.withTransaction {
@@ -883,7 +885,7 @@ class EpisodeManagerImpl @Inject constructor(
                     episodeDao.archiveAllInList(chunked.map { it.uuid }, System.currentTimeMillis())
                     playbackManager?.let { playbackManager ->
                         chunked.forEach {
-                            cleanUpEpisode(it, playbackManager)
+                            cleanUpEpisode(it, playbackManager, changeSource = changeSource)
                         }
                     }
                 }
@@ -915,11 +917,11 @@ class EpisodeManagerImpl @Inject constructor(
                 .filter { it.lastPlaybackInteractionDate != null && now.time - it.lastPlaybackInteractionDate!!.time > autoArchiveAfterPlayingTime }
 
             runBlocking {
-                archiveAllInList(playedEpisodes, playbackManager)
+                archiveAllInList(playedEpisodes, playbackManager, changeSource = UpNextChangeSource.AutoArchiveAfterPlaying)
             }
             playedEpisodes.forEach {
                 runBlocking {
-                    cleanUpEpisode(it, playbackManager)
+                    cleanUpEpisode(it, playbackManager, changeSource = UpNextChangeSource.AutoArchiveAfterPlaying)
                 }
                 LogBuffer.i(LogBuffer.TAG_BACKGROUND_TASKS, "Auto archiving played episode ${it.title}")
             }
@@ -933,11 +935,11 @@ class EpisodeManagerImpl @Inject constructor(
                 .filter { settings.autoArchiveIncludesStarred.value || !it.isStarred }
             if (inactiveEpisodes.isNotEmpty()) {
                 runBlocking {
-                    archiveAllInList(inactiveEpisodes, playbackManager)
+                    archiveAllInList(inactiveEpisodes, playbackManager, changeSource = UpNextChangeSource.AutoArchiveInactive)
                 }
                 inactiveEpisodes.forEach {
                     runBlocking {
-                        cleanUpEpisode(it, playbackManager)
+                        cleanUpEpisode(it, playbackManager, changeSource = UpNextChangeSource.AutoArchiveInactive)
                     }
                     LogBuffer.i(LogBuffer.TAG_BACKGROUND_TASKS, "Auto archiving inactive episode ${it.title}")
                 }
@@ -959,11 +961,11 @@ class EpisodeManagerImpl @Inject constructor(
                     .filter { playbackManager?.getCurrentEpisode()?.uuid != it.uuid }
                 if (episodesToRemove.isNotEmpty()) {
                     runBlocking {
-                        archiveAllInList(episodesToRemove, playbackManager)
+                        archiveAllInList(episodesToRemove, playbackManager, changeSource = UpNextChangeSource.EpisodeLimit)
                     }
                     episodesToRemove.forEach {
                         runBlocking {
-                            cleanUpEpisode(it, playbackManager)
+                            cleanUpEpisode(it, playbackManager, changeSource = UpNextChangeSource.EpisodeLimit)
                         }
                         LogBuffer.i(LogBuffer.TAG_BACKGROUND_TASKS, "Auto archiving episode over limit $episodeLimit ${it.title}")
                     }

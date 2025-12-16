@@ -8,7 +8,8 @@ import au.com.shiftyjelly.pocketcasts.analytics.EpisodeAnalytics
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
-import au.com.shiftyjelly.pocketcasts.repositories.playback.UpNextSource
+import au.com.shiftyjelly.pocketcasts.repositories.playback.UpNextChangeSource
+import au.com.shiftyjelly.pocketcasts.repositories.playback.UpNextPageSource
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
 import au.com.shiftyjelly.pocketcasts.ui.extensions.getThemeColor
@@ -64,7 +65,7 @@ class MiniPlayerDialog(
 
     private fun endPlaybackAndClearUpNext(context: Context) {
         val dialog = ClearUpNextDialog(
-            source = UpNextSource.MINI_PLAYER,
+            source = UpNextPageSource.MiniPlayer,
             removeNowPlaying = true,
             playbackManager = playbackManager,
             analyticsTracker = analyticsTracker,
@@ -75,7 +76,7 @@ class MiniPlayerDialog(
 
     private fun markAsPlayed() {
         val episode = playbackManager.upNextQueue.currentEpisode ?: return
-        episodeManager.markAsPlayedAsync(episode, playbackManager, podcastManager, settings.upNextShuffle.value)
+        episodeManager.markAsPlayedAsync(episode, playbackManager, podcastManager, settings.upNextShuffle.value, changeSource = UpNextChangeSource.MiniPlayer)
         episodeAnalytics.trackEvent(AnalyticsEvent.EPISODE_MARKED_AS_PLAYED, SourceView.MINIPLAYER, episode.uuid)
     }
 

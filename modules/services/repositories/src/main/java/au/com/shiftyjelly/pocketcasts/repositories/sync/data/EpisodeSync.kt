@@ -5,6 +5,7 @@ import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.models.type.EpisodePlayingStatus
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
+import au.com.shiftyjelly.pocketcasts.repositories.playback.UpNextChangeSource
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
 import com.google.protobuf.boolValue
@@ -80,12 +81,12 @@ internal class EpisodeSync(
                 onShouldBeFinished = { episodeToFinish += localEpisode },
             )
         }
-        episodeManager.archiveAllInList(episodesToArchive, playbackManager)
+        episodeManager.archiveAllInList(episodesToArchive, playbackManager, changeSource = UpNextChangeSource.UserSyncArchive)
         episodesToArchive.forEach { episode ->
             episode.isArchived = true
         }
         episodeToFinish.forEach { episode ->
-            episodeManager.markedAsPlayedExternally(episode, playbackManager, podcastManager)
+            episodeManager.markedAsPlayedExternally(episode, playbackManager, podcastManager, changeSource = UpNextChangeSource.UserSyncMarkAsPlayed)
         }
         episodeManager.updateAll(localEpisodes)
     }

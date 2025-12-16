@@ -10,6 +10,7 @@ import au.com.shiftyjelly.pocketcasts.models.entity.PodcastEpisode
 import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.download.DownloadManager
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
+import au.com.shiftyjelly.pocketcasts.repositories.playback.UpNextChangeSource
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
 import au.com.shiftyjelly.pocketcasts.utils.Network
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
@@ -58,7 +59,7 @@ class PlayButtonListener @Inject constructor(
     }
 
     private fun play(episode: BaseEpisode, force: Boolean = true) {
-        playbackManager.playNow(episode = episode, forceStream = force, sourceView = source)
+        playbackManager.playNow(episode = episode, forceStream = force, sourceView = source, changeSource = UpNextChangeSource.PlayButton)
         warningsHelper.showBatteryWarningSnackbarIfAppropriate()
     }
 
@@ -77,7 +78,7 @@ class PlayButtonListener @Inject constructor(
     override fun onPlayNext(episodeUuid: String) {
         launch {
             episodeManager.findEpisodeByUuid(episodeUuid)?.let { episode ->
-                playbackManager.playNext(episode = episode, source = source)
+                playbackManager.playNext(episode = episode, source = source, changeSource = UpNextChangeSource.PlayNextButton)
             }
         }
     }
@@ -85,7 +86,7 @@ class PlayButtonListener @Inject constructor(
     override fun onPlayLast(episodeUuid: String) {
         launch {
             episodeManager.findEpisodeByUuid(episodeUuid)?.let { episode ->
-                playbackManager.playLast(episode = episode, source = source)
+                playbackManager.playLast(episode = episode, source = source, changeSource = UpNextChangeSource.PlayLastButton)
             }
         }
     }

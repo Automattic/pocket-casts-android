@@ -17,6 +17,7 @@ import au.com.shiftyjelly.pocketcasts.repositories.notification.NotificationSche
 import au.com.shiftyjelly.pocketcasts.repositories.notification.NotificationSchedulerImpl.Companion.TAG_TRENDING_RECOMMENDATIONS
 import au.com.shiftyjelly.pocketcasts.repositories.notification.TrendingAndRecommendationsNotificationType
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
+import au.com.shiftyjelly.pocketcasts.repositories.playback.UpNextChangeSource
 import au.com.shiftyjelly.pocketcasts.repositories.playback.UpNextQueue
 import au.com.shiftyjelly.pocketcasts.repositories.playlist.DefaultPlaylistsInitializer
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
@@ -179,11 +180,12 @@ class UserManagerImpl @Inject constructor(
             // Unknown is fine here because we don't send analytics when the user did not initiate the action
             source = SourceView.UNKNOWN,
             userInitiated = false,
+            changeSource = UpNextChangeSource.SignOutClearData,
         )
 
         // Block while clearing data so that users cannot interact with the app until we're done clearing data
         runBlocking(Dispatchers.IO) {
-            upNextQueue.removeAllIncludingChanges()
+            upNextQueue.removeAllIncludingChanges(changeSource = UpNextChangeSource.SignOutClearData)
 
             playlistDao.deleteAllPlaylists()
             playlistsInitializer.initialize(force = true)

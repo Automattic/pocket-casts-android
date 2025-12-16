@@ -68,18 +68,18 @@ class UpNextQueueImpl @Inject constructor(
     override val isEmpty: Boolean
         get() = changesObservable.blockingFirst() is UpNextQueue.State.Empty
 
-    sealed class UpNextAction(val _onAdd: (() -> Unit)?) {
-        data class PlayNow(val episode: BaseEpisode, val onAdd: (() -> Unit)? = null) : UpNextAction(onAdd)
-        data class PlayNext(val episode: BaseEpisode, val onAdd: (() -> Unit)? = null) : UpNextAction(onAdd)
-        data class PlayLast(val episode: BaseEpisode, val onAdd: (() -> Unit)? = null) : UpNextAction(onAdd)
-        data class ReplaceAll(val episodes: List<BaseEpisode>) : UpNextAction({})
-        data class Rearrange(val episodes: List<BaseEpisode>, val onAdd: (() -> Unit)? = null) : UpNextAction(onAdd)
-        data class Remove(val episode: BaseEpisode, val onAdd: (() -> Unit)? = null) : UpNextAction(onAdd)
-        data class RemoveAndShuffle(val episode: BaseEpisode, val onAdd: (() -> Unit)? = null) : UpNextAction(onAdd)
-        data class Import(val episodes: List<BaseEpisode>, val onAdd: (() -> Unit)? = null) : UpNextAction(onAdd)
-        object ClearAll : UpNextAction(null)
-        object ClearAllIncludingChanges : UpNextAction(null)
-        object ClearUpNext : UpNextAction(null)
+    sealed class UpNextAction(val log: String, val onAddInternal: (() -> Unit)?) {
+        data class PlayNow(val episode: BaseEpisode, val onAdd: (() -> Unit)? = null) : UpNextAction(log = "Play now ${episode.uuid}", onAddInternal = onAdd)
+        data class PlayNext(val episode: BaseEpisode, val onAdd: (() -> Unit)? = null) : UpNextAction(log = "Play next ${episode.uuid}", onAddInternal = onAdd)
+        data class PlayLast(val episode: BaseEpisode, val onAdd: (() -> Unit)? = null) : UpNextAction(log = "Play last ${episode.uuid}", onAddInternal = onAdd)
+        data class ReplaceAll(val episodes: List<BaseEpisode>) : UpNextAction(log = "Replace all [${logEpisodeUuids(episodes)}]", onAddInternal = {})
+        data class Rearrange(val episodes: List<BaseEpisode>, val onAdd: (() -> Unit)? = null) : UpNextAction(log = "Rearrange [${logEpisodeUuids(episodes)}]", onAddInternal = onAdd)
+        data class Remove(val episode: BaseEpisode, val onAdd: (() -> Unit)? = null) : UpNextAction(log = "Remove ${episode.uuid}", onAddInternal = onAdd)
+        data class RemoveAndShuffle(val episode: BaseEpisode, val onAdd: (() -> Unit)? = null) : UpNextAction(log = "Remove and shuffle ${episode.uuid}", onAddInternal = onAdd)
+        data class Import(val episodes: List<BaseEpisode>, val onAdd: (() -> Unit)? = null) : UpNextAction(log = "Import [${logEpisodeUuids(episodes)}]", onAddInternal = onAdd)
+        object ClearAll : UpNextAction(log = "Clear all", onAddInternal = null)
+        object ClearAllIncludingChanges : UpNextAction(log = "Clear all including changes", onAddInternal = null)
+        object ClearUpNext : UpNextAction(log = "Clear up next", onAddInternal = null)
     }
 
     override fun setupBlocking() {
@@ -122,7 +122,8 @@ class UpNextQueueImpl @Inject constructor(
         (changesObservable as Relay).accept(state)
     }
 
-    private fun saveChangesBlocking(action: UpNextAction) {
+    private fun saveChangesBlocking(action: UpNextAction, source: UpNextChangeSource) {
+        LogBuffer.i(LogBuffer.TAG_PLAYBACK, "Up Next change. From: ${source.value}. Action: ${action.log}")
         when (action) {
             is UpNextAction.PlayNow -> insertUpNextEpisodeBlocking(episode = action.episode, position = 0)
 
@@ -176,7 +177,7 @@ class UpNextQueueImpl @Inject constructor(
         val state = updateStateBlocking(shouldShuffleUpNext = shouldShuffleUpNext)
         updateCurrentEpisodeState(state)
 
-        action._onAdd?.invoke()
+        action.onAddInternal?.invoke()
     }
 
     override fun isCurrentEpisode(episode: BaseEpisode): Boolean {
@@ -190,6 +191,7 @@ class UpNextQueueImpl @Inject constructor(
     override suspend fun playNow(
         episode: BaseEpisode,
         automaticUpNextSource: AutoPlaySource?,
+        changeSource: UpNextChangeSource,
         onAdd: (() -> Unit)?,
     ) = withContext(coroutineContext) {
         // Don't build an Up Next if it is already empty
@@ -198,27 +200,27 @@ class UpNextQueueImpl @Inject constructor(
             automaticUpNextSource?.let {
                 settings.lastAutoPlaySource.set(value = it, updateModifiedAt = true)
             }
-            saveChangesBlocking(UpNextAction.ClearAll)
+            saveChangesBlocking(action = UpNextAction.ClearAll, source = changeSource)
         }
-        saveChangesBlocking(UpNextAction.PlayNow(episode, onAdd))
+        saveChangesBlocking(action = UpNextAction.PlayNow(episode, onAdd), source = changeSource)
         if (episode.isFinished) {
             episodeManager.markAsNotPlayedBlocking(episode)
         }
     }
 
-    override suspend fun playNextBlocking(episode: BaseEpisode, downloadManager: DownloadManager, onAdd: (() -> Unit)?) {
-        playNextNowBlocking(episode, downloadManager, onAdd)
+    override suspend fun playNextBlocking(episode: BaseEpisode, downloadManager: DownloadManager, changeSource: UpNextChangeSource, onAdd: (() -> Unit)?) {
+        playNextNowBlocking(episode = episode, downloadManager = downloadManager, source = changeSource, onAdd = onAdd)
     }
 
-    private suspend fun playNextNowBlocking(episode: BaseEpisode, downloadManager: DownloadManager, onAdd: (() -> Unit)?) = withContext(coroutineContext) {
-        saveChangesBlocking(UpNextAction.PlayNext(episode, onAdd))
+    private suspend fun playNextNowBlocking(episode: BaseEpisode, downloadManager: DownloadManager, source: UpNextChangeSource, onAdd: (() -> Unit)?) = withContext(coroutineContext) {
+        saveChangesBlocking(action = UpNextAction.PlayNext(episode, onAdd), source = source)
         downloadIfPossible(episode, downloadManager)
         if (episode.isFinished) {
             episodeManager.markAsNotPlayedBlocking(episode)
         }
     }
 
-    override suspend fun playAllNext(episodes: List<BaseEpisode>, downloadManager: DownloadManager) = withContext(coroutineContext) {
+    override suspend fun playAllNext(episodes: List<BaseEpisode>, downloadManager: DownloadManager, changeSource: UpNextChangeSource) = withContext(coroutineContext) {
         appDatabase.runInTransaction {
             val current = currentEpisode
             val queued = queueEpisodes
@@ -234,16 +236,16 @@ class UpNextQueueImpl @Inject constructor(
                     }
                 }
             }
-            replaceAll(prependedEpisodes, downloadManager)
+            replaceAll(prependedEpisodes, downloadManager, changeSource)
         }
     }
 
-    override suspend fun clearAndPlayAll(episodes: List<BaseEpisode>, downloadManager: DownloadManager) = withContext(coroutineContext) {
-        clearAndPlayAllBlocking(episodes, downloadManager)
+    override suspend fun clearAndPlayAll(episodes: List<BaseEpisode>, downloadManager: DownloadManager, changeSource: UpNextChangeSource) = withContext(coroutineContext) {
+        clearAndPlayAllBlocking(episodes, downloadManager, changeSource)
     }
 
-    private fun clearAndPlayAllBlocking(episodes: List<BaseEpisode>, downloadManager: DownloadManager) {
-        changeList(episodes)
+    private fun clearAndPlayAllBlocking(episodes: List<BaseEpisode>, downloadManager: DownloadManager, source: UpNextChangeSource) {
+        changeList(episodes, source)
         episodes.forEach { episode ->
             downloadIfPossible(episode, downloadManager)
             if (episode.isFinished) {
@@ -252,8 +254,8 @@ class UpNextQueueImpl @Inject constructor(
         }
     }
 
-    private fun replaceAll(episodes: List<BaseEpisode>, downloadManager: DownloadManager) {
-        saveChangesBlocking(UpNextAction.ReplaceAll(episodes))
+    private fun replaceAll(episodes: List<BaseEpisode>, downloadManager: DownloadManager, source: UpNextChangeSource) {
+        saveChangesBlocking(action = UpNextAction.ReplaceAll(episodes), source = source)
         episodes.forEach { episode ->
             downloadIfPossible(episode, downloadManager)
             if (episode.isFinished) {
@@ -262,13 +264,13 @@ class UpNextQueueImpl @Inject constructor(
         }
     }
 
-    override suspend fun playLast(episode: BaseEpisode, downloadManager: DownloadManager, onAdd: (() -> Unit)?) {
+    override suspend fun playLast(episode: BaseEpisode, downloadManager: DownloadManager, changeSource: UpNextChangeSource, onAdd: (() -> Unit)?) {
         withContext(coroutineContext) {
-            playLastNowBlocking(episode, downloadManager, onAdd)
+            playLastNowBlocking(episode, downloadManager, changeSource, onAdd)
         }
     }
 
-    override suspend fun playAllLast(episodes: List<BaseEpisode>, downloadManager: DownloadManager) = withContext(coroutineContext) {
+    override suspend fun playAllLast(episodes: List<BaseEpisode>, downloadManager: DownloadManager, changeSource: UpNextChangeSource) = withContext(coroutineContext) {
         appDatabase.runInTransaction {
             val current = currentEpisode
             val queued = queueEpisodes
@@ -284,61 +286,61 @@ class UpNextQueueImpl @Inject constructor(
                 }
                 addAll(episodes)
             }
-            replaceAll(appendedEpisodes, downloadManager)
+            replaceAll(appendedEpisodes, downloadManager, changeSource)
         }
     }
 
-    private fun playLastNowBlocking(episode: BaseEpisode, downloadManager: DownloadManager, onAdd: (() -> Unit)?) {
-        saveChangesBlocking(UpNextAction.PlayLast(episode, onAdd))
+    private fun playLastNowBlocking(episode: BaseEpisode, downloadManager: DownloadManager, source: UpNextChangeSource, onAdd: (() -> Unit)?) {
+        saveChangesBlocking(action = UpNextAction.PlayLast(episode, onAdd), source = source)
         downloadIfPossible(episode, downloadManager)
         if (episode.isFinished) {
             episodeManager.markAsNotPlayedBlocking(episode)
         }
     }
 
-    override suspend fun removeEpisode(episode: BaseEpisode, shouldShuffleUpNext: Boolean) {
+    override suspend fun removeEpisode(episode: BaseEpisode, shouldShuffleUpNext: Boolean, changeSource: UpNextChangeSource) {
         if (contains(episode.uuid)) {
             if (shouldShuffleUpNext) {
-                saveChangesBlocking(UpNextAction.RemoveAndShuffle(episode))
+                saveChangesBlocking(action = UpNextAction.RemoveAndShuffle(episode), source = changeSource)
             } else {
-                saveChangesBlocking(UpNextAction.Remove(episode))
+                saveChangesBlocking(action = UpNextAction.Remove(episode), source = changeSource)
             }
         }
     }
 
-    override fun moveEpisode(from: Int, to: Int) {
+    override fun moveEpisode(from: Int, to: Int, changeSource: UpNextChangeSource) {
         val episodes = queueEpisodes.toMutableList()
         Collections.swap(episodes, from, to)
         currentEpisode?.let { episodes.add(0, it) }
-        saveChangesBlocking(UpNextAction.Rearrange(episodes))
+        saveChangesBlocking(action = UpNextAction.Rearrange(episodes), source = changeSource)
     }
 
-    override fun changeList(episodes: List<BaseEpisode>) {
+    override fun changeList(episodes: List<BaseEpisode>, changeSource: UpNextChangeSource) {
         val mutableEpisodes = episodes.toMutableList()
         currentEpisode?.let { mutableEpisodes.add(0, it) }
-        saveChangesBlocking(UpNextAction.Rearrange(mutableEpisodes))
+        saveChangesBlocking(action = UpNextAction.Rearrange(mutableEpisodes), source = changeSource)
     }
 
     /**
      * Removes only the episodes in the Up Next queue, not the playing episode.
      */
-    override fun clearUpNext() {
-        saveChangesBlocking(UpNextAction.ClearUpNext)
+    override fun clearUpNext(changeSource: UpNextChangeSource) {
+        saveChangesBlocking(action = UpNextAction.ClearUpNext, source = changeSource)
     }
 
     /**
      * Removes all episodes including the playing episode
      */
-    override fun removeAll() {
-        saveChangesBlocking(UpNextAction.ClearAll)
+    override fun removeAll(changeSource: UpNextChangeSource) {
+        saveChangesBlocking(action = UpNextAction.ClearAll, source = changeSource)
     }
 
     /**
      * Removes all episodes including the playing episode and any pending changes
      */
-    override suspend fun removeAllIncludingChanges() {
+    override suspend fun removeAllIncludingChanges(changeSource: UpNextChangeSource) {
         withContext(Dispatchers.IO) {
-            saveChangesBlocking(UpNextAction.ClearAllIncludingChanges)
+            saveChangesBlocking(action = UpNextAction.ClearAllIncludingChanges, source = changeSource)
         }
     }
 
@@ -348,7 +350,7 @@ class UpNextQueueImpl @Inject constructor(
         if (playbackManager.isPlaying() && playingEpisode != null) {
             val firstEpisode = episodes.firstOrNull()
             if (firstEpisode != null && firstEpisode.uuid == playingEpisode.uuid) {
-                saveChangesBlocking(UpNextAction.Import(episodes))
+                saveChangesBlocking(action = UpNextAction.Import(episodes), source = UpNextChangeSource.ServerImport)
 
                 episodes.forEach { downloadIfPossible(it, downloadManager) }
             } else {
@@ -356,19 +358,19 @@ class UpNextQueueImpl @Inject constructor(
                 val modifiedList = episodes.filterNot { it.uuid == playingEpisode.uuid }.toMutableList()
                 modifiedList.add(0, playingEpisode)
 
-                saveChangesBlocking(UpNextAction.Import(modifiedList))
+                saveChangesBlocking(action = UpNextAction.Import(modifiedList), source = UpNextChangeSource.ServerImport)
                 upNextChangeDao.savePlayNowBlocking(playingEpisode)
 
                 modifiedList.forEach { downloadIfPossible(it, downloadManager) }
             }
         } else {
-            saveChangesBlocking(UpNextAction.Import(episodes))
+            saveChangesBlocking(action = UpNextAction.Import(episodes), source = UpNextChangeSource.ServerImport)
 
             episodes.forEach { downloadIfPossible(it, downloadManager) }
         }
     }
 
-    override fun sortUpNext(sortType: UpNextSortType) {
+    override fun sortUpNext(sortType: UpNextSortType, changeSource: UpNextChangeSource) {
         launch {
             val episodes = withContext(Dispatchers.Default) {
                 buildList {
@@ -377,7 +379,7 @@ class UpNextQueueImpl @Inject constructor(
                 }
             }
             withContext(Dispatchers.IO) {
-                saveChangesBlocking(UpNextAction.Rearrange(episodes))
+                saveChangesBlocking(action = UpNextAction.Rearrange(episodes), source = changeSource)
             }
         }
     }
@@ -410,4 +412,8 @@ class UpNextQueueImpl @Inject constructor(
         }
         UpNextSyncWorker.enqueue(syncManager, application)
     }
+}
+
+private fun logEpisodeUuids(episodes: List<BaseEpisode>): String {
+    return if (episodes.size > 20) "20+" else episodes.joinToString { it.uuid }
 }

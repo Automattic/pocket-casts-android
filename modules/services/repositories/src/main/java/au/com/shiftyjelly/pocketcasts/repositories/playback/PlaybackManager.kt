@@ -282,7 +282,11 @@ open class PlaybackManager @Inject constructor(
         val autoPlayEpisode = autoSelectNextEpisode() ?: return null
 
         withContext(Dispatchers.Default) {
-            upNextQueue.playNextBlocking(autoPlayEpisode, downloadManager) {
+            upNextQueue.playNextBlocking(
+                episode = autoPlayEpisode,
+                downloadManager = downloadManager,
+                changeSource = UpNextChangeSource.AutoPlay,
+            ) {
                 launch {
                     loadCurrentEpisode(play = autoPlay, sourceView = SourceView.AUTO_PLAY)
                 }
@@ -434,6 +438,7 @@ open class PlaybackManager @Inject constructor(
         forceStream: Boolean = false,
         showedStreamWarning: Boolean = false,
         sourceView: SourceView = SourceView.UNKNOWN,
+        changeSource: UpNextChangeSource,
     ) {
         launch {
             playNowSuspend(
@@ -441,6 +446,7 @@ open class PlaybackManager @Inject constructor(
                 forceStream = forceStream,
                 showedStreamWarning = showedStreamWarning,
                 sourceView = sourceView,
+                changeSource = changeSource,
             )
         }
     }
@@ -450,9 +456,10 @@ open class PlaybackManager @Inject constructor(
         forceStream: Boolean = false,
         showedStreamWarning: Boolean = false,
         sourceView: SourceView = SourceView.UNKNOWN,
+        changeSource: UpNextChangeSource,
     ) {
         val episode = episodeManager.findEpisodeByUuid(episodeUuid) ?: return
-        playNowSuspend(episode, forceStream, showedStreamWarning, sourceView)
+        playNowSuspend(episode, forceStream, showedStreamWarning, sourceView, changeSource)
     }
 
     suspend fun playNowSuspend(
@@ -460,6 +467,7 @@ open class PlaybackManager @Inject constructor(
         forceStream: Boolean = false,
         showedStreamWarning: Boolean = false,
         sourceView: SourceView = SourceView.UNKNOWN,
+        changeSource: UpNextChangeSource,
     ) {
         forcePlayerSwitch = true
         playNowSync(
@@ -467,6 +475,7 @@ open class PlaybackManager @Inject constructor(
             forceStream = forceStream,
             showedStreamWarning = showedStreamWarning,
             sourceView = sourceView,
+            changeSource = changeSource,
         )
     }
 
@@ -475,6 +484,7 @@ open class PlaybackManager @Inject constructor(
         forceStream: Boolean = false,
         showedStreamWarning: Boolean = false,
         sourceView: SourceView = SourceView.UNKNOWN,
+        changeSource: UpNextChangeSource,
     ) {
         LogBuffer.i(LogBuffer.TAG_PLAYBACK, "Play now: ${episode.uuid} ${episode.title}")
 
@@ -495,6 +505,7 @@ open class PlaybackManager @Inject constructor(
             upNextQueue.playNow(
                 episode = episode,
                 automaticUpNextSource = autoPlaySource(sourceView, episode),
+                changeSource = changeSource,
                 onAdd = {
                     launch {
                         loadCurrentEpisode(
@@ -597,10 +608,11 @@ open class PlaybackManager @Inject constructor(
         episode: BaseEpisode,
         source: SourceView,
         userInitiated: Boolean = true,
+        changeSource: UpNextChangeSource,
     ) {
         when (upNextPosition) {
-            UpNextPosition.NEXT -> playNext(episode, source, userInitiated)
-            UpNextPosition.LAST -> playLast(episode, source, userInitiated)
+            UpNextPosition.NEXT -> playNext(episode = episode, source = source, userInitiated = userInitiated, changeSource = changeSource)
+            UpNextPosition.LAST -> playLast(episode = episode, source = source, userInitiated = userInitiated, changeSource = changeSource)
         }
     }
 
@@ -611,9 +623,10 @@ open class PlaybackManager @Inject constructor(
         episode: BaseEpisode,
         source: SourceView,
         userInitiated: Boolean = true,
+        changeSource: UpNextChangeSource,
     ) = withContext(Dispatchers.Default) {
         val wasEmpty: Boolean = upNextQueue.isEmpty
-        upNextQueue.playNextBlocking(episode, downloadManager, null)
+        upNextQueue.playNextBlocking(episode = episode, downloadManager = downloadManager, changeSource = changeSource, onAdd = null)
         if (userInitiated) {
             episodeAnalytics.trackEvent(AnalyticsEvent.EPISODE_ADDED_TO_UP_NEXT, source, true, episode)
             notificationManager.updateUserFeatureInteraction(OnboardingNotificationType.UpNext)
@@ -627,9 +640,10 @@ open class PlaybackManager @Inject constructor(
         episode: BaseEpisode,
         source: SourceView,
         userInitiated: Boolean = true,
+        changeSource: UpNextChangeSource,
     ) {
         val wasEmpty: Boolean = upNextQueue.isEmpty
-        upNextQueue.playLast(episode, downloadManager, null)
+        upNextQueue.playLast(episode = episode, downloadManager = downloadManager, changeSource = changeSource, onAdd = null)
         if (userInitiated) {
             episodeAnalytics.trackEvent(AnalyticsEvent.EPISODE_ADDED_TO_UP_NEXT, source, false, episode)
             notificationManager.updateUserFeatureInteraction(OnboardingNotificationType.UpNext)
@@ -654,7 +668,7 @@ open class PlaybackManager @Inject constructor(
         }
     }
 
-    suspend fun addEpisodes(episodes: List<Pair<AutoAddUpNext, PodcastEpisode>>) {
+    suspend fun addEpisodes(episodes: List<Pair<AutoAddUpNext, PodcastEpisode>>, changeSource: UpNextChangeSource) {
         val upNextLimit = settings.autoAddUpNextLimit.value
         episodes
             .filter { !upNextQueue.contains(it.second.uuid) }
@@ -663,55 +677,59 @@ open class PlaybackManager @Inject constructor(
                 if (upNextQueue.queueEpisodes.size < upNextLimit) {
                     when (it.first) {
                         AutoAddUpNext.OFF -> {}
-                        AutoAddUpNext.PLAY_LAST -> playLast(it.second, source = SourceView.UNKNOWN, userInitiated = false)
-                        AutoAddUpNext.PLAY_NEXT -> playNext(it.second, source = SourceView.UNKNOWN, userInitiated = false)
+                        AutoAddUpNext.PLAY_LAST -> playLast(it.second, source = SourceView.UNKNOWN, userInitiated = false, changeSource = changeSource)
+                        AutoAddUpNext.PLAY_NEXT -> playNext(it.second, source = SourceView.UNKNOWN, userInitiated = false, changeSource = changeSource)
                     }
                 } else if (upNextQueue.queueEpisodes.size >= upNextLimit &&
                     settings.autoAddUpNextLimitBehaviour.value == AutoAddUpNextLimitBehaviour.ONLY_ADD_TO_TOP &&
                     it.first == AutoAddUpNext.PLAY_NEXT
                 ) {
-                    playNext(it.second, source = SourceView.UNKNOWN, userInitiated = false)
+                    playNext(it.second, source = SourceView.UNKNOWN, userInitiated = false, changeSource = changeSource)
                     upNextQueue.queueEpisodes.lastOrNull()?.let { lastEpisode ->
-                        removeEpisode(lastEpisode, source = SourceView.UNKNOWN, userInitiated = false)
+                        removeEpisode(lastEpisode, source = SourceView.UNKNOWN, userInitiated = false, changeSource = changeSource)
                     }
                 }
             }
     }
 
-    fun playEpisodes(episodes: List<BaseEpisode>, sourceView: SourceView = SourceView.UNKNOWN) {
+    fun playEpisodes(episodes: List<BaseEpisode>, sourceView: SourceView = SourceView.UNKNOWN, changeSource: UpNextChangeSource) {
         if (episodes.isEmpty()) {
             return
         }
 
         launch {
             val topEpisode = episodes.first()
-            playNowSync(episode = topEpisode, sourceView = sourceView)
+            playNowSync(episode = topEpisode, sourceView = sourceView, changeSource = changeSource)
             if (episodes.size > 1) {
-                upNextQueue.clearAndPlayAll(episodes.slice(1 until min(episodes.size, settings.getMaxUpNextEpisodes())), downloadManager)
+                upNextQueue.clearAndPlayAll(
+                    episodes = episodes.slice(1 until min(episodes.size, settings.getMaxUpNextEpisodes())),
+                    downloadManager = downloadManager,
+                    changeSource = changeSource,
+                )
             }
         }
     }
 
-    fun playEpisodesLast(episodes: List<BaseEpisode>, source: SourceView) {
+    fun playEpisodesLast(episodes: List<BaseEpisode>, source: SourceView, changeSource: UpNextChangeSource) {
         if (episodes.isEmpty()) {
             return
         }
 
         launch {
             val wasEmpty = upNextQueue.isEmpty
-            addEpisodesLast(episodes, source)
+            addEpisodesLast(episodes = episodes, source = source, changeSource = changeSource)
             if (wasEmpty) {
                 loadCurrentEpisode(play = false)
             }
         }
     }
 
-    suspend fun addEpisodesLast(episodes: List<BaseEpisode>, source: SourceView) {
+    suspend fun addEpisodesLast(episodes: List<BaseEpisode>, source: SourceView, changeSource: UpNextChangeSource) {
         if (episodes.isEmpty()) {
             return
         }
         val currentEpisode = upNextQueue.currentEpisode?.uuid
-        upNextQueue.playAllLast(episodes.filter { it.uuid != currentEpisode }, downloadManager)
+        upNextQueue.playAllLast(episodes = episodes.filter { it.uuid != currentEpisode }, downloadManager = downloadManager, changeSource = changeSource)
         episodeAnalytics.trackBulkEvent(
             event = AnalyticsEvent.EPISODE_BULK_ADD_TO_UP_NEXT,
             count = episodes.size,
@@ -721,7 +739,7 @@ open class PlaybackManager @Inject constructor(
         notificationManager.updateUserFeatureInteraction(OnboardingNotificationType.UpNext)
     }
 
-    fun playEpisodesNext(episodes: List<BaseEpisode>, source: SourceView) {
+    fun playEpisodesNext(episodes: List<BaseEpisode>, source: SourceView, changeSource: UpNextChangeSource) {
         if (episodes.isEmpty()) {
             return
         }
@@ -729,7 +747,7 @@ open class PlaybackManager @Inject constructor(
         launch {
             val currentEpisode = upNextQueue.currentEpisode?.uuid
             val wasEmpty: Boolean = upNextQueue.isEmpty
-            upNextQueue.playAllNext(episodes.filter { it.uuid != currentEpisode }, downloadManager)
+            upNextQueue.playAllNext(episodes = episodes.filter { it.uuid != currentEpisode }, downloadManager = downloadManager, changeSource = changeSource)
             episodeAnalytics.trackBulkEvent(
                 event = AnalyticsEvent.EPISODE_BULK_ADD_TO_UP_NEXT,
                 count = episodes.size,
@@ -743,9 +761,9 @@ open class PlaybackManager @Inject constructor(
         }
     }
 
-    fun changeUpNext(episodes: List<BaseEpisode>) {
+    fun changeUpNext(episodes: List<BaseEpisode>, changeSource: UpNextChangeSource) {
         launch {
-            upNextQueue.changeList(episodes)
+            upNextQueue.changeList(episodes = episodes, changeSource = changeSource)
         }
     }
 
@@ -885,12 +903,12 @@ open class PlaybackManager @Inject constructor(
     /**
      * Remove the currently playing episode from the Up Next and load the next episode in the queue.
      */
-    fun playNextInQueue(sourceView: SourceView = SourceView.UNKNOWN) {
+    fun playNextInQueue(sourceView: SourceView = SourceView.UNKNOWN, changeSource: UpNextChangeSource) {
         val currentEpisode = upNextQueue.currentEpisode
         if (currentEpisode == null || upNextQueue.queueEpisodes.isEmpty()) {
             return
         }
-        removeEpisode(currentEpisode, sourceView)
+        removeEpisode(episodeToRemove = currentEpisode, source = sourceView, changeSource = changeSource)
     }
 
     fun skipForward(
@@ -1001,18 +1019,18 @@ open class PlaybackManager @Inject constructor(
         }
     }
 
-    fun clearUpNextAsync() {
+    fun clearUpNextAsync(changeSource: UpNextChangeSource) {
         launch {
             upNextHistoryManager.snapshotUpNext()
-            upNextQueue.clearUpNext()
+            upNextQueue.clearUpNext(changeSource)
         }
     }
 
-    fun endPlaybackAndClearUpNextAsync() {
+    fun endPlaybackAndClearUpNextAsync(changeSource: UpNextChangeSource) {
         launch {
             shutdown()
             upNextHistoryManager.snapshotUpNext()
-            upNextQueue.removeAll()
+            upNextQueue.removeAll(changeSource = changeSource)
         }
     }
 
@@ -1037,7 +1055,7 @@ open class PlaybackManager @Inject constructor(
     }
 
     private val removeMutex = Mutex()
-    fun removeEpisode(episodeToRemove: BaseEpisode?, source: SourceView, userInitiated: Boolean = true, shouldShuffleUpNext: Boolean = false) {
+    fun removeEpisode(episodeToRemove: BaseEpisode?, source: SourceView, userInitiated: Boolean = true, shouldShuffleUpNext: Boolean = false, changeSource: UpNextChangeSource) {
         launch {
             if (episodeToRemove == null) {
                 return@launch
@@ -1059,7 +1077,7 @@ open class PlaybackManager @Inject constructor(
                     }
                 }
 
-                upNextQueue.removeEpisode(episodeToRemove, shouldShuffleUpNext)
+                upNextQueue.removeEpisode(episode = episodeToRemove, shouldShuffleUpNext = shouldShuffleUpNext, changeSource = changeSource)
                 if (userInitiated) {
                     episodeAnalytics.trackEvent(AnalyticsEvent.EPISODE_REMOVED_FROM_UP_NEXT, source, episodeToRemove.uuid)
                 }
@@ -1078,7 +1096,7 @@ open class PlaybackManager @Inject constructor(
         if (player?.isRemote == true && player?.isPlaying() == false) {
             if (castManager.isPlaying()) {
                 Timber.d("Playing remote episode %s", episode.title)
-                playNowSync(episode)
+                playNowSync(episode = episode, changeSource = UpNextChangeSource.ChromecastEventPlay)
             } else {
                 loadCurrentEpisode(play = false)
             }
@@ -1310,7 +1328,7 @@ open class PlaybackManager @Inject constructor(
             )
 
             // remove from Up Next
-            upNextQueue.removeEpisode(episode, shouldShuffleUpNext = settings.upNextShuffle.value)
+            upNextQueue.removeEpisode(episode, shouldShuffleUpNext = settings.upNextShuffle.value, changeSource = UpNextChangeSource.EpisodeCompleted)
 
             // stop the downloads
             episodeManager.updateAutoDownloadStatus(episode, PodcastEpisode.AUTO_DOWNLOAD_STATUS_IGNORE)
@@ -1321,7 +1339,7 @@ open class PlaybackManager @Inject constructor(
 
             // auto archive after playing
             if (episode is PodcastEpisode) {
-                episodeManager.archivePlayedEpisode(episode, this, podcastManager, sync = true)
+                episodeManager.archivePlayedEpisode(episode, this, podcastManager, sync = true, changeSource = UpNextChangeSource.EpisodeCompleted)
             } else if (episode is UserEpisode) {
                 userEpisodeManager.deletePlayedEpisodeIfReq(episode, this)
             }
@@ -1715,7 +1733,7 @@ open class PlaybackManager @Inject constructor(
                         episode.downloadUrl = newDownloadUrl
                     } catch (e: Exception) {
                         onPlayerError(PlayerEvent.PlayerError("Could not load cloud file ${e.message}"))
-                        removeEpisode(episode, source = sourceView)
+                        removeEpisode(episode, source = sourceView, changeSource = UpNextChangeSource.UserEpisodePlaybackFailed)
                         return
                     }
                 }
@@ -2155,7 +2173,7 @@ open class PlaybackManager @Inject constructor(
             if (timeRemaining < skipLast) {
                 if (isSleepAfterEpisodeEnabled()) {
                     sleepEndOfEpisode(episode)
-                    episodeManager.markAsPlayedBlocking(episode, this, podcastManager)
+                    episodeManager.markAsPlayedBlocking(episode, this, podcastManager, changeSource = UpNextChangeSource.SleepTimerEnd)
                 } else {
                     analyticsTracker.track(
                         AnalyticsEvent.PLAYER_EPISODE_COMPLETED,
@@ -2165,7 +2183,7 @@ open class PlaybackManager @Inject constructor(
                         ),
                     )
                     statsManager.addTimeSavedAutoSkipping(timeRemaining.toLong() * 1000L)
-                    episodeManager.markAsPlayedBlocking(episode, this, podcastManager)
+                    episodeManager.markAsPlayedBlocking(episode, this, podcastManager, changeSource = UpNextChangeSource.SkipLast)
                     LogBuffer.i(LogBuffer.TAG_PLAYBACK, "Skipping remainder of ${episode.title} with skip last $skipLast")
                     showToast(application.getString(LR.string.player_skipped_last, skipLast))
                 }

@@ -7,6 +7,7 @@ import androidx.glance.action.actionParametersOf
 import androidx.glance.appwidget.action.ActionCallback
 import androidx.glance.appwidget.action.actionRunCallback
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
+import au.com.shiftyjelly.pocketcasts.repositories.playback.UpNextChangeSource
 import au.com.shiftyjelly.pocketcasts.widget.di.widgetEntryPoint
 import timber.log.Timber
 
@@ -19,7 +20,7 @@ internal class PlayEpisodeAction : ActionCallback {
             val episodeId = requireNotNull(parameters[EpisodeIdKey]) {
                 "Missing episode id"
             }
-            playbackManager.playNowSuspend(episodeUuid = episodeId, sourceView = sourceView)
+            playbackManager.playNowSuspend(episodeUuid = episodeId, sourceView = sourceView, changeSource = UpNextChangeSource.Widget)
         } catch (e: Throwable) {
             Timber.e(e, "Failed to play episode")
         }

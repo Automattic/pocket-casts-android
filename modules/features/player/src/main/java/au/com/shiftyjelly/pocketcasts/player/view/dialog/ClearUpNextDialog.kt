@@ -6,7 +6,8 @@ import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsEvent
 import au.com.shiftyjelly.pocketcasts.analytics.AnalyticsTracker
 import au.com.shiftyjelly.pocketcasts.player.R
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
-import au.com.shiftyjelly.pocketcasts.repositories.playback.UpNextSource
+import au.com.shiftyjelly.pocketcasts.repositories.playback.UpNextChangeSource
+import au.com.shiftyjelly.pocketcasts.repositories.playback.UpNextPageSource
 import au.com.shiftyjelly.pocketcasts.views.dialog.ConfirmationDialog
 import dagger.hilt.android.AndroidEntryPoint
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
@@ -16,7 +17,7 @@ import au.com.shiftyjelly.pocketcasts.localization.R as LR
  */
 @AndroidEntryPoint
 class ClearUpNextDialog(
-    private val source: UpNextSource = UpNextSource.UNKNOWN,
+    private val source: UpNextPageSource = UpNextPageSource.Unknown,
     private val removeNowPlaying: Boolean,
     private val playbackManager: PlaybackManager,
     private val analyticsTracker: AnalyticsTracker,
@@ -35,9 +36,9 @@ class ClearUpNextDialog(
     private fun clear() {
         analyticsTracker.track(AnalyticsEvent.UP_NEXT_QUEUE_CLEARED, mapOf(SOURCE_KEY to source.analyticsValue))
         if (removeNowPlaying) {
-            playbackManager.endPlaybackAndClearUpNextAsync()
+            playbackManager.endPlaybackAndClearUpNextAsync(changeSource = UpNextChangeSource.ClearUpNextDialog)
         } else {
-            playbackManager.clearUpNextAsync()
+            playbackManager.clearUpNextAsync(changeSource = UpNextChangeSource.ClearUpNextDialog)
         }
     }
 

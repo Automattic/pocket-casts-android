@@ -15,6 +15,7 @@ import au.com.shiftyjelly.pocketcasts.repositories.download.DownloadManager
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlayAllHandler
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlayAllResponse
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
+import au.com.shiftyjelly.pocketcasts.repositories.playback.UpNextChangeSource
 import au.com.shiftyjelly.pocketcasts.repositories.playlist.Playlist
 import au.com.shiftyjelly.pocketcasts.repositories.playlist.PlaylistManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
@@ -203,7 +204,7 @@ class PlaylistViewModel @AssistedInject constructor(
                 .orEmpty()
 
             if (episodes.isNotEmpty()) {
-                episodeManager.archiveAllInList(episodes, playbackManager)
+                episodeManager.archiveAllInList(episodes, playbackManager, changeSource = UpNextChangeSource.Playlist)
             }
         }
     }

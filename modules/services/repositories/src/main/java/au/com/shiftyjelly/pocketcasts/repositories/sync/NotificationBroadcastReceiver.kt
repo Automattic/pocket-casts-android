@@ -12,6 +12,7 @@ import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.download.DownloadHelper
 import au.com.shiftyjelly.pocketcasts.repositories.download.DownloadManager
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
+import au.com.shiftyjelly.pocketcasts.repositories.playback.UpNextChangeSource
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
 import dagger.hilt.android.AndroidEntryPoint
@@ -110,6 +111,7 @@ class NotificationBroadcastReceiver :
                     showedStreamWarning = showedStreamWarning,
                     forceStream = forceStream,
                     sourceView = source,
+                    changeSource = UpNextChangeSource.Notification,
                 )
             }
         }
@@ -126,7 +128,7 @@ class NotificationBroadcastReceiver :
     private fun markAsPlayed(episodeUuid: String) {
         launch {
             episodeManager.findEpisodeByUuid(episodeUuid)?.let { episode ->
-                episodeManager.markAsPlayedBlocking(episode, playbackManager, podcastManager)
+                episodeManager.markAsPlayedBlocking(episode = episode, playbackManager = playbackManager, podcastManager = podcastManager, changeSource = UpNextChangeSource.Notification)
                 episodeAnalytics.trackEvent(AnalyticsEvent.EPISODE_MARKED_AS_PLAYED, source, episodeUuid)
             }
         }
@@ -135,7 +137,7 @@ class NotificationBroadcastReceiver :
     private fun archiveEpisode(episodeUuid: String) {
         launch {
             episodeManager.findByUuid(episodeUuid)?.let { episode ->
-                episodeManager.archiveBlocking(episode, playbackManager, true)
+                episodeManager.archiveBlocking(episode = episode, playbackManager = playbackManager, sync = true, changeSource = UpNextChangeSource.Notification)
                 episodeAnalytics.trackEvent(AnalyticsEvent.EPISODE_ARCHIVED, source, episodeUuid)
             }
         }
@@ -144,7 +146,7 @@ class NotificationBroadcastReceiver :
     private fun playNext(episodeUuid: String) {
         launch {
             episodeManager.findEpisodeByUuid(episodeUuid)?.let { episode ->
-                playbackManager.playNext(episode = episode, source = source)
+                playbackManager.playNext(episode = episode, source = source, changeSource = UpNextChangeSource.Notification)
             }
         }
     }
@@ -152,9 +154,9 @@ class NotificationBroadcastReceiver :
     private fun playLast(episodeUuid: String, playNext: Boolean) {
         launch {
             episodeManager.findEpisodeByUuid(episodeUuid)?.let { episode ->
-                playbackManager.playLast(episode = episode, source = source)
+                playbackManager.playLast(episode = episode, source = source, changeSource = UpNextChangeSource.Notification)
                 if (playNext) {
-                    playbackManager.playNextInQueue(sourceView = source)
+                    playbackManager.playNextInQueue(sourceView = source, changeSource = UpNextChangeSource.Notification)
                 }
             }
         }
@@ -167,10 +169,10 @@ class NotificationBroadcastReceiver :
                 val downloadedEpisode = playbackManager.upNextQueue.queueEpisodes[downloadedIndex]
                 val undownloadedEpisodes = playbackManager.upNextQueue.queueEpisodes.subList(0, downloadedIndex)
                 playbackManager.upNextQueue.currentEpisode?.let {
-                    playbackManager.playEpisodesLast(episodes = listOf(it) + undownloadedEpisodes, source = source)
+                    playbackManager.playEpisodesLast(episodes = listOf(it) + undownloadedEpisodes, source = source, changeSource = UpNextChangeSource.Notification)
                 }
 
-                playbackManager.playNow(downloadedEpisode)
+                playbackManager.playNow(episode = downloadedEpisode, changeSource = UpNextChangeSource.Notification)
             }
         }
     }

@@ -36,7 +36,7 @@ import au.com.shiftyjelly.pocketcasts.repositories.extensions.getSummaryText
 import au.com.shiftyjelly.pocketcasts.repositories.images.PocketCastsImageRequestFactory
 import au.com.shiftyjelly.pocketcasts.repositories.images.loadInto
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
-import au.com.shiftyjelly.pocketcasts.repositories.playback.UpNextSource
+import au.com.shiftyjelly.pocketcasts.repositories.playback.UpNextPageSource
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
 import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingFlow
 import au.com.shiftyjelly.pocketcasts.settings.onboarding.OnboardingLauncher
@@ -69,7 +69,7 @@ class UpNextAdapter(
     val multiSelectHelper: MultiSelectEpisodesHelper,
     val fragmentManager: FragmentManager,
     private val analyticsTracker: AnalyticsTracker,
-    private val upNextSource: UpNextSource,
+    private val upNextPageSource: UpNextPageSource,
     private val settings: Settings,
     private val playbackManager: PlaybackManager,
     private val swipeRowActionsFactory: SwipeRowActions.Factory,
@@ -238,7 +238,7 @@ class UpNextAdapter(
                 shuffle.setOnClickListener {
                     if (isSignedInAsPaidUser) {
                         val newValue = !settings.upNextShuffle.value
-                        analyticsTracker.track(AnalyticsEvent.UP_NEXT_SHUFFLE_ENABLED, mapOf("value" to newValue, SOURCE_KEY to upNextSource.analyticsValue))
+                        analyticsTracker.track(AnalyticsEvent.UP_NEXT_SHUFFLE_ENABLED, mapOf("value" to newValue, SOURCE_KEY to upNextPageSource.analyticsValue))
 
                         if (newValue) {
                             (root.context.getActivity() as? FragmentHostListener)?.snackBarView()?.let { snackBarView ->
@@ -346,7 +346,7 @@ class UpNextAdapter(
 
     private fun trackUpNextEvent(event: AnalyticsEvent, props: Map<String, Any> = emptyMap()) {
         val properties = HashMap<String, Any>()
-        properties[SOURCE_KEY] = upNextSource.analyticsValue
+        properties[SOURCE_KEY] = upNextPageSource.analyticsValue
         properties.putAll(props)
         analyticsTracker.track(event, properties)
     }

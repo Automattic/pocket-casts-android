@@ -10,6 +10,7 @@ import au.com.shiftyjelly.pocketcasts.preferences.model.ArtworkConfiguration.Ele
 import au.com.shiftyjelly.pocketcasts.repositories.di.IoDispatcher
 import au.com.shiftyjelly.pocketcasts.repositories.history.upnext.UpNextHistoryManager
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
+import au.com.shiftyjelly.pocketcasts.repositories.playback.UpNextChangeSource
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
 import au.com.shiftyjelly.pocketcasts.settings.history.HistoryFragment.HistoryNavRoutes.UP_NEXT_HISTORY_DATE_ARGUMENT
 import au.com.shiftyjelly.pocketcasts.utils.log.LogBuffer
@@ -69,7 +70,7 @@ class UpNextHistoryDetailsViewModel @Inject constructor(
         viewModelScope.launch(ioDispatcher) {
             try {
                 val currentState = _state.value as? UiState.Loaded ?: return@launch
-                playbackManager.playEpisodesLast(currentState.episodes, SourceView.UP_NEXT_HISTORY)
+                playbackManager.playEpisodesLast(currentState.episodes, SourceView.UP_NEXT_HISTORY, changeSource = UpNextChangeSource.RestoreHistory)
             } catch (e: Exception) {
                 val message = "Failed to restore up next for date: $date"
                 Timber.e(e, message)

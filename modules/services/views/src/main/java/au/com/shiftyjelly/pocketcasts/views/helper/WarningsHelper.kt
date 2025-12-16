@@ -14,6 +14,7 @@ import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.di.ApplicationScope
 import au.com.shiftyjelly.pocketcasts.repositories.download.DownloadManager
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
+import au.com.shiftyjelly.pocketcasts.repositories.playback.UpNextChangeSource
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.UserEpisodeManager
 import au.com.shiftyjelly.pocketcasts.ui.helper.FragmentHostListener
@@ -23,7 +24,7 @@ import au.com.shiftyjelly.pocketcasts.views.dialog.ConfirmationDialog
 import au.com.shiftyjelly.pocketcasts.views.fragments.BatteryRestrictionsSettingsFragment
 import com.google.android.material.snackbar.Snackbar
 import dagger.hilt.android.qualifiers.ActivityContext
-import java.util.*
+import java.util.Locale
 import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
@@ -54,6 +55,7 @@ class WarningsHelper @Inject constructor(
                     forceStream = true,
                     showedStreamWarning = true,
                     sourceView = sourceView,
+                    changeSource = UpNextChangeSource.WarningPlayButton,
                 )
                 showBatteryWarningSnackbarIfAppropriate(snackbarParentView)
             }

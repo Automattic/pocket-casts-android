@@ -26,6 +26,7 @@ import au.com.shiftyjelly.pocketcasts.preferences.model.BookmarksSortTypeForProf
 import au.com.shiftyjelly.pocketcasts.repositories.bookmark.BookmarkManager
 import au.com.shiftyjelly.pocketcasts.repositories.di.IoDispatcher
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
+import au.com.shiftyjelly.pocketcasts.repositories.playback.UpNextChangeSource
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
 import au.com.shiftyjelly.pocketcasts.ui.theme.Theme
@@ -296,7 +297,7 @@ class BookmarksViewModel
                 val shouldLoadOrSwitchEpisode = !playbackManager.isPlaying() ||
                     playbackManager.getCurrentEpisode()?.uuid != bookmarkEpisode.uuid
                 if (shouldLoadOrSwitchEpisode) {
-                    playbackManager.playNowSync(it, sourceView = sourceView)
+                    playbackManager.playNowSync(it, sourceView = sourceView, changeSource = UpNextChangeSource.BookmarkPlayButton)
                 }
             } ?: run {
                 _message.emit(BookmarkMessage.BookmarkEpisodeNotFound)

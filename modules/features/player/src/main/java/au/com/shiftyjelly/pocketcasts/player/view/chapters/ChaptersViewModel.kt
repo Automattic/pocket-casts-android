@@ -14,6 +14,7 @@ import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.di.IoDispatcher
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackState
+import au.com.shiftyjelly.pocketcasts.repositories.playback.UpNextChangeSource
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.ChapterManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
 import dagger.assisted.Assisted
@@ -92,7 +93,7 @@ class ChaptersViewModel @AssistedInject constructor(
                 playbackState.episodeUuid == episodeId -> {
                     playbackManager.skipToChapter(chapter)
                     if (!playbackState.isPlaying) {
-                        playbackManager.playNowSuspend(episodeId)
+                        playbackManager.playNowSuspend(episodeId, changeSource = UpNextChangeSource.Chapter)
                     }
                 }
 
@@ -100,7 +101,7 @@ class ChaptersViewModel @AssistedInject constructor(
                     val episode = episodeManager.findEpisodeByUuid(episodeId) ?: return@launch
                     episode.playedUpToMs = chapter.startTime.inWholeMilliseconds.toInt()
                     episodeManager.updatePlayedUpToBlocking(episode, chapter.startTime.inWholeSeconds.toDouble(), forceUpdate = true)
-                    playbackManager.playNowSuspend(episode)
+                    playbackManager.playNowSuspend(episode, changeSource = UpNextChangeSource.Chapter)
                 }
             }
         }

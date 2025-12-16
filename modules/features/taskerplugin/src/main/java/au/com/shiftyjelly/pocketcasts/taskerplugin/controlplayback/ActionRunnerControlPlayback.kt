@@ -4,6 +4,7 @@ import android.content.Context
 import au.com.shiftyjelly.pocketcasts.analytics.SourceView
 import au.com.shiftyjelly.pocketcasts.localization.R
 import au.com.shiftyjelly.pocketcasts.models.to.PlaybackEffects
+import au.com.shiftyjelly.pocketcasts.repositories.playback.UpNextChangeSource
 import au.com.shiftyjelly.pocketcasts.taskerplugin.base.hilt.playbackManager
 import au.com.shiftyjelly.pocketcasts.taskerplugin.base.hilt.podcastManager
 import au.com.shiftyjelly.pocketcasts.taskerplugin.base.hilt.settings
@@ -55,9 +56,7 @@ class ActionRunnerControlPlayback : TaskerPluginRunnerActionNoOutput<InputContro
                 }
             }
 
-            InputControlPlayback.PlaybackCommand.PlayNextInQueue -> playbackManager.playNextInQueue(
-                SourceView.TASKER,
-            )
+            InputControlPlayback.PlaybackCommand.PlayNextInQueue -> playbackManager.playNextInQueue(sourceView = SourceView.TASKER, changeSource = UpNextChangeSource.Tasker)
 
             InputControlPlayback.PlaybackCommand.SetPlaybackSpeed -> {
                 val speed = input.regular.playbackSpeed?.toDoubleOrNull() ?: return TaskerPluginResultError(ERROR_INVALID_PLAYBACK_SPEED_PROVIDED, context.getString(R.string.playback_speed_not_valid, input.regular.playbackSpeed))

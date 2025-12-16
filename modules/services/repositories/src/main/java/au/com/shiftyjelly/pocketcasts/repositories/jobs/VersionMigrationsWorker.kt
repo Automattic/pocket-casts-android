@@ -23,6 +23,7 @@ import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.preferences.model.ArtworkConfiguration
 import au.com.shiftyjelly.pocketcasts.repositories.file.FileStorage
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
+import au.com.shiftyjelly.pocketcasts.repositories.playback.UpNextChangeSource
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.EpisodeManager
 import au.com.shiftyjelly.pocketcasts.repositories.podcast.PodcastManager
 import au.com.shiftyjelly.pocketcasts.utils.FileUtil
@@ -268,6 +269,7 @@ class VersionMigrationsWorker @AssistedInject constructor(
                 episodeToRemove = episode,
                 source = SourceView.UNKNOWN,
                 userInitiated = false,
+                changeSource = UpNextChangeSource.VersionMigrations,
             )
             appDatabase.episodeDao().deleteBlocking(episode)
         }

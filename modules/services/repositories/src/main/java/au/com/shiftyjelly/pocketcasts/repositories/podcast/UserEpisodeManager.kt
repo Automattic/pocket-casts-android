@@ -21,6 +21,7 @@ import au.com.shiftyjelly.pocketcasts.preferences.Settings
 import au.com.shiftyjelly.pocketcasts.repositories.download.DownloadManager
 import au.com.shiftyjelly.pocketcasts.repositories.download.task.UploadEpisodeTask
 import au.com.shiftyjelly.pocketcasts.repositories.playback.PlaybackManager
+import au.com.shiftyjelly.pocketcasts.repositories.playback.UpNextChangeSource
 import au.com.shiftyjelly.pocketcasts.repositories.sync.SyncManager
 import au.com.shiftyjelly.pocketcasts.servers.sync.FileAccount
 import au.com.shiftyjelly.pocketcasts.servers.sync.FilePost
@@ -51,7 +52,6 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.mapNotNull
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -185,7 +185,7 @@ class UserEpisodeManagerImpl @Inject constructor(
         userEpisodeDao.insert(episode)
 
         if (settings.cloudAddToUpNext.value) {
-            playbackManager.playLast(episode = episode, source = SourceView.FILES)
+            playbackManager.playLast(episode = episode, source = SourceView.FILES, changeSource = UpNextChangeSource.UserEpisode)
         }
     }
 
@@ -195,7 +195,7 @@ class UserEpisodeManagerImpl @Inject constructor(
 
     override suspend fun delete(episode: UserEpisode, playbackManager: PlaybackManager) {
         deleteFilesForEpisode(episode)
-        playbackManager.removeEpisode(episodeToRemove = episode, source = SourceView.FILES, userInitiated = false)
+        playbackManager.removeEpisode(episodeToRemove = episode, source = SourceView.FILES, userInitiated = false, changeSource = UpNextChangeSource.UserEpisode)
         cancelUpload(episode)
         userEpisodeDao.delete(episode)
     }
@@ -209,7 +209,7 @@ class UserEpisodeManagerImpl @Inject constructor(
 
     override suspend fun deleteAll(episodes: List<UserEpisode>, playbackManager: PlaybackManager) {
         episodes.forEach {
-            playbackManager.removeEpisode(episodeToRemove = it, source = SourceView.FILES, userInitiated = false)
+            playbackManager.removeEpisode(episodeToRemove = it, source = SourceView.FILES, userInitiated = false, changeSource = UpNextChangeSource.UserEpisode)
         }
         userEpisodeDao.deleteAll(episodes)
     }
@@ -407,7 +407,7 @@ class UserEpisodeManagerImpl @Inject constructor(
                 if (!episode.isDownloaded) {
                     // Remove file not found on server only if it is not added to up-next to prevent it from being removed from up-next (Github Issue#356)
                     if (!upNextDao.containsEpisodeBlocking(episode.uuid)) {
-                        playbackManager.removeEpisode(episode, source = SourceView.UNKNOWN, userInitiated = false)
+                        playbackManager.removeEpisode(episode, source = SourceView.UNKNOWN, userInitiated = false, changeSource = UpNextChangeSource.UserEpisode)
                         userEpisodeDao.delete(episode)
                     }
                 } else {
@@ -604,7 +604,7 @@ class UserEpisodeManagerImpl @Inject constructor(
     }
 
     override suspend fun markAsPlayed(episode: UserEpisode, playbackManager: PlaybackManager) {
-        playbackManager.removeEpisode(episode, source = SourceView.UNKNOWN, userInitiated = false)
+        playbackManager.removeEpisode(episode, source = SourceView.UNKNOWN, userInitiated = false, changeSource = UpNextChangeSource.UserEpisode)
         deletePlayedEpisodeIfReq(episode, playbackManager)
     }
 
