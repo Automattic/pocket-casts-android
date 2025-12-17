@@ -5,6 +5,8 @@
 8.2
 -----
 *   Bug Fixes
+    *   Fix notifications choose podcasts obscuring the mini player
+        ([#4861](https://github.com/Automattic/pocket-casts-android/pull/4861))
     *   Fix Android 10 full screen player appearing under the status and navigation bars
         ([#4804](https://github.com/Automattic/pocket-casts-android/pull/4804))
     *   Fix the mini player Up Next count overflow
