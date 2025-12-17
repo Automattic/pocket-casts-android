@@ -21,18 +21,23 @@ import com.jakewharton.rxrelay2.BehaviorRelay
 import com.jakewharton.rxrelay2.Relay
 import dagger.hilt.android.qualifiers.ApplicationContext
 import io.reactivex.Observable
-import io.reactivex.disposables.CompositeDisposable
-import io.reactivex.rxkotlin.addTo
-import io.reactivex.rxkotlin.subscribeBy
-import io.reactivex.schedulers.Schedulers
 import java.util.Collections
-import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 import kotlin.coroutines.CoroutineContext
 import kotlin.random.Random
+import kotlin.time.Duration.Companion.milliseconds
+import kotlin.time.Duration.Companion.seconds
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.FlowPreview
+import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.debounce
+import kotlinx.coroutines.flow.filterNot
+import kotlinx.coroutines.flow.flowOn
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.rx2.asFlow
 import kotlinx.coroutines.withContext
 import timber.log.Timber
 
@@ -45,9 +50,16 @@ class UpNextQueueImpl @Inject constructor(
 ) : UpNextQueue,
     CoroutineScope {
 
+    companion object {
+        private val CHANGE_GRACE_PERIOD = 5.seconds
+        private val INTERACTION_GRACE_PERIOD = 10.seconds
+    }
+
     private val upNextDao = appDatabase.upNextDao()
     private val upNextChangeDao = appDatabase.upNextChangeDao()
     private val podcastDao = appDatabase.podcastDao()
+    private var lastUserInteractionTime: Long = 0
+
     override val coroutineContext: CoroutineContext
         get() = Dispatchers.Default
 
@@ -56,8 +68,6 @@ class UpNextQueueImpl @Inject constructor(
         relay.accept(UpNextQueue.State.Empty)
         return@lazy relay
     }
-
-    private val disposables = CompositeDisposable()
 
     override val currentEpisode: BaseEpisode?
         get() = (changesObservable.blockingFirst() as? UpNextQueue.State.Loaded)?.episode
@@ -82,17 +92,20 @@ class UpNextQueueImpl @Inject constructor(
         object ClearUpNext : UpNextAction(null)
     }
 
+    @OptIn(FlowPreview::class)
     override fun setupBlocking() {
         val initState = updateStateBlocking()
         updateCurrentEpisodeState(initState)
 
-        // listen for user changes and send to server
-        changesObservable.observeOn(Schedulers.io())
-            // send server changes in bulk
-            .debounce(5, TimeUnit.SECONDS)
-            .doOnNext { sendToServerBlocking() }
-            .subscribeBy(onError = { Timber.e(it) })
-            .addTo(disposables)
+        // Sync Up Next changes to server after 5 seconds of inactivity.
+        // Skips sync during user interactions such as dragging to rearrange.
+        changesObservable.asFlow()
+            .debounce(CHANGE_GRACE_PERIOD)
+            .filterNot { recentUserInteraction() }
+            .onEach { sendToServer() }
+            .catch { error -> Timber.e(error) }
+            .flowOn(Dispatchers.IO)
+            .launchIn(this)
     }
 
     private fun updateStateBlocking(shouldShuffleUpNext: Boolean = false): UpNextQueue.State {
@@ -319,6 +332,10 @@ class UpNextQueueImpl @Inject constructor(
         saveChangesBlocking(UpNextAction.Rearrange(mutableEpisodes))
     }
 
+    override fun recordUpNextUserInteraction() {
+        lastUserInteractionTime = System.currentTimeMillis()
+    }
+
     /**
      * Removes only the episodes in the Up Next queue, not the playing episode.
      */
@@ -403,8 +420,18 @@ class UpNextQueueImpl @Inject constructor(
         }
     }
 
-    private fun sendToServerBlocking() {
-        val changes: List<UpNextChange> = upNextChangeDao.findAllBlocking()
+    fun recentUserInteraction(): Boolean {
+        val now = System.currentTimeMillis()
+        val timeSinceInteraction = (now - lastUserInteractionTime).milliseconds
+        val recentInteraction = timeSinceInteraction < INTERACTION_GRACE_PERIOD
+        if (recentInteraction) {
+            Timber.i("Skipping sync - user interacted ${timeSinceInteraction.inWholeSeconds} secs ago")
+        }
+        return recentInteraction
+    }
+
+    private suspend fun sendToServer() {
+        val changes: List<UpNextChange> = upNextChangeDao.findAll()
         if (changes.isEmpty()) {
             return
         }

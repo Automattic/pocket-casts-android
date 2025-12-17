@@ -43,6 +43,7 @@ interface UpNextQueue {
     fun changeList(episodes: List<BaseEpisode>)
     fun clearUpNext()
     fun removeAll()
+    fun recordUpNextUserInteraction()
     suspend fun removeAllIncludingChanges()
     suspend fun importServerChangesBlocking(episodes: List<BaseEpisode>, playbackManager: PlaybackManager, downloadManager: DownloadManager)
     fun contains(uuid: String): Boolean

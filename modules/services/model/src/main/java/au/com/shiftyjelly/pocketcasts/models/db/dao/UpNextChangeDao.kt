@@ -12,7 +12,7 @@ import au.com.shiftyjelly.pocketcasts.models.entity.UpNextChange
 abstract class UpNextChangeDao {
 
     @Query("SELECT * FROM up_next_changes")
-    abstract fun findAllBlocking(): List<UpNextChange>
+    abstract suspend fun findAll(): List<UpNextChange>
 
     @Query("DELETE FROM up_next_changes WHERE modified <= :modified")
     abstract suspend fun deleteChangesOlderOrEqualTo(modified: Long)

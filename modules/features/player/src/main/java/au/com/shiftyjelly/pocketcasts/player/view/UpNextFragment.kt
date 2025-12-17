@@ -483,6 +483,8 @@ class UpNextFragment :
     }
 
     override fun onUpNextEpisodeMove(fromPosition: Int, toPosition: Int) {
+        playerViewModel.recordUpNextUserInteraction()
+
         if (userRearrangingFrom == null) {
             userRearrangingFrom = fromPosition
         } else if (userRearrangingFrom != fromPosition) {

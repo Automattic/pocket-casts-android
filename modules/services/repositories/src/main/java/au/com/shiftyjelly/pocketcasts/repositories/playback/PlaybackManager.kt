@@ -749,6 +749,10 @@ open class PlaybackManager @Inject constructor(
         }
     }
 
+    fun recordUpNextUserInteraction() {
+        upNextQueue.recordUpNextUserInteraction()
+    }
+
     fun pause(transientLoss: Boolean = false, sourceView: SourceView = SourceView.UNKNOWN) {
         launch {
             pauseSuspend(transientLoss, sourceView)
