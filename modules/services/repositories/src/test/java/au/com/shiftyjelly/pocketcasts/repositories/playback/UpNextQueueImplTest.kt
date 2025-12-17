@@ -44,7 +44,7 @@ class UpNextQueueImplTest {
     }
 
     @Test
-    fun `recentUserInteraction returns true when exactly at grace period boundary`() {
+    fun `recentUserInteraction returns false when exactly at grace period boundary`() {
         upNextQueue.setLastUserInteractionTimeForTesting(1_000L)
         // checking exactly 10 seconds later (exactly at grace period)
         assertFalse(upNextQueue.recentUserInteraction(now = 1_000L + 10_000L))

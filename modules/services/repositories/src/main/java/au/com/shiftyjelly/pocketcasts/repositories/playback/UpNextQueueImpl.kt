@@ -58,7 +58,8 @@ class UpNextQueueImpl @Inject constructor(
     private val upNextDao = appDatabase.upNextDao()
     private val upNextChangeDao = appDatabase.upNextChangeDao()
     private val podcastDao = appDatabase.podcastDao()
-    private var lastUserInteractionTime: Long = 0
+
+    @Volatile private var lastUserInteractionTime: Long = 0
 
     override val coroutineContext: CoroutineContext
         get() = Dispatchers.Default
