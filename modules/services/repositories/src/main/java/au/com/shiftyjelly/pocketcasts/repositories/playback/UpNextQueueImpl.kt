@@ -336,6 +336,10 @@ class UpNextQueueImpl @Inject constructor(
         lastUserInteractionTime = System.currentTimeMillis()
     }
 
+    internal fun setLastUserInteractionTimeForTesting(time: Long) {
+        lastUserInteractionTime = time
+    }
+
     /**
      * Removes only the episodes in the Up Next queue, not the playing episode.
      */
@@ -420,8 +424,7 @@ class UpNextQueueImpl @Inject constructor(
         }
     }
 
-    fun recentUserInteraction(): Boolean {
-        val now = System.currentTimeMillis()
+    internal fun recentUserInteraction(now: Long = System.currentTimeMillis()): Boolean {
         val timeSinceInteraction = (now - lastUserInteractionTime).milliseconds
         val recentInteraction = timeSinceInteraction < INTERACTION_GRACE_PERIOD
         if (recentInteraction) {

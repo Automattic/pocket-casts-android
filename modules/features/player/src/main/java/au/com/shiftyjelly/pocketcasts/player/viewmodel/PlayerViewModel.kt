@@ -667,9 +667,7 @@ class PlayerViewModel @Inject constructor(
     }
 
     fun recordUpNextUserInteraction() {
-        viewModelScope.launch {
-            playbackManager.recordUpNextUserInteraction()
-        }
+        playbackManager.recordUpNextUserInteraction()
     }
 
     fun saveEffects(effects: PlaybackEffects, podcast: Podcast) {
