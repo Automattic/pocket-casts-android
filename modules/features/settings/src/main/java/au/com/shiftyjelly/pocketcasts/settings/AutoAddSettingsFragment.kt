@@ -6,8 +6,6 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
-import androidx.core.view.ViewCompat
-import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.updatePadding
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.Lifecycle
@@ -168,22 +166,6 @@ class AutoAddSettingsFragment :
     }
 
     private fun openPodcastsList() {
-        view?.let {
-            ViewCompat.setOnApplyWindowInsetsListener(FragmentAutoAddSettingsBinding.bind(it).fragmentContainer) { v, insets ->
-                val bars = insets.getInsets(
-                    WindowInsetsCompat.Type.systemBars()
-                        or WindowInsetsCompat.Type.displayCutout(),
-                )
-                v.updatePadding(
-                    left = bars.left,
-                    top = bars.top,
-                    right = bars.right,
-                    bottom = bars.bottom,
-                )
-                WindowInsetsCompat.CONSUMED
-            }
-        }
-
         val fragment = PodcastSelectFragment.newInstance(
             tintColor = ThemeColor.primaryInteractive01(theme.activeTheme),
             showToolbar = true,

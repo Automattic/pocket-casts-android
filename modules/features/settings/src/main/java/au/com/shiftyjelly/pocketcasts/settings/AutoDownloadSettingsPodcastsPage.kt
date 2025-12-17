@@ -27,6 +27,7 @@ import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
 import au.com.shiftyjelly.pocketcasts.compose.AppThemeWithBackground
 import au.com.shiftyjelly.pocketcasts.compose.PreviewRegularDevice
+import au.com.shiftyjelly.pocketcasts.compose.components.FadeConfig
 import au.com.shiftyjelly.pocketcasts.compose.components.FadedLazyColumn
 import au.com.shiftyjelly.pocketcasts.compose.components.HorizontalDivider
 import au.com.shiftyjelly.pocketcasts.compose.components.PodcastImage
@@ -88,9 +89,10 @@ internal fun AutoDownloadSettingsPodcastsPage(
         }
 
         Spacer(
-            modifier = Modifier.height(16.dp),
+            modifier = Modifier.height(8.dp),
         )
         FadedLazyColumn(
+            fadeConfig = FadeConfig.Default.copy(showEndFade = false),
             modifier = Modifier.weight(1f),
         ) {
             itemsIndexed(
