@@ -376,7 +376,7 @@ class Theme @Inject constructor(private val settings: Settings) {
         else if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) {
             Color.BLACK
         } else {
-            return context.getThemeColor(R.attr.primary_ui_03)
+            context.getThemeColor(R.attr.primary_ui_03)
         }
     }
 
