@@ -368,7 +368,7 @@ class Theme @Inject constructor(private val settings: Settings) {
     }
 
     @ColorInt fun getNavigationBackgroundColor(context: Context): Int {
-        // For SDK 35+ edge-to-edge will draw a view with this color behind the navigation bar so always make it transparent
+        // For SDK 35 and above edge-to-edge will draw a view with this color behind the navigation bar so always make it transparent
         return if (Build.VERSION.SDK_INT >= 35) {
             Color.TRANSPARENT
         }
