@@ -14,9 +14,6 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.core.content.IntentCompat.getParcelableExtra
 import androidx.core.net.toUri
-import androidx.core.view.ViewCompat
-import androidx.core.view.WindowInsetsCompat
-import androidx.core.view.updatePadding
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import au.com.shiftyjelly.pocketcasts.compose.AppThemeWithBackground
@@ -157,22 +154,6 @@ internal class NotificationsSettingsFragment :
     }
 
     private fun showPodcastSelector() {
-        view?.let {
-            ViewCompat.setOnApplyWindowInsetsListener(FragmentNotificationSettingsBinding.bind(it).fragmentContainer) { v, insets ->
-                val bars = insets.getInsets(
-                    WindowInsetsCompat.Type.systemBars()
-                        or WindowInsetsCompat.Type.displayCutout(),
-                )
-                v.updatePadding(
-                    left = bars.left,
-                    top = bars.top,
-                    right = bars.right,
-                    bottom = bars.bottom,
-                )
-                WindowInsetsCompat.CONSUMED
-            }
-        }
-
         val fragment = PodcastSelectFragment.newInstance(
             source = PodcastSelectFragmentSource.NOTIFICATIONS,
             showToolbar = true,

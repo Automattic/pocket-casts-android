@@ -368,11 +368,15 @@ class Theme @Inject constructor(private val settings: Settings) {
     }
 
     @ColorInt fun getNavigationBackgroundColor(context: Context): Int {
+        // For SDK 35 and above edge-to-edge will draw a view with this color behind the navigation bar so always make it transparent
+        return if (Build.VERSION.SDK_INT >= 35) {
+            Color.TRANSPARENT
+        }
         // For SDK 24 and 25 the navigation bar icons aren't tinted correctly so always use black
-        return if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) {
+        else if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) {
             Color.BLACK
         } else {
-            return context.getThemeColor(R.attr.primary_ui_03)
+            context.getThemeColor(R.attr.primary_ui_03)
         }
     }
 
