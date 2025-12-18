@@ -15,6 +15,8 @@
     *   On Wear OS show archived or played episodes as greyed out
         ([#4842](https://github.com/Automattic/pocket-casts-android/pull/4842))
 *   Bug Fixes
+    *   Fix volume boost displaying as off when it's on
+        ([#4864](https://github.com/Automattic/pocket-casts-android/pull/4864))
     *   Improve help & feedback page padding
         ([#4843](https://github.com/Automattic/pocket-casts-android/pull/4843))
     *   On Wear OS hide archived or played episodes
