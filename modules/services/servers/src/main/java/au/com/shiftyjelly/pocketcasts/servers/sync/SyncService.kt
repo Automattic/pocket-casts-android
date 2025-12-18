@@ -28,6 +28,7 @@ import com.pocketcasts.service.api.StarredEpisodesResponse
 import com.pocketcasts.service.api.SupportFeedbackRequest
 import com.pocketcasts.service.api.SyncUpdateRequest
 import com.pocketcasts.service.api.SyncUpdateResponse
+import com.pocketcasts.service.api.UpNextResponse
 import com.pocketcasts.service.api.UserPlaylistListRequest
 import com.pocketcasts.service.api.UserPlaylistListResponse
 import com.pocketcasts.service.api.UserPodcastListRequest
@@ -48,6 +49,7 @@ import retrofit2.http.PUT
 import retrofit2.http.Path
 import retrofit2.http.Query
 import retrofit2.http.Url
+import com.pocketcasts.service.api.UpNextSyncRequest as UpNextSyncRequestProtobuf
 
 interface SyncService {
     @POST("/user/login_pocket_casts")
@@ -86,6 +88,10 @@ interface SyncService {
 
     @POST("/up_next/sync")
     suspend fun upNextSync(@Header("Authorization") authorization: String, @Body request: UpNextSyncRequest): UpNextSyncResponse
+
+    @Headers("Content-Type: application/octet-stream")
+    @POST("/up_next/sync")
+    suspend fun upNextSyncProtobuf(@Header("Authorization") authorization: String, @Body request: UpNextSyncRequestProtobuf): UpNextResponse
 
     @POST("/user/last_sync_at")
     fun getLastSyncAtRx(@Header("Authorization") authorization: String, @Body request: BasicRequest): Single<LastSyncAtResponse>
