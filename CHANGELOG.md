@@ -1,6 +1,24 @@
 8.3
 -----
-
+*   New Features
+    *   Allow Wear OS playback through the watch speaker
+        ([#4830](https://github.com/Automattic/pocket-casts-android/pull/4830))
+    *   Add the starred episodes screen on Wear OS
+        ([#4838](https://github.com/Automattic/pocket-casts-android/pull/4838))
+*   Updates
+    *   Improve Wear OS downloads page with a loading spinner and empty message
+        ([#4837](https://github.com/Automattic/pocket-casts-android/pull/4837))
+    *   Improve starred page to include episodes for unfollowed podcasts and fix sort order
+        ([#4839](https://github.com/Automattic/pocket-casts-android/pull/4839))
+    *   When following a podcast cache the smaller podcast images
+        ([#4827](https://github.com/Automattic/pocket-casts-android/pull/4827))
+    *   On Wear OS show archived or played episodes as greyed out
+        ([#4842](https://github.com/Automattic/pocket-casts-android/pull/4842))
+*   Bug Fixes
+    *   Improve help & feedback page padding
+        ([#4843](https://github.com/Automattic/pocket-casts-android/pull/4843))
+    *   On Wear OS hide archived or played episodes
+        ([#4831](https://github.com/Automattic/pocket-casts-android/pull/4831))
 
 8.2
 -----

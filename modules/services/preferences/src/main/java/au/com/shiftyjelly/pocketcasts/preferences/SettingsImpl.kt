@@ -783,6 +783,14 @@ class SettingsImpl @Inject constructor(
         setLong("historyModified", timeMs)
     }
 
+    override fun getStarredServerModified(): Long {
+        return getLong("starredServerModified", 0)
+    }
+
+    override fun setStarredServerModified(timeMs: Long) {
+        setLong("starredServerModified", timeMs)
+    }
+
     override fun setClearHistoryTime(timeMs: Long) {
         setLong("clearHistoryTime", timeMs)
     }

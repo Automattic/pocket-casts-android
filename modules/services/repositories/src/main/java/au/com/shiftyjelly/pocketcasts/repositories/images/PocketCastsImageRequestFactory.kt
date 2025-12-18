@@ -125,14 +125,7 @@ data class PocketCastsImageRequestFactory(
     }
 
     private fun podcastArtworkUrl(context: Context, podcastUuid: String): String {
-        val maxSize = if (Util.isWearOs(context)) 480 else 960
-        val urlSize = when {
-            actualSize == null -> maxSize
-            actualSize > 480 -> maxSize
-            actualSize > 200 -> 480
-            else -> 200
-        }
-        return "${Settings.SERVER_STATIC_URL}/discover/images/webp/$urlSize/$podcastUuid.webp"
+        return PodcastImage.getArtworkUrl(size = actualSize, uuid = podcastUuid, isWearOS = Util.isWearOs(context))
     }
 
     private fun RequestType.listener(context: Context, onSuccess: () -> Unit): ImageRequest.Listener? = when (this) {

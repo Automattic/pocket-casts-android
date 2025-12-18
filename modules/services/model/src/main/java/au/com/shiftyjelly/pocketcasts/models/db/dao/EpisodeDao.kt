@@ -203,7 +203,7 @@ abstract class EpisodeDao {
         END) ASC
     """,
     )
-    abstract fun findByPodcastOrderTitleAscRxFlowable(podcastUuid: String): Flowable<List<PodcastEpisode>>
+    abstract fun findByPodcastOrderTitleAscFlow(podcastUuid: String): Flow<List<PodcastEpisode>>
 
     @Transaction
     @Query(
@@ -220,23 +220,23 @@ abstract class EpisodeDao {
         END) DESC
     """,
     )
-    abstract fun findByPodcastOrderTitleDescRxFlowable(podcastUuid: String): Flowable<List<PodcastEpisode>>
+    abstract fun findByPodcastOrderTitleDescFlow(podcastUuid: String): Flow<List<PodcastEpisode>>
 
     @Transaction
     @Query("SELECT * FROM podcast_episodes WHERE podcast_id = :podcastUuid ORDER BY published_date ASC")
-    abstract fun findByPodcastOrderPublishedDateAscRxFlowable(podcastUuid: String): Flowable<List<PodcastEpisode>>
+    abstract fun findByPodcastOrderPublishedDateAscFlow(podcastUuid: String): Flow<List<PodcastEpisode>>
 
     @Transaction
     @Query("SELECT * FROM podcast_episodes WHERE podcast_id = :podcastUuid ORDER BY published_date DESC")
-    abstract fun findByPodcastOrderPublishedDateDescFlowable(podcastUuid: String): Flowable<List<PodcastEpisode>>
+    abstract fun findByPodcastOrderPublishedDateDescFlow(podcastUuid: String): Flow<List<PodcastEpisode>>
 
     @Transaction
     @Query("SELECT * FROM podcast_episodes WHERE podcast_id = :podcastUuid ORDER BY duration ASC")
-    abstract fun findByPodcastOrderDurationAscFlowable(podcastUuid: String): Flowable<List<PodcastEpisode>>
+    abstract fun findByPodcastOrderDurationAscFlow(podcastUuid: String): Flow<List<PodcastEpisode>>
 
     @Transaction
     @Query("SELECT * FROM podcast_episodes WHERE podcast_id = :podcastUuid ORDER BY duration DESC")
-    abstract fun findByPodcastOrderDurationDescFlowable(podcastUuid: String): Flowable<List<PodcastEpisode>>
+    abstract fun findByPodcastOrderDurationDescFlow(podcastUuid: String): Flow<List<PodcastEpisode>>
 
     @Query("UPDATE podcast_episodes SET downloaded_error_details = NULL, episode_status = :episodeStatusNotDownloaded WHERE episode_status = :episodeStatusFailed")
     abstract fun clearAllDownloadErrorsBlocking(episodeStatusNotDownloaded: EpisodeStatusEnum, episodeStatusFailed: EpisodeStatusEnum)
@@ -249,7 +249,7 @@ abstract class EpisodeDao {
 
     @Transaction
     @Query("SELECT * FROM podcast_episodes WHERE (download_task_id IS NOT NULL OR episode_status == :downloadEpisodeStatusEnum OR (episode_status == :failedEpisodeStatusEnum AND last_download_attempt_date > :failedDownloadCutoff AND archived == 0)) ORDER BY last_download_attempt_date DESC")
-    abstract fun findDownloadingEpisodesIncludingFailedRxFlowable(failedDownloadCutoff: Long, failedEpisodeStatusEnum: EpisodeStatusEnum = EpisodeStatusEnum.DOWNLOAD_FAILED, downloadEpisodeStatusEnum: EpisodeStatusEnum = EpisodeStatusEnum.DOWNLOADED): Flowable<List<PodcastEpisode>>
+    abstract fun findDownloadingEpisodesIncludingFailedFlow(failedDownloadCutoff: Long, failedEpisodeStatusEnum: EpisodeStatusEnum = EpisodeStatusEnum.DOWNLOAD_FAILED, downloadEpisodeStatusEnum: EpisodeStatusEnum = EpisodeStatusEnum.DOWNLOADED): Flow<List<PodcastEpisode>>
 
     @Transaction
     @Query("SELECT * FROM podcast_episodes WHERE (download_task_id IS NOT NULL AND episode_status != :status)")
@@ -266,8 +266,8 @@ abstract class EpisodeDao {
     ): Int
 
     @Transaction
-    @Query("SELECT * FROM podcast_episodes WHERE starred = 1")
-    abstract fun findStarredEpisodesRxFlowable(): Flowable<List<PodcastEpisode>>
+    @Query("SELECT * FROM podcast_episodes WHERE starred = 1 ORDER BY last_starred_date DESC")
+    abstract fun findStarredEpisodesFlow(): Flow<List<PodcastEpisode>>
 
     @Transaction
     @Query("SELECT * FROM podcast_episodes WHERE starred = 1")
@@ -275,7 +275,7 @@ abstract class EpisodeDao {
 
     @Transaction
     @Query("SELECT * FROM podcast_episodes WHERE last_playback_interaction_date IS NOT NULL AND last_playback_interaction_date > 0 ORDER BY last_playback_interaction_date DESC LIMIT 1000")
-    abstract fun findPlaybackHistoryRxFlowable(): Flowable<List<PodcastEpisode>>
+    abstract fun findPlaybackHistoryFlow(): Flow<List<PodcastEpisode>>
 
     @Transaction
     @Query(
@@ -408,11 +408,14 @@ abstract class EpisodeDao {
     @Query("SELECT podcast_episodes.* FROM podcast_episodes JOIN podcasts ON podcast_episodes.podcast_id = podcasts.uuid WHERE podcasts.subscribed = 1 AND podcast_episodes.playing_status != 2 AND podcast_episodes.archived = 0 ORDER BY podcast_episodes.published_date DESC LIMIT 1")
     abstract fun findLatestEpisodeToPlayBlocking(): PodcastEpisode?
 
-    @Query("UPDATE podcast_episodes SET starred = :starred, starred_modified = :modified WHERE uuid = :uuid")
-    abstract suspend fun updateStarred(starred: Boolean, modified: Long, uuid: String)
+    @Query("UPDATE podcast_episodes SET starred = :starred, starred_modified = :starredModified, last_starred_date = :lastStarredDate WHERE uuid = :uuid")
+    abstract suspend fun updateStarred(starred: Boolean, starredModified: Long, lastStarredDate: Long, uuid: String)
 
-    @Query("UPDATE podcast_episodes SET starred = :starred, starred_modified = :modified WHERE uuid IN (:episodesUUIDs)")
-    abstract suspend fun updateAllStarred(episodesUUIDs: List<String>, starred: Boolean, modified: Long)
+    @Query("UPDATE podcast_episodes SET starred = :starred, last_starred_date = :lastStarredDate WHERE uuid = :uuid")
+    abstract suspend fun updateStarredNoSync(starred: Boolean, lastStarredDate: Long, uuid: String)
+
+    @Query("UPDATE podcast_episodes SET starred = :starred, starred_modified = :starredModified, last_starred_date = :lastStarredDate WHERE uuid IN (:episodesUuids)")
+    abstract suspend fun updateAllStarred(episodesUuids: List<String>, starred: Boolean, starredModified: Long, lastStarredDate: Long)
 
     @Query("UPDATE podcast_episodes SET archived = 0, archived_modified = :modified, last_archive_interaction_date = :modified, exclude_from_episode_limit = 1 WHERE uuid = :uuid")
     abstract fun unarchiveBlocking(uuid: String, modified: Long)

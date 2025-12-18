@@ -220,7 +220,7 @@ class AutoPlaybackService : PlaybackService() {
                     val extras = Bundle()
                     extras.putString(EXTRA_CONTENT_STYLE_GROUP_TITLE_HINT, groupTitle)
 
-                    val artworkUri = PodcastImage.getArtworkUrl(size = 480, uuid = it.uuid)
+                    val artworkUri = PodcastImage.getMediumArtworkUrl(uuid = it.uuid)
                     val localUri = AutoConverter.getArtworkUriForContentProvider(artworkUri.toUri(), this)
 
                     val discoverDescription = MediaDescriptionCompat.Builder()
