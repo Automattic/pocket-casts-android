@@ -399,17 +399,16 @@ class Support @Inject constructor(
                     .append(" Volume boost: ").append(if (effects.isVolumeBoosted) "on" else "off").append(eol).append(eol)
 
                 output.append("Database").append(eol)
-                    .append(" ").append(podcastManager.countPodcastsBlocking()).append(" Podcasts ").append(eol)
-                    .append(" ").append(episodeManager.countEpisodes()).append(" Episodes ").append(eol)
-                    .append(" ").append(runBlocking { playlistManager.playlistPreviewsFlow() }.first().size).append(" Playlists ").append(eol)
-                    .append(" ").append(queue.size).append(" Up Next ").append(eol).append(eol)
+                    .append(" ").append(podcastManager.countPodcasts()).append(" Podcasts").append(eol)
+                    .append(" ").append(episodeManager.countEpisodes()).append(" Episodes").append(eol)
+                    .append(" ").append(playlistManager.playlistPreviewsFlow().first().size).append(" Playlists").append(eol)
+                    .append(" ").append(queue.size).append(" Up Next").append(eol).append(eol)
 
                 output.append(podcastsOutput.toString())
 
-                output.append("Filters").append(eol).append("-------").append(eol).append(eol)
-
+                output.appendHeader(title = "Playlists", eol = eol)
                 try {
-                    val playlists = runBlocking { playlistManager.playlistPreviewsFlow() }.first()
+                    val playlists = playlistManager.playlistPreviewsFlow().first()
                     for (playlist in playlists) {
                         output.append(playlist.title).append(eol)
                         output.append("Auto Download? ").append(playlist.settings.isAutoDownloadEnabled).append(eol)
@@ -419,26 +418,47 @@ class Support @Inject constructor(
                     Timber.e(e)
                 }
 
-                output.append("Advance Settings").append(eol).append("-------------------").append(eol).append(eol)
+                output.appendHeader(title = "Advance Settings", eol = eol)
                 output.append("Prioritize seek accuracy? ").append(settings.prioritizeSeekAccuracy.value).append(eol)
                 output.append(eol)
 
-                output.append("Episode Issues").append(eol).append("--------------").append(eol).append(eol)
-
+                output.appendHeader(title = "Episode Download Issues", eol = eol)
                 try {
-                    val episodes = episodeManager.findEpisodesWhereBlocking("downloaded_error_details IS NOT NULL AND LENGTH(downloaded_error_details) > 0 LIMIT 100")
+                    val episodes = episodeManager.findEpisodesWhereBlocking("downloaded_error_details IS NOT NULL AND LENGTH(downloaded_error_details) > 0 ORDER BY last_download_attempt_date DESC LIMIT 100")
                     for (episode in episodes) {
-                        output.append("Title: ").append(episode.title).append(eol)
-                        output.append("Id: ").append(episode.uuid).append(eol)
-                        output.append("Error: ").append(if (episode.downloadErrorDetails == null) "-" else episode.downloadErrorDetails).append(eol)
-                        output.append("Url: ").append(if (episode.downloadUrl == null) "-" else episode.downloadUrl).append(eol)
+                        output.append("Episode: ").append(episode.title).append(", ").append(episode.uuid).append(eol)
                         val podcast = uuidToPodcast[episode.podcastUuid]
-                        output.append("Podcast: ").append(episode.podcastUuid).append(" ").append(podcast?.title ?: "-").append(eol)
+                        output.append("Podcast: ").append(podcast?.title ?: "-").append(", ").append(episode.podcastUuid).append(eol)
+                        output.append("Error: ").append(if (episode.downloadErrorDetails == null) "-" else episode.downloadErrorDetails).append(eol)
+                        output.append("Attempt: ").append(
+                            timeToFriendlyString(episode.lastDownloadAttemptDate?.time, localDateFormatter),
+                        ).append(eol)
+                        output.append("Url: ").append(if (episode.downloadUrl == null) "-" else episode.downloadUrl).append(eol)
                         output.append(eol)
                     }
                 } catch (e: Exception) {
                     Timber.e(e)
                 }
+
+                output.appendHeader(title = "Episode Playback Issues", eol = eol)
+                try {
+                    val episodes = episodeManager.findEpisodesWhereBlocking("play_error_details IS NOT NULL AND LENGTH(play_error_details) > 0 ORDER BY last_playback_interaction_date DESC LIMIT 10")
+                    for (episode in episodes) {
+                        output.append("Episode: ").append(episode.title).append(", ").append(episode.uuid).append(eol)
+                        val podcast = uuidToPodcast[episode.podcastUuid]
+                        output.append("Podcast: ").append(podcast?.title ?: "-").append(",").append(episode.podcastUuid).append(eol)
+                        output.append("Error: ").append(if (episode.playErrorDetails == null) "-" else episode.playErrorDetails).append(eol)
+                        output.append("Attempt: ").append(
+                            timeToFriendlyString(episode.lastPlaybackInteraction, localDateFormatter),
+                        ).append(eol)
+                        output.append("Url: ").append(if (episode.downloadUrl == null) "-" else episode.downloadUrl).append(eol)
+                        output.append(eol)
+                    }
+                } catch (e: Exception) {
+                    Timber.e(e)
+                }
+
+                output.appendHeader(title = "Logs", eol = eol)
             }
         } catch (e: Exception) {
             Timber.e(e)
@@ -460,6 +480,20 @@ class Support @Inject constructor(
         return if (value) "yes" else "no"
     }
 
+    private fun timeToFriendlyString(timestamp: Long?, dateFormatter: SimpleDateFormat): String {
+        return timestamp?.let {
+            val formattedDate = dateFormatter.format(Date(it))
+            val minutesAgo = (System.currentTimeMillis() - it) / (60 * 1000)
+            val timeAgo = when {
+                minutesAgo < 1 -> "just now"
+                minutesAgo < 60 -> "$minutesAgo minutes ago"
+                minutesAgo < 1440 -> "${minutesAgo / 60} hours ago"
+                else -> "${minutesAgo / 1440} days ago"
+            }
+            "$formattedDate ($timeAgo)"
+        } ?: "-"
+    }
+
     private fun getDeviceName(): String {
         try {
             return DeviceName.getDeviceName()
@@ -468,6 +502,12 @@ class Support @Inject constructor(
             return ""
         }
     }
+}
+
+private fun StringBuilder.appendHeader(title: String, eol: String) {
+    append(title).append(eol)
+    append("-".repeat(title.length)).append(eol)
+    append(eol)
 }
 
 private fun AutoPlaySource.prettyPrint(
