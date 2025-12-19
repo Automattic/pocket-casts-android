@@ -58,6 +58,7 @@ import com.pocketcasts.service.api.ReferralValidationResponse
 import com.pocketcasts.service.api.StarredEpisodesResponse
 import com.pocketcasts.service.api.SyncUpdateRequest
 import com.pocketcasts.service.api.SyncUpdateResponse
+import com.pocketcasts.service.api.UpNextResponse
 import com.pocketcasts.service.api.UserPlaylistListResponse
 import com.pocketcasts.service.api.UserPodcastListResponse
 import com.pocketcasts.service.api.WinbackResponse
@@ -77,6 +78,7 @@ import retrofit2.HttpException
 import retrofit2.Response
 import timber.log.Timber
 import au.com.shiftyjelly.pocketcasts.localization.R as LR
+import com.pocketcasts.service.api.UpNextSyncRequest as UpNextSyncRequestProtobuf
 
 @Singleton
 class SyncManagerImpl @Inject constructor(
@@ -430,6 +432,10 @@ class SyncManagerImpl @Inject constructor(
 
     override suspend fun upNextSync(request: UpNextSyncRequest): UpNextSyncResponse = getCacheTokenOrLogin { token ->
         syncServiceManager.upNextSync(request, token)
+    }
+
+    override suspend fun upNextSyncProtobuf(request: UpNextSyncRequestProtobuf): UpNextResponse = getCacheTokenOrLogin { token ->
+        syncServiceManager.upNextSyncProtobuf(request, token)
     }
 
     // Referral

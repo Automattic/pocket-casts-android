@@ -37,6 +37,7 @@ import com.pocketcasts.service.api.StarredEpisodesResponse
 import com.pocketcasts.service.api.SupportFeedbackRequest
 import com.pocketcasts.service.api.SyncUpdateRequest
 import com.pocketcasts.service.api.SyncUpdateResponse
+import com.pocketcasts.service.api.UpNextResponse
 import com.pocketcasts.service.api.UserPlaylistListResponse
 import com.pocketcasts.service.api.UserPodcastListResponse
 import com.pocketcasts.service.api.WinbackResponse
@@ -147,6 +148,8 @@ open class SyncServiceManager @Inject constructor(
     }
 
     suspend fun upNextSync(request: UpNextSyncRequest, token: AccessToken): UpNextSyncResponse = service.upNextSync(addBearer(token), request)
+
+    suspend fun upNextSyncProtobuf(request: com.pocketcasts.service.api.UpNextSyncRequest, token: AccessToken): UpNextResponse = service.upNextSyncProtobuf(addBearer(token), request)
 
     fun getLastSyncAtRx(token: AccessToken): Single<String> = service.getLastSyncAtRx(addBearer(token), buildBasicRequest())
         .map { response -> response.lastSyncAt ?: "" }

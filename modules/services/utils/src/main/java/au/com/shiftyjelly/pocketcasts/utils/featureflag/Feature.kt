@@ -222,6 +222,14 @@ enum class Feature(
         hasFirebaseRemoteFlag = false,
         hasDevToggle = false,
     ),
+    UP_NEXT_SYNC_PROTOBUF(
+        key = "up_next_sync_protobuf",
+        title = "Up Next sync with Protocol Buffers",
+        defaultValue = isDebugOrPrototypeBuild,
+        tier = FeatureTier.Free,
+        hasFirebaseRemoteFlag = false,
+        hasDevToggle = true,
+    ),
 }
 
 sealed class FeatureTier {
