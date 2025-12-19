@@ -286,7 +286,7 @@ class UpNextSync @Inject constructor(
         upNextHistoryManager.snapshotUpNext()
         // import the server Up Next into the database
         upNextQueue.importServerChangesBlocking(episodes, playbackManager, downloadManager)
-        // check the current episode is correct
+        // reload the queue to ensure it reflects the imported server changes
         playbackManager.loadQueue()
     }
 
