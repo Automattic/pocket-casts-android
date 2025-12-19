@@ -418,7 +418,7 @@ class Support @Inject constructor(
                     Timber.e(e)
                 }
 
-                output.appendHeader(title = "Advance Settings", eol = eol)
+                output.appendHeader(title = "Advanced Settings", eol = eol)
                 output.append("Prioritize seek accuracy? ").append(settings.prioritizeSeekAccuracy.value).append(eol)
                 output.append(eol)
 
@@ -446,7 +446,7 @@ class Support @Inject constructor(
                     for (episode in episodes) {
                         output.append("Episode: ").append(episode.title).append(", ").append(episode.uuid).append(eol)
                         val podcast = uuidToPodcast[episode.podcastUuid]
-                        output.append("Podcast: ").append(podcast?.title ?: "-").append(",").append(episode.podcastUuid).append(eol)
+                        output.append("Podcast: ").append(podcast?.title ?: "-").append(", ").append(episode.podcastUuid).append(eol)
                         output.append("Error: ").append(if (episode.playErrorDetails == null) "-" else episode.playErrorDetails).append(eol)
                         output.append("Attempt: ").append(
                             timeToFriendlyString(episode.lastPlaybackInteraction, localDateFormatter),
