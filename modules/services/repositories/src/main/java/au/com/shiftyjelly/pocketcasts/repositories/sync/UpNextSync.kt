@@ -282,7 +282,7 @@ class UpNextSync @Inject constructor(
     }
 
     private suspend fun processResponseEpisodes(episodes: List<BaseEpisode>) {
-        // snapshot local up next queue before  making changes
+        // snapshot local up next queue before making changes
         upNextHistoryManager.snapshotUpNext()
         // import the server Up Next into the database
         upNextQueue.importServerChangesBlocking(episodes, playbackManager, downloadManager)
