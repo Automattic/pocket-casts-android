@@ -328,3 +328,71 @@ message EpisodeResponse {
   string podcast_slug = 19;
   string slug = 20;
 }
+
+message StarredEpisodesResponse {
+  repeated StarredEpisode episodes = 1;
+}
+
+message StarredEpisode {
+  string uuid = 1;
+  string podcast_uuid = 2;
+  int32 duration = 3;
+  int32 playing_status = 4;
+  int32 played_up_to = 5;
+  bool is_deleted = 6;
+  int64 starred_modified = 7;
+}
+
+message UpNextEpisodeRequest {
+  string uuid = 1;
+  string title = 4;
+  string url = 5;
+  string podcast = 6;
+  google.protobuf.Timestamp published = 7;
+}
+
+message UpNextChanges {
+  message Change {
+    string uuid = 1;
+    int32 action = 2;
+    int64 modified = 3;
+    string title = 4;
+    string url = 5;
+    string podcast = 6;
+    repeated UpNextEpisodeRequest episodes = 7;
+    google.protobuf.Timestamp published = 8;
+  }
+
+  int64 server_modified = 1;
+  repeated Change changes = 2;
+  repeated string order = 3;
+}
+
+message UpNextSyncRequest {
+  int64 device_time = 1;
+  string version = 2;
+  string model = 3;
+  UpNextChanges up_next = 4;
+  bool show_play_status = 5;
+  string device_id = 6;
+}
+
+message UpNextResponse {
+  message EpisodeResponse {
+    string title = 1;
+    string url = 2;
+    string podcast = 3;
+    string uuid = 4;
+    google.protobuf.Timestamp published = 5;
+  }
+
+  message EpisodeSyncResponse {
+    string uuid = 1;
+    google.protobuf.Int32Value played_up_to = 6;
+    google.protobuf.Int32Value duration = 7;
+  }
+
+  int64 server_modified = 1;
+  repeated EpisodeResponse episodes = 4;
+  repeated EpisodeSyncResponse episodeSync = 5;
+}

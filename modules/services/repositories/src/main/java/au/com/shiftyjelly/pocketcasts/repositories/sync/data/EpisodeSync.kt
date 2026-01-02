@@ -17,6 +17,7 @@ import com.pocketcasts.service.api.isDeletedOrNull
 import com.pocketcasts.service.api.playedUpToOrNull
 import com.pocketcasts.service.api.playingStatusOrNull
 import com.pocketcasts.service.api.record
+import com.pocketcasts.service.api.starredModifiedOrNull
 import com.pocketcasts.service.api.starredOrNull
 import com.pocketcasts.service.api.syncUserEpisode
 import kotlinx.coroutines.Dispatchers
@@ -101,6 +102,7 @@ internal class EpisodeSync(
         serverEpisode.starredOrNull?.value?.let { value ->
             isStarred = value
             starredModified = null
+            serverEpisode.starredModifiedOrNull?.value?.let { lastStarredDate = it }
         }
         serverEpisode.durationOrNull?.value?.takeIf { it > 0 }?.let { value ->
             duration = value.toDouble()

@@ -147,14 +147,14 @@ class ProfileViewModel @Inject constructor(
     internal fun onEndOfYearCardShown() {
         tracker.track(
             AnalyticsEvent.END_OF_YEAR_PROFILE_CARD_SHOWN,
-            mapOf("year" to EndOfYearManager.YEAR_TO_SYNC.value),
+            mapOf("current_year" to EndOfYearManager.YEAR_TO_SYNC.value),
         )
     }
 
     internal fun onPlaybackClick() {
         tracker.track(
             AnalyticsEvent.END_OF_YEAR_PROFILE_CARD_TAPPED,
-            mapOf("year" to EndOfYearManager.YEAR_TO_SYNC.value),
+            mapOf("current_year" to EndOfYearManager.YEAR_TO_SYNC.value),
         )
         // once stories prompt card is tapped, we don't want to show stories launch modal if not already shown
         if (settings.getEndOfYearShowModal()) {

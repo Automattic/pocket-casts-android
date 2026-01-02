@@ -18,45 +18,49 @@ import java.util.Locale
 import kotlinx.coroutines.coroutineScope
 
 @HiltWorker
-class UpNextSyncWorker @AssistedInject constructor(
+class StarredSyncWorker @AssistedInject constructor(
     @Assisted context: Context,
     @Assisted workerParams: WorkerParameters,
-    private val upNextSync: UpNextSync,
+    private val starredSync: StarredSync,
+    private val syncManager: SyncManager,
 ) : CoroutineWorker(context, workerParams) {
 
     companion object {
-        private const val WORKER_TAG = "pocket_casts_up_next_sync_worker_tag"
+        private const val WORKER_TAG = "pocket_casts_starred_sync_worker_tag"
 
         fun enqueue(syncManager: SyncManager, context: Context): Operation? {
-            // Don't run the job if Up Next syncing is turned off
             if (!syncManager.isLoggedIn()) {
                 return null
             }
-            LogBuffer.i(LogBuffer.TAG_BACKGROUND_TASKS, "UpNextSyncWorker - scheduled")
+            LogBuffer.i(LogBuffer.TAG_BACKGROUND_TASKS, "StarredSyncWorker - scheduled")
 
             val constraints = Constraints.Builder()
                 .setRequiredNetworkType(NetworkType.CONNECTED)
                 .build()
 
-            val workRequest = OneTimeWorkRequestBuilder<UpNextSyncWorker>()
+            val workRequest = OneTimeWorkRequestBuilder<StarredSyncWorker>()
                 .addTag(WORKER_TAG)
                 .setConstraints(constraints)
                 .build()
-
-            return WorkManager.getInstance(context).enqueueUniqueWork(WORKER_TAG, ExistingWorkPolicy.APPEND_OR_REPLACE, workRequest)
+            return WorkManager.getInstance(context).enqueueUniqueWork(WORKER_TAG, ExistingWorkPolicy.KEEP, workRequest)
         }
     }
 
     override suspend fun doWork() = coroutineScope {
         val startTime = SystemClock.elapsedRealtime()
-        try {
-            LogBuffer.i(LogBuffer.TAG_BACKGROUND_TASKS, "UpNextSyncWorker - started")
-            upNextSync.sync()
-            LogBuffer.i(LogBuffer.TAG_BACKGROUND_TASKS, "UpNextSyncWorker - finished - ${String.format(Locale.ENGLISH, "%d ms", SystemClock.elapsedRealtime() - startTime)}")
+        return@coroutineScope try {
+            LogBuffer.i(LogBuffer.TAG_BACKGROUND_TASKS, "StarredSyncWorker - started")
+            performSync()
+            LogBuffer.i(LogBuffer.TAG_BACKGROUND_TASKS, "StarredSyncWorker - finished - ${String.format(Locale.ENGLISH, "%d ms", SystemClock.elapsedRealtime() - startTime)}")
             Result.success()
         } catch (e: Exception) {
-            LogBuffer.e(LogBuffer.TAG_BACKGROUND_TASKS, e, "UpNextSyncWorker - failed - ${String.format(Locale.ENGLISH, "%d ms", SystemClock.elapsedRealtime() - startTime)}")
+            LogBuffer.e(LogBuffer.TAG_BACKGROUND_TASKS, e, "StarredSyncWorker - failed - ${String.format(Locale.ENGLISH, "%d ms", SystemClock.elapsedRealtime() - startTime)}")
             Result.failure()
         }
+    }
+
+    private suspend fun performSync() {
+        val serverEpisodes = syncManager.getStarredEpisodesOrThrow().episodesList
+        starredSync.syncStarredEpisodes(serverEpisodes = serverEpisodes)
     }
 }

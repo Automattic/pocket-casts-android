@@ -47,6 +47,7 @@ import au.com.shiftyjelly.pocketcasts.wear.ui.playlists.PlaylistsScreen
 import au.com.shiftyjelly.pocketcasts.wear.ui.podcast.PodcastScreen
 import au.com.shiftyjelly.pocketcasts.wear.ui.podcasts.PodcastsScreen
 import au.com.shiftyjelly.pocketcasts.wear.ui.settings.settingsRoutes
+import au.com.shiftyjelly.pocketcasts.wear.ui.starred.StarredScreen
 import com.google.android.horologist.compose.layout.AppScaffold
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
@@ -274,6 +275,21 @@ private fun WearApp(
                         columnState = columnState,
                         navigateToEpisode = { episodeUuid ->
                             navController.navigate(EpisodeScreenFlow.navigateRoute(episodeUuid))
+                        },
+                    )
+                }
+            }
+
+            composable(StarredScreen.ROUTE) {
+                NowPlayingPager(
+                    navController = navController,
+                    swipeToDismissState = swipeToDismissState,
+                ) {
+                    StarredScreen(
+                        columnState = columnState,
+                        onItemClick = { episode ->
+                            val route = EpisodeScreenFlow.navigateRoute(episodeUuid = episode.uuid)
+                            navController.navigate(route)
                         },
                     )
                 }

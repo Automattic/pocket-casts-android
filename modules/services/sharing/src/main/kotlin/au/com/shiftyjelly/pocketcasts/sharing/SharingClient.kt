@@ -265,7 +265,7 @@ class SharingClient(
                     event = AnalyticsEvent.END_OF_YEAR_STORY_SHARED,
                     values = mapOf(
                         "story" to data.story.analyticsValue,
-                        "year" to data.year.value,
+                        "current_year" to data.year.value,
                         "from" to "button",
                     ),
                 )
@@ -437,7 +437,7 @@ data class SharingRequest internal constructor(
         ) = Builder(Data.EndOfYearStory(story, year, screenshot))
             .setAnalyticsEvent(AnalyticsEvent.END_OF_YEAR_STORY_SHARE)
             .addAnalyticsProperty("story", story.analyticsValue)
-            .addAnalyticsProperty("year", year.value)
+            .addAnalyticsProperty("current_year", year.value)
 
         fun transcript(
             podcastUuid: String?,

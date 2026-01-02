@@ -39,7 +39,7 @@ interface EpisodeManager {
     fun findNotificationEpisodesBlocking(date: Date): List<PodcastEpisode>
     fun findLatestUnfinishedEpisodeByPodcastBlocking(podcast: Podcast): PodcastEpisode?
     fun findLatestEpisodeToPlayBlocking(): PodcastEpisode?
-    fun findEpisodesByPodcastOrderedRxFlowable(podcast: Podcast): Flowable<List<PodcastEpisode>>
+    fun findEpisodesByPodcastOrderedFlow(podcast: Podcast): Flow<List<PodcastEpisode>>
     fun findEpisodesWhereRxFlowable(queryAfterWhere: String): Flowable<List<PodcastEpisode>>
 
     suspend fun findEpisodesToSync(): List<PodcastEpisode>
@@ -47,9 +47,9 @@ interface EpisodeManager {
 
     fun findEpisodesDownloadingBlocking(queued: Boolean = true, waitingForPower: Boolean = true, waitingForWifi: Boolean = true, downloading: Boolean = true): List<PodcastEpisode>
 
-    fun findDownloadEpisodesRxFlowable(): Flowable<List<PodcastEpisode>>
+    fun findDownloadEpisodesFlow(): Flow<List<PodcastEpisode>>
     fun findDownloadedEpisodesRxFlowable(): Flowable<List<PodcastEpisode>>
-    fun findStarredEpisodesRxFlowable(): Flowable<List<PodcastEpisode>>
+    fun findStarredEpisodesFlow(): Flow<List<PodcastEpisode>>
     suspend fun findStarredEpisodes(): List<PodcastEpisode>
     suspend fun downloadedEpisodesThatHaveNotBeenPlayedCount(): Int
 
@@ -86,6 +86,7 @@ interface EpisodeManager {
     fun markAsPlayedBlocking(episode: BaseEpisode?, playbackManager: PlaybackManager, podcastManager: PodcastManager, shouldShuffleUpNext: Boolean = false)
     fun markAsPlaybackErrorBlocking(episode: BaseEpisode?, errorMessage: String?)
     fun markAsPlaybackErrorBlocking(episode: BaseEpisode?, event: PlayerEvent.PlayerError, isPlaybackRemote: Boolean)
+    suspend fun starEpisodeFromServer(episode: PodcastEpisode, modified: Long)
     suspend fun starEpisode(episode: PodcastEpisode, starred: Boolean, sourceView: SourceView)
     suspend fun updateAllStarred(episodes: List<PodcastEpisode>, starred: Boolean)
     suspend fun toggleStarEpisode(episode: PodcastEpisode, sourceView: SourceView)
@@ -116,12 +117,13 @@ interface EpisodeManager {
     suspend fun countEpisodes(): Int
     fun countEpisodesWhereBlocking(queryAfterWhere: String): Int
     fun downloadMissingEpisodeRxMaybe(episodeUuid: String, podcastUuid: String, skeletonEpisode: PodcastEpisode, podcastManager: PodcastManager, downloadMetaData: Boolean, source: SourceView): Maybe<BaseEpisode>
+    suspend fun downloadMissingPodcastEpisode(episodeUuid: String, podcastUuid: String): PodcastEpisode?
 
     fun deleteEpisodeFilesAsync(episodes: List<PodcastEpisode>, playbackManager: PlaybackManager)
     suspend fun deleteEpisodeFiles(episodes: List<PodcastEpisode>, playbackManager: PlaybackManager)
 
     fun unarchiveAllInListBlocking(episodes: List<PodcastEpisode>)
-    fun findPlaybackHistoryEpisodesRxFlowable(): Flowable<List<PodcastEpisode>>
+    fun findPlaybackHistoryEpisodesFlow(): Flow<List<PodcastEpisode>>
     fun filteredPlaybackHistoryEpisodesFlow(query: String): Flow<List<PodcastEpisode>>
     suspend fun findPlaybackHistoryEpisodes(): List<PodcastEpisode>
     fun checkPodcastForEpisodeLimitBlocking(podcast: Podcast, playbackManager: PlaybackManager?)

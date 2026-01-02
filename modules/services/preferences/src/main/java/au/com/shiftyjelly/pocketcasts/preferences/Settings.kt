@@ -388,6 +388,8 @@ interface Settings {
     fun getUpNextServerModified(): Long
     fun setHistoryServerModified(timeMs: Long)
     fun getHistoryServerModified(): Long
+    fun setStarredServerModified(timeMs: Long)
+    fun getStarredServerModified(): Long
     fun setClearHistoryTime(timeMs: Long)
     fun setClearHistoryTimeNow()
     fun getClearHistoryTime(): Long

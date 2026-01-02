@@ -186,7 +186,7 @@ internal fun PodcastSettingsHomePage(
                     )
                     append(", ")
                     append(
-                        if (podcast.isSilenceRemoved) {
+                        if (podcast.isVolumeBoosted) {
                             stringResource(LR.string.podcast_effects_summary_volume_boost_on)
                         } else {
                             stringResource(LR.string.podcast_effects_summary_volume_boost_off)

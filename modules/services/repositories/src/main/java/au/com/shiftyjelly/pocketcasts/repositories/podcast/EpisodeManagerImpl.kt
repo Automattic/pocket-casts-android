@@ -161,14 +161,14 @@ class EpisodeManagerImpl @Inject constructor(
         }
     }
 
-    override fun findEpisodesByPodcastOrderedRxFlowable(podcast: Podcast): Flowable<List<PodcastEpisode>> {
+    override fun findEpisodesByPodcastOrderedFlow(podcast: Podcast): Flow<List<PodcastEpisode>> {
         return when (podcast.episodesSortType) {
-            EpisodesSortType.EPISODES_SORT_BY_TITLE_ASC -> episodeDao.findByPodcastOrderTitleAscRxFlowable(podcastUuid = podcast.uuid)
-            EpisodesSortType.EPISODES_SORT_BY_TITLE_DESC -> episodeDao.findByPodcastOrderTitleDescRxFlowable(podcastUuid = podcast.uuid)
-            EpisodesSortType.EPISODES_SORT_BY_DATE_ASC -> episodeDao.findByPodcastOrderPublishedDateAscRxFlowable(podcastUuid = podcast.uuid)
-            EpisodesSortType.EPISODES_SORT_BY_LENGTH_ASC -> episodeDao.findByPodcastOrderDurationAscFlowable(podcastUuid = podcast.uuid)
-            EpisodesSortType.EPISODES_SORT_BY_LENGTH_DESC -> episodeDao.findByPodcastOrderDurationDescFlowable(podcastUuid = podcast.uuid)
-            else -> episodeDao.findByPodcastOrderPublishedDateDescFlowable(podcastUuid = podcast.uuid)
+            EpisodesSortType.EPISODES_SORT_BY_TITLE_ASC -> episodeDao.findByPodcastOrderTitleAscFlow(podcastUuid = podcast.uuid)
+            EpisodesSortType.EPISODES_SORT_BY_TITLE_DESC -> episodeDao.findByPodcastOrderTitleDescFlow(podcastUuid = podcast.uuid)
+            EpisodesSortType.EPISODES_SORT_BY_DATE_ASC -> episodeDao.findByPodcastOrderPublishedDateAscFlow(podcastUuid = podcast.uuid)
+            EpisodesSortType.EPISODES_SORT_BY_LENGTH_ASC -> episodeDao.findByPodcastOrderDurationAscFlow(podcastUuid = podcast.uuid)
+            EpisodesSortType.EPISODES_SORT_BY_LENGTH_DESC -> episodeDao.findByPodcastOrderDurationDescFlow(podcastUuid = podcast.uuid)
+            else -> episodeDao.findByPodcastOrderPublishedDateDescFlow(podcastUuid = podcast.uuid)
         }
     }
 
@@ -205,8 +205,8 @@ class EpisodeManagerImpl @Inject constructor(
             }
     }
 
-    override fun findPlaybackHistoryEpisodesRxFlowable(): Flowable<List<PodcastEpisode>> {
-        return episodeDao.findPlaybackHistoryRxFlowable()
+    override fun findPlaybackHistoryEpisodesFlow(): Flow<List<PodcastEpisode>> {
+        return episodeDao.findPlaybackHistoryFlow()
     }
 
     override fun filteredPlaybackHistoryEpisodesFlow(query: String): Flow<List<PodcastEpisode>> {
@@ -412,8 +412,23 @@ class EpisodeManagerImpl @Inject constructor(
         }
     }
 
+    override suspend fun starEpisodeFromServer(episode: PodcastEpisode, modified: Long) {
+        episodeDao.updateStarredNoSync(
+            starred = true,
+            lastStarredDate = modified,
+            uuid = episode.uuid,
+        )
+    }
+
     override suspend fun starEpisode(episode: PodcastEpisode, starred: Boolean, sourceView: SourceView) {
-        episodeDao.updateStarred(starred, System.currentTimeMillis(), episode.uuid)
+        val modifiedDate = System.currentTimeMillis()
+        episodeDao.updateStarred(
+            starred = starred,
+            starredModified = modifiedDate,
+            lastStarredDate = modifiedDate,
+            uuid = episode.uuid,
+        )
+
         val event =
             if (starred) {
                 AnalyticsEvent.EPISODE_STARRED
@@ -425,7 +440,13 @@ class EpisodeManagerImpl @Inject constructor(
 
     override suspend fun updateAllStarred(episodes: List<PodcastEpisode>, starred: Boolean) {
         episodes.chunked(500).forEach { episodesChunk ->
-            episodeDao.updateAllStarred(episodesChunk.map { it.uuid }, starred, System.currentTimeMillis())
+            val modified = System.currentTimeMillis()
+            episodeDao.updateAllStarred(
+                episodesUuids = episodesChunk.map { it.uuid },
+                starred = starred,
+                starredModified = modified,
+                lastStarredDate = modified,
+            )
         }
     }
 
@@ -433,7 +454,7 @@ class EpisodeManagerImpl @Inject constructor(
         // Retrieve the episode to make sure we have the latest starred status
         findByUuid(episode.uuid)?.let {
             episode.isStarred = !it.isStarred
-            starEpisode(episode, episode.isStarred, sourceView)
+            starEpisode(episode = episode, starred = episode.isStarred, sourceView = sourceView)
         }
     }
 
@@ -781,9 +802,9 @@ class EpisodeManagerImpl @Inject constructor(
         }
     }
 
-    override fun findDownloadEpisodesRxFlowable(): Flowable<List<PodcastEpisode>> {
+    override fun findDownloadEpisodesFlow(): Flow<List<PodcastEpisode>> {
         val failedDownloadCutoff = Date().time - 7.days()
-        return episodeDao.findDownloadingEpisodesIncludingFailedRxFlowable(failedDownloadCutoff)
+        return episodeDao.findDownloadingEpisodesIncludingFailedFlow(failedDownloadCutoff)
     }
 
     override fun findDownloadedEpisodesRxFlowable(): Flowable<List<PodcastEpisode>> {
@@ -794,8 +815,8 @@ class EpisodeManagerImpl @Inject constructor(
         return episodeDao.downloadedEpisodesThatHaveNotBeenPlayedCount()
     }
 
-    override fun findStarredEpisodesRxFlowable(): Flowable<List<PodcastEpisode>> {
-        return episodeDao.findStarredEpisodesRxFlowable()
+    override fun findStarredEpisodesFlow(): Flow<List<PodcastEpisode>> {
+        return episodeDao.findStarredEpisodesFlow()
     }
 
     override suspend fun findStarredEpisodes(): List<PodcastEpisode> {
@@ -1026,6 +1047,13 @@ class EpisodeManagerImpl @Inject constructor(
                     }
                 }
             }
+    }
+
+    override suspend fun downloadMissingPodcastEpisode(episodeUuid: String, podcastUuid: String): PodcastEpisode? {
+        val response = podcastCacheServiceManager.getPodcastAndEpisode(podcastUuid = podcastUuid, episodeUuid = episodeUuid)
+        val episode = response.episodes.firstOrNull() ?: return null
+        add(episodes = listOf(episode), podcastUuid = podcastUuid, downloadMetaData = false)
+        return findByUuid(episodeUuid)
     }
 
     override suspend fun calculatePlayedUptoSumInSecsWithinDays(days: Int): Double {

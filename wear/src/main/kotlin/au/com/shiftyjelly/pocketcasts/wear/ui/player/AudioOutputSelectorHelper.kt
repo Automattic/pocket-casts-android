@@ -27,5 +27,7 @@ class AudioOutputSelectorHelper @Inject constructor(
         }
     }
 
-    private val AudioOutput.isOutputAllowed get() = isEmulator || this is AudioOutput.BluetoothHeadset
+    private val AudioOutput.isOutputAllowed get() = isEmulator ||
+        this is AudioOutput.BluetoothHeadset ||
+        this is AudioOutput.WatchSpeaker
 }
