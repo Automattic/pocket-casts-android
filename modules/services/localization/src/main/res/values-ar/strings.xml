@@ -1,11 +1,16 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2025-11-26 15:54:03+0000
+Translation-Revision-Date: 2025-12-18 13:54:04+0000
 Plural-Forms: nplurals=6; plural=n==0 ? 0 : n==1 ? 1 : n==2 ? 2 : n%100>=3 && n%100<=10 ? 3 : n%100>=11 && n%100<=99 ? 4 : 5;
 Generator: GlotPress/2.4.0-alpha
 Language: ar
 -->
 <resources>
+    <string name="no_episodes">لا توجد حلقات</string>
+    <string name="more_rules">المزيد من القواعد</string>
+    <string name="player_notification_skip_forward_seconds">تقديم %d ثوانٍ</string>
+    <string name="player_notification_skip_back_seconds">تأخير %d ثوانٍ</string>
+    <string name="set_volume">ضبط مستوى الصوت</string>
     <string name="eoy_story_top_podcasts_subtitle">مزيد من المُفضلات، ومزيد من التشغيل، ومزيد من الميزات لديك</string>
     <string name="eoy_story_top_podcasts_title">الأخرى الخاصة بك</string>
     <string name="end_of_year_listening_time_subtitle_with_number">من ⁦%1$d⁩ الدقائق التي تم الاستماع فيها</string>
@@ -488,6 +493,7 @@ Language: ar
     <string name="podcast_this">هذا البث الصوتي</string>
     <string name="end_of_year_cant_share_message">لا يمكن مشاركة هذه القصة</string>
     <string name="end_of_year_story_ratings_share_text">قمتُ بالتصنيف ⁦%1$d⁩ من حلقات البث الصوتي المختلفة في ⁦%2$d⁩، مع ⁦%3$d⁩ بوصفه تقييمي الأكثر استخدامًا</string>
+    <string name="end_of_year_stories_completion_rate_share_text">نسبة إكمال الاستماع لدي هذا العام كانت ⁦%1$d⁩%%</string>
     <string name="end_of_year_share_dialog_message">ألصق هذه الصورة في شبكات التواصل الاجتماعي الخاصة بك وأطلق العنان للعروض ومنشئي المحتوى المفضلين لديك</string>
     <string name="end_of_year_share_dialog_title">هل تريد مشاركة هذه القصة؟</string>
     <string name="up_next_shuffle_disable_button_content_description">تعطيل خلط العناصر التالية</string>

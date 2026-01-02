@@ -1,11 +1,16 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2025-11-28 09:54:04+0000
+Translation-Revision-Date: 2025-12-18 09:54:04+0000
 Plural-Forms: nplurals=1; plural=0;
 Generator: GlotPress/2.4.0-alpha
 Language: ja_JP
 -->
 <resources>
+    <string name="no_episodes">エピソードなし</string>
+    <string name="more_rules">その他のルール</string>
+    <string name="player_notification_skip_forward_seconds">%d秒前方に移動</string>
+    <string name="player_notification_skip_back_seconds">%d秒後方に戻る</string>
+    <string name="set_volume">ボリュームを設定</string>
     <string name="eoy_story_top_podcasts_subtitle">お気に入りを増やして楽しめば、もっとあなたらしく</string>
     <string name="eoy_story_top_podcasts_title">その他の定番ポッドキャスト</string>
     <string name="end_of_year_listening_time_subtitle_with_number">%1$d分聴取</string>
@@ -488,6 +493,7 @@ Language: ja_JP
     <string name="podcast_this">このポッドキャスト</string>
     <string name="end_of_year_cant_share_message">このストーリーは共有できません</string>
     <string name="end_of_year_story_ratings_share_text">%2$dは%1$d個のポッドキャストを評価し、最もよく使った評価は%3$dでした</string>
+    <string name="end_of_year_stories_completion_rate_share_text">今年の完了率は%1$d%% です</string>
     <string name="end_of_year_share_dialog_message">この画像をソーシャルに貼り付けて、お気に入りのショーや作成者を応援しましょう</string>
     <string name="end_of_year_share_dialog_title">このストーリーを共有しませんか ?</string>
     <string name="up_next_shuffle_disable_button_content_description">次のシャッフルの無効化</string>

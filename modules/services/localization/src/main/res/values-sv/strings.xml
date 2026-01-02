@@ -1,11 +1,16 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2025-11-27 13:54:03+0000
+Translation-Revision-Date: 2025-12-18 15:54:04+0000
 Plural-Forms: nplurals=2; plural=n != 1;
 Generator: GlotPress/2.4.0-alpha
 Language: sv_SE
 -->
 <resources>
+    <string name="no_episodes">Inga avsnitt</string>
+    <string name="more_rules">Fler regler</string>
+    <string name="player_notification_skip_forward_seconds">Framåt %d sekunder</string>
+    <string name="player_notification_skip_back_seconds">Tillbaka %d sekunder</string>
+    <string name="set_volume">Ställ in volym</string>
     <string name="eoy_story_top_podcasts_subtitle">Mer favoriter, mer lek, mer du</string>
     <string name="eoy_story_top_podcasts_title">Dina andra favoriter</string>
     <string name="end_of_year_listening_time_subtitle_with_number">%1$d lyssnade minuter</string>
@@ -488,6 +493,7 @@ Language: sv_SE
     <string name="podcast_this">Den här podcasten</string>
     <string name="end_of_year_cant_share_message">Den här berättelsen kan inte delas</string>
     <string name="end_of_year_story_ratings_share_text">Jag betygsatte %1$d olika podcasts under %2$d, med %3$d som mitt mest använda betyg</string>
+    <string name="end_of_year_stories_completion_rate_share_text">Min slutförandegrad i år var %1$d%%</string>
     <string name="end_of_year_share_dialog_message">Klistra in den här bilden på dina sociala medier och uppmärksamma dina favoritshower och deras skapare</string>
     <string name="end_of_year_share_dialog_title">Dela den här berättelsen?</string>
     <string name="up_next_shuffle_disable_button_content_description">Inaktivera slumpmässig Nästa-uppspelning</string>

@@ -1,11 +1,16 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2025-11-27 09:54:03+0000
+Translation-Revision-Date: 2025-12-18 09:54:04+0000
 Plural-Forms: nplurals=1; plural=0;
 Generator: GlotPress/2.4.0-alpha
 Language: ko_KR
 -->
 <resources>
+    <string name="no_episodes">에피소드 없음</string>
+    <string name="more_rules">추가 규칙</string>
+    <string name="player_notification_skip_forward_seconds">앞으로 %d초 이동</string>
+    <string name="player_notification_skip_back_seconds">뒤로 %d초 이동</string>
+    <string name="set_volume">볼륨 설정</string>
     <string name="eoy_story_top_podcasts_subtitle">더 많은 즐겨찾기, 더 많은 재생, 더 많은 맞춤형 기능</string>
     <string name="eoy_story_top_podcasts_title">다른 최애 팟캐스트</string>
     <string name="end_of_year_listening_time_subtitle_with_number">청취한 시간: %1$d분</string>
@@ -488,6 +493,7 @@ Language: ko_KR
     <string name="podcast_this">이 팟캐스트</string>
     <string name="end_of_year_cant_share_message">이 스토리는 공유할 수 없습니다.</string>
     <string name="end_of_year_story_ratings_share_text">내가 %2$d년에 평가한 팟캐스트는 %1$d가지, 가장 많이 사용한 평점은 %3$d</string>
+    <string name="end_of_year_stories_completion_rate_share_text">올해 완료율은 %1$d%%였습니다.</string>
     <string name="end_of_year_share_dialog_message">이 이미지를 회원님의 소셜 미디어에 붙여 넣고 즐겨 찾는 프로그램과 크리에이터에게 감사 인사를 보내세요.</string>
     <string name="end_of_year_share_dialog_title">이 스토리 공유 여부</string>
     <string name="up_next_shuffle_disable_button_content_description">다음 순서 섞기 비활성화</string>

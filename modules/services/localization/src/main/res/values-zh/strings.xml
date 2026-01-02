@@ -1,11 +1,16 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2025-11-27 09:54:03+0000
+Translation-Revision-Date: 2025-12-18 09:54:06+0000
 Plural-Forms: nplurals=1; plural=0;
 Generator: GlotPress/2.4.0-alpha
 Language: zh_CN
 -->
 <resources>
+    <string name="no_episodes">无剧集</string>
+    <string name="more_rules">更多规则</string>
+    <string name="player_notification_skip_forward_seconds">快进 %d 秒</string>
+    <string name="player_notification_skip_back_seconds">后退 %d 秒</string>
+    <string name="set_volume">设置音量</string>
     <string name="eoy_story_top_podcasts_subtitle">更多心仪之选、更多畅玩时光、更多精彩自我</string>
     <string name="eoy_story_top_podcasts_title">您的其他首选</string>
     <string name="end_of_year_listening_time_subtitle_with_number">已收听 %1$d 分钟</string>
@@ -488,6 +493,7 @@ Language: zh_CN
     <string name="podcast_this">此播客</string>
     <string name="end_of_year_cant_share_message">此故事无法共享</string>
     <string name="end_of_year_story_ratings_share_text">我在 %2$d 年对 %1$d 个不同的播客进行了评级，%3$d 是我最常用的评级</string>
+    <string name="end_of_year_stories_completion_rate_share_text">我今年的完成率为 %1$d%%</string>
     <string name="end_of_year_share_dialog_message">将此图片粘贴到您的社交平台上，与大家分享您最喜欢的节目和创作者</string>
     <string name="end_of_year_share_dialog_title">分享此故事？</string>
     <string name="up_next_shuffle_disable_button_content_description">下一个随机播放禁用</string>

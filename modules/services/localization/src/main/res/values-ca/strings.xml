@@ -1,11 +1,16 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2025-11-26 23:56:41+0000
+Translation-Revision-Date: 2025-12-28 23:46:29+0000
 Plural-Forms: nplurals=2; plural=n != 1;
 Generator: GlotPress/2.4.0-alpha
 Language: ca
 -->
 <resources>
+    <string name="no_episodes">No hi ha episodis</string>
+    <string name="more_rules">Més regles</string>
+    <string name="player_notification_skip_forward_seconds">Avançar %d segons</string>
+    <string name="player_notification_skip_back_seconds">Enrere %d segons</string>
+    <string name="set_volume">Estableix el volum</string>
     <string name="eoy_story_top_podcasts_title">Els teus altres preferits</string>
     <string name="eoy_story_top_podcasts_subtitle">Més favorits, més reproducció, més tu</string>
     <string name="pocket_casts_plus_badge">Insígnia de Pocket Casts Plus</string>
@@ -488,6 +493,7 @@ Language: ca
     <string name="podcast_this">Aquest pòdcast</string>
     <string name="end_of_year_cant_share_message">Aquesta història no es pot compartir</string>
     <string name="end_of_year_story_ratings_share_text">Vaig valorar %1$d pòdcasts diferents a %2$d, amb %3$d com la meva valoració més utilitzada</string>
+    <string name="end_of_year_stories_completion_rate_share_text">La meva taxa de finalització aquest any ha estat %1$d%%</string>
     <string name="end_of_year_share_dialog_message">Copia aquesta imatge a les teves xarxes socials i fes una crida sobre els teus programes i creadors preferits</string>
     <string name="end_of_year_share_dialog_title">Compartir aquesta història?</string>
     <string name="podcast_ratings_page_title">Valoracions</string>
