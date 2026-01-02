@@ -1,11 +1,16 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2025-11-28 09:54:04+0000
+Translation-Revision-Date: 2025-12-17 16:54:03+0000
 Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);
 Generator: GlotPress/2.4.0-alpha
 Language: ru
 -->
 <resources>
+    <string name="no_episodes">Нет выпусков</string>
+    <string name="more_rules">Другие правила</string>
+    <string name="player_notification_skip_forward_seconds">На %d сек вперёд</string>
+    <string name="player_notification_skip_back_seconds">На %d сек назад</string>
+    <string name="set_volume">Установить громкость</string>
     <string name="eoy_story_top_podcasts_subtitle">Больше любимых подкастов, больше удовольствия, больше индивидуальности</string>
     <string name="eoy_story_top_podcasts_title">Остальные ваши показатели</string>
     <string name="end_of_year_listening_time_subtitle_with_number">%1$d мин прослушано</string>
@@ -488,6 +493,7 @@ Language: ru
     <string name="podcast_this">Этот подкаст</string>
     <string name="end_of_year_cant_share_message">Этой историей поделиться нельзя</string>
     <string name="end_of_year_story_ratings_share_text">Я оценивал(а) разные подкасты (%1$d) в %2$d, чаще всего на %3$d.</string>
+    <string name="end_of_year_stories_completion_rate_share_text">Мой процент завершения в этом году равен %1$d %%</string>
     <string name="end_of_year_share_dialog_message">Разместите это изображение в социальных сетях, чтобы рассказать о своих любимых шоу и авторах.</string>
     <string name="end_of_year_share_dialog_title">Поделиться этой историей?</string>
     <string name="up_next_shuffle_disable_button_content_description">Отключить следующий случайный выбор</string>

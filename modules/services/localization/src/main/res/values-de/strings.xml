@@ -1,11 +1,16 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2025-11-27 09:54:03+0000
+Translation-Revision-Date: 2025-12-18 09:54:06+0000
 Plural-Forms: nplurals=2; plural=n != 1;
 Generator: GlotPress/2.4.0-alpha
 Language: de
 -->
 <resources>
+    <string name="no_episodes">Keine Folgen</string>
+    <string name="more_rules">Weitere Regeln</string>
+    <string name="player_notification_skip_forward_seconds">%d Sekunden vorspulen</string>
+    <string name="player_notification_skip_back_seconds">%d Sekunden zurückspulen</string>
+    <string name="set_volume">Lautstärke festlegen</string>
     <string name="eoy_story_top_podcasts_subtitle">Mehr Favoriten, mehr Wiedergaben, mehr du</string>
     <string name="eoy_story_top_podcasts_title">Was du sonst noch ausgewählt hast</string>
     <string name="end_of_year_listening_time_subtitle_with_number">%1$d Minuten angehört</string>
@@ -488,6 +493,7 @@ Language: de
     <string name="podcast_this">Dieser Podcast</string>
     <string name="end_of_year_cant_share_message">Diese Story kann nicht geteilt werden</string>
     <string name="end_of_year_story_ratings_share_text">Ich habe %2$d %1$d verschiedene Podcasts bewertet. %3$d war dabei meine am häufigsten verwendete Bewertung.</string>
+    <string name="end_of_year_stories_completion_rate_share_text">Meine Abschlussquote lag dieses Jahr bei %1$d %%</string>
     <string name="end_of_year_share_dialog_message">Füge dieses Bild zu deinen sozialen Medien hinzu, um deine Lieblingsshows und -ersteller dankend zu erwähnen</string>
     <string name="end_of_year_share_dialog_title">Diese Story teilen?</string>
     <string name="podcast_ratings_page_title">Bewertungen</string>
@@ -1667,7 +1673,7 @@ Language: de
     <string name="profile_privacy_policy_title">Datenschutzerklärung</string>
     <string name="profile_privacy_policy">Datenschutzerklärung</string>
     <string name="profile_plus_thankyou">The Pocket Casts Webplayer ist jetzt Bestandteil von Pocket Casts Plus. Als Dankeschön für deine Unterstützung haben wir für dein Konto ein Upgrade auf Pocket Casts Plus für %s vorgenommen.</string>
-    <string name="profile_plus_expires_in">Plus läuft in %s ab</string>
+    <string name="profile_plus_expires_in">Plus läuft ab am %s</string>
     <string name="profile_plus_expires">Läuft ab %s</string>
     <string name="profile_plus_expired">Plus ist abgelaufen</string>
     <string name="profile_plus">plus</string>

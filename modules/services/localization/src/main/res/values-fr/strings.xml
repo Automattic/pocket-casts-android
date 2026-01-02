@@ -1,11 +1,16 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2025-11-28 09:54:03+0000
+Translation-Revision-Date: 2025-12-18 15:54:04+0000
 Plural-Forms: nplurals=2; plural=n > 1;
 Generator: GlotPress/2.4.0-alpha
 Language: fr
 -->
 <resources>
+    <string name="no_episodes">Aucun épisode</string>
+    <string name="more_rules">Plus de règles</string>
+    <string name="player_notification_skip_forward_seconds">Avancer de %d secondes</string>
+    <string name="player_notification_skip_back_seconds">Revenir %d secondes en arrière</string>
+    <string name="set_volume">Définir le volume</string>
     <string name="eoy_story_top_podcasts_subtitle">Plus de favoris, plus de lecture, plus comme vous</string>
     <string name="eoy_story_top_podcasts_title">Vos autres incontournables</string>
     <string name="pocket_casts_patron_badge">Badge Pocket Casts Patron</string>
@@ -488,6 +493,7 @@ Language: fr
     <string name="podcast_this">Ce podcast</string>
     <string name="end_of_year_cant_share_message">Impossible de partager cette story</string>
     <string name="end_of_year_story_ratings_share_text">J’ai évalué %1$d podcasts différents en %2$d, que j’ai le plus souvent notés %3$d</string>
+    <string name="end_of_year_stories_completion_rate_share_text">Cette année, mon taux d’achèvement s’élève à %1$d%%</string>
     <string name="end_of_year_share_dialog_message">Coller cette image sur vos réseaux sociaux et faire connaître vos émissions et créateurs préférés</string>
     <string name="end_of_year_share_dialog_title">Partager cette story ?</string>
     <string name="up_next_shuffle_disable_button_content_description">Désactiver la lecture aléatoire dans la file d’attente</string>
