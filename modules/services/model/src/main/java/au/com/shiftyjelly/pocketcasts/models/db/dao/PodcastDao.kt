@@ -286,9 +286,8 @@ abstract class PodcastDao {
     @Update
     abstract suspend fun updateSuspend(podcast: Podcast)
 
-    fun updateRxCompletable(podcast: Podcast): Completable {
-        return Completable.fromCallable { updateBlocking(podcast) }
-    }
+    @Query("UPDATE podcasts SET title = :title, author = :author, podcast_category = :podcastCategory, podcast_description = :podcastDescription, estimated_next_episode = :estimatedNextEpisode, episode_frequency = :episodeFrequency, refresh_available = :refreshAvailable, funding_url = :fundingUrl WHERE uuid = :uuid")
+    abstract suspend fun updateRefresh(uuid: String, title: String, author: String, podcastCategory: String, podcastDescription: String, estimatedNextEpisode: Date?, episodeFrequency: String?, refreshAvailable: Boolean, fundingUrl: String?)
 
     @Query("DELETE FROM podcasts WHERE uuid = :uuid")
     abstract fun deleteByUuidBlocking(uuid: String)
