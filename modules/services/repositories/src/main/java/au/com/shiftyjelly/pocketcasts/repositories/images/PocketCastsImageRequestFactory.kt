@@ -33,7 +33,7 @@ data class PocketCastsImageRequestFactory(
     private val transformations: List<Transformation> = emptyList(),
 ) {
     private val actualCornerRadius = cornerRadius.dpToPx(context)
-    private val actualSize = size?.takeIf { it > 0 }?.dpToPx(context)
+    private val actualSize = size?.dpToPx(context)?.takeIf { it > 0 }
 
     fun smallSize() = copy(size = 128)
 
