@@ -1,11 +1,16 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2025-11-26 15:54:03+0000
+Translation-Revision-Date: 2025-12-18 15:54:04+0000
 Plural-Forms: nplurals=2; plural=n != 1;
 Generator: GlotPress/2.4.0-alpha
 Language: es
 -->
 <resources>
+    <string name="no_episodes">No hay episodios</string>
+    <string name="more_rules">Más reglas</string>
+    <string name="player_notification_skip_forward_seconds">Avanzar %d segundos</string>
+    <string name="player_notification_skip_back_seconds">Retroceder %d segundos</string>
+    <string name="set_volume">Configurar volumen</string>
     <string name="eoy_story_top_podcasts_subtitle">Más favoritos, más reproducción, más tú</string>
     <string name="eoy_story_top_podcasts_title">Tus otros favoritos</string>
     <string name="end_of_year_listening_time_subtitle_with_number">%1$d minutos escuchados</string>
@@ -488,6 +493,7 @@ Language: es
     <string name="podcast_this">Este podcast</string>
     <string name="end_of_year_cant_share_message">Esta historia no se puede compartir</string>
     <string name="end_of_year_story_ratings_share_text">He valorado %1$d podcasts diferentes en %2$d y he indicado que %3$d es el que más utilizo</string>
+    <string name="end_of_year_stories_completion_rate_share_text">Mi tasa de finalización de este año ha sido de %1$d %%</string>
     <string name="end_of_year_share_dialog_message">Pega esta imagen en tus redes sociales y haz que todo el mundo sepa cuáles son tus programas y creadores favoritos</string>
     <string name="end_of_year_share_dialog_title">¿Quieres compartir esta historia?</string>
     <string name="up_next_shuffle_disable_button_content_description">Reproducción aleatoria desactivada</string>

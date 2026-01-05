@@ -35,6 +35,8 @@
         ([#4858](https://github.com/Automattic/pocket-casts-android/pull/4858)) 
     *   Fix 3-button navigation obstructing the sharing buttons
         ([#4810](https://github.com/Automattic/pocket-casts-android/pull/4810))
+    *   Fix unfollow issue
+        ([#4856](https://github.com/Automattic/pocket-casts-android/pull/4856))
 
 8.1
 -----

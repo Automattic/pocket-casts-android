@@ -1,11 +1,16 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2025-11-27 09:54:03+0000
+Translation-Revision-Date: 2025-12-18 09:54:04+0000
 Plural-Forms: nplurals=1; plural=0;
 Generator: GlotPress/2.4.0-alpha
 Language: zh_TW
 -->
 <resources>
+    <string name="no_episodes">沒有單集</string>
+    <string name="more_rules">更多規則</string>
+    <string name="player_notification_skip_forward_seconds">往前 %d 秒</string>
+    <string name="player_notification_skip_back_seconds">倒轉 %d 秒</string>
+    <string name="set_volume">設定音量</string>
     <string name="eoy_story_top_podcasts_subtitle">其他常聽的喜愛節目，其他面向的你</string>
     <string name="eoy_story_top_podcasts_title">其他常聽節目</string>
     <string name="end_of_year_listening_time_subtitle_with_number">%1$d 分鐘 (收聽時間)</string>
@@ -488,6 +493,7 @@ Language: zh_TW
     <string name="podcast_this">這個 Podcast</string>
     <string name="end_of_year_cant_share_message">這則限時動態不提供分享</string>
     <string name="end_of_year_story_ratings_share_text">我在 %2$d 年為 %1$d 個不同的 Podcast 評分，而「%3$d」是我最常用的評分</string>
+    <string name="end_of_year_stories_completion_rate_share_text">我今年的完成率為 %1$d%%</string>
     <string name="end_of_year_share_dialog_message">將這張圖片貼到你的社群媒體，向你最愛的節目和創作者致意</string>
     <string name="end_of_year_share_dialog_title">要分享這則限時動態嗎？</string>
     <string name="podcast_ratings_page_title">評分</string>

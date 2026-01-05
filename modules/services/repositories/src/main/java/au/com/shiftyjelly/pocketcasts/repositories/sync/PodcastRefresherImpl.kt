@@ -37,15 +37,6 @@ class PodcastRefresherImpl @Inject constructor(
 
             val startTime = SystemClock.elapsedRealtime()
 
-            val originalPodcast = existingPodcast.copy()
-            existingPodcast.title = updatedPodcast.title
-            existingPodcast.author = updatedPodcast.author
-            existingPodcast.podcastCategory = updatedPodcast.podcastCategory
-            existingPodcast.podcastDescription = updatedPodcast.podcastDescription
-            existingPodcast.estimatedNextEpisode = updatedPodcast.estimatedNextEpisode
-            existingPodcast.episodeFrequency = updatedPodcast.episodeFrequency
-            existingPodcast.refreshAvailable = updatedPodcast.refreshAvailable
-            existingPodcast.fundingUrl = updatedPodcast.fundingUrl
             val existingEpisodes = episodeManager.findEpisodesByPodcastOrderedByPublishDate(existingPodcast)
             val mostRecentEpisode = existingEpisodes.firstOrNull()
             val insertEpisodes = mutableListOf<PodcastEpisode>()
@@ -118,15 +109,37 @@ class PodcastRefresherImpl @Inject constructor(
                 episodeManager.deleteEpisodesWithoutSync(episodesToDelete, playbackManager)
             }
 
-            if (originalPodcast != existingPodcast) {
-                LogBuffer.i(LogBuffer.TAG_BACKGROUND_TASKS, "Refresh required update for podcast ${existingPodcast.uuid}")
-                appDatabase.podcastDao().updateSuspend(existingPodcast)
-            }
+            updatePodcastIfRequired(existingPodcast, updatedPodcast)
 
             LogBuffer.i(LogBuffer.TAG_BACKGROUND_TASKS, "Refreshing podcast ${existingPodcast.uuid} - ${String.format(Locale.ENGLISH, "%d ms", SystemClock.elapsedRealtime() - startTime)}")
         } catch (e: Exception) {
             LogBuffer.e(LogBuffer.TAG_BACKGROUND_TASKS, e, "Error refreshing podcast ${existingPodcast.uuid} in background")
             crashLogging.sendReport(e)
+        }
+    }
+
+    internal suspend fun updatePodcastIfRequired(existingPodcast: Podcast, updatedPodcast: Podcast) {
+        if (existingPodcast.title != updatedPodcast.title ||
+            existingPodcast.author != updatedPodcast.author ||
+            existingPodcast.podcastCategory != updatedPodcast.podcastCategory ||
+            existingPodcast.podcastDescription != updatedPodcast.podcastDescription ||
+            existingPodcast.estimatedNextEpisode != updatedPodcast.estimatedNextEpisode ||
+            existingPodcast.episodeFrequency != updatedPodcast.episodeFrequency ||
+            existingPodcast.refreshAvailable != updatedPodcast.refreshAvailable ||
+            existingPodcast.fundingUrl != updatedPodcast.fundingUrl
+        ) {
+            LogBuffer.i(LogBuffer.TAG_BACKGROUND_TASKS, "Refresh required update for podcast ${existingPodcast.uuid}")
+            appDatabase.podcastDao().updateRefresh(
+                uuid = existingPodcast.uuid,
+                title = updatedPodcast.title,
+                author = updatedPodcast.author,
+                podcastCategory = updatedPodcast.podcastCategory,
+                podcastDescription = updatedPodcast.podcastDescription,
+                estimatedNextEpisode = updatedPodcast.estimatedNextEpisode,
+                episodeFrequency = updatedPodcast.episodeFrequency,
+                refreshAvailable = updatedPodcast.refreshAvailable,
+                fundingUrl = updatedPodcast.fundingUrl,
+            )
         }
     }
 }

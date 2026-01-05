@@ -1,11 +1,16 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Translation-Revision-Date: 2025-11-27 11:54:04+0000
+Translation-Revision-Date: 2025-12-18 15:54:04+0000
 Plural-Forms: nplurals=2; plural=n != 1;
 Generator: GlotPress/2.4.0-alpha
 Language: nl
 -->
 <resources>
+    <string name="no_episodes">Geen afleveringen</string>
+    <string name="more_rules">Meer regels</string>
+    <string name="set_volume">Volume instellen</string>
+    <string name="player_notification_skip_forward_seconds">%d seconden verder</string>
+    <string name="player_notification_skip_back_seconds">%d seconden terug</string>
     <string name="eoy_story_top_podcasts_subtitle">Meer favorieten, meer spelen, meer jij</string>
     <string name="eoy_story_top_podcasts_title">Je andere favorieten</string>
     <string name="end_of_year_listening_time_subtitle_with_number">%1$d minuten geluisterd</string>
@@ -487,6 +492,7 @@ Language: nl
     <string name="podcast_this">Deze podcast</string>
     <string name="end_of_year_cant_share_message">Dit verhaal kan niet gedeeld worden</string>
     <string name="end_of_year_story_ratings_share_text">Ik heb %1$d verschillende podcasts beoordeeld in %2$d, me %3$d als mijn meest gegeven beoordeling</string>
+    <string name="end_of_year_stories_completion_rate_share_text">Mijn afrondingspercentage dit jaar was %1$d%%</string>
     <string name="end_of_year_share_dialog_message">Plaats deze afbeelding op je sociale media en noem je favoriete shows en makers</string>
     <string name="end_of_year_share_dialog_title">Dit verhaal delen?</string>
     <string name="up_next_shuffle_disable_button_content_description">Hierna shuffle uitschakelen</string>
@@ -2241,6 +2247,10 @@ Language: nl
     <plurals name="profile_stats_hour_listened">
         <item quantity="one">Uur geluisterd</item>
         <item quantity="other">Uren geluisterd</item>
+    </plurals>
+    <plurals name="profile_stats_hour_saved">
+        <item quantity="one">Uur opgeslagen</item>
+        <item quantity="other">Uur opgeslagen</item>
     </plurals>
     <plurals name="profile_stats_minute_listened">
         <item quantity="one">Minuut geluisterd</item>
