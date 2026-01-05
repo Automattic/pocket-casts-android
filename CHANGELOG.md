@@ -21,6 +21,8 @@
         ([#4843](https://github.com/Automattic/pocket-casts-android/pull/4843))
     *   On Wear OS hide archived or played episodes
         ([#4831](https://github.com/Automattic/pocket-casts-android/pull/4831))
+    *   Fix podcast image crash
+        ([#4880](https://github.com/Automattic/pocket-casts-android/pull/4880))
 
 8.2
 -----
