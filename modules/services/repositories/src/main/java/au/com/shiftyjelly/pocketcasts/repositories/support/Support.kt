@@ -486,15 +486,18 @@ class Support @Inject constructor(
             val minutesAgo = (System.currentTimeMillis() - it) / (60 * 1000)
             val timeAgo = when {
                 minutesAgo < 1 -> "just now"
+
                 minutesAgo < 60 -> {
                     val unit = if (minutesAgo == 1L) "minute" else "minutes"
                     "$minutesAgo $unit ago"
                 }
+
                 minutesAgo < 1440 -> {
                     val hoursAgo = minutesAgo / 60
                     val unit = if (hoursAgo == 1L) "hour" else "hours"
                     "$hoursAgo $unit ago"
                 }
+
                 else -> {
                     val daysAgo = minutesAgo / 1440
                     val unit = if (daysAgo == 1L) "day" else "days"
