@@ -430,16 +430,16 @@ class UpNextQueueImpl @Inject constructor(
         }
     }
 
-    internal fun isUserDragging(now: Long = System.currentTimeMillis()): Boolean {
+    override fun isUserDragging(now: Long): Boolean {
         val startTime = dragStartTime ?: return false
 
         // in case the drag start time is never cleared ignore it after a certain period
-        val timeSinceInteraction = (now - startTime).milliseconds
-        val recentInteraction = timeSinceInteraction < DRAG_GRACE_PERIOD
-        if (recentInteraction) {
-            Timber.i("Skipping sync - Up Next drag started ${timeSinceInteraction.inWholeSeconds} secs ago")
+        val timeSince = (now - startTime).milliseconds
+        val isDragging = timeSince < DRAG_GRACE_PERIOD
+        if (isDragging) {
+            Timber.i("Skipping sync - Up Next drag started ${timeSince.inWholeSeconds} secs ago")
         }
-        return recentInteraction
+        return isDragging
     }
 
     private suspend fun sendToServer() {

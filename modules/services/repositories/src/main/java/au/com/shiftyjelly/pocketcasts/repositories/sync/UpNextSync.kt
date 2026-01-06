@@ -35,9 +35,11 @@ import com.pocketcasts.service.api.upNextEpisodeRequest
 import com.pocketcasts.service.api.upNextSyncRequest
 import java.util.Date
 import javax.inject.Inject
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.rx2.await
 import kotlinx.coroutines.rx2.awaitSingleOrNull
 import retrofit2.HttpException
+import timber.log.Timber
 import com.pocketcasts.service.api.UpNextSyncRequest as UpNextProtobufSyncRequest
 
 class UpNextSync @Inject constructor(
@@ -67,8 +69,10 @@ class UpNextSync @Inject constructor(
         val request = buildJsonRequest(changes)
         try {
             val response = syncManager.upNextSync(request)
-            readJsonResponse(response)
-            clearJsonSyncedData(request, upNextChangeDao)
+            if (shouldProcessResponse(changes)) {
+                readJsonResponse(response)
+                clearJsonSyncedData(request, upNextChangeDao)
+            }
         } catch (e: HttpException) {
             if (e.code() != 304) throw e
         }
@@ -176,8 +180,13 @@ class UpNextSync @Inject constructor(
         val request = buildProtobufRequest(changes)
         try {
             val response = syncManager.upNextSyncProtobuf(request)
-            readProtobufResponse(response)
-            clearProtobufSyncedData(request, upNextChangeDao)
+            delay(5000)
+
+            // don't process response if the user has rearranged the Up Next during a sync
+            if (shouldProcessResponse(changes)) {
+                readProtobufResponse(response)
+                clearProtobufSyncedData(request, upNextChangeDao)
+            }
         } catch (e: HttpException) {
             if (e.code() != 304) throw e
         }
@@ -288,6 +297,28 @@ class UpNextSync @Inject constructor(
         upNextQueue.importServerChangesBlocking(episodes, playbackManager, downloadManager)
         // reload the queue to ensure it reflects the imported server changes
         playbackManager.loadQueue()
+    }
+
+    private suspend fun shouldProcessResponse(changes: List<UpNextChange>): Boolean {
+        // don't process response if the user has rearranged the Up Next during a sync or if they are currently dragging
+        return !hasNewReplaceChange(changes) && !upNextQueue.isUserDragging()
+    }
+
+    private suspend fun hasNewReplaceChange(originalChanges: List<UpNextChange>): Boolean {
+        val currentChanges = appDatabase.upNextChangeDao().findAll()
+
+        // find changes that weren't in the sync
+        val originalIds = originalChanges.mapNotNull { it.id }.toSet()
+        val newChanges = currentChanges.filterNot { change ->
+            change.id != null && change.id in originalIds
+        }
+
+        // check if any new change is rearranging the Up Next
+        val rearrangeFound = newChanges.any { it.type == UpNextChange.ACTION_REPLACE }
+        if (rearrangeFound) {
+            Timber.i("Up Next rearrange change found waiting to sync.")
+        }
+        return rearrangeFound
     }
 
     internal fun serverAndLocalEpisodesMatch(serverUuids: List<String>, localUuids: List<String>): Boolean {

@@ -114,7 +114,7 @@ class UpNextSyncTest {
     fun `sync uses JSON implementation when protobuf feature flag is disabled`() = runTest {
         FeatureFlag.setEnabled(Feature.UP_NEXT_SYNC_PROTOBUF, false)
 
-        whenever(upNextChangeDao.findAllBlocking()).thenReturn(emptyList())
+        whenever(upNextChangeDao.findAll()).thenReturn(emptyList())
         whenever(settings.getUpNextServerModified()).thenReturn(0L)
         whenever(syncManager.upNextSync(any())).thenReturn(createJsonResponse())
 
@@ -128,7 +128,7 @@ class UpNextSyncTest {
     fun `sync uses protobuf implementation when feature flag is enabled`() = runTest {
         FeatureFlag.setEnabled(Feature.UP_NEXT_SYNC_PROTOBUF, true)
 
-        whenever(upNextChangeDao.findAllBlocking()).thenReturn(emptyList())
+        whenever(upNextChangeDao.findAll()).thenReturn(emptyList())
         whenever(settings.getUpNextServerModified()).thenReturn(0L)
 
         whenever(syncManager.upNextSyncProtobuf(any())).thenReturn(createProtobufResponse())
@@ -145,7 +145,7 @@ class UpNextSyncTest {
     fun `performJsonSync handles 304 Not Modified response`() = runTest {
         FeatureFlag.setEnabled(Feature.UP_NEXT_SYNC_PROTOBUF, false)
 
-        whenever(upNextChangeDao.findAllBlocking()).thenReturn(emptyList())
+        whenever(upNextChangeDao.findAll()).thenReturn(emptyList())
         whenever(settings.getUpNextServerModified()).thenReturn(123L)
         whenever(syncManager.upNextSync(any())).thenThrow(httpExceptionNotModified())
 
@@ -170,7 +170,7 @@ class UpNextSyncTest {
             modified = 2000L,
         )
 
-        whenever(upNextChangeDao.findAllBlocking()).thenReturn(listOf(change1, change2))
+        whenever(upNextChangeDao.findAll()).thenReturn(listOf(change1, change2))
         whenever(settings.getUpNextServerModified()).thenReturn(0L)
         whenever(episodeManager.findEpisodeByUuid(any())).thenReturn(createPodcastEpisode())
         whenever(syncManager.upNextSync(any())).thenReturn(createJsonResponse())
@@ -193,7 +193,7 @@ class UpNextSyncTest {
             modified = 1000L,
         )
 
-        whenever(upNextChangeDao.findAllBlocking()).thenReturn(listOf(change))
+        whenever(upNextChangeDao.findAll()).thenReturn(listOf(change))
         whenever(settings.getUpNextServerModified()).thenReturn(0L)
         whenever(episodeManager.findEpisodeByUuid("ep1")).thenReturn(episode1)
         whenever(episodeManager.findEpisodeByUuid("ep2")).thenReturn(episode2)
@@ -210,7 +210,7 @@ class UpNextSyncTest {
     fun `performProtobufSync handles 304 Not Modified response`() = runTest {
         FeatureFlag.setEnabled(Feature.UP_NEXT_SYNC_PROTOBUF, true)
 
-        whenever(upNextChangeDao.findAllBlocking()).thenReturn(emptyList())
+        whenever(upNextChangeDao.findAll()).thenReturn(emptyList())
         whenever(settings.getUpNextServerModified()).thenReturn(123L)
         whenever(syncManager.upNextSyncProtobuf(any())).thenThrow(httpExceptionNotModified())
 
@@ -235,7 +235,7 @@ class UpNextSyncTest {
             modified = 2000L,
         )
 
-        whenever(upNextChangeDao.findAllBlocking()).thenReturn(listOf(change1, change2))
+        whenever(upNextChangeDao.findAll()).thenReturn(listOf(change1, change2))
         whenever(settings.getUpNextServerModified()).thenReturn(0L)
         whenever(episodeManager.findEpisodeByUuid(any())).thenReturn(createPodcastEpisode())
         whenever(syncManager.upNextSyncProtobuf(any())).thenReturn(createProtobufResponse())
@@ -258,7 +258,7 @@ class UpNextSyncTest {
             modified = 1000L,
         )
 
-        whenever(upNextChangeDao.findAllBlocking()).thenReturn(listOf(change))
+        whenever(upNextChangeDao.findAll()).thenReturn(listOf(change))
         whenever(settings.getUpNextServerModified()).thenReturn(0L)
         whenever(episodeManager.findEpisodeByUuid("ep1")).thenReturn(episode1)
         whenever(episodeManager.findEpisodeByUuid("ep2")).thenReturn(episode2)
@@ -278,7 +278,7 @@ class UpNextSyncTest {
         val currentEpisode = createPodcastEpisode(uuid = "current")
         val queueEpisodes = listOf(createPodcastEpisode(uuid = "next"))
 
-        whenever(upNextChangeDao.findAllBlocking()).thenReturn(emptyList())
+        whenever(upNextChangeDao.findAll()).thenReturn(emptyList())
         whenever(settings.getUpNextServerModified()).thenReturn(0L) // First login
         whenever(playbackManager.getCurrentEpisode()).thenReturn(currentEpisode)
         whenever(playbackManager.upNextQueue).thenReturn(upNextQueue)
@@ -299,7 +299,7 @@ class UpNextSyncTest {
 
         val serverModified = 5000L
 
-        whenever(upNextChangeDao.findAllBlocking()).thenReturn(emptyList())
+        whenever(upNextChangeDao.findAll()).thenReturn(emptyList())
         whenever(settings.getUpNextServerModified()).thenReturn(serverModified)
         whenever(syncManager.upNextSync(any())).thenReturn(
             createJsonResponse(serverModified = serverModified),
@@ -318,7 +318,7 @@ class UpNextSyncTest {
         val currentEpisode = createPodcastEpisode(uuid = "current")
         val queueEpisodes = listOf(createPodcastEpisode(uuid = "next"))
 
-        whenever(upNextChangeDao.findAllBlocking()).thenReturn(emptyList())
+        whenever(upNextChangeDao.findAll()).thenReturn(emptyList())
         whenever(settings.getUpNextServerModified()).thenReturn(0L) // First login
         whenever(playbackManager.getCurrentEpisode()).thenReturn(currentEpisode)
         whenever(playbackManager.upNextQueue).thenReturn(upNextQueue)
@@ -339,7 +339,7 @@ class UpNextSyncTest {
 
         val serverModified = 5000L
 
-        whenever(upNextChangeDao.findAllBlocking()).thenReturn(emptyList())
+        whenever(upNextChangeDao.findAll()).thenReturn(emptyList())
         whenever(settings.getUpNextServerModified()).thenReturn(serverModified)
         whenever(syncManager.upNextSyncProtobuf(any())).thenReturn(
             createProtobufResponse(serverModified = serverModified),
@@ -518,16 +518,180 @@ class UpNextSyncTest {
         )
     }
 
+    @Test
+    fun `shouldProcessResponse returns true when no new changes and user not dragging`() = runTest {
+        FeatureFlag.setEnabled(Feature.UP_NEXT_SYNC_PROTOBUF, false)
+
+        val originalChanges = listOf(
+            createUpNextChange(id = 1, type = UpNextChange.ACTION_PLAY_NEXT, uuid = "ep1"),
+        )
+
+        whenever(upNextChangeDao.findAll())
+            .thenReturn(originalChanges) // First call for building request
+            .thenReturn(originalChanges) // Second call for checking new changes
+        whenever(upNextQueue.isUserDragging()).thenReturn(false)
+        whenever(settings.getUpNextServerModified()).thenReturn(0L)
+        whenever(syncManager.upNextSync(any())).thenReturn(createJsonResponse())
+
+        upNextSync.sync()
+
+        // Verify response was processed
+        verify(settings).setUpNextServerModified(any())
+    }
+
+    @Test
+    fun `shouldProcessResponse returns false when new REPLACE change exists`() = runTest {
+        FeatureFlag.setEnabled(Feature.UP_NEXT_SYNC_PROTOBUF, false)
+
+        val originalChanges = listOf(
+            createUpNextChange(id = 1, type = UpNextChange.ACTION_PLAY_NEXT, uuid = "ep1"),
+        )
+        val newChanges = originalChanges + createUpNextChange(
+            id = 2,
+            type = UpNextChange.ACTION_REPLACE,
+            uuids = "ep1,ep2",
+        )
+
+        whenever(upNextChangeDao.findAll())
+            .thenReturn(originalChanges) // First call for building request
+            .thenReturn(newChanges) // Second call shows new REPLACE change
+        whenever(upNextQueue.isUserDragging()).thenReturn(false)
+        whenever(settings.getUpNextServerModified()).thenReturn(0L)
+        whenever(syncManager.upNextSync(any())).thenReturn(createJsonResponse(serverModified = 2000L))
+
+        upNextSync.sync()
+
+        // Verify response was NOT processed (server modified not updated)
+        verify(settings, never()).setUpNextServerModified(any())
+    }
+
+    @Test
+    fun `shouldProcessResponse returns false when user is dragging`() = runTest {
+        FeatureFlag.setEnabled(Feature.UP_NEXT_SYNC_PROTOBUF, false)
+
+        val changes = listOf(
+            createUpNextChange(id = 1, type = UpNextChange.ACTION_PLAY_NEXT, uuid = "ep1"),
+        )
+
+        whenever(upNextChangeDao.findAll()).thenReturn(changes)
+        whenever(upNextQueue.isUserDragging()).thenReturn(true)
+        whenever(settings.getUpNextServerModified()).thenReturn(0L)
+        whenever(syncManager.upNextSync(any())).thenReturn(createJsonResponse(serverModified = 2000L))
+
+        upNextSync.sync()
+
+        // Verify response was NOT processed
+        verify(settings, never()).setUpNextServerModified(any())
+    }
+
+    @Test
+    fun `shouldProcessResponse returns false when both new REPLACE change and user dragging`() = runTest {
+        FeatureFlag.setEnabled(Feature.UP_NEXT_SYNC_PROTOBUF, false)
+
+        val originalChanges = listOf(
+            createUpNextChange(id = 1, type = UpNextChange.ACTION_PLAY_NEXT, uuid = "ep1"),
+        )
+        val newChanges = originalChanges + createUpNextChange(
+            id = 2,
+            type = UpNextChange.ACTION_REPLACE,
+            uuids = "ep1,ep2",
+        )
+
+        whenever(upNextChangeDao.findAll())
+            .thenReturn(originalChanges)
+            .thenReturn(newChanges)
+        whenever(upNextQueue.isUserDragging()).thenReturn(true)
+        whenever(settings.getUpNextServerModified()).thenReturn(0L)
+        whenever(syncManager.upNextSync(any())).thenReturn(createJsonResponse(serverModified = 2000L))
+
+        upNextSync.sync()
+
+        // Verify response was NOT processed
+        verify(settings, never()).setUpNextServerModified(any())
+    }
+
+    @Test
+    fun `hasNewReplaceChange returns false when no new changes`() = runTest {
+        FeatureFlag.setEnabled(Feature.UP_NEXT_SYNC_PROTOBUF, false)
+
+        val changes = listOf(
+            createUpNextChange(id = 1, type = UpNextChange.ACTION_PLAY_NEXT, uuid = "ep1"),
+            createUpNextChange(id = 2, type = UpNextChange.ACTION_PLAY_LAST, uuid = "ep2"),
+        )
+
+        whenever(upNextChangeDao.findAll()).thenReturn(changes)
+        whenever(upNextQueue.isUserDragging()).thenReturn(false)
+        whenever(settings.getUpNextServerModified()).thenReturn(0L)
+        whenever(syncManager.upNextSync(any())).thenReturn(createJsonResponse())
+
+        upNextSync.sync()
+
+        // Should process response since no new changes
+        verify(settings).setUpNextServerModified(any())
+    }
+
+    @Test
+    fun `hasNewReplaceChange returns false when new changes exist but none are REPLACE`() = runTest {
+        FeatureFlag.setEnabled(Feature.UP_NEXT_SYNC_PROTOBUF, false)
+
+        val originalChanges = listOf(
+            createUpNextChange(id = 1, type = UpNextChange.ACTION_PLAY_NEXT, uuid = "ep1"),
+        )
+        val newChanges = originalChanges + listOf(
+            createUpNextChange(id = 2, type = UpNextChange.ACTION_PLAY_NEXT, uuid = "ep2"),
+            createUpNextChange(id = 3, type = UpNextChange.ACTION_PLAY_LAST, uuid = "ep3"),
+        )
+
+        whenever(upNextChangeDao.findAll())
+            .thenReturn(originalChanges)
+            .thenReturn(newChanges)
+        whenever(upNextQueue.isUserDragging()).thenReturn(false)
+        whenever(settings.getUpNextServerModified()).thenReturn(0L)
+        whenever(syncManager.upNextSync(any())).thenReturn(createJsonResponse())
+
+        upNextSync.sync()
+
+        // Should process response since no REPLACE changes
+        verify(settings).setUpNextServerModified(any())
+    }
+
+    @Test
+    fun `hasNewReplaceChange returns true when new REPLACE change exists`() = runTest {
+        FeatureFlag.setEnabled(Feature.UP_NEXT_SYNC_PROTOBUF, false)
+
+        val originalChanges = listOf(
+            createUpNextChange(id = 1, type = UpNextChange.ACTION_PLAY_NEXT, uuid = "ep1"),
+        )
+        val newChanges = originalChanges + createUpNextChange(
+            id = 2,
+            type = UpNextChange.ACTION_REPLACE,
+            uuids = "ep1,ep2,ep3",
+        )
+
+        whenever(upNextChangeDao.findAll())
+            .thenReturn(originalChanges)
+            .thenReturn(newChanges)
+        whenever(upNextQueue.isUserDragging()).thenReturn(false)
+        whenever(settings.getUpNextServerModified()).thenReturn(0L)
+        whenever(syncManager.upNextSync(any())).thenReturn(createJsonResponse(serverModified = 2000L))
+
+        upNextSync.sync()
+
+        // Should NOT process response
+        verify(settings, never()).setUpNextServerModified(any())
+    }
+
     // Helper Functions
 
     private fun createUpNextChange(
+        id: Long? = null,
         type: Int,
         uuid: String? = null,
         uuids: String? = null,
         modified: Long = System.currentTimeMillis(),
     ): UpNextChange {
         return UpNextChange(
-            id = null,
+            id = id,
             type = type,
             uuid = uuid,
             uuids = uuids,

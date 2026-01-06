@@ -45,6 +45,7 @@ interface UpNextQueue {
     fun removeAll()
     fun recordUpNextDragStart()
     fun recordUpNextDragStop()
+    fun isUserDragging(now: Long = System.currentTimeMillis()): Boolean
     suspend fun removeAllIncludingChanges()
     suspend fun importServerChangesBlocking(episodes: List<BaseEpisode>, playbackManager: PlaybackManager, downloadManager: DownloadManager)
     fun contains(uuid: String): Boolean
