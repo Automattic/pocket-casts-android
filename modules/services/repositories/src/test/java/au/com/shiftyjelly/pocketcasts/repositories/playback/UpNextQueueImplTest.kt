@@ -32,28 +32,28 @@ class UpNextQueueImplTest {
     }
 
     @Test
-    fun `recentUserInteraction returns false when no previous interaction`() {
-        assertFalse(upNextQueue.recentUserInteraction(now = 15_000L))
+    fun `isUserDragging returns false when no drag time`() {
+        assertFalse(upNextQueue.isUserDragging(now = 15_000L))
     }
 
     @Test
-    fun `recentUserInteraction returns true when within grace period`() {
-        upNextQueue.setLastUserInteractionTimeForTesting(1_000L)
-        // checking 3 seconds later (within 10 second grace period)
-        assertTrue(upNextQueue.recentUserInteraction(now = 1_000L + 3_000L))
+    fun `isUserDragging returns true when within grace period`() {
+        upNextQueue.setDragStartTimeForTesting(1_000L)
+        // checking 4 seconds later (within 10 second grace period)
+        assertTrue(upNextQueue.isUserDragging(now = 1_000L + 3_000L))
     }
 
     @Test
-    fun `recentUserInteraction returns false when exactly at grace period boundary`() {
-        upNextQueue.setLastUserInteractionTimeForTesting(1_000L)
-        // checking exactly 10 seconds later (exactly at grace period)
-        assertFalse(upNextQueue.recentUserInteraction(now = 1_000L + 10_000L))
+    fun `isUserDragging returns false when exactly at grace period boundary`() {
+        upNextQueue.setDragStartTimeForTesting(1_000L)
+        // checking exactly 1 minute later (exactly at grace period)
+        assertFalse(upNextQueue.isUserDragging(now = 1_000L + 60_000L))
     }
 
     @Test
-    fun `recentUserInteraction returns false when outside grace period`() {
-        upNextQueue.setLastUserInteractionTimeForTesting(1_000L)
-        // checking 11 seconds later (outside 10 second grace period)
-        assertFalse(upNextQueue.recentUserInteraction(now = 1_000L + 11_000L))
+    fun `isUserDragging returns false when outside grace period`() {
+        upNextQueue.setDragStartTimeForTesting(1_000L)
+        // checking 61 seconds later (outside 1 minute grace period)
+        assertFalse(upNextQueue.isUserDragging(now = 1_000L + 61_000L))
     }
 }

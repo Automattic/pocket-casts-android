@@ -666,8 +666,12 @@ class PlayerViewModel @Inject constructor(
         playbackManager.changeUpNext(episodes)
     }
 
-    fun recordUpNextUserInteraction() {
-        playbackManager.recordUpNextUserInteraction()
+    fun recordUpNextDragStart() {
+        playbackManager.recordUpNextDragStart()
+    }
+
+    fun recordUpNextDragStop() {
+        playbackManager.recordUpNextDragStop()
     }
 
     fun saveEffects(effects: PlaybackEffects, podcast: Podcast) {

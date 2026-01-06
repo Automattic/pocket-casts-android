@@ -26,6 +26,7 @@ import javax.inject.Inject
 import kotlin.coroutines.CoroutineContext
 import kotlin.random.Random
 import kotlin.time.Duration.Companion.milliseconds
+import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -52,14 +53,14 @@ class UpNextQueueImpl @Inject constructor(
 
     companion object {
         private val CHANGE_GRACE_PERIOD = 5.seconds
-        private val INTERACTION_GRACE_PERIOD = 10.seconds
+        private val DRAG_GRACE_PERIOD = 1.minutes
     }
 
     private val upNextDao = appDatabase.upNextDao()
     private val upNextChangeDao = appDatabase.upNextChangeDao()
     private val podcastDao = appDatabase.podcastDao()
 
-    @Volatile private var lastUserInteractionTime: Long = 0
+    @Volatile private var dragStartTime: Long? = null
 
     override val coroutineContext: CoroutineContext
         get() = Dispatchers.Default
@@ -102,7 +103,7 @@ class UpNextQueueImpl @Inject constructor(
         // Skips sync during user interactions such as dragging to rearrange.
         changesObservable.asFlow()
             .debounce(CHANGE_GRACE_PERIOD)
-            .filterNot { recentUserInteraction() }
+            .filterNot { isUserDragging() }
             .onEach { sendToServer() }
             .catch { error -> Timber.e(error) }
             .flowOn(Dispatchers.IO)
@@ -333,12 +334,16 @@ class UpNextQueueImpl @Inject constructor(
         saveChangesBlocking(UpNextAction.Rearrange(mutableEpisodes))
     }
 
-    override fun recordUpNextUserInteraction() {
-        lastUserInteractionTime = System.currentTimeMillis()
+    override fun recordUpNextDragStart() {
+        dragStartTime = System.currentTimeMillis()
     }
 
-    internal fun setLastUserInteractionTimeForTesting(time: Long) {
-        lastUserInteractionTime = time
+    override fun recordUpNextDragStop() {
+        dragStartTime = null
+    }
+
+    internal fun setDragStartTimeForTesting(time: Long) {
+        dragStartTime = time
     }
 
     /**
@@ -425,11 +430,14 @@ class UpNextQueueImpl @Inject constructor(
         }
     }
 
-    internal fun recentUserInteraction(now: Long = System.currentTimeMillis()): Boolean {
-        val timeSinceInteraction = (now - lastUserInteractionTime).milliseconds
-        val recentInteraction = timeSinceInteraction < INTERACTION_GRACE_PERIOD
+    internal fun isUserDragging(now: Long = System.currentTimeMillis()): Boolean {
+        val startTime = dragStartTime ?: return false
+
+        // in case the drag start time is never cleared ignore it after a certain period
+        val timeSinceInteraction = (now - startTime).milliseconds
+        val recentInteraction = timeSinceInteraction < DRAG_GRACE_PERIOD
         if (recentInteraction) {
-            Timber.i("Skipping sync - user interacted ${timeSinceInteraction.inWholeSeconds} secs ago")
+            Timber.i("Skipping sync - Up Next drag started ${timeSinceInteraction.inWholeSeconds} secs ago")
         }
         return recentInteraction
     }

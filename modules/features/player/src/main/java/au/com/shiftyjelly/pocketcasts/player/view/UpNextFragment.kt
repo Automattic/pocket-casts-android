@@ -132,7 +132,7 @@ class UpNextFragment :
     )
 
     private var userRearrangingFrom: Int? = null
-    private var userDraggingStart: Int? = null
+    private var userDraggingStartMs: Int? = null
     private var playingEpisodeAtStartOfDrag: String? = null
 
     private var realBinding: FragmentUpnextBinding? = null
@@ -449,9 +449,10 @@ class UpNextFragment :
 
     override fun onUpNextEpisodeStartDrag(viewHolder: RecyclerView.ViewHolder) {
         val itemTouchHelper = itemTouchHelper ?: return
+        playerViewModel.recordUpNextDragStart()
         itemTouchHelper.startDrag(viewHolder)
         viewHolder.setIsRecyclable(false)
-        userDraggingStart = viewHolder.bindingAdapterPosition
+        userDraggingStartMs = viewHolder.bindingAdapterPosition
     }
 
     override fun onEpisodeActionsClick(episodeUuid: String, podcastUuid: String?) {
@@ -483,8 +484,6 @@ class UpNextFragment :
     }
 
     override fun onUpNextEpisodeMove(fromPosition: Int, toPosition: Int) {
-        playerViewModel.recordUpNextUserInteraction()
-
         if (userRearrangingFrom == null) {
             userRearrangingFrom = fromPosition
         } else if (userRearrangingFrom != fromPosition) {
@@ -506,6 +505,8 @@ class UpNextFragment :
     }
 
     override fun onUpNextItemTouchHelperFinished(position: Int) {
+        playerViewModel.recordUpNextDragStop()
+
         if (playingEpisodeAtStartOfDrag == playbackManager.upNextQueue.currentEpisode?.uuid) {
             playerViewModel.changeUpNextEpisodes(upNextItems.subList(1, upNextItems.size).filterIsInstance<BaseEpisode>())
         } else {
@@ -515,8 +516,8 @@ class UpNextFragment :
             }
         }
 
-        userDraggingStart?.let { dragStartPosition ->
-            if (position != userDraggingStart) {
+        userDraggingStartMs?.let { dragStartPosition ->
+            if (position != userDraggingStartMs) {
                 trackUpNextEvent(
                     AnalyticsEvent.UP_NEXT_QUEUE_REORDERED,
                     mapOf(
@@ -529,7 +530,7 @@ class UpNextFragment :
         }
 
         userRearrangingFrom = null
-        userDraggingStart = null
+        userDraggingStartMs = null
         playingEpisodeAtStartOfDrag = null
     }
 

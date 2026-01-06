@@ -63,7 +63,7 @@ class UpNextSync @Inject constructor(
 
     private suspend fun performJsonSync() {
         val upNextChangeDao = appDatabase.upNextChangeDao()
-        val changes = upNextChangeDao.findAllBlocking()
+        val changes = upNextChangeDao.findAll()
         val request = buildJsonRequest(changes)
         try {
             val response = syncManager.upNextSync(request)
@@ -172,7 +172,7 @@ class UpNextSync @Inject constructor(
 
     private suspend fun performProtobufSync() {
         val upNextChangeDao = appDatabase.upNextChangeDao()
-        val changes = upNextChangeDao.findAllBlocking()
+        val changes = upNextChangeDao.findAll()
         val request = buildProtobufRequest(changes)
         try {
             val response = syncManager.upNextSyncProtobuf(request)

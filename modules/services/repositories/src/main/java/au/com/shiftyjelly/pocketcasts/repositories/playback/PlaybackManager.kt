@@ -749,8 +749,12 @@ open class PlaybackManager @Inject constructor(
         }
     }
 
-    fun recordUpNextUserInteraction() {
-        upNextQueue.recordUpNextUserInteraction()
+    fun recordUpNextDragStart() {
+        upNextQueue.recordUpNextDragStart()
+    }
+
+    fun recordUpNextDragStop() {
+        upNextQueue.recordUpNextDragStop()
     }
 
     fun pause(transientLoss: Boolean = false, sourceView: SourceView = SourceView.UNKNOWN) {
