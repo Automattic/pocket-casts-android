@@ -18,4 +18,6 @@ internal class InMemoryFeatureProvider : ModifiableFeatureProvider {
     override fun hasFeature(feature: Feature) = true
 
     override fun isEnabled(feature: Feature) = features[feature] ?: feature.defaultValue
+
+    override suspend fun awaitInitialization() = true
 }
