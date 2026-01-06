@@ -3,6 +3,7 @@ package au.com.shiftyjelly.pocketcasts.repositories.playback
 import android.annotation.SuppressLint
 import androidx.annotation.OptIn
 import androidx.media3.common.C
+import androidx.media3.common.audio.AudioProcessor
 import androidx.media3.common.audio.AudioProcessor.AudioFormat
 import androidx.media3.common.audio.AudioProcessor.UnhandledAudioFormatException
 import androidx.media3.common.audio.BaseAudioProcessor
@@ -105,7 +106,8 @@ class ShiftyTrimSilenceProcessor(
         paddingBufferSize = 0
     }
 
-    override fun onFlush() {
+    override fun onFlush(streamMetadata: AudioProcessor.StreamMetadata) {
+        super.onFlush(streamMetadata)
         if (enabled) {
             onSkippedListener.onSkippedFrames(skippedFrames.frameCountToDuration())
 
